@@ -77,24 +77,24 @@ BOOL CAnimeList::Read() {
   // Read anime list
   for (xml_node anime = myanimelist.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
     AddItem(XML_ReadIntValue(anime, L"series_animedb_id"),
-        XML_ReadStrValue(anime, L"series_title"),
-        XML_ReadStrValue(anime, L"series_synonyms"),
-        XML_ReadIntValue(anime, L"series_type"),
-        XML_ReadIntValue(anime, L"series_episodes"),
-        XML_ReadIntValue(anime, L"series_status"),
-        XML_ReadStrValue(anime, L"series_start"),
-        XML_ReadStrValue(anime, L"series_end"),
-        XML_ReadStrValue(anime, L"series_image"),
-        XML_ReadIntValue(anime, L"my_id"),
-        XML_ReadIntValue(anime, L"my_watched_episodes"),
-        XML_ReadStrValue(anime, L"my_start_date"),
-        XML_ReadStrValue(anime, L"my_finish_date"),
-        XML_ReadIntValue(anime, L"my_score"),
-        XML_ReadIntValue(anime, L"my_status"),
-        XML_ReadIntValue(anime, L"my_rewatching"),
-        XML_ReadIntValue(anime, L"my_rewatching_ep"),
-        XML_ReadStrValue(anime, L"my_last_updated"),
-        XML_ReadStrValue(anime, L"my_tags"));
+      XML_ReadStrValue(anime, L"series_title"),
+      XML_ReadStrValue(anime, L"series_synonyms"),
+      XML_ReadIntValue(anime, L"series_type"),
+      XML_ReadIntValue(anime, L"series_episodes"),
+      XML_ReadIntValue(anime, L"series_status"),
+      XML_ReadStrValue(anime, L"series_start"),
+      XML_ReadStrValue(anime, L"series_end"),
+      XML_ReadStrValue(anime, L"series_image"),
+      XML_ReadIntValue(anime, L"my_id"),
+      XML_ReadIntValue(anime, L"my_watched_episodes"),
+      XML_ReadStrValue(anime, L"my_start_date"),
+      XML_ReadStrValue(anime, L"my_finish_date"),
+      XML_ReadIntValue(anime, L"my_score"),
+      XML_ReadIntValue(anime, L"my_status"),
+      XML_ReadIntValue(anime, L"my_rewatching"),
+      XML_ReadIntValue(anime, L"my_rewatching_ep"),
+      XML_ReadStrValue(anime, L"my_last_updated"),
+      XML_ReadStrValue(anime, L"my_tags"));
   }
 
   return TRUE;

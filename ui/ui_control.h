@@ -286,7 +286,7 @@ public:
   LPCWSTR GetButtonTooltip(int nIndex);
   DWORD   GetPadding();
   BOOL    InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled, 
-             BYTE fsStyle, DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip);
+            BYTE fsStyle, DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip);
   BOOL    SetButtonImage(int nIndex, int iImage);
   BOOL    SetButtonText(int nIndex, LPCWSTR lpText);
   BOOL    SetButtonTooltip(int nIndex, LPCWSTR lpTooltip);

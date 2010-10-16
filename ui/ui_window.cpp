@@ -1,4 +1,20 @@
-// ui_window.cpp
+/*
+** Taiga, a lightweight client for MyAnimeList
+** Copyright (C) 2010, Eren Okka
+** 
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+** 
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+** 
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "ui_main.h"
 #include "ui_taskbar.h"
@@ -316,7 +332,7 @@ HWND CWindow::SetFocus() const {
 }
 
 void CWindow::SetFont(LPCWSTR lpFaceName, int iSize, bool bBold, bool bItalic, bool bUnderline) {
-  HDC hDC  = ::GetDC(m_hWindow);
+  HDC hDC = ::GetDC(m_hWindow);
   HFONT hFontOld = reinterpret_cast<HFONT>(::GetCurrentObject(hDC, OBJ_FONT));
   LOGFONT lFont; ::GetObject(hFontOld, sizeof(LOGFONT), &lFont);
   
@@ -325,10 +341,10 @@ void CWindow::SetFont(LPCWSTR lpFaceName, int iSize, bool bBold, bool bItalic, b
   }
   if (iSize) {
     lFont.lfHeight = -MulDiv(iSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
-    lFont.lfWidth  = 0;
+    lFont.lfWidth = 0;
   }
-  lFont.lfItalic    = bItalic;
-  lFont.lfWeight    = bBold ? FW_BOLD : FW_NORMAL;
+  lFont.lfItalic = bItalic;
+  lFont.lfWeight = bBold ? FW_BOLD : FW_NORMAL;
   lFont.lfUnderline = bUnderline;
 
   if (m_hFont) ::DeleteObject(m_hFont);
@@ -536,10 +552,10 @@ LRESULT CWindow::WindowProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
     }
     default: {
       if (uMsg == WM_TASKBARCREATED || 
-        uMsg == WM_TASKBARBUTTONCREATED || 
-        uMsg == WM_TASKBARCALLBACK) {
-        OnTaskbarCallback(uMsg, lParam);
-        return 0;
+          uMsg == WM_TASKBARBUTTONCREATED || 
+          uMsg == WM_TASKBARCALLBACK) {
+            OnTaskbarCallback(uMsg, lParam);
+            return 0;
       }
       break;
     }
