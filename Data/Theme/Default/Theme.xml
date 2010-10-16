@@ -1,0 +1,335 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<theme>
+	<!-- Icons -->
+	<!-- Fugue Icons by Yusuke Kamiyamane - http://p.yusukekamiyamane.com -->
+
+	<!-- List -->
+	<list>
+		<progress>
+			<background type="progress" value_1="FCFCFC" value_2="EBEBEB" value_3="E5E5E5"/>
+			<border     type="solid"    value_1="E8E8E8"/>
+			<completed  type="progress" value_1="E0F0FF" value_2="88E0FF" value_3="33DDFF"/>
+			<dropped    type="progress" value_1="FFDDDD" value_2="FF8888" value_3="FF5555"/>
+			<watching   type="progress" value_1="DDFFDD" value_2="88FF88" value_3="33FF33"/>
+			<unknown    type="progress" value_1="FCFFFC" value_2="DDFFDD" value_3="C0FFC0"/>
+		</progress>
+	</list>
+
+	<!-- Menus -->
+	<menus>
+		<!-- Main -->
+		<menu name="Main" type="menubar">
+			<item name="File"    sub="File"/>
+			<item name="Account" sub="Account"/>
+			<item name="List"    sub="List"/>
+			<item name="Help"    sub="Help"/>
+		</menu>
+		
+		<!-- File -->
+		<menu name="File">
+			<item name="Folders" sub="Folders"/>
+			<item type="seperator"/>
+			<item name="Settings" action="Settings()"/>
+			<item name="Tools" sub="Tools"/>
+			<item name="Torrents" action="Torrents()"/>
+			<item type="seperator"/>
+			<item name="Exit" action="Exit()"/>
+		</menu>
+		<!-- Account -->
+		<menu name="Account">
+			<item name="Log in" action="LoginLogout()"/>
+			<item name="Download anime list" action="RefreshList()"/>
+			<item type="seperator"/>
+			<item name="Check queued events" action="CheckEventBuffer()"/>
+			<item name="Toggle updates" action="ToggleUpdates()" checked="1"/>
+			<item type="seperator"/>
+			<item name="MyAnimeList" sub="MyAnimeList"/>
+		</menu>
+			<!-- MyAnimeList -->
+			<menu name="MyAnimeList">
+				<item name="View my panel" 	 action="ViewPanel()"/>
+				<item name="View my profile" action="ViewProfile()"/>
+				<item name="View my history" action="ViewHistory()"/>
+			</menu>
+		<!-- List -->
+		<menu name="List">
+			<item name="Announce current episode" sub="Announce"/>
+			<item name="Check new episodes" action="CheckNewEpisodes()"/>
+			<item name="Play random anime" action="PlayRandomAnime()"/>
+			<item type="seperator"/>
+			<item name="Filter" sub="Filter"/>
+		</menu>
+			<!-- Announce -->
+			<menu name="Announce">
+				<item name="HTTP"      action="AnnounceToHTTP(true)"/>
+				<item name="Messenger" action="AnnounceToMessenger(true)"/>
+				<item name="mIRC"      action="AnnounceToMIRC(true)"/>
+				<item name="Skype"     action="AnnounceToSkype(true)"/>
+				<!--<item name="Twitter"   action="AnnounceToTwitter(true)"/>-->
+			</menu>
+			<!-- Filter -->
+			<menu name="Filter">
+				<item name="Status" sub="FilterStatus"/>
+				<item name="Type"   sub="FilterType"/>
+				<item type="seperator"/>
+				<item name="Reset" action="FilterReset"/>
+			</menu>
+				<!-- Status -->
+				<menu name="FilterStatus">
+					<item name="Currently airing" action="FilterStatus(1)"/>
+					<item name="Finished airing"  action="FilterStatus(2)"/>
+					<item name="Not yet aired"    action="FilterStatus(3)"/>
+				</menu>
+				<!-- Type -->
+				<menu name="FilterType">
+					<item name="TV"      action="FilterType(1)"/>
+					<item name="OVA"     action="FilterType(2)"/>
+					<item name="Movie"   action="FilterType(3)"/>
+					<item name="Special" action="FilterType(4)"/>
+					<item name="ONA"     action="FilterType(5)"/>
+					<item name="Music"   action="FilterType(6)"/>
+				</menu>
+		<!-- Folders -->
+		<menu name="Folders">
+			<!-- Note: Overwritten -->
+			<item name="Add new folder..." action="AddFolder()"/>
+		</menu>
+		<!-- Tools -->
+		<menu name="Tools">
+			<item name="Fansub groups" sub="Fansub"/>
+			<item name="Useful links"  sub="Links"/>
+			<!--<item type="seperator"/>
+			<item name="Customize..." action="CustomizeTools()" disabled="1"/>-->
+		</menu>
+			<!-- Fansub groups -->
+			<menu name="Fansub">
+				<!-- Note: This is just another example of custom menus. You can add your favorite groups here. -->
+				<item name="ANBU"         action="URL(http://anbudom.net/)"/>
+				<item name="AniYoshi"     action="URL(http://www.animeyoshi.net/)"/>
+				<item name="Dattebayo"    action="URL(http://www.dattebayo.com/)"/>
+				<item name="Eclipse"      action="URL(http://eclipse.speedsubs.org/)"/>
+				<item name="Frostii"      action="URL(http://frostii.com/)"/>
+				<item name="gg"           action="URL(http://www.ggkthx.org/)"/>
+				<item name="m.3.3.w"      action="URL(http://m33w-fansubs.com/)"/>
+				<item name="Menclave"     action="URL(http://www.mymenclave.com/)"/>
+				<item name="Shinsen-Subs" action="URL(http://www.shinsen-subs.org/)"/>
+				<item name="Static-Subs"  action="URL(http://www.staticsubs.org/)"/>
+				<item name="THORA"        action="URL(http://www.thoranime.org/)"/>
+			</menu>
+			<!-- Useful links -->
+			<menu name="Links">
+				<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
+				<item name="The Fansub Wiki"  action="URL(http://www.fansubwiki.com/)"/>
+			</menu>
+		<!-- Help -->
+		<menu name="Help">
+			<!--<item name="Help" action="Help()" disabled="1"/>-->
+			<item name="About Taiga" action="About()"/>
+		</menu>
+		
+		<!-- Search bar -->
+		<menu name="SearchBar">
+			<item name="List"        action="SetSearchMode(List)" radio="1"/>
+			<item name="MyAnimeList" action="SetSearchMode(MAL)"  radio="1"/>
+		</menu>
+		
+		<!-- Search list -->
+		<menu name="SearchList">
+			<item name="Information" action="Info()" default="1"/>
+			<item type="seperator"/>
+			<item name="Add to list" sub="AddToList" disabled="1"/>
+		</menu>
+			<menu name="AddToList">
+				<item name="Currently watching" action="AddToListAs(1)"/>
+				<item name="Completed"          action="AddToListAs(2)"/>
+				<item name="On hold"            action="AddToListAs(3)"/>
+				<item name="Dropped"            action="AddToListAs(4)"/>
+				<item name="Plan to watch"      action="AddToListAs(6)"/>
+			</menu>
+		
+		<!-- Right click -->
+		<menu name="RightClick">
+			<item name="Information" action="Info()"/>
+			<item type="seperator"/>
+			<item name="Edit"        sub="Edit"/>
+			<item name="Search"      sub="Search"/>
+			<item type="seperator"/>
+			<item name="Open folder" action="OpenFolder()"/>
+			<item name="Play" sub="Play"/>
+		</menu>
+			<!-- Edit -->
+			<menu name="Edit">
+				<item name="Edit all..." action="EditAll()"/>
+				<item type="seperator"/>
+				<item name="Episode..." action="EditEpisode()"/>
+				<item name="Score"      sub="EditScore"/>
+				<item name="Status"     sub="EditStatus"/>
+				<item name="Tags..."    action="EditTags()"/>
+				<item name="Titles..."  action="EditTitles()"/>
+				<item type="seperator"/>
+				<item name="Delete"  action="EditDelete()"/>
+			</menu>
+				<!-- Score -->
+				<menu name="EditScore">
+					<item name="(0) No Score"     action="EditScore(0)"  radio="1"/>
+					<item name="(1) Unwatchable"  action="EditScore(1)"  radio="1"/>
+					<item name="(2) Horrible"     action="EditScore(2)"  radio="1"/>
+					<item name="(3) Very Bad"     action="EditScore(3)"  radio="1"/>
+					<item name="(4) Bad"          action="EditScore(4)"  radio="1"/>
+					<item name="(5) Average"      action="EditScore(5)"  radio="1"/>
+					<item name="(6) Fine"         action="EditScore(6)"  radio="1"/>
+					<item name="(7) Good"         action="EditScore(7)"  radio="1"/>
+					<item name="(8) Very Good"    action="EditScore(8)"  radio="1"/>
+					<item name="(9) Great"        action="EditScore(9)"  radio="1"/>
+					<item name="(10) Masterpiece" action="EditScore(10)" radio="1"/>
+				</menu>
+				<!-- Status -->
+				<menu name="EditStatus">
+					<item name="Currently watching" action="EditStatus(1)" radio="1"/>
+					<item name="Completed"          action="EditStatus(2)" radio="1"/>
+					<item name="On hold"            action="EditStatus(3)" radio="1"/>
+					<item name="Dropped"            action="EditStatus(4)" radio="1"/>
+					<item name="Plan to watch"      action="EditStatus(6)" radio="1"/>
+				</menu>
+			<!-- Search -->
+			<menu name="Search">
+				<!-- Note: You can customize this list too. Use %title% as the search string. -->
+				<item name="AniDB"        action="URL(http://anidb.net/perl-bin/animedb.pl?show=animelist&adb.search=%title%&noalias=1&do.update=update)"/>
+				<item name="AnimeNfo"     action="URL(http://www.animenfo.com/search.php?query=%title%&queryin=anime_titles&action=Go&option=keywords)"/>
+				<item name="ANN"          action="URL(http://www.animenewsnetwork.com/search?cx=016604166282602569737%3Aznd1ysjewre&cof=FORID%3A11&q=<SEARCH>)"/>
+				<item name="MyAnimeList"  action="URL(http://myanimelist.net/anime.php?q=%title%)"/>
+				<item name="Wikipedia"    action="URL(http://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
+				<item type="seperator"/>
+				<item name="NyaaTorrents" action="SearchTorrents(http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2&term=%title%)"/>
+				<item name="TokyoTosho"   action="SearchTorrents(http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&_id=a1de48c2d65e13f4e022a982432b41b0&_render=rss)"/>
+			</menu>
+			<!-- Play -->
+			<menu name="Play">
+				<!-- Note: Overwritten -->
+				<item name="Last watched"   action="PlayLast()"/>
+				<item name="Next episode"   action="PlayNext()"/>
+				<item name="Random episode" action="PlayRandom()"/>
+				<item type="seperator"/>
+				<item name="Episode" sub="PlayEpisode"/>
+			</menu>
+				<!-- Play > Episode -->
+				<menu name="PlayEpisode">
+					<!-- Note: Overwritten -->
+					<item name="#1" action="PlayEpisode(1)"/>
+				</menu>
+		
+		<!-- Tray -->
+		<menu name="Tray">
+			<item name="Settings..." action="Settings()"/>
+			<item type="seperator"/>
+			<item name="Toggle updates" action="ToggleUpdates()"/>
+			<item name="Anime folders" sub="Folders"/>
+			<item name="MyAnimeList"   sub="MyAnimeList"/>
+			<item type="seperator"/>
+			<item name="Exit" action="Exit()"/>
+		</menu>
+		
+		<!-- Generic list menu -->
+		<menu name="GenericList">
+			<item name="Select all"   action="SelectAll()"/>
+			<item name="Deselect all" action="DeselectAll()"/>
+		</menu>
+		
+		<!-- Anime folders editing -->
+		<menu name="AnimeFoldersEdit">
+			<item name="Browse..." action="AnimeFolders_Browse()" default="1"/>
+			<item name="Clear"     action="AnimeFolders_Clear()"/>
+			<item name="Search"    action="AnimeFolders_Search()"/>
+			<item type="seperator"/>
+			<item name="Clear all folders" action="AnimeFolders_ClearAll()"/>
+		</menu>
+		
+		<!-- Torrent list right click -->
+		<menu name="TorrentListRightClick">
+			<item name="Download" action="DownloadTorrent" default="1"/>
+			<item type="seperator"/>
+			<item name="Search more torrents for this title" action="MoreTorrents"/>
+			<item name="Search MyAnimeList for this title" action="SearchMAL"/>
+		</menu>
+		
+		<!-- Script functions and variables -->
+		<menu name="ScriptAdd">
+			<item name="Character" sub="ScriptAddCharacter"/>
+			<item name="Function"  sub="ScriptAddFunction"/>
+			<item name="Variable"  sub="ScriptAddVariable"/>
+		</menu>
+			<menu name="ScriptAddCharacter">
+				<item name="IRC characters" sub="IRCCharacters"/>
+				<item name="New line (\n)"       action="\n"/>
+				<item name="Horizontal tab (\t)" action="\t"/>
+			</menu>
+				<menu name="IRCCharacters">
+					<item name="Bold" action="&#2;"/>
+					<item name="Color" sub="IRCColors"/>
+					<item name="Italic" action="&#29;"/>
+					<item name="Reverse" action="&#22;"/>
+					<item name="Underline" action="&#31;"/>
+					<item type="seperator"/>
+					<item name="Disable all" action="&#15;"/>
+				</menu>
+					<menu name="IRCColors">
+						<item name="00 - White"       action="&#3;00"/>
+						<item name="01 - Black"       action="&#3;01"/>
+						<item name="02 - Blue"        action="&#3;02"/>
+						<item name="03 - Green"       action="&#3;03"/>
+						<item name="04 - Light red"   action="&#3;04"/>
+						<item name="05 - Brown"       action="&#3;05"/>
+						<item name="06 - Purple"      action="&#3;06"/>
+						<item name="07 - Orange"      action="&#3;07"/>
+						<item name="08 - Yellow"      action="&#3;08"/>
+						<item name="09 - Light green" action="&#3;09"/>
+						<item name="10 - Cyan"        action="&#3;10"/>
+						<item name="11 - Light cyan"  action="&#3;11"/>
+						<item name="12 - Light blue"  action="&#3;12"/>
+						<item name="13 - Pink"        action="&#3;13"/>
+						<item name="14 - Grey"        action="&#3;14"/>
+						<item name="15 - Light grey"  action="&#3;15"/>
+					</menu>
+			<menu name="ScriptAddFunction">
+				<item name="cut()"     action="$cut(string,len)"/>
+				<item name="equal()"   action="$equal(x,y)"/>
+				<item name="gequal()"  action="$gequal(x,y)"/>
+				<item name="greater()" action="$greater(x,y)"/>
+				<item name="if()"      action="$if(cond,then,else)"/>
+				<item name="ifequal()" action="$ifequal(n1,n2,then,else)"/>
+				<item name="lequal()"  action="$lequal(x,y)"/>
+				<item name="len()"     action="$len(string)"/>
+				<item name="less()"    action="$less(x,y)"/>
+				<item name="lower()"   action="$lower(string)"/>
+				<item name="num()"     action="$num(n,len)"/>
+				<item name="pad()"     action="pad$(s,len,chars)"/>
+				<item name="replace()" action="replace$(a,b,c)"/>
+				<item name="substr()"  action="substr$(s,pos,n)"/>
+				<item name="triml()"   action="triml$(s,c)"/>
+				<item name="trimr()"   action="trimr$(s,c)"/>
+				<item name="upper()"   action="$upper(string)"/>
+			</menu>
+			<menu name="ScriptAddVariable">
+				<item name="audio"      action="%audio%"/>
+				<item name="checksum"   action="%checksum%"/>
+				<item name="episode"    action="%episode%"/>
+				<item name="extra"      action="%extra%"/>
+				<item name="file"       action="%file%"/>
+				<item name="folder"     action="%folder%"/>
+				<item name="group"      action="%group%"/>
+				<item name="id"         action="%id%"/>
+				<item name="image"      action="%image%"/>
+				<item name="name"       action="%name%"/>
+				<item name="playstatus" action="%playstatus%"/>
+				<item name="resolution" action="%resolution%"/>
+				<item name="score"      action="%score%"/>
+				<item name="status"     action="%status%"/>
+				<item name="title"      action="%title%"/>
+				<item name="total"      action="%total%"/>
+				<item name="user"       action="%user%"/>
+				<item name="version"    action="%version%"/>
+				<item name="video"      action="%video%"/>
+				<item name="watched"    action="%watched%"/>
+			</menu>
+	</menus>
+</theme>
