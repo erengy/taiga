@@ -58,6 +58,7 @@ BOOL CAnimeWindow::OnInitDialog() {
     ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
     CDC dc = GetDC();
     lstrcpy(lFont.lfFaceName, L"Verdana");
+    lFont.lfCharSet = DEFAULT_CHARSET;
     lFont.lfHeight = -MulDiv(12, GetDeviceCaps(dc.Get(), LOGPIXELSY), 72);
     lFont.lfWeight = FW_BOLD;
     m_hfTitle = ::CreateFontIndirect(&lFont);
@@ -137,7 +138,7 @@ void CAnimeWindow::Refresh(CAnime* pAnimeItem) {
   SetDlgItemText(IDC_STATIC_ANIME_INFO2, text.c_str());
 
   // Load image
-  if (AnimeImage.Load(Taiga.GetDataPath() + L"Image\\" + WSTR(m_pAnimeItem->Series_ID) + L".jpg")) {
+  if (AnimeImage.Load(Taiga.GetDataPath() + L"Image\\" + ToWSTR(m_pAnimeItem->Series_ID) + L".jpg")) {
     CWindow img = GetDlgItem(IDC_STATIC_ANIME_IMG);
     img.SetPosition(NULL, AnimeImage.Rect);
     img.SetWindowHandle(NULL);

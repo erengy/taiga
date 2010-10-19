@@ -83,11 +83,11 @@ BOOL CMediaPlayers::Write() {
     player.append_child().set_name(L"name");
     player.child(L"name").append_child(node_pcdata).set_value(Item[i].Name.c_str());
     player.append_child().set_name(L"enabled");
-    player.child(L"enabled").append_child(node_pcdata).set_value(WSTR(Item[i].Enabled).c_str());
+    player.child(L"enabled").append_child(node_pcdata).set_value(ToWSTR(Item[i].Enabled).c_str());
     player.append_child().set_name(L"visible");
-    player.child(L"visible").append_child(node_pcdata).set_value(WSTR(Item[i].Visible).c_str());
+    player.child(L"visible").append_child(node_pcdata).set_value(ToWSTR(Item[i].Visible).c_str());
     player.append_child().set_name(L"mode");
-    player.child(L"mode").append_child(node_pcdata).set_value(WSTR(Item[i].Mode).c_str());
+    player.child(L"mode").append_child(node_pcdata).set_value(ToWSTR(Item[i].Mode).c_str());
     XML_WriteChildNodes(player, Item[i].Class, L"class");
     XML_WriteChildNodes(player, Item[i].File, L"file");
     XML_WriteChildNodes(player, Item[i].Folder, L"folder");

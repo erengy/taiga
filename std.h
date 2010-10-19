@@ -36,9 +36,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-
 using std::string;
 using std::vector;
 using std::wstring;

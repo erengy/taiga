@@ -102,7 +102,8 @@ public:
   BOOL    SetPosition(HWND hInsertAfter, const RECT& rc, UINT uFlags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER) const;
   BOOL    SetRedraw(BOOL bRedraw) const;
   void    SetStyle(UINT style, UINT style_not, int nIndex = GWL_STYLE);
-  BOOL    SetText(LPCWSTR lpszString);
+  BOOL    SetText(LPCWSTR lpszString) const;
+  BOOL    SetText(const std::wstring& str) const;
   HRESULT SetTheme(LPCWSTR pszName = L"explorer") const;
   BOOL    SetTransparency(BYTE alpha, COLORREF color = 0xFF000000);
   BOOL    Show(int nCmdShow = SW_SHOWNORMAL) const;

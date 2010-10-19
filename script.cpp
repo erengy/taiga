@@ -172,7 +172,7 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
   // $len(string)
   // Returns length of string in characters.
   } else if (func_name == L"len") {
-    str = WSTR(body_parts[0].length());
+    str = ToWSTR(static_cast<int>(body_parts[0].length()));
 
   // $lower(string)
   // Converts string to lowercase.
@@ -281,9 +281,9 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].My_WatchedEpisodes, L"")), L""));
   Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].Series_Episodes, L"")), L""));
   Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].My_Score, L"")), L""));
-  Replace(str, L"%id%",      VALIDATE(ENCODE(WSTR(AnimeList.Item[episode.Index].Series_ID)), L""));
+  Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].Series_ID)), L""));
   Replace(str, L"%image%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Image), L""));
-  Replace(str, L"%status%",  VALIDATE(ENCODE(WSTR(AnimeList.Item[episode.Index].My_Status)), L""));
+  Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].My_Status)), L""));
   Replace(str, L"%name%",       ENCODE(episode.Name));
   Replace(str, L"%episode%",    ENCODE(GetLastEpisode(episode.Number)));
   Replace(str, L"%version%",    ENCODE(episode.Version));

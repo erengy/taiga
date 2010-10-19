@@ -395,8 +395,12 @@ void CWindow::SetStyle(UINT style, UINT style_not, int nIndex) {
   ::SetWindowLongPtr(m_hWindow, nIndex, (old_style | style) & ~style_not);
 }
 
-BOOL CWindow::SetText(LPCWSTR lpszString) {
+BOOL CWindow::SetText(LPCWSTR lpszString) const {
   return ::SendMessage(m_hWindow, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(lpszString));
+}
+
+BOOL CWindow::SetText(const std::wstring& str) const {
+  return SetText(str.c_str());
 }
 
 HRESULT CWindow::SetTheme(LPCWSTR pszName) const {

@@ -92,8 +92,8 @@ BOOL CAnimeEditWindow::OnInitDialog() {
   }
   // Finish date
   if (AnimeList.Item[m_Index].My_FinishDate == L"0000-00-00" ||
-    AnimeList.Item[m_Index].My_FinishDate.empty()) {
-      SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, NULL);
+      AnimeList.Item[m_Index].My_FinishDate.empty()) {
+        SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, NULL);
   } else {
     SYSTEMTIME st;
     st.wYear  = ToINT(AnimeList.Item[m_Index].My_FinishDate.substr(0, 4));
@@ -125,9 +125,9 @@ void CAnimeEditWindow::OnOK() {
   if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, reinterpret_cast<LPARAM>(&sts)) == GDT_NONE) {
     AnimeList.Item[m_Index].My_StartDate = L"0000-00-00";
   } else {
-    wstring year  = WSTR(sts.wYear);
-    wstring month = (sts.wMonth < 10 ? L"0" : L"") + WSTR(sts.wMonth);
-    wstring day   = (sts.wDay < 10 ? L"0" : L"") + WSTR(sts.wDay);
+    wstring year = ToWSTR(sts.wYear);
+    wstring month = (sts.wMonth < 10 ? L"0" : L"") + ToWSTR(sts.wMonth);
+    wstring day = (sts.wDay < 10 ? L"0" : L"") + ToWSTR(sts.wDay);
     AnimeList.Item[m_Index].SetStartDate(year + L"-" + month + L"-" + day, true);
   }
   // Finish date
@@ -135,9 +135,9 @@ void CAnimeEditWindow::OnOK() {
   if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, reinterpret_cast<LPARAM>(&stf)) == GDT_NONE) {
     AnimeList.Item[m_Index].My_FinishDate = L"0000-00-00";
   } else {
-    wstring year  = WSTR(stf.wYear);
-    wstring month = (stf.wMonth < 10 ? L"0" : L"") + WSTR(stf.wMonth);
-    wstring day   = (stf.wDay < 10 ? L"0" : L"") + WSTR(stf.wDay);
+    wstring year = ToWSTR(stf.wYear);
+    wstring month = (stf.wMonth < 10 ? L"0" : L"") + ToWSTR(stf.wMonth);
+    wstring day = (stf.wDay < 10 ? L"0" : L"") + ToWSTR(stf.wDay);
     AnimeList.Item[m_Index].SetFinishDate(year + L"-" + month + L"-" + day, true);
   }
   

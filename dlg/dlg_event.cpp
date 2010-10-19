@@ -125,7 +125,7 @@ void CEventWindow::RefreshList() {
       SetText(L"There is 1 item in the event queue.");
       break;
     default:
-      SetText(WSTR(L"There are " + WSTR(EventBuffer.GetItemCount()) + L" items in the event queue.").c_str());
+      SetText(L"There are " + ToWSTR(EventBuffer.GetItemCount()) + L" items in the event queue.");
       break;
   }
 }

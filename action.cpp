@@ -475,7 +475,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       AnimeList.Item[AnimeList.Index].My_WatchedEpisodes);
     dlg.Title = AnimeList.Item[AnimeList.Index].Series_Title;
     dlg.Info = L"Please enter episode number for this title:";
-    dlg.Text = WSTR(AnimeList.Item[AnimeList.Index].My_WatchedEpisodes);
+    dlg.Text = ToWSTR(AnimeList.Item[AnimeList.Index].My_WatchedEpisodes);
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK && MAL.IsValidEpisode(ToINT(dlg.Text), 0, AnimeList.Item[AnimeList.Index].Series_Episodes)) {
       CEpisode episode;
@@ -583,7 +583,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int number = ToINT(body);
     wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
     if (file.empty()) {
-      MainWindow.ChangeStatus(L"Could not find episode #" + WSTR(number) + L".");
+      MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + L".");
     } else {
       Execute(file);
     }
@@ -595,7 +595,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
     if (file.empty()) {
       if (number == 0) number = 1;
-      MainWindow.ChangeStatus(L"Could not find episode #" + WSTR(number) + L".");
+      MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + L".");
     } else {
       Execute(file);
     }
@@ -610,7 +610,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
     if (file.empty()) {
       if (number == 0) number = 1;
-      MainWindow.ChangeStatus(L"Could not find episode #" + WSTR(number) + L".");
+      MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + L".");
     } else {
       Execute(file);
     }

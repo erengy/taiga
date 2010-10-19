@@ -72,7 +72,7 @@ void CEventList::Add(int index, int id, int episode, int score, int status, wstr
   if (Taiga.LoggedIn && Taiga.UpdatesEnabled && episode > 0 && index > 0) {
     CEpisode temp_episode;
     temp_episode.Index = index;
-    temp_episode.Number = WSTR(episode);
+    temp_episode.Number = ToWSTR(episode);
     Taiga.PlayStatus = PLAYSTATUS_UPDATED;
     ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&temp_episode));
     ExecuteAction(L"AnnounceToTwitter", 0, reinterpret_cast<LPARAM>(&temp_episode));

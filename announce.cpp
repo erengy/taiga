@@ -53,7 +53,7 @@ void AnnounceToMessenger(wstring artist, wstring album, wstring title, BOOL show
   COPYDATASTRUCT cds;
   WCHAR buffer[256];
 
-  wstring wstr = L"\\0Music\\0" + WSTR(show) + L"\\0{1}\\0" + 
+  wstring wstr = L"\\0Music\\0" + ToWSTR(show) + L"\\0{1}\\0" + 
     artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
   wcscpy_s(buffer, 256, wstr.c_str());
 

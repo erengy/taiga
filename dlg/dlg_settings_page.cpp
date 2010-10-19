@@ -631,10 +631,10 @@ int TranslateFilterType(const wstring& type_str, wstring& value) {
     type = 0;
   } else if (type_str == L"Airing status") {
     type = 1;
-    value = WSTR(MAL.TranslateStatus(value));
+    value = ToWSTR(MAL.TranslateStatus(value));
   } else if (type_str == L"Watching status") {
     type = 2;
-    value = WSTR(MAL.TranslateMyStatus(value));
+    value = ToWSTR(MAL.TranslateMyStatus(value));
   }
   return type;
 }

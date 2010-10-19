@@ -40,15 +40,19 @@ CHTTPClient MainClient, ImageClient, SearchClient, VersionClient;
 // =============================================================================
 
 BOOL CHTTPClient::OnError(DWORD dwError) {
-  wstring error_text = L"HTTP error #" + WSTR(dwError) + L": " + 
+  wstring error_text = L"HTTP error #" + ToWSTR(dwError) + L": " + 
     FormatError(dwError, L"winhttp.dll");
 
   switch (GetClientMode()) {
     case HTTP_MAL_Login:
+      MainWindow.ChangeStatus(error_text);
+      MainWindow.m_Toolbar.EnableButton(0, true);
+      break;
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin:
       MainWindow.ChangeStatus(error_text);
       MainWindow.m_Toolbar.EnableButton(0, true);
+      MainWindow.m_Toolbar.EnableButton(1, true);
       break;
     case HTTP_MAL_Image:
       break;
@@ -159,7 +163,7 @@ BOOL CHTTPClient::OnReadData() {
 
   if (m_dwTotal > 0) {
     TaskbarList.SetProgressValue(m_dwDownloaded, m_dwTotal);
-    status += L" (" + WSTR(static_cast<int>(((float)m_dwDownloaded / (float)m_dwTotal) * 100)) + L"%)";
+    status += L" (" + ToWSTR(static_cast<int>(((float)m_dwDownloaded / (float)m_dwTotal) * 100)) + L"%)";
   } else {
     status += L" (" + ToSizeString(m_dwDownloaded) + L")";
   }
@@ -263,7 +267,7 @@ BOOL CHTTPClient::OnReadComplete() {
           if (msg_end > -1) {
             int msg_count = ToINT(GetData().substr(msg_pos + 27, msg_end));
             if (msg_count > 0) {
-              status = L"You have " + WSTR(msg_count) + L" new message(s)!";
+              status = L"You have " + ToWSTR(msg_count) + L" new message(s)!";
               CTaskDialog dlg;
               dlg.SetWindowTitle(APP_TITLE);
               dlg.SetMainIcon(TD_ICON_INFORMATION);

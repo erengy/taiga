@@ -78,7 +78,7 @@ void CAnime::Start(CEpisode episode) {
   Playing = true;
 
   // Update main window
-  wstring status = L"Watching: " + Series_Title + STR_ADD(L" #", episode.Number);
+  wstring status = L"Watching: " + Series_Title + PushString(L" #", episode.Number);
   if (Settings.Account.Update.OutOfRange && ToINT(episode.Number) > My_WatchedEpisodes + 1) {
     status += L" (out of range)";
   }
@@ -195,7 +195,7 @@ int CAnime::Ask(CEpisode episode) {
     dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
   }
   wstring button = L"Update\nUpdate episode number from " + 
-    WSTR(My_WatchedEpisodes) + L" to " + GetLastEpisode(episode.Number);
+    ToWSTR(My_WatchedEpisodes) + L" to " + GetLastEpisode(episode.Number);
   dlg.AddButton(button.c_str(), IDYES);
   dlg.AddButton(L"Cancel\nDon't update anything", IDNO);
   
@@ -387,8 +387,8 @@ void CAnime::Refresh(wstring data) {
   wstring buffer = L"Update "; buffer += (success ? L"succeeded." : L"failed.");
   MainWindow.ChangeStatus(buffer + L" (" + Series_Title + L")");
   // Show balloon tip
-  if (episode > -1)       buffer += L"\nEpisode: " + WSTR(episode);
-  if (score > -1)         buffer += L"\nScore: "   + WSTR(score);
+  if (episode > -1)       buffer += L"\nEpisode: " + ToWSTR(episode);
+  if (score > -1)         buffer += L"\nScore: "   + ToWSTR(score);
   if (status > -1)        buffer += L"\nStatus: "  + MAL.TranslateMyStatus(status, false);
   if (tags != L"%empty%") buffer += L"\nTags: "    + tags;
   Taskbar.Tip(buffer.c_str(), Series_Title.c_str(), (success ? NIIF_INFO : NIIF_ERROR));
@@ -406,13 +406,13 @@ void CAnime::Refresh(wstring data) {
   if (success) {
     if (episode > -1) {
       My_WatchedEpisodes = episode;
-      AnimeList.Write(index, L"my_watched_episodes", WSTR(episode), ANIMELIST_EDITANIME);
+      AnimeList.Write(index, L"my_watched_episodes", ToWSTR(episode), ANIMELIST_EDITANIME);
       NewEps = false;
       CheckNewEpisode();
     }
     if (score > -1) {
       My_Score = score;
-      AnimeList.Write(index, L"my_score", WSTR(score), ANIMELIST_EDITANIME);
+      AnimeList.Write(index, L"my_score", ToWSTR(score), ANIMELIST_EDITANIME);
       AnimeWindow.Refresh();
     }
     if (tags != L"%empty%") {
@@ -432,7 +432,7 @@ void CAnime::Refresh(wstring data) {
         MainWindow.m_List.EnsureVisible(list_index);
         MainWindow.m_List.SetSelectedItem(list_index);
       }
-      AnimeList.Write(index, L"my_status", WSTR(My_Status), ANIMELIST_EDITANIME);
+      AnimeList.Write(index, L"my_status", ToWSTR(My_Status), ANIMELIST_EDITANIME);
     }
 
     // Remove item from update buffer

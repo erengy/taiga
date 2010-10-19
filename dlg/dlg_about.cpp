@@ -17,6 +17,7 @@
 */
 
 #include "../std.h"
+#include <math.h>
 #include "../common.h"
 #include "dlg_about.h"
 #include "../resource.h"

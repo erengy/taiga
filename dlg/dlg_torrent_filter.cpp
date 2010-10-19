@@ -155,9 +155,9 @@ void CTorrentFilterWindow::RefreshComboBox(int type) {
   DWORD old_style = m_Combo.GetWindowLong();
   DWORD style = type == 0 ? CBS_DROPDOWN : CBS_DROPDOWNLIST;
   DWORD new_style = old_style | style;
-  DEBUG_PRINT(L"Cmb style: " + WSTR(style) + L" | ");
-  DEBUG_PRINT(L"Old style: " + WSTR(old_style) + L" | ");
-  DEBUG_PRINT(L"New style: " + WSTR(new_style) + L"\n");
+  DEBUG_PRINT(L"Cmb style: " + ToWSTR(style) + L" | ");
+  DEBUG_PRINT(L"Old style: " + ToWSTR(old_style) + L" | ");
+  DEBUG_PRINT(L"New style: " + ToWSTR(new_style) + L"\n");
   /*if (new_style != old_style)*/ {
     m_Combo.Create(0, WC_COMBOBOX, NULL, 
       style | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE, 

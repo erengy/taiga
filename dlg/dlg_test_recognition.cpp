@@ -111,9 +111,9 @@ BOOL CTestRecognition::OnInitDialog() {
     }
   }
   wstring title = L"Taiga Recognition Test";
-  title += L" - Item count: " + WSTR(m_EpisodeList.size());
-  title += L" - Success rate: %" + WSTR(((float)success_count / (float)m_EpisodeList.size()) * 100.0f);
-  title += L" - Time: " + WSTR(tick) + L" ms";
+  title += L" - Item count: " + ToWSTR(static_cast<int>(m_EpisodeList.size()));
+  title += L" - Success rate: %" + ToWSTR(((float)success_count / (float)m_EpisodeList.size()) * 100.0f, 2);
+  title += L" - Time: " + ToWSTR(tick) + L" ms";
   SetText(title.c_str());
   
   // Success

@@ -25,7 +25,7 @@
 #define APP_NAME             L"Taiga"
 #define APP_TITLE            L"Taiga 0.5"
 #define APP_VERSION          L"0.5"
-#define APP_BUILD            L"2010.10.16"
+#define APP_BUILD            L"2010.10.19"
 #define APP_VERSION_MAJOR    0
 #define APP_VERSION_MINOR    5
 #define APP_VERSION_REVISION 0

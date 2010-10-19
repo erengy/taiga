@@ -89,10 +89,10 @@ void UpdateAnimeMenu(int anime_index) {
 
     // Add items
     MENU.CreateItem(L"PlayLast()", 
-      L"Last watched (#" + WSTR(AnimeList.Item[anime_index].My_WatchedEpisodes) + L")", 
+      L"Last watched (#" + ToWSTR(AnimeList.Item[anime_index].My_WatchedEpisodes) + L")", 
       L"", false, false, AnimeList.Item[anime_index].My_WatchedEpisodes > 0);
     MENU.CreateItem(L"PlayNext()", 
-      L"Next episode (#" + WSTR(AnimeList.Item[anime_index].My_WatchedEpisodes + 1) + L")", 
+      L"Next episode (#" + ToWSTR(AnimeList.Item[anime_index].My_WatchedEpisodes + 1) + L")", 
       L"", false, false, AnimeList.Item[anime_index].My_Status != MAL_COMPLETED);
     MENU.CreateItem(L"PlayRandom()", L"Random episode");
     MENU.CreateItem();
@@ -118,7 +118,7 @@ void UpdateAnimeMenu(int anime_index) {
     for (int i = 1; i <= count_max; i++) {
       count_column = count_max % 12 == 0 ? 12 : 13;
       if (count_max > 52) count_column *= 2;
-      MENU.CreateItem(L"PlayEpisode(" + WSTR(i) + L")", L"#" + WSTR(i), L"", 
+      MENU.CreateItem(L"PlayEpisode(" + ToWSTR(i) + L")", L"#" + ToWSTR(i), L"", 
         i <= AnimeList.Item[anime_index].My_WatchedEpisodes, 
         false, true, (i > 1) && (i % count_column == 1), false);
     }

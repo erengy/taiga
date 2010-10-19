@@ -21,10 +21,6 @@
 
 #include "std.h"
 
-#define STR(value) boost::lexical_cast<string>(value)
-#define WSTR(value) boost::lexical_cast<wstring>(value)
-#define STR_ADD(x, y) (!y.empty() ? x + y : L"")
-
 // =============================================================================
 
 wstring CharLeft(const wstring& str, int length);
@@ -55,6 +51,7 @@ bool IsHex(const wstring& str);
 bool IsNumeric(const wchar_t c);
 bool IsNumeric(const wstring& str);
 bool IsWhitespace(const wchar_t c);
+wstring PushString(const wstring& str1, const wstring& str2);
 void ReadStringTable(UINT uID, wstring& str);
 void Replace(wstring& input, wstring find, wstring replace_with, bool replace_all = false, bool case_insensitive = false);
 void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_with);
@@ -74,7 +71,7 @@ wstring ToWSTR(const INT& value);
 wstring ToWSTR(const ULONG& value);
 wstring ToWSTR(const INT64& value);
 wstring ToWSTR(const UINT64& value);
-wstring ToWSTR(const double& value, int count);
+wstring ToWSTR(const double& value, int count = 16);
 void Trim(wstring& input, const wchar_t trim_chars[] = L" ");
 void TrimLeft(wstring& input, const wchar_t trim_chars[] = L" ");
 void TrimRight(wstring& input, const wchar_t trim_chars[] = L" ");

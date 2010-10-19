@@ -255,23 +255,23 @@ void CAnimeList::ChangeItemCount(int status, int count) {
   switch (status) {
     case MAL_WATCHING:
       User.Watching += count;
-      Write(-1, L"user_watching", WSTR(User.Watching), ANIMELIST_EDITUSER);
+      Write(-1, L"user_watching", ToWSTR(User.Watching), ANIMELIST_EDITUSER);
       break;
     case MAL_COMPLETED:
       User.Completed += count;
-      Write(-1, L"user_completed", WSTR(User.Completed), ANIMELIST_EDITUSER);
+      Write(-1, L"user_completed", ToWSTR(User.Completed), ANIMELIST_EDITUSER);
       break;
     case MAL_ONHOLD:
       User.OnHold += count;
-      Write(-1, L"user_onhold", WSTR(User.OnHold), ANIMELIST_EDITUSER);
+      Write(-1, L"user_onhold", ToWSTR(User.OnHold), ANIMELIST_EDITUSER);
       break;
     case MAL_DROPPED:
       User.Dropped += count;
-      Write(-1, L"user_dropped", WSTR(User.Dropped), ANIMELIST_EDITUSER);
+      Write(-1, L"user_dropped", ToWSTR(User.Dropped), ANIMELIST_EDITUSER);
       break;
     case MAL_PLANTOWATCH:
       User.PlanToWatch += count;
-      Write(-1, L"user_plantowatch", WSTR(User.PlanToWatch), ANIMELIST_EDITUSER);
+      Write(-1, L"user_plantowatch", ToWSTR(User.PlanToWatch), ANIMELIST_EDITUSER);
       break;
   }
 }

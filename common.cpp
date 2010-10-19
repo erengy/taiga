@@ -63,7 +63,7 @@ wstring FormatError(DWORD dwError, LPCWSTR lpSource) {
       return buffer;
   } else {
     if (hInstance) FreeLibrary(hInstance);
-    return WSTR(dwError);
+    return ToWSTR(dwError);
   }
 }
 
@@ -97,16 +97,16 @@ wstring ToTimeString(int seconds) {
   wstring time;
   
   if (seconds < 60) {
-    time = L"00:" + (seconds >= 10 ? WSTR(seconds) : L"0" + WSTR(seconds));
+    time = L"00:" + (seconds >= 10 ? ToWSTR(seconds) : L"0" + ToWSTR(seconds));
   } else {
     hours   = seconds / 3600;
     seconds = seconds % 3600;
     minutes = seconds / 60;
     seconds = seconds % 60;
     if (seconds < 0) seconds = 0;
-    time = (hours > 0 ? (hours >= 10 ? WSTR(hours) : L"0" + WSTR(hours)) + L":" : L"") + 
-      (minutes >= 10 ? WSTR(minutes) : L"0" + WSTR(minutes)) + L":" + 
-      (seconds >= 10 ? WSTR(seconds) : L"0" + WSTR(seconds));
+    time = (hours > 0 ? (hours >= 10 ? ToWSTR(hours) : L"0" + ToWSTR(hours)) + L":" : L"") + 
+      (minutes >= 10 ? ToWSTR(minutes) : L"0" + ToWSTR(minutes)) + L":" + 
+      (seconds >= 10 ? ToWSTR(seconds) : L"0" + ToWSTR(seconds));
   }
 
   return time;
@@ -243,31 +243,23 @@ int PopulateFiles(vector<wstring>& file_vector, wstring path, wstring extension)
 }
 
 wstring ToSizeString(QWORD qwSize) {
-  wstring buffer, text;
+  wstring size, unit;
 
-  /*if (qwSize > 1073741824) {    // 2^30
-    buffer = WSTR(static_cast<double>(qwSize) / 1073741824);
-    text = L" GB";
+  if (qwSize > 1073741824) {      // 2^30
+    size = ToWSTR(static_cast<double>(qwSize) / 1073741824, 2);
+    unit = L" GB";
   } else if (qwSize > 1048576) {  // 2^20
-    buffer = WSTR(static_cast<double>(qwSize) / 1048576);
-    text = L" MB";
-  } else*/ if (qwSize > 1024) {    // 2^10
-    buffer = WSTR(static_cast<double>(qwSize) / 1024);
-    text = L" KB";
+    size = ToWSTR(static_cast<double>(qwSize) / 1048576, 2);
+    unit = L" MB";
+  } else if (qwSize > 1024) {     // 2^10
+    size = ToWSTR(static_cast<double>(qwSize) / 1024, 2);
+    unit = L" KB";
   } else {
-    buffer = WSTR(qwSize);
-    text = L" bytes";
-  }
-  
-  size_t position;
-  position = buffer.find_first_of(L".");
-  if (position != buffer.npos) {
-    buffer.replace(position, 1, L",");
-    buffer.resize(position + 3);
+    size = ToWSTR(qwSize);
+    unit = L" bytes";
   }
 
-  text = buffer + text;
-  return text;
+  return size + unit;
 }
 
 // =============================================================================

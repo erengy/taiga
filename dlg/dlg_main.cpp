@@ -174,7 +174,7 @@ BOOL CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         ReleaseCapture();
         int tab_index = m_Tab.HitTest();
         if (tab_index > -1) {
-          ExecuteAction(L"EditStatus(" + WSTR(m_Tab.GetItemParam(tab_index)) + L")");
+          ExecuteAction(L"EditStatus(" + ToWSTR(m_Tab.GetItemParam(tab_index)) + L")");
         }
       }
       break;
@@ -432,7 +432,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
         ChangeStatus(MediaPlayers.Item[MediaPlayers.Index].Name + L" is running.");
       } else {
         ChangeStatus(L"Watching: " + CurrentEpisode.Title + 
-          STR_ADD(L" #", CurrentEpisode.Number) + L" (Not recognized)");
+          PushString(L" #", CurrentEpisode.Number) + L" (Not recognized)");
         wstring tip_text = ReplaceVariables(Settings.Program.Balloon.Format, CurrentEpisode);
         tip_text += L"\nClick here to search MyAnimeList for this anime.";
         Taiga.CurrentTipType = TIPTYPE_SEARCH;
@@ -516,7 +516,7 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   } else if (uMsg == WM_TASKBARCALLBACK) {
     switch (lParam) {
       case NIN_BALLOONSHOW: {
-        DEBUG_PRINT(L"Tip type: " + WSTR(Taiga.CurrentTipType) + L"\n");
+        DEBUG_PRINT(L"Tip type: " + ToWSTR(Taiga.CurrentTipType) + L"\n");
         break;
       }
       case NIN_BALLOONTIMEOUT: {
@@ -601,7 +601,7 @@ void CMainWindow::RefreshList(int index) {
           reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
         int eps_estimate = AnimeList.Item[i].EstimateTotalEpisodes();
         float ratio = eps_estimate ? (float)AnimeList.Item[i].My_WatchedEpisodes / (float)eps_estimate : 0.8f;
-        m_List.SetItem(j, 1, WSTR(ratio).c_str());
+        m_List.SetItem(j, 1, ToWSTR(ratio).c_str());
         m_List.SetItem(j, 2, MAL.TranslateNumber(AnimeList.Item[i].My_Score).c_str());
         m_List.SetItem(j, 3, MAL.TranslateType(AnimeList.Item[i].Series_Type).c_str());
         m_List.SetItem(j, 4, MAL.TranslateDate(AnimeList.Item[i].Series_Start).c_str());
@@ -613,7 +613,7 @@ void CMainWindow::RefreshList(int index) {
   for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
     if (index == 0 && i != MAL_UNKNOWN) {
       wstring text = MAL.TranslateMyStatus(i, false);
-      text += group_count[i - 1] > 0 ? L" (" + WSTR(group_count[i - 1]) + L")" : L"";
+      text += group_count[i - 1] > 0 ? L" (" + ToWSTR(group_count[i - 1]) + L")" : L"";
       m_List.SetGroupText(i, text.c_str());
     }
   }

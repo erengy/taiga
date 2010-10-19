@@ -116,7 +116,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
   MediaPlayers.EditTitle(title);
   if (title.empty()) return false;
 
-  // Retrieve the file name from full path
+  // Retrieve file name from full path
   if (title.substr(1, 2) == L":\\") {
     episode.Folder = GetPathOnly(title);
     title = GetFileName(title);
@@ -173,7 +173,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     }
   }
 
-  // Get group and title
+  // Get group name and title
   int group_index = -1, title_index = -1;
   vector<int> group_vector, title_vector;
   for (unsigned int i = 0; i < tokens.size(); i++) {
@@ -223,7 +223,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     tokens[group_index].Content.clear();
   }
 
-  // Get episode number
+  // Get episode number and version
   if (examine_number && episode.Number.empty()) {
     for (unsigned int i = title.length(); i > 0; i--) {
       if (IsNumeric(title[i])) {
@@ -424,9 +424,9 @@ bool IsResolution(const wstring& str) {
 
 bool IsTokenEnclosed(const CToken& token) {
   if (token.Encloser == L"[" || 
-    token.Encloser == L"(" || 
-    token.Encloser == L"{")
-      return true;
+      token.Encloser == L"(" || 
+      token.Encloser == L"{")
+        return true;
   return false;
 }
 

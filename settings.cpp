@@ -89,7 +89,6 @@ bool CSettings::Read() {
     Announce.MIRC.MultiServer = mirc.attribute(L"multiserver").as_int(FALSE);
     Announce.MIRC.Service = mirc.attribute(L"service").value(L"mIRC");
     Announce.MIRC.UseAction = mirc.attribute(L"useaction").as_int(TRUE);
-    
     // Skype
     xml_node skype = announce.child(L"skype");
     Announce.Skype.Enabled = skype.attribute(L"enabled").as_int();
@@ -150,11 +149,11 @@ bool CSettings::Read() {
     Program.List.DoubleClick = list.child(L"action").attribute(L"doubleclick").as_int(4);
     Program.List.MiddleClick = list.child(L"action").attribute(L"middleclick").as_int(3);
     for (int i = 0; i < 3; i++) {
-      wstring name = L"s" + WSTR(i + 1);
+      wstring name = L"s" + ToWSTR(i + 1);
       AnimeList.Filter.Status[i] = list.child(L"filter").child(L"status").attribute(name.c_str()).as_int(1);
     }
     for (int i = 0; i < 6; i++) {
-      wstring name = L"t" + WSTR(i + 1);
+      wstring name = L"t" + ToWSTR(i + 1);
       AnimeList.Filter.Type[i] = list.child(L"filter").child(L"type").attribute(name.c_str()).as_int(1);
     }
     Program.List.Highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
