@@ -17,12 +17,12 @@
 */
 
 #include "../std.h"
-#include <math.h>
 #include "../common.h"
 #include "dlg_about.h"
 #include "../resource.h"
 #include "../taiga.h"
 #include "../ui/ui_gdi.h"
+#include <math.h>
 
 CAboutWindow AboutWindow;
 
@@ -115,12 +115,11 @@ BOOL CAboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     case WM_NOTIFY: {
       switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
         case NM_CLICK:
-        case NM_RETURN:
+        case NM_RETURN: {
           PNMLINK pNMLink = (PNMLINK)lParam;
-          if (wcscmp(pNMLink->item.szID, L"id_link") == 0) {
-            ShellExecute(NULL, L"open", pNMLink->item.szUrl, NULL, NULL, SW_SHOW);
-          }
+          ShellExecute(NULL, L"open", pNMLink->item.szUrl, NULL, NULL, SW_SHOW);
           return TRUE;
+        }
       }
       break;
     }

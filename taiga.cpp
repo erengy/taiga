@@ -56,7 +56,8 @@ CTaiga::~CTaiga() {
 
 BOOL CTaiga::InitInstance() {
   // Check another instance
-  if (CheckInstance(L"TaigaMainW")) return FALSE;
+  if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258", L"TaigaMainW"))
+    return FALSE;
   g_hInstance = GetInstanceHandle();
 
   // Initialize

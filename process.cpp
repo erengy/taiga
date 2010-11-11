@@ -219,17 +219,17 @@ void ActivateWindow(HWND hwnd) {
   BringWindowToTop(hwnd);
 }
 
-bool CheckInstance(LPCWSTR lpClassName) {
-  INT_PTR hwnd_64 = reinterpret_cast<INT_PTR>(FindWindow(lpClassName, NULL)); // TEMP
-  HWND hwnd = reinterpret_cast<HWND>(hwnd_64);
-  if (reinterpret_cast<INT_PTR>(hwnd) != hwnd_64) {
-    MessageBox(NULL, L"hwnd != hwnd_64", L"CheckInstance()", 0); // TEMP
+bool CheckInstance(LPCWSTR lpMutexName, LPCWSTR lpClassName) {
+  if (CreateMutex(NULL, FALSE, lpMutexName) == NULL ||
+      GetLastError() == ERROR_ALREADY_EXISTS || GetLastError() == ERROR_ACCESS_DENIED) {
+        HWND hwnd = FindWindow(lpClassName, NULL);
+        if (IsWindow(hwnd)) {
+          ActivateWindow(hwnd);
+          FlashWindow(hwnd, TRUE);
+        }
+        return TRUE;
   }
-  if (IsWindow(hwnd)) {
-    ActivateWindow(hwnd);
-    FlashWindow(hwnd, TRUE);
-  }
-  return hwnd != NULL;
+  return FALSE;
 }
 
 wstring GetWindowClass(HWND hwnd) {

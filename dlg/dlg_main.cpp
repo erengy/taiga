@@ -436,6 +436,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
         wstring tip_text = ReplaceVariables(Settings.Program.Balloon.Format, CurrentEpisode);
         tip_text += L"\nClick here to search MyAnimeList for this anime.";
         Taiga.CurrentTipType = TIPTYPE_SEARCH;
+        Taskbar.Tip(L"", L"", 0);
         Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
       }
 
@@ -573,7 +574,7 @@ void CMainWindow::RefreshList(int index) {
   // Change window title
   wstring title = APP_TITLE;
   if (!Settings.Account.MAL.User.empty()) {
-    title += L" – " + Settings.Account.MAL.User + L"'";
+    title += L" - " + Settings.Account.MAL.User + L"'";
     title += EndsWith(Settings.Account.MAL.User, L"s") ? L"" : L"s";
     title += L" Anime List";
   }

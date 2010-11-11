@@ -94,6 +94,7 @@ void CAnime::Start(CEpisode episode) {
   }
   
   // Show balloon tip
+  Taskbar.Tip(L"", L"", 0);
   Taskbar.Tip(ReplaceVariables(Settings.Program.Balloon.Format, episode).c_str(), 
     L"Watching:", NIIF_INFO);
   
@@ -391,6 +392,7 @@ void CAnime::Refresh(wstring data) {
   if (score > -1)         buffer += L"\nScore: "   + ToWSTR(score);
   if (status > -1)        buffer += L"\nStatus: "  + MAL.TranslateMyStatus(status, false);
   if (tags != L"%empty%") buffer += L"\nTags: "    + tags;
+  Taskbar.Tip(L"", L"", 0);
   Taskbar.Tip(buffer.c_str(), Series_Title.c_str(), (success ? NIIF_INFO : NIIF_ERROR));
 
   // Update main list

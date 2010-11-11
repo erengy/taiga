@@ -45,9 +45,6 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
 
   switch (GetClientMode()) {
     case HTTP_MAL_Login:
-      MainWindow.ChangeStatus(error_text);
-      MainWindow.m_Toolbar.EnableButton(0, true);
-      break;
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin:
       MainWindow.ChangeStatus(error_text);
