@@ -602,7 +602,7 @@ void CMainWindow::RefreshList(int index) {
           reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
         int eps_estimate = AnimeList.Item[i].EstimateTotalEpisodes();
         float ratio = eps_estimate ? (float)AnimeList.Item[i].My_WatchedEpisodes / (float)eps_estimate : 0.8f;
-        m_List.SetItem(j, 1, ToWSTR(ratio).c_str());
+        m_List.SetItem(j, 1, ToWSTR(ratio, 4).c_str());
         m_List.SetItem(j, 2, MAL.TranslateNumber(AnimeList.Item[i].My_Score).c_str());
         m_List.SetItem(j, 3, MAL.TranslateType(AnimeList.Item[i].Series_Type).c_str());
         m_List.SetItem(j, 4, MAL.TranslateDate(AnimeList.Item[i].Series_Start).c_str());
