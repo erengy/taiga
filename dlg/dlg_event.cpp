@@ -102,7 +102,7 @@ void CEventWindow::RefreshList() {
     for (size_t i = 0; i < EventBuffer.List[user_index].Item.size(); i++) {
       int episode  = EventBuffer.List[user_index].Item[i].Episode; if (episode == -1) episode++;
       int score    = EventBuffer.List[user_index].Item[i].Score;   if (score == -1) score++;
-      int status   = EventBuffer.List[user_index].Item[i].Status;  if (status == -1) status++;
+      int status   = EventBuffer.List[user_index].Item[i].Status;
       wstring tags = EventBuffer.List[user_index].Item[i].Tags;    if (tags == L"%empty%") tags.clear();
 
       if (EventBuffer.List[user_index].Item[i].Index <= AnimeList.Count) {
