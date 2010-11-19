@@ -433,7 +433,7 @@ bool CSettings::Write() {
     
   // Save file
   ::CreateDirectory(m_Folder.c_str(), NULL);
-  return doc.save_file(ToANSI(m_File), L"\x09", format_default | format_write_bom_utf8);
+  return doc.save_file(m_File.c_str(), L"\x09", format_default | format_write_bom);
 }
 
 // =============================================================================

@@ -403,10 +403,6 @@
 					RelativePath=".\third_party\pugixml\pugixml.hpp"
 					>
 				</File>
-				<File
-					RelativePath=".\third_party\pugixml\pugixpath.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="base64"

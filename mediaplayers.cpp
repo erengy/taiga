@@ -101,7 +101,7 @@ BOOL CMediaPlayers::Write() {
 
   // Save file
   CreateDirectory(folder.c_str(), NULL);
-  return doc.save_file(ToANSI(file), L"\x09", format_default | format_write_bom_utf8);
+  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
   return TRUE;
 }
 

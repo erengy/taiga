@@ -115,7 +115,7 @@ BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
     // Edit user data
     case ANIMELIST_EDITUSER: {
       myanimelist.child(L"myinfo").child(child.c_str()).first_child().set_value(value.c_str());
-      doc.save_file(ToANSI(file), L"\x09", format_default | format_write_bom_utf8);
+      doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
       return TRUE;
     }
     // Edit anime data
@@ -123,7 +123,7 @@ BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
       for (xml_node anime = myanimelist.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
         if (XML_ReadIntValue(anime, L"series_animedb_id") == Item[index].Series_ID) {
           anime.child(child.c_str()).first_child().set_value(value.c_str());
-          doc.save_file(ToANSI(file), L"\x09", format_default | format_write_bom_utf8);
+          doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
           return TRUE;
         }
       }
@@ -152,7 +152,7 @@ BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
       XML_WriteIntValue(anime, L"my_rewatching_ep", Item[index].My_RewatchingEP);
       XML_WriteStrValue(anime, L"my_last_updated", Item[index].My_LastUpdated.c_str());
       XML_WriteStrValue(anime, L"my_tags", Item[index].My_Tags.c_str());
-      doc.save_file(ToANSI(file), L"\x09", format_default | format_write_bom_utf8);
+      doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
       return TRUE;
     }
     // Delete anime item
@@ -160,7 +160,7 @@ BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
       for (xml_node anime = myanimelist.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
         if (XML_ReadIntValue(anime, L"series_animedb_id") == Item[index].Series_ID) {
           myanimelist.remove_child(anime);
-          doc.save_file(ToANSI(file), L"\x09", format_default | format_write_bom_utf8);
+          doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
           return TRUE;
         }
       }
