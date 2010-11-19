@@ -79,7 +79,7 @@ void CAnime::Start(CEpisode episode) {
 
   // Update main window
   wstring status = L"Watching: " + Series_Title + PushString(L" #", episode.Number);
-  if (Settings.Account.Update.OutOfRange && ToINT(episode.Number) > My_WatchedEpisodes + 1) {
+  if (Settings.Account.Update.OutOfRange && ToINT(episode.Number) > GetLastWatchedEpisode() + 1) {
     status += L" (out of range)";
   }
   MainWindow.ChangeStatus(status);
@@ -154,8 +154,8 @@ void CAnime::End(CEpisode episode, bool do_end, bool do_update) {
     if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT || 
       Taiga.Ticker == -1 || Taiga.Ticker >= Settings.Account.Update.Delay) {
         int number = ToINT(episode.Number);
-        if (Settings.Account.Update.OutOfRange == FALSE || number == My_WatchedEpisodes + 1) {
-          if (MAL.IsValidEpisode(number, My_WatchedEpisodes, Series_Episodes)) {
+        if (Settings.Account.Update.OutOfRange == FALSE || number == GetLastWatchedEpisode() + 1) {
+          if (MAL.IsValidEpisode(number, GetLastWatchedEpisode(), Series_Episodes)) {
             switch (Settings.Account.Update.Mode) {
               case UPDATE_MODE_NONE:
                 break;
@@ -196,7 +196,7 @@ int CAnime::Ask(CEpisode episode) {
     dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
   }
   wstring button = L"Update\nUpdate episode number from " + 
-    ToWSTR(My_WatchedEpisodes) + L" to " + GetLastEpisode(episode.Number);
+    ToWSTR(GetLastWatchedEpisode()) + L" to " + GetLastEpisode(episode.Number);
   dlg.AddButton(button.c_str(), IDYES);
   dlg.AddButton(L"Cancel\nDon't update anything", IDNO);
   
@@ -260,7 +260,7 @@ void CAnime::CheckFolder() {
 void CAnime::CheckNewEpisode(bool check_folder) {
   if (NewEps) return;
   if (check_folder) CheckFolder();
-  int number = Series_Episodes == 1 ? 0 : My_WatchedEpisodes + 1;
+  int number = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
   wstring file;
   
   // Check anime folder first
@@ -295,6 +295,12 @@ int CAnime::EstimateTotalEpisodes() {
   if (My_WatchedEpisodes < 24) return 26;
   if (My_WatchedEpisodes < 50) return 51;
   return 0;
+}
+
+int CAnime::GetLastWatchedEpisode() {
+  int value = EventBuffer.GetLastWatchedEpisode(Index);
+  if (!value) value = My_WatchedEpisodes;
+  return value;
 }
 
 bool CAnime::ParseSearchResult(const wstring& data) {

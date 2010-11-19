@@ -175,7 +175,8 @@
 #define IDC_TOOLBAR_MAIN                        1139
 #define IDC_TOOLBAR_SEARCH                      1140
 #define IDC_TOOLBAR_TORRENT                     1141
-#define IDC_TREE_PAGES                          1142
+#define IDC_TREE_MAIN                           1142
+#define IDC_TREE_PAGES                          1143
 #define IDS_KEYWORD_AUDIO                       40000
 #define IDS_KEYWORD_EXTENSION                   40001
 #define IDS_KEYWORD_EXTRA                       40002

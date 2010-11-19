@@ -36,6 +36,14 @@ class CMainWindow : public CDialog {
 public:
   CMainWindow();
   virtual ~CMainWindow() {}
+
+  // Tree control
+  class CMainTree : public CTreeView {
+  public:
+    void RefreshItems();
+  private:
+    HTREEITEM htItem[7];
+  } m_Tree;
   
   // List control
   class CMainList : public CListView {
@@ -75,6 +83,7 @@ public:
   LRESULT OnListNotify(LPARAM lParam);
   LRESULT OnTabNotify(LPARAM lParam);
   LRESULT OnToolbarNotify(LPARAM lParam);
+  LRESULT OnTreeNotify(LPARAM lParam);
   BOOL PreTranslateMessage(MSG* pMsg);
 
   // Other functions

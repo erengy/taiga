@@ -131,7 +131,7 @@ void CAnimeWindow::Refresh(CAnime* pAnimeItem) {
   SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
   // Set user information
   text = MAL.TranslateMyStatus(m_pAnimeItem->My_Status, false) + L"\n" + 
-    MAL.TranslateNumber(m_pAnimeItem->My_WatchedEpisodes) + L"/" + 
+    MAL.TranslateNumber(m_pAnimeItem->GetLastWatchedEpisode()) + L"/" + 
     MAL.TranslateNumber(m_pAnimeItem->Series_Episodes) + L"\n" + 
     MAL.TranslateNumber(m_pAnimeItem->My_Score) + L"\n" + 
     m_pAnimeItem->My_Tags;

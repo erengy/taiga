@@ -33,6 +33,10 @@ BOOL CTreeView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
 // =============================================================================
 
+BOOL CTreeView::DeleteAllItems() {
+  return TreeView_DeleteAllItems(m_hWindow);
+}
+
 BOOL CTreeView::Expand(HTREEITEM hItem, bool bExpand) {
   return TreeView_Expand(m_hWindow, hItem, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
 }

@@ -20,6 +20,7 @@
 #include "../animelist.h"
 #include "../common.h"
 #include "dlg_main.h"
+#include "../event.h"
 #include "../gfx.h"
 #include "../myanimelist.h"
 #include "../resource.h"
@@ -28,6 +29,81 @@
 #include "../taiga.h"
 #include "../theme.h"
 #include "../ui/ui_gdi.h"
+
+// =============================================================================
+
+/* TreeView control */
+
+void CMainWindow::CMainTree::RefreshItems() {
+  // Clear items
+  DeleteAllItems();
+  for (int i = 0; i < 7; i++) {
+    htItem[i] = NULL;
+  }
+  
+  // My tralala
+  htItem[0] = InsertItem(L"My Panel", NULL, NULL);
+  htItem[1] = InsertItem(L"My Profile", NULL, NULL);
+  htItem[2] = InsertItem(L"My History", NULL, NULL);
+
+  // Seperator
+  htItem[3] = InsertItem(NULL, -1, NULL);
+  
+  // My Anime List
+  htItem[4] = InsertItem(L"My Anime List", NULL, NULL);
+  InsertItem(MAL.TranslateMyStatus(MAL_WATCHING, true).c_str(), NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_COMPLETED, true).c_str(), NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_ONHOLD, true).c_str(), NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_DROPPED, true).c_str(), NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, true).c_str(), NULL, htItem[4]);
+  Expand(htItem[4]);
+
+  // Seperator
+  htItem[5] = InsertItem(NULL, -1, NULL);
+
+  // Foobar
+  htItem[6] = InsertItem(L"Foo", NULL, NULL);
+  InsertItem(L"Foofoo", NULL, htItem[6]);
+  InsertItem(L"Foobar", NULL, htItem[6]);
+  InsertItem(L"Foobaz", NULL, htItem[6]);
+  Expand(htItem[6]);
+}
+
+LRESULT CMainWindow::OnTreeNotify(LPARAM lParam) {
+  LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
+
+  switch (pnmh->code) {
+    // Custom draw
+    case NM_CUSTOMDRAW: {
+      LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(lParam);
+      switch (pCD->nmcd.dwDrawStage) {
+        case CDDS_PREPAINT:
+          return CDRF_NOTIFYITEMDRAW;
+        case CDDS_ITEMPREPAINT:
+          return CDRF_NOTIFYPOSTPAINT;
+        case CDDS_ITEMPOSTPAINT: {
+          // Draw seperator
+          if (pCD->nmcd.lItemlParam == -1) {
+            CRect rcItem = pCD->nmcd.rc;
+            CDC hdc = pCD->nmcd.hdc;
+            hdc.FillRect(rcItem, RGB(255, 255, 255));
+            rcItem.Inflate(-8, 0);
+            rcItem.top += (rcItem.bottom - rcItem.top) / 2;
+            GradientRect(hdc.Get(), &rcItem, RGB(245, 245 ,245), RGB(255, 255, 255), true);
+            rcItem.bottom = rcItem.top + 2;
+            hdc.FillRect(rcItem, RGB(255, 255, 255));
+            rcItem.bottom -= 1;
+            hdc.FillRect(rcItem, RGB(230, 230, 230));
+            hdc.DetachDC();
+          }
+          return CDRF_DODEFAULT;
+        }
+      }
+    }
+  }
+
+  return 0;
+}
 
 // =============================================================================
 
@@ -229,6 +305,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
       int eps_watched  = pAnimeItem->My_WatchedEpisodes;
       int eps_total    = pAnimeItem->Series_Episodes;
       int eps_estimate = pAnimeItem->EstimateTotalEpisodes();
+      int eps_buffer   = EventBuffer.GetLastWatchedEpisode(pAnimeItem->Index);
       
       // Draw progress bar
       if (pCD->iSubItem == 1) {
@@ -250,24 +327,35 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         UI.ListProgress.Background.Draw(hdc.Get(), &rcItem);
         
         // Draw gradient
-        if (eps_watched > 0) {
-          float ratio;
+        if (eps_watched > 0 || eps_buffer > 0) {
+          float ratio_watched, ratio_buffer;
           if (eps_total == 0) {
             // Estimate episode count
             if (eps_estimate) {
-              ratio = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
+              ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
             } else {
-              ratio = 0.8f;
+              ratio_watched = eps_buffer > 0 ? 0.75f : 0.8f;
+              ratio_buffer = eps_buffer > 0 ? 0.8f : 0.0f;
             }
-            // Indicate that episode count is unknown
-            UI.ListProgress.Unknown.Draw(hdc.Get(), &rcItem);
           } else {
-            ratio = static_cast<float>(eps_watched) / static_cast<float>(eps_total);
+            ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_total);
+            ratio_buffer = static_cast<float>(eps_buffer) / static_cast<float>(eps_total);
           }
 
-          rcItem.right = static_cast<int>((rcItem.right - rcItem.left) * ratio) + rcItem.left;
+          CRect rcBuffer = rcItem;
+          rcItem.right = static_cast<int>((rcItem.right - rcItem.left) * ratio_watched) + rcItem.left;
+          
+          // Draw buffer
+          if (eps_buffer > 0) {
+            rcBuffer.right = static_cast<int>((rcBuffer.right - rcBuffer.left) * ratio_buffer) + rcBuffer.left;
+            UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
+            rcBuffer.left = rcItem.right;
+            rcBuffer.right = rcItem.right + 1;
+            UI.ListProgress.Seperator.Draw(hdc.Get(), &rcBuffer);
+          }
+          
           // Completed
-          if (ratio == 1.0f) {
+          if (ratio_watched == 1.0f) {
             UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem);
           // Watching
           } else if (pAnimeItem->My_Status == MAL_WATCHING) {
@@ -275,15 +363,16 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
           // Dropped
           } else if (pAnimeItem->My_Status == MAL_DROPPED) {
             UI.ListProgress.Dropped.Draw(hdc.Get(), &rcItem);
-          // Completed / On Hold / Plan to Watch
+          // Completed / On hold / Plan to watch
           } else {
             UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem);
           }
         }
 
         // Draw text
-        if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT) { // TODO: || !Settings.List_HideProgressData
-          wstring text = MAL.TranslateNumber(eps_watched) + L"/" + MAL.TranslateNumber(eps_total) + L" episodes";
+        if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT) {
+          wstring text = MAL.TranslateNumber(eps_buffer ? eps_buffer : eps_watched) + L"/" + 
+            MAL.TranslateNumber(eps_total) + L" episodes";
           hdc.EditFont(NULL, 7);
           hdc.SetBkMode(TRANSPARENT);
           hdc.SetTextColor(RGB(0, 0, 0)); // TODO: Color should be set in theme data

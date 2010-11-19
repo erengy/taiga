@@ -66,7 +66,7 @@ HMENU CMenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
       // Sub menu
       case MENU_ITEM_SUBMENU: {
         int sub_index = GetIndex(Menu[menu_index].Item[i].SubMenu.c_str());
-        if (sub_index > -1) {
+        if (sub_index > -1 && sub_index != menu_index) {
           HMENU hSubMenu = CreateNewMenu(Menu[sub_index].Name.c_str(), hMenu);
           ::AppendMenu(hMenu[nMenu], MF_POPUP | uFlags, 
             (UINT_PTR)hSubMenu, Menu[menu_index].Item[i].Name.c_str());

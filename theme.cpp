@@ -60,10 +60,11 @@ bool CTheme::Read(const wstring& name) {
     ListProgress.x.Value[2] = HexToARGB(progress.child(name).attribute(L"value_3").value());
   READ_PROGRESS_DATA(Background, L"background");
   READ_PROGRESS_DATA(Border,     L"border");
+  READ_PROGRESS_DATA(Buffer,     L"buffer");
   READ_PROGRESS_DATA(Completed,  L"completed");
   READ_PROGRESS_DATA(Dropped,    L"dropped");
+  READ_PROGRESS_DATA(Seperator,  L"seperator");
   READ_PROGRESS_DATA(Watching,   L"watching");
-  READ_PROGRESS_DATA(Unknown,    L"unknown");
 
   // Read menus
   for (xml_node menu = menus.child(L"menu"); menu; menu = menu.next_sibling(L"menu")) {
@@ -110,8 +111,9 @@ bool CTheme::LoadImages() {
 void CTheme::CThemeListProgress::CThemeListProgressItem::Draw(HDC hdc, const LPRECT lpRect) {
   // Solid
   if (Type == L"solid") {
-    static const HBRUSH hbrSolid = CreateSolidBrush(Value[0]);
+    HBRUSH hbrSolid = CreateSolidBrush(BGR2RGB(Value[0]));
     FillRect(hdc, lpRect, hbrSolid);
+    DeleteObject(hbrSolid);
 
   // Gradient
   } else if (Type == L"gradient") {

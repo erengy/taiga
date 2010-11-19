@@ -62,6 +62,7 @@ public:
   void CheckFolder();
   void CheckNewEpisode(bool check_folder = false);
   int  EstimateTotalEpisodes();
+  int  GetLastWatchedEpisode();
   bool ParseSearchResult(const wstring& data);
   void Refresh(wstring data);
   void SetStartDate(wstring date, bool ignore_previous);

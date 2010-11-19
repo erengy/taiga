@@ -52,7 +52,7 @@ BOOL CMainWindow::OnInitDialog() {
   
   // Set member variables
   CRect rect; GetWindowRect(&rect);
-  SetSizeMin(rect.Width(), rect.Height());
+  SetSizeMin(786 /*rect.Width()*/, 568 /*rect.Height()*/);
   SetSnapGap(10);
 
   // Set icon
@@ -81,6 +81,10 @@ BOOL CMainWindow::OnInitDialog() {
   m_CancelSearch.SetParent(m_EditSearch.GetWindowHandle());
   m_CancelSearch.SetPosition(NULL, rcEdit.right + 1, 0, 16, 16);
   //m_CancelSearch.SetClassLong(GCL_HCURSOR, reinterpret_cast<LONG>(::LoadImage(NULL, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+  // Create tree control
+  m_Tree.Attach(GetDlgItem(IDC_TREE_MAIN));
+  m_Tree.SetItemHeight(20);
+  m_Tree.SetTheme();
   // Create tab control
   m_Tab.Attach(GetDlgItem(IDC_TAB_MAIN));
   // Create main list
@@ -93,6 +97,9 @@ BOOL CMainWindow::OnInitDialog() {
   m_Status.SetImageList(UI.ImgList16.GetHandle());
   //m_Status.InsertPart(-1, 0, 0, 700, NULL, NULL);
   //m_Status.InsertPart(-1, 0, 0, 750, NULL, NULL);
+
+  // Insert tree items
+  m_Tree.RefreshItems();
 
   // Insert list columns
   m_List.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 370, LVCFMT_LEFT, L"Anime title");
@@ -329,6 +336,10 @@ LRESULT CMainWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
   } else if (idCtrl == IDC_TOOLBAR_MAIN || idCtrl == IDC_TOOLBAR_SEARCH) {
     return OnToolbarNotify(reinterpret_cast<LPARAM>(pnmh));
 
+  // Tree control
+  } else if (idCtrl == IDC_TREE_MAIN) {
+    return OnTreeNotify(reinterpret_cast<LPARAM>(pnmh));
+
   // Button control
   } else if (idCtrl == IDC_BUTTON_CANCELSEARCH) {
     if (pnmh->code == NM_CUSTOMDRAW) {
@@ -370,6 +381,11 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
       m_Status.GetClientRect(&rcStatus);
       m_Status.SendMessage(WM_SIZE, 0, 0);
       rcWindow.bottom -= rcStatus.Height();
+      // Resize tree
+      if (m_Tree.IsVisible()) {
+        m_Tree.SetPosition(NULL, rcWindow.left, rcWindow.top, 200 /* TEMP */, rcWindow.Height());
+        rcWindow.left += 200 + CONTROL_MARGIN;
+      }
       // Resize tab
       m_Tab.SetPosition(NULL, rcWindow);
       // Resize list

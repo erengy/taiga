@@ -278,7 +278,7 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
 
   // Replace variables
   Replace(str, L"%title%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Title), ENCODE(episode.Title)));
-  Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].My_WatchedEpisodes, L"")), L""));
+  Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].GetLastWatchedEpisode(), L"")), L""));
   Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].Series_Episodes, L"")), L""));
   Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].My_Score, L"")), L""));
   Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].Series_ID)), L""));

@@ -72,7 +72,7 @@ BOOL CTorrents::Compare() {
   for (size_t i = 0; i < Feed.Item.size(); i++) {
     int anime_index = Feed.Item[i].EpisodeData.Index;
     if (anime_index > 0) {
-      if (ToINT(GetLastEpisode(Feed.Item[i].EpisodeData.Number)) > AnimeList.Item[anime_index].My_WatchedEpisodes) {
+      if (ToINT(GetLastEpisode(Feed.Item[i].EpisodeData.Number)) > AnimeList.Item[anime_index].GetLastWatchedEpisode()) {
         Feed.Item[i].NewItem = true;
         if (Filter(i, anime_index)) {
           wstring file = Feed.Item[i].Title + L".torrent";

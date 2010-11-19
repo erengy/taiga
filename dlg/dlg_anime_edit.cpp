@@ -46,7 +46,7 @@ BOOL CAnimeEditWindow::OnInitDialog() {
   // Progress
   SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0, 
     AnimeList.Item[m_Index].Series_Episodes > 0 ? AnimeList.Item[m_Index].Series_Episodes : 999);
-  SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, AnimeList.Item[m_Index].My_WatchedEpisodes);
+  SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, AnimeList.Item[m_Index].GetLastWatchedEpisode());
 
   // Status
   CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);

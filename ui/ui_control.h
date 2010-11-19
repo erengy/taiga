@@ -332,6 +332,7 @@ public:
   CTreeView(HWND hWnd) { SetWindowHandle(hWnd); }
   virtual ~CTreeView() {}
 
+  BOOL      DeleteAllItems();
   BOOL      Expand(HTREEITEM hItem, bool bExpand = true);
   UINT      GetCount();
   BOOL      GetItem(LPTVITEM pItem);

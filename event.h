@@ -36,6 +36,7 @@ public:
   void Add(int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
   void Check();
   void Clear();
+  int  GetLastWatchedEpisode(int index);
   void Remove(unsigned int index);
   
   unsigned int Index;
@@ -49,6 +50,7 @@ public:
   void Check();
   void Clear();
   int  GetItemCount();
+  int  GetLastWatchedEpisode(int index);
   int  GetUserIndex(wstring user = L"");
   bool IsEmpty();
   void Remove(int index = -1);

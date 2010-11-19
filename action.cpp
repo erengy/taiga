@@ -472,10 +472,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditEpisode") {
     CInputDialog dlg;
     dlg.SetNumbers(true, 0, AnimeList.Item[AnimeList.Index].Series_Episodes, 
-      AnimeList.Item[AnimeList.Index].My_WatchedEpisodes);
+      AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode());
     dlg.Title = AnimeList.Item[AnimeList.Index].Series_Title;
     dlg.Info = L"Please enter episode number for this title:";
-    dlg.Text = ToWSTR(AnimeList.Item[AnimeList.Index].My_WatchedEpisodes);
+    dlg.Text = ToWSTR(AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode());
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK && MAL.IsValidEpisode(ToINT(dlg.Text), 0, AnimeList.Item[AnimeList.Index].Series_Episodes)) {
       CEpisode episode;
@@ -591,7 +591,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // PlayLast()
   // Searches for the last watched episode of an anime and plays it.
   } else if (action == L"PlayLast") {
-    int number = AnimeList.Item[AnimeList.Index].My_WatchedEpisodes;
+    int number = AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode();
     wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
     if (file.empty()) {
       if (number == 0) number = 1;
@@ -605,7 +605,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"PlayNext") {
     int number = 0;
     if (AnimeList.Item[AnimeList.Index].Series_Episodes != 1) {
-      number = AnimeList.Item[AnimeList.Index].My_WatchedEpisodes + 1;
+      number = AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode() + 1;
     }
     wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
     if (file.empty()) {
@@ -623,7 +623,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (anime_index > 0) {
       if (anime_index <= AnimeList.Count) {
         int total = AnimeList.Item[anime_index].EstimateTotalEpisodes();
-        if (total == 0) total = AnimeList.Item[anime_index].My_WatchedEpisodes + 1;
+        if (total == 0) total = AnimeList.Item[anime_index].GetLastWatchedEpisode() + 1;
         for (int i = 0; i < total; i++) {
           srand(static_cast<unsigned int>(GetTickCount()));
           int episode = rand() % total + 1;
@@ -643,7 +643,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     for (int i = 0; i < AnimeList.Count; i++) {
       int anime_index = rand() % AnimeList.Count + 1;
       int total = AnimeList.Item[anime_index].EstimateTotalEpisodes();
-      if (total == 0) total = AnimeList.Item[anime_index].My_WatchedEpisodes + 1;
+      if (total == 0) total = AnimeList.Item[anime_index].GetLastWatchedEpisode() + 1;
       srand(static_cast<unsigned int>(GetTickCount()));
       int episode = rand() % total + 1;
       AnimeList.Item[anime_index].CheckFolder();

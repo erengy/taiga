@@ -85,12 +85,13 @@ public:
       COLORREF Value[3];
       wstring  Type;
     }
-      Background, 
-      Border, 
-      Completed, 
-      Dropped, 
-      Watching, 
-      Unknown;
+      Background,
+      Border,
+      Buffer,
+      Completed,
+      Dropped,
+      Seperator,
+      Watching;
   } ListProgress;
 };
 

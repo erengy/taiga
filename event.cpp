@@ -126,6 +126,16 @@ void CEventList::Clear() {
   Index = 0;
 }
 
+int CEventList::GetLastWatchedEpisode(int index) {
+  int value = 0;
+  for (unsigned int i = 0; i < Item.size(); i++) {
+    if (Item[i].Index == index)
+      if (Item[i].Episode > value)
+        value = Item[i].Episode;
+  }
+  return value;
+}
+
 void CEventList::Remove(unsigned int index) {
   // Remove item
   if (index < Item.size()) {
@@ -159,6 +169,12 @@ void CEventBuffer::Clear() {
 int CEventBuffer::GetItemCount() {
   int user_index = GetUserIndex();
   if (user_index > -1) return List[user_index].Item.size();
+  return 0;
+}
+
+int CEventBuffer::GetLastWatchedEpisode(int index) {
+  int user_index = GetUserIndex();
+  if (user_index > -1) return List[user_index].GetLastWatchedEpisode(index);
   return 0;
 }
 

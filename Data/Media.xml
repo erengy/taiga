@@ -163,7 +163,7 @@
 		<name>PotPlayer</name>
 		<enabled>1</enabled>
 		<visible>1</visible>
-		<mode>0</mode>
+		<mode>1</mode>
 		<class>PotPlayer</class>
 		<class>PotPlayer64</class>
 		<file>PotPlayer.exe</file>
