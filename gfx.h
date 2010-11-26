@@ -32,8 +32,7 @@ HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bIta
 BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, bool bVertical);
 BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, DWORD dwColor3);
 
-COLORREF BGR2RGB(COLORREF color);
-COLORREF HexToARGB(LPCWSTR lpText);
+COLORREF HexToARGB(const wstring& text);
 int ScaleX(int value);
 int ScaleY(int value);
 

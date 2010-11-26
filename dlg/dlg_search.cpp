@@ -180,7 +180,6 @@ BOOL CSearchWindow::PreTranslateMessage(MSG* pMsg) {
 // =============================================================================
 
 BOOL CSearchWindow::Search(const wstring& title) {
-  //wstring data = L"0"; ParseResults(data); return TRUE; // TEMP
   if (MAL.SearchAnime(title)) {
     m_Edit.SetText(title.c_str());
     EnableDlgItem(IDOK, FALSE);
@@ -202,21 +201,21 @@ void CSearchWindow::ParseResults(const wstring& data) {
   
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
-  //xml_parse_result result = doc.load_file(ToANSI(L"Data\\search.xml")); // TEMP
   if (result.status == status_ok) {
     xml_node anime = doc.child(L"anime");
     for (xml_node entry = anime.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
       int i = m_Anime.size(); m_Anime.resize(i + 1);
       int anime_id = XML_ReadIntValue(entry, L"id");
       m_Anime[i].Index = AnimeList.FindItemByID(anime_id);
+      
       if (m_Anime[i].Index > -1) {
         AnimeList.Item[m_Anime[i].Index].Score = XML_ReadStrValue(entry, L"score");
         AnimeList.Item[m_Anime[i].Index].Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        DecodeHTML(AnimeList.Item[m_Anime[i].Index].Synopsis);
+        MAL.DecodeSynopsis(AnimeList.Item[m_Anime[i].Index].Synopsis);
       } else {
         m_Anime[i].Series_ID = anime_id;
         m_Anime[i].Series_Title = XML_ReadStrValue(entry, L"title");
-        m_Anime[i].Synonyms = XML_ReadStrValue(entry, L"synonyms");
+        m_Anime[i].Series_Synonyms = XML_ReadStrValue(entry, L"synonyms");
         m_Anime[i].Series_Episodes = XML_ReadIntValue(entry, L"episodes");
         m_Anime[i].Score = XML_ReadStrValue(entry, L"score");
         m_Anime[i].Series_Type = MAL.TranslateType(XML_ReadStrValue(entry, L"type"));
@@ -224,7 +223,7 @@ void CSearchWindow::ParseResults(const wstring& data) {
         m_Anime[i].Series_Start = XML_ReadStrValue(entry, L"start_date");
         m_Anime[i].Series_End = XML_ReadStrValue(entry, L"end_date");
         m_Anime[i].Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        DecodeHTML(m_Anime[i].Synopsis);
+        MAL.DecodeSynopsis(m_Anime[i].Synopsis);
         m_Anime[i].Series_Image = XML_ReadStrValue(entry, L"image");
       }
     }
@@ -236,6 +235,7 @@ void CSearchWindow::ParseResults(const wstring& data) {
 void CSearchWindow::RefreshList() {
   if (!IsWindow()) return;
 
+  // Hide and clear the list
   m_List.Show(SW_HIDE);
   m_List.DeleteAllItems();
   
@@ -244,24 +244,16 @@ void CSearchWindow::RefreshList() {
     if (m_Anime[i].Index == -1) {
       m_Anime[i].Index = AnimeList.FindItemByID(m_Anime[i].Series_ID);
     }
-    if (m_Anime[i].Index > -1) {
-      int j = m_Anime[i].Index;
-      m_List.InsertItem(i, -1, StatusToIcon(AnimeList.Item[j].Series_Status), 
-        AnimeList.Item[j].Series_Title.c_str(), reinterpret_cast<LPARAM>(&AnimeList.Item[j]));
-      m_List.SetItem(i, 1, MAL.TranslateType(AnimeList.Item[j].Series_Type).c_str());
-      m_List.SetItem(i, 2, MAL.TranslateNumber(AnimeList.Item[j].Series_Episodes).c_str());
-      m_List.SetItem(i, 3, AnimeList.Item[j].Score.c_str());
-      m_List.SetItem(i, 4, MAL.TranslateDate(AnimeList.Item[j].Series_Start).c_str());
-    } else {
-      m_List.InsertItem(i, -1, StatusToIcon(m_Anime[i].Series_Status), 
-        m_Anime[i].Series_Title.c_str(), reinterpret_cast<LPARAM>(&m_Anime[i]));
-      m_List.SetItem(i, 1, MAL.TranslateType(m_Anime[i].Series_Type).c_str());
-      m_List.SetItem(i, 2, MAL.TranslateNumber(m_Anime[i].Series_Episodes).c_str());
-      m_List.SetItem(i, 3, m_Anime[i].Score.c_str());
-      m_List.SetItem(i, 4, MAL.TranslateDate(m_Anime[i].Series_Start).c_str());
-    }
+    CAnime* item = m_Anime[i].Index > -1 ? &AnimeList.Item[m_Anime[i].Index] : &m_Anime[i];
+    m_List.InsertItem(i, -1, StatusToIcon(item->Series_Status), item->Series_Title.c_str(), 
+      reinterpret_cast<LPARAM>(item));
+    m_List.SetItem(i, 1, MAL.TranslateType(item->Series_Type).c_str());
+    m_List.SetItem(i, 2, MAL.TranslateNumber(item->Series_Episodes).c_str());
+    m_List.SetItem(i, 3, item->Score.c_str());
+    m_List.SetItem(i, 4, MAL.TranslateDate(item->Series_Start).c_str());
   }
 
+  // Sort and show the list again
   m_List.Sort(0, 1, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
   m_List.Show();
 }

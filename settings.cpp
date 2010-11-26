@@ -199,7 +199,7 @@ bool CSettings::Read() {
   // Events
   for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
-      EventBuffer.Add(user.attribute(L"name").value(),
+      EventQueue.Add(user.attribute(L"name").value(),
         item.attribute(L"index").as_int(),
         item.attribute(L"id").as_int(),
         item.attribute(L"episode").as_int(),
@@ -408,25 +408,25 @@ bool CSettings::Write() {
   }
 
   // Write event buffer
-  if (Program.Exit.SaveBuffer && !EventBuffer.IsEmpty()) {
+  if (Program.Exit.SaveBuffer && !EventQueue.IsEmpty()) {
     xml_node events = doc.append_child();
     events.set_name(L"events");
-    for (size_t i = 0; i < EventBuffer.List.size(); i++) {
-      if (EventBuffer.List[i].Item.empty()) continue;
+    for (size_t i = 0; i < EventQueue.List.size(); i++) {
+      if (EventQueue.List[i].Item.empty()) continue;
       xml_node user = events.append_child();
       user.set_name(L"user");
-      user.append_attribute(L"name") = EventBuffer.List[i].User.c_str();
-      for (size_t j = 0; j < EventBuffer.List[i].Item.size(); j++) {
+      user.append_attribute(L"name") = EventQueue.List[i].User.c_str();
+      for (size_t j = 0; j < EventQueue.List[i].Item.size(); j++) {
         xml_node item = user.append_child();
         item.set_name(L"event");
-        item.append_attribute(L"index")   = EventBuffer.List[i].Item[j].Index;
-        item.append_attribute(L"id")      = EventBuffer.List[i].Item[j].ID;
-        item.append_attribute(L"episode") = EventBuffer.List[i].Item[j].Episode;
-        item.append_attribute(L"score")   = EventBuffer.List[i].Item[j].Score;
-        item.append_attribute(L"status")  = EventBuffer.List[i].Item[j].Status;
-        item.append_attribute(L"tags")    = EventBuffer.List[i].Item[j].Tags.c_str();
-        item.append_attribute(L"time")    = EventBuffer.List[i].Item[j].Time.c_str();
-        item.append_attribute(L"mode")    = EventBuffer.List[i].Item[j].Mode;
+        item.append_attribute(L"index")   = EventQueue.List[i].Item[j].Index;
+        item.append_attribute(L"id")      = EventQueue.List[i].Item[j].ID;
+        item.append_attribute(L"episode") = EventQueue.List[i].Item[j].Episode;
+        item.append_attribute(L"score")   = EventQueue.List[i].Item[j].Score;
+        item.append_attribute(L"status")  = EventQueue.List[i].Item[j].Status;
+        item.append_attribute(L"tags")    = EventQueue.List[i].Item[j].Tags.c_str();
+        item.append_attribute(L"time")    = EventQueue.List[i].Item[j].Time.c_str();
+        item.append_attribute(L"mode")    = EventQueue.List[i].Item[j].Mode;
       }
     }
   }

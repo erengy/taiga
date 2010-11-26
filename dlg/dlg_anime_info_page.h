@@ -16,26 +16,32 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ANIME_EDIT_H
-#define DLG_ANIME_EDIT_H
+#ifndef DLG_ANIME_INFO_PAGE_H
+#define DLG_ANIME_INFO_PAGE_H
 
 #include "../std.h"
 #include "../ui/ui_dialog.h"
 
 // =============================================================================
 
-class CAnimeEditWindow : public CDialog {
-public:
-  CAnimeEditWindow();
-  virtual ~CAnimeEditWindow();
-
-  BOOL OnInitDialog();
-  void OnOK();
-
-private:
-  int m_Index;
+enum AnimeInfoTab{
+  TAB_SERIESINFO,
+  TAB_MYINFO,
+  TAB_COUNT
 };
 
-extern CAnimeEditWindow AnimeEditWindow;
+class CAnimeInfoPage : public CDialog {
+public:
+  CAnimeInfoPage();
+  virtual ~CAnimeInfoPage();
 
-#endif // DLG_ANIME_EDIT_H
+  int Index;
+
+  void Refresh(CAnime* pAnimeItem = NULL);
+  BOOL OnInitDialog();
+
+private:
+  HFONT m_hfHeader;
+};
+
+#endif // DLG_ANIME_INFO_PAGE_H

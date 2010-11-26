@@ -98,15 +98,15 @@ BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, 
   TRIVERTEX vertex[2];
   vertex[0].x     = lpRect->left;
   vertex[0].y     = lpRect->top;
-  vertex[0].Red   = GetBValue(dwColor1) << 8;
+  vertex[0].Red   = GetRValue(dwColor1) << 8;
   vertex[0].Green = GetGValue(dwColor1) << 8;
-  vertex[0].Blue  = GetRValue(dwColor1) << 8;
+  vertex[0].Blue  = GetBValue(dwColor1) << 8;
   vertex[0].Alpha = 0x0000;
   vertex[1].x     = lpRect->right;
   vertex[1].y     = lpRect->bottom;
-  vertex[1].Red   = GetBValue(dwColor2) << 8;
+  vertex[1].Red   = GetRValue(dwColor2) << 8;
   vertex[1].Green = GetGValue(dwColor2) << 8;
-  vertex[1].Blue  = GetRValue(dwColor2) << 8;
+  vertex[1].Blue  = GetBValue(dwColor2) << 8;
   vertex[1].Alpha = 0x0000;
   GRADIENT_RECT gRect = {0, 1};
   return GdiGradientFill(hdc, vertex, 2, &gRect, 1, static_cast<ULONG>(bVertical));
@@ -116,7 +116,7 @@ BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor
   // Draw bottom rect
   RECT rect = *lpRect;
   rect.top += (rect.bottom - rect.top) / 2;
-  HBRUSH brush = CreateSolidBrush(BGR2RGB(dwColor3));
+  HBRUSH brush = CreateSolidBrush(dwColor3);
   FillRect(hdc, &rect, brush);
   DeleteObject(brush);
   // Draw top gradient
@@ -127,14 +127,16 @@ BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor
 
 // =============================================================================
 
-COLORREF BGR2RGB(COLORREF color) {
-  return (color & 0x000000ff) << 16 | (color & 0x0000FF00) | (color & 0x00FF0000) >> 16;
-}
+COLORREF HexToARGB(const wstring& text) {
+  int i = text.length() - 6;
+  if (i < 0) return 0;
 
-COLORREF HexToARGB(LPCWSTR lpText) {
-  wchar_t* stopwcs;
-  COLORREF buffer = wcstoul(lpText, &stopwcs, 16);
-  return buffer;
+  unsigned int r, g, b;
+  r = wcstoul(text.substr(i + 0, 2).c_str(), NULL, 16);
+  g = wcstoul(text.substr(i + 2, 2).c_str(), NULL, 16);
+  b = wcstoul(text.substr(i + 4, 2).c_str(), NULL, 16);
+
+  return RGB(r, g, b);
 }
 
 int ScaleX(int value) {

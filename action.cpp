@@ -22,7 +22,7 @@
 #include "common.h"
 #include "dlg/dlg_about.h"
 #include "dlg/dlg_anime_info.h"
-#include "dlg/dlg_anime_edit.h"
+#include "dlg/dlg_anime_info_page.h"
 #include "dlg/dlg_filter.h"
 #include "dlg/dlg_input.h"
 #include "dlg/dlg_main.h"
@@ -108,8 +108,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Synchronize()
   // Synchronize local and remote lists.
   } else if (action == L"Synchronize") {
-    if (Taiga.LoggedIn && EventBuffer.GetItemCount() > 0) {
-      EventBuffer.Check();
+    if (Taiga.LoggedIn && EventQueue.GetItemCount() > 0) {
+      EventQueue.Check();
     } else {
       ExecuteAction(L"RefreshList");
     }
@@ -167,15 +167,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Shows anime information window.
   // lParam is a pointer to an anime list item.
   } else if (action == L"Info") {
-    if (lParam) {
-      AnimeWindow.Refresh(reinterpret_cast<CAnime*>(lParam));
-    } else {
-      AnimeWindow.Refresh(&AnimeList.Item[AnimeList.Index]);
-    }
+    CAnime* anime_item = lParam ? 
+      reinterpret_cast<CAnime*>(lParam) : &AnimeList.Item[AnimeList.Index];
+    AnimeWindow.Refresh(anime_item);
+    AnimeWindow.SetCurrentPage(TAB_SERIESINFO);
     if (!AnimeWindow.IsWindow()) {
       AnimeWindow.Create(IDD_ANIME_INFO, g_hMain, false);
+    } else {
+       ActivateWindow(AnimeWindow.GetWindowHandle());
     }
-    ActivateWindow(AnimeWindow.GetWindowHandle());
 
   // RecognitionTest()
   // Shows recognition test window.
@@ -196,7 +196,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // Settings()
   // Shows settings window.
+  // lParam is the initial page number.
   } else if (action == L"Settings") {
+    SettingsWindow.SetCurrentPage(lParam);
     if (!SettingsWindow.IsWindow()) {
       SettingsWindow.Create(IDD_SETTINGS, g_hMain, true);
     } else {
@@ -262,7 +264,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       MainWindow.RefreshList(pAnimeItem->My_Status);
       MainWindow.RefreshTabs(pAnimeItem->My_Status);
       SearchWindow.RefreshList();
-      EventBuffer.Add(L"", AnimeList.Count, pAnimeItem->Series_ID, 
+      EventQueue.Add(L"", AnimeList.Count, pAnimeItem->Series_ID, 
         pAnimeItem->My_WatchedEpisodes ? pAnimeItem->My_WatchedEpisodes : -1, 
         -1, status, L"%empty%", L"", HTTP_MAL_AnimeAdd);
     }
@@ -276,14 +278,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (BrowseForFolder(g_hMain, L"Please select a folder:", 
       BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
         Settings.Folders.Root.push_back(path);
-        SettingsWindow.SetCurrentPage(PAGE_FOLDERS_ROOT);
-        SettingsWindow.Create(IDD_SETTINGS, g_hMain, true);
+        ExecuteAction(L"Settings", 0, PAGE_FOLDERS_ROOT);
     }
 
   // CheckEventBuffer()
   // Checks for queued events and shows related window.
   } else if (action == L"CheckEventBuffer") {
-    EventBuffer.Show();
+    EventQueue.Show();
 
   // CheckNewEpisodes()
   // Checks new episodes.
@@ -449,8 +450,17 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditAll()
   // Shows a dialog to edit details of an anime.
+  // lParam is a pointer to an anime list item.
   } else if (action == L"EditAll") {
-    AnimeEditWindow.Create(IDD_ANIME_EDIT, g_hMain, true);
+    CAnime* anime_item = lParam ? 
+      reinterpret_cast<CAnime*>(lParam) : &AnimeList.Item[AnimeList.Index];
+    AnimeWindow.Refresh(anime_item);
+    AnimeWindow.SetCurrentPage(TAB_MYINFO);
+    if (!AnimeWindow.IsWindow()) {
+      AnimeWindow.Create(IDD_ANIME_INFO, g_hMain, false);
+    } else {
+       ActivateWindow(AnimeWindow.GetWindowHandle());
+    }
 
   // EditDelete()
   // Removes an anime from list.
@@ -463,7 +473,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() == IDYES) {
-      EventBuffer.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
+      EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
         -1, -1, -1, L"%empty%", L"", HTTP_MAL_AnimeDelete);
     }
 
@@ -488,10 +498,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Value must be between 0-10 and different from current score.
   } else if (action == L"EditScore") {
     int score = ToINT(body);
-    if (score >= 0 && score <= 10 && score != AnimeList.Item[AnimeList.Index].My_Score) {
-      EventBuffer.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-        -1, score, -1, L"%empty%", L"", HTTP_MAL_ScoreUpdate);
-    }
+    EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
+      -1, score, -1, L"%empty%", L"", HTTP_MAL_ScoreUpdate);
 
   // EditStatus(value)
   // Changes anime status of user.
@@ -528,7 +536,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         if (episode == 0) episode = -1;
         break;
     }
-    EventBuffer.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
+    EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
       episode, -1, status, L"%empty%", L"", episode == -1 ? HTTP_MAL_StatusUpdate : HTTP_MAL_AnimeEdit);
 
   // EditTags(tags)
@@ -540,8 +548,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.Info  = L"Please enter tags for this title, seperated by a comma:";
     dlg.Text  = AnimeList.Item[AnimeList.Index].My_Tags;
     dlg.Show(g_hMain);
-    if (dlg.Result == IDOK && dlg.Text != AnimeList.Item[AnimeList.Index].My_Tags) {
-      EventBuffer.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
+    if (dlg.Result == IDOK) {
+      EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
         -1, -1, -1, dlg.Text, L"", HTTP_MAL_TagUpdate);
     }
 

@@ -44,7 +44,7 @@ public:
   vector<CEventItem> Item;
 };
 
-class CEventBuffer {
+class CEventQueue {
 public:
   void Add(wstring user, int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
   void Check();
@@ -59,6 +59,6 @@ public:
   vector<CEventList> List;
 };
 
-extern CEventBuffer EventBuffer;
+extern CEventQueue EventQueue;
 
 #endif // EVENT_H

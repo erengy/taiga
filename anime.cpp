@@ -68,7 +68,7 @@ CMALAnime::CMALAnime() :
 }
 
 CAnime::CAnime() : 
-  Index(0), NewEps(false), Playing(false)
+  Index(0), NewEps(false), Playing(false), Score(L"0.00")
 {
 }
 
@@ -218,17 +218,17 @@ void CAnime::Update(CEpisode episode, bool do_move) {
   if (do_move) {
     // Move to completed
     if (Series_Episodes == number) {
-      EventBuffer.Add(L"", Index, Series_ID, number, -1, MAL_COMPLETED, L"%empty%", L"", HTTP_MAL_AnimeEdit);
+      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_COMPLETED, L"%empty%", L"", HTTP_MAL_AnimeEdit);
       return;
     // Move to watching
     } else if (My_Status != MAL_WATCHING || number == 1) {
-      EventBuffer.Add(L"", Index, Series_ID, number, -1, MAL_WATCHING, L"%empty%", L"", HTTP_MAL_AnimeEdit);
+      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_WATCHING, L"%empty%", L"", HTTP_MAL_AnimeEdit);
       return;
     }
   }
 
   // Update normally
-  EventBuffer.Add(L"", Index, Series_ID, number, -1, -1, L"%empty%", L"", HTTP_MAL_AnimeUpdate);
+  EventQueue.Add(L"", Index, Series_ID, number, -1, -1, L"%empty%", L"", HTTP_MAL_AnimeUpdate);
 }
 
 void CAnime::CheckFolder() {
@@ -298,7 +298,7 @@ int CAnime::EstimateTotalEpisodes() {
 }
 
 int CAnime::GetLastWatchedEpisode() {
-  int value = EventBuffer.GetLastWatchedEpisode(Index);
+  int value = EventQueue.GetLastWatchedEpisode(Index);
   if (!value) value = My_WatchedEpisodes;
   return value;
 }
@@ -313,7 +313,7 @@ bool CAnime::ParseSearchResult(const wstring& data) {
       if (XML_ReadIntValue(entry, L"id") == Series_ID) {
         Score = XML_ReadStrValue(entry, L"score");
         Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        DecodeHTML(Synopsis);
+        MAL.DecodeSynopsis(Synopsis);
         return true;
       }
     }
@@ -338,14 +338,14 @@ void CAnime::SetFinishDate(wstring date, bool ignore_previous) {
 // =============================================================================
 
 void CAnime::Refresh(wstring data) {
-  if (EventBuffer.GetItemCount() == 0) return;
-  int user_index = EventBuffer.GetUserIndex();
-  int index    = EventBuffer.List[user_index].Item[EventBuffer.List[user_index].Index].Index;
-  int episode  = EventBuffer.List[user_index].Item[EventBuffer.List[user_index].Index].Episode;
-  int score    = EventBuffer.List[user_index].Item[EventBuffer.List[user_index].Index].Score;
-  int status   = EventBuffer.List[user_index].Item[EventBuffer.List[user_index].Index].Status;
-  int mode     = EventBuffer.List[user_index].Item[EventBuffer.List[user_index].Index].Mode;
-  wstring tags = EventBuffer.List[user_index].Item[EventBuffer.List[user_index].Index].Tags;
+  if (EventQueue.GetItemCount() == 0) return;
+  int user_index = EventQueue.GetUserIndex();
+  int index    = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Index;
+  int episode  = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Episode;
+  int score    = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Score;
+  int status   = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Status;
+  int mode     = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Mode;
+  wstring tags = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Tags;
 
   // Check success
   bool success = false;
@@ -421,12 +421,10 @@ void CAnime::Refresh(wstring data) {
     if (score > -1) {
       My_Score = score;
       AnimeList.Write(index, L"my_score", ToWSTR(score), ANIMELIST_EDITANIME);
-      AnimeWindow.Refresh();
     }
     if (tags != L"%empty%") {
       My_Tags = tags;
       AnimeList.Write(index, L"my_tags", tags, ANIMELIST_EDITANIME);
-      AnimeWindow.Refresh();
     }
 
     if (status > 0) {
@@ -444,8 +442,8 @@ void CAnime::Refresh(wstring data) {
     }
 
     // Remove item from update buffer
-    EventBuffer.Remove();
+    EventQueue.Remove();
     // Check for more items
-    EventBuffer.Check();
+    EventQueue.Check();
   }
 }

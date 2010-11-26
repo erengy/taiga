@@ -174,7 +174,7 @@ void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus,
         lpOutBuffer, &dwSize, 
         WINHTTP_NO_HEADER_INDEX)) {
           ParseHeaders((LPWSTR)lpOutBuffer);
-          if (OnHeadersAvailable()) {
+          if (OnHeadersAvailable((LPWSTR)lpOutBuffer)) {
             delete [] lpOutBuffer;
             Cleanup();
           }

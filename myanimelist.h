@@ -62,6 +62,7 @@ public:
   BOOL SearchAnime(wstring title, CAnime* pAnimeItem = NULL);
   void Update(int index, int id, int episode, int score, int status, wstring tags, int mode);
   
+  void DecodeSynopsis(wstring& text);
   bool IsValidEpisode(int episode, int watched, int total);
   wstring TranslateDate(wstring value, bool reverse = false);
   wstring TranslateMyStatus(int value, bool add_count);

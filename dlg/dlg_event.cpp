@@ -56,7 +56,7 @@ BOOL CEventWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Clear all items
     case IDC_BUTTON_EVENT_CLEAR: {
-      EventBuffer.Clear();
+      EventQueue.Clear();
       RefreshList();
       return TRUE;
     }
@@ -87,7 +87,7 @@ LRESULT CEventWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 void CEventWindow::OnOK() {
-  EventBuffer.Check();
+  EventQueue.Check();
 }
 
 void CEventWindow::RefreshList() {
@@ -97,27 +97,27 @@ void CEventWindow::RefreshList() {
   m_List.DeleteAllItems();
   
   // Add items
-  int user_index = EventBuffer.GetUserIndex();
+  int user_index = EventQueue.GetUserIndex();
   if (user_index > -1) {
-    for (size_t i = 0; i < EventBuffer.List[user_index].Item.size(); i++) {
-      int episode  = EventBuffer.List[user_index].Item[i].Episode; if (episode == -1) episode++;
-      int score    = EventBuffer.List[user_index].Item[i].Score;   if (score == -1) score++;
-      int status   = EventBuffer.List[user_index].Item[i].Status;
-      wstring tags = EventBuffer.List[user_index].Item[i].Tags;    if (tags == L"%empty%") tags.clear();
+    for (size_t i = 0; i < EventQueue.List[user_index].Item.size(); i++) {
+      int episode  = EventQueue.List[user_index].Item[i].Episode; if (episode == -1) episode++;
+      int score    = EventQueue.List[user_index].Item[i].Score;   if (score == -1) score++;
+      int status   = EventQueue.List[user_index].Item[i].Status;
+      wstring tags = EventQueue.List[user_index].Item[i].Tags;    if (tags == L"%empty%") tags.clear();
 
-      if (EventBuffer.List[user_index].Item[i].Index <= AnimeList.Count) {
-        m_List.InsertItem(i, -1, -1, AnimeList.Item[EventBuffer.List[user_index].Item[i].Index].Series_Title.c_str(), 0);
+      if (EventQueue.List[user_index].Item[i].Index <= AnimeList.Count) {
+        m_List.InsertItem(i, -1, -1, AnimeList.Item[EventQueue.List[user_index].Item[i].Index].Series_Title.c_str(), 0);
         m_List.SetItem(i, 1, MAL.TranslateNumber(episode, L"").c_str());
         m_List.SetItem(i, 2, MAL.TranslateNumber(score, L"").c_str());
         m_List.SetItem(i, 3, MAL.TranslateMyStatus(status, false).c_str());
         m_List.SetItem(i, 4, tags.c_str());
-        m_List.SetItem(i, 5, EventBuffer.List[user_index].Item[i].Time.c_str());
+        m_List.SetItem(i, 5, EventQueue.List[user_index].Item[i].Time.c_str());
       }
     }
   }
 
   // Set title
-  switch (EventBuffer.GetItemCount()) {
+  switch (EventQueue.GetItemCount()) {
     case 0:
       SetText(L"Event queue is empty.");
       break;
@@ -125,7 +125,7 @@ void CEventWindow::RefreshList() {
       SetText(L"There is 1 item in the event queue.");
       break;
     default:
-      SetText(L"There are " + ToWSTR(EventBuffer.GetItemCount()) + L" items in the event queue.");
+      SetText(L"There are " + ToWSTR(EventQueue.GetItemCount()) + L" items in the event queue.");
       break;
   }
 }

@@ -47,6 +47,8 @@ class CSettingsPage : public CDialog {
 public:
   CSettingsPage();
   virtual ~CSettingsPage() {}
+
+  int Index;
   
   void CreateItem(LPCWSTR pszText, HTREEITEM htiParent);
   void Select();
@@ -54,8 +56,6 @@ public:
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
-  
-  int Index;
 
 private:
   HTREEITEM m_hTreeItem;

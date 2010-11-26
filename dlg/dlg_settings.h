@@ -37,7 +37,6 @@ public:
   } m_Tree;
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  void OnCancel();
   BOOL OnInitDialog();
   void OnOK();
   void SetCurrentPage(int index);

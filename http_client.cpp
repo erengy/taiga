@@ -20,6 +20,7 @@
 #include "animelist.h"
 #include "common.h"
 #include "dlg/dlg_anime_info.h"
+#include "dlg/dlg_anime_info_page.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_search.h"
 #include "dlg/dlg_settings.h"
@@ -27,6 +28,7 @@
 #include "event.h"
 #include "http.h"
 #include "myanimelist.h"
+#include "resource.h"
 #include "rss.h"
 #include "settings.h"
 #include "string.h"
@@ -93,7 +95,7 @@ BOOL CHTTPClient::OnSendRequestComplete() {
   return 0;
 }
 
-BOOL CHTTPClient::OnHeadersAvailable() {
+BOOL CHTTPClient::OnHeadersAvailable(wstring headers) {
   if (GetClientMode() != HTTP_Silent) {
     TaskbarList.SetProgressState(m_dwTotal > 0 ? TBPF_NORMAL : TBPF_INDETERMINATE);
   }
@@ -243,7 +245,7 @@ BOOL CHTTPClient::OnReadComplete() {
       MainWindow.UpdateTip();
       switch (Settings.Account.MAL.API) {
         case MAL_API_OFFICIAL:
-          EventBuffer.Check();
+          EventQueue.Check();
           return TRUE;
         case MAL_API_NONE:
           MAL.CheckProfile();
@@ -280,7 +282,7 @@ BOOL CHTTPClient::OnReadComplete() {
           }
         }
         MainWindow.ChangeStatus(status);
-        EventBuffer.Check();
+        EventQueue.Check();
         return TRUE;
       }
       break;
@@ -300,8 +302,8 @@ BOOL CHTTPClient::OnReadComplete() {
             MainWindow.RefreshList();
             MainWindow.RefreshTabs();
             SearchWindow.RefreshList();
-            EventBuffer.Remove();
-            EventBuffer.Check();
+            EventQueue.Remove();
+            EventQueue.Check();
             return TRUE;
           } else {
             MainWindow.ChangeStatus(L"Error: " + GetData());
@@ -336,9 +338,10 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_SearchAnime: {
       if (pItem) {
         if (pItem->ParseSearchResult(GetData())) {
-          AnimeWindow.Refresh(pItem);
+          AnimeWindow.Refresh(pItem, true, false);
         } else {
-          AnimeWindow.m_Edit.SetText(L"Could not read anime information.");
+          AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, 
+            L"Could not read anime information.");
         }
       } else {
         if (SearchWindow.IsWindow()) {
@@ -354,7 +357,7 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Download image
     case HTTP_MAL_Image: {
-      AnimeWindow.Refresh();
+      AnimeWindow.Refresh(NULL, false, false);
       break;
     }
 

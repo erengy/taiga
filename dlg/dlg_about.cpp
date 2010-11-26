@@ -28,8 +28,10 @@ CAboutWindow AboutWindow;
 
 // =============================================================================
 
+#define NOTE_COUNT 32
+
 int note_index;
-int note_list[][2] = {
+int note_list[NOTE_COUNT][2] = {
   {84, 1}, // 1/2
   {84, 2}, // 1/4
   {86, 4}, // 1/8
@@ -141,7 +143,7 @@ BOOL CAboutPage::OnInitDialog() {
 }
 
 void CAboutPage::OnTimer(UINT_PTR nIDEvent) {
-  if (note_index == 32) {
+  if (note_index == NOTE_COUNT) {
     KillTimer(GetWindowHandle(), TIMER_TAIGA);
     AboutWindow.SetText(L"About");
     note_index = 0;

@@ -71,7 +71,7 @@ public:
 
   virtual BOOL OnError(DWORD dwError) { return FALSE; }
   virtual BOOL OnSendRequestComplete() { return FALSE; }
-  virtual BOOL OnHeadersAvailable() { return FALSE; }
+  virtual BOOL OnHeadersAvailable(wstring headers) { return FALSE; }
   virtual BOOL OnDataAvailable() { return FALSE; }
   virtual BOOL OnReadData() { return FALSE; }
   virtual BOOL OnReadComplete() { return TRUE; }
@@ -110,7 +110,7 @@ public:
 protected:
   BOOL OnError(DWORD dwError);
   BOOL OnSendRequestComplete();
-  BOOL OnHeadersAvailable();
+  BOOL OnHeadersAvailable(wstring headers);
   BOOL OnReadData();
   BOOL OnReadComplete();
   BOOL OnRedirect(wstring address);

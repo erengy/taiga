@@ -40,11 +40,11 @@ void CEdit::GetRect(LPRECT lprc) {
 }
 
 void CEdit::LimitText(int cchMax) {
-  ::SendMessage(m_hWindow, EM_SETLIMITTEXT, (WPARAM)cchMax, 0);
+  ::SendMessage(m_hWindow, EM_SETLIMITTEXT, cchMax, 0);
 }
 
-BOOL CEdit::SetCueBannerText(LPCWSTR lpcwText) {
-  return Edit_SetCueBannerText(m_hWindow, lpcwText);
+BOOL CEdit::SetCueBannerText(LPCWSTR lpcwText, BOOL fDrawFocused) {
+  return ::SendMessage(m_hWindow, EM_SETCUEBANNER, fDrawFocused, reinterpret_cast<LPARAM>(lpcwText));
 }
 
 void CEdit::SetMargins(int iLeft, int iRight) {
@@ -86,5 +86,5 @@ BOOL CEdit::ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon) {
   ebt.pszText  = pszText;
   ebt.pszTitle = pszTitle;
   ebt.ttiIcon  = ttiIcon;
-  return Edit_ShowBalloonTip(m_hWindow, &ebt);
+  return ::SendMessage(m_hWindow, EM_SHOWBALLOONTIP, 0, reinterpret_cast<LPARAM>(&ebt));
 }

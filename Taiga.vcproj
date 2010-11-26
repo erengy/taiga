@@ -376,16 +376,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\resource.rc"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Third Party"
 			>
 			<Filter
@@ -537,11 +527,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\dlg\dlg_anime_edit.cpp"
+				RelativePath=".\dlg\dlg_anime_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dlg\dlg_anime_info.cpp"
+				RelativePath=".\dlg\dlg_anime_info_page.cpp"
 				>
 			</File>
 			<File
@@ -600,11 +590,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\dlg\dlg_anime_edit.h"
+					RelativePath=".\dlg\dlg_anime_info.h"
 					>
 				</File>
 				<File
-					RelativePath=".\dlg\dlg_anime_info.h"
+					RelativePath=".\dlg\dlg_anime_info_page.h"
 					>
 				</File>
 				<File
@@ -652,6 +642,16 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+			<File
+				RelativePath=".\resource.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

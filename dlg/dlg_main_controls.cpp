@@ -305,7 +305,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
       int eps_watched  = pAnimeItem->My_WatchedEpisodes;
       int eps_total    = pAnimeItem->Series_Episodes;
       int eps_estimate = pAnimeItem->EstimateTotalEpisodes();
-      int eps_buffer   = EventBuffer.GetLastWatchedEpisode(pAnimeItem->Index);
+      int eps_buffer   = EventQueue.GetLastWatchedEpisode(pAnimeItem->Index);
       
       // Draw progress bar
       if (pCD->iSubItem == 1) {

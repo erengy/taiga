@@ -54,7 +54,7 @@ bool CTheme::Read(const wstring& name) {
 
   // Read list
   #define READ_PROGRESS_DATA(x, name) \
-    ListProgress.x.Type     = progress.child(name).attribute(L"type").value(); \
+    ListProgress.x.Type = progress.child(name).attribute(L"type").value(); \
     ListProgress.x.Value[0] = HexToARGB(progress.child(name).attribute(L"value_1").value()); \
     ListProgress.x.Value[1] = HexToARGB(progress.child(name).attribute(L"value_2").value()); \
     ListProgress.x.Value[2] = HexToARGB(progress.child(name).attribute(L"value_3").value());
@@ -65,6 +65,7 @@ bool CTheme::Read(const wstring& name) {
   READ_PROGRESS_DATA(Dropped,    L"dropped");
   READ_PROGRESS_DATA(Seperator,  L"seperator");
   READ_PROGRESS_DATA(Watching,   L"watching");
+  #undef READ_PROGRESS_DATA
 
   // Read menus
   for (xml_node menu = menus.child(L"menu"); menu; menu = menu.next_sibling(L"menu")) {
@@ -111,7 +112,7 @@ bool CTheme::LoadImages() {
 void CTheme::CThemeListProgress::CThemeListProgressItem::Draw(HDC hdc, const LPRECT lpRect) {
   // Solid
   if (Type == L"solid") {
-    HBRUSH hbrSolid = CreateSolidBrush(BGR2RGB(Value[0]));
+    HBRUSH hbrSolid = CreateSolidBrush(Value[0]);
     FillRect(hdc, lpRect, hbrSolid);
     DeleteObject(hbrSolid);
 

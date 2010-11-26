@@ -99,8 +99,7 @@ BOOL CTaiga::InitInstance() {
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() == IDYES) {
-      SettingsWindow.SetCurrentPage(PAGE_ACCOUNT);
-      ExecuteAction(L"Settings");
+      ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
     }
   }
   if (Settings.Program.StartUp.CheckNewVersion) {

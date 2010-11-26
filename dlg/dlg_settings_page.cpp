@@ -37,8 +37,9 @@ int TranslateFilterType(const wstring& type_str, wstring& value);
 
 // =============================================================================
 
-CSettingsPage::CSettingsPage() {
-  m_hTreeItem = NULL;
+CSettingsPage::CSettingsPage() :
+  m_hTreeItem(NULL)
+{
 }
 
 void CSettingsPage::CreateItem(LPCWSTR pszText, HTREEITEM htiParent) {

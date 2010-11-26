@@ -63,7 +63,7 @@ public:
 
   void GetRect(LPRECT lprc);
   void LimitText(int cchMax);
-  BOOL SetCueBannerText(LPCWSTR lpcwText);
+  BOOL SetCueBannerText(LPCWSTR lpcwText, BOOL fDrawFocused = FALSE);
   void SetMargins(int iLeft = -1, int iRight = -1);
   void SetMultiLine(BOOL bEnabled);
   void SetPasswordChar(UINT ch);

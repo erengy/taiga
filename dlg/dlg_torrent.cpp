@@ -184,8 +184,7 @@ BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Settings
     case 103: {
-      SettingsWindow.SetCurrentPage(PAGE_TORRENT1);
-      ExecuteAction(L"Settings");
+      ExecuteAction(L"Settings", 0, PAGE_TORRENT1);
       return TRUE;
     }
   }

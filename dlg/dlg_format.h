@@ -46,7 +46,7 @@ public:
   wstring Text;
 
   void ColorizeText();
-  void RefreshExampleText();
+  void RefreshPreviewText();
   
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();

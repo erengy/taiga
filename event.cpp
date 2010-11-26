@@ -30,12 +30,43 @@
 #include "taiga.h"
 #include "ui/ui_taskdialog.h"
 
-CEventBuffer EventBuffer;
+CEventQueue EventQueue;
 
 // =============================================================================
 
 void CEventList::Add(int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
-  // Compare with previous items
+  // Validate values
+  if (AnimeList.Item[index].My_WatchedEpisodes == episode || episode < 0) {
+    episode = -1;
+  }
+  if (AnimeList.Item[index].My_Score == score || score < 0 || score > 10) {
+    score = -1;
+  }
+  if (AnimeList.Item[index].My_Status == status || status < 1 || status == 5 || status > 6) {
+    status = -1;
+  }
+  if (AnimeList.Item[index].My_Tags == tags) {
+    tags = L"%empty%";
+  }
+  switch (mode) {
+    case HTTP_MAL_AnimeEdit:
+      if (episode == -1 && score == -1 && status == -1 && tags == L"%empty%") return;
+      break;
+    case HTTP_MAL_AnimeUpdate:
+      if (episode == -1) return;
+      break;
+    case HTTP_MAL_ScoreUpdate:
+      if (score == -1) return;
+      break;
+    case HTTP_MAL_StatusUpdate:
+      if (status == -1) return;
+      break;
+    case HTTP_MAL_TagUpdate:
+      if (tags == L"%empty%") return;
+      break;
+  }
+
+  // Compare with previous items in buffer
   for (unsigned int i = 0; i < Item.size(); i++) {
     if (Item[i].Index == index && Item[i].Mode == mode) { 
       if (episode < Item[i].Episode) {
@@ -51,8 +82,8 @@ void CEventList::Add(int index, int id, int episode, int score, int status, wstr
         Remove(i); break;
       }
       if (Item[i].Episode == episode && Item[i].Score == score && 
-        Item[i].Status  == status  && Item[i].Tags  == tags) {
-          return;
+          Item[i].Status  == status  && Item[i].Tags  == tags) {
+            return;
       }
     }
   }
@@ -146,7 +177,7 @@ void CEventList::Remove(unsigned int index) {
 
 // =============================================================================
 
-void CEventBuffer::Add(wstring user, int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
+void CEventQueue::Add(wstring user, int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
   int user_index = GetUserIndex(user);
   if (user_index == -1) {
     List.resize(List.size() + 1);
@@ -156,29 +187,29 @@ void CEventBuffer::Add(wstring user, int index, int id, int episode, int score, 
   List[user_index].Add(index, id, episode, score, status, tags, time, mode);
 }
 
-void CEventBuffer::Check() {
+void CEventQueue::Check() {
   int user_index = GetUserIndex();
   if (user_index > -1) List[user_index].Check();
 }
 
-void CEventBuffer::Clear() {
+void CEventQueue::Clear() {
   int user_index = GetUserIndex();
   if (user_index > -1) List[user_index].Clear();
 }
 
-int CEventBuffer::GetItemCount() {
+int CEventQueue::GetItemCount() {
   int user_index = GetUserIndex();
   if (user_index > -1) return List[user_index].Item.size();
   return 0;
 }
 
-int CEventBuffer::GetLastWatchedEpisode(int index) {
+int CEventQueue::GetLastWatchedEpisode(int index) {
   int user_index = GetUserIndex();
   if (user_index > -1) return List[user_index].GetLastWatchedEpisode(index);
   return 0;
 }
 
-int CEventBuffer::GetUserIndex(wstring user) {
+int CEventQueue::GetUserIndex(wstring user) {
   if (user.empty()) user = Settings.Account.MAL.User;
   for (unsigned int i = 0; i < List.size(); i++) {
     if (List[i].User == user) return i;
@@ -186,14 +217,14 @@ int CEventBuffer::GetUserIndex(wstring user) {
   return -1;
 }
 
-bool CEventBuffer::IsEmpty() {
+bool CEventQueue::IsEmpty() {
   for (unsigned int i = 0; i < List.size(); i++) {
     if (List[i].Item.size() > 0) return false;
   }
   return true;
 }
 
-void CEventBuffer::Remove(int index) {
+void CEventQueue::Remove(int index) {
   int user_index = GetUserIndex();
   if (user_index > -1) {
     if (index > -1) {
@@ -204,7 +235,7 @@ void CEventBuffer::Remove(int index) {
   }
 }
 
-void CEventBuffer::Show() {
+void CEventQueue::Show() {
   if (GetItemCount() == 0) {
     CTaskDialog dlg;
     dlg.SetWindowTitle(L"Previously on Taiga...");

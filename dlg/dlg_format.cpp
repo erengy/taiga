@@ -132,9 +132,9 @@ BOOL CFormatWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
   }
   
-  if (HIWORD(wParam) == EN_CHANGE) {
-    // Set example text
-    RefreshExampleText();
+  if (LOWORD(wParam) == IDC_RICHEDIT_FORMAT && HIWORD(wParam) == EN_CHANGE) {
+    // Set preview text
+    RefreshPreviewText();
     // Highlight
     ColorizeText();
     return TRUE;
@@ -204,7 +204,7 @@ void CFormatWindow::ColorizeText() {
   m_RichEdit.InvalidateRect();
 }
 
-void CFormatWindow::RefreshExampleText() {
+void CFormatWindow::RefreshPreviewText() {
   // Replace variables
   wstring str;
   GetDlgItemText(IDC_RICHEDIT_FORMAT, str);
@@ -239,5 +239,5 @@ void CFormatWindow::RefreshExampleText() {
   }
   
   // Set final text
-  SetDlgItemText(IDC_STATIC_FORMAT, str.c_str());
+  SetDlgItemText(IDC_EDIT_PREVIEW, str.c_str());
 }

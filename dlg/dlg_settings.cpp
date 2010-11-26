@@ -54,10 +54,15 @@ CSettingsWindow SettingsWindow;
 
 // =============================================================================
 
-CSettingsWindow::CSettingsWindow() {
+CSettingsWindow::CSettingsWindow() :
+  m_hStaticFont(NULL), m_iCurrentPage(PAGE_ACCOUNT)
+{
   RegisterDlgClass(L"TaigaSettingsW");
-  m_hStaticFont = NULL;
-  m_iCurrentPage = PAGE_ACCOUNT;
+
+  m_Page.resize(PAGE_COUNT);
+  for (size_t i = 0; i < PAGE_COUNT; i++) {
+    m_Page[i].Index = i;
+  }
 }
 
 CSettingsWindow::~CSettingsWindow() {
@@ -65,11 +70,6 @@ CSettingsWindow::~CSettingsWindow() {
     ::DeleteObject(m_hStaticFont);
     m_hStaticFont = NULL;
   }
-}
-
-void CSettingsWindow::OnCancel() {
-  m_iCurrentPage = PAGE_ACCOUNT;
-  EndDialog(IDCANCEL);
 }
 
 void CSettingsWindow::SetCurrentPage(int index) {
@@ -95,12 +95,10 @@ BOOL CSettingsWindow::OnInitDialog() {
   ::GetWindowRect(GetDlgItem(IDC_STATIC_TITLE), &rcWindow);
   ::GetClientRect(GetDlgItem(IDC_STATIC_TITLE), &rcClient);
   ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rcWindow));
-  m_Page.resize(PAGE_COUNT);
   for (size_t i = 0; i < PAGE_COUNT; i++) {
-    m_Page[i].Index = i;
     m_Page[i].Create(IDD_SETTINGS_PAGE01 + i, m_hWindow, false);
     m_Page[i].SetPosition(NULL, rcWindow.left, (rcWindow.top * 2) + rcClient.bottom, 
-                0, 0, SWP_HIDEWINDOW | SWP_NOSIZE);
+      0, 0, SWP_HIDEWINDOW | SWP_NOSIZE);
   }
   
   // Add tree items
@@ -273,7 +271,6 @@ void CSettingsWindow::OnOK() {
   VersionClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
   
   // End dialog
-  m_iCurrentPage = PAGE_ACCOUNT;
   EndDialog(IDOK);
 }
 

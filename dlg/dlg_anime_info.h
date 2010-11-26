@@ -28,29 +28,37 @@ class CAnime;
 
 // =============================================================================
 
+class CAnimeInfoPage;
+
 class CAnimeWindow : public CDialog {
 public:
   CAnimeWindow();
   virtual ~CAnimeWindow();
 
-  // Functions
-  void Refresh(CAnime* pAnimeItem = NULL);
-  
   // Controls
-  CEdit m_Edit;
-  CToolbar m_Toolbar;
+  CTab m_Tab;
+
+  // Pages
+  vector<CAnimeInfoPage> m_Page;
 
   // Image class
   class CAnimeImage {
   public:
-    bool Load(wstring file);
+    bool Load(const wstring& file);
     int Height, Width;
     CDC DC;
     CRect Rect;
   } AnimeImage;
 
+  // Functions
+  void SetCurrentPage(int index);
+  void Refresh(CAnime* pAnimeItem = NULL, 
+    bool series_info = true, bool my_info = true);
+
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
+  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+  void OnOK();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
   BOOL PreTranslateMessage(MSG* pMsg);
 
@@ -58,6 +66,7 @@ private:
   CAnime* m_pAnimeItem;
   HBRUSH m_hbrDarkBlue, m_hbrLightBlue;
   HFONT m_hfTitle;
+  int m_iCurrentPage;
 };
 
 extern CAnimeWindow AnimeWindow;
