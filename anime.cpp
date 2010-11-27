@@ -152,7 +152,7 @@ void CAnime::End(CEpisode episode, bool do_end, bool do_update) {
   // Update list
   if (do_update && Taiga.UpdatesEnabled && My_Status != MAL_COMPLETED) {
     if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT || 
-      Taiga.Ticker == -1 || Taiga.Ticker >= Settings.Account.Update.Delay) {
+      Taiga.TickerMedia == -1 || Taiga.TickerMedia >= Settings.Account.Update.Delay) {
         int number = ToINT(episode.Number);
         if (Settings.Account.Update.OutOfRange == FALSE || number == GetLastWatchedEpisode() + 1) {
           if (MAL.IsValidEpisode(number, GetLastWatchedEpisode(), Series_Episodes)) {

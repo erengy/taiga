@@ -39,7 +39,7 @@ BOOL CEventWindow::OnInitDialog() {
   m_List.SetTheme();
   
   // Insert list columns
-  m_List.InsertColumn(0, 190, 190, LVCFMT_LEFT,   L"Anime Title");
+  m_List.InsertColumn(0, 190, 190, LVCFMT_LEFT,   L"Anime title");
   m_List.InsertColumn(1,  55,  55, LVCFMT_CENTER, L"Episode");
   m_List.InsertColumn(2,  50,  50, LVCFMT_CENTER, L"Score");
   m_List.InsertColumn(3, 110, 110, LVCFMT_LEFT,   L"Status");

@@ -43,7 +43,7 @@ CTaiga Taiga;
 CTaiga::CTaiga() : 
   LoggedIn(false), UpdatesEnabled(true), 
   CurrentTipType(TIPTYPE_NORMAL), PlayStatus(PLAYSTATUS_STOPPED), 
-  Ticker(0), TickerTorrent(0)
+  TickerMedia(0), TickerQueue(0), TickerTorrent(0)
 {
 }
 

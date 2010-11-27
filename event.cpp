@@ -34,19 +34,26 @@ CEventQueue EventQueue;
 
 // =============================================================================
 
+CEventList::CEventList() : 
+  Index(0)
+{
+}
+
 void CEventList::Add(int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
   // Validate values
-  if (AnimeList.Item[index].My_WatchedEpisodes == episode || episode < 0) {
-    episode = -1;
-  }
-  if (AnimeList.Item[index].My_Score == score || score < 0 || score > 10) {
-    score = -1;
-  }
-  if (AnimeList.Item[index].My_Status == status || status < 1 || status == 5 || status > 6) {
-    status = -1;
-  }
-  if (AnimeList.Item[index].My_Tags == tags) {
-    tags = L"%empty%";
+  if (index > 0 && index <= AnimeList.Count) {
+    if (AnimeList.Item[index].My_WatchedEpisodes == episode || episode < 0) {
+      episode = -1;
+    }
+    if (AnimeList.Item[index].My_Score == score || score < 0 || score > 10) {
+      score = -1;
+    }
+    if (AnimeList.Item[index].My_Status == status || status < 1 || status == 5 || status > 6) {
+      status = -1;
+    }
+    if (AnimeList.Item[index].My_Tags == tags) {
+      tags = L"%empty%";
+    }
   }
   switch (mode) {
     case HTTP_MAL_AnimeEdit:
@@ -147,6 +154,7 @@ void CEventList::Check() {
   }
   
   // Update
+  EventQueue.UpdateInProgress = true;
   MAL.Update(Item[Index].Index, Item[Index].ID, Item[Index].Episode, 
     Item[Index].Score, Item[Index].Status, Item[Index].Tags, 
     Item[Index].Mode);
@@ -176,6 +184,11 @@ void CEventList::Remove(unsigned int index) {
 }
 
 // =============================================================================
+
+CEventQueue::CEventQueue() :
+  UpdateInProgress(false)
+{
+}
 
 void CEventQueue::Add(wstring user, int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
   int user_index = GetUserIndex(user);

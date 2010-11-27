@@ -40,6 +40,9 @@ enum IconList16 {
   Icon16_Download,
   Icon16_Settings,
   Icon16_Cross,
+  Icon16_Plus,
+  Icon16_Minus,
+  Icon16_TickSmall,
   ICONCOUNT_16PX
 };
 

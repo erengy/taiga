@@ -648,15 +648,15 @@ void AddTorrentFilterToList(HWND hwnd_list, int option, int type, wstring value)
   switch (option) {
     case 0:
       option_str = L"Exclude";
-      icon = Icon16_Red;
+      icon = Icon16_Minus;
       break;
     case 1:
       option_str = L"Include";
-      icon = Icon16_Green;
+      icon = Icon16_Plus;
       break;
     case 2:
       option_str = L"Preference";
-      icon = Icon16_Blue;
+      icon = Icon16_TickSmall;
       break;
   }
   switch (type) {

@@ -31,7 +31,8 @@ public:
 
 class CEventList {
 public:
-  CEventList() : Index(0) {}
+  CEventList();
+  virtual ~CEventList() {}
   
   void Add(int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
   void Check();
@@ -46,6 +47,9 @@ public:
 
 class CEventQueue {
 public:
+  CEventQueue();
+  virtual ~CEventQueue() {}
+
   void Add(wstring user, int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
   void Check();
   void Clear();
@@ -56,6 +60,7 @@ public:
   void Remove(int index = -1);
   void Show();
 
+  bool UpdateInProgress;
   vector<CEventList> List;
 };
 

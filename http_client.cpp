@@ -67,6 +67,7 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
       TorrentWindow.m_Toolbar.EnableButton(1, true);
       break;
     default:
+      EventQueue.UpdateInProgress = false;
       MainWindow.ChangeStatus(error_text);
       MainWindow.m_Toolbar.EnableButton(1, true);
       break;
@@ -325,6 +326,7 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_ScoreUpdate:
     case HTTP_MAL_StatusUpdate:
     case HTTP_MAL_TagUpdate: {
+      EventQueue.UpdateInProgress = false;
       if (pItem) {
         pItem->Refresh(GetData());
         return TRUE;

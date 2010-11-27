@@ -25,7 +25,7 @@
 #define APP_NAME             L"Taiga"
 #define APP_TITLE            L"Taiga 0.5"
 #define APP_VERSION          L"0.5"
-#define APP_BUILD            L"2010.11.25"
+#define APP_BUILD            L"2010.11.27"
 #define APP_VERSION_MAJOR    0
 #define APP_VERSION_MINOR    5
 #define APP_VERSION_REVISION 0
@@ -58,7 +58,8 @@ public:
   BOOL InitInstance();
   
   bool LoggedIn, UpdatesEnabled;
-  int CurrentTipType, PlayStatus, Ticker, TickerTorrent;
+  int CurrentTipType, PlayStatus;
+  int TickerMedia, TickerQueue, TickerTorrent;
 };
 
 extern CTaiga Taiga;

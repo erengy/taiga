@@ -22,6 +22,7 @@
 #include "../common.h"
 #include "dlg_main.h"
 #include "dlg_torrent.h"
+#include "../event.h"
 #include "../gfx.h"
 #include "../http.h"
 #include "../media.h"
@@ -404,6 +405,18 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
 // Please be careful with what you change.
 
 void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
+  // Check event queue
+  if (Taiga.TickerQueue >= 60 /*seconds*/) {
+    Taiga.TickerQueue = 0;
+    if (EventQueue.UpdateInProgress == false) {
+      EventQueue.Check();
+    }
+  } else {
+    Taiga.TickerQueue++;
+  }
+
+  // ===========================================================================
+  
   // Check new torrents
   if (Settings.RSS.Torrent.CheckEnabled && Settings.RSS.Torrent.CheckInterval) {
     if (Taiga.TickerTorrent >= Settings.RSS.Torrent.CheckInterval * 60) {
@@ -421,6 +434,8 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
       TorrentWindow.m_Toolbar.SetButtonText(0, L"Check new torrents");
     }
   }
+
+  // ===========================================================================
   
   // Check process list for media players
   int media_index = MediaPlayers.Check();
@@ -459,10 +474,10 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
     // Already watching or not recognized before
     } else {
       // Tick and compare with delay time
-      if (Taiga.Ticker > -1 && Taiga.Ticker <= Settings.Account.Update.Delay) {
-        if (Taiga.Ticker == Settings.Account.Update.Delay) {
+      if (Taiga.TickerMedia > -1 && Taiga.TickerMedia <= Settings.Account.Update.Delay) {
+        if (Taiga.TickerMedia == Settings.Account.Update.Delay) {
           // Disable ticker
-          Taiga.Ticker = -1;
+          Taiga.TickerMedia = -1;
           // Announce current episode
           ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           ExecuteAction(L"AnnounceToMessenger", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
@@ -476,8 +491,8 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
         }
         if (Settings.Account.Update.CheckPlayer == FALSE || 
           MediaPlayers.Item[media_index].WindowHandle == GetForegroundWindow()) {
-            Taiga.Ticker++;
-            //wstring text = L" " + ToTimeString(Settings.Account.Update.Delay - Taiga.Ticker);
+            Taiga.TickerMedia++;
+            //wstring text = L" " + ToTimeString(Settings.Account.Update.Delay - Taiga.TickerMedia);
             //m_Status.SetPanelText(1, text.c_str());
         }
       }
@@ -488,7 +503,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
         if (anime_index > 0) {
           AnimeList.Item[anime_index].End(CurrentEpisode, true, true);
         }
-        Taiga.Ticker = 0;
+        Taiga.TickerMedia = 0;
         //m_Status.SetPanelText(1, L" 00:00");
       }
     }
@@ -510,7 +525,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
       RefreshMenubar(CurrentEpisode.Index);
       AnimeList.Item[anime_index].End(CurrentEpisode, true, 
         Settings.Account.Update.Time == UPDATE_MODE_WAITPLAYER);
-      Taiga.Ticker = 0;
+      Taiga.TickerMedia = 0;
       //m_Status.SetPanelText(1, L" 00:00");
     }
   }
