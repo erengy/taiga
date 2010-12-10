@@ -27,7 +27,7 @@
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
-#include "ui/ui_taskbar.h"
+#include "win32/win_taskbar.h"
 #include "xml.h"
 
 CTorrents Torrents;
@@ -185,7 +185,7 @@ BOOL CTorrents::Tip() {
 
   for (size_t i = 0; i < Feed.Item.size(); i++) {
     if (Feed.Item[i].Download) {
-      tip_text += L"» " + ReplaceVariables(L"%title%$if(%episode%, #%episode%)\n", 
+      tip_text += L"\u00BB " + ReplaceVariables(L"%title%$if(%episode%, #%episode%)\n", 
         Feed.Item[i].EpisodeData);
     }
   }
@@ -279,7 +279,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
       // Filter watching status
       case RSS_FILTER_WATCHINGSTATUS: {
         if (anime_index > 0 && 
-          AnimeList.Item[anime_index].My_Status == ToINT(FILTER.Value)) {
+          AnimeList.Item[anime_index].GetStatus() == ToINT(FILTER.Value)) {
             return FALSE;
         }
         break;

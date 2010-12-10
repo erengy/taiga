@@ -109,7 +109,7 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
           }
         }
       }
-      int status = pAnimeItem->My_Status;
+      int status = pAnimeItem->GetStatus();
       if (status == MAL_PLANTOWATCH) status--;
       m_Combo.SetCurSel(status - 1);
       m_Combo.SetWindowHandle(NULL);
@@ -129,13 +129,13 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
         m_Combo.AddString(L"(1) Unwatchable");
         m_Combo.AddString(L"(0) No Score");
       }
-      m_Combo.SetCurSel(10 - pAnimeItem->My_Score);
+      m_Combo.SetCurSel(10 - pAnimeItem->GetScore());
       m_Combo.SetWindowHandle(NULL);
 
       // Tags
       CEdit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
       m_Edit.SetCueBannerText(L"Enter tags here, seperated by a comma (e.g. tag1, tag2)");
-      m_Edit.SetText(pAnimeItem->My_Tags);
+      m_Edit.SetText(pAnimeItem->GetTags());
       m_Edit.SetWindowHandle(NULL);
       
       // Date limits and defaults

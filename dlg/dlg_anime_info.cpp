@@ -60,8 +60,8 @@ BOOL CAnimeWindow::OnInitDialog() {
   if (!m_pAnimeItem) m_pAnimeItem = &AnimeList.Item[AnimeList.Index];
 
   // Create GDI objects
-  if (!m_hbrDarkBlue) m_hbrDarkBlue = ::CreateSolidBrush(RGB(46, 81, 162));
-  if (!m_hbrLightBlue) m_hbrLightBlue = ::CreateSolidBrush(RGB(225, 231, 245));
+  if (!m_hbrDarkBlue) m_hbrDarkBlue = ::CreateSolidBrush(MAL_DARKBLUE);
+  if (!m_hbrLightBlue) m_hbrLightBlue = ::CreateSolidBrush(MAL_LIGHTBLUE);
   if (!m_hfTitle) {
     LOGFONT lFont;
     ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
@@ -159,7 +159,7 @@ void CAnimeWindow::OnOK() {
   wstring titles;
   m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
   m_pAnimeItem->Synonyms = titles;
-  Settings.Anime.SetItem(m_pAnimeItem->Series_ID, L"%empty%", titles);
+  Settings.Anime.SetItem(m_pAnimeItem->Series_ID, EMPTY_STR, titles);
   if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
   
   // Add to buffer
@@ -179,6 +179,7 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
       HWND hwnd_static = reinterpret_cast<HWND>(lParam);
       if (hwnd_static == GetDlgItem(IDC_STATIC_ANIME_TITLE)) {
         SetBkMode(hdc, TRANSPARENT);
+        SetTextColor(hdc, MAL_DARKBLUE);
         return reinterpret_cast<INT_PTR>(m_hbrLightBlue);
       }
       break;

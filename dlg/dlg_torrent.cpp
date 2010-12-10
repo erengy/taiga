@@ -28,7 +28,7 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
-#include "../ui/ui_gdi.h"
+#include "../win32/win_gdi.h"
 
 CTorrentWindow TorrentWindow;
 

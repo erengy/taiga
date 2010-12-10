@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{50BAD968-CEBF-46CA-A18A-FE3E8D625F94}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Taiga</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>comctl32.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winhttp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
+      <AdditionalManifestDependencies>type=%27win32%27 name=%27Microsoft.Windows.Common-Controls%27 version=%276.0.0.0%27 processorArchitecture=%27x86%27 publicKeyToken=%276595b64144ccf1df%27 language=%27*%27;%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MinSpace</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>comctl32.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winhttp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
+      <AdditionalManifestDependencies>type=%27win32%27 name=%27Microsoft.Windows.Common-Controls%27 version=%276.0.0.0%27 processorArchitecture=%27x86%27 publicKeyToken=%276595b64144ccf1df%27 language=%27*%27;%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="action.cpp" />
+    <ClCompile Include="anime.cpp" />
+    <ClCompile Include="animelist.cpp" />
+    <ClCompile Include="announce.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="dde.cpp" />
+    <ClCompile Include="debug.cpp" />
+    <ClCompile Include="dlg\dlg_about.cpp" />
+    <ClCompile Include="dlg\dlg_anime_info.cpp" />
+    <ClCompile Include="dlg\dlg_anime_info_page.cpp" />
+    <ClCompile Include="dlg\dlg_event.cpp" />
+    <ClCompile Include="dlg\dlg_filter.cpp" />
+    <ClCompile Include="dlg\dlg_format.cpp" />
+    <ClCompile Include="dlg\dlg_input.cpp" />
+    <ClCompile Include="dlg\dlg_main.cpp" />
+    <ClCompile Include="dlg\dlg_main_controls.cpp" />
+    <ClCompile Include="dlg\dlg_search.cpp" />
+    <ClCompile Include="dlg\dlg_settings.cpp" />
+    <ClCompile Include="dlg\dlg_settings_page.cpp" />
+    <ClCompile Include="dlg\dlg_test_recognition.cpp" />
+    <ClCompile Include="dlg\dlg_torrent.cpp" />
+    <ClCompile Include="dlg\dlg_torrent_filter.cpp" />
+    <ClCompile Include="encryption.cpp" />
+    <ClCompile Include="event.cpp" />
+    <ClCompile Include="gfx.cpp" />
+    <ClCompile Include="http.cpp" />
+    <ClCompile Include="http_client.cpp" />
+    <ClCompile Include="list_sort.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mediaplayers.cpp" />
+    <ClCompile Include="menu.cpp" />
+    <ClCompile Include="myanimelist.cpp" />
+    <ClCompile Include="process.cpp" />
+    <ClCompile Include="recognition.cpp" />
+    <ClCompile Include="rss.cpp" />
+    <ClCompile Include="script.cpp" />
+    <ClCompile Include="search.cpp" />
+    <ClCompile Include="settings.cpp" />
+    <ClCompile Include="string.cpp" />
+    <ClCompile Include="taiga.cpp" />
+    <ClCompile Include="theme.cpp" />
+    <ClCompile Include="third_party\base64\base64.cpp" />
+    <ClCompile Include="third_party\pugixml\pugixml.cpp" />
+    <ClCompile Include="win32\win_ctl_combobox.cpp" />
+    <ClCompile Include="win32\win_ctl_edit.cpp" />
+    <ClCompile Include="win32\win_ctl_imagelist.cpp" />
+    <ClCompile Include="win32\win_ctl_listview.cpp" />
+    <ClCompile Include="win32\win_ctl_rebar.cpp" />
+    <ClCompile Include="win32\win_ctl_richedit.cpp" />
+    <ClCompile Include="win32\win_ctl_spin.cpp" />
+    <ClCompile Include="win32\win_ctl_statusbar.cpp" />
+    <ClCompile Include="win32\win_ctl_tab.cpp" />
+    <ClCompile Include="win32\win_ctl_toolbar.cpp" />
+    <ClCompile Include="win32\win_ctl_tooltip.cpp" />
+    <ClCompile Include="win32\win_ctl_treeview.cpp" />
+    <ClCompile Include="win32\win_dialog.cpp" />
+    <ClCompile Include="win32\win_gdi.cpp" />
+    <ClCompile Include="win32\win_main.cpp" />
+    <ClCompile Include="win32\win_menu.cpp" />
+    <ClCompile Include="win32\win_taskbar.cpp" />
+    <ClCompile Include="win32\win_taskdialog.cpp" />
+    <ClCompile Include="win32\win_window.cpp" />
+    <ClCompile Include="xml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="anime.h" />
+    <ClInclude Include="animelist.h" />
+    <ClInclude Include="announce.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="dde.h" />
+    <ClInclude Include="dlg\dlg_about.h" />
+    <ClInclude Include="dlg\dlg_anime_info.h" />
+    <ClInclude Include="dlg\dlg_anime_info_page.h" />
+    <ClInclude Include="dlg\dlg_event.h" />
+    <ClInclude Include="dlg\dlg_filter.h" />
+    <ClInclude Include="dlg\dlg_format.h" />
+    <ClInclude Include="dlg\dlg_input.h" />
+    <ClInclude Include="dlg\dlg_main.h" />
+    <ClInclude Include="dlg\dlg_search.h" />
+    <ClInclude Include="dlg\dlg_settings.h" />
+    <ClInclude Include="dlg\dlg_settings_page.h" />
+    <ClInclude Include="dlg\dlg_test_recognition.h" />
+    <ClInclude Include="dlg\dlg_torrent.h" />
+    <ClInclude Include="dlg\dlg_torrent_filter.h" />
+    <ClInclude Include="event.h" />
+    <ClInclude Include="gfx.h" />
+    <ClInclude Include="http.h" />
+    <ClInclude Include="media.h" />
+    <ClInclude Include="myanimelist.h" />
+    <ClInclude Include="process.h" />
+    <ClInclude Include="recognition.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="rss.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="std.h" />
+    <ClInclude Include="string.h" />
+    <ClInclude Include="taiga.h" />
+    <ClInclude Include="theme.h" />
+    <ClInclude Include="third_party\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="third_party\pugixml\pugixml.hpp" />
+    <ClInclude Include="win32\win_control.h" />
+    <ClInclude Include="win32\win_dialog.h" />
+    <ClInclude Include="win32\win_gdi.h" />
+    <ClInclude Include="win32\win_main.h" />
+    <ClInclude Include="win32\win_menu.h" />
+    <ClInclude Include="win32\win_taskbar.h" />
+    <ClInclude Include="win32\win_taskdialog.h" />
+    <ClInclude Include="win32\win_window.h" />
+    <ClInclude Include="xml.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

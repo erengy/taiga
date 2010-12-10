@@ -21,6 +21,10 @@
 
 #include "std.h"
 
+#define MAL_DARKBLUE RGB(46, 81, 162)
+#define MAL_LIGHTBLUE RGB(225, 231, 245)
+#define MAL_LIGHTGRAY RGB(246, 246, 246)
+
 enum MAL_MyStatus {
   MAL_NOTINLIST,
   MAL_WATCHING,
@@ -61,6 +65,7 @@ public:
   bool Login();
   BOOL SearchAnime(wstring title, CAnime* pAnimeItem = NULL);
   void Update(int index, int id, int episode, int score, int status, wstring tags, int mode);
+  bool UpdateSucceeded(const wstring& data, int update_mode, int episode = -1, const wstring& tags = L"");
   
   void DecodeSynopsis(wstring& text);
   bool IsValidEpisode(int episode, int watched, int total);

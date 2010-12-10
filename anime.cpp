@@ -31,8 +31,8 @@
 #include "string.h"
 #include "taiga.h"
 #include "theme.h"
-#include "ui/ui_taskbar.h"
-#include "ui/ui_taskdialog.h"
+#include "win32/win_taskbar.h"
+#include "win32/win_taskdialog.h"
 #include "xml.h"
 
 CEpisode CurrentEpisode;
@@ -78,14 +78,10 @@ void CAnime::Start(CEpisode episode) {
   Playing = true;
 
   // Update main window
-  wstring status = L"Watching: " + Series_Title + PushString(L" #", episode.Number);
-  if (Settings.Account.Update.OutOfRange && ToINT(episode.Number) > GetLastWatchedEpisode() + 1) {
-    status += L" (out of range)";
-  }
-  MainWindow.ChangeStatus(status);
+  MainWindow.ChangeStatus();
   MainWindow.UpdateTip();
-  MainWindow.RefreshList(My_Status);
-  MainWindow.RefreshTabs(My_Status);
+  MainWindow.RefreshList(GetStatus());
+  MainWindow.RefreshTabs(GetStatus());
   int list_index = MainWindow.GetListIndex(Index);
   if (list_index > -1) {
     MainWindow.m_List.SetItemIcon(list_index, Icon16_Play);
@@ -110,7 +106,7 @@ void CAnime::Start(CEpisode episode) {
         // Set the folder if only it is under a root folder
         if (StartsWith(episode.Folder, Settings.Folders.Root[i])) {
           Folder = episode.Folder;
-          Settings.Anime.SetItem(Series_ID, Folder, L"%empty%");
+          Settings.Anime.SetItem(Series_ID, Folder, EMPTY_STR);
         }
       }
     }
@@ -139,7 +135,7 @@ void CAnime::End(CEpisode episode, bool do_end, bool do_update) {
     ExecuteAction(L"AnnounceToSkype", FALSE);
     // Update main window
     episode.Index = 0;
-    MainWindow.ChangeStatus(DEFAULT_STATUS);
+    MainWindow.ChangeStatus();
     MainWindow.UpdateTip();
     int list_index = MainWindow.GetListIndex(Index);
     int ret_value = 0;
@@ -150,7 +146,7 @@ void CAnime::End(CEpisode episode, bool do_end, bool do_update) {
   }
 
   // Update list
-  if (do_update && Taiga.UpdatesEnabled && My_Status != MAL_COMPLETED) {
+  if (do_update && Taiga.UpdatesEnabled && GetStatus() != MAL_COMPLETED) {
     if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT || 
       Taiga.TickerMedia == -1 || Taiga.TickerMedia >= Settings.Account.Update.Delay) {
         int number = ToINT(episode.Number);
@@ -187,12 +183,12 @@ int CAnime::Ask(CEpisode episode) {
 
   // Add buttons
   int number = ToINT(GetLastEpisode(episode.Number));
-  if (Series_Episodes == 1) {             // Completed (1 eps.)
+  if (Series_Episodes == 1) {               // Completed (1 eps.)
     episode.Number = L"1";
     dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
-  } else if (Series_Episodes == number) { // Completed (>1 eps.)
+  } else if (Series_Episodes == number) {   // Completed (>1 eps.)
     dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
-  } else if (My_Status != 1) {            // Watching
+  } else if (GetStatus() != MAL_WATCHING) { // Watching
     dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
   }
   wstring button = L"Update\nUpdate episode number from " + 
@@ -218,18 +214,20 @@ void CAnime::Update(CEpisode episode, bool do_move) {
   if (do_move) {
     // Move to completed
     if (Series_Episodes == number) {
-      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_COMPLETED, L"%empty%", L"", HTTP_MAL_AnimeEdit);
+      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_COMPLETED, EMPTY_STR, L"", HTTP_MAL_AnimeEdit);
       return;
     // Move to watching
-    } else if (My_Status != MAL_WATCHING || number == 1) {
-      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_WATCHING, L"%empty%", L"", HTTP_MAL_AnimeEdit);
+    } else if (GetStatus() != MAL_WATCHING || number == 1) {
+      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_WATCHING, EMPTY_STR, L"", HTTP_MAL_AnimeEdit);
       return;
     }
   }
 
   // Update normally
-  EventQueue.Add(L"", Index, Series_ID, number, -1, -1, L"%empty%", L"", HTTP_MAL_AnimeUpdate);
+  EventQueue.Add(L"", Index, Series_ID, number, -1, -1, EMPTY_STR, L"", HTTP_MAL_AnimeUpdate);
 }
+
+// =============================================================================
 
 void CAnime::CheckFolder() {
   wstring old_folder = Folder;
@@ -248,7 +246,7 @@ void CAnime::CheckFolder() {
     for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
       Folder = SearchFileFolder(Index, Settings.Folders.Root[i], 0, true);
       if (!Folder.empty()) {
-        Settings.Anime.SetItem(Series_ID, Folder, L"%empty%");
+        Settings.Anime.SetItem(Series_ID, Folder, EMPTY_STR);
         return;
       }
     }
@@ -289,19 +287,37 @@ void CAnime::CheckNewEpisode(bool check_folder) {
   }
 }
 
-int CAnime::EstimateTotalEpisodes() {
+// =============================================================================
+
+int CAnime::GetLastWatchedEpisode() {
+  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_EPISODE);
+  return item ? item->Episode : My_WatchedEpisodes;
+}
+
+int CAnime::GetScore() {
+  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_SCORE);
+  return item ? item->Score : My_Score;
+}
+
+int CAnime::GetStatus() {
+  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_STATUS);
+  return item ? item->Status : My_Status;
+}
+
+wstring CAnime::GetTags() {
+  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_TAGS);
+  return item ? item->Tags : My_Tags;
+}
+
+int CAnime::GetTotalEpisodes() {
   if (Series_Episodes > 0) return Series_Episodes;
-  if (My_WatchedEpisodes < 12) return 13;
-  if (My_WatchedEpisodes < 24) return 26;
-  if (My_WatchedEpisodes < 50) return 51;
+  if (GetLastWatchedEpisode() < 12) return 13;
+  if (GetLastWatchedEpisode() < 24) return 26;
+  if (GetLastWatchedEpisode() < 50) return 51;
   return 0;
 }
 
-int CAnime::GetLastWatchedEpisode() {
-  int value = EventQueue.GetLastWatchedEpisode(Index);
-  if (!value) value = My_WatchedEpisodes;
-  return value;
-}
+// =============================================================================
 
 bool CAnime::ParseSearchResult(const wstring& data) {
   if (data.empty()) return false;
@@ -321,6 +337,8 @@ bool CAnime::ParseSearchResult(const wstring& data) {
   return false;
 }
 
+// =============================================================================
+
 void CAnime::SetStartDate(wstring date, bool ignore_previous) {
   if (My_StartDate == L"0000-00-00" || My_StartDate.empty() || ignore_previous) {
     My_StartDate = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
@@ -337,113 +355,63 @@ void CAnime::SetFinishDate(wstring date, bool ignore_previous) {
 
 // =============================================================================
 
-void CAnime::Refresh(wstring data) {
-  if (EventQueue.GetItemCount() == 0) return;
-  int user_index = EventQueue.GetUserIndex();
-  int index    = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Index;
-  int episode  = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Episode;
-  int score    = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Score;
-  int status   = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Status;
-  int mode     = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Mode;
-  wstring tags = EventQueue.List[user_index].Item[EventQueue.List[user_index].Index].Tags;
-
+void CAnime::Edit(const wstring& data, int index, int episode, int score, int status, int mode, const wstring& tags) {
   // Check success
-  bool success = false;
-  switch (Settings.Account.MAL.API) {
-    case MAL_API_OFFICIAL:
-      switch (mode) {
-        case HTTP_MAL_AnimeAdd:
-          success = IsNumeric(data);
-          if (success) {
-            My_ID = ToINT(data);
-            AnimeList.Write(index, L"my_id", data, ANIMELIST_EDITANIME);
-            status = -1; // TEMP
-          } else {
-            MainWindow.ChangeStatus(L"Error: " + data);
-            return;
-          }
-          break;
-        default:
-          success = (data == L"Updated");
-          break;
-      }
-      break;
-    case MAL_API_NONE:
-      switch (mode) {
-        case HTTP_MAL_AnimeAdd:
-          // TODO
-          break;
-        case HTTP_MAL_AnimeUpdate:
-          success = (ToINT(data) == episode);
-          break;
-        case HTTP_MAL_ScoreUpdate:
-          success = (InStr(data, L"Updated score", 0) > -1);
-          break;
-        case HTTP_MAL_TagUpdate:
-          success = (tags.empty() ? data.empty() : InStr(data, L"/animelist/", 0) > -1);
-          break;
-        case HTTP_MAL_AnimeEdit:
-        case HTTP_MAL_StatusUpdate:
-          success = (InStr(data, L"Success", 0) > -1);
-          break;
-      }
-      break;
-  }
+  bool success = MAL.UpdateSucceeded(data, mode, episode, tags);
 
-  // Update status
-  wstring buffer = L"Update "; buffer += (success ? L"succeeded." : L"failed.");
-  MainWindow.ChangeStatus(buffer + L" (" + Series_Title + L")");
-  // Show balloon tip
-  if (episode > -1)       buffer += L"\nEpisode: " + ToWSTR(episode);
-  if (score > -1)         buffer += L"\nScore: "   + ToWSTR(score);
-  if (status > -1)        buffer += L"\nStatus: "  + MAL.TranslateMyStatus(status, false);
-  if (tags != L"%empty%") buffer += L"\nTags: "    + tags;
-  Taskbar.Tip(L"", L"", 0);
-  Taskbar.Tip(buffer.c_str(), Series_Title.c_str(), (success ? NIIF_INFO : NIIF_ERROR));
-
-  // Update main list
-  int list_index = MainWindow.GetListIndex(Index);
-  if (list_index > -1) {
-    if (success && (score > -1)) {
-      MainWindow.m_List.SetItem(list_index, 2, MAL.TranslateNumber(score).c_str());
-    }
-    MainWindow.m_List.SetItemIcon(list_index, success ? Icon16_Tick : Icon16_Error);
-    MainWindow.m_List.RedrawItems(list_index, list_index, true);
+  if (!success) {
+    // Update status
+    wstring buffer = L"Update failed.";
+    MainWindow.ChangeStatus(buffer + L" (" + Series_Title + L")");
+    // Show balloon tip
+    if (episode > -1) buffer += L"\nEpisode: " + ToWSTR(episode);
+    if (score > -1) buffer += L"\nScore: " + ToWSTR(score);
+    if (status > -1) buffer += L"\nStatus: " + MAL.TranslateMyStatus(status, false);
+    if (tags != EMPTY_STR) buffer += L"\nTags: " + tags;
+    buffer += L"\nClick to try again.";
+    Taiga.CurrentTipType = TIPTYPE_UPDATEFAILED;
+    Taskbar.Tip(L"", L"", 0);
+    Taskbar.Tip(buffer.c_str(), Series_Title.c_str(), (success ? NIIF_INFO : NIIF_ERROR));
   }
 
   if (success) {
+    // Edit episode
     if (episode > -1) {
       My_WatchedEpisodes = episode;
       AnimeList.Write(index, L"my_watched_episodes", ToWSTR(episode), ANIMELIST_EDITANIME);
-      NewEps = false;
-      CheckNewEpisode();
     }
+    // Edit score
     if (score > -1) {
       My_Score = score;
       AnimeList.Write(index, L"my_score", ToWSTR(score), ANIMELIST_EDITANIME);
     }
-    if (tags != L"%empty%") {
+    // Edit status
+    if (status > 0) {
+      AnimeList.User.IncreaseItemCount(My_Status, -1);
+      AnimeList.User.IncreaseItemCount(status, 1);
+      My_Status = status;
+      AnimeList.Write(index, L"my_status", ToWSTR(My_Status), ANIMELIST_EDITANIME);
+    }
+    // Edit ID
+    if (mode == HTTP_MAL_AnimeAdd) {
+      My_ID = ToINT(data);
+      AnimeList.Write(index, L"my_id", data, ANIMELIST_EDITANIME);
+    }
+    // Edit tags
+    if (tags != EMPTY_STR) {
       My_Tags = tags;
       AnimeList.Write(index, L"my_tags", tags, ANIMELIST_EDITANIME);
-    }
-
-    if (status > 0) {
-      AnimeList.ChangeItemCount(My_Status, -1);
-      AnimeList.ChangeItemCount(status, 1);
-      My_Status = status;
-      MainWindow.RefreshList(My_Status);
-      MainWindow.RefreshTabs(My_Status);
-      list_index = MainWindow.GetListIndex(Index);
-      if (list_index > -1) {
-        MainWindow.m_List.EnsureVisible(list_index);
-        MainWindow.m_List.SetSelectedItem(list_index);
-      }
-      AnimeList.Write(index, L"my_status", ToWSTR(My_Status), ANIMELIST_EDITANIME);
     }
 
     // Remove item from update buffer
     EventQueue.Remove();
     // Check for more items
     EventQueue.Check();
+
+    // Redraw main list item
+    int list_index = MainWindow.GetListIndex(Index);
+    if (list_index > -1) {
+      MainWindow.m_List.RedrawItems(list_index, list_index, true);
+    }
   }
 }

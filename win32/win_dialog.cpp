@@ -16,14 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ui_dialog.h"
-#include "ui_taskbar.h"
+#include "win_dialog.h"
+#include "win_taskbar.h"
 
 // =============================================================================
 
-CDialog::CDialog() {
-  m_bModal      = true;
-  m_iSnapGap    = 0;
+CDialog::CDialog() :
+  m_bModal(true), m_iSnapGap(0)
+{
   m_SizeLast.cx = 0; m_SizeLast.cy = 0;
   m_SizeMax.cx  = 0; m_SizeMax.cy  = 0;
   m_SizeMin.cx  = 0; m_SizeMin.cy  = 0;
@@ -150,7 +150,7 @@ void CDialog::RegisterDlgClass(LPCWSTR lpszClassName) {
 // =============================================================================
 
 BOOL CDialog::AddComboString(int nIDDlgItem, LPCWSTR lpString) {
-  return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_ADDSTRING, 0, (LPARAM)lpString);
+  return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(lpString));
 }
 
 BOOL CDialog::CheckDlgButton(int nIDButton, UINT uCheck) {
@@ -339,10 +339,10 @@ INT_PTR CDialog::DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
     }
     default: {
       if (uMsg == WM_TASKBARCREATED || 
-        uMsg == WM_TASKBARBUTTONCREATED || 
-        uMsg == WM_TASKBARCALLBACK) {
-        OnTaskbarCallback(uMsg, lParam);
-        return FALSE;
+          uMsg == WM_TASKBARBUTTONCREATED || 
+          uMsg == WM_TASKBARCALLBACK) {
+            OnTaskbarCallback(uMsg, lParam);
+            return FALSE;
       }
       break;
     }

@@ -19,7 +19,7 @@
 #include <windows.h>
 #include <commctrl.h>
 
-#include "ui_control.h"
+#include "win_control.h"
 
 // =============================================================================
 

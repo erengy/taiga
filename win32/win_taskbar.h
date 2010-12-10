@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_TASKBAR_H
-#define UI_TASKBAR_H
+#ifndef WIN_TASKBAR_H
+#define WIN_TASKBAR_H
 
 #include <shobjidl.h>
 
@@ -36,7 +36,7 @@ public:
   BOOL Tip(LPCWSTR lpText, LPCWSTR lpTitle, int iIconIndex);
 
 private:
-  HWND           m_hApp;
+  HWND m_hApp;
   NOTIFYICONDATA m_NID;
 };
 
@@ -53,7 +53,7 @@ public:
   void SetProgressValue(ULONGLONG ullValue, ULONGLONG ullTotal);
 
 private:
-  HWND           m_hWnd;
+  HWND m_hWnd;
   ITaskbarList3* m_pTaskbarList;
 };
 
@@ -66,4 +66,4 @@ extern const DWORD WM_TASKBARCALLBACK;
 extern const DWORD WM_TASKBARCREATED;
 extern const DWORD WM_TASKBARBUTTONCREATED;
 
-#endif // UI_TASKBAR_H
+#endif // WIN_TASKBAR_H

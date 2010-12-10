@@ -16,10 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_GDI_H
-#define UI_GDI_H
+#ifndef WIN_GDI_H
+#define WIN_GDI_H
 
-#include "ui_main.h"
+#include "win_main.h"
 
 // =============================================================================
 
@@ -46,7 +46,7 @@ public:
   HFONT DetachFont();
   void  EditFont(LPCWSTR lpFaceName = NULL, INT iSize = -1, BOOL bBold = -1, BOOL bItalic = -1, BOOL bUnderline = -1);
 
-  //
+  // Painting
   BOOL FillRect(const RECT& rc, HBRUSH hbr) const;
   void FillRect(const RECT& rc, COLORREF color) const;
   
@@ -109,4 +109,4 @@ public:
   BOOL Union(const RECT& rc1, const RECT& rc2);
 };
 
-#endif // UI_GDI_H
+#endif // WIN_GDI_H

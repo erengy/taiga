@@ -21,8 +21,8 @@
 
 #include "../std.h"
 #include "../rss.h"
-#include "../ui/ui_control.h"
-#include "../ui/ui_dialog.h"
+#include "../win32/win_control.h"
+#include "../win32/win_dialog.h"
 
 // =============================================================================
 
@@ -42,6 +42,10 @@ public:
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnOK();
+
+private:
+  wstring m_LastKeyword;
+  int m_iLastType;
 };
 
 extern CTorrentFilterWindow TorrentFilterWindow;

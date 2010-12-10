@@ -16,10 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_TASKDIALOG_H
-#define UI_TASKDIALOG_H
+#ifndef WIN_TASKDIALOG_H
+#define WIN_TASKDIALOG_H
 
-#include "ui_main.h"
+#include "win_main.h"
 
 #define TD_ICON_NONE         static_cast<PCWSTR>(0)
 #define TD_ICON_INFORMATION  TD_INFORMATION_ICON
@@ -61,4 +61,4 @@ protected:
   int m_SelectedButtonID;
 };
 
-#endif // UI_TASKDIALOG_H
+#endif // WIN_TASKDIALOG_H

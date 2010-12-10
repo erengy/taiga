@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "event.h"
 #include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
@@ -251,35 +252,10 @@ void CAnimeList::AddItem(
   }
 }
 
-void CAnimeList::ChangeItemCount(int status, int count) {
-  switch (status) {
-    case MAL_WATCHING:
-      User.Watching += count;
-      Write(-1, L"user_watching", ToWSTR(User.Watching), ANIMELIST_EDITUSER);
-      break;
-    case MAL_COMPLETED:
-      User.Completed += count;
-      Write(-1, L"user_completed", ToWSTR(User.Completed), ANIMELIST_EDITUSER);
-      break;
-    case MAL_ONHOLD:
-      User.OnHold += count;
-      Write(-1, L"user_onhold", ToWSTR(User.OnHold), ANIMELIST_EDITUSER);
-      break;
-    case MAL_DROPPED:
-      User.Dropped += count;
-      Write(-1, L"user_dropped", ToWSTR(User.Dropped), ANIMELIST_EDITUSER);
-      break;
-    case MAL_PLANTOWATCH:
-      User.PlanToWatch += count;
-      Write(-1, L"user_plantowatch", ToWSTR(User.PlanToWatch), ANIMELIST_EDITUSER);
-      break;
-  }
-}
-
 void CAnimeList::DeleteItem(int index) {
   if (index <= 0 || index > Count) return;
 
-  ChangeItemCount(Item[index].My_Status, -1);
+  User.IncreaseItemCount(Item[index].My_Status, -1);
   Write(index, L"", L"", ANIMELIST_DELETEANIME);
   
   Count--;
@@ -306,7 +282,7 @@ CAnimeList::CFilter::CFilter() {
 BOOL CAnimeList::CFilter::Check(int item_index) {
   // Filter my status
   for (int i = 0; i < 6; i++) {
-    if (!MyStatus[i] && AnimeList.Item[item_index].My_Status == i + 1) {
+    if (!MyStatus[i] && AnimeList.Item[item_index].GetStatus() == i + 1) {
       return FALSE;
     }
   }
@@ -333,7 +309,7 @@ BOOL CAnimeList::CFilter::Check(int item_index) {
     if (InStr(AnimeList.Item[item_index].Series_Title,  text_vector[i], 0, true) == -1 && 
       InStr(AnimeList.Item[item_index].Series_Synonyms, text_vector[i], 0, true) == -1 && 
       InStr(AnimeList.Item[item_index].Synonyms,        text_vector[i], 0, true) == -1 && 
-      InStr(AnimeList.Item[item_index].My_Tags,         text_vector[i], 0, true) == -1) {
+      InStr(AnimeList.Item[item_index].GetTags(),       text_vector[i], 0, true) == -1) {
         return FALSE;
     }
   }
@@ -364,4 +340,71 @@ void CUser::Clear() {
   PlanToWatch = 0;
   Name        = L"";
   DaysSpent   = L"";
+}
+
+int CUser::GetItemCount(int status) {
+  int count = 0;
+  
+  // Get current count
+  switch (status) {
+    case MAL_WATCHING:
+      count = Watching;
+      break;
+    case MAL_COMPLETED:
+      count = Completed;
+      break;
+    case MAL_ONHOLD:
+      count = OnHold;
+      break;
+    case MAL_DROPPED:
+      count = Dropped;
+      break;
+    case MAL_PLANTOWATCH:
+      count = PlanToWatch;
+      break;
+  }
+
+  // Search event queue for status changes
+  int user_index = EventQueue.GetUserIndex();
+  if (user_index > -1) {
+    #define ITEM EventQueue.List[user_index].Item
+    for (unsigned int i = 0; i < ITEM.size(); i++) {
+      if (ITEM[i].Status > -1) {
+        if (status == ITEM[i].Status) {
+          count++;
+        } else if (status == AnimeList.Item[ITEM[i].AnimeIndex].My_Status) {
+          count--;
+        }
+      }
+    }
+    #undef ITEM
+  }
+
+  // Return final value
+  return count;
+}
+
+void CUser::IncreaseItemCount(int status, int count) {
+  switch (status) {
+    case MAL_WATCHING:
+      Watching += count;
+      AnimeList.Write(-1, L"user_watching", ToWSTR(Watching), ANIMELIST_EDITUSER);
+      break;
+    case MAL_COMPLETED:
+      Completed += count;
+      AnimeList.Write(-1, L"user_completed", ToWSTR(Completed), ANIMELIST_EDITUSER);
+      break;
+    case MAL_ONHOLD:
+      OnHold += count;
+      AnimeList.Write(-1, L"user_onhold", ToWSTR(OnHold), ANIMELIST_EDITUSER);
+      break;
+    case MAL_DROPPED:
+      Dropped += count;
+      AnimeList.Write(-1, L"user_dropped", ToWSTR(Dropped), ANIMELIST_EDITUSER);
+      break;
+    case MAL_PLANTOWATCH:
+      PlanToWatch += count;
+      AnimeList.Write(-1, L"user_plantowatch", ToWSTR(PlanToWatch), ANIMELIST_EDITUSER);
+      break;
+  }
 }

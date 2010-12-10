@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_MAIN_H
-#define UI_MAIN_H
+#ifndef WIN_MAIN_H
+#define WIN_MAIN_H
 
 #include <windows.h>
 #include <commctrl.h>
@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "ui_window.h"
+#include "win_window.h"
 
 using std::vector;
 using std::wstring;
@@ -39,15 +39,15 @@ using std::wstring;
 typedef std::map<HWND, CWindow*> WndMap;
 
 class CWindowMap {
-public:  
-  CWindow* GetWindow(HWND hWnd);
+public:
   void     Add(HWND hWnd, CWindow* pWindow);
-  void     Remove(CWindow* pWindow);
-  void     Remove(HWND hWnd);
   void     Clear();
+  CWindow* GetWindow(HWND hWnd);
+  void     Remove(HWND hWnd);
+  void     Remove(CWindow* pWindow);
 
 private:
-  WndMap   m_WindowMap;
+  WndMap m_WindowMap;
 };
 
 extern CWindowMap WindowMap;
@@ -66,10 +66,10 @@ public:
   virtual void PostQuitMessage(int nExitCode = 0);
   virtual int  Run();
 
-  BOOL      InitCommonControls(DWORD dwFlags);
-  HINSTANCE GetInstanceHandle() const { return m_hInstance; }
   wstring   GetCurrentDirectory();
+  HINSTANCE GetInstanceHandle() const;
   wstring   GetModulePath();
+  BOOL      InitCommonControls(DWORD dwFlags);
   BOOL      SetCurrentDirectory(const wstring& directory);
 
 private:
@@ -92,4 +92,4 @@ WinVersion GetWinVersion();
 
 void DEBUG_PRINT(wstring text);
 
-#endif // UI_MAIN_H
+#endif // WIN_MAIN_H

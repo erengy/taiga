@@ -16,23 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ui_main.h"
-#include "ui_taskbar.h"
+#include "win_main.h"
+#include "win_taskbar.h"
 
 static const DWORD WM_TASKBARCALLBACK = WM_APP + 0x15;
 static const DWORD WM_TASKBARCREATED = ::RegisterWindowMessage(L"TaskbarCreated");
 static const DWORD WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(L"TaskbarButtonCreated");
 
-#define APP_SYSTRAY_ID 74164
+#define APP_SYSTRAY_ID 74164 // TAIGA ^_^
 
 CTaskbar Taskbar;
 CTaskbarList TaskbarList;
 
 // =============================================================================
 
-CTaskbar::CTaskbar() {
-  m_hApp = NULL;
-
+CTaskbar::CTaskbar() :
+  m_hApp(NULL)
+{
   WinVersion win_version = GetWinVersion();
   if (win_version >= WINVERSION_VISTA) {
     m_NID.cbSize = sizeof(NOTIFYICONDATA);

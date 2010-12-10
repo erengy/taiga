@@ -20,7 +20,7 @@
 #define DLG_SETTINGS_PAGE_H
 
 #include "../std.h"
-#include "../ui/ui_dialog.h"
+#include "../win32/win_dialog.h"
 
 // =============================================================================
 

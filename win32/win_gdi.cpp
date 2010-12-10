@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ui_gdi.h"
+#include "win_gdi.h"
 
 // =============================================================================
 

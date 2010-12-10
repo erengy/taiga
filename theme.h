@@ -20,8 +20,8 @@
 #define THEME_H
 
 #include "std.h"
-#include "ui/ui_control.h"
-#include "ui/ui_menu.h"
+#include "win32/win_control.h"
+#include "win32/win_menu.h"
 
 enum IconList16 {
   Icon16_Green,

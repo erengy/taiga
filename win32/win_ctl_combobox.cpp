@@ -17,7 +17,7 @@
 */
 
 #include <windowsx.h>
-#include "ui_control.h"
+#include "win_control.h"
 
 // =============================================================================
 

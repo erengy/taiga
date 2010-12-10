@@ -20,7 +20,7 @@
 #include "animelist.h"
 #include "common.h"
 #include "string.h"
-#include "ui/ui_control.h"
+#include "win32/win_control.h"
 
 // =============================================================================
 

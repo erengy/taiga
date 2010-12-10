@@ -16,10 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_WINDOW_H
-#define UI_WINDOW_H
+#ifndef WIN_WINDOW_H
+#define WIN_WINDOW_H
 
-#include "ui_main.h"
+#include "win_main.h"
 
 #define CONTROL_MARGIN 6
 #define DEFAULT_CLASS  L"TaigaDefaultW"
@@ -42,14 +42,14 @@ public:
 
   virtual HWND Create(HWND hWndParent = NULL);
   virtual HWND Create(DWORD dwExStyle, 
-    LPCWSTR lpClassName, 
-    LPCWSTR lpWindowName, 
-    DWORD dwStyle, 
-    int X, int Y, 
-    int nWidth, int nHeight, 
-    HWND hWndParent, 
-    HMENU hMenu, 
-    LPVOID lpParam);
+                      LPCWSTR lpClassName, 
+                      LPCWSTR lpWindowName, 
+                      DWORD dwStyle, 
+                      int X, int Y, 
+                      int nWidth, int nHeight, 
+                      HWND hWndParent, 
+                      HMENU hMenu, 
+                      LPVOID lpParam);
   virtual void Destroy();
   virtual void PreCreate(CREATESTRUCT& cs) {};
   virtual void PreRegisterClass(WNDCLASSEX& wc) {};
@@ -58,8 +58,8 @@ public:
   void    Attach(HWND hWindow);
   void    CenterOwner();
   HWND    Detach();
-  LPCWSTR GetClassName()    const { return m_WndClass.lpszClassName; };
-  HMENU   GetMenuHandle()   const { return m_hMenu; };
+  LPCWSTR GetClassName() const { return m_WndClass.lpszClassName; };
+  HMENU   GetMenuHandle() const { return m_hMenu; };
   HWND    GetParentHandle() const { return m_hParent; };
   HICON   SetIconLarge(int nIcon);
   HICON   SetIconSmall(int nIcon);
@@ -138,9 +138,10 @@ protected:
 
 private:
   static LRESULT CALLBACK WindowProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  
   BOOL RegisterClass(WNDCLASSEX& wc);
   void Subclass(HWND hWnd);
   void UnSubclass();
 };
 
-#endif // UI_WINDOW_H
+#endif // WIN_WINDOW_H

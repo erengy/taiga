@@ -43,6 +43,8 @@ public:
   virtual ~CUser() {}
 
   void Clear();
+  int GetItemCount(int status);
+  void IncreaseItemCount(int status, int count = 1);
 };
 
 // =============================================================================
@@ -75,7 +77,6 @@ public:
   void Clear();
   BOOL Read();
   BOOL Write(int index, wstring child, wstring value, int mode);
-  void ChangeItemCount(int status, int count = 1);
   void DeleteItem(int index);
   int FindItemByID(int anime_id);
 

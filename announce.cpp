@@ -25,7 +25,7 @@
 #include "http.h"
 #include "settings.h"
 #include "string.h"
-#include "ui/ui_taskdialog.h"
+#include "win32/win_taskdialog.h"
 
 CHTTP HTTPClient, TwitterClient;
 CSkype Skype;

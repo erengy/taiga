@@ -110,8 +110,8 @@ bool CSettings::Read() {
   wstring folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
-    folder = item.attribute(L"folder").value(); if (folder.empty()) folder = L"%empty%";
-    titles = item.attribute(L"titles").value(); if (titles.empty()) titles = L"%empty%";
+    folder = item.attribute(L"folder").value(); if (folder.empty()) folder = EMPTY_STR;
+    titles = item.attribute(L"titles").value(); if (titles.empty()) titles = EMPTY_STR;
     Anime.SetItem(item.attribute(L"id").as_int(), folder, titles);
   }
 
@@ -419,7 +419,7 @@ bool CSettings::Write() {
       for (size_t j = 0; j < EventQueue.List[i].Item.size(); j++) {
         xml_node item = user.append_child();
         item.set_name(L"event");
-        item.append_attribute(L"index")   = EventQueue.List[i].Item[j].Index;
+        item.append_attribute(L"index")   = EventQueue.List[i].Item[j].AnimeIndex;
         item.append_attribute(L"id")      = EventQueue.List[i].Item[j].ID;
         item.append_attribute(L"episode") = EventQueue.List[i].Item[j].Episode;
         item.append_attribute(L"score")   = EventQueue.List[i].Item[j].Score;
@@ -452,6 +452,6 @@ void CSettings::CSettingsAnime::SetItem(int id, wstring folder, wstring titles) 
     Item.resize(index + 1);
   }
   Item[index].ID = id;
-  if (folder != L"%empty%") Item[index].Folder = folder;
-  if (titles != L"%empty%") Item[index].Titles = titles;
+  if (folder != EMPTY_STR) Item[index].Folder = folder;
+  if (titles != EMPTY_STR) Item[index].Titles = titles;
 }

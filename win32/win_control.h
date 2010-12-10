@@ -16,15 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_CONTROL_H
-#define UI_CONTROL_H
+#ifndef WIN_CONTROL_H
+#define WIN_CONTROL_H
 
 #include <windows.h>
 #include <commctrl.h>
 #include <richedit.h>
 
-#include "ui_main.h"
-#include "ui_window.h"
+#include "win_main.h"
+#include "win_window.h"
 
 // =============================================================================
 
@@ -173,8 +173,8 @@ public:
   UINT GetBarHeight();
   BOOL InsertBand(LPREBARBANDINFO lpBarInfo);
   BOOL InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UINT cxMinChild, 
-          UINT cyChild, UINT cyIntegral, UINT cyMaxChild, UINT cyMinChild, 
-          UINT fMask, UINT fStyle);
+                  UINT cyChild, UINT cyIntegral, UINT cyMaxChild, UINT cyMinChild, 
+                  UINT fMask, UINT fStyle);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
@@ -285,8 +285,9 @@ public:
   DWORD   GetButtonSize();
   LPCWSTR GetButtonTooltip(int nIndex);
   DWORD   GetPadding();
-  BOOL    InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled, 
-            BYTE fsStyle, DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip);
+  BOOL    InsertButton(int iIndex, int iBitmap, int idCommand, 
+                       bool bEnabled, BYTE fsStyle, DWORD_PTR dwData, 
+                       LPCWSTR lpText, LPCWSTR lpTooltip);
   BOOL    SetButtonImage(int nIndex, int iImage);
   BOOL    SetButtonText(int nIndex, LPCWSTR lpText);
   BOOL    SetButtonTooltip(int nIndex, LPCWSTR lpTooltip);
@@ -345,4 +346,4 @@ protected:
   virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
-#endif // UI_CONTROL_H
+#endif // WIN_CONTROL_H

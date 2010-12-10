@@ -20,8 +20,8 @@
 #define DLG_TORRENT_H
 
 #include "../std.h"
-#include "../ui/ui_control.h"
-#include "../ui/ui_dialog.h"
+#include "../win32/win_control.h"
+#include "../win32/win_dialog.h"
 
 // =============================================================================
 

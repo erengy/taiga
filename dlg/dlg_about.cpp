@@ -21,7 +21,7 @@
 #include "dlg_about.h"
 #include "../resource.h"
 #include "../taiga.h"
-#include "../ui/ui_gdi.h"
+#include "../win32/win_gdi.h"
 #include <math.h>
 
 CAboutWindow AboutWindow;

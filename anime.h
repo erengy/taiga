@@ -61,10 +61,15 @@ public:
   void Update(CEpisode episode, bool do_move);
   void CheckFolder();
   void CheckNewEpisode(bool check_folder = false);
-  int  EstimateTotalEpisodes();
-  int  GetLastWatchedEpisode();
+  int GetLastWatchedEpisode();
+  int GetScore();
+  int GetStatus();
+  wstring GetTags();
+  int GetTotalEpisodes();
   bool ParseSearchResult(const wstring& data);
-  void Refresh(wstring data);
+  void Edit(const wstring& data, 
+    int index = -1, int episode = -1, int score = -1, 
+    int status = -1, int mode = -1, const wstring& tags = L"");
   void SetStartDate(wstring date, bool ignore_previous);
   void SetFinishDate(wstring date, bool ignore_previous);
   void Delete();

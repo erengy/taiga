@@ -21,6 +21,8 @@
 
 #include "std.h"
 
+#define EMPTY_STR L"%empty%"
+
 // =============================================================================
 
 wstring CharLeft(const wstring& str, int length);

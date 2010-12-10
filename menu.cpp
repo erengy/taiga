@@ -60,7 +60,7 @@ void UpdateAnimeMenu(int anime_index) {
       MENU.Item[i].Checked = false;
       MENU.Item[i].Default = false;
     }
-    item_index = AnimeList.Item[anime_index].My_Score;
+    item_index = AnimeList.Item[anime_index].GetScore();
     if (item_index < static_cast<int>(MENU.Item.size())) {
       MENU.Item[item_index].Checked = true;
       MENU.Item[item_index].Default = true;
@@ -73,7 +73,7 @@ void UpdateAnimeMenu(int anime_index) {
       MENU.Item[i].Checked = false;
       MENU.Item[i].Default = false;
     }
-    item_index = AnimeList.Item[anime_index].My_Status;
+    item_index = AnimeList.Item[anime_index].GetStatus();
     if (item_index == MAL_PLANTOWATCH) item_index--;
     if (item_index - 1 < static_cast<int>(MENU.Item.size())) {
       MENU.Item[item_index - 1].Checked = true;
@@ -93,7 +93,7 @@ void UpdateAnimeMenu(int anime_index) {
       L"", false, false, AnimeList.Item[anime_index].GetLastWatchedEpisode() > 0);
     MENU.CreateItem(L"PlayNext()", 
       L"Next episode (#" + ToWSTR(AnimeList.Item[anime_index].GetLastWatchedEpisode() + 1) + L")", 
-      L"", false, false, AnimeList.Item[anime_index].My_Status != MAL_COMPLETED);
+      L"", false, false, AnimeList.Item[anime_index].GetStatus() != MAL_COMPLETED);
     MENU.CreateItem(L"PlayRandom()", L"Random episode");
     MENU.CreateItem();
     MENU.CreateItem(L"", L"Episode", L"PlayEpisode");
@@ -110,7 +110,7 @@ void UpdateAnimeMenu(int anime_index) {
     if (AnimeList.Item[anime_index].Series_Episodes > 0) {
       count_max = AnimeList.Item[anime_index].Series_Episodes;
     } else {
-      count_max = AnimeList.Item[anime_index].EstimateTotalEpisodes();
+      count_max = AnimeList.Item[anime_index].GetTotalEpisodes();
       if (count_max == 0) {
         count_max = AnimeList.Item[anime_index].GetLastWatchedEpisode() + 1;
       }

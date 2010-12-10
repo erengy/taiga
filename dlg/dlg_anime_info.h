@@ -20,9 +20,9 @@
 #define DLG_ANIME_INFO_H
 
 #include "../std.h"
-#include "../ui/ui_control.h"
-#include "../ui/ui_dialog.h"
-#include "../ui/ui_gdi.h"
+#include "../win32/win_control.h"
+#include "../win32/win_dialog.h"
+#include "../win32/win_gdi.h"
 
 class CAnime;
 

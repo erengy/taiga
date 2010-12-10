@@ -28,7 +28,7 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
-#include "../ui/ui_gdi.h"
+#include "../win32/win_gdi.h"
 
 // =============================================================================
 
@@ -304,8 +304,9 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
       if (!pAnimeItem) return CDRF_DODEFAULT;
       int eps_watched  = pAnimeItem->My_WatchedEpisodes;
       int eps_total    = pAnimeItem->Series_Episodes;
-      int eps_estimate = pAnimeItem->EstimateTotalEpisodes();
-      int eps_buffer   = EventQueue.GetLastWatchedEpisode(pAnimeItem->Index);
+      int eps_estimate = pAnimeItem->GetTotalEpisodes();
+      int eps_buffer   = pAnimeItem->GetLastWatchedEpisode();
+      if (eps_buffer == eps_watched) eps_buffer = 0;
       
       // Draw progress bar
       if (pCD->iSubItem == 1) {
@@ -358,10 +359,10 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
           if (ratio_watched == 1.0f) {
             UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem);
           // Watching
-          } else if (pAnimeItem->My_Status == MAL_WATCHING) {
+          } else if (pAnimeItem->GetStatus() == MAL_WATCHING) {
             UI.ListProgress.Watching.Draw(hdc.Get(), &rcItem);
           // Dropped
-          } else if (pAnimeItem->My_Status == MAL_DROPPED) {
+          } else if (pAnimeItem->GetStatus() == MAL_DROPPED) {
             UI.ListProgress.Dropped.Draw(hdc.Get(), &rcItem);
           // Completed / On hold / Plan to watch
           } else {

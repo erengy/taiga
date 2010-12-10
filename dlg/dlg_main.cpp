@@ -34,9 +34,9 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
-#include "../ui/ui_gdi.h"
-#include "../ui/ui_taskbar.h"
-#include "../ui/ui_taskdialog.h"
+#include "../win32/win_gdi.h"
+#include "../win32/win_taskbar.h"
+#include "../win32/win_taskdialog.h"
 
 CMainWindow MainWindow;
 
@@ -152,7 +152,7 @@ BOOL CMainWindow::OnInitDialog() {
   Taskbar.Create(g_hMain, NULL, APP_TITLE);
   UpdateTip();
   // Change status
-  ChangeStatus(DEFAULT_STATUS);
+  ChangeStatus();
   // Refresh list
   RefreshList(MAL_WATCHING);
   // Refresh menu bar
@@ -182,7 +182,8 @@ BOOL CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         ReleaseCapture();
         int tab_index = m_Tab.HitTest();
         if (tab_index > -1) {
-          ExecuteAction(L"EditStatus(" + ToWSTR(m_Tab.GetItemParam(tab_index)) + L")");
+          int status = m_Tab.GetItemParam(tab_index);
+          ExecuteAction(L"EditStatus(" + ToWSTR(status) + L")");
         }
       }
       break;
@@ -406,28 +407,35 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
   // Check event queue
-  if (Taiga.TickerQueue >= 60 /*seconds*/) {
+  Taiga.TickerQueue++;
+  if (Taiga.TickerQueue >= 1 * 60) {
     Taiga.TickerQueue = 0;
     if (EventQueue.UpdateInProgress == false) {
       EventQueue.Check();
     }
-  } else {
-    Taiga.TickerQueue++;
   }
 
   // ===========================================================================
   
+  // Check new episodes
+  Taiga.TickerNewEpisodes++;
+  if (Taiga.TickerNewEpisodes >= 30 * 60) {
+    Taiga.TickerNewEpisodes = 0;
+    ExecuteAction(L"CheckNewEpisodes()", TRUE);
+  }
+
+  // ===========================================================================
+
   // Check new torrents
   if (Settings.RSS.Torrent.CheckEnabled && Settings.RSS.Torrent.CheckInterval) {
+    Taiga.TickerTorrent++;
+    if (TorrentWindow.IsWindow()) {
+      wstring text = L"Check new torrents [" + 
+        ToTimeString(Settings.RSS.Torrent.CheckInterval * 60 - Taiga.TickerTorrent) + L"]";
+      TorrentWindow.m_Toolbar.SetButtonText(0, text.c_str());
+    }
     if (Taiga.TickerTorrent >= Settings.RSS.Torrent.CheckInterval * 60) {
       Torrents.Check(Settings.RSS.Torrent.Source);
-    } else {
-      Taiga.TickerTorrent++;
-      if (TorrentWindow.IsWindow()) {
-        wstring text = L"Check new torrents [" + 
-          ToTimeString(Settings.RSS.Torrent.CheckInterval * 60 - Taiga.TickerTorrent) + L"]";
-        TorrentWindow.m_Toolbar.SetButtonText(0, text.c_str());
-      }
     }
   } else {
     if (TorrentWindow.IsWindow()) {
@@ -492,8 +500,6 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
         if (Settings.Account.Update.CheckPlayer == FALSE || 
           MediaPlayers.Item[media_index].WindowHandle == GetForegroundWindow()) {
             Taiga.TickerMedia++;
-            //wstring text = L" " + ToTimeString(Settings.Account.Update.Delay - Taiga.TickerMedia);
-            //m_Status.SetPanelText(1, text.c_str());
         }
       }
       // Caption changed?
@@ -504,7 +510,6 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
           AnimeList.Item[anime_index].End(CurrentEpisode, true, true);
         }
         Taiga.TickerMedia = 0;
-        //m_Status.SetPanelText(1, L" 00:00");
       }
     }
   
@@ -513,7 +518,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
     // Was running, but not watching
     if (anime_index < 1) {
       if (MediaPlayers.IndexOld > 0){
-        ChangeStatus(DEFAULT_STATUS);
+        ChangeStatus();
         CurrentEpisode.Index = 0;
         MediaPlayers.IndexOld = 0;
         RefreshMenubar(CurrentEpisode.Index);
@@ -526,7 +531,6 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
       AnimeList.Item[anime_index].End(CurrentEpisode, true, 
         Settings.Account.Update.Time == UPDATE_MODE_WAITPLAYER);
       Taiga.TickerMedia = 0;
-      //m_Status.SetPanelText(1, L" 00:00");
     }
   }
 }
@@ -563,6 +567,9 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
           case TIPTYPE_TORRENT:
             ExecuteAction(L"Torrents");
             break;
+          case TIPTYPE_UPDATEFAILED:
+            EventQueue.Check();
+            break;
         }
         Taiga.CurrentTipType = TIPTYPE_NORMAL;
         break;
@@ -586,10 +593,17 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
 
 void CMainWindow::ChangeStatus(wstring str) {
   // Change status text
-  if (!str.empty()) {
-    str = L"  " + str;
-    m_Status.SetText(str.c_str());
+  if (str.empty() && CurrentEpisode.Index > 0) {
+    str = L"Watching: " + 
+      AnimeList.Item[CurrentEpisode.Index].Series_Title + 
+      PushString(L" #", CurrentEpisode.Number);
+    if (Settings.Account.Update.OutOfRange && 
+        ToINT(CurrentEpisode.Number) > AnimeList.Item[CurrentEpisode.Index].GetLastWatchedEpisode() + 1) {
+          str += L" (out of range)";
+    }
   }
+  if (!str.empty()) str = L"  " + str;
+  m_Status.SetText(str.c_str());
 }
 
 int CMainWindow::GetListIndex(int anime_index) {
@@ -625,16 +639,16 @@ void CMainWindow::RefreshList(int index) {
   int icon_index = 0;
   int group_count[6] = {0};
   for (int i = 1; i <= AnimeList.Count; i++) {
-    if (AnimeList.Item[i].My_Status == index || index == 0) {
+    if (AnimeList.Item[i].GetStatus() == index || index == 0) {
       if (AnimeList.Filter.Check(i)) {
         icon_index = AnimeList.Item[i].Playing ? Icon16_Play : StatusToIcon(AnimeList.Item[i].Series_Status);
-        group_count[AnimeList.Item[i].My_Status - 1]++;
-        int j = m_List.InsertItem(i, AnimeList.Item[i].My_Status, icon_index, LPSTR_TEXTCALLBACK, 
+        group_count[AnimeList.Item[i].GetStatus() - 1]++;
+        int j = m_List.InsertItem(i, AnimeList.Item[i].GetStatus(), icon_index, LPSTR_TEXTCALLBACK, 
           reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
-        int eps_estimate = AnimeList.Item[i].EstimateTotalEpisodes();
-        float ratio = eps_estimate ? (float)AnimeList.Item[i].My_WatchedEpisodes / (float)eps_estimate : 0.8f;
+        int eps_total = AnimeList.Item[i].GetTotalEpisodes();
+        float ratio = eps_total ? (float)AnimeList.Item[i].GetLastWatchedEpisode() / (float)eps_total : 0.8f;
         m_List.SetItem(j, 1, ToWSTR(ratio, 4).c_str());
-        m_List.SetItem(j, 2, MAL.TranslateNumber(AnimeList.Item[i].My_Score).c_str());
+        m_List.SetItem(j, 2, MAL.TranslateNumber(AnimeList.Item[i].GetScore()).c_str());
         m_List.SetItem(j, 3, MAL.TranslateType(AnimeList.Item[i].Series_Type).c_str());
         m_List.SetItem(j, 4, MAL.TranslateDate(AnimeList.Item[i].Series_Start).c_str());
       }

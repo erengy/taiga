@@ -30,7 +30,7 @@
 #include "../settings.h"
 #include "../string.h"
 #include "../theme.h"
-#include "../ui/ui_control.h"
+#include "../win32/win_control.h"
 
 LPCWSTR PAGE_TITLE[PAGE_COUNT] = {
   L" MyAnimeList",
@@ -194,7 +194,7 @@ void CSettingsWindow::OnOK() {
     pItem = reinterpret_cast<CAnime*>(List.GetItemParam(i));
     if (pItem) {
       List.GetItemText(i, 1, pItem->Folder);
-      Settings.Anime.SetItem(pItem->Series_ID, pItem->Folder, L"%empty%");
+      Settings.Anime.SetItem(pItem->Series_ID, pItem->Folder, EMPTY_STR);
     }
   }
   List.SetWindowHandle(NULL);

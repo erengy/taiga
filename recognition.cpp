@@ -225,7 +225,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
 
   // Get episode number and version
   if (examine_number && episode.Number.empty()) {
-    for (unsigned int i = title.length(); i > 0; i--) {
+    for (unsigned int i = title.length() - 1; i > 0; i--) {
       if (IsNumeric(title[i])) {
         episode.Number = title[i] + episode.Number;
       } else {

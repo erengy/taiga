@@ -19,7 +19,7 @@
 #include "../std.h"
 #include "dlg_input.h"
 #include "../resource.h"
-#include "../ui/ui_control.h"
+#include "../win32/win_control.h"
 
 // =============================================================================
 

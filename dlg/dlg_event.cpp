@@ -19,6 +19,7 @@
 #include "../std.h"
 #include "../animelist.h"
 #include "dlg_event.h"
+#include "dlg_main.h"
 #include "../event.h"
 #include "../myanimelist.h"
 #include "../resource.h"
@@ -56,9 +57,15 @@ BOOL CEventWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Clear all items
     case IDC_BUTTON_EVENT_CLEAR: {
-      EventQueue.Clear();
-      RefreshList();
-      return TRUE;
+      if (EventQueue.UpdateInProgress) {
+        MessageBox(L"Event list can not be cleared while an update is in progress.", L"Error", MB_ICONERROR);
+      } else {
+        EventQueue.Clear();
+        RefreshList();
+        MainWindow.RefreshList();
+        MainWindow.RefreshTabs();
+        return TRUE;
+      }
     }
   }
 
@@ -103,10 +110,10 @@ void CEventWindow::RefreshList() {
       int episode  = EventQueue.List[user_index].Item[i].Episode; if (episode == -1) episode++;
       int score    = EventQueue.List[user_index].Item[i].Score;   if (score == -1) score++;
       int status   = EventQueue.List[user_index].Item[i].Status;
-      wstring tags = EventQueue.List[user_index].Item[i].Tags;    if (tags == L"%empty%") tags.clear();
+      wstring tags = EventQueue.List[user_index].Item[i].Tags;    if (tags == EMPTY_STR) tags.clear();
 
-      if (EventQueue.List[user_index].Item[i].Index <= AnimeList.Count) {
-        m_List.InsertItem(i, -1, -1, AnimeList.Item[EventQueue.List[user_index].Item[i].Index].Series_Title.c_str(), 0);
+      if (EventQueue.List[user_index].Item[i].AnimeIndex <= AnimeList.Count) {
+        m_List.InsertItem(i, -1, -1, AnimeList.Item[EventQueue.List[user_index].Item[i].AnimeIndex].Series_Title.c_str(), 0);
         m_List.SetItem(i, 1, MAL.TranslateNumber(episode, L"").c_str());
         m_List.SetItem(i, 2, MAL.TranslateNumber(score, L"").c_str());
         m_List.SetItem(i, 3, MAL.TranslateMyStatus(status, false).c_str());
@@ -119,13 +126,13 @@ void CEventWindow::RefreshList() {
   // Set title
   switch (EventQueue.GetItemCount()) {
     case 0:
-      SetText(L"Event queue is empty.");
+      SetText(L"Event Queue");
       break;
     case 1:
-      SetText(L"There is 1 item in the event queue.");
+      SetText(L"Event Queue (1 item)");
       break;
     default:
-      SetText(L"There are " + ToWSTR(EventQueue.GetItemCount()) + L" items in the event queue.");
+      SetText(L"Event Queue (" + ToWSTR(EventQueue.GetItemCount()) + L" items)");
       break;
   }
 }

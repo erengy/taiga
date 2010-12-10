@@ -352,8 +352,8 @@ void DecodeHTML(wstring& input) {
     {L"&ldquo;",  L"\u201C"},
     {L"&rdquo;",  L"\u201D"},
     {L"&dagger;", L"\u2020"},
-    {L"&hellip;", L"\u2026"},
-    {L"&trade;",  L"\u2122"}
+    {L"&trade;",  L"\u2122"},
+    {L"&hellip;", L"\u2026"}
   };
 
   if (InStr(input, L"&") > -1) {

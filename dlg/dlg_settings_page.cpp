@@ -104,7 +104,7 @@ BOOL CSettingsPage::OnInitDialog() {
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
       for (int i = 1; i <= AnimeList.Count; i++) {
-        List.InsertItem(i - 1, AnimeList.Item[i].My_Status, 
+        List.InsertItem(i - 1, AnimeList.Item[i].GetStatus(), 
                 StatusToIcon(AnimeList.Item[i].Series_Status), 
                 LPSTR_TEXTCALLBACK, 
                 reinterpret_cast<LPARAM>(&AnimeList.Item[i]));

@@ -22,8 +22,8 @@
 #include "../std.h"
 #include "dlg_settings_page.h"
 #include "../rss.h"
-#include "../ui/ui_control.h"
-#include "../ui/ui_dialog.h"
+#include "../win32/win_control.h"
+#include "../win32/win_dialog.h"
 
 // =============================================================================
 

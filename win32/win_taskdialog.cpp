@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ui_taskdialog.h"
+#include "win_taskdialog.h"
 
 vector<wstring> ButtonText;
 LRESULT CALLBACK MsgBoxHookProc(int nCode, WPARAM wParam, LPARAM lParam);

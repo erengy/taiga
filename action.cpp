@@ -40,8 +40,8 @@
 #include "string.h"
 #include "taiga.h"
 #include "theme.h"
-#include "ui/ui_taskbar.h"
-#include "ui/ui_taskdialog.h"
+#include "win32/win_taskbar.h"
+#include "win32/win_taskdialog.h"
 
 // =============================================================================
 
@@ -59,20 +59,20 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ===========================================================================
 
   // Login()
-  // Logs in to MyAnimeList.
+  //   Logs in to MyAnimeList.
   if (action == L"Login") {
     if (AnimeList.Count > 0) {
       MainWindow.ChangeStatus(L"Logging in...");
       bool result = MAL.Login();
       MainWindow.m_Toolbar.EnableButton(0, !result);
       MainWindow.m_Toolbar.EnableButton(1, !result);
-      if (!result) MainWindow.ChangeStatus(DEFAULT_STATUS);
+      if (!result) MainWindow.ChangeStatus();
     } else {
       ExecuteAction(L"RefreshList", TRUE);
     }
 
   // Logout()
-  // Logs out of MyAnimeList.
+  //   Logs out of MyAnimeList.
   } else if (action == L"Logout") {
     if (Taiga.LoggedIn) {
       Taiga.LoggedIn = false;
@@ -86,27 +86,27 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // LoginLogout(), ToggleLogin()
-  // Logs in or out depending on status.
+  //   Logs in or out depending on status.
   } else if (action == L"LoginLogout" || action == L"ToggleLogin") {
     ExecuteAction(Taiga.LoggedIn ? L"Logout" : L"Login");
 
   // RefreshList()
-  // Retrieves anime list from MyAnimeList.
-  // wParam is a BOOL value
+  //   Retrieves anime list from MyAnimeList.
+  //   wParam is a BOOL value
   } else if (action == L"RefreshList") {
     MainWindow.ChangeStatus(L"Refreshing list...");
     bool result = MAL.GetList(wParam == TRUE);
     MainWindow.m_Toolbar.EnableButton(0, !result);
     MainWindow.m_Toolbar.EnableButton(1, !result);
-    if (!result) MainWindow.ChangeStatus(DEFAULT_STATUS);
+    if (!result) MainWindow.ChangeStatus();
 
   // RefreshLogin()
-  // Retrieves anime list and logs in afterwards.
+  //   Retrieves anime list and logs in afterwards.
   } else if (action == L"RefreshLogin") {
     ExecuteAction(L"RefreshList", TRUE);
 
   // Synchronize()
-  // Synchronize local and remote lists.
+  //   Synchronize local and remote lists.
   } else if (action == L"Synchronize") {
     if (Taiga.LoggedIn && EventQueue.GetItemCount() > 0) {
       EventQueue.Check();
@@ -115,7 +115,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // ViewPanel(), ViewProfile(), ViewHistory()
-  // Opens up MyAnimeList user pages.
+  //   Opens up MyAnimeList user pages.
   } else if (action == L"ViewPanel") {
     MAL.ViewPanel();
   } else if (action == L"ViewProfile") {
@@ -126,12 +126,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ===========================================================================
 
   // Execute(path)
-  // Executes a file or folder.
+  //   Executes a file or folder.
   } else if (action == L"Execute") {
     Execute(body);
 
   // URL(address)
-  // Opens a web page.
+  //   Opens a web page.
   } else if (action == L"URL") {
     wstring title = AnimeList.Item[AnimeList.Index].Series_Title;
     ReplaceChars(title, L"_!?.,:;~+", L"");
@@ -142,7 +142,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ===========================================================================
 
   // About()
-  // Shows about window.
+  //   Shows about window.
   } else if (action == L"About") {
     if (!AboutWindow.IsWindow()) {
       AboutWindow.Create(IDD_ABOUT, g_hMain, true);
@@ -151,12 +151,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // Exit(), Quit()
-  // Exits from Taiga.
+  //   Exits from Taiga.
   } else if (action == L"Exit" || action == L"Quit") {
     MainWindow.Destroy();
 
   // Filter()
-  // Shows filter window.
+  //   Shows filter window.
   } else if (action == L"Filter") {
     if (!FilterWindow.IsWindow()) {
       FilterWindow.Create(IDD_FILTER, g_hMain, false);
@@ -164,8 +164,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     ActivateWindow(FilterWindow.GetWindowHandle());
 
   // Info()
-  // Shows anime information window.
-  // lParam is a pointer to an anime list item.
+  //   Shows anime information window.
+  //   lParam is a pointer to an anime list item.
   } else if (action == L"Info") {
     CAnime* anime_item = lParam ? 
       reinterpret_cast<CAnime*>(lParam) : &AnimeList.Item[AnimeList.Index];
@@ -178,7 +178,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // RecognitionTest()
-  // Shows recognition test window.
+  //   Shows recognition test window.
   } else if (action == L"RecognitionTest") {
     if (!RecognitionTestWindow.IsWindow()) {
       RecognitionTestWindow.Create(IDD_TEST_RECOGNITION, NULL, false);
@@ -186,7 +186,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     ActivateWindow(RecognitionTestWindow.GetWindowHandle());
 
   // SetSearchMode()
-  // Changes search bar mode.
+  //   Changes search bar mode.
   } else if (action == L"SetSearchMode") {
     if (body == L"List") {
       MainWindow.SetSearchMode(SEARCH_MODE_LIST);
@@ -195,8 +195,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // Settings()
-  // Shows settings window.
-  // lParam is the initial page number.
+  //   Shows settings window.
+  //   lParam is the initial page number.
   } else if (action == L"Settings") {
     SettingsWindow.SetCurrentPage(lParam);
     if (!SettingsWindow.IsWindow()) {
@@ -222,7 +222,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     ExecuteAction(L"Torrents");
 
   // Torrents()
-  // Shows torrents window.
+  //   Shows torrents window.
   } else if (action == L"Torrents") {
     if (!TorrentWindow.IsWindow()) {
       TorrentWindow.Create(IDD_TORRENT, NULL, false);
@@ -230,9 +230,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     ActivateWindow(TorrentWindow.GetWindowHandle());
 
   // TorrentAddFilter()
-  // Shows add new filter window.
-  // wParam is a BOOL value that represents modal status.
-  // lParam is the handle of the parent window.
+  //   Shows add new filter window.
+  //   wParam is a BOOL value that represents modal status.
+  //   lParam is the handle of the parent window.
   } else if (action == L"TorrentAddFilter") {
     if (!TorrentFilterWindow.IsWindow()) {
       TorrentFilterWindow.Create(IDD_ADDFILTER, 
@@ -244,8 +244,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ===========================================================================
   
   // AddToListAs(status)
-  // Adds new anime to list with given status
-  // lParam is a pointer to a CAnime
+  //   Adds new anime to list with given status.
+  //   lParam is a pointer to a CAnime.
   } else if (action == L"AddToListAs") {
     int status = ToINT(body);
     CAnime* pAnimeItem = reinterpret_cast<CAnime*>(lParam);
@@ -253,12 +253,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       pAnimeItem->My_Status = status;
       if (status == MAL_COMPLETED) {
         pAnimeItem->My_WatchedEpisodes = pAnimeItem->Series_Episodes;
+        pAnimeItem->SetFinishDate(L"", true);
       }
       AnimeList.AddItem(*pAnimeItem);
-      if (status == MAL_COMPLETED) {
-        AnimeList.Item[AnimeList.Count].SetFinishDate(L"", true);
-      }
-      AnimeList.ChangeItemCount(status, 1);
+      AnimeList.User.IncreaseItemCount(status, 1);
       AnimeList.Write(AnimeList.Count, L"", L"", ANIMELIST_ADDANIME);
       if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
       MainWindow.RefreshList(pAnimeItem->My_Status);
@@ -266,13 +264,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       SearchWindow.RefreshList();
       EventQueue.Add(L"", AnimeList.Count, pAnimeItem->Series_ID, 
         pAnimeItem->My_WatchedEpisodes ? pAnimeItem->My_WatchedEpisodes : -1, 
-        -1, status, L"%empty%", L"", HTTP_MAL_AnimeAdd);
+        -1, status, EMPTY_STR, L"", HTTP_MAL_AnimeAdd);
     }
 
   // ===========================================================================
 
   // AddFolder()
-  // Opens up a dialog to add new root folder.
+  //   Opens up a dialog to add new root folder.
   } else if (action == L"AddFolder") {
     wstring path;
     if (BrowseForFolder(g_hMain, L"Please select a folder:", 
@@ -282,13 +280,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // CheckEventBuffer()
-  // Checks for queued events and shows related window.
+  //   Checks for queued events and shows related window.
   } else if (action == L"CheckEventBuffer") {
     EventQueue.Show();
 
   // CheckNewEpisodes()
-  // Checks new episodes.
-  // wParam is a BOOL value that activates silent operation mode.
+  //   Checks new episodes.
+  //   wParam is a BOOL value that activates silent operation mode.
   } else if (action == L"CheckNewEpisodes") {
     bool check_folder = true;
     bool silent = wParam == TRUE;
@@ -313,7 +311,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (!silent) TaskbarList.SetProgressState(TBPF_NORMAL);
     for (int i = 1; i <= AnimeList.Count; i++) {
       TaskbarList.SetProgressValue(i, AnimeList.Count);
-      switch (AnimeList.Item[i].My_Status) {
+      switch (AnimeList.Item[i].GetStatus()) {
         case MAL_WATCHING:
         case MAL_ONHOLD:
         case MAL_PLANTOWATCH:
@@ -331,7 +329,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // ToggleUpdates()
-  // Enabled or disables list updates.
+  //   Enabled or disables list updates.
   } else if (action == L"ToggleUpdates") {
     Taiga.UpdatesEnabled = !Taiga.UpdatesEnabled;
     if (Taiga.UpdatesEnabled) {
@@ -343,7 +341,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ===========================================================================
 
   // FilterReset()
-  // Resets list filters to their default values.
+  //   Resets list filters to their default values.
   } else if (action == L"FilterReset") {
     AnimeList.Filter.Reset();
     FilterWindow.RefreshFilters();
@@ -352,8 +350,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // FilterStatus(value)
-  // Filters list by status.
-  // Value must be between 1-3.
+  //   Filters list by status.
+  //   Value must be between 1-3.
   } else if (action == L"FilterStatus") {
     int index = ToINT(body) - 1;
     if (index > -1 && index < 3) {
@@ -363,8 +361,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // FilterType(value)
-  // Filters list by type.
-  // Value must be between 1-6.
+  //   Filters list by type.
+  //   Value must be between 1-6.
   } else if (action == L"FilterType") {
     int index = ToINT(body) - 1;
     if (index > -1 && index < 6) {
@@ -376,9 +374,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ===========================================================================
 
   // AnnounceToHTTP(force)
-  // Sends an HTTP request.
-  // If wParam is set to FALSE, this function sends an empty string.
-  // lParam points to a CEpisode class.
+  //   Sends an HTTP request.
+  //   If wParam is set to FALSE, this function sends an empty string.
+  //   lParam points to a CEpisode class.
   } else if (action == L"AnnounceToHTTP") {
     if (Settings.Announce.HTTP.Enabled || body == L"true") {
       if (wParam) {
@@ -390,9 +388,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // AnnounceToMessenger(force)
-  // Changes MSN Messenger status text.
-  // If wParam is set to FALSE, this function sends an empty string.
-  // lParam points to a CEpisode class.
+  //   Changes MSN Messenger status text.
+  //   If wParam is set to FALSE, this function sends an empty string.
+  //   lParam points to a CEpisode class.
   } else if (action == L"AnnounceToMessenger") {
     if (Settings.Announce.MSN.Enabled || body == L"true") {
       if (wParam) {
@@ -406,8 +404,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // AnnounceToMIRC(force)
-  // Sends message to specified channels in mIRC.
-  // lParam points to a CEpisode class.
+  //   Sends message to specified channels in mIRC.
+  //   lParam points to a CEpisode class.
   } else if (action == L"AnnounceToMIRC") {
     if (Settings.Announce.MIRC.Enabled || body == L"true") {
       CEpisode* pEpisode = lParam ? reinterpret_cast<CEpisode*>(lParam) : &CurrentEpisode;
@@ -419,10 +417,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // AnnounceToSkype(force)
-  // Changes Skype mood text.
-  // Requires authorization.
-  // If wParam is set to FALSE, this function sends an empty string.
-  // lParam points to a CEpisode class.
+  //   Changes Skype mood text.
+  //   Requires authorization.
+  //   If wParam is set to FALSE, this function sends an empty string.
+  //   lParam points to a CEpisode class.
   } else if (action == L"AnnounceToSkype") {
     if (Settings.Announce.Skype.Enabled || body == L"true") {
       if (wParam) {
@@ -436,8 +434,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // AnnounceToTwitter(force)
-  // Changes Twitter status.
-  // lParam points to a CEpisode class.
+  //   Changes Twitter status.
+  //   lParam points to a CEpisode class.
   } else if (action == L"AnnounceToTwitter") {
     if (Settings.Announce.Twitter.Enabled || body == L"true") {
       CEpisode* pEpisode = lParam ? reinterpret_cast<CEpisode*>(lParam) : &CurrentEpisode;
@@ -449,8 +447,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ===========================================================================
 
   // EditAll()
-  // Shows a dialog to edit details of an anime.
-  // lParam is a pointer to an anime list item.
+  //   Shows a dialog to edit details of an anime.
+  //   lParam is a pointer to an anime list item.
   } else if (action == L"EditAll") {
     CAnime* anime_item = lParam ? 
       reinterpret_cast<CAnime*>(lParam) : &AnimeList.Item[AnimeList.Index];
@@ -463,7 +461,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // EditDelete()
-  // Removes an anime from list.
+  //   Removes an anime from list.
   } else if (action == L"EditDelete") {
     CTaskDialog dlg;
     dlg.SetWindowTitle(AnimeList.Item[AnimeList.Index].Series_Title.c_str());
@@ -474,11 +472,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() == IDYES) {
       EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-        -1, -1, -1, L"%empty%", L"", HTTP_MAL_AnimeDelete);
+        -1, -1, -1, EMPTY_STR, L"", HTTP_MAL_AnimeDelete);
     }
 
   // EditEpisode()
-  // Changes wathed episode value of an anime.
+  //   Changes watched episode value of an anime.
   } else if (action == L"EditEpisode") {
     CInputDialog dlg;
     dlg.SetNumbers(true, 0, AnimeList.Item[AnimeList.Index].Series_Episodes, 
@@ -494,19 +492,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // EditScore(value)
-  // Changes anime score.
-  // Value must be between 0-10 and different from current score.
+  //   Changes anime score.
+  //   Value must be between 0-10 and different from current score.
   } else if (action == L"EditScore") {
     int score = ToINT(body);
     EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-      -1, score, -1, L"%empty%", L"", HTTP_MAL_ScoreUpdate);
+      -1, score, -1, EMPTY_STR, L"", HTTP_MAL_ScoreUpdate);
 
   // EditStatus(value)
-  // Changes anime status of user.
-  // Value must be 1, 2, 3, 4 or 6, and different from current status.
+  //   Changes anime status of user.
+  //   Value must be 1, 2, 3, 4 or 6, and different from current status.
   } else if (action == L"EditStatus") {
     int episode = -1, status = ToINT(body);
-    if (status < 1 || status == 5 || status > 6 || status == AnimeList.Item[AnimeList.Index].My_Status) return;
     switch (AnimeList.Item[AnimeList.Index].Series_Status) {
       case MAL_AIRING:
         if (status == MAL_COMPLETED) {
@@ -537,16 +534,16 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         break;
     }
     EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-      episode, -1, status, L"%empty%", L"", episode == -1 ? HTTP_MAL_StatusUpdate : HTTP_MAL_AnimeEdit);
+      episode, -1, status, EMPTY_STR, L"", episode == -1 ? HTTP_MAL_StatusUpdate : HTTP_MAL_AnimeEdit);
 
   // EditTags(tags)
-  // Changes anime tags.
-  // Tags must be seperated by a comma.
+  //   Changes anime tags.
+  //   Tags must be seperated by a comma.
   } else if (action == L"EditTags") {
     CInputDialog dlg;
     dlg.Title = AnimeList.Item[AnimeList.Index].Series_Title;
-    dlg.Info  = L"Please enter tags for this title, seperated by a comma:";
-    dlg.Text  = AnimeList.Item[AnimeList.Index].My_Tags;
+    dlg.Info = L"Please enter tags for this title, seperated by a comma:";
+    dlg.Text = AnimeList.Item[AnimeList.Index].GetTags();
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {
       EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
@@ -554,8 +551,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // EditTitles(titles)
-  // Changes alternative titles of an anime.
-  // Titles must me seperated by "; ".
+  //   Changes alternative titles of an anime.
+  //   Titles must be seperated by "; ".
   } else if (action == L"EditTitles") {
     CInputDialog dlg;
     dlg.Title = AnimeList.Item[AnimeList.Index].Series_Title;
@@ -564,14 +561,14 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {
       AnimeList.Item[AnimeList.Index].Synonyms = dlg.Text;
-      Settings.Anime.SetItem(AnimeList.Item[AnimeList.Index].Series_ID, L"%empty%", dlg.Text);
+      Settings.Anime.SetItem(AnimeList.Item[AnimeList.Index].Series_ID, EMPTY_STR, dlg.Text);
       if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
     }
   
   // ===========================================================================
   
   // OpenFolder()
-  // Searches for anime folder and opens it.
+  //   Searches for anime folder and opens it.
   } else if (action == L"OpenFolder") {
     if (AnimeList.Item[AnimeList.Index].Folder.empty()) {
       MainWindow.ChangeStatus(L"Searching for folder...");
@@ -586,7 +583,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     Execute(AnimeList.Item[AnimeList.Index].Folder);
 
   // PlayEpisode(value)
-  // Searches for an episode of an anime and plays it.
+  //   Searches for an episode of an anime and plays it.
   } else if (action == L"PlayEpisode") {
     int number = ToINT(body);
     wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
@@ -597,7 +594,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // PlayLast()
-  // Searches for the last watched episode of an anime and plays it.
+  //   Searches for the last watched episode of an anime and plays it.
   } else if (action == L"PlayLast") {
     int number = AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode();
     wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
@@ -609,7 +606,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // PlayNext()
-  // Searches for the next episode of an anime and plays it.
+  //   Searches for the next episode of an anime and plays it.
   } else if (action == L"PlayNext") {
     int number = 0;
     if (AnimeList.Item[AnimeList.Index].Series_Episodes != 1) {
@@ -624,13 +621,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // PlayRandom()
-  // Searches for a random episode of an anime and plays it.
+  //   Searches for a random episode of an anime and plays it.
   } else if (action == L"PlayRandom") {
     int anime_index = ToINT(body);
     if (anime_index == 0) anime_index = AnimeList.Index;
     if (anime_index > 0) {
       if (anime_index <= AnimeList.Count) {
-        int total = AnimeList.Item[anime_index].EstimateTotalEpisodes();
+        int total = AnimeList.Item[anime_index].GetTotalEpisodes();
         if (total == 0) total = AnimeList.Item[anime_index].GetLastWatchedEpisode() + 1;
         for (int i = 0; i < total; i++) {
           srand(static_cast<unsigned int>(GetTickCount()));
@@ -646,11 +643,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
   
   // PlayRandomAnime()
-  // Searches for a random episode of a random anime and plays it.
+  //   Searches for a random episode of a random anime and plays it.
   } else if (action == L"PlayRandomAnime") {
     for (int i = 0; i < AnimeList.Count; i++) {
       int anime_index = rand() % AnimeList.Count + 1;
-      int total = AnimeList.Item[anime_index].EstimateTotalEpisodes();
+      int total = AnimeList.Item[anime_index].GetTotalEpisodes();
       if (total == 0) total = AnimeList.Item[anime_index].GetLastWatchedEpisode() + 1;
       srand(static_cast<unsigned int>(GetTickCount()));
       int episode = rand() % total + 1;

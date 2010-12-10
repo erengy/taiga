@@ -20,12 +20,10 @@
 #define DLG_MAIN_H
 
 #include "../std.h"
-#include "../ui/ui_control.h"
-#include "../ui/ui_dialog.h"
+#include "../win32/win_control.h"
+#include "../win32/win_dialog.h"
 
-#define DEFAULT_STATUS L"Taiga is ready."
-
-enum {
+enum SearchMode {
   SEARCH_MODE_LIST,
   SEARCH_MODE_MAL
 };
@@ -87,7 +85,7 @@ public:
   BOOL PreTranslateMessage(MSG* pMsg);
 
   // Other functions
-  void ChangeStatus(wstring str);
+  void ChangeStatus(wstring str = L"");
   int GetListIndex(int anime_index);
   UINT GetSearchMode() { return m_iSearchMode; }
   void RefreshList(int index = -1);

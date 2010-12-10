@@ -16,10 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_MENU_H
-#define UI_MENU_H
+#ifndef WIN_MENU_H
+#define WIN_MENU_H
 
-#include "ui_main.h"
+#include "win_main.h"
 
 // =============================================================================
 
@@ -31,7 +31,7 @@ enum MenuItemType {
 
 class CMenuList {
 public:
-  CMenuList() { m_hImageList = NULL; }
+  CMenuList() : m_hImageList(NULL) {}
   ~CMenuList() {}
 
   void    Create(LPCWSTR lpName, LPCWSTR lpType);
@@ -75,4 +75,4 @@ private:
   HIMAGELIST m_hImageList;
 };
 
-#endif // UI_MENU_H
+#endif // WIN_MENU_H

@@ -280,10 +280,10 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   Replace(str, L"%title%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Title), ENCODE(episode.Title)));
   Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].GetLastWatchedEpisode(), L"")), L""));
   Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].Series_Episodes, L"")), L""));
-  Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].My_Score, L"")), L""));
+  Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].GetScore(), L"")), L""));
   Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].Series_ID)), L""));
   Replace(str, L"%image%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Image), L""));
-  Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].My_Status)), L""));
+  Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].GetStatus())), L""));
   Replace(str, L"%name%",       ENCODE(episode.Name));
   Replace(str, L"%episode%",    ENCODE(GetLastEpisode(episode.Number)));
   Replace(str, L"%version%",    ENCODE(episode.Version));

@@ -16,10 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UI_DIALOG_H
-#define UI_DIALOG_H
+#ifndef WIN_DIALOG_H
+#define WIN_DIALOG_H
 
-#include "ui_main.h"
+#include "win_main.h"
 
 // =============================================================================
 
@@ -34,20 +34,20 @@ public:
   virtual void    SetSizeMin(LONG cx, LONG cy);
   virtual void    SetSnapGap(int iSnapGap);
 
-  virtual BOOL    AddComboString(int nIDDlgItem, LPCWSTR lpString);
-  virtual BOOL    CheckDlgButton(int nIDButton, UINT uCheck);
-  virtual BOOL    CheckRadioButton(int nIDFirstButton, int nIDLastButton, int nIDCheckButton);
-  virtual BOOL    EnableDlgItem(int nIDDlgItem, BOOL bEnable);
-  virtual INT     GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton);
-  virtual INT     GetComboSelection(int nIDDlgItem);
-  virtual HWND    GetDlgItem(int nIDDlgItem);
-  virtual UINT    GetDlgItemInt(int nIDDlgItem);
-  virtual void    GetDlgItemText(int nIDDlgItem, LPWSTR lpString, int cchMax = MAX_PATH);
-  virtual void    GetDlgItemText(int nIDDlgItem, wstring& str);
-  virtual BOOL    IsDlgButtonChecked(int nIDButton);
-  virtual BOOL    SendDlgItemMessage(int nIDDlgItem, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  virtual BOOL    SetComboSelection(int nIDDlgItem, int iIndex);
-  virtual BOOL    SetDlgItemText(int nIDDlgItem, LPCWSTR lpString);
+  virtual BOOL AddComboString(int nIDDlgItem, LPCWSTR lpString);
+  virtual BOOL CheckDlgButton(int nIDButton, UINT uCheck);
+  virtual BOOL CheckRadioButton(int nIDFirstButton, int nIDLastButton, int nIDCheckButton);
+  virtual BOOL EnableDlgItem(int nIDDlgItem, BOOL bEnable);
+  virtual INT  GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton);
+  virtual INT  GetComboSelection(int nIDDlgItem);
+  virtual HWND GetDlgItem(int nIDDlgItem);
+  virtual UINT GetDlgItemInt(int nIDDlgItem);
+  virtual void GetDlgItemText(int nIDDlgItem, LPWSTR lpString, int cchMax = MAX_PATH);
+  virtual void GetDlgItemText(int nIDDlgItem, wstring& str);
+  virtual BOOL IsDlgButtonChecked(int nIDButton);
+  virtual BOOL SendDlgItemMessage(int nIDDlgItem, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  virtual BOOL SetComboSelection(int nIDDlgItem, int iIndex);
+  virtual BOOL SetDlgItemText(int nIDDlgItem, LPCWSTR lpString);
 
 protected:
   virtual void OnCancel();
@@ -60,9 +60,10 @@ protected:
   virtual INT_PTR DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
+  static INT_PTR CALLBACK DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
   void SetMinMaxInfo(LPMINMAXINFO lpMMI);
   void SnapToEdges(LPWINDOWPOS lpWndPos);
-  static INT_PTR CALLBACK DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
   bool  m_bModal;
   int   m_iSnapGap;
@@ -70,4 +71,4 @@ private:
   POINT m_PosLast;
 };
 
-#endif // UI_DIALOG_H
+#endif // WIN_DIALOG_H

@@ -23,9 +23,17 @@
 
 // =============================================================================
 
+enum EventSearchMode {
+  EVENT_SEARCH_EPISODE = 1,
+  EVENT_SEARCH_SCORE,
+  EVENT_SEARCH_STATUS,
+  EVENT_SEARCH_TAGS
+};
+
 class CEventItem {
 public:
-  int Episode, ID, Index, Mode, Score, Status;
+  int Index;
+  int AnimeIndex, Episode, ID, Mode, Score, Status;
   wstring Reason, Tags, Time;
 };
 
@@ -34,11 +42,11 @@ public:
   CEventList();
   virtual ~CEventList() {}
   
-  void Add(int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
+  void Add(int anime_index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
   void Check();
   void Clear();
-  int  GetLastWatchedEpisode(int index);
   void Remove(unsigned int index);
+  CEventItem* SearchItem(int anime_index, int search_mode = 0);
   
   unsigned int Index;
   wstring User;
@@ -50,14 +58,14 @@ public:
   CEventQueue();
   virtual ~CEventQueue() {}
 
-  void Add(wstring user, int index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
+  void Add(wstring user, int anime_index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
   void Check();
   void Clear();
-  int  GetItemCount();
-  int  GetLastWatchedEpisode(int index);
-  int  GetUserIndex(wstring user = L"");
+  int GetItemCount();
+  int GetUserIndex(wstring user = L"");
   bool IsEmpty();
   void Remove(int index = -1);
+  CEventItem* SearchItem(int anime_index, int search_mode = 0);
   void Show();
 
   bool UpdateInProgress;

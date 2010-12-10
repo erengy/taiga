@@ -16,9 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ui_main.h"
-#include "ui_taskbar.h"
-#include "ui_window.h"
+#include "win_main.h"
+#include "win_taskbar.h"
+#include "win_window.h"
 
 // =============================================================================
 
@@ -440,13 +440,10 @@ static LPCWSTR PROP_CWINDOW = L"PROP_CWINDOW";
 void CWindow::Subclass(HWND hWnd) {
   WNDPROC current_proc = reinterpret_cast<WNDPROC>(::GetWindowLongPtr(hWnd, GWLP_WNDPROC));
   if (current_proc != reinterpret_cast<WNDPROC>(WindowProcStatic)) {
-    //::SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProcStatic));
     m_PrevWindowProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(hWnd, GWLP_WNDPROC, 
       reinterpret_cast<LONG_PTR>(WindowProcStatic)));
     ::SetProp(hWnd, PROP_CWINDOW, this);
     m_hWindow = hWnd;
-    //m_PrevWindowProc = current_proc;
-    //::SendMessage(m_hWindow, WM_NULL, 0, 0);
   }
 }
 

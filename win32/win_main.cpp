@@ -16,11 +16,28 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ui_main.h"
+#include "win_main.h"
 
 CWindowMap WindowMap;
 
 // =============================================================================
+
+void CWindowMap::Add(HWND hWnd, CWindow* pWindow) {
+  if (hWnd != NULL) {
+    if (GetWindow(hWnd) == NULL) {
+      m_WindowMap.insert(std::make_pair(hWnd, pWindow));
+    }
+  }
+}
+
+void CWindowMap::Clear() {
+  if (m_WindowMap.empty()) return;
+  for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
+    HWND hWnd = i->first;
+    if (::IsWindow(hWnd)) ::DestroyWindow(hWnd);
+  }
+  m_WindowMap.clear();
+}
 
 CWindow* CWindowMap::GetWindow(HWND hWnd) {
   if (m_WindowMap.empty()) return NULL;
@@ -29,25 +46,6 @@ CWindow* CWindowMap::GetWindow(HWND hWnd) {
     return i->second;
   } else {
     return NULL;
-  }
-}
-
-void CWindowMap::Add(HWND hWnd, CWindow* pWindow) {
-  if (hWnd != NULL) {
-    if (GetWindow(hWnd) == NULL) {
-      m_WindowMap.insert(std::make_pair(hWnd, pWindow));
-      DEBUG_PRINT(L"");
-    }
-  }
-}
-
-void CWindowMap::Remove(CWindow* pWindow) {
-  if (m_WindowMap.empty()) return;
-  for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
-    if (pWindow == i->second) {
-      m_WindowMap.erase(i);
-      return;
-    }
   }
 }
 
@@ -61,13 +59,14 @@ void CWindowMap::Remove(HWND hWnd) {
   }
 }
 
-void CWindowMap::Clear() {
+void CWindowMap::Remove(CWindow* pWindow) {
   if (m_WindowMap.empty()) return;
   for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
-    HWND hWnd = i->first;
-    if (::IsWindow(hWnd)) ::DestroyWindow(hWnd);
+    if (pWindow == i->second) {
+      m_WindowMap.erase(i);
+      return;
+    }
   }
-  m_WindowMap.clear();
 }
 
 // =============================================================================
@@ -102,7 +101,7 @@ int CApp::MessageLoop() {
       ::TranslateMessage(&msg);
       ::DispatchMessage(&msg);
     }
-    }
+  }
   return static_cast<int>(LOWORD(msg.wParam));
 }
 
@@ -119,13 +118,6 @@ int CApp::Run() {
   }
 }
 
-BOOL CApp::InitCommonControls(DWORD dwFlags) {
-  INITCOMMONCONTROLSEX icc;
-  icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
-  icc.dwICC = dwFlags;
-  return ::InitCommonControlsEx(&icc);
-}
-
 wstring CApp::GetCurrentDirectory() {
   WCHAR buff[MAX_PATH];
   DWORD len = ::GetCurrentDirectory(MAX_PATH, buff);
@@ -136,10 +128,21 @@ wstring CApp::GetCurrentDirectory() {
   }
 }
 
+HINSTANCE CApp::GetInstanceHandle() const {
+  return m_hInstance;
+}
+
 wstring CApp::GetModulePath() {
   WCHAR buff[MAX_PATH];
   ::GetModuleFileName(m_hInstance, buff, MAX_PATH);
   return buff;
+}
+
+BOOL CApp::InitCommonControls(DWORD dwFlags) {
+  INITCOMMONCONTROLSEX icc;
+  icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
+  icc.dwICC = dwFlags;
+  return ::InitCommonControlsEx(&icc);
 }
 
 BOOL CApp::SetCurrentDirectory(const wstring& directory) {

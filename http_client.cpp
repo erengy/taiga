@@ -34,8 +34,8 @@
 #include "string.h"
 #include "taiga.h"
 #include "theme.h"
-#include "ui/ui_taskbar.h"
-#include "ui/ui_taskdialog.h"
+#include "win32/win_taskbar.h"
+#include "win32/win_taskdialog.h"
 
 CHTTPClient MainClient, ImageClient, SearchClient, VersionClient;
 
@@ -327,9 +327,16 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_StatusUpdate:
     case HTTP_MAL_TagUpdate: {
       EventQueue.UpdateInProgress = false;
-      if (pItem) {
-        pItem->Refresh(GetData());
-        return TRUE;
+      if (pItem && EventQueue.GetItemCount() > 0) {
+        int user_index = EventQueue.GetUserIndex();
+        if (user_index > -1) {
+          #define EVENT_ITEM EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]
+          pItem->Edit(GetData(), 
+            EVENT_ITEM.AnimeIndex, EVENT_ITEM.Episode, EVENT_ITEM.Score, 
+            EVENT_ITEM.Status, EVENT_ITEM.Mode, EVENT_ITEM.Tags);
+          return TRUE;
+          #undef EVENT_ITEM
+        }
       }
       break;
     }
@@ -342,9 +349,12 @@ BOOL CHTTPClient::OnReadComplete() {
         if (pItem->ParseSearchResult(GetData())) {
           AnimeWindow.Refresh(pItem, true, false);
         } else {
-          AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, 
-            L"Could not read anime information.");
+          status = L"Could not read anime information.";
+          AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
         }
+        #ifdef _DEBUG
+        MainWindow.ChangeStatus(status);
+        #endif
       } else {
         if (SearchWindow.IsWindow()) {
           SearchWindow.ParseResults(GetData());

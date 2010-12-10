@@ -93,23 +93,14 @@ wstring GetLastEpisode(const wstring& episode) {
 }
 
 wstring ToTimeString(int seconds) {
-  int hours = 0, minutes = 0;
-  wstring time;
-  
-  if (seconds < 60) {
-    time = L"00:" + (seconds >= 10 ? ToWSTR(seconds) : L"0" + ToWSTR(seconds));
-  } else {
-    hours   = seconds / 3600;
-    seconds = seconds % 3600;
-    minutes = seconds / 60;
-    seconds = seconds % 60;
-    if (seconds < 0) seconds = 0;
-    time = (hours > 0 ? (hours >= 10 ? ToWSTR(hours) : L"0" + ToWSTR(hours)) + L":" : L"") + 
-      (minutes >= 10 ? ToWSTR(minutes) : L"0" + ToWSTR(minutes)) + L":" + 
-      (seconds >= 10 ? ToWSTR(seconds) : L"0" + ToWSTR(seconds));
-  }
-
-  return time;
+  int hours = seconds / 3600;
+  seconds = seconds % 3600;
+  int minutes = seconds / 60;
+  seconds = seconds % 60;
+  #define TWO_DIGIT(x) (x >= 10 ? ToWSTR(x) : L"0" + ToWSTR(x))
+  return (hours > 0 ? TWO_DIGIT(hours) + L":" : L"") + 
+    TWO_DIGIT(minutes) + L":" + TWO_DIGIT(seconds);
+  #undef TWO_DIGIT
 }
 
 // =============================================================================

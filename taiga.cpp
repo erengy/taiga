@@ -32,7 +32,7 @@
 #include "string.h"
 #include "taiga.h"
 #include "theme.h"
-#include "ui/ui_taskdialog.h"
+#include "win32/win_taskdialog.h"
 
 HINSTANCE g_hInstance;
 HWND g_hMain;
@@ -43,7 +43,7 @@ CTaiga Taiga;
 CTaiga::CTaiga() : 
   LoggedIn(false), UpdatesEnabled(true), 
   CurrentTipType(TIPTYPE_NORMAL), PlayStatus(PLAYSTATUS_STOPPED), 
-  TickerMedia(0), TickerQueue(0), TickerTorrent(0)
+  TickerMedia(0), TickerNewEpisodes(0), TickerQueue(0), TickerTorrent(0)
 {
 }
 

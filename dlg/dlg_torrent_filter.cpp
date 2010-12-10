@@ -26,7 +26,9 @@ CTorrentFilterWindow TorrentFilterWindow;
 
 // =============================================================================
 
-CTorrentFilterWindow::CTorrentFilterWindow() {
+CTorrentFilterWindow::CTorrentFilterWindow() :
+  m_iLastType(-1)
+{
   RegisterDlgClass(L"TaigaTorrentFilterW");
 }
 
@@ -149,24 +151,24 @@ void CTorrentFilterWindow::RefreshComboBox(int type) {
   m_Combo.GetWindowRect(&rect);
   int width = rect.right - rect.left;
   int height = rect.bottom - rect.top;
-  ::ScreenToClient(m_hWindow, (LPPOINT)&rect);
+  ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rect));
+  
+  // Save text
+  if (m_iLastType == RSS_FILTER_KEYWORD) m_Combo.GetText(m_LastKeyword);
+  m_iLastType = type;
 
   // Re-create window
-  DWORD old_style = m_Combo.GetWindowLong();
-  DWORD style = type == 0 ? CBS_DROPDOWN : CBS_DROPDOWNLIST;
-  DWORD new_style = old_style | style;
-  DEBUG_PRINT(L"Cmb style: " + ToWSTR(style) + L" | ");
-  DEBUG_PRINT(L"Old style: " + ToWSTR(old_style) + L" | ");
-  DEBUG_PRINT(L"New style: " + ToWSTR(new_style) + L"\n");
-  /*if (new_style != old_style)*/ {
-    m_Combo.Create(0, WC_COMBOBOX, NULL, 
-      style | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE, 
-      rect.left, rect.top, width, height, 
-      m_hWindow, NULL, NULL);
-  }
+  DWORD style = type == RSS_FILTER_KEYWORD ? CBS_DROPDOWN : CBS_DROPDOWNLIST;
+  m_Combo.Create(0, WC_COMBOBOX, NULL, 
+    style | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE, 
+    rect.left, rect.top, width, height, 
+    m_hWindow, NULL, NULL);
 
   // Add items
   switch (type) {
+    case RSS_FILTER_KEYWORD:
+      m_Combo.SetText(m_LastKeyword);
+      break;
     case RSS_FILTER_AIRINGSTATUS:
       m_Combo.ResetContent();
       for (int i = 0; i < 3; i ++) {

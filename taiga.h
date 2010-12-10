@@ -20,14 +20,14 @@
 #define TAIGA_H
 
 #include "std.h"
-#include "ui/ui_main.h"
+#include "win32/win_main.h"
 
 #define APP_NAME             L"Taiga"
-#define APP_TITLE            L"Taiga 0.5"
-#define APP_VERSION          L"0.5"
-#define APP_BUILD            L"2010.11.27"
+#define APP_TITLE            L"Taiga 0.6"
+#define APP_VERSION          L"0.6"
+#define APP_BUILD            L"2010.12.10"
 #define APP_VERSION_MAJOR    0
-#define APP_VERSION_MINOR    5
+#define APP_VERSION_MINOR    6
 #define APP_VERSION_REVISION 0
 
 #ifndef PORTABLE
@@ -43,7 +43,8 @@ enum PlayStatus {
 enum TipType {
   TIPTYPE_NORMAL,
   TIPTYPE_SEARCH,
-  TIPTYPE_TORRENT
+  TIPTYPE_TORRENT,
+  TIPTYPE_UPDATEFAILED
 };
 
 // =============================================================================
@@ -59,7 +60,7 @@ public:
   
   bool LoggedIn, UpdatesEnabled;
   int CurrentTipType, PlayStatus;
-  int TickerMedia, TickerQueue, TickerTorrent;
+  int TickerMedia, TickerNewEpisodes, TickerQueue, TickerTorrent;
 };
 
 extern CTaiga Taiga;
