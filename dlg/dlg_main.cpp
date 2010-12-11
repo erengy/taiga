@@ -468,7 +468,9 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
       CurrentEpisode.Index = -1;
       RefreshMenubar(CurrentEpisode.Index);
       if (CurrentEpisode.Title.empty()) {
+        #ifdef _DEBUG
         ChangeStatus(MediaPlayers.Item[MediaPlayers.Index].Name + L" is running.");
+        #endif
       } else {
         ChangeStatus(L"Watching: " + CurrentEpisode.Title + 
           PushString(L" #", CurrentEpisode.Number) + L" (Not recognized)");

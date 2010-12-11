@@ -9,7 +9,7 @@
 		<class>TApplication</class>
 		<file>ALLPlayer.exe</file>
 		<folder>%ProgramFiles%\ALLPlayer\</folder>
-		<folder>%ProgramFiles(x86)%\ALLPlayer\</folder>
+		<folder>%ProgramW6432%\ALLPlayer\</folder>
 	</player>
 	<!-- BESTplayer -->
 	<player>
@@ -20,7 +20,7 @@
 		<class>TBESTplayerApp.UnicodeClass</class>
 		<file>BESTplayer.exe</file>
 		<folder>%ProgramFiles%\BESTplayer\</folder>
-		<folder>%ProgramFiles(x86)%\BESTplayer\</folder>
+		<folder>%ProgramW6432%\BESTplayer\</folder>
 		<edit mode="2">BESTplayer</edit>
 	</player>
 	<!-- BSPlayer -->
@@ -32,7 +32,7 @@
 		<class>BSPlayer</class>
 		<file>bsplayer.exe</file>
 		<folder>%ProgramFiles%\Webteh\BSplayer\</folder>
-		<folder>%ProgramFiles(x86)%\Webteh\BSplayer\</folder>
+		<folder>%ProgramW6432%\Webteh\BSplayer\</folder>
 	</player>
 	<!-- DivX Player -->
 	<player>
@@ -44,7 +44,7 @@
 		<file>DivX Player.exe</file>
 		<file>DivX Plus Player.exe</file>
 		<folder>%ProgramFiles%\DivX\DivX Plus Player\</folder>
-		<folder>%ProgramFiles(x86)%\DivX\DivX Plus Player\</folder>
+		<folder>%ProgramW6432%\DivX\DivX Plus Player\</folder>
 	</player>
 	<!-- GOM Player -->
 	<player>
@@ -55,9 +55,9 @@
 		<class>GomPlayer1.x</class>
 		<file>GOM.exe</file>
 		<folder>%ProgramFiles%\GomPlayer\</folder>
-		<folder>%ProgramFiles(x86)%\GomPlayer\</folder>
+		<folder>%ProgramW6432%\GomPlayer\</folder>
 		<folder>%ProgramFiles%\GRETECH\GomPlayer\</folder>
-		<folder>%ProgramFiles(x86)%\GRETECH\GomPlayer\</folder>
+		<folder>%ProgramW6432%\GRETECH\GomPlayer\</folder>
 		<edit mode="1">GOM Player</edit>
 		<edit mode="1">[Built-in subtitle]</edit>
 	</player>
@@ -70,7 +70,7 @@
 		<class>COWON Jet-Audio MainWnd Class</class>
 		<file>JetAudio.exe</file>
 		<folder>%ProgramFiles%\JetAudio\</folder>
-		<folder>%ProgramFiles(x86)%\JetAudio\</folder>
+		<folder>%ProgramW6432%\JetAudio\</folder>
 	</player>
 	<!-- Kantaris Media Player -->
 	<player>
@@ -82,7 +82,7 @@
 		<file>Kantaris.exe</file>
 		<file>KantarisMain.exe</file>
 		<folder>%ProgramFiles%\Kantaris\</folder>
-		<folder>%ProgramFiles(x86)%\Kantaris\</folder>
+		<folder>%ProgramW6432%\Kantaris\</folder>
 	</player>
 	<!-- KMPlayer -->
 	<player>
@@ -93,7 +93,7 @@
 		<class>Winamp v1.x</class>
 		<file>KMPlayer.exe</file>
 		<folder>%ProgramFiles%\The KMPlayer\</folder>
-		<folder>%ProgramFiles(x86)%\The KMPlayer\</folder>
+		<folder>%ProgramW6432%\The KMPlayer\</folder>
 	</player>
 	<!-- Media Player Classic -->
 	<player>
@@ -105,7 +105,7 @@
 		<file>mplayerc.exe</file>
 		<file>mplayerc64.exe</file>
 		<folder>%ProgramFiles%\K-Lite Codec Pack\Media Player Classic\</folder>
-		<folder>%ProgramFiles(x86)%\K-Lite Codec Pack\Media Player Classic\</folder>
+		<folder>%ProgramW6432%\K-Lite Codec Pack\Media Player Classic\</folder>
 		<edit mode="2">Media Player Classic</edit>
 	</player>
 	<!-- Media Player Classic Home Cinema -->
@@ -118,7 +118,7 @@
 		<file>mpc-hc.exe</file>
 		<file>mpc-hc.exe64</file>
 		<folder>%ProgramFiles%\K-Lite Codec Pack\Media Player Classic\</folder>
-		<folder>%ProgramFiles(x86)%\K-Lite Codec Pack\Media Player Classic\</folder>
+		<folder>%ProgramW6432%\K-Lite Codec Pack\Media Player Classic\</folder>
 		<edit mode="2">Media Player Classic</edit>
 		<edit mode="2">MPC-HC</edit>
 	</player>
@@ -131,7 +131,7 @@
 		<class>gdkWindowToplevel</class>
 		<file>Miro.exe</file>
 		<folder>%ProgramFiles%\Participatory Culture Foundation\Miro\</folder>
-		<folder>%ProgramFiles(x86)%\Participatory Culture Foundation\Miro\</folder>
+		<folder>%ProgramW6432%\Participatory Culture Foundation\Miro\</folder>
 	</player>
 	<!-- MPCSTAR -->
 	<player>
@@ -142,7 +142,7 @@
 		<class>wxWindowClassNR</class>
 		<file>mpcstar.exe</file>
 		<folder>%ProgramFiles%\MpcStar\</folder>
-		<folder>%ProgramFiles(x86)%\MpcStar\</folder>
+		<folder>%ProgramW6432%\MpcStar\</folder>
 		<edit mode="2">MPCSTAR</edit>
 	</player>
 	<!-- MV2Player -->
@@ -155,7 +155,7 @@
 		<file>Mv2Player.exe</file>
 		<file>Mv2PlayerPlus.exe</file>
 		<folder>%ProgramFiles%\MV2Player\</folder>
-		<folder>%ProgramFiles(x86)%\MV2Player\</folder>
+		<folder>%ProgramW6432%\MV2Player\</folder>
 		<edit mode="1">MV2 Player</edit>
 	</player>
 	<!-- PotPlayer -->
@@ -171,7 +171,7 @@
 		<file>PotPlayerMini.exe</file>
 		<file>PotPlayerMini64.exe</file>
 		<folder>%ProgramFiles%\Daum\PotPlayer\</folder>
-		<folder>%ProgramFiles(x86)%\Daum\PotPlayer\</folder>
+		<folder>%ProgramW6432%\Daum\PotPlayer\</folder>
 	</player>
 	<!-- SMPlayer -->
 	<player>
@@ -182,7 +182,7 @@
 		<class>QWidget</class>
 		<file>smplayer.exe</file>
 		<folder>%ProgramFiles%\SMPlayer\</folder>
-		<folder>%ProgramFiles(x86)%\SMPlayer\</folder>
+		<folder>%ProgramW6432%\SMPlayer\</folder>
 		<edit mode="2">SMPlayer</edit>
 	</player>
 	<!-- Splash Lite -->
@@ -194,7 +194,7 @@
 		<class>DX_DISPLAY0</class>
 		<file>SplashLite.exe</file>
 		<folder>%ProgramFiles%\Mirillis\Splash Lite\</folder>
-		<folder>%ProgramFiles(x86)%\Mirillis\Splash Lite\</folder>
+		<folder>%ProgramW6432%\Mirillis\Splash Lite\</folder>
 	</player>
 	<!-- Shooter Player -->
 	<player>
@@ -205,7 +205,7 @@
 		<class>MediaPlayerClassicW</class>
 		<file>splayer.exe</file>
 		<folder>%ProgramFiles%\SPlayer\</folder>
-		<folder>%ProgramFiles(x86)%\SPlayer\</folder>
+		<folder>%ProgramW6432%\SPlayer\</folder>
 		<edit mode="1">SPlayer</edit>
 		<edit mode="1">[GPU Accel+EVR] </edit>
 	</player>
@@ -219,7 +219,7 @@
 		<class>VLC DirectX</class>
 		<file>vlc.exe</file>
 		<folder>%ProgramFiles%\VideoLAN\VLC\</folder>
-		<folder>%ProgramFiles(x86)%\VideoLAN\VLC\</folder>
+		<folder>%ProgramW6432%\VideoLAN\VLC\</folder>
 	</player>
 	<!-- Winamp -->
 	<player>
@@ -230,7 +230,7 @@
 		<class>Winamp v1.x</class>
 		<file>winamp.exe</file>
 		<folder>%ProgramFiles%\Winamp\</folder>
-		<folder>%ProgramFiles(x86)%\Winamp\</folder>
+		<folder>%ProgramW6432%\Winamp\</folder>
 	</player>
 	<!-- Windows Media Center -->
 	<player>
@@ -252,7 +252,7 @@
 		<class>WMP Skin Host</class>
 		<file>wmplayer.exe</file>
 		<folder>%ProgramFiles%\Windows Media Player\</folder>
-		<folder>%ProgramFiles(x86)%\Windows Media Player\</folder>
+		<folder>%ProgramW6432%\Windows Media Player\</folder>
 	</player>
 	<!-- XBMC -->
 	<player>
@@ -263,7 +263,7 @@
 		<class>XBMC</class>
 		<file>XBMC.exe</file>
 		<folder>%ProgramFiles%\XBMC\</folder>
-		<folder>%ProgramFiles(x86)%\XBMC\</folder>
+		<folder>%ProgramW6432%\XBMC\</folder>
 	</player>
 	<!-- Zoom Player -->
 	<player>
@@ -274,9 +274,10 @@
 		<class>TApplication</class>
 		<file>zplayer.exe</file>
 		<folder>%ProgramFiles%\Zoom Player\</folder>
+		<folder>%ProgramW6432%\Zoom Player\</folder>
 		<folder>%ProgramFiles(x86)%\Zoom Player\</folder>
 		<folder>%ProgramFiles%\Combined Community Codec Pack\Zoom Player\</folder>
-		<folder>%ProgramFiles(x86)%\Combined Community Codec Pack\Zoom Player\</folder>
+		<folder>%ProgramW6432%\Combined Community Codec Pack\Zoom Player\</folder>
 		<edit mode="2">Zoom Player</edit>
 	</player>
 </media_players>

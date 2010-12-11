@@ -22,6 +22,7 @@
 #include "dlg_event.h"
 #include "dlg_input.h"
 #include "dlg_main.h"
+#include "dlg_search.h"
 #include "dlg_settings.h"
 #include "../http.h"
 #include "../media.h"
@@ -256,6 +257,7 @@ void CSettingsWindow::OnOK() {
     MainWindow.RefreshList(MAL_WATCHING);
     MainWindow.RefreshTabs(MAL_WATCHING);
     EventWindow.RefreshList();
+    SearchWindow.PostMessage(WM_CLOSE);
     ExecuteAction(L"Logout(" + mal_user_old + L")");
   } else {
     MainWindow.RefreshList();

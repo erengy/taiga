@@ -114,7 +114,7 @@ void CAnimeWindow::OnOK() {
 
   // Episodes watched
   int episode = m_Page[TAB_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!MAL.IsValidEpisode(episode, 0, m_pAnimeItem->Series_Episodes)) {
+  if (!MAL.IsValidEpisode(episode, -1, m_pAnimeItem->Series_Episodes)) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
       ToWSTR(m_pAnimeItem->Series_Episodes) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);

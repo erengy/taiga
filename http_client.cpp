@@ -195,7 +195,7 @@ BOOL CHTTPClient::OnReadComplete() {
       MainWindow.ChangeStatus(L"List download completed.");
       MainWindow.RefreshList(MAL_WATCHING);
       MainWindow.RefreshTabs(MAL_WATCHING);
-      SearchWindow.RefreshList();
+      SearchWindow.PostMessage(WM_CLOSE);
       if (GetClientMode() == HTTP_MAL_RefreshList) {
         MainWindow.m_Toolbar.EnableButton(0, true);
         MainWindow.m_Toolbar.EnableButton(1, true);
@@ -302,7 +302,7 @@ BOOL CHTTPClient::OnReadComplete() {
             }
             MainWindow.RefreshList();
             MainWindow.RefreshTabs();
-            SearchWindow.RefreshList();
+            SearchWindow.PostMessage(WM_CLOSE);
             EventQueue.Remove();
             EventQueue.Check();
             return TRUE;

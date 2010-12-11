@@ -361,17 +361,14 @@ void CAnime::Edit(const wstring& data, int index, int episode, int score, int st
 
   if (!success) {
     // Update status
-    wstring buffer = L"Update failed.";
-    MainWindow.ChangeStatus(buffer + L" (" + Series_Title + L")");
+    MainWindow.ChangeStatus(L"Update failed. (" + Series_Title + L")");
     // Show balloon tip
-    if (episode > -1) buffer += L"\nEpisode: " + ToWSTR(episode);
-    if (score > -1) buffer += L"\nScore: " + ToWSTR(score);
-    if (status > -1) buffer += L"\nStatus: " + MAL.TranslateMyStatus(status, false);
-    if (tags != EMPTY_STR) buffer += L"\nTags: " + tags;
-    buffer += L"\nClick to try again.";
+    wstring text = L"Title: " + Series_Title;
+    text += L"\nReason: " + (data.empty() ? L"-" : data);
+    text += L"\nClick to try again.";
     Taiga.CurrentTipType = TIPTYPE_UPDATEFAILED;
     Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(buffer.c_str(), Series_Title.c_str(), (success ? NIIF_INFO : NIIF_ERROR));
+    Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
   }
 
   if (success) {

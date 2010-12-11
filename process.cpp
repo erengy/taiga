@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include "win32/win_main.h"
 
 #define NT_SUCCESS(x) ((x) >= 0)
 #define STATUS_INFO_LENGTH_MISMATCH 0xc0000004
@@ -242,18 +243,35 @@ wstring GetWindowTitle(HWND hwnd) {
   WCHAR buff[MAX_PATH];
   GetWindowText(hwnd, buff, MAX_PATH);
   return buff;
-}
+} 
 
 wstring GetWindowPath(HWND hwnd) {
   DWORD dwProcessId;
   DWORD dwSize = MAX_PATH;
-  WCHAR buff[MAX_PATH];
+  WCHAR buff[MAX_PATH] = {'\0'};
 
   GetWindowThreadProcessId(hwnd, &dwProcessId);
   HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
 
+  typedef DWORD (WINAPI *_QueryFullProcessImageName)(
+    HANDLE hProcess, DWORD dwFlags, LPTSTR lpExeName, PDWORD lpdwSize);
+
   if (hProcess != NULL) {
-    GetModuleFileNameEx(hProcess, NULL, buff, dwSize);
+    bool success = false;
+    if (GetWinVersion() >= WINVERSION_VISTA) {
+      HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
+      if (hKernel32 != NULL) {
+        _QueryFullProcessImageName proc = 
+          (_QueryFullProcessImageName)GetProcAddress(hKernel32, "QueryFullProcessImageNameW");
+        if (proc != NULL) {
+          success = (proc)(hProcess, 0, buff, &dwSize) != 0;
+        }
+        FreeLibrary(hKernel32);
+      }
+    }
+    if (!success) {
+      GetModuleFileNameEx(hProcess, NULL, buff, dwSize);
+    }
     CloseHandle(hProcess);
   }
 

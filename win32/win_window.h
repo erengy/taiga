@@ -86,9 +86,9 @@ public:
   BOOL    IsVisible() const;
   BOOL    IsWindow() const;
   INT     MessageBox(LPCWSTR lpText, LPCWSTR lpCaption, UINT uType) const;
-  LRESULT PostMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+  LRESULT PostMessage(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0);
   BOOL    RedrawWindow(LPCRECT lprcUpdate, HRGN hrgnUpdate, UINT flags) const;
-  LRESULT SendMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+  LRESULT SendMessage(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0);
   BOOL    SetBorder(int iStyle);
   HWND    SetCapture() const;
   DWORD   SetClassLong(int nIndex, LONG dwNewLong) const;

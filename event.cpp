@@ -41,7 +41,7 @@ CEventList::CEventList() :
 
 void CEventList::Add(int anime_index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
   // Validate values
-  if (anime_index > 0 && anime_index <= AnimeList.Count) {
+  if (anime_index > 0 && anime_index <= AnimeList.Count && mode != HTTP_MAL_AnimeAdd) {
     if (AnimeList.Item[anime_index].GetLastWatchedEpisode() == episode || episode < 0) {
       episode = -1;
     }

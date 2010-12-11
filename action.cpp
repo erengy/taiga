@@ -160,8 +160,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"Filter") {
     if (!FilterWindow.IsWindow()) {
       FilterWindow.Create(IDD_FILTER, g_hMain, false);
+    } else {
+      ActivateWindow(FilterWindow.GetWindowHandle());
     }
-    ActivateWindow(FilterWindow.GetWindowHandle());
 
   // Info()
   //   Shows anime information window.
@@ -174,7 +175,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (!AnimeWindow.IsWindow()) {
       AnimeWindow.Create(IDD_ANIME_INFO, g_hMain, false);
     } else {
-       ActivateWindow(AnimeWindow.GetWindowHandle());
+      ActivateWindow(AnimeWindow.GetWindowHandle());
     }
 
   // RecognitionTest()
@@ -182,8 +183,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"RecognitionTest") {
     if (!RecognitionTestWindow.IsWindow()) {
       RecognitionTestWindow.Create(IDD_TEST_RECOGNITION, NULL, false);
+    } else {
+      ActivateWindow(RecognitionTestWindow.GetWindowHandle());
     }
-    ActivateWindow(RecognitionTestWindow.GetWindowHandle());
 
   // SetSearchMode()
   //   Changes search bar mode.
@@ -210,9 +212,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (body.empty()) return;
     if (!SearchWindow.IsWindow()) {
       SearchWindow.Create(IDD_SEARCH, g_hMain, false);
+    } else {
+      ActivateWindow(SearchWindow.GetWindowHandle());
     }
     SearchWindow.Search(body);
-    ActivateWindow(SearchWindow.GetWindowHandle());
 
   // SearchTorrents()
   } else if (action == L"SearchTorrents") {
@@ -226,8 +229,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"Torrents") {
     if (!TorrentWindow.IsWindow()) {
       TorrentWindow.Create(IDD_TORRENT, NULL, false);
+    } else {
+      ActivateWindow(TorrentWindow.GetWindowHandle());
     }
-    ActivateWindow(TorrentWindow.GetWindowHandle());
 
   // TorrentAddFilter()
   //   Shows add new filter window.
@@ -310,7 +314,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
     if (!silent) TaskbarList.SetProgressState(TBPF_NORMAL);
     for (int i = 1; i <= AnimeList.Count; i++) {
-      TaskbarList.SetProgressValue(i, AnimeList.Count);
+      if (!silent) TaskbarList.SetProgressValue(i, AnimeList.Count);
       switch (AnimeList.Item[i].GetStatus()) {
         case MAL_WATCHING:
         case MAL_ONHOLD:
@@ -322,7 +326,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
           AnimeList.Item[i].CheckNewEpisode(check_folder);
       }
     }
-    MainWindow.RefreshList();
     if (!silent) {
       TaskbarList.SetProgressState(TBPF_NOPROGRESS);
       MainWindow.ChangeStatus(L"Search finished.");
