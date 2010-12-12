@@ -327,6 +327,7 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_StatusUpdate:
     case HTTP_MAL_TagUpdate: {
       EventQueue.UpdateInProgress = false;
+      MainWindow.ChangeStatus();
       if (pItem && EventQueue.GetItemCount() > 0) {
         int user_index = EventQueue.GetUserIndex();
         if (user_index > -1) {

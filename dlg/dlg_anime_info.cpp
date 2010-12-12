@@ -88,6 +88,9 @@ BOOL CAnimeWindow::OnInitDialog() {
     ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rcTemp));
     AnimeImage.Rect.Offset(rcTemp.left - AnimeImage.Rect.left, rcTemp.top - AnimeImage.Rect.top);
   }
+  // Change image mouse pointer
+  ::SetClassLong(GetDlgItem(IDC_STATIC_ANIME_IMG), GCL_HCURSOR, 
+    reinterpret_cast<LONG>(::LoadImage(NULL, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
 
   // Create pages
   CRect rcPage;
@@ -213,6 +216,19 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+BOOL CAnimeWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+  if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG) {
+    if (HIWORD(wParam) == STN_CLICKED) {
+      if (m_pAnimeItem) {
+        MAL.ViewAnimePage(m_pAnimeItem->Series_ID);
+        return TRUE;
+      }
+    }
+  }
+  
+  return FALSE;
 }
 
 LRESULT CAnimeWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {

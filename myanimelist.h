@@ -77,7 +77,7 @@ public:
   int TranslateStatus(const wstring& value);
   wstring TranslateType(int value);
   int TranslateType(const wstring& value);
-  void ViewAnimePage(int index);
+  void ViewAnimePage(int series_id);
   void ViewAnimeSearch(wstring title);
   void ViewHistory();
   void ViewMessages();

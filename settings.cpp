@@ -64,7 +64,7 @@ bool CSettings::Read() {
     // Update
     xml_node update = account.child(L"update");
     Account.Update.CheckPlayer = update.attribute(L"checkplayer").as_int(TRUE);
-    Account.Update.Delay = update.attribute(L"delay").as_int(10);
+    Account.Update.Delay = update.attribute(L"delay").as_int(60);
     Account.Update.Mode = update.attribute(L"mode").as_int(3);
     Account.Update.OutOfRange = update.attribute(L"outofrange").as_int();
     Account.Update.Time = update.attribute(L"time").as_int(2);

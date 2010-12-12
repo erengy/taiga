@@ -360,8 +360,6 @@ void CAnime::Edit(const wstring& data, int index, int episode, int score, int st
   bool success = MAL.UpdateSucceeded(data, mode, episode, tags);
 
   if (!success) {
-    // Update status
-    MainWindow.ChangeStatus(L"Update failed. (" + Series_Title + L")");
     // Show balloon tip
     wstring text = L"Title: " + Series_Title;
     text += L"\nReason: " + (data.empty() ? L"-" : data);
