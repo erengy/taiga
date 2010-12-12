@@ -158,8 +158,18 @@ BOOL CSettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_AUTOSTART, Settings.Program.General.AutoStart);
       CheckDlgButton(IDC_CHECK_GENERAL_CLOSE, Settings.Program.General.Close);
       CheckDlgButton(IDC_CHECK_GENERAL_MINIMIZE, Settings.Program.General.Minimize);
-      AddComboString(IDC_COMBO_THEME, Settings.Program.General.Theme.c_str()); // TEMP
-      SetComboSelection(IDC_COMBO_THEME, 0); // TEMP
+      vector<wstring> theme_list;
+      PopulateFolders(theme_list, Taiga.GetDataPath() + L"Theme\\");
+      if (theme_list.empty()) {
+        EnableDlgItem(IDC_COMBO_THEME, FALSE);
+      } else {
+        for (size_t i = 0; i < theme_list.size(); i++) {
+          AddComboString(IDC_COMBO_THEME, theme_list[i].c_str());
+          if (IsEqual(theme_list[i], Settings.Program.General.Theme)) {
+            SetComboSelection(IDC_COMBO_THEME, i);
+          }
+        }
+      }
       CheckDlgButton(IDC_CHECK_START_VERSION, Settings.Program.StartUp.CheckNewVersion);
       CheckDlgButton(IDC_CHECK_START_CHECKEPS, Settings.Program.StartUp.CheckNewEpisodes);
       CheckDlgButton(IDC_CHECK_START_MINIMIZE, Settings.Program.StartUp.Minimize);

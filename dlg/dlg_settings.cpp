@@ -200,10 +200,12 @@ void CSettingsWindow::OnOK() {
   }
   List.SetWindowHandle(NULL);
 
-  // Program
+  // Program > General
   Settings.Program.General.AutoStart = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_AUTOSTART);
   Settings.Program.General.Close = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_GENERAL_CLOSE);
   Settings.Program.General.Minimize = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_GENERAL_MINIMIZE);
+  wstring theme_old = Settings.Program.General.Theme;
+  m_Page[PAGE_PROGRAM].GetDlgItemText(IDC_COMBO_THEME, Settings.Program.General.Theme);
   Settings.Program.StartUp.CheckNewVersion = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_VERSION);
   Settings.Program.StartUp.CheckNewEpisodes = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_CHECKEPS);
   Settings.Program.StartUp.Minimize = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_MINIMIZE);
@@ -213,16 +215,16 @@ void CSettingsWindow::OnOK() {
   m_Page[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_USER, Settings.Program.Proxy.User);
   m_Page[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_PASS, Settings.Program.Proxy.Password);
 
-  // List
+  // Program > List
   Settings.Program.List.DoubleClick = m_Page[PAGE_LIST].GetComboSelection(IDC_COMBO_DBLCLICK);
   Settings.Program.List.MiddleClick = m_Page[PAGE_LIST].GetComboSelection(IDC_COMBO_MDLCLICK);
   AnimeList.Filter.NewEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS);
   Settings.Program.List.Highlight = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
 
-  // Notifications
+  // Program > Notifications
   Settings.Program.Balloon.Enabled = m_Page[PAGE_NOTIFICATIONS].IsDlgButtonChecked(IDC_CHECK_BALLOON);
 
-  // Media players
+  // Recognition > Media players
   List.SetWindowHandle(m_Page[PAGE_MEDIA].GetDlgItem(IDC_LIST_MEDIA));
   for (size_t i = 0; i < MediaPlayers.Item.size(); i++) {
     MediaPlayers.Item[i].Enabled = List.GetCheckState(i);
@@ -250,6 +252,14 @@ void CSettingsWindow::OnOK() {
   // Save settings
   MediaPlayers.Write();
   Settings.Write();
+
+  // Change theme
+  if (Settings.Program.General.Theme != theme_old) {
+    UI.Read(Settings.Program.General.Theme);
+    UI.LoadImages();
+    MainWindow.m_Rebar.RedrawWindow();
+    MainWindow.RefreshMenubar();
+  }
 
   // Refresh other windows
   if (Settings.Account.MAL.User != mal_user_old) {

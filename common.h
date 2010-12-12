@@ -69,7 +69,8 @@ BOOL FolderExists(const wstring& folder);
 BOOL PathExists(const wstring& path);
 void ValidateFileName(wstring& path);
 wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value);
-int PopulateFiles(vector<wstring>& file_vector, wstring path, wstring extension = L"*.*");
+int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = L"*.*");
+int PopulateFolders(vector<wstring>& folder_list, wstring path);
 wstring ToSizeString(QWORD qwSize);
 
 // debug.cpp

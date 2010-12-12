@@ -41,7 +41,7 @@ bool CTheme::Read(const wstring& name) {
   
   // Read XML file
   xml_document doc;
-  xml_parse_result result = doc.load_file(ToANSI(File));
+  xml_parse_result result = doc.load_file(File.c_str());
   if (result.status != status_ok) {
     MessageBox(NULL, L"Could not read theme file.", File.c_str(), MB_OK | MB_ICONERROR);
     return false;
@@ -68,13 +68,14 @@ bool CTheme::Read(const wstring& name) {
   #undef READ_PROGRESS_DATA
 
   // Read menus
+  Menus.Menu.clear();
   for (xml_node menu = menus.child(L"menu"); menu; menu = menu.next_sibling(L"menu")) {
     Menus.Create(menu.attribute(L"name").value(), menu.attribute(L"type").value());
     for (xml_node item = menu.child(L"item"); item; item = item.next_sibling(L"item")) {
       UI.Menus.Menu.back().CreateItem(
         item.attribute(L"action").value(), 
         item.attribute(L"name").value(), 
-        item.attribute(L"sub").value(),  
+        item.attribute(L"sub").value(), 
         item.attribute(L"checked").as_bool(), 
         item.attribute(L"default").as_bool(), 
         !item.attribute(L"disabled").as_bool(), 

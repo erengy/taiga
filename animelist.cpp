@@ -57,7 +57,7 @@ BOOL CAnimeList::Read() {
   
   // Read XML file
   xml_document doc;
-  xml_parse_result result = doc.load_file(ToANSI(file));
+  xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok && result.status != status_file_not_found) {
     MessageBox(NULL, L"Could not read anime list.", file.c_str(), MB_OK | MB_ICONERROR);
     return FALSE;
@@ -107,7 +107,7 @@ BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
   
   // Read XML file
   xml_document doc;
-  xml_parse_result result = doc.load_file(ToANSI(file));
+  xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok) return FALSE;
 
   // Read anime list

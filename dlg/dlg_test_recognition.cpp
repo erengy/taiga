@@ -37,7 +37,7 @@ BOOL CTestRecognition::OnInitDialog() {
   
   // Read XML file
   xml_document doc;
-  xml_parse_result result = doc.load_file(ToANSI(file));
+  xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok) {
     ::MessageBox(NULL, L"Could not read recognition test file.", file.c_str(), MB_OK | MB_ICONERROR);
     return FALSE;

@@ -48,7 +48,7 @@ bool CSettings::Read() {
   
   // Read XML file
   xml_document doc;
-  xml_parse_result result = doc.load_file(ToANSI(m_File));
+  xml_parse_result result = doc.load_file(m_File.c_str());
   
   // Read settings
   xml_node settings = doc.child(L"settings");

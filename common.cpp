@@ -213,7 +213,7 @@ wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value
   return path.empty() ? default_value : path;
 }
 
-int PopulateFiles(vector<wstring>& file_vector, wstring path, wstring extension) {
+int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension) {
   if (path.empty()) return 0;
   path += extension;
   int found = 0;
@@ -224,7 +224,29 @@ int PopulateFiles(vector<wstring>& file_vector, wstring path, wstring extension)
     do {
       if (wfd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY) {
         found++;
-        file_vector.push_back(wfd.cFileName);
+        file_list.push_back(wfd.cFileName);
+      }
+    } while (FindNextFile(hFind, &wfd));
+    FindClose(hFind);
+  }
+
+  return found;
+}
+
+int PopulateFolders(vector<wstring>& folder_list, wstring path) {
+  if (path.empty()) return 0;
+  path += L"*.*";
+  int found = 0;
+
+  WIN32_FIND_DATA wfd;
+  HANDLE hFind = FindFirstFile(path.c_str(), &wfd);
+  if (hFind != INVALID_HANDLE_VALUE) {
+    do {
+      if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        if (!IsEqual(wfd.cFileName, L".") && !IsEqual(wfd.cFileName, L"..")) {
+          found++;
+          folder_list.push_back(wfd.cFileName);
+        }
       }
     } while (FindNextFile(hFind, &wfd));
     FindClose(hFind);
