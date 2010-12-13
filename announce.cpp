@@ -248,12 +248,15 @@ void AnnounceToTwitter(wstring status_text) {
       return;
   }
 
-  TwitterClient.Connect(L"twitter.com", 
+  /*TwitterClient.Connect(L"twitter.com", 
     L"/statuses/update.xml", 
     L"status=" + EncodeURL(status_text), 
     L"POST", 
     L"Authorization: Basic " + 
     GetUserPassEncoded(Settings.Announce.Twitter.User, Settings.Announce.Twitter.Password), 
     L"myanimelist.net", 
-    L"", HTTP_Twitter);
+    L"", HTTP_Twitter);*/
+  HTTPParameters postParams;
+  postParams[L"status"] = UrlEncode(status_text);
+  OAuthWebRequestSubmit(L"http://twitter.com/statuses/update.xml", L"POST", &postParams, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", Settings.Announce.Twitter.oAuthKey, Settings.Announce.Twitter.oAuthSecret);
 }

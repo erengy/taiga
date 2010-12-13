@@ -121,7 +121,7 @@ BOOL CSettingsWindow::OnInitDialog() {
   m_Page[PAGE_MESSENGER].CreateItem(L"Messenger", htAnnounce);
   m_Page[PAGE_MIRC].CreateItem(L"mIRC", htAnnounce);
   m_Page[PAGE_SKYPE].CreateItem(L"Skype", htAnnounce);
-  //m_Page[PAGE_TWITTER].CreateItem(L"Twitter", htAnnounce); // TODO: Re-enable after Twitter announcements are fixed.
+  m_Page[PAGE_TWITTER].CreateItem(L"Twitter", htAnnounce); // TODO: Re-enable after Twitter announcements are fixed.
   m_Tree.Expand(htAnnounce);
   // Program
   HTREEITEM htProgram = m_Tree.InsertItem(L"Program", reinterpret_cast<LPARAM>(&m_Page[PAGE_PROGRAM]), NULL);
@@ -179,6 +179,36 @@ void CSettingsWindow::OnOK() {
   Settings.Announce.Twitter.Enabled = m_Page[PAGE_TWITTER].IsDlgButtonChecked(IDC_CHECK_TWITTER);
   m_Page[PAGE_TWITTER].GetDlgItemText(IDC_EDIT_TWITTER_USER, Settings.Announce.Twitter.User);
   m_Page[PAGE_TWITTER].GetDlgItemText(IDC_EDIT_TWITTER_PASS, Settings.Announce.Twitter.Password);
+  //oAuth Flow
+  if(Settings.Announce.Twitter.Enabled && (!Settings.Announce.Twitter.oAuthKey.size() || !Settings.Announce.Twitter.oAuthSecret.size()))
+  {
+	  wstring requestToken = OAuthWebRequestSubmit(L"http://api.twitter.com/oauth/request_token", L"GET", NULL, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw");
+	  std::map<wstring, wstring> response = ParseQueryString(requestToken);
+	  //Execute URL
+	  wchar_t buf[1024] = {};
+	  swprintf_s(buf, SIZEOF(buf), L"http://api.twitter.com/oauth/authorize?oauth_token=", response[L"oauth_token"].c_str());
+	  ExecuteLink(wstring(buf));
+	  //Dialog Here
+	  CInputDialog oAuthPinGet;
+	  oAuthPinGet.Title = L"Twitter Authorization";
+	  oAuthPinGet.Text = L"";
+	  oAuthPinGet.Info = L"Please Enter the oAuth Pin Shown on the page after logging into Twitter. If you chose to click cancel or leave it blank, Twitter Announcements will be Disabled.";
+	  oAuthPinGet.Show(this->m_hWindow);
+	  if(oAuthPinGet.Result == IDOK && oAuthPinGet.Text.size())
+	  {
+		wstring pin = oAuthPinGet.Text;
+		//Trade off Pin and Save Settings
+		wstring accessTokenStr = OAuthWebRequestSubmit(L"http://api.twitter.com/oauth/access_token", L"GET", NULL, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", L"", L"", pin);
+		std::map<wstring, wstring> access = ParseQueryString(accessTokenStr);
+		//Save the Key and Secret
+		Settings.Announce.Twitter.oAuthKey = access[L"oauth_token"];
+		Settings.Announce.Twitter.oAuthSecret = access[L"oauth_token_secret"];
+	  }
+	  else
+	  {
+		Settings.Announce.Twitter.Enabled = false;
+	  }
+  }
 
   // Folders > Root
   CListView List = m_Page[PAGE_FOLDERS_ROOT].GetDlgItem(IDC_LIST_FOLDERS_ROOT);
