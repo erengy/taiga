@@ -75,8 +75,11 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       
       // Set synopsis
       if (pAnimeItem->Synopsis.empty()) {
-        text = L"Retrieving...";
-        MAL.SearchAnime(pAnimeItem->Series_Title, pAnimeItem);
+        if (MAL.SearchAnime(pAnimeItem->Series_Title, pAnimeItem)) {
+          text = L"Retrieving...";
+        } else {
+          text = L"-";
+        }
       } else {
         text = pAnimeItem->Synopsis;
       }

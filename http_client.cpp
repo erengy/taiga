@@ -37,7 +37,7 @@
 #include "win32/win_taskbar.h"
 #include "win32/win_taskdialog.h"
 
-CHTTPClient MainClient, ImageClient, SearchClient, VersionClient;
+CHTTPClient MainClient, ImageClient, SearchClient, TwitterClient, VersionClient;
 
 // =============================================================================
 
@@ -227,8 +227,11 @@ BOOL CHTTPClient::OnReadComplete() {
         status = L"Failed to log in.";
         switch (Settings.Account.MAL.API) {
           case MAL_API_OFFICIAL:
-            //status += L" (" + GetData() + L")";
+            #ifdef _DEBUG
+            status += L" (" + GetData() + L")";
+            #else
             status += L" (Invalid user name or password)";
+            #endif
             break;
           case MAL_API_NONE:
             if (InStr(GetData(), L"Could not find that username", 1) > -1) {
@@ -353,6 +356,7 @@ BOOL CHTTPClient::OnReadComplete() {
           status = L"Could not read anime information.";
           AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
         }
+        
         #ifdef _DEBUG
         MainWindow.ChangeStatus(status);
         #endif
@@ -480,7 +484,7 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Twitter status
     case HTTP_Twitter: {
-      if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
+      /*if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
         status = L"Twitter status updated.";
       } else {
         status = L"Twitter status update failed.";
@@ -491,7 +495,10 @@ BOOL CHTTPClient::OnReadComplete() {
           status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
         }
       }
-      MainWindow.ChangeStatus(status);
+      MainWindow.ChangeStatus(status);*/
+
+      MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
+
       break;
     }
 

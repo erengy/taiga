@@ -330,7 +330,7 @@ wstring EncodeURL(const wstring& str) {
 }
 
 void DecodeHTML(wstring& input) {
-  static const wchar_t* html_chars[23][2] = {
+  static const wchar_t* html_chars[24][2] = {
     {L"&quot;",   L"\""},
     {L"&amp;",    L"&"},
     {L"&apos;",   L"'"},
@@ -345,6 +345,7 @@ void DecodeHTML(wstring& input) {
     {L"&deg;",    L"\u00B0"},
     {L"&acute;",  L"\u00B4"},
     {L"&raquo;",  L"\u00BB"},
+    {L"&egrave;", L"\u00E8"},
     {L"&ndash;",  L"\u2013"},
     {L"&mdash;",  L"\u2014"},
     {L"&lsquo;",  L"\u2018"},
@@ -357,7 +358,7 @@ void DecodeHTML(wstring& input) {
   };
 
   if (InStr(input, L"&") > -1) {
-    for (int i = 0; i < 23; i++) {
+    for (int i = 0; i < 24; i++) {
       Replace(input, html_chars[i][0], html_chars[i][1], true);
     }
   }

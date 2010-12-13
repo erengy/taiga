@@ -27,7 +27,7 @@
 #include "string.h"
 #include "win32/win_taskdialog.h"
 
-CHTTP HTTPClient, TwitterClient;
+CHTTP HTTPClient;
 CSkype Skype;
 
 // =============================================================================

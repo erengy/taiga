@@ -38,14 +38,13 @@ THE SOFTWARE.
 #include <fstream>
 
 #include "../../common.h"
+#include "../../http.h"
 #include "../../string.h"
 
 typedef std::basic_string<TCHAR> tstring;
 
 #include "TwitDebug.h"
 #include "Base64Coder.h"
-
-CHTTP Twitter;
 
 using namespace std;
 
@@ -147,7 +146,7 @@ wstring OAuthBuildHeader( const HTTPParameters &parameters )
 
 		if(it != parameters.begin())
 		{
-			query += L",\r\n";
+			query += L","; //L",\r\n";
 		}
 
 		wstring pair;
@@ -592,7 +591,7 @@ HTTPParameters BuildSignedOAuthParameters( const HTTPParameters& requestParamete
 	oauthParameters[L"oauth_version"] = L"1.0";
 	oauthParameters[L"oauth_signature_method"] = L"HMAC-SHA1";
 	oauthParameters[L"oauth_consumer_key"] = consumerKey;
-	oauthParameters[L"oauth_callback"] = L"oob";
+	//oauthParameters[L"oauth_callback"] = L"oob";
 
 	// add the request token if found
 	if (!requestToken.empty())
@@ -655,8 +654,14 @@ wstring OAuthWebRequestSignedSubmit(
 	components.dwUrlPathLength = SIZEOF(path);
 
 	wstring normalUrl = url;
+	
+    TwitterClient.Connect(L"twitter.com", L"/oauth/request_token",
+      L"", L"GET", oauthHeader, L"", L"", HTTP_Twitter);
 
-	BOOL crackUrlOk = WinHttpCrackUrl(url.c_str(), url.size(), 0, &components);
+    return L"";
+
+    /*
+    BOOL crackUrlOk = WinHttpCrackUrl(url.c_str(), url.size(), 0, &components);
 	_ASSERTE(crackUrlOk);
 	wstring result;
 	// TODO you'd probably want to InternetOpen only once at app initialization
@@ -734,7 +739,7 @@ wstring OAuthWebRequestSignedSubmit(
 		WinHttpCloseHandle(hINet);
 	}
 
-	return result;
+	return result;*/
 }
 
 // OAuthWebRequest used for all OAuth related queries
@@ -764,5 +769,6 @@ wstring OAuthWebRequestSubmit(
         consumerKey, consumerSecret,
         oauthToken, oauthTokenSecret,
         pin );
-	return OAuthWebRequestSignedSubmit(oauthSignedParameters, url, httpMethod, postParameters);
+	
+   return OAuthWebRequestSignedSubmit(oauthSignedParameters, url, httpMethod, postParameters);
 }

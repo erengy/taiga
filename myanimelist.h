@@ -67,7 +67,7 @@ public:
   void Update(int index, int id, int episode, int score, int status, wstring tags, int mode);
   bool UpdateSucceeded(const wstring& data, int update_mode, int episode = -1, const wstring& tags = L"");
   
-  void DecodeSynopsis(wstring& text);
+  void DecodeText(wstring& text);
   bool IsValidEpisode(int episode, int watched, int total);
   wstring TranslateDate(wstring value, bool reverse = false);
   wstring TranslateMyStatus(int value, bool add_count);

@@ -116,7 +116,7 @@ protected:
   BOOL OnRedirect(wstring address);
 };
 
-extern CHTTPClient MainClient, ImageClient, SearchClient, TorrentClient, VersionClient;
-extern CHTTP HTTPClient, TwitterClient;
+extern CHTTPClient MainClient, ImageClient, SearchClient, TorrentClient, TwitterClient, VersionClient;
+extern CHTTP HTTPClient;
 
 #endif // HTTP_H

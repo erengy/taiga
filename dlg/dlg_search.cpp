@@ -27,6 +27,7 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
+#include "../win32/win_taskdialog.h"
 #include "../xml.h"
 
 CSearchWindow SearchWindow;
@@ -194,7 +195,26 @@ BOOL CSearchWindow::Search(const wstring& title) {
 
 void CSearchWindow::ParseResults(const wstring& data) {
   if (data.empty()) {
-    MessageBox(L"No results found.", APP_NAME, MB_ICONINFORMATION);
+    wstring msg;
+    m_Edit.GetText(msg);
+    msg = L"No results found for \"" + msg + L"\".";
+    CTaskDialog dlg;
+    dlg.SetWindowTitle(L"Search Anime");
+    dlg.SetMainIcon(TD_INFORMATION_ICON);
+    dlg.SetMainInstruction(msg.c_str());
+    dlg.AddButton(L"OK", IDOK);
+    dlg.Show(GetWindowHandle());
+    return;
+  }
+  if (data == L"Invalid credentials") {
+    CTaskDialog dlg;
+    dlg.SetWindowTitle(L"Search Anime");
+    dlg.SetMainIcon(TD_ERROR_ICON);
+    dlg.SetMainInstruction(L"Invalid user name or password.");
+    dlg.SetContent(L"Anime search requires authentication, which means, "
+      L"you need to enter a valid user name and password to search MyAnimeList.");
+    dlg.AddButton(L"OK", IDOK);
+    dlg.Show(GetWindowHandle());
     return;
   }
   m_Anime.clear();
@@ -211,10 +231,11 @@ void CSearchWindow::ParseResults(const wstring& data) {
       if (m_Anime[i].Index > -1) {
         AnimeList.Item[m_Anime[i].Index].Score = XML_ReadStrValue(entry, L"score");
         AnimeList.Item[m_Anime[i].Index].Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeSynopsis(AnimeList.Item[m_Anime[i].Index].Synopsis);
+        MAL.DecodeText(AnimeList.Item[m_Anime[i].Index].Synopsis);
       } else {
         m_Anime[i].Series_ID = anime_id;
         m_Anime[i].Series_Title = XML_ReadStrValue(entry, L"title");
+        MAL.DecodeText(m_Anime[i].Series_Title);
         m_Anime[i].Series_Synonyms = XML_ReadStrValue(entry, L"synonyms");
         m_Anime[i].Series_Episodes = XML_ReadIntValue(entry, L"episodes");
         m_Anime[i].Score = XML_ReadStrValue(entry, L"score");
@@ -223,7 +244,7 @@ void CSearchWindow::ParseResults(const wstring& data) {
         m_Anime[i].Series_Start = XML_ReadStrValue(entry, L"start_date");
         m_Anime[i].Series_End = XML_ReadStrValue(entry, L"end_date");
         m_Anime[i].Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeSynopsis(m_Anime[i].Synopsis);
+        MAL.DecodeText(m_Anime[i].Synopsis);
         m_Anime[i].Series_Image = XML_ReadStrValue(entry, L"image");
       }
     }

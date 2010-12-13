@@ -210,6 +210,23 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // SearchAnime()
   } else if (action == L"SearchAnime") {
     if (body.empty()) return;
+    if (Settings.Account.MAL.API == MAL_API_OFFICIAL) {
+      if (Settings.Account.MAL.User.empty() || Settings.Account.MAL.Password.empty()) {
+        CTaskDialog dlg;
+        dlg.SetWindowTitle(APP_TITLE);
+        dlg.SetMainIcon(TD_INFORMATION_ICON);
+        dlg.SetMainInstruction(L"Would you like to set your account information first?");
+        dlg.SetContent(L"Anime search requires authentication, which means, "
+          L"you need to enter a valid user name and password to search MyAnimeList.");
+        dlg.AddButton(L"Yes", IDYES);
+        dlg.AddButton(L"No", IDNO);
+        dlg.Show(g_hMain);
+        if (dlg.GetSelectedButtonID() == IDYES) {
+          ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
+        }
+        return;
+      }
+    }
     if (!SearchWindow.IsWindow()) {
       SearchWindow.Create(IDD_SEARCH, g_hMain, false);
     } else {

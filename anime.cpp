@@ -329,7 +329,7 @@ bool CAnime::ParseSearchResult(const wstring& data) {
       if (XML_ReadIntValue(entry, L"id") == Series_ID) {
         Score = XML_ReadStrValue(entry, L"score");
         Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeSynopsis(Synopsis);
+        MAL.DecodeText(Synopsis);
         return true;
       }
     }
