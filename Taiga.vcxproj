@@ -125,6 +125,9 @@
     <ClCompile Include="theme.cpp" />
     <ClCompile Include="third_party\base64\base64.cpp" />
     <ClCompile Include="third_party\pugixml\pugixml.cpp" />
+    <ClCompile Include="third_party\twitter\Base64Coder.cpp" />
+    <ClCompile Include="third_party\twitter\TwitDebug.c" />
+    <ClCompile Include="third_party\twitter\tc2.cpp" />
     <ClCompile Include="win32\win_ctl_combobox.cpp" />
     <ClCompile Include="win32\win_ctl_edit.cpp" />
     <ClCompile Include="win32\win_ctl_imagelist.cpp" />
@@ -182,6 +185,8 @@
     <ClInclude Include="theme.h" />
     <ClInclude Include="third_party\pugixml\pugiconfig.hpp" />
     <ClInclude Include="third_party\pugixml\pugixml.hpp" />
+    <ClInclude Include="third_party\twitter\Base64Coder.h" />
+    <ClInclude Include="third_party\twitter\TwitDebug.h" />
     <ClInclude Include="win32\win_control.h" />
     <ClInclude Include="win32\win_dialog.h" />
     <ClInclude Include="win32\win_gdi.h" />
