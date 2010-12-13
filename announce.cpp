@@ -240,8 +240,6 @@ void AnnounceToSkype(wstring mood) {
 /* Twitter */
 
 void AnnounceToTwitter(wstring status_text) {
-  return; // TODO: Re-enable after Twitter announcements are fixed.
-  
   if (Settings.Announce.Twitter.User.empty() || 
     Settings.Announce.Twitter.Password.empty() ||
     status_text.empty()) {
@@ -262,4 +260,5 @@ void AnnounceToTwitter(wstring status_text) {
 	  &postParams, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
 	  HTTP_Twitter_Post, 
 	  Settings.Announce.Twitter.oAuthKey, Settings.Announce.Twitter.oAuthSecret);
+  return; // TODO: Re-enable after Twitter announcements are fixed.
 }

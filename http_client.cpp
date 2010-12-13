@@ -486,21 +486,7 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Twitter status
     case HTTP_Twitter_Request: {
-      /*if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
-        status = L"Twitter status updated.";
-      } else {
-        status = L"Twitter status update failed.";
-        int index_begin = InStr(GetData(), L"<error>", 0);
-        int index_end = InStr(GetData(), L"</error>", index_begin);
-        if (index_begin > -1 && index_end > -1) {
-          index_begin += 7;
-          status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
-        }
-      }
-      MainWindow.ChangeStatus(status);*/
-      //MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
-
-		HTTPParameters response = ParseQueryString(GetData());
+     	HTTPParameters response = ParseQueryString(GetData());
 		//Execute URL
 		wstring url = L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"];
 		ExecuteLink(url);
@@ -513,7 +499,7 @@ BOOL CHTTPClient::OnReadComplete() {
 		if(oAuth.Result == IDOK && oAuth.Text.size())
 		{
 			//Trade off Pin and Save Settings
-			OAuthWebRequestSubmit(L"http://twitter.com/oauth/access_token", L"POST", NULL, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", HTTP_Twitter_Auth, L"", L"", oAuth.Text);
+			OAuthWebRequestSubmit(L"http://twitter.com/oauth/access_token", L"POST", NULL, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", HTTP_Twitter_Auth, response[L"oauth_token"], L"", oAuth.Text);
 			return TRUE;
 		}
 		else
@@ -535,11 +521,26 @@ BOOL CHTTPClient::OnReadComplete() {
 		{
 			Settings.Announce.Twitter.Enabled = false;
 		}
-		MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
+		
 		break;
 	}
 
-
+	case HTTP_Twitter_Post:{
+	  MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
+	  if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
+        status = L"Twitter status updated.";
+      } else {
+        status = L"Twitter status update failed.";
+        int index_begin = InStr(GetData(), L"<error>", 0);
+        int index_end = InStr(GetData(), L"</error>", index_begin);
+        if (index_begin > -1 && index_end > -1) {
+          index_begin += 7;
+          status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
+        }
+      }
+      MainWindow.ChangeStatus(status);
+	  break;
+	}
     // =========================================================================
     
     // Debug

@@ -179,7 +179,12 @@ void CSettingsWindow::OnOK() {
   Settings.Announce.Twitter.Enabled = m_Page[PAGE_TWITTER].IsDlgButtonChecked(IDC_CHECK_TWITTER);
   m_Page[PAGE_TWITTER].GetDlgItemText(IDC_EDIT_TWITTER_USER, Settings.Announce.Twitter.User);
   m_Page[PAGE_TWITTER].GetDlgItemText(IDC_EDIT_TWITTER_PASS, Settings.Announce.Twitter.Password);
-
+  if(Settings.Announce.Twitter.Enabled && (!Settings.Announce.Twitter.oAuthKey.size() || !Settings.Announce.Twitter.oAuthSecret.size()))
+  {
+	  OAuthWebRequestSubmit(L"http://twitter.com/oauth/request_token", 
+      L"GET", NULL, 
+      L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", HTTP_Twitter_Request);
+  }
   // Folders > Root
   CListView List = m_Page[PAGE_FOLDERS_ROOT].GetDlgItem(IDC_LIST_FOLDERS_ROOT);
   Settings.Folders.Root.clear();

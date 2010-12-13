@@ -133,6 +133,7 @@ void CAnime::End(CEpisode episode, bool do_end, bool do_update) {
     ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&episode));
     ExecuteAction(L"AnnounceToMessenger", FALSE);
     ExecuteAction(L"AnnounceToSkype", FALSE);
+	ExecuteAction(L"AnnounceToTwitter", FALSE);
     // Update main window
     episode.Index = 0;
     MainWindow.ChangeStatus();
