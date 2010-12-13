@@ -657,9 +657,14 @@ wstring OAuthWebRequestSignedSubmit(
 	WinHttpCrackUrl(url.c_str(), url.size(), 0, &components);
 
 	wstring normalUrl = url;
-	
+
+	wstring data;
+	if(CompareStrings(httpMethod, L"POST") == 0 && postParameters) {
+		data = BuildQueryString(*postParameters);
+	}
+
     TwitterClient.Connect(host, path,
-      L"", httpMethod, oauthHeader, L"", L"", HTTP_Call);
+      data, httpMethod, oauthHeader, L"", L"", HTTP_Call);
 
     return L"";
 
