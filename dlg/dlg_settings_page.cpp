@@ -146,8 +146,6 @@ BOOL CSettingsPage::OnInitDialog() {
     // Announcements > Twitter
     case PAGE_TWITTER: {
       CheckDlgButton(IDC_CHECK_TWITTER, Settings.Announce.Twitter.Enabled);
-      SetDlgItemText(IDC_EDIT_TWITTER_USER, Settings.Announce.Twitter.User.c_str());
-      SetDlgItemText(IDC_EDIT_TWITTER_PASS, Settings.Announce.Twitter.Password.c_str());
       break;
     }
 

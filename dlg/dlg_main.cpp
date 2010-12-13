@@ -493,7 +493,6 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
           ExecuteAction(L"AnnounceToMessenger", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           ExecuteAction(L"AnnounceToMIRC", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           ExecuteAction(L"AnnounceToSkype", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
-		  ExecuteAction(L"AnnounceToTwitter", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           // Update
           if (Settings.Account.Update.Time == UPDATE_MODE_AFTERDELAY && anime_index > 0) {
             AnimeList.Item[anime_index].End(CurrentEpisode, false, true);

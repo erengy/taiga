@@ -240,25 +240,13 @@ void AnnounceToSkype(wstring mood) {
 /* Twitter */
 
 void AnnounceToTwitter(wstring status_text) {
-  if (Settings.Announce.Twitter.User.empty() || 
-    Settings.Announce.Twitter.Password.empty() ||
-    status_text.empty()) {
-      return;
-  }
+  if (status_text.empty()) return;
 
-  /*TwitterClient.Connect(L"twitter.com", 
-    L"/statuses/update.xml", 
-    L"status=" + EncodeURL(status_text), 
-    L"POST", 
-    L"Authorization: Basic " + 
-    GetUserPassEncoded(Settings.Announce.Twitter.User, Settings.Announce.Twitter.Password), 
-    L"myanimelist.net", 
-    L"", HTTP_Twitter);*/
   HTTPParameters postParams;
   postParams[L"status"] = UrlEncode(status_text);
-  OAuthWebRequestSubmit(L"http://twitter.com/statuses/update.xml", L"POST", 
-	  &postParams, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
-	  HTTP_Twitter_Post, 
-	  Settings.Announce.Twitter.oAuthKey, Settings.Announce.Twitter.oAuthSecret);
-  return; // TODO: Re-enable after Twitter announcements are fixed.
+  OAuthWebRequestSubmit(L"http://twitter.com/statuses/update.xml", 
+    L"POST", &postParams, 
+    L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
+    HTTP_Twitter_Post, 
+    Settings.Announce.Twitter.OAuthKey, Settings.Announce.Twitter.OAuthSecret);
 }

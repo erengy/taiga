@@ -97,10 +97,8 @@ bool CSettings::Read() {
     xml_node twitter = announce.child(L"twitter");
     Announce.Twitter.Enabled = twitter.attribute(L"enabled").as_int();
     Announce.Twitter.Format = twitter.attribute(L"format").value(DEFAULT_FORMAT_TWITTER);
-    Announce.Twitter.Password = SimpleDecrypt(twitter.attribute(L"password").value());
-    Announce.Twitter.User = twitter.attribute(L"username").value();
-	Announce.Twitter.oAuthKey = twitter.attribute(L"oauth_token").value();
-	Announce.Twitter.oAuthSecret = twitter.attribute(L"oauth_secret").value();
+    Announce.Twitter.OAuthKey = twitter.attribute(L"oauth_token").value();
+    Announce.Twitter.OAuthSecret = twitter.attribute(L"oauth_secret").value();
 
   // Folders
   xml_node folders = settings.child(L"anime").child(L"folders");
@@ -303,10 +301,8 @@ bool CSettings::Write() {
     twitter.set_name(L"twitter");
     twitter.append_attribute(L"enabled") = Announce.Twitter.Enabled;
     twitter.append_attribute(L"format") = Announce.Twitter.Format.c_str();
-    twitter.append_attribute(L"username") = Announce.Twitter.User.c_str();
-    twitter.append_attribute(L"password") = SimpleEncrypt(Announce.Twitter.Password).c_str();
-	twitter.append_attribute(L"oauth_token") = Announce.Twitter.oAuthKey.c_str();
-	twitter.append_attribute(L"oauth_secret") = Announce.Twitter.oAuthSecret.c_str();
+    twitter.append_attribute(L"oauth_token") = Announce.Twitter.OAuthKey.c_str();
+    twitter.append_attribute(L"oauth_secret") = Announce.Twitter.OAuthSecret.c_str();
 
   // Program
   settings.append_child(node_comment).set_value(L" Program ");

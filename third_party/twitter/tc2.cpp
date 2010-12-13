@@ -102,7 +102,7 @@ HTTPParameters ParseQueryString( const wstring& url )
 	{
 		vector<wstring> paramElements;
 		Split(queryParams[i], L"=", paramElements);
-		_ASSERTE(paramElements.size() == 2);
+		//_ASSERTE(paramElements.size() == 2);
 		if(paramElements.size() == 2)
 		{
 			ret[paramElements[0]] = paramElements[1];
@@ -553,8 +553,8 @@ wstring OAuthNormalizeUrl( const wstring& url )
 		wchar_t port[10] = {};
 
 		// The port number must only be included if it is non-standard
-		if((CompareStrings(scheme, L"http", false) && components.nPort != 80) || 
-			(CompareStrings(scheme, L"https", false) && components.nPort != 443))
+		if((CompareStrings(scheme, L"http") == 0 && components.nPort != 80) || 
+			(CompareStrings(scheme, L"https") == 0 && components.nPort != 443))
 		{
 			swprintf_s(port, SIZEOF(port), L":%u", components.nPort);
 		}
@@ -591,7 +591,7 @@ HTTPParameters BuildSignedOAuthParameters( const HTTPParameters& requestParamete
 	oauthParameters[L"oauth_version"] = L"1.0";
 	oauthParameters[L"oauth_signature_method"] = L"HMAC-SHA1";
 	oauthParameters[L"oauth_consumer_key"] = consumerKey;
-	//oauthParameters[L"oauth_callback"] = L"oob";
+	oauthParameters[L"oauth_callback"] = L"oob";
 
 	// add the request token if found
 	if (!requestToken.empty())
@@ -608,7 +608,7 @@ HTTPParameters BuildSignedOAuthParameters( const HTTPParameters& requestParamete
 	// create a parameter list containing both oauth and original parameters
 	// this will be used to create the parameter signature
 	HTTPParameters allParameters = requestParameters;
-	if(CompareStrings(httpMethod, L"POST", false) && postParameters)
+	if(CompareStrings(httpMethod, L"POST") == 0 && postParameters)
 	{
 		allParameters.insert(postParameters->begin(), postParameters->end());
 	}
@@ -619,7 +619,7 @@ HTTPParameters BuildSignedOAuthParameters( const HTTPParameters& requestParamete
 	wstring normalUrl = OAuthNormalizeUrl(url);
 	wstring normalizedParameters = OAuthNormalizeRequestParameters(allParameters);
 	wstring signatureBase = OAuthConcatenateRequestElements(httpMethod, normalUrl, normalizedParameters);
-	Replace(signatureBase, L"%3A80%2F", L"%2F");
+	//Replace(signatureBase, L"%3A80%2F", L"%2F");
 	// obtain a signature and add it to header requestParameters
 	wstring signature = OAuthCreateSignature(signatureBase, consumerSecret, requestTokenSecret);
 	oauthParameters[L"oauth_signature"] = signature;

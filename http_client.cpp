@@ -486,48 +486,44 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Twitter status
     case HTTP_Twitter_Request: {
-     	HTTPParameters response = ParseQueryString(GetData());
-		//Execute URL
-		wstring url = L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"];
-		ExecuteLink(url);
-		//Dialog Here
-		CInputDialog oAuth;
-		oAuth.Title = L"Twitter Authorization";
-		oAuth.Text = L"";
-		oAuth.Info = L"Please Enter the oAuth Pin Shown on the page after logging into Twitter. If you chose to click cancel or leave it blank, Twitter Announcements will be Disabled.";
-		oAuth.Show(NULL);
-		if(oAuth.Result == IDOK && oAuth.Text.size())
-		{
-			//Trade off Pin and Save Settings
-			OAuthWebRequestSubmit(L"http://twitter.com/oauth/access_token", L"POST", NULL, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", HTTP_Twitter_Auth, response[L"oauth_token"], L"", oAuth.Text);
-			return TRUE;
-		}
-		else
-		{
-			Settings.Announce.Twitter.Enabled = false;
-		}
-		break;
-	}
-	
+      HTTPParameters response = ParseQueryString(GetData());
+      // Execute URL
+      wstring url = L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"];
+      ExecuteLink(url);
+      // Dialog here
+      CInputDialog oAuth;
+      oAuth.Title = L"Twitter Authorization";
+      oAuth.Text = L"";
+      oAuth.Info = L"Please Enter the oAuth Pin Shown on the page after logging into Twitter. "
+        L"If you choose to click cancel or leave it blank, Twitter announcements will be disabled.";
+      oAuth.Show();
+      if (oAuth.Result == IDOK && !oAuth.Text.empty()) {
+        // Trade off pin and save settings
+        OAuthWebRequestSubmit(L"http://twitter.com/oauth/access_token", 
+          L"POST", NULL, 
+          L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
+          HTTP_Twitter_Auth, 
+          response[L"oauth_token"], response[L"oauth_token_secret"], oAuth.Text);
+          return TRUE;
+      } else {
+        Settings.Announce.Twitter.Enabled = false;
+      }
+      break;
+    }
 	case HTTP_Twitter_Auth: {
-		wstring data = GetData();
-		std::map<wstring, wstring> access = ParseQueryString(GetData());
-		//Save the Key and Secret
-		if(access[L"oauth_token"].size() && access[L"oauth_token_secret"].size()) {
-			Settings.Announce.Twitter.oAuthKey = access[L"oauth_token"];
-			Settings.Announce.Twitter.oAuthSecret = access[L"oauth_token_secret"];
-		}
-		else
-		{
-			Settings.Announce.Twitter.Enabled = false;
-		}
-		
-		break;
-	}
-
-	case HTTP_Twitter_Post:{
-	  MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
-	  if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
+      // Save the key and secret
+      std::map<wstring, wstring> access = ParseQueryString(GetData());
+      if (!access[L"oauth_token"].empty() && !access[L"oauth_token_secret"].empty()) {
+        Settings.Announce.Twitter.OAuthKey = access[L"oauth_token"];
+        Settings.Announce.Twitter.OAuthSecret = access[L"oauth_token_secret"];
+      } else {
+        Settings.Announce.Twitter.Enabled = false;
+      }
+      break;
+    }
+    case HTTP_Twitter_Post: {
+      ::MessageBox(g_hMain, GetData().c_str(), L"HTTP_Twitter_Post", 0);
+      /*if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
         status = L"Twitter status updated.";
       } else {
         status = L"Twitter status update failed.";
@@ -538,9 +534,10 @@ BOOL CHTTPClient::OnReadComplete() {
           status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
         }
       }
-      MainWindow.ChangeStatus(status);
-	  break;
-	}
+      MainWindow.ChangeStatus(status);*/
+      break;
+    }
+
     // =========================================================================
     
     // Debug

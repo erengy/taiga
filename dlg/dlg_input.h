@@ -34,7 +34,7 @@ public:
   INT_PTR Result;
   wstring Info, Title, Text;
   void SetNumbers(bool enabled, int min_value, int max_value, int current_value);
-  void Show(HWND hParent);
+  void Show(HWND hParent = NULL);
 
   void OnCancel();
   BOOL OnInitDialog();

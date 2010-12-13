@@ -113,7 +113,7 @@ public:
     class CSettingsAnnounceTwitter {
     public:
       BOOL Enabled;
-      wstring Format, Password, User, oAuthKey, oAuthSecret;
+      wstring Format, OAuthKey, OAuthSecret;
     } Twitter;
   } Announce;
 
