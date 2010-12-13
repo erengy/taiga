@@ -522,8 +522,7 @@ BOOL CHTTPClient::OnReadComplete() {
       break;
     }
     case HTTP_Twitter_Post: {
-      ::MessageBox(g_hMain, GetData().c_str(), L"HTTP_Twitter_Post", 0);
-      /*if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
+      if (InStr(GetData(), L"<error>", 0) == -1) {
         status = L"Twitter status updated.";
       } else {
         status = L"Twitter status update failed.";
@@ -534,7 +533,7 @@ BOOL CHTTPClient::OnReadComplete() {
           status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
         }
       }
-      MainWindow.ChangeStatus(status);*/
+      MainWindow.ChangeStatus(status);
       break;
     }
 
