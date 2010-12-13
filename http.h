@@ -40,7 +40,9 @@ enum HTTP_ClientMode {
   HTTP_TorrentCheck,
   HTTP_TorrentDownload,
   HTTP_TorrentDownloadAll,
-  HTTP_Twitter,
+  HTTP_Twitter_Request,
+  HTTP_Twitter_Auth,
+  HTTP_Twitter_Post,
   HTTP_VersionCheck
 };
 

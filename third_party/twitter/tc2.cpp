@@ -619,7 +619,7 @@ HTTPParameters BuildSignedOAuthParameters( const HTTPParameters& requestParamete
 	wstring normalUrl = OAuthNormalizeUrl(url);
 	wstring normalizedParameters = OAuthNormalizeRequestParameters(allParameters);
 	wstring signatureBase = OAuthConcatenateRequestElements(httpMethod, normalUrl, normalizedParameters);
-
+	Replace(signatureBase, L"%3A80%2F", L"%2F");
 	// obtain a signature and add it to header requestParameters
 	wstring signature = OAuthCreateSignature(signatureBase, consumerSecret, requestTokenSecret);
 	oauthParameters[L"oauth_signature"] = signature;
@@ -631,7 +631,8 @@ wstring OAuthWebRequestSignedSubmit(
 	const HTTPParameters& oauthParameters, 
 	const wstring& url,
 	const wstring& httpMethod, 
-	const HTTPParameters* postParameters
+	const HTTPParameters* postParameters,
+	const int HTTP_Call
 	) 
 {
 	_TRACE("OAuthWebRequestSignedSubmit(%s)", url.c_str());
@@ -653,10 +654,12 @@ wstring OAuthWebRequestSignedSubmit(
 	components.lpszUrlPath = path;
 	components.dwUrlPathLength = SIZEOF(path);
 
+	WinHttpCrackUrl(url.c_str(), url.size(), 0, &components);
+
 	wstring normalUrl = url;
 	
-    TwitterClient.Connect(L"twitter.com", L"/oauth/request_token",
-      L"", L"GET", oauthHeader, L"", L"", HTTP_Twitter);
+    TwitterClient.Connect(host, path,
+      L"", httpMethod, oauthHeader, L"", L"", HTTP_Call);
 
     return L"";
 
@@ -752,7 +755,8 @@ wstring OAuthWebRequestSubmit(
 	const wstring& httpMethod, 
 	const HTTPParameters* postParameters,
     const wstring& consumerKey, 
-    const wstring& consumerSecret, 
+    const wstring& consumerSecret,
+	const int HTTP_Call,
     const wstring& oauthToken, 
     const wstring& oauthTokenSecret, 
     const wstring& pin
@@ -770,5 +774,5 @@ wstring OAuthWebRequestSubmit(
         oauthToken, oauthTokenSecret,
         pin );
 	
-   return OAuthWebRequestSignedSubmit(oauthSignedParameters, url, httpMethod, postParameters);
+   return OAuthWebRequestSignedSubmit(oauthSignedParameters, url, httpMethod, postParameters, HTTP_Call);
 }

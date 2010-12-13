@@ -25,6 +25,8 @@
 #include "dlg/dlg_search.h"
 #include "dlg/dlg_settings.h"
 #include "dlg/dlg_torrent.h"
+#include "dlg/dlg_event.h"
+#include "dlg/dlg_input.h"
 #include "event.h"
 #include "http.h"
 #include "myanimelist.h"
@@ -153,7 +155,7 @@ BOOL CHTTPClient::OnReadData() {
     case HTTP_TorrentDownloadAll:
       status = L"Downloading torrent file...";
       break;
-    case HTTP_Twitter:
+    case HTTP_Twitter_Post:
       status = L"Updating Twitter status...";
       break;
     default:
@@ -483,7 +485,7 @@ BOOL CHTTPClient::OnReadComplete() {
     // =========================================================================
 
     // Twitter status
-    case HTTP_Twitter: {
+    case HTTP_Twitter_Request: {
       /*if (InStr(GetData(), L"<screen_name>" + Settings.Announce.Twitter.User + L"</screen_name>", 0) > -1) {
         status = L"Twitter status updated.";
       } else {
@@ -496,11 +498,47 @@ BOOL CHTTPClient::OnReadComplete() {
         }
       }
       MainWindow.ChangeStatus(status);*/
+      //MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
 
-      MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
+		HTTPParameters response = ParseQueryString(GetData());
+		//Execute URL
+		wstring url = L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"];
+		ExecuteLink(url);
+		//Dialog Here
+		CInputDialog oAuth;
+		oAuth.Title = L"Twitter Authorization";
+		oAuth.Text = L"";
+		oAuth.Info = L"Please Enter the oAuth Pin Shown on the page after logging into Twitter. If you chose to click cancel or leave it blank, Twitter Announcements will be Disabled.";
+		oAuth.Show(NULL);
+		if(oAuth.Result == IDOK && oAuth.Text.size())
+		{
+			//Trade off Pin and Save Settings
+			OAuthWebRequestSubmit(L"http://twitter.com/oauth/access_token", L"POST", NULL, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", HTTP_Twitter_Auth, L"", L"", oAuth.Text);
+			return TRUE;
+		}
+		else
+		{
+			Settings.Announce.Twitter.Enabled = false;
+		}
+		break;
+	}
+	
+	case HTTP_Twitter_Auth: {
+		wstring data = GetData();
+		std::map<wstring, wstring> access = ParseQueryString(GetData());
+		//Save the Key and Secret
+		if(access[L"oauth_token"].size() && access[L"oauth_token_secret"].size()) {
+			Settings.Announce.Twitter.oAuthKey = access[L"oauth_token"];
+			Settings.Announce.Twitter.oAuthSecret = access[L"oauth_token_secret"];
+		}
+		else
+		{
+			Settings.Announce.Twitter.Enabled = false;
+		}
+		MessageBox(g_hMain, GetData().c_str(), L"Twitter", 0);
+		break;
+	}
 
-      break;
-    }
 
     // =========================================================================
     

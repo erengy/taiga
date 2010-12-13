@@ -258,5 +258,8 @@ void AnnounceToTwitter(wstring status_text) {
     L"", HTTP_Twitter);*/
   HTTPParameters postParams;
   postParams[L"status"] = UrlEncode(status_text);
-  OAuthWebRequestSubmit(L"http://twitter.com/statuses/update.xml", L"POST", &postParams, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", Settings.Announce.Twitter.oAuthKey, Settings.Announce.Twitter.oAuthSecret);
+  OAuthWebRequestSubmit(L"http://twitter.com/statuses/update.xml", L"POST", 
+	  &postParams, L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
+	  HTTP_Twitter_Post, 
+	  Settings.Announce.Twitter.oAuthKey, Settings.Announce.Twitter.oAuthSecret);
 }

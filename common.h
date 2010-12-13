@@ -109,14 +109,16 @@ wstring OAuthWebRequestSubmit(const wstring& url,
 							  const wstring& httpMethod, 
 							  const HTTPParameters* postParameters,
 							  const wstring& consumerKey, 
-							  const wstring& consumerSecret, 
+							  const wstring& consumerSecret,
+							  const int HTTP_Call,
 							  const wstring& oauthToken = L"", 
 							  const wstring& oauthTokenSecret = L"", 
 							  const wstring& pin = L"");
 wstring OAuthWebRequestSignedSubmit(const HTTPParameters& oauthParameters, 
 									const wstring& url,
 									const wstring& httpMethod, 
-									const HTTPParameters* postParameters);
+									const HTTPParameters* postParameters,
+									const int HTTP_Call);
 HTTPParameters BuildSignedOAuthParameters(const HTTPParameters& requestParameters, 
 										  const wstring& url, 
 										  const wstring& httpMethod, 
