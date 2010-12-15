@@ -35,12 +35,9 @@
 
 #include <string>
 #include <vector>
-#include <map>
 using std::string;
 using std::vector;
 using std::wstring;
-
-#define SIZEOF(x) (sizeof(x)/sizeof(*x))
 
 extern HINSTANCE g_hInstance;
 extern HWND g_hMain;

@@ -103,45 +103,4 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode =
 // search.cpp
 wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool search_folder);
 
-//tc2.cpp
-typedef std::map<wstring,wstring> HTTPParameters;
-wstring OAuthWebRequestSubmit(const wstring& url, 
-							  const wstring& httpMethod, 
-							  const HTTPParameters* postParameters,
-							  const wstring& consumerKey, 
-							  const wstring& consumerSecret,
-							  const int HTTP_Call,
-							  const wstring& oauthToken = L"", 
-							  const wstring& oauthTokenSecret = L"", 
-							  const wstring& pin = L"");
-wstring OAuthWebRequestSignedSubmit(const HTTPParameters& oauthParameters, 
-									const wstring& url,
-									const wstring& httpMethod, 
-									const HTTPParameters* postParameters,
-									const int HTTP_Call);
-HTTPParameters BuildSignedOAuthParameters(const HTTPParameters& requestParameters, 
-										  const wstring& url, 
-										  const wstring& httpMethod, 
-										  const HTTPParameters* postParameters, 
-										  const wstring& consumerKey, 
-										  const wstring& consumerSecret,
-										  const wstring& requestToken = L"", 
-										  const wstring& requestTokenSecret = L"", 
-										  const wstring& pin = L"" );
-wstring OAuthNormalizeUrl(const wstring& url) ;
-wstring OAuthNormalizeRequestParameters(const HTTPParameters& requestParameters);
-wstring OAuthConcatenateRequestElements(const wstring& httpMethod, wstring url, const wstring& parameters);
-wstring OAuthCreateSignature(const wstring& signatureBase, const wstring& consumerSecret, const wstring& requestTokenSecret);
-wstring UrlEncode(const wstring& url);
-string urlencode(const string &c);
-string char2hex(char dec);
-wstring Base64String(const string& hash);
-string HMACSHA1(const string& keyBytes, const string& data);
-wstring OAuthCreateTimestamp();
-wstring OAuthCreateNonce();
-wstring OAuthBuildHeader(const HTTPParameters &parameters);
-wstring BuildQueryString(const HTTPParameters &parameters);
-HTTPParameters ParseQueryString(const wstring& url);
-wstring UrlGetQuery(const wstring& url);
-
 #endif // COMMON_H

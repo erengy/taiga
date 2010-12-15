@@ -6,12 +6,13 @@
 	<!-- List -->
 	<list>
 		<progress>
-			<background type="progress" value_1="FCFCFC" value_2="EBEBEB" value_3="E5E5E5"/>
 			<border     type="solid"    value_1="E8E8E8"/>
+			<seperator  type="solid"    value_1="D2FFD2"/>
+			<background type="progress" value_1="FCFCFC" value_2="EBEBEB" value_3="E5E5E5"/>
+			<buffer     type="progress" value_1="F0FFF0" value_2="DDFFDD" value_3="A0FFA0"/>
 			<completed  type="progress" value_1="E0F0FF" value_2="88E0FF" value_3="33DDFF"/>
 			<dropped    type="progress" value_1="FFDDDD" value_2="FF8888" value_3="FF5555"/>
 			<watching   type="progress" value_1="DDFFDD" value_2="88FF88" value_3="33FF33"/>
-			<unknown    type="progress" value_1="FCFFFC" value_2="DDFFDD" value_3="C0FFC0"/>
 		</progress>
 	</list>
 
@@ -98,8 +99,6 @@
 		<menu name="Tools">
 			<item name="Fansub groups" sub="Fansub"/>
 			<item name="Useful links"  sub="Links"/>
-			<!--<item type="seperator"/>
-			<item name="Customize..." action="CustomizeTools()" disabled="1"/>-->
 		</menu>
 			<!-- Fansub groups -->
 			<menu name="Fansub">
@@ -123,7 +122,6 @@
 			</menu>
 		<!-- Help -->
 		<menu name="Help">
-			<!--<item name="Help" action="Help()" disabled="1"/>-->
 			<item name="About Taiga" action="About()"/>
 		</menu>
 		

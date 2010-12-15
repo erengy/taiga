@@ -38,7 +38,7 @@ FONT 8, "Tahoma", 400, 0, 162
     LTEXT           "Built on YYYY.MM.DD", IDC_STATIC_ABOUT_BUILD, 55, 35, 175, 8, SS_LEFT
     CONTROL         "Links: <a href=""http://code.google.com/p/taiga/"">Google Code</a> | <a href=""http://myanimelist.net/clubs.php?cid=21400"">MyAnimeList club</a> | #taiga @ irc.rizon.net", IDC_LINK_ABOUT, "SysLink", 0x50000000, 15, 95, 215, 25
     ICON            IDI_MAIN, 0, 15, 15, 32, 30, SS_ICON | SS_NOTIFY | 0x00000800
-    LTEXT           "Contributors: saka (beta testing), Diablofan (Twitter Support)", IDC_STATIC, 15, 69, 220, 8, SS_LEFT
+    LTEXT           "Contributors: saka (testing), Diablofan (Twitter support)", IDC_STATIC, 15, 69, 215, 8, SS_LEFT
     LTEXT           "", IDC_STATIC, 15, 50, 212, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
     LTEXT           "", IDC_STATIC, 15, 85, 212, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
 }
@@ -405,12 +405,11 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "Tahoma"
 {
     AUTOCHECKBOX    "Update status", IDC_CHECK_TWITTER, 10, 5, 70, 10
-    LTEXT           "User name:", IDC_STATIC, 20, 40, 50, 8, SS_LEFT
-    LTEXT           "Password:", IDC_STATIC, 165, 40, 50, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_TWITTER_USER, 20, 50, 130, 12, WS_DISABLED | ES_AUTOHSCROLL
-    EDITTEXT        IDC_EDIT_TWITTER_PASS, 165, 50, 130, 12, WS_DISABLED | ES_AUTOHSCROLL | ES_PASSWORD
-    GROUPBOX        "Options", IDC_STATIC, 10, 25, 295, 70
-    PUSHBUTTON      "Edit format string...", IDC_BUTTON_FORMAT_TWITTER, 20, 70, 85, 14
+    GROUPBOX        "Options", IDC_STATIC, 10, 25, 295, 40
+    PUSHBUTTON      "Edit format string...", IDC_BUTTON_FORMAT_TWITTER, 20, 40, 85, 14
+    GROUPBOX        "Authorization", IDC_STATIC, 10, 70, 295, 55
+    CONTROL         "Taiga is not authorized to post to your Twitter account yet.", IDC_LINK_TWITTER, "SysLink", 0x50010000, 20, 85, 275, 10
+    PUSHBUTTON      "Authorize...", IDC_BUTTON_TWITTER_AUTH, 20, 100, 85, 14
 }
 
 
@@ -613,8 +612,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,0,0
-    PRODUCTVERSION  0,6,0,0
+    FILEVERSION     0,6,1,0
+    PRODUCTVERSION  0,6,1,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -628,11 +627,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6"
+            VALUE "FileVersion", "0.6.1"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6"
+            VALUE "ProductVersion", "0.6.1"
         }
     }
     BLOCK "VarFileInfo"

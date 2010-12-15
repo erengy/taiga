@@ -18,6 +18,7 @@
 
 #include "../std.h"
 #include "../animelist.h"
+#include "../announce.h"
 #include "../common.h"
 #include "dlg_event.h"
 #include "dlg_input.h"
@@ -177,12 +178,6 @@ void CSettingsWindow::OnOK() {
   Settings.Announce.Skype.Enabled = m_Page[PAGE_SKYPE].IsDlgButtonChecked(IDC_CHECK_SKYPE);
   // Twitter
   Settings.Announce.Twitter.Enabled = m_Page[PAGE_TWITTER].IsDlgButtonChecked(IDC_CHECK_TWITTER);
-  if (Settings.Announce.Twitter.Enabled && (Settings.Announce.Twitter.OAuthKey.empty() || Settings.Announce.Twitter.OAuthSecret.empty())) {
-    OAuthWebRequestSubmit(L"http://twitter.com/oauth/request_token", 
-      L"GET", NULL, 
-      L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
-      HTTP_Twitter_Request);
-  }
 
   // Folders > Root
   CListView List = m_Page[PAGE_FOLDERS_ROOT].GetDlgItem(IDC_LIST_FOLDERS_ROOT);
@@ -374,4 +369,21 @@ LRESULT CSettingsWindow::CSettingsTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM 
   }
 
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+// =============================================================================
+
+void CSettingsWindow::RefreshTwitterLink() {
+  wstring text;
+  if (Settings.Announce.Twitter.User.empty()) {
+    text = L"Taiga is not authorized to post to your Twitter account yet.";
+  } else {
+    text = L"Taiga is authorized to post to this Twitter account: ";
+    text += L"<a href=\"http://twitter.com/";
+    text += Settings.Announce.Twitter.User;
+    text += L"\" id=\"id_link\">";
+    text += Settings.Announce.Twitter.User;
+    text += L"</a>";
+  }
+  m_Page[PAGE_TWITTER].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
 }

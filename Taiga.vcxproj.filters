@@ -31,11 +31,11 @@
     <Filter Include="Win32\Controls">
       <UniqueIdentifier>{965e89b5-8902-466c-a26f-ab39814e4991}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Third Party\twitter">
-      <UniqueIdentifier>{1c1c56f5-5f1c-4db5-88f0-ed1f7286f97d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Third Party\base64">
       <UniqueIdentifier>{632c9571-5b54-4fc7-b4cb-25cb4abc7b96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Third Party\oauth">
+      <UniqueIdentifier>{1c1c56f5-5f1c-4db5-88f0-ed1f7286f97d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -228,14 +228,11 @@
     <ClCompile Include="win32\win_ctl_tooltip.cpp">
       <Filter>Win32\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="third_party\twitter\tc2.cpp">
-      <Filter>Third Party\twitter</Filter>
+    <ClCompile Include="third_party\oauth\Base64Coder.cpp">
+      <Filter>Third Party\oauth</Filter>
     </ClCompile>
-    <ClCompile Include="third_party\twitter\TwitDebug.c">
-      <Filter>Third Party\twitter</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\twitter\Base64Coder.cpp">
-      <Filter>Third Party\twitter</Filter>
+    <ClCompile Include="third_party\oauth\oauth.cpp">
+      <Filter>Third Party\oauth</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -371,11 +368,11 @@
     <ClInclude Include="win32\win_control.h">
       <Filter>Win32\Controls</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\twitter\TwitDebug.h">
-      <Filter>Third Party\twitter</Filter>
+    <ClInclude Include="third_party\oauth\Base64Coder.h">
+      <Filter>Third Party\oauth</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\twitter\Base64Coder.h">
-      <Filter>Third Party\twitter</Filter>
+    <ClInclude Include="third_party\oauth\oauth.h">
+      <Filter>Third Party\oauth</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

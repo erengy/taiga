@@ -50,7 +50,7 @@ void DebugTest() {
   // Start ticking
   Test.Start();
 
-  for (int i = 0; i < 50000; i++) {
+  for (int i = 0; i < 10000; i++) {
     // Do some tests here
     //       ___
     //      {o,o}
@@ -64,7 +64,7 @@ void DebugTest() {
   
   // Default action
   //ExecuteAction(L"RecognitionTest");
-  AnnounceToTwitter(L"Testing OAuth within Taiga...");
+  AnnounceToTwitter(L"Testing OAuth within Taiga... - " + GetTime());
 }
 
 // =============================================================================

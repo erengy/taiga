@@ -33,7 +33,7 @@ wstring CheckSlash(const wstring& str);
 int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensitive = true, size_t max_count = MAX_PATH);
 void CrackURL(wstring url, wstring& server, wstring& object);
 void DecodeHTML(wstring& input);
-wstring EncodeURL(const wstring& str);
+wstring EncodeURL(const wstring& str, bool encode_unreserved = false);
 bool EndsWith(const wstring& str, const wstring& search);
 void EraseLeft(wstring& str, const wstring find, bool case_insensitive);
 void EraseRight(wstring& str, const wstring find, bool case_insensitive);

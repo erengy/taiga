@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "announce.h"
 #include "common.h"
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_info_page.h"
@@ -154,6 +155,12 @@ BOOL CHTTPClient::OnReadData() {
     case HTTP_TorrentDownload:
     case HTTP_TorrentDownloadAll:
       status = L"Downloading torrent file...";
+      break;
+    case HTTP_Twitter_Request:
+      status = L"Connecting to Twitter...";
+      break;
+    case HTTP_Twitter_Auth:
+      status = L"Authorizing Twitter...";
       break;
     case HTTP_Twitter_Post:
       status = L"Updating Twitter status...";
@@ -486,39 +493,35 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Twitter status
     case HTTP_Twitter_Request: {
-      HTTPParameters response = ParseQueryString(GetData());
-      // Execute URL
-      wstring url = L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"];
-      ExecuteLink(url);
-      // Dialog here
-      CInputDialog oAuth;
-      oAuth.Title = L"Twitter Authorization";
-      oAuth.Text = L"";
-      oAuth.Info = L"Please Enter the oAuth Pin Shown on the page after logging into Twitter. "
-        L"If you choose to click cancel or leave it blank, Twitter announcements will be disabled.";
-      oAuth.Show();
-      if (oAuth.Result == IDOK && !oAuth.Text.empty()) {
-        // Trade off pin and save settings
-        OAuthWebRequestSubmit(L"http://twitter.com/oauth/access_token", 
-          L"POST", NULL, 
-          L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
-          HTTP_Twitter_Auth, 
-          response[L"oauth_token"], response[L"oauth_token_secret"], oAuth.Text);
-          return TRUE;
+      HTTPParameters response = Twitter.OAuth.ParseQueryString(GetData());
+      ExecuteLink(L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
+      CInputDialog dlg;
+      dlg.Title = L"Twitter Authorization";
+      dlg.Info = L"Please enter the PIN shown on the page after logging into Twitter:";
+      dlg.Show();
+      if (dlg.Result == IDOK && !dlg.Text.empty()) {
+        Twitter.AccessToken(response[L"oauth_token"], response[L"oauth_token_secret"], dlg.Text);
+        return TRUE;
       } else {
-        Settings.Announce.Twitter.Enabled = false;
+        MainWindow.ChangeStatus();
+        Settings.Announce.Twitter.Enabled = FALSE;
       }
       break;
     }
 	case HTTP_Twitter_Auth: {
-      // Save the key and secret
-      std::map<wstring, wstring> access = ParseQueryString(GetData());
+      HTTPParameters access = Twitter.OAuth.ParseQueryString(GetData());
       if (!access[L"oauth_token"].empty() && !access[L"oauth_token_secret"].empty()) {
         Settings.Announce.Twitter.OAuthKey = access[L"oauth_token"];
         Settings.Announce.Twitter.OAuthSecret = access[L"oauth_token_secret"];
+        Settings.Announce.Twitter.User = access[L"screen_name"];
+        status = L"Taiga is now authorized to post to this Twitter account: ";
+        status += Settings.Announce.Twitter.User;
       } else {
-        Settings.Announce.Twitter.Enabled = false;
+        status = L"Twitter authorization failed.";
+        Settings.Announce.Twitter.Enabled = FALSE;
       }
+      MainWindow.ChangeStatus(status);
+      SettingsWindow.RefreshTwitterLink();
       break;
     }
     case HTTP_Twitter_Post: {

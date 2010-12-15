@@ -29,6 +29,7 @@
 
 CHTTP HTTPClient;
 CSkype Skype;
+CTwitter Twitter;
 
 // =============================================================================
 
@@ -239,14 +240,55 @@ void AnnounceToSkype(wstring mood) {
 
 /* Twitter */
 
-void AnnounceToTwitter(wstring status_text) {
-  if (status_text.empty()) return;
+CTwitter::CTwitter() {
+  // These are unique values that identify Taiga
+  OAuth.ConsumerKey = L"9GZsCbqzjOrsPWlIlysvg";
+  OAuth.ConsumerSecret = L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw";
+}
 
-  HTTPParameters postParams;
-  postParams[L"status"] = UrlEncode(status_text);
-  OAuthWebRequestSubmit(L"http://twitter.com/statuses/update.xml", 
-    L"POST", &postParams, 
-    L"9GZsCbqzjOrsPWlIlysvg", L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw", 
-    HTTP_Twitter_Post, 
-    Settings.Announce.Twitter.OAuthKey, Settings.Announce.Twitter.OAuthSecret);
+bool CTwitter::RequestToken() {
+  wstring header = OAuth.BuildHeader(
+    L"http://twitter.com/oauth/request_token", 
+    L"GET", NULL);
+
+  return TwitterClient.Connect(
+    L"twitter.com", L"oauth/request_token",
+    L"", L"GET", header, L"myanimelist.net", L"",
+    HTTP_Twitter_Request);
+}
+
+bool CTwitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
+  wstring header = OAuth.BuildHeader(
+    L"http://twitter.com/oauth/access_token", 
+    L"POST", NULL, 
+    key, secret, pin);
+
+  return TwitterClient.Connect(
+    L"twitter.com", L"oauth/access_token",
+    L"", L"GET", header, L"myanimelist.net", L"",
+    HTTP_Twitter_Auth);
+}
+
+bool CTwitter::SetStatusText(const wstring& status_text) {
+  if (status_text.empty() || status_text == m_StatusText) return false;
+  m_StatusText = status_text;
+
+  HTTPParameters post_parameters;
+  post_parameters[L"status"] = EncodeURL(m_StatusText);
+
+  wstring header = OAuth.BuildHeader(
+    L"http://twitter.com/statuses/update.xml", 
+    L"POST", &post_parameters, 
+    Settings.Announce.Twitter.OAuthKey, 
+    Settings.Announce.Twitter.OAuthSecret);
+
+  return TwitterClient.Connect(
+    L"twitter.com", L"/statuses/update.xml", 
+    L"status=" + post_parameters[L"status"],
+    L"POST", header, L"myanimelist.net", L"", 
+    HTTP_Twitter_Post);
+}
+
+void AnnounceToTwitter(wstring status_text) {
+  Twitter.SetStatusText(status_text); 
 }

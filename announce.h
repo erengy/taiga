@@ -20,6 +20,7 @@
 #define ANNOUNCE_H
 
 #include "std.h"
+#include "third_party/oauth/oauth.h"
 
 // =============================================================================
 
@@ -70,6 +71,23 @@ void AnnounceToSkype(wstring mood);
 // =============================================================================
 
 /* Twitter */
+
+class CTwitter {
+public:
+  CTwitter();
+  virtual ~CTwitter() {}
+
+  COAuth OAuth;
+
+  bool RequestToken();
+  bool AccessToken(const wstring& key, const wstring& secret, const wstring& pin);
+  bool SetStatusText(const wstring& status_text);
+
+private:
+  wstring m_StatusText;
+};
+
+extern CTwitter Twitter;
 
 void AnnounceToTwitter(wstring status_text);
 

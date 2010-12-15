@@ -24,7 +24,7 @@
 
 bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring szVerb, wstring szHeader, 
                     wstring szReferer, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
-  // Close previous connection, if any        
+  // Close previous connection, if any
   Cleanup();
 
   // Set new information

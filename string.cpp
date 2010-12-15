@@ -310,19 +310,22 @@ wstring ToWSTR(const double& value, int count) {
 
 /* Encoding & Decoding */
 
-wstring EncodeURL(const wstring& str) {
+wstring EncodeURL(const wstring& str, bool encode_unreserved) {
   static const wchar_t* digits = L"0123456789ABCDEF";
   wstring buffer;
 
   for (unsigned int c = 0; c < str.length(); c++) {
     if ((str[c] >= '0' && str[c] <= '9') || 
         (str[c] >= 'A' && str[c] <= 'Z') || 
-        (str[c] >= 'a' && str[c] <= 'z')) {
-          buffer.push_back(str[c]);
+        (str[c] >= 'a' && str[c] <= 'z') || 
+        (!encode_unreserved && 
+        (str[c] == '-' || str[c] == '.' || 
+         str[c] == '_' || str[c] == '~'))) {
+           buffer.append(&str[c], 1);
     } else {
-      buffer.push_back('%');
-      buffer.push_back(digits[(str[c] >> 4) & 0x0F]);
-      buffer.push_back(digits[str[c] & 0x0F]);
+      buffer.append(L"%");
+      buffer.append(&digits[(str[c] >> 4) & 0x0F], 1);
+      buffer.append(&digits[str[c] & 0x0F], 1);
     }
   }
 
@@ -330,7 +333,7 @@ wstring EncodeURL(const wstring& str) {
 }
 
 void DecodeHTML(wstring& input) {
-  static const wchar_t* html_chars[24][2] = {
+  static const wchar_t* html_chars[27][2] = {
     {L"&quot;",   L"\""},
     {L"&amp;",    L"&"},
     {L"&apos;",   L"'"},
@@ -345,7 +348,10 @@ void DecodeHTML(wstring& input) {
     {L"&deg;",    L"\u00B0"},
     {L"&acute;",  L"\u00B4"},
     {L"&raquo;",  L"\u00BB"},
+    {L"&Egrave;", L"\u00C8"},
+    {L"&Eacute;", L"\u00C9"},
     {L"&egrave;", L"\u00E8"},
+    {L"&eacute;", L"\u00E9"},
     {L"&ndash;",  L"\u2013"},
     {L"&mdash;",  L"\u2014"},
     {L"&lsquo;",  L"\u2018"},
@@ -358,7 +364,7 @@ void DecodeHTML(wstring& input) {
   };
 
   if (InStr(input, L"&") > -1) {
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 27; i++) {
       Replace(input, html_chars[i][0], html_chars[i][1], true);
     }
   }

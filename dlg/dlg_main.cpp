@@ -408,7 +408,7 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
 void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
   // Check event queue
   Taiga.TickerQueue++;
-  if (Taiga.TickerQueue >= 1 * 60) {
+  if (Taiga.TickerQueue >= 5 * 60) { // 5 minutes
     Taiga.TickerQueue = 0;
     if (EventQueue.UpdateInProgress == false) {
       EventQueue.Check();
@@ -419,7 +419,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
   
   // Check new episodes
   Taiga.TickerNewEpisodes++;
-  if (Taiga.TickerNewEpisodes >= 30 * 60) {
+  if (Taiga.TickerNewEpisodes >= 30 * 60) { // 30 minutes
     Taiga.TickerNewEpisodes = 0;
     ExecuteAction(L"CheckNewEpisodes()", TRUE);
   }

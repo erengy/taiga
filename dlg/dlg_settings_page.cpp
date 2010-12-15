@@ -146,6 +146,7 @@ BOOL CSettingsPage::OnInitDialog() {
     // Announcements > Twitter
     case PAGE_TWITTER: {
       CheckDlgButton(IDC_CHECK_TWITTER, Settings.Announce.Twitter.Enabled);
+      SettingsWindow.RefreshTwitterLink();
       break;
     }
 
@@ -355,6 +356,14 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         wstring service;
         GetDlgItemText(IDC_EDIT_MIRC_SERVICE, service);
         TestMIRCConnection(service);
+        return TRUE;
+      }
+
+      // ================================================================================
+    
+      // Authorize Twitter
+      case IDC_BUTTON_TWITTER_AUTH: {
+        Twitter.RequestToken();
         return TRUE;
       }
 

@@ -90,15 +90,15 @@ void CEventList::Add(int anime_index, int id, int episode, int score, int status
 
   // Add new item
   Item.resize(Item.size() + 1);
-  Item.back().Index      = Item.size();
-  Item.back().ID         = id > 0 ? id : AnimeList.Item[anime_index].Series_ID;
+  Item.back().Index = Item.size();
+  Item.back().ID = id > 0 ? id : AnimeList.Item[anime_index].Series_ID;
   Item.back().AnimeIndex = anime_index;
-  Item.back().Episode    = episode;
-  Item.back().Score      = score;
-  Item.back().Status     = status;
-  Item.back().Tags       = tags;
-  Item.back().Mode       = mode;
-  Item.back().Time       = time.empty() ? GetDate() + L" " + GetTime() : time;
+  Item.back().Episode = episode;
+  Item.back().Score = score;
+  Item.back().Status = status;
+  Item.back().Tags = tags;
+  Item.back().Mode = mode;
+  Item.back().Time = time.empty() ? GetDate() + L" " + GetTime() : time;
 
   if (anime_index > 0 && anime_index <= AnimeList.Count) {
     // Announce
@@ -139,11 +139,11 @@ void CEventList::Check() {
   // Check
   if (Item.empty()) return;
   if (!Taiga.UpdatesEnabled) {
-    Item[Index].Reason = L"Updates are disabled.";
+    Item[Index].Reason = L"Updates are disabled";
     return;
   }
   if (!Taiga.LoggedIn) {
-    Item[Index].Reason = L"Not logged in.";
+    Item[Index].Reason = L"Not logged in";
     return;
   }
   
