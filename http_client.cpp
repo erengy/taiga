@@ -491,25 +491,25 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // =========================================================================
 
-    // Twitter status
+    // Twitter
     case HTTP_Twitter_Request: {
-      HTTPParameters response = Twitter.OAuth.ParseQueryString(GetData());
-      ExecuteLink(L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
-      CInputDialog dlg;
-      dlg.Title = L"Twitter Authorization";
-      dlg.Info = L"Please enter the PIN shown on the page after logging into Twitter:";
-      dlg.Show();
-      if (dlg.Result == IDOK && !dlg.Text.empty()) {
-        Twitter.AccessToken(response[L"oauth_token"], response[L"oauth_token_secret"], dlg.Text);
-        return TRUE;
-      } else {
-        MainWindow.ChangeStatus();
-        Settings.Announce.Twitter.Enabled = FALSE;
+      OAuthParameters response = Twitter.OAuth.ParseQueryString(GetData());
+      if (!response[L"oauth_token"].empty()) {
+        ExecuteLink(L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
+        CInputDialog dlg;
+        dlg.Title = L"Twitter Authorization";
+        dlg.Info = L"Please enter the PIN shown on the page after logging into Twitter:";
+        dlg.Show();
+        if (dlg.Result == IDOK && !dlg.Text.empty()) {
+          Twitter.AccessToken(response[L"oauth_token"], response[L"oauth_token_secret"], dlg.Text);
+          return TRUE;
+        }
       }
+      MainWindow.ChangeStatus();
       break;
     }
 	case HTTP_Twitter_Auth: {
-      HTTPParameters access = Twitter.OAuth.ParseQueryString(GetData());
+      OAuthParameters access = Twitter.OAuth.ParseQueryString(GetData());
       if (!access[L"oauth_token"].empty() && !access[L"oauth_token_secret"].empty()) {
         Settings.Announce.Twitter.OAuthKey = access[L"oauth_token"];
         Settings.Announce.Twitter.OAuthSecret = access[L"oauth_token_secret"];
@@ -518,7 +518,6 @@ BOOL CHTTPClient::OnReadComplete() {
         status += Settings.Announce.Twitter.User;
       } else {
         status = L"Twitter authorization failed.";
-        Settings.Announce.Twitter.Enabled = FALSE;
       }
       MainWindow.ChangeStatus(status);
       SettingsWindow.RefreshTwitterLink();

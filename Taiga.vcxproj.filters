@@ -165,9 +165,6 @@
     <ClCompile Include="xml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="third_party\base64\base64.cpp">
-      <Filter>Third Party\base64</Filter>
-    </ClCompile>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
       <Filter>Third Party\pugixml</Filter>
     </ClCompile>
@@ -228,11 +225,11 @@
     <ClCompile Include="win32\win_ctl_tooltip.cpp">
       <Filter>Win32\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="third_party\oauth\Base64Coder.cpp">
-      <Filter>Third Party\oauth</Filter>
-    </ClCompile>
     <ClCompile Include="third_party\oauth\oauth.cpp">
       <Filter>Third Party\oauth</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\base64\base64.cpp">
+      <Filter>Third Party\base64</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -368,11 +365,11 @@
     <ClInclude Include="win32\win_control.h">
       <Filter>Win32\Controls</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\oauth\Base64Coder.h">
-      <Filter>Third Party\oauth</Filter>
-    </ClInclude>
     <ClInclude Include="third_party\oauth\oauth.h">
       <Filter>Third Party\oauth</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\base64\base64.h">
+      <Filter>Third Party\base64</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

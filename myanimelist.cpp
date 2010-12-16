@@ -27,6 +27,8 @@
 
 CMyAnimeList MAL;
 
+#define MAL_USER_PASS Base64Encode(Settings.Account.MAL.User + L":" + Settings.Account.MAL.Password)
+
 // =============================================================================
 
 CMyAnimeList::CMyAnimeList() {
@@ -55,8 +57,7 @@ bool CMyAnimeList::Login() {
         L"/api/account/verify_credentials.xml", 
         L"", 
         L"GET", 
-        L"Authorization: Basic " + 
-        GetUserPassEncoded(Settings.Account.MAL.User, Settings.Account.MAL.Password), 
+        L"Authorization: Basic " + MAL_USER_PASS, 
         L"myanimelist.net", 
         L"", HTTP_MAL_Login);
     }
@@ -103,8 +104,7 @@ BOOL CMyAnimeList::SearchAnime(wstring title, CAnime* pAnimeItem) {
         L"/api/anime/search.xml?q=" + title, 
         L"", 
         L"GET", 
-        L"Authorization: Basic " + 
-        GetUserPassEncoded(Settings.Account.MAL.User, Settings.Account.MAL.Password), 
+        L"Authorization: Basic " + MAL_USER_PASS, 
         L"myanimelist.net", 
         L"", HTTP_MAL_SearchAnime, 
         reinterpret_cast<LPARAM>(pAnimeItem));
@@ -157,8 +157,7 @@ void CMyAnimeList::Update(int index, int id, int episode, int score, int status,
           MainClient.Connect(L"myanimelist.net", 
             L"/api/animelist/add/" + ToWSTR(id) + L".xml", 
             data, L"POST", 
-            L"Authorization: Basic " + 
-            GetUserPassEncoded(Settings.Account.MAL.User, Settings.Account.MAL.Password), 
+            L"Authorization: Basic " + MAL_USER_PASS, 
             L"myanimelist.net", 
             L"", mode, reinterpret_cast<LPARAM>(&ANIME));
           break;
@@ -168,8 +167,7 @@ void CMyAnimeList::Update(int index, int id, int episode, int score, int status,
           MainClient.Connect(L"myanimelist.net", 
             L"/api/animelist/delete/" + ToWSTR(ANIME.Series_ID) + L".xml", 
             data, L"POST", 
-            L"Authorization: Basic " + 
-            GetUserPassEncoded(Settings.Account.MAL.User, Settings.Account.MAL.Password), 
+            L"Authorization: Basic " + MAL_USER_PASS, 
             L"myanimelist.net", 
             L"", mode, reinterpret_cast<LPARAM>(&ANIME));
           break;
@@ -179,8 +177,7 @@ void CMyAnimeList::Update(int index, int id, int episode, int score, int status,
           MainClient.Connect(L"myanimelist.net", 
             L"/api/animelist/update/" + ToWSTR(ANIME.Series_ID) + L".xml", 
             data, L"POST", 
-            L"Authorization: Basic " + 
-            GetUserPassEncoded(Settings.Account.MAL.User, Settings.Account.MAL.Password), 
+            L"Authorization: Basic " + MAL_USER_PASS, 
             L"myanimelist.net", 
             L"", mode, reinterpret_cast<LPARAM>(&ANIME));
         }

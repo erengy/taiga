@@ -124,7 +124,6 @@
     <ClCompile Include="taiga.cpp" />
     <ClCompile Include="theme.cpp" />
     <ClCompile Include="third_party\base64\base64.cpp" />
-    <ClCompile Include="third_party\oauth\Base64Coder.cpp" />
     <ClCompile Include="third_party\oauth\oauth.cpp" />
     <ClCompile Include="third_party\pugixml\pugixml.cpp" />
     <ClCompile Include="win32\win_ctl_combobox.cpp" />
@@ -182,7 +181,7 @@
     <ClInclude Include="string.h" />
     <ClInclude Include="taiga.h" />
     <ClInclude Include="theme.h" />
-    <ClInclude Include="third_party\oauth\Base64Coder.h" />
+    <ClInclude Include="third_party\base64\base64.h" />
     <ClInclude Include="third_party\oauth\oauth.h" />
     <ClInclude Include="third_party\pugixml\pugiconfig.hpp" />
     <ClInclude Include="third_party\pugixml\pugixml.hpp" />

@@ -37,17 +37,16 @@ enum ListSortType {
 
 typedef unsigned __int64 QWORD, *LPQWORD;
 
+class CEpisode;
+
 // =============================================================================
 
 // action.cpp
 void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 
-// base64.cpp
-wstring base64_encode(wchar_t const* bytes_to_encode, unsigned int in_len);
-wstring base64_decode(wstring const& encoded_string);
-
 // common.cpp
-class CEpisode;
+wstring Base64Decode(const wstring& str);
+wstring Base64Encode(const wstring& str);
 int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 wstring GetDate(LPCWSTR lpFormat = L"yyyy'-'MM'-'dd");
@@ -58,7 +57,6 @@ bool Execute(const wstring& path, const wstring& parameters = L"");
 BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");
 void ExecuteLink(const wstring& link);
 wstring ExpandEnvironmentStrings(const wstring& path);
-wstring GetUserPassEncoded(const wstring& user, const wstring& pass);
 void Registry_DeleteValue(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValueName);
 wstring Registry_ReadValue(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValueName);
 void Registry_SetValue(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValueName, LPCWSTR lpData, DWORD cbData);

@@ -29,7 +29,7 @@
 using std::string;
 using std::wstring;
 
-typedef std::map<wstring, wstring> HTTPParameters;
+typedef std::map<wstring, wstring> OAuthParameters;
 
 // =============================================================================
 
@@ -43,27 +43,27 @@ public:
   wstring BuildHeader(
     const wstring& url, 
     const wstring& http_method, 
-    const HTTPParameters* post_parameters = NULL, 
+    const OAuthParameters* post_parameters = NULL, 
     const wstring& oauth_token = L"", 
     const wstring& oauth_token_secret = L"", 
     const wstring& pin = L"");
-  HTTPParameters ParseQueryString(const wstring& url);
+  OAuthParameters ParseQueryString(const wstring& url);
 
 private:
-  HTTPParameters BuildSignedParameters(
-    const HTTPParameters& get_parameters, 
+  OAuthParameters BuildSignedParameters(
+    const OAuthParameters& get_parameters, 
     const wstring& url, 
     const wstring& http_method, 
-    const HTTPParameters* post_parameters, 
+    const OAuthParameters* post_parameters, 
     const wstring& oauth_token, 
     const wstring& oauth_token_secret, 
     const wstring& pin);
   wstring CreateNonce();
   wstring CreateSignature(const wstring& signature_base, const wstring& oauth_token_secret);
   wstring CreateTimestamp();
-  string Crypt_HMACSHA1(const string& keyBytes, const string& data);
+  string Crypt_HMACSHA1(const string& key_bytes, const string& data);
   wstring NormalizeURL(const wstring& url);
-  wstring SortParameters(const HTTPParameters& parameters);
+  wstring SortParameters(const OAuthParameters& parameters);
   wstring UrlGetQuery(const wstring& url);
 };
 

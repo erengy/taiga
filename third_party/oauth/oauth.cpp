@@ -25,7 +25,7 @@
 #include <list>
 #include <vector>
 
-#include "Base64Coder.h" // TODO: Remove dependency
+#include "../base64/base64.h"
 #include "oauth.h"
 #include "../../string.h"
 
@@ -40,22 +40,22 @@ using std::wstring;
 wstring COAuth::BuildHeader(
   const wstring& url, 
   const wstring& http_method, 
-  const HTTPParameters* post_parameters, 
+  const OAuthParameters* post_parameters, 
   const wstring& oauth_token, 
   const wstring& oauth_token_secret, 
   const wstring& pin)
 {
   // Build request parameters
-  HTTPParameters get_parameters = ParseQueryString(UrlGetQuery(url));
+  OAuthParameters get_parameters = ParseQueryString(UrlGetQuery(url));
 
   // Build signed OAuth parameters
-  HTTPParameters signed_parameters = 
+  OAuthParameters signed_parameters = 
     BuildSignedParameters(get_parameters, url, http_method, post_parameters, 
       oauth_token, oauth_token_secret, pin);
 
   // Build and return OAuth header
   wstring oauth_header = L"Authorization: OAuth ";
-  for (HTTPParameters::const_iterator it = signed_parameters.begin(); 
+  for (OAuthParameters::const_iterator it = signed_parameters.begin(); 
        it != signed_parameters.end(); ++it) {
          if (it != signed_parameters.begin()) oauth_header += L", ";
          oauth_header += it->first + L"=\"" + it->second + L"\"";
@@ -64,8 +64,8 @@ wstring COAuth::BuildHeader(
   return oauth_header;
 }
 
-HTTPParameters COAuth::ParseQueryString(const wstring& url) {
-  HTTPParameters parsed_parameters;
+OAuthParameters COAuth::ParseQueryString(const wstring& url) {
+  OAuthParameters parsed_parameters;
 
   vector<wstring> parameters;
   Split(url, L"&", parameters);
@@ -83,17 +83,17 @@ HTTPParameters COAuth::ParseQueryString(const wstring& url) {
 
 // =============================================================================
 
-HTTPParameters COAuth::BuildSignedParameters(
-  const HTTPParameters& get_parameters, 
+OAuthParameters COAuth::BuildSignedParameters(
+  const OAuthParameters& get_parameters, 
   const wstring& url, 
   const wstring& http_method, 
-  const HTTPParameters* post_parameters, 
+  const OAuthParameters* post_parameters, 
   const wstring& oauth_token, 
   const wstring& oauth_token_secret, 
   const wstring& pin)
 {
   // Create OAuth parameters
-  HTTPParameters oauth_parameters;
+  OAuthParameters oauth_parameters;
   oauth_parameters[L"oauth_callback"] = L"oob";
   oauth_parameters[L"oauth_consumer_key"] = ConsumerKey;
   oauth_parameters[L"oauth_nonce"] = CreateNonce();
@@ -111,7 +111,7 @@ HTTPParameters COAuth::BuildSignedParameters(
   }
 
   // Create a parameter list containing both OAuth and original parameters
-  HTTPParameters all_parameters = get_parameters;
+  OAuthParameters all_parameters = get_parameters;
   if (CompareStrings(http_method, L"POST") == 0 && post_parameters) {
     all_parameters.insert(post_parameters->begin(), post_parameters->end());
   }
@@ -122,7 +122,7 @@ HTTPParameters COAuth::BuildSignedParameters(
   wstring sorted_parameters = SortParameters(all_parameters);
   wstring signature_base = http_method + L"&" + EncodeURL(normal_url) + L"&" + EncodeURL(sorted_parameters);
 
-  // obtain a signature and add it to header requestParameters
+  // Obtain a signature and add it to header parameters
   wstring signature = CreateSignature(signature_base, oauth_token_secret);
   oauth_parameters[L"oauth_signature"] = signature;
 
@@ -143,9 +143,7 @@ wstring COAuth::CreateNonce() {
 wstring COAuth::CreateSignature(const wstring& signature_base, const wstring& oauth_token_secret) {
   // Create a SHA-1 hash of signature
   wstring key = EncodeURL(ConsumerSecret) + L"&" + EncodeURL(oauth_token_secret);
-  string key_bytes = std::string(ToANSI(key));
-  string data = std::string(ToANSI(signature_base));
-  string hash = Crypt_HMACSHA1(key_bytes, data);
+  string hash = Crypt_HMACSHA1(ToANSI(key), ToANSI(signature_base));
 
   // Encode signature in Base64
   Base64Coder coder;
@@ -159,17 +157,17 @@ wstring COAuth::CreateSignature(const wstring& signature_base, const wstring& oa
 wstring COAuth::CreateTimestamp() {
   __time64_t utcNow;
   __time64_t ret = _time64(&utcNow);
-  wchar_t buf[100] = {};
+  wchar_t buf[100] = {'\0'};
   swprintf_s(buf, SIZEOF(buf), L"%I64u", utcNow);
   return buf;
 }
 
 wstring COAuth::NormalizeURL(const wstring& url) {
-  wchar_t scheme[1024*4] = {};
-  wchar_t host[1024*4] = {};
-  wchar_t path[1024*4] = {};
+  wchar_t scheme[1024 * 4] = {'\0'};
+  wchar_t host[1024 * 4] = {'\0'};
+  wchar_t path[1024 * 4] = {'\0'};
 
-  URL_COMPONENTS components = { sizeof(URL_COMPONENTS) };
+  URL_COMPONENTS components = {sizeof(URL_COMPONENTS)};
   components.lpszScheme = scheme;
   components.dwSchemeLength = SIZEOF(scheme);
   components.lpszHostName = host;
@@ -197,9 +195,9 @@ wstring COAuth::NormalizeURL(const wstring& url) {
   return normal_url;
 }
 
-wstring COAuth::SortParameters(const HTTPParameters& parameters) {
+wstring COAuth::SortParameters(const OAuthParameters& parameters) {
   list<wstring> sorted;
-  for (HTTPParameters::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
+  for (OAuthParameters::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
     wstring param = it->first + L"=" + it->second;
     sorted.push_back(param);
   }
@@ -217,7 +215,7 @@ wstring COAuth::SortParameters(const HTTPParameters& parameters) {
 
 wstring COAuth::UrlGetQuery(const wstring& url) {
   wstring query;
-  wchar_t buf[1024 * 4] = {};
+  wchar_t buf[1024 * 4] = {'\0'};
   
   URL_COMPONENTS components = {sizeof(URL_COMPONENTS)};
   components.dwExtraInfoLength = SIZEOF(buf);
@@ -246,7 +244,7 @@ wstring COAuth::UrlGetQuery(const wstring& url) {
 // Key creation is based on:
 // http://mirror.leaseweb.com/NetBSD/NetBSD-release-5-0/src/dist/wpa/src/crypto/crypto_cryptoapi.c
 
-string COAuth::Crypt_HMACSHA1(const string& keyBytes, const string& data) {
+string COAuth::Crypt_HMACSHA1(const string& key_bytes, const string& data) {
   string hash;
   HCRYPTPROV hProv = NULL;
   HCRYPTHASH hHash = NULL;
@@ -260,7 +258,7 @@ string COAuth::Crypt_HMACSHA1(const string& keyBytes, const string& data) {
 
   if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
     if (CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)) {
-      if (CryptHashData(hHash, (BYTE*)keyBytes.c_str(), keyBytes.size(), 0)) {
+      if (CryptHashData(hHash, (BYTE*)key_bytes.c_str(), key_bytes.size(), 0)) {
         struct {
           BLOBHEADER hdr;
           DWORD len;
@@ -270,9 +268,9 @@ string COAuth::Crypt_HMACSHA1(const string& keyBytes, const string& data) {
         key_blob.hdr.bVersion = CUR_BLOB_VERSION;
         key_blob.hdr.reserved = 0;
         key_blob.hdr.aiKeyAlg = CALG_RC2;
-        key_blob.len = keyBytes.size();
+        key_blob.len = key_bytes.size();
         ZeroMemory(key_blob.key, sizeof(key_blob.key));
-        CopyMemory(key_blob.key, keyBytes.c_str(), min(keyBytes.size(), SIZEOF(key_blob.key)));
+        CopyMemory(key_blob.key, key_bytes.c_str(), min(key_bytes.size(), SIZEOF(key_blob.key)));
         if (CryptImportKey(hProv, (BYTE*)&key_blob, sizeof(key_blob), 0, CRYPT_IPSEC_HMAC_KEY, &hKey)) {
           if (CryptCreateHash(hProv, CALG_HMAC, hKey, 0, &hHmacHash)) {
             if (CryptSetHashParam(hHmacHash, HP_HMAC_INFO, (BYTE*)&HmacInfo, 0)) {

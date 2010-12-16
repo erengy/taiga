@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "third_party/base64/base64.h"
 #include "common.h"
 #include "myanimelist.h"
 #include "settings.h"
@@ -26,18 +27,32 @@
 
 // =============================================================================
 
-wstring GetUserPassEncoded(const wstring& user, const wstring& pass) {
-  wstring userpass = user + L":" + pass;
-  userpass = base64_encode(userpass.c_str(), userpass.length());
-  return userpass;
+wstring Base64Decode(const wstring& str) {
+  Base64Coder coder;
+  string buff = ToANSI(str);
+  coder.Decode((BYTE*)buff.c_str(), buff.length());
+  return ToUTF8(coder.DecodedMessage());
 }
+
+wstring Base64Encode(const wstring& str) {
+  Base64Coder coder;
+  string buff = ToANSI(str);
+  coder.Encode((BYTE*)buff.c_str(), buff.length());
+  return ToUTF8(coder.EncodedMessage());
+}
+
+// =============================================================================
 
 int StatusToIcon(int status) {  
   switch (status) {
-    case MAL_AIRING:      return Icon16_Green;
-    case MAL_FINISHED:    return Icon16_Blue;
-    case MAL_NOTYETAIRED: return Icon16_Red;
-    default:              return Icon16_Gray;
+    case MAL_AIRING:
+      return Icon16_Green;
+    case MAL_FINISHED:
+      return Icon16_Blue;
+    case MAL_NOTYETAIRED:
+      return Icon16_Red;
+    default:
+      return Icon16_Gray;
   }
 }
 

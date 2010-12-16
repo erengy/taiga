@@ -270,10 +270,15 @@ bool CTwitter::AccessToken(const wstring& key, const wstring& secret, const wstr
 }
 
 bool CTwitter::SetStatusText(const wstring& status_text) {
-  if (status_text.empty() || status_text == m_StatusText) return false;
+  if (Settings.Announce.Twitter.OAuthKey.empty() || Settings.Announce.Twitter.OAuthSecret.empty()) {
+    return false;
+  }
+  if (status_text.empty() || status_text == m_StatusText) {
+    return false;
+  }
   m_StatusText = status_text;
 
-  HTTPParameters post_parameters;
+  OAuthParameters post_parameters;
   post_parameters[L"status"] = EncodeURL(m_StatusText);
 
   wstring header = OAuth.BuildHeader(
