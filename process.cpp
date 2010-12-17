@@ -165,6 +165,16 @@ BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
     if (reinterpret_cast<ULONG>(handle.ProcessId) != pid) {
       continue;
     }
+    // Skip if the handle does not belong to a file.
+    if (handle.ObjectTypeIndex != OBJECT_TYPE_FILE) {
+      continue;
+    }
+    // Skip access codes which can cause NtDuplicateObject() or NtQueryObject() to hang.
+    if (handle.GrantedAccess == 0x00100000 || handle.GrantedAccess == 0x00120189 || 
+        handle.GrantedAccess == 0x0012019f || handle.GrantedAccess == 0x001a019f) {
+          continue;
+    }
+
     // Duplicate the handle so we can query it.
     if (!NT_SUCCESS(NtDuplicateObject(processHandle, handle.Handle, GetCurrentProcess(), &dupHandle, 0, 0, 0))) {
       continue;
@@ -175,14 +185,14 @@ BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
       CloseHandle(dupHandle);
       continue;
     }
-    // Query the object name (unless it has an access of 0x0012019f, on which NtQueryObject could hang).
-    if (handle.GrantedAccess == 0x0012019f) {
-      free(objectTypeInfo);
-      CloseHandle(dupHandle);
-      continue;
-    }
     objectNameInfo = malloc(0x1000);
     if (!NT_SUCCESS(NtQueryObject(dupHandle, ObjectNameInformation, objectNameInfo, 0x1000, &returnLength))) {
+      if (returnLength > 0x10000) {
+        free(objectTypeInfo);
+        free(objectNameInfo);
+        CloseHandle(dupHandle);
+        continue;
+      }
       // Reallocate the buffer and try again.
       objectNameInfo = realloc(objectNameInfo, returnLength);
       if (!NT_SUCCESS(NtQueryObject(dupHandle, ObjectNameInformation, objectNameInfo, returnLength, NULL))) {
@@ -193,12 +203,11 @@ BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
       }
     }
 
-    // Cast our buffer into an UNICODE_STRING.
+    // Cast our buffer into a UNICODE_STRING.
     objectName = *reinterpret_cast<PUNICODE_STRING>(objectNameInfo);
-    // Print the information (if it is a file).
+    // Add file path to our list.
     if (objectName.Length && handle.ObjectTypeIndex == OBJECT_TYPE_FILE) {
-      wstring buff = objectName.Buffer;
-      files_vector.push_back(buff);
+      files_vector.push_back(wstring(objectName.Buffer));
     }
 
     free(objectTypeInfo);
