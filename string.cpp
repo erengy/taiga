@@ -333,7 +333,7 @@ wstring EncodeURL(const wstring& str, bool encode_unreserved) {
 }
 
 void DecodeHTML(wstring& input) {
-  static const wchar_t* html_chars[38][2] = {
+  static const wchar_t* html_chars[39][2] = {
     {L"&quot;",   L"\""},
     {L"&amp;",    L"&"},
     {L"&apos;",   L"'"},
@@ -342,6 +342,7 @@ void DecodeHTML(wstring& input) {
     {L"&gt;",     L">"},
     {L"&nbsp;",   L" "},
 	{L"&acirc;\uFFFD&yen;", L"\u2665"}, //Heart Encodes
+	{L"&Atilde;&copy;", L"\u00E9"}, //Accented e Encoding
     {L"&yen;",    L"\u00A5"},
     {L"&copy;",   L"\u00A9"},
     {L"&laquo;",  L"\u00AB"},
@@ -375,7 +376,7 @@ void DecodeHTML(wstring& input) {
   };
 
   if (InStr(input, L"&") > -1) {
-    for (int i = 0; i < 38; i++) {
+    for (int i = 0; i < 39; i++) {
       Replace(input, html_chars[i][0], html_chars[i][1], true);
     }
   }
