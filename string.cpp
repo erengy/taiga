@@ -333,7 +333,7 @@ wstring EncodeURL(const wstring& str, bool encode_unreserved) {
 }
 
 void DecodeHTML(wstring& input) {
-  static const wchar_t* html_chars[27][2] = {
+  static const wchar_t* html_chars[38][2] = {
     {L"&quot;",   L"\""},
     {L"&amp;",    L"&"},
     {L"&apos;",   L"'"},
@@ -341,6 +341,7 @@ void DecodeHTML(wstring& input) {
     {L"&lt;",     L"<"},
     {L"&gt;",     L">"},
     {L"&nbsp;",   L" "},
+	{L"&acirc;\uFFFD&yen;", L"\u2665"}, //Heart Encodes
     {L"&yen;",    L"\u00A5"},
     {L"&copy;",   L"\u00A9"},
     {L"&laquo;",  L"\u00AB"},
@@ -360,11 +361,21 @@ void DecodeHTML(wstring& input) {
     {L"&rdquo;",  L"\u201D"},
     {L"&dagger;", L"\u2020"},
     {L"&trade;",  L"\u2122"},
-    {L"&hellip;", L"\u2026"}
+    {L"&hellip;", L"\u2026"},
+	{L"&acirc;\uFFFD&ordf;", L"\u266A"}, //Music Note Encode
+	{L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"}, //Black Rock Shooter Star (White Star and Black Star are encoded the same in API >_<)
+	{L"&acirc;\uFFFD\uFFFD", L"\u2729"}, //White Star
+	{L"&acirc;\uFFFD", L"\u2020"}, //Dagger Encode
+	{L"&Atilde;&curren;", L"\u00E4"}, //a with Umlaut Encode
+	{L"&Atilde;&cent;", L"\u00E2"}, //a with circumflex
+	{L"&Acirc;&frac12;", L"\u00BD"}, //1/2 Encoding
+	{L"&Atilde;\uFFFD", L"\u00DF"}, //ss weird B character Kreuz Encoding
+	{L"&Atilde;&frac14;", L"\u00FC"}, //u with Umlauts
+	{L"&Acirc;&sup2;", L"\u00B2"} //Superscript 2 Encoding
   };
 
   if (InStr(input, L"&") > -1) {
-    for (int i = 0; i < 27; i++) {
+    for (int i = 0; i < 38; i++) {
       Replace(input, html_chars[i][0], html_chars[i][1], true);
     }
   }
