@@ -69,6 +69,8 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
       TorrentWindow.m_Toolbar.EnableButton(0, true);
       TorrentWindow.m_Toolbar.EnableButton(1, true);
       break;
+    case HTTP_VersionCheckSilent:
+      break;
     default:
       EventQueue.UpdateInProgress = false;
       MainWindow.ChangeStatus(error_text);
@@ -89,6 +91,8 @@ BOOL CHTTPClient::OnSendRequestComplete() {
     case HTTP_TorrentDownloadAll:
       TorrentWindow.ChangeStatus(status);
       break;
+    case HTTP_VersionCheck:
+      MainWindow.ChangeStatus(L"Checking for updates...");
     default:
       #ifdef _DEBUG
       MainWindow.ChangeStatus(status);
@@ -148,6 +152,7 @@ BOOL CHTTPClient::OnReadData() {
     case HTTP_MAL_Image:
     case HTTP_Silent:
     case HTTP_VersionCheck:
+    case HTTP_VersionCheckSilent:
       return 0;
     case HTTP_TorrentCheck:
       status = L"Checking new torrents...";
@@ -390,18 +395,20 @@ BOOL CHTTPClient::OnReadComplete() {
     // =========================================================================
 
     // Version check
-    case HTTP_VersionCheck: {
+    case HTTP_VersionCheck:
+    case HTTP_VersionCheckSilent: {
       vector<wstring> data;
       Split(GetData(), L"\r\n", data);
       if (data.size() >= 3) {
+        CTaskDialog dlg;
+        dlg.SetWindowTitle(APP_TITLE);
+        dlg.SetMainIcon(TD_ICON_INFORMATION);
         if (CompareStrings(data[1], APP_BUILD) > 0) {
           wstring content = L"Version: " + data[0] + L"\nBuild: " + data[1];
+          wstring details;
           for (unsigned int i = 3; i < data.size(); i++) {
-            content += L"\n" + data[i];
+            details += (i > 4 && i < data.size() ? L"\n" : L"") + data[i];
           }
-          CTaskDialog dlg;
-          dlg.SetWindowTitle(APP_TITLE);
-          dlg.SetMainIcon(TD_ICON_INFORMATION);
           TrimLeft(data[0], L"\uFEFF");
           if (data[0] != APP_VERSION) {
             dlg.SetMainInstruction(L"A new version of Taiga is available!");
@@ -409,13 +416,25 @@ BOOL CHTTPClient::OnReadComplete() {
             dlg.SetMainInstruction(L"A new build of Taiga is available!");
           }
           dlg.SetContent(content.c_str());
+          dlg.SetExpandedInformation(details.c_str());
           dlg.AddButton(L"Download", IDYES);
           dlg.AddButton(L"Cancel", IDNO);
           dlg.Show(g_hMain);
           if (dlg.GetSelectedButtonID() == IDYES) {
             ExecuteLink(data[2]);
           }
+        } else {
+          if (GetClientMode() != HTTP_VersionCheckSilent) {
+            dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
+            dlg.AddButton(L"OK", IDOK);
+            dlg.Show(g_hMain);
+          }
         }
+      } else {
+        status = L"Error reading version information.";
+      }
+      if (GetClientMode() != HTTP_VersionCheckSilent) {
+        MainWindow.ChangeStatus(status);
       }
       break;
     }

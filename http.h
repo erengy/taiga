@@ -43,7 +43,8 @@ enum HTTP_ClientMode {
   HTTP_Twitter_Request,
   HTTP_Twitter_Auth,
   HTTP_Twitter_Post,
-  HTTP_VersionCheck
+  HTTP_VersionCheck,
+  HTTP_VersionCheckSilent
 };
 
 // =============================================================================

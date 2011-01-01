@@ -333,53 +333,42 @@ wstring EncodeURL(const wstring& str, bool encode_unreserved) {
 }
 
 void DecodeHTML(wstring& input) {
-  static const wchar_t* html_chars[39][2] = {
-    {L"&quot;",   L"\""},
-    {L"&amp;",    L"&"},
-    {L"&apos;",   L"'"},
-    {L"&#039;",   L"'"},
-    {L"&lt;",     L"<"},
-    {L"&gt;",     L">"},
-    {L"&nbsp;",   L" "},
-	{L"&acirc;\uFFFD&yen;", L"\u2665"}, //Heart Encodes
-	{L"&Atilde;&copy;", L"\u00E9"}, //Accented e Encoding
-    {L"&yen;",    L"\u00A5"},
-    {L"&copy;",   L"\u00A9"},
-    {L"&laquo;",  L"\u00AB"},
-    {L"&reg;",    L"\u00AE"},
-    {L"&deg;",    L"\u00B0"},
-    {L"&acute;",  L"\u00B4"},
-    {L"&raquo;",  L"\u00BB"},
-    {L"&Egrave;", L"\u00C8"},
-    {L"&Eacute;", L"\u00C9"},
-    {L"&egrave;", L"\u00E8"},
-    {L"&eacute;", L"\u00E9"},
-    {L"&ndash;",  L"\u2013"},
-    {L"&mdash;",  L"\u2014"},
-    {L"&lsquo;",  L"\u2018"},
-    {L"&rsquo;",  L"\u2019"},
-    {L"&ldquo;",  L"\u201C"},
-    {L"&rdquo;",  L"\u201D"},
-    {L"&dagger;", L"\u2020"},
-    {L"&trade;",  L"\u2122"},
-    {L"&hellip;", L"\u2026"},
-	{L"&acirc;\uFFFD&ordf;", L"\u266A"}, //Music Note Encode
-	{L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"}, //Black Rock Shooter Star (White Star and Black Star are encoded the same in API >_<)
-	{L"&acirc;\uFFFD\uFFFD", L"\u2729"}, //White Star
-	{L"&acirc;\uFFFD", L"\u2020"}, //Dagger Encode
-	{L"&Atilde;&curren;", L"\u00E4"}, //a with Umlaut Encode
-	{L"&Atilde;&cent;", L"\u00E2"}, //a with circumflex
-	{L"&Acirc;&frac12;", L"\u00BD"}, //1/2 Encoding
-	{L"&Atilde;\uFFFD", L"\u00DF"}, //ss weird B character Kreuz Encoding
-	{L"&Atilde;&frac14;", L"\u00FC"}, //u with Umlauts
-	{L"&Acirc;&sup2;", L"\u00B2"} //Superscript 2 Encoding
+  #define HTMLCHARCOUNT 27
+  static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
+    {L"&quot;",   L"\""},     // quotation mark
+    {L"&amp;",    L"&"},      // ampersand
+    {L"&apos;",   L"'"},      // apostrophe
+    {L"&#039;",   L"'"},      // apostrophe
+    {L"&lt;",     L"<"},      // less-than
+    {L"&gt;",     L">"},      // greater-than
+    {L"&nbsp;",   L" "},      // non-breaking space
+    {L"&yen;",    L"\u00A5"}, // yen
+    {L"&copy;",   L"\u00A9"}, // copyright
+    {L"&laquo;",  L"\u00AB"}, // angle quotation mark (left)
+    {L"&reg;",    L"\u00AE"}, // registered trademark
+    {L"&deg;",    L"\u00B0"}, // degree
+    {L"&acute;",  L"\u00B4"}, // spacing acute
+    {L"&raquo;",  L"\u00BB"}, // angle quotation mark (right)
+    {L"&Egrave;", L"\u00C8"}, // capital e, grave accent
+    {L"&Eacute;", L"\u00C9"}, // capital e, acute accent
+    {L"&egrave;", L"\u00E8"}, // small e, grave accent
+    {L"&eacute;", L"\u00E9"}, // small e, acute accent
+    {L"&ndash;",  L"\u2013"}, // en dash
+    {L"&mdash;",  L"\u2014"}, // em dash
+    {L"&lsquo;",  L"\u2018"}, // left single quotation mark
+    {L"&rsquo;",  L"\u2019"}, // right single quotation mark
+    {L"&ldquo;",  L"\u201C"}, // left double quotation mark
+    {L"&rdquo;",  L"\u201D"}, // right double quotation mark
+    {L"&dagger;", L"\u2020"}, // dagger
+    {L"&hellip;", L"\u2026"}, // horizontal ellipsis
+    {L"&trade;",  L"\u2122"}  // trademark
   };
-
   if (InStr(input, L"&") > -1) {
-    for (int i = 0; i < 39; i++) {
-      Replace(input, html_chars[i][0], html_chars[i][1], true);
+    for (int i = 0; i < HTMLCHARCOUNT; i++) {
+      Replace(input, html_chars[i][0], html_chars[i][1], true, false);
     }
   }
+  #undef HTMLCHARCOUNT
 }
 
 void StripHTML(wstring& str) {

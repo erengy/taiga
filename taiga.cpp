@@ -103,7 +103,7 @@ BOOL CTaiga::InitInstance() {
     }
   }
   if (Settings.Program.StartUp.CheckNewVersion) {
-    CheckNewVersion();
+    CheckNewVersion(true);
   }
 
   return TRUE;
@@ -111,10 +111,11 @@ BOOL CTaiga::InitInstance() {
 
 // =============================================================================
 
-BOOL CTaiga::CheckNewVersion() {
-  return VersionClient.Get(L"dl.dropbox.com", 
+BOOL CTaiga::CheckNewVersion(bool silent) {
+  return VersionClient.Get(
+    L"dl.dropbox.com", 
     L"/u/2298899/Taiga/Version.txt", 
-    L"", HTTP_VersionCheck);
+    L"", silent ? HTTP_VersionCheckSilent : HTTP_VersionCheck);
 }
 
 wstring CTaiga::GetDataPath() {

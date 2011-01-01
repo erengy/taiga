@@ -321,9 +321,33 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
 
 void CMyAnimeList::DecodeText(wstring& text) {
   Replace(text, L"<br />", L"\r", true);
-  Replace(text, L"&Aring;&laquo;", L"\u016B"); // TODO: Remove when MAL fixes its encoding
-  Replace(text, L"&Aring;\uFFFD", L"\u014D");  // TODO: Remove when MAL fixes its encoding
-  Replace(text, L"&Atilde;&uml;", L"\u00E8");  // TODO: Remove when MAL fixes its encoding
+  
+  // TODO: Remove when MAL fixes its encoding >_<
+  #define HTMLCHARCOUNT 15
+  static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
+    {L"&Acirc;&sup2;",         L"\u00B2"},   // superscript 2
+    {L"&Acirc;&frac12;",       L"\u00BD"},   // fraction 1/2
+    {L"&Atilde;\uFFFD",        L"\u00DF"},   // small sharp s, German
+    {L"&Atilde;&cent;",        L"\u00E2"},   // small a, circumflex accent
+    {L"&Atilde;&curren;",      L"\u00E4"},   // small a, umlaut mark
+    {L"&Atilde;&uml;",         L"\u00E8"},   // small e, grave accent
+    {L"&Atilde;&copy;",        L"\u00E9"},   // small e, acute accent
+    {L"&Atilde;&frac14;",      L"\u00FC"},   // small u, umlaut mark
+    {L"&Aring;\uFFFD",         L"\u014D"},   // small o, macron mark
+    {L"&Aring;&laquo;",        L"\u016B"},   // small u, macron mark
+    {L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"}, // black star (black and white stars are encoded the same in API >_<)
+    {L"&acirc;\uFFFD&yen;",    L"\u2665"},   // heart
+    {L"&acirc;\uFFFD&ordf;",   L"\u266A"},   // eighth note
+    {L"&acirc;\uFFFD\uFFFD",   L"\u2729"},   // white star
+    {L"&acirc;\uFFFD",         L"\u2020"},   // dagger
+  };
+  if (InStr(text, L"&") > -1) {
+    for (int i = 0; i < HTMLCHARCOUNT; i++) {
+      Replace(text, html_chars[i][0], html_chars[i][1], true, false);
+    }
+  }
+  #undef HTMLCHARCOUNT
+  
   StripHTML(text);
   DecodeHTML(text);
 }

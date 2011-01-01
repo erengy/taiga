@@ -25,7 +25,7 @@
 #define APP_NAME             L"Taiga"
 #define APP_TITLE            L"Taiga 0.6"
 #define APP_VERSION          L"0.6.1"
-#define APP_BUILD            L"2010.12.17"
+#define APP_BUILD            L"2011.01.01"
 #define APP_VERSION_MAJOR    0
 #define APP_VERSION_MINOR    6
 #define APP_VERSION_REVISION 1
@@ -54,7 +54,7 @@ public:
   CTaiga();
   ~CTaiga();
   
-  BOOL CheckNewVersion();
+  BOOL CheckNewVersion(bool silent);
   wstring GetDataPath();
   BOOL InitInstance();
   

@@ -123,6 +123,8 @@
 		<!-- Help -->
 		<menu name="Help">
 			<item name="About Taiga" action="About()"/>
+			<item type="seperator"/>
+			<item name="Check for updates" action="CheckUpdates()"/>
 		</menu>
 		
 		<!-- Search bar -->

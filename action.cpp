@@ -150,6 +150,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       ActivateWindow(AboutWindow.GetWindowHandle());
     }
 
+  // CheckUpdates()
+  //   Checks for a new version of the program.
+  } else if (action == L"CheckUpdates") {
+    Taiga.CheckNewVersion(false);
+
   // Exit(), Quit()
   //   Exits from Taiga.
   } else if (action == L"Exit" || action == L"Quit") {
