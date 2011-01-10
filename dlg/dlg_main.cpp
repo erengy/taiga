@@ -456,7 +456,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
       // Recognized?
       if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode, true, true, true, true, true)) {
         for (int i = AnimeList.Count; i > 0; i--) {
-          if (Meow.CompareTitle(CurrentEpisode.Title, i)) {
+          if (Meow.CompareEpisode(CurrentEpisode, AnimeList.Item[i])) {
             CurrentEpisode.Index = i;
             RefreshMenubar(CurrentEpisode.Index);
             AnimeList.Item[i].Start(CurrentEpisode);

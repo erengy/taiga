@@ -182,7 +182,8 @@ int CAnime::Ask(CEpisode episode) {
   dlg.UseCommandLinks(true);
 
   // Add buttons
-  int number = ToINT(GetLastEpisode(episode.Number));
+  int number = GetLastEpisode(episode.Number);
+  if (number == 0) number = 1;
   if (Series_Episodes == 1) {               // Completed (1 eps.)
     episode.Number = L"1";
     dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
@@ -192,7 +193,7 @@ int CAnime::Ask(CEpisode episode) {
     dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
   }
   wstring button = L"Update\nUpdate episode number from " + 
-    ToWSTR(GetLastWatchedEpisode()) + L" to " + GetLastEpisode(episode.Number);
+    ToWSTR(GetLastWatchedEpisode()) + L" to " + ToWSTR(number);
   dlg.AddButton(button.c_str(), IDYES);
   dlg.AddButton(L"Cancel\nDon't update anything", IDNO);
   
@@ -203,8 +204,8 @@ int CAnime::Ask(CEpisode episode) {
 }
 
 void CAnime::Update(CEpisode episode, bool do_move) {
-  int number = ToINT(GetLastEpisode(episode.Number));
-  if (Series_Episodes == 1) number = 1;
+  int number = GetLastEpisode(episode.Number);
+  if (number == 0 || Series_Episodes == 1) number = 1;
   episode.Index = Index;
   
   // Set start/finish date
@@ -238,8 +239,11 @@ void CAnime::CheckFolder() {
       old_folder.clear();
       Folder.clear();
     // Check if it's a valid folder
-    } else if (!Meow.CompareTitle(Folder, Index)) {
-      Folder.clear();
+    } else {
+      CEpisode episode; episode.Title = Folder;
+      if (!Meow.CompareEpisode(episode, AnimeList.Item[Index])) {
+        Folder.clear();
+      }
     }
   }
   if (Folder.empty()) {

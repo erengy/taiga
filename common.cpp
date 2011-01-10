@@ -94,7 +94,7 @@ wstring GetTime(LPCWSTR lpFormat) {
   return buff;
 }
 
-wstring GetLastEpisode(const wstring& episode) {
+int GetLastEpisode(const wstring& episode) {
   int value = 1, pos = InStrRev(episode, L"-", episode.length());
   if (pos == episode.length() - 1) {
     value = ToINT(episode.substr(0, pos));
@@ -103,8 +103,7 @@ wstring GetLastEpisode(const wstring& episode) {
   } else {
     value = ToINT(episode);
   }
-  if (value == 0) value = 1;
-  return ToWSTR(value);
+  return value;
 }
 
 wstring ToTimeString(int seconds) {

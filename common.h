@@ -51,7 +51,7 @@ int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 wstring GetDate(LPCWSTR lpFormat = L"yyyy'-'MM'-'dd");
 wstring GetTime(LPCWSTR lpFormat = L"HH':'mm':'ss");
-wstring GetLastEpisode(const wstring& episode);
+int GetLastEpisode(const wstring& episode);
 wstring ToTimeString(int seconds);
 bool Execute(const wstring& path, const wstring& parameters = L"");
 BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");

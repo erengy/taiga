@@ -61,7 +61,7 @@ BOOL CTorrents::Compare() {
   for (size_t i = 0; i < Feed.Item.size(); i++) {
     Meow.ExamineTitle(Feed.Item[i].Title, Feed.Item[i].EpisodeData, true, true, true, true, false);
     for (int j = AnimeList.Count; j > 0; j--) {
-      if (Meow.CompareTitle(Feed.Item[i].EpisodeData.Title, j)) {
+      if (Meow.CompareEpisode(Feed.Item[i].EpisodeData, AnimeList.Item[j])) {
         Feed.Item[i].EpisodeData.Index = j;
         break;
       }
@@ -72,7 +72,7 @@ BOOL CTorrents::Compare() {
   for (size_t i = 0; i < Feed.Item.size(); i++) {
     int anime_index = Feed.Item[i].EpisodeData.Index;
     if (anime_index > 0) {
-      if (ToINT(GetLastEpisode(Feed.Item[i].EpisodeData.Number)) > AnimeList.Item[anime_index].GetLastWatchedEpisode()) {
+      if (GetLastEpisode(Feed.Item[i].EpisodeData.Number) > AnimeList.Item[anime_index].GetLastWatchedEpisode()) {
         Feed.Item[i].NewItem = true;
         if (Filter(i, anime_index)) {
           wstring file = Feed.Item[i].Title + L".torrent";

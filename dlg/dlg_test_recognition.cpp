@@ -103,16 +103,16 @@ BOOL CTestRecognition::OnInitDialog() {
   }
 
   // Set title
-  int success_count = 0;
-  for (UINT i = 0; i < m_EpisodeList.size(); i++) {
+  int success_count = 0, total_items = m_EpisodeList.size();
+  for (int i = 0; i < total_items; i++) {
     if (m_EpisodeList[i].Title == m_EpisodeListTest[i].Title && 
       m_EpisodeList[i].Number == m_EpisodeListTest[i].Number) {
         success_count++;
     }
   }
   wstring title = L"Taiga Recognition Test";
-  title += L" - Item count: " + ToWSTR(static_cast<int>(m_EpisodeList.size()));
-  title += L" - Success rate: %" + ToWSTR(((float)success_count / (float)m_EpisodeList.size()) * 100.0f, 2);
+  title += L" - Success rate: " + ToWSTR(success_count) + L"/" + ToWSTR(total_items);
+  title += L" (" + ToWSTR(((float)success_count / (float)total_items) * 100.0f, 2) + L"%)";
   title += L" - Time: " + ToWSTR(tick) + L" ms";
   SetText(title.c_str());
   

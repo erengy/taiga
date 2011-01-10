@@ -210,6 +210,7 @@ BOOL CHTTPClient::OnReadComplete() {
       MainWindow.RefreshList(MAL_WATCHING);
       MainWindow.RefreshTabs(MAL_WATCHING);
       SearchWindow.PostMessage(WM_CLOSE);
+      ExecuteAction(L"CheckNewEpisodes()", TRUE);
       if (GetClientMode() == HTTP_MAL_RefreshList) {
         MainWindow.m_Toolbar.EnableButton(0, true);
         MainWindow.m_Toolbar.EnableButton(1, true);

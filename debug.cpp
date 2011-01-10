@@ -37,7 +37,6 @@ public:
 private:
   DWORD m_dwTick;
 };
-CDebugTest Test;
 
 // =============================================================================
 
@@ -48,6 +47,7 @@ void DebugTest() {
   wstring str;
 
   // Start ticking
+  CDebugTest Test;
   Test.Start();
 
   for (int i = 0; i < 10000; i++) {
@@ -63,8 +63,8 @@ void DebugTest() {
   Test.End(str, 0);
   
   // Default action
-  //ExecuteAction(L"RecognitionTest");
-  AnnounceToTwitter(L"Testing OAuth within Taiga... - " + GetTime());
+  ExecuteAction(L"RecognitionTest");
+  //AnnounceToTwitter(L"Testing OAuth within Taiga... - " + GetTime());
 }
 
 // =============================================================================

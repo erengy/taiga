@@ -374,7 +374,7 @@ FONT 8, "Tahoma", 400, 0, 162
     PUSHBUTTON      "Edit format string...", IDC_BUTTON_FORMAT_MIRC, 20, 40, 85, 14
     RADIOBUTTON     "Active channel", IDC_RADIO_MIRC_CHANNEL1, 20, 145, 100, 10
     RADIOBUTTON     "All open channels", IDC_RADIO_MIRC_CHANNEL2, 20, 155, 100, 10
-    RADIOBUTTON     "Custom: (seperate by a comma)", IDC_RADIO_MIRC_CHANNEL3, 20, 165, 135, 10
+    RADIOBUTTON     "Custom: (separate by a comma)", IDC_RADIO_MIRC_CHANNEL3, 20, 165, 135, 10
     GROUPBOX        "Channels to send message", IDC_STATIC, 10, 130, 295, 70
     AUTOCHECKBOX    "Use ""/me"" action", IDC_CHECK_MIRC_ACTION, 160, 50, 80, 10
     PUSHBUTTON      "Test connection", IDC_BUTTON_MIRC_TEST, 225, 100, 70, 14
@@ -612,8 +612,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,1,0
-    PRODUCTVERSION  0,6,1,0
+    FILEVERSION     0,6,38,0
+    PRODUCTVERSION  0,6,38,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -627,11 +627,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6.1"
+            VALUE "FileVersion", "0.6.38"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6.1"
+            VALUE "ProductVersion", "0.6.38"
         }
     }
     BLOCK "VarFileInfo"

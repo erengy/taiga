@@ -272,9 +272,12 @@ bool IsScriptVariable(const wstring& str) {
 // =============================================================================
 
 wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) {
-  bool is_valid = episode.Index > -1 && episode.Index <= AnimeList.Count;
-  #define VALIDATE(x, y) is_valid ? x : y
+  #define VALIDATE(x, y) episode.Index > -1 && episode.Index <= AnimeList.Count ? x : y
   #define ENCODE(x) url_encode ? EncodeURL(x) : x
+
+  // Prepare episode value
+  wstring episode_number = ToWSTR(GetLastEpisode(episode.Number));
+  TrimLeft(episode_number, L"0");
 
   // Replace variables
   Replace(str, L"%title%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Title), ENCODE(episode.Title)));
@@ -285,7 +288,7 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   Replace(str, L"%image%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Image), L""));
   Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].GetStatus())), L""));
   Replace(str, L"%name%",       ENCODE(episode.Name));
-  Replace(str, L"%episode%",    ENCODE(GetLastEpisode(episode.Number)));
+  Replace(str, L"%episode%",    ENCODE(episode_number));
   Replace(str, L"%version%",    ENCODE(episode.Version));
   Replace(str, L"%group%",      ENCODE(episode.Group));
   Replace(str, L"%resolution%", ENCODE(episode.Resolution));
@@ -356,4 +359,6 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
 
   // Return
   return str;
+  #undef VALIDATE
+  #undef ENCODE
 }

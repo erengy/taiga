@@ -39,7 +39,7 @@ wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool
         // Check root folder
         if (search_folder == true) {
           if (Meow.ExamineTitle(WFD.cFileName, episode, false, false, false, false, false)) {
-            if (Meow.CompareTitle(episode.Title, anime_index)) {
+            if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
               FindClose(hFind);
               return root + WFD.cFileName + L"\\";
             }
@@ -58,7 +58,7 @@ wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool
     } else {
       if (search_folder == false) {
         if (Meow.ExamineTitle(WFD.cFileName, episode, true, true, true, true, true)) {
-          if (Meow.CompareTitle(episode.Title, anime_index)) {
+          if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
             if (episode_number == 0 || episode_number == ToINT(episode.Number)) {
               FindClose(hFind);
               return root + WFD.cFileName;

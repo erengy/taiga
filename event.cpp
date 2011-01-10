@@ -165,9 +165,12 @@ void CEventList::Check() {
   // Update
   EventQueue.UpdateInProgress = true;
   MainWindow.ChangeStatus(L"Updating list...");
-  MAL.Update(Item[Index].AnimeIndex, Item[Index].ID, Item[Index].Episode, 
-    Item[Index].Score, Item[Index].Status, Item[Index].Tags, 
-    Item[Index].Mode);
+  CMALAnimeValues anime;
+  anime.episode = Item[Index].Episode;
+  anime.status = Item[Index].Status;
+  anime.score = Item[Index].Score;
+  anime.tags = Item[Index].Tags;
+  MAL.Update(anime, Item[Index].AnimeIndex, Item[Index].ID, Item[Index].Mode);
 }
 
 void CEventList::Clear() {

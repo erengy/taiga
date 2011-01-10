@@ -25,6 +25,53 @@
 
 /* Erasing */
 
+void Erase(wstring& input, const wstring& find, bool case_insensitive) {
+  if (find.empty() || input.length() < find.length()) return;
+  if (!case_insensitive) {
+    for (size_t pos = input.find(find); pos != wstring::npos; pos = input.find(find, pos)) {
+      input.erase(pos, find.length());
+    }
+  } else {
+    for (size_t i = 0; i < input.length() - find.length() + 1; i++) {
+      for (size_t j = 0; j < find.length(); j++) {
+        if (input.length() < find.length()) return;
+        if (tolower(input[i + j]) == tolower(find[j])) {
+          if (j == find.length() - 1) {
+            input.erase(i--, find.length());
+            break;
+          }
+        } else {
+          i += j;
+          break;
+        }
+      }
+    }
+  }
+}
+
+void EraseChars(wstring& input, const wchar_t chars[]) {
+  size_t pos = 0;
+  do {
+    pos = input.find_first_of(chars, pos);
+    if (pos != wstring::npos) input.erase(pos, 1);
+  } while (pos != wstring::npos);
+}
+
+void ErasePunctuation(wstring& input, bool keep_trailing) {
+  wchar_t c;
+  for (int i = input.length() - 1; i >= 0; i--) {
+    c = input[i];
+    if ((c >  31 && c <  48) || //  !"#$%&'()*+,-./
+        (c >  57 && c <  65) || // :;<=>?@
+        (c >  90 && c <  97) || // [\]^_`
+        (c > 122 && c < 128)) { // {|}~) {
+          if (!keep_trailing) input.erase(i, 1);
+    } else {
+      keep_trailing = false;
+    }
+  }
+}
+
 void EraseLeft(wstring& str, const wstring find, bool case_insensitive) {
   if (str.length() < find.length()) return;
   for (size_t i = 0; i < find.length(); i++) {
@@ -48,6 +95,8 @@ void EraseRight(wstring& str, const wstring find, bool case_insensitive) {
   }
   str.resize(str.length() - find.length());
 }
+
+// =============================================================================
 
 /* Searching and comparison */
 
@@ -145,6 +194,8 @@ bool EndsWith(const wstring& str, const wstring& search) {
   return str.compare(str.length() - search.length(), search.length(), search) == 0;
 }
 
+// =============================================================================
+
 /* Replace */
 
 void Replace(wstring& input, wstring find, wstring replace_with, bool replace_all, bool case_insensitive) {
@@ -181,6 +232,8 @@ void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_w
     if (pos != wstring::npos) input.replace(pos, 1, replace_with);
   } while (pos != wstring::npos);
 }
+
+// =============================================================================
 
 /* Split, tokenize */
 
@@ -222,6 +275,8 @@ size_t Tokenize(const wstring& input, const wstring& delimiters, vector<wstring>
   return tokens.size();
 }
 
+// =============================================================================
+
 /* ANSI <-> Unicode conversion */
 
 const char* ToANSI(const wstring& input, UINT code_page) {
@@ -248,6 +303,8 @@ wstring ToUTF8(const string& input, UINT code_page) {
   }
 }
 
+// =============================================================================
+
 /* Case conversion */
 
 void ToLower(wstring& str) {
@@ -271,6 +328,8 @@ wstring ToUpper_Copy(wstring str) {
     str[i] = toupper(str[i]);
   return str;
 }
+
+// =============================================================================
 
 /* Type conversion */
 
@@ -307,6 +366,8 @@ wstring ToWSTR(const double& value, int count) {
   out << std::fixed << std::setprecision(count) << value;
   return out.str();
 }
+
+// =============================================================================
 
 /* Encoding & Decoding */
 
@@ -386,6 +447,8 @@ void StripHTML(wstring& str) {
   } while (index_begin > -1);
 }
 
+// =============================================================================
+
 /* Trimming */
 
 void Trim(wstring& input, const wchar_t trim_chars[]) {
@@ -404,6 +467,8 @@ void TrimRight(wstring& input, const wchar_t trim_chars[]) {
   const size_t index_end = input.find_last_not_of(trim_chars);
   input.erase(index_end + 1, input.length() - index_end + 1);
 }
+
+// =============================================================================
 
 /* File and folder related */
 
@@ -447,6 +512,8 @@ bool ValidateFileExtension(const wstring& extension, unsigned int max_length) {
   if (!IsAlphanumeric(extension)) return false;
   return true;
 }
+
+// =============================================================================
 
 /* Other */
 

@@ -35,10 +35,28 @@ enum MAL_MyStatus {
   MAL_PLANTOWATCH
 };
 
+enum MAL_RewatchValue {
+  MAL_REWATCH_VERYLOW = 1,
+  MAL_REWATCH_LOW,
+  MAL_REWATCH_MEDIUM,
+  MAL_REWATCH_HIGH,
+  MAL_REWATCH_VERYHIGH
+};
+
 enum MAL_Status {
   MAL_AIRING = 1,
   MAL_FINISHED,
   MAL_NOTYETAIRED
+};
+
+enum MAL_StorageType {
+  MAL_STORAGE_HARDDRIVE = 1,
+  MAL_STORAGE_DVDCD,
+  MAL_STORAGE_NONE,
+  MAL_STORAGE_RETAILDVD,
+  MAL_STORAGE_VHS,
+  MAL_STORAGE_EXTERNALHD,
+  MAL_STORAGE_NAS
 };
 
 enum MAL_Type {
@@ -54,17 +72,40 @@ enum MAL_Type {
 
 class CAnime;
 
+class CMALAnimeValues {
+public:
+  CMALAnimeValues();
+  virtual ~CMALAnimeValues() {};
+  
+  int episode;
+  int status;
+  int score;
+  int downloaded_episodes;
+  int storage_type;
+  float storage_value;
+  int times_rewatched;
+  int rewatch_value;
+  wstring date_start;
+  wstring date_finish;
+  int priority;
+  int enable_discussion;
+  int enable_rewatching;
+  wstring comments;
+  wstring fansub_group;
+  wstring tags;
+};
+
 class CMyAnimeList {
 public:
-  CMyAnimeList();
-  ~CMyAnimeList() {};
+  CMyAnimeList() {};
+  virtual ~CMyAnimeList() {};
 
   void CheckProfile();
   void DownloadImage(CAnime* pAnimeItem);
   bool GetList(bool login);
   bool Login();
   BOOL SearchAnime(wstring title, CAnime* pAnimeItem = NULL);
-  void Update(int index, int id, int episode, int score, int status, wstring tags, int mode);
+  void Update(CMALAnimeValues anime, int list_index, int anime_id, int update_mode);
   bool UpdateSucceeded(const wstring& data, int update_mode, int episode = -1, const wstring& tags = L"");
   
   void DecodeText(wstring& text);
@@ -73,8 +114,10 @@ public:
   wstring TranslateMyStatus(int value, bool add_count);
   int TranslateMyStatus(const wstring& value);
   wstring TranslateNumber(int value, LPCWSTR default_char = L"-");
+  wstring TranslateRewatchValue(int value);
   wstring TranslateStatus(int value);
   int TranslateStatus(const wstring& value);
+  wstring TranslateStorageType(int value);
   wstring TranslateType(int value);
   int TranslateType(const wstring& value);
   void ViewAnimePage(int series_id);

@@ -263,6 +263,7 @@ void CSettingsWindow::OnOK() {
   // Refresh other windows
   if (Settings.Account.MAL.User != mal_user_old) {
     AnimeList.Read();
+    CurrentEpisode.Index = 0;
     MainWindow.RefreshList(MAL_WATCHING);
     MainWindow.RefreshTabs(MAL_WATCHING);
     EventWindow.RefreshList();
