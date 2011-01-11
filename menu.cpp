@@ -181,8 +181,8 @@ void UpdateSearchMenu() {
     for (unsigned int i = 0; i < MENU.Item.size(); i++) {
       MENU.Item[i].Checked = FALSE;
     }
-    if (MainWindow.GetSearchMode() < MENU.Item.size()) {
-      MENU.Item[MainWindow.GetSearchMode()].Checked = TRUE;
+    if (MainWindow.m_SearchBar.Index < MENU.Item.size()) {
+      MENU.Item[MainWindow.m_SearchBar.Index].Checked = TRUE;
     }
   }
 }

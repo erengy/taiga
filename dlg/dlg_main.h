@@ -25,7 +25,9 @@
 
 enum SearchMode {
   SEARCH_MODE_LIST,
-  SEARCH_MODE_MAL
+  SEARCH_MODE_MAL,
+  SEARCH_MODE_TORRENT,
+  SEARCH_MODE_WEB
 };
 
 // =============================================================================
@@ -64,6 +66,15 @@ public:
   CTab m_Tab;
   CToolbar m_Toolbar, m_ToolbarSearch;
   CWindow m_CancelSearch;
+
+  // Search bar
+  class CSearchBar {
+  public:
+    CSearchBar() : Index(0), Mode(0) {}
+    UINT Index, Mode;
+    wstring CueText, URL;
+    void SetMode(UINT index, UINT mode, wstring cue_text = L"Search", wstring url = L"");
+  } m_SearchBar;
   
   // Message handlers
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -87,15 +98,10 @@ public:
   // Other functions
   void ChangeStatus(wstring str = L"");
   int GetListIndex(int anime_index);
-  UINT GetSearchMode() { return m_iSearchMode; }
   void RefreshList(int index = -1);
   void RefreshMenubar(int index = -1, bool show = true);
   void RefreshTabs(int index = -1, bool redraw = true);
-  void SetSearchMode(UINT mode);
   void UpdateTip();
-
-private:
-  UINT m_iSearchMode;
 };
 
 extern CMainWindow MainWindow;

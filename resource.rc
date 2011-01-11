@@ -245,7 +245,7 @@ FONT 8, "Verdana"
 {
     CONTROL         "", IDC_REBAR_MAIN, REBARCLASSNAME, WS_CLIPCHILDREN | WS_CLIPSIBLINGS | 0x00000801, 0, 1, 580, 21
     CONTROL         "", IDC_TOOLBAR_MAIN, "ToolbarWindow32", 0x5600994D, 10, 5, 305, 16
-    EDITTEXT        IDC_EDIT_SEARCH, 485, 30, 85, 12, WS_CLIPCHILDREN | ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_SEARCH, 470, 30, 100, 12, WS_CLIPCHILDREN | ES_AUTOHSCROLL
     CONTROL         "", IDC_TOOLBAR_SEARCH, "ToolbarWindow32", 0x5600894D, 430, 5, 135, 16
     CONTROL         "", IDC_TAB_MAIN, WC_TABCONTROL, WS_TABSTOP | WS_CLIPSIBLINGS, 125, 30, 450, 345
     CONTROL         "", IDC_LIST_MAIN, WC_LISTVIEW, WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | LVS_ALIGNLEFT | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 125, 43, 448, 330
@@ -612,8 +612,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,38,0
-    PRODUCTVERSION  0,6,38,0
+    FILEVERSION     0,6,39,0
+    PRODUCTVERSION  0,6,39,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -627,11 +627,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6.38"
+            VALUE "FileVersion", "0.6.39"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6.38"
+            VALUE "ProductVersion", "0.6.39"
         }
     }
     BLOCK "VarFileInfo"

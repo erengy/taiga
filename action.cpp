@@ -194,11 +194,24 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // SetSearchMode()
   //   Changes search bar mode.
+  //   Body text has 4 parameters: Menu index, search mode, cue text, search URL
   } else if (action == L"SetSearchMode") {
-    if (body == L"List") {
-      MainWindow.SetSearchMode(SEARCH_MODE_LIST);
-    } else if (body == L"MAL") {
-      MainWindow.SetSearchMode(SEARCH_MODE_MAL);
+    vector<wstring> body_vector;
+    Split(body, L", ", body_vector);
+    if (body_vector.size() > 2) {
+      if (body_vector[1] == L"List") {
+        MainWindow.m_SearchBar.SetMode(
+          ToINT(body_vector[0]), SEARCH_MODE_LIST, body_vector[2]);
+      } else if (body_vector[1] == L"MAL") {
+        MainWindow.m_SearchBar.SetMode(
+          ToINT(body_vector[0]), SEARCH_MODE_MAL, body_vector[2]);
+      } else if (body_vector[1] == L"Torrent" && body_vector.size() > 3) {
+        MainWindow.m_SearchBar.SetMode(
+          ToINT(body_vector[0]), SEARCH_MODE_TORRENT, body_vector[2], body_vector[3]);
+      } else if (body_vector[1] == L"Web" && body_vector.size() > 3) {
+        MainWindow.m_SearchBar.SetMode(
+          ToINT(body_vector[0]), SEARCH_MODE_WEB, body_vector[2], body_vector[3]);
+      }
     }
 
   // Settings()

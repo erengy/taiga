@@ -508,7 +508,7 @@ BOOL CMainWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
       wstring text;
       m_EditSearch.GetText(text);
       m_CancelSearch.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
-      switch (GetSearchMode()) {
+      switch (m_SearchBar.Mode) {
         case SEARCH_MODE_LIST:
           AnimeList.Filter.Text = text;
           RefreshList(text.empty() ? -1 : 0);
@@ -553,7 +553,13 @@ LRESULT CMainWindow::OnToolbarNotify(LPARAM lParam) {
     case TBN_GETINFOTIP: {
       NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(lParam);
       git->cchTextMax = INFOTIPSIZE;
-      git->pszText = (LPWSTR)(m_Toolbar.GetButtonTooltip(git->lParam));
+      // Main toolbar
+      if (git->hdr.hwndFrom == m_Toolbar.GetWindowHandle()) {
+        git->pszText = (LPWSTR)(m_Toolbar.GetButtonTooltip(git->lParam));
+      // Search toolbar
+      } else if (git->hdr.hwndFrom == m_ToolbarSearch.GetWindowHandle()) {
+        git->pszText = (LPWSTR)(m_ToolbarSearch.GetButtonTooltip(git->lParam));
+      }
       break;
     }
   }

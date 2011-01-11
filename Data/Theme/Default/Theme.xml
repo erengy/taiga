@@ -117,6 +117,9 @@
 			</menu>
 			<!-- Useful links -->
 			<menu name="Links">
+				<item name="How to Watch Anime" action="URL(http://myanimelist.net/clubs.php?cid=8711)"/>
+				<item name="Winter 2011 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
+				<item type="seperator"/>
 				<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
 				<item name="The Fansub Wiki"  action="URL(http://www.fansubwiki.com/)"/>
 			</menu>
@@ -129,8 +132,11 @@
 		
 		<!-- Search bar -->
 		<menu name="SearchBar">
-			<item name="List"        action="SetSearchMode(List)" radio="1"/>
-			<item name="MyAnimeList" action="SetSearchMode(MAL)"  radio="1"/>
+			<item name="List"        action="SetSearchMode(0, List, Search list)" radio="1"/>
+			<item name="MyAnimeList" action="SetSearchMode(1, MAL, Search MyAnimeList)"  radio="1"/>
+			<item type="seperator"/>
+			<item name="NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2&term=%search%)" radio="1"/>
+			<item name="TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&_id=a1de48c2d65e13f4e022a982432b41b0&_render=rss)" radio="1"/>
 		</menu>
 		
 		<!-- Search list -->

@@ -44,7 +44,6 @@ CMainWindow MainWindow;
 
 CMainWindow::CMainWindow() {
   RegisterDlgClass(L"TaigaMainW");
-  m_iSearchMode = SEARCH_MODE_LIST;
 }
 
 BOOL CMainWindow::OnInitDialog() {
@@ -74,7 +73,7 @@ BOOL CMainWindow::OnInitDialog() {
   m_EditSearch.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   m_EditSearch.SetCueBannerText(L"Search list");
   m_EditSearch.SetParent(m_ToolbarSearch.GetWindowHandle());
-  m_EditSearch.SetPosition(NULL, ScaleX(32), 1, 140, 20);
+  m_EditSearch.SetPosition(NULL, ScaleX(32), 1, 200, 20);
   m_EditSearch.SetMargins(1, 16);
   CRect rcEdit; m_EditSearch.GetRect(&rcEdit);
   // Create cancel search button
@@ -135,7 +134,7 @@ BOOL CMainWindow::OnInitDialog() {
   m_Rebar.InsertBand(NULL, 0, 0, 0, 0, 0, 0, 0, 0, fMask, fStyle);
   m_Rebar.InsertBand(m_Toolbar.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
     HIWORD(m_Toolbar.GetButtonSize()) + (HIWORD(m_Toolbar.GetPadding()) / 2), fMask, fStyle);
-  m_Rebar.InsertBand(m_ToolbarSearch.GetWindowHandle(), 0, 0, 0, 180, 0, 0, 0, 
+  m_Rebar.InsertBand(m_ToolbarSearch.GetWindowHandle(), 0, 0, 0, 240, 0, 0, 0, 
     HIWORD(m_ToolbarSearch.GetButtonSize()), fMask, fStyle);
 
   // Insert tabs and list groups
@@ -249,7 +248,7 @@ BOOL CMainWindow::PreTranslateMessage(MSG* pMsg) {
           }
           // Search
           case VK_RETURN: {
-            switch (MainWindow.GetSearchMode()) {
+            switch (m_SearchBar.Mode) {
               case SEARCH_MODE_MAL: {
                 wstring text;
                 m_EditSearch.GetText(text);
@@ -263,6 +262,23 @@ BOOL CMainWindow::PreTranslateMessage(MSG* pMsg) {
                     return TRUE;
                   }
                 }
+                break;
+              }
+              case SEARCH_MODE_TORRENT: {
+                wstring text;
+                m_EditSearch.GetText(text);
+                wstring search_url = m_SearchBar.URL;
+                Replace(search_url, L"%search%", text);
+                Torrents.Check(search_url);
+                ExecuteAction(L"Torrents");
+                break;
+              }
+              case SEARCH_MODE_WEB: {
+                wstring text;
+                m_EditSearch.GetText(text);
+                wstring search_url = m_SearchBar.URL;
+                Replace(search_url, L"%search%", text);
+                ExecuteLink(search_url);
                 break;
               }
             }
@@ -712,21 +728,26 @@ void CMainWindow::RefreshTabs(int index, bool redraw) {
   m_Tab.Show(SW_SHOW);
 }
 
-void CMainWindow::SetSearchMode(UINT mode) {
-  m_iSearchMode = mode;
+void CMainWindow::CSearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wstring url) {
+  Index = index;
+  Mode = mode;
+  URL = url;
+  CueText = cue_text;
+  MainWindow.m_EditSearch.SetCueBannerText(cue_text.c_str());
+
   switch (mode) {
     case SEARCH_MODE_LIST:
-      m_EditSearch.SetCueBannerText(L"Search list");
-      m_EditSearch.GetText(AnimeList.Filter.Text);
+      MainWindow.m_EditSearch.GetText(AnimeList.Filter.Text);
       if (!AnimeList.Filter.Text.empty()) {
-        RefreshList(0);
+        MainWindow.RefreshList(0);
       }
       break;
     case SEARCH_MODE_MAL:
-      m_EditSearch.SetCueBannerText(L"Search MyAnimeList");
+    case SEARCH_MODE_TORRENT:
+    case SEARCH_MODE_WEB:
       if (!AnimeList.Filter.Text.empty()) {
         AnimeList.Filter.Text.clear();
-        RefreshList();
+        MainWindow.RefreshList();
       }
       break;
   }
