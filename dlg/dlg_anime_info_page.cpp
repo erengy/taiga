@@ -82,16 +82,27 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
         }
       } else {
         text = pAnimeItem->Synopsis;
+        if (pAnimeItem->Genres.empty()) {
+          MAL.GetAnimeDetails(pAnimeItem);
+        }
       }
       SetDlgItemText(IDC_EDIT_ANIME_INFO, text.c_str());
       
       // Set information
       text = MAL.TranslateType(pAnimeItem->Series_Type) + L"\n" + 
-        MAL.TranslateNumber(pAnimeItem->Series_Episodes, L"Unknown") + L"\n" + 
-        MAL.TranslateStatus(pAnimeItem->Series_Status) + L"\n" + 
-        MAL.TranslateDate(pAnimeItem->Series_Start) + L"\n" + 
-        pAnimeItem->Score;
+             MAL.TranslateNumber(pAnimeItem->Series_Episodes, L"Unknown") + L"\n" + 
+             MAL.TranslateStatus(pAnimeItem->Series_Status) + L"\n" + 
+             MAL.TranslateDate(pAnimeItem->Series_Start);
       SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
+      #define ADD_INFOLINE(x, y) (pAnimeItem->x.empty() ? y : pAnimeItem->x)
+      wstring genres = pAnimeItem->Genres; LimitText(pAnimeItem->Genres, 50); // TEMP
+      text = ADD_INFOLINE(Genres, L"-") + L"\n" +
+             ADD_INFOLINE(Score, L"0.00") + L"\n" + 
+             ADD_INFOLINE(Rank, L"#0") + L"\n" + 
+             ADD_INFOLINE(Popularity, L"#0");
+      #undef ADD_INFOLINE
+      pAnimeItem->Genres = genres;
+      SetDlgItemText(IDC_STATIC_ANIME_INFO2, text.c_str());
     }
 
     // =========================================================================
@@ -102,6 +113,14 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0, 
         pAnimeItem->Series_Episodes > 0 ? pAnimeItem->Series_Episodes : 999);
       SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, pAnimeItem->GetLastWatchedEpisode());
+
+      // Re-watching
+      if (pAnimeItem->GetStatus() == MAL_COMPLETED) {
+        CheckDlgButton(IDC_CHECK_ANIME_REWATCH, pAnimeItem->GetRewatching());
+        ShowDlgItem(IDC_CHECK_ANIME_REWATCH);
+      } else {
+        HideDlgItem(IDC_CHECK_ANIME_REWATCH);
+      }
 
       // Status
       CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
@@ -185,6 +204,12 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_ALT));
       m_Edit.SetCueBannerText(L"Enter alternative titles here, seperated by a semicolon (e.g. Title 1; Title 2)");
       m_Edit.SetText(pAnimeItem->Synonyms);
+      m_Edit.SetWindowHandle(NULL);
+
+      //// Fansub group
+      m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_FANSUB));
+      m_Edit.SetCueBannerText(L"Enter fansub group preference, which will be used for torrents (e.g. THORA)");
+      m_Edit.SetText(pAnimeItem->FansubGroup);
       m_Edit.SetWindowHandle(NULL);
     }
   }

@@ -39,82 +39,82 @@ CEventList::CEventList() :
 {
 }
 
-void CEventList::Add(int anime_index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
+void CEventList::Add(CEventItem& item) {
   // Validate values
-  if (anime_index > 0 && anime_index <= AnimeList.Count && mode != HTTP_MAL_AnimeAdd) {
-    if (AnimeList.Item[anime_index].GetLastWatchedEpisode() == episode || episode < 0) {
-      episode = -1;
+  if (item.AnimeIndex > 0 && item.AnimeIndex <= AnimeList.Count && item.Mode != HTTP_MAL_AnimeAdd) {
+    if (AnimeList.Item[item.AnimeIndex].GetLastWatchedEpisode() == item.episode || item.episode < 0) {
+      item.episode = -1;
     }
-    if (AnimeList.Item[anime_index].GetScore() == score || score < 0 || score > 10) {
-      score = -1;
+    if (AnimeList.Item[item.AnimeIndex].GetScore() == item.score || item.score < 0 || item.score > 10) {
+      item.score = -1;
     }
-    if (AnimeList.Item[anime_index].GetStatus() == status || status < 1 || status == 5 || status > 6) {
-      status = -1;
+    if (AnimeList.Item[item.AnimeIndex].GetStatus() == item.status || item.status < 1 || item.status == 5 || item.status > 6) {
+      item.status = -1;
     }
-    if (AnimeList.Item[anime_index].GetTags() == tags) {
-      tags = EMPTY_STR;
+    if (AnimeList.Item[item.AnimeIndex].GetRewatching() == item.enable_rewatching) {
+      item.enable_rewatching = -1;
+    }
+    if (AnimeList.Item[item.AnimeIndex].GetTags() == item.tags) {
+      item.tags = EMPTY_STR;
     }
   }
-  switch (mode) {
+  switch (item.Mode) {
     case HTTP_MAL_AnimeEdit:
-      if (episode == -1 && score == -1 && status == -1 && tags == EMPTY_STR) return;
+      if (item.episode == -1 && item.score == -1 && item.status == -1 && item.enable_rewatching == -1 && item.tags == EMPTY_STR) return;
       break;
     case HTTP_MAL_AnimeUpdate:
-      if (episode == -1) return;
+      if (item.episode == -1) return;
       break;
     case HTTP_MAL_ScoreUpdate:
-      if (score == -1) return;
+      if (item.score == -1) return;
       break;
     case HTTP_MAL_StatusUpdate:
-      if (status == -1) return;
+      if (item.status == -1) return;
       break;
     case HTTP_MAL_TagUpdate:
-      if (tags == EMPTY_STR) return;
+      if (item.tags == EMPTY_STR) return;
       break;
   }
 
   // Compare with previous items in buffer
   for (unsigned int i = 0; i < Item.size(); i++) {
-    if (Item[i].AnimeIndex == anime_index && Item[i].Mode == mode) { 
-      if ((score > -1 && Item[i].Score > -1  && Item[i].Score != score) ||
-        (status > -1 && Item[i].Status > -1 && Item[i].Status != status) ||
-        (tags != EMPTY_STR && Item[i].Tags != EMPTY_STR && Item[i].Tags != tags) ||
-        (Item[i].Episode == episode && Item[i].Score == score && Item[i].Status == status && Item[i].Tags == tags)) {
-          if (!EventQueue.UpdateInProgress) {
-            Remove(i);
-            break;
-          }
+    if (Item[i].AnimeIndex == item.AnimeIndex && Item[i].Mode == item.Mode) { 
+      #define COMPAREITEMS(x) item.x == Item[i].x
+      #define COMPAREITEMSI(x) (item.x > -1 && Item[i].x > -1 && item.x != Item[i].x)
+      #define COMPAREITEMSS(x) (item.x != EMPTY_STR && Item[i].x != EMPTY_STR && item.x != Item[i].x)
+      if (COMPAREITEMSI(score) || COMPAREITEMSI(status) || COMPAREITEMSI(enable_rewatching) || COMPAREITEMSS(tags) ||
+         (COMPAREITEMS(episode) && COMPAREITEMS(score) && COMPAREITEMS(status) && COMPAREITEMS(enable_rewatching) &&  COMPAREITEMS(tags))) {
+           if (!EventQueue.UpdateInProgress) {
+             Remove(i);
+             break;
+           }
       }
+      #undef COMPAREITEMS
+      #undef COMPAREITEMSI
+      #undef COMPAREITEMSS
     }
   }
 
   // Add new item
-  Item.resize(Item.size() + 1);
-  Item.back().Index = Item.size();
-  Item.back().ID = id > 0 ? id : AnimeList.Item[anime_index].Series_ID;
-  Item.back().AnimeIndex = anime_index;
-  Item.back().Episode = episode;
-  Item.back().Score = score;
-  Item.back().Status = status;
-  Item.back().Tags = tags;
-  Item.back().Mode = mode;
-  Item.back().Time = time.empty() ? GetDate() + L" " + GetTime() : time;
+  if (!item.AnimeID) item.AnimeID = AnimeList.Item[item.AnimeIndex].Series_ID;
+  if (item.Time.empty()) item.Time = GetDate() + L" " + GetTime();
+  Item.push_back(item);
 
-  if (anime_index > 0 && anime_index <= AnimeList.Count) {
+  if (item.AnimeIndex > 0 && item.AnimeIndex <= AnimeList.Count) {
     // Announce
-    if (Taiga.LoggedIn && Taiga.UpdatesEnabled && episode > 0) {
-      CEpisode temp_episode;
-      temp_episode.Index = anime_index;
-      temp_episode.Number = ToWSTR(episode);
+    if (Taiga.LoggedIn && Taiga.UpdatesEnabled && item.episode > 0) {
+      CEpisode episode;
+      episode.Index = item.AnimeIndex;
+      episode.Number = ToWSTR(item.episode);
       Taiga.PlayStatus = PLAYSTATUS_UPDATED;
-      ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&temp_episode));
-      ExecuteAction(L"AnnounceToTwitter", 0, reinterpret_cast<LPARAM>(&temp_episode));
+      ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&episode));
+      ExecuteAction(L"AnnounceToTwitter", 0, reinterpret_cast<LPARAM>(&episode));
     }
 
     // Check new episodes
-    if (episode > -1) {
-      AnimeList.Item[anime_index].NewEps = false;
-      AnimeList.Item[anime_index].CheckNewEpisode();
+    if (item.episode > -1) {
+      AnimeList.Item[item.AnimeIndex].NewEps = false;
+      AnimeList.Item[item.AnimeIndex].CheckNewEpisode();
     }
     
     // Refresh event window
@@ -127,7 +127,7 @@ void CEventList::Add(int anime_index, int id, int episode, int score, int status
     // Change status
     if (!Taiga.LoggedIn) {
       MainWindow.ChangeStatus(L"Item added to the event queue. (" + 
-        AnimeList.Item[anime_index].Series_Title + L")");
+        AnimeList.Item[item.AnimeIndex].Series_Title + L")");
     }
 
     // Update
@@ -148,9 +148,9 @@ void CEventList::Check() {
   }
   
   // Compare ID with anime list
-  if (Index > 0 && AnimeList.Item[Item[Index].AnimeIndex].Series_ID != Item[Index].ID) {
+  if (Index > 0 && AnimeList.Item[Item[Index].AnimeIndex].Series_ID != Item[Index].AnimeID) {
     for (int i = 1; i <= AnimeList.Count; i++) {
-      if (AnimeList.Item[i].Series_ID == Item[Index].ID) {
+      if (AnimeList.Item[i].Series_ID == Item[Index].AnimeID) {
         Item[Index].AnimeIndex = i;
         break;
       }
@@ -165,12 +165,8 @@ void CEventList::Check() {
   // Update
   EventQueue.UpdateInProgress = true;
   MainWindow.ChangeStatus(L"Updating list...");
-  CMALAnimeValues anime;
-  anime.episode = Item[Index].Episode;
-  anime.status = Item[Index].Status;
-  anime.score = Item[Index].Score;
-  anime.tags = Item[Index].Tags;
-  MAL.Update(anime, Item[Index].AnimeIndex, Item[Index].ID, Item[Index].Mode);
+  CMALAnimeValues* anime = reinterpret_cast<CMALAnimeValues*>(&Item[Index]);
+  MAL.Update(*anime, Item[Index].AnimeIndex, Item[Index].AnimeID, Item[Index].Mode);
 }
 
 void CEventList::Clear() {
@@ -192,22 +188,27 @@ CEventItem* CEventList::SearchItem(int anime_index, int search_mode) {
       switch (search_mode) {
         // Episode
         case EVENT_SEARCH_EPISODE:
-          if (Item[i].Episode > -1)
+          if (Item[i].episode > -1)
+            return &Item[i];
+          break;
+        // Rewatching
+        case EVENT_SEARCH_REWATCH:
+          if (Item[i].enable_rewatching > -1)
             return &Item[i];
           break;
         // Score
         case EVENT_SEARCH_SCORE:
-          if (Item[i].Score > -1)
+          if (Item[i].score > -1)
             return &Item[i];
           break;
         // Status
         case EVENT_SEARCH_STATUS:
-          if (Item[i].Status > -1)
+          if (Item[i].status > -1)
             return &Item[i];
           break;
         // Tags
         case EVENT_SEARCH_TAGS:
-          if (Item[i].Tags != EMPTY_STR)
+          if (Item[i].tags != EMPTY_STR)
             return &Item[i];
           break;
         // Default
@@ -226,14 +227,14 @@ CEventQueue::CEventQueue() :
 {
 }
 
-void CEventQueue::Add(wstring user, int anime_index, int id, int episode, int score, int status, wstring tags, wstring time, int mode) {
+void CEventQueue::Add(CEventItem& item, wstring user) {
   int user_index = GetUserIndex(user);
   if (user_index == -1) {
     List.resize(List.size() + 1);
     List.back().User = user.empty() ? Settings.Account.MAL.User : user;
     user_index = List.size() - 1;
   }
-  List[user_index].Add(anime_index, id, episode, score, status, tags, time, mode);
+  List[user_index].Add(item);
 }
 
 void CEventQueue::Check() {

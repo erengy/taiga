@@ -90,10 +90,12 @@ void UpdateAnimeMenu(int anime_index) {
     // Add items
     MENU.CreateItem(L"PlayLast()", 
       L"Last watched (#" + ToWSTR(AnimeList.Item[anime_index].GetLastWatchedEpisode()) + L")", 
-      L"", false, false, AnimeList.Item[anime_index].GetLastWatchedEpisode() > 0);
+      L"", false, false, 
+      AnimeList.Item[anime_index].GetLastWatchedEpisode() > 0);
     MENU.CreateItem(L"PlayNext()", 
       L"Next episode (#" + ToWSTR(AnimeList.Item[anime_index].GetLastWatchedEpisode() + 1) + L")", 
-      L"", false, false, AnimeList.Item[anime_index].GetStatus() != MAL_COMPLETED);
+      L"", false, false, 
+      AnimeList.Item[anime_index].GetLastWatchedEpisode() < AnimeList.Item[anime_index].Series_Episodes);
     MENU.CreateItem(L"PlayRandom()", L"Random episode");
     MENU.CreateItem();
     MENU.CreateItem(L"", L"Episode", L"PlayEpisode");

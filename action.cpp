@@ -301,9 +301,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       MainWindow.RefreshList(pAnimeItem->My_Status);
       MainWindow.RefreshTabs(pAnimeItem->My_Status);
       SearchWindow.RefreshList();
-      EventQueue.Add(L"", AnimeList.Count, pAnimeItem->Series_ID, 
-        pAnimeItem->My_WatchedEpisodes ? pAnimeItem->My_WatchedEpisodes : -1, 
-        -1, status, EMPTY_STR, L"", HTTP_MAL_AnimeAdd);
+      CEventItem item;
+      item.AnimeIndex = AnimeList.Count;
+      item.AnimeID = pAnimeItem->Series_ID;
+      item.episode = pAnimeItem->My_WatchedEpisodes ? pAnimeItem->My_WatchedEpisodes : -1;
+      item.status = status;
+      item.Mode = HTTP_MAL_AnimeAdd;
+      EventQueue.Add(item);
     }
 
   // ===========================================================================
@@ -509,8 +513,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() == IDYES) {
-      EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-        -1, -1, -1, EMPTY_STR, L"", HTTP_MAL_AnimeDelete);
+      CEventItem item;
+      item.AnimeIndex = AnimeList.Index;
+      item.AnimeID = AnimeList.Item[AnimeList.Index].Series_ID;
+      item.Mode = HTTP_MAL_AnimeDelete;
+      EventQueue.Add(item);
     }
 
   // EditEpisode()
@@ -533,9 +540,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Changes anime score.
   //   Value must be between 0-10 and different from current score.
   } else if (action == L"EditScore") {
-    int score = ToINT(body);
-    EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-      -1, score, -1, EMPTY_STR, L"", HTTP_MAL_ScoreUpdate);
+    CEventItem item;
+    item.AnimeIndex = AnimeList.Index;
+    item.AnimeID = AnimeList.Item[AnimeList.Index].Series_ID;
+    item.score = ToINT(body);
+    item.Mode = HTTP_MAL_ScoreUpdate;
+    EventQueue.Add(item);
 
   // EditStatus(value)
   //   Changes anime status of user.
@@ -571,8 +581,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         if (episode == 0) episode = -1;
         break;
     }
-    EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-      episode, -1, status, EMPTY_STR, L"", episode == -1 ? HTTP_MAL_StatusUpdate : HTTP_MAL_AnimeEdit);
+    CEventItem item;
+    item.AnimeIndex = AnimeList.Index;
+    item.AnimeID = AnimeList.Item[AnimeList.Index].Series_ID;
+    item.episode = episode;
+    item.status = status;
+    item.Mode = episode == -1 ? HTTP_MAL_StatusUpdate : HTTP_MAL_AnimeEdit;
+    EventQueue.Add(item);
 
   // EditTags(tags)
   //   Changes anime tags.
@@ -584,8 +599,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.Text = AnimeList.Item[AnimeList.Index].GetTags();
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {
-      EventQueue.Add(L"", AnimeList.Index, AnimeList.Item[AnimeList.Index].Series_ID, 
-        -1, -1, -1, dlg.Text, L"", HTTP_MAL_TagUpdate);
+      CEventItem item;
+      item.AnimeIndex = AnimeList.Index;
+      item.AnimeID = AnimeList.Item[AnimeList.Index].Series_ID;
+      item.tags = dlg.Text;
+      item.Mode = HTTP_MAL_TagUpdate;
+      EventQueue.Add(item);
     }
 
   // EditTitles(titles)
@@ -594,12 +613,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditTitles") {
     CInputDialog dlg;
     dlg.Title = AnimeList.Item[AnimeList.Index].Series_Title;
-    dlg.Info  = L"Please enter alternative titles, seperated by a semicolon:";
-    dlg.Text  = AnimeList.Item[AnimeList.Index].Synonyms;
+    dlg.Info = L"Please enter alternative titles, seperated by a semicolon:";
+    dlg.Text = AnimeList.Item[AnimeList.Index].Synonyms;
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {
       AnimeList.Item[AnimeList.Index].Synonyms = dlg.Text;
-      Settings.Anime.SetItem(AnimeList.Item[AnimeList.Index].Series_ID, EMPTY_STR, dlg.Text);
+      Settings.Anime.SetItem(AnimeList.Item[AnimeList.Index].Series_ID, EMPTY_STR, EMPTY_STR, dlg.Text);
       if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
     }
   
@@ -619,6 +638,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
     Execute(AnimeList.Item[AnimeList.Index].Folder);
+
+  // SetFolder()
+  //   Lets user set an anime folder.
+  } else if (action == L"SetFolder") {
+    wstring path, title = L"Anime title: " + AnimeList.Item[AnimeList.Index].Series_Title;
+    if (BrowseForFolder(MainWindow.GetWindowHandle(), title.c_str(), 
+      BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
+        AnimeList.Item[AnimeList.Index].Folder = path;
+        Settings.Anime.SetItem(AnimeList.Item[AnimeList.Index].Series_ID, EMPTY_STR, path, EMPTY_STR);
+    }
+
+  // ===========================================================================
 
   // PlayEpisode(value)
   //   Searches for an episode of an anime and plays it.

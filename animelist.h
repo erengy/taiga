@@ -76,7 +76,7 @@ public:
     wstring my_tags);
   void Clear();
   BOOL Read();
-  BOOL Write(int index, wstring child, wstring value, int mode);
+  BOOL Write(int index, wstring child, wstring value, int mode = ANIMELIST_EDITANIME);
   void DeleteItem(int index);
   int FindItemByID(int anime_id);
 

@@ -67,11 +67,11 @@ public:
   // Anime
   class CSettingsAnime {
   public:
-    void SetItem(int id, wstring folder, wstring titles);
+    void SetItem(int id, wstring fansub, wstring folder, wstring titles);
     class CSettingsAnimeItem {
     public:
       int ID;
-      wstring Folder, Titles;
+      wstring FansubGroup, Folder, Titles;
     };
     vector<CSettingsAnimeItem> Item;
   } Anime;
@@ -124,6 +124,7 @@ public:
     class CSettingsProgramGeneral {
     public:
       BOOL AutoStart, Close, Minimize;
+      int SearchIndex, SizeX, SizeY;
       wstring Theme;
     } General;
     // Start-up

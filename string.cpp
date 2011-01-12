@@ -132,6 +132,19 @@ int InStr(const wstring& str, const wstring find, int pos, bool case_insensitive
   }
 }
 
+wstring InStr(const wstring& str, const wstring& str_left, const wstring& str_right) {
+  wstring output;
+  int index_begin = InStr(str, str_left);
+  if (index_begin > -1) {
+    index_begin += str_left.length();
+    int index_end = InStr(str, str_right, index_begin);
+    if (index_end > -1) {
+      output = str.substr(index_begin, index_end - index_begin);
+    }
+  }
+  return output;
+}
+
 int InStrRev(const wstring& str, const wstring find, int pos) {
   size_t i = str.rfind(find, pos);
   return (i != wstring::npos) ? i : -1;
@@ -450,6 +463,15 @@ void StripHTML(wstring& str) {
 // =============================================================================
 
 /* Trimming */
+
+void LimitText(wstring& input, unsigned int limit, const wstring& tail) {
+  if (input.length() > limit) {
+    input.resize(limit);
+    if (!tail.empty() && input.length() > tail.length()) {
+      input.replace(input.length() - tail.length(), tail.length(), tail);
+    }
+  }
+}
 
 void Trim(wstring& input, const wchar_t trim_chars[]) {
   const size_t index_begin = input.find_first_not_of(trim_chars);

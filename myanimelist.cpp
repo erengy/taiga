@@ -60,6 +60,15 @@ void CMyAnimeList::CheckProfile() {
     HTTP_MAL_Profile);
 }
 
+bool CMyAnimeList::GetAnimeDetails(CAnime* pAnimeItem) {
+  if (!pAnimeItem) return false;
+  return SearchClient.Connect(L"myanimelist.net", 
+    L"/includes/ajax.inc.php?t=64&id=" + ToWSTR(pAnimeItem->Series_ID), 
+    L"", L"GET", L"", L"myanimelist.net", 
+    L"", HTTP_MAL_AnimeDetails, 
+    reinterpret_cast<LPARAM>(pAnimeItem));
+}
+
 bool CMyAnimeList::GetList(bool login) {
   if (Settings.Account.MAL.User.empty()) return false;
   return MainClient.Get(L"myanimelist.net", 
@@ -161,22 +170,20 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
         switch (update_mode) { // TODO: Move to CEventList::Check() or somewhere else
           case HTTP_MAL_AnimeEdit: {
             if (ANIME.My_StartDate != L"0000-00-00" && !ANIME.My_StartDate.empty()) {
-              anime.date_start = 
-                ANIME.My_StartDate.substr(5, 2) + 
-                ANIME.My_StartDate.substr(8, 2) + 
-                ANIME.My_StartDate.substr(0, 4);
+              anime.date_start = ANIME.My_StartDate.substr(5, 2) + 
+                                 ANIME.My_StartDate.substr(8, 2) + 
+                                 ANIME.My_StartDate.substr(0, 4);
             }
             if (ANIME.My_FinishDate != L"0000-00-00" && !ANIME.My_FinishDate.empty()) {
-              anime.date_finish = 
-                ANIME.My_FinishDate.substr(5, 2) + 
-                ANIME.My_FinishDate.substr(8, 2) + 
-                ANIME.My_FinishDate.substr(0, 4);
+              anime.date_finish = ANIME.My_FinishDate.substr(5, 2) + 
+                                  ANIME.My_FinishDate.substr(8, 2) + 
+                                  ANIME.My_FinishDate.substr(0, 4);
             }
             break;
           }
         }
-        //ADD_DATA_S(L"date_start", anime.date_start);
-        //ADD_DATA_S(L"date_finish", anime.date_finish);
+        ADD_DATA_S(L"date_start", anime.date_start);
+        ADD_DATA_S(L"date_finish", anime.date_finish);
         ADD_DATA_I(L"priority", anime.priority);
         ADD_DATA_I(L"enable_discussion", anime.enable_discussion);
         ADD_DATA_I(L"enable_rewatching", anime.enable_rewatching);

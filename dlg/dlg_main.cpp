@@ -52,7 +52,12 @@ BOOL CMainWindow::OnInitDialog() {
   
   // Set member variables
   CRect rect; GetWindowRect(&rect);
-  SetSizeMin(786 /*rect.Width()*/, 568 /*rect.Height()*/);
+  /*m_SearchBar.Index = Settings.Program.General.SearchIndex;
+  if (Settings.Program.General.SizeX && Settings.Program.General.SizeY) {
+    SetPosition(NULL, 0, 0, Settings.Program.General.SizeX, Settings.Program.General.SizeY, 
+      SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+  }*/
+  SetSizeMin(ScaleX(786), ScaleY(568));
   SetSnapGap(10);
 
   // Set icon
@@ -154,6 +159,8 @@ BOOL CMainWindow::OnInitDialog() {
   ChangeStatus();
   // Refresh list
   RefreshList(MAL_WATCHING);
+  // Set search bar mode
+  //m_SearchBar.SetMode(); // TODO
   // Refresh menu bar
   RefreshMenubar();
 
@@ -297,7 +304,7 @@ BOOL CMainWindow::PreTranslateMessage(MSG* pMsg) {
 
 BOOL CMainWindow::OnClose() {
   if (Settings.Program.General.Close) {
-    Show(SW_HIDE);
+    Hide();
     return TRUE;
   }
   if (Settings.Program.Exit.Ask) {
@@ -384,10 +391,14 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
     }
     case WM_SIZE: {
       if (IsIconic()) {
-        if (Settings.Program.General.Minimize) Show(SW_HIDE);
+        if (Settings.Program.General.Minimize) Hide();
         return;
       }
       
+      // Save size settings
+      Settings.Program.General.SizeX = size.cx;
+      Settings.Program.General.SizeY = size.cy;
+      // Set window area
       CRect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
       rcWindow.Inflate(-ScaleX(CONTROL_MARGIN), -ScaleY(CONTROL_MARGIN));
@@ -644,7 +655,7 @@ void CMainWindow::RefreshList(int index) {
   SetText(title.c_str());
 
   // Hide list to avoid visual defects and gain performance
-  m_List.Show(SW_HIDE);
+  m_List.Hide();
   m_List.EnableGroupView(index == 0);
   m_List.DeleteAllItems();
 
@@ -657,7 +668,7 @@ void CMainWindow::RefreshList(int index) {
   int icon_index = 0;
   int group_count[6] = {0};
   for (int i = 1; i <= AnimeList.Count; i++) {
-    if (AnimeList.Item[i].GetStatus() == index || index == 0) {
+    if (AnimeList.Item[i].GetStatus() == index || index == 0 || (index == MAL_WATCHING && AnimeList.Item[i].GetRewatching())) {
       if (AnimeList.Filter.Check(i)) {
         icon_index = AnimeList.Item[i].Playing ? Icon16_Play : StatusToIcon(AnimeList.Item[i].Series_Status);
         group_count[AnimeList.Item[i].GetStatus() - 1]++;
@@ -712,7 +723,7 @@ void CMainWindow::RefreshTabs(int index, bool redraw) {
   if (!redraw) return;
   
   // Hide
-  m_Tab.Show(SW_HIDE);
+  m_Tab.Hide();
 
   // Refresh text
   for (int i = 1; i <= 6; i++) {
@@ -734,6 +745,7 @@ void CMainWindow::CSearchBar::SetMode(UINT index, UINT mode, wstring cue_text, w
   URL = url;
   CueText = cue_text;
   MainWindow.m_EditSearch.SetCueBannerText(cue_text.c_str());
+  Settings.Program.General.SearchIndex = index;
 
   switch (mode) {
     case SEARCH_MODE_LIST:

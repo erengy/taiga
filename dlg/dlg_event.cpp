@@ -107,16 +107,17 @@ void CEventWindow::RefreshList() {
   int user_index = EventQueue.GetUserIndex();
   if (user_index > -1) {
     for (size_t i = 0; i < EventQueue.List[user_index].Item.size(); i++) {
-      int episode  = EventQueue.List[user_index].Item[i].Episode; if (episode == -1) episode++;
-      int score    = EventQueue.List[user_index].Item[i].Score;   if (score == -1) score++;
-      int status   = EventQueue.List[user_index].Item[i].Status;
-      wstring tags = EventQueue.List[user_index].Item[i].Tags;    if (tags == EMPTY_STR) tags.clear();
+      int episode = EventQueue.List[user_index].Item[i].episode; if (episode == -1) episode++;
+      int score = EventQueue.List[user_index].Item[i].score; if (score == -1) score++;
+      int status = EventQueue.List[user_index].Item[i].status;
+      int rewatching = EventQueue.List[user_index].Item[i].enable_rewatching;
+      wstring tags = EventQueue.List[user_index].Item[i].tags; if (tags == EMPTY_STR) tags.clear();
 
       if (EventQueue.List[user_index].Item[i].AnimeIndex <= AnimeList.Count) {
         m_List.InsertItem(i, -1, -1, AnimeList.Item[EventQueue.List[user_index].Item[i].AnimeIndex].Series_Title.c_str(), 0);
         m_List.SetItem(i, 1, MAL.TranslateNumber(episode, L"").c_str());
         m_List.SetItem(i, 2, MAL.TranslateNumber(score, L"").c_str());
-        m_List.SetItem(i, 3, MAL.TranslateMyStatus(status, false).c_str());
+        m_List.SetItem(i, 3, rewatching != TRUE ? MAL.TranslateMyStatus(status, false).c_str() : L"Re-watching");
         m_List.SetItem(i, 4, tags.c_str());
         m_List.SetItem(i, 5, EventQueue.List[user_index].Item[i].Time.c_str());
       }

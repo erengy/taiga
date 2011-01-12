@@ -108,7 +108,7 @@ void CTorrentWindow::RefreshList() {
   if (!IsWindow()) return;
   
   // Hide list to avoid visual defects and gain performance
-  m_List.Show(SW_HIDE);
+  m_List.Hide();
   m_List.DeleteAllItems();
 
   // Add items
@@ -164,11 +164,13 @@ BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Check new torrents
     case 100: {
       Torrents.Check(Settings.RSS.Torrent.Source);
-      
-      /*Torrents.Read(); // TEMP
+      /*
+      #ifdef _DEBUG
+      Torrents.Read();
       Torrents.Compare();
-      RefreshList();*/
-      
+      RefreshList();
+      #endif
+      */
       return TRUE;
     }
     // Download selected torrents

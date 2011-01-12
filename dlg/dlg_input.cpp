@@ -66,7 +66,7 @@ BOOL CInputDialog::OnInitDialog() {
     m_Edit.SetStyle(0, ES_NUMBER);
     m_Edit.SetText(Text.c_str());
     m_Spin.Enable(FALSE);
-    m_Spin.Show(SW_HIDE);
+    m_Spin.Hide();
   }
   m_Edit.SetSel(0, -1);
   m_Edit.SetWindowHandle(NULL);

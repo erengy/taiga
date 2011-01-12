@@ -20,21 +20,24 @@
 #define EVENT_H
 
 #include "std.h"
+#include "myanimelist.h"
 
 // =============================================================================
 
 enum EventSearchMode {
   EVENT_SEARCH_EPISODE = 1,
+  EVENT_SEARCH_REWATCH,
   EVENT_SEARCH_SCORE,
   EVENT_SEARCH_STATUS,
   EVENT_SEARCH_TAGS
 };
 
-class CEventItem {
+class CEventItem : public CMALAnimeValues {
 public:
+  CEventItem() : Index(0), AnimeID(0), AnimeIndex(0), Mode(0) {}
   int Index;
-  int AnimeIndex, Episode, ID, Mode, Score, Status;
-  wstring Reason, Tags, Time;
+  int AnimeID, AnimeIndex, Mode;
+  wstring Reason, Time;
 };
 
 class CEventList {
@@ -42,7 +45,7 @@ public:
   CEventList();
   virtual ~CEventList() {}
   
-  void Add(int anime_index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
+  void Add(CEventItem& item);
   void Check();
   void Clear();
   void Remove(unsigned int index);
@@ -58,7 +61,7 @@ public:
   CEventQueue();
   virtual ~CEventQueue() {}
 
-  void Add(wstring user, int anime_index, int id, int episode, int score, int status, wstring tags, wstring time, int mode);
+  void Add(CEventItem& item, wstring user = L"");
   void Check();
   void Clear();
   int GetItemCount();

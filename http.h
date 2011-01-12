@@ -28,6 +28,7 @@ enum HTTP_ClientMode {
   HTTP_MAL_RefreshAndLogin,
   HTTP_MAL_AnimeAdd,
   HTTP_MAL_AnimeDelete,
+  HTTP_MAL_AnimeDetails,
   HTTP_MAL_AnimeEdit,
   HTTP_MAL_AnimeUpdate,
   HTTP_MAL_ScoreUpdate,

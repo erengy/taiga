@@ -115,25 +115,33 @@ void CAnimeWindow::OnOK() {
     return;
   }
 
+  // Create item
+  CEventItem item;
+  item.AnimeIndex = m_pAnimeItem->Index;
+  item.AnimeID = m_pAnimeItem->Series_ID;
+  item.Mode = HTTP_MAL_AnimeEdit;
+
   // Episodes watched
-  int episode = m_Page[TAB_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!MAL.IsValidEpisode(episode, -1, m_pAnimeItem->Series_Episodes)) {
+  item.episode = m_Page[TAB_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
+  if (!MAL.IsValidEpisode(item.episode, -1, m_pAnimeItem->Series_Episodes)) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
       ToWSTR(m_pAnimeItem->Series_Episodes) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
     return;
   }
+
+  // Re-watching
+  item.enable_rewatching = m_Page[TAB_MYINFO].IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
   
   // Score
-  int score = 10 - m_Page[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
+  item.score = 10 - m_Page[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
   
   // Status
-  int status = m_Page[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
-  if (status == MAL_UNKNOWN) status++;
+  item.status = m_Page[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
+  if (item.status == MAL_UNKNOWN) item.status++;
   
   // Tags
-  wstring tags;
-  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, tags);
+  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, item.tags);
 
   // Start date
   SYSTEMTIME stMyStart;
@@ -158,16 +166,15 @@ void CAnimeWindow::OnOK() {
     m_pAnimeItem->SetFinishDate(year + L"-" + month + L"-" + day, true);
   }
 
-  // Alternative titles
-  wstring titles;
-  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
-  m_pAnimeItem->Synonyms = titles;
-  Settings.Anime.SetItem(m_pAnimeItem->Series_ID, EMPTY_STR, titles);
+  // Alternative titles & fansub group
+  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, m_pAnimeItem->Synonyms);
+  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_FANSUB, m_pAnimeItem->FansubGroup);
+  Settings.Anime.SetItem(m_pAnimeItem->Series_ID, 
+    m_pAnimeItem->FansubGroup, EMPTY_STR, m_pAnimeItem->Synonyms);
   if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
-  
-  // Add to buffer
-  EventQueue.Add(L"", m_pAnimeItem->Index, m_pAnimeItem->Series_ID, 
-    episode, score, status, tags, L"", HTTP_MAL_AnimeEdit);
+
+  // Add item to event queue
+  EventQueue.Add(item);
 
   // Exit
   EndDialog(IDOK);
@@ -262,7 +269,7 @@ void CAnimeWindow::SetCurrentPage(int index) {
   m_iCurrentPage = index;
   if (IsWindow()) {
     for (int i = 0; i < TAB_COUNT; i++) {
-      if (i != index) m_Page[i].Show(SW_HIDE);
+      if (i != index) m_Page[i].Hide();
     }
     m_Page[index].Show();
     m_Tab.SetCurrentlySelected(index);

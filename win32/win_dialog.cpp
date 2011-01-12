@@ -197,6 +197,10 @@ void CDialog::GetDlgItemText(int nIDDlgItem, wstring& str) {
   str.assign(&buffer[0]);
 }
 
+BOOL CDialog::HideDlgItem(int nIDDlgItem) {
+  return ::ShowWindow(::GetDlgItem(m_hWindow, nIDDlgItem), SW_HIDE);
+}
+
 BOOL CDialog::IsDlgButtonChecked(int nIDButton) {
   return ::IsDlgButtonChecked(m_hWindow, nIDButton);
 }
@@ -211,6 +215,10 @@ BOOL CDialog::SetComboSelection(int nIDDlgItem, int iIndex) {
 
 BOOL CDialog::SetDlgItemText(int nIDDlgItem, LPCWSTR lpString) {
   return ::SetDlgItemText(m_hWindow, nIDDlgItem, lpString);
+}
+
+BOOL CDialog::ShowDlgItem(int nIDDlgItem, int nCmdShow) {
+  return ::ShowWindow(::GetDlgItem(m_hWindow, nIDDlgItem), nCmdShow);
 }
 
 // =============================================================================

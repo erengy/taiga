@@ -80,6 +80,7 @@ public:
   INT     GetTextLength() const;
   DWORD   GetWindowLong(int nIndex = GWL_STYLE) const;
   BOOL    GetWindowRect(LPRECT lpRect) const;
+  BOOL    Hide() const;
   BOOL    InvalidateRect(LPCRECT lpRect = NULL, BOOL bErase = TRUE) const;
   BOOL    IsEnabled() const;
   BOOL    IsIconic() const;

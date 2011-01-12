@@ -79,6 +79,9 @@ public:
   
   CRSSFeed Feed;
   vector<wstring> Archive;
+
+private:
+  void ParseDescription(CRSSFeedItem& feed_item, const wstring& source);
 };
 
 extern CTorrents Torrents;

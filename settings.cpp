@@ -108,12 +108,13 @@ bool CSettings::Read() {
   }
 
   // Anime items
-  wstring folder, titles;
+  wstring fansub, folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
+    fansub = item.attribute(L"fansub").value(); if (fansub.empty()) fansub = EMPTY_STR;
     folder = item.attribute(L"folder").value(); if (folder.empty()) folder = EMPTY_STR;
     titles = item.attribute(L"titles").value(); if (titles.empty()) titles = EMPTY_STR;
-    Anime.SetItem(item.attribute(L"id").as_int(), folder, titles);
+    Anime.SetItem(item.attribute(L"id").as_int(), fansub, folder, titles);
   }
 
   // Program
@@ -123,6 +124,9 @@ bool CSettings::Read() {
     Program.General.AutoStart = general.attribute(L"autostart").as_int();
     Program.General.Close = general.attribute(L"close").as_int();
     Program.General.Minimize = general.attribute(L"minimize").as_int();
+    Program.General.SearchIndex = general.attribute(L"searchindex").as_int();
+    Program.General.SizeX = general.attribute(L"sizex").as_int();
+    Program.General.SizeY = general.attribute(L"sizey").as_int();
     Program.General.Theme = general.attribute(L"theme").value(L"Default");
     // Start-up
     xml_node startup = program.child(L"startup");
@@ -200,15 +204,17 @@ bool CSettings::Read() {
   // Events
   for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
-      EventQueue.Add(user.attribute(L"name").value(),
-        item.attribute(L"index").as_int(),
-        item.attribute(L"id").as_int(),
-        item.attribute(L"episode").as_int(),
-        item.attribute(L"score").as_int(),
-        item.attribute(L"status").as_int(),
-        item.attribute(L"tags").value(),
-        item.attribute(L"time").value(),
-        item.attribute(L"mode").as_int());
+      CEventItem event_item;
+      event_item.AnimeIndex = item.attribute(L"index").as_int();
+      event_item.AnimeID = item.attribute(L"id").as_int();
+      event_item.episode = item.attribute(L"episode").as_int();
+      event_item.score = item.attribute(L"score").as_int();
+      event_item.status = item.attribute(L"status").as_int();
+      event_item.enable_rewatching = item.attribute(L"rewatch").as_int();
+      event_item.tags = item.attribute(L"tags").value();
+      event_item.Time = item.attribute(L"time").value();
+      event_item.Mode = item.attribute(L"mode").as_int();
+      EventQueue.Add(event_item, user.attribute(L"name").value());
     }
   }
 
@@ -262,6 +268,8 @@ bool CSettings::Write() {
       xml_node item = items.append_child();
       item.set_name(L"item");
       item.append_attribute(L"id") = Anime.Item[i].ID;
+      if (!Anime.Item[i].FansubGroup.empty())
+        item.append_attribute(L"fansub") = Anime.Item[i].FansubGroup.c_str();
       if (!Anime.Item[i].Folder.empty())
         item.append_attribute(L"folder") = Anime.Item[i].Folder.c_str();
       if (!Anime.Item[i].Titles.empty())
@@ -316,6 +324,9 @@ bool CSettings::Write() {
     general.append_attribute(L"autostart") = Program.General.AutoStart;
     general.append_attribute(L"close") = Program.General.Close;
     general.append_attribute(L"minimize") = Program.General.Minimize;
+    general.append_attribute(L"searchindex") = Program.General.SearchIndex;
+    general.append_attribute(L"sizex") = Program.General.SizeX;
+    general.append_attribute(L"sizey") = Program.General.SizeY;
     general.append_attribute(L"theme") = Program.General.Theme.c_str();
     // Startup
     xml_node startup = program.append_child();
@@ -422,11 +433,12 @@ bool CSettings::Write() {
         xml_node item = user.append_child();
         item.set_name(L"event");
         item.append_attribute(L"index")   = EventQueue.List[i].Item[j].AnimeIndex;
-        item.append_attribute(L"id")      = EventQueue.List[i].Item[j].ID;
-        item.append_attribute(L"episode") = EventQueue.List[i].Item[j].Episode;
-        item.append_attribute(L"score")   = EventQueue.List[i].Item[j].Score;
-        item.append_attribute(L"status")  = EventQueue.List[i].Item[j].Status;
-        item.append_attribute(L"tags")    = EventQueue.List[i].Item[j].Tags.c_str();
+        item.append_attribute(L"id")      = EventQueue.List[i].Item[j].AnimeID;
+        item.append_attribute(L"episode") = EventQueue.List[i].Item[j].episode;
+        item.append_attribute(L"score")   = EventQueue.List[i].Item[j].score;
+        item.append_attribute(L"status")  = EventQueue.List[i].Item[j].status;
+        item.append_attribute(L"rewatch") = EventQueue.List[i].Item[j].enable_rewatching;
+        item.append_attribute(L"tags")    = EventQueue.List[i].Item[j].tags.c_str();
         item.append_attribute(L"time")    = EventQueue.List[i].Item[j].Time.c_str();
         item.append_attribute(L"mode")    = EventQueue.List[i].Item[j].Mode;
       }
@@ -440,7 +452,7 @@ bool CSettings::Write() {
 
 // =============================================================================
 
-void CSettings::CSettingsAnime::SetItem(int id, wstring folder, wstring titles) {
+void CSettings::CSettingsAnime::SetItem(int id, wstring fansub, wstring folder, wstring titles) {
   int index = -1;
   for (unsigned int i = 0; i < Item.size(); i++) {
     if (Item[i].ID == id) {
@@ -449,11 +461,12 @@ void CSettings::CSettingsAnime::SetItem(int id, wstring folder, wstring titles) 
     }
   }
   if (index == -1) {
-    if (folder.empty() || titles.empty()) return;
+    if (fansub.empty() || folder.empty() || titles.empty()) return;
     index = Item.size();
     Item.resize(index + 1);
   }
   Item[index].ID = id;
+  if (fansub != EMPTY_STR) Item[index].FansubGroup = fansub;
   if (folder != EMPTY_STR) Item[index].Folder = folder;
   if (titles != EMPTY_STR) Item[index].Titles = titles;
 }

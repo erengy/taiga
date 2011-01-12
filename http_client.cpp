@@ -56,6 +56,7 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
       MainWindow.m_Toolbar.EnableButton(0, true);
       MainWindow.m_Toolbar.EnableButton(1, true);
       break;
+    case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_Image:
       break;
     case HTTP_MAL_SearchAnime:
@@ -148,6 +149,7 @@ BOOL CHTTPClient::OnReadData() {
     case HTTP_MAL_TagUpdate:
       status = L"Updating list...";
       break;
+    case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_SearchAnime:
     case HTTP_MAL_Image:
     case HTTP_Silent:
@@ -349,13 +351,25 @@ BOOL CHTTPClient::OnReadComplete() {
       if (pItem && EventQueue.GetItemCount() > 0) {
         int user_index = EventQueue.GetUserIndex();
         if (user_index > -1) {
-          #define EVENT_ITEM EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]
-          pItem->Edit(GetData(), 
-            EVENT_ITEM.AnimeIndex, EVENT_ITEM.Episode, EVENT_ITEM.Score, 
-            EVENT_ITEM.Status, EVENT_ITEM.Mode, EVENT_ITEM.Tags);
+          pItem->Edit(GetData(), EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]);
           return TRUE;
-          #undef EVENT_ITEM
         }
+      }
+      break;
+    }
+
+    // =========================================================================
+
+    // Anime details
+    case HTTP_MAL_AnimeDetails: {
+      wstring data = GetData();
+      if (pItem && !data.empty()) {
+        pItem->Genres = InStr(data, L"Genres:</span> ", L"<br />");
+        pItem->Rank = InStr(data, L"Ranked:</span> ", L"<br />");
+        pItem->Popularity = InStr(data, L"Popularity:</span> ", L"<br />");
+        pItem->Score = InStr(data, L"Score:</span> ", L"<br />");
+        StripHTML(pItem->Score);
+        AnimeWindow.Refresh(pItem, true, false);
       }
       break;
     }
@@ -367,11 +381,11 @@ BOOL CHTTPClient::OnReadComplete() {
       if (pItem) {
         if (pItem->ParseSearchResult(GetData())) {
           AnimeWindow.Refresh(pItem, true, false);
+          if (MAL.GetAnimeDetails(pItem)) return TRUE;
         } else {
           status = L"Could not read anime information.";
           AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
         }
-        
         #ifdef _DEBUG
         MainWindow.ChangeStatus(status);
         #endif
@@ -571,3 +585,4 @@ BOOL CHTTPClient::OnReadComplete() {
 
   return FALSE;
 }
+

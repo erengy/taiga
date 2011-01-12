@@ -194,7 +194,7 @@ void CSettingsWindow::OnOK() {
     pItem = reinterpret_cast<CAnime*>(List.GetItemParam(i));
     if (pItem) {
       List.GetItemText(i, 1, pItem->Folder);
-      Settings.Anime.SetItem(pItem->Series_ID, pItem->Folder, EMPTY_STR);
+      Settings.Anime.SetItem(pItem->Series_ID, EMPTY_STR, pItem->Folder, EMPTY_STR);
     }
   }
   List.SetWindowHandle(NULL);
@@ -346,7 +346,7 @@ INT_PTR CSettingsWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
             CSettingsPage* pPageOld = reinterpret_cast<CSettingsPage*>(pnmtv->itemOld.lParam);
             if (pPageNew != pPageOld) {
               SetDlgItemText(IDC_STATIC_TITLE, PAGE_TITLE[pPageNew->Index]);
-              if (pPageOld) pPageOld->Show(SW_HIDE);
+              if (pPageOld) pPageOld->Hide();
               m_iCurrentPage = pPageNew->Index;
               pPageNew->Show();
             }

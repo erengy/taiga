@@ -102,6 +102,7 @@ public:
 
   void CheckProfile();
   void DownloadImage(CAnime* pAnimeItem);
+  bool GetAnimeDetails(CAnime* pAnimeItem);
   bool GetList(bool login);
   bool Login();
   BOOL SearchAnime(wstring title, CAnime* pAnimeItem = NULL);

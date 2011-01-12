@@ -44,10 +44,12 @@ public:
   virtual UINT GetDlgItemInt(int nIDDlgItem);
   virtual void GetDlgItemText(int nIDDlgItem, LPWSTR lpString, int cchMax = MAX_PATH);
   virtual void GetDlgItemText(int nIDDlgItem, wstring& str);
+  virtual BOOL HideDlgItem(int nIDDlgItem);
   virtual BOOL IsDlgButtonChecked(int nIDButton);
   virtual BOOL SendDlgItemMessage(int nIDDlgItem, UINT uMsg, WPARAM wParam, LPARAM lParam);
   virtual BOOL SetComboSelection(int nIDDlgItem, int iIndex);
   virtual BOOL SetDlgItemText(int nIDDlgItem, LPCWSTR lpString);
+  virtual BOOL ShowDlgItem(int nIDDlgItem, int nCmdShow = SW_SHOWNORMAL);
 
 protected:
   virtual void OnCancel();

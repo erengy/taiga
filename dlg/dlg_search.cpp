@@ -257,7 +257,7 @@ void CSearchWindow::RefreshList() {
   if (!IsWindow()) return;
 
   // Hide and clear the list
-  m_List.Show(SW_HIDE);
+  m_List.Hide();
   m_List.DeleteAllItems();
   
   // Add anime items to list

@@ -267,6 +267,10 @@ BOOL CWindow::GetWindowRect(LPRECT lpRect) const {
   return ::GetWindowRect(m_hWindow, lpRect);
 }
 
+BOOL CWindow::Hide() const {
+  return ::ShowWindow(m_hWindow, SW_HIDE);
+}
+
 BOOL CWindow::InvalidateRect(LPCRECT lpRect, BOOL bErase) const {
   return ::InvalidateRect(m_hWindow, lpRect, bErase);
 }

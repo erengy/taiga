@@ -68,7 +68,7 @@ CMALAnime::CMALAnime() :
 }
 
 CAnime::CAnime() : 
-  Index(0), NewEps(false), Playing(false), Score(L"0.00")
+  Index(0), NewEps(false), Playing(false)
 {
 }
 
@@ -106,7 +106,7 @@ void CAnime::Start(CEpisode episode) {
         // Set the folder if only it is under a root folder
         if (StartsWith(episode.Folder, Settings.Folders.Root[i])) {
           Folder = episode.Folder;
-          Settings.Anime.SetItem(Series_ID, Folder, EMPTY_STR);
+          Settings.Anime.SetItem(Series_ID, EMPTY_STR, Folder, EMPTY_STR);
         }
       }
     }
@@ -123,8 +123,8 @@ void CAnime::Start(CEpisode episode) {
   }
 }
 
-void CAnime::End(CEpisode episode, bool do_end, bool do_update) {
-  if (do_end) {
+void CAnime::End(CEpisode episode, bool end_watching, bool update_list) {
+  if (end_watching) {
     // Change status
     Taiga.PlayStatus = PLAYSTATUS_STOPPED;
     Playing = false;
@@ -146,7 +146,7 @@ void CAnime::End(CEpisode episode, bool do_end, bool do_update) {
   }
 
   // Update list
-  if (do_update && Taiga.UpdatesEnabled && GetStatus() != MAL_COMPLETED) {
+  if (update_list && Taiga.UpdatesEnabled && (GetStatus() != MAL_COMPLETED || GetRewatching())) {
     if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT || 
       Taiga.TickerMedia == -1 || Taiga.TickerMedia >= Settings.Account.Update.Delay) {
         int number = ToINT(episode.Number);
@@ -203,29 +203,45 @@ int CAnime::Ask(CEpisode episode) {
   return dlg.GetSelectedButtonID();
 }
 
-void CAnime::Update(CEpisode episode, bool do_move) {
-  int number = GetLastEpisode(episode.Number);
-  if (number == 0 || Series_Episodes == 1) number = 1;
+void CAnime::Update(CEpisode episode, bool change_status) {
+  // Create event item
+  CEventItem item;
+  item.AnimeIndex = Index;
+  item.AnimeID = Series_ID;
+
+  // Set episode number
+  item.episode = GetLastEpisode(episode.Number);
+  if (item.episode == 0 || Series_Episodes == 1) item.episode = 1;
   episode.Index = Index;
   
   // Set start/finish date
-  if (number == 1) SetStartDate(L"", false);
-  if (number == Series_Episodes) SetFinishDate(L"", true);
-  
-  if (do_move) {
+  if (item.episode == 1) SetStartDate(L"", false);
+  if (item.episode == Series_Episodes) SetFinishDate(L"", false);
+
+  if (change_status) {
+    item.Mode = HTTP_MAL_AnimeEdit;
     // Move to completed
-    if (Series_Episodes == number) {
-      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_COMPLETED, EMPTY_STR, L"", HTTP_MAL_AnimeEdit);
+    if (Series_Episodes == item.episode) {
+      item.status = MAL_COMPLETED;
+      if (GetRewatching()) {
+        item.enable_rewatching = FALSE;
+        item.times_rewatched = 1; // TEMP
+      }
+      EventQueue.Add(item);
       return;
     // Move to watching
-    } else if (GetStatus() != MAL_WATCHING || number == 1) {
-      EventQueue.Add(L"", Index, Series_ID, number, -1, MAL_WATCHING, EMPTY_STR, L"", HTTP_MAL_AnimeEdit);
-      return;
+    } else if (GetStatus() != MAL_WATCHING || item.episode == 1) {
+      if (!GetRewatching()) {
+        item.status = MAL_WATCHING;
+        EventQueue.Add(item);
+        return;
+      }
     }
   }
 
   // Update normally
-  EventQueue.Add(L"", Index, Series_ID, number, -1, -1, EMPTY_STR, L"", HTTP_MAL_AnimeUpdate);
+  item.Mode = HTTP_MAL_AnimeUpdate;
+  EventQueue.Add(item);
 }
 
 // =============================================================================
@@ -250,7 +266,7 @@ void CAnime::CheckFolder() {
     for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
       Folder = SearchFileFolder(Index, Settings.Folders.Root[i], 0, true);
       if (!Folder.empty()) {
-        Settings.Anime.SetItem(Series_ID, Folder, EMPTY_STR);
+        Settings.Anime.SetItem(Series_ID, EMPTY_STR, Folder, EMPTY_STR);
         return;
       }
     }
@@ -293,24 +309,46 @@ void CAnime::CheckNewEpisode(bool check_folder) {
 
 // =============================================================================
 
+int CAnime::GetIntValue(int mode) {
+  CEventItem* item = EventQueue.SearchItem(Index, mode);
+  switch (mode) {
+    case EVENT_SEARCH_EPISODE:
+      return item ? item->episode : My_WatchedEpisodes;
+    case EVENT_SEARCH_REWATCH:
+      return item ? item->enable_rewatching : My_Rewatching;
+    case EVENT_SEARCH_SCORE:
+      return item ? item->score : My_Score;
+    case EVENT_SEARCH_STATUS:
+      return item ? item->status : My_Status;
+    default:
+      return -1;
+  }
+}
+
+wstring CAnime::GetStrValue(int mode) {
+  CEventItem* item = EventQueue.SearchItem(Index, mode);
+  switch (mode) {
+    case EVENT_SEARCH_TAGS:
+      return item ? item->tags : My_Tags;
+    default:
+      return L"";
+  }
+}
+
 int CAnime::GetLastWatchedEpisode() {
-  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_EPISODE);
-  return item ? item->Episode : My_WatchedEpisodes;
+  return GetIntValue(EVENT_SEARCH_EPISODE);
 }
-
+int CAnime::GetRewatching() {
+  return GetIntValue(EVENT_SEARCH_REWATCH);
+}
 int CAnime::GetScore() {
-  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_SCORE);
-  return item ? item->Score : My_Score;
+  return GetIntValue(EVENT_SEARCH_SCORE);
 }
-
 int CAnime::GetStatus() {
-  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_STATUS);
-  return item ? item->Status : My_Status;
+  return GetIntValue(EVENT_SEARCH_STATUS);
 }
-
 wstring CAnime::GetTags() {
-  CEventItem* item = EventQueue.SearchItem(Index, EVENT_SEARCH_TAGS);
-  return item ? item->Tags : My_Tags;
+  return GetStrValue(EVENT_SEARCH_TAGS);
 }
 
 int CAnime::GetTotalEpisodes() {
@@ -359,58 +397,62 @@ void CAnime::SetFinishDate(wstring date, bool ignore_previous) {
 
 // =============================================================================
 
-void CAnime::Edit(const wstring& data, int index, int episode, int score, int status, int mode, const wstring& tags) {
+void CAnime::Edit(const wstring& data, CEventItem item) {
   // Check success
-  bool success = MAL.UpdateSucceeded(data, mode, episode, tags);
+  bool success = MAL.UpdateSucceeded(data, item.Mode, item.episode, item.tags);
 
+  // Show balloon tip
   if (!success) {
-    // Show balloon tip
     wstring text = L"Title: " + Series_Title;
     text += L"\nReason: " + (data.empty() ? L"-" : data);
     text += L"\nClick to try again.";
     Taiga.CurrentTipType = TIPTYPE_UPDATEFAILED;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
+    return;
   }
 
-  if (success) {
-    // Edit episode
-    if (episode > -1) {
-      My_WatchedEpisodes = episode;
-      AnimeList.Write(index, L"my_watched_episodes", ToWSTR(episode), ANIMELIST_EDITANIME);
-    }
-    // Edit score
-    if (score > -1) {
-      My_Score = score;
-      AnimeList.Write(index, L"my_score", ToWSTR(score), ANIMELIST_EDITANIME);
-    }
-    // Edit status
-    if (status > 0) {
-      AnimeList.User.IncreaseItemCount(My_Status, -1);
-      AnimeList.User.IncreaseItemCount(status, 1);
-      My_Status = status;
-      AnimeList.Write(index, L"my_status", ToWSTR(My_Status), ANIMELIST_EDITANIME);
-    }
-    // Edit ID
-    if (mode == HTTP_MAL_AnimeAdd) {
-      My_ID = ToINT(data);
-      AnimeList.Write(index, L"my_id", data, ANIMELIST_EDITANIME);
-    }
-    // Edit tags
-    if (tags != EMPTY_STR) {
-      My_Tags = tags;
-      AnimeList.Write(index, L"my_tags", tags, ANIMELIST_EDITANIME);
-    }
+  // Edit episode
+  if (item.episode > -1) {
+    My_WatchedEpisodes = item.episode;
+    AnimeList.Write(item.AnimeIndex, L"my_watched_episodes", ToWSTR(My_WatchedEpisodes));
+  }
+  // Edit score
+  if (item.score > -1) {
+    My_Score = item.score;
+    AnimeList.Write(item.AnimeIndex, L"my_score", ToWSTR(My_Score));
+  }
+  // Edit status
+  if (item.status > 0) {
+    AnimeList.User.IncreaseItemCount(My_Status, -1);
+    AnimeList.User.IncreaseItemCount(item.status, 1);
+    My_Status = item.status;
+    AnimeList.Write(item.AnimeIndex, L"my_status", ToWSTR(My_Status));
+  }
+  // Edit re-watching status
+  if (item.enable_rewatching > -1) {
+    My_Rewatching = item.enable_rewatching;
+    AnimeList.Write(item.AnimeIndex, L"my_rewatching", ToWSTR(My_Rewatching));
+  }
+  // Edit ID
+  if (item.Mode == HTTP_MAL_AnimeAdd) {
+    My_ID = ToINT(data);
+    AnimeList.Write(item.AnimeIndex, L"my_id", data);
+  }
+  // Edit tags
+  if (item.tags != EMPTY_STR) {
+    My_Tags = item.tags;
+    AnimeList.Write(item.AnimeIndex, L"my_tags", My_Tags);
+  }
 
-    // Remove item from update buffer
-    EventQueue.Remove();
-    // Check for more items
-    EventQueue.Check();
+  // Remove item from update buffer
+  EventQueue.Remove();
+  // Check for more items
+  EventQueue.Check();
 
-    // Redraw main list item
-    int list_index = MainWindow.GetListIndex(Index);
-    if (list_index > -1) {
-      MainWindow.m_List.RedrawItems(list_index, list_index, true);
-    }
+  // Redraw main list item
+  int list_index = MainWindow.GetListIndex(Index);
+  if (list_index > -1) {
+    MainWindow.m_List.RedrawItems(list_index, list_index, true);
   }
 }

@@ -244,6 +244,7 @@ void CAnimeList::AddItem(
     DecodeHTML(Item[Count].Series_Synonyms);
     for (size_t i = 0; i < Settings.Anime.Item.size(); i++) {
       if (Item[Count].Series_ID == Settings.Anime.Item[i].ID) {
+        Item[Count].FansubGroup = Settings.Anime.Item[i].FansubGroup;
         Item[Count].Folder = Settings.Anime.Item[i].Folder;
         Item[Count].Synonyms = Settings.Anime.Item[i].Titles;
         break;
@@ -369,8 +370,8 @@ int CUser::GetItemCount(int status) {
   if (user_index > -1) {
     #define ITEM EventQueue.List[user_index].Item
     for (unsigned int i = 0; i < ITEM.size(); i++) {
-      if (ITEM[i].Status > -1) {
-        if (status == ITEM[i].Status) {
+      if (ITEM[i].status > -1) {
+        if (status == ITEM[i].status) {
           count++;
         } else if (status == AnimeList.Item[ITEM[i].AnimeIndex].My_Status) {
           count--;

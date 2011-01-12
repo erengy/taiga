@@ -39,6 +39,8 @@ extern CEpisode CurrentEpisode;
 
 // =============================================================================
 
+class CEventItem;
+
 class CMALAnime {
 public:
   CMALAnime();
@@ -57,26 +59,28 @@ public:
 
   int  Ask(CEpisode episode);
   void Start(CEpisode episode);
-  void End(CEpisode episode, bool do_end, bool do_update);
-  void Update(CEpisode episode, bool do_move);
+  void End(CEpisode episode, bool end_watching, bool update_list);
+  void Update(CEpisode episode, bool change_status);
   void CheckFolder();
   void CheckNewEpisode(bool check_folder = false);
+  int GetIntValue(int mode);
   int GetLastWatchedEpisode();
+  int GetRewatching();
   int GetScore();
   int GetStatus();
+  wstring GetStrValue(int mode);
   wstring GetTags();
   int GetTotalEpisodes();
   bool ParseSearchResult(const wstring& data);
-  void Edit(const wstring& data, 
-    int index = -1, int episode = -1, int score = -1, 
-    int status = -1, int mode = -1, const wstring& tags = L"");
+  void Edit(const wstring& data, CEventItem item);
   void SetStartDate(wstring date, bool ignore_previous);
   void SetFinishDate(wstring date, bool ignore_previous);
   void Delete();
   
   int Index;
   bool NewEps, Playing;
-  wstring Folder, Score, Synonyms, Synopsis;
+  wstring FansubGroup, Folder, Synonyms;
+  wstring Genres, Popularity, Rank, Score, Synopsis;
 };
 
 #endif // ANIME_H

@@ -33,8 +33,6 @@
 CTorrents Torrents;
 CHTTPClient TorrentClient;
 
-void ParseDescription(CRSSFeedItem& feed_item, const wstring& source);
-
 // =============================================================================
 
 CRSSFeedItem::CRSSFeedItem() {
@@ -195,9 +193,7 @@ BOOL CTorrents::Tip() {
   } else {
     tip_text += L"Click to see all.";
     tip_title = L"New torrents available";
-    if (tip_text.length() > 255) {
-      tip_text = tip_text.substr(0, 252) + L"...";
-    }
+    LimitText(tip_text, 255);
     Taiga.CurrentTipType = TIPTYPE_TORRENT;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
@@ -215,6 +211,13 @@ void CTorrents::AddFilter(int option, int type, wstring value) {
 }
 
 BOOL CTorrents::Filter(int feed_index, int anime_index) {
+  // Filter fansub group preference
+  if (!AnimeList.Item[anime_index].FansubGroup.empty() && 
+    CompareStrings(AnimeList.Item[anime_index].FansubGroup, Feed.Item[feed_index].EpisodeData.Group) != 0) {
+      return FALSE;
+  }
+  
+  // Return if global filters are disabled
   if (Settings.RSS.Torrent.Filters.GlobalEnabled == FALSE) {
     return TRUE;
   }
@@ -245,6 +248,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
             break;
           }
           // Preference
+          // TODO: Fix this
           case RSS_FILTER_PREFERENCE: {
             if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) > -1 || 
               InStr(FEED.Title, FILTER.Value, 0, true) > -1 || 
@@ -295,7 +299,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
 
 // =============================================================================
 
-void ParseDescription(CRSSFeedItem& feed_item, const wstring& source) {
+void CTorrents::ParseDescription(CRSSFeedItem& feed_item, const wstring& source) {
   // AnimeSuki
   if (InStr(source, L"animesuki", 0, true) > -1) {
     wstring size_str = L"Filesize: ";
