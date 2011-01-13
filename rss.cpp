@@ -213,11 +213,11 @@ void CTorrents::AddFilter(int option, int type, wstring value) {
 BOOL CTorrents::Filter(int feed_index, int anime_index) {
   // Filter fansub group preference
   if (!AnimeList.Item[anime_index].FansubGroup.empty() && 
-    CompareStrings(AnimeList.Item[anime_index].FansubGroup, Feed.Item[feed_index].EpisodeData.Group) != 0) {
+    !IsEqual(AnimeList.Item[anime_index].FansubGroup, Feed.Item[feed_index].EpisodeData.Group)) {
       return FALSE;
   }
   
-  // Return if global filters are disabled
+  // Don't bother if global filters are disabled
   if (Settings.RSS.Torrent.Filters.GlobalEnabled == FALSE) {
     return TRUE;
   }

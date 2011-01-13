@@ -38,7 +38,7 @@ FONT 8, "Tahoma", 400, 0, 162
     LTEXT           "Built on YYYY.MM.DD", IDC_STATIC_ABOUT_BUILD, 55, 35, 175, 8, SS_LEFT
     CONTROL         "Links: <a href=""http://code.google.com/p/taiga/"">Google Code</a> | <a href=""http://myanimelist.net/clubs.php?cid=21400"">MyAnimeList club</a> | <a href=""irc://irc.rizon.net/taiga"">#taiga@irc.rizon.net</a>", IDC_LINK_ABOUT, "SysLink", 0x50000000, 15, 95, 215, 25
     ICON            IDI_MAIN, 0, 15, 15, 32, 30, SS_ICON | SS_NOTIFY | 0x00000800
-    LTEXT           "Contributors: saka (testing), Diablofan (Twitter support)", IDC_STATIC, 15, 69, 215, 8, SS_LEFT
+    LTEXT           "Contributors: saka, Diablofan, slevir", IDC_STATIC, 15, 69, 215, 8, SS_LEFT
     LTEXT           "", IDC_STATIC, 15, 50, 212, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
     LTEXT           "", IDC_STATIC, 15, 85, 212, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
 }
@@ -617,8 +617,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,40,0
-    PRODUCTVERSION  0,6,40,0
+    FILEVERSION     0,6,41,0
+    PRODUCTVERSION  0,6,41,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -632,11 +632,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6.40"
+            VALUE "FileVersion", "0.6.41"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6.40"
+            VALUE "ProductVersion", "0.6.41"
         }
     }
     BLOCK "VarFileInfo"

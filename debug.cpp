@@ -58,13 +58,12 @@ void DebugTest() {
     //     --"-"--
     //      O RLY?
   }
-  
+
   // Show result
   Test.End(str, 0);
   
   // Default action
   ExecuteAction(L"RecognitionTest");
-  //AnnounceToTwitter(L"Testing OAuth within Taiga... - " + GetTime());
 }
 
 // =============================================================================

@@ -63,7 +63,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       m_List->GetItemText(lParam2, m_List->GetSortColumn(), item[1]);
       for (size_t i = 0; i < 2; i++) {
         TrimRight(item[i], L".\r");
-        ReplaceChars(item[i], L" ", L"");
+        EraseChars(item[i], L" ");
         if (item[i].length() >= 2) {
           unit[i] = item[i].substr(item[i].length() - 2);
           item[i].resize(item[i].length() - 2);
@@ -72,7 +72,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
         if (index > -1) {
           int length = item[i].substr(index + 1).length();
           if (length <= 2) item[i].append(2 - length, '0');
-          ReplaceChars(item[i], L".", L"");
+          EraseChars(item[i], L".");
         } else {
           item[i].append(2, '0');
         }

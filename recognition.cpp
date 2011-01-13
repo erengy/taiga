@@ -29,8 +29,9 @@ CRecognition Meow;
 
 class CToken {
 public:
-  CToken() { Virgin = true; }
-  wstring Content, Encloser, Seperator;
+  CToken() : Encloser('\0'), Seperator('\0'), Virgin(true) {}
+  wchar_t Encloser, Seperator;
+  wstring Content;
   bool Virgin;
 };
 
@@ -47,16 +48,16 @@ CRecognition::CRecognition() {
 
 // =============================================================================
 
-bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime) {
+bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime, bool strict) {
   // Leave if title is empty
   if (episode.Title.empty()) return false;
   // Leave if episode number is out of range
-  if (anime.Series_Episodes > 1) {
+  if (strict && anime.Series_Episodes > 1) {
     int number = GetLastEpisode(episode.Number);
     if (number == 0 || number > anime.Series_Episodes) return false;
   }
   // Leave if not yet aired
-  if (anime.Series_Status == MAL_NOTYETAIRED) {
+  if (strict && anime.Series_Status == MAL_NOTYETAIRED) {
     if (anime.Series_Start.empty() || anime.Series_Start == L"0000-00-00" || 
       CompareStrings(GetDate(L"yyyy'-'MM'-'dd"), anime.Series_Start) < 0) {
         return false;
@@ -71,38 +72,50 @@ bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime) {
 
   // Compare with main title
   wstring anime_title = anime.Series_Title;
-  if (CompareTitle(title, anime_title, episode, anime)) return true;
+  if (CompareTitle(title, anime_title, episode, anime, strict)) return true;
   // Compare with synonyms
-  if (CompareSynonyms(title, anime_title, anime.Series_Synonyms, episode, anime)) return true;
-  if (CompareSynonyms(title, anime_title, anime.Synonyms, episode, anime)) return true;
+  if (CompareSynonyms(title, anime_title, anime.Series_Synonyms, episode, anime, strict)) return true;
+  if (CompareSynonyms(title, anime_title, anime.Synonyms, episode, anime, strict)) return true;
 
   // Failed
   return false;
 }
 
 bool CRecognition::CompareTitle(const wstring& title, wstring& anime_title, 
-                                CEpisode& episode, const CAnime& anime) {
+                                CEpisode& episode, const CAnime& anime, bool strict) {
+  // Remove unnecessary characters
+  if (anime_title.empty()) return false;
   EraseUnnecessary(anime_title);
   ErasePunctuation(anime_title, true);
-  if (anime.Series_Episodes == 1 && !episode.Number.empty()) {
+  if (anime_title.empty()) return false;
+  
+  // Compare with title & episode number
+  if (strict && anime.Series_Episodes == 1 && !episode.Number.empty()) {
     if (IsEqual(title + episode.Number, anime_title)) {
       episode.Title += episode.Number;
       episode.Number.clear();
       return true;
     }
   }
-  if (IsEqual(title, anime_title)) return true;
+  // Compare with title
+  if (strict) {
+    if (IsEqual(title, anime_title)) return true;
+  } else {
+    if (InStr(title, anime_title, 0, true) > -1) return true;
+  }
+
+  // Failed
   return false;
 }
 
 bool CRecognition::CompareSynonyms(const wstring& title, wstring& anime_title, const wstring& synonyms, 
-                                   CEpisode& episode, const CAnime& anime) {
+                                   CEpisode& episode, const CAnime& anime, bool strict) {
   size_t index_begin = 0, index_end;
   do {
     index_end = synonyms.find(L"; ", index_begin);
     if (index_end == wstring::npos) index_end = synonyms.length();
     anime_title = synonyms.substr(index_begin, index_end - index_begin);
-    if (CompareTitle(title, anime_title, episode, anime)) return true;
+    if (CompareTitle(title, anime_title, episode, anime, strict)) return true;
     index_begin = index_end + 2;
   } while (index_begin <= synonyms.length());
   return false;
@@ -116,15 +129,15 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
   // Clear previous data
   episode.Clear();
 
-  // Remove zero width space characters
-  Replace(title, L"\u200B", L"", true);
+  // Remove zero width space character
+  Erase(title, L"\u200B");
                   
   // Trim media player name
   MediaPlayers.EditTitle(title);
   if (title.empty()) return false;
 
   // Retrieve file name from full path
-  if (title.substr(1, 2) == L":\\") {
+  if (title.length() > 2 && title.at(1) == ':' && title.at(2) == '\\') {
     episode.Folder = GetPathOnly(title);
     title = GetFileName(title);
   }
@@ -143,6 +156,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
 
   // Tokenize
   vector<CToken> tokens;
+  tokens.reserve(4);
   TokenizeTitle(title, L"[](){}", tokens);
   if (tokens.empty()) return false;
   title.clear();
@@ -159,21 +173,23 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
   // Tidy tokens
   for (unsigned int i = 1; i < tokens.size() - 1; i++) {
     if (tokens[i - 1].Virgin == false || tokens[i].Virgin == false || 
-      IsTokenEnclosed(tokens[i - 1]) == true || tokens[i].Encloser != L"(" || 
+      IsTokenEnclosed(tokens[i - 1]) == true || tokens[i].Encloser != '(' || 
       tokens[i - 1].Content.length() < 2) {
         continue;
     }
     tokens[i - 1].Content += L"(" + tokens[i].Content + L")";
     if (IsTokenEnclosed(tokens[i + 1]) == false) {
       tokens[i - 1].Content += tokens[i + 1].Content;
-      if (tokens[i - 1].Seperator.empty()) tokens[i - 1].Seperator = tokens[i + 1].Seperator;
+      if (tokens[i - 1].Seperator == '\0')
+        tokens[i - 1].Seperator = tokens[i + 1].Seperator;
       tokens.erase(tokens.begin() + i + 1);
     }
     tokens.erase(tokens.begin() + i);
     i = 0;
   }
   for (unsigned int i = 0; i < tokens.size(); i++) {
-    Trim(tokens[i].Content, tokens[i].Seperator.c_str());
+    wchar_t trim_char[] = {tokens[i].Seperator};
+    Trim(tokens[i].Content, trim_char);
     if (tokens[i].Content.length() < 2) {
       tokens.erase(tokens.begin() + i);
       i--;
@@ -216,14 +232,14 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     }
   }
   if (title_index > -1) {
-    ReplaceChars(tokens[title_index].Content, tokens[title_index].Seperator.c_str(), L" ");
+    ReplaceChar(tokens[title_index].Content, tokens[title_index].Seperator, ' ');
     Trim(tokens[title_index].Content, L" -");
     title = tokens[title_index].Content;
     tokens[title_index].Content.clear();
   }
   if (group_index > -1) {
     if (!IsTokenEnclosed(tokens[group_index])) {
-      ReplaceChars(tokens[group_index].Content, tokens[group_index].Seperator.c_str(), L" ");
+      ReplaceChar(tokens[group_index].Content, tokens[group_index].Seperator, ' ');
       Trim(tokens[group_index].Content, L" -");
     }
     episode.Group = tokens[group_index].Content;
@@ -279,12 +295,8 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
   }
 
   // Set the final title, hopefully name of the anime
-  if (title.empty()) {
-    return false;
-  } else {
-    episode.Title = title;
-    return true;
-  }
+  episode.Title = title;
+  return !title.empty();
 }
 
 // =============================================================================
@@ -294,7 +306,7 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
   // The most common non-alphanumeric character is the seperator
   vector<wstring> words;
   token.Seperator = GetMostCommonCharacter(token.Content);
-  Split(token.Content, token.Seperator, words);
+  Split(token.Content, wstring(1, token.Seperator), words);
   
   // Revert if there are words that are too short
   // This prevents splitting group names like "m.3.3.w" and keywords like "H.264"
@@ -310,7 +322,7 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
   for (unsigned int i = 0; i < words.size(); i++) {
     if (words[i].empty()) continue;
     #define RemoveWordFromToken(b) { \
-      Replace(token.Content, words[i], L"", false, b); token.Virgin = false; }
+      Erase(token.Content, words[i], b); token.Virgin = false; }
     
     // Checksum
     if (episode.Checksum.empty() && words[i].length() == 8 && IsHex(words[i])) {
@@ -322,11 +334,11 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
       RemoveWordFromToken(false);
     // Video info
     } else if (CompareKeys(words[i], Meow.VideoKeywords)) {
-      AddCommaString(episode.VideoType, words[i]);
+      AppendKeyword(episode.VideoType, words[i]);
       RemoveWordFromToken(true);
     // Audio info
     } else if (CompareKeys(words[i], Meow.AudioKeywords)) {
-      AddCommaString(episode.AudioType, words[i]);
+      AppendKeyword(episode.AudioType, words[i]);
       RemoveWordFromToken(true);
     // Version
     } else if (episode.Version.empty() && CompareKeys(words[i], Meow.VersionKeywords)) {
@@ -339,16 +351,18 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
       token.Content.resize(InStr(token.Content, words[i], 0));
     } else if (episode.Number.empty() && (i == 0 || i == words.size() - 1) && IsNumeric(words[i])) {
       episode.Number = words[i];
-      if (!CheckEpisodeNumber(episode)) continue;
+      if (!ValidateEpisodeNumber(episode)) continue;
       RemoveWordFromToken(false);
     // Extras
     } else if (compare_extras && CompareKeys(words[i], Meow.ExtraKeywords)) {
-      AddCommaString(episode.Extra, words[i]);
+      AppendKeyword(episode.Extra, words[i]);
       RemoveWordFromToken(true);
     } else if (compare_extras && CompareKeys(words[i], Meow.ExtraUnsafeKeywords)) {
-      AddCommaString(episode.Extra, words[i]);
+      AppendKeyword(episode.Extra, words[i]);
       if (IsTokenEnclosed(token)) RemoveWordFromToken(true);
     }
+
+    #undef RemoveWordFromToken
   }
 }
 
@@ -356,20 +370,9 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
 
 // Helper functions
 
-void CRecognition::AddCommaString(wstring& str, const wstring add) {
-  str += (!str.empty() ? L" " : L"") + add;
-}
-
-bool CRecognition::CheckEpisodeNumber(CEpisode& episode) {
-  int number = ToINT(episode.Number);
-  if (number > 1000) {
-    if (number > 1950 && number < 2050) {
-      AddCommaString(episode.Extra, L"Year: " + episode.Number);
-    }
-    episode.Number.clear();
-    return false;
-  }
-  return true;
+void CRecognition::AppendKeyword(wstring& str, const wstring& keyword) {
+  if (!str.empty()) str.append(L" ");
+  str.append(keyword);
 }
 
 bool CRecognition::CompareKeys(const wstring& str, const vector<wstring>& keys) {
@@ -386,26 +389,35 @@ void CRecognition::EraseUnnecessary(wstring& str) {
 }
 
 bool CRecognition::IsEpisode(const wstring& str, CEpisode& episode) {  
-  if (IsEqual(str.substr(0, 2), L"Ep")) {
-    // Ep##
-    if (IsNumeric(str.substr(2))) {
+  // Ep##
+  if (str.length() > 2 && 
+    (str.at(0) == 'E' || str.at(0) == 'e') &&
+    (str.at(1) == 'P' || str.at(1) == 'p')) {
+      for (unsigned int i = 2; i < str.length(); i++) {
+        if (!IsNumeric(str.at(i))) {
+          // Ep##v#
+          if (str.at(i) == 'V' || str.at(i) == 'v') {
+            for (unsigned int j = i + 1; j < str.length(); j++) {
+              if (!IsNumeric(str.at(j))) return false;
+            }
+            episode.Number = str.substr(2, str.length() - i);
+            episode.Version = str.substr(i + 1);
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
       episode.Number = str.substr(2);
       return true;
-    // Ep##v#
-    } else {
-      int pos = InStrChars(str, L"vV", 0);
-      if (pos > -1 && IsNumeric(str.substr(2, pos - 2))) {
-        episode.Number = str.substr(2, str.length() - pos);
-        episode.Version = str.substr(pos + 1);
-        return true;
+  // E##
+  } else if (str.length() > 1 &&
+    (str.at(0) == 'E' || str.at(0) == 'e')) {
+      for (unsigned int i = 1; i < str.length(); i++) {
+        if (!IsNumeric(str.at(i))) return false;
       }
-    }
-  } else if (IsEqual(str.substr(0, 1), L"E")) {
-    // E##
-    if (IsNumeric(str.substr(1))) {
       episode.Number = str.substr(1);
       return true;
-    }
   }
   return false;
 }
@@ -414,23 +426,26 @@ bool CRecognition::IsResolution(const wstring& str) {
   // *###x###*
   if (str.length() > 6) {
     int pos = InStr(str, L"x", 0);
-    if (pos > -1 && 
-      IsNumeric(str.substr(0, pos)) && 
-      IsNumeric(str.substr(pos + 1))) {
-        return true;
+    if (pos > -1) {
+      for (unsigned int i = 0; i < str.length(); i++) {
+        if (i != pos && !IsNumeric(str.at(i))) return false;
+      }
+      return true;
     }
   // *###p
   } else if (str.length() > 3) {
-    if (str.at(str.length() - 1) == 'p' && 
-      IsNumeric(str.substr(0, str.length() - 1))) {
-        return true;
+    if (str.at(str.length() - 1) == 'p') {
+      for (unsigned int i = 0; i < str.length() - 1; i++) {
+        if (!IsNumeric(str.at(i))) return false;
+      }
+      return true;
     }
   }
   return false;
 }
 
 bool CRecognition::IsTokenEnclosed(const CToken& token) {
-  return token.Encloser == L"[" || token.Encloser == L"(" || token.Encloser == L"{";
+  return token.Encloser == '[' || token.Encloser == '(' || token.Encloser == '{';
 }
 
 void CRecognition::ReadKeyword(unsigned int uID, vector<wstring>& str) {
@@ -449,9 +464,21 @@ size_t CRecognition::TokenizeTitle(const wstring& str, const wstring& delimiters
       break;
     } else {
       tokens.back().Content = str.substr(index_begin, index_end - index_begin);
-      if (index_begin > 0) tokens.back().Encloser = str.substr(index_begin - 1, 1);
+      if (index_begin > 0) tokens.back().Encloser = str.at(index_begin - 1);
       index_begin = str.find_first_not_of(delimiters, index_end + 1);
     }
   }
   return tokens.size();
+}
+
+bool CRecognition::ValidateEpisodeNumber(CEpisode& episode) {
+  int number = ToINT(episode.Number);
+  if (number > 1000) {
+    if (number > 1950 && number < 2050) {
+      AppendKeyword(episode.Extra, L"Year: " + episode.Number);
+    }
+    episode.Number.clear();
+    return false;
+  }
+  return true;
 }

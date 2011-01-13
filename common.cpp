@@ -213,7 +213,7 @@ BOOL PathExists(const wstring& path) {
 }
 
 void ValidateFileName(wstring& file) {
-  ReplaceChars(file, L"\\/:*?<>|", L"");
+  EraseChars(file, L"\\/:*?<>|");
 }
 
 wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value) {
@@ -257,7 +257,7 @@ int PopulateFolders(vector<wstring>& folder_list, wstring path) {
   if (hFind != INVALID_HANDLE_VALUE) {
     do {
       if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-        if (!IsEqual(wfd.cFileName, L".") && !IsEqual(wfd.cFileName, L"..")) {
+        if (wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
           found++;
           folder_list.push_back(wfd.cFileName);
         }

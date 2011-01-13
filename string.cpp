@@ -171,6 +171,7 @@ bool IsAlphanumeric(const wstring& str) {
 }
 
 bool IsEqual(const wstring& str1, const wstring& str2) {
+  if (str1.length() != str2.length()) return false;
   return _wcsnicmp(str1.c_str(), str2.c_str(), MAX_PATH) == 0;
 }
 
@@ -237,6 +238,15 @@ void Replace(wstring& input, wstring find, wstring replace_with, bool replace_al
   }
 }
 
+void ReplaceChar(wstring& input, const wchar_t c, const wchar_t replace_with) {
+  if (c == replace_with) return;
+  size_t pos = 0;
+  do {
+    pos = input.find_first_of(c, pos);
+    if (pos != wstring::npos) input.at(pos) = replace_with;
+  } while (pos != wstring::npos);
+}
+
 void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_with) {
   if (chars == replace_with) return;
   size_t pos = 0;
@@ -250,7 +260,7 @@ void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_w
 
 /* Split, tokenize */
 
-void Split(const wstring& input, const wstring seperator, std::vector<wstring>& split_vector) {
+void Split(const wstring& input, const wstring& seperator, std::vector<wstring>& split_vector) {
   if (seperator.empty()) {
     split_vector.push_back(input);
     return;
@@ -575,7 +585,7 @@ int GetCommonCharIndex(wchar_t c) {
   return -1;
 }
 
-wstring GetMostCommonCharacter(const wstring& str) {
+wchar_t GetMostCommonCharacter(const wstring& str) {
   struct type_map { wchar_t ch; int count; };
   vector<type_map> char_map;
   int char_index = -1;
@@ -608,7 +618,5 @@ wstring GetMostCommonCharacter(const wstring& str) {
     }
   }
 
-  wstring value;
-  if (!char_map.empty()) value = char_map[char_index].ch;
-  return value;
+  return char_map.empty() ? '\0' : char_map[char_index].ch;
 }

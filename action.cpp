@@ -134,8 +134,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Opens a web page.
   } else if (action == L"URL") {
     wstring title = AnimeList.Item[AnimeList.Index].Series_Title;
-    ReplaceChars(title, L"_!?.,:;~+", L"");
-    Replace(title, L" -", L"");
+    EraseChars(title, L"_!?.,:;~+");
+    Erase(title, L" -");
     Replace(body, L"%title%", title);
     ExecuteLink(body);
 

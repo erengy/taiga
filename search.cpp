@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "common.h"
 #include "recognition.h"
 #include "string.h"
 
@@ -26,27 +27,27 @@
 wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool search_folder) {
   if (root.empty()) return L"";
   CheckSlash(root);
-  WIN32_FIND_DATA WFD;
+  WIN32_FIND_DATA wfd;
   wstring folder = root + L"*.*";
-  HANDLE hFind = FindFirstFile(folder.c_str(), &WFD);
+  HANDLE hFind = FindFirstFile(folder.c_str(), &wfd);
   if (hFind == INVALID_HANDLE_VALUE) return L"";
   CEpisode episode;
 
   do {
     // Folders
-    if (WFD.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-      if (!IsEqual(WFD.cFileName, L".") && !IsEqual(WFD.cFileName, L"..")) {
+    if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+      if (wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
         // Check root folder
         if (search_folder == true) {
-          if (Meow.ExamineTitle(WFD.cFileName, episode, false, false, false, false, false)) {
+          if (Meow.ExamineTitle(wfd.cFileName, episode, false, false, false, false, false)) {
             if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
               FindClose(hFind);
-              return root + WFD.cFileName + L"\\";
+              return root + wfd.cFileName + L"\\";
             }
           }
         }
         // Check sub folders
-        folder = root + WFD.cFileName + L"\\";
+        folder = root + wfd.cFileName + L"\\";
         folder = SearchFileFolder(anime_index, folder, episode_number, search_folder);
         if (!folder.empty()) {
           FindClose(hFind);
@@ -57,17 +58,23 @@ wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool
     // Files
     } else {
       if (search_folder == false) {
-        if (Meow.ExamineTitle(WFD.cFileName, episode, true, true, true, true, true)) {
-          if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
-            if (episode_number == 0 || episode_number == ToINT(episode.Number)) {
-              FindClose(hFind);
-              return root + WFD.cFileName;
+        // Check file size - anything less than 10 MB can't be a new episode
+        if (wfd.nFileSizeLow > 1024 * 1024 * 10) {
+          // Examine file name and extract episode data
+          if (Meow.ExamineTitle(wfd.cFileName, episode, true, true, true, true, true)) {
+            // Compare episode data with anime title
+            if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
+              if (episode_number == 0 || episode_number == GetLastEpisode(episode.Number)) {
+                FindClose(hFind);
+                return root + wfd.cFileName;
+              }
             }
           }
         }
+
       }
     }
-  } while (FindNextFile(hFind, &WFD));
+  } while (FindNextFile(hFind, &wfd));
   
   FindClose(hFind);
   return L"";

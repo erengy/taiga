@@ -33,7 +33,7 @@ public:
   virtual ~CRecognition() {};
   
   void Initialize();
-  bool CompareEpisode(CEpisode& episode, const CAnime& anime);
+  bool CompareEpisode(CEpisode& episode, const CAnime& anime, bool strict = true);
   bool ExamineTitle(wstring title, CEpisode& episode, 
     bool examine_inside, bool examine_outside, bool examine_number,
     bool check_extras, bool check_extension);
@@ -46,13 +46,12 @@ public:
 
 private:
   bool CompareTitle(const wstring& title, wstring& anime_title, 
-    CEpisode& episode, const CAnime& anime);
+    CEpisode& episode, const CAnime& anime, bool strict = true);
   bool CompareSynonyms(const wstring& title, wstring& anime_title, const wstring& synonyms, 
-    CEpisode& episode, const CAnime& anime);
+    CEpisode& episode, const CAnime& anime, bool strict = true);
 
   // Helper functions
-  void AddCommaString(wstring& str, const wstring add);
-  bool CheckEpisodeNumber(CEpisode& episode);
+  void AppendKeyword(wstring& str, const wstring& keyword);
   bool CompareKeys(const wstring& str, const vector<wstring>& keys);
   void EraseUnnecessary(wstring& str);
   bool IsEpisode(const wstring& str, CEpisode& episode);
@@ -60,6 +59,7 @@ private:
   bool IsTokenEnclosed(const CToken& token);
   void ReadKeyword(unsigned int uID, vector<wstring>& str);
   size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<CToken>& tokens);
+  bool ValidateEpisodeNumber(CEpisode& episode);
 };
 
 extern CRecognition Meow;
