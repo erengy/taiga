@@ -113,6 +113,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mediaplayers.cpp" />
     <ClCompile Include="menu.cpp" />
+    <ClCompile Include="monitor.cpp" />
     <ClCompile Include="myanimelist.cpp" />
     <ClCompile Include="process.cpp" />
     <ClCompile Include="recognition.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="win32\win_menu.cpp" />
     <ClCompile Include="win32\win_taskbar.cpp" />
     <ClCompile Include="win32\win_taskdialog.cpp" />
+    <ClCompile Include="win32\win_thread.cpp" />
     <ClCompile Include="win32\win_window.cpp" />
     <ClCompile Include="xml.cpp" />
   </ItemGroup>
@@ -171,6 +173,7 @@
     <ClInclude Include="gfx.h" />
     <ClInclude Include="http.h" />
     <ClInclude Include="media.h" />
+    <ClInclude Include="monitor.h" />
     <ClInclude Include="myanimelist.h" />
     <ClInclude Include="process.h" />
     <ClInclude Include="recognition.h" />
@@ -192,6 +195,7 @@
     <ClInclude Include="win32\win_menu.h" />
     <ClInclude Include="win32\win_taskbar.h" />
     <ClInclude Include="win32\win_taskdialog.h" />
+    <ClInclude Include="win32\win_thread.h" />
     <ClInclude Include="win32\win_window.h" />
     <ClInclude Include="xml.h" />
   </ItemGroup>

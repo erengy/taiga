@@ -237,8 +237,12 @@ void CAnimeList::AddItem(
   Item[Count].My_RewatchingEP    = my_rewatching_ep;
   Item[Count].My_LastUpdated     = my_last_updated;
   Item[Count].My_Tags            = my_tags;
-  Item[Count].Index = Count;
   
+  Item[Count].Index = Count;
+  if (Item[Count].Series_Episodes) {
+    Item[Count].EpisodeAvailable.resize(Item[Count].Series_Episodes);
+  }
+
   if (Count > 0) {
     DecodeHTML(Item[Count].Series_Title);
     DecodeHTML(Item[Count].Series_Synonyms);

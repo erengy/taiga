@@ -87,6 +87,7 @@ BOOL CSettingsPage::OnInitDialog() {
         List.InsertItem(i, -1, Icon16_Folder, Settings.Folders.Root[i].c_str(), NULL);
       }
       List.SetWindowHandle(NULL);
+      CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, Settings.Folders.WatchEnabled);
       break;
     }
     // Anime folders > Specific

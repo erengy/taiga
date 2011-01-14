@@ -79,6 +79,7 @@ public:
   class CSettingsFolders {
   public:
     vector<wstring> Root;
+    BOOL WatchEnabled;
   } Folders;
   
   // Announcements

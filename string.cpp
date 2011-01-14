@@ -65,7 +65,10 @@ void ErasePunctuation(wstring& input, bool keep_trailing) {
         (c >  57 && c <  65) || // :;<=>?@
         (c >  90 && c <  97) || // [\]^_`
         (c > 122 && c < 128)) { // {|}~) {
-          if (!keep_trailing) input.erase(i, 1);
+          if (!keep_trailing || c != '!') {
+            keep_trailing = false;
+            input.erase(i, 1);
+          }
     } else {
       keep_trailing = false;
     }

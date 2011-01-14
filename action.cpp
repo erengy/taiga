@@ -33,6 +33,7 @@
 #include "dlg/dlg_torrent_filter.h"
 #include "event.h"
 #include "http.h"
+#include "monitor.h"
 #include "myanimelist.h"
 #include "process.h"
 #include "resource.h"
@@ -319,6 +320,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (BrowseForFolder(g_hMain, L"Please select a folder:", 
       BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
         Settings.Folders.Root.push_back(path);
+        if (Settings.Folders.WatchEnabled) FolderMonitor.Enable();
         ExecuteAction(L"Settings", 0, PAGE_FOLDERS_ROOT);
     }
 
@@ -326,6 +328,19 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Checks for queued events and shows related window.
   } else if (action == L"CheckEventBuffer") {
     EventQueue.Show();
+
+  // CheckEpisodes()
+  //   Checks episode availability.
+  //   wParam is a BOOL value.
+  } else if (action == L"CheckEpisodes") {
+    if (wParam) {
+      for (int i = 1; i < AnimeList.Count; i++) {
+        AnimeList.Item[i].CheckEpisodeAvailability();
+      }
+      MainWindow.RefreshList();
+    } else {
+      AnimeList.Item[AnimeList.Index].CheckEpisodeAvailability();
+    }
 
   // CheckNewEpisodes()
   //   Checks new episodes.

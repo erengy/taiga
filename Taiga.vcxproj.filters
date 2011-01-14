@@ -231,6 +231,12 @@
     <ClCompile Include="third_party\base64\base64.cpp">
       <Filter>Third Party\base64</Filter>
     </ClCompile>
+    <ClCompile Include="monitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\win_thread.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -370,6 +376,12 @@
     </ClInclude>
     <ClInclude Include="third_party\base64\base64.h">
       <Filter>Third Party\base64</Filter>
+    </ClInclude>
+    <ClInclude Include="monitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\win_thread.h">
+      <Filter>Win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

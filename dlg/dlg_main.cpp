@@ -26,6 +26,7 @@
 #include "../gfx.h"
 #include "../http.h"
 #include "../media.h"
+#include "../monitor.h"
 #include "../myanimelist.h"
 #include "../process.h"
 #include "../recognition.h"
@@ -107,8 +108,8 @@ BOOL CMainWindow::OnInitDialog() {
   m_Tree.RefreshItems();
 
   // Insert list columns
-  m_List.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 370, LVCFMT_LEFT, L"Anime title");
-  m_List.InsertColumn(1, 130, 130, LVCFMT_CENTER, L"Progress");
+  m_List.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");
+  m_List.InsertColumn(1, 160, 160, LVCFMT_CENTER, L"Progress");
   m_List.InsertColumn(2,  62,  62, LVCFMT_CENTER, L"Score");
   m_List.InsertColumn(3,  62,  62, LVCFMT_CENTER, L"Type");
   m_List.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
@@ -198,6 +199,12 @@ BOOL CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL: {
       return m_List.SendMessage(uMsg, wParam, lParam);
+    }
+
+    // Monitor anime folders
+    case WM_MONITORCALLBACK: {
+      FolderMonitor.OnChange(reinterpret_cast<CFolderInfo*>(lParam), wParam);
+      return TRUE;
     }
     
     // External programs
@@ -342,7 +349,7 @@ void CMainWindow::OnDropFiles(HDROP hDropInfo) {
   WCHAR buffer[MAX_PATH];
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
     CEpisode episode;
-    Meow.ExamineTitle(buffer, episode, true, true, true, true, true); 
+    Meow.ExamineTitle(buffer, episode); 
     MessageBox(ReplaceVariables(Settings.Program.Balloon.Format, episode).c_str(), APP_TITLE, MB_OK);
   }
   #endif
@@ -481,7 +488,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
     // Started to watch?
     if (anime_index == 0) {
       // Recognized?
-      if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode, true, true, true, true, true)) {
+      if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode)) {
         for (int i = AnimeList.Count; i > 0; i--) {
           if (Meow.CompareEpisode(CurrentEpisode, AnimeList.Item[i])) {
             CurrentEpisode.Index = i;

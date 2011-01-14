@@ -24,6 +24,7 @@
 #include "gfx.h"
 #include "http.h"
 #include "media.h"
+#include "monitor.h"
 #include "myanimelist.h"
 #include "process.h"
 #include "recognition.h"
@@ -104,6 +105,10 @@ BOOL CTaiga::InitInstance() {
   }
   if (Settings.Program.StartUp.CheckNewVersion) {
     CheckNewVersion(true);
+  }
+  if (Settings.Folders.WatchEnabled) {
+    FolderMonitor.SetWindowHandle(MainWindow.GetWindowHandle());
+    FolderMonitor.Enable();
   }
 
   return TRUE;

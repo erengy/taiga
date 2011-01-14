@@ -35,8 +35,8 @@ public:
   void Initialize();
   bool CompareEpisode(CEpisode& episode, const CAnime& anime, bool strict = true);
   bool ExamineTitle(wstring title, CEpisode& episode, 
-    bool examine_inside, bool examine_outside, bool examine_number,
-    bool check_extras, bool check_extension);
+    bool examine_inside = true, bool examine_outside = true, bool examine_number = true,
+    bool check_extras = true, bool check_extension = true);
   void ExamineToken(CToken& token, CEpisode& episode, bool compare_extras);
   
   // Keywords

@@ -62,7 +62,9 @@ public:
   void End(CEpisode episode, bool end_watching, bool update_list);
   void Update(CEpisode episode, bool change_status);
   void CheckFolder();
-  void CheckNewEpisode(bool check_folder = false);
+  bool CheckNewEpisode(bool check_folder = false);
+  void CheckEpisodeAvailability();
+  bool SetEpisodeAvailability(int number, bool available);
   int GetIntValue(int mode);
   int GetLastWatchedEpisode();
   int GetRewatching();
@@ -79,6 +81,7 @@ public:
   
   int Index;
   bool NewEps, Playing;
+  vector<bool> EpisodeAvailable;
   wstring FansubGroup, Folder, Synonyms;
   wstring Genres, Popularity, Rank, Score, Synopsis;
 };

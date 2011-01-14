@@ -106,6 +106,8 @@ bool CSettings::Read() {
   for (xml_node folder = folders.child(L"root"); folder; folder = folder.next_sibling(L"root")) {
     Folders.Root.push_back(folder.attribute(L"folder").value());
   }
+  xml_node watch = folders.child(L"watch");
+  Folders.WatchEnabled = watch.attribute(L"enabled").as_int();
 
   // Anime items
   wstring fansub, folder, titles;
@@ -261,6 +263,9 @@ bool CSettings::Write() {
       root.set_name(L"root");
       root.append_attribute(L"folder") = Folders.Root[i].c_str();
     }
+    xml_node watch = folders.append_child();
+    watch.set_name(L"watch");
+    watch.append_attribute(L"enabled") = Folders.WatchEnabled;
     // Items
     xml_node items = anime.append_child();
     items.set_name(L"items");

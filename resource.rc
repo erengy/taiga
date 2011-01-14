@@ -429,6 +429,8 @@ FONT 8, "Tahoma", 400, 0, 162
     PUSHBUTTON      "Add new...", IDC_BUTTON_ADDFOLDER, 200, 85, 50, 14
     PUSHBUTTON      "Remove", IDC_BUTTON_REMOVEFOLDER, 250, 85, 50, 14, WS_DISABLED
     LTEXT           "Tip: You can drag and drop folders here.", IDC_STATIC, 15, 88, 180, 8, SS_LEFT | SS_NOPREFIX
+    GROUPBOX        "Monitor", IDC_STATIC, 10, 110, 290, 35
+    AUTOCHECKBOX    "Watch anime folders for file changes", IDC_CHECK_FOLDERS_WATCH, 20, 125, 170, 8
 }
 
 
@@ -617,8 +619,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,41,0
-    PRODUCTVERSION  0,6,41,0
+    FILEVERSION     0,6,42,0
+    PRODUCTVERSION  0,6,42,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -632,11 +634,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6.41"
+            VALUE "FileVersion", "0.6.42"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6.41"
+            VALUE "ProductVersion", "0.6.42"
         }
     }
     BLOCK "VarFileInfo"

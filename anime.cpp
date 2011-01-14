@@ -275,8 +275,8 @@ void CAnime::CheckFolder() {
   Folder = old_folder;
 }
 
-void CAnime::CheckNewEpisode(bool check_folder) {
-  if (NewEps) return;
+bool CAnime::CheckNewEpisode(bool check_folder) {
+  if (NewEps) return true;
   if (check_folder) CheckFolder();
   int number = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
   wstring file;
@@ -293,18 +293,34 @@ void CAnime::CheckNewEpisode(bool check_folder) {
     }
   }*/
 
-  if (file.empty()) {
-    NewEps = false;
-    return;
-  } else {
-    NewEps = true;
-    if (!Playing) {
-      int list_index = MainWindow.GetListIndex(Index);
-      if (list_index > -1) {
-        MainWindow.m_List.RedrawItems(list_index, list_index, true);
+  return !file.empty();
+}
+
+void CAnime::CheckEpisodeAvailability() {
+  if (!Folder.empty()) {
+    SearchFileFolder(Index, Folder, -1, false);
+  }
+}
+
+bool CAnime::SetEpisodeAvailability(int number, bool available) {
+  if (number == 0) number = 1;
+  if (number <= Series_Episodes || Series_Episodes == 0) {
+    if (static_cast<unsigned int>(number) > EpisodeAvailable.size()) {
+      EpisodeAvailable.resize(number);
+    }
+    EpisodeAvailable[number - 1] = available;
+    if (number == GetLastWatchedEpisode() + 1) {
+      NewEps = available;
+      if (!Playing) {
+        int list_index = MainWindow.GetListIndex(Index);
+        if (list_index > -1) {
+          MainWindow.m_List.RedrawItems(list_index, list_index, true);
+        }
       }
     }
+    return true;
   }
+  return false;
 }
 
 // =============================================================================

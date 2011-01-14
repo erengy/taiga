@@ -27,6 +27,7 @@
 #include "dlg_settings.h"
 #include "../http.h"
 #include "../media.h"
+#include "../monitor.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../settings.h"
@@ -187,6 +188,7 @@ void CSettingsWindow::OnOK() {
     List.GetItemText(i, 0, folder);
     Settings.Folders.Root.push_back(folder);
   }
+  Settings.Folders.WatchEnabled = m_Page[PAGE_FOLDERS_ROOT].IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH);
   // Folders > Specific
   CAnime* pItem;
   List.SetWindowHandle(m_Page[PAGE_FOLDERS_ANIME].GetDlgItem(IDC_LIST_FOLDERS_ANIME));
@@ -272,6 +274,9 @@ void CSettingsWindow::OnOK() {
   } else {
     MainWindow.RefreshList();
   }
+
+  // Enable/disable folder monitor
+  FolderMonitor.Enable(Settings.Folders.WatchEnabled == TRUE);
 
   // Setup proxy
   HTTPClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);

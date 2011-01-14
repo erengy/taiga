@@ -64,14 +64,15 @@ wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool
           if (Meow.ExamineTitle(wfd.cFileName, episode, true, true, true, true, true)) {
             // Compare episode data with anime title
             if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
-              if (episode_number == 0 || episode_number == GetLastEpisode(episode.Number)) {
+              int number = GetLastEpisode(episode.Number);
+              AnimeList.Item[anime_index].SetEpisodeAvailability(number, true);
+              if (episode_number == 0 || episode_number == number) {
                 FindClose(hFind);
                 return root + wfd.cFileName;
               }
             }
           }
         }
-
       }
     }
   } while (FindNextFile(hFind, &wfd));
