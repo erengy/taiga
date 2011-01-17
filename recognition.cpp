@@ -170,7 +170,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     }
   }
 
-  // Tidy tokens
+  // Tidy up tokens
   for (unsigned int i = 1; i < tokens.size() - 1; i++) {
     if (tokens[i - 1].Virgin == false || tokens[i].Virgin == false || 
       IsTokenEnclosed(tokens[i - 1]) == true || tokens[i].Encloser != '(' || 
@@ -263,34 +263,50 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
             break;
           case '(': case ')':
             episode.Number.clear();
-            i = 1;
+            i = 0;
             break;
-          case '.': {
-            int pos = InStrRev(title, L" ", i);
-            i = pos > -1 ? pos : 1;
+          case '.':
+            i = InStrRev(title, L" ", i);
             episode.Number.clear();
             break;
-          }
-          default:
+          case ' ': {
+            // Break title into two parts
             wstring str_left = title.substr(0, i + 1);
             wstring str_right = title.substr(i + 1 + episode.Number.length());
+            // Tidy up strings
             Replace(str_left, L"  ", L" ", true);
             Replace(str_right, L"  ", L" ", true);
             TrimLeft(episode.Number, L"-");
             TrimRight(str_left);
             TrimLeft(str_right);
-            EraseRight(str_left, L" ep.", true);
-            EraseRight(str_left, L" ep", true);
-            EraseRight(str_left, L" episode", true);
-            EraseRight(str_left, L" vol", true);
+            const wchar_t* erase_right[4] = {
+              L" ep.", L" ep", L" episode", L" vol"
+            };
+            for (int j = 0; j < 4; j++) {
+              EraseRight(str_left, erase_right[j], true);
+            }
             TrimRight(str_left, L" -");
             TrimLeft(str_right, L" -");
+            // Return title and name
             title = str_left;
-            if (str_right.length() > 2) episode.Name = str_right;
+            if (str_right.length() > 2) {
+              episode.Name = str_right;
+            }
             i = 0;
+            break;
+          }
+          default:
+            episode.Number.clear();
             break;
         }
       }
+    }
+  }
+
+  // Examine remaining tokens once more
+  for (unsigned int i = 0; i < tokens.size(); i++) {
+    if (!tokens[i].Content.empty()) {
+      ExamineToken(tokens[i], episode, true);
     }
   }
 

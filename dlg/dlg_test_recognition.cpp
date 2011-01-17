@@ -17,6 +17,7 @@
 */
 
 #include "../std.h"
+#include "../common.h"
 #include "dlg_test_recognition.h"
 #include "../recognition.h"
 #include "../resource.h"
@@ -67,6 +68,7 @@ BOOL CTestRecognition::OnInitDialog() {
   for (UINT i = 0; i < m_EpisodeList.size(); i++) {
     CEpisode episode;
     Meow.ExamineTitle(m_EpisodeList[i].File, episode, true, true, true, true, false);
+    episode.Index = i;
     m_EpisodeListTest.push_back(episode);
   }
   tick = GetTickCount() - tick;
@@ -88,7 +90,8 @@ BOOL CTestRecognition::OnInitDialog() {
 
   // Fill list
   for (UINT i = 0; i < m_EpisodeList.size(); i++) {
-    m_List.InsertItem(i, -1, -1, m_EpisodeListTest[i].File.c_str(), 0);
+    m_List.InsertItem(i, -1, -1, m_EpisodeListTest[i].File.c_str(), 
+      reinterpret_cast<LPARAM>(&m_EpisodeListTest[i]));
     m_List.SetItem(i, 1, m_EpisodeListTest[i].Title.c_str());
     m_List.SetItem(i, 2, m_EpisodeListTest[i].Group.c_str());
     m_List.SetItem(i, 3, m_EpisodeListTest[i].Number.c_str());
@@ -101,6 +104,7 @@ BOOL CTestRecognition::OnInitDialog() {
     m_List.SetItem(i, 10, m_EpisodeListTest[i].Name.c_str());
     m_List.SetItem(i, 11, m_EpisodeListTest[i].Format.c_str());
   }
+  m_List.Sort(1, 1, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
 
   // Set title
   int success_count = 0, total_items = m_EpisodeList.size();
@@ -122,10 +126,6 @@ BOOL CTestRecognition::OnInitDialog() {
 
 // =============================================================================
 
-#define CheckSubItem(i, t) \
-  m_EpisodeList[i].t == m_EpisodeListTest[i].t ? RGB(230, 255, 230) : \
-  m_EpisodeListTest[i].t.empty() ? RGB(245, 255, 245) : RGB(255, 230, 230)
-
 LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // ListView control
   if (idCtrl == IDC_LIST_TEST_RECOGNITION) {
@@ -142,33 +142,38 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
             return CDRF_NOTIFYPOSTERASE;
 
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-            int i = static_cast<int>(pCD->nmcd.dwItemSpec);
+            CEpisode* e = reinterpret_cast<CEpisode*>(pCD->nmcd.lItemlParam);
+            if (!e) return CDRF_NOTIFYPOSTPAINT;
+            #define CheckSubItem(e, t) \
+              e->t == m_EpisodeList[e->Index].t ? RGB(230, 255, 230) : \
+              e->t.empty() ? RGB(245, 255, 245) : RGB(255, 230, 230)
             switch (pCD->iSubItem) {
               // Title
-              case 1: pCD->clrTextBk = CheckSubItem(i, Title); break;
+              case 1: pCD->clrTextBk = CheckSubItem(e, Title); break;
               // Group
-              case 2: pCD->clrTextBk = CheckSubItem(i, Group); break;
+              case 2: pCD->clrTextBk = CheckSubItem(e, Group); break;
               // Episode
-              case 3: pCD->clrTextBk = CheckSubItem(i, Number); break;
+              case 3: pCD->clrTextBk = CheckSubItem(e, Number); break;
               // Version
-              case 4: pCD->clrTextBk = CheckSubItem(i, Version); break;
+              case 4: pCD->clrTextBk = CheckSubItem(e, Version); break;
               // Audio
-              case 5: pCD->clrTextBk = CheckSubItem(i, AudioType); break;
+              case 5: pCD->clrTextBk = CheckSubItem(e, AudioType); break;
               // Video
-              case 6: pCD->clrTextBk = CheckSubItem(i, VideoType); break;
+              case 6: pCD->clrTextBk = CheckSubItem(e, VideoType); break;
               // Resolution
-              case 7: pCD->clrTextBk = CheckSubItem(i, Resolution); break;
+              case 7: pCD->clrTextBk = CheckSubItem(e, Resolution); break;
               // Checksum
-              case 8: pCD->clrTextBk = CheckSubItem(i, Checksum); break;
+              case 8: pCD->clrTextBk = CheckSubItem(e, Checksum); break;
               // Extra
-              case 9: pCD->clrTextBk = CheckSubItem(i, Extra); break;
+              case 9: pCD->clrTextBk = CheckSubItem(e, Extra); break;
               // Name
-              case 10: pCD->clrTextBk = CheckSubItem(i, Name); break;
+              case 10: pCD->clrTextBk = CheckSubItem(e, Name); break;
               // Format
-              case 11: pCD->clrTextBk = CheckSubItem(i, Format); break;
+              case 11: pCD->clrTextBk = CheckSubItem(e, Format); break;
               // Default
               default: pCD->clrTextBk = GetSysColor(COLOR_WINDOW);
             }
+            #undef CheckSubItem
             return CDRF_NOTIFYPOSTPAINT;
           }
         }

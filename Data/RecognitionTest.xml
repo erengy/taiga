@@ -5,7 +5,7 @@
 		<checksum>2048A39A</checksum>
 		<format>MKV</format>
 		<group>ANBU</group>
-		<number>1</number>
+		<number>01</number>
 		<title>Princess Lover!</title>
 	</file>
 	<file>
@@ -14,7 +14,7 @@
 		<checksum>12F00E89</checksum>
 		<format>MKV</format>
 		<group>ANBU-Menclave</group>
-		<number>1</number>
+		<number>01</number>
 		<resolution>1024x576</resolution>
 		<title>Canaan</title>
 		<video>H.264</video>
@@ -31,7 +31,7 @@
 		<checksum>C83164B9</checksum>
 		<format>MKV</format>
 		<group>BakaWolf-m.3.3.w</group>
-		<number>1</number>
+		<number>01</number>
 		<title>Special A</title>
 		<video>H.264</video>
 	</file>
@@ -63,9 +63,8 @@
 		<extra>DVD</extra>
 		<format>MKV</format>
 		<group>Coalgirls</group>
-		<number>2</number>
 		<resolution>704x480</resolution>
-		<title>Toradora ED</title>
+		<title>Toradora ED2</title>
 	</file>
 	<file>
 		<file>[Conclave-Mendoi]_Mobile_Suit_Gundam_00_S2_-_01v2_[1280x720_H.264_AAC][4863FBE8].mkv</file>
@@ -73,7 +72,7 @@
 		<checksum>4863FBE8</checksum>
 		<format>MKV</format>
 		<group>Conclave-Mendoi</group>
-		<number>1</number>
+		<number>01</number>
 		<resolution>1280x720</resolution>
 		<title>Mobile Suit Gundam 00 S2</title>
 		<version>2</version>
@@ -97,25 +96,22 @@
 	</file>
 	<file>
 		<file>[Hard-Boiled FS]FullMetalAlchemist_09.rmvb</file>
-		<checksum></checksum>
 		<format>RMVB</format>
 		<group>Hard-Boiled FS</group>
-		<number>9</number>
+		<number>09</number>
 		<title>FullMetalAlchemist</title>
 	</file>
 	<file>
 		<file>[HorribleSubs] Tower of Druaga - Sword of Uruk - 04 [480p].mkv</file>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>HorribleSubs</group>
-		<number>4</number>
+		<number>04</number>
 		<resolution>480p</resolution>
 		<title>Tower of Druaga - Sword of Uruk</title>
 	</file>
 	<file>
 		<file>[Juuni.Kokki]-(Les.12.Royaumes)-[Ep.24]-[x264+OGG]-[JAP+FR+Sub.FR]-[Chap]-[AzF].mkv</file>
 		<audio>OGG</audio>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group></group>
 		<number>24</number>
@@ -124,7 +120,6 @@
 	</file>
 	<file>
 		<file>[KAF-TEAM]_One_Piece_Movie_9_vostfr_HD.avi</file>
-		<checksum></checksum>
 		<extra>vostfr</extra>
 		<format>AVI</format>
 		<group>KAF-TEAM</group>
@@ -134,11 +129,10 @@
 	</file>
 	<file>
 		<file>[kito].Nazca.episode.01.DVDRip.[x264.He-aac.{Jpn}+Sub{Fr}].mkv</file>
-		<checksum></checksum>
 		<extra>DVDRip</extra>
 		<format>MKV</format>
 		<group>kito</group>
-		<number>1</number>
+		<number>01</number>
 		<title>Nazca</title>
 		<video>x264</video>
 	</file>
@@ -169,7 +163,7 @@
 		<extra>Year: 2009</extra>
 		<format>MP4</format>
 		<group>Taka</group>
-		<number>4</number>
+		<number>04</number>
 		<resolution>720p</resolution>
 		<title>Fullmetal Alchemist (2009)</title>
 	</file>
@@ -186,8 +180,7 @@
 	</file>
 	<file>
 		<file>[ValdikSS]_First_Squad_The_Morment_Of_Truth_[720x576_h264_dvdscr_eng_hardsub].mkv</file>
-		<checksum></checksum>
-		<extra>eng, hardsub</extra>
+		<extra>eng hardsub</extra>
 		<format>MKV</format>
 		<group>ValdikSS</group>
 		<resolution>720x576</resolution>
@@ -196,7 +189,6 @@
 	</file>
 	<file>
 		<file>Code_Geass_R2_TV_[20_of_25]_[ru_jp]_[HDTV]_[Varies_&_Cuba77_&_AnimeReactor_RU].mkv</file>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>Varies & Cuba77 & AnimeReactor RU</group>
 		<number>20</number>
@@ -206,12 +198,21 @@
 	<file>
 		<file>Evangelion_1.11_You_Are_(Not)_Alone_(2009)_[1080p,BluRay,x264,DTS-ES]_-_THORA.mkv</file>
 		<audio>DTS-ES</audio>
-		<checksum></checksum>
-		<extra>Year: 2009, BluRay</extra>
+		<extra>Year: 2009 BluRay</extra>
 		<format>MKV</format>
 		<group>THORA</group>
 		<resolution>1080p</resolution>
 		<title>Evangelion 1.11 You Are (Not) Alone (2009)</title>
+		<video>x264</video>
+	</file>
+	<file>
+		<file>Evangelion_1.11_You_Are_(Not)_Alone_[1080p,BluRay,x264,DTS-ES]_-_THORA.mkv</file>
+		<audio>DTS-ES</audio>
+		<extra>BluRay</extra>
+		<format>MKV</format>
+		<group>THORA</group>
+		<resolution>1080p</resolution>
+		<title>Evangelion 1.11 You Are (Not) Alone</title>
 		<video>x264</video>
 	</file>
 	<file>
@@ -225,8 +226,7 @@
 	<file>
 		<file>Gin'iro_no_Kami_no_Agito_(2006)_[1080p,BluRay,x264,DTS]_-_THORA.mkv</file>
 		<audio>DTS</audio>
-		<checksum></checksum>
-		<extra>Year: 2006, BluRay</extra>
+		<extra>Year: 2006 BluRay</extra>
 		<format>MKV</format>
 		<group>THORA</group>
 		<resolution>1080p</resolution>
@@ -240,91 +240,85 @@
 		<extra>DVD</extra>
 		<format>MKV</format>
 		<group>DGz</group>
-		<number>1</number>
+		<number>01</number>
 		<title>Magical Girl Lyrical Nanoha A's</title>
 		<video>H264</video>
 	</file>
 	<file>
 		<file>Mobile_Suit_Gundam_00_Season_2_Ep07_A_Reunion_and_a_Parting_[1080p,BluRay,x264]_-_THORA.mkv</file>
-		<checksum></checksum>
 		<extra>BluRay</extra>
 		<format>MKV</format>
 		<group>THORA</group>
 		<name>A Reunion and a Parting</name>
-		<number>7</number>
+		<number>07</number>
 		<resolution>1080p</resolution>
 		<title>Mobile Suit Gundam 00 Season 2</title>
 		<video>x264</video>
 	</file>
 	<file>
 		<file>Noein_[01_of_24]_[ru_jp]_[bodlerov_&_torrents_ru].mkv</file>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>bodlerov & torrents ru</group>
-		<number>1</number>
+		<number>01</number>
 		<title>Noein</title>
 	</file>
 	<file>
 		<file>ponyo_on_the_cliff_by_the_sea[h264.dts][niizk].mkv</file>
 		<audio>dts</audio>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>niizk</group>
 		<title>ponyo on the cliff by the sea</title>
 		<video>h264</video>
 	</file>
-	
 	<file>
 		<file>[Seto_Otaku]_AIKa_ZERO_OVA_-_01_[BD][1920x1080_H264-Flac][6730D40A].mkv</file>
 		<audio>Flac</audio>
 		<checksum>6730D40A</checksum>
-		<extra>OVA, BD</extra>
+		<extra>OVA BD</extra>
 		<format>MKV</format>
 		<group>Seto_Otaku</group>
-		<number>1</number>
+		<number>01</number>
 		<resolution>1920x1080</resolution>
 		<title>AIKa ZERO OVA</title>
 		<video>H264</video>
 	</file>
 	<file>
 		<file>[a4e]R.O.D_the_TV_01[divx5.2.1].mkv</file>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>a4e</group>
-		<number>1</number>
+		<number>01</number>
 		<title>R.O.D the TV</title>
 	</file>
 	<file>
 		<file>Ghost_in_the_Shell_Stand_Alone_Complex_2nd_GIG_Ep05v2_EXCAVATION_[720p,HDTV,x264,AAC_5.1]_-_THORA.mkv</file>
-		<checksum></checksum>
+		<audio>AAC 5.1</audio>
 		<format>MKV</format>
 		<group>THORA</group>
 		<name>EXCAVATION</name>
-		<number>5</number>
+		<number>05</number>
 		<resolution>720p</resolution>
 		<title>Ghost in the Shell Stand Alone Complex 2nd GIG</title>
 		<version>2</version>
-		<video>HDTV, x264</video>
+		<video>HDTV x264</video>
 	</file>
 	<file>
 		<file>Ghost_in_the_Shell_Stand_Alone_Complex_2nd_GIG_Ep06_Pu239_[720p,HDTV,x264,AAC_5.1]_-_THORA.mkv</file>
-		<checksum></checksum>
+		<audio>AAC 5.1</audio>
 		<format>MKV</format>
 		<group>THORA</group>
 		<name>Pu239</name>
-		<number>6</number>
+		<number>06</number>
 		<resolution>720p</resolution>
 		<title>Ghost in the Shell Stand Alone Complex 2nd GIG</title>
-		<video>HDTV, x264</video>
+		<video>HDTV x264</video>
 	</file>
 	<file>
 		<file>Fate_Stay_Night_Ep05_The_Two_Magi_Part1_[720p,BluRay,x264]_-_THORA.mkv</file>
-		<checksum></checksum>
 		<extra>BluRay</extra>
 		<format>MKV</format>
 		<group>THORA</group>
 		<name>The Two Magi Part1</name>
-		<number>5</number>
+		<number>05</number>
 		<resolution>720p</resolution>
 		<title>Fate Stay Night</title>
 		<video>x264</video>
@@ -335,7 +329,7 @@
 		<checksum>585d9971</checksum>
 		<format>MKV</format>
 		<group>RaX</group>
-		<number>5</number>
+		<number>05</number>
 		<title>Mezzo(DSA)</title>
 		<video>x264</video>
 	</file>
@@ -346,7 +340,7 @@
 		<extra>Year: 2009</extra>
 		<format>MKV</format>
 		<group>AKH-SWE</group>
-		<number>2</number>
+		<number>02</number>
 		<title>Fullmetal Alchemist (2009)</title>
 		<version>2</version>
 		<video>H.264</video>
@@ -354,11 +348,10 @@
 	<file>
 		<file>[FuktLogik][Sayonara_Zetsubou_Sensei][01][DVDRip][x264_AC3].mkv</file>
 		<audio>AC3</audio>
-		<checksum></checksum>
 		<extra>DVDRip</extra>
 		<format>MKV</format>
 		<group>FuktLogik</group>
-		<number>1</number>
+		<number>01</number>
 		<title>Sayonara Zetsubou Sensei</title>
 		<video>x264</video>
 	</file>
@@ -375,7 +368,6 @@
 	<file>
 		<file>[Darksoul-Subs] Tatakau Shisho - The Book of Bantorra [848x480 XVID_MP3].mkv</file>
 		<audio>MP3</audio>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>Darksoul-Subs</group>
 		<resolution>848x480</resolution>
@@ -388,7 +380,7 @@
 		<format>MKV</format>
 		<group>ACX</group>
 		<name>Showdown in Tokyo 3</name>
-		<number>6</number>
+		<number>06</number>
 		<title>Neon Genesis Evangelion - Platinum</title>
 	</file>
 	<file>
@@ -396,7 +388,7 @@
 		<checksum>E83AD672</checksum>
 		<format>MKV</format>
 		<group>Himatsubushi</group>
-		<number>1</number>
+		<number>01</number>
 		<resolution>720p</resolution>
 		<title>Sora no Woto</title>
 		<video>H264</video>
@@ -408,18 +400,16 @@
 		<group>EroGaKi-Team</group>
 		<title>Nurse Witch Komugi-chan Magikarte 02.5</title>
 	</file>
-	
 	<file>
 		<file>Ookiku Furikabutte S2 - 09 (Central Anime) [BD841253].mkv</file>
 		<checksum>BD841253</checksum>
 		<format>MKV</format>
 		<group>Central Anime</group>
-		<number>9</number>
+		<number>09</number>
 		<title>Ookiku Furikabutte S2</title>
 	</file>
 	<file>
 		<file>[HorribleSubs] HEROMAN - 10_(XviD_AnimeSenshi).mkv</file>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>HorribleSubs</group>
 		<number>10</number>
@@ -436,7 +426,6 @@
 	</file>
 	<file>
 		<file>[N LogN Fansubs] Angel Beats (9).mkv</file>
-		<checksum></checksum>
 		<format>MKV</format>
 		<group>N LogN Fansubs</group>
 		<number>9</number>
@@ -444,24 +433,21 @@
 	</file>
 	<file>
 		<file>To_Aru_Kagaku_no_Railgun_13-15_[BD_1080p][AtsA]</file>
-		<checksum></checksum>
 		<extra>BD</extra>
-		<format></format>
 		<group>AtsA</group>
 		<number>13-15</number>
 		<resolution>1080p</resolution>
 		<title>To Aru Kagaku no Railgun</title>
 	</file>
-	
 	<file>
 		<file>Juuousei_-_01_[Black_Sheep][HDTV_H264_AAC][803DA487].mkv</file>
 		<audio>AAC</audio>
 		<checksum>803DA487</checksum>
 		<format>MKV</format>
 		<group>Black_Sheep</group>
-		<number>1</number>
+		<number>01</number>
 		<title>Juuousei</title>
-		<video>HDTV, H264</video>
+		<video>HDTV H264</video>
 	</file>
 	<file>
 		<file>[RNA]_Sakura_Taisen_New_York_NY_Ep_2_[1590D378].avi</file>
@@ -471,12 +457,9 @@
 		<number>2</number>
 		<title>Sakura Taisen New York NY</title>
 	</file>
-	
 	<file>
 		<file>Hayate no Gotoku 2nd Season 24 (Blu-Ray 1080p) [Chihiro]</file>
-		<checksum></checksum>
 		<extra>Blu-Ray</extra>
-		<format></format>
 		<group>Chihiro</group>
 		<number>24</number>
 		<resolution>1080p</resolution>
@@ -484,9 +467,7 @@
 	</file>
 	<file>
 		<file>[BluDragon] Blue Submarine No.6 (DVD, R2, Dual Audio) V3</file>
-		<checksum></checksum>
 		<extra>DVD</extra>
-		<format></format>
 		<group>BluDragon</group>
 		<title>Blue Submarine No.6</title>
 		<version>3</version>
@@ -495,5 +476,46 @@
 		<file>Chrono Crusade ep. 1-5</file>
 		<number>1-5</number>
 		<title>Chrono Crusade</title>
+	</file>
+	<file>
+		<file>[gg]_Kimi_ni_Todoke_2nd_Season_-_00_[BF735BC4].mkv</file>
+		<checksum>BF735BC4</checksum>
+		<format>MKV</format>
+		<group>gg</group>
+		<number>00</number>
+		<title>Kimi ni Todoke 2nd Season</title>
+	</file>
+	<file>
+		<file>K-ON!_Ep03_Training!_[1080p,BluRay,x264]_-_THORA.mkv</file>
+		<extra>BluRay</extra>
+		<format>MKV</format>
+		<group>THORA</group>
+		<name>Training!</name>
+		<number>03</number>
+		<resolution>1080p</resolution>
+		<title>K-ON!</title>
+		<video>x264</video>
+	</file>
+	<file>
+		<file>K-ON!!_Ep08_Career_Plan!_[1080p,BluRay,x264]_-_THORA.mkv</file>
+		<extra>BluRay</extra>
+		<format>MKV</format>
+		<group>THORA</group>
+		<name>Career Plan!</name>
+		<number>08</number>
+		<resolution>1080p</resolution>
+		<title>K-ON!!</title>
+		<video>x264</video>
+	</file>
+	<file>
+		<file>[SFW]​_Queen's​_Blade​_S2</file>
+		<group>SFW</group>
+		<title>Queen's Blade S2</title>
+	</file>
+	<file>
+		<file>Evangelion​_1.​0​_You​_Are​_[Not]​_Alone​_(1080p)​_[@Home]</file>
+		<group>@Home</group>
+		<resolution>1080p</resolution>
+		<title>Evangelion​ 1.​0​ You​ Are​ (Not) Alone​</title>
 	</file>
 </recognition>

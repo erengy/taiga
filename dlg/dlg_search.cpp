@@ -237,6 +237,7 @@ void CSearchWindow::ParseResults(const wstring& data) {
         m_Anime[i].Series_Title = XML_ReadStrValue(entry, L"title");
         MAL.DecodeText(m_Anime[i].Series_Title);
         m_Anime[i].Series_Synonyms = XML_ReadStrValue(entry, L"synonyms");
+        MAL.DecodeText(m_Anime[i].Series_Synonyms);
         m_Anime[i].Series_Episodes = XML_ReadIntValue(entry, L"episodes");
         m_Anime[i].Score = XML_ReadStrValue(entry, L"score");
         m_Anime[i].Series_Type = MAL.TranslateType(XML_ReadStrValue(entry, L"type"));

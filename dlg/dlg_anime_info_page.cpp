@@ -67,7 +67,6 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       wstring text;
       if (!pAnimeItem->Series_Synonyms.empty()) {
         text = pAnimeItem->Series_Synonyms;
-		MAL.DecodeText(text);
         Replace(text, L"; ", L", ", true);
         TrimLeft(text, L", ");
       }

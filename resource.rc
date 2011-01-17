@@ -120,7 +120,7 @@ FONT 8, "Tahoma", 400, 0, 0
 {
     LTEXT           "Alternative titles", IDC_STATIC_HEADER1, 5, 5, 340, 8, SS_LEFT
     LTEXT           "", IDC_STATIC, 5, 15, 340, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
-    CONTROL         "Alternative titles", IDC_STATIC_ANIME_ALT, WC_STATIC, NOT WS_GROUP | SS_LEFTNOWORDWRAP | SS_WORDELLIPSIS, 10, 20, 330, 8
+    CONTROL         "Alternative titles", IDC_STATIC_ANIME_ALT, WC_STATIC, NOT WS_GROUP | SS_LEFTNOWORDWRAP | SS_NOPREFIX | SS_WORDELLIPSIS, 10, 20, 330, 8
     LTEXT           "Information", IDC_STATIC_HEADER2, 5, 35, 340, 8, SS_LEFT
     LTEXT           "", IDC_STATIC, 5, 45, 340, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
     LTEXT           "Type:\nEpisodes:\nStatus:\nSeason:", IDC_STATIC, 10, 50, 35, 35, SS_LEFT
@@ -619,8 +619,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,42,0
-    PRODUCTVERSION  0,6,42,0
+    FILEVERSION     0,6,44,0
+    PRODUCTVERSION  0,6,44,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -634,11 +634,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6.42"
+            VALUE "FileVersion", "0.6.44"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6.42"
+            VALUE "ProductVersion", "0.6.44"
         }
     }
     BLOCK "VarFileInfo"
