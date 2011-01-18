@@ -221,6 +221,8 @@ void CSettingsWindow::OnOK() {
   Settings.Program.List.MiddleClick = m_Page[PAGE_LIST].GetComboSelection(IDC_COMBO_MDLCLICK);
   AnimeList.Filter.NewEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS);
   Settings.Program.List.Highlight = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
+  Settings.Program.List.ProgressMode = m_Page[PAGE_LIST].GetCheckedRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2);
+  Settings.Program.List.ProgressShowEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
 
   // Program > Notifications
   Settings.Program.Balloon.Enabled = m_Page[PAGE_NOTIFICATIONS].IsDlgButtonChecked(IDC_CHECK_BALLOON);

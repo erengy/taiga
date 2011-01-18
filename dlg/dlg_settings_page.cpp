@@ -196,6 +196,8 @@ BOOL CSettingsPage::OnInitDialog() {
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.Program.List.MiddleClick);
       CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, AnimeList.Filter.NewEps);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.Highlight);
+      CheckDlgButton(IDC_RADIO_LIST_PROGRESS1 + Settings.Program.List.ProgressMode, TRUE);
+      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.ProgressShowEps);
       break;
     }
     // Program > Notifications
@@ -434,6 +436,11 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
       case IDC_RADIO_MIRC_CHANNEL2:
       case IDC_RADIO_MIRC_CHANNEL3: {
         CheckRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3, LOWORD(wParam));
+        return TRUE;
+      }
+      case IDC_RADIO_LIST_PROGRESS1:
+      case IDC_RADIO_LIST_PROGRESS2: {
+        CheckRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2, LOWORD(wParam));
         return TRUE;
       }
       case IDC_RADIO_TORRENT_NEW1:

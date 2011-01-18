@@ -203,7 +203,7 @@ BOOL CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     // Monitor anime folders
     case WM_MONITORCALLBACK: {
-      FolderMonitor.OnChange(reinterpret_cast<CFolderInfo*>(lParam), wParam);
+      FolderMonitor.OnChange(reinterpret_cast<CFolderInfo*>(lParam));
       return TRUE;
     }
     

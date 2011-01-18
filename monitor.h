@@ -37,7 +37,15 @@ public:
   CFolderInfo();
   virtual ~CFolderInfo();
   
-  vector<wstring> m_ChangeList;
+  class CFolderChangeInfo {
+  public:
+    CFolderChangeInfo() : AnimeIndex(0) {}
+    DWORD Action;
+    int AnimeIndex;
+    wstring FileName;
+  };
+  vector<CFolderChangeInfo> m_ChangeList;
+  
   wstring m_Path;
   int m_State;
 
@@ -61,7 +69,7 @@ public:
 
   // Main thread
   void Enable(bool enabled = true);
-  virtual void OnChange(CFolderInfo* folder, DWORD action);
+  virtual void OnChange(CFolderInfo* info);
 
   // ...
   HANDLE GetCompletionPort() { return m_hCompPort; }

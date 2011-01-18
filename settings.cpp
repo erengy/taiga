@@ -165,6 +165,8 @@ bool CSettings::Read() {
     }
     Program.List.Highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
     AnimeList.Filter.NewEps = list.child(L"filter").child(L"episodes").attribute(L"new").as_int();
+    Program.List.ProgressMode = list.child(L"progress").attribute(L"mode").as_int(1);
+    Program.List.ProgressShowEps = list.child(L"progress").attribute(L"showeps").as_int();
     // Notifications
     xml_node notifications = program.child(L"notifications");
     Program.Balloon.Enabled = notifications.child(L"balloon").attribute(L"enabled").as_int(TRUE);
@@ -375,6 +377,11 @@ bool CSettings::Write() {
       filter.append_child().set_name(L"episodes");
       filter.child(L"episodes").append_attribute(L"highlight") = Program.List.Highlight;
       filter.child(L"episodes").append_attribute(L"new") = AnimeList.Filter.NewEps;
+      // Progress
+      xml_node progress = list.append_child();
+      progress.set_name(L"progress");
+      progress.append_attribute(L"mode") = Program.List.ProgressMode;
+      progress.append_attribute(L"showeps") = Program.List.ProgressShowEps;
     // Notifications
     xml_node notifications = program.append_child();
     notifications.set_name(L"notifications");

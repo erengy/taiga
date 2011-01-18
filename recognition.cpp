@@ -48,16 +48,17 @@ CRecognition::CRecognition() {
 
 // =============================================================================
 
-bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime, bool strict) {
+bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime, 
+                                  bool strict, bool check_episode, bool check_date) {
   // Leave if title is empty
   if (episode.Title.empty()) return false;
   // Leave if episode number is out of range
-  if (strict && anime.Series_Episodes > 1) {
+  if (check_episode && anime.Series_Episodes > 1) {
     int number = GetLastEpisode(episode.Number);
     if (number == 0 || number > anime.Series_Episodes) return false;
   }
   // Leave if not yet aired
-  if (strict && anime.Series_Status == MAL_NOTYETAIRED) {
+  if (check_date && anime.Series_Status == MAL_NOTYETAIRED) {
     if (anime.Series_Start.empty() || anime.Series_Start == L"0000-00-00" || 
       CompareStrings(GetDate(L"yyyy'-'MM'-'dd"), anime.Series_Start) < 0) {
         return false;

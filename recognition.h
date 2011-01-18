@@ -33,7 +33,8 @@ public:
   virtual ~CRecognition() {};
   
   void Initialize();
-  bool CompareEpisode(CEpisode& episode, const CAnime& anime, bool strict = true);
+  bool CompareEpisode(CEpisode& episode, const CAnime& anime, 
+    bool strict = true, bool check_episode = true, bool check_date = true);
   bool ExamineTitle(wstring title, CEpisode& episode, 
     bool examine_inside = true, bool examine_outside = true, bool examine_number = true,
     bool check_extras = true, bool check_extension = true);

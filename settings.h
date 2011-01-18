@@ -39,6 +39,11 @@ enum UpdateTime {
   UPDATE_MODE_AFTERDELAY = 3
 };
 
+enum ListProgressMode {
+  LIST_PROGRESS_AVAILABLEEPS = 0,
+  LIST_PROGRESS_QUEUEDEPS    = 1
+};
+
 // =============================================================================
 
 class CSettings {
@@ -148,6 +153,8 @@ public:
     public:
       int DoubleClick, MiddleClick;
       BOOL Highlight;
+      int ProgressMode;
+      BOOL ProgressShowEps;
     } List;
     // Balloon
     class CSettingsProgramBalloon {

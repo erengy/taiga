@@ -492,6 +492,11 @@ FONT 8, "Tahoma"
     GROUPBOX        "Filter", IDC_STATIC, 10, 60, 295, 45
     AUTOCHECKBOX    "Show only new episodes", IDC_CHECK_FILTER_NEWEPS, 165, 85, 90, 10
     PUSHBUTTON      "Filter list...", IDC_BUTTON_FILTERLIST, 20, 75, 65, 14
+    GROUPBOX        "Progress", IDC_STATIC, 10, 110, 295, 55
+    LTEXT           "Buffer shows:", IDC_STATIC, 20, 125, 75, 8, SS_LEFT
+    RADIOBUTTON     "Available episodes", IDC_RADIO_LIST_PROGRESS1, 25, 135, 110, 8, WS_TABSTOP
+    RADIOBUTTON     "Queued episodes", IDC_RADIO_LIST_PROGRESS2, 25, 145, 105, 8, WS_TABSTOP
+    AUTOCHECKBOX    "Show episode count for all items", IDC_CHECK_LIST_PROGRESS_EPS, 165, 135, 125, 8
 }
 
 
@@ -619,8 +624,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,44,0
-    PRODUCTVERSION  0,6,44,0
+    FILEVERSION     0,6,45,0
+    PRODUCTVERSION  0,6,45,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -634,11 +639,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6.44"
+            VALUE "FileVersion", "0.6.45"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6.44"
+            VALUE "ProductVersion", "0.6.45"
         }
     }
     BLOCK "VarFileInfo"

@@ -278,26 +278,50 @@ void CAnime::CheckFolder() {
 bool CAnime::CheckNewEpisode(bool check_folder) {
   if (NewEps) return true;
   if (check_folder) CheckFolder();
-  int number = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
+
   wstring file;
+  int number = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
   
-  // Check anime folder first
   if (!Folder.empty()) {
     file = SearchFileFolder(Index, Folder, number, false);
   }
-  // Check other folders
-  /*if (file.empty()) {
-    for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
-      file = SearchFileFolder(Index, Settings.Folders.Root[i], number, false);
-      if (!file.empty()) break;
-    }
-  }*/
 
   return !file.empty();
 }
 
-void CAnime::CheckEpisodeAvailability() {
+bool CAnime::PlayEpisode(int number) {
+  wstring file;
+  
+  // Check anime folder first
+  CheckFolder();
   if (!Folder.empty()) {
+    file = SearchFileFolder(Index, Folder, number, false);
+  }
+
+  // Check other folders
+  if (file.empty()) {
+    for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
+      file = SearchFileFolder(Index, Settings.Folders.Root[i], number, false);
+      if (!file.empty()) break;
+    }
+  }
+
+  if (file.empty()) {
+    if (number == 0) number = 1;
+    MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + 
+      L" (" + Series_Title + L").");
+  } else {
+    Execute(file);
+  }
+  return !file.empty();
+}
+
+void CAnime::CheckEpisodeAvailability() {
+  if (Folder.empty()) {
+    for (int i = 1; i <= Series_Episodes; i++) {
+      SetEpisodeAvailability(i, false);
+    }
+  } else {
     SearchFileFolder(Index, Folder, -1, false);
   }
 }
@@ -311,11 +335,11 @@ bool CAnime::SetEpisodeAvailability(int number, bool available) {
     EpisodeAvailable[number - 1] = available;
     if (number == GetLastWatchedEpisode() + 1) {
       NewEps = available;
-      if (!Playing) {
-        int list_index = MainWindow.GetListIndex(Index);
-        if (list_index > -1) {
-          MainWindow.m_List.RedrawItems(list_index, list_index, true);
-        }
+    }
+    if (!Playing) {
+      int list_index = MainWindow.GetListIndex(Index);
+      if (list_index > -1) {
+        MainWindow.m_List.RedrawItems(list_index, list_index, true);
       }
     }
     return true;

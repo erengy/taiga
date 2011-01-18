@@ -33,7 +33,7 @@ CFolderInfo::CFolderInfo() :
   m_State(MONITOR_STATE_STOPPED),
   m_hDirectory(INVALID_HANDLE_VALUE),
   m_bWatchSubtree(TRUE),
-  m_dwNotifyFilter(FILE_NOTIFY_CHANGE_FILE_NAME),
+  m_dwNotifyFilter(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME),
   m_dwBytesReturned(0)
 {
   ZeroMemory(&m_Overlapped, sizeof(m_Overlapped));
@@ -59,8 +59,7 @@ CFolderMonitor::~CFolderMonitor() {
 
 bool CFolderMonitor::AddFolder(const wstring folder) {
   // Validate path
-  DWORD file_attr = ::GetFileAttributes(folder.c_str());
-  if (file_attr == INVALID_FILE_ATTRIBUTES || !(file_attr & FILE_ATTRIBUTE_DIRECTORY)) {
+  if (!FolderExists(folder)) {
     return false;
   }
 
@@ -166,20 +165,27 @@ DWORD CFolderMonitor::ThreadProc() {
         case MONITOR_STATE_ACTIVE: {
           DWORD dwNextEntryOffset = 0;
           PFILE_NOTIFY_INFORMATION pfni = NULL;
+          
           do {
             pfni = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(pfi->m_Buffer + dwNextEntryOffset);
             // Retrieve changed file name
             WCHAR file_name[MAX_PATH + 1] = {'\0'};
             CopyMemory(file_name, pfni->FileName, pfni->FileNameLength);
-            pfi->m_ChangeList.push_back(file_name);
-            // Send a message to the main thread
-            if (m_hWindow) {
-              ::PostMessage(m_hWindow, WM_MONITORCALLBACK, pfni->Action, reinterpret_cast<LPARAM>(pfi));
-            }
-            DEBUG_PRINT(L"CFolderMonitor :: Change detected: " + pfi->m_Path + L"\\" + file_name + L"\n");
+            DEBUG_PRINT(L"CFolderMonitor :: Change detected: (" + ToWSTR(pfni->Action) + L") " + 
+              pfi->m_Path + L"\\" + file_name + L"\n");
+            // Add item to list
+            pfi->m_ChangeList.resize(pfi->m_ChangeList.size() + 1);
+            pfi->m_ChangeList.back().Action = pfni->Action;
+            pfi->m_ChangeList.back().FileName = file_name;
             // Continue to next change
             dwNextEntryOffset += pfni->NextEntryOffset;
           } while (pfni->NextEntryOffset != 0);
+          
+          // Send a message to the main thread
+          if (m_hWindow) {
+            ::PostMessage(m_hWindow, WM_MONITORCALLBACK, 0, reinterpret_cast<LPARAM>(pfi));
+          }
+          
           // Continue monitoring
           ReadDirectoryChanges(pfi);
           break;
@@ -212,54 +218,122 @@ void CFolderMonitor::Enable(bool enabled) {
   }
 }
 
-void CFolderMonitor::OnChange(CFolderInfo* folder, DWORD action) {
+void CFolderMonitor::OnChange(CFolderInfo* info) {
   // Lock folder data
   m_CriticalSection.Enter();
 
-  // ...
-  switch (action) {
-    case FILE_ACTION_ADDED:
-    case FILE_ACTION_REMOVED:
-    case FILE_ACTION_RENAMED_NEW_NAME: {
-      for (unsigned int i = 0; i < folder->m_ChangeList.size(); i++) {
-        CEpisode episode;
-        CheckSlash(folder->m_Path);
-        wstring path = folder->m_Path + folder->m_ChangeList[i];
+  for (unsigned int i = 0; i < info->m_ChangeList.size(); i++) {
+    #define LIST info->m_ChangeList
+    
+    // Is path available?
+    bool path_available;
+    switch (info->m_ChangeList[i].Action) {
+      case FILE_ACTION_ADDED:
+      case FILE_ACTION_RENAMED_NEW_NAME:
+        path_available = true;
+        break;
+      case FILE_ACTION_REMOVED:
+      case FILE_ACTION_RENAMED_OLD_NAME:
+        path_available = false;
+        break;
+      default:
+        continue;
+    }
+    
+    CEpisode episode;
+    CheckSlash(info->m_Path);
+    wstring path = info->m_Path + LIST[i].FileName;
         
-        if (Meow.ExamineTitle(path, episode)) {
-          for (int i = AnimeList.Count; i > 0; i--) {
-            if (Meow.CompareEpisode(episode, AnimeList.Item[i])) {
-              #define ANIME AnimeList.Item[i]
-              
-              // Set anime folder
-              if (ANIME.Folder.empty() && !episode.Folder.empty()) {
-                CEpisode temp_episode; temp_episode.Title = episode.Folder;
-                if (Meow.CompareEpisode(temp_episode, ANIME)) {
-                  ANIME.Folder = episode.Folder;
-                  Settings.Anime.SetItem(ANIME.Series_ID, EMPTY_STR, ANIME.Folder, EMPTY_STR);
-                  DEBUG_PRINT(L"CFolderMonitor :: Set anime folder: " + ANIME.Series_Title + 
-                    L" -> " + ANIME.Folder + L"\n");
-                }
-              }
+    // Is it a file or a folder?
+    bool is_folder = false;
+    if (path_available) {
+      is_folder = FolderExists(path);
+    } else {
+      is_folder = !ValidateFileExtension(GetFileExtension(LIST[i].FileName), 4);
+    }
 
-              // Set episode availability
-              int number = GetLastEpisode(episode.Number);
-              if (ANIME.SetEpisodeAvailability(number, action != FILE_ACTION_REMOVED)) {
-                DEBUG_PRINT(L"CFolderMonitor :: New episode: " + ANIME.Series_Title + 
-                  L" -> " + ToWSTR(number) + L" (" + ToWSTR(action != FILE_ACTION_REMOVED) + L")\n");
-              }
+    // Compare with list item folders
+    if (is_folder && !path_available) {
+      int anime_index = 0;
+      for (int j = AnimeList.Count; j > 0; j--) {
+        if (!AnimeList.Item[j].Folder.empty() && IsEqual(AnimeList.Item[j].Folder, path)) {
+          anime_index = j;
+          break;
+        }
+      }
+      if (anime_index > 0) {
+        if (i == LIST.size() - 1) {
+          LIST[i].AnimeIndex = anime_index;
+        } else {
+          LIST[i + 1].AnimeIndex = anime_index;
+          continue;
+        }
+      }
+    }
 
-              #undef ANIME
-              break;
-            }
+    // Change anime folder
+    if (is_folder && LIST[i].AnimeIndex > 0) {
+      #define ANIME AnimeList.Item[LIST[i].AnimeIndex]
+      ANIME.Folder = path_available ? path : L"";
+      ANIME.CheckEpisodeAvailability();
+      Settings.Anime.SetItem(ANIME.Series_ID, EMPTY_STR, ANIME.Folder, EMPTY_STR);
+      DEBUG_PRINT(L"CFolderMonitor :: Change anime folder: " + 
+        ANIME.Series_Title + L" -> " + ANIME.Folder + L"\n");
+      #undef ANIME
+      continue;
+    }
+
+    // Examine path and compare with list items
+    if (Meow.ExamineTitle(path, episode)) {
+      if (LIST[i].AnimeIndex == 0 || is_folder == false) {
+        for (int j = AnimeList.Count; j > 0; j--) {
+          if (Meow.CompareEpisode(episode, AnimeList.Item[j], true, false, false)) {
+            LIST[i].AnimeIndex = j;
+            break;
           }
         }
       }
+      if (LIST[i].AnimeIndex > 0) {
+        #define ANIME AnimeList.Item[LIST[i].AnimeIndex]
 
-      folder->m_ChangeList.clear();
-      break;
+        // Set anime folder
+        if (path_available && ANIME.Folder.empty()) {
+          if (is_folder) {
+            ANIME.Folder = path;
+          } else if (!episode.Folder.empty()) {
+            CEpisode temp_episode;
+            temp_episode.Title = episode.Folder;
+            if (Meow.CompareEpisode(temp_episode, ANIME)) {
+              ANIME.Folder = episode.Folder;
+            }
+          }
+          if (!ANIME.Folder.empty()) {
+            ANIME.CheckEpisodeAvailability();
+            Settings.Anime.SetItem(ANIME.Series_ID, EMPTY_STR, ANIME.Folder, EMPTY_STR);
+            DEBUG_PRINT(L"CFolderMonitor :: Set anime folder: " + 
+              ANIME.Series_Title + L" -> " + ANIME.Folder + L"\n");
+          }
+        }
+
+        // Set episode availability
+        if (!is_folder) {
+          int number = GetLastEpisode(episode.Number);
+          if (path_available) {
+            path_available = IsEqual(GetPathOnly(path), ANIME.Folder);
+          }
+          if (ANIME.SetEpisodeAvailability(number, path_available)) {
+            DEBUG_PRINT(L"CFolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
+              ANIME.Series_Title + L" -> " + ToWSTR(number) + L"\n");
+          }
+        }
+        #undef ANIME
+      }
     }
+    #undef LIST
   }
+
+  // Clear change list
+  info->m_ChangeList.clear();
 
   // Unlock folder data
   m_CriticalSection.Leave();

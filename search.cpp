@@ -40,7 +40,7 @@ wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool
         // Check root folder
         if (search_folder == true) {
           if (Meow.ExamineTitle(wfd.cFileName, episode, false, false, false, false, false)) {
-            if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
+            if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index], true, false, false)) {
               FindClose(hFind);
               return root + wfd.cFileName + L"\\";
             }

@@ -134,10 +134,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // URL(address)
   //   Opens a web page.
   } else if (action == L"URL") {
-    wstring title = AnimeList.Item[AnimeList.Index].Series_Title;
-    EraseChars(title, L"_!?.,:;~+");
-    Erase(title, L" -");
-    Replace(body, L"%title%", title);
+    if (AnimeList.Index > 0) {
+      wstring title = AnimeList.Item[AnimeList.Index].Series_Title;
+      EraseChars(title, L"_!?.,:;~+");
+      Erase(title, L" -");
+      Replace(body, L"%title%", title);
+    }
     ExecuteLink(body);
 
   // ===========================================================================
@@ -333,11 +335,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Checks episode availability.
   //   wParam is a BOOL value.
   } else if (action == L"CheckEpisodes") {
-    if (wParam) {
-      for (int i = 1; i < AnimeList.Count; i++) {
+    if (wParam || !body.empty()) {
+      TaskbarList.SetProgressState(TBPF_NORMAL);
+      for (int i = 1; i <= AnimeList.Count; i++) {
+        MainWindow.ChangeStatus(L"Searching... (" + AnimeList.Item[i].Series_Title + L")");
         AnimeList.Item[i].CheckEpisodeAvailability();
+        TaskbarList.SetProgressValue(i, AnimeList.Count);
       }
-      MainWindow.RefreshList();
+      MainWindow.ChangeStatus(L"Search finished.");
+      TaskbarList.SetProgressState(TBPF_NOPROGRESS);
     } else {
       AnimeList.Item[AnimeList.Index].CheckEpisodeAvailability();
     }
@@ -670,24 +676,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Searches for an episode of an anime and plays it.
   } else if (action == L"PlayEpisode") {
     int number = ToINT(body);
-    wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
-    if (file.empty()) {
-      MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + L".");
-    } else {
-      Execute(file);
-    }
+    AnimeList.Item[AnimeList.Index].PlayEpisode(number);
   
   // PlayLast()
   //   Searches for the last watched episode of an anime and plays it.
   } else if (action == L"PlayLast") {
     int number = AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode();
-    wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
-    if (file.empty()) {
-      if (number == 0) number = 1;
-      MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + L".");
-    } else {
-      Execute(file);
-    }
+    AnimeList.Item[AnimeList.Index].PlayEpisode(number);
   
   // PlayNext()
   //   Searches for the next episode of an anime and plays it.
@@ -696,13 +691,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (AnimeList.Item[AnimeList.Index].Series_Episodes != 1) {
       number = AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode() + 1;
     }
-    wstring file = SearchFileFolder(AnimeList.Index, AnimeList.Item[AnimeList.Index].Folder, number, false);
-    if (file.empty()) {
-      if (number == 0) number = 1;
-      MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + L".");
-    } else {
-      Execute(file);
-    }
+    AnimeList.Item[AnimeList.Index].PlayEpisode(number);
   
   // PlayRandom()
   //   Searches for a random episode of an anime and plays it.

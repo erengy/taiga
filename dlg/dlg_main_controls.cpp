@@ -243,9 +243,13 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
           }
           break;
         }
-        // Check new episodes
+        // Check episodes
         case VK_F5: {
-          ExecuteAction(L"CheckNewEpisodes");
+          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS) {
+            ExecuteAction(L"CheckEpisodes(1)");
+          } else {
+            ExecuteAction(L"CheckNewEpisodes");
+          }
           break;
         }
       }
@@ -344,14 +348,21 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
             ratio_buffer = static_cast<float>(eps_buffer) / static_cast<float>(eps_total);
           }
 
-          // Draw buffer
           if (eps_buffer > 0) {
             rcBuffer.right = static_cast<int>((rcBuffer.right - rcBuffer.left) * ratio_buffer) + rcBuffer.left;
+          }
+          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS && eps_buffer > 0) {
+            rcItem.right = rcBuffer.right;
+          } else {
+            rcItem.right = static_cast<int>((rcItem.right - rcItem.left) * ratio_watched) + rcItem.left;
+          }
+
+          // Draw buffer
+          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_QUEUEDEPS && eps_buffer > 0) {
             UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
           }
-          
+
           // Draw progress
-          rcItem.right = static_cast<int>((rcItem.right - rcItem.left) * ratio_watched) + rcItem.left;
           if (ratio_watched == 1.0f) {
             UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem); // Completed
           } else if (pAnimeItem->GetStatus() == MAL_WATCHING) {
@@ -361,36 +372,39 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
           } else {
             UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem); // Completed / On hold / Plan to watch
           }
+        }
 
-          // Draw seperator
+        // Draw episode availability
+        if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS) {
+          if (eps_total > 0) {
+            float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(pAnimeItem->Series_Episodes);
+            for (unsigned int i = eps_buffer > 0 ? eps_buffer : eps_watched; i < pAnimeItem->EpisodeAvailable.size(); i++) {
+              if (pAnimeItem->EpisodeAvailable[i]) {
+                rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
+                rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
+                UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
+              }
+            }
+          } else {
+            if (pAnimeItem->NewEps) {
+              rcBuffer.left = rcItem.right;
+              rcBuffer.right = rcBuffer.left + static_cast<int>((rcAvail.right - rcAvail.left) * 0.05f);
+              UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
+            }
+          }
+        }
+
+        // Draw seperator
+        if (eps_watched > 0 || eps_buffer > 0) {
           rcBuffer.left = rcItem.right;
           rcBuffer.right = rcItem.right + 1;
           UI.ListProgress.Seperator.Draw(hdc.Get(), &rcBuffer);
         }
 
-        // Draw episode availability
-        // TODO: Enable after creating a user setting for this.
-        /*if (eps_total > 0) {
-          float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(pAnimeItem->Series_Episodes);
-          for (unsigned int i = eps_watched; i < pAnimeItem->EpisodeAvailable.size(); i++) {
-            if (pAnimeItem->EpisodeAvailable[i]) {
-              rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
-              rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
-              UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
-            }
-          }
-        } else {
-          if (pAnimeItem->NewEps) {
-            rcBuffer.left = rcItem.right;
-            rcBuffer.right = rcBuffer.left + static_cast<int>((rcAvail.right - rcAvail.left) * 0.05f);
-            UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
-          }
-        }*/
-
         // Draw text
-        if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT) {
-          wstring text = MAL.TranslateNumber(eps_buffer ? eps_buffer : eps_watched) + L"/" + 
-            MAL.TranslateNumber(eps_total) + L" episodes";
+        if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT || Settings.Program.List.ProgressShowEps) {
+          wstring text = MAL.TranslateNumber(eps_buffer ? eps_buffer : eps_watched) + L"/" + MAL.TranslateNumber(eps_total);
+          if (!Settings.Program.List.ProgressShowEps) text += L" episodes";
           hdc.EditFont(NULL, 7);
           hdc.SetBkMode(TRANSPARENT);
           hdc.SetTextColor(RGB(0, 0, 0)); // TODO: Color should be set in theme data

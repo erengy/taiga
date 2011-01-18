@@ -189,26 +189,23 @@ BOOL BrowseForFolder(HWND hwndOwner, LPCWSTR lpszTitle, UINT ulFlags, wstring& o
   return TRUE;
 }
 
-BOOL FileExists(const wstring& file) {
+bool FileExists(const wstring& file) {
   if (file.empty()) return FALSE;
   HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, 
     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (hFile != INVALID_HANDLE_VALUE) {
     CloseHandle(hFile);
-    return TRUE;
+    return false;
   }
-  return FALSE;
+  return true;
 }
 
-BOOL FolderExists(const wstring& path) {
-  DWORD fileattr = GetFileAttributes(path.c_str());
-  if (fileattr != INVALID_FILE_ATTRIBUTES) {
-    return (fileattr & FILE_ATTRIBUTE_DIRECTORY) != 0;
-  }
-  return false;
+bool FolderExists(const wstring& path) {
+  DWORD file_attr = GetFileAttributes(path.c_str());
+  return (file_attr != INVALID_FILE_ATTRIBUTES) && (file_attr & FILE_ATTRIBUTE_DIRECTORY);
 }
 
-BOOL PathExists(const wstring& path) {
+bool PathExists(const wstring& path) {
   return GetFileAttributes(path.c_str()) != INVALID_FILE_ATTRIBUTES;
 }
 

@@ -63,6 +63,7 @@ public:
   void Update(CEpisode episode, bool change_status);
   void CheckFolder();
   bool CheckNewEpisode(bool check_folder = false);
+  bool PlayEpisode(int number);
   void CheckEpisodeAvailability();
   bool SetEpisodeAvailability(int number, bool available);
   int GetIntValue(int mode);

@@ -7,7 +7,7 @@
 	<list>
 		<progress>
 			<border     type="solid"    value_1="E8E8E8"/>
-			<seperator  type="solid"    value_1="D2FFD2"/>
+			<seperator  type="progress" value_1="FFFFFF" value_2="EDEDED" value_3="E8E8E8"/>
 			<background type="progress" value_1="FCFCFC" value_2="EBEBEB" value_3="E5E5E5"/>
 			<buffer     type="progress" value_1="F0FFF0" value_2="DDFFDD" value_3="A0FFA0"/>
 			<completed  type="progress" value_1="E0F0FF" value_2="88E0FF" value_3="33DDFF"/>
@@ -55,6 +55,7 @@
 		<!-- List -->
 		<menu name="List">
 			<item name="Announce current episode" sub="Announce"/>
+			<item name="Check available episodes" action="CheckEpisodes(1)"/>
 			<item name="Check new episodes" action="CheckNewEpisodes()"/>
 			<item name="Play random anime" action="PlayRandomAnime()"/>
 			<item type="seperator"/>
@@ -160,7 +161,9 @@
 			<item name="Edit"        sub="Edit"/>
 			<item name="Search"      sub="Search"/>
 			<item type="seperator"/>
+			<item name="Check available episodes" action="CheckEpisodes()"/>
 			<item name="Open folder" action="OpenFolder()"/>
+			<item type="seperator"/>
 			<item name="Play" sub="Play"/>
 		</menu>
 			<!-- Edit -->
