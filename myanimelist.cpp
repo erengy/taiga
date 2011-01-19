@@ -371,13 +371,15 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
 
 void CMyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 21
+  #define HTMLCHARCOUNT 24
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Characters are sorted by their Unicode value */
+	{L"&sup3;&para;",           L"\u5CF6"}    // han character 'island'
     {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2
     {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
     {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
     {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
+	{L"\u00E8\u00BB\uFFFD&aring;", L"\u8ED2"},// surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
     {L"&Atilde;&uml;",          L"\u00E8"},   // small e, grave accent
     {L"&Atilde;&copy;",         L"\u00E9"},   // small e, acute accent
     {L"&Atilde;&frac14;",       L"\u00FC"},   // small u, umlaut mark
@@ -392,6 +394,7 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&atilde;\uFFFD&iquest;", L"\u30BF"},   // katakana letter ta
     {L"&atilde;\uFFFD\uFFFD",   L"\u30CD"},   // katakana letter ne
     {L"&atilde;\uFFFD&iexcl;",  L"\u30E1"},   // katakana letter me
+	{L"&aring;\uFFFD&shy;",     L"\u516D"},   // han character 'number six'
     /* Keep these at the end so they get replaced after others that include \uFFFD */
     {L"&Atilde;\uFFFD",         L"\u00DF"},   // small sharp s, German
     {L"&Aring;\uFFFD",          L"\u014D"},   // small o, macron mark

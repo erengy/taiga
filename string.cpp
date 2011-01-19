@@ -421,7 +421,7 @@ wstring EncodeURL(const wstring& str, bool encode_unreserved) {
 }
 
 void DecodeHTML(wstring& input) {
-  #define HTMLCHARCOUNT 27
+  #define HTMLCHARCOUNT 28
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     {L"&quot;",   L"\""},     // quotation mark
     {L"&amp;",    L"&"},      // ampersand
@@ -441,6 +441,7 @@ void DecodeHTML(wstring& input) {
     {L"&Eacute;", L"\u00C9"}, // capital e, acute accent
     {L"&egrave;", L"\u00E8"}, // small e, grave accent
     {L"&eacute;", L"\u00E9"}, // small e, acute accent
+	{L"&auml;",   L"\u00E4"}, // small a, diaeresis
     {L"&ndash;",  L"\u2013"}, // en dash
     {L"&mdash;",  L"\u2014"}, // em dash
     {L"&lsquo;",  L"\u2018"}, // left single quotation mark
