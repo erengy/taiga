@@ -369,7 +369,7 @@ void CMyAnimeList::DecodeText(wstring& text) {
   Replace(text, L"<br />", L"\r", true);
   
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 18
+  #define HTMLCHARCOUNT 21
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     {L"&Acirc;&sup2;",         L"\u00B2"},   // superscript 2
     {L"&Acirc;&frac12;",       L"\u00BD"},   // fraction 1/2
