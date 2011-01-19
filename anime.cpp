@@ -249,18 +249,10 @@ void CAnime::Update(CEpisode episode, bool change_status) {
 void CAnime::CheckFolder() {
   wstring old_folder = Folder;
   
-  if (!Folder.empty()) {
-    // Check if that folder still exists
-    if (!FolderExists(Folder)) {
-      old_folder.clear();
-      Folder.clear();
-    // Check if it's a valid folder
-    } else {
-      CEpisode episode; episode.Title = Folder;
-      if (!Meow.CompareEpisode(episode, AnimeList.Item[Index])) {
-        Folder.clear();
-      }
-    }
+  // Check if that folder still exists
+  if (!Folder.empty() && !FolderExists(Folder)) {
+    old_folder.clear();
+    Folder.clear();
   }
   if (Folder.empty()) {
     for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
@@ -422,14 +414,14 @@ bool CAnime::ParseSearchResult(const wstring& data) {
 // =============================================================================
 
 void CAnime::SetStartDate(wstring date, bool ignore_previous) {
-  if (My_StartDate == L"0000-00-00" || My_StartDate.empty() || ignore_previous) {
+  if (!MAL.IsValidDate(My_StartDate) || ignore_previous) {
     My_StartDate = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
     AnimeList.Write(Index, L"my_start_date", My_StartDate, ANIMELIST_EDITANIME);
   }
 }
 
 void CAnime::SetFinishDate(wstring date, bool ignore_previous) {
-  if (My_FinishDate == L"0000-00-00" || My_FinishDate.empty() || ignore_previous) {
+  if (!MAL.IsValidDate(My_FinishDate) || ignore_previous) {
     My_FinishDate = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
     AnimeList.Write(Index, L"my_finish_date", My_FinishDate, ANIMELIST_EDITANIME);
   }

@@ -81,20 +81,20 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Column click
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = (LPNMLISTVIEW)pnmh;
-        int iOrder = m_List.GetSortOrder() * -1;
-        if (iOrder == 0) iOrder = 1;
+        int order = m_List.GetSortOrder() * -1;
+        if (order == 0) order = 1;
         switch (lplv->iSubItem) {
           // Episode
           case 2:
-            m_List.Sort(lplv->iSubItem, iOrder, LISTSORTTYPE_NUMBER, ListViewCompareProc);
+            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_NUMBER, ListViewCompareProc);
             break;
           // Season
           case 4:
-            m_List.Sort(lplv->iSubItem, iOrder, LISTSORTTYPE_SEASON, ListViewCompareProc);
+            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_SEASON, ListViewCompareProc);
             break;
           // Other columns
           default:
-            m_List.Sort(lplv->iSubItem, iOrder, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
+            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
             break;
         }
         break;

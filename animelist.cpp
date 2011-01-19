@@ -68,11 +68,15 @@ BOOL CAnimeList::Read() {
   xml_node myinfo = myanimelist.child(L"myinfo");
     User.ID          = XML_ReadIntValue(myinfo, L"user_id");
     User.Name        = XML_ReadStrValue(myinfo, L"user_name");
+    // Since MAL is too slow to update these values, 
+    // we'll be counting by ourselves at CAnimeList::AddItem
+    /*
     User.Watching    = XML_ReadIntValue(myinfo, L"user_watching");
     User.Completed   = XML_ReadIntValue(myinfo, L"user_completed");
     User.OnHold      = XML_ReadIntValue(myinfo, L"user_onhold");
     User.Dropped     = XML_ReadIntValue(myinfo, L"user_dropped");
     User.PlanToWatch = XML_ReadIntValue(myinfo, L"user_plantowatch");
+    */
     User.DaysSpent   = XML_ReadStrValue(myinfo, L"user_days_spent_watching");
 
   // Read anime list
@@ -242,17 +246,19 @@ void CAnimeList::AddItem(
   if (Item[Count].Series_Episodes) {
     Item[Count].EpisodeAvailable.resize(Item[Count].Series_Episodes);
   }
+  if (Count <= 0) return;
 
-  if (Count > 0) {
-    DecodeHTML(Item[Count].Series_Title);
-    DecodeHTML(Item[Count].Series_Synonyms);
-    for (size_t i = 0; i < Settings.Anime.Item.size(); i++) {
-      if (Item[Count].Series_ID == Settings.Anime.Item[i].ID) {
-        Item[Count].FansubGroup = Settings.Anime.Item[i].FansubGroup;
-        Item[Count].Folder = Settings.Anime.Item[i].Folder;
-        Item[Count].Synonyms = Settings.Anime.Item[i].Titles;
-        break;
-      }
+  DecodeHTML(Item[Count].Series_Title);
+  DecodeHTML(Item[Count].Series_Synonyms);
+
+  User.IncreaseItemCount(my_status, 1, false);
+
+  for (size_t i = 0; i < Settings.Anime.Item.size(); i++) {
+    if (Item[Count].Series_ID == Settings.Anime.Item[i].ID) {
+      Item[Count].FansubGroup = Settings.Anime.Item[i].FansubGroup;
+      Item[Count].Folder = Settings.Anime.Item[i].Folder;
+      Item[Count].Synonyms = Settings.Anime.Item[i].Titles;
+      break;
     }
   }
 }
@@ -389,27 +395,27 @@ int CUser::GetItemCount(int status) {
   return count;
 }
 
-void CUser::IncreaseItemCount(int status, int count) {
+void CUser::IncreaseItemCount(int status, int count, bool write) {
   switch (status) {
     case MAL_WATCHING:
       Watching += count;
-      AnimeList.Write(-1, L"user_watching", ToWSTR(Watching), ANIMELIST_EDITUSER);
+      if (write) AnimeList.Write(-1, L"user_watching", ToWSTR(Watching), ANIMELIST_EDITUSER);
       break;
     case MAL_COMPLETED:
       Completed += count;
-      AnimeList.Write(-1, L"user_completed", ToWSTR(Completed), ANIMELIST_EDITUSER);
+      if (write) AnimeList.Write(-1, L"user_completed", ToWSTR(Completed), ANIMELIST_EDITUSER);
       break;
     case MAL_ONHOLD:
       OnHold += count;
-      AnimeList.Write(-1, L"user_onhold", ToWSTR(OnHold), ANIMELIST_EDITUSER);
+      if (write) AnimeList.Write(-1, L"user_onhold", ToWSTR(OnHold), ANIMELIST_EDITUSER);
       break;
     case MAL_DROPPED:
       Dropped += count;
-      AnimeList.Write(-1, L"user_dropped", ToWSTR(Dropped), ANIMELIST_EDITUSER);
+      if (write) AnimeList.Write(-1, L"user_dropped", ToWSTR(Dropped), ANIMELIST_EDITUSER);
       break;
     case MAL_PLANTOWATCH:
       PlanToWatch += count;
-      AnimeList.Write(-1, L"user_plantowatch", ToWSTR(PlanToWatch), ANIMELIST_EDITUSER);
+      if (write) AnimeList.Write(-1, L"user_plantowatch", ToWSTR(PlanToWatch), ANIMELIST_EDITUSER);
       break;
   }
 }

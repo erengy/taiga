@@ -161,43 +161,35 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       m_Edit.SetWindowHandle(NULL);
       
       // Date limits and defaults
-      if (pAnimeItem->Series_Start != L"0000-00-00" && !pAnimeItem->Series_Start.empty()) {
+      if (MAL.IsValidDate(pAnimeItem->Series_Start)) {
         SYSTEMTIME stSeriesStart;
-        stSeriesStart.wYear  = ToINT(pAnimeItem->Series_Start.substr(0, 4));
-        stSeriesStart.wMonth = ToINT(pAnimeItem->Series_Start.substr(5, 2));
-        stSeriesStart.wDay   = ToINT(pAnimeItem->Series_Start.substr(8, 2));
+        MAL.ParseDateString(pAnimeItem->Series_Start, stSeriesStart.wYear, stSeriesStart.wMonth, stSeriesStart.wDay);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
       }
-      if (pAnimeItem->Series_End != L"0000-00-00" && !pAnimeItem->Series_End.empty()) {
+      if (MAL.IsValidDate(pAnimeItem->Series_End)) {
         SYSTEMTIME stSeriesEnd;
-        stSeriesEnd.wYear  = ToINT(pAnimeItem->Series_End.substr(0, 4));
-        stSeriesEnd.wMonth = ToINT(pAnimeItem->Series_End.substr(5, 2));
-        stSeriesEnd.wDay   = ToINT(pAnimeItem->Series_End.substr(8, 2));
+        MAL.ParseDateString(pAnimeItem->Series_End, stSeriesEnd.wYear, stSeriesEnd.wMonth, stSeriesEnd.wDay);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesEnd);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesEnd);
       }
       // Start date
-      if (pAnimeItem->My_StartDate == L"0000-00-00" || pAnimeItem->My_StartDate.empty()) {
-        SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, NULL);
-      } else {
+      if (MAL.IsValidDate(pAnimeItem->My_StartDate)) {
         SYSTEMTIME stMyStart;
-        stMyStart.wYear  = ToINT(pAnimeItem->My_StartDate.substr(0, 4));
-        stMyStart.wMonth = ToINT(pAnimeItem->My_StartDate.substr(5, 2));
-        stMyStart.wDay   = ToINT(pAnimeItem->My_StartDate.substr(8, 2));
+        MAL.ParseDateString(pAnimeItem->My_StartDate, stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyStart);
+      } else {
+        SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, NULL);
       }
       // Finish date
-      if (pAnimeItem->My_FinishDate == L"0000-00-00" || pAnimeItem->My_FinishDate.empty()) {
-        SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, NULL);
-      } else {
+      if (MAL.IsValidDate(pAnimeItem->My_FinishDate)) {
         SYSTEMTIME stMyFinish;
-        stMyFinish.wYear  = ToINT(pAnimeItem->My_FinishDate.substr(0, 4));
-        stMyFinish.wMonth = ToINT(pAnimeItem->My_FinishDate.substr(5, 2));
-        stMyFinish.wDay   = ToINT(pAnimeItem->My_FinishDate.substr(8, 2));
+        MAL.ParseDateString(pAnimeItem->My_FinishDate, stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyFinish);
+      } else {
+        SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, NULL);
       }
 
       // Alternative titles

@@ -204,10 +204,12 @@ BOOL CTorrents::Tip() {
 // =============================================================================
 
 void CTorrents::AddFilter(int option, int type, wstring value) {
-  Settings.RSS.Torrent.Filters.Global.resize(Settings.RSS.Torrent.Filters.Global.size() + 1);
-  Settings.RSS.Torrent.Filters.Global.back().Option = option;
-  Settings.RSS.Torrent.Filters.Global.back().Type = type;
-  Settings.RSS.Torrent.Filters.Global.back().Value = value;
+  #define FILTERS Settings.RSS.Torrent.Filters.Global
+  FILTERS.resize(FILTERS.size() + 1);
+  FILTERS.back().Option = option;
+  FILTERS.back().Type = type;
+  FILTERS.back().Value = value;
+  #undef FILTERS
 }
 
 BOOL CTorrents::Filter(int feed_index, int anime_index) {
@@ -324,7 +326,7 @@ void CTorrents::ParseDescription(CRSSFeedItem& feed_item, const wstring& source)
 
   // NyaaTorrents
   } else if (InStr(source, L"nyaatorrents", 0, true) > -1) {
-    Replace(feed_item.Description, L"None\n", L"");
+    Erase(feed_item.Description, L"None\n");
     Replace(feed_item.Description, L"\n\n", L"\n", true);
 
   // TokyoTosho

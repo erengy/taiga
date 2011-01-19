@@ -59,7 +59,7 @@ bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime,
   }
   // Leave if not yet aired
   if (check_date && anime.Series_Status == MAL_NOTYETAIRED) {
-    if (anime.Series_Start.empty() || anime.Series_Start == L"0000-00-00" || 
+    if (!MAL.IsValidDate(anime.Series_Start) || 
       CompareStrings(GetDate(L"yyyy'-'MM'-'dd"), anime.Series_Start) < 0) {
         return false;
     }

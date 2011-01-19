@@ -44,7 +44,7 @@ public:
 
   void Clear();
   int GetItemCount(int status);
-  void IncreaseItemCount(int status, int count = 1);
+  void IncreaseItemCount(int status, int count = 1, bool write = true);
 };
 
 // =============================================================================

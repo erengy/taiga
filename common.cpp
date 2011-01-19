@@ -190,14 +190,14 @@ BOOL BrowseForFolder(HWND hwndOwner, LPCWSTR lpszTitle, UINT ulFlags, wstring& o
 }
 
 bool FileExists(const wstring& file) {
-  if (file.empty()) return FALSE;
+  if (file.empty()) return false;
   HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, 
     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (hFile != INVALID_HANDLE_VALUE) {
     CloseHandle(hFile);
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool FolderExists(const wstring& path) {

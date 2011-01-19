@@ -53,12 +53,13 @@ BOOL CTorrentWindow::OnInitDialog() {
   m_List.SetTheme();
   
   // Insert list columns
-  m_List.InsertColumn(0, 230, 230, LVCFMT_LEFT,  L"Anime title");
+  m_List.InsertColumn(0, 240, 240, LVCFMT_LEFT,  L"Anime title");
   m_List.InsertColumn(1,  60,  60, LVCFMT_RIGHT, L"Episode");
   m_List.InsertColumn(2, 120, 120, LVCFMT_LEFT,  L"Group");
   m_List.InsertColumn(3,  70,  70, LVCFMT_RIGHT, L"Size");
   m_List.InsertColumn(4, 100, 100, LVCFMT_LEFT,  L"Video");
   m_List.InsertColumn(5, 250, 250, LVCFMT_LEFT,  L"Description");
+  m_List.InsertColumn(6, 250, 250, LVCFMT_LEFT,  L"File name");
   // Insert list groups
   m_List.InsertGroup(0, L"Anime");
   m_List.InsertGroup(1, L"Batch");
@@ -116,7 +117,7 @@ void CTorrentWindow::RefreshList() {
     if (Settings.RSS.Torrent.HideUnidentified && !Torrents.Feed.Item[i].EpisodeData.Index) {
       continue;
     }
-    wstring title, video;
+    wstring title, number, video;
     int group = TORRENT_ANIME, icon = StatusToIcon(0);
     if (Torrents.Feed.Item[i].Category == L"Batch" || 
       !IsNumeric(Torrents.Feed.Item[i].EpisodeData.Number)) {
@@ -131,6 +132,11 @@ void CTorrentWindow::RefreshList() {
       group = TORRENT_OTHER;
       title = Torrents.Feed.Item[i].Title;
     }
+    number = Torrents.Feed.Item[i].EpisodeData.Number;
+    EraseLeft(number, L"0", false);
+    if (!Torrents.Feed.Item[i].EpisodeData.Version.empty()) {
+      number += L"v" + Torrents.Feed.Item[i].EpisodeData.Version;
+    }
     video = Torrents.Feed.Item[i].EpisodeData.VideoType;
     if (!Torrents.Feed.Item[i].EpisodeData.Resolution.empty()) {
       if (!video.empty()) video += L" ";
@@ -138,16 +144,17 @@ void CTorrentWindow::RefreshList() {
     }
     int index = m_List.InsertItem(i, group, icon, title.c_str(), 
       reinterpret_cast<LPARAM>(&Torrents.Feed.Item[i]));
-    m_List.SetItem(index, 1, Torrents.Feed.Item[i].EpisodeData.Number.c_str());
+    m_List.SetItem(index, 1, number.c_str());
     m_List.SetItem(index, 2, Torrents.Feed.Item[i].EpisodeData.Group.c_str());
     m_List.SetItem(index, 3, Torrents.Feed.Item[i].Size.c_str());
     m_List.SetItem(index, 4, video.c_str());
     m_List.SetItem(index, 5, Torrents.Feed.Item[i].Description.c_str());
+    m_List.SetItem(index, 6, Torrents.Feed.Item[i].EpisodeData.File.c_str());
     m_List.SetCheckState(index, Torrents.Feed.Item[i].Download);
   }
 
   // Show again
-  m_List.Show(SW_SHOW);
+  m_List.Show();
 
   // Set title
   wstring title = L"Torrents";
@@ -201,20 +208,20 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Column click
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = (LPNMLISTVIEW)pnmh;
-        int iOrder = m_List.GetSortOrder() * -1;
-        if (iOrder == 0) iOrder = 1;
+        int order = m_List.GetSortOrder() * -1;
+        if (order == 0) order = 1;
         switch (lplv->iSubItem) {
           // Episode
           case 1:
-            m_List.Sort(lplv->iSubItem, iOrder, LISTSORTTYPE_NUMBER, ListViewCompareProc);
+            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_NUMBER, ListViewCompareProc);
             break;
           // File size
           case 3:
-            m_List.Sort(lplv->iSubItem, iOrder, LISTSORTTYPE_FILESIZE, ListViewCompareProc);
+            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_FILESIZE, ListViewCompareProc);
             break;
           // Other columns
           default:
-            m_List.Sort(lplv->iSubItem, iOrder, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
+            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
             break;
         }
         break;

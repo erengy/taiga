@@ -110,7 +110,9 @@ public:
   bool UpdateSucceeded(const wstring& data, int update_mode, int episode = -1, const wstring& tags = L"");
   
   void DecodeText(wstring& text);
+  bool IsValidDate(const wstring& date);
   bool IsValidEpisode(int episode, int watched, int total);
+  void ParseDateString(const wstring& date, unsigned short& year, unsigned short& month, unsigned short& day);
   wstring TranslateDate(wstring value, bool reverse = false);
   wstring TranslateMyStatus(int value, bool add_count);
   int TranslateMyStatus(const wstring& value);

@@ -451,11 +451,13 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
 
   // ===========================================================================
   
-  // Check new episodes
-  Taiga.TickerNewEpisodes++;
-  if (Taiga.TickerNewEpisodes >= 30 * 60) { // 30 minutes
-    Taiga.TickerNewEpisodes = 0;
-    ExecuteAction(L"CheckNewEpisodes()", TRUE);
+  // Check new episodes (if folder monitor is disabled)
+  if (!Settings.Folders.WatchEnabled) {
+    Taiga.TickerNewEpisodes++;
+    if (Taiga.TickerNewEpisodes >= 30 * 60) { // 30 minutes
+      Taiga.TickerNewEpisodes = 0;
+      ExecuteAction(L"CheckNewEpisodes()", TRUE);
+    }
   }
 
   // ===========================================================================

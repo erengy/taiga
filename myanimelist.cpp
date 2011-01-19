@@ -169,12 +169,12 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
         ADD_DATA_I(L"rewatch_value", anime.rewatch_value);
         switch (update_mode) { // TODO: Move to CEventList::Check() or somewhere else
           case HTTP_MAL_AnimeEdit: {
-            if (ANIME.My_StartDate != L"0000-00-00" && !ANIME.My_StartDate.empty()) {
+            if (MAL.IsValidDate(ANIME.My_StartDate)) {
               anime.date_start = ANIME.My_StartDate.substr(5, 2) + 
                                  ANIME.My_StartDate.substr(8, 2) + 
                                  ANIME.My_StartDate.substr(0, 4);
             }
-            if (ANIME.My_FinishDate != L"0000-00-00" && !ANIME.My_FinishDate.empty()) {
+            if (MAL.IsValidDate(ANIME.My_FinishDate)) {
               anime.date_finish = ANIME.My_FinishDate.substr(5, 2) + 
                                   ANIME.My_FinishDate.substr(8, 2) + 
                                   ANIME.My_FinishDate.substr(0, 4);
@@ -296,23 +296,27 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
             L"&completed_eps="      + ToWSTR(anime.episode > -1 ? anime.episode : ANIME.My_WatchedEpisodes) + 
             L"&last_completed_eps=" + ToWSTR(ANIME.My_WatchedEpisodes) + 
             L"&score="              + ToWSTR(anime.score > -1 ? anime.score : ANIME.My_Score);
-          if (ANIME.My_StartDate == L"0000-00-00" || ANIME.My_StartDate.empty()) {
+          if (MAL.IsValidDate(ANIME.My_StartDate)) {
+            unsigned short year, month, day;
+            MAL.ParseDateString(ANIME.My_StartDate, year, month, day);
+            buffer += 
+            L"&startMonth=" + ToWSTR(month) + 
+            L"&startDay="   + ToWSTR(day) + 
+            L"&startYear="  + ToWSTR(year);
+          } else {
             buffer += 
             L"&unknownStart=1";
-          } else {
-            buffer += 
-            L"&startMonth=" + ANIME.My_StartDate.substr(5, 2) + 
-            L"&startDay="   + ANIME.My_StartDate.substr(8, 2) + 
-            L"&startYear="  + ANIME.My_StartDate.substr(0, 4);
           }
-          if (ANIME.My_FinishDate == L"0000-00-00" || ANIME.My_FinishDate.empty()) {
+          if (MAL.IsValidDate(ANIME.My_FinishDate)) {
+            unsigned short year, month, day;
+            MAL.ParseDateString(ANIME.My_FinishDate, year, month, day);
+            buffer += 
+            L"&endMonth=" + ToWSTR(month) + 
+            L"&endDay="   + ToWSTR(day) + 
+            L"&endYear="  + ToWSTR(year);
+          } else {
             buffer += 
             L"&unknownEnd=1";
-          } else {
-            buffer += 
-            L"&endMonth=" + ANIME.My_FinishDate.substr(5, 2) + 
-            L"&endDay="   + ANIME.My_FinishDate.substr(8, 2) + 
-            L"&endYear="  + ANIME.My_FinishDate.substr(0, 4);
           }
           buffer += L"&submitIt=2";
           MainClient.Post(L"myanimelist.net", 
@@ -366,32 +370,32 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
 // =============================================================================
 
 void CMyAnimeList::DecodeText(wstring& text) {
-  Replace(text, L"<br />", L"\r", true);
-  
   // TODO: Remove when MAL fixes its encoding >_<
   #define HTMLCHARCOUNT 21
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
-    {L"&Acirc;&sup2;",         L"\u00B2"},   // superscript 2
-    {L"&Acirc;&frac12;",       L"\u00BD"},   // fraction 1/2
-	{L"&atilde;\uFFFD\uFFFD",  L"\u30CD"},   // katakana letter ne
-    {L"&Atilde;\uFFFD",        L"\u00DF"},   // small sharp s, German
-    {L"&Atilde;&cent;",        L"\u00E2"},   // small a, circumflex accent
-    {L"&Atilde;&curren;",      L"\u00E4"},   // small a, umlaut mark
-    {L"&Atilde;&uml;",         L"\u00E8"},   // small e, grave accent
-    {L"&Atilde;&copy;",        L"\u00E9"},   // small e, acute accent
-    {L"&Atilde;&frac14;",      L"\u00FC"},   // small u, umlaut mark
-    {L"&Aring;\uFFFD",         L"\u014D"},   // small o, macron mark
-    {L"&atilde;\uFFFD&ordf;",  L"\u30AA"},   // katakana letter o
-	{L"&atilde;\uFFFD&iquest;",L"\u30BF"},   // katakana letter ta
-	{L"&atilde;\uFFFD&macr;",  L"\u30AF"},   // katakana letter ku
-	{L"&atilde;\uFFFD&iexcl;", L"\u30E1"},   // katakana letter me
-	{L"&atilde;\uFFFD&not;",   L"\u30AC"},   // katakana letter ga
-    {L"&Aring;&laquo;",        L"\u016B"},   // small u, macron mark
-    {L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"}, // black star (black and white stars are encoded the same in API >_<)
-    {L"&acirc;\uFFFD&yen;",    L"\u2665"},   // heart
-    {L"&acirc;\uFFFD&ordf;",   L"\u266A"},   // eighth note
-    {L"&acirc;\uFFFD\uFFFD",   L"\u2729"},   // white star
-    {L"&acirc;\uFFFD",         L"\u2020"},   // dagger
+    /* Characters are sorted by their Unicode value */
+    {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2
+    {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
+    {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
+    {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
+    {L"&Atilde;&uml;",          L"\u00E8"},   // small e, grave accent
+    {L"&Atilde;&copy;",         L"\u00E9"},   // small e, acute accent
+    {L"&Atilde;&frac14;",       L"\u00FC"},   // small u, umlaut mark
+    {L"&Aring;&laquo;",         L"\u016B"},   // small u, macron mark
+    {L"k&acirc;\uFFFD\uFFFDR",  L"k\u2605R"}, // black star (black and white stars are encoded the same in API >_<)
+    {L"&acirc;\uFFFD&yen;",     L"\u2665"},   // heart
+    {L"&acirc;\uFFFD&ordf;",    L"\u266A"},   // eighth note
+    {L"&acirc;\uFFFD\uFFFD",    L"\u2729"},   // white star
+    {L"&atilde;\uFFFD&ordf;",   L"\u30AA"},   // katakana letter o
+    {L"&atilde;\uFFFD&not;",    L"\u30AC"},   // katakana letter ga
+    {L"&atilde;\uFFFD&macr;",   L"\u30AF"},   // katakana letter ku
+    {L"&atilde;\uFFFD&iquest;", L"\u30BF"},   // katakana letter ta
+    {L"&atilde;\uFFFD\uFFFD",   L"\u30CD"},   // katakana letter ne
+    {L"&atilde;\uFFFD&iexcl;",  L"\u30E1"},   // katakana letter me
+    /* Keep these at the end so they get replaced after others that include \uFFFD */
+    {L"&Atilde;\uFFFD",         L"\u00DF"},   // small sharp s, German
+    {L"&Aring;\uFFFD",          L"\u014D"},   // small o, macron mark
+    {L"&acirc;\uFFFD",          L"\u2020"},   // dagger
   };
   if (InStr(text, L"&") > -1) {
     for (int i = 0; i < HTMLCHARCOUNT; i++) {
@@ -400,8 +404,13 @@ void CMyAnimeList::DecodeText(wstring& text) {
   }
   #undef HTMLCHARCOUNT
   
+  Replace(text, L"<br />", L"\r", true);
   StripHTML(text);
   DecodeHTML(text);
+}
+
+bool CMyAnimeList::IsValidDate(const wstring& date) {
+  return date.length() == 10 && date != L"0000-00-00";
 }
 
 bool CMyAnimeList::IsValidEpisode(int episode, int watched, int total) {
@@ -418,13 +427,20 @@ bool CMyAnimeList::IsValidEpisode(int episode, int watched, int total) {
   }
 }
 
+void CMyAnimeList::ParseDateString(const wstring& date, unsigned short& year, unsigned short& month, unsigned short& day) {
+  if (date.length() == 10) {
+    year  = ToINT(date.substr(0, 4));
+    month = ToINT(date.substr(5, 2));
+    day   = ToINT(date.substr(8, 2));
+  }
+}
+
 wstring CMyAnimeList::TranslateDate(wstring value, bool reverse) {
-  if (value == L"0000-00-00" || value.empty()) {
+  if (!IsValidDate(value)) {
     return L"Unknown";
   } else {
-    int year  = ToINT(value.substr(0, 4));
-    int month = ToINT(value.substr(5, 2));
-    int day   = ToINT(value.substr(8, 2));
+    unsigned short year, month, day;
+    ParseDateString(value, year, month, day);
 
     if (month < 3) {
       value = L"Winter";
