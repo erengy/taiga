@@ -369,10 +369,11 @@ void CMyAnimeList::DecodeText(wstring& text) {
   Replace(text, L"<br />", L"\r", true);
   
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 15
+  #define HTMLCHARCOUNT 18
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     {L"&Acirc;&sup2;",         L"\u00B2"},   // superscript 2
     {L"&Acirc;&frac12;",       L"\u00BD"},   // fraction 1/2
+	{L"&atilde;\uFFFD\uFFFD",  L"\u30CD"},   // katakana letter ne
     {L"&Atilde;\uFFFD",        L"\u00DF"},   // small sharp s, German
     {L"&Atilde;&cent;",        L"\u00E2"},   // small a, circumflex accent
     {L"&Atilde;&curren;",      L"\u00E4"},   // small a, umlaut mark
@@ -380,6 +381,11 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&Atilde;&copy;",        L"\u00E9"},   // small e, acute accent
     {L"&Atilde;&frac14;",      L"\u00FC"},   // small u, umlaut mark
     {L"&Aring;\uFFFD",         L"\u014D"},   // small o, macron mark
+    {L"&atilde;\uFFFD&ordf;",  L"\u30AA"},   // katakana letter o
+	{L"&atilde;\uFFFD&iquest;",L"\u30BF"},   // katakana letter ta
+	{L"&atilde;\uFFFD&macr;",  L"\u30AF"},   // katakana letter ku
+	{L"&atilde;\uFFFD&iexcl;", L"\u30E1"},   // katakana letter me
+	{L"&atilde;\uFFFD&not;",   L"\u30AC"},   // katakana letter ga
     {L"&Aring;&laquo;",        L"\u016B"},   // small u, macron mark
     {L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"}, // black star (black and white stars are encoded the same in API >_<)
     {L"&acirc;\uFFFD&yen;",    L"\u2665"},   // heart
