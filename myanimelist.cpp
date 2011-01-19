@@ -374,7 +374,7 @@ void CMyAnimeList::DecodeText(wstring& text) {
   #define HTMLCHARCOUNT 24
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Characters are sorted by their Unicode value */
-	{L"&sup3;&para;",           L"\u5CF6"}    // han character 'island'
+	{L"&sup3;&para;",           L"\u5CF6"},   // han character 'island'
     {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2
     {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
     {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
