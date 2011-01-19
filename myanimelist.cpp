@@ -379,7 +379,7 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
     {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
     {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
-	{L"\u00E8\u00BB\uFFFD&aring;", L"\u8ED2"},// surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
+	{L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"}, // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
     {L"&Atilde;&uml;",          L"\u00E8"},   // small e, grave accent
     {L"&Atilde;&copy;",         L"\u00E9"},   // small e, acute accent
     {L"&Atilde;&frac14;",       L"\u00FC"},   // small u, umlaut mark
