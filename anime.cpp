@@ -105,8 +105,8 @@ void CAnime::Start(CEpisode episode) {
       for (size_t i = 0; i < Settings.Folders.Root.size(); i++) {
         // Set the folder if only it is under a root folder
         if (StartsWith(episode.Folder, Settings.Folders.Root[i])) {
-          Folder = episode.Folder;
-          Settings.Anime.SetItem(Series_ID, EMPTY_STR, Folder, EMPTY_STR);
+          SetFolder(episode.Folder, true, false);
+          break;
         }
       }
     }
@@ -247,25 +247,34 @@ void CAnime::Update(CEpisode episode, bool change_status) {
 // =============================================================================
 
 void CAnime::CheckFolder() {
-  wstring old_folder = Folder;
-  
-  // Check if that folder still exists
+  // Check if current folder still exists
   if (!Folder.empty() && !FolderExists(Folder)) {
-    old_folder.clear();
     Folder.clear();
   }
+  // Search root folders
   if (Folder.empty()) {
+    wstring new_folder;
     for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
-      Folder = SearchFileFolder(Index, Settings.Folders.Root[i], 0, true);
-      if (!Folder.empty()) {
-        Settings.Anime.SetItem(Series_ID, EMPTY_STR, Folder, EMPTY_STR);
+      new_folder = SearchFileFolder(Index, Settings.Folders.Root[i], 0, true);
+      if (!new_folder.empty()) {
+        SetFolder(new_folder, true, false);
         return;
       }
     }
   }
-
-  Folder = old_folder;
 }
+
+void CAnime::SetFolder(const wstring& folder, bool save_settings, bool check_episodes) {
+  Folder = folder;
+  if (save_settings) {
+    Settings.Anime.SetItem(Series_ID, EMPTY_STR, Folder, EMPTY_STR);
+  }
+  if (check_episodes) {
+    CheckEpisodeAvailability();
+  }
+}
+
+// =============================================================================
 
 bool CAnime::CheckNewEpisode(bool check_folder) {
   if (NewEps) return true;
@@ -341,6 +350,27 @@ bool CAnime::SetEpisodeAvailability(int number, bool available) {
 
 // =============================================================================
 
+void CAnime::SetLocalData(const wstring& fansub, const wstring& folder, const wstring& titles) {
+  if ((fansub == EMPTY_STR || fansub == FansubGroup) && 
+      (folder == EMPTY_STR || folder == Folder) && 
+      (titles == EMPTY_STR || titles == Synonyms)) {
+        return;
+  }
+
+  if (fansub != EMPTY_STR) FansubGroup = fansub;
+  if (folder != EMPTY_STR) Folder = folder;
+  if (titles != EMPTY_STR) Synonyms = titles;
+
+  Settings.Anime.SetItem(Series_ID, fansub, folder, titles);
+  Settings.Write();
+
+  if (!Synonyms.empty() && CurrentEpisode.Index == -1) {
+    CurrentEpisode.Index = 0;
+  }
+}
+
+// =============================================================================
+
 int CAnime::GetIntValue(int mode) {
   CEventItem* item = EventQueue.SearchItem(Index, mode);
   switch (mode) {
@@ -385,9 +415,11 @@ wstring CAnime::GetTags() {
 
 int CAnime::GetTotalEpisodes() {
   if (Series_Episodes > 0) return Series_Episodes;
-  if (GetLastWatchedEpisode() < 12) return 13;
-  if (GetLastWatchedEpisode() < 24) return 26;
-  if (GetLastWatchedEpisode() < 50) return 51;
+  int number = max(My_WatchedEpisodes, GetLastWatchedEpisode());
+  number = max(number, static_cast<int>(EpisodeAvailable.size()));
+  if (number < 12) return 13;
+  if (number < 24) return 26;
+  if (number < 50) return 51;
   return 0;
 }
 

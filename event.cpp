@@ -227,7 +227,7 @@ CEventQueue::CEventQueue() :
 {
 }
 
-void CEventQueue::Add(CEventItem& item, wstring user) {
+void CEventQueue::Add(CEventItem& item, bool save, wstring user) {
   int user_index = GetUserIndex(user);
   if (user_index == -1) {
     List.resize(List.size() + 1);
@@ -235,6 +235,7 @@ void CEventQueue::Add(CEventItem& item, wstring user) {
     user_index = List.size() - 1;
   }
   List[user_index].Add(item);
+  if (save) Settings.Write();
 }
 
 void CEventQueue::Check() {
@@ -242,9 +243,12 @@ void CEventQueue::Check() {
   if (user_index > -1) List[user_index].Check();
 }
 
-void CEventQueue::Clear() {
+void CEventQueue::Clear(bool save) {
   int user_index = GetUserIndex();
-  if (user_index > -1) List[user_index].Clear();
+  if (user_index > -1) {
+    List[user_index].Clear();
+    if (save) Settings.Write();
+  }
 }
 
 int CEventQueue::GetItemCount() {
@@ -268,7 +272,7 @@ bool CEventQueue::IsEmpty() {
   return true;
 }
 
-void CEventQueue::Remove(int index) {
+void CEventQueue::Remove(int index, bool save) {
   int user_index = GetUserIndex();
   if (user_index > -1) {
     if (index > -1) {
@@ -276,6 +280,7 @@ void CEventQueue::Remove(int index) {
     } else {
       List[user_index].Remove(List[user_index].Index);
     }
+    if (save) Settings.Write();
   }
 }
 

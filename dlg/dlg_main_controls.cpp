@@ -306,14 +306,16 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
     case CDDS_ITEMPOSTPAINT | CDDS_SUBITEM: {
       CAnime* pAnimeItem = reinterpret_cast<CAnime*>(pCD->nmcd.lItemlParam);
       if (!pAnimeItem) return CDRF_DODEFAULT;
-      int eps_watched  = pAnimeItem->My_WatchedEpisodes;
-      int eps_total    = pAnimeItem->Series_Episodes;
-      int eps_estimate = pAnimeItem->GetTotalEpisodes();
-      int eps_buffer   = pAnimeItem->GetLastWatchedEpisode();
-      if (eps_buffer == eps_watched) eps_buffer = 0;
-      
+
       // Draw progress bar
       if (pCD->iSubItem == 1) {
+        int eps_watched  = pAnimeItem->My_WatchedEpisodes;
+        int eps_total    = pAnimeItem->Series_Episodes;
+        int eps_estimate = pAnimeItem->GetTotalEpisodes();
+        int eps_buffer   = pAnimeItem->GetLastWatchedEpisode();
+        if (eps_buffer == eps_watched) eps_buffer = -1;
+        if (eps_watched == 0) eps_watched = -1;
+
         CRect rcItem;
         if (GetWinVersion() < WINVERSION_VISTA) {
           m_List.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
@@ -334,24 +336,24 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         CRect rcBuffer = rcItem;
         
         // Draw progress
-        if (eps_watched > 0 || eps_buffer > 0) {
-          float ratio_watched, ratio_buffer;
-          if (eps_total == 0) {
-            if (eps_estimate) {
+        if (eps_watched > -1 || eps_buffer > -1) {
+          float ratio_watched = 0.0f, ratio_buffer = 0.0f;
+          if (eps_estimate) {
+            if (eps_watched > 0) {
               ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
-            } else {
-              ratio_watched = eps_buffer > 0 ? 0.75f : 0.8f;
-              ratio_buffer = eps_buffer > 0 ? 0.8f : 0.0f;
+            }
+            if (eps_buffer > 0) {
+              ratio_buffer = static_cast<float>(eps_buffer) / static_cast<float>(eps_estimate);
             }
           } else {
-            ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_total);
-            ratio_buffer = static_cast<float>(eps_buffer) / static_cast<float>(eps_total);
+            ratio_watched = eps_buffer > -1 ? 0.75f : 0.8f;
+            ratio_buffer = eps_buffer > -1 ? 0.8f : 0.0f;
           }
 
-          if (eps_buffer > 0) {
+          if (eps_buffer > -1) {
             rcBuffer.right = static_cast<int>((rcBuffer.right - rcBuffer.left) * ratio_buffer) + rcBuffer.left;
           }
-          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS && eps_buffer > 0) {
+          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS && eps_buffer > -1) {
             rcItem.right = rcBuffer.right;
           } else {
             rcItem.right = static_cast<int>((rcItem.right - rcItem.left) * ratio_watched) + rcItem.left;
@@ -378,7 +380,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS) {
           if (eps_total > 0) {
             float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(pAnimeItem->Series_Episodes);
-            for (unsigned int i = eps_buffer > 0 ? eps_buffer : eps_watched; i < pAnimeItem->EpisodeAvailable.size(); i++) {
+            for (int i = max(eps_buffer, eps_watched); i > 0 && i < pAnimeItem->EpisodeAvailable.size(); i++) {
               if (pAnimeItem->EpisodeAvailable[i]) {
                 rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
                 rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
@@ -395,7 +397,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         }
 
         // Draw seperator
-        if (eps_watched > 0 || eps_buffer > 0) {
+        if (eps_watched > -1 || eps_buffer > -1) {
           rcBuffer.left = rcItem.right;
           rcBuffer.right = rcItem.right + 1;
           UI.ListProgress.Seperator.Draw(hdc.Get(), &rcBuffer);
@@ -403,7 +405,8 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
 
         // Draw text
         if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT || Settings.Program.List.ProgressShowEps) {
-          wstring text = MAL.TranslateNumber(eps_buffer ? eps_buffer : eps_watched) + L"/" + MAL.TranslateNumber(eps_total);
+          if (eps_watched == -1) eps_watched = 0;
+          wstring text = MAL.TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + MAL.TranslateNumber(eps_total);
           if (!Settings.Program.List.ProgressShowEps) text += L" episodes";
           hdc.EditFont(NULL, 7);
           hdc.SetBkMode(TRANSPARENT);

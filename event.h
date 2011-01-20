@@ -61,13 +61,13 @@ public:
   CEventQueue();
   virtual ~CEventQueue() {}
 
-  void Add(CEventItem& item, wstring user = L"");
+  void Add(CEventItem& item, bool save = true, wstring user = L"");
   void Check();
-  void Clear();
+  void Clear(bool save = true);
   int GetItemCount();
   int GetUserIndex(wstring user = L"");
   bool IsEmpty();
-  void Remove(int index = -1);
+  void Remove(int index = -1, bool save = true);
   CEventItem* SearchItem(int anime_index, int search_mode = 0);
   void Show();
 

@@ -113,9 +113,9 @@ bool CSettings::Read() {
   wstring fansub, folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
-    fansub = item.attribute(L"fansub").value(); if (fansub.empty()) fansub = EMPTY_STR;
-    folder = item.attribute(L"folder").value(); if (folder.empty()) folder = EMPTY_STR;
-    titles = item.attribute(L"titles").value(); if (titles.empty()) titles = EMPTY_STR;
+    fansub = item.attribute(L"fansub").value(EMPTY_STR);
+    folder = item.attribute(L"folder").value(EMPTY_STR);
+    titles = item.attribute(L"titles").value(EMPTY_STR);
     Anime.SetItem(item.attribute(L"id").as_int(), fansub, folder, titles);
   }
 
@@ -218,7 +218,7 @@ bool CSettings::Read() {
       event_item.tags = item.attribute(L"tags").value();
       event_item.Time = item.attribute(L"time").value();
       event_item.Mode = item.attribute(L"mode").as_int();
-      EventQueue.Add(event_item, user.attribute(L"name").value());
+      EventQueue.Add(event_item, false, user.attribute(L"name").value());
     }
   }
 
@@ -473,7 +473,6 @@ void CSettings::CSettingsAnime::SetItem(int id, wstring fansub, wstring folder, 
     }
   }
   if (index == -1) {
-    if (fansub.empty() || folder.empty() || titles.empty()) return;
     index = Item.size();
     Item.resize(index + 1);
   }

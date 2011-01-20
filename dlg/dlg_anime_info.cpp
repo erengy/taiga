@@ -167,11 +167,10 @@ void CAnimeWindow::OnOK() {
   }
 
   // Alternative titles & fansub group
-  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, m_pAnimeItem->Synonyms);
-  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_FANSUB, m_pAnimeItem->FansubGroup);
-  Settings.Anime.SetItem(m_pAnimeItem->Series_ID, 
-    m_pAnimeItem->FansubGroup, EMPTY_STR, m_pAnimeItem->Synonyms);
-  if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
+  wstring fansub, titles;
+  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
+  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_FANSUB, fansub);
+  m_pAnimeItem->SetLocalData(fansub, EMPTY_STR, titles);
 
   // Add item to event queue
   EventQueue.Add(item);

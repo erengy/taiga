@@ -274,9 +274,7 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
     // Change anime folder
     if (is_folder && LIST[i].AnimeIndex > 0) {
       #define ANIME AnimeList.Item[LIST[i].AnimeIndex]
-      ANIME.Folder = path_available ? path : L"";
-      ANIME.CheckEpisodeAvailability();
-      Settings.Anime.SetItem(ANIME.Series_ID, EMPTY_STR, ANIME.Folder, EMPTY_STR);
+      ANIME.SetFolder(path_available ? path : L"", true, true);
       DEBUG_PRINT(L"CFolderMonitor :: Change anime folder: " + 
         ANIME.Series_Title + L" -> " + ANIME.Folder + L"\n");
       #undef ANIME
@@ -304,12 +302,10 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
             CEpisode temp_episode;
             temp_episode.Title = episode.Folder;
             if (Meow.CompareEpisode(temp_episode, ANIME)) {
-              ANIME.Folder = episode.Folder;
+              ANIME.SetFolder(episode.Folder, true, true);
             }
           }
           if (!ANIME.Folder.empty()) {
-            ANIME.CheckEpisodeAvailability();
-            Settings.Anime.SetItem(ANIME.Series_ID, EMPTY_STR, ANIME.Folder, EMPTY_STR);
             DEBUG_PRINT(L"CFolderMonitor :: Set anime folder: " + 
               ANIME.Series_Title + L" -> " + ANIME.Folder + L"\n");
           }

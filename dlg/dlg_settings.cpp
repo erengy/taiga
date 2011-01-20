@@ -196,7 +196,7 @@ void CSettingsWindow::OnOK() {
     pItem = reinterpret_cast<CAnime*>(List.GetItemParam(i));
     if (pItem) {
       List.GetItemText(i, 1, pItem->Folder);
-      Settings.Anime.SetItem(pItem->Series_ID, EMPTY_STR, pItem->Folder, EMPTY_STR);
+      pItem->SetFolder(pItem->Folder, true, false);
     }
   }
   List.SetWindowHandle(NULL);

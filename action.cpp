@@ -227,6 +227,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     } else {
       ActivateWindow(SettingsWindow.GetWindowHandle());
     }
+
+  // SaveSettings()
+  } else if (action == L"SaveSettings") {
+    Settings.Write();
   
   // SearchAnime()
   } else if (action == L"SearchAnime") {
@@ -638,9 +642,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.Text = AnimeList.Item[AnimeList.Index].Synonyms;
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {
-      AnimeList.Item[AnimeList.Index].Synonyms = dlg.Text;
-      Settings.Anime.SetItem(AnimeList.Item[AnimeList.Index].Series_ID, EMPTY_STR, EMPTY_STR, dlg.Text);
-      if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
+      AnimeList.Item[AnimeList.Index].SetLocalData(EMPTY_STR, EMPTY_STR, dlg.Text);
     }
   
   // ===========================================================================
@@ -666,8 +668,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     wstring path, title = L"Anime title: " + AnimeList.Item[AnimeList.Index].Series_Title;
     if (BrowseForFolder(MainWindow.GetWindowHandle(), title.c_str(), 
       BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
-        AnimeList.Item[AnimeList.Index].Folder = path;
-        Settings.Anime.SetItem(AnimeList.Item[AnimeList.Index].Series_ID, EMPTY_STR, path, EMPTY_STR);
+        AnimeList.Item[AnimeList.Index].SetFolder(path, true, true);
     }
 
   // ===========================================================================

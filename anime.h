@@ -62,10 +62,12 @@ public:
   void End(CEpisode episode, bool end_watching, bool update_list);
   void Update(CEpisode episode, bool change_status);
   void CheckFolder();
+  void SetFolder(const wstring& folder, bool save_settings, bool check_episodes);
   bool CheckNewEpisode(bool check_folder = false);
   bool PlayEpisode(int number);
   void CheckEpisodeAvailability();
   bool SetEpisodeAvailability(int number, bool available);
+  void SetLocalData(const wstring& fansub, const wstring& folder, const wstring& titles);
   int GetIntValue(int mode);
   int GetLastWatchedEpisode();
   int GetRewatching();

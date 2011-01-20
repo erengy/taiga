@@ -20,7 +20,10 @@
 #include "../animelist.h"
 #include "../announce.h"
 #include "../common.h"
+#include "dlg_anime_info.h"
 #include "dlg_main.h"
+#include "dlg_search.h"
+#include "dlg_test_recognition.h"
 #include "dlg_torrent.h"
 #include "../event.h"
 #include "../gfx.h"
@@ -135,7 +138,7 @@ BOOL CMainWindow::OnInitDialog() {
   m_ToolbarSearch.InsertButton(0, Icon16_Search, 200, 1, fsStyle2, NULL, NULL, L"Search");
 
   // Insert rebar bands
-  UINT fMask  = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
+  UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
   UINT fStyle = RBBS_NOGRIPPER;
   m_Rebar.InsertBand(NULL, 0, 0, 0, 0, 0, 0, 0, 0, fMask, fStyle);
   m_Rebar.InsertBand(m_Toolbar.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
@@ -170,8 +173,14 @@ BOOL CMainWindow::OnInitDialog() {
 
 // =============================================================================
 
-BOOL CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
+    // Log off / Shutdown
+    case WM_ENDSESSION: {
+      OnDestroy();
+      return FALSE;
+    }
+
     // Drag  list item
     case WM_MOUSEMOVE: {
       if (m_List.m_bDragging) {
@@ -335,6 +344,11 @@ void CMainWindow::OnDestroy() {
   }
   ExecuteAction(L"AnnounceToMessenger", FALSE);
   ExecuteAction(L"AnnounceToSkype", FALSE);
+  // Close other dialogs
+  AnimeWindow.Destroy();
+  RecognitionTestWindow.Destroy();
+  SearchWindow.Destroy();
+  TorrentWindow.Destroy();
   // Cleanup
   MainClient.Cleanup();
   Settings.Write();
