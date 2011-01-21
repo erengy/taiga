@@ -106,6 +106,10 @@ BOOL CAnimeList::Read() {
 }
 
 BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
+  if (mode != ANIMELIST_EDITUSER) {
+    if (index < 1 || index > Count) return FALSE;
+  }
+  
   // Initialize
   wstring file = Taiga.GetDataPath() + Settings.Account.MAL.User + L".xml";
   
@@ -383,8 +387,11 @@ int CUser::GetItemCount(int status) {
       if (ITEM[i].status > -1) {
         if (status == ITEM[i].status) {
           count++;
-        } else if (status == AnimeList.Item[ITEM[i].AnimeIndex].My_Status) {
-          count--;
+        } else {
+          if (ITEM[i].AnimeIndex > 0 && ITEM[i].AnimeIndex <= AnimeList.Count && 
+            status == AnimeList.Item[ITEM[i].AnimeIndex].My_Status) {
+              count--;
+          }
         }
       }
     }

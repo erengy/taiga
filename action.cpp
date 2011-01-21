@@ -296,18 +296,22 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int status = ToINT(body);
     CAnime* pAnimeItem = reinterpret_cast<CAnime*>(lParam);
     if (pAnimeItem) {
+      // Set item properties
       pAnimeItem->My_Status = status;
       if (status == MAL_COMPLETED) {
         pAnimeItem->My_WatchedEpisodes = pAnimeItem->Series_Episodes;
         pAnimeItem->SetFinishDate(L"", true);
       }
+      // Add item to list
       AnimeList.AddItem(*pAnimeItem);
       AnimeList.User.IncreaseItemCount(status, 1);
       AnimeList.Write(AnimeList.Count, L"", L"", ANIMELIST_ADDANIME);
+      // Refresh
       if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;
-      MainWindow.RefreshList(pAnimeItem->My_Status);
-      MainWindow.RefreshTabs(pAnimeItem->My_Status);
+      MainWindow.RefreshList(status);
+      MainWindow.RefreshTabs(status);
       SearchWindow.RefreshList();
+      // Add item to event queue
       CEventItem item;
       item.AnimeIndex = AnimeList.Count;
       item.AnimeID = pAnimeItem->Series_ID;

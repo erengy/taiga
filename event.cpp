@@ -284,9 +284,9 @@ void CEventQueue::Remove(int index, bool save) {
   }
 }
 
-CEventItem* CEventQueue::SearchItem(int anime_index, int index_begin) {
+CEventItem* CEventQueue::SearchItem(int anime_index, int search_mode) {
   int user_index = GetUserIndex();
-  if (user_index > -1) return List[user_index].SearchItem(anime_index, index_begin);
+  if (user_index > -1) return List[user_index].SearchItem(anime_index, search_mode);
   return NULL;
 }
 

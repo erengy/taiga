@@ -265,10 +265,13 @@ void CAnime::CheckFolder() {
 }
 
 void CAnime::SetFolder(const wstring& folder, bool save_settings, bool check_episodes) {
-  Folder = folder;
-  if (save_settings) {
+  // Save settings
+  if (save_settings && folder != EMPTY_STR && folder != Folder) {
     Settings.Anime.SetItem(Series_ID, EMPTY_STR, Folder, EMPTY_STR);
   }
+  // Set new folder
+  Folder = folder;
+  // Check episodes
   if (check_episodes) {
     CheckEpisodeAvailability();
   }

@@ -190,13 +190,13 @@ void CSettingsWindow::OnOK() {
   }
   Settings.Folders.WatchEnabled = m_Page[PAGE_FOLDERS_ROOT].IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH);
   // Folders > Specific
-  CAnime* pItem;
+  CAnime* pItem; wstring folder;
   List.SetWindowHandle(m_Page[PAGE_FOLDERS_ANIME].GetDlgItem(IDC_LIST_FOLDERS_ANIME));
   for (int i = 0; i < List.GetItemCount(); i++) {
     pItem = reinterpret_cast<CAnime*>(List.GetItemParam(i));
     if (pItem) {
-      List.GetItemText(i, 1, pItem->Folder);
-      pItem->SetFolder(pItem->Folder, true, false);
+      List.GetItemText(i, 1, folder);
+      pItem->SetFolder(folder, true, false);
     }
   }
   List.SetWindowHandle(NULL);
