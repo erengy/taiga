@@ -64,7 +64,7 @@ void ErasePunctuation(wstring& input, bool keep_trailing) {
     if ((c >  31 && c <  48) || //  !"#$%&'()*+,-./
         (c >  57 && c <  65) || // :;<=>?@
         (c >  90 && c <  97) || // [\]^_`
-        (c > 122 && c < 128)) { // {|}~) {
+        (c > 122 && c < 128)) { // {|}~
           if (!keep_trailing || 
             c != '!' || c!= '+') {
               keep_trailing = false;
