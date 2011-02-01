@@ -94,7 +94,7 @@ bool CRecognition::CompareTitle(const wstring& title, wstring& anime_title,
   if (strict && anime.Series_Episodes == 1 && !episode.Number.empty()) {
     if (IsEqual(title + episode.Number, anime_title)) {
       episode.Title += episode.Number;
-      episode.Number.clear();
+      episode.Number = L"1";
       return true;
     }
   }
