@@ -61,7 +61,7 @@ void DebugTest() {
 
   // Show result
   Test.End(str, 0);
-  
+
   // Default action
   ExecuteAction(L"RecognitionTest");
 }

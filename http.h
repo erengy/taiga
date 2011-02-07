@@ -48,6 +48,11 @@ enum HTTP_ClientMode {
   HTTP_VersionCheckSilent
 };
 
+enum HTTP_ContentEncoding {
+  HTTP_Encoding_None = 0,
+  HTTP_Encoding_Gzip
+};
+
 // =============================================================================
 
 class CHTTP {
@@ -92,6 +97,7 @@ protected:
 
   BOOL    m_AutoRedirect;
   LPSTR   m_Buffer;
+  INT     m_ContentEncoding;
   wstring m_Cookie;
   wstring m_File;
   string  m_OptionalData;

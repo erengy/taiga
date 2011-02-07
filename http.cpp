@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include "common.h"
 #include "http.h"
 #include "string.h"
 
@@ -203,6 +204,17 @@ void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus,
           Cleanup();
         }
       } else if (dwSize == 0) {
+        if (m_ContentEncoding == HTTP_Encoding_Gzip) {
+          string input, output;
+          input.append(m_Buffer, m_dwDownloaded);
+          UncompressGzippedString(input, output);
+          if (!output.empty()) {
+            delete [] m_Buffer;
+            m_dwDownloaded = output.length();
+            m_Buffer = new char[m_dwDownloaded];
+            memcpy(m_Buffer, &output[0], m_dwDownloaded);
+          }
+        }
         if (!m_File.empty()) {
           HANDLE hFile = ::CreateFile(m_File.c_str(), GENERIC_WRITE, 0, NULL, 
             CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -292,6 +304,7 @@ void CHTTP::Cleanup() {
   m_Buffer = NULL;
 
   // Reset variables
+  m_ContentEncoding = HTTP_Encoding_None;
   m_File.clear();
   m_OptionalData.clear();
   m_dwDownloaded = 0;
@@ -349,8 +362,14 @@ void CHTTP::ParseHeaders(wstring headers) {
       wstring part_left = ToLower_Copy(CharLeft(header_list[i], pos));
       wstring part_right = header_list[i].substr(pos + 2);
       
+      // Content-Encoding:
+      if (part_left == L"content-encoding") {
+        if (InStr(part_right, L"gzip") > -1) {
+          m_ContentEncoding = HTTP_Encoding_Gzip;
+        }
+
       // Content-Length:
-      if (part_left == L"content-length") {
+      } else if (part_left == L"content-length") {
         m_dwTotal = ToINT(part_right);
 
       // Location:

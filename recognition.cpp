@@ -280,12 +280,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
             TrimLeft(episode.Number, L"-");
             TrimRight(str_left);
             TrimLeft(str_right);
-            const wchar_t* erase_right[4] = {
-              L" ep.", L" ep", L" episode", L" vol"
-            };
-            for (int j = 0; j < 4; j++) {
-              EraseRight(str_left, erase_right[j], true);
-            }
+            TrimEpisodeWord(str_left, true);
             TrimRight(str_left, L" -");
             TrimLeft(str_right, L" -");
             // Return title and name
@@ -369,6 +364,7 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
     } else if (episode.Number.empty() && (i == 0 || i == words.size() - 1) && IsNumeric(words[i])) {
       episode.Number = words[i];
       if (!ValidateEpisodeNumber(episode)) continue;
+      if (i > 0 && TrimEpisodeWord(words[i - 1], false)) Erase(token.Content, words[i - 1], true);
       RemoveWordFromToken(false);
     // Extras
     } else if (compare_extras && CompareKeys(words[i], Meow.ExtraKeywords)) {
@@ -486,6 +482,25 @@ size_t CRecognition::TokenizeTitle(const wstring& str, const wstring& delimiters
     }
   }
   return tokens.size();
+}
+
+bool CRecognition::TrimEpisodeWord(wstring& str, bool erase_right) {
+  if (erase_right) {
+    static const wchar_t* erase_right[4] = {
+      L" ep.", L" ep", L" episode", L" vol"
+    };
+    for (int j = 0; j < 4; j++) {
+      EraseRight(str, erase_right[j], true);
+    }
+  } else {
+    if (IsEqual(str, L"ep.") || 
+        IsEqual(str, L"ep") ||
+        IsEqual(str, L"episode") || 
+        IsEqual(str, L"vol")) {
+          return true;
+    }
+  }
+  return false;
 }
 
 bool CRecognition::ValidateEpisodeNumber(CEpisode& episode) {

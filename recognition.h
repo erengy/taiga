@@ -60,6 +60,7 @@ private:
   bool IsTokenEnclosed(const CToken& token);
   void ReadKeyword(unsigned int uID, vector<wstring>& str);
   size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<CToken>& tokens);
+  bool TrimEpisodeWord(wstring& str, bool erase_right);
   bool ValidateEpisodeNumber(CEpisode& episode);
 };
 

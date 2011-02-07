@@ -71,8 +71,9 @@ bool CMyAnimeList::GetAnimeDetails(CAnime* pAnimeItem) {
 
 bool CMyAnimeList::GetList(bool login) {
   if (Settings.Account.MAL.User.empty()) return false;
-  return MainClient.Get(L"myanimelist.net", 
+  return MainClient.Connect(L"myanimelist.net", 
     L"/malappinfo.php?u=" + Settings.Account.MAL.User + L"&status=all", 
+    L"", L"GET", L"Accept-Encoding: gzip", L"",
     Taiga.GetDataPath() + Settings.Account.MAL.User + L".xml",
     login ? HTTP_MAL_RefreshAndLogin : HTTP_MAL_RefreshList);
 }

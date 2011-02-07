@@ -37,6 +37,9 @@
     <Filter Include="Third Party\oauth">
       <UniqueIdentifier>{1c1c56f5-5f1c-4db5-88f0-ed1f7286f97d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Third Party\zlib">
+      <UniqueIdentifier>{c8d3c2ca-aff5-47eb-a494-791f8c819306}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dlg\dlg_about.cpp">
@@ -237,6 +240,54 @@
     <ClCompile Include="win32\win_thread.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
+    <ClCompile Include="gzip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\adler32.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\compress.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\crc32.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\deflate.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\gzclose.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\gzlib.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\gzread.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\gzwrite.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\infback.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\inffast.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\inflate.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\inftrees.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\trees.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\uncompr.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\zlib\zutil.c">
+      <Filter>Third Party\zlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -382,6 +433,39 @@
     </ClInclude>
     <ClInclude Include="win32\win_thread.h">
       <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\crc32.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\deflate.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\gzguts.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\inffast.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\inffixed.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\inflate.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\inftrees.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\trees.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\zconf.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\zlib.h">
+      <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\zlib\zutil.h">
+      <Filter>Third Party\zlib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
