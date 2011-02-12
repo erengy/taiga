@@ -127,6 +127,11 @@ BOOL CHTTPClient::OnRedirect(wstring address) {
       break;
   }
 
+  // Reset variables
+  m_ContentEncoding = HTTP_Encoding_None;
+  m_dwDownloaded = 0;
+  m_dwTotal = 0;
+
   return 0;
 }
 
