@@ -85,7 +85,7 @@ BOOL CTaiga::InitInstance() {
     ExecuteAction(L"Login");
   }
   if (Settings.Program.StartUp.CheckNewEpisodes) {
-    ExecuteAction(L"CheckNewEpisodes()", TRUE);
+    ExecuteAction(L"CheckEpisodes()", TRUE);
   }
   if (!Settings.Program.StartUp.Minimize) {
     MainWindow.Show();

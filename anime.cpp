@@ -273,24 +273,36 @@ void CAnime::SetFolder(const wstring& folder, bool save_settings, bool check_epi
   Folder = folder;
   // Check episodes
   if (check_episodes) {
-    CheckEpisodeAvailability();
+    CheckEpisodes();
   }
 }
 
 // =============================================================================
 
-bool CAnime::CheckNewEpisode(bool check_folder) {
-  if (NewEps) return true;
+bool CAnime::CheckEpisodes(int episode, bool check_folder) {
+  // Check folder
   if (check_folder) CheckFolder();
-
-  wstring file;
-  int number = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
-  
-  if (!Folder.empty()) {
-    file = SearchFileFolder(Index, Folder, number, false);
+  if (Folder.empty()) {
+    for (int i = 1; i <= Series_Episodes; i++)
+      SetEpisodeAvailability(i, false);
+    NewEps = false;
+    return false;
   }
+  
+  // Check all episodes
+  if (episode == -1) {
+    SearchFileFolder(Index, Folder, -1, false);
+    return true;
 
-  return !file.empty();
+  // Check single episode
+  } else {
+    if (episode == 0) {
+      if (NewEps) return true;
+      episode = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
+    }
+    wstring file = SearchFileFolder(Index, Folder, episode, false);
+    return !file.empty();
+  }
 }
 
 bool CAnime::PlayEpisode(int number) {
@@ -318,16 +330,6 @@ bool CAnime::PlayEpisode(int number) {
     Execute(file);
   }
   return !file.empty();
-}
-
-void CAnime::CheckEpisodeAvailability() {
-  if (Folder.empty()) {
-    for (int i = 1; i <= Series_Episodes; i++) {
-      SetEpisodeAvailability(i, false);
-    }
-  } else {
-    SearchFileFolder(Index, Folder, -1, false);
-  }
 }
 
 bool CAnime::SetEpisodeAvailability(int number, bool available) {

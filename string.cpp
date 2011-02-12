@@ -264,17 +264,17 @@ void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_w
 
 /* Split, tokenize */
 
-void Split(const wstring& input, const wstring& seperator, std::vector<wstring>& split_vector) {
-  if (seperator.empty()) {
+void Split(const wstring& input, const wstring& separator, std::vector<wstring>& split_vector) {
+  if (separator.empty()) {
     split_vector.push_back(input);
     return;
   }
   size_t index_begin = 0, index_end;
   do {
-    index_end = input.find(seperator, index_begin);
+    index_end = input.find(separator, index_begin);
     if (index_end == wstring::npos) index_end = input.length();
     split_vector.push_back(input.substr(index_begin, index_end - index_begin));
-    index_begin = index_end + seperator.length();
+    index_begin = index_end + separator.length();
   } while (index_begin <= input.length());
 }
 

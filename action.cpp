@@ -340,28 +340,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     EventQueue.Show();
 
   // CheckEpisodes()
-  //   Checks episode availability.
-  //   wParam is a BOOL value.
-  } else if (action == L"CheckEpisodes") {
-    if (wParam || !body.empty()) {
-      TaskbarList.SetProgressState(TBPF_NORMAL);
-      for (int i = 1; i <= AnimeList.Count; i++) {
-        MainWindow.ChangeStatus(L"Searching... (" + AnimeList.Item[i].Series_Title + L")");
-        AnimeList.Item[i].CheckEpisodeAvailability();
-        TaskbarList.SetProgressValue(i, AnimeList.Count);
-      }
-      MainWindow.ChangeStatus(L"Search finished.");
-      TaskbarList.SetProgressState(TBPF_NOPROGRESS);
-    } else {
-      AnimeList.Item[AnimeList.Index].CheckEpisodeAvailability();
-    }
-
-  // CheckNewEpisodes()
-  //   Checks new episodes.
+  //   Checks new episodes or episode availability.
   //   wParam is a BOOL value that activates silent operation mode.
-  } else if (action == L"CheckNewEpisodes") {
+  //   If body text is empty, search is made for all list items.
+  } else if (action == L"CheckEpisodes") {
+    // Check silent operation mode
+    bool silent = (wParam == TRUE);
+    if (!silent) TaskbarList.SetProgressState(TBPF_NORMAL);
+    // If there's no anime folder set, we'll check them first
     bool check_folder = true;
-    bool silent = wParam == TRUE;
     for (int i = 1; i <= AnimeList.Count; i++) {
       if (!AnimeList.Item[i].Folder.empty()) {
         check_folder = false;
@@ -378,22 +365,31 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       dlg.AddButton(L"Yes", IDYES);
       dlg.AddButton(L"No", IDNO);
       dlg.Show(g_hMain);
-      check_folder = dlg.GetSelectedButtonID() == IDYES ? true : false;
+      check_folder = (dlg.GetSelectedButtonID() == IDYES);
     }
-    if (!silent) TaskbarList.SetProgressState(TBPF_NORMAL);
-    for (int i = 1; i <= AnimeList.Count; i++) {
-      if (!silent) TaskbarList.SetProgressValue(i, AnimeList.Count);
-      switch (AnimeList.Item[i].GetStatus()) {
-        case MAL_WATCHING:
-        case MAL_ONHOLD:
-        case MAL_PLANTOWATCH:
-          if (!silent) {
-            MainWindow.ChangeStatus(L"Searching... (" + 
-              AnimeList.Item[i].Series_Title + L")");
-          }
-          AnimeList.Item[i].CheckNewEpisode(check_folder);
+    // Search for all list items
+    if (body.empty()) {
+      for (int i = 1; i <= AnimeList.Count; i++) {
+        if (!silent) TaskbarList.SetProgressValue(i, AnimeList.Count);
+        switch (AnimeList.Item[i].GetStatus()) {
+          case MAL_WATCHING:
+          case MAL_ONHOLD:
+          case MAL_PLANTOWATCH:
+            if (!silent) {
+              MainWindow.ChangeStatus(L"Searching... (" + AnimeList.Item[i].Series_Title + L")");
+            }
+            AnimeList.Item[i].CheckEpisodes(
+              Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS ? -1 : 0, 
+              check_folder);
+        }
       }
+    // Search only for selected list item
+    } else {
+      AnimeList.Item[AnimeList.Index].CheckEpisodes(
+        Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS ? -1 : 0,
+        true);
     }
+    // We're done
     if (!silent) {
       TaskbarList.SetProgressState(TBPF_NOPROGRESS);
       MainWindow.ChangeStatus(L"Search finished.");
@@ -620,11 +616,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditTags(tags)
   //   Changes anime tags.
-  //   Tags must be seperated by a comma.
+  //   Tags must be separated by a comma.
   } else if (action == L"EditTags") {
     CInputDialog dlg;
     dlg.Title = AnimeList.Item[AnimeList.Index].Series_Title;
-    dlg.Info = L"Please enter tags for this title, seperated by a comma:";
+    dlg.Info = L"Please enter tags for this title, separated by a comma:";
     dlg.Text = AnimeList.Item[AnimeList.Index].GetTags();
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {
@@ -638,11 +634,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditTitles(titles)
   //   Changes alternative titles of an anime.
-  //   Titles must be seperated by "; ".
+  //   Titles must be separated by "; ".
   } else if (action == L"EditTitles") {
     CInputDialog dlg;
     dlg.Title = AnimeList.Item[AnimeList.Index].Series_Title;
-    dlg.Info = L"Please enter alternative titles, seperated by a semicolon:";
+    dlg.Info = L"Please enter alternative titles, separated by a semicolon:";
     dlg.Text = AnimeList.Item[AnimeList.Index].Synonyms;
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {

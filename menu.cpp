@@ -168,7 +168,7 @@ void UpdateFoldersMenu() {
       for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
         MENU.CreateItem(L"Execute(" + Settings.Folders.Root[i] + L")", Settings.Folders.Root[i]);
       }
-      // Add seperator
+      // Add separator
       MENU.CreateItem();
     }
 

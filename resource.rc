@@ -173,7 +173,7 @@ CAPTION "Events"
 CLASS "TaigaEventW"
 FONT 8, "Tahoma"
 {
-    CONTROL         "", IDC_LIST_EVENT, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_EDITLABELS | LVS_NOSORTHEADER | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 7, 7, 430, 215
+    CONTROL         "", IDC_LIST_EVENT, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_NOSORTHEADER | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 7, 7, 430, 215
     LTEXT           "", IDC_STATIC, 0, 228, 444, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
     PUSHBUTTON      "Clear", IDC_BUTTON_EVENT_CLEAR, 10, 235, 65, 14
     DEFPUSHBUTTON   "Update", IDOK, 300, 235, 65, 14
@@ -624,8 +624,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,6,57,0
-    PRODUCTVERSION  0,6,57,0
+    FILEVERSION     0,7,59,0
+    PRODUCTVERSION  0,7,59,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -639,11 +639,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.6.58"
+            VALUE "FileVersion", "0.7.59"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.6.58"
+            VALUE "ProductVersion", "0.7.59"
         }
     }
     BLOCK "VarFileInfo"

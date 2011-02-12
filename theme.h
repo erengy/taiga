@@ -93,7 +93,7 @@ public:
       Buffer,
       Completed,
       Dropped,
-      Seperator,
+      Separator,
       Watching;
   } ListProgress;
 };

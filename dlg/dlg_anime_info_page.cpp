@@ -156,7 +156,7 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
 
       // Tags
       CEdit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
-      m_Edit.SetCueBannerText(L"Enter tags here, seperated by a comma (e.g. tag1, tag2)");
+      m_Edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
       m_Edit.SetText(pAnimeItem->GetTags());
       m_Edit.SetWindowHandle(NULL);
       
@@ -194,7 +194,7 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
 
       // Alternative titles
       m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_ALT));
-      m_Edit.SetCueBannerText(L"Enter alternative titles here, seperated by a semicolon (e.g. Title 1; Title 2)");
+      m_Edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
       m_Edit.SetText(pAnimeItem->Synonyms);
       m_Edit.SetWindowHandle(NULL);
 

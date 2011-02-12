@@ -58,8 +58,8 @@ HMENU CMenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
           Menu[menu_index].Item[i].Icon.Handle, NULL);*/
         break;
       }
-      // Seperator
-      case MENU_ITEM_SEPERATOR: {
+      // Separator
+      case MENU_ITEM_SEPARATOR: {
         ::AppendMenu(hMenu[nMenu], MF_SEPARATOR, NULL, NULL);
         break;
       }
@@ -155,7 +155,7 @@ void CMenuList::CMenu::CreateItem(wstring action, wstring name, wstring sub,
   if (!sub.empty()) {
     Item[i].Type = MENU_ITEM_SUBMENU;
   } else if (name.empty()) {
-    Item[i].Type = MENU_ITEM_SEPERATOR;
+    Item[i].Type = MENU_ITEM_SEPARATOR;
   } else {
     Item[i].Type = MENU_ITEM_NORMAL;
   }

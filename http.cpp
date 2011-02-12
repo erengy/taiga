@@ -375,6 +375,9 @@ void CHTTP::ParseHeaders(wstring headers) {
       // Location:
       } else if (part_left == L"location") {
         OnRedirect(part_right);
+        m_ContentEncoding = HTTP_Encoding_None;
+        m_dwDownloaded = 0;
+        m_dwTotal = 0;
       
       // Set-Cookie:
       } else if (part_left == L"set-cookie") {

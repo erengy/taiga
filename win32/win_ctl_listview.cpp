@@ -214,8 +214,8 @@ void CListView::SetExtendedStyle(DWORD dwExStyle) {
   ListView_SetExtendedListViewStyle(m_hWindow, dwExStyle);
 }
 
-void CListView::SetImageList(HIMAGELIST hImageList) {
-  ListView_SetImageList(m_hWindow, hImageList, LVSIL_SMALL);
+void CListView::SetImageList(HIMAGELIST hImageList, int iImageList) {
+  ListView_SetImageList(m_hWindow, hImageList, iImageList);
 }
 
 BOOL CListView::SetItem(int nIndex, int nSubItem, LPCWSTR szText) {

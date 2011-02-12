@@ -63,7 +63,7 @@ void ReadStringTable(UINT uID, wstring& str);
 void Replace(wstring& input, wstring find, wstring replace_with, bool replace_all = false, bool case_insensitive = false);
 void ReplaceChar(wstring& input, const wchar_t c, const wchar_t replace_with);
 void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_with);
-void Split(const wstring& input, const wstring& seperator, std::vector<wstring>& split_vector);
+void Split(const wstring& input, const wstring& separator, std::vector<wstring>& split_vector);
 bool StartsWith(const wstring& str, const wstring& search);
 void StripHTML(wstring& str);
 wstring SubStr(const wstring& input, const wstring& sub_begin, const wstring& sub_end);

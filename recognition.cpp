@@ -29,8 +29,8 @@ CRecognition Meow;
 
 class CToken {
 public:
-  CToken() : Encloser('\0'), Seperator('\0'), Virgin(true) {}
-  wchar_t Encloser, Seperator;
+  CToken() : Encloser('\0'), Separator('\0'), Virgin(true) {}
+  wchar_t Encloser, Separator;
   wstring Content;
   bool Virgin;
 };
@@ -181,15 +181,15 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     tokens[i - 1].Content += L"(" + tokens[i].Content + L")";
     if (IsTokenEnclosed(tokens[i + 1]) == false) {
       tokens[i - 1].Content += tokens[i + 1].Content;
-      if (tokens[i - 1].Seperator == '\0')
-        tokens[i - 1].Seperator = tokens[i + 1].Seperator;
+      if (tokens[i - 1].Separator == '\0')
+        tokens[i - 1].Separator = tokens[i + 1].Separator;
       tokens.erase(tokens.begin() + i + 1);
     }
     tokens.erase(tokens.begin() + i);
     i = 0;
   }
   for (unsigned int i = 0; i < tokens.size(); i++) {
-    wchar_t trim_char[] = {tokens[i].Seperator};
+    wchar_t trim_char[] = {tokens[i].Separator};
     Trim(tokens[i].Content, trim_char);
     if (tokens[i].Content.length() < 2) {
       tokens.erase(tokens.begin() + i);
@@ -233,14 +233,14 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     }
   }
   if (title_index > -1) {
-    ReplaceChar(tokens[title_index].Content, tokens[title_index].Seperator, ' ');
+    ReplaceChar(tokens[title_index].Content, tokens[title_index].Separator, ' ');
     Trim(tokens[title_index].Content, L" -");
     title = tokens[title_index].Content;
     tokens[title_index].Content.clear();
   }
   if (group_index > -1) {
     if (!IsTokenEnclosed(tokens[group_index])) {
-      ReplaceChar(tokens[group_index].Content, tokens[group_index].Seperator, ' ');
+      ReplaceChar(tokens[group_index].Content, tokens[group_index].Separator, ' ');
       Trim(tokens[group_index].Content, L" -");
     }
     episode.Group = tokens[group_index].Content;
@@ -315,10 +315,10 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
 
 void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_extras) {
   // Split into words
-  // The most common non-alphanumeric character is the seperator
+  // The most common non-alphanumeric character is the separator
   vector<wstring> words;
-  token.Seperator = GetMostCommonCharacter(token.Content);
-  Split(token.Content, wstring(1, token.Seperator), words);
+  token.Separator = GetMostCommonCharacter(token.Content);
+  Split(token.Content, wstring(1, token.Separator), words);
   
   // Revert if there are words that are too short
   // This prevents splitting group names like "m.3.3.w" and keywords like "H.264"

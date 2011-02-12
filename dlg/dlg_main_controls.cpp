@@ -46,7 +46,7 @@ void CMainWindow::CMainTree::RefreshItems() {
   htItem[1] = InsertItem(L"My Profile", NULL, NULL);
   htItem[2] = InsertItem(L"My History", NULL, NULL);
 
-  // Seperator
+  // Separator
   htItem[3] = InsertItem(NULL, -1, NULL);
   
   // My Anime List
@@ -58,7 +58,7 @@ void CMainWindow::CMainTree::RefreshItems() {
   InsertItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, true).c_str(), NULL, htItem[4]);
   Expand(htItem[4]);
 
-  // Seperator
+  // Separator
   htItem[5] = InsertItem(NULL, -1, NULL);
 
   // Foobar
@@ -82,7 +82,7 @@ LRESULT CMainWindow::OnTreeNotify(LPARAM lParam) {
         case CDDS_ITEMPREPAINT:
           return CDRF_NOTIFYPOSTPAINT;
         case CDDS_ITEMPOSTPAINT: {
-          // Draw seperator
+          // Draw separator
           if (pCD->nmcd.lItemlParam == -1) {
             CRect rcItem = pCD->nmcd.rc;
             CDC hdc = pCD->nmcd.hdc;
@@ -245,11 +245,7 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
         }
         // Check episodes
         case VK_F5: {
-          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS) {
-            ExecuteAction(L"CheckEpisodes(1)");
-          } else {
-            ExecuteAction(L"CheckNewEpisodes");
-          }
+          ExecuteAction(L"CheckEpisodes()");
           break;
         }
       }
@@ -396,11 +392,11 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
           }
         }
 
-        // Draw seperator
+        // Draw separator
         if (eps_watched > -1 || eps_buffer > -1) {
           rcBuffer.left = rcItem.right;
           rcBuffer.right = rcItem.right + 1;
-          UI.ListProgress.Seperator.Draw(hdc.Get(), &rcBuffer);
+          UI.ListProgress.Separator.Draw(hdc.Get(), &rcBuffer);
         }
 
         // Draw text

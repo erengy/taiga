@@ -111,10 +111,10 @@ void CEventList::Add(CEventItem& item) {
       ExecuteAction(L"AnnounceToTwitter", 0, reinterpret_cast<LPARAM>(&episode));
     }
 
-    // Check new episodes
+    // Check new episode
     if (item.episode > -1) {
       AnimeList.Item[item.AnimeIndex].NewEps = false;
-      AnimeList.Item[item.AnimeIndex].CheckNewEpisode();
+      AnimeList.Item[item.AnimeIndex].CheckEpisodes(0);
     }
     
     // Refresh event window

@@ -470,7 +470,7 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
     Taiga.TickerNewEpisodes++;
     if (Taiga.TickerNewEpisodes >= 30 * 60) { // 30 minutes
       Taiga.TickerNewEpisodes = 0;
-      ExecuteAction(L"CheckNewEpisodes()", TRUE);
+      ExecuteAction(L"CheckEpisodes()", TRUE);
     }
   }
 

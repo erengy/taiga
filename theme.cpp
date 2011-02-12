@@ -63,7 +63,7 @@ bool CTheme::Read(const wstring& name) {
   READ_PROGRESS_DATA(Buffer,     L"buffer");
   READ_PROGRESS_DATA(Completed,  L"completed");
   READ_PROGRESS_DATA(Dropped,    L"dropped");
-  READ_PROGRESS_DATA(Seperator,  L"seperator");
+  READ_PROGRESS_DATA(Separator,  L"separator");
   READ_PROGRESS_DATA(Watching,   L"watching");
   #undef READ_PROGRESS_DATA
 
