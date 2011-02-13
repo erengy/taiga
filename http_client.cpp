@@ -212,10 +212,10 @@ BOOL CHTTPClient::OnReadComplete() {
       MainWindow.RefreshList(MAL_WATCHING);
       MainWindow.RefreshTabs(MAL_WATCHING);
       SearchWindow.PostMessage(WM_CLOSE);
-      ExecuteAction(L"CheckEpisodes()", TRUE);
       if (GetClientMode() == HTTP_MAL_RefreshList) {
         MainWindow.m_Toolbar.EnableButton(0, true);
         MainWindow.m_Toolbar.EnableButton(1, true);
+        ExecuteAction(L"CheckEpisodes()", TRUE);
       } else if (GetClientMode() == HTTP_MAL_RefreshAndLogin) {
         MAL.Login();
         return TRUE;

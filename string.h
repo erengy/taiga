@@ -80,7 +80,7 @@ wstring ToWSTR(const ULONG& value);
 wstring ToWSTR(const INT64& value);
 wstring ToWSTR(const UINT64& value);
 wstring ToWSTR(const double& value, int count = 16);
-void Trim(wstring& input, const wchar_t trim_chars[] = L" ");
+void Trim(wstring& input, const wchar_t trim_chars[] = L" ", bool trim_left = true, bool trim_right = true);
 void TrimLeft(wstring& input, const wchar_t trim_chars[] = L" ");
 void TrimRight(wstring& input, const wchar_t trim_chars[] = L" ");
 bool ValidateFileExtension(const wstring& extension, unsigned int max_length = 0);

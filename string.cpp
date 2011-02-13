@@ -65,11 +65,11 @@ void ErasePunctuation(wstring& input, bool keep_trailing) {
         (c >  57 && c <  65) || // :;<=>?@
         (c >  90 && c <  97) || // [\]^_`
         (c > 122 && c < 128)) { // {|}~
-          if (!keep_trailing || 
-            c != '!' || c!= '+') {
-              keep_trailing = false;
-              input.erase(i, 1);
+          if (keep_trailing) {
+            if (c == '!' || c == '+') continue;
+            keep_trailing = false;
           }
+          input.erase(i, 1);
     } else {
       keep_trailing = false;
     }
@@ -488,21 +488,21 @@ void LimitText(wstring& input, unsigned int limit, const wstring& tail) {
   }
 }
 
-void Trim(wstring& input, const wchar_t trim_chars[]) {
-  const size_t index_begin = input.find_first_not_of(trim_chars);
-  const size_t index_end = input.find_last_not_of(trim_chars);
-  input.erase(index_end + 1, input.length() - index_end + 1);
-  input.erase(0, index_begin);
+void Trim(wstring& input, const wchar_t trim_chars[], bool trim_left, bool trim_right) {
+  if (input.empty()) return;
+  const size_t index_begin = trim_left ? input.find_first_not_of(trim_chars) : 0;
+  const size_t index_end = trim_right ? input.find_last_not_of(trim_chars) : input.length() - 1;
+  if (index_begin == wstring::npos || index_end == wstring::npos) return;
+  if (trim_right) input.erase(index_end + 1, input.length() - index_end + 1);
+  if (trim_left) input.erase(0, index_begin);
 }
 
 void TrimLeft(wstring& input, const wchar_t trim_chars[]) {
-  const size_t index_begin = input.find_first_not_of(trim_chars);
-  input.erase(0, index_begin);
+  Trim(input, trim_chars, true, false);
 }
 
 void TrimRight(wstring& input, const wchar_t trim_chars[]) {
-  const size_t index_end = input.find_last_not_of(trim_chars);
-  input.erase(index_end + 1, input.length() - index_end + 1);
+  Trim(input, trim_chars, false, true);
 }
 
 // =============================================================================

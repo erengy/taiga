@@ -132,7 +132,7 @@ BOOL CMainWindow::OnInitDialog() {
   m_Toolbar.InsertButton(9, Icon24_Settings, 109, 1, fsStyle1, 9, NULL, L"Change program settings");
   #ifdef _DEBUG
   m_Toolbar.InsertButton(10, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(11, Icon24_About, 111, 1, fsStyle1, 11, NULL, L"About Taiga");
+  m_Toolbar.InsertButton(11, Icon24_About, 111, 1, fsStyle1, 11, NULL, L"Debug");
   #endif
   // Insert search toolbar button
   m_ToolbarSearch.InsertButton(0, Icon16_Search, 200, 1, fsStyle2, NULL, NULL, L"Search");

@@ -189,7 +189,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     i = 0;
   }
   for (unsigned int i = 0; i < tokens.size(); i++) {
-    wchar_t trim_char[] = {tokens[i].Separator};
+    wchar_t trim_char[] = {tokens[i].Separator, '\0'};
     Trim(tokens[i].Content, trim_char);
     if (tokens[i].Content.length() < 2) {
       tokens.erase(tokens.begin() + i);
