@@ -309,9 +309,11 @@ bool CAnimeWindow::CAnimeImage::Load(const wstring& file) {
   ::DeleteObject(DC.DetachBitmap());
   
   HBITMAP hbmp = NULL;
-  HDC hScreen = ::GetDC(NULL);
-  DC = ::CreateCompatibleDC(hScreen);
-  ::ReleaseDC(NULL, hScreen);
+  if (DC.Get() == NULL) {
+    HDC hScreen = ::GetDC(NULL);
+    DC = ::CreateCompatibleDC(hScreen);
+    ::ReleaseDC(NULL, hScreen);
+  }
 
   Gdiplus::Bitmap bmp(file.c_str());
   Width = bmp.GetWidth();

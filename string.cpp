@@ -400,24 +400,34 @@ wstring ToWSTR(const double& value, int count) {
 
 wstring EncodeURL(const wstring& str, bool encode_unreserved) {
   static const wchar_t* digits = L"0123456789ABCDEF";
-  wstring buffer;
+  wstring output;
 
-  for (unsigned int c = 0; c < str.length(); c++) {
-    if ((str[c] >= '0' && str[c] <= '9') || 
-        (str[c] >= 'A' && str[c] <= 'Z') || 
-        (str[c] >= 'a' && str[c] <= 'z') || 
+  for (unsigned int i = 0; i < str.length(); i++) {
+    if ((str[i] >= '0' && str[i] <= '9') || 
+        (str[i] >= 'A' && str[i] <= 'Z') || 
+        (str[i] >= 'a' && str[i] <= 'z') || 
         (!encode_unreserved && 
-        (str[c] == '-' || str[c] == '.' || 
-         str[c] == '_' || str[c] == '~'))) {
-           buffer.append(&str[c], 1);
+        (str[i] == '-' || str[i] == '.' || 
+         str[i] == '_' || str[i] == '~'))) {
+           output.push_back(str[i]);
     } else {
-      buffer.append(L"%");
-      buffer.append(&digits[(str[c] >> 4) & 0x0F], 1);
-      buffer.append(&digits[str[c] & 0x0F], 1);
+      #define PercentEncode(x) \
+        output.append(L"%"); \
+        output.append(&digits[(x >> 4) & 0x0F], 1); \
+        output.append(&digits[x & 0x0F], 1);
+      if (str[i] > 255) {
+        string buffer = ToANSI(wstring(&str[i], 1));
+        for (unsigned int j = 0; j < buffer.length(); j++) {
+          PercentEncode(buffer[j]);
+        }
+      } else {
+        PercentEncode(str[i]);
+      }
+      #undef PercentEncode
     }
   }
 
-  return buffer;
+  return output;
 }
 
 void DecodeHTML(wstring& input) {
