@@ -372,7 +372,7 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
 
 void CMyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 24
+  #define HTMLCHARCOUNT 29
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Characters are sorted by their Unicode value */
 	{L"&sup3;&para;",           L"\u5CF6"},   // han character 'island'
@@ -396,6 +396,11 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&atilde;\uFFFD\uFFFD",   L"\u30CD"},   // katakana letter ne
     {L"&atilde;\uFFFD&iexcl;",  L"\u30E1"},   // katakana letter me
 	{L"&aring;\uFFFD&shy;",     L"\u516D"},   // han character 'number six'
+	{L"&aring;&iquest;\uFFFD",	L"\u5FCD"},	  // endure
+	{L"&aelig;\uFFFD\uFFFD",	L"\u624B"},	  // hand
+	{L"&aelig;\uFFFD&frac14;",	L"\u62BC"},	  // mortgage
+	{L"&ccedil;&copy;&ordm;",	L"\u7A7A"},	  // empty
+	{L"&eacute;\uFFFD&uml;",	L"\u90E8"},   // division
     /* Keep these at the end so they get replaced after others that include \uFFFD */
     {L"&Atilde;\uFFFD",         L"\u00DF"},   // small sharp s, German
     {L"&Aring;\uFFFD",          L"\u014D"},   // small o, macron mark
