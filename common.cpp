@@ -123,6 +123,30 @@ wstring GetTime(LPCWSTR lpFormat) {
   return buff;
 }
 
+wstring GetTimeJapan(LPCWSTR lpFormat) {
+  WCHAR buff[32];
+  SYSTEMTIME stJST;
+  FILETIME ftJST;
+  ULARGE_INTEGER uLargeIntJST;
+
+  // current UTC SYSTEMTIME converted to FILETIME converted to ULARGE_INTEGER
+  GetSystemTime(&stJST);
+  SystemTimeToFileTime(&stJST, &ftJST);
+  uLargeIntJST.LowPart  = ftJST.dwLowDateTime;
+  uLargeIntJST.HighPart = ftJST.dwHighDateTime;
+
+  // JST is UTC+9
+  uLargeIntJST.QuadPart += 324000000000; // 9 * 60 * 60 * 10000000
+
+  // convert back to SYSTEMTIME
+  ftJST.dwLowDateTime  = uLargeIntJST.LowPart;
+  ftJST.dwHighDateTime = uLargeIntJST.HighPart;
+  FileTimeToSystemTime(&ftJST, &stJST);
+
+  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, lpFormat, buff, 32);
+  return buff;
+}
+
 int GetLastEpisode(const wstring& episode) {
   int value = 1, pos = InStrRev(episode, L"-", episode.length());
   if (pos == episode.length() - 1) {
