@@ -72,6 +72,18 @@ wstring CalculateCRC(const wstring& file) {
 
 // =============================================================================
 
+int GetLastEpisode(const wstring& episode) {
+  int value = 1, pos = InStrRev(episode, L"-", episode.length());
+  if (pos == episode.length() - 1) {
+    value = ToINT(episode.substr(0, pos));
+  } else if (pos > -1) {
+    value = ToINT(episode.substr(pos + 1));
+  } else {
+    value = ToINT(episode);
+  }
+  return value;
+}
+
 int StatusToIcon(int status) {  
   switch (status) {
     case MAL_AIRING:
@@ -111,6 +123,30 @@ wstring FormatError(DWORD dwError, LPCWSTR lpSource) {
   }
 }
 
+// =============================================================================
+
+void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
+  // Get current time, expressed in UTC
+  GetSystemTime(&st);
+  if (utc_offset == 0) return;
+  
+  // Convert to FILETIME
+  FILETIME ft;
+  SystemTimeToFileTime(&st, &ft);
+  // Convert to ULARGE_INTEGER
+  ULARGE_INTEGER ul;
+  ul.LowPart = ft.dwLowDateTime;
+  ul.HighPart = ft.dwHighDateTime;
+
+  // Apply UTC offset
+  ul.QuadPart += static_cast<ULONGLONG>(utc_offset) * 60 * 60 * 10000000;
+
+  // Convert back to SYSTEMTIME
+  ft.dwLowDateTime = ul.LowPart;
+  ft.dwHighDateTime = ul.HighPart;
+  FileTimeToSystemTime(&ft, &st);
+}
+
 wstring GetDate(LPCWSTR lpFormat) {
   WCHAR buff[32];
   GetDateFormat(LOCALE_SYSTEM_DEFAULT, 0, NULL, lpFormat, buff, 32);
@@ -123,40 +159,20 @@ wstring GetTime(LPCWSTR lpFormat) {
   return buff;
 }
 
-wstring GetTimeJapan(LPCWSTR lpFormat) {
+wstring GetDateJapan(LPCWSTR lpFormat) {
   WCHAR buff[32];
   SYSTEMTIME stJST;
-  FILETIME ftJST;
-  ULARGE_INTEGER uLargeIntJST;
-
-  // current UTC SYSTEMTIME converted to FILETIME converted to ULARGE_INTEGER
-  GetSystemTime(&stJST);
-  SystemTimeToFileTime(&stJST, &ftJST);
-  uLargeIntJST.LowPart  = ftJST.dwLowDateTime;
-  uLargeIntJST.HighPart = ftJST.dwHighDateTime;
-
-  // JST is UTC+9
-  uLargeIntJST.QuadPart += 324000000000; // 9 * 60 * 60 * 10000000
-
-  // convert back to SYSTEMTIME
-  ftJST.dwLowDateTime  = uLargeIntJST.LowPart;
-  ftJST.dwHighDateTime = uLargeIntJST.HighPart;
-  FileTimeToSystemTime(&ftJST, &stJST);
-
-  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, lpFormat, buff, 32);
+  GetSystemTime(stJST, 9); // JST is UTC+09
+  GetDateFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, lpFormat, buff, 32);
   return buff;
 }
 
-int GetLastEpisode(const wstring& episode) {
-  int value = 1, pos = InStrRev(episode, L"-", episode.length());
-  if (pos == episode.length() - 1) {
-    value = ToINT(episode.substr(0, pos));
-  } else if (pos > -1) {
-    value = ToINT(episode.substr(pos + 1));
-  } else {
-    value = ToINT(episode);
-  }
-  return value;
+wstring GetTimeJapan(LPCWSTR lpFormat) {
+  WCHAR buff[32];
+  SYSTEMTIME stJST;
+  GetSystemTime(stJST, 9); // JST is UTC+09
+  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, lpFormat, buff, 32);
+  return buff;
 }
 
 wstring ToTimeString(int seconds) {

@@ -77,6 +77,7 @@ public:
   int GetTotalEpisodes();
   bool ParseSearchResult(const wstring& data);
   void Edit(const wstring& data, CEventItem item);
+  bool IsAiredYet() const;
   void SetStartDate(wstring date, bool ignore_previous);
   void SetFinishDate(wstring date, bool ignore_previous);
   void Delete();

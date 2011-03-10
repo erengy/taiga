@@ -216,6 +216,15 @@ void CListView::RemoveAllGroups() {
   ListView_RemoveAllGroups(m_hWindow);
 }
 
+BOOL CListView::SetBkImage(HBITMAP hbmp, ULONG ulFlags, int xOffset, int yOffset) {
+  LVBKIMAGE bki      = {0};
+  bki.hbm            = hbmp;
+  bki.ulFlags        = ulFlags;
+  bki.xOffsetPercent = xOffset;
+  bki.yOffsetPercent = yOffset;
+  return ListView_SetBkImage(m_hWindow, &bki);
+}
+
 void CListView::SetCheckState(int iIndex, BOOL fCheck) {
   ListView_SetItemState(m_hWindow, iIndex, INDEXTOSTATEIMAGEMASK((fCheck==TRUE) ? 2 : 1), LVIS_STATEIMAGEMASK);
 }

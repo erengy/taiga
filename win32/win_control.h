@@ -145,6 +145,7 @@ public:
   BOOL       IsGroupViewEnabled();
   BOOL       RedrawItems(int iFirst, int iLast, bool repaint);
   void       RemoveAllGroups();
+  BOOL       SetBkImage(HBITMAP hbmp, ULONG ulFlags = LVBKIF_TYPE_WATERMARK, int xOffset = 100, int yOffset = 100);
   void       SetCheckState(int iIndex, BOOL fCheck);
   BOOL       SetColumnWidth(int iCol, int cx);
   void       SetExtendedStyle(DWORD dwExStyle);

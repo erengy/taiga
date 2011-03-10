@@ -38,6 +38,7 @@ public:
 // =============================================================================
 
 CRecognition::CRecognition() {
+  // Load keywords into memory
   ReadKeyword(IDS_KEYWORD_AUDIO, AudioKeywords);
   ReadKeyword(IDS_KEYWORD_VIDEO, VideoKeywords);
   ReadKeyword(IDS_KEYWORD_EXTRA, ExtraKeywords);
@@ -58,12 +59,7 @@ bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime,
     if (number == 0 || number > anime.Series_Episodes) return false;
   }
   // Leave if not yet aired
-  if (check_date && anime.Series_Status == MAL_NOTYETAIRED) {
-    if (!MAL.IsValidDate(anime.Series_Start) || 
-      CompareStrings(GetTimeJapan(L"yyyy'-'MM'-'dd"), anime.Series_Start) < 0) {
-        return false;
-    }
-  }
+  if (check_date && !anime.IsAiredYet()) return false;
 
   // Remove unnecessary characters
   wstring title = episode.Title;

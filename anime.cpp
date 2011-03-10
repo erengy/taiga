@@ -451,6 +451,16 @@ bool CAnime::ParseSearchResult(const wstring& data) {
 
 // =============================================================================
 
+bool CAnime::IsAiredYet() const {
+  if (Series_Status == MAL_NOTYETAIRED) {
+    if (!MAL.IsValidDate(Series_Start) || 
+      CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_Start) < 0) {
+        return false;
+    }
+  }
+  return true;
+}
+
 void CAnime::SetStartDate(wstring date, bool ignore_previous) {
   if (!MAL.IsValidDate(My_StartDate) || ignore_previous) {
     My_StartDate = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
