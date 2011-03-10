@@ -21,13 +21,13 @@
 
 #include "win_main.h"
 
-#define CONTROL_MARGIN 6
-#define DEFAULT_CLASS  L"TaigaDefaultW"
+#define WIN_CONTROL_MARGIN 6
+#define WIN_DEFAULT_CLASS  L"TaigaDefaultW"
 
-enum BorderStyle {
-  BORDER_NONE,
-  BORDER_CLIENT,
-  BORDER_STATIC
+enum WinBorderStyle {
+  WIN_BORDER_NONE,
+  WIN_BORDER_CLIENT,
+  WIN_BORDER_STATIC
 };
 
 // =============================================================================
@@ -51,8 +51,8 @@ public:
                       HMENU hMenu, 
                       LPVOID lpParam);
   virtual void Destroy();
-  virtual void PreCreate(CREATESTRUCT& cs) {};
-  virtual void PreRegisterClass(WNDCLASSEX& wc) {};
+  virtual void PreCreate(CREATESTRUCT& cs);
+  virtual void PreRegisterClass(WNDCLASSEX& wc);
   virtual BOOL PreTranslateMessage(MSG* pMsg) { return FALSE; };
 
   void    Attach(HWND hWindow);
@@ -113,8 +113,8 @@ public:
 protected:
   // Message handlers
   virtual BOOL    OnCommand(WPARAM wParam, LPARAM lParam) { return FALSE; };
-  virtual BOOL    OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) { return FALSE; };
-  virtual void    OnDestroy() {};
+  virtual void    OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual BOOL    OnDestroy() { return FALSE; };
   virtual void    OnDropFiles(HDROP hDropInfo) {};
   virtual void    OnGetMinMaxInfo(LPMINMAXINFO lpMMI) {};
   virtual LRESULT OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) { return -1; };

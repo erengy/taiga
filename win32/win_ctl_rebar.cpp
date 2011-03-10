@@ -16,9 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <windows.h>
-#include <commctrl.h>
-
 #include "win_control.h"
 
 // =============================================================================
@@ -29,8 +26,8 @@ void CRebar::PreCreate(CREATESTRUCT &cs) {
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | CCS_NODIVIDER | RBS_BANDBORDERS | RBS_VARHEIGHT;
 }
 
-BOOL CRebar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  return TRUE;
+void CRebar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

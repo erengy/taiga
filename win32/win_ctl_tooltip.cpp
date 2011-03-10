@@ -26,9 +26,9 @@ void CTooltip::PreCreate(CREATESTRUCT &cs) {
   cs.style     = WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP;
 }
 
-BOOL CTooltip::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void CTooltip::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   ::SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-  return TRUE;
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

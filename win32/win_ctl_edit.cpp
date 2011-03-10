@@ -16,9 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <windows.h>
-#include <commctrl.h>
-
 #include "win_control.h"
 
 // =============================================================================
@@ -29,8 +26,8 @@ void CEdit::PreCreate(CREATESTRUCT &cs) {
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL;
 }
 
-BOOL CEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  return TRUE;
+void CEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

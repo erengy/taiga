@@ -31,6 +31,7 @@
 #include "dlg/dlg_test_recognition.h"
 #include "dlg/dlg_torrent.h"
 #include "dlg/dlg_torrent_filter.h"
+#include "dlg/dlg_update.h"
 #include "event.h"
 #include "http.h"
 #include "monitor.h"
@@ -156,7 +157,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // CheckUpdates()
   //   Checks for a new version of the program.
   } else if (action == L"CheckUpdates") {
-    Taiga.CheckNewVersion(false);
+    if (!UpdateDialog.IsWindow()) {
+      UpdateDialog.Create(IDD_UPDATE, g_hMain, true);
+    } else {
+      ActivateWindow(UpdateDialog.GetWindowHandle());
+    }
 
   // Exit(), Quit()
   //   Exits from Taiga.
@@ -184,6 +189,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       AnimeWindow.Create(IDD_ANIME_INFO, g_hMain, false);
     } else {
       ActivateWindow(AnimeWindow.GetWindowHandle());
+    }
+
+  // MainWindow()
+  } else if (action == L"MainWindow") {
+    if (!MainWindow.IsWindow()) {
+      MainWindow.Create(IDD_MAIN, NULL, false);
+      //Taiga.UpdateHelper.RunActions();
+    } else {
+      ActivateWindow(MainWindow.GetWindowHandle());
     }
 
   // RecognitionTest()
@@ -237,9 +251,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (body.empty()) return;
     if (Settings.Account.MAL.API == MAL_API_OFFICIAL) {
       if (Settings.Account.MAL.User.empty() || Settings.Account.MAL.Password.empty()) {
-        CTaskDialog dlg;
-        dlg.SetWindowTitle(APP_TITLE);
-        dlg.SetMainIcon(TD_INFORMATION_ICON);
+        CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
         dlg.SetMainInstruction(L"Would you like to set your account information first?");
         dlg.SetContent(L"Anime search requires authentication, which means, "
           L"you need to enter a valid user name and password to search MyAnimeList.");
@@ -356,9 +368,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
     if (check_folder && !silent && !Settings.Folders.Root.empty()) {
-      CTaskDialog dlg;
-      dlg.SetWindowTitle(APP_TITLE);
-      dlg.SetMainIcon(TD_ICON_INFORMATION);
+      CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"Would you like to search for anime folders first?");
       dlg.SetContent(L"This feature only checks specific anime folders for new episodes. "
         L"As you have none set at the moment, searching for folders is highly recommended.");

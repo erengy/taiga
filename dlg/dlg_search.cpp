@@ -198,18 +198,14 @@ void CSearchWindow::ParseResults(const wstring& data) {
     wstring msg;
     m_Edit.GetText(msg);
     msg = L"No results found for \"" + msg + L"\".";
-    CTaskDialog dlg;
-    dlg.SetWindowTitle(L"Search Anime");
-    dlg.SetMainIcon(TD_INFORMATION_ICON);
+    CTaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(GetWindowHandle());
     return;
   }
   if (data == L"Invalid credentials") {
-    CTaskDialog dlg;
-    dlg.SetWindowTitle(L"Search Anime");
-    dlg.SetMainIcon(TD_ERROR_ICON);
+    CTaskDialog dlg(L"Search Anime", TD_ERROR_ICON);
     dlg.SetMainInstruction(L"Invalid user name or password.");
     dlg.SetContent(L"Anime search requires authentication, which means, "
       L"you need to enter a valid user name and password to search MyAnimeList.");
@@ -267,7 +263,8 @@ void CSearchWindow::RefreshList() {
       m_Anime[i].Index = AnimeList.FindItemByID(m_Anime[i].Series_ID);
     }
     CAnime* item = m_Anime[i].Index > -1 ? &AnimeList.Item[m_Anime[i].Index] : &m_Anime[i];
-    m_List.InsertItem(i, -1, StatusToIcon(item->Series_Status), item->Series_Title.c_str(), 
+    m_List.InsertItem(i, -1, StatusToIcon(item->Series_Status), 0, NULL, 
+      item->Series_Title.c_str(), 
       reinterpret_cast<LPARAM>(item));
     m_List.SetItem(i, 1, MAL.TranslateType(item->Series_Type).c_str());
     m_List.SetItem(i, 2, MAL.TranslateNumber(item->Series_Episodes).c_str());

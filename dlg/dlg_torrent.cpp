@@ -142,7 +142,7 @@ void CTorrentWindow::RefreshList() {
       if (!video.empty()) video += L" ";
       video += Torrents.Feed.Item[i].EpisodeData.Resolution;
     }
-    int index = m_List.InsertItem(i, group, icon, title.c_str(), 
+    int index = m_List.InsertItem(i, group, icon, 0, NULL, title.c_str(), 
       reinterpret_cast<LPARAM>(&Torrents.Feed.Item[i]));
     m_List.SetItem(index, 1, number.c_str());
     m_List.SetItem(index, 2, Torrents.Feed.Item[i].EpisodeData.Group.c_str());
@@ -301,10 +301,10 @@ void CTorrentWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       CRect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
-      rcWindow.Inflate(-ScaleX(CONTROL_MARGIN), -ScaleY(CONTROL_MARGIN));
+      rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       m_Rebar.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += m_Rebar.GetBarHeight() + ScaleY(CONTROL_MARGIN / 2);
+      rcWindow.top += m_Rebar.GetBarHeight() + ScaleY(WIN_CONTROL_MARGIN / 2);
       // Resize status bar
       CRect rcStatus;
       m_Status.GetClientRect(&rcStatus);

@@ -19,57 +19,7 @@
 #include "std.h"
 #include "gfx.h"
 
-#pragma comment(lib, "gdiplus.lib")
-static ULONG_PTR gdiplusToken;
-using namespace Gdiplus;
-
-// =============================================================================
-
-void Gdiplus_Initialize() {
-  Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-  Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-}
-
-void Gdiplus_Shutdown() {
-  Gdiplus::GdiplusShutdown(gdiplusToken);
-  gdiplusToken = NULL;
-}
-
-HBITMAP Gdiplus_LoadImage(wstring file) {
-  HBITMAP hBitmap = NULL;
-  
-  Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(file.c_str());
-  if (pBitmap) {
-    pBitmap->GetHBITMAP(NULL, &hBitmap);
-    delete pBitmap; pBitmap = NULL;
-  }
-
-  return hBitmap;
-}
-
-HBITMAP Gdiplus_LoadPNGResource(HINSTANCE hInstance, int nResource, LPCWSTR lpResourceType) {
-  HBITMAP hBitmap = NULL;
-
-  if (HRSRC hResource = FindResource(hInstance, MAKEINTRESOURCE(nResource), lpResourceType)) {
-    if (DWORD dwSize = SizeofResource(hInstance, hResource)) {
-      if (const void* pResourceData = LockResource(LoadResource(hInstance, hResource))) {
-        if (HGLOBAL hBuffer = GlobalAlloc(GHND, dwSize)) {
-          if (void* pBuffer = GlobalLock(hBuffer)) {
-            CopyMemory(pBuffer, pResourceData, dwSize);
-            IStream* pStream = NULL;
-            if (CreateStreamOnHGlobal(hBuffer, FALSE, &pStream) == S_OK) {
-              Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromStream(pStream);
-              pStream->Release();
-              if (pBitmap) { 
-                pBitmap->GetHBITMAP(NULL, &hBitmap);
-                delete pBitmap; pBitmap = NULL;
-              }
-            } GlobalUnlock(hBuffer);
-          } GlobalFree(hBuffer);
-  } } } }
-
-  return hBitmap;
-}
+CGdiPlus GdiPlus;
 
 // =============================================================================
 

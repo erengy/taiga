@@ -24,6 +24,8 @@
 #include "settings.h"
 #include "string.h"
 #include "theme.h"
+#include "win32/win_registry.h"
+#include "third_party/zlib/zlib.h"
 
 // =============================================================================
 
@@ -39,6 +41,33 @@ wstring Base64Encode(const wstring& str) {
   string buff = ToANSI(str);
   coder.Encode((BYTE*)buff.c_str(), buff.length());
   return ToUTF8(coder.EncodedMessage());
+}
+
+// =============================================================================
+
+wstring CalculateCRC(const wstring& file) {
+  BYTE buffer[0x10000];
+  DWORD dwBytesRead = 0;
+  
+  HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+  if (hFile == INVALID_HANDLE_VALUE) return L"";
+
+  ULONG crc = crc32(0L, Z_NULL, 0);
+  BOOL bSuccess = ReadFile(hFile, buffer, sizeof(buffer), &dwBytesRead, NULL);
+  while (bSuccess && dwBytesRead) {
+    crc = crc32(crc, buffer, dwBytesRead);
+    bSuccess = ReadFile(hFile, buffer, sizeof(buffer), &dwBytesRead, NULL);
+  }
+
+  if (hFile != NULL) CloseHandle(hFile);
+
+  wchar_t val[16] = {0};
+  _ultow_s(crc, val, 16, 16);
+  wstring value = val;
+  if (value.length() < 8) {
+    value.insert(0, 8 - value.length(), '0');
+  }
+  return value;
 }
 
 // =============================================================================
@@ -189,6 +218,20 @@ BOOL BrowseForFolder(HWND hwndOwner, LPCWSTR lpszTitle, UINT ulFlags, wstring& o
   return TRUE;
 }
 
+bool CreateFolder(const wstring& path) {
+  return SHCreateDirectoryEx(NULL, path.c_str(), NULL) == ERROR_SUCCESS;
+}
+
+int DeleteFolder(wstring path) {
+  if (path.back() == '\\') path.pop_back();
+  path.push_back('\0');
+  SHFILEOPSTRUCT fos = {0};
+  fos.wFunc = FO_DELETE;
+  fos.pFrom = path.c_str();
+  fos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+  return SHFileOperation(&fos);
+}
+
 bool FileExists(const wstring& file) {
   if (file.empty()) return false;
   HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, 
@@ -214,13 +257,19 @@ void ValidateFileName(wstring& file) {
 }
 
 wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value) {
-  wstring path = Registry_ReadValue(HKEY_CLASSES_ROOT, extension.c_str(), NULL);
+  CRegistry reg;
+  reg.OpenKey(HKEY_CLASSES_ROOT, extension, 0, KEY_QUERY_VALUE);
+  wstring path = reg.QueryValue(L"");
+  
   if (!path.empty()) {
     path += L"\\shell\\open\\command";
-    path = Registry_ReadValue(HKEY_CLASSES_ROOT, path.c_str(), NULL);
+    reg.OpenKey(HKEY_CLASSES_ROOT, path, 0, KEY_QUERY_VALUE);
+    path = reg.QueryValue(L"");
     Replace(path, L"\"", L"");
     Trim(path, L" %1");
   }
+
+  reg.CloseKey();
   return path.empty() ? default_value : path;
 }
 
@@ -284,39 +333,4 @@ wstring ToSizeString(QWORD qwSize) {
   }
 
   return size + unit;
-}
-
-// =============================================================================
-
-void Registry_DeleteValue(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValueName) {
-  HKEY hResult = NULL;
-  if (RegOpenKeyEx(hKey, lpSubKey, 0, KEY_SET_VALUE, &hResult) == ERROR_SUCCESS) {
-    RegDeleteValue(hResult, lpValueName);
-    RegCloseKey(hResult);
-  }
-}
-
-wstring Registry_ReadValue(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValueName) {
-  HKEY hResult = NULL;
-  if (RegOpenKeyEx(hKey, lpSubKey, 0, KEY_QUERY_VALUE, &hResult) == ERROR_SUCCESS) {
-    DWORD dwType = 0;
-    WCHAR szBuffer[MAX_PATH];
-    DWORD dwBufferSize = sizeof(szBuffer);
-    if (RegQueryValueEx(hResult, lpValueName, NULL, &dwType, (LPBYTE)&szBuffer, &dwBufferSize) == ERROR_SUCCESS) {
-      if (dwType == REG_SZ) {
-        RegCloseKey(hResult);
-        return szBuffer;
-      }
-    }
-    RegCloseKey(hResult);
-  }
-  return L"";
-}
-
-void Registry_SetValue(HKEY hKey, LPCWSTR lpSubKey, LPCWSTR lpValueName, LPCWSTR lpData, DWORD cbData) {
-  HKEY hResult = NULL;
-  if (RegCreateKeyEx(hKey, lpSubKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_SET_VALUE, NULL, &hResult, NULL) == ERROR_SUCCESS) {
-    RegSetValueEx(hResult, lpValueName, 0, REG_SZ, (LPBYTE)lpData, (cbData + 1) * sizeof(WCHAR));
-    RegCloseKey(hResult);
-  }
 }

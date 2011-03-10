@@ -26,9 +26,9 @@ void CTreeView::PreCreate(CREATESTRUCT &cs) {
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT;
 }
 
-BOOL CTreeView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void CTreeView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   TreeView_SetExtendedStyle(hwnd, TVS_EX_DOUBLEBUFFER, NULL);
-  return TRUE;
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

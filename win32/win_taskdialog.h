@@ -36,6 +36,7 @@
 class CTaskDialog {
 public:
   CTaskDialog();
+  CTaskDialog(LPCWSTR title, LPWSTR icon);
   virtual ~CTaskDialog() {}
   
   void    AddButton(LPCWSTR text, int id);
@@ -55,6 +56,7 @@ public:
 protected:
   static HRESULT CALLBACK Callback(HWND hwnd, UINT uNotification, 
     WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
+  void Initialize();
   
   vector<TASKDIALOG_BUTTON> m_Buttons;
   TASKDIALOGCONFIG m_Config;

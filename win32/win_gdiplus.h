@@ -16,39 +16,22 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ABOUT_H
-#define DLG_ABOUT_H
+#ifndef WIN_GDIPLUS_H
+#define WIN_GDIPLUS_H
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "win_main.h"
 
 // =============================================================================
 
-/* About dialog */
-
-class CAboutPage: public CDialog {
+class CGdiPlus {
 public:
-  CAboutPage() {}
-  virtual ~CAboutPage() {}
+  CGdiPlus();
+  ~CGdiPlus();
 
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  void OnTimer(UINT_PTR nIDEvent);
+  HBITMAP LoadImage(const wstring& file);
+
+private:
+  ULONG_PTR m_Token;
 };
 
-class CAboutWindow : public CDialog {
-public:
-  CAboutWindow();
-  ~CAboutWindow() {}
-  
-  CAboutPage m_PageTaiga;
-  CTab m_Tab;
-  
-  BOOL OnDestroy();
-  BOOL OnInitDialog();
-};
-
-extern CAboutWindow AboutWindow;
-
-#endif // DLG_ABOUT_H
+#endif // WIN_GDIPLUS_H

@@ -25,6 +25,7 @@
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
+#include "win32/win_registry.h"
 #include "xml.h"
 
 #define DEFAULT_FORMAT_HTTP      L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%"
@@ -102,6 +103,7 @@ bool CSettings::Read() {
     Announce.Twitter.User = twitter.attribute(L"user").value();
 
   // Folders
+  Folders.Root.clear();
   xml_node folders = settings.child(L"anime").child(L"folders");
   for (xml_node folder = folders.child(L"root"); folder; folder = folder.next_sibling(L"root")) {
     Folders.Root.push_back(folder.attribute(L"folder").value());
@@ -110,6 +112,7 @@ bool CSettings::Read() {
   Folders.WatchEnabled = watch.attribute(L"enabled").as_int();
 
   // Anime items
+  Anime.Item.clear();
   wstring fansub, folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
@@ -133,7 +136,7 @@ bool CSettings::Read() {
     // Start-up
     xml_node startup = program.child(L"startup");
     Program.StartUp.CheckNewEpisodes = startup.attribute(L"checkeps").as_int();
-    Program.StartUp.CheckNewVersion = startup.attribute(L"checkversion").as_int();
+    Program.StartUp.CheckNewVersion = startup.attribute(L"checkversion").as_int(TRUE);
     Program.StartUp.Minimize = startup.attribute(L"minimize").as_int();
     // Exit
     xml_node exit = program.child(L"exit");
@@ -189,6 +192,7 @@ bool CSettings::Read() {
       RSS.Torrent.SetFolder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
       RSS.Torrent.Source = torrent.child(L"source").attribute(L"address").value(DEFAULT_TORRENT_SOURCE);
       // Filters
+      RSS.Torrent.Filters.Global.clear();
       xml_node filter = torrent.child(L"filter");
       xml_node global = filter.child(L"global");
       RSS.Torrent.Filters.GlobalEnabled = global.attribute(L"enabled").as_int(TRUE);
@@ -203,9 +207,11 @@ bool CSettings::Read() {
         Torrents.AddFilter(2, 0, L"MKV");
       }
       // Archive
+      Torrents.Archive.clear();
       PopulateFiles(Torrents.Archive, Taiga.GetDataPath() + L"Torrents\\");
     
   // Events
+  EventQueue.List.clear();
   for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
       CEventItem event_item;
@@ -422,15 +428,16 @@ bool CSettings::Write() {
       }
   
   // Write registry
+  CRegistry reg;
+  reg.OpenKey(HKEY_CURRENT_USER, 
+    L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_SET_VALUE);
   if (Program.General.AutoStart) {
     wstring app_path = Taiga.GetModulePath();
-    Registry_SetValue(HKEY_CURRENT_USER, 
-      L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", APP_NAME, 
-      app_path.c_str(), app_path.size());
+    reg.SetValue(APP_NAME, app_path.c_str());
   } else {
-    Registry_DeleteValue(HKEY_CURRENT_USER, 
-      L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", APP_NAME);
+    reg.DeleteValue(APP_NAME);
   }
+  reg.CloseKey();
 
   // Write event buffer
   if (Program.Exit.SaveBuffer && !EventQueue.IsEmpty()) {

@@ -103,7 +103,7 @@ CLASS "TaigaAnimeInfoW"
 FONT 8, "Tahoma"
 {
     CONTROL         "", IDC_TAB_ANIME, WC_TABCONTROL, 0, 106, 26, 360, 250
-    CONTROL         "", IDC_STATIC_ANIME_IMG, WC_STATIC, SS_ETCHEDFRAME | SS_CENTERIMAGE | SS_NOTIFY, 6, 26, 95, 120
+    CONTROL         "", IDC_STATIC_ANIME_IMG, WC_STATIC, SS_OWNERDRAW | SS_NOTIFY, 6, 26, 95, 120
     LTEXT           "Title", IDC_STATIC_ANIME_TITLE, 0, 0, 472, 20, SS_LEFT | SS_CENTERIMAGE | SS_NOPREFIX | SS_WORDELLIPSIS
     DEFPUSHBUTTON   "OK", IDOK, 341, 281, 60, 14
     PUSHBUTTON      "Cancel", IDCANCEL, 401, 281, 60, 14
@@ -595,6 +595,22 @@ FONT 8, "Tahoma", 400, 0, 162
 
 
 
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_UPDATE DIALOGEX 0, 0, 252, 42
+STYLE DS_3DLOOK | DS_CENTER | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Update"
+CLASS "TaigaUpdateW"
+FONT 8, "Ms Shell Dlg", 400, 0, 1
+{
+    LTEXT           "Checking updates...", IDC_STATIC_UPDATE_PROGRESS, 46, 11, 195, 8, SS_LEFT | SS_WORDELLIPSIS
+    CONTROL         "", IDC_PROGRESS_UPDATE, PROGRESS_CLASS, 0, 46, 21, 195, 10
+    ICON            IDI_MAIN, 0, 6, 6, 32, 30, SS_ICON | SS_NOTIFY | 0x00000800
+    LTEXT           "Taiga", IDC_STATIC_UPDATE_TITLE, 46, 26, 30, 10, NOT WS_VISIBLE | SS_LEFT
+}
+
+
+
 //
 // String Table resources
 //
@@ -624,8 +640,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,7,62,0
-    PRODUCTVERSION  0,7,62,0
+    FILEVERSION     0,7,64,0
+    PRODUCTVERSION  0,7,64,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -639,11 +655,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.7.62"
+            VALUE "FileVersion", "0.7.64"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.7.62"
+            VALUE "ProductVersion", "0.7.64"
         }
     }
     BLOCK "VarFileInfo"

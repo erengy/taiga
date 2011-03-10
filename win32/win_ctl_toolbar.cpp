@@ -27,11 +27,11 @@ void CToolbar::PreCreate(CREATESTRUCT &cs) {
                  TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | TBSTYLE_TRANSPARENT;
 }
 
-BOOL CToolbar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void CToolbar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   ::SendMessage(m_hWindow, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
   ::SendMessage(m_hWindow, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   SetImageList(NULL, 0, 0);
-  return TRUE;
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

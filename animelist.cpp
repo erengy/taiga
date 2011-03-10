@@ -53,6 +53,7 @@ BOOL CAnimeList::Read() {
   // Initialize
   Clear();
   User.Clear();
+  if (Settings.Account.MAL.User.empty()) return FALSE;
   wstring file = Taiga.GetDataPath() + Settings.Account.MAL.User + L".xml";
   
   // Read XML file

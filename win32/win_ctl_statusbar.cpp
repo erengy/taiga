@@ -26,9 +26,9 @@ void CStatusBar::PreCreate(CREATESTRUCT &cs) {
   cs.style     = WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS;
 }
 
-BOOL CStatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void CStatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   m_iWidth.clear();
-  return TRUE;
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

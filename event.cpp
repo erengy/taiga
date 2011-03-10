@@ -292,9 +292,7 @@ CEventItem* CEventQueue::SearchItem(int anime_index, int search_mode) {
 
 void CEventQueue::Show() {
   if (GetItemCount() == 0) {
-    CTaskDialog dlg;
-    dlg.SetWindowTitle(L"Previously on Taiga...");
-    dlg.SetMainIcon(TD_ICON_INFORMATION);
+    CTaskDialog dlg(L"Previously on Taiga...", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"There are no events in the queue.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);

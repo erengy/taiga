@@ -29,6 +29,7 @@
 
 #include "win_window.h"
 
+using std::string;
 using std::vector;
 using std::wstring;
 
@@ -66,6 +67,11 @@ public:
   virtual void PostQuitMessage(int nExitCode = 0);
   virtual int  Run();
 
+  int  GetVersionMajor() { return m_VersionMajor; }
+  int  GetVersionMinor() { return m_VersionMinor; }
+  int  GetVersionRevision() { return m_VersionRevision; }
+  void SetVersionInfo(int major, int minor, int revision);
+
   wstring   GetCurrentDirectory();
   HINSTANCE GetInstanceHandle() const;
   wstring   GetModulePath();
@@ -74,6 +80,7 @@ public:
 
 private:
   HINSTANCE m_hInstance;
+  int       m_VersionMajor, m_VersionMinor, m_VersionRevision;
 };
 
 // =============================================================================

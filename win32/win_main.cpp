@@ -71,7 +71,9 @@ void CWindowMap::Remove(CWindow* pWindow) {
 
 // =============================================================================
 
-CApp::CApp() {
+CApp::CApp() : 
+  m_VersionMajor(1), m_VersionMinor(0), m_VersionRevision(0)
+{
   m_hInstance = ::GetModuleHandle(NULL);
 }
 
@@ -116,6 +118,12 @@ int CApp::Run() {
     ::PostQuitMessage(-1);
     return -1;
   }
+}
+
+void CApp::SetVersionInfo(int major, int minor, int revision) {
+  m_VersionMajor = major;
+  m_VersionMinor = minor;
+  m_VersionRevision = revision;
 }
 
 wstring CApp::GetCurrentDirectory() {

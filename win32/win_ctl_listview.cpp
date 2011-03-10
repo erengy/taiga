@@ -35,10 +35,10 @@ void CListView::PreCreate(CREATESTRUCT &cs) {
                  LVS_REPORT | LVS_SHAREIMAGELISTS | LVS_SINGLESEL;
 }
 
-BOOL CListView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void CListView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   ListView_SetExtendedListViewStyle(hwnd, LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | 
     LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  return TRUE;
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
@@ -64,14 +64,14 @@ int CListView::EnableGroupView(bool bValue) {
   return ListView_EnableGroupView(m_hWindow, bValue);
 }
 
-int CListView::InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsed) {
+int CListView::InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable, bool bCollapsed) {
   LVGROUP lvg = {0};
   lvg.cbSize    = sizeof(LVGROUP);
   lvg.iGroupId  = nIndex;
   lvg.mask      = LVGF_HEADER | LVGF_GROUPID;
   lvg.pszHeader = const_cast<LPWSTR>(szText);
   
-  if (GetWinVersion() >= WINVERSION_VISTA) {
+  if (bCollapsable && GetWinVersion() >= WINVERSION_VISTA) {
     lvg.mask |= LVGF_STATE;
     lvg.state = LVGS_COLLAPSIBLE;
     if (bCollapsed) lvg.state |= LVGS_COLLAPSED;
@@ -171,6 +171,10 @@ BOOL CListView::GetSubItemRect(int iItem, int iSubItem, LPRECT lpRect) {
   return ListView_GetSubItemRect(m_hWindow, iItem, iSubItem, LVIR_BOUNDS, lpRect);
 }
 
+DWORD CListView::GetView() {
+  return ListView_GetView(m_hWindow);
+}
+
 int CListView::HitTest(bool return_subitem) {
   LVHITTESTINFO lvhi;
   ::GetCursorPos(&lvhi.pt);
@@ -179,18 +183,25 @@ int CListView::HitTest(bool return_subitem) {
   return return_subitem ? lvhi.iSubItem : lvhi.iItem;
 }
 
-int CListView::InsertItem(int nIndex, int nGroup, int nIcon, LPCWSTR pszText, LPARAM lParam) {
-  LVITEM lvi   = {0};
-  lvi.iGroupId = nGroup;
-  lvi.iImage   = nIcon;
-  lvi.iItem    = nIndex;
-  lvi.lParam   = lParam;
-  lvi.pszText  = const_cast<LPWSTR>(pszText);
+int CListView::InsertItem(const LVITEM& lvi) {
+  return ListView_InsertItem(m_hWindow, &lvi);
+}
 
+int CListView::InsertItem(int iItem, int iGroupId, int iImage, UINT cColumns, PUINT puColumns, LPCWSTR pszText, LPARAM lParam) {
+  LVITEM lvi    = {0};
+  lvi.cColumns  = cColumns;
+  lvi.iGroupId  = iGroupId;
+  lvi.iImage    = iImage;
+  lvi.iItem     = iItem;
+  lvi.lParam    = lParam;
+  lvi.puColumns = puColumns;
+  lvi.pszText   = const_cast<LPWSTR>(pszText);
+
+  if (cColumns != 0)   lvi.mask |= LVIF_COLUMNS;
+  if (iGroupId > -1)   lvi.mask |= LVIF_GROUPID;
+  if (iImage > -1)     lvi.mask |= LVIF_IMAGE;
+  if (lParam != 0)     lvi.mask |= LVIF_PARAM;
   if (pszText != NULL) lvi.mask |= LVIF_TEXT;
-  if (nGroup > -1) lvi.mask |= LVIF_GROUPID;
-  if (nIcon  > -1) lvi.mask |= LVIF_IMAGE;
-  if (lParam != 0) lvi.mask |= LVIF_PARAM;
 
   return ListView_InsertItem(m_hWindow, &lvi);
 }
@@ -199,6 +210,10 @@ BOOL CListView::RedrawItems(int iFirst, int iLast, bool repaint) {
   BOOL return_value = ListView_RedrawItems(m_hWindow, iFirst, iLast);
   if (return_value && repaint) ::UpdateWindow(m_hWindow);
   return return_value;
+}
+
+void CListView::RemoveAllGroups() {
+  ListView_RemoveAllGroups(m_hWindow);
 }
 
 void CListView::SetCheckState(int iIndex, BOOL fCheck) {
@@ -239,6 +254,14 @@ BOOL CListView::SetItemIcon(int nIndex, int nIcon) {
 
 void CListView::SetSelectedItem(int iIndex) {
   ListView_SetItemState(m_hWindow, iIndex, LVIS_SELECTED, LVIS_SELECTED);
+}
+
+BOOL CListView::SetTileViewInfo(PLVTILEVIEWINFO plvtvinfo) {
+  return ListView_SetTileViewInfo(m_hWindow, plvtvinfo);
+}
+
+int CListView::SetView(DWORD iView) {
+  return ListView_SetView(m_hWindow, iView);
 }
 
 // =============================================================================

@@ -306,6 +306,14 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     }
   }
 
+  // Episode number and title can't be the same
+  if (!episode.Number.empty() && !episode.Group.empty()) {
+    if (IsNumeric(title) && IsEqual(title, episode.Number)) {
+      title = episode.Group;
+      episode.Group.clear();
+    }
+  }
+
   // Set the final title, hopefully name of the anime
   episode.Title = title;
   return !title.empty();

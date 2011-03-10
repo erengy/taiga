@@ -24,16 +24,13 @@ LRESULT CALLBACK MsgBoxHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 // =============================================================================
 
 CTaskDialog::CTaskDialog() {
-  ::ZeroMemory(&m_Config, sizeof(TASKDIALOGCONFIG));
-  m_Config.cbSize         = sizeof(TASKDIALOGCONFIG);
-  m_Config.dwFlags        = TDF_ALLOW_DIALOG_CANCELLATION | 
-                            TDF_ENABLE_HYPERLINKS | 
-                            TDF_POSITION_RELATIVE_TO_WINDOW | 
-                            TDF_SIZE_TO_CONTENT;
-  m_Config.hInstance      = ::GetModuleHandle(NULL);
-  m_Config.lpCallbackData = reinterpret_cast<LONG_PTR>(this);
-  m_Config.pfCallback     = Callback;
-  m_SelectedButtonID      = 0;
+  Initialize();
+}
+
+CTaskDialog::CTaskDialog(LPCWSTR title, LPWSTR icon) {
+  Initialize();
+  SetWindowTitle(title);
+  SetMainIcon(icon);
 }
 
 HRESULT CALLBACK CTaskDialog::Callback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData) {
@@ -47,6 +44,19 @@ HRESULT CALLBACK CTaskDialog::Callback(HWND hwnd, UINT uNotification, WPARAM wPa
       break;
   }
   return S_OK;
+}
+
+void CTaskDialog::Initialize() {
+  ::ZeroMemory(&m_Config, sizeof(TASKDIALOGCONFIG));
+  m_Config.cbSize = sizeof(TASKDIALOGCONFIG);
+  m_Config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | 
+                     TDF_ENABLE_HYPERLINKS | 
+                     TDF_POSITION_RELATIVE_TO_WINDOW | 
+                     TDF_SIZE_TO_CONTENT;
+  m_Config.hInstance = ::GetModuleHandle(NULL);
+  m_Config.lpCallbackData = reinterpret_cast<LONG_PTR>(this);
+  m_Config.pfCallback = Callback;
+  m_SelectedButtonID = 0;
 }
 
 // =============================================================================
@@ -159,6 +169,7 @@ HRESULT CTaskDialog::Show(HWND hParent) {
     } else if (icon == TD_ICON_ERROR || icon == TD_ICON_SHIELD_RED) {
       msgbox.dwStyle |= MB_ICONERROR;
     }
+    #undef icon
     // Hook
     if (hParent == NULL) hParent = ::GetDesktopWindow();
     ::SetProp(hParent, L"MsgBoxHook", ::SetWindowsHookEx(WH_CALLWNDPROCRET, 
@@ -199,6 +210,7 @@ LRESULT CALLBACK MsgBoxHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
             default:
               SETBUTTONTEXT(IDCANCEL, ButtonText[0]);
           }
+          #undef SETBUTTONTEXT
       }
     }
   }

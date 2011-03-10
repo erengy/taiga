@@ -20,6 +20,7 @@
 #define HTTP_H
 
 #include "std.h"
+#include "win32/win_http.h"
 
 enum HTTP_ClientMode {
   HTTP_Silent = 0,
@@ -44,72 +45,10 @@ enum HTTP_ClientMode {
   HTTP_Twitter_Request,
   HTTP_Twitter_Auth,
   HTTP_Twitter_Post,
-  HTTP_VersionCheck,
-  HTTP_VersionCheckSilent
+  HTTP_UpdateCheck,
+  HTTP_UpdateDownload
 };
 
-enum HTTP_ContentEncoding {
-  HTTP_Encoding_None = 0,
-  HTTP_Encoding_Gzip
-};
-
-// =============================================================================
-
-class CHTTP {
-public:
-  CHTTP();
-  ~CHTTP();
-  
-  void    Cleanup();
-  void    ClearCookies();
-  wstring GetCookie();
-  wstring GetData();
-  DWORD   GetClientMode();
-  LPARAM  GetParam();
-  void    SetAutoRedirect(BOOL enabled);
-  void    SetProxy(const wstring& proxy, const wstring& user, const wstring& pass);
-  void    SetUserAgent(const wstring& user_agent);
-  
-  bool Connect(wstring szServer, wstring szObject, wstring szData, wstring szVerb, 
-    wstring szHeader, wstring szReferer, wstring szFile, 
-    DWORD dwClientMode = 0, LPARAM lParam = 0);
-  bool Get(wstring szServer, wstring szObject, wstring szFile, 
-    DWORD dwClientMode = 0, LPARAM lParam = 0);
-  bool Post(wstring szServer, wstring szObject, wstring szData, wstring szFile, 
-    DWORD dwClientMode = 0, LPARAM lParam = 0);
-
-  virtual BOOL OnError(DWORD dwError) { return FALSE; }
-  virtual BOOL OnSendRequestComplete() { return FALSE; }
-  virtual BOOL OnHeadersAvailable(wstring headers) { return FALSE; }
-  virtual BOOL OnDataAvailable() { return FALSE; }
-  virtual BOOL OnReadData() { return FALSE; }
-  virtual BOOL OnReadComplete() { return TRUE; }
-  virtual BOOL OnRedirect(wstring address) { return FALSE; }
-
-private:
-  static void CALLBACK Callback(HINTERNET hInternet, DWORD_PTR dwContext, 
-    DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
-  void StatusCallback(HINTERNET hInternet, 
-    DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
-
-protected:
-  void ParseHeaders(wstring headers);
-
-  BOOL    m_AutoRedirect;
-  LPSTR   m_Buffer;
-  INT     m_ContentEncoding;
-  wstring m_Cookie;
-  wstring m_File;
-  string  m_OptionalData;
-  wstring m_Proxy, m_ProxyUser, m_ProxyPass;
-  wstring m_UserAgent;
-
-  DWORD  m_dwDownloaded, m_dwTotal;
-  DWORD  m_dwClientMode;
-  LPARAM m_lParam;
-
-  HINTERNET m_hConnect, m_hRequest, m_hSession;
-};
 // =============================================================================
 
 class CHTTPClient : public CHTTP {

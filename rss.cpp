@@ -45,11 +45,12 @@ CRSSFeedItem::CRSSFeedItem() {
 BOOL CTorrents::Check(const wstring& source) {
   Taiga.TickerTorrent = 0;
   if (source.empty()) return FALSE;
-  wstring server, object;
-  CrackURL(source, server, object);
+  
   TorrentWindow.m_Toolbar.EnableButton(0, false);
   TorrentWindow.m_Toolbar.EnableButton(1, false);
-  return TorrentClient.Get(server, object, Taiga.GetDataPath() + L"rss.xml", HTTP_TorrentCheck);
+  
+  CCrackURL url(source);
+  return TorrentClient.Get(url.Host, url.Path, Taiga.GetDataPath() + L"rss.xml", HTTP_TorrentCheck);
 }
 
 BOOL CTorrents::Compare() {
@@ -107,15 +108,13 @@ BOOL CTorrents::Download(int index) {
   TorrentWindow.m_Toolbar.EnableButton(0, false);
   TorrentWindow.m_Toolbar.EnableButton(1, false);
   
-  wstring server, object;
-  CrackURL(Feed.Item[index].Link, server, object);
-  
   wstring folder = Taiga.GetDataPath() + L"Torrents\\";
   CreateDirectory(folder.c_str(), NULL);
   wstring file = Feed.Item[index].Title + L".torrent";
   ValidateFileName(file);
   
-  return TorrentClient.Get(server, object, folder + file, dwMode, 
+  CCrackURL url(Feed.Item[index].Link);
+  return TorrentClient.Get(url.Host, url.Path, folder + file, dwMode, 
     reinterpret_cast<LPARAM>(&Feed.Item[index]));
 }
 

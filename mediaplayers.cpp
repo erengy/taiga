@@ -32,6 +32,7 @@ CMediaPlayers MediaPlayers;
 BOOL CMediaPlayers::Read() {
   // Initialize
   wstring file = Taiga.GetDataPath() + L"Media.xml";
+  Item.clear();
   Index = -1;
   
   // Read XML file
@@ -110,16 +111,19 @@ BOOL CMediaPlayers::Write() {
 int CMediaPlayers::Check() {
   m_bTitleChanged = false;
   Index = -1;
-  
-  HWND hwnd = GetWindow(g_hMain, 0);
+
+  HWND hwnd = GetWindow(g_hMain, GW_HWNDFIRST);
   while (hwnd != NULL) {
     for (UINT i = 0; i < Item.size(); i++) {
       if (Item[i].Enabled == FALSE) continue;
       if (Item[i].Visible == FALSE || IsWindowVisible(hwnd)) {
+        // Compare window classes
         for (UINT c = 0; c < Item[i].Class.size(); c++) {
           if (Item[i].Class[c] == GetWindowClass(hwnd)) {
+            // Compare file names
             for (UINT f = 0; f < Item[i].File.size(); f++) {
-              if (Item[i].File[f] == GetFileName(GetWindowPath(hwnd))) {
+              if (IsEqual(Item[i].File[f], GetFileName(GetWindowPath(hwnd)))) {
+                // We have a match!
                 NewCaption = GetTitle(hwnd, Item[i].Class[c], Item[i].Mode);
                 if (CurrentCaption != NewCaption) m_bTitleChanged = true;
                 CurrentCaption = NewCaption;
@@ -132,9 +136,11 @@ int CMediaPlayers::Check() {
         }
       }
     }
+    // Check next window
     hwnd = GetWindow(hwnd, GW_HWNDNEXT);
   }
 
+  // Not found
   return -1;
 }
 

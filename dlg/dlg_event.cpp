@@ -114,7 +114,8 @@ void CEventWindow::RefreshList() {
       wstring tags = EventQueue.List[user_index].Item[i].tags; if (tags == EMPTY_STR) tags.clear();
 
       if (EventQueue.List[user_index].Item[i].AnimeIndex <= AnimeList.Count) {
-        m_List.InsertItem(i, -1, -1, AnimeList.Item[EventQueue.List[user_index].Item[i].AnimeIndex].Series_Title.c_str(), 0);
+        m_List.InsertItem(i, -1, -1, 0, NULL, 
+          AnimeList.Item[EventQueue.List[user_index].Item[i].AnimeIndex].Series_Title.c_str(), 0);
         m_List.SetItem(i, 1, MAL.TranslateNumber(episode, L"").c_str());
         m_List.SetItem(i, 2, MAL.TranslateNumber(score, L"").c_str());
         m_List.SetItem(i, 3, rewatching != TRUE ? MAL.TranslateMyStatus(status, false).c_str() : L"Re-watching");

@@ -161,25 +161,25 @@ BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
     UNICODE_STRING objectName;
     ULONG returnLength;
 
-    // Check if this handle belongs to the PID the user specified.
+    // Check if this handle belongs to the PID the user specified
     if (reinterpret_cast<ULONG>(handle.ProcessId) != pid) {
       continue;
     }
-    // Skip if the handle does not belong to a file.
+    // Skip if the handle does not belong to a file
     if (handle.ObjectTypeIndex != OBJECT_TYPE_FILE) {
       continue;
     }
-    // Skip access codes which can cause NtDuplicateObject() or NtQueryObject() to hang.
+    // Skip access codes which can cause NtDuplicateObject() or NtQueryObject() to hang
     if (handle.GrantedAccess == 0x00100000 || handle.GrantedAccess == 0x00120189 || 
         handle.GrantedAccess == 0x0012019f || handle.GrantedAccess == 0x001a019f) {
           continue;
     }
 
-    // Duplicate the handle so we can query it.
+    // Duplicate the handle so we can query it
     if (!NT_SUCCESS(NtDuplicateObject(processHandle, handle.Handle, GetCurrentProcess(), &dupHandle, 0, 0, 0))) {
       continue;
     }
-    // Query the object type.
+    // Query the object type
     objectTypeInfo = reinterpret_cast<POBJECT_TYPE_INFORMATION>(malloc(0x1000));
     if (!NT_SUCCESS(NtQueryObject(dupHandle, ObjectTypeInformation, objectTypeInfo, 0x1000, NULL))) {
       CloseHandle(dupHandle);
@@ -193,7 +193,7 @@ BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
         CloseHandle(dupHandle);
         continue;
       }
-      // Reallocate the buffer and try again.
+      // Reallocate the buffer and try again
       objectNameInfo = realloc(objectNameInfo, returnLength);
       if (!NT_SUCCESS(NtQueryObject(dupHandle, ObjectNameInformation, objectNameInfo, returnLength, NULL))) {
         free(objectTypeInfo);
@@ -203,9 +203,9 @@ BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
       }
     }
 
-    // Cast our buffer into a UNICODE_STRING.
+    // Cast our buffer into a UNICODE_STRING
     objectName = *reinterpret_cast<PUNICODE_STRING>(objectNameInfo);
-    // Add file path to our list.
+    // Add file path to our list
     if (objectName.Length && handle.ObjectTypeIndex == OBJECT_TYPE_FILE) {
       files_vector.push_back(wstring(objectName.Buffer));
     }
@@ -292,9 +292,9 @@ bool IsFullscreen(HWND hwnd) {
   
   if (style & WS_EX_TOPMOST) {
     RECT rect; GetClientRect(hwnd, &rect);
-    if (rect.right >= GetSystemMetrics(SM_CXSCREEN) &&
-      rect.bottom >= GetSystemMetrics(SM_CYSCREEN)) {
-        return true;
+    if (rect.right  >= GetSystemMetrics(SM_CXSCREEN) &&
+        rect.bottom >= GetSystemMetrics(SM_CYSCREEN)) {
+          return true;
     }
   }
   

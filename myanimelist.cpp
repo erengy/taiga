@@ -86,7 +86,7 @@ bool CMyAnimeList::Login() {
         L"/api/account/verify_credentials.xml", 
         L"", 
         L"GET", 
-        L"Authorization: Basic " + MAL_USER_PASS, 
+        MainClient.GetDefaultHeader() + L"Authorization: Basic " + MAL_USER_PASS, 
         L"myanimelist.net", 
         L"", HTTP_MAL_Login);
     }
@@ -133,7 +133,7 @@ BOOL CMyAnimeList::SearchAnime(wstring title, CAnime* pAnimeItem) {
         L"/api/anime/search.xml?q=" + title, 
         L"", 
         L"GET", 
-        L"Authorization: Basic " + MAL_USER_PASS, 
+        SearchClient.GetDefaultHeader() + L"Authorization: Basic " + MAL_USER_PASS, 
         L"myanimelist.net", 
         L"", HTTP_MAL_SearchAnime, 
         reinterpret_cast<LPARAM>(pAnimeItem));
@@ -199,7 +199,7 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
           MainClient.Connect(L"myanimelist.net", 
             L"/api/animelist/add/" + ToWSTR(anime_id) + L".xml", 
             data, L"POST", 
-            L"Authorization: Basic " + MAL_USER_PASS, 
+            MainClient.GetDefaultHeader() + L"Authorization: Basic " + MAL_USER_PASS, 
             L"myanimelist.net", 
             L"", update_mode, reinterpret_cast<LPARAM>(&ANIME));
           break;
@@ -209,7 +209,7 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
           MainClient.Connect(L"myanimelist.net", 
             L"/api/animelist/delete/" + ToWSTR(ANIME.Series_ID) + L".xml", 
             data, L"POST", 
-            L"Authorization: Basic " + MAL_USER_PASS, 
+            MainClient.GetDefaultHeader() + L"Authorization: Basic " + MAL_USER_PASS, 
             L"myanimelist.net", 
             L"", update_mode, reinterpret_cast<LPARAM>(&ANIME));
           break;
@@ -219,7 +219,7 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
           MainClient.Connect(L"myanimelist.net", 
             L"/api/animelist/update/" + ToWSTR(ANIME.Series_ID) + L".xml", 
             data, L"POST", 
-            L"Authorization: Basic " + MAL_USER_PASS, 
+            MainClient.GetDefaultHeader() + L"Authorization: Basic " + MAL_USER_PASS, 
             L"myanimelist.net", 
             L"", update_mode, reinterpret_cast<LPARAM>(&ANIME));
         }
@@ -395,12 +395,12 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&atilde;\uFFFD&iquest;", L"\u30BF"},   // katakana letter ta
     {L"&atilde;\uFFFD\uFFFD",   L"\u30CD"},   // katakana letter ne
     {L"&atilde;\uFFFD&iexcl;",  L"\u30E1"},   // katakana letter me
-	{L"&aring;\uFFFD&shy;",     L"\u516D"},   // han character 'number six'
-	{L"&aring;&iquest;\uFFFD",	L"\u5FCD"},	  // endure
-	{L"&aelig;\uFFFD\uFFFD",	L"\u624B"},	  // hand
-	{L"&aelig;\uFFFD&frac14;",	L"\u62BC"},	  // mortgage
-	{L"&ccedil;&copy;&ordm;",	L"\u7A7A"},	  // empty
-	{L"&eacute;\uFFFD&uml;",	L"\u90E8"},   // division
+    {L"&aring;\uFFFD&shy;",     L"\u516D"},   // han character 'number six'
+    {L"&aring;&iquest;\uFFFD",  L"\u5FCD"},	  // endure
+    {L"&aelig;\uFFFD\uFFFD",    L"\u624B"},	  // hand
+    {L"&aelig;\uFFFD&frac14;",  L"\u62BC"},	  // mortgage
+    {L"&ccedil;&copy;&ordm;",   L"\u7A7A"},	  // empty
+    {L"&eacute;\uFFFD&uml;",    L"\u90E8"},   // division
     /* Keep these at the end so they get replaced after others that include \uFFFD */
     {L"&Atilde;\uFFFD",         L"\u00DF"},   // small sharp s, German
     {L"&Aring;\uFFFD",          L"\u014D"},   // small o, macron mark

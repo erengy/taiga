@@ -81,7 +81,7 @@ public:
   LRESULT OnButtonCustomDraw(LPARAM lParam);
   BOOL OnClose();
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-  void OnDestroy();
+  BOOL OnDestroy();
   void OnDropFiles(HDROP hDropInfo);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
@@ -97,6 +97,7 @@ public:
 
   // Other functions
   void ChangeStatus(wstring str = L"");
+  void CreateDialogControls();
   int GetListIndex(int anime_index);
   void RefreshList(int index = -1);
   void RefreshMenubar(int index = -1, bool show = true);

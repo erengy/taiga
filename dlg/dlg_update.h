@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ABOUT_H
-#define DLG_ABOUT_H
+#ifndef DLG_UPDATE_H
+#define DLG_UPDATE_H
 
 #include "../std.h"
 #include "../win32/win_control.h"
@@ -25,30 +25,24 @@
 
 // =============================================================================
 
-/* About dialog */
-
-class CAboutPage: public CDialog {
+class CUpdateDialog : public CDialog {
 public:
-  CAboutPage() {}
-  virtual ~CAboutPage() {}
+  CUpdateDialog();
+  virtual ~CUpdateDialog() {}
 
+  // Progress bar
+  CProgressBar m_ProgressBar;
+  
+  // Message handlers
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  void OnTimer(UINT_PTR nIDEvent);
-};
-
-class CAboutWindow : public CDialog {
-public:
-  CAboutWindow();
-  ~CAboutWindow() {}
-  
-  CAboutPage m_PageTaiga;
-  CTab m_Tab;
-  
   BOOL OnDestroy();
   BOOL OnInitDialog();
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+
+private:
+  HFONT m_hfHeader;
 };
 
-extern CAboutWindow AboutWindow;
+extern CUpdateDialog UpdateDialog;
 
-#endif // DLG_ABOUT_H
+#endif // DLG_UPDATE_H

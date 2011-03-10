@@ -38,10 +38,8 @@ CTwitter Twitter;
 void AnnounceToHTTP(wstring url, wstring data) {
   if (url.empty() || data.empty()) return;
 
-  wstring server, object;
-  CrackURL(url, server, object);
-
-  HTTPClient.Post(server, object, data, L"", HTTP_Silent);
+  CCrackURL curl(url);
+  HTTPClient.Post(curl.Host, curl.Path, data, L"", HTTP_Silent);
 }
 
 // =============================================================================
@@ -81,9 +79,7 @@ BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, B
   // Initialize
   CDDE DDE;
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
-    CTaskDialog dlg;
-    dlg.SetWindowTitle(L"Announce to mIRC");
-    dlg.SetMainIcon(TD_ICON_ERROR);
+    CTaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);
@@ -120,9 +116,7 @@ BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, B
 
   // Connect
   if (!DDE.Connect(service, L"COMMAND")) {
-    CTaskDialog dlg;
-    dlg.SetWindowTitle(L"Announce to mIRC");
-    dlg.SetMainIcon(TD_ICON_ERROR);
+    CTaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE connection failed.");
     dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
     dlg.AddButton(L"OK", IDOK);
@@ -148,9 +142,7 @@ BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, B
 
 BOOL TestMIRCConnection(wstring service) {
   wstring content;
-  CTaskDialog dlg;
-  dlg.SetWindowTitle(L"Test DDE connection");
-  dlg.SetMainIcon(TD_ICON_ERROR);
+  CTaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
   dlg.AddButton(L"OK", IDOK);
   
   // Search for mIRC window
@@ -247,7 +239,8 @@ CTwitter::CTwitter() {
 }
 
 bool CTwitter::RequestToken() {
-  wstring header = OAuth.BuildHeader(
+  wstring header = TwitterClient.GetDefaultHeader() + 
+    OAuth.BuildHeader(
     L"http://twitter.com/oauth/request_token", 
     L"GET", NULL);
 
@@ -258,7 +251,8 @@ bool CTwitter::RequestToken() {
 }
 
 bool CTwitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
-  wstring header = OAuth.BuildHeader(
+  wstring header = TwitterClient.GetDefaultHeader() + 
+    OAuth.BuildHeader(
     L"http://twitter.com/oauth/access_token", 
     L"POST", NULL, 
     key, secret, pin);
@@ -281,7 +275,8 @@ bool CTwitter::SetStatusText(const wstring& status_text) {
   OAuthParameters post_parameters;
   post_parameters[L"status"] = EncodeURL(m_StatusText);
 
-  wstring header = OAuth.BuildHeader(
+  wstring header = TwitterClient.GetDefaultHeader() + 
+    OAuth.BuildHeader(
     L"http://twitter.com/statuses/update.xml", 
     L"POST", &post_parameters, 
     Settings.Announce.Twitter.OAuthKey, 

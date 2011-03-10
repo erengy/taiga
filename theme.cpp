@@ -95,12 +95,12 @@ bool CTheme::LoadImages() {
   // Populate image lists
   HBITMAP hBitmap;
   for (int i = 1; i <= ICONCOUNT_16PX; i++) {
-    hBitmap = Gdiplus_LoadImage(Folder + L"16px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(Folder + L"16px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
     ImgList16.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }
   for (int i = 1; i <= ICONCOUNT_24PX; i++) {
-    hBitmap = Gdiplus_LoadImage(Folder + L"24px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(Folder + L"24px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
     ImgList24.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }

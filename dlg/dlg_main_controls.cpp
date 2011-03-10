@@ -309,6 +309,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         int eps_total    = pAnimeItem->Series_Episodes;
         int eps_estimate = pAnimeItem->GetTotalEpisodes();
         int eps_buffer   = pAnimeItem->GetLastWatchedEpisode();
+        if (eps_watched > eps_buffer) eps_watched = -1;
         if (eps_buffer == eps_watched) eps_buffer = -1;
         if (eps_watched == 0) eps_watched = -1;
 
@@ -361,10 +362,10 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
           }
 
           // Draw progress
-          if (ratio_watched == 1.0f) {
-            UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem); // Completed
-          } else if (pAnimeItem->GetStatus() == MAL_WATCHING) {
+          if (pAnimeItem->GetStatus() == MAL_WATCHING || pAnimeItem->GetRewatching()) {
             UI.ListProgress.Watching.Draw(hdc.Get(), &rcItem);  // Watching
+          } else if (pAnimeItem->GetStatus() == MAL_COMPLETED) {
+            UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem); // Completed
           } else if (pAnimeItem->GetStatus() == MAL_DROPPED) {
             UI.ListProgress.Dropped.Draw(hdc.Get(), &rcItem);   // Dropped
           } else {
@@ -404,6 +405,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
           if (eps_watched == -1) eps_watched = 0;
           wstring text = MAL.TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + MAL.TranslateNumber(eps_total);
           if (!Settings.Program.List.ProgressShowEps) text += L" episodes";
+          if (pAnimeItem->GetRewatching()) text += L" (rw)";
           hdc.EditFont(NULL, 7);
           hdc.SetBkMode(TRANSPARENT);
           hdc.SetTextColor(RGB(0, 0, 0)); // TODO: Color should be set in theme data

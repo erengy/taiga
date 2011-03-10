@@ -194,6 +194,28 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
       break;
     }
 
+    case WM_DRAWITEM: {
+      // Draw anime image
+      if (wParam == IDC_STATIC_ANIME_IMG) {
+        LPDRAWITEMSTRUCT dis = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+        CRect rect = dis->rcItem;
+        CDC dc = dis->hDC;
+        // Paint border
+        dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
+        rect.Inflate(-1, -1);
+        dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+        rect.Inflate(-1, -1);
+        // Paint image
+        dc.FillRect(rect, RGB(255, 255, 255));
+        dc.SetStretchBltMode(HALFTONE);
+        dc.StretchBlt(rect.left, rect.top, rect.Width(), rect.Height(), 
+          AnimeImage.DC.Get(), 0, 0, AnimeImage.Width, AnimeImage.Height, SRCCOPY);
+        dc.DetachDC();
+        return TRUE;
+      }
+      break;
+    }
+
     // Drag window
     case WM_ENTERSIZEMOVE: {
       if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
@@ -341,12 +363,4 @@ void CAnimeWindow::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   dc.FillRect(rect, RGB(255, 255, 255));
   rect.bottom = rect.top + 200;
   GradientRect(dc.Get(), &rect, ::GetSysColor(COLOR_BTNFACE), RGB(255, 255, 255), true);
-
-  // Paint image
-  rect.Copy(AnimeImage.Rect);
-  rect.right -= 3; rect.bottom -= 3;
-  dc.FillRect(rect, RGB(255, 255, 255));
-  dc.SetStretchBltMode(HALFTONE);
-  dc.StretchBlt(rect.left, rect.top, rect.Width(), rect.Height(), 
-    AnimeImage.DC.Get(), 0, 0, AnimeImage.Width, AnimeImage.Height, SRCCOPY);
 }

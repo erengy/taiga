@@ -16,39 +16,33 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ABOUT_H
-#define DLG_ABOUT_H
+#include "win_gdiplus.h"
+#include <gdiplus.h>
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#pragma comment(lib, "gdiplus.lib")
+
+using namespace Gdiplus;
 
 // =============================================================================
 
-/* About dialog */
+CGdiPlus::CGdiPlus() {
+  Gdiplus::GdiplusStartupInput input;
+  Gdiplus::GdiplusStartup(&m_Token, &input, NULL);
+}
 
-class CAboutPage: public CDialog {
-public:
-  CAboutPage() {}
-  virtual ~CAboutPage() {}
+CGdiPlus::~CGdiPlus() {
+  Gdiplus::GdiplusShutdown(m_Token);
+  m_Token = NULL;
+}
 
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  void OnTimer(UINT_PTR nIDEvent);
-};
-
-class CAboutWindow : public CDialog {
-public:
-  CAboutWindow();
-  ~CAboutWindow() {}
+HBITMAP CGdiPlus::LoadImage(const wstring& file) {
+  HBITMAP hBitmap = NULL;
   
-  CAboutPage m_PageTaiga;
-  CTab m_Tab;
-  
-  BOOL OnDestroy();
-  BOOL OnInitDialog();
-};
+  Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(file.c_str());
+  if (pBitmap) {
+    pBitmap->GetHBITMAP(NULL, &hBitmap);
+    delete pBitmap; pBitmap = NULL;
+  }
 
-extern CAboutWindow AboutWindow;
-
-#endif // DLG_ABOUT_H
+  return hBitmap;
+}

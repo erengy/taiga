@@ -20,13 +20,11 @@
 #define GFX_H
 
 #include "std.h"
+#include "win32/win_gdiplus.h"
+
+extern CGdiPlus GdiPlus;
 
 // =============================================================================
-
-void Gdiplus_Initialize();
-void Gdiplus_Shutdown();
-HBITMAP Gdiplus_LoadImage(wstring file);
-HBITMAP Gdiplus_LoadPNGResource(HINSTANCE hInstance, int nResource, LPCWSTR lpResourceType);
 
 HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bItalic, BOOL bUnderline);
 BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, bool bVertical);

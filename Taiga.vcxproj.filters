@@ -120,9 +120,6 @@
     <ClCompile Include="http.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="http_client.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="list_sort.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -287,6 +284,24 @@
     </ClCompile>
     <ClCompile Include="third_party\zlib\zutil.c">
       <Filter>Third Party\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\win_ctl_progressbar.cpp">
+      <Filter>Win32\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\win_gdiplus.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\win_http.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\win_registry.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="dlg\dlg_update.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="update.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -466,6 +481,21 @@
     </ClInclude>
     <ClInclude Include="third_party\zlib\zutil.h">
       <Filter>Third Party\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\win_gdiplus.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\win_http.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\win_registry.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_update.h">
+      <Filter>Dialogs\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="update.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

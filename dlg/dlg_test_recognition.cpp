@@ -90,7 +90,7 @@ BOOL CTestRecognition::OnInitDialog() {
 
   // Fill list
   for (UINT i = 0; i < m_EpisodeList.size(); i++) {
-    m_List.InsertItem(i, -1, -1, m_EpisodeListTest[i].File.c_str(), 
+    m_List.InsertItem(i, -1, -1, 0, NULL, m_EpisodeListTest[i].File.c_str(), 
       reinterpret_cast<LPARAM>(&m_EpisodeListTest[i]));
     m_List.SetItem(i, 1, m_EpisodeListTest[i].Title.c_str());
     m_List.SetItem(i, 2, m_EpisodeListTest[i].Group.c_str());

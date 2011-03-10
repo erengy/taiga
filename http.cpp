@@ -17,374 +17,565 @@
 */
 
 #include "std.h"
+#include "animelist.h"
+#include "announce.h"
 #include "common.h"
+#include "dlg/dlg_anime_info.h"
+#include "dlg/dlg_anime_info_page.h"
+#include "dlg/dlg_event.h"
+#include "dlg/dlg_input.h"
+#include "dlg/dlg_main.h"
+#include "dlg/dlg_search.h"
+#include "dlg/dlg_settings.h"
+#include "dlg/dlg_torrent.h"
+#include "dlg/dlg_update.h"
+#include "event.h"
 #include "http.h"
+#include "myanimelist.h"
+#include "resource.h"
+#include "rss.h"
+#include "settings.h"
 #include "string.h"
+#include "taiga.h"
+#include "theme.h"
+#include "win32/win_taskbar.h"
+#include "win32/win_taskdialog.h"
+
+CHTTPClient MainClient, ImageClient, SearchClient, TwitterClient, VersionClient;
 
 // =============================================================================
 
-bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring szVerb, wstring szHeader, 
-                    wstring szReferer, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
-  // Close previous connection, if any
-  Cleanup();
+BOOL CHTTPClient::OnError(DWORD dwError) {
+  wstring error_text = L"HTTP error #" + ToWSTR(dwError) + L": " + 
+    FormatError(dwError, L"winhttp.dll");
 
-  // Set new information
-  m_OptionalData = ToANSI(szData);
-  m_dwClientMode = dwClientMode;
-  m_lParam = lParam;
-  m_File = szFile;
+  switch (GetClientMode()) {
+    case HTTP_MAL_Login:
+    case HTTP_MAL_RefreshList:
+    case HTTP_MAL_RefreshAndLogin:
+      MainWindow.ChangeStatus(error_text);
+      MainWindow.m_Toolbar.EnableButton(0, true);
+      MainWindow.m_Toolbar.EnableButton(1, true);
+      break;
+    case HTTP_MAL_AnimeDetails:
+    case HTTP_MAL_Image:
+      break;
+    case HTTP_MAL_SearchAnime:
+      SearchWindow.EnableDlgItem(IDOK, TRUE);
+      SearchWindow.SetDlgItemText(IDOK, L"Search");
+      break;
+    case HTTP_TorrentCheck:
+    case HTTP_TorrentDownload:
+    case HTTP_TorrentDownloadAll:
+      TorrentWindow.ChangeStatus(error_text);
+      TorrentWindow.m_Toolbar.EnableButton(0, true);
+      TorrentWindow.m_Toolbar.EnableButton(1, true);
+      break;
+    case HTTP_UpdateCheck:
+      MessageBox(UpdateDialog.GetWindowHandle(), error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
+      UpdateDialog.PostMessage(WM_CLOSE);
+      break;
+    default:
+      EventQueue.UpdateInProgress = false;
+      MainWindow.ChangeStatus(error_text);
+      MainWindow.m_Toolbar.EnableButton(1, true);
+      break;
+  }
+  
+  TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+  return 0;
+}
+
+BOOL CHTTPClient::OnSendRequestComplete() {
+  wstring status = L"Connecting...";
+  
+  switch (GetClientMode()) {
+    case HTTP_TorrentCheck:
+    case HTTP_TorrentDownload:
+    case HTTP_TorrentDownloadAll:
+      TorrentWindow.ChangeStatus(status);
+      break;
+    default:
+      #ifdef _DEBUG
+      MainWindow.ChangeStatus(status);
+      #endif
+      break;
+  }
+
+  return 0;
+}
+
+BOOL CHTTPClient::OnHeadersAvailable(wstring headers) {
+  switch (GetClientMode()) {
+    case HTTP_Silent:
+      break;
+    case HTTP_UpdateCheck:
+    case HTTP_UpdateDownload:
+      if (m_dwTotal > 0) {
+        UpdateDialog.m_ProgressBar.SetMarquee(false);
+        UpdateDialog.m_ProgressBar.SetRange(0, m_dwTotal);
+      } else {
+        UpdateDialog.m_ProgressBar.SetMarquee(true);
+      }
+      break;
+    default:
+      TaskbarList.SetProgressState(m_dwTotal > 0 ? TBPF_NORMAL : TBPF_INDETERMINATE);
+      break;
+  }
+
+  return 0;
+}
+
+BOOL CHTTPClient::OnRedirect(wstring address) {
+  wstring status = L"Redirecting... (" + address + L")";
+  
+  switch (GetClientMode()) {
+    case HTTP_TorrentCheck:
+    case HTTP_TorrentDownload:
+    case HTTP_TorrentDownloadAll:
+      TorrentWindow.ChangeStatus(status);
+      break;
+    default:
+      #ifdef _DEBUG
+      MainWindow.ChangeStatus(status);
+      #endif
+      break;
+  }
+
+  return 0;
+}
+
+BOOL CHTTPClient::OnReadData() {
+  wstring status;
+
+  switch (GetClientMode()) {
+    case HTTP_MAL_RefreshList:
+    case HTTP_MAL_RefreshAndLogin:
+      status = L"Downloading anime list...";
+      break;
+    case HTTP_MAL_Login:
+      status = L"Reading account information...";
+      break;
+    case HTTP_MAL_AnimeAdd:
+    case HTTP_MAL_AnimeEdit:
+    case HTTP_MAL_AnimeUpdate:
+    case HTTP_MAL_ScoreUpdate:
+    case HTTP_MAL_StatusUpdate:
+    case HTTP_MAL_TagUpdate:
+      status = L"Updating list...";
+      break;
+    case HTTP_MAL_AnimeDetails:
+    case HTTP_MAL_SearchAnime:
+    case HTTP_MAL_Image:
+    case HTTP_Silent:
+      return 0;
+    case HTTP_TorrentCheck:
+      status = L"Checking new torrents...";
+      break;
+    case HTTP_TorrentDownload:
+    case HTTP_TorrentDownloadAll:
+      status = L"Downloading torrent file...";
+      break;
+    case HTTP_Twitter_Request:
+      status = L"Connecting to Twitter...";
+      break;
+    case HTTP_Twitter_Auth:
+      status = L"Authorizing Twitter...";
+      break;
+    case HTTP_Twitter_Post:
+      status = L"Updating Twitter status...";
+      break;
+    case HTTP_UpdateCheck:
+    case HTTP_UpdateDownload:
+      if (m_dwTotal > 0) {
+        UpdateDialog.m_ProgressBar.SetPosition(m_dwDownloaded);
+      }
+      return 0;
+    default:
+      status = L"Downloading data...";
+      break;
+  }
+
+  if (m_dwTotal > 0) {
+    TaskbarList.SetProgressValue(m_dwDownloaded, m_dwTotal);
+    status += L" (" + ToWSTR(static_cast<int>(((float)m_dwDownloaded / (float)m_dwTotal) * 100)) + L"%)";
+  } else {
+    status += L" (" + ToSizeString(m_dwDownloaded) + L")";
+  }
+
+  switch (GetClientMode()) {
+    case HTTP_TorrentCheck:
+    case HTTP_TorrentDownload:
+    case HTTP_TorrentDownloadAll:
+      TorrentWindow.ChangeStatus(status);
+      break;
+    default:
+      MainWindow.ChangeStatus(status);
+      break;
+  }
+
+  return 0;
+}
+
+BOOL CHTTPClient::OnReadComplete() {
+  CAnime* pItem = reinterpret_cast<CAnime*>(GetParam());
+  TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+  wstring status;
+  
+  switch (GetClientMode()) {
+    // List
+    case HTTP_MAL_RefreshList:
+    case HTTP_MAL_RefreshAndLogin: {
+      AnimeList.Read();
+      MainWindow.ChangeStatus(L"List download completed.");
+      MainWindow.RefreshList(MAL_WATCHING);
+      MainWindow.RefreshTabs(MAL_WATCHING);
+      SearchWindow.PostMessage(WM_CLOSE);
+      if (GetClientMode() == HTTP_MAL_RefreshList) {
+        MainWindow.m_Toolbar.EnableButton(0, true);
+        MainWindow.m_Toolbar.EnableButton(1, true);
+        ExecuteAction(L"CheckEpisodes()", TRUE);
+      } else if (GetClientMode() == HTTP_MAL_RefreshAndLogin) {
+        MAL.Login();
+        return TRUE;
+      }
+      break;
+    }
+
+    // =========================================================================
     
-  // Setup headers
-  wstring headers = L"Content-Type: application/x-www-form-urlencoded\r\nAccept: */*\r\n" + 
-    (m_Cookie.empty() ? L"" : L"Cookie: " + m_Cookie + L"\r\n") +
-    (szHeader.empty() ? L"" : szHeader + L"\r\n");
-
-  // Create a session handle
-  m_hSession = ::WinHttpOpen(m_UserAgent.c_str(), 
-    WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, 
-    WINHTTP_NO_PROXY_NAME, 
-    WINHTTP_NO_PROXY_BYPASS, 
-    WINHTTP_FLAG_ASYNC);
-  if (!m_hSession) {
-    Cleanup();
-    OnError(::GetLastError());
-    return false;
-  }
-  
-  // Open an HTTP session
-  m_hConnect = ::WinHttpConnect(m_hSession, 
-    szServer.c_str(), 
-    INTERNET_DEFAULT_HTTP_PORT, 
-    0);
-  if (!m_hConnect) {
-    Cleanup();
-    OnError(::GetLastError());
-    return false;
-  }
-
-  // Open a GET/POST request
-  m_hRequest = ::WinHttpOpenRequest(m_hConnect, 
-    szVerb.c_str(), 
-    szObject.c_str(), 
-    NULL, 
-    szReferer.c_str(), 
-    WINHTTP_DEFAULT_ACCEPT_TYPES, 
-    0);
-  if (!m_hRequest) {
-    Cleanup();
-    OnError(::GetLastError());
-    return false;
-  }
-
-  // Setup proxy
-  if (!m_Proxy.empty()) {
-    WINHTTP_PROXY_INFO pi = {0};
-    pi.dwAccessType = WINHTTP_ACCESS_TYPE_NAMED_PROXY;
-    pi.lpszProxy = const_cast<LPWSTR>(m_Proxy.c_str());
-    ::WinHttpSetOption(m_hRequest, WINHTTP_OPTION_PROXY, &pi, sizeof(pi));
-    if (!m_ProxyUser.empty()) {
-      ::WinHttpSetOption(m_hRequest, WINHTTP_OPTION_PROXY_USERNAME, 
-        (LPVOID)m_ProxyUser.c_str(), m_ProxyUser.size() * sizeof(wchar_t));
-      if (!m_ProxyPass.empty()) {
-        ::WinHttpSetOption(m_hRequest, WINHTTP_OPTION_PROXY_PASSWORD, 
-          (LPVOID)m_ProxyPass.c_str(), m_ProxyPass.size() * sizeof(wchar_t));
-      }
-    }
-  }
-
-  // Disable auto-redirect
-  if (m_AutoRedirect == FALSE) {
-    DWORD dwDisable = WINHTTP_DISABLE_REDIRECTS;
-    ::WinHttpSetOption(m_hRequest, WINHTTP_OPTION_DISABLE_FEATURE, &dwDisable, sizeof(dwDisable));
-  }
-  
-  // Install the status callback function
-  WINHTTP_STATUS_CALLBACK pCallback = ::WinHttpSetStatusCallback(m_hRequest, 
-    reinterpret_cast<WINHTTP_STATUS_CALLBACK>(&Callback), 
-    WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 
-    NULL);
-  if (pCallback != NULL) {
-    Cleanup();
-    OnError(::GetLastError());
-    return false;
-  }
-  
-  // Send the request
-  if (!::WinHttpSendRequest(m_hRequest, 
-    headers.c_str(), 
-    headers.length(), 
-    (LPVOID)(m_OptionalData.c_str()), 
-    m_OptionalData.length(), 
-    m_OptionalData.length(), 
-    reinterpret_cast<DWORD_PTR>(this))) {
-      Cleanup();
-      OnError(::GetLastError());
-      return false;
-  }
-
-  // Success
-  return true;
-}
-
-bool CHTTP::Get(wstring szServer, wstring szObject, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
-  return Connect(szServer, szObject, L"", L"GET", L"", szServer, szFile, dwClientMode, lParam);
-}
-
-bool CHTTP::Post(wstring szServer, wstring szObject, wstring szData, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
-  return Connect(szServer, szObject, szData, L"POST", L"", szServer, szFile, dwClientMode, lParam);
-}
-
-// =============================================================================
-
-void CALLBACK CHTTP::Callback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, 
-                              LPVOID lpvStatusInformation, DWORD dwStatusInformationLength) {
-  CHTTP* object = reinterpret_cast<CHTTP*>(dwContext);
-  if (object != NULL) {
-    object->StatusCallback(hInternet, dwInternetStatus,
-      lpvStatusInformation, dwStatusInformationLength);
-  }
-}
-
-void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus, 
-                           LPVOID lpvStatusInformation, DWORD dwStatusInformationLength) {
-  switch (dwInternetStatus) {
-    case WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE: {
-      if (::WinHttpReceiveResponse(hInternet, NULL)) {
-        OnSendRequestComplete();
-      }
-      break;
-    }
-
-    case WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE: {
-      DWORD dwSize = 0;
-      LPVOID lpOutBuffer = NULL;
-      if (!::WinHttpQueryHeaders(hInternet, 
-        WINHTTP_QUERY_RAW_HEADERS_CRLF, 
-        WINHTTP_HEADER_NAME_BY_INDEX, 
-        NULL, &dwSize, WINHTTP_NO_HEADER_INDEX)) {
-          DWORD dwError = GetLastError();
-          if (dwError != ERROR_INSUFFICIENT_BUFFER) {
-            OnError(dwError);
-            break;
-          }
-      }
-      lpOutBuffer = new WCHAR[dwSize];
-      if (::WinHttpQueryHeaders(hInternet, 
-        WINHTTP_QUERY_RAW_HEADERS_CRLF, 
-        WINHTTP_HEADER_NAME_BY_INDEX, 
-        lpOutBuffer, &dwSize, 
-        WINHTTP_NO_HEADER_INDEX)) {
-          ParseHeaders((LPWSTR)lpOutBuffer);
-          if (OnHeadersAvailable((LPWSTR)lpOutBuffer)) {
-            delete [] lpOutBuffer;
-            Cleanup();
-          }
-      }
-      delete [] lpOutBuffer;
-      ::WinHttpQueryDataAvailable(hInternet, NULL);
-      break;
-    }
-
-    case WINHTTP_CALLBACK_STATUS_REDIRECT: {
-      StatusCallback(hInternet, WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE, 
-        lpvStatusInformation, dwStatusInformationLength);
-      break;
-    }
-
-    case WINHTTP_CALLBACK_STATUS_DATA_AVAILABLE: {
-      DWORD dwSize = *reinterpret_cast<LPDWORD>(lpvStatusInformation);
-      if (dwSize > 0) {
-        LPSTR lpOutBuffer = new char[dwSize + 1];
-        ::ZeroMemory(lpOutBuffer, dwSize + 1);
-        if (!WinHttpReadData(hInternet, (LPVOID)lpOutBuffer, dwSize, NULL)) {
-          delete [] lpOutBuffer;
+    // Login
+    case HTTP_MAL_Login: {
+      switch (Settings.Account.MAL.API) {
+        case MAL_API_OFFICIAL:
+          Taiga.LoggedIn = InStr(GetData(), L"<username>" + Settings.Account.MAL.User + L"</username>", 0) > -1;
           break;
+        case MAL_API_NONE:
+          Taiga.LoggedIn = !(GetCookie().empty());
+          break;
+      }
+      if (Taiga.LoggedIn) {
+        status = L"Logged in as " + Settings.Account.MAL.User + L".";
+        MainWindow.m_Toolbar.SetButtonImage(0, Icon24_Online);
+        MainWindow.m_Toolbar.SetButtonText(0, L"Log out");
+        MainWindow.m_Toolbar.SetButtonTooltip(0, L"Log out");
+      } else {
+        status = L"Failed to log in.";
+        switch (Settings.Account.MAL.API) {
+          case MAL_API_OFFICIAL:
+            #ifdef _DEBUG
+            status += L" (" + GetData() + L")";
+            #else
+            status += L" (Invalid user name or password)";
+            #endif
+            break;
+          case MAL_API_NONE:
+            if (InStr(GetData(), L"Could not find that username", 1) > -1) {
+              status += L" (Invalid user name)";
+            } else if (InStr(GetData(), L"Error: Invalid password", 1) > -1) {
+              status += L" (Invalid password)";
+            }
+            break;
         }
-        if (OnDataAvailable()) {
-          Cleanup();
-        }
-      } else if (dwSize == 0) {
-        if (m_ContentEncoding == HTTP_Encoding_Gzip) {
-          string input, output;
-          input.append(m_Buffer, m_dwDownloaded);
-          UncompressGzippedString(input, output);
-          if (!output.empty()) {
-            delete [] m_Buffer;
-            m_dwDownloaded = output.length();
-            m_Buffer = new char[m_dwDownloaded];
-            memcpy(m_Buffer, &output[0], m_dwDownloaded);
+      }
+      MainWindow.m_Toolbar.EnableButton(0, true);
+      MainWindow.m_Toolbar.EnableButton(1, true);
+      MainWindow.ChangeStatus(status);
+      MainWindow.RefreshMenubar();
+      MainWindow.UpdateTip();
+      switch (Settings.Account.MAL.API) {
+        case MAL_API_OFFICIAL:
+          EventQueue.Check();
+          return TRUE;
+        case MAL_API_NONE:
+          MAL.CheckProfile();
+          return TRUE;
+      }
+      break;
+    }
+
+    // =========================================================================
+
+    // Check profile
+    case HTTP_MAL_Profile: {
+      status = L"You have no new messages.";
+      if (Settings.Account.MAL.API == MAL_API_NONE) {
+        int msg_pos = InStr(GetData(), L"<a href=\"/mymessages.php\">(", 0);
+        if (msg_pos > -1) {
+          int msg_end = InStr(GetData(), L")", msg_pos);
+          if (msg_end > -1) {
+            int msg_count = ToINT(GetData().substr(msg_pos + 27, msg_end));
+            if (msg_count > 0) {
+              status = L"You have " + ToWSTR(msg_count) + L" new message(s)!";
+              CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+              dlg.SetMainInstruction(status.c_str());
+              dlg.UseCommandLinks(true);
+              dlg.AddButton(L"Check\nView your messages now", IDYES);
+              dlg.AddButton(L"Cancel\nCheck them later", IDNO);
+              dlg.Show(g_hMain);
+              if (dlg.GetSelectedButtonID() == IDYES) {
+                MAL.ViewMessages();
+              }
+            }
           }
         }
-        if (!m_File.empty()) {
-          HANDLE hFile = ::CreateFile(m_File.c_str(), GENERIC_WRITE, 0, NULL, 
-            CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-          if (hFile != INVALID_HANDLE_VALUE) {
-            DWORD dwBytesToWrite = m_dwDownloaded, dwBytesWritten = 0;
-            ::WriteFile(hFile, (LPCVOID)m_Buffer, dwBytesToWrite, &dwBytesWritten, NULL);
-            ::CloseHandle(hFile);
+        MainWindow.ChangeStatus(status);
+        EventQueue.Check();
+        return TRUE;
+      }
+      break;
+    }
+
+    // =========================================================================
+
+    // Delete anime
+    case HTTP_MAL_AnimeDelete: {
+      switch (Settings.Account.MAL.API) {
+        case MAL_API_OFFICIAL:
+          if (GetData() == L"Deleted") {
+            if (pItem) {
+              MainWindow.ChangeStatus(L"Item deleted. (" + pItem->Series_Title + L")");
+              AnimeList.DeleteItem(pItem->Index);
+            }
+            MainWindow.RefreshList();
+            MainWindow.RefreshTabs();
+            SearchWindow.PostMessage(WM_CLOSE);
+            EventQueue.Remove();
+            EventQueue.Check();
+            return TRUE;
+          } else {
+            MainWindow.ChangeStatus(L"Error: " + GetData());
           }
-        }
-        if (!OnReadComplete()) {
-          Cleanup();
+          break;
+        case MAL_API_NONE:
+          // TODO
+          break;
+      }
+      break;
+    }
+
+    // =========================================================================
+
+    // Update list
+    case HTTP_MAL_AnimeAdd:
+    case HTTP_MAL_AnimeEdit:
+    case HTTP_MAL_AnimeUpdate:
+    case HTTP_MAL_ScoreUpdate:
+    case HTTP_MAL_StatusUpdate:
+    case HTTP_MAL_TagUpdate: {
+      EventQueue.UpdateInProgress = false;
+      MainWindow.ChangeStatus();
+      if (pItem && EventQueue.GetItemCount() > 0) {
+        int user_index = EventQueue.GetUserIndex();
+        if (user_index > -1) {
+          pItem->Edit(GetData(), EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]);
+          return TRUE;
         }
       }
       break;
     }
 
-    case WINHTTP_CALLBACK_STATUS_READ_COMPLETE: {
-      if (dwStatusInformationLength > 0) {
-        LPSTR lpReadBuffer = (LPSTR)lpvStatusInformation;
-        DWORD dwBytesRead = dwStatusInformationLength;
-        if(!m_Buffer) {
-          m_Buffer = lpReadBuffer;
+    // =========================================================================
+
+    // Anime details
+    case HTTP_MAL_AnimeDetails: {
+      wstring data = GetData();
+      if (pItem && !data.empty()) {
+        pItem->Genres = InStr(data, L"Genres:</span> ", L"<br />");
+        pItem->Rank = InStr(data, L"Ranked:</span> ", L"<br />");
+        pItem->Popularity = InStr(data, L"Popularity:</span> ", L"<br />");
+        pItem->Score = InStr(data, L"Score:</span> ", L"<br />");
+        StripHTML(pItem->Score);
+        AnimeWindow.Refresh(pItem, true, false);
+      }
+      break;
+    }
+
+    // =========================================================================
+
+    // Download image
+    case HTTP_MAL_Image: {
+      AnimeWindow.Refresh(NULL, false, false);
+      break;
+    }
+
+    // =========================================================================
+
+    // Search anime
+    case HTTP_MAL_SearchAnime: {
+      if (pItem) {
+        if (pItem->ParseSearchResult(GetData())) {
+          AnimeWindow.Refresh(pItem, true, false);
+          if (MAL.GetAnimeDetails(pItem)) return TRUE;
         } else {
-          LPSTR lpOldBuffer = m_Buffer;
-          m_Buffer = new char[m_dwDownloaded + dwBytesRead];
-          memcpy(m_Buffer, lpOldBuffer, m_dwDownloaded);
-          memcpy(m_Buffer + m_dwDownloaded, lpReadBuffer, dwBytesRead);
-          delete [] lpOldBuffer;
-          delete [] lpReadBuffer;
+          status = L"Could not read anime information.";
+          AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
         }
-        m_dwDownloaded += dwBytesRead;
-        if (OnReadData()) {
-          Cleanup();
-        } else {
-          ::WinHttpQueryDataAvailable(hInternet, NULL);
+        #ifdef _DEBUG
+        MainWindow.ChangeStatus(status);
+        #endif
+      } else {
+        if (SearchWindow.IsWindow()) {
+          SearchWindow.ParseResults(GetData());
+          SearchWindow.EnableDlgItem(IDOK, TRUE);
+          SearchWindow.SetDlgItemText(IDOK, L"Search");
         }
       }
       break;
     }
 
-    case WINHTTP_CALLBACK_STATUS_REQUEST_ERROR: {
-      WINHTTP_ASYNC_RESULT* result = (WINHTTP_ASYNC_RESULT*)lpvStatusInformation;
-      switch (result->dwResult) {
-        case API_RECEIVE_RESPONSE:
-        case API_QUERY_DATA_AVAILABLE:
-        case API_READ_DATA:
-        case API_WRITE_DATA:
-        case API_SEND_REQUEST:
-          OnError(result->dwError);
-          //Cleanup();
+    // =========================================================================
+
+    // Torrent
+    case HTTP_TorrentCheck: {
+      Torrents.Read();
+      int torrent_count = Torrents.Compare();
+      if (torrent_count > 0) {
+        status = L"There are new torrents available!";
+      } else {
+        status = L"No new torrents found.";
+      }
+      if (TorrentWindow.IsWindow()) {
+        TorrentWindow.ChangeStatus(status);
+        TorrentWindow.RefreshList();
+        TorrentWindow.m_Toolbar.EnableButton(0, true);
+        TorrentWindow.m_Toolbar.EnableButton(1, true);
+      } else {
+        switch (Settings.RSS.Torrent.NewAction) {
+          // Notify
+          case 1:
+            Torrents.Tip();
+            break;
+          // Download
+          case 2:
+            if (Torrents.Download(-1)) return TRUE;
+            break;
+        }
       }
       break;
     }
-  }
-}
-
-// =============================================================================
-
-CHTTP::CHTTP() {
-  m_AutoRedirect = TRUE;
-  m_UserAgent = L"Mozilla/5.0";
-  Cleanup();
-}
-
-CHTTP::~CHTTP() {
-  Cleanup();
-}
-
-void CHTTP::Cleanup() {
-  // Close handles
-  if (m_hRequest) {
-    ::WinHttpSetStatusCallback(m_hRequest, NULL, NULL, NULL);
-    ::WinHttpCloseHandle(m_hRequest);
-    m_hRequest = NULL;
-  }
-  if (m_hConnect) {
-    ::WinHttpCloseHandle(m_hConnect);
-    m_hConnect = NULL;
-  }
-  if (m_hSession) {
-    ::WinHttpCloseHandle(m_hSession);
-    m_hSession = NULL;
-  }
-
-  // Clear buffer
-  delete [] m_Buffer;
-  m_Buffer = NULL;
-
-  // Reset variables
-  m_ContentEncoding = HTTP_Encoding_None;
-  m_File.clear();
-  m_OptionalData.clear();
-  m_dwDownloaded = 0;
-  m_dwTotal = 0;
-  m_dwClientMode = 0;
-  m_lParam = 0;
-}
-
-void CHTTP::ClearCookies() {
-  m_Cookie.clear();
-}
-
-wstring CHTTP::GetCookie() {
-  return m_Cookie;
-}
-
-wstring CHTTP::GetData() {
-  if (!m_Buffer) return L"";
-  return ToUTF8(m_Buffer);
-}
-
-DWORD CHTTP::GetClientMode() {
-  return m_dwClientMode;
-}
-
-LPARAM CHTTP::GetParam() {
-  return m_lParam;
-}
-
-void CHTTP::SetAutoRedirect(BOOL enabled) {
-  m_AutoRedirect = enabled;
-}
-
-void CHTTP::SetProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
-  m_Proxy = proxy;
-  m_ProxyUser = user;
-  m_ProxyPass = pass;
-}
-
-void CHTTP::SetUserAgent(const wstring& user_agent) {
-  m_UserAgent = user_agent;
-}
-
-// =============================================================================
-
-void CHTTP::ParseHeaders(wstring headers) {
-  if (headers.empty()) return;
-  
-  vector<wstring> header_list;
-  Split(headers, L"\r\n", header_list);
-
-  for (unsigned int i = 0; i < header_list.size(); i++) {
-    int pos = InStr(header_list[i], L":", 0);
-    if (pos > -1) {
-      wstring part_left = ToLower_Copy(CharLeft(header_list[i], pos));
-      wstring part_right = header_list[i].substr(pos + 2);
-      
-      // Content-Encoding:
-      if (part_left == L"content-encoding") {
-        if (InStr(part_right, L"gzip") > -1) {
-          m_ContentEncoding = HTTP_Encoding_Gzip;
+    case HTTP_TorrentDownload:
+    case HTTP_TorrentDownloadAll: {
+      CRSSFeedItem* pFeed = reinterpret_cast<CRSSFeedItem*>(GetParam());
+      if (pFeed) {
+        wstring app_path, cmd, file = pFeed->Title + L".torrent";
+        ValidateFileName(file);
+        Torrents.Archive.push_back(file);
+        file = Taiga.GetDataPath() + L"Torrents\\" + file;
+        if (FileExists(file)) {
+          switch (Settings.RSS.Torrent.NewAction) {
+            // Default application
+            case 1:
+              app_path = GetDefaultAppPath(L".torrent", L"");
+              break;
+            // Custom application
+            case 2:
+              app_path = Settings.RSS.Torrent.AppPath;
+              break;
+          }
+          if (Settings.RSS.Torrent.SetFolder && InStr(app_path, L"utorrent", 0, true) > -1) {
+            if (pFeed->EpisodeData.Index > 0 && !AnimeList.Item[pFeed->EpisodeData.Index].Folder.empty()) {
+              cmd = L"/directory \"" + AnimeList.Item[pFeed->EpisodeData.Index].Folder + L"\" ";
+            }
+          }
+          cmd += L"\"" + file + L"\"";
+          Execute(app_path, cmd);
+          pFeed->Download = FALSE;
+          TorrentWindow.RefreshList();
         }
-
-      // Content-Length:
-      } else if (part_left == L"content-length") {
-        m_dwTotal = ToINT(part_right);
-
-      // Location:
-      } else if (part_left == L"location") {
-        OnRedirect(part_right);
-        m_ContentEncoding = HTTP_Encoding_None;
-        m_dwDownloaded = 0;
-        m_dwTotal = 0;
-      
-      // Set-Cookie:
-      } else if (part_left == L"set-cookie") {
-        pos = InStr(part_right, L";", 0);
-        if (pos > -1) part_right = part_right.substr(0, pos);
-        m_Cookie += (m_Cookie.empty() ? L"" : L"; ") + part_right;
       }
+      if (GetClientMode() == HTTP_TorrentDownloadAll) {
+        if (Torrents.Download(-1)) return TRUE;
+      }
+      TorrentWindow.ChangeStatus(L"Successfully downloaded all torrents.");
+      TorrentWindow.m_Toolbar.EnableButton(0, true);
+      TorrentWindow.m_Toolbar.EnableButton(1, true);
+      break;
+    }
+
+    // =========================================================================
+
+    // Twitter
+    case HTTP_Twitter_Request: {
+      OAuthParameters response = Twitter.OAuth.ParseQueryString(GetData());
+      if (!response[L"oauth_token"].empty()) {
+        ExecuteLink(L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
+        CInputDialog dlg;
+        dlg.Title = L"Twitter Authorization";
+        dlg.Info = L"Please enter the PIN shown on the page after logging into Twitter:";
+        dlg.Show();
+        if (dlg.Result == IDOK && !dlg.Text.empty()) {
+          Twitter.AccessToken(response[L"oauth_token"], response[L"oauth_token_secret"], dlg.Text);
+          return TRUE;
+        }
+      }
+      MainWindow.ChangeStatus();
+      break;
+    }
+	case HTTP_Twitter_Auth: {
+      OAuthParameters access = Twitter.OAuth.ParseQueryString(GetData());
+      if (!access[L"oauth_token"].empty() && !access[L"oauth_token_secret"].empty()) {
+        Settings.Announce.Twitter.OAuthKey = access[L"oauth_token"];
+        Settings.Announce.Twitter.OAuthSecret = access[L"oauth_token_secret"];
+        Settings.Announce.Twitter.User = access[L"screen_name"];
+        status = L"Taiga is now authorized to post to this Twitter account: ";
+        status += Settings.Announce.Twitter.User;
+      } else {
+        status = L"Twitter authorization failed.";
+      }
+      MainWindow.ChangeStatus(status);
+      SettingsWindow.RefreshTwitterLink();
+      break;
+    }
+    case HTTP_Twitter_Post: {
+      if (InStr(GetData(), L"<error>", 0) == -1) {
+        status = L"Twitter status updated.";
+      } else {
+        status = L"Twitter status update failed.";
+        int index_begin = InStr(GetData(), L"<error>", 0);
+        int index_end = InStr(GetData(), L"</error>", index_begin);
+        if (index_begin > -1 && index_end > -1) {
+          index_begin += 7;
+          status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
+        }
+      }
+      MainWindow.ChangeStatus(status);
+      break;
+    }
+
+    // =========================================================================
+
+    // Check updates
+    case HTTP_UpdateCheck: {
+      if (Taiga.UpdateHelper.ParseData(GetData(), HTTP_UpdateDownload)) {
+        return TRUE;
+      } else {
+        UpdateDialog.PostMessage(WM_CLOSE);
+      }
+      break;
+    }
+
+    // Download updates
+    case HTTP_UpdateDownload: {
+      CUpdateFile* file = reinterpret_cast<CUpdateFile*>(GetParam());
+      file->Download = false;
+      if (Taiga.UpdateHelper.DownloadNextFile(HTTP_UpdateDownload)) {
+        return TRUE;
+      } else {
+        UpdateDialog.PostMessage(WM_CLOSE);
+      }
+      break;
+    }
+
+    // =========================================================================
+    
+    // Debug
+    default: {
+      #ifdef _DEBUG
+      ::MessageBox(0, GetData().c_str(), 0, 0);
+      #endif
     }
   }
+
+  return FALSE;
 }

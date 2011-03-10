@@ -23,6 +23,7 @@
 #include "dlg_anime_info.h"
 #include "dlg_main.h"
 #include "dlg_search.h"
+#include "dlg_settings.h"
 #include "dlg_test_recognition.h"
 #include "dlg_torrent.h"
 #include "../event.h"
@@ -55,8 +56,7 @@ BOOL CMainWindow::OnInitDialog() {
   g_hMain = GetWindowHandle();
   
   // Set member variables
-  CRect rect; GetWindowRect(&rect);
-  /*m_SearchBar.Index = Settings.Program.General.SearchIndex;
+  /*CRect rect; GetWindowRect(&rect);
   if (Settings.Program.General.SizeX && Settings.Program.General.SizeY) {
     SetPosition(NULL, 0, 0, Settings.Program.General.SizeX, Settings.Program.General.SizeY, 
       SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
@@ -64,10 +64,64 @@ BOOL CMainWindow::OnInitDialog() {
   SetSizeMin(ScaleX(786), ScaleY(568));
   SetSnapGap(10);
 
-  // Set icon
+  // Set icons
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
   
+  // Create controls
+  CreateDialogControls();
+
+  // Start process timer
+  SetTimer(g_hMain, TIMER_MAIN, 1000, NULL);
+  
+  // Add icon to taskbar
+  Taskbar.Create(g_hMain, NULL, APP_TITLE);
+  UpdateTip();
+  
+  // Change status
+  ChangeStatus();
+  
+  // Refresh list
+  RefreshList(MAL_WATCHING);
+  
+  // TODO: Set search bar mode
+  //m_SearchBar.Index = Settings.Program.General.SearchIndex;
+  //m_SearchBar.SetMode();
+  
+  // Refresh menu bar
+  RefreshMenubar();
+
+  // Apply start-up settings
+  if (Settings.Account.MAL.AutoLogin) {
+    ExecuteAction(L"Login");
+  }
+  if (Settings.Program.StartUp.CheckNewEpisodes) {
+    ExecuteAction(L"CheckEpisodes()", TRUE);
+  }
+  if (!Settings.Program.StartUp.Minimize) {
+    MainWindow.Show();
+  }
+  if (Settings.Account.MAL.User.empty()) {
+    CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    dlg.SetMainInstruction(L"Welcome to Taiga!");
+    dlg.SetContent(L"User name is not set. Would you like to open settings window to set it now?");
+    dlg.AddButton(L"Yes", IDYES);
+    dlg.AddButton(L"No", IDNO);
+    dlg.Show(g_hMain);
+    if (dlg.GetSelectedButtonID() == IDYES) {
+      ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
+    }
+  }
+  if (Settings.Folders.WatchEnabled) {
+    FolderMonitor.SetWindowHandle(MainWindow.GetWindowHandle());
+    FolderMonitor.Enable();
+  }
+
+  // Success
+  return TRUE;
+}
+
+void CMainWindow::CreateDialogControls() {
   // Create rebar
   m_Rebar.Attach(GetDlgItem(IDC_REBAR_MAIN));
   // Create main toolbar
@@ -153,22 +207,6 @@ BOOL CMainWindow::OnInitDialog() {
       m_List.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str());
     }
   }
-
-  // Start process timer
-  SetTimer(g_hMain, TIMER_MAIN, 1000, NULL);
-  // Add icon to taskbar
-  Taskbar.Create(g_hMain, NULL, APP_TITLE);
-  UpdateTip();
-  // Change status
-  ChangeStatus();
-  // Refresh list
-  RefreshList(MAL_WATCHING);
-  // Set search bar mode
-  //m_SearchBar.SetMode(); // TODO
-  // Refresh menu bar
-  RefreshMenubar();
-
-  return TRUE;
 }
 
 // =============================================================================
@@ -324,9 +362,7 @@ BOOL CMainWindow::OnClose() {
     return TRUE;
   }
   if (Settings.Program.Exit.Ask) {
-    CTaskDialog dlg;
-    dlg.SetWindowTitle(APP_TITLE);
-    dlg.SetMainIcon(TD_ICON_INFORMATION);
+    CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Are you sure you want to exit?");
     dlg.AddButton(L"Yes", IDYES);
     dlg.AddButton(L"No", IDNO);
@@ -336,7 +372,7 @@ BOOL CMainWindow::OnClose() {
   return FALSE;
 }
 
-void CMainWindow::OnDestroy() {
+BOOL CMainWindow::OnDestroy() {
   // Announce
   if (Taiga.PlayStatus == PLAYSTATUS_PLAYING) {
     Taiga.PlayStatus = PLAYSTATUS_STOPPED;
@@ -356,6 +392,7 @@ void CMainWindow::OnDestroy() {
   TaskbarList.Release();
   // Exit
   Taiga.PostQuitMessage();
+  return TRUE;
 }
 
 void CMainWindow::OnDropFiles(HDROP hDropInfo) {
@@ -422,7 +459,7 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
       // Set window area
       CRect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
-      rcWindow.Inflate(-ScaleX(CONTROL_MARGIN), -ScaleY(CONTROL_MARGIN));
+      rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       m_Rebar.SendMessage(WM_SIZE, 0, 0);
       rcWindow.top += m_Rebar.GetBarHeight() + 2;
@@ -434,7 +471,7 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
       // Resize tree
       if (m_Tree.IsVisible()) {
         m_Tree.SetPosition(NULL, rcWindow.left, rcWindow.top, 200 /* TEMP */, rcWindow.Height());
-        rcWindow.left += 200 + CONTROL_MARGIN;
+        rcWindow.left += 200 + WIN_CONTROL_MARGIN;
       }
       // Resize tab
       m_Tab.SetPosition(NULL, rcWindow);
@@ -695,7 +732,8 @@ void CMainWindow::RefreshList(int index) {
       if (AnimeList.Filter.Check(i)) {
         icon_index = AnimeList.Item[i].Playing ? Icon16_Play : StatusToIcon(AnimeList.Item[i].Series_Status);
         group_count[AnimeList.Item[i].GetStatus() - 1]++;
-        int j = m_List.InsertItem(i, AnimeList.Item[i].GetStatus(), icon_index, LPSTR_TEXTCALLBACK, 
+        int j = m_List.InsertItem(i, AnimeList.Item[i].GetStatus(), icon_index, 
+          0, NULL, LPSTR_TEXTCALLBACK, 
           reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
         int eps_total = AnimeList.Item[i].GetTotalEpisodes();
         float ratio = eps_total ? (float)AnimeList.Item[i].GetLastWatchedEpisode() / (float)eps_total : 0.8f;

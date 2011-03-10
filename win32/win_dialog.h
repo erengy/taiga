@@ -29,10 +29,10 @@ public:
   virtual ~CDialog();
   
   virtual INT_PTR Create(UINT uResourceID, HWND hParent = NULL, bool bModal = true);
-  virtual void    EndDialog(INT_PTR nResult);
-  virtual void    SetSizeMax(LONG cx, LONG cy);
-  virtual void    SetSizeMin(LONG cx, LONG cy);
-  virtual void    SetSnapGap(int iSnapGap);
+  virtual void EndDialog(INT_PTR nResult);
+  virtual void SetSizeMax(LONG cx, LONG cy);
+  virtual void SetSizeMin(LONG cx, LONG cy);
+  virtual void SetSnapGap(int iSnapGap);
 
   virtual BOOL AddComboString(int nIDDlgItem, LPCWSTR lpString);
   virtual BOOL CheckDlgButton(int nIDButton, UINT uCheck);

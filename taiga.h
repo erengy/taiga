@@ -20,15 +20,16 @@
 #define TAIGA_H
 
 #include "std.h"
+#include "update.h"
 #include "win32/win_main.h"
 
 #define APP_NAME             L"Taiga"
 #define APP_TITLE            L"Taiga 0.7"
-#define APP_VERSION          L"0.7.62"
-#define APP_BUILD            L"2011.03.08"
+#define APP_VERSION          L"0.7.64"
+#define APP_BUILD            L"2011-03-10"
 #define APP_VERSION_MAJOR    0
 #define APP_VERSION_MINOR    7
-#define APP_VERSION_REVISION 62
+#define APP_VERSION_REVISION 64
 
 #ifndef PORTABLE
 #define PORTABLE
@@ -57,10 +58,24 @@ public:
   BOOL CheckNewVersion(bool silent);
   wstring GetDataPath();
   BOOL InitInstance();
+  void ReadData();
   
   bool LoggedIn, UpdatesEnabled;
   int CurrentTipType, PlayStatus;
   int TickerMedia, TickerNewEpisodes, TickerQueue, TickerTorrent;
+
+  class CUpdate : public CUpdateHelper {
+  public:
+    CUpdate() {}
+    virtual ~CUpdate() {}
+
+    void OnCheck();
+    void OnCRCCheck(const wstring& path, wstring& crc);
+    void OnDone();
+    void OnProgress(int file_index);
+    bool OnRestartApp();
+    void OnRunActions();
+  } UpdateHelper;
 };
 
 extern CTaiga Taiga;

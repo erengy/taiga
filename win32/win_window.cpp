@@ -20,6 +20,8 @@
 #include "win_taskbar.h"
 #include "win_window.h"
 
+static LPCWSTR PROP_CWINDOW = L"PROP_CWINDOW";
+
 // =============================================================================
 
 CWindow::CWindow() : 
@@ -32,14 +34,14 @@ CWindow::CWindow() :
 
   // Create default window class
   WNDCLASSEX wc = {0};
-  if (!::GetClassInfoEx(m_hInstance, DEFAULT_CLASS, &wc)) {
-    wc.cbSize        = sizeof(WNDCLASSEX);
-    wc.hInstance     = m_hInstance;
-    wc.lpfnWndProc   = WindowProcStatic;
-    wc.lpszClassName = DEFAULT_CLASS;
-    wc.hbrBackground = (HBRUSH)::GetStockObject(WHITE_BRUSH);
-    wc.hCursor       = ::LoadCursor(NULL, IDC_ARROW);
+  if (!::GetClassInfoEx(m_hInstance, WIN_DEFAULT_CLASS, &wc)) {
+    wc.cbSize        = sizeof(wc);
     wc.style         = CS_DBLCLKS;
+    wc.lpfnWndProc   = WindowProcStatic;
+    wc.hInstance     = m_hInstance;
+    wc.hCursor       = ::LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)::GetStockObject(WHITE_BRUSH);
+    wc.lpszClassName = WIN_DEFAULT_CLASS;
     ::RegisterClassEx(&wc);
   }
 }
@@ -67,7 +69,7 @@ HWND CWindow::Create(HWND hWndParent) {
   
   PreCreate(m_CreateStruct);
   if (!m_CreateStruct.lpszClass) {
-    m_CreateStruct.lpszClass = DEFAULT_CLASS;
+    m_CreateStruct.lpszClass = WIN_DEFAULT_CLASS;
   }
   if (!hWndParent && m_CreateStruct.hwndParent) {
     hWndParent = m_CreateStruct.hwndParent;
@@ -102,17 +104,11 @@ HWND CWindow::Create(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName,
   m_hWindow = ::CreateWindowEx(dwExStyle, lpClassName, lpWindowName, dwStyle, 
     X, Y, nWidth, nHeight, 
     hWndParent, hMenu, m_hInstance, lpParam);
-  
+
   WNDCLASSEX wc = {0};
   ::GetClassInfoEx(m_hInstance, lpClassName, &wc);
   if (wc.lpfnWndProc != reinterpret_cast<WNDPROC>(WindowProcStatic)) {
     Subclass(m_hWindow);
-
-    LOGFONT lFont;
-    ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(lFont), &lFont);
-    m_hFont = ::CreateFontIndirect(&lFont);
-    ::SendMessage(m_hWindow, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), FALSE);
-
     OnCreate(m_hWindow, &m_CreateStruct);
   }
 
@@ -125,6 +121,7 @@ void CWindow::Destroy() {
   }
   if (m_hFont && m_hParent) {
     ::DeleteObject(m_hFont);
+    m_hFont = NULL;
   }
   if (m_hIconLarge) {
     ::DestroyIcon(m_hIconLarge);
@@ -135,11 +132,39 @@ void CWindow::Destroy() {
     m_hIconSmall = NULL;
   }
   if (m_PrevWindowProc) {
-    UnSubclass(); // TODO: Wrong?
+    UnSubclass();
+    m_PrevWindowProc = NULL;
   }
-  m_hWindow = NULL;
-  m_PrevWindowProc = NULL;
   WindowMap.Remove(this);
+  m_hWindow = NULL;
+}
+
+void CWindow::PreCreate(CREATESTRUCT& cs) {
+  m_CreateStruct.cx             = cs.cx;
+  m_CreateStruct.cy             = cs.cy;
+  m_CreateStruct.dwExStyle      = cs.dwExStyle;
+  m_CreateStruct.hInstance      = m_hInstance;
+  m_CreateStruct.hMenu          = cs.hMenu;
+  m_CreateStruct.hwndParent     = cs.hwndParent;
+  m_CreateStruct.lpCreateParams = cs.lpCreateParams;
+  m_CreateStruct.lpszClass      = cs.lpszClass;
+  m_CreateStruct.lpszName       = cs.lpszName;
+  m_CreateStruct.style          = cs.style;
+  m_CreateStruct.x              = cs.x;
+  m_CreateStruct.y              = cs.y;
+}
+
+void CWindow::PreRegisterClass(WNDCLASSEX& wc) {
+  m_WndClass.style         = wc.style;
+  m_WndClass.lpfnWndProc   = WindowProcStatic;
+  m_WndClass.cbClsExtra    = wc.cbClsExtra;
+  m_WndClass.cbWndExtra    = wc.cbWndExtra;
+  m_WndClass.hInstance     = m_hInstance;
+  m_WndClass.hIcon         = wc.hIcon;
+  m_WndClass.hCursor       = wc.hCursor;
+  m_WndClass.hbrBackground = wc.hbrBackground;
+  m_WndClass.lpszMenuName  = wc.lpszMenuName;
+  m_WndClass.lpszClassName = wc.lpszClassName;
 }
 
 BOOL CWindow::RegisterClass(WNDCLASSEX& wc) {
@@ -170,21 +195,34 @@ void CWindow::Attach(HWND hWindow) {
 
 void CWindow::CenterOwner() {
   GetParent();
-  RECT rcParent, rcWindow;
-  ::GetWindowRect(m_hParent, &rcParent);
+  RECT rcDesktop, rcParent, rcWindow;
   ::GetWindowRect(m_hWindow, &rcWindow);
-  ::MoveWindow(m_hWindow, 
-    (rcParent.right  - rcWindow.right  - rcWindow.left) / 2, 
-    (rcParent.bottom - rcWindow.bottom - rcWindow.top)  / 2, 
-    (rcWindow.right  - rcWindow.left), 
-    (rcWindow.bottom - rcWindow.top), FALSE);
+  ::SystemParametersInfo(SPI_GETWORKAREA, 0, &rcDesktop, 0);
+  if (m_hParent != NULL) {
+    ::GetWindowRect(m_hParent, &rcParent);
+  } else {
+    ::CopyRect(&rcParent, &rcDesktop);
+  }
+
+  HMONITOR hMonitor = MonitorFromWindow(m_hWindow, MONITOR_DEFAULTTONEAREST);
+  MONITORINFO mi = { sizeof(mi), 0 };
+  if (GetMonitorInfo(hMonitor, &mi)) {
+    rcDesktop = mi.rcWork;
+    if (m_hParent == NULL) rcParent = mi.rcWork;
+  }
+
+  ::IntersectRect(&rcParent, &rcParent, &rcDesktop);
+  ::SetWindowPos(m_hWindow, HWND_TOP, 
+    rcParent.left + ((rcParent.right - rcParent.left) - (rcWindow.right - rcWindow.left)) / 2, 
+    rcParent.top + ((rcParent.bottom - rcParent.top) - (rcWindow.bottom - rcWindow.top)) / 2, 
+    0, 0, SWP_NOSIZE);
 }
 
 HWND CWindow::Detach() {
   HWND hWnd = m_hWindow;
   if (m_PrevWindowProc) UnSubclass();
-  m_hWindow = NULL;
   WindowMap.Remove(this);
+  m_hWindow = NULL;
   return hWnd;
 }
 
@@ -309,13 +347,13 @@ LRESULT CWindow::SendMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 BOOL CWindow::SetBorder(int iStyle) {
   switch (iStyle) {
-    case BORDER_NONE:
+    case WIN_BORDER_NONE:
       SetStyle(0, WS_EX_CLIENTEDGE | WS_EX_STATICEDGE, GWL_EXSTYLE);
       break;
-    case BORDER_CLIENT:
+    case WIN_BORDER_CLIENT:
       SetStyle(WS_EX_CLIENTEDGE, WS_EX_STATICEDGE, GWL_EXSTYLE);
       break;
-    case BORDER_STATIC:
+    case WIN_BORDER_STATIC:
       SetStyle(WS_EX_STATICEDGE, WS_EX_CLIENTEDGE, GWL_EXSTYLE);
       break;
   }
@@ -439,7 +477,14 @@ BOOL CWindow::Update() const {
 
 // =============================================================================
 
-static LPCWSTR PROP_CWINDOW = L"PROP_CWINDOW";
+void CWindow::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  LOGFONT lFont;
+  ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(lFont), &lFont);
+  m_hFont = ::CreateFontIndirect(&lFont);
+  ::SendMessage(m_hWindow, WM_SETFONT, reinterpret_cast<WPARAM>(m_hFont), FALSE);
+}
+
+// =============================================================================
 
 void CWindow::Subclass(HWND hWnd) {
   WNDPROC current_proc = reinterpret_cast<WNDPROC>(::GetWindowLongPtr(hWnd, GWLP_WNDPROC));
@@ -464,8 +509,10 @@ LRESULT CALLBACK CWindow::WindowProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, 
   CWindow* window = WindowMap.GetWindow(hwnd);
   if (!window) {
     window = reinterpret_cast<CWindow*>(::GetProp(hwnd, PROP_CWINDOW));
-    window->SetWindowHandle(hwnd);
-    WindowMap.Add(hwnd, window);
+    if (window) {
+      window->SetWindowHandle(hwnd);
+      WindowMap.Add(hwnd, window);
+    }
   }
   if (window) {
     return window->WindowProc(hwnd, uMsg, wParam, lParam);
@@ -481,15 +528,15 @@ LRESULT CWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 LRESULT CWindow::WindowProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_COMMAND: {
-      if (OnCommand(wParam, lParam)) return TRUE;
+      if (OnCommand(wParam, lParam)) return 0;
       break;
     }
     case WM_CREATE: {
-      if (OnCreate(hwnd, reinterpret_cast<LPCREATESTRUCT>(lParam))) return TRUE;
+      OnCreate(hwnd, reinterpret_cast<LPCREATESTRUCT>(lParam));
       break;
     }
     case WM_DESTROY: {
-      OnDestroy();
+      if (OnDestroy()) return 0;
       break;
     }
     case WM_DROPFILES: {
@@ -534,11 +581,16 @@ LRESULT CWindow::WindowProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
     }
     case WM_PAINT: {
       if (!m_PrevWindowProc) {
-        HDC hdc;
-        PAINTSTRUCT ps;
-        hdc = ::BeginPaint(hwnd, &ps);
-        OnPaint(hdc, &ps);
-        ::EndPaint(hwnd, &ps);
+        if (::GetUpdateRect(hwnd, NULL, FALSE)) {
+          PAINTSTRUCT ps;
+          HDC hdc = ::BeginPaint(hwnd, &ps);
+          OnPaint(hdc, &ps);
+          ::EndPaint(hwnd, &ps);
+        } else {
+          HDC hdc = ::GetDC(hwnd);
+          OnPaint(hdc, NULL);
+          ::ReleaseDC(hwnd, hdc);
+        }
       }
       break;
     }

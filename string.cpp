@@ -66,7 +66,11 @@ void ErasePunctuation(wstring& input, bool keep_trailing) {
         (c >  90 && c <  97) || // [\]^_`
         (c > 122 && c < 128)) { // {|}~
           if (keep_trailing) {
-            if (c == '!' || c == '+') continue;
+            if (c == '!' ||  // "Hayate no Gotoku!", "K-ON!"...
+                c == '+' ||  // "Needless+"
+                c == '\'') { // "Gintama'"
+                  continue;
+            }
             keep_trailing = false;
           }
           input.erase(i, 1);
@@ -563,14 +567,6 @@ bool ValidateFileExtension(const wstring& extension, unsigned int max_length) {
 // =============================================================================
 
 /* Other */
-
-void CrackURL(wstring url, wstring& server, wstring& object) {
-  EraseLeft(url, L"http://", true);
-  int pos = InStr(url, L"/");
-  if (pos == -1) pos = url.length();
-  object = url.substr(pos);
-  server = url.substr(0, pos);
-}
 
 wstring PushString(const wstring& str1, const wstring& str2) {
   if (str2.empty()) {

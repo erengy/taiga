@@ -81,8 +81,6 @@ void CDialog::SetSnapGap(int iSnapGap) {
 
 // =============================================================================
 
-#include "string.h"
-
 void CDialog::SetMinMaxInfo(LPMINMAXINFO lpMMI) {
   if (m_SizeMax.cx > 0) lpMMI->ptMaxTrackSize.x = m_SizeMax.cx;
   if (m_SizeMax.cy > 0) lpMMI->ptMaxTrackSize.y = m_SizeMax.cy;
@@ -323,11 +321,16 @@ INT_PTR CDialog::DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
       break;
     }
     case WM_PAINT: {
-      HDC hdc;
-      PAINTSTRUCT ps;
-      hdc = ::BeginPaint(hwnd, &ps);
-      OnPaint(hdc, &ps);
-      ::EndPaint(hwnd, &ps);
+      if (::GetUpdateRect(hwnd, NULL, FALSE)) {
+        PAINTSTRUCT ps;
+        HDC hdc = ::BeginPaint(hwnd, &ps);
+        OnPaint(hdc, &ps);
+        ::EndPaint(hwnd, &ps);
+      } else {
+        HDC hdc = ::GetDC(hwnd);
+        OnPaint(hdc, NULL);
+        ::ReleaseDC(hwnd, hdc);
+      }
       break;
     }
     case WM_SIZE: {

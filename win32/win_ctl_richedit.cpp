@@ -36,8 +36,8 @@ void CRichEdit::PreCreate(CREATESTRUCT &cs) {
   cs.style     = WS_CHILD | WS_CLIPCHILDREN | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL | ES_AUTOHSCROLL;
 }
 
-BOOL CRichEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  return TRUE;
+void CRichEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

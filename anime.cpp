@@ -80,8 +80,9 @@ void CAnime::Start(CEpisode episode) {
   // Update main window
   MainWindow.ChangeStatus();
   MainWindow.UpdateTip();
-  MainWindow.RefreshList(GetStatus());
-  MainWindow.RefreshTabs(GetStatus());
+  int status = GetRewatching() ? MAL_WATCHING : GetStatus();
+  MainWindow.RefreshList(status);
+  MainWindow.RefreshTabs(status);
   int list_index = MainWindow.GetListIndex(Index);
   if (list_index > -1) {
     MainWindow.m_List.SetItemIcon(list_index, Icon16_Play);

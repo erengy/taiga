@@ -21,14 +21,16 @@
 // =============================================================================
 
 BOOL CImageList::Create(int cx, int cy) {
-  if (m_hImageList) Destroy();
+  Destroy();
   m_hImageList = ::ImageList_Create(cx, cy, ILC_COLOR32 | ILC_MASK, 0, 0);
   return m_hImageList != NULL;
 }
 
 VOID CImageList::Destroy() {
-  ::ImageList_Destroy(m_hImageList);
-  m_hImageList = NULL;
+  if (m_hImageList) {
+    ::ImageList_Destroy(m_hImageList);
+    m_hImageList = NULL;
+  }
 }
 
 // =============================================================================

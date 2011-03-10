@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <windowsx.h>
 #include "win_control.h"
+#include <windowsx.h>
 
 // =============================================================================
 
@@ -27,8 +27,8 @@ void CComboBox::PreCreate(CREATESTRUCT &cs) {
   cs.style     = CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE;
 }
 
-BOOL CComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  return TRUE;
+void CComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  CWindow::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================

@@ -77,8 +77,9 @@ CAboutWindow::CAboutWindow() {
   RegisterDlgClass(L"TaigaAboutW");
 }
 
-void CAboutWindow::OnDestroy() {
+BOOL CAboutWindow::OnDestroy() {
   KillTimer(GetWindowHandle(), TIMER_TAIGA);
+  return TRUE;
 }
 
 BOOL CAboutWindow::OnInitDialog() {

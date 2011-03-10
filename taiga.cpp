@@ -19,10 +19,8 @@
 #include "std.h"
 #include "animelist.h"
 #include "common.h"
-#include "dlg/dlg_main.h"
-#include "dlg/dlg_settings.h"
+#include "dlg/dlg_update.h"
 #include "gfx.h"
-#include "http.h"
 #include "media.h"
 #include "monitor.h"
 #include "myanimelist.h"
@@ -46,10 +44,10 @@ CTaiga::CTaiga() :
   CurrentTipType(TIPTYPE_NORMAL), PlayStatus(PLAYSTATUS_STOPPED), 
   TickerMedia(0), TickerNewEpisodes(0), TickerQueue(0), TickerTorrent(0)
 {
+  SetVersionInfo(APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_REVISION);
 }
 
 CTaiga::~CTaiga() {
-  Gdiplus_Shutdown();
   OleUninitialize();
 }
 
@@ -63,52 +61,17 @@ BOOL CTaiga::InitInstance() {
 
   // Initialize
   InitCommonControls(ICC_STANDARD_CLASSES);
-  Gdiplus_Initialize();
   OleInitialize(NULL);
 
   // Read data
-  MediaPlayers.Read();
-  Settings.Read();
-  UI.Read(Settings.Program.General.Theme);
-  UI.LoadImages();
-
-  // Read anime list
-  if (!Settings.Account.MAL.User.empty()) {
-    AnimeList.Read();
-  }
-
-  // Create main window
-  MainWindow.Create(IDD_MAIN, NULL, false);
-
-  // Start-up settings
-  if (Settings.Account.MAL.AutoLogin) {
-    ExecuteAction(L"Login");
-  }
-  if (Settings.Program.StartUp.CheckNewEpisodes) {
-    ExecuteAction(L"CheckEpisodes()", TRUE);
-  }
-  if (!Settings.Program.StartUp.Minimize) {
-    MainWindow.Show();
-  }
-  if (Settings.Account.MAL.User.empty()) {
-    CTaskDialog dlg;
-    dlg.SetWindowTitle(APP_TITLE);
-    dlg.SetMainIcon(TD_ICON_INFORMATION);
-    dlg.SetMainInstruction(L"Welcome to Taiga!");
-    dlg.SetContent(L"User name is not set. Would you like to open settings window to set it now?");
-    dlg.AddButton(L"Yes", IDYES);
-    dlg.AddButton(L"No", IDNO);
-    dlg.Show(g_hMain);
-    if (dlg.GetSelectedButtonID() == IDYES) {
-      ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
-    }
-  }
+  ReadData();
+  
   if (Settings.Program.StartUp.CheckNewVersion) {
-    CheckNewVersion(true);
-  }
-  if (Settings.Folders.WatchEnabled) {
-    FolderMonitor.SetWindowHandle(MainWindow.GetWindowHandle());
-    FolderMonitor.Enable();
+    // Create update dialog
+    ExecuteAction(L"CheckUpdates");
+  } else {
+    // Create main dialog
+    ExecuteAction(L"MainWindow");
   }
 
   return TRUE;
@@ -116,15 +79,8 @@ BOOL CTaiga::InitInstance() {
 
 // =============================================================================
 
-BOOL CTaiga::CheckNewVersion(bool silent) {
-  return VersionClient.Get(
-    L"dl.dropbox.com", 
-    L"/u/2298899/Taiga/Version.txt", 
-    L"", silent ? HTTP_VersionCheckSilent : HTTP_VersionCheck);
-}
-
 wstring CTaiga::GetDataPath() {
-  // Return current working directory in debug mode  
+  // Return current working directory in debug mode
   #ifdef _DEBUG
   return CheckSlash(GetCurrentDirectory()) + L"Data\\";
   #endif
@@ -142,4 +98,55 @@ wstring CTaiga::GetDataPath() {
   }
 
   return L"";
+}
+
+void CTaiga::ReadData() {
+  // Read media player data
+  MediaPlayers.Read();
+  
+  // Read settings
+  Settings.Read();
+  
+  // Read theme data
+  UI.Read(Settings.Program.General.Theme);
+  UI.LoadImages();
+  
+  // Read anime list
+  AnimeList.Read();
+}
+
+// =============================================================================
+
+void CTaiga::CUpdate::OnCheck() {
+  //
+}
+
+void CTaiga::CUpdate::OnCRCCheck(const wstring& path, wstring& crc) {
+  wstring text = L"Checking file integrity... (" + GetFileName(path) + L")";
+  UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, text.c_str());
+  crc = CalculateCRC(path);
+  ToUpper(crc);
+}
+
+void CTaiga::CUpdate::OnDone() {
+  UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Done!");
+}
+
+void CTaiga::CUpdate::OnProgress(int file_index) {
+  wstring text = L"Downloading file... (" + Files[file_index].Path + L")";
+  UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, text.c_str());
+}
+
+bool CTaiga::CUpdate::OnRestartApp() {
+  if (g_hMain) {
+    Settings.Write();
+  }
+
+  return true;
+}
+
+void CTaiga::CUpdate::OnRunActions() {
+  for (unsigned int i = 0; i < Actions.size(); i++) {
+    ExecuteAction(Actions[i]);
+  }
 }

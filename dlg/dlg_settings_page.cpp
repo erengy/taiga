@@ -84,7 +84,7 @@ BOOL CSettingsPage::OnInitDialog() {
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
       for (size_t i = 0; i < Settings.Folders.Root.size(); i++) {
-        List.InsertItem(i, -1, Icon16_Folder, Settings.Folders.Root[i].c_str(), NULL);
+        List.InsertItem(i, -1, Icon16_Folder, 0, NULL, Settings.Folders.Root[i].c_str(), NULL);
       }
       List.SetWindowHandle(NULL);
       CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, Settings.Folders.WatchEnabled);
@@ -107,7 +107,7 @@ BOOL CSettingsPage::OnInitDialog() {
       for (int i = 1; i <= AnimeList.Count; i++) {
         List.InsertItem(i - 1, AnimeList.Item[i].GetStatus(), 
                 StatusToIcon(AnimeList.Item[i].Series_Status), 
-                LPSTR_TEXTCALLBACK, 
+                0, NULL, LPSTR_TEXTCALLBACK, 
                 reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
         List.SetItem(i - 1, 1, AnimeList.Item[i].Folder.c_str());
       }
@@ -231,7 +231,7 @@ BOOL CSettingsPage::OnInitDialog() {
       for (size_t i = 0; i < MediaPlayers.Item.size(); i++) {
         BOOL player_available = MediaPlayers.Item[i].GetPath().empty() ? FALSE : TRUE;
         List.InsertItem(i, MediaPlayers.Item[i].Mode, 
-          Icon16_AppGray - player_available, 
+          Icon16_AppGray - player_available, 0, NULL, 
           MediaPlayers.Item[i].Name.c_str(), NULL);
         if (MediaPlayers.Item[i].Enabled) List.SetCheckState(i, TRUE);
       }
@@ -335,7 +335,7 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
           BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
             CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
-            List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, path.c_str(), 0);
+            List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, 0, NULL, path.c_str(), 0);
             List.SetSelectedItem(List.GetItemCount() - 1);
             List.SetWindowHandle(NULL);
         }
@@ -605,7 +605,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
           ZeroMemory(szFileName, MAX_PATH + 1);
           DragQueryFile(hDrop, i, (LPWSTR)szFileName, MAX_PATH + 1);
           if (GetFileAttributes(szFileName) & FILE_ATTRIBUTE_DIRECTORY) {
-            List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, szFileName, 0);
+            List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, 0, NULL, szFileName, 0);
             List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
           }
         }
@@ -699,7 +699,7 @@ void AddTorrentFilterToList(HWND hwnd_list, int option, int type, wstring value)
   }
 
   CListView List = hwnd_list;
-  List.InsertItem(List.GetItemCount(), option, icon, value.c_str(), NULL);
+  List.InsertItem(List.GetItemCount(), option, icon, 0, NULL, value.c_str(), NULL);
   List.SetItem(List.GetItemCount() - 1, 1, option_str.c_str());
   List.SetItem(List.GetItemCount() - 1, 2, type_str.c_str());
   List.Sort(0, 1, 0, ListViewCompareProc);

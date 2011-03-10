@@ -48,7 +48,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
 // =============================================================================
@@ -74,7 +74,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
 // =============================================================================
@@ -136,12 +136,15 @@ public:
   int        GetSortOrder();
   int        GetSortType();
   BOOL       GetSubItemRect(int iItem, int iSubItem, LPRECT lpRect);
+  DWORD      GetView();
   int        HitTest(bool return_subitem = false);
   int        InsertColumn(int nIndex, int nWidth, int nWidthMin, int nAlign, LPCWSTR szText);
-  int        InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsed = false);
-  int        InsertItem(int nIndex, int nGroup, int nIcon, LPCWSTR pszText, LPARAM lParam);
+  int        InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable = false, bool bCollapsed = false);
+  int        InsertItem(const LVITEM& lvi);
+  int        InsertItem(int nIndex, int nGroup, int nIcon, UINT cColumns, PUINT puColumns, LPCWSTR pszText, LPARAM lParam);
   BOOL       IsGroupViewEnabled();
   BOOL       RedrawItems(int iFirst, int iLast, bool repaint);
+  void       RemoveAllGroups();
   void       SetCheckState(int iIndex, BOOL fCheck);
   BOOL       SetColumnWidth(int iCol, int cx);
   void       SetExtendedStyle(DWORD dwExStyle);
@@ -150,14 +153,37 @@ public:
   BOOL       SetItem(int nIndex, int nSubItem, LPCWSTR szText);
   BOOL       SetItemIcon(int nIndex, int nIcon);
   void       SetSelectedItem(int iIndex);
+  BOOL       SetTileViewInfo(PLVTILEVIEWINFO plvtvinfo);
+  int        SetView(DWORD iView);
   void       Sort(int iColumn, int iOrder, int iType, PFNLVCOMPARE pfnCompare);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 
 private:
   int m_iSortColumn, m_iSortOrder, m_iSortType;
+};
+
+// =============================================================================
+
+/* Progress bar */
+
+class CProgressBar : public CWindow {
+public:
+  CProgressBar() {}
+  CProgressBar(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~CProgressBar() {}
+
+  UINT  GetPosition();
+  void  SetMarquee(bool enabled);
+  UINT  SetPosition(UINT position);
+  DWORD SetRange(UINT min, UINT max);
+  UINT  SetState(UINT state);
+
+protected:
+  virtual void PreCreate(CREATESTRUCT &cs);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
 // =============================================================================
@@ -178,7 +204,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
 // =============================================================================
@@ -200,7 +226,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 
 private:
   HMODULE m_hInstRichEdit;
@@ -238,7 +264,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 
 private:
   HIMAGELIST  m_hImageList;
@@ -267,7 +293,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
 // =============================================================================
@@ -295,7 +321,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 
 private:
   vector<LPCWSTR> m_TooltipText;
@@ -320,7 +346,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
 // =============================================================================
@@ -343,7 +369,7 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
 
 #endif // WIN_CONTROL_H
