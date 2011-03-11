@@ -655,11 +655,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.7.65"
+            VALUE "FileVersion", "0.7.66"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.7.65"
+            VALUE "ProductVersion", "0.7.66"
         }
     }
     BLOCK "VarFileInfo"
