@@ -30,9 +30,7 @@ CUpdateDialog UpdateDialog;
 
 // =============================================================================
 
-CUpdateDialog::CUpdateDialog() :
-  m_hfHeader(NULL)
-{
+CUpdateDialog::CUpdateDialog() {
   RegisterDlgClass(L"TaigaUpdateW");
 }
 
@@ -44,20 +42,6 @@ BOOL CUpdateDialog::OnInitDialog() {
   // Set title
   SetText(APP_TITLE);
 
-  // Set header text and font
-  SetDlgItemText(IDC_STATIC_UPDATE_TITLE, APP_NAME);
-  if (!m_hfHeader) {
-    LOGFONT lFont;
-    ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
-    CDC dc = GetDC();
-    lFont.lfCharSet = DEFAULT_CHARSET;
-    lFont.lfHeight = -MulDiv(14, GetDeviceCaps(dc.Get(), LOGPIXELSY), 72);
-    lFont.lfWeight = FW_BOLD;
-    m_hfHeader = ::CreateFontIndirect(&lFont);
-  }
-  SendDlgItemMessage(IDC_STATIC_UPDATE_TITLE, WM_SETFONT, 
-    reinterpret_cast<WPARAM>(m_hfHeader), FALSE);
-
   // Set progress text
   SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Checking updates...");
   // Set progress bar
@@ -68,9 +52,7 @@ BOOL CUpdateDialog::OnInitDialog() {
   #ifdef _DEBUG
   PostMessage(WM_CLOSE);
   #else
-  Taiga.UpdateHelper.Check(
-    L"dl.dropbox.com/u/2298899/Taiga/update.xml", // TODO: Move to L"taiga.erengy.com/update.xml"
-    Taiga, HTTP_UpdateCheck);
+  Taiga.UpdateHelper.Check(L"taiga.erengy.com/update.php", Taiga, HTTP_UpdateCheck);
   #endif
 
   // Success
@@ -94,7 +76,7 @@ BOOL CUpdateDialog::OnDestroy() {
   
   if (Taiga.UpdateHelper.UpdateAvailable) {
     // Restart application
-    if (Taiga.UpdateHelper.RestartApplication(L"UpdateHelper.exe", L"Taiga.exe", L"Taiga.exe.!uh")) {
+    if (Taiga.UpdateHelper.RestartApplication(L"UpdateHelper.exe", L"Taiga.exe", L"Taiga.exe.new")) {
       return TRUE;
     } else {
       // Read data again

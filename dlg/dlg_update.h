@@ -38,9 +38,6 @@ public:
   BOOL OnDestroy();
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
-
-private:
-  HFONT m_hfHeader;
 };
 
 extern CUpdateDialog UpdateDialog;

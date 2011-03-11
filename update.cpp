@@ -52,7 +52,7 @@ bool CUpdateHelper::DownloadNextFile(DWORD client_mode) {
       CreateFolder(GetPathOnly(path));
       if (!RestartApp) {
         if (IsEqual(Files[i].Path, GetFileName(m_App->GetModulePath()))) {
-          path += L".!uh";
+          path += L".new";
           RestartApp = true;
         }
       }
@@ -140,7 +140,7 @@ bool CUpdateHelper::RestartApplication(const wstring& updatehelper_exe, const ws
   if (RestartApp) {
     if (FileExists(CheckSlash(m_App->GetCurrentDirectory()) + new_exe)) {
       if (OnRestartApp()) {
-        Execute(updatehelper_exe, current_exe + L" " + new_exe);
+        Execute(updatehelper_exe, current_exe + L" " + new_exe + L" " + ToWSTR(GetCurrentProcessId()));
         m_App->PostQuitMessage();
         return true;
       }

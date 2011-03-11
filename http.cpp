@@ -128,7 +128,6 @@ BOOL CHTTPClient::OnHeadersAvailable(wstring headers) {
 
 BOOL CHTTPClient::OnRedirect(wstring address) {
   wstring status = L"Redirecting... (" + address + L")";
-  this->m_dwTotal = 0; // Reset in case the next header set doesn't include Content Length.
   switch (GetClientMode()) {
     case HTTP_TorrentCheck:
     case HTTP_TorrentDownload:
