@@ -451,7 +451,9 @@ wstring CMyAnimeList::TranslateDate(wstring value, bool reverse) {
     unsigned short year, month, day;
     ParseDateString(value, year, month, day);
 
-    if (month < 3) {
+    if (month == 0) {
+      value = L"Unknown";
+    } else if (month < 3) {
       value = L"Winter";
       year--;
     } else if (month < 6) {

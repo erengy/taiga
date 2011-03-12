@@ -67,12 +67,15 @@ bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime,
   ErasePunctuation(title, true);
   if (title.empty()) return false;
 
-  // Compare with main title
+  // Compare with main title then synonyms
   wstring anime_title = anime.Series_Title;
-  if (CompareTitle(title, anime_title, episode, anime, strict)) return true;
-  // Compare with synonyms
-  if (CompareSynonyms(title, anime_title, anime.Series_Synonyms, episode, anime, strict)) return true;
-  if (CompareSynonyms(title, anime_title, anime.Synonyms, episode, anime, strict)) return true;
+  if (CompareTitle(title, anime_title, episode, anime, strict) ||
+      CompareSynonyms(title, anime_title, anime.Series_Synonyms, episode, anime, strict) ||
+      CompareSynonyms(title, anime_title, anime.Synonyms, episode, anime, strict)) {
+        // Assume episode 1 if matched one-episode series
+        if (episode.Number.empty() && anime.Series_Episodes == 1) episode.Number = L"1";
+        return true;
+  }
 
   // Failed
   return false;
@@ -86,11 +89,11 @@ bool CRecognition::CompareTitle(const wstring& title, wstring& anime_title,
   ErasePunctuation(anime_title, true);
   if (anime_title.empty()) return false;
   
-  // Compare with title & episode number
+  // Compare with title + number
   if (strict && anime.Series_Episodes == 1 && !episode.Number.empty()) {
     if (IsEqual(title + episode.Number, anime_title)) {
       episode.Title += episode.Number;
-      episode.Number = L"1";
+      episode.Number.clear();
       return true;
     }
   }

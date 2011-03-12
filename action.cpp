@@ -698,7 +698,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // PlayNext()
   //   Searches for the next episode of an anime and plays it.
   } else if (action == L"PlayNext") {
-    int number = 0;
+    int number = 1;
     if (AnimeList.Item[AnimeList.Index].Series_Episodes != 1) {
       number = AnimeList.Item[AnimeList.Index].GetLastWatchedEpisode() + 1;
     }
