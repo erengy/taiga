@@ -72,16 +72,20 @@ wstring CalculateCRC(const wstring& file) {
 
 // =============================================================================
 
-int GetLastEpisode(const wstring& episode) {
-  int value = 1, pos = InStrRev(episode, L"-", episode.length());
-  if (pos == episode.length() - 1) {
-    value = ToINT(episode.substr(0, pos));
+int GetEpisodeHigh(const wstring& episodenum) {
+  int value = 1, pos = InStrRev(episodenum, L"-", episodenum.length());
+  if (pos == episodenum.length() - 1) {
+    value = ToINT(episodenum.substr(0, pos));
   } else if (pos > -1) {
-    value = ToINT(episode.substr(pos + 1));
+    value = ToINT(episodenum.substr(pos + 1));
   } else {
-    value = ToINT(episode);
+    value = ToINT(episodenum);
   }
   return value;
+}
+
+int GetEpisodeLow(const wstring& episodenum) {
+  return ToINT(episodenum); // ToINT() stops at -
 }
 
 int StatusToIcon(int status) {  

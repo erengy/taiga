@@ -150,9 +150,11 @@ void CAnime::End(CEpisode episode, bool end_watching, bool update_list) {
   if (update_list && Taiga.UpdatesEnabled && (GetStatus() != MAL_COMPLETED || GetRewatching())) {
     if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT || 
       Taiga.TickerMedia == -1 || Taiga.TickerMedia >= Settings.Account.Update.Delay) {
-        int number = ToINT(episode.Number);
-        if (Settings.Account.Update.OutOfRange == FALSE || number == GetLastWatchedEpisode() + 1) {
-          if (MAL.IsValidEpisode(number, GetLastWatchedEpisode(), Series_Episodes)) {
+        int number = GetEpisodeHigh(episode.Number);
+        int numberlow = GetEpisodeLow(episode.Number);
+        int lastwatched = GetLastWatchedEpisode();
+        if (Settings.Account.Update.OutOfRange == FALSE || number == lastwatched + 1 || numberlow == lastwatched + 1) {
+          if (MAL.IsValidEpisode(number, lastwatched, Series_Episodes)) {
             switch (Settings.Account.Update.Mode) {
               case UPDATE_MODE_NONE:
                 break;
@@ -183,7 +185,7 @@ int CAnime::Ask(CEpisode episode) {
   dlg.UseCommandLinks(true);
 
   // Add buttons
-  int number = GetLastEpisode(episode.Number);
+  int number = GetEpisodeHigh(episode.Number);
   if (number == 0) number = 1;
   if (Series_Episodes == 1) {               // Completed (1 eps.)
     episode.Number = L"1";
@@ -211,7 +213,7 @@ void CAnime::Update(CEpisode episode, bool change_status) {
   item.AnimeID = Series_ID;
 
   // Set episode number
-  item.episode = GetLastEpisode(episode.Number);
+  item.episode = GetEpisodeHigh(episode.Number);
   if (item.episode == 0 || Series_Episodes == 1) item.episode = 1;
   episode.Index = Index;
   

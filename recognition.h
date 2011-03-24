@@ -43,7 +43,8 @@ public:
   // Keywords
   vector<wstring> AudioKeywords, VideoKeywords, 
     ExtraKeywords, ExtraUnsafeKeywords, 
-    VersionKeywords, ValidExtensions;
+    VersionKeywords, ValidExtensions,
+    EpisodeKeywords, EpisodePrefixes;
 
 private:
   bool CompareTitle(const wstring& title, wstring& anime_title, 
@@ -54,13 +55,15 @@ private:
   // Helper functions
   void AppendKeyword(wstring& str, const wstring& keyword);
   bool CompareKeys(const wstring& str, const vector<wstring>& keys);
+  void CRecognition::CleanTitle(wstring& title);
   void EraseUnnecessary(wstring& str);
-  bool IsEpisode(const wstring& str, CEpisode& episode);
+  void CRecognition::TransliterateSpecial(wstring& str);
+  bool IsEpisodeFormat(const wstring& str, CEpisode& episode);
   bool IsResolution(const wstring& str);
   bool IsTokenEnclosed(const CToken& token);
   void ReadKeyword(unsigned int uID, vector<wstring>& str);
   size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<CToken>& tokens);
-  bool TrimEpisodeWord(wstring& str, bool erase_right);
+  void TrimEpisodeWord(wstring& str, bool erase_rightleft);
   bool ValidateEpisodeNumber(CEpisode& episode);
 };
 

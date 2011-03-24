@@ -276,7 +276,7 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   #define ENCODE(x) url_encode ? EncodeURL(x) : x
 
   // Prepare episode value
-  wstring episode_number = ToWSTR(GetLastEpisode(episode.Number));
+  wstring episode_number = ToWSTR(GetEpisodeHigh(episode.Number));
   TrimLeft(episode_number, L"0");
 
   // Replace variables

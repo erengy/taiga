@@ -61,7 +61,7 @@ void ErasePunctuation(wstring& input, bool keep_trailing) {
   wchar_t c;
   for (int i = input.length() - 1; i >= 0; i--) {
     c = input[i];
-    if ((c >  31 && c <  48) || //  !"#$%&'()*+,-./
+    if ((c >  31 && c <  48) || // !"#$%&'()*+,-./
         (c >  57 && c <  65) || // :;<=>?@
         (c >  90 && c <  97) || // [\]^_`
         (c > 122 && c < 128)) { // {|}~

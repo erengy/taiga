@@ -687,7 +687,7 @@ void CMainWindow::ChangeStatus(wstring str) {
       AnimeList.Item[CurrentEpisode.Index].Series_Title + 
       PushString(L" #", CurrentEpisode.Number);
     if (Settings.Account.Update.OutOfRange && 
-        ToINT(CurrentEpisode.Number) > AnimeList.Item[CurrentEpisode.Index].GetLastWatchedEpisode() + 1) {
+        GetEpisodeLow(CurrentEpisode.Number) > AnimeList.Item[CurrentEpisode.Index].GetLastWatchedEpisode() + 1) {
           str += L" (out of range)";
     }
   }

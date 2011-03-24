@@ -621,7 +621,9 @@ STRINGTABLE
     IDS_KEYWORD_EXTRA             "ASS, BD, BLURAY, BLU-RAY, COMPLETE, DIRECTOR'S CUT, DVD, DVD5, DVD9, DVD-R2J, DVDRIP, ENG, ENGLISH, HARDSUB, PS3, R2DVD, R2J, R2JDVD, RAW, REMASTERED, SOFTSUB, UNCENSORED, UNCUT, VOSTFR, WEBCAST, WIDESCREEN, WS"
     IDS_KEYWORD_EXTRA_UNSAFE      "END, FINAL, OAV, ONA, OVA"
     IDS_KEYWORD_VERSION           "V0, V2, V3, V4"
-    IDS_KEYWORD_VIDEO             "AVI, DIVX, H264, H.264, HD, HDTV, HQ, LQ, SD, VFR, WMV, X264, X.264, XVID"
+    IDS_KEYWORD_VIDEO             "AVI, DIVX, H264, H.264, HD, HDTV, HQ, LQ, RMVB, SD, TS, VFR, WMV, X264, X.264, XVID"
+    IDS_KEYWORD_EPISODE           "EPISODE, EP., EP, VOLUME, VOL., VOL, EPS., EPS"
+    IDS_KEYWORD_EPISODE_PREFIX    "EP., EP, E, VOL., VOL, EPS."
 }
 
 
@@ -639,8 +641,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,7,65,0
-    PRODUCTVERSION  0,7,65,0
+    FILEVERSION     0,7,70,0
+    PRODUCTVERSION  0,7,70,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -654,11 +656,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.7.66"
+            VALUE "FileVersion", "0.7.70"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.7.66"
+            VALUE "ProductVersion", "0.7.70"
         }
     }
     BLOCK "VarFileInfo"

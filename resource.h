@@ -197,3 +197,5 @@
 #define IDS_KEYWORD_EXTRA_UNSAFE                40003
 #define IDS_KEYWORD_VERSION                     40004
 #define IDS_KEYWORD_VIDEO                       40005
+#define IDS_KEYWORD_EPISODE                     40006
+#define IDS_KEYWORD_EPISODE_PREFIX              40007
