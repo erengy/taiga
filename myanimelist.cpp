@@ -372,15 +372,15 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
 
 void CMyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 29
+  #define HTMLCHARCOUNT 30
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Characters are sorted by their Unicode value */
-	{L"&sup3;&para;",           L"\u5CF6"},   // han character 'island'
+		{L"&sup3;&para;",           L"\u5CF6"},   // han character 'island'
     {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2
     {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
     {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
     {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
-	{L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"}, // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
+		{L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"}, // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
     {L"&Atilde;&uml;",          L"\u00E8"},   // small e, grave accent
     {L"&Atilde;&copy;",         L"\u00E9"},   // small e, acute accent
     {L"&Atilde;&frac14;",       L"\u00FC"},   // small u, umlaut mark
@@ -389,6 +389,8 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&acirc;\uFFFD&yen;",     L"\u2665"},   // heart
     {L"&acirc;\uFFFD&ordf;",    L"\u266A"},   // eighth note
     {L"&acirc;\uFFFD\uFFFD",    L"\u2729"},   // white star
+		{L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&curren;&atilde;\uFFFD&iexcl;&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound; &atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound;",
+		 L"\u304A\u306D\u304C\u3044\u30DE\u30A4\u30E1\u30ED\u30C7\u30A3 \u304D\u3089\u3089\u3063"},		// Onegai My Melody Kirara complete encode (spare the star, because I can't crack that damn encoding so it will work with the rest of this crappy encoding mal employs in their API)...
     {L"&atilde;\uFFFD&ordf;",   L"\u30AA"},   // katakana letter o
     {L"&atilde;\uFFFD&not;",    L"\u30AC"},   // katakana letter ga
     {L"&atilde;\uFFFD&macr;",   L"\u30AF"},   // katakana letter ku
