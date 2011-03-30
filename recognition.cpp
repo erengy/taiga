@@ -269,7 +269,8 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
             i = InStrRev(title, L" ", i);
             episode.Number.clear();
             break;
-          case ' ': {
+          case ' ': { // TODO case tokens[title_index].Separator:
+            if (!ValidateEpisodeNumber(episode)) break;
             // Break title into two parts
             wstring str_left = title.substr(0, i + 1);
             wstring str_right = title.substr(i + 1 + episode.Number.length());
@@ -441,11 +442,10 @@ bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode) {
   for (i = numstart; i < str.length(); i++) {
     if (!IsNumeric(str.at(i))) {
       // ##-##
-      if (str.at(i) == '-' && i - numstart > 1 ) {
-        if (i == str.length() - 1 || !IsNumeric(str.at(i+1))) return false;
+      if (i - numstart > 1 && (str.at(i) == '-' || str.at(i) == '&')) {
+        if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
         for(j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
-        episode.Number = str.substr(i + 1, j - 1 - i);
-        if (ToINT(str.substr(numstart, i-numstart)) + 1 == ToINT(episode.Number)) {
+        if (ToINT(str.substr(numstart, i-numstart)) + 1 == ToINT(str.substr(i + 1, j - 1 - i))) {
           episode.Number = str.substr(numstart,j - numstart);
           // ##-##v#
           if(j < str.length() - 1 && (str.at(j) == 'v' || str.at(j) =='V')) {
@@ -529,15 +529,17 @@ size_t CRecognition::TokenizeTitle(const wstring& str, const wstring& delimiters
 
 void CRecognition::TrimEpisodeWord(wstring& str, bool erase_rightleft) {
     if (erase_rightleft) {
-      for (int j = 0; j < 5; j++) EraseRight(str, L" " + Meow.EpisodeKeywords[j], true);
+      for (unsigned int j = 0; j < Meow.EpisodeKeywords.size(); j++)
+        EraseRight(str, L" " + Meow.EpisodeKeywords[j], true);
     } else {
-      for (int j = 0; j < 5; j++) EraseLeft(str, Meow.EpisodeKeywords[j] + L" ", true);
+      for (unsigned int j = 0; j < Meow.EpisodeKeywords.size(); j++)
+        EraseLeft(str, Meow.EpisodeKeywords[j] + L" ", true);
     }
 }
 
 bool CRecognition::ValidateEpisodeNumber(CEpisode& episode) {
   int number = ToINT(episode.Number);
-  if (number > 1000) {
+  if (number <= 0 || number > 1000) {
     if (number > 1950 && number < 2050) {
       AppendKeyword(episode.Extra, L"Year: " + episode.Number);
     }
