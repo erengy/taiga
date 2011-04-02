@@ -39,24 +39,25 @@ CEpisode CurrentEpisode;
 
 // =============================================================================
 
-CEpisode::CEpisode() {
-  Clear();
+CEpisode::CEpisode() :
+  Index(-1)
+{
 }
 
 void CEpisode::Clear() {
-  Index      = -1;
-  AudioType  = L"";
-  Checksum   = L"";
-  Extra      = L"";
-  File       = L"";
-  Format     = L"";
-  Group      = L"";
-  Name       = L"";
-  Number     = L"";
-  Resolution = L""; 
-  Title      = L"";
-  Version    = L"";
-  VideoType  = L"";
+  Index = -1;
+  AudioType.clear();
+  Checksum.clear();
+  Extra.clear();
+  File.clear();
+  Format.clear();
+  Group.clear();
+  Name.clear();
+  Number.clear();
+  Resolution.clear();
+  Title.clear();
+  Version.clear();
+  VideoType.clear();
 }
 
 // =============================================================================
@@ -147,27 +148,30 @@ void CAnime::End(CEpisode episode, bool end_watching, bool update_list) {
   }
 
   // Update list
-  if (update_list && Taiga.UpdatesEnabled && (GetStatus() != MAL_COMPLETED || GetRewatching())) {
+  if (update_list) {
+    if (!Taiga.UpdatesEnabled) return;
+    if (GetStatus() == MAL_COMPLETED && GetRewatching() == 0) return;
     if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT || 
       Taiga.TickerMedia == -1 || Taiga.TickerMedia >= Settings.Account.Update.Delay) {
         int number = GetEpisodeHigh(episode.Number);
         int numberlow = GetEpisodeLow(episode.Number);
         int lastwatched = GetLastWatchedEpisode();
-        if (Settings.Account.Update.OutOfRange == FALSE || number == lastwatched + 1 || numberlow == lastwatched + 1) {
-          if (MAL.IsValidEpisode(number, lastwatched, Series_Episodes)) {
-            switch (Settings.Account.Update.Mode) {
-              case UPDATE_MODE_NONE:
-                break;
-              case UPDATE_MODE_AUTO:
-                Update(episode, true);
-                break;
-              case UPDATE_MODE_ASK:
-              default:
-                int choice = Ask(episode);
-                if (choice != IDNO) {
-                  Update(episode, (choice == IDCANCEL));
-                }
-            }
+        if (Settings.Account.Update.OutOfRange) {
+          if (numberlow > lastwatched + 1 || number < lastwatched + 1) return;
+        }
+        if (MAL.IsValidEpisode(number, lastwatched, Series_Episodes)) {
+          switch (Settings.Account.Update.Mode) {
+            case UPDATE_MODE_NONE:
+              break;
+            case UPDATE_MODE_AUTO:
+              Update(episode, true);
+              break;
+            case UPDATE_MODE_ASK:
+            default:
+              int choice = Ask(episode);
+              if (choice != IDNO) {
+                Update(episode, (choice == IDCANCEL));
+              }
           }
         }
     }

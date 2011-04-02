@@ -318,13 +318,11 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
           if (path_available) {
             path_available = IsEqual(GetPathOnly(path), ANIME.Folder);
           }
-          if (numberlow != number && ANIME.SetEpisodeAvailability(numberlow, path_available)) {
-            DEBUG_PRINT(L"CFolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
-              ANIME.Series_Title + L" -> " + ToWSTR(numberlow) + L"\n");
-          }
-          if (ANIME.SetEpisodeAvailability(number, path_available)) {
-            DEBUG_PRINT(L"CFolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
-              ANIME.Series_Title + L" -> " + ToWSTR(number) + L"\n");
+          for (int j = numberlow; j <= number; j++) {
+            if (ANIME.SetEpisodeAvailability(number, path_available)) {
+              DEBUG_PRINT(L"CFolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
+                ANIME.Series_Title + L" -> " + ToWSTR(j) + L"\n");
+            }
           }
         }
         #undef ANIME

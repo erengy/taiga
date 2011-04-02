@@ -518,4 +518,54 @@
 		<resolution>1080p</resolution>
 		<title>Evangelion​ 1.​0​ You​ Are​ (Not) Alone​</title>
 	</file>
+	<file>
+		<file>[Ayako]_Infinite_Stratos_-_IS_-_01v2_[XVID][400p][29675B71].avi</file>
+		<checksum>29675B71</checksum>
+		<format>AVI</format>
+		<group>Ayako</group>
+		<number>01</number>
+		<resolution>400p</resolution>
+		<title>Infinite Stratos - IS</title>
+		<version>2</version>
+		<video>XVID</video>
+	</file>
+	<file>
+		<file>[E-HARO Raws] Kore wa Zombie desu ka - 03 (TV 1280x720 h264 AAC) [888E4991].mkv</file>
+		<audio>AAC</audio>
+		<checksum>888E4991</checksum>
+		<format>MKV</format>
+		<group>E-HARO Raws</group>
+		<number>03</number>
+		<resolution>1280x720</resolution>
+		<title>Kore wa Zombie desu ka</title>
+		<video>h264</video>
+	</file>
+	<file>
+		<file>[Edomae Subs] Kore wa Zombie desu ka  Episode 2.​mkv</file>
+		<format>MKV</format>
+		<group>Edomae Subs</group>
+		<number>2</number>
+		<title>Kore wa Zombie desu ka</title>
+	</file>
+	<file>
+		<file>Juuni.Kokki.Ep.5.avi</file>
+		<format>AVI</format>
+		<number>5</number>
+		<title>Juuni Kokki</title>
+	</file>
+	<file>
+		<file>Juuni Kokki Ep.5.avi</file>
+		<format>AVI</format>
+		<number>5</number>
+		<title>Juuni Kokki</title>
+	</file>
+	<file>
+		<file>[Keroro].148.[Xvid.mp3].[FE68D5F1].avi</file>
+		<audio>mp3</audio>
+		<checksum>FE68D5F1</checksum>
+		<format>AVI</format>
+		<number>148</number>
+		<title>Keroro</title>
+		<video>Xvid</video>
+	</file>
 </recognition>

@@ -118,7 +118,7 @@
     <ClCompile Include="myanimelist.cpp" />
     <ClCompile Include="process.cpp" />
     <ClCompile Include="recognition.cpp" />
-    <ClCompile Include="rss.cpp" />
+    <ClCompile Include="feed.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="search.cpp" />
     <ClCompile Include="settings.cpp" />
@@ -200,7 +200,7 @@
     <ClInclude Include="process.h" />
     <ClInclude Include="recognition.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="rss.h" />
+    <ClInclude Include="feed.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="std.h" />
     <ClInclude Include="string.h" />

@@ -118,7 +118,7 @@
 			<!-- Useful links -->
 			<menu name="Links">
 				<item name="How to Watch Anime" action="URL(http://myanimelist.net/clubs.php?cid=8711)"/>
-				<item name="Winter 2011 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
+				<item name="Spring 2011 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
 				<item type="separator"/>
 				<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
 				<item name="The Fansub Wiki"  action="URL(http://www.fansubwiki.com/)"/>

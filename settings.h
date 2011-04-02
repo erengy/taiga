@@ -20,7 +20,7 @@
 #define SETTINGS_H
 
 #include "std.h"
-#include "rss.h"
+#include "feed.h"
 
 enum MAL_API {
   MAL_API_NONE     = 1,
@@ -176,7 +176,7 @@ public:
       class CSettingsRSSTorrentFilters {
       public:
         BOOL GlobalEnabled;
-        vector<CRSSFilter> Global;
+        vector<CFeedFilter> Global;
       } Filters;
     } Torrent;
   } RSS;

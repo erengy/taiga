@@ -55,9 +55,9 @@ private:
   // Helper functions
   void AppendKeyword(wstring& str, const wstring& keyword);
   bool CompareKeys(const wstring& str, const vector<wstring>& keys);
-  void CRecognition::CleanTitle(wstring& title);
+  void CleanTitle(wstring& title);
   void EraseUnnecessary(wstring& str);
-  void CRecognition::TransliterateSpecial(wstring& str);
+  void TransliterateSpecial(wstring& str);
   bool IsEpisodeFormat(const wstring& str, CEpisode& episode);
   bool IsResolution(const wstring& str);
   bool IsTokenEnclosed(const CToken& token);

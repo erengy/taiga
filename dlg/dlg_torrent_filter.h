@@ -20,7 +20,7 @@
 #define DLG_TORRENT_FILTER_H
 
 #include "../std.h"
-#include "../rss.h"
+#include "../feed.h"
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
@@ -32,7 +32,7 @@ public:
   virtual ~CTorrentFilterWindow();
 
   CComboBox m_Combo;
-  CRSSFilter m_Filter;
+  CFeedFilter m_Filter;
 
   void RefreshComboBox(int type = 0);
   void SetValues(int option, int type, wstring value);

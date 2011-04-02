@@ -66,8 +66,10 @@ wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool
             if (Meow.CompareEpisode(episode, AnimeList.Item[anime_index])) {
               int number = GetEpisodeHigh(episode.Number);
               int numberlow = GetEpisodeLow(episode.Number);
-              AnimeList.Item[anime_index].SetEpisodeAvailability(number, true);
-              if (episode_number == 0 || episode_number == number || episode_number == numberlow) {
+              for (int i = numberlow; i <= number; i++) {
+                AnimeList.Item[anime_index].SetEpisodeAvailability(i, true);
+              }
+              if (episode_number == 0 || (episode_number >= numberlow && episode_number <= number)) {
                 FindClose(hFind);
                 return root + wfd.cFileName;
               }

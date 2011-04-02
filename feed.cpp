@@ -20,10 +20,10 @@
 #include "animelist.h"
 #include "common.h"
 #include "dlg/dlg_torrent.h"
+#include "feed.h"
 #include "http.h"
 #include "recognition.h"
 #include "resource.h"
-#include "rss.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -35,9 +35,9 @@ CHTTPClient TorrentClient;
 
 // =============================================================================
 
-CRSSFeedItem::CRSSFeedItem() {
-  NewItem = false;
-  Download = false;
+CFeedItem::CFeedItem() :
+  NewItem(false), Download(false) 
+{
 }
 
 // =============================================================================
@@ -228,10 +228,10 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
     #define FILTER Settings.RSS.Torrent.Filters.Global[i]
     switch (FILTER.Type) {
       // Filter keyword
-      case RSS_FILTER_KEYWORD: {
+      case FEED_FILTER_KEYWORD: {
         switch (FILTER.Option) {
           // Exclude
-          case RSS_FILTER_EXCLUDE: {
+          case FEED_FILTER_EXCLUDE: {
             if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) > -1 || 
               InStr(FEED.Title, FILTER.Value, 0, true) > -1 || 
               InStr(FEED.Link, FILTER.Value, 0, true) > -1) {
@@ -240,7 +240,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
             break;
           }
           // Include
-          case RSS_FILTER_INCLUDE: {
+          case FEED_FILTER_INCLUDE: {
             if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) == -1 && 
               InStr(FEED.Title, FILTER.Value, 0, true) == -1 && 
               InStr(FEED.Link, FILTER.Value, 0, true) == -1) {
@@ -250,7 +250,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
           }
           // Preference
           // TODO: Fix this
-          case RSS_FILTER_PREFERENCE: {
+          case FEED_FILTER_PREFERENCE: {
             if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) > -1 || 
               InStr(FEED.Title, FILTER.Value, 0, true) > -1 || 
               InStr(FEED.Link, FILTER.Value, 0, true) > -1) {
@@ -274,7 +274,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
         break;
       }
       // Filter airing status
-      case RSS_FILTER_AIRINGSTATUS: {
+      case FEED_FILTER_AIRINGSTATUS: {
         if (anime_index > 0 && 
           AnimeList.Item[anime_index].Series_Status == ToINT(FILTER.Value)) {
             return FALSE;
@@ -282,7 +282,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
         break;
       }
       // Filter watching status
-      case RSS_FILTER_WATCHINGSTATUS: {
+      case FEED_FILTER_WATCHINGSTATUS: {
         if (anime_index > 0 && 
           AnimeList.Item[anime_index].GetStatus() == ToINT(FILTER.Value)) {
             return FALSE;
@@ -300,7 +300,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
 
 // =============================================================================
 
-void CTorrents::ParseDescription(CRSSFeedItem& feed_item, const wstring& source) {
+void CTorrents::ParseDescription(CFeedItem& feed_item, const wstring& source) {
   // AnimeSuki
   if (InStr(source, L"animesuki", 0, true) > -1) {
     wstring size_str = L"Filesize: ";

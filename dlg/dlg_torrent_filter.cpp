@@ -74,12 +74,12 @@ BOOL CTorrentFilterWindow::OnInitDialog() {
   m_Combo.Attach(GetDlgItem(IDC_COMBO_FILTER_VALUE));
   RefreshComboBox(m_Filter.Type);
   switch (m_Filter.Type) {
-    case RSS_FILTER_KEYWORD:
+    case FEED_FILTER_KEYWORD:
       m_Combo.SetText(m_Filter.Value.c_str());
       m_Combo.SetEditSel(0, -1);
       break;
-    case RSS_FILTER_AIRINGSTATUS:
-    case RSS_FILTER_WATCHINGSTATUS:
+    case FEED_FILTER_AIRINGSTATUS:
+    case FEED_FILTER_WATCHINGSTATUS:
       int index = ToINT(m_Filter.Value);
       if (index == MAL_PLANTOWATCH) index--;
       m_Combo.SetCurSel(index - 1);
@@ -94,11 +94,11 @@ void CTorrentFilterWindow::OnOK() {
   m_Filter.Option = GetCheckedRadioButton(IDC_RADIO_FILTER_OPTION1, IDC_RADIO_FILTER_OPTION3);
   m_Filter.Type = GetCheckedRadioButton(IDC_RADIO_FILTER_TYPE1, IDC_RADIO_FILTER_TYPE3);
   switch (m_Filter.Type) {
-    case RSS_FILTER_KEYWORD:
+    case FEED_FILTER_KEYWORD:
       m_Combo.GetText(m_Filter.Value);
       break;
-    case RSS_FILTER_AIRINGSTATUS:
-    case RSS_FILTER_WATCHINGSTATUS:
+    case FEED_FILTER_AIRINGSTATUS:
+    case FEED_FILTER_WATCHINGSTATUS:
       int index = m_Combo.GetCurSel() + 1;
       if (index == MAL_UNKNOWN) index++;
       m_Filter.Value = ToWSTR(index);
@@ -154,11 +154,11 @@ void CTorrentFilterWindow::RefreshComboBox(int type) {
   ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rect));
   
   // Save text
-  if (m_iLastType == RSS_FILTER_KEYWORD) m_Combo.GetText(m_LastKeyword);
+  if (m_iLastType == FEED_FILTER_KEYWORD) m_Combo.GetText(m_LastKeyword);
   m_iLastType = type;
 
   // Re-create window
-  DWORD style = type == RSS_FILTER_KEYWORD ? CBS_DROPDOWN : CBS_DROPDOWNLIST;
+  DWORD style = type == FEED_FILTER_KEYWORD ? CBS_DROPDOWN : CBS_DROPDOWNLIST;
   m_Combo.Create(0, WC_COMBOBOX, NULL, 
     style | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE, 
     rect.left, rect.top, width, height, 
@@ -166,17 +166,17 @@ void CTorrentFilterWindow::RefreshComboBox(int type) {
 
   // Add items
   switch (type) {
-    case RSS_FILTER_KEYWORD:
+    case FEED_FILTER_KEYWORD:
       m_Combo.SetText(m_LastKeyword);
       break;
-    case RSS_FILTER_AIRINGSTATUS:
+    case FEED_FILTER_AIRINGSTATUS:
       m_Combo.ResetContent();
       for (int i = 0; i < 3; i ++) {
         m_Combo.AddString(MAL.TranslateStatus(i + 1).c_str());
       }
       m_Combo.SetCurSel(0);
       break;
-    case RSS_FILTER_WATCHINGSTATUS:
+    case FEED_FILTER_WATCHINGSTATUS:
       m_Combo.ResetContent();
       for (int i = 0; i < 6; i ++) {
         if (i != 4) {

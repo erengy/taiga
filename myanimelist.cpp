@@ -379,25 +379,30 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
 
 void CMyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 30
+  #define HTMLCHARCOUNT 32
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
+    /* Extreme measures */
+    // black star (black and white stars are encoded the same in API >_<)
+    {L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"},
+    // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
+    {L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"},
+    // Onegai My Melody Kirara complete encode (spare the star, because I can't crack that damn encoding so it will work with the rest of this crappy encoding mal employs in their API)...
+    {L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&curren;&atilde;\uFFFD&iexcl;&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound; &atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound;", 
+     L"\u304A\u306D\u304C\u3044\u30DE\u30A4\u30E1\u30ED\u30C7\u30A3 \u304D\u3089\u3089\u3063"},
     /* Characters are sorted by their Unicode value */
-		{L"&sup3;&para;",           L"\u5CF6"},   // han character 'island'
     {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2
     {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
     {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
     {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
-		{L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"}, // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
     {L"&Atilde;&uml;",          L"\u00E8"},   // small e, grave accent
     {L"&Atilde;&copy;",         L"\u00E9"},   // small e, acute accent
     {L"&Atilde;&frac14;",       L"\u00FC"},   // small u, umlaut mark
     {L"&Aring;&laquo;",         L"\u016B"},   // small u, macron mark
-    {L"k&acirc;\uFFFD\uFFFDR",  L"k\u2605R"}, // black star (black and white stars are encoded the same in API >_<)
+    {L"&Icirc;&nbsp;",          L"\u03A0"},   // greek capital letter pi
+    {L"&Icirc;&pound;",         L"\u03A3"},   // greek capital letter sigma
     {L"&acirc;\uFFFD&yen;",     L"\u2665"},   // heart
     {L"&acirc;\uFFFD&ordf;",    L"\u266A"},   // eighth note
     {L"&acirc;\uFFFD\uFFFD",    L"\u2729"},   // white star
-		{L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&curren;&atilde;\uFFFD&iexcl;&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound; &atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound;",
-		 L"\u304A\u306D\u304C\u3044\u30DE\u30A4\u30E1\u30ED\u30C7\u30A3 \u304D\u3089\u3089\u3063"},		// Onegai My Melody Kirara complete encode (spare the star, because I can't crack that damn encoding so it will work with the rest of this crappy encoding mal employs in their API)...
     {L"&atilde;\uFFFD&ordf;",   L"\u30AA"},   // katakana letter o
     {L"&atilde;\uFFFD&not;",    L"\u30AC"},   // katakana letter ga
     {L"&atilde;\uFFFD&macr;",   L"\u30AF"},   // katakana letter ku
@@ -405,10 +410,11 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&atilde;\uFFFD\uFFFD",   L"\u30CD"},   // katakana letter ne
     {L"&atilde;\uFFFD&iexcl;",  L"\u30E1"},   // katakana letter me
     {L"&aring;\uFFFD&shy;",     L"\u516D"},   // han character 'number six'
-    {L"&aring;&iquest;\uFFFD",  L"\u5FCD"},	  // endure
-    {L"&aelig;\uFFFD\uFFFD",    L"\u624B"},	  // hand
-    {L"&aelig;\uFFFD&frac14;",  L"\u62BC"},	  // mortgage
-    {L"&ccedil;&copy;&ordm;",   L"\u7A7A"},	  // empty
+    {L"&sup3;&para;",           L"\u5CF6"},   // han character 'island'
+    {L"&aring;&iquest;\uFFFD",  L"\u5FCD"},   // endure
+    {L"&aelig;\uFFFD\uFFFD",    L"\u624B"},   // hand
+    {L"&aelig;\uFFFD&frac14;",  L"\u62BC"},   // mortgage
+    {L"&ccedil;&copy;&ordm;",   L"\u7A7A"},   // empty
     {L"&eacute;\uFFFD&uml;",    L"\u90E8"},   // division
     /* Keep these at the end so they get replaced after others that include \uFFFD */
     {L"&Atilde;\uFFFD",         L"\u00DF"},   // small sharp s, German

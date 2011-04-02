@@ -20,10 +20,10 @@
 #include "../common.h"
 #include "dlg_settings.h"
 #include "dlg_torrent.h"
+#include "../feed.h"
 #include "../gfx.h"
 #include "../http.h"
 #include "../resource.h"
-#include "../rss.h"
 #include "../settings.h"
 #include "../string.h"
 #include "../taiga.h"
@@ -183,7 +183,7 @@ BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Download selected torrents
     case 101: {
       for (int i = 0; i < m_List.GetItemCount(); i++) {
-        CRSSFeedItem* pFeed = reinterpret_cast<CRSSFeedItem*>(m_List.GetItemParam(i));
+        CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
         if (pFeed) {
           pFeed->Download = m_List.GetCheckState(i);
         }
@@ -232,7 +232,7 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (m_List.GetSelectedCount() > 0) {
           LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
           if (lpnmitem->iItem == -1) break;
-          CRSSFeedItem* pFeed = reinterpret_cast<CRSSFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
+          CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
           if (pFeed) {
             Torrents.Download(pFeed->Index);
           }
@@ -244,7 +244,7 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case NM_RCLICK: {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
         if (lpnmitem->iItem == -1) break;
-        CRSSFeedItem* pFeed = reinterpret_cast<CRSSFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
+        CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
         if (pFeed) {
           wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
@@ -278,7 +278,7 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
               pCD->clrTextBk = RGB(248, 248, 248);
             }
             // Change text color
-            CRSSFeedItem* pFeed = reinterpret_cast<CRSSFeedItem*>(pCD->nmcd.lItemlParam);
+            CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(pCD->nmcd.lItemlParam);
             if (pFeed) {
               if (pFeed->EpisodeData.Index == -1) {
                 pCD->clrText = RGB(180, 180, 180);

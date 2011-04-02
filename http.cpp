@@ -30,10 +30,10 @@
 #include "dlg/dlg_torrent.h"
 #include "dlg/dlg_update.h"
 #include "event.h"
+#include "feed.h"
 #include "http.h"
 #include "myanimelist.h"
 #include "resource.h"
-#include "rss.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -329,7 +329,7 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Delete anime
     case HTTP_MAL_AnimeDelete: {
-      if (MAL.UpdateSucceeded(GetData(),HTTP_MAL_AnimeDelete)) {
+      if (MAL.UpdateSucceeded(GetData(), HTTP_MAL_AnimeDelete)) {
         if (pItem) {
           MainWindow.ChangeStatus(L"Item deleted. (" + pItem->Series_Title + L")");
           AnimeList.DeleteItem(pItem->Index);
@@ -343,6 +343,7 @@ BOOL CHTTPClient::OnReadComplete() {
       } else {
         MainWindow.ChangeStatus(L"Error: " + GetData());
       }
+      break;
     }
 
     // =========================================================================
@@ -447,7 +448,7 @@ BOOL CHTTPClient::OnReadComplete() {
     }
     case HTTP_TorrentDownload:
     case HTTP_TorrentDownloadAll: {
-      CRSSFeedItem* pFeed = reinterpret_cast<CRSSFeedItem*>(GetParam());
+      CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(GetParam());
       if (pFeed) {
         wstring app_path, cmd, file = pFeed->Title + L".torrent";
         ValidateFileName(file);

@@ -130,7 +130,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
   episode.Clear();
 
   // Remove zero width space character
-  Erase(title, L"\u200B");
+  EraseChars(title, L"\u200B");
                   
   // Trim media player name
   MediaPlayers.EditTitle(title);
@@ -353,15 +353,15 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
       episode.Resolution = words[i];
       RemoveWordFromToken(false);
     // Video info
-    } else if (CompareKeys(words[i], Meow.VideoKeywords)) {
+    } else if (CompareKeys(words[i], VideoKeywords)) {
       AppendKeyword(episode.VideoType, words[i]);
       RemoveWordFromToken(true);
     // Audio info
-    } else if (CompareKeys(words[i], Meow.AudioKeywords)) {
+    } else if (CompareKeys(words[i], AudioKeywords)) {
       AppendKeyword(episode.AudioType, words[i]);
       RemoveWordFromToken(true);
     // Version
-    } else if (episode.Version.empty() && CompareKeys(words[i], Meow.VersionKeywords)) {
+    } else if (episode.Version.empty() && CompareKeys(words[i], VersionKeywords)) {
       episode.Version.push_back(words[i].at(words[i].length() - 1));
       RemoveWordFromToken(true);
     // Episode number
@@ -372,13 +372,13 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
     } else if (episode.Number.empty() && (i == 0 || i == words.size() - 1) && IsNumeric(words[i])) {
       episode.Number = words[i];
       if (!ValidateEpisodeNumber(episode)) continue;
-      if (i > 0 && CompareKeys(words[i - 1], Meow.EpisodeKeywords)) Erase(token.Content, words[i - 1], true);
+      if (i > 0 && CompareKeys(words[i - 1], EpisodeKeywords)) Erase(token.Content, words[i - 1], true);
       RemoveWordFromToken(false);
     // Extras
-    } else if (compare_extras && CompareKeys(words[i], Meow.ExtraKeywords)) {
+    } else if (compare_extras && CompareKeys(words[i], ExtraKeywords)) {
       AppendKeyword(episode.Extra, words[i]);
       RemoveWordFromToken(true);
-    } else if (compare_extras && CompareKeys(words[i], Meow.ExtraUnsafeKeywords)) {
+    } else if (compare_extras && CompareKeys(words[i], ExtraUnsafeKeywords)) {
       AppendKeyword(episode.Extra, words[i]);
       if (IsTokenEnclosed(token)) RemoveWordFromToken(true);
     }
@@ -436,7 +436,7 @@ bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode) {
 
   // Check for episode prefix
   if (numstart != 0) {
-    if (!CompareKeys(str.substr(0,numstart),Meow.EpisodePrefixes)) return false;
+    if (!CompareKeys(str.substr(0, numstart), EpisodePrefixes)) return false;
   }
 
   for (i = numstart; i < str.length(); i++) {
@@ -446,12 +446,14 @@ bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode) {
         if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
         for(j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
         if (ToINT(str.substr(numstart, i-numstart)) + 1 == ToINT(str.substr(i + 1, j - 1 - i))) {
-          episode.Number = str.substr(numstart,j - numstart);
+          episode.Number = str.substr(numstart, j - numstart);
           // ##-##v#
-          if(j < str.length() - 1 && (str.at(j) == 'v' || str.at(j) =='V')) {
+          if (j < str.length() - 1 && (str.at(j) == 'v' || str.at(j) =='V')) {
             numstart = i + 1;
             continue;
-          } else return true;
+          } else {
+            return true;
+          }
         } else {
           episode.Number.clear();
           return false;
@@ -469,7 +471,7 @@ bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode) {
 
   // EP.##
   if (numstart != 0) {
-    episode.Number = str.substr(numstart,str.length() - numstart);
+    episode.Number = str.substr(numstart, str.length() - numstart);
     if (!ValidateEpisodeNumber(episode)) return false;
     return true;
   }
@@ -528,13 +530,13 @@ size_t CRecognition::TokenizeTitle(const wstring& str, const wstring& delimiters
 }
 
 void CRecognition::TrimEpisodeWord(wstring& str, bool erase_rightleft) {
+  for (unsigned int i = 0; i < EpisodeKeywords.size(); i++) {
     if (erase_rightleft) {
-      for (unsigned int j = 0; j < Meow.EpisodeKeywords.size(); j++)
-        EraseRight(str, L" " + Meow.EpisodeKeywords[j], true);
+      EraseRight(str, L" " + EpisodeKeywords[i], true);
     } else {
-      for (unsigned int j = 0; j < Meow.EpisodeKeywords.size(); j++)
-        EraseLeft(str, Meow.EpisodeKeywords[j] + L" ", true);
+      EraseLeft(str, EpisodeKeywords[i] + L" ", true);
     }
+  }
 }
 
 bool CRecognition::ValidateEpisodeNumber(CEpisode& episode) {

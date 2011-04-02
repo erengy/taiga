@@ -16,11 +16,63 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef RSS_H
-#define RSS_H
+#ifndef FEED_H
+#define FEED_H
 
 #include "std.h"
 #include "animelist.h"
+
+// =============================================================================
+
+class CFeedItem {
+public:
+  CFeedItem();
+  ~CFeedItem() {};
+
+  wstring Title, Link, Description;
+  wstring Author, Category, Comments, Enclosure, GUID, PubDate, Source;
+
+  int Index;
+  wstring Size;
+  CEpisode EpisodeData;
+  BOOL NewItem, Download;
+};
+
+class CFeed {
+public:
+  // Required channel elements
+  wstring Title, Link, Description;
+
+  // Optional elements
+  /*
+  wstring language, copyright, managingEditor, webMaster, pubDate, 
+    lastBuildDate, category, generator, docs, cloud, ttl, image, 
+    rating, textInput, skipHours, skipDays;
+  */
+  
+  // Feed items
+  vector<CFeedItem> Item;
+};
+
+// =============================================================================
+
+enum FeedFilterOption {
+  FEED_FILTER_EXCLUDE,
+  FEED_FILTER_INCLUDE,
+  FEED_FILTER_PREFERENCE
+};
+
+enum FeedFilterType {
+  FEED_FILTER_KEYWORD,
+  FEED_FILTER_AIRINGSTATUS,
+  FEED_FILTER_WATCHINGSTATUS
+};
+
+class CFeedFilter {
+public:
+  int Option, Type;
+  wstring Value;
+};
 
 // =============================================================================
 
@@ -28,41 +80,6 @@ enum TorrentCategory {
   TORRENT_ANIME,
   TORRENT_BATCH,
   TORRENT_OTHER
-};
-
-class CRSSFeedItem {
-public:
-  CRSSFeedItem();
-  ~CRSSFeedItem() {};
-
-  wstring Category, Description, Link, Size, Title;
-  BOOL NewItem, Download;
-  int Index;
-  CEpisode EpisodeData;
-};
-
-class CRSSFeed {
-public:
-  wstring Title, Link, Description;
-  vector<CRSSFeedItem> Item;
-};
-
-enum RssFilterOption {
-  RSS_FILTER_EXCLUDE,
-  RSS_FILTER_INCLUDE,
-  RSS_FILTER_PREFERENCE
-};
-
-enum RssFilterType {
-  RSS_FILTER_KEYWORD,
-  RSS_FILTER_AIRINGSTATUS,
-  RSS_FILTER_WATCHINGSTATUS
-};
-
-class CRSSFilter {
-public:
-  int Option, Type;
-  wstring Value;
 };
 
 class CTorrents {
@@ -77,13 +94,13 @@ public:
   void AddFilter(int option, int type, wstring value);
   BOOL Filter(int feed_index, int anime_index);
   
-  CRSSFeed Feed;
+  CFeed Feed;
   vector<wstring> Archive;
 
 private:
-  void ParseDescription(CRSSFeedItem& feed_item, const wstring& source);
+  void ParseDescription(CFeedItem& feed_item, const wstring& source);
 };
 
 extern CTorrents Torrents;
 
-#endif // RSS_H
+#endif // FEED_H

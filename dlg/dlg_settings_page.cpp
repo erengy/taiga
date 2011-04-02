@@ -621,7 +621,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 // =============================================================================
 
-void AddTorrentFilterFromList(HWND hwnd_list, int item_index, vector<CRSSFilter>& filter_vector) {
+void AddTorrentFilterFromList(HWND hwnd_list, int item_index, vector<CFeedFilter>& filter_vector) {
   wstring option_str, type_str, value;
   int option = 0, type = 0;
 

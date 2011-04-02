@@ -61,8 +61,8 @@ private:
   HTREEITEM m_hTreeItem;
 };
 
-class CRSSFilter;
-void AddTorrentFilterFromList(HWND hwnd_list, int item_index, vector<CRSSFilter>& filter_vector);
+class CFeedFilter;
+void AddTorrentFilterFromList(HWND hwnd_list, int item_index, vector<CFeedFilter>& filter_vector);
 void AddTorrentFilterToList(HWND hwnd_list, int option, int type, wstring value);
 
 #endif // DLG_SETTINGS_PAGE_H

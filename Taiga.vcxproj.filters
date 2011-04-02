@@ -141,9 +141,6 @@
     <ClCompile Include="recognition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rss.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="script.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -303,6 +300,9 @@
     <ClCompile Include="update.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="feed.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -384,9 +384,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rss.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="settings.h">
@@ -495,6 +492,9 @@
       <Filter>Dialogs\Headers</Filter>
     </ClInclude>
     <ClInclude Include="update.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="feed.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
