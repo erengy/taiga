@@ -158,7 +158,7 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
   switch (Settings.Account.MAL.API) {
     // Use official MAL API
     case MAL_API_OFFICIAL: {
-      // Buil XML data
+      // Build XML data
       wstring data = L"data=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<entry>";
         ADD_DATA_I(L"episode", anime.episode);
         ADD_DATA_I(L"status", anime.status);
@@ -265,11 +265,15 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
             L"", update_mode, reinterpret_cast<LPARAM>(&ANIME));
           break;
         // Delete anime
-        case HTTP_MAL_AnimeDelete: // TODO
-          /*MainClient.Post(L"myanimelist.net", 
-            L"/editlist.php?type=anime",
-            L"id=" + ToWSTR(ANIME.My_ID) + L"&submitIt=3", 
-            L"", update_mode, reinterpret_cast<LPARAM>(&ANIME));*/
+        case HTTP_MAL_AnimeDelete: 
+          MainClient.Post(L"myanimelist.net", 
+            L"/editlist.php?type=anime&id=" + ToWSTR(ANIME.My_ID), 
+            L"series_id=" + ToWSTR(ANIME.My_ID) +
+            L"&anime_db_series_id=" + ToWSTR(anime_id) + 
+            L"&series_title=" + ToWSTR(anime_id) + 
+            L"&submitIt=3" + 
+            L"&hideLayout",
+            L"", update_mode, reinterpret_cast<LPARAM>(&ANIME));
           break;
         // Update status
         case HTTP_MAL_StatusUpdate:
@@ -343,6 +347,8 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
       switch (update_mode) {
         case HTTP_MAL_AnimeAdd:
           return IsNumeric(data);
+        case HTTP_MAL_AnimeDelete:
+          return data == L"Deleted";
         default:
           return data == L"Updated";
       }
@@ -359,6 +365,7 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int epi
         case HTTP_MAL_TagUpdate:
           return tags.empty() ? data.empty() : InStr(data, L"/animelist/", 0) > -1;
         case HTTP_MAL_AnimeEdit:
+        case HTTP_MAL_AnimeDelete:
         case HTTP_MAL_StatusUpdate:
           return InStr(data, L"Success", 0) > -1;
       }

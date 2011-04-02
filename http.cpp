@@ -329,28 +329,20 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Delete anime
     case HTTP_MAL_AnimeDelete: {
-      switch (Settings.Account.MAL.API) {
-        case MAL_API_OFFICIAL:
-          if (GetData() == L"Deleted") {
-            if (pItem) {
-              MainWindow.ChangeStatus(L"Item deleted. (" + pItem->Series_Title + L")");
-              AnimeList.DeleteItem(pItem->Index);
-            }
-            MainWindow.RefreshList();
-            MainWindow.RefreshTabs();
-            SearchWindow.PostMessage(WM_CLOSE);
-            EventQueue.Remove();
-            EventQueue.Check();
-            return TRUE;
-          } else {
-            MainWindow.ChangeStatus(L"Error: " + GetData());
-          }
-          break;
-        case MAL_API_NONE:
-          // TODO
-          break;
+      if (MAL.UpdateSucceeded(GetData(),HTTP_MAL_AnimeDelete)) {
+        if (pItem) {
+          MainWindow.ChangeStatus(L"Item deleted. (" + pItem->Series_Title + L")");
+          AnimeList.DeleteItem(pItem->Index);
+        }
+        MainWindow.RefreshList();
+        MainWindow.RefreshTabs();
+        SearchWindow.PostMessage(WM_CLOSE);
+        EventQueue.Remove();
+        EventQueue.Check();
+        return TRUE;
+      } else {
+        MainWindow.ChangeStatus(L"Error: " + GetData());
       }
-      break;
     }
 
     // =========================================================================
