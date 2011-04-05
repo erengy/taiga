@@ -484,13 +484,10 @@ void CAnime::SetFinishDate(wstring date, bool ignore_previous) {
 // =============================================================================
 
 void CAnime::Edit(const wstring& data, CEventItem item) {
-  // Check success
-  bool success = MAL.UpdateSucceeded(data, item.Mode, item.episode, item.tags);
-
-  // Show balloon tip
-  if (!success) {
+  // Show balloon tip on failure
+  if (!MAL.UpdateSucceeded(data, item)) {
     wstring text = L"Title: " + Series_Title;
-    text += L"\nReason: " + (data.empty() ? L"-" : data);
+    text += L"\nReason: " + (item.Reason.empty() ? L"-" : item.Reason);
     text += L"\nClick to try again.";
     Taiga.CurrentTipType = TIPTYPE_UPDATEFAILED;
     Taskbar.Tip(L"", L"", 0);
@@ -510,8 +507,8 @@ void CAnime::Edit(const wstring& data, CEventItem item) {
   }
   // Edit status
   if (item.status > 0) {
+    AnimeList.User.IncreaseItemCount(item.status, 1, false);
     AnimeList.User.IncreaseItemCount(My_Status, -1);
-    AnimeList.User.IncreaseItemCount(item.status, 1);
     My_Status = item.status;
     AnimeList.Write(item.AnimeIndex, L"my_status", ToWSTR(My_Status));
   }
@@ -520,7 +517,7 @@ void CAnime::Edit(const wstring& data, CEventItem item) {
     My_Rewatching = item.enable_rewatching;
     AnimeList.Write(item.AnimeIndex, L"my_rewatching", ToWSTR(My_Rewatching));
   }
-  // Edit ID
+  // Edit ID (Add)
   if (item.Mode == HTTP_MAL_AnimeAdd) {
     My_ID = ToINT(data);
     AnimeList.Write(item.AnimeIndex, L"my_id", data);
@@ -529,6 +526,13 @@ void CAnime::Edit(const wstring& data, CEventItem item) {
   if (item.tags != EMPTY_STR) {
     My_Tags = item.tags;
     AnimeList.Write(item.AnimeIndex, L"my_tags", My_Tags);
+  }
+  // Delete
+  if (item.Mode == HTTP_MAL_AnimeDelete) {
+    MainWindow.ChangeStatus(L"Item deleted. (" + Series_Title + L")");
+    AnimeList.DeleteItem(item.AnimeIndex);
+    MainWindow.RefreshList();
+    MainWindow.RefreshTabs();
   }
 
   // Remove item from update buffer

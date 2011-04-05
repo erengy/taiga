@@ -21,6 +21,7 @@
 #include "common.h"
 #include "http.h"
 #include "myanimelist.h"
+#include "event.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -341,36 +342,69 @@ void CMyAnimeList::Update(CMALAnimeValues anime, int list_index, int anime_id, i
   #undef ANIME
 }
 
-bool CMyAnimeList::UpdateSucceeded(const wstring& data, int update_mode, int episode, const wstring& tags) {
+bool CMyAnimeList::UpdateSucceeded(const wstring& data, CEventItem& item) {
+  int update_mode = item.Mode;
+  bool success = false;
+  
   switch (Settings.Account.MAL.API) {
     case MAL_API_OFFICIAL: {
       switch (update_mode) {
         case HTTP_MAL_AnimeAdd:
-          return IsNumeric(data);
+          success = IsNumeric(data);
+          break;
         case HTTP_MAL_AnimeDelete:
-          return data == L"Deleted";
+          success = data == L"Deleted";
+          break;
         default:
-          return data == L"Updated";
+          success = data == L"Updated";
+          break;
       }
       break;
     }
     case MAL_API_NONE: {
       switch (update_mode) {
         case HTTP_MAL_AnimeAdd:
-          return true; // TODO
-        case HTTP_MAL_AnimeUpdate:
-          return ToINT(data) == episode;
-        case HTTP_MAL_ScoreUpdate:
-          return InStr(data, L"Updated score", 0) > -1;
-        case HTTP_MAL_TagUpdate:
-          return tags.empty() ? data.empty() : InStr(data, L"/animelist/", 0) > -1;
-        case HTTP_MAL_AnimeEdit:
+          success = true; // TODO
+          break;
         case HTTP_MAL_AnimeDelete:
+          success = (InStr(data, L"Success", 0) > -1) || (InStr(data, L"This is not your entry", 0) > -1);
+          break;
+        case HTTP_MAL_AnimeUpdate:
+          success = ToINT(data) == item.episode;
+          break;
+        case HTTP_MAL_ScoreUpdate:
+          success = InStr(data, L"Updated score", 0) > -1;
+          break;
+        case HTTP_MAL_TagUpdate:
+          success = item.tags.empty() ? data.empty() : InStr(data, L"/animelist/", 0) > -1;
+          break;
+        case HTTP_MAL_AnimeEdit:
         case HTTP_MAL_StatusUpdate:
-          return InStr(data, L"Success", 0) > -1;
+          success = InStr(data, L"Success", 0) > -1;
+          break;
       }
       break;
     }
+  }
+  if (success) return true;
+
+  // Set error message on failure     
+  switch (Settings.Account.MAL.API) {
+    case MAL_API_OFFICIAL:
+      item.Reason = data;
+      break;
+    case MAL_API_NONE:
+      switch (update_mode) {
+        case HTTP_MAL_AnimeDelete:
+          item.Reason = InStr(data, L"class=\"badresult\">", L"</div>");
+          if (item.Reason.empty()) item.Reason = data;
+          StripHTML(item.Reason);
+          break;
+        default:
+          item.Reason = data;
+          StripHTML(item.Reason);
+          break;
+      }
   }
   return false;
 }

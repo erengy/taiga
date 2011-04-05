@@ -316,7 +316,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
       // Add item to list
       AnimeList.AddItem(*pAnimeItem);
-      AnimeList.User.IncreaseItemCount(status, 1);
       AnimeList.Write(AnimeList.Count, L"", L"", ANIMELIST_ADDANIME);
       // Refresh
       if (CurrentEpisode.Index == -1) CurrentEpisode.Index = 0;

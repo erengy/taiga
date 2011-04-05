@@ -327,29 +327,9 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // =========================================================================
 
-    // Delete anime
-    case HTTP_MAL_AnimeDelete: {
-      if (MAL.UpdateSucceeded(GetData(), HTTP_MAL_AnimeDelete)) {
-        if (pItem) {
-          MainWindow.ChangeStatus(L"Item deleted. (" + pItem->Series_Title + L")");
-          AnimeList.DeleteItem(pItem->Index);
-        }
-        MainWindow.RefreshList();
-        MainWindow.RefreshTabs();
-        SearchWindow.PostMessage(WM_CLOSE);
-        EventQueue.Remove();
-        EventQueue.Check();
-        return TRUE;
-      } else {
-        MainWindow.ChangeStatus(L"Error: " + GetData());
-      }
-      break;
-    }
-
-    // =========================================================================
-
     // Update list
     case HTTP_MAL_AnimeAdd:
+    case HTTP_MAL_AnimeDelete:
     case HTTP_MAL_AnimeEdit:
     case HTTP_MAL_AnimeUpdate:
     case HTTP_MAL_ScoreUpdate:
@@ -360,6 +340,7 @@ BOOL CHTTPClient::OnReadComplete() {
       if (pItem && EventQueue.GetItemCount() > 0) {
         int user_index = EventQueue.GetUserIndex();
         if (user_index > -1) {
+          if(GetClientMode() == HTTP_MAL_AnimeDelete) SearchWindow.PostMessage(WM_CLOSE);
           pItem->Edit(GetData(), EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]);
           return TRUE;
         }

@@ -107,7 +107,7 @@ public:
   bool Login();
   BOOL SearchAnime(wstring title, CAnime* pAnimeItem = NULL);
   void Update(CMALAnimeValues anime, int list_index, int anime_id, int update_mode);
-  bool UpdateSucceeded(const wstring& data, int update_mode, int episode = -1, const wstring& tags = L"");
+  bool UpdateSucceeded(const wstring& data, CEventItem& item);
   
   void DecodeText(wstring& text);
   bool IsValidDate(const wstring& date);
