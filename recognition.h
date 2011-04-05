@@ -58,7 +58,7 @@ private:
   void CleanTitle(wstring& title);
   void EraseUnnecessary(wstring& str);
   void TransliterateSpecial(wstring& str);
-  bool IsEpisodeFormat(const wstring& str, CEpisode& episode);
+  bool IsEpisodeFormat(const wstring& str, CEpisode& episode, const wchar_t separator = ' ');
   bool IsResolution(const wstring& str);
   bool IsTokenEnclosed(const CToken& token);
   void ReadKeyword(unsigned int uID, vector<wstring>& str);

@@ -37,7 +37,13 @@ public:
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
-  vector<CEpisode> m_EpisodeList, m_EpisodeListTest;
+  class CEpisodeTest : public CEpisode {
+  public:
+    CEpisodeTest() : Priority(0) {}
+    int Priority;
+  };
+  vector<CEpisodeTest> m_EpisodeList, m_EpisodeListTest;
+  
   CListView m_List;
 };
 

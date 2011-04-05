@@ -215,12 +215,12 @@ bool CSettings::Read() {
   for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
       CEventItem event_item;
-      event_item.AnimeIndex = item.attribute(L"index").as_int();
-      event_item.AnimeID = item.attribute(L"id").as_int();
-      event_item.episode = item.attribute(L"episode").as_int();
-      event_item.score = item.attribute(L"score").as_int();
-      event_item.status = item.attribute(L"status").as_int();
-      event_item.enable_rewatching = item.attribute(L"rewatch").as_int();
+      event_item.AnimeIndex = item.attribute(L"index").as_int(-1);
+      event_item.AnimeID = item.attribute(L"id").as_int(-1);
+      event_item.episode = item.attribute(L"episode").as_int(-1);
+      event_item.score = item.attribute(L"score").as_int(-1);
+      event_item.status = item.attribute(L"status").as_int(-1);
+      event_item.enable_rewatching = item.attribute(L"rewatch").as_int(-1);
       event_item.tags = item.attribute(L"tags").value();
       event_item.Time = item.attribute(L"time").value();
       event_item.Mode = item.attribute(L"mode").as_int();
@@ -451,15 +451,19 @@ bool CSettings::Write() {
       for (size_t j = 0; j < EventQueue.List[i].Item.size(); j++) {
         xml_node item = user.append_child();
         item.set_name(L"event");
-        item.append_attribute(L"index")   = EventQueue.List[i].Item[j].AnimeIndex;
-        item.append_attribute(L"id")      = EventQueue.List[i].Item[j].AnimeID;
-        item.append_attribute(L"episode") = EventQueue.List[i].Item[j].episode;
-        item.append_attribute(L"score")   = EventQueue.List[i].Item[j].score;
-        item.append_attribute(L"status")  = EventQueue.List[i].Item[j].status;
-        item.append_attribute(L"rewatch") = EventQueue.List[i].Item[j].enable_rewatching;
-        item.append_attribute(L"tags")    = EventQueue.List[i].Item[j].tags.c_str();
-        item.append_attribute(L"time")    = EventQueue.List[i].Item[j].Time.c_str();
-        item.append_attribute(L"mode")    = EventQueue.List[i].Item[j].Mode;
+        #define APPEND_ATTRIBUTE_INT(x, y) \
+          if (EventQueue.List[i].Item[j].y > -1) \
+          item.append_attribute(x) = EventQueue.List[i].Item[j].y;
+        APPEND_ATTRIBUTE_INT(L"mode", Mode);
+        APPEND_ATTRIBUTE_INT(L"index", AnimeIndex);
+        APPEND_ATTRIBUTE_INT(L"id", AnimeID);
+        APPEND_ATTRIBUTE_INT(L"episode", episode);
+        APPEND_ATTRIBUTE_INT(L"score", score);
+        APPEND_ATTRIBUTE_INT(L"status", status);
+        APPEND_ATTRIBUTE_INT(L"rewatch", enable_rewatching);
+        item.append_attribute(L"tags") = EventQueue.List[i].Item[j].tags.c_str();
+        item.append_attribute(L"time") = EventQueue.List[i].Item[j].Time.c_str();
+        #undef APPEND_ATTRIBUTE
       }
     }
   }

@@ -413,6 +413,7 @@
 		<format>MKV</format>
 		<group>HorribleSubs</group>
 		<number>10</number>
+		<priority>-1</priority>
 		<title>HEROMAN</title>
 		<video>XviD</video>
 	</file>
@@ -508,15 +509,16 @@
 		<video>x264</video>
 	</file>
 	<file>
-		<file>[SFW]​_Queen's​_Blade​_S2</file>
+		<file>[SFW]_Queen's_Blade_S2</file>
 		<group>SFW</group>
 		<title>Queen's Blade S2</title>
 	</file>
 	<file>
-		<file>Evangelion​_1.​0​_You​_Are​_[Not]​_Alone​_(1080p)​_[@Home]</file>
+		<file>Evangelion_1.0_You_Are_[Not]_Alone_(1080p)_[@Home]</file>
 		<group>@Home</group>
+		<priority>-1</priority>
 		<resolution>1080p</resolution>
-		<title>Evangelion​ 1.​0​ You​ Are​ (Not) Alone​</title>
+		<title>Evangelion 1.0 You Are (Not) Alone</title>
 	</file>
 	<file>
 		<file>[Ayako]_Infinite_Stratos_-_IS_-_01v2_[XVID][400p][29675B71].avi</file>
@@ -541,7 +543,7 @@
 		<video>h264</video>
 	</file>
 	<file>
-		<file>[Edomae Subs] Kore wa Zombie desu ka  Episode 2.​mkv</file>
+		<file>[Edomae Subs] Kore wa Zombie desu ka  Episode 2.mkv</file>
 		<format>MKV</format>
 		<group>Edomae Subs</group>
 		<number>2</number>
@@ -565,7 +567,34 @@
 		<checksum>FE68D5F1</checksum>
 		<format>AVI</format>
 		<number>148</number>
+		<priority>-1</priority>
 		<title>Keroro</title>
 		<video>Xvid</video>
+	</file>
+	<file>
+		<file>5_centimeters_per_second[1904x1072.h264.flac][niizk].mkv</file>
+		<audio>flac</audio>
+		<format>MKV</format>
+		<group>niizk</group>
+		<resolution>1904x1072</resolution>
+		<title>5 centimeters per second</title>
+		<video>h264</video>
+	</file>
+	<file>
+		<file>[Yoroshiku]_009-1_-_02_(H264)_[36D2444D].mkv</file>
+		<checksum>36D2444D</checksum>
+		<format>MKV</format>
+		<group>Yoroshiku</group>
+		<number>02</number>
+		<title>009-1</title>
+		<video>H264</video>
+	</file>
+	<file>
+		<file>After War Gundam X - 1x03 - My Mount is Fierce!.mkv</file>
+		<checksum></checksum>
+		<format>MKV</format>
+		<name>My Mount is Fierce!</name>
+		<number>03</number>
+		<title>After War Gundam X</title>
 	</file>
 </recognition>

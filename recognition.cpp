@@ -154,6 +154,15 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  // Here we are, entering the world of tokens. Each token has four properties:
+  // * Content: Self-explanatory
+  // * Encloser: Can be empty or one of these characters: [](){}
+  // * Separator: The most common non-alphanumeric character - usually a space 
+  //   or an underscore
+  // * Virgin: All tokens start out as virgins but lose this property when some
+  //   keyword within is recognized and erased.
+
   // Tokenize
   vector<CToken> tokens;
   tokens.reserve(4);
@@ -172,6 +181,8 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
 
   // Tidy up tokens
   for (unsigned int i = 1; i < tokens.size() - 1; i++) {
+    // Combine remaining tokens that are enclosed with parentheses - this is
+    // especially useful for titles that include a year value and some other cases
     if (tokens[i - 1].Virgin == false || tokens[i].Virgin == false || 
       IsTokenEnclosed(tokens[i - 1]) == true || tokens[i].Encloser != '(' || 
       tokens[i - 1].Content.length() < 2) {
@@ -188,15 +199,19 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     i = 0;
   }
   for (unsigned int i = 0; i < tokens.size(); i++) {
+    // Trim separator character from each side of the token
     wchar_t trim_char[] = {tokens[i].Separator, '\0'};
     Trim(tokens[i].Content, trim_char);
-    if (tokens[i].Content.length() < 2) {
+    // Tokens that are too short are now garbage, so we take them out
+    if (tokens[i].Content.length() < 2 && !IsNumeric(tokens[i].Content)) {
       tokens.erase(tokens.begin() + i);
       i--;
     }
   }
 
-  // Get group name and title
+  //////////////////////////////////////////////////////////////////////////////
+  // Now we apply some logic to decide on the title and the group name
+
   int group_index = -1, title_index = -1;
   vector<int> group_vector, title_vector;
   for (unsigned int i = 0; i < tokens.size(); i++) {
@@ -206,95 +221,150 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
       title_vector.push_back(i);
     }
   }
+
+  // Choose the first free token as the title, if there is one
   if (title_vector.size() > 0) {
     title_index = title_vector[0];
     title_vector.erase(title_vector.begin());
   } else {
+    // Choose the second enclosed token as the title, if there is more than one
+    // (it is more probable that the group name comes before the title)
     if (group_vector.size() > 1) {
       title_index = group_vector[1];
       group_vector.erase(group_vector.begin() + 1);
+    // Choose the first enclosed token as the title, if there is one
+    // (which means that there is no group name available)
     } else if (group_vector.size() > 0) {
       title_index = group_vector[0];
       group_vector.erase(group_vector.begin());
     }
   }
+
+  // Choose the first enclosed virgin token as the group name
   for (unsigned int i = 0; i < group_vector.size(); i++) {
+    // Here we assume that group names are never enclosed with other keywords
     if (tokens[group_vector[i]].Virgin) {
       group_index = group_vector[i];
       group_vector.erase(group_vector.begin() + i);
       break;
     }
   }
+  // Group name might not be enclosed at all
+  // This is a special case for THORA releases, where the group name is at the end
   if (group_index == -1) {
     if (title_vector.size() > 0) {
       group_index = title_vector.back();
       title_vector.erase(title_vector.end() - 1);
     }
   }
+
+  // Do we have a title?
   if (title_index > -1) {
+    // Replace the separator with a space character
     ReplaceChar(tokens[title_index].Content, tokens[title_index].Separator, ' ');
+    // Do some clean-up
     Trim(tokens[title_index].Content, L" -");
+    // Set the title
     title = tokens[title_index].Content;
     tokens[title_index].Content.clear();
   }
+
+  // Do we have a group name?
   if (group_index > -1) {
+    // We don't want to lose any character if the token is enclosed, because
+    // those characters can be a part of the group name itself
     if (!IsTokenEnclosed(tokens[group_index])) {
+      // Replace the separator with a space character
       ReplaceChar(tokens[group_index].Content, tokens[group_index].Separator, ' ');
+      // Do some clean-up
       Trim(tokens[group_index].Content, L" -");
     }
+    // Set the group name
     episode.Group = tokens[group_index].Content;
-    tokens[group_index].Content.clear();
+    // We don't clear token content here, becuse we'll be checking it for
+    // episode number later on
   }
 
-  // Get episode number and version
-  if (examine_number && episode.Number.empty()) {
-    for (int i = title.length() - 1; i >= 0; i--) {
-      if (IsNumeric(title[i])) {
-        episode.Number = title[i] + episode.Number;
-      } else {
-        if (episode.Number.empty()) continue;
-        switch (title[i]) {
-          case '-': case '&':
-            episode.Number = L"-" + episode.Number;
-            break;
-          case 'v': case 'V':
-            episode.Version = episode.Number;
-            episode.Number.clear();
-            break;
-          case '(': case ')':
-            episode.Number.clear();
-            i = 0;
-            break;
-          case '.':
-            i = InStrRev(title, L" ", i);
-            episode.Number.clear();
-            break;
-          case ' ': { // TODO case tokens[title_index].Separator:
-            if (!ValidateEpisodeNumber(episode)) break;
-            // Break title into two parts
-            wstring str_left = title.substr(0, i + 1);
-            wstring str_right = title.substr(i + 1 + episode.Number.length());
-            // Tidy up strings
-            Replace(str_left, L"  ", L" ", true);
-            Replace(str_right, L"  ", L" ", true);
-            TrimLeft(episode.Number, L"-");
-            TrimRight(str_left);
-            TrimLeft(str_right);
-            TrimEpisodeWord(str_left, true);
-            TrimRight(str_left, L" -");
-            TrimLeft(str_right, L" -");
-            // Return title and name
-            title = str_left;
-            if (str_right.length() > 2) {
-              episode.Name = str_right;
-            }
-            i = 0;
-            break;
-          }
-          default:
-            episode.Number.clear();
-            break;
+  //////////////////////////////////////////////////////////////////////////////
+  // Get episode number and version, if available
+  
+  if (examine_number) {
+    // Check remaining tokens first
+    for (unsigned int i = 0; i < tokens.size(); i++) {
+      if (IsEpisodeFormat(tokens[i].Content, episode, tokens[i].Separator)) {
+        tokens[i].Virgin = false;
+        break;
+      }
+    }
+
+    // Check title
+    if (episode.Number.empty()) {
+      // Split into words
+      vector<wstring> words;
+      words.reserve(4);
+      Tokenize(title, L" ", words);
+      title.clear();
+      int number_index = -1;
+
+      // Check each word, starting out with the second one, since the first one
+      // can never be the episode number
+      for (unsigned int i = 1; i < words.size(); i++) {
+        if (IsEpisodeFormat(words[i], episode)) {
+          number_index = i;
+          break;
         }
+      }
+
+      // Get the first number we stumble on as a last resort
+      if (episode.Number.empty()) {
+        for (unsigned int i = 0; i < tokens.size(); i++) {
+          if (IsNumeric(tokens[i].Content)) {
+            episode.Number = tokens[i].Content;
+            if (ValidateEpisodeNumber(episode)) {
+              tokens[i].Virgin = false;
+              break;
+            }
+          }
+        }
+      }
+      if (episode.Number.empty()) {
+        for (unsigned int i = 1; i < words.size(); i++) {
+          if (IsNumeric(words[i])) {
+            episode.Number = words[i];
+            if (ValidateEpisodeNumber(episode)) {
+              number_index = i;
+              break;
+            }
+          }
+        }
+      }
+  
+      // Build title and name
+      for (unsigned int i = 0; i < words.size(); i++) {
+        if (i < number_index) {
+          // Ignore episode keywords
+          if (i == number_index - 1 && CompareKeys(words[i], EpisodeKeywords)) continue;
+          AppendKeyword(title, words[i]);
+        } else if (i > number_index) {
+          AppendKeyword(episode.Name, words[i]);
+        }
+      }
+
+      // Clean up
+      TrimRight(title, L" -");
+      TrimLeft(episode.Name, L" -");
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  // Check if the group token is still a virgin
+  if (group_index > -1 && !tokens[group_index].Virgin) {
+    episode.Group.clear();
+    for (unsigned int i = 0; i < tokens.size(); i++) {
+      if (!tokens[i].Content.empty() && tokens[i].Virgin) {
+        episode.Group = tokens[i].Content;
+        break;
       }
     }
   }
@@ -306,13 +376,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
     }
   }
 
-  // Episode number and title can't be the same
-  if (!episode.Number.empty() && !episode.Group.empty()) {
-    if (IsNumeric(title) && IsEqual(title, episode.Number)) {
-      title = episode.Group;
-      episode.Group.clear();
-    }
-  }
+  //////////////////////////////////////////////////////////////////////////////
 
   // Set the final title, hopefully name of the anime
   episode.Title = title;
@@ -364,16 +428,6 @@ void CRecognition::ExamineToken(CToken& token, CEpisode& episode, bool compare_e
     } else if (episode.Version.empty() && CompareKeys(words[i], VersionKeywords)) {
       episode.Version.push_back(words[i].at(words[i].length() - 1));
       RemoveWordFromToken(true);
-    // Episode number
-    } else if (episode.Number.empty() && IsEpisodeFormat(words[i], episode)) {
-      for (unsigned int j = i + 1; j < words.size(); j++)
-        if (!words[j].empty()) episode.Name += (j == i + 1 ? L"" : L" ") + words[j];
-      token.Content.resize(InStr(token.Content, words[i], 0));
-    } else if (episode.Number.empty() && (i == 0 || i == words.size() - 1) && IsNumeric(words[i])) {
-      episode.Number = words[i];
-      if (!ValidateEpisodeNumber(episode)) continue;
-      if (i > 0 && CompareKeys(words[i - 1], EpisodeKeywords)) Erase(token.Content, words[i - 1], true);
-      RemoveWordFromToken(false);
     // Extras
     } else if (compare_extras && CompareKeys(words[i], ExtraKeywords)) {
       AppendKeyword(episode.Extra, words[i]);
@@ -427,7 +481,7 @@ void CRecognition::TransliterateSpecial(wstring& str) {
   Replace(str, L" & ", L" and ", true, false); // & and 'and' are equivalent
 }
 
-bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode) {
+bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode, const wchar_t separator) {
   unsigned int numstart, i, j;
 
   // Find first number
@@ -435,48 +489,71 @@ bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode) {
   if (numstart == str.length()) return false;
 
   // Check for episode prefix
-  if (numstart != 0) {
+  if (numstart > 0) {
     if (!CompareKeys(str.substr(0, numstart), EpisodePrefixes)) return false;
   }
 
-  for (i = numstart; i < str.length(); i++) {
+  for (i = numstart + 1; i < str.length(); i++) {
     if (!IsNumeric(str.at(i))) {
-      // ##-##
-      if (i - numstart > 1 && (str.at(i) == '-' || str.at(i) == '&')) {
+      // *#-#*
+      if (str.at(i) == '-' || str.at(i) == '&') {
         if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
-        for(j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
-        if (ToINT(str.substr(numstart, i-numstart)) + 1 == ToINT(str.substr(i + 1, j - 1 - i))) {
-          episode.Number = str.substr(numstart, j - numstart);
-          // ##-##v#
-          if (j < str.length() - 1 && (str.at(j) == 'v' || str.at(j) =='V')) {
-            numstart = i + 1;
-            continue;
-          } else {
-            return true;
-          }
+        for (j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
+        episode.Number = str.substr(numstart, j - numstart);
+        // *#-#*v#
+        if (j < str.length() - 1 && (str.at(j) == 'v' || str.at(j) =='V')) {
+          numstart = i + 1;
+          continue;
+        } else {
+          return true;
+        }
+      
+      // v#
+      } else if (str.at(i) == 'v' || str.at(i) == 'V') {
+        if (episode.Number.empty()) {
+          if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
+          episode.Number = str.substr(numstart, i - numstart);
+        }
+        episode.Version = str.substr(i + 1);
+        return true;
+      
+      // *# of #*
+      } else if (str.at(i) == separator) {
+        if (str.length() < i + 5) return false;
+        if (str.at(i + 1) == 'o' && 
+            str.at(i + 2) == 'f' && 
+            str.at(i + 3) == separator) {
+              episode.Number = str.substr(numstart, i - numstart);
+              return true;
+        }
+
+      // *#x#*
+      } else if (str.at(i) == 'x') {
+        if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
+        for (j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
+        episode.Number = str.substr(i + 1, j - i - 1);
+        if (ToINT(episode.Number) < 100) {
+          return true;
         } else {
           episode.Number.clear();
           return false;
         }
-      } 
-      // ##v#
-      else if ((str.at(i) == 'v' || str.at(i) == 'V') && i - numstart > 1) {
-        if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
-        if (episode.Number.empty()) episode.Number = str.substr(numstart, i - numstart);
-        episode.Version = str.substr(i + 1);
-        return true;
-      } else return false;
+
+      } else {
+        episode.Number.clear();
+        return false;
+      }
     }
   }
 
-  // EP.##
-  if (numstart != 0) {
+  // [prefix]#*
+  if (numstart > 0 && episode.Number.empty()) {
     episode.Number = str.substr(numstart, str.length() - numstart);
     if (!ValidateEpisodeNumber(episode)) return false;
     return true;
   }
 
-  // ##
+  // *#
   return false;
 }
 

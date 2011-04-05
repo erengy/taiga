@@ -47,7 +47,7 @@ BOOL CTestRecognition::OnInitDialog() {
   // Fill episode data
   xml_node recognition = doc.child(L"recognition");
   for (xml_node file_node = recognition.child(L"file"); file_node; file_node = file_node.next_sibling(L"file")) {
-    CEpisode new_episode;
+    CEpisodeTest new_episode;
     new_episode.AudioType  = XML_ReadStrValue(file_node, L"audio");
     new_episode.Checksum   = XML_ReadStrValue(file_node, L"checksum");
     new_episode.Extra      = XML_ReadStrValue(file_node, L"extra");
@@ -56,6 +56,7 @@ BOOL CTestRecognition::OnInitDialog() {
     new_episode.Group      = XML_ReadStrValue(file_node, L"group");
     new_episode.Name       = XML_ReadStrValue(file_node, L"name");
     new_episode.Number     = XML_ReadStrValue(file_node, L"number");
+    new_episode.Priority   = XML_ReadIntValue(file_node, L"priority");
     new_episode.Resolution = XML_ReadStrValue(file_node, L"resolution");
     new_episode.Title      = XML_ReadStrValue(file_node, L"title");
     new_episode.Version    = XML_ReadStrValue(file_node, L"version");
@@ -66,9 +67,10 @@ BOOL CTestRecognition::OnInitDialog() {
   // Examine files
   DWORD tick = GetTickCount();
   for (UINT i = 0; i < m_EpisodeList.size(); i++) {
-    CEpisode episode;
+    CEpisodeTest episode;
     Meow.ExamineTitle(m_EpisodeList[i].File, episode, true, true, true, true, false);
     episode.Index = i;
+    episode.Priority = m_EpisodeList[i].Priority;
     m_EpisodeListTest.push_back(episode);
   }
   tick = GetTickCount() - tick;
@@ -130,6 +132,23 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // ListView control
   if (idCtrl == IDC_LIST_TEST_RECOGNITION) {
     switch (pnmh->code) {
+      // Column click
+      case LVN_COLUMNCLICK: {
+        LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
+        int order = m_List.GetSortOrder() * -1;
+        if (order == 0) order = 1;
+        int type = LISTSORTTYPE_DEFAULT;
+        switch (lplv->iSubItem) {
+          case 3:
+          case 4:
+            type = LISTSORTTYPE_NUMBER;
+            break;
+        }
+        m_List.Sort(lplv->iSubItem, order, type, ListViewCompareProc);
+        break;
+      }
+
+      // Custom draw
       case NM_CUSTOMDRAW: {
         LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(pnmh);
         switch (pCD->nmcd.dwDrawStage) {
@@ -142,7 +161,7 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
             return CDRF_NOTIFYPOSTERASE;
 
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-            CEpisode* e = reinterpret_cast<CEpisode*>(pCD->nmcd.lItemlParam);
+            CEpisodeTest* e = reinterpret_cast<CEpisodeTest*>(pCD->nmcd.lItemlParam);
             if (!e) return CDRF_NOTIFYPOSTPAINT;
             #define CheckSubItem(e, t) \
               e->t == m_EpisodeList[e->Index].t ? RGB(230, 255, 230) : \
@@ -172,6 +191,11 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
               case 11: pCD->clrTextBk = CheckSubItem(e, Format); break;
               // Default
               default: pCD->clrTextBk = GetSysColor(COLOR_WINDOW);
+            }
+            if (e->Priority < 0) {
+              pCD->clrText = RGB(200, 200, 200);
+            } else if (e->Priority > 0) {
+              pCD->clrText = RGB(255, 0, 0);
             }
             #undef CheckSubItem
             return CDRF_NOTIFYPOSTPAINT;
