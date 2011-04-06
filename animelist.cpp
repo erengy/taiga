@@ -385,6 +385,7 @@ int CUser::GetItemCount(int status) {
   if (user_index > -1) {
     #define ITEM EventQueue.List[user_index].Item
     for (unsigned int i = 0; i < ITEM.size(); i++) {
+      if (ITEM[i].Mode == HTTP_MAL_AnimeAdd) continue;
       if (ITEM[i].status > -1) {
         if (status == ITEM[i].status) {
           count++;
