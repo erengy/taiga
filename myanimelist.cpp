@@ -468,7 +468,7 @@ void CMyAnimeList::DecodeText(wstring& text) {
 }
 
 bool CMyAnimeList::IsValidDate(const wstring& date) {
-  return date.length() == 10 && date != L"0000-00-00";
+  return date.length() == 10 && !StartsWith(date != L"0");
 }
 
 bool CMyAnimeList::IsValidEpisode(int episode, int watched, int total) {

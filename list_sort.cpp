@@ -50,7 +50,16 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
       CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        return_value = lstrcmpi(pItem1->Series_Start.c_str(), pItem2->Series_Start.c_str());
+        wstring date1, date2;
+        date1 = pItem1->Series_Start;
+        date2 = pItem2->Series_Start;
+        // if (date1[0] == '0') date1[0] = '?';
+        // if (date2[0] == '0') date2[0] = '?';
+        if (date1[5] == '0' && date1[6] == '0') date1[5] = '?';
+        if (date2[5] == '0' && date2[6] == '0') date2[5] = '?';
+        if (date1[8] == '0' && date2[9] == '0') date1[8] = '?';
+        if (date2[8] == '0' && date2[9] == '0') date2[8] = '?';
+        return_value = wcsncmp(date1.c_str(), date2.c_str(),10);
       }
       break;
     }

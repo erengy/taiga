@@ -459,12 +459,27 @@ bool CAnime::ParseSearchResult(const wstring& data) {
 
 bool CAnime::IsAiredYet() const {
   if (Series_Status == MAL_NOTYETAIRED) {
-    if (!MAL.IsValidDate(Series_Start) || 
-      CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_Start) < 0) {
-        return false;
-    }
+    if (!MAL.IsValidDate(Series_Start)) return false;
+    if (CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_Start) >= 0) return false;
   }
   return true;
+}
+
+bool CAnime::IsFinishedAiring() const {
+  if (Series_Status == MAL_FINISHED) return true;
+  if (!MAL.IsValidDate(Series_End)) return false;
+  if (!IsAiredYet()) return false;
+  if (Series_End.substr(5,2) == L"00")
+    return CompareStrings(GetDateJapan(L"yyyy"), Series_End.substr(0,4)) > 0;
+  if (Series_End.substr(8,2) == L"00")
+    return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_End.substr(0,7)) > 0;
+  return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_End) > 0;
+}
+
+int CAnime::GetRealTimeStatus() {
+  if (IsFinishedAiring()) return MAL_FINISHED;
+  else if (IsAiredYet()) return MAL_AIRING;
+  else return MAL_NOTYETAIRED;
 }
 
 void CAnime::SetStartDate(wstring date, bool ignore_previous) {

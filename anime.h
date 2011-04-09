@@ -72,15 +72,16 @@ public:
   int GetRewatching();
   int GetScore();
   int GetStatus();
+  int GetRealTimeStatus();
   wstring GetStrValue(int mode);
   wstring GetTags();
   int GetTotalEpisodes();
   bool ParseSearchResult(const wstring& data);
   void Edit(const wstring& data, CEventItem item);
   bool IsAiredYet() const;
+  bool IsFinishedAiring() const;
   void SetStartDate(wstring date, bool ignore_previous);
   void SetFinishDate(wstring date, bool ignore_previous);
-  void Delete();
   
   int Index;
   bool NewEps, Playing;
