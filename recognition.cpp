@@ -315,7 +315,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
         }
       }
 
-      // Get the first number we stumble on as a last resort
+      // Get the first valid number we stumble on as a last resort
       if (episode.Number.empty()) {
         for (unsigned int i = 0; i < tokens.size(); i++) {
           if (IsNumeric(tokens[i].Content)) {
@@ -332,6 +332,12 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
           if (IsNumeric(words[i])) {
             episode.Number = words[i];
             if (ValidateEpisodeNumber(episode)) {
+              // Discard and give up if reached movie or season number
+              if (i > 1 && (IsEqual(words[i - 1], L"Movie") || IsEqual(words[i - 1], L"Season")) &&
+                  !IsCountingWord(words[i - 2])) {
+                    episode.Number.clear();
+                    break;
+              }
               number_index = i;
               break;
             }
@@ -574,6 +580,23 @@ bool CRecognition::IsResolution(const wstring& str) {
         if (!IsNumeric(str.at(i))) return false;
       }
       return true;
+    }
+  }
+  return false;
+}
+
+bool CRecognition::IsCountingWord(const wstring& str) {
+  if (!str.empty()) {
+    if (EndsWith(str, L"th") || EndsWith(str, L"nd") || EndsWith(str, L"rd") || EndsWith(str, L"st") ||
+        EndsWith(str, L"TH") || EndsWith(str, L"ND") || EndsWith(str, L"RD") || EndsWith(str, L"ST")) {
+      if (IsNumeric(str.substr(0, str.length() - 2)) ||
+          IsEqual(str, L"FIRST") ||
+          IsEqual(str, L"SECOND") ||
+          IsEqual(str, L"THIRD") ||
+          IsEqual(str, L"FOURTH") ||
+          IsEqual(str, L"FIFTH")) {
+            return true;
+      }
     }
   }
   return false;

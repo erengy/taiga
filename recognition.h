@@ -60,6 +60,7 @@ private:
   void TransliterateSpecial(wstring& str);
   bool IsEpisodeFormat(const wstring& str, CEpisode& episode, const wchar_t separator = ' ');
   bool IsResolution(const wstring& str);
+  bool IsCountingWord(const wstring& str);
   bool IsTokenEnclosed(const CToken& token);
   void ReadKeyword(unsigned int uID, vector<wstring>& str);
   size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<CToken>& tokens);
