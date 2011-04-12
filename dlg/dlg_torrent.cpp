@@ -124,7 +124,7 @@ void CTorrentWindow::RefreshList() {
         group = TORRENT_BATCH;
     }
     if (Torrents.Feed.Item[i].EpisodeData.Index > 0) {
-      icon = StatusToIcon(AnimeList.Item[Torrents.Feed.Item[i].EpisodeData.Index].Series_Status);
+      icon = StatusToIcon(AnimeList.Item[Torrents.Feed.Item[i].EpisodeData.Index].GetAiringStatus());
       title = AnimeList.Item[Torrents.Feed.Item[i].EpisodeData.Index].Series_Title;
     } else if (!Torrents.Feed.Item[i].EpisodeData.Title.empty()) {
       title = Torrents.Feed.Item[i].EpisodeData.Title;

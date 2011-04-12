@@ -106,7 +106,7 @@ BOOL CSettingsPage::OnInitDialog() {
       List.SetTheme();
       for (int i = 1; i <= AnimeList.Count; i++) {
         List.InsertItem(i - 1, AnimeList.Item[i].GetStatus(), 
-                StatusToIcon(AnimeList.Item[i].Series_Status), 
+                StatusToIcon(AnimeList.Item[i].GetAiringStatus()), 
                 0, NULL, LPSTR_TEXTCALLBACK, 
                 reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
         List.SetItem(i - 1, 1, AnimeList.Item[i].Folder.c_str());

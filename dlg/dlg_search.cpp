@@ -263,7 +263,7 @@ void CSearchWindow::RefreshList() {
       m_Anime[i].Index = AnimeList.FindItemByID(m_Anime[i].Series_ID);
     }
     CAnime* item = m_Anime[i].Index > -1 ? &AnimeList.Item[m_Anime[i].Index] : &m_Anime[i];
-    m_List.InsertItem(i, -1, StatusToIcon(item->Series_Status), 0, NULL, 
+    m_List.InsertItem(i, -1, StatusToIcon(item->GetAiringStatus()), 0, NULL, 
       item->Series_Title.c_str(), 
       reinterpret_cast<LPARAM>(item));
     m_List.SetItem(i, 1, MAL.TranslateType(item->Series_Type).c_str());

@@ -276,7 +276,7 @@ BOOL CTorrents::Filter(int feed_index, int anime_index) {
       // Filter airing status
       case FEED_FILTER_AIRINGSTATUS: {
         if (anime_index > 0 && 
-          AnimeList.Item[anime_index].Series_Status == ToINT(FILTER.Value)) {
+          AnimeList.Item[anime_index].GetAiringStatus() == ToINT(FILTER.Value)) {
             return FALSE;
         }
         break;

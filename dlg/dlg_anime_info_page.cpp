@@ -91,7 +91,7 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       // Set information
       text = MAL.TranslateType(pAnimeItem->Series_Type) + L"\n" + 
              MAL.TranslateNumber(pAnimeItem->Series_Episodes, L"Unknown") + L"\n" + 
-             MAL.TranslateStatus(pAnimeItem->Series_Status) + L"\n" + 
+             MAL.TranslateStatus(pAnimeItem->GetAiringStatus()) + L"\n" + 
              MAL.TranslateDate(pAnimeItem->Series_Start);
       SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
       #define ADD_INFOLINE(x, y) (pAnimeItem->x.empty() ? y : pAnimeItem->x)

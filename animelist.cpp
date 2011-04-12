@@ -304,7 +304,7 @@ BOOL CAnimeList::CFilter::Check(int item_index) {
   }
   // Filter status
   for (int i = 0; i < 3; i++) {
-    if (!Status[i] && AnimeList.Item[item_index].Series_Status == i + 1) {
+    if (!Status[i] && AnimeList.Item[item_index].GetAiringStatus() == i + 1) {
       return FALSE;
     }
   }

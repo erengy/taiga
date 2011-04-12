@@ -586,7 +586,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Value must be 1, 2, 3, 4 or 6, and different from current status.
   } else if (action == L"EditStatus") {
     int episode = -1, status = ToINT(body);
-    switch (AnimeList.Item[AnimeList.Index].Series_Status) {
+    switch (AnimeList.Item[AnimeList.Index].GetAiringStatus()) {
       case MAL_AIRING:
         if (status == MAL_COMPLETED) {
           MessageBox(g_hMain, 

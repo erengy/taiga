@@ -142,7 +142,7 @@ void CAnime::End(CEpisode episode, bool end_watching, bool update_list) {
     int list_index = MainWindow.GetListIndex(Index);
     int ret_value = 0;
     if (list_index > -1) {
-      MainWindow.m_List.SetItemIcon(list_index, StatusToIcon(Series_Status));
+      MainWindow.m_List.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
       MainWindow.m_List.RedrawItems(list_index, list_index, true);
     }
   }
@@ -457,10 +457,16 @@ bool CAnime::ParseSearchResult(const wstring& data) {
 
 // =============================================================================
 
-bool CAnime::IsAiredYet() const {
+bool CAnime::IsAiredYet(bool strict) const {
   if (Series_Status == MAL_NOTYETAIRED) {
     if (!MAL.IsValidDate(Series_Start)) return false;
-    if (CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_Start) >= 0) return false;
+    if (strict) {
+      if (Series_Start.at(5) == '0' && Series_Start.at(6) == '0')
+        return CompareStrings(GetDateJapan(L"yyyy"), Series_Start.substr(0,4)) > 0;
+      if (Series_Start.at(8) == '0' && Series_Start.at(9) == '0')
+        return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_Start.substr(0,7)) > 0;
+    }
+    return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_Start) >= 0;
   }
   return true;
 }
@@ -469,16 +475,16 @@ bool CAnime::IsFinishedAiring() const {
   if (Series_Status == MAL_FINISHED) return true;
   if (!MAL.IsValidDate(Series_End)) return false;
   if (!IsAiredYet()) return false;
-  if (Series_End.substr(5,2) == L"00")
+  if (Series_End.at(5) == '0' && Series_End.at(6) == '0')
     return CompareStrings(GetDateJapan(L"yyyy"), Series_End.substr(0,4)) > 0;
-  if (Series_End.substr(8,2) == L"00")
+  if (Series_End.at(8) == '0' && Series_End.at(9) == '0')
     return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_End.substr(0,7)) > 0;
   return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_End) > 0;
 }
 
-int CAnime::GetRealTimeStatus() {
+int CAnime::GetAiringStatus() {
   if (IsFinishedAiring()) return MAL_FINISHED;
-  else if (IsAiredYet()) return MAL_AIRING;
+  else if (IsAiredYet(true)) return MAL_AIRING;
   else return MAL_NOTYETAIRED;
 }
 

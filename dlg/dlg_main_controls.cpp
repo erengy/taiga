@@ -281,7 +281,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
       }
       // Change text color
       if (!pAnimeItem) return CDRF_NOTIFYPOSTPAINT;
-      if (pAnimeItem->Series_Status == MAL_NOTYETAIRED) {
+      if (pAnimeItem->GetAiringStatus() == MAL_NOTYETAIRED) {
         pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
       } else if (pAnimeItem->NewEps) {
         if (Settings.Program.List.Highlight) {

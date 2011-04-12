@@ -730,7 +730,7 @@ void CMainWindow::RefreshList(int index) {
   for (int i = 1; i <= AnimeList.Count; i++) {
     if (AnimeList.Item[i].GetStatus() == index || index == 0 || (index == MAL_WATCHING && AnimeList.Item[i].GetRewatching())) {
       if (AnimeList.Filter.Check(i)) {
-        icon_index = AnimeList.Item[i].Playing ? Icon16_Play : StatusToIcon(AnimeList.Item[i].Series_Status);
+        icon_index = AnimeList.Item[i].Playing ? Icon16_Play : StatusToIcon(AnimeList.Item[i].GetAiringStatus());
         group_count[AnimeList.Item[i].GetStatus() - 1]++;
         int j = m_List.InsertItem(i, AnimeList.Item[i].GetStatus(), icon_index, 
           0, NULL, LPSTR_TEXTCALLBACK, 
