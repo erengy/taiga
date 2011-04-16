@@ -755,7 +755,7 @@ void CMainWindow::RefreshList(int index) {
   }
 
   // Sort items
-  m_List.Sort(0, 1, 0, ListViewCompareProc);
+  m_List.Sort(m_List.GetSortColumn(), m_List.GetSortOrder(), m_List.GetSortType(m_List.GetSortColumn()), ListViewCompareProc);
 
   // Show again
   m_List.Show(SW_SHOW);

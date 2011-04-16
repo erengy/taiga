@@ -58,7 +58,7 @@ bool CRecognition::CompareEpisode(CEpisode& episode, const CAnime& anime,
   // Leave if episode number is out of range
   if (check_episode && anime.Series_Episodes > 1) {
     int number = GetEpisodeHigh(episode.Number);
-    if (number == 0 || number > anime.Series_Episodes) return false;
+    if (number > anime.Series_Episodes) return false;
   }
   // Leave if not yet aired
   if (check_date && !anime.IsAiredYet()) return false;
