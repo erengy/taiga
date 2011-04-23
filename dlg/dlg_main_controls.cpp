@@ -377,7 +377,7 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS) {
           if (eps_total > 0) {
             float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(pAnimeItem->Series_Episodes);
-            for (int i = max(eps_buffer, eps_watched); i < static_cast<int>(pAnimeItem->EpisodeAvailable.size()); i++) {
+            for (int i = max(eps_buffer, eps_watched); i > -1 && i < static_cast<int>(pAnimeItem->EpisodeAvailable.size()); i++) {
               if (pAnimeItem->EpisodeAvailable[i]) {
                 rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
                 rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
