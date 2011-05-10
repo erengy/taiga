@@ -59,14 +59,15 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
       break;
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_Image:
+    case HTTP_Feed_DownloadIcon:
       break;
     case HTTP_MAL_SearchAnime:
       SearchWindow.EnableDlgItem(IDOK, TRUE);
       SearchWindow.SetDlgItemText(IDOK, L"Search");
       break;
-    case HTTP_TorrentCheck:
-    case HTTP_TorrentDownload:
-    case HTTP_TorrentDownloadAll:
+    case HTTP_Feed_Check:
+    case HTTP_Feed_Download:
+    case HTTP_Feed_DownloadAll:
       TorrentWindow.ChangeStatus(error_text);
       TorrentWindow.m_Toolbar.EnableButton(0, true);
       TorrentWindow.m_Toolbar.EnableButton(1, true);
@@ -90,9 +91,9 @@ BOOL CHTTPClient::OnSendRequestComplete() {
   wstring status = L"Connecting...";
   
   switch (GetClientMode()) {
-    case HTTP_TorrentCheck:
-    case HTTP_TorrentDownload:
-    case HTTP_TorrentDownloadAll:
+    case HTTP_Feed_Check:
+    case HTTP_Feed_Download:
+    case HTTP_Feed_DownloadAll:
       TorrentWindow.ChangeStatus(status);
       break;
     default:
@@ -129,9 +130,9 @@ BOOL CHTTPClient::OnHeadersAvailable(wstring headers) {
 BOOL CHTTPClient::OnRedirect(wstring address) {
   wstring status = L"Redirecting... (" + address + L")";
   switch (GetClientMode()) {
-    case HTTP_TorrentCheck:
-    case HTTP_TorrentDownload:
-    case HTTP_TorrentDownloadAll:
+    case HTTP_Feed_Check:
+    case HTTP_Feed_Download:
+    case HTTP_Feed_DownloadAll:
       TorrentWindow.ChangeStatus(status);
       break;
     default:
@@ -163,16 +164,17 @@ BOOL CHTTPClient::OnReadData() {
     case HTTP_MAL_TagUpdate:
       status = L"Updating list...";
       break;
+    case HTTP_Feed_DownloadIcon:
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_SearchAnime:
     case HTTP_MAL_Image:
     case HTTP_Silent:
       return 0;
-    case HTTP_TorrentCheck:
+    case HTTP_Feed_Check:
       status = L"Checking new torrents...";
       break;
-    case HTTP_TorrentDownload:
-    case HTTP_TorrentDownloadAll:
+    case HTTP_Feed_Download:
+    case HTTP_Feed_DownloadAll:
       status = L"Downloading torrent file...";
       break;
     case HTTP_Twitter_Request:
@@ -203,9 +205,9 @@ BOOL CHTTPClient::OnReadData() {
   }
 
   switch (GetClientMode()) {
-    case HTTP_TorrentCheck:
-    case HTTP_TorrentDownload:
-    case HTTP_TorrentDownloadAll:
+    case HTTP_Feed_Check:
+    case HTTP_Feed_Download:
+    case HTTP_Feed_DownloadAll:
       TorrentWindow.ChangeStatus(status);
       break;
     default:
@@ -217,7 +219,6 @@ BOOL CHTTPClient::OnReadData() {
 }
 
 BOOL CHTTPClient::OnReadComplete() {
-  CAnime* pItem = reinterpret_cast<CAnime*>(GetParam());
   TaskbarList.SetProgressState(TBPF_NOPROGRESS);
   wstring status;
   
@@ -337,11 +338,11 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_TagUpdate: {
       EventQueue.UpdateInProgress = false;
       MainWindow.ChangeStatus();
-      if (pItem && EventQueue.GetItemCount() > 0) {
+      CAnime* pAnime = reinterpret_cast<CAnime*>(GetParam());
+      if (pAnime && EventQueue.GetItemCount() > 0) {
         int user_index = EventQueue.GetUserIndex();
         if (user_index > -1) {
-          if(GetClientMode() == HTTP_MAL_AnimeDelete) SearchWindow.PostMessage(WM_CLOSE);
-          pItem->Edit(GetData(), EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]);
+          pAnime->Edit(GetData(), EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]);
           return TRUE;
         }
       }
@@ -352,14 +353,15 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Anime details
     case HTTP_MAL_AnimeDetails: {
+      CAnime* pAnime = reinterpret_cast<CAnime*>(GetParam());
       wstring data = GetData();
-      if (pItem && !data.empty()) {
-        pItem->Genres = InStr(data, L"Genres:</span> ", L"<br />");
-        pItem->Rank = InStr(data, L"Ranked:</span> ", L"<br />");
-        pItem->Popularity = InStr(data, L"Popularity:</span> ", L"<br />");
-        pItem->Score = InStr(data, L"Score:</span> ", L"<br />");
-        StripHTML(pItem->Score);
-        AnimeWindow.Refresh(pItem, true, false);
+      if (pAnime && !data.empty()) {
+        pAnime->Genres = InStr(data, L"Genres:</span> ", L"<br />");
+        pAnime->Rank = InStr(data, L"Ranked:</span> ", L"<br />");
+        pAnime->Popularity = InStr(data, L"Popularity:</span> ", L"<br />");
+        pAnime->Score = InStr(data, L"Score:</span> ", L"<br />");
+        StripHTML(pAnime->Score);
+        AnimeWindow.Refresh(pAnime, true, false);
       }
       break;
     }
@@ -376,10 +378,11 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Search anime
     case HTTP_MAL_SearchAnime: {
-      if (pItem) {
-        if (pItem->ParseSearchResult(GetData())) {
-          AnimeWindow.Refresh(pItem, true, false);
-          if (MAL.GetAnimeDetails(pItem)) return TRUE;
+      CAnime* pAnime = reinterpret_cast<CAnime*>(GetParam());
+      if (pAnime) {
+        if (pAnime->ParseSearchResult(GetData())) {
+          AnimeWindow.Refresh(pAnime, true, false);
+          if (MAL.GetAnimeDetails(pAnime)) return TRUE;
         } else {
           status = L"Could not read anime information.";
           AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
@@ -400,41 +403,46 @@ BOOL CHTTPClient::OnReadComplete() {
     // =========================================================================
 
     // Torrent
-    case HTTP_TorrentCheck: {
-      Torrents.Read();
-      int torrent_count = Torrents.Compare();
-      if (torrent_count > 0) {
-        status = L"There are new torrents available!";
-      } else {
-        status = L"No new torrents found.";
-      }
-      if (TorrentWindow.IsWindow()) {
-        TorrentWindow.ChangeStatus(status);
-        TorrentWindow.RefreshList();
-        TorrentWindow.m_Toolbar.EnableButton(0, true);
-        TorrentWindow.m_Toolbar.EnableButton(1, true);
-      } else {
-        switch (Settings.RSS.Torrent.NewAction) {
-          // Notify
-          case 1:
-            Torrents.Tip();
-            break;
-          // Download
-          case 2:
-            if (Torrents.Download(-1)) return TRUE;
-            break;
+    case HTTP_Feed_Check: {
+      CFeed* pFeed = reinterpret_cast<CFeed*>(GetParam());
+      if (pFeed) {
+        pFeed->Read();
+        int torrent_count = pFeed->ExamineData();
+        if (torrent_count > 0) {
+          status = L"There are new torrents available!";
+        } else {
+          status = L"No new torrents found.";
+        }
+        if (TorrentWindow.IsWindow()) {
+          TorrentWindow.ChangeStatus(status);
+          TorrentWindow.RefreshList();
+          TorrentWindow.m_Toolbar.EnableButton(0, true);
+          TorrentWindow.m_Toolbar.EnableButton(1, true);
+          // TODO: GetIcon() fails if we don't return TRUE here
+        } else {
+          switch (Settings.RSS.Torrent.NewAction) {
+            // Notify
+            case 1:
+              Aggregator.Notify(*pFeed);
+              break;
+            // Download
+            case 2:
+              if (pFeed->Download(-1)) return TRUE;
+              break;
+          }
         }
       }
       break;
     }
-    case HTTP_TorrentDownload:
-    case HTTP_TorrentDownloadAll: {
-      CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(GetParam());
+    case HTTP_Feed_Download:
+    case HTTP_Feed_DownloadAll: {
+      CFeed* pFeed = reinterpret_cast<CFeed*>(GetParam());
       if (pFeed) {
-        wstring app_path, cmd, file = pFeed->Title + L".torrent";
+        CFeedItem* pFeedItem = reinterpret_cast<CFeedItem*>(&pFeed->Item[pFeed->DownloadIndex]);
+        wstring app_path, cmd, file = pFeedItem->Title + L".torrent";
         ValidateFileName(file);
-        Torrents.Archive.push_back(file);
-        file = Taiga.GetDataPath() + L"Torrents\\" + file;
+        Aggregator.FileArchive.push_back(file);
+        file = pFeed->GetDataPath() + file;
         if (FileExists(file)) {
           switch (Settings.RSS.Torrent.NewAction) {
             // Default application
@@ -447,22 +455,26 @@ BOOL CHTTPClient::OnReadComplete() {
               break;
           }
           if (Settings.RSS.Torrent.SetFolder && InStr(app_path, L"utorrent", 0, true) > -1) {
-            if (pFeed->EpisodeData.Index > 0 && !AnimeList.Item[pFeed->EpisodeData.Index].Folder.empty()) {
-              cmd = L"/directory \"" + AnimeList.Item[pFeed->EpisodeData.Index].Folder + L"\" ";
+            if (pFeedItem->EpisodeData.Index > 0 && !AnimeList.Item[pFeedItem->EpisodeData.Index].Folder.empty()) {
+              cmd = L"/directory \"" + AnimeList.Item[pFeedItem->EpisodeData.Index].Folder + L"\" ";
             }
           }
           cmd += L"\"" + file + L"\"";
           Execute(app_path, cmd);
-          pFeed->Download = FALSE;
+          pFeedItem->Download = FALSE;
           TorrentWindow.RefreshList();
         }
-      }
-      if (GetClientMode() == HTTP_TorrentDownloadAll) {
-        if (Torrents.Download(-1)) return TRUE;
+        pFeed->DownloadIndex = -1;
+        if (GetClientMode() == HTTP_Feed_DownloadAll) {
+          if (pFeed->Download(-1)) return TRUE;
+        }
       }
       TorrentWindow.ChangeStatus(L"Successfully downloaded all torrents.");
       TorrentWindow.m_Toolbar.EnableButton(0, true);
       TorrentWindow.m_Toolbar.EnableButton(1, true);
+      break;
+    }
+    case HTTP_Feed_DownloadIcon: {
       break;
     }
 

@@ -21,29 +21,61 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "http.h"
 
 // =============================================================================
 
-class CFeedItem {
+class CGenericFeedItem {
 public:
-  CFeedItem();
-  ~CFeedItem() {};
+  CGenericFeedItem() : IsPermaLink(true) {}
+  virtual ~CGenericFeedItem() {}
 
-  wstring Title, Link, Description;
-  wstring Author, Category, Comments, Enclosure, GUID, PubDate, Source;
-
-  int Index;
-  wstring Size;
-  CEpisode EpisodeData;
-  BOOL NewItem, Download;
+  wstring Title, Link, Description,
+    Author, Category, Comments, Enclosure, GUID, PubDate, Source;
+  bool IsPermaLink;
 };
 
-class CFeed {
+class CFeedItem : public CGenericFeedItem {
+public:
+  CFeedItem() : Download(false) {}
+  virtual ~CFeedItem() {};
+
+  int Index;
+  bool Download;
+  
+  class CEpisodeData : public CEpisode {
+  public:
+    CEpisodeData() : NewEpisode(false) {}
+    virtual ~CEpisodeData() {}
+    wstring FileSize;
+    bool NewEpisode;
+  } EpisodeData;
+};
+
+// =============================================================================
+
+enum FeedCategory {
+  // Broadcatching for torrent files and DDL
+  FEED_CATEGORY_LINK,
+  // News around the web
+  FEED_CATEGORY_TEXT,
+  // Airing times for anime titles
+  FEED_CATEGORY_TIME
+};
+
+enum TorrentCategory {
+  TORRENT_ANIME,
+  TORRENT_BATCH,
+  TORRENT_OTHER
+};
+
+class CGenericFeed {
 public:
   // Required channel elements
   wstring Title, Link, Description;
 
-  // Optional elements
+  // Optional channel elements
+  // (see www.rssboard.org/rss-specification for more information)
   /*
   wstring language, copyright, managingEditor, webMaster, pubDate, 
     lastBuildDate, category, generator, docs, cloud, ttl, image, 
@@ -54,53 +86,124 @@ public:
   vector<CFeedItem> Item;
 };
 
-// =============================================================================
+class CFeed : public CGenericFeed {
+public:
+  CFeed() : Category(0), DownloadIndex(-1), Ticker(0), m_hIcon(NULL) {}
+  virtual ~CFeed() {
+    if (m_hIcon) DeleteObject(m_hIcon);
+  }
 
-enum FeedFilterOption {
-  FEED_FILTER_EXCLUDE,
-  FEED_FILTER_INCLUDE,
-  FEED_FILTER_PREFERENCE
+  bool Check(const wstring& source);
+  bool Download(int index);
+  int ExamineData();
+  wstring GetDataPath();
+  HICON GetIcon();
+  bool Read();
+
+  int Category, DownloadIndex, Ticker;
+  wstring Title, Link;
+  CHTTPClient Client;
+
+private:
+  HICON m_hIcon;
 };
 
-enum FeedFilterType {
-  FEED_FILTER_KEYWORD,
-  FEED_FILTER_AIRINGSTATUS,
-  FEED_FILTER_WATCHINGSTATUS
+// =============================================================================
+
+enum FeedFilterElement {
+  FEED_FILTER_ELEMENT_TITLE,
+  FEED_FILTER_ELEMENT_LINK,
+  FEED_FILTER_ELEMENT_DESCRIPTION,
+  FEED_FILTER_ELEMENT_ANIME_ID,
+  FEED_FILTER_ELEMENT_ANIME_TITLE,
+  FEED_FILTER_ELEMENT_ANIME_GROUP,
+  FEED_FILTER_ELEMENT_ANIME_EPISODE,
+  FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE,
+  FEED_FILTER_ELEMENT_ANIME_RESOLUTION,
+  FEED_FILTER_ELEMENT_ANIME_MYSTATUS,
+  FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS
+};
+
+enum FeedFilterOperator {
+  FEED_FILTER_OPERATOR_IS,
+  FEED_FILTER_OPERATOR_ISNOT,
+  FEED_FILTER_OPERATOR_ISGREATERTHAN,
+  FEED_FILTER_OPERATOR_ISLESSTHAN,
+  FEED_FILTER_OPERATOR_BEGINSWITH,
+  FEED_FILTER_OPERATOR_ENDSWITH,
+  FEED_FILTER_OPERATOR_CONTAINS,
+  FEED_FILTER_OPERATOR_CONTAINSNOT
+};
+
+enum FeedFilterMatch {
+  FEED_FILTER_MATCH_ALL,
+  FEED_FILTER_MATCH_ANY
+};
+
+class CFeedFilterCondition {
+public:
+  CFeedFilterCondition() : Element(0), Operator(0) {}
+  virtual ~CFeedFilterCondition() {}
+
+  int Element;
+  int Operator;
+  wstring Value;
+};
+
+enum FeedFilterAction {
+  FEED_FILTER_ACTION_EXCLUDE,
+  FEED_FILTER_ACTION_INCLUDE,
+  FEED_FILTER_ACTION_PREFER
 };
 
 class CFeedFilter {
 public:
-  int Option, Type;
-  wstring Value;
+  CFeedFilter() : Action(0), Enabled(true), Match(FEED_FILTER_MATCH_ALL) {}
+  virtual ~CFeedFilter() {}
+
+  void AddCondition(int element, int op, const wstring& value);
+  bool Filter(CFeedItem& item);
+
+  wstring Name;
+  bool Enabled;
+  vector<CFeedFilterCondition> Conditions;
+  int Action, Match;
+};
+
+class CFeedFilterManager {
+public:
+  void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
+    bool enabled = true, const wstring& name = L"");
+  int Filter(CFeed& feed);
+
+  wstring TranslateCondition(const CFeedFilter& filter, size_t index);
+  wstring TranslateElement(int element);
+  wstring TranslateOperator(int op);
+  
+  vector<CFeedFilter> Filters;
 };
 
 // =============================================================================
 
-enum TorrentCategory {
-  TORRENT_ANIME,
-  TORRENT_BATCH,
-  TORRENT_OTHER
-};
-
-class CTorrents {
+class CAggregator {
 public:
-  BOOL Check(const wstring& source);
-  BOOL Compare();
-  BOOL Download(int index);
-  BOOL Read();
-  BOOL SearchArchive(const wstring& file);
-  BOOL Tip();
+  CAggregator();
+  virtual ~CAggregator() {}
 
-  void AddFilter(int option, int type, wstring value);
-  BOOL Filter(int feed_index, int anime_index);
-  
-  CFeed Feed;
-  vector<wstring> Archive;
+  CFeed* Get(int category);
+
+  bool Notify(const CFeed& feed);
+  bool SearchArchive(const wstring& file);
+  void ParseDescription(CFeedItem& feed_item, const wstring& source);
+
+  vector<CFeed> Feeds;
+  vector<wstring> FileArchive;
+  CFeedFilterManager FilterManager;
 
 private:
-  void ParseDescription(CFeedItem& feed_item, const wstring& source);
+  bool CompareFeedItems(const CGenericFeedItem& item1, const CGenericFeedItem& item2);
 };
 
-extern CTorrents Torrents;
+extern CAggregator Aggregator;
 
 #endif // FEED_H

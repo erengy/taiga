@@ -59,6 +59,10 @@ int CTab::GetCurrentlySelected() {
   return TabCtrl_GetCurSel(m_hWindow);
 }
 
+int CTab::GetItemCount() {
+  return TabCtrl_GetItemCount(m_hWindow);
+}
+
 LPARAM CTab::GetItemParam(int nIndex) {
   TCITEM tci;
   tci.mask = TCIF_PARAM;

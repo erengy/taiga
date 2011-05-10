@@ -78,7 +78,8 @@ public:
   BOOL Read();
   BOOL Write(int index, wstring child, wstring value, int mode = ANIMELIST_EDITANIME);
   void DeleteItem(int index);
-  int FindItemByID(int anime_id);
+  CAnime* FindItem(int anime_id);
+  int FindItemIndex(int anime_id);
 
   CUser User;
   vector<CAnime> Item;

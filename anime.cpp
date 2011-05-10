@@ -21,6 +21,7 @@
 #include "common.h"
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_main.h"
+#include "dlg/dlg_search.h"
 #include "event.h"
 #include "http.h"
 #include "media.h"
@@ -314,11 +315,20 @@ bool CAnime::CheckEpisodes(int episode, bool check_folder) {
 
 bool CAnime::PlayEpisode(int number) {
   wstring file;
+
+  // Check saved episode path
+  if (number == GetLastWatchedEpisode() + 1) {
+    if (!NextEpisodePath.empty() && FileExists(NextEpisodePath)) {
+      file = NextEpisodePath;
+    }
+  }
   
-  // Check anime folder first
-  CheckFolder();
-  if (!Folder.empty()) {
-    file = SearchFileFolder(Index, Folder, number, false);
+  // Check anime folder
+  if (file.empty()) {
+    CheckFolder();
+    if (!Folder.empty()) {
+      file = SearchFileFolder(Index, Folder, number, false);
+    }
   }
 
   // Check other folders
@@ -339,7 +349,12 @@ bool CAnime::PlayEpisode(int number) {
   return !file.empty();
 }
 
-bool CAnime::SetEpisodeAvailability(int number, bool available) {
+bool CAnime::IsEpisodeAvailable(int number) {
+  if (static_cast<unsigned int>(number) > EpisodeAvailable.size()) return false;
+  return EpisodeAvailable.at(number - 1);
+}
+
+bool CAnime::SetEpisodeAvailability(int number, bool available, const wstring& path) {
   if (number == 0) number = 1;
   if (number <= Series_Episodes || Series_Episodes == 0) {
     if (static_cast<unsigned int>(number) > EpisodeAvailable.size()) {
@@ -347,6 +362,7 @@ bool CAnime::SetEpisodeAvailability(int number, bool available) {
     }
     EpisodeAvailable[number - 1] = available;
     if (number == GetLastWatchedEpisode() + 1) {
+      NextEpisodePath = path;
       NewEps = available;
     }
     if (!Playing) {
@@ -462,9 +478,9 @@ bool CAnime::IsAiredYet(bool strict) const {
     if (!MAL.IsValidDate(Series_Start)) return false;
     if (strict) {
       if (Series_Start.at(5) == '0' && Series_Start.at(6) == '0')
-        return CompareStrings(GetDateJapan(L"yyyy"), Series_Start.substr(0,4)) > 0;
+        return CompareStrings(GetDateJapan(L"yyyy"), Series_Start.substr(0, 4)) > 0;
       if (Series_Start.at(8) == '0' && Series_Start.at(9) == '0')
-        return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_Start.substr(0,7)) > 0;
+        return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_Start.substr(0, 7)) > 0;
     }
     return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_Start) >= 0;
   }
@@ -475,17 +491,21 @@ bool CAnime::IsFinishedAiring() const {
   if (Series_Status == MAL_FINISHED) return true;
   if (!MAL.IsValidDate(Series_End)) return false;
   if (!IsAiredYet()) return false;
-  if (Series_End.at(5) == '0' && Series_End.at(6) == '0')
-    return CompareStrings(GetDateJapan(L"yyyy"), Series_End.substr(0,4)) > 0;
-  if (Series_End.at(8) == '0' && Series_End.at(9) == '0')
-    return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_End.substr(0,7)) > 0;
+  
+  if (Series_End.at(5) == '0' && Series_End.at(6) == '0') {
+    return CompareStrings(GetDateJapan(L"yyyy"), Series_End.substr(0, 4)) > 0;
+  }
+  if (Series_End.at(8) == '0' && Series_End.at(9) == '0') {
+    return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_End.substr(0, 7)) > 0;
+  }
   return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_End) > 0;
 }
 
 int CAnime::GetAiringStatus() {
   if (IsFinishedAiring()) return MAL_FINISHED;
-  else if (IsAiredYet(true)) return MAL_AIRING;
-  else return MAL_NOTYETAIRED;
+  if (IsAiredYet()) return MAL_AIRING;
+  if (IsAiredYet(true)) return MAL_AIRING;
+  return MAL_NOTYETAIRED;
 }
 
 void CAnime::SetStartDate(wstring date, bool ignore_previous) {
@@ -554,6 +574,7 @@ void CAnime::Edit(const wstring& data, CEventItem item) {
     AnimeList.DeleteItem(item.AnimeIndex);
     MainWindow.RefreshList();
     MainWindow.RefreshTabs();
+    SearchWindow.PostMessage(WM_CLOSE);
   }
 
   // Remove item from update buffer

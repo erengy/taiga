@@ -248,7 +248,7 @@ BOOL CSettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.animesuki.com/rss.php?link=enclosure");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.baka-updates.com/rss.php");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.eu/?page=rss&catid=1&subcat=37&filter=2");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings.RSS.Torrent.Source.c_str());
       CheckDlgButton(IDC_CHECK_TORRENT_HIDE, Settings.RSS.Torrent.HideUnidentified);
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.RSS.Torrent.CheckEnabled);
@@ -264,7 +264,7 @@ BOOL CSettingsPage::OnInitDialog() {
     }
     // Torrent > Filters
     case PAGE_TORRENT2: {
-      CheckDlgButton(IDC_CHECK_TORRENT_FILTERGLOBAL, Settings.RSS.Torrent.Filters.GlobalEnabled);
+      /*CheckDlgButton(IDC_CHECK_TORRENT_FILTERGLOBAL, Settings.RSS.Torrent.Filters.GlobalEnabled);
       CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTERGLOBAL);
       List.InsertColumn(0, 220, 220, 0, L"Value");
       List.InsertColumn(1, 100, 100, 0, L"Option");
@@ -282,7 +282,7 @@ BOOL CSettingsPage::OnInitDialog() {
           Settings.RSS.Torrent.Filters.Global[i].Value);
       }
       List.Sort(0, 1, 0, ListViewCompareProc);
-      List.SetWindowHandle(NULL);
+      List.SetWindowHandle(NULL);*/
       break;
     }
   }
@@ -395,7 +395,7 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         return TRUE;
       }
       // Add global filter
-      case IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD: {
+      /*case IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD: {
         TorrentFilterWindow.SetValues(0, 0, L"");
         ExecuteAction(L"TorrentAddFilter", TRUE, 
           reinterpret_cast<LPARAM>(SettingsWindow.GetWindowHandle()));
@@ -415,7 +415,7 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, FALSE);
         List.SetWindowHandle(NULL);
         return TRUE;
-      }
+      }*/
 
       // ================================================================================
 
@@ -522,7 +522,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
             }
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
             Execute(MediaPlayers.Item[lpnmitem->iItem].GetPath());
-          } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTERGLOBAL)) {
+          } /*else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTERGLOBAL)) {
             wstring option_str, type_str, value;
             int option = 0, type = 0;
             List.GetItemText(lpnmitem->iItem, 0, value);
@@ -540,7 +540,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
                 TorrentFilterWindow.m_Filter.Type, 
                 TorrentFilterWindow.m_Filter.Value);
             }
-          }
+          }*/
           List.SetWindowHandle(NULL);
           return TRUE;
         }
@@ -622,7 +622,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 // =============================================================================
 
 void AddTorrentFilterFromList(HWND hwnd_list, int item_index, vector<CFeedFilter>& filter_vector) {
-  wstring option_str, type_str, value;
+  /*wstring option_str, type_str, value;
   int option = 0, type = 0;
 
   CListView List = hwnd_list;
@@ -637,7 +637,7 @@ void AddTorrentFilterFromList(HWND hwnd_list, int item_index, vector<CFeedFilter
   filter_vector.resize(filter_vector.size() + 1);
   filter_vector.back().Option = option;
   filter_vector.back().Type = type;
-  filter_vector.back().Value = value;
+  filter_vector.back().Value = value;*/
 }
 
 int TranslateFilterOption(const wstring& option_str) {

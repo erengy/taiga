@@ -28,6 +28,7 @@ public:
   CGdiPlus();
   ~CGdiPlus();
 
+  HICON LoadIcon(const wstring& file);
   HBITMAP LoadImage(const wstring& file);
 
 private:

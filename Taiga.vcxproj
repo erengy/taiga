@@ -107,6 +107,7 @@
     <ClCompile Include="dlg\dlg_update.cpp" />
     <ClCompile Include="encryption.cpp" />
     <ClCompile Include="event.cpp" />
+    <ClCompile Include="feed_filter.cpp" />
     <ClCompile Include="gfx.cpp" />
     <ClCompile Include="gzip.cpp" />
     <ClCompile Include="http.cpp" />

@@ -35,6 +35,18 @@ CGdiPlus::~CGdiPlus() {
   m_Token = NULL;
 }
 
+HICON CGdiPlus::LoadIcon(const wstring& file) {
+  HICON hIcon = NULL;
+  
+  Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(file.c_str());
+  if (pBitmap) {
+    pBitmap->GetHICON(&hIcon);
+    delete pBitmap; pBitmap = NULL;
+  }
+
+  return hIcon;
+}
+
 HBITMAP CGdiPlus::LoadImage(const wstring& file) {
   HBITMAP hBitmap = NULL;
   

@@ -24,12 +24,12 @@
 #include "win32/win_main.h"
 
 #define APP_NAME             L"Taiga"
-#define APP_TITLE            L"Taiga 0.7"
-#define APP_VERSION          L"0.7.70"
-#define APP_BUILD            L"2011-03-23"
+#define APP_TITLE            L"Taiga 0.8"
+#define APP_VERSION          L"0.8.86"
+#define APP_BUILD            L"2011-05-10"
 #define APP_VERSION_MAJOR    0
-#define APP_VERSION_MINOR    7
-#define APP_VERSION_REVISION 70
+#define APP_VERSION_MINOR    8
+#define APP_VERSION_REVISION 86
 
 #ifndef PORTABLE
 #define PORTABLE
@@ -62,7 +62,7 @@ public:
   
   bool LoggedIn, UpdatesEnabled;
   int CurrentTipType, PlayStatus;
-  int TickerMedia, TickerNewEpisodes, TickerQueue, TickerTorrent;
+  int TickerMedia, TickerNewEpisodes, TickerQueue;
 
   class CUpdate : public CUpdateHelper {
   public:

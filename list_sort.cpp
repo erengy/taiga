@@ -44,22 +44,42 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       }
       break;
     }
+
+    // Progress
+    case LISTSORTTYPE_PROGRESS: {
+      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
+      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+      if (pItem1 && pItem2) {
+        int total1 = pItem1->GetTotalEpisodes();
+        int total2 = pItem2->GetTotalEpisodes();
+        float ratio1 = total1 ? (float)pItem1->GetLastWatchedEpisode() / (float)total1 : 0.8f;
+        float ratio2 = total2 ? (float)pItem2->GetLastWatchedEpisode() / (float)total2 : 0.8f;
+        if (ratio1 > ratio2) {
+          return_value = 1;
+        } else if (ratio1 < ratio2) {
+          return_value = -1;
+        }
+      }
+      break;
+    }
     
     // Season
     case LISTSORTTYPE_SEASON: {
       CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
       CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        wstring date1, date2;
+        static wstring date1, date2;
         date1 = pItem1->Series_Start;
         date2 = pItem2->Series_Start;
+        if (date1.length() < 10) date1 = L"0000-00-00";
+        if (date2.length() < 10) date2 = L"0000-00-00";
         // if (date1[0] == '0') date1[0] = '?';
         // if (date2[0] == '0') date2[0] = '?';
         if (date1[5] == '0' && date1[6] == '0') date1[5] = '?';
         if (date2[5] == '0' && date2[6] == '0') date2[5] = '?';
         if (date1[8] == '0' && date1[9] == '0') date1[8] = '?';
         if (date2[8] == '0' && date2[9] == '0') date2[8] = '?';
-        return_value = wcsncmp(date1.c_str(), date2.c_str(),10);
+        return_value = wcsncmp(date1.c_str(), date2.c_str(), 10);
       }
       break;
     }

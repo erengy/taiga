@@ -46,7 +46,7 @@ public:
   bool RestartApp, UpdateAvailable;
   CVersionInfo VersionInfo;
 
-  bool Check(const wstring& url, CApp& app, DWORD client_mode);
+  bool Check(const wstring& address, CApp& app, DWORD client_mode);
   bool DownloadNextFile(DWORD client_mode);
   bool ParseData(wstring data, DWORD client_mode);
   bool RestartApplication(const wstring& updatehelper_exe, 

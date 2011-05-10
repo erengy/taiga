@@ -21,7 +21,8 @@
 #include "common.h"
 #include "dlg/dlg_torrent.h"
 #include "feed.h"
-#include "http.h"
+#include "gfx.h"
+#include "myanimelist.h"
 #include "recognition.h"
 #include "resource.h"
 #include "settings.h"
@@ -30,165 +31,220 @@
 #include "win32/win_taskbar.h"
 #include "xml.h"
 
-CTorrents Torrents;
-CHTTPClient TorrentClient;
+CAggregator Aggregator;
 
 // =============================================================================
 
-CFeedItem::CFeedItem() :
-  NewItem(false), Download(false) 
-{
-}
-
-// =============================================================================
-
-BOOL CTorrents::Check(const wstring& source) {
-  Taiga.TickerTorrent = 0;
-  if (source.empty()) return FALSE;
+bool CFeed::Check(const wstring& source) {
+  // Reset ticker before checking the source so we don't fall into a loop
+  Ticker = 0;
+  if (source.empty()) return false;
+  Link = source;
   
-  TorrentWindow.m_Toolbar.EnableButton(0, false);
-  TorrentWindow.m_Toolbar.EnableButton(1, false);
-  
-  CCrackURL url(source);
-  return TorrentClient.Get(url.Host, url.Path, Taiga.GetDataPath() + L"rss.xml", HTTP_TorrentCheck);
-}
-
-BOOL CTorrents::Compare() {
-  int torrent_count = 0;
-  
-  // Examine title and compare with anime list items
-  for (size_t i = 0; i < Feed.Item.size(); i++) {
-    Meow.ExamineTitle(Feed.Item[i].Title, Feed.Item[i].EpisodeData, true, true, true, true, false);
-    for (int j = AnimeList.Count; j > 0; j--) {
-      if (Meow.CompareEpisode(Feed.Item[i].EpisodeData, AnimeList.Item[j])) {
-        Feed.Item[i].EpisodeData.Index = j;
-        break;
-      }
-    }
+  switch (Category) {
+    case FEED_CATEGORY_LINK:
+      // Disable toolbar buttons on torrent dialog
+      TorrentWindow.m_Toolbar.EnableButton(0, false);
+      TorrentWindow.m_Toolbar.EnableButton(1, false);
+      break;
   }
   
-  // Filter
-  for (size_t i = 0; i < Feed.Item.size(); i++) {
-    int anime_index = Feed.Item[i].EpisodeData.Index;
-    if (anime_index > 0) {
-      if (GetEpisodeHigh(Feed.Item[i].EpisodeData.Number) > AnimeList.Item[anime_index].GetLastWatchedEpisode()) {
-        Feed.Item[i].NewItem = true;
-        if (Filter(i, anime_index)) {
-          wstring file = Feed.Item[i].Title + L".torrent";
-          ValidateFileName(file);
-          if (!SearchArchive(file)) {
-            Feed.Item[i].Download = true;
-            torrent_count++;
-          }
-        }
-      }
-    }
-  }
-
-  return torrent_count;
+  CUrl url(Link);
+  return Client.Get(url, GetDataPath() + L"feed.xml", 
+    HTTP_Feed_Check, reinterpret_cast<LPARAM>(this));
 }
 
-BOOL CTorrents::Download(int index) {
-  DWORD dwMode = HTTP_TorrentDownload;
+bool CFeed::Download(int index) {
+  if (Category != FEED_CATEGORY_LINK) {
+    DEBUG_PRINT(L"CFeed::Download - How did we end up here?\n");
+    return false;
+  }
   
+  DWORD dwMode = HTTP_Feed_Download;
   if (index == -1) {
-    for (size_t i = 0; i < Feed.Item.size(); i++) {
-      if (Feed.Item[i].Download) {
-        dwMode = HTTP_TorrentDownloadAll;
+    for (size_t i = 0; i < Item.size(); i++) {
+      if (Item[i].Download) {
+        dwMode = HTTP_Feed_DownloadAll;
         index = i;
         break;
       }
     }
   }
-  
-  if (index < 0 || index > static_cast<int>(Feed.Item.size()))
-    return FALSE;
+  if (index < 0 || index > static_cast<int>(Item.size())) return false;
+  DownloadIndex = index;
 
-  TorrentWindow.ChangeStatus(L"Downloading \"" + Feed.Item[index].Title + L"\"...");
+  TorrentWindow.ChangeStatus(L"Downloading \"" + Item[index].Title + L"\"...");
   TorrentWindow.m_Toolbar.EnableButton(0, false);
   TorrentWindow.m_Toolbar.EnableButton(1, false);
   
-  wstring folder = Taiga.GetDataPath() + L"Torrents\\";
-  CreateDirectory(folder.c_str(), NULL);
-  wstring file = Feed.Item[index].Title + L".torrent";
+  wstring file = Item[index].Title + L".torrent";
   ValidateFileName(file);
+  file = GetDataPath() + file;
   
-  CCrackURL url(Feed.Item[index].Link);
-  return TorrentClient.Get(url.Host, url.Path, folder + file, dwMode, 
-    reinterpret_cast<LPARAM>(&Feed.Item[index]));
+  CUrl url(Item[index].Link);
+  return Client.Get(url, file, dwMode, reinterpret_cast<LPARAM>(this));
 }
 
-BOOL CTorrents::Read() {
+int CFeed::ExamineData() {
+  // Examine title and compare with anime list items
+  for (size_t i = 0; i < Item.size(); i++) {
+    Meow.ExamineTitle(Item[i].Title, Item[i].EpisodeData, true, true, true, true, false);
+    for (int j = AnimeList.Count; j > 0; j--) {
+      if (Meow.CompareEpisode(Item[i].EpisodeData, AnimeList.Item[j])) {
+        Item[i].EpisodeData.Index = j;
+        break;
+      }
+    }
+  }
+
+  // Filter
+  int count = Aggregator.FilterManager.Filter(*this);
+  return count;
+}
+
+wstring CFeed::GetDataPath() {
+  wstring path = Taiga.GetDataPath() + L"Feed\\";
+  if (!Link.empty()) {
+    CUrl url(Link);
+    path += Base64Encode(url.Host, true) + L"\\";
+  }
+  return path;
+}
+
+HICON CFeed::GetIcon() {
+  if (m_hIcon) return m_hIcon;
+  if (Link.empty()) return NULL;
+
+  wstring path = GetDataPath() + L"favicon.ico";
+
+  if (FileExists(path)) {
+    m_hIcon = GdiPlus.LoadIcon(path);
+    return m_hIcon;
+  } else {
+    CUrl url(Link + L"/favicon.ico");
+    Client.Get(url, path, HTTP_Feed_DownloadIcon, reinterpret_cast<LPARAM>(this));
+    return NULL;
+  }
+}
+
+bool CFeed::Read() {
   // Initialize
-  wstring file = Taiga.GetDataPath() + L"rss.xml";
-  Feed.Item.clear();
+  wstring file = GetDataPath() + L"feed.xml";
+  Item.clear();
 
   // Read XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok) {
-    return FALSE;
+    return false;
   }
 
-  // Read information
+  // Read channel information
   xml_node channel = doc.child(L"rss").child(L"channel");
-  Feed.Title = XML_ReadStrValue(channel, L"title");
-  Feed.Link = XML_ReadStrValue(channel, L"link");
-  Feed.Description = XML_ReadStrValue(channel, L"description");
+  Title = XML_ReadStrValue(channel, L"title");
+  Link = XML_ReadStrValue(channel, L"link");
+  Description = XML_ReadStrValue(channel, L"description");
 
   // Read items
   for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
     // Read data
-    Feed.Item.resize(Feed.Item.size() + 1);
-    Feed.Item.back().Index = Feed.Item.size() - 1;
-    Feed.Item.back().Category = XML_ReadStrValue(item, L"category");
-    Feed.Item.back().Title = XML_ReadStrValue(item, L"title");
-    Feed.Item.back().Link = XML_ReadStrValue(item, L"link");
-    Feed.Item.back().Description = XML_ReadStrValue(item, L"description");
+    Item.resize(Item.size() + 1);
+    Item.back().Index = Item.size() - 1;
+    Item.back().Category = XML_ReadStrValue(item, L"category");
+    Item.back().Title = XML_ReadStrValue(item, L"title");
+    Item.back().Link = XML_ReadStrValue(item, L"link");
+    Item.back().Description = XML_ReadStrValue(item, L"description");
+    
     // Remove if title or link is empty
-    if (Feed.Item.back().Title.empty() || Feed.Item.back().Link.empty()) {
-      Feed.Item.pop_back();
-      continue;
+    if (Category == FEED_CATEGORY_LINK) {
+      if (Item.back().Title.empty() || Item.back().Link.empty()) {
+        Item.pop_back();
+        continue;
+      }
     }
+    
     // Clean up title
-    DecodeHTML(Feed.Item.back().Title);
-    Replace(Feed.Item.back().Title, L"\\'", L"'");
+    DecodeHTML(Item.back().Title);
+    Replace(Item.back().Title, L"\\'", L"'");
     // Clean up description
-    DecodeHTML(Feed.Item.back().Description);
-    Replace(Feed.Item.back().Description, L"<br/>", L"\n");
-    Replace(Feed.Item.back().Description, L"<br />", L"\n");
-    StripHTML(Feed.Item.back().Description);
-    Trim(Feed.Item.back().Description, L" \n");
-    ParseDescription(Feed.Item.back(), Feed.Link);
-    Replace(Feed.Item.back().Description, L"\n", L" | ");
-    // Get real link
-    if (InStr(Feed.Item.back().Link, L"nyaatorrents", 0, true) > -1) {
-      Replace(Feed.Item.back().Link, L"torrentinfo", L"download");
+    DecodeHTML(Item.back().Description);
+    Replace(Item.back().Description, L"<br/>", L"\n");
+    Replace(Item.back().Description, L"<br />", L"\n");
+    StripHTML(Item.back().Description);
+    Trim(Item.back().Description, L" \n");
+    Aggregator.ParseDescription(Item.back(), Link);
+    Replace(Item.back().Description, L"\n", L" | ");
+    // Get download link
+    if (InStr(Item.back().Link, L"nyaatorrents", 0, true) > -1) {
+      Replace(Item.back().Link, L"torrentinfo", L"download");
     }
   }
+
+  return true;
+}
+
+// =============================================================================
+
+CAggregator::CAggregator() {
+  // Add torrent feed
+  Feeds.resize(Feeds.size() + 1);
+  Feeds.back().Category = FEED_CATEGORY_LINK;
+
+  // TEMP: Add temporary filters for testing purposes
+  #ifdef _DEBUG
+  #define FM Aggregator.FilterManager
+  // Discard unknown titles
+  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
   
-  return TRUE;
+  // Discard items for completed titles
+  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
+  
+  // Discard items for dropped titles
+  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
+  
+  // Discard already watched episodes
+  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY);
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_IS, L"%watched%");
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"1");
+  
+  // Discard low resolution files
+  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY);
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"360p");
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"480p");
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"704x400");
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"XviD");
+  
+  // Discard fansub groups other than "Ahodomo" for "Nichijou"
+  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"10165");
+  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, FEED_FILTER_OPERATOR_ISNOT, L"Ahodomo");
+  #undef FM
+  #endif
 }
 
-BOOL CTorrents::SearchArchive(const wstring& file) {
-  for (size_t i = 0; i < Archive.size(); i++) {
-    if (Archive[i] == file) return TRUE;
+CFeed* CAggregator::Get(int category) {
+  for (unsigned int i = 0; i < Feeds.size(); i++) {
+    if (Feeds[i].Category == category) return &Feeds[i];
   }
-  return FALSE;
+  return NULL;
 }
 
-BOOL CTorrents::Tip() {
+bool CAggregator::Notify(const CFeed& feed) {
   wstring tip_text, tip_title;
 
-  for (size_t i = 0; i < Feed.Item.size(); i++) {
-    if (Feed.Item[i].Download) {
+  for (size_t i = 0; i < feed.Item.size(); i++) {
+    if (feed.Item[i].Download) {
       tip_text += L"\u00BB " + ReplaceVariables(L"%title%$if(%episode%, #%episode%)\n", 
-        Feed.Item[i].EpisodeData);
+        feed.Item[i].EpisodeData);
     }
   }
 
   if (tip_text.empty()) {
-    return FALSE;
+    return false;
   } else {
     tip_text += L"Click to see all.";
     tip_title = L"New torrents available";
@@ -196,118 +252,25 @@ BOOL CTorrents::Tip() {
     Taiga.CurrentTipType = TIPTYPE_TORRENT;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
-    return TRUE;
+    return true;
   }
 }
 
-// =============================================================================
-
-void CTorrents::AddFilter(int option, int type, wstring value) {
-  #define FILTERS Settings.RSS.Torrent.Filters.Global
-  FILTERS.resize(FILTERS.size() + 1);
-  FILTERS.back().Option = option;
-  FILTERS.back().Type = type;
-  FILTERS.back().Value = value;
-  #undef FILTERS
+bool CAggregator::SearchArchive(const wstring& file) {
+  for (size_t i = 0; i < FileArchive.size(); i++) {
+    if (FileArchive[i] == file) return TRUE;
+  }
+  return FALSE;
 }
 
-BOOL CTorrents::Filter(int feed_index, int anime_index) {
-  // Filter fansub group preference
-  if (!AnimeList.Item[anime_index].FansubGroup.empty() && 
-    !IsEqual(AnimeList.Item[anime_index].FansubGroup, Feed.Item[feed_index].EpisodeData.Group)) {
-      return FALSE;
-  }
-  
-  // Don't bother if global filters are disabled
-  if (Settings.RSS.Torrent.Filters.GlobalEnabled == FALSE) {
-    return TRUE;
-  }
-  
-  for (size_t i = 0; i < Settings.RSS.Torrent.Filters.Global.size(); i++) {
-    #define FEED Feed.Item[feed_index]
-    #define FILTER Settings.RSS.Torrent.Filters.Global[i]
-    switch (FILTER.Type) {
-      // Filter keyword
-      case FEED_FILTER_KEYWORD: {
-        switch (FILTER.Option) {
-          // Exclude
-          case FEED_FILTER_EXCLUDE: {
-            if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) > -1 || 
-              InStr(FEED.Title, FILTER.Value, 0, true) > -1 || 
-              InStr(FEED.Link, FILTER.Value, 0, true) > -1) {
-                return FALSE;
-            }
-            break;
-          }
-          // Include
-          case FEED_FILTER_INCLUDE: {
-            if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) == -1 && 
-              InStr(FEED.Title, FILTER.Value, 0, true) == -1 && 
-              InStr(FEED.Link, FILTER.Value, 0, true) == -1) {
-                return FALSE;
-            }
-            break;
-          }
-          // Preference
-          // TODO: Fix this
-          case FEED_FILTER_PREFERENCE: {
-            if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) > -1 || 
-              InStr(FEED.Title, FILTER.Value, 0, true) > -1 || 
-              InStr(FEED.Link, FILTER.Value, 0, true) > -1) {
-                break;
-            }
-            for (size_t j = 0; j < Feed.Item.size(); j++) {
-              if (j == feed_index || 
-                Feed.Item[j].EpisodeData.Index  != FEED.EpisodeData.Index || 
-                Feed.Item[j].EpisodeData.Number != FEED.EpisodeData.Number) {
-                  continue;
-              }
-              if (InStr(FEED.EpisodeData.Title, FILTER.Value, 0, true) > -1 || 
-                InStr(Feed.Item[j].Title, FILTER.Value, 0, true) > -1 || 
-                InStr(Feed.Item[j].Link, FILTER.Value, 0, true) > -1) {
-                  return FALSE;
-              }
-            }
-            break;
-          }
-        }
-        break;
-      }
-      // Filter airing status
-      case FEED_FILTER_AIRINGSTATUS: {
-        if (anime_index > 0 && 
-          AnimeList.Item[anime_index].GetAiringStatus() == ToINT(FILTER.Value)) {
-            return FALSE;
-        }
-        break;
-      }
-      // Filter watching status
-      case FEED_FILTER_WATCHINGSTATUS: {
-        if (anime_index > 0 && 
-          AnimeList.Item[anime_index].GetStatus() == ToINT(FILTER.Value)) {
-            return FALSE;
-        }
-        break;
-      }
-    }
-    #undef FEED
-    #undef FILTER
-  }
-
-  // Passed
-  return TRUE;
-}
-
-// =============================================================================
-
-void CTorrents::ParseDescription(CFeedItem& feed_item, const wstring& source) {
+void CAggregator::ParseDescription(CFeedItem& feed_item, const wstring& source) {
   // AnimeSuki
   if (InStr(source, L"animesuki", 0, true) > -1) {
     wstring size_str = L"Filesize: ";
     vector<wstring> description_vector;
     Split(feed_item.Description, L"\n", description_vector);
     if (description_vector.size() > 2) {
-      feed_item.Size = description_vector[2].substr(size_str.length());
+      feed_item.EpisodeData.FileSize = description_vector[2].substr(size_str.length());
     }
     if (description_vector.size() > 1) {
       feed_item.Description = description_vector[0] + L" " + description_vector[1];
@@ -334,7 +297,7 @@ void CTorrents::ParseDescription(CFeedItem& feed_item, const wstring& source) {
     vector<wstring> description_vector;
     Split(feed_item.Description, L"\n", description_vector);
     if (description_vector.size() > 1) {
-      feed_item.Size = description_vector[1].substr(size_str.length());
+      feed_item.EpisodeData.FileSize = description_vector[1].substr(size_str.length());
     }
     if (description_vector.size() > 2) {
       feed_item.Description = description_vector[2].substr(comment_str.length());
@@ -342,4 +305,28 @@ void CTorrents::ParseDescription(CFeedItem& feed_item, const wstring& source) {
     }
     feed_item.Description.clear();
   }
+}
+
+// =============================================================================
+
+bool CAggregator::CompareFeedItems(const CGenericFeedItem& item1, const CGenericFeedItem& item2) {
+  // Check for guid element first
+  if (item1.IsPermaLink && item2.IsPermaLink) {
+    if (!item1.GUID.empty() || !item2.GUID.empty()) {
+      if (item1.GUID == item2.GUID) return true;
+    }
+  }
+
+  // Fallback to link element
+  if (!item1.Link.empty() || !item2.Link.empty()) {
+    if (item1.Link == item2.Link) return true;
+  }
+
+  // Fallback to title element
+  if (!item1.Title.empty() || !item2.Title.empty()) {
+    if (item1.Title == item2.Title) return true;
+  }
+
+  // Items are different
+  return false;
 }

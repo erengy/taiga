@@ -281,7 +281,15 @@ void CAnimeList::DeleteItem(int index) {
   }
 }
 
-int CAnimeList::FindItemByID(int anime_id) {
+CAnime* CAnimeList::FindItem(int anime_id) {
+  if (anime_id)
+    for (int i = 1; i <= Count; i++)
+      if (Item[i].Series_ID == anime_id)
+        return &Item[i];
+  return NULL;
+}
+
+int CAnimeList::FindItemIndex(int anime_id) {
   if (anime_id)
     for (int i = 1; i <= Count; i++)
       if (Item[i].Series_ID == anime_id)

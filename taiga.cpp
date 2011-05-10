@@ -42,7 +42,7 @@ CTaiga Taiga;
 CTaiga::CTaiga() : 
   LoggedIn(false), UpdatesEnabled(true), 
   CurrentTipType(TIPTYPE_NORMAL), PlayStatus(PLAYSTATUS_STOPPED), 
-  TickerMedia(0), TickerNewEpisodes(0), TickerQueue(0), TickerTorrent(0)
+  TickerMedia(0), TickerNewEpisodes(0), TickerQueue(0)
 {
   SetVersionInfo(APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_REVISION);
 }

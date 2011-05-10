@@ -35,11 +35,11 @@ CTwitter Twitter;
 
 /* HTTP */
 
-void AnnounceToHTTP(wstring url, wstring data) {
-  if (url.empty() || data.empty()) return;
+void AnnounceToHTTP(wstring address, wstring data) {
+  if (address.empty() || data.empty()) return;
 
-  CCrackURL curl(url);
-  HTTPClient.Post(curl.Host, curl.Path, data, L"", HTTP_Silent);
+  CUrl url(address);
+  HTTPClient.Post(url, data, L"", HTTP_Silent);
 }
 
 // =============================================================================

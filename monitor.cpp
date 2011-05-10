@@ -319,7 +319,7 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
             path_available = IsEqual(GetPathOnly(path), ANIME.Folder);
           }
           for (int j = numberlow; j <= number; j++) {
-            if (ANIME.SetEpisodeAvailability(number, path_available)) {
+            if (ANIME.SetEpisodeAvailability(number, path_available, path)) {
               DEBUG_PRINT(L"CFolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
                 ANIME.Series_Title + L" -> " + ToWSTR(j) + L"\n");
             }

@@ -145,7 +145,7 @@ FONT 8, "Tahoma", 400, 0, 0
     LTEXT           "Episodes watched:", IDC_STATIC, 10, 20, 100, 8, SS_LEFT
     EDITTEXT        IDC_EDIT_ANIME_PROGRESS, 10, 30, 100, 14, ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "", IDC_SPIN_PROGRESS, UPDOWN_CLASS, UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_AUTOBUDDY | UDS_SETBUDDYINT, 98, 30, 12, 14
-    AUTOCHECKBOX    "Re-watching", IDC_CHECK_ANIME_REWATCH, 125, 33, 75, 8, NOT WS_VISIBLE
+    AUTOCHECKBOX    "Re-watching", IDC_CHECK_ANIME_REWATCH, 125, 33, 75, 8
     LTEXT           "Status:", IDC_STATIC, 10, 50, 100, 8, SS_LEFT
     COMBOBOX        IDC_COMBO_ANIME_STATUS, 10, 60, 100, 30, WS_TABSTOP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS
     LTEXT           "Score:", IDC_STATIC, 125, 50, 100, 8, SS_LEFT
@@ -641,8 +641,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,7,70,0
-    PRODUCTVERSION  0,7,70,0
+    FILEVERSION     0,8,86,0
+    PRODUCTVERSION  0,8,86,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -656,11 +656,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.7.70"
+            VALUE "FileVersion", "0.8.86"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.7.70"
+            VALUE "ProductVersion", "0.8.86"
         }
     }
     BLOCK "VarFileInfo"

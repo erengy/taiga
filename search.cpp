@@ -67,7 +67,7 @@ wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool
               int number = GetEpisodeHigh(episode.Number);
               int numberlow = GetEpisodeLow(episode.Number);
               for (int i = numberlow; i <= number; i++) {
-                AnimeList.Item[anime_index].SetEpisodeAvailability(i, true);
+                AnimeList.Item[anime_index].SetEpisodeAvailability(i, true, root + wfd.cFileName);
               }
               if (episode_number == 0 || (episode_number >= numberlow && episode_number <= number)) {
                 FindClose(hFind);

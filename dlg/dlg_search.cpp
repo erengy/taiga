@@ -222,7 +222,7 @@ void CSearchWindow::ParseResults(const wstring& data) {
     for (xml_node entry = anime.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
       int i = m_Anime.size(); m_Anime.resize(i + 1);
       int anime_id = XML_ReadIntValue(entry, L"id");
-      m_Anime[i].Index = AnimeList.FindItemByID(anime_id);
+      m_Anime[i].Index = AnimeList.FindItemIndex(anime_id);
       
       if (m_Anime[i].Index > -1) {
         AnimeList.Item[m_Anime[i].Index].Score = XML_ReadStrValue(entry, L"score");
@@ -260,7 +260,7 @@ void CSearchWindow::RefreshList() {
   // Add anime items to list
   for (size_t i = 0; i < m_Anime.size(); i++) {
     if (m_Anime[i].Index == -1) {
-      m_Anime[i].Index = AnimeList.FindItemByID(m_Anime[i].Series_ID);
+      m_Anime[i].Index = AnimeList.FindItemIndex(m_Anime[i].Series_ID);
     }
     CAnime* item = m_Anime[i].Index > -1 ? &AnimeList.Item[m_Anime[i].Index] : &m_Anime[i];
     m_List.InsertItem(i, -1, StatusToIcon(item->GetAiringStatus()), 0, NULL, 

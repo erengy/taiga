@@ -22,7 +22,7 @@
 
 CListView::CListView() {
   m_iSortColumn = 0;
-  m_iSortOrder = -1;
+  m_iSortOrder = 1;
   m_iSortType = 0;
 }
 

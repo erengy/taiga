@@ -29,18 +29,32 @@
 
 // =============================================================================
 
-wstring Base64Decode(const wstring& str) {
+wstring Base64Decode(const wstring& str, bool for_filename) {
+  if (str.empty()) return L"";
   Base64Coder coder;
   string buff = ToANSI(str);
   coder.Decode((BYTE*)buff.c_str(), buff.length());
-  return ToUTF8(coder.DecodedMessage());
+  if (for_filename) {
+    wstring msg = ToUTF8(coder.DecodedMessage());
+    ReplaceChar(msg, '-', '/');
+    return msg;
+  } else {
+    return ToUTF8(coder.DecodedMessage());
+  }
 }
 
-wstring Base64Encode(const wstring& str) {
+wstring Base64Encode(const wstring& str, bool for_filename) {
+  if (str.empty()) return L"";
   Base64Coder coder;
   string buff = ToANSI(str);
   coder.Encode((BYTE*)buff.c_str(), buff.length());
-  return ToUTF8(coder.EncodedMessage());
+  if (for_filename) {
+    wstring msg = ToUTF8(coder.EncodedMessage());
+    ReplaceChar(msg, '/', '-');
+    return msg;
+  } else {
+    return ToUTF8(coder.EncodedMessage());
+  }
 }
 
 // =============================================================================
@@ -317,18 +331,25 @@ wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value
   return path.empty() ? default_value : path;
 }
 
-int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension) {
+int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension, bool recursive) {
   if (path.empty()) return 0;
-  path += extension;
+  wstring folder = path + L"*.*";
   int found = 0;
 
   WIN32_FIND_DATA wfd;
-  HANDLE hFind = FindFirstFile(path.c_str(), &wfd);
+  HANDLE hFind = FindFirstFile(folder.c_str(), &wfd);
   if (hFind != INVALID_HANDLE_VALUE) {
     do {
-      if (wfd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY) {
-        found++;
-        file_list.push_back(wfd.cFileName);
+      if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        if (recursive && wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
+          folder = path + wfd.cFileName + L"\\";
+          found += PopulateFiles(file_list, folder, extension, recursive);
+        }
+      } else if (wfd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY) {
+        if (extension.empty() || IsEqual(GetFileExtension(wfd.cFileName), extension)) {
+          file_list.push_back(wfd.cFileName);
+          found++;
+        }
       }
     } while (FindNextFile(hFind, &wfd));
     FindClose(hFind);

@@ -61,7 +61,9 @@ public:
   LPCWSTR GetClassName() const { return m_WndClass.lpszClassName; };
   HMENU   GetMenuHandle() const { return m_hMenu; };
   HWND    GetParentHandle() const { return m_hParent; };
+  HICON   SetIconLarge(HICON hIcon);
   HICON   SetIconLarge(int nIcon);
+  HICON   SetIconSmall(HICON hIcon);
   HICON   SetIconSmall(int nIcon);
   HWND    GetWindowHandle() const { return m_hWindow; };
   void    SetWindowHandle(HWND hWnd) { m_hWindow = hWnd; };

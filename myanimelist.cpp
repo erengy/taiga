@@ -19,9 +19,9 @@
 #include "std.h"
 #include "animelist.h"
 #include "common.h"
+#include "event.h"
 #include "http.h"
 #include "myanimelist.h"
-#include "event.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -103,22 +103,9 @@ bool CMyAnimeList::Login() {
 }
 
 void CMyAnimeList::DownloadImage(CAnime* pAnimeItem) {
-  wstring server, object, file;
-  server = pAnimeItem->Series_Image;
-  if (server.empty()) return;
-
-  EraseLeft(server, L"http://", true);
-  int pos = InStr(server, L"/");
-  if (pos > -1) {
-    object = server.substr(pos);
-    server.resize(pos);
-  }
-  file = Taiga.GetDataPath() + L"Image\\";
-  CreateDirectory(file.c_str(), NULL);
-  file += ToWSTR(pAnimeItem->Series_ID) + L".jpg";
-  
-  ImageClient.Get(server, object, file, HTTP_MAL_Image, 
-    reinterpret_cast<LPARAM>(pAnimeItem));
+  CUrl url(pAnimeItem->Series_Image);
+  wstring file = Taiga.GetDataPath() + L"Image\\" + ToWSTR(pAnimeItem->Series_ID) + L".jpg";
+  ImageClient.Get(url, file, HTTP_MAL_Image, reinterpret_cast<LPARAM>(pAnimeItem));
 }
 
 BOOL CMyAnimeList::SearchAnime(wstring title, CAnime* pAnimeItem) {
@@ -420,8 +407,11 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"},
     // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
     {L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"},
-    // Onegai My Melody Kirara complete encode (spare the star, because I can't crack that damn encoding so it will work with the rest of this crappy encoding mal employs in their API)...
-    {L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&curren;&atilde;\uFFFD&iexcl;&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound; &atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound;", 
+    // Onegai My Melody Kirara complete encode (spare the star, because I can't crack that damn encoding 
+    // so it will work with the rest of this crappy encoding mal employs in their API)...
+    {L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD"
+     L"&atilde;\uFFFD&curren;&atilde;\uFFFD&iexcl;&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound; "
+     L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound;", 
      L"\u304A\u306D\u304C\u3044\u30DE\u30A4\u30E1\u30ED\u30C7\u30A3 \u304D\u3089\u3089\u3063"},
     /* Characters are sorted by their Unicode value */
     {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2

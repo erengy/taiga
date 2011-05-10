@@ -226,22 +226,26 @@ HWND CWindow::Detach() {
   return hWnd;
 }
 
+HICON CWindow::SetIconLarge(HICON hIcon) {
+  m_hIconLarge = hIcon;
+  if (!m_hIconLarge) return NULL;
+  return (HICON)::SendMessage(m_hWindow, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)m_hIconLarge);
+}
+
 HICON CWindow::SetIconLarge(int nIcon) {
-  m_hIconLarge = reinterpret_cast<HICON>(LoadImage(m_hInstance, MAKEINTRESOURCE(nIcon), IMAGE_ICON, 
-    ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR));
-  if (m_hIconLarge) {
-    ::SendMessage(m_hWindow, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)m_hIconLarge);
-  }
-  return m_hIconLarge;
+  return SetIconLarge(reinterpret_cast<HICON>(LoadImage(m_hInstance, MAKEINTRESOURCE(nIcon), IMAGE_ICON, 
+    ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR)));
+}
+
+HICON CWindow::SetIconSmall(HICON hIcon) {
+  m_hIconSmall = hIcon;
+  if (!m_hIconSmall) return NULL;
+  return (HICON)::SendMessage(m_hWindow, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)m_hIconSmall);
 }
 
 HICON CWindow::SetIconSmall(int nIcon) {
-  m_hIconSmall = reinterpret_cast<HICON>(LoadImage(m_hInstance, MAKEINTRESOURCE(nIcon), IMAGE_ICON, 
-    ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
-  if (m_hIconSmall) {
-    ::SendMessage(m_hWindow, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)m_hIconSmall);
-  }
-  return m_hIconSmall;
+  return SetIconSmall(reinterpret_cast<HICON>(LoadImage(m_hInstance, MAKEINTRESOURCE(nIcon), IMAGE_ICON, 
+    ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR)));
 }
 
 // =============================================================================

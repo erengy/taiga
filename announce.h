@@ -26,7 +26,7 @@
 
 /* HTTP */
 
-void AnnounceToHTTP(wstring url, wstring data);
+void AnnounceToHTTP(wstring address, wstring data);
 
 // =============================================================================
 

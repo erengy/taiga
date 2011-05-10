@@ -29,11 +29,11 @@ enum HTTP_ContentEncoding {
 
 // =============================================================================
 
-class CCrackURL {
+class CUrl {
 public:
-  CCrackURL() {}
-  CCrackURL(wstring url) { Crack(url); }
-  virtual ~CCrackURL() {}
+  CUrl() {}
+  CUrl(wstring url) { Crack(url); }
+  virtual ~CUrl() {}
 
   void Crack(wstring url);
   wstring Scheme, Host, Path;
@@ -56,13 +56,20 @@ public:
   void    SetAutoRedirect(BOOL enabled);
   void    SetProxy(const wstring& proxy, const wstring& user, const wstring& pass);
   void    SetUserAgent(const wstring& user_agent);
-  
+
   bool Connect(wstring szServer, wstring szObject, wstring szData, wstring szVerb, 
+    wstring szHeader, wstring szReferer, wstring szFile, 
+    DWORD dwClientMode = 0, LPARAM lParam = 0);
+  bool Connect(const CUrl& url, wstring szData, wstring szVerb, 
     wstring szHeader, wstring szReferer, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
   bool Get(wstring szServer, wstring szObject, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
+  bool Get(const CUrl& url, wstring szFile, 
+    DWORD dwClientMode = 0, LPARAM lParam = 0);
   bool Post(wstring szServer, wstring szObject, wstring szData, wstring szFile, 
+    DWORD dwClientMode = 0, LPARAM lParam = 0);
+  bool Post(const CUrl& url, wstring szData, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
 
   virtual BOOL OnError(DWORD dwError) { return FALSE; }

@@ -107,88 +107,104 @@ void CTorrentWindow::ChangeStatus(wstring str, int panel_index) {
 
 void CTorrentWindow::RefreshList() {
   if (!IsWindow()) return;
+  CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
+  if (!pFeed) return;
   
   // Hide list to avoid visual defects and gain performance
   m_List.Hide();
   m_List.DeleteAllItems();
 
   // Add items
-  for (size_t i = 0; i < Torrents.Feed.Item.size(); i++) {
-    if (Settings.RSS.Torrent.HideUnidentified && !Torrents.Feed.Item[i].EpisodeData.Index) {
+  for (size_t i = 0; i < pFeed->Item.size(); i++) {
+    if (Settings.RSS.Torrent.HideUnidentified && !pFeed->Item[i].EpisodeData.Index) {
       continue;
     }
     wstring title, number, video;
     int group = TORRENT_ANIME, icon = StatusToIcon(0);
-    if (Torrents.Feed.Item[i].Category == L"Batch" || 
-      !IsNumeric(Torrents.Feed.Item[i].EpisodeData.Number)) {
+    if (pFeed->Item[i].Category == L"Batch" || 
+      !IsNumeric(pFeed->Item[i].EpisodeData.Number)) {
         group = TORRENT_BATCH;
     }
-    if (Torrents.Feed.Item[i].EpisodeData.Index > 0) {
-      icon = StatusToIcon(AnimeList.Item[Torrents.Feed.Item[i].EpisodeData.Index].GetAiringStatus());
-      title = AnimeList.Item[Torrents.Feed.Item[i].EpisodeData.Index].Series_Title;
-    } else if (!Torrents.Feed.Item[i].EpisodeData.Title.empty()) {
-      title = Torrents.Feed.Item[i].EpisodeData.Title;
+    if (pFeed->Item[i].EpisodeData.Index > 0) {
+      icon = StatusToIcon(AnimeList.Item[pFeed->Item[i].EpisodeData.Index].GetAiringStatus());
+      title = AnimeList.Item[pFeed->Item[i].EpisodeData.Index].Series_Title;
+    } else if (!pFeed->Item[i].EpisodeData.Title.empty()) {
+      title = pFeed->Item[i].EpisodeData.Title;
     } else {
       group = TORRENT_OTHER;
-      title = Torrents.Feed.Item[i].Title;
+      title = pFeed->Item[i].Title;
     }
-    number = Torrents.Feed.Item[i].EpisodeData.Number;
+    number = pFeed->Item[i].EpisodeData.Number;
     EraseLeft(number, L"0", false);
-    if (!Torrents.Feed.Item[i].EpisodeData.Version.empty()) {
-      number += L"v" + Torrents.Feed.Item[i].EpisodeData.Version;
+    if (!pFeed->Item[i].EpisodeData.Version.empty()) {
+      number += L"v" + pFeed->Item[i].EpisodeData.Version;
     }
-    video = Torrents.Feed.Item[i].EpisodeData.VideoType;
-    if (!Torrents.Feed.Item[i].EpisodeData.Resolution.empty()) {
+    video = pFeed->Item[i].EpisodeData.VideoType;
+    if (!pFeed->Item[i].EpisodeData.Resolution.empty()) {
       if (!video.empty()) video += L" ";
-      video += Torrents.Feed.Item[i].EpisodeData.Resolution;
+      video += pFeed->Item[i].EpisodeData.Resolution;
     }
     int index = m_List.InsertItem(i, group, icon, 0, NULL, title.c_str(), 
-      reinterpret_cast<LPARAM>(&Torrents.Feed.Item[i]));
+      reinterpret_cast<LPARAM>(&pFeed->Item[i]));
     m_List.SetItem(index, 1, number.c_str());
-    m_List.SetItem(index, 2, Torrents.Feed.Item[i].EpisodeData.Group.c_str());
-    m_List.SetItem(index, 3, Torrents.Feed.Item[i].Size.c_str());
+    m_List.SetItem(index, 2, pFeed->Item[i].EpisodeData.Group.c_str());
+    m_List.SetItem(index, 3, pFeed->Item[i].EpisodeData.FileSize.c_str());
     m_List.SetItem(index, 4, video.c_str());
-    m_List.SetItem(index, 5, Torrents.Feed.Item[i].Description.c_str());
-    m_List.SetItem(index, 6, Torrents.Feed.Item[i].EpisodeData.File.c_str());
-    m_List.SetCheckState(index, Torrents.Feed.Item[i].Download);
+    m_List.SetItem(index, 5, pFeed->Item[i].Description.c_str());
+    m_List.SetItem(index, 6, pFeed->Item[i].EpisodeData.File.c_str());
+    m_List.SetCheckState(index, pFeed->Item[i].Download);
   }
 
   // Show again
   m_List.Show();
 
+  // Set icon
+  HICON hIcon = pFeed->GetIcon();
+  if (hIcon) SetIconSmall(hIcon);
+
   // Set title
   wstring title = L"Torrents";
-  if (!Torrents.Feed.Title.empty()) title = Torrents.Feed.Title;
-  if (!Torrents.Feed.Description.empty()) title += L" - " + Torrents.Feed.Description;
+  if (!pFeed->Title.empty()) {
+    title = pFeed->Title;
+  } else if (!pFeed->Link.empty()) {
+    CUrl url(pFeed->Link);
+    title += L" (" + url.Host + L")";
+  }
+  if (!pFeed->Description.empty()) {
+    title += L" - " + pFeed->Description;
+  }
   SetText(title.c_str());
 }
 
 // =============================================================================
 
 BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+  CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
+  if (!pFeed) return 0;
+  
   // Toolbar
   switch (LOWORD(wParam)) {
     // Check new torrents
     case 100: {
-      Torrents.Check(Settings.RSS.Torrent.Source);
-      /*
+      pFeed->Check(Settings.RSS.Torrent.Source);
+      /**
       #ifdef _DEBUG
-      Torrents.Read();
-      Torrents.Compare();
+      pFeed->Read();
+      pFeed->ExamineData();
       RefreshList();
       #endif
-      */
+      /**/
       return TRUE;
     }
     // Download selected torrents
     case 101: {
       for (int i = 0; i < m_List.GetItemCount(); i++) {
-        CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
-        if (pFeed) {
-          pFeed->Download = m_List.GetCheckState(i);
+        CFeedItem* pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
+        if (pItem) {
+          pItem->Download = m_List.GetCheckState(i) == TRUE;
         }
       }
-      Torrents.Download(-1);
+      pFeed->Download(-1);
       return TRUE;
     }
     // Settings
@@ -202,6 +218,9 @@ BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
+  if (!pFeed) return 0;
+
   // ListView control
   if (idCtrl == IDC_LIST_TORRENT) {
     switch (pnmh->code) {
@@ -232,9 +251,9 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (m_List.GetSelectedCount() > 0) {
           LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
           if (lpnmitem->iItem == -1) break;
-          CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
-          if (pFeed) {
-            Torrents.Download(pFeed->Index);
+          CFeedItem* pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
+          if (pItem) {
+            pFeed->Download(pItem->Index);
           }
         }
         break;
@@ -244,17 +263,17 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case NM_RCLICK: {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
         if (lpnmitem->iItem == -1) break;
-        CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
-        if (pFeed) {
+        CFeedItem* pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(lpnmitem->iItem));
+        if (pItem) {
           wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
-            Torrents.Download(pFeed->Index);
+            pFeed->Download(pItem->Index);
           } else if (answer == L"MoreTorrents") {
-            Torrents.Check(ReplaceVariables(
-              L"http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2&term=%title%", 
-              pFeed->EpisodeData));
+            pFeed->Check(ReplaceVariables(
+              L"http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2&term=%title%", // TEMP
+              pItem->EpisodeData));
           } else if (answer == L"SearchMAL") {
-            ExecuteAction(L"SearchAnime(" + pFeed->EpisodeData.Title + L")");
+            ExecuteAction(L"SearchAnime(" + pItem->EpisodeData.Title + L")");
           }
         }
         break;
@@ -278,11 +297,11 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
               pCD->clrTextBk = RGB(248, 248, 248);
             }
             // Change text color
-            CFeedItem* pFeed = reinterpret_cast<CFeedItem*>(pCD->nmcd.lItemlParam);
-            if (pFeed) {
-              if (pFeed->EpisodeData.Index == -1) {
+            CFeedItem* pItem = reinterpret_cast<CFeedItem*>(pCD->nmcd.lItemlParam);
+            if (pItem) {
+              if (pItem->EpisodeData.Index == -1) {
                 pCD->clrText = RGB(180, 180, 180);
-              } else if (pFeed->NewItem) {
+              } else if (pItem->EpisodeData.NewEpisode) {
                 pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
               }
             }

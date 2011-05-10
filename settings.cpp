@@ -151,9 +151,11 @@ bool CSettings::Read() {
     ImageClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
     MainClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
     SearchClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
-    TorrentClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
     TwitterClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
     VersionClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
+    for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
+      Aggregator.Feeds[i].Client.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
+    }
     // List
     xml_node list = program.child(L"list");
     Program.List.DoubleClick = list.child(L"action").attribute(L"doubleclick").as_int(4);
@@ -196,7 +198,7 @@ bool CSettings::Read() {
       xml_node filter = torrent.child(L"filter");
       xml_node global = filter.child(L"global");
       RSS.Torrent.Filters.GlobalEnabled = global.attribute(L"enabled").as_int(TRUE);
-      for (xml_node item = global.child(L"item"); item; item = item.next_sibling(L"item")) {
+      /*for (xml_node item = global.child(L"item"); item; item = item.next_sibling(L"item")) {
         Torrents.AddFilter(item.attribute(L"option").as_int(), item.attribute(L"type").as_int(), item.attribute(L"value").value());
       }
       if (RSS.Torrent.Filters.Global.empty() && RSS.Torrent.Filters.GlobalEnabled == TRUE) {
@@ -205,10 +207,13 @@ bool CSettings::Read() {
         Torrents.AddFilter(2, 0, L"720p");
         Torrents.AddFilter(2, 0, L"HD");
         Torrents.AddFilter(2, 0, L"MKV");
-      }
-      // Archive
-      Torrents.Archive.clear();
-      PopulateFiles(Torrents.Archive, Taiga.GetDataPath() + L"Torrents\\");
+      }*/
+      // Torrent source
+      CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
+      if (pFeed) pFeed->Link = RSS.Torrent.Source;
+      // File archive
+      Aggregator.FileArchive.clear();
+      PopulateFiles(Aggregator.FileArchive, Taiga.GetDataPath() + L"Feed\\", L"torrent", true);
     
   // Events
   EventQueue.List.clear();
@@ -419,13 +424,13 @@ bool CSettings::Write() {
       xml_node global = torrent.child(L"filter").append_child();
       global.set_name(L"global");
       global.append_attribute(L"enabled") = RSS.Torrent.Filters.GlobalEnabled;
-      for (size_t i = 0; i < RSS.Torrent.Filters.Global.size(); i++) {
+      /*for (size_t i = 0; i < RSS.Torrent.Filters.Global.size(); i++) {
         xml_node item = global.append_child();
         item.set_name(L"item");
         item.append_attribute(L"option") = RSS.Torrent.Filters.Global[i].Option;
         item.append_attribute(L"type") = RSS.Torrent.Filters.Global[i].Type;
         item.append_attribute(L"value") = RSS.Torrent.Filters.Global[i].Value.c_str();
-      }
+      }*/
   
   // Write registry
   CRegistry reg;

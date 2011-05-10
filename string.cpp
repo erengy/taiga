@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "string.h"
+#include <algorithm>
 #include <sstream>
 #include <iomanip>
 
@@ -25,19 +26,19 @@
 
 /* Erasing */
 
-void Erase(wstring& input, const wstring& find, bool case_insensitive) {
-  if (find.empty() || input.length() < find.length()) return;
+void Erase(wstring& str1, const wstring& str2, bool case_insensitive) {
+  if (str2.empty() || str1.length() < str2.length()) return;
   if (!case_insensitive) {
-    for (size_t pos = input.find(find); pos != wstring::npos; pos = input.find(find, pos)) {
-      input.erase(pos, find.length());
+    for (size_t pos = str1.find(str2); pos != wstring::npos; pos = str1.find(str2, pos)) {
+      str1.erase(pos, str2.length());
     }
   } else {
-    for (size_t i = 0; i < input.length() - find.length() + 1; i++) {
-      for (size_t j = 0; j < find.length(); j++) {
-        if (input.length() < find.length()) return;
-        if (tolower(input[i + j]) == tolower(find[j])) {
-          if (j == find.length() - 1) {
-            input.erase(i--, find.length());
+    for (size_t i = 0; i < str1.length() - str2.length() + 1; i++) {
+      for (size_t j = 0; j < str2.length(); j++) {
+        if (str1.length() < str2.length()) return;
+        if (tolower(str1[i + j]) == tolower(str2[j])) {
+          if (j == str2.length() - 1) {
+            str1.erase(i--, str2.length());
             break;
           }
         } else {
@@ -49,18 +50,31 @@ void Erase(wstring& input, const wstring& find, bool case_insensitive) {
   }
 }
 
-void EraseChars(wstring& input, const wchar_t chars[]) {
+void Erase2(wstring& str1, const wstring& str2, bool case_insensitive) {
+  if (str2.empty() || str1.length() < str2.length()) return;
+  wstring::iterator i = str1.begin();
+  do {
+    if (case_insensitive) {
+      i = std::search(i, str1.end(), str2.begin(), str2.end(), &IsCharsEqual);
+    } else {
+      i = std::search(i, str1.end(), str2.begin(), str2.end());
+    }
+    if (i != str1.end()) str1.erase(i, i + str2.length());
+  } while (i != str1.end());
+}
+
+void EraseChars(wstring& str, const wchar_t chars[]) {
   size_t pos = 0;
   do {
-    pos = input.find_first_of(chars, pos);
-    if (pos != wstring::npos) input.erase(pos, 1);
+    pos = str.find_first_of(chars, pos);
+    if (pos != wstring::npos) str.erase(pos, 1);
   } while (pos != wstring::npos);
 }
 
-void ErasePunctuation(wstring& input, bool keep_trailing) {
+void ErasePunctuation(wstring& str, bool keep_trailing) {
   wchar_t c;
-  for (int i = input.length() - 1; i >= 0; i--) {
-    c = input[i];
+  for (int i = str.length() - 1; i >= 0; i--) {
+    c = str[i];
     if ((c >  31 && c <  48) || // !"#$%&'()*+,-./
         (c >  57 && c <  65) || // :;<=>?@
         (c >  90 && c <  97) || // [\]^_`
@@ -73,35 +87,31 @@ void ErasePunctuation(wstring& input, bool keep_trailing) {
             }
             keep_trailing = false;
           }
-          input.erase(i, 1);
+          str.erase(i, 1);
     } else {
       keep_trailing = false;
     }
   }
 }
 
-void EraseLeft(wstring& str, const wstring find, bool case_insensitive) {
-  if (str.length() < find.length()) return;
-  for (size_t i = 0; i < find.length(); i++) {
-    if (case_insensitive) {
-      if (tolower(str[i]) != tolower(find[i])) return;
-    } else {
-      if (str[i] != find[i]) return;
-    }
+void EraseLeft(wstring& str1, const wstring str2, bool case_insensitive) {
+  if (str1.length() < str2.length()) return;
+  if (case_insensitive) {
+    if (!std::equal(str2.begin(), str2.end(), str1.begin(), &IsCharsEqual)) return;
+  } else {
+    if (!std::equal(str2.begin(), str2.end(), str1.begin())) return;
   }
-  str = str.substr(find.length(), str.length() - find.length());
+  str1.erase(str1.begin(), str1.begin() + str2.length());
 }
 
-void EraseRight(wstring& str, const wstring find, bool case_insensitive) {
-  if (str.length() < find.length()) return;
-  for (size_t i = 0; i < find.length(); i++) {
-    if (case_insensitive) {
-      if (tolower(str[str.length() - find.length() + i]) != tolower(find[i])) return;
-    } else {
-      if (str[str.length() - find.length() + i] != find[i]) return;
-    }
+void EraseRight(wstring& str1, const wstring str2, bool case_insensitive) {
+  if (str1.length() < str2.length()) return;
+  if (case_insensitive) {
+    if (!std::equal(str2.begin(), str2.end(), str1.end() - str2.length(), &IsCharsEqual)) return;
+  } else {
+    if (!std::equal(str2.begin(), str2.end(), str1.end() - str2.length())) return;
   }
-  str.resize(str.length() - find.length());
+  str1.resize(str1.length() - str2.length());
 }
 
 // =============================================================================
@@ -124,47 +134,43 @@ int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensiti
   }
 }
 
-int InStr(const wstring& str, const wstring find, int pos, bool case_insensitive) {
-  if (str.empty()) return -1; if (find.empty()) return 0;
-  if (str.length() < find.length()) return -1;
-  if (!case_insensitive) {
-    size_t i = str.find(find, pos);
-    return (i != wstring::npos) ? i : -1;
+int InStr(const wstring& str1, const wstring str2, int pos, bool case_insensitive) {
+  if (str1.empty()) return -1; if (str2.empty()) return 0;
+  if (str1.length() < str2.length()) return -1;
+  if (case_insensitive) {
+    auto i = std::search(str1.begin() + pos, str1.end(), str2.begin(), str2.end(), &IsCharsEqual);
+    return (i == str1.end()) ? -1 : i - str1.begin();
   } else {
-    for (size_t i = pos; i < str.length() - find.length() + 1; i++) {
-      if (tolower(str[i]) != tolower(find[0])) continue;
-      if (_wcsnicmp(str.substr(i).c_str(), find.c_str(), find.length()) == 0)
-        return i;
-    }
-    return -1;
+    size_t i = str1.find(str2, pos);
+    return (i != wstring::npos) ? i : -1;
   }
 }
 
-wstring InStr(const wstring& str, const wstring& str_left, const wstring& str_right) {
+wstring InStr(const wstring& str1, const wstring& str2_left, const wstring& str2_right) {
   wstring output;
-  int index_begin = InStr(str, str_left);
+  int index_begin = InStr(str1, str2_left);
   if (index_begin > -1) {
-    index_begin += str_left.length();
-    int index_end = InStr(str, str_right, index_begin);
+    index_begin += str2_left.length();
+    int index_end = InStr(str1, str2_right, index_begin);
     if (index_end > -1) {
-      output = str.substr(index_begin, index_end - index_begin);
+      output = str1.substr(index_begin, index_end - index_begin);
     }
   }
   return output;
 }
 
-int InStrRev(const wstring& str, const wstring find, int pos) {
-  size_t i = str.rfind(find, pos);
+int InStrRev(const wstring& str1, const wstring str2, int pos) {
+  size_t i = str1.rfind(str2, pos);
   return (i != wstring::npos) ? i : -1;
 }
 
-int InStrChars(const wstring& str, const wstring find, int pos) {
-  size_t i = str.find_first_of(find, pos);
+int InStrChars(const wstring& str1, const wstring str2, int pos) {
+  size_t i = str1.find_first_of(str2, pos);
   return (i != wstring::npos) ? i : -1;
 }
 
-int InStrCharsRev(const wstring& str, const wstring find, int pos) {
-  size_t i = str.find_last_of(find, pos);
+int InStrCharsRev(const wstring& str1, const wstring str2, int pos) {
+  size_t i = str1.find_last_of(str2, pos);
   return (i != wstring::npos) ? i : -1;
 }
 
@@ -176,6 +182,10 @@ bool IsAlphanumeric(const wstring& str) {
   for (size_t i = 0; i < str.length(); i++)
     if (!IsAlphanumeric(str[i])) return false;
   return true;
+}
+
+inline bool IsCharsEqual(const wchar_t c1, const wchar_t c2) {
+  return tolower(c1) == tolower(c2);
 }
 
 bool IsEqual(const wstring& str1, const wstring& str2) {
@@ -207,13 +217,13 @@ bool IsWhitespace(const wchar_t c) {
   return c == ' ' || c == '\r' || c == '\n' || c == '\t';
 }
 
-bool StartsWith(const wstring& str, const wstring& search) {
-  return str.compare(0, search.length(), search) == 0;
+bool StartsWith(const wstring& str1, const wstring& str2) {
+  return str1.compare(0, str2.length(), str2) == 0;
 }
 
-bool EndsWith(const wstring& str, const wstring& search) {
-  if (search.length() > str.length()) return false;
-  return str.compare(str.length() - search.length(), search.length(), search) == 0;
+bool EndsWith(const wstring& str1, const wstring& str2) {
+  if (str2.length() > str1.length()) return false;
+  return str1.compare(str1.length() - str2.length(), str2.length(), str2) == 0;
 }
 
 // =============================================================================
@@ -246,21 +256,21 @@ void Replace(wstring& input, wstring find, wstring replace_with, bool replace_al
   }
 }
 
-void ReplaceChar(wstring& input, const wchar_t c, const wchar_t replace_with) {
+void ReplaceChar(wstring& str, const wchar_t c, const wchar_t replace_with) {
   if (c == replace_with) return;
   size_t pos = 0;
   do {
-    pos = input.find_first_of(c, pos);
-    if (pos != wstring::npos) input.at(pos) = replace_with;
+    pos = str.find_first_of(c, pos);
+    if (pos != wstring::npos) str.at(pos) = replace_with;
   } while (pos != wstring::npos);
 }
 
-void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_with) {
+void ReplaceChars(wstring& str, const wchar_t chars[], const wstring replace_with) {
   if (chars == replace_with) return;
   size_t pos = 0;
   do {
-    pos = input.find_first_of(chars, pos);
-    if (pos != wstring::npos) input.replace(pos, 1, replace_with);
+    pos = str.find_first_of(chars, pos);
+    if (pos != wstring::npos) str.replace(pos, 1, replace_with);
   } while (pos != wstring::npos);
 }
 
@@ -268,39 +278,39 @@ void ReplaceChars(wstring& input, const wchar_t chars[], const wstring replace_w
 
 /* Split, tokenize */
 
-void Split(const wstring& input, const wstring& separator, std::vector<wstring>& split_vector) {
+void Split(const wstring& str, const wstring& separator, std::vector<wstring>& split_vector) {
   if (separator.empty()) {
-    split_vector.push_back(input);
+    split_vector.push_back(str);
     return;
   }
   size_t index_begin = 0, index_end;
   do {
-    index_end = input.find(separator, index_begin);
-    if (index_end == wstring::npos) index_end = input.length();
-    split_vector.push_back(input.substr(index_begin, index_end - index_begin));
+    index_end = str.find(separator, index_begin);
+    if (index_end == wstring::npos) index_end = str.length();
+    split_vector.push_back(str.substr(index_begin, index_end - index_begin));
     index_begin = index_end + separator.length();
-  } while (index_begin <= input.length());
+  } while (index_begin <= str.length());
 }
 
-wstring SubStr(const wstring& input, const wstring& sub_begin, const wstring& sub_end) {
-  size_t index_begin = input.find(sub_begin, 0);
+wstring SubStr(const wstring& str, const wstring& sub_begin, const wstring& sub_end) {
+  size_t index_begin = str.find(sub_begin, 0);
   if (index_begin == wstring::npos) return L"";
-  size_t index_end = input.find(sub_end, index_begin);
-  if (index_end == wstring::npos) index_end = input.length();
-  return input.substr(index_begin + 1, index_end - index_begin - 1);
+  size_t index_end = str.find(sub_end, index_begin);
+  if (index_end == wstring::npos) index_end = str.length();
+  return str.substr(index_begin + 1, index_end - index_begin - 1);
 }
 
-size_t Tokenize(const wstring& input, const wstring& delimiters, vector<wstring>& tokens) {
+size_t Tokenize(const wstring& str, const wstring& delimiters, vector<wstring>& tokens) {
   tokens.clear();
-  size_t index_begin = input.find_first_not_of(delimiters);
+  size_t index_begin = str.find_first_not_of(delimiters);
   while (index_begin != wstring::npos) {
-    size_t index_end = input.find_first_of(delimiters, index_begin + 1);
+    size_t index_end = str.find_first_of(delimiters, index_begin + 1);
     if (index_end == wstring::npos) {
-      tokens.push_back(input.substr(index_begin));
+      tokens.push_back(str.substr(index_begin));
       break;
     } else {
-      tokens.push_back(input.substr(index_begin, index_end - index_begin));
-      index_begin = input.find_first_not_of(delimiters, index_end + 1);
+      tokens.push_back(str.substr(index_begin, index_end - index_begin));
+      index_begin = str.find_first_not_of(delimiters, index_end + 1);
     }
   }
   return tokens.size();
@@ -310,24 +320,24 @@ size_t Tokenize(const wstring& input, const wstring& delimiters, vector<wstring>
 
 /* ANSI <-> Unicode conversion */
 
-const char* ToANSI(const wstring& input, UINT code_page) {
-  if (input.empty()) return "";
-  int length = WideCharToMultiByte(code_page, 0, input.c_str(), -1, NULL, 0, NULL, NULL);
+const char* ToANSI(const wstring& str, UINT code_page) {
+  if (str.empty()) return "";
+  int length = WideCharToMultiByte(code_page, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
   if (length > 0) {
     char* output = new char[length + 1];
-    WideCharToMultiByte(code_page, 0, input.c_str(), -1, output, length, NULL, NULL);
+    WideCharToMultiByte(code_page, 0, str.c_str(), -1, output, length, NULL, NULL);
     return output;
   } else {
     return "";
   }
 }
 
-wstring ToUTF8(const string& input, UINT code_page) {
-  if (input.empty()) return L"";
-  int length = MultiByteToWideChar(code_page, 0, input.c_str(), -1, NULL, 0);
+wstring ToUTF8(const string& str, UINT code_page) {
+  if (str.empty()) return L"";
+  int length = MultiByteToWideChar(code_page, 0, str.c_str(), -1, NULL, 0);
   if (length > 0) {
     vector<wchar_t> output(length);
-    MultiByteToWideChar(code_page, 0, input.c_str(), -1, &output[0], length);
+    MultiByteToWideChar(code_page, 0, str.c_str(), -1, &output[0], length);
     return &output[0];
   } else {
     return L"";
@@ -434,7 +444,7 @@ wstring EncodeURL(const wstring& str, bool encode_unreserved) {
   return output;
 }
 
-void DecodeHTML(wstring& input) {
+void DecodeHTML(wstring& str) {
   #define HTMLCHARCOUNT 28
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     {L"&quot;",   L"\""},     // quotation mark
@@ -466,9 +476,9 @@ void DecodeHTML(wstring& input) {
     {L"&hellip;", L"\u2026"}, // horizontal ellipsis
     {L"&trade;",  L"\u2122"}  // trademark
   };
-  if (InStr(input, L"&") > -1) {
+  if (InStr(str, L"&") > -1) {
     for (int i = 0; i < HTMLCHARCOUNT; i++) {
-      Replace(input, html_chars[i][0], html_chars[i][1], true, false);
+      Replace(str, html_chars[i][0], html_chars[i][1], true, false);
     }
   }
   #undef HTMLCHARCOUNT
@@ -493,30 +503,30 @@ void StripHTML(wstring& str) {
 
 /* Trimming */
 
-void LimitText(wstring& input, unsigned int limit, const wstring& tail) {
-  if (input.length() > limit) {
-    input.resize(limit);
-    if (!tail.empty() && input.length() > tail.length()) {
-      input.replace(input.length() - tail.length(), tail.length(), tail);
+void LimitText(wstring& str, unsigned int limit, const wstring& tail) {
+  if (str.length() > limit) {
+    str.resize(limit);
+    if (!tail.empty() && str.length() > tail.length()) {
+      str.replace(str.length() - tail.length(), tail.length(), tail);
     }
   }
 }
 
-void Trim(wstring& input, const wchar_t trim_chars[], bool trim_left, bool trim_right) {
-  if (input.empty()) return;
-  const size_t index_begin = trim_left ? input.find_first_not_of(trim_chars) : 0;
-  const size_t index_end = trim_right ? input.find_last_not_of(trim_chars) : input.length() - 1;
+void Trim(wstring& str, const wchar_t trim_chars[], bool trim_left, bool trim_right) {
+  if (str.empty()) return;
+  const size_t index_begin = trim_left ? str.find_first_not_of(trim_chars) : 0;
+  const size_t index_end = trim_right ? str.find_last_not_of(trim_chars) : str.length() - 1;
   if (index_begin == wstring::npos || index_end == wstring::npos) return;
-  if (trim_right) input.erase(index_end + 1, input.length() - index_end + 1);
-  if (trim_left) input.erase(0, index_begin);
+  if (trim_right) str.erase(index_end + 1, str.length() - index_end + 1);
+  if (trim_left) str.erase(0, index_begin);
 }
 
-void TrimLeft(wstring& input, const wchar_t trim_chars[]) {
-  Trim(input, trim_chars, true, false);
+void TrimLeft(wstring& str, const wchar_t trim_chars[]) {
+  Trim(str, trim_chars, true, false);
 }
 
-void TrimRight(wstring& input, const wchar_t trim_chars[]) {
-  Trim(input, trim_chars, false, true);
+void TrimRight(wstring& str, const wchar_t trim_chars[]) {
+  Trim(str, trim_chars, false, true);
 }
 
 // =============================================================================

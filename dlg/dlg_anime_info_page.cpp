@@ -117,9 +117,9 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       // Re-watching
       if (pAnimeItem->GetStatus() == MAL_COMPLETED) {
         CheckDlgButton(IDC_CHECK_ANIME_REWATCH, pAnimeItem->GetRewatching());
-        ShowDlgItem(IDC_CHECK_ANIME_REWATCH);
+        EnableDlgItem(IDC_CHECK_ANIME_REWATCH, TRUE);
       } else {
-        HideDlgItem(IDC_CHECK_ANIME_REWATCH);
+        EnableDlgItem(IDC_CHECK_ANIME_REWATCH, FALSE);
       }
 
       // Status

@@ -22,7 +22,7 @@
 
 // =============================================================================
 
-void CCrackURL::Crack(wstring url) {
+void CUrl::Crack(wstring url) {
   // Get scheme
   size_t i = url.find(L"://", 0);
   if (i != wstring::npos) {
@@ -51,6 +51,11 @@ bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring 
   m_dwClientMode = dwClientMode;
   m_lParam = lParam;
   m_File = szFile;
+
+  // Prepare file location
+  if (!szFile.empty()) {
+    CreateFolder(GetPathOnly(szFile));
+  }
     
   // Setup headers
   wstring headers;
@@ -150,12 +155,25 @@ bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring 
   return true;
 }
 
+bool CHTTP::Connect(const CUrl& url, wstring szData, wstring szVerb, wstring szHeader, wstring szReferer, 
+                    wstring szFile, DWORD dwClientMode, LPARAM lParam) {
+  return Connect(url.Host, url.Path, szData, szVerb, szHeader, szReferer, szFile, dwClientMode, lParam);
+}
+
 bool CHTTP::Get(wstring szServer, wstring szObject, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   return Connect(szServer, szObject, L"", L"GET", L"", szServer, szFile, dwClientMode, lParam);
 }
 
+bool CHTTP::Get(const CUrl& url, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
+  return Connect(url.Host, url.Path, L"", L"GET", L"", url.Host, szFile, dwClientMode, lParam);
+}
+
 bool CHTTP::Post(wstring szServer, wstring szObject, wstring szData, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   return Connect(szServer, szObject, szData, L"POST", L"", szServer, szFile, dwClientMode, lParam);
+}
+
+bool CHTTP::Post(const CUrl& url, wstring szData, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
+  return Connect(url.Host, url.Path, szData, L"POST", L"", url.Host, szFile, dwClientMode, lParam);
 }
 
 // =============================================================================
@@ -297,10 +315,12 @@ void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus,
 
 // =============================================================================
 
-CHTTP::CHTTP() {
-  m_AutoRedirect = TRUE;
+CHTTP::CHTTP() : 
+  m_AutoRedirect(TRUE), m_Buffer(NULL), m_ContentEncoding(HTTP_Encoding_None), 
+  m_dwDownloaded(0), m_dwTotal(0), m_dwClientMode(0), m_lParam(0),
+  m_hConnect(NULL), m_hRequest(NULL), m_hSession(NULL)
+{
   m_UserAgent = L"Mozilla/5.0";
-  Cleanup();
 }
 
 CHTTP::~CHTTP() {
@@ -324,8 +344,10 @@ void CHTTP::Cleanup() {
   }
 
   // Clear buffer
-  delete [] m_Buffer;
-  m_Buffer = NULL;
+  if (m_Buffer) {
+    delete [] m_Buffer;
+    m_Buffer = NULL;
+  }
 
   // Reset variables
   m_ContentEncoding = HTTP_Encoding_None;

@@ -24,6 +24,7 @@
 
 enum HTTP_ClientMode {
   HTTP_Silent = 0,
+  // MyAnimeList
   HTTP_MAL_Login,
   HTTP_MAL_RefreshList,
   HTTP_MAL_RefreshAndLogin,
@@ -39,12 +40,16 @@ enum HTTP_ClientMode {
   HTTP_MAL_Profile,
   HTTP_MAL_SearchAnime,
   HTTP_MAL_Image,
-  HTTP_TorrentCheck,
-  HTTP_TorrentDownload,
-  HTTP_TorrentDownloadAll,
+  // Feed
+  HTTP_Feed_Check,
+  HTTP_Feed_Download,
+  HTTP_Feed_DownloadAll,
+  HTTP_Feed_DownloadIcon,
+  // Twitter
   HTTP_Twitter_Request,
   HTTP_Twitter_Auth,
   HTTP_Twitter_Post,
+  // Taiga
   HTTP_UpdateCheck,
   HTTP_UpdateDownload
 };
@@ -65,7 +70,7 @@ protected:
   BOOL OnRedirect(wstring address);
 };
 
-extern CHTTPClient MainClient, ImageClient, SearchClient, TorrentClient, TwitterClient, VersionClient;
+extern CHTTPClient MainClient, ImageClient, SearchClient, TwitterClient, VersionClient;
 extern CHTTP HTTPClient;
 
 #endif // HTTP_H

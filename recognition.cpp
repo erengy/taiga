@@ -586,7 +586,7 @@ bool CRecognition::IsResolution(const wstring& str) {
 }
 
 bool CRecognition::IsCountingWord(const wstring& str) {
-  if (!str.empty()) {
+  if (str.length() > 2) {
     if (EndsWith(str, L"th") || EndsWith(str, L"nd") || EndsWith(str, L"rd") || EndsWith(str, L"st") ||
         EndsWith(str, L"TH") || EndsWith(str, L"ND") || EndsWith(str, L"RD") || EndsWith(str, L"ST")) {
       if (IsNumeric(str.substr(0, str.length() - 2)) ||

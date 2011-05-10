@@ -287,6 +287,7 @@ public:
   int    DeleteItem(int nIndex);
   int    InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam);
   int    GetCurrentlySelected();
+  int    GetItemCount();
   LPARAM GetItemParam(int nIndex);
   int    HitTest();
   int    SetCurrentlySelected(int iItem);

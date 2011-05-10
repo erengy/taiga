@@ -31,11 +31,12 @@
 
 class CDebugTest {
 public:
-  CDebugTest() : m_dwTick(0) {}
+  CDebugTest() : m_Freq(0.0), m_Value(0) {}
   void Start();
   void End(wstring str, BOOL show);
 private:
-  DWORD m_dwTick;
+  double m_Freq;
+  __int64 m_Value;
 };
 
 // =============================================================================
@@ -69,11 +70,25 @@ void DebugTest() {
 // =============================================================================
 
 void CDebugTest::Start() {
-  m_dwTick = GetTickCount();
+  LARGE_INTEGER li;
+  
+  if (m_Freq == 0.0) {
+    QueryPerformanceFrequency(&li);
+    m_Freq = double(li.QuadPart) / 1000.0;
+  }
+  
+  QueryPerformanceCounter(&li);
+  m_Value = li.QuadPart;
 }
 
 void CDebugTest::End(wstring str, BOOL show) {
-  m_dwTick = GetTickCount() - m_dwTick;
-  str = ToWSTR(m_dwTick) + L" ms | Text: [" + str + L"]";
-  if (show) MainWindow.SetText(str.c_str());
+  LARGE_INTEGER li;
+
+  QueryPerformanceCounter(&li);
+  double value = double(li.QuadPart - m_Value) / m_Freq;
+
+  if (show) {
+    str = ToWSTR(value, 2) + L" ms | Text: [" + str + L"]";
+    MainWindow.SetText(str.c_str());
+  }
 }

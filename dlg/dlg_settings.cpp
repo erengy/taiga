@@ -138,7 +138,7 @@ BOOL CSettingsWindow::OnInitDialog() {
   // Torrent
   HTREEITEM htTorrent = m_Tree.InsertItem(L"Torrent", reinterpret_cast<LPARAM>(&m_Page[PAGE_TORRENT1]), NULL);
   m_Page[PAGE_TORRENT1].CreateItem(L"Options", htTorrent);
-  m_Page[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent);
+  //m_Page[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent);
   m_Tree.Expand(htTorrent);
 
   // Select current page
@@ -285,9 +285,11 @@ void CSettingsWindow::OnOK() {
   ImageClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
   MainClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
   SearchClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  TorrentClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
   TwitterClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
   VersionClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
+  for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
+    Aggregator.Feeds[i].Client.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
+  }
   
   // End dialog
   EndDialog(IDOK);

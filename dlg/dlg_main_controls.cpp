@@ -111,6 +111,9 @@ LRESULT CMainWindow::OnTreeNotify(LPARAM lParam) {
 
 int CMainWindow::CMainList::GetSortType(int column) {
   switch (column) {
+    // Progress
+    case 1:
+      return LISTSORTTYPE_PROGRESS;
     // Score
     case 2:
       return LISTSORTTYPE_NUMBER;
@@ -125,6 +128,7 @@ int CMainWindow::CMainList::GetSortType(int column) {
 
 LRESULT CMainWindow::CMainList::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
+    // Middle mouse button
     case WM_MBUTTONDOWN: {
       int item_index = HitTest();
       if (item_index > -1) {
@@ -137,6 +141,21 @@ LRESULT CMainWindow::CMainList::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
         }
       }
       break;
+    }
+
+    // Back & forward buttons
+    case WM_XBUTTONUP: {
+      int index = MainWindow.m_Tab.GetCurrentlySelected();
+      int count = MainWindow.m_Tab.GetItemCount();
+      switch (HIWORD(wParam)) {
+        case XBUTTON1: index--; break;
+        case XBUTTON2: index++; break;
+      }
+      if (index < 0 || index > count - 1) return TRUE;
+      MainWindow.m_Tab.SetCurrentlySelected(index);
+      index++; if (index == 5) index = 6;
+      MainWindow.RefreshList(index);
+      return TRUE;
     }
   }
   
@@ -377,8 +396,8 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS) {
           if (eps_total > 0) {
             float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(pAnimeItem->Series_Episodes);
-            for (int i = max(eps_buffer, eps_watched); i > -1 && i < static_cast<int>(pAnimeItem->EpisodeAvailable.size()); i++) {
-              if (pAnimeItem->EpisodeAvailable[i]) {
+            for (int i = max(eps_buffer, eps_watched); i < static_cast<int>(pAnimeItem->EpisodeAvailable.size()); i++) {
+              if (i > -1 && pAnimeItem->EpisodeAvailable[i]) {
                 rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
                 rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
                 UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
@@ -516,13 +535,9 @@ BOOL CMainWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
     case 109:
       ExecuteAction(L"Settings");
       return TRUE;
-    // About
+    // Debug
     case 111:
-      #ifdef _DEBUG
       DebugTest();
-      #else
-      ExecuteAction(L"About");
-      #endif
       return TRUE;
   }
 

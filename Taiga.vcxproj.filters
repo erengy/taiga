@@ -303,6 +303,9 @@
     <ClCompile Include="feed.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="feed_filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">

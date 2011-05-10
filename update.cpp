@@ -31,13 +31,13 @@ CUpdateHelper::CUpdateHelper() :
 
 // =============================================================================
 
-bool CUpdateHelper::Check(const wstring& url, CApp& app, DWORD client_mode) {
+bool CUpdateHelper::Check(const wstring& address, CApp& app, DWORD client_mode) {
   OnCheck();
   m_App = &app;
-  if (m_App == NULL || url.empty()) return false;
+  if (m_App == NULL || address.empty()) return false;
 
-  CCrackURL curl(url);
-  return Client.Get(curl.Host, curl.Path, L"", client_mode);
+  CUrl url(address);
+  return Client.Get(url, L"", client_mode);
 }
 
 bool CUpdateHelper::DownloadNextFile(DWORD client_mode) {
@@ -58,11 +58,8 @@ bool CUpdateHelper::DownloadNextFile(DWORD client_mode) {
       }
 
       // Download file
-      CCrackURL curl(VersionInfo.URL);
-      return Client.Connect(
-        curl.Host, curl.Path + Files[i].Path, 
-        L"", L"GET", L"", L"", path, client_mode,
-        reinterpret_cast<LPARAM>(&Files[i]));
+      CUrl url(VersionInfo.URL + Files[i].Path);
+      return Client.Get(url, path, client_mode, reinterpret_cast<LPARAM>(&Files[i]));
     }
   }
 

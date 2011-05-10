@@ -57,7 +57,7 @@ public:
   CAnime();
   virtual ~CAnime() {}
 
-  int  Ask(CEpisode episode);
+  int Ask(CEpisode episode);
   void Start(CEpisode episode);
   void End(CEpisode episode, bool end_watching, bool update_list);
   void Update(CEpisode episode, bool change_status);
@@ -65,14 +65,14 @@ public:
   void SetFolder(const wstring& folder, bool save_settings, bool check_episodes);
   bool CheckEpisodes(int episode = -1, bool check_folder = false);
   bool PlayEpisode(int number);
-  bool SetEpisodeAvailability(int number, bool available);
+  bool IsEpisodeAvailable(int number);
+  bool SetEpisodeAvailability(int number, bool available, const wstring& path = L"");
   void SetLocalData(const wstring& fansub, const wstring& folder, const wstring& titles);
   int GetIntValue(int mode);
   int GetLastWatchedEpisode();
   int GetRewatching();
   int GetScore();
   int GetStatus();
-  int GetAiringStatus();
   wstring GetStrValue(int mode);
   wstring GetTags();
   int GetTotalEpisodes();
@@ -80,12 +80,14 @@ public:
   void Edit(const wstring& data, CEventItem item);
   bool IsAiredYet(bool strict = false) const;
   bool IsFinishedAiring() const;
+  int GetAiringStatus();
   void SetStartDate(wstring date, bool ignore_previous);
   void SetFinishDate(wstring date, bool ignore_previous);
   
   int Index;
   bool NewEps, Playing;
   vector<bool> EpisodeAvailable;
+  wstring NextEpisodePath;
   wstring FansubGroup, Folder, Synonyms;
   wstring Genres, Popularity, Rank, Score, Synopsis;
 };

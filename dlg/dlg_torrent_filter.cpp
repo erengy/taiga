@@ -59,9 +59,9 @@ BOOL CTorrentFilterWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 
 void CTorrentFilterWindow::OnCancel() {
   // Set values
-  m_Filter.Option = 0;
+  /*m_Filter.Option = 0;
   m_Filter.Type = 0;
-  m_Filter.Value.clear();
+  m_Filter.Value.clear();*/
 
   // Exit
   EndDialog(IDOK);
@@ -69,7 +69,7 @@ void CTorrentFilterWindow::OnCancel() {
 
 BOOL CTorrentFilterWindow::OnInitDialog() {
   // Initialize
-  OnCommand(MAKEWPARAM(IDC_RADIO_FILTER_OPTION1 + m_Filter.Option, STN_CLICKED), 0);
+  /*OnCommand(MAKEWPARAM(IDC_RADIO_FILTER_OPTION1 + m_Filter.Option, STN_CLICKED), 0);
   CheckDlgButton(IDC_RADIO_FILTER_TYPE1 + m_Filter.Type, TRUE);
   m_Combo.Attach(GetDlgItem(IDC_COMBO_FILTER_VALUE));
   RefreshComboBox(m_Filter.Type);
@@ -84,14 +84,14 @@ BOOL CTorrentFilterWindow::OnInitDialog() {
       if (index == MAL_PLANTOWATCH) index--;
       m_Combo.SetCurSel(index - 1);
       break;
-  }
+  }*/
 
   return TRUE;
 }
 
 void CTorrentFilterWindow::OnOK() {
   // Set values
-  m_Filter.Option = GetCheckedRadioButton(IDC_RADIO_FILTER_OPTION1, IDC_RADIO_FILTER_OPTION3);
+  /*m_Filter.Option = GetCheckedRadioButton(IDC_RADIO_FILTER_OPTION1, IDC_RADIO_FILTER_OPTION3);
   m_Filter.Type = GetCheckedRadioButton(IDC_RADIO_FILTER_TYPE1, IDC_RADIO_FILTER_TYPE3);
   switch (m_Filter.Type) {
     case FEED_FILTER_KEYWORD:
@@ -103,7 +103,7 @@ void CTorrentFilterWindow::OnOK() {
       if (index == MAL_UNKNOWN) index++;
       m_Filter.Value = ToWSTR(index);
       break;
-  }
+  }*/
 
   // Exit
   EndDialog(IDOK);
@@ -147,7 +147,7 @@ BOOL CTorrentFilterWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
 
 void CTorrentFilterWindow::RefreshComboBox(int type) {
   // Save position
-  RECT rect;
+  /*RECT rect;
   m_Combo.GetWindowRect(&rect);
   int width = rect.right - rect.left;
   int height = rect.bottom - rect.top;
@@ -185,11 +185,11 @@ void CTorrentFilterWindow::RefreshComboBox(int type) {
       }
       m_Combo.SetCurSel(0);
       break;
-  }
+  }*/
 }
 
 void CTorrentFilterWindow::SetValues(int option, int type, wstring value) {
-  m_Filter.Option = option;
+  /*m_Filter.Option = option;
   m_Filter.Type = type;
-  m_Filter.Value = value;
+  m_Filter.Value = value;*/
 }

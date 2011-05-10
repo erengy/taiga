@@ -31,6 +31,7 @@ enum TimerID {
 enum ListSortType {
   LISTSORTTYPE_DEFAULT,
   LISTSORTTYPE_NUMBER,
+  LISTSORTTYPE_PROGRESS,
   LISTSORTTYPE_SEASON,
   LISTSORTTYPE_FILESIZE
 };
@@ -45,8 +46,8 @@ class CEpisode;
 void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 
 // common.cpp
-wstring Base64Decode(const wstring& str);
-wstring Base64Encode(const wstring& str);
+wstring Base64Decode(const wstring& str, bool for_filename = false);
+wstring Base64Encode(const wstring& str, bool for_filename = false);
 wstring CalculateCRC(const wstring& file);
 int GetEpisodeHigh(const wstring& episode_number);
 int GetEpisodeLow(const wstring& episode_number);
@@ -71,7 +72,7 @@ bool FolderExists(const wstring& folder);
 bool PathExists(const wstring& path);
 void ValidateFileName(wstring& path);
 wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value);
-int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = L"*.*");
+int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = L"", bool recursive = false);
 int PopulateFolders(vector<wstring>& folder_list, wstring path);
 wstring ToSizeString(QWORD qwSize);
 

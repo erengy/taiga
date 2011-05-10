@@ -48,6 +48,8 @@
 // =============================================================================
 
 void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
+  DEBUG_PRINT(L"Action :: " + action + L"\n");
+  
   wstring body;
   size_t pos = action.find('(');
   if (pos != action.npos) {
@@ -273,10 +275,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // SearchTorrents()
   } else if (action == L"SearchTorrents") {
-    CEpisode episode;
-    episode.Index = AnimeList.Index;
-    Torrents.Check(ReplaceVariables(body, episode));
-    ExecuteAction(L"Torrents");
+    CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
+    if (pFeed) {
+      CEpisode episode;
+      episode.Index = AnimeList.Index;
+      pFeed->Check(ReplaceVariables(body, episode));
+      ExecuteAction(L"Torrents");
+    }
 
   // Torrents()
   //   Shows torrents window.

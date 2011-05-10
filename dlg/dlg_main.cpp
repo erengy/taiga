@@ -219,7 +219,7 @@ INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
       return FALSE;
     }
 
-    // Drag  list item
+    // Drag list item
     case WM_MOUSEMOVE: {
       if (m_List.m_bDragging) {
         m_List.m_DragImage.DragMove(LOWORD(lParam) + 16, HIWORD(lParam) + 24);
@@ -244,7 +244,8 @@ INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
 
     // Forward mouse wheel messages to the list
-    case WM_MOUSEWHEEL: {
+    case WM_MOUSEWHEEL:
+    case WM_XBUTTONUP: {
       return m_List.SendMessage(uMsg, wParam, lParam);
     }
 
@@ -326,12 +327,15 @@ BOOL CMainWindow::PreTranslateMessage(MSG* pMsg) {
                 break;
               }
               case SEARCH_MODE_TORRENT: {
-                wstring text;
-                m_EditSearch.GetText(text);
-                wstring search_url = m_SearchBar.URL;
-                Replace(search_url, L"%search%", text);
-                Torrents.Check(search_url);
-                ExecuteAction(L"Torrents");
+                CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
+                if (pFeed) {
+                  wstring text;
+                  m_EditSearch.GetText(text);
+                  wstring search_url = m_SearchBar.URL;
+                  Replace(search_url, L"%search%", text);
+                  pFeed->Check(search_url);
+                  ExecuteAction(L"Torrents");
+                }
                 break;
               }
               case SEARCH_MODE_WEB: {
@@ -513,20 +517,26 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
 
   // ===========================================================================
 
-  // Check new torrents
-  if (Settings.RSS.Torrent.CheckEnabled && Settings.RSS.Torrent.CheckInterval) {
-    Taiga.TickerTorrent++;
-    if (TorrentWindow.IsWindow()) {
-      wstring text = L"Check new torrents [" + 
-        ToTimeString(Settings.RSS.Torrent.CheckInterval * 60 - Taiga.TickerTorrent) + L"]";
-      TorrentWindow.m_Toolbar.SetButtonText(0, text.c_str());
-    }
-    if (Taiga.TickerTorrent >= Settings.RSS.Torrent.CheckInterval * 60) {
-      Torrents.Check(Settings.RSS.Torrent.Source);
-    }
-  } else {
-    if (TorrentWindow.IsWindow()) {
-      TorrentWindow.m_Toolbar.SetButtonText(0, L"Check new torrents");
+  // Check feeds
+  for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
+    Aggregator.Feeds[i].Ticker++;
+    switch (Aggregator.Feeds[i].Category) {
+      case FEED_CATEGORY_LINK:
+        if (Settings.RSS.Torrent.CheckEnabled && Settings.RSS.Torrent.CheckInterval) {
+          if (TorrentWindow.IsWindow()) {
+            wstring text = L"Check new torrents [" + 
+              ToTimeString(Settings.RSS.Torrent.CheckInterval * 60 - Aggregator.Feeds[i].Ticker) + L"]";
+            TorrentWindow.m_Toolbar.SetButtonText(0, text.c_str());
+          }
+          if (Aggregator.Feeds[i].Ticker >= Settings.RSS.Torrent.CheckInterval * 60) {
+            Aggregator.Feeds[i].Check(Settings.RSS.Torrent.Source);
+          }
+        } else {
+          if (TorrentWindow.IsWindow()) {
+            TorrentWindow.m_Toolbar.SetButtonText(0, L"Check new torrents");
+          }
+        }
+        break;
     }
   }
 
@@ -733,11 +743,7 @@ void CMainWindow::RefreshList(int index) {
         icon_index = AnimeList.Item[i].Playing ? Icon16_Play : StatusToIcon(AnimeList.Item[i].GetAiringStatus());
         group_count[AnimeList.Item[i].GetStatus() - 1]++;
         int j = m_List.InsertItem(i, AnimeList.Item[i].GetStatus(), icon_index, 
-          0, NULL, LPSTR_TEXTCALLBACK, 
-          reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
-        int eps_total = AnimeList.Item[i].GetTotalEpisodes();
-        float ratio = eps_total ? (float)AnimeList.Item[i].GetLastWatchedEpisode() / (float)eps_total : 0.8f;
-        m_List.SetItem(j, 1, ToWSTR(ratio, 4).c_str());
+          0, NULL, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
         m_List.SetItem(j, 2, MAL.TranslateNumber(AnimeList.Item[i].GetScore()).c_str());
         m_List.SetItem(j, 3, MAL.TranslateType(AnimeList.Item[i].Series_Type).c_str());
         m_List.SetItem(j, 4, MAL.TranslateDate(AnimeList.Item[i].Series_Start).c_str());
