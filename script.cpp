@@ -73,12 +73,25 @@ const wchar_t* script_variables[] = {
 
 wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
   wstring str;
+
+  // Parse parameters
   vector<wstring> body_parts;
-  Split(func_body, L",", body_parts);
+  size_t param_begin = 0, param_end = -1;
+  do { // Split by unescaped comma
+    do {
+      param_end = InStr(func_body, L",", param_end + 1);
+    } while (0 < param_end && param_end < func_body.length() - 1 && func_body[param_end - 1] == '\\');
+    if (param_end == -1) param_end = func_body.length();
+
+    body_parts.push_back(func_body.substr(param_begin, param_end - param_begin));
+    param_begin = param_end + 1;
+  } while (param_begin <= func_body.length());
+
+  // All functions should have parameters
   if (body_parts.empty()) return L"";
   
   // $cut(string,len)
-  // Returns first len characters on the left of string. 
+  // Returns first len characters of string. 
   if (func_name == L"cut") {
     if (body_parts.size() > 1) {
       int length = ToINT(body_parts[1]);
@@ -273,7 +286,7 @@ bool IsScriptVariable(const wstring& str) {
 
 wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) {
   #define VALIDATE(x, y) episode.Index > -1 && episode.Index <= AnimeList.Count ? x : y
-  #define ENCODE(x) url_encode ? EncodeURL(x) : x
+  #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeURL(x)) : EscapeScriptEntities(x)
 
   // Prepare episode value
   wstring episode_number = ToWSTR(GetEpisodeHigh(episode.Number));
@@ -316,10 +329,15 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   Replace(str, L"\\t", L"\t", true);
   
   // Scripting
-  int pos_func = -1, pos_left = 0, pos_right = 0;
+  int pos_func = 0, pos_left = 0, pos_right = 0;
   int open_brackets = 0;
   do {
-    pos_func = InStr(str, L"$", 0);
+    // Find non-escaped dollar sign
+    pos_func = 0;
+    do {
+      pos_func = InStr(str, L"$", pos_func);
+    } while (0 < pos_func && pos_func < str.length() && str[pos_func - 1] == '\\');
+
     if (pos_func > -1) {
       for (unsigned int i = pos_func; i < str.length(); i++) {
         switch (str[i]) {
@@ -346,12 +364,18 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
               if (open_brackets > 0) open_brackets--;
             }
             break;
+          case '\\':
+            i++;
+            break;
         }
       }
       if (!pos_left || !pos_right) break;
     }
   } while (pos_func > -1);
   
+
+  // Unescape
+  str = UnescapeScriptEntities(str);
 
   // Clean-up
   Replace(str, L"\n\n", L"\n", true);
@@ -361,4 +385,34 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   return str;
   #undef VALIDATE
   #undef ENCODE
+}
+
+wstring EscapeScriptEntities(wstring str) {
+  wstring escaped;
+  size_t entity_pos;
+  for (size_t pos = 0; pos <= str.length();) {
+    entity_pos = InStrChars(str, L"$,()%\\", pos);
+    if (entity_pos != -1) {
+      escaped.append(str, pos, entity_pos - pos);
+      escaped.append(L"\\");
+      escaped.append(str, entity_pos, 1);
+    } else {
+      entity_pos = str.length();
+      escaped.append(str, pos, entity_pos - pos);
+    }
+    pos = entity_pos + 1;
+  }
+  return escaped;
+}
+
+wstring UnescapeScriptEntities(wstring str) {
+  wstring unescaped;
+  size_t entity_pos;
+  for (size_t pos = 0; pos <= str.length();) {
+    entity_pos = InStr(str, L"\\", pos);
+    if (entity_pos == -1) entity_pos = str.length();
+    unescaped.append(str, pos, entity_pos - pos);
+    pos = entity_pos + 1;
+  }
+  return unescaped;
 }

@@ -187,9 +187,9 @@
 		<video>h264</video>
 	</file>
 	<file>
-		<file>Code_Geass_R2_TV_[20_of_25]_[ru_jp]_[HDTV]_[Varies_&_Cuba77_&_AnimeReactor_RU].mkv</file>
+		<file>Code_Geass_R2_TV_[20_of_25]_[ru_jp]_[HDTV]_[Varies_&amp;_Cuba77_&amp;_AnimeReactor_RU].mkv</file>
 		<format>MKV</format>
-		<group>Varies & Cuba77 & AnimeReactor RU</group>
+		<group>Varies &amp; Cuba77 &amp; AnimeReactor RU</group>
 		<number>20</number>
 		<title>Code Geass R2 TV</title>
 		<video>HDTV</video>
@@ -255,9 +255,9 @@
 		<video>x264</video>
 	</file>
 	<file>
-		<file>Noein_[01_of_24]_[ru_jp]_[bodlerov_&_torrents_ru].mkv</file>
+		<file>Noein_[01_of_24]_[ru_jp]_[bodlerov_&amp;_torrents_ru].mkv</file>
 		<format>MKV</format>
-		<group>bodlerov & torrents ru</group>
+		<group>bodlerov &amp; torrents ru</group>
 		<number>01</number>
 		<title>Noein</title>
 	</file>
@@ -595,5 +595,14 @@
 		<name>My Mount is Fierce!</name>
 		<number>03</number>
 		<title>After War Gundam X</title>
+	</file>
+	<file>
+		<file>[HorribleSubs] The World God Only Knows 2 - 03 [720p].mkv</file>
+		<checksum></checksum>
+		<format>MKV</format>
+		<group>HorribleSubs</group>
+		<number>03</number>
+		<resolution>720p</resolution>
+		<title>The World God Only Knows 2</title>
 	</file>
 </recognition>

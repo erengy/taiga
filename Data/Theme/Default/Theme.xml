@@ -135,8 +135,8 @@
 			<item name="List"        action="SetSearchMode(0, List, Search list)" radio="1"/>
 			<item name="MyAnimeList" action="SetSearchMode(1, MAL, Search MyAnimeList)"  radio="1"/>
 			<item type="separator"/>
-			<item name="NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2&term=%search%)" radio="1"/>
-			<item name="TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&_id=a1de48c2d65e13f4e022a982432b41b0&_render=rss)" radio="1"/>
+			<item name="NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaatorrents.org/?page=rss&amp;catid=1&amp;subcat=37&amp;filter=2&amp;term=%search%)" radio="1"/>
+			<item name="TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&amp;_id=a1de48c2d65e13f4e022a982432b41b0&amp;_render=rss)" radio="1"/>
 		</menu>
 		
 		<!-- Search list -->
@@ -202,14 +202,14 @@
 			<!-- Search -->
 			<menu name="Search">
 				<!-- Note: You can customize this list too. Use %title% as the search string. -->
-				<item name="AniDB"        action="URL(http://anidb.net/perl-bin/animedb.pl?show=animelist&adb.search=%title%&noalias=1&do.update=update)"/>
-				<item name="AnimeNfo"     action="URL(http://www.animenfo.com/search.php?query=%title%&queryin=anime_titles&action=Go&option=keywords)"/>
-				<item name="ANN"          action="URL(http://www.animenewsnetwork.com/search?cx=016604166282602569737%3Aznd1ysjewre&cof=FORID%3A11&q=<SEARCH>)"/>
+				<item name="AniDB"        action="URL(http://anidb.net/perl-bin/animedb.pl?show=animelist&amp;adb.search=%title%&amp;noalias=1&amp;do.update=update)"/>
+				<item name="AnimeNfo"     action="URL(http://www.animenfo.com/search.php?query=%title%&amp;queryin=anime_titles&amp;action=Go&amp;option=keywords)"/>
+				<item name="ANN"          action="URL(http://www.animenewsnetwork.com/search?cx=016604166282602569737%3Aznd1ysjewre&amp;cof=FORID%3A11&amp;q=%title%)"/>
 				<item name="MyAnimeList"  action="URL(http://myanimelist.net/anime.php?q=%title%)"/>
 				<item name="Wikipedia"    action="URL(http://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
 				<item type="separator"/>
-				<item name="NyaaTorrents" action="SearchTorrents(http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2&term=%title%)"/>
-				<item name="TokyoTosho"   action="SearchTorrents(http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&_id=a1de48c2d65e13f4e022a982432b41b0&_render=rss)"/>
+				<item name="NyaaTorrents" action="SearchTorrents(http://www.nyaatorrents.org/?page=rss&amp;catid=1&amp;subcat=37&amp;filter=2&amp;term=%title%)"/>
+				<item name="TokyoTosho"   action="SearchTorrents(http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&amp;_id=a1de48c2d65e13f4e022a982432b41b0&amp;_render=rss)"/>
 			</menu>
 			<!-- Play -->
 			<menu name="Play">

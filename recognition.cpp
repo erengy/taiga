@@ -306,8 +306,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
       title.clear();
       int number_index = -1;
 
-      // Check each word, starting out with the second one, since the first one
-      // can never be the episode number
+      // Check for episode number format, starting with the second word
       for (unsigned int i = 1; i < words.size(); i++) {
         if (IsEpisodeFormat(words[i], episode)) {
           number_index = i;
@@ -315,7 +314,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
         }
       }
 
-      // Get the first valid number we stumble on as a last resort
+      // Set the first valid numeric token as episode number
       if (episode.Number.empty()) {
         for (unsigned int i = 0; i < tokens.size(); i++) {
           if (IsNumeric(tokens[i].Content)) {
@@ -327,17 +326,34 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
           }
         }
       }
+
+      // Set the first valid number word as a last resort
       if (episode.Number.empty()) {
         for (unsigned int i = 1; i < words.size(); i++) {
           if (IsNumeric(words[i])) {
             episode.Number = words[i];
             if (ValidateEpisodeNumber(episode)) {
-              // Discard and give up if reached movie or season number
-              if (i > 1 && (IsEqual(words[i - 1], L"Movie") || IsEqual(words[i - 1], L"Season")) &&
-                  !IsCountingWord(words[i - 2])) {
-                    episode.Number.clear();
-                    break;
+              // Discard and give up if movie number
+              if ( i > 1 && IsEqual(words[i - 1], L"Movie") && !IsCountingWord(words[i - 2])) {
+                episode.Number.clear();
+                break;
               }
+              // Discard if season number
+              if (i > 1 && IsEqual(words[i - 1], L"Season") && !IsCountingWord(words[i - 2])) {
+                episode.Number.clear();
+                continue;
+              }
+              // Discard numbers preceding other valid numbers (e.g. "KamiNomi 2 - 05")
+              if (i < words.size() - 1 && IsNumeric(words[i + 1]) ||
+                  i < words.size() - 2 && words[i + 1] == L"-" && IsNumeric(words[i + 2])) {
+                    episode.Number = words[i + 1] == L"-" ? words[i + 2] : words[i + 1];
+                    if (ValidateEpisodeNumber(episode)) {
+                      continue;
+                    } else {
+                      episode.Number = words[i];
+                    }
+              }
+
               number_index = i;
               break;
             }
@@ -476,6 +492,8 @@ void CRecognition::EraseUnnecessary(wstring& str) {
 }
 
 void CRecognition::TransliterateSpecial(wstring& str) {
+  // Character equivalencies
+  ReplaceChar(str, L'_', L' ');
   ReplaceChar(str, L'\u00E9', L'e'); // small e acute accent
   ReplaceChar(str, L'\uFF0F', L'/'); // unicode slash
   ReplaceChar(str, L'\uFF5E', L'~'); // unicode tilde
@@ -483,8 +501,16 @@ void CRecognition::TransliterateSpecial(wstring& str) {
   ReplaceChar(str, L'\u301C', L'~'); // unicode tilde 3
   ReplaceChar(str, L'\uFF1F', L'?'); // unicode question mark
   ReplaceChar(str, L'\uFF01', L'!'); // unicode exclamation point
-  
-  Replace(str, L" & ", L" and ", true, false); // & and 'and' are equivalent
+
+  // A few common always-equivalent romanizations
+  Replace(str, L"\u014C", L"Ou"); // O macron
+  Replace(str, L"\u014D", L"ou"); // o macron
+  Replace(str, L"\u016B", L"uu"); // u macron
+  Replace(str, L" o ", L" wo "); // hepburn to wapuro
+  Replace(str, L" e ", L" he "); // hepburn to wapuro
+
+  // Abbreviations
+  Replace(str, L" & ", L" and ", true, false);
 }
 
 bool CRecognition::IsEpisodeFormat(const wstring& str, CEpisode& episode, const wchar_t separator) {

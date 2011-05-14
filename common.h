@@ -106,6 +106,8 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
 bool IsScriptFunction(const wstring& str);
 bool IsScriptVariable(const wstring& str);
 wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode = false);
+wstring EscapeScriptEntities(wstring str);
+wstring UnescapeScriptEntities(wstring str);
 
 // search.cpp
 wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool search_folder);
