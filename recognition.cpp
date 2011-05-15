@@ -493,7 +493,6 @@ void CRecognition::EraseUnnecessary(wstring& str) {
 
 void CRecognition::TransliterateSpecial(wstring& str) {
   // Character equivalencies
-  ReplaceChar(str, L'_', L' ');
   ReplaceChar(str, L'\u00E9', L'e'); // small e acute accent
   ReplaceChar(str, L'\uFF0F', L'/'); // unicode slash
   ReplaceChar(str, L'\uFF5E', L'~'); // unicode tilde
