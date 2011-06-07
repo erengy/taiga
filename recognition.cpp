@@ -303,6 +303,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
       vector<wstring> words;
       words.reserve(4);
       Tokenize(title, L" ", words);
+      if (words.empty()) return false;
       title.clear();
       int number_index = -1;
 
@@ -327,31 +328,31 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
         }
       }
 
-      // Set the first valid number word as a last resort
+      // Set the lastmost number that follows a '-'
+      if (episode.Number.empty() && words.size() > 2) {
+        for (unsigned int i = words.size() - 2; i > 0; i--) {
+          if (words[i] == L"-" && IsNumeric(words[i + 1])) {
+            episode.Number = words[i + 1];
+            if (ValidateEpisodeNumber(episode)) {
+              number_index = i;
+              break;
+            }
+          }
+        }
+      }
+
+      // Set the lastmost number as a last resort
       if (episode.Number.empty()) {
-        for (unsigned int i = 1; i < words.size(); i++) {
+        for (unsigned int i = words.size() - 1; i > 0; i--) {
           if (IsNumeric(words[i])) {
             episode.Number = words[i];
             if (ValidateEpisodeNumber(episode)) {
-              // Discard and give up if movie number
-              if ( i > 1 && IsEqual(words[i - 1], L"Movie") && !IsCountingWord(words[i - 2])) {
+              // Discard and give up if movie or season number (episode numbers cannot precede them)
+              if (i > 1 && (IsEqual(words[i - 1], L"Season") || IsEqual(words[i - 1], L"Movie")) &&
+                  !IsCountingWord(words[i - 2])) {
                 episode.Number.clear();
+                number_index = -1;
                 break;
-              }
-              // Discard if season number
-              if (i > 1 && IsEqual(words[i - 1], L"Season") && !IsCountingWord(words[i - 2])) {
-                episode.Number.clear();
-                continue;
-              }
-              // Discard numbers preceding other valid numbers (e.g. "KamiNomi 2 - 05")
-              if (i < words.size() - 1 && IsNumeric(words[i + 1]) ||
-                  i < words.size() - 2 && words[i + 1] == L"-" && IsNumeric(words[i + 2])) {
-                    episode.Number = words[i + 1] == L"-" ? words[i + 2] : words[i + 1];
-                    if (ValidateEpisodeNumber(episode)) {
-                      continue;
-                    } else {
-                      episode.Number = words[i];
-                    }
               }
 
               number_index = i;
@@ -487,8 +488,11 @@ void CRecognition::CleanTitle(wstring& title) {
 }
 
 void CRecognition::EraseUnnecessary(wstring& str) {
-  Erase(str, L"The ", true);
-  Erase(str, L" The", true);
+  EraseLeft(str, L"the ", true);
+  Replace(str, L" the ", L" ", false, true);
+  Erase(str, L"episode ", true);
+  Erase(str, L" ep.", true);
+  Replace(str, L" specials", L" special",false,true);
 }
 
 void CRecognition::TransliterateSpecial(wstring& str) {

@@ -75,10 +75,11 @@ void ErasePunctuation(wstring& str, bool keep_trailing) {
   wchar_t c;
   for (int i = str.length() - 1; i >= 0; i--) {
     c = str[i];
-    if ((c >  31 && c <  48) || // !"#$%&'()*+,-./
+    if ((c >  31 && c <  48) || //  !"#$%&'()*+,-./
         (c >  57 && c <  65) || // :;<=>?@
         (c >  90 && c <  97) || // [\]^_`
-        (c > 122 && c < 128)) { // {|}~
+        (c > 122 && c < 128) || // {|}~
+        (c > 9472 && c < 10087)) { // unicode stars, hearts, notes, etc
           if (keep_trailing) {
             if (c == '!' ||  // "Hayate no Gotoku!", "K-ON!"...
                 c == '+' ||  // "Needless+"
