@@ -334,7 +334,7 @@ bool CRecognition::ExamineTitle(wstring title, CEpisode& episode,
           if (words[i] == L"-" && IsNumeric(words[i + 1])) {
             episode.Number = words[i + 1];
             if (ValidateEpisodeNumber(episode)) {
-              number_index = i;
+              number_index = i + 1;
               break;
             }
           }
@@ -504,6 +504,8 @@ void CRecognition::TransliterateSpecial(wstring& str) {
   ReplaceChar(str, L'\u301C', L'~'); // unicode tilde 3
   ReplaceChar(str, L'\uFF1F', L'?'); // unicode question mark
   ReplaceChar(str, L'\uFF01', L'!'); // unicode exclamation point
+  ReplaceChar(str, L'\u00D7', L'x'); // multiplication symbol
+  ReplaceChar(str, L'\u2715', L'x'); // multiplication symbol 2
 
   // A few common always-equivalent romanizations
   Replace(str, L"\u014C", L"Ou"); // O macron

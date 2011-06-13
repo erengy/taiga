@@ -503,7 +503,6 @@ bool CAnime::IsFinishedAiring() const {
 
 int CAnime::GetAiringStatus() {
   if (IsFinishedAiring()) return MAL_FINISHED;
-  if (IsAiredYet()) return MAL_AIRING;
   if (IsAiredYet(true)) return MAL_AIRING;
   return MAL_NOTYETAIRED;
 }
