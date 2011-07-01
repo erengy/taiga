@@ -484,7 +484,7 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_Twitter_Request: {
       OAuthParameters response = Twitter.OAuth.ParseQueryString(GetData());
       if (!response[L"oauth_token"].empty()) {
-        ExecuteLink(L"http://twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
+        ExecuteLink(L"http://api.twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
         CInputDialog dlg;
         dlg.Title = L"Twitter Authorization";
         dlg.Info = L"Please enter the PIN shown on the page after logging into Twitter:";

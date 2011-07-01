@@ -270,7 +270,7 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
             pFeed->Download(pItem->Index);
           } else if (answer == L"MoreTorrents") {
             pFeed->Check(ReplaceVariables(
-              L"http://www.nyaatorrents.org/?page=rss&catid=1&subcat=37&filter=2&term=%title%", // TEMP
+              L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%", // TEMP
               pItem->EpisodeData));
           } else if (answer == L"SearchMAL") {
             ExecuteAction(L"SearchAnime(" + pItem->EpisodeData.Title + L")");
