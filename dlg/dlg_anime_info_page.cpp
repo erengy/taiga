@@ -115,8 +115,8 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, pAnimeItem->GetLastWatchedEpisode());
 
       // Re-watching
+      CheckDlgButton(IDC_CHECK_ANIME_REWATCH, pAnimeItem->GetRewatching());
       if (pAnimeItem->GetStatus() == MAL_COMPLETED) {
-        CheckDlgButton(IDC_CHECK_ANIME_REWATCH, pAnimeItem->GetRewatching());
         EnableDlgItem(IDC_CHECK_ANIME_REWATCH, TRUE);
       } else {
         EnableDlgItem(IDC_CHECK_ANIME_REWATCH, FALSE);
@@ -196,12 +196,6 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_ALT));
       m_Edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
       m_Edit.SetText(pAnimeItem->Synonyms);
-      m_Edit.SetWindowHandle(NULL);
-
-      //// Fansub group
-      m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_FANSUB));
-      m_Edit.SetCueBannerText(L"Enter fansub group preference, which will be used for torrents (e.g. THORA)");
-      m_Edit.SetText(pAnimeItem->FansubGroup);
       m_Edit.SetWindowHandle(NULL);
     }
   }

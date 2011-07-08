@@ -84,9 +84,6 @@
     <ClCompile Include="dlg\dlg_torrent.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="dlg\dlg_torrent_filter.cpp">
-      <Filter>Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="action.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -306,6 +303,12 @@
     <ClCompile Include="feed_filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dlg\dlg_feed_filter.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="dlg\dlg_feed_condition.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -345,9 +348,6 @@
       <Filter>Dialogs\Headers</Filter>
     </ClInclude>
     <ClInclude Include="dlg\dlg_torrent.h">
-      <Filter>Dialogs\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="dlg\dlg_torrent_filter.h">
       <Filter>Dialogs\Headers</Filter>
     </ClInclude>
     <ClInclude Include="anime.h">
@@ -499,6 +499,12 @@
     </ClInclude>
     <ClInclude Include="feed.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_feed_filter.h">
+      <Filter>Dialogs\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_feed_condition.h">
+      <Filter>Dialogs\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

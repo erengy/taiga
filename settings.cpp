@@ -113,13 +113,12 @@ bool CSettings::Read() {
 
   // Anime items
   Anime.Item.clear();
-  wstring fansub, folder, titles;
+  wstring folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
-    fansub = item.attribute(L"fansub").value(EMPTY_STR);
     folder = item.attribute(L"folder").value(EMPTY_STR);
     titles = item.attribute(L"titles").value(EMPTY_STR);
-    Anime.SetItem(item.attribute(L"id").as_int(), fansub, folder, titles);
+    Anime.SetItem(item.attribute(L"id").as_int(), folder, titles);
   }
 
   // Program
@@ -194,20 +193,26 @@ bool CSettings::Read() {
       RSS.Torrent.SetFolder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
       RSS.Torrent.Source = torrent.child(L"source").attribute(L"address").value(DEFAULT_TORRENT_SOURCE);
       // Filters
-      RSS.Torrent.Filters.Global.clear();
       xml_node filter = torrent.child(L"filter");
       xml_node global = filter.child(L"global");
       RSS.Torrent.Filters.GlobalEnabled = global.attribute(L"enabled").as_int(TRUE);
-      /*for (xml_node item = global.child(L"item"); item; item = item.next_sibling(L"item")) {
-        Torrents.AddFilter(item.attribute(L"option").as_int(), item.attribute(L"type").as_int(), item.attribute(L"value").value());
+      Aggregator.FilterManager.Filters.clear();
+      for (xml_node item = global.child(L"item"); item; item = item.next_sibling(L"item")) {
+        Aggregator.FilterManager.AddFilter(
+          item.attribute(L"action").as_int(), 
+          item.attribute(L"match").as_int(), 
+          item.attribute(L"enabled").as_bool(), 
+          item.attribute(L"name").value());
+        for (xml_node condition = item.child(L"condition"); condition; condition = condition.next_sibling(L"condition")) {
+          Aggregator.FilterManager.Filters.back().AddCondition(
+            condition.attribute(L"element").as_int(), 
+            condition.attribute(L"op").as_int(), 
+            condition.attribute(L"value").value());
+        }
       }
-      if (RSS.Torrent.Filters.Global.empty() && RSS.Torrent.Filters.GlobalEnabled == TRUE) {
-        Torrents.AddFilter(0, 2, L"2");
-        Torrents.AddFilter(0, 2, L"4");
-        Torrents.AddFilter(2, 0, L"720p");
-        Torrents.AddFilter(2, 0, L"HD");
-        Torrents.AddFilter(2, 0, L"MKV");
-      }*/
+      if (Aggregator.FilterManager.Filters.empty()) {
+        Aggregator.FilterManager.AddDefaultFilters();
+      }
       // Torrent source
       CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
       if (pFeed) pFeed->Link = RSS.Torrent.Source;
@@ -286,8 +291,6 @@ bool CSettings::Write() {
       xml_node item = items.append_child();
       item.set_name(L"item");
       item.append_attribute(L"id") = Anime.Item[i].ID;
-      if (!Anime.Item[i].FansubGroup.empty())
-        item.append_attribute(L"fansub") = Anime.Item[i].FansubGroup.c_str();
       if (!Anime.Item[i].Folder.empty())
         item.append_attribute(L"folder") = Anime.Item[i].Folder.c_str();
       if (!Anime.Item[i].Titles.empty())
@@ -424,13 +427,21 @@ bool CSettings::Write() {
       xml_node global = torrent.child(L"filter").append_child();
       global.set_name(L"global");
       global.append_attribute(L"enabled") = RSS.Torrent.Filters.GlobalEnabled;
-      /*for (size_t i = 0; i < RSS.Torrent.Filters.Global.size(); i++) {
+      for (auto it = Aggregator.FilterManager.Filters.begin(); it != Aggregator.FilterManager.Filters.end(); ++it) {
         xml_node item = global.append_child();
         item.set_name(L"item");
-        item.append_attribute(L"option") = RSS.Torrent.Filters.Global[i].Option;
-        item.append_attribute(L"type") = RSS.Torrent.Filters.Global[i].Type;
-        item.append_attribute(L"value") = RSS.Torrent.Filters.Global[i].Value.c_str();
-      }*/
+        item.append_attribute(L"action") = it->Action;
+        item.append_attribute(L"match") = it->Match;
+        item.append_attribute(L"enabled") = it->Enabled;
+        item.append_attribute(L"name") = it->Name.c_str();
+        for (auto itc = it->Conditions.begin(); itc != it->Conditions.end(); ++itc) {
+          xml_node condition = item.append_child();
+          condition.set_name(L"condition");
+          condition.append_attribute(L"element") = itc->Element;
+          condition.append_attribute(L"op") = itc->Operator;
+          condition.append_attribute(L"value") = itc->Value.c_str();
+        }
+      }
   
   // Write registry
   CRegistry reg;
@@ -480,7 +491,7 @@ bool CSettings::Write() {
 
 // =============================================================================
 
-void CSettings::CSettingsAnime::SetItem(int id, wstring fansub, wstring folder, wstring titles) {
+void CSettings::CSettingsAnime::SetItem(int id, wstring folder, wstring titles) {
   int index = -1;
   for (unsigned int i = 0; i < Item.size(); i++) {
     if (Item[i].ID == id) {
@@ -493,7 +504,6 @@ void CSettings::CSettingsAnime::SetItem(int id, wstring fansub, wstring folder, 
     Item.resize(index + 1);
   }
   Item[index].ID = id;
-  if (fansub != EMPTY_STR) Item[index].FansubGroup = fansub;
   if (folder != EMPTY_STR) Item[index].Folder = folder;
   if (titles != EMPTY_STR) Item[index].Titles = titles;
 }

@@ -36,60 +36,11 @@ FONT 8, "Tahoma", 400, 0, 162
     LTEXT           "Version X.Y", IDC_STATIC_ABOUT_VERSION, 55, 25, 175, 8, SS_LEFT
     LTEXT           "Author: Eren 'erengy' Okka", IDC_STATIC, 15, 59, 215, 8, SS_LEFT
     LTEXT           "Built on YYYY.MM.DD", IDC_STATIC_ABOUT_BUILD, 55, 35, 175, 8, SS_LEFT
-    CONTROL         "Links: <a href=""http://code.google.com/p/taiga/"">Google Code</a> | <a href=""http://myanimelist.net/clubs.php?cid=21400"">MyAnimeList club</a> | <a href=""irc://irc.rizon.net/taiga"">#taiga@irc.rizon.net</a>", IDC_LINK_ABOUT, "SysLink", 0x50000000, 15, 95, 215, 25
+    CONTROL         "Links: <a href=""URL(http://code.google.com/p/taiga/)"">Google Code</a> | <a href=""URL(http://myanimelist.net/clubs.php?cid=21400)"">MyAnimeList club</a> | <a href=""URL(irc://irc.rizon.net/taiga)"">#taiga@irc.rizon.net</a>", IDC_LINK_ABOUT, "SysLink", 0x50000000, 15, 95, 215, 25
     ICON            IDI_MAIN, 0, 15, 15, 32, 30, SS_ICON | SS_NOTIFY | 0x00000800
     LTEXT           "Contributors: saka, Diablofan, slevir", IDC_STATIC, 15, 69, 215, 8, SS_LEFT
     LTEXT           "", IDC_STATIC, 15, 50, 212, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
     LTEXT           "", IDC_STATIC, 15, 85, 212, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
-}
-
-
-
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDD_ADDFILTER DIALOGEX 0, 0, 226, 220
-STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
-CAPTION "Add New Filter"
-CLASS "TaigaTorrentFilterW"
-FONT 8, "Ms Shell Dlg", 400, 0, 1
-{
-    RADIOBUTTON     "Exclude", IDC_RADIO_FILTER_OPTION1, 15, 20, 200, 11, WS_TABSTOP
-    RADIOBUTTON     "Include", IDC_RADIO_FILTER_OPTION2, 15, 40, 200, 11, WS_TABSTOP
-    RADIOBUTTON     "Preference", IDC_RADIO_FILTER_OPTION3, 15, 60, 200, 11, WS_TABSTOP
-    RADIOBUTTON     "Keyword", IDC_RADIO_FILTER_TYPE1, 15, 110, 65, 8, WS_TABSTOP
-    RADIOBUTTON     "Airing status", IDC_RADIO_FILTER_TYPE2, 15, 120, 65, 8, WS_TABSTOP
-    RADIOBUTTON     "Watching status", IDC_RADIO_FILTER_TYPE3, 15, 130, 65, 8, WS_TABSTOP
-    COMBOBOX        IDC_COMBO_FILTER_VALUE, 15, 170, 195, 30, WS_TABSTOP | WS_TABSTOP | CBS_DROPDOWN | CBS_HASSTRINGS
-    DEFPUSHBUTTON   "OK", IDOK, 110, 200, 50, 14
-    PUSHBUTTON      "Cancel", IDCANCEL, 160, 200, 50, 14
-    GROUPBOX        "Option", IDC_STATIC, 5, 5, 215, 85
-    LTEXT           "Discard items that contain given value.", IDC_STATIC_DETAILS1, 26, 30, 190, 8, SS_LEFT | SS_NOTIFY
-    LTEXT           "Choose items only if they contain given value.", IDC_STATIC_DETAILS2, 26, 50, 190, 8, SS_LEFT | SS_NOTIFY
-    LTEXT           "Prefer the item with this value if there are similar items.", IDC_STATIC_DETAILS3, 26, 70, 190, 8, SS_LEFT | SS_NOTIFY
-    GROUPBOX        "Type", IDC_STATIC, 5, 95, 215, 55
-    GROUPBOX        "Value", IDC_STATIC, 5, 155, 215, 40
-}
-
-
-
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDD_ADDMEDIA DIALOGEX 0, 0, 266, 240
-STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
-EXSTYLE WS_EX_CONTROLPARENT
-CAPTION "Add New Player"
-FONT 8, "Tahoma", 400, 0, 162
-{
-    DEFPUSHBUTTON   "OK", IDOK, 145, 220, 55, 14
-    PUSHBUTTON      "Cancel", IDCANCEL, 200, 220, 55, 14
-    LTEXT           "Step #1: Run the player you want to add.", IDC_STATIC, 10, 10, 140, 8, SS_LEFT
-    GROUPBOX        "Step #2: Select the player from the list", IDC_STATIC, 5, 25, 255, 115
-    CONTROL         "", IDC_LIST_ADDMEDIA, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_NOSORTHEADER | LVS_REPORT, 15, 40, 235, 90
-    GROUPBOX        "Step #3: Set options", IDC_STATIC, 5, 145, 255, 70
-    GROUPBOX        "Recognize", IDC_STATIC, 135, 160, 115, 45
-    RADIOBUTTON     "By window title", IDC_RADIO_ADDMEDIA_MODE1, 145, 175, 65, 10
-    RADIOBUTTON     "By file handle", IDC_RADIO_ADDMEDIA_MODE2, 145, 185, 55, 10
-    PUSHBUTTON      "Refresh list", IDC_BUTTON_ADDMEDIA_REFRESH, 10, 220, 65, 14
-    AUTOCHECKBOX    "Enabled", IDC_CHECK_ADDMEDIA_ENABLED, 25, 175, 39, 10
-    GROUPBOX        "Basic", IDC_STATIC, 15, 160, 115, 45
 }
 
 
@@ -160,8 +111,6 @@ FONT 8, "Tahoma", 400, 0, 0
     LTEXT           "", IDC_STATIC, 5, 160, 340, 1, NOT WS_GROUP | SS_LEFT | SS_SUNKEN, WS_EX_STATICEDGE
     LTEXT           "Alternative titles:", IDC_STATIC, 10, 165, 85, 8, SS_LEFT
     EDITTEXT        IDC_EDIT_ANIME_ALT, 10, 175, 330, 15, ES_AUTOHSCROLL
-    LTEXT           "Fansub group:", IDC_STATIC, 10, 195, 85, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_ANIME_FANSUB, 10, 205, 330, 14, ES_AUTOHSCROLL
 }
 
 
@@ -178,6 +127,49 @@ FONT 8, "Tahoma"
     PUSHBUTTON      "Clear", IDC_BUTTON_EVENT_CLEAR, 10, 235, 65, 14
     DEFPUSHBUTTON   "Update", IDOK, 300, 235, 65, 14
     PUSHBUTTON      "Cancel", IDCANCEL, 365, 235, 65, 14
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_FEED_CONDITION DIALOGEX 0, 0, 371, 75
+STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
+CAPTION "Add Condition"
+CLASS "TaigaFeedConditionW"
+FONT 8, "Ms Shell Dlg", 400, 0, 1
+{
+    DEFPUSHBUTTON   "OK", IDOK, 250, 55, 50, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 300, 55, 50, 14
+    COMBOBOX        IDC_COMBO_FEED_VALUE, 235, 25, 120, 30, WS_TABSTOP | WS_VSCROLL | WS_TABSTOP | CBS_DROPDOWN | CBS_HASSTRINGS
+    LTEXT           "Element:", IDC_STATIC, 15, 15, 50, 8, SS_LEFT
+    LTEXT           "Operator:", IDC_STATIC, 140, 15, 55, 8, SS_LEFT
+    LTEXT           "Value:", IDC_STATIC, 235, 15, 19, 8, SS_LEFT
+    COMBOBOX        IDC_COMBO_FEED_ELEMENT, 15, 25, 120, 30, CBS_DROPDOWNLIST | CBS_HASSTRINGS
+    COMBOBOX        IDC_COMBO_FEED_OPERATOR, 140, 25, 90, 30, CBS_DROPDOWNLIST | CBS_HASSTRINGS
+    GROUPBOX        "", IDC_STATIC, 5, 5, 360, 45
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_FEED_FILTER DIALOGEX 0, 0, 341, 235
+STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
+CAPTION "Add New Filter"
+CLASS "TaigaFeedFilterW"
+FONT 8, "Ms Shell Dlg", 400, 0, 1
+{
+    EDITTEXT        IDC_EDIT_FEED_NAME, 5, 15, 330, 14, ES_AUTOHSCROLL
+    CONTROL         "", IDC_LIST_FEED_CONDITIONS, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_REPORT, 15, 80, 310, 75
+    DEFPUSHBUTTON   "OK", IDOK, 230, 215, 50, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 280, 215, 50, 14
+    LTEXT           "Name:", IDC_STATIC, 5, 5, 40, 8, SS_LEFT
+    GROUPBOX        "Conditions:", IDC_STATIC, 5, 35, 330, 130
+    RADIOBUTTON     "Match all conditions", IDC_RADIO_FEED_MATCH1, 15, 50, 90, 8
+    RADIOBUTTON     "Match any condition", IDC_RADIO_FEED_MATCH2, 15, 60, 95, 8
+    GROUPBOX        "Action:", IDC_STATIC, 5, 170, 330, 40
+    RADIOBUTTON     "Exclude matched items", IDC_RADIO_FEED_ACTION1, 15, 185, 95, 8
+    RADIOBUTTON     "Include matched items", IDC_RADIO_FEED_ACTION2, 15, 195, 90, 8
+    PUSHBUTTON      "Add new condition...", IDC_BUTTON_FEED_ADDCONDITION, 240, 60, 85, 14
 }
 
 
@@ -303,7 +295,7 @@ FONT 8, "Tahoma"
     EDITTEXT        IDC_EDIT_USER, 20, 30, 130, 12, ES_AUTOHSCROLL
     LTEXT           "Password:", IDC_STATIC, 165, 20, 60, 8, SS_LEFT
     EDITTEXT        IDC_EDIT_PASS, 165, 30, 130, 12, ES_AUTOHSCROLL | ES_PASSWORD
-    CONTROL         "<a href=""http://myanimelist.net/register.php"" id=""id_link"">Create a new account</a>", IDC_LINK_MAL, "SysLink", 0x50010000, 20, 50, 130, 10
+    CONTROL         "<a href=""URL(http://myanimelist.net/register.php)"">Create a new account</a>", IDC_LINK_MAL, "SysLink", 0x50010000, 20, 50, 130, 10
     AUTORADIOBUTTON "Default", IDC_RADIO_API1, 20, 90, 50, 10
     AUTORADIOBUTTON "Official API (recommended)", IDC_RADIO_API2, 20, 100, 120, 10
     AUTOCHECKBOX    "Automatically login at start-up", IDC_CHECK_START_LOGIN, 165, 95, 130, 10
@@ -560,9 +552,9 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "Tahoma", 400, 0, 162
 {
     AUTOCHECKBOX    "Enable global filters", IDC_CHECK_TORRENT_FILTERGLOBAL, 10, 5, 90, 8
-    CONTROL         "", IDC_LIST_TORRENT_FILTERGLOBAL, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHAREIMAGELISTS | LVS_REPORT, 10, 20, 295, 143
-    PUSHBUTTON      "Add new...", IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD, 200, 168, 50, 14
-    PUSHBUTTON      "Delete", IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, 250, 168, 50, 14, WS_DISABLED
+    PUSHBUTTON      "Add new...", IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD, 200, 200, 50, 14
+    PUSHBUTTON      "Delete", IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, 250, 200, 50, 14, WS_DISABLED
+    CONTROL         "", IDC_TREE_TORRENT_FILTERGLOBAL, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_TRACKSELECT | TVS_INFOTIP | TVS_NONEVENHEIGHT, 10, 20, 295, 175
 }
 
 
@@ -590,7 +582,7 @@ FONT 8, "Tahoma", 400, 0, 162
     CONTROL         "", IDC_REBAR_TORRENT, REBARCLASSNAME, WS_CLIPCHILDREN | WS_CLIPSIBLINGS | 0x00000801, 0, 1, 580, 21
     CONTROL         "", IDC_TOOLBAR_TORRENT, "ToolbarWindow32", 0x5600994D, 10, 5, 550, 10
     CONTROL         "", IDC_LIST_TORRENT, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 5, 25, 570, 315
-    CONTROL         "", IDC_STATUSBAR_TORRENT, "msctls_statusbar32", 0x50000900, 0, 346, 580, 14
+    CONTROL         "", IDC_STATUSBAR_TORRENT, "msctls_statusbar32", 0x50000900, 0, 345, 580, 15
 }
 
 
@@ -641,8 +633,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,8,91,0
-    PRODUCTVERSION  0,8,91,0
+    FILEVERSION     0,8,92,0
+    PRODUCTVERSION  0,8,92,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -656,11 +648,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.8.91"
+            VALUE "FileVersion", "0.8.92"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.8.91"
+            VALUE "ProductVersion", "0.8.92"
         }
     }
     BLOCK "VarFileInfo"

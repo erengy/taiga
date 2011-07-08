@@ -19,6 +19,7 @@
 #include "std.h"
 #include "common.h"
 #include "feed.h"
+#include "myanimelist.h"
 #include "string.h"
 
 // =============================================================================
@@ -42,6 +43,9 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
   switch (condition.Element) {
     case FEED_FILTER_ELEMENT_TITLE:
       element = item.Title;
+      break;
+    case FEED_FILTER_ELEMENT_CATEGORY:
+      element = item.Category;
       break;
     case FEED_FILTER_ELEMENT_LINK:
       element = item.Link;
@@ -92,12 +96,14 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
   switch (condition.Operator) {
     case FEED_FILTER_OPERATOR_IS:
       if (is_numeric) {
+        if (IsEqual(value, L"True")) value = L"1";
         return ToINT(element) == ToINT(value);
       } else {
         return IsEqual(element, value);
       }
     case FEED_FILTER_OPERATOR_ISNOT:
       if (is_numeric) {
+        if (IsEqual(value, L"True")) value = L"1";
         return ToINT(element) != ToINT(value);
       } else {
         return !IsEqual(element, value);
@@ -128,6 +134,18 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
 }
 
 // =============================================================================
+
+CFeedFilter& CFeedFilter::operator=(const CFeedFilter& filter) {
+  Action = filter.Action;
+  Enabled = filter.Enabled;
+  Match = filter.Match;
+  Name = filter.Name;
+
+  Conditions.resize(filter.Conditions.size());
+  std::copy(filter.Conditions.begin(), filter.Conditions.end(), Conditions.begin());
+
+  return *this;
+}
 
 void CFeedFilter::AddCondition(int element, int op, const wstring& value) {
   Conditions.resize(Conditions.size() + 1);
@@ -170,7 +188,7 @@ bool CFeedFilter::Filter(CFeedItem& item) {
   } else {
     #ifdef _DEBUG
     item.Description = L"!FILTER :: " + 
-      Aggregator.FilterManager.TranslateCondition(*this, index) +
+      Aggregator.FilterManager.TranslateConditions(*this, index) +
       L" -- " + item.Description;
     #endif
     return false;
@@ -178,6 +196,31 @@ bool CFeedFilter::Filter(CFeedItem& item) {
 }
 
 // =============================================================================
+
+void CFeedFilterManager::AddDefaultFilters() {
+  // Discard unknown titles
+  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard unknown titles");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
+  // Discard completed titles
+  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard completed titles");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
+  // Discard dropped titles
+  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard dropped titles");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
+  
+  // Discard watched episodes
+  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY, true, L"Discard watched episodes");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_IS, L"%watched%");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"True");
+  
+  // Discard low resolution files
+  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY, true, L"Discard low resolution files");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"360p");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"480p");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"704x400");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"XviD");
+}
 
 void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
   Filters.resize(Filters.size() + 1);
@@ -227,7 +270,26 @@ int CFeedFilterManager::Filter(CFeed& feed) {
 
 // =============================================================================
 
-wstring CFeedFilterManager::TranslateCondition(const CFeedFilter& filter, size_t index) {
+wstring CFeedFilterManager::TranslateCondition(const CFeedFilterCondition& condition) {
+  wstring value;
+
+  switch (condition.Element) {
+    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+      value = MAL.TranslateMyStatus(ToINT(condition.Value), false);
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+      value = MAL.TranslateStatus(ToINT(condition.Value));
+      break;
+    default:
+      value = condition.Value;
+  }
+
+  return TranslateElement(condition.Element) + L" " + 
+    TranslateOperator(condition.Operator) + L" \"" + 
+    value + L"\"";
+}
+
+wstring CFeedFilterManager::TranslateConditions(const CFeedFilter& filter, size_t index) {
   wstring str;
   
   size_t max_index = filter.Match == FEED_FILTER_MATCH_ALL ? 
@@ -235,9 +297,7 @@ wstring CFeedFilterManager::TranslateCondition(const CFeedFilter& filter, size_t
   
   for (size_t i = index; i < max_index; i++) {
     if (i > index) str += L" & ";
-    str += TranslateElement(filter.Conditions[i].Element) + L" " + 
-      TranslateOperator(filter.Conditions[i].Operator) + L" \"" + 
-      filter.Conditions[i].Value + L"\"";
+    str += TranslateCondition(filter.Conditions[i]);
   }
 
   return str;
@@ -247,6 +307,8 @@ wstring CFeedFilterManager::TranslateElement(int element) {
   switch (element) {
     case FEED_FILTER_ELEMENT_TITLE:
       return L"Title";
+    case FEED_FILTER_ELEMENT_CATEGORY:
+      return L"Category";
     case FEED_FILTER_ELEMENT_LINK:
       return L"Link";
     case FEED_FILTER_ELEMENT_DESCRIPTION:

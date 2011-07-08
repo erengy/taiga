@@ -363,10 +363,14 @@ public:
 
   BOOL      DeleteAllItems();
   BOOL      Expand(HTREEITEM hItem, bool bExpand = true);
+  UINT      GetCheckState(HTREEITEM hItem);
   UINT      GetCount();
   BOOL      GetItem(LPTVITEM pItem);
+  LPARAM    GetItemData(HTREEITEM hItem);
+  HTREEITEM GetSelection();
   HTREEITEM InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent);
   BOOL      SelectItem(HTREEITEM hItem);
+  UINT      SetCheckState(HTREEITEM hItem, BOOL fCheck);
   int       SetItemHeight(SHORT cyItem);
 
 protected:

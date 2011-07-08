@@ -18,6 +18,7 @@
 
 #include "../std.h"
 #include "../animelist.h"
+#include "../common.h"
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
 #include "../event.h"
@@ -166,11 +167,10 @@ void CAnimeWindow::OnOK() {
     m_pAnimeItem->SetFinishDate(year + L"-" + month + L"-" + day, true);
   }
 
-  // Alternative titles & fansub group
-  wstring fansub, titles;
+  // Alternative titles
+  wstring titles;
   m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
-  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_FANSUB, fansub);
-  m_pAnimeItem->SetLocalData(fansub, EMPTY_STR, titles);
+  m_pAnimeItem->SetLocalData(EMPTY_STR, titles);
 
   // Add item to event queue
   EventQueue.Add(item);
@@ -307,10 +307,18 @@ void CAnimeWindow::Refresh(CAnime* pAnimeItem, bool series_info, bool my_info) {
   SetDlgItemText(IDC_STATIC_ANIME_TITLE, text.c_str());
 
   // Load image
-  if (AnimeImage.Load(Taiga.GetDataPath() + L"Image\\" + ToWSTR(m_pAnimeItem->Series_ID) + L".jpg")) {
+  wstring image_path = Taiga.GetDataPath() + L"Image\\" + ToWSTR(m_pAnimeItem->Series_ID) + L".jpg";
+  if (AnimeImage.Load(image_path)) {
     CWindow img = GetDlgItem(IDC_STATIC_ANIME_IMG);
     img.SetPosition(NULL, AnimeImage.Rect);
     img.SetWindowHandle(NULL);
+    // Refresh if current file is too old
+    if (m_pAnimeItem->GetAiringStatus() != MAL_FINISHED) {
+      // Check last modified date (>= 7 days)
+      if (GetFileAge(image_path) / (60 * 60 * 24) >= 7) {
+        MAL.DownloadImage(m_pAnimeItem);
+      }
+    }
   } else {
     MAL.DownloadImage(m_pAnimeItem);
   }

@@ -119,8 +119,8 @@ BOOL CAboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
       switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
         case NM_CLICK:
         case NM_RETURN: {
-          PNMLINK pNMLink = (PNMLINK)lParam;
-          ShellExecute(NULL, L"open", pNMLink->item.szUrl, NULL, NULL, SW_SHOW);
+          PNMLINK pNMLink = reinterpret_cast<PNMLINK>(lParam);
+          ExecuteAction(pNMLink->item.szUrl);
           return TRUE;
         }
       }

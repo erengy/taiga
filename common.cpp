@@ -143,6 +143,33 @@ wstring FormatError(DWORD dwError, LPCWSTR lpSource) {
 
 // =============================================================================
 
+unsigned long GetFileAge(const wstring& path) {
+  FILETIME ft_file, ft_now;
+  
+  // Get the time the file was last modified
+  HANDLE hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, 
+    NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (hFile == INVALID_HANDLE_VALUE) return 0;
+  BOOL result = GetFileTime(hFile, NULL, NULL, &ft_file);
+  CloseHandle(hFile);
+  if (!result) return 0;
+  
+  // Get current time
+  SYSTEMTIME st_now;
+  GetSystemTime(&st_now);
+  SystemTimeToFileTime(&st_now, &ft_now);
+
+  // Convert to ULARGE_INTEGER
+  ULARGE_INTEGER ul_file, ul_now;
+  ul_file.LowPart = ft_file.dwLowDateTime;
+  ul_file.HighPart = ft_file.dwHighDateTime;
+  ul_now.LowPart = ft_now.dwLowDateTime;
+  ul_now.HighPart = ft_now.dwHighDateTime;
+
+  // Return difference in seconds
+  return static_cast<unsigned long>((ul_now.QuadPart - ul_file.QuadPart) / 10000000);
+}
+
 void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
   // Get current time, expressed in UTC
   GetSystemTime(&st);

@@ -16,49 +16,36 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SETTINGS_PAGE_H
-#define DLG_SETTINGS_PAGE_H
+#ifndef DLG_FEED_CONDITION_H
+#define DLG_FEED_CONDITION_H
 
 #include "../std.h"
+#include "../feed.h"
+#include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
 // =============================================================================
 
-enum SettingsPage{
-  PAGE_ACCOUNT,
-  PAGE_UPDATE,
-  PAGE_HTTP,
-  PAGE_MESSENGER,
-  PAGE_MIRC,
-  PAGE_SKYPE,
-  PAGE_TWITTER,
-  PAGE_FOLDERS_ROOT,
-  PAGE_FOLDERS_ANIME,
-  PAGE_PROGRAM,
-  PAGE_LIST,
-  PAGE_NOTIFICATIONS,
-  PAGE_MEDIA,
-  PAGE_TORRENT1,
-  PAGE_TORRENT2,
-  PAGE_COUNT
-};
-
-class CSettingsPage : public CDialog {
+class CFeedConditionWindow : public CDialog {
 public:
-  CSettingsPage();
-  virtual ~CSettingsPage() {}
+  CFeedConditionWindow();
+  virtual ~CFeedConditionWindow();
 
-  int Index;
+  CComboBox m_Element;
+  CComboBox m_Operator;
+  CComboBox m_Value;
+
+  CFeedFilterCondition m_Condition;
+
+  void ChooseElement(int element);
   
-  void CreateItem(LPCWSTR pszText, HTREEITEM htiParent);
-  void Select();
-
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  BOOL DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  void OnCancel();
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
-
-private:
-  HTREEITEM m_hTreeItem;
+  void OnOK();
 };
 
-#endif // DLG_SETTINGS_PAGE_H
+extern CFeedConditionWindow FeedConditionWindow;
+
+#endif // DLG_FEED_CONDITION_H

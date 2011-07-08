@@ -275,7 +275,7 @@ void CAnime::CheckFolder() {
 void CAnime::SetFolder(const wstring& folder, bool save_settings, bool check_episodes) {
   // Save settings
   if (save_settings && folder != EMPTY_STR && folder != Folder) {
-    Settings.Anime.SetItem(Series_ID, EMPTY_STR, folder, EMPTY_STR);
+    Settings.Anime.SetItem(Series_ID, folder, EMPTY_STR);
   }
   // Set new folder
   Folder = folder;
@@ -378,18 +378,16 @@ bool CAnime::SetEpisodeAvailability(int number, bool available, const wstring& p
 
 // =============================================================================
 
-void CAnime::SetLocalData(const wstring& fansub, const wstring& folder, const wstring& titles) {
-  if ((fansub == EMPTY_STR || fansub == FansubGroup) && 
-      (folder == EMPTY_STR || folder == Folder) && 
+void CAnime::SetLocalData(const wstring& folder, const wstring& titles) {
+  if ((folder == EMPTY_STR || folder == Folder) && 
       (titles == EMPTY_STR || titles == Synonyms)) {
         return;
   }
 
-  if (fansub != EMPTY_STR) FansubGroup = fansub;
   if (folder != EMPTY_STR) Folder = folder;
   if (titles != EMPTY_STR) Synonyms = titles;
 
-  Settings.Anime.SetItem(Series_ID, fansub, folder, titles);
+  Settings.Anime.SetItem(Series_ID, folder, titles);
   Settings.Write();
 
   if (!Synonyms.empty() && CurrentEpisode.Index == -1) {

@@ -30,7 +30,7 @@
 #include "dlg/dlg_settings.h"
 #include "dlg/dlg_test_recognition.h"
 #include "dlg/dlg_torrent.h"
-#include "dlg/dlg_torrent_filter.h"
+#include "dlg/dlg_feed_filter.h"
 #include "dlg/dlg_update.h"
 #include "event.h"
 #include "http.h"
@@ -297,12 +297,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   wParam is a BOOL value that represents modal status.
   //   lParam is the handle of the parent window.
   } else if (action == L"TorrentAddFilter") {
-    if (!TorrentFilterWindow.IsWindow()) {
+    /*if (!TorrentFilterWindow.IsWindow()) {
       TorrentFilterWindow.Create(IDD_ADDFILTER, 
         reinterpret_cast<HWND>(lParam), wParam != FALSE);
     } else {
       ActivateWindow(TorrentFilterWindow.GetWindowHandle());
-    }
+    }*/
 
   // ===========================================================================
   
@@ -656,7 +656,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.Text = AnimeList.Item[AnimeList.Index].Synonyms;
     dlg.Show(g_hMain);
     if (dlg.Result == IDOK) {
-      AnimeList.Item[AnimeList.Index].SetLocalData(EMPTY_STR, EMPTY_STR, dlg.Text);
+      AnimeList.Item[AnimeList.Index].SetLocalData(EMPTY_STR, dlg.Text);
     }
   
   // ===========================================================================

@@ -138,7 +138,7 @@ BOOL CSettingsWindow::OnInitDialog() {
   // Torrent
   HTREEITEM htTorrent = m_Tree.InsertItem(L"Torrent", reinterpret_cast<LPARAM>(&m_Page[PAGE_TORRENT1]), NULL);
   m_Page[PAGE_TORRENT1].CreateItem(L"Options", htTorrent);
-  //m_Page[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent);
+  m_Page[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent);
   m_Tree.Expand(htTorrent);
 
   // Select current page
@@ -245,12 +245,10 @@ void CSettingsWindow::OnOK() {
   Settings.RSS.Torrent.SetFolder = m_Page[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER);
   // Torrent > Filters
   Settings.RSS.Torrent.Filters.GlobalEnabled = m_Page[PAGE_TORRENT2].IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTERGLOBAL);
-  Settings.RSS.Torrent.Filters.Global.clear();
-  List.SetWindowHandle(m_Page[PAGE_TORRENT2].GetDlgItem(IDC_LIST_TORRENT_FILTERGLOBAL));
-  for (int i = 0; i < List.GetItemCount(); i++) {
-    AddTorrentFilterFromList(List.GetWindowHandle(), i, Settings.RSS.Torrent.Filters.Global);
+  Aggregator.FilterManager.Filters.clear();
+  for (auto it = m_FeedFilters.begin(); it != m_FeedFilters.end(); ++it) {
+    Aggregator.FilterManager.Filters.push_back(*it);
   }
-  List.SetWindowHandle(NULL);
 
   // Save settings
   MediaPlayers.Write();
@@ -339,7 +337,7 @@ INT_PTR CSettingsWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
             IDC_LIST_MEDIA, uMsg, wParam, lParam);
         case PAGE_TORRENT2:
           return m_Page[PAGE_TORRENT2].SendDlgItemMessage(
-            IDC_LIST_TORRENT_FILTERGLOBAL, uMsg, wParam, lParam);
+            IDC_TREE_TORRENT_FILTERGLOBAL, uMsg, wParam, lParam);
       }
       break;
     }
@@ -389,11 +387,8 @@ void CSettingsWindow::RefreshTwitterLink() {
     text = L"Taiga is not authorized to post to your Twitter account yet.";
   } else {
     text = L"Taiga is authorized to post to this Twitter account: ";
-    text += L"<a href=\"http://twitter.com/";
-    text += Settings.Announce.Twitter.User;
-    text += L"\" id=\"id_link\">";
-    text += Settings.Announce.Twitter.User;
-    text += L"</a>";
+    text += L"<a href=\"URL(http://twitter.com/" + Settings.Announce.Twitter.User;
+    text += L")\">" + Settings.Announce.Twitter.User + L"</a>";
   }
   m_Page[PAGE_TWITTER].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
 }

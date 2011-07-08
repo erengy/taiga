@@ -42,6 +42,8 @@ public:
   BOOL OnInitDialog();
   void OnOK();
   void SetCurrentPage(int index);
+  
+  vector<CFeedFilter> m_FeedFilters;
 
 private:
   int m_iCurrentPage;

@@ -41,12 +41,29 @@ BOOL CTreeView::Expand(HTREEITEM hItem, bool bExpand) {
   return TreeView_Expand(m_hWindow, hItem, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
 }
 
+UINT CTreeView::GetCheckState(HTREEITEM hItem) {
+  return TreeView_GetCheckState(m_hWindow, hItem);
+}
+
 UINT CTreeView::GetCount() {
   return TreeView_GetCount(m_hWindow);
 }
 
 BOOL CTreeView::GetItem(LPTVITEM pItem) {
   return TreeView_GetItem(m_hWindow, pItem);
+}
+
+LPARAM CTreeView::GetItemData(HTREEITEM hItem) {
+  TVITEM tvi = {0};
+  tvi.mask = TVIF_PARAM;
+  tvi.hItem = hItem;
+  TreeView_GetItem(m_hWindow, &tvi);
+
+  return tvi.lParam;
+}
+
+HTREEITEM CTreeView::GetSelection() {
+  return TreeView_GetSelection(m_hWindow);
 }
 
 HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent) {
@@ -65,6 +82,16 @@ HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiPar
 
 BOOL CTreeView::SelectItem(HTREEITEM hItem) {
   return TreeView_Select(m_hWindow, hItem, TVGN_CARET);
+}
+
+UINT CTreeView::SetCheckState(HTREEITEM hItem, BOOL fCheck) {
+  TVITEM tvi    = {0};
+  tvi.mask      = TVIF_HANDLE | TVIF_STATE;
+  tvi.hItem     = hItem;
+  tvi.stateMask = TVIS_STATEIMAGEMASK;
+  tvi.state     = INDEXTOSTATEIMAGEMASK(fCheck + 1);
+
+  return TreeView_SetItem(m_hWindow, &tvi);
 }
 
 int CTreeView::SetItemHeight(SHORT cyItem) {

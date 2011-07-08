@@ -260,7 +260,6 @@ void CAnimeList::AddItem(
 
   for (size_t i = 0; i < Settings.Anime.Item.size(); i++) {
     if (Item[Count].Series_ID == Settings.Anime.Item[i].ID) {
-      Item[Count].FansubGroup = Settings.Anime.Item[i].FansubGroup;
       Item[Count].Folder = Settings.Anime.Item[i].Folder;
       Item[Count].Synonyms = Settings.Anime.Item[i].Titles;
       break;

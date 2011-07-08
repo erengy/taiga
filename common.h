@@ -53,6 +53,7 @@ int GetEpisodeHigh(const wstring& episode_number);
 int GetEpisodeLow(const wstring& episode_number);
 int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
+unsigned long GetFileAge(const wstring& path);
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 wstring GetDate(LPCWSTR lpFormat = L"yyyy'-'MM'-'dd");
 wstring GetTime(LPCWSTR lpFormat = L"HH':'mm':'ss");

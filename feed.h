@@ -112,6 +112,7 @@ private:
 
 enum FeedFilterElement {
   FEED_FILTER_ELEMENT_TITLE,
+  FEED_FILTER_ELEMENT_CATEGORY,
   FEED_FILTER_ELEMENT_LINK,
   FEED_FILTER_ELEMENT_DESCRIPTION,
   FEED_FILTER_ELEMENT_ANIME_ID,
@@ -121,7 +122,8 @@ enum FeedFilterElement {
   FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE,
   FEED_FILTER_ELEMENT_ANIME_RESOLUTION,
   FEED_FILTER_ELEMENT_ANIME_MYSTATUS,
-  FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS
+  FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS,
+  FEED_FILTER_ELEMENT_COUNT
 };
 
 enum FeedFilterOperator {
@@ -132,7 +134,8 @@ enum FeedFilterOperator {
   FEED_FILTER_OPERATOR_BEGINSWITH,
   FEED_FILTER_OPERATOR_ENDSWITH,
   FEED_FILTER_OPERATOR_CONTAINS,
-  FEED_FILTER_OPERATOR_CONTAINSNOT
+  FEED_FILTER_OPERATOR_CONTAINSNOT,
+  FEED_FILTER_OPERATOR_COUNT
 };
 
 enum FeedFilterMatch {
@@ -160,6 +163,7 @@ class CFeedFilter {
 public:
   CFeedFilter() : Action(0), Enabled(true), Match(FEED_FILTER_MATCH_ALL) {}
   virtual ~CFeedFilter() {}
+  CFeedFilter& operator=(const CFeedFilter& filter);
 
   void AddCondition(int element, int op, const wstring& value);
   bool Filter(CFeedItem& item);
@@ -172,11 +176,13 @@ public:
 
 class CFeedFilterManager {
 public:
+  void AddDefaultFilters();
   void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
     bool enabled = true, const wstring& name = L"");
   int Filter(CFeed& feed);
 
-  wstring TranslateCondition(const CFeedFilter& filter, size_t index);
+  wstring TranslateCondition(const CFeedFilterCondition& condition);
+  wstring TranslateConditions(const CFeedFilter& filter, size_t index);
   wstring TranslateElement(int element);
   wstring TranslateOperator(int op);
   

@@ -22,7 +22,6 @@
 #include "dlg/dlg_torrent.h"
 #include "feed.h"
 #include "gfx.h"
-#include "myanimelist.h"
 #include "recognition.h"
 #include "resource.h"
 #include "settings.h"
@@ -189,41 +188,6 @@ CAggregator::CAggregator() {
   // Add torrent feed
   Feeds.resize(Feeds.size() + 1);
   Feeds.back().Category = FEED_CATEGORY_LINK;
-
-  // TEMP: Add temporary filters for testing purposes
-  #ifdef _DEBUG
-  #define FM Aggregator.FilterManager
-  // Discard unknown titles
-  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
-  
-  // Discard items for completed titles
-  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
-  
-  // Discard items for dropped titles
-  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
-  
-  // Discard already watched episodes
-  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY);
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_IS, L"%watched%");
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"1");
-  
-  // Discard low resolution files
-  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY);
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"360p");
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"480p");
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"704x400");
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"XviD");
-  
-  // Discard fansub groups other than "Ahodomo" for "Nichijou"
-  FM.AddFilter(FEED_FILTER_ACTION_EXCLUDE);
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"10165");
-  FM.Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, FEED_FILTER_OPERATOR_ISNOT, L"Ahodomo");
-  #undef FM
-  #endif
 }
 
 CFeed* CAggregator::Get(int category) {

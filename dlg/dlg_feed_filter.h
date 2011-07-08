@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_TORRENT_FILTER_H
-#define DLG_TORRENT_FILTER_H
+#ifndef DLG_FEED_FILTER_H
+#define DLG_FEED_FILTER_H
 
 #include "../std.h"
 #include "../feed.h"
@@ -26,28 +26,27 @@
 
 // =============================================================================
 
-class CTorrentFilterWindow : public CDialog {
+class CFeedFilterWindow : public CDialog {
 public:
-  CTorrentFilterWindow();
-  virtual ~CTorrentFilterWindow();
-
-  CComboBox m_Combo;
-  CFeedFilter m_Filter;
-
-  void RefreshComboBox(int type = 0);
-  void SetValues(int option, int type, wstring value);
+  CFeedFilterWindow();
+  virtual ~CFeedFilterWindow();
   
   BOOL DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnOK();
+  
+public:
+  CFeedFilter m_Filter;
 
 private:
-  wstring m_LastKeyword;
-  int m_iLastType;
+  void AddConditionToList(const CFeedFilterCondition& condition);
+
+private:
+  CListView m_List;
 };
 
-extern CTorrentFilterWindow TorrentFilterWindow;
+extern CFeedFilterWindow FeedFilterWindow;
 
-#endif // DLG_TORRENT_FILTER_H
+#endif // DLG_FEED_FILTER_H

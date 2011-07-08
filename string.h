@@ -70,10 +70,10 @@ wstring SubStr(const wstring& str, const wstring& sub_begin, const wstring& sub_
 size_t Tokenize(const wstring& str, const wstring& delimiters, vector<wstring>& tokens);
 const char* ToANSI(const wstring& str, UINT code_page = CP_UTF8);
 wstring ToUTF8(const string& str, UINT code_page = CP_UTF8);
-void ToLower(wstring& str);
-wstring ToLower_Copy(wstring str);
-void ToUpper(wstring& str);
-wstring ToUpper_Copy(wstring str);
+void ToLower(wstring& str, bool use_locale = false);
+wstring ToLower_Copy(wstring str, bool use_locale = false);
+void ToUpper(wstring& str, bool use_locale = false);
+wstring ToUpper_Copy(wstring str, bool use_locale = false);
 int ToINT(const wstring& str);
 wstring ToWSTR(const INT& value);
 wstring ToWSTR(const ULONG& value);

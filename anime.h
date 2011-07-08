@@ -67,7 +67,7 @@ public:
   bool PlayEpisode(int number);
   bool IsEpisodeAvailable(int number);
   bool SetEpisodeAvailability(int number, bool available, const wstring& path = L"");
-  void SetLocalData(const wstring& fansub, const wstring& folder, const wstring& titles);
+  void SetLocalData(const wstring& folder, const wstring& titles);
   int GetIntValue(int mode);
   int GetLastWatchedEpisode();
   int GetRewatching();
@@ -88,7 +88,7 @@ public:
   bool NewEps, Playing;
   vector<bool> EpisodeAvailable;
   wstring NextEpisodePath;
-  wstring FansubGroup, Folder, Synonyms;
+  wstring Folder, Synonyms;
   wstring Genres, Popularity, Rank, Score, Synopsis;
 };
 

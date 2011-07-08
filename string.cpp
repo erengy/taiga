@@ -19,8 +19,10 @@
 #include "std.h"
 #include "string.h"
 #include <algorithm>
-#include <sstream>
+#include <functional>
 #include <iomanip>
+#include <locale>
+#include <sstream>
 
 // =============================================================================
 
@@ -28,39 +30,15 @@
 
 void Erase(wstring& str1, const wstring& str2, bool case_insensitive) {
   if (str2.empty() || str1.length() < str2.length()) return;
-  if (!case_insensitive) {
-    for (size_t pos = str1.find(str2); pos != wstring::npos; pos = str1.find(str2, pos)) {
-      str1.erase(pos, str2.length());
-    }
-  } else {
-    for (size_t i = 0; i < str1.length() - str2.length() + 1; i++) {
-      for (size_t j = 0; j < str2.length(); j++) {
-        if (str1.length() < str2.length()) return;
-        if (tolower(str1[i + j]) == tolower(str2[j])) {
-          if (j == str2.length() - 1) {
-            str1.erase(i--, str2.length());
-            break;
-          }
-        } else {
-          i += j;
-          break;
-        }
-      }
-    }
-  }
-}
-
-void Erase2(wstring& str1, const wstring& str2, bool case_insensitive) {
-  if (str2.empty() || str1.length() < str2.length()) return;
-  wstring::iterator i = str1.begin();
+  auto it = str1.begin();
   do {
     if (case_insensitive) {
-      i = std::search(i, str1.end(), str2.begin(), str2.end(), &IsCharsEqual);
+      it = std::search(it, str1.end(), str2.begin(), str2.end(), &IsCharsEqual);
     } else {
-      i = std::search(i, str1.end(), str2.begin(), str2.end());
+      it = std::search(it, str1.end(), str2.begin(), str2.end());
     }
-    if (i != str1.end()) str1.erase(i, i + str2.length());
-  } while (i != str1.end());
+    if (it != str1.end()) str1.erase(it, it + str2.length());
+  } while (it != str1.end());
 }
 
 void EraseChars(wstring& str, const wchar_t chars[]) {
@@ -72,27 +50,28 @@ void EraseChars(wstring& str, const wchar_t chars[]) {
 }
 
 void ErasePunctuation(wstring& str, bool keep_trailing) {
-  wchar_t c;
-  for (int i = str.length() - 1; i >= 0; i--) {
-    c = str[i];
-    if ((c >  31 && c <  48) || //  !"#$%&'()*+,-./
-        (c >  57 && c <  65) || // :;<=>?@
-        (c >  90 && c <  97) || // [\]^_`
-        (c > 122 && c < 128) || // {|}~
-        (c > 9472 && c < 10087)) { // unicode stars, hearts, notes, etc
-          if (keep_trailing) {
-            if (c == '!' ||  // "Hayate no Gotoku!", "K-ON!"...
-                c == '+' ||  // "Needless+"
-                c == '\'') { // "Gintama'"
-                  continue;
-            }
-            keep_trailing = false;
-          }
-          str.erase(i, 1);
-    } else {
-      keep_trailing = false;
-    }
+  auto rlast = str.rbegin();
+  if (keep_trailing) {
+    rlast = std::find_if(str.rbegin(), str.rend(), 
+    [](wchar_t c) -> bool {
+      return !(c == L'!' || // "Hayate no Gotoku!", "K-ON!"...
+               c == L'+' || // "Needless+"
+               c == L'\''); // "Gintama'"
+    });
   }
+
+  auto it = std::remove_if(str.begin(), rlast.base(), 
+    [](int c) -> bool {
+      // Control codes, white-space and punctuation characters
+      if (c <= 255 && !isalnum(c)) return true;
+      // Unicode stars, hearts, notes, etc.
+      if (c > 9472 && c < 10087) return true;
+      // Valid character
+      return false;
+    });
+  
+  if (keep_trailing) std::copy(rlast.base(), str.end(), it);
+  str.resize(str.size() - (rlast.base() - it));
 }
 
 void EraseLeft(wstring& str1, const wstring str2, bool case_insensitive) {
@@ -191,7 +170,7 @@ inline bool IsCharsEqual(const wchar_t c1, const wchar_t c2) {
 
 bool IsEqual(const wstring& str1, const wstring& str2) {
   if (str1.length() != str2.length()) return false;
-  return _wcsnicmp(str1.c_str(), str2.c_str(), MAX_PATH) == 0;
+  return std::equal(str1.begin(), str1.end(), str2.begin(), &IsCharsEqual);
 }
 
 bool IsHex(const wchar_t c) {
@@ -349,25 +328,34 @@ wstring ToUTF8(const string& str, UINT code_page) {
 
 /* Case conversion */
 
-void ToLower(wstring& str) {
-  for (size_t i = 0; i < str.length(); i++)
-    str[i] = tolower(str[i]);
+// System-default ANSI code page
+std::locale current_locale("");
+
+void ToLower(wstring& str, bool use_locale) {
+  if (use_locale) {
+    std::transform(str.begin(), str.end(), str.begin(), 
+      std::bind2nd(std::ptr_fun(&std::tolower<wchar_t>), current_locale));
+  } else {
+    std::transform(str.begin(), str.end(), str.begin(), towlower);
+  }
 }
 
-wstring ToLower_Copy(wstring str) {
-  for (size_t i = 0; i < str.length(); i++)
-    str[i] = tolower(str[i]);
+wstring ToLower_Copy(wstring str, bool use_locale) {
+  ToLower(str, use_locale);
   return str;
 }
 
-void ToUpper(wstring& str) {
-  for (size_t i = 0; i < str.length(); i++)
-    str[i] = toupper(str[i]);
+void ToUpper(wstring& str, bool use_locale) {
+  if (use_locale) {
+    std::transform(str.begin(), str.end(), str.begin(), 
+      std::bind2nd(std::ptr_fun(&std::toupper<wchar_t>), current_locale));
+  } else {
+    std::transform(str.begin(), str.end(), str.begin(), towupper);
+  }
 }
 
-wstring ToUpper_Copy(wstring str) {
-  for (size_t i = 0; i < str.length(); i++)
-    str[i] = toupper(str[i]);
+wstring ToUpper_Copy(wstring str, bool use_locale) {
+  ToUpper(str, use_locale);
   return str;
 }
 
@@ -608,37 +596,33 @@ int GetCommonCharIndex(wchar_t c) {
 }
 
 wchar_t GetMostCommonCharacter(const wstring& str) {
-  struct type_map { wchar_t ch; int count; };
-  vector<type_map> char_map;
+  vector<std::pair<wchar_t, int>> char_map;
   int char_index = -1;
 
   for (size_t i = 0; i < str.length(); i++) {
     if (!IsAlphanumeric(str[i])) {
       char_index = GetCommonCharIndex(str[i]);
       if (char_index == -1) continue;
-      for (size_t j = 0; j < char_map.size(); j++) {
-        if (char_map[j].ch == str[i]) {
-          char_map[j].count++;
+      for (auto it = char_map.begin(); it != char_map.end(); ++it) {
+        if (it->first == str[i]) {
+          it->second++;
           char_index = -1;
           break;
         }
       }
       if (char_index > -1) {
-        size_t size = char_map.size();
-        char_map.resize(size + 1);
-        char_map[size].ch = str[i];
-        char_map[size].count = 1;
+        char_map.push_back(std::make_pair(str[i], 1));
       }
     }
   }
   
   char_index = 0;
-  for (size_t i = 0; i < char_map.size(); i++) {
-    if (char_map[i].count * 2 >= char_map[char_index].count &&
-      GetCommonCharIndex(char_map[i].ch) < GetCommonCharIndex(char_map[char_index].ch)) {
-        char_index = i;
+  for (auto it = char_map.begin(); it != char_map.end(); ++it) {
+    if (it->second * 2 >= char_map.at(char_index).second &&
+      GetCommonCharIndex(it->first) < GetCommonCharIndex(char_map.at(char_index).first)) {
+        char_index = it - char_map.begin();
     }
   }
 
-  return char_map.empty() ? '\0' : char_map[char_index].ch;
+  return char_map.empty() ? '\0' : char_map.at(char_index).first;
 }

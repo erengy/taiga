@@ -72,11 +72,11 @@ public:
   // Anime
   class CSettingsAnime {
   public:
-    void SetItem(int id, wstring fansub, wstring folder, wstring titles);
+    void SetItem(int id, wstring folder, wstring titles);
     class CSettingsAnimeItem {
     public:
       int ID;
-      wstring FansubGroup, Folder, Titles;
+      wstring Folder, Titles;
     };
     vector<CSettingsAnimeItem> Item;
   } Anime;
@@ -176,7 +176,6 @@ public:
       class CSettingsRSSTorrentFilters {
       public:
         BOOL GlobalEnabled;
-        vector<CFeedFilter> Global;
       } Filters;
     } Torrent;
   } RSS;
