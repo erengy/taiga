@@ -71,7 +71,7 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
         TrimLeft(text, L", ");
       }
       if (text.empty()) text = L"-";
-      SetDlgItemText(IDC_STATIC_ANIME_ALT, text.c_str());
+      SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
       
       // Set synopsis
       if (pAnimeItem->Synopsis.empty()) {
@@ -103,6 +103,8 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       #undef ADD_INFOLINE
       pAnimeItem->Genres = genres;
       SetDlgItemText(IDC_STATIC_ANIME_INFO2, text.c_str());
+
+      break;
     }
 
     // =========================================================================
@@ -197,6 +199,8 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       m_Edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
       m_Edit.SetText(pAnimeItem->Synonyms);
       m_Edit.SetWindowHandle(NULL);
+      
+      break;
     }
   }
 }

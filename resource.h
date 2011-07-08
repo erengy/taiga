@@ -36,6 +36,7 @@
 #define IDD_TORRENT                             140
 #define IDD_UPDATE                              141
 #define IDC_BUTTON_ADDFOLDER                    1000
+#define IDC_EDIT_ANIME_TITLE                    1000
 #define IDC_BUTTON_CANCELSEARCH                 1001
 #define IDC_BUTTON_EVENT_CLEAR                  1002
 #define IDC_TREE_TORRENT_FILTERGLOBAL           1002
@@ -164,7 +165,6 @@
 #define IDC_STATIC_ABOUT_BUILD                  1127
 #define IDC_STATIC_ABOUT_TITLE                  1128
 #define IDC_STATIC_ABOUT_VERSION                1129
-#define IDC_STATIC_ANIME_ALT                    1130
 #define IDC_STATIC_ANIME_IMG                    1131
 #define IDC_STATIC_ANIME_INFO1                  1132
 #define IDC_STATIC_ANIME_INFO2                  1133

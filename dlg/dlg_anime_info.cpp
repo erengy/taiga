@@ -72,7 +72,7 @@ BOOL CAnimeWindow::OnInitDialog() {
     lFont.lfWeight = FW_BOLD;
     m_hfTitle = ::CreateFontIndirect(&lFont);
   }
-  SendDlgItemMessage(IDC_STATIC_ANIME_TITLE, WM_SETFONT, reinterpret_cast<WPARAM>(m_hfTitle), FALSE);
+  SendDlgItemMessage(IDC_EDIT_ANIME_TITLE, WM_SETFONT, reinterpret_cast<WPARAM>(m_hfTitle), FALSE);
 
   // Create tabs
   m_Tab.Attach(GetDlgItem(IDC_TAB_ANIME));
@@ -185,11 +185,12 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
   switch (uMsg) {
     case WM_CTLCOLORSTATIC: {
       HDC hdc = reinterpret_cast<HDC>(wParam);
-      HWND hwnd_static = reinterpret_cast<HWND>(lParam);
-      if (hwnd_static == GetDlgItem(IDC_STATIC_ANIME_TITLE)) {
-        SetBkMode(hdc, TRANSPARENT);
-        SetTextColor(hdc, MAL_DARKBLUE);
-        return reinterpret_cast<INT_PTR>(m_hbrLightBlue);
+      HWND hwnd_control = reinterpret_cast<HWND>(lParam);
+      if (hwnd_control == GetDlgItem(IDC_STATIC_ANIME_TITLE) || 
+          hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, MAL_DARKBLUE);
+            return reinterpret_cast<INT_PTR>(m_hbrLightBlue);
       }
       break;
     }
@@ -303,8 +304,7 @@ void CAnimeWindow::Refresh(CAnime* pAnimeItem, bool series_info, bool my_info) {
   if (!m_pAnimeItem || !IsWindow()) return;
 
   // Set title
-  wstring text = L"  " + m_pAnimeItem->Series_Title;
-  SetDlgItemText(IDC_STATIC_ANIME_TITLE, text.c_str());
+  SetDlgItemText(IDC_EDIT_ANIME_TITLE, m_pAnimeItem->Series_Title.c_str());
 
   // Load image
   wstring image_path = Taiga.GetDataPath() + L"Image\\" + ToWSTR(m_pAnimeItem->Series_ID) + L".jpg";

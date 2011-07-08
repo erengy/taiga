@@ -41,9 +41,14 @@
 #include "win32/win_taskbar.h"
 #include "win32/win_taskdialog.h"
 
-CHTTPClient MainClient, ImageClient, SearchClient, TwitterClient, VersionClient;
+CHTTPClient HTTPClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
 
 // =============================================================================
+
+CHTTPClient::CHTTPClient() {
+  SetUserAgent(APP_NAME L"/" + 
+    ToWSTR(APP_VERSION_MAJOR) + L"." + ToWSTR(APP_VERSION_MINOR));
+}
 
 BOOL CHTTPClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWSTR(dwError) + L": " + 
@@ -563,4 +568,20 @@ BOOL CHTTPClient::OnReadComplete() {
   }
 
   return FALSE;
+}
+
+// =============================================================================
+
+void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) {
+  #define SET_PROXY(client) client.SetProxy(proxy, user, pass);
+  SET_PROXY(HTTPClient);
+  SET_PROXY(ImageClient);
+  SET_PROXY(MainClient);
+  SET_PROXY(SearchClient);
+  SET_PROXY(TwitterClient);
+  SET_PROXY(VersionClient);
+  for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
+    SET_PROXY(Aggregator.Feeds[i].Client);
+  }
+  #undef SET_PROXY
 }

@@ -400,7 +400,7 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, CEventItem& item) {
 
 void CMyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 32
+  #define HTMLCHARCOUNT 33
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Extreme measures */
     // black star (black and white stars are encoded the same in API >_<)
@@ -424,6 +424,7 @@ void CMyAnimeList::DecodeText(wstring& text) {
     {L"&Aring;&laquo;",         L"\u016B"},   // small u, macron mark
     {L"&Icirc;&nbsp;",          L"\u03A0"},   // greek capital letter pi
     {L"&Icirc;&pound;",         L"\u03A3"},   // greek capital letter sigma
+    {L"&acirc;\uFFFD&frac14;",  L"\u203C"},   // double exclamation mark
     {L"&acirc;\uFFFD&yen;",     L"\u2665"},   // heart
     {L"&acirc;\uFFFD&ordf;",    L"\u266A"},   // eighth note
     {L"&acirc;\uFFFD\uFFFD",    L"\u2729"},   // white star

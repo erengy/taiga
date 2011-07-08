@@ -279,16 +279,10 @@ void CSettingsWindow::OnOK() {
   FolderMonitor.Enable(Settings.Folders.WatchEnabled == TRUE);
 
   // Setup proxy
-  HTTPClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  ImageClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  MainClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  SearchClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  TwitterClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  VersionClient.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
-    Aggregator.Feeds[i].Client.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-  }
-  
+  SetProxies(Settings.Program.Proxy.Host, 
+    Settings.Program.Proxy.User, 
+    Settings.Program.Proxy.Password);
+
   // End dialog
   EndDialog(IDOK);
 }

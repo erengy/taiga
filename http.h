@@ -58,7 +58,7 @@ enum HTTP_ClientMode {
 
 class CHTTPClient : public CHTTP {
 public:
-  CHTTPClient() {}
+  CHTTPClient();
   virtual ~CHTTPClient() {}
 
 protected:
@@ -70,7 +70,10 @@ protected:
   BOOL OnRedirect(wstring address);
 };
 
-extern CHTTPClient MainClient, ImageClient, SearchClient, TwitterClient, VersionClient;
-extern CHTTP HTTPClient;
+extern CHTTPClient HTTPClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
+
+// =============================================================================
+
+void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass);
 
 #endif // HTTP_H

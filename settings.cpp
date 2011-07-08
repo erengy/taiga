@@ -146,15 +146,7 @@ bool CSettings::Read() {
     Program.Proxy.Host = proxy.attribute(L"host").value();
     Program.Proxy.Password = SimpleDecrypt(proxy.attribute(L"password").value());
     Program.Proxy.User = proxy.attribute(L"username").value();
-    HTTPClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
-    ImageClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
-    MainClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
-    SearchClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
-    TwitterClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
-    VersionClient.SetProxy(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
-    for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
-      Aggregator.Feeds[i].Client.SetProxy(Settings.Program.Proxy.Host, Settings.Program.Proxy.User, Settings.Program.Proxy.Password);
-    }
+    SetProxies(Program.Proxy.Host, Program.Proxy.User, Program.Proxy.Password);
     // List
     xml_node list = program.child(L"list");
     Program.List.DoubleClick = list.child(L"action").attribute(L"doubleclick").as_int(4);

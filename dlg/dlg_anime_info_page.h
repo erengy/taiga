@@ -34,11 +34,12 @@ class CAnimeInfoPage : public CDialog {
 public:
   CAnimeInfoPage();
   virtual ~CAnimeInfoPage();
-
-  int Index;
-
-  void Refresh(CAnime* pAnimeItem = NULL);
+  
   BOOL OnInitDialog();
+  void Refresh(CAnime* pAnimeItem = NULL);
+
+public:
+  int Index;
 
 private:
   HFONT m_hfHeader;
