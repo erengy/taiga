@@ -97,7 +97,7 @@ BOOL CSettingsPage::OnInitDialog() {
       List.InsertColumn(1, 200, 200, 0, L"Folder");
       for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
         if (i != MAL_UNKNOWN) {
-          List.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str(), i != MAL_WATCHING);
+          List.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str(), true, i != MAL_WATCHING);
         }
       }
       List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);

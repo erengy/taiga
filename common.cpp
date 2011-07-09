@@ -102,6 +102,26 @@ int GetEpisodeLow(const wstring& episode_number) {
   return ToINT(episode_number); // ToINT() stops at -
 }
 
+void SplitEpisodeNumbers(const wstring& input, vector<int>& output) {
+  if (input.empty()) return;
+  vector<wstring> numbers;
+  Split(input, L"-", numbers);
+  for (auto it = numbers.begin(); it != numbers.end(); ++it) {
+    output.push_back(ToINT(*it));
+  }
+}
+
+wstring JoinEpisodeNumbers(const vector<int>& input) {
+  wstring output;
+  for (auto it = input.begin(); it != input.end(); ++it) {
+    if (!output.empty()) output += L"-";
+    output += ToWSTR(*it);
+  }
+  return output;
+}
+
+// =============================================================================
+
 int StatusToIcon(int status) {  
   switch (status) {
     case MAL_AIRING:

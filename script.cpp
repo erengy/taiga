@@ -290,7 +290,7 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
 
   // Prepare episode value
   wstring episode_number = ToWSTR(GetEpisodeHigh(episode.Number));
-  TrimLeft(episode_number, L"0"); // TODO: Fails with "0"
+  TrimLeft(episode_number, L"0");
 
   // Replace variables
   Replace(str, L"%title%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Title), ENCODE(episode.Title)));

@@ -51,6 +51,8 @@ wstring Base64Encode(const wstring& str, bool for_filename = false);
 wstring CalculateCRC(const wstring& file);
 int GetEpisodeHigh(const wstring& episode_number);
 int GetEpisodeLow(const wstring& episode_number);
+void SplitEpisodeNumbers(const wstring& input, vector<int>& output);
+wstring JoinEpisodeNumbers(const vector<int>& input);
 int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 unsigned long GetFileAge(const wstring& path);

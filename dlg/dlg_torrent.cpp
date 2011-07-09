@@ -134,8 +134,9 @@ void CTorrentWindow::RefreshList() {
       group = TORRENT_OTHER;
       title = pFeed->Item[i].Title;
     }
-    number = pFeed->Item[i].EpisodeData.Number;
-    EraseLeft(number, L"0", false);
+    vector<int> numbers;
+    SplitEpisodeNumbers(pFeed->Item[i].EpisodeData.Number, numbers);
+    number = JoinEpisodeNumbers(numbers);
     if (!pFeed->Item[i].EpisodeData.Version.empty()) {
       number += L"v" + pFeed->Item[i].EpisodeData.Version;
     }

@@ -505,7 +505,10 @@ void Trim(wstring& str, const wchar_t trim_chars[], bool trim_left, bool trim_ri
   if (str.empty()) return;
   const size_t index_begin = trim_left ? str.find_first_not_of(trim_chars) : 0;
   const size_t index_end = trim_right ? str.find_last_not_of(trim_chars) : str.length() - 1;
-  if (index_begin == wstring::npos || index_end == wstring::npos) return;
+  if (index_begin == wstring::npos || index_end == wstring::npos) {
+    str.clear();
+    return;
+  }
   if (trim_right) str.erase(index_end + 1, str.length() - index_end + 1);
   if (trim_left) str.erase(0, index_begin);
 }
