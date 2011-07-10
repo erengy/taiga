@@ -362,13 +362,14 @@ public:
   virtual ~CTreeView() {}
 
   BOOL      DeleteAllItems();
+  BOOL      DeleteItem(HTREEITEM hitem);
   BOOL      Expand(HTREEITEM hItem, bool bExpand = true);
   UINT      GetCheckState(HTREEITEM hItem);
   UINT      GetCount();
   BOOL      GetItem(LPTVITEM pItem);
   LPARAM    GetItemData(HTREEITEM hItem);
   HTREEITEM GetSelection();
-  HTREEITEM InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent);
+  HTREEITEM InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter = TVI_LAST);
   BOOL      SelectItem(HTREEITEM hItem);
   UINT      SetCheckState(HTREEITEM hItem, BOOL fCheck);
   int       SetItemHeight(SHORT cyItem);

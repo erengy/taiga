@@ -37,7 +37,7 @@ public:
 
 class CFeedItem : public CGenericFeedItem {
 public:
-  CFeedItem() : Download(false) {}
+  CFeedItem() : Download(true) {}
   virtual ~CFeedItem() {};
 
   int Index;
@@ -166,7 +166,7 @@ public:
   CFeedFilter& operator=(const CFeedFilter& filter);
 
   void AddCondition(int element, int op, const wstring& value);
-  bool Filter(CFeedItem& item);
+  bool Filter(CFeed& feed, CFeedItem& item, bool recursive);
 
   wstring Name;
   bool Enabled;

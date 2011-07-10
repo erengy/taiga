@@ -30,6 +30,8 @@ bool EvaluateAction(int action, bool condition) {
       return !condition;
     case FEED_FILTER_ACTION_INCLUDE:
       return condition;
+    case FEED_FILTER_ACTION_PREFER:
+      return condition;
     default:
       return true;
   }
@@ -96,14 +98,14 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
   switch (condition.Operator) {
     case FEED_FILTER_OPERATOR_IS:
       if (is_numeric) {
-        if (IsEqual(value, L"True")) value = L"1";
+        if (IsEqual(value, L"True")) return ToINT(element) == TRUE;
         return ToINT(element) == ToINT(value);
       } else {
         return IsEqual(element, value);
       }
     case FEED_FILTER_OPERATOR_ISNOT:
       if (is_numeric) {
-        if (IsEqual(value, L"True")) value = L"1";
+        if (IsEqual(value, L"True")) return ToINT(element) == TRUE;
         return ToINT(element) != ToINT(value);
       } else {
         return !IsEqual(element, value);
@@ -154,7 +156,7 @@ void CFeedFilter::AddCondition(int element, int op, const wstring& value) {
   Conditions.back().Value = value;
 }
 
-bool CFeedFilter::Filter(CFeedItem& item) {
+bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   if (!Enabled) return true;
   
   bool condition = false;
@@ -184,13 +186,39 @@ bool CFeedFilter::Filter(CFeedItem& item) {
   }
   
   if (EvaluateAction(Action, condition)) {
+    // Handle preferences
+    if (Action == FEED_FILTER_ACTION_PREFER && recursive) {
+      for (auto it = feed.Item.begin(); it != feed.Item.end(); ++it) {
+        // Do not bother if the item failed before
+        if (it->Download == false) continue;
+        // Do not filter the same item again
+        if (it->Index == item.Index) continue;
+        // Is it the same title?
+        if (it->EpisodeData.Index > -1 && it->EpisodeData.Index != item.EpisodeData.Index) continue;
+        if (it->EpisodeData.Index == -1 && !IsEqual(it->EpisodeData.Title, item.EpisodeData.Title)) continue;
+        // Is it the same episode?
+        if (it->EpisodeData.Number != item.EpisodeData.Number) continue;
+        // Try applying the same filter
+        if (!this->Filter(feed, *it, false)) {
+          // Hey, we don't prefer your kind around here!
+          it->Download = false;
+        }
+      }
+    }
+
+    // Item passed the filter (tick!)
     return true;
+  
   } else {
+    if (Action == FEED_FILTER_ACTION_PREFER && recursive) return true;
+
     #ifdef _DEBUG
     item.Description = L"!FILTER :: " + 
       Aggregator.FilterManager.TranslateConditions(*this, index) +
       L" -- " + item.Description;
     #endif
+    
+    // Out you go, you pathetic feed item!
     return false;
   }
 }
@@ -214,12 +242,10 @@ void CFeedFilterManager::AddDefaultFilters() {
   Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
   Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"True");
   
-  // Discard low resolution files
-  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY, true, L"Discard low resolution files");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"360p");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"480p");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"704x400");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"XviD");
+  // Prefer high resolution files
+  AddFilter(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, L"Prefer high resolution files");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"720p");
+  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"1280x720");
 }
 
 void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
@@ -234,18 +260,20 @@ int CFeedFilterManager::Filter(CFeed& feed) {
   bool download = true;
   int anime_index = -1, count = 0, number = 0;
   
-  for (size_t i = 0; i < feed.Item.size(); i++) {
+  for (auto item = feed.Item.begin(); item != feed.Item.end(); ++item) {
     download = true;
-    anime_index = feed.Item[i].EpisodeData.Index;
-    number = GetEpisodeHigh(feed.Item[i].EpisodeData.Number);
+    anime_index = item->EpisodeData.Index;
+    number = GetEpisodeHigh(item->EpisodeData.Number);
     
     if (anime_index > 0 && number > AnimeList.Item[anime_index].GetLastWatchedEpisode()) {
-      feed.Item[i].EpisodeData.NewEpisode = true;
+      item->EpisodeData.NewEpisode = true;
     }
+
+    if (!item->Download) continue;
       
     // Apply filters
     for (size_t j = 0; j < Filters.size(); j++) {
-      if (!Filters[j].Filter(feed.Item[i])) {
+      if (!Filters[j].Filter(feed, *item, true)) {
         download = false;
         break;
       }
@@ -253,15 +281,17 @@ int CFeedFilterManager::Filter(CFeed& feed) {
       
     // Check archive
     if (download) {
-      wstring file = feed.Item[i].Title + L".torrent";
+      wstring file = item->Title + L".torrent";
       ValidateFileName(file);
       download = !Aggregator.SearchArchive(file);
     }
 
     // Mark item
     if (download) {
-      feed.Item[i].Download = true;
+      item->Download = true;
       count++;
+    } else {
+      item->Download = false;
     }
   }
 

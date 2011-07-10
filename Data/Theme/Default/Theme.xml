@@ -330,6 +330,7 @@
 				<item name="name"       action="%name%"/>
 				<item name="playstatus" action="%playstatus%"/>
 				<item name="resolution" action="%resolution%"/>
+				<item name="rewatching" action="%rewatching%"/>
 				<item name="score"      action="%score%"/>
 				<item name="status"     action="%status%"/>
 				<item name="title"      action="%title%"/>

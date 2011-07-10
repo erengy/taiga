@@ -115,45 +115,45 @@ void CTorrentWindow::RefreshList() {
   m_List.DeleteAllItems();
 
   // Add items
-  for (size_t i = 0; i < pFeed->Item.size(); i++) {
-    if (Settings.RSS.Torrent.HideUnidentified && !pFeed->Item[i].EpisodeData.Index) {
+  for (auto it = pFeed->Item.begin(); it != pFeed->Item.end(); ++it) {
+    if (Settings.RSS.Torrent.HideUnidentified && !it->EpisodeData.Index) {
       continue;
     }
     wstring title, number, video;
     int group = TORRENT_ANIME, icon = StatusToIcon(0);
-    if (pFeed->Item[i].Category == L"Batch" || 
-      !IsNumeric(pFeed->Item[i].EpisodeData.Number)) {
+    if (it->Category == L"Batch" || 
+      !IsNumeric(it->EpisodeData.Number)) {
         group = TORRENT_BATCH;
     }
-    if (pFeed->Item[i].EpisodeData.Index > 0) {
-      icon = StatusToIcon(AnimeList.Item[pFeed->Item[i].EpisodeData.Index].GetAiringStatus());
-      title = AnimeList.Item[pFeed->Item[i].EpisodeData.Index].Series_Title;
-    } else if (!pFeed->Item[i].EpisodeData.Title.empty()) {
-      title = pFeed->Item[i].EpisodeData.Title;
+    if (it->EpisodeData.Index > 0) {
+      icon = StatusToIcon(AnimeList.Item[it->EpisodeData.Index].GetAiringStatus());
+      title = AnimeList.Item[it->EpisodeData.Index].Series_Title;
+    } else if (!it->EpisodeData.Title.empty()) {
+      title = it->EpisodeData.Title;
     } else {
       group = TORRENT_OTHER;
-      title = pFeed->Item[i].Title;
+      title = it->Title;
     }
     vector<int> numbers;
-    SplitEpisodeNumbers(pFeed->Item[i].EpisodeData.Number, numbers);
+    SplitEpisodeNumbers(it->EpisodeData.Number, numbers);
     number = JoinEpisodeNumbers(numbers);
-    if (!pFeed->Item[i].EpisodeData.Version.empty()) {
-      number += L"v" + pFeed->Item[i].EpisodeData.Version;
+    if (!it->EpisodeData.Version.empty()) {
+      number += L"v" + it->EpisodeData.Version;
     }
-    video = pFeed->Item[i].EpisodeData.VideoType;
-    if (!pFeed->Item[i].EpisodeData.Resolution.empty()) {
+    video = it->EpisodeData.VideoType;
+    if (!it->EpisodeData.Resolution.empty()) {
       if (!video.empty()) video += L" ";
-      video += pFeed->Item[i].EpisodeData.Resolution;
+      video += it->EpisodeData.Resolution;
     }
-    int index = m_List.InsertItem(i, group, icon, 0, NULL, title.c_str(), 
-      reinterpret_cast<LPARAM>(&pFeed->Item[i]));
+    int index = m_List.InsertItem(it - pFeed->Item.begin(), 
+      group, icon, 0, NULL, title.c_str(), reinterpret_cast<LPARAM>(&(*it)));
     m_List.SetItem(index, 1, number.c_str());
-    m_List.SetItem(index, 2, pFeed->Item[i].EpisodeData.Group.c_str());
-    m_List.SetItem(index, 3, pFeed->Item[i].EpisodeData.FileSize.c_str());
+    m_List.SetItem(index, 2, it->EpisodeData.Group.c_str());
+    m_List.SetItem(index, 3, it->EpisodeData.FileSize.c_str());
     m_List.SetItem(index, 4, video.c_str());
-    m_List.SetItem(index, 5, pFeed->Item[i].Description.c_str());
-    m_List.SetItem(index, 6, pFeed->Item[i].EpisodeData.File.c_str());
-    m_List.SetCheckState(index, pFeed->Item[i].Download);
+    m_List.SetItem(index, 5, it->Description.c_str());
+    m_List.SetItem(index, 6, it->EpisodeData.File.c_str());
+    m_List.SetCheckState(index, it->Download);
   }
 
   // Show again

@@ -45,7 +45,7 @@ const wchar_t* script_functions[] = {
   L"upper"
 };
 
-#define SCRIPT_VARIABLE_COUNT 20
+#define SCRIPT_VARIABLE_COUNT 21
 const wchar_t* script_variables[] = {
   L"audio", 
   L"checksum", 
@@ -59,6 +59,7 @@ const wchar_t* script_variables[] = {
   L"name", 
   L"playstatus", 
   L"resolution", 
+  L"rewatching", 
   L"score", 
   L"status", 
   L"title", 
@@ -300,6 +301,7 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].Series_ID)), L""));
   Replace(str, L"%image%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Image), L""));
   Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].GetStatus())), L""));
+  Replace(str, L"%rewatching%", VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].GetRewatching())), L""));
   Replace(str, L"%name%",       ENCODE(episode.Name));
   Replace(str, L"%episode%",    ENCODE(episode_number));
   Replace(str, L"%version%",    ENCODE(episode.Version));

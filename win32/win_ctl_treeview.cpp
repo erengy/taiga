@@ -37,6 +37,10 @@ BOOL CTreeView::DeleteAllItems() {
   return TreeView_DeleteAllItems(m_hWindow);
 }
 
+BOOL CTreeView::DeleteItem(HTREEITEM hitem) {
+  return TreeView_DeleteItem(m_hWindow, hitem);
+}
+
 BOOL CTreeView::Expand(HTREEITEM hItem, bool bExpand) {
   return TreeView_Expand(m_hWindow, hItem, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
 }
@@ -66,7 +70,7 @@ HTREEITEM CTreeView::GetSelection() {
   return TreeView_GetSelection(m_hWindow);
 }
 
-HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent) {
+HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
   TVITEM tvi  = {0};
   tvi.mask    = TVIF_TEXT | TVIF_PARAM;
   tvi.pszText = (LPWSTR)pszText;
@@ -74,7 +78,7 @@ HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiPar
 
   TVINSERTSTRUCT tvis = {0};
   tvis.item           = tvi; 
-  tvis.hInsertAfter   = 0;
+  tvis.hInsertAfter   = hInsertAfter;
   tvis.hParent        = htiParent;
 
   return TreeView_InsertItem(m_hWindow, &tvis);

@@ -72,7 +72,7 @@ void CFeedFilterWindow::OnOK() {
   // Set values
   GetDlgItemText(IDC_EDIT_FEED_NAME, m_Filter.Name);
   m_Filter.Match = GetCheckedRadioButton(IDC_RADIO_FEED_MATCH1, IDC_RADIO_FEED_MATCH2);
-  m_Filter.Action = GetCheckedRadioButton(IDC_RADIO_FEED_ACTION1, IDC_RADIO_FEED_ACTION2);
+  m_Filter.Action = GetCheckedRadioButton(IDC_RADIO_FEED_ACTION1, IDC_RADIO_FEED_ACTION3);
 
   // Exit
   EndDialog(IDOK);
@@ -99,7 +99,8 @@ BOOL CFeedFilterWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
         return TRUE;
       case IDC_RADIO_FEED_ACTION1:
       case IDC_RADIO_FEED_ACTION2:
-        CheckRadioButton(IDC_RADIO_FEED_ACTION1, IDC_RADIO_FEED_ACTION2, LOWORD(wParam));
+      case IDC_RADIO_FEED_ACTION3:
+        CheckRadioButton(IDC_RADIO_FEED_ACTION1, IDC_RADIO_FEED_ACTION3, LOWORD(wParam));
         return TRUE;
     }
   }
