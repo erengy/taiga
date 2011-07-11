@@ -72,9 +72,11 @@ BOOL CTorrentWindow::OnInitDialog() {
   // Insert toolbar buttons
   BYTE fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
   m_Toolbar.InsertButton(0, Icon16_Refresh,  100, 1, fsStyle, 0, L"Check new torrents", NULL);
-  m_Toolbar.InsertButton(1, Icon16_Download, 101, 1, fsStyle, 0, L"Download selected torrents", NULL);
-  m_Toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(3, Icon16_Settings, 103, 1, fsStyle, 0, L"Settings", NULL);
+  m_Toolbar.InsertButton(1, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
+  m_Toolbar.InsertButton(2, Icon16_Download, 101, 1, fsStyle, 0, L"Download marked torrents", NULL);
+  m_Toolbar.InsertButton(3, Icon16_Cross,    102, 1, fsStyle, 0, L"Discard marked torrents", NULL);
+  m_Toolbar.InsertButton(4, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
+  m_Toolbar.InsertButton(5, Icon16_Settings, 103, 1, fsStyle, 0, L"Settings", NULL);
 
   // Create rebar
   m_Rebar.Attach(GetDlgItem(IDC_REBAR_TORRENT));
@@ -197,7 +199,7 @@ BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
       /**/
       return TRUE;
     }
-    // Download selected torrents
+    // Download marked torrents
     case 101: {
       for (int i = 0; i < m_List.GetItemCount(); i++) {
         CFeedItem* pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
@@ -206,6 +208,20 @@ BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
       }
       pFeed->Download(-1);
+      return TRUE;
+    }
+    // Discard marked torrents
+    case 102: {
+      for (int i = 0; i < m_List.GetItemCount(); i++) {
+        if (m_List.GetCheckState(i) == TRUE) {
+          CFeedItem* pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
+          if (pItem) {
+            pItem->Download = false;
+            m_List.SetCheckState(i, FALSE);
+            Aggregator.FileArchive.push_back(pItem->Title);
+          }
+        }
+      }
       return TRUE;
     }
     // Settings
@@ -269,6 +285,10 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
           wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
             pFeed->Download(pItem->Index);
+          } else if (answer == L"DiscardTorrent") {
+            pItem->Download = false;
+            m_List.SetCheckState(lpnmitem->iItem, FALSE);
+            Aggregator.FileArchive.push_back(pItem->Title);
           } else if (answer == L"MoreTorrents") {
             pFeed->Check(ReplaceVariables(
               L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%", // TEMP

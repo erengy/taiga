@@ -44,7 +44,7 @@ bool CFeed::Check(const wstring& source) {
     case FEED_CATEGORY_LINK:
       // Disable toolbar buttons on torrent dialog
       TorrentWindow.m_Toolbar.EnableButton(0, false);
-      TorrentWindow.m_Toolbar.EnableButton(1, false);
+      TorrentWindow.m_Toolbar.EnableButton(2, false);
       break;
   }
   
@@ -74,7 +74,7 @@ bool CFeed::Download(int index) {
 
   TorrentWindow.ChangeStatus(L"Downloading \"" + Item[index].Title + L"\"...");
   TorrentWindow.m_Toolbar.EnableButton(0, false);
-  TorrentWindow.m_Toolbar.EnableButton(1, false);
+  TorrentWindow.m_Toolbar.EnableButton(2, false);
   
   wstring file = Item[index].Title + L".torrent";
   ValidateFileName(file);
@@ -222,9 +222,9 @@ bool CAggregator::Notify(const CFeed& feed) {
 
 bool CAggregator::SearchArchive(const wstring& file) {
   for (size_t i = 0; i < FileArchive.size(); i++) {
-    if (FileArchive[i] == file) return TRUE;
+    if (FileArchive[i] == file) return true;
   }
-  return FALSE;
+  return false;
 }
 
 void CAggregator::ParseDescription(CFeedItem& feed_item, const wstring& source) {

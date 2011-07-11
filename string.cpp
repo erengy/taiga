@@ -548,15 +548,21 @@ wstring CheckSlash(const wstring& str) {
   }
 }
 
-wstring GetFileExtension(const wstring str) {
+wstring GetFileExtension(const wstring& str) {
   return str.substr(str.find_last_of(L".") + 1);
 }
 
-wstring GetFileName(const wstring str) {
+wstring GetFileWithoutExtension(wstring str) {
+  size_t pos = str.find_last_of(L".");
+  if (pos != wstring::npos) str.resize(pos);
+  return str;
+}
+
+wstring GetFileName(const wstring& str) {
   return str.substr(str.find_last_of(L"/\\") + 1);
 }
 
-wstring GetPathOnly(const wstring str) {
+wstring GetPathOnly(const wstring& str) {
   return str.substr(0, str.find_last_of(L"/\\") + 1);
 }
 

@@ -118,7 +118,7 @@
 			<!-- Useful links -->
 			<menu name="Links">
 				<item name="How to Watch Anime" action="URL(http://myanimelist.net/clubs.php?cid=8711)"/>
-				<item name="Spring 2011 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
+				<item name="Summer 2011 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
 				<item type="separator"/>
 				<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
 				<item name="The Fansub Wiki"  action="URL(http://www.fansubwiki.com/)"/>
@@ -255,6 +255,7 @@
 		<!-- Torrent list right click -->
 		<menu name="TorrentListRightClick">
 			<item name="Download" action="DownloadTorrent" default="1"/>
+			<item name="Discard" action="DiscardTorrent"/>
 			<item type="separator"/>
 			<item name="Search more torrents for this title" action="MoreTorrents"/>
 			<item name="Search MyAnimeList for this title" action="SearchMAL"/>

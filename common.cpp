@@ -378,7 +378,7 @@ wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value
   return path.empty() ? default_value : path;
 }
 
-int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension, bool recursive) {
+int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension, bool recursive, bool trim_extension) {
   if (path.empty()) return 0;
   wstring folder = path + L"*.*";
   int found = 0;
@@ -390,11 +390,15 @@ int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension, b
       if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
         if (recursive && wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
           folder = path + wfd.cFileName + L"\\";
-          found += PopulateFiles(file_list, folder, extension, recursive);
+          found += PopulateFiles(file_list, folder, extension, recursive, trim_extension);
         }
       } else if (wfd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY) {
         if (extension.empty() || IsEqual(GetFileExtension(wfd.cFileName), extension)) {
-          file_list.push_back(wfd.cFileName);
+          if (trim_extension) {
+            file_list.push_back(GetFileWithoutExtension(wfd.cFileName));
+          } else {
+            file_list.push_back(wfd.cFileName);
+          }
           found++;
         }
       }

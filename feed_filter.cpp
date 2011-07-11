@@ -281,9 +281,7 @@ int CFeedFilterManager::Filter(CFeed& feed) {
       
     // Check archive
     if (download) {
-      wstring file = item->Title + L".torrent";
-      ValidateFileName(file);
-      download = !Aggregator.SearchArchive(file);
+      download = !Aggregator.SearchArchive(item->Title);
     }
 
     // Mark item

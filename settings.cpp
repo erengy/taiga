@@ -210,7 +210,7 @@ bool CSettings::Read() {
       if (pFeed) pFeed->Link = RSS.Torrent.Source;
       // File archive
       Aggregator.FileArchive.clear();
-      PopulateFiles(Aggregator.FileArchive, Taiga.GetDataPath() + L"Feed\\", L"torrent", true);
+      PopulateFiles(Aggregator.FileArchive, Taiga.GetDataPath() + L"Feed\\", L"torrent", true, true);
     
   // Events
   EventQueue.List.clear();

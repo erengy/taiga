@@ -75,7 +75,7 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
     case HTTP_Feed_DownloadAll:
       TorrentWindow.ChangeStatus(error_text);
       TorrentWindow.m_Toolbar.EnableButton(0, true);
-      TorrentWindow.m_Toolbar.EnableButton(1, true);
+      TorrentWindow.m_Toolbar.EnableButton(2, true);
       break;
     case HTTP_UpdateCheck:
       MessageBox(UpdateDialog.GetWindowHandle(), error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
@@ -422,7 +422,7 @@ BOOL CHTTPClient::OnReadComplete() {
           TorrentWindow.ChangeStatus(status);
           TorrentWindow.RefreshList();
           TorrentWindow.m_Toolbar.EnableButton(0, true);
-          TorrentWindow.m_Toolbar.EnableButton(1, true);
+          TorrentWindow.m_Toolbar.EnableButton(2, true);
           // TODO: GetIcon() fails if we don't return TRUE here
         } else {
           switch (Settings.RSS.Torrent.NewAction) {
@@ -444,10 +444,10 @@ BOOL CHTTPClient::OnReadComplete() {
       CFeed* pFeed = reinterpret_cast<CFeed*>(GetParam());
       if (pFeed) {
         CFeedItem* pFeedItem = reinterpret_cast<CFeedItem*>(&pFeed->Item[pFeed->DownloadIndex]);
-        wstring app_path, cmd, file = pFeedItem->Title + L".torrent";
+        wstring app_path, cmd, file = pFeedItem->Title;
         ValidateFileName(file);
-        Aggregator.FileArchive.push_back(file);
-        file = pFeed->GetDataPath() + file;
+        file = pFeed->GetDataPath() + file + L".torrent";
+        Aggregator.FileArchive.push_back(pFeedItem->Title);
         if (FileExists(file)) {
           switch (Settings.RSS.Torrent.NewAction) {
             // Default application
@@ -476,7 +476,7 @@ BOOL CHTTPClient::OnReadComplete() {
       }
       TorrentWindow.ChangeStatus(L"Successfully downloaded all torrents.");
       TorrentWindow.m_Toolbar.EnableButton(0, true);
-      TorrentWindow.m_Toolbar.EnableButton(1, true);
+      TorrentWindow.m_Toolbar.EnableButton(2, true);
       break;
     }
     case HTTP_Feed_DownloadIcon: {
