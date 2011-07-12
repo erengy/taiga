@@ -35,9 +35,10 @@ public:
   bool TitleChanged() { return m_bTitleChanged; }
 
   //
-  wstring GetTitleFromProcessHandle(HWND hwnd);
+  wstring GetTitleFromProcessHandle(HWND hwnd, ULONG process_id = 0);
   wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
   wstring GetTitleFromSpecialMessage(HWND hwnd, const wstring& class_name);
+  wstring GetTitleFromMPlayer();
   
   // Variables
   int Index, IndexOld;

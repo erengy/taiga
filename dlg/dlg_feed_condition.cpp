@@ -17,6 +17,7 @@
 */
 
 #include "../std.h"
+#include <algorithm>
 #include "dlg_feed_condition.h"
 #include "../feed.h"
 #include "../myanimelist.h"
@@ -141,7 +142,7 @@ void CFeedConditionWindow::ChooseElement(int element) {
       break;
     case FEED_FILTER_ELEMENT_ANIME_TITLE: {
       RECREATE_COMBO(CBS_DROPDOWN);
-      list<wstring> title_list;
+      vector<wstring> title_list;
       for (auto it = AnimeList.Item.rbegin(); it != AnimeList.Item.rend() - 1; ++it) {
         switch (it->GetStatus()) {
           case MAL_COMPLETED:
@@ -151,7 +152,10 @@ void CFeedConditionWindow::ChooseElement(int element) {
             title_list.push_back(it->Series_Title);
         }
       }
-      title_list.sort(); // TODO: Sort case insensitive
+      std::sort(title_list.begin(), title_list.end(), 
+        [](const wstring& str1, const wstring& str2) {
+          return CompareStrings(str1, str2) < 0;
+        });
       for (auto it = title_list.begin(); it != title_list.end(); ++it) {
         m_Value.AddString(it->c_str());
       }

@@ -185,6 +185,7 @@ public:
   wstring TranslateConditions(const CFeedFilter& filter, size_t index);
   wstring TranslateElement(int element);
   wstring TranslateOperator(int op);
+  wstring TranslateValue(const CFeedFilterCondition& condition);
   
   vector<CFeedFilter> Filters;
 };

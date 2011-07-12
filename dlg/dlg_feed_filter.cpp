@@ -114,6 +114,6 @@ void CFeedFilterWindow::AddConditionToList(const CFeedFilterCondition& condition
   int i = m_List.GetItemCount();
   m_List.InsertItem(i, -1, -1, 0, 0, Aggregator.FilterManager.TranslateElement(condition.Element).c_str(), NULL);
   m_List.SetItem(i, 1, Aggregator.FilterManager.TranslateOperator(condition.Operator).c_str());
-  m_List.SetItem(i, 2, condition.Value.c_str());
+  m_List.SetItem(i, 2, Aggregator.FilterManager.TranslateValue(condition).c_str());
   m_List.SetCheckState(i, TRUE);
 }

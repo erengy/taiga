@@ -20,6 +20,7 @@
 #include "common.h"
 #include "feed.h"
 #include "myanimelist.h"
+#include "settings.h"
 #include "string.h"
 
 // =============================================================================
@@ -39,8 +40,9 @@ bool EvaluateAction(int action, bool condition) {
 
 bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& item) {
   bool is_numeric = false;
-  int anime_index = item.EpisodeData.Index;
   wstring element, value = ReplaceVariables(condition.Value, item.EpisodeData);
+  CAnime* anime = item.EpisodeData.Index > 0 ? 
+    &AnimeList.Item.at(item.EpisodeData.Index) : nullptr;
 
   switch (condition.Element) {
     case FEED_FILTER_ELEMENT_TITLE:
@@ -66,32 +68,24 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE:
-      if (anime_index > 0 && anime_index <= AnimeList.Count) {
-        int number = GetEpisodeHigh(item.EpisodeData.Number);
-        element = ToWSTR(AnimeList.Item[anime_index].IsEpisodeAvailable(number));
-        is_numeric = true;
-      }
+      if (anime) element = ToWSTR(anime->IsEpisodeAvailable(
+        GetEpisodeHigh(item.EpisodeData.Number)));
+      is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_RESOLUTION:
       element = item.EpisodeData.Resolution;
       break;
     case FEED_FILTER_ELEMENT_ANIME_ID:
-      if (anime_index > 0 && anime_index <= AnimeList.Count) {
-        element = ToWSTR(AnimeList.Item[anime_index].Series_ID);
-        is_numeric = true;
-      }
+      if (anime) element = ToWSTR(anime->Series_ID);
+      is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      if (anime_index > 0 && anime_index <= AnimeList.Count) {
-        element = ToWSTR(AnimeList.Item[anime_index].GetStatus());
-        is_numeric = true;
-      }
+      if (anime) element = ToWSTR(anime->GetStatus());
+      is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      if (anime_index > 0 && anime_index <= AnimeList.Count) {
-        element = ToWSTR(AnimeList.Item[anime_index].GetAiringStatus());
-        is_numeric = true;
-      }
+      if (anime) element = ToWSTR(anime->GetAiringStatus());
+      is_numeric = true;
       break;
   }
 
@@ -210,16 +204,17 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
     return true;
   
   } else {
-    if (Action == FEED_FILTER_ACTION_PREFER && recursive) return true;
-
-    #ifdef _DEBUG
-    item.Description = L"!FILTER :: " + 
-      Aggregator.FilterManager.TranslateConditions(*this, index) +
-      L" -- " + item.Description;
-    #endif
-    
-    // Out you go, you pathetic feed item!
-    return false;
+    if (Action == FEED_FILTER_ACTION_PREFER && recursive) {
+      return true;
+    } else {
+      #ifdef _DEBUG
+      item.Description = L"!FILTER :: " + 
+        Aggregator.FilterManager.TranslateConditions(*this, index) +
+        L" -- " + item.Description;
+      #endif
+      // Out you go, you pathetic feed item!
+      return false;
+    }
   }
 }
 
@@ -258,27 +253,30 @@ void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const ws
 
 int CFeedFilterManager::Filter(CFeed& feed) {
   bool download = true;
-  int anime_index = -1, count = 0, number = 0;
+  CAnime* anime = nullptr;
+  int count = 0, number = 0;
   
   for (auto item = feed.Item.begin(); item != feed.Item.end(); ++item) {
     download = true;
-    anime_index = item->EpisodeData.Index;
+    anime = item->EpisodeData.Index > 0 ? &AnimeList.Item[item->EpisodeData.Index] : nullptr;
     number = GetEpisodeHigh(item->EpisodeData.Number);
     
-    if (anime_index > 0 && number > AnimeList.Item[anime_index].GetLastWatchedEpisode()) {
+    if (anime > 0 && number > anime->GetLastWatchedEpisode()) {
       item->EpisodeData.NewEpisode = true;
     }
 
     if (!item->Download) continue;
-      
+
     // Apply filters
-    for (size_t j = 0; j < Filters.size(); j++) {
-      if (!Filters[j].Filter(feed, *item, true)) {
-        download = false;
-        break;
+    if (Settings.RSS.Torrent.Filters.GlobalEnabled) {
+      for (size_t j = 0; j < Filters.size(); j++) {
+        if (!Filters[j].Filter(feed, *item, true)) {
+          download = false;
+          break;
+        }
       }
     }
-      
+    
     // Check archive
     if (download) {
       download = !Aggregator.SearchArchive(item->Title);
@@ -299,22 +297,9 @@ int CFeedFilterManager::Filter(CFeed& feed) {
 // =============================================================================
 
 wstring CFeedFilterManager::TranslateCondition(const CFeedFilterCondition& condition) {
-  wstring value;
-
-  switch (condition.Element) {
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      value = MAL.TranslateMyStatus(ToINT(condition.Value), false);
-      break;
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      value = MAL.TranslateStatus(ToINT(condition.Value));
-      break;
-    default:
-      value = condition.Value;
-  }
-
   return TranslateElement(condition.Element) + L" " + 
     TranslateOperator(condition.Operator) + L" \"" + 
-    value + L"\"";
+    TranslateValue(condition) + L"\"";
 }
 
 wstring CFeedFilterManager::TranslateConditions(const CFeedFilter& filter, size_t index) {
@@ -382,5 +367,16 @@ wstring CFeedFilterManager::TranslateOperator(int op) {
       return L"doesn't contain";
     default:
       return L"?";
+  }
+}
+
+wstring CFeedFilterManager::TranslateValue(const CFeedFilterCondition& condition) {
+  switch (condition.Element) {
+    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+      return MAL.TranslateMyStatus(ToINT(condition.Value), false);
+    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+      return MAL.TranslateStatus(ToINT(condition.Value));
+    default:
+      return condition.Value;
   }
 }

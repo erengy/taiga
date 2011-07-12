@@ -128,18 +128,16 @@ PVOID GetLibraryProcAddress(PSTR LibraryName, PSTR ProcName) {
   return GetProcAddress(GetModuleHandleA(LibraryName), ProcName);
 }
 
-BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
+BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
   _NtQuerySystemInformation NtQuerySystemInformation = reinterpret_cast<_NtQuerySystemInformation>
     (GetLibraryProcAddress("ntdll.dll", "NtQuerySystemInformation"));
   _NtDuplicateObject NtDuplicateObject = reinterpret_cast<_NtDuplicateObject>
     (GetLibraryProcAddress("ntdll.dll", "NtDuplicateObject"));
   _NtQueryObject NtQueryObject = reinterpret_cast<_NtQueryObject>
     (GetLibraryProcAddress("ntdll.dll", "NtQueryObject"));
-
-  ULONG pid;
+  
   HANDLE processHandle;
-  GetWindowThreadProcessId(hwnd_process, &pid);
-  if (!(processHandle = OpenProcess(PROCESS_DUP_HANDLE, FALSE, pid))) {
+  if (!(processHandle = OpenProcess(PROCESS_DUP_HANDLE, FALSE, process_id))) {
     return FALSE;
   }
 
@@ -162,7 +160,7 @@ BOOL GetProcessFiles(HWND hwnd_process, vector<wstring>& files_vector) {
     ULONG returnLength;
 
     // Check if this handle belongs to the PID the user specified
-    if (reinterpret_cast<ULONG>(handle.ProcessId) != pid) {
+    if (reinterpret_cast<ULONG>(handle.ProcessId) != process_id) {
       continue;
     }
     // Skip if the handle does not belong to a file

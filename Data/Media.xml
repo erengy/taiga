@@ -211,6 +211,17 @@
 		<edit mode="1">SPlayer</edit>
 		<edit mode="1">[GPU Accel+EVR] </edit>
 	</player>
+	<!-- UMPlayer -->
+	<player>
+		<name>UMPlayer</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>4</mode>
+		<class>QWidget</class>
+		<file>umplayer.exe</file>
+		<folder>%ProgramFiles%\UMPlayer\</folder>
+		<folder>%ProgramW6432%\UMPlayer\</folder>
+	</player>
 	<!-- VLC Media Player -->
 	<player>
 		<name>VLC Media Player</name>

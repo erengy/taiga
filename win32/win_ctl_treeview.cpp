@@ -70,6 +70,14 @@ HTREEITEM CTreeView::GetSelection() {
   return TreeView_GetSelection(m_hWindow);
 }
 
+HTREEITEM CTreeView::HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos) {
+  if (bGetCursorPos) {
+    GetCursorPos(&lpht->pt);
+    ScreenToClient(m_hWindow, &lpht->pt);
+  }
+  return TreeView_HitTest(m_hWindow, lpht);
+}
+
 HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
   TVITEM tvi  = {0};
   tvi.mask    = TVIF_TEXT | TVIF_PARAM;

@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include <tlhelp32.h>
 #include "common.h"
 #include "media.h"
 #include "process.h"
@@ -114,22 +115,22 @@ int CMediaPlayers::Check() {
 
   HWND hwnd = GetWindow(g_hMain, GW_HWNDFIRST);
   while (hwnd != NULL) {
-    for (UINT i = 0; i < Item.size(); i++) {
-      if (Item[i].Enabled == FALSE) continue;
-      if (Item[i].Visible == FALSE || IsWindowVisible(hwnd)) {
+    for (auto item = Item.begin(); item != Item.end(); ++item) {
+      if (item->Enabled == FALSE) continue;
+      if (item->Visible == FALSE || IsWindowVisible(hwnd)) {
         // Compare window classes
-        for (UINT c = 0; c < Item[i].Class.size(); c++) {
-          if (Item[i].Class[c] == GetWindowClass(hwnd)) {
+        for (auto c = item->Class.begin(); c != item->Class.end(); ++c) {
+          if (*c == GetWindowClass(hwnd)) {
             // Compare file names
-            for (UINT f = 0; f < Item[i].File.size(); f++) {
-              if (IsEqual(Item[i].File[f], GetFileName(GetWindowPath(hwnd)))) {
+            for (auto f = item->File.begin(); f != item->File.end(); ++f) {
+              if (IsEqual(*f, GetFileName(GetWindowPath(hwnd)))) {
                 // We have a match!
-                NewCaption = GetTitle(hwnd, Item[i].Class[c], Item[i].Mode);
+                NewCaption = GetTitle(hwnd, *c, item->Mode);
                 if (CurrentCaption != NewCaption) m_bTitleChanged = true;
                 CurrentCaption = NewCaption;
-                Item[i].WindowHandle = hwnd;
-                Index = IndexOld = i;
-                return i;
+                item->WindowHandle = hwnd;
+                Index = IndexOld = item - Item.begin();
+                return Index;
               }
             }
           }
@@ -188,6 +189,9 @@ wstring CMediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) 
     // Special message
     case 3:
       return GetTitleFromSpecialMessage(hwnd, class_name);
+    // MPlayer
+    case 4:
+      return GetTitleFromMPlayer();
     // Window title
     default:
       return GetWindowTitle(hwnd);
@@ -214,20 +218,23 @@ wstring CMediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) 
 #define IPC_GETPLAYLISTFILE  211
 #define IPC_GETPLAYLISTFILEW 214
 
-wstring CMediaPlayers::GetTitleFromProcessHandle(HWND hwnd) {
-  if (IsWindow(hwnd)) {
-    vector<wstring> files_vector;
-    if (GetProcessFiles(hwnd, files_vector)) {
-      for (unsigned int i = 0; i < files_vector.size(); i++) {
-        if (CheckFileExtension(GetFileExtension(files_vector[i]), Meow.ValidExtensions)) {
-          if (files_vector[i].at(1) != ':') {
-            TranslateDeviceName(files_vector[i]);
-          }
-          if (files_vector[i].at(1) != ':') {
-            return GetFileName(files_vector[i]);
-          } else {
-            return files_vector[i];
-          }
+wstring CMediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
+  vector<wstring> files_vector;
+  if (hwnd != NULL && process_id == 0) {
+    GetWindowThreadProcessId(hwnd, &process_id);
+  }
+  if (GetProcessFiles(process_id, files_vector)) {
+    for (unsigned int i = 0; i < files_vector.size(); i++) {
+      if (CheckFileExtension(GetFileExtension(files_vector[i]), Meow.ValidExtensions)) {
+        if (files_vector[i].at(1) != L':') {
+          TranslateDeviceName(files_vector[i]);
+        }
+        if (files_vector[i].at(1) == L':') {
+          WCHAR buffer[4096] = {0};
+          GetLongPathName(files_vector[i].c_str(), buffer, 4096);
+          return GetFileName(buffer);
+        } else {
+          return files_vector[i];
         }
       }
     }
@@ -294,4 +301,26 @@ wstring CMediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& clas
   }
 
   return L"";
+}
+
+wstring CMediaPlayers::GetTitleFromMPlayer() {
+  HANDLE hProcessSnap;
+  PROCESSENTRY32 pe32;
+  wstring title;
+
+  hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  if (hProcessSnap != INVALID_HANDLE_VALUE) {
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+    if (Process32First(hProcessSnap, &pe32)) {
+      do {
+        if (IsEqual(pe32.szExeFile, L"mplayer.exe")) {
+          title = GetTitleFromProcessHandle(NULL, pe32.th32ProcessID);
+          break;
+        }
+      } while (Process32Next(hProcessSnap, &pe32));
+    }
+    CloseHandle(hProcessSnap);
+  }
+  
+  return title;
 }

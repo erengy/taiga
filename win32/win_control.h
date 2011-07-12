@@ -369,6 +369,7 @@ public:
   BOOL      GetItem(LPTVITEM pItem);
   LPARAM    GetItemData(HTREEITEM hItem);
   HTREEITEM GetSelection();
+  HTREEITEM HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos = false);
   HTREEITEM InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter = TVI_LAST);
   BOOL      SelectItem(HTREEITEM hItem);
   UINT      SetCheckState(HTREEITEM hItem, BOOL fCheck);
