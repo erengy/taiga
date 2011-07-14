@@ -385,14 +385,14 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, CEventItem& item) {
         case HTTP_MAL_AnimeDelete:
           item.Reason = InStr(data, L"class=\"badresult\">", L"</div>");
           if (item.Reason.empty()) item.Reason = data;
-          StripHTML(item.Reason);
           break;
         default:
           item.Reason = data;
-          StripHTML(item.Reason);
           break;
       }
   }
+  Replace(item.Reason, L"</div><div>", L"\r\n");
+  StripHTML(item.Reason);
   return false;
 }
 

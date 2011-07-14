@@ -95,6 +95,18 @@
 		<folder>%ProgramFiles%\The KMPlayer\</folder>
 		<folder>%ProgramW6432%\The KMPlayer\</folder>
 	</player>
+	<!-- Light Alloy -->
+	<player>
+		<name>Light Alloy</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>0</mode>
+		<class>LightAlloyFront</class>
+		<file>LA.exe</file>
+		<folder>%ProgramFiles%\Light Alloy\</folder>
+		<folder>%ProgramW6432%\Light Alloy\</folder>
+		<edit mode="2">Light Alloy</edit>
+	</player>
 	<!-- Media Player Classic -->
 	<player>
 		<name>Media Player Classic</name>
