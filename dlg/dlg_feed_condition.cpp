@@ -71,7 +71,19 @@ void CFeedConditionWindow::OnOK() {
   // Set values
   m_Condition.Element = m_Element.GetCurSel();
   m_Condition.Operator = m_Operator.GetCurSel();
-  m_Value.GetText(m_Condition.Value);
+  switch (m_Condition.Element) {
+    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS: {
+      int value = m_Value.GetCurSel();
+      if (value == 5) value++;
+      m_Condition.Value = ToWSTR(value);
+      break;
+    }
+    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+      m_Condition.Value = ToWSTR(m_Value.GetCurSel() + 1);
+      break;
+    default:
+      m_Value.GetText(m_Condition.Value);
+  }
 
   // Exit
   EndDialog(IDOK);
@@ -114,7 +126,7 @@ void CFeedConditionWindow::ChooseElement(int element) {
   }
 
   #undef ADD_OPERATOR
-  m_Operator.SetCurSel(op_index < 0 ? 0 : op_index);
+  m_Operator.SetCurSel(op_index < 0 || op_index > m_Operator.GetCount() - 1 ? 0 : op_index);
   
   // ===========================================================================
   
@@ -143,7 +155,7 @@ void CFeedConditionWindow::ChooseElement(int element) {
     case FEED_FILTER_ELEMENT_ANIME_TITLE: {
       RECREATE_COMBO(CBS_DROPDOWN);
       vector<wstring> title_list;
-      for (auto it = AnimeList.Item.rbegin(); it != AnimeList.Item.rend() - 1; ++it) {
+      for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
         switch (it->GetStatus()) {
           case MAL_COMPLETED:
           case MAL_DROPPED:

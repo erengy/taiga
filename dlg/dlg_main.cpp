@@ -480,7 +480,7 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
       // Resize tab
       m_Tab.SetPosition(NULL, rcWindow);
       // Resize list
-      m_Tab.AdjustRect(FALSE, &rcWindow);
+      m_Tab.AdjustRect(NULL, FALSE, &rcWindow);
       rcWindow.left -= 3; rcWindow.top -= 1;
       m_List.SetPosition(NULL, rcWindow, 0);
     }

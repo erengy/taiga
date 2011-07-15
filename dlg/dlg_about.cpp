@@ -85,15 +85,10 @@ BOOL CAboutWindow::OnDestroy() {
 BOOL CAboutWindow::OnInitDialog() {
   // Initialize
   m_Tab.Attach(GetDlgItem(IDC_TAB_ABOUT));
-  
-  // Set position
-  CRect rect;
-  GetClientRect(&rect);
-  m_Tab.AdjustRect(FALSE, &rect);
-  rect.Inflate(-10, -10);
 
   // Create about page
   m_PageTaiga.Create(IDD_ABOUT_TAIGA, m_hWindow, false);
+  CRect rect; m_Tab.AdjustRect(m_hWindow, FALSE, &rect);
   m_PageTaiga.SetPosition(NULL, rect, 0);
   EnableThemeDialogTexture(m_PageTaiga.GetWindowHandle(), ETDT_ENABLETAB);
 

@@ -17,24 +17,30 @@
 */
 
 #include "../std.h"
+#include <algorithm>
 #include "dlg_feed_condition.h"
 #include "dlg_feed_filter.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../string.h"
+#include "../theme.h"
 
 CFeedFilterWindow FeedFilterWindow;
 
 // =============================================================================
 
-CFeedFilterWindow::CFeedFilterWindow() {
+CFeedFilterWindow::CFeedFilterWindow() : 
+  m_hfHeader(NULL)
+{
   RegisterDlgClass(L"TaigaFeedFilterW");
 }
 
 CFeedFilterWindow::~CFeedFilterWindow() {
+  if (m_hfHeader) {
+    ::DeleteObject(m_hfHeader);
+    m_hfHeader = NULL;
+  }
 }
-
-// =============================================================================
 
 BOOL CFeedFilterWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
@@ -48,72 +54,391 @@ void CFeedFilterWindow::OnCancel() {
 }
 
 BOOL CFeedFilterWindow::OnInitDialog() {
-  // Initialize
-  SetDlgItemText(IDC_EDIT_FEED_NAME, m_Filter.Name.c_str());
-  CheckDlgButton(IDC_RADIO_FEED_MATCH1 + m_Filter.Match, TRUE);
-  CheckDlgButton(IDC_RADIO_FEED_ACTION1 + m_Filter.Action, TRUE);
-
-  // Initialize list
-  m_List.Attach(GetDlgItem(IDC_LIST_FEED_CONDITIONS));
-  m_List.InsertColumn(0, 150, 150, 0, L"Element");
-  m_List.InsertColumn(1, 150, 150, 0, L"Operator");
-  m_List.InsertColumn(2, 150, 150, 0, L"Value");
-  m_List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER);
-
-  // Add conditions to list
-  for (auto it = m_Filter.Conditions.begin(); it != m_Filter.Conditions.end(); ++it) {
-    AddConditionToList(*it);
+  // Create bold header font
+  if (!m_hfHeader) {
+    LOGFONT lFont;
+    ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
+    lFont.lfCharSet = DEFAULT_CHARSET;
+    lFont.lfWeight = FW_BOLD;
+    m_hfHeader = ::CreateFontIndirect(&lFont);
   }
+
+  // Create basic page
+  if (m_Filter.Conditions.empty()) {
+    m_PageBasic.m_Parent = this;
+    m_PageBasic.Create(IDD_FEED_FILTER_BASIC, GetWindowHandle(), false);
+    EnableThemeDialogTexture(m_PageBasic.GetWindowHandle(), ETDT_ENABLETAB);
+  }
+  // Create advanced page
+  m_PageAdvanced.m_Parent = this;
+  m_PageAdvanced.Create(IDD_FEED_FILTER_ADVANCED, GetWindowHandle(), false);
+  EnableThemeDialogTexture(m_PageAdvanced.GetWindowHandle(), ETDT_ENABLETAB);
+
+  // Initialize tab
+  m_Tab.Attach(GetDlgItem(IDC_TAB_FEED_FILTER));
+  // Insert tab items
+  if (m_Filter.Conditions.empty()) {
+    m_Tab.InsertItem(0, L"Basic", 0);
+    m_Tab.InsertItem(1, L"Advanced", 1);
+    m_Tab.SetCurrentlySelected(0);
+    m_PageBasic.Show();
+  } else {
+    m_PageAdvanced.Show();
+  }
+
+  // Set pages position
+  RECT rect; m_Tab.AdjustRect(m_hWindow, FALSE, &rect);
+  m_PageBasic.SetPosition(NULL, rect, 0);
+  m_PageAdvanced.SetPosition(NULL, rect, 0);
 
   return TRUE;
 }
 
+LRESULT CFeedFilterWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  switch (idCtrl) {
+    // Tabs
+    case IDC_TAB_FEED_FILTER:
+      switch (pnmh->code) {
+        // Tab change
+        case TCN_SELCHANGE: {
+          int index = static_cast<int>(m_Tab.GetItemParam(m_Tab.GetCurrentlySelected()));
+          m_PageBasic.Show(index == 0);
+          m_PageAdvanced.Show(index == 1);
+          break;
+        }
+      }
+      break;
+  }
+
+  return 0;
+}
+
 void CFeedFilterWindow::OnOK() {
   // Set values
-  GetDlgItemText(IDC_EDIT_FEED_NAME, m_Filter.Name);
-  m_Filter.Match = GetCheckedRadioButton(IDC_RADIO_FEED_MATCH1, IDC_RADIO_FEED_MATCH2);
-  m_Filter.Action = GetCheckedRadioButton(IDC_RADIO_FEED_ACTION1, IDC_RADIO_FEED_ACTION3);
+  if (m_Tab.GetItemCount() > 0 && m_Tab.GetItemParam(m_Tab.GetCurrentlySelected()) == 0) {
+    // Basic
+    if (!m_PageBasic.BuildFilter(m_Filter)) return;
+  } else {
+    // Advanced
+    m_PageAdvanced.m_Edit.GetText(m_Filter.Name);
+    m_Filter.Match = m_PageAdvanced.m_ComboMatch.GetCurSel();
+    m_Filter.Action = m_PageAdvanced.m_ComboAction.GetCurSel();
+  }
 
   // Exit
   EndDialog(IDOK);
 }
 
-BOOL CFeedFilterWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
-  if (HIWORD(wParam) == BN_CLICKED) {
-    switch (LOWORD(wParam)) {
-      // Add new condition
-      case IDC_BUTTON_FEED_ADDCONDITION:
-        FeedConditionWindow.Create(IDD_FEED_CONDITION, GetWindowHandle());
-        if (FeedConditionWindow.m_Condition.Element > -1) {
-          m_Filter.AddCondition(
-            FeedConditionWindow.m_Condition.Element,
-            FeedConditionWindow.m_Condition.Operator,
-            FeedConditionWindow.m_Condition.Value);
-          AddConditionToList(m_Filter.Conditions.back());
+// =============================================================================
+
+/* Basic */
+
+BOOL CFeedFilterWindow::CDialogPageBasic::OnInitDialog() {
+  // Set new font for headers
+  for (int i = 0; i < 2; i++) {
+    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
+      reinterpret_cast<WPARAM>(m_Parent->m_hfHeader), FALSE);
+  }
+
+  //
+  m_ComboOption1.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_OPTION1));
+  m_ComboOption2.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_OPTION2));
+  m_ComboOption1.SetCurSel(m_Parent->m_Filter.Match);
+
+  //
+  CheckRadioButton(IDC_RADIO_FEED_FILTER_BASIC1, IDC_RADIO_FEED_FILTER_BASIC2, 
+    IDC_RADIO_FEED_FILTER_BASIC1);
+  BuildOptions(0);
+
+  return TRUE;
+}
+
+BOOL CFeedFilterWindow::CDialogPageBasic::OnCommand(WPARAM wParam, LPARAM lParam) {
+  switch (HIWORD(wParam)) {
+    case BN_CLICKED: {
+      switch (LOWORD(wParam)) {
+        case IDC_RADIO_FEED_FILTER_BASIC1:
+        case IDC_RADIO_FEED_FILTER_BASIC2: {
+          CheckRadioButton(IDC_RADIO_FEED_FILTER_BASIC1, IDC_RADIO_FEED_FILTER_BASIC2, LOWORD(wParam));
+          BuildOptions(LOWORD(wParam) - IDC_RADIO_FEED_FILTER_BASIC1);
+          return TRUE;
         }
-        return TRUE;
-      // Check radio buttons
-      case IDC_RADIO_FEED_MATCH1:
-      case IDC_RADIO_FEED_MATCH2:
-        CheckRadioButton(IDC_RADIO_FEED_MATCH1, IDC_RADIO_FEED_MATCH2, LOWORD(wParam));
-        return TRUE;
-      case IDC_RADIO_FEED_ACTION1:
-      case IDC_RADIO_FEED_ACTION2:
-      case IDC_RADIO_FEED_ACTION3:
-        CheckRadioButton(IDC_RADIO_FEED_ACTION1, IDC_RADIO_FEED_ACTION3, LOWORD(wParam));
-        return TRUE;
+      }
+      break;
     }
   }
 
   return FALSE;
 }
 
+bool CFeedFilterWindow::CDialogPageBasic::BuildFilter(CFeedFilter& filter) {
+  int mode = GetCheckedRadioButton(IDC_RADIO_FEED_FILTER_BASIC1, IDC_RADIO_FEED_FILTER_BASIC2);
+
+  switch (mode) {
+    // Default filters  
+    case 0: {
+      int index = m_ComboOption1.GetCurSel();
+      m_Parent->m_Filter = Aggregator.FilterManager.DefaultFilters.at(index);
+      break;
+    }
+
+    // Fansub group
+    case 1: {
+      wstring group_name;
+      m_ComboOption2.GetText(group_name);
+      Trim(group_name);
+      if (group_name.empty()) {
+        HWND hEdit = ::FindWindowEx(m_ComboOption2.GetWindowHandle(), NULL, NULL, NULL);
+        if (hEdit) {
+          CEdit edit = hEdit;
+          edit.ShowBalloonTip(L"You must enter a fansub group name.", L"Required field", TTI_ERROR);
+          edit.SetWindowHandle(NULL);
+        }
+        return false;
+      }
+      CAnime* anime = reinterpret_cast<CAnime*>(m_ComboOption1.GetItemData(m_ComboOption1.GetCurSel()));
+      if (anime) {
+        // Set properties
+        m_Parent->m_Filter.Name = L"[Fansub] " + anime->Series_Title;
+        m_Parent->m_Filter.Match = FEED_FILTER_MATCH_ALL;
+        m_Parent->m_Filter.Action = FEED_FILTER_ACTION_EXCLUDE;
+        // Add conditions
+        m_Parent->m_Filter.AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, 
+          FEED_FILTER_OPERATOR_IS, ToWSTR(anime->Series_ID));
+        m_Parent->m_Filter.AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, 
+          FEED_FILTER_OPERATOR_ISNOT, group_name);
+      }
+      break;
+    }
+  }
+
+  return true;
+}
+
+void CFeedFilterWindow::CDialogPageBasic::BuildOptions(int mode) {
+  m_ComboOption1.ResetContent();
+  
+  switch (mode) {
+    // Default filters  
+    case 0:
+      SetDlgItemText(IDC_STATIC_FEED_FILTER_OPTION1, L"Filter:");
+      for (auto it = Aggregator.FilterManager.DefaultFilters.begin(); it != Aggregator.FilterManager.DefaultFilters.end(); ++it) {
+        m_ComboOption1.AddString(it->Name.c_str());
+      }
+      ShowDlgItem(IDC_STATIC_FEED_FILTER_OPTION2, SW_HIDE);
+      m_ComboOption2.Hide();
+      break;
+
+    // Fansub group
+    case 1: {
+      SetDlgItemText(IDC_STATIC_FEED_FILTER_OPTION1, L"Anime title:");
+      SetDlgItemText(IDC_STATIC_FEED_FILTER_OPTION2, L"Fansub group name:");
+      ShowDlgItem(IDC_STATIC_FEED_FILTER_OPTION2);
+      m_ComboOption2.Show();
+      typedef std::pair<LPARAM, wstring> anime_pair;
+      vector<anime_pair> title_list;
+      for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
+        title_list.push_back(std::make_pair((LPARAM)&(*it), it->Series_Title));
+      }
+      std::sort(title_list.begin(), title_list.end(), 
+        [](const anime_pair& a1, const anime_pair& a2) {
+          return CompareStrings(a1.second, a2.second) < 0;
+        });
+      for (auto it = title_list.begin(); it != title_list.end(); ++it) {
+        m_ComboOption1.AddString(it->second.c_str());
+        m_ComboOption1.SetItemData(it - title_list.begin(), it->first);
+      }
+      break;
+    }
+  }
+
+  m_ComboOption1.SetCurSel(0);
+}
+
+void CFeedFilterWindow::CDialogPageBasic::BuildOptions2(int mode) {
+  m_ComboOption2.ResetContent();
+
+  switch (mode) {
+    // Default filters  
+    case 0:
+      //m_ComboOption2.SetCurSel(0);
+      break;
+
+    // Fansub group
+    case 1: {
+      //m_ComboOption2.AddString(L"gg");
+      break;
+    }
+  }
+}
+
 // =============================================================================
 
-void CFeedFilterWindow::AddConditionToList(const CFeedFilterCondition& condition) {
-  int i = m_List.GetItemCount();
-  m_List.InsertItem(i, -1, -1, 0, 0, Aggregator.FilterManager.TranslateElement(condition.Element).c_str(), NULL);
-  m_List.SetItem(i, 1, Aggregator.FilterManager.TranslateOperator(condition.Operator).c_str());
-  m_List.SetItem(i, 2, Aggregator.FilterManager.TranslateValue(condition).c_str());
-  m_List.SetCheckState(i, TRUE);
+/* Advanced */
+
+BOOL CFeedFilterWindow::CDialogPageAdvanced::OnInitDialog() {
+  // Set new font for headers
+  for (int i = 0; i < 3; i++) {
+    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
+      reinterpret_cast<WPARAM>(m_Parent->m_hfHeader), FALSE);
+  }
+  
+  // Initialize name
+  m_Edit.Attach(GetDlgItem(IDC_EDIT_FEED_NAME));
+  m_Edit.SetCueBannerText(L"Type something to identify this filter");
+  m_Edit.SetText(m_Parent->m_Filter.Name);
+
+  // Initialize list
+  m_List.Attach(GetDlgItem(IDC_LIST_FEED_CONDITIONS));
+  m_List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  m_List.SetImageList(UI.ImgList16.GetHandle());
+  m_List.SetTheme();
+  // Insert list columns
+  m_List.InsertColumn(0, 150, 150, 0, L"Element");
+  m_List.InsertColumn(1, 150, 150, 0, L"Operator");
+  m_List.InsertColumn(2, 175, 175, 0, L"Value");
+  // Add conditions to list
+  for (auto it = m_Parent->m_Filter.Conditions.begin(); it != m_Parent->m_Filter.Conditions.end(); ++it) {
+    AddConditionToList(*it);
+  }
+
+  // Initialize toolbar
+  m_Toolbar.Attach(GetDlgItem(IDC_TOOLBAR_FEED_FILTER));
+  m_Toolbar.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  m_Toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
+  // Add toolbar items
+  m_Toolbar.InsertButton(0, Icon16_Plus,      100, true,  0, 0, NULL, L"Add new condition...");
+  m_Toolbar.InsertButton(1, Icon16_Minus,     101, false, 0, 1, NULL, L"Delete condition");
+  m_Toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
+  m_Toolbar.InsertButton(3, Icon16_ArrowUp,   103, false, 0, 3, NULL, L"Move up");
+  m_Toolbar.InsertButton(4, Icon16_ArrowDown, 104, false, 0, 4, NULL, L"Move down");
+  
+  // Initialize options
+  m_ComboMatch.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_MATCH));
+  m_ComboMatch.AddString(L"Match all conditions");
+  m_ComboMatch.AddString(L"Match any condition");
+  m_ComboMatch.SetCurSel(m_Parent->m_Filter.Match);
+  m_ComboAction.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_ACTION));
+  m_ComboAction.AddString(L"Discard matched items");
+  m_ComboAction.AddString(L"Include matched items only");
+  m_ComboAction.AddString(L"Prefer matched items");
+  m_ComboAction.SetCurSel(m_Parent->m_Filter.Action);
+
+  return TRUE;
+}
+
+BOOL CFeedFilterWindow::CDialogPageAdvanced::OnCommand(WPARAM wParam, LPARAM lParam) {
+  switch (LOWORD(wParam)) {
+    // Add new condition
+    case 100:
+      FeedConditionWindow.Create(IDD_FEED_CONDITION, GetWindowHandle());
+      if (FeedConditionWindow.m_Condition.Element > -1) {
+        m_Parent->m_Filter.AddCondition(
+          FeedConditionWindow.m_Condition.Element,
+          FeedConditionWindow.m_Condition.Operator,
+          FeedConditionWindow.m_Condition.Value);
+        AddConditionToList(m_Parent->m_Filter.Conditions.back());
+        m_List.SetSelectedItem(m_List.GetItemCount() - 1);
+      }
+      return TRUE;
+    // Delete condition
+    case 101: {
+      int index = m_List.GetNextItem(-1, LVNI_SELECTED);
+      if (index > -1) {
+        m_List.DeleteItem(index);
+        m_Parent->m_Filter.Conditions.erase(m_Parent->m_Filter.Conditions.begin() + index);
+      }
+      return TRUE;
+    }
+    // Move condition up
+    case 103: {
+      int index = m_List.GetNextItem(-1, LVNI_SELECTED);
+      if (index > 0) {
+        iter_swap(m_Parent->m_Filter.Conditions.begin() + index, 
+          m_Parent->m_Filter.Conditions.begin() + index - 1);
+        RefreshConditionsList();
+        m_List.SetSelectedItem(index - 1);
+      }
+      return TRUE;
+    }
+    // Move condition down
+    case 104:
+      int index = m_List.GetNextItem(-1, LVNI_SELECTED);
+      if (index > -1 && index < m_List.GetItemCount() - 1) {
+        iter_swap(m_Parent->m_Filter.Conditions.begin() + index, 
+          m_Parent->m_Filter.Conditions.begin() + index + 1);
+        RefreshConditionsList();
+        m_List.SetSelectedItem(index + 1);
+      }
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+LRESULT CFeedFilterWindow::CDialogPageAdvanced::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  switch (idCtrl) {
+    // Condition list
+    case IDC_LIST_FEED_CONDITIONS:
+      switch (pnmh->code) {
+        // List item change
+        case LVN_ITEMCHANGED: {
+          int index = m_List.GetNextItem(-1, LVNI_SELECTED);
+          int count = m_List.GetItemCount();
+          m_Toolbar.EnableButton(1, index > -1);
+          m_Toolbar.EnableButton(3, index > 0);
+          m_Toolbar.EnableButton(4, index > -1 && index < count - 1);
+          break;
+        }
+        // Key press
+        case LVN_KEYDOWN: {
+          LPNMLVKEYDOWN pnkd = reinterpret_cast<LPNMLVKEYDOWN>(pnmh);
+          switch (pnkd->wVKey) {
+            // Delete condition
+            case VK_DELETE:
+              OnCommand(MAKEWPARAM(101, 0), 0);
+              break;
+            // Move condition up
+            case VK_SUBTRACT:
+              OnCommand(MAKEWPARAM(103, 0), 0);
+              break;
+            // Move condition down
+            case VK_ADD:
+              OnCommand(MAKEWPARAM(104, 0), 0);
+              break;
+          }
+          break;
+        }
+      }
+      break;
+
+    // Toolbar
+    case IDC_TOOLBAR_FEED_FILTER:
+      switch (pnmh->code) {
+        // Show tooltip text
+        case TBN_GETINFOTIP:
+          NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(pnmh);
+          git->cchTextMax = INFOTIPSIZE;
+          git->pszText = (LPWSTR)(m_Toolbar.GetButtonTooltip(git->lParam));
+          break;
+      }
+      break;
+  }
+
+  return 0;
+}
+
+void CFeedFilterWindow::CDialogPageAdvanced::AddConditionToList(const CFeedFilterCondition& condition, int index) {
+  if (index == -1) index = m_List.GetItemCount();
+  m_List.InsertItem(index, -1, Icon16_Funnel, 0, NULL, 
+    Aggregator.FilterManager.TranslateElement(condition.Element).c_str(), NULL);
+  m_List.SetItem(index, 1, Aggregator.FilterManager.TranslateOperator(condition.Operator).c_str());
+  m_List.SetItem(index, 2, Aggregator.FilterManager.TranslateValue(condition).c_str());
+}
+
+void CFeedFilterWindow::CDialogPageAdvanced::RefreshConditionsList() {
+  m_List.DeleteAllItems();
+  for (auto it = m_Parent->m_Filter.Conditions.begin(); it != m_Parent->m_Filter.Conditions.end(); ++it) {
+    AddConditionToList(*it);
+  }
 }

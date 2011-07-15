@@ -108,17 +108,17 @@ BOOL CSettingsWindow::OnInitDialog() {
   m_Tree.Attach(GetDlgItem(IDC_TREE_PAGES));
   m_Tree.SetTheme();
   // Account
-  HTREEITEM htAccount = m_Tree.InsertItem(L"Account", reinterpret_cast<LPARAM>(&m_Page[PAGE_ACCOUNT]), NULL);
+  HTREEITEM htAccount = m_Tree.InsertItem(L"Account", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_ACCOUNT]), NULL);
   m_Page[PAGE_ACCOUNT].CreateItem(L"MyAnimeList", htAccount);
   m_Page[PAGE_UPDATE].CreateItem(L"Update", htAccount);
   m_Tree.Expand(htAccount);
   // Folders
-  HTREEITEM htFolders = m_Tree.InsertItem(L"Anime folders", reinterpret_cast<LPARAM>(&m_Page[PAGE_FOLDERS_ROOT]), NULL);
+  HTREEITEM htFolders = m_Tree.InsertItem(L"Anime folders", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_FOLDERS_ROOT]), NULL);
   m_Page[PAGE_FOLDERS_ROOT].CreateItem(L"Root", htFolders);
   m_Page[PAGE_FOLDERS_ANIME].CreateItem(L"Specific", htFolders);
   m_Tree.Expand(htFolders);
   // Announcements
-  HTREEITEM htAnnounce = m_Tree.InsertItem(L"Announcements", reinterpret_cast<LPARAM>(&m_Page[PAGE_HTTP]), NULL);
+  HTREEITEM htAnnounce = m_Tree.InsertItem(L"Announcements", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_HTTP]), NULL);
   m_Page[PAGE_HTTP].CreateItem(L"HTTP", htAnnounce);
   m_Page[PAGE_MESSENGER].CreateItem(L"Messenger", htAnnounce);
   m_Page[PAGE_MIRC].CreateItem(L"mIRC", htAnnounce);
@@ -126,17 +126,17 @@ BOOL CSettingsWindow::OnInitDialog() {
   m_Page[PAGE_TWITTER].CreateItem(L"Twitter", htAnnounce);
   m_Tree.Expand(htAnnounce);
   // Program
-  HTREEITEM htProgram = m_Tree.InsertItem(L"Program", reinterpret_cast<LPARAM>(&m_Page[PAGE_PROGRAM]), NULL);
+  HTREEITEM htProgram = m_Tree.InsertItem(L"Program", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_PROGRAM]), NULL);
   m_Page[PAGE_PROGRAM].CreateItem(L"General", htProgram);
   m_Page[PAGE_LIST].CreateItem(L"List", htProgram);
   m_Page[PAGE_NOTIFICATIONS].CreateItem(L"Notifications", htProgram);
   m_Tree.Expand(htProgram);
   // Media players
-  HTREEITEM htRecognition = m_Tree.InsertItem(L"Recognition", reinterpret_cast<LPARAM>(&m_Page[PAGE_MEDIA]), NULL);
+  HTREEITEM htRecognition = m_Tree.InsertItem(L"Recognition", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_MEDIA]), NULL);
   m_Page[PAGE_MEDIA].CreateItem(L"Media players", htRecognition);
   m_Tree.Expand(htRecognition);
   // Torrent
-  HTREEITEM htTorrent = m_Tree.InsertItem(L"Torrent", reinterpret_cast<LPARAM>(&m_Page[PAGE_TORRENT1]), NULL);
+  HTREEITEM htTorrent = m_Tree.InsertItem(L"Torrent", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_TORRENT1]), NULL);
   m_Page[PAGE_TORRENT1].CreateItem(L"Options", htTorrent);
   m_Page[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent);
   m_Tree.Expand(htTorrent);

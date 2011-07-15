@@ -33,18 +33,49 @@ public:
   
   BOOL DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
+  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnOK();
   
 public:
   CFeedFilter m_Filter;
+  HFONT m_hfHeader;
 
 private:
-  void AddConditionToList(const CFeedFilterCondition& condition);
+  CTab m_Tab;
 
 private:
-  CListView m_List;
+  // Page: Basic
+  class CDialogPageBasic : public CDialog {
+  public:
+    BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+    BOOL OnInitDialog();
+  public:
+    bool BuildFilter(CFeedFilter& filter);
+    void BuildOptions(int mode);
+    void BuildOptions2(int mode);
+  public:
+    CComboBox m_ComboOption1, m_ComboOption2;
+  public:
+    CFeedFilterWindow* m_Parent;
+  } m_PageBasic;
+  // Page: Advanced
+  class CDialogPageAdvanced : public CDialog {
+  public:
+    BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+    BOOL OnInitDialog();
+    LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+  private:
+    void AddConditionToList(const CFeedFilterCondition& condition, int index = -1);
+    void RefreshConditionsList();
+  public:
+    CComboBox m_ComboAction, m_ComboMatch;
+    CEdit m_Edit;
+    CListView m_List;
+    CToolbar m_Toolbar;
+  public:
+    CFeedFilterWindow* m_Parent;
+  } m_PageAdvanced;
 };
 
 extern CFeedFilterWindow FeedFilterWindow;

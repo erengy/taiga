@@ -42,7 +42,9 @@ enum IconList16 {
   Icon16_Cross,
   Icon16_Plus,
   Icon16_Minus,
-  Icon16_TickSmall,
+  Icon16_ArrowUp,
+  Icon16_ArrowDown,
+  Icon16_Funnel,
   ICONCOUNT_16PX
 };
 

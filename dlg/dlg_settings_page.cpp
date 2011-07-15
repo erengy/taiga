@@ -33,7 +33,7 @@
 #include "../theme.h"
 
 void AddTorrentFilterToList(HWND hwnd_list, HTREEITEM hInsertAfter, const CFeedFilter& filter, bool enabled, bool expand);
-void RefreshTorrentFilterList(HWND hwnd_list);
+void RefreshTorrentFilterList(HWND hwnd_list, HWND hwnd_combo);
 
 // =============================================================================
 
@@ -43,7 +43,7 @@ CSettingsPage::CSettingsPage() :
 }
 
 void CSettingsPage::CreateItem(LPCWSTR pszText, HTREEITEM htiParent) {
-  m_hTreeItem = SettingsWindow.m_Tree.InsertItem(pszText, reinterpret_cast<LPARAM>(this), htiParent);
+  m_hTreeItem = SettingsWindow.m_Tree.InsertItem(pszText, -1, reinterpret_cast<LPARAM>(this), htiParent);
 }
 
 void CSettingsPage::Select() {
@@ -73,7 +73,7 @@ BOOL CSettingsPage::OnInitDialog() {
       break;
     }
               
-    // ================================================================================
+    // =========================================================================
 
     // Anime folders > Root
     case PAGE_FOLDERS_ROOT: {
@@ -116,7 +116,7 @@ BOOL CSettingsPage::OnInitDialog() {
       break;
     }
 
-    // ================================================================================
+    // =========================================================================
 
     // Announcements > HTTP
     case PAGE_HTTP: {
@@ -151,7 +151,7 @@ BOOL CSettingsPage::OnInitDialog() {
       break;
     }
 
-    // ================================================================================
+    // =========================================================================
 
     // Program > General
     case PAGE_PROGRAM: {
@@ -206,7 +206,7 @@ BOOL CSettingsPage::OnInitDialog() {
       break;
     }
 
-    // ================================================================================
+    // =========================================================================
 
     // Recognition > Media players
     case PAGE_MEDIA: {
@@ -242,7 +242,7 @@ BOOL CSettingsPage::OnInitDialog() {
       break;
     }
 
-    // ================================================================================
+    // =========================================================================
 
     // Torrent > Options
     case PAGE_TORRENT1: {
@@ -266,13 +266,19 @@ BOOL CSettingsPage::OnInitDialog() {
     // Torrent > Filters
     case PAGE_TORRENT2: {
       CheckDlgButton(IDC_CHECK_TORRENT_FILTERGLOBAL, Settings.RSS.Torrent.Filters.GlobalEnabled);
+      CComboBox Combo = GetDlgItem(IDC_COMBO_TORRENT_FILTER);
+      Combo.AddString(L"Show all filters");
+      Combo.AddString(L"Show general filters");
+      Combo.AddString(L"Show anime-specific filters");
+      Combo.SetCurSel(0);
+      Combo.SetWindowHandle(NULL);
       CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
       Tree.SetStyle(TVS_CHECKBOXES, 0);
       Tree.SetTheme();
       SettingsWindow.m_FeedFilters.resize(Aggregator.FilterManager.Filters.size());
       std::copy(Aggregator.FilterManager.Filters.begin(), Aggregator.FilterManager.Filters.end(), 
         SettingsWindow.m_FeedFilters.begin());
-      RefreshTorrentFilterList(Tree.GetWindowHandle());
+      RefreshTorrentFilterList(Tree.GetWindowHandle(), GetDlgItem(IDC_COMBO_TORRENT_FILTER));
       Tree.SetWindowHandle(NULL);
       break;
     }
@@ -284,188 +290,201 @@ BOOL CSettingsPage::OnInitDialog() {
 // =============================================================================
 
 BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
-  if (HIWORD(wParam) == BN_CLICKED) {
-    switch (LOWORD(wParam)) {
-      // Edit format
-      case IDC_BUTTON_FORMAT_HTTP: {
-        FormatWindow.Mode = FORMAT_MODE_HTTP;
-        FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
-        return TRUE;
-      }
-      case IDC_BUTTON_FORMAT_MSN: {
-        FormatWindow.Mode = FORMAT_MODE_MESSENGER;
-        FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
-        return TRUE;
-      }
-      case IDC_BUTTON_FORMAT_MIRC: {
-        FormatWindow.Mode = FORMAT_MODE_MIRC;
-        FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
-        return TRUE;
-      }
-      case IDC_BUTTON_FORMAT_SKYPE: {
-        FormatWindow.Mode = FORMAT_MODE_SKYPE;
-        FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
-        return TRUE;
-      }
-      case IDC_BUTTON_FORMAT_TWITTER: {
-        FormatWindow.Mode = FORMAT_MODE_TWITTER;
-        FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
-        return TRUE;
-      }
-      case IDC_BUTTON_FORMAT_BALLOON: {
-        FormatWindow.Mode = FORMAT_MODE_BALLOON;
-        FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
-        return TRUE;
-      }
-
-      // ================================================================================
-
-      // Add folders
-      case IDC_BUTTON_ADDFOLDER: {
-        wstring path;
-        if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
-          BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
-            CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
-            List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, 0, NULL, path.c_str(), 0);
-            List.SetSelectedItem(List.GetItemCount() - 1);
-            List.SetWindowHandle(NULL);
+  switch (HIWORD(wParam)) {
+    case BN_CLICKED: {
+      switch (LOWORD(wParam)) {
+        // Edit format
+        case IDC_BUTTON_FORMAT_HTTP: {
+          FormatWindow.Mode = FORMAT_MODE_HTTP;
+          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          return TRUE;
         }
-        return TRUE;
-      }
-      // Remove folders
-      case IDC_BUTTON_REMOVEFOLDER: {
-        CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
-        while (List.GetSelectedCount() > 0) {
-          List.DeleteItem(List.GetNextItem(-1, LVNI_SELECTED));
+        case IDC_BUTTON_FORMAT_MSN: {
+          FormatWindow.Mode = FORMAT_MODE_MESSENGER;
+          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          return TRUE;
         }
-        EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, FALSE);
-        List.SetWindowHandle(NULL);
-        return TRUE;
-      }
-
-      // ================================================================================
-
-      // Test DDE connection
-      case IDC_BUTTON_MIRC_TEST: {
-        wstring service;
-        GetDlgItemText(IDC_EDIT_MIRC_SERVICE, service);
-        TestMIRCConnection(service);
-        return TRUE;
-      }
-
-      // ================================================================================
-    
-      // Authorize Twitter
-      case IDC_BUTTON_TWITTER_AUTH: {
-        Twitter.RequestToken();
-        return TRUE;
-      }
-
-      // ================================================================================
-
-      // Filter list
-      case IDC_BUTTON_FILTERLIST: {
-        ExecuteAction(L"Filter");
-        return TRUE;
-      }
-
-      // ================================================================================
-
-      // Browse for torrent application
-      case IDC_BUTTON_TORRENT_BROWSE: {
-        wstring path, current_directory;
-        current_directory = Taiga.GetCurrentDirectory();
-        path = BrowseForFile(m_hWindow, L"Please select a torrent application", 
-          L"Executable files (*.exe)\0*.exe\0\0");
-        if (current_directory != Taiga.GetCurrentDirectory()) {
-          Taiga.SetCurrentDirectory(current_directory);
+        case IDC_BUTTON_FORMAT_MIRC: {
+          FormatWindow.Mode = FORMAT_MODE_MIRC;
+          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          return TRUE;
         }
-        if (!path.empty()) {
-          SetDlgItemText(IDC_EDIT_TORRENT_APP, path.c_str());
+        case IDC_BUTTON_FORMAT_SKYPE: {
+          FormatWindow.Mode = FORMAT_MODE_SKYPE;
+          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          return TRUE;
         }
-        return TRUE;
-      }
-      // Add global filter
-      case IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD: {
-        FeedFilterWindow.m_Filter.Name = L"Filter #" + 
-          ToWSTR((int)SettingsWindow.m_FeedFilters.size() + 1);
-        FeedFilterWindow.m_Filter.Conditions.clear();
-        FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
-        if (!FeedFilterWindow.m_Filter.Conditions.empty()) {
-          SettingsWindow.m_FeedFilters.push_back(FeedFilterWindow.m_Filter);
-          AddTorrentFilterToList(GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL), 
-            NULL, SettingsWindow.m_FeedFilters.back(), true, true);
+        case IDC_BUTTON_FORMAT_TWITTER: {
+          FormatWindow.Mode = FORMAT_MODE_TWITTER;
+          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          return TRUE;
         }
-        return TRUE;
-      }
-      // Remove global filter
-      case IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE: {
-        CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-        HTREEITEM hti = Tree.GetSelection();
-        CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(Tree.GetItemData(hti));
-        for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
-          if (pFeedFilter == &(*it)) {
-            SettingsWindow.m_FeedFilters.erase(it);
-            RefreshTorrentFilterList(Tree.GetWindowHandle());
-            break;
+        case IDC_BUTTON_FORMAT_BALLOON: {
+          FormatWindow.Mode = FORMAT_MODE_BALLOON;
+          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          return TRUE;
+        }
+
+        // ================================================================================
+
+        // Add folders
+        case IDC_BUTTON_ADDFOLDER: {
+          wstring path;
+          if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
+            BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
+              CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+              List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, 0, NULL, path.c_str(), 0);
+              List.SetSelectedItem(List.GetItemCount() - 1);
+              List.SetWindowHandle(NULL);
           }
+          return TRUE;
         }
-        EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, FALSE);
-        Tree.SetWindowHandle(NULL);
-        return TRUE;
-      }
-      // Enable/disable filters
-      case IDC_CHECK_TORRENT_FILTERGLOBAL: {
-        BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
-        EnableDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL, enable);
-        EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD, enable);
-        if (enable) {
+        // Remove folders
+        case IDC_BUTTON_REMOVEFOLDER: {
+          CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+          while (List.GetSelectedCount() > 0) {
+            List.DeleteItem(List.GetNextItem(-1, LVNI_SELECTED));
+          }
+          EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, FALSE);
+          List.SetWindowHandle(NULL);
+          return TRUE;
+        }
+
+        // ================================================================================
+
+        // Test DDE connection
+        case IDC_BUTTON_MIRC_TEST: {
+          wstring service;
+          GetDlgItemText(IDC_EDIT_MIRC_SERVICE, service);
+          TestMIRCConnection(service);
+          return TRUE;
+        }
+
+        // ================================================================================
+    
+        // Authorize Twitter
+        case IDC_BUTTON_TWITTER_AUTH: {
+          Twitter.RequestToken();
+          return TRUE;
+        }
+
+        // ================================================================================
+
+        // Filter list
+        case IDC_BUTTON_FILTERLIST: {
+          ExecuteAction(L"Filter");
+          return TRUE;
+        }
+
+        // ================================================================================
+
+        // Browse for torrent application
+        case IDC_BUTTON_TORRENT_BROWSE: {
+          wstring path, current_directory;
+          current_directory = Taiga.GetCurrentDirectory();
+          path = BrowseForFile(m_hWindow, L"Please select a torrent application", 
+            L"Executable files (*.exe)\0*.exe\0\0");
+          if (current_directory != Taiga.GetCurrentDirectory()) {
+            Taiga.SetCurrentDirectory(current_directory);
+          }
+          if (!path.empty()) {
+            SetDlgItemText(IDC_EDIT_TORRENT_APP, path.c_str());
+          }
+          return TRUE;
+        }
+        // Add global filter
+        case IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD: {
+          FeedFilterWindow.m_Filter.Reset();
+          FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
+          if (!FeedFilterWindow.m_Filter.Conditions.empty()) {
+            if (FeedFilterWindow.m_Filter.Name.empty()) {
+              FeedFilterWindow.m_Filter.Name = L"Filter #" + 
+                ToWSTR((int)SettingsWindow.m_FeedFilters.size() + 1);
+            }
+            SettingsWindow.m_FeedFilters.push_back(FeedFilterWindow.m_Filter);
+            AddTorrentFilterToList(GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL), 
+              NULL, SettingsWindow.m_FeedFilters.back(), true, true);
+          }
+          return TRUE;
+        }
+        // Remove global filter
+        case IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE: {
           CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-          enable = Tree.GetItemData(Tree.GetSelection()) != NULL;
+          HTREEITEM hti = Tree.GetSelection();
+          CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(Tree.GetItemData(hti));
+          for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
+            if (pFeedFilter == &(*it)) {
+              SettingsWindow.m_FeedFilters.erase(it);
+              RefreshTorrentFilterList(Tree.GetWindowHandle(), GetDlgItem(IDC_COMBO_TORRENT_FILTER));
+              break;
+            }
+          }
+          EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, FALSE);
           Tree.SetWindowHandle(NULL);
+          return TRUE;
         }
-        EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, enable);
-        return TRUE;
-      }
+        // Enable/disable filters
+        case IDC_CHECK_TORRENT_FILTERGLOBAL: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL, enable);
+          EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD, enable);
+          if (enable) {
+            CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
+            enable = Tree.GetItemData(Tree.GetSelection()) != NULL;
+            Tree.SetWindowHandle(NULL);
+          }
+          EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, enable);
+          return TRUE;
+        }
 
-      // ================================================================================
+        // ================================================================================
 
-      // Check radio buttons
-      case IDC_RADIO_UPDATE_MODE1:
-      case IDC_RADIO_UPDATE_MODE2:
-      case IDC_RADIO_UPDATE_MODE3: {
-        CheckRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3, LOWORD(wParam));
-        return TRUE;
+        // Check radio buttons
+        case IDC_RADIO_UPDATE_MODE1:
+        case IDC_RADIO_UPDATE_MODE2:
+        case IDC_RADIO_UPDATE_MODE3: {
+          CheckRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3, LOWORD(wParam));
+          return TRUE;
+        }
+        case IDC_RADIO_UPDATE_TIME1:
+        case IDC_RADIO_UPDATE_TIME2:
+        case IDC_RADIO_UPDATE_TIME3: {
+          CheckRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3, LOWORD(wParam));
+          return TRUE;
+        }
+        case IDC_RADIO_MIRC_CHANNEL1:
+        case IDC_RADIO_MIRC_CHANNEL2:
+        case IDC_RADIO_MIRC_CHANNEL3: {
+          CheckRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3, LOWORD(wParam));
+          return TRUE;
+        }
+        case IDC_RADIO_LIST_PROGRESS1:
+        case IDC_RADIO_LIST_PROGRESS2: {
+          CheckRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2, LOWORD(wParam));
+          return TRUE;
+        }
+        case IDC_RADIO_TORRENT_NEW1:
+        case IDC_RADIO_TORRENT_NEW2: {
+          CheckRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2, LOWORD(wParam));
+          return TRUE;
+        }
+        case IDC_RADIO_TORRENT_APP1:
+        case IDC_RADIO_TORRENT_APP2: {
+          CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2, LOWORD(wParam));
+          EnableDlgItem(IDC_EDIT_TORRENT_APP, LOWORD(wParam) == IDC_RADIO_TORRENT_APP2);
+          EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE, LOWORD(wParam) == IDC_RADIO_TORRENT_APP2);
+          return TRUE;
+        }
       }
-      case IDC_RADIO_UPDATE_TIME1:
-      case IDC_RADIO_UPDATE_TIME2:
-      case IDC_RADIO_UPDATE_TIME3: {
-        CheckRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3, LOWORD(wParam));
-        return TRUE;
+      break;
+    }
+
+    case CBN_SELCHANGE: {
+      // Torrent filters
+      if (LOWORD(wParam) == IDC_COMBO_TORRENT_FILTER) {
+        RefreshTorrentFilterList(GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL), GetDlgItem(LOWORD(wParam)));
       }
-      case IDC_RADIO_MIRC_CHANNEL1:
-      case IDC_RADIO_MIRC_CHANNEL2:
-      case IDC_RADIO_MIRC_CHANNEL3: {
-        CheckRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3, LOWORD(wParam));
-        return TRUE;
-      }
-      case IDC_RADIO_LIST_PROGRESS1:
-      case IDC_RADIO_LIST_PROGRESS2: {
-        CheckRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2, LOWORD(wParam));
-        return TRUE;
-      }
-      case IDC_RADIO_TORRENT_NEW1:
-      case IDC_RADIO_TORRENT_NEW2: {
-        CheckRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2, LOWORD(wParam));
-        return TRUE;
-      }
-      case IDC_RADIO_TORRENT_APP1:
-      case IDC_RADIO_TORRENT_APP2: {
-        CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2, LOWORD(wParam));
-        EnableDlgItem(IDC_EDIT_TORRENT_APP, LOWORD(wParam) == IDC_RADIO_TORRENT_APP2);
-        EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE, LOWORD(wParam) == IDC_RADIO_TORRENT_APP2);
-        return TRUE;
-      }
+      break;
     }
   }
 
@@ -508,7 +527,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
         case LVN_ITEMCHANGED: {
           LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
           if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
-            EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, lplv->uNewState != 0);
+            EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
           }
           break;
         }
@@ -691,11 +710,11 @@ void AddTorrentFilterToList(HWND hwnd_list, HTREEITEM hInsertAfter, const CFeedF
   CTreeView Tree = hwnd_list;
   
   // Insert item
-  HTREEITEM hti = Tree.InsertItem(filter.Name.c_str(), reinterpret_cast<LPARAM>(&filter), NULL, hInsertAfter);
+  HTREEITEM hti = Tree.InsertItem(filter.Name.c_str(), -1, reinterpret_cast<LPARAM>(&filter), NULL, hInsertAfter);
   
   // Insert conditions
   for (auto it = filter.Conditions.begin(); it != filter.Conditions.end(); ++it) {
-    HTREEITEM htc = Tree.InsertItem(Aggregator.FilterManager.TranslateCondition(*it).c_str(), NULL, hti);
+    HTREEITEM htc = Tree.InsertItem(Aggregator.FilterManager.TranslateCondition(*it).c_str(), -1, NULL, hti);
     Tree.SetCheckState(htc, -1);
   }
 
@@ -704,10 +723,30 @@ void AddTorrentFilterToList(HWND hwnd_list, HTREEITEM hInsertAfter, const CFeedF
   Tree.SetWindowHandle(NULL);
 }
 
-void RefreshTorrentFilterList(HWND hwnd_list) {
+void RefreshTorrentFilterList(HWND hwnd_list, HWND hwnd_combo) {
+  CComboBox Combo = hwnd_combo;
+  int index = Combo.GetCurSel();
+  Combo.SetWindowHandle(NULL);
+  
   CTreeView Tree = hwnd_list;
   Tree.DeleteAllItems();
   for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
+    if (index > 0) {
+      bool found = false;
+      for (auto c = it->Conditions.begin(); c != it->Conditions.end(); ++c) {
+        if (c->Element == FEED_FILTER_ELEMENT_ANIME_ID || c->Element == FEED_FILTER_ELEMENT_ANIME_TITLE) {
+          if (!c->Value.empty()) {
+            found = true;
+            break;
+          }
+        }
+      }
+      if (index == 1) {
+        if (found) continue;
+      } else {
+        if (!found) continue;
+      }
+    }
     AddTorrentFilterToList(hwnd_list, NULL, *it, it->Enabled, false);
   }
   Tree.SetWindowHandle(NULL);

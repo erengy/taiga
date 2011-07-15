@@ -218,29 +218,55 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   }
 }
 
+void CFeedFilter::Reset() {
+  Action = FEED_FILTER_ACTION_EXCLUDE;
+  Enabled = true;
+  Match = FEED_FILTER_MATCH_ALL;
+  Name.clear();
+  Conditions.clear();
+}
+
 // =============================================================================
 
-void CFeedFilterManager::AddDefaultFilters() {
+CFeedFilterManager::CFeedFilterManager() {
+  #define ADD_DEFAULT_FILTER(action, match, enabled, name) \
+    DefaultFilters.resize(DefaultFilters.size() + 1); \
+    DefaultFilters.back().Action = action; \
+    DefaultFilters.back().Enabled = enabled; \
+    DefaultFilters.back().Match = match; \
+    DefaultFilters.back().Name = name;
+
   // Discard unknown titles
-  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard unknown titles");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard unknown titles");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
   // Discard completed titles
-  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard completed titles");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard completed titles");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
   // Discard dropped titles
-  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard dropped titles");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard dropped titles");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
   
   // Discard watched episodes
-  AddFilter(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY, true, L"Discard watched episodes");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_IS, L"%watched%");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"True");
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY, true, L"Discard watched episodes");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_IS, L"%watched%");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"True");
   
   // Prefer high resolution files
-  AddFilter(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, L"Prefer high resolution files");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"720p");
-  Filters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"1280x720");
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, L"Prefer high resolution files");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"720p");
+  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"1280x720");
+
+  #undef ADD_DEFAULT_FILTER
+}
+
+void CFeedFilterManager::AddDefaultFilters() {
+  for (auto it = DefaultFilters.begin(); it != DefaultFilters.end(); ++it) {
+    AddFilter(it->Action, it->Match, it->Enabled, it->Name);
+    for (auto c = it->Conditions.begin(); c != it->Conditions.end(); ++c) {
+      it->AddCondition(c->Element, c->Operator, c->Value);
+    }
+  }
 }
 
 void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
@@ -372,6 +398,18 @@ wstring CFeedFilterManager::TranslateOperator(int op) {
 
 wstring CFeedFilterManager::TranslateValue(const CFeedFilterCondition& condition) {
   switch (condition.Element) {
+    case FEED_FILTER_ELEMENT_ANIME_ID: {
+      if (condition.Value.empty()) {
+        return L"(?)";
+      } else {
+        CAnime* anime = AnimeList.FindItem(ToINT(condition.Value));
+        if (anime) {
+          return condition.Value + L" (" + anime->Series_Title + L")";
+        } else {
+          return condition.Value + L" (?)";
+        }
+      }
+    }
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
       return MAL.TranslateMyStatus(ToINT(condition.Value), false);
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:

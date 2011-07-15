@@ -282,7 +282,7 @@ public:
   CTab(HWND hWnd) { SetWindowHandle(hWnd); }
   virtual ~CTab() {}
 
-  void   AdjustRect(BOOL fLarger, LPRECT lpRect);
+  void   AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect);
   int    Clear();
   int    DeleteItem(int nIndex);
   int    InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam);
@@ -361,19 +361,21 @@ public:
   CTreeView(HWND hWnd) { SetWindowHandle(hWnd); }
   virtual ~CTreeView() {}
 
-  BOOL      DeleteAllItems();
-  BOOL      DeleteItem(HTREEITEM hitem);
-  BOOL      Expand(HTREEITEM hItem, bool bExpand = true);
-  UINT      GetCheckState(HTREEITEM hItem);
-  UINT      GetCount();
-  BOOL      GetItem(LPTVITEM pItem);
-  LPARAM    GetItemData(HTREEITEM hItem);
-  HTREEITEM GetSelection();
-  HTREEITEM HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos = false);
-  HTREEITEM InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter = TVI_LAST);
-  BOOL      SelectItem(HTREEITEM hItem);
-  UINT      SetCheckState(HTREEITEM hItem, BOOL fCheck);
-  int       SetItemHeight(SHORT cyItem);
+  BOOL       DeleteAllItems();
+  BOOL       DeleteItem(HTREEITEM hitem);
+  BOOL       Expand(HTREEITEM hItem, bool bExpand = true);
+  UINT       GetCheckState(HTREEITEM hItem);
+  UINT       GetCount();
+  BOOL       GetItem(LPTVITEM pItem);
+  LPARAM     GetItemData(HTREEITEM hItem);
+  HTREEITEM  GetSelection();
+  HTREEITEM  HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos = false);
+  HTREEITEM  InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, 
+                        HTREEITEM htiParent, HTREEITEM hInsertAfter = TVI_LAST);
+  BOOL       SelectItem(HTREEITEM hItem);
+  UINT       SetCheckState(HTREEITEM hItem, BOOL fCheck);
+  HIMAGELIST SetImageList(HIMAGELIST himl, INT iImage = TVSIL_NORMAL);
+  int        SetItemHeight(SHORT cyItem);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);

@@ -94,13 +94,10 @@ BOOL CAnimeWindow::OnInitDialog() {
     reinterpret_cast<LONG>(::LoadImage(NULL, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
 
   // Create pages
-  CRect rcPage;
-  m_Tab.GetWindowRect(&rcPage);
-  m_Tab.AdjustRect(FALSE, &rcPage);
-  ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rcPage));
+  CRect rcPage; m_Tab.AdjustRect(m_hWindow, FALSE, &rcPage);
   for (size_t i = 0; i < TAB_COUNT; i++) {
     m_Page[i].Create(IDD_ANIME_INFO_PAGE01 + i, m_hWindow, false);
-    m_Page[i].SetPosition(NULL, rcPage.left, rcPage.top, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE);
+    m_Page[i].SetPosition(NULL, rcPage, SWP_HIDEWINDOW);
     EnableThemeDialogTexture(m_Page[i].GetWindowHandle(), ETDT_ENABLETAB);
   }
 

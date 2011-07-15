@@ -78,10 +78,11 @@ HTREEITEM CTreeView::HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos) {
   return TreeView_HitTest(m_hWindow, lpht);
 }
 
-HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
+HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
   TVITEM tvi  = {0};
-  tvi.mask    = TVIF_TEXT | TVIF_PARAM;
+  tvi.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
   tvi.pszText = (LPWSTR)pszText;
+  tvi.iImage  = tvi.iSelectedImage = iImage;
   tvi.lParam  = lParam;
 
   TVINSERTSTRUCT tvis = {0};
@@ -104,6 +105,10 @@ UINT CTreeView::SetCheckState(HTREEITEM hItem, BOOL fCheck) {
   tvi.state     = INDEXTOSTATEIMAGEMASK(fCheck + 1);
 
   return TreeView_SetItem(m_hWindow, &tvi);
+}
+
+HIMAGELIST CTreeView::SetImageList(HIMAGELIST himl, INT iImage) {
+  return TreeView_SetImageList(m_hWindow, himl, iImage);
 }
 
 int CTreeView::SetItemHeight(SHORT cyItem) {

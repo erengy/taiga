@@ -33,7 +33,17 @@ void CTab::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
 // =============================================================================
 
-void CTab::AdjustRect(BOOL fLarger, LPRECT lpRect) {
+void CTab::AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect) {
+  if (hWindow) {
+    RECT window_rect;
+    ::GetClientRect(m_hWindow, lpRect);
+    ::GetWindowRect(m_hWindow, &window_rect);
+    ::ScreenToClient(hWindow, (LPPOINT)&window_rect);
+    ::SetRect(lpRect, 
+      window_rect.left, window_rect.top, 
+      window_rect.left + lpRect->right, 
+      window_rect.top + lpRect->bottom);
+  }
   TabCtrl_AdjustRect(m_hWindow, fLarger, lpRect);
 }
 

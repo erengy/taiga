@@ -167,6 +167,7 @@ public:
 
   void AddCondition(int element, int op, const wstring& value);
   bool Filter(CFeed& feed, CFeedItem& item, bool recursive);
+  void Reset();
 
   wstring Name;
   bool Enabled;
@@ -176,6 +177,8 @@ public:
 
 class CFeedFilterManager {
 public:
+  CFeedFilterManager();
+
   void AddDefaultFilters();
   void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
     bool enabled = true, const wstring& name = L"");
@@ -188,6 +191,7 @@ public:
   wstring TranslateValue(const CFeedFilterCondition& condition);
   
   vector<CFeedFilter> Filters;
+  vector<CFeedFilter> DefaultFilters;
 };
 
 // =============================================================================

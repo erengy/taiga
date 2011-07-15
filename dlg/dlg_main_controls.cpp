@@ -42,30 +42,30 @@ void CMainWindow::CMainTree::RefreshItems() {
   }
   
   // My tralala
-  htItem[0] = InsertItem(L"My Panel", NULL, NULL);
-  htItem[1] = InsertItem(L"My Profile", NULL, NULL);
-  htItem[2] = InsertItem(L"My History", NULL, NULL);
+  htItem[0] = InsertItem(L"My Panel", -1, NULL, NULL);
+  htItem[1] = InsertItem(L"My Profile", -1, NULL, NULL);
+  htItem[2] = InsertItem(L"My History", -1, NULL, NULL);
 
   // Separator
-  htItem[3] = InsertItem(NULL, -1, NULL);
+  htItem[3] = InsertItem(NULL, -1, -1, NULL);
   
   // My Anime List
-  htItem[4] = InsertItem(L"My Anime List", NULL, NULL);
-  InsertItem(MAL.TranslateMyStatus(MAL_WATCHING, true).c_str(), NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_COMPLETED, true).c_str(), NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_ONHOLD, true).c_str(), NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_DROPPED, true).c_str(), NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, true).c_str(), NULL, htItem[4]);
+  htItem[4] = InsertItem(L"My Anime List", -1, NULL, NULL);
+  InsertItem(MAL.TranslateMyStatus(MAL_WATCHING, true).c_str(), -1, NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_COMPLETED, true).c_str(), -1, NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_ONHOLD, true).c_str(), -1, NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_DROPPED, true).c_str(), -1, NULL, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, true).c_str(), -1, NULL, htItem[4]);
   Expand(htItem[4]);
 
   // Separator
-  htItem[5] = InsertItem(NULL, -1, NULL);
+  htItem[5] = InsertItem(NULL, -1, -1, NULL);
 
   // Foobar
-  htItem[6] = InsertItem(L"Foo", NULL, NULL);
-  InsertItem(L"Foofoo", NULL, htItem[6]);
-  InsertItem(L"Foobar", NULL, htItem[6]);
-  InsertItem(L"Foobaz", NULL, htItem[6]);
+  htItem[6] = InsertItem(L"Foo", -1, NULL, NULL);
+  InsertItem(L"Foofoo", -1, NULL, htItem[6]);
+  InsertItem(L"Foobar", -1, NULL, htItem[6]);
+  InsertItem(L"Foobaz", -1, NULL, htItem[6]);
   Expand(htItem[6]);
 }
 
