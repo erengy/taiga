@@ -40,12 +40,12 @@
 #define IDC_BUTTON_ADDFOLDER                    1000
 #define IDC_COMBO_FEED_FILTER_MATCH             1000
 #define IDC_BUTTON_CANCELSEARCH                 1001
-#define IDC_COMBO_TORRENT_FILTER                1001
 #define IDC_STATIC_FEED_FILTER_OPTION1          1001
 #define IDC_TOOLBAR_FEED_FILTER                 1001
 #define IDC_BUTTON_EVENT_CLEAR                  1002
 #define IDC_STATIC_FEED_FILTER_OPTION2          1002
 #define IDC_COMBO_FEED_FILTER_OPTION1           1003
+#define IDC_LIST_FEED_FILTER_ANIME              1003
 #define IDC_BUTTON_FILTERLIST                   1004
 #define IDC_COMBO_FEED_FILTER_OPTION2           1004
 #define IDC_BUTTON_FORMAT_BALLOON               1005
@@ -57,8 +57,6 @@
 #define IDC_BUTTON_MIRC_TEST                    1011
 #define IDC_BUTTON_REMOVEFOLDER                 1012
 #define IDC_BUTTON_TORRENT_BROWSE               1013
-#define IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD     1014
-#define IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE  1015
 #define IDC_BUTTON_TWITTER_AUTH                 1016
 #define IDC_CHECK_ANIME_REWATCH                 1017
 #define IDC_CHECK_AUTOSTART                     1018
@@ -92,7 +90,6 @@
 #define IDC_CHECK_START_VERSION                 1046
 #define IDC_CHECK_TORRENT_AUTOCHECK             1047
 #define IDC_CHECK_TORRENT_AUTOSETFOLDER         1048
-#define IDC_CHECK_TORRENT_FILTERGLOBAL          1049
 #define IDC_CHECK_TORRENT_HIDE                  1050
 #define IDC_CHECK_TWITTER                       1051
 #define IDC_CHECK_UPDATE_CHECKMP                1052
@@ -188,7 +185,6 @@
 #define IDC_TOOLBAR_TORRENT                     1147
 #define IDC_TREE_MAIN                           1148
 #define IDC_TREE_PAGES                          1149
-#define IDC_TREE_TORRENT_FILTERGLOBAL           1150
 #define IDS_KEYWORD_AUDIO                       40000
 #define IDS_KEYWORD_EXTENSION                   40001
 #define IDS_KEYWORD_EXTRA                       40002
@@ -200,4 +196,8 @@
 #define IDC_TAB_FEED_FILTER                     40008
 #define IDC_COMBO_FEED_FILTER_ACTION            40012
 #define IDC_RADIO_FEED_FILTER_BASIC1            40013
+#define IDC_CHECK_TORRENT_FILTER                40014
 #define IDC_RADIO_FEED_FILTER_BASIC2            40014
+#define IDC_BUTTON_TORRENT_FILTER_ADD           40015
+#define IDC_BUTTON_TORRENT_FILTER_DELETE        40016
+#define IDC_LIST_TORRENT_FILTER                 40018

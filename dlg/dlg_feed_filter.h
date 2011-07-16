@@ -65,13 +65,15 @@ private:
     BOOL OnCommand(WPARAM wParam, LPARAM lParam);
     BOOL OnInitDialog();
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+  public:
+    bool BuildFilter(CFeedFilter& filter);
   private:
     void AddConditionToList(const CFeedFilterCondition& condition, int index = -1);
     void RefreshConditionsList();
   public:
     CComboBox m_ComboAction, m_ComboMatch;
     CEdit m_Edit;
-    CListView m_List;
+    CListView m_ListCondition, m_ListAnime;
     CToolbar m_Toolbar;
   public:
     CFeedFilterWindow* m_Parent;

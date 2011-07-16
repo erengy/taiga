@@ -138,6 +138,7 @@ public:
   BOOL       GetSubItemRect(int iItem, int iSubItem, LPRECT lpRect);
   DWORD      GetView();
   int        HitTest(bool return_subitem = false);
+  int        HitTestEx(LPLVHITTESTINFO lplvhi);
   int        InsertColumn(int nIndex, int nWidth, int nWidthMin, int nAlign, LPCWSTR szText);
   int        InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable = false, bool bCollapsed = false);
   int        InsertItem(const LVITEM& lvi);

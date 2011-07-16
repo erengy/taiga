@@ -154,8 +154,8 @@ public:
 };
 
 enum FeedFilterAction {
-  FEED_FILTER_ACTION_EXCLUDE,
-  FEED_FILTER_ACTION_INCLUDE,
+  FEED_FILTER_ACTION_DISCARD,
+  FEED_FILTER_ACTION_SELECT,
   FEED_FILTER_ACTION_PREFER
 };
 
@@ -171,8 +171,9 @@ public:
 
   wstring Name;
   bool Enabled;
-  vector<CFeedFilterCondition> Conditions;
   int Action, Match;
+  vector<int> AnimeID;
+  vector<CFeedFilterCondition> Conditions;
 };
 
 class CFeedFilterManager {
@@ -184,11 +185,14 @@ public:
     bool enabled = true, const wstring& name = L"");
   int Filter(CFeed& feed);
 
+  wstring CreateNameFromConditions(const CFeedFilter& filter);
   wstring TranslateCondition(const CFeedFilterCondition& condition);
   wstring TranslateConditions(const CFeedFilter& filter, size_t index);
   wstring TranslateElement(int element);
   wstring TranslateOperator(int op);
   wstring TranslateValue(const CFeedFilterCondition& condition);
+  wstring TranslateMatching(int match);
+  wstring TranslateAction(int action);
   
   vector<CFeedFilter> Filters;
   vector<CFeedFilter> DefaultFilters;

@@ -118,7 +118,7 @@ void CTorrentWindow::RefreshList() {
 
   // Add items
   for (auto it = pFeed->Item.begin(); it != pFeed->Item.end(); ++it) {
-    if (Settings.RSS.Torrent.HideUnidentified && !it->EpisodeData.Index) {
+    if (Settings.RSS.Torrent.HideUnidentified && it->EpisodeData.Index == -1) {
       continue;
     }
     wstring title, number, video;

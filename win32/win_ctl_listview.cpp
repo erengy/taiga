@@ -183,6 +183,13 @@ int CListView::HitTest(bool return_subitem) {
   return return_subitem ? lvhi.iSubItem : lvhi.iItem;
 }
 
+int CListView::HitTestEx(LPLVHITTESTINFO lplvhi) {
+  ::GetCursorPos(&lplvhi->pt);
+  ::ScreenToClient(m_hWindow, &lplvhi->pt);
+  ListView_SubItemHitTestEx(m_hWindow, lplvhi);
+  return lplvhi->iItem;
+}
+
 int CListView::InsertItem(const LVITEM& lvi) {
   return ListView_InsertItem(m_hWindow, &lvi);
 }

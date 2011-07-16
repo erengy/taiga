@@ -32,8 +32,8 @@
 #include "../taiga.h"
 #include "../theme.h"
 
-void AddTorrentFilterToList(HWND hwnd_list, HTREEITEM hInsertAfter, const CFeedFilter& filter, bool enabled, bool expand);
-void RefreshTorrentFilterList(HWND hwnd_list, HWND hwnd_combo);
+int AddTorrentFilterToList(HWND hwnd_list, const CFeedFilter& filter);
+void RefreshTorrentFilterList(HWND hwnd_list);
 
 // =============================================================================
 
@@ -265,21 +265,21 @@ BOOL CSettingsPage::OnInitDialog() {
     }
     // Torrent > Filters
     case PAGE_TORRENT2: {
-      CheckDlgButton(IDC_CHECK_TORRENT_FILTERGLOBAL, Settings.RSS.Torrent.Filters.GlobalEnabled);
-      CComboBox Combo = GetDlgItem(IDC_COMBO_TORRENT_FILTER);
-      Combo.AddString(L"Show all filters");
-      Combo.AddString(L"Show general filters");
-      Combo.AddString(L"Show anime-specific filters");
-      Combo.SetCurSel(0);
-      Combo.SetWindowHandle(NULL);
-      CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-      Tree.SetStyle(TVS_CHECKBOXES, 0);
-      Tree.SetTheme();
+      CheckDlgButton(IDC_CHECK_TORRENT_FILTER, Settings.RSS.Torrent.Filters.GlobalEnabled);
+      CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+      List.EnableGroupView(true);
+      List.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+      List.SetImageList(UI.ImgList16.GetHandle());
+      List.SetTheme();
+      List.InsertColumn(0, 0, 0, 0, L"Name");
+      List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
+      List.InsertGroup(0, L"General filters", true, false);
+      List.InsertGroup(1, L"Limited filters", true, false);
       SettingsWindow.m_FeedFilters.resize(Aggregator.FilterManager.Filters.size());
       std::copy(Aggregator.FilterManager.Filters.begin(), Aggregator.FilterManager.Filters.end(), 
         SettingsWindow.m_FeedFilters.begin());
-      RefreshTorrentFilterList(Tree.GetWindowHandle(), GetDlgItem(IDC_COMBO_TORRENT_FILTER));
-      Tree.SetWindowHandle(NULL);
+      RefreshTorrentFilterList(List.GetWindowHandle());
+      List.SetWindowHandle(NULL);
       break;
     }
   }
@@ -393,47 +393,48 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         }
         // Add global filter
-        case IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD: {
+        case IDC_BUTTON_TORRENT_FILTER_ADD: {
           FeedFilterWindow.m_Filter.Reset();
           FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
           if (!FeedFilterWindow.m_Filter.Conditions.empty()) {
             if (FeedFilterWindow.m_Filter.Name.empty()) {
-              FeedFilterWindow.m_Filter.Name = L"Filter #" + 
-                ToWSTR((int)SettingsWindow.m_FeedFilters.size() + 1);
+              FeedFilterWindow.m_Filter.Name = Aggregator.FilterManager.CreateNameFromConditions(FeedFilterWindow.m_Filter);
             }
             SettingsWindow.m_FeedFilters.push_back(FeedFilterWindow.m_Filter);
-            AddTorrentFilterToList(GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL), 
-              NULL, SettingsWindow.m_FeedFilters.back(), true, true);
+            CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+            RefreshTorrentFilterList(List.GetWindowHandle());
+            List.SetSelectedItem(List.GetItemCount() - 1);
+            List.SetWindowHandle(NULL);
           }
           return TRUE;
         }
         // Remove global filter
-        case IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE: {
-          CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-          HTREEITEM hti = Tree.GetSelection();
-          CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(Tree.GetItemData(hti));
+        case IDC_BUTTON_TORRENT_FILTER_DELETE: {
+          CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+          int item_index = List.GetNextItem(-1, LVNI_SELECTED);
+          CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(List.GetItemParam(item_index));
           for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
             if (pFeedFilter == &(*it)) {
               SettingsWindow.m_FeedFilters.erase(it);
-              RefreshTorrentFilterList(Tree.GetWindowHandle(), GetDlgItem(IDC_COMBO_TORRENT_FILTER));
+              RefreshTorrentFilterList(List.GetWindowHandle());
               break;
             }
           }
-          EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, FALSE);
-          Tree.SetWindowHandle(NULL);
+          EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, FALSE);
+          List.SetWindowHandle(NULL);
           return TRUE;
         }
         // Enable/disable filters
-        case IDC_CHECK_TORRENT_FILTERGLOBAL: {
+        case IDC_CHECK_TORRENT_FILTER: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
-          EnableDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL, enable);
-          EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_ADD, enable);
+          EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
+          EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_ADD, enable);
           if (enable) {
-            CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-            enable = Tree.GetItemData(Tree.GetSelection()) != NULL;
-            Tree.SetWindowHandle(NULL);
+            CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+            enable = List.GetNextItem(-1, LVNI_SELECTED) > -1;
+            List.SetWindowHandle(NULL);
           }
-          EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, enable);
+          EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, enable);
           return TRUE;
         }
 
@@ -478,22 +479,12 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
       }
       break;
     }
-
-    case CBN_SELCHANGE: {
-      // Torrent filters
-      if (LOWORD(wParam) == IDC_COMBO_TORRENT_FILTER) {
-        RefreshTorrentFilterList(GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL), GetDlgItem(LOWORD(wParam)));
-      }
-      break;
-    }
   }
 
   return FALSE;
 }
 
 // =============================================================================
-
-#define TVN_CUSTOM_CHECK (WM_USER + 100)
 
 INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
@@ -508,18 +499,6 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
               ExecuteAction(pNMLink->item.szUrl);
               return TRUE;
             }
-            // Check TreeView item
-            case IDC_TREE_TORRENT_FILTERGLOBAL: {
-              HWND hTree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-              TVHITTESTINFO hti = {0};
-              GetCursorPos(&hti.pt);
-              ScreenToClient(hTree, &hti.pt);
-              TreeView_HitTest(hTree, &hti);
-              if (hti.hItem && (hti.flags & TVHT_ONITEMSTATEICON)) {
-                PostMessage(TVN_CUSTOM_CHECK, 0, reinterpret_cast<LPARAM>(hti.hItem));
-              }
-              return TRUE;
-            }
           }
         }
 
@@ -528,6 +507,8 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
           LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
           if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
             EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
+          } else if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
+            EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
           }
           break;
         }
@@ -570,23 +551,19 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
             Execute(MediaPlayers.Item[lpnmitem->iItem].GetPath());
           // Torrent filters
-          } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL)) {
-            CTreeView Tree = lpnmitem->hdr.hwndFrom;
-            TVHITTESTINFO ht = {0};
-            Tree.HitTest(&ht, true);
-            if (ht.hItem && !(ht.flags & TVHT_ONITEMBUTTON)) {
-              CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(Tree.GetItemData(ht.hItem));
-              if (pFeedFilter) {
-                FeedFilterWindow.m_Filter = *pFeedFilter;
-                FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
-                if (!FeedFilterWindow.m_Filter.Conditions.empty()) {
-                  *pFeedFilter = FeedFilterWindow.m_Filter;
-                  AddTorrentFilterToList(lpnmitem->hdr.hwndFrom, ht.hItem, *pFeedFilter, true, true);
-                  Tree.DeleteItem(ht.hItem);
-                }
+          } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
+            CListView List = lpnmitem->hdr.hwndFrom;
+            CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(List.GetItemParam(lpnmitem->iItem));
+            if (pFeedFilter) {
+              FeedFilterWindow.m_Filter = *pFeedFilter;
+              FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
+              if (!FeedFilterWindow.m_Filter.Conditions.empty()) {
+                *pFeedFilter = FeedFilterWindow.m_Filter;
+                RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
+                List.SetSelectedItem(lpnmitem->iItem);
               }
             }
-            Tree.SetWindowHandle(NULL);
+            List.SetWindowHandle(NULL);
           }
           return TRUE;
         }
@@ -636,45 +613,6 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
           List.SetWindowHandle(NULL);
           return TRUE;
         }
-
-        // Capture space key on TreeView
-        case TVN_KEYDOWN: {
-          LPNMTVKEYDOWN pnmtv = reinterpret_cast<LPNMTVKEYDOWN>(lParam);
-          if (pnmtv->hdr.idFrom == IDC_TREE_TORRENT_FILTERGLOBAL) {
-            if (pnmtv->wVKey == VK_SPACE) {
-              CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-              HTREEITEM hti = Tree.GetSelection();
-              PostMessage(TVN_CUSTOM_CHECK, 0, reinterpret_cast<LPARAM>(hti));
-              Tree.SetWindowHandle(NULL);
-            }
-          }
-          return TRUE;
-        }
-
-        // TreeView item selection
-        case TVN_SELCHANGED: {
-          LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(lParam);
-          if (pnmtv->hdr.hwndFrom == GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL)) {
-            EnableDlgItem(IDC_BUTTON_TORRENT_FILTERGLOBAL_DELETE, pnmtv->itemNew.lParam != NULL);
-          }
-          return TRUE;
-        }
-      }
-      break;
-    }
-
-    // Handle TreeView checkbox
-    case TVN_CUSTOM_CHECK: {
-      HTREEITEM hti = reinterpret_cast<HTREEITEM>(lParam);
-      if (hti) {
-        CTreeView Tree = GetDlgItem(IDC_TREE_TORRENT_FILTERGLOBAL);
-        CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(Tree.GetItemData(hti));
-        if (pFeedFilter) {
-          pFeedFilter->Enabled = Tree.GetCheckState(hti) == 1;
-        } else {
-          Tree.SetCheckState(hti, -1);
-        }
-        Tree.SetWindowHandle(NULL);
       }
       break;
     }
@@ -706,48 +644,57 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 // =============================================================================
 
-void AddTorrentFilterToList(HWND hwnd_list, HTREEITEM hInsertAfter, const CFeedFilter& filter, bool enabled, bool expand) {
-  CTreeView Tree = hwnd_list;
-  
-  // Insert item
-  HTREEITEM hti = Tree.InsertItem(filter.Name.c_str(), -1, reinterpret_cast<LPARAM>(&filter), NULL, hInsertAfter);
-  
-  // Insert conditions
-  for (auto it = filter.Conditions.begin(); it != filter.Conditions.end(); ++it) {
-    HTREEITEM htc = Tree.InsertItem(Aggregator.FilterManager.TranslateCondition(*it).c_str(), -1, NULL, hti);
-    Tree.SetCheckState(htc, -1);
+int AddTorrentFilterToList(HWND hwnd_list, const CFeedFilter& filter) {
+  wstring text;
+  CListView List = hwnd_list;
+  int index = List.GetItemCount();
+  int group = filter.AnimeID.empty() ? 0 : 1;
+  int icon = Icon16_Funnel;
+  switch (filter.Action) {
+    case FEED_FILTER_ACTION_DISCARD: icon = Icon16_FunnelCross; break;
+    case FEED_FILTER_ACTION_SELECT:  icon = Icon16_FunnelTick;  break;
+    case FEED_FILTER_ACTION_PREFER:  icon = Icon16_FunnelPlus;  break;
   }
 
-  Tree.SetCheckState(hti, enabled);
-  if (expand) Tree.Expand(hti);
-  Tree.SetWindowHandle(NULL);
-}
+  // Insert item
+  index = List.InsertItem(index, group, icon, 0, NULL, filter.Name.c_str(), 
+    reinterpret_cast<LPARAM>(&filter));
+  List.SetCheckState(index, filter.Enabled);
 
-void RefreshTorrentFilterList(HWND hwnd_list, HWND hwnd_combo) {
-  CComboBox Combo = hwnd_combo;
-  int index = Combo.GetCurSel();
-  Combo.SetWindowHandle(NULL);
-  
-  CTreeView Tree = hwnd_list;
-  Tree.DeleteAllItems();
-  for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
-    if (index > 0) {
-      bool found = false;
-      for (auto c = it->Conditions.begin(); c != it->Conditions.end(); ++c) {
-        if (c->Element == FEED_FILTER_ELEMENT_ANIME_ID || c->Element == FEED_FILTER_ELEMENT_ANIME_TITLE) {
-          if (!c->Value.empty()) {
-            found = true;
-            break;
-          }
-        }
-      }
-      if (index == 1) {
-        if (found) continue;
+  // Insert anime limits
+  /*if (!filter.AnimeID.empty()) {
+    text.clear();
+    for (auto it = filter.AnimeID.begin(); it != filter.AnimeID.end(); ++it) {
+      if (!text.empty()) text += L", ";
+      CAnime* anime = AnimeList.FindItem(*it);
+      if (anime) {
+        text += anime->Series_Title;
       } else {
-        if (!found) continue;
+        text += L"(?)";
       }
     }
-    AddTorrentFilterToList(hwnd_list, NULL, *it, it->Enabled, false);
+    List.SetItem(index, 1, text.c_str());
   }
-  Tree.SetWindowHandle(NULL);
+
+  // Insert conditions
+  text.clear();
+  for (size_t i = 0; i < filter.Conditions.size(); i++) {
+    if (i > 0) text += filter.Match == FEED_FILTER_MATCH_ALL ? L" & " : L" | ";
+    text += Aggregator.FilterManager.TranslateCondition(filter.Conditions[i]);
+  }
+  List.SetItem(index, 2, text.c_str());*/
+  
+  List.SetWindowHandle(NULL);
+  return index;
+}
+
+void RefreshTorrentFilterList(HWND hwnd_list) {
+  CListView List = hwnd_list;
+  List.DeleteAllItems();
+
+  for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
+    AddTorrentFilterToList(hwnd_list, *it);
+  }
+
+  List.SetWindowHandle(NULL);
 }

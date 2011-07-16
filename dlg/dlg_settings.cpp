@@ -244,7 +244,13 @@ void CSettingsWindow::OnOK() {
   m_Page[PAGE_TORRENT1].GetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.AppPath);
   Settings.RSS.Torrent.SetFolder = m_Page[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER);
   // Torrent > Filters
-  Settings.RSS.Torrent.Filters.GlobalEnabled = m_Page[PAGE_TORRENT2].IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTERGLOBAL);
+  Settings.RSS.Torrent.Filters.GlobalEnabled = m_Page[PAGE_TORRENT2].IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTER);
+  List.SetWindowHandle(m_Page[PAGE_TORRENT2].GetDlgItem(IDC_LIST_TORRENT_FILTER));
+  for (int i = 0; i < List.GetItemCount(); i++) {
+    CFeedFilter* filter = reinterpret_cast<CFeedFilter*>(List.GetItemParam(i));
+    if (filter) filter->Enabled = List.GetCheckState(i) == TRUE;
+  }
+  List.SetWindowHandle(NULL);
   Aggregator.FilterManager.Filters.clear();
   for (auto it = m_FeedFilters.begin(); it != m_FeedFilters.end(); ++it) {
     Aggregator.FilterManager.Filters.push_back(*it);
@@ -331,7 +337,7 @@ INT_PTR CSettingsWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
             IDC_LIST_MEDIA, uMsg, wParam, lParam);
         case PAGE_TORRENT2:
           return m_Page[PAGE_TORRENT2].SendDlgItemMessage(
-            IDC_TREE_TORRENT_FILTERGLOBAL, uMsg, wParam, lParam);
+            IDC_LIST_TORRENT_FILTER, uMsg, wParam, lParam);
       }
       break;
     }

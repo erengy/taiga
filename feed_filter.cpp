@@ -27,9 +27,9 @@
 
 bool EvaluateAction(int action, bool condition) {
   switch (action) {
-    case FEED_FILTER_ACTION_EXCLUDE:
+    case FEED_FILTER_ACTION_DISCARD:
       return !condition;
-    case FEED_FILTER_ACTION_INCLUDE:
+    case FEED_FILTER_ACTION_SELECT:
       return condition;
     case FEED_FILTER_ACTION_PREFER:
       return condition;
@@ -140,6 +140,9 @@ CFeedFilter& CFeedFilter::operator=(const CFeedFilter& filter) {
   Conditions.resize(filter.Conditions.size());
   std::copy(filter.Conditions.begin(), filter.Conditions.end(), Conditions.begin());
 
+  AnimeID.resize(filter.AnimeID.size());
+  std::copy(filter.AnimeID.begin(), filter.AnimeID.end(), AnimeID.begin());
+
   return *this;
 }
 
@@ -152,9 +155,22 @@ void CFeedFilter::AddCondition(int element, int op, const wstring& value) {
 
 bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   if (!Enabled) return true;
-  
+
   bool condition = false;
   size_t index = 0;
+
+  if (!AnimeID.empty() && item.EpisodeData.Index > 0 && item.EpisodeData.Index < AnimeList.Item.size()) {
+    for (auto it = AnimeID.begin(); it != AnimeID.end(); ++it) {
+      if (*it == AnimeList.Item.at(item.EpisodeData.Index).Series_ID) {
+        condition = true;
+        break;
+      }
+    }
+    if (!condition) {
+      // Filter doesn't apply to this item
+      return true;
+    }
+  }
   
   switch (Match) {
     case FEED_FILTER_MATCH_ALL:
@@ -206,12 +222,14 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   } else {
     if (Action == FEED_FILTER_ACTION_PREFER && recursive) {
       return true;
+    
     } else {
       #ifdef _DEBUG
       item.Description = L"!FILTER :: " + 
         Aggregator.FilterManager.TranslateConditions(*this, index) +
         L" -- " + item.Description;
       #endif
+
       // Out you go, you pathetic feed item!
       return false;
     }
@@ -219,11 +237,12 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
 }
 
 void CFeedFilter::Reset() {
-  Action = FEED_FILTER_ACTION_EXCLUDE;
   Enabled = true;
+  Action = FEED_FILTER_ACTION_DISCARD;
   Match = FEED_FILTER_MATCH_ALL;
-  Name.clear();
+  AnimeID.clear();
   Conditions.clear();
+  Name.clear();
 }
 
 // =============================================================================
@@ -237,17 +256,17 @@ CFeedFilterManager::CFeedFilterManager() {
     DefaultFilters.back().Name = name;
 
   // Discard unknown titles
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard unknown titles");
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, L"Discard unknown titles");
   DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
   // Discard completed titles
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard completed titles");
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, L"Discard completed titles");
   DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
   // Discard dropped titles
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ALL, true, L"Discard dropped titles");
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, L"Discard dropped titles");
   DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
   
   // Discard watched episodes
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_EXCLUDE, FEED_FILTER_MATCH_ANY, true, L"Discard watched episodes");
+  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, L"Discard watched episodes");
   DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_IS, L"%watched%");
   DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
   DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"True");
@@ -321,6 +340,15 @@ int CFeedFilterManager::Filter(CFeed& feed) {
 }
 
 // =============================================================================
+
+wstring CFeedFilterManager::CreateNameFromConditions(const CFeedFilter& filter) {
+  wstring name;
+
+  // TODO
+  name = L"New Filter";
+
+  return name;
+}
 
 wstring CFeedFilterManager::TranslateCondition(const CFeedFilterCondition& condition) {
   return TranslateElement(condition.Element) + L" " + 
@@ -416,5 +444,29 @@ wstring CFeedFilterManager::TranslateValue(const CFeedFilterCondition& condition
       return MAL.TranslateStatus(ToINT(condition.Value));
     default:
       return condition.Value;
+  }
+}
+
+wstring CFeedFilterManager::TranslateMatching(int match) {
+  switch (match) {
+    case FEED_FILTER_MATCH_ALL:
+      return L"Match all conditions";
+    case FEED_FILTER_MATCH_ANY:
+      return L"Match any condition";
+    default:
+      return L"?";
+  }
+}
+
+wstring CFeedFilterManager::TranslateAction(int action) {
+  switch (action) {
+    case FEED_FILTER_ACTION_DISCARD:
+      return L"Discard matched items";
+    case FEED_FILTER_ACTION_SELECT:
+      return L"Select matched items only";
+    case FEED_FILTER_ACTION_PREFER:
+      return L"Prefer matched items to similar ones";
+    default:
+      return L"?";
   }
 }

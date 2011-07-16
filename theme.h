@@ -45,6 +45,9 @@ enum IconList16 {
   Icon16_ArrowUp,
   Icon16_ArrowDown,
   Icon16_Funnel,
+  Icon16_FunnelCross,
+  Icon16_FunnelTick,
+  Icon16_FunnelPlus,
   ICONCOUNT_16PX
 };
 

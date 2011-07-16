@@ -195,6 +195,9 @@ bool CSettings::Read() {
           item.attribute(L"match").as_int(), 
           item.attribute(L"enabled").as_bool(), 
           item.attribute(L"name").value());
+        for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
+          Aggregator.FilterManager.Filters.back().AnimeID.push_back(anime.attribute(L"id").as_int());
+        }
         for (xml_node condition = item.child(L"condition"); condition; condition = condition.next_sibling(L"condition")) {
           Aggregator.FilterManager.Filters.back().AddCondition(
             condition.attribute(L"element").as_int(), 
@@ -426,6 +429,11 @@ bool CSettings::Write() {
         item.append_attribute(L"match") = it->Match;
         item.append_attribute(L"enabled") = it->Enabled;
         item.append_attribute(L"name") = it->Name.c_str();
+        for (auto ita = it->AnimeID.begin(); ita != it->AnimeID.end(); ++ita) {
+          xml_node anime = item.append_child();
+          anime.set_name(L"anime");
+          anime.append_attribute(L"id") = *ita;
+        }
         for (auto itc = it->Conditions.begin(); itc != it->Conditions.end(); ++itc) {
           xml_node condition = item.append_child();
           condition.set_name(L"condition");
