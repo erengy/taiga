@@ -306,6 +306,7 @@ bool CAnime::CheckEpisodes(int episode, bool check_folder) {
   } else {
     if (episode == 0) {
       if (NewEps) return true;
+      NextEpisodePath.clear();
       episode = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
     }
     wstring file = SearchFileFolder(Index, Folder, episode, false);

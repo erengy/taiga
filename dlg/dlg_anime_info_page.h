@@ -37,12 +37,14 @@ public:
   
   BOOL OnInitDialog();
   void Refresh(CAnime* pAnimeItem = NULL);
+  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 
 public:
   int Index;
 
 private:
   HFONT m_hfHeader;
+  CAnime* m_pAnimeItem;
 };
 
 #endif // DLG_ANIME_INFO_PAGE_H

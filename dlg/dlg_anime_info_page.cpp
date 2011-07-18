@@ -27,7 +27,8 @@
 // =============================================================================
 
 CAnimeInfoPage::CAnimeInfoPage() :
-  m_hfHeader(NULL)
+  m_hfHeader(NULL),
+  m_pAnimeItem(NULL)
 {
 }
 
@@ -55,10 +56,58 @@ BOOL CAnimeInfoPage::OnInitDialog() {
   return TRUE;
 }
 
+BOOL CAnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
+  switch (LOWORD(wParam)) {
+    // User changed rewatching checkbox
+    case IDC_CHECK_ANIME_REWATCH:
+      if (HIWORD(wParam) == BN_CLICKED) {
+        int EpisodeValue = SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_GETPOS32, NULL, NULL);
+        if(IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
+          if(m_pAnimeItem) {
+            if(m_pAnimeItem->GetStatus() == MAL_COMPLETED && EpisodeValue == m_pAnimeItem->Series_Episodes) {
+              SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, 0);
+            }
+            EnableDlgItem(IDC_COMBO_ANIME_STATUS, FALSE);
+            SendDlgItemMessage(IDC_COMBO_ANIME_STATUS, CB_SETCURSEL, MAL_COMPLETED - 1, 0);
+            return TRUE;
+          }
+        } else {
+          if(m_pAnimeItem) {
+            if (EpisodeValue == 0) {
+              SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, m_pAnimeItem->GetLastWatchedEpisode());
+            }
+            EnableDlgItem(IDC_COMBO_ANIME_STATUS, TRUE);
+            SendDlgItemMessage(IDC_COMBO_ANIME_STATUS, CB_SETCURSEL, m_pAnimeItem->GetStatus() - 1, 0);
+            return TRUE;
+          }
+        }
+      }
+      break;
+
+    // User changed status dropdown
+    case IDC_COMBO_ANIME_STATUS:
+      if (HIWORD(wParam) == CBN_SELENDOK) {
+        // Selected "Completed"
+        if(GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1 == MAL_COMPLETED) {
+          if(m_pAnimeItem && m_pAnimeItem->GetStatus() != MAL_COMPLETED && m_pAnimeItem->Series_Episodes > 0) {
+                SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, m_pAnimeItem->Series_Episodes);
+                return TRUE;
+          }
+        }
+      }
+      break;
+  }
+  
+  return FALSE;
+}
+
 // =============================================================================
 
 void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
   if (!pAnimeItem) return;
+
+  // Store pointer to current anime item
+  m_pAnimeItem = pAnimeItem;
   
   switch (Index) {
     // Series information
@@ -113,15 +162,18 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
     case TAB_MYINFO: {
       // Episodes watched
       SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0, 
-        pAnimeItem->Series_Episodes > 0 ? pAnimeItem->Series_Episodes : 999);
+        pAnimeItem->Series_Episodes > 0 ? pAnimeItem->Series_Episodes : 9999);
       SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, pAnimeItem->GetLastWatchedEpisode());
 
       // Re-watching
       CheckDlgButton(IDC_CHECK_ANIME_REWATCH, pAnimeItem->GetRewatching());
       if (pAnimeItem->GetStatus() == MAL_COMPLETED) {
         EnableDlgItem(IDC_CHECK_ANIME_REWATCH, TRUE);
+        EnableDlgItem(IDC_COMBO_ANIME_STATUS, FALSE);
+        SendDlgItemMessage(IDC_COMBO_ANIME_STATUS, CB_SETCURSEL, MAL_COMPLETED - 1, 0);
       } else {
         EnableDlgItem(IDC_CHECK_ANIME_REWATCH, FALSE);
+        EnableDlgItem(IDC_COMBO_ANIME_STATUS, TRUE);
       }
 
       // Status

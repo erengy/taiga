@@ -249,7 +249,7 @@ BOOL CSettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.animesuki.com/rss.php?link=enclosure");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.baka-updates.com/rss.php");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.eu/?page=rss&catid=1&subcat=37&filter=2");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings.RSS.Torrent.Source.c_str());
       CheckDlgButton(IDC_CHECK_TORRENT_HIDE, Settings.RSS.Torrent.HideUnidentified);
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.RSS.Torrent.CheckEnabled);

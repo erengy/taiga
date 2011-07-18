@@ -60,7 +60,7 @@ BOOL CInputDialog::OnInitDialog() {
   if (m_NumbersOnly) {
     m_Edit.SetStyle(ES_NUMBER, 0);
     m_Spin.SetBuddy(m_Edit.GetWindowHandle());
-    m_Spin.SetRange32(m_MinValue, m_MaxValue > 0 ? m_MaxValue : 999);
+    m_Spin.SetRange32(m_MinValue, m_MaxValue > 0 ? m_MaxValue : 9999);
     m_Spin.SetPos32(m_CurrentValue);
   } else {
     m_Edit.SetStyle(0, ES_NUMBER);
