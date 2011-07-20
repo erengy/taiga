@@ -34,8 +34,17 @@ CTorrentWindow TorrentWindow;
 
 // =============================================================================
 
-CTorrentWindow::CTorrentWindow() {
+CTorrentWindow::CTorrentWindow() : 
+  m_hIcon(NULL)
+{
   RegisterDlgClass(L"TaigaTorrentW");
+}
+
+CTorrentWindow::~CTorrentWindow() {
+  if (m_hIcon) {
+    DeleteObject(m_hIcon);
+    m_hIcon = NULL;
+  }
 }
 
 BOOL CTorrentWindow::OnInitDialog() {
@@ -107,6 +116,14 @@ void CTorrentWindow::ChangeStatus(wstring str, int panel_index) {
   m_Status.SetPanelText(panel_index, str.c_str());
 }
 
+void CTorrentWindow::EnableInput(bool enable) {
+  // Enable/disable toolbar buttons
+  m_Toolbar.EnableButton(0, enable);
+  m_Toolbar.EnableButton(2, enable);
+  // Enable/disable list
+  m_List.Enable(enable);
+}
+
 void CTorrentWindow::RefreshList() {
   if (!IsWindow()) return;
   CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
@@ -162,8 +179,9 @@ void CTorrentWindow::RefreshList() {
   m_List.Show();
 
   // Set icon
-  HICON hIcon = pFeed->GetIcon();
-  if (hIcon) SetIconSmall(hIcon);
+  if (m_hIcon) DeleteObject(m_hIcon);
+  m_hIcon = pFeed->GetIcon();
+  if (m_hIcon) SetIconSmall(m_hIcon);
 
   // Set title
   wstring title = L"Torrents";

@@ -51,41 +51,47 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
     case FEED_FILTER_ELEMENT_CATEGORY:
       element = item.Category;
       break;
+    case FEED_FILTER_ELEMENT_DESCRIPTION:
+      element = item.Description;
+      break;
     case FEED_FILTER_ELEMENT_LINK:
       element = item.Link;
       break;
-    case FEED_FILTER_ELEMENT_DESCRIPTION:
-      element = item.Description;
+    case FEED_FILTER_ELEMENT_ANIME_ID:
+      if (anime) element = ToWSTR(anime->Series_ID);
+      is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_TITLE:
       element = item.EpisodeData.Title;
       break;
-    case FEED_FILTER_ELEMENT_ANIME_GROUP:
-      element = item.EpisodeData.Group;
-      break;
-    case FEED_FILTER_ELEMENT_ANIME_EPISODE:
-      element = ToWSTR(GetEpisodeHigh(item.EpisodeData.Number));
-      is_numeric = true;
-      break;
-    case FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE:
-      if (anime) element = ToWSTR(anime->IsEpisodeAvailable(
-        GetEpisodeHigh(item.EpisodeData.Number)));
-      is_numeric = true;
-      break;
-    case FEED_FILTER_ELEMENT_ANIME_RESOLUTION:
-      element = item.EpisodeData.Resolution;
-      break;
-    case FEED_FILTER_ELEMENT_ANIME_ID:
-      if (anime) element = ToWSTR(anime->Series_ID);
+    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+      if (anime) element = ToWSTR(anime->GetAiringStatus());
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
       if (anime) element = ToWSTR(anime->GetStatus());
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      if (anime) element = ToWSTR(anime->GetAiringStatus());
+    case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
+      element = ToWSTR(GetEpisodeHigh(item.EpisodeData.Number));
       is_numeric = true;
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION:
+      element = item.EpisodeData.Version;
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
+      if (anime) element = ToWSTR(anime->IsEpisodeAvailable(
+        GetEpisodeHigh(item.EpisodeData.Number)));
+      is_numeric = true;
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_GROUP:
+      element = item.EpisodeData.Group;
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION:
+      element = item.EpisodeData.Resolution;
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE:
+      element = item.EpisodeData.VideoType;
       break;
   }
 
@@ -131,6 +137,22 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
 
 // =============================================================================
 
+CFeedFilterCondition& CFeedFilterCondition::operator=(const CFeedFilterCondition& condition) {
+  Element = condition.Element;
+  Operator = condition.Operator;
+  Value = condition.Value;
+
+  return *this;
+}
+
+void CFeedFilterCondition::Reset() {
+  Element = FEED_FILTER_ELEMENT_TITLE;
+  Operator = FEED_FILTER_OPERATOR_IS;
+  Value.clear();
+}
+
+// =============================================================================
+
 CFeedFilter& CFeedFilter::operator=(const CFeedFilter& filter) {
   Action = filter.Action;
   Enabled = filter.Enabled;
@@ -159,11 +181,13 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   bool condition = false;
   size_t index = 0;
 
-  if (!AnimeID.empty() && item.EpisodeData.Index > 0 && item.EpisodeData.Index < AnimeList.Item.size()) {
-    for (auto it = AnimeID.begin(); it != AnimeID.end(); ++it) {
-      if (*it == AnimeList.Item.at(item.EpisodeData.Index).Series_ID) {
-        condition = true;
-        break;
+  if (!AnimeID.empty()) {
+    if (item.EpisodeData.Index > 0 && item.EpisodeData.Index < static_cast<int>(AnimeList.Item.size())) {
+      for (auto it = AnimeID.begin(); it != AnimeID.end(); ++it) {
+        if (*it == AnimeList.Item.at(item.EpisodeData.Index).Series_ID) {
+          condition = true;
+          break;
+        }
       }
     }
     if (!condition) {
@@ -248,42 +272,92 @@ void CFeedFilter::Reset() {
 // =============================================================================
 
 CFeedFilterManager::CFeedFilterManager() {
-  #define ADD_DEFAULT_FILTER(action, match, enabled, name) \
-    DefaultFilters.resize(DefaultFilters.size() + 1); \
-    DefaultFilters.back().Action = action; \
-    DefaultFilters.back().Enabled = enabled; \
-    DefaultFilters.back().Match = match; \
-    DefaultFilters.back().Name = name;
+  #define ADD_PRESET(action, match, def, name, desc) \
+    Presets.resize(Presets.size() + 1); \
+    Presets.back().Default = def; \
+    Presets.back().Description = desc; \
+    Presets.back().Filter.Action = action; \
+    Presets.back().Filter.Enabled = true; \
+    Presets.back().Filter.Match = match; \
+    Presets.back().Filter.Name = name;
+  #define ADD_CONDITION(e, o, v) \
+    Presets.back().Filter.AddCondition(e, o, v);
+
+  /* Preset filters */
+
+  // Custom
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, false, 
+    L"(Custom)", 
+    L"Lets you create a custom filter from scratch");
+
+  // Fansub group
+  ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ANY, false, 
+    L"[Fansub] Anime", 
+    L"Lets you choose a fansub group for one or more anime");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_GROUP, FEED_FILTER_OPERATOR_IS, L"TaigaSubs (change this)");
+
+  // Discard video keywords
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, false, 
+    L"Discard bad video keywords", 
+    L"Discards everything that is AVI, DIVX, LQ, RMVB, SD, WMV or XVID");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"AVI");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"DIVX");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"LQ");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"RMVB");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"SD");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"WMV");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"XVID");
+
+  // Prefer new versions
+  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, false, 
+    L"Prefer new versions", 
+    L"Prefers v2 files when there are earlier releases of the same episode as well");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION, FEED_FILTER_OPERATOR_IS, L"v2");
+
+  /* Default filters */
 
   // Discard unknown titles
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, L"Discard unknown titles");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
-  // Discard completed titles
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, L"Discard completed titles");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
-  // Discard dropped titles
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, L"Discard dropped titles");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
+    L"Discard unknown titles", 
+    L"Discards files that do not belong to any anime in your list");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, L"");
   
-  // Discard watched episodes
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, L"Discard watched episodes");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_IS, L"%watched%");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODE, FEED_FILTER_OPERATOR_ISLESSTHAN, L"%watched%");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE, FEED_FILTER_OPERATOR_IS, L"True");
+  // Discard completed titles
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
+    L"Discard completed titles", 
+    L"Discards files that belong to anime you've already finished");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
+  
+  // Discard dropped titles
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
+    L"Discard dropped titles", 
+    L"Discards files that belong to anime you've dropped");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
+  
+  // Select new episodes only
+  ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ALL, true, 
+    L"Select new episodes only", 
+    L"Discards episodes you've already watched or downloaded");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER, FEED_FILTER_OPERATOR_ISGREATERTHAN, L"%watched%");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE, FEED_FILTER_OPERATOR_IS, L"False");
   
   // Prefer high resolution files
-  ADD_DEFAULT_FILTER(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, L"Prefer high resolution files");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"720p");
-  DefaultFilters.back().AddCondition(FEED_FILTER_ELEMENT_ANIME_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"1280x720");
+  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, 
+    L"Prefer high-resolution files", 
+    L"Prefers 720p files when there are other files of the same episode as well");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"720p");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION, FEED_FILTER_OPERATOR_CONTAINS, L"1280x720");
 
-  #undef ADD_DEFAULT_FILTER
+  #undef ADD_CONDITION
+  #undef ADD_PRESET
 }
 
-void CFeedFilterManager::AddDefaultFilters() {
-  for (auto it = DefaultFilters.begin(); it != DefaultFilters.end(); ++it) {
-    AddFilter(it->Action, it->Match, it->Enabled, it->Name);
-    for (auto c = it->Conditions.begin(); c != it->Conditions.end(); ++c) {
-      it->AddCondition(c->Element, c->Operator, c->Value);
+void CFeedFilterManager::AddPresets() {
+  for (auto it = Presets.begin(); it != Presets.end(); ++it) {
+    if (!it->Default) continue;
+    AddFilter(it->Filter.Action, it->Filter.Match, it->Filter.Enabled, it->Filter.Name);
+    for (auto c = it->Filter.Conditions.begin(); c != it->Filter.Conditions.end(); ++c) {
+      Filters.back().AddCondition(c->Element, c->Operator, c->Value);
     }
   }
 }
@@ -294,6 +368,23 @@ void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const ws
   Filters.back().Enabled = enabled;
   Filters.back().Match = match;
   Filters.back().Name = name;
+}
+
+void CFeedFilterManager::Cleanup() {
+  for (auto i = Filters.begin(); i != Filters.end(); ++i) {
+    for (auto j = i->AnimeID.begin(); j != i->AnimeID.end(); ++j) {
+      CAnime* anime = AnimeList.FindItem(*j);
+      if (!anime) {
+        if (i->AnimeID.size() > 1) {
+          j = i->AnimeID.erase(j) - 1;
+          continue;
+        } else {
+          i = Filters.erase(i) - 1;
+          break;
+        }
+      }
+    }
+  }
 }
 
 int CFeedFilterManager::Filter(CFeed& feed) {
@@ -373,29 +464,33 @@ wstring CFeedFilterManager::TranslateConditions(const CFeedFilter& filter, size_
 wstring CFeedFilterManager::TranslateElement(int element) {
   switch (element) {
     case FEED_FILTER_ELEMENT_TITLE:
-      return L"Title";
+      return L"File name";
     case FEED_FILTER_ELEMENT_CATEGORY:
-      return L"Category";
-    case FEED_FILTER_ELEMENT_LINK:
-      return L"Link";
+      return L"File category";
     case FEED_FILTER_ELEMENT_DESCRIPTION:
-      return L"Description";
-    case FEED_FILTER_ELEMENT_ANIME_TITLE:
-      return L"Anime title";
-    case FEED_FILTER_ELEMENT_ANIME_GROUP:
-      return L"Anime group";
-    case FEED_FILTER_ELEMENT_ANIME_EPISODE:
-      return L"Anime episode";
-    case FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE:
-      return L"Anime episode availability";
-    case FEED_FILTER_ELEMENT_ANIME_RESOLUTION:
-      return L"Anime resolution";
+      return L"File description";
+    case FEED_FILTER_ELEMENT_LINK:
+      return L"File link";
     case FEED_FILTER_ELEMENT_ANIME_ID:
       return L"Anime ID";
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      return L"Anime watching status";
+    case FEED_FILTER_ELEMENT_ANIME_TITLE:
+      return L"Anime title";
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
       return L"Anime airing status";
+    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+      return L"Anime watching status";
+    case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
+      return L"Episode number";
+    case FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION:
+      return L"Episode version";
+    case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
+      return L"Episode availability";
+    case FEED_FILTER_ELEMENT_ANIME_GROUP:
+      return L"Fansub group";
+    case FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION:
+      return L"Video resolution";
+    case FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE:
+      return L"Video type";
     default:
       return L"?";
   }

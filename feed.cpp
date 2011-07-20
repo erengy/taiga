@@ -42,9 +42,8 @@ bool CFeed::Check(const wstring& source) {
   
   switch (Category) {
     case FEED_CATEGORY_LINK:
-      // Disable toolbar buttons on torrent dialog
-      TorrentWindow.m_Toolbar.EnableButton(0, false);
-      TorrentWindow.m_Toolbar.EnableButton(2, false);
+      // Disable torrent dialog input
+      TorrentWindow.EnableInput(false);
       break;
   }
   
@@ -73,8 +72,7 @@ bool CFeed::Download(int index) {
   DownloadIndex = index;
 
   TorrentWindow.ChangeStatus(L"Downloading \"" + Item[index].Title + L"\"...");
-  TorrentWindow.m_Toolbar.EnableButton(0, false);
-  TorrentWindow.m_Toolbar.EnableButton(2, false);
+  TorrentWindow.EnableInput(false);
   
   wstring file = Item[index].Title + L".torrent";
   ValidateFileName(file);

@@ -30,54 +30,66 @@ class CFeedFilterWindow : public CDialog {
 public:
   CFeedFilterWindow();
   virtual ~CFeedFilterWindow();
-  
+
   BOOL DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
+  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
-  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-  void OnOK();
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+
+  void ChoosePage(int index);
   
 public:
-  CFeedFilter m_Filter;
-  HFONT m_hfHeader;
+  int current_page_;
+  CFeedFilter filter_;
+  HFONT header_font_, main_instructions_font_;
+  HICON icon_;
+  CWindow main_instructions_label_;
 
 private:
-  CTab m_Tab;
-
-private:
-  // Page: Basic
-  class CDialogPageBasic : public CDialog {
+  // Page
+  class CDialogPage : public CDialog {
   public:
-    BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+    void Create(UINT uResourceID, CFeedFilterWindow* parent, const RECT& rect);
+  public:
+    CFeedFilterWindow* parent_;
+  };
+  
+  // Page #0
+  class CDialogPage0 : public CDialogPage {
+  public:
     BOOL OnInitDialog();
-  public:
+    LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     bool BuildFilter(CFeedFilter& filter);
-    void BuildOptions(int mode);
-    void BuildOptions2(int mode);
   public:
-    CComboBox m_ComboOption1, m_ComboOption2;
-  public:
-    CFeedFilterWindow* m_Parent;
-  } m_PageBasic;
-  // Page: Advanced
-  class CDialogPageAdvanced : public CDialog {
+    CListView preset_list_;
+  } m_Page0;
+
+  // Page #1
+  class CDialogPage1 : public CDialogPage {
   public:
     BOOL OnCommand(WPARAM wParam, LPARAM lParam);
     BOOL OnInitDialog();
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-  public:
     bool BuildFilter(CFeedFilter& filter);
-  private:
     void AddConditionToList(const CFeedFilterCondition& condition, int index = -1);
-    void RefreshConditionsList();
+    void RefreshConditionList();
   public:
-    CComboBox m_ComboAction, m_ComboMatch;
-    CEdit m_Edit;
-    CListView m_ListCondition, m_ListAnime;
-    CToolbar m_Toolbar;
+    CComboBox action_combo_, match_combo_;
+    CEdit name_text_;
+    CListView condition_list_;
+    CToolbar condition_toolbar_;
+  } m_Page1;
+
+  // Page #2
+  class CDialogPage2 : public CDialogPage {
   public:
-    CFeedFilterWindow* m_Parent;
-  } m_PageAdvanced;
+    BOOL OnInitDialog();
+    LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+    bool BuildFilter(CFeedFilter& filter);
+  public:
+    CListView anime_list_;
+  } m_Page2;
 };
 
 extern CFeedFilterWindow FeedFilterWindow;

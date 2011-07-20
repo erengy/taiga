@@ -271,8 +271,7 @@ BOOL CSettingsPage::OnInitDialog() {
       List.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
-      List.InsertColumn(0, 0, 0, 0, L"Name");
-      List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
+      List.InsertColumn(0, 400, 400, 0, L"Name");
       List.InsertGroup(0, L"General filters", true, false);
       List.InsertGroup(1, L"Limited filters", true, false);
       SettingsWindow.m_FeedFilters.resize(Aggregator.FilterManager.Filters.size());
@@ -394,13 +393,14 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         // Add global filter
         case IDC_BUTTON_TORRENT_FILTER_ADD: {
-          FeedFilterWindow.m_Filter.Reset();
-          FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
-          if (!FeedFilterWindow.m_Filter.Conditions.empty()) {
-            if (FeedFilterWindow.m_Filter.Name.empty()) {
-              FeedFilterWindow.m_Filter.Name = Aggregator.FilterManager.CreateNameFromConditions(FeedFilterWindow.m_Filter);
+          FeedFilterWindow.filter_.Reset();
+          ExecuteAction(L"TorrentAddFilter", TRUE, 
+            reinterpret_cast<LPARAM>(SettingsWindow.GetWindowHandle()));
+          if (!FeedFilterWindow.filter_.Conditions.empty()) {
+            if (FeedFilterWindow.filter_.Name.empty()) {
+              FeedFilterWindow.filter_.Name = Aggregator.FilterManager.CreateNameFromConditions(FeedFilterWindow.filter_);
             }
-            SettingsWindow.m_FeedFilters.push_back(FeedFilterWindow.m_Filter);
+            SettingsWindow.m_FeedFilters.push_back(FeedFilterWindow.filter_);
             CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             RefreshTorrentFilterList(List.GetWindowHandle());
             List.SetSelectedItem(List.GetItemCount() - 1);
@@ -555,10 +555,10 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
             CListView List = lpnmitem->hdr.hwndFrom;
             CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(List.GetItemParam(lpnmitem->iItem));
             if (pFeedFilter) {
-              FeedFilterWindow.m_Filter = *pFeedFilter;
+              FeedFilterWindow.filter_ = *pFeedFilter;
               FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
-              if (!FeedFilterWindow.m_Filter.Conditions.empty()) {
-                *pFeedFilter = FeedFilterWindow.m_Filter;
+              if (!FeedFilterWindow.filter_.Conditions.empty()) {
+                *pFeedFilter = FeedFilterWindow.filter_;
                 RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
                 List.SetSelectedItem(lpnmitem->iItem);
               }
@@ -660,29 +660,6 @@ int AddTorrentFilterToList(HWND hwnd_list, const CFeedFilter& filter) {
   index = List.InsertItem(index, group, icon, 0, NULL, filter.Name.c_str(), 
     reinterpret_cast<LPARAM>(&filter));
   List.SetCheckState(index, filter.Enabled);
-
-  // Insert anime limits
-  /*if (!filter.AnimeID.empty()) {
-    text.clear();
-    for (auto it = filter.AnimeID.begin(); it != filter.AnimeID.end(); ++it) {
-      if (!text.empty()) text += L", ";
-      CAnime* anime = AnimeList.FindItem(*it);
-      if (anime) {
-        text += anime->Series_Title;
-      } else {
-        text += L"(?)";
-      }
-    }
-    List.SetItem(index, 1, text.c_str());
-  }
-
-  // Insert conditions
-  text.clear();
-  for (size_t i = 0; i < filter.Conditions.size(); i++) {
-    if (i > 0) text += filter.Match == FEED_FILTER_MATCH_ALL ? L" & " : L" | ";
-    text += Aggregator.FilterManager.TranslateCondition(filter.Conditions[i]);
-  }
-  List.SetItem(index, 2, text.c_str());*/
   
   List.SetWindowHandle(NULL);
   return index;

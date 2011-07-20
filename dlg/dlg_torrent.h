@@ -30,21 +30,24 @@
 class CTorrentWindow : public CDialog {
 public:
   CTorrentWindow();
-  ~CTorrentWindow() {};
-
-  // Controls
-  CListView  m_List;
-  CRebar m_Rebar;
-  CStatusBar m_Status;
-  CToolbar m_Toolbar;
-  
-  void ChangeStatus(wstring str, int panel_index = 0);
-  void RefreshList();
+  ~CTorrentWindow();
 
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
+
+  void ChangeStatus(wstring str, int panel_index = 0);
+  void EnableInput(bool enable = true);
+  void RefreshList();
+
+public:
+  CListView  m_List;
+  CRebar m_Rebar;
+  CStatusBar m_Status;
+  CToolbar m_Toolbar;
+  
+  HICON m_hIcon;
 };
 
 extern CTorrentWindow TorrentWindow;

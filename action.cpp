@@ -33,6 +33,7 @@
 #include "dlg/dlg_feed_filter.h"
 #include "dlg/dlg_update.h"
 #include "event.h"
+#include "feed.h"
 #include "http.h"
 #include "monitor.h"
 #include "myanimelist.h"
@@ -297,12 +298,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   wParam is a BOOL value that represents modal status.
   //   lParam is the handle of the parent window.
   } else if (action == L"TorrentAddFilter") {
-    /*if (!TorrentFilterWindow.IsWindow()) {
-      TorrentFilterWindow.Create(IDD_ADDFILTER, 
+    if (!FeedFilterWindow.IsWindow()) {
+      FeedFilterWindow.Create(IDD_FEED_FILTER, 
         reinterpret_cast<HWND>(lParam), wParam != FALSE);
     } else {
-      ActivateWindow(TorrentFilterWindow.GetWindowHandle());
-    }*/
+      ActivateWindow(FeedFilterWindow.GetWindowHandle());
+    }
 
   // ===========================================================================
   

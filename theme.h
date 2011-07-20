@@ -48,6 +48,7 @@ enum IconList16 {
   Icon16_FunnelCross,
   Icon16_FunnelTick,
   Icon16_FunnelPlus,
+  Icon16_FunnelPencil,
   ICONCOUNT_16PX
 };
 

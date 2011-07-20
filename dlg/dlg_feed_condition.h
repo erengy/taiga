@@ -31,19 +31,21 @@ public:
   CFeedConditionWindow();
   virtual ~CFeedConditionWindow();
 
-  CComboBox m_Element;
-  CComboBox m_Operator;
-  CComboBox m_Value;
-
-  CFeedFilterCondition m_Condition;
-
-  void ChooseElement(int element);
-  
   BOOL DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnOK();
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+
+  void ChooseElement(int index);
+
+public:
+  CComboBox element_combo_;
+  CComboBox operator_combo_;
+  CComboBox value_combo_;
+
+  CFeedFilterCondition condition_;
 };
 
 extern CFeedConditionWindow FeedConditionWindow;

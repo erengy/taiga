@@ -101,6 +101,25 @@ BOOL CAnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
+LRESULT CAnimeInfoPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  switch (pnmh->idFrom) {
+    case IDC_LINK_ANIME_FANSUB:
+      switch (pnmh->code) {
+        case NM_CLICK: {
+          if (m_pAnimeItem) {
+            // Set/change fansub group preference
+            if (m_pAnimeItem->SetFansubFilter()) {
+              RefreshFansubPreference();
+            }
+          }
+          return TRUE;
+        }
+      }
+  }
+
+  return 0;
+}
+
 // =============================================================================
 
 void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
@@ -251,8 +270,20 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       m_Edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
       m_Edit.SetText(pAnimeItem->Synonyms);
       m_Edit.SetWindowHandle(NULL);
+
+      // Fansub group
+      RefreshFansubPreference();
       
       break;
     }
   }
+}
+
+void CAnimeInfoPage::RefreshFansubPreference() {
+  if (!m_pAnimeItem || Index != TAB_MYINFO) return;
+
+  wstring text = m_pAnimeItem->GetFansubFilter();
+  text = text.empty() ? L"None" : L"\"" + text + L"\"";
+  text = L"Fansub group preference: " + text + L" <a href=\"#\">(Change)</a>";
+  SetDlgItemText(IDC_LINK_ANIME_FANSUB, text.c_str());
 }

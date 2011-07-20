@@ -33,6 +33,11 @@ void CComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
 // =============================================================================
 
+int CComboBox::AddItem(LPCWSTR lpsz, LPARAM data) {
+  int index = ComboBox_AddString(m_hWindow, lpsz);
+  return ComboBox_SetItemData(m_hWindow, index, data);
+}
+
 int CComboBox::AddString(LPCWSTR lpsz) {
   return ComboBox_AddString(m_hWindow, lpsz);
 }

@@ -113,16 +113,18 @@ private:
 enum FeedFilterElement {
   FEED_FILTER_ELEMENT_TITLE,
   FEED_FILTER_ELEMENT_CATEGORY,
-  FEED_FILTER_ELEMENT_LINK,
   FEED_FILTER_ELEMENT_DESCRIPTION,
+  FEED_FILTER_ELEMENT_LINK,
   FEED_FILTER_ELEMENT_ANIME_ID,
   FEED_FILTER_ELEMENT_ANIME_TITLE,
-  FEED_FILTER_ELEMENT_ANIME_GROUP,
-  FEED_FILTER_ELEMENT_ANIME_EPISODE,
-  FEED_FILTER_ELEMENT_ANIME_EPISODEAVAILABLE,
-  FEED_FILTER_ELEMENT_ANIME_RESOLUTION,
-  FEED_FILTER_ELEMENT_ANIME_MYSTATUS,
   FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS,
+  FEED_FILTER_ELEMENT_ANIME_MYSTATUS,
+  FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER,
+  FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION,
+  FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE,
+  FEED_FILTER_ELEMENT_ANIME_GROUP,
+  FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION,
+  FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE,
   FEED_FILTER_ELEMENT_COUNT
 };
 
@@ -147,6 +149,9 @@ class CFeedFilterCondition {
 public:
   CFeedFilterCondition() : Element(0), Operator(0) {}
   virtual ~CFeedFilterCondition() {}
+  CFeedFilterCondition& operator=(const CFeedFilterCondition& condition);
+
+  void Reset();
 
   int Element;
   int Operator;
@@ -176,13 +181,22 @@ public:
   vector<CFeedFilterCondition> Conditions;
 };
 
+class CFeedFilterPreset {
+public:
+  CFeedFilterPreset() : Default(false) {}
+  bool Default;
+  wstring Description;
+  CFeedFilter Filter;
+};
+
 class CFeedFilterManager {
 public:
   CFeedFilterManager();
 
-  void AddDefaultFilters();
+  void AddPresets();
   void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
     bool enabled = true, const wstring& name = L"");
+  void Cleanup();
   int Filter(CFeed& feed);
 
   wstring CreateNameFromConditions(const CFeedFilter& filter);
@@ -195,7 +209,7 @@ public:
   wstring TranslateAction(int action);
   
   vector<CFeedFilter> Filters;
-  vector<CFeedFilter> DefaultFilters;
+  vector<CFeedFilterPreset> Presets;
 };
 
 // =============================================================================

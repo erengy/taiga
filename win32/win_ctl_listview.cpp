@@ -254,7 +254,7 @@ BOOL CListView::SetItem(int nIndex, int nSubItem, LPCWSTR szText) {
   lvi.iItem    = nIndex;
   lvi.iSubItem = nSubItem;
   lvi.mask     = LVIF_TEXT;
-  lvi.pszText  = (LPWSTR)szText;
+  lvi.pszText  = const_cast<LPWSTR>(szText);
 
   return ListView_SetItem(m_hWindow, &lvi);
 }
@@ -274,6 +274,28 @@ void CListView::SetSelectedItem(int iIndex) {
 
 BOOL CListView::SetTileViewInfo(PLVTILEVIEWINFO plvtvinfo) {
   return ListView_SetTileViewInfo(m_hWindow, plvtvinfo);
+}
+
+BOOL CListView::SetTileViewInfo(int cLines, DWORD dwFlags, RECT* rcLabelMargin, SIZE* sizeTile) {
+  LVTILEVIEWINFO tvi = {0};
+  tvi.cbSize = sizeof(LVTILEVIEWINFO);
+  
+  tvi.dwFlags = dwFlags;
+
+  if (cLines) {
+    tvi.dwMask |= LVTVIM_COLUMNS;
+    tvi.cLines = cLines;
+  }
+  if (sizeTile) {
+    tvi.dwMask |= LVTVIM_TILESIZE;
+    tvi.sizeTile = *sizeTile;
+  }
+  if (rcLabelMargin) {
+    tvi.dwMask |= LVTVIM_LABELMARGIN;
+    tvi.rcLabelMargin = *rcLabelMargin;
+  }
+
+  return ListView_SetTileViewInfo(m_hWindow, &tvi);
 }
 
 int CListView::SetView(DWORD iView) {

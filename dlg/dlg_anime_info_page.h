@@ -34,10 +34,13 @@ class CAnimeInfoPage : public CDialog {
 public:
   CAnimeInfoPage();
   virtual ~CAnimeInfoPage();
-  
-  BOOL OnInitDialog();
-  void Refresh(CAnime* pAnimeItem = NULL);
+
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+  BOOL OnInitDialog();
+  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+
+  void Refresh(CAnime* pAnimeItem = NULL);
+  void RefreshFansubPreference();
 
 public:
   int Index;

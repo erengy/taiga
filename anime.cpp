@@ -20,9 +20,11 @@
 #include "animelist.h"
 #include "common.h"
 #include "dlg/dlg_anime_info.h"
+#include "dlg/dlg_feed_filter.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_search.h"
 #include "event.h"
+#include "feed.h"
 #include "http.h"
 #include "media.h"
 #include "myanimelist.h"
@@ -584,5 +586,63 @@ void CAnime::Edit(const wstring& data, CEventItem item) {
   int list_index = MainWindow.GetListIndex(Index);
   if (list_index > -1) {
     MainWindow.m_List.RedrawItems(list_index, list_index, true);
+  }
+}
+
+// =============================================================================
+
+wstring CAnime::GetFansubFilter() {
+  for (auto i = Aggregator.FilterManager.Filters.begin(); 
+       i != Aggregator.FilterManager.Filters.end(); ++i) {
+    for (auto j = i->AnimeID.begin(); j != i->AnimeID.end(); ++j) {
+      if (*j != Series_ID) continue;
+      for (auto k = i->Conditions.begin(); k != i->Conditions.end(); ++k) {
+        if (k->Element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
+        return k->Value;
+      }
+    }
+  }
+
+  return L"";
+}
+
+bool CAnime::SetFansubFilter(const wstring& group_name) {
+  CFeedFilter* filter = nullptr;
+
+  for (auto i = Aggregator.FilterManager.Filters.begin(); 
+       i != Aggregator.FilterManager.Filters.end(); ++i) {
+    if (filter) break;
+    for (auto j = i->AnimeID.begin(); j != i->AnimeID.end(); ++j) {
+      if (*j != Series_ID) continue;
+      for (auto k = i->Conditions.begin(); k != i->Conditions.end(); ++k) {
+        if (k->Element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
+        filter = &(*i); break;
+      }
+    }
+  }
+  
+  if (filter) {
+    FeedFilterWindow.filter_ = *filter;
+  } else {
+    FeedFilterWindow.filter_.Reset();
+    FeedFilterWindow.filter_.Name = L"[Fansub] " + Series_Title;
+    FeedFilterWindow.filter_.Match = FEED_FILTER_MATCH_ANY;
+    FeedFilterWindow.filter_.Action = FEED_FILTER_ACTION_SELECT;
+    FeedFilterWindow.filter_.AnimeID.push_back(Series_ID);
+    FeedFilterWindow.filter_.AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, 
+      FEED_FILTER_OPERATOR_IS, group_name);
+  }
+
+  ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(g_hMain));
+  
+  if (!FeedFilterWindow.filter_.Conditions.empty()) {
+    if (filter) {
+      *filter = FeedFilterWindow.filter_;
+    } else {
+      Aggregator.FilterManager.Filters.push_back(FeedFilterWindow.filter_);
+    }
+    return true;
+  } else {
+    return false;
   }
 }

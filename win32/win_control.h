@@ -36,6 +36,7 @@ public:
   CComboBox(HWND hWnd) { SetWindowHandle(hWnd); }
   virtual ~CComboBox() {}
 
+  int     AddItem(LPCWSTR lpsz, LPARAM data);
   int     AddString(LPCWSTR lpsz);
   int     DeleteString(int index);
   int     GetCount();
@@ -156,6 +157,7 @@ public:
   BOOL       SetItemIcon(int nIndex, int nIcon);
   void       SetSelectedItem(int iIndex);
   BOOL       SetTileViewInfo(PLVTILEVIEWINFO plvtvinfo);
+  BOOL       SetTileViewInfo(int cLines, DWORD dwFlags, RECT* rcLabelMargin = NULL, SIZE* sizeTile = NULL);
   int        SetView(DWORD iView);
   void       Sort(int iColumn, int iOrder, int iType, PFNLVCOMPARE pfnCompare);
 

@@ -74,8 +74,7 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
       TorrentWindow.ChangeStatus(error_text);
-      TorrentWindow.m_Toolbar.EnableButton(0, true);
-      TorrentWindow.m_Toolbar.EnableButton(2, true);
+      TorrentWindow.EnableInput();
       break;
     case HTTP_UpdateCheck:
       MessageBox(UpdateDialog.GetWindowHandle(), error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
@@ -421,8 +420,7 @@ BOOL CHTTPClient::OnReadComplete() {
         if (TorrentWindow.IsWindow()) {
           TorrentWindow.ChangeStatus(status);
           TorrentWindow.RefreshList();
-          TorrentWindow.m_Toolbar.EnableButton(0, true);
-          TorrentWindow.m_Toolbar.EnableButton(2, true);
+          TorrentWindow.EnableInput();
           // TODO: GetIcon() fails if we don't return TRUE here
         } else {
           switch (Settings.RSS.Torrent.NewAction) {
@@ -475,8 +473,7 @@ BOOL CHTTPClient::OnReadComplete() {
         }
       }
       TorrentWindow.ChangeStatus(L"Successfully downloaded all torrents.");
-      TorrentWindow.m_Toolbar.EnableButton(0, true);
-      TorrentWindow.m_Toolbar.EnableButton(2, true);
+      TorrentWindow.EnableInput();
       break;
     }
     case HTTP_Feed_DownloadIcon: {

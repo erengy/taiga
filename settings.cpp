@@ -186,10 +186,9 @@ bool CSettings::Read() {
       RSS.Torrent.Source = torrent.child(L"source").attribute(L"address").value(DEFAULT_TORRENT_SOURCE);
       // Filters
       xml_node filter = torrent.child(L"filter");
-      xml_node global = filter.child(L"global");
-      RSS.Torrent.Filters.GlobalEnabled = global.attribute(L"enabled").as_int(TRUE);
+      RSS.Torrent.Filters.GlobalEnabled = filter.attribute(L"enabled").as_int(TRUE);
       Aggregator.FilterManager.Filters.clear();
-      for (xml_node item = global.child(L"item"); item; item = item.next_sibling(L"item")) {
+      for (xml_node item = filter.child(L"item"); item; item = item.next_sibling(L"item")) {
         Aggregator.FilterManager.AddFilter(
           item.attribute(L"action").as_int(), 
           item.attribute(L"match").as_int(), 
@@ -206,7 +205,7 @@ bool CSettings::Read() {
         }
       }
       if (Aggregator.FilterManager.Filters.empty()) {
-        Aggregator.FilterManager.AddDefaultFilters();
+        Aggregator.FilterManager.AddPresets();
       }
       // Torrent source
       CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
@@ -418,12 +417,11 @@ bool CSettings::Write() {
       torrent.child(L"options").append_attribute(L"hideunidentified") = RSS.Torrent.HideUnidentified;
       torrent.child(L"options").append_attribute(L"newaction") = RSS.Torrent.NewAction;
       // Filter
-      torrent.append_child().set_name(L"filter");
-      xml_node global = torrent.child(L"filter").append_child();
-      global.set_name(L"global");
-      global.append_attribute(L"enabled") = RSS.Torrent.Filters.GlobalEnabled;
+      xml_node torrent_filter = torrent.append_child();
+      torrent_filter.set_name(L"filter");
+      torrent_filter.append_attribute(L"enabled") = RSS.Torrent.Filters.GlobalEnabled;
       for (auto it = Aggregator.FilterManager.Filters.begin(); it != Aggregator.FilterManager.Filters.end(); ++it) {
-        xml_node item = global.append_child();
+        xml_node item = torrent_filter.append_child();
         item.set_name(L"item");
         item.append_attribute(L"action") = it->Action;
         item.append_attribute(L"match") = it->Match;
