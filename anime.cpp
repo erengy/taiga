@@ -591,19 +591,22 @@ void CAnime::Edit(const wstring& data, CEventItem item) {
 
 // =============================================================================
 
-wstring CAnime::GetFansubFilter() {
+bool CAnime::GetFansubFilter(vector<wstring>& groups) {
+  bool found = false;
   for (auto i = Aggregator.FilterManager.Filters.begin(); 
        i != Aggregator.FilterManager.Filters.end(); ++i) {
+    if (found) break;
     for (auto j = i->AnimeID.begin(); j != i->AnimeID.end(); ++j) {
       if (*j != Series_ID) continue;
+      if (found) break;
       for (auto k = i->Conditions.begin(); k != i->Conditions.end(); ++k) {
         if (k->Element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
-        return k->Value;
+        groups.push_back(k->Value);
+        found = true;
       }
     }
   }
-
-  return L"";
+  return found;
 }
 
 bool CAnime::SetFansubFilter(const wstring& group_name) {

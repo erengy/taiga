@@ -282,8 +282,18 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
 void CAnimeInfoPage::RefreshFansubPreference() {
   if (!m_pAnimeItem || Index != TAB_MYINFO) return;
 
-  wstring text = m_pAnimeItem->GetFansubFilter();
-  text = text.empty() ? L"None" : L"\"" + text + L"\"";
+  wstring text;
+  vector<wstring> groups;
+  
+  if (m_pAnimeItem->GetFansubFilter(groups)) {
+    for (auto it = groups.begin(); it != groups.end(); ++it) {
+      if (!text.empty()) text += L" or ";
+      text += L"\"" + *it + L"\"";
+    }
+  } else {
+    text = L"None";
+  }
+
   text = L"Fansub group preference: " + text + L" <a href=\"#\">(Change)</a>";
   SetDlgItemText(IDC_LINK_ANIME_FANSUB, text.c_str());
 }

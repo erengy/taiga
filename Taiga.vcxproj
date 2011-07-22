@@ -125,6 +125,7 @@
     <ClCompile Include="script.cpp" />
     <ClCompile Include="search.cpp" />
     <ClCompile Include="settings.cpp" />
+    <ClCompile Include="stats.cpp" />
     <ClCompile Include="string.cpp" />
     <ClCompile Include="taiga.cpp" />
     <ClCompile Include="theme.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="feed.h" />
     <ClInclude Include="settings.h" />
+    <ClInclude Include="stats.h" />
     <ClInclude Include="std.h" />
     <ClInclude Include="string.h" />
     <ClInclude Include="taiga.h" />

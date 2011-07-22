@@ -83,7 +83,7 @@ public:
   int GetAiringStatus();
   void SetStartDate(wstring date, bool ignore_previous);
   void SetFinishDate(wstring date, bool ignore_previous);
-  wstring GetFansubFilter();
+  bool GetFansubFilter(vector<wstring>& groups);
   bool SetFansubFilter(const wstring& group_name = L"TaigaSubs (change this)");
   
   int Index;

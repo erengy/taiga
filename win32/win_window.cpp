@@ -227,6 +227,7 @@ HWND CWindow::Detach() {
 }
 
 HICON CWindow::SetIconLarge(HICON hIcon) {
+  if (m_hIconLarge) ::DestroyIcon(m_hIconLarge);
   m_hIconLarge = hIcon;
   if (!m_hIconLarge) return NULL;
   return (HICON)::SendMessage(m_hWindow, WM_SETICON, (WPARAM)ICON_BIG, (LPARAM)m_hIconLarge);
@@ -238,6 +239,7 @@ HICON CWindow::SetIconLarge(int nIcon) {
 }
 
 HICON CWindow::SetIconSmall(HICON hIcon) {
+  if (m_hIconSmall) ::DestroyIcon(m_hIconSmall);
   m_hIconSmall = hIcon;
   if (!m_hIconSmall) return NULL;
   return (HICON)::SendMessage(m_hWindow, WM_SETICON, (WPARAM)ICON_SMALL, (LPARAM)m_hIconSmall);

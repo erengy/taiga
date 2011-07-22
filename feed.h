@@ -88,10 +88,8 @@ public:
 
 class CFeed : public CGenericFeed {
 public:
-  CFeed() : Category(0), DownloadIndex(-1), Ticker(0), m_hIcon(NULL) {}
-  virtual ~CFeed() {
-    if (m_hIcon) DeleteObject(m_hIcon);
-  }
+  CFeed();
+  virtual ~CFeed();
 
   bool Check(const wstring& source);
   bool Download(int index);

@@ -34,23 +34,15 @@ CTorrentWindow TorrentWindow;
 
 // =============================================================================
 
-CTorrentWindow::CTorrentWindow() : 
-  m_hIcon(NULL)
-{
+CTorrentWindow::CTorrentWindow() {
   RegisterDlgClass(L"TaigaTorrentW");
 }
 
 CTorrentWindow::~CTorrentWindow() {
-  if (m_hIcon) {
-    DeleteObject(m_hIcon);
-    m_hIcon = NULL;
-  }
 }
 
 BOOL CTorrentWindow::OnInitDialog() {
   // Set properties
-  SetIconLarge(IDI_MAIN);
-  SetIconSmall(IDI_MAIN);
   SetSizeMin(470, 260);
 
   // Create list
@@ -179,9 +171,9 @@ void CTorrentWindow::RefreshList() {
   m_List.Show();
 
   // Set icon
-  if (m_hIcon) DeleteObject(m_hIcon);
-  m_hIcon = pFeed->GetIcon();
-  if (m_hIcon) SetIconSmall(m_hIcon);
+  HICON hIcon = pFeed->GetIcon();
+  if (hIcon) hIcon = CopyIcon(hIcon);
+  SetIconSmall(hIcon);
 
   // Set title
   wstring title = L"Torrents";

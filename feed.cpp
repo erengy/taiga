@@ -34,6 +34,18 @@ CAggregator Aggregator;
 
 // =============================================================================
 
+CFeed::CFeed() : 
+  Category(0), DownloadIndex(-1), Ticker(0), m_hIcon(NULL)
+{
+}
+
+CFeed::~CFeed() {
+  if (m_hIcon) {
+    DestroyIcon(m_hIcon);
+    m_hIcon = NULL;
+  }
+}
+
 bool CFeed::Check(const wstring& source) {
   // Reset ticker before checking the source so we don't fall into a loop
   Ticker = 0;
@@ -109,8 +121,11 @@ wstring CFeed::GetDataPath() {
 }
 
 HICON CFeed::GetIcon() {
-  if (m_hIcon) return m_hIcon;
   if (Link.empty()) return NULL;
+  if (m_hIcon) {
+    DestroyIcon(m_hIcon);
+    m_hIcon = NULL;
+  }
 
   wstring path = GetDataPath() + L"favicon.ico";
 

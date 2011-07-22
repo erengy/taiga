@@ -16,38 +16,27 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_TORRENT_H
-#define DLG_TORRENT_H
+#ifndef STATS_H
+#define STATS_H
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "std.h"
 
 // =============================================================================
 
-/* Torrent window */
-
-class CTorrentWindow : public CDialog {
+class TaigaStats {
 public:
-  CTorrentWindow();
-  ~CTorrentWindow();
+  TaigaStats();
+  virtual ~TaigaStats() {}
 
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-  void OnSize(UINT uMsg, UINT nType, SIZE size);
-
-  void ChangeStatus(wstring str, int panel_index = 0);
-  void EnableInput(bool enable = true);
-  void RefreshList();
+  void Calculate();
 
 public:
-  CListView  m_List;
-  CRebar m_Rebar;
-  CStatusBar m_Status;
-  CToolbar m_Toolbar;
+  int anime_count_;
+  int episode_count_;
+  wstring life_spent_;
+  float mean_score_;
 };
 
-extern CTorrentWindow TorrentWindow;
+extern TaigaStats Stats;
 
-#endif // DLG_TORRENT_H
+#endif // STATS_H
