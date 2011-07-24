@@ -89,13 +89,4 @@ void TaigaStats::Calculate() {
     }
   }
   mean_score_ = total_score / items_scored;
-
-  #ifdef _DEBUG
-  wstring msg;
-  msg += L"Anime count: \t\t" + ToWSTR(anime_count_);
-  msg += L"\nEpisode count: \t\t" + ToWSTR(episode_count_);
-  msg += L"\nLife spent on watching: \t" + life_spent_;
-  msg += L"\nMean score: \t\t" + ToWSTR(mean_score_, 2);
-  MessageBox(g_hMain, msg.c_str(), L"Statistics", MB_OK | MB_ICONINFORMATION);
-  #endif
 }

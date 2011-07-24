@@ -48,6 +48,9 @@ CHTTPClient HTTPClient, ImageClient, MainClient, SearchClient, TwitterClient, Ve
 CHTTPClient::CHTTPClient() {
   SetUserAgent(APP_NAME L"/" + 
     ToWSTR(APP_VERSION_MAJOR) + L"." + ToWSTR(APP_VERSION_MINOR));
+  if (GetWinVersion() < WINVERSION_VISTA) {
+    SetAutoRedirect(FALSE);
+  }
 }
 
 BOOL CHTTPClient::OnError(DWORD dwError) {
@@ -580,5 +583,6 @@ void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) 
   for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
     SET_PROXY(Aggregator.Feeds[i].Client);
   }
+  SET_PROXY(Taiga.UpdateHelper.Client);
   #undef SET_PROXY
 }

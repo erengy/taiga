@@ -21,11 +21,14 @@
 
 #include "win_main.h"
 #include <winhttp.h>
+#include <map>
 
 enum HTTP_ContentEncoding {
   HTTP_Encoding_None = 0,
   HTTP_Encoding_Gzip
 };
+
+typedef std::map<wstring, wstring> http_header_t;
 
 // =============================================================================
 
@@ -74,7 +77,7 @@ public:
 
   virtual BOOL OnError(DWORD dwError) { return FALSE; }
   virtual BOOL OnSendRequestComplete() { return FALSE; }
-  virtual BOOL OnHeadersAvailable(wstring headers) { return FALSE; }
+  virtual BOOL OnHeadersAvailable(http_header_t& headers) { return FALSE; }
   virtual BOOL OnDataAvailable() { return FALSE; }
   virtual BOOL OnReadData() { return FALSE; }
   virtual BOOL OnReadComplete() { return TRUE; }
@@ -87,7 +90,9 @@ private:
     DWORD dwInternetStatus, LPVOID lpvStatusInformation, DWORD dwStatusInformationLength);
 
 protected:
-  void ParseHeaders(wstring headers);
+  wstring BuildRequestHeader(wstring header);
+  bool ParseHeader(const wstring& text, http_header_t& header);
+  bool ParseResponseHeader(const wstring& header);
 
   BOOL    m_AutoRedirect;
   LPSTR   m_Buffer;
@@ -96,7 +101,12 @@ protected:
   wstring m_File;
   string  m_OptionalData;
   wstring m_Proxy, m_ProxyUser, m_ProxyPass;
+  wstring m_Referer;
   wstring m_UserAgent;
+  wstring m_Verb;
+
+  wstring m_RequestHeader;
+  http_header_t m_ResponseHeader;
 
   DWORD  m_dwDownloaded, m_dwTotal;
   DWORD  m_dwClientMode;

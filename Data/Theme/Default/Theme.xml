@@ -57,6 +57,7 @@
 			<item name="Announce current episode" sub="Announce"/>
 			<item name="Check available episodes" action="CheckEpisodes()"/>
 			<item name="Play random anime" action="PlayRandomAnime()"/>
+			<item name="Show statistics" action="ShowListStats()"/>
 			<item type="separator"/>
 			<item name="Filter" sub="Filter"/>
 		</menu>

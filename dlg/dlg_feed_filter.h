@@ -31,7 +31,7 @@ public:
   CFeedFilterWindow();
   virtual ~CFeedFilterWindow();
 
-  BOOL DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
@@ -51,6 +51,7 @@ private:
   class CDialogPage : public CDialog {
   public:
     void Create(UINT uResourceID, CFeedFilterWindow* parent, const RECT& rect);
+    INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   public:
     CFeedFilterWindow* parent_;
   };

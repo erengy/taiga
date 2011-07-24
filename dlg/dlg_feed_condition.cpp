@@ -91,11 +91,10 @@ BOOL CFeedConditionWindow::OnInitDialog() {
 
 // =============================================================================
 
-BOOL CFeedConditionWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CFeedConditionWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
-    case WM_CTLCOLORSTATIC: {
+    case WM_CTLCOLORSTATIC:
       return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
-    }
   }
 
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);

@@ -51,22 +51,17 @@ bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring 
   m_dwClientMode = dwClientMode;
   m_lParam = lParam;
   m_File = szFile;
+  m_Referer = szReferer;
+  m_Verb = szVerb;
 
   // Prepare file location
   if (!szFile.empty()) {
     CreateFolder(GetPathOnly(szFile));
   }
     
-  // Setup headers
-  wstring headers;
-  if (szHeader.empty()) {
-    headers = GetDefaultHeader();
-  } else {
-    headers = szHeader + L"\r\n";
-  }
-  if (!m_Cookie.empty()) {
-    headers += L"Cookie: " + m_Cookie + L"\r\n";
-  }
+  // Build request header
+  m_RequestHeader = szHeader;
+  wstring header = BuildRequestHeader(szHeader);
 
   // Create a session handle
   m_hSession = ::WinHttpOpen(m_UserAgent.c_str(), 
@@ -140,8 +135,8 @@ bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring 
   
   // Send the request
   if (!::WinHttpSendRequest(m_hRequest, 
-    headers.c_str(), 
-    headers.length(), 
+    header.c_str(), 
+    header.length(), 
     (LPVOID)(m_OptionalData.c_str()), 
     m_OptionalData.length(), 
     m_OptionalData.length(), 
@@ -216,10 +211,10 @@ void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus,
         WINHTTP_HEADER_NAME_BY_INDEX, 
         lpOutBuffer, &dwSize, 
         WINHTTP_NO_HEADER_INDEX)) {
-          ParseHeaders((LPWSTR)lpOutBuffer);
-          if (OnHeadersAvailable((LPWSTR)lpOutBuffer)) {
-            delete [] lpOutBuffer;
-            Cleanup();
+          if (!ParseResponseHeader((LPWSTR)lpOutBuffer) || 
+            OnHeadersAvailable(m_ResponseHeader)) {
+              delete [] lpOutBuffer;
+              break;
           }
       }
       delete [] lpOutBuffer;
@@ -353,6 +348,10 @@ void CHTTP::Cleanup() {
   m_ContentEncoding = HTTP_Encoding_None;
   m_File.clear();
   m_OptionalData.clear();
+  m_Referer.clear();
+  m_RequestHeader.clear();
+  m_ResponseHeader.clear();
+  m_Verb.clear();
   m_dwDownloaded = 0;
   m_dwTotal = 0;
   m_dwClientMode = 0;
@@ -400,41 +399,82 @@ void CHTTP::SetUserAgent(const wstring& user_agent) {
 
 // =============================================================================
 
-void CHTTP::ParseHeaders(wstring headers) {
-  if (headers.empty()) return;
-  
+bool CHTTP::ParseHeader(const wstring& text, http_header_t& header) {
+  header.clear();
+  if (text.empty()) return false;
   vector<wstring> header_list;
-  Split(headers, L"\r\n", header_list);
+  Split(text, L"\r\n", header_list);
 
-  for (unsigned int i = 0; i < header_list.size(); i++) {
-    int pos = InStr(header_list[i], L":", 0);
+  for (auto it = header_list.begin(); it != header_list.end(); ++it) {
+    int pos = InStr(*it, L":", 0);
     if (pos > -1) {
-      wstring part_left = ToLower_Copy(CharLeft(header_list[i], pos));
-      wstring part_right = header_list[i].substr(pos + 2);
-      
-      // Content-Encoding:
-      if (part_left == L"content-encoding") {
-        if (InStr(part_right, L"gzip") > -1) {
-          m_ContentEncoding = HTTP_Encoding_Gzip;
+      wstring name = CharLeft(*it, pos);
+      wstring value = it->substr(pos + 2);
+      header[name] = value;
+    }
+  }
+
+  return true;
+}
+
+wstring CHTTP::BuildRequestHeader(wstring header) {
+  if (header.empty()) {
+    header = GetDefaultHeader();
+  } else {
+    header = header + L"\r\n";
+  }
+  
+  if (!m_Cookie.empty()) {
+    header += L"Cookie: " + m_Cookie + L"\r\n";
+  }
+  
+  return header;
+}
+
+
+
+bool CHTTP::ParseResponseHeader(const wstring& header) {
+  if (!ParseHeader(header, m_ResponseHeader)) return false;
+
+  for (auto it = m_ResponseHeader.cbegin(); it != m_ResponseHeader.cend(); ++it) {
+    wstring name = it->first;
+    wstring value = it->second;
+
+    // Content-Encoding:
+    if (IsEqual(name, L"Content-Encoding")) {
+      if (InStr(value, L"gzip") > -1) {
+        m_ContentEncoding = HTTP_Encoding_Gzip;
+      } else {
+        m_ContentEncoding = HTTP_Encoding_None;
+      }
+
+    // Content-Length:
+    } else if (IsEqual(name, L"Content-Length")) {
+      m_dwTotal = ToINT(value);
+
+    // Location:
+    } else if (IsEqual(name, L"Location")) {
+      OnRedirect(value);
+      if (m_AutoRedirect == FALSE) {
+        CUrl url(value);
+        if (!Connect(url, ToUTF8(m_OptionalData), m_Verb, m_RequestHeader, 
+          m_Referer, m_File, m_dwClientMode, m_lParam)) {
+            Cleanup();
         }
-
-      // Content-Length:
-      } else if (part_left == L"content-length") {
-        m_dwTotal = ToINT(part_right);
-
-      // Location:
-      } else if (part_left == L"location") {
-        OnRedirect(part_right);
+        return false;
+      } else {
         m_ContentEncoding = HTTP_Encoding_None;
         m_dwDownloaded = 0;
         m_dwTotal = 0;
-      
-      // Set-Cookie:
-      } else if (part_left == L"set-cookie") {
-        pos = InStr(part_right, L";", 0);
-        if (pos > -1) part_right = part_right.substr(0, pos);
-        m_Cookie += (m_Cookie.empty() ? L"" : L"; ") + part_right;
       }
+      
+    // Set-Cookie:
+    } else if (IsEqual(name, L"Set-Cookie")) {
+      int pos = InStr(value, L";", 0);
+      if (pos > -1) value = value.substr(0, pos);
+      m_Cookie += (m_Cookie.empty() ? L"" : L"; ") + value;
     }
   }
+
+  return true;
 }

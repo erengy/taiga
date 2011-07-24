@@ -55,7 +55,7 @@ CFeedFilterWindow::~CFeedFilterWindow() {
   }
 }
 
-BOOL CFeedFilterWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CFeedFilterWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     // Set main instruction text color
     case WM_CTLCOLORSTATIC: {
@@ -249,8 +249,17 @@ void CFeedFilterWindow::ChoosePage(int index) {
 void CFeedFilterWindow::CDialogPage::Create(UINT uResourceID, CFeedFilterWindow* parent, const RECT& rect) {
   parent_ = parent;
   CDialog::Create(uResourceID, parent->GetWindowHandle(), false);
-  EnableThemeDialogTexture(GetWindowHandle(), ETDT_ENABLEAEROWIZARDTAB);
   SetPosition(nullptr, rect, SWP_NOSIZE);
+}
+
+INT_PTR CFeedFilterWindow::CDialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_CTLCOLORDLG:
+    case WM_CTLCOLORSTATIC:
+      return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
+  }
+  
+  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
 // =============================================================================
@@ -561,7 +570,7 @@ void CFeedFilterWindow::CDialogPage1::RefreshConditionList() {
 BOOL CFeedFilterWindow::CDialogPage2::OnInitDialog() {
   // Initialize anime list
   anime_list_.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_ANIME));
-  anime_list_.EnableGroupView(true);
+  anime_list_.EnableGroupView(GetWinVersion() > WINVERSION_XP);
   anime_list_.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
   anime_list_.SetImageList(UI.ImgList16.GetHandle());
   anime_list_.SetTheme();
