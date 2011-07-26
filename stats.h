@@ -34,7 +34,8 @@ public:
   int anime_count_;
   int episode_count_;
   wstring life_spent_;
-  float mean_score_;
+  float score_mean_;
+  float score_dev_;
 };
 
 extern TaigaStats Stats;

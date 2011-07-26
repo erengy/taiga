@@ -293,8 +293,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       main_instruction = AnimeList.User.Name + L"'s anime list stats:";
       content += L"\u2022 Anime count: \t\t" + ToWSTR(Stats.anime_count_);
       content += L"\n\u2022 Episode count: \t\t" + ToWSTR(Stats.episode_count_);
-      content += L"\n\u2022 Life spent on watching: \t" + Stats.life_spent_;
-      content += L"\n\u2022 Mean score: \t\t" + ToWSTR(Stats.mean_score_, 2);
+      content += L"\n\u2022 Life spent watching: \t" + Stats.life_spent_;
+      content += L"\n\u2022 Mean score: \t\t" + ToWSTR(Stats.score_mean_, 2);
+      content += L"\n\u2022 Score deviation: \t\t" + ToWSTR(Stats.score_dev_, 2);
       CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(main_instruction.c_str());
       dlg.SetContent(content.c_str());

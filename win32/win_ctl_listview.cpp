@@ -21,7 +21,7 @@
 // =============================================================================
 
 CListView::CListView() {
-  m_iSortColumn = 0;
+  m_iSortColumn = -1;
   m_iSortOrder = 1;
   m_iSortType = 0;
 }
@@ -310,7 +310,7 @@ int CListView::GetSortType() { return m_iSortType; }
 
 void CListView::Sort(int iColumn, int iOrder, int iType, PFNLVCOMPARE pfnCompare) {
   m_iSortColumn = iColumn;
-  m_iSortOrder = iOrder;
+  m_iSortOrder = (iOrder == 0)? 1 : iOrder;
   m_iSortType = iType;
 
   ListView_SortItemsEx(m_hWindow, pfnCompare, this);

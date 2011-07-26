@@ -27,7 +27,7 @@ TaigaStats Stats;
 // =============================================================================
 
 TaigaStats::TaigaStats() : 
-  anime_count_(0), episode_count_(0), mean_score_(0.0f)
+  anime_count_(0), episode_count_(0), score_mean_(0.0f), score_dev_(0.0f)
 {
 }
 
@@ -40,10 +40,11 @@ void TaigaStats::Calculate() {
   // Episode count
   episode_count_ = 0;
   for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
-    episode_count_ += it->Series_Episodes;
+    // TODO: implement times_rewatched when MAL adds to API
+    episode_count_ += it->GetRewatching() == TRUE ? it->GetTotalEpisodes() : it->GetLastWatchedEpisode();
   }
 
-  // Life spent on watching
+  // Life spent watching
   int duration, days, hours, minutes, seconds = 0;
   for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
     // Approximate duration in minutes
@@ -56,7 +57,8 @@ void TaigaStats::Calculate() {
       case MAL_ONA:     duration = 24;  break;
       case MAL_MUSIC:   duration = 5;   break;
     }
-    seconds += (duration * 60) * it->GetLastWatchedEpisode();
+    int episodes_watched = it->GetRewatching() == TRUE ? it->GetTotalEpisodes() : it->GetLastWatchedEpisode();
+    seconds += (duration * 60) * episodes_watched;
   }
   if (seconds > 0) {
     #define CALC_TIME(x, y) x = seconds / (y); seconds = seconds % (y);
@@ -81,12 +83,21 @@ void TaigaStats::Calculate() {
   }
 
   // Mean score
-  float total_score = 0.0f, items_scored = 0.0f;
+  float sum_scores = 0.0f, items_scored = 0.0f;
   for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
     if (it->My_Score > 0) {
-      total_score += static_cast<float>(it->My_Score);
+      sum_scores += static_cast<float>(it->My_Score);
       items_scored++;
     }
   }
-  mean_score_ = total_score / items_scored;
+  score_mean_ = items_scored > 0 ? sum_scores / items_scored : 0;
+
+  // Standard deviation of score
+  float sum_squares = 0.0f;
+  for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
+    if (it->My_Score > 0) {
+      sum_squares += pow(static_cast<float>(it->My_Score) - score_mean_, 2);
+    }
+  }
+  score_dev_ = items_scored > 0 ? sqrt(sum_squares / items_scored) : 0;
 }

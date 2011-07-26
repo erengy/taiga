@@ -135,8 +135,8 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Column click
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
-        int order = m_List.GetSortOrder() * -1;
-        if (order == 0) order = 1;
+        int order = 1;
+        if (lplv->iSubItem == m_List.GetSortColumn()) order = m_List.GetSortOrder() * -1;
         int type = LISTSORTTYPE_DEFAULT;
         switch (lplv->iSubItem) {
           case 3:

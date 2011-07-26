@@ -154,6 +154,7 @@ void CMainWindow::CreateDialogControls() {
   m_List.Attach(GetDlgItem(IDC_LIST_MAIN));
   m_List.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   m_List.SetImageList(UI.ImgList16.GetHandle());
+  m_List.Sort(0, 1, 0, ListViewCompareProc);
   m_List.SetTheme();
   // Create status bar
   m_Status.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));

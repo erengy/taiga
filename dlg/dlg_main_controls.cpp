@@ -183,8 +183,8 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
     // Column click
     case LVN_COLUMNCLICK: {
       LPNMLISTVIEW lplv = (LPNMLISTVIEW)lParam;
-      int order = m_List.GetSortOrder() * -1;
-      if (order == 0) order = 1;
+      int order = 1;
+      if (lplv->iSubItem == m_List.GetSortColumn()) order = m_List.GetSortOrder() * -1;
       m_List.Sort(lplv->iSubItem, order, m_List.GetSortType(lplv->iSubItem), ListViewCompareProc);
       break;
     }

@@ -81,8 +81,8 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Column click
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = (LPNMLISTVIEW)pnmh;
-        int order = m_List.GetSortOrder() * -1;
-        if (order == 0) order = 1;
+        int order = 1;
+        if (lplv->iSubItem == m_List.GetSortColumn()) order = m_List.GetSortOrder() * -1;
         switch (lplv->iSubItem) {
           // Episode
           case 2:
