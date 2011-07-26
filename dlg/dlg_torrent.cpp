@@ -75,7 +75,7 @@ BOOL CTorrentWindow::OnInitDialog() {
   m_Toolbar.InsertButton(0, Icon16_Refresh,  100, 1, fsStyle, 0, L"Check new torrents", NULL);
   m_Toolbar.InsertButton(1, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
   m_Toolbar.InsertButton(2, Icon16_Download, 101, 1, fsStyle, 0, L"Download marked torrents", NULL);
-  m_Toolbar.InsertButton(3, Icon16_Cross,    102, 1, fsStyle, 0, L"Discard marked torrents", NULL);
+  m_Toolbar.InsertButton(3, Icon16_Cross,    102, 1, fsStyle, 0, L"Discard all", NULL);
   m_Toolbar.InsertButton(4, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
   m_Toolbar.InsertButton(5, Icon16_Settings, 103, 1, fsStyle, 0, L"Settings", NULL);
 
@@ -214,7 +214,12 @@ BOOL CTorrentWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
       for (int i = 0; i < m_List.GetItemCount(); i++) {
         CFeedItem* pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
         if (pItem) {
-          pItem->Download = m_List.GetCheckState(i) == TRUE;
+          bool check_state = m_List.GetCheckState(i) == TRUE;
+          if (pItem->Download && !check_state) {
+            // Discard items that have passed all filters but are unchecked by the user
+            Aggregator.FileArchive.push_back(pItem->Title);
+          }
+          pItem->Download = check_state;
         }
       }
       pFeed->Download(-1);
@@ -299,6 +304,23 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
             pItem->Download = false;
             m_List.SetCheckState(lpnmitem->iItem, FALSE);
             Aggregator.FileArchive.push_back(pItem->Title);
+          } else if (answer == L"DiscardTorrents") {
+            int anime_index = pItem->EpisodeData.Index;
+            if (anime_index > -1 && anime_index <= AnimeList.Count) {
+              for (int i = 0; i < m_List.GetItemCount(); i++) {
+                pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
+                if (pItem && pItem->EpisodeData.Index == anime_index) {
+                  pItem->Download = false;
+                  m_List.SetCheckState(i, FALSE);
+                }
+              }
+              Aggregator.FilterManager.AddFilter(
+                FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
+                L"Discard \"" + AnimeList.Item[anime_index].Series_Title + L"\"");
+              Aggregator.FilterManager.Filters.back().AddCondition(
+                FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, 
+                ToWSTR(AnimeList.Item[anime_index].Series_ID));
+            }
           } else if (answer == L"MoreTorrents") {
             pFeed->Check(ReplaceVariables(
               L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%", // TEMP

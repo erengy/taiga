@@ -20,6 +20,12 @@
 
 // =============================================================================
 
+bool CSpin::GetPos32(int& value) {
+  BOOL result;
+  value = ::SendMessage(m_hWindow, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&result));
+  return result == 0;
+}
+
 HWND CSpin::SetBuddy(HWND hwnd) {
   return reinterpret_cast<HWND>(::SendMessage(m_hWindow, UDM_SETBUDDY, reinterpret_cast<WPARAM>(hwnd), 0));
 }

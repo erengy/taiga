@@ -61,26 +61,26 @@ BOOL CAnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
-        int EpisodeValue = SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_GETPOS32, NULL, NULL);
-        if(IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if(m_pAnimeItem) {
-            if(m_pAnimeItem->GetStatus() == MAL_COMPLETED && EpisodeValue == m_pAnimeItem->Series_Episodes) {
-              SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, 0);
-            }
-            EnableDlgItem(IDC_COMBO_ANIME_STATUS, FALSE);
-            SendDlgItemMessage(IDC_COMBO_ANIME_STATUS, CB_SETCURSEL, MAL_COMPLETED - 1, 0);
-            return TRUE;
+        if (!m_pAnimeItem) break;
+        CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        CSpin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
+        int episode_value; m_Spin.GetPos32(episode_value);
+        if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
+          if (m_pAnimeItem->GetStatus() == MAL_COMPLETED && episode_value == m_pAnimeItem->Series_Episodes) {
+            m_Spin.SetPos32(0);
           }
+          m_Combo.Enable(FALSE);
+          m_Combo.SetCurSel(MAL_COMPLETED - 1);
         } else {
-          if(m_pAnimeItem) {
-            if (EpisodeValue == 0) {
-              SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, m_pAnimeItem->GetLastWatchedEpisode());
-            }
-            EnableDlgItem(IDC_COMBO_ANIME_STATUS, TRUE);
-            SendDlgItemMessage(IDC_COMBO_ANIME_STATUS, CB_SETCURSEL, m_pAnimeItem->GetStatus() - 1, 0);
-            return TRUE;
+          if (episode_value == 0) {
+            m_Spin.SetPos32(m_pAnimeItem->GetLastWatchedEpisode());
           }
+          m_Combo.Enable();
+          m_Combo.SetCurSel(m_pAnimeItem->GetStatus() - 1);
         }
+        m_Spin.SetWindowHandle(NULL);
+        m_Combo.SetWindowHandle(NULL);
+        return TRUE;
       }
       break;
 
@@ -88,12 +88,14 @@ BOOL CAnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
     case IDC_COMBO_ANIME_STATUS:
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
-        if(GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1 == MAL_COMPLETED) {
-          if(m_pAnimeItem && m_pAnimeItem->GetStatus() != MAL_COMPLETED && m_pAnimeItem->Series_Episodes > 0) {
-                SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, m_pAnimeItem->Series_Episodes);
-                return TRUE;
+        CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == MAL_COMPLETED) {
+          if (m_pAnimeItem && m_pAnimeItem->GetStatus() != MAL_COMPLETED && m_pAnimeItem->Series_Episodes > 0) {
+            SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, m_pAnimeItem->Series_Episodes);
           }
         }
+        m_Combo.SetWindowHandle(NULL);
+        return TRUE;
       }
       break;
   }
@@ -186,27 +188,21 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
 
       // Re-watching
       CheckDlgButton(IDC_CHECK_ANIME_REWATCH, pAnimeItem->GetRewatching());
-      if (pAnimeItem->GetStatus() == MAL_COMPLETED) {
-        EnableDlgItem(IDC_CHECK_ANIME_REWATCH, TRUE);
-        EnableDlgItem(IDC_COMBO_ANIME_STATUS, FALSE);
-        SendDlgItemMessage(IDC_COMBO_ANIME_STATUS, CB_SETCURSEL, MAL_COMPLETED - 1, 0);
-      } else {
-        EnableDlgItem(IDC_CHECK_ANIME_REWATCH, FALSE);
-        EnableDlgItem(IDC_COMBO_ANIME_STATUS, TRUE);
-      }
+      EnableDlgItem(IDC_CHECK_ANIME_REWATCH, pAnimeItem->GetStatus() == MAL_COMPLETED);
 
       // Status
       CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
       if (m_Combo.GetCount() == 0) {
         for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
           if (i != MAL_UNKNOWN) {
-            m_Combo.AddString(MAL.TranslateMyStatus(i, false).c_str());
+            m_Combo.AddItem(MAL.TranslateMyStatus(i, false).c_str(), i);
           }
         }
       }
       int status = pAnimeItem->GetStatus();
       if (status == MAL_PLANTOWATCH) status--;
       m_Combo.SetCurSel(status - 1);
+      m_Combo.Enable(!pAnimeItem->GetRewatching());
       m_Combo.SetWindowHandle(NULL);
 
       // Score

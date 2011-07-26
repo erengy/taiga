@@ -256,7 +256,9 @@
 		<!-- Torrent list right click -->
 		<menu name="TorrentListRightClick">
 			<item name="Download" action="DownloadTorrent" default="1"/>
+			<item type="separator"/>
 			<item name="Discard" action="DiscardTorrent"/>
+			<item name="Discard all torrents for this title" action="DiscardTorrents"/>
 			<item type="separator"/>
 			<item name="Search more torrents for this title" action="MoreTorrents"/>
 			<item name="Search MyAnimeList for this title" action="SearchMAL"/>

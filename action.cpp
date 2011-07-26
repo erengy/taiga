@@ -287,7 +287,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // ShowListStats()
   } else if (action == L"ShowListStats") {
-    Stats.Calculate();
+    Stats.CalculateAll();
     if (!AnimeList.User.Name.empty()) {
       wstring main_instruction, content;
       main_instruction = AnimeList.User.Name + L"'s anime list stats:";

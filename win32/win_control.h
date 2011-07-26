@@ -246,6 +246,7 @@ public:
   CSpin(HWND hWnd) { SetWindowHandle(hWnd); }
   virtual ~CSpin() {}
 
+  bool GetPos32(int& value);
   HWND SetBuddy(HWND hwnd);
   int  SetPos32(int position);
   void SetRange32(int lower_limit, int upper_limit);

@@ -28,7 +28,12 @@ public:
   TaigaStats();
   virtual ~TaigaStats() {}
 
-  void Calculate();
+  void CalculateAll();
+  int CalculateAnimeCount();
+  int CalculateEpisodeCount();
+  wstring CalculateLifeSpentWatching();
+  float CalculateMeanScore();
+  float CalculateScoreDeviation();
 
 public:
   int anime_count_;
