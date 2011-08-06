@@ -256,7 +256,7 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
     if (is_folder && !path_available) {
       int anime_index = 0;
       for (int j = AnimeList.Count; j > 0; j--) {
-        if (!AnimeList.Item[j].Folder.empty() && IsEqual(AnimeList.Item[j].Folder, path)) {
+        if (!AnimeList.Items[j].Folder.empty() && IsEqual(AnimeList.Items[j].Folder, path)) {
           anime_index = j;
           break;
         }
@@ -273,7 +273,7 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
 
     // Change anime folder
     if (is_folder && LIST[i].AnimeIndex > 0) {
-      #define ANIME AnimeList.Item[LIST[i].AnimeIndex]
+      #define ANIME AnimeList.Items[LIST[i].AnimeIndex]
       ANIME.SetFolder(path_available ? path : L"", true, true);
       DEBUG_PRINT(L"CFolderMonitor :: Change anime folder: " + 
         ANIME.Series_Title + L" -> " + ANIME.Folder + L"\n");
@@ -285,14 +285,14 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
     if (Meow.ExamineTitle(path, episode)) {
       if (LIST[i].AnimeIndex == 0 || is_folder == false) {
         for (int j = AnimeList.Count; j > 0; j--) {
-          if (Meow.CompareEpisode(episode, AnimeList.Item[j], true, false, false)) {
+          if (Meow.CompareEpisode(episode, AnimeList.Items[j], true, false, false)) {
             LIST[i].AnimeIndex = j;
             break;
           }
         }
       }
       if (LIST[i].AnimeIndex > 0) {
-        #define ANIME AnimeList.Item[LIST[i].AnimeIndex]
+        #define ANIME AnimeList.Items[LIST[i].AnimeIndex]
 
         // Set anime folder
         if (path_available && ANIME.Folder.empty()) {

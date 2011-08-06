@@ -75,14 +75,14 @@ public:
     wstring my_last_updated, 
     wstring my_tags);
   void Clear();
-  BOOL Read();
-  BOOL Write(int index, wstring child, wstring value, int mode = ANIMELIST_EDITANIME);
-  void DeleteItem(int index);
+  bool Read();
+  bool Write(int anime_id, wstring child, wstring value, int mode = ANIMELIST_EDITANIME);
+  bool DeleteItem(int anime_id);
   CAnime* FindItem(int anime_id);
   int FindItemIndex(int anime_id);
 
   CUser User;
-  vector<CAnime> Item;
+  vector<CAnime> Items;
   int Index, Count;
 
   class CFilter {
@@ -90,10 +90,10 @@ public:
     CFilter();
     virtual ~CFilter() {}
     
-    BOOL Check(int item_index);
+    bool Check(CAnime& anime);
     void Reset();
     
-    BOOL MyStatus[6], Status[3], Type[6], NewEps;
+    bool MyStatus[6], Status[3], Type[6], NewEps;
     wstring Text;
   } Filter;
 };

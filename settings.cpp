@@ -112,7 +112,7 @@ bool CSettings::Read() {
   Folders.WatchEnabled = watch.attribute(L"enabled").as_int();
 
   // Anime items
-  Anime.Item.clear();
+  Anime.Items.clear();
   wstring folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
@@ -153,14 +153,14 @@ bool CSettings::Read() {
     Program.List.MiddleClick = list.child(L"action").attribute(L"middleclick").as_int(3);
     for (int i = 0; i < 3; i++) {
       wstring name = L"s" + ToWSTR(i + 1);
-      AnimeList.Filter.Status[i] = list.child(L"filter").child(L"status").attribute(name.c_str()).as_int(1);
+      AnimeList.Filter.Status[i] = list.child(L"filter").child(L"status").attribute(name.c_str()).as_bool(true);
     }
     for (int i = 0; i < 6; i++) {
       wstring name = L"t" + ToWSTR(i + 1);
-      AnimeList.Filter.Type[i] = list.child(L"filter").child(L"type").attribute(name.c_str()).as_int(1);
+      AnimeList.Filter.Type[i] = list.child(L"filter").child(L"type").attribute(name.c_str()).as_bool(true);
     }
     Program.List.Highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
-    AnimeList.Filter.NewEps = list.child(L"filter").child(L"episodes").attribute(L"new").as_int();
+    AnimeList.Filter.NewEps = list.child(L"filter").child(L"episodes").attribute(L"new").as_bool();
     Program.List.ProgressMode = list.child(L"progress").attribute(L"mode").as_int(1);
     Program.List.ProgressShowEps = list.child(L"progress").attribute(L"showeps").as_int();
     // Notifications
@@ -195,7 +195,7 @@ bool CSettings::Read() {
           item.attribute(L"enabled").as_bool(), 
           item.attribute(L"name").value());
         for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
-          Aggregator.FilterManager.Filters.back().AnimeID.push_back(anime.attribute(L"id").as_int());
+          Aggregator.FilterManager.Filters.back().AnimeIds.push_back(anime.attribute(L"id").as_int());
         }
         for (xml_node condition = item.child(L"condition"); condition; condition = condition.next_sibling(L"condition")) {
           Aggregator.FilterManager.Filters.back().AddCondition(
@@ -219,8 +219,7 @@ bool CSettings::Read() {
   for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
       CEventItem event_item;
-      event_item.AnimeIndex = item.attribute(L"index").as_int(-1);
-      event_item.AnimeID = item.attribute(L"id").as_int(-1);
+      event_item.AnimeId = item.attribute(L"id").as_int(ANIMEID_NOTINLIST);
       event_item.episode = item.attribute(L"episode").as_int(-1);
       event_item.score = item.attribute(L"score").as_int(-1);
       event_item.status = item.attribute(L"status").as_int(-1);
@@ -281,14 +280,14 @@ bool CSettings::Write() {
     // Items
     xml_node items = anime.append_child();
     items.set_name(L"items");
-    for (size_t i = 0; i < Anime.Item.size(); i++) {
+    for (size_t i = 0; i < Anime.Items.size(); i++) {
       xml_node item = items.append_child();
       item.set_name(L"item");
-      item.append_attribute(L"id") = Anime.Item[i].ID;
-      if (!Anime.Item[i].Folder.empty())
-        item.append_attribute(L"folder") = Anime.Item[i].Folder.c_str();
-      if (!Anime.Item[i].Titles.empty())
-        item.append_attribute(L"titles") = Anime.Item[i].Titles.c_str();
+      item.append_attribute(L"id") = Anime.Items[i].ID;
+      if (!Anime.Items[i].Folder.empty())
+        item.append_attribute(L"folder") = Anime.Items[i].Folder.c_str();
+      if (!Anime.Items[i].Titles.empty())
+        item.append_attribute(L"titles") = Anime.Items[i].Titles.c_str();
     }
 
   // Announcements
@@ -427,7 +426,7 @@ bool CSettings::Write() {
         item.append_attribute(L"match") = it->Match;
         item.append_attribute(L"enabled") = it->Enabled;
         item.append_attribute(L"name") = it->Name.c_str();
-        for (auto ita = it->AnimeID.begin(); ita != it->AnimeID.end(); ++ita) {
+        for (auto ita = it->AnimeIds.begin(); ita != it->AnimeIds.end(); ++ita) {
           xml_node anime = item.append_child();
           anime.set_name(L"anime");
           anime.append_attribute(L"id") = *ita;
@@ -458,25 +457,24 @@ bool CSettings::Write() {
     xml_node events = doc.append_child();
     events.set_name(L"events");
     for (size_t i = 0; i < EventQueue.List.size(); i++) {
-      if (EventQueue.List[i].Item.empty()) continue;
+      if (EventQueue.List[i].Items.empty()) continue;
       xml_node user = events.append_child();
       user.set_name(L"user");
       user.append_attribute(L"name") = EventQueue.List[i].User.c_str();
-      for (size_t j = 0; j < EventQueue.List[i].Item.size(); j++) {
+      for (size_t j = 0; j < EventQueue.List[i].Items.size(); j++) {
         xml_node item = user.append_child();
         item.set_name(L"event");
         #define APPEND_ATTRIBUTE_INT(x, y) \
-          if (EventQueue.List[i].Item[j].y > -1) \
-          item.append_attribute(x) = EventQueue.List[i].Item[j].y;
+          if (EventQueue.List[i].Items[j].y > -1) \
+          item.append_attribute(x) = EventQueue.List[i].Items[j].y;
         APPEND_ATTRIBUTE_INT(L"mode", Mode);
-        APPEND_ATTRIBUTE_INT(L"index", AnimeIndex);
-        APPEND_ATTRIBUTE_INT(L"id", AnimeID);
+        APPEND_ATTRIBUTE_INT(L"id", AnimeId);
         APPEND_ATTRIBUTE_INT(L"episode", episode);
         APPEND_ATTRIBUTE_INT(L"score", score);
         APPEND_ATTRIBUTE_INT(L"status", status);
         APPEND_ATTRIBUTE_INT(L"rewatch", enable_rewatching);
-        item.append_attribute(L"tags") = EventQueue.List[i].Item[j].tags.c_str();
-        item.append_attribute(L"time") = EventQueue.List[i].Item[j].Time.c_str();
+        item.append_attribute(L"tags") = EventQueue.List[i].Items[j].tags.c_str();
+        item.append_attribute(L"time") = EventQueue.List[i].Items[j].Time.c_str();
         #undef APPEND_ATTRIBUTE
       }
     }
@@ -491,17 +489,17 @@ bool CSettings::Write() {
 
 void CSettings::CSettingsAnime::SetItem(int id, wstring folder, wstring titles) {
   int index = -1;
-  for (unsigned int i = 0; i < Item.size(); i++) {
-    if (Item[i].ID == id) {
+  for (unsigned int i = 0; i < Items.size(); i++) {
+    if (Items[i].ID == id) {
       index = static_cast<int>(i);
       break;
     }
   }
   if (index == -1) {
-    index = Item.size();
-    Item.resize(index + 1);
+    index = Items.size();
+    Items.resize(index + 1);
   }
-  Item[index].ID = id;
-  if (folder != EMPTY_STR) Item[index].Folder = folder;
-  if (titles != EMPTY_STR) Item[index].Titles = titles;
+  Items[index].ID = id;
+  if (folder != EMPTY_STR) Items[index].Folder = folder;
+  if (titles != EMPTY_STR) Items[index].Titles = titles;
 }

@@ -60,7 +60,7 @@ public:
     };
     vector<CEditTitle> Edit;
   };
-  vector<CMediaPlayer> Item;
+  vector<CMediaPlayer> Items;
 
 private:
   bool m_bTitleChanged;

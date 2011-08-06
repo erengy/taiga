@@ -34,9 +34,9 @@ enum EventSearchMode {
 
 class CEventItem : public CMALAnimeValues {
 public:
-  CEventItem() : Index(0), AnimeID(0), AnimeIndex(0), Mode(0) {}
+  CEventItem() : Index(0), AnimeId(0), Mode(0) {}
   int Index;
-  int AnimeID, AnimeIndex, Mode;
+  int AnimeId, Mode;
   wstring Reason, Time;
 };
 
@@ -49,11 +49,11 @@ public:
   void Check();
   void Clear();
   void Remove(unsigned int index);
-  CEventItem* SearchItem(int anime_index, int search_mode = 0);
+  CEventItem* SearchItem(int anime_id, int search_mode = 0);
   
   unsigned int Index;
   wstring User;
-  vector<CEventItem> Item;
+  vector<CEventItem> Items;
 };
 
 class CEventQueue {
@@ -68,7 +68,7 @@ public:
   int GetUserIndex(wstring user = L"");
   bool IsEmpty();
   void Remove(int index = -1, bool save = true);
-  CEventItem* SearchItem(int anime_index, int search_mode = 0);
+  CEventItem* SearchItem(int anime_id, int search_mode = 0);
   void Show();
 
   bool UpdateInProgress;

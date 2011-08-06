@@ -78,7 +78,7 @@ public:
       int ID;
       wstring Folder, Titles;
     };
-    vector<CSettingsAnimeItem> Item;
+    vector<CSettingsAnimeItem> Items;
   } Anime;
   // Folders
   class CSettingsFolders {

@@ -83,7 +83,7 @@ public:
   */
   
   // Feed items
-  vector<CFeedItem> Item;
+  vector<CFeedItem> Items;
 };
 
 class CFeed : public CGenericFeed {
@@ -175,7 +175,7 @@ public:
   wstring Name;
   bool Enabled;
   int Action, Match;
-  vector<int> AnimeID;
+  vector<int> AnimeIds;
   vector<CFeedFilterCondition> Conditions;
 };
 

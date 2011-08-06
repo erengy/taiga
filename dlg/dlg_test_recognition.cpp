@@ -69,7 +69,7 @@ BOOL CTestRecognition::OnInitDialog() {
   for (UINT i = 0; i < m_EpisodeList.size(); i++) {
     CEpisodeTest episode;
     Meow.ExamineTitle(m_EpisodeList[i].File, episode, true, true, true, true, false);
-    episode.Index = i;
+    episode.AnimeId = i;
     episode.Priority = m_EpisodeList[i].Priority;
     m_EpisodeListTest.push_back(episode);
   }
@@ -164,7 +164,7 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
             CEpisodeTest* e = reinterpret_cast<CEpisodeTest*>(pCD->nmcd.lItemlParam);
             if (!e) return CDRF_NOTIFYPOSTPAINT;
             #define CheckSubItem(e, t) \
-              e->t == m_EpisodeList[e->Index].t ? RGB(230, 255, 230) : \
+              e->t == m_EpisodeList[e->AnimeId].t ? RGB(230, 255, 230) : \
               e->t.empty() ? RGB(245, 255, 245) : RGB(255, 230, 230)
             switch (pCD->iSubItem) {
               // Title

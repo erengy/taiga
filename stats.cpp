@@ -58,7 +58,7 @@ int TaigaStats::CalculateAnimeCount() {
 int TaigaStats::CalculateEpisodeCount() {
   episode_count_ = 0;
   
-  for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
+  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
     episode_count_ += it->GetLastWatchedEpisode();
     // TODO: implement times_rewatched when MAL adds to API
     if (it->GetRewatching() == TRUE) episode_count_ += it->GetTotalEpisodes();
@@ -70,7 +70,7 @@ int TaigaStats::CalculateEpisodeCount() {
 wstring TaigaStats::CalculateLifeSpentWatching() {
   int duration, days, hours, minutes, seconds = 0;
   
-  for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
+  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
     // Approximate duration in minutes
     switch (it->Series_Type) {
       default:
@@ -114,7 +114,7 @@ wstring TaigaStats::CalculateLifeSpentWatching() {
 float TaigaStats::CalculateMeanScore() {
   float sum_scores = 0.0f, items_scored = 0.0f;
   
-  for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
+  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
     if (it->My_Score > 0) {
       sum_scores += static_cast<float>(it->My_Score);
       items_scored++;
@@ -129,7 +129,7 @@ float TaigaStats::CalculateMeanScore() {
 float TaigaStats::CalculateScoreDeviation() {
   float sum_squares = 0.0f, items_scored = 0.0f;
   
-  for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
+  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
     if (it->My_Score > 0) {
       sum_squares += pow(static_cast<float>(it->My_Score) - score_mean_, 2);
       items_scored++;

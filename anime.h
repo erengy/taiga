@@ -23,6 +23,11 @@
 
 // =============================================================================
 
+enum AnimeId {
+  ANIMEID_NOTINLIST = -1,
+  ANIMEID_UNKNOWN = 0
+};
+
 class CEpisode {
 public:
   CEpisode();
@@ -30,7 +35,7 @@ public:
 
   void Clear();
 
-  int Index;
+  int AnimeId;
   wstring File, Folder, Format, Title, Name, Group, Number, Version, 
     Resolution, AudioType, VideoType, Checksum, Extra;
 };
@@ -68,16 +73,16 @@ public:
   bool IsEpisodeAvailable(int number);
   bool SetEpisodeAvailability(int number, bool available, const wstring& path = L"");
   void SetLocalData(const wstring& folder, const wstring& titles);
-  int GetIntValue(int mode);
-  int GetLastWatchedEpisode();
-  int GetRewatching();
-  int GetScore();
-  int GetStatus();
-  wstring GetStrValue(int mode);
-  wstring GetTags();
-  int GetTotalEpisodes();
+  int GetIntValue(int mode) const;
+  int GetLastWatchedEpisode() const;
+  int GetRewatching() const;
+  int GetScore() const;
+  int GetStatus() const;
+  wstring GetStrValue(int mode) const;
+  wstring GetTags() const;
+  int GetTotalEpisodes() const;
   bool ParseSearchResult(const wstring& data);
-  void Edit(const wstring& data, CEventItem item);
+  bool Edit(const wstring& data, CEventItem& item);
   bool IsAiredYet(bool strict = false) const;
   bool IsFinishedAiring() const;
   int GetAiringStatus();

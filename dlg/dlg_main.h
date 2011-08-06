@@ -97,10 +97,11 @@ public:
 
   // Other functions
   void ChangeStatus(wstring str = L"");
+  void EnableInput(bool enable = true);
   void CreateDialogControls();
-  int GetListIndex(int anime_index);
+  int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
-  void RefreshMenubar(int index = -1, bool show = true);
+  void RefreshMenubar(int anime_id = -1, bool show = true);
   void RefreshTabs(int index = -1, bool redraw = true);
   void UpdateTip();
 };

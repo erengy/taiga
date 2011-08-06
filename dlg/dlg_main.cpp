@@ -544,30 +544,30 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
   // ===========================================================================
   
   // Check process list for media players
+  CAnime* anime = AnimeList.FindItem(CurrentEpisode.AnimeId);
   int media_index = MediaPlayers.Check();
-  int anime_index = CurrentEpisode.Index;
 
   // Media player is running
   if (media_index > -1) {
     // Started to watch?
-    if (anime_index == 0) {
+    if (CurrentEpisode.AnimeId == ANIMEID_UNKNOWN) {
       // Recognized?
       if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode)) {
         for (int i = AnimeList.Count; i > 0; i--) {
-          if (Meow.CompareEpisode(CurrentEpisode, AnimeList.Item[i])) {
-            CurrentEpisode.Index = i;
-            RefreshMenubar(CurrentEpisode.Index);
-            AnimeList.Item[i].Start(CurrentEpisode);
+          if (Meow.CompareEpisode(CurrentEpisode, AnimeList.Items[i])) {
+            CurrentEpisode.AnimeId = AnimeList.Items[i].Series_ID;
+            RefreshMenubar(CurrentEpisode.AnimeId);
+            AnimeList.Items[i].Start(CurrentEpisode);
             return;
           }
         }
       }
       // Not recognized
-      CurrentEpisode.Index = -1;
-      RefreshMenubar(CurrentEpisode.Index);
+      CurrentEpisode.AnimeId = ANIMEID_NOTINLIST;
+      RefreshMenubar(CurrentEpisode.AnimeId);
       if (CurrentEpisode.Title.empty()) {
         #ifdef _DEBUG
-        ChangeStatus(MediaPlayers.Item[MediaPlayers.Index].Name + L" is running.");
+        ChangeStatus(MediaPlayers.Items[MediaPlayers.Index].Name + L" is running.");
         #endif
       } else {
         ChangeStatus(L"Watching: " + CurrentEpisode.Title + 
@@ -592,22 +592,22 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
           ExecuteAction(L"AnnounceToMIRC", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           ExecuteAction(L"AnnounceToSkype", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           // Update
-          if (Settings.Account.Update.Time == UPDATE_MODE_AFTERDELAY && anime_index > 0) {
-            AnimeList.Item[anime_index].End(CurrentEpisode, false, true);
+          if (Settings.Account.Update.Time == UPDATE_MODE_AFTERDELAY && anime) {
+            anime->End(CurrentEpisode, false, true);
           }
           return;
         }
         if (Settings.Account.Update.CheckPlayer == FALSE || 
-          MediaPlayers.Item[media_index].WindowHandle == GetForegroundWindow()) {
+          MediaPlayers.Items[media_index].WindowHandle == GetForegroundWindow()) {
             Taiga.TickerMedia++;
         }
       }
       // Caption changed?
       if (MediaPlayers.TitleChanged() == true) {
-        CurrentEpisode.Index = 0;
-        RefreshMenubar(CurrentEpisode.Index);
-        if (anime_index > 0) {
-          AnimeList.Item[anime_index].End(CurrentEpisode, true, true);
+        CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
+        RefreshMenubar(CurrentEpisode.AnimeId);
+        if (anime) {
+          anime->End(CurrentEpisode, true, true);
         }
         Taiga.TickerMedia = 0;
       }
@@ -616,20 +616,19 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
   // Media player is NOT running
   } else {
     // Was running, but not watching
-    if (anime_index < 1) {
+    if (!anime) {
       if (MediaPlayers.IndexOld > 0){
         ChangeStatus();
-        CurrentEpisode.Index = 0;
+        CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
         MediaPlayers.IndexOld = 0;
-        RefreshMenubar(CurrentEpisode.Index);
+        RefreshMenubar(CurrentEpisode.AnimeId);
       }
     
     // Was running and watching
     } else {
-      CurrentEpisode.Index = 0;
-      RefreshMenubar(CurrentEpisode.Index);
-      AnimeList.Item[anime_index].End(CurrentEpisode, true, 
-        Settings.Account.Update.Time == UPDATE_MODE_WAITPLAYER);
+      CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
+      RefreshMenubar(CurrentEpisode.AnimeId);
+      anime->End(CurrentEpisode, true, Settings.Account.Update.Time == UPDATE_MODE_WAITPLAYER);
       Taiga.TickerMedia = 0;
     }
   }
@@ -679,7 +678,7 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case WM_RBUTTONDOWN: {
-        UpdateAllMenus(AnimeList.Index);
+        UpdateAllMenus(AnimeList.Index > -1 ? &AnimeList.Items[AnimeList.Index] : nullptr);
         SetForegroundWindow();
         ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"Tray"));
         RefreshMenubar(AnimeList.Index);
@@ -693,24 +692,31 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
 
 void CMainWindow::ChangeStatus(wstring str) {
   // Change status text
-  if (str.empty() && CurrentEpisode.Index > 0) {
-    str = L"Watching: " + 
-      AnimeList.Item[CurrentEpisode.Index].Series_Title + 
-      PushString(L" #", CurrentEpisode.Number);
+  if (str.empty() && CurrentEpisode.AnimeId > 0) {
+    CAnime* anime = AnimeList.FindItem(CurrentEpisode.AnimeId);
+    str = L"Watching: " + anime->Series_Title + PushString(L" #", CurrentEpisode.Number);
     if (Settings.Account.Update.OutOfRange && 
-        GetEpisodeLow(CurrentEpisode.Number) > AnimeList.Item[CurrentEpisode.Index].GetLastWatchedEpisode() + 1) {
-          str += L" (out of range)";
+      GetEpisodeLow(CurrentEpisode.Number) > anime->GetLastWatchedEpisode() + 1) {
+        str += L" (out of range)";
     }
   }
   if (!str.empty()) str = L"  " + str;
   m_Status.SetText(str.c_str());
 }
 
-int CMainWindow::GetListIndex(int anime_index) {
-  CAnime* pItem;
+void CMainWindow::EnableInput(bool enable) {
+  // Enable/disable toolbar buttons
+  m_Toolbar.EnableButton(0, enable);
+  m_Toolbar.EnableButton(1, enable);
+  // Enable/disable list
+  m_List.Enable(enable);
+}
+
+int CMainWindow::GetListIndex(int anime_id) {
+  CAnime* anime;
   for (int i = 0; i < m_List.GetItemCount(); i++) {
-    pItem = reinterpret_cast<CAnime*>(m_List.GetItemParam(i));
-    if (pItem && pItem->Index == anime_index) return i;
+    anime = reinterpret_cast<CAnime*>(m_List.GetItemParam(i));
+    if (anime && anime->Series_ID == anime_id) return i;
   }
   return -1;
 }
@@ -727,7 +733,7 @@ void CMainWindow::RefreshList(int index) {
 
   // Hide list to avoid visual defects and gain performance
   m_List.Hide();
-  m_List.EnableGroupView(index == 0);
+  m_List.EnableGroupView(index == 0 && GetWinVersion() > WINVERSION_XP);
   m_List.DeleteAllItems();
 
   // Remember last index
@@ -736,18 +742,21 @@ void CMainWindow::RefreshList(int index) {
   if (index > 0) last_index = index;
 
   // Add items
-  int icon_index = 0;
-  int group_count[6] = {0};
-  for (int i = 1; i <= AnimeList.Count; i++) {
-    if (AnimeList.Item[i].GetStatus() == index || index == 0 || (index == MAL_WATCHING && AnimeList.Item[i].GetRewatching())) {
-      if (AnimeList.Filter.Check(i)) {
-        icon_index = AnimeList.Item[i].Playing ? Icon16_Play : StatusToIcon(AnimeList.Item[i].GetAiringStatus());
-        group_count[AnimeList.Item[i].GetStatus() - 1]++;
-        int j = m_List.InsertItem(i, AnimeList.Item[i].GetStatus(), icon_index, 
-          0, NULL, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
-        m_List.SetItem(j, 2, MAL.TranslateNumber(AnimeList.Item[i].GetScore()).c_str());
-        m_List.SetItem(j, 3, MAL.TranslateType(AnimeList.Item[i].Series_Type).c_str());
-        m_List.SetItem(j, 4, MAL.TranslateDate(AnimeList.Item[i].Series_Start).c_str());
+  int group_index = -1, icon_index = 0, status = 0;
+  vector<int> group_count(6);
+  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
+    status = it->GetStatus();
+    if (status == index || index == 0 || (index == MAL_WATCHING && it->GetRewatching())) {
+      if (AnimeList.Filter.Check(*it)) {
+        group_index = GetWinVersion() > WINVERSION_XP ? status : -1;
+        icon_index = it->Playing ? Icon16_Play : StatusToIcon(it->GetAiringStatus());
+        group_count.at(status - 1)++;
+        int i = m_List.GetItemCount();
+        m_List.InsertItem(i, group_index, icon_index, 
+          0, NULL, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
+        m_List.SetItem(i, 2, MAL.TranslateNumber(it->GetScore()).c_str());
+        m_List.SetItem(i, 3, MAL.TranslateType(it->Series_Type).c_str());
+        m_List.SetItem(i, 4, MAL.TranslateDate(it->Series_Start).c_str());
       }
     }
   }
@@ -756,21 +765,22 @@ void CMainWindow::RefreshList(int index) {
   for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
     if (index == 0 && i != MAL_UNKNOWN) {
       wstring text = MAL.TranslateMyStatus(i, false);
-      text += group_count[i - 1] > 0 ? L" (" + ToWSTR(group_count[i - 1]) + L")" : L"";
+      text += group_count.at(i - 1) > 0 ? L" (" + ToWSTR(group_count.at(i - 1)) + L")" : L"";
       m_List.SetGroupText(i, text.c_str());
     }
   }
 
   // Sort items
-  m_List.Sort(m_List.GetSortColumn(), m_List.GetSortOrder(), m_List.GetSortType(m_List.GetSortColumn()), ListViewCompareProc);
+  m_List.Sort(m_List.GetSortColumn(), m_List.GetSortOrder(), 
+    m_List.GetSortType(m_List.GetSortColumn()), ListViewCompareProc);
 
   // Show again
   m_List.Show(SW_SHOW);
 }
 
-void CMainWindow::RefreshMenubar(int index, bool show) {
+void CMainWindow::RefreshMenubar(int anime_id, bool show) {
   if (show) {
-    UpdateAllMenus(index);
+    UpdateAllMenus(AnimeList.FindItem(anime_id));
     vector<HMENU> hMenu;
     UI.Menus.CreateNewMenu(L"Main", hMenu);
     if (!hMenu.empty()) {
@@ -838,8 +848,9 @@ void CMainWindow::UpdateTip() {
   if (Taiga.LoggedIn) {
     tip += L"\n" + AnimeList.User.Name + L" is logged in.";
   }
-  if (CurrentEpisode.Index > 0) {
-    tip += L"\nWatching: " + AnimeList.Item[CurrentEpisode.Index].Series_Title + 
+  if (CurrentEpisode.AnimeId > 0) {
+    CAnime* anime = AnimeList.FindItem(CurrentEpisode.AnimeId);
+    tip += L"\nWatching: " + anime->Series_Title + 
       (!CurrentEpisode.Number.empty() ? L" #" + CurrentEpisode.Number : L"");
   }
   Taskbar.Modify(tip.c_str());

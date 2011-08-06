@@ -105,8 +105,8 @@ public:
   bool GetAnimeDetails(CAnime* pAnimeItem);
   bool GetList(bool login);
   bool Login();
-  BOOL SearchAnime(wstring title, CAnime* pAnimeItem = NULL);
-  void Update(CMALAnimeValues anime, int list_index, int anime_id, int update_mode);
+  bool SearchAnime(wstring title, CAnime* pAnimeItem = NULL);
+  bool Update(CMALAnimeValues& anime_values, int anime_id, int update_mode);
   bool UpdateSucceeded(const wstring& data, CEventItem& item);
   
   void DecodeText(wstring& text);

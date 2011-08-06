@@ -225,9 +225,9 @@ void CSearchWindow::ParseResults(const wstring& data) {
       m_Anime[i].Index = AnimeList.FindItemIndex(anime_id);
       
       if (m_Anime[i].Index > -1) {
-        AnimeList.Item[m_Anime[i].Index].Score = XML_ReadStrValue(entry, L"score");
-        AnimeList.Item[m_Anime[i].Index].Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeText(AnimeList.Item[m_Anime[i].Index].Synopsis);
+        AnimeList.Items[m_Anime[i].Index].Score = XML_ReadStrValue(entry, L"score");
+        AnimeList.Items[m_Anime[i].Index].Synopsis = XML_ReadStrValue(entry, L"synopsis");
+        MAL.DecodeText(AnimeList.Items[m_Anime[i].Index].Synopsis);
       } else {
         m_Anime[i].Series_ID = anime_id;
         m_Anime[i].Series_Title = XML_ReadStrValue(entry, L"title");
@@ -262,7 +262,7 @@ void CSearchWindow::RefreshList() {
     if (m_Anime[i].Index == -1) {
       m_Anime[i].Index = AnimeList.FindItemIndex(m_Anime[i].Series_ID);
     }
-    CAnime* item = m_Anime[i].Index > -1 ? &AnimeList.Item[m_Anime[i].Index] : &m_Anime[i];
+    CAnime* item = m_Anime[i].Index > -1 ? &AnimeList.Items[m_Anime[i].Index] : &m_Anime[i];
     m_List.InsertItem(i, -1, StatusToIcon(item->GetAiringStatus()), 0, NULL, 
       item->Series_Title.c_str(), 
       reinterpret_cast<LPARAM>(item));

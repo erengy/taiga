@@ -38,6 +38,7 @@ enum ListSortType {
 
 typedef unsigned __int64 QWORD, *LPQWORD;
 
+class CAnime;
 class CEpisode;
 
 // =============================================================================
@@ -94,10 +95,10 @@ bool UncompressGzippedString(const string& input, string& output);
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 // menu.cpp
-void UpdateAllMenus(int anime_index);
+void UpdateAllMenus(CAnime* anime);
 void UpdateAccountMenu();
-void UpdateAnimeMenu(int anime_index);
-void UpdateAnnounceMenu(int anime_index);
+void UpdateAnimeMenu(CAnime* anime);
+void UpdateAnnounceMenu();
 void UpdateFilterMenu();
 void UpdateFoldersMenu();
 void UpdateSearchMenu();
@@ -113,6 +114,6 @@ wstring EscapeScriptEntities(wstring str);
 wstring UnescapeScriptEntities(wstring str);
 
 // search.cpp
-wstring SearchFileFolder(int anime_index, wstring root, int episode_number, bool search_folder);
+wstring SearchFileFolder(CAnime& anime, wstring root, int episode_number, bool search_folder);
 
 #endif // COMMON_H

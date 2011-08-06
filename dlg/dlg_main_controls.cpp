@@ -218,7 +218,7 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
     case NM_RCLICK: {
       if (pnmh->hwndFrom == m_List.GetWindowHandle()) {
         if (m_List.GetSelectedCount() > 0) {
-          UpdateAllMenus(AnimeList.Index);
+          UpdateAllMenus(AnimeList.Index > -1 ? &AnimeList.Items[AnimeList.Index] : nullptr);
           int index = m_List.HitTest(true);
           ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, index == 2 ? L"EditScore" : L"RightClick"));
           RefreshMenubar(AnimeList.Index);
@@ -453,9 +453,6 @@ LRESULT CMainWindow::OnButtonCustomDraw(LPARAM lParam) {
 
   switch (pCD->dwDrawStage) {
     case CDDS_PREPAINT: {
-      return CDRF_NOTIFYPOSTPAINT;
-    }
-    case CDDS_POSTPAINT: {
       CDC dc = pCD->hdc;
       dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
       UI.ImgList16.Draw(Icon16_Cross, dc.Get(), 0, 0);

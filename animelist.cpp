@@ -37,10 +37,10 @@ void CAnimeList::Clear() {
   // Clear list
   Index = 0;
   Count = -1;
-  Item.clear();
+  Items.clear();
   
   // Add default item
-  AddItem(4224, L"Toradora!", L"Tiger X Dragon",
+  AddItem(-4224, L"Toradora!", L"Tiger X Dragon",
     1, 25, 2, L"2008-10-01", L"2009-03-25",
     L"http://cdn.myanimelist.net/images/anime/5/22125.jpg",
     5741141, 26, L"0000-00-00", L"0000-00-00",
@@ -49,7 +49,7 @@ void CAnimeList::Clear() {
 
 // =============================================================================
 
-BOOL CAnimeList::Read() {
+bool CAnimeList::Read() {
   // Initialize
   Clear();
   User.Clear();
@@ -61,7 +61,7 @@ BOOL CAnimeList::Read() {
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok && result.status != status_file_not_found) {
     MessageBox(NULL, L"Could not read anime list.", file.c_str(), MB_OK | MB_ICONERROR);
-    return FALSE;
+    return false;
   }
 
   // Read user info
@@ -103,12 +103,14 @@ BOOL CAnimeList::Read() {
       XML_ReadStrValue(anime, L"my_tags"));
   }
 
-  return TRUE;
+  return true;
 }
 
-BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
-  if (mode != ANIMELIST_EDITUSER) {
-    if (index < 1 || index > Count) return FALSE;
+bool CAnimeList::Write(int anime_id, wstring child, wstring value, int mode) {
+  CAnime* anime = FindItem(anime_id);
+
+  if (mode != ANIMELIST_EDITUSER && !anime) {
+    return false;
   }
   
   // Initialize
@@ -117,7 +119,7 @@ BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
   // Read XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok) return FALSE;
+  if (result.status != status_ok) return false;
 
   // Read anime list
   xml_node myanimelist = doc.child(L"myanimelist");
@@ -126,59 +128,59 @@ BOOL CAnimeList::Write(int index, wstring child, wstring value, int mode) {
     case ANIMELIST_EDITUSER: {
       myanimelist.child(L"myinfo").child(child.c_str()).first_child().set_value(value.c_str());
       doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
-      return TRUE;
+      return true;
     }
     // Edit anime data
     case ANIMELIST_EDITANIME: {
-      for (xml_node anime = myanimelist.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
-        if (XML_ReadIntValue(anime, L"series_animedb_id") == Item[index].Series_ID) {
-          anime.child(child.c_str()).first_child().set_value(value.c_str());
+      for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
+        if (XML_ReadIntValue(node, L"series_animedb_id") == anime->Series_ID) {
+          node.child(child.c_str()).first_child().set_value(value.c_str());
           doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
-          return TRUE;
+          return true;
         }
       }
       break;
     }
     // Add anime item
     case ANIMELIST_ADDANIME: {
-      xml_node anime = myanimelist.append_child();
-      anime.set_name(L"anime");
-      XML_WriteIntValue(anime, L"series_animedb_id", Item[index].Series_ID);
-      XML_WriteStrValue(anime, L"series_title", Item[index].Series_Title.c_str(), node_cdata);
-      XML_WriteStrValue(anime, L"series_synonyms", Item[index].Series_Synonyms.c_str(), node_cdata);
-      XML_WriteIntValue(anime, L"series_type", Item[index].Series_Type);
-      XML_WriteIntValue(anime, L"series_episodes", Item[index].Series_Episodes);
-      XML_WriteIntValue(anime, L"series_status", Item[index].Series_Status);
-      XML_WriteStrValue(anime, L"series_start", Item[index].Series_Start.c_str());
-      XML_WriteStrValue(anime, L"series_end", Item[index].Series_End.c_str());
-      XML_WriteStrValue(anime, L"series_image", Item[index].Series_Image.c_str());
-      XML_WriteIntValue(anime, L"my_id", Item[index].My_ID);
-      XML_WriteIntValue(anime, L"my_watched_episodes", Item[index].My_WatchedEpisodes);
-      XML_WriteStrValue(anime, L"my_start_date", Item[index].My_StartDate.c_str());
-      XML_WriteStrValue(anime, L"my_finish_date", Item[index].My_FinishDate.c_str());
-      XML_WriteIntValue(anime, L"my_score", Item[index].My_Score);
-      XML_WriteIntValue(anime, L"my_status", Item[index].My_Status);
-      XML_WriteIntValue(anime, L"my_rewatching", Item[index].My_Rewatching);
-      XML_WriteIntValue(anime, L"my_rewatching_ep", Item[index].My_RewatchingEP);
-      XML_WriteStrValue(anime, L"my_last_updated", Item[index].My_LastUpdated.c_str());
-      XML_WriteStrValue(anime, L"my_tags", Item[index].My_Tags.c_str());
+      xml_node node = myanimelist.append_child();
+      node.set_name(L"anime");
+      XML_WriteIntValue(node, L"series_animedb_id", anime->Series_ID);
+      XML_WriteStrValue(node, L"series_title", anime->Series_Title.c_str(), node_cdata);
+      XML_WriteStrValue(node, L"series_synonyms", anime->Series_Synonyms.c_str(), node_cdata);
+      XML_WriteIntValue(node, L"series_type", anime->Series_Type);
+      XML_WriteIntValue(node, L"series_episodes", anime->Series_Episodes);
+      XML_WriteIntValue(node, L"series_status", anime->Series_Status);
+      XML_WriteStrValue(node, L"series_start", anime->Series_Start.c_str());
+      XML_WriteStrValue(node, L"series_end", anime->Series_End.c_str());
+      XML_WriteStrValue(node, L"series_image", anime->Series_Image.c_str());
+      XML_WriteIntValue(node, L"my_id", anime->My_ID);
+      XML_WriteIntValue(node, L"my_watched_episodes", anime->My_WatchedEpisodes);
+      XML_WriteStrValue(node, L"my_start_date", anime->My_StartDate.c_str());
+      XML_WriteStrValue(node, L"my_finish_date", anime->My_FinishDate.c_str());
+      XML_WriteIntValue(node, L"my_score", anime->My_Score);
+      XML_WriteIntValue(node, L"my_status", anime->My_Status);
+      XML_WriteIntValue(node, L"my_rewatching", anime->My_Rewatching);
+      XML_WriteIntValue(node, L"my_rewatching_ep", anime->My_RewatchingEP);
+      XML_WriteStrValue(node, L"my_last_updated", anime->My_LastUpdated.c_str());
+      XML_WriteStrValue(node, L"my_tags", anime->My_Tags.c_str());
       doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
-      return TRUE;
+      return true;
     }
     // Delete anime item
     case ANIMELIST_DELETEANIME: {
-      for (xml_node anime = myanimelist.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
-        if (XML_ReadIntValue(anime, L"series_animedb_id") == Item[index].Series_ID) {
-          myanimelist.remove_child(anime);
+      for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
+        if (XML_ReadIntValue(node, L"series_animedb_id") == anime->Series_ID) {
+          myanimelist.remove_child(node);
           doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
-          return TRUE;
+          return true;
         }
       }
       break;
     }
   }
 
-  return FALSE;
+  return false;
 }
 
 // =============================================================================
@@ -226,72 +228,75 @@ void CAnimeList::AddItem(
   wstring my_last_updated, 
   wstring my_tags)
 {
-  Item.resize(++Count + 1);
-  Item[Count].Series_ID          = series_id;
-  Item[Count].Series_Title       = series_title;
-  Item[Count].Series_Synonyms    = series_synonyms;
-  Item[Count].Series_Type        = series_type;
-  Item[Count].Series_Episodes    = series_episodes;
-  Item[Count].Series_Status      = series_status;
-  Item[Count].Series_Start       = series_start;
-  Item[Count].Series_End         = series_end;
-  Item[Count].Series_Image       = series_image;
-  Item[Count].My_ID              = my_id;
-  Item[Count].My_WatchedEpisodes = my_watched_episodes;
-  Item[Count].My_StartDate       = my_start_date;
-  Item[Count].My_FinishDate      = my_finish_date;
-  Item[Count].My_Score           = my_score;
-  Item[Count].My_Status          = my_status;
-  Item[Count].My_Rewatching      = my_rewatching;
-  Item[Count].My_RewatchingEP    = my_rewatching_ep;
-  Item[Count].My_LastUpdated     = my_last_updated;
-  Item[Count].My_Tags            = my_tags;
+  Items.resize(++Count + 1);
+  Items[Count].Series_ID          = series_id;
+  Items[Count].Series_Title       = series_title;
+  Items[Count].Series_Synonyms    = series_synonyms;
+  Items[Count].Series_Type        = series_type;
+  Items[Count].Series_Episodes    = series_episodes;
+  Items[Count].Series_Status      = series_status;
+  Items[Count].Series_Start       = series_start;
+  Items[Count].Series_End         = series_end;
+  Items[Count].Series_Image       = series_image;
+  Items[Count].My_ID              = my_id;
+  Items[Count].My_WatchedEpisodes = my_watched_episodes;
+  Items[Count].My_StartDate       = my_start_date;
+  Items[Count].My_FinishDate      = my_finish_date;
+  Items[Count].My_Score           = my_score;
+  Items[Count].My_Status          = my_status;
+  Items[Count].My_Rewatching      = my_rewatching;
+  Items[Count].My_RewatchingEP    = my_rewatching_ep;
+  Items[Count].My_LastUpdated     = my_last_updated;
+  Items[Count].My_Tags            = my_tags;
   
-  Item[Count].Index = Count;
-  if (Item[Count].Series_Episodes) {
-    Item[Count].EpisodeAvailable.resize(Item[Count].Series_Episodes);
+  Items[Count].Index = Count;
+  if (Items[Count].Series_Episodes) {
+    Items[Count].EpisodeAvailable.resize(Items[Count].Series_Episodes);
   }
   if (Count <= 0) return;
 
-  DecodeHTML(Item[Count].Series_Title);
-  DecodeHTML(Item[Count].Series_Synonyms);
+  DecodeHTML(Items[Count].Series_Title);
+  DecodeHTML(Items[Count].Series_Synonyms);
 
   User.IncreaseItemCount(my_status, 1, false);
 
-  for (size_t i = 0; i < Settings.Anime.Item.size(); i++) {
-    if (Item[Count].Series_ID == Settings.Anime.Item[i].ID) {
-      Item[Count].Folder = Settings.Anime.Item[i].Folder;
-      Item[Count].Synonyms = Settings.Anime.Item[i].Titles;
+  for (size_t i = 0; i < Settings.Anime.Items.size(); i++) {
+    if (Items[Count].Series_ID == Settings.Anime.Items[i].ID) {
+      Items[Count].Folder = Settings.Anime.Items[i].Folder;
+      Items[Count].Synonyms = Settings.Anime.Items[i].Titles;
       break;
     }
   }
 }
 
-void CAnimeList::DeleteItem(int index) {
-  if (index <= 0 || index > Count) return;
+bool CAnimeList::DeleteItem(int anime_id) {
+  CAnime* anime = FindItem(anime_id);
+  if (!anime) return false;
 
-  User.IncreaseItemCount(Item[index].My_Status, -1);
-  Write(index, L"", L"", ANIMELIST_DELETEANIME);
+  User.IncreaseItemCount(anime->My_Status, -1);
+  Write(anime_id, L"", L"", ANIMELIST_DELETEANIME);
   
   Count--;
-  Item.erase(Item.begin() + index);
+  Items.erase(Items.begin() + anime->Index);
   for (int i = 1; i <= Count; i++) {
-    Item[i].Index = i;
+    Items[i].Index = i;
   }
+
+  return true;
 }
 
 CAnime* CAnimeList::FindItem(int anime_id) {
   if (anime_id)
-    for (int i = 1; i <= Count; i++)
-      if (Item[i].Series_ID == anime_id)
-        return &Item[i];
-  return NULL;
+    for (int i = 0; i <= Count; i++)
+      if (Items[i].Series_ID == anime_id)
+        return &Items[i];
+  return nullptr;
 }
 
 int CAnimeList::FindItemIndex(int anime_id) {
   if (anime_id)
-    for (int i = 1; i <= Count; i++)
-      if (Item[i].Series_ID == anime_id)
+    for (int i = 0; i <= Count; i++)
+      if (Items[i].Series_ID == anime_id)
         return i;
   return -1;
 }
@@ -302,49 +307,49 @@ CAnimeList::CFilter::CFilter() {
   Reset();
 }
 
-BOOL CAnimeList::CFilter::Check(int item_index) {
+bool CAnimeList::CFilter::Check(CAnime& anime) {
   // Filter my status
   for (int i = 0; i < 6; i++) {
-    if (!MyStatus[i] && AnimeList.Item[item_index].GetStatus() == i + 1) {
-      return FALSE;
+    if (!MyStatus[i] && anime.GetStatus() == i + 1) {
+      return false;
     }
   }
   // Filter status
   for (int i = 0; i < 3; i++) {
-    if (!Status[i] && AnimeList.Item[item_index].GetAiringStatus() == i + 1) {
-      return FALSE;
+    if (!Status[i] && anime.GetAiringStatus() == i + 1) {
+      return false;
     }
   }
   // Filter type
   for (int i = 0; i < 6; i++) {
-    if (!Type[i] && AnimeList.Item[item_index].Series_Type == i + 1) {
-      return FALSE;
+    if (!Type[i] && anime.Series_Type == i + 1) {
+      return false;
     }
   }
   // Filter new episodes
-  if (NewEps && !AnimeList.Item[item_index].NewEps) {
-    return FALSE;
+  if (NewEps && !anime.NewEps) {
+    return false;
   }
   // Filter text
   vector<wstring> text_vector;
   Split(Text, L" ", text_vector);
-  for (size_t i = 0; i < text_vector.size(); i++) {
-    if (InStr(AnimeList.Item[item_index].Series_Title,  text_vector[i], 0, true) == -1 && 
-      InStr(AnimeList.Item[item_index].Series_Synonyms, text_vector[i], 0, true) == -1 && 
-      InStr(AnimeList.Item[item_index].Synonyms,        text_vector[i], 0, true) == -1 && 
-      InStr(AnimeList.Item[item_index].GetTags(),       text_vector[i], 0, true) == -1) {
-        return FALSE;
+  for (auto it = text_vector.begin(); it != text_vector.end(); ++it) {
+    if (InStr(anime.Series_Title,  *it, 0, true) == -1 && 
+      InStr(anime.Series_Synonyms, *it, 0, true) == -1 && 
+      InStr(anime.Synonyms,        *it, 0, true) == -1 && 
+      InStr(anime.GetTags(),       *it, 0, true) == -1) {
+        return false;
     }
   }
 
-  return TRUE;
+  return true;
 }
 
 void CAnimeList::CFilter::Reset() {
-  for (int i = 0; i < 6; i++) MyStatus[i] = TRUE;
-  for (int i = 0; i < 3; i++) Status[i] = TRUE;
-  for (int i = 0; i < 6; i++) Type[i] = TRUE;
-  NewEps = FALSE;
+  for (int i = 0; i < 6; i++) MyStatus[i] = true;
+  for (int i = 0; i < 3; i++) Status[i] = true;
+  for (int i = 0; i < 6; i++) Type[i] = true;
+  NewEps = false;
   Text = L"";
 }
 
@@ -390,21 +395,20 @@ int CUser::GetItemCount(int status) {
   // Search event queue for status changes
   int user_index = EventQueue.GetUserIndex();
   if (user_index > -1) {
-    #define ITEM EventQueue.List[user_index].Item
-    for (unsigned int i = 0; i < ITEM.size(); i++) {
-      if (ITEM[i].Mode == HTTP_MAL_AnimeAdd) continue;
-      if (ITEM[i].status > -1) {
-        if (status == ITEM[i].status) {
-          count++;
-        } else {
-          if (ITEM[i].AnimeIndex > 0 && ITEM[i].AnimeIndex <= AnimeList.Count && 
-            status == AnimeList.Item[ITEM[i].AnimeIndex].My_Status) {
+    for (auto it = EventQueue.List[user_index].Items.begin(); 
+      it != EventQueue.List[user_index].Items.end(); ++it) {
+        if (it->Mode == HTTP_MAL_AnimeAdd) continue;
+        if (it->status > -1) {
+          if (status == it->status) {
+            count++;
+          } else {
+            CAnime* anime = AnimeList.FindItem(it->AnimeId);
+            if (anime && status == anime->My_Status) {
               count--;
+            }
           }
         }
-      }
     }
-    #undef ITEM
   }
 
   // Return final value

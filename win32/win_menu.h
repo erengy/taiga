@@ -66,7 +66,7 @@ public:
         int     Index;
       } Icon;
     };
-    vector<CMenuItem> Item;
+    vector<CMenuItem> Items;
     wstring Name, Type;
   };
   vector<CMenu> Menu;

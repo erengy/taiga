@@ -219,7 +219,7 @@ void CSettingsWindow::OnOK() {
   // Program > List
   Settings.Program.List.DoubleClick = m_Page[PAGE_LIST].GetComboSelection(IDC_COMBO_DBLCLICK);
   Settings.Program.List.MiddleClick = m_Page[PAGE_LIST].GetComboSelection(IDC_COMBO_MDLCLICK);
-  AnimeList.Filter.NewEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS);
+  AnimeList.Filter.NewEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS) == TRUE;
   Settings.Program.List.Highlight = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
   Settings.Program.List.ProgressMode = m_Page[PAGE_LIST].GetCheckedRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2);
   Settings.Program.List.ProgressShowEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
@@ -229,8 +229,8 @@ void CSettingsWindow::OnOK() {
 
   // Recognition > Media players
   List.SetWindowHandle(m_Page[PAGE_MEDIA].GetDlgItem(IDC_LIST_MEDIA));
-  for (size_t i = 0; i < MediaPlayers.Item.size(); i++) {
-    MediaPlayers.Item[i].Enabled = List.GetCheckState(i);
+  for (size_t i = 0; i < MediaPlayers.Items.size(); i++) {
+    MediaPlayers.Items[i].Enabled = List.GetCheckState(i);
   }
   List.SetWindowHandle(NULL);
 
@@ -271,7 +271,7 @@ void CSettingsWindow::OnOK() {
   // Refresh other windows
   if (Settings.Account.MAL.User != mal_user_old) {
     AnimeList.Read();
-    CurrentEpisode.Index = 0;
+    CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
     MainWindow.RefreshList(MAL_WATCHING);
     MainWindow.RefreshTabs(MAL_WATCHING);
     EventWindow.RefreshList();

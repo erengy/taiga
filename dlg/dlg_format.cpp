@@ -42,10 +42,10 @@ BOOL CFormatWindow::OnInitDialog() {
   m_RichEdit.SetEventMask(ENM_CHANGE);
 
   // Create temporary episode
-  if (CurrentEpisode.Index > 0) {
+  if (CurrentEpisode.AnimeId > 0) {
     Example = CurrentEpisode;
   } else {
-    Example.Index      = 0;
+    Example.AnimeId    = -4224;
     Example.AudioType  = L"AAC";
     Example.Checksum   = L"ABCD1234";
     Example.Extra      = L"DVD";

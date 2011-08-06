@@ -233,7 +233,7 @@ void CFeedConditionWindow::ChooseElement(int element_index) {
       RECREATE_COMBO((element_index == FEED_FILTER_ELEMENT_ANIME_ID ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
       typedef std::pair<LPARAM, wstring> anime_pair;
       vector<anime_pair> title_list;
-      for (auto it = AnimeList.Item.begin() + 1; it != AnimeList.Item.end(); ++it) {
+      for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
         switch (it->GetStatus()) {
           case MAL_COMPLETED:
           case MAL_DROPPED:

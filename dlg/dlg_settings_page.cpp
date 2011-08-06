@@ -105,11 +105,11 @@ BOOL CSettingsPage::OnInitDialog() {
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
       for (int i = 1; i <= AnimeList.Count; i++) {
-        List.InsertItem(i - 1, AnimeList.Item[i].GetStatus(), 
-                StatusToIcon(AnimeList.Item[i].GetAiringStatus()), 
+        List.InsertItem(i - 1, AnimeList.Items[i].GetStatus(), 
+                StatusToIcon(AnimeList.Items[i].GetAiringStatus()), 
                 0, NULL, LPSTR_TEXTCALLBACK, 
-                reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
-        List.SetItem(i - 1, 1, AnimeList.Item[i].Folder.c_str());
+                reinterpret_cast<LPARAM>(&AnimeList.Items[i]));
+        List.SetItem(i - 1, 1, AnimeList.Items[i].Folder.c_str());
       }
       List.Sort(0, 1, 0, ListViewCompareProc);
       List.SetWindowHandle(NULL);
@@ -229,12 +229,12 @@ BOOL CSettingsPage::OnInitDialog() {
         hdi.fmt |= HDF_CHECKBOX;
         Header_SetItem(Header.GetWindowHandle(), 0, &hdi);
       }
-      for (size_t i = 0; i < MediaPlayers.Item.size(); i++) {
-        BOOL player_available = MediaPlayers.Item[i].GetPath().empty() ? FALSE : TRUE;
-        List.InsertItem(i, MediaPlayers.Item[i].Mode, 
+      for (size_t i = 0; i < MediaPlayers.Items.size(); i++) {
+        BOOL player_available = MediaPlayers.Items[i].GetPath().empty() ? FALSE : TRUE;
+        List.InsertItem(i, MediaPlayers.Items[i].Mode, 
           Icon16_AppGray - player_available, 0, NULL, 
-          MediaPlayers.Item[i].Name.c_str(), NULL);
-        if (MediaPlayers.Item[i].Enabled) List.SetCheckState(i, TRUE);
+          MediaPlayers.Items[i].Name.c_str(), NULL);
+        if (MediaPlayers.Items[i].Enabled) List.SetCheckState(i, TRUE);
       }
       Header.SetWindowHandle(NULL);
       List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -549,7 +549,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
             List.SetWindowHandle(NULL);
           // Media players
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-            Execute(MediaPlayers.Item[lpnmitem->iItem].GetPath());
+            Execute(MediaPlayers.Items[lpnmitem->iItem].GetPath());
           // Torrent filters
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
             CListView List = lpnmitem->hdr.hwndFrom;
@@ -648,7 +648,7 @@ int AddTorrentFilterToList(HWND hwnd_list, const CFeedFilter& filter) {
   wstring text;
   CListView List = hwnd_list;
   int index = List.GetItemCount();
-  int group = filter.AnimeID.empty() ? 0 : 1;
+  int group = filter.AnimeIds.empty() ? 0 : 1;
   int icon = Icon16_Funnel;
   switch (filter.Action) {
     case FEED_FILTER_ACTION_DISCARD: icon = Icon16_FunnelCross; break;

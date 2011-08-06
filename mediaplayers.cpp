@@ -33,7 +33,7 @@ CMediaPlayers MediaPlayers;
 BOOL CMediaPlayers::Read() {
   // Initialize
   wstring file = Taiga.GetDataPath() + L"Media.xml";
-  Item.clear();
+  Items.clear();
   Index = -1;
   
   // Read XML file
@@ -47,19 +47,19 @@ BOOL CMediaPlayers::Read() {
   // Read player list
   xml_node mediaplayers = doc.child(L"media_players");
   for (xml_node player = mediaplayers.child(L"player"); player; player = player.next_sibling(L"player")) {
-    Item.resize(Item.size() + 1);
-    Item.back().Name = XML_ReadStrValue(player, L"name");
-    Item.back().Enabled = XML_ReadIntValue(player, L"enabled");
-    Item.back().Visible = XML_ReadIntValue(player, L"visible");
-    Item.back().Mode = XML_ReadIntValue(player, L"mode");
-    XML_ReadChildNodes(player, Item.back().Class, L"class");
-    XML_ReadChildNodes(player, Item.back().File, L"file");
-    XML_ReadChildNodes(player, Item.back().Folder, L"folder");
+    Items.resize(Items.size() + 1);
+    Items.back().Name = XML_ReadStrValue(player, L"name");
+    Items.back().Enabled = XML_ReadIntValue(player, L"enabled");
+    Items.back().Visible = XML_ReadIntValue(player, L"visible");
+    Items.back().Mode = XML_ReadIntValue(player, L"mode");
+    XML_ReadChildNodes(player, Items.back().Class, L"class");
+    XML_ReadChildNodes(player, Items.back().File, L"file");
+    XML_ReadChildNodes(player, Items.back().Folder, L"folder");
     for (xml_node child_node = player.child(L"edit"); child_node; child_node = child_node.next_sibling(L"edit")) {
       CMediaPlayer::CEditTitle edit;
       edit.Mode = child_node.attribute(L"mode").as_int();
       edit.Value = child_node.child_value();
-      Item.back().Edit.push_back(edit);
+      Items.back().Edit.push_back(edit);
     }
   }
   
@@ -77,27 +77,27 @@ BOOL CMediaPlayers::Write() {
   players.set_name(L"media_players");
 
   // Write player list
-  for (unsigned int i = 0; i < Item.size(); i++) {
-    wstring comment = L" " + Item[i].Name + L" ";
+  for (unsigned int i = 0; i < Items.size(); i++) {
+    wstring comment = L" " + Items[i].Name + L" ";
     players.append_child(node_comment).set_value(comment.c_str());
     xml_node player = players.append_child();
     player.set_name(L"player");
     player.append_child().set_name(L"name");
-    player.child(L"name").append_child(node_pcdata).set_value(Item[i].Name.c_str());
+    player.child(L"name").append_child(node_pcdata).set_value(Items[i].Name.c_str());
     player.append_child().set_name(L"enabled");
-    player.child(L"enabled").append_child(node_pcdata).set_value(ToWSTR(Item[i].Enabled).c_str());
+    player.child(L"enabled").append_child(node_pcdata).set_value(ToWSTR(Items[i].Enabled).c_str());
     player.append_child().set_name(L"visible");
-    player.child(L"visible").append_child(node_pcdata).set_value(ToWSTR(Item[i].Visible).c_str());
+    player.child(L"visible").append_child(node_pcdata).set_value(ToWSTR(Items[i].Visible).c_str());
     player.append_child().set_name(L"mode");
-    player.child(L"mode").append_child(node_pcdata).set_value(ToWSTR(Item[i].Mode).c_str());
-    XML_WriteChildNodes(player, Item[i].Class, L"class");
-    XML_WriteChildNodes(player, Item[i].File, L"file");
-    XML_WriteChildNodes(player, Item[i].Folder, L"folder");
-    for (unsigned int j = 0; j < Item[i].Edit.size(); j++) {
+    player.child(L"mode").append_child(node_pcdata).set_value(ToWSTR(Items[i].Mode).c_str());
+    XML_WriteChildNodes(player, Items[i].Class, L"class");
+    XML_WriteChildNodes(player, Items[i].File, L"file");
+    XML_WriteChildNodes(player, Items[i].Folder, L"folder");
+    for (unsigned int j = 0; j < Items[i].Edit.size(); j++) {
       xml_node edit = player.append_child();
       edit.set_name(L"edit");
-      edit.append_attribute(L"mode") = Item[i].Edit[j].Mode;
-      edit.append_child(node_pcdata).set_value(Item[i].Edit[j].Value.c_str());
+      edit.append_attribute(L"mode") = Items[i].Edit[j].Mode;
+      edit.append_child(node_pcdata).set_value(Items[i].Edit[j].Value.c_str());
     }
   }
 
@@ -115,7 +115,7 @@ int CMediaPlayers::Check() {
 
   HWND hwnd = GetWindow(g_hMain, GW_HWNDFIRST);
   while (hwnd != NULL) {
-    for (auto item = Item.begin(); item != Item.end(); ++item) {
+    for (auto item = Items.begin(); item != Items.end(); ++item) {
       if (item->Enabled == FALSE) continue;
       if (item->Visible == FALSE || IsWindowVisible(hwnd)) {
         // Compare window classes
@@ -129,7 +129,7 @@ int CMediaPlayers::Check() {
                 if (CurrentCaption != NewCaption) m_bTitleChanged = true;
                 CurrentCaption = NewCaption;
                 item->WindowHandle = hwnd;
-                Index = IndexOld = item - Item.begin();
+                Index = IndexOld = item - Items.begin();
                 return Index;
               }
             }
@@ -146,18 +146,18 @@ int CMediaPlayers::Check() {
 }
 
 void CMediaPlayers::EditTitle(wstring& str) {
-  if (str.empty() || Index == -1 || Item[Index].Edit.empty()) return;
+  if (str.empty() || Index == -1 || Items[Index].Edit.empty()) return;
   
-  for (unsigned int i = 0; i < Item[Index].Edit.size(); i++) {
-    switch (Item[Index].Edit[i].Mode) {
+  for (unsigned int i = 0; i < Items[Index].Edit.size(); i++) {
+    switch (Items[Index].Edit[i].Mode) {
       // Erase
       case 1: {
-        Replace(str, Item[Index].Edit[i].Value, L"", false, true);
+        Replace(str, Items[Index].Edit[i].Value, L"", false, true);
         break;
       }
       // Cut right side
       case 2: {
-        int pos = InStr(str, Item[Index].Edit[i].Value, 0);
+        int pos = InStr(str, Items[Index].Edit[i].Value, 0);
         if (pos > -1) str.resize(pos);
         break;
       }

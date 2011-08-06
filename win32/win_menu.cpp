@@ -36,26 +36,26 @@ HMENU CMenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
   if (!hMenu[nMenu]) return NULL;
 
   // Add items
-  for (unsigned int i = 0; i < Menu[menu_index].Item.size(); i++) {
-    UINT uFlags = (Menu[menu_index].Item[i].Checked ? MF_CHECKED : NULL) | 
-      (Menu[menu_index].Item[i].Default ? MF_DEFAULT : NULL) | 
-      (Menu[menu_index].Item[i].Enabled ? MF_ENABLED : MF_GRAYED) | 
-      (Menu[menu_index].Item[i].NewColumn ? MF_MENUBARBREAK : NULL) | 
-      (Menu[menu_index].Item[i].Radio ? MFT_RADIOCHECK : NULL);
+  for (unsigned int i = 0; i < Menu[menu_index].Items.size(); i++) {
+    UINT uFlags = (Menu[menu_index].Items[i].Checked ? MF_CHECKED : NULL) | 
+      (Menu[menu_index].Items[i].Default ? MF_DEFAULT : NULL) | 
+      (Menu[menu_index].Items[i].Enabled ? MF_ENABLED : MF_GRAYED) | 
+      (Menu[menu_index].Items[i].NewColumn ? MF_MENUBARBREAK : NULL) | 
+      (Menu[menu_index].Items[i].Radio ? MFT_RADIOCHECK : NULL);
     
-    switch (Menu[menu_index].Item[i].Type) {
+    switch (Menu[menu_index].Items[i].Type) {
       // Normal item      
       case MENU_ITEM_NORMAL: {
-        UINT_PTR uIDNewItem = (UINT_PTR)&Menu[menu_index].Item[i].Action;
+        UINT_PTR uIDNewItem = (UINT_PTR)&Menu[menu_index].Items[i].Action;
         ::AppendMenu(hMenu[nMenu], MF_STRING | uFlags, uIDNewItem, 
-          Menu[menu_index].Item[i].Name.c_str());
-        if (Menu[menu_index].Item[i].Default) {
+          Menu[menu_index].Items[i].Name.c_str());
+        if (Menu[menu_index].Items[i].Default) {
           ::SetMenuDefaultItem(hMenu[nMenu], uIDNewItem, FALSE);
         }
         // TEMP
-        /*Menu[menu_index].Item[i].Icon.Load(ImageList_GetIcon(m_hImageList, 1, ILD_NORMAL));
+        /*Menu[menu_index].Items[i].Icon.Load(ImageList_GetIcon(m_hImageList, 1, ILD_NORMAL));
         BOOL bReturn = ::SetMenuItemBitmaps(hMenu[nMenu], uIDNewItem, MF_BITMAP | MF_BYCOMMAND, 
-          Menu[menu_index].Item[i].Icon.Handle, NULL);*/
+          Menu[menu_index].Items[i].Icon.Handle, NULL);*/
         break;
       }
       // Separator
@@ -65,11 +65,11 @@ HMENU CMenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
       }
       // Sub menu
       case MENU_ITEM_SUBMENU: {
-        int sub_index = GetIndex(Menu[menu_index].Item[i].SubMenu.c_str());
+        int sub_index = GetIndex(Menu[menu_index].Items[i].SubMenu.c_str());
         if (sub_index > -1 && sub_index != menu_index) {
           HMENU hSubMenu = CreateNewMenu(Menu[sub_index].Name.c_str(), hMenu);
           ::AppendMenu(hMenu[nMenu], MF_POPUP | uFlags, 
-            (UINT_PTR)hSubMenu, Menu[menu_index].Item[i].Name.c_str());
+            (UINT_PTR)hSubMenu, Menu[menu_index].Items[i].Name.c_str());
         }
         break;
       }
@@ -103,7 +103,7 @@ wstring CMenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
   }
   /*for (int i = 1; i < Count; i++) {
     for (int j = 1; j < Menu[i].Count; i++) {
-      Menu[i].Item[j].Icon.Destroy();
+      Menu[i].Items[j].Icon.Destroy();
     }
   }*/
 
@@ -140,28 +140,28 @@ void CMenuList::SetImageList(HIMAGELIST hImageList) {
 void CMenuList::CMenu::CreateItem(wstring action, wstring name, wstring sub,
                                   bool checked, bool def, bool enabled, 
                                   bool newcolumn, bool radio) {
-  unsigned int i = Item.size();
-  Item.resize(i + 1);
+  unsigned int i = Items.size();
+  Items.resize(i + 1);
   
-  Item[i].Action    = action;
-  Item[i].Checked   = checked;
-  Item[i].Default   = def;
-  Item[i].Enabled   = enabled;
-  Item[i].Name      = name;
-  Item[i].NewColumn = newcolumn;
-  Item[i].Radio     = radio;
-  Item[i].SubMenu   = sub;
+  Items[i].Action    = action;
+  Items[i].Checked   = checked;
+  Items[i].Default   = def;
+  Items[i].Enabled   = enabled;
+  Items[i].Name      = name;
+  Items[i].NewColumn = newcolumn;
+  Items[i].Radio     = radio;
+  Items[i].SubMenu   = sub;
 
   if (!sub.empty()) {
-    Item[i].Type = MENU_ITEM_SUBMENU;
+    Items[i].Type = MENU_ITEM_SUBMENU;
   } else if (name.empty()) {
-    Item[i].Type = MENU_ITEM_SEPARATOR;
+    Items[i].Type = MENU_ITEM_SEPARATOR;
   } else {
-    Item[i].Type = MENU_ITEM_NORMAL;
+    Items[i].Type = MENU_ITEM_NORMAL;
   }
 
-  Item[i].Icon.Index = 0;
-  Item[i].Icon.Destroy();
+  Items[i].Icon.Index = 0;
+  Items[i].Icon.Destroy();
 }
 
 // =============================================================================

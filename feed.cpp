@@ -72,35 +72,35 @@ bool CFeed::Download(int index) {
   
   DWORD dwMode = HTTP_Feed_Download;
   if (index == -1) {
-    for (size_t i = 0; i < Item.size(); i++) {
-      if (Item[i].Download) {
+    for (size_t i = 0; i < Items.size(); i++) {
+      if (Items[i].Download) {
         dwMode = HTTP_Feed_DownloadAll;
         index = i;
         break;
       }
     }
   }
-  if (index < 0 || index > static_cast<int>(Item.size())) return false;
+  if (index < 0 || index > static_cast<int>(Items.size())) return false;
   DownloadIndex = index;
 
-  TorrentWindow.ChangeStatus(L"Downloading \"" + Item[index].Title + L"\"...");
+  TorrentWindow.ChangeStatus(L"Downloading \"" + Items[index].Title + L"\"...");
   TorrentWindow.EnableInput(false);
   
-  wstring file = Item[index].Title + L".torrent";
+  wstring file = Items[index].Title + L".torrent";
   ValidateFileName(file);
   file = GetDataPath() + file;
   
-  CUrl url(Item[index].Link);
+  CUrl url(Items[index].Link);
   return Client.Get(url, file, dwMode, reinterpret_cast<LPARAM>(this));
 }
 
 int CFeed::ExamineData() {
   // Examine title and compare with anime list items
-  for (size_t i = 0; i < Item.size(); i++) {
-    Meow.ExamineTitle(Item[i].Title, Item[i].EpisodeData, true, true, true, true, false);
+  for (size_t i = 0; i < Items.size(); i++) {
+    Meow.ExamineTitle(Items[i].Title, Items[i].EpisodeData, true, true, true, true, false);
     for (int j = AnimeList.Count; j > 0; j--) {
-      if (Meow.CompareEpisode(Item[i].EpisodeData, AnimeList.Item[j])) {
-        Item[i].EpisodeData.Index = j;
+      if (Meow.CompareEpisode(Items[i].EpisodeData, AnimeList.Items[j])) {
+        Items[i].EpisodeData.AnimeId = AnimeList.Items[j].Series_ID;
         break;
       }
     }
@@ -142,7 +142,7 @@ HICON CFeed::GetIcon() {
 bool CFeed::Read() {
   // Initialize
   wstring file = GetDataPath() + L"feed.xml";
-  Item.clear();
+  Items.clear();
 
   // Read XML file
   xml_document doc;
@@ -160,35 +160,35 @@ bool CFeed::Read() {
   // Read items
   for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
     // Read data
-    Item.resize(Item.size() + 1);
-    Item.back().Index = Item.size() - 1;
-    Item.back().Category = XML_ReadStrValue(item, L"category");
-    Item.back().Title = XML_ReadStrValue(item, L"title");
-    Item.back().Link = XML_ReadStrValue(item, L"link");
-    Item.back().Description = XML_ReadStrValue(item, L"description");
+    Items.resize(Items.size() + 1);
+    Items.back().Index = Items.size() - 1;
+    Items.back().Category = XML_ReadStrValue(item, L"category");
+    Items.back().Title = XML_ReadStrValue(item, L"title");
+    Items.back().Link = XML_ReadStrValue(item, L"link");
+    Items.back().Description = XML_ReadStrValue(item, L"description");
     
     // Remove if title or link is empty
     if (Category == FEED_CATEGORY_LINK) {
-      if (Item.back().Title.empty() || Item.back().Link.empty()) {
-        Item.pop_back();
+      if (Items.back().Title.empty() || Items.back().Link.empty()) {
+        Items.pop_back();
         continue;
       }
     }
     
     // Clean up title
-    DecodeHTML(Item.back().Title);
-    Replace(Item.back().Title, L"\\'", L"'");
+    DecodeHTML(Items.back().Title);
+    Replace(Items.back().Title, L"\\'", L"'");
     // Clean up description
-    DecodeHTML(Item.back().Description);
-    Replace(Item.back().Description, L"<br/>", L"\n");
-    Replace(Item.back().Description, L"<br />", L"\n");
-    StripHTML(Item.back().Description);
-    Trim(Item.back().Description, L" \n");
-    Aggregator.ParseDescription(Item.back(), Link);
-    Replace(Item.back().Description, L"\n", L" | ");
+    DecodeHTML(Items.back().Description);
+    Replace(Items.back().Description, L"<br/>", L"\n");
+    Replace(Items.back().Description, L"<br />", L"\n");
+    StripHTML(Items.back().Description);
+    Trim(Items.back().Description, L" \n");
+    Aggregator.ParseDescription(Items.back(), Link);
+    Replace(Items.back().Description, L"\n", L" | ");
     // Get download link
-    if (InStr(Item.back().Link, L"nyaatorrents", 0, true) > -1) {
-      Replace(Item.back().Link, L"torrentinfo", L"download");
+    if (InStr(Items.back().Link, L"nyaatorrents", 0, true) > -1) {
+      Replace(Items.back().Link, L"torrentinfo", L"download");
     }
   }
 
@@ -213,10 +213,10 @@ CFeed* CAggregator::Get(int category) {
 bool CAggregator::Notify(const CFeed& feed) {
   wstring tip_text, tip_title;
 
-  for (size_t i = 0; i < feed.Item.size(); i++) {
-    if (feed.Item[i].Download) {
+  for (size_t i = 0; i < feed.Items.size(); i++) {
+    if (feed.Items[i].Download) {
       tip_text += L"\u00BB " + ReplaceVariables(L"%title%$if(%episode%, #%episode%)\n", 
-        feed.Item[i].EpisodeData);
+        feed.Items[i].EpisodeData);
     }
   }
 

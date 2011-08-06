@@ -41,8 +41,7 @@ bool EvaluateAction(int action, bool condition) {
 bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& item) {
   bool is_numeric = false;
   wstring element, value = ReplaceVariables(condition.Value, item.EpisodeData);
-  CAnime* anime = item.EpisodeData.Index > 0 ? 
-    &AnimeList.Item.at(item.EpisodeData.Index) : nullptr;
+  CAnime* anime = AnimeList.FindItem(item.EpisodeData.AnimeId);
 
   switch (condition.Element) {
     case FEED_FILTER_ELEMENT_TITLE:
@@ -162,8 +161,8 @@ CFeedFilter& CFeedFilter::operator=(const CFeedFilter& filter) {
   Conditions.resize(filter.Conditions.size());
   std::copy(filter.Conditions.begin(), filter.Conditions.end(), Conditions.begin());
 
-  AnimeID.resize(filter.AnimeID.size());
-  std::copy(filter.AnimeID.begin(), filter.AnimeID.end(), AnimeID.begin());
+  AnimeIds.resize(filter.AnimeIds.size());
+  std::copy(filter.AnimeIds.begin(), filter.AnimeIds.end(), AnimeIds.begin());
 
   return *this;
 }
@@ -181,10 +180,11 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   bool condition = false;
   size_t index = 0;
 
-  if (!AnimeID.empty()) {
-    if (item.EpisodeData.Index > 0 && item.EpisodeData.Index < static_cast<int>(AnimeList.Item.size())) {
-      for (auto it = AnimeID.begin(); it != AnimeID.end(); ++it) {
-        if (*it == AnimeList.Item.at(item.EpisodeData.Index).Series_ID) {
+  if (!AnimeIds.empty()) {
+    CAnime* anime = AnimeList.FindItem(item.EpisodeData.AnimeId);
+    if (anime) {
+      for (auto it = AnimeIds.begin(); it != AnimeIds.end(); ++it) {
+        if (*it == anime->Series_ID) {
           condition = true;
           break;
         }
@@ -222,14 +222,17 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   if (EvaluateAction(Action, condition)) {
     // Handle preferences
     if (Action == FEED_FILTER_ACTION_PREFER && recursive) {
-      for (auto it = feed.Item.begin(); it != feed.Item.end(); ++it) {
+      for (auto it = feed.Items.begin(); it != feed.Items.end(); ++it) {
         // Do not bother if the item failed before
         if (it->Download == false) continue;
         // Do not filter the same item again
         if (it->Index == item.Index) continue;
         // Is it the same title?
-        if (it->EpisodeData.Index > -1 && it->EpisodeData.Index != item.EpisodeData.Index) continue;
-        if (it->EpisodeData.Index == -1 && !IsEqual(it->EpisodeData.Title, item.EpisodeData.Title)) continue;
+        if (it->EpisodeData.AnimeId == ANIMEID_NOTINLIST) {
+          if (!IsEqual(it->EpisodeData.Title, item.EpisodeData.Title)) continue;
+        } else {
+          if (it->EpisodeData.AnimeId != item.EpisodeData.AnimeId) continue;
+        }
         // Is it the same episode?
         if (it->EpisodeData.Number != item.EpisodeData.Number) continue;
         // Try applying the same filter
@@ -264,7 +267,7 @@ void CFeedFilter::Reset() {
   Enabled = true;
   Action = FEED_FILTER_ACTION_DISCARD;
   Match = FEED_FILTER_MATCH_ALL;
-  AnimeID.clear();
+  AnimeIds.clear();
   Conditions.clear();
   Name.clear();
 }
@@ -372,11 +375,11 @@ void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const ws
 
 void CFeedFilterManager::Cleanup() {
   for (auto i = Filters.begin(); i != Filters.end(); ++i) {
-    for (auto j = i->AnimeID.begin(); j != i->AnimeID.end(); ++j) {
+    for (auto j = i->AnimeIds.begin(); j != i->AnimeIds.end(); ++j) {
       CAnime* anime = AnimeList.FindItem(*j);
       if (!anime) {
-        if (i->AnimeID.size() > 1) {
-          j = i->AnimeID.erase(j) - 1;
+        if (i->AnimeIds.size() > 1) {
+          j = i->AnimeIds.erase(j) - 1;
           continue;
         } else {
           i = Filters.erase(i) - 1;
@@ -392,12 +395,12 @@ int CFeedFilterManager::Filter(CFeed& feed) {
   CAnime* anime = nullptr;
   int count = 0, number = 0;
   
-  for (auto item = feed.Item.begin(); item != feed.Item.end(); ++item) {
+  for (auto item = feed.Items.begin(); item != feed.Items.end(); ++item) {
     download = true;
-    anime = item->EpisodeData.Index > 0 ? &AnimeList.Item[item->EpisodeData.Index] : nullptr;
+    anime = AnimeList.FindItem(item->EpisodeData.AnimeId);
     number = GetEpisodeHigh(item->EpisodeData.Number);
     
-    if (anime > 0 && number > anime->GetLastWatchedEpisode()) {
+    if (anime && number > anime->GetLastWatchedEpisode()) {
       item->EpisodeData.NewEpisode = true;
     }
 

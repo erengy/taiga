@@ -62,8 +62,7 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin:
       MainWindow.ChangeStatus(error_text);
-      MainWindow.m_Toolbar.EnableButton(0, true);
-      MainWindow.m_Toolbar.EnableButton(1, true);
+      MainWindow.EnableInput(true);
       break;
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_Image:
@@ -86,7 +85,7 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
     default:
       EventQueue.UpdateInProgress = false;
       MainWindow.ChangeStatus(error_text);
-      MainWindow.m_Toolbar.EnableButton(1, true);
+      MainWindow.EnableInput(true);
       break;
   }
   
@@ -237,10 +236,10 @@ BOOL CHTTPClient::OnReadComplete() {
       MainWindow.ChangeStatus(L"List download completed.");
       MainWindow.RefreshList(MAL_WATCHING);
       MainWindow.RefreshTabs(MAL_WATCHING);
+      EventWindow.RefreshList();
       SearchWindow.PostMessage(WM_CLOSE);
       if (GetClientMode() == HTTP_MAL_RefreshList) {
-        MainWindow.m_Toolbar.EnableButton(0, true);
-        MainWindow.m_Toolbar.EnableButton(1, true);
+        MainWindow.EnableInput(true);
         ExecuteAction(L"CheckEpisodes()", TRUE);
       } else if (GetClientMode() == HTTP_MAL_RefreshAndLogin) {
         MAL.Login();
@@ -285,9 +284,8 @@ BOOL CHTTPClient::OnReadComplete() {
             break;
         }
       }
-      MainWindow.m_Toolbar.EnableButton(0, true);
-      MainWindow.m_Toolbar.EnableButton(1, true);
       MainWindow.ChangeStatus(status);
+      MainWindow.EnableInput(true);
       MainWindow.RefreshMenubar();
       MainWindow.UpdateTip();
       switch (Settings.Account.MAL.API) {
@@ -349,7 +347,7 @@ BOOL CHTTPClient::OnReadComplete() {
       if (pAnime && EventQueue.GetItemCount() > 0) {
         int user_index = EventQueue.GetUserIndex();
         if (user_index > -1) {
-          pAnime->Edit(GetData(), EventQueue.List[user_index].Item[EventQueue.List[user_index].Index]);
+          pAnime->Edit(GetData(), EventQueue.List[user_index].Items[EventQueue.List[user_index].Index]);
           return TRUE;
         }
       }
@@ -444,7 +442,7 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_Feed_DownloadAll: {
       CFeed* pFeed = reinterpret_cast<CFeed*>(GetParam());
       if (pFeed) {
-        CFeedItem* pFeedItem = reinterpret_cast<CFeedItem*>(&pFeed->Item[pFeed->DownloadIndex]);
+        CFeedItem* pFeedItem = reinterpret_cast<CFeedItem*>(&pFeed->Items[pFeed->DownloadIndex]);
         wstring app_path, cmd, file = pFeedItem->Title;
         ValidateFileName(file);
         file = pFeed->GetDataPath() + file + L".torrent";
@@ -461,8 +459,9 @@ BOOL CHTTPClient::OnReadComplete() {
               break;
           }
           if (Settings.RSS.Torrent.SetFolder && InStr(app_path, L"utorrent", 0, true) > -1) {
-            if (pFeedItem->EpisodeData.Index > 0 && !AnimeList.Item[pFeedItem->EpisodeData.Index].Folder.empty()) {
-              cmd = L"/directory \"" + AnimeList.Item[pFeedItem->EpisodeData.Index].Folder + L"\" ";
+            CAnime* anime = AnimeList.FindItem(pFeedItem->EpisodeData.AnimeId);
+            if (anime && !anime->Folder.empty()) {
+              cmd = L"/directory \"" + anime->Folder + L"\" ";
             }
           }
           cmd += L"\"" + file + L"\"";

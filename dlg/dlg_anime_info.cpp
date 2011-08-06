@@ -58,7 +58,7 @@ CAnimeWindow::~CAnimeWindow() {
 
 BOOL CAnimeWindow::OnInitDialog() {
   // Set anime index
-  if (!m_pAnimeItem) m_pAnimeItem = &AnimeList.Item[AnimeList.Index];
+  if (!m_pAnimeItem) m_pAnimeItem = &AnimeList.Items[AnimeList.Index];
 
   // Create GDI objects
   if (!m_hbrDarkBlue) m_hbrDarkBlue = ::CreateSolidBrush(MAL_DARKBLUE);
@@ -115,8 +115,7 @@ void CAnimeWindow::OnOK() {
 
   // Create item
   CEventItem item;
-  item.AnimeIndex = m_pAnimeItem->Index;
-  item.AnimeID = m_pAnimeItem->Series_ID;
+  item.AnimeId = m_pAnimeItem->Series_ID;
   item.Mode = HTTP_MAL_AnimeEdit;
 
   // Episodes watched

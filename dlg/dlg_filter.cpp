@@ -41,12 +41,12 @@ BOOL CFilterWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) >= IDC_CHECK_FILTER_STATUS1 && 
     LOWORD(wParam) <= IDC_CHECK_FILTER_STATUS3) {
       AnimeList.Filter.Status[2 - (IDC_CHECK_FILTER_STATUS3 - LOWORD(wParam))] = 
-        IsDlgButtonChecked(LOWORD(wParam));
+        IsDlgButtonChecked(LOWORD(wParam)) == TRUE;
   // Type
   } else if (LOWORD(wParam) >= IDC_CHECK_FILTER_TYPE1 && 
     LOWORD(wParam) <= IDC_CHECK_FILTER_TYPE6) {
       AnimeList.Filter.Type[5 - (IDC_CHECK_FILTER_TYPE6 - LOWORD(wParam))] = 
-        IsDlgButtonChecked(LOWORD(wParam));
+        IsDlgButtonChecked(LOWORD(wParam)) == TRUE;
   }
   
   UpdateFilterMenu();

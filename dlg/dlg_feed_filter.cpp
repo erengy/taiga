@@ -587,11 +587,11 @@ BOOL CFeedFilterWindow::CDialogPage2::OnInitDialog() {
   
   // Add anime to list
   for (int i = 1; i <= AnimeList.Count; i++) {
-    anime_list_.InsertItem(i - 1, AnimeList.Item[i].GetStatus(), 
-      StatusToIcon(AnimeList.Item[i].GetAiringStatus()), 0, nullptr, 
-      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeList.Item[i]));
-    for (auto it = parent_->filter_.AnimeID.begin(); it != parent_->filter_.AnimeID.end(); ++it) {
-      if (*it == AnimeList.Item[i].Series_ID) {
+    anime_list_.InsertItem(i - 1, AnimeList.Items[i].GetStatus(), 
+      StatusToIcon(AnimeList.Items[i].GetAiringStatus()), 0, nullptr, 
+      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeList.Items[i]));
+    for (auto it = parent_->filter_.AnimeIds.begin(); it != parent_->filter_.AnimeIds.end(); ++it) {
+      if (*it == AnimeList.Items[i].Series_ID) {
         anime_list_.SetCheckState(i - 1, TRUE);
         break;
       }
@@ -647,12 +647,12 @@ LRESULT CFeedFilterWindow::CDialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 bool CFeedFilterWindow::CDialogPage2::BuildFilter(CFeedFilter& filter) {
-  filter.AnimeID.clear();
+  filter.AnimeIds.clear();
 
   for (int i = 0; i < anime_list_.GetItemCount(); i++) {
     if (anime_list_.GetCheckState(i)) {
       CAnime* anime = reinterpret_cast<CAnime*>(anime_list_.GetItemParam(i));
-      if (anime) filter.AnimeID.push_back(anime->Series_ID);
+      if (anime) filter.AnimeIds.push_back(anime->Series_ID);
     }
   }
   

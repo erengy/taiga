@@ -126,8 +126,8 @@ void CTorrentWindow::RefreshList() {
   m_List.DeleteAllItems();
 
   // Add items
-  for (auto it = pFeed->Item.begin(); it != pFeed->Item.end(); ++it) {
-    if (Settings.RSS.Torrent.HideUnidentified && it->EpisodeData.Index == -1) {
+  for (auto it = pFeed->Items.begin(); it != pFeed->Items.end(); ++it) {
+    if (Settings.RSS.Torrent.HideUnidentified && it->EpisodeData.AnimeId == ANIMEID_NOTINLIST) {
       continue;
     }
     wstring title, number, video;
@@ -136,9 +136,10 @@ void CTorrentWindow::RefreshList() {
       !IsNumeric(it->EpisodeData.Number)) {
         group = TORRENT_BATCH;
     }
-    if (it->EpisodeData.Index > 0) {
-      icon = StatusToIcon(AnimeList.Item[it->EpisodeData.Index].GetAiringStatus());
-      title = AnimeList.Item[it->EpisodeData.Index].Series_Title;
+    CAnime* anime = AnimeList.FindItem(it->EpisodeData.AnimeId);
+    if (anime) {
+      icon = StatusToIcon(anime->GetAiringStatus());
+      title = anime->Series_Title;
     } else if (!it->EpisodeData.Title.empty()) {
       title = it->EpisodeData.Title;
     } else {
@@ -156,7 +157,7 @@ void CTorrentWindow::RefreshList() {
       if (!video.empty()) video += L" ";
       video += it->EpisodeData.Resolution;
     }
-    int index = m_List.InsertItem(it - pFeed->Item.begin(), 
+    int index = m_List.InsertItem(it - pFeed->Items.begin(), 
       group, icon, 0, NULL, title.c_str(), reinterpret_cast<LPARAM>(&(*it)));
     m_List.SetItem(index, 1, number.c_str());
     m_List.SetItem(index, 2, it->EpisodeData.Group.c_str());
@@ -305,21 +306,21 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
             m_List.SetCheckState(lpnmitem->iItem, FALSE);
             Aggregator.FileArchive.push_back(pItem->Title);
           } else if (answer == L"DiscardTorrents") {
-            int anime_index = pItem->EpisodeData.Index;
-            if (anime_index > -1 && anime_index <= AnimeList.Count) {
+            CAnime* anime = AnimeList.FindItem(pItem->EpisodeData.AnimeId);
+            if (anime) {
               for (int i = 0; i < m_List.GetItemCount(); i++) {
                 pItem = reinterpret_cast<CFeedItem*>(m_List.GetItemParam(i));
-                if (pItem && pItem->EpisodeData.Index == anime_index) {
+                if (pItem && pItem->EpisodeData.AnimeId == anime->Series_ID) {
                   pItem->Download = false;
                   m_List.SetCheckState(i, FALSE);
                 }
               }
               Aggregator.FilterManager.AddFilter(
                 FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
-                L"Discard \"" + AnimeList.Item[anime_index].Series_Title + L"\"");
+                L"Discard \"" + anime->Series_Title + L"\"");
               Aggregator.FilterManager.Filters.back().AddCondition(
                 FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, 
-                ToWSTR(AnimeList.Item[anime_index].Series_ID));
+                ToWSTR(anime->Series_ID));
             }
           } else if (answer == L"MoreTorrents") {
             pFeed->Check(ReplaceVariables(
@@ -352,7 +353,7 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
             // Change text color
             CFeedItem* pItem = reinterpret_cast<CFeedItem*>(pCD->nmcd.lItemlParam);
             if (pItem) {
-              if (pItem->EpisodeData.Index == -1) {
+              if (pItem->EpisodeData.AnimeId == ANIMEID_NOTINLIST) {
                 pCD->clrText = RGB(180, 180, 180);
               } else if (pItem->EpisodeData.NewEpisode) {
                 pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);

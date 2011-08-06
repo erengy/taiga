@@ -286,7 +286,9 @@ bool IsScriptVariable(const wstring& str) {
 // =============================================================================
 
 wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) {
-  #define VALIDATE(x, y) episode.Index > -1 && episode.Index <= AnimeList.Count ? x : y
+  CAnime* anime = AnimeList.FindItem(episode.AnimeId);
+
+  #define VALIDATE(x, y) anime ? x : y
   #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeURL(x)) : EscapeScriptEntities(x)
 
   // Prepare episode value
@@ -294,14 +296,14 @@ wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) 
   TrimLeft(episode_number, L"0");
 
   // Replace variables
-  Replace(str, L"%title%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Title), ENCODE(episode.Title)));
-  Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].GetLastWatchedEpisode(), L"")), L""));
-  Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].Series_Episodes, L"")), L""));
-  Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(AnimeList.Item[episode.Index].GetScore(), L"")), L""));
-  Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].Series_ID)), L""));
-  Replace(str, L"%image%",   VALIDATE(ENCODE(AnimeList.Item[episode.Index].Series_Image), L""));
-  Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].GetStatus())), L""));
-  Replace(str, L"%rewatching%", VALIDATE(ENCODE(ToWSTR(AnimeList.Item[episode.Index].GetRewatching())), L""));
+  Replace(str, L"%title%",   VALIDATE(ENCODE(anime->Series_Title), ENCODE(episode.Title)));
+  Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(anime->GetLastWatchedEpisode(), L"")), L""));
+  Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(anime->Series_Episodes, L"")), L""));
+  Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(anime->GetScore(), L"")), L""));
+  Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(anime->Series_ID)), L""));
+  Replace(str, L"%image%",   VALIDATE(ENCODE(anime->Series_Image), L""));
+  Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(anime->GetStatus())), L""));
+  Replace(str, L"%rewatching%", VALIDATE(ENCODE(ToWSTR(anime->GetRewatching())), L""));
   Replace(str, L"%name%",       ENCODE(episode.Name));
   Replace(str, L"%episode%",    ENCODE(episode_number));
   Replace(str, L"%version%",    ENCODE(episode.Version));
