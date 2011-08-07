@@ -353,7 +353,7 @@ LRESULT CTorrentWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
             // Change text color
             CFeedItem* pItem = reinterpret_cast<CFeedItem*>(pCD->nmcd.lItemlParam);
             if (pItem) {
-              if (pItem->EpisodeData.AnimeId == ANIMEID_NOTINLIST) {
+              if (pItem->EpisodeData.AnimeId < 1) {
                 pCD->clrText = RGB(180, 180, 180);
               } else if (pItem->EpisodeData.NewEpisode) {
                 pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);

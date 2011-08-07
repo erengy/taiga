@@ -45,7 +45,7 @@ BOOL CEventWindow::OnInitDialog() {
   m_List.InsertColumn(2,  50,  50, LVCFMT_CENTER, L"Score");
   m_List.InsertColumn(3, 110, 110, LVCFMT_LEFT,   L"Status");
   m_List.InsertColumn(4, 110, 110, LVCFMT_LEFT,   L"Tags");
-  m_List.InsertColumn(5, 120, 120, LVCFMT_LEFT,   L"Time");
+  m_List.InsertColumn(5, 120, 120, LVCFMT_LEFT,   L"Last modified");
   m_List.SetColumnWidth(5, LVSCW_AUTOSIZE_USEHEADER);
   
   // Refresh list

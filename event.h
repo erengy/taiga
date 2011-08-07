@@ -34,8 +34,7 @@ enum EventSearchMode {
 
 class CEventItem : public CMALAnimeValues {
 public:
-  CEventItem() : Index(0), AnimeId(0), Mode(0) {}
-  int Index;
+  CEventItem() : AnimeId(0), Mode(0) {}
   int AnimeId, Mode;
   wstring Reason, Time;
 };

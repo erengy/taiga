@@ -71,6 +71,7 @@ enum MAL_Type {
 // =============================================================================
 
 class CAnime;
+class CEventItem;
 
 class CMALAnimeValues {
 public:

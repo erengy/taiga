@@ -62,7 +62,11 @@ void CEventList::Add(CEventItem& item) {
   }
   switch (item.Mode) {
     case HTTP_MAL_AnimeEdit:
-      if (item.episode == -1 && item.score == -1 && item.status == -1 && item.enable_rewatching == -1 && item.tags == EMPTY_STR) return;
+      if (item.episode == -1 && 
+          item.score == -1 && 
+          item.status == -1 && 
+          item.enable_rewatching == -1 && 
+          item.tags == EMPTY_STR) return;
       break;
     case HTTP_MAL_AnimeUpdate:
       if (item.episode == -1) return;
@@ -78,28 +82,32 @@ void CEventList::Add(CEventItem& item) {
       break;
   }
 
-  // Compare with previous items in buffer
-  for (unsigned int i = 0; i < Items.size(); i++) {
-    if (Items[i].AnimeId == item.AnimeId && Items[i].Mode == item.Mode) { 
-      #define COMPAREITEMS(x) item.x == Items[i].x
-      #define COMPAREITEMSI(x) (item.x > -1 && Items[i].x > -1 && item.x != Items[i].x)
-      #define COMPAREITEMSS(x) (item.x != EMPTY_STR && Items[i].x != EMPTY_STR && item.x != Items[i].x)
-      if (COMPAREITEMSI(score) || COMPAREITEMSI(status) || COMPAREITEMSI(enable_rewatching) || COMPAREITEMSS(tags) ||
-         (COMPAREITEMS(episode) && COMPAREITEMS(score) && COMPAREITEMS(status) && COMPAREITEMS(enable_rewatching) &&  COMPAREITEMS(tags))) {
-           if (!EventQueue.UpdateInProgress) {
-             Remove(i);
-             break;
-           }
+  // Edit previous item with the same ID...
+  bool add_new_item = true;
+  if (!EventQueue.UpdateInProgress) {
+    for (auto it = Items.rbegin(); it != Items.rend(); ++it) {
+      if (it->AnimeId == item.AnimeId) {
+        if (item.episode == -1 || (it->episode == -1 && it == Items.rbegin())) {
+          if (item.episode > -1) it->episode = item.episode;
+          if (item.score > -1) it->score = item.score;
+          if (item.status > -1) it->status = item.status;
+          if (item.enable_rewatching > -1) it->enable_rewatching = item.enable_rewatching;
+          if (item.tags != EMPTY_STR) it->tags = item.tags;
+          add_new_item = false;
+        }
+        if (!add_new_item) {
+          it->Mode = HTTP_MAL_AnimeEdit;
+          it->Time = GetDate() + L" " + GetTime();
+        }
+        break;
       }
-      #undef COMPAREITEMS
-      #undef COMPAREITEMSI
-      #undef COMPAREITEMSS
     }
   }
-
-  // Add new item
-  if (item.Time.empty()) item.Time = GetDate() + L" " + GetTime();
-  Items.push_back(item);
+  // ...or add a new one
+  if (add_new_item) {
+    if (item.Time.empty()) item.Time = GetDate() + L" " + GetTime();
+    Items.push_back(item);
+  }
 
   if (anime) {
     // Announce
@@ -177,37 +185,32 @@ void CEventList::Remove(unsigned int index) {
 }
 
 CEventItem* CEventList::SearchItem(int anime_id, int search_mode) {
-  for (int i = static_cast<int>(Items.size()) - 1; i >= 0; i--) {
-    if (Items[i].AnimeId == anime_id) {
+  for (auto it = Items.rbegin(); it != Items.rend(); ++it) {
+    if (it->AnimeId == anime_id) {
       switch (search_mode) {
         // Episode
         case EVENT_SEARCH_EPISODE:
-          if (Items[i].episode > -1)
-            return &Items[i];
+          if (it->episode > -1) return &(*it);
           break;
-        // Rewatching
+        // Re-watching
         case EVENT_SEARCH_REWATCH:
-          if (Items[i].enable_rewatching > -1)
-            return &Items[i];
+          if (it->enable_rewatching > -1) return &(*it);
           break;
         // Score
         case EVENT_SEARCH_SCORE:
-          if (Items[i].score > -1)
-            return &Items[i];
+          if (it->score > -1) return &(*it);
           break;
         // Status
         case EVENT_SEARCH_STATUS:
-          if (Items[i].status > -1)
-            return &Items[i];
+          if (it->status > -1) return &(*it);
           break;
         // Tags
         case EVENT_SEARCH_TAGS:
-          if (Items[i].tags != EMPTY_STR)
-            return &Items[i];
+          if (it->tags != EMPTY_STR) return &(*it);
           break;
         // Default
         default:
-          return &Items[i];
+          return &(*it);
       }
     }
   }
@@ -281,7 +284,7 @@ void CEventQueue::Remove(int index, bool save) {
 CEventItem* CEventQueue::SearchItem(int anime_id, int search_mode) {
   int user_index = GetUserIndex();
   if (user_index > -1) return List[user_index].SearchItem(anime_id, search_mode);
-  return NULL;
+  return nullptr;
 }
 
 void CEventQueue::Show() {
