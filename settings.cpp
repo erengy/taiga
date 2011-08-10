@@ -224,7 +224,7 @@ bool CSettings::Read() {
       event_item.score = item.attribute(L"score").as_int(-1);
       event_item.status = item.attribute(L"status").as_int(-1);
       event_item.enable_rewatching = item.attribute(L"rewatch").as_int(-1);
-      event_item.tags = item.attribute(L"tags").value();
+      event_item.tags = item.attribute(L"tags").value(EMPTY_STR);
       event_item.Time = item.attribute(L"time").value();
       event_item.Mode = item.attribute(L"mode").as_int();
       EventQueue.Add(event_item, false, user.attribute(L"name").value());
@@ -452,34 +452,36 @@ bool CSettings::Write() {
   }
   reg.CloseKey();
 
-  // Write event buffer
+  // Write event queue
   if (Program.Exit.SaveBuffer && !EventQueue.IsEmpty()) {
     xml_node events = doc.append_child();
     events.set_name(L"events");
-    for (size_t i = 0; i < EventQueue.List.size(); i++) {
-      if (EventQueue.List[i].Items.empty()) continue;
+    for (auto i = EventQueue.List.begin(); i != EventQueue.List.end(); ++i) {
+      if (i->Items.empty()) continue;
       xml_node user = events.append_child();
       user.set_name(L"user");
-      user.append_attribute(L"name") = EventQueue.List[i].User.c_str();
-      for (size_t j = 0; j < EventQueue.List[i].Items.size(); j++) {
+      user.append_attribute(L"name") = i->User.c_str();
+      for (auto j = i->Items.begin(); j != i->Items.end(); ++j) {
         xml_node item = user.append_child();
         item.set_name(L"event");
         #define APPEND_ATTRIBUTE_INT(x, y) \
-          if (EventQueue.List[i].Items[j].y > -1) \
-          item.append_attribute(x) = EventQueue.List[i].Items[j].y;
+          if (j->y > -1) item.append_attribute(x) = j->y;
+        #define APPEND_ATTRIBUTE_STR(x, y) \
+          if (j->y != EMPTY_STR) item.append_attribute(x) = j->y.c_str();
         APPEND_ATTRIBUTE_INT(L"mode", Mode);
         APPEND_ATTRIBUTE_INT(L"id", AnimeId);
         APPEND_ATTRIBUTE_INT(L"episode", episode);
         APPEND_ATTRIBUTE_INT(L"score", score);
         APPEND_ATTRIBUTE_INT(L"status", status);
         APPEND_ATTRIBUTE_INT(L"rewatch", enable_rewatching);
-        item.append_attribute(L"tags") = EventQueue.List[i].Items[j].tags.c_str();
-        item.append_attribute(L"time") = EventQueue.List[i].Items[j].Time.c_str();
-        #undef APPEND_ATTRIBUTE
+        APPEND_ATTRIBUTE_STR(L"tags", tags);
+        APPEND_ATTRIBUTE_STR(L"time", Time);
+        #undef APPEND_ATTRIBUTE_STR
+        #undef APPEND_ATTRIBUTE_INT
       }
     }
   }
-    
+
   // Save file
   ::CreateDirectory(m_Folder.c_str(), NULL);
   return doc.save_file(m_File.c_str(), L"\x09", format_default | format_write_bom);

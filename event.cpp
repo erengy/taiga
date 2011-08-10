@@ -87,19 +87,21 @@ void CEventList::Add(CEventItem& item) {
   if (!EventQueue.UpdateInProgress) {
     for (auto it = Items.rbegin(); it != Items.rend(); ++it) {
       if (it->AnimeId == item.AnimeId) {
-        if (item.episode == -1 || (it->episode == -1 && it == Items.rbegin())) {
-          if (item.episode > -1) it->episode = item.episode;
-          if (item.score > -1) it->score = item.score;
-          if (item.status > -1) it->status = item.status;
-          if (item.enable_rewatching > -1) it->enable_rewatching = item.enable_rewatching;
-          if (item.tags != EMPTY_STR) it->tags = item.tags;
-          add_new_item = false;
+        if (it->Mode != HTTP_MAL_AnimeAdd && it->Mode != HTTP_MAL_AnimeDelete) {
+          if (item.episode == -1 || (it->episode == -1 && it == Items.rbegin())) {
+            if (item.episode > -1) it->episode = item.episode;
+            if (item.score > -1) it->score = item.score;
+            if (item.status > -1) it->status = item.status;
+            if (item.enable_rewatching > -1) it->enable_rewatching = item.enable_rewatching;
+            if (item.tags != EMPTY_STR) it->tags = item.tags;
+            add_new_item = false;
+          }
+          if (!add_new_item) {
+            it->Mode = HTTP_MAL_AnimeEdit;
+            it->Time = GetDate() + L" " + GetTime();
+          }
+          break;
         }
-        if (!add_new_item) {
-          it->Mode = HTTP_MAL_AnimeEdit;
-          it->Time = GetDate() + L" " + GetTime();
-        }
-        break;
       }
     }
   }
