@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include "animedb.h"
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
@@ -27,6 +28,7 @@
 #include "dlg/dlg_input.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_search.h"
+#include "dlg/dlg_season.h"
 #include "dlg/dlg_settings.h"
 #include "dlg/dlg_test_recognition.h"
 #include "dlg/dlg_torrent.h"
@@ -73,6 +75,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       MainWindow.EnableInput(!result);
       if (!result) MainWindow.ChangeStatus();
     } else {
+      // Retrieve anime list and log in afterwards
       ExecuteAction(L"RefreshList", TRUE);
     }
 
@@ -118,11 +121,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     bool result = MAL.GetList(wParam == TRUE);
     MainWindow.EnableInput(!result);
     if (!result) MainWindow.ChangeStatus();
-
-  // RefreshLogin()
-  //   Retrieves anime list and logs in afterwards.
-  } else if (action == L"RefreshLogin") {
-    ExecuteAction(L"RefreshList", TRUE);
 
   // Synchronize()
   //   Synchronize local and remote lists.
@@ -224,6 +222,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       RecognitionTestWindow.Create(IDD_TEST_RECOGNITION, NULL, false);
     } else {
       ActivateWindow(RecognitionTestWindow.GetWindowHandle());
+    }
+
+  // SeasonBrowser()
+  //   Shows season browser window.
+  } else if (action == L"SeasonBrowser") {
+    if (!SeasonWindow.IsWindow()) {
+      SeasonWindow.Create(IDD_SEASON, nullptr, false);
+    } else {
+      ActivateWindow(SeasonWindow.GetWindowHandle());
     }
 
   // SetSearchMode()
@@ -773,5 +780,29 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         break;
       }
     }
+
+  // ===========================================================================
+
+  // Season_Load(file)
+  //   Loads season data.
+  } else if (action == L"Season_Load") {
+    if (SeasonDatabase.Read(body)) {
+      SeasonWindow.RefreshData(false);
+      SeasonWindow.RefreshList();
+    }
+
+  // Season_GroupBy(group)
+  //   Groups season data.
+  } else if (action == L"Season_GroupBy") {
+    SeasonWindow.GroupBy = ToINT(body);
+    SeasonWindow.RefreshList();
+    SeasonWindow.RefreshToolbar();
+
+  // Season_SortBy(sort)
+  //   Sorts season data.
+  } else if (action == L"Season_SortBy") {
+    SeasonWindow.SortBy = ToINT(body);
+    SeasonWindow.RefreshList();
+    SeasonWindow.RefreshToolbar();
   }
 }

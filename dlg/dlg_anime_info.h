@@ -20,9 +20,9 @@
 #define DLG_ANIME_INFO_H
 
 #include "../std.h"
+#include "../gfx.h"
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
-#include "../win32/win_gdi.h"
 
 class CAnime;
 
@@ -41,14 +41,8 @@ public:
   // Pages
   vector<CAnimeInfoPage> m_Page;
 
-  // Image class
-  class CAnimeImage {
-  public:
-    bool Load(const wstring& file);
-    int Height, Width;
-    CDC DC;
-    CRect Rect;
-  } AnimeImage;
+  // Image data
+  CImage AnimeImage;
 
   // Functions
   void SetCurrentPage(int index);

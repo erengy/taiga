@@ -72,6 +72,7 @@ public:
   bool PlayEpisode(int number);
   bool IsEpisodeAvailable(int number);
   bool SetEpisodeAvailability(int number, bool available, const wstring& path = L"");
+  wstring GetImagePath();
   void SetLocalData(const wstring& folder, const wstring& titles);
   int GetIntValue(int mode) const;
   int GetLastWatchedEpisode() const;
@@ -81,7 +82,6 @@ public:
   wstring GetStrValue(int mode) const;
   wstring GetTags() const;
   int GetTotalEpisodes() const;
-  bool ParseSearchResult(const wstring& data);
   bool Edit(const wstring& data, CEventItem& item);
   bool IsAiredYet(bool strict = false) const;
   bool IsFinishedAiring() const;
@@ -96,7 +96,7 @@ public:
   vector<bool> EpisodeAvailable;
   wstring NextEpisodePath;
   wstring Folder, Synonyms;
-  wstring Genres, Popularity, Rank, Score, Synopsis;
+  wstring Genres, Popularity, Producers, Rank, Score, Synopsis;
 };
 
 #endif // ANIME_H

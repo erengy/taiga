@@ -42,7 +42,7 @@ public:
   void RefreshList();
 
 public:
-  CListView  m_List;
+  CListView m_List;
   CRebar m_Rebar;
   CStatusBar m_Status;
   CToolbar m_Toolbar;

@@ -31,6 +31,8 @@
 			<item name="Folders" sub="Folders"/>
 			<item type="separator"/>
 			<item name="Settings" action="Settings()"/>
+			<item type="separator"/>
+			<item name="Season browser" action="SeasonBrowser()"/>
 			<item name="Tools" sub="Tools"/>
 			<item name="Torrents" action="Torrents()"/>
 			<item type="separator"/>
@@ -251,6 +253,22 @@
 			<item name="Search"    action="AnimeFolders_Search()"/>
 			<item type="separator"/>
 			<item name="Clear all folders" action="AnimeFolders_ClearAll()"/>
+		</menu>
+		
+		<!-- Season browser -->
+		<menu name="SeasonSelect">
+			<item name="Summer 2011" action="Season_Load(2011_summer.xml)"/>
+		</menu>
+		<menu name="SeasonGroup">
+			<item name="Airing status" action="Season_GroupBy(0)" radio="1"/>
+			<item name="List status"   action="Season_GroupBy(1)" radio="1"/>
+			<item name="Type"          action="Season_GroupBy(2)" radio="1"/>
+		</menu>
+		<menu name="SeasonSort">
+			<item name="Episodes"   action="Season_SortBy(0)" radio="1"/>
+			<item name="Name"       action="Season_SortBy(1)" radio="1"/>
+			<item name="Score"      action="Season_SortBy(2)" radio="1"/>
+			<item name="Start date" action="Season_SortBy(3)" radio="1"/>
 		</menu>
 		
 		<!-- Torrent list right click -->

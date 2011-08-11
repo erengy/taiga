@@ -19,6 +19,7 @@
 #include "std.h"
 #include "animelist.h"
 #include "dlg/dlg_main.h"
+#include "dlg/dlg_season.h"
 #include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
@@ -198,6 +199,34 @@ void UpdateSearchListMenu(bool enabled) {
         MENU.Items[i].Enabled = enabled;
         break;
       }
+    }
+  }
+}
+
+void UpdateSeasonMenu() {
+  int item_index, menu_index = -1;
+  
+  // Group by
+  menu_index = UI.Menus.GetIndex(L"SeasonGroup");
+  if (menu_index > -1) {
+    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+      MENU.Items[i].Checked = false;
+    }
+    item_index = SeasonWindow.GroupBy;
+    if (item_index < static_cast<int>(MENU.Items.size())) {
+      MENU.Items[item_index].Checked = true;
+    }
+  }
+
+  // Sort by
+  menu_index = UI.Menus.GetIndex(L"SeasonSort");
+  if (menu_index > -1) {
+    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+      MENU.Items[i].Checked = false;
+    }
+    item_index = SeasonWindow.SortBy;
+    if (item_index < static_cast<int>(MENU.Items.size())) {
+      MENU.Items[item_index].Checked = true;
     }
   }
 }

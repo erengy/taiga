@@ -16,34 +16,37 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GFX_H
-#define GFX_H
+#ifndef ANIMEDB_H
+#define ANIMEDB_H
 
 #include "std.h"
-#include "win32/win_gdi.h"
-#include "win32/win_gdiplus.h"
-
-extern CGdiPlus GdiPlus;
+#include "anime.h"
 
 // =============================================================================
 
-HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bItalic, BOOL bUnderline);
-BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, bool bVertical);
-BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, DWORD dwColor3);
-
-COLORREF HexToARGB(const wstring& text);
-CRect ResizeRect(const CRect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y);
-int ScaleX(int value);
-int ScaleY(int value);
-
-class CImage {
+class CAnimeDatabase {
 public:
-  CImage() : Height(0), Width(0), Data(0) {}
-  bool Load(const wstring& file);
-  CDC DC;
-  CRect Rect;
-  LPARAM Data;
-  int Height, Width;
+  CAnimeDatabase() {}
+  virtual ~CAnimeDatabase() {}
 };
 
-#endif // GFX_H
+extern CAnimeDatabase AnimeDatabase;
+
+// =============================================================================
+
+class CAnimeSeasonDatabase {
+public:
+  CAnimeSeasonDatabase() {}
+  virtual ~CAnimeSeasonDatabase() {}
+
+  bool Read(wstring file);
+  bool Write(wstring file);
+
+public:
+  vector<CAnime> Items;
+  wstring Name;
+};
+
+extern CAnimeSeasonDatabase SeasonDatabase;
+
+#endif // ANIMEDB_H

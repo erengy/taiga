@@ -49,6 +49,9 @@ enum IconList16 {
   Icon16_FunnelTick,
   Icon16_FunnelPlus,
   Icon16_FunnelPencil,
+  Icon16_Calendar,
+  Icon16_Category,
+  Icon16_Sort,
   ICONCOUNT_16PX
 };
 
@@ -58,6 +61,7 @@ enum IconList24 {
   Icon24_Sync,
   Icon24_MAL,
   Icon24_Folders,
+  Icon24_Calendar,
   Icon24_Tools,
   Icon24_RSS,
   Icon24_Filter,

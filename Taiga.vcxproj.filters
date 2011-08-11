@@ -312,6 +312,12 @@
     <ClCompile Include="stats.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="animedb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlg\dlg_season.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -511,6 +517,12 @@
     </ClInclude>
     <ClInclude Include="stats.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="animedb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_season.h">
+      <Filter>Dialogs\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

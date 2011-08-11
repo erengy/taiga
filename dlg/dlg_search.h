@@ -38,6 +38,7 @@ public:
   CListView m_List;
   vector<CAnime> m_Anime;
 
+  void EnableInput(bool enable);
   BOOL Search(const wstring& title);
   void ParseResults(const wstring& data);
   void RefreshList();

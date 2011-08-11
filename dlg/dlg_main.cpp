@@ -23,6 +23,7 @@
 #include "dlg_anime_info.h"
 #include "dlg_main.h"
 #include "dlg_search.h"
+#include "dlg_season.h"
 #include "dlg_settings.h"
 #include "dlg_test_recognition.h"
 #include "dlg_torrent.h"
@@ -175,19 +176,20 @@ void CMainWindow::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  m_Toolbar.InsertButton(0, Icon24_Offline,  100, 1, fsStyle1, 0, NULL, L"Log in");
-  m_Toolbar.InsertButton(1, Icon24_Sync,     101, 1, fsStyle1, 1, NULL, L"Synchronize list");
-  m_Toolbar.InsertButton(2, Icon24_MAL,      102, 1, fsStyle1, 2, NULL, L"View your panel at MyAnimeList");
-  m_Toolbar.InsertButton(3, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(4, Icon24_Folders,  104, 1, fsStyle2, 4, NULL, L"Anime folders");
-  m_Toolbar.InsertButton(5, Icon24_Tools,    105, 1, fsStyle2, 5, NULL, L"Tools");
-  m_Toolbar.InsertButton(6, Icon24_RSS,      106, 1, fsStyle1, 6, NULL, L"Torrents");
-  m_Toolbar.InsertButton(7, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(8, Icon24_Filter,   108, 1, fsStyle1, 8, NULL, L"Filter list");
-  m_Toolbar.InsertButton(9, Icon24_Settings, 109, 1, fsStyle1, 9, NULL, L"Change program settings");
+  m_Toolbar.InsertButton(0,  Icon24_Offline,  100, 1, fsStyle1,  0, NULL, L"Log in");
+  m_Toolbar.InsertButton(1,  Icon24_Sync,     101, 1, fsStyle1,  1, NULL, L"Synchronize list");
+  m_Toolbar.InsertButton(2,  Icon24_MAL,      102, 1, fsStyle1,  2, NULL, L"View your panel at MyAnimeList");
+  m_Toolbar.InsertButton(3,  0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
+  m_Toolbar.InsertButton(4,  Icon24_Folders,  104, 1, fsStyle2,  4, NULL, L"Anime folders");
+  m_Toolbar.InsertButton(5,  Icon24_Calendar, 105, 1, fsStyle1,  5, NULL, L"Season browser");
+  m_Toolbar.InsertButton(6,  Icon24_Tools,    106, 1, fsStyle2,  6, NULL, L"Tools");
+  m_Toolbar.InsertButton(7,  Icon24_RSS,      107, 1, fsStyle1,  7, NULL, L"Torrents");
+  m_Toolbar.InsertButton(8,  0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
+  m_Toolbar.InsertButton(9,  Icon24_Filter,   109, 1, fsStyle1,  9, NULL, L"Filter list");
+  m_Toolbar.InsertButton(10, Icon24_Settings, 110, 1, fsStyle1, 10, NULL, L"Change program settings");
   #ifdef _DEBUG
-  m_Toolbar.InsertButton(10, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(11, Icon24_About, 111, 1, fsStyle1, 11, NULL, L"Debug");
+  m_Toolbar.InsertButton(11, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
+  m_Toolbar.InsertButton(12, Icon24_About,    112, 1, fsStyle1, 12, NULL, L"Debug");
   #endif
   // Insert search toolbar button
   m_ToolbarSearch.InsertButton(0, Icon16_Search, 200, 1, fsStyle2, NULL, NULL, L"Search");
@@ -389,6 +391,7 @@ BOOL CMainWindow::OnDestroy() {
   AnimeWindow.Destroy();
   RecognitionTestWindow.Destroy();
   SearchWindow.Destroy();
+  SeasonWindow.Destroy();
   TorrentWindow.Destroy();
   // Cleanup
   MainClient.Cleanup();

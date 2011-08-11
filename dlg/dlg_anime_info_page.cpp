@@ -152,7 +152,7 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
         }
       } else {
         text = pAnimeItem->Synopsis;
-        if (pAnimeItem->Genres.empty()) {
+        if (pAnimeItem->Genres.empty() || pAnimeItem->Score.empty()) {
           MAL.GetAnimeDetails(pAnimeItem);
         }
       }

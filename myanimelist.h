@@ -72,6 +72,7 @@ enum MAL_Type {
 
 class CAnime;
 class CEventItem;
+class CHTTPClient;
 
 class CMALAnimeValues {
 public:
@@ -102,11 +103,13 @@ public:
   virtual ~CMyAnimeList() {};
 
   void CheckProfile();
-  void DownloadImage(CAnime* pAnimeItem);
-  bool GetAnimeDetails(CAnime* pAnimeItem);
+  void DownloadImage(CAnime* anime, CHTTPClient* client = nullptr);
+  bool GetAnimeDetails(CAnime* anime, CHTTPClient* client = nullptr);
   bool GetList(bool login);
   bool Login();
-  bool SearchAnime(wstring title, CAnime* pAnimeItem = NULL);
+  bool ParseAnimeDetails(const wstring& data, CAnime* anime = nullptr);
+  bool ParseSearchResult(const wstring& data, CAnime* anime = nullptr);
+  bool SearchAnime(wstring title, CAnime* anime = NULL, CHTTPClient* client = nullptr);
   bool Update(CMALAnimeValues& anime_values, int anime_id, int update_mode);
   bool UpdateSucceeded(const wstring& data, CEventItem& item);
   
@@ -114,16 +117,20 @@ public:
   bool IsValidDate(const wstring& date);
   bool IsValidEpisode(int episode, int watched, int total);
   void ParseDateString(const wstring& date, unsigned short& year, unsigned short& month, unsigned short& day);
-  wstring TranslateDate(wstring value, bool reverse = false);
+  
+  wstring TranslateDate(wstring value);
+  wstring TranslateDate(wstring value, const wstring& format);
   wstring TranslateMyStatus(int value, bool add_count);
-  int TranslateMyStatus(const wstring& value);
   wstring TranslateNumber(int value, LPCWSTR default_char = L"-");
   wstring TranslateRewatchValue(int value);
   wstring TranslateStatus(int value);
-  int TranslateStatus(const wstring& value);
   wstring TranslateStorageType(int value);
   wstring TranslateType(int value);
+  
+  int TranslateMyStatus(const wstring& value);
+  int TranslateStatus(const wstring& value);
   int TranslateType(const wstring& value);
+  
   void ViewAnimePage(int series_id);
   void ViewAnimeSearch(wstring title);
   void ViewHistory();

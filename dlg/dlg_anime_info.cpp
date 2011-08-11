@@ -303,15 +303,14 @@ void CAnimeWindow::Refresh(CAnime* pAnimeItem, bool series_info, bool my_info) {
   SetDlgItemText(IDC_EDIT_ANIME_TITLE, m_pAnimeItem->Series_Title.c_str());
 
   // Load image
-  wstring image_path = Taiga.GetDataPath() + L"Image\\" + ToWSTR(m_pAnimeItem->Series_ID) + L".jpg";
-  if (AnimeImage.Load(image_path)) {
+  if (AnimeImage.Load(m_pAnimeItem->GetImagePath())) {
     CWindow img = GetDlgItem(IDC_STATIC_ANIME_IMG);
     img.SetPosition(NULL, AnimeImage.Rect);
     img.SetWindowHandle(NULL);
     // Refresh if current file is too old
     if (m_pAnimeItem->GetAiringStatus() != MAL_FINISHED) {
       // Check last modified date (>= 7 days)
-      if (GetFileAge(image_path) / (60 * 60 * 24) >= 7) {
+      if (GetFileAge(m_pAnimeItem->GetImagePath()) / (60 * 60 * 24) >= 7) {
         MAL.DownloadImage(m_pAnimeItem);
       }
     }
@@ -330,32 +329,6 @@ void CAnimeWindow::Refresh(CAnime* pAnimeItem, bool series_info, bool my_info) {
 }
 
 // =============================================================================
-
-bool CAnimeWindow::CAnimeImage::Load(const wstring& file) {
-  ::DeleteObject(DC.DetachBitmap());
-  
-  HBITMAP hbmp = NULL;
-  if (DC.Get() == NULL) {
-    HDC hScreen = ::GetDC(NULL);
-    DC = ::CreateCompatibleDC(hScreen);
-    ::ReleaseDC(NULL, hScreen);
-  }
-
-  Gdiplus::Bitmap bmp(file.c_str());
-  Width = bmp.GetWidth();
-  Height = bmp.GetHeight();
-  bmp.GetHBITMAP(NULL, &hbmp);
-  
-  if (!hbmp || !Width || !Height) {
-    ::DeleteObject(hbmp);
-    return false;
-  } else {
-    Rect.bottom = Rect.top + static_cast<int>(Rect.Width() * 
-      (static_cast<float>(Height) / static_cast<float>(Width)));
-    DC.AttachBitmap(hbmp);
-    return true;
-  }
-}
 
 void CAnimeWindow::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   CDC dc = hdc;

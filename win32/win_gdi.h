@@ -89,10 +89,10 @@ public:
     ::CopyRect(this, &srcRect);
   }
 
-  int Height() {
+  int Height() const {
     return bottom - top;
   }
-  int Width() {
+  int Width() const {
     return right - left;
   }
 

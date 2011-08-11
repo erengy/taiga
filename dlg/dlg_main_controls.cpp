@@ -119,7 +119,7 @@ int CMainWindow::CMainList::GetSortType(int column) {
       return LISTSORTTYPE_NUMBER;
     // Season
     case 4:
-      return LISTSORTTYPE_SEASON;
+      return LISTSORTTYPE_STARTDATE;
     // Other columns
     default:
       return LISTSORTTYPE_DEFAULT;
@@ -520,20 +520,24 @@ BOOL CMainWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
     case 102:
       ExecuteAction(L"ViewPanel");
       return TRUE;
+    // Season browser
+    case 105:
+      ExecuteAction(L"SeasonBrowser");
+      return TRUE;
     // Torrents
-    case 106:
+    case 107:
       ExecuteAction(L"Torrents");
       return TRUE;
     // Filter
-    case 108:
+    case 109:
       ExecuteAction(L"Filter");
       return TRUE;
     // Settings
-    case 109:
+    case 110:
       ExecuteAction(L"Settings");
       return TRUE;
     // Debug
-    case 111:
+    case 112:
       DebugTest();
       return TRUE;
   }
@@ -578,7 +582,7 @@ LRESULT CMainWindow::OnToolbarNotify(LPARAM lParam) {
           action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"Folders");
           break;
         // Tools
-        case 105:
+        case 106:
           action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"Tools");
           break;
         // Search

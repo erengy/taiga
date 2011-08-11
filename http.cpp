@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include "animedb.h"
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
@@ -26,6 +27,7 @@
 #include "dlg/dlg_input.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_search.h"
+#include "dlg/dlg_season.h"
 #include "dlg/dlg_settings.h"
 #include "dlg/dlg_torrent.h"
 #include "dlg/dlg_update.h"
@@ -69,8 +71,7 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
     case HTTP_Feed_DownloadIcon:
       break;
     case HTTP_MAL_SearchAnime:
-      SearchWindow.EnableDlgItem(IDOK, TRUE);
-      SearchWindow.SetDlgItemText(IDOK, L"Search");
+      SearchWindow.EnableInput(true);
       break;
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
@@ -343,11 +344,11 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_TagUpdate: {
       EventQueue.UpdateInProgress = false;
       MainWindow.ChangeStatus();
-      CAnime* pAnime = reinterpret_cast<CAnime*>(GetParam());
-      if (pAnime && EventQueue.GetItemCount() > 0) {
+      CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+      if (anime && EventQueue.GetItemCount() > 0) {
         int user_index = EventQueue.GetUserIndex();
         if (user_index > -1) {
-          pAnime->Edit(GetData(), EventQueue.List[user_index].Items[EventQueue.List[user_index].Index]);
+          anime->Edit(GetData(), EventQueue.List[user_index].Items[EventQueue.List[user_index].Index]);
           return TRUE;
         }
       }
@@ -358,15 +359,14 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Anime details
     case HTTP_MAL_AnimeDetails: {
-      CAnime* pAnime = reinterpret_cast<CAnime*>(GetParam());
-      wstring data = GetData();
-      if (pAnime && !data.empty()) {
-        pAnime->Genres = InStr(data, L"Genres:</span> ", L"<br />");
-        pAnime->Rank = InStr(data, L"Ranked:</span> ", L"<br />");
-        pAnime->Popularity = InStr(data, L"Popularity:</span> ", L"<br />");
-        pAnime->Score = InStr(data, L"Score:</span> ", L"<br />");
-        StripHTML(pAnime->Score);
-        AnimeWindow.Refresh(pAnime, true, false);
+      CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+      if (MAL.ParseAnimeDetails(GetData(), anime)) {
+        if (AnimeWindow.IsWindow()) {
+          AnimeWindow.Refresh(anime, true, false);
+        }
+        if (SeasonWindow.IsWindow()) {
+          SeasonWindow.m_List.RedrawWindow();
+        }
       }
       break;
     }
@@ -375,7 +375,34 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Download image
     case HTTP_MAL_Image: {
-      AnimeWindow.Refresh(NULL, false, false);
+      if (AnimeWindow.IsWindow()) {
+        AnimeWindow.Refresh(NULL, false, false);
+      }
+      if (SeasonWindow.IsWindow()) {
+        CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+        if (anime) {
+          for (auto it = SeasonWindow.Images.begin(); it != SeasonWindow.Images.end(); ++it) {
+            if (it->Data == anime->Series_ID) {
+              if (it->Load(anime->GetImagePath())) {
+                SeasonWindow.m_List.RedrawWindow();
+                break;
+              }
+            }
+          }
+        }
+        /*for (auto i = SeasonWindow.Images.begin(); i != SeasonWindow.Images.end(); ++i) {
+          if (i->DC.Get() == nullptr) {
+            for (auto j = SeasonDatabase.Items.begin(); j != SeasonDatabase.Items.end(); ++j) {
+              if (i->Data == j->Series_ID) {
+                if (anime != &(*j) || !anime) {
+                  MAL.DownloadImage(&(*j));
+                  return TRUE;
+                }
+              }
+            }
+          }
+        }*/
+      }
       break;
     }
 
@@ -383,11 +410,12 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Search anime
     case HTTP_MAL_SearchAnime: {
-      CAnime* pAnime = reinterpret_cast<CAnime*>(GetParam());
-      if (pAnime) {
-        if (pAnime->ParseSearchResult(GetData())) {
-          AnimeWindow.Refresh(pAnime, true, false);
-          if (MAL.GetAnimeDetails(pAnime)) return TRUE;
+      CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+      if (anime) {
+        if (MAL.ParseSearchResult(GetData(), anime)) {
+          AnimeWindow.Refresh(anime, true, false);
+          SeasonWindow.m_List.RedrawWindow();
+          if (MAL.GetAnimeDetails(anime, this)) return TRUE;
         } else {
           status = L"Could not read anime information.";
           AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
@@ -398,8 +426,7 @@ BOOL CHTTPClient::OnReadComplete() {
       } else {
         if (SearchWindow.IsWindow()) {
           SearchWindow.ParseResults(GetData());
-          SearchWindow.EnableDlgItem(IDOK, TRUE);
-          SearchWindow.SetDlgItemText(IDOK, L"Search");
+          SearchWindow.EnableInput(true);
         }
       }
       break;
@@ -409,10 +436,10 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Torrent
     case HTTP_Feed_Check: {
-      CFeed* pFeed = reinterpret_cast<CFeed*>(GetParam());
-      if (pFeed) {
-        pFeed->Read();
-        int torrent_count = pFeed->ExamineData();
+      CFeed* feed = reinterpret_cast<CFeed*>(GetParam());
+      if (feed) {
+        feed->Read();
+        int torrent_count = feed->ExamineData();
         if (torrent_count > 0) {
           status = L"There are new torrents available!";
         } else {
@@ -427,11 +454,11 @@ BOOL CHTTPClient::OnReadComplete() {
           switch (Settings.RSS.Torrent.NewAction) {
             // Notify
             case 1:
-              Aggregator.Notify(*pFeed);
+              Aggregator.Notify(*feed);
               break;
             // Download
             case 2:
-              if (pFeed->Download(-1)) return TRUE;
+              if (feed->Download(-1)) return TRUE;
               break;
           }
         }
@@ -440,13 +467,13 @@ BOOL CHTTPClient::OnReadComplete() {
     }
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll: {
-      CFeed* pFeed = reinterpret_cast<CFeed*>(GetParam());
-      if (pFeed) {
-        CFeedItem* pFeedItem = reinterpret_cast<CFeedItem*>(&pFeed->Items[pFeed->DownloadIndex]);
-        wstring app_path, cmd, file = pFeedItem->Title;
+      CFeed* feed = reinterpret_cast<CFeed*>(GetParam());
+      if (feed) {
+        CFeedItem* feed_item = reinterpret_cast<CFeedItem*>(&feed->Items[feed->DownloadIndex]);
+        wstring app_path, cmd, file = feed_item->Title;
         ValidateFileName(file);
-        file = pFeed->GetDataPath() + file + L".torrent";
-        Aggregator.FileArchive.push_back(pFeedItem->Title);
+        file = feed->GetDataPath() + file + L".torrent";
+        Aggregator.FileArchive.push_back(feed_item->Title);
         if (FileExists(file)) {
           switch (Settings.RSS.Torrent.NewAction) {
             // Default application
@@ -459,19 +486,19 @@ BOOL CHTTPClient::OnReadComplete() {
               break;
           }
           if (Settings.RSS.Torrent.SetFolder && InStr(app_path, L"utorrent", 0, true) > -1) {
-            CAnime* anime = AnimeList.FindItem(pFeedItem->EpisodeData.AnimeId);
+            CAnime* anime = AnimeList.FindItem(feed_item->EpisodeData.AnimeId);
             if (anime && !anime->Folder.empty()) {
               cmd = L"/directory \"" + anime->Folder + L"\" ";
             }
           }
           cmd += L"\"" + file + L"\"";
           Execute(app_path, cmd);
-          pFeedItem->Download = FALSE;
+          feed_item->Download = FALSE;
           TorrentWindow.RefreshList();
         }
-        pFeed->DownloadIndex = -1;
+        feed->DownloadIndex = -1;
         if (GetClientMode() == HTTP_Feed_DownloadAll) {
-          if (pFeed->Download(-1)) return TRUE;
+          if (feed->Download(-1)) return TRUE;
         }
       }
       TorrentWindow.ChangeStatus(L"Successfully downloaded all torrents.");

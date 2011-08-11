@@ -89,6 +89,41 @@ COLORREF HexToARGB(const wstring& text) {
   return RGB(r, g, b);
 }
 
+CRect ResizeRect(const CRect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y) {
+  CRect rect = rect_dest;
+
+  float dest_width   = static_cast<float>(rect_dest.Width());
+  float dest_height  = static_cast<float>(rect_dest.Height());
+  float image_width  = static_cast<float>(src_width);
+  float image_Height = static_cast<float>(src_height);
+  
+  // Source < Destination (No need to resize)
+  if ((image_width < dest_width) && (image_Height < dest_height) && !stretch) {
+    rect.right = rect.left + src_width;
+    rect.bottom = rect.top + src_height;
+    if (center_x) rect.Offset(static_cast<int>((image_width - image_width) / 2), 0);
+    if (center_y) rect.Offset(0, static_cast<int>((dest_height - image_Height) / 2));
+
+  // Source > Destination (Resize)
+  } else {
+    // Calculate aspect ratios
+    float dest_ratio = dest_width / dest_height;
+    float image_ratio = image_width / image_Height;
+    
+    // Width > Height
+    if (image_ratio > dest_ratio) {
+      rect.bottom = rect.top + static_cast<int>(dest_width * (1.0f / image_ratio));
+      if (center_y) rect.Offset(0, static_cast<int>((dest_height - rect.Height()) / 2.0f));
+    // Height > Width
+    } else if (image_ratio < dest_ratio) {
+      rect.right = rect.left + static_cast<int>(dest_height * image_ratio);
+      if (center_x) rect.Offset(static_cast<int>((dest_width - rect.Width()) / 2.0f), 0);
+    }
+  }
+  
+  return rect;
+}
+
 int ScaleX(int value) {
   static int dpi_x = 0;
   if (!dpi_x) {
@@ -111,4 +146,33 @@ int ScaleY(int value) {
     }
   }
   return MulDiv(value, dpi_y, 96);
+}
+
+// =============================================================================
+
+bool CImage::Load(const wstring& path) {
+  ::DeleteObject(DC.DetachBitmap());
+  
+  HBITMAP hbmp = nullptr;
+  if (DC.Get() == nullptr) {
+    HDC hScreen = ::GetDC(nullptr);
+    DC = ::CreateCompatibleDC(hScreen);
+    ::ReleaseDC(NULL, hScreen);
+  }
+
+  Gdiplus::Bitmap bmp(path.c_str());
+  Width = bmp.GetWidth();
+  Height = bmp.GetHeight();
+  bmp.GetHBITMAP(NULL, &hbmp);
+  
+  if (!hbmp || !Width || !Height) {
+    ::DeleteObject(hbmp);
+    ::DeleteDC(DC.DetachDC());
+    return false;
+  } else {
+    Rect.bottom = Rect.top + static_cast<int>(Rect.Width() * // TODO: Move to dlg_anime_info
+      (static_cast<float>(Height) / static_cast<float>(Width)));
+    DC.AttachBitmap(hbmp);
+    return true;
+  }
 }

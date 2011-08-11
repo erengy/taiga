@@ -62,9 +62,33 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       }
       break;
     }
+
+    // Episodes
+    case LISTSORTTYPE_EPISODES: {
+      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
+      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+      if (pItem1 && pItem2) {
+        if (pItem1->Series_Episodes > pItem2->Series_Episodes) {
+          return_value = 1;
+        } else if (pItem1->Series_Episodes < pItem2->Series_Episodes) {
+          return_value = -1;
+        }
+      }
+      break;
+    }
+
+    // Score
+    case LISTSORTTYPE_SCORE: {
+      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
+      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+      if (pItem1 && pItem2) {
+        return_value = lstrcmpi(pItem1->Score.c_str(), pItem2->Score.c_str());
+      }
+      break;
+    }
     
-    // Season
-    case LISTSORTTYPE_SEASON: {
+    // Start date
+    case LISTSORTTYPE_STARTDATE: {
       CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
       CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {

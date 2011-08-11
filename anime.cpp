@@ -316,6 +316,8 @@ bool CAnime::CheckEpisodes(int episode, bool check_folder) {
 }
 
 bool CAnime::PlayEpisode(int number) {
+  if (number > Series_Episodes && Series_Episodes != 0) return false;
+
   wstring file;
 
   // Check saved episode path
@@ -379,6 +381,10 @@ bool CAnime::SetEpisodeAvailability(int number, bool available, const wstring& p
 }
 
 // =============================================================================
+
+wstring CAnime::GetImagePath() {
+  return Taiga.GetDataPath() + L"Image\\" + ToWSTR(Series_ID) + L".jpg";
+}
 
 void CAnime::SetLocalData(const wstring& folder, const wstring& titles) {
   if ((folder == EMPTY_STR || folder == Folder) && 
@@ -449,26 +455,6 @@ int CAnime::GetTotalEpisodes() const {
   if (number < 24) return 26;
   if (number < 50) return 51;
   return 0;
-}
-
-// =============================================================================
-
-bool CAnime::ParseSearchResult(const wstring& data) {
-  if (data.empty()) return false;
-  xml_document doc;
-  xml_parse_result result = doc.load(data.c_str());
-  if (result.status == status_ok) {
-    xml_node anime = doc.child(L"anime");
-    for (xml_node entry = anime.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
-      if (XML_ReadIntValue(entry, L"id") == Series_ID) {
-        Score = XML_ReadStrValue(entry, L"score");
-        Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeText(Synopsis);
-        return true;
-      }
-    }
-  }
-  return false;
 }
 
 // =============================================================================

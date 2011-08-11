@@ -30,10 +30,12 @@ enum TimerID {
 // ListView sort types
 enum ListSortType {
   LISTSORTTYPE_DEFAULT,
+  LISTSORTTYPE_EPISODES,
+  LISTSORTTYPE_FILESIZE,
   LISTSORTTYPE_NUMBER,
   LISTSORTTYPE_PROGRESS,
-  LISTSORTTYPE_SEASON,
-  LISTSORTTYPE_FILESIZE
+  LISTSORTTYPE_SCORE,
+  LISTSORTTYPE_STARTDATE
 };
 
 typedef unsigned __int64 QWORD, *LPQWORD;
@@ -103,6 +105,7 @@ void UpdateFilterMenu();
 void UpdateFoldersMenu();
 void UpdateSearchMenu();
 void UpdateSearchListMenu(bool enabled = false);
+void UpdateSeasonMenu();
 void UpdateTrayMenu();
 
 // script.cpp

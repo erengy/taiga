@@ -25,6 +25,7 @@
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
+#include "xml.h"
 
 CMyAnimeList MAL;
 
@@ -61,13 +62,14 @@ void CMyAnimeList::CheckProfile() {
     HTTP_MAL_Profile);
 }
 
-bool CMyAnimeList::GetAnimeDetails(CAnime* pAnimeItem) {
-  if (!pAnimeItem) return false;
-  return SearchClient.Connect(L"myanimelist.net", 
-    L"/includes/ajax.inc.php?t=64&id=" + ToWSTR(pAnimeItem->Series_ID), 
+bool CMyAnimeList::GetAnimeDetails(CAnime* anime, CHTTPClient* client) {
+  if (!anime) return false;
+  if (!client) client = &SearchClient;
+  return client->Connect(L"myanimelist.net", 
+    L"/includes/ajax.inc.php?t=64&id=" + ToWSTR(anime->Series_ID), 
     L"", L"GET", L"", L"myanimelist.net", 
     L"", HTTP_MAL_AnimeDetails, 
-    reinterpret_cast<LPARAM>(pAnimeItem));
+    reinterpret_cast<LPARAM>(anime));
 }
 
 bool CMyAnimeList::GetList(bool login) {
@@ -102,32 +104,90 @@ bool CMyAnimeList::Login() {
   return false;
 }
 
-void CMyAnimeList::DownloadImage(CAnime* pAnimeItem) {
-  CUrl url(pAnimeItem->Series_Image);
-  wstring file = Taiga.GetDataPath() + L"Image\\" + ToWSTR(pAnimeItem->Series_ID) + L".jpg";
-  ImageClient.Get(url, file, HTTP_MAL_Image, reinterpret_cast<LPARAM>(pAnimeItem));
+void CMyAnimeList::DownloadImage(CAnime* anime, CHTTPClient* client) {
+  CUrl url(anime->Series_Image);
+  if (!client) client = &ImageClient;
+  client->Get(url, anime->GetImagePath(), HTTP_MAL_Image, reinterpret_cast<LPARAM>(anime));
 }
 
-bool CMyAnimeList::SearchAnime(wstring title, CAnime* pAnimeItem) {
+bool CMyAnimeList::ParseAnimeDetails(const wstring& data, CAnime* anime) {
+  if (data.empty()) return false;
+
+  int series_id = ToINT(InStr(data, L"myanimelist.net/anime/", L"/"));
+  if (!series_id) return false;
+
+  if (!anime) anime = AnimeList.FindItem(series_id);
+  if (!anime) return false;
+
+  anime->Genres = InStr(data, L"Genres:</span> ", L"<br />");
+  anime->Rank = InStr(data, L"Ranked:</span> ", L"<br />");
+  anime->Popularity = InStr(data, L"Popularity:</span> ", L"<br />");
+  anime->Score = InStr(data, L"Score:</span> ", L"<br />");
+  StripHTML(anime->Score);
+
+  return true;
+}
+
+bool CMyAnimeList::ParseSearchResult(const wstring& data, CAnime* anime) {
+  if (data.empty()) return false;
+  bool found_item = false;
+  
+  xml_document doc;
+  xml_parse_result result = doc.load(data.c_str());
+  
+  if (result.status == status_ok) {
+    xml_node node = doc.child(L"anime");
+    for (xml_node entry = node.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
+      int series_id = XML_ReadIntValue(entry, L"id");
+      CAnime* anime_item = AnimeList.FindItem(series_id);
+      if (anime && anime->Series_ID == series_id) {
+        anime_item = anime;
+      }
+      if (anime_item) {
+        anime_item->Series_Title = XML_ReadStrValue(entry, L"title");
+        MAL.DecodeText(anime_item->Series_Title);
+        anime_item->Series_Synonyms = XML_ReadStrValue(entry, L"synonyms");
+        MAL.DecodeText(anime_item->Series_Synonyms);
+        anime_item->Series_Episodes = XML_ReadIntValue(entry, L"episodes");
+        anime_item->Score = XML_ReadStrValue(entry, L"score");
+        anime_item->Series_Type = MAL.TranslateType(XML_ReadStrValue(entry, L"type"));
+        anime_item->Series_Status = MAL.TranslateStatus(XML_ReadStrValue(entry, L"status"));
+        anime_item->Series_Start = XML_ReadStrValue(entry, L"start_date");
+        anime_item->Series_End = XML_ReadStrValue(entry, L"end_date");
+        anime_item->Synopsis = XML_ReadStrValue(entry, L"synopsis");
+        MAL.DecodeText(anime_item->Synopsis);
+        anime_item->Series_Image = XML_ReadStrValue(entry, L"image");
+        if (!anime || anime->Series_ID == anime_item->Series_ID) {
+          found_item = true;
+        }
+      }
+    }
+  }
+  
+  return found_item;
+}
+
+bool CMyAnimeList::SearchAnime(wstring title, CAnime* anime, CHTTPClient* client) {
   if (title.empty()) return false;
   Replace(title, L"+", L"%2B", true);
+  if (!client) client = &SearchClient;
 
   switch (Settings.Account.MAL.API) {
     case MAL_API_OFFICIAL: {
       if (Settings.Account.MAL.User.empty() || Settings.Account.MAL.Password.empty()) {
         return false;
       }
-      return SearchClient.Connect(L"myanimelist.net", 
+      return client->Connect(L"myanimelist.net", 
         L"/api/anime/search.xml?q=" + title, 
         L"", 
         L"GET", 
-        SearchClient.GetDefaultHeader() + L"Authorization: Basic " + MAL_USER_PASS, 
+        client->GetDefaultHeader() + L"Authorization: Basic " + MAL_USER_PASS, 
         L"myanimelist.net", 
         L"", HTTP_MAL_SearchAnime, 
-        reinterpret_cast<LPARAM>(pAnimeItem));
+        reinterpret_cast<LPARAM>(anime));
     }
     case MAL_API_NONE: {
-      if (!pAnimeItem) {
+      if (!anime) {
         ViewAnimeSearch(title); // TEMP
       }
       return true;
@@ -488,7 +548,15 @@ void CMyAnimeList::ParseDateString(const wstring& date, unsigned short& year, un
   }
 }
 
-wstring CMyAnimeList::TranslateDate(wstring value, bool reverse) {
+wstring CMyAnimeList::TranslateDate(wstring value, const wstring& format) {
+  WCHAR buff[32] = {L'\0'};
+  SYSTEMTIME st = {0};
+  ParseDateString(value, st.wYear, st.wMonth, st.wDay);
+  GetDateFormat(LOCALE_INVARIANT, 0, &st, format.c_str(), buff, 32);
+  return buff;
+}
+
+wstring CMyAnimeList::TranslateDate(wstring value) {
   if (!IsValidDate(value)) {
     return L"Unknown";
   } else {
@@ -510,12 +578,7 @@ wstring CMyAnimeList::TranslateDate(wstring value, bool reverse) {
       value = L"Winter";
     }
     
-    if (reverse) {
-      value = ToWSTR(year) + L" " + value;
-    } else {
-      value = value + L" " + ToWSTR(year);
-    }
-    
+    value = value + L" " + ToWSTR(year);
     return value;
   }
 }

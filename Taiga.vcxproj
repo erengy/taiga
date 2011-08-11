@@ -85,6 +85,7 @@
   <ItemGroup>
     <ClCompile Include="action.cpp" />
     <ClCompile Include="anime.cpp" />
+    <ClCompile Include="animedb.cpp" />
     <ClCompile Include="animelist.cpp" />
     <ClCompile Include="announce.cpp" />
     <ClCompile Include="common.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="dlg\dlg_main.cpp" />
     <ClCompile Include="dlg\dlg_main_controls.cpp" />
     <ClCompile Include="dlg\dlg_search.cpp" />
+    <ClCompile Include="dlg\dlg_season.cpp" />
     <ClCompile Include="dlg\dlg_settings.cpp" />
     <ClCompile Include="dlg\dlg_settings_page.cpp" />
     <ClCompile Include="dlg\dlg_test_recognition.cpp" />
@@ -176,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="anime.h" />
+    <ClInclude Include="animedb.h" />
     <ClInclude Include="animelist.h" />
     <ClInclude Include="announce.h" />
     <ClInclude Include="common.h" />
@@ -190,6 +193,7 @@
     <ClInclude Include="dlg\dlg_input.h" />
     <ClInclude Include="dlg\dlg_main.h" />
     <ClInclude Include="dlg\dlg_search.h" />
+    <ClInclude Include="dlg\dlg_season.h" />
     <ClInclude Include="dlg\dlg_settings.h" />
     <ClInclude Include="dlg\dlg_settings_page.h" />
     <ClInclude Include="dlg\dlg_test_recognition.h" />

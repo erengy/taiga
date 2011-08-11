@@ -90,7 +90,7 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
             break;
           // Season
           case 4:
-            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_SEASON, ListViewCompareProc);
+            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_STARTDATE, ListViewCompareProc);
             break;
           // Other columns
           default:
@@ -180,11 +180,15 @@ BOOL CSearchWindow::PreTranslateMessage(MSG* pMsg) {
 
 // =============================================================================
 
+void CSearchWindow::EnableInput(bool enable) {
+  EnableDlgItem(IDOK, !enable);
+  SetDlgItemText(IDOK, enable ? L"Search" : L"Searching...");
+}
+
 BOOL CSearchWindow::Search(const wstring& title) {
   if (MAL.SearchAnime(title)) {
     m_Edit.SetText(title.c_str());
-    EnableDlgItem(IDOK, FALSE);
-    SetDlgItemText(IDOK, L"Searching...");
+    EnableInput(false);
     m_List.DeleteAllItems();
     m_Anime.clear();
     return TRUE;
