@@ -58,6 +58,7 @@ CHTTPClient::CHTTPClient() {
 BOOL CHTTPClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWSTR(dwError) + L": " + 
     FormatError(dwError, L"winhttp.dll");
+  DEBUG_PRINT(error_text + L"\n");
 
   switch (GetClientMode()) {
     case HTTP_MAL_Login:

@@ -103,7 +103,7 @@ public:
   virtual ~CMyAnimeList() {};
 
   void CheckProfile();
-  void DownloadImage(CAnime* anime, CHTTPClient* client = nullptr);
+  bool DownloadImage(CAnime* anime, CHTTPClient* client = nullptr);
   bool GetAnimeDetails(CAnime* anime, CHTTPClient* client = nullptr);
   bool GetList(bool login);
   bool Login();

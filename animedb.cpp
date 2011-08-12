@@ -146,6 +146,7 @@ bool CAnimeSeasonDatabase::WriteForRelease() {
     XML_WriteIntValue(anime, L"series_animedb_id", it->Series_ID);
     XML_WriteStrValue(anime, L"series_title", it->Series_Title.c_str(), node_cdata);
     XML_WriteIntValue(anime, L"series_type", it->Series_Type);
+    XML_WriteStrValue(anime, L"series_image", it->Series_Image.c_str());
     XML_WriteStrValue(anime, L"producers", it->Producers.c_str());
   }
 

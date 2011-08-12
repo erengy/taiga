@@ -453,9 +453,15 @@ LRESULT CSeasonWindow::OnToolbarNotify(LPARAM lParam) {
 
 void CSeasonWindow::RefreshData(bool connect) {
   size_t size = SeasonDatabase.Items.size();
+  
+  for (size_t i = 0; i < size; i++) {
+    if (i < ImageClients.size()) ImageClients.at(i).Cleanup();
+    if (i < InfoClients.size()) InfoClients.at(i).Cleanup();
+  }
   if (ImageClients.size() != size) ImageClients.resize(size);
   if (InfoClients.size() != size) InfoClients.resize(size);
-  Images.clear(); Images.resize(size);
+  Images.clear();
+  Images.resize(size);
 
   for (auto i = SeasonDatabase.Items.begin(); i != SeasonDatabase.Items.end(); ++i) {
     size_t index = i - SeasonDatabase.Items.begin();

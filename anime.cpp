@@ -545,8 +545,10 @@ bool CAnime::Edit(const wstring& data, CEventItem& item) {
   }
   // Edit ID (Add)
   if (item.Mode == HTTP_MAL_AnimeAdd) {
-    My_ID = ToINT(data);
-    AnimeList.Write(Series_ID, L"my_id", data);
+    if (IsNumeric(data)) {
+      My_ID = ToINT(data);
+      AnimeList.Write(Series_ID, L"my_id", data);
+    }
   }
   // Edit tags
   if (item.tags != EMPTY_STR) {

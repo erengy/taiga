@@ -104,10 +104,11 @@ bool CMyAnimeList::Login() {
   return false;
 }
 
-void CMyAnimeList::DownloadImage(CAnime* anime, CHTTPClient* client) {
+bool CMyAnimeList::DownloadImage(CAnime* anime, CHTTPClient* client) {
+  if (anime->Series_Image.empty()) return false;
   CUrl url(anime->Series_Image);
   if (!client) client = &ImageClient;
-  client->Get(url, anime->GetImagePath(), HTTP_MAL_Image, reinterpret_cast<LPARAM>(anime));
+  return client->Get(url, anime->GetImagePath(), HTTP_MAL_Image, reinterpret_cast<LPARAM>(anime));
 }
 
 bool CMyAnimeList::ParseAnimeDetails(const wstring& data, CAnime* anime) {
@@ -403,7 +404,8 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, CEventItem& item) {
     case MAL_API_OFFICIAL: {
       switch (update_mode) {
         case HTTP_MAL_AnimeAdd:
-          success = IsNumeric(data);
+          success = IsNumeric(data) || 
+            InStr(data, L"<title>201 Created</title>") > -1; // TODO: Remove when MAL fixes its API
           break;
         case HTTP_MAL_AnimeDelete:
           success = data == L"Deleted";
