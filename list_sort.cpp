@@ -45,6 +45,22 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       break;
     }
 
+    // Popularity
+    case LISTSORTTYPE_POPULARITY: {
+      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
+      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+      if (pItem1 && pItem2) {
+        int iItem1 = pItem1->Popularity.empty() ? 0 : _wtoi(pItem1->Popularity.substr(1).c_str());
+        int iItem2 = pItem2->Popularity.empty() ? 0 : _wtoi(pItem2->Popularity.substr(1).c_str());
+        if (iItem1 > iItem2) {
+          return_value = 1;
+        } else if (iItem1 < iItem2) {
+          return_value = -1;
+        }
+      }
+      break;
+    }
+
     // Progress
     case LISTSORTTYPE_PROGRESS: {
       CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));

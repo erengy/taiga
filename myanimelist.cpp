@@ -169,8 +169,10 @@ bool CMyAnimeList::ParseSearchResult(const wstring& data, CAnime* anime) {
 
 bool CMyAnimeList::SearchAnime(wstring title, CAnime* anime, CHTTPClient* client) {
   if (title.empty()) return false;
-  Replace(title, L"+", L"%2B", true);
   if (!client) client = &SearchClient;
+
+  Replace(title, L"+", L"%2B", true);
+  ReplaceChar(title, L'\u2729', L'\u2606'); // stress outlined white star to white star
 
   switch (Settings.Account.MAL.API) {
     case MAL_API_OFFICIAL: {
@@ -464,7 +466,7 @@ bool CMyAnimeList::UpdateSucceeded(const wstring& data, CEventItem& item) {
 
 void CMyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 33
+  #define HTMLCHARCOUNT 34
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Extreme measures */
     // black star (black and white stars are encoded the same in API >_<)
@@ -479,6 +481,7 @@ void CMyAnimeList::DecodeText(wstring& text) {
      L"\u304A\u306D\u304C\u3044\u30DE\u30A4\u30E1\u30ED\u30C7\u30A3 \u304D\u3089\u3089\u3063"},
     /* Characters are sorted by their Unicode value */
     {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2
+    {L"&Acirc;&sup3;",          L"\u00B3"},   // superscript 3
     {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
     {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
     {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
@@ -548,15 +551,29 @@ void CMyAnimeList::ParseDateString(const wstring& date, unsigned short& year, un
   }
 }
 
-wstring CMyAnimeList::TranslateDate(wstring value, const wstring& format) {
-  WCHAR buff[32] = {L'\0'};
-  SYSTEMTIME st = {0};
-  ParseDateString(value, st.wYear, st.wMonth, st.wDay);
-  GetDateFormat(LOCALE_INVARIANT, 0, &st, format.c_str(), buff, 32);
-  return buff;
+wstring CMyAnimeList::TranslateDate(wstring value) {
+  if (!MAL.IsValidDate(value)) return L"?";
+
+  wstring date;
+  unsigned short day, month, year;
+  MAL.ParseDateString(value, year, month, day);
+  
+  if (month > 0 && month <= 12) {
+    const wchar_t* months[] = {
+      L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
+      L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"};
+    date += months[month - 1];
+    date += L" ";
+  }
+  if (day) {
+    date += ToWSTR(day) + L", ";
+  }
+  date += ToWSTR(year);
+
+  return date;
 }
 
-wstring CMyAnimeList::TranslateDate(wstring value) {
+wstring CMyAnimeList::TranslateDateToSeason(wstring value) {
   if (!IsValidDate(value)) {
     return L"Unknown";
   } else {
@@ -713,4 +730,8 @@ void CMyAnimeList::ViewPanel() {
 
 void CMyAnimeList::ViewProfile() {
   ExecuteLink(L"http://myanimelist.net/profile/" + Settings.Account.MAL.User);
+}
+
+void CMyAnimeList::ViewSeasonGroup() {
+  ExecuteLink(L"http://myanimelist.net/clubs.php?cid=743");
 }

@@ -52,6 +52,7 @@ enum IconList16 {
   Icon16_Calendar,
   Icon16_Category,
   Icon16_Sort,
+  Icon16_Balloon,
   ICONCOUNT_16PX
 };
 

@@ -119,7 +119,7 @@ public:
   void ParseDateString(const wstring& date, unsigned short& year, unsigned short& month, unsigned short& day);
   
   wstring TranslateDate(wstring value);
-  wstring TranslateDate(wstring value, const wstring& format);
+  wstring TranslateDateToSeason(wstring value);
   wstring TranslateMyStatus(int value, bool add_count);
   wstring TranslateNumber(int value, LPCWSTR default_char = L"-");
   wstring TranslateRewatchValue(int value);
@@ -137,6 +137,7 @@ public:
   void ViewMessages();
   void ViewPanel();
   void ViewProfile();
+  void ViewSeasonGroup();
 };
 
 extern CMyAnimeList MAL;

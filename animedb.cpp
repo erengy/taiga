@@ -17,8 +17,10 @@
 */
 
 #include "std.h"
+#include <algorithm>
 #include "animedb.h"
 #include "myanimelist.h"
+#include "string.h"
 #include "taiga.h"
 #include "xml.h"
 
@@ -28,8 +30,13 @@ CAnimeSeasonDatabase SeasonDatabase;
 // =============================================================================
 
 bool CAnimeSeasonDatabase::Read(wstring file) {
+  // Write modifications
+  if (!File.empty() && Modified) Write();
+
+  // Initialize
+  Folder = Taiga.GetDataPath() + L"db\\season\\";
+  File = file; file = Folder + File;
   Items.clear();
-  file = Taiga.GetDataPath() + L"db\\season\\" + file;
   
   // Read XML file
   xml_document doc;
@@ -42,6 +49,7 @@ bool CAnimeSeasonDatabase::Read(wstring file) {
   // Read information
   xml_node season = doc.child(L"season");
   Name = XML_ReadStrValue(season.child(L"info"), L"name");
+  LastModified = XML_ReadStrValue(season.child(L"info"), L"last_modified");
 
   // Read items
   for (xml_node anime = season.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
@@ -62,15 +70,21 @@ bool CAnimeSeasonDatabase::Read(wstring file) {
     Items.back().Rank = XML_ReadStrValue(anime, L"rank");
     Items.back().Popularity = XML_ReadStrValue(anime, L"popularity");
     Items.back().Synopsis = XML_ReadStrValue(anime, L"synopsis");
-    MAL.DecodeText(Items.back().Synopsis);
   }
 
   return true;
 }
 
 bool CAnimeSeasonDatabase::Write(wstring file) {
-  wstring folder = Taiga.GetDataPath() + L"db\\season\\";
-  file = folder + file;
+  if (Items.empty() || !Modified) return false;
+  if (File.empty() && file.empty()) return false;
+  
+  #ifdef _DEBUG
+  SeasonDatabase.WriteForRelease();
+  #endif
+
+  if (file.empty()) file = Folder + File;
+  Modified = false;
 
   xml_document doc;
   xml_node season = doc.append_child();
@@ -80,6 +94,7 @@ bool CAnimeSeasonDatabase::Write(wstring file) {
   xml_node info = season.append_child();
   info.set_name(L"info");
   XML_WriteStrValue(info, L"name", Name.c_str());
+  XML_WriteStrValue(info, L"last_modified", LastModified.c_str());
 
   // Items
   for (auto it = Items.begin(); it != Items.end(); ++it) {
@@ -102,6 +117,38 @@ bool CAnimeSeasonDatabase::Write(wstring file) {
     XML_WriteStrValue(anime, L"synopsis", it->Synopsis.c_str());
   }
 
-  ::CreateDirectory(folder.c_str(), NULL);
+  ::CreateDirectory(Folder.c_str(), NULL);
+  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+}
+
+bool CAnimeSeasonDatabase::WriteForRelease() {
+  wstring file = Folder + L"_" + File;
+
+  std::sort(Items.begin(), Items.end(), 
+    [](const CAnime& a1, const CAnime& a2) {
+      return CompareStrings(a1.Series_Title, a2.Series_Title) < 0;
+    });
+
+  xml_document doc;
+  xml_node season = doc.append_child();
+  season.set_name(L"season");
+
+  // Info
+  xml_node info = season.append_child();
+  info.set_name(L"info");
+  XML_WriteStrValue(info, L"name", Name.c_str());
+  XML_WriteStrValue(info, L"last_modified", LastModified.c_str());
+
+  // Items
+  for (auto it = Items.begin(); it != Items.end(); ++it) {
+    xml_node anime = season.append_child();
+    anime.set_name(L"anime");
+    XML_WriteIntValue(anime, L"series_animedb_id", it->Series_ID);
+    XML_WriteStrValue(anime, L"series_title", it->Series_Title.c_str(), node_cdata);
+    XML_WriteIntValue(anime, L"series_type", it->Series_Type);
+    XML_WriteStrValue(anime, L"producers", it->Producers.c_str());
+  }
+
+  ::CreateDirectory(Folder.c_str(), NULL);
   return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
 }

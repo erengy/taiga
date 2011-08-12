@@ -759,7 +759,7 @@ void CMainWindow::RefreshList(int index) {
           0, NULL, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
         m_List.SetItem(i, 2, MAL.TranslateNumber(it->GetScore()).c_str());
         m_List.SetItem(i, 3, MAL.TranslateType(it->Series_Type).c_str());
-        m_List.SetItem(i, 4, MAL.TranslateDate(it->Series_Start).c_str());
+        m_List.SetItem(i, 4, MAL.TranslateDateToSeason(it->Series_Start).c_str());
       }
     }
   }

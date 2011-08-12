@@ -789,6 +789,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (SeasonDatabase.Read(body)) {
       SeasonWindow.RefreshData(false);
       SeasonWindow.RefreshList();
+      SeasonWindow.RefreshStatus();
+      SeasonWindow.m_Toolbar.EnableButton(1, true);
     }
 
   // Season_GroupBy(group)

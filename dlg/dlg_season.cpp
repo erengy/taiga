@@ -35,7 +35,7 @@ CSeasonWindow SeasonWindow;
 // =============================================================================
 
 CSeasonWindow::CSeasonWindow() :
-  GroupBy(SEASONBROWSER_GROUPBY_TYPE), SortBy(SEASONBROWSER_SORTBY_NAME)
+  GroupBy(SEASONBROWSER_GROUPBY_TYPE), SortBy(SEASONBROWSER_SORTBY_TITLE)
 {
   RegisterDlgClass(L"TaigaSeasonW");
 }
@@ -82,9 +82,9 @@ BOOL CSeasonWindow::OnInitDialog() {
   m_Toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
   m_Toolbar.InsertButton(3, Icon16_Category, 103, 1, fsStyle2, 3, L"Group by", NULL);
   m_Toolbar.InsertButton(4, Icon16_Sort,     104, 1, fsStyle2, 4, L"Sort by", NULL);
-  #ifdef _DEBUG
-  m_Toolbar.EnableButton(1, false);
-  #endif
+  m_Toolbar.InsertButton(5, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
+  m_Toolbar.InsertButton(6, Icon16_Balloon,  106, 1, fsStyle1, 6, L"Discuss", L"");
+  m_Toolbar.EnableButton(1, !SeasonDatabase.Items.empty());
 
   // Create rebar
   m_Rebar.Attach(GetDlgItem(IDC_REBAR_SEASON));
@@ -103,14 +103,13 @@ BOOL CSeasonWindow::OnInitDialog() {
   // Refresh
   RefreshData(false);
   RefreshList();
+  RefreshStatus();
   RefreshToolbar();
 
   return TRUE;
 }
 
-INT_PTR CSeasonWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
-}
+// =============================================================================
 
 BOOL CSeasonWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
@@ -118,6 +117,10 @@ BOOL CSeasonWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Refresh data
     case 101:
       RefreshData(true);
+      return TRUE;
+    // Discuss
+    case 106:
+      MAL.ViewSeasonGroup();
       return TRUE;
   }
 
@@ -137,7 +140,7 @@ BOOL CSeasonWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
 
 BOOL CSeasonWindow::OnDestroy() {
   // Save database
-  SeasonDatabase.Write(L"2011_summer.xml"); // TODO
+  SeasonDatabase.Write();
   
   // Free some memory
   Images.clear();
@@ -201,6 +204,39 @@ BOOL CSeasonWindow::PreTranslateMessage(MSG* pMsg) {
   return FALSE;
 }
 
+LRESULT CSeasonWindow::CEditFilter::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_COMMAND: {
+      if (HIWORD(wParam) == BN_CLICKED) {
+        // Clear filter text
+        if (LOWORD(wParam) == IDC_BUTTON_CANCELFILTER) {
+          SetText(L"");
+          return TRUE;
+        }
+      }
+      break;
+    }
+  }
+  
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CSeasonWindow::OnButtonCustomDraw(LPARAM lParam) {
+  LPNMCUSTOMDRAW pCD = reinterpret_cast<LPNMCUSTOMDRAW>(lParam);
+
+  switch (pCD->dwDrawStage) {
+    case CDDS_PREPAINT: {
+      CDC dc = pCD->hdc;
+      dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
+      UI.ImgList16.Draw(Icon16_Cross, dc.Get(), 0, 0);
+      dc.DetachDC();
+      return CDRF_SKIPDEFAULT;
+    }
+  }
+
+  return 0;
+}
+
 // =============================================================================
 
 LRESULT CSeasonWindow::OnListNotify(LPARAM lParam) {
@@ -262,18 +298,35 @@ LRESULT CSeasonWindow::OnListCustomDraw(LPARAM lParam) {
     case CDDS_ITEMPOSTPAINT: {
       CAnime* anime = reinterpret_cast<CAnime*>(pCD->nmcd.lItemlParam);
       if (!anime) break;
-
+      
       // Draw border
       rect.Inflate(-4, -4);
       hdc.FillRect(rect, RGB(230, 230, 230));
+
       // Draw background
       rect.Inflate(-1, -1);
       hdc.FillRect(rect, RGB(250, 250, 250));
 
+      // Calculate text height
+      SIZE size = {0};
+      GetTextExtentPoint32(hdc.Get(), L"T", 1, &size);
+      int text_height = size.cy;
+
+      // Calculate areas
+      CRect rect_image(
+        rect.left + 4, rect.top + 4, 
+        rect.left + 124, rect.bottom - 4);
+      CRect rect_title(
+        rect_image.right + 4, rect_image.top, 
+        rect.right - 4, rect_image.top + 20);
+      CRect rect_details(
+        rect_title.left + 4, rect_title.bottom + 8, 
+        rect_title.right, rect_title.bottom + 8 + (7 * (text_height + 2)));
+      CRect rect_synopsis(
+        rect_details.left, rect_details.bottom + 4, 
+        rect_details.right, rect_image.bottom);
+
       // Draw image
-      rect.Inflate(-4, -4);
-      CRect rect_image = rect;
-      rect_image.right = rect_image.left + 120;
       int image_index = -1;
       for (size_t i = 0; i < Images.size(); i++) {
         if (Images.at(i).Data == anime->Series_ID) {
@@ -296,39 +349,55 @@ LRESULT CSeasonWindow::OnListCustomDraw(LPARAM lParam) {
       }
       
       // Draw title background
-      rect.left += 120 + 4;
-      CRect rect_text = rect;
-      rect_text.bottom = rect_text.top + 20;
       CAnime* anime_onlist = AnimeList.FindItem(anime->Series_ID);
-      hdc.FillRect(rect_text, anime_onlist ? RGB(225, 245, 231) : MAL_LIGHTBLUE);
+      hdc.FillRect(rect_title, anime_onlist ? RGB(225, 245, 231) : MAL_LIGHTBLUE);
       // Draw title
-      rect_text.Inflate(-4, 0);
+      rect_title.Inflate(-4, 0);
       hdc.EditFont(NULL, -1, TRUE);
       hdc.SetBkMode(TRANSPARENT);
-      hdc.DrawText(anime->Series_Title.c_str(), anime->Series_Title.length(), rect_text, 
+      hdc.DrawText(anime->Series_Title.c_str(), anime->Series_Title.length(), rect_title, 
         DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
-      DeleteObject(hdc.DetachFont());
 
       // Draw details
-      rect_text.left += 2;
-      rect_text.top = rect_text.bottom + 8;
-      rect_text.bottom = rect.bottom;
-      wstring text = 
-        L"Aired: \t\t" + MAL.TranslateDate(anime->Series_Start, L"MMM dd',' yyyy") 
-        + L" (" + MAL.TranslateStatus(anime->GetAiringStatus()) + L")\n"
-        L"Episodes: \t" + MAL.TranslateNumber(anime->Series_Episodes, L"Unknown") + L"\n"
-        L"Genres: \t" + anime->Genres + L"\n"
-        L"Producers: \t" + anime->Producers + L"\n"
-        L"Score: \t\t" + (anime->Score.empty() ? L"0.00" : anime->Score) + L"\n"
-        L"Rank: \t\t" + (anime->Rank.empty() ? L"#0" : anime->Rank) + L"\n"
-        L"Popularity: \t" + (anime->Popularity.empty() ? L"#0" : anime->Popularity);
-      hdc.DrawText(text.c_str(), text.length(), rect_text, 
-        DT_END_ELLIPSIS | DT_EXPANDTABS | DT_NOPREFIX);
+      int text_top = rect_details.top;
+      wstring text;
+      #define DRAWLINE(t) \
+        text = t; \
+        hdc.DrawText(text.c_str(), text.length(), rect_details, \
+          DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE); \
+        rect_details.Offset(0, text_height + 2);
+
+      DRAWLINE(L"Aired:");
+      DRAWLINE(L"Episodes:");
+      DRAWLINE(L"Genres:");
+      DRAWLINE(L"Producers:");
+      DRAWLINE(L"Score:");
+      DRAWLINE(L"Rank:");
+      DRAWLINE(L"Popularity:");
+
+      rect_details.Set(rect_details.left + 75, text_top, 
+        rect_details.right, rect_details.top + text_height);
+      DeleteObject(hdc.DetachFont());
+
+      text = MAL.TranslateDate(anime->Series_Start);
+      text += anime->Series_End != anime->Series_Start ? L" to " + MAL.TranslateDate(anime->Series_End) : L"";
+      text += L" (" + MAL.TranslateStatus(anime->GetAiringStatus()) + L")";
+      DRAWLINE(text);
+      DRAWLINE(MAL.TranslateNumber(anime->Series_Episodes, L"Unknown"));
+      DRAWLINE(anime->Genres.empty() ? L"?" : anime->Genres);
+      DRAWLINE(anime->Producers.empty() ? L"?" : anime->Producers);
+      DRAWLINE(anime->Score.empty() ? L"0.00" : anime->Score);
+      DRAWLINE(anime->Rank.empty() ? L"#0" : anime->Rank);
+      DRAWLINE(anime->Popularity.empty() ? L"#0" : anime->Popularity);
+
+      #undef DRAWLINE
+      
       // Draw synopsis
-      rect_text.top += 98;
+      rect_synopsis.bottom -= (rect_synopsis.Height() % text_height) + 1;
       text = anime->Synopsis;
-      hdc.DrawText(text.c_str(), text.length(), rect_text, 
-        DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK);
+      hdc.DrawText(text.c_str(), text.length(), rect_synopsis, 
+        DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK | DT_WORD_ELLIPSIS);
+
       break;
     }
   }
@@ -380,46 +449,13 @@ LRESULT CSeasonWindow::OnToolbarNotify(LPARAM lParam) {
   return 0L;
 }
 
-LRESULT CSeasonWindow::OnButtonCustomDraw(LPARAM lParam) {
-  LPNMCUSTOMDRAW pCD = reinterpret_cast<LPNMCUSTOMDRAW>(lParam);
-
-  switch (pCD->dwDrawStage) {
-    case CDDS_PREPAINT: {
-      CDC dc = pCD->hdc;
-      dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
-      UI.ImgList16.Draw(Icon16_Cross, dc.Get(), 0, 0);
-      dc.DetachDC();
-      return CDRF_SKIPDEFAULT;
-    }
-  }
-
-  return 0;
-}
-
-LRESULT CSeasonWindow::CEditFilter::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uMsg) {
-    case WM_COMMAND: {
-      if (HIWORD(wParam) == BN_CLICKED) {
-        // Clear filter text
-        if (LOWORD(wParam) == IDC_BUTTON_CANCELFILTER) {
-          SetText(L"");
-          return TRUE;
-        }
-      }
-      break;
-    }
-  }
-  
-  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
-}
-
 // =============================================================================
 
 void CSeasonWindow::RefreshData(bool connect) {
   size_t size = SeasonDatabase.Items.size();
-  if (Images.size() != size) Images.resize(size);
   if (ImageClients.size() != size) ImageClients.resize(size);
   if (InfoClients.size() != size) InfoClients.resize(size);
+  Images.clear(); Images.resize(size);
 
   for (auto i = SeasonDatabase.Items.begin(); i != SeasonDatabase.Items.end(); ++i) {
     size_t index = i - SeasonDatabase.Items.begin();
@@ -434,6 +470,12 @@ void CSeasonWindow::RefreshData(bool connect) {
     if (connect) {
       MAL.SearchAnime(i->Series_Title, &(*i), &InfoClients.at(index));
     }
+  }
+
+  if (connect) {
+    SeasonDatabase.Modified = true;
+    SeasonDatabase.LastModified = GetDateJapan() + L" " + GetTimeJapan();
+    RefreshStatus();
   }
 
   m_List.RedrawWindow();
@@ -512,17 +554,20 @@ void CSeasonWindow::RefreshList() {
   
   // Sort items
   switch (SortBy) {
+    case SEASONBROWSER_SORTBY_AIRINGDATE:
+      m_List.Sort(0, -1, LISTSORTTYPE_STARTDATE, ListViewCompareProc);
+      break;
     case SEASONBROWSER_SORTBY_EPISODES:
       m_List.Sort(0, -1, LISTSORTTYPE_EPISODES, ListViewCompareProc);
       break;
-    case SEASONBROWSER_SORTBY_NAME:
-      m_List.Sort(0, 1, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
+    case SEASONBROWSER_SORTBY_POPULARITY:
+      m_List.Sort(0, 1, LISTSORTTYPE_POPULARITY, ListViewCompareProc);
       break;
     case SEASONBROWSER_SORTBY_SCORE:
       m_List.Sort(0, -1, LISTSORTTYPE_SCORE, ListViewCompareProc);
       break;
-    case SEASONBROWSER_SORTBY_STARTDATE:
-      m_List.Sort(0, -1, LISTSORTTYPE_STARTDATE, ListViewCompareProc);
+    case SEASONBROWSER_SORTBY_TITLE:
+      m_List.Sort(0, 1, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
       break;
   }
 
@@ -530,6 +575,15 @@ void CSeasonWindow::RefreshList() {
   m_List.SetRedraw(TRUE);
   m_List.RedrawWindow(nullptr, nullptr, 
     RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
+void CSeasonWindow::RefreshStatus() {
+  // Set status
+  if (SeasonDatabase.LastModified.empty()) {
+    m_Status.SetText(L"");
+  } else {
+    m_Status.SetText(L"  Last updated: " + SeasonDatabase.LastModified + L" (JST)");
+  }
 }
 
 void CSeasonWindow::RefreshToolbar() {
@@ -551,17 +605,20 @@ void CSeasonWindow::RefreshToolbar() {
 
   text = L"Sort by: ";
   switch (SortBy) {
+    case SEASONBROWSER_SORTBY_AIRINGDATE:
+      text += L"Airing date";
+      break;
     case SEASONBROWSER_SORTBY_EPISODES:
       text += L"Episodes";
       break;
-    case SEASONBROWSER_SORTBY_NAME:
-      text += L"Name";
+    case SEASONBROWSER_SORTBY_POPULARITY:
+      text += L"Popularity";
       break;
     case SEASONBROWSER_SORTBY_SCORE:
       text += L"Score";
       break;
-    case SEASONBROWSER_SORTBY_STARTDATE:
-      text += L"Start date";
+    case SEASONBROWSER_SORTBY_TITLE:
+      text += L"Title";
       break;
   }
   m_Toolbar.SetButtonText(4, text.c_str());

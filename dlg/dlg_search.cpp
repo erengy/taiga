@@ -181,7 +181,7 @@ BOOL CSearchWindow::PreTranslateMessage(MSG* pMsg) {
 // =============================================================================
 
 void CSearchWindow::EnableInput(bool enable) {
-  EnableDlgItem(IDOK, !enable);
+  EnableDlgItem(IDOK, enable);
   SetDlgItemText(IDOK, enable ? L"Search" : L"Searching...");
 }
 
@@ -273,7 +273,7 @@ void CSearchWindow::RefreshList() {
     m_List.SetItem(i, 1, MAL.TranslateType(item->Series_Type).c_str());
     m_List.SetItem(i, 2, MAL.TranslateNumber(item->Series_Episodes).c_str());
     m_List.SetItem(i, 3, item->Score.c_str());
-    m_List.SetItem(i, 4, MAL.TranslateDate(item->Series_Start).c_str());
+    m_List.SetItem(i, 4, MAL.TranslateDateToSeason(item->Series_Start).c_str());
   }
 
   // Sort and show the list again

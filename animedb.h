@@ -36,15 +36,18 @@ extern CAnimeDatabase AnimeDatabase;
 
 class CAnimeSeasonDatabase {
 public:
-  CAnimeSeasonDatabase() {}
+  CAnimeSeasonDatabase() : Modified(false) {}
   virtual ~CAnimeSeasonDatabase() {}
 
   bool Read(wstring file);
-  bool Write(wstring file);
+  bool Write(wstring file = L"");
+  bool WriteForRelease();
 
 public:
   vector<CAnime> Items;
-  wstring Name;
+  wstring LastModified, Name;
+  wstring File, Folder;
+  bool Modified;
 };
 
 extern CAnimeSeasonDatabase SeasonDatabase;

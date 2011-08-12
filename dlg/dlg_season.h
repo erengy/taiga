@@ -36,10 +36,11 @@ enum {
 };
 
 enum {
+  SEASONBROWSER_SORTBY_AIRINGDATE,
   SEASONBROWSER_SORTBY_EPISODES,
-  SEASONBROWSER_SORTBY_NAME,
+  SEASONBROWSER_SORTBY_POPULARITY,
   SEASONBROWSER_SORTBY_SCORE,
-  SEASONBROWSER_SORTBY_STARTDATE
+  SEASONBROWSER_SORTBY_TITLE
 };
 
 class CSeasonWindow : public CDialog {
@@ -47,7 +48,6 @@ public:
   CSeasonWindow();
   virtual ~CSeasonWindow() {}
 
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   LRESULT OnButtonCustomDraw(LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
@@ -62,6 +62,7 @@ public:
 public:
   void RefreshData(bool connect = true);
   void RefreshList();
+  void RefreshStatus();
   void RefreshToolbar();
 
 public:

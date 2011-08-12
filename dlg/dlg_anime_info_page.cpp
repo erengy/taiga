@@ -162,7 +162,7 @@ void CAnimeInfoPage::Refresh(CAnime* pAnimeItem) {
       text = MAL.TranslateType(pAnimeItem->Series_Type) + L"\n" + 
              MAL.TranslateNumber(pAnimeItem->Series_Episodes, L"Unknown") + L"\n" + 
              MAL.TranslateStatus(pAnimeItem->GetAiringStatus()) + L"\n" + 
-             MAL.TranslateDate(pAnimeItem->Series_Start);
+             MAL.TranslateDateToSeason(pAnimeItem->Series_Start);
       SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
       #define ADD_INFOLINE(x, y) (pAnimeItem->x.empty() ? y : pAnimeItem->x)
       wstring genres = pAnimeItem->Genres; LimitText(pAnimeItem->Genres, 50); // TEMP
