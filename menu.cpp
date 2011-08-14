@@ -40,10 +40,10 @@ void UpdateAccountMenu() {
         break;
       }
     }
-    // Account > Toggle updates
+    // Account > Enable recognition
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].Action == L"ToggleUpdates()") {
-        MENU.Items[i].Checked = Taiga.updates_enabled;
+      if (MENU.Items[i].Action == L"ToggleRecognition()") {
+        MENU.Items[i].Checked = Taiga.is_recognition_enabled;
         break;
       }
     }
@@ -234,10 +234,10 @@ void UpdateSeasonMenu() {
 void UpdateTrayMenu() {
   int menu_index = UI.Menus.GetIndex(L"Tray");
   if (menu_index > -1) {
-    // Tray > Toggle updates
+    // Tray > Enable recognition
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].Action == L"ToggleUpdates()") {
-        MENU.Items[i].Checked = Taiga.updates_enabled;
+      if (MENU.Items[i].Action == L"ToggleRecognition()") {
+        MENU.Items[i].Checked = Taiga.is_recognition_enabled;
         break;
       }
     }

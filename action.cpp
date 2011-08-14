@@ -76,7 +76,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       if (!result) MainDialog.ChangeStatus();
     } else {
       // Retrieve anime list and log in afterwards
-      ExecuteAction(L"RefreshList", TRUE);
+      ExecuteAction(L"Synchronize", TRUE);
     }
 
   // Logout()
@@ -98,36 +98,29 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"LoginLogout" || action == L"ToggleLogin") {
     ExecuteAction(Taiga.logged_in ? L"Logout" : L"Login");
 
-  // RefreshList()
-  //   Retrieves anime list from MyAnimeList.
-  //   wParam is a BOOL value
-  } else if (action == L"RefreshList") {
-    EventList* event_list = EventQueue.FindList();
-    if (event_list) {
-      for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
-        if (it->mode == HTTP_MAL_AnimeAdd) {
-          // Refreshing list would cause this item to disappear
-          if (Taiga.logged_in) {
-            EventQueue.Check();
-          } else {
-            ExecuteAction(L"Login");
-          }
-          return;
-        }
-      }
-    }
-    MainDialog.ChangeStatus(L"Refreshing list...");
-    bool result = MAL.GetList(wParam == TRUE);
-    MainDialog.EnableInput(!result);
-    if (!result) MainDialog.ChangeStatus();
-
   // Synchronize()
-  //   Synchronize local and remote lists.
+  //   Synchronizes local and remote lists.
+  //   wParam is a BOOL value that activates HTTP_MAL_RefreshAndLogin mode.
   } else if (action == L"Synchronize") {
     if (Taiga.logged_in && EventQueue.GetItemCount() > 0) {
       EventQueue.Check();
     } else {
-      ExecuteAction(L"RefreshList");
+      EventList* event_list = EventQueue.FindList();
+      if (event_list) {
+        for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
+          if (it->mode == HTTP_MAL_AnimeAdd) {
+            // Refreshing list would cause this item to disappear
+            // We must first log in and process the event queue
+            ExecuteAction(L"Login");
+            return;
+          }
+        }
+      }
+      // We can safely refresh our list
+      MainDialog.ChangeStatus(L"Refreshing list...");
+      bool result = MAL.GetList(wParam == TRUE);
+      MainDialog.EnableInput(!result);
+      if (!result) MainDialog.ChangeStatus();
     }
 
   // ViewPanel(), ViewProfile(), ViewHistory()
@@ -362,7 +355,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       AnimeList.AddItem(*anime);
       AnimeList.Save(anime->series_id, L"", L"", ANIMELIST_ADDANIME);
       // Refresh
-      if (CurrentEpisode.anime_id == ANIMEID_NOTINLIST) CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
+      if (CurrentEpisode.anime_id == ANIMEID_NOTINLIST) {
+        CurrentEpisode.Set(ANIMEID_UNKNOWN);
+      }
       MainDialog.RefreshList(status);
       MainDialog.RefreshTabs(status);
       SearchDialog.RefreshList();
@@ -447,14 +442,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       MainDialog.ChangeStatus(L"Search finished.");
     }
 
-  // ToggleUpdates()
-  //   Enabled or disables list updates.
-  } else if (action == L"ToggleUpdates") {
-    Taiga.updates_enabled = !Taiga.updates_enabled;
-    if (Taiga.updates_enabled) {
-      MainDialog.ChangeStatus(L"Updates are now enabled.");
+  // ToggleRecognition()
+  //   Enables or disables list updates.
+  } else if (action == L"ToggleRecognition") {
+    Taiga.is_recognition_enabled = !Taiga.is_recognition_enabled;
+    if (Taiga.is_recognition_enabled) {
+      MainDialog.ChangeStatus(L"Automatic anime recognition is now enabled.");
+      CurrentEpisode.Set(ANIMEID_UNKNOWN);
     } else {
-      MainDialog.ChangeStatus(L"Updates are now disabled.");
+      MainDialog.ChangeStatus(L"Automatic anime recognition is now disabled.");
+      Anime* anime = AnimeList.FindItem(CurrentEpisode.anime_id);
+      CurrentEpisode.Set(ANIMEID_NOTINLIST);
+      if (anime) anime->End(CurrentEpisode, true, false);
     }
 
   // ===========================================================================

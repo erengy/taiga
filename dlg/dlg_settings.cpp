@@ -271,7 +271,7 @@ void SettingsDialog::OnOK() {
   // Refresh other windows
   if (Settings.Account.MAL.user != mal_user_old) {
     AnimeList.Load();
-    CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
+    CurrentEpisode.Set(ANIMEID_UNKNOWN);
     MainDialog.RefreshList(MAL_WATCHING);
     MainDialog.RefreshTabs(MAL_WATCHING);
     EventDialog.RefreshList();

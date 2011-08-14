@@ -118,7 +118,7 @@ void EventList::Add(EventItem& item) {
 
   if (anime) {
     // Announce
-    if (Taiga.logged_in && Taiga.updates_enabled && item.episode > 0) {
+    if (Taiga.logged_in && item.episode > 0) {
       Episode episode;
       episode.anime_id = anime->series_id;
       episode.number = ToWSTR(item.episode);
@@ -153,10 +153,6 @@ void EventList::Add(EventItem& item) {
 void EventList::Check() {
   // Check
   if (items.empty()) return;
-  if (!Taiga.updates_enabled) {
-    items[index].reason = L"Updates are disabled";
-    return;
-  }
   if (!Taiga.logged_in) {
     items[index].reason = L"Not logged in";
     return;

@@ -62,8 +62,8 @@ public:
   void LoadData();
 
 public:
-  bool logged_in, updates_enabled;
   int current_tip_type, play_status;
+  bool is_recognition_enabled, logged_in;
   int ticker_media, ticker_new_episodes, ticker_queue;
 
   class Updater : public UpdateHelper {

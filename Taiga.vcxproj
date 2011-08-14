@@ -80,6 +80,7 @@
       <AdditionalDependencies>comctl32.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winhttp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type=%27win32%27 name=%27Microsoft.Windows.Common-Controls%27 version=%276.0.0.0%27 processorArchitecture=%27x86%27 publicKeyToken=%276595b64144ccf1df%27 language=%27*%27;%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

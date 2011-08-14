@@ -572,19 +572,19 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     // Started to watch?
     if (CurrentEpisode.anime_id == ANIMEID_UNKNOWN) {
       // Recognized?
-      if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode)) {
-        for (int i = AnimeList.count; i > 0; i--) {
-          if (Meow.CompareEpisode(CurrentEpisode, AnimeList.items[i])) {
-            CurrentEpisode.anime_id = AnimeList.items[i].series_id;
-            RefreshMenubar(CurrentEpisode.anime_id);
-            AnimeList.items[i].Start(CurrentEpisode);
-            return;
+      if (Taiga.is_recognition_enabled) {
+        if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode)) {
+          for (int i = AnimeList.count; i > 0; i--) {
+            if (Meow.CompareEpisode(CurrentEpisode, AnimeList.items[i])) {
+              CurrentEpisode.Set(AnimeList.items[i].series_id);
+              AnimeList.items[i].Start(CurrentEpisode);
+              return;
+            }
           }
         }
       }
       // Not recognized
-      CurrentEpisode.anime_id = ANIMEID_NOTINLIST;
-      RefreshMenubar(CurrentEpisode.anime_id);
+      CurrentEpisode.Set(ANIMEID_NOTINLIST);
       if (CurrentEpisode.title.empty()) {
         #ifdef _DEBUG
         ChangeStatus(MediaPlayers.Items[MediaPlayers.Index].Name + L" is running.");
@@ -624,11 +624,8 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       }
       // Caption changed?
       if (MediaPlayers.TitleChanged() == true) {
-        CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
-        RefreshMenubar(CurrentEpisode.anime_id);
-        if (anime) {
-          anime->End(CurrentEpisode, true, true);
-        }
+        CurrentEpisode.Set(ANIMEID_UNKNOWN);
+        if (anime) anime->End(CurrentEpisode, true, true);
         Taiga.ticker_media = 0;
       }
     }
@@ -639,15 +636,13 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     if (!anime) {
       if (MediaPlayers.IndexOld > 0){
         ChangeStatus();
-        CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
+        CurrentEpisode.Set(ANIMEID_UNKNOWN);
         MediaPlayers.IndexOld = 0;
-        RefreshMenubar(CurrentEpisode.anime_id);
       }
     
     // Was running and watching
     } else {
-      CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
-      RefreshMenubar(CurrentEpisode.anime_id);
+      CurrentEpisode.Set(ANIMEID_UNKNOWN);
       anime->End(CurrentEpisode, true, Settings.Account.Update.time == UPDATE_MODE_WAITPLAYER);
       Taiga.ticker_media = 0;
     }

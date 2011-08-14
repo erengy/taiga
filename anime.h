@@ -36,6 +36,7 @@ public:
   virtual ~Episode() {}
 
   void Clear();
+  void Set(int anime_id);
 
 public:
   int anime_id;

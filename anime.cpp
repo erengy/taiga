@@ -63,6 +63,11 @@ void Episode::Clear() {
   video_type.clear();
 }
 
+void Episode::Set(int anime_id) {
+  this->anime_id = anime_id;
+  MainDialog.RefreshMenubar(anime_id);
+}
+
 // =============================================================================
 
 MalAnime::MalAnime() : 
@@ -143,7 +148,6 @@ void Anime::End(Episode episode, bool end_watching, bool update_list) {
     MainDialog.ChangeStatus();
     MainDialog.UpdateTip();
     int list_index = MainDialog.GetListIndex(series_id);
-    int ret_value = 0;
     if (list_index > -1) {
       MainDialog.listview.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
       MainDialog.listview.RedrawItems(list_index, list_index, true);
@@ -152,7 +156,6 @@ void Anime::End(Episode episode, bool end_watching, bool update_list) {
 
   // Update list
   if (update_list) {
-    if (!Taiga.updates_enabled) return;
     if (GetStatus() == MAL_COMPLETED && GetRewatching() == 0) return;
     if (Settings.Account.Update.time == UPDATE_TIME_INSTANT || 
       Taiga.ticker_media == -1 || Taiga.ticker_media >= Settings.Account.Update.delay) {
@@ -400,7 +403,7 @@ void Anime::SetLocalData(const wstring& folder, const wstring& titles) {
   Settings.Save();
 
   if (!synonyms.empty() && CurrentEpisode.anime_id == ANIMEID_NOTINLIST) {
-    CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
+    CurrentEpisode.Set(ANIMEID_UNKNOWN);
   }
 }
 
@@ -566,7 +569,7 @@ bool Anime::Edit(EventItem& item, const wstring& data, int status_code) {
     MainDialog.RefreshTabs();
     SearchDialog.PostMessage(WM_CLOSE);
     if (CurrentEpisode.anime_id == item.anime_id) {
-      CurrentEpisode.anime_id = ANIMEID_NOTINLIST;
+      CurrentEpisode.Set(ANIMEID_NOTINLIST);
     }
   }
 

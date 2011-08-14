@@ -41,10 +41,10 @@
 		<!-- Account -->
 		<menu name="Account">
 			<item name="Log in" action="LoginLogout()"/>
-			<item name="Download anime list" action="RefreshList()"/>
+			<item name="Synchronize list" action="Synchronize()"/>
 			<item type="separator"/>
 			<item name="Check queued events" action="CheckEventBuffer()"/>
-			<item name="Toggle updates" action="ToggleUpdates()" checked="1"/>
+			<item name="Enable recognition" action="ToggleRecognition()" checked="1"/>
 			<item type="separator"/>
 			<item name="MyAnimeList" sub="MyAnimeList"/>
 		</menu>
