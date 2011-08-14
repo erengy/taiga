@@ -239,7 +239,7 @@ wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
           GetLongPathName(files_vector[i].c_str(), buffer, 4096);
           return GetFileName(buffer);
         } else {
-          return files_vector[i];
+          return GetFileName(files_vector[i]);
         }
       }
     }
