@@ -38,10 +38,10 @@ bool EvaluateAction(int action, bool condition) {
   }
 }
 
-bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& item) {
+bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& item) {
   bool is_numeric = false;
   wstring element, value = ReplaceVariables(condition.Value, item.EpisodeData);
-  CAnime* anime = AnimeList.FindItem(item.EpisodeData.AnimeId);
+  Anime* anime = AnimeList.FindItem(item.EpisodeData.anime_id);
 
   switch (condition.Element) {
     case FEED_FILTER_ELEMENT_TITLE:
@@ -57,11 +57,11 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
       element = item.Link;
       break;
     case FEED_FILTER_ELEMENT_ANIME_ID:
-      if (anime) element = ToWSTR(anime->Series_ID);
+      if (anime) element = ToWSTR(anime->series_id);
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_TITLE:
-      element = item.EpisodeData.Title;
+      element = item.EpisodeData.title;
       break;
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
       if (anime) element = ToWSTR(anime->GetAiringStatus());
@@ -72,25 +72,25 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
-      element = ToWSTR(GetEpisodeHigh(item.EpisodeData.Number));
+      element = ToWSTR(GetEpisodeHigh(item.EpisodeData.number));
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION:
-      element = item.EpisodeData.Version;
+      element = item.EpisodeData.version;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
       if (anime) element = ToWSTR(anime->IsEpisodeAvailable(
-        GetEpisodeHigh(item.EpisodeData.Number)));
+        GetEpisodeHigh(item.EpisodeData.number)));
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_GROUP:
-      element = item.EpisodeData.Group;
+      element = item.EpisodeData.group;
       break;
     case FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION:
-      element = item.EpisodeData.Resolution;
+      element = item.EpisodeData.resolution;
       break;
     case FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE:
-      element = item.EpisodeData.VideoType;
+      element = item.EpisodeData.video_type;
       break;
   }
 
@@ -136,7 +136,7 @@ bool EvaluateCondition(const CFeedFilterCondition& condition, const CFeedItem& i
 
 // =============================================================================
 
-CFeedFilterCondition& CFeedFilterCondition::operator=(const CFeedFilterCondition& condition) {
+FeedFilterCondition& FeedFilterCondition::operator=(const FeedFilterCondition& condition) {
   Element = condition.Element;
   Operator = condition.Operator;
   Value = condition.Value;
@@ -144,7 +144,7 @@ CFeedFilterCondition& CFeedFilterCondition::operator=(const CFeedFilterCondition
   return *this;
 }
 
-void CFeedFilterCondition::Reset() {
+void FeedFilterCondition::Reset() {
   Element = FEED_FILTER_ELEMENT_TITLE;
   Operator = FEED_FILTER_OPERATOR_IS;
   Value.clear();
@@ -152,7 +152,7 @@ void CFeedFilterCondition::Reset() {
 
 // =============================================================================
 
-CFeedFilter& CFeedFilter::operator=(const CFeedFilter& filter) {
+FeedFilter& FeedFilter::operator=(const FeedFilter& filter) {
   Action = filter.Action;
   Enabled = filter.Enabled;
   Match = filter.Match;
@@ -167,24 +167,24 @@ CFeedFilter& CFeedFilter::operator=(const CFeedFilter& filter) {
   return *this;
 }
 
-void CFeedFilter::AddCondition(int element, int op, const wstring& value) {
+void FeedFilter::AddCondition(int element, int op, const wstring& value) {
   Conditions.resize(Conditions.size() + 1);
   Conditions.back().Element = element;
   Conditions.back().Operator = op;
   Conditions.back().Value = value;
 }
 
-bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
+bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   if (!Enabled) return true;
 
   bool condition = false;
   size_t index = 0;
 
   if (!AnimeIds.empty()) {
-    CAnime* anime = AnimeList.FindItem(item.EpisodeData.AnimeId);
+    Anime* anime = AnimeList.FindItem(item.EpisodeData.anime_id);
     if (anime) {
       for (auto it = AnimeIds.begin(); it != AnimeIds.end(); ++it) {
-        if (*it == anime->Series_ID) {
+        if (*it == anime->series_id) {
           condition = true;
           break;
         }
@@ -228,13 +228,13 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
         // Do not filter the same item again
         if (it->Index == item.Index) continue;
         // Is it the same title?
-        if (it->EpisodeData.AnimeId == ANIMEID_NOTINLIST) {
-          if (!IsEqual(it->EpisodeData.Title, item.EpisodeData.Title)) continue;
+        if (it->EpisodeData.anime_id == ANIMEID_NOTINLIST) {
+          if (!IsEqual(it->EpisodeData.title, item.EpisodeData.title)) continue;
         } else {
-          if (it->EpisodeData.AnimeId != item.EpisodeData.AnimeId) continue;
+          if (it->EpisodeData.anime_id != item.EpisodeData.anime_id) continue;
         }
         // Is it the same episode?
-        if (it->EpisodeData.Number != item.EpisodeData.Number) continue;
+        if (it->EpisodeData.number != item.EpisodeData.number) continue;
         // Try applying the same filter
         if (!this->Filter(feed, *it, false)) {
           // Hey, we don't prefer your kind around here!
@@ -263,7 +263,7 @@ bool CFeedFilter::Filter(CFeed& feed, CFeedItem& item, bool recursive) {
   }
 }
 
-void CFeedFilter::Reset() {
+void FeedFilter::Reset() {
   Enabled = true;
   Action = FEED_FILTER_ACTION_DISCARD;
   Match = FEED_FILTER_MATCH_ALL;
@@ -274,7 +274,7 @@ void CFeedFilter::Reset() {
 
 // =============================================================================
 
-CFeedFilterManager::CFeedFilterManager() {
+FeedFilterManager::FeedFilterManager() {
   #define ADD_PRESET(action, match, def, name, desc) \
     Presets.resize(Presets.size() + 1); \
     Presets.back().Default = def; \
@@ -355,7 +355,7 @@ CFeedFilterManager::CFeedFilterManager() {
   #undef ADD_PRESET
 }
 
-void CFeedFilterManager::AddPresets() {
+void FeedFilterManager::AddPresets() {
   for (auto it = Presets.begin(); it != Presets.end(); ++it) {
     if (!it->Default) continue;
     AddFilter(it->Filter.Action, it->Filter.Match, it->Filter.Enabled, it->Filter.Name);
@@ -365,7 +365,7 @@ void CFeedFilterManager::AddPresets() {
   }
 }
 
-void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
+void FeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
   Filters.resize(Filters.size() + 1);
   Filters.back().Action = action;
   Filters.back().Enabled = enabled;
@@ -373,10 +373,10 @@ void CFeedFilterManager::AddFilter(int action, int match, bool enabled, const ws
   Filters.back().Name = name;
 }
 
-void CFeedFilterManager::Cleanup() {
+void FeedFilterManager::Cleanup() {
   for (auto i = Filters.begin(); i != Filters.end(); ++i) {
     for (auto j = i->AnimeIds.begin(); j != i->AnimeIds.end(); ++j) {
-      CAnime* anime = AnimeList.FindItem(*j);
+      Anime* anime = AnimeList.FindItem(*j);
       if (!anime) {
         if (i->AnimeIds.size() > 1) {
           j = i->AnimeIds.erase(j) - 1;
@@ -390,15 +390,15 @@ void CFeedFilterManager::Cleanup() {
   }
 }
 
-int CFeedFilterManager::Filter(CFeed& feed) {
+int FeedFilterManager::Filter(Feed& feed) {
   bool download = true;
-  CAnime* anime = nullptr;
+  Anime* anime = nullptr;
   int count = 0, number = 0;
   
   for (auto item = feed.Items.begin(); item != feed.Items.end(); ++item) {
     download = true;
-    anime = AnimeList.FindItem(item->EpisodeData.AnimeId);
-    number = GetEpisodeHigh(item->EpisodeData.Number);
+    anime = AnimeList.FindItem(item->EpisodeData.anime_id);
+    number = GetEpisodeHigh(item->EpisodeData.number);
     
     if (anime && number > anime->GetLastWatchedEpisode()) {
       item->EpisodeData.NewEpisode = true;
@@ -407,7 +407,7 @@ int CFeedFilterManager::Filter(CFeed& feed) {
     if (!item->Download) continue;
 
     // Apply filters
-    if (Settings.RSS.Torrent.Filters.GlobalEnabled) {
+    if (Settings.RSS.Torrent.Filters.global_enabled) {
       for (size_t j = 0; j < Filters.size(); j++) {
         if (!Filters[j].Filter(feed, *item, true)) {
           download = false;
@@ -435,7 +435,7 @@ int CFeedFilterManager::Filter(CFeed& feed) {
 
 // =============================================================================
 
-wstring CFeedFilterManager::CreateNameFromConditions(const CFeedFilter& filter) {
+wstring FeedFilterManager::CreateNameFromConditions(const FeedFilter& filter) {
   wstring name;
 
   // TODO
@@ -444,13 +444,13 @@ wstring CFeedFilterManager::CreateNameFromConditions(const CFeedFilter& filter) 
   return name;
 }
 
-wstring CFeedFilterManager::TranslateCondition(const CFeedFilterCondition& condition) {
+wstring FeedFilterManager::TranslateCondition(const FeedFilterCondition& condition) {
   return TranslateElement(condition.Element) + L" " + 
     TranslateOperator(condition.Operator) + L" \"" + 
     TranslateValue(condition) + L"\"";
 }
 
-wstring CFeedFilterManager::TranslateConditions(const CFeedFilter& filter, size_t index) {
+wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, size_t index) {
   wstring str;
   
   size_t max_index = filter.Match == FEED_FILTER_MATCH_ALL ? 
@@ -464,7 +464,7 @@ wstring CFeedFilterManager::TranslateConditions(const CFeedFilter& filter, size_
   return str;
 }
 
-wstring CFeedFilterManager::TranslateElement(int element) {
+wstring FeedFilterManager::TranslateElement(int element) {
   switch (element) {
     case FEED_FILTER_ELEMENT_TITLE:
       return L"File name";
@@ -499,7 +499,7 @@ wstring CFeedFilterManager::TranslateElement(int element) {
   }
 }
 
-wstring CFeedFilterManager::TranslateOperator(int op) {
+wstring FeedFilterManager::TranslateOperator(int op) {
   switch (op) {
     case FEED_FILTER_OPERATOR_IS:
       return L"is";
@@ -522,15 +522,15 @@ wstring CFeedFilterManager::TranslateOperator(int op) {
   }
 }
 
-wstring CFeedFilterManager::TranslateValue(const CFeedFilterCondition& condition) {
+wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) {
   switch (condition.Element) {
     case FEED_FILTER_ELEMENT_ANIME_ID: {
       if (condition.Value.empty()) {
         return L"(?)";
       } else {
-        CAnime* anime = AnimeList.FindItem(ToINT(condition.Value));
+        Anime* anime = AnimeList.FindItem(ToINT(condition.Value));
         if (anime) {
-          return condition.Value + L" (" + anime->Series_Title + L")";
+          return condition.Value + L" (" + anime->series_title + L")";
         } else {
           return condition.Value + L" (?)";
         }
@@ -545,7 +545,7 @@ wstring CFeedFilterManager::TranslateValue(const CFeedFilterCondition& condition
   }
 }
 
-wstring CFeedFilterManager::TranslateMatching(int match) {
+wstring FeedFilterManager::TranslateMatching(int match) {
   switch (match) {
     case FEED_FILTER_MATCH_ALL:
       return L"Match all conditions";
@@ -556,7 +556,7 @@ wstring CFeedFilterManager::TranslateMatching(int match) {
   }
 }
 
-wstring CFeedFilterManager::TranslateAction(int action) {
+wstring FeedFilterManager::TranslateAction(int action) {
   switch (action) {
     case FEED_FILTER_ACTION_DISCARD:
       return L"Discard matched items";

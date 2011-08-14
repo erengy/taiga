@@ -29,20 +29,20 @@ enum TimerID {
 
 // ListView sort types
 enum ListSortType {
-  LISTSORTTYPE_DEFAULT,
-  LISTSORTTYPE_EPISODES,
-  LISTSORTTYPE_FILESIZE,
-  LISTSORTTYPE_NUMBER,
-  LISTSORTTYPE_POPULARITY,
-  LISTSORTTYPE_PROGRESS,
-  LISTSORTTYPE_SCORE,
-  LISTSORTTYPE_STARTDATE
+  LIST_SORTTYPE_DEFAULT,
+  LIST_SORTTYPE_EPISODES,
+  LIST_SORTTYPE_FILESIZE,
+  LIST_SORTTYPE_NUMBER,
+  LIST_SORTTYPE_POPULARITY,
+  LIST_SORTTYPE_PROGRESS,
+  LIST_SORTTYPE_SCORE,
+  LIST_SORTTYPE_STARTDATE
 };
 
 typedef unsigned __int64 QWORD, *LPQWORD;
 
-class CAnime;
-class CEpisode;
+class Anime;
+class Episode;
 
 // =============================================================================
 
@@ -98,9 +98,9 @@ bool UncompressGzippedString(const string& input, string& output);
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 // menu.cpp
-void UpdateAllMenus(CAnime* anime);
+void UpdateAllMenus(Anime* anime);
 void UpdateAccountMenu();
-void UpdateAnimeMenu(CAnime* anime);
+void UpdateAnimeMenu(Anime* anime);
 void UpdateAnnounceMenu();
 void UpdateFilterMenu();
 void UpdateFoldersMenu();
@@ -113,11 +113,11 @@ void UpdateTrayMenu();
 wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
 bool IsScriptFunction(const wstring& str);
 bool IsScriptVariable(const wstring& str);
-wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode = false);
+wstring ReplaceVariables(wstring str, const Episode& episode, bool url_encode = false);
 wstring EscapeScriptEntities(wstring str);
 wstring UnescapeScriptEntities(wstring str);
 
 // search.cpp
-wstring SearchFileFolder(CAnime& anime, wstring root, int episode_number, bool search_folder);
+wstring SearchFileFolder(Anime& anime, wstring root, int episode_number, bool search_folder);
 
 #endif // COMMON_H

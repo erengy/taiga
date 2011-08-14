@@ -51,44 +51,45 @@ BOOL TestMIRCConnection(wstring service);
 
 /* Skype */
 
-class CSkype {
+class Skype {
 public:
-  CSkype();
-  virtual ~CSkype() {}
+  Skype();
+  virtual ~Skype() {}
   
   BOOL Attach();
   BOOL ChangeMood();
 
-  HWND m_APIWindowHandle;
-  wstring m_Mood;
-  UINT m_uControlAPIAttach;
-  UINT m_uControlAPIDiscover;
+public:
+  HWND api_window_handle;
+  wstring mood;
+  UINT control_api_attach;
+  UINT control_api_discover;
 };
 
-extern CSkype Skype;
-void AnnounceToSkype(wstring mood);
+extern Skype Skype;
+void AnnounceToSkype(const wstring& mood);
 
 // =============================================================================
 
 /* Twitter */
 
-class CTwitter {
+class Twitter {
 public:
-  CTwitter();
-  virtual ~CTwitter() {}
-
-  COAuth OAuth;
+  Twitter();
+  virtual ~Twitter() {}
 
   bool RequestToken();
   bool AccessToken(const wstring& key, const wstring& secret, const wstring& pin);
   bool SetStatusText(const wstring& status_text);
 
+public:
+  COAuth oauth;
+
 private:
-  wstring m_StatusText;
+  wstring status_text_;
 };
 
-extern CTwitter Twitter;
-
-void AnnounceToTwitter(wstring status_text);
+extern Twitter Twitter;
+void AnnounceToTwitter(const wstring& status_text);
 
 #endif // ANNOUNCE_H

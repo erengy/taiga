@@ -25,17 +25,17 @@
 
 #define APP_NAME             L"Taiga"
 #define APP_TITLE            L"Taiga 0.8"
-#define APP_VERSION          L"0.8.112"
-#define APP_BUILD            L"2011-08-11"
+#define APP_VERSION          L"0.8.115"
+#define APP_BUILD            L"2011-08-14"
 #define APP_VERSION_MAJOR    0
 #define APP_VERSION_MINOR    8
-#define APP_VERSION_REVISION 112
+#define APP_VERSION_REVISION 115
 
 #ifndef PORTABLE
 #define PORTABLE
 #endif
 
-enum PlayStatus {
+enum play_status {
   PLAYSTATUS_STOPPED,
   PLAYSTATUS_PLAYING,
   PLAYSTATUS_UPDATED
@@ -50,24 +50,26 @@ enum TipType {
 
 // =============================================================================
 
-class CTaiga : public CApp {
+class Taiga : public CApp {
 public:
-  CTaiga();
-  ~CTaiga();
-  
-  BOOL CheckNewVersion(bool silent);
-  wstring GetDataPath();
-  BOOL InitInstance();
-  void ReadData();
-  
-  bool LoggedIn, UpdatesEnabled;
-  int CurrentTipType, PlayStatus;
-  int TickerMedia, TickerNewEpisodes, TickerQueue;
+  Taiga();
+  ~Taiga();
 
-  class CUpdate : public CUpdateHelper {
+  BOOL InitInstance();
+  
+public:
+  wstring GetDataPath();
+  void ReadData();
+
+public:
+  bool logged_in, updates_enabled;
+  int current_tip_type, play_status;
+  int ticker_media, ticker_new_episodes, ticker_queue;
+
+  class Updater : public UpdateHelper {
   public:
-    CUpdate() {}
-    virtual ~CUpdate() {}
+    Updater() {}
+    virtual ~Updater() {}
 
     void OnCheck();
     void OnCRCCheck(const wstring& path, wstring& crc);
@@ -75,9 +77,9 @@ public:
     void OnProgress(int file_index);
     bool OnRestartApp();
     void OnRunActions();
-  } UpdateHelper;
+  } Updater;
 };
 
-extern CTaiga Taiga;
+extern Taiga Taiga;
 
 #endif // TAIGA_H

@@ -150,29 +150,29 @@ int ScaleY(int value) {
 
 // =============================================================================
 
-bool CImage::Load(const wstring& path) {
-  ::DeleteObject(DC.DetachBitmap());
+bool Image::Load(const wstring& path) {
+  ::DeleteObject(dc.DetachBitmap());
   
   HBITMAP hbmp = nullptr;
-  if (DC.Get() == nullptr) {
+  if (dc.Get() == nullptr) {
     HDC hScreen = ::GetDC(nullptr);
-    DC = ::CreateCompatibleDC(hScreen);
+    dc = ::CreateCompatibleDC(hScreen);
     ::ReleaseDC(NULL, hScreen);
   }
 
   Gdiplus::Bitmap bmp(path.c_str());
-  Width = bmp.GetWidth();
-  Height = bmp.GetHeight();
+  width = bmp.GetWidth();
+  height = bmp.GetHeight();
   bmp.GetHBITMAP(NULL, &hbmp);
   
-  if (!hbmp || !Width || !Height) {
+  if (!hbmp || !width || !height) {
     ::DeleteObject(hbmp);
-    ::DeleteDC(DC.DetachDC());
+    ::DeleteDC(dc.DetachDC());
     return false;
   } else {
-    Rect.bottom = Rect.top + static_cast<int>(Rect.Width() * // TODO: Move to dlg_anime_info
-      (static_cast<float>(Height) / static_cast<float>(Width)));
-    DC.AttachBitmap(hbmp);
+    rect.bottom = rect.top + static_cast<int>(rect.Width() * // TODO: Move to dlg_anime_info
+      (static_cast<float>(height) / static_cast<float>(width)));
+    dc.AttachBitmap(hbmp);
     return true;
   }
 }

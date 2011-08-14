@@ -38,7 +38,13 @@ public:
   CUrl(wstring url) { Crack(url); }
   virtual ~CUrl() {}
 
+  CUrl& operator=(const CUrl& url);
+  void operator=(const wstring& url);
+
+public:
   void Crack(wstring url);
+
+public:
   wstring Scheme, Host, Path;
 };
 
@@ -56,6 +62,7 @@ public:
   wstring GetData();
   wstring GetDefaultHeader();
   LPARAM  GetParam();
+  int     GetResponseStatusCode();
   void    SetAutoRedirect(BOOL enabled);
   void    SetProxy(const wstring& proxy, const wstring& user, const wstring& pass);
   void    SetUserAgent(const wstring& user_agent);
@@ -106,6 +113,7 @@ protected:
   wstring m_Verb;
 
   wstring m_RequestHeader;
+  int m_ResponseStatusCode;
   http_header_t m_ResponseHeader;
 
   DWORD  m_dwDownloaded, m_dwTotal;

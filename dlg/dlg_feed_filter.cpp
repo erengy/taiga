@@ -29,18 +29,18 @@
 #include "../win32/win_gdi.h"
 #include "../win32/win_taskdialog.h"
 
-CFeedFilterWindow FeedFilterWindow;
+class FeedFilterDialog FeedFilterDialog;
 
 // =============================================================================
 
-CFeedFilterWindow::CFeedFilterWindow() : 
+FeedFilterDialog::FeedFilterDialog() : 
   current_page_(0), icon_(nullptr), 
   header_font_(nullptr), main_instructions_font_(nullptr)
 {
   RegisterDlgClass(L"TaigaFeedFilterW");
 }
 
-CFeedFilterWindow::~CFeedFilterWindow() {
+FeedFilterDialog::~FeedFilterDialog() {
   if (header_font_) {
     ::DeleteObject(header_font_);
     header_font_ = nullptr;
@@ -55,7 +55,7 @@ CFeedFilterWindow::~CFeedFilterWindow() {
   }
 }
 
-INT_PTR CFeedFilterWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FeedFilterDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     // Set main instruction text color
     case WM_CTLCOLORSTATIC: {
@@ -73,13 +73,13 @@ INT_PTR CFeedFilterWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
     case WM_MOUSEWHEEL: {
       switch (current_page_) {
         case 0:
-          return m_Page0.SendDlgItemMessage(
+          return page_0_.SendDlgItemMessage(
             IDC_LIST_FEED_FILTER_PRESETS, uMsg, wParam, lParam);
         case 1:
-          return m_Page1.SendDlgItemMessage(
+          return page_1_.SendDlgItemMessage(
             IDC_LIST_FEED_FILTER_CONDITIONS, uMsg, wParam, lParam);
         case 2:
-          return m_Page2.SendDlgItemMessage(
+          return page_2_.SendDlgItemMessage(
             IDC_LIST_FEED_FILTER_ANIME, uMsg, wParam, lParam);
       }
       break;
@@ -89,12 +89,12 @@ INT_PTR CFeedFilterWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-void CFeedFilterWindow::OnCancel() {
-  filter_.Reset();
+void FeedFilterDialog::OnCancel() {
+  filter.Reset();
   EndDialog(IDCANCEL);
 }
 
-BOOL CFeedFilterWindow::OnInitDialog() {
+BOOL FeedFilterDialog::OnInitDialog() {
   // Create main instructions font
   if (!main_instructions_font_) {
     LOGFONT lFont;
@@ -114,9 +114,9 @@ BOOL CFeedFilterWindow::OnInitDialog() {
     lFont.lfWeight = FW_BOLD;
     header_font_ = ::CreateFontIndirect(&lFont);
   }
-  // Set icon
+  // Set icon_
   if (!icon_) {
-    icon_ = UI.ImgList16.GetIcon(Icon16_Funnel);
+    icon_ = UI.ImgList16.GetIcon(ICON16_FUNNEL);
   }
   //SetIconSmall(icon_);
 
@@ -132,12 +132,12 @@ BOOL CFeedFilterWindow::OnInitDialog() {
   page_area.left *= 2;
 
   // Create pages
-  m_Page0.Create(IDD_FEED_FILTER_PAGE1, this, page_area);
-  m_Page1.Create(IDD_FEED_FILTER_PAGE2, this, page_area);
-  m_Page2.Create(IDD_FEED_FILTER_PAGE3, this, page_area);
+  page_0_.Create(IDD_FEED_FILTER_PAGE1, this, page_area);
+  page_1_.Create(IDD_FEED_FILTER_PAGE2, this, page_area);
+  page_2_.Create(IDD_FEED_FILTER_PAGE3, this, page_area);
 
   // Choose and display a page
-  if (!filter_.Conditions.empty()) {
+  if (!filter.Conditions.empty()) {
     SetText(L"Edit Filter");
     current_page_ = 1;
     ChoosePage(1);
@@ -148,7 +148,7 @@ BOOL CFeedFilterWindow::OnInitDialog() {
   return TRUE;
 }
 
-void CFeedFilterWindow::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+void FeedFilterDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   CDC dc = hdc;
   CRect rect;
 
@@ -167,7 +167,7 @@ void CFeedFilterWindow::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
 }
 
-BOOL CFeedFilterWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL FeedFilterDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Back
     case IDNO:
@@ -182,7 +182,7 @@ BOOL CFeedFilterWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-void CFeedFilterWindow::ChoosePage(int index) {
+void FeedFilterDialog::ChoosePage(int index) {
   switch (index) {
     // Page #0
     case 0:
@@ -193,12 +193,12 @@ void CFeedFilterWindow::ChoosePage(int index) {
     // Page #1
     case 1:
       if (current_page_ == 0) {
-        m_Page0.BuildFilter(filter_);
+        page_0_.BuildFilter(filter);
       }
-      m_Page1.name_text_.SetText(filter_.Name);
-      m_Page1.RefreshConditionList();
-      m_Page1.match_combo_.SetCurSel(filter_.Match);
-      m_Page1.action_combo_.SetCurSel(filter_.Action);
+      page_1_.name_text.SetText(filter.Name);
+      page_1_.RefreshConditionList();
+      page_1_.match_combo.SetCurSel(filter.Match);
+      page_1_.action_combo.SetCurSel(filter.Action);
       main_instructions_label_.SetText(
         L"Change filter options and add conditions");
       break;
@@ -206,7 +206,7 @@ void CFeedFilterWindow::ChoosePage(int index) {
     // Page #2
     case 2:
       if (current_page_ == 1) {
-        if (m_Page1.condition_list_.GetItemCount() == 0) {
+        if (page_1_.condition_list.GetItemCount() == 0) {
           CTaskDialog dlg(APP_TITLE, TD_ICON_ERROR);
           dlg.SetMainInstruction(
             L"There must be at least one condition in order to create a filter.");
@@ -217,7 +217,7 @@ void CFeedFilterWindow::ChoosePage(int index) {
           dlg.Show(GetWindowHandle());
           return;
         }
-        m_Page1.BuildFilter(filter_);
+        page_1_.BuildFilter(filter);
       }
       main_instructions_label_.SetText(
         L"Limit this filter to one or more anime title, or leave it blank to apply to all items");
@@ -226,15 +226,15 @@ void CFeedFilterWindow::ChoosePage(int index) {
     // Finished
     case 3:
       if (current_page_ == 2) {
-        m_Page2.BuildFilter(filter_);
+        page_2_.BuildFilter(filter);
       }
       EndDialog(IDOK);
       return;
   }
 
-  m_Page0.Show(index == 0 ? 1 : 0);
-  m_Page1.Show(index == 1 ? 1 : 0);
-  m_Page2.Show(index == 2 ? 1 : 0);
+  page_0_.Show(index == 0 ? 1 : 0);
+  page_1_.Show(index == 1 ? 1 : 0);
+  page_2_.Show(index == 2 ? 1 : 0);
 
   EnableDlgItem(IDNO, index > 0);
   SetDlgItemText(IDYES, index < 2 ? L"Next >" : L"Finish");
@@ -246,13 +246,13 @@ void CFeedFilterWindow::ChoosePage(int index) {
 
 /* Page */
 
-void CFeedFilterWindow::CDialogPage::Create(UINT uResourceID, CFeedFilterWindow* parent, const RECT& rect) {
-  parent_ = parent;
+void FeedFilterDialog::DialogPage::Create(UINT uResourceID, FeedFilterDialog* parent, const RECT& rect) {
+  parent = parent;
   CDialog::Create(uResourceID, parent->GetWindowHandle(), false);
   SetPosition(nullptr, rect, SWP_NOSIZE);
 }
 
-INT_PTR CFeedFilterWindow::CDialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FeedFilterDialog::DialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORDLG:
     case WM_CTLCOLORSTATIC:
@@ -266,48 +266,48 @@ INT_PTR CFeedFilterWindow::CDialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM 
 
 /* Page 0 */
 
-BOOL CFeedFilterWindow::CDialogPage0::OnInitDialog() {
+BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   // Initialize presets list
-  preset_list_.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_PRESETS));
-  preset_list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
-  preset_list_.SetImageList(UI.ImgList16.GetHandle(), LVSIL_NORMAL);
-  preset_list_.SetTheme();
+  preset_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_PRESETS));
+  preset_list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
+  preset_list.SetImageList(UI.ImgList16.GetHandle(), LVSIL_NORMAL);
+  preset_list.SetTheme();
   
   // Insert list groups
-  //preset_list_.EnableGroupView(true);
-  preset_list_.InsertGroup(0, L"Presets", true, false);
+  //preset_list.EnableGroupView(true);
+  preset_list.InsertGroup(0, L"Presets", true, false);
   
   // Insert list columns
-  preset_list_.InsertColumn(0, 200, 200, 0, L"Title");
-  preset_list_.InsertColumn(1, 350, 350, 0, L"Details");
+  preset_list.InsertColumn(0, 200, 200, 0, L"Title");
+  preset_list.InsertColumn(1, 350, 350, 0, L"Details");
   
   // Enable tile view
   SIZE size = {580, 40};
   RECT rect = {5, 0, 5, 0};
-  preset_list_.SetTileViewInfo(1, LVTVIF_FIXEDSIZE, &rect, &size);
-  preset_list_.SetView(LV_VIEW_TILE);
+  preset_list.SetTileViewInfo(1, LVTVIF_FIXEDSIZE, &rect, &size);
+  preset_list.SetView(LV_VIEW_TILE);
 
   // Insert presets
   for (auto it = Aggregator.FilterManager.Presets.begin(); 
        it != Aggregator.FilterManager.Presets.end(); ++it) {
     if (it->Default) continue;
-    int icon = Icon16_Funnel;
+    int icon_ = ICON16_FUNNEL;
     switch (it->Filter.Action) {
-      case FEED_FILTER_ACTION_DISCARD: icon = Icon16_FunnelCross; break;
-      case FEED_FILTER_ACTION_SELECT:  icon = Icon16_FunnelTick;  break;
-      case FEED_FILTER_ACTION_PREFER:  icon = Icon16_FunnelPlus;  break;
+      case FEED_FILTER_ACTION_DISCARD: icon_ = ICON16_FUNNEL_CROSS; break;
+      case FEED_FILTER_ACTION_SELECT:  icon_ = ICON16_FUNNEL_TICK;  break;
+      case FEED_FILTER_ACTION_PREFER:  icon_ = ICON16_FUNNEL_PLUS;  break;
     }
-    if (it->Filter.Conditions.empty()) icon = Icon16_FunnelPencil;
-    preset_list_.InsertItem(it - Aggregator.FilterManager.Presets.begin(), 
-      0, icon, I_COLUMNSCALLBACK, nullptr, LPSTR_TEXTCALLBACK, 
+    if (it->Filter.Conditions.empty()) icon_ = ICON16_FUNNEL_PENCIL;
+    preset_list.InsertItem(it - Aggregator.FilterManager.Presets.begin(), 
+      0, icon_, I_COLUMNSCALLBACK, nullptr, LPSTR_TEXTCALLBACK, 
       reinterpret_cast<LPARAM>(&(*it)));
   }
-  preset_list_.SetSelectedItem(0);
+  preset_list.SetSelectedItem(0);
 
   return TRUE;
 }
 
-LRESULT CFeedFilterWindow::CDialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT FeedFilterDialog::DialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
   switch (idCtrl) {
     case IDC_LIST_FEED_FILTER_PRESETS:
       switch (pnmh->code) {
@@ -319,7 +319,7 @@ LRESULT CFeedFilterWindow::CDialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
             plvdi->item.puColumns[0] = 1;
           }
           if (plvdi->item.mask & LVIF_TEXT) {
-            CFeedFilterPreset* preset = reinterpret_cast<CFeedFilterPreset*>(plvdi->item.lParam);
+            FeedFilterPreset* preset = reinterpret_cast<FeedFilterPreset*>(plvdi->item.lParam);
             if (!preset) break;
             switch (plvdi->item.iSubItem) {
               case 0: // Filter name
@@ -335,8 +335,8 @@ LRESULT CFeedFilterWindow::CDialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
         // Double click
         case NM_DBLCLK: {
-          if (preset_list_.GetSelectedCount() > 0) {
-            parent_->ChoosePage(1);
+          if (preset_list.GetSelectedCount() > 0) {
+            parent->ChoosePage(1);
           }
           return TRUE;
         }
@@ -347,20 +347,20 @@ LRESULT CFeedFilterWindow::CDialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-bool CFeedFilterWindow::CDialogPage0::BuildFilter(CFeedFilter& filter) {
-  int selected_item = preset_list_.GetNextItem(-1, LVIS_SELECTED);
+bool FeedFilterDialog::DialogPage0::BuildFilter(FeedFilter& filter) {
+  int selected_item = preset_list.GetNextItem(-1, LVIS_SELECTED);
   
   if (selected_item > -1) {
     // Build filter from preset
-    CFeedFilterPreset* preset = 
-      reinterpret_cast<CFeedFilterPreset*>(preset_list_.GetItemParam(selected_item));
+    FeedFilterPreset* preset = 
+      reinterpret_cast<FeedFilterPreset*>(preset_list.GetItemParam(selected_item));
     if (!preset || preset->Filter.Conditions.empty()) {
-      parent_->filter_.Reset();
+      parent->filter.Reset();
       return false;
     }
-    parent_->filter_ = preset->Filter;
+    parent->filter = preset->Filter;
     // Clear selection
-    ListView_SetItemState(preset_list_.GetWindowHandle(), selected_item, 0, LVIS_SELECTED);
+    ListView_SetItemState(preset_list.GetWindowHandle(), selected_item, 0, LVIS_SELECTED);
   }
 
   return true;
@@ -370,99 +370,99 @@ bool CFeedFilterWindow::CDialogPage0::BuildFilter(CFeedFilter& filter) {
 
 /* Page #1 */
 
-BOOL CFeedFilterWindow::CDialogPage1::OnInitDialog() {
+BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 3; i++) {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-      reinterpret_cast<WPARAM>(parent_->header_font_), FALSE);
+      reinterpret_cast<WPARAM>(parent->header_font_), FALSE);
   }
   
   // Initialize name
-  name_text_.Attach(GetDlgItem(IDC_EDIT_FEED_NAME));
-  name_text_.SetCueBannerText(L"Type something to identify this filter");
+  name_text.Attach(GetDlgItem(IDC_EDIT_FEED_NAME));
+  name_text.SetCueBannerText(L"Type something to identify this filter");
 
   // Initialize condition list
-  condition_list_.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_CONDITIONS));
-  condition_list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  condition_list_.SetImageList(UI.ImgList16.GetHandle());
-  condition_list_.SetTheme();
+  condition_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_CONDITIONS));
+  condition_list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  condition_list.SetImageList(UI.ImgList16.GetHandle());
+  condition_list.SetTheme();
   // Insert list columns
-  condition_list_.InsertColumn(0, 170, 170, 0, L"Element");
-  condition_list_.InsertColumn(1, 170, 170, 0, L"Operator");
-  condition_list_.InsertColumn(2, 170, 170, 0, L"Value");
+  condition_list.InsertColumn(0, 170, 170, 0, L"Element");
+  condition_list.InsertColumn(1, 170, 170, 0, L"Operator");
+  condition_list.InsertColumn(2, 170, 170, 0, L"Value");
 
   // Initialize toolbar
-  condition_toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_FEED_FILTER));
-  condition_toolbar_.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
-  condition_toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
+  condition_toolbar.Attach(GetDlgItem(IDC_TOOLBAR_FEED_FILTER));
+  condition_toolbar.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  condition_toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
   // Add toolbar items
-  condition_toolbar_.InsertButton(0, Icon16_Plus,      100, true,  0, 0, nullptr, L"Add new condition...");
-  condition_toolbar_.InsertButton(1, Icon16_Minus,     101, false, 0, 1, nullptr, L"Delete condition");
-  condition_toolbar_.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  condition_toolbar_.InsertButton(3, Icon16_ArrowUp,   103, false, 0, 3, nullptr, L"Move up");
-  condition_toolbar_.InsertButton(4, Icon16_ArrowDown, 104, false, 0, 4, nullptr, L"Move down");
+  condition_toolbar.InsertButton(0, ICON16_PLUS,      100, true,  0, 0, nullptr, L"Add new condition...");
+  condition_toolbar.InsertButton(1, ICON16_MINUS,     101, false, 0, 1, nullptr, L"Delete condition");
+  condition_toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  condition_toolbar.InsertButton(3, ICON16_ARROW_UP,   103, false, 0, 3, nullptr, L"Move up");
+  condition_toolbar.InsertButton(4, ICON16_ARROW_DOWN, 104, false, 0, 4, nullptr, L"Move down");
   
   // Initialize options
-  match_combo_.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_MATCH));
-  match_combo_.AddString(Aggregator.FilterManager.TranslateMatching(FEED_FILTER_MATCH_ALL).c_str());
-  match_combo_.AddString(Aggregator.FilterManager.TranslateMatching(FEED_FILTER_MATCH_ANY).c_str());
-  action_combo_.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_ACTION));
-  action_combo_.AddString(Aggregator.FilterManager.TranslateAction(FEED_FILTER_ACTION_DISCARD).c_str());
-  action_combo_.AddString(Aggregator.FilterManager.TranslateAction(FEED_FILTER_ACTION_SELECT).c_str());
-  action_combo_.AddString(Aggregator.FilterManager.TranslateAction(FEED_FILTER_ACTION_PREFER).c_str());
+  match_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_MATCH));
+  match_combo.AddString(Aggregator.FilterManager.TranslateMatching(FEED_FILTER_MATCH_ALL).c_str());
+  match_combo.AddString(Aggregator.FilterManager.TranslateMatching(FEED_FILTER_MATCH_ANY).c_str());
+  action_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_ACTION));
+  action_combo.AddString(Aggregator.FilterManager.TranslateAction(FEED_FILTER_ACTION_DISCARD).c_str());
+  action_combo.AddString(Aggregator.FilterManager.TranslateAction(FEED_FILTER_ACTION_SELECT).c_str());
+  action_combo.AddString(Aggregator.FilterManager.TranslateAction(FEED_FILTER_ACTION_PREFER).c_str());
 
   // Display current filter
-  name_text_.SetText(parent_->filter_.Name);
+  name_text.SetText(parent->filter.Name);
   RefreshConditionList();
-  match_combo_.SetCurSel(parent_->filter_.Match);
-  action_combo_.SetCurSel(parent_->filter_.Action);
+  match_combo.SetCurSel(parent->filter.Match);
+  action_combo.SetCurSel(parent->filter.Action);
 
   return TRUE;
 }
 
-BOOL CFeedFilterWindow::CDialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Add new condition
     case 100:
-      FeedConditionWindow.condition_.Reset();
-      FeedConditionWindow.Create(IDD_FEED_CONDITION, GetWindowHandle());
-      if (FeedConditionWindow.condition_.Element > -1) {
-        parent_->filter_.AddCondition(
-          FeedConditionWindow.condition_.Element,
-          FeedConditionWindow.condition_.Operator,
-          FeedConditionWindow.condition_.Value);
+      FeedConditionDialog.condition.Reset();
+      FeedConditionDialog.Create(IDD_FEED_CONDITION, GetWindowHandle());
+      if (FeedConditionDialog.condition.Element > -1) {
+        parent->filter.AddCondition(
+          FeedConditionDialog.condition.Element,
+          FeedConditionDialog.condition.Operator,
+          FeedConditionDialog.condition.Value);
         RefreshConditionList();
-        condition_list_.SetSelectedItem(condition_list_.GetItemCount() - 1);
+        condition_list.SetSelectedItem(condition_list.GetItemCount() - 1);
       }
       return TRUE;
     // Delete condition
     case 101: {
-      int index = condition_list_.GetNextItem(-1, LVNI_SELECTED);
+      int index = condition_list.GetNextItem(-1, LVNI_SELECTED);
       if (index > -1) {
-        condition_list_.DeleteItem(index);
-        parent_->filter_.Conditions.erase(parent_->filter_.Conditions.begin() + index);
+        condition_list.DeleteItem(index);
+        parent->filter.Conditions.erase(parent->filter.Conditions.begin() + index);
       }
       return TRUE;
     }
     // Move condition up
     case 103: {
-      int index = condition_list_.GetNextItem(-1, LVNI_SELECTED);
+      int index = condition_list.GetNextItem(-1, LVNI_SELECTED);
       if (index > 0) {
-        iter_swap(parent_->filter_.Conditions.begin() + index, 
-          parent_->filter_.Conditions.begin() + index - 1);
+        iter_swap(parent->filter.Conditions.begin() + index, 
+          parent->filter.Conditions.begin() + index - 1);
         RefreshConditionList();
-        condition_list_.SetSelectedItem(index - 1);
+        condition_list.SetSelectedItem(index - 1);
       }
       return TRUE;
     }
     // Move condition down
     case 104:
-      int index = condition_list_.GetNextItem(-1, LVNI_SELECTED);
-      if (index > -1 && index < condition_list_.GetItemCount() - 1) {
-        iter_swap(parent_->filter_.Conditions.begin() + index, 
-          parent_->filter_.Conditions.begin() + index + 1);
+      int index = condition_list.GetNextItem(-1, LVNI_SELECTED);
+      if (index > -1 && index < condition_list.GetItemCount() - 1) {
+        iter_swap(parent->filter.Conditions.begin() + index, 
+          parent->filter.Conditions.begin() + index + 1);
         RefreshConditionList();
-        condition_list_.SetSelectedItem(index + 1);
+        condition_list.SetSelectedItem(index + 1);
       }
       return TRUE;
   }
@@ -470,18 +470,18 @@ BOOL CFeedFilterWindow::CDialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-LRESULT CFeedFilterWindow::CDialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
   switch (idCtrl) {
     // Condition list
     case IDC_LIST_FEED_FILTER_CONDITIONS:
       switch (pnmh->code) {
         // List item change
         case LVN_ITEMCHANGED: {
-          int index = condition_list_.GetNextItem(-1, LVNI_SELECTED);
-          int count = condition_list_.GetItemCount();
-          condition_toolbar_.EnableButton(1, index > -1);
-          condition_toolbar_.EnableButton(3, index > 0);
-          condition_toolbar_.EnableButton(4, index > -1 && index < count - 1);
+          int index = condition_list.GetNextItem(-1, LVNI_SELECTED);
+          int count = condition_list.GetItemCount();
+          condition_toolbar.EnableButton(1, index > -1);
+          condition_toolbar.EnableButton(3, index > 0);
+          condition_toolbar.EnableButton(4, index > -1 && index < count - 1);
           break;
         }
         // Key press
@@ -505,17 +505,17 @@ LRESULT CFeedFilterWindow::CDialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
         }
         // Double click
         case NM_DBLCLK: {
-          int selected_item = condition_list_.GetNextItem(-1, LVIS_SELECTED);
+          int selected_item = condition_list.GetNextItem(-1, LVIS_SELECTED);
           if (selected_item == -1) break;
-          CFeedFilterCondition* condition = reinterpret_cast<CFeedFilterCondition*>(
-            condition_list_.GetItemParam(selected_item));
+          FeedFilterCondition* condition = reinterpret_cast<FeedFilterCondition*>(
+            condition_list.GetItemParam(selected_item));
           if (condition) {
-            FeedConditionWindow.condition_ = *condition;
-            FeedConditionWindow.Create(IDD_FEED_CONDITION, GetWindowHandle());
-            if (FeedConditionWindow.condition_.Element > -1) {
-              *condition = FeedConditionWindow.condition_;
+            FeedConditionDialog.condition = *condition;
+            FeedConditionDialog.Create(IDD_FEED_CONDITION, GetWindowHandle());
+            if (FeedConditionDialog.condition.Element > -1) {
+              *condition = FeedConditionDialog.condition;
               RefreshConditionList();
-              condition_list_.SetSelectedItem(selected_item);
+              condition_list.SetSelectedItem(selected_item);
             }
           }
           break;
@@ -530,7 +530,7 @@ LRESULT CFeedFilterWindow::CDialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case TBN_GETINFOTIP:
           NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(pnmh);
           git->cchTextMax = INFOTIPSIZE;
-          git->pszText = (LPWSTR)(condition_toolbar_.GetButtonTooltip(git->lParam));
+          git->pszText = (LPWSTR)(condition_toolbar.GetButtonTooltip(git->lParam));
           break;
       }
       break;
@@ -539,26 +539,26 @@ LRESULT CFeedFilterWindow::CDialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-bool CFeedFilterWindow::CDialogPage1::BuildFilter(CFeedFilter& filter) {
-  name_text_.GetText(filter.Name);
-  filter.Match = match_combo_.GetCurSel();
-  filter.Action = action_combo_.GetCurSel();
+bool FeedFilterDialog::DialogPage1::BuildFilter(FeedFilter& filter) {
+  name_text.GetText(filter.Name);
+  filter.Match = match_combo.GetCurSel();
+  filter.Action = action_combo.GetCurSel();
   
   return true;
 }
 
-void CFeedFilterWindow::CDialogPage1::AddConditionToList(const CFeedFilterCondition& condition, int index) {
-  if (index == -1) index = condition_list_.GetItemCount();
-  condition_list_.InsertItem(index, -1, Icon16_Funnel, 0, nullptr, 
+void FeedFilterDialog::DialogPage1::AddConditionToList(const FeedFilterCondition& condition, int index) {
+  if (index == -1) index = condition_list.GetItemCount();
+  condition_list.InsertItem(index, -1, ICON16_FUNNEL, 0, nullptr, 
     Aggregator.FilterManager.TranslateElement(condition.Element).c_str(), 
     reinterpret_cast<LPARAM>(&condition));
-  condition_list_.SetItem(index, 1, Aggregator.FilterManager.TranslateOperator(condition.Operator).c_str());
-  condition_list_.SetItem(index, 2, Aggregator.FilterManager.TranslateValue(condition).c_str());
+  condition_list.SetItem(index, 1, Aggregator.FilterManager.TranslateOperator(condition.Operator).c_str());
+  condition_list.SetItem(index, 2, Aggregator.FilterManager.TranslateValue(condition).c_str());
 }
 
-void CFeedFilterWindow::CDialogPage1::RefreshConditionList() {
-  condition_list_.DeleteAllItems();
-  for (auto it = parent_->filter_.Conditions.begin(); it != parent_->filter_.Conditions.end(); ++it) {
+void FeedFilterDialog::DialogPage1::RefreshConditionList() {
+  condition_list.DeleteAllItems();
+  for (auto it = parent->filter.Conditions.begin(); it != parent->filter.Conditions.end(); ++it) {
     AddConditionToList(*it);
   }
 }
@@ -567,44 +567,44 @@ void CFeedFilterWindow::CDialogPage1::RefreshConditionList() {
 
 /* Page 2 */
 
-BOOL CFeedFilterWindow::CDialogPage2::OnInitDialog() {
+BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   // Initialize anime list
-  anime_list_.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_ANIME));
-  anime_list_.EnableGroupView(GetWinVersion() > WINVERSION_XP);
-  anime_list_.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
-  anime_list_.SetImageList(UI.ImgList16.GetHandle());
-  anime_list_.SetTheme();
+  anime_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_ANIME));
+  anime_list.EnableGroupView(GetWinVersion() > WINVERSION_XP);
+  anime_list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
+  anime_list.SetImageList(UI.ImgList16.GetHandle());
+  anime_list.SetTheme();
   
   // Insert list columns
-  anime_list_.InsertColumn(0, 543, 543, 0, L"Title");
+  anime_list.InsertColumn(0, 543, 543, 0, L"Title");
   
   // Insert list groups
   for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
     if (i != MAL_UNKNOWN) {
-      anime_list_.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str(), true, i != MAL_WATCHING);
+      anime_list.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str(), true, i != MAL_WATCHING);
     }
   }
   
   // Add anime to list
-  for (int i = 1; i <= AnimeList.Count; i++) {
-    anime_list_.InsertItem(i - 1, AnimeList.Items[i].GetStatus(), 
-      StatusToIcon(AnimeList.Items[i].GetAiringStatus()), 0, nullptr, 
-      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeList.Items[i]));
-    for (auto it = parent_->filter_.AnimeIds.begin(); it != parent_->filter_.AnimeIds.end(); ++it) {
-      if (*it == AnimeList.Items[i].Series_ID) {
-        anime_list_.SetCheckState(i - 1, TRUE);
+  for (int i = 1; i <= AnimeList.count; i++) {
+    anime_list.InsertItem(i - 1, AnimeList.items[i].GetStatus(), 
+      StatusToIcon(AnimeList.items[i].GetAiringStatus()), 0, nullptr, 
+      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeList.items[i]));
+    for (auto it = parent->filter.AnimeIds.begin(); it != parent->filter.AnimeIds.end(); ++it) {
+      if (*it == AnimeList.items[i].series_id) {
+        anime_list.SetCheckState(i - 1, TRUE);
         break;
       }
     }
   }
   
   // Sort items
-  anime_list_.Sort(0, 1, 0, ListViewCompareProc);
+  anime_list.Sort(0, 1, 0, ListViewCompareProc);
 
   return TRUE;
 }
 
-LRESULT CFeedFilterWindow::CDialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
   switch (idCtrl) {
     // Anime list
     case IDC_LIST_FEED_FILTER_ANIME:
@@ -612,11 +612,11 @@ LRESULT CFeedFilterWindow::CDialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Text callback
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
-          CAnime* anime = reinterpret_cast<CAnime*>(plvdi->item.lParam);
+          Anime* anime = reinterpret_cast<Anime*>(plvdi->item.lParam);
           if (!anime) break;
           switch (plvdi->item.iSubItem) {
             case 0: // Anime title
-              plvdi->item.pszText = const_cast<LPWSTR>(anime->Series_Title.data());
+              plvdi->item.pszText = const_cast<LPWSTR>(anime->series_title.data());
               break;
           }
           break;
@@ -626,11 +626,11 @@ LRESULT CFeedFilterWindow::CDialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
           LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
           if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
             wstring text;
-            for (int i = 0; i < anime_list_.GetItemCount(); i++) {
-              CAnime* anime = reinterpret_cast<CAnime*>(anime_list_.GetItemParam(i));
-              if (anime && anime_list_.GetCheckState(i)) {
+            for (int i = 0; i < anime_list.GetItemCount(); i++) {
+              Anime* anime = reinterpret_cast<Anime*>(anime_list.GetItemParam(i));
+              if (anime && anime_list.GetCheckState(i)) {
                 if (!text.empty()) text += L", ";
-                text += anime->Series_Title;
+                text += anime->series_title;
               }
             }
             if (text.empty()) text = L"(nothing)";
@@ -646,13 +646,13 @@ LRESULT CFeedFilterWindow::CDialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-bool CFeedFilterWindow::CDialogPage2::BuildFilter(CFeedFilter& filter) {
+bool FeedFilterDialog::DialogPage2::BuildFilter(FeedFilter& filter) {
   filter.AnimeIds.clear();
 
-  for (int i = 0; i < anime_list_.GetItemCount(); i++) {
-    if (anime_list_.GetCheckState(i)) {
-      CAnime* anime = reinterpret_cast<CAnime*>(anime_list_.GetItemParam(i));
-      if (anime) filter.AnimeIds.push_back(anime->Series_ID);
+  for (int i = 0; i < anime_list.GetItemCount(); i++) {
+    if (anime_list.GetCheckState(i)) {
+      Anime* anime = reinterpret_cast<Anime*>(anime_list.GetItemParam(i));
+      if (anime) filter.AnimeIds.push_back(anime->series_id);
     }
   }
   

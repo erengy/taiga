@@ -23,10 +23,10 @@
 
 // =============================================================================
 
-class TaigaStats {
+class Statistics {
 public:
-  TaigaStats();
-  virtual ~TaigaStats() {}
+  Statistics();
+  virtual ~Statistics() {}
 
   void CalculateAll();
   int CalculateAnimeCount();
@@ -36,13 +36,13 @@ public:
   float CalculateScoreDeviation();
 
 public:
-  int anime_count_;
-  int episode_count_;
-  wstring life_spent_;
-  float score_mean_;
-  float score_dev_;
+  int anime_count;
+  int episode_count;
+  wstring life_spent_watching;
+  float score_mean;
+  float score_deviation;
 };
 
-extern TaigaStats Stats;
+extern Statistics Stats;
 
 #endif // STATS_H

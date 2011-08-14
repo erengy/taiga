@@ -23,92 +23,91 @@
 #include "win32/win_control.h"
 #include "win32/win_menu.h"
 
-enum IconList16 {
-  Icon16_Green,
-  Icon16_Blue,
-  Icon16_Red,
-  Icon16_Gray,
-  Icon16_Play,
-  Icon16_New,
-  Icon16_Tick,
-  Icon16_Error,
-  Icon16_Search,
-  Icon16_Folder,
-  Icon16_AppBlue,
-  Icon16_AppGray,
-  Icon16_Refresh,
-  Icon16_Download,
-  Icon16_Settings,
-  Icon16_Cross,
-  Icon16_Plus,
-  Icon16_Minus,
-  Icon16_ArrowUp,
-  Icon16_ArrowDown,
-  Icon16_Funnel,
-  Icon16_FunnelCross,
-  Icon16_FunnelTick,
-  Icon16_FunnelPlus,
-  Icon16_FunnelPencil,
-  Icon16_Calendar,
-  Icon16_Category,
-  Icon16_Sort,
-  Icon16_Balloon,
+enum Icons16px {
+  ICON16_GREEN,
+  ICON16_BLUE,
+  ICON16_RED,
+  ICON16_GRAY,
+  ICON16_PLAY,
+  ICON16_NEW,
+  ICON16_TICK,
+  ICON16_ERROR,
+  ICON16_SEARCH,
+  ICON16_FOLDER,
+  ICON16_APP_BLUE,
+  ICON16_APP_GRAY,
+  ICON16_REFRESH,
+  ICON16_DOWNLOAD,
+  ICON16_SETTINGS,
+  ICON16_CROSS,
+  ICON16_PLUS,
+  ICON16_MINUS,
+  ICON16_ARROW_UP,
+  ICON16_ARROW_DOWN,
+  ICON16_FUNNEL,
+  ICON16_FUNNEL_CROSS,
+  ICON16_FUNNEL_TICK,
+  ICON16_FUNNEL_PLUS,
+  ICON16_FUNNEL_PENCIL,
+  ICON16_CALENDAR,
+  ICON16_CATEGORY,
+  ICON16_SORT,
+  ICON16_BALLOON,
   ICONCOUNT_16PX
 };
 
-enum IconList24 {
-  Icon24_Offline,
-  Icon24_Online,
-  Icon24_Sync,
-  Icon24_MAL,
-  Icon24_Folders,
-  Icon24_Calendar,
-  Icon24_Tools,
-  Icon24_RSS,
-  Icon24_Filter,
-  Icon24_Settings,
-  Icon24_About,
+enum Icons24px {
+  ICON24_OFFLINE,
+  ICON24_ONLINE,
+  ICON24_SYNC,
+  ICON24_MAL,
+  ICON24_FOLDERS,
+  ICON24_CALENDAR,
+  ICON24_TOOLS,
+  ICON24_RSS,
+  ICON24_FILTER,
+  ICON24_SETTINGS,
+  ICON24_ABOUT,
   ICONCOUNT_24PX
 };
 
 // =============================================================================
 
-class CTheme {
+class Theme {
 public:
-  CTheme();
-  ~CTheme() {}
-
-  // Image lists
-  CImageList ImgList16;
-  CImageList ImgList24;
+  Theme();
+  ~Theme() {}
   
-  // Functions
   bool LoadImages();
   bool Read(const wstring& name);
 
-  // Variables
-  wstring File, Folder;
+public:
   CMenuList Menus;
+
+  CImageList ImgList16;
+  CImageList ImgList24;
   
-  // Progress class
-  class CThemeListProgress {
+  class ListProgress {
   public:
-    class CThemeListProgressItem {
+    class Item {
     public:
-      void Draw(HDC hdc, const LPRECT lpRect);
-      COLORREF Value[3];
-      wstring  Type;
+      void Draw(HDC hdc, const LPRECT rect);
+      COLORREF value[3];
+      wstring type;
     }
-      Background,
-      Border,
-      Buffer,
-      Completed,
-      Dropped,
-      Separator,
-      Watching;
-  } ListProgress;
+      background,
+      border,
+      buffer,
+      completed,
+      dropped,
+      separator,
+      watching;
+  } list_progress;
+
+private:
+  wstring file_, folder_;
 };
 
-extern CTheme UI;
+extern Theme UI;
 
 #endif // THEME_H

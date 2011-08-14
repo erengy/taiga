@@ -23,27 +23,27 @@
 #include "theme.h"
 #include "xml.h"
 
-CTheme UI;
+Theme UI;
 
 // =============================================================================
 
-CTheme::CTheme() {
+Theme::Theme() {
   // Create image lists
   ImgList16.Create(16, 16);
   ImgList24.Create(24, 24);
   Menus.SetImageList(ImgList16.GetHandle());
 }
 
-bool CTheme::Read(const wstring& name) {
+bool Theme::Read(const wstring& name) {
   // Initialize
-  Folder = Taiga.GetDataPath() + L"Theme\\" + name + L"\\";
-  File = Folder + L"Theme.xml";
+  folder_ = Taiga.GetDataPath() + L"Theme\\" + name + L"\\";
+  file_ = folder_ + L"Theme.xml";
   
   // Read XML file
   xml_document doc;
-  xml_parse_result result = doc.load_file(File.c_str());
+  xml_parse_result result = doc.load_file(file_.c_str());
   if (result.status != status_ok) {
-    MessageBox(NULL, L"Could not read theme file.", File.c_str(), MB_OK | MB_ICONERROR);
+    MessageBox(NULL, L"Could not read theme file.", file_.c_str(), MB_OK | MB_ICONERROR);
     return false;
   }
   
@@ -54,17 +54,17 @@ bool CTheme::Read(const wstring& name) {
 
   // Read list
   #define READ_PROGRESS_DATA(x, name) \
-    ListProgress.x.Type = progress.child(name).attribute(L"type").value(); \
-    ListProgress.x.Value[0] = HexToARGB(progress.child(name).attribute(L"value_1").value()); \
-    ListProgress.x.Value[1] = HexToARGB(progress.child(name).attribute(L"value_2").value()); \
-    ListProgress.x.Value[2] = HexToARGB(progress.child(name).attribute(L"value_3").value());
-  READ_PROGRESS_DATA(Background, L"background");
-  READ_PROGRESS_DATA(Border,     L"border");
-  READ_PROGRESS_DATA(Buffer,     L"buffer");
-  READ_PROGRESS_DATA(Completed,  L"completed");
-  READ_PROGRESS_DATA(Dropped,    L"dropped");
-  READ_PROGRESS_DATA(Separator,  L"separator");
-  READ_PROGRESS_DATA(Watching,   L"watching");
+    list_progress.x.type = progress.child(name).attribute(L"type").value(); \
+    list_progress.x.value[0] = HexToARGB(progress.child(name).attribute(L"value_1").value()); \
+    list_progress.x.value[1] = HexToARGB(progress.child(name).attribute(L"value_2").value()); \
+    list_progress.x.value[2] = HexToARGB(progress.child(name).attribute(L"value_3").value());
+  READ_PROGRESS_DATA(background, L"background");
+  READ_PROGRESS_DATA(border,     L"border");
+  READ_PROGRESS_DATA(buffer,     L"buffer");
+  READ_PROGRESS_DATA(completed,  L"completed");
+  READ_PROGRESS_DATA(dropped,    L"dropped");
+  READ_PROGRESS_DATA(separator,  L"separator");
+  READ_PROGRESS_DATA(watching,   L"watching");
   #undef READ_PROGRESS_DATA
 
   // Read menus
@@ -87,7 +87,7 @@ bool CTheme::Read(const wstring& name) {
   return true;
 }
 
-bool CTheme::LoadImages() {
+bool Theme::LoadImages() {
   // Clear image lists
   ImgList16.Remove(-1);
   ImgList24.Remove(-1);
@@ -95,12 +95,12 @@ bool CTheme::LoadImages() {
   // Populate image lists
   HBITMAP hBitmap;
   for (int i = 1; i <= ICONCOUNT_16PX; i++) {
-    hBitmap = GdiPlus.LoadImage(Folder + L"16px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(folder_ + L"16px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
     ImgList16.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }
   for (int i = 1; i <= ICONCOUNT_24PX; i++) {
-    hBitmap = GdiPlus.LoadImage(Folder + L"24px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(folder_ + L"24px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
     ImgList24.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }
@@ -110,19 +110,19 @@ bool CTheme::LoadImages() {
 
 // =============================================================================
 
-void CTheme::CThemeListProgress::CThemeListProgressItem::Draw(HDC hdc, const LPRECT lpRect) {
+void Theme::ListProgress::Item::Draw(HDC hdc, const LPRECT rect) {
   // Solid
-  if (Type == L"solid") {
-    HBRUSH hbrSolid = CreateSolidBrush(Value[0]);
-    FillRect(hdc, lpRect, hbrSolid);
+  if (type == L"solid") {
+    HBRUSH hbrSolid = CreateSolidBrush(value[0]);
+    FillRect(hdc, rect, hbrSolid);
     DeleteObject(hbrSolid);
 
   // Gradient
-  } else if (Type == L"gradient") {
-    GradientRect(hdc, lpRect, Value[0], Value[1], Value[2] > 0);
+  } else if (type == L"gradient") {
+    GradientRect(hdc, rect, value[0], value[1], value[2] > 0);
 
   // Progress bar
-  } else if (Type == L"progress") {
-    DrawProgressBar(hdc, lpRect, Value[0], Value[1], Value[2]);
+  } else if (type == L"progress") {
+    DrawProgressBar(hdc, rect, value[0], value[1], value[2]);
   }
 }

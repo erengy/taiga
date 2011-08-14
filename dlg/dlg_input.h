@@ -20,29 +20,33 @@
 #define DLG_INPUT_H
 
 #include "../std.h"
+#include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
 // =============================================================================
 
-/* Input dialog */
-
-class CInputDialog : public CDialog {
+class InputDialog : public CDialog {
 public:
-  CInputDialog();
-  virtual ~CInputDialog() {}
-
-  INT_PTR Result;
-  wstring Info, Title, Text;
-  void SetNumbers(bool enabled, int min_value, int max_value, int current_value);
-  void Show(HWND hParent = NULL);
+  InputDialog();
+  virtual ~InputDialog() {}
 
   void OnCancel();
   BOOL OnInitDialog();
   void OnOK();
 
+public:
+  void SetNumbers(bool enabled, int min_value, int max_value, int current_value);
+  void Show(HWND parent = nullptr);
+
+public:
+  INT_PTR result;
+  wstring info, title, text;
+
 private:
-  bool m_NumbersOnly;
-  int m_CurrentValue, m_MinValue, m_MaxValue;
+  int current_value_, min_value_, max_value_;
+  bool numbers_only_;
+  CEdit edit_;
+  CSpin spin_;
 };
 
 #endif // DLG_INPUT_H

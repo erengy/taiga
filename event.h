@@ -32,48 +32,55 @@ enum EventSearchMode {
   EVENT_SEARCH_TAGS
 };
 
-class CEventItem : public CMALAnimeValues {
+class EventItem : public MalAnimeValues {
 public:
-  CEventItem() : AnimeId(0), Mode(0) {}
-  int AnimeId, Mode;
-  wstring Reason, Time;
+  EventItem();
+  virtual ~EventItem() {}
+  
+public:
+  int anime_id, mode;
+  wstring reason, time;
 };
 
-class CEventList {
+class EventList {
 public:
-  CEventList();
-  virtual ~CEventList() {}
+  EventList();
+  virtual ~EventList() {}
   
-  void Add(CEventItem& item);
+  void Add(EventItem& item);
   void Check();
   void Clear();
+  EventItem* FindItem(int anime_id, int search_mode = 0);
   void Remove(unsigned int index);
-  CEventItem* SearchItem(int anime_id, int search_mode = 0);
   
-  unsigned int Index;
-  wstring User;
-  vector<CEventItem> Items;
+public:
+  unsigned int index;
+  vector<EventItem> items;
+  wstring user;
 };
 
-class CEventQueue {
+class EventQueue {
 public:
-  CEventQueue();
-  virtual ~CEventQueue() {}
+  EventQueue();
+  virtual ~EventQueue() {}
 
-  void Add(CEventItem& item, bool save = true, wstring user = L"");
+  void Add(EventItem& item, bool save = true, wstring user = L"");
   void Check();
   void Clear(bool save = true);
+  
+  EventItem* FindItem(int anime_id, int search_mode = 0);
+  EventList* FindList(wstring user = L"");
+  
   int GetItemCount();
-  int GetUserIndex(wstring user = L"");
   bool IsEmpty();
   void Remove(int index = -1, bool save = true);
-  CEventItem* SearchItem(int anime_id, int search_mode = 0);
   void Show();
 
-  bool UpdateInProgress;
-  vector<CEventList> List;
+public:
+  vector<EventList> list;
+  bool updating;
 };
 
-extern CEventQueue EventQueue;
+extern EventQueue EventQueue;
 
 #endif // EVENT_H

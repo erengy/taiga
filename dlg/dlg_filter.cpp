@@ -23,40 +23,40 @@
 #include "dlg_main.h"
 #include "../resource.h"
 
-CFilterWindow FilterWindow;
+class FilterDialog FilterDialog;
 
 // =============================================================================
 
-CFilterWindow::CFilterWindow() {
+FilterDialog::FilterDialog() {
   RegisterDlgClass(L"TaigaFilterW");
 }
 
-BOOL CFilterWindow::OnInitDialog() {
+BOOL FilterDialog::OnInitDialog() {
   RefreshFilters();
   return TRUE;
 }
 
-BOOL CFilterWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL FilterDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Status
   if (LOWORD(wParam) >= IDC_CHECK_FILTER_STATUS1 && 
     LOWORD(wParam) <= IDC_CHECK_FILTER_STATUS3) {
-      AnimeList.Filter.Status[2 - (IDC_CHECK_FILTER_STATUS3 - LOWORD(wParam))] = 
+      AnimeList.filters.status[2 - (IDC_CHECK_FILTER_STATUS3 - LOWORD(wParam))] = 
         IsDlgButtonChecked(LOWORD(wParam)) == TRUE;
   // Type
   } else if (LOWORD(wParam) >= IDC_CHECK_FILTER_TYPE1 && 
     LOWORD(wParam) <= IDC_CHECK_FILTER_TYPE6) {
-      AnimeList.Filter.Type[5 - (IDC_CHECK_FILTER_TYPE6 - LOWORD(wParam))] = 
+      AnimeList.filters.type[5 - (IDC_CHECK_FILTER_TYPE6 - LOWORD(wParam))] = 
         IsDlgButtonChecked(LOWORD(wParam)) == TRUE;
   }
   
   UpdateFilterMenu();
-  MainWindow.RefreshMenubar();
-  MainWindow.RefreshList();
+  MainDialog.RefreshMenubar();
+  MainDialog.RefreshList();
   
   return FALSE;
 }
 
-BOOL CFilterWindow::PreTranslateMessage(MSG* pMsg) {
+BOOL FilterDialog::PreTranslateMessage(MSG* pMsg) {
   if (pMsg->message == WM_KEYDOWN) {
     // Close window
     if (pMsg->wParam == VK_ESCAPE) {
@@ -69,15 +69,15 @@ BOOL CFilterWindow::PreTranslateMessage(MSG* pMsg) {
 
 // =============================================================================
 
-void CFilterWindow::RefreshFilters() {
+void FilterDialog::RefreshFilters() {
   if (!IsWindow()) return;
 
   // Status
   for (int i = 0; i < 3; i++) {
-    CheckDlgButton(IDC_CHECK_FILTER_STATUS1 + i, AnimeList.Filter.Status[i]);
+    CheckDlgButton(IDC_CHECK_FILTER_STATUS1 + i, AnimeList.filters.status[i]);
   }
   // Type
   for (int i = 0; i < 6; i++) {
-    CheckDlgButton(IDC_CHECK_FILTER_TYPE1 + i, AnimeList.Filter.Type[i]);
+    CheckDlgButton(IDC_CHECK_FILTER_TYPE1 + i, AnimeList.filters.type[i]);
   }
 }

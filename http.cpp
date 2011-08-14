@@ -43,11 +43,11 @@
 #include "win32/win_taskbar.h"
 #include "win32/win_taskdialog.h"
 
-CHTTPClient HTTPClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
+class HttpClient HttpClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
 
 // =============================================================================
 
-CHTTPClient::CHTTPClient() {
+HttpClient::HttpClient() {
   SetUserAgent(APP_NAME L"/" + 
     ToWSTR(APP_VERSION_MAJOR) + L"." + ToWSTR(APP_VERSION_MINOR));
   if (GetWinVersion() < WINVERSION_VISTA) {
@@ -55,7 +55,7 @@ CHTTPClient::CHTTPClient() {
   }
 }
 
-BOOL CHTTPClient::OnError(DWORD dwError) {
+BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWSTR(dwError) + L": " + 
     FormatError(dwError, L"winhttp.dll");
   DEBUG_PRINT(error_text + L"\n");
@@ -64,33 +64,33 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
     case HTTP_MAL_Login:
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin:
-      MainWindow.ChangeStatus(error_text);
-      MainWindow.EnableInput(true);
+      MainDialog.ChangeStatus(error_text);
+      MainDialog.EnableInput(true);
       break;
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_Image:
     case HTTP_Feed_DownloadIcon:
       #ifdef _DEBUG
-      MainWindow.ChangeStatus(error_text);
+      MainDialog.ChangeStatus(error_text);
       #endif
       break;
     case HTTP_MAL_SearchAnime:
-      SearchWindow.EnableInput(true);
+      SearchDialog.EnableInput(true);
       break;
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentWindow.ChangeStatus(error_text);
-      TorrentWindow.EnableInput();
+      TorrentDialog.ChangeStatus(error_text);
+      TorrentDialog.EnableInput();
       break;
     case HTTP_UpdateCheck:
       MessageBox(UpdateDialog.GetWindowHandle(), error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
       UpdateDialog.PostMessage(WM_CLOSE);
       break;
     default:
-      EventQueue.UpdateInProgress = false;
-      MainWindow.ChangeStatus(error_text);
-      MainWindow.EnableInput(true);
+      EventQueue.updating = false;
+      MainDialog.ChangeStatus(error_text);
+      MainDialog.EnableInput(true);
       break;
   }
   
@@ -98,18 +98,18 @@ BOOL CHTTPClient::OnError(DWORD dwError) {
   return 0;
 }
 
-BOOL CHTTPClient::OnSendRequestComplete() {
+BOOL HttpClient::OnSendRequestComplete() {
   wstring status = L"Connecting...";
   
   switch (GetClientMode()) {
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentWindow.ChangeStatus(status);
+      TorrentDialog.ChangeStatus(status);
       break;
     default:
       #ifdef _DEBUG
-      MainWindow.ChangeStatus(status);
+      MainDialog.ChangeStatus(status);
       #endif
       break;
   }
@@ -117,17 +117,17 @@ BOOL CHTTPClient::OnSendRequestComplete() {
   return 0;
 }
 
-BOOL CHTTPClient::OnHeadersAvailable(wstring headers) {
+BOOL HttpClient::OnHeadersAvailable(wstring headers) {
   switch (GetClientMode()) {
     case HTTP_Silent:
       break;
     case HTTP_UpdateCheck:
     case HTTP_UpdateDownload:
       if (m_dwTotal > 0) {
-        UpdateDialog.m_ProgressBar.SetMarquee(false);
-        UpdateDialog.m_ProgressBar.SetRange(0, m_dwTotal);
+        UpdateDialog.progressbar.SetMarquee(false);
+        UpdateDialog.progressbar.SetRange(0, m_dwTotal);
       } else {
-        UpdateDialog.m_ProgressBar.SetMarquee(true);
+        UpdateDialog.progressbar.SetMarquee(true);
       }
       break;
     default:
@@ -138,17 +138,17 @@ BOOL CHTTPClient::OnHeadersAvailable(wstring headers) {
   return 0;
 }
 
-BOOL CHTTPClient::OnRedirect(wstring address) {
+BOOL HttpClient::OnRedirect(wstring address) {
   wstring status = L"Redirecting... (" + address + L")";
   switch (GetClientMode()) {
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentWindow.ChangeStatus(status);
+      TorrentDialog.ChangeStatus(status);
       break;
     default:
       #ifdef _DEBUG
-      MainWindow.ChangeStatus(status);
+      MainDialog.ChangeStatus(status);
       #endif
       break;
   }
@@ -156,7 +156,7 @@ BOOL CHTTPClient::OnRedirect(wstring address) {
   return 0;
 }
 
-BOOL CHTTPClient::OnReadData() {
+BOOL HttpClient::OnReadData() {
   wstring status;
 
   switch (GetClientMode()) {
@@ -200,7 +200,7 @@ BOOL CHTTPClient::OnReadData() {
     case HTTP_UpdateCheck:
     case HTTP_UpdateDownload:
       if (m_dwTotal > 0) {
-        UpdateDialog.m_ProgressBar.SetPosition(m_dwDownloaded);
+        UpdateDialog.progressbar.SetPosition(m_dwDownloaded);
       }
       return 0;
     default:
@@ -219,17 +219,17 @@ BOOL CHTTPClient::OnReadData() {
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentWindow.ChangeStatus(status);
+      TorrentDialog.ChangeStatus(status);
       break;
     default:
-      MainWindow.ChangeStatus(status);
+      MainDialog.ChangeStatus(status);
       break;
   }
 
   return 0;
 }
 
-BOOL CHTTPClient::OnReadComplete() {
+BOOL HttpClient::OnReadComplete() {
   TaskbarList.SetProgressState(TBPF_NOPROGRESS);
   wstring status;
   
@@ -238,13 +238,13 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin: {
       AnimeList.Read();
-      MainWindow.ChangeStatus(L"List download completed.");
-      MainWindow.RefreshList(MAL_WATCHING);
-      MainWindow.RefreshTabs(MAL_WATCHING);
-      EventWindow.RefreshList();
-      SearchWindow.PostMessage(WM_CLOSE);
+      MainDialog.ChangeStatus(L"List download completed.");
+      MainDialog.RefreshList(MAL_WATCHING);
+      MainDialog.RefreshTabs(MAL_WATCHING);
+      EventDialog.RefreshList();
+      SearchDialog.PostMessage(WM_CLOSE);
       if (GetClientMode() == HTTP_MAL_RefreshList) {
-        MainWindow.EnableInput(true);
+        MainDialog.EnableInput(true);
         ExecuteAction(L"CheckEpisodes()", TRUE);
       } else if (GetClientMode() == HTTP_MAL_RefreshAndLogin) {
         MAL.Login();
@@ -257,22 +257,22 @@ BOOL CHTTPClient::OnReadComplete() {
     
     // Login
     case HTTP_MAL_Login: {
-      switch (Settings.Account.MAL.API) {
+      switch (Settings.Account.MAL.api) {
         case MAL_API_OFFICIAL:
-          Taiga.LoggedIn = InStr(GetData(), L"<username>" + Settings.Account.MAL.User + L"</username>", 0) > -1;
+          Taiga.logged_in = InStr(GetData(), L"<username>" + Settings.Account.MAL.user + L"</username>", 0) > -1;
           break;
         case MAL_API_NONE:
-          Taiga.LoggedIn = !(GetCookie().empty());
+          Taiga.logged_in = !(GetCookie().empty());
           break;
       }
-      if (Taiga.LoggedIn) {
-        status = L"Logged in as " + Settings.Account.MAL.User + L".";
-        MainWindow.m_Toolbar.SetButtonImage(0, Icon24_Online);
-        MainWindow.m_Toolbar.SetButtonText(0, L"Log out");
-        MainWindow.m_Toolbar.SetButtonTooltip(0, L"Log out");
+      if (Taiga.logged_in) {
+        status = L"Logged in as " + Settings.Account.MAL.user + L".";
+        MainDialog.toolbar.SetButtonImage(0, ICON24_ONLINE);
+        MainDialog.toolbar.SetButtonText(0, L"Log out");
+        MainDialog.toolbar.SetButtonTooltip(0, L"Log out");
       } else {
         status = L"Failed to log in.";
-        switch (Settings.Account.MAL.API) {
+        switch (Settings.Account.MAL.api) {
           case MAL_API_OFFICIAL:
             #ifdef _DEBUG
             status += L" (" + GetData() + L")";
@@ -289,11 +289,11 @@ BOOL CHTTPClient::OnReadComplete() {
             break;
         }
       }
-      MainWindow.ChangeStatus(status);
-      MainWindow.EnableInput(true);
-      MainWindow.RefreshMenubar();
-      MainWindow.UpdateTip();
-      switch (Settings.Account.MAL.API) {
+      MainDialog.ChangeStatus(status);
+      MainDialog.EnableInput(true);
+      MainDialog.RefreshMenubar();
+      MainDialog.UpdateTip();
+      switch (Settings.Account.MAL.api) {
         case MAL_API_OFFICIAL:
           EventQueue.Check();
           return TRUE;
@@ -309,7 +309,7 @@ BOOL CHTTPClient::OnReadComplete() {
     // Check profile
     case HTTP_MAL_Profile: {
       status = L"You have no new messages.";
-      if (Settings.Account.MAL.API == MAL_API_NONE) {
+      if (Settings.Account.MAL.api == MAL_API_NONE) {
         int msg_pos = InStr(GetData(), L"<a href=\"/mymessages.php\">(", 0);
         if (msg_pos > -1) {
           int msg_end = InStr(GetData(), L")", msg_pos);
@@ -329,7 +329,7 @@ BOOL CHTTPClient::OnReadComplete() {
             }
           }
         }
-        MainWindow.ChangeStatus(status);
+        MainDialog.ChangeStatus(status);
         EventQueue.Check();
         return TRUE;
       }
@@ -346,13 +346,13 @@ BOOL CHTTPClient::OnReadComplete() {
     case HTTP_MAL_ScoreUpdate:
     case HTTP_MAL_StatusUpdate:
     case HTTP_MAL_TagUpdate: {
-      EventQueue.UpdateInProgress = false;
-      MainWindow.ChangeStatus();
-      CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+      EventQueue.updating = false;
+      MainDialog.ChangeStatus();
+      Anime* anime = reinterpret_cast<Anime*>(GetParam());
       if (anime && EventQueue.GetItemCount() > 0) {
-        int user_index = EventQueue.GetUserIndex();
-        if (user_index > -1) {
-          anime->Edit(GetData(), EventQueue.List[user_index].Items[EventQueue.List[user_index].Index]);
+        EventList* event_list = EventQueue.FindList();
+        if (event_list) {
+          anime->Edit(event_list->items[event_list->index], GetData(), GetResponseStatusCode());
           return TRUE;
         }
       }
@@ -363,13 +363,13 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Anime details
     case HTTP_MAL_AnimeDetails: {
-      CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+      Anime* anime = reinterpret_cast<Anime*>(GetParam());
       if (MAL.ParseAnimeDetails(GetData(), anime)) {
-        if (AnimeWindow.IsWindow()) {
-          AnimeWindow.Refresh(anime, true, false);
+        if (AnimeDialog.IsWindow()) {
+          AnimeDialog.Refresh(anime, true, false);
         }
-        if (SeasonWindow.IsWindow()) {
-          SeasonWindow.m_List.RedrawWindow();
+        if (SeasonDialog.IsWindow()) {
+          SeasonDialog.RefreshList(true);
         }
       }
       break;
@@ -379,33 +379,21 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Download image
     case HTTP_MAL_Image: {
-      if (AnimeWindow.IsWindow()) {
-        AnimeWindow.Refresh(NULL, false, false);
+      if (AnimeDialog.IsWindow()) {
+        AnimeDialog.Refresh(NULL, false, false);
       }
-      if (SeasonWindow.IsWindow()) {
-        CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+      if (SeasonDialog.IsWindow()) {
+        Anime* anime = reinterpret_cast<Anime*>(GetParam());
         if (anime) {
-          for (auto it = SeasonWindow.Images.begin(); it != SeasonWindow.Images.end(); ++it) {
-            if (it->Data == anime->Series_ID) {
+          for (auto it = SeasonDialog.images.begin(); it != SeasonDialog.images.end(); ++it) {
+            if (it->data == anime->series_id) {
               if (it->Load(anime->GetImagePath())) {
-                SeasonWindow.m_List.RedrawWindow();
+                SeasonDialog.RefreshList(true);
                 break;
               }
             }
           }
         }
-        /*for (auto i = SeasonWindow.Images.begin(); i != SeasonWindow.Images.end(); ++i) {
-          if (i->DC.Get() == nullptr) {
-            for (auto j = SeasonDatabase.Items.begin(); j != SeasonDatabase.Items.end(); ++j) {
-              if (i->Data == j->Series_ID) {
-                if (anime != &(*j) || !anime) {
-                  MAL.DownloadImage(&(*j));
-                  return TRUE;
-                }
-              }
-            }
-          }
-        }*/
       }
       break;
     }
@@ -414,23 +402,23 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Search anime
     case HTTP_MAL_SearchAnime: {
-      CAnime* anime = reinterpret_cast<CAnime*>(GetParam());
+      Anime* anime = reinterpret_cast<Anime*>(GetParam());
       if (anime) {
         if (MAL.ParseSearchResult(GetData(), anime)) {
-          AnimeWindow.Refresh(anime, true, false);
-          SeasonWindow.m_List.RedrawWindow();
+          AnimeDialog.Refresh(anime, true, false);
+          SeasonDialog.RefreshList(true);
           if (MAL.GetAnimeDetails(anime, this)) return TRUE;
         } else {
           status = L"Could not read anime information.";
-          AnimeWindow.m_Page[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
+          AnimeDialog.pages[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
         }
         #ifdef _DEBUG
-        MainWindow.ChangeStatus(status);
+        MainDialog.ChangeStatus(status);
         #endif
       } else {
-        if (SearchWindow.IsWindow()) {
-          SearchWindow.ParseResults(GetData());
-          SearchWindow.EnableInput(true);
+        if (SearchDialog.IsWindow()) {
+          SearchDialog.ParseResults(GetData());
+          SearchDialog.EnableInput(true);
         }
       }
       break;
@@ -440,7 +428,7 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Torrent
     case HTTP_Feed_Check: {
-      CFeed* feed = reinterpret_cast<CFeed*>(GetParam());
+      Feed* feed = reinterpret_cast<Feed*>(GetParam());
       if (feed) {
         feed->Read();
         int torrent_count = feed->ExamineData();
@@ -449,13 +437,13 @@ BOOL CHTTPClient::OnReadComplete() {
         } else {
           status = L"No new torrents found.";
         }
-        if (TorrentWindow.IsWindow()) {
-          TorrentWindow.ChangeStatus(status);
-          TorrentWindow.RefreshList();
-          TorrentWindow.EnableInput();
+        if (TorrentDialog.IsWindow()) {
+          TorrentDialog.ChangeStatus(status);
+          TorrentDialog.RefreshList();
+          TorrentDialog.EnableInput();
           // TODO: GetIcon() fails if we don't return TRUE here
         } else {
-          switch (Settings.RSS.Torrent.NewAction) {
+          switch (Settings.RSS.Torrent.new_action) {
             // Notify
             case 1:
               Aggregator.Notify(*feed);
@@ -471,42 +459,42 @@ BOOL CHTTPClient::OnReadComplete() {
     }
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll: {
-      CFeed* feed = reinterpret_cast<CFeed*>(GetParam());
+      Feed* feed = reinterpret_cast<Feed*>(GetParam());
       if (feed) {
-        CFeedItem* feed_item = reinterpret_cast<CFeedItem*>(&feed->Items[feed->DownloadIndex]);
+        FeedItem* feed_item = reinterpret_cast<FeedItem*>(&feed->Items[feed->DownloadIndex]);
         wstring app_path, cmd, file = feed_item->Title;
         ValidateFileName(file);
         file = feed->GetDataPath() + file + L".torrent";
         Aggregator.FileArchive.push_back(feed_item->Title);
         if (FileExists(file)) {
-          switch (Settings.RSS.Torrent.NewAction) {
+          switch (Settings.RSS.Torrent.new_action) {
             // Default application
             case 1:
               app_path = GetDefaultAppPath(L".torrent", L"");
               break;
             // Custom application
             case 2:
-              app_path = Settings.RSS.Torrent.AppPath;
+              app_path = Settings.RSS.Torrent.app_path;
               break;
           }
-          if (Settings.RSS.Torrent.SetFolder && InStr(app_path, L"utorrent", 0, true) > -1) {
-            CAnime* anime = AnimeList.FindItem(feed_item->EpisodeData.AnimeId);
-            if (anime && !anime->Folder.empty()) {
-              cmd = L"/directory \"" + anime->Folder + L"\" ";
+          if (Settings.RSS.Torrent.set_folder && InStr(app_path, L"utorrent", 0, true) > -1) {
+            Anime* anime = AnimeList.FindItem(feed_item->EpisodeData.anime_id);
+            if (anime && !anime->folder.empty()) {
+              cmd = L"/directory \"" + anime->folder + L"\" ";
             }
           }
           cmd += L"\"" + file + L"\"";
           Execute(app_path, cmd);
           feed_item->Download = FALSE;
-          TorrentWindow.RefreshList();
+          TorrentDialog.RefreshList();
         }
         feed->DownloadIndex = -1;
         if (GetClientMode() == HTTP_Feed_DownloadAll) {
           if (feed->Download(-1)) return TRUE;
         }
       }
-      TorrentWindow.ChangeStatus(L"Successfully downloaded all torrents.");
-      TorrentWindow.EnableInput();
+      TorrentDialog.ChangeStatus(L"Successfully downloaded all torrents.");
+      TorrentDialog.EnableInput();
       break;
     }
     case HTTP_Feed_DownloadIcon: {
@@ -517,34 +505,34 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Twitter
     case HTTP_Twitter_Request: {
-      OAuthParameters response = Twitter.OAuth.ParseQueryString(GetData());
+      OAuthParameters response = Twitter.oauth.ParseQueryString(GetData());
       if (!response[L"oauth_token"].empty()) {
         ExecuteLink(L"http://api.twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
-        CInputDialog dlg;
-        dlg.Title = L"Twitter Authorization";
-        dlg.Info = L"Please enter the PIN shown on the page after logging into Twitter:";
+        InputDialog dlg;
+        dlg.title = L"Twitter Authorization";
+        dlg.info = L"Please enter the PIN shown on the page after logging into Twitter:";
         dlg.Show();
-        if (dlg.Result == IDOK && !dlg.Text.empty()) {
-          Twitter.AccessToken(response[L"oauth_token"], response[L"oauth_token_secret"], dlg.Text);
+        if (dlg.result == IDOK && !dlg.text.empty()) {
+          Twitter.AccessToken(response[L"oauth_token"], response[L"oauth_token_secret"], dlg.text);
           return TRUE;
         }
       }
-      MainWindow.ChangeStatus();
+      MainDialog.ChangeStatus();
       break;
     }
 	case HTTP_Twitter_Auth: {
-      OAuthParameters access = Twitter.OAuth.ParseQueryString(GetData());
+      OAuthParameters access = Twitter.oauth.ParseQueryString(GetData());
       if (!access[L"oauth_token"].empty() && !access[L"oauth_token_secret"].empty()) {
-        Settings.Announce.Twitter.OAuthKey = access[L"oauth_token"];
-        Settings.Announce.Twitter.OAuthSecret = access[L"oauth_token_secret"];
-        Settings.Announce.Twitter.User = access[L"screen_name"];
+        Settings.Announce.Twitter.oauth_key = access[L"oauth_token"];
+        Settings.Announce.Twitter.oauth_secret = access[L"oauth_token_secret"];
+        Settings.Announce.Twitter.user = access[L"screen_name"];
         status = L"Taiga is now authorized to post to this Twitter account: ";
-        status += Settings.Announce.Twitter.User;
+        status += Settings.Announce.Twitter.user;
       } else {
         status = L"Twitter authorization failed.";
       }
-      MainWindow.ChangeStatus(status);
-      SettingsWindow.RefreshTwitterLink();
+      MainDialog.ChangeStatus(status);
+      SettingsDialog.RefreshTwitterLink();
       break;
     }
     case HTTP_Twitter_Post: {
@@ -559,7 +547,7 @@ BOOL CHTTPClient::OnReadComplete() {
           status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
         }
       }
-      MainWindow.ChangeStatus(status);
+      MainDialog.ChangeStatus(status);
       break;
     }
 
@@ -567,7 +555,7 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Check updates
     case HTTP_UpdateCheck: {
-      if (Taiga.UpdateHelper.ParseData(GetData(), HTTP_UpdateDownload)) {
+      if (Taiga.Updater.ParseData(GetData(), HTTP_UpdateDownload)) {
         return TRUE;
       } else {
         UpdateDialog.PostMessage(WM_CLOSE);
@@ -577,9 +565,9 @@ BOOL CHTTPClient::OnReadComplete() {
 
     // Download updates
     case HTTP_UpdateDownload: {
-      CUpdateFile* file = reinterpret_cast<CUpdateFile*>(GetParam());
-      file->Download = false;
-      if (Taiga.UpdateHelper.DownloadNextFile(HTTP_UpdateDownload)) {
+      UpdateFile* file = reinterpret_cast<UpdateFile*>(GetParam());
+      file->download = false;
+      if (Taiga.Updater.DownloadNextFile(HTTP_UpdateDownload)) {
         return TRUE;
       } else {
         UpdateDialog.PostMessage(WM_CLOSE);
@@ -604,7 +592,7 @@ BOOL CHTTPClient::OnReadComplete() {
 
 void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) {
   #define SET_PROXY(client) client.SetProxy(proxy, user, pass);
-  SET_PROXY(HTTPClient);
+  SET_PROXY(HttpClient);
   SET_PROXY(ImageClient);
   SET_PROXY(MainClient);
   SET_PROXY(SearchClient);
@@ -613,6 +601,6 @@ void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) 
   for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
     SET_PROXY(Aggregator.Feeds[i].Client);
   }
-  SET_PROXY(Taiga.UpdateHelper.Client);
+  SET_PROXY(Taiga.Updater.client);
   #undef SET_PROXY
 }

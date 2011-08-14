@@ -692,8 +692,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,8,112,0
-    PRODUCTVERSION  0,8,112,0
+    FILEVERSION     0,8,115,0
+    PRODUCTVERSION  0,8,115,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -707,11 +707,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.8.112"
+            VALUE "FileVersion", "0.8.115"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.8.112"
+            VALUE "ProductVersion", "0.8.115"
         }
     }
     BLOCK "VarFileInfo"

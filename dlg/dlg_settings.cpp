@@ -35,7 +35,7 @@
 #include "../theme.h"
 #include "../win32/win_control.h"
 
-LPCWSTR PAGE_TITLE[PAGE_COUNT] = {
+const WCHAR* PAGE_TITLE[PAGE_COUNT] = {
   L" MyAnimeList",
   L" Update",
   L" HTTP announcement",
@@ -53,45 +53,45 @@ LPCWSTR PAGE_TITLE[PAGE_COUNT] = {
   L" Torrent filters"
 };
 
-CSettingsWindow SettingsWindow;
+class SettingsDialog SettingsDialog;
 
 // =============================================================================
 
-CSettingsWindow::CSettingsWindow() :
-  m_hStaticFont(NULL), m_iCurrentPage(PAGE_ACCOUNT)
+SettingsDialog::SettingsDialog() :
+  static_font_(nullptr), current_page_(PAGE_ACCOUNT)
 {
   RegisterDlgClass(L"TaigaSettingsW");
 
-  m_Page.resize(PAGE_COUNT);
+  pages.resize(PAGE_COUNT);
   for (size_t i = 0; i < PAGE_COUNT; i++) {
-    m_Page[i].Index = i;
+    pages[i].index = i;
   }
 }
 
-CSettingsWindow::~CSettingsWindow() {
-  if (m_hStaticFont) {
-    ::DeleteObject(m_hStaticFont);
-    m_hStaticFont = NULL;
+SettingsDialog::~SettingsDialog() {
+  if (static_font_) {
+    ::DeleteObject(static_font_);
+    static_font_ = nullptr;
   }
 }
 
-void CSettingsWindow::SetCurrentPage(int index) {
-  m_iCurrentPage = index;
-  if (IsWindow()) m_Page[index].Select();
+void SettingsDialog::SetCurrentPage(int index) {
+  current_page_ = index;
+  if (IsWindow()) pages[index].Select();
 }
 
 // =============================================================================
 
-BOOL CSettingsWindow::OnInitDialog() {
+BOOL SettingsDialog::OnInitDialog() {
   // Set title font
-  if (!m_hStaticFont) {
+  if (!static_font_) {
     LOGFONT lFont;
-    m_hStaticFont = GetFont();
-    ::GetObject(m_hStaticFont, sizeof(LOGFONT), &lFont);
+    static_font_ = GetFont();
+    ::GetObject(static_font_, sizeof(LOGFONT), &lFont);
     lFont.lfWeight = FW_BOLD;
-    m_hStaticFont = ::CreateFontIndirect(&lFont);
+    static_font_ = ::CreateFontIndirect(&lFont);
   }
-  SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, reinterpret_cast<WPARAM>(m_hStaticFont), TRUE);
+  SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, reinterpret_cast<WPARAM>(static_font_), TRUE);
   
   // Create pages
   RECT rcWindow, rcClient;
@@ -99,195 +99,195 @@ BOOL CSettingsWindow::OnInitDialog() {
   ::GetClientRect(GetDlgItem(IDC_STATIC_TITLE), &rcClient);
   ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rcWindow));
   for (size_t i = 0; i < PAGE_COUNT; i++) {
-    m_Page[i].Create(IDD_SETTINGS_PAGE01 + i, m_hWindow, false);
-    m_Page[i].SetPosition(NULL, rcWindow.left, (rcWindow.top * 2) + rcClient.bottom, 
+    pages[i].Create(IDD_SETTINGS_PAGE01 + i, m_hWindow, false);
+    pages[i].SetPosition(nullptr, rcWindow.left, (rcWindow.top * 2) + rcClient.bottom, 
       0, 0, SWP_HIDEWINDOW | SWP_NOSIZE);
   }
   
   // Add tree items
-  m_Tree.Attach(GetDlgItem(IDC_TREE_PAGES));
-  m_Tree.SetTheme();
+  tree_.Attach(GetDlgItem(IDC_TREE_PAGES));
+  tree_.SetTheme();
   // Account
-  HTREEITEM htAccount = m_Tree.InsertItem(L"Account", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_ACCOUNT]), NULL);
-  m_Page[PAGE_ACCOUNT].CreateItem(L"MyAnimeList", htAccount);
-  m_Page[PAGE_UPDATE].CreateItem(L"Update", htAccount);
-  m_Tree.Expand(htAccount);
+  HTREEITEM htAccount = tree_.InsertItem(L"Account", -1, reinterpret_cast<LPARAM>(&pages[PAGE_ACCOUNT]), nullptr);
+  pages[PAGE_ACCOUNT].CreateItem(L"MyAnimeList", htAccount, this);
+  pages[PAGE_UPDATE].CreateItem(L"Update", htAccount, this);
+  tree_.Expand(htAccount);
   // Folders
-  HTREEITEM htFolders = m_Tree.InsertItem(L"Anime folders", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_FOLDERS_ROOT]), NULL);
-  m_Page[PAGE_FOLDERS_ROOT].CreateItem(L"Root", htFolders);
-  m_Page[PAGE_FOLDERS_ANIME].CreateItem(L"Specific", htFolders);
-  m_Tree.Expand(htFolders);
+  HTREEITEM htFolders = tree_.InsertItem(L"Anime folders", -1, reinterpret_cast<LPARAM>(&pages[PAGE_FOLDERS_ROOT]), nullptr);
+  pages[PAGE_FOLDERS_ROOT].CreateItem(L"Root", htFolders, this);
+  pages[PAGE_FOLDERS_ANIME].CreateItem(L"Specific", htFolders, this);
+  tree_.Expand(htFolders);
   // Announcements
-  HTREEITEM htAnnounce = m_Tree.InsertItem(L"Announcements", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_HTTP]), NULL);
-  m_Page[PAGE_HTTP].CreateItem(L"HTTP", htAnnounce);
-  m_Page[PAGE_MESSENGER].CreateItem(L"Messenger", htAnnounce);
-  m_Page[PAGE_MIRC].CreateItem(L"mIRC", htAnnounce);
-  m_Page[PAGE_SKYPE].CreateItem(L"Skype", htAnnounce);
-  m_Page[PAGE_TWITTER].CreateItem(L"Twitter", htAnnounce);
-  m_Tree.Expand(htAnnounce);
+  HTREEITEM htAnnounce = tree_.InsertItem(L"Announcements", -1, reinterpret_cast<LPARAM>(&pages[PAGE_HTTP]), nullptr);
+  pages[PAGE_HTTP].CreateItem(L"HTTP", htAnnounce, this);
+  pages[PAGE_MESSENGER].CreateItem(L"Messenger", htAnnounce, this);
+  pages[PAGE_MIRC].CreateItem(L"mIRC", htAnnounce, this);
+  pages[PAGE_SKYPE].CreateItem(L"Skype", htAnnounce, this);
+  pages[PAGE_TWITTER].CreateItem(L"Twitter", htAnnounce, this);
+  tree_.Expand(htAnnounce);
   // Program
-  HTREEITEM htProgram = m_Tree.InsertItem(L"Program", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_PROGRAM]), NULL);
-  m_Page[PAGE_PROGRAM].CreateItem(L"General", htProgram);
-  m_Page[PAGE_LIST].CreateItem(L"List", htProgram);
-  m_Page[PAGE_NOTIFICATIONS].CreateItem(L"Notifications", htProgram);
-  m_Tree.Expand(htProgram);
+  HTREEITEM htProgram = tree_.InsertItem(L"Program", -1, reinterpret_cast<LPARAM>(&pages[PAGE_PROGRAM]), nullptr);
+  pages[PAGE_PROGRAM].CreateItem(L"General", htProgram, this);
+  pages[PAGE_LIST].CreateItem(L"List", htProgram, this);
+  pages[PAGE_NOTIFICATIONS].CreateItem(L"Notifications", htProgram, this);
+  tree_.Expand(htProgram);
   // Media players
-  HTREEITEM htRecognition = m_Tree.InsertItem(L"Recognition", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_MEDIA]), NULL);
-  m_Page[PAGE_MEDIA].CreateItem(L"Media players", htRecognition);
-  m_Tree.Expand(htRecognition);
+  HTREEITEM htRecognition = tree_.InsertItem(L"Recognition", -1, reinterpret_cast<LPARAM>(&pages[PAGE_MEDIA]), nullptr);
+  pages[PAGE_MEDIA].CreateItem(L"Media players", htRecognition, this);
+  tree_.Expand(htRecognition);
   // Torrent
-  HTREEITEM htTorrent = m_Tree.InsertItem(L"Torrent", -1, reinterpret_cast<LPARAM>(&m_Page[PAGE_TORRENT1]), NULL);
-  m_Page[PAGE_TORRENT1].CreateItem(L"Options", htTorrent);
-  m_Page[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent);
-  m_Tree.Expand(htTorrent);
+  HTREEITEM htTorrent = tree_.InsertItem(L"Torrent", -1, reinterpret_cast<LPARAM>(&pages[PAGE_TORRENT1]), nullptr);
+  pages[PAGE_TORRENT1].CreateItem(L"Options", htTorrent, this);
+  pages[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent, this);
+  tree_.Expand(htTorrent);
 
   // Select current page
-  m_Page[m_iCurrentPage].Select();
+  pages[current_page_].Select();
   return TRUE;
 }
 
 // =============================================================================
 
-void CSettingsWindow::OnOK() {
+void SettingsDialog::OnOK() {
   // Account
-  wstring mal_user_old = Settings.Account.MAL.User;
-  m_Page[PAGE_ACCOUNT].GetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.User);
-  m_Page[PAGE_ACCOUNT].GetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.Password);
-  Settings.Account.MAL.API = m_Page[PAGE_ACCOUNT].GetCheckedRadioButton(IDC_RADIO_API1, IDC_RADIO_API2) + 1;
-  Settings.Account.MAL.AutoLogin = m_Page[PAGE_ACCOUNT].IsDlgButtonChecked(IDC_CHECK_START_LOGIN);
+  wstring mal_user_old = Settings.Account.MAL.user;
+  pages[PAGE_ACCOUNT].GetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.user);
+  pages[PAGE_ACCOUNT].GetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.password);
+  Settings.Account.MAL.api = pages[PAGE_ACCOUNT].GetCheckedRadioButton(IDC_RADIO_API1, IDC_RADIO_API2) + 1;
+  Settings.Account.MAL.auto_login = pages[PAGE_ACCOUNT].IsDlgButtonChecked(IDC_CHECK_START_LOGIN);
 
   // Update
-  Settings.Account.Update.Mode = m_Page[PAGE_UPDATE].GetCheckedRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3) + 1;
-  Settings.Account.Update.Time = m_Page[PAGE_UPDATE].GetCheckedRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3) + 1;
-  Settings.Account.Update.Delay = m_Page[PAGE_UPDATE].GetDlgItemInt(IDC_EDIT_DELAY);
-  Settings.Account.Update.CheckPlayer = m_Page[PAGE_UPDATE].IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP);
-  Settings.Account.Update.OutOfRange = m_Page[PAGE_UPDATE].IsDlgButtonChecked(IDC_CHECK_UPDATE_RANGE);
+  Settings.Account.Update.mode = pages[PAGE_UPDATE].GetCheckedRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3) + 1;
+  Settings.Account.Update.time = pages[PAGE_UPDATE].GetCheckedRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3) + 1;
+  Settings.Account.Update.delay = pages[PAGE_UPDATE].GetDlgItemInt(IDC_EDIT_DELAY);
+  Settings.Account.Update.check_player = pages[PAGE_UPDATE].IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP);
+  Settings.Account.Update.out_of_range = pages[PAGE_UPDATE].IsDlgButtonChecked(IDC_CHECK_UPDATE_RANGE);
 
   // HTTP
-  Settings.Announce.HTTP.Enabled = m_Page[PAGE_HTTP].IsDlgButtonChecked(IDC_CHECK_HTTP);
-  m_Page[PAGE_HTTP].GetDlgItemText(IDC_EDIT_HTTP_URL, Settings.Announce.HTTP.URL);
+  Settings.Announce.HTTP.enabled = pages[PAGE_HTTP].IsDlgButtonChecked(IDC_CHECK_HTTP);
+  pages[PAGE_HTTP].GetDlgItemText(IDC_EDIT_HTTP_URL, Settings.Announce.HTTP.url);
   // Messenger
-  Settings.Announce.MSN.Enabled = m_Page[PAGE_MESSENGER].IsDlgButtonChecked(IDC_CHECK_MESSENGER);
+  Settings.Announce.MSN.enabled = pages[PAGE_MESSENGER].IsDlgButtonChecked(IDC_CHECK_MESSENGER);
   // mIRC
-  Settings.Announce.MIRC.Enabled = m_Page[PAGE_MIRC].IsDlgButtonChecked(IDC_CHECK_MIRC);
-  m_Page[PAGE_MIRC].GetDlgItemText(IDC_EDIT_MIRC_SERVICE, Settings.Announce.MIRC.Service);
-  Settings.Announce.MIRC.Mode = m_Page[PAGE_MIRC].GetCheckedRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3) + 1;
-  Settings.Announce.MIRC.MultiServer = m_Page[PAGE_MIRC].IsDlgButtonChecked(IDC_CHECK_MIRC_MULTISERVER);
-  Settings.Announce.MIRC.UseAction = m_Page[PAGE_MIRC].IsDlgButtonChecked(IDC_CHECK_MIRC_ACTION);
-  m_Page[PAGE_MIRC].GetDlgItemText(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.Channels);
+  Settings.Announce.MIRC.enabled = pages[PAGE_MIRC].IsDlgButtonChecked(IDC_CHECK_MIRC);
+  pages[PAGE_MIRC].GetDlgItemText(IDC_EDIT_MIRC_SERVICE, Settings.Announce.MIRC.service);
+  Settings.Announce.MIRC.mode = pages[PAGE_MIRC].GetCheckedRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3) + 1;
+  Settings.Announce.MIRC.multi_server = pages[PAGE_MIRC].IsDlgButtonChecked(IDC_CHECK_MIRC_MULTISERVER);
+  Settings.Announce.MIRC.use_action = pages[PAGE_MIRC].IsDlgButtonChecked(IDC_CHECK_MIRC_ACTION);
+  pages[PAGE_MIRC].GetDlgItemText(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.channels);
   // Skype
-  Settings.Announce.Skype.Enabled = m_Page[PAGE_SKYPE].IsDlgButtonChecked(IDC_CHECK_SKYPE);
+  Settings.Announce.Skype.enabled = pages[PAGE_SKYPE].IsDlgButtonChecked(IDC_CHECK_SKYPE);
   // Twitter
-  Settings.Announce.Twitter.Enabled = m_Page[PAGE_TWITTER].IsDlgButtonChecked(IDC_CHECK_TWITTER);
+  Settings.Announce.Twitter.enabled = pages[PAGE_TWITTER].IsDlgButtonChecked(IDC_CHECK_TWITTER);
 
   // Folders > Root
-  CListView List = m_Page[PAGE_FOLDERS_ROOT].GetDlgItem(IDC_LIST_FOLDERS_ROOT);
-  Settings.Folders.Root.clear();
+  CListView List = pages[PAGE_FOLDERS_ROOT].GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+  Settings.Folders.root.clear();
   for (int i = 0; i < List.GetItemCount(); i++) {
     wstring folder;
     List.GetItemText(i, 0, folder);
-    Settings.Folders.Root.push_back(folder);
+    Settings.Folders.root.push_back(folder);
   }
-  Settings.Folders.WatchEnabled = m_Page[PAGE_FOLDERS_ROOT].IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH);
+  Settings.Folders.watch_enabled = pages[PAGE_FOLDERS_ROOT].IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH);
   // Folders > Specific
-  CAnime* pItem; wstring folder;
-  List.SetWindowHandle(m_Page[PAGE_FOLDERS_ANIME].GetDlgItem(IDC_LIST_FOLDERS_ANIME));
+  Anime* anime; wstring folder;
+  List.SetWindowHandle(pages[PAGE_FOLDERS_ANIME].GetDlgItem(IDC_LIST_FOLDERS_ANIME));
   for (int i = 0; i < List.GetItemCount(); i++) {
-    pItem = reinterpret_cast<CAnime*>(List.GetItemParam(i));
-    if (pItem) {
+    anime = reinterpret_cast<Anime*>(List.GetItemParam(i));
+    if (anime) {
       List.GetItemText(i, 1, folder);
-      pItem->SetFolder(folder, true, false);
+      anime->SetFolder(folder, true, false);
     }
   }
-  List.SetWindowHandle(NULL);
+  List.SetWindowHandle(nullptr);
 
   // Program > General
-  Settings.Program.General.AutoStart = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_AUTOSTART);
-  Settings.Program.General.Close = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_GENERAL_CLOSE);
-  Settings.Program.General.Minimize = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_GENERAL_MINIMIZE);
-  wstring theme_old = Settings.Program.General.Theme;
-  m_Page[PAGE_PROGRAM].GetDlgItemText(IDC_COMBO_THEME, Settings.Program.General.Theme);
-  Settings.Program.StartUp.CheckNewVersion = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_VERSION);
-  Settings.Program.StartUp.CheckNewEpisodes = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_CHECKEPS);
-  Settings.Program.StartUp.Minimize = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_MINIMIZE);
-  Settings.Program.Exit.Ask = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_EXIT_ASK);
-  Settings.Program.Exit.SaveBuffer = m_Page[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_EXIT_SAVEBUFFER);
-  m_Page[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_HOST, Settings.Program.Proxy.Host);
-  m_Page[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_USER, Settings.Program.Proxy.User);
-  m_Page[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_PASS, Settings.Program.Proxy.Password);
+  Settings.Program.General.auto_start = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_AUTOSTART);
+  Settings.Program.General.close = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_GENERAL_CLOSE);
+  Settings.Program.General.minimize = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_GENERAL_MINIMIZE);
+  wstring theme_old = Settings.Program.General.theme;
+  pages[PAGE_PROGRAM].GetDlgItemText(IDC_COMBO_THEME, Settings.Program.General.theme);
+  Settings.Program.StartUp.check_new_version = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_VERSION);
+  Settings.Program.StartUp.check_new_episodes = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_CHECKEPS);
+  Settings.Program.StartUp.minimize = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_MINIMIZE);
+  Settings.Program.Exit.ask = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_EXIT_ASK);
+  Settings.Program.Exit.save_event_queue = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_EXIT_SAVEBUFFER);
+  pages[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_HOST, Settings.Program.Proxy.host);
+  pages[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_USER, Settings.Program.Proxy.user);
+  pages[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_PASS, Settings.Program.Proxy.password);
 
   // Program > List
-  Settings.Program.List.DoubleClick = m_Page[PAGE_LIST].GetComboSelection(IDC_COMBO_DBLCLICK);
-  Settings.Program.List.MiddleClick = m_Page[PAGE_LIST].GetComboSelection(IDC_COMBO_MDLCLICK);
-  AnimeList.Filter.NewEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS) == TRUE;
-  Settings.Program.List.Highlight = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
-  Settings.Program.List.ProgressMode = m_Page[PAGE_LIST].GetCheckedRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2);
-  Settings.Program.List.ProgressShowEps = m_Page[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
+  Settings.Program.List.double_click = pages[PAGE_LIST].GetComboSelection(IDC_COMBO_DBLCLICK);
+  Settings.Program.List.middle_click = pages[PAGE_LIST].GetComboSelection(IDC_COMBO_MDLCLICK);
+  AnimeList.filters.new_episodes = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS) == TRUE;
+  Settings.Program.List.highlight = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
+  Settings.Program.List.progress_mode = pages[PAGE_LIST].GetCheckedRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2);
+  Settings.Program.List.progress_show_eps = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
 
   // Program > Notifications
-  Settings.Program.Balloon.Enabled = m_Page[PAGE_NOTIFICATIONS].IsDlgButtonChecked(IDC_CHECK_BALLOON);
+  Settings.Program.Balloon.enabled = pages[PAGE_NOTIFICATIONS].IsDlgButtonChecked(IDC_CHECK_BALLOON);
 
   // Recognition > Media players
-  List.SetWindowHandle(m_Page[PAGE_MEDIA].GetDlgItem(IDC_LIST_MEDIA));
+  List.SetWindowHandle(pages[PAGE_MEDIA].GetDlgItem(IDC_LIST_MEDIA));
   for (size_t i = 0; i < MediaPlayers.Items.size(); i++) {
     MediaPlayers.Items[i].Enabled = List.GetCheckState(i);
   }
-  List.SetWindowHandle(NULL);
+  List.SetWindowHandle(nullptr);
 
   // Torrent > Options
-  m_Page[PAGE_TORRENT1].GetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings.RSS.Torrent.Source);
-  Settings.RSS.Torrent.HideUnidentified = m_Page[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_HIDE);
-  Settings.RSS.Torrent.CheckEnabled = m_Page[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCHECK);
-  Settings.RSS.Torrent.CheckInterval = m_Page[PAGE_TORRENT1].GetDlgItemInt(IDC_EDIT_TORRENT_INTERVAL);
-  Settings.RSS.Torrent.AppMode = m_Page[PAGE_TORRENT1].GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1;
-  Settings.RSS.Torrent.NewAction = m_Page[PAGE_TORRENT1].GetCheckedRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2) + 1;
-  m_Page[PAGE_TORRENT1].GetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.AppPath);
-  Settings.RSS.Torrent.SetFolder = m_Page[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER);
+  pages[PAGE_TORRENT1].GetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings.RSS.Torrent.source);
+  Settings.RSS.Torrent.hide_unidentified = pages[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_HIDE);
+  Settings.RSS.Torrent.check_enabled = pages[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCHECK);
+  Settings.RSS.Torrent.check_interval = pages[PAGE_TORRENT1].GetDlgItemInt(IDC_EDIT_TORRENT_INTERVAL);
+  Settings.RSS.Torrent.app_mode = pages[PAGE_TORRENT1].GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1;
+  Settings.RSS.Torrent.new_action = pages[PAGE_TORRENT1].GetCheckedRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2) + 1;
+  pages[PAGE_TORRENT1].GetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_path);
+  Settings.RSS.Torrent.set_folder = pages[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER);
   // Torrent > Filters
-  Settings.RSS.Torrent.Filters.GlobalEnabled = m_Page[PAGE_TORRENT2].IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTER);
-  List.SetWindowHandle(m_Page[PAGE_TORRENT2].GetDlgItem(IDC_LIST_TORRENT_FILTER));
+  Settings.RSS.Torrent.Filters.global_enabled = pages[PAGE_TORRENT2].IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTER);
+  List.SetWindowHandle(pages[PAGE_TORRENT2].GetDlgItem(IDC_LIST_TORRENT_FILTER));
   for (int i = 0; i < List.GetItemCount(); i++) {
-    CFeedFilter* filter = reinterpret_cast<CFeedFilter*>(List.GetItemParam(i));
+    FeedFilter* filter = reinterpret_cast<FeedFilter*>(List.GetItemParam(i));
     if (filter) filter->Enabled = List.GetCheckState(i) == TRUE;
   }
-  List.SetWindowHandle(NULL);
+  List.SetWindowHandle(nullptr);
   Aggregator.FilterManager.Filters.clear();
-  for (auto it = m_FeedFilters.begin(); it != m_FeedFilters.end(); ++it) {
+  for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it) {
     Aggregator.FilterManager.Filters.push_back(*it);
   }
 
   // Save settings
-  MediaPlayers.Write();
-  Settings.Write();
+  MediaPlayers.Save();
+  Settings.Save();
 
   // Change theme
-  if (Settings.Program.General.Theme != theme_old) {
-    UI.Read(Settings.Program.General.Theme);
+  if (Settings.Program.General.theme != theme_old) {
+    UI.Read(Settings.Program.General.theme);
     UI.LoadImages();
-    MainWindow.m_Rebar.RedrawWindow();
-    MainWindow.RefreshMenubar();
+    MainDialog.rebar.RedrawWindow();
+    MainDialog.RefreshMenubar();
   }
 
   // Refresh other windows
-  if (Settings.Account.MAL.User != mal_user_old) {
+  if (Settings.Account.MAL.user != mal_user_old) {
     AnimeList.Read();
-    CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
-    MainWindow.RefreshList(MAL_WATCHING);
-    MainWindow.RefreshTabs(MAL_WATCHING);
-    EventWindow.RefreshList();
-    SearchWindow.PostMessage(WM_CLOSE);
+    CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
+    MainDialog.RefreshList(MAL_WATCHING);
+    MainDialog.RefreshTabs(MAL_WATCHING);
+    EventDialog.RefreshList();
+    SearchDialog.PostMessage(WM_CLOSE);
     ExecuteAction(L"Logout(" + mal_user_old + L")");
   } else {
-    MainWindow.RefreshList();
+    MainDialog.RefreshList();
   }
 
   // Enable/disable folder monitor
-  FolderMonitor.Enable(Settings.Folders.WatchEnabled == TRUE);
+  FolderMonitor.Enable(Settings.Folders.watch_enabled == TRUE);
 
   // Setup proxy
-  SetProxies(Settings.Program.Proxy.Host, 
-    Settings.Program.Proxy.User, 
-    Settings.Program.Proxy.Password);
+  SetProxies(Settings.Program.Proxy.host, 
+    Settings.Program.Proxy.user, 
+    Settings.Program.Proxy.password);
 
   // End dialog
   EndDialog(IDOK);
@@ -295,7 +295,7 @@ void CSettingsWindow::OnOK() {
 
 // =============================================================================
 
-INT_PTR CSettingsWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     // Set title color
     case WM_CTLCOLORSTATIC: {
@@ -325,18 +325,18 @@ INT_PTR CSettingsWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL: {
-      switch (m_iCurrentPage) {
+      switch (current_page_) {
         case PAGE_FOLDERS_ROOT:
-          return m_Page[PAGE_FOLDERS_ROOT].SendDlgItemMessage(
+          return pages[PAGE_FOLDERS_ROOT].SendDlgItemMessage(
             IDC_LIST_FOLDERS_ROOT, uMsg, wParam, lParam);
         case PAGE_FOLDERS_ANIME:
-          return m_Page[PAGE_FOLDERS_ANIME].SendDlgItemMessage(
+          return pages[PAGE_FOLDERS_ANIME].SendDlgItemMessage(
             IDC_LIST_FOLDERS_ANIME, uMsg, wParam, lParam);
         case PAGE_MEDIA:
-          return m_Page[PAGE_MEDIA].SendDlgItemMessage(
+          return pages[PAGE_MEDIA].SendDlgItemMessage(
             IDC_LIST_MEDIA, uMsg, wParam, lParam);
         case PAGE_TORRENT2:
-          return m_Page[PAGE_TORRENT2].SendDlgItemMessage(
+          return pages[PAGE_TORRENT2].SendDlgItemMessage(
             IDC_LIST_TORRENT_FILTER, uMsg, wParam, lParam);
       }
       break;
@@ -349,13 +349,13 @@ INT_PTR CSettingsWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         switch (pnmh->code) {
           case TVN_SELCHANGED: {
             LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(lParam);
-            CSettingsPage* pPageNew = reinterpret_cast<CSettingsPage*>(pnmtv->itemNew.lParam);
-            CSettingsPage* pPageOld = reinterpret_cast<CSettingsPage*>(pnmtv->itemOld.lParam);
-            if (pPageNew != pPageOld) {
-              SetDlgItemText(IDC_STATIC_TITLE, PAGE_TITLE[pPageNew->Index]);
-              if (pPageOld) pPageOld->Hide();
-              m_iCurrentPage = pPageNew->Index;
-              pPageNew->Show();
+            SettingsPage* page_new = reinterpret_cast<SettingsPage*>(pnmtv->itemNew.lParam);
+            SettingsPage* page_old = reinterpret_cast<SettingsPage*>(pnmtv->itemOld.lParam);
+            if (page_new != page_old) {
+              SetDlgItemText(IDC_STATIC_TITLE, PAGE_TITLE[page_new->index]);
+              if (page_old) page_old->Hide();
+              current_page_ = page_new->index;
+              page_new->Show();
             }
           }
           break;
@@ -368,7 +368,7 @@ INT_PTR CSettingsWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CSettingsWindow::CSettingsTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {  
     // Forward mouse wheel messages to parent
     case WM_MOUSEWHEEL: {
@@ -381,14 +381,46 @@ LRESULT CSettingsWindow::CSettingsTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM 
 
 // =============================================================================
 
-void CSettingsWindow::RefreshTwitterLink() {
+int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter) {
   wstring text;
-  if (Settings.Announce.Twitter.User.empty()) {
+  CListView List = hwnd_list;
+  int index = List.GetItemCount();
+  int group = filter.AnimeIds.empty() ? 0 : 1;
+  int icon = ICON16_FUNNEL;
+  switch (filter.Action) {
+    case FEED_FILTER_ACTION_DISCARD: icon = ICON16_FUNNEL_CROSS; break;
+    case FEED_FILTER_ACTION_SELECT:  icon = ICON16_FUNNEL_TICK;  break;
+    case FEED_FILTER_ACTION_PREFER:  icon = ICON16_FUNNEL_PLUS;  break;
+  }
+
+  // Insert item
+  index = List.InsertItem(index, group, icon, 0, nullptr, filter.Name.c_str(), 
+    reinterpret_cast<LPARAM>(&filter));
+  List.SetCheckState(index, filter.Enabled);
+  
+  List.SetWindowHandle(nullptr);
+  return index;
+}
+
+void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {
+  CListView List = hwnd_list;
+  List.DeleteAllItems();
+
+  for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it) {
+    AddTorrentFilterToList(hwnd_list, *it);
+  }
+
+  List.SetWindowHandle(nullptr);
+}
+
+void SettingsDialog::RefreshTwitterLink() {
+  wstring text;
+  if (Settings.Announce.Twitter.user.empty()) {
     text = L"Taiga is not authorized to post to your Twitter account yet.";
   } else {
     text = L"Taiga is authorized to post to this Twitter account: ";
-    text += L"<a href=\"URL(http://twitter.com/" + Settings.Announce.Twitter.User;
-    text += L")\">" + Settings.Announce.Twitter.User + L"</a>";
+    text += L"<a href=\"URL(http://twitter.com/" + Settings.Announce.Twitter.user;
+    text += L")\">" + Settings.Announce.Twitter.user + L"</a>";
   }
-  m_Page[PAGE_TWITTER].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
+  pages[PAGE_TWITTER].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
 }

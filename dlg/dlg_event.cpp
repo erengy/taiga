@@ -25,45 +25,45 @@
 #include "../resource.h"
 #include "../string.h"
 
-CEventWindow EventWindow;
+class EventDialog EventDialog;
 
 // =============================================================================
 
-CEventWindow::CEventWindow() {
+EventDialog::EventDialog() {
   RegisterDlgClass(L"TaigaEventW");
 }
 
-BOOL CEventWindow::OnInitDialog() {
+BOOL EventDialog::OnInitDialog() {
   // Create list
-  m_List.Attach(GetDlgItem(IDC_LIST_EVENT));
-  m_List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  m_List.SetTheme();
+  list_.Attach(GetDlgItem(IDC_LIST_EVENT));
+  list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  list_.SetTheme();
   
   // Insert list columns
-  m_List.InsertColumn(0, 190, 190, LVCFMT_LEFT,   L"Anime title");
-  m_List.InsertColumn(1,  55,  55, LVCFMT_CENTER, L"Episode");
-  m_List.InsertColumn(2,  50,  50, LVCFMT_CENTER, L"Score");
-  m_List.InsertColumn(3, 110, 110, LVCFMT_LEFT,   L"Status");
-  m_List.InsertColumn(4, 110, 110, LVCFMT_LEFT,   L"Tags");
-  m_List.InsertColumn(5, 120, 120, LVCFMT_LEFT,   L"Last modified");
-  m_List.SetColumnWidth(5, LVSCW_AUTOSIZE_USEHEADER);
+  list_.InsertColumn(0, 190, 190, LVCFMT_LEFT,   L"Anime title");
+  list_.InsertColumn(1,  55,  55, LVCFMT_CENTER, L"Episode");
+  list_.InsertColumn(2,  50,  50, LVCFMT_CENTER, L"Score");
+  list_.InsertColumn(3, 110, 110, LVCFMT_LEFT,   L"Status");
+  list_.InsertColumn(4, 110, 110, LVCFMT_LEFT,   L"Tags");
+  list_.InsertColumn(5, 120, 120, LVCFMT_LEFT,   L"Last modified");
+  list_.SetColumnWidth(5, LVSCW_AUTOSIZE_USEHEADER);
   
   // Refresh list
   RefreshList();
   return TRUE;
 }
 
-BOOL CEventWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL EventDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Clear all items
     case IDC_BUTTON_EVENT_CLEAR: {
-      if (EventQueue.UpdateInProgress) {
+      if (EventQueue.updating) {
         MessageBox(L"Event list can not be cleared while an update is in progress.", L"Error", MB_ICONERROR);
       } else {
         EventQueue.Clear();
         RefreshList();
-        MainWindow.RefreshList();
-        MainWindow.RefreshTabs();
+        MainDialog.RefreshList();
+        MainDialog.RefreshTabs();
         return TRUE;
       }
     }
@@ -72,8 +72,8 @@ BOOL CEventWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-LRESULT CEventWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
-  if (pnmh->hwndFrom == m_List.GetWindowHandle()) {
+LRESULT EventDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  if (pnmh->hwndFrom == list_.GetWindowHandle()) {
     switch (pnmh->code) {
       case NM_CUSTOMDRAW:
         LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(pnmh);
@@ -93,37 +93,37 @@ LRESULT CEventWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-void CEventWindow::OnOK() {
+void EventDialog::OnOK() {
   EventQueue.Check();
 }
 
-void CEventWindow::RefreshList() {
+void EventDialog::RefreshList() {
   if (!IsWindow()) return;
   
   // Clear list
-  m_List.DeleteAllItems();
+  list_.DeleteAllItems();
   
   // Add items
-  int user_index = EventQueue.GetUserIndex();
-  if (user_index > -1) {
-    for (auto it = EventQueue.List[user_index].Items.begin(); it != EventQueue.List[user_index].Items.end(); ++it) {
+  EventList* event_list = EventQueue.FindList();
+  if (event_list) {
+    for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
       int episode = it->episode; if (episode == -1) episode++;
       int score = it->score; if (score == -1) score++;
       int status = it->status;
       int rewatching = it->enable_rewatching;
       wstring tags = it->tags; if (tags == EMPTY_STR) tags.clear();
-      CAnime* anime = AnimeList.FindItem(it->AnimeId);
-      int i = m_List.GetItemCount();
+      Anime* anime = AnimeList.FindItem(it->anime_id);
+      int i = list_.GetItemCount();
       if (anime) {
-        m_List.InsertItem(i, -1, -1, 0, NULL, anime->Series_Title.c_str(), reinterpret_cast<LPARAM>(anime));
+        list_.InsertItem(i, -1, -1, 0, nullptr, anime->series_title.c_str(), reinterpret_cast<LPARAM>(anime));
       } else {
-        m_List.InsertItem(i, -1, -1, 0, NULL, L"???", 0);
+        list_.InsertItem(i, -1, -1, 0, nullptr, L"???", 0);
       }
-      m_List.SetItem(i, 1, MAL.TranslateNumber(episode, L"").c_str());
-      m_List.SetItem(i, 2, MAL.TranslateNumber(score, L"").c_str());
-      m_List.SetItem(i, 3, rewatching != TRUE ? MAL.TranslateMyStatus(status, false).c_str() : L"Re-watching");
-      m_List.SetItem(i, 4, tags.c_str());
-      m_List.SetItem(i, 5, it->Time.c_str());
+      list_.SetItem(i, 1, MAL.TranslateNumber(episode, L"").c_str());
+      list_.SetItem(i, 2, MAL.TranslateNumber(score, L"").c_str());
+      list_.SetItem(i, 3, rewatching != TRUE ? MAL.TranslateMyStatus(status, false).c_str() : L"Re-watching");
+      list_.SetItem(i, 4, tags.c_str());
+      list_.SetItem(i, 5, it->time.c_str());
     }
   }
 

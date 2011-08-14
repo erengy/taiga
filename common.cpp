@@ -125,13 +125,13 @@ wstring JoinEpisodeNumbers(const vector<int>& input) {
 int StatusToIcon(int status) {  
   switch (status) {
     case MAL_AIRING:
-      return Icon16_Green;
+      return ICON16_GREEN;
     case MAL_FINISHED:
-      return Icon16_Blue;
+      return ICON16_BLUE;
     case MAL_NOTYETAIRED:
-      return Icon16_Red;
+      return ICON16_RED;
     default:
-      return Icon16_Gray;
+      return ICON16_GRAY;
   }
 }
 

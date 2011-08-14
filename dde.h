@@ -23,10 +23,10 @@
 
 // =============================================================================
 
-class CDDE {
+class DynamicDataExchange {
 public:
-  CDDE();
-  ~CDDE();
+  DynamicDataExchange();
+  ~DynamicDataExchange();
   
   BOOL ClientTransaction(const wstring& item, const wstring& data, wstring* output, UINT wType);
   BOOL Connect(const wstring& service, const wstring& topic);
@@ -41,11 +41,12 @@ public:
   virtual void OnRequest() {}
 
 private:
-  static FNCALLBACK DDECallback;
+  static FNCALLBACK DdeCallback;
 
-  BOOL m_bUnicode;
-  DWORD m_dwInstance;
-  HCONV m_hConversation;
+private:
+  HCONV conversation_;
+  DWORD instance_;
+  BOOL is_unicode_;
 };
 
 #endif // DDE_H

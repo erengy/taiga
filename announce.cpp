@@ -27,8 +27,8 @@
 #include "string.h"
 #include "win32/win_taskdialog.h"
 
-CSkype Skype;
-CTwitter Twitter;
+class Skype Skype;
+class Twitter Twitter;
 
 // =============================================================================
 
@@ -38,7 +38,7 @@ void AnnounceToHTTP(wstring address, wstring data) {
   if (address.empty() || data.empty()) return;
 
   CUrl url(address);
-  HTTPClient.Post(url, data, L"", HTTP_Silent);
+  HttpClient.Post(url, data, L"", HTTP_Silent);
 }
 
 // =============================================================================
@@ -76,7 +76,7 @@ BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, B
   if (service.empty() || channels.empty() || data.empty()) return FALSE;
 
   // Initialize
-  CDDE DDE;
+  DynamicDataExchange DDE;
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     CTaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE initialization failed.");
@@ -152,7 +152,7 @@ BOOL TestMIRCConnection(wstring service) {
   }
 
   // Initialize
-  CDDE DDE;
+  DynamicDataExchange DDE;
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.Show(g_hMain);
@@ -186,41 +186,41 @@ BOOL TestMIRCConnection(wstring service) {
 
 /* Skype */
 
-CSkype::CSkype() {
-  m_APIWindowHandle = NULL;
-  m_uControlAPIAttach = ::RegisterWindowMessage(L"SkypeControlAPIAttach");
-  m_uControlAPIDiscover = ::RegisterWindowMessage(L"SkypeControlAPIDiscover");
+Skype::Skype() {
+  api_window_handle = NULL;
+  control_api_attach = ::RegisterWindowMessage(L"SkypeControlAPIAttach");
+  control_api_discover = ::RegisterWindowMessage(L"SkypeControlAPIDiscover");
 }
 
-BOOL CSkype::Attach() {
+BOOL Skype::Attach() {
   PDWORD_PTR sendMessageResult = NULL;
-  return SendMessageTimeout(HWND_BROADCAST, m_uControlAPIDiscover, reinterpret_cast<WPARAM>(g_hMain), 
+  return SendMessageTimeout(HWND_BROADCAST, control_api_discover, reinterpret_cast<WPARAM>(g_hMain), 
     0, SMTO_NORMAL, 1000, sendMessageResult);
 }
 
-BOOL CSkype::ChangeMood() {
-  m_Mood = L"SET PROFILE RICH_MOOD_TEXT " + m_Mood;
-  const char* buffer = ToANSI(m_Mood);
-  m_Mood.clear();
+BOOL Skype::ChangeMood() {
+  mood = L"SET PROFILE RICH_MOOD_TEXT " + mood;
+  const char* buffer = ToANSI(mood);
+  mood.clear();
 
   COPYDATASTRUCT cds;
   cds.dwData = 0;
   cds.lpData = (void*)buffer;
   cds.cbData = strlen(buffer) + 1;
 
-  if (SendMessage(m_APIWindowHandle, WM_COPYDATA, reinterpret_cast<WPARAM>(g_hMain), 
+  if (SendMessage(api_window_handle, WM_COPYDATA, reinterpret_cast<WPARAM>(g_hMain), 
     reinterpret_cast<LPARAM>(&cds)) == FALSE) {
-      m_APIWindowHandle = NULL;
+      api_window_handle = NULL;
       return FALSE;
   } else {
     return TRUE;
   }
 }
 
-void AnnounceToSkype(wstring mood) {
-  Skype.m_Mood = mood;
+void AnnounceToSkype(const wstring& mood) {
+  Skype.mood = mood;
 
-  if (Skype.m_APIWindowHandle == NULL) {
+  if (Skype.api_window_handle == NULL) {
     Skype.Attach();
   } else {
     Skype.ChangeMood();
@@ -231,15 +231,15 @@ void AnnounceToSkype(wstring mood) {
 
 /* Twitter */
 
-CTwitter::CTwitter() {
+Twitter::Twitter() {
   // These are unique values that identify Taiga
-  OAuth.ConsumerKey = L"9GZsCbqzjOrsPWlIlysvg";
-  OAuth.ConsumerSecret = L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw";
+  oauth.ConsumerKey = L"9GZsCbqzjOrsPWlIlysvg";
+  oauth.ConsumerSecret = L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw";
 }
 
-bool CTwitter::RequestToken() {
+bool Twitter::RequestToken() {
   wstring header = TwitterClient.GetDefaultHeader() + 
-    OAuth.BuildHeader(
+    oauth.BuildHeader(
     L"http://twitter.com/oauth/request_token", 
     L"GET", NULL);
 
@@ -249,9 +249,9 @@ bool CTwitter::RequestToken() {
     HTTP_Twitter_Request);
 }
 
-bool CTwitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
+bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
   wstring header = TwitterClient.GetDefaultHeader() + 
-    OAuth.BuildHeader(
+    oauth.BuildHeader(
     L"http://twitter.com/oauth/access_token", 
     L"POST", NULL, 
     key, secret, pin);
@@ -262,24 +262,24 @@ bool CTwitter::AccessToken(const wstring& key, const wstring& secret, const wstr
     HTTP_Twitter_Auth);
 }
 
-bool CTwitter::SetStatusText(const wstring& status_text) {
-  if (Settings.Announce.Twitter.OAuthKey.empty() || Settings.Announce.Twitter.OAuthSecret.empty()) {
+bool Twitter::SetStatusText(const wstring& status_text) {
+  if (Settings.Announce.Twitter.oauth_key.empty() || Settings.Announce.Twitter.oauth_secret.empty()) {
     return false;
   }
-  if (status_text.empty() || status_text == m_StatusText) {
+  if (status_text.empty() || status_text == status_text_) {
     return false;
   }
-  m_StatusText = status_text;
+  status_text_ = status_text;
 
   OAuthParameters post_parameters;
-  post_parameters[L"status"] = EncodeURL(m_StatusText);
+  post_parameters[L"status"] = EncodeURL(status_text_);
 
   wstring header = TwitterClient.GetDefaultHeader() + 
-    OAuth.BuildHeader(
+    oauth.BuildHeader(
     L"http://twitter.com/statuses/update.xml", 
     L"POST", &post_parameters, 
-    Settings.Announce.Twitter.OAuthKey, 
-    Settings.Announce.Twitter.OAuthSecret);
+    Settings.Announce.Twitter.oauth_key, 
+    Settings.Announce.Twitter.oauth_secret);
 
   return TwitterClient.Connect(
     L"twitter.com", L"/statuses/update.xml", 
@@ -288,6 +288,6 @@ bool CTwitter::SetStatusText(const wstring& status_text) {
     HTTP_Twitter_Post);
 }
 
-void AnnounceToTwitter(wstring status_text) {
+void AnnounceToTwitter(const wstring& status_text) {
   Twitter.SetStatusText(status_text); 
 }

@@ -26,15 +26,15 @@
 #include "../win32/win_gdi.h"
 #include "../win32/win_taskdialog.h"
 
-CUpdateDialog UpdateDialog;
+class UpdateDialog UpdateDialog;
 
 // =============================================================================
 
-CUpdateDialog::CUpdateDialog() {
+UpdateDialog::UpdateDialog() {
   RegisterDlgClass(L"TaigaUpdateW");
 }
 
-BOOL CUpdateDialog::OnInitDialog() {
+BOOL UpdateDialog::OnInitDialog() {
   // Set icon
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
@@ -45,21 +45,21 @@ BOOL CUpdateDialog::OnInitDialog() {
   // Set progress text
   SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Checking updates...");
   // Set progress bar
-  m_ProgressBar.Attach(GetDlgItem(IDC_PROGRESS_UPDATE));
-  m_ProgressBar.SetMarquee(true);
+  progressbar.Attach(GetDlgItem(IDC_PROGRESS_UPDATE));
+  progressbar.SetMarquee(true);
 
   // Check updates
   #ifdef _DEBUG
   PostMessage(WM_CLOSE);
   #else
-  Taiga.UpdateHelper.Check(L"taiga.erengy.com/update.php", Taiga, HTTP_UpdateCheck);
+  Taiga.Updater.Check(L"taiga.erengy.com/update.php", Taiga, HTTP_UpdateCheck);
   #endif
 
   // Success
   return TRUE;
 }
 
-INT_PTR CUpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC: {
       return ::GetSysColor(COLOR_WINDOW);
@@ -70,13 +70,13 @@ INT_PTR CUpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-BOOL CUpdateDialog::OnDestroy() {
+BOOL UpdateDialog::OnDestroy() {
   // Clean up
-  Taiga.UpdateHelper.Client.Cleanup();
+  Taiga.Updater.client.Cleanup();
   
-  if (Taiga.UpdateHelper.UpdateAvailable) {
+  if (Taiga.Updater.update_available) {
     // Restart application
-    if (Taiga.UpdateHelper.RestartApplication(L"UpdateHelper.exe", L"Taiga.exe", L"Taiga.exe.new")) {
+    if (Taiga.Updater.RestartApplication(L"UpdateHelper.exe", L"Taiga.exe", L"Taiga.exe.new")) {
       return TRUE;
     } else {
       // Read data again
@@ -93,11 +93,11 @@ BOOL CUpdateDialog::OnDestroy() {
   }
 
   // Create/activate main window
-  ExecuteAction(L"MainWindow");
+  ExecuteAction(L"MainDialog");
   return TRUE;
 }
 
-void CUpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+void UpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   CDC dc = hdc;
   dc.FillRect(lpps->rcPaint, ::GetSysColor(COLOR_WINDOW));

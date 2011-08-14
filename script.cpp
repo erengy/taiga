@@ -285,38 +285,38 @@ bool IsScriptVariable(const wstring& str) {
 
 // =============================================================================
 
-wstring ReplaceVariables(wstring str, const CEpisode& episode, bool url_encode) {
-  CAnime* anime = AnimeList.FindItem(episode.AnimeId);
+wstring ReplaceVariables(wstring str, const Episode& episode, bool url_encode) {
+  Anime* anime = AnimeList.FindItem(episode.anime_id);
 
   #define VALIDATE(x, y) anime ? x : y
   #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeURL(x)) : EscapeScriptEntities(x)
 
   // Prepare episode value
-  wstring episode_number = ToWSTR(GetEpisodeHigh(episode.Number));
+  wstring episode_number = ToWSTR(GetEpisodeHigh(episode.number));
   TrimLeft(episode_number, L"0");
 
   // Replace variables
-  Replace(str, L"%title%",   VALIDATE(ENCODE(anime->Series_Title), ENCODE(episode.Title)));
+  Replace(str, L"%title%",   VALIDATE(ENCODE(anime->series_title), ENCODE(episode.title)));
   Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(anime->GetLastWatchedEpisode(), L"")), L""));
-  Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(anime->Series_Episodes, L"")), L""));
+  Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(anime->series_episodes, L"")), L""));
   Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(anime->GetScore(), L"")), L""));
-  Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(anime->Series_ID)), L""));
-  Replace(str, L"%image%",   VALIDATE(ENCODE(anime->Series_Image), L""));
+  Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(anime->series_id)), L""));
+  Replace(str, L"%image%",   VALIDATE(ENCODE(anime->series_image), L""));
   Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(anime->GetStatus())), L""));
   Replace(str, L"%rewatching%", VALIDATE(ENCODE(ToWSTR(anime->GetRewatching())), L""));
-  Replace(str, L"%name%",       ENCODE(episode.Name));
+  Replace(str, L"%name%",       ENCODE(episode.name));
   Replace(str, L"%episode%",    ENCODE(episode_number));
-  Replace(str, L"%version%",    ENCODE(episode.Version));
-  Replace(str, L"%group%",      ENCODE(episode.Group));
-  Replace(str, L"%resolution%", ENCODE(episode.Resolution));
-  Replace(str, L"%video%",      ENCODE(episode.VideoType));
-  Replace(str, L"%audio%",      ENCODE(episode.AudioType));
-  Replace(str, L"%checksum%",   ENCODE(episode.Checksum));
-  Replace(str, L"%extra%",      ENCODE(episode.Extra));
-  Replace(str, L"%file%",       ENCODE(episode.File));
-  Replace(str, L"%folder%",     ENCODE(episode.Folder));
-  Replace(str, L"%user%",       ENCODE(Settings.Account.MAL.User));
-  switch (Taiga.PlayStatus) {
+  Replace(str, L"%version%",    ENCODE(episode.version));
+  Replace(str, L"%group%",      ENCODE(episode.group));
+  Replace(str, L"%resolution%", ENCODE(episode.resolution));
+  Replace(str, L"%video%",      ENCODE(episode.video_type));
+  Replace(str, L"%audio%",      ENCODE(episode.audio_type));
+  Replace(str, L"%checksum%",   ENCODE(episode.checksum));
+  Replace(str, L"%extra%",      ENCODE(episode.extras));
+  Replace(str, L"%file%",       ENCODE(episode.file));
+  Replace(str, L"%folder%",     ENCODE(episode.folder));
+  Replace(str, L"%user%",       ENCODE(Settings.Account.MAL.user));
+  switch (Taiga.play_status) {
     case PLAYSTATUS_STOPPED:
       Replace(str, L"%playstatus%", L"stopped");
       break;

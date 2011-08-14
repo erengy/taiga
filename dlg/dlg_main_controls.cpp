@@ -34,42 +34,42 @@
 
 /* TreeView control */
 
-void CMainWindow::CMainTree::RefreshItems() {
+void MainDialog::CMainTree::RefreshItems() {
   // Clear items
   DeleteAllItems();
   for (int i = 0; i < 7; i++) {
-    htItem[i] = NULL;
+    htItem[i] = nullptr;
   }
   
   // My tralala
-  htItem[0] = InsertItem(L"My Panel", -1, NULL, NULL);
-  htItem[1] = InsertItem(L"My Profile", -1, NULL, NULL);
-  htItem[2] = InsertItem(L"My History", -1, NULL, NULL);
+  htItem[0] = InsertItem(L"My Panel", -1, 0, nullptr);
+  htItem[1] = InsertItem(L"My Profile", -1, 0, nullptr);
+  htItem[2] = InsertItem(L"My History", -1, 0, nullptr);
 
   // Separator
-  htItem[3] = InsertItem(NULL, -1, -1, NULL);
+  htItem[3] = InsertItem(nullptr, -1, -1, nullptr);
   
   // My Anime List
-  htItem[4] = InsertItem(L"My Anime List", -1, NULL, NULL);
-  InsertItem(MAL.TranslateMyStatus(MAL_WATCHING, true).c_str(), -1, NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_COMPLETED, true).c_str(), -1, NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_ONHOLD, true).c_str(), -1, NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_DROPPED, true).c_str(), -1, NULL, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, true).c_str(), -1, NULL, htItem[4]);
+  htItem[4] = InsertItem(L"My Anime List", -1, 0, nullptr);
+  InsertItem(MAL.TranslateMyStatus(MAL_WATCHING, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_COMPLETED, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_ONHOLD, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_DROPPED, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, true).c_str(), -1, 0, htItem[4]);
   Expand(htItem[4]);
 
   // Separator
-  htItem[5] = InsertItem(NULL, -1, -1, NULL);
+  htItem[5] = InsertItem(nullptr, -1, -1, nullptr);
 
   // Foobar
-  htItem[6] = InsertItem(L"Foo", -1, NULL, NULL);
-  InsertItem(L"Foofoo", -1, NULL, htItem[6]);
-  InsertItem(L"Foobar", -1, NULL, htItem[6]);
-  InsertItem(L"Foobaz", -1, NULL, htItem[6]);
+  htItem[6] = InsertItem(L"Foo", -1, 0, nullptr);
+  InsertItem(L"Foofoo", -1, 0, htItem[6]);
+  InsertItem(L"Foobar", -1, 0, htItem[6]);
+  InsertItem(L"Foobaz", -1, 0, htItem[6]);
   Expand(htItem[6]);
 }
 
-LRESULT CMainWindow::OnTreeNotify(LPARAM lParam) {
+LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
 
   switch (pnmh->code) {
@@ -109,31 +109,31 @@ LRESULT CMainWindow::OnTreeNotify(LPARAM lParam) {
 
 /* ListView control */
 
-int CMainWindow::CMainList::GetSortType(int column) {
+int MainDialog::ListView::GetSortType(int column) {
   switch (column) {
     // Progress
     case 1:
-      return LISTSORTTYPE_PROGRESS;
+      return LIST_SORTTYPE_PROGRESS;
     // Score
     case 2:
-      return LISTSORTTYPE_NUMBER;
+      return LIST_SORTTYPE_NUMBER;
     // Season
     case 4:
-      return LISTSORTTYPE_STARTDATE;
+      return LIST_SORTTYPE_STARTDATE;
     // Other columns
     default:
-      return LISTSORTTYPE_DEFAULT;
+      return LIST_SORTTYPE_DEFAULT;
   }
 }
 
-LRESULT CMainWindow::CMainList::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT MainDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     // Middle mouse button
     case WM_MBUTTONDOWN: {
       int item_index = HitTest();
       if (item_index > -1) {
         SetSelectedItem(item_index);
-        switch (Settings.Program.List.MiddleClick) {
+        switch (Settings.Program.List.middle_click) {
           case 1: ExecuteAction(L"EditAll");    break;
           case 2: ExecuteAction(L"OpenFolder"); break;
           case 3: ExecuteAction(L"PlayNext");   break;
@@ -145,36 +145,26 @@ LRESULT CMainWindow::CMainList::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 
     // Back & forward buttons
     case WM_XBUTTONUP: {
-      int index = MainWindow.m_Tab.GetCurrentlySelected();
-      int count = MainWindow.m_Tab.GetItemCount();
-      switch (HIWORD(wParam)) {
-        case XBUTTON1: index--; break;
-        case XBUTTON2: index++; break;
-      }
-      if (index < 0 || index > count - 1) return TRUE;
-      MainWindow.m_Tab.SetCurrentlySelected(index);
-      index++; if (index == 5) index = 6;
-      MainWindow.RefreshList(index);
-      return TRUE;
+      return parent->DialogProc(hwnd, uMsg, wParam, lParam);
     }
   }
   
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
+LRESULT MainDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
   switch (pnmh->code) {
     // Item drag
     case LVN_BEGINDRAG: {
       POINT pt = {0};
       LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      m_List.m_DragImage = m_List.CreateDragImage(lplv->iItem, &pt);
-      if (m_List.m_DragImage.GetHandle()) {
+      listview.drag_image = listview.CreateDragImage(lplv->iItem, &pt);
+      if (listview.drag_image.GetHandle()) {
         pt = lplv->ptAction;
-        m_List.m_DragImage.BeginDrag(0, 0, 0);
-        m_List.m_DragImage.DragEnter(g_hMain, pt.x, pt.y);
-        m_List.m_bDragging = true;
+        listview.drag_image.BeginDrag(0, 0, 0);
+        listview.drag_image.DragEnter(g_hMain, pt.x, pt.y);
+        listview.dragging = true;
         SetCapture();
       }
       break;
@@ -184,27 +174,27 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
     case LVN_COLUMNCLICK: {
       LPNMLISTVIEW lplv = (LPNMLISTVIEW)lParam;
       int order = 1;
-      if (lplv->iSubItem == m_List.GetSortColumn()) order = m_List.GetSortOrder() * -1;
-      m_List.Sort(lplv->iSubItem, order, m_List.GetSortType(lplv->iSubItem), ListViewCompareProc);
+      if (lplv->iSubItem == listview.GetSortColumn()) order = listview.GetSortOrder() * -1;
+      listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ListViewCompareProc);
       break;
     }
 
     // Item select
     case LVN_ITEMCHANGED: {
       LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      CAnime* pItem = reinterpret_cast<CAnime*>(lplv->lParam);
-      if (pItem) {
-        AnimeList.Index = pItem->Index;
+      Anime* anime = reinterpret_cast<Anime*>(lplv->lParam);
+      if (anime) {
+        AnimeList.index = anime->index;
       } else {
-        AnimeList.Index = 0;
+        AnimeList.index = 0;
       }
       break;
     }
 
       // Double click
     case NM_DBLCLK: {
-      if (m_List.GetSelectedCount() > 0) {
-        switch (Settings.Program.List.DoubleClick) {
+      if (listview.GetSelectedCount() > 0) {
+        switch (Settings.Program.List.double_click) {
           case 1: ExecuteAction(L"EditAll");    break;
           case 2: ExecuteAction(L"OpenFolder"); break;
           case 3: ExecuteAction(L"PlayNext");   break;
@@ -216,21 +206,21 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
 
     // Right click
     case NM_RCLICK: {
-      if (pnmh->hwndFrom == m_List.GetWindowHandle()) {
-        if (m_List.GetSelectedCount() > 0) {
-          UpdateAllMenus(AnimeList.Index > -1 ? &AnimeList.Items[AnimeList.Index] : nullptr);
-          int index = m_List.HitTest(true);
+      if (pnmh->hwndFrom == listview.GetWindowHandle()) {
+        if (listview.GetSelectedCount() > 0) {
+          UpdateAllMenus(AnimeList.index > -1 ? &AnimeList.items[AnimeList.index] : nullptr);
+          int index = listview.HitTest(true);
           ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, index == 2 ? L"EditScore" : L"RightClick"));
-          RefreshMenubar(AnimeList.Index);
+          RefreshMenubar(AnimeList.index);
         }
-      } else if (pnmh->hwndFrom == m_List.GetHeader()) {
+      } else if (pnmh->hwndFrom == listview.GetHeader()) {
         HDHITTESTINFO hdhti;
         ::GetCursorPos(&hdhti.pt);
-        ::ScreenToClient(m_List.GetHeader(), &hdhti.pt);
-        if (::SendMessage(m_List.GetHeader(), HDM_HITTEST, 0, reinterpret_cast<LPARAM>(&hdhti))) {
+        ::ScreenToClient(listview.GetHeader(), &hdhti.pt);
+        if (::SendMessage(listview.GetHeader(), HDM_HITTEST, 0, reinterpret_cast<LPARAM>(&hdhti))) {
           if (hdhti.iItem == 3) {
             ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"FilterType"));
-            RefreshMenubar(AnimeList.Index);
+            RefreshMenubar(AnimeList.index);
             return TRUE;
           }
         }
@@ -241,11 +231,11 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
     // Text callback
     case LVN_GETDISPINFO: {
       NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-      CAnime* pItem = reinterpret_cast<CAnime*>(plvdi->item.lParam);
-      if (!pItem) break;
+      Anime* anime = reinterpret_cast<Anime*>(plvdi->item.lParam);
+      if (!anime) break;
       switch (plvdi->item.iSubItem) {
         case 0: // Anime title
-          plvdi->item.pszText = const_cast<LPWSTR>(pItem->Series_Title.data());
+          plvdi->item.pszText = const_cast<LPWSTR>(anime->series_title.data());
           break;
       }
       break;
@@ -257,7 +247,7 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
       switch (pnkd->wVKey) {
         // Delete item
         case VK_DELETE: {
-          if (m_List.GetSelectedCount() > 0) {
+          if (listview.GetSelectedCount() > 0) {
             ExecuteAction(L"EditDelete()");
           }
           break;
@@ -280,7 +270,7 @@ LRESULT CMainWindow::OnListNotify(LPARAM lParam) {
   return 0;
 }
 
-LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
+LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
   LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(lParam);
 
   switch (pCD->nmcd.dwDrawStage) {
@@ -293,24 +283,24 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
       return CDRF_NOTIFYPOSTERASE;
 
     case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-      CAnime* pAnimeItem = reinterpret_cast<CAnime*>(pCD->nmcd.lItemlParam);
+      Anime* anime = reinterpret_cast<Anime*>(pCD->nmcd.lItemlParam);
       // Alternate background color
-      if ((pCD->nmcd.dwItemSpec % 2) && !m_List.IsGroupViewEnabled()) {
+      if ((pCD->nmcd.dwItemSpec % 2) && !listview.IsGroupViewEnabled()) {
         pCD->clrTextBk = RGB(248, 248, 248);
       }
       // Change text color
-      if (!pAnimeItem) return CDRF_NOTIFYPOSTPAINT;
-      if (pAnimeItem->GetAiringStatus() == MAL_NOTYETAIRED) {
+      if (!anime) return CDRF_NOTIFYPOSTPAINT;
+      if (anime->GetAiringStatus() == MAL_NOTYETAIRED) {
         pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
-      } else if (pAnimeItem->NewEps) {
-        if (Settings.Program.List.Highlight) {
+      } else if (anime->new_episode_available) {
+        if (Settings.Program.List.highlight) {
           pCD->clrText = GetSysColor(pCD->iSubItem == 0 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
         }
       }
       // Indicate currently playing
-      if (pAnimeItem->Playing) {
+      if (anime->playing) {
         pCD->clrTextBk = RGB(230, 255, 230);
-        static HFONT hFontDefault = ChangeDCFont(pCD->nmcd.hdc, NULL, -1, true, -1, -1);
+        static HFONT hFontDefault = ChangeDCFont(pCD->nmcd.hdc, nullptr, -1, true, -1, -1);
         static HFONT hFontBold = reinterpret_cast<HFONT>(GetCurrentObject(pCD->nmcd.hdc, OBJ_FONT));
         SelectObject(pCD->nmcd.hdc, pCD->iSubItem == 0 ? hFontBold : hFontDefault);
         return CDRF_NEWFONT | CDRF_NOTIFYPOSTPAINT;
@@ -319,22 +309,22 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
     }
     
     case CDDS_ITEMPOSTPAINT | CDDS_SUBITEM: {
-      CAnime* pAnimeItem = reinterpret_cast<CAnime*>(pCD->nmcd.lItemlParam);
-      if (!pAnimeItem) return CDRF_DODEFAULT;
+      Anime* anime = reinterpret_cast<Anime*>(pCD->nmcd.lItemlParam);
+      if (!anime) return CDRF_DODEFAULT;
 
       // Draw progress bar
       if (pCD->iSubItem == 1) {
-        int eps_watched  = pAnimeItem->My_WatchedEpisodes;
-        int eps_total    = pAnimeItem->Series_Episodes;
-        int eps_estimate = pAnimeItem->GetTotalEpisodes();
-        int eps_buffer   = pAnimeItem->GetLastWatchedEpisode();
+        int eps_watched  = anime->my_watched_episodes;
+        int eps_total    = anime->series_episodes;
+        int eps_estimate = anime->GetTotalEpisodes();
+        int eps_buffer   = anime->GetLastWatchedEpisode();
         if (eps_watched > eps_buffer) eps_watched = -1;
         if (eps_buffer == eps_watched) eps_buffer = -1;
         if (eps_watched == 0) eps_watched = -1;
 
         CRect rcItem;
         if (GetWinVersion() < WINVERSION_VISTA) {
-          m_List.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
+          listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
         } else {
           rcItem = pCD->nmcd.rc;
         }
@@ -344,10 +334,10 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         
         // Draw border
         rcItem.Inflate(-2, -2);
-        UI.ListProgress.Border.Draw(hdc.Get(), &rcItem);
+        UI.list_progress.border.Draw(hdc.Get(), &rcItem);
         // Draw background
         rcItem.Inflate(-1, -1);
-        UI.ListProgress.Background.Draw(hdc.Get(), &rcItem);
+        UI.list_progress.background.Draw(hdc.Get(), &rcItem);
         CRect rcAvail = rcItem;
         CRect rcBuffer = rcItem;
         
@@ -369,45 +359,45 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
           if (eps_buffer > -1) {
             rcBuffer.right = static_cast<int>((rcBuffer.right - rcBuffer.left) * ratio_buffer) + rcBuffer.left;
           }
-          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS && eps_buffer > -1) {
+          if (Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS && eps_buffer > -1) {
             rcItem.right = rcBuffer.right;
           } else {
             rcItem.right = static_cast<int>((rcItem.right - rcItem.left) * ratio_watched) + rcItem.left;
           }
 
           // Draw buffer
-          if (Settings.Program.List.ProgressMode == LIST_PROGRESS_QUEUEDEPS && eps_buffer > 0) {
-            UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
+          if (Settings.Program.List.progress_mode == LIST_PROGRESS_QUEUEDEPS && eps_buffer > 0) {
+            UI.list_progress.buffer.Draw(hdc.Get(), &rcBuffer);
           }
 
           // Draw progress
-          if (pAnimeItem->GetStatus() == MAL_WATCHING || pAnimeItem->GetRewatching()) {
-            UI.ListProgress.Watching.Draw(hdc.Get(), &rcItem);  // Watching
-          } else if (pAnimeItem->GetStatus() == MAL_COMPLETED) {
-            UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem); // Completed
-          } else if (pAnimeItem->GetStatus() == MAL_DROPPED) {
-            UI.ListProgress.Dropped.Draw(hdc.Get(), &rcItem);   // Dropped
+          if (anime->GetStatus() == MAL_WATCHING || anime->GetRewatching()) {
+            UI.list_progress.watching.Draw(hdc.Get(), &rcItem);  // Watching
+          } else if (anime->GetStatus() == MAL_COMPLETED) {
+            UI.list_progress.completed.Draw(hdc.Get(), &rcItem); // Completed
+          } else if (anime->GetStatus() == MAL_DROPPED) {
+            UI.list_progress.dropped.Draw(hdc.Get(), &rcItem);   // Dropped
           } else {
-            UI.ListProgress.Completed.Draw(hdc.Get(), &rcItem); // Completed / On hold / Plan to watch
+            UI.list_progress.completed.Draw(hdc.Get(), &rcItem); // Completed / On hold / Plan to watch
           }
         }
 
         // Draw episode availability
-        if (Settings.Program.List.ProgressMode == LIST_PROGRESS_AVAILABLEEPS) {
+        if (Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS) {
           if (eps_total > 0) {
-            float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(pAnimeItem->Series_Episodes);
-            for (int i = max(eps_buffer, eps_watched); i < static_cast<int>(pAnimeItem->EpisodeAvailable.size()); i++) {
-              if (i > -1 && pAnimeItem->EpisodeAvailable[i]) {
+            float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(anime->series_episodes);
+            for (int i = max(eps_buffer, eps_watched); i < static_cast<int>(anime->episode_available.size()); i++) {
+              if (i > -1 && anime->episode_available[i]) {
                 rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
                 rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
-                UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
+                UI.list_progress.buffer.Draw(hdc.Get(), &rcBuffer);
               }
             }
           } else {
-            if (pAnimeItem->NewEps) {
+            if (anime->new_episode_available) {
               rcBuffer.left = eps_buffer > -1 ? rcBuffer.right : (eps_watched > -1 ? rcItem.right : rcItem.left);
               rcBuffer.right = rcBuffer.left + static_cast<int>((rcAvail.right - rcAvail.left) * 0.05f);
-              UI.ListProgress.Buffer.Draw(hdc.Get(), &rcBuffer);
+              UI.list_progress.buffer.Draw(hdc.Get(), &rcBuffer);
             }
           }
         }
@@ -416,16 +406,16 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
         if (eps_watched > -1 || eps_buffer > -1) {
           rcBuffer.left = rcItem.right;
           rcBuffer.right = rcItem.right + 1;
-          UI.ListProgress.Separator.Draw(hdc.Get(), &rcBuffer);
+          UI.list_progress.separator.Draw(hdc.Get(), &rcBuffer);
         }
 
         // Draw text
-        if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT || Settings.Program.List.ProgressShowEps) {
+        if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT || Settings.Program.List.progress_show_eps) {
           if (eps_watched == -1) eps_watched = 0;
           wstring text = MAL.TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + MAL.TranslateNumber(eps_total);
-          if (!Settings.Program.List.ProgressShowEps) text += L" episodes";
-          if (pAnimeItem->GetRewatching()) text += L" (rw)";
-          hdc.EditFont(NULL, 7);
+          if (!Settings.Program.List.progress_show_eps) text += L" episodes";
+          if (anime->GetRewatching()) text += L" (rw)";
+          hdc.EditFont(nullptr, 7);
           hdc.SetBkMode(TRANSPARENT);
           hdc.SetTextColor(RGB(0, 0, 0)); // TODO: Color should be set in theme data
           hdc.DrawText(text.c_str(), text.length(), rcText, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
@@ -448,14 +438,14 @@ LRESULT CMainWindow::OnListCustomDraw(LPARAM lParam) {
 
 /* Button control */
 
-LRESULT CMainWindow::OnButtonCustomDraw(LPARAM lParam) {
+LRESULT MainDialog::OnButtonCustomDraw(LPARAM lParam) {
   LPNMCUSTOMDRAW pCD = reinterpret_cast<LPNMCUSTOMDRAW>(lParam);
 
   switch (pCD->dwDrawStage) {
     case CDDS_PREPAINT: {
       CDC dc = pCD->hdc;
       dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
-      UI.ImgList16.Draw(Icon16_Cross, dc.Get(), 0, 0);
+      UI.ImgList16.Draw(ICON16_CROSS, dc.Get(), 0, 0);
       dc.DetachDC();
       return CDRF_SKIPDEFAULT;
     }
@@ -466,13 +456,13 @@ LRESULT CMainWindow::OnButtonCustomDraw(LPARAM lParam) {
 
 /* Edit control */
 
-LRESULT CMainWindow::CEditSearch::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT MainDialog::EditSearch::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_COMMAND: {
       if (HIWORD(wParam) == BN_CLICKED) {
         // Clear search text
         if (LOWORD(wParam) == IDC_BUTTON_CANCELSEARCH) {
-          MainWindow.m_EditSearch.SetText(L"");
+          SetText(L"");
           return TRUE;
         }
       }
@@ -487,11 +477,11 @@ LRESULT CMainWindow::CEditSearch::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 /* Tab control */
 
-LRESULT CMainWindow::OnTabNotify(LPARAM lParam) {
+LRESULT MainDialog::OnTabNotify(LPARAM lParam) {
   switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
     // Tab select
     case TCN_SELCHANGE: {
-      int index = static_cast<int>(m_Tab.GetItemParam(m_Tab.GetCurrentlySelected()));
+      int index = static_cast<int>(tab.GetItemParam(tab.GetCurrentlySelected()));
       RefreshList(index);
       RefreshTabs(index, false);
       break;
@@ -505,7 +495,7 @@ LRESULT CMainWindow::OnTabNotify(LPARAM lParam) {
 
 /* Toolbar */
 
-BOOL CMainWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
   switch (LOWORD(wParam)) {
     // Login
@@ -554,11 +544,11 @@ BOOL CMainWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (HIWORD(wParam) == EN_CHANGE) {
     if (LOWORD(wParam) == IDC_EDIT_SEARCH) {
       wstring text;
-      m_EditSearch.GetText(text);
-      m_CancelSearch.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
-      switch (m_SearchBar.Mode) {
+      edit.GetText(text);
+      cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
+      switch (search_bar.mode) {
         case SEARCH_MODE_LIST:
-          AnimeList.Filter.Text = text;
+          AnimeList.filters.text = text;
           RefreshList(text.empty() ? -1 : 0);
           return TRUE;
       }
@@ -568,7 +558,7 @@ BOOL CMainWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-LRESULT CMainWindow::OnToolbarNotify(LPARAM lParam) {
+LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
   switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
     // Dropdown button click
     case TBN_DROPDOWN: {
@@ -592,7 +582,7 @@ LRESULT CMainWindow::OnToolbarNotify(LPARAM lParam) {
       }
       if (!action.empty()) {
         ExecuteAction(action);
-        RefreshMenubar(AnimeList.Index);
+        RefreshMenubar(AnimeList.index);
       }
       break;
     }
@@ -602,11 +592,11 @@ LRESULT CMainWindow::OnToolbarNotify(LPARAM lParam) {
       NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(lParam);
       git->cchTextMax = INFOTIPSIZE;
       // Main toolbar
-      if (git->hdr.hwndFrom == m_Toolbar.GetWindowHandle()) {
-        git->pszText = (LPWSTR)(m_Toolbar.GetButtonTooltip(git->lParam));
+      if (git->hdr.hwndFrom == toolbar.GetWindowHandle()) {
+        git->pszText = (LPWSTR)(toolbar.GetButtonTooltip(git->lParam));
       // Search toolbar
-      } else if (git->hdr.hwndFrom == m_ToolbarSearch.GetWindowHandle()) {
-        git->pszText = (LPWSTR)(m_ToolbarSearch.GetButtonTooltip(git->lParam));
+      } else if (git->hdr.hwndFrom == toolbar_search.GetWindowHandle()) {
+        git->pszText = (LPWSTR)(toolbar_search.GetButtonTooltip(git->lParam));
       }
       break;
     }

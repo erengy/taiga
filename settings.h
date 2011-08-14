@@ -22,7 +22,7 @@
 #include "std.h"
 #include "feed.h"
 
-enum MAL_API {
+enum MalApi {
   MAL_API_NONE     = 1,
   MAL_API_OFFICIAL = 2
 };
@@ -46,144 +46,145 @@ enum ListProgressMode {
 
 // =============================================================================
 
-class CSettings {
+class Settings {
 public:
   bool Read();
-  bool Write();
+  bool Save();
 
+public:
   // Account
-  class CSettingsAccount {
+  class Account {
   public:
     // MyAnimeList
-    class CSettingsAccountMAL {
+    class Mal {
     public:
-      int API;
-      BOOL AutoLogin;
-      wstring Password, User;
+      int api;
+      BOOL auto_login;
+      wstring password, user;
     } MAL;
     // Update
-    class CSettingsAccountUpdate {
+    class Update {
     public:
-      int Delay, Mode, Time;
-      BOOL CheckPlayer, OutOfRange;
+      int delay, mode, time;
+      BOOL check_player, out_of_range;
     } Update;
   } Account;
 
   // Anime
-  class CSettingsAnime {
+  class Anime {
   public:
     void SetItem(int id, wstring folder, wstring titles);
-    class CSettingsAnimeItem {
+    class Item {
     public:
-      int ID;
-      wstring Folder, Titles;
+      int id;
+      wstring folder, titles;
     };
-    vector<CSettingsAnimeItem> Items;
+    vector<Item> items;
   } Anime;
   // Folders
-  class CSettingsFolders {
+  class Folders {
   public:
-    vector<wstring> Root;
-    BOOL WatchEnabled;
+    vector<wstring> root;
+    BOOL watch_enabled;
   } Folders;
   
   // Announcements
-  class CSettingsAnnounce {
+  class Announce {
   public:
     // HTTP
-    class CSettingsAnnounceHTTP {
+    class Http {
     public:
-      BOOL Enabled;
-      wstring Format, URL;
+      BOOL enabled;
+      wstring format, url;
     } HTTP;
     // Messenger
-    class CSettingsAnnounceMSN {
+    class Msn {
     public:
-      BOOL Enabled;
-      wstring Format;
+      BOOL enabled;
+      wstring format;
     } MSN;
     // mIRC
-    class CSettingsAnnounceMIRC {
+    class Mirc {
     public:
-      BOOL Enabled, MultiServer, UseAction;
-      int Mode;
-      wstring Channels, Format, Service;
+      BOOL enabled, multi_server, use_action;
+      int mode;
+      wstring channels, format, service;
     } MIRC;
     // Skype
-    class CSettingsAnnounceSkype {
+    class Skype {
     public:
-      BOOL Enabled;
-      wstring Format;
+      BOOL enabled;
+      wstring format;
     } Skype;
     // Twitter
-    class CSettingsAnnounceTwitter {
+    class Twitter {
     public:
-      BOOL Enabled;
-      wstring Format, OAuthKey, OAuthSecret, User;
+      BOOL enabled;
+      wstring format, oauth_key, oauth_secret, user;
     } Twitter;
   } Announce;
 
   // Program
-  class CSettingsProgram {
+  class Program {
   public:
     // General
-    class CSettingsProgramGeneral {
+    class General {
     public:
-      BOOL AutoStart, Close, Minimize;
-      int SearchIndex, SizeX, SizeY;
-      wstring Theme;
+      BOOL auto_start, close, minimize;
+      int search_index, size_x, size_y;
+      wstring theme;
     } General;
     // Start-up
-    class CSettingsProgramStartUp {
+    class StartUp {
     public:
-      BOOL CheckNewEpisodes, CheckNewVersion, Minimize;
+      BOOL check_new_episodes, check_new_version, minimize;
     } StartUp;
     // Exit
-    class CSettingsProgramExit {
+    class Exit {
     public:
-      BOOL Ask, SaveBuffer;
+      BOOL ask, save_event_queue;
     } Exit;
     // Proxy
-    class CSettingsProgramProxy {
+    class Proxy {
     public:
-      wstring Host, Password, User;
+      wstring host, password, user;
     } Proxy;
     // List
-    class CSettingsProgramList {
+    class List {
     public:
-      int DoubleClick, MiddleClick;
-      BOOL Highlight;
-      int ProgressMode;
-      BOOL ProgressShowEps;
+      int double_click, middle_click;
+      BOOL highlight;
+      int progress_mode;
+      BOOL progress_show_eps;
     } List;
     // Balloon
-    class CSettingsProgramBalloon {
+    class Balloon {
     public:
-      BOOL Enabled;
-      wstring Format;
+      BOOL enabled;
+      wstring format;
     } Balloon;
   } Program;
 
   // RSS
-  class CSettingsRSS {
+  class Rss {
   public:
     // Torrent
-    class CSettingsRSSTorrent {
+    class Torrent {
     public:
-      BOOL CheckEnabled, HideUnidentified, SetFolder;
-      int AppMode, CheckInterval, NewAction;
-      wstring AppPath, Source;
-      class CSettingsRSSTorrentFilters {
+      BOOL check_enabled, hide_unidentified, set_folder;
+      int app_mode, check_interval, new_action;
+      wstring app_path, source;
+      class Filters {
       public:
-        BOOL GlobalEnabled;
+        BOOL global_enabled;
       } Filters;
     } Torrent;
   } RSS;
 
 private:
-  wstring m_File, m_Folder;
+  wstring file_, folder_;
 };
 
-extern CSettings Settings;
+extern Settings Settings;
 
 #endif // SETTINGS_H

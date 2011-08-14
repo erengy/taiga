@@ -35,25 +35,25 @@
 
 HINSTANCE g_hInstance;
 HWND g_hMain;
-CTaiga Taiga;
+class Taiga Taiga;
 
 // =============================================================================
 
-CTaiga::CTaiga() : 
-  LoggedIn(false), UpdatesEnabled(true), 
-  CurrentTipType(TIPTYPE_NORMAL), PlayStatus(PLAYSTATUS_STOPPED), 
-  TickerMedia(0), TickerNewEpisodes(0), TickerQueue(0)
+Taiga::Taiga() : 
+  logged_in(false), updates_enabled(true), 
+  current_tip_type(TIPTYPE_NORMAL), play_status(PLAYSTATUS_STOPPED), 
+  ticker_media(0), ticker_new_episodes(0), ticker_queue(0)
 {
   SetVersionInfo(APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_REVISION);
 }
 
-CTaiga::~CTaiga() {
+Taiga::~Taiga() {
   OleUninitialize();
 }
 
 // =============================================================================
 
-BOOL CTaiga::InitInstance() {
+BOOL Taiga::InitInstance() {
   // Check another instance
   if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258", L"TaigaMainW"))
     return FALSE;
@@ -66,12 +66,12 @@ BOOL CTaiga::InitInstance() {
   // Read data
   ReadData();
   
-  if (Settings.Program.StartUp.CheckNewVersion) {
+  if (Settings.Program.StartUp.check_new_version) {
     // Create update dialog
     ExecuteAction(L"CheckUpdates");
   } else {
     // Create main dialog
-    ExecuteAction(L"MainWindow");
+    ExecuteAction(L"MainDialog");
   }
 
   return TRUE;
@@ -79,7 +79,7 @@ BOOL CTaiga::InitInstance() {
 
 // =============================================================================
 
-wstring CTaiga::GetDataPath() {
+wstring Taiga::GetDataPath() {
   // Return current working directory in debug mode
   #ifdef _DEBUG
   return CheckSlash(GetCurrentDirectory()) + L"Data\\";
@@ -100,7 +100,7 @@ wstring CTaiga::GetDataPath() {
   return L"";
 }
 
-void CTaiga::ReadData() {
+void Taiga::ReadData() {
   // Read media player data
   MediaPlayers.Read();
   
@@ -108,7 +108,7 @@ void CTaiga::ReadData() {
   Settings.Read();
   
   // Read theme data
-  UI.Read(Settings.Program.General.Theme);
+  UI.Read(Settings.Program.General.theme);
   UI.LoadImages();
   
   // Read anime list
@@ -117,36 +117,36 @@ void CTaiga::ReadData() {
 
 // =============================================================================
 
-void CTaiga::CUpdate::OnCheck() {
+void Taiga::Updater::OnCheck() {
   //
 }
 
-void CTaiga::CUpdate::OnCRCCheck(const wstring& path, wstring& crc) {
+void Taiga::Updater::OnCRCCheck(const wstring& path, wstring& crc) {
   wstring text = L"Checking file integrity... (" + GetFileName(path) + L")";
   UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, text.c_str());
   crc = CalculateCRC(path);
   ToUpper(crc);
 }
 
-void CTaiga::CUpdate::OnDone() {
+void Taiga::Updater::OnDone() {
   UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Done!");
 }
 
-void CTaiga::CUpdate::OnProgress(int file_index) {
-  wstring text = L"Downloading file... (" + Files[file_index].Path + L")";
+void Taiga::Updater::OnProgress(int file_index) {
+  wstring text = L"Downloading file... (" + files[file_index].path + L")";
   UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, text.c_str());
 }
 
-bool CTaiga::CUpdate::OnRestartApp() {
+bool Taiga::Updater::OnRestartApp() {
   if (g_hMain) {
-    Settings.Write();
+    Settings.Save();
   }
 
   return true;
 }
 
-void CTaiga::CUpdate::OnRunActions() {
-  for (unsigned int i = 0; i < Actions.size(); i++) {
-    ExecuteAction(Actions[i]);
+void Taiga::Updater::OnRunActions() {
+  for (unsigned int i = 0; i < actions.size(); i++) {
+    ExecuteAction(actions[i]);
   }
 }

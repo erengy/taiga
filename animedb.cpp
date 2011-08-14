@@ -18,27 +18,33 @@
 
 #include "std.h"
 #include <algorithm>
+#include "anime.h"
 #include "animedb.h"
+#include "common.h"
 #include "myanimelist.h"
 #include "string.h"
 #include "taiga.h"
 #include "xml.h"
 
-CAnimeDatabase AnimeDatabase;
-CAnimeSeasonDatabase SeasonDatabase;
+AnimeSeasonDatabase SeasonDatabase;
 
 // =============================================================================
 
-bool CAnimeSeasonDatabase::Read(wstring file) {
+AnimeSeasonDatabase::AnimeSeasonDatabase() : 
+  modified(false)
+{
+}
+
+bool AnimeSeasonDatabase::Read(wstring file) {
   // Write modifications
-  if (!File.empty() && Modified) Write();
+  if (modified && !file.empty()) Save();
 
   // Initialize
-  Folder = Taiga.GetDataPath() + L"db\\season\\";
-  File = file; file = Folder + File;
-  Items.clear();
+  folder_ = Taiga.GetDataPath() + L"db\\season\\";
+  file_ = file; file = folder_ + file;
+  items.clear();
   
-  // Read XML file
+  // Read XML file_name
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok && result.status != status_file_not_found) {
@@ -47,109 +53,96 @@ bool CAnimeSeasonDatabase::Read(wstring file) {
   }
 
   // Read information
-  xml_node season = doc.child(L"season");
-  Name = XML_ReadStrValue(season.child(L"info"), L"name");
-  LastModified = XML_ReadStrValue(season.child(L"info"), L"last_modified");
+  xml_node season_node = doc.child(L"season");
+  name = XML_ReadStrValue(season_node.child(L"info"), L"name");
+  last_modified = XML_ReadStrValue(season_node.child(L"info"), L"last_modified");
 
   // Read items
-  for (xml_node anime = season.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
-    Items.resize(Items.size() + 1);
-    Items.back().Index = -1;
-    Items.back().Series_ID = XML_ReadIntValue(anime, L"series_animedb_id");
-    Items.back().Series_Title = XML_ReadStrValue(anime, L"series_title");
-    Items.back().Series_Synonyms = XML_ReadStrValue(anime, L"series_synonyms");
-    Items.back().Series_Type = XML_ReadIntValue(anime, L"series_type");
-    Items.back().Series_Episodes = XML_ReadIntValue(anime, L"series_episodes");
-    Items.back().Series_Status = XML_ReadIntValue(anime, L"series_status");
-    Items.back().Series_Start = XML_ReadStrValue(anime, L"series_start");
-    Items.back().Series_End = XML_ReadStrValue(anime, L"series_end");
-    Items.back().Series_Image = XML_ReadStrValue(anime, L"series_image");
-    Items.back().Genres = XML_ReadStrValue(anime, L"genres");
-    Items.back().Producers = XML_ReadStrValue(anime, L"producers");
-    Items.back().Score = XML_ReadStrValue(anime, L"score");
-    Items.back().Rank = XML_ReadStrValue(anime, L"rank");
-    Items.back().Popularity = XML_ReadStrValue(anime, L"popularity");
-    Items.back().Synopsis = XML_ReadStrValue(anime, L"synopsis");
+  size_t anime_count = 0, i = 0;
+  for (xml_node node = season_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
+    anime_count++;
+  }
+  if (anime_count > 0) {
+    items.resize(anime_count + 1);
+  }
+  for (xml_node node = season_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
+    items.at(i).index = -1;
+    items.at(i).series_id = XML_ReadIntValue(node, L"series_animedb_id");
+    items.at(i).series_title = XML_ReadStrValue(node, L"series_title");
+    items.at(i).series_synonyms = XML_ReadStrValue(node, L"series_synonyms");
+    items.at(i).series_type = XML_ReadIntValue(node, L"series_type");
+    items.at(i).series_episodes = XML_ReadIntValue(node, L"series_episodes");
+    items.at(i).series_status = XML_ReadIntValue(node, L"series_status");
+    items.at(i).series_start = XML_ReadStrValue(node, L"series_start");
+    items.at(i).series_end = XML_ReadStrValue(node, L"series_end");
+    items.at(i).series_image = XML_ReadStrValue(node, L"series_image");
+    items.at(i).genres = XML_ReadStrValue(node, L"genres");
+    items.at(i).producers = XML_ReadStrValue(node, L"producers");
+    items.at(i).score = XML_ReadStrValue(node, L"score");
+    items.at(i).rank = XML_ReadStrValue(node, L"rank");
+    items.at(i).popularity = XML_ReadStrValue(node, L"popularity");
+    items.at(i).synopsis = XML_ReadStrValue(node, L"synopsis");
+    i++;
   }
 
   return true;
 }
 
-bool CAnimeSeasonDatabase::Write(wstring file) {
-  if (Items.empty() || !Modified) return false;
-  if (File.empty() && file.empty()) return false;
-  
-  #ifdef _DEBUG
-  SeasonDatabase.WriteForRelease();
-  #endif
+bool AnimeSeasonDatabase::Save(wstring file, bool minimal) {
+  if (items.empty() || !modified) return false;
+  if (file_.empty() && file.empty()) return false;
 
-  if (file.empty()) file = Folder + File;
-  Modified = false;
+  if (file.empty()) file = file_;
+  if (minimal) file = L"_" + file;
+  file = folder_ + file;
+  if (!minimal) modified = false;
 
-  xml_document doc;
-  xml_node season = doc.append_child();
-  season.set_name(L"season");
-
-  // Info
-  xml_node info = season.append_child();
-  info.set_name(L"info");
-  XML_WriteStrValue(info, L"name", Name.c_str());
-  XML_WriteStrValue(info, L"last_modified", LastModified.c_str());
-
-  // Items
-  for (auto it = Items.begin(); it != Items.end(); ++it) {
-    xml_node anime = season.append_child();
-    anime.set_name(L"anime");
-    XML_WriteIntValue(anime, L"series_animedb_id", it->Series_ID);
-    XML_WriteStrValue(anime, L"series_title", it->Series_Title.c_str(), node_cdata);
-    XML_WriteStrValue(anime, L"series_synonyms", it->Series_Synonyms.c_str(), node_cdata);
-    XML_WriteIntValue(anime, L"series_type", it->Series_Type);
-    XML_WriteIntValue(anime, L"series_episodes", it->Series_Episodes);
-    XML_WriteIntValue(anime, L"series_status", it->Series_Status);
-    XML_WriteStrValue(anime, L"series_start", it->Series_Start.c_str());
-    XML_WriteStrValue(anime, L"series_end", it->Series_End.c_str());
-    XML_WriteStrValue(anime, L"series_image", it->Series_Image.c_str());
-    XML_WriteStrValue(anime, L"genres", it->Genres.c_str());
-    XML_WriteStrValue(anime, L"producers", it->Producers.c_str());
-    XML_WriteStrValue(anime, L"score", it->Score.c_str());
-    XML_WriteStrValue(anime, L"rank", it->Rank.c_str());
-    XML_WriteStrValue(anime, L"popularity", it->Popularity.c_str());
-    XML_WriteStrValue(anime, L"synopsis", it->Synopsis.c_str());
+  if (minimal) {
+    std::sort(items.begin(), items.end(), 
+      [](const Anime& a1, const Anime& a2) {
+        return CompareStrings(a1.series_title, a2.series_title) < 0;
+      });
   }
 
-  ::CreateDirectory(Folder.c_str(), NULL);
-  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
-}
-
-bool CAnimeSeasonDatabase::WriteForRelease() {
-  wstring file = Folder + L"_" + File;
-
-  std::sort(Items.begin(), Items.end(), 
-    [](const CAnime& a1, const CAnime& a2) {
-      return CompareStrings(a1.Series_Title, a2.Series_Title) < 0;
-    });
-
   xml_document doc;
-  xml_node season = doc.append_child();
-  season.set_name(L"season");
+  xml_node season_node = doc.append_child();
+  season_node.set_name(L"season");
 
   // Info
-  xml_node info = season.append_child();
-  info.set_name(L"info");
-  XML_WriteStrValue(info, L"name", Name.c_str());
-  XML_WriteStrValue(info, L"last_modified", LastModified.c_str());
+  xml_node info_node = season_node.append_child();
+  info_node.set_name(L"info");
+  XML_WriteStrValue(info_node, L"name", name.c_str());
+  XML_WriteStrValue(info_node, L"last_modified", last_modified.c_str());
 
   // Items
-  for (auto it = Items.begin(); it != Items.end(); ++it) {
-    xml_node anime = season.append_child();
-    anime.set_name(L"anime");
-    XML_WriteIntValue(anime, L"series_animedb_id", it->Series_ID);
-    XML_WriteStrValue(anime, L"series_title", it->Series_Title.c_str(), node_cdata);
-    XML_WriteIntValue(anime, L"series_type", it->Series_Type);
-    XML_WriteStrValue(anime, L"series_image", it->Series_Image.c_str());
-    XML_WriteStrValue(anime, L"producers", it->Producers.c_str());
+  for (auto it = items.begin(); it != items.end(); ++it) {
+    xml_node anime_node = season_node.append_child();
+    anime_node.set_name(L"anime");
+    if (minimal) {
+      XML_WriteIntValue(anime_node, L"series_animedb_id", it->series_id);
+      XML_WriteStrValue(anime_node, L"series_title", it->series_title.c_str(), node_cdata);
+      XML_WriteIntValue(anime_node, L"series_type", it->series_type);
+      XML_WriteStrValue(anime_node, L"series_image", it->series_image.c_str());
+      XML_WriteStrValue(anime_node, L"producers", it->producers.c_str());
+    } else {
+      XML_WriteIntValue(anime_node, L"series_animedb_id", it->series_id);
+      XML_WriteStrValue(anime_node, L"series_title", it->series_title.c_str(), node_cdata);
+      XML_WriteStrValue(anime_node, L"series_synonyms", it->series_synonyms.c_str(), node_cdata);
+      XML_WriteIntValue(anime_node, L"series_type", it->series_type);
+      XML_WriteIntValue(anime_node, L"series_episodes", it->series_episodes);
+      XML_WriteIntValue(anime_node, L"series_status", it->series_status);
+      XML_WriteStrValue(anime_node, L"series_start", it->series_start.c_str());
+      XML_WriteStrValue(anime_node, L"series_end", it->series_end.c_str());
+      XML_WriteStrValue(anime_node, L"series_image", it->series_image.c_str());
+      XML_WriteStrValue(anime_node, L"genres", it->genres.c_str());
+      XML_WriteStrValue(anime_node, L"producers", it->producers.c_str());
+      XML_WriteStrValue(anime_node, L"score", it->score.c_str());
+      XML_WriteStrValue(anime_node, L"rank", it->rank.c_str());
+      XML_WriteStrValue(anime_node, L"popularity", it->popularity.c_str());
+      XML_WriteStrValue(anime_node, L"synopsis", it->synopsis.c_str());
+    }
   }
 
-  ::CreateDirectory(Folder.c_str(), NULL);
+  CreateFolder(folder_);
   return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
 }

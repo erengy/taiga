@@ -25,22 +25,23 @@
 
 // =============================================================================
 
-/* Event dialog */
-
-class CEventWindow : public CDialog {
+class EventDialog : public CDialog {
 public:
-  CEventWindow();
-  ~CEventWindow() {}
-
-  CListView m_List;
+  EventDialog();
+  ~EventDialog() {}
 
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnOK();
+
+public:
   void RefreshList();
+
+private:
+  CListView list_;
 };
 
-extern CEventWindow EventWindow;
+extern EventDialog EventDialog;
 
 #endif // DLG_EVENT_H

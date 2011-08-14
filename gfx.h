@@ -36,14 +36,14 @@ CRect ResizeRect(const CRect& rect_dest, int src_width, int src_height, bool str
 int ScaleX(int value);
 int ScaleY(int value);
 
-class CImage {
+class Image {
 public:
-  CImage() : Height(0), Width(0), Data(0) {}
+  Image() : height(0), width(0), data(0) {}
   bool Load(const wstring& file);
-  CDC DC;
-  CRect Rect;
-  LPARAM Data;
-  int Height, Width;
+  CDC dc;
+  CRect rect;
+  LPARAM data;
+  int height, width;
 };
 
 #endif // GFX_H

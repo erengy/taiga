@@ -25,21 +25,20 @@
 
 // =============================================================================
 
-class CUpdateDialog : public CDialog {
+class UpdateDialog : public CDialog {
 public:
-  CUpdateDialog();
-  virtual ~CUpdateDialog() {}
+  UpdateDialog();
+  virtual ~UpdateDialog() {}
 
-  // Progress bar
-  CProgressBar m_ProgressBar;
-  
-  // Message handlers
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+
+public:
+  CProgressBar progressbar;
 };
 
-extern CUpdateDialog UpdateDialog;
+extern UpdateDialog UpdateDialog;
 
 #endif // DLG_UPDATE_H

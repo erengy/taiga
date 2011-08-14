@@ -44,22 +44,22 @@
 #include "../win32/win_taskbar.h"
 #include "../win32/win_taskdialog.h"
 
-CMainWindow MainWindow;
+class MainDialog MainDialog;
 
 // =============================================================================
 
-CMainWindow::CMainWindow() {
+MainDialog::MainDialog() {
   RegisterDlgClass(L"TaigaMainW");
 }
 
-BOOL CMainWindow::OnInitDialog() {
+BOOL MainDialog::OnInitDialog() {
   // Set global variables
   g_hMain = GetWindowHandle();
   
   // Set member variables
   /*CRect rect; GetWindowRect(&rect);
   if (Settings.Program.General.SizeX && Settings.Program.General.SizeY) {
-    SetPosition(NULL, 0, 0, Settings.Program.General.SizeX, Settings.Program.General.SizeY, 
+    SetPosition(nullptr, 0, 0, Settings.Program.General.SizeX, Settings.Program.General.SizeY, 
       SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
   }*/
   SetSizeMin(ScaleX(786), ScaleY(568));
@@ -73,10 +73,10 @@ BOOL CMainWindow::OnInitDialog() {
   CreateDialogControls();
 
   // Start process timer
-  SetTimer(g_hMain, TIMER_MAIN, 1000, NULL);
+  SetTimer(g_hMain, TIMER_MAIN, 1000, nullptr);
   
   // Add icon to taskbar
-  Taskbar.Create(g_hMain, NULL, APP_TITLE);
+  Taskbar.Create(g_hMain, nullptr, APP_TITLE);
   UpdateTip();
   
   // Change status
@@ -86,23 +86,23 @@ BOOL CMainWindow::OnInitDialog() {
   RefreshList(MAL_WATCHING);
   
   // TODO: Set search bar mode
-  //m_SearchBar.Index = Settings.Program.General.SearchIndex;
-  //m_SearchBar.SetMode();
+  //search_bar.Index = Settings.Program.General.SearchIndex;
+  //search_bar.SetMode();
   
   // Refresh menu bar
   RefreshMenubar();
 
   // Apply start-up settings
-  if (Settings.Account.MAL.AutoLogin) {
+  if (Settings.Account.MAL.auto_login) {
     ExecuteAction(L"Login");
   }
-  if (Settings.Program.StartUp.CheckNewEpisodes) {
+  if (Settings.Program.StartUp.check_new_episodes) {
     ExecuteAction(L"CheckEpisodes()", TRUE);
   }
-  if (!Settings.Program.StartUp.Minimize) {
-    MainWindow.Show();
+  if (!Settings.Program.StartUp.minimize) {
+    Show();
   }
-  if (Settings.Account.MAL.User.empty()) {
+  if (Settings.Account.MAL.user.empty()) {
     CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
     dlg.SetContent(L"User name is not set. Would you like to open settings window to set it now?");
@@ -113,8 +113,8 @@ BOOL CMainWindow::OnInitDialog() {
       ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
     }
   }
-  if (Settings.Folders.WatchEnabled) {
-    FolderMonitor.SetWindowHandle(MainWindow.GetWindowHandle());
+  if (Settings.Folders.watch_enabled) {
+    FolderMonitor.SetWindowHandle(GetWindowHandle());
     FolderMonitor.Enable();
   }
 
@@ -122,99 +122,102 @@ BOOL CMainWindow::OnInitDialog() {
   return TRUE;
 }
 
-void CMainWindow::CreateDialogControls() {
+void MainDialog::CreateDialogControls() {
   // Create rebar
-  m_Rebar.Attach(GetDlgItem(IDC_REBAR_MAIN));
+  rebar.Attach(GetDlgItem(IDC_REBAR_MAIN));
   // Create main toolbar
-  m_Toolbar.Attach(GetDlgItem(IDC_TOOLBAR_MAIN));
-  m_Toolbar.SetImageList(UI.ImgList24.GetHandle(), 24, 24);
-  m_Toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
+  toolbar.Attach(GetDlgItem(IDC_TOOLBAR_MAIN));
+  toolbar.SetImageList(UI.ImgList24.GetHandle(), 24, 24);
+  toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Create search toolbar
-  m_ToolbarSearch.Attach(GetDlgItem(IDC_TOOLBAR_SEARCH));
-  m_ToolbarSearch.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
-  m_ToolbarSearch.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
+  toolbar_search.Attach(GetDlgItem(IDC_TOOLBAR_SEARCH));
+  toolbar_search.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  toolbar_search.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Create search text
-  m_EditSearch.Attach(GetDlgItem(IDC_EDIT_SEARCH));
-  m_EditSearch.SetCueBannerText(L"Search list");
-  m_EditSearch.SetParent(m_ToolbarSearch.GetWindowHandle());
-  m_EditSearch.SetPosition(NULL, ScaleX(32), 1, 200, 20);
-  m_EditSearch.SetMargins(1, 16);
-  CRect rcEdit; m_EditSearch.GetRect(&rcEdit);
+  edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
+  edit.SetCueBannerText(L"Search list");
+  edit.SetParent(toolbar_search.GetWindowHandle());
+  edit.SetPosition(nullptr, ScaleX(32), 1, 200, 20);
+  edit.SetMargins(1, 16);
+  CRect rcEdit; edit.GetRect(&rcEdit);
   // Create cancel search button
-  m_CancelSearch.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
-  m_CancelSearch.SetParent(m_EditSearch.GetWindowHandle());
-  m_CancelSearch.SetPosition(NULL, rcEdit.right + 1, 0, 16, 16);
-  //m_CancelSearch.SetClassLong(GCL_HCURSOR, reinterpret_cast<LONG>(::LoadImage(NULL, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
-  // Create tree control
-  m_Tree.Attach(GetDlgItem(IDC_TREE_MAIN));
-  m_Tree.SetItemHeight(20);
-  m_Tree.SetTheme();
+  cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
+  cancel_button.SetParent(edit.GetWindowHandle());
+  cancel_button.SetPosition(nullptr, rcEdit.right + 1, 0, 16, 16);
+  //cancel_button.SetClassLong(GCL_HCURSOR, reinterpret_cast<LONG>(::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+  // Create treeview control
+  treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
+  treeview.SetItemHeight(20);
+  treeview.SetTheme();
   // Create tab control
-  m_Tab.Attach(GetDlgItem(IDC_TAB_MAIN));
+  tab.Attach(GetDlgItem(IDC_TAB_MAIN));
   // Create main list
-  m_List.Attach(GetDlgItem(IDC_LIST_MAIN));
-  m_List.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  m_List.SetImageList(UI.ImgList16.GetHandle());
-  m_List.Sort(0, 1, 0, ListViewCompareProc);
-  m_List.SetTheme();
+  listview.Attach(GetDlgItem(IDC_LIST_MAIN));
+  listview.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  listview.SetImageList(UI.ImgList16.GetHandle());
+  listview.Sort(0, 1, 0, ListViewCompareProc);
+  listview.SetTheme();
   // Create status bar
-  m_Status.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
-  m_Status.SetImageList(UI.ImgList16.GetHandle());
-  //m_Status.InsertPart(-1, 0, 0, 700, NULL, NULL);
-  //m_Status.InsertPart(-1, 0, 0, 750, NULL, NULL);
+  statusbar.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
+  statusbar.SetImageList(UI.ImgList16.GetHandle());
+  //statusbar.InsertPart(-1, 0, 0, 700, NULL, NULL);
+  //statusbar.InsertPart(-1, 0, 0, 750, NULL, NULL);
 
-  // Insert tree items
-  m_Tree.RefreshItems();
+  // Insert treeview items
+  treeview.RefreshItems();
 
   // Insert list columns
-  m_List.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");
-  m_List.InsertColumn(1, 160, 160, LVCFMT_CENTER, L"Progress");
-  m_List.InsertColumn(2,  62,  62, LVCFMT_CENTER, L"Score");
-  m_List.InsertColumn(3,  62,  62, LVCFMT_CENTER, L"Type");
-  m_List.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
+  listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");
+  listview.InsertColumn(1, 160, 160, LVCFMT_CENTER, L"Progress");
+  listview.InsertColumn(2,  62,  62, LVCFMT_CENTER, L"Score");
+  listview.InsertColumn(3,  62,  62, LVCFMT_CENTER, L"Type");
+  listview.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
 
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  m_Toolbar.InsertButton(0,  Icon24_Offline,  100, 1, fsStyle1,  0, NULL, L"Log in");
-  m_Toolbar.InsertButton(1,  Icon24_Sync,     101, 1, fsStyle1,  1, NULL, L"Synchronize list");
-  m_Toolbar.InsertButton(2,  Icon24_MAL,      102, 1, fsStyle1,  2, NULL, L"View your panel at MyAnimeList");
-  m_Toolbar.InsertButton(3,  0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(4,  Icon24_Folders,  104, 1, fsStyle2,  4, NULL, L"Anime folders");
-  m_Toolbar.InsertButton(5,  Icon24_Calendar, 105, 1, fsStyle1,  5, NULL, L"Season browser");
-  m_Toolbar.InsertButton(6,  Icon24_Tools,    106, 1, fsStyle2,  6, NULL, L"Tools");
-  m_Toolbar.InsertButton(7,  Icon24_RSS,      107, 1, fsStyle1,  7, NULL, L"Torrents");
-  m_Toolbar.InsertButton(8,  0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(9,  Icon24_Filter,   109, 1, fsStyle1,  9, NULL, L"Filter list");
-  m_Toolbar.InsertButton(10, Icon24_Settings, 110, 1, fsStyle1, 10, NULL, L"Change program settings");
+  toolbar.InsertButton(0,  ICON24_OFFLINE,  100, 1, fsStyle1,  0, nullptr, L"Log in");
+  toolbar.InsertButton(1,  ICON24_SYNC,     101, 1, fsStyle1,  1, nullptr, L"Synchronize list");
+  toolbar.InsertButton(2,  ICON24_MAL,      102, 1, fsStyle1,  2, nullptr, L"View your panel at MyAnimeList");
+  toolbar.InsertButton(3,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar.InsertButton(4,  ICON24_FOLDERS,  104, 1, fsStyle2,  4, nullptr, L"Anime folders");
+  toolbar.InsertButton(5,  ICON24_CALENDAR, 105, 1, fsStyle1,  5, nullptr, L"Season browser");
+  toolbar.InsertButton(6,  ICON24_TOOLS,    106, 1, fsStyle2,  6, nullptr, L"Tools");
+  toolbar.InsertButton(7,  ICON24_RSS,      107, 1, fsStyle1,  7, nullptr, L"Torrents");
+  toolbar.InsertButton(8,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar.InsertButton(9,  ICON24_FILTER,   109, 1, fsStyle1,  9, nullptr, L"Filter list");
+  toolbar.InsertButton(10, ICON24_SETTINGS, 110, 1, fsStyle1, 10, nullptr, L"Change program settings");
   #ifdef _DEBUG
-  m_Toolbar.InsertButton(11, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  m_Toolbar.InsertButton(12, Icon24_About,    112, 1, fsStyle1, 12, NULL, L"Debug");
+  toolbar.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar.InsertButton(12, ICON24_ABOUT,    112, 1, fsStyle1, 12, nullptr, L"Debug");
   #endif
   // Insert search toolbar button
-  m_ToolbarSearch.InsertButton(0, Icon16_Search, 200, 1, fsStyle2, NULL, NULL, L"Search");
+  toolbar_search.InsertButton(0, ICON16_SEARCH, 200, 1, fsStyle2, 0, nullptr, L"Search");
 
   // Insert rebar bands
   UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
   UINT fStyle = RBBS_NOGRIPPER;
-  m_Rebar.InsertBand(NULL, 0, 0, 0, 0, 0, 0, 0, 0, fMask, fStyle);
-  m_Rebar.InsertBand(m_Toolbar.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
-    HIWORD(m_Toolbar.GetButtonSize()) + (HIWORD(m_Toolbar.GetPadding()) / 2), fMask, fStyle);
-  m_Rebar.InsertBand(m_ToolbarSearch.GetWindowHandle(), 0, 0, 0, 240, 0, 0, 0, 
-    HIWORD(m_ToolbarSearch.GetButtonSize()), fMask, fStyle);
+  rebar.InsertBand(nullptr, 0, 0, 0, 0, 0, 0, 0, 0, fMask, fStyle);
+  rebar.InsertBand(toolbar.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
+    HIWORD(toolbar.GetButtonSize()) + (HIWORD(toolbar.GetPadding()) / 2), fMask, fStyle);
+  rebar.InsertBand(toolbar_search.GetWindowHandle(), 0, 0, 0, 240, 0, 0, 0, 
+    HIWORD(toolbar_search.GetButtonSize()), fMask, fStyle);
 
   // Insert tabs and list groups
   for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
     if (i != MAL_UNKNOWN) {
-      m_Tab.InsertItem(i - 1, MAL.TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-      m_List.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str());
+      tab.InsertItem(i - 1, MAL.TranslateMyStatus(i, true).c_str(), (LPARAM)i);
+      listview.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str());
     }
   }
+
+  listview.parent = this;
+  search_bar.parent = this;
 }
 
 // =============================================================================
 
-INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     // Log off / Shutdown
     case WM_ENDSESSION: {
@@ -224,22 +227,22 @@ INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
     // Drag list item
     case WM_MOUSEMOVE: {
-      if (m_List.m_bDragging) {
-        m_List.m_DragImage.DragMove(LOWORD(lParam) + 16, HIWORD(lParam) + 24);
-        SetCursor(LoadCursor(NULL, m_Tab.HitTest() > -1 ? IDC_ARROW : IDC_NO));
+      if (listview.dragging) {
+        listview.drag_image.DragMove(LOWORD(lParam) + 16, HIWORD(lParam) + 24);
+        SetCursor(LoadCursor(nullptr, tab.HitTest() > -1 ? IDC_ARROW : IDC_NO));
       }
       break;
     }
     case WM_LBUTTONUP: {
-      if (m_List.m_bDragging) {
-        m_List.m_DragImage.DragLeave(g_hMain);
-        m_List.m_DragImage.EndDrag();
-        m_List.m_DragImage.Destroy();
-        m_List.m_bDragging = false;
+      if (listview.dragging) {
+        listview.drag_image.DragLeave(g_hMain);
+        listview.drag_image.EndDrag();
+        listview.drag_image.Destroy();
+        listview.dragging = false;
         ReleaseCapture();
-        int tab_index = m_Tab.HitTest();
+        int tab_index = tab.HitTest();
         if (tab_index > -1) {
-          int status = m_Tab.GetItemParam(tab_index);
+          int status = tab.GetItemParam(tab_index);
           ExecuteAction(L"EditStatus(" + ToWSTR(status) + L")");
         }
       }
@@ -247,14 +250,28 @@ INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
 
     // Forward mouse wheel messages to the list
-    case WM_MOUSEWHEEL:
+    case WM_MOUSEWHEEL: {
+      return listview.SendMessage(uMsg, wParam, lParam);
+    }
+
+    // Back & forward buttons
     case WM_XBUTTONUP: {
-      return m_List.SendMessage(uMsg, wParam, lParam);
+      int index = tab.GetCurrentlySelected();
+      int count = tab.GetItemCount();
+      switch (HIWORD(wParam)) {
+        case XBUTTON1: index--; break;
+        case XBUTTON2: index++; break;
+      }
+      if (index < 0 || index > count - 1) return TRUE;
+      tab.SetCurrentlySelected(index);
+      index++; if (index == 5) index = 6;
+      RefreshList(index);
+      return TRUE;
     }
 
     // Monitor anime folders
     case WM_MONITORCALLBACK: {
-      FolderMonitor.OnChange(reinterpret_cast<CFolderInfo*>(lParam));
+      FolderMonitor.OnChange(reinterpret_cast<FolderInfo*>(lParam));
       return TRUE;
     }
     
@@ -262,7 +279,7 @@ INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     case WM_COPYDATA: {
       PCOPYDATASTRUCT pCDS = (PCOPYDATASTRUCT)lParam;
       // Skype
-      if (reinterpret_cast<HWND>(wParam) == Skype.m_APIWindowHandle) {
+      if (reinterpret_cast<HWND>(wParam) == Skype.api_window_handle) {
         return TRUE; // pCDS->lpData is the response
 
       // JetAudio
@@ -279,13 +296,13 @@ INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
     default: {
       // Skype
-      if (uMsg == Skype.m_uControlAPIAttach) {
+      if (uMsg == Skype.control_api_attach) {
         switch (lParam) {
           case 0: // ATTACH_SUCCESS
             #ifdef _DEBUG
             ChangeStatus(L"Skype attach succeeded.");
             #endif
-            Skype.m_APIWindowHandle = reinterpret_cast<HWND>(wParam);
+            Skype.api_window_handle = reinterpret_cast<HWND>(wParam);
             Skype.ChangeMood();
             return TRUE;
           case 1: // ATTACH_PENDING_AUTHORIZATION
@@ -301,23 +318,23 @@ INT_PTR CMainWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-BOOL CMainWindow::PreTranslateMessage(MSG* pMsg) {
+BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
   switch (pMsg->message) {
     case WM_KEYDOWN: {
-      if (::GetFocus() == m_EditSearch.GetWindowHandle()) {
+      if (::GetFocus() == edit.GetWindowHandle()) {
         switch (pMsg->wParam) {
           // Clear search text
           case VK_ESCAPE: {
-            m_EditSearch.SetText(L"");
+            edit.SetText(L"");
             return TRUE;
           }
           // Search
           case VK_RETURN: {
-            switch (m_SearchBar.Mode) {
+            switch (search_bar.mode) {
               case SEARCH_MODE_MAL: {
                 wstring text;
-                m_EditSearch.GetText(text);
-                switch (Settings.Account.MAL.API) {
+                edit.GetText(text);
+                switch (Settings.Account.MAL.api) {
                   case MAL_API_OFFICIAL: {
                     ExecuteAction(L"SearchAnime(" + text + L")");
                     return TRUE;
@@ -330,21 +347,21 @@ BOOL CMainWindow::PreTranslateMessage(MSG* pMsg) {
                 break;
               }
               case SEARCH_MODE_TORRENT: {
-                CFeed* pFeed = Aggregator.Get(FEED_CATEGORY_LINK);
-                if (pFeed) {
+                Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
+                if (feed) {
                   wstring text;
-                  m_EditSearch.GetText(text);
-                  wstring search_url = m_SearchBar.URL;
+                  edit.GetText(text);
+                  wstring search_url = search_bar.url;
                   Replace(search_url, L"%search%", text);
-                  pFeed->Check(search_url);
+                  feed->Check(search_url);
                   ExecuteAction(L"Torrents");
                 }
                 break;
               }
               case SEARCH_MODE_WEB: {
                 wstring text;
-                m_EditSearch.GetText(text);
-                wstring search_url = m_SearchBar.URL;
+                edit.GetText(text);
+                wstring search_url = search_bar.url;
                 Replace(search_url, L"%search%", text);
                 ExecuteLink(search_url);
                 break;
@@ -363,12 +380,12 @@ BOOL CMainWindow::PreTranslateMessage(MSG* pMsg) {
 
 // =============================================================================
 
-BOOL CMainWindow::OnClose() {
-  if (Settings.Program.General.Close) {
+BOOL MainDialog::OnClose() {
+  if (Settings.Program.General.close) {
     Hide();
     return TRUE;
   }
-  if (Settings.Program.Exit.Ask) {
+  if (Settings.Program.Exit.ask) {
     CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Are you sure you want to exit?");
     dlg.AddButton(L"Yes", IDYES);
@@ -379,44 +396,45 @@ BOOL CMainWindow::OnClose() {
   return FALSE;
 }
 
-BOOL CMainWindow::OnDestroy() {
+BOOL MainDialog::OnDestroy() {
   // Announce
-  if (Taiga.PlayStatus == PLAYSTATUS_PLAYING) {
-    Taiga.PlayStatus = PLAYSTATUS_STOPPED;
+  if (Taiga.play_status == PLAYSTATUS_PLAYING) {
+    Taiga.play_status = PLAYSTATUS_STOPPED;
     ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
   }
   ExecuteAction(L"AnnounceToMessenger", FALSE);
   ExecuteAction(L"AnnounceToSkype", FALSE);
   // Close other dialogs
-  AnimeWindow.Destroy();
-  RecognitionTestWindow.Destroy();
-  SearchWindow.Destroy();
-  SeasonWindow.Destroy();
-  TorrentWindow.Destroy();
+  AnimeDialog.Destroy();
+  RecognitionTest.Destroy();
+  SearchDialog.Destroy();
+  SeasonDialog.Destroy();
+  TorrentDialog.Destroy();
   // Cleanup
   MainClient.Cleanup();
-  Settings.Write();
   Taskbar.Destroy();
   TaskbarList.Release();
+  // Save settings
+  Settings.Save();
   // Exit
   Taiga.PostQuitMessage();
   return TRUE;
 }
 
-void CMainWindow::OnDropFiles(HDROP hDropInfo) {
+void MainDialog::OnDropFiles(HDROP hDropInfo) {
   #ifdef _DEBUG
   WCHAR buffer[MAX_PATH];
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
-    CEpisode episode;
+    Episode episode;
     Meow.ExamineTitle(buffer, episode); 
-    MessageBox(ReplaceVariables(Settings.Program.Balloon.Format, episode).c_str(), APP_TITLE, MB_OK);
+    MessageBox(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), APP_TITLE, MB_OK);
   }
   #endif
 }
 
-LRESULT CMainWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // ListView control
-  if (idCtrl == IDC_LIST_MAIN || pnmh->hwndFrom == m_List.GetHeader()) {
+  if (idCtrl == IDC_LIST_MAIN || pnmh->hwndFrom == listview.GetHeader()) {
     return OnListNotify(reinterpret_cast<LPARAM>(pnmh));
   
   // Tab control
@@ -441,7 +459,7 @@ LRESULT CMainWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
+void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_ENTERSIZEMOVE: {
       if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
@@ -457,36 +475,36 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
     }
     case WM_SIZE: {
       if (IsIconic()) {
-        if (Settings.Program.General.Minimize) Hide();
+        if (Settings.Program.General.minimize) Hide();
         return;
       }
       
       // Save size settings
-      Settings.Program.General.SizeX = size.cx;
-      Settings.Program.General.SizeY = size.cy;
+      Settings.Program.General.size_x = size.cx;
+      Settings.Program.General.size_y = size.cy;
       // Set window area
       CRect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
       rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
-      m_Rebar.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += m_Rebar.GetBarHeight() + 2;
+      rebar.SendMessage(WM_SIZE, 0, 0);
+      rcWindow.top += rebar.GetBarHeight() + 2;
       // Resize status bar
       CRect rcStatus;
-      m_Status.GetClientRect(&rcStatus);
-      m_Status.SendMessage(WM_SIZE, 0, 0);
+      statusbar.GetClientRect(&rcStatus);
+      statusbar.SendMessage(WM_SIZE, 0, 0);
       rcWindow.bottom -= rcStatus.Height();
-      // Resize tree
-      if (m_Tree.IsVisible()) {
-        m_Tree.SetPosition(NULL, rcWindow.left, rcWindow.top, 200 /* TEMP */, rcWindow.Height());
+      // Resize treeview
+      if (treeview.IsVisible()) {
+        treeview.SetPosition(nullptr, rcWindow.left, rcWindow.top, 200 /* TEMP */, rcWindow.Height());
         rcWindow.left += 200 + WIN_CONTROL_MARGIN;
       }
       // Resize tab
-      m_Tab.SetPosition(NULL, rcWindow);
+      tab.SetPosition(nullptr, rcWindow);
       // Resize list
-      m_Tab.AdjustRect(NULL, FALSE, &rcWindow);
+      tab.AdjustRect(nullptr, FALSE, &rcWindow);
       rcWindow.left -= 3; rcWindow.top -= 1;
-      m_List.SetPosition(NULL, rcWindow, 0);
+      listview.SetPosition(nullptr, rcWindow, 0);
     }
   }
 }
@@ -498,12 +516,12 @@ void CMainWindow::OnSize(UINT uMsg, UINT nType, SIZE size) {
 // This function is very delicate, even order of things are important.
 // Please be careful with what you change.
 
-void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
+void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   // Check event queue
-  Taiga.TickerQueue++;
-  if (Taiga.TickerQueue >= 5 * 60) { // 5 minutes
-    Taiga.TickerQueue = 0;
-    if (EventQueue.UpdateInProgress == false) {
+  Taiga.ticker_queue++;
+  if (Taiga.ticker_queue >= 5 * 60) { // 5 minutes
+    Taiga.ticker_queue = 0;
+    if (EventQueue.updating == false) {
       EventQueue.Check();
     }
   }
@@ -511,10 +529,10 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
   // ===========================================================================
   
   // Check new episodes (if folder monitor is disabled)
-  if (!Settings.Folders.WatchEnabled) {
-    Taiga.TickerNewEpisodes++;
-    if (Taiga.TickerNewEpisodes >= 30 * 60) { // 30 minutes
-      Taiga.TickerNewEpisodes = 0;
+  if (!Settings.Folders.watch_enabled) {
+    Taiga.ticker_new_episodes++;
+    if (Taiga.ticker_new_episodes >= 30 * 60) { // 30 minutes
+      Taiga.ticker_new_episodes = 0;
       ExecuteAction(L"CheckEpisodes()", TRUE);
     }
   }
@@ -526,18 +544,17 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
     Aggregator.Feeds[i].Ticker++;
     switch (Aggregator.Feeds[i].Category) {
       case FEED_CATEGORY_LINK:
-        if (Settings.RSS.Torrent.CheckEnabled && Settings.RSS.Torrent.CheckInterval) {
-          if (TorrentWindow.IsWindow()) {
-            wstring text = L"Check new torrents [" + 
-              ToTimeString(Settings.RSS.Torrent.CheckInterval * 60 - Aggregator.Feeds[i].Ticker) + L"]";
-            TorrentWindow.m_Toolbar.SetButtonText(0, text.c_str());
+        if (Settings.RSS.Torrent.check_enabled && Settings.RSS.Torrent.check_interval) {
+          if (TorrentDialog.IsWindow()) {
+            TorrentDialog.SetTimerText(L"Check new torrents [" + 
+              ToTimeString(Settings.RSS.Torrent.check_interval * 60 - Aggregator.Feeds[i].Ticker) + L"]");
           }
-          if (Aggregator.Feeds[i].Ticker >= Settings.RSS.Torrent.CheckInterval * 60) {
-            Aggregator.Feeds[i].Check(Settings.RSS.Torrent.Source);
+          if (Aggregator.Feeds[i].Ticker >= Settings.RSS.Torrent.check_interval * 60) {
+            Aggregator.Feeds[i].Check(Settings.RSS.Torrent.source);
           }
         } else {
-          if (TorrentWindow.IsWindow()) {
-            TorrentWindow.m_Toolbar.SetButtonText(0, L"Check new torrents");
+          if (TorrentDialog.IsWindow()) {
+            TorrentDialog.SetTimerText(L"Check new torrents");
           }
         }
         break;
@@ -547,37 +564,37 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
   // ===========================================================================
   
   // Check process list for media players
-  CAnime* anime = AnimeList.FindItem(CurrentEpisode.AnimeId);
+  Anime* anime = AnimeList.FindItem(CurrentEpisode.anime_id);
   int media_index = MediaPlayers.Check();
 
   // Media player is running
   if (media_index > -1) {
     // Started to watch?
-    if (CurrentEpisode.AnimeId == ANIMEID_UNKNOWN) {
+    if (CurrentEpisode.anime_id == ANIMEID_UNKNOWN) {
       // Recognized?
       if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode)) {
-        for (int i = AnimeList.Count; i > 0; i--) {
-          if (Meow.CompareEpisode(CurrentEpisode, AnimeList.Items[i])) {
-            CurrentEpisode.AnimeId = AnimeList.Items[i].Series_ID;
-            RefreshMenubar(CurrentEpisode.AnimeId);
-            AnimeList.Items[i].Start(CurrentEpisode);
+        for (int i = AnimeList.count; i > 0; i--) {
+          if (Meow.CompareEpisode(CurrentEpisode, AnimeList.items[i])) {
+            CurrentEpisode.anime_id = AnimeList.items[i].series_id;
+            RefreshMenubar(CurrentEpisode.anime_id);
+            AnimeList.items[i].Start(CurrentEpisode);
             return;
           }
         }
       }
       // Not recognized
-      CurrentEpisode.AnimeId = ANIMEID_NOTINLIST;
-      RefreshMenubar(CurrentEpisode.AnimeId);
-      if (CurrentEpisode.Title.empty()) {
+      CurrentEpisode.anime_id = ANIMEID_NOTINLIST;
+      RefreshMenubar(CurrentEpisode.anime_id);
+      if (CurrentEpisode.title.empty()) {
         #ifdef _DEBUG
         ChangeStatus(MediaPlayers.Items[MediaPlayers.Index].Name + L" is running.");
         #endif
       } else {
-        ChangeStatus(L"Watching: " + CurrentEpisode.Title + 
-          PushString(L" #", CurrentEpisode.Number) + L" (Not recognized)");
-        wstring tip_text = ReplaceVariables(Settings.Program.Balloon.Format, CurrentEpisode);
+        ChangeStatus(L"Watching: " + CurrentEpisode.title + 
+          PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
+        wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);
         tip_text += L"\nClick here to search MyAnimeList for this anime.";
-        Taiga.CurrentTipType = TIPTYPE_SEARCH;
+        Taiga.current_tip_type = TIPTYPE_SEARCH;
         Taskbar.Tip(L"", L"", 0);
         Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
       }
@@ -585,34 +602,34 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
     // Already watching or not recognized before
     } else {
       // Tick and compare with delay time
-      if (Taiga.TickerMedia > -1 && Taiga.TickerMedia <= Settings.Account.Update.Delay) {
-        if (Taiga.TickerMedia == Settings.Account.Update.Delay) {
+      if (Taiga.ticker_media > -1 && Taiga.ticker_media <= Settings.Account.Update.delay) {
+        if (Taiga.ticker_media == Settings.Account.Update.delay) {
           // Disable ticker
-          Taiga.TickerMedia = -1;
+          Taiga.ticker_media = -1;
           // Announce current episode
           ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           ExecuteAction(L"AnnounceToMessenger", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           ExecuteAction(L"AnnounceToMIRC", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           ExecuteAction(L"AnnounceToSkype", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
           // Update
-          if (Settings.Account.Update.Time == UPDATE_MODE_AFTERDELAY && anime) {
+          if (Settings.Account.Update.time == UPDATE_MODE_AFTERDELAY && anime) {
             anime->End(CurrentEpisode, false, true);
           }
           return;
         }
-        if (Settings.Account.Update.CheckPlayer == FALSE || 
+        if (Settings.Account.Update.check_player == FALSE || 
           MediaPlayers.Items[media_index].WindowHandle == GetForegroundWindow()) {
-            Taiga.TickerMedia++;
+            Taiga.ticker_media++;
         }
       }
       // Caption changed?
       if (MediaPlayers.TitleChanged() == true) {
-        CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
-        RefreshMenubar(CurrentEpisode.AnimeId);
+        CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
+        RefreshMenubar(CurrentEpisode.anime_id);
         if (anime) {
           anime->End(CurrentEpisode, true, true);
         }
-        Taiga.TickerMedia = 0;
+        Taiga.ticker_media = 0;
       }
     }
   
@@ -622,17 +639,17 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
     if (!anime) {
       if (MediaPlayers.IndexOld > 0){
         ChangeStatus();
-        CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
+        CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
         MediaPlayers.IndexOld = 0;
-        RefreshMenubar(CurrentEpisode.AnimeId);
+        RefreshMenubar(CurrentEpisode.anime_id);
       }
     
     // Was running and watching
     } else {
-      CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
-      RefreshMenubar(CurrentEpisode.AnimeId);
-      anime->End(CurrentEpisode, true, Settings.Account.Update.Time == UPDATE_MODE_WAITPLAYER);
-      Taiga.TickerMedia = 0;
+      CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
+      RefreshMenubar(CurrentEpisode.anime_id);
+      anime->End(CurrentEpisode, true, Settings.Account.Update.time == UPDATE_MODE_WAITPLAYER);
+      Taiga.ticker_media = 0;
     }
   }
 }
@@ -641,10 +658,10 @@ void CMainWindow::OnTimer(UINT_PTR nIDEvent) {
 
 /* Taskbar */
 
-void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
+void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   // Taskbar creation notification
   if (uMsg == WM_TASKBARCREATED) {
-    Taskbar.Create(m_hWindow, NULL, APP_TITLE);
+    Taskbar.Create(m_hWindow, nullptr, APP_TITLE);
   
   // Windows 7 taskbar interface
   } else if (uMsg == WM_TASKBARBUTTONCREATED) {
@@ -654,17 +671,17 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   } else if (uMsg == WM_TASKBARCALLBACK) {
     switch (lParam) {
       case NIN_BALLOONSHOW: {
-        DEBUG_PRINT(L"Tip type: " + ToWSTR(Taiga.CurrentTipType) + L"\n");
+        DEBUG_PRINT(L"Tip type: " + ToWSTR(Taiga.current_tip_type) + L"\n");
         break;
       }
       case NIN_BALLOONTIMEOUT: {
-        Taiga.CurrentTipType = TIPTYPE_NORMAL;
+        Taiga.current_tip_type = TIPTYPE_NORMAL;
         break;
       }
       case NIN_BALLOONUSERCLICK: {
-        switch (Taiga.CurrentTipType) {
+        switch (Taiga.current_tip_type) {
           case TIPTYPE_SEARCH:
-            ExecuteAction(L"SearchAnime(" + CurrentEpisode.Title + L")");
+            ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
             break;
           case TIPTYPE_TORRENT:
             ExecuteAction(L"Torrents");
@@ -673,7 +690,7 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             EventQueue.Check();
             break;
         }
-        Taiga.CurrentTipType = TIPTYPE_NORMAL;
+        Taiga.current_tip_type = TIPTYPE_NORMAL;
         break;
       }
       case WM_LBUTTONDBLCLK: {
@@ -681,10 +698,10 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case WM_RBUTTONDOWN: {
-        UpdateAllMenus(AnimeList.Index > -1 ? &AnimeList.Items[AnimeList.Index] : nullptr);
+        UpdateAllMenus(AnimeList.index > -1 ? &AnimeList.items[AnimeList.index] : nullptr);
         SetForegroundWindow();
         ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"Tray"));
-        RefreshMenubar(AnimeList.Index);
+        RefreshMenubar(AnimeList.index);
         break;
       }
     }
@@ -693,51 +710,51 @@ void CMainWindow::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
 
 // =============================================================================
 
-void CMainWindow::ChangeStatus(wstring str) {
+void MainDialog::ChangeStatus(wstring str) {
   // Change status text
-  if (str.empty() && CurrentEpisode.AnimeId > 0) {
-    CAnime* anime = AnimeList.FindItem(CurrentEpisode.AnimeId);
-    str = L"Watching: " + anime->Series_Title + PushString(L" #", CurrentEpisode.Number);
-    if (Settings.Account.Update.OutOfRange && 
-      GetEpisodeLow(CurrentEpisode.Number) > anime->GetLastWatchedEpisode() + 1) {
+  if (str.empty() && CurrentEpisode.anime_id > 0) {
+    Anime* anime = AnimeList.FindItem(CurrentEpisode.anime_id);
+    str = L"Watching: " + anime->series_title + PushString(L" #", CurrentEpisode.number);
+    if (Settings.Account.Update.out_of_range && 
+      GetEpisodeLow(CurrentEpisode.number) > anime->GetLastWatchedEpisode() + 1) {
         str += L" (out of range)";
     }
   }
   if (!str.empty()) str = L"  " + str;
-  m_Status.SetText(str.c_str());
+  statusbar.SetText(str.c_str());
 }
 
-void CMainWindow::EnableInput(bool enable) {
+void MainDialog::EnableInput(bool enable) {
   // Enable/disable toolbar buttons
-  m_Toolbar.EnableButton(0, enable);
-  m_Toolbar.EnableButton(1, enable);
+  toolbar.EnableButton(0, enable);
+  toolbar.EnableButton(1, enable);
   // Enable/disable list
-  m_List.Enable(enable);
+  listview.Enable(enable);
 }
 
-int CMainWindow::GetListIndex(int anime_id) {
-  CAnime* anime;
-  for (int i = 0; i < m_List.GetItemCount(); i++) {
-    anime = reinterpret_cast<CAnime*>(m_List.GetItemParam(i));
-    if (anime && anime->Series_ID == anime_id) return i;
+int MainDialog::GetListIndex(int anime_id) {
+  Anime* anime;
+  for (int i = 0; i < listview.GetItemCount(); i++) {
+    anime = reinterpret_cast<Anime*>(listview.GetItemParam(i));
+    if (anime && anime->series_id == anime_id) return i;
   }
   return -1;
 }
 
-void CMainWindow::RefreshList(int index) {
+void MainDialog::RefreshList(int index) {
   // Change window title
   wstring title = APP_TITLE;
-  if (!Settings.Account.MAL.User.empty()) {
-    title += L" - " + Settings.Account.MAL.User + L"'";
-    title += EndsWith(Settings.Account.MAL.User, L"s") ? L"" : L"s";
+  if (!Settings.Account.MAL.user.empty()) {
+    title += L" - " + Settings.Account.MAL.user + L"'";
+    title += EndsWith(Settings.Account.MAL.user, L"s") ? L"" : L"s";
     title += L" Anime List";
   }
   SetText(title.c_str());
 
   // Hide list to avoid visual defects and gain performance
-  m_List.Hide();
-  m_List.EnableGroupView(index == 0 && GetWinVersion() > WINVERSION_XP);
-  m_List.DeleteAllItems();
+  listview.Hide();
+  listview.EnableGroupView(index == 0 && GetWinVersion() > WINVERSION_XP);
+  listview.DeleteAllItems();
 
   // Remember last index
   static int last_index = 0;
@@ -747,19 +764,19 @@ void CMainWindow::RefreshList(int index) {
   // Add items
   int group_index = -1, icon_index = 0, status = 0;
   vector<int> group_count(6);
-  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
+  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
     status = it->GetStatus();
     if (status == index || index == 0 || (index == MAL_WATCHING && it->GetRewatching())) {
-      if (AnimeList.Filter.Check(*it)) {
+      if (AnimeList.filters.Check(*it)) {
         group_index = GetWinVersion() > WINVERSION_XP ? status : -1;
-        icon_index = it->Playing ? Icon16_Play : StatusToIcon(it->GetAiringStatus());
+        icon_index = it->playing ? ICON16_PLAY : StatusToIcon(it->GetAiringStatus());
         group_count.at(status - 1)++;
-        int i = m_List.GetItemCount();
-        m_List.InsertItem(i, group_index, icon_index, 
-          0, NULL, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
-        m_List.SetItem(i, 2, MAL.TranslateNumber(it->GetScore()).c_str());
-        m_List.SetItem(i, 3, MAL.TranslateType(it->Series_Type).c_str());
-        m_List.SetItem(i, 4, MAL.TranslateDateToSeason(it->Series_Start).c_str());
+        int i = listview.GetItemCount();
+        listview.InsertItem(i, group_index, icon_index, 
+          0, nullptr, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
+        listview.SetItem(i, 2, MAL.TranslateNumber(it->GetScore()).c_str());
+        listview.SetItem(i, 3, MAL.TranslateType(it->series_type).c_str());
+        listview.SetItem(i, 4, MAL.TranslateDateToSeason(it->series_start).c_str());
       }
     }
   }
@@ -769,19 +786,19 @@ void CMainWindow::RefreshList(int index) {
     if (index == 0 && i != MAL_UNKNOWN) {
       wstring text = MAL.TranslateMyStatus(i, false);
       text += group_count.at(i - 1) > 0 ? L" (" + ToWSTR(group_count.at(i - 1)) + L")" : L"";
-      m_List.SetGroupText(i, text.c_str());
+      listview.SetGroupText(i, text.c_str());
     }
   }
 
   // Sort items
-  m_List.Sort(m_List.GetSortColumn(), m_List.GetSortOrder(), 
-    m_List.GetSortType(m_List.GetSortColumn()), ListViewCompareProc);
+  listview.Sort(listview.GetSortColumn(), listview.GetSortOrder(), 
+    listview.GetSortType(listview.GetSortColumn()), ListViewCompareProc);
 
   // Show again
-  m_List.Show(SW_SHOW);
+  listview.Show(SW_SHOW);
 }
 
-void CMainWindow::RefreshMenubar(int anime_id, bool show) {
+void MainDialog::RefreshMenubar(int anime_id, bool show) {
   if (show) {
     UpdateAllMenus(AnimeList.FindItem(anime_id));
     vector<HMENU> hMenu;
@@ -791,11 +808,11 @@ void CMainWindow::RefreshMenubar(int anime_id, bool show) {
       SetMenu(hMenu[0]);
     }
   } else {
-    SetMenu(NULL);
+    SetMenu(nullptr);
   }
 }
 
-void CMainWindow::RefreshTabs(int index, bool redraw) {
+void MainDialog::RefreshTabs(int index, bool redraw) {
   // Remember last index
   static int last_index = 1;
   if (index == -1) index = last_index;
@@ -804,57 +821,57 @@ void CMainWindow::RefreshTabs(int index, bool redraw) {
   if (!redraw) return;
   
   // Hide
-  m_Tab.Hide();
+  tab.Hide();
 
   // Refresh text
   for (int i = 1; i <= 6; i++) {
     if (i != 5) {
-      m_Tab.SetItemText(i == 6 ? 4 : i - 1, MAL.TranslateMyStatus(i, true).c_str());
+      tab.SetItemText(i == 6 ? 4 : i - 1, MAL.TranslateMyStatus(i, true).c_str());
     }
   }
 
   // Select related tab
-  m_Tab.SetCurrentlySelected(--index);
+  tab.SetCurrentlySelected(--index);
 
   // Show again
-  m_Tab.Show(SW_SHOW);
+  tab.Show(SW_SHOW);
 }
 
-void CMainWindow::CSearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wstring url) {
-  Index = index;
-  Mode = mode;
-  URL = url;
-  CueText = cue_text;
-  MainWindow.m_EditSearch.SetCueBannerText(cue_text.c_str());
-  Settings.Program.General.SearchIndex = index;
+void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wstring url) {
+  this->index = index;
+  this->mode = mode;
+  this->url = url;
+  this->cue_text = cue_text;
+  parent->edit.SetCueBannerText(cue_text.c_str());
+  Settings.Program.General.search_index = index;
 
   switch (mode) {
     case SEARCH_MODE_LIST:
-      MainWindow.m_EditSearch.GetText(AnimeList.Filter.Text);
-      if (!AnimeList.Filter.Text.empty()) {
-        MainWindow.RefreshList(0);
+      parent->edit.GetText(AnimeList.filters.text);
+      if (!AnimeList.filters.text.empty()) {
+        parent->RefreshList(0);
       }
       break;
     case SEARCH_MODE_MAL:
     case SEARCH_MODE_TORRENT:
     case SEARCH_MODE_WEB:
-      if (!AnimeList.Filter.Text.empty()) {
-        AnimeList.Filter.Text.clear();
-        MainWindow.RefreshList();
+      if (!AnimeList.filters.text.empty()) {
+        AnimeList.filters.text.clear();
+        parent->RefreshList();
       }
       break;
   }
 }
 
-void CMainWindow::UpdateTip() {
+void MainDialog::UpdateTip() {
   wstring tip = APP_TITLE;
-  if (Taiga.LoggedIn) {
-    tip += L"\n" + AnimeList.User.Name + L" is logged in.";
+  if (Taiga.logged_in) {
+    tip += L"\n" + AnimeList.user.name + L" is logged in.";
   }
-  if (CurrentEpisode.AnimeId > 0) {
-    CAnime* anime = AnimeList.FindItem(CurrentEpisode.AnimeId);
-    tip += L"\nWatching: " + anime->Series_Title + 
-      (!CurrentEpisode.Number.empty() ? L" #" + CurrentEpisode.Number : L"");
+  if (CurrentEpisode.anime_id > 0) {
+    Anime* anime = AnimeList.FindItem(CurrentEpisode.anime_id);
+    tip += L"\nWatching: " + anime->series_title + 
+      (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
   }
   Taskbar.Modify(tip.c_str());
 }

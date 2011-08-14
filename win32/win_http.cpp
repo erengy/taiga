@@ -22,6 +22,18 @@
 
 // =============================================================================
 
+CUrl& CUrl::operator=(const CUrl& url) {
+  Scheme = url.Scheme;
+  Host = url.Host;
+  Path = url.Path;
+
+  return *this;
+}
+
+void CUrl::operator=(const wstring& url) {
+  Crack(url);
+}
+
 void CUrl::Crack(wstring url) {
   // Get scheme
   size_t i = url.find(L"://", 0);
@@ -312,7 +324,7 @@ void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus,
 
 CHTTP::CHTTP() : 
   m_AutoRedirect(TRUE), m_Buffer(NULL), m_ContentEncoding(HTTP_Encoding_None), 
-  m_dwDownloaded(0), m_dwTotal(0), m_dwClientMode(0), m_lParam(0),
+  m_ResponseStatusCode(0), m_dwDownloaded(0), m_dwTotal(0), m_dwClientMode(0), m_lParam(0), 
   m_hConnect(NULL), m_hRequest(NULL), m_hSession(NULL)
 {
   m_UserAgent = L"Mozilla/5.0";
@@ -350,6 +362,7 @@ void CHTTP::Cleanup() {
   m_OptionalData.clear();
   m_Referer.clear();
   m_RequestHeader.clear();
+  m_ResponseStatusCode = 0;
   m_ResponseHeader.clear();
   m_Verb.clear();
   m_dwDownloaded = 0;
@@ -383,6 +396,10 @@ LPARAM CHTTP::GetParam() {
   return m_lParam;
 }
 
+int CHTTP::GetResponseStatusCode() {
+  return m_ResponseStatusCode;
+}
+
 void CHTTP::SetAutoRedirect(BOOL enabled) {
   m_AutoRedirect = enabled;
 }
@@ -402,12 +419,17 @@ void CHTTP::SetUserAgent(const wstring& user_agent) {
 bool CHTTP::ParseHeader(const wstring& text, http_header_t& header) {
   header.clear();
   if (text.empty()) return false;
+  
   vector<wstring> header_list;
   Split(text, L"\r\n", header_list);
 
   for (auto it = header_list.begin(); it != header_list.end(); ++it) {
     int pos = InStr(*it, L":", 0);
-    if (pos > -1) {
+    if (pos == -1) {
+      if (StartsWith(*it, L"HTTP/")) {
+        m_ResponseStatusCode = ToINT(InStr(*it, L" ", L" "));
+      }
+    } else {
       wstring name = CharLeft(*it, pos);
       wstring value = it->substr(pos + 2);
       header[name] = value;
@@ -430,8 +452,6 @@ wstring CHTTP::BuildRequestHeader(wstring header) {
   
   return header;
 }
-
-
 
 bool CHTTP::ParseResponseHeader(const wstring& header) {
   if (!ParseHeader(header, m_ResponseHeader)) return false;

@@ -30,23 +30,23 @@
 #include "win32/win_taskbar.h"
 #include "xml.h"
 
-CAggregator Aggregator;
+class Aggregator Aggregator;
 
 // =============================================================================
 
-CFeed::CFeed() : 
+Feed::Feed() : 
   Category(0), DownloadIndex(-1), Ticker(0), m_hIcon(NULL)
 {
 }
 
-CFeed::~CFeed() {
+Feed::~Feed() {
   if (m_hIcon) {
     DestroyIcon(m_hIcon);
     m_hIcon = NULL;
   }
 }
 
-bool CFeed::Check(const wstring& source) {
+bool Feed::Check(const wstring& source) {
   // Reset ticker before checking the source so we don't fall into a loop
   Ticker = 0;
   if (source.empty()) return false;
@@ -55,7 +55,7 @@ bool CFeed::Check(const wstring& source) {
   switch (Category) {
     case FEED_CATEGORY_LINK:
       // Disable torrent dialog input
-      TorrentWindow.EnableInput(false);
+      TorrentDialog.EnableInput(false);
       break;
   }
   
@@ -64,9 +64,9 @@ bool CFeed::Check(const wstring& source) {
     HTTP_Feed_Check, reinterpret_cast<LPARAM>(this));
 }
 
-bool CFeed::Download(int index) {
+bool Feed::Download(int index) {
   if (Category != FEED_CATEGORY_LINK) {
-    DEBUG_PRINT(L"CFeed::Download - How did we end up here?\n");
+    DEBUG_PRINT(L"Feed::Download - How did we end up here?\n");
     return false;
   }
   
@@ -83,8 +83,8 @@ bool CFeed::Download(int index) {
   if (index < 0 || index > static_cast<int>(Items.size())) return false;
   DownloadIndex = index;
 
-  TorrentWindow.ChangeStatus(L"Downloading \"" + Items[index].Title + L"\"...");
-  TorrentWindow.EnableInput(false);
+  TorrentDialog.ChangeStatus(L"Downloading \"" + Items[index].Title + L"\"...");
+  TorrentDialog.EnableInput(false);
   
   wstring file = Items[index].Title + L".torrent";
   ValidateFileName(file);
@@ -94,13 +94,13 @@ bool CFeed::Download(int index) {
   return Client.Get(url, file, dwMode, reinterpret_cast<LPARAM>(this));
 }
 
-int CFeed::ExamineData() {
+int Feed::ExamineData() {
   // Examine title and compare with anime list items
   for (size_t i = 0; i < Items.size(); i++) {
     Meow.ExamineTitle(Items[i].Title, Items[i].EpisodeData, true, true, true, true, false);
-    for (int j = AnimeList.Count; j > 0; j--) {
-      if (Meow.CompareEpisode(Items[i].EpisodeData, AnimeList.Items[j])) {
-        Items[i].EpisodeData.AnimeId = AnimeList.Items[j].Series_ID;
+    for (int j = AnimeList.count; j > 0; j--) {
+      if (Meow.CompareEpisode(Items[i].EpisodeData, AnimeList.items[j])) {
+        Items[i].EpisodeData.anime_id = AnimeList.items[j].series_id;
         break;
       }
     }
@@ -111,7 +111,7 @@ int CFeed::ExamineData() {
   return count;
 }
 
-wstring CFeed::GetDataPath() {
+wstring Feed::GetDataPath() {
   wstring path = Taiga.GetDataPath() + L"Feed\\";
   if (!Link.empty()) {
     CUrl url(Link);
@@ -120,7 +120,7 @@ wstring CFeed::GetDataPath() {
   return path;
 }
 
-HICON CFeed::GetIcon() {
+HICON Feed::GetIcon() {
   if (Link.empty()) return NULL;
   if (m_hIcon) {
     DestroyIcon(m_hIcon);
@@ -139,7 +139,7 @@ HICON CFeed::GetIcon() {
   }
 }
 
-bool CFeed::Read() {
+bool Feed::Read() {
   // Initialize
   wstring file = GetDataPath() + L"feed.xml";
   Items.clear();
@@ -197,20 +197,20 @@ bool CFeed::Read() {
 
 // =============================================================================
 
-CAggregator::CAggregator() {
+Aggregator::Aggregator() {
   // Add torrent feed
   Feeds.resize(Feeds.size() + 1);
   Feeds.back().Category = FEED_CATEGORY_LINK;
 }
 
-CFeed* CAggregator::Get(int category) {
+Feed* Aggregator::Get(int category) {
   for (unsigned int i = 0; i < Feeds.size(); i++) {
     if (Feeds[i].Category == category) return &Feeds[i];
   }
   return NULL;
 }
 
-bool CAggregator::Notify(const CFeed& feed) {
+bool Aggregator::Notify(const Feed& feed) {
   wstring tip_text, tip_title;
 
   for (size_t i = 0; i < feed.Items.size(); i++) {
@@ -226,21 +226,21 @@ bool CAggregator::Notify(const CFeed& feed) {
     tip_text += L"Click to see all.";
     tip_title = L"New torrents available";
     LimitText(tip_text, 255);
-    Taiga.CurrentTipType = TIPTYPE_TORRENT;
+    Taiga.current_tip_type = TIPTYPE_TORRENT;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
     return true;
   }
 }
 
-bool CAggregator::SearchArchive(const wstring& file) {
+bool Aggregator::SearchArchive(const wstring& file) {
   for (size_t i = 0; i < FileArchive.size(); i++) {
     if (FileArchive[i] == file) return true;
   }
   return false;
 }
 
-void CAggregator::ParseDescription(CFeedItem& feed_item, const wstring& source) {
+void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
   // AnimeSuki
   if (InStr(source, L"animesuki", 0, true) > -1) {
     wstring size_str = L"Filesize: ";
@@ -286,7 +286,7 @@ void CAggregator::ParseDescription(CFeedItem& feed_item, const wstring& source) 
 
 // =============================================================================
 
-bool CAggregator::CompareFeedItems(const CGenericFeedItem& item1, const CGenericFeedItem& item2) {
+bool Aggregator::CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2) {
   // Check for guid element first
   if (item1.IsPermaLink && item2.IsPermaLink) {
     if (!item1.GUID.empty() || !item2.GUID.empty()) {

@@ -26,27 +26,26 @@
 
 // =============================================================================
 
-/* Recognition test dialog */
-
-class CTestRecognition : public CDialog {
+class RecognitionTestDialog : public CDialog {
 public:
-  CTestRecognition() {};
-  ~CTestRecognition() {};
+  RecognitionTestDialog() {};
+  ~RecognitionTestDialog() {};
 
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
-  class CEpisodeTest : public CEpisode {
+private:
+  class EpisodeTest : public Episode {
   public:
-    CEpisodeTest() : Priority(0) {}
-    int Priority;
+    EpisodeTest() : priority(0) {}
+    int priority;
   };
-  vector<CEpisodeTest> m_EpisodeList, m_EpisodeListTest;
-  
-  CListView m_List;
+  vector<EpisodeTest> episodes_, test_episodes_;
+
+  CListView list_;
 };
 
-extern CTestRecognition RecognitionTestWindow;
+extern RecognitionTestDialog RecognitionTest;
 
 #endif // DLG_TEST_RECOGNITOIN_H

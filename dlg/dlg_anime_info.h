@@ -24,30 +24,15 @@
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
-class CAnime;
+class Anime;
+class AnimeInfoPage;
 
 // =============================================================================
 
-class CAnimeInfoPage;
-
-class CAnimeWindow : public CDialog {
+class AnimeDialog : public CDialog {
 public:
-  CAnimeWindow();
-  virtual ~CAnimeWindow();
-
-  // Controls
-  CTab m_Tab;
-
-  // Pages
-  vector<CAnimeInfoPage> m_Page;
-
-  // Image data
-  CImage AnimeImage;
-
-  // Functions
-  void SetCurrentPage(int index);
-  void Refresh(CAnime* pAnimeItem = NULL, 
-    bool series_info = true, bool my_info = true);
+  AnimeDialog();
+  virtual ~AnimeDialog();
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -57,13 +42,23 @@ public:
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
   BOOL PreTranslateMessage(MSG* pMsg);
 
+public:
+  void SetCurrentPage(int index);
+  void Refresh(Anime* anime = nullptr, 
+    bool series_info = true, bool my_info = true);
+
+public:
+  vector<AnimeInfoPage> pages;
+
 private:
-  CAnime* m_pAnimeItem;
-  HBRUSH m_hbrDarkBlue, m_hbrLightBlue;
-  HFONT m_hfTitle;
-  int m_iCurrentPage;
+  Anime* anime_;
+  HBRUSH brush_darkblue_, brush_lightblue_;
+  int current_page_;
+  Image image_;
+  CTab tab_;
+  HFONT title_font_;
 };
 
-extern CAnimeWindow AnimeWindow;
+extern AnimeDialog AnimeDialog;
 
 #endif // DLG_ANIME_INFO_H

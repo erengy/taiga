@@ -27,26 +27,24 @@
 
 // =============================================================================
 
-/* Season browser */
-
-enum {
-  SEASONBROWSER_GROUPBY_AIRINGSTATUS,
-  SEASONBROWSER_GROUPBY_LISTSTATUS,
-  SEASONBROWSER_GROUPBY_TYPE
+enum SeasonGroupBy {
+  SEASON_GROUPBY_AIRINGSTATUS,
+  SEASON_GROUPBY_LISTSTATUS,
+  SEASON_GROUPBY_TYPE
 };
 
-enum {
-  SEASONBROWSER_SORTBY_AIRINGDATE,
-  SEASONBROWSER_SORTBY_EPISODES,
-  SEASONBROWSER_SORTBY_POPULARITY,
-  SEASONBROWSER_SORTBY_SCORE,
-  SEASONBROWSER_SORTBY_TITLE
+enum SeasonSortBy {
+  SEASON_SORTBY_AIRINGDATE,
+  SEASON_SORTBY_EPISODES,
+  SEASON_SORTBY_POPULARITY,
+  SEASON_SORTBY_SCORE,
+  SEASON_SORTBY_TITLE
 };
 
-class CSeasonWindow : public CDialog {
+class SeasonDialog : public CDialog {
 public:
-  CSeasonWindow();
-  virtual ~CSeasonWindow() {}
+  SeasonDialog();
+  virtual ~SeasonDialog() {}
 
   LRESULT OnButtonCustomDraw(LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -61,27 +59,29 @@ public:
 
 public:
   void RefreshData(bool connect = true);
-  void RefreshList();
+  void RefreshList(bool redraw_only = false);
   void RefreshStatus();
   void RefreshToolbar();
 
 public:
+  int group_by, sort_by;
+  vector<Image> images;
+
+private:
+  vector<class HttpClient> image_clients_, info_clients_;
+
+private:
   class CEditFilter : public CEdit {
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  } m_EditFilter;
-
-  CListView m_List;
-  CRebar m_Rebar;
-  CStatusBar m_Status;
-  CToolbar m_Toolbar, m_ToolbarFilter;
-  CWindow m_CancelFilter;
-
-public:
-  vector<CImage> Images;
-  vector<CHTTPClient> ImageClients, InfoClients;
-  int GroupBy, SortBy;
+  } edit_;
+  
+  CWindow cancel_button_;
+  CListView list_;
+  CRebar rebar_;
+  CStatusBar statusbar_;
+  CToolbar toolbar_, toolbar_filter_;
 };
 
-extern CSeasonWindow SeasonWindow;
+extern SeasonDialog SeasonDialog;
 
 #endif // DLG_SEASON_H

@@ -25,20 +25,19 @@
 
 // =============================================================================
 
-/* Filter dialog */
-
-class CFilterWindow : public CDialog {
+class FilterDialog : public CDialog {
 public:
-  CFilterWindow();
-  ~CFilterWindow() {}
-
-  void RefreshFilters();
+  FilterDialog();
+  ~FilterDialog() {}
   
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   BOOL PreTranslateMessage(MSG* pMsg);
+
+public:
+  void RefreshFilters();
 };
 
-extern CFilterWindow FilterWindow;
+extern FilterDialog FilterDialog;
 
 #endif // DLG_FILTER_H

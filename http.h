@@ -56,10 +56,10 @@ enum HTTP_ClientMode {
 
 // =============================================================================
 
-class CHTTPClient : public CHTTP {
+class HttpClient : public CHTTP {
 public:
-  CHTTPClient();
-  virtual ~CHTTPClient() {}
+  HttpClient();
+  virtual ~HttpClient() {}
 
 protected:
   BOOL OnError(DWORD dwError);
@@ -70,7 +70,7 @@ protected:
   BOOL OnRedirect(wstring address);
 };
 
-extern CHTTPClient HTTPClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
+extern HttpClient HttpClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
 
 // =============================================================================
 

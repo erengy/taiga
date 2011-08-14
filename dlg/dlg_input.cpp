@@ -19,67 +19,62 @@
 #include "../std.h"
 #include "dlg_input.h"
 #include "../resource.h"
-#include "../win32/win_control.h"
 
 // =============================================================================
 
-CInputDialog::CInputDialog() {
-  Info = L"Set new value:";
-  m_NumbersOnly = false;
-  m_CurrentValue = 0;
-  m_MinValue = 0;
-  m_MaxValue = 0;
-  Result = 0;
-  Title = L"Input";
+InputDialog::InputDialog() :
+  current_value_(0), min_value_(0), max_value_(0), 
+  numbers_only_(false), result(0)
+{
+  info = L"Set new value:";
+  title = L"Input";
 };
 
-void CInputDialog::SetNumbers(bool enabled, int min_value, int max_value, int current_value) {
-  m_NumbersOnly = enabled;
-  m_MinValue = min_value;
-  m_MaxValue = max_value;
-  m_CurrentValue = current_value;
+void InputDialog::SetNumbers(bool enabled, int min_value, int max_value, int current_value) {
+  numbers_only_ = enabled;
+  min_value_ = min_value;
+  max_value_ = max_value;
+  current_value_ = current_value;
 }
 
-void CInputDialog::Show(HWND hParent) {
-  Result = Create(IDD_INPUT, hParent, true);
+void InputDialog::Show(HWND parent) {
+  result = Create(IDD_INPUT, parent, true);
 }
 
 // =============================================================================
 
-BOOL CInputDialog::OnInitDialog() {
+BOOL InputDialog::OnInitDialog() {
   // Set dialog title
-  SetWindowText(m_hWindow, Title.c_str());
+  SetWindowText(m_hWindow, title.c_str());
 
   // Set information text
-  SetDlgItemText(IDC_STATIC_INPUTINFO, Info.c_str());
+  SetDlgItemText(IDC_STATIC_INPUTINFO, info.c_str());
 
   // Set text style and properties
-  CEdit m_Edit = GetDlgItem(IDC_EDIT_INPUT);
-  CSpin m_Spin = GetDlgItem(IDC_SPIN_INPUT);
-  m_Edit.LimitText(256);
-  if (m_NumbersOnly) {
-    m_Edit.SetStyle(ES_NUMBER, 0);
-    m_Spin.SetBuddy(m_Edit.GetWindowHandle());
-    m_Spin.SetRange32(m_MinValue, m_MaxValue > 0 ? m_MaxValue : 9999);
-    m_Spin.SetPos32(m_CurrentValue);
+  edit_.Attach(GetDlgItem(IDC_EDIT_INPUT));
+  spin_.Attach(GetDlgItem(IDC_SPIN_INPUT));
+  edit_.LimitText(256);
+  if (numbers_only_) {
+    edit_.SetStyle(ES_NUMBER, 0);
+    spin_.SetBuddy(edit_.GetWindowHandle());
+    spin_.SetRange32(min_value_, max_value_ > 0 ? max_value_ : 9999);
+    spin_.SetPos32(current_value_);
   } else {
-    m_Edit.SetStyle(0, ES_NUMBER);
-    m_Edit.SetText(Text.c_str());
-    m_Spin.Enable(FALSE);
-    m_Spin.Hide();
+    edit_.SetStyle(0, ES_NUMBER);
+    edit_.SetText(text.c_str());
+    spin_.Enable(FALSE);
+    spin_.Hide();
   }
-  m_Edit.SetSel(0, -1);
-  m_Edit.SetWindowHandle(NULL);
-  m_Spin.SetWindowHandle(NULL);
+  edit_.SetSel(0, -1);
 
   return TRUE;
 }
 
-void CInputDialog::OnCancel() {
+void InputDialog::OnCancel() {
   EndDialog(IDCANCEL);
 }
 
-void CInputDialog::OnOK() {
-  GetDlgItemText(IDC_EDIT_INPUT, Text);
+void InputDialog::OnOK() {
+  edit_.GetText(text);
   EndDialog(IDOK);
 }

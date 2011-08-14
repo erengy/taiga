@@ -22,18 +22,18 @@
 #include "stats.h"
 #include "string.h"
 
-TaigaStats Stats;
+Statistics Stats;
 
 // =============================================================================
 
-TaigaStats::TaigaStats() : 
-  anime_count_(0), episode_count_(0), score_mean_(0.0f), score_dev_(0.0f)
+Statistics::Statistics() : 
+  anime_count(0), episode_count(0), score_mean(0.0f), score_deviation(0.0f)
 {
 }
 
 // =============================================================================
 
-void TaigaStats::CalculateAll() {
+void Statistics::CalculateAll() {
   // Anime count
   CalculateAnimeCount();
 
@@ -50,29 +50,29 @@ void TaigaStats::CalculateAll() {
   CalculateScoreDeviation();
 }
 
-int TaigaStats::CalculateAnimeCount() {
-  anime_count_ = AnimeList.Count;
-  return anime_count_;
+int Statistics::CalculateAnimeCount() {
+  anime_count = AnimeList.count;
+  return anime_count;
 }
 
-int TaigaStats::CalculateEpisodeCount() {
-  episode_count_ = 0;
+int Statistics::CalculateEpisodeCount() {
+  episode_count = 0;
   
-  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
-    episode_count_ += it->GetLastWatchedEpisode();
+  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
+    episode_count += it->GetLastWatchedEpisode();
     // TODO: implement times_rewatched when MAL adds to API
-    if (it->GetRewatching() == TRUE) episode_count_ += it->GetTotalEpisodes();
+    if (it->GetRewatching() == TRUE) episode_count += it->GetTotalEpisodes();
   }
 
-  return episode_count_;
+  return episode_count;
 }
 
-wstring TaigaStats::CalculateLifeSpentWatching() {
+wstring Statistics::CalculateLifeSpentWatching() {
   int duration, days, hours, minutes, seconds = 0;
   
-  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
+  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
     // Approximate duration in minutes
-    switch (it->Series_Type) {
+    switch (it->series_type) {
       default:
       case MAL_TV:      duration = 24;  break;
       case MAL_OVA:     duration = 24;  break;
@@ -92,12 +92,12 @@ wstring TaigaStats::CalculateLifeSpentWatching() {
     CALC_TIME(hours, 60 * 60);
     CALC_TIME(minutes, 60);
     #undef CALC_TIME
-    life_spent_.clear();
+    life_spent_watching.clear();
     #define ADD_TIME(x, y) \
       if (x > 0) { \
-        if (!life_spent_.empty()) life_spent_ += L" "; \
-        life_spent_ += ToWSTR(static_cast<int>(x)) + y; \
-        if (x > 1) life_spent_ += L"s"; \
+        if (!life_spent_watching.empty()) life_spent_watching += L" "; \
+        life_spent_watching += ToWSTR(static_cast<int>(x)) + y; \
+        if (x > 1) life_spent_watching += L"s"; \
       }
     ADD_TIME(days, L" day");
     ADD_TIME(hours, L" hour");
@@ -105,38 +105,38 @@ wstring TaigaStats::CalculateLifeSpentWatching() {
     ADD_TIME(seconds, L" second");
     #undef ADD_TIME
   } else {
-    life_spent_ = L"None";
+    life_spent_watching = L"None";
   }
 
-  return life_spent_;
+  return life_spent_watching;
 }
 
-float TaigaStats::CalculateMeanScore() {
+float Statistics::CalculateMeanScore() {
   float sum_scores = 0.0f, items_scored = 0.0f;
   
-  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
-    if (it->My_Score > 0) {
-      sum_scores += static_cast<float>(it->My_Score);
+  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
+    if (it->my_score > 0) {
+      sum_scores += static_cast<float>(it->my_score);
       items_scored++;
     }
   }
   
-  score_mean_ = items_scored > 0 ? sum_scores / items_scored : 0.0f;
+  score_mean = items_scored > 0 ? sum_scores / items_scored : 0.0f;
   
-  return score_mean_;
+  return score_mean;
 }
 
-float TaigaStats::CalculateScoreDeviation() {
+float Statistics::CalculateScoreDeviation() {
   float sum_squares = 0.0f, items_scored = 0.0f;
   
-  for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
-    if (it->My_Score > 0) {
-      sum_squares += pow(static_cast<float>(it->My_Score) - score_mean_, 2);
+  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
+    if (it->my_score > 0) {
+      sum_squares += pow(static_cast<float>(it->my_score) - score_mean, 2);
       items_scored++;
     }
   }
   
-  score_dev_ = items_scored > 0 ? sqrt(sum_squares / items_scored) : 0.0f;
+  score_deviation = items_scored > 0 ? sqrt(sum_squares / items_scored) : 0.0f;
 
-  return score_dev_;
+  return score_deviation;
 }

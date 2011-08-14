@@ -22,7 +22,7 @@
 #include "std.h"
 #include "anime.h"
 
-enum {
+enum AnimeListWriteMode {
   ANIMELIST_EDITUSER,
   ANIMELIST_EDITANIME,
   ANIMELIST_ADDANIME,
@@ -31,16 +31,16 @@ enum {
 
 // =============================================================================
 
-class CMALUser {
+class MalUser {
 public:
-  int ID, Watching, Completed, OnHold, Dropped, PlanToWatch;
-  wstring Name, DaysSpent;
+  int id, watching, completed, on_hold, dropped, plan_to_watch;
+  wstring name, days_spent_watching;
 };
 
-class CUser : public CMALUser {
+class User : public MalUser {
 public:
-  CUser();
-  virtual ~CUser() {}
+  User();
+  virtual ~User() {}
 
   void Clear();
   int GetItemCount(int status);
@@ -49,55 +49,59 @@ public:
 
 // =============================================================================
 
-class CAnimeList {
+class AnimeList {
 public:
-  CAnimeList();
-  ~CAnimeList() {};
+  AnimeList();
+  ~AnimeList() {};
 
-  void AddItem(CAnime& anime_item);
+  void AddItem(Anime& anime);
   void AddItem(int series_id, 
-    wstring series_title, 
-    wstring series_synonyms, 
+    const wstring& series_title, 
+    const wstring& series_synonyms, 
     int series_type, 
     int series_episodes, 
     int series_status, 
-    wstring series_start, 
-    wstring series_end, 
-    wstring series_image, 
+    const wstring& series_start, 
+    const wstring& series_end, 
+    const wstring& series_image, 
     int my_id, 
     int my_watched_episodes, 
-    wstring my_start_date, 
-    wstring my_finish_date, 
+    const wstring& my_start_date, 
+    const wstring& my_finish_date, 
     int my_score, 
     int my_status, 
     int my_rewatching, 
     int my_rewatching_ep, 
-    wstring my_last_updated, 
-    wstring my_tags);
+    const wstring& my_last_updated, 
+    const wstring& my_tags, 
+    bool resize = true);
+  
   void Clear();
   bool Read();
-  bool Write(int anime_id, wstring child, wstring value, int mode = ANIMELIST_EDITANIME);
+  bool Save(int anime_id, wstring child, wstring value, 
+    int mode = ANIMELIST_EDITANIME);
+  
   bool DeleteItem(int anime_id);
-  CAnime* FindItem(int anime_id);
+  Anime* FindItem(int anime_id);
   int FindItemIndex(int anime_id);
 
-  CUser User;
-  vector<CAnime> Items;
-  int Index, Count;
+public:
+  User user;
+  vector<Anime> items;
+  int index, count;
 
-  class CFilter {
+  class ListFilters {
   public:
-    CFilter();
-    virtual ~CFilter() {}
-    
-    bool Check(CAnime& anime);
+    ListFilters();
+    virtual ~ListFilters() {}
+    bool Check(Anime& anime);
     void Reset();
-    
-    bool MyStatus[6], Status[3], Type[6], NewEps;
-    wstring Text;
-  } Filter;
+  public:
+    bool my_status[6], status[3], type[6], new_episodes;
+    wstring text;
+  } filters;
 };
 
-extern CAnimeList AnimeList;
+extern AnimeList AnimeList;
 
 #endif // ANIMELIST_H

@@ -26,10 +26,10 @@
 
 // =============================================================================
 
-class CFeedConditionWindow : public CDialog {
+class FeedConditionDialog : public CDialog {
 public:
-  CFeedConditionWindow();
-  virtual ~CFeedConditionWindow();
+  FeedConditionDialog();
+  virtual ~FeedConditionDialog();
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
@@ -38,16 +38,16 @@ public:
   void OnOK();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
+public:
   void ChooseElement(int index);
 
 public:
-  CComboBox element_combo_;
-  CComboBox operator_combo_;
-  CComboBox value_combo_;
+  FeedFilterCondition condition;
 
-  CFeedFilterCondition condition_;
+private:
+  CComboBox element_combo_, operator_combo_, value_combo_;
 };
 
-extern CFeedConditionWindow FeedConditionWindow;
+extern FeedConditionDialog FeedConditionDialog;
 
 #endif // DLG_FEED_CONDITION_H

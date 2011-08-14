@@ -25,30 +25,29 @@
 
 // =============================================================================
 
-/* About dialog */
-
-class CAboutPage: public CDialog {
+class AboutPage: public CDialog {
 public:
-  CAboutPage() {}
-  virtual ~CAboutPage() {}
+  AboutPage() {}
+  virtual ~AboutPage() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnTimer(UINT_PTR nIDEvent);
 };
 
-class CAboutWindow : public CDialog {
+class AboutDialog : public CDialog {
 public:
-  CAboutWindow();
-  ~CAboutWindow() {}
-  
-  CAboutPage m_PageTaiga;
-  CTab m_Tab;
+  AboutDialog();
+  ~AboutDialog() {}
   
   BOOL OnDestroy();
   BOOL OnInitDialog();
+  
+private:
+  AboutPage page_taiga_;
+  CTab tab_;
 };
 
-extern CAboutWindow AboutWindow;
+extern AboutDialog AboutDialog;
 
 #endif // DLG_ABOUT_H

@@ -25,16 +25,16 @@
 #include "../taiga.h"
 #include "../xml.h"
 
-CTestRecognition RecognitionTestWindow;
+RecognitionTestDialog RecognitionTest;
 
 // =============================================================================
 
-BOOL CTestRecognition::OnInitDialog() {
+BOOL RecognitionTestDialog::OnInitDialog() {
   // Initialize
   wstring file = Taiga.GetDataPath() + L"RecognitionTest.xml";
-  m_EpisodeList.clear();
-  m_EpisodeListTest.clear();
-  m_List.DeleteAllItems();
+  episodes_.clear();
+  test_episodes_.clear();
+  list_.DeleteAllItems();
   
   // Read XML file
   xml_document doc;
@@ -47,72 +47,72 @@ BOOL CTestRecognition::OnInitDialog() {
   // Fill episode data
   xml_node recognition = doc.child(L"recognition");
   for (xml_node file_node = recognition.child(L"file"); file_node; file_node = file_node.next_sibling(L"file")) {
-    CEpisodeTest new_episode;
-    new_episode.AudioType  = XML_ReadStrValue(file_node, L"audio");
-    new_episode.Checksum   = XML_ReadStrValue(file_node, L"checksum");
-    new_episode.Extra      = XML_ReadStrValue(file_node, L"extra");
-    new_episode.File       = XML_ReadStrValue(file_node, L"file");
-    new_episode.Format     = XML_ReadStrValue(file_node, L"format");
-    new_episode.Group      = XML_ReadStrValue(file_node, L"group");
-    new_episode.Name       = XML_ReadStrValue(file_node, L"name");
-    new_episode.Number     = XML_ReadStrValue(file_node, L"number");
-    new_episode.Priority   = XML_ReadIntValue(file_node, L"priority");
-    new_episode.Resolution = XML_ReadStrValue(file_node, L"resolution");
-    new_episode.Title      = XML_ReadStrValue(file_node, L"title");
-    new_episode.Version    = XML_ReadStrValue(file_node, L"version");
-    new_episode.VideoType  = XML_ReadStrValue(file_node, L"video");
-    m_EpisodeList.push_back(new_episode);
+    EpisodeTest new_episode;
+    new_episode.audio_type = XML_ReadStrValue(file_node, L"audio");
+    new_episode.checksum   = XML_ReadStrValue(file_node, L"checksum");
+    new_episode.extras     = XML_ReadStrValue(file_node, L"extra");
+    new_episode.file       = XML_ReadStrValue(file_node, L"file");
+    new_episode.format     = XML_ReadStrValue(file_node, L"format");
+    new_episode.group      = XML_ReadStrValue(file_node, L"group");
+    new_episode.name       = XML_ReadStrValue(file_node, L"name");
+    new_episode.number     = XML_ReadStrValue(file_node, L"number");
+    new_episode.priority   = XML_ReadIntValue(file_node, L"priority");
+    new_episode.resolution = XML_ReadStrValue(file_node, L"resolution");
+    new_episode.title      = XML_ReadStrValue(file_node, L"title");
+    new_episode.version    = XML_ReadStrValue(file_node, L"version");
+    new_episode.video_type = XML_ReadStrValue(file_node, L"video");
+    episodes_.push_back(new_episode);
   }
 
   // Examine files
   DWORD tick = GetTickCount();
-  for (UINT i = 0; i < m_EpisodeList.size(); i++) {
-    CEpisodeTest episode;
-    Meow.ExamineTitle(m_EpisodeList[i].File, episode, true, true, true, true, false);
-    episode.AnimeId = i;
-    episode.Priority = m_EpisodeList[i].Priority;
-    m_EpisodeListTest.push_back(episode);
+  for (UINT i = 0; i < episodes_.size(); i++) {
+    EpisodeTest episode;
+    Meow.ExamineTitle(episodes_[i].file, episode, true, true, true, true, false);
+    episode.anime_id = i;
+    episode.priority = episodes_[i].priority;
+    test_episodes_.push_back(episode);
   }
   tick = GetTickCount() - tick;
 
   // Create list
-  m_List.Attach(GetDlgItem(IDC_LIST_TEST_RECOGNITION));
-  m_List.InsertColumn(0, 400, 400, 0, L"File name");
-  m_List.InsertColumn(1, 200, 200, 0, L"Title");
-  m_List.InsertColumn(2, 100, 100, 0, L"Group");
-  m_List.InsertColumn(3, 55, 55, 0, L"Episode");
-  m_List.InsertColumn(4, 50, 50, 0, L"Version");
-  m_List.InsertColumn(5, 70, 70, 0, L"Audio");
-  m_List.InsertColumn(6, 70, 70, 0, L"Video");
-  m_List.InsertColumn(7, 80, 80, 0, L"Resolution");
-  m_List.InsertColumn(8, 80, 80, 0, L"Checksum");
-  m_List.InsertColumn(9, 100, 100, 0, L"Extra");
-  m_List.InsertColumn(10, 100, 100, 0, L"Name");
-  m_List.InsertColumn(11, 50, 50, 0, L"Format");
+  list_.Attach(GetDlgItem(IDC_LIST_TEST_RECOGNITION));
+  list_.InsertColumn(0, 400, 400, 0, L"File name");
+  list_.InsertColumn(1, 200, 200, 0, L"Title");
+  list_.InsertColumn(2, 100, 100, 0, L"Group");
+  list_.InsertColumn(3, 55, 55, 0, L"Episode");
+  list_.InsertColumn(4, 50, 50, 0, L"Version");
+  list_.InsertColumn(5, 70, 70, 0, L"Audio");
+  list_.InsertColumn(6, 70, 70, 0, L"Video");
+  list_.InsertColumn(7, 80, 80, 0, L"Resolution");
+  list_.InsertColumn(8, 80, 80, 0, L"Checksum");
+  list_.InsertColumn(9, 100, 100, 0, L"Extra");
+  list_.InsertColumn(10, 100, 100, 0, L"Name");
+  list_.InsertColumn(11, 50, 50, 0, L"Format");
 
   // Fill list
-  for (UINT i = 0; i < m_EpisodeList.size(); i++) {
-    m_List.InsertItem(i, -1, -1, 0, NULL, m_EpisodeListTest[i].File.c_str(), 
-      reinterpret_cast<LPARAM>(&m_EpisodeListTest[i]));
-    m_List.SetItem(i, 1, m_EpisodeListTest[i].Title.c_str());
-    m_List.SetItem(i, 2, m_EpisodeListTest[i].Group.c_str());
-    m_List.SetItem(i, 3, m_EpisodeListTest[i].Number.c_str());
-    m_List.SetItem(i, 4, m_EpisodeListTest[i].Version.c_str());
-    m_List.SetItem(i, 5, m_EpisodeListTest[i].AudioType.c_str());
-    m_List.SetItem(i, 6, m_EpisodeListTest[i].VideoType.c_str());
-    m_List.SetItem(i, 7, m_EpisodeListTest[i].Resolution.c_str());
-    m_List.SetItem(i, 8, m_EpisodeListTest[i].Checksum.c_str());
-    m_List.SetItem(i, 9, m_EpisodeListTest[i].Extra.c_str());
-    m_List.SetItem(i, 10, m_EpisodeListTest[i].Name.c_str());
-    m_List.SetItem(i, 11, m_EpisodeListTest[i].Format.c_str());
+  for (UINT i = 0; i < episodes_.size(); i++) {
+    list_.InsertItem(i, -1, -1, 0, NULL, test_episodes_[i].file.c_str(), 
+      reinterpret_cast<LPARAM>(&test_episodes_[i]));
+    list_.SetItem(i, 1, test_episodes_[i].title.c_str());
+    list_.SetItem(i, 2, test_episodes_[i].group.c_str());
+    list_.SetItem(i, 3, test_episodes_[i].number.c_str());
+    list_.SetItem(i, 4, test_episodes_[i].version.c_str());
+    list_.SetItem(i, 5, test_episodes_[i].audio_type.c_str());
+    list_.SetItem(i, 6, test_episodes_[i].video_type.c_str());
+    list_.SetItem(i, 7, test_episodes_[i].resolution.c_str());
+    list_.SetItem(i, 8, test_episodes_[i].checksum.c_str());
+    list_.SetItem(i, 9, test_episodes_[i].extras.c_str());
+    list_.SetItem(i, 10, test_episodes_[i].name.c_str());
+    list_.SetItem(i, 11, test_episodes_[i].format.c_str());
   }
-  m_List.Sort(1, 1, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
+  list_.Sort(1, 1, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
 
   // Set title
-  int success_count = 0, total_items = m_EpisodeList.size();
+  int success_count = 0, total_items = episodes_.size();
   for (int i = 0; i < total_items; i++) {
-    if (m_EpisodeList[i].Title == m_EpisodeListTest[i].Title && 
-      m_EpisodeList[i].Number == m_EpisodeListTest[i].Number) {
+    if (episodes_[i].title == test_episodes_[i].title && 
+      episodes_[i].number == test_episodes_[i].number) {
         success_count++;
     }
   }
@@ -128,7 +128,7 @@ BOOL CTestRecognition::OnInitDialog() {
 
 // =============================================================================
 
-LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT RecognitionTestDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // ListView control
   if (idCtrl == IDC_LIST_TEST_RECOGNITION) {
     switch (pnmh->code) {
@@ -136,15 +136,15 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         int order = 1;
-        if (lplv->iSubItem == m_List.GetSortColumn()) order = m_List.GetSortOrder() * -1;
-        int type = LISTSORTTYPE_DEFAULT;
+        if (lplv->iSubItem == list_.GetSortColumn()) order = list_.GetSortOrder() * -1;
+        int type = LIST_SORTTYPE_DEFAULT;
         switch (lplv->iSubItem) {
           case 3:
           case 4:
-            type = LISTSORTTYPE_NUMBER;
+            type = LIST_SORTTYPE_NUMBER;
             break;
         }
-        m_List.Sort(lplv->iSubItem, order, type, ListViewCompareProc);
+        list_.Sort(lplv->iSubItem, order, type, ListViewCompareProc);
         break;
       }
 
@@ -161,40 +161,40 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
             return CDRF_NOTIFYPOSTERASE;
 
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-            CEpisodeTest* e = reinterpret_cast<CEpisodeTest*>(pCD->nmcd.lItemlParam);
+            EpisodeTest* e = reinterpret_cast<EpisodeTest*>(pCD->nmcd.lItemlParam);
             if (!e) return CDRF_NOTIFYPOSTPAINT;
             #define CheckSubItem(e, t) \
-              e->t == m_EpisodeList[e->AnimeId].t ? RGB(230, 255, 230) : \
+              e->t == episodes_[e->anime_id].t ? RGB(230, 255, 230) : \
               e->t.empty() ? RGB(245, 255, 245) : RGB(255, 230, 230)
             switch (pCD->iSubItem) {
               // Title
-              case 1: pCD->clrTextBk = CheckSubItem(e, Title); break;
+              case 1: pCD->clrTextBk = CheckSubItem(e, title); break;
               // Group
-              case 2: pCD->clrTextBk = CheckSubItem(e, Group); break;
+              case 2: pCD->clrTextBk = CheckSubItem(e, group); break;
               // Episode
-              case 3: pCD->clrTextBk = CheckSubItem(e, Number); break;
+              case 3: pCD->clrTextBk = CheckSubItem(e, number); break;
               // Version
-              case 4: pCD->clrTextBk = CheckSubItem(e, Version); break;
+              case 4: pCD->clrTextBk = CheckSubItem(e, version); break;
               // Audio
-              case 5: pCD->clrTextBk = CheckSubItem(e, AudioType); break;
+              case 5: pCD->clrTextBk = CheckSubItem(e, audio_type); break;
               // Video
-              case 6: pCD->clrTextBk = CheckSubItem(e, VideoType); break;
+              case 6: pCD->clrTextBk = CheckSubItem(e, video_type); break;
               // Resolution
-              case 7: pCD->clrTextBk = CheckSubItem(e, Resolution); break;
+              case 7: pCD->clrTextBk = CheckSubItem(e, resolution); break;
               // Checksum
-              case 8: pCD->clrTextBk = CheckSubItem(e, Checksum); break;
+              case 8: pCD->clrTextBk = CheckSubItem(e, checksum); break;
               // Extra
-              case 9: pCD->clrTextBk = CheckSubItem(e, Extra); break;
+              case 9: pCD->clrTextBk = CheckSubItem(e, extras); break;
               // Name
-              case 10: pCD->clrTextBk = CheckSubItem(e, Name); break;
+              case 10: pCD->clrTextBk = CheckSubItem(e, name); break;
               // Format
-              case 11: pCD->clrTextBk = CheckSubItem(e, Format); break;
+              case 11: pCD->clrTextBk = CheckSubItem(e, format); break;
               // Default
               default: pCD->clrTextBk = GetSysColor(COLOR_WINDOW);
             }
-            if (e->Priority < 0) {
+            if (e->priority < 0) {
               pCD->clrText = RGB(200, 200, 200);
-            } else if (e->Priority > 0) {
+            } else if (e->priority > 0) {
               pCD->clrText = RGB(255, 0, 0);
             }
             #undef CheckSubItem
@@ -208,10 +208,10 @@ LRESULT CTestRecognition::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-void CTestRecognition::OnSize(UINT uMsg, UINT nType, SIZE size) {
+void RecognitionTestDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      m_List.SetPosition(NULL, 0, 0, size.cx, size.cy);
+      list_.SetPosition(NULL, 0, 0, size.cx, size.cy);
     }
   }
 }

@@ -25,22 +25,22 @@
 #include "../string.h"
 #include "../win32/win_gdi.h"
 
-CFeedConditionWindow FeedConditionWindow;
+class FeedConditionDialog FeedConditionDialog;
 
 // =============================================================================
 
-CFeedConditionWindow::CFeedConditionWindow() {
+FeedConditionDialog::FeedConditionDialog() {
   RegisterDlgClass(L"TaigaFeedConditionW");
 }
 
-CFeedConditionWindow::~CFeedConditionWindow() {
+FeedConditionDialog::~FeedConditionDialog() {
 }
 
 // =============================================================================
 
-BOOL CFeedConditionWindow::OnInitDialog() {
+BOOL FeedConditionDialog::OnInitDialog() {
   // Set title
-  if (condition_.Element != 0 || condition_.Operator != 0 || !condition_.Value.empty()) {
+  if (condition.Element != 0 || condition.Operator != 0 || !condition.Value.empty()) {
     SetText(L"Edit Condition");
   }
 
@@ -55,15 +55,15 @@ BOOL CFeedConditionWindow::OnInitDialog() {
   }
   
   // Choose
-  element_combo_.SetCurSel(condition_.Element);
-  ChooseElement(condition_.Element);
-  operator_combo_.SetCurSel(condition_.Operator);
-  switch (condition_.Element) {
+  element_combo_.SetCurSel(condition.Element);
+  ChooseElement(condition.Element);
+  operator_combo_.SetCurSel(condition.Operator);
+  switch (condition.Element) {
     case FEED_FILTER_ELEMENT_ANIME_ID: {
       value_combo_.SetCurSel(0);
       for (int i = 0; i < value_combo_.GetCount(); i++) {
-        CAnime* anime = reinterpret_cast<CAnime*>(value_combo_.GetItemData(i));
-        if (anime && anime->Series_ID == ToINT(condition_.Value)) {
+        Anime* anime = reinterpret_cast<Anime*>(value_combo_.GetItemData(i));
+        if (anime && anime->series_id == ToINT(condition.Value)) {
           value_combo_.SetCurSel(i);
           break;
         }
@@ -71,19 +71,19 @@ BOOL CFeedConditionWindow::OnInitDialog() {
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS: {
-      int value = ToINT(condition_.Value);
+      int value = ToINT(condition.Value);
       if (value == 6) value--;
       value_combo_.SetCurSel(value);
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      value_combo_.SetCurSel(ToINT(condition_.Value) - 1);
+      value_combo_.SetCurSel(ToINT(condition.Value) - 1);
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
-      value_combo_.SetCurSel(condition_.Value == L"True" ? 1 : 0);
+      value_combo_.SetCurSel(condition.Value == L"True" ? 1 : 0);
       break;
     default:
-      value_combo_.SetText(condition_.Value);
+      value_combo_.SetText(condition.Value);
   }
 
   return TRUE;
@@ -91,7 +91,7 @@ BOOL CFeedConditionWindow::OnInitDialog() {
 
 // =============================================================================
 
-INT_PTR CFeedConditionWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR FeedConditionDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC:
       return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
@@ -100,43 +100,43 @@ INT_PTR CFeedConditionWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-void CFeedConditionWindow::OnCancel() {
+void FeedConditionDialog::OnCancel() {
   // Clear data
-  condition_.Element = -1;
-  condition_.Operator = -1;
-  condition_.Value = L"";
+  condition.Element = -1;
+  condition.Operator = -1;
+  condition.Value = L"";
 
   // Exit
   EndDialog(IDCANCEL);
 }
 
-void CFeedConditionWindow::OnOK() {
+void FeedConditionDialog::OnOK() {
   // Set values
-  condition_.Element = element_combo_.GetCurSel();
-  condition_.Operator = operator_combo_.GetCurSel();
-  switch (condition_.Element) {
+  condition.Element = element_combo_.GetCurSel();
+  condition.Operator = operator_combo_.GetCurSel();
+  switch (condition.Element) {
     case FEED_FILTER_ELEMENT_ANIME_ID: {
-      CAnime* anime = reinterpret_cast<CAnime*>(value_combo_.GetItemData(value_combo_.GetCurSel()));
+      Anime* anime = reinterpret_cast<Anime*>(value_combo_.GetItemData(value_combo_.GetCurSel()));
       if (anime) {
-        condition_.Value = ToWSTR(anime->Series_ID);
+        condition.Value = ToWSTR(anime->series_id);
       } else {
-        condition_.Value = L"";
+        condition.Value = L"";
       }
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      condition_.Value = ToWSTR(value_combo_.GetItemData(value_combo_.GetCurSel()));
+      condition.Value = ToWSTR(value_combo_.GetItemData(value_combo_.GetCurSel()));
       break;
     default:
-      value_combo_.GetText(condition_.Value);
+      value_combo_.GetText(condition.Value);
   }
 
   // Exit
   EndDialog(IDOK);
 }
 
-BOOL CFeedConditionWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL FeedConditionDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (HIWORD(wParam)) {
     case CBN_SELCHANGE: {
       if (LOWORD(wParam) == IDC_COMBO_FEED_ELEMENT) {
@@ -149,7 +149,7 @@ BOOL CFeedConditionWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-void CFeedConditionWindow::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+void FeedConditionDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   CDC dc = hdc;
   CRect rect;
 
@@ -170,7 +170,7 @@ void CFeedConditionWindow::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
 // =============================================================================
 
-void CFeedConditionWindow::ChooseElement(int element_index) {
+void FeedConditionDialog::ChooseElement(int element_index) {
   // Operator
   int op_index = operator_combo_.GetCurSel();
   operator_combo_.ResetContent();
@@ -213,10 +213,10 @@ void CFeedConditionWindow::ChooseElement(int element_index) {
   ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rect));
 
   #define RECREATE_COMBO(style) \
-    value_combo_.Create(0, WC_COMBOBOX, NULL, \
+    value_combo_.Create(0, WC_COMBOBOX, nullptr, \
       style | CBS_AUTOHSCROLL | WS_CHILD | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL, \
       rect.left, rect.top, width, height * 2, \
-      m_hWindow, NULL, NULL);
+      m_hWindow, nullptr, nullptr);
 
   switch (element_index) {
     case FEED_FILTER_ELEMENT_CATEGORY:
@@ -233,13 +233,13 @@ void CFeedConditionWindow::ChooseElement(int element_index) {
       RECREATE_COMBO((element_index == FEED_FILTER_ELEMENT_ANIME_ID ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
       typedef std::pair<LPARAM, wstring> anime_pair;
       vector<anime_pair> title_list;
-      for (auto it = AnimeList.Items.begin() + 1; it != AnimeList.Items.end(); ++it) {
+      for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
         switch (it->GetStatus()) {
           case MAL_COMPLETED:
           case MAL_DROPPED:
             continue;
           default:
-            title_list.push_back(std::make_pair((LPARAM)&(*it), it->Series_Title));
+            title_list.push_back(std::make_pair((LPARAM)&(*it), it->series_title));
         }
       }
       std::sort(title_list.begin(), title_list.end(), 

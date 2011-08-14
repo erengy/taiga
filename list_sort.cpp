@@ -31,7 +31,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
   switch (m_List->GetSortType()) {
     // Number
-    case LISTSORTTYPE_NUMBER: {
+    case LIST_SORTTYPE_NUMBER: {
       WCHAR szItem1[MAX_PATH], szItem2[MAX_PATH];
       m_List->GetItemText(lParam1, m_List->GetSortColumn(), szItem1);
       m_List->GetItemText(lParam2, m_List->GetSortColumn(), szItem2);
@@ -46,12 +46,12 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Popularity
-    case LISTSORTTYPE_POPULARITY: {
-      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
-      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+    case LIST_SORTTYPE_POPULARITY: {
+      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
+      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        int iItem1 = pItem1->Popularity.empty() ? 0 : _wtoi(pItem1->Popularity.substr(1).c_str());
-        int iItem2 = pItem2->Popularity.empty() ? 0 : _wtoi(pItem2->Popularity.substr(1).c_str());
+        int iItem1 = pItem1->popularity.empty() ? 0 : _wtoi(pItem1->popularity.substr(1).c_str());
+        int iItem2 = pItem2->popularity.empty() ? 0 : _wtoi(pItem2->popularity.substr(1).c_str());
         if (iItem1 > iItem2) {
           return_value = 1;
         } else if (iItem1 < iItem2) {
@@ -62,9 +62,9 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Progress
-    case LISTSORTTYPE_PROGRESS: {
-      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
-      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+    case LIST_SORTTYPE_PROGRESS: {
+      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
+      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
         int total1 = pItem1->GetTotalEpisodes();
         int total2 = pItem2->GetTotalEpisodes();
@@ -80,13 +80,13 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Episodes
-    case LISTSORTTYPE_EPISODES: {
-      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
-      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+    case LIST_SORTTYPE_EPISODES: {
+      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
+      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        if (pItem1->Series_Episodes > pItem2->Series_Episodes) {
+        if (pItem1->series_episodes > pItem2->series_episodes) {
           return_value = 1;
-        } else if (pItem1->Series_Episodes < pItem2->Series_Episodes) {
+        } else if (pItem1->series_episodes < pItem2->series_episodes) {
           return_value = -1;
         }
       }
@@ -94,23 +94,23 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Score
-    case LISTSORTTYPE_SCORE: {
-      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
-      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+    case LIST_SORTTYPE_SCORE: {
+      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
+      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        return_value = lstrcmpi(pItem1->Score.c_str(), pItem2->Score.c_str());
+        return_value = lstrcmpi(pItem1->score.c_str(), pItem2->score.c_str());
       }
       break;
     }
     
     // Start date
-    case LISTSORTTYPE_STARTDATE: {
-      CAnime* pItem1 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam1));
-      CAnime* pItem2 = reinterpret_cast<CAnime*>(m_List->GetItemParam(lParam2));
+    case LIST_SORTTYPE_STARTDATE: {
+      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
+      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
         static wstring date1, date2;
-        date1 = pItem1->Series_Start;
-        date2 = pItem2->Series_Start;
+        date1 = pItem1->series_start;
+        date2 = pItem2->series_start;
         if (date1.length() < 10) date1 = L"0000-00-00";
         if (date2.length() < 10) date2 = L"0000-00-00";
         if (date1[5] == '0' && date1[6] == '0') date1[5] = '?';
@@ -123,7 +123,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // File size
-    case LISTSORTTYPE_FILESIZE: {
+    case LIST_SORTTYPE_FILESIZE: {
       wstring item[2], unit[2];
       UINT64 size[2] = {1, 1};
       m_List->GetItemText(lParam1, m_List->GetSortColumn(), item[0]);
@@ -161,7 +161,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
     
     // Text
-    case LISTSORTTYPE_DEFAULT:
+    case LIST_SORTTYPE_DEFAULT:
     default:
       WCHAR szItem1[MAX_PATH], szItem2[MAX_PATH];
       m_List->GetItemText(lParam1, m_List->GetSortColumn(), szItem1);

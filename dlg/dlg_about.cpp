@@ -17,14 +17,14 @@
 */
 
 #include "../std.h"
+#include <math.h>
 #include "../common.h"
 #include "dlg_about.h"
 #include "../resource.h"
 #include "../taiga.h"
 #include "../win32/win_gdi.h"
-#include <math.h>
 
-CAboutWindow AboutWindow;
+class AboutDialog AboutDialog;
 
 // =============================================================================
 
@@ -73,36 +73,36 @@ float NoteToFrequency(int n) {
 
 // =============================================================================
 
-CAboutWindow::CAboutWindow() {
+AboutDialog::AboutDialog() {
   RegisterDlgClass(L"TaigaAboutW");
 }
 
-BOOL CAboutWindow::OnDestroy() {
+BOOL AboutDialog::OnDestroy() {
   KillTimer(GetWindowHandle(), TIMER_TAIGA);
   return TRUE;
 }
 
-BOOL CAboutWindow::OnInitDialog() {
+BOOL AboutDialog::OnInitDialog() {
   // Initialize
-  m_Tab.Attach(GetDlgItem(IDC_TAB_ABOUT));
+  tab_.Attach(GetDlgItem(IDC_TAB_ABOUT));
 
   // Create about page
-  m_PageTaiga.Create(IDD_ABOUT_TAIGA, m_hWindow, false);
-  CRect rect; m_Tab.AdjustRect(m_hWindow, FALSE, &rect);
-  m_PageTaiga.SetPosition(NULL, rect, 0);
-  EnableThemeDialogTexture(m_PageTaiga.GetWindowHandle(), ETDT_ENABLETAB);
+  page_taiga_.Create(IDD_ABOUT_TAIGA, m_hWindow, false);
+  CRect rect; tab_.AdjustRect(m_hWindow, FALSE, &rect);
+  page_taiga_.SetPosition(nullptr, rect, 0);
+  EnableThemeDialogTexture(page_taiga_.GetWindowHandle(), ETDT_ENABLETAB);
 
   return TRUE;
 }
 
 // =============================================================================
 
-BOOL CAboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+BOOL AboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     // Icon click
     case WM_COMMAND: {
       if (HIWORD(wParam) == STN_DBLCLK) {
-        SetTimer(hwnd, TIMER_TAIGA, 100, NULL);
+        SetTimer(hwnd, TIMER_TAIGA, 100, nullptr);
         note_index = 0;
         return TRUE;
       }
@@ -126,7 +126,7 @@ BOOL CAboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-BOOL CAboutPage::OnInitDialog() {
+BOOL AboutPage::OnInitDialog() {
   // Set information text
   wstring text = APP_NAME;
   SetDlgItemText(IDC_STATIC_ABOUT_TITLE, text.c_str());
@@ -138,13 +138,13 @@ BOOL CAboutPage::OnInitDialog() {
   return TRUE;
 }
 
-void CAboutPage::OnTimer(UINT_PTR nIDEvent) {
+void AboutPage::OnTimer(UINT_PTR nIDEvent) {
   if (note_index == NOTE_COUNT) {
     KillTimer(GetWindowHandle(), TIMER_TAIGA);
-    AboutWindow.SetText(L"About");
+    AboutDialog.SetText(L"About");
     note_index = 0;
   } else {
-    if (note_index == 0) AboutWindow.SetText(L"Orange");
+    if (note_index == 0) AboutDialog.SetText(L"Orange");
     Beep((DWORD)NoteToFrequency(note_list[note_index][0]), 800 / note_list[note_index][1]);
     note_index++;
   }

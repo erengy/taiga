@@ -34,25 +34,26 @@ enum {
 
 // =============================================================================
 
-/* Format dialog */
-
-class CFormatWindow : public CDialog {
+class FormatDialog : public CDialog {
 public:
-  CFormatWindow();
-  ~CFormatWindow() {}
-
-  CRichEdit m_RichEdit;
-  int Mode;
-  wstring Text;
-
-  void ColorizeText();
-  void RefreshPreviewText();
+  FormatDialog();
+  ~FormatDialog() {}
   
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnOK();
+
+public:
+  void ColorizeText();
+  void RefreshPreviewText();
+
+public:
+  int mode;
+
+private:
+  CRichEdit rich_edit_;
 };
 
-extern CFormatWindow FormatWindow;
+extern FormatDialog FormatDialog;
 
 #endif // DLG_FORMAT_H

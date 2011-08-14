@@ -36,21 +36,21 @@ void UpdateAccountMenu() {
     // Account > Log in
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       if (MENU.Items[i].Action == L"LoginLogout()") {
-        MENU.Items[i].Name = Taiga.LoggedIn ? L"Log out" : L"Log in";
+        MENU.Items[i].Name = Taiga.logged_in ? L"Log out" : L"Log in";
         break;
       }
     }
     // Account > Toggle updates
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       if (MENU.Items[i].Action == L"ToggleUpdates()") {
-        MENU.Items[i].Checked = Taiga.UpdatesEnabled;
+        MENU.Items[i].Checked = Taiga.updates_enabled;
         break;
       }
     }
   }
 }
 
-void UpdateAnimeMenu(CAnime* anime) {
+void UpdateAnimeMenu(Anime* anime) {
   if (!anime) return;
   int item_index = 0, menu_index = 0;
 
@@ -96,7 +96,7 @@ void UpdateAnimeMenu(CAnime* anime) {
     MENU.CreateItem(L"PlayNext()", 
       L"Next episode (#" + ToWSTR(anime->GetLastWatchedEpisode() + 1) + L")", 
       L"", false, false, 
-      anime->GetLastWatchedEpisode() < anime->Series_Episodes || anime->Series_Episodes == 0);
+      anime->GetLastWatchedEpisode() < anime->series_episodes || anime->series_episodes == 0);
     MENU.CreateItem(L"PlayRandom()", L"Random episode");
     MENU.CreateItem();
     MENU.CreateItem(L"", L"Episode", L"PlayEpisode");
@@ -110,8 +110,8 @@ void UpdateAnimeMenu(CAnime* anime) {
 
     // Add episode numbers
     int count_max, count_column;
-    if (anime->Series_Episodes > 0) {
-      count_max = anime->Series_Episodes;
+    if (anime->series_episodes > 0) {
+      count_max = anime->series_episodes;
     } else {
       count_max = anime->GetTotalEpisodes();
       if (count_max == 0) {
@@ -134,7 +134,7 @@ void UpdateAnnounceMenu() {
   if (menu_index > -1) {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       if (MENU.Items[i].SubMenu == L"Announce") {
-        MENU.Items[i].Enabled = CurrentEpisode.AnimeId > 0;
+        MENU.Items[i].Enabled = CurrentEpisode.anime_id > 0;
         break;
       }
     }
@@ -146,14 +146,14 @@ void UpdateFilterMenu() {
   int menu_index = UI.Menus.GetIndex(L"FilterStatus");
   if (menu_index > -1) {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = AnimeList.Filter.Status[i] == TRUE;
+      MENU.Items[i].Checked = AnimeList.filters.status[i] == TRUE;
     }
   }
   // Filter > Type
   menu_index = UI.Menus.GetIndex(L"FilterType");
   if (menu_index > -1) {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = AnimeList.Filter.Type[i] == TRUE;
+      MENU.Items[i].Checked = AnimeList.filters.type[i] == TRUE;
     }
   }
 }
@@ -164,10 +164,10 @@ void UpdateFoldersMenu() {
     // Clear menu
     MENU.Items.clear();
 
-    if (!Settings.Folders.Root.empty()) {
+    if (!Settings.Folders.root.empty()) {
       // Add folders
-      for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
-        MENU.CreateItem(L"Execute(" + Settings.Folders.Root[i] + L")", Settings.Folders.Root[i]);
+      for (unsigned int i = 0; i < Settings.Folders.root.size(); i++) {
+        MENU.CreateItem(L"Execute(" + Settings.Folders.root[i] + L")", Settings.Folders.root[i]);
       }
       // Add separator
       MENU.CreateItem();
@@ -184,8 +184,8 @@ void UpdateSearchMenu() {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       MENU.Items[i].Checked = FALSE;
     }
-    if (MainWindow.m_SearchBar.Index < MENU.Items.size()) {
-      MENU.Items[MainWindow.m_SearchBar.Index].Checked = TRUE;
+    if (MainDialog.search_bar.index < MENU.Items.size()) {
+      MENU.Items[MainDialog.search_bar.index].Checked = TRUE;
     }
   }
 }
@@ -212,7 +212,7 @@ void UpdateSeasonMenu() {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       MENU.Items[i].Checked = false;
     }
-    item_index = SeasonWindow.GroupBy;
+    item_index = SeasonDialog.group_by;
     if (item_index < static_cast<int>(MENU.Items.size())) {
       MENU.Items[item_index].Checked = true;
     }
@@ -224,7 +224,7 @@ void UpdateSeasonMenu() {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       MENU.Items[i].Checked = false;
     }
-    item_index = SeasonWindow.SortBy;
+    item_index = SeasonDialog.sort_by;
     if (item_index < static_cast<int>(MENU.Items.size())) {
       MENU.Items[item_index].Checked = true;
     }
@@ -237,14 +237,14 @@ void UpdateTrayMenu() {
     // Tray > Toggle updates
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       if (MENU.Items[i].Action == L"ToggleUpdates()") {
-        MENU.Items[i].Checked = Taiga.UpdatesEnabled;
+        MENU.Items[i].Checked = Taiga.updates_enabled;
         break;
       }
     }
   }
 }
 
-void UpdateAllMenus(CAnime* anime) {
+void UpdateAllMenus(Anime* anime) {
   UpdateAccountMenu();
   UpdateAnimeMenu(anime);
   UpdateAnnounceMenu();

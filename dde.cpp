@@ -22,36 +22,36 @@
 
 // =============================================================================
 
-CDDE::CDDE() {
-  m_bUnicode = FALSE;
-  m_dwInstance = 0;
-  m_hConversation = NULL;
+DynamicDataExchange::DynamicDataExchange() {
+  is_unicode_ = FALSE;
+  instance_ = 0;
+  conversation_ = NULL;
 }
 
-CDDE::~CDDE() {
+DynamicDataExchange::~DynamicDataExchange() {
   Disconnect();
   UnInitialize();
 }
 
-BOOL CDDE::ClientTransaction(const wstring& item, const wstring& data, wstring* output, UINT wType) {
+BOOL DynamicDataExchange::ClientTransaction(const wstring& item, const wstring& data, wstring* output, UINT wType) {
   HDDEDATA hData = NULL;
   HSZ hszItem = NULL;
   DWORD dwResult = 0;
-  if (m_bUnicode) {
+  if (is_unicode_) {
     if (wType != XTYP_EXECUTE) {
-      hszItem = ::DdeCreateStringHandleW(m_dwInstance, item.c_str(), CP_WINUNICODE);
+      hszItem = ::DdeCreateStringHandleW(instance_, item.c_str(), CP_WINUNICODE);
     }
-    hData = ::DdeClientTransaction((LPBYTE)data.data(), (data.size() + 1) * sizeof(WCHAR), m_hConversation, 
+    hData = ::DdeClientTransaction((LPBYTE)data.data(), (data.size() + 1) * sizeof(WCHAR), conversation_, 
       hszItem, CF_UNICODETEXT, wType, 3000, &dwResult);
   } else {
     string item_ansi = ToANSI(item), data_ansi = ToANSI(data);
     if (wType != XTYP_EXECUTE) {
-      hszItem = ::DdeCreateStringHandleA(m_dwInstance, item_ansi.c_str(), CP_WINANSI);
+      hszItem = ::DdeCreateStringHandleA(instance_, item_ansi.c_str(), CP_WINANSI);
     }
-    hData = ::DdeClientTransaction((LPBYTE)data_ansi.data(), data_ansi.size() + 1, m_hConversation, 
+    hData = ::DdeClientTransaction((LPBYTE)data_ansi.data(), data_ansi.size() + 1, conversation_, 
       hszItem, CF_TEXT, wType, 3000, &dwResult);
   }
-  ::DdeFreeStringHandle(m_dwInstance, hszItem);
+  ::DdeFreeStringHandle(instance_, hszItem);
   if (output) {
     char szResult[255];
     ::DdeGetData(hData, (unsigned char*)szResult, 255, 0);
@@ -60,73 +60,73 @@ BOOL CDDE::ClientTransaction(const wstring& item, const wstring& data, wstring* 
   return hData != 0;
 }
 
-BOOL CDDE::Connect(const wstring& service, const wstring& topic) {
-  if (m_dwInstance) {
+BOOL DynamicDataExchange::Connect(const wstring& service, const wstring& topic) {
+  if (instance_) {
     HSZ hszService = NULL, hszTopic = NULL;
-    if (m_bUnicode) {
-      hszService = ::DdeCreateStringHandleW(m_dwInstance, service.c_str(), CP_WINUNICODE);
-      hszTopic = ::DdeCreateStringHandleW(m_dwInstance, topic.c_str(), CP_WINUNICODE);
+    if (is_unicode_) {
+      hszService = ::DdeCreateStringHandleW(instance_, service.c_str(), CP_WINUNICODE);
+      hszTopic = ::DdeCreateStringHandleW(instance_, topic.c_str(), CP_WINUNICODE);
     } else {
-      hszService = ::DdeCreateStringHandleA(m_dwInstance, ToANSI(service), CP_WINANSI);
-      hszTopic = ::DdeCreateStringHandleA(m_dwInstance, ToANSI(topic), CP_WINANSI);
+      hszService = ::DdeCreateStringHandleA(instance_, ToANSI(service), CP_WINANSI);
+      hszTopic = ::DdeCreateStringHandleA(instance_, ToANSI(topic), CP_WINANSI);
     }
-    m_hConversation = ::DdeConnect(m_dwInstance, hszService, hszTopic, NULL);
-    ::DdeFreeStringHandle(m_dwInstance, hszService);
-    ::DdeFreeStringHandle(m_dwInstance, hszTopic);
-    return m_hConversation != NULL;
+    conversation_ = ::DdeConnect(instance_, hszService, hszTopic, NULL);
+    ::DdeFreeStringHandle(instance_, hszService);
+    ::DdeFreeStringHandle(instance_, hszTopic);
+    return conversation_ != NULL;
   } else {
     return FALSE;
   }
 }
 
-void CDDE::Disconnect() {
-  if (m_hConversation) {
-    ::DdeDisconnect(m_hConversation);
-    m_hConversation = NULL;
+void DynamicDataExchange::Disconnect() {
+  if (conversation_) {
+    ::DdeDisconnect(conversation_);
+    conversation_ = NULL;
   }
 }
 
-BOOL CDDE::Initialize(DWORD afCmd, BOOL unicode) {
-  m_bUnicode = unicode;
-  if (m_bUnicode) {
-    ::DdeInitializeW(&m_dwInstance, DDECallback, afCmd, 0);
+BOOL DynamicDataExchange::Initialize(DWORD afCmd, BOOL unicode) {
+  is_unicode_ = unicode;
+  if (is_unicode_) {
+    ::DdeInitializeW(&instance_, DdeCallback, afCmd, 0);
   } else {
-    ::DdeInitializeA(&m_dwInstance, DDECallback, afCmd, 0);
+    ::DdeInitializeA(&instance_, DdeCallback, afCmd, 0);
   }
-  return m_dwInstance != 0;
+  return instance_ != 0;
 }
 
-BOOL CDDE::IsAvailable() {
-  return m_dwInstance != 0;
+BOOL DynamicDataExchange::IsAvailable() {
+  return instance_ != 0;
 }
 
-BOOL CDDE::NameService(const wstring& service, UINT afCmd) {
+BOOL DynamicDataExchange::NameService(const wstring& service, UINT afCmd) {
   HSZ hszService = NULL;
-  if (m_bUnicode) {
-    hszService = ::DdeCreateStringHandleW(m_dwInstance, service.c_str(), CP_WINUNICODE);
+  if (is_unicode_) {
+    hszService = ::DdeCreateStringHandleW(instance_, service.c_str(), CP_WINUNICODE);
   } else {
-    hszService = ::DdeCreateStringHandleA(m_dwInstance, ToANSI(service), CP_WINANSI);
+    hszService = ::DdeCreateStringHandleA(instance_, ToANSI(service), CP_WINANSI);
   }
-  HDDEDATA result = ::DdeNameService(m_dwInstance, hszService, 0, afCmd);
-  ::DdeFreeStringHandle(m_dwInstance, hszService);
+  HDDEDATA result = ::DdeNameService(instance_, hszService, 0, afCmd);
+  ::DdeFreeStringHandle(instance_, hszService);
   return result != 0;
 }
 
-void CDDE::UnInitialize() {
-  if (m_dwInstance) {
-    ::DdeUninitialize(m_dwInstance);
-    m_dwInstance = 0;
+void DynamicDataExchange::UnInitialize() {
+  if (instance_) {
+    ::DdeUninitialize(instance_);
+    instance_ = 0;
   }
 }
 
 // =============================================================================
 
-HDDEDATA CALLBACK CDDE::DDECallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, DWORD dwData1, DWORD dwData2) {
+HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt, HCONV hconv, HSZ hsz1, HSZ hsz2, HDDEDATA hdata, DWORD dwData1, DWORD dwData2) {
   DWORD cb = 0;
   LPVOID lpData = NULL;
   char sz1[256] = {'\0'}, sz2[256] = {'\0'};
-  //DdeQueryStringA(m_dwInstance, hsz1, sz1, 256, CP_WINANSI);
-  //DdeQueryStringA(m_dwInstance, hsz2, sz2, 256, CP_WINANSI);
+  //DdeQueryStringA(instance_, hsz1, sz1, 256, CP_WINANSI);
+  //DdeQueryStringA(instance_, hsz2, sz2, 256, CP_WINANSI);
 
   switch (uType) { 
     case XTYP_CONNECT: {

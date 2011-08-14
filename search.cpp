@@ -24,14 +24,14 @@
 
 // =============================================================================
 
-wstring SearchFileFolder(CAnime& anime, wstring root, int episode_number, bool search_folder) {
+wstring SearchFileFolder(Anime& anime, wstring root, int episode_number, bool search_folder) {
   if (root.empty()) return L"";
   CheckSlash(root);
   WIN32_FIND_DATA wfd;
   wstring folder = root + L"*.*";
   HANDLE hFind = FindFirstFile(folder.c_str(), &wfd);
   if (hFind == INVALID_HANDLE_VALUE) return L"";
-  CEpisode episode;
+  Episode episode;
 
   do {
     // Folders
@@ -64,8 +64,8 @@ wstring SearchFileFolder(CAnime& anime, wstring root, int episode_number, bool s
           if (Meow.ExamineTitle(wfd.cFileName, episode, true, true, true, true, true)) {
             // Compare episode data with anime title
             if (Meow.CompareEpisode(episode, anime)) {
-              int number = GetEpisodeHigh(episode.Number);
-              int numberlow = GetEpisodeLow(episode.Number);
+              int number = GetEpisodeHigh(episode.number);
+              int numberlow = GetEpisodeLow(episode.number);
               for (int i = numberlow; i <= number; i++) {
                 anime.SetEpisodeAvailability(i, true, root + wfd.cFileName);
               }

@@ -30,24 +30,25 @@ enum AnimeInfoTab{
   TAB_COUNT
 };
 
-class CAnimeInfoPage : public CDialog {
+class AnimeInfoPage : public CDialog {
 public:
-  CAnimeInfoPage();
-  virtual ~CAnimeInfoPage();
+  AnimeInfoPage();
+  virtual ~AnimeInfoPage();
 
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
 
-  void Refresh(CAnime* pAnimeItem = NULL);
+public:
+  void Refresh(Anime* anime = nullptr);
   void RefreshFansubPreference();
 
 public:
-  int Index;
+  int index;
 
 private:
-  HFONT m_hfHeader;
-  CAnime* m_pAnimeItem;
+  Anime* anime_;
+  HFONT header_font_;
 };
 
 #endif // DLG_ANIME_INFO_PAGE_H

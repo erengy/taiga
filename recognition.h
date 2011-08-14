@@ -23,51 +23,50 @@
 
 // =============================================================================
 
-class CAnime;
-class CEpisode;
-class CToken;
+class Anime;
+class Episode;
+class Token;
 
-class CRecognition {
+class RecognitionEngine {
 public:
-  CRecognition();
-  virtual ~CRecognition() {};
+  RecognitionEngine();
+  virtual ~RecognitionEngine() {};
   
   void Initialize();
-  bool CompareEpisode(CEpisode& episode, const CAnime& anime, 
+  bool CompareEpisode(Episode& episode, const Anime& anime, 
     bool strict = true, bool check_episode = true, bool check_date = true);
-  bool ExamineTitle(wstring title, CEpisode& episode, 
+  bool ExamineTitle(wstring title, Episode& episode, 
     bool examine_inside = true, bool examine_outside = true, bool examine_number = true,
     bool check_extras = true, bool check_extension = true);
-  void ExamineToken(CToken& token, CEpisode& episode, bool compare_extras);
-  
-  // Keywords
-  vector<wstring> AudioKeywords, VideoKeywords, 
-    ExtraKeywords, ExtraUnsafeKeywords, 
-    VersionKeywords, ValidExtensions,
-    EpisodeKeywords, EpisodePrefixes;
+  void ExamineToken(Token& token, Episode& episode, bool compare_extras);
 
 private:
   bool CompareTitle(const wstring& title, wstring& anime_title, 
-    CEpisode& episode, const CAnime& anime, bool strict = true);
+    Episode& episode, const Anime& anime, bool strict = true);
   bool CompareSynonyms(const wstring& title, wstring& anime_title, const wstring& synonyms, 
-    CEpisode& episode, const CAnime& anime, bool strict = true);
+    Episode& episode, const Anime& anime, bool strict = true);
 
-  // Helper functions
   void AppendKeyword(wstring& str, const wstring& keyword);
   bool CompareKeys(const wstring& str, const vector<wstring>& keys);
   void CleanTitle(wstring& title);
   void EraseUnnecessary(wstring& str);
   void TransliterateSpecial(wstring& str);
-  bool IsEpisodeFormat(const wstring& str, CEpisode& episode, const wchar_t separator = ' ');
+  bool IsEpisodeFormat(const wstring& str, Episode& episode, const wchar_t separator = ' ');
   bool IsResolution(const wstring& str);
   bool IsCountingWord(const wstring& str);
-  bool IsTokenEnclosed(const CToken& token);
+  bool IsTokenEnclosed(const Token& token);
   void ReadKeyword(unsigned int uID, vector<wstring>& str);
-  size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<CToken>& tokens);
+  size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<Token>& tokens);
   void TrimEpisodeWord(wstring& str, bool erase_rightleft);
-  bool ValidateEpisodeNumber(CEpisode& episode);
+  bool ValidateEpisodeNumber(Episode& episode);
+
+public:
+  vector<wstring> audio_keywords, video_keywords, 
+    extra_keywords, extra_unsafe_keywords, 
+    version_keywords, valid_extensions,
+    episode_keywords, episode_prefixes;
 };
 
-extern CRecognition Meow;
+extern RecognitionEngine Meow;
 
 #endif // RECOGNITION_H

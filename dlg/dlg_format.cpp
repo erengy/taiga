@@ -25,109 +25,110 @@
 #include "../string.h"
 #include "../theme.h"
 
-CEpisode Example;
-CFormatWindow FormatWindow;
+Episode Example;
+class FormatDialog FormatDialog;
 vector<wstring> functions, keywords;
 
 // =============================================================================
 
-CFormatWindow::CFormatWindow() {
+FormatDialog::FormatDialog() :
+  mode(FORMAT_MODE_HTTP)
+{
   RegisterDlgClass(L"TaigaFormatW");
-  Mode = 0;
 }
 
-BOOL CFormatWindow::OnInitDialog() {
+BOOL FormatDialog::OnInitDialog() {
   // Set up rich edit control
-  m_RichEdit.Attach(GetDlgItem(IDC_RICHEDIT_FORMAT));
-  m_RichEdit.SetEventMask(ENM_CHANGE);
+  rich_edit_.Attach(GetDlgItem(IDC_RICHEDIT_FORMAT));
+  rich_edit_.SetEventMask(ENM_CHANGE);
 
   // Create temporary episode
-  if (CurrentEpisode.AnimeId > 0) {
+  if (CurrentEpisode.anime_id > 0) {
     Example = CurrentEpisode;
   } else {
-    Example.AnimeId    = -4224;
-    Example.AudioType  = L"AAC";
-    Example.Checksum   = L"ABCD1234";
-    Example.Extra      = L"DVD";
-    Example.File       = L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv";
-    Example.Folder     = L"D:\\Anime\\";
-    Example.Format     = L"MKV";
-    Example.Group      = L"TaigaSubs";
-    Example.Name       = L"Tiger and Dragon";
-    Example.Number     = L"01";
-    Example.Resolution = L"1280x720";
-    Example.Title      = L"Toradora!";
-    Example.Version    = L"2";
-    Example.VideoType  = L"H264";
+    Example.anime_id   = -4224;
+    Example.audio_type = L"AAC";
+    Example.checksum   = L"ABCD1234";
+    Example.extras     = L"DVD";
+    Example.file       = L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv";
+    Example.folder     = L"D:\\Anime\\";
+    Example.format     = L"MKV";
+    Example.group      = L"TaigaSubs";
+    Example.name       = L"Tiger and Dragon";
+    Example.number     = L"01";
+    Example.resolution = L"1280x720";
+    Example.title      = L"Toradora!";
+    Example.version    = L"2";
+    Example.video_type = L"H264";
   }
 
   // Set text
-  switch (Mode) {
+  switch (mode) {
     case FORMAT_MODE_HTTP:
       SetText(L"Edit format - HTTP request");
-      m_RichEdit.SetText(Settings.Announce.HTTP.Format.c_str());
+      rich_edit_.SetText(Settings.Announce.HTTP.format.c_str());
       break;    
     case FORMAT_MODE_MESSENGER:
       SetText(L"Edit format - Messenger");
-      m_RichEdit.SetText(Settings.Announce.MSN.Format.c_str());
+      rich_edit_.SetText(Settings.Announce.MSN.format.c_str());
       break;
     case FORMAT_MODE_MIRC:
       SetText(L"Edit format - mIRC");
-      m_RichEdit.SetText(Settings.Announce.MIRC.Format.c_str());
+      rich_edit_.SetText(Settings.Announce.MIRC.format.c_str());
       break;
     case FORMAT_MODE_SKYPE:
       SetText(L"Edit format - Skype");
-      m_RichEdit.SetText(Settings.Announce.Skype.Format.c_str());
+      rich_edit_.SetText(Settings.Announce.Skype.format.c_str());
       break;
     case FORMAT_MODE_TWITTER:
       SetText(L"Edit format - Twitter");
-      m_RichEdit.SetText(Settings.Announce.Twitter.Format.c_str());
+      rich_edit_.SetText(Settings.Announce.Twitter.format.c_str());
       break;
     case FORMAT_MODE_BALLOON:
       SetText(L"Edit format - Balloon tooltips");
-      m_RichEdit.SetText(Settings.Program.Balloon.Format.c_str());
+      rich_edit_.SetText(Settings.Program.Balloon.format.c_str());
       break;
   }
 
   return TRUE;
 }
 
-void CFormatWindow::OnOK() {
-  switch (Mode) {
+void FormatDialog::OnOK() {
+  switch (mode) {
     case FORMAT_MODE_HTTP:
-      m_RichEdit.GetText(Settings.Announce.HTTP.Format);
+      rich_edit_.GetText(Settings.Announce.HTTP.format);
       break;
     case FORMAT_MODE_MESSENGER:
-      m_RichEdit.GetText(Settings.Announce.MSN.Format);
+      rich_edit_.GetText(Settings.Announce.MSN.format);
       break;
     case FORMAT_MODE_MIRC:
-      m_RichEdit.GetText(Settings.Announce.MIRC.Format);
+      rich_edit_.GetText(Settings.Announce.MIRC.format);
       break;
     case FORMAT_MODE_SKYPE:
-      m_RichEdit.GetText(Settings.Announce.Skype.Format);
+      rich_edit_.GetText(Settings.Announce.Skype.format);
       break;
     case FORMAT_MODE_TWITTER:
-      m_RichEdit.GetText(Settings.Announce.Twitter.Format);
+      rich_edit_.GetText(Settings.Announce.Twitter.format);
       break;
     case FORMAT_MODE_BALLOON:
-      m_RichEdit.GetText(Settings.Program.Balloon.Format);
+      rich_edit_.GetText(Settings.Program.Balloon.format);
       break;
   }
   
   EndDialog(IDOK);
 }
 
-BOOL CFormatWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Add button    
     case IDHELP: {
       wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"ScriptAdd");
-      wstring str; m_RichEdit.GetText(str);
+      wstring str; rich_edit_.GetText(str);
       CHARRANGE cr = {0};
-      m_RichEdit.GetSel(&cr);
+      rich_edit_.GetSel(&cr);
       str.insert(cr.cpMin, answer);
-      m_RichEdit.SetText(str.c_str());
-      m_RichEdit.SetFocus();
+      rich_edit_.SetText(str.c_str());
+      rich_edit_.SetFocus();
       return TRUE;
     }
   }
@@ -144,12 +145,12 @@ BOOL CFormatWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
 
 // =============================================================================
 
-void CFormatWindow::ColorizeText() {
+void FormatDialog::ColorizeText() {
   // Save old selection
   CHARRANGE cr = {0};
-  m_RichEdit.GetSel(&cr);
-  m_RichEdit.SetRedraw(FALSE);
-  m_RichEdit.HideSelection(TRUE);
+  rich_edit_.GetSel(&cr);
+  rich_edit_.SetRedraw(FALSE);
+  rich_edit_.HideSelection(TRUE);
 
   // Set up character format
   CHARFORMAT cf = {0};
@@ -159,11 +160,11 @@ void CFormatWindow::ColorizeText() {
   lstrcpy(cf.szFaceName, L"Courier New");
 
   // Get current text
-  wstring text; m_RichEdit.GetText(text);
+  wstring text; rich_edit_.GetText(text);
 
   // Reset all colors
   cf.crTextColor = ::GetSysColor(COLOR_WINDOWTEXT);
-  m_RichEdit.SetCharFormat(SCF_ALL, &cf);
+  rich_edit_.SetCharFormat(SCF_ALL, &cf);
 
   // Highlight
   for (size_t i = 0; i < text.length(); i++) {
@@ -174,8 +175,8 @@ void CFormatWindow::ColorizeText() {
         size_t pos = text.find('(', i);
         if (pos != wstring::npos) {
           if (IsScriptFunction(text.substr(i + 1, pos - (i + 1)))) {
-            m_RichEdit.SetSel(i, pos);
-            m_RichEdit.SetCharFormat(SCF_SELECTION, &cf);
+            rich_edit_.SetSel(i, pos);
+            rich_edit_.SetCharFormat(SCF_SELECTION, &cf);
             i = pos;
           }
         }
@@ -187,8 +188,8 @@ void CFormatWindow::ColorizeText() {
         size_t pos = text.find('%', i + 1);
         if (pos != wstring::npos) {
           if (IsScriptVariable(text.substr(i + 1, pos - (i + 1)))) {
-            m_RichEdit.SetSel(i, pos + 1);
-            m_RichEdit.SetCharFormat(SCF_SELECTION, &cf);
+            rich_edit_.SetSel(i, pos + 1);
+            rich_edit_.SetCharFormat(SCF_SELECTION, &cf);
             i = pos;
           }
         }
@@ -198,19 +199,19 @@ void CFormatWindow::ColorizeText() {
   }
 
   // Reset to old selection
-  m_RichEdit.SetSel(&cr);
-  m_RichEdit.HideSelection(FALSE);
-  m_RichEdit.SetRedraw(TRUE);
-  m_RichEdit.InvalidateRect();
+  rich_edit_.SetSel(&cr);
+  rich_edit_.HideSelection(FALSE);
+  rich_edit_.SetRedraw(TRUE);
+  rich_edit_.InvalidateRect();
 }
 
-void CFormatWindow::RefreshPreviewText() {
+void FormatDialog::RefreshPreviewText() {
   // Replace variables
   wstring str;
   GetDlgItemText(IDC_RICHEDIT_FORMAT, str);
   str = ReplaceVariables(str, Example);
   
-  switch (Mode) {
+  switch (mode) {
     case FORMAT_MODE_MIRC: {
       // Strip IRC characters
       for (size_t i = 0; i < str.length(); i++) {

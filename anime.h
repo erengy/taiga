@@ -21,82 +21,95 @@
 
 #include "std.h"
 
-// =============================================================================
-
 enum AnimeId {
   ANIMEID_NOTINLIST = -1,
   ANIMEID_UNKNOWN = 0
 };
 
-class CEpisode {
-public:
-  CEpisode();
-  virtual ~CEpisode() {}
-
-  void Clear();
-
-  int AnimeId;
-  wstring File, Folder, Format, Title, Name, Group, Number, Version, 
-    Resolution, AudioType, VideoType, Checksum, Extra;
-};
-
-extern CEpisode CurrentEpisode;
+class EventItem;
 
 // =============================================================================
 
-class CEventItem;
-
-class CMALAnime {
+class Episode {
 public:
-  CMALAnime();
-  virtual ~CMALAnime() {}
+  Episode();
+  virtual ~Episode() {}
 
-  int Series_ID, Series_Type, Series_Episodes, Series_Status,
-    My_ID, My_WatchedEpisodes, My_Score, My_Status, My_Rewatching, My_RewatchingEP;
-  wstring Series_Title, Series_Synonyms, Series_Start, Series_End, Series_Image,
-    My_LastUpdated, My_StartDate, My_FinishDate, My_Tags;
+  void Clear();
+
+public:
+  int anime_id;
+  wstring file, folder, format, title, name, group, number, version, 
+    resolution, audio_type, video_type, checksum, extras;
 };
 
-class CAnime : public CMALAnime {
-public:
-  CAnime();
-  virtual ~CAnime() {}
+extern Episode CurrentEpisode;
 
-  int Ask(CEpisode episode);
-  void Start(CEpisode episode);
-  void End(CEpisode episode, bool end_watching, bool update_list);
-  void Update(CEpisode episode, bool change_status);
-  void CheckFolder();
+// =============================================================================
+
+class MalAnime {
+public:
+  MalAnime();
+  virtual ~MalAnime() {}
+
+public:
+  int series_id, series_type, series_episodes, series_status,
+    my_id, my_watched_episodes, my_score, my_status, my_rewatching, my_rewatching_ep;
+  wstring series_title, series_synonyms, series_start, series_end, series_image,
+    my_start_date, my_finish_date, my_last_updated, my_tags;
+};
+
+class Anime : public MalAnime {
+public:
+  Anime();
+  virtual ~Anime() {}
+
+  int Ask(Episode episode);
+  void End(Episode episode, bool end_watching, bool update_list);
+  void Start(Episode episode);
+  void Update(Episode episode, bool change_status);
+  
+  bool CheckFolder();
   void SetFolder(const wstring& folder, bool save_settings, bool check_episodes);
-  bool CheckEpisodes(int episode = -1, bool check_folder = false);
-  bool PlayEpisode(int number);
+  
+  bool CheckEpisodes(int number = -1, bool check_folder = false);
   bool IsEpisodeAvailable(int number);
+  bool PlayEpisode(int number);
   bool SetEpisodeAvailability(int number, bool available, const wstring& path = L"");
+  
   wstring GetImagePath();
   void SetLocalData(const wstring& folder, const wstring& titles);
+  
   int GetIntValue(int mode) const;
+  wstring GetStrValue(int mode) const;
+
   int GetLastWatchedEpisode() const;
   int GetRewatching() const;
   int GetScore() const;
   int GetStatus() const;
-  wstring GetStrValue(int mode) const;
   wstring GetTags() const;
   int GetTotalEpisodes() const;
-  bool Edit(const wstring& data, CEventItem& item);
+  
+  int GetAiringStatus();
   bool IsAiredYet(bool strict = false) const;
   bool IsFinishedAiring() const;
-  int GetAiringStatus();
-  void SetStartDate(wstring date, bool ignore_previous);
-  void SetFinishDate(wstring date, bool ignore_previous);
+  void SetFinishDate(const wstring& date, bool ignore_previous);
+  void SetStartDate(const wstring& date, bool ignore_previous);
+
+  bool Edit(EventItem& item, const wstring& data, int status_code);
+  
   bool GetFansubFilter(vector<wstring>& groups);
   bool SetFansubFilter(const wstring& group_name = L"TaigaSubs (change this)");
   
-  int Index;
-  bool NewEps, Playing;
-  vector<bool> EpisodeAvailable;
-  wstring NextEpisodePath;
-  wstring Folder, Synonyms;
-  wstring Genres, Popularity, Producers, Rank, Score, Synopsis;
+public:
+  int index;
+  bool new_episode_available, playing;
+  vector<bool> episode_available;
+  wstring next_episode_path;
+  wstring folder, synonyms;
+
+public:
+  wstring genres, popularity, producers, rank, score, synopsis;
 };
 
 #endif // ANIME_H

@@ -24,42 +24,42 @@
 
 // =============================================================================
 
-CUpdateHelper::CUpdateHelper() :
-  RestartApp(false), UpdateAvailable(false), m_App(NULL)
+UpdateHelper::UpdateHelper() :
+  restart_app(false), update_available(false), app_(nullptr)
 {
 }
 
 // =============================================================================
 
-bool CUpdateHelper::Check(const wstring& address, CApp& app, DWORD client_mode) {
+bool UpdateHelper::Check(const wstring& address, CApp& app, DWORD client_mode) {
   OnCheck();
-  m_App = &app;
-  if (m_App == NULL || address.empty()) return false;
+  app_ = &app;
+  if (app_ == nullptr || address.empty()) return false;
 
   CUrl url(address);
-  return Client.Get(url, L"", client_mode);
+  return client.Get(url, L"", client_mode);
 }
 
-bool CUpdateHelper::DownloadNextFile(DWORD client_mode) {
+bool UpdateHelper::DownloadNextFile(DWORD client_mode) {
   // Check files
-  for (unsigned int i = 0; i < Files.size(); i++) {
-    if (Files[i].Download) {
+  for (unsigned int i = 0; i < files.size(); i++) {
+    if (files[i].download) {
       OnProgress(i);
 
       // Get file path
-      wstring path = CheckSlash(GetPathOnly(m_App->GetModulePath())) + Files[i].Path;
+      wstring path = CheckSlash(GetPathOnly(app_->GetModulePath())) + files[i].path;
       ReplaceChar(path, '/', '\\');
       CreateFolder(GetPathOnly(path));
-      if (!RestartApp) {
-        if (IsEqual(Files[i].Path, GetFileName(m_App->GetModulePath()))) {
+      if (!restart_app) {
+        if (IsEqual(files[i].path, GetFileName(app_->GetModulePath()))) {
           path += L".new";
-          RestartApp = true;
+          restart_app = true;
         }
       }
 
       // Download file
-      CUrl url(VersionInfo.URL + Files[i].Path);
-      return Client.Get(url, path, client_mode, reinterpret_cast<LPARAM>(&Files[i]));
+      CUrl url(version_info.url + files[i].path);
+      return client.Get(url, path, client_mode, reinterpret_cast<LPARAM>(&files[i]));
     }
   }
 
@@ -67,11 +67,11 @@ bool CUpdateHelper::DownloadNextFile(DWORD client_mode) {
   return false;
 }
 
-bool CUpdateHelper::ParseData(wstring data, DWORD client_mode) {
+bool UpdateHelper::ParseData(wstring data, DWORD client_mode) {
   // Reset values
-  Actions.clear();
-  Files.clear();
-  UpdateAvailable = false;
+  actions.clear();
+  files.clear();
+  update_available = false;
   
   // Read XML data
   xml_document doc;
@@ -81,64 +81,64 @@ bool CUpdateHelper::ParseData(wstring data, DWORD client_mode) {
   }
   
   // Read startup actions
-  xml_node actions = doc.child(L"actions");
-  for (xml_node action = actions.child(L"action"); action; action = action.next_sibling(L"action")) {
-    Actions.push_back(action.child_value());
+  xml_node actions_node = doc.child(L"actions");
+  for (xml_node action = actions_node.child(L"action"); action; action = action.next_sibling(L"action")) {
+    actions.push_back(action.child_value());
   }
 
   // Read version information
   xml_node version = doc.child(L"version");
-  VersionInfo.Major = version.child_value(L"major");
-  VersionInfo.Minor = version.child_value(L"minor");
-  VersionInfo.Revision = version.child_value(L"revision");
-  VersionInfo.Build = version.child_value(L"build");
-  VersionInfo.URL = version.child_value(L"url");
+  version_info.major = version.child_value(L"major");
+  version_info.minor = version.child_value(L"minor");
+  version_info.revision = version.child_value(L"revision");
+  version_info.build = version.child_value(L"build");
+  version_info.url = version.child_value(L"url");
 
   // Compare version information
-  if (ToINT(VersionInfo.Major) > m_App->GetVersionMajor() || 
-      ToINT(VersionInfo.Minor) > m_App->GetVersionMinor() || 
-      ToINT(VersionInfo.Revision) > m_App->GetVersionRevision()) {
-        UpdateAvailable = true;
+  if (ToINT(version_info.major) > app_->GetVersionMajor() || 
+      ToINT(version_info.minor) > app_->GetVersionMinor() || 
+      ToINT(version_info.revision) > app_->GetVersionRevision()) {
+        update_available = true;
   }
 
   // Read files
-  xml_node files = doc.child(L"files");
-  for (xml_node file = files.child(L"file"); file; file = file.next_sibling(L"file")) {
-    Files.resize(Files.size() + 1);
-    Files.back().Path = file.child_value(L"path");
-    Files.back().Checksum = file.child_value(L"checksum");
+  xml_node files_node = doc.child(L"files");
+  for (xml_node file = files_node.child(L"file"); file; file = file.next_sibling(L"file")) {
+    files.resize(files.size() + 1);
+    files.back().path = file.child_value(L"path");
+    files.back().checksum = file.child_value(L"checksum");
   }
 
   // Check files
-  for (unsigned int i = 0; i < Files.size(); i++) {
-    if (Files[i].Checksum.empty()) {
-      Files[i].Download = true;
+  for (unsigned int i = 0; i < files.size(); i++) {
+    if (files[i].checksum.empty()) {
+      files[i].download = true;
     } else {
-      wstring path = CheckSlash(GetPathOnly(m_App->GetModulePath())) + Files[i].Path;
+      wstring path = CheckSlash(GetPathOnly(app_->GetModulePath())) + files[i].path;
       ReplaceChar(path, '/', '\\');
       wstring crc;
       OnCRCCheck(path, crc);
-      if (crc.empty() || !IsEqual(crc, Files[i].Checksum)) {
-        Files[i].Download = true;
+      if (crc.empty() || !IsEqual(crc, files[i].checksum)) {
+        files[i].download = true;
       } else {
-        Files[i].Download = false;
+        files[i].download = false;
       }
     }
   }
 
-  if (UpdateAvailable && DownloadNextFile(client_mode)) {
+  if (update_available && DownloadNextFile(client_mode)) {
     return true;
   } else {
     return false;
   }
 }
 
-bool CUpdateHelper::RestartApplication(const wstring& updatehelper_exe, const wstring& current_exe, const wstring& new_exe) {
-  if (RestartApp) {
-    if (FileExists(CheckSlash(m_App->GetCurrentDirectory()) + new_exe)) {
+bool UpdateHelper::RestartApplication(const wstring& updatehelper_exe, const wstring& current_exe, const wstring& new_exe) {
+  if (restart_app) {
+    if (FileExists(CheckSlash(app_->GetCurrentDirectory()) + new_exe)) {
       if (OnRestartApp()) {
         Execute(updatehelper_exe, current_exe + L" " + new_exe + L" " + ToWSTR(GetCurrentProcessId()));
-        m_App->PostQuitMessage();
+        app_->PostQuitMessage();
         return true;
       }
     }

@@ -24,33 +24,21 @@
 
 // =============================================================================
 
-class CVersionInfo {
+class VersionInfo {
 public:
-  wstring Major, Minor, Revision, Build, URL;
+  wstring major, minor, revision, build, url;
 };
 
-class CUpdateFile {
+class UpdateFile {
 public:
-  bool Download;
-  wstring Path, Checksum;
+  bool download;
+  wstring path, checksum;
 };
 
-class CUpdateHelper {
+class UpdateHelper {
 public:
-  CUpdateHelper();
-  virtual ~CUpdateHelper() {}
-
-  CHTTPClient Client;
-  vector<wstring> Actions;
-  vector<CUpdateFile> Files;
-  bool RestartApp, UpdateAvailable;
-  CVersionInfo VersionInfo;
-
-  bool Check(const wstring& address, CApp& app, DWORD client_mode);
-  bool DownloadNextFile(DWORD client_mode);
-  bool ParseData(wstring data, DWORD client_mode);
-  bool RestartApplication(const wstring& updatehelper_exe, 
-    const wstring& current_exe, const wstring& new_exe);
+  UpdateHelper();
+  virtual ~UpdateHelper() {}
 
   virtual void OnCheck() {}
   virtual void OnCRCCheck(const wstring& path, wstring& crc) {}
@@ -59,8 +47,21 @@ public:
   virtual bool OnRestartApp() { return true; }
   virtual void OnRunActions() {}
 
+  bool Check(const wstring& address, CApp& app, DWORD client_mode);
+  bool DownloadNextFile(DWORD client_mode);
+  bool ParseData(wstring data, DWORD client_mode);
+  bool RestartApplication(const wstring& updatehelper_exe, 
+    const wstring& current_exe, const wstring& new_exe);
+
+public:
+  vector<wstring> actions;
+  class HttpClient client;
+  vector<UpdateFile> files;
+  bool restart_app, update_available;
+  VersionInfo version_info;
+
 private:
-  CApp* m_App;
+  CApp* app_;
 };
 
 #endif // UPDATE_H

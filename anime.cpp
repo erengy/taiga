@@ -38,79 +38,79 @@
 #include "win32/win_taskdialog.h"
 #include "xml.h"
 
-CEpisode CurrentEpisode;
+Episode CurrentEpisode;
 
 // =============================================================================
 
-CEpisode::CEpisode() :
-  AnimeId(ANIMEID_UNKNOWN)
+Episode::Episode() :
+  anime_id(ANIMEID_UNKNOWN)
 {
 }
 
-void CEpisode::Clear() {
-  AnimeId = ANIMEID_UNKNOWN;
-  AudioType.clear();
-  Checksum.clear();
-  Extra.clear();
-  File.clear();
-  Format.clear();
-  Group.clear();
-  Name.clear();
-  Number.clear();
-  Resolution.clear();
-  Title.clear();
-  Version.clear();
-  VideoType.clear();
+void Episode::Clear() {
+  anime_id = ANIMEID_UNKNOWN;
+  audio_type.clear();
+  checksum.clear();
+  extras.clear();
+  file.clear();
+  format.clear();
+  group.clear();
+  name.clear();
+  number.clear();
+  resolution.clear();
+  title.clear();
+  version.clear();
+  video_type.clear();
 }
 
 // =============================================================================
 
-CMALAnime::CMALAnime() : 
-  Series_ID(0), Series_Type(0), Series_Episodes(0), Series_Status(0),
-  My_ID(0), My_WatchedEpisodes(0), My_Score(0), My_Status(0), My_Rewatching(0), My_RewatchingEP(0)
+MalAnime::MalAnime() : 
+  series_id(0), series_type(0), series_episodes(0), series_status(0),
+  my_id(0), my_watched_episodes(0), my_score(0), my_status(0), my_rewatching(0), my_rewatching_ep(0)
 {
 }
 
-CAnime::CAnime() : 
-  Index(0), NewEps(false), Playing(false)
+Anime::Anime() : 
+  index(0), new_episode_available(false), playing(false)
 {
 }
 
-void CAnime::Start(CEpisode episode) {
+void Anime::Start(Episode episode) {
   // Change status
-  Taiga.PlayStatus = PLAYSTATUS_PLAYING;
-  Playing = true;
+  Taiga.play_status = PLAYSTATUS_PLAYING;
+  playing = true;
 
   // Update main window
-  MainWindow.ChangeStatus();
-  MainWindow.UpdateTip();
+  MainDialog.ChangeStatus();
+  MainDialog.UpdateTip();
   int status = GetRewatching() ? MAL_WATCHING : GetStatus();
-  MainWindow.RefreshList(status);
-  MainWindow.RefreshTabs(status);
-  int list_index = MainWindow.GetListIndex(Series_ID);
+  MainDialog.RefreshList(status);
+  MainDialog.RefreshTabs(status);
+  int list_index = MainDialog.GetListIndex(series_id);
   if (list_index > -1) {
-    MainWindow.m_List.SetItemIcon(list_index, Icon16_Play);
-    MainWindow.m_List.RedrawItems(list_index, list_index, true);
-    MainWindow.m_List.EnsureVisible(list_index);
+    MainDialog.listview.SetItemIcon(list_index, ICON16_PLAY);
+    MainDialog.listview.RedrawItems(list_index, list_index, true);
+    MainDialog.listview.EnsureVisible(list_index);
   }
   
   // Show balloon tip
   Taskbar.Tip(L"", L"", 0);
-  Taskbar.Tip(ReplaceVariables(Settings.Program.Balloon.Format, episode).c_str(), 
+  Taskbar.Tip(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), 
     L"Watching:", NIIF_INFO);
   
   // Check folder
-  if (Folder.empty()) {
-    if (episode.Folder.empty()) {
+  if (folder.empty()) {
+    if (episode.folder.empty()) {
       HWND hwnd = MediaPlayers.Items[MediaPlayers.Index].WindowHandle;
-      episode.Folder = MediaPlayers.GetTitleFromProcessHandle(hwnd);
-      episode.Folder = GetPathOnly(episode.Folder);
+      episode.folder = MediaPlayers.GetTitleFromProcessHandle(hwnd);
+      episode.folder = GetPathOnly(episode.folder);
     }
-    if (!episode.Folder.empty()) {
-      for (size_t i = 0; i < Settings.Folders.Root.size(); i++) {
+    if (!episode.folder.empty()) {
+      for (size_t i = 0; i < Settings.Folders.root.size(); i++) {
         // Set the folder if only it is under a root folder
-        if (StartsWith(episode.Folder, Settings.Folders.Root[i])) {
-          SetFolder(episode.Folder, true, false);
+        if (StartsWith(episode.folder, Settings.Folders.root[i])) {
+          SetFolder(episode.folder, true, false);
           break;
         }
       }
@@ -118,52 +118,52 @@ void CAnime::Start(CEpisode episode) {
   }
 
   // Get additional information
-  if (Score.empty() || Synopsis.empty()) {
-    MAL.SearchAnime(Series_Title, this);
+  if (score.empty() || synopsis.empty()) {
+    MAL.SearchAnime(series_title, this);
   }
   
   // Update
-  if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT) {
+  if (Settings.Account.Update.time == UPDATE_TIME_INSTANT) {
     End(episode, false, true);
   }
 }
 
-void CAnime::End(CEpisode episode, bool end_watching, bool update_list) {
+void Anime::End(Episode episode, bool end_watching, bool update_list) {
   if (end_watching) {
     // Change status
-    Taiga.PlayStatus = PLAYSTATUS_STOPPED;
-    Playing = false;
+    Taiga.play_status = PLAYSTATUS_STOPPED;
+    playing = false;
     // Announce
-    episode.AnimeId = Series_ID;
+    episode.anime_id = series_id;
     ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&episode));
     ExecuteAction(L"AnnounceToMessenger", FALSE);
     ExecuteAction(L"AnnounceToSkype", FALSE);
     // Update main window
-    episode.AnimeId = ANIMEID_UNKNOWN;
-    MainWindow.ChangeStatus();
-    MainWindow.UpdateTip();
-    int list_index = MainWindow.GetListIndex(Series_ID);
+    episode.anime_id = ANIMEID_UNKNOWN;
+    MainDialog.ChangeStatus();
+    MainDialog.UpdateTip();
+    int list_index = MainDialog.GetListIndex(series_id);
     int ret_value = 0;
     if (list_index > -1) {
-      MainWindow.m_List.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
-      MainWindow.m_List.RedrawItems(list_index, list_index, true);
+      MainDialog.listview.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
+      MainDialog.listview.RedrawItems(list_index, list_index, true);
     }
   }
 
   // Update list
   if (update_list) {
-    if (!Taiga.UpdatesEnabled) return;
+    if (!Taiga.updates_enabled) return;
     if (GetStatus() == MAL_COMPLETED && GetRewatching() == 0) return;
-    if (Settings.Account.Update.Time == UPDATE_TIME_INSTANT || 
-      Taiga.TickerMedia == -1 || Taiga.TickerMedia >= Settings.Account.Update.Delay) {
-        int number = GetEpisodeHigh(episode.Number);
-        int numberlow = GetEpisodeLow(episode.Number);
+    if (Settings.Account.Update.time == UPDATE_TIME_INSTANT || 
+      Taiga.ticker_media == -1 || Taiga.ticker_media >= Settings.Account.Update.delay) {
+        int number = GetEpisodeHigh(episode.number);
+        int number_low = GetEpisodeLow(episode.number);
         int lastwatched = GetLastWatchedEpisode();
-        if (Settings.Account.Update.OutOfRange) {
-          if (numberlow > lastwatched + 1 || number < lastwatched + 1) return;
+        if (Settings.Account.Update.out_of_range) {
+          if (number_low > lastwatched + 1 || number < lastwatched + 1) return;
         }
-        if (MAL.IsValidEpisode(number, lastwatched, Series_Episodes)) {
-          switch (Settings.Account.Update.Mode) {
+        if (MAL.IsValidEpisode(number, lastwatched, series_episodes)) {
+          switch (Settings.Account.Update.mode) {
             case UPDATE_MODE_NONE:
               break;
             case UPDATE_MODE_AUTO:
@@ -181,10 +181,10 @@ void CAnime::End(CEpisode episode, bool end_watching, bool update_list) {
   }
 }
 
-int CAnime::Ask(CEpisode episode) {
+int Anime::Ask(Episode episode) {
   // Set up dialog
   CTaskDialog dlg;
-  wstring title = L"Anime title: " + Series_Title;
+  wstring title = L"Anime title: " + series_title;
   dlg.SetWindowTitle(APP_TITLE);
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Do you want to update your anime list?");
@@ -192,12 +192,12 @@ int CAnime::Ask(CEpisode episode) {
   dlg.UseCommandLinks(true);
 
   // Add buttons
-  int number = GetEpisodeHigh(episode.Number);
+  int number = GetEpisodeHigh(episode.number);
   if (number == 0) number = 1;
-  if (Series_Episodes == 1) {               // Completed (1 eps.)
-    episode.Number = L"1";
+  if (series_episodes == 1) {               // Completed (1 eps.)
+    episode.number = L"1";
     dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
-  } else if (Series_Episodes == number) {   // Completed (>1 eps.)
+  } else if (series_episodes == number) {   // Completed (>1 eps.)
     dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
   } else if (GetStatus() != MAL_WATCHING) { // Watching
     dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
@@ -213,24 +213,24 @@ int CAnime::Ask(CEpisode episode) {
   return dlg.GetSelectedButtonID();
 }
 
-void CAnime::Update(CEpisode episode, bool change_status) {
+void Anime::Update(Episode episode, bool change_status) {
   // Create event item
-  CEventItem item;
-  item.AnimeId = Series_ID;
+  EventItem item;
+  item.anime_id = series_id;
 
   // Set episode number
-  item.episode = GetEpisodeHigh(episode.Number);
-  if (item.episode == 0 || Series_Episodes == 1) item.episode = 1;
-  episode.AnimeId = Series_ID;
+  item.episode = GetEpisodeHigh(episode.number);
+  if (item.episode == 0 || series_episodes == 1) item.episode = 1;
+  episode.anime_id = series_id;
   
   // Set start/finish date
   if (item.episode == 1) SetStartDate(L"", false);
-  if (item.episode == Series_Episodes) SetFinishDate(L"", false);
+  if (item.episode == series_episodes) SetFinishDate(L"", false);
 
   if (change_status) {
-    item.Mode = HTTP_MAL_AnimeEdit;
+    item.mode = HTTP_MAL_AnimeEdit;
     // Move to completed
-    if (Series_Episodes == item.episode) {
+    if (series_episodes == item.episode) {
       item.status = MAL_COMPLETED;
       if (GetRewatching()) {
         item.enable_rewatching = FALSE;
@@ -249,37 +249,38 @@ void CAnime::Update(CEpisode episode, bool change_status) {
   }
 
   // Update normally
-  item.Mode = HTTP_MAL_AnimeUpdate;
+  item.mode = HTTP_MAL_AnimeUpdate;
   EventQueue.Add(item);
 }
 
 // =============================================================================
 
-void CAnime::CheckFolder() {
+bool Anime::CheckFolder() {
   // Check if current folder still exists
-  if (!Folder.empty() && !FolderExists(Folder)) {
-    Folder.clear();
+  if (!folder.empty() && !FolderExists(folder)) {
+    folder.clear();
   }
   // Search root folders
-  if (Folder.empty()) {
+  if (folder.empty()) {
     wstring new_folder;
-    for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
-      new_folder = SearchFileFolder(*this, Settings.Folders.Root[i], 0, true);
+    for (unsigned int i = 0; i < Settings.Folders.root.size(); i++) {
+      new_folder = SearchFileFolder(*this, Settings.Folders.root[i], 0, true);
       if (!new_folder.empty()) {
         SetFolder(new_folder, true, false);
-        return;
+        break;
       }
     }
   }
+  return !folder.empty();
 }
 
-void CAnime::SetFolder(const wstring& folder, bool save_settings, bool check_episodes) {
+void Anime::SetFolder(const wstring& folder, bool save_settings, bool check_episodes) {
   // Save settings
-  if (save_settings && folder != EMPTY_STR && folder != Folder) {
-    Settings.Anime.SetItem(Series_ID, folder, EMPTY_STR);
+  if (save_settings && folder != EMPTY_STR && folder != this->folder) {
+    Settings.Anime.SetItem(series_id, folder, EMPTY_STR);
   }
   // Set new folder
-  Folder = folder;
+  this->folder = folder;
   // Check episodes
   if (check_episodes) {
     CheckEpisodes();
@@ -288,91 +289,91 @@ void CAnime::SetFolder(const wstring& folder, bool save_settings, bool check_epi
 
 // =============================================================================
 
-bool CAnime::CheckEpisodes(int episode, bool check_folder) {
+bool Anime::CheckEpisodes(int number, bool check_folder) {
   // Check folder
   if (check_folder) CheckFolder();
-  if (Folder.empty()) {
-    for (int i = 1; i <= Series_Episodes; i++)
+  if (folder.empty()) {
+    for (int i = 1; i <= series_episodes; i++)
       SetEpisodeAvailability(i, false);
-    NewEps = false;
+    new_episode_available = false;
     return false;
   }
   
   // Check all episodes
-  if (episode == -1) {
-    SearchFileFolder(*this, Folder, -1, false);
+  if (number == -1) {
+    SearchFileFolder(*this, folder, -1, false);
     return true;
 
   // Check single episode
   } else {
-    if (episode == 0) {
-      if (NewEps) return true;
-      NextEpisodePath.clear();
-      episode = Series_Episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
+    if (number == 0) {
+      if (new_episode_available) return true;
+      next_episode_path.clear();
+      number = series_episodes == 1 ? 0 : GetLastWatchedEpisode() + 1;
     }
-    wstring file = SearchFileFolder(*this, Folder, episode, false);
+    wstring file = SearchFileFolder(*this, folder, number, false);
     return !file.empty();
   }
 }
 
-bool CAnime::PlayEpisode(int number) {
-  if (number > Series_Episodes && Series_Episodes != 0) return false;
+bool Anime::PlayEpisode(int number) {
+  if (number > series_episodes && series_episodes != 0) return false;
 
   wstring file;
 
   // Check saved episode path
   if (number == GetLastWatchedEpisode() + 1) {
-    if (!NextEpisodePath.empty() && FileExists(NextEpisodePath)) {
-      file = NextEpisodePath;
+    if (!next_episode_path.empty() && FileExists(next_episode_path)) {
+      file = next_episode_path;
     }
   }
   
   // Check anime folder
   if (file.empty()) {
     CheckFolder();
-    if (!Folder.empty()) {
-      file = SearchFileFolder(*this, Folder, number, false);
+    if (!folder.empty()) {
+      file = SearchFileFolder(*this, folder, number, false);
     }
   }
 
   // Check other folders
   if (file.empty()) {
-    for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
-      file = SearchFileFolder(*this, Settings.Folders.Root[i], number, false);
+    for (unsigned int i = 0; i < Settings.Folders.root.size(); i++) {
+      file = SearchFileFolder(*this, Settings.Folders.root[i], number, false);
       if (!file.empty()) break;
     }
   }
 
   if (file.empty()) {
     if (number == 0) number = 1;
-    MainWindow.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + 
-      L" (" + Series_Title + L").");
+    MainDialog.ChangeStatus(L"Could not find episode #" + ToWSTR(number) + 
+      L" (" + series_title + L").");
   } else {
     Execute(file);
   }
   return !file.empty();
 }
 
-bool CAnime::IsEpisodeAvailable(int number) {
-  if (static_cast<unsigned int>(number) > EpisodeAvailable.size()) return false;
-  return EpisodeAvailable.at(number - 1);
+bool Anime::IsEpisodeAvailable(int number) {
+  if (static_cast<unsigned int>(number) > episode_available.size()) return false;
+  return episode_available.at(number - 1);
 }
 
-bool CAnime::SetEpisodeAvailability(int number, bool available, const wstring& path) {
+bool Anime::SetEpisodeAvailability(int number, bool available, const wstring& path) {
   if (number == 0) number = 1;
-  if (number <= Series_Episodes || Series_Episodes == 0) {
-    if (static_cast<unsigned int>(number) > EpisodeAvailable.size()) {
-      EpisodeAvailable.resize(number);
+  if (number <= series_episodes || series_episodes == 0) {
+    if (static_cast<unsigned int>(number) > episode_available.size()) {
+      episode_available.resize(number);
     }
-    EpisodeAvailable[number - 1] = available;
+    episode_available[number - 1] = available;
     if (number == GetLastWatchedEpisode() + 1) {
-      NextEpisodePath = path;
-      NewEps = available;
+      next_episode_path = path;
+      new_episode_available = available;
     }
-    if (!Playing) {
-      int list_index = MainWindow.GetListIndex(Series_ID);
+    if (!playing) {
+      int list_index = MainDialog.GetListIndex(series_id);
       if (list_index > -1) {
-        MainWindow.m_List.RedrawItems(list_index, list_index, true);
+        MainDialog.listview.RedrawItems(list_index, list_index, true);
       }
     }
     return true;
@@ -382,75 +383,75 @@ bool CAnime::SetEpisodeAvailability(int number, bool available, const wstring& p
 
 // =============================================================================
 
-wstring CAnime::GetImagePath() {
-  return Taiga.GetDataPath() + L"Image\\" + ToWSTR(Series_ID) + L".jpg";
+wstring Anime::GetImagePath() {
+  return Taiga.GetDataPath() + L"Image\\" + ToWSTR(series_id) + L".jpg";
 }
 
-void CAnime::SetLocalData(const wstring& folder, const wstring& titles) {
-  if ((folder == EMPTY_STR || folder == Folder) && 
-      (titles == EMPTY_STR || titles == Synonyms)) {
+void Anime::SetLocalData(const wstring& folder, const wstring& titles) {
+  if ((folder == EMPTY_STR || folder == this->folder) && 
+      (titles == EMPTY_STR || titles == synonyms)) {
         return;
   }
 
-  if (folder != EMPTY_STR) Folder = folder;
-  if (titles != EMPTY_STR) Synonyms = titles;
+  if (folder != EMPTY_STR) this->folder = folder;
+  if (titles != EMPTY_STR) synonyms = titles;
 
-  Settings.Anime.SetItem(Series_ID, folder, titles);
-  Settings.Write();
+  Settings.Anime.SetItem(series_id, folder, titles);
+  Settings.Save();
 
-  if (!Synonyms.empty() && CurrentEpisode.AnimeId == ANIMEID_NOTINLIST) {
-    CurrentEpisode.AnimeId = ANIMEID_UNKNOWN;
+  if (!synonyms.empty() && CurrentEpisode.anime_id == ANIMEID_NOTINLIST) {
+    CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
   }
 }
 
 // =============================================================================
 
-int CAnime::GetIntValue(int mode) const {
-  CEventItem* item = EventQueue.SearchItem(Series_ID, mode);
+int Anime::GetIntValue(int mode) const {
+  EventItem* item = EventQueue.FindItem(series_id, mode);
   switch (mode) {
     case EVENT_SEARCH_EPISODE:
-      return item ? item->episode : My_WatchedEpisodes;
+      return item ? item->episode : my_watched_episodes;
     case EVENT_SEARCH_REWATCH:
-      return item ? item->enable_rewatching : My_Rewatching;
+      return item ? item->enable_rewatching : my_rewatching;
     case EVENT_SEARCH_SCORE:
-      return item ? item->score : My_Score;
+      return item ? item->score : my_score;
     case EVENT_SEARCH_STATUS:
-      return item ? item->status : My_Status;
+      return item ? item->status : my_status;
     default:
       return -1;
   }
 }
 
-wstring CAnime::GetStrValue(int mode) const {
-  CEventItem* item = EventQueue.SearchItem(Series_ID, mode);
+wstring Anime::GetStrValue(int mode) const {
+  EventItem* item = EventQueue.FindItem(series_id, mode);
   switch (mode) {
     case EVENT_SEARCH_TAGS:
-      return item ? item->tags : My_Tags;
+      return item ? item->tags : my_tags;
     default:
       return L"";
   }
 }
 
-int CAnime::GetLastWatchedEpisode() const {
+int Anime::GetLastWatchedEpisode() const {
   return GetIntValue(EVENT_SEARCH_EPISODE);
 }
-int CAnime::GetRewatching() const {
+int Anime::GetRewatching() const {
   return GetIntValue(EVENT_SEARCH_REWATCH);
 }
-int CAnime::GetScore() const {
+int Anime::GetScore() const {
   return GetIntValue(EVENT_SEARCH_SCORE);
 }
-int CAnime::GetStatus() const {
+int Anime::GetStatus() const {
   return GetIntValue(EVENT_SEARCH_STATUS);
 }
-wstring CAnime::GetTags() const {
+wstring Anime::GetTags() const {
   return GetStrValue(EVENT_SEARCH_TAGS);
 }
 
-int CAnime::GetTotalEpisodes() const {
-  if (Series_Episodes > 0) return Series_Episodes;
-  int number = max(My_WatchedEpisodes, GetLastWatchedEpisode());
-  number = max(number, static_cast<int>(EpisodeAvailable.size()));
+int Anime::GetTotalEpisodes() const {
+  if (series_episodes > 0) return series_episodes;
+  int number = max(my_watched_episodes, GetLastWatchedEpisode());
+  number = max(number, static_cast<int>(episode_available.size()));
   if (number < 12) return 13;
   if (number < 24) return 26;
   if (number < 50) return 51;
@@ -459,63 +460,65 @@ int CAnime::GetTotalEpisodes() const {
 
 // =============================================================================
 
-bool CAnime::IsAiredYet(bool strict) const {
-  if (Series_Status == MAL_NOTYETAIRED) {
-    if (!MAL.IsValidDate(Series_Start)) return false;
-    if (strict) {
-      if (Series_Start.at(5) == '0' && Series_Start.at(6) == '0')
-        return CompareStrings(GetDateJapan(L"yyyy"), Series_Start.substr(0, 4)) > 0;
-      if (Series_Start.at(8) == '0' && Series_Start.at(9) == '0')
-        return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_Start.substr(0, 7)) > 0;
-    }
-    return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_Start) >= 0;
-  }
-  return true;
-}
-
-bool CAnime::IsFinishedAiring() const {
-  if (Series_Status == MAL_FINISHED) return true;
-  if (!MAL.IsValidDate(Series_End)) return false;
-  if (!IsAiredYet()) return false;
-  
-  if (Series_End.at(5) == '0' && Series_End.at(6) == '0') {
-    return CompareStrings(GetDateJapan(L"yyyy"), Series_End.substr(0, 4)) > 0;
-  }
-  if (Series_End.at(8) == '0' && Series_End.at(9) == '0') {
-    return CompareStrings(GetDateJapan(L"yyyy'-'MM"), Series_End.substr(0, 7)) > 0;
-  }
-  return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), Series_End) > 0;
-}
-
-int CAnime::GetAiringStatus() {
+int Anime::GetAiringStatus() {
   if (IsFinishedAiring()) return MAL_FINISHED;
   if (IsAiredYet(true)) return MAL_AIRING;
   return MAL_NOTYETAIRED;
 }
 
-void CAnime::SetStartDate(wstring date, bool ignore_previous) {
-  if (!MAL.IsValidDate(My_StartDate) || ignore_previous) {
-    My_StartDate = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
-    AnimeList.Write(Series_ID, L"my_start_date", My_StartDate, ANIMELIST_EDITANIME);
+bool Anime::IsAiredYet(bool strict) const {
+  if (series_status == MAL_NOTYETAIRED) {
+    if (!MAL.IsValidDate(series_start)) return false;
+    if (strict) {
+      if (series_start.at(5) == '0' && series_start.at(6) == '0')
+        return CompareStrings(GetDateJapan(L"yyyy"), series_start.substr(0, 4)) > 0;
+      if (series_start.at(8) == '0' && series_start.at(9) == '0')
+        return CompareStrings(GetDateJapan(L"yyyy'-'MM"), series_start.substr(0, 7)) > 0;
+    }
+    return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), series_start) >= 0;
+  }
+  return true;
+}
+
+bool Anime::IsFinishedAiring() const {
+  if (series_status == MAL_FINISHED) return true;
+  if (!MAL.IsValidDate(series_end)) return false;
+  if (!IsAiredYet()) return false;
+  
+  if (series_end.at(5) == '0' && series_end.at(6) == '0') {
+    return CompareStrings(GetDateJapan(L"yyyy"), series_end.substr(0, 4)) > 0;
+  }
+  if (series_end.at(8) == '0' && series_end.at(9) == '0') {
+    return CompareStrings(GetDateJapan(L"yyyy'-'MM"), series_end.substr(0, 7)) > 0;
+  }
+  return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), series_end) > 0;
+}
+
+
+
+void Anime::SetStartDate(const wstring& date, bool ignore_previous) {
+  if (!MAL.IsValidDate(my_start_date) || ignore_previous) {
+    my_start_date = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
+    AnimeList.Save(series_id, L"my_start_date", my_start_date, ANIMELIST_EDITANIME);
   }
 }
 
-void CAnime::SetFinishDate(wstring date, bool ignore_previous) {
-  if (!MAL.IsValidDate(My_FinishDate) || ignore_previous) {
-    My_FinishDate = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
-    AnimeList.Write(Series_ID, L"my_finish_date", My_FinishDate, ANIMELIST_EDITANIME);
+void Anime::SetFinishDate(const wstring& date, bool ignore_previous) {
+  if (!MAL.IsValidDate(my_finish_date) || ignore_previous) {
+    my_finish_date = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
+    AnimeList.Save(series_id, L"my_finish_date", my_finish_date, ANIMELIST_EDITANIME);
   }
 }
 
 // =============================================================================
 
-bool CAnime::Edit(const wstring& data, CEventItem& item) {
-  // Show balloon tip on failure
-  if (!MAL.UpdateSucceeded(data, item)) {
-    wstring text = L"Title: " + Series_Title;
-    text += L"\nReason: " + (item.Reason.empty() ? L"-" : item.Reason);
+bool Anime::Edit(EventItem& item, const wstring& data, int status_code) {
+  if (!MAL.UpdateSucceeded(item, data, status_code)) {
+    // Show balloon tip on failure
+    wstring text = L"Title: " + series_title;
+    text += L"\nReason: " + (item.reason.empty() ? L"Unknown" : item.reason);
     text += L"\nClick to try again.";
-    Taiga.CurrentTipType = TIPTYPE_UPDATEFAILED;
+    Taiga.current_tip_type = TIPTYPE_UPDATEFAILED;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
     return false;
@@ -523,59 +526,59 @@ bool CAnime::Edit(const wstring& data, CEventItem& item) {
 
   // Edit episode
   if (item.episode > -1) {
-    My_WatchedEpisodes = item.episode;
-    AnimeList.Write(Series_ID, L"my_watched_episodes", ToWSTR(My_WatchedEpisodes));
+    my_watched_episodes = item.episode;
+    AnimeList.Save(series_id, L"my_watched_episodes", ToWSTR(my_watched_episodes));
   }
   // Edit score
   if (item.score > -1) {
-    My_Score = item.score;
-    AnimeList.Write(Series_ID, L"my_score", ToWSTR(My_Score));
+    my_score = item.score;
+    AnimeList.Save(series_id, L"my_score", ToWSTR(my_score));
   }
   // Edit status
   if (item.status > 0) {
-    AnimeList.User.IncreaseItemCount(item.status, 1, false);
-    AnimeList.User.IncreaseItemCount(My_Status, -1);
-    My_Status = item.status;
-    AnimeList.Write(Series_ID, L"my_status", ToWSTR(My_Status));
+    AnimeList.user.IncreaseItemCount(item.status, 1, false);
+    AnimeList.user.IncreaseItemCount(my_status, -1);
+    my_status = item.status;
+    AnimeList.Save(series_id, L"my_status", ToWSTR(my_status));
   }
   // Edit re-watching status
   if (item.enable_rewatching > -1) {
-    My_Rewatching = item.enable_rewatching;
-    AnimeList.Write(Series_ID, L"my_rewatching", ToWSTR(My_Rewatching));
+    my_rewatching = item.enable_rewatching;
+    AnimeList.Save(series_id, L"my_rewatching", ToWSTR(my_rewatching));
   }
   // Edit ID (Add)
-  if (item.Mode == HTTP_MAL_AnimeAdd) {
+  if (item.mode == HTTP_MAL_AnimeAdd) {
     if (IsNumeric(data)) {
-      My_ID = ToINT(data);
-      AnimeList.Write(Series_ID, L"my_id", data);
+      my_id = ToINT(data);
+      AnimeList.Save(series_id, L"my_id", data);
     }
   }
   // Edit tags
   if (item.tags != EMPTY_STR) {
-    My_Tags = item.tags;
-    AnimeList.Write(Series_ID, L"my_tags", My_Tags);
+    my_tags = item.tags;
+    AnimeList.Save(series_id, L"my_tags", my_tags);
   }
   // Delete
-  if (item.Mode == HTTP_MAL_AnimeDelete) {
-    MainWindow.ChangeStatus(L"Item deleted. (" + Series_Title + L")");
-    AnimeList.DeleteItem(Series_ID);
-    MainWindow.RefreshList();
-    MainWindow.RefreshTabs();
-    SearchWindow.PostMessage(WM_CLOSE);
-    if (CurrentEpisode.AnimeId == item.AnimeId) {
-      CurrentEpisode.AnimeId = ANIMEID_NOTINLIST;
+  if (item.mode == HTTP_MAL_AnimeDelete) {
+    MainDialog.ChangeStatus(L"Item deleted. (" + series_title + L")");
+    AnimeList.DeleteItem(series_id);
+    MainDialog.RefreshList();
+    MainDialog.RefreshTabs();
+    SearchDialog.PostMessage(WM_CLOSE);
+    if (CurrentEpisode.anime_id == item.anime_id) {
+      CurrentEpisode.anime_id = ANIMEID_NOTINLIST;
     }
   }
 
-  // Remove item from update buffer
+  // Remove item from event queue
   EventQueue.Remove();
-  // Check for more items
+  // Check for more events
   EventQueue.Check();
 
   // Redraw main list item
-  int list_index = MainWindow.GetListIndex(Series_ID);
+  int list_index = MainDialog.GetListIndex(series_id);
   if (list_index > -1) {
-    MainWindow.m_List.RedrawItems(list_index, list_index, true);
+    MainDialog.listview.RedrawItems(list_index, list_index, true);
   }
 
   return true;
@@ -583,13 +586,13 @@ bool CAnime::Edit(const wstring& data, CEventItem& item) {
 
 // =============================================================================
 
-bool CAnime::GetFansubFilter(vector<wstring>& groups) {
+bool Anime::GetFansubFilter(vector<wstring>& groups) {
   bool found = false;
   for (auto i = Aggregator.FilterManager.Filters.begin(); 
        i != Aggregator.FilterManager.Filters.end(); ++i) {
     if (found) break;
     for (auto j = i->AnimeIds.begin(); j != i->AnimeIds.end(); ++j) {
-      if (*j != Series_ID) continue;
+      if (*j != series_id) continue;
       if (found) break;
       for (auto k = i->Conditions.begin(); k != i->Conditions.end(); ++k) {
         if (k->Element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
@@ -601,14 +604,14 @@ bool CAnime::GetFansubFilter(vector<wstring>& groups) {
   return found;
 }
 
-bool CAnime::SetFansubFilter(const wstring& group_name) {
-  CFeedFilter* filter = nullptr;
+bool Anime::SetFansubFilter(const wstring& group_name) {
+  FeedFilter* filter = nullptr;
 
   for (auto i = Aggregator.FilterManager.Filters.begin(); 
        i != Aggregator.FilterManager.Filters.end(); ++i) {
     if (filter) break;
     for (auto j = i->AnimeIds.begin(); j != i->AnimeIds.end(); ++j) {
-      if (*j != Series_ID) continue;
+      if (*j != series_id) continue;
       for (auto k = i->Conditions.begin(); k != i->Conditions.end(); ++k) {
         if (k->Element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
         filter = &(*i); break;
@@ -617,24 +620,24 @@ bool CAnime::SetFansubFilter(const wstring& group_name) {
   }
   
   if (filter) {
-    FeedFilterWindow.filter_ = *filter;
+    FeedFilterDialog.filter = *filter;
   } else {
-    FeedFilterWindow.filter_.Reset();
-    FeedFilterWindow.filter_.Name = L"[Fansub] " + Series_Title;
-    FeedFilterWindow.filter_.Match = FEED_FILTER_MATCH_ANY;
-    FeedFilterWindow.filter_.Action = FEED_FILTER_ACTION_SELECT;
-    FeedFilterWindow.filter_.AnimeIds.push_back(Series_ID);
-    FeedFilterWindow.filter_.AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, 
+    FeedFilterDialog.filter.Reset();
+    FeedFilterDialog.filter.Name = L"[Fansub] " + series_title;
+    FeedFilterDialog.filter.Match = FEED_FILTER_MATCH_ANY;
+    FeedFilterDialog.filter.Action = FEED_FILTER_ACTION_SELECT;
+    FeedFilterDialog.filter.AnimeIds.push_back(series_id);
+    FeedFilterDialog.filter.AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, 
       FEED_FILTER_OPERATOR_IS, group_name);
   }
 
   ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(g_hMain));
   
-  if (!FeedFilterWindow.filter_.Conditions.empty()) {
+  if (!FeedFilterDialog.filter.Conditions.empty()) {
     if (filter) {
-      *filter = FeedFilterWindow.filter_;
+      *filter = FeedFilterDialog.filter;
     } else {
-      Aggregator.FilterManager.Filters.push_back(FeedFilterWindow.filter_);
+      Aggregator.FilterManager.Filters.push_back(FeedFilterDialog.filter);
     }
     return true;
   } else {

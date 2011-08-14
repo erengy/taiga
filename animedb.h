@@ -20,36 +20,28 @@
 #define ANIMEDB_H
 
 #include "std.h"
-#include "anime.h"
+
+class Anime;
 
 // =============================================================================
 
-class CAnimeDatabase {
+class AnimeSeasonDatabase {
 public:
-  CAnimeDatabase() {}
-  virtual ~CAnimeDatabase() {}
-};
-
-extern CAnimeDatabase AnimeDatabase;
-
-// =============================================================================
-
-class CAnimeSeasonDatabase {
-public:
-  CAnimeSeasonDatabase() : Modified(false) {}
-  virtual ~CAnimeSeasonDatabase() {}
+  AnimeSeasonDatabase();
+  virtual ~AnimeSeasonDatabase() {}
 
   bool Read(wstring file);
-  bool Write(wstring file = L"");
-  bool WriteForRelease();
+  bool Save(wstring file = L"", bool minimal = false);
 
 public:
-  vector<CAnime> Items;
-  wstring LastModified, Name;
-  wstring File, Folder;
-  bool Modified;
+  vector<Anime> items;
+  wstring last_modified, name;
+  bool modified;
+
+private:
+  wstring file_, folder_;
 };
 
-extern CAnimeSeasonDatabase SeasonDatabase;
+extern AnimeSeasonDatabase SeasonDatabase;
 
 #endif // ANIMEDB_H

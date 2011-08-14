@@ -26,11 +26,16 @@
 #include "taiga.h"
 #include "xml.h"
 
-CMediaPlayers MediaPlayers;
+class MediaPlayers MediaPlayers;
 
 // =============================================================================
 
-BOOL CMediaPlayers::Read() {
+MediaPlayers::MediaPlayers() : 
+  Index(-1), IndexOld(-1), title_changed_(false)
+{
+}
+
+BOOL MediaPlayers::Read() {
   // Initialize
   wstring file = Taiga.GetDataPath() + L"Media.xml";
   Items.clear();
@@ -56,7 +61,7 @@ BOOL CMediaPlayers::Read() {
     XML_ReadChildNodes(player, Items.back().File, L"file");
     XML_ReadChildNodes(player, Items.back().Folder, L"folder");
     for (xml_node child_node = player.child(L"edit"); child_node; child_node = child_node.next_sibling(L"edit")) {
-      CMediaPlayer::CEditTitle edit;
+      MediaPlayer::EditTitle edit;
       edit.Mode = child_node.attribute(L"mode").as_int();
       edit.Value = child_node.child_value();
       Items.back().Edit.push_back(edit);
@@ -66,7 +71,7 @@ BOOL CMediaPlayers::Read() {
   return TRUE;
 }
 
-BOOL CMediaPlayers::Write() {
+BOOL MediaPlayers::Save() {
   // Initialize
   wstring folder = Taiga.GetDataPath();
   wstring file = folder + L"Media.xml";
@@ -109,8 +114,8 @@ BOOL CMediaPlayers::Write() {
 
 // =============================================================================
 
-int CMediaPlayers::Check() {
-  m_bTitleChanged = false;
+int MediaPlayers::Check() {
+  title_changed_ = false;
   Index = -1;
 
   HWND hwnd = GetWindow(g_hMain, GW_HWNDFIRST);
@@ -126,7 +131,7 @@ int CMediaPlayers::Check() {
               if (IsEqual(*f, GetFileName(GetWindowPath(hwnd)))) {
                 // We have a match!
                 NewCaption = GetTitle(hwnd, *c, item->Mode);
-                if (CurrentCaption != NewCaption) m_bTitleChanged = true;
+                if (CurrentCaption != NewCaption) title_changed_ = true;
                 CurrentCaption = NewCaption;
                 item->WindowHandle = hwnd;
                 Index = IndexOld = item - Items.begin();
@@ -145,7 +150,7 @@ int CMediaPlayers::Check() {
   return -1;
 }
 
-void CMediaPlayers::EditTitle(wstring& str) {
+void MediaPlayers::EditTitle(wstring& str) {
   if (str.empty() || Index == -1 || Items[Index].Edit.empty()) return;
   
   for (unsigned int i = 0; i < Items[Index].Edit.size(); i++) {
@@ -167,7 +172,7 @@ void CMediaPlayers::EditTitle(wstring& str) {
   TrimRight(str, L" -");
 }
 
-wstring CMediaPlayers::CMediaPlayer::GetPath() {
+wstring MediaPlayers::MediaPlayer::GetPath() {
   for (size_t i = 0; i < Folder.size(); i++) {
     for (size_t j = 0; j < File.size(); j++) {
       wstring path = Folder[i] + File[j];
@@ -178,7 +183,7 @@ wstring CMediaPlayers::CMediaPlayer::GetPath() {
   return L"";
 }
 
-wstring CMediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) {
+wstring MediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) {
   switch (mode) {
     // File handle
     case 1:
@@ -218,14 +223,14 @@ wstring CMediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) 
 #define IPC_GETPLAYLISTFILE  211
 #define IPC_GETPLAYLISTFILEW 214
 
-wstring CMediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
+wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
   vector<wstring> files_vector;
   if (hwnd != NULL && process_id == 0) {
     GetWindowThreadProcessId(hwnd, &process_id);
   }
   if (GetProcessFiles(process_id, files_vector)) {
     for (unsigned int i = 0; i < files_vector.size(); i++) {
-      if (CheckFileExtension(GetFileExtension(files_vector[i]), Meow.ValidExtensions)) {
+      if (CheckFileExtension(GetFileExtension(files_vector[i]), Meow.valid_extensions)) {
         if (files_vector[i].at(1) != L':') {
           TranslateDeviceName(files_vector[i]);
         }
@@ -242,7 +247,7 @@ wstring CMediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
   return L"";
 }
 
-wstring CMediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
+wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
   if (IsWindow(hwnd)) {
     if (SendMessage(hwnd, WM_USER, 0, IPC_ISPLAYING)) {
       int list_index = SendMessage(hwnd, WM_USER, 0, IPC_GETLISTPOS);
@@ -272,7 +277,7 @@ wstring CMediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
   return L"";
 }
 
-wstring CMediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class_name) {
+wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class_name) {
   // BS.Player
   if (class_name == BSP_CLASS) {
     if (IsWindow(hwnd)) {
@@ -294,7 +299,7 @@ wstring CMediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& clas
       if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 0, GET_STATUS_STATUS) != MCI_MODE_STOP) {
         if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 
           reinterpret_cast<WPARAM>(g_hMain), GET_STATUS_TRACK_FILENAME)) {
-            return MediaPlayers.NewCaption;
+            return NewCaption;
         }
       }
     }
@@ -303,7 +308,7 @@ wstring CMediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& clas
   return L"";
 }
 
-wstring CMediaPlayers::GetTitleFromMPlayer() {
+wstring MediaPlayers::GetTitleFromMPlayer() {
   HANDLE hProcessSnap;
   PROCESSENTRY32 pe32;
   wstring title;

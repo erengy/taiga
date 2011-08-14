@@ -25,6 +25,8 @@
 #define WM_MONITORCALLBACK (WM_APP + 0x32)
 #define MONITOR_BUFFER_SIZE 4096
 
+class FolderMonitor;
+
 // =============================================================================
 
 enum FolderMonitorState {
@@ -32,64 +34,67 @@ enum FolderMonitorState {
   MONITOR_STATE_ACTIVE
 };
 
-class CFolderInfo {
+class FolderInfo {
 public:
-  CFolderInfo();
-  virtual ~CFolderInfo();
-  
-  class CFolderChangeInfo {
-  public:
-    CFolderChangeInfo() : AnimeIndex(0) {}
-    DWORD Action;
-    int AnimeIndex;
-    wstring FileName;
-  };
-  vector<CFolderChangeInfo> m_ChangeList;
-  
-  wstring m_Path;
-  int m_State;
+  FolderInfo();
+  virtual ~FolderInfo();
 
-  HANDLE m_hDirectory;
-  BYTE m_Buffer[MONITOR_BUFFER_SIZE];
-  BOOL m_bWatchSubtree;
-  DWORD m_dwNotifyFilter;
-  DWORD m_dwBytesReturned;
-  OVERLAPPED m_Overlapped;
+  friend class FolderMonitor;
+  
+public:
+  wstring path;
+  int state;
+  
+  class FolderChangeInfo {
+  public:
+    FolderChangeInfo() : anime_index(0) {}
+    DWORD action;
+    int anime_index;
+    wstring file_name;
+  };
+  vector<FolderChangeInfo> change_list;
+  
+private:
+  BYTE buffer_[MONITOR_BUFFER_SIZE];
+  DWORD bytes_returned_;
+  HANDLE directory_handle_;
+  DWORD notify_filter_;
+  OVERLAPPED overlapped_;
+  BOOL watch_subtree_;
 };
 
 // =============================================================================
 
-class CFolderMonitor : public CThread {
+class FolderMonitor : public CThread {
 public:
-  CFolderMonitor();
-  virtual ~CFolderMonitor();
+  FolderMonitor();
+  virtual ~FolderMonitor();
 
   // Worker thread
   DWORD ThreadProc();
 
   // Main thread
   void Enable(bool enabled = true);
-  virtual void OnChange(CFolderInfo* info);
+  virtual void OnChange(FolderInfo* folder_info);
 
-  // ...
-  HANDLE GetCompletionPort() { return m_hCompPort; }
-  void SetWindowHandle(HWND hwnd) { m_hWindow = hwnd; }
-  
-  // ...
-  bool AddFolder(const wstring folder);
+  HANDLE GetCompletionPort() { return completion_port_; }
+  void SetWindowHandle(HWND hwnd) { window_handle_ = hwnd; }
+
+  bool AddFolder(const wstring& folder);
   bool ClearFolders();
   bool Start();
   bool Stop();
 
 private:
-  BOOL ReadDirectoryChanges(CFolderInfo* pfi);
+  BOOL ReadDirectoryChanges(FolderInfo* folder_info);
 
-  CCriticalSection m_CriticalSection;
-  vector<CFolderInfo> m_Folders;
-  HANDLE m_hCompPort;
-  HWND m_hWindow;
+private:
+  CCriticalSection critical_section_;
+  vector<FolderInfo> folders_;
+  HANDLE completion_port_;
+  HWND window_handle_;
 };
 
-extern CFolderMonitor FolderMonitor;
+extern FolderMonitor FolderMonitor;
 
 #endif // MONITOR_H

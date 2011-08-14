@@ -23,33 +23,33 @@
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
-class CAnime;
+class Anime;
 
 // =============================================================================
 
-/* Search window */
-
-class CSearchWindow : public CDialog {
+class SearchDialog : public CDialog {
 public:
-  CSearchWindow();
-  ~CSearchWindow() {};
-
-  CEdit m_Edit;
-  CListView m_List;
-  vector<CAnime> m_Anime;
-
-  void EnableInput(bool enable);
-  BOOL Search(const wstring& title);
-  void ParseResults(const wstring& data);
-  void RefreshList();
+  SearchDialog();
+  ~SearchDialog() {};
   
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnOK();
   BOOL PreTranslateMessage(MSG* pMsg);
+
+public:
+  void EnableInput(bool enable);
+  void ParseResults(const wstring& data);
+  void RefreshList();
+  bool Search(const wstring& title);
+
+private:
+  vector<Anime> anime_results_;
+  CEdit edit_;
+  CListView list_;
 };
 
-extern CSearchWindow SearchWindow;
+extern SearchDialog SearchDialog;
 
 #endif // DLG_SEARCH_H

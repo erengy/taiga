@@ -22,9 +22,7 @@
 #include "../std.h"
 #include "../win32/win_dialog.h"
 
-// =============================================================================
-
-enum SettingsPage{
+enum SettingsPages {
   PAGE_ACCOUNT,
   PAGE_UPDATE,
   PAGE_HTTP,
@@ -43,22 +41,31 @@ enum SettingsPage{
   PAGE_COUNT
 };
 
-class CSettingsPage : public CDialog {
-public:
-  CSettingsPage();
-  virtual ~CSettingsPage() {}
+class SettingsDialog;
 
-  int Index;
-  
-  void CreateItem(LPCWSTR pszText, HTREEITEM htiParent);
-  void Select();
+// =============================================================================
+
+class SettingsPage : public CDialog {
+public:
+  SettingsPage();
+  virtual ~SettingsPage() {}
+
+  friend class SettingsDialog;
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
 
+public:
+  void CreateItem(LPCWSTR pszText, HTREEITEM htiParent, class SettingsDialog* parent);
+  void Select();
+
+public:
+  int index;
+
 private:
-  HTREEITEM m_hTreeItem;
+  SettingsDialog* parent;
+  HTREEITEM tree_item_;
 };
 
 #endif // DLG_SETTINGS_PAGE_H

@@ -32,44 +32,43 @@
 #include "../taiga.h"
 #include "../theme.h"
 
-int AddTorrentFilterToList(HWND hwnd_list, const CFeedFilter& filter);
-void RefreshTorrentFilterList(HWND hwnd_list);
-
 // =============================================================================
 
-CSettingsPage::CSettingsPage() :
-  m_hTreeItem(NULL)
+SettingsPage::SettingsPage() :
+  tree_item_(nullptr)
 {
 }
 
-void CSettingsPage::CreateItem(LPCWSTR pszText, HTREEITEM htiParent) {
-  m_hTreeItem = SettingsWindow.m_Tree.InsertItem(pszText, -1, reinterpret_cast<LPARAM>(this), htiParent);
+void SettingsPage::CreateItem(LPCWSTR pszText, HTREEITEM htiParent, class SettingsDialog* parent) {
+  tree_item_ = parent->tree_.InsertItem(
+    pszText, -1, reinterpret_cast<LPARAM>(this), htiParent);
+  this->parent = parent;
 }
 
-void CSettingsPage::Select() {
-  SettingsWindow.m_Tree.SelectItem(m_hTreeItem);
+void SettingsPage::Select() {
+  parent->tree_.SelectItem(tree_item_);
 }
 
 // =============================================================================
 
-BOOL CSettingsPage::OnInitDialog() {
-  switch (Index) {
+BOOL SettingsPage::OnInitDialog() {
+  switch (index) {
     // Account
     case PAGE_ACCOUNT: {
-      SetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.User.c_str());
-      SetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.Password.c_str());
-      CheckDlgButton(IDC_RADIO_API1 + Settings.Account.MAL.API - 1, TRUE);
-      CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.Account.MAL.AutoLogin);
+      SetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.user.c_str());
+      SetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.password.c_str());
+      CheckDlgButton(IDC_RADIO_API1 + Settings.Account.MAL.api - 1, TRUE);
+      CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.Account.MAL.auto_login);
       break;
     }
     // Account > Update
     case PAGE_UPDATE: {
-      CheckDlgButton(IDC_RADIO_UPDATE_MODE1 + Settings.Account.Update.Mode - 1, TRUE);
-      CheckDlgButton(IDC_RADIO_UPDATE_TIME1 + Settings.Account.Update.Time - 1, TRUE);
+      CheckDlgButton(IDC_RADIO_UPDATE_MODE1 + Settings.Account.Update.mode - 1, TRUE);
+      CheckDlgButton(IDC_RADIO_UPDATE_TIME1 + Settings.Account.Update.time - 1, TRUE);
       SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETRANGE32, 0, 3600);
-      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, Settings.Account.Update.Delay);
-      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.Account.Update.CheckPlayer);
-      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.Account.Update.OutOfRange);
+      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, Settings.Account.Update.delay);
+      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.Account.Update.check_player);
+      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.Account.Update.out_of_range);
       break;
     }
               
@@ -83,11 +82,11 @@ BOOL CSettingsPage::OnInitDialog() {
       List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER);
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
-      for (size_t i = 0; i < Settings.Folders.Root.size(); i++) {
-        List.InsertItem(i, -1, Icon16_Folder, 0, NULL, Settings.Folders.Root[i].c_str(), NULL);
+      for (size_t i = 0; i < Settings.Folders.root.size(); i++) {
+        List.InsertItem(i, -1, ICON16_FOLDER, 0, nullptr, Settings.Folders.root[i].c_str(), 0);
       }
-      List.SetWindowHandle(NULL);
-      CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, Settings.Folders.WatchEnabled);
+      List.SetWindowHandle(nullptr);
+      CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, Settings.Folders.watch_enabled);
       break;
     }
     // Anime folders > Specific
@@ -104,15 +103,15 @@ BOOL CSettingsPage::OnInitDialog() {
       List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
-      for (int i = 1; i <= AnimeList.Count; i++) {
-        List.InsertItem(i - 1, AnimeList.Items[i].GetStatus(), 
-                StatusToIcon(AnimeList.Items[i].GetAiringStatus()), 
-                0, NULL, LPSTR_TEXTCALLBACK, 
-                reinterpret_cast<LPARAM>(&AnimeList.Items[i]));
-        List.SetItem(i - 1, 1, AnimeList.Items[i].Folder.c_str());
+      for (int i = 1; i <= AnimeList.count; i++) {
+        List.InsertItem(i - 1, AnimeList.items[i].GetStatus(), 
+                StatusToIcon(AnimeList.items[i].GetAiringStatus()), 
+                0, nullptr, LPSTR_TEXTCALLBACK, 
+                reinterpret_cast<LPARAM>(&AnimeList.items[i]));
+        List.SetItem(i - 1, 1, AnimeList.items[i].folder.c_str());
       }
       List.Sort(0, 1, 0, ListViewCompareProc);
-      List.SetWindowHandle(NULL);
+      List.SetWindowHandle(nullptr);
       break;
     }
 
@@ -120,34 +119,34 @@ BOOL CSettingsPage::OnInitDialog() {
 
     // Announcements > HTTP
     case PAGE_HTTP: {
-      CheckDlgButton(IDC_CHECK_HTTP, Settings.Announce.HTTP.Enabled);
-      SetDlgItemText(IDC_EDIT_HTTP_URL, Settings.Announce.HTTP.URL.c_str());
+      CheckDlgButton(IDC_CHECK_HTTP, Settings.Announce.HTTP.enabled);
+      SetDlgItemText(IDC_EDIT_HTTP_URL, Settings.Announce.HTTP.url.c_str());
       break;
     }
       // Announcements > Messenger
     case PAGE_MESSENGER: {
-      CheckDlgButton(IDC_CHECK_MESSENGER, Settings.Announce.MSN.Enabled);
+      CheckDlgButton(IDC_CHECK_MESSENGER, Settings.Announce.MSN.enabled);
       break;
     }
     // Announcements > mIRC
     case PAGE_MIRC: {
-      CheckDlgButton(IDC_CHECK_MIRC, Settings.Announce.MIRC.Enabled);
-      CheckDlgButton(IDC_CHECK_MIRC_MULTISERVER, Settings.Announce.MIRC.MultiServer);
-      CheckDlgButton(IDC_CHECK_MIRC_ACTION, Settings.Announce.MIRC.UseAction);
-      SetDlgItemText(IDC_EDIT_MIRC_SERVICE, Settings.Announce.MIRC.Service.c_str());
-      CheckDlgButton(IDC_RADIO_MIRC_CHANNEL1 + Settings.Announce.MIRC.Mode - 1, TRUE);
-      SetDlgItemText(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.Channels.c_str());
+      CheckDlgButton(IDC_CHECK_MIRC, Settings.Announce.MIRC.enabled);
+      CheckDlgButton(IDC_CHECK_MIRC_MULTISERVER, Settings.Announce.MIRC.multi_server);
+      CheckDlgButton(IDC_CHECK_MIRC_ACTION, Settings.Announce.MIRC.use_action);
+      SetDlgItemText(IDC_EDIT_MIRC_SERVICE, Settings.Announce.MIRC.service.c_str());
+      CheckDlgButton(IDC_RADIO_MIRC_CHANNEL1 + Settings.Announce.MIRC.mode - 1, TRUE);
+      SetDlgItemText(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.channels.c_str());
       break;
     }
     // Announcements > Skype
     case PAGE_SKYPE: {
-      CheckDlgButton(IDC_CHECK_SKYPE, Settings.Announce.Skype.Enabled);
+      CheckDlgButton(IDC_CHECK_SKYPE, Settings.Announce.Skype.enabled);
       break;
     }
     // Announcements > Twitter
     case PAGE_TWITTER: {
-      CheckDlgButton(IDC_CHECK_TWITTER, Settings.Announce.Twitter.Enabled);
-      SettingsWindow.RefreshTwitterLink();
+      CheckDlgButton(IDC_CHECK_TWITTER, Settings.Announce.Twitter.enabled);
+      parent->RefreshTwitterLink();
       break;
     }
 
@@ -155,9 +154,9 @@ BOOL CSettingsPage::OnInitDialog() {
 
     // Program > General
     case PAGE_PROGRAM: {
-      CheckDlgButton(IDC_CHECK_AUTOSTART, Settings.Program.General.AutoStart);
-      CheckDlgButton(IDC_CHECK_GENERAL_CLOSE, Settings.Program.General.Close);
-      CheckDlgButton(IDC_CHECK_GENERAL_MINIMIZE, Settings.Program.General.Minimize);
+      CheckDlgButton(IDC_CHECK_AUTOSTART, Settings.Program.General.auto_start);
+      CheckDlgButton(IDC_CHECK_GENERAL_CLOSE, Settings.Program.General.close);
+      CheckDlgButton(IDC_CHECK_GENERAL_MINIMIZE, Settings.Program.General.minimize);
       vector<wstring> theme_list;
       PopulateFolders(theme_list, Taiga.GetDataPath() + L"Theme\\");
       if (theme_list.empty()) {
@@ -165,19 +164,19 @@ BOOL CSettingsPage::OnInitDialog() {
       } else {
         for (size_t i = 0; i < theme_list.size(); i++) {
           AddComboString(IDC_COMBO_THEME, theme_list[i].c_str());
-          if (IsEqual(theme_list[i], Settings.Program.General.Theme)) {
+          if (IsEqual(theme_list[i], Settings.Program.General.theme)) {
             SetComboSelection(IDC_COMBO_THEME, i);
           }
         }
       }
-      CheckDlgButton(IDC_CHECK_START_VERSION, Settings.Program.StartUp.CheckNewVersion);
-      CheckDlgButton(IDC_CHECK_START_CHECKEPS, Settings.Program.StartUp.CheckNewEpisodes);
-      CheckDlgButton(IDC_CHECK_START_MINIMIZE, Settings.Program.StartUp.Minimize);
-      CheckDlgButton(IDC_CHECK_EXIT_ASK, Settings.Program.Exit.Ask);
-      CheckDlgButton(IDC_CHECK_EXIT_SAVEBUFFER, Settings.Program.Exit.SaveBuffer);
-      SetDlgItemText(IDC_EDIT_PROXY_HOST, Settings.Program.Proxy.Host.c_str());
-      SetDlgItemText(IDC_EDIT_PROXY_USER, Settings.Program.Proxy.User.c_str());
-      SetDlgItemText(IDC_EDIT_PROXY_PASS, Settings.Program.Proxy.Password.c_str());
+      CheckDlgButton(IDC_CHECK_START_VERSION, Settings.Program.StartUp.check_new_version);
+      CheckDlgButton(IDC_CHECK_START_CHECKEPS, Settings.Program.StartUp.check_new_episodes);
+      CheckDlgButton(IDC_CHECK_START_MINIMIZE, Settings.Program.StartUp.minimize);
+      CheckDlgButton(IDC_CHECK_EXIT_ASK, Settings.Program.Exit.ask);
+      CheckDlgButton(IDC_CHECK_EXIT_SAVEBUFFER, Settings.Program.Exit.save_event_queue);
+      SetDlgItemText(IDC_EDIT_PROXY_HOST, Settings.Program.Proxy.host.c_str());
+      SetDlgItemText(IDC_EDIT_PROXY_USER, Settings.Program.Proxy.user.c_str());
+      SetDlgItemText(IDC_EDIT_PROXY_PASS, Settings.Program.Proxy.password.c_str());
       break;
     }
     // Program > List
@@ -187,22 +186,22 @@ BOOL CSettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_DBLCLICK, L"Open folder");
       AddComboString(IDC_COMBO_DBLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_DBLCLICK, L"View anime info");
-      SetComboSelection(IDC_COMBO_DBLCLICK, Settings.Program.List.DoubleClick);
+      SetComboSelection(IDC_COMBO_DBLCLICK, Settings.Program.List.double_click);
       AddComboString(IDC_COMBO_MDLCLICK, L"Do nothing");
       AddComboString(IDC_COMBO_MDLCLICK, L"Edit details");
       AddComboString(IDC_COMBO_MDLCLICK, L"Open folder");
       AddComboString(IDC_COMBO_MDLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
-      SetComboSelection(IDC_COMBO_MDLCLICK, Settings.Program.List.MiddleClick);
-      CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, AnimeList.Filter.NewEps);
-      CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.Highlight);
-      CheckDlgButton(IDC_RADIO_LIST_PROGRESS1 + Settings.Program.List.ProgressMode, TRUE);
-      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.ProgressShowEps);
+      SetComboSelection(IDC_COMBO_MDLCLICK, Settings.Program.List.middle_click);
+      CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, AnimeList.filters.new_episodes);
+      CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.highlight);
+      CheckDlgButton(IDC_RADIO_LIST_PROGRESS1 + Settings.Program.List.progress_mode, TRUE);
+      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.progress_show_eps);
       break;
     }
     // Program > Notifications
     case PAGE_NOTIFICATIONS: {
-      CheckDlgButton(IDC_CHECK_BALLOON, Settings.Program.Balloon.Enabled);
+      CheckDlgButton(IDC_CHECK_BALLOON, Settings.Program.Balloon.enabled);
       break;
     }
 
@@ -232,13 +231,13 @@ BOOL CSettingsPage::OnInitDialog() {
       for (size_t i = 0; i < MediaPlayers.Items.size(); i++) {
         BOOL player_available = MediaPlayers.Items[i].GetPath().empty() ? FALSE : TRUE;
         List.InsertItem(i, MediaPlayers.Items[i].Mode, 
-          Icon16_AppGray - player_available, 0, NULL, 
-          MediaPlayers.Items[i].Name.c_str(), NULL);
+          ICON16_APP_GRAY - player_available, 0, nullptr, 
+          MediaPlayers.Items[i].Name.c_str(), 0);
         if (MediaPlayers.Items[i].Enabled) List.SetCheckState(i, TRUE);
       }
-      Header.SetWindowHandle(NULL);
+      Header.SetWindowHandle(nullptr);
       List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
-      List.SetWindowHandle(NULL);
+      List.SetWindowHandle(nullptr);
       break;
     }
 
@@ -250,22 +249,22 @@ BOOL CSettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.animesuki.com/rss.php?link=enclosure");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.baka-updates.com/rss.php");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2");
-      SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings.RSS.Torrent.Source.c_str());
-      CheckDlgButton(IDC_CHECK_TORRENT_HIDE, Settings.RSS.Torrent.HideUnidentified);
-      CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.RSS.Torrent.CheckEnabled);
+      SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings.RSS.Torrent.source.c_str());
+      CheckDlgButton(IDC_CHECK_TORRENT_HIDE, Settings.RSS.Torrent.hide_unidentified);
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.RSS.Torrent.check_enabled);
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETRANGE32, 0, 3600);
-      SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETPOS32, 0, Settings.RSS.Torrent.CheckInterval);
-      CheckDlgButton(IDC_RADIO_TORRENT_NEW1 + Settings.RSS.Torrent.NewAction - 1, TRUE);
-      CheckDlgButton(IDC_RADIO_TORRENT_APP1 + Settings.RSS.Torrent.AppMode - 1, TRUE);
-      SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.AppPath.c_str());
-      EnableDlgItem(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.AppMode > 1);
-      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE, Settings.RSS.Torrent.AppMode > 1);
-      CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, Settings.RSS.Torrent.SetFolder);
+      SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETPOS32, 0, Settings.RSS.Torrent.check_interval);
+      CheckDlgButton(IDC_RADIO_TORRENT_NEW1 + Settings.RSS.Torrent.new_action - 1, TRUE);
+      CheckDlgButton(IDC_RADIO_TORRENT_APP1 + Settings.RSS.Torrent.app_mode - 1, TRUE);
+      SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_path.c_str());
+      EnableDlgItem(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_mode > 1);
+      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE, Settings.RSS.Torrent.app_mode > 1);
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, Settings.RSS.Torrent.set_folder);
       break;
     }
     // Torrent > Filters
     case PAGE_TORRENT2: {
-      CheckDlgButton(IDC_CHECK_TORRENT_FILTER, Settings.RSS.Torrent.Filters.GlobalEnabled);
+      CheckDlgButton(IDC_CHECK_TORRENT_FILTER, Settings.RSS.Torrent.Filters.global_enabled);
       CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
       List.EnableGroupView(true);
       List.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
@@ -274,11 +273,11 @@ BOOL CSettingsPage::OnInitDialog() {
       List.InsertColumn(0, 400, 400, 0, L"Name");
       List.InsertGroup(0, L"General filters", true, false);
       List.InsertGroup(1, L"Limited filters", true, false);
-      SettingsWindow.m_FeedFilters.resize(Aggregator.FilterManager.Filters.size());
+      parent->feed_filters_.resize(Aggregator.FilterManager.Filters.size());
       std::copy(Aggregator.FilterManager.Filters.begin(), Aggregator.FilterManager.Filters.end(), 
-        SettingsWindow.m_FeedFilters.begin());
-      RefreshTorrentFilterList(List.GetWindowHandle());
-      List.SetWindowHandle(NULL);
+        parent->feed_filters_.begin());
+      parent->RefreshTorrentFilterList(List.GetWindowHandle());
+      List.SetWindowHandle(nullptr);
       break;
     }
   }
@@ -288,39 +287,39 @@ BOOL CSettingsPage::OnInitDialog() {
 
 // =============================================================================
 
-BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (HIWORD(wParam)) {
     case BN_CLICKED: {
       switch (LOWORD(wParam)) {
         // Edit format
         case IDC_BUTTON_FORMAT_HTTP: {
-          FormatWindow.Mode = FORMAT_MODE_HTTP;
-          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          FormatDialog.mode = FORMAT_MODE_HTTP;
+          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         }
         case IDC_BUTTON_FORMAT_MSN: {
-          FormatWindow.Mode = FORMAT_MODE_MESSENGER;
-          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          FormatDialog.mode = FORMAT_MODE_MESSENGER;
+          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         }
         case IDC_BUTTON_FORMAT_MIRC: {
-          FormatWindow.Mode = FORMAT_MODE_MIRC;
-          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          FormatDialog.mode = FORMAT_MODE_MIRC;
+          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         }
         case IDC_BUTTON_FORMAT_SKYPE: {
-          FormatWindow.Mode = FORMAT_MODE_SKYPE;
-          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          FormatDialog.mode = FORMAT_MODE_SKYPE;
+          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         }
         case IDC_BUTTON_FORMAT_TWITTER: {
-          FormatWindow.Mode = FORMAT_MODE_TWITTER;
-          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          FormatDialog.mode = FORMAT_MODE_TWITTER;
+          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         }
         case IDC_BUTTON_FORMAT_BALLOON: {
-          FormatWindow.Mode = FORMAT_MODE_BALLOON;
-          FormatWindow.Create(IDD_FORMAT, SettingsWindow.GetWindowHandle(), true);
+          FormatDialog.mode = FORMAT_MODE_BALLOON;
+          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         }
 
@@ -332,9 +331,9 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
             BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
               CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
-              List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, 0, NULL, path.c_str(), 0);
+              List.InsertItem(List.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, path.c_str(), 0);
               List.SetSelectedItem(List.GetItemCount() - 1);
-              List.SetWindowHandle(NULL);
+              List.SetWindowHandle(nullptr);
           }
           return TRUE;
         }
@@ -345,7 +344,7 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             List.DeleteItem(List.GetNextItem(-1, LVNI_SELECTED));
           }
           EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, FALSE);
-          List.SetWindowHandle(NULL);
+          List.SetWindowHandle(nullptr);
           return TRUE;
         }
 
@@ -393,18 +392,18 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         // Add global filter
         case IDC_BUTTON_TORRENT_FILTER_ADD: {
-          FeedFilterWindow.filter_.Reset();
+          FeedFilterDialog.filter.Reset();
           ExecuteAction(L"TorrentAddFilter", TRUE, 
-            reinterpret_cast<LPARAM>(SettingsWindow.GetWindowHandle()));
-          if (!FeedFilterWindow.filter_.Conditions.empty()) {
-            if (FeedFilterWindow.filter_.Name.empty()) {
-              FeedFilterWindow.filter_.Name = Aggregator.FilterManager.CreateNameFromConditions(FeedFilterWindow.filter_);
+            reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
+          if (!FeedFilterDialog.filter.Conditions.empty()) {
+            if (FeedFilterDialog.filter.Name.empty()) {
+              FeedFilterDialog.filter.Name = Aggregator.FilterManager.CreateNameFromConditions(FeedFilterDialog.filter);
             }
-            SettingsWindow.m_FeedFilters.push_back(FeedFilterWindow.filter_);
+            parent->feed_filters_.push_back(FeedFilterDialog.filter);
             CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
-            RefreshTorrentFilterList(List.GetWindowHandle());
+            parent->RefreshTorrentFilterList(List.GetWindowHandle());
             List.SetSelectedItem(List.GetItemCount() - 1);
-            List.SetWindowHandle(NULL);
+            List.SetWindowHandle(nullptr);
           }
           return TRUE;
         }
@@ -412,16 +411,16 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_BUTTON_TORRENT_FILTER_DELETE: {
           CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
           int item_index = List.GetNextItem(-1, LVNI_SELECTED);
-          CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(List.GetItemParam(item_index));
-          for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
-            if (pFeedFilter == &(*it)) {
-              SettingsWindow.m_FeedFilters.erase(it);
-              RefreshTorrentFilterList(List.GetWindowHandle());
+          FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(List.GetItemParam(item_index));
+          for (auto it = parent->feed_filters_.begin(); it != parent->feed_filters_.end(); ++it) {
+            if (feed_filter == &(*it)) {
+              parent->feed_filters_.erase(it);
+              parent->RefreshTorrentFilterList(List.GetWindowHandle());
               break;
             }
           }
           EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, FALSE);
-          List.SetWindowHandle(NULL);
+          List.SetWindowHandle(nullptr);
           return TRUE;
         }
         // Enable/disable filters
@@ -432,7 +431,7 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (enable) {
             CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             enable = List.GetNextItem(-1, LVNI_SELECTED) > -1;
-            List.SetWindowHandle(NULL);
+            List.SetWindowHandle(nullptr);
           }
           EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, enable);
           return TRUE;
@@ -486,7 +485,7 @@ BOOL CSettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
 // =============================================================================
 
-INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_NOTIFY: {
       switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
@@ -516,11 +515,11 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
         // Text callback
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-          CAnime* pItem = reinterpret_cast<CAnime*>(plvdi->item.lParam);
-          if (!pItem) break;
+          Anime* anime = reinterpret_cast<Anime*>(plvdi->item.lParam);
+          if (!anime) break;
           switch (plvdi->item.iSubItem) {
             case 0: // Anime title
-              plvdi->item.pszText = const_cast<LPWSTR>(pItem->Series_Title.data());
+              plvdi->item.pszText = const_cast<LPWSTR>(anime->series_title.data());
               break;
           }
           break;
@@ -536,7 +535,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
             WCHAR buffer[MAX_PATH];
             List.GetItemText(lpnmitem->iItem, 0, buffer);
             Execute(buffer);
-            List.SetWindowHandle(NULL);
+            List.SetWindowHandle(nullptr);
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ANIME)) {
             CListView List = lpnmitem->hdr.hwndFrom;
             wstring path, title;
@@ -546,24 +545,24 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
                 BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
                   List.SetItem(lpnmitem->iItem, 1, path.c_str());
             }
-            List.SetWindowHandle(NULL);
+            List.SetWindowHandle(nullptr);
           // Media players
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
             Execute(MediaPlayers.Items[lpnmitem->iItem].GetPath());
           // Torrent filters
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
             CListView List = lpnmitem->hdr.hwndFrom;
-            CFeedFilter* pFeedFilter = reinterpret_cast<CFeedFilter*>(List.GetItemParam(lpnmitem->iItem));
-            if (pFeedFilter) {
-              FeedFilterWindow.filter_ = *pFeedFilter;
-              FeedFilterWindow.Create(IDD_FEED_FILTER, SettingsWindow.GetWindowHandle());
-              if (!FeedFilterWindow.filter_.Conditions.empty()) {
-                *pFeedFilter = FeedFilterWindow.filter_;
-                RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
+            FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(List.GetItemParam(lpnmitem->iItem));
+            if (feed_filter) {
+              FeedFilterDialog.filter = *feed_filter;
+              FeedFilterDialog.Create(IDD_FEED_FILTER, parent->GetWindowHandle());
+              if (!FeedFilterDialog.filter.Conditions.empty()) {
+                *feed_filter = FeedFilterDialog.filter;
+                parent->RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
                 List.SetSelectedItem(lpnmitem->iItem);
               }
             }
-            List.SetWindowHandle(NULL);
+            List.SetWindowHandle(nullptr);
           }
           return TRUE;
         }
@@ -587,11 +586,11 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
             } else if (answer == L"AnimeFolders_Clear()") {
               List.SetItem(lpnmitem->iItem, 1, L"");
             } else if (answer == L"AnimeFolders_Search()") {
-              CAnime* pItem = reinterpret_cast<CAnime*>(List.GetItemParam(lpnmitem->iItem));
-              if (pItem) {
-                pItem->CheckFolder();
-                if (!pItem->Folder.empty()) {
-                  List.SetItem(lpnmitem->iItem, 1, pItem->Folder.c_str());
+              Anime* anime = reinterpret_cast<Anime*>(List.GetItemParam(lpnmitem->iItem));
+              if (anime) {
+                anime->CheckFolder();
+                if (!anime->folder.empty()) {
+                  List.SetItem(lpnmitem->iItem, 1, anime->folder.c_str());
                 }
               }
             } else if (answer == L"AnimeFolders_ClearAll()") {
@@ -610,7 +609,7 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
               }
             }
           }
-          List.SetWindowHandle(NULL);
+          List.SetWindowHandle(nullptr);
           return TRUE;
         }
       }
@@ -620,19 +619,19 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
     // Drop folders
     case WM_DROPFILES: {
       HDROP hDrop = reinterpret_cast<HDROP>(wParam);
-      if (hDrop && Index == PAGE_FOLDERS_ROOT) {
+      if (hDrop && index == PAGE_FOLDERS_ROOT) {
         WCHAR szFileName[MAX_PATH + 1];
-        UINT nFiles = DragQueryFile(hDrop, static_cast<UINT>(-1), NULL, 0);
+        UINT nFiles = DragQueryFile(hDrop, static_cast<UINT>(-1), nullptr, 0);
         CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
         for  (UINT i = 0; i < nFiles; i++) {
           ZeroMemory(szFileName, MAX_PATH + 1);
           DragQueryFile(hDrop, i, (LPWSTR)szFileName, MAX_PATH + 1);
           if (GetFileAttributes(szFileName) & FILE_ATTRIBUTE_DIRECTORY) {
-            List.InsertItem(List.GetItemCount(), -1, Icon16_Folder, 0, NULL, szFileName, 0);
+            List.InsertItem(List.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, szFileName, 0);
             List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
           }
         }
-        List.SetWindowHandle(NULL);
+        List.SetWindowHandle(nullptr);
         return TRUE;
       }
       break;
@@ -640,38 +639,4 @@ INT_PTR CSettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
-}
-
-// =============================================================================
-
-int AddTorrentFilterToList(HWND hwnd_list, const CFeedFilter& filter) {
-  wstring text;
-  CListView List = hwnd_list;
-  int index = List.GetItemCount();
-  int group = filter.AnimeIds.empty() ? 0 : 1;
-  int icon = Icon16_Funnel;
-  switch (filter.Action) {
-    case FEED_FILTER_ACTION_DISCARD: icon = Icon16_FunnelCross; break;
-    case FEED_FILTER_ACTION_SELECT:  icon = Icon16_FunnelTick;  break;
-    case FEED_FILTER_ACTION_PREFER:  icon = Icon16_FunnelPlus;  break;
-  }
-
-  // Insert item
-  index = List.InsertItem(index, group, icon, 0, NULL, filter.Name.c_str(), 
-    reinterpret_cast<LPARAM>(&filter));
-  List.SetCheckState(index, filter.Enabled);
-  
-  List.SetWindowHandle(NULL);
-  return index;
-}
-
-void RefreshTorrentFilterList(HWND hwnd_list) {
-  CListView List = hwnd_list;
-  List.DeleteAllItems();
-
-  for (auto it = SettingsWindow.m_FeedFilters.begin(); it != SettingsWindow.m_FeedFilters.end(); ++it) {
-    AddTorrentFilterToList(hwnd_list, *it);
-  }
-
-  List.SetWindowHandle(NULL);
 }

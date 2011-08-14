@@ -25,29 +25,29 @@
 
 // =============================================================================
 
-/* Torrent window */
-
-class CTorrentWindow : public CDialog {
+class TorrentDialog : public CDialog {
 public:
-  CTorrentWindow();
-  ~CTorrentWindow();
+  TorrentDialog();
+  ~TorrentDialog();
 
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
-  void ChangeStatus(wstring str, int panel_index = 0);
+public:
+  void ChangeStatus(wstring text, int panel_index = 0);
   void EnableInput(bool enable = true);
   void RefreshList();
+  void SetTimerText(const wstring& text);
 
-public:
-  CListView m_List;
-  CRebar m_Rebar;
-  CStatusBar m_Status;
-  CToolbar m_Toolbar;
+private:
+  CListView list_;
+  CRebar rebar_;
+  CStatusBar statusbar_;
+  CToolbar toolbar_;
 };
 
-extern CTorrentWindow TorrentWindow;
+extern TorrentDialog TorrentDialog;
 
 #endif // DLG_TORRENT_H

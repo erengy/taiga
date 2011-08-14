@@ -31,142 +31,141 @@
 #include "../taiga.h"
 #include "../theme.h"
 
-CAnimeWindow AnimeWindow;
+class AnimeDialog AnimeDialog;
 
 // =============================================================================
 
-CAnimeWindow::CAnimeWindow() :
-  m_hbrDarkBlue(NULL), m_hbrLightBlue(NULL), 
-  m_hfTitle(NULL), m_pAnimeItem(NULL),
-  m_iCurrentPage(0)
+AnimeDialog::AnimeDialog() :
+  anime_(nullptr), brush_darkblue_(nullptr), brush_lightblue_(nullptr), 
+  current_page_(0), title_font_(nullptr)
 {
   RegisterDlgClass(L"TaigaAnimeInfoW");
  
-  m_Page.resize(TAB_COUNT);
+  pages.resize(TAB_COUNT);
   for (size_t i = 0; i < TAB_COUNT; i++) {
-    m_Page[i].Index = i;
+    pages[i].index = i;
   }
 }
 
-CAnimeWindow::~CAnimeWindow() {
-  if (m_hbrDarkBlue)  ::DeleteObject(m_hbrDarkBlue);
-  if (m_hbrLightBlue) ::DeleteObject(m_hbrLightBlue);
-  if (m_hfTitle)      ::DeleteObject(m_hfTitle);
+AnimeDialog::~AnimeDialog() {
+  if (brush_darkblue_)  ::DeleteObject(brush_darkblue_);
+  if (brush_lightblue_) ::DeleteObject(brush_lightblue_);
+  if (title_font_)      ::DeleteObject(title_font_);
 }
 
 // =============================================================================
 
-BOOL CAnimeWindow::OnInitDialog() {
+BOOL AnimeDialog::OnInitDialog() {
   // Set anime index
-  if (!m_pAnimeItem) m_pAnimeItem = &AnimeList.Items[AnimeList.Index];
+  if (!anime_) anime_ = &AnimeList.items[AnimeList.index];
 
   // Create GDI objects
-  if (!m_hbrDarkBlue) m_hbrDarkBlue = ::CreateSolidBrush(MAL_DARKBLUE);
-  if (!m_hbrLightBlue) m_hbrLightBlue = ::CreateSolidBrush(MAL_LIGHTBLUE);
-  if (!m_hfTitle) {
+  if (!brush_darkblue_) brush_darkblue_ = ::CreateSolidBrush(MAL_DARKBLUE);
+  if (!brush_lightblue_) brush_lightblue_ = ::CreateSolidBrush(MAL_LIGHTBLUE);
+  if (!title_font_) {
     LOGFONT lFont;
     ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
     CDC dc = GetDC();
     lFont.lfCharSet = DEFAULT_CHARSET;
     lFont.lfHeight = -MulDiv(12, GetDeviceCaps(dc.Get(), LOGPIXELSY), 72);
     lFont.lfWeight = FW_BOLD;
-    m_hfTitle = ::CreateFontIndirect(&lFont);
+    title_font_ = ::CreateFontIndirect(&lFont);
   }
-  SendDlgItemMessage(IDC_EDIT_ANIME_TITLE, WM_SETFONT, reinterpret_cast<WPARAM>(m_hfTitle), FALSE);
+  SendDlgItemMessage(IDC_EDIT_ANIME_TITLE, WM_SETFONT, reinterpret_cast<WPARAM>(title_font_), FALSE);
 
   // Create tabs
-  m_Tab.Attach(GetDlgItem(IDC_TAB_ANIME));
-  m_Tab.InsertItem(0, L"Series information", NULL);
-  if (m_pAnimeItem->Index > -1) {
-    m_Tab.InsertItem(1, L"My information", NULL);
+  tab_.Attach(GetDlgItem(IDC_TAB_ANIME));
+  tab_.InsertItem(0, L"Series information", 0);
+  if (anime_->index > -1) {
+    tab_.InsertItem(1, L"My information", 0);
   }
 
   // Set image position
-  if (AnimeImage.Rect.IsEmpty()) {
+  if (image_.rect.IsEmpty()) {
     CRect rcTemp;
     ::GetWindowRect(GetDlgItem(IDC_STATIC_ANIME_IMG), &rcTemp);
-    ::GetWindowRect(GetDlgItem(IDC_STATIC_ANIME_IMG), &AnimeImage.Rect);
+    ::GetWindowRect(GetDlgItem(IDC_STATIC_ANIME_IMG), &image_.rect);
     ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rcTemp));
-    AnimeImage.Rect.Offset(rcTemp.left - AnimeImage.Rect.left, rcTemp.top - AnimeImage.Rect.top);
+    image_.rect.Offset(rcTemp.left - image_.rect.left, rcTemp.top - image_.rect.top);
   }
   // Change image mouse pointer
   ::SetClassLong(GetDlgItem(IDC_STATIC_ANIME_IMG), GCL_HCURSOR, 
-    reinterpret_cast<LONG>(::LoadImage(NULL, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+    reinterpret_cast<LONG>(::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
 
   // Create pages
-  CRect rcPage; m_Tab.AdjustRect(m_hWindow, FALSE, &rcPage);
+  CRect rcPage; tab_.AdjustRect(m_hWindow, FALSE, &rcPage);
   for (size_t i = 0; i < TAB_COUNT; i++) {
-    m_Page[i].Create(IDD_ANIME_INFO_PAGE01 + i, m_hWindow, false);
-    m_Page[i].SetPosition(NULL, rcPage, SWP_HIDEWINDOW);
-    EnableThemeDialogTexture(m_Page[i].GetWindowHandle(), ETDT_ENABLETAB);
+    pages[i].Create(IDD_ANIME_INFO_PAGE01 + i, m_hWindow, false);
+    pages[i].SetPosition(nullptr, rcPage, SWP_HIDEWINDOW);
+    EnableThemeDialogTexture(pages[i].GetWindowHandle(), ETDT_ENABLETAB);
   }
 
   // Refresh
-  SetCurrentPage(m_iCurrentPage);
-  Refresh(m_pAnimeItem);
+  SetCurrentPage(current_page_);
+  Refresh(anime_);
   return TRUE;
 }
 
-void CAnimeWindow::OnOK() {
-  if (!m_pAnimeItem || m_pAnimeItem->Index == -1) {
+void AnimeDialog::OnOK() {
+  if (!anime_ || anime_->index == -1) {
     EndDialog(IDOK);
     return;
   }
 
   // Create item
-  CEventItem item;
-  item.AnimeId = m_pAnimeItem->Series_ID;
-  item.Mode = HTTP_MAL_AnimeEdit;
+  EventItem item;
+  item.anime_id = anime_->series_id;
+  item.mode = HTTP_MAL_AnimeEdit;
 
   // Episodes watched
-  item.episode = m_Page[TAB_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!MAL.IsValidEpisode(item.episode, -1, m_pAnimeItem->Series_Episodes)) {
+  item.episode = pages[TAB_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
+  if (!MAL.IsValidEpisode(item.episode, -1, anime_->series_episodes)) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
-      ToWSTR(m_pAnimeItem->Series_Episodes) + L".";
+      ToWSTR(anime_->series_episodes) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
     return;
   }
 
   // Re-watching
-  item.enable_rewatching = m_Page[TAB_MYINFO].IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
+  item.enable_rewatching = pages[TAB_MYINFO].IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
   
   // Score
-  item.score = 10 - m_Page[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
+  item.score = 10 - pages[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
   
   // Status
-  item.status = m_Page[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
+  item.status = pages[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
   if (item.status == MAL_UNKNOWN) item.status++;
   
   // Tags
-  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, item.tags);
+  pages[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, item.tags);
 
   // Start date
   SYSTEMTIME stMyStart;
-  if (m_Page[TAB_MYINFO].SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
+  if (pages[TAB_MYINFO].SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
     reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
-      m_pAnimeItem->My_StartDate = L"0000-00-00";
+      anime_->my_start_date = L"0000-00-00";
   } else {
     wstring year = ToWSTR(stMyStart.wYear);
     wstring month = (stMyStart.wMonth < 10 ? L"0" : L"") + ToWSTR(stMyStart.wMonth);
     wstring day = (stMyStart.wDay < 10 ? L"0" : L"") + ToWSTR(stMyStart.wDay);
-    m_pAnimeItem->SetStartDate(year + L"-" + month + L"-" + day, true);
+    anime_->SetStartDate(year + L"-" + month + L"-" + day, true);
   }
   // Finish date
   SYSTEMTIME stMyFinish;
-  if (m_Page[TAB_MYINFO].SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
+  if (pages[TAB_MYINFO].SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
     reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
-      m_pAnimeItem->My_FinishDate = L"0000-00-00";
+      anime_->my_finish_date = L"0000-00-00";
   } else {
     wstring year = ToWSTR(stMyFinish.wYear);
     wstring month = (stMyFinish.wMonth < 10 ? L"0" : L"") + ToWSTR(stMyFinish.wMonth);
     wstring day = (stMyFinish.wDay < 10 ? L"0" : L"") + ToWSTR(stMyFinish.wDay);
-    m_pAnimeItem->SetFinishDate(year + L"-" + month + L"-" + day, true);
+    anime_->SetFinishDate(year + L"-" + month + L"-" + day, true);
   }
 
   // Alternative titles
   wstring titles;
-  m_Page[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
-  m_pAnimeItem->SetLocalData(EMPTY_STR, titles);
+  pages[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
+  anime_->SetLocalData(EMPTY_STR, titles);
 
   // Add item to event queue
   EventQueue.Add(item);
@@ -177,7 +176,7 @@ void CAnimeWindow::OnOK() {
 
 // =============================================================================
 
-BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC: {
       HDC hdc = reinterpret_cast<HDC>(wParam);
@@ -186,7 +185,7 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
           hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
             SetBkMode(hdc, TRANSPARENT);
             SetTextColor(hdc, MAL_DARKBLUE);
-            return reinterpret_cast<INT_PTR>(m_hbrLightBlue);
+            return reinterpret_cast<INT_PTR>(brush_lightblue_);
       }
       break;
     }
@@ -206,7 +205,7 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
         dc.FillRect(rect, RGB(255, 255, 255));
         dc.SetStretchBltMode(HALFTONE);
         dc.StretchBlt(rect.left, rect.top, rect.Width(), rect.Height(), 
-          AnimeImage.DC.Get(), 0, 0, AnimeImage.Width, AnimeImage.Height, SRCCOPY);
+          image_.dc.Get(), 0, 0, image_.width, image_.height, SRCCOPY);
         dc.DetachDC();
         return TRUE;
       }
@@ -227,9 +226,9 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
       break;
     }    
     case WM_LBUTTONDOWN: {
-      SetCursor(reinterpret_cast<HCURSOR>(LoadImage(NULL, IDC_SIZEALL, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+      SetCursor(reinterpret_cast<HCURSOR>(LoadImage(nullptr, IDC_SIZEALL, IMAGE_CURSOR, 0, 0, LR_SHARED)));
       ReleaseCapture();
-      SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, NULL);
+      SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, 0);
       break;
     }
 
@@ -243,11 +242,11 @@ BOOL CAnimeWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-BOOL CAnimeWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
+BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG) {
     if (HIWORD(wParam) == STN_CLICKED) {
-      if (m_pAnimeItem) {
-        MAL.ViewAnimePage(m_pAnimeItem->Series_ID);
+      if (anime_) {
+        MAL.ViewAnimePage(anime_->series_id);
         return TRUE;
       }
     }
@@ -256,12 +255,12 @@ BOOL CAnimeWindow::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-LRESULT CAnimeWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   if (idCtrl == IDC_TAB_ANIME) {
     switch (pnmh->code) {
       // Tab select
       case TCN_SELCHANGE: {
-        SetCurrentPage(m_Tab.GetCurrentlySelected());
+        SetCurrentPage(tab_.GetCurrentlySelected());
         break;
       }
     }
@@ -270,7 +269,7 @@ LRESULT CAnimeWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-BOOL CAnimeWindow::PreTranslateMessage(MSG* pMsg) {
+BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
   if (pMsg->message == WM_KEYDOWN) {
     // Close window
     if (pMsg->wParam == VK_ESCAPE) {
@@ -283,60 +282,60 @@ BOOL CAnimeWindow::PreTranslateMessage(MSG* pMsg) {
 
 // =============================================================================
 
-void CAnimeWindow::SetCurrentPage(int index) {
-  m_iCurrentPage = index;
+void AnimeDialog::SetCurrentPage(int index) {
+  current_page_ = index;
   if (IsWindow()) {
     for (int i = 0; i < TAB_COUNT; i++) {
-      if (i != index) m_Page[i].Hide();
+      if (i != index) pages[i].Hide();
     }
-    m_Page[index].Show();
-    m_Tab.SetCurrentlySelected(index);
+    pages[index].Show();
+    tab_.SetCurrentlySelected(index);
   }
 }
 
-void CAnimeWindow::Refresh(CAnime* pAnimeItem, bool series_info, bool my_info) {
+void AnimeDialog::Refresh(Anime* anime, bool series_info, bool my_info) {
   // Set anime index
-  if (pAnimeItem) m_pAnimeItem = pAnimeItem;
-  if (!m_pAnimeItem || !IsWindow()) return;
+  if (anime) anime_ = anime;
+  if (!anime_ || !IsWindow()) return;
 
   // Set title
-  SetDlgItemText(IDC_EDIT_ANIME_TITLE, m_pAnimeItem->Series_Title.c_str());
+  SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_->series_title.c_str());
 
   // Load image
-  if (AnimeImage.Load(m_pAnimeItem->GetImagePath())) {
+  if (image_.Load(anime_->GetImagePath())) {
     CWindow img = GetDlgItem(IDC_STATIC_ANIME_IMG);
-    img.SetPosition(NULL, AnimeImage.Rect);
-    img.SetWindowHandle(NULL);
+    img.SetPosition(nullptr, image_.rect);
+    img.SetWindowHandle(nullptr);
     // Refresh if current file is too old
-    if (m_pAnimeItem->GetAiringStatus() != MAL_FINISHED) {
+    if (anime_->GetAiringStatus() != MAL_FINISHED) {
       // Check last modified date (>= 7 days)
-      if (GetFileAge(m_pAnimeItem->GetImagePath()) / (60 * 60 * 24) >= 7) {
-        MAL.DownloadImage(m_pAnimeItem);
+      if (GetFileAge(anime_->GetImagePath()) / (60 * 60 * 24) >= 7) {
+        MAL.DownloadImage(anime_);
       }
     }
   } else {
-    MAL.DownloadImage(m_pAnimeItem);
+    MAL.DownloadImage(anime_);
   }
-  InvalidateRect(&AnimeImage.Rect);
+  InvalidateRect(&image_.rect);
 
   // Refresh pages
   if (series_info) {
-    m_Page[TAB_SERIESINFO].Refresh(m_pAnimeItem);
+    pages[TAB_SERIESINFO].Refresh(anime_);
   }
   if (my_info) {
-    m_Page[TAB_MYINFO].Refresh(m_pAnimeItem);
+    pages[TAB_MYINFO].Refresh(anime_);
   }
 }
 
 // =============================================================================
 
-void CAnimeWindow::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   CDC dc = hdc;
   CRect rect;
 
   // Paint background
   GetClientRect(&rect);
-  rect.top = AnimeImage.Rect.top + 20;
+  rect.top = image_.rect.top + 20;
   dc.FillRect(rect, RGB(255, 255, 255));
   rect.bottom = rect.top + 200;
   GradientRect(dc.Get(), &rect, ::GetSysColor(COLOR_BTNFACE), RGB(255, 255, 255), true);

@@ -25,25 +25,25 @@
 
 // =============================================================================
 
-class CGenericFeedItem {
+class GenericFeedItem {
 public:
-  CGenericFeedItem() : IsPermaLink(true) {}
-  virtual ~CGenericFeedItem() {}
+  GenericFeedItem() : IsPermaLink(true) {}
+  virtual ~GenericFeedItem() {}
 
   wstring Title, Link, Description,
     Author, Category, Comments, Enclosure, GUID, PubDate, Source;
   bool IsPermaLink;
 };
 
-class CFeedItem : public CGenericFeedItem {
+class FeedItem : public GenericFeedItem {
 public:
-  CFeedItem() : Download(true) {}
-  virtual ~CFeedItem() {};
+  FeedItem() : Download(true) {}
+  virtual ~FeedItem() {};
 
   int Index;
   bool Download;
   
-  class CEpisodeData : public CEpisode {
+  class CEpisodeData : public Episode {
   public:
     CEpisodeData() : NewEpisode(false) {}
     virtual ~CEpisodeData() {}
@@ -69,7 +69,7 @@ enum TorrentCategory {
   TORRENT_OTHER
 };
 
-class CGenericFeed {
+class GenericFeed {
 public:
   // Required channel elements
   wstring Title, Link, Description;
@@ -83,13 +83,13 @@ public:
   */
   
   // Feed items
-  vector<CFeedItem> Items;
+  vector<FeedItem> Items;
 };
 
-class CFeed : public CGenericFeed {
+class Feed : public GenericFeed {
 public:
-  CFeed();
-  virtual ~CFeed();
+  Feed();
+  virtual ~Feed();
 
   bool Check(const wstring& source);
   bool Download(int index);
@@ -100,7 +100,7 @@ public:
 
   int Category, DownloadIndex, Ticker;
   wstring Title, Link;
-  CHTTPClient Client;
+  class HttpClient Client;
 
 private:
   HICON m_hIcon;
@@ -143,11 +143,11 @@ enum FeedFilterMatch {
   FEED_FILTER_MATCH_ANY
 };
 
-class CFeedFilterCondition {
+class FeedFilterCondition {
 public:
-  CFeedFilterCondition() : Element(0), Operator(0) {}
-  virtual ~CFeedFilterCondition() {}
-  CFeedFilterCondition& operator=(const CFeedFilterCondition& condition);
+  FeedFilterCondition() : Element(0), Operator(0) {}
+  virtual ~FeedFilterCondition() {}
+  FeedFilterCondition& operator=(const FeedFilterCondition& condition);
 
   void Reset();
 
@@ -162,75 +162,75 @@ enum FeedFilterAction {
   FEED_FILTER_ACTION_PREFER
 };
 
-class CFeedFilter {
+class FeedFilter {
 public:
-  CFeedFilter() : Action(0), Enabled(true), Match(FEED_FILTER_MATCH_ALL) {}
-  virtual ~CFeedFilter() {}
-  CFeedFilter& operator=(const CFeedFilter& filter);
+  FeedFilter() : Action(0), Enabled(true), Match(FEED_FILTER_MATCH_ALL) {}
+  virtual ~FeedFilter() {}
+  FeedFilter& operator=(const FeedFilter& filter);
 
   void AddCondition(int element, int op, const wstring& value);
-  bool Filter(CFeed& feed, CFeedItem& item, bool recursive);
+  bool Filter(Feed& feed, FeedItem& item, bool recursive);
   void Reset();
 
   wstring Name;
   bool Enabled;
   int Action, Match;
   vector<int> AnimeIds;
-  vector<CFeedFilterCondition> Conditions;
+  vector<FeedFilterCondition> Conditions;
 };
 
-class CFeedFilterPreset {
+class FeedFilterPreset {
 public:
-  CFeedFilterPreset() : Default(false) {}
+  FeedFilterPreset() : Default(false) {}
   bool Default;
   wstring Description;
-  CFeedFilter Filter;
+  FeedFilter Filter;
 };
 
-class CFeedFilterManager {
+class FeedFilterManager {
 public:
-  CFeedFilterManager();
+  FeedFilterManager();
 
   void AddPresets();
   void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
     bool enabled = true, const wstring& name = L"");
   void Cleanup();
-  int Filter(CFeed& feed);
+  int Filter(Feed& feed);
 
-  wstring CreateNameFromConditions(const CFeedFilter& filter);
-  wstring TranslateCondition(const CFeedFilterCondition& condition);
-  wstring TranslateConditions(const CFeedFilter& filter, size_t index);
+  wstring CreateNameFromConditions(const FeedFilter& filter);
+  wstring TranslateCondition(const FeedFilterCondition& condition);
+  wstring TranslateConditions(const FeedFilter& filter, size_t index);
   wstring TranslateElement(int element);
   wstring TranslateOperator(int op);
-  wstring TranslateValue(const CFeedFilterCondition& condition);
+  wstring TranslateValue(const FeedFilterCondition& condition);
   wstring TranslateMatching(int match);
   wstring TranslateAction(int action);
   
-  vector<CFeedFilter> Filters;
-  vector<CFeedFilterPreset> Presets;
+  vector<FeedFilter> Filters;
+  vector<FeedFilterPreset> Presets;
 };
 
 // =============================================================================
 
-class CAggregator {
+class Aggregator {
 public:
-  CAggregator();
-  virtual ~CAggregator() {}
+  Aggregator();
+  virtual ~Aggregator() {}
 
-  CFeed* Get(int category);
+  Feed* Get(int category);
 
-  bool Notify(const CFeed& feed);
+  bool Notify(const Feed& feed);
   bool SearchArchive(const wstring& file);
-  void ParseDescription(CFeedItem& feed_item, const wstring& source);
+  void ParseDescription(FeedItem& feed_item, const wstring& source);
 
-  vector<CFeed> Feeds;
+  vector<Feed> Feeds;
   vector<wstring> FileArchive;
-  CFeedFilterManager FilterManager;
+  FeedFilterManager FilterManager;
 
 private:
-  bool CompareFeedItems(const CGenericFeedItem& item1, const CGenericFeedItem& item2);
+  bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
 };
 
-extern CAggregator Aggregator;
+extern Aggregator Aggregator;
 
 #endif // FEED_H

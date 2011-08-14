@@ -27,30 +27,35 @@
 
 // =============================================================================
 
-class CSettingsWindow : public CDialog {
+class SettingsDialog : public CDialog {
 public:
-  CSettingsWindow();
-  virtual ~CSettingsWindow();
+  SettingsDialog();
+  virtual ~SettingsDialog();
 
-  class CSettingsTree : public CTreeView {
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  } m_Tree;
-
-  void RefreshTwitterLink();
+  friend class SettingsPage;
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnOK();
   void SetCurrentPage(int index);
-  
-  vector<CFeedFilter> m_FeedFilters;
+
+public:
+  int AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter);
+  void RefreshTorrentFilterList(HWND hwnd_list);
+  void RefreshTwitterLink();
 
 private:
-  int m_iCurrentPage;
-  HFONT m_hStaticFont;
-  vector<CSettingsPage> m_Page;
+  class TreeView : public CTreeView {
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  } tree_;
+
+private:
+  int current_page_;
+  vector<FeedFilter> feed_filters_;
+  HFONT static_font_;
+  vector<SettingsPage> pages;
 };
 
-extern CSettingsWindow SettingsWindow;
+extern SettingsDialog SettingsDialog;
 
 #endif // DLG_SETTINGS_H

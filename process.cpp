@@ -227,10 +227,10 @@ void ActivateWindow(HWND hwnd) {
   BringWindowToTop(hwnd);
 }
 
-bool CheckInstance(LPCWSTR lpMutexName, LPCWSTR lpClassName) {
-  if (CreateMutex(NULL, FALSE, lpMutexName) == NULL ||
+bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name) {
+  if (CreateMutex(NULL, FALSE, mutex_name) == NULL ||
       GetLastError() == ERROR_ALREADY_EXISTS || GetLastError() == ERROR_ACCESS_DENIED) {
-        HWND hwnd = FindWindow(lpClassName, NULL);
+        HWND hwnd = FindWindow(class_name, NULL);
         if (IsWindow(hwnd)) {
           ActivateWindow(hwnd);
           FlashWindow(hwnd, TRUE);

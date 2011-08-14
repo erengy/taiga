@@ -43,7 +43,7 @@ private:
 
 void DebugTest() {
   // Define variables
-  CEpisode episode;
+  Episode episode;
   int value = 0;
   wstring str;
 
@@ -89,6 +89,6 @@ void CDebugTest::End(wstring str, BOOL show) {
 
   if (show) {
     str = ToWSTR(value, 2) + L" ms | Text: [" + str + L"]";
-    MainWindow.SetText(str.c_str());
+    MainDialog.SetText(str.c_str());
   }
 }

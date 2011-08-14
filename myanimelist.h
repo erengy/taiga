@@ -70,14 +70,14 @@ enum MAL_Type {
 
 // =============================================================================
 
-class CAnime;
-class CEventItem;
-class CHTTPClient;
+class Anime;
+class EventItem;
+class HttpClient;
 
-class CMALAnimeValues {
+class MalAnimeValues {
 public:
-  CMALAnimeValues();
-  virtual ~CMALAnimeValues() {};
+  MalAnimeValues();
+  virtual ~MalAnimeValues() {};
   
   int episode;
   int status;
@@ -97,21 +97,21 @@ public:
   wstring tags;
 };
 
-class CMyAnimeList {
+class MyAnimeList {
 public:
-  CMyAnimeList() {};
-  virtual ~CMyAnimeList() {};
+  MyAnimeList() {};
+  virtual ~MyAnimeList() {};
 
   void CheckProfile();
-  bool DownloadImage(CAnime* anime, CHTTPClient* client = nullptr);
-  bool GetAnimeDetails(CAnime* anime, CHTTPClient* client = nullptr);
+  bool DownloadImage(Anime* anime, class HttpClient* client = nullptr);
+  bool GetAnimeDetails(Anime* anime, class HttpClient* client = nullptr);
   bool GetList(bool login);
   bool Login();
-  bool ParseAnimeDetails(const wstring& data, CAnime* anime = nullptr);
-  bool ParseSearchResult(const wstring& data, CAnime* anime = nullptr);
-  bool SearchAnime(wstring title, CAnime* anime = NULL, CHTTPClient* client = nullptr);
-  bool Update(CMALAnimeValues& anime_values, int anime_id, int update_mode);
-  bool UpdateSucceeded(const wstring& data, CEventItem& item);
+  bool ParseAnimeDetails(const wstring& data, Anime* anime = nullptr);
+  bool ParseSearchResult(const wstring& data, Anime* anime = nullptr);
+  bool SearchAnime(wstring title, Anime* anime = NULL, class HttpClient* client = nullptr);
+  bool Update(MalAnimeValues& anime_values, int anime_id, int update_mode);
+  bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code);
   
   void DecodeText(wstring& text);
   bool IsValidDate(const wstring& date);
@@ -140,6 +140,6 @@ public:
   void ViewSeasonGroup();
 };
 
-extern CMyAnimeList MAL;
+extern MyAnimeList MAL;
 
 #endif // MYANIMELIST_H

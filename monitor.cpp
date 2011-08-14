@@ -25,39 +25,42 @@
 #include "settings.h"
 #include "string.h"
 
-CFolderMonitor FolderMonitor;
+class FolderMonitor FolderMonitor;
 
 // =============================================================================
 
-CFolderInfo::CFolderInfo() :
-  m_State(MONITOR_STATE_STOPPED),
-  m_hDirectory(INVALID_HANDLE_VALUE),
-  m_bWatchSubtree(TRUE),
-  m_dwNotifyFilter(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME),
-  m_dwBytesReturned(0)
+FolderInfo::FolderInfo() :
+  bytes_returned_(0),
+  directory_handle_(INVALID_HANDLE_VALUE),
+  notify_filter_(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME),
+  state(MONITOR_STATE_STOPPED),
+  watch_subtree_(TRUE)
 {
-  ZeroMemory(&m_Overlapped, sizeof(m_Overlapped));
+  ZeroMemory(&overlapped_, sizeof(overlapped_));
 }
 
-CFolderInfo::~CFolderInfo() {
+FolderInfo::~FolderInfo() {
 }
 
 // =============================================================================
 
-CFolderMonitor::CFolderMonitor() :
-  m_hCompPort(NULL), m_hWindow(NULL)
+FolderMonitor::FolderMonitor() :
+  completion_port_(nullptr), window_handle_(nullptr)
 {
 }
 
-CFolderMonitor::~CFolderMonitor() {
+FolderMonitor::~FolderMonitor() {
   Stop();
   ClearFolders();
-  if (m_hCompPort) ::CloseHandle(m_hCompPort);
+  if (completion_port_) {
+    ::CloseHandle(completion_port_);
+    completion_port_ = nullptr;
+  }
 }
 
 // =============================================================================
 
-bool CFolderMonitor::AddFolder(const wstring folder) {
+bool FolderMonitor::AddFolder(const wstring& folder) {
   // Validate path
   if (!FolderExists(folder)) {
     return false;
@@ -65,98 +68,104 @@ bool CFolderMonitor::AddFolder(const wstring folder) {
 
   // Get directory handle
   HANDLE handle = ::CreateFile(folder.c_str(), FILE_LIST_DIRECTORY, 
-    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, 
-    OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
+    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, 
+    OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
   if (handle == INVALID_HANDLE_VALUE) {
     return false;
   }
 
   // Set folder data
-  m_Folders.resize(m_Folders.size() + 1);
-  m_Folders.back().m_hDirectory = handle;
-  m_Folders.back().m_Path = folder;
+  folders_.resize(folders_.size() + 1);
+  folders_.back().directory_handle_ = handle;
+  folders_.back().path = folder;
 
   // Success
   return true;
 }
 
-bool CFolderMonitor::ClearFolders() {
+bool FolderMonitor::ClearFolders() {
   // Close handles
-  for (unsigned int i = 0; i < m_Folders.size(); i++) {
-    if (m_Folders[i].m_hDirectory != INVALID_HANDLE_VALUE) {
-      ::CloseHandle(m_Folders[i].m_hDirectory);
-      m_Folders[i].m_hDirectory = INVALID_HANDLE_VALUE;
+  for (unsigned int i = 0; i < folders_.size(); i++) {
+    if (folders_[i].directory_handle_ != INVALID_HANDLE_VALUE) {
+      ::CloseHandle(folders_[i].directory_handle_);
+      folders_[i].directory_handle_ = INVALID_HANDLE_VALUE;
     }
   }
   // Remove all items
-  m_Folders.clear();
+  folders_.clear();
   return true;
 }
 
-bool CFolderMonitor::Start() {
+bool FolderMonitor::Start() {
   // Create worker thread
-  if (GetThreadHandle() == NULL) {
-    CreateThread(NULL, 0, 0);
+  if (GetThreadHandle() == nullptr) {
+    CreateThread(nullptr, 0, 0);
   }
 
   // Start watching folders
-  if (GetThreadHandle() != NULL) {
-    for (unsigned int i = 0; i < m_Folders.size(); i++) {
-      m_hCompPort = ::CreateIoCompletionPort(m_Folders[i].m_hDirectory, 
-        m_hCompPort, reinterpret_cast<ULONG_PTR>(&m_Folders[i]), 0);
-      if (m_hCompPort) {
-        ::PostQueuedCompletionStatus(m_hCompPort, sizeof(m_Folders[i]), 
-          reinterpret_cast<ULONG_PTR>(&m_Folders[i]), &m_Folders[i].m_Overlapped);
+  if (GetThreadHandle() != nullptr) {
+    for (unsigned int i = 0; i < folders_.size(); i++) {
+      completion_port_ = ::CreateIoCompletionPort(folders_[i].directory_handle_, 
+        completion_port_, reinterpret_cast<ULONG_PTR>(&folders_[i]), 0);
+      if (completion_port_) {
+        ::PostQueuedCompletionStatus(completion_port_, sizeof(folders_[i]), 
+          reinterpret_cast<ULONG_PTR>(&folders_[i]), &folders_[i].overlapped_);
       }
     }
   }
 
   // Return
-  return GetThreadHandle() != NULL;
+  return GetThreadHandle() != nullptr;
 }
 
-bool CFolderMonitor::Stop() {
+bool FolderMonitor::Stop() {
   if (GetThreadHandle()) {
     // Signal worker thread to stop
-    ::PostQueuedCompletionStatus(m_hCompPort, 0, 0, NULL);
+    ::PostQueuedCompletionStatus(completion_port_, 0, 0, nullptr);
     // Wait for thread to stop
     ::WaitForSingleObject(GetThreadHandle(), INFINITE);
     // Clean up
     CloseThreadHandle();
-    ::CloseHandle(m_hCompPort);
-    m_hCompPort = NULL;
+    ::CloseHandle(completion_port_);
+    completion_port_ = nullptr;
   }
   return true;
 }
 
 // =============================================================================
 
-BOOL CFolderMonitor::ReadDirectoryChanges(CFolderInfo* pfi) {
+BOOL FolderMonitor::ReadDirectoryChanges(FolderInfo* folder_info) {
   return ::ReadDirectoryChangesW(
-    pfi->m_hDirectory, pfi->m_Buffer, MONITOR_BUFFER_SIZE, pfi->m_bWatchSubtree, 
-    pfi->m_dwNotifyFilter, &pfi->m_dwBytesReturned, &pfi->m_Overlapped, NULL);
+    folder_info->directory_handle_, 
+    folder_info->buffer_, 
+    MONITOR_BUFFER_SIZE, 
+    folder_info->watch_subtree_, 
+    folder_info->notify_filter_, 
+    &folder_info->bytes_returned_, 
+    &folder_info->overlapped_, 
+    nullptr);
 }
 
-DWORD CFolderMonitor::ThreadProc() {
+DWORD FolderMonitor::ThreadProc() {
   DWORD dwNumBytes = 0;
-  CFolderInfo* pfi = NULL;
+  FolderInfo* folder_info = nullptr;
   LPOVERLAPPED lpOverlapped;
 
   do {
     // ...
     ::GetQueuedCompletionStatus(GetCompletionPort(), &dwNumBytes, 
-      reinterpret_cast<PULONG_PTR>(&pfi), &lpOverlapped, INFINITE);
+      reinterpret_cast<PULONG_PTR>(&folder_info), &lpOverlapped, INFINITE);
 
-    if (pfi) {
+    if (folder_info) {
       // Lock folder data
-      m_CriticalSection.Enter();
+      critical_section_.Enter();
 
-      switch (pfi->m_State) {
+      switch (folder_info->state) {
         // Start monitoring
         case MONITOR_STATE_STOPPED: {
-          if (ReadDirectoryChanges(pfi)) {
-            pfi->m_State = MONITOR_STATE_ACTIVE;
-            DEBUG_PRINT(L"CFolderMonitor :: Started monitoring: " + pfi->m_Path + L"\n");
+          if (ReadDirectoryChanges(folder_info)) {
+            folder_info->state = MONITOR_STATE_ACTIVE;
+            DEBUG_PRINT(L"FolderMonitor :: Started monitoring: " + folder_info->path + L"\n");
           }
           break;
         }
@@ -164,70 +173,70 @@ DWORD CFolderMonitor::ThreadProc() {
         // Change detected 
         case MONITOR_STATE_ACTIVE: {
           DWORD dwNextEntryOffset = 0;
-          PFILE_NOTIFY_INFORMATION pfni = NULL;
+          PFILE_NOTIFY_INFORMATION pfni = nullptr;
           
           do {
-            pfni = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(pfi->m_Buffer + dwNextEntryOffset);
+            pfni = reinterpret_cast<PFILE_NOTIFY_INFORMATION>(folder_info->buffer_ + dwNextEntryOffset);
             // Retrieve changed file name
             WCHAR file_name[MAX_PATH + 1] = {'\0'};
             CopyMemory(file_name, pfni->FileName, pfni->FileNameLength);
-            DEBUG_PRINT(L"CFolderMonitor :: Change detected: (" + ToWSTR(pfni->Action) + L") " + 
-              pfi->m_Path + L"\\" + file_name + L"\n");
+            DEBUG_PRINT(L"FolderMonitor :: Change detected: (" + ToWSTR(pfni->Action) + L") " + 
+              folder_info->path + L"\\" + file_name + L"\n");
             // Add item to list
-            pfi->m_ChangeList.resize(pfi->m_ChangeList.size() + 1);
-            pfi->m_ChangeList.back().Action = pfni->Action;
-            pfi->m_ChangeList.back().FileName = file_name;
+            folder_info->change_list.resize(folder_info->change_list.size() + 1);
+            folder_info->change_list.back().action = pfni->Action;
+            folder_info->change_list.back().file_name = file_name;
             // Continue to next change
             dwNextEntryOffset += pfni->NextEntryOffset;
           } while (pfni->NextEntryOffset != 0);
           
           // Send a message to the main thread
-          if (m_hWindow) {
-            ::PostMessage(m_hWindow, WM_MONITORCALLBACK, 0, reinterpret_cast<LPARAM>(pfi));
+          if (window_handle_) {
+            ::PostMessage(window_handle_, WM_MONITORCALLBACK, 0, reinterpret_cast<LPARAM>(folder_info));
           }
           
           // Continue monitoring
-          ReadDirectoryChanges(pfi);
+          ReadDirectoryChanges(folder_info);
           break;
         }
       }
 
       // Unlock folder data
-      m_CriticalSection.Leave();
+      critical_section_.Leave();
     }
-  } while (pfi);
+  } while (folder_info);
 
-  DEBUG_PRINT(L"CFolderMonitor :: Stopped monitoring.\n");
+  DEBUG_PRINT(L"FolderMonitor :: Stopped monitoring.\n");
   return 0;
 }
 
 // =============================================================================
 
-void CFolderMonitor::Enable(bool enabled) {
+void FolderMonitor::Enable(bool enabled) {
   // Stop monitoring
   Stop();
   if (enabled) {
     // Clear folder data
     ClearFolders();
     // Add new folders
-    for (unsigned int i = 0; i < Settings.Folders.Root.size(); i++) {
-      AddFolder(Settings.Folders.Root[i]);
+    for (unsigned int i = 0; i < Settings.Folders.root.size(); i++) {
+      AddFolder(Settings.Folders.root[i]);
     }
     // Start monitoring again
     Start();
   }
 }
 
-void CFolderMonitor::OnChange(CFolderInfo* info) {
+void FolderMonitor::OnChange(FolderInfo* folder_info) {
   // Lock folder data
-  m_CriticalSection.Enter();
+  critical_section_.Enter();
 
-  for (unsigned int i = 0; i < info->m_ChangeList.size(); i++) {
-    #define LIST info->m_ChangeList
+  for (unsigned int i = 0; i < folder_info->change_list.size(); i++) {
+    #define LIST folder_info->change_list
     
     // Is path available?
     bool path_available;
-    switch (info->m_ChangeList[i].Action) {
+    switch (folder_info->change_list[i].action) {
       case FILE_ACTION_ADDED:
       case FILE_ACTION_RENAMED_NEW_NAME:
         path_available = true;
@@ -240,88 +249,88 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
         continue;
     }
     
-    CEpisode episode;
-    CheckSlash(info->m_Path);
-    wstring path = info->m_Path + LIST[i].FileName;
+    Episode episode;
+    CheckSlash(folder_info->path);
+    wstring path = folder_info->path + LIST[i].file_name;
         
     // Is it a file or a folder?
     bool is_folder = false;
     if (path_available) {
       is_folder = FolderExists(path);
     } else {
-      is_folder = !ValidateFileExtension(GetFileExtension(LIST[i].FileName), 4);
+      is_folder = !ValidateFileExtension(GetFileExtension(LIST[i].file_name), 4);
     }
 
     // Compare with list item folders
     if (is_folder && !path_available) {
       int anime_index = 0;
-      for (int j = AnimeList.Count; j > 0; j--) {
-        if (!AnimeList.Items[j].Folder.empty() && IsEqual(AnimeList.Items[j].Folder, path)) {
+      for (int j = AnimeList.count; j > 0; j--) {
+        if (!AnimeList.items[j].folder.empty() && IsEqual(AnimeList.items[j].folder, path)) {
           anime_index = j;
           break;
         }
       }
       if (anime_index > 0) {
         if (i == LIST.size() - 1) {
-          LIST[i].AnimeIndex = anime_index;
+          LIST[i].anime_index = anime_index;
         } else {
-          LIST[i + 1].AnimeIndex = anime_index;
+          LIST[i + 1].anime_index = anime_index;
           continue;
         }
       }
     }
 
     // Change anime folder
-    if (is_folder && LIST[i].AnimeIndex > 0) {
-      #define ANIME AnimeList.Items[LIST[i].AnimeIndex]
+    if (is_folder && LIST[i].anime_index > 0) {
+      #define ANIME AnimeList.items[LIST[i].anime_index]
       ANIME.SetFolder(path_available ? path : L"", true, true);
-      DEBUG_PRINT(L"CFolderMonitor :: Change anime folder: " + 
-        ANIME.Series_Title + L" -> " + ANIME.Folder + L"\n");
+      DEBUG_PRINT(L"FolderMonitor :: Change anime folder: " + 
+        ANIME.series_title + L" -> " + ANIME.folder + L"\n");
       #undef ANIME
       continue;
     }
 
     // Examine path and compare with list items
     if (Meow.ExamineTitle(path, episode)) {
-      if (LIST[i].AnimeIndex == 0 || is_folder == false) {
-        for (int j = AnimeList.Count; j > 0; j--) {
-          if (Meow.CompareEpisode(episode, AnimeList.Items[j], true, false, false)) {
-            LIST[i].AnimeIndex = j;
+      if (LIST[i].anime_index == 0 || is_folder == false) {
+        for (int j = AnimeList.count; j > 0; j--) {
+          if (Meow.CompareEpisode(episode, AnimeList.items[j], true, false, false)) {
+            LIST[i].anime_index = j;
             break;
           }
         }
       }
-      if (LIST[i].AnimeIndex > 0) {
-        #define ANIME AnimeList.Items[LIST[i].AnimeIndex]
+      if (LIST[i].anime_index > 0) {
+        #define ANIME AnimeList.items[LIST[i].anime_index]
 
         // Set anime folder
-        if (path_available && ANIME.Folder.empty()) {
+        if (path_available && ANIME.folder.empty()) {
           if (is_folder) {
-            ANIME.Folder = path;
-          } else if (!episode.Folder.empty()) {
-            CEpisode temp_episode;
-            temp_episode.Title = episode.Folder;
+            ANIME.folder = path;
+          } else if (!episode.folder.empty()) {
+            Episode temp_episode;
+            temp_episode.title = episode.folder;
             if (Meow.CompareEpisode(temp_episode, ANIME)) {
-              ANIME.SetFolder(episode.Folder, true, true);
+              ANIME.SetFolder(episode.folder, true, true);
             }
           }
-          if (!ANIME.Folder.empty()) {
-            DEBUG_PRINT(L"CFolderMonitor :: Set anime folder: " + 
-              ANIME.Series_Title + L" -> " + ANIME.Folder + L"\n");
+          if (!ANIME.folder.empty()) {
+            DEBUG_PRINT(L"FolderMonitor :: Set anime folder: " + 
+              ANIME.series_title + L" -> " + ANIME.folder + L"\n");
           }
         }
 
         // Set episode availability
         if (!is_folder) {
-          int number = GetEpisodeHigh(episode.Number);
-          int numberlow = GetEpisodeLow(episode.Number);
+          int number = GetEpisodeHigh(episode.number);
+          int numberlow = GetEpisodeLow(episode.number);
           if (path_available) {
-            path_available = IsEqual(GetPathOnly(path), ANIME.Folder);
+            path_available = IsEqual(GetPathOnly(path), ANIME.folder);
           }
           for (int j = numberlow; j <= number; j++) {
             if (ANIME.SetEpisodeAvailability(number, path_available, path)) {
-              DEBUG_PRINT(L"CFolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
-                ANIME.Series_Title + L" -> " + ToWSTR(j) + L"\n");
+              DEBUG_PRINT(L"FolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
+                ANIME.series_title + L" -> " + ToWSTR(j) + L"\n");
             }
           }
         }
@@ -332,8 +341,8 @@ void CFolderMonitor::OnChange(CFolderInfo* info) {
   }
 
   // Clear change list
-  info->m_ChangeList.clear();
+  folder_info->change_list.clear();
 
   // Unlock folder data
-  m_CriticalSection.Leave();
+  critical_section_.Leave();
 }

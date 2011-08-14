@@ -32,51 +32,11 @@ enum SearchMode {
 
 // =============================================================================
 
-class CMainWindow : public CDialog {
+class MainDialog : public CDialog {
 public:
-  CMainWindow();
-  virtual ~CMainWindow() {}
+  MainDialog();
+  virtual ~MainDialog() {}
 
-  // Tree control
-  class CMainTree : public CTreeView {
-  public:
-    void RefreshItems();
-  private:
-    HTREEITEM htItem[7];
-  } m_Tree;
-  
-  // List control
-  class CMainList : public CListView {
-  public:
-    CMainList() { m_bDragging = false; };
-    int GetSortType(int column);
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    bool m_bDragging;
-    CImageList m_DragImage;
-  } m_List;
-
-  // Edit control
-  class CEditSearch : public CEdit {
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  } m_EditSearch;
-
-  // Other controls
-  CRebar m_Rebar;
-  CStatusBar m_Status;
-  CTab m_Tab;
-  CToolbar m_Toolbar, m_ToolbarSearch;
-  CWindow m_CancelSearch;
-
-  // Search bar
-  class CSearchBar {
-  public:
-    CSearchBar() : Index(0), Mode(0) {}
-    UINT Index, Mode;
-    wstring CueText, URL;
-    void SetMode(UINT index, UINT mode, wstring cue_text = L"Search", wstring url = L"");
-  } m_SearchBar;
-  
-  // Message handlers
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   LRESULT OnButtonCustomDraw(LPARAM lParam);
   BOOL OnClose();
@@ -95,17 +55,61 @@ public:
   LRESULT OnTreeNotify(LPARAM lParam);
   BOOL PreTranslateMessage(MSG* pMsg);
 
-  // Other functions
+public:
   void ChangeStatus(wstring str = L"");
   void EnableInput(bool enable = true);
-  void CreateDialogControls();
   int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
   void RefreshMenubar(int anime_id = -1, bool show = true);
   void RefreshTabs(int index = -1, bool redraw = true);
   void UpdateTip();
+
+private:
+  void CreateDialogControls();
+
+public:
+  // Tree-view control
+  class CMainTree : public CTreeView {
+  public:
+    void RefreshItems();
+  private:
+    HTREEITEM htItem[7];
+  } treeview;
+  
+  // List-view control
+  class ListView : public CListView {
+  public:
+    ListView() { dragging = false; };
+    int GetSortType(int column);
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    bool dragging;
+    CImageList drag_image;
+    MainDialog* parent;
+  } listview;
+
+  // Edit control
+  class EditSearch : public CEdit {
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  } edit;
+
+  // Other controls
+  CWindow cancel_button;
+  CRebar rebar;
+  CStatusBar statusbar;
+  CTab tab;
+  CToolbar toolbar, toolbar_search;
+
+  // Search bar
+  class SearchBar {
+  public:
+    SearchBar() : index(0), mode(0) {}
+    UINT index, mode;
+    wstring cue_text, url;
+    MainDialog* parent;
+    void SetMode(UINT index, UINT mode, wstring cue_text = L"Search", wstring url = L"");
+  } search_bar;
 };
 
-extern CMainWindow MainWindow;
+extern MainDialog MainDialog;
 
 #endif // DLG_MAIN_H

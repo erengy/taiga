@@ -24,7 +24,7 @@
 // =============================================================================
 
 void ActivateWindow(HWND hwnd);
-bool CheckInstance(LPCWSTR lpMutexName, LPCWSTR lpClassName);
+bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name);
 BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector);
 wstring GetWindowClass(HWND hwnd);
 wstring GetWindowPath(HWND hwnd);

@@ -30,51 +30,51 @@
 #include "../win32/win_taskdialog.h"
 #include "../xml.h"
 
-CSearchWindow SearchWindow;
+class SearchDialog SearchDialog;
 
 // =============================================================================
 
-CSearchWindow::CSearchWindow() {
+SearchDialog::SearchDialog() {
   RegisterDlgClass(L"TaigaSearchW");
 }
 
-BOOL CSearchWindow::OnInitDialog() {
+BOOL SearchDialog::OnInitDialog() {
   // Create list control
-  m_List.Attach(GetDlgItem(IDC_LIST_SEARCH));
-  m_List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  m_List.SetImageList(UI.ImgList16.GetHandle());
-  m_List.SetTheme();
-  m_List.InsertColumn(0, 280, 280, LVCFMT_LEFT,   L"Anime title");
-  m_List.InsertColumn(1,  60,  60, LVCFMT_CENTER, L"Type");
-  m_List.InsertColumn(2,  60,  60, LVCFMT_RIGHT,  L"Episodes");
-  m_List.InsertColumn(3,  60,  60, LVCFMT_RIGHT,  L"Score");
-  m_List.InsertColumn(4, 100, 100, LVCFMT_RIGHT,  L"Season");
+  list_.Attach(GetDlgItem(IDC_LIST_SEARCH));
+  list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  list_.SetImageList(UI.ImgList16.GetHandle());
+  list_.SetTheme();
+  list_.InsertColumn(0, 280, 280, LVCFMT_LEFT,   L"Anime title");
+  list_.InsertColumn(1,  60,  60, LVCFMT_CENTER, L"Type");
+  list_.InsertColumn(2,  60,  60, LVCFMT_RIGHT,  L"Episodes");
+  list_.InsertColumn(3,  60,  60, LVCFMT_RIGHT,  L"Score");
+  list_.InsertColumn(4, 100, 100, LVCFMT_RIGHT,  L"Season");
 
   // Create edit control
-  m_Edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
+  edit_.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   
   // Success
   return TRUE;
 }
 
-void CSearchWindow::OnOK() {
+void SearchDialog::OnOK() {
   wstring text;
-  m_Edit.GetText(text);
+  edit_.GetText(text);
   Search(text);
 }
 
-INT_PTR CSearchWindow::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR SearchDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL: {
-      return m_List.SendMessage(uMsg, wParam, lParam);
+      return list_.SendMessage(uMsg, wParam, lParam);
     }
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // ListView control
   if (idCtrl == IDC_LIST_SEARCH) {
     switch (pnmh->code) {
@@ -82,19 +82,19 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = (LPNMLISTVIEW)pnmh;
         int order = 1;
-        if (lplv->iSubItem == m_List.GetSortColumn()) order = m_List.GetSortOrder() * -1;
+        if (lplv->iSubItem == list_.GetSortColumn()) order = list_.GetSortOrder() * -1;
         switch (lplv->iSubItem) {
           // Episode
           case 2:
-            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_NUMBER, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_NUMBER, ListViewCompareProc);
             break;
           // Season
           case 4:
-            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_STARTDATE, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_STARTDATE, ListViewCompareProc);
             break;
           // Other columns
           default:
-            m_List.Sort(lplv->iSubItem, order, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
             break;
         }
         break;
@@ -102,10 +102,10 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
       // Double click
       case NM_DBLCLK: {
-        if (m_List.GetSelectedCount() > 0) {
+        if (list_.GetSelectedCount() > 0) {
           LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
           if (lpnmitem->iItem == -1) break;
-          LPARAM lParam = m_List.GetItemParam(lpnmitem->iItem);
+          LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
           if (lParam) ExecuteAction(L"Info", 0, lParam);
         }
         break;
@@ -115,9 +115,9 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case NM_RCLICK: {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
         if (lpnmitem->iItem == -1) break;
-        LPARAM lParam = m_List.GetItemParam(lpnmitem->iItem);
+        LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
         if (!lParam) break;
-        UpdateSearchListMenu(reinterpret_cast<CAnime*>(lParam)->Index <= 0);
+        UpdateSearchListMenu(reinterpret_cast<Anime*>(lParam)->index <= 0);
         ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SearchList"), 0, lParam);
         break;
       }
@@ -135,13 +135,13 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
             return CDRF_NOTIFYPOSTERASE;
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             // Alternate background color
-            if ((pCD->nmcd.dwItemSpec % 2) && !m_List.IsGroupViewEnabled()) {
+            if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled()) {
               pCD->clrTextBk = RGB(248, 248, 248);
             }
             // Change text color
-            CAnime* pAnimeItem = reinterpret_cast<CAnime*>(pCD->nmcd.lItemlParam);
-            if (pAnimeItem) {
-              if (pAnimeItem->Index > 0) {
+            Anime* anime = reinterpret_cast<Anime*>(pCD->nmcd.lItemlParam);
+            if (anime) {
+              if (anime->index > 0) {
                 pCD->clrText = RGB(180, 180, 180);
               } else {
                 pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
@@ -157,7 +157,7 @@ LRESULT CSearchWindow::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-BOOL CSearchWindow::PreTranslateMessage(MSG* pMsg) {
+BOOL SearchDialog::PreTranslateMessage(MSG* pMsg) {
   if (pMsg->message == WM_KEYDOWN) {
     switch (pMsg->wParam) {
       // Close window
@@ -167,7 +167,7 @@ BOOL CSearchWindow::PreTranslateMessage(MSG* pMsg) {
       }
       // Search
       case VK_RETURN: {
-        if (::GetFocus() == m_Edit.GetWindowHandle()) {
+        if (::GetFocus() == edit_.GetWindowHandle()) {
           OnOK();
           return TRUE;
         }
@@ -180,27 +180,15 @@ BOOL CSearchWindow::PreTranslateMessage(MSG* pMsg) {
 
 // =============================================================================
 
-void CSearchWindow::EnableInput(bool enable) {
+void SearchDialog::EnableInput(bool enable) {
   EnableDlgItem(IDOK, enable);
   SetDlgItemText(IDOK, enable ? L"Search" : L"Searching...");
 }
 
-BOOL CSearchWindow::Search(const wstring& title) {
-  if (MAL.SearchAnime(title)) {
-    m_Edit.SetText(title.c_str());
-    EnableInput(false);
-    m_List.DeleteAllItems();
-    m_Anime.clear();
-    return TRUE;
-  } else {
-    return FALSE;
-  }
-}
-
-void CSearchWindow::ParseResults(const wstring& data) {
+void SearchDialog::ParseResults(const wstring& data) {
   if (data.empty()) {
     wstring msg;
-    m_Edit.GetText(msg);
+    edit_.GetText(msg);
     msg = L"No results found for \"" + msg + L"\".";
     CTaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
@@ -217,36 +205,36 @@ void CSearchWindow::ParseResults(const wstring& data) {
     dlg.Show(GetWindowHandle());
     return;
   }
-  m_Anime.clear();
+  anime_results_.clear();
   
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
   if (result.status == status_ok) {
     xml_node anime = doc.child(L"anime");
     for (xml_node entry = anime.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
-      int i = m_Anime.size(); m_Anime.resize(i + 1);
+      int i = anime_results_.size(); anime_results_.resize(i + 1);
       int anime_id = XML_ReadIntValue(entry, L"id");
-      m_Anime[i].Index = AnimeList.FindItemIndex(anime_id);
+      anime_results_[i].index = AnimeList.FindItemIndex(anime_id);
       
-      if (m_Anime[i].Index > -1) {
-        AnimeList.Items[m_Anime[i].Index].Score = XML_ReadStrValue(entry, L"score");
-        AnimeList.Items[m_Anime[i].Index].Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeText(AnimeList.Items[m_Anime[i].Index].Synopsis);
+      if (anime_results_[i].index > -1) {
+        AnimeList.items[anime_results_[i].index].score = XML_ReadStrValue(entry, L"score");
+        AnimeList.items[anime_results_[i].index].synopsis = XML_ReadStrValue(entry, L"synopsis");
+        MAL.DecodeText(AnimeList.items[anime_results_[i].index].synopsis);
       } else {
-        m_Anime[i].Series_ID = anime_id;
-        m_Anime[i].Series_Title = XML_ReadStrValue(entry, L"title");
-        MAL.DecodeText(m_Anime[i].Series_Title);
-        m_Anime[i].Series_Synonyms = XML_ReadStrValue(entry, L"synonyms");
-        MAL.DecodeText(m_Anime[i].Series_Synonyms);
-        m_Anime[i].Series_Episodes = XML_ReadIntValue(entry, L"episodes");
-        m_Anime[i].Score = XML_ReadStrValue(entry, L"score");
-        m_Anime[i].Series_Type = MAL.TranslateType(XML_ReadStrValue(entry, L"type"));
-        m_Anime[i].Series_Status = MAL.TranslateStatus(XML_ReadStrValue(entry, L"status"));
-        m_Anime[i].Series_Start = XML_ReadStrValue(entry, L"start_date");
-        m_Anime[i].Series_End = XML_ReadStrValue(entry, L"end_date");
-        m_Anime[i].Synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeText(m_Anime[i].Synopsis);
-        m_Anime[i].Series_Image = XML_ReadStrValue(entry, L"image");
+        anime_results_[i].series_id = anime_id;
+        anime_results_[i].series_title = XML_ReadStrValue(entry, L"title");
+        MAL.DecodeText(anime_results_[i].series_title);
+        anime_results_[i].series_synonyms = XML_ReadStrValue(entry, L"synonyms");
+        MAL.DecodeText(anime_results_[i].series_synonyms);
+        anime_results_[i].series_episodes = XML_ReadIntValue(entry, L"episodes");
+        anime_results_[i].score = XML_ReadStrValue(entry, L"score");
+        anime_results_[i].series_type = MAL.TranslateType(XML_ReadStrValue(entry, L"type"));
+        anime_results_[i].series_status = MAL.TranslateStatus(XML_ReadStrValue(entry, L"status"));
+        anime_results_[i].series_start = XML_ReadStrValue(entry, L"start_date");
+        anime_results_[i].series_end = XML_ReadStrValue(entry, L"end_date");
+        anime_results_[i].synopsis = XML_ReadStrValue(entry, L"synopsis");
+        MAL.DecodeText(anime_results_[i].synopsis);
+        anime_results_[i].series_image = XML_ReadStrValue(entry, L"image");
       }
     }
   }
@@ -254,29 +242,41 @@ void CSearchWindow::ParseResults(const wstring& data) {
   RefreshList();
 }
 
-void CSearchWindow::RefreshList() {
+void SearchDialog::RefreshList() {
   if (!IsWindow()) return;
 
   // Hide and clear the list
-  m_List.Hide();
-  m_List.DeleteAllItems();
+  list_.Hide();
+  list_.DeleteAllItems();
   
   // Add anime items to list
-  for (size_t i = 0; i < m_Anime.size(); i++) {
-    if (m_Anime[i].Index == -1) {
-      m_Anime[i].Index = AnimeList.FindItemIndex(m_Anime[i].Series_ID);
+  for (size_t i = 0; i < anime_results_.size(); i++) {
+    if (anime_results_[i].index == -1) {
+      anime_results_[i].index = AnimeList.FindItemIndex(anime_results_[i].series_id);
     }
-    CAnime* item = m_Anime[i].Index > -1 ? &AnimeList.Items[m_Anime[i].Index] : &m_Anime[i];
-    m_List.InsertItem(i, -1, StatusToIcon(item->GetAiringStatus()), 0, NULL, 
-      item->Series_Title.c_str(), 
+    Anime* item = anime_results_[i].index > -1 ? &AnimeList.items[anime_results_[i].index] : &anime_results_[i];
+    list_.InsertItem(i, -1, StatusToIcon(item->GetAiringStatus()), 0, nullptr, 
+      item->series_title.c_str(), 
       reinterpret_cast<LPARAM>(item));
-    m_List.SetItem(i, 1, MAL.TranslateType(item->Series_Type).c_str());
-    m_List.SetItem(i, 2, MAL.TranslateNumber(item->Series_Episodes).c_str());
-    m_List.SetItem(i, 3, item->Score.c_str());
-    m_List.SetItem(i, 4, MAL.TranslateDateToSeason(item->Series_Start).c_str());
+    list_.SetItem(i, 1, MAL.TranslateType(item->series_type).c_str());
+    list_.SetItem(i, 2, MAL.TranslateNumber(item->series_episodes).c_str());
+    list_.SetItem(i, 3, item->score.c_str());
+    list_.SetItem(i, 4, MAL.TranslateDateToSeason(item->series_start).c_str());
   }
 
   // Sort and show the list again
-  m_List.Sort(0, 1, LISTSORTTYPE_DEFAULT, ListViewCompareProc);
-  m_List.Show();
+  list_.Sort(0, 1, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
+  list_.Show();
+}
+
+bool SearchDialog::Search(const wstring& title) {
+  if (MAL.SearchAnime(title)) {
+    edit_.SetText(title.c_str());
+    EnableInput(false);
+    list_.DeleteAllItems();
+    anime_results_.clear();
+    return true;
+  } else {
+    return false;
+  }
 }

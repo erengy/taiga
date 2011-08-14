@@ -25,27 +25,29 @@
 
 /* Media players class */
 
-class CMediaPlayers {
+class MediaPlayers {
 public:
+  MediaPlayers();
+  virtual ~MediaPlayers() {}
+
   BOOL Read();
-  BOOL Write();
+  BOOL Save();
   int Check();
+
   void EditTitle(wstring& str);
   wstring GetTitle(HWND hwnd, const wstring& class_name, int mode);
-  bool TitleChanged() { return m_bTitleChanged; }
+  bool TitleChanged() { return title_changed_; }
 
-  //
   wstring GetTitleFromProcessHandle(HWND hwnd, ULONG process_id = 0);
   wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
   wstring GetTitleFromSpecialMessage(HWND hwnd, const wstring& class_name);
   wstring GetTitleFromMPlayer();
   
-  // Variables
+public:
   int Index, IndexOld;
   wstring CurrentCaption, NewCaption;
 
-  // Player class
-  class CMediaPlayer {
+  class MediaPlayer {
   public:
     wstring Name;
     BOOL Enabled, Visible;
@@ -53,19 +55,19 @@ public:
     HWND WindowHandle;
     vector<wstring> Class, File, Folder;
     wstring GetPath();
-    class CEditTitle {
+    class EditTitle {
     public:
       int Mode;
       wstring Value;
     };
-    vector<CEditTitle> Edit;
+    vector<EditTitle> Edit;
   };
-  vector<CMediaPlayer> Items;
+  vector<MediaPlayer> Items;
 
 private:
-  bool m_bTitleChanged;
+  bool title_changed_;
 };
 
-extern CMediaPlayers MediaPlayers;
+extern MediaPlayers MediaPlayers;
 
 #endif // MEDIA_H

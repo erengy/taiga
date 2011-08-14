@@ -30,20 +30,25 @@
 #include "taiga.h"
 #include "win32/win_taskdialog.h"
 
-CEventQueue EventQueue;
+class EventQueue EventQueue;
 
 // =============================================================================
 
-CEventList::CEventList() : 
-  Index(0)
+EventItem::EventItem() : 
+  anime_id(0), mode(0)
 {
 }
 
-void CEventList::Add(CEventItem& item) {
-  CAnime* anime = AnimeList.FindItem(item.AnimeId);
+EventList::EventList() : 
+  index(0)
+{
+}
+
+void EventList::Add(EventItem& item) {
+  Anime* anime = AnimeList.FindItem(item.anime_id);
   
   // Validate values
-  if (anime && item.Mode != HTTP_MAL_AnimeAdd) {
+  if (anime && item.mode != HTTP_MAL_AnimeAdd) {
     if (anime->GetLastWatchedEpisode() == item.episode || item.episode < 0) {
       item.episode = -1;
     }
@@ -60,7 +65,7 @@ void CEventList::Add(CEventItem& item) {
       item.tags = EMPTY_STR;
     }
   }
-  switch (item.Mode) {
+  switch (item.mode) {
     case HTTP_MAL_AnimeEdit:
       if (item.episode == -1 && 
           item.score == -1 && 
@@ -84,11 +89,11 @@ void CEventList::Add(CEventItem& item) {
 
   // Edit previous item with the same ID...
   bool add_new_item = true;
-  if (!EventQueue.UpdateInProgress) {
-    for (auto it = Items.rbegin(); it != Items.rend(); ++it) {
-      if (it->AnimeId == item.AnimeId) {
-        if (it->Mode != HTTP_MAL_AnimeAdd && it->Mode != HTTP_MAL_AnimeDelete) {
-          if (item.episode == -1 || (it->episode == -1 && it == Items.rbegin())) {
+  if (!EventQueue.updating) {
+    for (auto it = items.rbegin(); it != items.rend(); ++it) {
+      if (it->anime_id == item.anime_id) {
+        if (it->mode != HTTP_MAL_AnimeAdd && it->mode != HTTP_MAL_AnimeDelete) {
+          if (item.episode == -1 || (it->episode == -1 && it == items.rbegin())) {
             if (item.episode > -1) it->episode = item.episode;
             if (item.score > -1) it->score = item.score;
             if (item.status > -1) it->status = item.status;
@@ -97,8 +102,8 @@ void CEventList::Add(CEventItem& item) {
             add_new_item = false;
           }
           if (!add_new_item) {
-            it->Mode = HTTP_MAL_AnimeEdit;
-            it->Time = GetDate() + L" " + GetTime();
+            it->mode = HTTP_MAL_AnimeEdit;
+            it->time = GetDate() + L" " + GetTime();
           }
           break;
         }
@@ -107,37 +112,37 @@ void CEventList::Add(CEventItem& item) {
   }
   // ...or add a new one
   if (add_new_item) {
-    if (item.Time.empty()) item.Time = GetDate() + L" " + GetTime();
-    Items.push_back(item);
+    if (item.time.empty()) item.time = GetDate() + L" " + GetTime();
+    items.push_back(item);
   }
 
   if (anime) {
     // Announce
-    if (Taiga.LoggedIn && Taiga.UpdatesEnabled && item.episode > 0) {
-      CEpisode episode;
-      episode.AnimeId = anime->Series_ID;
-      episode.Number = ToWSTR(item.episode);
-      Taiga.PlayStatus = PLAYSTATUS_UPDATED;
+    if (Taiga.logged_in && Taiga.updates_enabled && item.episode > 0) {
+      Episode episode;
+      episode.anime_id = anime->series_id;
+      episode.number = ToWSTR(item.episode);
+      Taiga.play_status = PLAYSTATUS_UPDATED;
       ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&episode));
       ExecuteAction(L"AnnounceToTwitter", 0, reinterpret_cast<LPARAM>(&episode));
     }
 
     // Check new episode
     if (item.episode > -1) {
-      anime->NewEps = false;
+      anime->new_episode_available = false;
       anime->CheckEpisodes(0);
     }
     
     // Refresh event window
-    EventWindow.RefreshList();
+    EventDialog.RefreshList();
     
     // Refresh main window
-    MainWindow.RefreshList();
-    MainWindow.RefreshTabs();
+    MainDialog.RefreshList();
+    MainDialog.RefreshTabs();
     
     // Change status
-    if (!Taiga.LoggedIn) {
-      MainWindow.ChangeStatus(L"Item added to the event queue. (" + anime->Series_Title + L")");
+    if (!Taiga.logged_in) {
+      MainDialog.ChangeStatus(L"Item added to the event queue. (" + anime->series_title + L")");
     }
 
     // Update
@@ -145,50 +150,42 @@ void CEventList::Add(CEventItem& item) {
   }
 }
 
-void CEventList::Check() {
+void EventList::Check() {
   // Check
-  if (Items.empty()) return;
-  if (!Taiga.UpdatesEnabled) {
-    Items[Index].Reason = L"Updates are disabled";
+  if (items.empty()) return;
+  if (!Taiga.updates_enabled) {
+    items[index].reason = L"Updates are disabled";
     return;
   }
-  if (!Taiga.LoggedIn) {
-    Items[Index].Reason = L"Not logged in";
+  if (!Taiga.logged_in) {
+    items[index].reason = L"Not logged in";
     return;
   }
   
   // Compare ID with anime list
-  CAnime* anime = AnimeList.FindItem(Items[Index].AnimeId);
+  Anime* anime = AnimeList.FindItem(items[index].anime_id);
   if (!anime) {
-    DEBUG_PRINT(L"CEventList::Check :: Item not found in list, removing...\n");
-    Remove(Index);
+    DEBUG_PRINT(L"EventList::Check :: Item not found in list, removing...\n");
+    Remove(index);
     Check();
     return;
   }
   
   // Update
-  EventQueue.UpdateInProgress = true;
-  MainWindow.ChangeStatus(L"Updating list...");
-  CMALAnimeValues* anime_values = reinterpret_cast<CMALAnimeValues*>(&Items[Index]);
-  MAL.Update(*anime_values, Items[Index].AnimeId, Items[Index].Mode);
+  EventQueue.updating = true;
+  MainDialog.ChangeStatus(L"Updating list...");
+  MalAnimeValues* anime_values = reinterpret_cast<MalAnimeValues*>(&items[index]);
+  MAL.Update(*anime_values, items[index].anime_id, items[index].mode);
 }
 
-void CEventList::Clear() {
-  Items.clear();
-  Index = 0;
+void EventList::Clear() {
+  items.clear();
+  index = 0;
 }
 
-void CEventList::Remove(unsigned int index) {
-  // Remove item
-  if (index < Items.size()) {
-    Items.erase(Items.begin() + index);
-    EventWindow.RefreshList();
-  }
-}
-
-CEventItem* CEventList::SearchItem(int anime_id, int search_mode) {
-  for (auto it = Items.rbegin(); it != Items.rend(); ++it) {
-    if (it->AnimeId == anime_id) {
+EventItem* EventList::FindItem(int anime_id, int search_mode) {
+  for (auto it = items.rbegin(); it != items.rend(); ++it) {
+    if (it->anime_id == anime_id) {
       switch (search_mode) {
         // Episode
         case EVENT_SEARCH_EPISODE:
@@ -219,77 +216,85 @@ CEventItem* CEventList::SearchItem(int anime_id, int search_mode) {
   return nullptr;
 }
 
+void EventList::Remove(unsigned int index) {
+  // Remove item
+  if (index < items.size()) {
+    items.erase(items.begin() + index);
+    EventDialog.RefreshList();
+  }
+}
+
 // =============================================================================
 
-CEventQueue::CEventQueue() :
-  UpdateInProgress(false)
+EventQueue::EventQueue() :
+  updating(false)
 {
 }
 
-void CEventQueue::Add(CEventItem& item, bool save, wstring user) {
-  int user_index = GetUserIndex(user);
-  if (user_index == -1) {
-    List.resize(List.size() + 1);
-    List.back().User = user.empty() ? Settings.Account.MAL.User : user;
-    user_index = List.size() - 1;
+void EventQueue::Add(EventItem& item, bool save, wstring user) {
+  EventList* event_list = FindList(user);
+  if (event_list == nullptr) {
+    list.resize(list.size() + 1);
+    list.back().user = user.empty() ? Settings.Account.MAL.user : user;
+    event_list = &list.back();
   }
-  List[user_index].Add(item);
-  if (save) Settings.Write();
+  event_list->Add(item);
+  if (save) Settings.Save();
 }
 
-void CEventQueue::Check() {
-  int user_index = GetUserIndex();
-  if (user_index > -1) List[user_index].Check();
+void EventQueue::Check() {
+  EventList* event_list = FindList();
+  if (event_list) event_list->Check();
 }
 
-void CEventQueue::Clear(bool save) {
-  int user_index = GetUserIndex();
-  if (user_index > -1) {
-    List[user_index].Clear();
-    if (save) Settings.Write();
+void EventQueue::Clear(bool save) {
+  EventList* event_list = FindList();
+  if (event_list) {
+    event_list->Clear();
+    if (save) Settings.Save();
   }
 }
 
-int CEventQueue::GetItemCount() {
-  int user_index = GetUserIndex();
-  if (user_index > -1) return List[user_index].Items.size();
+EventItem* EventQueue::FindItem(int anime_id, int search_mode) {
+  EventList* event_list = FindList();
+  if (event_list) return event_list->FindItem(anime_id, search_mode);
+  return nullptr;
+}
+
+EventList* EventQueue::FindList(wstring user) {
+  if (user.empty()) user = Settings.Account.MAL.user;
+  for (unsigned int i = 0; i < list.size(); i++) {
+    if (list[i].user == user) return &list[i];
+  }
+  return nullptr;
+}
+
+int EventQueue::GetItemCount() {
+  EventList* event_list = FindList();
+  if (event_list) return event_list->items.size();
   return 0;
 }
 
-int CEventQueue::GetUserIndex(wstring user) {
-  if (user.empty()) user = Settings.Account.MAL.User;
-  for (unsigned int i = 0; i < List.size(); i++) {
-    if (List[i].User == user) return i;
-  }
-  return -1;
-}
-
-bool CEventQueue::IsEmpty() {
-  for (unsigned int i = 0; i < List.size(); i++) {
-    if (List[i].Items.size() > 0) return false;
+bool EventQueue::IsEmpty() {
+  for (unsigned int i = 0; i < list.size(); i++) {
+    if (list[i].items.size() > 0) return false;
   }
   return true;
 }
 
-void CEventQueue::Remove(int index, bool save) {
-  int user_index = GetUserIndex();
-  if (user_index > -1) {
+void EventQueue::Remove(int index, bool save) {
+  EventList* event_list = FindList();
+  if (event_list) {
     if (index > -1) {
-      List[user_index].Remove(static_cast<unsigned int>(index));
+      event_list->Remove(static_cast<unsigned int>(index));
     } else {
-      List[user_index].Remove(List[user_index].Index);
+      event_list->Remove(event_list->index);
     }
-    if (save) Settings.Write();
+    if (save) Settings.Save();
   }
 }
 
-CEventItem* CEventQueue::SearchItem(int anime_id, int search_mode) {
-  int user_index = GetUserIndex();
-  if (user_index > -1) return List[user_index].SearchItem(anime_id, search_mode);
-  return nullptr;
-}
-
-void CEventQueue::Show() {
+void EventQueue::Show() {
   if (GetItemCount() == 0) {
     CTaskDialog dlg(L"Previously on Taiga...", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"There are no events in the queue.");
@@ -298,9 +303,9 @@ void CEventQueue::Show() {
     return;
   }
   
-  if (EventWindow.IsWindow()) {
-    EventWindow.Show();
+  if (EventDialog.IsWindow()) {
+    EventDialog.Show();
   } else {
-    EventWindow.Create(IDD_EVENT, g_hMain, false);
+    EventDialog.Create(IDD_EVENT, g_hMain, false);
   }
 }
