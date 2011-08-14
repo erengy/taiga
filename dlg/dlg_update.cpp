@@ -79,8 +79,8 @@ BOOL UpdateDialog::OnDestroy() {
     if (Taiga.Updater.RestartApplication(L"UpdateHelper.exe", L"Taiga.exe", L"Taiga.exe.new")) {
       return TRUE;
     } else {
-      // Read data again
-      Taiga.ReadData();
+      // Load data again
+      Taiga.LoadData();
     }
   } else {
     if (g_hMain) {

@@ -35,7 +35,7 @@ AnimeSeasonDatabase::AnimeSeasonDatabase() :
 {
 }
 
-bool AnimeSeasonDatabase::Read(wstring file) {
+bool AnimeSeasonDatabase::Load(wstring file) {
   // Write modifications
   if (modified && !file.empty()) Save();
 
@@ -44,7 +44,7 @@ bool AnimeSeasonDatabase::Read(wstring file) {
   file_ = file; file = folder_ + file;
   items.clear();
   
-  // Read XML file_name
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok && result.status != status_file_not_found) {
@@ -63,7 +63,7 @@ bool AnimeSeasonDatabase::Read(wstring file) {
     anime_count++;
   }
   if (anime_count > 0) {
-    items.resize(anime_count + 1);
+    items.resize(anime_count);
   }
   for (xml_node node = season_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
     items.at(i).index = -1;
@@ -82,6 +82,8 @@ bool AnimeSeasonDatabase::Read(wstring file) {
     items.at(i).rank = XML_ReadStrValue(node, L"rank");
     items.at(i).popularity = XML_ReadStrValue(node, L"popularity");
     items.at(i).synopsis = XML_ReadStrValue(node, L"synopsis");
+    xml_node settings_node = node.child(L"settings");
+    items.at(i).settings_keep_title = XML_ReadIntValue(settings_node, L"keep_title");
     i++;
   }
 
@@ -89,7 +91,8 @@ bool AnimeSeasonDatabase::Read(wstring file) {
 }
 
 bool AnimeSeasonDatabase::Save(wstring file, bool minimal) {
-  if (items.empty() || !modified) return false;
+  if (items.empty()) return false;
+  if (!modified && !minimal) return false;
   if (file_.empty() && file.empty()) return false;
 
   if (file.empty()) file = file_;
@@ -140,6 +143,11 @@ bool AnimeSeasonDatabase::Save(wstring file, bool minimal) {
       XML_WriteStrValue(anime_node, L"rank", it->rank.c_str());
       XML_WriteStrValue(anime_node, L"popularity", it->popularity.c_str());
       XML_WriteStrValue(anime_node, L"synopsis", it->synopsis.c_str());
+    }
+    if (it->settings_keep_title) {
+      xml_node settings_node = anime_node.append_child();
+      settings_node.set_name(L"settings");
+      XML_WriteIntValue(settings_node, L"keep_title", it->settings_keep_title);
     }
   }
 

@@ -145,8 +145,10 @@ bool MyAnimeList::ParseSearchResult(const wstring& data, Anime* anime) {
         anime_item = anime;
       }
       if (anime_item) {
-        anime_item->series_title = XML_ReadStrValue(entry, L"title");
-        MAL.DecodeText(anime_item->series_title);
+        if (!anime_item->settings_keep_title) {
+          anime_item->series_title = XML_ReadStrValue(entry, L"title");
+          MAL.DecodeText(anime_item->series_title);
+        }
         anime_item->series_synonyms = XML_ReadStrValue(entry, L"synonyms");
         MAL.DecodeText(anime_item->series_synonyms);
         anime_item->series_episodes = XML_ReadIntValue(entry, L"episodes");

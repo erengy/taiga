@@ -784,7 +784,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Season_Load(file)
   //   Loads season data.
   } else if (action == L"Season_Load") {
-    if (SeasonDatabase.Read(body)) {
+    if (SeasonDatabase.Load(body)) {
       SeasonDialog.RefreshData(false);
       SeasonDialog.RefreshList();
       SeasonDialog.RefreshStatus();

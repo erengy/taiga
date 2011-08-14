@@ -34,12 +34,12 @@ Theme::Theme() {
   Menus.SetImageList(ImgList16.GetHandle());
 }
 
-bool Theme::Read(const wstring& name) {
+bool Theme::Load(const wstring& name) {
   // Initialize
   folder_ = Taiga.GetDataPath() + L"Theme\\" + name + L"\\";
   file_ = folder_ + L"Theme.xml";
   
-  // Read XML file
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file_.c_str());
   if (result.status != status_ok) {

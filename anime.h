@@ -107,6 +107,7 @@ public:
   vector<bool> episode_available;
   wstring next_episode_path;
   wstring folder, synonyms;
+  int settings_keep_title;
 
 public:
   wstring genres, popularity, producers, rank, score, synopsis;

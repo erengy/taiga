@@ -30,7 +30,7 @@ public:
   MediaPlayers();
   virtual ~MediaPlayers() {}
 
-  BOOL Read();
+  BOOL Load();
   BOOL Save();
   int Check();
 

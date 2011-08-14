@@ -273,8 +273,8 @@ BOOL SettingsPage::OnInitDialog() {
       List.InsertColumn(0, 400, 400, 0, L"Name");
       List.InsertGroup(0, L"General filters", true, false);
       List.InsertGroup(1, L"Limited filters", true, false);
-      parent->feed_filters_.resize(Aggregator.FilterManager.Filters.size());
-      std::copy(Aggregator.FilterManager.Filters.begin(), Aggregator.FilterManager.Filters.end(), 
+      parent->feed_filters_.resize(Aggregator.filter_manager.filters.size());
+      std::copy(Aggregator.filter_manager.filters.begin(), Aggregator.filter_manager.filters.end(), 
         parent->feed_filters_.begin());
       parent->RefreshTorrentFilterList(List.GetWindowHandle());
       List.SetWindowHandle(nullptr);
@@ -395,9 +395,9 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           FeedFilterDialog.filter.Reset();
           ExecuteAction(L"TorrentAddFilter", TRUE, 
             reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
-          if (!FeedFilterDialog.filter.Conditions.empty()) {
-            if (FeedFilterDialog.filter.Name.empty()) {
-              FeedFilterDialog.filter.Name = Aggregator.FilterManager.CreateNameFromConditions(FeedFilterDialog.filter);
+          if (!FeedFilterDialog.filter.conditions.empty()) {
+            if (FeedFilterDialog.filter.name.empty()) {
+              FeedFilterDialog.filter.name = Aggregator.filter_manager.CreateNameFromConditions(FeedFilterDialog.filter);
             }
             parent->feed_filters_.push_back(FeedFilterDialog.filter);
             CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
@@ -556,7 +556,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             if (feed_filter) {
               FeedFilterDialog.filter = *feed_filter;
               FeedFilterDialog.Create(IDD_FEED_FILTER, parent->GetWindowHandle());
-              if (!FeedFilterDialog.filter.Conditions.empty()) {
+              if (!FeedFilterDialog.filter.conditions.empty()) {
                 *feed_filter = FeedFilterDialog.filter;
                 parent->RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
                 List.SetSelectedItem(lpnmitem->iItem);

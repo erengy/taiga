@@ -73,7 +73,7 @@ bool UpdateHelper::ParseData(wstring data, DWORD client_mode) {
   files.clear();
   update_available = false;
   
-  // Read XML data
+  // Load XML data
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
   if (result.status != status_ok) {

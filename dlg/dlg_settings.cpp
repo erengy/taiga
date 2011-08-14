@@ -248,12 +248,12 @@ void SettingsDialog::OnOK() {
   List.SetWindowHandle(pages[PAGE_TORRENT2].GetDlgItem(IDC_LIST_TORRENT_FILTER));
   for (int i = 0; i < List.GetItemCount(); i++) {
     FeedFilter* filter = reinterpret_cast<FeedFilter*>(List.GetItemParam(i));
-    if (filter) filter->Enabled = List.GetCheckState(i) == TRUE;
+    if (filter) filter->enabled = List.GetCheckState(i) == TRUE;
   }
   List.SetWindowHandle(nullptr);
-  Aggregator.FilterManager.Filters.clear();
+  Aggregator.filter_manager.filters.clear();
   for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it) {
-    Aggregator.FilterManager.Filters.push_back(*it);
+    Aggregator.filter_manager.filters.push_back(*it);
   }
 
   // Save settings
@@ -262,7 +262,7 @@ void SettingsDialog::OnOK() {
 
   // Change theme
   if (Settings.Program.General.theme != theme_old) {
-    UI.Read(Settings.Program.General.theme);
+    UI.Load(Settings.Program.General.theme);
     UI.LoadImages();
     MainDialog.rebar.RedrawWindow();
     MainDialog.RefreshMenubar();
@@ -270,7 +270,7 @@ void SettingsDialog::OnOK() {
 
   // Refresh other windows
   if (Settings.Account.MAL.user != mal_user_old) {
-    AnimeList.Read();
+    AnimeList.Load();
     CurrentEpisode.anime_id = ANIMEID_UNKNOWN;
     MainDialog.RefreshList(MAL_WATCHING);
     MainDialog.RefreshTabs(MAL_WATCHING);
@@ -385,18 +385,18 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
   wstring text;
   CListView List = hwnd_list;
   int index = List.GetItemCount();
-  int group = filter.AnimeIds.empty() ? 0 : 1;
+  int group = filter.anime_ids.empty() ? 0 : 1;
   int icon = ICON16_FUNNEL;
-  switch (filter.Action) {
+  switch (filter.action) {
     case FEED_FILTER_ACTION_DISCARD: icon = ICON16_FUNNEL_CROSS; break;
     case FEED_FILTER_ACTION_SELECT:  icon = ICON16_FUNNEL_TICK;  break;
     case FEED_FILTER_ACTION_PREFER:  icon = ICON16_FUNNEL_PLUS;  break;
   }
 
   // Insert item
-  index = List.InsertItem(index, group, icon, 0, nullptr, filter.Name.c_str(), 
+  index = List.InsertItem(index, group, icon, 0, nullptr, filter.name.c_str(), 
     reinterpret_cast<LPARAM>(&filter));
-  List.SetCheckState(index, filter.Enabled);
+  List.SetCheckState(index, filter.enabled);
   
   List.SetWindowHandle(nullptr);
   return index;

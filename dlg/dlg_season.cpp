@@ -140,6 +140,10 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 BOOL SeasonDialog::OnDestroy() {
   // Save database
   SeasonDatabase.Save();
+#ifdef _DEBUG
+  // Save minimal info for release
+  SeasonDatabase.Save(L"", true);
+#endif
   
   // Free some memory
   images.clear();
@@ -251,11 +255,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
       if (lpnmitem->iItem == -1) break;
       Anime* anime = reinterpret_cast<Anime*>(list_.GetItemParam(lpnmitem->iItem));
-      if (anime) {
-        Anime* anime_onlist = AnimeList.FindItem(anime->series_id);
-        ExecuteAction(L"Info", 0, reinterpret_cast<LPARAM>(
-          anime_onlist ? anime_onlist : anime));
-      }
+      if (anime) MAL.ViewAnimePage(anime->series_id);
       break;
     }
 

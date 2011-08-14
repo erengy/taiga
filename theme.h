@@ -79,7 +79,7 @@ public:
   ~Theme() {}
   
   bool LoadImages();
-  bool Read(const wstring& name);
+  bool Load(const wstring& name);
 
 public:
   CMenuList Menus;

@@ -30,7 +30,7 @@ public:
   AnimeSeasonDatabase();
   virtual ~AnimeSeasonDatabase() {}
 
-  bool Read(wstring file);
+  bool Load(wstring file);
   bool Save(wstring file = L"", bool minimal = false);
 
 public:

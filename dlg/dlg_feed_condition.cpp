@@ -40,7 +40,7 @@ FeedConditionDialog::~FeedConditionDialog() {
 
 BOOL FeedConditionDialog::OnInitDialog() {
   // Set title
-  if (condition.Element != 0 || condition.Operator != 0 || !condition.Value.empty()) {
+  if (condition.element != 0 || condition.op != 0 || !condition.value.empty()) {
     SetText(L"Edit Condition");
   }
 
@@ -51,19 +51,19 @@ BOOL FeedConditionDialog::OnInitDialog() {
 
   // Add elements
   for (int i = 0; i < FEED_FILTER_ELEMENT_COUNT; i++) {
-    element_combo_.AddString(Aggregator.FilterManager.TranslateElement(i).c_str());
+    element_combo_.AddString(Aggregator.filter_manager.TranslateElement(i).c_str());
   }
   
   // Choose
-  element_combo_.SetCurSel(condition.Element);
-  ChooseElement(condition.Element);
-  operator_combo_.SetCurSel(condition.Operator);
-  switch (condition.Element) {
+  element_combo_.SetCurSel(condition.element);
+  ChooseElement(condition.element);
+  operator_combo_.SetCurSel(condition.op);
+  switch (condition.element) {
     case FEED_FILTER_ELEMENT_ANIME_ID: {
       value_combo_.SetCurSel(0);
       for (int i = 0; i < value_combo_.GetCount(); i++) {
         Anime* anime = reinterpret_cast<Anime*>(value_combo_.GetItemData(i));
-        if (anime && anime->series_id == ToINT(condition.Value)) {
+        if (anime && anime->series_id == ToINT(condition.value)) {
           value_combo_.SetCurSel(i);
           break;
         }
@@ -71,19 +71,19 @@ BOOL FeedConditionDialog::OnInitDialog() {
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS: {
-      int value = ToINT(condition.Value);
+      int value = ToINT(condition.value);
       if (value == 6) value--;
       value_combo_.SetCurSel(value);
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      value_combo_.SetCurSel(ToINT(condition.Value) - 1);
+      value_combo_.SetCurSel(ToINT(condition.value) - 1);
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
-      value_combo_.SetCurSel(condition.Value == L"True" ? 1 : 0);
+      value_combo_.SetCurSel(condition.value == L"True" ? 1 : 0);
       break;
     default:
-      value_combo_.SetText(condition.Value);
+      value_combo_.SetText(condition.value);
   }
 
   return TRUE;
@@ -102,9 +102,9 @@ INT_PTR FeedConditionDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 void FeedConditionDialog::OnCancel() {
   // Clear data
-  condition.Element = -1;
-  condition.Operator = -1;
-  condition.Value = L"";
+  condition.element = -1;
+  condition.op = -1;
+  condition.value = L"";
 
   // Exit
   EndDialog(IDCANCEL);
@@ -112,24 +112,24 @@ void FeedConditionDialog::OnCancel() {
 
 void FeedConditionDialog::OnOK() {
   // Set values
-  condition.Element = element_combo_.GetCurSel();
-  condition.Operator = operator_combo_.GetCurSel();
-  switch (condition.Element) {
+  condition.element = element_combo_.GetCurSel();
+  condition.op = operator_combo_.GetCurSel();
+  switch (condition.element) {
     case FEED_FILTER_ELEMENT_ANIME_ID: {
       Anime* anime = reinterpret_cast<Anime*>(value_combo_.GetItemData(value_combo_.GetCurSel()));
       if (anime) {
-        condition.Value = ToWSTR(anime->series_id);
+        condition.value = ToWSTR(anime->series_id);
       } else {
-        condition.Value = L"";
+        condition.value = L"";
       }
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      condition.Value = ToWSTR(value_combo_.GetItemData(value_combo_.GetCurSel()));
+      condition.value = ToWSTR(value_combo_.GetItemData(value_combo_.GetCurSel()));
       break;
     default:
-      value_combo_.GetText(condition.Value);
+      value_combo_.GetText(condition.value);
   }
 
   // Exit
@@ -176,7 +176,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   operator_combo_.ResetContent();
 
   #define ADD_OPERATOR(op) \
-    operator_combo_.AddString(Aggregator.FilterManager.TranslateOperator(op).c_str())
+    operator_combo_.AddString(Aggregator.filter_manager.TranslateOperator(op).c_str())
 
   switch (element_index) {
     case FEED_FILTER_ELEMENT_ANIME_ID:

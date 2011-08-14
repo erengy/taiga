@@ -48,7 +48,7 @@ enum ListProgressMode {
 
 class Settings {
 public:
-  bool Read();
+  bool Load();
   bool Save();
 
 public:

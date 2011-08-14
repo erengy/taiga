@@ -35,116 +35,116 @@ class Aggregator Aggregator;
 // =============================================================================
 
 Feed::Feed() : 
-  Category(0), DownloadIndex(-1), Ticker(0), m_hIcon(NULL)
+  category(0), download_index(-1), ticker(0), icon_(nullptr)
 {
 }
 
 Feed::~Feed() {
-  if (m_hIcon) {
-    DestroyIcon(m_hIcon);
-    m_hIcon = NULL;
+  if (icon_) {
+    DestroyIcon(icon_);
+    icon_ = nullptr;
   }
 }
 
 bool Feed::Check(const wstring& source) {
   // Reset ticker before checking the source so we don't fall into a loop
-  Ticker = 0;
+  ticker = 0;
   if (source.empty()) return false;
-  Link = source;
+  link = source;
   
-  switch (Category) {
+  switch (category) {
     case FEED_CATEGORY_LINK:
       // Disable torrent dialog input
       TorrentDialog.EnableInput(false);
       break;
   }
   
-  CUrl url(Link);
-  return Client.Get(url, GetDataPath() + L"feed.xml", 
+  CUrl url(link);
+  return client.Get(url, GetDataPath() + L"feed.xml", 
     HTTP_Feed_Check, reinterpret_cast<LPARAM>(this));
 }
 
 bool Feed::Download(int index) {
-  if (Category != FEED_CATEGORY_LINK) {
+  if (category != FEED_CATEGORY_LINK) {
     DEBUG_PRINT(L"Feed::Download - How did we end up here?\n");
     return false;
   }
   
   DWORD dwMode = HTTP_Feed_Download;
   if (index == -1) {
-    for (size_t i = 0; i < Items.size(); i++) {
-      if (Items[i].Download) {
+    for (size_t i = 0; i < items.size(); i++) {
+      if (items[i].download) {
         dwMode = HTTP_Feed_DownloadAll;
         index = i;
         break;
       }
     }
   }
-  if (index < 0 || index > static_cast<int>(Items.size())) return false;
-  DownloadIndex = index;
+  if (index < 0 || index > static_cast<int>(items.size())) return false;
+  download_index = index;
 
-  TorrentDialog.ChangeStatus(L"Downloading \"" + Items[index].Title + L"\"...");
+  TorrentDialog.ChangeStatus(L"Downloading \"" + items[index].title + L"\"...");
   TorrentDialog.EnableInput(false);
   
-  wstring file = Items[index].Title + L".torrent";
+  wstring file = items[index].title + L".torrent";
   ValidateFileName(file);
   file = GetDataPath() + file;
   
-  CUrl url(Items[index].Link);
-  return Client.Get(url, file, dwMode, reinterpret_cast<LPARAM>(this));
+  CUrl url(items[index].link);
+  return client.Get(url, file, dwMode, reinterpret_cast<LPARAM>(this));
 }
 
 int Feed::ExamineData() {
   // Examine title and compare with anime list items
-  for (size_t i = 0; i < Items.size(); i++) {
-    Meow.ExamineTitle(Items[i].Title, Items[i].EpisodeData, true, true, true, true, false);
+  for (size_t i = 0; i < items.size(); i++) {
+    Meow.ExamineTitle(items[i].title, items[i].episode_data, true, true, true, true, false);
     for (int j = AnimeList.count; j > 0; j--) {
-      if (Meow.CompareEpisode(Items[i].EpisodeData, AnimeList.items[j])) {
-        Items[i].EpisodeData.anime_id = AnimeList.items[j].series_id;
+      if (Meow.CompareEpisode(items[i].episode_data, AnimeList.items[j])) {
+        items[i].episode_data.anime_id = AnimeList.items[j].series_id;
         break;
       }
     }
   }
 
   // Filter
-  int count = Aggregator.FilterManager.Filter(*this);
+  int count = Aggregator.filter_manager.Filter(*this);
   return count;
 }
 
 wstring Feed::GetDataPath() {
   wstring path = Taiga.GetDataPath() + L"Feed\\";
-  if (!Link.empty()) {
-    CUrl url(Link);
+  if (!link.empty()) {
+    CUrl url(link);
     path += Base64Encode(url.Host, true) + L"\\";
   }
   return path;
 }
 
 HICON Feed::GetIcon() {
-  if (Link.empty()) return NULL;
-  if (m_hIcon) {
-    DestroyIcon(m_hIcon);
-    m_hIcon = NULL;
+  if (link.empty()) return NULL;
+  if (icon_) {
+    DestroyIcon(icon_);
+    icon_ = nullptr;
   }
 
   wstring path = GetDataPath() + L"favicon.ico";
 
   if (FileExists(path)) {
-    m_hIcon = GdiPlus.LoadIcon(path);
-    return m_hIcon;
+    icon_ = GdiPlus.LoadIcon(path);
+    return icon_;
   } else {
-    CUrl url(Link + L"/favicon.ico");
-    Client.Get(url, path, HTTP_Feed_DownloadIcon, reinterpret_cast<LPARAM>(this));
+    CUrl url(link + L"/favicon.ico");
+    client.Get(url, path, HTTP_Feed_DownloadIcon, reinterpret_cast<LPARAM>(this));
     return NULL;
   }
 }
 
-bool Feed::Read() {
+bool Feed::Load() {
   // Initialize
   wstring file = GetDataPath() + L"feed.xml";
-  Items.clear();
+  items.clear();
 
-  // Read XML file
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok) {
@@ -153,42 +153,42 @@ bool Feed::Read() {
 
   // Read channel information
   xml_node channel = doc.child(L"rss").child(L"channel");
-  Title = XML_ReadStrValue(channel, L"title");
-  Link = XML_ReadStrValue(channel, L"link");
-  Description = XML_ReadStrValue(channel, L"description");
+  title = XML_ReadStrValue(channel, L"title");
+  link = XML_ReadStrValue(channel, L"link");
+  description = XML_ReadStrValue(channel, L"description");
 
   // Read items
   for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
     // Read data
-    Items.resize(Items.size() + 1);
-    Items.back().Index = Items.size() - 1;
-    Items.back().Category = XML_ReadStrValue(item, L"category");
-    Items.back().Title = XML_ReadStrValue(item, L"title");
-    Items.back().Link = XML_ReadStrValue(item, L"link");
-    Items.back().Description = XML_ReadStrValue(item, L"description");
+    items.resize(items.size() + 1);
+    items.back().index = items.size() - 1;
+    items.back().category = XML_ReadStrValue(item, L"category");
+    items.back().title = XML_ReadStrValue(item, L"title");
+    items.back().link = XML_ReadStrValue(item, L"link");
+    items.back().description = XML_ReadStrValue(item, L"description");
     
     // Remove if title or link is empty
-    if (Category == FEED_CATEGORY_LINK) {
-      if (Items.back().Title.empty() || Items.back().Link.empty()) {
-        Items.pop_back();
+    if (category == FEED_CATEGORY_LINK) {
+      if (items.back().title.empty() || items.back().link.empty()) {
+        items.pop_back();
         continue;
       }
     }
     
     // Clean up title
-    DecodeHTML(Items.back().Title);
-    Replace(Items.back().Title, L"\\'", L"'");
+    DecodeHTML(items.back().title);
+    Replace(items.back().title, L"\\'", L"'");
     // Clean up description
-    DecodeHTML(Items.back().Description);
-    Replace(Items.back().Description, L"<br/>", L"\n");
-    Replace(Items.back().Description, L"<br />", L"\n");
-    StripHTML(Items.back().Description);
-    Trim(Items.back().Description, L" \n");
-    Aggregator.ParseDescription(Items.back(), Link);
-    Replace(Items.back().Description, L"\n", L" | ");
+    DecodeHTML(items.back().description);
+    Replace(items.back().description, L"<br/>", L"\n");
+    Replace(items.back().description, L"<br />", L"\n");
+    StripHTML(items.back().description);
+    Trim(items.back().description, L" \n");
+    Aggregator.ParseDescription(items.back(), link);
+    Replace(items.back().description, L"\n", L" | ");
     // Get download link
-    if (InStr(Items.back().Link, L"nyaatorrents", 0, true) > -1) {
-      Replace(Items.back().Link, L"torrentinfo", L"download");
+    if (InStr(items.back().link, L"nyaatorrents", 0, true) > -1) {
+      Replace(items.back().link, L"torrentinfo", L"download");
     }
   }
 
@@ -199,24 +199,24 @@ bool Feed::Read() {
 
 Aggregator::Aggregator() {
   // Add torrent feed
-  Feeds.resize(Feeds.size() + 1);
-  Feeds.back().Category = FEED_CATEGORY_LINK;
+  feeds.resize(feeds.size() + 1);
+  feeds.back().category = FEED_CATEGORY_LINK;
 }
 
 Feed* Aggregator::Get(int category) {
-  for (unsigned int i = 0; i < Feeds.size(); i++) {
-    if (Feeds[i].Category == category) return &Feeds[i];
+  for (unsigned int i = 0; i < feeds.size(); i++) {
+    if (feeds[i].category == category) return &feeds[i];
   }
-  return NULL;
+  return nullptr;
 }
 
 bool Aggregator::Notify(const Feed& feed) {
   wstring tip_text, tip_title;
 
-  for (size_t i = 0; i < feed.Items.size(); i++) {
-    if (feed.Items[i].Download) {
+  for (size_t i = 0; i < feed.items.size(); i++) {
+    if (feed.items[i].download) {
       tip_text += L"\u00BB " + ReplaceVariables(L"%title%$if(%episode%, #%episode%)\n", 
-        feed.Items[i].EpisodeData);
+        feed.items[i].episode_data);
     }
   }
 
@@ -234,8 +234,8 @@ bool Aggregator::Notify(const Feed& feed) {
 }
 
 bool Aggregator::SearchArchive(const wstring& file) {
-  for (size_t i = 0; i < FileArchive.size(); i++) {
-    if (FileArchive[i] == file) return true;
+  for (size_t i = 0; i < file_archive.size(); i++) {
+    if (file_archive[i] == file) return true;
   }
   return false;
 }
@@ -245,42 +245,42 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
   if (InStr(source, L"animesuki", 0, true) > -1) {
     wstring size_str = L"Filesize: ";
     vector<wstring> description_vector;
-    Split(feed_item.Description, L"\n", description_vector);
+    Split(feed_item.description, L"\n", description_vector);
     if (description_vector.size() > 2) {
-      feed_item.EpisodeData.FileSize = description_vector[2].substr(size_str.length());
+      feed_item.episode_data.file_size = description_vector[2].substr(size_str.length());
     }
     if (description_vector.size() > 1) {
-      feed_item.Description = description_vector[0] + L" " + description_vector[1];
+      feed_item.description = description_vector[0] + L" " + description_vector[1];
       return;
     }
-    feed_item.Description.clear();
+    feed_item.description.clear();
 
   // Baka-Updates
   } else if (InStr(source, L"baka-updates", 0, true) > -1) {
-    int index_begin = 0, index_end = feed_item.Description.length();
-    index_begin = InStr(feed_item.Description, L"Released on");
+    int index_begin = 0, index_end = feed_item.description.length();
+    index_begin = InStr(feed_item.description, L"Released on");
     if (index_begin > -1) index_end -= index_begin;
     if (index_begin == -1) index_begin = 0;
-    feed_item.Description = feed_item.Description.substr(index_begin, index_end);
+    feed_item.description = feed_item.description.substr(index_begin, index_end);
 
   // NyaaTorrents
   } else if (InStr(source, L"nyaatorrents", 0, true) > -1) {
-    Erase(feed_item.Description, L"None\n");
-    Replace(feed_item.Description, L"\n\n", L"\n", true);
+    Erase(feed_item.description, L"None\n");
+    Replace(feed_item.description, L"\n\n", L"\n", true);
 
   // TokyoTosho
   } else if (InStr(source, L"tokyotosho", 0, true) > -1) {
     wstring size_str = L"Size: ", comment_str = L"Comment: ";
     vector<wstring> description_vector;
-    Split(feed_item.Description, L"\n", description_vector);
+    Split(feed_item.description, L"\n", description_vector);
     if (description_vector.size() > 1) {
-      feed_item.EpisodeData.FileSize = description_vector[1].substr(size_str.length());
+      feed_item.episode_data.file_size = description_vector[1].substr(size_str.length());
     }
     if (description_vector.size() > 2) {
-      feed_item.Description = description_vector[2].substr(comment_str.length());
+      feed_item.description = description_vector[2].substr(comment_str.length());
       return;
     }
-    feed_item.Description.clear();
+    feed_item.description.clear();
   }
 }
 
@@ -288,22 +288,22 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
 
 bool Aggregator::CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2) {
   // Check for guid element first
-  if (item1.IsPermaLink && item2.IsPermaLink) {
-    if (!item1.GUID.empty() || !item2.GUID.empty()) {
-      if (item1.GUID == item2.GUID) return true;
+  if (item1.is_permalink && item2.is_permalink) {
+    if (!item1.guid.empty() || !item2.guid.empty()) {
+      if (item1.guid == item2.guid) return true;
     }
   }
 
   // Fallback to link element
-  if (!item1.Link.empty() || !item2.Link.empty()) {
-    if (item1.Link == item2.Link) return true;
+  if (!item1.link.empty() || !item2.link.empty()) {
+    if (item1.link == item2.link) return true;
   }
 
   // Fallback to title element
-  if (!item1.Title.empty() || !item2.Title.empty()) {
-    if (item1.Title == item2.Title) return true;
+  if (!item1.title.empty() || !item2.title.empty()) {
+    if (item1.title == item2.title) return true;
   }
 
-  // Items are different
+  // items are different
   return false;
 }

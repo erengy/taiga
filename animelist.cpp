@@ -49,14 +49,14 @@ void AnimeList::Clear() {
 
 // =============================================================================
 
-bool AnimeList::Read() {
+bool AnimeList::Load() {
   // Initialize
   Clear();
   user.Clear();
   if (Settings.Account.MAL.user.empty()) return false;
   wstring file = Taiga.GetDataPath() + Settings.Account.MAL.user + L".xml";
   
-  // Read XML file
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok && result.status != status_file_not_found) {
@@ -125,7 +125,7 @@ bool AnimeList::Save(int anime_id, wstring child, wstring value, int mode) {
   // Initialize
   wstring file = Taiga.GetDataPath() + Settings.Account.MAL.user + L".xml";
   
-  // Read XML file
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok) return false;

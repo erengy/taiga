@@ -237,7 +237,7 @@ BOOL HttpClient::OnReadComplete() {
     // List
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin: {
-      AnimeList.Read();
+      AnimeList.Load();
       MainDialog.ChangeStatus(L"List download completed.");
       MainDialog.RefreshList(MAL_WATCHING);
       MainDialog.RefreshTabs(MAL_WATCHING);
@@ -430,7 +430,7 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_Feed_Check: {
       Feed* feed = reinterpret_cast<Feed*>(GetParam());
       if (feed) {
-        feed->Read();
+        feed->Load();
         int torrent_count = feed->ExamineData();
         if (torrent_count > 0) {
           status = L"There are new torrents available!";
@@ -461,11 +461,11 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_Feed_DownloadAll: {
       Feed* feed = reinterpret_cast<Feed*>(GetParam());
       if (feed) {
-        FeedItem* feed_item = reinterpret_cast<FeedItem*>(&feed->Items[feed->DownloadIndex]);
-        wstring app_path, cmd, file = feed_item->Title;
+        FeedItem* feed_item = reinterpret_cast<FeedItem*>(&feed->items[feed->download_index]);
+        wstring app_path, cmd, file = feed_item->title;
         ValidateFileName(file);
         file = feed->GetDataPath() + file + L".torrent";
-        Aggregator.FileArchive.push_back(feed_item->Title);
+        Aggregator.file_archive.push_back(feed_item->title);
         if (FileExists(file)) {
           switch (Settings.RSS.Torrent.new_action) {
             // Default application
@@ -478,17 +478,17 @@ BOOL HttpClient::OnReadComplete() {
               break;
           }
           if (Settings.RSS.Torrent.set_folder && InStr(app_path, L"utorrent", 0, true) > -1) {
-            Anime* anime = AnimeList.FindItem(feed_item->EpisodeData.anime_id);
+            Anime* anime = AnimeList.FindItem(feed_item->episode_data.anime_id);
             if (anime && !anime->folder.empty()) {
               cmd = L"/directory \"" + anime->folder + L"\" ";
             }
           }
           cmd += L"\"" + file + L"\"";
           Execute(app_path, cmd);
-          feed_item->Download = FALSE;
+          feed_item->download = FALSE;
           TorrentDialog.RefreshList();
         }
-        feed->DownloadIndex = -1;
+        feed->download_index = -1;
         if (GetClientMode() == HTTP_Feed_DownloadAll) {
           if (feed->Download(-1)) return TRUE;
         }
@@ -598,8 +598,8 @@ void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) 
   SET_PROXY(SearchClient);
   SET_PROXY(TwitterClient);
   SET_PROXY(VersionClient);
-  for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
-    SET_PROXY(Aggregator.Feeds[i].Client);
+  for (unsigned int i = 0; i < Aggregator.feeds.size(); i++) {
+    SET_PROXY(Aggregator.feeds[i].client);
   }
   SET_PROXY(Taiga.Updater.client);
   #undef SET_PROXY

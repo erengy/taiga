@@ -27,29 +27,28 @@
 
 class GenericFeedItem {
 public:
-  GenericFeedItem() : IsPermaLink(true) {}
+  GenericFeedItem() : is_permalink(true) {}
   virtual ~GenericFeedItem() {}
 
-  wstring Title, Link, Description,
-    Author, Category, Comments, Enclosure, GUID, PubDate, Source;
-  bool IsPermaLink;
+  wstring title, link, description,
+    author, category, comments, enclosure, guid, pub_date, source;
+  bool is_permalink;
 };
 
 class FeedItem : public GenericFeedItem {
 public:
-  FeedItem() : Download(true) {}
+  FeedItem() : download(true) {}
   virtual ~FeedItem() {};
 
-  int Index;
-  bool Download;
+  bool download;
+  int index;
   
-  class CEpisodeData : public Episode {
+  class EpisodeData : public Episode {
   public:
-    CEpisodeData() : NewEpisode(false) {}
-    virtual ~CEpisodeData() {}
-    wstring FileSize;
-    bool NewEpisode;
-  } EpisodeData;
+    EpisodeData() : new_episode(false) {}
+    wstring file_size;
+    bool new_episode;
+  } episode_data;
 };
 
 // =============================================================================
@@ -72,7 +71,7 @@ enum TorrentCategory {
 class GenericFeed {
 public:
   // Required channel elements
-  wstring Title, Link, Description;
+  wstring title, link, description;
 
   // Optional channel elements
   // (see www.rssboard.org/rss-specification for more information)
@@ -83,7 +82,7 @@ public:
   */
   
   // Feed items
-  vector<FeedItem> Items;
+  vector<FeedItem> items;
 };
 
 class Feed : public GenericFeed {
@@ -96,14 +95,15 @@ public:
   int ExamineData();
   wstring GetDataPath();
   HICON GetIcon();
-  bool Read();
+  bool Load();
 
-  int Category, DownloadIndex, Ticker;
-  wstring Title, Link;
-  class HttpClient Client;
+public:
+  int category, download_index, ticker;
+  wstring title, link;
+  class HttpClient client;
 
 private:
-  HICON m_hIcon;
+  HICON icon_;
 };
 
 // =============================================================================
@@ -145,15 +145,16 @@ enum FeedFilterMatch {
 
 class FeedFilterCondition {
 public:
-  FeedFilterCondition() : Element(0), Operator(0) {}
+  FeedFilterCondition() : element(0), op(0) {}
   virtual ~FeedFilterCondition() {}
   FeedFilterCondition& operator=(const FeedFilterCondition& condition);
 
   void Reset();
 
-  int Element;
-  int Operator;
-  wstring Value;
+public:
+  int element;
+  int op;
+  wstring value;
 };
 
 enum FeedFilterAction {
@@ -164,7 +165,7 @@ enum FeedFilterAction {
 
 class FeedFilter {
 public:
-  FeedFilter() : Action(0), Enabled(true), Match(FEED_FILTER_MATCH_ALL) {}
+  FeedFilter() : action(0), enabled(true), match(FEED_FILTER_MATCH_ALL) {}
   virtual ~FeedFilter() {}
   FeedFilter& operator=(const FeedFilter& filter);
 
@@ -172,19 +173,20 @@ public:
   bool Filter(Feed& feed, FeedItem& item, bool recursive);
   void Reset();
 
-  wstring Name;
-  bool Enabled;
-  int Action, Match;
-  vector<int> AnimeIds;
-  vector<FeedFilterCondition> Conditions;
+public:
+  wstring name;
+  bool enabled;
+  int action, match;
+  vector<int> anime_ids;
+  vector<FeedFilterCondition> conditions;
 };
 
 class FeedFilterPreset {
 public:
-  FeedFilterPreset() : Default(false) {}
-  bool Default;
-  wstring Description;
-  FeedFilter Filter;
+  FeedFilterPreset() : is_default(false) {}
+  wstring description;
+  FeedFilter filter;
+  bool is_default;
 };
 
 class FeedFilterManager {
@@ -206,8 +208,9 @@ public:
   wstring TranslateMatching(int match);
   wstring TranslateAction(int action);
   
-  vector<FeedFilter> Filters;
-  vector<FeedFilterPreset> Presets;
+public:
+  vector<FeedFilter> filters;
+  vector<FeedFilterPreset> presets;
 };
 
 // =============================================================================
@@ -223,12 +226,13 @@ public:
   bool SearchArchive(const wstring& file);
   void ParseDescription(FeedItem& feed_item, const wstring& source);
 
-  vector<Feed> Feeds;
-  vector<wstring> FileArchive;
-  FeedFilterManager FilterManager;
-
 private:
   bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
+
+public:
+  vector<Feed> feeds;
+  vector<wstring> file_archive;
+  FeedFilterManager filter_manager;
 };
 
 extern Aggregator Aggregator;

@@ -35,13 +35,13 @@ MediaPlayers::MediaPlayers() :
 {
 }
 
-BOOL MediaPlayers::Read() {
+BOOL MediaPlayers::Load() {
   // Initialize
   wstring file = Taiga.GetDataPath() + L"Media.xml";
   Items.clear();
   Index = -1;
   
-  // Read XML file
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok) {

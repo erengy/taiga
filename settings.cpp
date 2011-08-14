@@ -41,13 +41,13 @@ class Settings Settings;
 
 // =============================================================================
 
-bool Settings::Read() {
+bool Settings::Load() {
   // Initialize
   folder_ = Taiga.GetDataPath();
   file_ = folder_ + L"Settings.xml";
   CreateDirectory(folder_.c_str(), NULL);
   
-  // Read XML file
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file_.c_str());
   
@@ -187,32 +187,32 @@ bool Settings::Read() {
       // Filters
       xml_node filter = torrent.child(L"filter");
       RSS.Torrent.Filters.global_enabled = filter.attribute(L"enabled").as_int(TRUE);
-      Aggregator.FilterManager.Filters.clear();
+      Aggregator.filter_manager.filters.clear();
       for (xml_node item = filter.child(L"item"); item; item = item.next_sibling(L"item")) {
-        Aggregator.FilterManager.AddFilter(
+        Aggregator.filter_manager.AddFilter(
           item.attribute(L"action").as_int(), 
           item.attribute(L"match").as_int(), 
           item.attribute(L"enabled").as_bool(), 
           item.attribute(L"name").value());
         for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
-          Aggregator.FilterManager.Filters.back().AnimeIds.push_back(anime.attribute(L"id").as_int());
+          Aggregator.filter_manager.filters.back().anime_ids.push_back(anime.attribute(L"id").as_int());
         }
         for (xml_node condition = item.child(L"condition"); condition; condition = condition.next_sibling(L"condition")) {
-          Aggregator.FilterManager.Filters.back().AddCondition(
+          Aggregator.filter_manager.filters.back().AddCondition(
             condition.attribute(L"element").as_int(), 
             condition.attribute(L"op").as_int(), 
             condition.attribute(L"value").value());
         }
       }
-      if (Aggregator.FilterManager.Filters.empty()) {
-        Aggregator.FilterManager.AddPresets();
+      if (Aggregator.filter_manager.filters.empty()) {
+        Aggregator.filter_manager.AddPresets();
       }
       // Torrent source
       Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-      if (feed) feed->Link = RSS.Torrent.source;
+      if (feed) feed->link = RSS.Torrent.source;
       // File archive
-      Aggregator.FileArchive.clear();
-      PopulateFiles(Aggregator.FileArchive, Taiga.GetDataPath() + L"Feed\\", L"torrent", true, true);
+      Aggregator.file_archive.clear();
+      PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"Feed\\", L"torrent", true, true);
     
   // Events
   EventQueue.list.clear();
@@ -419,24 +419,24 @@ bool Settings::Save() {
       xml_node torrent_filter = torrent.append_child();
       torrent_filter.set_name(L"filter");
       torrent_filter.append_attribute(L"enabled") = RSS.Torrent.Filters.global_enabled;
-      for (auto it = Aggregator.FilterManager.Filters.begin(); it != Aggregator.FilterManager.Filters.end(); ++it) {
+      for (auto it = Aggregator.filter_manager.filters.begin(); it != Aggregator.filter_manager.filters.end(); ++it) {
         xml_node item = torrent_filter.append_child();
         item.set_name(L"item");
-        item.append_attribute(L"action") = it->Action;
-        item.append_attribute(L"match") = it->Match;
-        item.append_attribute(L"enabled") = it->Enabled;
-        item.append_attribute(L"name") = it->Name.c_str();
-        for (auto ita = it->AnimeIds.begin(); ita != it->AnimeIds.end(); ++ita) {
+        item.append_attribute(L"action") = it->action;
+        item.append_attribute(L"match") = it->match;
+        item.append_attribute(L"enabled") = it->enabled;
+        item.append_attribute(L"name") = it->name.c_str();
+        for (auto ita = it->anime_ids.begin(); ita != it->anime_ids.end(); ++ita) {
           xml_node anime = item.append_child();
           anime.set_name(L"anime");
           anime.append_attribute(L"id") = *ita;
         }
-        for (auto itc = it->Conditions.begin(); itc != it->Conditions.end(); ++itc) {
+        for (auto itc = it->conditions.begin(); itc != it->conditions.end(); ++itc) {
           xml_node condition = item.append_child();
           condition.set_name(L"condition");
-          condition.append_attribute(L"element") = itc->Element;
-          condition.append_attribute(L"op") = itc->Operator;
-          condition.append_attribute(L"value") = itc->Value.c_str();
+          condition.append_attribute(L"element") = itc->element;
+          condition.append_attribute(L"op") = itc->op;
+          condition.append_attribute(L"value") = itc->value.c_str();
         }
       }
   

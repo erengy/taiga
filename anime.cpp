@@ -72,7 +72,7 @@ MalAnime::MalAnime() :
 }
 
 Anime::Anime() : 
-  index(0), new_episode_available(false), playing(false)
+  index(0), new_episode_available(false), playing(false), settings_keep_title(FALSE)
 {
 }
 
@@ -588,15 +588,15 @@ bool Anime::Edit(EventItem& item, const wstring& data, int status_code) {
 
 bool Anime::GetFansubFilter(vector<wstring>& groups) {
   bool found = false;
-  for (auto i = Aggregator.FilterManager.Filters.begin(); 
-       i != Aggregator.FilterManager.Filters.end(); ++i) {
+  for (auto i = Aggregator.filter_manager.filters.begin(); 
+       i != Aggregator.filter_manager.filters.end(); ++i) {
     if (found) break;
-    for (auto j = i->AnimeIds.begin(); j != i->AnimeIds.end(); ++j) {
+    for (auto j = i->anime_ids.begin(); j != i->anime_ids.end(); ++j) {
       if (*j != series_id) continue;
       if (found) break;
-      for (auto k = i->Conditions.begin(); k != i->Conditions.end(); ++k) {
-        if (k->Element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
-        groups.push_back(k->Value);
+      for (auto k = i->conditions.begin(); k != i->conditions.end(); ++k) {
+        if (k->element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
+        groups.push_back(k->value);
         found = true;
       }
     }
@@ -607,13 +607,13 @@ bool Anime::GetFansubFilter(vector<wstring>& groups) {
 bool Anime::SetFansubFilter(const wstring& group_name) {
   FeedFilter* filter = nullptr;
 
-  for (auto i = Aggregator.FilterManager.Filters.begin(); 
-       i != Aggregator.FilterManager.Filters.end(); ++i) {
+  for (auto i = Aggregator.filter_manager.filters.begin(); 
+       i != Aggregator.filter_manager.filters.end(); ++i) {
     if (filter) break;
-    for (auto j = i->AnimeIds.begin(); j != i->AnimeIds.end(); ++j) {
+    for (auto j = i->anime_ids.begin(); j != i->anime_ids.end(); ++j) {
       if (*j != series_id) continue;
-      for (auto k = i->Conditions.begin(); k != i->Conditions.end(); ++k) {
-        if (k->Element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
+      for (auto k = i->conditions.begin(); k != i->conditions.end(); ++k) {
+        if (k->element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
         filter = &(*i); break;
       }
     }
@@ -623,21 +623,21 @@ bool Anime::SetFansubFilter(const wstring& group_name) {
     FeedFilterDialog.filter = *filter;
   } else {
     FeedFilterDialog.filter.Reset();
-    FeedFilterDialog.filter.Name = L"[Fansub] " + series_title;
-    FeedFilterDialog.filter.Match = FEED_FILTER_MATCH_ANY;
-    FeedFilterDialog.filter.Action = FEED_FILTER_ACTION_SELECT;
-    FeedFilterDialog.filter.AnimeIds.push_back(series_id);
+    FeedFilterDialog.filter.name = L"[Fansub] " + series_title;
+    FeedFilterDialog.filter.match = FEED_FILTER_MATCH_ANY;
+    FeedFilterDialog.filter.action = FEED_FILTER_ACTION_SELECT;
+    FeedFilterDialog.filter.anime_ids.push_back(series_id);
     FeedFilterDialog.filter.AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, 
       FEED_FILTER_OPERATOR_IS, group_name);
   }
 
   ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(g_hMain));
   
-  if (!FeedFilterDialog.filter.Conditions.empty()) {
+  if (!FeedFilterDialog.filter.conditions.empty()) {
     if (filter) {
       *filter = FeedFilterDialog.filter;
     } else {
-      Aggregator.FilterManager.Filters.push_back(FeedFilterDialog.filter);
+      Aggregator.filter_manager.filters.push_back(FeedFilterDialog.filter);
     }
     return true;
   } else {

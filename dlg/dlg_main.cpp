@@ -540,17 +540,17 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   // ===========================================================================
 
   // Check feeds
-  for (unsigned int i = 0; i < Aggregator.Feeds.size(); i++) {
-    Aggregator.Feeds[i].Ticker++;
-    switch (Aggregator.Feeds[i].Category) {
+  for (unsigned int i = 0; i < Aggregator.feeds.size(); i++) {
+    Aggregator.feeds[i].ticker++;
+    switch (Aggregator.feeds[i].category) {
       case FEED_CATEGORY_LINK:
         if (Settings.RSS.Torrent.check_enabled && Settings.RSS.Torrent.check_interval) {
           if (TorrentDialog.IsWindow()) {
             TorrentDialog.SetTimerText(L"Check new torrents [" + 
-              ToTimeString(Settings.RSS.Torrent.check_interval * 60 - Aggregator.Feeds[i].Ticker) + L"]");
+              ToTimeString(Settings.RSS.Torrent.check_interval * 60 - Aggregator.feeds[i].ticker) + L"]");
           }
-          if (Aggregator.Feeds[i].Ticker >= Settings.RSS.Torrent.check_interval * 60) {
-            Aggregator.Feeds[i].Check(Settings.RSS.Torrent.source);
+          if (Aggregator.feeds[i].ticker >= Settings.RSS.Torrent.check_interval * 60) {
+            Aggregator.feeds[i].Check(Settings.RSS.Torrent.source);
           }
         } else {
           if (TorrentDialog.IsWindow()) {

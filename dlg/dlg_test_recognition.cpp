@@ -36,7 +36,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   test_episodes_.clear();
   list_.DeleteAllItems();
   
-  // Read XML file
+  // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
   if (result.status != status_ok) {

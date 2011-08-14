@@ -63,8 +63,8 @@ BOOL Taiga::InitInstance() {
   InitCommonControls(ICC_STANDARD_CLASSES);
   OleInitialize(NULL);
 
-  // Read data
-  ReadData();
+  // Load data
+  LoadData();
   
   if (Settings.Program.StartUp.check_new_version) {
     // Create update dialog
@@ -100,19 +100,19 @@ wstring Taiga::GetDataPath() {
   return L"";
 }
 
-void Taiga::ReadData() {
-  // Read media player data
-  MediaPlayers.Read();
+void Taiga::LoadData() {
+  // Load media player data
+  MediaPlayers.Load();
   
-  // Read settings
-  Settings.Read();
+  // Load settings
+  Settings.Load();
   
-  // Read theme data
-  UI.Read(Settings.Program.General.theme);
+  // Load theme data
+  UI.Load(Settings.Program.General.theme);
   UI.LoadImages();
   
-  // Read anime list
-  AnimeList.Read();
+  // Load anime list
+  AnimeList.Load();
 }
 
 // =============================================================================

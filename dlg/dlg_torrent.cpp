@@ -110,7 +110,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       feed->Check(Settings.RSS.Torrent.source);
       /**
       #ifdef _DEBUG
-      feed->Read();
+      feed->Load();
       feed->ExamineData();
       RefreshList();
       #endif
@@ -123,11 +123,11 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
         FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
         if (feed_item) {
           bool check_state = list_.GetCheckState(i) == TRUE;
-          if (feed_item->Download && !check_state) {
+          if (feed_item->download && !check_state) {
             // Discard items that have passed all filters but are unchecked by the user
-            Aggregator.FileArchive.push_back(feed_item->Title);
+            Aggregator.file_archive.push_back(feed_item->title);
           }
-          feed_item->Download = check_state;
+          feed_item->download = check_state;
         }
       }
       feed->Download(-1);
@@ -139,9 +139,9 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
         if (list_.GetCheckState(i) == TRUE) {
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
           if (feed_item) {
-            feed_item->Download = false;
+            feed_item->download = false;
             list_.SetCheckState(i, FALSE);
-            Aggregator.FileArchive.push_back(feed_item->Title);
+            Aggregator.file_archive.push_back(feed_item->title);
           }
         }
       }
@@ -193,7 +193,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (lpnmitem->iItem == -1) break;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
           if (feed_item) {
-            feed->Download(feed_item->Index);
+            feed->Download(feed_item->index);
           }
         }
         break;
@@ -207,34 +207,34 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (feed_item) {
           wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
-            feed->Download(feed_item->Index);
+            feed->Download(feed_item->index);
           } else if (answer == L"DiscardTorrent") {
-            feed_item->Download = false;
+            feed_item->download = false;
             list_.SetCheckState(lpnmitem->iItem, FALSE);
-            Aggregator.FileArchive.push_back(feed_item->Title);
+            Aggregator.file_archive.push_back(feed_item->title);
           } else if (answer == L"DiscardTorrents") {
-            Anime* anime = AnimeList.FindItem(feed_item->EpisodeData.anime_id);
+            Anime* anime = AnimeList.FindItem(feed_item->episode_data.anime_id);
             if (anime) {
               for (int i = 0; i < list_.GetItemCount(); i++) {
                 feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-                if (feed_item && feed_item->EpisodeData.anime_id == anime->series_id) {
-                  feed_item->Download = false;
+                if (feed_item && feed_item->episode_data.anime_id == anime->series_id) {
+                  feed_item->download = false;
                   list_.SetCheckState(i, FALSE);
                 }
               }
-              Aggregator.FilterManager.AddFilter(
+              Aggregator.filter_manager.AddFilter(
                 FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
                 L"Discard \"" + anime->series_title + L"\"");
-              Aggregator.FilterManager.Filters.back().AddCondition(
+              Aggregator.filter_manager.filters.back().AddCondition(
                 FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, 
                 ToWSTR(anime->series_id));
             }
           } else if (answer == L"MoreTorrents") {
             feed->Check(ReplaceVariables(
               L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%", // TEMP
-              feed_item->EpisodeData));
+              feed_item->episode_data));
           } else if (answer == L"SearchMAL") {
-            ExecuteAction(L"SearchAnime(" + feed_item->EpisodeData.title + L")");
+            ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
           }
         }
         break;
@@ -260,9 +260,9 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             // Change text color
             FeedItem* feed_item = reinterpret_cast<FeedItem*>(pCD->nmcd.lItemlParam);
             if (feed_item) {
-              if (feed_item->EpisodeData.anime_id < 1) {
+              if (feed_item->episode_data.anime_id < 1) {
                 pCD->clrText = RGB(180, 180, 180);
-              } else if (feed_item->EpisodeData.NewEpisode) {
+              } else if (feed_item->episode_data.new_episode) {
                 pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
               }
             }
@@ -322,46 +322,46 @@ void TorrentDialog::RefreshList() {
   list_.DeleteAllItems();
 
   // Add items
-  for (auto it = feed->Items.begin(); it != feed->Items.end(); ++it) {
-    if (Settings.RSS.Torrent.hide_unidentified && it->EpisodeData.anime_id == ANIMEID_NOTINLIST) {
+  for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
+    if (Settings.RSS.Torrent.hide_unidentified && it->episode_data.anime_id == ANIMEID_NOTINLIST) {
       continue;
     }
     wstring title, number, video;
     int group = TORRENT_ANIME, icon = StatusToIcon(0);
-    if (it->Category == L"Batch" || 
-      !IsNumeric(it->EpisodeData.number)) {
+    if (it->category == L"Batch" || 
+      !IsNumeric(it->episode_data.number)) {
         group = TORRENT_BATCH;
     }
-    Anime* anime = AnimeList.FindItem(it->EpisodeData.anime_id);
+    Anime* anime = AnimeList.FindItem(it->episode_data.anime_id);
     if (anime) {
       icon = StatusToIcon(anime->GetAiringStatus());
       title = anime->series_title;
-    } else if (!it->EpisodeData.title.empty()) {
-      title = it->EpisodeData.title;
+    } else if (!it->episode_data.title.empty()) {
+      title = it->episode_data.title;
     } else {
       group = TORRENT_OTHER;
-      title = it->Title;
+      title = it->title;
     }
     vector<int> numbers;
-    SplitEpisodeNumbers(it->EpisodeData.number, numbers);
+    SplitEpisodeNumbers(it->episode_data.number, numbers);
     number = JoinEpisodeNumbers(numbers);
-    if (!it->EpisodeData.version.empty()) {
-      number += L"v" + it->EpisodeData.version;
+    if (!it->episode_data.version.empty()) {
+      number += L"v" + it->episode_data.version;
     }
-    video = it->EpisodeData.video_type;
-    if (!it->EpisodeData.resolution.empty()) {
+    video = it->episode_data.video_type;
+    if (!it->episode_data.resolution.empty()) {
       if (!video.empty()) video += L" ";
-      video += it->EpisodeData.resolution;
+      video += it->episode_data.resolution;
     }
-    int index = list_.InsertItem(it - feed->Items.begin(), 
+    int index = list_.InsertItem(it - feed->items.begin(), 
       group, icon, 0, NULL, title.c_str(), reinterpret_cast<LPARAM>(&(*it)));
     list_.SetItem(index, 1, number.c_str());
-    list_.SetItem(index, 2, it->EpisodeData.group.c_str());
-    list_.SetItem(index, 3, it->EpisodeData.FileSize.c_str());
+    list_.SetItem(index, 2, it->episode_data.group.c_str());
+    list_.SetItem(index, 3, it->episode_data.file_size.c_str());
     list_.SetItem(index, 4, video.c_str());
-    list_.SetItem(index, 5, it->Description.c_str());
-    list_.SetItem(index, 6, it->EpisodeData.file.c_str());
-    list_.SetCheckState(index, it->Download);
+    list_.SetItem(index, 5, it->description.c_str());
+    list_.SetItem(index, 6, it->episode_data.file.c_str());
+    list_.SetCheckState(index, it->download);
   }
 
   // Show again
@@ -374,14 +374,14 @@ void TorrentDialog::RefreshList() {
 
   // Set title
   wstring title = L"Torrents";
-  if (!feed->Title.empty()) {
-    title = feed->Title;
-  } else if (!feed->Link.empty()) {
-    CUrl url(feed->Link);
+  if (!feed->title.empty()) {
+    title = feed->title;
+  } else if (!feed->link.empty()) {
+    CUrl url(feed->link);
     title += L" (" + url.Host + L")";
   }
-  if (!feed->Description.empty()) {
-    title += L" - " + feed->Description;
+  if (!feed->description.empty()) {
+    title += L" - " + feed->description;
   }
   SetText(title.c_str());
 }

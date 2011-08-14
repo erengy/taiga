@@ -40,28 +40,28 @@ bool EvaluateAction(int action, bool condition) {
 
 bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& item) {
   bool is_numeric = false;
-  wstring element, value = ReplaceVariables(condition.Value, item.EpisodeData);
-  Anime* anime = AnimeList.FindItem(item.EpisodeData.anime_id);
+  wstring element, value = ReplaceVariables(condition.value, item.episode_data);
+  Anime* anime = AnimeList.FindItem(item.episode_data.anime_id);
 
-  switch (condition.Element) {
+  switch (condition.element) {
     case FEED_FILTER_ELEMENT_TITLE:
-      element = item.Title;
+      element = item.title;
       break;
     case FEED_FILTER_ELEMENT_CATEGORY:
-      element = item.Category;
+      element = item.category;
       break;
     case FEED_FILTER_ELEMENT_DESCRIPTION:
-      element = item.Description;
+      element = item.description;
       break;
     case FEED_FILTER_ELEMENT_LINK:
-      element = item.Link;
+      element = item.link;
       break;
     case FEED_FILTER_ELEMENT_ANIME_ID:
       if (anime) element = ToWSTR(anime->series_id);
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_TITLE:
-      element = item.EpisodeData.title;
+      element = item.episode_data.title;
       break;
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
       if (anime) element = ToWSTR(anime->GetAiringStatus());
@@ -72,29 +72,29 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
-      element = ToWSTR(GetEpisodeHigh(item.EpisodeData.number));
+      element = ToWSTR(GetEpisodeHigh(item.episode_data.number));
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION:
-      element = item.EpisodeData.version;
+      element = item.episode_data.version;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
       if (anime) element = ToWSTR(anime->IsEpisodeAvailable(
-        GetEpisodeHigh(item.EpisodeData.number)));
+        GetEpisodeHigh(item.episode_data.number)));
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_GROUP:
-      element = item.EpisodeData.group;
+      element = item.episode_data.group;
       break;
     case FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION:
-      element = item.EpisodeData.resolution;
+      element = item.episode_data.resolution;
       break;
     case FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE:
-      element = item.EpisodeData.video_type;
+      element = item.episode_data.video_type;
       break;
   }
 
-  switch (condition.Operator) {
+  switch (condition.op) {
     case FEED_FILTER_OPERATOR_IS:
       if (is_numeric) {
         if (IsEqual(value, L"True")) return ToINT(element) == TRUE;
@@ -113,13 +113,13 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
       if (is_numeric) {
         return ToINT(element) > ToINT(value);
       } else {
-        return CompareStrings(element, condition.Value) > 0;
+        return CompareStrings(element, condition.value) > 0;
       }
     case FEED_FILTER_OPERATOR_ISLESSTHAN:
       if (is_numeric) {
         return ToINT(element) < ToINT(value);
       } else {
-        return CompareStrings(element, condition.Value) < 0;
+        return CompareStrings(element, condition.value) < 0;
       }
     case FEED_FILTER_OPERATOR_BEGINSWITH:
       return StartsWith(element, value);
@@ -137,53 +137,53 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
 // =============================================================================
 
 FeedFilterCondition& FeedFilterCondition::operator=(const FeedFilterCondition& condition) {
-  Element = condition.Element;
-  Operator = condition.Operator;
-  Value = condition.Value;
+  element = condition.element;
+  op = condition.op;
+  value = condition.value;
 
   return *this;
 }
 
 void FeedFilterCondition::Reset() {
-  Element = FEED_FILTER_ELEMENT_TITLE;
-  Operator = FEED_FILTER_OPERATOR_IS;
-  Value.clear();
+  element = FEED_FILTER_ELEMENT_TITLE;
+  op = FEED_FILTER_OPERATOR_IS;
+  value.clear();
 }
 
 // =============================================================================
 
 FeedFilter& FeedFilter::operator=(const FeedFilter& filter) {
-  Action = filter.Action;
-  Enabled = filter.Enabled;
-  Match = filter.Match;
-  Name = filter.Name;
+  action = filter.action;
+  enabled = filter.enabled;
+  match = filter.match;
+  name = filter.name;
 
-  Conditions.resize(filter.Conditions.size());
-  std::copy(filter.Conditions.begin(), filter.Conditions.end(), Conditions.begin());
+  conditions.resize(filter.conditions.size());
+  std::copy(filter.conditions.begin(), filter.conditions.end(), conditions.begin());
 
-  AnimeIds.resize(filter.AnimeIds.size());
-  std::copy(filter.AnimeIds.begin(), filter.AnimeIds.end(), AnimeIds.begin());
+  anime_ids.resize(filter.anime_ids.size());
+  std::copy(filter.anime_ids.begin(), filter.anime_ids.end(), anime_ids.begin());
 
   return *this;
 }
 
 void FeedFilter::AddCondition(int element, int op, const wstring& value) {
-  Conditions.resize(Conditions.size() + 1);
-  Conditions.back().Element = element;
-  Conditions.back().Operator = op;
-  Conditions.back().Value = value;
+  conditions.resize(conditions.size() + 1);
+  conditions.back().element = element;
+  conditions.back().op = op;
+  conditions.back().value = value;
 }
 
 bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
-  if (!Enabled) return true;
+  if (!enabled) return true;
 
   bool condition = false;
   size_t index = 0;
 
-  if (!AnimeIds.empty()) {
-    Anime* anime = AnimeList.FindItem(item.EpisodeData.anime_id);
+  if (!anime_ids.empty()) {
+    Anime* anime = AnimeList.FindItem(item.episode_data.anime_id);
     if (anime) {
-      for (auto it = AnimeIds.begin(); it != AnimeIds.end(); ++it) {
+      for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
         if (*it == anime->series_id) {
           condition = true;
           break;
@@ -196,11 +196,11 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     }
   }
   
-  switch (Match) {
+  switch (match) {
     case FEED_FILTER_MATCH_ALL:
       condition = true;
-      for (size_t i = 0; i < Conditions.size(); i++) {
-        if (!EvaluateCondition(Conditions[i], item)) {
+      for (size_t i = 0; i < conditions.size(); i++) {
+        if (!EvaluateCondition(conditions[i], item)) {
           condition = false;
           index = i;
           break;
@@ -209,8 +209,8 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
       break;
     case FEED_FILTER_MATCH_ANY:
       condition = false;
-      for (size_t i = 0; i < Conditions.size(); i++) {
-        if (EvaluateCondition(Conditions[i], item)) {
+      for (size_t i = 0; i < conditions.size(); i++) {
+        if (EvaluateCondition(conditions[i], item)) {
           condition = true;
           index = i;
           break;
@@ -219,26 +219,26 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
       break;
   }
   
-  if (EvaluateAction(Action, condition)) {
+  if (EvaluateAction(action, condition)) {
     // Handle preferences
-    if (Action == FEED_FILTER_ACTION_PREFER && recursive) {
-      for (auto it = feed.Items.begin(); it != feed.Items.end(); ++it) {
+    if (action == FEED_FILTER_ACTION_PREFER && recursive) {
+      for (auto it = feed.items.begin(); it != feed.items.end(); ++it) {
         // Do not bother if the item failed before
-        if (it->Download == false) continue;
+        if (it->download == false) continue;
         // Do not filter the same item again
-        if (it->Index == item.Index) continue;
+        if (it->index == item.index) continue;
         // Is it the same title?
-        if (it->EpisodeData.anime_id == ANIMEID_NOTINLIST) {
-          if (!IsEqual(it->EpisodeData.title, item.EpisodeData.title)) continue;
+        if (it->episode_data.anime_id == ANIMEID_NOTINLIST) {
+          if (!IsEqual(it->episode_data.title, item.episode_data.title)) continue;
         } else {
-          if (it->EpisodeData.anime_id != item.EpisodeData.anime_id) continue;
+          if (it->episode_data.anime_id != item.episode_data.anime_id) continue;
         }
         // Is it the same episode?
-        if (it->EpisodeData.number != item.EpisodeData.number) continue;
+        if (it->episode_data.number != item.episode_data.number) continue;
         // Try applying the same filter
         if (!this->Filter(feed, *it, false)) {
           // Hey, we don't prefer your kind around here!
-          it->Download = false;
+          it->download = false;
         }
       }
     }
@@ -247,14 +247,14 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     return true;
   
   } else {
-    if (Action == FEED_FILTER_ACTION_PREFER && recursive) {
+    if (action == FEED_FILTER_ACTION_PREFER && recursive) {
       return true;
     
     } else {
       #ifdef _DEBUG
-      item.Description = L"!FILTER :: " + 
-        Aggregator.FilterManager.TranslateConditions(*this, index) +
-        L" -- " + item.Description;
+      item.description = L"!FILTER :: " + 
+        Aggregator.filter_manager.TranslateConditions(*this, index) +
+        L" -- " + item.description;
       #endif
 
       // Out you go, you pathetic feed item!
@@ -264,27 +264,27 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
 }
 
 void FeedFilter::Reset() {
-  Enabled = true;
-  Action = FEED_FILTER_ACTION_DISCARD;
-  Match = FEED_FILTER_MATCH_ALL;
-  AnimeIds.clear();
-  Conditions.clear();
-  Name.clear();
+  enabled = true;
+  action = FEED_FILTER_ACTION_DISCARD;
+  match = FEED_FILTER_MATCH_ALL;
+  anime_ids.clear();
+  conditions.clear();
+  name.clear();
 }
 
 // =============================================================================
 
 FeedFilterManager::FeedFilterManager() {
-  #define ADD_PRESET(action, match, def, name, desc) \
-    Presets.resize(Presets.size() + 1); \
-    Presets.back().Default = def; \
-    Presets.back().Description = desc; \
-    Presets.back().Filter.Action = action; \
-    Presets.back().Filter.Enabled = true; \
-    Presets.back().Filter.Match = match; \
-    Presets.back().Filter.Name = name;
+  #define ADD_PRESET(action_, match_, is_default_, name_, description_) \
+    presets.resize(presets.size() + 1); \
+    presets.back().description = description_; \
+    presets.back().is_default = is_default_; \
+    presets.back().filter.action = action_; \
+    presets.back().filter.enabled = true; \
+    presets.back().filter.match = match_; \
+    presets.back().filter.name = name_;
   #define ADD_CONDITION(e, o, v) \
-    Presets.back().Filter.AddCondition(e, o, v);
+    presets.back().filter.AddCondition(e, o, v);
 
   /* Preset filters */
 
@@ -356,33 +356,33 @@ FeedFilterManager::FeedFilterManager() {
 }
 
 void FeedFilterManager::AddPresets() {
-  for (auto it = Presets.begin(); it != Presets.end(); ++it) {
-    if (!it->Default) continue;
-    AddFilter(it->Filter.Action, it->Filter.Match, it->Filter.Enabled, it->Filter.Name);
-    for (auto c = it->Filter.Conditions.begin(); c != it->Filter.Conditions.end(); ++c) {
-      Filters.back().AddCondition(c->Element, c->Operator, c->Value);
+  for (auto it = presets.begin(); it != presets.end(); ++it) {
+    if (!it->is_default) continue;
+    AddFilter(it->filter.action, it->filter.match, it->filter.enabled, it->filter.name);
+    for (auto c = it->filter.conditions.begin(); c != it->filter.conditions.end(); ++c) {
+      filters.back().AddCondition(c->element, c->op, c->value);
     }
   }
 }
 
 void FeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
-  Filters.resize(Filters.size() + 1);
-  Filters.back().Action = action;
-  Filters.back().Enabled = enabled;
-  Filters.back().Match = match;
-  Filters.back().Name = name;
+  filters.resize(filters.size() + 1);
+  filters.back().action = action;
+  filters.back().enabled = enabled;
+  filters.back().match = match;
+  filters.back().name = name;
 }
 
 void FeedFilterManager::Cleanup() {
-  for (auto i = Filters.begin(); i != Filters.end(); ++i) {
-    for (auto j = i->AnimeIds.begin(); j != i->AnimeIds.end(); ++j) {
+  for (auto i = filters.begin(); i != filters.end(); ++i) {
+    for (auto j = i->anime_ids.begin(); j != i->anime_ids.end(); ++j) {
       Anime* anime = AnimeList.FindItem(*j);
       if (!anime) {
-        if (i->AnimeIds.size() > 1) {
-          j = i->AnimeIds.erase(j) - 1;
+        if (i->anime_ids.size() > 1) {
+          j = i->anime_ids.erase(j) - 1;
           continue;
         } else {
-          i = Filters.erase(i) - 1;
+          i = filters.erase(i) - 1;
           break;
         }
       }
@@ -395,21 +395,21 @@ int FeedFilterManager::Filter(Feed& feed) {
   Anime* anime = nullptr;
   int count = 0, number = 0;
   
-  for (auto item = feed.Items.begin(); item != feed.Items.end(); ++item) {
+  for (auto item = feed.items.begin(); item != feed.items.end(); ++item) {
     download = true;
-    anime = AnimeList.FindItem(item->EpisodeData.anime_id);
-    number = GetEpisodeHigh(item->EpisodeData.number);
+    anime = AnimeList.FindItem(item->episode_data.anime_id);
+    number = GetEpisodeHigh(item->episode_data.number);
     
     if (anime && number > anime->GetLastWatchedEpisode()) {
-      item->EpisodeData.NewEpisode = true;
+      item->episode_data.new_episode = true;
     }
 
-    if (!item->Download) continue;
+    if (!item->download) continue;
 
     // Apply filters
     if (Settings.RSS.Torrent.Filters.global_enabled) {
-      for (size_t j = 0; j < Filters.size(); j++) {
-        if (!Filters[j].Filter(feed, *item, true)) {
+      for (size_t j = 0; j < filters.size(); j++) {
+        if (!filters[j].Filter(feed, *item, true)) {
           download = false;
           break;
         }
@@ -418,15 +418,15 @@ int FeedFilterManager::Filter(Feed& feed) {
     
     // Check archive
     if (download) {
-      download = !Aggregator.SearchArchive(item->Title);
+      download = !Aggregator.SearchArchive(item->title);
     }
 
     // Mark item
     if (download) {
-      item->Download = true;
+      item->download = true;
       count++;
     } else {
-      item->Download = false;
+      item->download = false;
     }
   }
 
@@ -445,20 +445,20 @@ wstring FeedFilterManager::CreateNameFromConditions(const FeedFilter& filter) {
 }
 
 wstring FeedFilterManager::TranslateCondition(const FeedFilterCondition& condition) {
-  return TranslateElement(condition.Element) + L" " + 
-    TranslateOperator(condition.Operator) + L" \"" + 
+  return TranslateElement(condition.element) + L" " + 
+    TranslateOperator(condition.op) + L" \"" + 
     TranslateValue(condition) + L"\"";
 }
 
 wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, size_t index) {
   wstring str;
   
-  size_t max_index = filter.Match == FEED_FILTER_MATCH_ALL ? 
-    filter.Conditions.size() : index + 1;
+  size_t max_index = filter.match == FEED_FILTER_MATCH_ALL ? 
+    filter.conditions.size() : index + 1;
   
   for (size_t i = index; i < max_index; i++) {
     if (i > index) str += L" & ";
-    str += TranslateCondition(filter.Conditions[i]);
+    str += TranslateCondition(filter.conditions[i]);
   }
 
   return str;
@@ -523,25 +523,25 @@ wstring FeedFilterManager::TranslateOperator(int op) {
 }
 
 wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) {
-  switch (condition.Element) {
+  switch (condition.element) {
     case FEED_FILTER_ELEMENT_ANIME_ID: {
-      if (condition.Value.empty()) {
+      if (condition.value.empty()) {
         return L"(?)";
       } else {
-        Anime* anime = AnimeList.FindItem(ToINT(condition.Value));
+        Anime* anime = AnimeList.FindItem(ToINT(condition.value));
         if (anime) {
-          return condition.Value + L" (" + anime->series_title + L")";
+          return condition.value + L" (" + anime->series_title + L")";
         } else {
-          return condition.Value + L" (?)";
+          return condition.value + L" (?)";
         }
       }
     }
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      return MAL.TranslateMyStatus(ToINT(condition.Value), false);
+      return MAL.TranslateMyStatus(ToINT(condition.value), false);
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      return MAL.TranslateStatus(ToINT(condition.Value));
+      return MAL.TranslateStatus(ToINT(condition.value));
     default:
-      return condition.Value;
+      return condition.value;
   }
 }
 

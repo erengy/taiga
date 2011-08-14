@@ -259,6 +259,7 @@
 		<menu name="SeasonSelect">
 			<item name="Fall 2011"   action="Season_Load(2011_fall.xml)"/>
 			<item name="Summer 2011" action="Season_Load(2011_summer.xml)"/>
+			<item name="Spring 2011" action="Season_Load(2011_spring.xml)"/>
 		</menu>
 		<menu name="SeasonGroup">
 			<item name="Airing status" action="Season_GroupBy(0)" radio="1"/>

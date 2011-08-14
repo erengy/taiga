@@ -59,7 +59,7 @@ public:
   
 public:
   wstring GetDataPath();
-  void ReadData();
+  void LoadData();
 
 public:
   bool logged_in, updates_enabled;

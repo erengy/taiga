@@ -77,7 +77,7 @@ public:
     bool resize = true);
   
   void Clear();
-  bool Read();
+  bool Load();
   bool Save(int anime_id, wstring child, wstring value, 
     int mode = ANIMELIST_EDITANIME);
   
