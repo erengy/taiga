@@ -65,6 +65,7 @@ SettingsDialog::SettingsDialog() :
   pages.resize(PAGE_COUNT);
   for (size_t i = 0; i < PAGE_COUNT; i++) {
     pages[i].index = i;
+    pages[i].parent = this;
   }
 }
 
@@ -109,36 +110,36 @@ BOOL SettingsDialog::OnInitDialog() {
   tree_.SetTheme();
   // Account
   HTREEITEM htAccount = tree_.InsertItem(L"Account", -1, reinterpret_cast<LPARAM>(&pages[PAGE_ACCOUNT]), nullptr);
-  pages[PAGE_ACCOUNT].CreateItem(L"MyAnimeList", htAccount, this);
-  pages[PAGE_UPDATE].CreateItem(L"Update", htAccount, this);
+  pages[PAGE_ACCOUNT].CreateItem(L"MyAnimeList", htAccount);
+  pages[PAGE_UPDATE].CreateItem(L"Update", htAccount);
   tree_.Expand(htAccount);
   // Folders
   HTREEITEM htFolders = tree_.InsertItem(L"Anime folders", -1, reinterpret_cast<LPARAM>(&pages[PAGE_FOLDERS_ROOT]), nullptr);
-  pages[PAGE_FOLDERS_ROOT].CreateItem(L"Root", htFolders, this);
-  pages[PAGE_FOLDERS_ANIME].CreateItem(L"Specific", htFolders, this);
+  pages[PAGE_FOLDERS_ROOT].CreateItem(L"Root", htFolders);
+  pages[PAGE_FOLDERS_ANIME].CreateItem(L"Specific", htFolders);
   tree_.Expand(htFolders);
   // Announcements
   HTREEITEM htAnnounce = tree_.InsertItem(L"Announcements", -1, reinterpret_cast<LPARAM>(&pages[PAGE_HTTP]), nullptr);
-  pages[PAGE_HTTP].CreateItem(L"HTTP", htAnnounce, this);
-  pages[PAGE_MESSENGER].CreateItem(L"Messenger", htAnnounce, this);
-  pages[PAGE_MIRC].CreateItem(L"mIRC", htAnnounce, this);
-  pages[PAGE_SKYPE].CreateItem(L"Skype", htAnnounce, this);
-  pages[PAGE_TWITTER].CreateItem(L"Twitter", htAnnounce, this);
+  pages[PAGE_HTTP].CreateItem(L"HTTP", htAnnounce);
+  pages[PAGE_MESSENGER].CreateItem(L"Messenger", htAnnounce);
+  pages[PAGE_MIRC].CreateItem(L"mIRC", htAnnounce);
+  pages[PAGE_SKYPE].CreateItem(L"Skype", htAnnounce);
+  pages[PAGE_TWITTER].CreateItem(L"Twitter", htAnnounce);
   tree_.Expand(htAnnounce);
   // Program
   HTREEITEM htProgram = tree_.InsertItem(L"Program", -1, reinterpret_cast<LPARAM>(&pages[PAGE_PROGRAM]), nullptr);
-  pages[PAGE_PROGRAM].CreateItem(L"General", htProgram, this);
-  pages[PAGE_LIST].CreateItem(L"List", htProgram, this);
-  pages[PAGE_NOTIFICATIONS].CreateItem(L"Notifications", htProgram, this);
+  pages[PAGE_PROGRAM].CreateItem(L"General", htProgram);
+  pages[PAGE_LIST].CreateItem(L"List", htProgram);
+  pages[PAGE_NOTIFICATIONS].CreateItem(L"Notifications", htProgram);
   tree_.Expand(htProgram);
   // Media players
   HTREEITEM htRecognition = tree_.InsertItem(L"Recognition", -1, reinterpret_cast<LPARAM>(&pages[PAGE_MEDIA]), nullptr);
-  pages[PAGE_MEDIA].CreateItem(L"Media players", htRecognition, this);
+  pages[PAGE_MEDIA].CreateItem(L"Media players", htRecognition);
   tree_.Expand(htRecognition);
   // Torrent
   HTREEITEM htTorrent = tree_.InsertItem(L"Torrent", -1, reinterpret_cast<LPARAM>(&pages[PAGE_TORRENT1]), nullptr);
-  pages[PAGE_TORRENT1].CreateItem(L"Options", htTorrent, this);
-  pages[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent, this);
+  pages[PAGE_TORRENT1].CreateItem(L"Options", htTorrent);
+  pages[PAGE_TORRENT2].CreateItem(L"Filters", htTorrent);
   tree_.Expand(htTorrent);
 
   // Select current page
@@ -229,8 +230,8 @@ void SettingsDialog::OnOK() {
 
   // Recognition > Media players
   List.SetWindowHandle(pages[PAGE_MEDIA].GetDlgItem(IDC_LIST_MEDIA));
-  for (size_t i = 0; i < MediaPlayers.Items.size(); i++) {
-    MediaPlayers.Items[i].Enabled = List.GetCheckState(i);
+  for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
+    MediaPlayers.items[i].enabled = List.GetCheckState(i);
   }
   List.SetWindowHandle(nullptr);
 

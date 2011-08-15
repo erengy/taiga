@@ -107,7 +107,7 @@ void Anime::Start(Episode episode) {
   // Check folder
   if (folder.empty()) {
     if (episode.folder.empty()) {
-      HWND hwnd = MediaPlayers.Items[MediaPlayers.Index].WindowHandle;
+      HWND hwnd = MediaPlayers.items[MediaPlayers.index].window_handle;
       episode.folder = MediaPlayers.GetTitleFromProcessHandle(hwnd);
       episode.folder = GetPathOnly(episode.folder);
     }

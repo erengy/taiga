@@ -35,14 +35,13 @@
 // =============================================================================
 
 SettingsPage::SettingsPage() :
-  tree_item_(nullptr)
+  parent(nullptr), tree_item_(nullptr)
 {
 }
 
-void SettingsPage::CreateItem(LPCWSTR pszText, HTREEITEM htiParent, class SettingsDialog* parent) {
+void SettingsPage::CreateItem(LPCWSTR pszText, HTREEITEM htiParent) {
   tree_item_ = parent->tree_.InsertItem(
     pszText, -1, reinterpret_cast<LPARAM>(this), htiParent);
-  this->parent = parent;
 }
 
 void SettingsPage::Select() {
@@ -228,12 +227,12 @@ BOOL SettingsPage::OnInitDialog() {
         hdi.fmt |= HDF_CHECKBOX;
         Header_SetItem(Header.GetWindowHandle(), 0, &hdi);
       }
-      for (size_t i = 0; i < MediaPlayers.Items.size(); i++) {
-        BOOL player_available = MediaPlayers.Items[i].GetPath().empty() ? FALSE : TRUE;
-        List.InsertItem(i, MediaPlayers.Items[i].Mode, 
+      for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
+        BOOL player_available = MediaPlayers.items[i].GetPath().empty() ? FALSE : TRUE;
+        List.InsertItem(i, MediaPlayers.items[i].mode, 
           ICON16_APP_GRAY - player_available, 0, nullptr, 
-          MediaPlayers.Items[i].Name.c_str(), 0);
-        if (MediaPlayers.Items[i].Enabled) List.SetCheckState(i, TRUE);
+          MediaPlayers.items[i].name.c_str(), 0);
+        if (MediaPlayers.items[i].enabled) List.SetCheckState(i, TRUE);
       }
       Header.SetWindowHandle(nullptr);
       List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -548,7 +547,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             List.SetWindowHandle(nullptr);
           // Media players
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-            Execute(MediaPlayers.Items[lpnmitem->iItem].GetPath());
+            Execute(MediaPlayers.items[lpnmitem->iItem].GetPath());
           // Torrent filters
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
             CListView List = lpnmitem->hdr.hwndFrom;

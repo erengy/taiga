@@ -284,12 +284,12 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
       // JetAudio
       } else if (pCDS->dwData == 0x3000 /* JRC_COPYDATA_ID_TRACK_FILENAME */) {
-        MediaPlayers.NewCaption = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
+        MediaPlayers.new_caption = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
         return TRUE;
 
       // Media Portal
       } else if (pCDS->dwData == 0x1337) {
-        MediaPlayers.NewCaption = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
+        MediaPlayers.new_caption = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
         return TRUE;
       }
       break;
@@ -573,7 +573,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     if (CurrentEpisode.anime_id == ANIMEID_UNKNOWN) {
       // Recognized?
       if (Taiga.is_recognition_enabled) {
-        if (Meow.ExamineTitle(MediaPlayers.CurrentCaption, CurrentEpisode)) {
+        if (Meow.ExamineTitle(MediaPlayers.current_caption, CurrentEpisode)) {
           for (int i = AnimeList.count; i > 0; i--) {
             if (Meow.CompareEpisode(CurrentEpisode, AnimeList.items[i])) {
               CurrentEpisode.Set(AnimeList.items[i].series_id);
@@ -587,7 +587,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       CurrentEpisode.Set(ANIMEID_NOTINLIST);
       if (CurrentEpisode.title.empty()) {
         #ifdef _DEBUG
-        ChangeStatus(MediaPlayers.Items[MediaPlayers.Index].Name + L" is running.");
+        ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
         #endif
       } else {
         ChangeStatus(L"Watching: " + CurrentEpisode.title + 
@@ -618,7 +618,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           return;
         }
         if (Settings.Account.Update.check_player == FALSE || 
-          MediaPlayers.Items[media_index].WindowHandle == GetForegroundWindow()) {
+          MediaPlayers.items[media_index].window_handle == GetForegroundWindow()) {
             Taiga.ticker_media++;
         }
       }
@@ -634,10 +634,10 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   } else {
     // Was running, but not watching
     if (!anime) {
-      if (MediaPlayers.IndexOld > 0){
+      if (MediaPlayers.index_old > 0){
         ChangeStatus();
         CurrentEpisode.Set(ANIMEID_UNKNOWN);
-        MediaPlayers.IndexOld = 0;
+        MediaPlayers.index_old = 0;
       }
     
     // Was running and watching

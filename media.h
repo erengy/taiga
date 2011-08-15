@@ -44,25 +44,25 @@ public:
   wstring GetTitleFromMPlayer();
   
 public:
-  int Index, IndexOld;
-  wstring CurrentCaption, NewCaption;
+  int index, index_old;
+  wstring current_caption, new_caption;
 
   class MediaPlayer {
   public:
-    wstring Name;
-    BOOL Enabled, Visible;
-    int Mode;
-    HWND WindowHandle;
-    vector<wstring> Class, File, Folder;
+    wstring name;
+    BOOL enabled, visible;
+    int mode;
+    HWND window_handle;
+    vector<wstring> classes, files, folders;
     wstring GetPath();
     class EditTitle {
     public:
-      int Mode;
-      wstring Value;
+      int mode;
+      wstring value;
     };
-    vector<EditTitle> Edit;
+    vector<EditTitle> edits;
   };
-  vector<MediaPlayer> Items;
+  vector<MediaPlayer> items;
 
 private:
   bool title_changed_;

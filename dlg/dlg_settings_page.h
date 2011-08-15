@@ -50,21 +50,19 @@ public:
   SettingsPage();
   virtual ~SettingsPage() {}
 
-  friend class SettingsDialog;
-
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
 
 public:
-  void CreateItem(LPCWSTR pszText, HTREEITEM htiParent, class SettingsDialog* parent);
+  void CreateItem(LPCWSTR pszText, HTREEITEM htiParent);
   void Select();
 
 public:
   int index;
+  SettingsDialog* parent;
 
 private:
-  SettingsDialog* parent;
   HTREEITEM tree_item_;
 };
 

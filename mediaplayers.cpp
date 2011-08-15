@@ -31,15 +31,15 @@ class MediaPlayers MediaPlayers;
 // =============================================================================
 
 MediaPlayers::MediaPlayers() : 
-  Index(-1), IndexOld(-1), title_changed_(false)
+  index(-1), index_old(-1), title_changed_(false)
 {
 }
 
 BOOL MediaPlayers::Load() {
   // Initialize
   wstring file = Taiga.GetDataPath() + L"Media.xml";
-  Items.clear();
-  Index = -1;
+  items.clear();
+  index = -1;
   
   // Load XML file
   xml_document doc;
@@ -52,19 +52,19 @@ BOOL MediaPlayers::Load() {
   // Read player list
   xml_node mediaplayers = doc.child(L"media_players");
   for (xml_node player = mediaplayers.child(L"player"); player; player = player.next_sibling(L"player")) {
-    Items.resize(Items.size() + 1);
-    Items.back().Name = XML_ReadStrValue(player, L"name");
-    Items.back().Enabled = XML_ReadIntValue(player, L"enabled");
-    Items.back().Visible = XML_ReadIntValue(player, L"visible");
-    Items.back().Mode = XML_ReadIntValue(player, L"mode");
-    XML_ReadChildNodes(player, Items.back().Class, L"class");
-    XML_ReadChildNodes(player, Items.back().File, L"file");
-    XML_ReadChildNodes(player, Items.back().Folder, L"folder");
+    items.resize(items.size() + 1);
+    items.back().name = XML_ReadStrValue(player, L"name");
+    items.back().enabled = XML_ReadIntValue(player, L"enabled");
+    items.back().visible = XML_ReadIntValue(player, L"visible");
+    items.back().mode = XML_ReadIntValue(player, L"mode");
+    XML_ReadChildNodes(player, items.back().classes, L"class");
+    XML_ReadChildNodes(player, items.back().files, L"file");
+    XML_ReadChildNodes(player, items.back().folders, L"folder");
     for (xml_node child_node = player.child(L"edit"); child_node; child_node = child_node.next_sibling(L"edit")) {
       MediaPlayer::EditTitle edit;
-      edit.Mode = child_node.attribute(L"mode").as_int();
-      edit.Value = child_node.child_value();
-      Items.back().Edit.push_back(edit);
+      edit.mode = child_node.attribute(L"mode").as_int();
+      edit.value = child_node.child_value();
+      items.back().edits.push_back(edit);
     }
   }
   
@@ -82,27 +82,27 @@ BOOL MediaPlayers::Save() {
   players.set_name(L"media_players");
 
   // Write player list
-  for (unsigned int i = 0; i < Items.size(); i++) {
-    wstring comment = L" " + Items[i].Name + L" ";
+  for (unsigned int i = 0; i < items.size(); i++) {
+    wstring comment = L" " + items[i].name + L" ";
     players.append_child(node_comment).set_value(comment.c_str());
     xml_node player = players.append_child();
     player.set_name(L"player");
     player.append_child().set_name(L"name");
-    player.child(L"name").append_child(node_pcdata).set_value(Items[i].Name.c_str());
+    player.child(L"name").append_child(node_pcdata).set_value(items[i].name.c_str());
     player.append_child().set_name(L"enabled");
-    player.child(L"enabled").append_child(node_pcdata).set_value(ToWSTR(Items[i].Enabled).c_str());
+    player.child(L"enabled").append_child(node_pcdata).set_value(ToWSTR(items[i].enabled).c_str());
     player.append_child().set_name(L"visible");
-    player.child(L"visible").append_child(node_pcdata).set_value(ToWSTR(Items[i].Visible).c_str());
+    player.child(L"visible").append_child(node_pcdata).set_value(ToWSTR(items[i].visible).c_str());
     player.append_child().set_name(L"mode");
-    player.child(L"mode").append_child(node_pcdata).set_value(ToWSTR(Items[i].Mode).c_str());
-    XML_WriteChildNodes(player, Items[i].Class, L"class");
-    XML_WriteChildNodes(player, Items[i].File, L"file");
-    XML_WriteChildNodes(player, Items[i].Folder, L"folder");
-    for (unsigned int j = 0; j < Items[i].Edit.size(); j++) {
+    player.child(L"mode").append_child(node_pcdata).set_value(ToWSTR(items[i].mode).c_str());
+    XML_WriteChildNodes(player, items[i].classes, L"class");
+    XML_WriteChildNodes(player, items[i].files, L"file");
+    XML_WriteChildNodes(player, items[i].folders, L"folder");
+    for (unsigned int j = 0; j < items[i].edits.size(); j++) {
       xml_node edit = player.append_child();
       edit.set_name(L"edit");
-      edit.append_attribute(L"mode") = Items[i].Edit[j].Mode;
-      edit.append_child(node_pcdata).set_value(Items[i].Edit[j].Value.c_str());
+      edit.append_attribute(L"mode") = items[i].edits[j].mode;
+      edit.append_child(node_pcdata).set_value(items[i].edits[j].value.c_str());
     }
   }
 
@@ -116,26 +116,26 @@ BOOL MediaPlayers::Save() {
 
 int MediaPlayers::Check() {
   title_changed_ = false;
-  Index = -1;
+  index = -1;
 
   HWND hwnd = GetWindow(g_hMain, GW_HWNDFIRST);
   while (hwnd != NULL) {
-    for (auto item = Items.begin(); item != Items.end(); ++item) {
-      if (item->Enabled == FALSE) continue;
-      if (item->Visible == FALSE || IsWindowVisible(hwnd)) {
+    for (auto item = items.begin(); item != items.end(); ++item) {
+      if (item->enabled == FALSE) continue;
+      if (item->visible == FALSE || IsWindowVisible(hwnd)) {
         // Compare window classes
-        for (auto c = item->Class.begin(); c != item->Class.end(); ++c) {
+        for (auto c = item->classes.begin(); c != item->classes.end(); ++c) {
           if (*c == GetWindowClass(hwnd)) {
             // Compare file names
-            for (auto f = item->File.begin(); f != item->File.end(); ++f) {
+            for (auto f = item->files.begin(); f != item->files.end(); ++f) {
               if (IsEqual(*f, GetFileName(GetWindowPath(hwnd)))) {
                 // We have a match!
-                NewCaption = GetTitle(hwnd, *c, item->Mode);
-                if (CurrentCaption != NewCaption) title_changed_ = true;
-                CurrentCaption = NewCaption;
-                item->WindowHandle = hwnd;
-                Index = IndexOld = item - Items.begin();
-                return Index;
+                new_caption = GetTitle(hwnd, *c, item->mode);
+                if (current_caption != new_caption) title_changed_ = true;
+                current_caption = new_caption;
+                item->window_handle = hwnd;
+                index = index_old = item - items.begin();
+                return index;
               }
             }
           }
@@ -151,18 +151,18 @@ int MediaPlayers::Check() {
 }
 
 void MediaPlayers::EditTitle(wstring& str) {
-  if (str.empty() || Index == -1 || Items[Index].Edit.empty()) return;
+  if (str.empty() || index == -1 || items[index].edits.empty()) return;
   
-  for (unsigned int i = 0; i < Items[Index].Edit.size(); i++) {
-    switch (Items[Index].Edit[i].Mode) {
+  for (unsigned int i = 0; i < items[index].edits.size(); i++) {
+    switch (items[index].edits[i].mode) {
       // Erase
       case 1: {
-        Replace(str, Items[Index].Edit[i].Value, L"", false, true);
+        Replace(str, items[index].edits[i].value, L"", false, true);
         break;
       }
       // Cut right side
       case 2: {
-        int pos = InStr(str, Items[Index].Edit[i].Value, 0);
+        int pos = InStr(str, items[index].edits[i].value, 0);
         if (pos > -1) str.resize(pos);
         break;
       }
@@ -173,9 +173,9 @@ void MediaPlayers::EditTitle(wstring& str) {
 }
 
 wstring MediaPlayers::MediaPlayer::GetPath() {
-  for (size_t i = 0; i < Folder.size(); i++) {
-    for (size_t j = 0; j < File.size(); j++) {
-      wstring path = Folder[i] + File[j];
+  for (size_t i = 0; i < folders.size(); i++) {
+    for (size_t j = 0; j < files.size(); j++) {
+      wstring path = folders[i] + files[j];
       path = ExpandEnvironmentStrings(path);
       if (FileExists(path)) return path;
     }
@@ -299,7 +299,7 @@ wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class
       if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 0, GET_STATUS_STATUS) != MCI_MODE_STOP) {
         if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 
           reinterpret_cast<WPARAM>(g_hMain), GET_STATUS_TRACK_FILENAME)) {
-            return NewCaption;
+            return new_caption;
         }
       }
     }
