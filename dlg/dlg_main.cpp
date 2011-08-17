@@ -400,10 +400,9 @@ BOOL MainDialog::OnDestroy() {
   // Announce
   if (Taiga.play_status == PLAYSTATUS_PLAYING) {
     Taiga.play_status = PLAYSTATUS_STOPPED;
-    ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
+    Announcer.Do(ANNOUNCE_TO_HTTP);
   }
-  ExecuteAction(L"AnnounceToMessenger", FALSE);
-  ExecuteAction(L"AnnounceToSkype", FALSE);
+  Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
   // Close other dialogs
   AnimeDialog.Destroy();
   RecognitionTest.Destroy();
@@ -607,10 +606,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           // Disable ticker
           Taiga.ticker_media = -1;
           // Announce current episode
-          ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
-          ExecuteAction(L"AnnounceToMessenger", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
-          ExecuteAction(L"AnnounceToMIRC", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
-          ExecuteAction(L"AnnounceToSkype", TRUE, reinterpret_cast<LPARAM>(&CurrentEpisode));
+          Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_MIRC | ANNOUNCE_TO_SKYPE);
           // Update
           if (Settings.Account.Update.time == UPDATE_MODE_AFTERDELAY && anime) {
             anime->End(CurrentEpisode, false, true);

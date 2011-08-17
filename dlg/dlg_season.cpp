@@ -285,6 +285,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
   CDC hdc = pCD->nmcd.hdc;
   CRect rect = pCD->nmcd.rc;
 
+  if (GetWinVersion() < WINVERSION_VISTA) {
+    list_.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rect);
+  }
+
   switch (pCD->nmcd.dwDrawStage) {
     case CDDS_PREPAINT: {
       result = CDRF_NOTIFYITEMDRAW;
@@ -299,8 +303,14 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (!anime) break;
       
       // Draw border
-      rect.Inflate(-4, -4);
-      hdc.FillRect(rect, RGB(230, 230, 230));
+      if (GetWinVersion() > WINVERSION_XP) {
+        rect.Inflate(-4, -4);
+      }
+      if (GetWinVersion() < WINVERSION_VISTA && pCD->nmcd.uItemState & CDIS_SELECTED) {
+        hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
+      } else {
+        hdc.FillRect(rect, RGB(230, 230, 230));
+      }
 
       // Draw background
       rect.Inflate(-1, -1);
@@ -363,6 +373,13 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         Anime* anime_onlist = AnimeList.FindItem(anime->series_id);
         hdc.FillRect(rect_title, anime_onlist ? RGB(225, 245, 231) : MAL_LIGHTBLUE);
       }
+
+      /*Anime* anime_onlist = AnimeList.FindItem(anime->series_id);
+      if (anime_onlist) {
+        UI.ImgList16.Draw(ICON16_TICK, hdc.Get(), rect_title.right - 20, rect_title.top + 2);
+        rect_title.right -= 20;
+      }*/
+
       // Draw title
       rect_title.Inflate(-4, 0);
       hdc.EditFont(nullptr, -1, TRUE);
@@ -519,6 +536,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 
   // Insert list groups
   list_.RemoveAllGroups();
+  list_.EnableGroupView(true); // Required for XP
   switch (group_by) {
     case SEASON_GROUPBY_AIRINGSTATUS:
       for (int i = MAL_AIRING; i <= MAL_NOTYETAIRED; i++) {

@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "announce.h"
 #include "common.h"
 #include "dlg/dlg_event.h"
 #include "dlg/dlg_main.h"
@@ -123,8 +124,7 @@ void EventList::Add(EventItem& item) {
       episode.anime_id = anime->series_id;
       episode.number = ToWSTR(item.episode);
       Taiga.play_status = PLAYSTATUS_UPDATED;
-      ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&episode));
-      ExecuteAction(L"AnnounceToTwitter", 0, reinterpret_cast<LPARAM>(&episode));
+      Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_TWITTER, &episode);
     }
 
     // Check new episode

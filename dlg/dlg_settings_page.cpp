@@ -353,7 +353,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_BUTTON_MIRC_TEST: {
           wstring service;
           GetDlgItemText(IDC_EDIT_MIRC_SERVICE, service);
-          TestMIRCConnection(service);
+          Announcer.TestMircConnection(service);
           return TRUE;
         }
 

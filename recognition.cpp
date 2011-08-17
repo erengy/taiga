@@ -29,10 +29,10 @@ RecognitionEngine Meow;
 
 class Token {
 public:
-  Token() : Encloser('\0'), Separator('\0'), Virgin(true) {}
-  wchar_t Encloser, Separator;
-  wstring Content;
-  bool Virgin;
+  Token() : encloser('\0'), separator('\0'), virgin(true) {}
+  wchar_t encloser, separator;
+  wstring content;
+  bool virgin;
 };
 
 // =============================================================================
@@ -52,7 +52,7 @@ RecognitionEngine::RecognitionEngine() {
 // =============================================================================
 
 bool RecognitionEngine::CompareEpisode(Episode& episode, const Anime& anime, 
-                                  bool strict, bool check_episode, bool check_date) {
+                                       bool strict, bool check_episode, bool check_date) {
   // Leave if title is empty
   if (episode.title.empty()) return false;
   // Leave if episode number is out of range
@@ -83,7 +83,7 @@ bool RecognitionEngine::CompareEpisode(Episode& episode, const Anime& anime,
 }
 
 bool RecognitionEngine::CompareTitle(const wstring& title, wstring& anime_title, 
-                                Episode& episode, const Anime& anime, bool strict) {
+                                     Episode& episode, const Anime& anime, bool strict) {
   // Remove unnecessary characters
   if (anime_title.empty()) return false;
   CleanTitle(anime_title);
@@ -109,7 +109,7 @@ bool RecognitionEngine::CompareTitle(const wstring& title, wstring& anime_title,
 }
 
 bool RecognitionEngine::CompareSynonyms(const wstring& title, wstring& anime_title, const wstring& synonyms, 
-                                   Episode& episode, const Anime& anime, bool strict) {
+                                        Episode& episode, const Anime& anime, bool strict) {
   size_t index_begin = 0, index_end;
   do {
     index_end = synonyms.find(L"; ", index_begin);
@@ -124,8 +124,8 @@ bool RecognitionEngine::CompareSynonyms(const wstring& title, wstring& anime_tit
 // =============================================================================
 
 bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode, 
-                                bool examine_inside, bool examine_outside, bool examine_number,
-                                bool check_extras, bool check_extension) {
+                                     bool examine_inside, bool examine_outside, bool examine_number,
+                                     bool check_extras, bool check_extension) {
   // Clear previous data
   episode.Clear();
 
@@ -156,11 +156,11 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
 
   //////////////////////////////////////////////////////////////////////////////
   // Here we are, entering the world of tokens. Each token has four properties:
-  // * Content: Self-explanatory
-  // * Encloser: Can be empty or one of these characters: [](){}
-  // * Separator: The most common non-alphanumeric character - usually a space 
+  // * content: Self-explanatory
+  // * encloser: Can be empty or one of these characters: [](){}
+  // * separator: The most common non-alphanumeric character - usually a space 
   //   or an underscore
-  // * Virgin: All tokens start out as virgins but lose this property when some
+  // * virgin: All tokens start out as virgins but lose this property when some
   //   keyword within is recognized and erased.
 
   // Tokenize
@@ -183,16 +183,16 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
   for (unsigned int i = 1; i < tokens.size() - 1; i++) {
     // Combine remaining tokens that are enclosed with parentheses - this is
     // especially useful for titles that include a year value and some other cases
-    if (tokens[i - 1].Virgin == false || tokens[i].Virgin == false || 
-      IsTokenEnclosed(tokens[i - 1]) == true || tokens[i].Encloser != '(' || 
-      tokens[i - 1].Content.length() < 2) {
+    if (tokens[i - 1].virgin == false || tokens[i].virgin == false || 
+      IsTokenEnclosed(tokens[i - 1]) == true || tokens[i].encloser != '(' || 
+      tokens[i - 1].content.length() < 2) {
         continue;
     }
-    tokens[i - 1].Content += L"(" + tokens[i].Content + L")";
+    tokens[i - 1].content += L"(" + tokens[i].content + L")";
     if (IsTokenEnclosed(tokens[i + 1]) == false) {
-      tokens[i - 1].Content += tokens[i + 1].Content;
-      if (tokens[i - 1].Separator == '\0')
-        tokens[i - 1].Separator = tokens[i + 1].Separator;
+      tokens[i - 1].content += tokens[i + 1].content;
+      if (tokens[i - 1].separator == '\0')
+        tokens[i - 1].separator = tokens[i + 1].separator;
       tokens.erase(tokens.begin() + i + 1);
     }
     tokens.erase(tokens.begin() + i);
@@ -200,10 +200,10 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
   }
   for (unsigned int i = 0; i < tokens.size(); i++) {
     // Trim separator character from each side of the token
-    wchar_t trim_char[] = {tokens[i].Separator, '\0'};
-    Trim(tokens[i].Content, trim_char);
+    wchar_t trim_char[] = {tokens[i].separator, '\0'};
+    Trim(tokens[i].content, trim_char);
     // Tokens that are too short are now garbage, so we take them out
-    if (tokens[i].Content.length() < 2 && !IsNumeric(tokens[i].Content)) {
+    if (tokens[i].content.length() < 2 && !IsNumeric(tokens[i].content)) {
       tokens.erase(tokens.begin() + i);
       i--;
     }
@@ -243,7 +243,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
   // Choose the first enclosed virgin token as the group name
   for (unsigned int i = 0; i < group_vector.size(); i++) {
     // Here we assume that group names are never enclosed with other keywords
-    if (tokens[group_vector[i]].Virgin) {
+    if (tokens[group_vector[i]].virgin) {
       group_index = group_vector[i];
       group_vector.erase(group_vector.begin() + i);
       break;
@@ -261,12 +261,12 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
   // Do we have a title?
   if (title_index > -1) {
     // Replace the separator with a space character
-    ReplaceChar(tokens[title_index].Content, tokens[title_index].Separator, ' ');
+    ReplaceChar(tokens[title_index].content, tokens[title_index].separator, ' ');
     // Do some clean-up
-    Trim(tokens[title_index].Content, L" -");
+    Trim(tokens[title_index].content, L" -");
     // Set the title
-    title = tokens[title_index].Content;
-    tokens[title_index].Content.clear();
+    title = tokens[title_index].content;
+    tokens[title_index].content.clear();
   }
 
   // Do we have a group name?
@@ -275,12 +275,12 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
     // those characters can be a part of the group name itself
     if (!IsTokenEnclosed(tokens[group_index])) {
       // Replace the separator with a space character
-      ReplaceChar(tokens[group_index].Content, tokens[group_index].Separator, ' ');
+      ReplaceChar(tokens[group_index].content, tokens[group_index].separator, ' ');
       // Do some clean-up
-      Trim(tokens[group_index].Content, L" -");
+      Trim(tokens[group_index].content, L" -");
     }
     // Set the group name
-    episode.group = tokens[group_index].Content;
+    episode.group = tokens[group_index].content;
     // We don't clear token content here, becuse we'll be checking it for
     // episode number later on
   }
@@ -291,8 +291,8 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
   if (examine_number) {
     // Check remaining tokens first
     for (unsigned int i = 0; i < tokens.size(); i++) {
-      if (IsEpisodeFormat(tokens[i].Content, episode, tokens[i].Separator)) {
-        tokens[i].Virgin = false;
+      if (IsEpisodeFormat(tokens[i].content, episode, tokens[i].separator)) {
+        tokens[i].virgin = false;
         break;
       }
     }
@@ -318,10 +318,10 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
       // Set the first valid numeric token as episode number
       if (episode.number.empty()) {
         for (unsigned int i = 0; i < tokens.size(); i++) {
-          if (IsNumeric(tokens[i].Content)) {
-            episode.number = tokens[i].Content;
+          if (IsNumeric(tokens[i].content)) {
+            episode.number = tokens[i].content;
             if (ValidateEpisodeNumber(episode)) {
-              tokens[i].Virgin = false;
+              tokens[i].virgin = false;
               break;
             }
           }
@@ -382,11 +382,11 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
   //////////////////////////////////////////////////////////////////////////////
 
   // Check if the group token is still a virgin
-  if (group_index > -1 && !tokens[group_index].Virgin) {
+  if (group_index > -1 && !tokens[group_index].virgin) {
     episode.group.clear();
     for (unsigned int i = 0; i < tokens.size(); i++) {
-      if (!tokens[i].Content.empty() && tokens[i].Virgin) {
-        episode.group = tokens[i].Content;
+      if (!tokens[i].content.empty() && tokens[i].virgin) {
+        episode.group = tokens[i].content;
         break;
       }
     }
@@ -394,7 +394,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
 
   // Examine remaining tokens once more
   for (unsigned int i = 0; i < tokens.size(); i++) {
-    if (!tokens[i].Content.empty()) {
+    if (!tokens[i].content.empty()) {
       ExamineToken(tokens[i], episode, true);
     }
   }
@@ -412,15 +412,15 @@ void RecognitionEngine::ExamineToken(Token& token, Episode& episode, bool compar
   // Split into words
   // The most common non-alphanumeric character is the separator
   vector<wstring> words;
-  token.Separator = GetMostCommonCharacter(token.Content);
-  Split(token.Content, wstring(1, token.Separator), words);
+  token.separator = GetMostCommonCharacter(token.content);
+  Split(token.content, wstring(1, token.separator), words);
   
   // Revert if there are words that are too short
   // This prevents splitting group names like "m.3.3.w" and keywords like "H.264"
   if (IsTokenEnclosed(token)) {
     for (unsigned int i = 0; i < words.size(); i++) {
       if (words[i].length() == 1) {
-        words.clear(); words.push_back(token.Content); break;
+        words.clear(); words.push_back(token.content); break;
       }
     }
   }
@@ -429,7 +429,7 @@ void RecognitionEngine::ExamineToken(Token& token, Episode& episode, bool compar
   for (unsigned int i = 0; i < words.size(); i++) {
     if (words[i].empty()) continue;
     #define RemoveWordFromToken(b) { \
-      Erase(token.Content, words[i], b); token.Virgin = false; }
+      Erase(token.content, words[i], b); token.virgin = false; }
     
     // Checksum
     if (episode.checksum.empty() && words[i].length() == 8 && IsHex(words[i])) {
@@ -634,12 +634,12 @@ bool RecognitionEngine::IsCountingWord(const wstring& str) {
 }
 
 bool RecognitionEngine::IsTokenEnclosed(const Token& token) {
-  return token.Encloser == '[' || token.Encloser == '(' || token.Encloser == '{';
+  return token.encloser == '[' || token.encloser == '(' || token.encloser == '{';
 }
 
-void RecognitionEngine::ReadKeyword(unsigned int uID, vector<wstring>& str) {
+void RecognitionEngine::ReadKeyword(unsigned int id, vector<wstring>& str) {
   wstring str_buff; 
-  ReadStringTable(uID, str_buff); 
+  ReadStringTable(id, str_buff); 
   Split(str_buff, L", ", str);
 }
 
@@ -649,11 +649,11 @@ size_t RecognitionEngine::TokenizeTitle(const wstring& str, const wstring& delim
     size_t index_end = str.find_first_of(delimiters, index_begin + 1);
     tokens.resize(tokens.size() + 1);
     if (index_end == wstring::npos) {
-      tokens.back().Content = str.substr(index_begin);
+      tokens.back().content = str.substr(index_begin);
       break;
     } else {
-      tokens.back().Content = str.substr(index_begin, index_end - index_begin);
-      if (index_begin > 0) tokens.back().Encloser = str.at(index_begin - 1);
+      tokens.back().content = str.substr(index_begin, index_end - index_begin);
+      if (index_begin > 0) tokens.back().encloser = str.at(index_begin - 1);
       index_begin = str.find_first_not_of(delimiters, index_end + 1);
     }
   }

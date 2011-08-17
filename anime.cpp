@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "announce.h"
 #include "common.h"
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_feed_filter.h"
@@ -140,9 +141,8 @@ void Anime::End(Episode episode, bool end_watching, bool update_list) {
     playing = false;
     // Announce
     episode.anime_id = series_id;
-    ExecuteAction(L"AnnounceToHTTP", TRUE, reinterpret_cast<LPARAM>(&episode));
-    ExecuteAction(L"AnnounceToMessenger", FALSE);
-    ExecuteAction(L"AnnounceToSkype", FALSE);
+    Announcer.Do(ANNOUNCE_TO_HTTP, &episode);
+    Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
     // Update main window
     episode.anime_id = ANIMEID_UNKNOWN;
     MainDialog.ChangeStatus();

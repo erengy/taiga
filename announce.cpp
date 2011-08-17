@@ -27,14 +27,80 @@
 #include "string.h"
 #include "win32/win_taskdialog.h"
 
+class Announcer Announcer;
 class Skype Skype;
 class Twitter Twitter;
 
 // =============================================================================
 
+void Announcer::Clear(int modes) {
+  if (modes & ANNOUNCE_TO_HTTP) {
+    ToHttp(Settings.Announce.HTTP.url, L"");
+  }
+  
+  if (modes & ANNOUNCE_TO_MESSENGER) {
+    ToMessenger(L"", L"", L"", false);
+  }
+  
+  if (modes & ANNOUNCE_TO_MIRC) {
+    // Not available
+  }
+  
+  if (modes & ANNOUNCE_TO_SKYPE) {
+    ToSkype(L"");
+  }
+  
+  if (modes & ANNOUNCE_TO_TWITTER) {
+    // Not available
+  }
+}
+
+void Announcer::Do(int modes, Episode* episode) {
+  if (!episode) episode = &CurrentEpisode;
+
+  if (modes & ANNOUNCE_TO_HTTP) {
+    DEBUG_PRINT(L"ANNOUNCE_TO_HTTP\n");
+    ToHttp(Settings.Announce.HTTP.url, 
+      ReplaceVariables(Settings.Announce.HTTP.format, *episode, true));
+  }
+
+  if (episode->anime_id == ANIMEID_NOTINLIST || 
+      episode->anime_id <= ANIMEID_UNKNOWN) {
+        return;
+  }
+
+  if (modes & ANNOUNCE_TO_MESSENGER) {
+    DEBUG_PRINT(L"ANNOUNCE_TO_MESSENGER\n");
+    ToMessenger(L"Taiga", L"MyAnimeList", 
+      ReplaceVariables(Settings.Announce.MSN.format, *episode), true);
+  }
+
+  if (modes & ANNOUNCE_TO_MIRC) {
+    DEBUG_PRINT(L"ANNOUNCE_TO_MIRC\n");
+    ToMirc(Settings.Announce.MIRC.service, 
+      Settings.Announce.MIRC.channels, 
+      ReplaceVariables(Settings.Announce.MIRC.format, *episode), 
+      Settings.Announce.MIRC.mode, 
+      Settings.Announce.MIRC.use_action, 
+      Settings.Announce.MIRC.multi_server);
+  }
+
+  if (modes & ANNOUNCE_TO_SKYPE) {
+    DEBUG_PRINT(L"ANNOUNCE_TO_SKYPE\n");
+    ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode));
+  }
+
+  if (modes & ANNOUNCE_TO_TWITTER) {
+    DEBUG_PRINT(L"ANNOUNCE_TO_TWITTER\n");
+    ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode));
+  }
+}
+
+// =============================================================================
+
 /* HTTP */
 
-void AnnounceToHTTP(wstring address, wstring data) {
+void Announcer::ToHttp(wstring address, wstring data) {
   if (address.empty() || data.empty()) return;
 
   CUrl url(address);
@@ -45,7 +111,7 @@ void AnnounceToHTTP(wstring address, wstring data) {
 
 /* Messenger */
 
-void AnnounceToMessenger(wstring artist, wstring album, wstring title, BOOL show) {
+void Announcer::ToMessenger(wstring artist, wstring album, wstring title, BOOL show) {
   if (title.empty() && show) return;
   
   COPYDATASTRUCT cds;
@@ -71,7 +137,7 @@ void AnnounceToMessenger(wstring artist, wstring album, wstring title, BOOL show
 
 /* mIRC */
 
-BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, BOOL use_action, BOOL multi_server) {
+bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode, BOOL use_action, BOOL multi_server) {
   if (!FindWindow(L"mIRC", NULL)) return FALSE;
   if (service.empty() || channels.empty() || data.empty()) return FALSE;
 
@@ -82,7 +148,7 @@ BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, B
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);
-    return FALSE;
+    return false;
   }
 
   // List channels
@@ -121,7 +187,7 @@ BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, B
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);
     DDE.UnInitialize();
-    return FALSE;
+    return false;
   }
   
   // Send message to channels
@@ -136,10 +202,10 @@ BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, B
   // Clean up
   DDE.Disconnect();
   DDE.UnInitialize();
-  return TRUE;
+  return true;
 }
 
-BOOL TestMIRCConnection(wstring service) {
+bool Announcer::TestMircConnection(wstring service) {
   wstring content;
   CTaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
   dlg.AddButton(L"OK", IDOK);
@@ -148,7 +214,7 @@ BOOL TestMIRCConnection(wstring service) {
   if (!FindWindow(L"mIRC", NULL)) {
     dlg.SetMainInstruction(L"mIRC is not running.");
     dlg.Show(g_hMain);
-    return FALSE;
+    return false;
   }
 
   // Initialize
@@ -156,7 +222,7 @@ BOOL TestMIRCConnection(wstring service) {
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.Show(g_hMain);
-    return FALSE;
+    return false;
   }
 
   // Try to connect
@@ -165,7 +231,7 @@ BOOL TestMIRCConnection(wstring service) {
     dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
     dlg.Show(g_hMain);
     DDE.UnInitialize();
-    return FALSE;
+    return false;
   } else {
     wstring channels;
     DDE.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
@@ -179,7 +245,7 @@ BOOL TestMIRCConnection(wstring service) {
   dlg.Show(g_hMain);
   DDE.Disconnect();
   DDE.UnInitialize();
-  return TRUE;
+  return true;
 }
 
 // =============================================================================
@@ -217,7 +283,7 @@ BOOL Skype::ChangeMood() {
   }
 }
 
-void AnnounceToSkype(const wstring& mood) {
+void Announcer::ToSkype(const wstring& mood) {
   Skype.mood = mood;
 
   if (Skype.api_window_handle == NULL) {
@@ -288,6 +354,6 @@ bool Twitter::SetStatusText(const wstring& status_text) {
     HTTP_Twitter_Post);
 }
 
-void AnnounceToTwitter(const wstring& status_text) {
+void Announcer::ToTwitter(const wstring& status_text) {
   Twitter.SetStatusText(status_text); 
 }

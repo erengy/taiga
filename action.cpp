@@ -493,73 +493,38 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
-  //   If wParam is set to FALSE, this function sends an empty string.
-  //   lParam points to a Episode class.
   } else if (action == L"AnnounceToHTTP") {
     if (Settings.Announce.HTTP.enabled || body == L"true") {
-      if (wParam) {
-        Episode* episode = lParam ? reinterpret_cast<Episode*>(lParam) : &CurrentEpisode;
-        AnnounceToHTTP(Settings.Announce.HTTP.url, ReplaceVariables(Settings.Announce.HTTP.format, *episode, true));
-      } else {
-        AnnounceToHTTP(Settings.Announce.HTTP.url, L"");
-      }
+      Announcer.Do(ANNOUNCE_TO_HTTP);
     }
   
   // AnnounceToMessenger(force)
   //   Changes MSN Messenger status text.
-  //   If wParam is set to FALSE, this function sends an empty string.
-  //   lParam points to a Episode class.
   } else if (action == L"AnnounceToMessenger") {
     if (Settings.Announce.MSN.enabled || body == L"true") {
-      if (wParam) {
-        Episode* episode = lParam ? reinterpret_cast<Episode*>(lParam) : &CurrentEpisode;
-        if (episode->anime_id > 0) {
-          AnnounceToMessenger(L"Taiga", L"MyAnimeList", ReplaceVariables(Settings.Announce.MSN.format, *episode), true);
-        }
-      } else {
-        AnnounceToMessenger(L"", L"", L"", false);
-      }
+      Announcer.Do(ANNOUNCE_TO_MESSENGER);
     }
   
   // AnnounceToMIRC(force)
   //   Sends message to specified channels in mIRC.
-  //   lParam points to a Episode class.
   } else if (action == L"AnnounceToMIRC") {
     if (Settings.Announce.MIRC.enabled || body == L"true") {
-      Episode* episode = lParam ? reinterpret_cast<Episode*>(lParam) : &CurrentEpisode;
-      if (episode->anime_id > 0) {
-        AnnounceToMIRC(Settings.Announce.MIRC.service, Settings.Announce.MIRC.channels, 
-          ReplaceVariables(Settings.Announce.MIRC.format, *episode), 
-          Settings.Announce.MIRC.mode, Settings.Announce.MIRC.use_action, Settings.Announce.MIRC.multi_server);
-      }
+      Announcer.Do(ANNOUNCE_TO_MIRC);
     }
   
   // AnnounceToSkype(force)
   //   Changes Skype mood text.
   //   Requires authorization.
-  //   If wParam is set to FALSE, this function sends an empty string.
-  //   lParam points to a Episode class.
   } else if (action == L"AnnounceToSkype") {
     if (Settings.Announce.Skype.enabled || body == L"true") {
-      if (wParam) {
-        Episode* episode = lParam ? reinterpret_cast<Episode*>(lParam) : &CurrentEpisode;
-        if (episode->anime_id > 0) {
-          AnnounceToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode));
-        }
-      } else {
-        AnnounceToSkype(L"");
-      }
+      Announcer.Do(ANNOUNCE_TO_SKYPE);
     }
 
   // AnnounceToTwitter(force)
   //   Changes Twitter status.
-  //   lParam points to a Episode class.
   } else if (action == L"AnnounceToTwitter") {
     if (Settings.Announce.Twitter.enabled || body == L"true") {
-      Episode* episode = lParam ? reinterpret_cast<Episode*>(lParam) : &CurrentEpisode;
-      if (episode->anime_id > 0) {
-        AnnounceToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode));
-      }
+      Announcer.Do(ANNOUNCE_TO_TWITTER);
     }
   
   // ===========================================================================

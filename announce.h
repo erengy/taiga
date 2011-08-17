@@ -22,17 +22,38 @@
 #include "std.h"
 #include "third_party/oauth/oauth.h"
 
-// =============================================================================
-
-/* HTTP */
-
-void AnnounceToHTTP(wstring address, wstring data);
+class Episode;
 
 // =============================================================================
 
-/* Messenger */
+enum AnnouncerModes {
+  ANNOUNCE_TO_HTTP      = 0x01,
+  ANNOUNCE_TO_MESSENGER = 0x02,
+  ANNOUNCE_TO_MIRC      = 0x04,
+  ANNOUNCE_TO_SKYPE     = 0x08,
+  ANNOUNCE_TO_TWITTER   = 0x10
+};
 
-void AnnounceToMessenger(wstring artist, wstring album, wstring title, BOOL show);
+class Announcer {
+public:
+  Announcer() {}
+  virtual ~Announcer() {}
+
+  void Clear(int modes);
+  void Do(int modes, Episode* episode = nullptr);
+
+public:
+  bool TestMircConnection(wstring service);
+
+private:
+  void ToHttp(wstring address, wstring data);
+  void ToMessenger(wstring artist, wstring album, wstring title, BOOL show);
+  bool ToMirc(wstring service, wstring channels, wstring data, int mode, BOOL use_action, BOOL multi_server);
+  void ToSkype(const wstring& mood);
+  void ToTwitter(const wstring& status_text);
+};
+
+extern Announcer Announcer;
 
 // =============================================================================
 
@@ -43,9 +64,6 @@ enum MircChannelMode {
   MIRC_CHANNELMODE_ALL    = 2,
   MIRC_CHANNELMODE_CUSTOM = 3
 };
-
-BOOL AnnounceToMIRC(wstring service, wstring channels, wstring data, int mode, BOOL use_action, BOOL multi_server);
-BOOL TestMIRCConnection(wstring service);
 
 // =============================================================================
 
@@ -67,7 +85,6 @@ public:
 };
 
 extern Skype Skype;
-void AnnounceToSkype(const wstring& mood);
 
 // =============================================================================
 
@@ -90,6 +107,5 @@ private:
 };
 
 extern Twitter Twitter;
-void AnnounceToTwitter(const wstring& status_text);
 
 #endif // ANNOUNCE_H
