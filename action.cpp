@@ -494,38 +494,28 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
   } else if (action == L"AnnounceToHTTP") {
-    if (Settings.Announce.HTTP.enabled || body == L"true") {
-      Announcer.Do(ANNOUNCE_TO_HTTP);
-    }
+    Announcer.Do(ANNOUNCE_TO_HTTP, nullptr, body == L"true");
   
   // AnnounceToMessenger(force)
   //   Changes MSN Messenger status text.
   } else if (action == L"AnnounceToMessenger") {
-    if (Settings.Announce.MSN.enabled || body == L"true") {
-      Announcer.Do(ANNOUNCE_TO_MESSENGER);
-    }
+    Announcer.Do(ANNOUNCE_TO_MESSENGER, nullptr, body == L"true");
   
   // AnnounceToMIRC(force)
   //   Sends message to specified channels in mIRC.
   } else if (action == L"AnnounceToMIRC") {
-    if (Settings.Announce.MIRC.enabled || body == L"true") {
-      Announcer.Do(ANNOUNCE_TO_MIRC);
-    }
+    Announcer.Do(ANNOUNCE_TO_MIRC, nullptr, body == L"true");
   
   // AnnounceToSkype(force)
   //   Changes Skype mood text.
   //   Requires authorization.
   } else if (action == L"AnnounceToSkype") {
-    if (Settings.Announce.Skype.enabled || body == L"true") {
-      Announcer.Do(ANNOUNCE_TO_SKYPE);
-    }
+    Announcer.Do(ANNOUNCE_TO_SKYPE, nullptr, body == L"true");
 
   // AnnounceToTwitter(force)
   //   Changes Twitter status.
   } else if (action == L"AnnounceToTwitter") {
-    if (Settings.Announce.Twitter.enabled || body == L"true") {
-      Announcer.Do(ANNOUNCE_TO_TWITTER);
-    }
+    Announcer.Do(ANNOUNCE_TO_TWITTER, nullptr, body == L"true");
   
   // ===========================================================================
 
@@ -768,5 +758,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     SeasonDialog.sort_by = ToINT(body);
     SeasonDialog.RefreshList();
     SeasonDialog.RefreshToolbar();
+
+  // Season_RefreshItemData()
+  //   Refreshes an individual season item data.
+  } else if (action == L"Season_RefreshItemData") {
+    SeasonDialog.RefreshData(true, reinterpret_cast<Anime*>(lParam));
   }
 }

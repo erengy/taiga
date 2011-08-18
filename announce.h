@@ -39,8 +39,8 @@ public:
   Announcer() {}
   virtual ~Announcer() {}
 
-  void Clear(int modes);
-  void Do(int modes, Episode* episode = nullptr);
+  void Clear(int modes, bool force = false);
+  void Do(int modes, Episode* episode = nullptr, bool force = false);
 
 public:
   bool TestMircConnection(wstring service);

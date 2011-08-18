@@ -25,17 +25,17 @@
 
 #define APP_NAME             L"Taiga"
 #define APP_TITLE            L"Taiga 0.8"
-#define APP_VERSION          L"0.8.115"
-#define APP_BUILD            L"2011-08-14"
+#define APP_VERSION          L"0.8.121"
+#define APP_BUILD            L"2011-08-18"
 #define APP_VERSION_MAJOR    0
 #define APP_VERSION_MINOR    8
-#define APP_VERSION_REVISION 115
+#define APP_VERSION_REVISION 121
 
 #ifndef PORTABLE
 #define PORTABLE
 #endif
 
-enum play_status {
+enum PlayStatus {
   PLAYSTATUS_STOPPED,
   PLAYSTATUS_PLAYING,
   PLAYSTATUS_UPDATED

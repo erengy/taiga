@@ -33,13 +33,17 @@ class Twitter Twitter;
 
 // =============================================================================
 
-void Announcer::Clear(int modes) {
+void Announcer::Clear(int modes, bool force) {
   if (modes & ANNOUNCE_TO_HTTP) {
-    ToHttp(Settings.Announce.HTTP.url, L"");
+    if (Settings.Announce.HTTP.enabled || force) {
+      ToHttp(Settings.Announce.HTTP.url, L"");
+    }
   }
   
   if (modes & ANNOUNCE_TO_MESSENGER) {
-    ToMessenger(L"", L"", L"", false);
+    if (Settings.Announce.MSN.enabled || force) {
+      ToMessenger(L"", L"", L"", false);
+    }
   }
   
   if (modes & ANNOUNCE_TO_MIRC) {
@@ -47,7 +51,9 @@ void Announcer::Clear(int modes) {
   }
   
   if (modes & ANNOUNCE_TO_SKYPE) {
-    ToSkype(L"");
+    if (Settings.Announce.Skype.enabled || force) {
+      ToSkype(L"");
+    }
   }
   
   if (modes & ANNOUNCE_TO_TWITTER) {
@@ -55,13 +61,15 @@ void Announcer::Clear(int modes) {
   }
 }
 
-void Announcer::Do(int modes, Episode* episode) {
+void Announcer::Do(int modes, Episode* episode, bool force) {
   if (!episode) episode = &CurrentEpisode;
 
   if (modes & ANNOUNCE_TO_HTTP) {
-    DEBUG_PRINT(L"ANNOUNCE_TO_HTTP\n");
-    ToHttp(Settings.Announce.HTTP.url, 
-      ReplaceVariables(Settings.Announce.HTTP.format, *episode, true));
+    if (Settings.Announce.HTTP.enabled || force) {
+      DEBUG_PRINT(L"ANNOUNCE_TO_HTTP\n");
+      ToHttp(Settings.Announce.HTTP.url, 
+        ReplaceVariables(Settings.Announce.HTTP.format, *episode, true));
+    }
   }
 
   if (episode->anime_id == ANIMEID_NOTINLIST || 
@@ -70,29 +78,37 @@ void Announcer::Do(int modes, Episode* episode) {
   }
 
   if (modes & ANNOUNCE_TO_MESSENGER) {
-    DEBUG_PRINT(L"ANNOUNCE_TO_MESSENGER\n");
-    ToMessenger(L"Taiga", L"MyAnimeList", 
-      ReplaceVariables(Settings.Announce.MSN.format, *episode), true);
+    if (Settings.Announce.MSN.enabled || force) {
+      DEBUG_PRINT(L"ANNOUNCE_TO_MESSENGER\n");
+      ToMessenger(L"Taiga", L"MyAnimeList", 
+        ReplaceVariables(Settings.Announce.MSN.format, *episode), true);
+    }
   }
 
   if (modes & ANNOUNCE_TO_MIRC) {
-    DEBUG_PRINT(L"ANNOUNCE_TO_MIRC\n");
-    ToMirc(Settings.Announce.MIRC.service, 
-      Settings.Announce.MIRC.channels, 
-      ReplaceVariables(Settings.Announce.MIRC.format, *episode), 
-      Settings.Announce.MIRC.mode, 
-      Settings.Announce.MIRC.use_action, 
-      Settings.Announce.MIRC.multi_server);
+    if (Settings.Announce.MIRC.enabled || force) {
+      DEBUG_PRINT(L"ANNOUNCE_TO_MIRC\n");
+      ToMirc(Settings.Announce.MIRC.service, 
+        Settings.Announce.MIRC.channels, 
+        ReplaceVariables(Settings.Announce.MIRC.format, *episode), 
+        Settings.Announce.MIRC.mode, 
+        Settings.Announce.MIRC.use_action, 
+        Settings.Announce.MIRC.multi_server);
+    }
   }
 
   if (modes & ANNOUNCE_TO_SKYPE) {
-    DEBUG_PRINT(L"ANNOUNCE_TO_SKYPE\n");
-    ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode));
+    if (Settings.Announce.Skype.enabled || force) {
+      DEBUG_PRINT(L"ANNOUNCE_TO_SKYPE\n");
+      ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode));
+    }
   }
 
   if (modes & ANNOUNCE_TO_TWITTER) {
-    DEBUG_PRINT(L"ANNOUNCE_TO_TWITTER\n");
-    ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode));
+    if (Settings.Announce.Twitter.enabled || force) {
+      DEBUG_PRINT(L"ANNOUNCE_TO_TWITTER\n");
+      ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode));
+    }
   }
 }
 

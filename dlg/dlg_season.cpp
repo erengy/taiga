@@ -266,8 +266,8 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
       Anime* anime = reinterpret_cast<Anime*>(list_.GetItemParam(lpnmitem->iItem));
       if (anime) {
         Anime* anime_onlist = AnimeList.FindItem(anime->series_id);
-        UpdateSearchListMenu(anime_onlist == nullptr);
-        ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SearchList"), 0, 
+        UpdateSeasonListMenu(anime_onlist == nullptr);
+        ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SeasonList"), 0, 
           reinterpret_cast<LPARAM>(anime_onlist ? anime_onlist : anime));
         list_.RedrawWindow();
       }
@@ -374,12 +374,6 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         hdc.FillRect(rect_title, anime_onlist ? RGB(225, 245, 231) : MAL_LIGHTBLUE);
       }
 
-      /*Anime* anime_onlist = AnimeList.FindItem(anime->series_id);
-      if (anime_onlist) {
-        UI.ImgList16.Draw(ICON16_TICK, hdc.Get(), rect_title.right - 20, rect_title.top + 2);
-        rect_title.right -= 20;
-      }*/
-
       // Draw title
       rect_title.Inflate(-4, 0);
       hdc.EditFont(nullptr, -1, TRUE);
@@ -480,19 +474,22 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
 
 // =============================================================================
 
-void SeasonDialog::RefreshData(bool connect) {
+void SeasonDialog::RefreshData(bool connect, Anime* anime) {
   size_t size = SeasonDatabase.items.size();
   
-  for (size_t i = 0; i < size; i++) {
-    if (i < image_clients_.size()) image_clients_.at(i).Cleanup();
-    if (i < info_clients_.size()) info_clients_.at(i).Cleanup();
+  if (!anime && images.size() != size) {
+    for (size_t i = 0; i < size; i++) {
+      if (i < image_clients_.size()) image_clients_.at(i).Cleanup();
+      if (i < info_clients_.size()) info_clients_.at(i).Cleanup();
+    }
+    if (image_clients_.size() != size) image_clients_.resize(size);
+    if (info_clients_.size() != size) info_clients_.resize(size);
+    images.clear();
+    images.resize(size);
   }
-  if (image_clients_.size() != size) image_clients_.resize(size);
-  if (info_clients_.size() != size) info_clients_.resize(size);
-  images.clear();
-  images.resize(size);
 
   for (auto i = SeasonDatabase.items.begin(); i != SeasonDatabase.items.end(); ++i) {
+    if (anime && anime->series_id != i->series_id) continue;
     size_t index = i - SeasonDatabase.items.begin();
     // Load available image
     images.at(index).data = i->series_id;

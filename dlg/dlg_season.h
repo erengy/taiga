@@ -58,7 +58,7 @@ public:
   BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
-  void RefreshData(bool connect = true);
+  void RefreshData(bool connect = true, Anime* anime = nullptr);
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();
   void RefreshToolbar();

@@ -84,6 +84,9 @@ bool AnimeSeasonDatabase::Load(wstring file) {
     items.at(i).synopsis = XML_ReadStrValue(node, L"synopsis");
     xml_node settings_node = node.child(L"settings");
     items.at(i).settings_keep_title = XML_ReadIntValue(settings_node, L"keep_title");
+    MAL.DecodeText(items.at(i).series_title);
+    MAL.DecodeText(items.at(i).series_synonyms);
+    MAL.DecodeText(items.at(i).synopsis);
     i++;
   }
 

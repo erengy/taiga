@@ -581,21 +581,21 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
             }
           }
         }
-      }
-      // Not recognized
-      CurrentEpisode.Set(ANIMEID_NOTINLIST);
-      if (CurrentEpisode.title.empty()) {
-        #ifdef _DEBUG
-        ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
-        #endif
-      } else {
-        ChangeStatus(L"Watching: " + CurrentEpisode.title + 
-          PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
-        wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);
-        tip_text += L"\nClick here to search MyAnimeList for this anime.";
-        Taiga.current_tip_type = TIPTYPE_SEARCH;
-        Taskbar.Tip(L"", L"", 0);
-        Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
+        // Not recognized
+        CurrentEpisode.Set(ANIMEID_NOTINLIST);
+        if (CurrentEpisode.title.empty()) {
+          #ifdef _DEBUG
+          ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
+          #endif
+        } else {
+          ChangeStatus(L"Watching: " + CurrentEpisode.title + 
+            PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
+          wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);
+          tip_text += L"\nClick here to search MyAnimeList for this anime.";
+          Taiga.current_tip_type = TIPTYPE_SEARCH;
+          Taskbar.Tip(L"", L"", 0);
+          Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
+        }
       }
 
     // Already watching or not recognized before

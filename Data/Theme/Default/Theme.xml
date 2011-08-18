@@ -274,6 +274,14 @@
 			<item name="Title"       action="Season_SortBy(4)" radio="1"/>
 		</menu>
 		
+		<!-- Season list -->
+		<menu name="SeasonList">
+			<item name="Information" action="Info()"/>
+			<item name="Refresh data" action="Season_RefreshItemData()"/>
+			<item type="separator"/>
+			<item name="Add to list" sub="AddToList" disabled="1"/>
+		</menu>
+		
 		<!-- Torrent list right click -->
 		<menu name="TorrentListRightClick">
 			<item name="Download" action="DownloadTorrent" default="1"/>

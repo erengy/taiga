@@ -203,6 +203,19 @@ void UpdateSearchListMenu(bool enabled) {
   }
 }
 
+void UpdateSeasonListMenu(bool enabled) {
+  int menu_index = UI.Menus.GetIndex(L"SeasonList");
+  if (menu_index > -1) {
+    // Add to list
+    for (size_t i = 0; i < MENU.Items.size(); i++) {
+      if (MENU.Items[i].SubMenu == L"AddToList") {
+        MENU.Items[i].Enabled = enabled;
+        break;
+      }
+    }
+  }
+}
+
 void UpdateSeasonMenu() {
   int item_index, menu_index = -1;
   

@@ -527,6 +527,7 @@ void MyAnimeList::DecodeText(wstring& text) {
   #undef HTMLCHARCOUNT
   
   Replace(text, L"<br />", L"\r", true);
+  Replace(text, L"\n\n", L"\r\n\r\n", true);
   StripHTML(text);
   DecodeHTML(text);
 }

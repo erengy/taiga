@@ -106,6 +106,7 @@ void UpdateFilterMenu();
 void UpdateFoldersMenu();
 void UpdateSearchMenu();
 void UpdateSearchListMenu(bool enabled = false);
+void UpdateSeasonListMenu(bool enabled = false);
 void UpdateSeasonMenu();
 void UpdateTrayMenu();
 
