@@ -247,7 +247,7 @@ void FeedFilterDialog::ChoosePage(int index) {
 /* Page */
 
 void FeedFilterDialog::DialogPage::Create(UINT uResourceID, FeedFilterDialog* parent, const RECT& rect) {
-  parent = parent;
+  this->parent = parent;
   CDialog::Create(uResourceID, parent->GetWindowHandle(), false);
   SetPosition(nullptr, rect, SWP_NOSIZE);
 }
