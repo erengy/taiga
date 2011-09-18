@@ -546,11 +546,10 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       wstring text;
       edit.GetText(text);
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
-      switch (search_bar.mode) {
-        case SEARCH_MODE_LIST:
-          AnimeList.filters.text = text;
-          RefreshList(text.empty() ? -1 : 0);
-          return TRUE;
+      if (search_bar.filter_list) {
+        AnimeList.filters.text = text;
+        RefreshList(text.empty() ? -1 : 0);
+        return TRUE;
       }
     }
   }

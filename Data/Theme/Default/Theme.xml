@@ -135,11 +135,11 @@
 		
 		<!-- Search bar -->
 		<menu name="SearchBar">
-			<item name="List"        action="SetSearchMode(0, List, Search list)" radio="1"/>
-			<item name="MyAnimeList" action="SetSearchMode(1, MAL, Search MyAnimeList)"  radio="1"/>
+			<item name="Filter list" action="ToggleListSearch()"/>
 			<item type="separator"/>
-			<item name="NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaa.eu/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%search%)" radio="1"/>
-			<item name="TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&amp;_id=a1de48c2d65e13f4e022a982432b41b0&amp;_render=rss)" radio="1"/>
+			<item name="Search MyAnimeList"  action="SetSearchMode(2, MAL, Search MyAnimeList)" radio="1"/>
+			<item name="Search NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaa.eu/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%search%)" radio="1"/>
+			<item name="Search TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&amp;_id=a1de48c2d65e13f4e022a982432b41b0&amp;_render=rss)" radio="1"/>
 		</menu>
 		
 		<!-- Search list -->

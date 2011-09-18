@@ -182,10 +182,11 @@ void UpdateSearchMenu() {
   int menu_index = UI.Menus.GetIndex(L"SearchBar");
   if (menu_index > -1) {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = FALSE;
+      MENU.Items[i].Checked = false;
     }
+    MENU.Items[0].Checked = MainDialog.search_bar.filter_list;
     if (MainDialog.search_bar.index < MENU.Items.size()) {
-      MENU.Items[MainDialog.search_bar.index].Checked = TRUE;
+      MENU.Items[MainDialog.search_bar.index].Checked = true;
     }
   }
 }

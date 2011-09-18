@@ -85,9 +85,9 @@ BOOL MainDialog::OnInitDialog() {
   // Refresh list
   RefreshList(MAL_WATCHING);
   
-  // TODO: Set search bar mode
+  // Set search bar mode
   //search_bar.Index = Settings.Program.General.SearchIndex;
-  //search_bar.SetMode();
+  search_bar.SetMode(2, SEARCH_MODE_MAL, L"Search MyAnimeList");
   
   // Refresh menu bar
   RefreshMenubar();
@@ -353,8 +353,9 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                   edit.GetText(text);
                   wstring search_url = search_bar.url;
                   Replace(search_url, L"%search%", text);
-                  feed->Check(search_url);
                   ExecuteAction(L"Torrents");
+                  TorrentDialog.ChangeStatus(L"Searching torrents for \"" + text + L"\"...");
+                  feed->Check(search_url);
                 }
                 break;
               }
@@ -835,23 +836,6 @@ void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wst
   this->cue_text = cue_text;
   parent->edit.SetCueBannerText(cue_text.c_str());
   Settings.Program.General.search_index = index;
-
-  switch (mode) {
-    case SEARCH_MODE_LIST:
-      parent->edit.GetText(AnimeList.filters.text);
-      if (!AnimeList.filters.text.empty()) {
-        parent->RefreshList(0);
-      }
-      break;
-    case SEARCH_MODE_MAL:
-    case SEARCH_MODE_TORRENT:
-    case SEARCH_MODE_WEB:
-      if (!AnimeList.filters.text.empty()) {
-        AnimeList.filters.text.clear();
-        parent->RefreshList();
-      }
-      break;
-  }
 }
 
 void MainDialog::UpdateTip() {

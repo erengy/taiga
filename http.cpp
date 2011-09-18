@@ -48,11 +48,9 @@ class HttpClient HttpClient, ImageClient, MainClient, SearchClient, TwitterClien
 // =============================================================================
 
 HttpClient::HttpClient() {
+  SetAutoRedirect(FALSE);
   SetUserAgent(APP_NAME L"/" + 
     ToWSTR(APP_VERSION_MAJOR) + L"." + ToWSTR(APP_VERSION_MINOR));
-  if (GetWinVersion() < WINVERSION_VISTA) {
-    SetAutoRedirect(FALSE);
-  }
 }
 
 BOOL HttpClient::OnError(DWORD dwError) {

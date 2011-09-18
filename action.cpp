@@ -232,10 +232,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     vector<wstring> body_vector;
     Split(body, L", ", body_vector);
     if (body_vector.size() > 2) {
-      if (body_vector[1] == L"List") {
-        MainDialog.search_bar.SetMode(
-          ToINT(body_vector[0]), SEARCH_MODE_LIST, body_vector[2]);
-      } else if (body_vector[1] == L"MAL") {
+      if (body_vector[1] == L"MAL") {
         MainDialog.search_bar.SetMode(
           ToINT(body_vector[0]), SEARCH_MODE_MAL, body_vector[2]);
       } else if (body_vector[1] == L"Torrent" && body_vector.size() > 3) {
@@ -244,6 +241,20 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       } else if (body_vector[1] == L"Web" && body_vector.size() > 3) {
         MainDialog.search_bar.SetMode(
           ToINT(body_vector[0]), SEARCH_MODE_WEB, body_vector[2], body_vector[3]);
+      }
+    }
+
+  // ToggleListSearch()
+  //   Enables or disables list filtering for search bar.
+  } else if (action == L"ToggleListSearch") {
+    MainDialog.search_bar.filter_list = !MainDialog.search_bar.filter_list;
+    if (!MainDialog.search_bar.filter_list) {
+      AnimeList.filters.text.clear();
+      MainDialog.RefreshList();
+    } else {
+      MainDialog.edit.GetText(AnimeList.filters.text);
+      if (!AnimeList.filters.text.empty()) {
+        MainDialog.RefreshList(0);
       }
     }
 
@@ -293,8 +304,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (feed) {
       Episode episode;
       episode.anime_id = AnimeList.items[AnimeList.index].series_id;
-      feed->Check(ReplaceVariables(body, episode));
       ExecuteAction(L"Torrents");
+      TorrentDialog.ChangeStatus(L"Searching torrents for \"" + 
+        AnimeList.items[AnimeList.index].series_title + L"\"...");
+      feed->Check(ReplaceVariables(body, episode));
     }
 
   // ShowListStats()

@@ -24,7 +24,6 @@
 #include "../win32/win_dialog.h"
 
 enum SearchMode {
-  SEARCH_MODE_LIST,
   SEARCH_MODE_MAL,
   SEARCH_MODE_TORRENT,
   SEARCH_MODE_WEB
@@ -102,7 +101,8 @@ public:
   // Search bar
   class SearchBar {
   public:
-    SearchBar() : index(0), mode(0) {}
+    SearchBar() : filter_list(true), index(2), mode(SEARCH_MODE_MAL) {}
+    bool filter_list;
     UINT index, mode;
     wstring cue_text, url;
     MainDialog* parent;
