@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include "animelist.h"
+#include "common.h"
 #include "myanimelist.h"
 #include "stats.h"
 #include "string.h"
@@ -68,7 +69,7 @@ int Statistics::CalculateEpisodeCount() {
 }
 
 wstring Statistics::CalculateLifeSpentWatching() {
-  int duration, days, hours, minutes, seconds = 0;
+  int duration, seconds = 0;
   
   for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
     // Approximate duration in minutes
@@ -85,25 +86,9 @@ wstring Statistics::CalculateLifeSpentWatching() {
     if (it->GetRewatching() == TRUE) episodes_watched += it->GetTotalEpisodes();
     seconds += (duration * 60) * episodes_watched;
   }
-
+  
   if (seconds > 0) {
-    #define CALC_TIME(x, y) x = seconds / (y); seconds = seconds % (y);
-    CALC_TIME(days, 60 * 60 * 24);
-    CALC_TIME(hours, 60 * 60);
-    CALC_TIME(minutes, 60);
-    #undef CALC_TIME
-    life_spent_watching.clear();
-    #define ADD_TIME(x, y) \
-      if (x > 0) { \
-        if (!life_spent_watching.empty()) life_spent_watching += L" "; \
-        life_spent_watching += ToWSTR(static_cast<int>(x)) + y; \
-        if (x > 1) life_spent_watching += L"s"; \
-      }
-    ADD_TIME(days, L" day");
-    ADD_TIME(hours, L" hour");
-    ADD_TIME(minutes, L" minute");
-    ADD_TIME(seconds, L" second");
-    #undef ADD_TIME
+    life_spent_watching = ToDateString(seconds);
   } else {
     life_spent_watching = L"None";
   }

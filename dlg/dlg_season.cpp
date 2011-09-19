@@ -18,6 +18,7 @@
 
 #include "../std.h"
 #include <algorithm>
+#include <ctime>
 #include "../animedb.h"
 #include "../animelist.h"
 #include "../common.h"
@@ -506,7 +507,7 @@ void SeasonDialog::RefreshData(bool connect, Anime* anime) {
 
   if (connect) {
     SeasonDatabase.modified = true;
-    SeasonDatabase.last_modified = GetDateJapan() + L" " + GetTimeJapan();
+    SeasonDatabase.last_modified = time(nullptr);
     RefreshStatus();
   }
 
@@ -617,10 +618,16 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 
 void SeasonDialog::RefreshStatus() {
   // Set status
-  if (SeasonDatabase.last_modified.empty()) {
+  if (!SeasonDatabase.last_modified) {
     statusbar_.SetText(L"");
   } else {
-    statusbar_.SetText(L"  Last updated: " + SeasonDatabase.last_modified + L" (JST)");
+    time_t time_now = time(nullptr);
+    time_t time_last = SeasonDatabase.last_modified;
+    if (time_now == time_last) {
+      statusbar_.SetText(L"  Last updated: Now");
+    } else {
+      statusbar_.SetText(L"  Last updated: " + ToDateString(time_now - time_last) + L" ago");
+    }
   }
 }
 

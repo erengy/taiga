@@ -35,8 +35,9 @@ public:
 
 public:
   vector<Anime> items;
-  wstring last_modified, name;
+  time_t last_modified;
   bool modified;
+  wstring name;
 
 private:
   wstring file_, folder_;

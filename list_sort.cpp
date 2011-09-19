@@ -122,6 +122,22 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       break;
     }
 
+    // Last updated
+    case LIST_SORTTYPE_LASTUPDATED: {
+      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
+      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
+      if (pItem1 && pItem2) {
+        time_t time1 = _wtoi64(pItem1->my_last_updated.c_str());
+        time_t time2 = _wtoi64(pItem2->my_last_updated.c_str());
+        if (time1 > time2) {
+          return_value = 1;
+        } else if (time1 < time2) {
+          return_value = -1;
+        }
+      }
+      break;
+    }
+
     // File size
     case LIST_SORTTYPE_FILESIZE: {
       wstring item[2], unit[2];

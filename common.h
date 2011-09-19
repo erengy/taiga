@@ -32,6 +32,7 @@ enum ListSortType {
   LIST_SORTTYPE_DEFAULT,
   LIST_SORTTYPE_EPISODES,
   LIST_SORTTYPE_FILESIZE,
+  LIST_SORTTYPE_LASTUPDATED,
   LIST_SORTTYPE_NUMBER,
   LIST_SORTTYPE_POPULARITY,
   LIST_SORTTYPE_PROGRESS,
@@ -65,6 +66,7 @@ wstring GetDate(LPCWSTR lpFormat = L"yyyy'-'MM'-'dd");
 wstring GetTime(LPCWSTR lpFormat = L"HH':'mm':'ss");
 wstring GetDateJapan(LPCWSTR lpFormat = L"yyyy'-'MM'-'dd");
 wstring GetTimeJapan(LPCWSTR lpFormat = L"HH':'mm':'ss");
+wstring ToDateString(time_t seconds);
 wstring ToTimeString(int seconds);
 bool Execute(const wstring& path, const wstring& parameters = L"");
 BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");

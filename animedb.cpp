@@ -31,7 +31,7 @@ AnimeSeasonDatabase SeasonDatabase;
 // =============================================================================
 
 AnimeSeasonDatabase::AnimeSeasonDatabase() : 
-  modified(false)
+  last_modified(0), modified(false)
 {
 }
 
@@ -55,7 +55,7 @@ bool AnimeSeasonDatabase::Load(wstring file) {
   // Read information
   xml_node season_node = doc.child(L"season");
   name = XML_ReadStrValue(season_node.child(L"info"), L"name");
-  last_modified = XML_ReadStrValue(season_node.child(L"info"), L"last_modified");
+  last_modified = _wtoi64(XML_ReadStrValue(season_node.child(L"info"), L"last_modified").c_str());
 
   // Read items
   size_t anime_count = 0, i = 0;
@@ -118,7 +118,7 @@ bool AnimeSeasonDatabase::Save(wstring file, bool minimal) {
   xml_node info_node = season_node.append_child();
   info_node.set_name(L"info");
   XML_WriteStrValue(info_node, L"name", name.c_str());
-  XML_WriteStrValue(info_node, L"last_modified", last_modified.c_str());
+  XML_WriteStrValue(info_node, L"last_modified", ToWSTR(last_modified).c_str());
 
   // Items
   for (auto it = items.begin(); it != items.end(); ++it) {

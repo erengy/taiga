@@ -240,6 +240,33 @@ wstring GetTimeJapan(LPCWSTR lpFormat) {
   return buff;
 }
 
+wstring ToDateString(time_t seconds) {
+  time_t days, hours, minutes;
+  wstring date;
+
+  if (seconds > 0) {
+    #define CALC_TIME(x, y) x = seconds / (y); seconds = seconds % (y);
+    CALC_TIME(days, 60 * 60 * 24);
+    CALC_TIME(hours, 60 * 60);
+    CALC_TIME(minutes, 60);
+    #undef CALC_TIME
+    date.clear();
+    #define ADD_TIME(x, y) \
+      if (x > 0) { \
+        if (!date.empty()) date += L" "; \
+        date += ToWSTR(x) + y; \
+        if (x > 1) date += L"s"; \
+      }
+    ADD_TIME(days, L" day");
+    ADD_TIME(hours, L" hour");
+    ADD_TIME(minutes, L" minute");
+    ADD_TIME(seconds, L" second");
+    #undef ADD_TIME
+  }
+
+  return date;
+}
+
 wstring ToTimeString(int seconds) {
   int hours = seconds / 3600;
   seconds = seconds % 3600;
