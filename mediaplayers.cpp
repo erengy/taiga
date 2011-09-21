@@ -18,6 +18,8 @@
 
 #include "std.h"
 #include <tlhelp32.h>
+#include "accessibility.h"
+#include "anime.h"
 #include "common.h"
 #include "media.h"
 #include "process.h"
@@ -129,13 +131,16 @@ int MediaPlayers::Check() {
             // Compare file names
             for (auto f = item->files.begin(); f != item->files.end(); ++f) {
               if (IsEqual(*f, GetFileName(GetWindowPath(hwnd)))) {
-                // We have a match!
-                new_caption = GetTitle(hwnd, *c, item->mode);
-                if (current_caption != new_caption) title_changed_ = true;
-                current_caption = new_caption;
-                item->window_handle = hwnd;
-                index = index_old = item - items.begin();
-                return index;
+                if (item->mode != MEDIA_MODE_WEBBROWSER || !GetWindowTitle(hwnd).empty()) {
+                  // We have a match!
+                  index = index_old = item - items.begin();
+                  new_title = GetTitle(hwnd, *c, item->mode);
+                  EditTitle(new_title, index);
+                  if (current_title != new_title) title_changed_ = true;
+                  current_title = new_title;
+                  item->window_handle = hwnd;
+                  return index;
+                }
               }
             }
           }
@@ -150,19 +155,19 @@ int MediaPlayers::Check() {
   return -1;
 }
 
-void MediaPlayers::EditTitle(wstring& str) {
-  if (str.empty() || index == -1 || items[index].edits.empty()) return;
+void MediaPlayers::EditTitle(wstring& str, int player_index) {
+  if (str.empty() || items[player_index].edits.empty()) return;
   
-  for (unsigned int i = 0; i < items[index].edits.size(); i++) {
-    switch (items[index].edits[i].mode) {
+  for (unsigned int i = 0; i < items[player_index].edits.size(); i++) {
+    switch (items[player_index].edits[i].mode) {
       // Erase
       case 1: {
-        Replace(str, items[index].edits[i].value, L"", false, true);
+        Replace(str, items[player_index].edits[i].value, L"", false, true);
         break;
       }
       // Cut right side
       case 2: {
-        int pos = InStr(str, items[index].edits[i].value, 0);
+        int pos = InStr(str, items[player_index].edits[i].value, 0);
         if (pos > -1) str.resize(pos);
         break;
       }
@@ -186,18 +191,22 @@ wstring MediaPlayers::MediaPlayer::GetPath() {
 wstring MediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) {
   switch (mode) {
     // File handle
-    case 1:
+    case MEDIA_MODE_FILEHANDLE:
       return GetTitleFromProcessHandle(hwnd);
     // Winamp API
-    case 2:
+    case MEDIA_MODE_WINAMPAPI:
       return GetTitleFromWinampAPI(hwnd, false);
     // Special message
-    case 3:
+    case MEDIA_MODE_SPECIALMESSAGE:
       return GetTitleFromSpecialMessage(hwnd, class_name);
     // MPlayer
-    case 4:
+    case MEDIA_MODE_MPLAYER:
       return GetTitleFromMPlayer();
+    // Browser
+    case MEDIA_MODE_WEBBROWSER:
+      return GetTitleFromBrowser(hwnd);
     // Window title
+    case MEDIA_MODE_WINDOWTITLE:
     default:
       return GetWindowTitle(hwnd);
   }
@@ -299,7 +308,7 @@ wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class
       if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 0, GET_STATUS_STATUS) != MCI_MODE_STOP) {
         if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 
           reinterpret_cast<WPARAM>(g_hMain), GET_STATUS_TRACK_FILENAME)) {
-            return new_caption;
+            return new_title;
         }
       }
     }
@@ -327,5 +336,169 @@ wstring MediaPlayers::GetTitleFromMPlayer() {
     CloseHandle(hProcessSnap);
   }
   
+  return title;
+}
+
+// =============================================================================
+
+/* Streaming media recognition */
+
+enum StreamingVideoProviders {
+  STREAM_UNKNOWN = -1,
+  STREAM_CRUNCHYROLL,
+  STREAM_YOUTUBE
+};
+
+enum WebBrowsers {
+  WEBBROWSER_UNKNOWN = -1,
+  WEBBROWSER_CHROME,
+  WEBBROWSER_FIREFOX,
+  WEBBROWSER_IE,
+  WEBBROWSER_OPERA
+};
+
+AccessibleChild* FindAccessibleChild(vector<AccessibleChild>& children, const wstring& name, const wstring& role) {
+  AccessibleChild* child = nullptr;
+  
+  for (auto it = children.begin(); it != children.end(); ++it) {
+    if (name.empty() || name == it->name) {
+      if (role.empty() || role == it->role) {
+        child = &(*it);
+      }
+    } else {
+      child = FindAccessibleChild(it->children, name, role);
+    }
+    if (child) {
+      break;
+    }
+  }
+
+  return child;
+}
+
+wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
+  int stream_provider = STREAM_UNKNOWN;
+  int web_browser = WEBBROWSER_UNKNOWN;
+
+  // Get window title
+  wstring title = GetWindowTitle(hwnd);
+  EditTitle(title, index);
+
+  // Return current title if the same web page is still open
+  if (CurrentEpisode.anime_id > 0) {
+    if (InStr(title, current_title) > -1) {
+      return current_title;
+    }
+  }
+
+  // Delay operation to save some CPU
+  static int counter = 0;
+  if (counter < 5) {
+    counter++;
+    return current_title;
+  } else {
+    counter = 0;
+  }
+
+  // Detect web browser
+  if (InStr(items.at(index).name, L"Chrome") > -1) {
+    web_browser = WEBBROWSER_CHROME;
+  } else if (InStr(items.at(index).name, L"Firefox") > -1) {
+    web_browser = WEBBROWSER_FIREFOX;
+  /*} else if (InStr(items.at(index).name, L"Explorer") > -1) {
+    web_browser = WEBBROWSER_IE;*/
+  } else if (InStr(items.at(index).name, L"Opera") > -1) {
+    web_browser = WEBBROWSER_OPERA;
+  } else {
+    return L"";
+  }
+
+  // Build accessibility data
+  AccessibleObject acc_obj;
+  if (acc_obj.FromWindow(hwnd) == S_OK) {
+    acc_obj.BuildChildren(acc_obj.children);
+    acc_obj.Release();
+  }
+
+  // Check other tabs
+  if (CurrentEpisode.anime_id > 0) {
+    AccessibleChild* child = nullptr;
+    switch (web_browser) {
+      case WEBBROWSER_CHROME:
+      case WEBBROWSER_FIREFOX:
+        child = FindAccessibleChild(acc_obj.children, L"", L"page tab list");
+        break;
+      case WEBBROWSER_IE:
+        child = FindAccessibleChild(acc_obj.children, L"Tab Row", L"");
+        break;
+      case WEBBROWSER_OPERA:
+        child = FindAccessibleChild(acc_obj.children, L"", L"client");
+        break;
+    }
+    if (child) {
+      for (auto it = child->children.begin(); it != child->children.end(); ++it) {
+        if (InStr(it->name, current_title) > -1) {
+          // Tab is still open, just not active
+          return current_title;
+        }
+      }
+    }
+    // Tab is closed
+    return L"";
+  }
+
+  // Find URL
+  AccessibleChild* child = nullptr;
+  switch (web_browser) {
+    case WEBBROWSER_CHROME:
+      child = FindAccessibleChild(acc_obj.children, L"Location", L"grouping");
+      break;
+    case WEBBROWSER_FIREFOX:
+      child = FindAccessibleChild(acc_obj.children, L"Go to a Web Site", L"editable text");
+      break;
+    case WEBBROWSER_IE:
+      child = FindAccessibleChild(acc_obj.children, L"Address", L"editable text");
+      break;
+    case WEBBROWSER_OPERA:
+      child = FindAccessibleChild(acc_obj.children, L"", L"client");
+      if (child && !child->children.empty()) {
+        child = FindAccessibleChild(child->children.at(0).children, L"", L"tool bar");
+        if (child && !child->children.empty()) {
+          child = FindAccessibleChild(child->children, L"", L"combo box");
+          if (child && !child->children.empty()) {
+            child = FindAccessibleChild(child->children, L"", L"editable text");
+          }
+        }
+      }
+      break;
+  }
+  
+  // Check URL for known streaming video providers
+  if (child) {
+    // Crunchyroll
+    if (InStr(child->value, L"crunchyroll.com/") > -1) {
+      stream_provider = STREAM_CRUNCHYROLL;
+    // YouTube
+    } else if (InStr(child->value, L"youtube.com/watch") > -1) {
+      stream_provider = STREAM_YOUTUBE;
+    }
+  }
+
+  // Clean-up title
+  switch (stream_provider) {
+    // Crunchyroll
+    case STREAM_CRUNCHYROLL:
+      EraseLeft(title, L"Watch ", false);
+      break;
+    // YouTube
+    case STREAM_YOUTUBE:
+      EraseRight(title, L" - YouTube", false);
+      break;
+    // Some other website, or URL is not found
+    case STREAM_UNKNOWN:
+      title.clear();
+      break;
+  }
+
   return title;
 }

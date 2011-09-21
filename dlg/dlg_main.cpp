@@ -284,12 +284,12 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
       // JetAudio
       } else if (pCDS->dwData == 0x3000 /* JRC_COPYDATA_ID_TRACK_FILENAME */) {
-        MediaPlayers.new_caption = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
+        MediaPlayers.new_title = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
         return TRUE;
 
       // Media Portal
       } else if (pCDS->dwData == 0x1337) {
-        MediaPlayers.new_caption = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
+        MediaPlayers.new_title = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
         return TRUE;
       }
       break;
@@ -573,7 +573,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     if (CurrentEpisode.anime_id == ANIMEID_UNKNOWN) {
       // Recognized?
       if (Taiga.is_recognition_enabled) {
-        if (Meow.ExamineTitle(MediaPlayers.current_caption, CurrentEpisode)) {
+        if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
           for (int i = AnimeList.count; i > 0; i--) {
             if (Meow.CompareEpisode(CurrentEpisode, AnimeList.items[i])) {
               CurrentEpisode.Set(AnimeList.items[i].series_id);

@@ -209,12 +209,10 @@ BOOL SettingsPage::OnInitDialog() {
     // Recognition > Media players
     case PAGE_MEDIA: {
       CListView List = GetDlgItem(IDC_LIST_MEDIA);
+      List.EnableGroupView(true);
       List.InsertColumn(0, 0, 0, 0, L"Supported players");
-      List.InsertGroup(0, L"By title");
-      List.InsertGroup(1, L"By handle");
-      List.InsertGroup(2, L"By API");
-      List.InsertGroup(3, L"By message");
-      List.InsertGroup(4, L"By MPlayer");
+      List.InsertGroup(0, L"Media players");
+      List.InsertGroup(1, L"Web browsers");
       List.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
@@ -229,7 +227,7 @@ BOOL SettingsPage::OnInitDialog() {
       }
       for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
         BOOL player_available = MediaPlayers.items[i].GetPath().empty() ? FALSE : TRUE;
-        List.InsertItem(i, MediaPlayers.items[i].mode, 
+        List.InsertItem(i, MediaPlayers.items[i].mode == 5 ? 1 : 0, 
           ICON16_APP_GRAY - player_available, 0, nullptr, 
           MediaPlayers.items[i].name.c_str(), 0);
         if (MediaPlayers.items[i].enabled) List.SetCheckState(i, TRUE);

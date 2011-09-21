@@ -23,6 +23,15 @@
 
 // =============================================================================
 
+enum MediaPlayerModes {
+  MEDIA_MODE_WINDOWTITLE,
+  MEDIA_MODE_FILEHANDLE,
+  MEDIA_MODE_WINAMPAPI,
+  MEDIA_MODE_SPECIALMESSAGE,
+  MEDIA_MODE_MPLAYER,
+  MEDIA_MODE_WEBBROWSER
+};
+
 /* Media players class */
 
 class MediaPlayers {
@@ -34,7 +43,7 @@ public:
   BOOL Save();
   int Check();
 
-  void EditTitle(wstring& str);
+  void EditTitle(wstring& str, int player_index);
   wstring GetTitle(HWND hwnd, const wstring& class_name, int mode);
   bool TitleChanged() { return title_changed_; }
 
@@ -42,10 +51,11 @@ public:
   wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
   wstring GetTitleFromSpecialMessage(HWND hwnd, const wstring& class_name);
   wstring GetTitleFromMPlayer();
+  wstring GetTitleFromBrowser(HWND hwnd);
   
 public:
   int index, index_old;
-  wstring current_caption, new_caption;
+  wstring current_title, new_title;
 
   class MediaPlayer {
   public:

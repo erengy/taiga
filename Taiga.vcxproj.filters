@@ -318,6 +318,9 @@
     <ClCompile Include="dlg\dlg_season.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="accessibility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -523,6 +526,9 @@
     </ClInclude>
     <ClInclude Include="dlg\dlg_season.h">
       <Filter>Dialogs\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="accessibility.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

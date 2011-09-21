@@ -128,13 +128,10 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
                                      bool check_extras, bool check_extension) {
   // Clear previous data
   episode.Clear();
+  if (title.empty()) return false;
 
   // Remove zero width space character
   EraseChars(title, L"\u200B");
-                  
-  // Trim media player name
-  MediaPlayers.EditTitle(title);
-  if (title.empty()) return false;
 
   // Retrieve file name from full path
   if (title.length() > 2 && title.at(1) == ':' && title.at(2) == '\\') {

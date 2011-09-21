@@ -305,4 +305,54 @@
 		<folder>%ProgramW6432%\Combined Community Codec Pack\Zoom Player\</folder>
 		<edit mode="2">Zoom Player</edit>
 	</player>
+	<!-- Google Chrome -->
+	<player>
+		<name>Google Chrome</name>
+		<enabled>0</enabled>
+		<visible>1</visible>
+		<mode>5</mode>
+		<class>Chrome_OmniboxView</class>
+		<class>Chrome_RenderWidgetHostHWND</class>
+		<class>Chrome_WidgetWin_0</class>
+		<file>chrome.exe</file>
+		<folder>%LocalAppData%\Google\Chrome\Application\</folder>
+		<edit mode="2">Google Chrome</edit>
+	</player>
+	<!-- Internet Explorer -->
+	<player>
+		<name>Internet Explorer</name>
+		<enabled>0</enabled>
+		<visible>1</visible>
+		<mode>5</mode>
+		<class>IEFrame</class>
+		<file>iexplore.exe</file>
+		<folder>%ProgramFiles%\Internet Explorer\</folder>
+		<folder>%ProgramW6432%\Internet Explorer\</folder>
+		<edit mode="2">Windows Internet Explorer</edit>
+	</player>
+	<!-- Mozilla Firefox -->
+	<player>
+		<name>Mozilla Firefox</name>
+		<enabled>0</enabled>
+		<visible>1</visible>
+		<mode>5</mode>
+		<class>MozillaUIWindowClass</class>
+		<class>MozillaWindowClass</class>
+		<file>firefox.exe</file>
+		<folder>%ProgramFiles%\Mozilla Firefox\</folder>
+		<folder>%ProgramW6432%\Mozilla Firefox\</folder>
+		<edit mode="2">Mozilla Firefox</edit>
+	</player>
+	<!-- Opera -->
+	<player>
+		<name>Opera</name>
+		<enabled>0</enabled>
+		<visible>1</visible>
+		<mode>5</mode>
+		<class>OperaWindowClass</class>
+		<file>opera.exe</file>
+		<folder>%ProgramFiles%\Opera\</folder>
+		<folder>%ProgramW6432%\Opera\</folder>
+		<edit mode="2">Opera</edit>
+	</player>
 </media_players>
