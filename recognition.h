@@ -57,7 +57,6 @@ private:
   bool IsTokenEnclosed(const Token& token);
   void ReadKeyword(unsigned int id, vector<wstring>& str);
   size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<Token>& tokens);
-  void TrimEpisodeWord(wstring& str, bool erase_rightleft);
   bool ValidateEpisodeNumber(Episode& episode);
 
 public:

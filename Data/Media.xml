@@ -195,6 +195,7 @@
 		<mode>0</mode>
 		<class>QWidget</class>
 		<file>smplayer.exe</file>
+		<file>smplayer2.exe</file>
 		<folder>%ProgramFiles%\SMPlayer\</folder>
 		<folder>%ProgramW6432%\SMPlayer\</folder>
 		<edit mode="2">SMPlayer</edit>

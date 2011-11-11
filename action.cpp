@@ -353,7 +353,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   
   // AddToListAs(status)
   //   Adds new anime to list with given status.
-  //   lParam is a pointer to a Anime.
+  //   lParam is a pointer to an Anime.
   } else if (action == L"AddToListAs") {
     int status = ToINT(body);
     Anime* anime = reinterpret_cast<Anime*>(lParam);
@@ -382,6 +382,14 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       item.mode = HTTP_MAL_AnimeAdd;
       EventQueue.Add(item);
     }
+
+  // ViewAnimePage
+  //   Opens up anime page on MAL.
+  //   lParam is a pointer to an Anime.
+  } else if (action == L"ViewAnimePage") {
+    Anime* anime = lParam ? 
+      reinterpret_cast<Anime*>(lParam) : &AnimeList.items[AnimeList.index];
+    MAL.ViewAnimePage(anime->series_id);
 
   // ===========================================================================
 

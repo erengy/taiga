@@ -39,8 +39,9 @@ public:
 
   HRESULT FromWindow(HWND hwnd, DWORD object_id = OBJID_CLIENT);
   
-  HRESULT BuildChildren(vector<AccessibleChild>& children, IAccessible* acc = nullptr);
+  HRESULT BuildChildren(vector<AccessibleChild>& children, IAccessible* acc = nullptr, LPARAM param = 0L);
   HRESULT GetChildCount(long* child_count, IAccessible* acc = nullptr);
+  virtual bool AllowChildTraverse(AccessibleChild& child, LPARAM param = 0L);
 
   HRESULT GetName(wstring& name, long child_id = CHILDID_SELF, IAccessible* acc = nullptr);
   HRESULT GetRole(wstring& role, long child_id = CHILDID_SELF, IAccessible* acc = nullptr);

@@ -255,8 +255,8 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
     case NM_DBLCLK: {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
       if (lpnmitem->iItem == -1) break;
-      Anime* anime = reinterpret_cast<Anime*>(list_.GetItemParam(lpnmitem->iItem));
-      if (anime) MAL.ViewAnimePage(anime->series_id);
+      LPARAM param = list_.GetItemParam(lpnmitem->iItem);
+      if (param) ExecuteAction(L"ViewAnimePage", 0, param);
       break;
     }
 

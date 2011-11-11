@@ -146,7 +146,7 @@ HRESULT AccessibleObject::GetChildCount(long* child_count, IAccessible* acc) {
   return acc->get_accChildCount(child_count);
 }
 
-HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAccessible* acc) {
+HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAccessible* acc, LPARAM param) {
   if (acc == nullptr) acc = acc_;
   if (acc == nullptr) return E_INVALIDARG;
 
@@ -172,8 +172,10 @@ HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAcce
         GetName(children.back().name, CHILDID_SELF, child);
         GetRole(children.back().role, CHILDID_SELF, child);
         GetValue(children.back().value, CHILDID_SELF, child);
-        if (children.back().role != L"document") { // Huge performance improvement for Firefox
+        if (AllowChildTraverse(children.back(), param)) {
           BuildChildren(children.back().children, child);
+        } else {
+          children.pop_back();
         }
         child->Release();
       }
@@ -188,6 +190,10 @@ HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAcce
   }
 
   return S_OK;
+}
+
+bool AccessibleObject::AllowChildTraverse(AccessibleChild& child, LPARAM param) {
+  return true;
 }
 
 // =============================================================================

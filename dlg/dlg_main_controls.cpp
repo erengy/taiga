@@ -417,7 +417,11 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
           if (anime->GetRewatching()) text += L" (rw)";
           hdc.EditFont(nullptr, 7);
           hdc.SetBkMode(TRANSPARENT);
-          hdc.SetTextColor(RGB(0, 0, 0)); // TODO: Color should be set in theme data
+          rcText.Offset(1, 1);
+          hdc.SetTextColor(RGB(255, 255, 255));
+          hdc.DrawText(text.c_str(), text.length(), rcText, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
+          rcText.Offset(-1, -1);
+          hdc.SetTextColor(RGB(0, 0, 0));
           hdc.DrawText(text.c_str(), text.length(), rcText, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
           DeleteObject(hdc.DetachFont());
         }

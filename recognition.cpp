@@ -147,7 +147,19 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
       episode.format = ToUpper_Copy(extension);
       title.resize(title.length() - extension.length() - 1);
     } else {
-      if (check_extension) return false;
+      if (IsNumeric(extension)) {
+        wstring temp = title.substr(0, title.length() - extension.length());
+        for (auto it = episode_keywords.begin(); it != episode_keywords.end(); ++it) {
+          if (IsEqual(CharRight(temp, it->length()), *it)) {
+            title.resize(title.length() - extension.length() - it->length() - 1);
+            episode.number = extension;
+            break;
+          }
+        }
+      }
+      if (check_extension && episode.number.empty()) {
+        return false;
+      }
     }
   }
 
@@ -655,16 +667,6 @@ size_t RecognitionEngine::TokenizeTitle(const wstring& str, const wstring& delim
     }
   }
   return tokens.size();
-}
-
-void RecognitionEngine::TrimEpisodeWord(wstring& str, bool erase_rightleft) {
-  for (unsigned int i = 0; i < episode_keywords.size(); i++) {
-    if (erase_rightleft) {
-      EraseRight(str, L" " + episode_keywords[i], true);
-    } else {
-      EraseLeft(str, episode_keywords[i] + L" ", true);
-    }
-  }
 }
 
 bool RecognitionEngine::ValidateEpisodeNumber(Episode& episode) {

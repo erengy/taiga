@@ -20,6 +20,7 @@
 #define MEDIA_H
 
 #include "std.h"
+#include "accessibility.h"
 
 // =============================================================================
 
@@ -73,6 +74,11 @@ public:
     vector<EditTitle> edits;
   };
   vector<MediaPlayer> items;
+
+  class BrowserAccessibleObject : public AccessibleObject {
+  public:
+    bool AllowChildTraverse(AccessibleChild& child, LPARAM param = 0L);
+  } acc_obj;
 
 private:
   bool title_changed_;

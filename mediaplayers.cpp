@@ -18,7 +18,6 @@
 
 #include "std.h"
 #include <tlhelp32.h>
-#include "accessibility.h"
 #include "anime.h"
 #include "common.h"
 #include "media.h"
@@ -345,7 +344,11 @@ wstring MediaPlayers::GetTitleFromMPlayer() {
 
 enum StreamingVideoProviders {
   STREAM_UNKNOWN = -1,
+  STREAM_ANN,
   STREAM_CRUNCHYROLL,
+  STREAM_HULU,
+  STREAM_VEOH,
+  STREAM_VIZANIME,
   STREAM_YOUTUBE
 };
 
@@ -365,7 +368,8 @@ AccessibleChild* FindAccessibleChild(vector<AccessibleChild>& children, const ws
       if (role.empty() || role == it->role) {
         child = &(*it);
       }
-    } else {
+    }
+    if (child == nullptr) {
       child = FindAccessibleChild(it->children, name, role);
     }
     if (child) {
@@ -405,8 +409,10 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     web_browser = WEBBROWSER_CHROME;
   } else if (InStr(items.at(index).name, L"Firefox") > -1) {
     web_browser = WEBBROWSER_FIREFOX;
-  /*} else if (InStr(items.at(index).name, L"Explorer") > -1) {
-    web_browser = WEBBROWSER_IE;*/
+  /*
+  } else if (InStr(items.at(index).name, L"Explorer") > -1) {
+    web_browser = WEBBROWSER_IE;
+  */
   } else if (InStr(items.at(index).name, L"Opera") > -1) {
     web_browser = WEBBROWSER_OPERA;
   } else {
@@ -414,9 +420,9 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   }
 
   // Build accessibility data
-  AccessibleObject acc_obj;
+  acc_obj.children.clear();
   if (acc_obj.FromWindow(hwnd) == S_OK) {
-    acc_obj.BuildChildren(acc_obj.children);
+    acc_obj.BuildChildren(acc_obj.children, nullptr, web_browser);
     acc_obj.Release();
   }
 
@@ -475,9 +481,23 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   
   // Check URL for known streaming video providers
   if (child) {
+    // Anime News Network
+    if (InStr(child->value, L"animenewsnetwork.com/video") > -1) {
+      stream_provider = STREAM_ANN;
     // Crunchyroll
-    if (InStr(child->value, L"crunchyroll.com/") > -1) {
+    } else if (InStr(child->value, L"crunchyroll.com/") > -1) {
       stream_provider = STREAM_CRUNCHYROLL;
+    // Hulu
+    /*
+    } else if (InStr(child->value, L"hulu.com/watch") > -1) {
+      stream_provider = STREAM_HULU;
+    */
+    // Veoh
+    } else if (InStr(child->value, L"veoh.com/watch") > -1) {
+      stream_provider = STREAM_VEOH;
+    // Viz Anime
+    } else if (InStr(child->value, L"vizanime.com/ep") > -1) {
+      stream_provider = STREAM_VIZANIME;
     // YouTube
     } else if (InStr(child->value, L"youtube.com/watch") > -1) {
       stream_provider = STREAM_YOUTUBE;
@@ -486,13 +506,31 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 
   // Clean-up title
   switch (stream_provider) {
+    // Anime News Network
+    case STREAM_ANN:
+      EraseRight(title, L" - Anime News Network");
+      break;
     // Crunchyroll
     case STREAM_CRUNCHYROLL:
-      EraseLeft(title, L"Watch ", false);
+      EraseLeft(title, L"Watch ");
+      break;
+    // Hulu
+    case STREAM_HULU:
+      EraseLeft(title, L"Hulu - ");
+      EraseRight(title, L" - Watch the full episode now.");
+      break;
+    // Veoh
+    case STREAM_VEOH:
+      EraseLeft(title, L"Watch Videos Online | ");
+      EraseRight(title, L" | Veoh.com");
+      break;
+    // Viz Anime
+    case STREAM_VIZANIME:
+      EraseRight(title, L" - VIZ ANIME: Free Online Anime - All The Time");
       break;
     // YouTube
     case STREAM_YOUTUBE:
-      EraseRight(title, L" - YouTube", false);
+      EraseRight(title, L" - YouTube");
       break;
     // Some other website, or URL is not found
     case STREAM_UNKNOWN:
@@ -501,4 +539,17 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   }
 
   return title;
+}
+
+bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(AccessibleChild& child, LPARAM param) {
+  switch (param) {
+    case WEBBROWSER_UNKNOWN:
+      return false;
+    case WEBBROWSER_FIREFOX:
+      // Huge performance improvement
+      if (child.role != L"document") return false;
+      break;
+  }
+
+  return true;
 }
