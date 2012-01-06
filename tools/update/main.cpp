@@ -32,7 +32,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
   // argv[3]: Process ID (optional)
   int argc = 0;
   LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-  if (argc < 3 || argv == NULL) return 1;
+  if (argc < 3 || argv == NULL) {
+    MessageBoxW(NULL, L"Usage example:\nUpdateHelper.exe App.exe App.exe.new [Process ID]", NULL, MB_ICONERROR | MB_OK);
+    return 1;
+  }
 
   // Wait for the application to close
   DWORD dwProcessId = argc > 3 ? _wtoi(argv[3]) : 0;
@@ -46,26 +49,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
         Sleep(100);
       }
     } while (hProcess != NULL);
-  } else {
-    // Wait a second
-    Sleep(1000);
   }
+  // Wait a second
+  Sleep(1000);
   
   // Take a backup of the old file (App.exe -> App.exe.bak)
   WCHAR backup[MAX_PATH] = {'\0'};
   wcscpy_s(backup, MAX_PATH, argv[1]);
   wcscat_s(backup, MAX_PATH, L".bak");
-  while (!MoveFileW(argv[1], backup)) Sleep(100);
+  while (!MoveFileW(argv[1], backup)) Sleep(1000);
   
   // Rename the new file (App.exe.new -> App.exe)
   if (MoveFileW(argv[2], argv[1])) {
+    Sleep(1000);
     // Execute the new file
     ShellExecuteW(NULL, L"open", argv[1], NULL, NULL, SW_SHOW);
-    // Delete the backup
+    // Delete the backup (App.exe.bak)
     DeleteFileW(backup);
   } else {
     MessageBoxW(NULL, L"An error occured while updating.", NULL, MB_ICONERROR | MB_OK);
-    // Revert to backup
+    // Revert to backup (App.exe.bak -> App.exe)
     MoveFileW(backup, argv[1]);
   }
 

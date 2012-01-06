@@ -121,7 +121,7 @@
 			<!-- Useful links -->
 			<menu name="Links">
 				<item name="How to Watch Anime" action="URL(http://myanimelist.net/clubs.php?cid=8711)"/>
-				<item name="Autumn 2011 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
+				<item name="Winter 2011 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
 				<item type="separator"/>
 				<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
 				<item name="The Fansub Wiki"  action="URL(http://www.fansubwiki.com/)"/>
@@ -233,7 +233,7 @@
 		<menu name="Tray">
 			<item name="Settings..." action="Settings()"/>
 			<item type="separator"/>
-			<item name="Toggle updates" action="ToggleUpdates()"/>
+			<item name="Enable recognition" action="ToggleRecognition()" checked="1"/>
 			<item name="Anime folders" sub="Folders"/>
 			<item name="MyAnimeList"   sub="MyAnimeList"/>
 			<item type="separator"/>
@@ -277,6 +277,8 @@
 		<!-- Season list -->
 		<menu name="SeasonList">
 			<item name="Information" action="Info()"/>
+			<item name="View on MAL" action="ViewAnimePage()"/>
+			<item type="separator"/>
 			<item name="Refresh data" action="Season_RefreshItemData()"/>
 			<item type="separator"/>
 			<item name="Add to list" sub="AddToList" disabled="1"/>

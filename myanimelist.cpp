@@ -589,16 +589,16 @@ wstring MyAnimeList::TranslateDateToSeason(wstring value) {
 
     if (month == 0) {
       value = L"Unknown";
-    } else if (month < 3) {
+    } else if (month < 3) {  // Jan-Feb
       value = L"Winter";
       year--;
-    } else if (month < 6) {
+    } else if (month < 6) {  // Mar-May
       value = L"Spring";
-    } else if (month < 9) {
+    } else if (month < 9) {  // Jun-Aug
       value = L"Summer";
-    } else if (month < 11) {
+    } else if (month < 12) { // Sep-Nov
       value = L"Fall";
-    } else {
+    } else {                 // Dec
       value = L"Winter";
     }
     

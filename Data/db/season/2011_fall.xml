@@ -138,13 +138,6 @@
 		<producers>Aniplex, Brains Base</producers>
 	</anime>
 	<anime>
-		<series_animedb_id>10935</series_animedb_id>
-		<series_title><![CDATA[Hourou Musuko Specials]]></series_title>
-		<series_type>4</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/7/30177.jpg</series_image>
-		<producers>Aniplex, AIC</producers>
-	</anime>
-	<anime>
 		<series_animedb_id>11061</series_animedb_id>
 		<series_title><![CDATA[Hunter x Hunter (2011)]]></series_title>
 		<series_type>1</series_type>
@@ -157,13 +150,6 @@
 		<series_type>4</series_type>
 		<series_image>http://cdn.myanimelist.net/images/anime/9/31995.jpg</series_image>
 		<producers>Satelight</producers>
-	</anime>
-	<anime>
-		<series_animedb_id>10794</series_animedb_id>
-		<series_title><![CDATA[IS: Infinite Stratos Encore: Koi ni Kogareru Sextet]]></series_title>
-		<series_type>2</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/4/29805.jpg</series_image>
-		<producers>8bit</producers>
 	</anime>
 	<anime>
 		<series_animedb_id>10805</series_animedb_id>
@@ -185,13 +171,6 @@
 		<series_type>1</series_type>
 		<series_image>http://cdn.myanimelist.net/images/anime/4/33743.jpg</series_image>
 		<producers>Sunrise</producers>
-	</anime>
-	<anime>
-		<series_animedb_id>10336</series_animedb_id>
-		<series_title><![CDATA[Last Exile: Ginyoku no Fam]]></series_title>
-		<series_type>1</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/3/33541.jpg</series_image>
-		<producers>Gonzo, FUNimation Entertainment</producers>
 	</anime>
 	<anime>
 		<series_animedb_id>10213</series_animedb_id>
@@ -264,6 +243,13 @@
 		<producers>Production I.G, NAS, M.S.C</producers>
 	</anime>
 	<anime>
+		<series_animedb_id>10731</series_animedb_id>
+		<series_title><![CDATA[Prince of Tennis: Eikokushiki Teikyuu Shiro Kessen!]]></series_title>
+		<series_type>3</series_type>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/32079.jpg</series_image>
+		<producers>Production I.G, NAS, M.S.C</producers>
+	</anime>
+	<anime>
 		<series_animedb_id>10924</series_animedb_id>
 		<series_title><![CDATA[Queen's Blade OVA]]></series_title>
 		<series_type>2</series_type>
@@ -278,18 +264,18 @@
 		<producers>Xebec</producers>
 	</anime>
 	<anime>
-		<series_animedb_id>10469</series_animedb_id>
-		<series_title><![CDATA[Sayonara Zetsubou Sensei Special]]></series_title>
-		<series_type>4</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/6/28743.jpg</series_image>
-		<producers>Shaft</producers>
-	</anime>
-	<anime>
 		<series_animedb_id>11123</series_animedb_id>
 		<series_title><![CDATA[Sekaiichi Hatsukoi 2]]></series_title>
 		<series_type>1</series_type>
 		<series_image>http://cdn.myanimelist.net/images/anime/7/32767.jpg</series_image>
 		<producers>Studio Deen</producers>
+	</anime>
+	<anime>
+		<series_animedb_id>10592</series_animedb_id>
+		<series_title><![CDATA[Scryed Alteration I: Tao]]></series_title>
+		<series_type>3</series_type>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/34093.jpg</series_image>
+		<producers>Sunrise</producers>
 	</anime>
 	<anime>
 		<series_animedb_id>6773</series_animedb_id>

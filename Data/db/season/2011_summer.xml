@@ -2,7 +2,7 @@
 <season>
 	<info>
 		<name>Summer 2011</name>
-		<last_modified>1313707014</last_modified>
+		<last_modified>1318481016</last_modified>
 	</info>
 	<anime>
 		<series_animedb_id>9117</series_animedb_id>
@@ -50,7 +50,7 @@
 		<series_animedb_id>10479</series_animedb_id>
 		<series_title><![CDATA[Beelzebub: Hashire! Beel-bo Keiji!!]]></series_title>
 		<series_type>4</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/6/28819.jpg</series_image>
+		<series_image>http://cdn.myanimelist.net/images/anime/4/31637.jpg</series_image>
 		<producers>Studio Pierrot</producers>
 	</anime>
 	<anime>
@@ -64,7 +64,7 @@
 		<series_animedb_id>10490</series_animedb_id>
 		<series_title><![CDATA[Blood-C]]></series_title>
 		<series_type>1</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/11/30252.jpg</series_image>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/31649.jpg</series_image>
 		<producers>Production I.G, Aniplex, Mainichi Broadcasting</producers>
 	</anime>
 	<anime>
@@ -92,7 +92,7 @@
 		<series_animedb_id>10838</series_animedb_id>
 		<series_title><![CDATA[Double-J]]></series_title>
 		<series_type>1</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/11/29917.jpg</series_image>
+		<series_image>http://cdn.myanimelist.net/images/anime/11/31695.jpg</series_image>
 		<producers>DLE</producers>
 	</anime>
 	<anime>
@@ -145,10 +145,17 @@
 		<producers>Madhouse Studios, Satelight</producers>
 	</anime>
 	<anime>
+		<series_animedb_id>10935</series_animedb_id>
+		<series_title><![CDATA[Hourou Musuko Specials]]></series_title>
+		<series_type>4</series_type>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/30177.jpg</series_image>
+		<producers>Aniplex, AIC</producers>
+	</anime>
+	<anime>
 		<series_animedb_id>9938</series_animedb_id>
 		<series_title><![CDATA[Ikoku Meiro no Croisée]]></series_title>
 		<series_type>1</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/8/29031.jpg</series_image>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/32405.jpg</series_image>
 		<producers>Satelight, Sentai Filmworks</producers>
 	</anime>
 	<anime>
@@ -204,7 +211,7 @@
 		<series_animedb_id>10029</series_animedb_id>
 		<series_title><![CDATA[Kokurikozaka Kara]]></series_title>
 		<series_type>3</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/12/29493.jpg</series_image>
+		<series_image>http://cdn.myanimelist.net/images/anime/8/32547.jpg</series_image>
 		<producers>Studio Ghibli</producers>
 	</anime>
 	<anime>
@@ -213,6 +220,13 @@
 		<series_type>2</series_type>
 		<series_image>http://cdn.myanimelist.net/images/anime/8/28161.jpg</series_image>
 		<producers>Studio Deen</producers>
+	</anime>
+	<anime>
+		<series_animedb_id>10336</series_animedb_id>
+		<series_title><![CDATA[Last Exile: Ginyoku no Fam]]></series_title>
+		<series_type>1</series_type>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/33541.jpg</series_image>
+		<producers>Gonzo, FUNimation Entertainment</producers>
 	</anime>
 	<anime>
 		<series_animedb_id>7135</series_animedb_id>
@@ -333,7 +347,7 @@
 		<series_animedb_id>10572</series_animedb_id>
 		<series_title><![CDATA[Ro-Kyu-Bu!]]></series_title>
 		<series_type>1</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/2/29851.jpg</series_image>
+		<series_image>http://cdn.myanimelist.net/images/anime/11/32643.jpg</series_image>
 		<producers>Magic Capsule, Sentai Filmworks, Project No.9, Studio Blanc</producers>
 	</anime>
 	<anime>
@@ -396,7 +410,7 @@
 		<series_animedb_id>10714</series_animedb_id>
 		<series_title><![CDATA[Towa no Quon 3: Mugen no Renza]]></series_title>
 		<series_type>3</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/2/29522.jpg</series_image>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/32945.jpg</series_image>
 		<producers>Bones</producers>
 	</anime>
 	<anime>

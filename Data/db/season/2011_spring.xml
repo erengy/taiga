@@ -123,13 +123,6 @@
 		</settings>
 	</anime>
 	<anime>
-		<series_animedb_id>10260</series_animedb_id>
-		<series_title><![CDATA[Eiyuu Densetsu: Sora no Kiseki]]></series_title>
-		<series_type>2</series_type>
-		<series_image>http://cdn.myanimelist.net/images/anime/7/29453.jpg</series_image>
-		<producers>Nihon Falcom</producers>
-	</anime>
-	<anime>
 		<series_animedb_id>9982</series_animedb_id>
 		<series_title><![CDATA[Fairy Tail OVA]]></series_title>
 		<series_type>2</series_type>
@@ -351,7 +344,7 @@
 	</anime>
 	<anime>
 		<series_animedb_id>10346</series_animedb_id>
-		<series_title><![CDATA[Ring no Kakero 1: Sekai Taikai Hen]]></series_title>
+		<series_title><![CDATA[Ring ni Kakero 1: Sekai Taikai Hen]]></series_title>
 		<series_type>1</series_type>
 		<series_image>http://cdn.myanimelist.net/images/anime/2/28438.jpg</series_image>
 		<producers>Toei Animation</producers>

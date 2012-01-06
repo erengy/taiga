@@ -150,7 +150,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
       if (IsNumeric(extension)) {
         wstring temp = title.substr(0, title.length() - extension.length());
         for (auto it = episode_keywords.begin(); it != episode_keywords.end(); ++it) {
-          if (IsEqual(CharRight(temp, it->length()), *it)) {
+          if (temp.length() >= it->length() && IsEqual(CharRight(temp, it->length()), *it)) {
             title.resize(title.length() - extension.length() - it->length() - 1);
             episode.number = extension;
             break;
