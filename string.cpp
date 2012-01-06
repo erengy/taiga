@@ -103,7 +103,11 @@ wstring CharLeft(const wstring& str, int length) {
 }
 
 wstring CharRight(const wstring& str, int length) {
-  return str.substr(str.length() - length, length);
+  if (length > str.length()) {
+    return str.substr(0, str.length());
+  } else {
+    return str.substr(str.length() - length, length);
+  }
 }
 
 int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensitive, size_t max_count) {
