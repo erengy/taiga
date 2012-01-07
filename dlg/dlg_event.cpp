@@ -17,13 +17,17 @@
 */
 
 #include "../std.h"
+#include <algorithm>
 #include "../animelist.h"
+#include "../common.h"
 #include "dlg_event.h"
 #include "dlg_main.h"
 #include "../event.h"
 #include "../myanimelist.h"
 #include "../resource.h"
+#include "../settings.h"
 #include "../string.h"
+#include "../taiga.h"
 
 class EventDialog EventDialog;
 
@@ -57,13 +61,7 @@ BOOL EventDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Clear all items
     case IDC_BUTTON_EVENT_CLEAR: {
-      if (EventQueue.updating) {
-        MessageBox(L"Event list can not be cleared while an update is in progress.", L"Error", MB_ICONERROR);
-      } else {
-        EventQueue.Clear();
-        RefreshList();
-        MainDialog.RefreshList();
-        MainDialog.RefreshTabs();
+      if (RemoveItems()) {
         return TRUE;
       }
     }
@@ -75,6 +73,13 @@ BOOL EventDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 LRESULT EventDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   if (pnmh->hwndFrom == list_.GetWindowHandle()) {
     switch (pnmh->code) {
+      // List item select
+      case LVN_ITEMCHANGED: {
+        SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, 
+          list_.GetSelectedCount() > 0 ? L"Remove selected items" : L"Remove all items");
+        break;
+      }
+      // Custom draw
       case NM_CUSTOMDRAW:
         LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(pnmh);
         switch (pCD->nmcd.dwDrawStage) {
@@ -94,8 +99,44 @@ LRESULT EventDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 void EventDialog::OnOK() {
-  EventQueue.Check();
+  if (!Taiga.logged_in) {
+    ExecuteAction(L"Login");
+  } else {
+    EventQueue.Check();
+  }
 }
+
+BOOL EventDialog::PreTranslateMessage(MSG* pMsg) {
+  switch (pMsg->message) {
+    case WM_KEYDOWN: {
+      if (::GetFocus() == list_.GetWindowHandle()) {
+        switch (pMsg->wParam) {
+          // Delete selected items
+          case VK_DELETE: {
+            if (RemoveItems()) {
+              return TRUE;
+            }
+          }
+          // Move selected items
+          case VK_UP:
+          case VK_DOWN: {
+            if (::GetKeyState(VK_CONTROL) & 0xFF80) {
+              if (MoveItems(pMsg->wParam == VK_UP ? -1 : 1)) {
+                return TRUE;
+              }
+            }
+            break;
+          }
+        }
+      }
+      break;
+    }
+  }
+
+  return FALSE;
+}
+
+// =============================================================================
 
 void EventDialog::RefreshList() {
   if (!IsWindow()) return;
@@ -139,4 +180,62 @@ void EventDialog::RefreshList() {
       SetText(L"Event Queue (" + ToWSTR(EventQueue.GetItemCount()) + L" items)");
       break;
   }
+}
+
+bool EventDialog::MoveItems(int pos) {
+  if (EventQueue.updating) {
+    MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
+    return false;
+  }
+
+  EventList* event_list = EventQueue.FindList();
+  if (event_list == nullptr) return false;
+  
+  int index = -1;
+  vector<bool> item_selected(list_.GetItemCount());
+  vector<bool> item_selected_new(list_.GetItemCount());
+  while ((index = list_.GetNextItem(index, LVNI_SELECTED)) > -1) {
+    item_selected.at(index) = true;
+  }
+
+  for (size_t i = 0; i < item_selected.size(); i++) {
+    size_t j = (pos < 0 ? i : item_selected.size() - 1 - i);
+    if (!item_selected.at(j)) continue;
+    if (j == (pos < 0 ? 0 : item_selected.size() - 1)) { item_selected_new.at(j) = true; continue; }
+    if (item_selected_new.at(j + pos)) { item_selected_new.at(j) = true; continue; }
+    std::iter_swap(event_list->items.begin() + j, event_list->items.begin() + j + pos);
+    item_selected_new.at(j + pos) = true;
+  }
+
+  RefreshList();
+  for (size_t i = 0; i < item_selected_new.size(); i++) {
+    if (item_selected_new.at(i)) list_.SetSelectedItem(i);
+  }
+
+  return true;
+}
+
+bool EventDialog::RemoveItems() {
+  if (EventQueue.updating) {
+    MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
+    return false;
+  }
+
+  if (list_.GetSelectedCount() > 0) {
+    while (list_.GetSelectedCount() > 0) {
+      int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
+      EventQueue.Remove(item_index, false, false);
+      list_.DeleteItem(item_index);
+    }
+    Settings.Save();
+  } else {
+    EventQueue.Clear();
+  }
+  
+  RefreshList();
+  SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, L"Remove all items");
+  MainDialog.RefreshList();
+  MainDialog.RefreshTabs();
+
+  return true;
 }

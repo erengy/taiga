@@ -36,7 +36,7 @@ class EventQueue EventQueue;
 // =============================================================================
 
 EventItem::EventItem() : 
-  anime_id(0), mode(0)
+  anime_id(0), enabled(true), mode(0)
 {
 }
 
@@ -152,7 +152,15 @@ void EventList::Add(EventItem& item) {
 
 void EventList::Check() {
   // Check
-  if (items.empty()) return;
+  if (items.empty()) {
+    return;
+  }
+  if (!items[index].enabled) {
+    DEBUG_PRINT(L"EventList::Check :: Item is disabled, removing...\n");
+    Remove(index);
+    Check();
+    return;
+  }
   if (!Taiga.logged_in) {
     items[index].reason = L"Not logged in";
     return;
@@ -212,11 +220,11 @@ EventItem* EventList::FindItem(int anime_id, int search_mode) {
   return nullptr;
 }
 
-void EventList::Remove(unsigned int index) {
+void EventList::Remove(unsigned int index, bool refresh) {
   // Remove item
   if (index < items.size()) {
     items.erase(items.begin() + index);
-    EventDialog.RefreshList();
+    if (refresh) EventDialog.RefreshList();
   }
 }
 
@@ -278,13 +286,13 @@ bool EventQueue::IsEmpty() {
   return true;
 }
 
-void EventQueue::Remove(int index, bool save) {
+void EventQueue::Remove(int index, bool save, bool refresh) {
   EventList* event_list = FindList();
   if (event_list) {
     if (index > -1) {
-      event_list->Remove(static_cast<unsigned int>(index));
+      event_list->Remove(static_cast<unsigned int>(index), refresh);
     } else {
-      event_list->Remove(event_list->index);
+      event_list->Remove(event_list->index, refresh);
     }
     if (save) Settings.Save();
   }

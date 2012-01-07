@@ -38,6 +38,7 @@ public:
   virtual ~EventItem() {}
   
 public:
+  bool enabled;
   int anime_id, mode;
   wstring reason, time;
 };
@@ -51,7 +52,7 @@ public:
   void Check();
   void Clear();
   EventItem* FindItem(int anime_id, int search_mode = 0);
-  void Remove(unsigned int index);
+  void Remove(unsigned int index, bool refresh = true);
   
 public:
   unsigned int index;
@@ -73,7 +74,7 @@ public:
   
   int GetItemCount();
   bool IsEmpty();
-  void Remove(int index = -1, bool save = true);
+  void Remove(int index = -1, bool save = true, bool refresh = true);
   void Show();
 
 public:

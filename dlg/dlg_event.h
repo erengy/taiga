@@ -34,9 +34,12 @@ public:
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnOK();
+  BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
   void RefreshList();
+  bool MoveItems(int pos);
+  bool RemoveItems();
 
 private:
   CListView list_;
