@@ -44,13 +44,10 @@ BOOL EventDialog::OnInitDialog() {
   list_.SetTheme();
   
   // Insert list columns
-  list_.InsertColumn(0, 190, 190, LVCFMT_LEFT,   L"Anime title");
-  list_.InsertColumn(1,  55,  55, LVCFMT_CENTER, L"Episode");
-  list_.InsertColumn(2,  50,  50, LVCFMT_CENTER, L"Score");
-  list_.InsertColumn(3, 110, 110, LVCFMT_LEFT,   L"Status");
-  list_.InsertColumn(4, 110, 110, LVCFMT_LEFT,   L"Tags");
-  list_.InsertColumn(5, 120, 120, LVCFMT_LEFT,   L"Last modified");
-  list_.SetColumnWidth(5, LVSCW_AUTOSIZE_USEHEADER);
+  list_.InsertColumn(0, 190, 190, LVCFMT_LEFT, L"Anime title");
+  list_.InsertColumn(1, 325, 325, LVCFMT_LEFT, L"Details");
+  list_.InsertColumn(2, 120, 120, LVCFMT_LEFT, L"Last modified");
+  list_.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
   
   // Refresh list
   RefreshList();
@@ -148,11 +145,6 @@ void EventDialog::RefreshList() {
   EventList* event_list = EventQueue.FindList();
   if (event_list) {
     for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
-      int episode = it->episode; if (episode == -1) episode++;
-      int score = it->score; if (score == -1) score++;
-      int status = it->status;
-      int rewatching = it->enable_rewatching;
-      wstring tags = it->tags; if (tags == EMPTY_STR) tags.clear();
       Anime* anime = AnimeList.FindItem(it->anime_id);
       int i = list_.GetItemCount();
       if (anime) {
@@ -160,11 +152,22 @@ void EventDialog::RefreshList() {
       } else {
         list_.InsertItem(i, -1, -1, 0, nullptr, L"???", 0);
       }
-      list_.SetItem(i, 1, MAL.TranslateNumber(episode, L"").c_str());
-      list_.SetItem(i, 2, MAL.TranslateNumber(score, L"").c_str());
-      list_.SetItem(i, 3, rewatching != TRUE ? MAL.TranslateMyStatus(status, false).c_str() : L"Re-watching");
-      list_.SetItem(i, 4, tags.c_str());
-      list_.SetItem(i, 5, it->time.c_str());
+      wstring details;
+      if (it->mode == HTTP_MAL_AnimeAdd)
+        AppendString(details, L"Add to list");
+      if (it->mode == HTTP_MAL_AnimeDelete)
+        AppendString(details, L"Remove from list");
+      if (it->episode > -1)
+        AppendString(details, L"Episode: " + MAL.TranslateNumber(it->episode));
+      if (it->score > -1)
+        AppendString(details, L"Score: " + MAL.TranslateNumber(it->score));
+      if (it->status > -1)
+        AppendString(details, it->enable_rewatching != TRUE ? 
+          L"Status: " + MAL.TranslateMyStatus(it->status, false) : L"Re-watching");
+      if (it->tags != EMPTY_STR)
+        AppendString(details, L"Tags: \"" + it->tags + L"\""); 
+      list_.SetItem(i, 1, details.c_str());
+      list_.SetItem(i, 2, it->time.c_str());
     }
   }
 

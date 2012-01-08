@@ -64,7 +64,7 @@ public:
 protected:
   BOOL OnError(DWORD dwError);
   BOOL OnSendRequestComplete();
-  BOOL OnHeadersAvailable(wstring headers);
+  BOOL OnHeadersAvailable(http_header_t& headers);
   BOOL OnReadData();
   BOOL OnReadComplete();
   BOOL OnRedirect(wstring address);

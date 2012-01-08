@@ -478,8 +478,7 @@ void RecognitionEngine::ExamineToken(Token& token, Episode& episode, bool compar
 // Helper functions
 
 void RecognitionEngine::AppendKeyword(wstring& str, const wstring& keyword) {
-  if (!str.empty()) str.append(L" ");
-  str.append(keyword);
+  AppendString(str, keyword, L" ");
 }
 
 bool RecognitionEngine::CompareKeys(const wstring& str, const vector<wstring>& keys) {

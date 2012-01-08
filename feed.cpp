@@ -284,8 +284,7 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
 
   // Yahoo! Pipes
   } else if (InStr(source, L"pipes.yahoo.com", 0, true) > -1) {
-    Erase(feed_item.title, L"<span class=\"s\">");
-    Erase(feed_item.title, L"</span>");
+    Erase(feed_item.title, L"<span class=\"s\"> </span>");
   }
 }
 

@@ -25,6 +25,7 @@
 
 // =============================================================================
 
+void AppendString(wstring& str0, const wstring& str1, const wstring& str2 = L", ");
 wstring CharLeft(const wstring& str, int length);
 wstring CharRight(const wstring& str, int length);
 bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list);

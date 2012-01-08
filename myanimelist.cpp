@@ -356,7 +356,7 @@ bool MyAnimeList::Update(MalAnimeValues& anime_values, int anime_id, int update_
             L"&score="              + ToWSTR(anime_values.score > -1 ? anime_values.score : anime->my_score);
           if (anime_values.tags != EMPTY_STR) {
             buffer += 
-            L"tags=" + EncodeURL(anime_values.tags);
+            L"&tags=" + EncodeURL(anime_values.tags);
           }
           if (MAL.IsValidDate(anime->my_start_date)) {
             unsigned short year, month, day;

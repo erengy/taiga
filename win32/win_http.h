@@ -28,7 +28,7 @@ enum HTTP_ContentEncoding {
   HTTP_Encoding_Gzip
 };
 
-typedef std::map<wstring, wstring> http_header_t;
+typedef std::multimap<wstring, wstring> http_header_t;
 
 // =============================================================================
 

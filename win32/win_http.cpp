@@ -432,7 +432,7 @@ bool CHTTP::ParseHeader(const wstring& text, http_header_t& header) {
     } else {
       wstring name = CharLeft(*it, pos);
       wstring value = it->substr(pos + 2);
-      header[name] = value;
+      header.insert(std::pair<wstring, wstring>(name, value));
     }
   }
 
@@ -455,6 +455,7 @@ wstring CHTTP::BuildRequestHeader(wstring header) {
 
 bool CHTTP::ParseResponseHeader(const wstring& header) {
   if (!ParseHeader(header, m_ResponseHeader)) return false;
+  CUrl location;
 
   for (auto it = m_ResponseHeader.cbegin(); it != m_ResponseHeader.cend(); ++it) {
     wstring name = it->first;
@@ -474,18 +475,8 @@ bool CHTTP::ParseResponseHeader(const wstring& header) {
 
     // Location:
     } else if (IsEqual(name, L"Location")) {
-      OnRedirect(value);
-      if (m_AutoRedirect == FALSE) {
-        CUrl url(value);
-        if (!Connect(url, ToUTF8(m_OptionalData), m_Verb, m_RequestHeader, 
-          m_Referer, m_File, m_dwClientMode, m_lParam)) {
-            Cleanup();
-        }
-        return false;
-      } else {
-        m_ContentEncoding = HTTP_Encoding_None;
-        m_dwDownloaded = 0;
-        m_dwTotal = 0;
+      if (!OnRedirect(value)) {
+        location.Crack(value);
       }
       
     // Set-Cookie:
@@ -493,6 +484,20 @@ bool CHTTP::ParseResponseHeader(const wstring& header) {
       int pos = InStr(value, L";", 0);
       if (pos > -1) value = value.substr(0, pos);
       m_Cookie += (m_Cookie.empty() ? L"" : L"; ") + value;
+    }
+  }
+
+  if (!location.Host.empty()) {
+    if (m_AutoRedirect == FALSE) {
+      if (!Connect(location, ToUTF8(m_OptionalData), m_Verb, m_RequestHeader, 
+        m_Referer, m_File, m_dwClientMode, m_lParam)) {
+          Cleanup();
+      }
+      return false;
+    } else {
+      m_ContentEncoding = HTTP_Encoding_None;
+      m_dwDownloaded = 0;
+      m_dwTotal = 0;
     }
   }
 

@@ -629,8 +629,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
             for (int i = 0; i < anime_list.GetItemCount(); i++) {
               Anime* anime = reinterpret_cast<Anime*>(anime_list.GetItemParam(i));
               if (anime && anime_list.GetCheckState(i)) {
-                if (!text.empty()) text += L", ";
-                text += anime->series_title;
+                AppendString(text, anime->series_title);
               }
             }
             if (text.empty()) text = L"(nothing)";

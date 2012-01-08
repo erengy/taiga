@@ -580,6 +580,11 @@ bool ValidateFileExtension(const wstring& extension, unsigned int max_length) {
 
 /* Other */
 
+void AppendString(wstring& str0, const wstring& str1, const wstring& str2) {
+  if (!str0.empty()) str0.append(str2);
+  str0.append(str1);
+}
+
 wstring PushString(const wstring& str1, const wstring& str2) {
   if (str2.empty()) {
     return L"";

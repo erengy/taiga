@@ -115,7 +115,7 @@ BOOL HttpClient::OnSendRequestComplete() {
   return 0;
 }
 
-BOOL HttpClient::OnHeadersAvailable(wstring headers) {
+BOOL HttpClient::OnHeadersAvailable(http_header_t& headers) {
   switch (GetClientMode()) {
     case HTTP_Silent:
       break;
@@ -139,6 +139,11 @@ BOOL HttpClient::OnHeadersAvailable(wstring headers) {
 BOOL HttpClient::OnRedirect(wstring address) {
   wstring status = L"Redirecting... (" + address + L")";
   switch (GetClientMode()) {
+    case HTTP_MAL_Login:
+      if (Settings.Account.MAL.api == MAL_API_NONE) {
+        return TRUE; // Disable auto-redirection to panel.php
+      }
+      break;
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
@@ -279,7 +284,7 @@ BOOL HttpClient::OnReadComplete() {
             #endif
             break;
           case MAL_API_NONE:
-            if (InStr(GetData(), L"Could not find that username", 1) > -1) {
+            if (InStr(GetData(), L"Could not find that user name", 1) > -1) {
               status += L" (Invalid user name)";
             } else if (InStr(GetData(), L"Error: Invalid password", 1) > -1) {
               status += L" (Invalid password)";
@@ -291,13 +296,15 @@ BOOL HttpClient::OnReadComplete() {
       MainDialog.EnableInput(true);
       MainDialog.RefreshMenubar();
       MainDialog.UpdateTip();
-      switch (Settings.Account.MAL.api) {
-        case MAL_API_OFFICIAL:
-          EventQueue.Check();
-          return TRUE;
-        case MAL_API_NONE:
-          MAL.CheckProfile();
-          return TRUE;
+      if (Taiga.logged_in) {
+        switch (Settings.Account.MAL.api) {
+          case MAL_API_OFFICIAL:
+            EventQueue.Check();
+            return TRUE;
+          case MAL_API_NONE:
+            MAL.CheckProfile();
+            return TRUE;
+        }
       }
       break;
     }
@@ -306,28 +313,51 @@ BOOL HttpClient::OnReadComplete() {
 
     // Check profile
     case HTTP_MAL_Profile: {
-      status = L"You have no new messages.";
       if (Settings.Account.MAL.api == MAL_API_NONE) {
-        int msg_pos = InStr(GetData(), L"<a href=\"/mymessages.php\">(", 0);
-        if (msg_pos > -1) {
-          int msg_end = InStr(GetData(), L")", msg_pos);
-          if (msg_end > -1) {
-            int msg_count = ToINT(GetData().substr(msg_pos + 27, msg_end));
-            if (msg_count > 0) {
-              status = L"You have " + ToWSTR(msg_count) + L" new message(s)!";
-              CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-              dlg.SetMainInstruction(status.c_str());
-              dlg.UseCommandLinks(true);
-              dlg.AddButton(L"Check\nView your messages now", IDYES);
-              dlg.AddButton(L"Cancel\nCheck them later", IDNO);
-              dlg.Show(g_hMain);
-              if (dlg.GetSelectedButtonID() == IDYES) {
-                MAL.ViewMessages();
-              }
-            }
+        int pos = 0;
+        wstring data = GetData();
+
+        #define CHECK_PROFILE_ITEM(new_item, page) \
+        new_item = false; \
+        pos = InStr(data, L"<a href=\"/" page L".php", 0); \
+        if (pos > -1) { \
+          if (IsEqual(data.substr(pos - 18, 18), L"<span class=\"new\">")) { \
+            new_item = true; \
+          } \
+        }
+        // Check messages
+        bool new_message = false;
+        CHECK_PROFILE_ITEM(new_message, L"mymessages");
+        // Check friend requests
+        bool new_friend_request = false;
+        CHECK_PROFILE_ITEM(new_friend_request, L"myfriends");
+        // Check club invitations
+        bool new_club_invitation = false;
+        CHECK_PROFILE_ITEM(new_club_invitation, L"clubs");
+        #undef CHECK_PROFILE_ITEM
+
+        if (new_message || new_friend_request || new_club_invitation) {
+          status.clear();
+          if (new_message)
+            AppendString(status, L"messages");
+          if (new_friend_request)
+            AppendString(status, L"friend requests");
+          if (new_club_invitation)
+            AppendString(status, L"club invitations");
+          status = L"You have new " + status + L" waiting on your profile.";
+          MainDialog.ChangeStatus(status);
+
+          CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+          dlg.SetMainInstruction(status.c_str());
+          dlg.UseCommandLinks(true);
+          dlg.AddButton(L"Check\nView your profile now", IDYES);
+          dlg.AddButton(L"Cancel\nCheck them later", IDNO);
+          dlg.Show(g_hMain);
+          if (dlg.GetSelectedButtonID() == IDYES) {
+            MAL.ViewProfile();
           }
         }
-        MainDialog.ChangeStatus(status);
+
         EventQueue.Check();
         return TRUE;
       }
