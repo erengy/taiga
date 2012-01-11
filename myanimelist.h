@@ -102,6 +102,7 @@ public:
   MyAnimeList() {};
   virtual ~MyAnimeList() {};
 
+  bool AskToDiscuss(Anime* anime, int episode_number);
   void CheckProfile();
   bool DownloadImage(Anime* anime, class HttpClient* client = nullptr);
   bool GetAnimeDetails(Anime* anime, class HttpClient* client = nullptr);

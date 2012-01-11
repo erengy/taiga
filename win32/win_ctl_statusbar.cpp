@@ -34,7 +34,12 @@ void CStatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 // =============================================================================
 
 int CStatusBar::InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPCWSTR lpText, LPCWSTR lpTooltip) {
-  m_iWidth.push_back(iWidth);
+  if (m_iWidth.empty()) {
+    m_iWidth.push_back(iWidth);
+  } else {
+    m_iWidth.push_back(m_iWidth.back() + iWidth);
+  }
+  
   int nParts = ::SendMessage(m_hWindow, SB_GETPARTS, 0, 0);
 
   ::SendMessage(m_hWindow, SB_SETPARTS,   nParts + 1, reinterpret_cast<LPARAM>(&m_iWidth[0]));
@@ -43,19 +48,31 @@ int CStatusBar::InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LP
 
   if (iImage > -1 && m_hImageList) {
     HICON hIcon = ::ImageList_GetIcon(m_hImageList, iImage, 0);
-    ::SendMessage(m_hWindow, SB_SETICON, nParts, reinterpret_cast<LPARAM>(hIcon));
+    ::SendMessage(m_hWindow, SB_SETICON, nParts - 1, reinterpret_cast<LPARAM>(hIcon));
   }
 
   return nParts;
 }
+
 void CStatusBar::SetImageList(HIMAGELIST hImageList) {
   m_hImageList = hImageList;
 }
 
-void CStatusBar::SetPanelText(int iPanel, LPCWSTR lpText) {
-  ::SendMessage(m_hWindow, SB_SETTEXT, iPanel, reinterpret_cast<LPARAM>(lpText));
+void CStatusBar::SetPartText(int iPart, LPCWSTR lpText) {
+  ::SendMessage(m_hWindow, SB_SETTEXT, iPart, reinterpret_cast<LPARAM>(lpText));
 }
 
-void CStatusBar::SetPanelTipText(int iPanel, LPCWSTR lpTipText) {
-  ::SendMessage(m_hWindow, SB_SETTIPTEXT, iPanel, reinterpret_cast<LPARAM>(lpTipText));
+void CStatusBar::SetPartTipText(int iPart, LPCWSTR lpTipText) {
+  ::SendMessage(m_hWindow, SB_SETTIPTEXT, iPart, reinterpret_cast<LPARAM>(lpTipText));
+}
+
+void CStatusBar::SetPartWidth(int iPart, int iWidth) {
+  if (iPart > static_cast<int>(m_iWidth.size()) - 1) return;
+  if (iPart == 0) {
+    m_iWidth.at(iPart) = iWidth;
+  } else {
+    m_iWidth.at(iPart) = m_iWidth.at(iPart - 1) + iWidth;
+  }
+  
+  ::SendMessage(m_hWindow, SB_SETPARTS, m_iWidth.size(), reinterpret_cast<LPARAM>(&m_iWidth[0]));
 }

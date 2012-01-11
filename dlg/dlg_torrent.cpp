@@ -301,7 +301,7 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 void TorrentDialog::ChangeStatus(wstring text, int panel_index) {
   // Change status text
   if (panel_index == 0) text = L"  " + text;
-  statusbar_.SetPanelText(panel_index, text.c_str());
+  statusbar_.SetPartText(panel_index, text.c_str());
 }
 
 void TorrentDialog::EnableInput(bool enable) {

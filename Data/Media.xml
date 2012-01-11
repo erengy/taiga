@@ -319,18 +319,6 @@
 		<folder>%LocalAppData%\Google\Chrome\Application\</folder>
 		<edit mode="2">Google Chrome</edit>
 	</player>
-	<!-- Internet Explorer -->
-	<player>
-		<name>Internet Explorer</name>
-		<enabled>0</enabled>
-		<visible>1</visible>
-		<mode>5</mode>
-		<class>IEFrame</class>
-		<file>iexplore.exe</file>
-		<folder>%ProgramFiles%\Internet Explorer\</folder>
-		<folder>%ProgramW6432%\Internet Explorer\</folder>
-		<edit mode="2">Windows Internet Explorer</edit>
-	</player>
 	<!-- Mozilla Firefox -->
 	<player>
 		<name>Mozilla Firefox</name>

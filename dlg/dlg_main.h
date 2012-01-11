@@ -61,6 +61,7 @@ public:
   void RefreshList(int index = -1);
   void RefreshMenubar(int anime_id = -1, bool show = true);
   void RefreshTabs(int index = -1, bool redraw = true);
+  void UpdateStatusTimer();
   void UpdateTip();
 
 private:

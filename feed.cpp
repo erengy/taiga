@@ -273,14 +273,14 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
     wstring size_str = L"Size: ", comment_str = L"Comment: ";
     vector<wstring> description_vector;
     Split(feed_item.description, L"\n", description_vector);
-    if (description_vector.size() > 1) {
-      feed_item.episode_data.file_size = description_vector[1].substr(size_str.length());
-    }
-    if (description_vector.size() > 2) {
-      feed_item.description = description_vector[2].substr(comment_str.length());
-      return;
-    }
     feed_item.description.clear();
+    for (auto it = description_vector.begin(); it != description_vector.end(); ++it) {
+      if (StartsWith(*it, size_str)) {
+        feed_item.episode_data.file_size = it->substr(size_str.length());
+      } else if (StartsWith(*it, comment_str)) {
+        feed_item.description = it->substr(comment_str.length());
+      }
+    }
 
   // Yahoo! Pipes
   } else if (InStr(source, L"pipes.yahoo.com", 0, true) > -1) {

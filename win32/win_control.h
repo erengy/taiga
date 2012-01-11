@@ -264,8 +264,9 @@ public:
 
   int  InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPCWSTR lpText, LPCWSTR lpTooltip);
   void SetImageList(HIMAGELIST hImageList);
-  void SetPanelText(int iPanel, LPCWSTR lpText);
-  void SetPanelTipText(int iPanel, LPCWSTR lpTipText);
+  void SetPartText(int iPart, LPCWSTR lpText);
+  void SetPartTipText(int iPart, LPCWSTR lpTipText);
+  void SetPartWidth(int iPart, int iWidth);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);

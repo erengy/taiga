@@ -65,6 +65,7 @@ BOOL HttpClient::OnError(DWORD dwError) {
       MainDialog.ChangeStatus(error_text);
       MainDialog.EnableInput(true);
       break;
+    case HTTP_MAL_AnimeAskToDiscuss:
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_Image:
     case HTTP_Feed_DownloadIcon:
@@ -178,6 +179,7 @@ BOOL HttpClient::OnReadData() {
     case HTTP_MAL_TagUpdate:
       status = L"Updating list...";
       break;
+    case HTTP_MAL_AnimeAskToDiscuss:
     case HTTP_Feed_DownloadIcon:
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_SearchAnime:
@@ -382,6 +384,32 @@ BOOL HttpClient::OnReadComplete() {
         if (event_list) {
           anime->Edit(event_list->items[event_list->index], GetData(), GetResponseStatusCode());
           return TRUE;
+        }
+      }
+      break;
+    }
+
+    // =========================================================================
+
+    // Ask to discuss
+    case HTTP_MAL_AnimeAskToDiscuss: {
+      wstring data = GetData();
+      if (InStr(data, L"trueEp") > -1) {
+        wstring url = InStr(data, L"self.parent.document.location='", L"';");
+        Anime* anime = reinterpret_cast<Anime*>(GetParam());
+        EventList* event_list = EventQueue.FindList();
+        if (!url.empty() && anime && event_list) {
+          int episode_number = event_list->items.at(event_list->index).episode;
+          wstring title = anime->series_title + (episode_number ? L" #" + ToWSTR(episode_number) : L"");
+          CTaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
+          dlg.SetMainInstruction(L"Someone has already made a discussion topic for this episode!");
+          dlg.UseCommandLinks(true);
+          dlg.AddButton(L"Discuss it", IDYES);
+          dlg.AddButton(L"Don't discuss", IDNO);
+          dlg.Show(g_hMain);
+          if (dlg.GetSelectedButtonID() == IDYES) {
+            ExecuteLink(url);
+          }
         }
       }
       break;

@@ -160,8 +160,8 @@ void MainDialog::CreateDialogControls() {
   // Create status bar
   statusbar.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
   statusbar.SetImageList(UI.ImgList16.GetHandle());
-  //statusbar.InsertPart(-1, 0, 0, 700, NULL, NULL);
-  //statusbar.InsertPart(-1, 0, 0, 750, NULL, NULL);
+  statusbar.InsertPart(-1, 0, 0, 900, nullptr, nullptr);
+  statusbar.InsertPart(ICON16_CLOCK, 0, 0,  32, nullptr, nullptr);
 
   // Insert treeview items
   treeview.RefreshItems();
@@ -493,6 +493,7 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       CRect rcStatus;
       statusbar.GetClientRect(&rcStatus);
       statusbar.SendMessage(WM_SIZE, 0, 0);
+      UpdateStatusTimer();
       rcWindow.bottom -= rcStatus.Height();
       // Resize treeview
       if (treeview.IsVisible()) {
@@ -541,9 +542,11 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 
   // Check feeds
   for (unsigned int i = 0; i < Aggregator.feeds.size(); i++) {
-    Aggregator.feeds[i].ticker++;
     switch (Aggregator.feeds[i].category) {
       case FEED_CATEGORY_LINK:
+        if (Settings.RSS.Torrent.check_enabled) {
+          Aggregator.feeds[i].ticker++;
+        }
         if (Settings.RSS.Torrent.check_enabled && Settings.RSS.Torrent.check_interval) {
           if (TorrentDialog.IsWindow()) {
             TorrentDialog.SetTimerText(L"Check new torrents [" + 
@@ -644,6 +647,9 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       Taiga.ticker_media = 0;
     }
   }
+
+  // Update status timer
+  UpdateStatusTimer();
 }
 
 // =============================================================================
@@ -836,6 +842,27 @@ void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wst
   this->cue_text = cue_text;
   parent->edit.SetCueBannerText(cue_text.c_str());
   Settings.Program.General.search_index = index;
+}
+
+void MainDialog::UpdateStatusTimer() {
+  CRect rect;
+  GetClientRect(&rect);
+  
+  int seconds = Settings.Account.Update.delay - Taiga.ticker_media;
+
+  if (CurrentEpisode.anime_id > ANIMEID_UNKNOWN && 
+    seconds > 0 && seconds < Settings.Account.Update.delay) {
+      wstring str = L"List update in " + ToTimeString(seconds);
+      statusbar.SetPartText(1, str.c_str());
+      statusbar.SetPartTipText(1, str.c_str());
+
+      statusbar.SetPartWidth(0, rect.Width() - ScaleX(160));
+      statusbar.SetPartWidth(1, ScaleX(160));
+  
+  } else {
+    statusbar.SetPartWidth(0, rect.Width());
+    statusbar.SetPartWidth(1, 0);
+  }
 }
 
 void MainDialog::UpdateTip() {

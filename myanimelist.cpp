@@ -55,6 +55,14 @@ MalAnimeValues::MalAnimeValues() :
 
 // =============================================================================
 
+bool MyAnimeList::AskToDiscuss(Anime* anime, int episode_number) {
+  return MainClient.Post(L"myanimelist.net",
+    L"/includes/ajax.inc.php?t=50",
+    L"epNum=" + ToWSTR(episode_number) + L"&aid=" + ToWSTR(anime->series_id) + L"&id=" + ToWSTR(anime->series_id),
+    L"", HTTP_MAL_AnimeAskToDiscuss,
+    reinterpret_cast<LPARAM>(anime));
+}
+
 void MyAnimeList::CheckProfile() {
   if (!Taiga.logged_in) return;
   MainClient.Get(L"myanimelist.net", 
