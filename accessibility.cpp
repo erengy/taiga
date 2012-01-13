@@ -173,7 +173,7 @@ HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAcce
         GetRole(children.back().role, CHILDID_SELF, child);
         GetValue(children.back().value, CHILDID_SELF, child);
         if (AllowChildTraverse(children.back(), param)) {
-          BuildChildren(children.back().children, child);
+          BuildChildren(children.back().children, child, param);
         } else {
           children.pop_back();
         }

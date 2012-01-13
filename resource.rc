@@ -571,13 +571,24 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "Tahoma"
 {
     CONTROL         "", IDC_LIST_MEDIA, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 10, 5, 295, 191, WS_EX_ACCEPTFILES
-    LTEXT           "Tip: This is a list of supported media players. You can disable players that you don't have on your system to improve performance.", IDC_STATIC, 15, 205, 285, 20, SS_LEFT
+    LTEXT           "Tip: This is a list of supported media players and web browsers. You can disable the ones that you don't have on your system to improve performance.", IDC_STATIC, 15, 205, 285, 20, SS_LEFT
 }
 
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDD_SETTINGS_PAGE14 DIALOGEX 0, 0, 315, 230
+STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_VISIBLE | WS_CHILDWINDOW
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "Tahoma", 400, 0, 0
+{
+    CONTROL         "", IDC_LIST_STREAM_PROVIDER, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_SHAREIMAGELISTS | LVS_SINGLESEL | LVS_REPORT, 10, 5, 295, 120, WS_EX_ACCEPTFILES
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_SETTINGS_PAGE15 DIALOGEX 0, 0, 315, 230
 STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_VISIBLE | WS_CHILDWINDOW
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "Tahoma", 400, 0, 162
@@ -604,7 +615,7 @@ FONT 8, "Tahoma", 400, 0, 162
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDD_SETTINGS_PAGE15 DIALOGEX 0, 0, 315, 230
+IDD_SETTINGS_PAGE16 DIALOGEX 0, 0, 315, 230
 STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_VISIBLE | WS_CHILDWINDOW
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "Tahoma", 400, 0, 162
@@ -691,8 +702,8 @@ IDI_MAIN           ICON           ".\\res\\Taiga.ico"
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 1 VERSIONINFO
-    FILEVERSION     0,9,132,0
-    PRODUCTVERSION  0,9,132,0
+    FILEVERSION     0,9,134,0
+    PRODUCTVERSION  0,9,134,0
     FILEOS          VOS_NT_WINDOWS32
     FILETYPE        VFT_APP
     FILESUBTYPE     VFT2_UNKNOWN
@@ -706,11 +717,11 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
             VALUE "Comments", "Anime list"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
-            VALUE "FileVersion", "0.9.132"
+            VALUE "FileVersion", "0.9.134"
             VALUE "InternalName", "Taiga"
             VALUE "OriginalFilename", "Taiga.exe"
             VALUE "ProductName", "Taiga"
-            VALUE "ProductVersion", "0.9.132"
+            VALUE "ProductVersion", "0.9.134"
         }
     }
     BLOCK "VarFileInfo"

@@ -165,6 +165,17 @@ public:
     } Balloon;
   } Program;
 
+  // Recognition
+  class Recognition {
+  public:
+    // Streaming
+    class Streaming {
+    public:
+      bool ann_enabled, crunchyroll_enabled, veoh_enabled,
+        viz_enabled, youtube_enabled;
+    } Streaming;
+  } Recognition;
+
   // RSS
   class Rss {
   public:

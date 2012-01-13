@@ -142,7 +142,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
 
   // Check and trim file extension
   wstring extension = GetFileExtension(title);
-  if (extension.length() < title.length() && extension.length() <= 5) {
+  if (!extension.empty() && extension.length() < title.length() && extension.length() <= 5) {
     if (IsAlphanumeric(extension) && CheckFileExtension(extension, valid_extensions)) {
       episode.format = ToUpper_Copy(extension);
       title.resize(title.length() - extension.length() - 1);

@@ -23,6 +23,7 @@
 #include "media.h"
 #include "process.h"
 #include "recognition.h"
+#include "settings.h"
 #include "string.h"
 #include "taiga.h"
 #include "xml.h"
@@ -364,12 +365,12 @@ AccessibleChild* FindAccessibleChild(vector<AccessibleChild>& children, const ws
   AccessibleChild* child = nullptr;
   
   for (auto it = children.begin(); it != children.end(); ++it) {
-    if (name.empty() || name == it->name) {
-      if (role.empty() || role == it->role) {
+    if (name.empty() || IsEqual(name, it->name)) {
+      if (role.empty() || IsEqual(role, it->role)) {
         child = &(*it);
       }
     }
-    if (child == nullptr) {
+    if (child == nullptr && !it->children.empty()) {
       child = FindAccessibleChild(it->children, name, role);
     }
     if (child) {
@@ -460,10 +461,10 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
       child = FindAccessibleChild(acc_obj.children, L"Location", L"grouping");
       break;
     case WEBBROWSER_FIREFOX:
-      child = FindAccessibleChild(acc_obj.children, L"Go to a Web Site", L"editable text");
+      child = FindAccessibleChild(acc_obj.children, L"Go to a Website", L"editable text");
       break;
     case WEBBROWSER_IE:
-      child = FindAccessibleChild(acc_obj.children, L"Address", L"editable text");
+      child = FindAccessibleChild(acc_obj.children, L"Address and search using Google", L"editable text");
       break;
     case WEBBROWSER_OPERA:
       child = FindAccessibleChild(acc_obj.children, L"", L"client");
@@ -482,25 +483,30 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   // Check URL for known streaming video providers
   if (child) {
     // Anime News Network
-    if (InStr(child->value, L"animenewsnetwork.com/video") > -1) {
-      stream_provider = STREAM_ANN;
+    if (Settings.Recognition.Streaming.ann_enabled && 
+      InStr(child->value, L"animenewsnetwork.com/video") > -1) {
+        stream_provider = STREAM_ANN;
     // Crunchyroll
-    } else if (InStr(child->value, L"crunchyroll.com/") > -1) {
-      stream_provider = STREAM_CRUNCHYROLL;
+    } else if (Settings.Recognition.Streaming.crunchyroll_enabled && 
+      InStr(child->value, L"crunchyroll.com/") > -1) {
+        stream_provider = STREAM_CRUNCHYROLL;
     // Hulu
     /*
     } else if (InStr(child->value, L"hulu.com/watch") > -1) {
       stream_provider = STREAM_HULU;
     */
     // Veoh
-    } else if (InStr(child->value, L"veoh.com/watch") > -1) {
-      stream_provider = STREAM_VEOH;
+    } else if (Settings.Recognition.Streaming.veoh_enabled && 
+      InStr(child->value, L"veoh.com/watch") > -1) {
+        stream_provider = STREAM_VEOH;
     // Viz Anime
-    } else if (InStr(child->value, L"vizanime.com/ep") > -1) {
-      stream_provider = STREAM_VIZANIME;
+    } else if (Settings.Recognition.Streaming.viz_enabled && 
+      InStr(child->value, L"vizanime.com/ep") > -1) {
+        stream_provider = STREAM_VIZANIME;
     // YouTube
-    } else if (InStr(child->value, L"youtube.com/watch") > -1) {
-      stream_provider = STREAM_YOUTUBE;
+    } else if (Settings.Recognition.Streaming.youtube_enabled && 
+      InStr(child->value, L"youtube.com/watch") > -1) {
+        stream_provider = STREAM_YOUTUBE;
     }
   }
 
@@ -546,8 +552,13 @@ bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(AccessibleChild& 
     case WEBBROWSER_UNKNOWN:
       return false;
     case WEBBROWSER_FIREFOX:
-      // Huge performance improvement
-      if (child.role != L"document") return false;
+      if (IsEqual(child.role, L"document")) return false;
+      break;
+    case WEBBROWSER_IE:
+      if (IsEqual(child.role, L"pane") || IsEqual(child.role, L"scroll bar")) return false;
+      break;
+    case WEBBROWSER_OPERA:
+      if (IsEqual(child.role, L"document") || IsEqual(child.role, L"pane")) return false;
       break;
   }
 

@@ -48,7 +48,8 @@ const WCHAR* PAGE_TITLE[PAGE_COUNT] = {
   L" Program",
   L" List",
   L" Notifications",
-  L" Media players",
+  L" Applications",
+  L" Streaming media",
   L" Torrent options",
   L" Torrent filters"
 };
@@ -132,9 +133,10 @@ BOOL SettingsDialog::OnInitDialog() {
   pages[PAGE_LIST].CreateItem(L"List", htProgram);
   pages[PAGE_NOTIFICATIONS].CreateItem(L"Notifications", htProgram);
   tree_.Expand(htProgram);
-  // Media players
+  // Recognition
   HTREEITEM htRecognition = tree_.InsertItem(L"Recognition", -1, reinterpret_cast<LPARAM>(&pages[PAGE_MEDIA]), nullptr);
-  pages[PAGE_MEDIA].CreateItem(L"Media players", htRecognition);
+  pages[PAGE_MEDIA].CreateItem(L"Applications", htRecognition);
+  pages[PAGE_STREAM].CreateItem(L"Streaming", htRecognition);
   tree_.Expand(htRecognition);
   // Torrent
   HTREEITEM htTorrent = tree_.InsertItem(L"Torrent", -1, reinterpret_cast<LPARAM>(&pages[PAGE_TORRENT1]), nullptr);
@@ -233,6 +235,14 @@ void SettingsDialog::OnOK() {
   for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
     MediaPlayers.items[i].enabled = List.GetCheckState(i);
   }
+  List.SetWindowHandle(nullptr);
+  // Recognition > Streaming
+  List.SetWindowHandle(pages[PAGE_STREAM].GetDlgItem(IDC_LIST_STREAM_PROVIDER));
+  Settings.Recognition.Streaming.ann_enabled = List.GetCheckState(0) == TRUE;
+  Settings.Recognition.Streaming.crunchyroll_enabled = List.GetCheckState(1) == TRUE;
+  Settings.Recognition.Streaming.veoh_enabled = List.GetCheckState(2) == TRUE;
+  Settings.Recognition.Streaming.viz_enabled = List.GetCheckState(3) == TRUE;
+  Settings.Recognition.Streaming.youtube_enabled = List.GetCheckState(4) == TRUE;
   List.SetWindowHandle(nullptr);
 
   // Torrent > Options

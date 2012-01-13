@@ -168,6 +168,16 @@ bool Settings::Load() {
     Program.Balloon.enabled = notifications.child(L"balloon").attribute(L"enabled").as_int(TRUE);
     Program.Balloon.format = notifications.child(L"balloon").attribute(L"format").value(DEFAULT_FORMAT_BALLOON);
 
+  // Recognition
+  xml_node recognition = settings.child(L"recognition");
+    // Streaming
+    xml_node streaming = recognition.child(L"streaming");
+      Recognition.Streaming.ann_enabled = streaming.child(L"providers").attribute(L"ann").as_bool();
+      Recognition.Streaming.crunchyroll_enabled = streaming.child(L"providers").attribute(L"crunchyroll").as_bool();
+      Recognition.Streaming.veoh_enabled = streaming.child(L"providers").attribute(L"veoh").as_bool();
+      Recognition.Streaming.viz_enabled = streaming.child(L"providers").attribute(L"viz").as_bool();
+      Recognition.Streaming.youtube_enabled = streaming.child(L"providers").attribute(L"youtube").as_bool();
+
   // RSS
   xml_node rss = settings.child(L"rss");
     // Torrent  
@@ -395,6 +405,22 @@ bool Settings::Save() {
     notifications.append_child().set_name(L"balloon");
     notifications.child(L"balloon").append_attribute(L"enabled") = Program.Balloon.enabled;
     notifications.child(L"balloon").append_attribute(L"format") = Program.Balloon.format.c_str();
+
+  // Recognition
+  settings.append_child(node_comment).set_value(L" Recognition ");
+  xml_node recognition = settings.append_child();
+  recognition.set_name(L"recognition");
+    // Streaming
+    xml_node streaming = recognition.append_child();
+    streaming.set_name(L"streaming");
+      // Providers
+      xml_node providers = streaming.append_child();
+      providers.set_name(L"providers");
+        providers.append_attribute(L"ann") = Recognition.Streaming.ann_enabled;
+        providers.append_attribute(L"crunchyroll") = Recognition.Streaming.crunchyroll_enabled;
+        providers.append_attribute(L"veoh") = Recognition.Streaming.veoh_enabled;
+        providers.append_attribute(L"viz") = Recognition.Streaming.viz_enabled;
+        providers.append_attribute(L"youtube") = Recognition.Streaming.youtube_enabled;
 
   // RSS
   settings.append_child(node_comment).set_value(L" RSS ");

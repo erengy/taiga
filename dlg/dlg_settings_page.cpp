@@ -238,6 +238,30 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
 
+    // Recognition > Streaming
+    case PAGE_STREAM: {
+      CListView List = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
+      List.EnableGroupView(true);
+      List.InsertColumn(0, 0, 0, 0, L"Media providers");
+      List.InsertGroup(0, L"Media providers");
+      List.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
+      List.SetImageList(UI.ImgList16.GetHandle());
+      List.SetTheme();
+      List.InsertItem(0, 0, ICON16_APP_BLUE, 0, nullptr, L"Anime News Network", 0);
+      List.InsertItem(1, 0, ICON16_APP_BLUE, 0, nullptr, L"Crunchyroll", 1);
+      List.InsertItem(2, 0, ICON16_APP_BLUE, 0, nullptr, L"Veoh", 3);
+      List.InsertItem(3, 0, ICON16_APP_BLUE, 0, nullptr, L"Viz Anime", 4);
+      List.InsertItem(4, 0, ICON16_APP_BLUE, 0, nullptr, L"YouTube", 5);
+      if (Settings.Recognition.Streaming.ann_enabled) List.SetCheckState(0, TRUE);
+      if (Settings.Recognition.Streaming.crunchyroll_enabled) List.SetCheckState(1, TRUE);
+      if (Settings.Recognition.Streaming.veoh_enabled) List.SetCheckState(2, TRUE);
+      if (Settings.Recognition.Streaming.viz_enabled) List.SetCheckState(3, TRUE);
+      if (Settings.Recognition.Streaming.youtube_enabled) List.SetCheckState(4, TRUE);
+      List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
+      List.SetWindowHandle(nullptr);
+      break;
+    }
+
     // =========================================================================
 
     // Torrent > Options
@@ -546,6 +570,25 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
           // Media players
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
             Execute(MediaPlayers.items[lpnmitem->iItem].GetPath());
+          // Streaming media providers
+          } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
+            switch (lpnmitem->iItem) {
+              case 0:
+                ExecuteLink(L"http://www.animenewsnetwork.com/video/");
+                break;
+              case 1:
+                ExecuteLink(L"http://www.crunchyroll.com");
+                break;
+              case 2:
+                ExecuteLink(L"http://www.veoh.com");
+                break;
+              case 3:
+                ExecuteLink(L"http://www.vizanime.com");
+                break;
+              case 4:
+                ExecuteLink(L"http://www.youtube.com");
+                break;
+            }
           // Torrent filters
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
             CListView List = lpnmitem->hdr.hwndFrom;
