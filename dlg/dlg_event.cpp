@@ -171,6 +171,9 @@ void EventDialog::RefreshList() {
     }
   }
 
+  // Enable/disable update button
+  EnableDlgItem(IDOK, EventQueue.GetItemCount() > 0 ? TRUE : FALSE);
+
   // Set title
   switch (EventQueue.GetItemCount()) {
     case 0:

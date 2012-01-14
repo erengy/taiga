@@ -330,10 +330,11 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           }
           // Search
           case VK_RETURN: {
+            wstring text;
+            edit.GetText(text);
+            if (text.empty()) break;
             switch (search_bar.mode) {
               case SEARCH_MODE_MAL: {
-                wstring text;
-                edit.GetText(text);
                 switch (Settings.Account.MAL.api) {
                   case MAL_API_OFFICIAL: {
                     ExecuteAction(L"SearchAnime(" + text + L")");
@@ -349,23 +350,20 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               case SEARCH_MODE_TORRENT: {
                 Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
                 if (feed) {
-                  wstring text;
-                  edit.GetText(text);
                   wstring search_url = search_bar.url;
                   Replace(search_url, L"%search%", text);
                   ExecuteAction(L"Torrents");
                   TorrentDialog.ChangeStatus(L"Searching torrents for \"" + text + L"\"...");
                   feed->Check(search_url);
+                  return TRUE;
                 }
                 break;
               }
               case SEARCH_MODE_WEB: {
-                wstring text;
-                edit.GetText(text);
                 wstring search_url = search_bar.url;
                 Replace(search_url, L"%search%", text);
                 ExecuteLink(search_url);
-                break;
+                return TRUE;
               }
             }
             break;
