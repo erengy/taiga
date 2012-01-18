@@ -66,6 +66,7 @@ public:
 
 private:
   void CreateDialogControls();
+  void InitWindowPosition();
 
 public:
   // Tree-view control

@@ -56,14 +56,8 @@ BOOL MainDialog::OnInitDialog() {
   // Set global variables
   g_hMain = GetWindowHandle();
   
-  // Set member variables
-  /*CRect rect; GetWindowRect(&rect);
-  if (Settings.Program.General.SizeX && Settings.Program.General.SizeY) {
-    SetPosition(nullptr, 0, 0, Settings.Program.General.SizeX, Settings.Program.General.SizeY, 
-      SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
-  }*/
-  SetSizeMin(ScaleX(786), ScaleY(568));
-  SetSnapGap(10);
+  // Initialize window position
+  InitWindowPosition();
 
   // Set icons
   SetIconLarge(IDI_MAIN);
@@ -100,7 +94,8 @@ BOOL MainDialog::OnInitDialog() {
     ExecuteAction(L"CheckEpisodes()", TRUE);
   }
   if (!Settings.Program.StartUp.minimize) {
-    Show();
+    Show(Settings.Program.Exit.remember_pos_size && Settings.Program.Position.maximized ? 
+      SW_MAXIMIZE : SW_SHOWNORMAL);
   }
   if (Settings.Account.MAL.user.empty()) {
     CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
@@ -213,6 +208,40 @@ void MainDialog::CreateDialogControls() {
 
   listview.parent = this;
   search_bar.parent = this;
+}
+
+void MainDialog::InitWindowPosition() {
+  UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
+  
+  CRect rcParent, rcWindow;
+  ::GetWindowRect(GetParent(), &rcParent);
+  rcWindow.Set(
+    Settings.Program.Position.x, 
+    Settings.Program.Position.y, 
+    Settings.Program.Position.x + Settings.Program.Position.w,
+    Settings.Program.Position.y + Settings.Program.Position.h);
+
+  if (rcWindow.left < 0 || rcWindow.left >= rcParent.right || 
+      rcWindow.top < 0 || rcWindow.top >= rcParent.bottom) {
+        flags |= SWP_NOMOVE;
+  }
+  if (rcWindow.Width() > rcParent.Width()) {
+    rcWindow.right = rcParent.left + rcParent.Width();
+  }
+  if (rcWindow.Height() > rcParent.Height()) {
+    rcWindow.bottom = rcParent.top + rcParent.Height();
+  }
+  if (rcWindow.Width() > 0 && rcWindow.Height() > 0 && 
+    Settings.Program.Position.maximized == FALSE &&
+    Settings.Program.Exit.remember_pos_size == TRUE) {
+      SetPosition(nullptr, rcWindow, flags);
+      if (flags & SWP_NOMOVE) {
+        CenterOwner();
+      }
+  }
+
+  SetSizeMin(ScaleX(786), ScaleY(568));
+  SetSnapGap(10);
 }
 
 // =============================================================================
@@ -384,6 +413,7 @@ BOOL MainDialog::OnClose() {
     Hide();
     return TRUE;
   }
+  
   if (Settings.Program.Exit.ask) {
     CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Are you sure you want to exit?");
@@ -392,6 +422,7 @@ BOOL MainDialog::OnClose() {
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() != IDYES) return TRUE;
   }
+
   return FALSE;
 }
 
@@ -402,18 +433,32 @@ BOOL MainDialog::OnDestroy() {
     Announcer.Do(ANNOUNCE_TO_HTTP);
   }
   Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
+  
   // Close other dialogs
   AnimeDialog.Destroy();
   RecognitionTest.Destroy();
   SearchDialog.Destroy();
   SeasonDialog.Destroy();
   TorrentDialog.Destroy();
+  
   // Cleanup
   MainClient.Cleanup();
   Taskbar.Destroy();
   TaskbarList.Release();
+  
   // Save settings
+  if (Settings.Program.Exit.remember_pos_size) {
+    Settings.Program.Position.maximized = (GetWindowLong() & WS_MAXIMIZE) ? TRUE : FALSE;
+    if (Settings.Program.Position.maximized == FALSE) {
+      CRect rcWindow; GetWindowRect(&rcWindow);
+      Settings.Program.Position.x = rcWindow.left;
+      Settings.Program.Position.y = rcWindow.top;
+      Settings.Program.Position.w = rcWindow.Width();
+      Settings.Program.Position.h = rcWindow.Height();
+    }
+  }
   Settings.Save();
+  
   // Exit
   Taiga.PostQuitMessage();
   return TRUE;
@@ -476,13 +521,9 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
         if (Settings.Program.General.minimize) Hide();
         return;
       }
-      
-      // Save size settings
-      Settings.Program.General.size_x = size.cx;
-      Settings.Program.General.size_y = size.cy;
-      // Set window area
-      CRect rcWindow;
-      rcWindow.Set(0, 0, size.cx, size.cy);
+
+      // Set client area
+      CRect rcWindow(0, 0, size.cx, size.cy);
       rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       rebar.SendMessage(WM_SIZE, 0, 0);

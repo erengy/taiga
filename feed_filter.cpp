@@ -113,13 +113,21 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
       if (is_numeric) {
         return ToINT(element) > ToINT(value);
       } else {
-        return CompareStrings(element, condition.value) > 0;
+        if (condition.element == FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION) {
+          return TranslateResolution(element) > TranslateResolution(condition.value);
+        } else {
+          return CompareStrings(element, condition.value) > 0;
+        }
       }
     case FEED_FILTER_OPERATOR_ISLESSTHAN:
       if (is_numeric) {
         return ToINT(element) < ToINT(value);
       } else {
-        return CompareStrings(element, condition.value) < 0;
+        if (condition.element == FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION) {
+          return TranslateResolution(element) < TranslateResolution(condition.value);
+        } else {
+          return CompareStrings(element, condition.value) < 0;
+        }
       }
     case FEED_FILTER_OPERATOR_BEGINSWITH:
       return StartsWith(element, value);

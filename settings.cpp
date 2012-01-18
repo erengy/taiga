@@ -129,9 +129,14 @@ bool Settings::Load() {
     Program.General.close = general.attribute(L"close").as_int();
     Program.General.minimize = general.attribute(L"minimize").as_int();
     Program.General.search_index = general.attribute(L"searchindex").as_int();
-    Program.General.size_x = general.attribute(L"sizex").as_int();
-    Program.General.size_y = general.attribute(L"sizey").as_int();
     Program.General.theme = general.attribute(L"theme").value(L"Default");
+    // Position
+    xml_node position = program.child(L"position");
+    Program.Position.x = position.attribute(L"x").as_int(-1);
+    Program.Position.y = position.attribute(L"y").as_int(-1);
+    Program.Position.w = position.attribute(L"w").as_int(-1);
+    Program.Position.h = position.attribute(L"h").as_int(-1);
+    Program.Position.maximized = position.attribute(L"maximized").as_int();
     // Start-up
     xml_node startup = program.child(L"startup");
     Program.StartUp.check_new_episodes = startup.attribute(L"checkeps").as_int();
@@ -140,6 +145,7 @@ bool Settings::Load() {
     // Exit
     xml_node exit = program.child(L"exit");
     Program.Exit.ask = exit.attribute(L"ask").as_int();
+    Program.Exit.remember_pos_size = exit.attribute(L"remember_pos_size").as_int();
     Program.Exit.save_event_queue = exit.attribute(L"savebuffer").as_int(1);
     // Proxy
     xml_node proxy = program.child(L"proxy");
@@ -349,9 +355,15 @@ bool Settings::Save() {
     general.append_attribute(L"close") = Program.General.close;
     general.append_attribute(L"minimize") = Program.General.minimize;
     general.append_attribute(L"searchindex") = Program.General.search_index;
-    general.append_attribute(L"sizex") = Program.General.size_x;
-    general.append_attribute(L"sizey") = Program.General.size_y;
     general.append_attribute(L"theme") = Program.General.theme.c_str();
+    // Position
+    xml_node position = program.append_child();
+    position.set_name(L"position");
+    position.append_attribute(L"x") = Program.Position.x;
+    position.append_attribute(L"y") = Program.Position.y;
+    position.append_attribute(L"w") = Program.Position.w;
+    position.append_attribute(L"h") = Program.Position.h;
+    position.append_attribute(L"maximized") = Program.Position.maximized;
     // Startup
     xml_node startup = program.append_child();
     startup.set_name(L"startup");
@@ -362,6 +374,7 @@ bool Settings::Save() {
     xml_node exit = program.append_child();
     exit.set_name(L"exit");
     exit.append_attribute(L"ask") = Program.Exit.ask;
+    exit.append_attribute(L"remember_pos_size") = Program.Exit.remember_pos_size;
     exit.append_attribute(L"savebuffer") = Program.Exit.save_event_queue;
     // Proxy
     xml_node proxy = program.append_child();

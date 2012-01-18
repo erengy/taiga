@@ -480,11 +480,13 @@ bool MyAnimeList::UpdateSucceeded(EventItem& item, const wstring& data, int stat
 
 void MyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 34
+  #define HTMLCHARCOUNT 35
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Extreme measures */
     // black star (black and white stars are encoded the same in API >_<)
     {L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"},
+    // right single quotation mark (followed by an 's')
+    {L"&acirc;\uFFFD\uFFFDs ", L"\u2019s "},
     // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
     {L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"},
     // Onegai My Melody Kirara complete encode (spare the star, because I can't crack that damn encoding 

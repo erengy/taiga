@@ -381,6 +381,16 @@ AccessibleChild* FindAccessibleChild(vector<AccessibleChild>& children, const ws
   return child;
 }
 
+#ifdef _DEBUG
+void BuildTreeString(vector<AccessibleChild>& children, wstring& str, int indent) {
+  for (auto it = children.begin(); it != children.end(); ++it) {
+    str.append(indent * 4, L' ');
+    str += L"[" + it->role + L"] " + it->name + L" = " + it->value + L"\n";
+    BuildTreeString(it->children, str, indent + 1);
+  }
+}
+#endif
+
 wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   int stream_provider = STREAM_UNKNOWN;
   int web_browser = WEBBROWSER_UNKNOWN;
@@ -458,13 +468,22 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   AccessibleChild* child = nullptr;
   switch (web_browser) {
     case WEBBROWSER_CHROME:
-      child = FindAccessibleChild(acc_obj.children, L"Location", L"grouping");
+      child = FindAccessibleChild(acc_obj.children, L"Address", L"grouping");
+      if (child == nullptr) {
+        child = FindAccessibleChild(acc_obj.children, L"Location", L"grouping");
+      }
       break;
     case WEBBROWSER_FIREFOX:
       child = FindAccessibleChild(acc_obj.children, L"Go to a Website", L"editable text");
+      if (child == nullptr) {
+        child = FindAccessibleChild(acc_obj.children, L"Go to a Web Site", L"editable text");
+      }
       break;
     case WEBBROWSER_IE:
-      child = FindAccessibleChild(acc_obj.children, L"Address and search using Google", L"editable text");
+      child = FindAccessibleChild(acc_obj.children, L"Address and search using Bing", L"editable text");
+      if (child == nullptr) {
+        child = FindAccessibleChild(acc_obj.children, L"Address and search using Google", L"editable text");
+      }
       break;
     case WEBBROWSER_OPERA:
       child = FindAccessibleChild(acc_obj.children, L"", L"client");

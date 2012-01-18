@@ -214,6 +214,7 @@ void SettingsDialog::OnOK() {
   Settings.Program.StartUp.check_new_episodes = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_CHECKEPS);
   Settings.Program.StartUp.minimize = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_START_MINIMIZE);
   Settings.Program.Exit.ask = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_EXIT_ASK);
+  Settings.Program.Exit.remember_pos_size = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_EXIT_REMEMBER);
   Settings.Program.Exit.save_event_queue = pages[PAGE_PROGRAM].IsDlgButtonChecked(IDC_CHECK_EXIT_SAVEBUFFER);
   pages[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_HOST, Settings.Program.Proxy.host);
   pages[PAGE_PROGRAM].GetDlgItemText(IDC_EDIT_PROXY_USER, Settings.Program.Proxy.user);

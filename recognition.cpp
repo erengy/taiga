@@ -394,10 +394,18 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
   if (group_index > -1 && !tokens[group_index].virgin) {
     episode.group.clear();
     for (unsigned int i = 0; i < tokens.size(); i++) {
+      // Set the first available virgin token as group name
       if (!tokens[i].content.empty() && tokens[i].virgin) {
         episode.group = tokens[i].content;
         break;
       }
+    }
+  }
+  // Set episode name as group name if necessary
+  if (episode.group.empty() && episode.name.length() > 2) {
+    if (StartsWith(episode.name, L"(") && EndsWith(episode.name, L")")) {
+      episode.group = episode.name.substr(1, episode.name.length() - 2);
+      episode.name.clear();
     }
   }
 
@@ -436,6 +444,7 @@ void RecognitionEngine::ExamineToken(Token& token, Episode& episode, bool compar
 
   // Compare with keywords
   for (unsigned int i = 0; i < words.size(); i++) {
+    Trim(words[i]);
     if (words[i].empty()) continue;
     #define RemoveWordFromToken(b) { \
       Erase(token.content, words[i], b); token.virgin = false; }
@@ -603,25 +612,7 @@ bool RecognitionEngine::IsEpisodeFormat(const wstring& str, Episode& episode, co
 }
 
 bool RecognitionEngine::IsResolution(const wstring& str) {
-  // *###x###*
-  if (str.length() > 6) {
-    int pos = InStr(str, L"x", 0);
-    if (pos > -1) {
-      for (unsigned int i = 0; i < str.length(); i++) {
-        if (i != pos && !IsNumeric(str.at(i))) return false;
-      }
-      return true;
-    }
-  // *###p
-  } else if (str.length() > 3) {
-    if (str.at(str.length() - 1) == 'p') {
-      for (unsigned int i = 0; i < str.length() - 1; i++) {
-        if (!IsNumeric(str.at(i))) return false;
-      }
-      return true;
-    }
-  }
-  return false;
+  return TranslateResolution(str, true) > 0;
 }
 
 bool RecognitionEngine::IsCountingWord(const wstring& str) {

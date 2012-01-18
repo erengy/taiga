@@ -172,6 +172,7 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_START_CHECKEPS, Settings.Program.StartUp.check_new_episodes);
       CheckDlgButton(IDC_CHECK_START_MINIMIZE, Settings.Program.StartUp.minimize);
       CheckDlgButton(IDC_CHECK_EXIT_ASK, Settings.Program.Exit.ask);
+      CheckDlgButton(IDC_CHECK_EXIT_REMEMBER, Settings.Program.Exit.remember_pos_size);
       CheckDlgButton(IDC_CHECK_EXIT_SAVEBUFFER, Settings.Program.Exit.save_event_queue);
       SetDlgItemText(IDC_EDIT_PROXY_HOST, Settings.Program.Proxy.host.c_str());
       SetDlgItemText(IDC_EDIT_PROXY_USER, Settings.Program.Proxy.user.c_str());

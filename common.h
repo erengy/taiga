@@ -58,6 +58,7 @@ int GetEpisodeHigh(const wstring& episode_number);
 int GetEpisodeLow(const wstring& episode_number);
 void SplitEpisodeNumbers(const wstring& input, vector<int>& output);
 wstring JoinEpisodeNumbers(const vector<int>& input);
+int TranslateResolution(const wstring& str, bool return_validity = false);
 int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 unsigned long GetFileAge(const wstring& path);

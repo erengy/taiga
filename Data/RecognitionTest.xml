@@ -605,4 +605,12 @@
 		<resolution>720p</resolution>
 		<title>The World God Only Knows 2</title>
 	</file>
+	<file>
+		<file>Macross Frontier - Sayonara no Tsubasa (Central Anime, 720p) [46B35E25].mkv</file>
+		<checksum>46B35E25</checksum>
+		<format>MKV</format>
+		<group>Central Anime</group>
+		<resolution>720p</resolution>
+		<title>Macross Frontier - Sayonara no Tsubasa</title>
+	</file>
 </recognition>

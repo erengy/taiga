@@ -120,6 +120,32 @@ wstring JoinEpisodeNumbers(const vector<int>& input) {
   return output;
 }
 
+int TranslateResolution(const wstring& str, bool return_validity) {
+  // *###x###*
+  if (str.length() > 6) {
+    int pos = InStr(str, L"x", 0);
+    if (pos > -1) {
+      for (unsigned int i = 0; i < str.length(); i++) {
+        if (i != pos && !IsNumeric(str.at(i))) return 0;
+      }
+      return return_validity ? 
+        TRUE : ToINT(str.substr(pos + 1));
+    }
+
+  // *###p
+  } else if (str.length() > 3) {
+    if (str.at(str.length() - 1) == 'p') {
+      for (unsigned int i = 0; i < str.length() - 1; i++) {
+        if (!IsNumeric(str.at(i))) return 0;
+      }
+      return return_validity ? 
+        TRUE : ToINT(str.substr(0, str.length() - 1));
+    }
+  }
+
+  return 0;
+}
+
 // =============================================================================
 
 int StatusToIcon(int status) {  

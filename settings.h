@@ -131,9 +131,15 @@ public:
     class General {
     public:
       BOOL auto_start, close, minimize;
-      int search_index, size_x, size_y;
+      int search_index;
       wstring theme;
     } General;
+    // Position
+    class Position {
+    public:
+      int x, y, w, h;
+      BOOL maximized;
+    } Position;
     // Start-up
     class StartUp {
     public:
@@ -142,7 +148,7 @@ public:
     // Exit
     class Exit {
     public:
-      BOOL ask, save_event_queue;
+      BOOL ask, remember_pos_size, save_event_queue;
     } Exit;
     // Proxy
     class Proxy {

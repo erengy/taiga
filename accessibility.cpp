@@ -160,6 +160,7 @@ HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAcce
   hr = AccessibleChildren(acc, 0L, child_count, var_array.data(), &obtained_count);
   if (FAILED(hr)) return hr;
 
+  children.resize(obtained_count);
   for (int i = 0; i < obtained_count; i++) {
     VARIANT var_child = var_array[i];
 
@@ -168,24 +169,20 @@ HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAcce
       IAccessible* child = nullptr;
       hr = dispatch->QueryInterface(IID_IAccessible, (void**)&child);
       if (hr == S_OK) {
-        children.resize(children.size() + 1);
-        GetName(children.back().name, CHILDID_SELF, child);
-        GetRole(children.back().role, CHILDID_SELF, child);
-        GetValue(children.back().value, CHILDID_SELF, child);
-        if (AllowChildTraverse(children.back(), param)) {
-          BuildChildren(children.back().children, child, param);
-        } else {
-          children.pop_back();
+        GetName(children.at(i).name, CHILDID_SELF, child);
+        GetRole(children.at(i).role, CHILDID_SELF, child);
+        GetValue(children.at(i).value, CHILDID_SELF, child);
+        if (AllowChildTraverse(children.at(i), param)) {
+          BuildChildren(children.at(i).children, child, param);
         }
         child->Release();
       }
       dispatch->Release();
 
     } else {
-      children.resize(children.size() + 1);
-      GetName(children.back().name, var_child.lVal, acc);
-      GetRole(children.back().role, var_child.lVal, acc);
-      GetValue(children.back().value, var_child.lVal, acc);
+      GetName(children.at(i).name, var_child.lVal, acc);
+      GetRole(children.at(i).role, var_child.lVal, acc);
+      GetValue(children.at(i).value, var_child.lVal, acc);
     }
   }
 
