@@ -139,7 +139,7 @@
 			<item type="separator"/>
 			<item name="Search MyAnimeList"  action="SetSearchMode(2, MAL, Search MyAnimeList)" radio="1"/>
 			<item name="Search NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaa.eu/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%search%)" radio="1"/>
-			<item name="Search TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&amp;_id=a1de48c2d65e13f4e022a982432b41b0&amp;_render=rss)" radio="1"/>
+			<item name="Search TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&amp;_id=7b99f981c5b1f02354642f4e271cca43&amp;_render=rss)" radio="1"/>
 		</menu>
 		
 		<!-- Search list -->
@@ -212,7 +212,7 @@
 				<item name="Wikipedia"    action="URL(http://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
 				<item type="separator"/>
 				<item name="NyaaTorrents" action="SearchTorrents(http://www.nyaa.eu/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%title%)"/>
-				<item name="TokyoTosho"   action="SearchTorrents(http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&amp;_id=a1de48c2d65e13f4e022a982432b41b0&amp;_render=rss)"/>
+				<item name="TokyoTosho"   action="SearchTorrents(http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&amp;_id=7b99f981c5b1f02354642f4e271cca43&amp;_render=rss)"/>
 			</menu>
 			<!-- Play -->
 			<menu name="Play">
