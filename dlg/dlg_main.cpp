@@ -212,6 +212,8 @@ void MainDialog::CreateDialogControls() {
 
 void MainDialog::InitWindowPosition() {
   UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
+  const LONG min_w = ScaleX(786);
+  const LONG min_h = ScaleX(568);
   
   CRect rcParent, rcWindow;
   ::GetWindowRect(GetParent(), &rcParent);
@@ -224,6 +226,12 @@ void MainDialog::InitWindowPosition() {
   if (rcWindow.left < 0 || rcWindow.left >= rcParent.right || 
       rcWindow.top < 0 || rcWindow.top >= rcParent.bottom) {
         flags |= SWP_NOMOVE;
+  }
+  if (rcWindow.Width() < min_w) {
+    rcWindow.right = rcWindow.left + min_w;
+  }
+  if (rcWindow.Height() < min_h) {
+    rcWindow.bottom = rcWindow.top + min_h;
   }
   if (rcWindow.Width() > rcParent.Width()) {
     rcWindow.right = rcParent.left + rcParent.Width();
@@ -240,7 +248,7 @@ void MainDialog::InitWindowPosition() {
       }
   }
 
-  SetSizeMin(ScaleX(786), ScaleY(568));
+  SetSizeMin(min_w, min_h);
   SetSnapGap(10);
 }
 

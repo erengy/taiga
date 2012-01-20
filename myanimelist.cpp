@@ -480,7 +480,7 @@ bool MyAnimeList::UpdateSucceeded(EventItem& item, const wstring& data, int stat
 
 void MyAnimeList::DecodeText(wstring& text) {
   // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 35
+  #define HTMLCHARCOUNT 36
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     /* Extreme measures */
     // black star (black and white stars are encoded the same in API >_<)
@@ -501,6 +501,7 @@ void MyAnimeList::DecodeText(wstring& text) {
     {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
     {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
     {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
+    {L"&Atilde;&brvbar",        L"\u00E6"},   // latin small letter ae
     {L"&Atilde;&uml;",          L"\u00E8"},   // small e, grave accent
     {L"&Atilde;&copy;",         L"\u00E9"},   // small e, acute accent
     {L"&Atilde;&frac14;",       L"\u00FC"},   // small u, umlaut mark
