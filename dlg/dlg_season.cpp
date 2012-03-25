@@ -417,10 +417,12 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       #undef DRAWLINE
       
       // Draw synopsis
-      rect_synopsis.bottom -= (rect_synopsis.Height() % text_height) + 1;
-      text = anime->synopsis;
-      hdc.DrawText(text.c_str(), text.length(), rect_synopsis, 
-        DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK | DT_WORD_ELLIPSIS);
+      if (!StartsWith(anime->synopsis, L"No synopsis has been added for this series yet.")) {
+        rect_synopsis.bottom -= (rect_synopsis.Height() % text_height) + 1;
+        text = anime->synopsis;
+        hdc.DrawText(text.c_str(), text.length(), rect_synopsis, 
+          DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK | DT_WORD_ELLIPSIS);
+      }
 
       break;
     }

@@ -458,7 +458,10 @@ BOOL MainDialog::OnDestroy() {
   if (Settings.Program.Exit.remember_pos_size) {
     Settings.Program.Position.maximized = (GetWindowLong() & WS_MAXIMIZE) ? TRUE : FALSE;
     if (Settings.Program.Position.maximized == FALSE) {
+      bool invisible = !IsVisible();
+      if (invisible) ActivateWindow(GetWindowHandle());
       CRect rcWindow; GetWindowRect(&rcWindow);
+      if (invisible ) Hide();
       Settings.Program.Position.x = rcWindow.left;
       Settings.Program.Position.y = rcWindow.top;
       Settings.Program.Position.w = rcWindow.Width();

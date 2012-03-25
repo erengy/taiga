@@ -523,7 +523,7 @@ BOOL HttpClient::OnReadComplete() {
         file = feed->GetDataPath() + file + L".torrent";
         Aggregator.file_archive.push_back(feed_item->title);
         if (FileExists(file)) {
-          switch (Settings.RSS.Torrent.new_action) {
+          switch (Settings.RSS.Torrent.app_mode) {
             // Default application
             case 1:
               app_path = GetDefaultAppPath(L".torrent", L"");

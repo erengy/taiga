@@ -52,7 +52,11 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       if (pItem1 && pItem2) {
         int iItem1 = pItem1->popularity.empty() ? 0 : _wtoi(pItem1->popularity.substr(1).c_str());
         int iItem2 = pItem2->popularity.empty() ? 0 : _wtoi(pItem2->popularity.substr(1).c_str());
-        if (iItem1 > iItem2) {
+        if (iItem2 == 0) {
+          return_value = -1;
+        } else if (iItem1 == 0) {
+          return_value = 1;
+        } else if (iItem1 > iItem2) {
           return_value = 1;
         } else if (iItem1 < iItem2) {
           return_value = -1;
