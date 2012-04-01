@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include "animedb.h"
 #include "animelist.h"
 #include "common.h"
 #include "event.h"
@@ -134,6 +135,8 @@ bool MyAnimeList::ParseAnimeDetails(const wstring& data, Anime* anime) {
   anime->score = InStr(data, L"Score:</span> ", L"<br />");
   StripHTML(anime->score);
 
+  //AnimeDatabase.Update(*anime);
+
   return true;
 }
 
@@ -171,6 +174,7 @@ bool MyAnimeList::ParseSearchResult(const wstring& data, Anime* anime) {
         if (!anime || anime->series_id == anime_item->series_id) {
           found_item = true;
         }
+        //AnimeDatabase.Update(*anime_item);
       }
     }
   }

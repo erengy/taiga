@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include "animedb.h"
 #include "animelist.h"
 #include "event.h"
 #include "myanimelist.h"
@@ -282,6 +283,11 @@ void AnimeList::AddItem(
       items[count].synonyms = Settings.Anime.items[i].titles;
       break;
     }
+  }
+
+  Anime* anime = AnimeDatabase.FindItem(series_id);
+  if (anime != nullptr) {
+    items[count].Update(*anime, false);
   }
 }
 

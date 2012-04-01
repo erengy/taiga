@@ -17,6 +17,7 @@
 */
 
 #include "../std.h"
+#include "../animedb.h"
 #include "../animelist.h"
 #include "../announce.h"
 #include "../common.h"
@@ -469,6 +470,9 @@ BOOL MainDialog::OnDestroy() {
     }
   }
   Settings.Save();
+
+  // Save anime database
+  AnimeDatabase.Save();
   
   // Exit
   Taiga.PostQuitMessage();

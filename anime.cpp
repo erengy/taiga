@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include <ctime>
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
@@ -78,7 +79,7 @@ MalAnime::MalAnime() :
 }
 
 Anime::Anime() : 
-  index(0), new_episode_available(false), playing(false), settings_keep_title(FALSE)
+  index(0), new_episode_available(false), last_modified(0), playing(false), settings_keep_title(FALSE)
 {
 }
 
@@ -585,6 +586,60 @@ bool Anime::Edit(EventItem& item, const wstring& data, int status_code) {
   }
 
   return true;
+}
+
+bool Anime::IsDataOld() {
+  time_t time_diff = time(nullptr) - last_modified;
+
+  if (GetAiringStatus() == MAL_FINISHED) {
+    return time_diff >= 60 * 60 * 24 * 7; // 1 week
+  } else {
+    return time_diff >= 60 * 60; // 1 hour
+  }
+}
+
+bool Anime::Update(Anime& anime, bool modify) {
+  bool modified = false;
+
+  #define UPDATE_ANIME_DATA_INT(x) \
+    if (this->x != anime.x) { \
+      this->x = anime.x; \
+      modified = true; \
+    }
+  #define UPDATE_ANIME_DATA_STR(x) \
+    if (!IsEqual(this->x, anime.x)) { \
+      if (!anime.x.empty()) { \
+        this->x = anime.x; \
+        modified = true; \
+      } \
+    }
+  
+  UPDATE_ANIME_DATA_INT(series_id);
+  UPDATE_ANIME_DATA_INT(series_type);
+  UPDATE_ANIME_DATA_INT(series_episodes);
+  UPDATE_ANIME_DATA_INT(series_status);
+  UPDATE_ANIME_DATA_STR(series_title);
+  UPDATE_ANIME_DATA_STR(series_synonyms);
+  UPDATE_ANIME_DATA_STR(series_start);
+  UPDATE_ANIME_DATA_STR(series_end);
+  UPDATE_ANIME_DATA_STR(series_image);
+  
+  UPDATE_ANIME_DATA_STR(genres);
+  UPDATE_ANIME_DATA_STR(popularity);
+  UPDATE_ANIME_DATA_STR(producers);
+  UPDATE_ANIME_DATA_STR(rank);
+  UPDATE_ANIME_DATA_STR(score);
+  UPDATE_ANIME_DATA_STR(synopsis);
+
+  #undef UPDATE_ANIME_DATA_STR
+  #undef UPDATE_ANIME_DATA_INT
+
+  if (modify && modified) {
+    last_modified = time(nullptr);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 // =============================================================================

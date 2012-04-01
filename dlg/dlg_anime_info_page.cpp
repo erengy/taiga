@@ -17,6 +17,7 @@
 */
 
 #include "../std.h"
+#include "../animedb.h"
 #include "../animelist.h"
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
@@ -146,7 +147,14 @@ void AnimeInfoPage::Refresh(Anime* anime) {
       SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
       
       // Set synopsis
-      if (anime->synopsis.empty()) {
+      bool must_update = false;
+      Anime* db_anime = AnimeDatabase.FindItem(anime->series_id);
+      if (db_anime != nullptr) {
+        must_update = db_anime->IsDataOld();
+      } else {
+        must_update = anime->synopsis.empty();
+      }
+      if (must_update) {
         if (MAL.SearchAnime(anime->series_title, anime)) {
           text = L"Retrieving...";
         } else {

@@ -25,13 +25,31 @@ class Anime;
 
 // =============================================================================
 
+class AnimeDatabase {
+public:
+  AnimeDatabase();
+  virtual ~AnimeDatabase() {}
+
+  bool Load();
+  bool Save();
+  
+  Anime* FindItem(int anime_id);
+  void Update(Anime& anime);
+
+public:
+  vector<Anime> items;
+
+private:
+  wstring file_, folder_;
+};
+
 class AnimeSeasonDatabase {
 public:
   AnimeSeasonDatabase();
   virtual ~AnimeSeasonDatabase() {}
 
   bool Load(wstring file);
-  bool Save(wstring file = L"", bool minimal = false);
+  bool Save(wstring file = L"");
 
 public:
   vector<Anime> items;
@@ -43,6 +61,7 @@ private:
   wstring file_, folder_;
 };
 
+extern AnimeDatabase AnimeDatabase;
 extern AnimeSeasonDatabase SeasonDatabase;
 
 #endif // ANIMEDB_H

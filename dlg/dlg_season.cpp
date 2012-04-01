@@ -141,10 +141,6 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 BOOL SeasonDialog::OnDestroy() {
   // Save database
   SeasonDatabase.Save();
-#ifdef _DEBUG
-  // Save minimal info for release
-  SeasonDatabase.Save(L"", true);
-#endif
   
   // Free some memory
   images.clear();

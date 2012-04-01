@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+#include "animedb.h"
 #include "animelist.h"
 #include "common.h"
 #include "dlg/dlg_update.h"
@@ -110,6 +111,9 @@ void Taiga::LoadData() {
   // Load theme data
   UI.Load(Settings.Program.General.theme);
   UI.LoadImages();
+
+  // Load anime database
+  AnimeDatabase.Load();
   
   // Load anime list
   AnimeList.Load();

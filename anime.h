@@ -98,6 +98,8 @@ public:
   void SetStartDate(const wstring& date, bool ignore_previous);
 
   bool Edit(EventItem& item, const wstring& data, int status_code);
+  bool IsDataOld();
+  bool Update(Anime& anime, bool modify = true);
   
   bool GetFansubFilter(vector<wstring>& groups);
   bool SetFansubFilter(const wstring& group_name = L"TaigaSubs (change this)");
@@ -109,6 +111,7 @@ public:
   wstring next_episode_path;
   wstring folder, synonyms;
   int settings_keep_title;
+  time_t last_modified;
 
 public:
   wstring genres, popularity, producers, rank, score, synopsis;
