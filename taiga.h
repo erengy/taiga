@@ -1,6 +1,6 @@
 /*
 ** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2011, Eren Okka
+** Copyright (C) 2010-2012, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,12 +24,12 @@
 #include "win32/win_main.h"
 
 #define APP_NAME             L"Taiga"
-#define APP_TITLE            L"Taiga 0.9"
-#define APP_VERSION          L"0.9.140"
-#define APP_BUILD            L"2012-03-25"
-#define APP_VERSION_MAJOR    0
-#define APP_VERSION_MINOR    9
-#define APP_VERSION_REVISION 140
+#define APP_TITLE            L"Taiga 1.0a"
+#define APP_VERSION          L"1.0.0 alpha"
+#define APP_BUILD            L"2012-04-01"
+#define APP_VERSION_MAJOR    1
+#define APP_VERSION_MINOR    0
+#define APP_VERSION_REVISION 0
 
 #ifndef PORTABLE
 #define PORTABLE
