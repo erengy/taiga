@@ -18,14 +18,16 @@
 
 #include "win_gdi.h"
 
+namespace win32 {
+
 // =============================================================================
 
-CDC::CDC(HDC hDC) : 
+Dc::Dc(HDC hDC) : 
   m_hDC(hDC), m_hBitmapOld(NULL), m_hBrushOld(NULL), m_hFontOld(NULL)
 {
 }
 
-CDC::~CDC() {
+Dc::~Dc() {
   if (m_hDC) {
     if (m_hBitmapOld) ::DeleteObject(::SelectObject(m_hDC, m_hBitmapOld));
     if (m_hBrushOld) ::DeleteObject(::SelectObject(m_hDC, m_hBrushOld));
@@ -40,12 +42,12 @@ CDC::~CDC() {
   }
 }
 
-void CDC::AttachDC(HDC hDC) {
+void Dc::AttachDC(HDC hDC) {
   if (m_hDC || !hDC) return;
   m_hDC = hDC;
 }
 
-HDC CDC::DetachDC() {
+HDC Dc::DetachDC() {
   if (!m_hDC) return NULL;
 
   if (m_hBitmapOld) ::DeleteObject(::SelectObject(m_hDC, m_hBitmapOld));
@@ -57,44 +59,44 @@ HDC CDC::DetachDC() {
   return hDC;
 }
 
-HDC CDC::Get() const {
+HDC Dc::Get() const {
   return m_hDC;
 }
 
-void CDC::AttachBrush(HBRUSH hBrush) {
+void Dc::AttachBrush(HBRUSH hBrush) {
   if (!m_hDC || !hBrush) return;
   if (m_hBrushOld) ::DeleteObject(::SelectObject(m_hDC, m_hBrushOld));
   m_hBrushOld = (HBRUSH)::SelectObject(m_hDC, hBrush);
 }
 
-void CDC::CreateSolidBrush(COLORREF color) {
+void Dc::CreateSolidBrush(COLORREF color) {
   if (!m_hDC) return;
   if (m_hBrushOld) ::DeleteObject(::SelectObject(m_hDC, m_hBrushOld));
   HBRUSH hBrush = ::CreateSolidBrush(color);
   m_hBrushOld = (HBRUSH)::SelectObject(m_hDC, hBrush);
 }
 
-HBRUSH CDC::DetachBrush() {
+HBRUSH Dc::DetachBrush() {
   if (!m_hDC || !m_hBrushOld) return NULL;
   HBRUSH hBrush = (HBRUSH)::SelectObject(m_hDC, m_hBrushOld);
   m_hBrushOld = NULL;
   return hBrush;
 }
 
-void CDC::AttachFont(HFONT hFont) {
+void Dc::AttachFont(HFONT hFont) {
   if (!m_hDC || !hFont) return;
   if (m_hFontOld) ::DeleteObject(::SelectObject(m_hDC, m_hFontOld));
   m_hFontOld = (HFONT)::SelectObject(m_hDC, hFont);
 }
 
-HFONT CDC::DetachFont() {
+HFONT Dc::DetachFont() {
   if (!m_hDC || !m_hFontOld) return NULL;
   HFONT hFont = (HFONT)::SelectObject(m_hDC, m_hFontOld);
   m_hFontOld = NULL;
   return hFont;
 }
 
-void CDC::EditFont(LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bItalic, BOOL bUnderline) {
+void Dc::EditFont(LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bItalic, BOOL bUnderline) {
   if (m_hFontOld) ::DeleteObject(::SelectObject(m_hDC, m_hFontOld));
   m_hFontOld = (HFONT)::GetCurrentObject(m_hDC, OBJ_FONT);
   LOGFONT lFont; ::GetObject(m_hFontOld, sizeof(LOGFONT), &lFont);
@@ -116,115 +118,117 @@ void CDC::EditFont(LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bItalic, BOOL
   ::SelectObject(m_hDC, hFont);
 }
 
-BOOL CDC::FillRect(const RECT& rc, HBRUSH hbr) const {
+BOOL Dc::FillRect(const RECT& rc, HBRUSH hbr) const {
   return (BOOL)::FillRect(m_hDC, &rc, hbr);
 }
 
-void CDC::FillRect(const RECT& rc, COLORREF color) const {
+void Dc::FillRect(const RECT& rc, COLORREF color) const {
   COLORREF old_color = ::SetBkColor(m_hDC, color);
   ::ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, &rc, L"", 0, 0);
   ::SetBkColor(m_hDC, old_color);
 }
 
-void CDC::AttachBitmap(HBITMAP hBitmap) {
+void Dc::AttachBitmap(HBITMAP hBitmap) {
   if (!m_hDC || !hBitmap) return;
   if (m_hBitmapOld) ::DeleteObject(::SelectObject(m_hDC, m_hBitmapOld));
   m_hBitmapOld = (HBITMAP)::SelectObject(m_hDC, hBitmap);
 }
 
-HBITMAP CDC::DetachBitmap() {
+HBITMAP Dc::DetachBitmap() {
   if (!m_hDC || !m_hBitmapOld) return NULL;
   HBITMAP hBitmap = (HBITMAP)::SelectObject(m_hDC, m_hBitmapOld);
   m_hBitmapOld = NULL;
   return hBitmap;
 }
 
-BOOL CDC::BitBlt(int x, int y, int nWidth, int nHeight, HDC hSrcDC, int xSrc, int ySrc, DWORD dwRop) const {
+BOOL Dc::BitBlt(int x, int y, int nWidth, int nHeight, HDC hSrcDC, int xSrc, int ySrc, DWORD dwRop) const {
   return ::BitBlt(m_hDC, x, y, nWidth, nHeight, hSrcDC, xSrc, ySrc, dwRop);
 }
 
-int CDC::SetStretchBltMode(int mode) {
+int Dc::SetStretchBltMode(int mode) {
   return ::SetStretchBltMode(m_hDC, mode);
 }
 
-BOOL CDC::StretchBlt(int x, int y, int nWidth, int nHeight, HDC hSrcDC, int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop) const {
+BOOL Dc::StretchBlt(int x, int y, int nWidth, int nHeight, HDC hSrcDC, int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop) const {
   return ::StretchBlt(m_hDC, x, y, nWidth, nHeight, hSrcDC, xSrc, ySrc, nSrcWidth, nSrcHeight, dwRop);
 }
 
-int CDC::DrawText(LPCWSTR lpszString, int nCount, const RECT& rc, UINT nFormat) const {
+int Dc::DrawText(LPCWSTR lpszString, int nCount, const RECT& rc, UINT nFormat) const {
   return ::DrawText(m_hDC, lpszString, nCount, (LPRECT)&rc, nFormat);
 }
 
-COLORREF CDC::SetBkColor(COLORREF crColor) const {
+COLORREF Dc::SetBkColor(COLORREF crColor) const {
   return ::SetBkColor(m_hDC, crColor);
 }
 
-int CDC::SetBkMode(int iBkMode) const {
+int Dc::SetBkMode(int iBkMode) const {
   return ::SetBkMode(m_hDC, iBkMode);
 }
 
-COLORREF CDC::SetTextColor(COLORREF crColor) const {
+COLORREF Dc::SetTextColor(COLORREF crColor) const {
   return ::SetTextColor(m_hDC, crColor);
 }
 
 // =============================================================================
 
-CRect::CRect() {
+Rect::Rect() {
   left = 0; top = 0; right = 0; bottom = 0;
 }
 
-CRect::CRect(int l, int t, int r, int b) {
+Rect::Rect(int l, int t, int r, int b) {
   left = l; top = t; right = r; bottom = b;
 }
 
-CRect::CRect(const RECT& rc) {
+Rect::Rect(const RECT& rc) {
   ::CopyRect(this, &rc);
 }
 
-CRect::CRect(LPCRECT lprc) {
+Rect::Rect(LPCRECT lprc) {
   ::CopyRect(this, lprc);
 }
 
-void CRect::Copy(const RECT& rc) {
+void Rect::Copy(const RECT& rc) {
   ::CopyRect(this, &rc);
 }
 
-BOOL CRect::Equal(const RECT& rc) {
+BOOL Rect::Equal(const RECT& rc) {
   return ::EqualRect(&rc, this);
 }
 
-BOOL CRect::Inflate(int dx, int dy) {
+BOOL Rect::Inflate(int dx, int dy) {
   return ::InflateRect(this, dx, dy);
 }
 
-BOOL CRect::Intersect(const RECT& rc1, const RECT& rc2) {
+BOOL Rect::Intersect(const RECT& rc1, const RECT& rc2) {
   return ::IntersectRect(this, &rc1, &rc2);
 }
 
-BOOL CRect::IsEmpty() {
+BOOL Rect::IsEmpty() {
   return ::IsRectEmpty(this);
 }
 
-BOOL CRect::Offset(int dx, int dy) {
+BOOL Rect::Offset(int dx, int dy) {
   return ::OffsetRect(this, dx, dy);
 }
 
-BOOL CRect::PtIn(POINT pt) {
+BOOL Rect::PtIn(POINT pt) {
   return ::PtInRect(this, pt);
 }
 
-BOOL CRect::Set(int left, int top, int right, int bottom) {
+BOOL Rect::Set(int left, int top, int right, int bottom) {
   return ::SetRect(this, left, top, right, bottom);
 }
 
-BOOL CRect::SetEmpty() {
+BOOL Rect::SetEmpty() {
   return ::SetRectEmpty(this);
 }
 
-BOOL CRect::Subtract(const RECT& rc1, const RECT& rc2) {
+BOOL Rect::Subtract(const RECT& rc1, const RECT& rc2) {
   return ::SubtractRect(this, &rc1, &rc2);
 }
 
-BOOL CRect::Union(const RECT& rc1, const RECT& rc2) {
+BOOL Rect::Union(const RECT& rc1, const RECT& rc2) {
   return ::UnionRect(this, &rc1, &rc2);
 }
+
+} // namespace win32

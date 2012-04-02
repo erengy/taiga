@@ -65,7 +65,7 @@ private:
 
 // =============================================================================
 
-class FolderMonitor : public CThread {
+class FolderMonitor : public win32::Thread {
 public:
   FolderMonitor();
   virtual ~FolderMonitor();
@@ -89,7 +89,7 @@ private:
   BOOL ReadDirectoryChanges(FolderInfo* folder_info);
 
 private:
-  CCriticalSection critical_section_;
+  win32::CriticalSection critical_section_;
   vector<FolderInfo> folders_;
   HANDLE completion_port_;
   HWND window_handle_;

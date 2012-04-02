@@ -21,6 +21,8 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 // =============================================================================
 
 enum MenuItemType {
@@ -29,10 +31,10 @@ enum MenuItemType {
   MENU_ITEM_SUBMENU
 };
 
-class CMenuList {
+class MenuList {
 public:
-  CMenuList() : m_hImageList(NULL) {}
-  ~CMenuList() {}
+  MenuList() : m_hImageList(NULL) {}
+  ~MenuList() {}
 
   void    Create(LPCWSTR lpName, LPCWSTR lpType);
   HMENU   CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu);
@@ -40,7 +42,7 @@ public:
   void    SetImageList(HIMAGELIST hImageList);
   wstring Show(HWND hwnd, int x, int y, LPCWSTR lpName);
 
-  class CMenu {
+  class Menu {
   public:
     void CreateItem(
       wstring action = L"", 
@@ -52,7 +54,7 @@ public:
       bool newcolumn = false, 
       bool radio     = false);
 
-    class CMenuItem {
+    class MenuItem {
     public:
       bool    Checked, Default, Enabled, NewColumn, Radio;
       wstring Action, Name, SubMenu;
@@ -66,13 +68,15 @@ public:
         int     Index;
       } Icon;
     };
-    vector<CMenuItem> Items;
+    vector<MenuItem> Items;
     wstring Name, Type;
   };
-  vector<CMenu> Menu;
+  vector<Menu> Menu;
 
 private:
   HIMAGELIST m_hImageList;
 };
+
+} // namespace win32
 
 #endif // WIN_MENU_H

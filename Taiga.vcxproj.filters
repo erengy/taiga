@@ -530,6 +530,9 @@
     <ClInclude Include="accessibility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

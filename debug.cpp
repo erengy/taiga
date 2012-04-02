@@ -17,59 +17,19 @@
 */
 
 #include "std.h"
-#include "announce.h"
 #include "common.h"
+#include "debug.h"
 #include "dlg/dlg_main.h"
-#include "recognition.h"
-#include "resource.h"
-#include "settings.h"
 #include "string.h"
-#include "taiga.h"
-#include "theme.h"
-#include "win32/win_taskbar.h"
-#include "http.h"
-
-class CDebugTest {
-public:
-  CDebugTest() : m_Freq(0.0), m_Value(0) {}
-  void Start();
-  void End(wstring str, BOOL show);
-private:
-  double m_Freq;
-  __int64 m_Value;
-};
 
 // =============================================================================
 
-void DebugTest() {
-  // Define variables
-  Episode episode;
-  int value = 0;
-  wstring str;
-
-  // Start ticking
-  CDebugTest Test;
-  Test.Start();
-
-  for (int i = 0; i < 10000; i++) {
-    // Do some tests here
-    //       ___
-    //      {o,o}
-    //      |)__)
-    //     --"-"--
-    //      O RLY?
-  }
-
-  // Show result
-  Test.End(str, 0);
-
-  // Default action
-  ExecuteAction(L"RecognitionTest");
+DebugTester::DebugTester() : 
+  m_Freq(0.0), m_Value(0)
+{
 }
 
-// =============================================================================
-
-void CDebugTest::Start() {
+void DebugTester::Start() {
   LARGE_INTEGER li;
   
   if (m_Freq == 0.0) {
@@ -81,7 +41,7 @@ void CDebugTest::Start() {
   m_Value = li.QuadPart;
 }
 
-void CDebugTest::End(wstring str, BOOL show) {
+void DebugTester::End(wstring str, BOOL show) {
   LARGE_INTEGER li;
 
   QueryPerformanceCounter(&li);
@@ -91,4 +51,38 @@ void CDebugTest::End(wstring str, BOOL show) {
     str = ToWSTR(value, 2) + L" ms | Text: [" + str + L"]";
     MainDialog.SetText(str.c_str());
   }
+}
+
+// =============================================================================
+
+void DebugPrint(wstring text) {
+  #ifdef _DEBUG
+  ::OutputDebugString(text.c_str());
+  #else
+  UNREFERENCED_PARAMETER(text);
+  #endif
+}
+
+void DebugTest() {
+  // Define variables
+  wstring str;
+
+  // Start ticking
+  DebugTester test;
+  test.Start();
+
+  for (int i = 0; i < 10000; i++) {
+    // Do some tests here
+    //       ___
+    //      {o,o}
+    //      |)__)
+    //     --"-"--
+    //      O RLY?
+  }
+
+  // Show result
+  test.End(str, 0);
+
+  // Default action
+  ExecuteAction(L"RecognitionTest");
 }

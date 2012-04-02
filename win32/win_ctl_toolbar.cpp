@@ -18,25 +18,27 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CToolbar::PreCreate(CREATESTRUCT &cs) {
+void Toolbar::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = NULL;
   cs.lpszClass = TOOLBARCLASSNAME;
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | CCS_NODIVIDER | CCS_NOPARENTALIGN | 
                  TBSTYLE_FLAT | TBSTYLE_LIST | TBSTYLE_TOOLTIPS | TBSTYLE_TRANSPARENT;
 }
 
-void CToolbar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void Toolbar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   ::SendMessage(m_hWindow, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
   ::SendMessage(m_hWindow, TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   SetImageList(NULL, 0, 0);
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-BOOL CToolbar::EnableButton(int nIndex, bool bEnabled) {
+BOOL Toolbar::EnableButton(int nIndex, bool bEnabled) {
   TBBUTTONINFO tbbi = {0};
   tbbi.cbSize  = sizeof(TBBUTTONINFO);
   tbbi.dwMask  = TBIF_BYINDEX | TBIF_STATE;
@@ -44,25 +46,25 @@ BOOL CToolbar::EnableButton(int nIndex, bool bEnabled) {
   return ::SendMessage(m_hWindow, TB_SETBUTTONINFO, nIndex, reinterpret_cast<LPARAM>(&tbbi));
 }
 
-int CToolbar::GetHeight() {
+int Toolbar::GetHeight() {
   RECT rect;
   ::SendMessage(m_hWindow, TB_GETITEMRECT, 1, (LPARAM)&rect);
   return rect.bottom;
 }
 
-DWORD CToolbar::GetButtonSize() {
+DWORD Toolbar::GetButtonSize() {
   return ::SendMessage(m_hWindow, TB_GETBUTTONSIZE, 0, 0);
 }
 
-LPCWSTR CToolbar::GetButtonTooltip(int nIndex) {
+LPCWSTR Toolbar::GetButtonTooltip(int nIndex) {
   return nIndex < static_cast<int>(m_TooltipText.size()) ? m_TooltipText[nIndex] : L"";
 }
 
-DWORD CToolbar::GetPadding() {
+DWORD Toolbar::GetPadding() {
   return ::SendMessage(m_hWindow, TB_GETPADDING, 0, 0);
 }
 
-BOOL CToolbar::InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled, 
+BOOL Toolbar::InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled, 
                             BYTE fsStyle, DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip) {
   TBBUTTON tbb  = {0};
   tbb.iBitmap   = iBitmap;
@@ -76,7 +78,7 @@ BOOL CToolbar::InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnable
   return ::SendMessage(m_hWindow, TB_INSERTBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbb));
 }
 
-BOOL CToolbar::SetButtonImage(int nIndex, int iImage) {
+BOOL Toolbar::SetButtonImage(int nIndex, int iImage) {
   TBBUTTONINFO tbbi = {0};
   tbbi.cbSize = sizeof(TBBUTTONINFO);
   tbbi.dwMask = TBIF_BYINDEX | TBIF_IMAGE;
@@ -84,7 +86,7 @@ BOOL CToolbar::SetButtonImage(int nIndex, int iImage) {
   return ::SendMessage(m_hWindow, TB_SETBUTTONINFO, nIndex, reinterpret_cast<LPARAM>(&tbbi));
 }
 
-BOOL CToolbar::SetButtonText(int nIndex, LPCWSTR lpText) {
+BOOL Toolbar::SetButtonText(int nIndex, LPCWSTR lpText) {
   TBBUTTONINFO tbbi = {0};
   tbbi.cbSize  = sizeof(TBBUTTONINFO);
   tbbi.dwMask  = TBIF_BYINDEX | TBIF_TEXT;
@@ -92,7 +94,7 @@ BOOL CToolbar::SetButtonText(int nIndex, LPCWSTR lpText) {
   return ::SendMessage(m_hWindow, TB_SETBUTTONINFO, nIndex, reinterpret_cast<LPARAM>(&tbbi));
 }
 
-BOOL CToolbar::SetButtonTooltip(int nIndex, LPCWSTR lpTooltip) {
+BOOL Toolbar::SetButtonTooltip(int nIndex, LPCWSTR lpTooltip) {
   if (nIndex > static_cast<int>(m_TooltipText.size())) {
     return FALSE;
   } else {
@@ -101,7 +103,9 @@ BOOL CToolbar::SetButtonTooltip(int nIndex, LPCWSTR lpTooltip) {
   }
 }
 
-void CToolbar::SetImageList(HIMAGELIST hImageList, int dxBitmap, int dyBitmap) {
+void Toolbar::SetImageList(HIMAGELIST hImageList, int dxBitmap, int dyBitmap) {
   ::SendMessage(m_hWindow, TB_SETBITMAPSIZE, 0, (LPARAM)MAKELONG(dxBitmap, dyBitmap));
   ::SendMessage(m_hWindow, TB_SETIMAGELIST, 0, (LPARAM)hImageList);
 }
+
+} // namespace win32

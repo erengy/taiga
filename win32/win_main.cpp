@@ -18,11 +18,13 @@
 
 #include "win_main.h"
 
-CWindowMap WindowMap;
+namespace win32 {
+
+class WindowMap WindowMap;
 
 // =============================================================================
 
-void CWindowMap::Add(HWND hWnd, CWindow* pWindow) {
+void WindowMap::Add(HWND hWnd, Window* pWindow) {
   if (hWnd != NULL) {
     if (GetWindow(hWnd) == NULL) {
       m_WindowMap.insert(std::make_pair(hWnd, pWindow));
@@ -30,7 +32,7 @@ void CWindowMap::Add(HWND hWnd, CWindow* pWindow) {
   }
 }
 
-void CWindowMap::Clear() {
+void WindowMap::Clear() {
   if (m_WindowMap.empty()) return;
   for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
     HWND hWnd = i->first;
@@ -39,7 +41,7 @@ void CWindowMap::Clear() {
   m_WindowMap.clear();
 }
 
-CWindow* CWindowMap::GetWindow(HWND hWnd) {
+Window* WindowMap::GetWindow(HWND hWnd) {
   if (m_WindowMap.empty()) return NULL;
   WndMap::iterator i = m_WindowMap.find(hWnd);
   if (i != m_WindowMap.end()) {
@@ -49,7 +51,7 @@ CWindow* CWindowMap::GetWindow(HWND hWnd) {
   }
 }
 
-void CWindowMap::Remove(HWND hWnd) {
+void WindowMap::Remove(HWND hWnd) {
   if (m_WindowMap.empty()) return;
   for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
     if (hWnd == i->first) {
@@ -59,7 +61,7 @@ void CWindowMap::Remove(HWND hWnd) {
   }
 }
 
-void CWindowMap::Remove(CWindow* pWindow) {
+void WindowMap::Remove(Window* pWindow) {
   if (m_WindowMap.empty()) return;
   for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
     if (pWindow == i->second) {
@@ -71,28 +73,28 @@ void CWindowMap::Remove(CWindow* pWindow) {
 
 // =============================================================================
 
-CApp::CApp() : 
+App::App() : 
   m_VersionMajor(1), m_VersionMinor(0), m_VersionRevision(0)
 {
   m_hInstance = ::GetModuleHandle(NULL);
 }
 
-CApp::~CApp() {
+App::~App() {
   WindowMap.Clear();
 }
 
-BOOL CApp::InitInstance() {
+BOOL App::InitInstance() {
   return TRUE;
 }
 
-int CApp::MessageLoop() {
+int App::MessageLoop() {
   MSG msg;
   while (::GetMessage(&msg, NULL, 0, 0)) {
     BOOL processed = FALSE;
     if ((msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) || 
       (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)) {
         for (HWND hwnd = msg.hwnd; hwnd != NULL; hwnd = ::GetParent(hwnd)) {
-          CWindow* pWindow = WindowMap.GetWindow(hwnd);
+          Window* pWindow = WindowMap.GetWindow(hwnd);
           if (pWindow) {
             processed = pWindow->PreTranslateMessage(&msg);
             if (processed) break;
@@ -107,11 +109,11 @@ int CApp::MessageLoop() {
   return static_cast<int>(LOWORD(msg.wParam));
 }
 
-void CApp::PostQuitMessage(int nExitCode) {
+void App::PostQuitMessage(int nExitCode) {
   ::PostQuitMessage(nExitCode);
 }
 
-int CApp::Run() {
+int App::Run() {
   if (InitInstance()) {
     return MessageLoop();
   } else {
@@ -120,13 +122,13 @@ int CApp::Run() {
   }
 }
 
-void CApp::SetVersionInfo(int major, int minor, int revision) {
+void App::SetVersionInfo(int major, int minor, int revision) {
   m_VersionMajor = major;
   m_VersionMinor = minor;
   m_VersionRevision = revision;
 }
 
-wstring CApp::GetCurrentDirectory() {
+wstring App::GetCurrentDirectory() {
   WCHAR buff[MAX_PATH];
   DWORD len = ::GetCurrentDirectory(MAX_PATH, buff);
   if (len > 0 && len < MAX_PATH) {
@@ -136,24 +138,24 @@ wstring CApp::GetCurrentDirectory() {
   }
 }
 
-HINSTANCE CApp::GetInstanceHandle() const {
+HINSTANCE App::GetInstanceHandle() const {
   return m_hInstance;
 }
 
-wstring CApp::GetModulePath() {
+wstring App::GetModulePath() {
   WCHAR buff[MAX_PATH];
   ::GetModuleFileName(m_hInstance, buff, MAX_PATH);
   return buff;
 }
 
-BOOL CApp::InitCommonControls(DWORD dwFlags) {
+BOOL App::InitCommonControls(DWORD dwFlags) {
   INITCOMMONCONTROLSEX icc;
   icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
   icc.dwICC = dwFlags;
   return ::InitCommonControlsEx(&icc);
 }
 
-BOOL CApp::SetCurrentDirectory(const wstring& directory) {
+BOOL App::SetCurrentDirectory(const wstring& directory) {
   return ::SetCurrentDirectory(directory.c_str());
 }
 
@@ -161,7 +163,7 @@ BOOL CApp::SetCurrentDirectory(const wstring& directory) {
 
 WinVersion GetWinVersion() {
   static bool checked_version = false;
-  static WinVersion win_version = WINVERSION_PRE_2000;
+  static WinVersion win_version = VERSION_PRE_XP;
   if (!checked_version) {
     OSVERSIONINFOEX version_info;
     version_info.dwOSVersionInfoSize = sizeof(version_info);
@@ -169,38 +171,39 @@ WinVersion GetWinVersion() {
     if (version_info.dwMajorVersion == 5) {
       switch (version_info.dwMinorVersion) {
         case 0:
-          win_version = WINVERSION_2000;
+          win_version = VERSION_PRE_XP;
           break;
         case 1:
-          win_version = WINVERSION_XP;
+          win_version = VERSION_XP;
           break;
         case 2:
         default:
-          win_version = WINVERSION_SERVER_2003;
+          win_version = VERSION_SERVER_2003;
           break;
         }
     } else if (version_info.dwMajorVersion == 6) {
       if (version_info.wProductType != VER_NT_WORKSTATION) {
-        win_version = WINVERSION_2008;
+        win_version = VERSION_SERVER_2008;
       } else {
-        if (version_info.dwMinorVersion == 0) {
-          win_version = WINVERSION_VISTA;
-        } else {
-          win_version = WINVERSION_WIN7;
+        switch (version_info.dwMinorVersion) {
+          case 0:
+            win_version = VERSION_VISTA;
+            break;
+          case 1:
+            win_version = VERSION_WIN7;
+            break;
+          case 2:
+          default:
+            win_version = VERSION_WIN8;
+            break;
         }
       }
     } else if (version_info.dwMajorVersion > 6) {
-      win_version = WINVERSION_WIN7;
+      win_version = VERSION_UNKNOWN;
     }
     checked_version = true;
   }
   return win_version;
 }
 
-void DEBUG_PRINT(wstring text) {
-  #ifdef _DEBUG
-  ::OutputDebugString(text.c_str());
-  #else
-  UNREFERENCED_PARAMETER(text);
-  #endif
-}
+} // namespace win32

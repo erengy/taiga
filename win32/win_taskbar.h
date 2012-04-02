@@ -21,14 +21,16 @@
 
 #include <shobjidl.h>
 
+namespace win32 {
+
 // =============================================================================
 
 /* Taskbar */
 
-class CTaskbar {
+class Taskbar {
 public:
-  CTaskbar();
-  virtual ~CTaskbar();
+  Taskbar();
+  virtual ~Taskbar();
 
   BOOL Create(HWND hwnd, HICON hIcon, LPCWSTR lpTooltip);
   BOOL Destroy();
@@ -42,10 +44,10 @@ private:
 
 /* Taskbar list */
 
-class CTaskbarList {
+class TaskbarList {
 public:
-  CTaskbarList();
-  virtual ~CTaskbarList();
+  TaskbarList();
+  virtual ~TaskbarList();
 
   void Initialize(HWND hwnd);
   void Release();
@@ -57,10 +59,10 @@ private:
   ITaskbarList3* m_pTaskbarList;
 };
 
-// =============================================================================
+} // namespace win32
 
-extern CTaskbar Taskbar;
-extern CTaskbarList TaskbarList;
+extern class win32::Taskbar Taskbar;
+extern class win32::TaskbarList TaskbarList;
 
 extern const DWORD WM_TASKBARCALLBACK;
 extern const DWORD WM_TASKBARCREATED;

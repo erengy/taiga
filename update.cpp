@@ -31,12 +31,12 @@ UpdateHelper::UpdateHelper() :
 
 // =============================================================================
 
-bool UpdateHelper::Check(const wstring& address, CApp& app, DWORD client_mode) {
+bool UpdateHelper::Check(const wstring& address, win32::App& app, DWORD client_mode) {
   OnCheck();
   app_ = &app;
   if (app_ == nullptr || address.empty()) return false;
 
-  CUrl url(address);
+  win32::Url url(address);
   return client.Get(url, L"", client_mode);
 }
 
@@ -58,7 +58,7 @@ bool UpdateHelper::DownloadNextFile(DWORD client_mode) {
       }
 
       // Download file
-      CUrl url(version_info.url + files[i].path);
+      win32::Url url(version_info.url + files[i].path);
       return client.Get(url, path, client_mode, reinterpret_cast<LPARAM>(&files[i]));
     }
   }

@@ -18,9 +18,11 @@
 
 #include "win_menu.h"
 
+namespace win32 {
+
 // =============================================================================
 
-HMENU CMenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
+HMENU MenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
   // Initialize
   int menu_index = GetIndex(lpName);
   if (menu_index == -1) return NULL;
@@ -79,7 +81,7 @@ HMENU CMenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
   return hMenu[nMenu];
 }
 
-wstring CMenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
+wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
   // Create menu
   vector<HMENU> hMenu;
   CreateNewMenu(lpName, hMenu);
@@ -118,28 +120,28 @@ wstring CMenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
 
 // =============================================================================
 
-void CMenuList::Create(LPCWSTR lpName, LPCWSTR lpType) {
+void MenuList::Create(LPCWSTR lpName, LPCWSTR lpType) {
   Menu.resize(Menu.size() + 1);
   Menu.back().Name = lpName;
   Menu.back().Type = lpType;
 }
 
-int CMenuList::GetIndex(LPCWSTR lpName) {
+int MenuList::GetIndex(LPCWSTR lpName) {
   for (unsigned int i = 0; i < Menu.size(); i++) {
     if (Menu[i].Name == lpName) return i;
   }
   return -1;
 }
 
-void CMenuList::SetImageList(HIMAGELIST hImageList) {
+void MenuList::SetImageList(HIMAGELIST hImageList) {
   m_hImageList = hImageList;
 }
 
 // =============================================================================
 
-void CMenuList::CMenu::CreateItem(wstring action, wstring name, wstring sub,
-                                  bool checked, bool def, bool enabled, 
-                                  bool newcolumn, bool radio) {
+void MenuList::Menu::CreateItem(wstring action, wstring name, wstring sub,
+                                bool checked, bool def, bool enabled, 
+                                bool newcolumn, bool radio) {
   unsigned int i = Items.size();
   Items.resize(i + 1);
   
@@ -166,12 +168,12 @@ void CMenuList::CMenu::CreateItem(wstring action, wstring name, wstring sub,
 
 // =============================================================================
 
-void CMenuList::CMenu::CMenuItem::CMenuIcon::Destroy() {
+void MenuList::Menu::MenuItem::CMenuIcon::Destroy() {
   ::DeleteObject(Handle);
   Handle = NULL;
 }
 
-void CMenuList::CMenu::CMenuItem::CMenuIcon::Load(HICON hIcon) {
+void MenuList::Menu::MenuItem::CMenuIcon::Load(HICON hIcon) {
   Destroy();
   
   RECT rect = {0};
@@ -193,3 +195,5 @@ void CMenuList::CMenu::CMenuItem::CMenuIcon::Load(HICON hIcon) {
   ::ReleaseDC(hDesktop, hScreen);
   ::DestroyIcon(hIcon);
 }
+
+} // namespace win32

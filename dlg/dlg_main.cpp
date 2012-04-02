@@ -21,6 +21,7 @@
 #include "../animelist.h"
 #include "../announce.h"
 #include "../common.h"
+#include "../debug.h"
 #include "dlg_anime_info.h"
 #include "dlg_main.h"
 #include "dlg_search.h"
@@ -99,7 +100,7 @@ BOOL MainDialog::OnInitDialog() {
       SW_MAXIMIZE : SW_SHOWNORMAL);
   }
   if (Settings.Account.MAL.user.empty()) {
-    CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
     dlg.SetContent(L"User name is not set. Would you like to open settings window to set it now?");
     dlg.AddButton(L"Yes", IDYES);
@@ -135,7 +136,7 @@ void MainDialog::CreateDialogControls() {
   edit.SetParent(toolbar_search.GetWindowHandle());
   edit.SetPosition(nullptr, ScaleX(32), 1, 200, 20);
   edit.SetMargins(1, 16);
-  CRect rcEdit; edit.GetRect(&rcEdit);
+  win32::Rect rcEdit; edit.GetRect(&rcEdit);
   // Create cancel search button
   cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
   cancel_button.SetParent(edit.GetWindowHandle());
@@ -216,7 +217,7 @@ void MainDialog::InitWindowPosition() {
   const LONG min_w = ScaleX(786);
   const LONG min_h = ScaleX(568);
   
-  CRect rcParent, rcWindow;
+  win32::Rect rcParent, rcWindow;
   ::GetWindowRect(GetParent(), &rcParent);
   rcWindow.Set(
     Settings.Program.Position.x, 
@@ -424,7 +425,7 @@ BOOL MainDialog::OnClose() {
   }
   
   if (Settings.Program.Exit.ask) {
-    CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Are you sure you want to exit?");
     dlg.AddButton(L"Yes", IDYES);
     dlg.AddButton(L"No", IDNO);
@@ -461,7 +462,7 @@ BOOL MainDialog::OnDestroy() {
     if (Settings.Program.Position.maximized == FALSE) {
       bool invisible = !IsVisible();
       if (invisible) ActivateWindow(GetWindowHandle());
-      CRect rcWindow; GetWindowRect(&rcWindow);
+      win32::Rect rcWindow; GetWindowRect(&rcWindow);
       if (invisible ) Hide();
       Settings.Program.Position.x = rcWindow.left;
       Settings.Program.Position.y = rcWindow.top;
@@ -520,13 +521,13 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_ENTERSIZEMOVE: {
-      if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
+      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
         SetTransparency(200);
       }
       break;
     }
     case WM_EXITSIZEMOVE: {
-      if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
+      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
         SetTransparency(255);
       }
       break;
@@ -538,13 +539,13 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       }
 
       // Set client area
-      CRect rcWindow(0, 0, size.cx, size.cy);
+      win32::Rect rcWindow(0, 0, size.cx, size.cy);
       rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       rebar.SendMessage(WM_SIZE, 0, 0);
       rcWindow.top += rebar.GetBarHeight() + 2;
       // Resize status bar
-      CRect rcStatus;
+      win32::Rect rcStatus;
       statusbar.GetClientRect(&rcStatus);
       statusbar.SendMessage(WM_SIZE, 0, 0);
       UpdateStatusTimer();
@@ -723,7 +724,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   } else if (uMsg == WM_TASKBARCALLBACK) {
     switch (lParam) {
       case NIN_BALLOONSHOW: {
-        DEBUG_PRINT(L"Tip type: " + ToWSTR(Taiga.current_tip_type) + L"\n");
+        DebugPrint(L"Tip type: " + ToWSTR(Taiga.current_tip_type) + L"\n");
         break;
       }
       case NIN_BALLOONTIMEOUT: {
@@ -805,7 +806,7 @@ void MainDialog::RefreshList(int index) {
 
   // Hide list to avoid visual defects and gain performance
   listview.Hide();
-  listview.EnableGroupView(index == 0 && GetWinVersion() > WINVERSION_XP);
+  listview.EnableGroupView(index == 0 && win32::GetWinVersion() > win32::VERSION_XP);
   listview.DeleteAllItems();
 
   // Remember last index
@@ -820,7 +821,7 @@ void MainDialog::RefreshList(int index) {
     status = it->GetStatus();
     if (status == index || index == 0 || (index == MAL_WATCHING && it->GetRewatching())) {
       if (AnimeList.filters.Check(*it)) {
-        group_index = GetWinVersion() > WINVERSION_XP ? status : -1;
+        group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
         icon_index = it->playing ? ICON16_PLAY : StatusToIcon(it->GetAiringStatus());
         group_count.at(status - 1)++;
         int i = listview.GetItemCount();
@@ -899,7 +900,7 @@ void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wst
 }
 
 void MainDialog::UpdateStatusTimer() {
-  CRect rect;
+  win32::Rect rect;
   GetClientRect(&rect);
   
   int seconds = Settings.Account.Update.delay - Taiga.ticker_media;

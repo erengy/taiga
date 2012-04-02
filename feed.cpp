@@ -19,6 +19,7 @@
 #include "std.h"
 #include "animelist.h"
 #include "common.h"
+#include "debug.h"
 #include "dlg/dlg_torrent.h"
 #include "feed.h"
 #include "gfx.h"
@@ -59,14 +60,14 @@ bool Feed::Check(const wstring& source) {
       break;
   }
   
-  CUrl url(link);
+  win32::Url url(link);
   return client.Get(url, GetDataPath() + L"feed.xml", 
     HTTP_Feed_Check, reinterpret_cast<LPARAM>(this));
 }
 
 bool Feed::Download(int index) {
   if (category != FEED_CATEGORY_LINK) {
-    DEBUG_PRINT(L"Feed::Download - How did we end up here?\n");
+    DebugPrint(L"Feed::Download - How did we end up here?\n");
     return false;
   }
   
@@ -90,7 +91,7 @@ bool Feed::Download(int index) {
   ValidateFileName(file);
   file = GetDataPath() + file;
   
-  CUrl url(items[index].link);
+  win32::Url url(items[index].link);
   return client.Get(url, file, dwMode, reinterpret_cast<LPARAM>(this));
 }
 
@@ -114,7 +115,7 @@ int Feed::ExamineData() {
 wstring Feed::GetDataPath() {
   wstring path = Taiga.GetDataPath() + L"Feed\\";
   if (!link.empty()) {
-    CUrl url(link);
+    win32::Url url(link);
     path += Base64Encode(url.Host, true) + L"\\";
   }
   return path;
@@ -133,7 +134,7 @@ HICON Feed::GetIcon() {
     icon_ = GdiPlus.LoadIcon(path);
     return icon_;
   } else {
-    CUrl url(link + L"/favicon.ico");
+    win32::Url url(link + L"/favicon.ico");
     client.Get(url, path, HTTP_Feed_DownloadIcon, reinterpret_cast<LPARAM>(this));
     return NULL;
   }

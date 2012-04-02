@@ -88,7 +88,7 @@ BOOL AboutDialog::OnInitDialog() {
 
   // Create about page
   page_taiga_.Create(IDD_ABOUT_TAIGA, m_hWindow, false);
-  CRect rect; tab_.AdjustRect(m_hWindow, FALSE, &rect);
+  win32::Rect rect; tab_.AdjustRect(m_hWindow, FALSE, &rect);
   page_taiga_.SetPosition(nullptr, rect, 0);
   EnableThemeDialogTexture(page_taiga_.GetWindowHandle(), ETDT_ENABLETAB);
 

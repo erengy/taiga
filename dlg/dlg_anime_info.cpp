@@ -65,7 +65,7 @@ BOOL AnimeDialog::OnInitDialog() {
   if (!title_font_) {
     LOGFONT lFont;
     ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
-    CDC dc = GetDC();
+    win32::Dc dc = GetDC();
     lFont.lfCharSet = DEFAULT_CHARSET;
     lFont.lfHeight = -MulDiv(12, GetDeviceCaps(dc.Get(), LOGPIXELSY), 72);
     lFont.lfWeight = FW_BOLD;
@@ -82,7 +82,7 @@ BOOL AnimeDialog::OnInitDialog() {
 
   // Set image position
   if (image_.rect.IsEmpty()) {
-    CRect rcTemp;
+    win32::Rect rcTemp;
     ::GetWindowRect(GetDlgItem(IDC_STATIC_ANIME_IMG), &rcTemp);
     ::GetWindowRect(GetDlgItem(IDC_STATIC_ANIME_IMG), &image_.rect);
     ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rcTemp));
@@ -93,7 +93,7 @@ BOOL AnimeDialog::OnInitDialog() {
     reinterpret_cast<LONG>(::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
 
   // Create pages
-  CRect rcPage; tab_.AdjustRect(m_hWindow, FALSE, &rcPage);
+  win32::Rect rcPage; tab_.AdjustRect(m_hWindow, FALSE, &rcPage);
   for (size_t i = 0; i < TAB_COUNT; i++) {
     pages[i].Create(IDD_ANIME_INFO_PAGE01 + i, m_hWindow, false);
     pages[i].SetPosition(nullptr, rcPage, SWP_HIDEWINDOW);
@@ -194,8 +194,8 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       // Draw anime image
       if (wParam == IDC_STATIC_ANIME_IMG) {
         LPDRAWITEMSTRUCT dis = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-        CRect rect = dis->rcItem;
-        CDC dc = dis->hDC;
+        win32::Rect rect = dis->rcItem;
+        win32::Dc dc = dis->hDC;
         // Paint border
         dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
         rect.Inflate(-1, -1);
@@ -214,13 +214,13 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     // Drag window
     case WM_ENTERSIZEMOVE: {
-      if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
+      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
         SetTransparency(200);
       }
       break;
     }
     case WM_EXITSIZEMOVE: {
-      if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
+      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
         SetTransparency(255);
       }
       break;
@@ -303,7 +303,7 @@ void AnimeDialog::Refresh(Anime* anime, bool series_info, bool my_info) {
 
   // Load image
   if (image_.Load(anime_->GetImagePath())) {
-    CWindow img = GetDlgItem(IDC_STATIC_ANIME_IMG);
+    win32::Window img = GetDlgItem(IDC_STATIC_ANIME_IMG);
     img.SetPosition(nullptr, image_.rect);
     img.SetWindowHandle(nullptr);
     // Refresh if current file is too old
@@ -330,8 +330,8 @@ void AnimeDialog::Refresh(Anime* anime, bool series_info, bool my_info) {
 // =============================================================================
 
 void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  CDC dc = hdc;
-  CRect rect;
+  win32::Dc dc = hdc;
+  win32::Rect rect;
 
   // Paint background
   GetClientRect(&rect);

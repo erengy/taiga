@@ -33,70 +33,73 @@ using std::string;
 using std::vector;
 using std::wstring;
 
+namespace win32 {
+
 // =============================================================================
 
 /* Window map */
 
-typedef std::map<HWND, CWindow*> WndMap;
+typedef std::map<HWND, Window*> WndMap;
 
-class CWindowMap {
+class WindowMap {
 public:
-  void     Add(HWND hWnd, CWindow* pWindow);
-  void     Clear();
-  CWindow* GetWindow(HWND hWnd);
-  void     Remove(HWND hWnd);
-  void     Remove(CWindow* pWindow);
+  void Add(HWND hWnd, Window* pWindow);
+  void Clear();
+  Window* GetWindow(HWND hWnd);
+  void Remove(HWND hWnd);
+  void Remove(Window* pWindow);
 
 private:
   WndMap m_WindowMap;
 };
 
-extern CWindowMap WindowMap;
+extern class WindowMap WindowMap;
 
 // =============================================================================
 
 /* Application */
 
-class CApp {
+class App {
 public:
-  CApp();
-  virtual ~CApp();
+  App();
+  virtual ~App();
 
   virtual BOOL InitInstance();
-  virtual int  MessageLoop();
+  virtual int MessageLoop();
   virtual void PostQuitMessage(int nExitCode = 0);
-  virtual int  Run();
+  virtual int Run();
 
-  int  GetVersionMajor() { return m_VersionMajor; }
-  int  GetVersionMinor() { return m_VersionMinor; }
-  int  GetVersionRevision() { return m_VersionRevision; }
+  int GetVersionMajor() { return m_VersionMajor; }
+  int GetVersionMinor() { return m_VersionMinor; }
+  int GetVersionRevision() { return m_VersionRevision; }
   void SetVersionInfo(int major, int minor, int revision);
 
-  wstring   GetCurrentDirectory();
+  wstring GetCurrentDirectory();
   HINSTANCE GetInstanceHandle() const;
-  wstring   GetModulePath();
-  BOOL      InitCommonControls(DWORD dwFlags);
-  BOOL      SetCurrentDirectory(const wstring& directory);
+  wstring GetModulePath();
+  BOOL InitCommonControls(DWORD dwFlags);
+  BOOL SetCurrentDirectory(const wstring& directory);
 
 private:
   HINSTANCE m_hInstance;
-  int       m_VersionMajor, m_VersionMinor, m_VersionRevision;
+  int m_VersionMajor, m_VersionMinor, m_VersionRevision;
 };
 
 // =============================================================================
 
 enum WinVersion {
-  WINVERSION_PRE_2000    = 0,
-  WINVERSION_2000        = 1,
-  WINVERSION_XP          = 2,
-  WINVERSION_SERVER_2003 = 3,
-  WINVERSION_VISTA       = 4,
-  WINVERSION_2008        = 5,
-  WINVERSION_WIN7        = 6
+  VERSION_PRE_XP = 0,
+  VERSION_XP,
+  VERSION_SERVER_2003,
+  VERSION_VISTA,
+  VERSION_SERVER_2008,
+  VERSION_WIN7,
+  VERSION_WIN8,
+  VERSION_UNKNOWN
 };
 
 WinVersion GetWinVersion();
 
-void DEBUG_PRINT(wstring text);
+} // namespace win32
 
 #endif // WIN_MAIN_H

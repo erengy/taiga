@@ -27,7 +27,7 @@ class Anime;
 
 // =============================================================================
 
-class SearchDialog : public CDialog {
+class SearchDialog : public win32::Dialog {
 public:
   SearchDialog();
   ~SearchDialog() {};
@@ -46,10 +46,10 @@ public:
 
 private:
   vector<Anime> anime_results_;
-  CEdit edit_;
-  CListView list_;
+  win32::Edit edit_;
+  win32::ListView list_;
 };
 
-extern SearchDialog SearchDialog;
+extern class SearchDialog SearchDialog;
 
 #endif // DLG_SEARCH_H

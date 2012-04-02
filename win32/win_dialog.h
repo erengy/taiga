@@ -21,12 +21,14 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 // =============================================================================
 
-class CDialog : public CWindow {
+class Dialog : public Window {
 public:
-  CDialog();
-  virtual ~CDialog();
+  Dialog();
+  virtual ~Dialog();
   
   virtual INT_PTR Create(UINT uResourceID, HWND hParent = NULL, bool bModal = true);
   virtual void EndDialog(INT_PTR nResult);
@@ -72,5 +74,7 @@ private:
   SIZE  m_SizeLast, m_SizeMax, m_SizeMin;
   POINT m_PosLast;
 };
+
+} // namespace win32
 
 #endif // WIN_DIALOG_H

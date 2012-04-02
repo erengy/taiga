@@ -279,14 +279,14 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      CRect rcWindow;
+      win32::Rect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
       rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
       rcWindow.top += rebar_.GetBarHeight() + ScaleY(WIN_CONTROL_MARGIN / 2);
       // Resize status bar
-      CRect rcStatus;
+      win32::Rect rcStatus;
       statusbar_.GetClientRect(&rcStatus);
       statusbar_.SendMessage(WM_SIZE, 0, 0);
       rcWindow.bottom -= rcStatus.Height();
@@ -377,7 +377,7 @@ void TorrentDialog::RefreshList() {
   if (!feed->title.empty()) {
     title = feed->title;
   } else if (!feed->link.empty()) {
-    CUrl url(feed->link);
+    win32::Url url(feed->link);
     title += L" (" + url.Host + L")";
   }
   if (!feed->description.empty()) {

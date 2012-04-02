@@ -41,7 +41,7 @@ enum SeasonSortBy {
   SEASON_SORTBY_TITLE
 };
 
-class SeasonDialog : public CDialog {
+class SeasonDialog : public win32::Dialog {
 public:
   SeasonDialog();
   virtual ~SeasonDialog() {}
@@ -71,17 +71,17 @@ private:
   vector<class HttpClient> image_clients_, info_clients_;
 
 private:
-  class CEditFilter : public CEdit {
+  class CEditFilter : public win32::Edit {
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } edit_;
   
-  CWindow cancel_button_;
-  CListView list_;
-  CRebar rebar_;
-  CStatusBar statusbar_;
-  CToolbar toolbar_, toolbar_filter_;
+  win32::Window cancel_button_;
+  win32::ListView list_;
+  win32::Rebar rebar_;
+  win32::StatusBar statusbar_;
+  win32::Toolbar toolbar_, toolbar_filter_;
 };
 
-extern SeasonDialog SeasonDialog;
+extern class SeasonDialog SeasonDialog;
 
 #endif // DLG_SEASON_H

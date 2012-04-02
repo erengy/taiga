@@ -190,14 +190,14 @@ void SearchDialog::ParseResults(const wstring& data) {
     wstring msg;
     edit_.GetText(msg);
     msg = L"No results found for \"" + msg + L"\".";
-    CTaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
+    win32::TaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(GetWindowHandle());
     return;
   }
   if (data == L"Invalid credentials") {
-    CTaskDialog dlg(L"Search Anime", TD_ERROR_ICON);
+    win32::TaskDialog dlg(L"Search Anime", TD_ERROR_ICON);
     dlg.SetMainInstruction(L"Invalid user name or password.");
     dlg.SetContent(L"Anime search requires authentication, which means, "
       L"you need to enter a valid user name and password to search MyAnimeList.");

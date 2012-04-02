@@ -18,22 +18,24 @@
 
 #include "win_taskdialog.h"
 
+namespace win32 {
+
 vector<wstring> ButtonText;
 LRESULT CALLBACK MsgBoxHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 // =============================================================================
 
-CTaskDialog::CTaskDialog() {
+TaskDialog::TaskDialog() {
   Initialize();
 }
 
-CTaskDialog::CTaskDialog(LPCWSTR title, LPWSTR icon) {
+TaskDialog::TaskDialog(LPCWSTR title, LPWSTR icon) {
   Initialize();
   SetWindowTitle(title);
   SetMainIcon(icon);
 }
 
-HRESULT CALLBACK CTaskDialog::Callback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData) {
+HRESULT CALLBACK TaskDialog::Callback(HWND hwnd, UINT uNotification, WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData) {
   switch (uNotification) {
     case TDN_DIALOG_CONSTRUCTED:
       //::SetForegroundWindow(hwnd);
@@ -46,7 +48,7 @@ HRESULT CALLBACK CTaskDialog::Callback(HWND hwnd, UINT uNotification, WPARAM wPa
   return S_OK;
 }
 
-void CTaskDialog::Initialize() {
+void TaskDialog::Initialize() {
   ::ZeroMemory(&m_Config, sizeof(TASKDIALOGCONFIG));
   m_Config.cbSize = sizeof(TASKDIALOGCONFIG);
   m_Config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | 
@@ -61,55 +63,55 @@ void CTaskDialog::Initialize() {
 
 // =============================================================================
 
-void CTaskDialog::AddButton(LPCWSTR text, int id) {
+void TaskDialog::AddButton(LPCWSTR text, int id) {
   m_Buttons.resize(m_Buttons.size() + 1);
   m_Buttons.back().pszButtonText = text;
   m_Buttons.back().nButtonID = id;
 }
 
-int CTaskDialog::GetSelectedButtonID() const {
+int TaskDialog::GetSelectedButtonID() const {
   return m_SelectedButtonID;
 }
 
-void CTaskDialog::SetCollapsedControlText(LPCWSTR text) {
+void TaskDialog::SetCollapsedControlText(LPCWSTR text) {
   m_Config.pszCollapsedControlText = text;
 }
 
-void CTaskDialog::SetContent(LPCWSTR text) {
+void TaskDialog::SetContent(LPCWSTR text) {
   m_Config.pszContent = text;
 }
 
-void CTaskDialog::SetExpandedControlText(LPCWSTR text) {
+void TaskDialog::SetExpandedControlText(LPCWSTR text) {
   m_Config.pszExpandedControlText = text;
 }
 
-void CTaskDialog::SetExpandedInformation(LPCWSTR text) {
+void TaskDialog::SetExpandedInformation(LPCWSTR text) {
   m_Config.pszExpandedInformation = text;
 }
 
-void CTaskDialog::SetFooter(LPCWSTR text) {
+void TaskDialog::SetFooter(LPCWSTR text) {
   m_Config.pszFooter = text;
 }
 
-void CTaskDialog::SetFooterIcon(LPWSTR icon) {
+void TaskDialog::SetFooterIcon(LPWSTR icon) {
   m_Config.dwFlags &= ~TDF_USE_HICON_FOOTER;
   m_Config.pszFooterIcon = icon;
 }
 
-void CTaskDialog::SetMainIcon(LPWSTR icon) {
+void TaskDialog::SetMainIcon(LPWSTR icon) {
   m_Config.dwFlags &= ~TDF_USE_HICON_MAIN;
   m_Config.pszMainIcon = icon;
 }
 
-void CTaskDialog::SetMainInstruction(LPCWSTR text) {
+void TaskDialog::SetMainInstruction(LPCWSTR text) {
   m_Config.pszMainInstruction = text;
 }
 
-void CTaskDialog::SetWindowTitle(LPCWSTR text) {
+void TaskDialog::SetWindowTitle(LPCWSTR text) {
   m_Config.pszWindowTitle = text;
 }
 
-void CTaskDialog::UseCommandLinks(bool use) {
+void TaskDialog::UseCommandLinks(bool use) {
   if (use) {
     m_Config.dwFlags |= TDF_USE_COMMAND_LINKS;
   } else {
@@ -119,7 +121,7 @@ void CTaskDialog::UseCommandLinks(bool use) {
 
 // =============================================================================
 
-HRESULT CTaskDialog::Show(HWND hParent) {
+HRESULT TaskDialog::Show(HWND hParent) {
   m_Config.hwndParent = hParent;
   if (!m_Buttons.empty()) {
     m_Config.pButtons = &m_Buttons[0];
@@ -130,7 +132,7 @@ HRESULT CTaskDialog::Show(HWND hParent) {
   }
 
   // Show task dialog, if available
-  if (GetWinVersion() >= WINVERSION_VISTA) {
+  if (GetWinVersion() >= VERSION_VISTA) {
     return ::TaskDialogIndirect(&m_Config, &m_SelectedButtonID, NULL, NULL);
   
   // Fall back to normal message box
@@ -220,3 +222,5 @@ LRESULT CALLBACK MsgBoxHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
 }
 
 // Fallback code is longer than TaskDialog code...  -_-'
+
+} // namespace win32

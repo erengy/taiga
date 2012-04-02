@@ -16,28 +16,26 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_FILTER_H
-#define DLG_FILTER_H
+#ifndef DEBUG_H
+#define DEBUG_H
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "std.h"
 
 // =============================================================================
 
-class FilterDialog : public win32::Dialog {
+class DebugTester {
 public:
-  FilterDialog();
-  ~FilterDialog() {}
-  
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  BOOL PreTranslateMessage(MSG* pMsg);
+  DebugTester();
 
-public:
-  void RefreshFilters();
+  void Start();
+  void End(wstring str, BOOL show);
+
+private:
+  double m_Freq;
+  __int64 m_Value;
 };
 
-extern class FilterDialog FilterDialog;
+void DebugPrint(wstring text);
+void DebugTest();
 
-#endif // DLG_FILTER_H
+#endif // DEBUG_H

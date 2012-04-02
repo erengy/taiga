@@ -18,18 +18,20 @@
 
 #include "win_registry.h"
 
+namespace win32 {
+
 // =============================================================================
 
-CRegistry::CRegistry() :
+Registry::Registry() :
   m_Key(NULL)
 {
 }
 
-CRegistry::~CRegistry() {
+Registry::~Registry() {
   CloseKey();
 }
 
-LSTATUS CRegistry::CloseKey() {
+LSTATUS Registry::CloseKey() {
   if (m_Key) {
     LSTATUS status = ::RegCloseKey(m_Key);
     m_Key = NULL;
@@ -39,18 +41,18 @@ LSTATUS CRegistry::CloseKey() {
   }
 }
 
-LSTATUS CRegistry::CreateKey(HKEY key, const wstring& sub_key, LPWSTR lpClass, DWORD dwOptions, REGSAM samDesired, 
+LSTATUS Registry::CreateKey(HKEY key, const wstring& sub_key, LPWSTR lpClass, DWORD dwOptions, REGSAM samDesired, 
                              LPSECURITY_ATTRIBUTES lpSecurityAttributes, LPDWORD lpdwDisposition) {
   CloseKey();
   return ::RegCreateKeyEx(key, sub_key.c_str(), 0, lpClass, dwOptions, samDesired, 
     lpSecurityAttributes, &m_Key, lpdwDisposition);
 }
 
-LONG CRegistry::DeleteKey(const wstring& sub_key) {
+LONG Registry::DeleteKey(const wstring& sub_key) {
   return DeleteSubkeys(m_Key, sub_key);
 }
 
-LSTATUS CRegistry::DeleteSubkeys(HKEY root_key, wstring sub_key) {
+LSTATUS Registry::DeleteSubkeys(HKEY root_key, wstring sub_key) {
   LSTATUS status = ::RegDeleteKey(root_key, sub_key.c_str());
   if (status == ERROR_SUCCESS) return status;
 
@@ -76,11 +78,11 @@ LSTATUS CRegistry::DeleteSubkeys(HKEY root_key, wstring sub_key) {
   return ::RegDeleteKey(root_key, sub_key.c_str());
 }
 
-LSTATUS CRegistry::DeleteValue(const wstring& value_name) {
+LSTATUS Registry::DeleteValue(const wstring& value_name) {
   return ::RegDeleteValue(m_Key, value_name.c_str());
 }
 
-void CRegistry::EnumKeys(vector<wstring>& output) {
+void Registry::EnumKeys(vector<wstring>& output) {
   // samDesired must be: KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS
   WCHAR name[MAX_PATH] = {0};
   DWORD cSubKeys = 0;
@@ -94,20 +96,20 @@ void CRegistry::EnumKeys(vector<wstring>& output) {
   }
 }
 
-LSTATUS CRegistry::OpenKey(HKEY key, const wstring& sub_key, DWORD ulOptions, REGSAM samDesired) {
+LSTATUS Registry::OpenKey(HKEY key, const wstring& sub_key, DWORD ulOptions, REGSAM samDesired) {
   CloseKey();
   return ::RegOpenKeyEx(key, sub_key.c_str(), ulOptions, samDesired, &m_Key);
 }
 
-LSTATUS CRegistry::QueryValue(const wstring& value_name, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData) {
+LSTATUS Registry::QueryValue(const wstring& value_name, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData) {
   return ::RegQueryValueEx(m_Key, value_name.c_str(), NULL, lpType, lpData, lpcbData);
 }
 
-LSTATUS CRegistry::SetValue(const wstring& value_name, DWORD dwType, CONST BYTE* lpData, DWORD cbData) {
+LSTATUS Registry::SetValue(const wstring& value_name, DWORD dwType, CONST BYTE* lpData, DWORD cbData) {
   return ::RegSetValueEx(m_Key, value_name.c_str(), 0, dwType, lpData, cbData);
 }
 
-wstring CRegistry::QueryValue(const wstring& value_name) {
+wstring Registry::QueryValue(const wstring& value_name) {
   DWORD dwType = 0;
   WCHAR szBuffer[MAX_PATH];
   DWORD dwBufferSize = sizeof(szBuffer);
@@ -117,6 +119,8 @@ wstring CRegistry::QueryValue(const wstring& value_name) {
   return L"";
 }
 
-void CRegistry::SetValue(const wstring& value_name, const wstring& value) {
+void Registry::SetValue(const wstring& value_name, const wstring& value) {
   SetValue(value_name.c_str(), REG_SZ, (LPBYTE)value.c_str(), value.length() * sizeof(WCHAR));
 }
+
+} // namespace win32

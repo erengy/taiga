@@ -265,7 +265,7 @@ wstring GetWindowPath(HWND hwnd) {
 
   if (hProcess != NULL) {
     bool success = false;
-    if (GetWinVersion() >= WINVERSION_VISTA) {
+    if (win32::GetWinVersion() >= win32::VERSION_VISTA) {
       HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
       if (hKernel32 != NULL) {
         _QueryFullProcessImageName proc = 

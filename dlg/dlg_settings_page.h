@@ -46,7 +46,7 @@ class SettingsDialog;
 
 // =============================================================================
 
-class SettingsPage : public CDialog {
+class SettingsPage : public win32::Dialog {
 public:
   SettingsPage();
   virtual ~SettingsPage() {}

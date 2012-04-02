@@ -19,9 +19,11 @@
 #include "win_dialog.h"
 #include "win_taskbar.h"
 
+namespace win32 {
+
 // =============================================================================
 
-CDialog::CDialog() :
+Dialog::Dialog() :
   m_bModal(true), m_iSnapGap(0)
 {
   m_SizeLast.cx = 0; m_SizeLast.cy = 0;
@@ -30,11 +32,11 @@ CDialog::CDialog() :
   m_PosLast.x   = 0; m_PosLast.y   = 0;
 }
 
-CDialog::~CDialog() {
+Dialog::~Dialog() {
   EndDialog(0);
 }
 
-INT_PTR CDialog::Create(UINT uResourceID, HWND hParent, bool bModal) {
+INT_PTR Dialog::Create(UINT uResourceID, HWND hParent, bool bModal) {
   m_bModal = bModal;
   if (bModal) {
     INT_PTR nResult = ::DialogBoxParam(m_hInstance, MAKEINTRESOURCE(uResourceID), 
@@ -48,7 +50,7 @@ INT_PTR CDialog::Create(UINT uResourceID, HWND hParent, bool bModal) {
   }
 }
 
-void CDialog::EndDialog(INT_PTR nResult) {
+void Dialog::EndDialog(INT_PTR nResult) {
   // Remember last position and size
   RECT rect; GetWindowRect(&rect);
   m_PosLast.x = rect.left;
@@ -67,28 +69,28 @@ void CDialog::EndDialog(INT_PTR nResult) {
   m_hWindow = NULL;
 }
 
-void CDialog::SetSizeMax(LONG cx, LONG cy) {
+void Dialog::SetSizeMax(LONG cx, LONG cy) {
   m_SizeMax.cx = cx; m_SizeMax.cy = cy;
 }
 
-void CDialog::SetSizeMin(LONG cx, LONG cy) {
+void Dialog::SetSizeMin(LONG cx, LONG cy) {
   m_SizeMin.cx = cx; m_SizeMin.cy = cy;
 }
 
-void CDialog::SetSnapGap(int iSnapGap) {
+void Dialog::SetSnapGap(int iSnapGap) {
   m_iSnapGap = iSnapGap;
 }
 
 // =============================================================================
 
-void CDialog::SetMinMaxInfo(LPMINMAXINFO lpMMI) {
+void Dialog::SetMinMaxInfo(LPMINMAXINFO lpMMI) {
   if (m_SizeMax.cx > 0) lpMMI->ptMaxTrackSize.x = m_SizeMax.cx;
   if (m_SizeMax.cy > 0) lpMMI->ptMaxTrackSize.y = m_SizeMax.cy;
   if (m_SizeMin.cx > 0) lpMMI->ptMinTrackSize.x = m_SizeMin.cx;
   if (m_SizeMin.cy > 0) lpMMI->ptMinTrackSize.y = m_SizeMin.cy;
 }
 
-void CDialog::SnapToEdges(LPWINDOWPOS lpWndPos) {
+void Dialog::SnapToEdges(LPWINDOWPOS lpWndPos) {
   if (m_iSnapGap == 0) return;
 
   HMONITOR hMonitor;
@@ -121,24 +123,24 @@ void CDialog::SnapToEdges(LPWINDOWPOS lpWndPos) {
 
 // =============================================================================
 
-void CDialog::OnCancel() {
+void Dialog::OnCancel() {
   EndDialog(IDCANCEL);
 }
 
-BOOL CDialog::OnClose() {
+BOOL Dialog::OnClose() {
   return FALSE;
 }
 
-BOOL CDialog::OnInitDialog() {
+BOOL Dialog::OnInitDialog() {
   return TRUE;
 }
 
-void CDialog::OnOK() {
+void Dialog::OnOK() {
   EndDialog(IDOK);
 }
 
 // Superclassing
-void CDialog::RegisterDlgClass(LPCWSTR lpszClassName) {
+void Dialog::RegisterDlgClass(LPCWSTR lpszClassName) {
   WNDCLASS wc;
   ::GetClassInfo(m_hInstance, WC_DIALOG, &wc); // WC_DIALOG is #32770
   wc.lpszClassName = lpszClassName;
@@ -147,23 +149,23 @@ void CDialog::RegisterDlgClass(LPCWSTR lpszClassName) {
 
 // =============================================================================
 
-BOOL CDialog::AddComboString(int nIDDlgItem, LPCWSTR lpString) {
+BOOL Dialog::AddComboString(int nIDDlgItem, LPCWSTR lpString) {
   return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(lpString));
 }
 
-BOOL CDialog::CheckDlgButton(int nIDButton, UINT uCheck) {
+BOOL Dialog::CheckDlgButton(int nIDButton, UINT uCheck) {
   return ::CheckDlgButton(m_hWindow, nIDButton, uCheck);
 }
 
-BOOL CDialog::CheckRadioButton(int nIDFirstButton, int nIDLastButton, int nIDCheckButton) {
+BOOL Dialog::CheckRadioButton(int nIDFirstButton, int nIDLastButton, int nIDCheckButton) {
   return ::CheckRadioButton(m_hWindow, nIDFirstButton, nIDLastButton, nIDCheckButton);
 }
 
-BOOL CDialog::EnableDlgItem(int nIDDlgItem, BOOL bEnable) {
+BOOL Dialog::EnableDlgItem(int nIDDlgItem, BOOL bEnable) {
   return ::EnableWindow(::GetDlgItem(m_hWindow, nIDDlgItem), bEnable);
 }
 
-INT CDialog::GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton) {
+INT Dialog::GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton) {
   for (int i = 0; i <= nIDLastButton - nIDFirstButton; i++) {
     if (::IsDlgButtonChecked(m_hWindow, nIDFirstButton + i)) {
       return i;
@@ -172,59 +174,59 @@ INT CDialog::GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton) {
   return 0;
 }
 
-INT CDialog::GetComboSelection(int nIDDlgItem) {
+INT Dialog::GetComboSelection(int nIDDlgItem) {
   return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_GETCURSEL, 0, 0);
 }
 
-HWND CDialog::GetDlgItem(int nIDDlgItem) {
+HWND Dialog::GetDlgItem(int nIDDlgItem) {
   return ::GetDlgItem(m_hWindow, nIDDlgItem);
 }
 
-UINT CDialog::GetDlgItemInt(int nIDDlgItem) {
+UINT Dialog::GetDlgItemInt(int nIDDlgItem) {
   return ::GetDlgItemInt(m_hWindow, nIDDlgItem, NULL, TRUE);
 }
 
-void CDialog::GetDlgItemText(int nIDDlgItem, LPWSTR lpString, int cchMax) {
+void Dialog::GetDlgItemText(int nIDDlgItem, LPWSTR lpString, int cchMax) {
   ::GetDlgItemText(m_hWindow, nIDDlgItem, lpString, cchMax);
 }
 
-void CDialog::GetDlgItemText(int nIDDlgItem, wstring& str) {
+void Dialog::GetDlgItemText(int nIDDlgItem, wstring& str) {
   int len = ::GetWindowTextLength(::GetDlgItem(m_hWindow, nIDDlgItem)) + 1;
   vector<wchar_t> buffer(len);
   ::GetDlgItemText(m_hWindow, nIDDlgItem, &buffer[0], len);
   str.assign(&buffer[0]);
 }
 
-BOOL CDialog::HideDlgItem(int nIDDlgItem) {
+BOOL Dialog::HideDlgItem(int nIDDlgItem) {
   return ::ShowWindow(::GetDlgItem(m_hWindow, nIDDlgItem), SW_HIDE);
 }
 
-BOOL CDialog::IsDlgButtonChecked(int nIDButton) {
+BOOL Dialog::IsDlgButtonChecked(int nIDButton) {
   return ::IsDlgButtonChecked(m_hWindow, nIDButton);
 }
 
-BOOL CDialog::SendDlgItemMessage(int nIDDlgItem, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+BOOL Dialog::SendDlgItemMessage(int nIDDlgItem, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, uMsg, wParam, lParam);
 }
 
-BOOL CDialog::SetComboSelection(int nIDDlgItem, int iIndex) {
+BOOL Dialog::SetComboSelection(int nIDDlgItem, int iIndex) {
   return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_SETCURSEL, iIndex, 0);
 }
 
-BOOL CDialog::SetDlgItemText(int nIDDlgItem, LPCWSTR lpString) {
+BOOL Dialog::SetDlgItemText(int nIDDlgItem, LPCWSTR lpString) {
   return ::SetDlgItemText(m_hWindow, nIDDlgItem, lpString);
 }
 
-BOOL CDialog::ShowDlgItem(int nIDDlgItem, int nCmdShow) {
+BOOL Dialog::ShowDlgItem(int nIDDlgItem, int nCmdShow) {
   return ::ShowWindow(::GetDlgItem(m_hWindow, nIDDlgItem), nCmdShow);
 }
 
 // =============================================================================
 
-INT_PTR CALLBACK CDialog::DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  CDialog* window = reinterpret_cast<CDialog*>(WindowMap.GetWindow(hwnd));
+INT_PTR CALLBACK Dialog::DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  Dialog* window = reinterpret_cast<Dialog*>(WindowMap.GetWindow(hwnd));
   if (!window && uMsg == WM_INITDIALOG) {
-    window = reinterpret_cast<CDialog*>(lParam);
+    window = reinterpret_cast<Dialog*>(lParam);
     if (window) {
       window->SetWindowHandle(hwnd);
       WindowMap.Add(hwnd, window);
@@ -237,11 +239,11 @@ INT_PTR CALLBACK CDialog::DialogProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, 
   }
 }
 
-INT_PTR CDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR Dialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-INT_PTR CDialog::DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR Dialog::DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CLOSE: {
       return OnClose();
@@ -361,3 +363,5 @@ INT_PTR CDialog::DialogProcDefault(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 
   return FALSE;
 }
+
+} // namespace win32

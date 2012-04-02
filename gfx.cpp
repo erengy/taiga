@@ -19,7 +19,7 @@
 #include "std.h"
 #include "gfx.h"
 
-CGdiPlus GdiPlus;
+win32::GdiPlus GdiPlus;
 
 // =============================================================================
 
@@ -89,8 +89,8 @@ COLORREF HexToARGB(const wstring& text) {
   return RGB(r, g, b);
 }
 
-CRect ResizeRect(const CRect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y) {
-  CRect rect = rect_dest;
+win32::Rect ResizeRect(const win32::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y) {
+  win32::Rect rect = rect_dest;
 
   float dest_width   = static_cast<float>(rect_dest.Width());
   float dest_height  = static_cast<float>(rect_dest.Height());

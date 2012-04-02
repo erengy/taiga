@@ -20,6 +20,7 @@
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
+#include "debug.h"
 #include "dlg/dlg_main.h"
 #include "dde.h"
 #include "http.h"
@@ -66,7 +67,7 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 
   if (modes & ANNOUNCE_TO_HTTP) {
     if (Settings.Announce.HTTP.enabled || force) {
-      DEBUG_PRINT(L"ANNOUNCE_TO_HTTP\n");
+      DebugPrint(L"ANNOUNCE_TO_HTTP\n");
       ToHttp(Settings.Announce.HTTP.url, 
         ReplaceVariables(Settings.Announce.HTTP.format, *episode, true));
     }
@@ -79,7 +80,7 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 
   if (modes & ANNOUNCE_TO_MESSENGER) {
     if (Settings.Announce.MSN.enabled || force) {
-      DEBUG_PRINT(L"ANNOUNCE_TO_MESSENGER\n");
+      DebugPrint(L"ANNOUNCE_TO_MESSENGER\n");
       ToMessenger(L"Taiga", L"MyAnimeList", 
         ReplaceVariables(Settings.Announce.MSN.format, *episode), true);
     }
@@ -87,7 +88,7 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 
   if (modes & ANNOUNCE_TO_MIRC) {
     if (Settings.Announce.MIRC.enabled || force) {
-      DEBUG_PRINT(L"ANNOUNCE_TO_MIRC\n");
+      DebugPrint(L"ANNOUNCE_TO_MIRC\n");
       ToMirc(Settings.Announce.MIRC.service, 
         Settings.Announce.MIRC.channels, 
         ReplaceVariables(Settings.Announce.MIRC.format, *episode), 
@@ -99,14 +100,14 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 
   if (modes & ANNOUNCE_TO_SKYPE) {
     if (Settings.Announce.Skype.enabled || force) {
-      DEBUG_PRINT(L"ANNOUNCE_TO_SKYPE\n");
+      DebugPrint(L"ANNOUNCE_TO_SKYPE\n");
       ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode));
     }
   }
 
   if (modes & ANNOUNCE_TO_TWITTER) {
     if (Settings.Announce.Twitter.enabled || force) {
-      DEBUG_PRINT(L"ANNOUNCE_TO_TWITTER\n");
+      DebugPrint(L"ANNOUNCE_TO_TWITTER\n");
       ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode));
     }
   }
@@ -119,7 +120,7 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 void Announcer::ToHttp(wstring address, wstring data) {
   if (address.empty() || data.empty()) return;
 
-  CUrl url(address);
+  win32::Url url(address);
   HttpClient.Post(url, data, L"", HTTP_Silent);
 }
 
@@ -160,7 +161,7 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
   // Initialize
   DynamicDataExchange DDE;
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
-    CTaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
+    win32::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);
@@ -197,7 +198,7 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
 
   // Connect
   if (!DDE.Connect(service, L"COMMAND")) {
-    CTaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
+    win32::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE connection failed.");
     dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
     dlg.AddButton(L"OK", IDOK);
@@ -223,7 +224,7 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
 
 bool Announcer::TestMircConnection(wstring service) {
   wstring content;
-  CTaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
+  win32::TaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
   dlg.AddButton(L"OK", IDOK);
   
   // Search for mIRC window

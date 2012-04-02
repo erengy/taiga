@@ -69,7 +69,7 @@ BOOL SeasonDialog::OnInitDialog() {
   edit_.SetParent(toolbar_filter_.GetWindowHandle());
   edit_.SetPosition(nullptr, 0, 0, 160, 20);
   edit_.SetMargins(1, 16);
-  CRect rect_edit; edit_.GetRect(&rect_edit);
+  win32::Rect rect_edit; edit_.GetRect(&rect_edit);
   // Create cancel filter button
   cancel_button_.Attach(GetDlgItem(IDC_BUTTON_CANCELFILTER));
   cancel_button_.SetParent(edit_.GetWindowHandle());
@@ -168,14 +168,14 @@ LRESULT SeasonDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      CRect rcWindow;
+      win32::Rect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
       rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
       rcWindow.top += rebar_.GetBarHeight() + ScaleY(WIN_CONTROL_MARGIN / 2);
       // Resize status bar
-      CRect rcStatus;
+      win32::Rect rcStatus;
       statusbar_.GetClientRect(&rcStatus);
       statusbar_.SendMessage(WM_SIZE, 0, 0);
       rcWindow.bottom -= rcStatus.Height();
@@ -226,7 +226,7 @@ LRESULT SeasonDialog::OnButtonCustomDraw(LPARAM lParam) {
 
   switch (pCD->dwDrawStage) {
     case CDDS_PREPAINT: {
-      CDC dc = pCD->hdc;
+      win32::Dc dc = pCD->hdc;
       dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
       UI.ImgList16.Draw(ICON16_CROSS, dc.Get(), 0, 0);
       dc.DetachDC();
@@ -279,10 +279,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
   LRESULT result = CDRF_DODEFAULT;
   LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(lParam);
 
-  CDC hdc = pCD->nmcd.hdc;
-  CRect rect = pCD->nmcd.rc;
+  win32::Dc hdc = pCD->nmcd.hdc;
+  win32::Rect rect = pCD->nmcd.rc;
 
-  if (GetWinVersion() < WINVERSION_VISTA) {
+  if (win32::GetWinVersion() < win32::VERSION_VISTA) {
     list_.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rect);
   }
 
@@ -300,10 +300,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (!anime) break;
       
       // Draw border
-      if (GetWinVersion() > WINVERSION_XP) {
+      if (win32::GetWinVersion() > win32::VERSION_XP) {
         rect.Inflate(-4, -4);
       }
-      if (GetWinVersion() < WINVERSION_VISTA && pCD->nmcd.uItemState & CDIS_SELECTED) {
+      if (win32::GetWinVersion() < win32::VERSION_VISTA && pCD->nmcd.uItemState & CDIS_SELECTED) {
         hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
       } else {
         hdc.FillRect(rect, RGB(230, 230, 230));
@@ -319,16 +319,16 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       int text_height = size.cy;
 
       // Calculate areas
-      CRect rect_image(
+      win32::Rect rect_image(
         rect.left + 4, rect.top + 4, 
         rect.left + 124, rect.bottom - 4);
-      CRect rect_title(
+      win32::Rect rect_title(
         rect_image.right + 4, rect_image.top, 
         rect.right - 4, rect_image.top + 20);
-      CRect rect_details(
+      win32::Rect rect_details(
         rect_title.left + 4, rect_title.bottom + 8, 
         rect_title.right, rect_title.bottom + 8 + (7 * (text_height + 2)));
-      CRect rect_synopsis(
+      win32::Rect rect_synopsis(
         rect_details.left, rect_details.bottom + 4, 
         rect_details.right, rect_image.bottom);
 

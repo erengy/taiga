@@ -18,50 +18,54 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-CRichEdit::CRichEdit() {
+RichEdit::RichEdit() {
   m_hInstRichEdit = ::LoadLibrary(L"riched20.dll");
 }
 
-CRichEdit::~CRichEdit() {
+RichEdit::~RichEdit() {
   if (m_hInstRichEdit) {
     ::FreeLibrary(m_hInstRichEdit);
   }
 }
 
-void CRichEdit::PreCreate(CREATESTRUCT &cs) {
+void RichEdit::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_STATICEDGE;
   cs.lpszClass = RICHEDIT_CLASS;
   cs.style     = WS_CHILD | WS_CLIPCHILDREN | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL | ES_AUTOHSCROLL;
 }
 
-void CRichEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+void RichEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-void CRichEdit::GetSel(CHARRANGE* cr) {
+void RichEdit::GetSel(CHARRANGE* cr) {
   ::SendMessage(m_hWindow, EM_EXGETSEL, 0, reinterpret_cast<LPARAM>(cr));
 }
 
-void CRichEdit::HideSelection(BOOL bHide) {
+void RichEdit::HideSelection(BOOL bHide) {
   ::SendMessage(m_hWindow, EM_HIDESELECTION, bHide, 0);
 }
 
-BOOL CRichEdit::SetCharFormat(DWORD dwFormat, CHARFORMAT* cf) {
+BOOL RichEdit::SetCharFormat(DWORD dwFormat, CHARFORMAT* cf) {
   return ::SendMessage(m_hWindow, EM_SETCHARFORMAT, dwFormat, reinterpret_cast<LPARAM>(cf));
 }
 
-DWORD CRichEdit::SetEventMask(DWORD dwFlags) {
+DWORD RichEdit::SetEventMask(DWORD dwFlags) {
   return ::SendMessage(m_hWindow, EM_SETEVENTMASK, 0, dwFlags);
 }
 
-void CRichEdit::SetSel(int ichStart, int ichEnd) {
+void RichEdit::SetSel(int ichStart, int ichEnd) {
   ::SendMessage(m_hWindow, EM_SETSEL, ichStart, ichEnd);
 }
 
-void CRichEdit::SetSel(CHARRANGE* cr) {
+void RichEdit::SetSel(CHARRANGE* cr) {
   ::SendMessage(m_hWindow, EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(cr));
 }
+
+} // namespace win32

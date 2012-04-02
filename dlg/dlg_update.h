@@ -25,7 +25,7 @@
 
 // =============================================================================
 
-class UpdateDialog : public CDialog {
+class UpdateDialog : public win32::Dialog {
 public:
   UpdateDialog();
   virtual ~UpdateDialog() {}
@@ -36,9 +36,9 @@ public:
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
 public:
-  CProgressBar progressbar;
+  win32::ProgressBar progressbar;
 };
 
-extern UpdateDialog UpdateDialog;
+extern class UpdateDialog UpdateDialog;
 
 #endif // DLG_UPDATE_H

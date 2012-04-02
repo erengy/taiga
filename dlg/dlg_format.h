@@ -34,7 +34,7 @@ enum {
 
 // =============================================================================
 
-class FormatDialog : public CDialog {
+class FormatDialog : public win32::Dialog {
 public:
   FormatDialog();
   ~FormatDialog() {}
@@ -51,9 +51,9 @@ public:
   int mode;
 
 private:
-  CRichEdit rich_edit_;
+  win32::RichEdit rich_edit_;
 };
 
-extern FormatDialog FormatDialog;
+extern class FormatDialog FormatDialog;
 
 #endif // DLG_FORMAT_H

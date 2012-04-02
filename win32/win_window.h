@@ -21,6 +21,8 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 #define WIN_CONTROL_MARGIN 6
 #define WIN_DEFAULT_CLASS  L"TaigaDefaultW"
 
@@ -34,11 +36,11 @@ enum WinBorderStyle {
 
 /* Window class */
 
-class CWindow {
+class Window {
 public:
-  CWindow();
-  CWindow(HWND hWnd);
-  virtual ~CWindow();
+  Window();
+  Window(HWND hWnd);
+  virtual ~Window();
 
   virtual HWND Create(HWND hWndParent = NULL);
   virtual HWND Create(DWORD dwExStyle, 
@@ -146,5 +148,7 @@ private:
   void Subclass(HWND hWnd);
   void UnSubclass();
 };
+
+} // namespace win32
 
 #endif // WIN_WINDOW_H

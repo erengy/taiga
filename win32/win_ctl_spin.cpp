@@ -18,22 +18,26 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-bool CSpin::GetPos32(int& value) {
+bool Spin::GetPos32(int& value) {
   BOOL result;
   value = ::SendMessage(m_hWindow, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&result));
   return result == 0;
 }
 
-HWND CSpin::SetBuddy(HWND hwnd) {
+HWND Spin::SetBuddy(HWND hwnd) {
   return reinterpret_cast<HWND>(::SendMessage(m_hWindow, UDM_SETBUDDY, reinterpret_cast<WPARAM>(hwnd), 0));
 }
 
-int CSpin::SetPos32(int position) {
+int Spin::SetPos32(int position) {
   return ::SendMessage(m_hWindow, UDM_SETPOS32, 0, position);
 }
 
-void CSpin::SetRange32(int lower_limit, int upper_limit) {
+void Spin::SetRange32(int lower_limit, int upper_limit) {
   ::SendMessage(m_hWindow, UDM_SETRANGE32, lower_limit, upper_limit);
 }
+
+} // namespace win32

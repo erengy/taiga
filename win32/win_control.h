@@ -26,15 +26,17 @@
 #include "win_main.h"
 #include "win_window.h"
 
+namespace win32 {
+
 // =============================================================================
 
 /* ComboBox */
 
-class CComboBox : public CWindow {
+class ComboBox : public Window {
 public:
-  CComboBox() {}
-  CComboBox(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CComboBox() {}
+  ComboBox() {}
+  ComboBox(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~ComboBox() {}
 
   int     AddItem(LPCWSTR lpsz, LPARAM data);
   int     AddString(LPCWSTR lpsz);
@@ -56,11 +58,11 @@ protected:
 
 /* Edit */
 
-class CEdit : public CWindow {
+class Edit : public Window {
 public:
-  CEdit() {}
-  CEdit(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CEdit() {}
+  Edit() {}
+  Edit(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~Edit() {}
 
   void GetRect(LPRECT lprc);
   void LimitText(int cchMax);
@@ -82,10 +84,10 @@ protected:
 
 /* Image list */
 
-class CImageList {
+class ImageList {
 public:
-  CImageList() { m_hImageList = NULL; }
-  ~CImageList() { Destroy(); }
+  ImageList() { m_hImageList = NULL; }
+  ~ImageList() { Destroy(); }
   void operator = (const HIMAGELIST hImageList) {
     SetHandle(hImageList);
   }
@@ -112,11 +114,11 @@ private:
 
 /* List view */
 
-class CListView : public CWindow {
+class ListView : public Window {
 public:
-  CListView();
-  CListView(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CListView() {}
+  ListView();
+  ListView(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~ListView() {}
   
   HIMAGELIST CreateDragImage(int iItem, LPPOINT lpptUpLeft);
   BOOL       DeleteAllItems();
@@ -173,11 +175,11 @@ private:
 
 /* Progress bar */
 
-class CProgressBar : public CWindow {
+class ProgressBar : public Window {
 public:
-  CProgressBar() {}
-  CProgressBar(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CProgressBar() {}
+  ProgressBar() {}
+  ProgressBar(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~ProgressBar() {}
 
   UINT  GetPosition();
   void  SetMarquee(bool enabled);
@@ -194,11 +196,11 @@ protected:
 
 /* Rebar */
 
-class CRebar : public CWindow {
+class Rebar : public Window {
 public:
-  CRebar() {}
-  CRebar(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CRebar() {}
+  Rebar() {}
+  Rebar(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~Rebar() {}
 
   UINT GetBarHeight();
   BOOL InsertBand(LPREBARBANDINFO lpBarInfo);
@@ -215,11 +217,11 @@ protected:
 
 /* Rich edit */
 
-class CRichEdit : public CWindow {
+class RichEdit : public Window {
 public:
-  CRichEdit();
-  CRichEdit(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CRichEdit();
+  RichEdit();
+  RichEdit(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~RichEdit();
 
   void  GetSel(CHARRANGE* cr);
   void  HideSelection(BOOL bHide);
@@ -240,11 +242,11 @@ private:
 
 /* Spin */
 
-class CSpin : public CWindow {
+class Spin : public Window {
 public:
-  CSpin() {}
-  CSpin(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CSpin() {}
+  Spin() {}
+  Spin(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~Spin() {}
 
   bool GetPos32(int& value);
   HWND SetBuddy(HWND hwnd);
@@ -256,11 +258,11 @@ public:
 
 /* Status bar */
 
-class CStatusBar : public CWindow {
+class StatusBar : public Window {
 public:
-  CStatusBar() {}
-  CStatusBar(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CStatusBar() {}
+  StatusBar() {}
+  StatusBar(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~StatusBar() {}
 
   int  InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPCWSTR lpText, LPCWSTR lpTooltip);
   void SetImageList(HIMAGELIST hImageList);
@@ -281,11 +283,11 @@ private:
 
 /* Tab */
 
-class CTab : public CWindow {
+class Tab : public Window {
 public:
-  CTab() {}
-  CTab(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CTab() {}
+  Tab() {}
+  Tab(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~Tab() {}
 
   void   AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect);
   int    Clear();
@@ -307,11 +309,11 @@ protected:
 
 /* Toolbar */
 
-class CToolbar : public CWindow {
+class Toolbar : public Window {
 public:
-  CToolbar() {}
-  CToolbar(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CToolbar() {}
+  Toolbar() {}
+  Toolbar(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~Toolbar() {}
 
   BOOL    EnableButton(int nIndex, bool bEnabled);
   int     GetHeight();
@@ -338,11 +340,11 @@ private:
 
 /* Tooltip */
 
-class CTooltip : public CWindow {
+class Tooltip : public Window {
 public:
-  CTooltip() {}
-  CTooltip(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CTooltip() {}
+  Tooltip() {}
+  Tooltip(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~Tooltip() {}
   
   BOOL AddTip(UINT uID, LPCWSTR lpText, LPCWSTR lpTitle, LPRECT rcArea, bool bWindowID);
   BOOL DeleteTip(UINT uID);
@@ -360,11 +362,11 @@ protected:
 
 /* Tree view */
 
-class CTreeView : public CWindow {
+class TreeView : public Window {
 public:
-  CTreeView() {}
-  CTreeView(HWND hWnd) { SetWindowHandle(hWnd); }
-  virtual ~CTreeView() {}
+  TreeView() {}
+  TreeView(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~TreeView() {}
 
   BOOL       DeleteAllItems();
   BOOL       DeleteItem(HTREEITEM hitem);
@@ -386,5 +388,7 @@ protected:
   virtual void PreCreate(CREATESTRUCT &cs);
   virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
 };
+
+} // namespace win32
 
 #endif // WIN_CONTROL_H

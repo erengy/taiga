@@ -21,12 +21,14 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 // =============================================================================
 
-class CRegistry {
+class Registry {
 public:
-  CRegistry();
-  ~CRegistry();
+  Registry();
+  ~Registry();
 
   LSTATUS CloseKey();
   LSTATUS CreateKey(HKEY key, const wstring& sub_key, 
@@ -57,5 +59,7 @@ private:
 
   HKEY m_Key;
 };
+
+} // namespace win32
 
 #endif // WIN_REGISTRY_H

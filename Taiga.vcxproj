@@ -186,6 +186,7 @@
     <ClInclude Include="announce.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="dde.h" />
+    <ClInclude Include="debug.h" />
     <ClInclude Include="dlg\dlg_about.h" />
     <ClInclude Include="dlg\dlg_anime_info.h" />
     <ClInclude Include="dlg\dlg_anime_info_page.h" />

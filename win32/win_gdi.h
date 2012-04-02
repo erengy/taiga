@@ -21,12 +21,14 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 // =============================================================================
 
-class CDC {
+class Dc {
 public:
-  CDC(HDC hDC = NULL);
-  virtual ~CDC();
+  Dc(HDC hDC = NULL);
+  virtual ~Dc();
 
   void operator = (const HDC hDC) {
     AttachDC(hDC);
@@ -72,12 +74,12 @@ private:
 
 // =============================================================================
 
-class CRect : public RECT {
+class Rect : public RECT {
 public:
-  CRect();
-  CRect(int l, int t, int r, int b);
-  CRect(const RECT& rc);
-  CRect(LPCRECT lprc);
+  Rect();
+  Rect(int l, int t, int r, int b);
+  Rect(const RECT& rc);
+  Rect(LPCRECT lprc);
 
   BOOL operator == (const RECT& rc) {
     return ::EqualRect(this, &rc);
@@ -108,5 +110,7 @@ public:
   BOOL Subtract(const RECT& rc1, const RECT& rc2);
   BOOL Union(const RECT& rc1, const RECT& rc2);
 };
+
+} // namespace win32
 
 #endif // WIN_GDI_H

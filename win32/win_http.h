@@ -23,7 +23,9 @@
 #include <winhttp.h>
 #include <map>
 
-enum HTTP_ContentEncoding {
+namespace win32 {
+
+enum HttpContentEncoding {
   HTTP_Encoding_None = 0,
   HTTP_Encoding_Gzip
 };
@@ -32,13 +34,13 @@ typedef std::multimap<wstring, wstring> http_header_t;
 
 // =============================================================================
 
-class CUrl {
+class Url {
 public:
-  CUrl() {}
-  CUrl(wstring url) { Crack(url); }
-  virtual ~CUrl() {}
+  Url() {}
+  Url(wstring url) { Crack(url); }
+  virtual ~Url() {}
 
-  CUrl& operator=(const CUrl& url);
+  Url& operator=(const Url& url);
   void operator=(const wstring& url);
 
 public:
@@ -50,10 +52,10 @@ public:
 
 // =============================================================================
 
-class CHTTP {
+class Http {
 public:
-  CHTTP();
-  ~CHTTP();
+  Http();
+  ~Http();
   
   void    Cleanup();
   void    ClearCookies();
@@ -70,16 +72,16 @@ public:
   bool Connect(wstring szServer, wstring szObject, wstring szData, wstring szVerb, 
     wstring szHeader, wstring szReferer, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
-  bool Connect(const CUrl& url, wstring szData, wstring szVerb, 
+  bool Connect(const Url& url, wstring szData, wstring szVerb, 
     wstring szHeader, wstring szReferer, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
   bool Get(wstring szServer, wstring szObject, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
-  bool Get(const CUrl& url, wstring szFile, 
+  bool Get(const Url& url, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
   bool Post(wstring szServer, wstring szObject, wstring szData, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
-  bool Post(const CUrl& url, wstring szData, wstring szFile, 
+  bool Post(const Url& url, wstring szData, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
 
   virtual BOOL OnError(DWORD dwError) { return FALSE; }
@@ -122,5 +124,7 @@ protected:
 
   HINTERNET m_hConnect, m_hRequest, m_hSession;
 };
+
+} // namespace win32
 
 #endif // WIN_HTTP_H

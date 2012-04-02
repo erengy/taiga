@@ -18,15 +18,17 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-BOOL CImageList::Create(int cx, int cy) {
+BOOL ImageList::Create(int cx, int cy) {
   Destroy();
   m_hImageList = ::ImageList_Create(cx, cy, ILC_COLOR32 | ILC_MASK, 0, 0);
   return m_hImageList != NULL;
 }
 
-VOID CImageList::Destroy() {
+VOID ImageList::Destroy() {
   if (m_hImageList) {
     ::ImageList_Destroy(m_hImageList);
     m_hImageList = NULL;
@@ -35,7 +37,7 @@ VOID CImageList::Destroy() {
 
 // =============================================================================
 
-int CImageList::AddBitmap(HBITMAP hBitmap, COLORREF crMask) {
+int ImageList::AddBitmap(HBITMAP hBitmap, COLORREF crMask) {
   if (crMask != CLR_NONE) {
     return ::ImageList_AddMasked(m_hImageList, hBitmap, crMask);
   } else {
@@ -43,43 +45,45 @@ int CImageList::AddBitmap(HBITMAP hBitmap, COLORREF crMask) {
   }
 }
 
-BOOL CImageList::BeginDrag(int iTrack, int dxHotspot, int dyHotspot) {
+BOOL ImageList::BeginDrag(int iTrack, int dxHotspot, int dyHotspot) {
   return ::ImageList_BeginDrag(m_hImageList, iTrack, dxHotspot, dyHotspot);
 }
 
-BOOL CImageList::DragEnter(HWND hwndLock, int x, int y) {
+BOOL ImageList::DragEnter(HWND hwndLock, int x, int y) {
   return ::ImageList_DragEnter(hwndLock, x, y);
 }
 
-BOOL CImageList::DragLeave(HWND hwndLock) {
+BOOL ImageList::DragLeave(HWND hwndLock) {
   return ::ImageList_DragLeave(hwndLock);
 }
 
-BOOL CImageList::DragMove(int x, int y) {
+BOOL ImageList::DragMove(int x, int y) {
   return ::ImageList_DragMove(x, y);
 }
 
-BOOL CImageList::Draw(int nIndex, HDC hdcDest, int x, int y) {
+BOOL ImageList::Draw(int nIndex, HDC hdcDest, int x, int y) {
   return ::ImageList_Draw(m_hImageList, nIndex, hdcDest, x, y, ILD_NORMAL);
 }
 
-VOID CImageList::EndDrag() {
+VOID ImageList::EndDrag() {
   ImageList_EndDrag();
 }
 
-HIMAGELIST CImageList::GetHandle() {
+HIMAGELIST ImageList::GetHandle() {
   return m_hImageList;
 }
 
-HICON CImageList::GetIcon(int nIndex) {
+HICON ImageList::GetIcon(int nIndex) {
   return ::ImageList_GetIcon(m_hImageList, nIndex, ILD_NORMAL);
 }
 
-BOOL CImageList::Remove(int index) {
+BOOL ImageList::Remove(int index) {
   return ::ImageList_Remove(m_hImageList, index);
 }
 
-VOID CImageList::SetHandle(HIMAGELIST hImageList) {
+VOID ImageList::SetHandle(HIMAGELIST hImageList) {
   Destroy();
   m_hImageList = hImageList;
 }
+
+} // namespace win32

@@ -18,22 +18,24 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CTab::PreCreate(CREATESTRUCT &cs) {
+void Tab::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = NULL;
   cs.lpszClass = WC_TABCONTROL;
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | TCS_TOOLTIPS;
 }
 
-void CTab::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void Tab::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   TabCtrl_SetExtendedStyle(hwnd, TCS_EX_REGISTERDROP);
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-void CTab::AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect) {
+void Tab::AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect) {
   if (hWindow) {
     RECT window_rect;
     ::GetClientRect(m_hWindow, lpRect);
@@ -47,15 +49,15 @@ void CTab::AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect) {
   TabCtrl_AdjustRect(m_hWindow, fLarger, lpRect);
 }
 
-int CTab::Clear() {
+int Tab::Clear() {
   return TabCtrl_DeleteAllItems(m_hWindow);
 }
 
-int CTab::DeleteItem(int nIndex) {
+int Tab::DeleteItem(int nIndex) {
   return TabCtrl_DeleteItem(m_hWindow, nIndex);
 }
 
-int CTab::InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam) {
+int Tab::InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam) {
   TCITEM tci;
   tci.mask    = TCIF_PARAM | TCIF_TEXT;
   tci.pszText = (LPWSTR)szText;
@@ -65,36 +67,38 @@ int CTab::InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam) {
   return TabCtrl_InsertItem(m_hWindow, nIndex, &tci);
 }
 
-int CTab::GetCurrentlySelected() {
+int Tab::GetCurrentlySelected() {
   return TabCtrl_GetCurSel(m_hWindow);
 }
 
-int CTab::GetItemCount() {
+int Tab::GetItemCount() {
   return TabCtrl_GetItemCount(m_hWindow);
 }
 
-LPARAM CTab::GetItemParam(int nIndex) {
+LPARAM Tab::GetItemParam(int nIndex) {
   TCITEM tci;
   tci.mask = TCIF_PARAM;
   TabCtrl_GetItem(m_hWindow, nIndex, &tci);
   return tci.lParam;
 }
 
-int CTab::HitTest() {
+int Tab::HitTest() {
   TCHITTESTINFO tchti;
   ::GetCursorPos(&tchti.pt);
   ::ScreenToClient(m_hWindow, &tchti.pt);
   return TabCtrl_HitTest(m_hWindow, &tchti);
 }
 
-int CTab::SetCurrentlySelected(int iItem) {
+int Tab::SetCurrentlySelected(int iItem) {
   return TabCtrl_SetCurSel(m_hWindow, iItem);
 }
 
-int CTab::SetItemText(int iItem, LPCWSTR szText) {
+int Tab::SetItemText(int iItem, LPCWSTR szText) {
   TCITEM tci;
   tci.mask = TCIF_TEXT;
   tci.pszText = (LPWSTR)szText;
 
   return TabCtrl_SetItem(m_hWindow, iItem, &tci);
 }
+
+} // namespace win32

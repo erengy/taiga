@@ -26,7 +26,7 @@
 
 // =============================================================================
 
-class FeedConditionDialog : public CDialog {
+class FeedConditionDialog : public win32::Dialog {
 public:
   FeedConditionDialog();
   virtual ~FeedConditionDialog();
@@ -45,9 +45,9 @@ public:
   FeedFilterCondition condition;
 
 private:
-  CComboBox element_combo_, operator_combo_, value_combo_;
+  win32::ComboBox element_combo_, operator_combo_, value_combo_;
 };
 
-extern FeedConditionDialog FeedConditionDialog;
+extern class FeedConditionDialog FeedConditionDialog;
 
 #endif // DLG_FEED_CONDITION_H

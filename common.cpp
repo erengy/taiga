@@ -415,7 +415,7 @@ void ValidateFileName(wstring& file) {
 }
 
 wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value) {
-  CRegistry reg;
+  win32::Registry reg;
   reg.OpenKey(HKEY_CLASSES_ROOT, extension, 0, KEY_QUERY_VALUE);
   wstring path = reg.QueryValue(L"");
   

@@ -20,9 +20,11 @@
 #include "../common.h"
 #include "../string.h"
 
+namespace win32 {
+
 // =============================================================================
 
-CUrl& CUrl::operator=(const CUrl& url) {
+Url& Url::operator=(const Url& url) {
   Scheme = url.Scheme;
   Host = url.Host;
   Path = url.Path;
@@ -30,11 +32,11 @@ CUrl& CUrl::operator=(const CUrl& url) {
   return *this;
 }
 
-void CUrl::operator=(const wstring& url) {
+void Url::operator=(const wstring& url) {
   Crack(url);
 }
 
-void CUrl::Crack(wstring url) {
+void Url::Crack(wstring url) {
   // Get scheme
   size_t i = url.find(L"://", 0);
   if (i != wstring::npos) {
@@ -53,7 +55,7 @@ void CUrl::Crack(wstring url) {
 
 // =============================================================================
 
-bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring szVerb, wstring szHeader, 
+bool Http::Connect(wstring szServer, wstring szObject, wstring szData, wstring szVerb, wstring szHeader, 
                     wstring szReferer, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   // Close previous connection, if any
   Cleanup();
@@ -162,39 +164,39 @@ bool CHTTP::Connect(wstring szServer, wstring szObject, wstring szData, wstring 
   return true;
 }
 
-bool CHTTP::Connect(const CUrl& url, wstring szData, wstring szVerb, wstring szHeader, wstring szReferer, 
+bool Http::Connect(const Url& url, wstring szData, wstring szVerb, wstring szHeader, wstring szReferer, 
                     wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   return Connect(url.Host, url.Path, szData, szVerb, szHeader, szReferer, szFile, dwClientMode, lParam);
 }
 
-bool CHTTP::Get(wstring szServer, wstring szObject, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
+bool Http::Get(wstring szServer, wstring szObject, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   return Connect(szServer, szObject, L"", L"GET", L"", szServer, szFile, dwClientMode, lParam);
 }
 
-bool CHTTP::Get(const CUrl& url, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
+bool Http::Get(const Url& url, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   return Connect(url.Host, url.Path, L"", L"GET", L"", url.Host, szFile, dwClientMode, lParam);
 }
 
-bool CHTTP::Post(wstring szServer, wstring szObject, wstring szData, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
+bool Http::Post(wstring szServer, wstring szObject, wstring szData, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   return Connect(szServer, szObject, szData, L"POST", L"", szServer, szFile, dwClientMode, lParam);
 }
 
-bool CHTTP::Post(const CUrl& url, wstring szData, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
+bool Http::Post(const Url& url, wstring szData, wstring szFile, DWORD dwClientMode, LPARAM lParam) {
   return Connect(url.Host, url.Path, szData, L"POST", L"", url.Host, szFile, dwClientMode, lParam);
 }
 
 // =============================================================================
 
-void CALLBACK CHTTP::Callback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, 
+void CALLBACK Http::Callback(HINTERNET hInternet, DWORD_PTR dwContext, DWORD dwInternetStatus, 
                               LPVOID lpvStatusInformation, DWORD dwStatusInformationLength) {
-  CHTTP* object = reinterpret_cast<CHTTP*>(dwContext);
+  Http* object = reinterpret_cast<Http*>(dwContext);
   if (object != NULL) {
     object->StatusCallback(hInternet, dwInternetStatus,
       lpvStatusInformation, dwStatusInformationLength);
   }
 }
 
-void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus, 
+void Http::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus, 
                            LPVOID lpvStatusInformation, DWORD dwStatusInformationLength) {
   switch (dwInternetStatus) {
     case WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE: {
@@ -322,7 +324,7 @@ void CHTTP::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus,
 
 // =============================================================================
 
-CHTTP::CHTTP() : 
+Http::Http() : 
   m_AutoRedirect(TRUE), m_Buffer(NULL), m_ContentEncoding(HTTP_Encoding_None), 
   m_ResponseStatusCode(0), m_dwDownloaded(0), m_dwTotal(0), m_dwClientMode(0), m_lParam(0), 
   m_hConnect(NULL), m_hRequest(NULL), m_hSession(NULL)
@@ -330,11 +332,11 @@ CHTTP::CHTTP() :
   m_UserAgent = L"Mozilla/5.0";
 }
 
-CHTTP::~CHTTP() {
+Http::~Http() {
   Cleanup();
 }
 
-void CHTTP::Cleanup() {
+void Http::Cleanup() {
   // Close handles
   if (m_hRequest) {
     ::WinHttpSetStatusCallback(m_hRequest, NULL, NULL, NULL);
@@ -371,52 +373,52 @@ void CHTTP::Cleanup() {
   m_lParam = 0;
 }
 
-void CHTTP::ClearCookies() {
+void Http::ClearCookies() {
   m_Cookie.clear();
 }
 
-wstring CHTTP::GetCookie() {
+wstring Http::GetCookie() {
   return m_Cookie;
 }
 
-DWORD CHTTP::GetClientMode() {
+DWORD Http::GetClientMode() {
   return m_dwClientMode;
 }
 
-wstring CHTTP::GetData() {
+wstring Http::GetData() {
   if (!m_Buffer) return L"";
   return ToUTF8(m_Buffer);
 }
 
-wstring CHTTP::GetDefaultHeader() {
+wstring Http::GetDefaultHeader() {
   return L"Content-Type: application/x-www-form-urlencoded\r\nAccept: */*\r\n";
 }
 
-LPARAM CHTTP::GetParam() {
+LPARAM Http::GetParam() {
   return m_lParam;
 }
 
-int CHTTP::GetResponseStatusCode() {
+int Http::GetResponseStatusCode() {
   return m_ResponseStatusCode;
 }
 
-void CHTTP::SetAutoRedirect(BOOL enabled) {
+void Http::SetAutoRedirect(BOOL enabled) {
   m_AutoRedirect = enabled;
 }
 
-void CHTTP::SetProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
+void Http::SetProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
   m_Proxy = proxy;
   m_ProxyUser = user;
   m_ProxyPass = pass;
 }
 
-void CHTTP::SetUserAgent(const wstring& user_agent) {
+void Http::SetUserAgent(const wstring& user_agent) {
   m_UserAgent = user_agent;
 }
 
 // =============================================================================
 
-bool CHTTP::ParseHeader(const wstring& text, http_header_t& header) {
+bool Http::ParseHeader(const wstring& text, http_header_t& header) {
   header.clear();
   if (text.empty()) return false;
   
@@ -439,7 +441,7 @@ bool CHTTP::ParseHeader(const wstring& text, http_header_t& header) {
   return true;
 }
 
-wstring CHTTP::BuildRequestHeader(wstring header) {
+wstring Http::BuildRequestHeader(wstring header) {
   if (header.empty()) {
     header = GetDefaultHeader();
   } else {
@@ -453,9 +455,9 @@ wstring CHTTP::BuildRequestHeader(wstring header) {
   return header;
 }
 
-bool CHTTP::ParseResponseHeader(const wstring& header) {
+bool Http::ParseResponseHeader(const wstring& header) {
   if (!ParseHeader(header, m_ResponseHeader)) return false;
-  CUrl location;
+  Url location;
 
   for (auto it = m_ResponseHeader.cbegin(); it != m_ResponseHeader.cend(); ++it) {
     wstring name = it->first;
@@ -503,3 +505,5 @@ bool CHTTP::ParseResponseHeader(const wstring& header) {
 
   return true;
 }
+
+} // namespace win32

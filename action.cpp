@@ -21,6 +21,7 @@
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
+#include "debug.h"
 #include "dlg/dlg_about.h"
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_info_page.h"
@@ -52,7 +53,7 @@
 // =============================================================================
 
 void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
-  DEBUG_PRINT(L"Action :: " + action + L"\n");
+  DebugPrint(L"Action :: " + action + L"\n");
   
   wstring body;
   size_t pos = action.find('(');
@@ -278,7 +279,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (body.empty()) return;
     if (Settings.Account.MAL.api == MAL_API_OFFICIAL) {
       if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty()) {
-        CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+        win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
         dlg.SetMainInstruction(L"Would you like to set your account information first?");
         dlg.SetContent(L"Anime search requires authentication, which means, "
           L"you need to enter a valid user name and password to search MyAnimeList.");
@@ -321,7 +322,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       content += L"\n\u2022 Life spent watching: \t" + Stats.life_spent_watching;
       content += L"\n\u2022 Mean score: \t\t" + ToWSTR(Stats.score_mean, 2);
       content += L"\n\u2022 Score deviation: \t\t" + ToWSTR(Stats.score_deviation, 2);
-      CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(main_instruction.c_str());
       dlg.SetContent(content.c_str());
       dlg.AddButton(L"OK", IDOK);
@@ -426,7 +427,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
     if (check_folder && !silent && !Settings.Folders.root.empty()) {
-      CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"Would you like to search for anime folders first?");
       dlg.SetContent(L"This feature only checks specific anime folders for new episodes. "
         L"As you have none set at the moment, searching for folders is highly recommended.");
@@ -557,7 +558,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // EditDelete()
   //   Removes an anime from list.
   } else if (action == L"EditDelete") {
-    CTaskDialog dlg;
+    win32::TaskDialog dlg;
     dlg.SetWindowTitle(AnimeList.items[AnimeList.index].series_title.c_str());
     dlg.SetMainIcon(TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Are you sure you want to delete this title from your list?");

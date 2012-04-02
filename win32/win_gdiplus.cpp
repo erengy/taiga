@@ -23,19 +23,21 @@
 
 using namespace Gdiplus;
 
+namespace win32 {
+
 // =============================================================================
 
-CGdiPlus::CGdiPlus() {
+GdiPlus::GdiPlus() {
   Gdiplus::GdiplusStartupInput input;
   Gdiplus::GdiplusStartup(&m_Token, &input, NULL);
 }
 
-CGdiPlus::~CGdiPlus() {
+GdiPlus::~GdiPlus() {
   Gdiplus::GdiplusShutdown(m_Token);
   m_Token = NULL;
 }
 
-HICON CGdiPlus::LoadIcon(const wstring& file) {
+HICON GdiPlus::LoadIcon(const wstring& file) {
   HICON hIcon = NULL;
   
   Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(file.c_str());
@@ -47,7 +49,7 @@ HICON CGdiPlus::LoadIcon(const wstring& file) {
   return hIcon;
 }
 
-HBITMAP CGdiPlus::LoadImage(const wstring& file) {
+HBITMAP GdiPlus::LoadImage(const wstring& file) {
   HBITMAP hBitmap = NULL;
   
   Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(file.c_str());
@@ -58,3 +60,5 @@ HBITMAP CGdiPlus::LoadImage(const wstring& file) {
 
   return hBitmap;
 }
+
+} // namespace win32

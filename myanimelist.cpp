@@ -115,7 +115,7 @@ bool MyAnimeList::Login() {
 
 bool MyAnimeList::DownloadImage(Anime* anime, class HttpClient* client) {
   if (anime->series_image.empty()) return false;
-  CUrl url(anime->series_image);
+  win32::Url url(anime->series_image);
   if (!client) client = &ImageClient;
   return client->Get(url, anime->GetImagePath(), HTTP_MAL_Image, reinterpret_cast<LPARAM>(anime));
 }
@@ -263,7 +263,7 @@ bool MyAnimeList::Update(MalAnimeValues& anime_values, int anime_id, int update_
       ADD_DATA_S(L"tags", anime_values.tags);
       data += L"\r\n</entry>";
       
-      CUrl url;
+      win32::Url url;
       switch (update_mode) {
         // Add anime
         case HTTP_MAL_AnimeAdd: {

@@ -50,7 +50,7 @@ enum TipType {
 
 // =============================================================================
 
-class Taiga : public CApp {
+class Taiga : public win32::App {
 public:
   Taiga();
   ~Taiga();
@@ -80,6 +80,6 @@ public:
   } Updater;
 };
 
-extern Taiga Taiga;
+extern class Taiga Taiga;
 
 #endif // TAIGA_H

@@ -19,6 +19,7 @@
 #include "../std.h"
 #include "../animelist.h"
 #include "../common.h"
+#include "../debug.h"
 #include "dlg_main.h"
 #include "../event.h"
 #include "../gfx.h"
@@ -84,8 +85,8 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
         case CDDS_ITEMPOSTPAINT: {
           // Draw separator
           if (pCD->nmcd.lItemlParam == -1) {
-            CRect rcItem = pCD->nmcd.rc;
-            CDC hdc = pCD->nmcd.hdc;
+            win32::Rect rcItem = pCD->nmcd.rc;
+            win32::Dc hdc = pCD->nmcd.hdc;
             hdc.FillRect(rcItem, RGB(255, 255, 255));
             rcItem.Inflate(-8, 0);
             rcItem.top += (rcItem.bottom - rcItem.top) / 2;
@@ -322,15 +323,15 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
         if (eps_buffer == eps_watched) eps_buffer = -1;
         if (eps_watched == 0) eps_watched = -1;
 
-        CRect rcItem;
-        if (GetWinVersion() < WINVERSION_VISTA) {
+        win32::Rect rcItem;
+        if (win32::GetWinVersion() < win32::VERSION_VISTA) {
           listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
         } else {
           rcItem = pCD->nmcd.rc;
         }
         if (rcItem.IsEmpty()) return CDRF_DODEFAULT;
-        CDC hdc = pCD->nmcd.hdc;
-        CRect rcText = rcItem;
+        win32::Dc hdc = pCD->nmcd.hdc;
+        win32::Rect rcText = rcItem;
         
         // Draw border
         rcItem.Inflate(-2, -2);
@@ -338,8 +339,8 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
         // Draw background
         rcItem.Inflate(-1, -1);
         UI.list_progress.background.Draw(hdc.Get(), &rcItem);
-        CRect rcAvail = rcItem;
-        CRect rcBuffer = rcItem;
+        win32::Rect rcAvail = rcItem;
+        win32::Rect rcBuffer = rcItem;
         
         // Draw progress
         if (eps_watched > -1 || eps_buffer > -1) {
@@ -447,7 +448,7 @@ LRESULT MainDialog::OnButtonCustomDraw(LPARAM lParam) {
 
   switch (pCD->dwDrawStage) {
     case CDDS_PREPAINT: {
-      CDC dc = pCD->hdc;
+      win32::Dc dc = pCD->hdc;
       dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
       UI.ImgList16.Draw(ICON16_CROSS, dc.Get(), 0, 0);
       dc.DetachDC();

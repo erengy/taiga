@@ -150,15 +150,15 @@ BOOL FeedConditionDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 void FeedConditionDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  CDC dc = hdc;
-  CRect rect;
+  win32::Dc dc = hdc;
+  win32::Rect rect;
 
   // Paint background
   GetClientRect(&rect);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 
   // Paint bottom area
-  CRect rect_button;
+  win32::Rect rect_button;
   ::GetClientRect(GetDlgItem(IDCANCEL), &rect_button);
   rect.top = rect.bottom - (rect_button.Height() * 2);
   dc.FillRect(rect, ::GetSysColor(COLOR_BTNFACE));

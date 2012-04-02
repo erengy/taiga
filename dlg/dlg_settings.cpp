@@ -184,7 +184,7 @@ void SettingsDialog::OnOK() {
   Settings.Announce.Twitter.enabled = pages[PAGE_TWITTER].IsDlgButtonChecked(IDC_CHECK_TWITTER);
 
   // Folders > Root
-  CListView List = pages[PAGE_FOLDERS_ROOT].GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+  win32::ListView List = pages[PAGE_FOLDERS_ROOT].GetDlgItem(IDC_LIST_FOLDERS_ROOT);
   Settings.Folders.root.clear();
   for (int i = 0; i < List.GetItemCount(); i++) {
     wstring folder;
@@ -323,13 +323,13 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 
     // Drag window
     case WM_ENTERSIZEMOVE: {
-      if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
+      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
         SetTransparency(200);
       }
       break;
     }
     case WM_EXITSIZEMOVE: {
-      if (::IsAppThemed() && GetWinVersion() >= WINVERSION_VISTA) {
+      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
         SetTransparency(255);
       }
       break;
@@ -395,7 +395,7 @@ LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter) {
   wstring text;
-  CListView List = hwnd_list;
+  win32::ListView List = hwnd_list;
   int index = List.GetItemCount();
   int group = filter.anime_ids.empty() ? 0 : 1;
   int icon = ICON16_FUNNEL;
@@ -415,7 +415,7 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
 }
 
 void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {
-  CListView List = hwnd_list;
+  win32::ListView List = hwnd_list;
   List.DeleteAllItems();
 
   for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it) {

@@ -83,10 +83,10 @@ public:
   bool Load(const wstring& name);
 
 public:
-  CMenuList Menus;
+  win32::MenuList Menus;
 
-  CImageList ImgList16;
-  CImageList ImgList24;
+  win32::ImageList ImgList16;
+  win32::ImageList ImgList24;
   
   class ListProgress {
   public:

@@ -19,35 +19,37 @@
 #include "win_main.h"
 #include "win_taskbar.h"
 
+class win32::Taskbar Taskbar;
+class win32::TaskbarList TaskbarList;
+
 static const DWORD WM_TASKBARCALLBACK = WM_APP + 0x15;
 static const DWORD WM_TASKBARCREATED = ::RegisterWindowMessage(L"TaskbarCreated");
 static const DWORD WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(L"TaskbarButtonCreated");
 
-#define APP_SYSTRAY_ID 74164 // TAIGA ^_^
+namespace win32 {
 
-CTaskbar Taskbar;
-CTaskbarList TaskbarList;
+#define APP_SYSTRAY_ID 74164 // TAIGA ^_^
 
 // =============================================================================
 
-CTaskbar::CTaskbar() :
+Taskbar::Taskbar() :
   m_hApp(NULL)
 {
   WinVersion win_version = GetWinVersion();
-  if (win_version >= WINVERSION_VISTA) {
+  if (win_version >= VERSION_VISTA) {
     m_NID.cbSize = sizeof(NOTIFYICONDATA);
-  } else if (win_version >= WINVERSION_XP) {
+  } else if (win_version >= VERSION_XP) {
     m_NID.cbSize = NOTIFYICONDATA_V3_SIZE;
   } else {
     m_NID.cbSize = NOTIFYICONDATA_V2_SIZE;
   }
 }
 
-CTaskbar::~CTaskbar() {
+Taskbar::~Taskbar() {
   Destroy();
 }
 
-BOOL CTaskbar::Create(HWND hwnd, HICON hIcon, LPCWSTR lpTip) {
+BOOL Taskbar::Create(HWND hwnd, HICON hIcon, LPCWSTR lpTip) {
   Destroy();
   m_hApp = hwnd;
 
@@ -69,12 +71,12 @@ BOOL CTaskbar::Create(HWND hwnd, HICON hIcon, LPCWSTR lpTip) {
   return ::Shell_NotifyIcon(NIM_ADD, &m_NID);
 }
 
-BOOL CTaskbar::Destroy() {
+BOOL Taskbar::Destroy() {
   if (!m_hApp) return FALSE;
   return ::Shell_NotifyIcon(NIM_DELETE, &m_NID);
 }
 
-BOOL CTaskbar::Modify(LPCWSTR lpTip) {
+BOOL Taskbar::Modify(LPCWSTR lpTip) {
   if (!m_hApp) return FALSE;
 
   m_NID.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
@@ -83,7 +85,7 @@ BOOL CTaskbar::Modify(LPCWSTR lpTip) {
   return ::Shell_NotifyIcon(NIM_MODIFY, &m_NID);
 }
 
-BOOL CTaskbar::Tip(LPCWSTR lpText, LPCWSTR lpTitle, int iIconIndex) {
+BOOL Taskbar::Tip(LPCWSTR lpText, LPCWSTR lpTitle, int iIconIndex) {
   if (!m_hApp) return FALSE;
 
   m_NID.uFlags = NIF_INFO;
@@ -96,23 +98,23 @@ BOOL CTaskbar::Tip(LPCWSTR lpText, LPCWSTR lpTitle, int iIconIndex) {
 
 // =============================================================================
 
-CTaskbarList::CTaskbarList() : 
+TaskbarList::TaskbarList() : 
   m_hWnd(NULL), m_pTaskbarList(NULL)
 {
 }
 
-CTaskbarList::~CTaskbarList() {
+TaskbarList::~TaskbarList() {
   Release();
 }
 
-void CTaskbarList::Initialize(HWND hwnd) {
+void TaskbarList::Initialize(HWND hwnd) {
   Release();
   m_hWnd = hwnd;
   ::CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, 
     __uuidof(ITaskbarList3), (void**)&m_pTaskbarList);
 }
 
-void CTaskbarList::Release() {
+void TaskbarList::Release() {
   if (m_pTaskbarList) {
     m_pTaskbarList->Release();
     m_pTaskbarList = NULL;
@@ -120,14 +122,16 @@ void CTaskbarList::Release() {
   }
 }
 
-void CTaskbarList::SetProgressState(TBPFLAG flag) {
+void TaskbarList::SetProgressState(TBPFLAG flag) {
   if (m_pTaskbarList) {
     m_pTaskbarList->SetProgressState(m_hWnd, flag);
   }
 }
 
-void CTaskbarList::SetProgressValue(ULONGLONG ullValue, ULONGLONG ullTotal) {
+void TaskbarList::SetProgressValue(ULONGLONG ullValue, ULONGLONG ullTotal) {
   if (m_pTaskbarList) {
     m_pTaskbarList->SetProgressValue(m_hWnd, ullValue, ullTotal);
   }
 }
+
+} // namespace win32

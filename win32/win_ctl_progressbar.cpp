@@ -18,25 +18,27 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CProgressBar::PreCreate(CREATESTRUCT &cs) {
+void ProgressBar::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = 0;
   cs.lpszClass = PROGRESS_CLASS;
   cs.style     = WS_CHILD | WS_VISIBLE;
 }
 
-void CProgressBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+void ProgressBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-UINT CProgressBar::GetPosition() {
+UINT ProgressBar::GetPosition() {
   return ::SendMessage(m_hWindow, PBM_GETPOS, 0, 0);
 }
 
-void CProgressBar::SetMarquee(bool enabled) {
+void ProgressBar::SetMarquee(bool enabled) {
   if (enabled) {
     SetStyle(PBS_MARQUEE, 0);
   } else {
@@ -45,14 +47,16 @@ void CProgressBar::SetMarquee(bool enabled) {
   ::SendMessage(m_hWindow, PBM_SETMARQUEE, enabled, 0);
 }
 
-UINT CProgressBar::SetPosition(UINT position) {
+UINT ProgressBar::SetPosition(UINT position) {
   return ::SendMessage(m_hWindow, PBM_SETPOS, position, 0);
 }
 
-DWORD CProgressBar::SetRange(UINT min, UINT max) {
+DWORD ProgressBar::SetRange(UINT min, UINT max) {
   return ::SendMessage(m_hWindow, PBM_SETRANGE32, min, max);
 }
 
-UINT CProgressBar::SetState(UINT state) {
+UINT ProgressBar::SetState(UINT state) {
   return ::SendMessage(m_hWindow, PBM_SETSTATE, state, 0);
 }
+
+} // namespace win32

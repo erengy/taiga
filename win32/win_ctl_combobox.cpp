@@ -19,57 +19,61 @@
 #include "win_control.h"
 #include <windowsx.h>
 
+namespace win32 {
+
 // =============================================================================
 
-void CComboBox::PreCreate(CREATESTRUCT &cs) {
+void ComboBox::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_CLIENTEDGE;
   cs.lpszClass = WC_COMBOBOX;
   cs.style     = CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE;
 }
 
-void CComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+void ComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-int CComboBox::AddItem(LPCWSTR lpsz, LPARAM data) {
+int ComboBox::AddItem(LPCWSTR lpsz, LPARAM data) {
   int index = ComboBox_AddString(m_hWindow, lpsz);
   return ComboBox_SetItemData(m_hWindow, index, data);
 }
 
-int CComboBox::AddString(LPCWSTR lpsz) {
+int ComboBox::AddString(LPCWSTR lpsz) {
   return ComboBox_AddString(m_hWindow, lpsz);
 }
 
-int CComboBox::DeleteString(int index) {
+int ComboBox::DeleteString(int index) {
   return ComboBox_DeleteString(m_hWindow, index);
 }
 
-int CComboBox::GetCount() {
+int ComboBox::GetCount() {
   return ComboBox_GetCount(m_hWindow);
 }
 
-int CComboBox::GetCurSel() {
+int ComboBox::GetCurSel() {
   return ComboBox_GetCurSel(m_hWindow);
 }
 
-LRESULT CComboBox::GetItemData(int index) {
+LRESULT ComboBox::GetItemData(int index) {
   return ComboBox_GetItemData(m_hWindow, index);
 }
 
-void CComboBox::ResetContent() {
+void ComboBox::ResetContent() {
   ComboBox_ResetContent(m_hWindow);
 }
 
-int CComboBox::SetCurSel(int index) {
+int ComboBox::SetCurSel(int index) {
   return ComboBox_SetCurSel(m_hWindow, index);
 }
 
-BOOL CComboBox::SetEditSel(int ichStart, int ichEnd) {
+BOOL ComboBox::SetEditSel(int ichStart, int ichEnd) {
   return ::SendMessage(m_hWindow, CB_SETEDITSEL, ichStart, ichEnd);
 }
 
-int CComboBox::SetItemData(int index, LPARAM data) {
+int ComboBox::SetItemData(int index, LPARAM data) {
   return ComboBox_SetItemData(m_hWindow, index, data);
 }
+
+} // namespace win32

@@ -22,7 +22,7 @@
 #include "std.h"
 #include "win32/win_http.h"
 
-enum HTTP_ClientMode {
+enum HttpClientMode {
   HTTP_Silent = 0,
   // MyAnimeList
   HTTP_MAL_Login,
@@ -57,7 +57,7 @@ enum HTTP_ClientMode {
 
 // =============================================================================
 
-class HttpClient : public CHTTP {
+class HttpClient : public win32::Http {
 public:
   HttpClient();
   virtual ~HttpClient() {}
@@ -65,7 +65,7 @@ public:
 protected:
   BOOL OnError(DWORD dwError);
   BOOL OnSendRequestComplete();
-  BOOL OnHeadersAvailable(http_header_t& headers);
+  BOOL OnHeadersAvailable(win32::http_header_t& headers);
   BOOL OnReadData();
   BOOL OnReadComplete();
   BOOL OnRedirect(wstring address);

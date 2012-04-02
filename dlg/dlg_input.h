@@ -25,7 +25,7 @@
 
 // =============================================================================
 
-class InputDialog : public CDialog {
+class InputDialog : public win32::Dialog {
 public:
   InputDialog();
   virtual ~InputDialog() {}
@@ -45,8 +45,8 @@ public:
 private:
   int current_value_, min_value_, max_value_;
   bool numbers_only_;
-  CEdit edit_;
-  CSpin spin_;
+  win32::Edit edit_;
+  win32::Spin spin_;
 };
 
 #endif // DLG_INPUT_H

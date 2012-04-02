@@ -18,22 +18,24 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CStatusBar::PreCreate(CREATESTRUCT &cs) {
+void StatusBar::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = NULL;
   cs.lpszClass = STATUSCLASSNAME;
   cs.style     = WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS;
 }
 
-void CStatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void StatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   m_iWidth.clear();
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-int CStatusBar::InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPCWSTR lpText, LPCWSTR lpTooltip) {
+int StatusBar::InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPCWSTR lpText, LPCWSTR lpTooltip) {
   if (m_iWidth.empty()) {
     m_iWidth.push_back(iWidth);
   } else {
@@ -54,19 +56,19 @@ int CStatusBar::InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LP
   return nParts;
 }
 
-void CStatusBar::SetImageList(HIMAGELIST hImageList) {
+void StatusBar::SetImageList(HIMAGELIST hImageList) {
   m_hImageList = hImageList;
 }
 
-void CStatusBar::SetPartText(int iPart, LPCWSTR lpText) {
+void StatusBar::SetPartText(int iPart, LPCWSTR lpText) {
   ::SendMessage(m_hWindow, SB_SETTEXT, iPart, reinterpret_cast<LPARAM>(lpText));
 }
 
-void CStatusBar::SetPartTipText(int iPart, LPCWSTR lpTipText) {
+void StatusBar::SetPartTipText(int iPart, LPCWSTR lpTipText) {
   ::SendMessage(m_hWindow, SB_SETTIPTEXT, iPart, reinterpret_cast<LPARAM>(lpTipText));
 }
 
-void CStatusBar::SetPartWidth(int iPart, int iWidth) {
+void StatusBar::SetPartWidth(int iPart, int iWidth) {
   if (iPart > static_cast<int>(m_iWidth.size()) - 1) return;
   if (iPart == 0) {
     m_iWidth.at(iPart) = iWidth;
@@ -76,3 +78,5 @@ void CStatusBar::SetPartWidth(int iPart, int iWidth) {
   
   ::SendMessage(m_hWindow, SB_SETPARTS, m_iWidth.size(), reinterpret_cast<LPARAM>(&m_iWidth[0]));
 }
+
+} // namespace win32

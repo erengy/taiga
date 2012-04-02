@@ -84,7 +84,7 @@ BOOL UpdateDialog::OnDestroy() {
     }
   } else {
     if (g_hMain) {
-      CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
       dlg.SetExpandedInformation(L"Current version: " APP_VERSION);
       dlg.AddButton(L"OK", IDOK);
@@ -99,6 +99,6 @@ BOOL UpdateDialog::OnDestroy() {
 
 void UpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
-  CDC dc = hdc;
+  win32::Dc dc = hdc;
   dc.FillRect(lpps->rcPaint, ::GetSysColor(COLOR_WINDOW));
 }

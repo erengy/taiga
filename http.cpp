@@ -21,6 +21,7 @@
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
+#include "debug.h"
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_info_page.h"
 #include "dlg/dlg_event.h"
@@ -56,7 +57,7 @@ HttpClient::HttpClient() {
 BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWSTR(dwError) + L": " + 
     FormatError(dwError, L"winhttp.dll");
-  DEBUG_PRINT(error_text + L"\n");
+  DebugPrint(error_text + L"\n");
 
   switch (GetClientMode()) {
     case HTTP_MAL_Login:
@@ -116,7 +117,7 @@ BOOL HttpClient::OnSendRequestComplete() {
   return 0;
 }
 
-BOOL HttpClient::OnHeadersAvailable(http_header_t& headers) {
+BOOL HttpClient::OnHeadersAvailable(win32::http_header_t& headers) {
   switch (GetClientMode()) {
     case HTTP_Silent:
       break;
@@ -349,7 +350,7 @@ BOOL HttpClient::OnReadComplete() {
           status = L"You have new " + status + L" waiting on your profile.";
           MainDialog.ChangeStatus(status);
 
-          CTaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+          win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
           dlg.SetMainInstruction(status.c_str());
           dlg.UseCommandLinks(true);
           dlg.AddButton(L"Check\nView your profile now", IDYES);
@@ -401,7 +402,7 @@ BOOL HttpClient::OnReadComplete() {
         if (!url.empty() && anime && event_list) {
           int episode_number = event_list->items.at(event_list->index).episode;
           wstring title = anime->series_title + (episode_number ? L" #" + ToWSTR(episode_number) : L"");
-          CTaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
+          win32::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
           dlg.SetMainInstruction(L"Someone has already made a discussion topic for this episode!");
           dlg.UseCommandLinks(true);
           dlg.AddButton(L"Discuss it", IDYES);

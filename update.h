@@ -47,7 +47,7 @@ public:
   virtual bool OnRestartApp() { return true; }
   virtual void OnRunActions() {}
 
-  bool Check(const wstring& address, CApp& app, DWORD client_mode);
+  bool Check(const wstring& address, win32::App& app, DWORD client_mode);
   bool DownloadNextFile(DWORD client_mode);
   bool ParseData(wstring data, DWORD client_mode);
   bool RestartApplication(const wstring& updatehelper_exe, 
@@ -61,7 +61,7 @@ public:
   VersionInfo version_info;
 
 private:
-  CApp* app_;
+  win32::App* app_;
 };
 
 #endif // UPDATE_H

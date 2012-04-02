@@ -21,12 +21,14 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 // =============================================================================
 
-class CGdiPlus {
+class GdiPlus {
 public:
-  CGdiPlus();
-  ~CGdiPlus();
+  GdiPlus();
+  ~GdiPlus();
 
   HICON LoadIcon(const wstring& file);
   HBITMAP LoadImage(const wstring& file);
@@ -34,5 +36,7 @@ public:
 private:
   ULONG_PTR m_Token;
 };
+
+} // namespace win32
 
 #endif // WIN_GDIPLUS_H

@@ -26,7 +26,7 @@
 
 // =============================================================================
 
-class RecognitionTestDialog : public CDialog {
+class RecognitionTestDialog : public win32::Dialog {
 public:
   RecognitionTestDialog() {};
   ~RecognitionTestDialog() {};
@@ -43,7 +43,7 @@ private:
   };
   vector<EpisodeTest> episodes_, test_episodes_;
 
-  CListView list_;
+  win32::ListView list_;
 };
 
 extern RecognitionTestDialog RecognitionTest;

@@ -18,46 +18,48 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CTreeView::PreCreate(CREATESTRUCT &cs) {
+void TreeView::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_CLIENTEDGE;
   cs.lpszClass = WC_TREEVIEW;
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT;
 }
 
-void CTreeView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void TreeView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   TreeView_SetExtendedStyle(hwnd, TVS_EX_DOUBLEBUFFER, NULL);
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-BOOL CTreeView::DeleteAllItems() {
+BOOL TreeView::DeleteAllItems() {
   return TreeView_DeleteAllItems(m_hWindow);
 }
 
-BOOL CTreeView::DeleteItem(HTREEITEM hitem) {
+BOOL TreeView::DeleteItem(HTREEITEM hitem) {
   return TreeView_DeleteItem(m_hWindow, hitem);
 }
 
-BOOL CTreeView::Expand(HTREEITEM hItem, bool bExpand) {
+BOOL TreeView::Expand(HTREEITEM hItem, bool bExpand) {
   return TreeView_Expand(m_hWindow, hItem, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
 }
 
-UINT CTreeView::GetCheckState(HTREEITEM hItem) {
+UINT TreeView::GetCheckState(HTREEITEM hItem) {
   return TreeView_GetCheckState(m_hWindow, hItem);
 }
 
-UINT CTreeView::GetCount() {
+UINT TreeView::GetCount() {
   return TreeView_GetCount(m_hWindow);
 }
 
-BOOL CTreeView::GetItem(LPTVITEM pItem) {
+BOOL TreeView::GetItem(LPTVITEM pItem) {
   return TreeView_GetItem(m_hWindow, pItem);
 }
 
-LPARAM CTreeView::GetItemData(HTREEITEM hItem) {
+LPARAM TreeView::GetItemData(HTREEITEM hItem) {
   TVITEM tvi = {0};
   tvi.mask = TVIF_PARAM;
   tvi.hItem = hItem;
@@ -66,11 +68,11 @@ LPARAM CTreeView::GetItemData(HTREEITEM hItem) {
   return tvi.lParam;
 }
 
-HTREEITEM CTreeView::GetSelection() {
+HTREEITEM TreeView::GetSelection() {
   return TreeView_GetSelection(m_hWindow);
 }
 
-HTREEITEM CTreeView::HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos) {
+HTREEITEM TreeView::HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos) {
   if (bGetCursorPos) {
     GetCursorPos(&lpht->pt);
     ScreenToClient(m_hWindow, &lpht->pt);
@@ -78,7 +80,7 @@ HTREEITEM CTreeView::HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos) {
   return TreeView_HitTest(m_hWindow, lpht);
 }
 
-HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
+HTREEITEM TreeView::InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
   TVITEM tvi  = {0};
   tvi.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
   tvi.pszText = (LPWSTR)pszText;
@@ -93,11 +95,11 @@ HTREEITEM CTreeView::InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, HTRE
   return TreeView_InsertItem(m_hWindow, &tvis);
 }
 
-BOOL CTreeView::SelectItem(HTREEITEM hItem) {
+BOOL TreeView::SelectItem(HTREEITEM hItem) {
   return TreeView_Select(m_hWindow, hItem, TVGN_CARET);
 }
 
-UINT CTreeView::SetCheckState(HTREEITEM hItem, BOOL fCheck) {
+UINT TreeView::SetCheckState(HTREEITEM hItem, BOOL fCheck) {
   TVITEM tvi    = {0};
   tvi.mask      = TVIF_HANDLE | TVIF_STATE;
   tvi.hItem     = hItem;
@@ -107,10 +109,12 @@ UINT CTreeView::SetCheckState(HTREEITEM hItem, BOOL fCheck) {
   return TreeView_SetItem(m_hWindow, &tvi);
 }
 
-HIMAGELIST CTreeView::SetImageList(HIMAGELIST himl, INT iImage) {
+HIMAGELIST TreeView::SetImageList(HIMAGELIST himl, INT iImage) {
   return TreeView_SetImageList(m_hWindow, himl, iImage);
 }
 
-int CTreeView::SetItemHeight(SHORT cyItem) {
+int TreeView::SetItemHeight(SHORT cyItem) {
   return TreeView_SetItemHeight(m_hWindow, cyItem);
 }
+
+} // namespace win32

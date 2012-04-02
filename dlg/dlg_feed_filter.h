@@ -26,7 +26,7 @@
 
 // =============================================================================
 
-class FeedFilterDialog : public CDialog {
+class FeedFilterDialog : public win32::Dialog {
 public:
   FeedFilterDialog();
   virtual ~FeedFilterDialog();
@@ -47,10 +47,10 @@ private:
   int current_page_;
   HFONT header_font_, main_instructions_font_;
   HICON icon_;
-  CWindow main_instructions_label_;
+  win32::Window main_instructions_label_;
 
   // Page
-  class DialogPage : public CDialog {
+  class DialogPage : public win32::Dialog {
   public:
     void Create(UINT uResourceID, FeedFilterDialog* parent, const RECT& rect);
     INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -65,7 +65,7 @@ private:
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     bool BuildFilter(FeedFilter& filter);
   public:
-    CListView preset_list;
+    win32::ListView preset_list;
   } page_0_;
 
   // Page #1
@@ -78,10 +78,10 @@ private:
     void AddConditionToList(const FeedFilterCondition& condition, int index = -1);
     void RefreshConditionList();
   public:
-    CComboBox action_combo, match_combo;
-    CEdit name_text;
-    CListView condition_list;
-    CToolbar condition_toolbar;
+    win32::ComboBox action_combo, match_combo;
+    win32::Edit name_text;
+    win32::ListView condition_list;
+    win32::Toolbar condition_toolbar;
   } page_1_;
 
   // Page #2
@@ -91,10 +91,10 @@ private:
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     bool BuildFilter(FeedFilter& filter);
   public:
-    CListView anime_list;
+    win32::ListView anime_list;
   } page_2_;
 };
 
-extern FeedFilterDialog FeedFilterDialog;
+extern class FeedFilterDialog FeedFilterDialog;
 
 #endif // DLG_FEED_FILTER_H

@@ -480,7 +480,7 @@ bool Settings::Save() {
       }
   
   // Write registry
-  CRegistry reg;
+  win32::Registry reg;
   reg.OpenKey(HKEY_CURRENT_USER, 
     L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_SET_VALUE);
   if (Program.General.auto_start) {

@@ -25,7 +25,7 @@
 
 // =============================================================================
 
-class TorrentDialog : public CDialog {
+class TorrentDialog : public win32::Dialog {
 public:
   TorrentDialog();
   ~TorrentDialog();
@@ -42,12 +42,12 @@ public:
   void SetTimerText(const wstring& text);
 
 private:
-  CListView list_;
-  CRebar rebar_;
-  CStatusBar statusbar_;
-  CToolbar toolbar_;
+  win32::ListView list_;
+  win32::Rebar rebar_;
+  win32::StatusBar statusbar_;
+  win32::Toolbar toolbar_;
 };
 
-extern TorrentDialog TorrentDialog;
+extern class TorrentDialog TorrentDialog;
 
 #endif // DLG_TORRENT_H

@@ -26,7 +26,7 @@
 
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) {
   if (!lParamSort) return 0;
-  CListView* m_List = reinterpret_cast<CListView*>(lParamSort);
+  win32::ListView* m_List = reinterpret_cast<win32::ListView*>(lParamSort);
   int return_value = 0;
 
   switch (m_List->GetSortType()) {

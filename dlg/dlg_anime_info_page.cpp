@@ -65,8 +65,8 @@ BOOL AnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
         if (!anime_) break;
-        CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        CSpin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
+        win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        win32::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value; m_Spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
           if (anime_->GetStatus() == MAL_COMPLETED && episode_value == anime_->series_episodes) {
@@ -91,7 +91,7 @@ BOOL AnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
     case IDC_COMBO_ANIME_STATUS:
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
-        CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
         if (m_Combo.GetItemData(m_Combo.GetCurSel()) == MAL_COMPLETED) {
           if (anime_ && anime_->GetStatus() != MAL_COMPLETED && anime_->series_episodes > 0) {
             SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_->series_episodes);
@@ -201,7 +201,7 @@ void AnimeInfoPage::Refresh(Anime* anime) {
       EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime->GetStatus() == MAL_COMPLETED);
 
       // Status
-      CComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+      win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
       if (m_Combo.GetCount() == 0) {
         for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
           if (i != MAL_UNKNOWN) {
@@ -234,7 +234,7 @@ void AnimeInfoPage::Refresh(Anime* anime) {
       m_Combo.SetWindowHandle(nullptr);
 
       // Tags
-      CEdit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
+      win32::Edit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
       m_Edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
       m_Edit.SetText(anime->GetTags());
       m_Edit.SetWindowHandle(nullptr);

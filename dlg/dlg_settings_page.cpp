@@ -75,7 +75,7 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Anime folders > Root
     case PAGE_FOLDERS_ROOT: {
-      CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+      win32::ListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
       List.InsertColumn(0, 0, 0, 0, L"Folder");
       List.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER);
@@ -90,7 +90,7 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Anime folders > Specific
     case PAGE_FOLDERS_ANIME: {
-      CListView List = GetDlgItem(IDC_LIST_FOLDERS_ANIME);
+      win32::ListView List = GetDlgItem(IDC_LIST_FOLDERS_ANIME);
       List.EnableGroupView(true);
       List.InsertColumn(0, 220, 220, 0, L"Anime title");
       List.InsertColumn(1, 200, 200, 0, L"Folder");
@@ -209,7 +209,7 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Recognition > Media players
     case PAGE_MEDIA: {
-      CListView List = GetDlgItem(IDC_LIST_MEDIA);
+      win32::ListView List = GetDlgItem(IDC_LIST_MEDIA);
       List.EnableGroupView(true);
       List.InsertColumn(0, 0, 0, 0, L"Supported players");
       List.InsertGroup(0, L"Media players");
@@ -217,9 +217,9 @@ BOOL SettingsPage::OnInitDialog() {
       List.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
-      CWindow Header; HDITEM hdi = {0};
+      win32::Window Header; HDITEM hdi = {0};
       Header.SetWindowHandle(List.GetHeader());
-      if (GetWinVersion() >= WINVERSION_VISTA) {
+      if (win32::GetWinVersion() >= win32::VERSION_VISTA) {
         Header.SetStyle(HDS_CHECKBOXES, 0);
         hdi.mask = HDI_FORMAT;
         Header_GetItem(Header.GetWindowHandle(), 0, &hdi);
@@ -241,7 +241,7 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Recognition > Streaming
     case PAGE_STREAM: {
-      CListView List = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
+      win32::ListView List = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
       List.EnableGroupView(true);
       List.InsertColumn(0, 0, 0, 0, L"Media providers");
       List.InsertGroup(0, L"Media providers");
@@ -287,7 +287,7 @@ BOOL SettingsPage::OnInitDialog() {
     // Torrent > Filters
     case PAGE_TORRENT2: {
       CheckDlgButton(IDC_CHECK_TORRENT_FILTER, Settings.RSS.Torrent.Filters.global_enabled);
-      CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+      win32::ListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
       List.EnableGroupView(true);
       List.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       List.SetImageList(UI.ImgList16.GetHandle());
@@ -352,7 +352,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           wstring path;
           if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
             BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
-              CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+              win32::ListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
               List.InsertItem(List.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, path.c_str(), 0);
               List.SetSelectedItem(List.GetItemCount() - 1);
               List.SetWindowHandle(nullptr);
@@ -361,7 +361,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         // Remove folders
         case IDC_BUTTON_REMOVEFOLDER: {
-          CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+          win32::ListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
           while (List.GetSelectedCount() > 0) {
             List.DeleteItem(List.GetNextItem(-1, LVNI_SELECTED));
           }
@@ -422,7 +422,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
               FeedFilterDialog.filter.name = Aggregator.filter_manager.CreateNameFromConditions(FeedFilterDialog.filter);
             }
             parent->feed_filters_.push_back(FeedFilterDialog.filter);
-            CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+            win32::ListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             parent->RefreshTorrentFilterList(List.GetWindowHandle());
             List.SetSelectedItem(List.GetItemCount() - 1);
             List.SetWindowHandle(nullptr);
@@ -431,7 +431,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         // Remove global filter
         case IDC_BUTTON_TORRENT_FILTER_DELETE: {
-          CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+          win32::ListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
           int item_index = List.GetNextItem(-1, LVNI_SELECTED);
           FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(List.GetItemParam(item_index));
           for (auto it = parent->feed_filters_.begin(); it != parent->feed_filters_.end(); ++it) {
@@ -451,7 +451,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
           EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_ADD, enable);
           if (enable) {
-            CListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+            win32::ListView List = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             enable = List.GetNextItem(-1, LVNI_SELECTED) > -1;
             List.SetWindowHandle(nullptr);
           }
@@ -553,13 +553,13 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
           if (lpnmitem->iItem == -1) break;
           // Anime folders
           if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
-            CListView List = lpnmitem->hdr.hwndFrom;
+            win32::ListView List = lpnmitem->hdr.hwndFrom;
             WCHAR buffer[MAX_PATH];
             List.GetItemText(lpnmitem->iItem, 0, buffer);
             Execute(buffer);
             List.SetWindowHandle(nullptr);
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ANIME)) {
-            CListView List = lpnmitem->hdr.hwndFrom;
+            win32::ListView List = lpnmitem->hdr.hwndFrom;
             wstring path, title;
             List.GetItemText(lpnmitem->iItem, 0, title);
             title = L"Anime title: " + title;
@@ -592,7 +592,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             }
           // Torrent filters
           } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
-            CListView List = lpnmitem->hdr.hwndFrom;
+            win32::ListView List = lpnmitem->hdr.hwndFrom;
             FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(List.GetItemParam(lpnmitem->iItem));
             if (feed_filter) {
               FeedFilterDialog.filter = *feed_filter;
@@ -612,7 +612,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         case NM_RCLICK: {
           LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
           if (lpnmitem->iItem == -1) break;
-          CListView List = lpnmitem->hdr.hwndFrom;
+          win32::ListView List = lpnmitem->hdr.hwndFrom;
           // Anime folders
           if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ANIME)) {
             wstring answer = UI.Menus.Show(hwnd, 0, 0, L"AnimeFoldersEdit");
@@ -663,7 +663,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
       if (hDrop && index == PAGE_FOLDERS_ROOT) {
         WCHAR szFileName[MAX_PATH + 1];
         UINT nFiles = DragQueryFile(hDrop, static_cast<UINT>(-1), nullptr, 0);
-        CListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+        win32::ListView List = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
         for  (UINT i = 0; i < nFiles; i++) {
           ZeroMemory(szFileName, MAX_PATH + 1);
           DragQueryFile(hDrop, i, (LPWSTR)szFileName, MAX_PATH + 1);

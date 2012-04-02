@@ -20,6 +20,7 @@
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
+#include "debug.h"
 #include "dlg/dlg_event.h"
 #include "dlg/dlg_main.h"
 #include "event.h"
@@ -156,7 +157,7 @@ void EventList::Check() {
     return;
   }
   if (!items[index].enabled) {
-    DEBUG_PRINT(L"EventList::Check :: Item is disabled, removing...\n");
+    DebugPrint(L"EventList::Check :: Item is disabled, removing...\n");
     Remove(index);
     Check();
     return;
@@ -169,7 +170,7 @@ void EventList::Check() {
   // Compare ID with anime list
   Anime* anime = AnimeList.FindItem(items[index].anime_id);
   if (!anime) {
-    DEBUG_PRINT(L"EventList::Check :: Item not found in list, removing...\n");
+    DebugPrint(L"EventList::Check :: Item not found in list, removing...\n");
     Remove(index);
     Check();
     return;
@@ -300,7 +301,7 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
 
 void EventQueue::Show() {
   if (GetItemCount() == 0) {
-    CTaskDialog dlg(L"Previously on Taiga...", TD_ICON_INFORMATION);
+    win32::TaskDialog dlg(L"Previously on Taiga...", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"There are no events in the queue.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);

@@ -21,6 +21,8 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 #define TD_ICON_NONE         static_cast<PCWSTR>(0)
 #define TD_ICON_INFORMATION  TD_INFORMATION_ICON
 #define TD_ICON_WARNING      TD_WARNING_ICON
@@ -33,11 +35,11 @@
 
 // =============================================================================
 
-class CTaskDialog {
+class TaskDialog {
 public:
-  CTaskDialog();
-  CTaskDialog(LPCWSTR title, LPWSTR icon);
-  virtual ~CTaskDialog() {}
+  TaskDialog();
+  TaskDialog(LPCWSTR title, LPWSTR icon);
+  virtual ~TaskDialog() {}
   
   void    AddButton(LPCWSTR text, int id);
   int     GetSelectedButtonID() const;
@@ -62,5 +64,7 @@ protected:
   TASKDIALOGCONFIG m_Config;
   int m_SelectedButtonID;
 };
+
+} // namespace win32
 
 #endif // WIN_TASKDIALOG_H

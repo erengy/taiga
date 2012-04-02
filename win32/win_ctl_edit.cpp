@@ -18,40 +18,42 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CEdit::PreCreate(CREATESTRUCT &cs) {
+void Edit::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_CLIENTEDGE;
   cs.lpszClass = L"EDIT";
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL;
 }
 
-void CEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+void Edit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-void CEdit::GetRect(LPRECT lprc) {
+void Edit::GetRect(LPRECT lprc) {
   ::SendMessage(m_hWindow, EM_GETRECT, 0, reinterpret_cast<LPARAM>(lprc));
 }
 
-void CEdit::LimitText(int cchMax) {
+void Edit::LimitText(int cchMax) {
   ::SendMessage(m_hWindow, EM_SETLIMITTEXT, cchMax, 0);
 }
 
-BOOL CEdit::SetCueBannerText(LPCWSTR lpcwText, BOOL fDrawFocused) {
+BOOL Edit::SetCueBannerText(LPCWSTR lpcwText, BOOL fDrawFocused) {
   return ::SendMessage(m_hWindow, EM_SETCUEBANNER, fDrawFocused, reinterpret_cast<LPARAM>(lpcwText));
 }
 
-void CEdit::SetMargins(int iLeft, int iRight) {
+void Edit::SetMargins(int iLeft, int iRight) {
   DWORD flags = 0;
   if (iLeft > -1)  flags |= EC_LEFTMARGIN;
   if (iRight > -1) flags |= EC_RIGHTMARGIN;
   ::SendMessage(m_hWindow, EM_SETMARGINS, flags, MAKELPARAM(iLeft, iRight));
 }
 
-void CEdit::SetMultiLine(BOOL bEnabled) {
+void Edit::SetMultiLine(BOOL bEnabled) {
   // TODO: We have to re-create the control, this does not work.
   if (bEnabled) {
     SetStyle(ES_MULTILINE | ES_AUTOVSCROLL, ES_AUTOHSCROLL);
@@ -60,24 +62,24 @@ void CEdit::SetMultiLine(BOOL bEnabled) {
   }
 }
 
-void CEdit::SetPasswordChar(UINT ch) {
+void Edit::SetPasswordChar(UINT ch) {
   ::SendMessage(m_hWindow, EM_SETPASSWORDCHAR, ch, 0);
 }
 
-void CEdit::SetReadOnly(BOOL bReadOnly) {
+void Edit::SetReadOnly(BOOL bReadOnly) {
   ::SendMessage(m_hWindow, EM_SETREADONLY, bReadOnly, 0);
 }
 
-void CEdit::SetRect(LPRECT lprc) {
+void Edit::SetRect(LPRECT lprc) {
   ::SendMessage(m_hWindow, EM_SETRECT, 0, reinterpret_cast<LPARAM>(lprc));
 }
 
-void CEdit::SetSel(int ichStart, int ichEnd) {
+void Edit::SetSel(int ichStart, int ichEnd) {
   ::SendMessage(m_hWindow, EM_SETSEL, ichStart, ichEnd);
   ::SendMessage(m_hWindow, EM_SCROLLCARET, 0, 0);
 }
 
-BOOL CEdit::ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon) {
+BOOL Edit::ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon) {
   EDITBALLOONTIP ebt;
   ebt.cbStruct = sizeof(EDITBALLOONTIP);
   ebt.pszText  = pszText;
@@ -85,3 +87,5 @@ BOOL CEdit::ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon) {
   ebt.ttiIcon  = ttiIcon;
   return ::SendMessage(m_hWindow, EM_SHOWBALLOONTIP, 0, reinterpret_cast<LPARAM>(&ebt));
 }
+
+} // namespace win32

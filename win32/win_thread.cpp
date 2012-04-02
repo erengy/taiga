@@ -19,18 +19,20 @@
 #include "win_main.h"
 #include "win_thread.h"
 
+namespace win32 {
+
 // =============================================================================
 
-CThread::CThread() : 
+Thread::Thread() : 
   m_dwThreadId(0), m_hThread(NULL)
 {
 }
 
-CThread::~CThread() {
+Thread::~Thread() {
   CloseThreadHandle();
 }
 
-bool CThread::CloseThreadHandle() {
+bool Thread::CloseThreadHandle() {
   BOOL value = TRUE;
   if (m_hThread) {
     value = ::CloseHandle(m_hThread);
@@ -39,39 +41,39 @@ bool CThread::CloseThreadHandle() {
   return value != FALSE;
 }
 
-bool CThread::CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, DWORD dwCreationFlags) {
+bool Thread::CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, DWORD dwCreationFlags) {
   m_hThread = ::CreateThread(lpThreadAttributes, dwStackSize, ThreadProcStatic, this, dwCreationFlags, &m_dwThreadId);
   return m_hThread != NULL;
 }
 
-DWORD WINAPI CThread::ThreadProcStatic(LPVOID lpParam) {
-  CThread* pThread = reinterpret_cast<CThread*>(lpParam);
+DWORD WINAPI Thread::ThreadProcStatic(LPVOID lpParam) {
+  Thread* pThread = reinterpret_cast<Thread*>(lpParam);
   return pThread->ThreadProc();
 }
 
 // =============================================================================
 
-CCriticalSection::CCriticalSection() {
+CriticalSection::CriticalSection() {
   ::InitializeCriticalSectionAndSpinCount(&m_CriticalSection, 0);
 }
 
-CCriticalSection::~CCriticalSection() {
+CriticalSection::~CriticalSection() {
   ::DeleteCriticalSection(&m_CriticalSection);
 }
 
-void CCriticalSection::Enter() {
+void CriticalSection::Enter() {
   ::EnterCriticalSection(&m_CriticalSection);
 }
 
-void CCriticalSection::Leave() {
+void CriticalSection::Leave() {
   ::LeaveCriticalSection(&m_CriticalSection);
 }
 
-bool CCriticalSection::TryEnter() {
+bool CriticalSection::TryEnter() {
   return ::TryEnterCriticalSection(&m_CriticalSection) != FALSE;
 }
 
-void CCriticalSection::Wait() {
+void CriticalSection::Wait() {
   while (!TryEnter()) {
     ::Sleep(1);
   }
@@ -79,42 +81,42 @@ void CCriticalSection::Wait() {
 
 // =============================================================================
 
-CEvent::CEvent() :
+Event::Event() :
   m_hEvent(NULL)
 {
 }
 
-CEvent::~CEvent() {
+Event::~Event() {
   if (m_hEvent) ::CloseHandle(m_hEvent);
 }
 
-HANDLE CEvent::Create(LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset, BOOL bInitialState, LPCTSTR lpName) {
+HANDLE Event::Create(LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset, BOOL bInitialState, LPCTSTR lpName) {
   m_hEvent = ::CreateEvent(lpEventAttributes, bManualReset, bInitialState, lpName);
   return m_hEvent;
 }
 
 // =============================================================================
 
-CMutex::CMutex() :
+Mutex::Mutex() :
   m_hMutex(NULL)
 {
 }
 
-CMutex::~CMutex() {
+Mutex::~Mutex() {
   if (m_hMutex) ::CloseHandle(m_hMutex);
 }
 
-HANDLE CMutex::Create(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner, LPCTSTR lpName) {
+HANDLE Mutex::Create(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner, LPCTSTR lpName) {
   m_hMutex = ::CreateMutex(lpMutexAttributes, bInitialOwner, lpName);
   return m_hMutex;
 }
 
-HANDLE CMutex::Open(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCTSTR lpName) {
+HANDLE Mutex::Open(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCTSTR lpName) {
   m_hMutex = ::OpenMutex(dwDesiredAccess, bInheritHandle, lpName);
   return m_hMutex;
 }
 
-bool CMutex::Release() {
+bool Mutex::Release() {
   BOOL value = TRUE;
   if (m_hMutex) {
     BOOL value = ::ReleaseMutex(m_hMutex);
@@ -122,3 +124,5 @@ bool CMutex::Release() {
   }
   return value != FALSE;
 }
+
+} // namespace win32

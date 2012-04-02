@@ -27,7 +27,7 @@
 
 // =============================================================================
 
-class SettingsDialog : public CDialog {
+class SettingsDialog : public win32::Dialog {
 public:
   SettingsDialog();
   virtual ~SettingsDialog();
@@ -45,7 +45,7 @@ public:
   void RefreshTwitterLink();
 
 private:
-  class TreeView : public CTreeView {
+  class TreeView : public win32::TreeView {
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } tree_;
 
@@ -56,6 +56,6 @@ private:
   vector<SettingsPage> pages;
 };
 
-extern SettingsDialog SettingsDialog;
+extern class SettingsDialog SettingsDialog;
 
 #endif // DLG_SETTINGS_H

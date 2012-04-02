@@ -25,7 +25,7 @@
 
 // =============================================================================
 
-class EventDialog : public CDialog {
+class EventDialog : public win32::Dialog {
 public:
   EventDialog();
   ~EventDialog() {}
@@ -42,9 +42,9 @@ public:
   bool RemoveItems();
 
 private:
-  CListView list_;
+  win32::ListView list_;
 };
 
-extern EventDialog EventDialog;
+extern class EventDialog EventDialog;
 
 #endif // DLG_EVENT_H

@@ -31,7 +31,7 @@ enum SearchMode {
 
 // =============================================================================
 
-class MainDialog : public CDialog {
+class MainDialog : public win32::Dialog {
 public:
   MainDialog();
   virtual ~MainDialog() {}
@@ -70,7 +70,7 @@ private:
 
 public:
   // Tree-view control
-  class CMainTree : public CTreeView {
+  class CMainTree : public win32::TreeView {
   public:
     void RefreshItems();
   private:
@@ -78,27 +78,27 @@ public:
   } treeview;
   
   // List-view control
-  class ListView : public CListView {
+  class ListView : public win32::ListView {
   public:
     ListView() { dragging = false; };
     int GetSortType(int column);
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool dragging;
-    CImageList drag_image;
+    win32::ImageList drag_image;
     MainDialog* parent;
   } listview;
 
   // Edit control
-  class EditSearch : public CEdit {
+  class EditSearch : public win32::Edit {
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } edit;
 
   // Other controls
-  CWindow cancel_button;
-  CRebar rebar;
-  CStatusBar statusbar;
-  CTab tab;
-  CToolbar toolbar, toolbar_search;
+  win32::Window cancel_button;
+  win32::Rebar rebar;
+  win32::StatusBar statusbar;
+  win32::Tab tab;
+  win32::Toolbar toolbar, toolbar_search;
 
   // Search bar
   class SearchBar {
@@ -112,6 +112,6 @@ public:
   } search_bar;
 };
 
-extern MainDialog MainDialog;
+extern class MainDialog MainDialog;
 
 #endif // DLG_MAIN_H

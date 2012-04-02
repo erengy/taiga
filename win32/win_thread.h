@@ -21,12 +21,14 @@
 
 #include "win_main.h"
 
+namespace win32 {
+
 // =============================================================================
 
-class CThread {
+class Thread {
 public:
-  CThread();
-  virtual ~CThread();
+  Thread();
+  virtual ~Thread();
 
   virtual DWORD ThreadProc() { return 0; }
 
@@ -46,10 +48,10 @@ private:
 
 // =============================================================================
 
-class CCriticalSection {
+class CriticalSection {
 public:
-  CCriticalSection();
-  virtual ~CCriticalSection();
+  CriticalSection();
+  virtual ~CriticalSection();
 
   void Enter();
   void Leave();
@@ -62,10 +64,10 @@ private:
 
 // =============================================================================
 
-class CEvent {
+class Event {
 public:
-  CEvent();
-  virtual ~CEvent();
+  Event();
+  virtual ~Event();
 
   HANDLE Create(LPSECURITY_ATTRIBUTES lpEventAttributes, 
     BOOL bManualReset, BOOL bInitialState, LPCTSTR lpName);
@@ -76,10 +78,10 @@ private:
 
 // =============================================================================
 
-class CMutex {
+class Mutex {
 public:
-  CMutex();
-  virtual ~CMutex();
+  Mutex();
+  virtual ~Mutex();
 
   HANDLE Create(LPSECURITY_ATTRIBUTES lpMutexAttributes, 
     BOOL bInitialOwner, LPCTSTR lpName);
@@ -90,5 +92,7 @@ public:
 private:
   HANDLE m_hMutex;
 };
+
+} // namespace win32
 
 #endif // WIN_THREAD_H

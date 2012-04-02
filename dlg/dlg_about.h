@@ -25,7 +25,7 @@
 
 // =============================================================================
 
-class AboutPage: public CDialog {
+class AboutPage: public win32::Dialog {
 public:
   AboutPage() {}
   virtual ~AboutPage() {}
@@ -35,7 +35,7 @@ public:
   void OnTimer(UINT_PTR nIDEvent);
 };
 
-class AboutDialog : public CDialog {
+class AboutDialog : public win32::Dialog {
 public:
   AboutDialog();
   ~AboutDialog() {}
@@ -45,9 +45,9 @@ public:
   
 private:
   AboutPage page_taiga_;
-  CTab tab_;
+  win32::Tab tab_;
 };
 
-extern AboutDialog AboutDialog;
+extern class AboutDialog AboutDialog;
 
 #endif // DLG_ABOUT_H

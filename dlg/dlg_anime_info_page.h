@@ -30,7 +30,7 @@ enum AnimeInfoTab{
   TAB_COUNT
 };
 
-class AnimeInfoPage : public CDialog {
+class AnimeInfoPage : public win32::Dialog {
 public:
   AnimeInfoPage();
   virtual ~AnimeInfoPage();

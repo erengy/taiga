@@ -23,7 +23,7 @@
 #include "win32/win_gdi.h"
 #include "win32/win_gdiplus.h"
 
-extern CGdiPlus GdiPlus;
+extern win32::GdiPlus GdiPlus;
 
 // =============================================================================
 
@@ -32,7 +32,7 @@ BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, 
 BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, DWORD dwColor3);
 
 COLORREF HexToARGB(const wstring& text);
-CRect ResizeRect(const CRect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y);
+win32::Rect ResizeRect(const win32::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y);
 int ScaleX(int value);
 int ScaleY(int value);
 
@@ -40,8 +40,8 @@ class Image {
 public:
   Image() : height(0), width(0), data(0) {}
   bool Load(const wstring& file);
-  CDC dc;
-  CRect rect;
+  win32::Dc dc;
+  win32::Rect rect;
   LPARAM data;
   int height, width;
 };

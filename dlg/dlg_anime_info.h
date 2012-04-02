@@ -29,7 +29,7 @@ class AnimeInfoPage;
 
 // =============================================================================
 
-class AnimeDialog : public CDialog {
+class AnimeDialog : public win32::Dialog {
 public:
   AnimeDialog();
   virtual ~AnimeDialog();
@@ -55,10 +55,10 @@ private:
   HBRUSH brush_darkblue_, brush_lightblue_;
   int current_page_;
   Image image_;
-  CTab tab_;
+  win32::Tab tab_;
   HFONT title_font_;
 };
 
-extern AnimeDialog AnimeDialog;
+extern class AnimeDialog AnimeDialog;
 
 #endif // DLG_ANIME_INFO_H

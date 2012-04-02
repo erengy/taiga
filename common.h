@@ -86,9 +86,6 @@ int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = 
 int PopulateFolders(vector<wstring>& folder_list, wstring path);
 wstring ToSizeString(QWORD qwSize);
 
-// debug.cpp
-void DebugTest();
-
 // encryption.cpp
 wstring SimpleEncrypt(wstring str);
 wstring SimpleDecrypt(wstring str);

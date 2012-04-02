@@ -18,22 +18,24 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CTooltip::PreCreate(CREATESTRUCT &cs) {
+void Tooltip::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = NULL;
   cs.lpszClass = TOOLTIPS_CLASS;
   cs.style     = WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP;
 }
 
-void CTooltip::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+void Tooltip::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   ::SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-BOOL CTooltip::AddTip(UINT uID, LPCWSTR lpText, LPCWSTR lpTitle, LPRECT rcArea, bool bWindowID) {
+BOOL Tooltip::AddTip(UINT uID, LPCWSTR lpText, LPCWSTR lpTitle, LPRECT rcArea, bool bWindowID) {
   TOOLINFO ti;
   ti.cbSize   = sizeof(TOOLINFO);
   ti.hwnd     = m_hParent;
@@ -50,7 +52,7 @@ BOOL CTooltip::AddTip(UINT uID, LPCWSTR lpText, LPCWSTR lpTitle, LPRECT rcArea, 
   return lResult;
 }
 
-BOOL CTooltip::DeleteTip(UINT uID) {
+BOOL Tooltip::DeleteTip(UINT uID) {
   TOOLINFO ti;
   ti.cbSize = sizeof(TOOLINFO);
   ti.hwnd   = m_hParent;
@@ -59,17 +61,17 @@ BOOL CTooltip::DeleteTip(UINT uID) {
   return ::SendMessage(m_hWindow, TTM_DELTOOL, 0, (LPARAM)&ti);
 }
 
-void CTooltip::SetDelayTime(long lAutopop, long lInitial, long lReshow) {
+void Tooltip::SetDelayTime(long lAutopop, long lInitial, long lReshow) {
   ::SendMessage(m_hWindow, TTM_SETDELAYTIME, TTDT_AUTOPOP, lAutopop);
   ::SendMessage(m_hWindow, TTM_SETDELAYTIME, TTDT_INITIAL, lInitial);
   ::SendMessage(m_hWindow, TTM_SETDELAYTIME, TTDT_RESHOW,  lReshow);
 }
 
-void CTooltip::SetMaxWidth(long lWidth) {
+void Tooltip::SetMaxWidth(long lWidth) {
   ::SendMessage(m_hWindow, TTM_SETMAXTIPWIDTH, NULL, lWidth);
 }
 
-void CTooltip::UpdateText(UINT uID, LPCWSTR lpText) {
+void Tooltip::UpdateText(UINT uID, LPCWSTR lpText) {
   TOOLINFO ti;
   ti.cbSize   = sizeof(TOOLINFO);
   ti.hinst    = m_hInstance;
@@ -80,6 +82,8 @@ void CTooltip::UpdateText(UINT uID, LPCWSTR lpText) {
   ::SendMessage(m_hWindow, TTM_UPDATETIPTEXT, NULL, (LPARAM)&ti);
 }
 
-void CTooltip::UpdateTitle(LPCWSTR lpTitle) {
+void Tooltip::UpdateTitle(LPCWSTR lpTitle) {
   ::SendMessage(m_hWindow, TTM_SETTITLE, lpTitle ? 0 : 1, (LPARAM)lpTitle);
 }
+
+} // namespace win32

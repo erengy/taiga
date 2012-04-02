@@ -187,7 +187,7 @@ void Anime::End(Episode episode, bool end_watching, bool update_list) {
 
 int Anime::Ask(Episode episode) {
   // Set up dialog
-  CTaskDialog dlg;
+  win32::TaskDialog dlg;
   wstring title = L"Anime title: " + series_title;
   dlg.SetWindowTitle(APP_TITLE);
   dlg.SetMainIcon(TD_ICON_INFORMATION);

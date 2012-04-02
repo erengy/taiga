@@ -19,6 +19,7 @@
 #include "std.h"
 #include "animelist.h"
 #include "common.h"
+#include "debug.h"
 #include "dlg/dlg_main.h"
 #include "monitor.h"
 #include "recognition.h"
@@ -165,7 +166,7 @@ DWORD FolderMonitor::ThreadProc() {
         case MONITOR_STATE_STOPPED: {
           if (ReadDirectoryChanges(folder_info)) {
             folder_info->state = MONITOR_STATE_ACTIVE;
-            DEBUG_PRINT(L"FolderMonitor :: Started monitoring: " + folder_info->path + L"\n");
+            DebugPrint(L"FolderMonitor :: Started monitoring: " + folder_info->path + L"\n");
           }
           break;
         }
@@ -180,7 +181,7 @@ DWORD FolderMonitor::ThreadProc() {
             // Retrieve changed file name
             WCHAR file_name[MAX_PATH + 1] = {'\0'};
             CopyMemory(file_name, pfni->FileName, pfni->FileNameLength);
-            DEBUG_PRINT(L"FolderMonitor :: Change detected: (" + ToWSTR(pfni->Action) + L") " + 
+            DebugPrint(L"FolderMonitor :: Change detected: (" + ToWSTR(pfni->Action) + L") " + 
               folder_info->path + L"\\" + file_name + L"\n");
             // Add item to list
             folder_info->change_list.resize(folder_info->change_list.size() + 1);
@@ -206,7 +207,7 @@ DWORD FolderMonitor::ThreadProc() {
     }
   } while (folder_info);
 
-  DEBUG_PRINT(L"FolderMonitor :: Stopped monitoring.\n");
+  DebugPrint(L"FolderMonitor :: Stopped monitoring.\n");
   return 0;
 }
 
@@ -284,7 +285,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
     if (is_folder && LIST[i].anime_index > 0) {
       #define ANIME AnimeList.items[LIST[i].anime_index]
       ANIME.SetFolder(path_available ? path : L"", true, true);
-      DEBUG_PRINT(L"FolderMonitor :: Change anime folder: " + 
+      DebugPrint(L"FolderMonitor :: Change anime folder: " + 
         ANIME.series_title + L" -> " + ANIME.folder + L"\n");
       #undef ANIME
       continue;
@@ -315,7 +316,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
             }
           }
           if (!ANIME.folder.empty()) {
-            DEBUG_PRINT(L"FolderMonitor :: Set anime folder: " + 
+            DebugPrint(L"FolderMonitor :: Set anime folder: " + 
               ANIME.series_title + L" -> " + ANIME.folder + L"\n");
           }
         }
@@ -329,7 +330,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
           }
           for (int j = numberlow; j <= number; j++) {
             if (ANIME.SetEpisodeAvailability(number, path_available, path)) {
-              DEBUG_PRINT(L"FolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
+              DebugPrint(L"FolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
                 ANIME.series_title + L" -> " + ToWSTR(j) + L"\n");
             }
           }

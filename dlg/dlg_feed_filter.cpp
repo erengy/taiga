@@ -126,7 +126,7 @@ BOOL FeedFilterDialog::OnInitDialog() {
     reinterpret_cast<WPARAM>(main_instructions_font_), FALSE);
   
   // Calculate page area
-  CRect page_area; main_instructions_label_.GetWindowRect(&page_area);
+  win32::Rect page_area; main_instructions_label_.GetWindowRect(&page_area);
   MapWindowPoints(nullptr, m_hWindow, reinterpret_cast<LPPOINT>(&page_area), 2);
   page_area.top += page_area.bottom;
   page_area.left *= 2;
@@ -149,15 +149,15 @@ BOOL FeedFilterDialog::OnInitDialog() {
 }
 
 void FeedFilterDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  CDC dc = hdc;
-  CRect rect;
+  win32::Dc dc = hdc;
+  win32::Rect rect;
 
   // Paint background
   GetClientRect(&rect);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 
   // Paint bottom area
-  CRect rect_button;
+  win32::Rect rect_button;
   ::GetClientRect(GetDlgItem(IDCANCEL), &rect_button);
   rect.top = rect.bottom - (rect_button.Height() * 2);
   dc.FillRect(rect, ::GetSysColor(COLOR_BTNFACE));
@@ -207,7 +207,7 @@ void FeedFilterDialog::ChoosePage(int index) {
     case 2:
       if (current_page_ == 1) {
         if (page_1_.condition_list.GetItemCount() == 0) {
-          CTaskDialog dlg(APP_TITLE, TD_ICON_ERROR);
+          win32::TaskDialog dlg(APP_TITLE, TD_ICON_ERROR);
           dlg.SetMainInstruction(
             L"There must be at least one condition in order to create a filter.");
           dlg.SetContent(
@@ -248,7 +248,7 @@ void FeedFilterDialog::ChoosePage(int index) {
 
 void FeedFilterDialog::DialogPage::Create(UINT uResourceID, FeedFilterDialog* parent, const RECT& rect) {
   this->parent = parent;
-  CDialog::Create(uResourceID, parent->GetWindowHandle(), false);
+  win32::Dialog::Create(uResourceID, parent->GetWindowHandle(), false);
   SetPosition(nullptr, rect, SWP_NOSIZE);
 }
 
@@ -570,7 +570,7 @@ void FeedFilterDialog::DialogPage1::RefreshConditionList() {
 BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   // Initialize anime list
   anime_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_ANIME));
-  anime_list.EnableGroupView(GetWinVersion() > WINVERSION_XP);
+  anime_list.EnableGroupView(win32::GetWinVersion() > win32::VERSION_XP);
   anime_list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
   anime_list.SetImageList(UI.ImgList16.GetHandle());
   anime_list.SetTheme();

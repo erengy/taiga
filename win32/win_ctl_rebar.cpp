@@ -18,29 +18,31 @@
 
 #include "win_control.h"
 
+namespace win32 {
+
 // =============================================================================
 
-void CRebar::PreCreate(CREATESTRUCT &cs) {
+void Rebar::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = 0;
   cs.lpszClass = REBARCLASSNAME;
   cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | CCS_NODIVIDER | RBS_BANDBORDERS | RBS_VARHEIGHT;
 }
 
-void CRebar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  CWindow::OnCreate(hwnd, lpCreateStruct);
+void Rebar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  Window::OnCreate(hwnd, lpCreateStruct);
 }
 
 // =============================================================================
 
-UINT CRebar::GetBarHeight() {
+UINT Rebar::GetBarHeight() {
   return ::SendMessage(m_hWindow, RB_GETBARHEIGHT, 0, 0);
 }
 
-BOOL CRebar::InsertBand(LPREBARBANDINFO lpBarInfo) {
+BOOL Rebar::InsertBand(LPREBARBANDINFO lpBarInfo) {
   return ::SendMessage(m_hWindow, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(lpBarInfo));
 }
 
-BOOL CRebar::InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UINT cxMinChild, 
+BOOL Rebar::InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UINT cxMinChild, 
                         UINT cyChild, UINT cyIntegral, UINT cyMaxChild, UINT cyMinChild, 
                         UINT fMask, UINT fStyle) {
   REBARBANDINFO rbi = {0};
@@ -59,3 +61,5 @@ BOOL CRebar::InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UI
 
   return ::SendMessage(m_hWindow, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(&rbi));
 }
+
+} // namespace win32
