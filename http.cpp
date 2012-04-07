@@ -245,15 +245,15 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_RefreshAndLogin: {
       AnimeList.Load();
       MainDialog.ChangeStatus(L"List download completed.");
-      MainDialog.RefreshList(MAL_WATCHING);
-      MainDialog.RefreshTabs(MAL_WATCHING);
+      MainDialog.RefreshList(mal::MYSTATUS_WATCHING);
+      MainDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
       EventDialog.RefreshList();
       SearchDialog.PostMessage(WM_CLOSE);
       if (GetClientMode() == HTTP_MAL_RefreshList) {
         MainDialog.EnableInput(true);
         ExecuteAction(L"CheckEpisodes()", TRUE);
       } else if (GetClientMode() == HTTP_MAL_RefreshAndLogin) {
-        MAL.Login();
+        mal::Login();
         return TRUE;
       }
       break;
@@ -305,7 +305,7 @@ BOOL HttpClient::OnReadComplete() {
             EventQueue.Check();
             return TRUE;
           case MAL_API_NONE:
-            MAL.CheckProfile();
+            mal::CheckProfile();
             return TRUE;
         }
       }
@@ -357,7 +357,7 @@ BOOL HttpClient::OnReadComplete() {
           dlg.AddButton(L"Cancel\nCheck them later", IDNO);
           dlg.Show(g_hMain);
           if (dlg.GetSelectedButtonID() == IDYES) {
-            MAL.ViewProfile();
+            mal::ViewProfile();
           }
         }
 
@@ -421,7 +421,7 @@ BOOL HttpClient::OnReadComplete() {
     // Anime details
     case HTTP_MAL_AnimeDetails: {
       Anime* anime = reinterpret_cast<Anime*>(GetParam());
-      if (MAL.ParseAnimeDetails(GetData(), anime)) {
+      if (mal::ParseAnimeDetails(GetData(), anime)) {
         if (AnimeDialog.IsWindow()) {
           AnimeDialog.Refresh(anime, true, false);
         }
@@ -461,10 +461,10 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_SearchAnime: {
       Anime* anime = reinterpret_cast<Anime*>(GetParam());
       if (anime) {
-        if (MAL.ParseSearchResult(GetData(), anime)) {
+        if (mal::ParseSearchResult(GetData(), anime)) {
           AnimeDialog.Refresh(anime, true, false);
           SeasonDialog.RefreshList(true);
-          if (MAL.GetAnimeDetails(anime, this)) return TRUE;
+          if (mal::GetAnimeDetails(anime, this)) return TRUE;
         } else {
           status = L"Could not read anime information.";
           AnimeDialog.pages[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());

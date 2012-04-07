@@ -19,6 +19,7 @@
 #include "std.h"
 #include "animedb.h"
 #include "animelist.h"
+#include "common.h"
 #include "event.h"
 #include "myanimelist.h"
 #include "settings.h"
@@ -55,7 +56,7 @@ bool AnimeList::Load() {
   Clear();
   user.Clear();
   if (Settings.Account.MAL.user.empty()) return false;
-  wstring file = Taiga.GetDataPath() + Settings.Account.MAL.user + L".xml";
+  wstring file = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L".xml";
   
   // Load XML file
   xml_document doc;
@@ -124,7 +125,9 @@ bool AnimeList::Save(int anime_id, wstring child, wstring value, int mode) {
   }
   
   // Initialize
-  wstring file = Taiga.GetDataPath() + Settings.Account.MAL.user + L".xml";
+  wstring folder = Taiga.GetDataPath() + L"user\\";
+  wstring file = folder + Settings.Account.MAL.user + L".xml";
+  if (!PathExists(folder)) CreateFolder(folder);
   
   // Load XML file
   xml_document doc;
@@ -397,19 +400,19 @@ int User::GetItemCount(int status) {
   
   // Get current count
   switch (status) {
-    case MAL_WATCHING:
+    case mal::MYSTATUS_WATCHING:
       count = watching;
       break;
-    case MAL_COMPLETED:
+    case mal::MYSTATUS_COMPLETED:
       count = completed;
       break;
-    case MAL_ONHOLD:
+    case mal::MYSTATUS_ONHOLD:
       count = on_hold;
       break;
-    case MAL_DROPPED:
+    case mal::MYSTATUS_DROPPED:
       count = dropped;
       break;
-    case MAL_PLANTOWATCH:
+    case mal::MYSTATUS_PLANTOWATCH:
       count = plan_to_watch;
       break;
   }
@@ -438,23 +441,23 @@ int User::GetItemCount(int status) {
 
 void User::IncreaseItemCount(int status, int count, bool write) {
   switch (status) {
-    case MAL_WATCHING:
+    case mal::MYSTATUS_WATCHING:
       watching += count;
       if (write) AnimeList.Save(-1, L"user_watching", ToWSTR(watching), ANIMELIST_EDITUSER);
       break;
-    case MAL_COMPLETED:
+    case mal::MYSTATUS_COMPLETED:
       completed += count;
       if (write) AnimeList.Save(-1, L"user_completed", ToWSTR(completed), ANIMELIST_EDITUSER);
       break;
-    case MAL_ONHOLD:
+    case mal::MYSTATUS_ONHOLD:
       on_hold += count;
       if (write) AnimeList.Save(-1, L"user_onhold", ToWSTR(on_hold), ANIMELIST_EDITUSER);
       break;
-    case MAL_DROPPED:
+    case mal::MYSTATUS_DROPPED:
       dropped += count;
       if (write) AnimeList.Save(-1, L"user_dropped", ToWSTR(dropped), ANIMELIST_EDITUSER);
       break;
-    case MAL_PLANTOWATCH:
+    case mal::MYSTATUS_PLANTOWATCH:
       plan_to_watch += count;
       if (write) AnimeList.Save(-1, L"user_plantowatch", ToWSTR(plan_to_watch), ANIMELIST_EDITUSER);
       break;

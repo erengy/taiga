@@ -69,11 +69,11 @@ BOOL AnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         win32::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value; m_Spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if (anime_->GetStatus() == MAL_COMPLETED && episode_value == anime_->series_episodes) {
+          if (anime_->GetStatus() == mal::MYSTATUS_COMPLETED && episode_value == anime_->series_episodes) {
             m_Spin.SetPos32(0);
           }
           m_Combo.Enable(FALSE);
-          m_Combo.SetCurSel(MAL_COMPLETED - 1);
+          m_Combo.SetCurSel(mal::MYSTATUS_COMPLETED - 1);
         } else {
           if (episode_value == 0) {
             m_Spin.SetPos32(anime_->GetLastWatchedEpisode());
@@ -92,8 +92,8 @@ BOOL AnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
         win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == MAL_COMPLETED) {
-          if (anime_ && anime_->GetStatus() != MAL_COMPLETED && anime_->series_episodes > 0) {
+        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == mal::MYSTATUS_COMPLETED) {
+          if (anime_ && anime_->GetStatus() != mal::MYSTATUS_COMPLETED && anime_->series_episodes > 0) {
             SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_->series_episodes);
           }
         }
@@ -155,7 +155,7 @@ void AnimeInfoPage::Refresh(Anime* anime) {
         must_update = anime->synopsis.empty();
       }
       if (must_update) {
-        if (MAL.SearchAnime(anime->series_title, anime)) {
+        if (mal::SearchAnime(anime->series_title, anime)) {
           text = L"Retrieving...";
         } else {
           text = L"-";
@@ -163,16 +163,16 @@ void AnimeInfoPage::Refresh(Anime* anime) {
       } else {
         text = anime->synopsis;
         if (anime->genres.empty() || anime->score.empty()) {
-          MAL.GetAnimeDetails(anime);
+          mal::GetAnimeDetails(anime);
         }
       }
       SetDlgItemText(IDC_EDIT_ANIME_INFO, text.c_str());
       
       // Set information
-      text = MAL.TranslateType(anime->series_type) + L"\n" + 
-             MAL.TranslateNumber(anime->series_episodes, L"Unknown") + L"\n" + 
-             MAL.TranslateStatus(anime->GetAiringStatus()) + L"\n" + 
-             MAL.TranslateDateToSeason(anime->series_start);
+      text = mal::TranslateType(anime->series_type) + L"\n" + 
+             mal::TranslateNumber(anime->series_episodes, L"Unknown") + L"\n" + 
+             mal::TranslateStatus(anime->GetAiringStatus()) + L"\n" + 
+             mal::TranslateDateToSeason(anime->series_start);
       SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
       #define ADD_INFOLINE(x, y) (anime->x.empty() ? y : anime->x)
       wstring genres = anime->genres; LimitText(anime->genres, 50); // TEMP
@@ -198,19 +198,19 @@ void AnimeInfoPage::Refresh(Anime* anime) {
 
       // Re-watching
       CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime->GetRewatching());
-      EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime->GetStatus() == MAL_COMPLETED);
+      EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime->GetStatus() == mal::MYSTATUS_COMPLETED);
 
       // Status
       win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
       if (m_Combo.GetCount() == 0) {
-        for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
-          if (i != MAL_UNKNOWN) {
-            m_Combo.AddItem(MAL.TranslateMyStatus(i, false).c_str(), i);
+        for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
+          if (i != mal::MYSTATUS_UNKNOWN) {
+            m_Combo.AddItem(mal::TranslateMyStatus(i, false).c_str(), i);
           }
         }
       }
       int status = anime->GetStatus();
-      if (status == MAL_PLANTOWATCH) status--;
+      if (status == mal::MYSTATUS_PLANTOWATCH) status--;
       m_Combo.SetCurSel(status - 1);
       m_Combo.Enable(!anime->GetRewatching());
       m_Combo.SetWindowHandle(nullptr);
@@ -240,32 +240,32 @@ void AnimeInfoPage::Refresh(Anime* anime) {
       m_Edit.SetWindowHandle(nullptr);
       
       // Date limits and defaults
-      if (MAL.IsValidDate(anime->series_start)) {
+      if (mal::IsValidDate(anime->series_start)) {
         SYSTEMTIME stSeriesStart;
-        MAL.ParseDateString(anime->series_start, stSeriesStart.wYear, stSeriesStart.wMonth, stSeriesStart.wDay);
+        mal::ParseDateString(anime->series_start, stSeriesStart.wYear, stSeriesStart.wMonth, stSeriesStart.wDay);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
       }
-      if (MAL.IsValidDate(anime->series_end)) {
+      if (mal::IsValidDate(anime->series_end)) {
         SYSTEMTIME stSeriesEnd;
-        MAL.ParseDateString(anime->series_end, stSeriesEnd.wYear, stSeriesEnd.wMonth, stSeriesEnd.wDay);
+        mal::ParseDateString(anime->series_end, stSeriesEnd.wYear, stSeriesEnd.wMonth, stSeriesEnd.wDay);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesEnd);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesEnd);
       }
       // Start date
-      if (MAL.IsValidDate(anime->my_start_date)) {
+      if (mal::IsValidDate(anime->my_start_date)) {
         SYSTEMTIME stMyStart;
-        MAL.ParseDateString(anime->my_start_date, stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
+        mal::ParseDateString(anime->my_start_date, stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyStart);
       } else {
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, 0);
       }
       // Finish date
-      if (MAL.IsValidDate(anime->my_finish_date)) {
+      if (mal::IsValidDate(anime->my_finish_date)) {
         SYSTEMTIME stMyFinish;
-        MAL.ParseDateString(anime->my_finish_date, stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
+        mal::ParseDateString(anime->my_finish_date, stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyFinish);
       } else {
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, 0);

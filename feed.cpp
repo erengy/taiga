@@ -113,7 +113,7 @@ int Feed::ExamineData() {
 }
 
 wstring Feed::GetDataPath() {
-  wstring path = Taiga.GetDataPath() + L"Feed\\";
+  wstring path = Taiga.GetDataPath() + L"feed\\";
   if (!link.empty()) {
     win32::Url url(link);
     path += Base64Encode(url.Host, true) + L"\\";

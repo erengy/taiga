@@ -579,9 +579,9 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   anime_list.InsertColumn(0, 543, 543, 0, L"Title");
   
   // Insert list groups
-  for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
-    if (i != MAL_UNKNOWN) {
-      anime_list.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str(), true, i != MAL_WATCHING);
+  for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
+    if (i != mal::MYSTATUS_UNKNOWN) {
+      anime_list.InsertGroup(i, mal::TranslateMyStatus(i, false).c_str(), true, i != mal::MYSTATUS_WATCHING);
     }
   }
   

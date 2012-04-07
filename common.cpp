@@ -150,11 +150,11 @@ int TranslateResolution(const wstring& str, bool return_validity) {
 
 int StatusToIcon(int status) {  
   switch (status) {
-    case MAL_AIRING:
+    case mal::STATUS_AIRING:
       return ICON16_GREEN;
-    case MAL_FINISHED:
+    case mal::STATUS_FINISHED:
       return ICON16_BLUE;
-    case MAL_NOTYETAIRED:
+    case mal::STATUS_NOTYETAIRED:
       return ICON16_RED;
     default:
       return ICON16_GRAY;

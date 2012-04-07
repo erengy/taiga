@@ -32,7 +32,7 @@ enum EventSearchMode {
   EVENT_SEARCH_TAGS
 };
 
-class EventItem : public MalAnimeValues {
+class EventItem : public mal::AnimeValues {
 public:
   EventItem();
   virtual ~EventItem() {}

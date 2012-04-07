@@ -150,14 +150,16 @@ Anime* AnimeDatabase::FindItem(int anime_id) {
 }
 
 void AnimeDatabase::Update(Anime& anime) {
-  Anime* item = FindItem(anime.series_id);
+  critical_section_.Enter();
   
+  Anime* item = FindItem(anime.series_id);
   if (item == nullptr) {
     items.resize(items.size() + 1);
     item = &items.back();
   }
-  
   item->Update(anime);
+
+  critical_section_.Leave();
 }
 
 // =============================================================================

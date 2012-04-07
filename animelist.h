@@ -102,6 +102,6 @@ public:
   } filters;
 };
 
-extern AnimeList AnimeList;
+extern class AnimeList AnimeList;
 
 #endif // ANIMELIST_H

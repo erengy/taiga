@@ -75,7 +75,7 @@ void UpdateAnimeMenu(Anime* anime) {
       MENU.Items[i].Default = false;
     }
     item_index = anime->GetStatus();
-    if (item_index == MAL_PLANTOWATCH) item_index--;
+    if (item_index == mal::MYSTATUS_PLANTOWATCH) item_index--;
     if (item_index - 1 < static_cast<int>(MENU.Items.size())) {
       MENU.Items[item_index - 1].Checked = true;
       MENU.Items[item_index - 1].Default = true;

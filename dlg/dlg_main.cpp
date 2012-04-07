@@ -79,7 +79,7 @@ BOOL MainDialog::OnInitDialog() {
   ChangeStatus();
   
   // Refresh list
-  RefreshList(MAL_WATCHING);
+  RefreshList(mal::MYSTATUS_WATCHING);
   
   // Set search bar mode
   //search_bar.Index = Settings.Program.General.SearchIndex;
@@ -201,10 +201,10 @@ void MainDialog::CreateDialogControls() {
     HIWORD(toolbar_search.GetButtonSize()), fMask, fStyle);
 
   // Insert tabs and list groups
-  for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
-    if (i != MAL_UNKNOWN) {
-      tab.InsertItem(i - 1, MAL.TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-      listview.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str());
+  for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
+    if (i != mal::MYSTATUS_UNKNOWN) {
+      tab.InsertItem(i - 1, mal::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
+      listview.InsertGroup(i, mal::TranslateMyStatus(i, false).c_str());
     }
   }
 
@@ -380,7 +380,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                     return TRUE;
                   }
                   case MAL_API_NONE: {
-                    MAL.ViewAnimeSearch(text); // TEMP
+                    mal::ViewAnimeSearch(text); // TEMP
                     return TRUE;
                   }
                 }
@@ -819,7 +819,7 @@ void MainDialog::RefreshList(int index) {
   vector<int> group_count(6);
   for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
     status = it->GetStatus();
-    if (status == index || index == 0 || (index == MAL_WATCHING && it->GetRewatching())) {
+    if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->GetRewatching())) {
       if (AnimeList.filters.Check(*it)) {
         group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
         icon_index = it->playing ? ICON16_PLAY : StatusToIcon(it->GetAiringStatus());
@@ -827,17 +827,17 @@ void MainDialog::RefreshList(int index) {
         int i = listview.GetItemCount();
         listview.InsertItem(i, group_index, icon_index, 
           0, nullptr, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
-        listview.SetItem(i, 2, MAL.TranslateNumber(it->GetScore()).c_str());
-        listview.SetItem(i, 3, MAL.TranslateType(it->series_type).c_str());
-        listview.SetItem(i, 4, MAL.TranslateDateToSeason(it->series_start).c_str());
+        listview.SetItem(i, 2, mal::TranslateNumber(it->GetScore()).c_str());
+        listview.SetItem(i, 3, mal::TranslateType(it->series_type).c_str());
+        listview.SetItem(i, 4, mal::TranslateDateToSeason(it->series_start).c_str());
       }
     }
   }
 
   // Set group headers
-  for (int i = MAL_WATCHING; i <= MAL_PLANTOWATCH; i++) {
-    if (index == 0 && i != MAL_UNKNOWN) {
-      wstring text = MAL.TranslateMyStatus(i, false);
+  for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
+    if (index == 0 && i != mal::MYSTATUS_UNKNOWN) {
+      wstring text = mal::TranslateMyStatus(i, false);
       text += group_count.at(i - 1) > 0 ? L" (" + ToWSTR(group_count.at(i - 1)) + L")" : L"";
       listview.SetGroupText(i, text.c_str());
     }
@@ -879,7 +879,7 @@ void MainDialog::RefreshTabs(int index, bool redraw) {
   // Refresh text
   for (int i = 1; i <= 6; i++) {
     if (i != 5) {
-      tab.SetItemText(i == 6 ? 4 : i - 1, MAL.TranslateMyStatus(i, true).c_str());
+      tab.SetItemText(i == 6 ? 4 : i - 1, mal::TranslateMyStatus(i, true).c_str());
     }
   }
 

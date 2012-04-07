@@ -219,21 +219,21 @@ void SearchDialog::ParseResults(const wstring& data) {
       if (anime_results_[i].index > -1) {
         AnimeList.items[anime_results_[i].index].score = XML_ReadStrValue(entry, L"score");
         AnimeList.items[anime_results_[i].index].synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeText(AnimeList.items[anime_results_[i].index].synopsis);
+        mal::DecodeText(AnimeList.items[anime_results_[i].index].synopsis);
       } else {
         anime_results_[i].series_id = anime_id;
         anime_results_[i].series_title = XML_ReadStrValue(entry, L"title");
-        MAL.DecodeText(anime_results_[i].series_title);
+        mal::DecodeText(anime_results_[i].series_title);
         anime_results_[i].series_synonyms = XML_ReadStrValue(entry, L"synonyms");
-        MAL.DecodeText(anime_results_[i].series_synonyms);
+        mal::DecodeText(anime_results_[i].series_synonyms);
         anime_results_[i].series_episodes = XML_ReadIntValue(entry, L"episodes");
         anime_results_[i].score = XML_ReadStrValue(entry, L"score");
-        anime_results_[i].series_type = MAL.TranslateType(XML_ReadStrValue(entry, L"type"));
-        anime_results_[i].series_status = MAL.TranslateStatus(XML_ReadStrValue(entry, L"status"));
+        anime_results_[i].series_type = mal::TranslateType(XML_ReadStrValue(entry, L"type"));
+        anime_results_[i].series_status = mal::TranslateStatus(XML_ReadStrValue(entry, L"status"));
         anime_results_[i].series_start = XML_ReadStrValue(entry, L"start_date");
         anime_results_[i].series_end = XML_ReadStrValue(entry, L"end_date");
         anime_results_[i].synopsis = XML_ReadStrValue(entry, L"synopsis");
-        MAL.DecodeText(anime_results_[i].synopsis);
+        mal::DecodeText(anime_results_[i].synopsis);
         anime_results_[i].series_image = XML_ReadStrValue(entry, L"image");
       }
     }
@@ -258,10 +258,10 @@ void SearchDialog::RefreshList() {
     list_.InsertItem(i, -1, StatusToIcon(item->GetAiringStatus()), 0, nullptr, 
       item->series_title.c_str(), 
       reinterpret_cast<LPARAM>(item));
-    list_.SetItem(i, 1, MAL.TranslateType(item->series_type).c_str());
-    list_.SetItem(i, 2, MAL.TranslateNumber(item->series_episodes).c_str());
+    list_.SetItem(i, 1, mal::TranslateType(item->series_type).c_str());
+    list_.SetItem(i, 2, mal::TranslateNumber(item->series_episodes).c_str());
     list_.SetItem(i, 3, item->score.c_str());
-    list_.SetItem(i, 4, MAL.TranslateDateToSeason(item->series_start).c_str());
+    list_.SetItem(i, 4, mal::TranslateDateToSeason(item->series_start).c_str());
   }
 
   // Sort and show the list again
@@ -270,7 +270,7 @@ void SearchDialog::RefreshList() {
 }
 
 bool SearchDialog::Search(const wstring& title) {
-  if (MAL.SearchAnime(title)) {
+  if (mal::SearchAnime(title)) {
     edit_.SetText(title.c_str());
     EnableInput(false);
     list_.DeleteAllItems();

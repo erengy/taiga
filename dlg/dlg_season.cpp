@@ -120,7 +120,7 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     // Discuss
     case 106:
-      MAL.ViewSeasonGroup();
+      mal::ViewSeasonGroup();
       return TRUE;
   }
 
@@ -358,17 +358,17 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (true) {
         COLORREF color;
         switch (anime->GetAiringStatus()) {
-          case MAL_AIRING:
+          case mal::STATUS_AIRING:
             color = RGB(225, 245, 231); break;
-          case MAL_FINISHED: default:
-            color = MAL_LIGHTBLUE; break;
-          case MAL_NOTYETAIRED:
+          case mal::STATUS_FINISHED: default:
+            color = mal::COLOR_LIGHTBLUE; break;
+          case mal::STATUS_NOTYETAIRED:
             color = RGB(245, 225, 231); break;
         }
         hdc.FillRect(rect_title, color);
       } else {
         Anime* anime_onlist = AnimeList.FindItem(anime->series_id);
-        hdc.FillRect(rect_title, anime_onlist ? RGB(225, 245, 231) : MAL_LIGHTBLUE);
+        hdc.FillRect(rect_title, anime_onlist ? RGB(225, 245, 231) : mal::COLOR_LIGHTBLUE);
       }
 
       // Draw title
@@ -399,11 +399,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
-      text = MAL.TranslateDate(anime->series_start);
-      text += anime->series_end != anime->series_start ? L" to " + MAL.TranslateDate(anime->series_end) : L"";
-      text += L" (" + MAL.TranslateStatus(anime->GetAiringStatus()) + L")";
+      text = mal::TranslateDate(anime->series_start);
+      text += anime->series_end != anime->series_start ? L" to " + mal::TranslateDate(anime->series_end) : L"";
+      text += L" (" + mal::TranslateStatus(anime->GetAiringStatus()) + L")";
       DRAWLINE(text);
-      DRAWLINE(MAL.TranslateNumber(anime->series_episodes, L"Unknown"));
+      DRAWLINE(mal::TranslateNumber(anime->series_episodes, L"Unknown"));
       DRAWLINE(anime->genres.empty() ? L"?" : anime->genres);
       DRAWLINE(anime->producers.empty() ? L"?" : anime->producers);
       DRAWLINE(anime->score.empty() ? L"0.00" : anime->score);
@@ -495,11 +495,11 @@ void SeasonDialog::RefreshData(bool connect, Anime* anime) {
     images.at(index).Load(i->GetImagePath());
     // Download missing image
     if (connect && images.at(index).dc.Get() == nullptr) {
-      MAL.DownloadImage(&(*i), &image_clients_.at(index));
+      mal::DownloadImage(&(*i), &image_clients_.at(index));
     }
     // Get details
     if (connect) {
-      MAL.SearchAnime(i->series_title, &(*i), &info_clients_.at(index));
+      mal::SearchAnime(i->series_title, &(*i), &info_clients_.at(index));
     }
   }
 
@@ -535,18 +535,18 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   list_.EnableGroupView(true); // Required for XP
   switch (group_by) {
     case SEASON_GROUPBY_AIRINGSTATUS:
-      for (int i = MAL_AIRING; i <= MAL_NOTYETAIRED; i++) {
-        list_.InsertGroup(i, MAL.TranslateStatus(i).c_str(), true, false);
+      for (int i = mal::STATUS_AIRING; i <= mal::STATUS_NOTYETAIRED; i++) {
+        list_.InsertGroup(i, mal::TranslateStatus(i).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_LISTSTATUS:
-      for (int i = MAL_NOTINLIST; i <= MAL_PLANTOWATCH; i++) {
-        list_.InsertGroup(i, MAL.TranslateMyStatus(i, false).c_str(), true, false);
+      for (int i = mal::MYSTATUS_NOTINLIST; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
+        list_.InsertGroup(i, mal::TranslateMyStatus(i, false).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_TYPE:
-      for (int i = MAL_TV; i <= MAL_MUSIC; i++) {
-        list_.InsertGroup(i, MAL.TranslateType(i).c_str(), true, false);
+      for (int i = mal::TYPE_TV; i <= mal::TYPE_MUSIC; i++) {
+        list_.InsertGroup(i, mal::TranslateType(i).c_str(), true, false);
       }
       break;
   }
@@ -577,7 +577,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         break;
       case SEASON_GROUPBY_LISTSTATUS: {
         Anime* anime_onlist = AnimeList.FindItem(i->series_id);
-        group = anime_onlist ? anime_onlist->GetStatus() : MAL_NOTINLIST;
+        group = anime_onlist ? anime_onlist->GetStatus() : mal::MYSTATUS_NOTINLIST;
         break;
       }
       case SEASON_GROUPBY_TYPE:

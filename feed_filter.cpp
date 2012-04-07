@@ -337,13 +337,13 @@ FeedFilterManager::FeedFilterManager() {
   ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
     L"Discard completed titles", 
     L"Discards files that belong to anime you've already finished");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_COMPLETED));
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(mal::MYSTATUS_COMPLETED));
   
   // Discard dropped titles
   ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
     L"Discard dropped titles", 
     L"Discards files that belong to anime you've dropped");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(MAL_DROPPED));
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWSTR(mal::MYSTATUS_DROPPED));
   
   // Select new episodes only
   ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ALL, true, 
@@ -545,9 +545,9 @@ wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) 
       }
     }
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      return MAL.TranslateMyStatus(ToINT(condition.value), false);
+      return mal::TranslateMyStatus(ToINT(condition.value), false);
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      return MAL.TranslateStatus(ToINT(condition.value));
+      return mal::TranslateStatus(ToINT(condition.value));
     default:
       return condition.value;
   }

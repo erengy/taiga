@@ -72,7 +72,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   if (action == L"Login") {
     if (AnimeList.count > 0) {
       MainDialog.ChangeStatus(L"Logging in...");
-      bool result = MAL.Login();
+      bool result = mal::Login();
       MainDialog.EnableInput(!result);
       if (!result) MainDialog.ChangeStatus();
     } else {
@@ -119,7 +119,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
       // We can safely refresh our list
       MainDialog.ChangeStatus(L"Refreshing list...");
-      bool result = MAL.GetList(wParam == TRUE);
+      bool result = mal::GetList(wParam == TRUE);
       MainDialog.EnableInput(!result);
       if (!result) MainDialog.ChangeStatus();
     }
@@ -127,11 +127,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ViewPanel(), ViewProfile(), ViewHistory()
   //   Opens up MyAnimeList user pages.
   } else if (action == L"ViewPanel") {
-    MAL.ViewPanel();
+    mal::ViewPanel();
   } else if (action == L"ViewProfile") {
-    MAL.ViewProfile();
+    mal::ViewProfile();
   } else if (action == L"ViewHistory") {
-    MAL.ViewHistory();
+    mal::ViewHistory();
 
   // ===========================================================================
 
@@ -361,7 +361,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (anime) {
       // Set item properties
       anime->my_status = status;
-      if (status == MAL_COMPLETED) {
+      if (status == mal::MYSTATUS_COMPLETED) {
         anime->my_watched_episodes = anime->series_episodes;
         anime->SetFinishDate(L"", true);
       }
@@ -385,12 +385,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // ViewAnimePage
-  //   Opens up anime page on MAL.
+  //   Opens up anime page on mal::
   //   lParam is a pointer to an Anime.
   } else if (action == L"ViewAnimePage") {
     Anime* anime = lParam ? 
       reinterpret_cast<Anime*>(lParam) : &AnimeList.items[AnimeList.index];
-    MAL.ViewAnimePage(anime->series_id);
+    mal::ViewAnimePage(anime->series_id);
 
   // ===========================================================================
 
@@ -441,9 +441,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       for (int i = 1; i <= AnimeList.count; i++) {
         if (!silent) TaskbarList.SetProgressValue(i, AnimeList.count);
         switch (AnimeList.items[i].GetStatus()) {
-          case MAL_WATCHING:
-          case MAL_ONHOLD:
-          case MAL_PLANTOWATCH:
+          case mal::MYSTATUS_WATCHING:
+          case mal::MYSTATUS_ONHOLD:
+          case mal::MYSTATUS_PLANTOWATCH:
             if (!silent) {
               MainDialog.ChangeStatus(L"Searching... (" + AnimeList.items[i].series_title + L")");
             }
@@ -582,7 +582,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.info = L"Please enter episode number for this title:";
     dlg.text = ToWSTR(AnimeList.items[AnimeList.index].GetLastWatchedEpisode());
     dlg.Show(g_hMain);
-    if (dlg.result == IDOK && MAL.IsValidEpisode(ToINT(dlg.text), 0, AnimeList.items[AnimeList.index].series_episodes)) {
+    if (dlg.result == IDOK && mal::IsValidEpisode(ToINT(dlg.text), 0, AnimeList.items[AnimeList.index].series_episodes)) {
       Episode episode;
       episode.number = dlg.text;
       AnimeList.items[AnimeList.index].Update(episode, true);
@@ -604,18 +604,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditStatus") {
     int episode = -1, status = ToINT(body);
     switch (AnimeList.items[AnimeList.index].GetAiringStatus()) {
-      case MAL_AIRING:
-        if (status == MAL_COMPLETED) {
+      case mal::STATUS_AIRING:
+        if (status == mal::MYSTATUS_COMPLETED) {
           MessageBox(g_hMain, 
             L"This anime is still airing, you cannot set it as completed.", 
             AnimeList.items[AnimeList.index].series_title.c_str(), MB_ICONERROR);
           return;
         }
         break;
-      case MAL_FINISHED:
+      case mal::STATUS_FINISHED:
         break;
-      case MAL_NOTYETAIRED:
-        if (status != MAL_PLANTOWATCH) {
+      case mal::STATUS_NOTYETAIRED:
+        if (status != mal::MYSTATUS_PLANTOWATCH) {
           MessageBox(g_hMain, 
             L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
             AnimeList.items[AnimeList.index].series_title.c_str(), MB_ICONERROR);
@@ -626,7 +626,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         return;
     }
     switch (status) {
-      case MAL_COMPLETED:
+      case mal::MYSTATUS_COMPLETED:
         AnimeList.items[AnimeList.index].SetFinishDate(L"", false);
         episode = AnimeList.items[AnimeList.index].series_episodes;
         if (episode == 0) episode = -1;

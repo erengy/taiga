@@ -52,11 +52,11 @@ void MainDialog::CMainTree::RefreshItems() {
   
   // My Anime List
   htItem[4] = InsertItem(L"My Anime List", -1, 0, nullptr);
-  InsertItem(MAL.TranslateMyStatus(MAL_WATCHING, true).c_str(), -1, 0, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_COMPLETED, true).c_str(), -1, 0, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_ONHOLD, true).c_str(), -1, 0, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_DROPPED, true).c_str(), -1, 0, htItem[4]);
-  InsertItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(mal::TranslateMyStatus(mal::MYSTATUS_WATCHING, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(mal::TranslateMyStatus(mal::MYSTATUS_COMPLETED, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(mal::TranslateMyStatus(mal::MYSTATUS_ONHOLD, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(mal::TranslateMyStatus(mal::MYSTATUS_DROPPED, true).c_str(), -1, 0, htItem[4]);
+  InsertItem(mal::TranslateMyStatus(mal::MYSTATUS_PLANTOWATCH, true).c_str(), -1, 0, htItem[4]);
   Expand(htItem[4]);
 
   // Separator
@@ -291,7 +291,7 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
       }
       // Change text color
       if (!anime) return CDRF_NOTIFYPOSTPAINT;
-      if (anime->GetAiringStatus() == MAL_NOTYETAIRED) {
+      if (anime->GetAiringStatus() == mal::STATUS_NOTYETAIRED) {
         pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
       } else if (anime->new_episode_available) {
         if (Settings.Program.List.highlight) {
@@ -372,11 +372,11 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
           }
 
           // Draw progress
-          if (anime->GetStatus() == MAL_WATCHING || anime->GetRewatching()) {
+          if (anime->GetStatus() == mal::MYSTATUS_WATCHING || anime->GetRewatching()) {
             UI.list_progress.watching.Draw(hdc.Get(), &rcItem);  // Watching
-          } else if (anime->GetStatus() == MAL_COMPLETED) {
+          } else if (anime->GetStatus() == mal::MYSTATUS_COMPLETED) {
             UI.list_progress.completed.Draw(hdc.Get(), &rcItem); // Completed
-          } else if (anime->GetStatus() == MAL_DROPPED) {
+          } else if (anime->GetStatus() == mal::MYSTATUS_DROPPED) {
             UI.list_progress.dropped.Draw(hdc.Get(), &rcItem);   // Dropped
           } else {
             UI.list_progress.completed.Draw(hdc.Get(), &rcItem); // Completed / On hold / Plan to watch
@@ -413,7 +413,7 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
         // Draw text
         if (pCD->nmcd.uItemState & CDIS_SELECTED || pCD->nmcd.uItemState & CDIS_HOT || Settings.Program.List.progress_show_eps) {
           if (eps_watched == -1) eps_watched = 0;
-          wstring text = MAL.TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + MAL.TranslateNumber(eps_total);
+          wstring text = mal::TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + mal::TranslateNumber(eps_total);
           if (!Settings.Program.List.progress_show_eps) text += L" episodes";
           if (anime->GetRewatching()) text += L" (rw)";
           hdc.EditFont(nullptr, 7);

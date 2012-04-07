@@ -18,6 +18,7 @@
 
 #include "std.h"
 #include <ctime>
+#include "anime.h"
 #include "animelist.h"
 #include "announce.h"
 #include "common.h"
@@ -91,7 +92,7 @@ void Anime::Start(Episode episode) {
   // Update main window
   MainDialog.ChangeStatus();
   MainDialog.UpdateTip();
-  int status = GetRewatching() ? MAL_WATCHING : GetStatus();
+  int status = GetRewatching() ? mal::MYSTATUS_WATCHING : GetStatus();
   MainDialog.RefreshList(status);
   MainDialog.RefreshTabs(status);
   int list_index = MainDialog.GetListIndex(series_id);
@@ -126,7 +127,7 @@ void Anime::Start(Episode episode) {
 
   // Get additional information
   if (score.empty() || synopsis.empty()) {
-    MAL.SearchAnime(series_title, this);
+    mal::SearchAnime(series_title, this);
   }
   
   // Update
@@ -157,7 +158,7 @@ void Anime::End(Episode episode, bool end_watching, bool update_list) {
 
   // Update list
   if (update_list) {
-    if (GetStatus() == MAL_COMPLETED && GetRewatching() == 0) return;
+    if (GetStatus() == mal::MYSTATUS_COMPLETED && GetRewatching() == 0) return;
     if (Settings.Account.Update.time == UPDATE_TIME_INSTANT || 
       Taiga.ticker_media == -1 || Taiga.ticker_media >= Settings.Account.Update.delay) {
         int number = GetEpisodeHigh(episode.number);
@@ -166,7 +167,7 @@ void Anime::End(Episode episode, bool end_watching, bool update_list) {
         if (Settings.Account.Update.out_of_range) {
           if (number_low > lastwatched + 1 || number < lastwatched + 1) return;
         }
-        if (MAL.IsValidEpisode(number, lastwatched, series_episodes)) {
+        if (mal::IsValidEpisode(number, lastwatched, series_episodes)) {
           switch (Settings.Account.Update.mode) {
             case UPDATE_MODE_NONE:
               break;
@@ -198,12 +199,12 @@ int Anime::Ask(Episode episode) {
   // Add buttons
   int number = GetEpisodeHigh(episode.number);
   if (number == 0) number = 1;
-  if (series_episodes == 1) {               // Completed (1 eps.)
+  if (series_episodes == 1) { // Completed (1 eps.)
     episode.number = L"1";
     dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
-  } else if (series_episodes == number) {   // Completed (>1 eps.)
+  } else if (series_episodes == number) { // Completed (>1 eps.)
     dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
-  } else if (GetStatus() != MAL_WATCHING) { // Watching
+  } else if (GetStatus() != mal::MYSTATUS_WATCHING) { // Watching
     dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
   }
   wstring button = L"Update\nUpdate episode number from " + 
@@ -235,7 +236,7 @@ void Anime::Update(Episode episode, bool change_status) {
     item.mode = HTTP_MAL_AnimeEdit;
     // Move to completed
     if (series_episodes == item.episode) {
-      item.status = MAL_COMPLETED;
+      item.status = mal::MYSTATUS_COMPLETED;
       if (GetRewatching()) {
         item.enable_rewatching = FALSE;
         //item.times_rewatched++; // TODO: Enable when MAL adds to API
@@ -243,9 +244,9 @@ void Anime::Update(Episode episode, bool change_status) {
       EventQueue.Add(item);
       return;
     // Move to watching
-    } else if (GetStatus() != MAL_WATCHING || item.episode == 1) {
+    } else if (GetStatus() != mal::MYSTATUS_WATCHING || item.episode == 1) {
       if (!GetRewatching()) {
-        item.status = MAL_WATCHING;
+        item.status = mal::MYSTATUS_WATCHING;
         EventQueue.Add(item);
         return;
       }
@@ -388,7 +389,7 @@ bool Anime::SetEpisodeAvailability(int number, bool available, const wstring& pa
 // =============================================================================
 
 wstring Anime::GetImagePath() {
-  return Taiga.GetDataPath() + L"Image\\" + ToWSTR(series_id) + L".jpg";
+  return Taiga.GetDataPath() + L"db\\image\\" + ToWSTR(series_id) + L".jpg";
 }
 
 void Anime::SetLocalData(const wstring& folder, const wstring& titles) {
@@ -453,9 +454,29 @@ wstring Anime::GetTags() const {
 }
 
 int Anime::GetTotalEpisodes() const {
-  if (series_episodes > 0) return series_episodes;
+  if (series_episodes > 0) {
+    return series_episodes;
+  }
+
   int number = max(my_watched_episodes, GetLastWatchedEpisode());
   number = max(number, static_cast<int>(episode_available.size()));
+
+  if (series_type == mal::TYPE_TV) {
+    if (mal::IsValidDate(series_start)) {
+      unsigned short year_start = 0, month_start = 0, day_start = 0;
+      mal::ParseDateString(series_start, year_start, month_start, day_start);
+      unsigned short year_end = 0, month_end = 0, day_end = 0;
+      if (mal::IsValidDate(series_end)) {
+        mal::ParseDateString(series_end, year_end, month_end, day_end);
+      } else {
+        mal::ParseDateString(GetDateJapan(L"yyyy'-'MM'-'dd"), year_end, month_end, day_end);
+      }
+      int days_end = (year_end * 365) + (month_end * 30) + day_end;
+      int days_start = (year_start * 365) + (month_start * 30) + day_start;
+      number = max(number, (days_end - days_start) / 7);
+    }
+  }
+
   if (number < 12) return 13;
   if (number < 24) return 26;
   if (number < 50) return 51;
@@ -465,14 +486,14 @@ int Anime::GetTotalEpisodes() const {
 // =============================================================================
 
 int Anime::GetAiringStatus() {
-  if (IsFinishedAiring()) return MAL_FINISHED;
-  if (IsAiredYet(true)) return MAL_AIRING;
-  return MAL_NOTYETAIRED;
+  if (IsFinishedAiring()) return mal::STATUS_FINISHED;
+  if (IsAiredYet(true)) return mal::STATUS_AIRING;
+  return mal::STATUS_NOTYETAIRED;
 }
 
 bool Anime::IsAiredYet(bool strict) const {
-  if (series_status == MAL_NOTYETAIRED) {
-    if (!MAL.IsValidDate(series_start)) return false;
+  if (series_status == mal::STATUS_NOTYETAIRED) {
+    if (!mal::IsValidDate(series_start)) return false;
     if (strict) {
       if (series_start.at(5) == '0' && series_start.at(6) == '0')
         return CompareStrings(GetDateJapan(L"yyyy"), series_start.substr(0, 4)) > 0;
@@ -485,8 +506,8 @@ bool Anime::IsAiredYet(bool strict) const {
 }
 
 bool Anime::IsFinishedAiring() const {
-  if (series_status == MAL_FINISHED) return true;
-  if (!MAL.IsValidDate(series_end)) return false;
+  if (series_status == mal::STATUS_FINISHED) return true;
+  if (!mal::IsValidDate(series_end)) return false;
   if (!IsAiredYet()) return false;
   
   if (series_end.at(5) == '0' && series_end.at(6) == '0') {
@@ -498,17 +519,15 @@ bool Anime::IsFinishedAiring() const {
   return CompareStrings(GetDateJapan(L"yyyy'-'MM'-'dd"), series_end) > 0;
 }
 
-
-
 void Anime::SetStartDate(const wstring& date, bool ignore_previous) {
-  if (!MAL.IsValidDate(my_start_date) || ignore_previous) {
+  if (!mal::IsValidDate(my_start_date) || ignore_previous) {
     my_start_date = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
     AnimeList.Save(series_id, L"my_start_date", my_start_date, ANIMELIST_EDITANIME);
   }
 }
 
 void Anime::SetFinishDate(const wstring& date, bool ignore_previous) {
-  if (!MAL.IsValidDate(my_finish_date) || ignore_previous) {
+  if (!mal::IsValidDate(my_finish_date) || ignore_previous) {
     my_finish_date = date.empty() ? GetDate(L"yyyy'-'MM'-'dd") : date;
     AnimeList.Save(series_id, L"my_finish_date", my_finish_date, ANIMELIST_EDITANIME);
   }
@@ -517,7 +536,7 @@ void Anime::SetFinishDate(const wstring& date, bool ignore_previous) {
 // =============================================================================
 
 bool Anime::Edit(EventItem& item, const wstring& data, int status_code) {
-  if (!MAL.UpdateSucceeded(item, data, status_code)) {
+  if (!mal::UpdateSucceeded(item, data, status_code)) {
     // Show balloon tip on failure
     wstring text = L"Title: " + series_title;
     text += L"\nReason: " + (item.reason.empty() ? L"Unknown" : item.reason);
@@ -591,7 +610,7 @@ bool Anime::Edit(EventItem& item, const wstring& data, int status_code) {
 bool Anime::IsDataOld() {
   time_t time_diff = time(nullptr) - last_modified;
 
-  if (GetAiringStatus() == MAL_FINISHED) {
+  if (GetAiringStatus() == mal::STATUS_FINISHED) {
     return time_diff >= 60 * 60 * 24 * 7; // 1 week
   } else {
     return time_diff >= 60 * 60; // 1 hour

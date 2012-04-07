@@ -20,6 +20,7 @@
 #define ANIMEDB_H
 
 #include "std.h"
+#include "win32/win_thread.h"
 
 class Anime;
 
@@ -40,6 +41,7 @@ public:
   vector<Anime> items;
 
 private:
+  win32::CriticalSection critical_section_;
   wstring file_, folder_;
 };
 

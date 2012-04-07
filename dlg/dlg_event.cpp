@@ -158,12 +158,12 @@ void EventDialog::RefreshList() {
       if (it->mode == HTTP_MAL_AnimeDelete)
         AppendString(details, L"Remove from list");
       if (it->episode > -1)
-        AppendString(details, L"Episode: " + MAL.TranslateNumber(it->episode));
+        AppendString(details, L"Episode: " + mal::TranslateNumber(it->episode));
       if (it->score > -1)
-        AppendString(details, L"Score: " + MAL.TranslateNumber(it->score));
+        AppendString(details, L"Score: " + mal::TranslateNumber(it->score));
       if (it->status > -1)
         AppendString(details, it->enable_rewatching != TRUE ? 
-          L"Status: " + MAL.TranslateMyStatus(it->status, false) : L"Re-watching");
+          L"Status: " + mal::TranslateMyStatus(it->status, false) : L"Re-watching");
       if (it->tags != EMPTY_STR)
         AppendString(details, L"Tags: \"" + it->tags + L"\""); 
       list_.SetItem(i, 1, details.c_str());

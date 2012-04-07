@@ -297,9 +297,9 @@ wstring ReplaceVariables(wstring str, const Episode& episode, bool url_encode) {
 
   // Replace variables
   Replace(str, L"%title%",   VALIDATE(ENCODE(anime->series_title), ENCODE(episode.title)));
-  Replace(str, L"%watched%", VALIDATE(ENCODE(MAL.TranslateNumber(anime->GetLastWatchedEpisode(), L"")), L""));
-  Replace(str, L"%total%",   VALIDATE(ENCODE(MAL.TranslateNumber(anime->series_episodes, L"")), L""));
-  Replace(str, L"%score%",   VALIDATE(ENCODE(MAL.TranslateNumber(anime->GetScore(), L"")), L""));
+  Replace(str, L"%watched%", VALIDATE(ENCODE(mal::TranslateNumber(anime->GetLastWatchedEpisode(), L"")), L""));
+  Replace(str, L"%total%",   VALIDATE(ENCODE(mal::TranslateNumber(anime->series_episodes, L"")), L""));
+  Replace(str, L"%score%",   VALIDATE(ENCODE(mal::TranslateNumber(anime->GetScore(), L"")), L""));
   Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(anime->series_id)), L""));
   Replace(str, L"%image%",   VALIDATE(ENCODE(anime->series_image), L""));
   Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(anime->GetStatus())), L""));

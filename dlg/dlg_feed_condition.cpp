@@ -235,8 +235,8 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       vector<anime_pair> title_list;
       for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
         switch (it->GetStatus()) {
-          case MAL_COMPLETED:
-          case MAL_DROPPED:
+          case mal::MYSTATUS_COMPLETED:
+          case mal::MYSTATUS_DROPPED:
             continue;
           default:
             title_list.push_back(std::make_pair((LPARAM)&(*it), it->series_title));
@@ -256,18 +256,18 @@ void FeedConditionDialog::ChooseElement(int element_index) {
     }
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(MAL.TranslateStatus(MAL_AIRING).c_str(), MAL_AIRING);
-      value_combo_.AddItem(MAL.TranslateStatus(MAL_FINISHED).c_str(), MAL_FINISHED);
-      value_combo_.AddItem(MAL.TranslateStatus(MAL_NOTYETAIRED).c_str(), MAL_NOTYETAIRED);
+      value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_AIRING).c_str(), mal::STATUS_AIRING);
+      value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_FINISHED).c_str(), mal::STATUS_FINISHED);
+      value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_NOTYETAIRED).c_str(), mal::STATUS_NOTYETAIRED);
       break;
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(MAL.TranslateMyStatus(MAL_NOTINLIST, false).c_str(), MAL_NOTINLIST);
-      value_combo_.AddItem(MAL.TranslateMyStatus(MAL_WATCHING, false).c_str(), MAL_WATCHING);
-      value_combo_.AddItem(MAL.TranslateMyStatus(MAL_COMPLETED, false).c_str(), MAL_COMPLETED);
-      value_combo_.AddItem(MAL.TranslateMyStatus(MAL_ONHOLD, false).c_str(), MAL_ONHOLD);
-      value_combo_.AddItem(MAL.TranslateMyStatus(MAL_DROPPED, false).c_str(), MAL_DROPPED);
-      value_combo_.AddItem(MAL.TranslateMyStatus(MAL_PLANTOWATCH, false).c_str(), MAL_PLANTOWATCH);
+      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_NOTINLIST, false).c_str(), mal::MYSTATUS_NOTINLIST);
+      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_WATCHING, false).c_str(), mal::MYSTATUS_WATCHING);
+      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_COMPLETED, false).c_str(), mal::MYSTATUS_COMPLETED);
+      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_ONHOLD, false).c_str(), mal::MYSTATUS_ONHOLD);
+      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_DROPPED, false).c_str(), mal::MYSTATUS_DROPPED);
+      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_PLANTOWATCH, false).c_str(), mal::MYSTATUS_PLANTOWATCH);
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
       RECREATE_COMBO(CBS_DROPDOWN);

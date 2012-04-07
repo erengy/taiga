@@ -284,8 +284,8 @@ void SettingsDialog::OnOK() {
   if (Settings.Account.MAL.user != mal_user_old) {
     AnimeList.Load();
     CurrentEpisode.Set(ANIMEID_UNKNOWN);
-    MainDialog.RefreshList(MAL_WATCHING);
-    MainDialog.RefreshTabs(MAL_WATCHING);
+    MainDialog.RefreshList(mal::MYSTATUS_WATCHING);
+    MainDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     EventDialog.RefreshList();
     SearchDialog.PostMessage(WM_CLOSE);
     ExecuteAction(L"Logout(" + mal_user_old + L")");

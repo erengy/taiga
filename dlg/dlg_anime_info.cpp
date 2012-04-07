@@ -60,8 +60,8 @@ BOOL AnimeDialog::OnInitDialog() {
   if (!anime_) anime_ = &AnimeList.items[AnimeList.index];
 
   // Create GDI objects
-  if (!brush_darkblue_) brush_darkblue_ = ::CreateSolidBrush(MAL_DARKBLUE);
-  if (!brush_lightblue_) brush_lightblue_ = ::CreateSolidBrush(MAL_LIGHTBLUE);
+  if (!brush_darkblue_) brush_darkblue_ = ::CreateSolidBrush(mal::COLOR_DARKBLUE);
+  if (!brush_lightblue_) brush_lightblue_ = ::CreateSolidBrush(mal::COLOR_LIGHTBLUE);
   if (!title_font_) {
     LOGFONT lFont;
     ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
@@ -119,7 +119,7 @@ void AnimeDialog::OnOK() {
 
   // Episodes watched
   item.episode = pages[TAB_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!MAL.IsValidEpisode(item.episode, -1, anime_->series_episodes)) {
+  if (!mal::IsValidEpisode(item.episode, -1, anime_->series_episodes)) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
       ToWSTR(anime_->series_episodes) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
@@ -134,7 +134,7 @@ void AnimeDialog::OnOK() {
   
   // Status
   item.status = pages[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
-  if (item.status == MAL_UNKNOWN) item.status++;
+  if (item.status == mal::MYSTATUS_UNKNOWN) item.status++;
   
   // Tags
   pages[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, item.tags);
@@ -184,7 +184,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       if (hwnd_control == GetDlgItem(IDC_STATIC_ANIME_TITLE) || 
           hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
             SetBkMode(hdc, TRANSPARENT);
-            SetTextColor(hdc, MAL_DARKBLUE);
+            SetTextColor(hdc, mal::COLOR_DARKBLUE);
             return reinterpret_cast<INT_PTR>(brush_lightblue_);
       }
       break;
@@ -246,7 +246,7 @@ BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG) {
     if (HIWORD(wParam) == STN_CLICKED) {
       if (anime_) {
-        MAL.ViewAnimePage(anime_->series_id);
+        mal::ViewAnimePage(anime_->series_id);
         return TRUE;
       }
     }
@@ -307,14 +307,14 @@ void AnimeDialog::Refresh(Anime* anime, bool series_info, bool my_info) {
     img.SetPosition(nullptr, image_.rect);
     img.SetWindowHandle(nullptr);
     // Refresh if current file is too old
-    if (anime_->GetAiringStatus() != MAL_FINISHED) {
+    if (anime_->GetAiringStatus() != mal::STATUS_FINISHED) {
       // Check last modified date (>= 7 days)
       if (GetFileAge(anime_->GetImagePath()) / (60 * 60 * 24) >= 7) {
-        MAL.DownloadImage(anime_);
+        mal::DownloadImage(anime_);
       }
     }
   } else {
-    MAL.DownloadImage(anime_);
+    mal::DownloadImage(anime_);
   }
   InvalidateRect(&image_.rect);
 

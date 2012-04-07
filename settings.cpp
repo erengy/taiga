@@ -228,7 +228,7 @@ bool Settings::Load() {
       if (feed) feed->link = RSS.Torrent.source;
       // File archive
       Aggregator.file_archive.clear();
-      PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"Feed\\", L"torrent", true, true);
+      PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
     
   // Events
   EventQueue.list.clear();

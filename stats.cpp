@@ -75,12 +75,12 @@ wstring Statistics::CalculateLifeSpentWatching() {
     // Approximate duration in minutes
     switch (it->series_type) {
       default:
-      case MAL_TV:      duration = 24;  break;
-      case MAL_OVA:     duration = 24;  break;
-      case MAL_MOVIE:   duration = 130; break;
-      case MAL_SPECIAL: duration = 12;  break;
-      case MAL_ONA:     duration = 24;  break;
-      case MAL_MUSIC:   duration = 5;   break;
+      case mal::TYPE_TV:      duration = 24;  break;
+      case mal::TYPE_OVA:     duration = 24;  break;
+      case mal::TYPE_MOVIE:   duration = 130; break;
+      case mal::TYPE_SPECIAL: duration = 12;  break;
+      case mal::TYPE_ONA:     duration = 24;  break;
+      case mal::TYPE_MUSIC:   duration = 5;   break;
     }
     int episodes_watched = it->GetLastWatchedEpisode();
     if (it->GetRewatching() == TRUE) episodes_watched += it->GetTotalEpisodes();

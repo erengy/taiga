@@ -83,12 +83,12 @@ BOOL Taiga::InitInstance() {
 wstring Taiga::GetDataPath() {
   // Return current working directory in debug mode
   #ifdef _DEBUG
-  return CheckSlash(GetCurrentDirectory()) + L"Data\\";
+  return CheckSlash(GetCurrentDirectory()) + L"data\\";
   #endif
   
   // Return current path in portable mode
   #ifdef PORTABLE
-  return CheckSlash(GetPathOnly(GetModulePath())) + L"Data\\";
+  return CheckSlash(GetPathOnly(GetModulePath())) + L"data\\";
   #endif
   
   // Return %APPDATA% folder
