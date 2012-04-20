@@ -262,6 +262,15 @@ void ReplaceChars(wstring& str, const wchar_t chars[], const wstring replace_wit
 
 /* Split, tokenize */
 
+wstring Join(const vector<wstring>& join_vector, const wstring& separator) {
+  wstring str;
+  for (auto it = join_vector.begin(); it != join_vector.end(); ++it) {
+    if (it != join_vector.begin()) str += separator;
+    str += *it;
+  }
+  return str;
+}
+
 void Split(const wstring& str, const wstring& separator, std::vector<wstring>& split_vector) {
   if (separator.empty()) {
     split_vector.push_back(str);
@@ -367,35 +376,35 @@ wstring ToUpper_Copy(wstring str, bool use_locale) {
 
 /* Type conversion */
 
-int ToINT(const wstring& str) {
+int ToInt(const wstring& str) {
   return _wtoi(str.c_str());
 }
 
-wstring ToWSTR(const INT& value) {
+wstring ToWstr(const INT& value) {
   wchar_t buffer[65];
   _ltow_s(value, buffer, 65, 10);
   return wstring(buffer);
 }
 
-wstring ToWSTR(const ULONG& value) {
+wstring ToWstr(const ULONG& value) {
   wchar_t buffer[65];
   _ultow_s(value, buffer, 65, 10);
   return wstring(buffer);
 }
 
-wstring ToWSTR(const INT64& value) {
+wstring ToWstr(const INT64& value) {
   wchar_t buffer[65];
   _i64tow_s(value, buffer, 65, 10);
   return wstring(buffer);
 }
 
-wstring ToWSTR(const UINT64& value) {
+wstring ToWstr(const UINT64& value) {
   wchar_t buffer[65];
   _ui64tow_s(value, buffer, 65, 10);
   return wstring(buffer);
 }
 
-wstring ToWSTR(const double& value, int count) {
+wstring ToWstr(const double& value, int count) {
   std::wostringstream out;
   out << std::fixed << std::setprecision(count) << value;
   return out.str();
@@ -405,7 +414,7 @@ wstring ToWSTR(const double& value, int count) {
 
 /* Encoding & Decoding */
 
-wstring EncodeURL(const wstring& str, bool encode_unreserved) {
+wstring EncodeUrl(const wstring& str, bool encode_unreserved) {
   static const wchar_t* digits = L"0123456789ABCDEF";
   wstring output;
 
@@ -437,7 +446,7 @@ wstring EncodeURL(const wstring& str, bool encode_unreserved) {
   return output;
 }
 
-void DecodeHTML(wstring& str) {
+wstring DecodeHtml(wstring str) {
   #define HTMLCHARCOUNT 28
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
     {L"&quot;",   L"\""},     // quotation mark
@@ -475,9 +484,10 @@ void DecodeHTML(wstring& str) {
     }
   }
   #undef HTMLCHARCOUNT
+  return str;
 }
 
-void StripHTML(wstring& str) {
+wstring StripHtml(wstring str) {
   int index_begin, index_end;
   do {
     index_begin = InStr(str, L"<", 0);
@@ -490,6 +500,7 @@ void StripHTML(wstring& str) {
       }
     }
   } while (index_begin > -1);
+  return str;
 }
 
 // =============================================================================
@@ -585,6 +596,12 @@ void AppendString(wstring& str0, const wstring& str1, const wstring& str2) {
   str0.append(str1);
 }
 
+wstring PadChar(wstring str, const wchar_t ch, const size_t len) {
+  if (len > str.length())
+    str.insert(0, len - str.length(), ch);
+  return str;
+}
+
 wstring PushString(const wstring& str1, const wstring& str2) {
   if (str2.empty()) {
     return L"";
@@ -604,7 +621,7 @@ void ReadStringTable(UINT uID, wstring& str) {
 // Returns the most common non-alphanumeric character in a string that is included in the table.
 // Characters in the table are listed by their precedence.
 
-LPCWSTR COMMON_CHAR_TABLE = L",_ -+;.&|~";
+const wchar_t* COMMON_CHAR_TABLE = L",_ -+;.&|~";
 
 int GetCommonCharIndex(wchar_t c) {
   for (int i = 0; i < 10; i++)

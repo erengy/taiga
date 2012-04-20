@@ -18,11 +18,15 @@
 
 #include "../std.h"
 #include <algorithm>
+
 #include "dlg_feed_condition.h"
+
+#include "../anime_db.h"
 #include "../feed.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../string.h"
+
 #include "../win32/win_gdi.h"
 
 class FeedConditionDialog FeedConditionDialog;
@@ -62,8 +66,8 @@ BOOL FeedConditionDialog::OnInitDialog() {
     case FEED_FILTER_ELEMENT_ANIME_ID: {
       value_combo_.SetCurSel(0);
       for (int i = 0; i < value_combo_.GetCount(); i++) {
-        Anime* anime = reinterpret_cast<Anime*>(value_combo_.GetItemData(i));
-        if (anime && anime->series_id == ToINT(condition.value)) {
+        int anime_id = static_cast<int>(value_combo_.GetItemData(i));
+        if (anime_id == ToInt(condition.value)) {
           value_combo_.SetCurSel(i);
           break;
         }
@@ -71,13 +75,13 @@ BOOL FeedConditionDialog::OnInitDialog() {
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS: {
-      int value = ToINT(condition.value);
+      int value = ToInt(condition.value);
       if (value == 6) value--;
       value_combo_.SetCurSel(value);
       break;
     }
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-      value_combo_.SetCurSel(ToINT(condition.value) - 1);
+      value_combo_.SetCurSel(ToInt(condition.value) - 1);
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
       value_combo_.SetCurSel(condition.value == L"True" ? 1 : 0);
@@ -115,18 +119,10 @@ void FeedConditionDialog::OnOK() {
   condition.element = element_combo_.GetCurSel();
   condition.op = operator_combo_.GetCurSel();
   switch (condition.element) {
-    case FEED_FILTER_ELEMENT_ANIME_ID: {
-      Anime* anime = reinterpret_cast<Anime*>(value_combo_.GetItemData(value_combo_.GetCurSel()));
-      if (anime) {
-        condition.value = ToWSTR(anime->series_id);
-      } else {
-        condition.value = L"";
-      }
-      break;
-    }
+    case FEED_FILTER_ELEMENT_ANIME_ID:
     case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
     case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
-      condition.value = ToWSTR(value_combo_.GetItemData(value_combo_.GetCurSel()));
+      condition.value = ToWstr(value_combo_.GetItemData(value_combo_.GetCurSel()));
       break;
     default:
       value_combo_.GetText(condition.value);
@@ -231,15 +227,17 @@ void FeedConditionDialog::ChooseElement(int element_index) {
     case FEED_FILTER_ELEMENT_ANIME_ID:
     case FEED_FILTER_ELEMENT_ANIME_TITLE: {
       RECREATE_COMBO((element_index == FEED_FILTER_ELEMENT_ANIME_ID ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
-      typedef std::pair<LPARAM, wstring> anime_pair;
+      typedef std::pair<int, wstring> anime_pair;
       vector<anime_pair> title_list;
-      for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
-        switch (it->GetStatus()) {
+      for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+        switch (it->GetMyStatus()) {
+          case mal::MYSTATUS_NOTINLIST:
           case mal::MYSTATUS_COMPLETED:
           case mal::MYSTATUS_DROPPED:
             continue;
           default:
-            title_list.push_back(std::make_pair((LPARAM)&(*it), it->series_title));
+            title_list.push_back(std::make_pair(it->GetId(), 
+              AnimeDatabase.FindItem(it->GetId())->GetTitle()));
         }
       }
       std::sort(title_list.begin(), title_list.end(), 

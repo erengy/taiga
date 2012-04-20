@@ -18,10 +18,12 @@
 
 #include "../std.h"
 #include <algorithm>
-#include "../animelist.h"
-#include "../common.h"
+
 #include "dlg_event.h"
 #include "dlg_main.h"
+
+#include "../anime_db.h"
+#include "../common.h"
 #include "../event.h"
 #include "../myanimelist.h"
 #include "../resource.h"
@@ -145,13 +147,10 @@ void EventDialog::RefreshList() {
   EventList* event_list = EventQueue.FindList();
   if (event_list) {
     for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
-      Anime* anime = AnimeList.FindItem(it->anime_id);
       int i = list_.GetItemCount();
-      if (anime) {
-        list_.InsertItem(i, -1, -1, 0, nullptr, anime->series_title.c_str(), reinterpret_cast<LPARAM>(anime));
-      } else {
-        list_.InsertItem(i, -1, -1, 0, nullptr, L"???", 0);
-      }
+      list_.InsertItem(i, -1, -1, 0, nullptr, 
+        AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(), 
+        static_cast<LPARAM>(it->anime_id));
       wstring details;
       if (it->mode == HTTP_MAL_AnimeAdd)
         AppendString(details, L"Add to list");
@@ -183,7 +182,7 @@ void EventDialog::RefreshList() {
       SetText(L"Event Queue (1 item)");
       break;
     default:
-      SetText(L"Event Queue (" + ToWSTR(EventQueue.GetItemCount()) + L" items)");
+      SetText(L"Event Queue (" + ToWstr(EventQueue.GetItemCount()) + L" items)");
       break;
   }
 }

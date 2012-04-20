@@ -44,14 +44,13 @@ public:
 
 public:
   void SetCurrentPage(int index);
-  void Refresh(Anime* anime = nullptr, 
-    bool series_info = true, bool my_info = true);
+  void Refresh(int anime_id, bool series_info = true, bool my_info = true);
 
 public:
   vector<AnimeInfoPage> pages;
 
 private:
-  Anime* anime_;
+  int anime_id_;
   HBRUSH brush_darkblue_, brush_lightblue_;
   int current_page_;
   Image image_;

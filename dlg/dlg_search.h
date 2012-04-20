@@ -23,8 +23,6 @@
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
-class Anime;
-
 // =============================================================================
 
 class SearchDialog : public win32::Dialog {
@@ -45,7 +43,7 @@ public:
   bool Search(const wstring& title);
 
 private:
-  vector<Anime> anime_results_;
+  vector<int> anime_ids_;
   win32::Edit edit_;
   win32::ListView list_;
 };

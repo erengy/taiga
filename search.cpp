@@ -17,21 +17,24 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "anime.h"
+#include "anime_episode.h"
+#include "anime_item.h"
 #include "common.h"
 #include "recognition.h"
 #include "string.h"
 
 // =============================================================================
 
-wstring SearchFileFolder(Anime& anime, wstring root, int episode_number, bool search_folder) {
+wstring SearchFileFolder(anime::Item& anime_item, wstring root, int episode_number, bool search_folder) {
   if (root.empty()) return L"";
   CheckSlash(root);
   WIN32_FIND_DATA wfd;
   wstring folder = root + L"*.*";
   HANDLE hFind = FindFirstFile(folder.c_str(), &wfd);
   if (hFind == INVALID_HANDLE_VALUE) return L"";
-  Episode episode;
+  anime::Episode episode;
 
   do {
     // Folders
@@ -40,7 +43,7 @@ wstring SearchFileFolder(Anime& anime, wstring root, int episode_number, bool se
         // Check root folder
         if (search_folder == true) {
           if (Meow.ExamineTitle(wfd.cFileName, episode, false, false, false, false, false)) {
-            if (Meow.CompareEpisode(episode, anime, true, false, false)) {
+            if (Meow.CompareEpisode(episode, anime_item, true, false, false)) {
               FindClose(hFind);
               return root + wfd.cFileName + L"\\";
             }
@@ -48,7 +51,7 @@ wstring SearchFileFolder(Anime& anime, wstring root, int episode_number, bool se
         }
         // Check sub folders
         folder = root + wfd.cFileName + L"\\";
-        folder = SearchFileFolder(anime, folder, episode_number, search_folder);
+        folder = SearchFileFolder(anime_item, folder, episode_number, search_folder);
         if (!folder.empty()) {
           FindClose(hFind);
           return folder;
@@ -63,11 +66,11 @@ wstring SearchFileFolder(Anime& anime, wstring root, int episode_number, bool se
           // Examine file name and extract episode data
           if (Meow.ExamineTitle(wfd.cFileName, episode, true, true, true, true, true)) {
             // Compare episode data with anime title
-            if (Meow.CompareEpisode(episode, anime)) {
+            if (Meow.CompareEpisode(episode, anime_item)) {
               int number = GetEpisodeHigh(episode.number);
               int numberlow = GetEpisodeLow(episode.number);
               for (int i = numberlow; i <= number; i++) {
-                anime.SetEpisodeAvailability(i, true, root + wfd.cFileName);
+                anime_item.SetEpisodeAvailability(i, true, root + wfd.cFileName);
               }
               if (episode_number == 0 || (episode_number >= numberlow && episode_number <= number)) {
                 FindClose(hFind);

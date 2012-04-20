@@ -429,7 +429,7 @@ bool Http::ParseHeader(const wstring& text, http_header_t& header) {
     int pos = InStr(*it, L":", 0);
     if (pos == -1) {
       if (StartsWith(*it, L"HTTP/")) {
-        m_ResponseStatusCode = ToINT(InStr(*it, L" ", L" "));
+        m_ResponseStatusCode = ToInt(InStr(*it, L" ", L" "));
       }
     } else {
       wstring name = CharLeft(*it, pos);
@@ -473,7 +473,7 @@ bool Http::ParseResponseHeader(const wstring& header) {
 
     // Content-Length:
     } else if (IsEqual(name, L"Content-Length")) {
-      m_dwTotal = ToINT(value);
+      m_dwTotal = ToInt(value);
 
     // Location:
     } else if (IsEqual(name, L"Location")) {

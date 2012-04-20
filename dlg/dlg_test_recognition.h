@@ -20,7 +20,9 @@
 #define DLG_TEST_RECOGNITOIN_H
 
 #include "../std.h"
-#include "../animelist.h"
+
+#include "../anime_episode.h"
+
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
@@ -36,7 +38,7 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
 private:
-  class EpisodeTest : public Episode {
+  class EpisodeTest : public anime::Episode {
   public:
     EpisodeTest() : priority(0) {}
     int priority;

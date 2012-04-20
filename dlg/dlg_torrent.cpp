@@ -17,9 +17,12 @@
 */
 
 #include "../std.h"
-#include "../common.h"
+
 #include "dlg_settings.h"
 #include "dlg_torrent.h"
+
+#include "../anime_db.h"
+#include "../common.h"
 #include "../feed.h"
 #include "../gfx.h"
 #include "../http.h"
@@ -28,6 +31,7 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
+
 #include "../win32/win_gdi.h"
 
 class TorrentDialog TorrentDialog;
@@ -213,21 +217,21 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             list_.SetCheckState(lpnmitem->iItem, FALSE);
             Aggregator.file_archive.push_back(feed_item->title);
           } else if (answer == L"DiscardTorrents") {
-            Anime* anime = AnimeList.FindItem(feed_item->episode_data.anime_id);
-            if (anime) {
+            auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
+            if (anime_item) {
               for (int i = 0; i < list_.GetItemCount(); i++) {
                 feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-                if (feed_item && feed_item->episode_data.anime_id == anime->series_id) {
+                if (feed_item && feed_item->episode_data.anime_id == anime_item->GetId()) {
                   feed_item->download = false;
                   list_.SetCheckState(i, FALSE);
                 }
               }
               Aggregator.filter_manager.AddFilter(
                 FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
-                L"Discard \"" + anime->series_title + L"\"");
+                L"Discard \"" + anime_item->GetTitle() + L"\"");
               Aggregator.filter_manager.filters.back().AddCondition(
                 FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, 
-                ToWSTR(anime->series_id));
+                ToWstr(anime_item->GetId()));
             }
           } else if (answer == L"MoreTorrents") {
             feed->Check(ReplaceVariables(
@@ -323,7 +327,7 @@ void TorrentDialog::RefreshList() {
 
   // Add items
   for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
-    if (Settings.RSS.Torrent.hide_unidentified && it->episode_data.anime_id == ANIMEID_NOTINLIST) {
+    if (Settings.RSS.Torrent.hide_unidentified && it->episode_data.anime_id == anime::ID_NOTINLIST) {
       continue;
     }
     wstring title, number, video;
@@ -332,10 +336,10 @@ void TorrentDialog::RefreshList() {
       !IsNumeric(it->episode_data.number)) {
         group = TORRENT_BATCH;
     }
-    Anime* anime = AnimeList.FindItem(it->episode_data.anime_id);
-    if (anime) {
-      icon = StatusToIcon(anime->GetAiringStatus());
-      title = anime->series_title;
+    auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
+    if (anime_item) {
+      icon = StatusToIcon(anime_item->GetAiringStatus());
+      title = anime_item->GetTitle();
     } else if (!it->episode_data.title.empty()) {
       title = it->episode_data.title;
     } else {

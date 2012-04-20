@@ -18,9 +18,11 @@
 
 #include "std.h"
 #include <tlhelp32.h>
+
+#include "media.h"
+
 #include "anime.h"
 #include "common.h"
-#include "media.h"
 #include "process.h"
 #include "recognition.h"
 #include "settings.h"
@@ -32,9 +34,10 @@ class MediaPlayers MediaPlayers;
 
 // =============================================================================
 
-MediaPlayers::MediaPlayers() : 
-  index(-1), index_old(-1), title_changed_(false)
-{
+MediaPlayers::MediaPlayers()
+    : index(-1), 
+      index_old(-1), 
+      title_changed_(false) {
 }
 
 BOOL MediaPlayers::Load() {
@@ -92,11 +95,11 @@ BOOL MediaPlayers::Save() {
     player.append_child().set_name(L"name");
     player.child(L"name").append_child(node_pcdata).set_value(items[i].name.c_str());
     player.append_child().set_name(L"enabled");
-    player.child(L"enabled").append_child(node_pcdata).set_value(ToWSTR(items[i].enabled).c_str());
+    player.child(L"enabled").append_child(node_pcdata).set_value(ToWstr(items[i].enabled).c_str());
     player.append_child().set_name(L"visible");
-    player.child(L"visible").append_child(node_pcdata).set_value(ToWSTR(items[i].visible).c_str());
+    player.child(L"visible").append_child(node_pcdata).set_value(ToWstr(items[i].visible).c_str());
     player.append_child().set_name(L"mode");
-    player.child(L"mode").append_child(node_pcdata).set_value(ToWSTR(items[i].mode).c_str());
+    player.child(L"mode").append_child(node_pcdata).set_value(ToWstr(items[i].mode).c_str());
     XML_WriteChildNodes(player, items[i].classes, L"class");
     XML_WriteChildNodes(player, items[i].files, L"file");
     XML_WriteChildNodes(player, items[i].folders, L"folder");

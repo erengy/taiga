@@ -87,8 +87,11 @@
     <ClCompile Include="accessibility.cpp" />
     <ClCompile Include="action.cpp" />
     <ClCompile Include="anime.cpp" />
-    <ClCompile Include="animedb.cpp" />
-    <ClCompile Include="animelist.cpp" />
+    <ClCompile Include="anime_db.cpp" />
+    <ClCompile Include="anime_item.cpp" />
+    <ClCompile Include="anime_episode.cpp" />
+    <ClCompile Include="anime_filter.cpp" />
+    <ClCompile Include="anime_user.cpp" />
     <ClCompile Include="announce.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="dde.cpp" />
@@ -151,6 +154,7 @@
     <ClCompile Include="third_party\zlib\trees.c" />
     <ClCompile Include="third_party\zlib\uncompr.c" />
     <ClCompile Include="third_party\zlib\zutil.c" />
+    <ClCompile Include="time.cpp" />
     <ClCompile Include="update.cpp" />
     <ClCompile Include="win32\win_ctl_combobox.cpp" />
     <ClCompile Include="win32\win_ctl_edit.cpp" />
@@ -181,8 +185,11 @@
   <ItemGroup>
     <ClInclude Include="accessibility.h" />
     <ClInclude Include="anime.h" />
-    <ClInclude Include="animedb.h" />
-    <ClInclude Include="animelist.h" />
+    <ClInclude Include="anime_db.h" />
+    <ClInclude Include="anime_item.h" />
+    <ClInclude Include="anime_episode.h" />
+    <ClInclude Include="anime_filter.h" />
+    <ClInclude Include="anime_user.h" />
     <ClInclude Include="announce.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="dde.h" />
@@ -235,7 +242,9 @@
     <ClInclude Include="third_party\zlib\zconf.h" />
     <ClInclude Include="third_party\zlib\zlib.h" />
     <ClInclude Include="third_party\zlib\zutil.h" />
+    <ClInclude Include="time.h" />
     <ClInclude Include="update.h" />
+    <ClInclude Include="version.h" />
     <ClInclude Include="win32\win_control.h" />
     <ClInclude Include="win32\win_dialog.h" />
     <ClInclude Include="win32\win_gdi.h" />
@@ -252,6 +261,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
+    <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

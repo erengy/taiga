@@ -17,12 +17,16 @@
 */
 
 #include "../std.h"
-#include "../announce.h"
-#include "../common.h"
+
 #include "dlg_format.h"
 #include "dlg_settings.h"
 #include "dlg_settings_page.h"
 #include "dlg_feed_filter.h"
+
+#include "../anime_db.h"
+#include "../anime_filter.h"
+#include "../announce.h"
+#include "../common.h"
 #include "../http.h"
 #include "../media.h"
 #include "../myanimelist.h"
@@ -34,9 +38,9 @@
 
 // =============================================================================
 
-SettingsPage::SettingsPage() :
-  parent(nullptr), tree_item_(nullptr)
-{
+SettingsPage::SettingsPage()
+    : parent(nullptr), 
+      tree_item_(nullptr) {
 }
 
 void SettingsPage::CreateItem(LPCWSTR pszText, HTREEITEM htiParent) {
@@ -102,12 +106,13 @@ BOOL SettingsPage::OnInitDialog() {
       List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
-      for (int i = 1; i <= AnimeList.count; i++) {
-        List.InsertItem(i - 1, AnimeList.items[i].GetStatus(), 
-                StatusToIcon(AnimeList.items[i].GetAiringStatus()), 
+      for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
+        if (!AnimeDatabase.items.at(i).IsInList()) continue;
+        List.InsertItem(i, AnimeDatabase.items[i].GetMyStatus(), 
+                StatusToIcon(AnimeDatabase.items[i].GetAiringStatus()), 
                 0, nullptr, LPSTR_TEXTCALLBACK, 
-                reinterpret_cast<LPARAM>(&AnimeList.items[i]));
-        List.SetItem(i - 1, 1, AnimeList.items[i].folder.c_str());
+                reinterpret_cast<LPARAM>(&AnimeDatabase.items[i]));
+        List.SetItem(i, 1, AnimeDatabase.items[i].GetFolder().c_str());
       }
       List.Sort(0, 1, 0, ListViewCompareProc);
       List.SetWindowHandle(nullptr);
@@ -193,7 +198,7 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_MDLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.Program.List.middle_click);
-      CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, AnimeList.filters.new_episodes);
+      CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, AnimeFilters.new_episodes);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.highlight);
       CheckDlgButton(IDC_RADIO_LIST_PROGRESS1 + Settings.Program.List.progress_mode, TRUE);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.progress_show_eps);
@@ -537,11 +542,11 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         // Text callback
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-          Anime* anime = reinterpret_cast<Anime*>(plvdi->item.lParam);
-          if (!anime) break;
+          auto anime_item = reinterpret_cast<anime::Item*>(plvdi->item.lParam);
+          if (!anime_item) break;
           switch (plvdi->item.iSubItem) {
             case 0: // Anime title
-              plvdi->item.pszText = const_cast<LPWSTR>(anime->series_title.data());
+              plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
               break;
           }
           break;
@@ -627,11 +632,11 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             } else if (answer == L"AnimeFolders_Clear()") {
               List.SetItem(lpnmitem->iItem, 1, L"");
             } else if (answer == L"AnimeFolders_Search()") {
-              Anime* anime = reinterpret_cast<Anime*>(List.GetItemParam(lpnmitem->iItem));
-              if (anime) {
-                anime->CheckFolder();
-                if (!anime->folder.empty()) {
-                  List.SetItem(lpnmitem->iItem, 1, anime->folder.c_str());
+              auto anime_item = reinterpret_cast<anime::Item*>(List.GetItemParam(lpnmitem->iItem));
+              if (anime_item) {
+                anime_item->CheckFolder();
+                if (!anime_item->GetFolder().empty()) {
+                  List.SetItem(lpnmitem->iItem, 1, anime_item->GetFolder().c_str());
                 }
               }
             } else if (answer == L"AnimeFolders_ClearAll()") {

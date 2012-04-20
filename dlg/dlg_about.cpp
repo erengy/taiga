@@ -18,10 +18,14 @@
 
 #include "../std.h"
 #include <math.h>
-#include "../common.h"
+
 #include "dlg_about.h"
+
+#include "../common.h"
 #include "../resource.h"
 #include "../taiga.h"
+#include "../time.h"
+
 #include "../win32/win_gdi.h"
 
 class AboutDialog AboutDialog;

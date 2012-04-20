@@ -17,10 +17,12 @@
 */
 
 #include "../std.h"
-#include "../animelist.h"
-#include "../common.h"
+
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
+
+#include "../anime_db.h"
+#include "../common.h"
 #include "../event.h"
 #include "../gfx.h"
 #include "../http.h"
@@ -35,14 +37,16 @@ class AnimeDialog AnimeDialog;
 
 // =============================================================================
 
-AnimeDialog::AnimeDialog() :
-  anime_(nullptr), brush_darkblue_(nullptr), brush_lightblue_(nullptr), 
-  current_page_(0), title_font_(nullptr)
-{
+AnimeDialog::AnimeDialog()
+    : anime_id_(anime::ID_UNKNOWN), 
+      brush_darkblue_(nullptr), 
+      brush_lightblue_(nullptr), 
+      current_page_(0), 
+      title_font_(nullptr) {
   RegisterDlgClass(L"TaigaAnimeInfoW");
  
-  pages.resize(TAB_COUNT);
-  for (size_t i = 0; i < TAB_COUNT; i++) {
+  pages.resize(INFOPAGE_COUNT);
+  for (size_t i = 0; i < INFOPAGE_COUNT; i++) {
     pages[i].index = i;
   }
 }
@@ -56,8 +60,9 @@ AnimeDialog::~AnimeDialog() {
 // =============================================================================
 
 BOOL AnimeDialog::OnInitDialog() {
-  // Set anime index
-  if (!anime_) anime_ = &AnimeList.items[AnimeList.index];
+  // Set anime ID
+  if (anime_id_ <= anime::ID_UNKNOWN)
+    anime_id_ = AnimeDatabase.GetCurrentId();
 
   // Create GDI objects
   if (!brush_darkblue_) brush_darkblue_ = ::CreateSolidBrush(mal::COLOR_DARKBLUE);
@@ -76,7 +81,7 @@ BOOL AnimeDialog::OnInitDialog() {
   // Create tabs
   tab_.Attach(GetDlgItem(IDC_TAB_ANIME));
   tab_.InsertItem(0, L"Series information", 0);
-  if (anime_->index > -1) {
+  if (AnimeDatabase.FindItem(anime_id_)->IsInList()) {
     tab_.InsertItem(1, L"My information", 0);
   }
 
@@ -94,7 +99,7 @@ BOOL AnimeDialog::OnInitDialog() {
 
   // Create pages
   win32::Rect rcPage; tab_.AdjustRect(m_hWindow, FALSE, &rcPage);
-  for (size_t i = 0; i < TAB_COUNT; i++) {
+  for (size_t i = 0; i < INFOPAGE_COUNT; i++) {
     pages[i].Create(IDD_ANIME_INFO_PAGE01 + i, m_hWindow, false);
     pages[i].SetPosition(nullptr, rcPage, SWP_HIDEWINDOW);
     EnableThemeDialogTexture(pages[i].GetWindowHandle(), ETDT_ENABLETAB);
@@ -102,70 +107,68 @@ BOOL AnimeDialog::OnInitDialog() {
 
   // Refresh
   SetCurrentPage(current_page_);
-  Refresh(anime_);
+  Refresh(anime_id_);
   return TRUE;
 }
 
 void AnimeDialog::OnOK() {
-  if (!anime_ || anime_->index == -1) {
+  // No need to save anything if anime is not in list
+  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+  if (!anime_item->IsInList()) {
     EndDialog(IDOK);
     return;
   }
 
   // Create item
   EventItem item;
-  item.anime_id = anime_->series_id;
+  item.anime_id = anime_id_;
   item.mode = HTTP_MAL_AnimeEdit;
 
   // Episodes watched
-  item.episode = pages[TAB_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!mal::IsValidEpisode(item.episode, -1, anime_->series_episodes)) {
+  item.episode = pages[INFOPAGE_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
+  if (!mal::IsValidEpisode(item.episode, -1, anime_item->GetEpisodeCount())) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
-      ToWSTR(anime_->series_episodes) + L".";
+      ToWstr(anime_item->GetEpisodeCount()) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
     return;
   }
 
   // Re-watching
-  item.enable_rewatching = pages[TAB_MYINFO].IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
+  item.enable_rewatching = pages[INFOPAGE_MYINFO].IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
   
   // Score
-  item.score = 10 - pages[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
+  item.score = 10 - pages[INFOPAGE_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
   
   // Status
-  item.status = pages[TAB_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
+  item.status = pages[INFOPAGE_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
   if (item.status == mal::MYSTATUS_UNKNOWN) item.status++;
   
   // Tags
-  pages[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, item.tags);
+  pages[INFOPAGE_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, item.tags);
 
   // Start date
   SYSTEMTIME stMyStart;
-  if (pages[TAB_MYINFO].SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
+  if (pages[INFOPAGE_MYINFO].SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
     reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
-      anime_->my_start_date = L"0000-00-00";
+      anime_item->SetMyDate(anime::DATE_START, Date(), true, true);
   } else {
-    wstring year = ToWSTR(stMyStart.wYear);
-    wstring month = (stMyStart.wMonth < 10 ? L"0" : L"") + ToWSTR(stMyStart.wMonth);
-    wstring day = (stMyStart.wDay < 10 ? L"0" : L"") + ToWSTR(stMyStart.wDay);
-    anime_->SetStartDate(year + L"-" + month + L"-" + day, true);
+    anime_item->SetMyDate(anime::DATE_START, 
+      Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay), true, true);
   }
   // Finish date
   SYSTEMTIME stMyFinish;
-  if (pages[TAB_MYINFO].SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
+  if (pages[INFOPAGE_MYINFO].SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
     reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
-      anime_->my_finish_date = L"0000-00-00";
+      anime_item->SetMyDate(anime::DATE_END, Date(), true, true);
   } else {
-    wstring year = ToWSTR(stMyFinish.wYear);
-    wstring month = (stMyFinish.wMonth < 10 ? L"0" : L"") + ToWSTR(stMyFinish.wMonth);
-    wstring day = (stMyFinish.wDay < 10 ? L"0" : L"") + ToWSTR(stMyFinish.wDay);
-    anime_->SetFinishDate(year + L"-" + month + L"-" + day, true);
+    anime_item->SetMyDate(anime::DATE_END, 
+      Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay), true, true);
   }
 
   // Alternative titles
   wstring titles;
-  pages[TAB_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
-  anime_->SetLocalData(EMPTY_STR, titles);
+  pages[INFOPAGE_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
+  anime_item->SetUserSynonyms(titles, true);
 
   // Add item to event queue
   EventQueue.Add(item);
@@ -245,10 +248,8 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG) {
     if (HIWORD(wParam) == STN_CLICKED) {
-      if (anime_) {
-        mal::ViewAnimePage(anime_->series_id);
-        return TRUE;
-      }
+      mal::ViewAnimePage(anime_id_);
+      return TRUE;
     }
   }
   
@@ -285,7 +286,7 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
 void AnimeDialog::SetCurrentPage(int index) {
   current_page_ = index;
   if (IsWindow()) {
-    for (int i = 0; i < TAB_COUNT; i++) {
+    for (int i = 0; i < INFOPAGE_COUNT; i++) {
       if (i != index) pages[i].Hide();
     }
     pages[index].Show();
@@ -293,37 +294,38 @@ void AnimeDialog::SetCurrentPage(int index) {
   }
 }
 
-void AnimeDialog::Refresh(Anime* anime, bool series_info, bool my_info) {
+void AnimeDialog::Refresh(int anime_id, bool series_info, bool my_info) {
   // Set anime index
-  if (anime) anime_ = anime;
-  if (!anime_ || !IsWindow()) return;
+  if (anime_id > anime::ID_UNKNOWN) anime_id_ = anime_id;
+  if (anime_id <= anime::ID_UNKNOWN || !IsWindow()) return;
 
   // Set title
-  SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_->series_title.c_str());
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
 
   // Load image
-  if (image_.Load(anime_->GetImagePath())) {
+  if (image_.Load(anime::GetImagePath(anime_id))) {
     win32::Window img = GetDlgItem(IDC_STATIC_ANIME_IMG);
     img.SetPosition(nullptr, image_.rect);
     img.SetWindowHandle(nullptr);
     // Refresh if current file is too old
-    if (anime_->GetAiringStatus() != mal::STATUS_FINISHED) {
+    if (anime_item->GetAiringStatus() != mal::STATUS_FINISHED) {
       // Check last modified date (>= 7 days)
-      if (GetFileAge(anime_->GetImagePath()) / (60 * 60 * 24) >= 7) {
-        mal::DownloadImage(anime_);
+      if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
+        mal::DownloadImage(anime_id, anime_item->GetImageUrl());
       }
     }
   } else {
-    mal::DownloadImage(anime_);
+    mal::DownloadImage(anime_id, anime_item->GetImageUrl());
   }
   InvalidateRect(&image_.rect);
 
   // Refresh pages
   if (series_info) {
-    pages[TAB_SERIESINFO].Refresh(anime_);
+    pages[INFOPAGE_SERIESINFO].Refresh(anime_id);
   }
   if (my_info) {
-    pages[TAB_MYINFO].Refresh(anime_);
+    pages[INFOPAGE_MYINFO].Refresh(anime_id);
   }
 }
 

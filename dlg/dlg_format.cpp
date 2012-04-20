@@ -17,15 +17,17 @@
 */
 
 #include "../std.h"
-#include "../animelist.h"
-#include "../common.h"
+
 #include "dlg_format.h"
+
+#include "../anime_db.h"
+#include "../common.h"
 #include "../resource.h"
 #include "../settings.h"
 #include "../string.h"
 #include "../theme.h"
 
-Episode Example;
+anime::Episode Example;
 class FormatDialog FormatDialog;
 vector<wstring> functions, keywords;
 
@@ -235,7 +237,7 @@ void FormatDialog::RefreshPreviewText() {
     }
     case FORMAT_MODE_SKYPE: {
       // Strip HTML codes
-      StripHTML(str);
+      str = StripHtml(str);
     }
   }
   

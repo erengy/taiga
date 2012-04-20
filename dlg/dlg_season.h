@@ -20,8 +20,10 @@
 #define DLG_SEASON_H
 
 #include "../std.h"
+
 #include "../gfx.h"
 #include "../http.h"
+
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
@@ -58,7 +60,7 @@ public:
   BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
-  void RefreshData(bool connect = true, Anime* anime = nullptr);
+  void RefreshData(bool connect = true, int anime_id = 0);
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();
   void RefreshToolbar();

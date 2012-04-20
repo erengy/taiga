@@ -21,12 +21,6 @@
 
 #include "std.h"
 
-// Timer IDs
-enum TimerID {
-  TIMER_MAIN = 1337,
-  TIMER_TAIGA = 74164
-};
-
 // ListView sort types
 enum ListSortType {
   LIST_SORTTYPE_DEFAULT,
@@ -42,8 +36,10 @@ enum ListSortType {
 
 typedef unsigned __int64 QWORD, *LPQWORD;
 
-class Anime;
+namespace anime {
 class Episode;
+class Item;
+}
 
 // =============================================================================
 
@@ -62,13 +58,6 @@ int TranslateResolution(const wstring& str, bool return_validity = false);
 int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 unsigned long GetFileAge(const wstring& path);
-void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
-wstring GetDate(LPCWSTR lpFormat = L"yyyy'-'MM'-'dd");
-wstring GetTime(LPCWSTR lpFormat = L"HH':'mm':'ss");
-wstring GetDateJapan(LPCWSTR lpFormat = L"yyyy'-'MM'-'dd");
-wstring GetTimeJapan(LPCWSTR lpFormat = L"HH':'mm':'ss");
-wstring ToDateString(time_t seconds);
-wstring ToTimeString(int seconds);
 bool Execute(const wstring& path, const wstring& parameters = L"");
 BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");
 void ExecuteLink(const wstring& link);
@@ -98,9 +87,9 @@ bool UncompressGzippedString(const string& input, string& output);
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 // menu.cpp
-void UpdateAllMenus(Anime* anime);
+void UpdateAllMenus(anime::Item* anime_item);
 void UpdateAccountMenu();
-void UpdateAnimeMenu(Anime* anime);
+void UpdateAnimeMenu(anime::Item* anime_item);
 void UpdateAnnounceMenu();
 void UpdateFilterMenu();
 void UpdateFoldersMenu();
@@ -114,11 +103,11 @@ void UpdateTrayMenu();
 wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
 bool IsScriptFunction(const wstring& str);
 bool IsScriptVariable(const wstring& str);
-wstring ReplaceVariables(wstring str, const Episode& episode, bool url_encode = false);
+wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_encode = false);
 wstring EscapeScriptEntities(wstring str);
 wstring UnescapeScriptEntities(wstring str);
 
 // search.cpp
-wstring SearchFileFolder(Anime& anime, wstring root, int episode_number, bool search_folder);
+wstring SearchFileFolder(anime::Item& anime_item, wstring root, int episode_number, bool search_folder);
 
 #endif // COMMON_H

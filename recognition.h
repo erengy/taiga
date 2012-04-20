@@ -21,11 +21,13 @@
 
 #include "std.h"
 
-// =============================================================================
-
-class Anime;
+namespace anime {
 class Episode;
+class Item;
+}
 class Token;
+
+// =============================================================================
 
 class RecognitionEngine {
 public:
@@ -33,37 +35,51 @@ public:
   virtual ~RecognitionEngine() {};
   
   void Initialize();
-  bool CompareEpisode(Episode& episode, const Anime& anime, 
-    bool strict = true, bool check_episode = true, bool check_date = true);
-  bool ExamineTitle(wstring title, Episode& episode, 
-    bool examine_inside = true, bool examine_outside = true, bool examine_number = true,
-    bool check_extras = true, bool check_extension = true);
-  void ExamineToken(Token& token, Episode& episode, bool compare_extras);
+  
+  bool CompareEpisode(anime::Episode& episode, 
+                      const anime::Item& anime_item, 
+                      bool strict = true, 
+                      bool check_episode = true, 
+                      bool check_date = true);
+  
+  bool ExamineTitle(wstring title, 
+                    anime::Episode& episode, 
+                    bool examine_inside = true, 
+                    bool examine_outside = true, 
+                    bool examine_number = true, 
+                    bool check_extras = true, 
+                    bool check_extension = true);
 
-private:
-  bool CompareTitle(const wstring& title, wstring& anime_title, 
-    Episode& episode, const Anime& anime, bool strict = true);
-  bool CompareSynonyms(const wstring& title, wstring& anime_title, const wstring& synonyms, 
-    Episode& episode, const Anime& anime, bool strict = true);
+  void ExamineToken(Token& token, anime::Episode& episode, bool compare_extras);
+
+  vector<wstring> audio_keywords;
+  vector<wstring> video_keywords;
+  vector<wstring> extra_keywords;
+  vector<wstring> extra_unsafe_keywords;
+  vector<wstring> version_keywords;
+  vector<wstring> valid_extensions;
+  vector<wstring> episode_keywords;
+  vector<wstring> episode_prefixes;
+
+ private:
+  bool CompareTitle(wstring anime_title, 
+                    const wstring& episode_title, 
+                    anime::Episode& episode, 
+                    const anime::Item& anime_item, 
+                    bool strict = true);
 
   void AppendKeyword(wstring& str, const wstring& keyword);
   bool CompareKeys(const wstring& str, const vector<wstring>& keys);
   void CleanTitle(wstring& title);
   void EraseUnnecessary(wstring& str);
   void TransliterateSpecial(wstring& str);
-  bool IsEpisodeFormat(const wstring& str, Episode& episode, const wchar_t separator = ' ');
+  bool IsEpisodeFormat(const wstring& str, anime::Episode& episode, const wchar_t separator = ' ');
   bool IsResolution(const wstring& str);
   bool IsCountingWord(const wstring& str);
   bool IsTokenEnclosed(const Token& token);
   void ReadKeyword(unsigned int id, vector<wstring>& str);
   size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<Token>& tokens);
-  bool ValidateEpisodeNumber(Episode& episode);
-
-public:
-  vector<wstring> audio_keywords, video_keywords, 
-    extra_keywords, extra_unsafe_keywords, 
-    version_keywords, valid_extensions,
-    episode_keywords, episode_prefixes;
+  bool ValidateEpisodeNumber(anime::Episode& episode);
 };
 
 extern RecognitionEngine Meow;

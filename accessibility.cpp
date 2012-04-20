@@ -21,9 +21,9 @@
 
 // =============================================================================
 
-AccessibleObject::AccessibleObject() :
-  acc_(nullptr), win_event_hook_(nullptr)
-{
+AccessibleObject::AccessibleObject()
+    : acc_(nullptr), 
+      win_event_hook_(nullptr) {
 }
 
 AccessibleObject::~AccessibleObject() {

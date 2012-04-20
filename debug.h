@@ -21,21 +21,25 @@
 
 #include "std.h"
 
+namespace debug {
+
 // =============================================================================
 
-class DebugTester {
-public:
-  DebugTester();
+class Tester {
+ public:
+  Tester();
 
   void Start();
-  void End(wstring str, BOOL show);
+  void End(wstring str, bool display_result);
 
-private:
-  double m_Freq;
-  __int64 m_Value;
+ private:
+  double frequency_;
+  __int64 value_;
 };
 
-void DebugPrint(wstring text);
-void DebugTest();
+void Print(wstring text);
+void Test();
+
+} // namespace debug
 
 #endif // DEBUG_H

@@ -17,11 +17,23 @@
 */
 
 #include "std.h"
-#include "animedb.h"
-#include "animelist.h"
+
+#include "http.h"
+
+#include "anime_db.h"
 #include "announce.h"
 #include "common.h"
 #include "debug.h"
+#include "event.h"
+#include "feed.h"
+#include "myanimelist.h"
+#include "resource.h"
+#include "settings.h"
+#include "string.h"
+#include "taiga.h"
+#include "theme.h"
+#include "version.h"
+
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_info_page.h"
 #include "dlg/dlg_event.h"
@@ -32,15 +44,7 @@
 #include "dlg/dlg_settings.h"
 #include "dlg/dlg_torrent.h"
 #include "dlg/dlg_update.h"
-#include "event.h"
-#include "feed.h"
-#include "http.h"
-#include "myanimelist.h"
-#include "resource.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
-#include "theme.h"
+
 #include "win32/win_taskbar.h"
 #include "win32/win_taskdialog.h"
 
@@ -50,14 +54,13 @@ class HttpClient HttpClient, ImageClient, MainClient, SearchClient, TwitterClien
 
 HttpClient::HttpClient() {
   SetAutoRedirect(FALSE);
-  SetUserAgent(APP_NAME L"/" + 
-    ToWSTR(APP_VERSION_MAJOR) + L"." + ToWSTR(APP_VERSION_MINOR));
+  SetUserAgent(APP_NAME L"/" + ToWstr(VERSION_MAJOR) + L"." + ToWstr(VERSION_MINOR));
 }
 
 BOOL HttpClient::OnError(DWORD dwError) {
-  wstring error_text = L"HTTP error #" + ToWSTR(dwError) + L": " + 
+  wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
     FormatError(dwError, L"winhttp.dll");
-  DebugPrint(error_text + L"\n");
+  debug::Print(error_text + L"\n");
 
   switch (GetClientMode()) {
     case HTTP_MAL_Login:
@@ -69,10 +72,11 @@ BOOL HttpClient::OnError(DWORD dwError) {
     case HTTP_MAL_AnimeAskToDiscuss:
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_Image:
+    case HTTP_MAL_UserImage:
     case HTTP_Feed_DownloadIcon:
-      #ifdef _DEBUG
+#ifdef _DEBUG
       MainDialog.ChangeStatus(error_text);
-      #endif
+#endif
       break;
     case HTTP_MAL_SearchAnime:
       SearchDialog.EnableInput(true);
@@ -84,7 +88,8 @@ BOOL HttpClient::OnError(DWORD dwError) {
       TorrentDialog.EnableInput();
       break;
     case HTTP_UpdateCheck:
-      MessageBox(UpdateDialog.GetWindowHandle(), error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
+      MessageBox(UpdateDialog.GetWindowHandle(), 
+        error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
       UpdateDialog.PostMessage(WM_CLOSE);
       break;
     default:
@@ -108,9 +113,9 @@ BOOL HttpClient::OnSendRequestComplete() {
       TorrentDialog.ChangeStatus(status);
       break;
     default:
-      #ifdef _DEBUG
+#ifdef _DEBUG
       MainDialog.ChangeStatus(status);
-      #endif
+#endif
       break;
   }
 
@@ -152,9 +157,9 @@ BOOL HttpClient::OnRedirect(wstring address) {
       TorrentDialog.ChangeStatus(status);
       break;
     default:
-      #ifdef _DEBUG
+#ifdef _DEBUG
       MainDialog.ChangeStatus(status);
-      #endif
+#endif
       break;
   }
 
@@ -185,6 +190,7 @@ BOOL HttpClient::OnReadData() {
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_SearchAnime:
     case HTTP_MAL_Image:
+    case HTTP_MAL_UserImage:
     case HTTP_Silent:
       return 0;
     case HTTP_Feed_Check:
@@ -216,7 +222,7 @@ BOOL HttpClient::OnReadData() {
 
   if (m_dwTotal > 0) {
     TaskbarList.SetProgressValue(m_dwDownloaded, m_dwTotal);
-    status += L" (" + ToWSTR(static_cast<int>(((float)m_dwDownloaded / (float)m_dwTotal) * 100)) + L"%)";
+    status += L" (" + ToWstr(static_cast<int>(((float)m_dwDownloaded / (float)m_dwTotal) * 100)) + L"%)";
   } else {
     status += L" (" + ToSizeString(m_dwDownloaded) + L")";
   }
@@ -243,7 +249,7 @@ BOOL HttpClient::OnReadComplete() {
     // List
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin: {
-      AnimeList.Load();
+      AnimeDatabase.LoadList();
       MainDialog.ChangeStatus(L"List download completed.");
       MainDialog.RefreshList(mal::MYSTATUS_WATCHING);
       MainDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
@@ -280,11 +286,11 @@ BOOL HttpClient::OnReadComplete() {
         status = L"Failed to log in.";
         switch (Settings.Account.MAL.api) {
           case MAL_API_OFFICIAL:
-            #ifdef _DEBUG
+#ifdef _DEBUG
             status += L" (" + GetData() + L")";
-            #else
+#else
             status += L" (Invalid user name or password)";
-            #endif
+#endif
             break;
           case MAL_API_NONE:
             if (InStr(GetData(), L"Could not find that user name", 1) > -1) {
@@ -379,11 +385,12 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_TagUpdate: {
       EventQueue.updating = false;
       MainDialog.ChangeStatus();
-      Anime* anime = reinterpret_cast<Anime*>(GetParam());
-      if (anime && EventQueue.GetItemCount() > 0) {
+      int anime_id = static_cast<int>(GetParam());
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (anime_item && EventQueue.GetItemCount() > 0) {
         EventList* event_list = EventQueue.FindList();
         if (event_list) {
-          anime->Edit(event_list->items[event_list->index], GetData(), GetResponseStatusCode());
+          anime_item->Edit(event_list->items[event_list->index], GetData(), GetResponseStatusCode());
           return TRUE;
         }
       }
@@ -397,11 +404,12 @@ BOOL HttpClient::OnReadComplete() {
       wstring data = GetData();
       if (InStr(data, L"trueEp") > -1) {
         wstring url = InStr(data, L"self.parent.document.location='", L"';");
-        Anime* anime = reinterpret_cast<Anime*>(GetParam());
+        int anime_id = static_cast<int>(GetParam());
         EventList* event_list = EventQueue.FindList();
-        if (!url.empty() && anime && event_list) {
+        if (!url.empty() && event_list) {
           int episode_number = event_list->items.at(event_list->index).episode;
-          wstring title = anime->series_title + (episode_number ? L" #" + ToWSTR(episode_number) : L"");
+          wstring title = AnimeDatabase.FindItem(anime_id)->GetTitle();
+          if (episode_number) title += L" #" + ToWstr(episode_number);
           win32::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
           dlg.SetMainInstruction(L"Someone has already made a discussion topic for this episode!");
           dlg.UseCommandLinks(true);
@@ -420,10 +428,10 @@ BOOL HttpClient::OnReadComplete() {
 
     // Anime details
     case HTTP_MAL_AnimeDetails: {
-      Anime* anime = reinterpret_cast<Anime*>(GetParam());
-      if (mal::ParseAnimeDetails(GetData(), anime)) {
+      int anime_id = static_cast<int>(GetParam());
+      if (mal::ParseAnimeDetails(GetData())) {
         if (AnimeDialog.IsWindow()) {
-          AnimeDialog.Refresh(anime, true, false);
+          AnimeDialog.Refresh(anime_id, true, false);
         }
         if (SeasonDialog.IsWindow()) {
           SeasonDialog.RefreshList(true);
@@ -440,14 +448,12 @@ BOOL HttpClient::OnReadComplete() {
         AnimeDialog.Refresh(NULL, false, false);
       }
       if (SeasonDialog.IsWindow()) {
-        Anime* anime = reinterpret_cast<Anime*>(GetParam());
-        if (anime) {
-          for (auto it = SeasonDialog.images.begin(); it != SeasonDialog.images.end(); ++it) {
-            if (it->data == anime->series_id) {
-              if (it->Load(anime->GetImagePath())) {
-                SeasonDialog.RefreshList(true);
-                break;
-              }
+        int anime_id = static_cast<int>(GetParam());
+        for (auto it = SeasonDialog.images.begin(); it != SeasonDialog.images.end(); ++it) {
+          if (it->data == anime_id) {
+            if (it->Load(anime::GetImagePath(anime_id))) {
+              SeasonDialog.RefreshList(true);
+              break;
             }
           }
         }
@@ -455,23 +461,28 @@ BOOL HttpClient::OnReadComplete() {
       break;
     }
 
+    case HTTP_MAL_UserImage: {
+      // TODO
+      break;
+    }
+
     // =========================================================================
 
     // Search anime
     case HTTP_MAL_SearchAnime: {
-      Anime* anime = reinterpret_cast<Anime*>(GetParam());
-      if (anime) {
-        if (mal::ParseSearchResult(GetData(), anime)) {
-          AnimeDialog.Refresh(anime, true, false);
+      int anime_id = static_cast<int>(GetParam());
+      if (anime_id) {
+        if (mal::ParseSearchResult(GetData(), anime_id)) {
+          AnimeDialog.Refresh(anime_id, true, false);
           SeasonDialog.RefreshList(true);
-          if (mal::GetAnimeDetails(anime, this)) return TRUE;
+          if (mal::GetAnimeDetails(anime_id, this)) return TRUE;
         } else {
           status = L"Could not read anime information.";
-          AnimeDialog.pages[TAB_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
+          AnimeDialog.pages[INFOPAGE_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
         }
-        #ifdef _DEBUG
+#ifdef _DEBUG
         MainDialog.ChangeStatus(status);
-        #endif
+#endif
       } else {
         if (SearchDialog.IsWindow()) {
           SearchDialog.ParseResults(GetData());
@@ -535,9 +546,9 @@ BOOL HttpClient::OnReadComplete() {
               break;
           }
           if (Settings.RSS.Torrent.set_folder && InStr(app_path, L"utorrent", 0, true) > -1) {
-            Anime* anime = AnimeList.FindItem(feed_item->episode_data.anime_id);
-            if (anime && !anime->folder.empty()) {
-              cmd = L"/directory \"" + anime->folder + L"\" ";
+            auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
+            if (anime_item && !anime_item->GetFolder().empty()) {
+              cmd = L"/directory \"" + anime_item->GetFolder() + L"\" ";
             }
           }
           cmd += L"\"" + file + L"\"";
@@ -636,9 +647,9 @@ BOOL HttpClient::OnReadComplete() {
     
     // Debug
     default: {
-      #ifdef _DEBUG
+#ifdef _DEBUG
       ::MessageBox(0, GetData().c_str(), 0, 0);
-      #endif
+#endif
     }
   }
 

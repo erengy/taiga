@@ -20,6 +20,7 @@
 #define MONITOR_H
 
 #include "std.h"
+
 #include "win32/win_thread.h"
 
 #define WM_MONITORCALLBACK (WM_APP + 0x32)
@@ -47,9 +48,9 @@ public:
   
   class FolderChangeInfo {
   public:
-    FolderChangeInfo() : anime_index(0) {}
+    FolderChangeInfo() : anime_id(0) {}
     DWORD action;
-    int anime_index;
+    int anime_id;
     wstring file_name;
   };
   vector<FolderChangeInfo> change_list;

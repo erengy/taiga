@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+
 #include "gfx.h"
 
 win32::GdiPlus GdiPlus;

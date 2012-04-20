@@ -26,6 +26,7 @@
 #endif
 #endif
 
+#include <assert.h>
 #include <windows.h>
 #include <commctrl.h>
 #include <gdiplus.h>

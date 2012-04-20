@@ -17,15 +17,19 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "anime_db.h"
 #include "common.h"
 #include "string.h"
+#include "time.h"
+
 #include "win32/win_control.h"
 
 // =============================================================================
 
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) {
   if (!lParamSort) return 0;
+  
   win32::ListView* m_List = reinterpret_cast<win32::ListView*>(lParamSort);
   int return_value = 0;
 
@@ -47,11 +51,11 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
     // Popularity
     case LIST_SORTTYPE_POPULARITY: {
-      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
-      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
+      auto pItem1 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam1));
+      auto pItem2 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        int iItem1 = pItem1->popularity.empty() ? 0 : _wtoi(pItem1->popularity.substr(1).c_str());
-        int iItem2 = pItem2->popularity.empty() ? 0 : _wtoi(pItem2->popularity.substr(1).c_str());
+        int iItem1 = pItem1->GetPopularity().empty() ? 0 : _wtoi(pItem1->GetPopularity().substr(1).c_str());
+        int iItem2 = pItem2->GetPopularity().empty() ? 0 : _wtoi(pItem2->GetPopularity().substr(1).c_str());
         if (iItem2 == 0) {
           return_value = -1;
         } else if (iItem1 == 0) {
@@ -67,13 +71,13 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
     // Progress
     case LIST_SORTTYPE_PROGRESS: {
-      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
-      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
+      auto pItem1 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam1));
+      auto pItem2 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        int total1 = pItem1->GetTotalEpisodes();
-        int total2 = pItem2->GetTotalEpisodes();
-        float ratio1 = total1 ? (float)pItem1->GetLastWatchedEpisode() / (float)total1 : 0.8f;
-        float ratio2 = total2 ? (float)pItem2->GetLastWatchedEpisode() / (float)total2 : 0.8f;
+        int total1 = pItem1->GetEpisodeCount();
+        int total2 = pItem2->GetEpisodeCount();
+        float ratio1 = total1 ? (float)pItem1->GetMyLastWatchedEpisode() / (float)total1 : 0.8f;
+        float ratio2 = total2 ? (float)pItem2->GetMyLastWatchedEpisode() / (float)total2 : 0.8f;
         if (ratio1 > ratio2) {
           return_value = -1;
         } else if (ratio1 < ratio2) {
@@ -85,12 +89,12 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
     // Episodes
     case LIST_SORTTYPE_EPISODES: {
-      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
-      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
+      auto pItem1 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam1));
+      auto pItem2 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        if (pItem1->series_episodes > pItem2->series_episodes) {
+        if (pItem1->GetEpisodeCount() > pItem2->GetEpisodeCount()) {
           return_value = 1;
-        } else if (pItem1->series_episodes < pItem2->series_episodes) {
+        } else if (pItem1->GetEpisodeCount() < pItem2->GetEpisodeCount()) {
           return_value = -1;
         }
       }
@@ -99,40 +103,35 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
     // Score
     case LIST_SORTTYPE_SCORE: {
-      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
-      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
+      auto pItem1 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam1));
+      auto pItem2 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        return_value = lstrcmpi(pItem1->score.c_str(), pItem2->score.c_str());
+        return_value = lstrcmpi(pItem1->GetScore().c_str(), pItem2->GetScore().c_str());
       }
       break;
     }
     
     // Start date
     case LIST_SORTTYPE_STARTDATE: {
-      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
-      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
+      auto pItem1 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam1));
+      auto pItem2 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        static wstring date1, date2;
-        date1 = pItem1->series_start;
-        date2 = pItem2->series_start;
-        if (date1.length() < 10) date1 = L"0000-00-00";
-        if (date2.length() < 10) date2 = L"0000-00-00";
-        if (date1[5] == '0' && date1[6] == '0') date1[5] = '?';
-        if (date2[5] == '0' && date2[6] == '0') date2[5] = '?';
-        if (date1[8] == '0' && date1[9] == '0') date1[8] = '?';
-        if (date2[8] == '0' && date2[9] == '0') date2[8] = '?';
-        return_value = wcsncmp(date2.c_str(), date1.c_str(), 10);
+        const Date& date1 = pItem1->GetDate(anime::DATE_START);
+        const Date& date2 = pItem2->GetDate(anime::DATE_START);
+        if (date1 != date2) {
+          return_value = date1 > date2 ? 1 : -1;
+        }
       }
       break;
     }
 
     // Last updated
     case LIST_SORTTYPE_LASTUPDATED: {
-      Anime* pItem1 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam1));
-      Anime* pItem2 = reinterpret_cast<Anime*>(m_List->GetItemParam(lParam2));
+      auto pItem1 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam1));
+      auto pItem2 = reinterpret_cast<anime::Item*>(m_List->GetItemParam(lParam2));
       if (pItem1 && pItem2) {
-        time_t time1 = _wtoi64(pItem1->my_last_updated.c_str());
-        time_t time2 = _wtoi64(pItem2->my_last_updated.c_str());
+        time_t time1 = _wtoi64(pItem1->GetMyLastUpdated().c_str());
+        time_t time2 = _wtoi64(pItem2->GetMyLastUpdated().c_str());
         if (time1 > time2) {
           return_value = 1;
         } else if (time1 < time2) {

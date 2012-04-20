@@ -20,6 +20,7 @@
 #define HTTP_H
 
 #include "std.h"
+
 #include "win32/win_http.h"
 
 enum HttpClientMode {
@@ -41,6 +42,7 @@ enum HttpClientMode {
   HTTP_MAL_Profile,
   HTTP_MAL_SearchAnime,
   HTTP_MAL_Image,
+  HTTP_MAL_UserImage,
   // Feed
   HTTP_Feed_Check,
   HTTP_Feed_Download,

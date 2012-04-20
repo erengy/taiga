@@ -120,7 +120,7 @@ OAuthParameters COAuth::BuildSignedParameters(
   // Prepare the signature base
   wstring normal_url = NormalizeURL(url);
   wstring sorted_parameters = SortParameters(all_parameters);
-  wstring signature_base = http_method + L"&" + EncodeURL(normal_url) + L"&" + EncodeURL(sorted_parameters);
+  wstring signature_base = http_method + L"&" + EncodeUrl(normal_url) + L"&" + EncodeUrl(sorted_parameters);
 
   // Obtain a signature and add it to header parameters
   wstring signature = CreateSignature(signature_base, oauth_token_secret);
@@ -142,7 +142,7 @@ wstring COAuth::CreateNonce() {
 
 wstring COAuth::CreateSignature(const wstring& signature_base, const wstring& oauth_token_secret) {
   // Create a SHA-1 hash of signature
-  wstring key = EncodeURL(ConsumerSecret) + L"&" + EncodeURL(oauth_token_secret);
+  wstring key = EncodeUrl(ConsumerSecret) + L"&" + EncodeUrl(oauth_token_secret);
   string hash = Crypt_HMACSHA1(ToANSI(key), ToANSI(signature_base));
 
   // Encode signature in Base64
@@ -151,7 +151,7 @@ wstring COAuth::CreateSignature(const wstring& signature_base, const wstring& oa
   wstring signature = ToUTF8(coder.EncodedMessage());
 
   // Return URL-encoded signature
-  return EncodeURL(signature);
+  return EncodeUrl(signature);
 }
 
 wstring COAuth::CreateTimestamp() {

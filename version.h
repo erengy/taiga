@@ -16,37 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ANIME_INFO_PAGE_H
-#define DLG_ANIME_INFO_PAGE_H
+#ifndef VERSION_H
+#define VERSION_H
 
-#include "../std.h"
-#include "../win32/win_dialog.h"
+#define VERSION_MAJOR    1
+#define VERSION_MINOR    0
+#define VERSION_REVISION 0
+#define VERSION_BUILD    0
 
-// =============================================================================
+#define VERSION_VALUE_DIGITAL 1, 0, 0, 0
+#define VERSION_VALUE_STRING "1.0.0\0"
 
-enum AnimeInfoPageType {
-  INFOPAGE_SERIESINFO,
-  INFOPAGE_MYINFO,
-  INFOPAGE_COUNT
-};
-
-class AnimeInfoPage : public win32::Dialog {
- public:
-  AnimeInfoPage();
-  virtual ~AnimeInfoPage();
-
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-
-  void Refresh(int anime_id);
-  void RefreshFansubPreference();
-
-  int index;
-
- private:
-  int anime_id_;
-  HFONT header_font_;
-};
-
-#endif // DLG_ANIME_INFO_PAGE_H
+#endif // VERSION_H

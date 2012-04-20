@@ -17,39 +17,41 @@
 */
 
 #include "std.h"
-#include "animedb.h"
-#include "animelist.h"
+
+#include "myanimelist.h"
+
+#include "anime.h"
+#include "anime_db.h"
 #include "common.h"
 #include "event.h"
 #include "http.h"
-#include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
+#include "time.h"
 #include "xml.h"
 
 namespace mal {
 
 // =============================================================================
 
-AnimeValues::AnimeValues() :
-  episode(-1),
-  status(-1),
-  score(-1),
-  downloaded_episodes(-1),
-  storage_type(-1),
-  storage_value(-1.0f),
-  times_rewatched(-1),
-  rewatch_value(-1),
-  date_start(EMPTY_STR),
-  date_finish(EMPTY_STR),
-  priority(-1),
-  enable_discussion(-1),
-  enable_rewatching(-1),
-  comments(EMPTY_STR),
-  fansub_group(EMPTY_STR),
-  tags(EMPTY_STR)
-{
+AnimeValues::AnimeValues()
+    : episode(-1),
+      status(-1),
+      score(-1),
+      downloaded_episodes(-1),
+      storage_type(-1),
+      storage_value(-1.0f),
+      times_rewatched(-1),
+      rewatch_value(-1),
+      date_start(EMPTY_STR),
+      date_finish(EMPTY_STR),
+      priority(-1),
+      enable_discussion(-1),
+      enable_rewatching(-1),
+      comments(EMPTY_STR),
+      fansub_group(EMPTY_STR),
+      tags(EMPTY_STR) {
 }
 
 // =============================================================================
@@ -60,12 +62,14 @@ wstring GetUserPassEncoded() {
 
 // =============================================================================
 
-bool AskToDiscuss(Anime* anime, int episode_number) {
+bool AskToDiscuss(int anime_id, int episode_number) {
   return MainClient.Post(L"myanimelist.net",
     L"/includes/ajax.inc.php?t=50",
-    L"epNum=" + ToWSTR(episode_number) + L"&aid=" + ToWSTR(anime->series_id) + L"&id=" + ToWSTR(anime->series_id),
-    L"", HTTP_MAL_AnimeAskToDiscuss,
-    reinterpret_cast<LPARAM>(anime));
+    L"epNum=" + ToWstr(episode_number) + 
+    L"&aid=" + ToWstr(anime_id) + 
+    L"&id=" + ToWstr(anime_id), L"", 
+    HTTP_MAL_AnimeAskToDiscuss, 
+    anime_id);
 }
 
 void CheckProfile() {
@@ -75,14 +79,13 @@ void CheckProfile() {
     HTTP_MAL_Profile);
 }
 
-bool GetAnimeDetails(Anime* anime, class HttpClient* client) {
-  if (!anime) return false;
+bool GetAnimeDetails(int anime_id, class HttpClient* client) {
   if (!client) client = &SearchClient;
   return client->Connect(L"myanimelist.net", 
-    L"/includes/ajax.inc.php?t=64&id=" + ToWSTR(anime->series_id), 
-    L"", L"GET", L"", L"myanimelist.net", 
-    L"", HTTP_MAL_AnimeDetails, 
-    reinterpret_cast<LPARAM>(anime));
+    L"/includes/ajax.inc.php?t=64&id=" + ToWstr(anime_id), 
+    L"", L"GET", L"", L"myanimelist.net", L"", 
+    HTTP_MAL_AnimeDetails, 
+    anime_id);
 }
 
 bool GetList(bool login) {
@@ -103,48 +106,62 @@ bool Login() {
         L"", 
         L"GET", 
         MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-        L"myanimelist.net", 
-        L"", HTTP_MAL_Login);
+        L"myanimelist.net", L"", 
+        HTTP_MAL_Login);
     }
     case MAL_API_NONE: {
       return MainClient.Post(L"myanimelist.net", L"/login.php",
         L"username=" + Settings.Account.MAL.user + 
         L"&password=" + Settings.Account.MAL.password + 
-        L"&cookie=1&sublogin=Login", 
-        L"", HTTP_MAL_Login);
+        L"&cookie=1&sublogin=Login", L"", 
+        HTTP_MAL_Login);
     }
   }
   return false;
 }
 
-bool DownloadImage(Anime* anime, class HttpClient* client) {
-  if (anime->series_image.empty()) return false;
-  win32::Url url(anime->series_image);
+bool DownloadImage(int anime_id, const wstring& image_url, class HttpClient* client) {
+  if (image_url.empty()) return false;
   if (!client) client = &ImageClient;
-  return client->Get(url, anime->GetImagePath(), HTTP_MAL_Image, reinterpret_cast<LPARAM>(anime));
+  return client->Get(win32::Url(image_url), 
+    anime::GetImagePath(anime_id), 
+    HTTP_MAL_Image, 
+    anime_id);
 }
 
-bool ParseAnimeDetails(const wstring& data, Anime* anime) {
+bool DownloadUserImage(bool thumb) {
+  if (!AnimeDatabase.user.GetId()) return false;
+  win32::Url url;
+  wstring path = Taiga.GetDataPath() + L"user\\image\\";
+  if (thumb) {
+    url.Crack(L"http://myanimelist.net/images/userimages/thumbs/" + ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg");
+    path += ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg";
+  } else {
+    url.Crack(L"http://cdn.myanimelist.net/images/userimages/" + ToWstr(AnimeDatabase.user.GetId()) + L".jpg");
+    path += ToWstr(AnimeDatabase.user.GetId()) + L".jpg";
+  }
+  return ImageClient.Get(url, path, HTTP_MAL_UserImage);
+}
+
+bool ParseAnimeDetails(const wstring& data) {
   if (data.empty()) return false;
 
-  int series_id = ToINT(InStr(data, L"myanimelist.net/anime/", L"/"));
-  if (!series_id) return false;
+  int anime_id = ToInt(InStr(data, L"myanimelist.net/anime/", L"/"));
+  if (!anime_id) return false;
 
-  if (!anime) anime = AnimeList.FindItem(series_id);
-  if (!anime) return false;
-
-  anime->genres = InStr(data, L"Genres:</span> ", L"<br />");
-  anime->rank = InStr(data, L"Ranked:</span> ", L"<br />");
-  anime->popularity = InStr(data, L"Popularity:</span> ", L"<br />");
-  anime->score = InStr(data, L"Score:</span> ", L"<br />");
-  StripHTML(anime->score);
-
-  AnimeDatabase.Update(*anime);
+  anime::Item anime_item;
+  anime_item.SetId(anime_id);
+  anime_item.SetGenres(InStr(data, L"Genres:</span> ", L"<br />"));
+  anime_item.SetRank(InStr(data, L"Ranked:</span> ", L"<br />"));
+  anime_item.SetPopularity(InStr(data, L"Popularity:</span> ", L"<br />"));
+  anime_item.SetScore(StripHtml(InStr(data, L"Score:</span> ", L"<br />")));
+  anime_item.last_modified = time(nullptr);
+  AnimeDatabase.UpdateItem(anime_item);
 
   return true;
 }
 
-bool ParseSearchResult(const wstring& data, Anime* anime) {
+bool ParseSearchResult(const wstring& data, int anime_id) {
   if (data.empty()) return false;
   bool found_item = false;
   
@@ -154,31 +171,22 @@ bool ParseSearchResult(const wstring& data, Anime* anime) {
   if (result.status == status_ok) {
     xml_node node = doc.child(L"anime");
     for (xml_node entry = node.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
-      int series_id = XML_ReadIntValue(entry, L"id");
-      Anime* anime_item = AnimeList.FindItem(series_id);
-      if (anime && anime->series_id == series_id) {
-        anime_item = anime;
-      }
-      if (anime_item) {
-        if (!anime_item->settings_keep_title) {
-          anime_item->series_title = XML_ReadStrValue(entry, L"title");
-          mal::DecodeText(anime_item->series_title);
-        }
-        anime_item->series_synonyms = XML_ReadStrValue(entry, L"synonyms");
-        mal::DecodeText(anime_item->series_synonyms);
-        anime_item->series_episodes = XML_ReadIntValue(entry, L"episodes");
-        anime_item->score = XML_ReadStrValue(entry, L"score");
-        anime_item->series_type = mal::TranslateType(XML_ReadStrValue(entry, L"type"));
-        anime_item->series_status = mal::TranslateStatus(XML_ReadStrValue(entry, L"status"));
-        anime_item->series_start = XML_ReadStrValue(entry, L"start_date");
-        anime_item->series_end = XML_ReadStrValue(entry, L"end_date");
-        anime_item->synopsis = XML_ReadStrValue(entry, L"synopsis");
-        mal::DecodeText(anime_item->synopsis);
-        anime_item->series_image = XML_ReadStrValue(entry, L"image");
-        if (!anime || anime->series_id == anime_item->series_id) {
-          found_item = true;
-        }
-        AnimeDatabase.Update(*anime_item);
+      anime::Item anime_item;
+      anime_item.SetId(XML_ReadIntValue(entry, L"id"));
+      anime_item.SetTitle(mal::DecodeText(XML_ReadStrValue(entry, L"title")));
+      anime_item.SetSynonyms(mal::DecodeText(XML_ReadStrValue(entry, L"synonyms")));
+      anime_item.SetEpisodeCount(XML_ReadIntValue(entry, L"episodes"));
+      anime_item.SetScore(XML_ReadStrValue(entry, L"score"));
+      anime_item.SetType(mal::TranslateType(XML_ReadStrValue(entry, L"type")));
+      anime_item.SetAiringStatus(mal::TranslateStatus(XML_ReadStrValue(entry, L"status")));
+      anime_item.SetDate(anime::DATE_START, XML_ReadStrValue(entry, L"start_date"));
+      anime_item.SetDate(anime::DATE_END, XML_ReadStrValue(entry, L"end_date"));
+      anime_item.SetSynopsis(mal::DecodeText(XML_ReadStrValue(entry, L"synopsis")));
+      anime_item.SetImageUrl(XML_ReadStrValue(entry, L"image"));
+      anime_item.last_modified = time(nullptr);
+      AnimeDatabase.UpdateItem(anime_item);
+      if (!anime_id || anime_id == anime_item.GetId()) {
+        found_item = true;
       }
     }
   }
@@ -186,9 +194,12 @@ bool ParseSearchResult(const wstring& data, Anime* anime) {
   return found_item;
 }
 
-bool SearchAnime(wstring title, Anime* anime, class HttpClient* client) {
-  if (title.empty()) return false;
+bool SearchAnime(int anime_id, wstring title, class HttpClient* client) {
   if (!client) client = &SearchClient;
+  if (title.empty()) {
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    title = anime_item->GetTitle();
+  }
 
   Replace(title, L"+", L"%2B", true);
   ReplaceChar(title, L'\u2729', L'\u2606'); // stress outlined white star to white star
@@ -205,10 +216,10 @@ bool SearchAnime(wstring title, Anime* anime, class HttpClient* client) {
         client->GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
         L"myanimelist.net", 
         L"", HTTP_MAL_SearchAnime, 
-        reinterpret_cast<LPARAM>(anime));
+        static_cast<LPARAM>(anime_id));
     }
     case MAL_API_NONE: {
-      if (!anime) {
+      if (anime_id <= anime::ID_UNKNOWN) {
         ViewAnimeSearch(title); // TEMP
       }
       return true;
@@ -220,14 +231,14 @@ bool SearchAnime(wstring title, Anime* anime, class HttpClient* client) {
 
 bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
   #define ADD_DATA_F(name, value) \
-    if (value > -1.0f) { data += L"\r\n\t<" ##name L">" + ToWSTR(value) + L"</" ##name L">"; }
+    if (value > -1.0f) { data += L"\r\n\t<" ##name L">" + ToWstr(value) + L"</" ##name L">"; }
   #define ADD_DATA_I(name, value) \
-    if (value > -1) { data += L"\r\n\t<" ##name L">" + ToWSTR(value) + L"</" ##name L">"; }
+    if (value > -1) { data += L"\r\n\t<" ##name L">" + ToWstr(value) + L"</" ##name L">"; }
   #define ADD_DATA_S(name, value) \
     if (value != EMPTY_STR) { data += L"\r\n\t<" ##name L">" + value + L"</" ##name L">"; }
-
-  Anime* anime = AnimeList.FindItem(anime_id);
-  if (!anime) return false;
+  
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  if (!anime_item) return false;
 
   switch (Settings.Account.MAL.api) {
     // Use official MAL API
@@ -244,15 +255,17 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
       ADD_DATA_I(L"rewatch_value", anime_values.rewatch_value);
       switch (update_mode) { // TODO: Move to EventList::Check() or somewhere else
         case HTTP_MAL_AnimeEdit: {
-          if (mal::IsValidDate(anime->my_start_date)) {
-            anime_values.date_start = anime->my_start_date.substr(5, 2) + 
-                                      anime->my_start_date.substr(8, 2) + 
-                                      anime->my_start_date.substr(0, 4);
+          const Date& date_start = anime_item->GetDate(anime::DATE_START);
+          const Date& date_end = anime_item->GetDate(anime::DATE_END);
+          if (mal::IsValidDate(date_start)) {
+            anime_values.date_start = PadChar(ToWstr(date_start.month), '0', 2) + 
+                                      PadChar(ToWstr(date_start.day),   '0', 2) + 
+                                      PadChar(ToWstr(date_start.year),  '0', 4);
           }
-          if (mal::IsValidDate(anime->my_finish_date)) {
-            anime_values.date_finish = anime->my_finish_date.substr(5, 2) + 
-                                       anime->my_finish_date.substr(8, 2) + 
-                                       anime->my_finish_date.substr(0, 4);
+          if (mal::IsValidDate(date_end)) {
+            anime_values.date_finish = PadChar(ToWstr(date_end.month), '0', 2) + 
+                                       PadChar(ToWstr(date_end.day),   '0', 2) + 
+                                       PadChar(ToWstr(date_end.year),  '0', 4);
           }
           break;
         }
@@ -271,24 +284,24 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
       switch (update_mode) {
         // Add anime
         case HTTP_MAL_AnimeAdd: {
-          url = L"myanimelist.net/api/animelist/add/" + ToWSTR(anime->series_id) + L".xml";
+          url = L"myanimelist.net/api/animelist/add/" + ToWstr(anime_id) + L".xml";
           break;
         }
         // Delete anime
         case HTTP_MAL_AnimeDelete: {
-          url = L"myanimelist.net/api/animelist/delete/" + ToWSTR(anime->series_id) + L".xml";
+          url = L"myanimelist.net/api/animelist/delete/" + ToWstr(anime_id) + L".xml";
           break;
         }
         // Update anime
         default: {
-          url = L"myanimelist.net/api/animelist/update/" + ToWSTR(anime->series_id) + L".xml";
+          url = L"myanimelist.net/api/animelist/update/" + ToWstr(anime_id) + L".xml";
           break;
         }
       }
 
       MainClient.Connect(url, data, L"POST", 
         MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-        L"myanimelist.net", L"", update_mode, reinterpret_cast<LPARAM>(anime));
+        L"myanimelist.net", L"", update_mode, static_cast<LPARAM>(anime_id));
       break;
     }
   
@@ -299,107 +312,105 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
         case HTTP_MAL_AnimeUpdate:
           MainClient.Post(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=79", 
-            L"anime_id=" + ToWSTR(anime->series_id) + 
-            L"&ep_val="  + ToWSTR(anime_values.episode), 
-            L"", update_mode, reinterpret_cast<LPARAM>(anime));
+            L"anime_id=" + ToWstr(anime_id) + 
+            L"&ep_val="  + ToWstr(anime_values.episode), 
+            L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Update score
         case HTTP_MAL_ScoreUpdate:
           MainClient.Post(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=63", 
-            L"id="     + ToWSTR(anime->series_id) + 
-            L"&score=" + ToWSTR(anime_values.score), 
-            L"", update_mode, reinterpret_cast<LPARAM>(anime));
+            L"id="     + ToWstr(anime_id) + 
+            L"&score=" + ToWstr(anime_values.score), 
+            L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Update tags
         case HTTP_MAL_TagUpdate:
           MainClient.Get(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=22" \
-            L"&aid="  + ToWSTR(anime->series_id) + 
-            L"&tags=" + EncodeURL(anime_values.tags), 
-            L"", update_mode, reinterpret_cast<LPARAM>(anime));
+            L"&aid="  + ToWstr(anime_id) + 
+            L"&tags=" + EncodeUrl(anime_values.tags), 
+            L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Add anime
         case HTTP_MAL_AnimeAdd:
           MainClient.Post(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=61", 
-            L"aid="      + ToWSTR(anime->series_id) + 
+            L"aid="      + ToWstr(anime_id) + 
             L"&score=0"
-            L"&status="  + ToWSTR(anime_values.status) + 
-            L"&epsseen=" + ToWSTR(anime_values.episode), 
-            L"", update_mode, reinterpret_cast<LPARAM>(anime));
+            L"&status="  + ToWstr(anime_values.status) + 
+            L"&epsseen=" + ToWstr(anime_values.episode), 
+            L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Delete anime
         case HTTP_MAL_AnimeDelete: 
           MainClient.Post(L"myanimelist.net", 
-            L"/editlist.php?type=anime&id=" + ToWSTR(anime->series_id), 
-            L"series_id=" + ToWSTR(anime->series_id) +
-            L"&anime_db_series_id=" + ToWSTR(anime->series_id) + 
-            L"&series_title=" + ToWSTR(anime->series_id) + 
+            L"/editlist.php?type=anime&id=" + ToWstr(anime_id), 
+            L"series_id=" + ToWstr(anime_id) +
+            L"&anime_db_series_id=" + ToWstr(anime_id) + 
+            L"&series_title=" + ToWstr(anime_id) + 
             L"&submitIt=3" + 
             L"&hideLayout",
-            L"", update_mode, reinterpret_cast<LPARAM>(anime));
+            L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Update status
         case HTTP_MAL_StatusUpdate:
           MainClient.Post(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=62", 
-            L"aid="      + ToWSTR(anime->series_id) + 
-            L"&alistid=" + ToWSTR(anime->series_id) + 
-            L"&score="   + ToWSTR(anime->my_score) + 
-            L"&status="  + ToWSTR(anime_values.status) + 
-            L"&epsseen=" + ToWSTR(anime_values.episode > -1 ? anime_values.episode : anime->my_watched_episodes), 
-            L"", update_mode, reinterpret_cast<LPARAM>(anime));
+            L"aid="      + ToWstr(anime_id) + 
+            L"&alistid=" + ToWstr(anime_id) + 
+            L"&score="   + ToWstr(anime_item->GetMyScore(false)) + 
+            L"&status="  + ToWstr(anime_values.status) + 
+            L"&epsseen=" + ToWstr(anime_values.episode > -1 ? anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)), 
+            L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Edit anime
         case HTTP_MAL_AnimeEdit: {
           wstring buffer = 
-            L"series_id="           + ToWSTR(anime->series_id) + 
-            L"&anime_db_series_id=" + ToWSTR(anime->series_id) + 
-            L"&series_title="       + ToWSTR(anime->series_id) + 
-            L"&aeps="               + ToWSTR(anime->series_episodes) + 
-            L"&astatus="            + ToWSTR(anime->series_status) + 
+            L"series_id="           + ToWstr(anime_id) + 
+            L"&anime_db_series_id=" + ToWstr(anime_id) + 
+            L"&series_title="       + ToWstr(anime_id) + 
+            L"&aeps="               + ToWstr(anime_item->GetEpisodeCount(false)) + 
+            L"&astatus="            + ToWstr(anime_item->GetAiringStatus()) + 
             L"&close_on_update=true"
-            L"&status="             + ToWSTR(anime_values.status);
+            L"&status="             + ToWstr(anime_values.status);
           if (anime_values.enable_rewatching > -1) {
             buffer += 
-            L"&rewatching="         + ToWSTR(anime_values.enable_rewatching);
+            L"&rewatching="         + ToWstr(anime_values.enable_rewatching);
           }
           buffer += 
-            L"&last_status="        + ToWSTR(anime->my_status) + 
-            L"&completed_eps="      + ToWSTR(anime_values.episode > -1 ? anime_values.episode : anime->my_watched_episodes) + 
-            L"&last_completed_eps=" + ToWSTR(anime->my_watched_episodes) + 
-            L"&score="              + ToWSTR(anime_values.score > -1 ? anime_values.score : anime->my_score);
+            L"&last_status="        + ToWstr(anime_item->GetMyStatus(false)) + 
+            L"&completed_eps="      + ToWstr(anime_values.episode > -1 ? anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)) + 
+            L"&last_completed_eps=" + ToWstr(anime_item->GetMyLastWatchedEpisode(false)) + 
+            L"&score="              + ToWstr(anime_values.score > -1 ? anime_values.score : anime_item->GetMyScore(false));
           if (anime_values.tags != EMPTY_STR) {
             buffer += 
-            L"&tags=" + EncodeURL(anime_values.tags);
+            L"&tags=" + EncodeUrl(anime_values.tags);
           }
-          if (mal::IsValidDate(anime->my_start_date)) {
-            unsigned short year, month, day;
-            mal::ParseDateString(anime->my_start_date, year, month, day);
+          const Date& date_start = anime_item->GetMyDate(anime::DATE_START);
+          if (mal::IsValidDate(date_start)) {
             buffer += 
-            L"&startMonth=" + ToWSTR(month) + 
-            L"&startDay="   + ToWSTR(day) + 
-            L"&startYear="  + ToWSTR(year);
+            L"&startMonth=" + ToWstr(date_start.month) + 
+            L"&startDay="   + ToWstr(date_start.day) + 
+            L"&startYear="  + ToWstr(date_start.year);
           } else {
             buffer += 
             L"&unknownStart=1";
           }
-          if (mal::IsValidDate(anime->my_finish_date)) {
-            unsigned short year, month, day;
-            mal::ParseDateString(anime->my_finish_date, year, month, day);
+          const Date& date_end = anime_item->GetMyDate(anime::DATE_END);
+          if (mal::IsValidDate(date_end)) {
             buffer += 
-            L"&endMonth=" + ToWSTR(month) + 
-            L"&endDay="   + ToWSTR(day) + 
-            L"&endYear="  + ToWSTR(year);
+            L"&endMonth=" + ToWstr(date_end.month) + 
+            L"&endDay="   + ToWstr(date_end.day) + 
+            L"&endYear="  + ToWstr(date_end.year);
           } else {
             buffer += 
             L"&unknownEnd=1";
           }
           buffer += L"&submitIt=2";
           MainClient.Post(L"myanimelist.net", 
-            L"/editlist.php?type=anime&id=" + ToWSTR(anime->series_id) + L"&hideLayout=true", 
-            buffer, L"", update_mode, reinterpret_cast<LPARAM>(anime));
+            L"/editlist.php?type=anime&id=" + ToWstr(anime_id) + L"&hideLayout=true", 
+            buffer, L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         }
       }
@@ -445,7 +456,7 @@ bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
           success = (InStr(data, L"Success", 0) > -1) || (InStr(data, L"This is not your entry", 0) > -1);
           break;
         case HTTP_MAL_AnimeUpdate:
-          success = ToINT(data) == item.episode;
+          success = ToInt(data) == item.episode;
           break;
         case HTTP_MAL_ScoreUpdate:
           success = InStr(data, L"Updated score", 0) > -1;
@@ -480,13 +491,13 @@ bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
       }
   }
   Replace(item.reason, L"</div><div>", L"\r\n");
-  StripHTML(item.reason);
+  item.reason = StripHtml(item.reason);
   return false;
 }
 
 // =============================================================================
 
-void DecodeText(wstring& text) {
+wstring DecodeText(wstring text) {
   // TODO: Remove when MAL fixes its encoding >_<
   #define HTMLCHARCOUNT 36
   static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
@@ -547,8 +558,13 @@ void DecodeText(wstring& text) {
   
   Replace(text, L"<br />", L"\r", true);
   Replace(text, L"\n\n", L"\r\n\r\n", true);
-  StripHTML(text);
-  DecodeHTML(text);
+  text = DecodeHtml(StripHtml(text));
+
+  return text;
+}
+
+bool IsValidDate(const Date& date) {
+  return date.year > 0;
 }
 
 bool IsValidDate(const wstring& date) {
@@ -556,80 +572,76 @@ bool IsValidDate(const wstring& date) {
 }
 
 bool IsValidEpisode(int episode, int watched, int total) {
-  if (episode < 0) {
-    return false;
-  } else if (episode < watched) {
-    return false;
-  } else if (episode == watched && total != 1) {
-    return false;
-  } else if (episode > total && total != 0) {
-    return false;
-  } else {
-    return true;
+  if ((episode < 0) ||
+      (episode < watched) ||
+      (episode == watched && total != 1) ||
+      (episode > total && total != 0)) {
+        return false;
   }
+  return true;
 }
 
-void ParseDateString(const wstring& date, unsigned short& year, unsigned short& month, unsigned short& day) {
-  if (date.length() == 10) {
-    year  = ToINT(date.substr(0, 4));
-    month = ToINT(date.substr(5, 2));
-    day   = ToINT(date.substr(8, 2));
-  }
-}
+Date ParseDateString(const wstring& str) {
+  Date date;
 
-// =============================================================================
-
-wstring TranslateDate(wstring value) {
-  if (!mal::IsValidDate(value)) return L"?";
-
-  wstring date;
-  unsigned short day, month, year;
-  mal::ParseDateString(value, year, month, day);
-  
-  if (month > 0 && month <= 12) {
-    const wchar_t* months[] = {
-      L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
-      L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"};
-    date += months[month - 1];
-    date += L" ";
+  if (IsValidDate(str)) {
+    date.year  = ToInt(str.substr(0, 4));
+    date.month = ToInt(str.substr(5, 2));
+    date.day   = ToInt(str.substr(8, 2));
   }
-  if (day) {
-    date += ToWSTR(day) + L", ";
-  }
-  date += ToWSTR(year);
 
   return date;
 }
 
-wstring TranslateDateToSeason(wstring value) {
-  if (!mal::IsValidDate(value)) {
+// =============================================================================
+
+wstring TranslateDate(const Date& date) {
+  if (!mal::IsValidDate(date)) return L"?";
+
+  wstring result;
+  
+  if (date.month > 0 && date.month <= 12) {
+    const wchar_t* months[] = {
+      L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
+      L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
+    };
+    result += months[date.month - 1];
+    result += L" ";
+  }
+  if (date.day > 0) result += ToWstr(date.day) + L", ";
+  result += ToWstr(date.year);
+
+  return result;
+}
+
+wstring TranslateDateToSeason(const Date& date) {
+  if (!mal::IsValidDate(date)) {
     return L"Unknown";
   } else {
-    unsigned short year, month, day;
-    ParseDateString(value, year, month, day);
+    wstring season;
+    unsigned short year = date.year;
 
-    if (month == 0) {
-      value = L"Unknown";
-    } else if (month < 3) {  // Jan-Feb
-      value = L"Winter";
+    if (date.month == 0) {
+      season = L"Unknown";
+    } else if (date.month < 3) {  // Jan-Feb
+      season = L"Winter";
       year--;
-    } else if (month < 6) {  // Mar-May
-      value = L"Spring";
-    } else if (month < 9) {  // Jun-Aug
-      value = L"Summer";
-    } else if (month < 12) { // Sep-Nov
-      value = L"Fall";
-    } else {                 // Dec
-      value = L"Winter";
+    } else if (date.month < 6) {  // Mar-May
+      season = L"Spring";
+    } else if (date.month < 9) {  // Jun-Aug
+      season = L"Summer";
+    } else if (date.month < 12) { // Sep-Nov
+      season = L"Fall";
+    } else {                      // Dec
+      season = L"Winter";
     }
     
-    value = value + L" " + ToWSTR(year);
-    return value;
+    return season + L" " + ToWstr(year);
   }
 }
 
 wstring TranslateMyStatus(int value, bool add_count) {
-  #define ADD_COUNT() (add_count ? L" (" + ToWSTR(AnimeList.user.GetItemCount(value)) + L")" : L"")
+  #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.user.GetItemCount(value)) + L")" : L"")
   switch (value) {
     case mal::MYSTATUS_NOTINLIST: return L"Not in list";
     case mal::MYSTATUS_WATCHING: return L"Currently watching" + ADD_COUNT();
@@ -657,8 +669,8 @@ int TranslateMyStatus(const wstring& value) {
   }
 }
 
-wstring TranslateNumber(int value, LPCWSTR default_char) {
-  return value == 0 ? default_char : ToWSTR(value);
+wstring TranslateNumber(int value, const wstring& default_char) {
+  return value == 0 ? default_char : ToWstr(value);
 }
 
 wstring TranslateRewatchValue(int value) {
@@ -677,7 +689,7 @@ wstring TranslateStatus(int value) {
     case mal::STATUS_AIRING: return L"Currently airing";
     case mal::STATUS_FINISHED: return L"Finished airing";
     case mal::STATUS_NOTYETAIRED: return L"Not yet aired";
-    default: return ToWSTR(value);
+    default: return ToWstr(value);
   }
 }
 int TranslateStatus(const wstring& value) {
@@ -736,11 +748,11 @@ int TranslateType(const wstring& value) {
 
 // =============================================================================
 
-void ViewAnimePage(int series_id) {
-  ExecuteLink(L"http://myanimelist.net/anime/" + ToWSTR(series_id) + L"/");
+void ViewAnimePage(int anime_id) {
+  ExecuteLink(L"http://myanimelist.net/anime/" + ToWstr(anime_id) + L"/");
 }
 
-void ViewAnimeSearch(wstring title) {
+void ViewAnimeSearch(const wstring& title) {
   ExecuteLink(L"http://myanimelist.net/anime.php?q=" + title + L"&referer=" + APP_NAME);
 }
 

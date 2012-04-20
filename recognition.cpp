@@ -17,11 +17,14 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "recognition.h"
+
+#include "anime_db.h"
+#include "anime_episode.h"
 #include "common.h"
 #include "media.h"
 #include "myanimelist.h"
-#include "recognition.h"
 #include "resource.h"
 #include "string.h"
 
@@ -51,47 +54,73 @@ RecognitionEngine::RecognitionEngine() {
 
 // =============================================================================
 
-bool RecognitionEngine::CompareEpisode(Episode& episode, const Anime& anime, 
+bool RecognitionEngine::CompareEpisode(anime::Episode& episode, 
+                                       const anime::Item& anime_item, 
                                        bool strict, bool check_episode, bool check_date) {
   // Leave if title is empty
   if (episode.title.empty()) return false;
   // Leave if episode number is out of range
-  if (check_episode && anime.series_episodes > 1) {
+  if (check_episode && anime_item.GetEpisodeCount() > 1) {
     int number = GetEpisodeHigh(episode.number);
-    if (number > anime.series_episodes) return false;
+    if (number > anime_item.GetEpisodeCount()) return false;
   }
   // Leave if not yet aired
-  if (check_date && !anime.IsAiredYet()) return false;
+  if (check_date && !anime_item.IsAiredYet()) return false;
 
   // Remove unnecessary characters
-  wstring title = episode.title;
-  CleanTitle(title);
-  if (title.empty()) return false;
+  wstring episode_title = episode.title;
+  CleanTitle(episode_title);
+  if (episode_title.empty()) return false;
+  
+  bool found = true;
+  
+  // Compare with main title
+  if (CompareTitle(anime_item.GetTitle(), episode_title, episode, anime_item, strict))
+    found = true;
+  
+  // Compare with synonyms
+  if (!found) {
+    for (auto it = anime_item.GetSynonyms().begin();
+         it != anime_item.GetSynonyms().end(); ++it) {
+      if (CompareTitle(*it, episode_title, episode, anime_item, strict)) {
+        found = true;
+        break;
+      }
+    }
+  }
+  if (!found) {
+    for (auto it = anime_item.GetUserSynonyms().begin();
+         it != anime_item.GetUserSynonyms().end(); ++it) {
+      if (CompareTitle(*it, episode_title, episode, anime_item, strict)) {
+        found = true;
+        break;
+      }
+    }
+  }
 
-  // Compare with main title then synonyms
-  wstring anime_title = anime.series_title;
-  if (CompareTitle(title, anime_title, episode, anime, strict) ||
-      CompareSynonyms(title, anime_title, anime.series_synonyms, episode, anime, strict) ||
-      CompareSynonyms(title, anime_title, anime.synonyms, episode, anime, strict)) {
-        // Assume episode 1 if matched one-episode series
-        if (episode.number.empty() && anime.series_episodes == 1) episode.number = L"1";
-        return true;
+  if (found) {
+    // Assume episode 1 if matched one-episode series
+    if (episode.number.empty() && anime_item.GetEpisodeCount() == 1)
+      episode.number = L"1";
+    return true;
   }
 
   // Failed
   return false;
 }
 
-bool RecognitionEngine::CompareTitle(const wstring& title, wstring& anime_title, 
-                                     Episode& episode, const Anime& anime, bool strict) {
+bool RecognitionEngine::CompareTitle(wstring anime_title, 
+                                     const wstring& episode_title, 
+                                     anime::Episode& episode, 
+                                     const anime::Item& anime_item, 
+                                     bool strict) {
   // Remove unnecessary characters
-  if (anime_title.empty()) return false;
   CleanTitle(anime_title);
   if (anime_title.empty()) return false;
   
   // Compare with title + number
-  if (strict && anime.series_episodes == 1 && !episode.number.empty()) {
-    if (IsEqual(title + episode.number, anime_title)) {
+  if (strict && anime_item.GetEpisodeCount() == 1 && !episode.number.empty()) {
+    if (IsEqual(episode_title + episode.number, anime_title)) {
       episode.title += episode.number;
       episode.number.clear();
       return true;
@@ -99,31 +128,18 @@ bool RecognitionEngine::CompareTitle(const wstring& title, wstring& anime_title,
   }
   // Compare with title
   if (strict) {
-    if (IsEqual(title, anime_title)) return true;
+    if (IsEqual(anime_title, episode_title)) return true;
   } else {
-    if (InStr(title, anime_title, 0, true) > -1) return true;
+    if (InStr(anime_title, episode_title, 0, true) > -1) return true;
   }
 
   // Failed
   return false;
 }
 
-bool RecognitionEngine::CompareSynonyms(const wstring& title, wstring& anime_title, const wstring& synonyms, 
-                                        Episode& episode, const Anime& anime, bool strict) {
-  size_t index_begin = 0, index_end;
-  do {
-    index_end = synonyms.find(L"; ", index_begin);
-    if (index_end == wstring::npos) index_end = synonyms.length();
-    anime_title = synonyms.substr(index_begin, index_end - index_begin);
-    if (CompareTitle(title, anime_title, episode, anime, strict)) return true;
-    index_begin = index_end + 2;
-  } while (index_begin <= synonyms.length());
-  return false;
-}
-
 // =============================================================================
 
-bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode, 
+bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode, 
                                      bool examine_inside, bool examine_outside, bool examine_number,
                                      bool check_extras, bool check_extension) {
   // Clear previous data
@@ -425,7 +441,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, Episode& episode,
 
 // =============================================================================
 
-void RecognitionEngine::ExamineToken(Token& token, Episode& episode, bool compare_extras) {
+void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode, bool compare_extras) {
   // Split into words
   // The most common non-alphanumeric character is the separator
   vector<wstring> words;
@@ -499,6 +515,7 @@ bool RecognitionEngine::CompareKeys(const wstring& str, const vector<wstring>& k
 }
 
 void RecognitionEngine::CleanTitle(wstring& title) {
+  if (title.empty()) return;
   EraseUnnecessary(title);
   TransliterateSpecial(title);
   ErasePunctuation(title, true);
@@ -535,7 +552,7 @@ void RecognitionEngine::TransliterateSpecial(wstring& str) {
   Replace(str, L" & ", L" and ", true, false);
 }
 
-bool RecognitionEngine::IsEpisodeFormat(const wstring& str, Episode& episode, const wchar_t separator) {
+bool RecognitionEngine::IsEpisodeFormat(const wstring& str, anime::Episode& episode, const wchar_t separator) {
   unsigned int numstart, i, j;
 
   // Find first number
@@ -586,7 +603,7 @@ bool RecognitionEngine::IsEpisodeFormat(const wstring& str, Episode& episode, co
         if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
         for (j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
         episode.number = str.substr(i + 1, j - i - 1);
-        if (ToINT(episode.number) < 100) {
+        if (ToInt(episode.number) < 100) {
           return true;
         } else {
           episode.number.clear();
@@ -659,8 +676,8 @@ size_t RecognitionEngine::TokenizeTitle(const wstring& str, const wstring& delim
   return tokens.size();
 }
 
-bool RecognitionEngine::ValidateEpisodeNumber(Episode& episode) {
-  int number = ToINT(episode.number);
+bool RecognitionEngine::ValidateEpisodeNumber(anime::Episode& episode) {
+  int number = ToInt(episode.number);
   if (number <= 0 || number > 1000) {
     if (number > 1950 && number < 2050) {
       AppendKeyword(episode.extras, L"Year: " + episode.number);

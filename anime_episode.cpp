@@ -16,54 +16,42 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ANIMEDB_H
-#define ANIMEDB_H
-
 #include "std.h"
-#include "win32/win_thread.h"
 
-class Anime;
+#include "anime.h"
+#include "anime_episode.h"
+
+#include "dlg/dlg_main.h"
+
+anime::Episode CurrentEpisode;
+
+namespace anime {
 
 // =============================================================================
 
-class AnimeDatabase {
-public:
-  AnimeDatabase();
-  virtual ~AnimeDatabase() {}
+Episode::Episode()
+    : anime_id(ID_UNKNOWN) {
+}
 
-  bool Load();
-  bool Save();
-  
-  Anime* FindItem(int anime_id);
-  void Update(Anime& anime);
+void Episode::Clear() {
+  anime_id = ID_UNKNOWN;
+  audio_type.clear();
+  checksum.clear();
+  extras.clear();
+  file.clear();
+  format.clear();
+  group.clear();
+  name.clear();
+  number.clear();
+  resolution.clear();
+  title.clear();
+  version.clear();
+  video_type.clear();
+}
 
-public:
-  vector<Anime> items;
+void Episode::Set(int anime_id) {
+  this->anime_id = anime_id;
+  MainDialog.RefreshMenubar(anime_id);
+}
 
-private:
-  win32::CriticalSection critical_section_;
-  wstring file_, folder_;
-};
-
-class AnimeSeasonDatabase {
-public:
-  AnimeSeasonDatabase();
-  virtual ~AnimeSeasonDatabase() {}
-
-  bool Load(wstring file);
-  bool Save(wstring file = L"");
-
-public:
-  vector<Anime> items;
-  time_t last_modified;
-  bool modified;
-  wstring name;
-
-private:
-  wstring file_, folder_;
-};
-
-extern AnimeDatabase AnimeDatabase;
-extern AnimeSeasonDatabase SeasonDatabase;
-
-#endif // ANIMEDB_H
+} // namespace anime

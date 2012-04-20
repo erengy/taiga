@@ -17,15 +17,17 @@
 */
 
 #include "std.h"
+
 #include "dde.h"
+
 #include "string.h"
 
 // =============================================================================
 
-DynamicDataExchange::DynamicDataExchange() {
-  is_unicode_ = FALSE;
-  instance_ = 0;
-  conversation_ = NULL;
+DynamicDataExchange::DynamicDataExchange()
+    : is_unicode_(FALSE), 
+      instance_(0), 
+      conversation_(NULL) {
 }
 
 DynamicDataExchange::~DynamicDataExchange() {
@@ -137,14 +139,14 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt, HCONV 
 
     case XTYP_POKE: {
       if (hdata) lpData = DdeAccessData(hdata, &cb);
-     #ifdef _DEBUG
+#ifdef _DEBUG
       string str = "[POKE]";
       str += "Topic: " + *sz1;
       str += " - Item: " + *sz2;
       if (lpData) str += " - Data: "; str += (LPCSTR)lpData;
       str += "\n";
       OutputDebugStringA(str.c_str());
-      #endif
+#endif
       //OnPoke();
       if (hdata) DdeUnaccessData(hdata);
       return reinterpret_cast<HDDEDATA>(DDE_FACK);
@@ -152,13 +154,13 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt, HCONV 
 
     case XTYP_REQUEST: {
       // TODO: Call DdeCreateDataHandle();
-      #ifdef _DEBUG
+#ifdef _DEBUG
       string str = "[REQUEST] ";
       str += "Topic: "; str += sz1;
       str += " - Item: "; str += sz2;
       str += "\n";
       OutputDebugStringA(str.c_str());
-      #endif
+#endif
       //OnRequest();
       break;
     }

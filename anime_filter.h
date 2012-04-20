@@ -16,37 +16,33 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ANIME_INFO_PAGE_H
-#define DLG_ANIME_INFO_PAGE_H
+#ifndef ANIME_FILTER_H
+#define ANIME_FILTER_H
 
-#include "../std.h"
-#include "../win32/win_dialog.h"
+#include "std.h"
 
-// =============================================================================
+namespace anime {
 
-enum AnimeInfoPageType {
-  INFOPAGE_SERIESINFO,
-  INFOPAGE_MYINFO,
-  INFOPAGE_COUNT
-};
+class Item;
 
-class AnimeInfoPage : public win32::Dialog {
+// Active filters for main dialog's ListView
+class Filters {
  public:
-  AnimeInfoPage();
-  virtual ~AnimeInfoPage();
-
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-
-  void Refresh(int anime_id);
-  void RefreshFansubPreference();
-
-  int index;
-
- private:
-  int anime_id_;
-  HFONT header_font_;
+  Filters();
+  virtual ~Filters() {}
+  
+  bool CheckItem(Item& item);
+  void Reset();
+  
+  vector<bool> my_status;
+  vector<bool> status;
+  vector<bool> type;
+  bool new_episodes;
+  wstring text;
 };
 
-#endif // DLG_ANIME_INFO_PAGE_H
+} // namespace anime
+
+extern anime::Filters AnimeFilters;
+
+#endif // ANIME_FILTER_H

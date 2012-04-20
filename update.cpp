@@ -17,16 +17,19 @@
 */
 
 #include "std.h"
+
+#include "update.h"
+
 #include "common.h"
 #include "string.h"
-#include "update.h"
 #include "xml.h"
 
 // =============================================================================
 
-UpdateHelper::UpdateHelper() :
-  restart_app(false), update_available(false), app_(nullptr)
-{
+UpdateHelper::UpdateHelper()
+    : restart_app(false), 
+      update_available(false), 
+      app_(nullptr) {
 }
 
 // =============================================================================
@@ -95,9 +98,10 @@ bool UpdateHelper::ParseData(wstring data, DWORD client_mode) {
   version_info.url = version.child_value(L"url");
 
   // Compare version information
-  if (ToINT(version_info.major) > app_->GetVersionMajor() || 
-      ToINT(version_info.minor) > app_->GetVersionMinor() || 
-      ToINT(version_info.revision) > app_->GetVersionRevision()) {
+  // TODO: fix (0.9 > 1.0 because 9 > 0)
+  if (ToInt(version_info.major) > app_->GetVersionMajor() || 
+      ToInt(version_info.minor) > app_->GetVersionMinor() || 
+      ToInt(version_info.revision) > app_->GetVersionRevision()) {
         update_available = true;
   }
 
@@ -137,7 +141,7 @@ bool UpdateHelper::RestartApplication(const wstring& updatehelper_exe, const wst
   if (restart_app) {
     if (FileExists(CheckSlash(app_->GetCurrentDirectory()) + new_exe)) {
       if (OnRestartApp()) {
-        Execute(updatehelper_exe, current_exe + L" " + new_exe + L" " + ToWSTR(GetCurrentProcessId()));
+        Execute(updatehelper_exe, current_exe + L" " + new_exe + L" " + ToWstr(GetCurrentProcessId()));
         app_->PostQuitMessage();
         return true;
       }

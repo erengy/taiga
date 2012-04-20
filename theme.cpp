@@ -17,10 +17,12 @@
 */
 
 #include "std.h"
+
+#include "theme.h"
+
 #include "gfx.h"
 #include "string.h"
 #include "taiga.h"
-#include "theme.h"
 #include "xml.h"
 
 Theme UI;
@@ -95,12 +97,12 @@ bool Theme::LoadImages() {
   // Populate image lists
   HBITMAP hBitmap;
   for (int i = 1; i <= ICONCOUNT_16PX; i++) {
-    hBitmap = GdiPlus.LoadImage(folder_ + L"16px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(folder_ + L"16px\\" + (i < 10 ? L"0" : L"") + ToWstr(i) + L".png");
     ImgList16.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }
   for (int i = 1; i <= ICONCOUNT_24PX; i++) {
-    hBitmap = GdiPlus.LoadImage(folder_ + L"24px\\" + (i < 10 ? L"0" : L"") + ToWSTR(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(folder_ + L"24px\\" + (i < 10 ? L"0" : L"") + ToWstr(i) + L".png");
     ImgList24.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }

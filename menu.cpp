@@ -17,14 +17,17 @@
 */
 
 #include "std.h"
-#include "animelist.h"
-#include "dlg/dlg_main.h"
-#include "dlg/dlg_season.h"
+
+#include "anime_db.h"
+#include "anime_filter.h"
 #include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
 #include "theme.h"
+
+#include "dlg/dlg_main.h"
+#include "dlg/dlg_season.h"
 
 #define MENU UI.Menus.Menu[menu_index]
 
@@ -50,8 +53,8 @@ void UpdateAccountMenu() {
   }
 }
 
-void UpdateAnimeMenu(Anime* anime) {
-  if (!anime) return;
+void UpdateAnimeMenu(anime::Item* anime_item) {
+  if (!anime_item) return;
   int item_index = 0, menu_index = 0;
 
   // Edit > Score
@@ -61,7 +64,7 @@ void UpdateAnimeMenu(Anime* anime) {
       MENU.Items[i].Checked = false;
       MENU.Items[i].Default = false;
     }
-    item_index = anime->GetScore();
+    item_index = anime_item->GetMyScore();
     if (item_index < static_cast<int>(MENU.Items.size())) {
       MENU.Items[item_index].Checked = true;
       MENU.Items[item_index].Default = true;
@@ -74,7 +77,7 @@ void UpdateAnimeMenu(Anime* anime) {
       MENU.Items[i].Checked = false;
       MENU.Items[i].Default = false;
     }
-    item_index = anime->GetStatus();
+    item_index = anime_item->GetMyStatus();
     if (item_index == mal::MYSTATUS_PLANTOWATCH) item_index--;
     if (item_index - 1 < static_cast<int>(MENU.Items.size())) {
       MENU.Items[item_index - 1].Checked = true;
@@ -90,13 +93,13 @@ void UpdateAnimeMenu(Anime* anime) {
 
     // Add items
     MENU.CreateItem(L"PlayLast()", 
-      L"Last watched (#" + ToWSTR(anime->GetLastWatchedEpisode()) + L")", 
+      L"Last watched (#" + ToWstr(anime_item->GetMyLastWatchedEpisode()) + L")", 
       L"", false, false, 
-      anime->GetLastWatchedEpisode() > 0);
+      anime_item->GetMyLastWatchedEpisode() > 0);
     MENU.CreateItem(L"PlayNext()", 
-      L"Next episode (#" + ToWSTR(anime->GetLastWatchedEpisode() + 1) + L")", 
+      L"Next episode (#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")", 
       L"", false, false, 
-      anime->GetLastWatchedEpisode() < anime->series_episodes || anime->series_episodes == 0);
+      anime_item->GetMyLastWatchedEpisode() < anime_item->GetEpisodeCount() || anime_item->GetEpisodeCount() == 0);
     MENU.CreateItem(L"PlayRandom()", L"Random episode");
     MENU.CreateItem();
     MENU.CreateItem(L"", L"Episode", L"PlayEpisode");
@@ -110,19 +113,19 @@ void UpdateAnimeMenu(Anime* anime) {
 
     // Add episode numbers
     int count_max, count_column;
-    if (anime->series_episodes > 0) {
-      count_max = anime->series_episodes;
+    if (anime_item->GetEpisodeCount() > 0) {
+      count_max = anime_item->GetEpisodeCount();
     } else {
-      count_max = anime->GetTotalEpisodes();
+      count_max = anime_item->GetEpisodeCount();
       if (count_max == 0) {
-        count_max = anime->GetLastWatchedEpisode() + 1;
+        count_max = anime_item->GetMyLastWatchedEpisode() + 1;
       }
     }
     for (int i = 1; i <= count_max; i++) {
       count_column = count_max % 12 == 0 ? 12 : 13;
       if (count_max > 52) count_column *= 2;
-      MENU.CreateItem(L"PlayEpisode(" + ToWSTR(i) + L")", L"#" + ToWSTR(i), L"", 
-        i <= anime->GetLastWatchedEpisode(), 
+      MENU.CreateItem(L"PlayEpisode(" + ToWstr(i) + L")", L"#" + ToWstr(i), L"", 
+        i <= anime_item->GetMyLastWatchedEpisode(), 
         false, true, (i > 1) && (i % count_column == 1), false);
     }
   }
@@ -146,14 +149,14 @@ void UpdateFilterMenu() {
   int menu_index = UI.Menus.GetIndex(L"FilterStatus");
   if (menu_index > -1) {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = AnimeList.filters.status[i] == TRUE;
+      MENU.Items[i].Checked = AnimeFilters.status[i] == TRUE;
     }
   }
   // Filter > Type
   menu_index = UI.Menus.GetIndex(L"FilterType");
   if (menu_index > -1) {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = AnimeList.filters.type[i] == TRUE;
+      MENU.Items[i].Checked = AnimeFilters.type[i] == TRUE;
     }
   }
 }
@@ -258,9 +261,9 @@ void UpdateTrayMenu() {
   }
 }
 
-void UpdateAllMenus(Anime* anime) {
+void UpdateAllMenus(anime::Item* anime_item) {
   UpdateAccountMenu();
-  UpdateAnimeMenu(anime);
+  UpdateAnimeMenu(anime_item);
   UpdateAnnounceMenu();
   UpdateFilterMenu();
   UpdateFoldersMenu();

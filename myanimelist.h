@@ -21,15 +21,20 @@
 
 #include "std.h"
 
-class Anime;
+namespace anime {
+class ListItem;
+}
+class Date;
 class EventItem;
 class HttpClient;
 
 namespace mal {
 
+// =============================================================================
+
 const COLORREF COLOR_DARKBLUE = RGB(46, 81, 162);
-const COLORREF COLOR_LIGHTBLUE RGB(225, 231, 245);
-const COLORREF COLOR_LIGHTGRAY RGB(246, 246, 246);
+const COLORREF COLOR_LIGHTBLUE = RGB(225, 231, 245);
+const COLORREF COLOR_LIGHTGRAY = RGB(246, 246, 246);
 
 enum MyStatus {
   MYSTATUS_NOTINLIST = 0,
@@ -74,8 +79,6 @@ enum Type {
   TYPE_MUSIC
 };
 
-// =============================================================================
-
 class AnimeValues {
 public:
   AnimeValues();
@@ -101,27 +104,29 @@ public:
 
 // =============================================================================
 
-bool AskToDiscuss(Anime* anime, int episode_number);
+bool AskToDiscuss(int anime_id, int episode_number);
 void CheckProfile();
-bool DownloadImage(Anime* anime, class HttpClient* client = nullptr);
-bool GetAnimeDetails(Anime* anime, class HttpClient* client = nullptr);
+bool DownloadImage(int anime_id, const wstring& image_url, class HttpClient* client = nullptr);
+bool DownloadUserImage(bool thumb);
+bool GetAnimeDetails(int anime_id, class HttpClient* client = nullptr);
 bool GetList(bool login);
 bool Login();
-bool ParseAnimeDetails(const wstring& data, Anime* anime = nullptr);
-bool ParseSearchResult(const wstring& data, Anime* anime = nullptr);
-bool SearchAnime(wstring title, Anime* anime = NULL, class HttpClient* client = nullptr);
+bool ParseAnimeDetails(const wstring& data);
+bool ParseSearchResult(const wstring& data, int anime_id = 0);
+bool SearchAnime(int anime_id, wstring title, class HttpClient* client = nullptr);
 bool Update(AnimeValues& anime_values, int anime_id, int update_mode);
 bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code);
 
-void DecodeText(wstring& text);
+wstring DecodeText(wstring text);
+bool IsValidDate(const Date& date);
 bool IsValidDate(const wstring& date);
 bool IsValidEpisode(int episode, int watched, int total);
-void ParseDateString(const wstring& date, unsigned short& year, unsigned short& month, unsigned short& day);
+Date ParseDateString(const wstring& str);
 
-wstring TranslateDate(wstring value);
-wstring TranslateDateToSeason(wstring value);
+wstring TranslateDate(const Date& date);
+wstring TranslateDateToSeason(const Date& date);
 wstring TranslateMyStatus(int value, bool add_count);
-wstring TranslateNumber(int value, LPCWSTR default_char = L"-");
+wstring TranslateNumber(int value, const wstring& default_char = L"-");
 wstring TranslateRewatchValue(int value);
 wstring TranslateStatus(int value);
 wstring TranslateStorageType(int value);
@@ -131,8 +136,8 @@ int TranslateMyStatus(const wstring& value);
 int TranslateStatus(const wstring& value);
 int TranslateType(const wstring& value);
 
-void ViewAnimePage(int series_id);
-void ViewAnimeSearch(wstring title);
+void ViewAnimePage(int anime_id);
+void ViewAnimeSearch(const wstring& title);
 void ViewHistory();
 void ViewMessages();
 void ViewPanel();

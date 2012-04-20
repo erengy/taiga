@@ -17,53 +17,57 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "event.h"
+
+#include "anime_db.h"
 #include "announce.h"
 #include "common.h"
 #include "debug.h"
-#include "dlg/dlg_event.h"
-#include "dlg/dlg_main.h"
-#include "event.h"
 #include "http.h"
 #include "myanimelist.h"
 #include "resource.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
+
+#include "dlg/dlg_event.h"
+#include "dlg/dlg_main.h"
+
 #include "win32/win_taskdialog.h"
 
 class EventQueue EventQueue;
 
 // =============================================================================
 
-EventItem::EventItem() : 
-  anime_id(0), enabled(true), mode(0)
-{
+EventItem::EventItem()
+    : anime_id(0), 
+      enabled(true), 
+      mode(0) {
 }
 
-EventList::EventList() : 
-  index(0)
-{
+EventList::EventList()
+    : index(0) {
 }
 
 void EventList::Add(EventItem& item) {
-  Anime* anime = AnimeList.FindItem(item.anime_id);
+  auto anime = AnimeDatabase.FindItem(item.anime_id);
   
   // Validate values
   if (anime && item.mode != HTTP_MAL_AnimeAdd) {
-    if (anime->GetLastWatchedEpisode() == item.episode || item.episode < 0) {
+    if (anime->GetMyLastWatchedEpisode() == item.episode || item.episode < 0) {
       item.episode = -1;
     }
-    if (anime->GetScore() == item.score || item.score < 0 || item.score > 10) {
+    if (anime->GetMyScore() == item.score || item.score < 0 || item.score > 10) {
       item.score = -1;
     }
-    if (anime->GetStatus() == item.status || item.status < 1 || item.status == 5 || item.status > 6) {
+    if (anime->GetMyStatus() == item.status || item.status < 1 || item.status == 5 || item.status > 6) {
       item.status = -1;
     }
-    if (anime->GetRewatching() == item.enable_rewatching) {
+    if (anime->GetMyRewatching() == item.enable_rewatching) {
       item.enable_rewatching = -1;
     }
-    if (anime->GetTags() == item.tags) {
+    if (anime->GetMyTags() == item.tags) {
       item.tags = EMPTY_STR;
     }
   }
@@ -105,7 +109,7 @@ void EventList::Add(EventItem& item) {
           }
           if (!add_new_item) {
             it->mode = HTTP_MAL_AnimeEdit;
-            it->time = GetDate() + L" " + GetTime();
+            it->time = (wstring)GetDate() + L" " + GetTime();
           }
           break;
         }
@@ -114,23 +118,24 @@ void EventList::Add(EventItem& item) {
   }
   // ...or add a new one
   if (add_new_item) {
-    if (item.time.empty()) item.time = GetDate() + L" " + GetTime();
+    if (item.time.empty()) item.time = (wstring)GetDate() + L" " + GetTime();
     items.push_back(item);
   }
 
   if (anime) {
     // Announce
     if (Taiga.logged_in && item.episode > 0) {
-      Episode episode;
-      episode.anime_id = anime->series_id;
-      episode.number = ToWSTR(item.episode);
+      anime::Episode episode;
+      episode.anime_id = anime->GetId();
+      episode.number = ToWstr(item.episode);
       Taiga.play_status = PLAYSTATUS_UPDATED;
       Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_TWITTER, &episode);
     }
 
     // Check new episode
     if (item.episode > -1) {
-      anime->new_episode_available = false;
+      anime->SetNewEpisodeAvailability(false);
+      anime->SetNewEpisodePath(L"");
       anime->CheckEpisodes(0);
     }
     
@@ -143,7 +148,8 @@ void EventList::Add(EventItem& item) {
     
     // Change status
     if (!Taiga.logged_in) {
-      MainDialog.ChangeStatus(L"Item added to the event queue. (" + anime->series_title + L")");
+      MainDialog.ChangeStatus(L"Item added to the event queue. (" + 
+        anime->GetTitle() + L")");
     }
 
     // Update
@@ -157,7 +163,7 @@ void EventList::Check() {
     return;
   }
   if (!items[index].enabled) {
-    DebugPrint(L"EventList::Check :: Item is disabled, removing...\n");
+    debug::Print(L"EventList::Check :: Item is disabled, removing...\n");
     Remove(index);
     Check();
     return;
@@ -168,9 +174,9 @@ void EventList::Check() {
   }
   
   // Compare ID with anime list
-  Anime* anime = AnimeList.FindItem(items[index].anime_id);
-  if (!anime) {
-    DebugPrint(L"EventList::Check :: Item not found in list, removing...\n");
+  auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);
+  if (!anime_item) {
+    debug::Print(L"EventList::Check :: Item not found in list, removing...\n");
     Remove(index);
     Check();
     return;
@@ -231,9 +237,8 @@ void EventList::Remove(unsigned int index, bool refresh) {
 
 // =============================================================================
 
-EventQueue::EventQueue() :
-  updating(false)
-{
+EventQueue::EventQueue()
+    : updating(false) {
 }
 
 void EventQueue::Add(EventItem& item, bool save, wstring user) {

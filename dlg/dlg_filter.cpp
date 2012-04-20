@@ -17,10 +17,12 @@
 */
 
 #include "../std.h"
-#include "../animelist.h"
-#include "../common.h"
+
 #include "dlg_filter.h"
 #include "dlg_main.h"
+
+#include "../anime_filter.h"
+#include "../common.h"
 #include "../resource.h"
 
 class FilterDialog FilterDialog;
@@ -40,12 +42,12 @@ BOOL FilterDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Status
   if (LOWORD(wParam) >= IDC_CHECK_FILTER_STATUS1 && 
     LOWORD(wParam) <= IDC_CHECK_FILTER_STATUS3) {
-      AnimeList.filters.status[2 - (IDC_CHECK_FILTER_STATUS3 - LOWORD(wParam))] = 
+      AnimeFilters.status[2 - (IDC_CHECK_FILTER_STATUS3 - LOWORD(wParam))] = 
         IsDlgButtonChecked(LOWORD(wParam)) == TRUE;
   // Type
   } else if (LOWORD(wParam) >= IDC_CHECK_FILTER_TYPE1 && 
     LOWORD(wParam) <= IDC_CHECK_FILTER_TYPE6) {
-      AnimeList.filters.type[5 - (IDC_CHECK_FILTER_TYPE6 - LOWORD(wParam))] = 
+      AnimeFilters.type[5 - (IDC_CHECK_FILTER_TYPE6 - LOWORD(wParam))] = 
         IsDlgButtonChecked(LOWORD(wParam)) == TRUE;
   }
   
@@ -74,10 +76,10 @@ void FilterDialog::RefreshFilters() {
 
   // Status
   for (int i = 0; i < 3; i++) {
-    CheckDlgButton(IDC_CHECK_FILTER_STATUS1 + i, AnimeList.filters.status[i]);
+    CheckDlgButton(IDC_CHECK_FILTER_STATUS1 + i, AnimeFilters.status[i]);
   }
   // Type
   for (int i = 0; i < 6; i++) {
-    CheckDlgButton(IDC_CHECK_FILTER_TYPE1 + i, AnimeList.filters.type[i]);
+    CheckDlgButton(IDC_CHECK_FILTER_TYPE1 + i, AnimeFilters.type[i]);
   }
 }

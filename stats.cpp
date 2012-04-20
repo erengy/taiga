@@ -17,19 +17,23 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "stats.h"
+
+#include "anime_db.h"
 #include "common.h"
 #include "myanimelist.h"
-#include "stats.h"
 #include "string.h"
 
 Statistics Stats;
 
 // =============================================================================
 
-Statistics::Statistics() : 
-  anime_count(0), episode_count(0), score_mean(0.0f), score_deviation(0.0f)
-{
+Statistics::Statistics()
+    : anime_count(0), 
+      episode_count(0), 
+      score_mean(0.0f), 
+      score_deviation(0.0f) {
 }
 
 // =============================================================================
@@ -52,17 +56,19 @@ void Statistics::CalculateAll() {
 }
 
 int Statistics::CalculateAnimeCount() {
-  anime_count = AnimeList.count;
+  anime_count = static_cast<int>(AnimeDatabase.items.size());
   return anime_count;
 }
 
 int Statistics::CalculateEpisodeCount() {
   episode_count = 0;
   
-  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
-    episode_count += it->GetLastWatchedEpisode();
-    // TODO: implement times_rewatched when MAL adds to API
-    if (it->GetRewatching() == TRUE) episode_count += it->GetTotalEpisodes();
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (!it->IsInList()) continue;
+    episode_count += it->GetMyLastWatchedEpisode();
+    // TODO: Implement times_rewatched when MAL adds to API
+    if (it->GetMyRewatching() == TRUE)
+      episode_count += it->GetEpisodeCount();
   }
 
   return episode_count;
@@ -71,9 +77,10 @@ int Statistics::CalculateEpisodeCount() {
 wstring Statistics::CalculateLifeSpentWatching() {
   int duration, seconds = 0;
   
-  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (!it->IsInList()) continue;
     // Approximate duration in minutes
-    switch (it->series_type) {
+    switch (it->GetType()) {
       default:
       case mal::TYPE_TV:      duration = 24;  break;
       case mal::TYPE_OVA:     duration = 24;  break;
@@ -82,8 +89,9 @@ wstring Statistics::CalculateLifeSpentWatching() {
       case mal::TYPE_ONA:     duration = 24;  break;
       case mal::TYPE_MUSIC:   duration = 5;   break;
     }
-    int episodes_watched = it->GetLastWatchedEpisode();
-    if (it->GetRewatching() == TRUE) episodes_watched += it->GetTotalEpisodes();
+    int episodes_watched = it->GetMyLastWatchedEpisode();
+    if (it->GetMyRewatching() == TRUE)
+      episodes_watched += it->GetEpisodeCount();
     seconds += (duration * 60) * episodes_watched;
   }
   
@@ -99,9 +107,10 @@ wstring Statistics::CalculateLifeSpentWatching() {
 float Statistics::CalculateMeanScore() {
   float sum_scores = 0.0f, items_scored = 0.0f;
   
-  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
-    if (it->my_score > 0) {
-      sum_scores += static_cast<float>(it->my_score);
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (!it->IsInList()) continue;
+    if (it->GetMyScore() > 0) {
+      sum_scores += static_cast<float>(it->GetMyScore());
       items_scored++;
     }
   }
@@ -114,9 +123,10 @@ float Statistics::CalculateMeanScore() {
 float Statistics::CalculateScoreDeviation() {
   float sum_squares = 0.0f, items_scored = 0.0f;
   
-  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
-    if (it->my_score > 0) {
-      sum_squares += pow(static_cast<float>(it->my_score) - score_mean, 2);
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (!it->IsInList()) continue;
+    if (it->GetMyScore() > 0) {
+      sum_squares += pow(static_cast<float>(it->GetMyScore()) - score_mean, 2);
       items_scored++;
     }
   }

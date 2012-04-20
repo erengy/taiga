@@ -20,7 +20,7 @@
 #define FEED_H
 
 #include "std.h"
-#include "animelist.h"
+#include "anime_episode.h"
 #include "http.h"
 
 // =============================================================================
@@ -43,7 +43,7 @@ public:
   bool download;
   int index;
   
-  class EpisodeData : public Episode {
+  class EpisodeData : public anime::Episode {
   public:
     EpisodeData() : new_episode(false) {}
     wstring file_size;

@@ -17,26 +17,29 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "monitor.h"
+
+#include "anime_db.h"
+#include "anime_episode.h"
 #include "common.h"
 #include "debug.h"
-#include "dlg/dlg_main.h"
-#include "monitor.h"
 #include "recognition.h"
 #include "settings.h"
 #include "string.h"
+
+#include "dlg/dlg_main.h"
 
 class FolderMonitor FolderMonitor;
 
 // =============================================================================
 
-FolderInfo::FolderInfo() :
-  bytes_returned_(0),
-  directory_handle_(INVALID_HANDLE_VALUE),
-  notify_filter_(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME),
-  state(MONITOR_STATE_STOPPED),
-  watch_subtree_(TRUE)
-{
+FolderInfo::FolderInfo()
+    : bytes_returned_(0),
+      directory_handle_(INVALID_HANDLE_VALUE),
+      notify_filter_(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME),
+      state(MONITOR_STATE_STOPPED),
+      watch_subtree_(TRUE) {
   ZeroMemory(&overlapped_, sizeof(overlapped_));
 }
 
@@ -45,9 +48,9 @@ FolderInfo::~FolderInfo() {
 
 // =============================================================================
 
-FolderMonitor::FolderMonitor() :
-  completion_port_(nullptr), window_handle_(nullptr)
-{
+FolderMonitor::FolderMonitor()
+    : completion_port_(nullptr), 
+      window_handle_(nullptr) {
 }
 
 FolderMonitor::~FolderMonitor() {
@@ -166,7 +169,7 @@ DWORD FolderMonitor::ThreadProc() {
         case MONITOR_STATE_STOPPED: {
           if (ReadDirectoryChanges(folder_info)) {
             folder_info->state = MONITOR_STATE_ACTIVE;
-            DebugPrint(L"FolderMonitor :: Started monitoring: " + folder_info->path + L"\n");
+            debug::Print(L"FolderMonitor :: Started monitoring: " + folder_info->path + L"\n");
           }
           break;
         }
@@ -181,7 +184,7 @@ DWORD FolderMonitor::ThreadProc() {
             // Retrieve changed file name
             WCHAR file_name[MAX_PATH + 1] = {'\0'};
             CopyMemory(file_name, pfni->FileName, pfni->FileNameLength);
-            DebugPrint(L"FolderMonitor :: Change detected: (" + ToWSTR(pfni->Action) + L") " + 
+            debug::Print(L"FolderMonitor :: Change detected: (" + ToWstr(pfni->Action) + L") " + 
               folder_info->path + L"\\" + file_name + L"\n");
             // Add item to list
             folder_info->change_list.resize(folder_info->change_list.size() + 1);
@@ -207,7 +210,7 @@ DWORD FolderMonitor::ThreadProc() {
     }
   } while (folder_info);
 
-  DebugPrint(L"FolderMonitor :: Stopped monitoring.\n");
+  debug::Print(L"FolderMonitor :: Stopped monitoring.\n");
   return 0;
 }
 
@@ -250,7 +253,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
         continue;
     }
     
-    Episode episode;
+    anime::Episode episode;
     CheckSlash(folder_info->path);
     wstring path = folder_info->path + LIST[i].file_name;
         
@@ -264,60 +267,63 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
 
     // Compare with list item folders
     if (is_folder && !path_available) {
-      int anime_index = 0;
-      for (int j = AnimeList.count; j > 0; j--) {
-        if (!AnimeList.items[j].folder.empty() && IsEqual(AnimeList.items[j].folder, path)) {
-          anime_index = j;
+      int anime_id = 0;
+      for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
+        if (!it->IsInList()) continue;
+        if (!it->GetFolder().empty() && IsEqual(it->GetFolder(), path)) {
+          anime_id = it->GetId();
           break;
         }
       }
-      if (anime_index > 0) {
+      if (anime_id > 0) {
         if (i == LIST.size() - 1) {
-          LIST[i].anime_index = anime_index;
+          LIST[i].anime_id = anime_id;
         } else {
-          LIST[i + 1].anime_index = anime_index;
+          LIST[i + 1].anime_id = anime_id;
           continue;
         }
       }
     }
 
     // Change anime folder
-    if (is_folder && LIST[i].anime_index > 0) {
-      #define ANIME AnimeList.items[LIST[i].anime_index]
-      ANIME.SetFolder(path_available ? path : L"", true, true);
-      DebugPrint(L"FolderMonitor :: Change anime folder: " + 
-        ANIME.series_title + L" -> " + ANIME.folder + L"\n");
-      #undef ANIME
+    if (is_folder && LIST[i].anime_id > 0) {
+      auto anime_item = AnimeDatabase.FindItem(LIST[i].anime_id);
+      anime_item->SetFolder(path_available ? path : L"", true);
+      anime_item->CheckEpisodes();
+      debug::Print(L"FolderMonitor :: Change anime folder: " + 
+        anime_item->GetTitle() + L" -> " + anime_item->GetFolder() + L"\n");
       continue;
     }
 
     // Examine path and compare with list items
     if (Meow.ExamineTitle(path, episode)) {
-      if (LIST[i].anime_index == 0 || is_folder == false) {
-        for (int j = AnimeList.count; j > 0; j--) {
-          if (Meow.CompareEpisode(episode, AnimeList.items[j], true, false, false)) {
-            LIST[i].anime_index = j;
+      if (LIST[i].anime_id == 0 || is_folder == false) {
+        for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
+          if (!it->IsInList()) continue;
+          if (Meow.CompareEpisode(episode, *it, true, false, false)) {
+            LIST[i].anime_id = it->GetId();
             break;
           }
         }
       }
-      if (LIST[i].anime_index > 0) {
-        #define ANIME AnimeList.items[LIST[i].anime_index]
+      if (LIST[i].anime_id > 0) {
+        auto anime_item = AnimeDatabase.FindItem(LIST[i].anime_id);
 
         // Set anime folder
-        if (path_available && ANIME.folder.empty()) {
+        if (path_available && anime_item->GetFolder().empty()) {
           if (is_folder) {
-            ANIME.folder = path;
+            anime_item->SetFolder(path, true);
           } else if (!episode.folder.empty()) {
-            Episode temp_episode;
+            anime::Episode temp_episode;
             temp_episode.title = episode.folder;
-            if (Meow.CompareEpisode(temp_episode, ANIME)) {
-              ANIME.SetFolder(episode.folder, true, true);
+            if (Meow.CompareEpisode(temp_episode, *anime_item)) {
+              anime_item->SetFolder(episode.folder, true);
+              anime_item->CheckEpisodes();
             }
           }
-          if (!ANIME.folder.empty()) {
-            DebugPrint(L"FolderMonitor :: Set anime folder: " + 
-              ANIME.series_title + L" -> " + ANIME.folder + L"\n");
+          if (!anime_item->GetFolder().empty()) {
+            debug::Print(L"FolderMonitor :: Set anime folder: " + 
+              anime_item->GetTitle() + L" -> " + anime_item->GetFolder() + L"\n");
           }
         }
 
@@ -326,16 +332,15 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
           int number = GetEpisodeHigh(episode.number);
           int numberlow = GetEpisodeLow(episode.number);
           if (path_available) {
-            path_available = IsEqual(GetPathOnly(path), ANIME.folder);
+            path_available = IsEqual(GetPathOnly(path), anime_item->GetFolder());
           }
           for (int j = numberlow; j <= number; j++) {
-            if (ANIME.SetEpisodeAvailability(number, path_available, path)) {
-              DebugPrint(L"FolderMonitor :: Episode: (" + ToWSTR(path_available) + L") " + 
-                ANIME.series_title + L" -> " + ToWSTR(j) + L"\n");
+            if (anime_item->SetEpisodeAvailability(number, path_available, path)) {
+              debug::Print(L"FolderMonitor :: Episode: (" + ToWstr(path_available) + L") " + 
+                anime_item->GetTitle() + L" -> " + ToWstr(j) + L"\n");
             }
           }
         }
-        #undef ANIME
       }
     }
     #undef LIST

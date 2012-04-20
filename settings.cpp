@@ -17,16 +17,20 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "settings.h"
+
+#include "anime.h"
+#include "anime_filter.h"
 #include "common.h"
 #include "event.h"
 #include "gfx.h"
 #include "http.h"
-#include "settings.h"
 #include "string.h"
 #include "taiga.h"
-#include "win32/win_registry.h"
 #include "xml.h"
+
+#include "win32/win_registry.h"
 
 #define DEFAULT_FORMAT_HTTP      L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%"
 #define DEFAULT_FORMAT_MESSENGER L"Watching: %title%$if(%episode%, #%episode%$if(%total%,/%total%)) ~ www.myanimelist.net/anime/%id%"
@@ -158,15 +162,15 @@ bool Settings::Load() {
     Program.List.double_click = list.child(L"action").attribute(L"doubleclick").as_int(4);
     Program.List.middle_click = list.child(L"action").attribute(L"middleclick").as_int(3);
     for (int i = 0; i < 3; i++) {
-      wstring name = L"s" + ToWSTR(i + 1);
-      AnimeList.filters.status[i] = list.child(L"filter").child(L"status").attribute(name.c_str()).as_bool(true);
+      wstring name = L"s" + ToWstr(i + 1);
+      AnimeFilters.status[i] = list.child(L"filter").child(L"status").attribute(name.c_str()).as_bool(true);
     }
     for (int i = 0; i < 6; i++) {
-      wstring name = L"t" + ToWSTR(i + 1);
-      AnimeList.filters.type[i] = list.child(L"filter").child(L"type").attribute(name.c_str()).as_bool(true);
+      wstring name = L"t" + ToWstr(i + 1);
+      AnimeFilters.type[i] = list.child(L"filter").child(L"type").attribute(name.c_str()).as_bool(true);
     }
     Program.List.highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
-    AnimeList.filters.new_episodes = list.child(L"filter").child(L"episodes").attribute(L"new").as_bool();
+    AnimeFilters.new_episodes = list.child(L"filter").child(L"episodes").attribute(L"new").as_bool();
     Program.List.progress_mode = list.child(L"progress").attribute(L"mode").as_int(1);
     Program.List.progress_show_eps = list.child(L"progress").attribute(L"showeps").as_int();
     // Notifications
@@ -235,7 +239,7 @@ bool Settings::Load() {
   for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
       EventItem event_item;
-      event_item.anime_id = item.attribute(L"id").as_int(ANIMEID_NOTINLIST);
+      event_item.anime_id = item.attribute(L"id").as_int(anime::ID_NOTINLIST);
       event_item.episode = item.attribute(L"episode").as_int(-1);
       event_item.score = item.attribute(L"score").as_int(-1);
       event_item.status = item.attribute(L"status").as_int(-1);
@@ -394,19 +398,19 @@ bool Settings::Save() {
       xml_node filter = list.append_child();
       filter.set_name(L"filter");
       filter.append_child().set_name(L"status");
-      filter.child(L"status").append_attribute(L"s1") = AnimeList.filters.status[0];
-      filter.child(L"status").append_attribute(L"s2") = AnimeList.filters.status[1];
-      filter.child(L"status").append_attribute(L"s3") = AnimeList.filters.status[2];
+      filter.child(L"status").append_attribute(L"s1") = AnimeFilters.status[0];
+      filter.child(L"status").append_attribute(L"s2") = AnimeFilters.status[1];
+      filter.child(L"status").append_attribute(L"s3") = AnimeFilters.status[2];
       filter.append_child().set_name(L"type");
-      filter.child(L"type").append_attribute(L"t1") = AnimeList.filters.type[0];
-      filter.child(L"type").append_attribute(L"t2") = AnimeList.filters.type[1];
-      filter.child(L"type").append_attribute(L"t3") = AnimeList.filters.type[2];
-      filter.child(L"type").append_attribute(L"t4") = AnimeList.filters.type[3];
-      filter.child(L"type").append_attribute(L"t5") = AnimeList.filters.type[4];
-      filter.child(L"type").append_attribute(L"t6") = AnimeList.filters.type[5];
+      filter.child(L"type").append_attribute(L"t1") = AnimeFilters.type[0];
+      filter.child(L"type").append_attribute(L"t2") = AnimeFilters.type[1];
+      filter.child(L"type").append_attribute(L"t3") = AnimeFilters.type[2];
+      filter.child(L"type").append_attribute(L"t4") = AnimeFilters.type[3];
+      filter.child(L"type").append_attribute(L"t5") = AnimeFilters.type[4];
+      filter.child(L"type").append_attribute(L"t6") = AnimeFilters.type[5];
       filter.append_child().set_name(L"episodes");
       filter.child(L"episodes").append_attribute(L"highlight") = Program.List.highlight;
-      filter.child(L"episodes").append_attribute(L"new") = AnimeList.filters.new_episodes;
+      filter.child(L"episodes").append_attribute(L"new") = AnimeFilters.new_episodes;
       // Progress
       xml_node progress = list.append_child();
       progress.set_name(L"progress");

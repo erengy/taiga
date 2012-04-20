@@ -17,8 +17,10 @@
 */
 
 #include "std.h"
-#include "string.h"
+
 #include "xml.h"
+
+#include "string.h"
 
 // =============================================================================
 
@@ -47,7 +49,7 @@ void XML_WriteChildNodes(xml_node& parent_node, vector<wstring>& str_vector, con
 void XML_WriteIntValue(xml_node& node, const wchar_t* name, int value) {
   xml_node child = node.append_child();
   child.set_name(name);
-  child.append_child(node_pcdata).set_value(ToWSTR(value).c_str());
+  child.append_child(node_pcdata).set_value(ToWstr(value).c_str());
 }
 
 void XML_WriteStrValue(xml_node& node, const wchar_t* name, const wchar_t* value, xml_node_type node_type) {

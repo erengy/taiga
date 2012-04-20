@@ -17,8 +17,10 @@
 */
 
 #include "../std.h"
-#include "../common.h"
+
 #include "dlg_test_recognition.h"
+
+#include "../common.h"
 #include "../recognition.h"
 #include "../resource.h"
 #include "../string.h"
@@ -117,9 +119,9 @@ BOOL RecognitionTestDialog::OnInitDialog() {
     }
   }
   wstring title = L"Taiga Recognition Test";
-  title += L" - Success rate: " + ToWSTR(success_count) + L"/" + ToWSTR(total_items);
-  title += L" (" + ToWSTR(((float)success_count / (float)total_items) * 100.0f, 2) + L"%)";
-  title += L" - Time: " + ToWSTR(tick) + L" ms";
+  title += L" - Success rate: " + ToWstr(success_count) + L"/" + ToWstr(total_items);
+  title += L" (" + ToWstr(((float)success_count / (float)total_items) * 100.0f, 2) + L"%)";
+  title += L" - Time: " + ToWstr(tick) + L" ms";
   SetText(title.c_str());
   
   // Success

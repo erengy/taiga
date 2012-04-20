@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+
 #include "win32/win_main.h"
 
 #define NT_SUCCESS(x) ((x) >= 0)

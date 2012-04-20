@@ -17,15 +17,20 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
 #include "announce.h"
+
+#include "anime.h"
+#include "anime_episode.h"
 #include "common.h"
 #include "debug.h"
-#include "dlg/dlg_main.h"
 #include "dde.h"
 #include "http.h"
 #include "settings.h"
 #include "string.h"
+
+#include "dlg/dlg_main.h"
+
 #include "win32/win_taskdialog.h"
 
 class Announcer Announcer;
@@ -62,25 +67,25 @@ void Announcer::Clear(int modes, bool force) {
   }
 }
 
-void Announcer::Do(int modes, Episode* episode, bool force) {
+void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (!episode) episode = &CurrentEpisode;
 
   if (modes & ANNOUNCE_TO_HTTP) {
     if (Settings.Announce.HTTP.enabled || force) {
-      DebugPrint(L"ANNOUNCE_TO_HTTP\n");
+      debug::Print(L"ANNOUNCE_TO_HTTP\n");
       ToHttp(Settings.Announce.HTTP.url, 
         ReplaceVariables(Settings.Announce.HTTP.format, *episode, true));
     }
   }
 
-  if (episode->anime_id == ANIMEID_NOTINLIST || 
-      episode->anime_id <= ANIMEID_UNKNOWN) {
+  if (episode->anime_id == anime::ID_NOTINLIST || 
+      episode->anime_id <= anime::ID_UNKNOWN) {
         return;
   }
 
   if (modes & ANNOUNCE_TO_MESSENGER) {
     if (Settings.Announce.MSN.enabled || force) {
-      DebugPrint(L"ANNOUNCE_TO_MESSENGER\n");
+      debug::Print(L"ANNOUNCE_TO_MESSENGER\n");
       ToMessenger(L"Taiga", L"MyAnimeList", 
         ReplaceVariables(Settings.Announce.MSN.format, *episode), true);
     }
@@ -88,7 +93,7 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 
   if (modes & ANNOUNCE_TO_MIRC) {
     if (Settings.Announce.MIRC.enabled || force) {
-      DebugPrint(L"ANNOUNCE_TO_MIRC\n");
+      debug::Print(L"ANNOUNCE_TO_MIRC\n");
       ToMirc(Settings.Announce.MIRC.service, 
         Settings.Announce.MIRC.channels, 
         ReplaceVariables(Settings.Announce.MIRC.format, *episode), 
@@ -100,14 +105,14 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 
   if (modes & ANNOUNCE_TO_SKYPE) {
     if (Settings.Announce.Skype.enabled || force) {
-      DebugPrint(L"ANNOUNCE_TO_SKYPE\n");
+      debug::Print(L"ANNOUNCE_TO_SKYPE\n");
       ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode));
     }
   }
 
   if (modes & ANNOUNCE_TO_TWITTER) {
     if (Settings.Announce.Twitter.enabled || force) {
-      DebugPrint(L"ANNOUNCE_TO_TWITTER\n");
+      debug::Print(L"ANNOUNCE_TO_TWITTER\n");
       ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode));
     }
   }
@@ -120,8 +125,7 @@ void Announcer::Do(int modes, Episode* episode, bool force) {
 void Announcer::ToHttp(wstring address, wstring data) {
   if (address.empty() || data.empty()) return;
 
-  win32::Url url(address);
-  HttpClient.Post(url, data, L"", HTTP_Silent);
+  HttpClient.Post(win32::Url(address), data, L"", HTTP_Silent);
 }
 
 // =============================================================================
@@ -134,7 +138,7 @@ void Announcer::ToMessenger(wstring artist, wstring album, wstring title, BOOL s
   COPYDATASTRUCT cds;
   WCHAR buffer[256];
 
-  wstring wstr = L"\\0Music\\0" + ToWSTR(show) + L"\\0{1}\\0" + 
+  wstring wstr = L"\\0Music\\0" + ToWstr(show) + L"\\0{1}\\0" + 
     artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
   wcscpy_s(buffer, 256, wstr.c_str());
 
@@ -355,7 +359,7 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   status_text_ = status_text;
 
   OAuthParameters post_parameters;
-  post_parameters[L"status"] = EncodeURL(status_text_);
+  post_parameters[L"status"] = EncodeUrl(status_text_);
 
   wstring header = TwitterClient.GetDefaultHeader() + 
     oauth.BuildHeader(

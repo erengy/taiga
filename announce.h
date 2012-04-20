@@ -22,7 +22,9 @@
 #include "std.h"
 #include "third_party/oauth/oauth.h"
 
+namespace anime {
 class Episode;
+}
 
 // =============================================================================
 
@@ -40,7 +42,7 @@ public:
   virtual ~Announcer() {}
 
   void Clear(int modes, bool force = false);
-  void Do(int modes, Episode* episode = nullptr, bool force = false);
+  void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
 
 public:
   bool TestMircConnection(wstring service);

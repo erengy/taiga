@@ -17,18 +17,21 @@
 */
 
 #include "../std.h"
-#include "../animedb.h"
-#include "../animelist.h"
-#include "../announce.h"
-#include "../common.h"
-#include "../debug.h"
-#include "dlg_anime_info.h"
+
 #include "dlg_main.h"
+
+#include "dlg_anime_info.h"
 #include "dlg_search.h"
 #include "dlg_season.h"
 #include "dlg_settings.h"
 #include "dlg_test_recognition.h"
 #include "dlg_torrent.h"
+
+#include "../anime_db.h"
+#include "../anime_filter.h"
+#include "../announce.h"
+#include "../common.h"
+#include "../debug.h"
 #include "../event.h"
 #include "../gfx.h"
 #include "../http.h"
@@ -42,6 +45,7 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
+
 #include "../win32/win_gdi.h"
 #include "../win32/win_taskbar.h"
 #include "../win32/win_taskdialog.h"
@@ -184,10 +188,10 @@ void MainDialog::CreateDialogControls() {
   toolbar.InsertButton(8,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar.InsertButton(9,  ICON24_FILTER,   109, 1, fsStyle1,  9, nullptr, L"Filter list");
   toolbar.InsertButton(10, ICON24_SETTINGS, 110, 1, fsStyle1, 10, nullptr, L"Change program settings");
-  #ifdef _DEBUG
+#ifdef _DEBUG
   toolbar.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar.InsertButton(12, ICON24_ABOUT,    112, 1, fsStyle1, 12, nullptr, L"Debug");
-  #endif
+#endif
   // Insert search toolbar button
   toolbar_search.InsertButton(0, ICON16_SEARCH, 200, 1, fsStyle2, 0, nullptr, L"Search");
 
@@ -282,7 +286,7 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         int tab_index = tab.HitTest();
         if (tab_index > -1) {
           int status = tab.GetItemParam(tab_index);
-          ExecuteAction(L"EditStatus(" + ToWSTR(status) + L")");
+          ExecuteAction(L"EditStatus(" + ToWstr(status) + L")");
         }
       }
       break;
@@ -338,16 +342,16 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       if (uMsg == Skype.control_api_attach) {
         switch (lParam) {
           case 0: // ATTACH_SUCCESS
-            #ifdef _DEBUG
+#ifdef _DEBUG
             ChangeStatus(L"Skype attach succeeded.");
-            #endif
+#endif
             Skype.api_window_handle = reinterpret_cast<HWND>(wParam);
             Skype.ChangeMood();
             return TRUE;
           case 1: // ATTACH_PENDING_AUTHORIZATION
-            #ifdef _DEBUG
+#ifdef _DEBUG
             ChangeStatus(L"Skype is pending authorization...");
-            #endif
+#endif
             return TRUE;
         }
       }
@@ -473,7 +477,7 @@ BOOL MainDialog::OnDestroy() {
   Settings.Save();
 
   // Save anime database
-  AnimeDatabase.Save();
+  AnimeDatabase.SaveDatabase();
   
   // Exit
   Taiga.PostQuitMessage();
@@ -481,14 +485,14 @@ BOOL MainDialog::OnDestroy() {
 }
 
 void MainDialog::OnDropFiles(HDROP hDropInfo) {
-  #ifdef _DEBUG
+#ifdef _DEBUG
   WCHAR buffer[MAX_PATH];
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
-    Episode episode;
+    anime::Episode episode;
     Meow.ExamineTitle(buffer, episode); 
     MessageBox(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), APP_TITLE, MB_OK);
   }
-  #endif
+#endif
 }
 
 LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
@@ -622,30 +626,31 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   // ===========================================================================
   
   // Check process list for media players
-  Anime* anime = AnimeList.FindItem(CurrentEpisode.anime_id);
+  auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
   int media_index = MediaPlayers.Check();
 
   // Media player is running
   if (media_index > -1) {
     // Started to watch?
-    if (CurrentEpisode.anime_id == ANIMEID_UNKNOWN) {
+    if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
       // Recognized?
       if (Taiga.is_recognition_enabled) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
-          for (int i = AnimeList.count; i > 0; i--) {
-            if (Meow.CompareEpisode(CurrentEpisode, AnimeList.items[i])) {
-              CurrentEpisode.Set(AnimeList.items[i].series_id);
-              AnimeList.items[i].Start(CurrentEpisode);
+          for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
+            if (!it->IsInList()) continue;
+            if (Meow.CompareEpisode(CurrentEpisode, *it)) {
+              CurrentEpisode.Set(it->GetId());
+              it->Start(CurrentEpisode);
               return;
             }
           }
         }
         // Not recognized
-        CurrentEpisode.Set(ANIMEID_NOTINLIST);
+        CurrentEpisode.Set(anime::ID_NOTINLIST);
         if (CurrentEpisode.title.empty()) {
-          #ifdef _DEBUG
+#ifdef _DEBUG
           ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
-          #endif
+#endif
         } else {
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
@@ -667,8 +672,8 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           // Announce current episode
           Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_MIRC | ANNOUNCE_TO_SKYPE);
           // Update
-          if (Settings.Account.Update.time == UPDATE_MODE_AFTERDELAY && anime) {
-            anime->End(CurrentEpisode, false, true);
+          if (Settings.Account.Update.time == UPDATE_MODE_AFTERDELAY && anime_item) {
+            anime_item->End(CurrentEpisode, false, true);
           }
           return;
         }
@@ -679,8 +684,8 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       }
       // Caption changed?
       if (MediaPlayers.TitleChanged() == true) {
-        CurrentEpisode.Set(ANIMEID_UNKNOWN);
-        if (anime) anime->End(CurrentEpisode, true, true);
+        CurrentEpisode.Set(anime::ID_UNKNOWN);
+        if (anime_item) anime_item->End(CurrentEpisode, true, true);
         Taiga.ticker_media = 0;
       }
     }
@@ -688,17 +693,18 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   // Media player is NOT running
   } else {
     // Was running, but not watching
-    if (!anime) {
+    if (!anime_item) {
       if (MediaPlayers.index_old > 0){
         ChangeStatus();
-        CurrentEpisode.Set(ANIMEID_UNKNOWN);
+        CurrentEpisode.Set(anime::ID_UNKNOWN);
         MediaPlayers.index_old = 0;
       }
     
     // Was running and watching
     } else {
-      CurrentEpisode.Set(ANIMEID_UNKNOWN);
-      anime->End(CurrentEpisode, true, Settings.Account.Update.time == UPDATE_MODE_WAITPLAYER);
+      CurrentEpisode.Set(anime::ID_UNKNOWN);
+      anime_item->End(CurrentEpisode, true, 
+        Settings.Account.Update.time == UPDATE_MODE_WAITPLAYER);
       Taiga.ticker_media = 0;
     }
   }
@@ -724,7 +730,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   } else if (uMsg == WM_TASKBARCALLBACK) {
     switch (lParam) {
       case NIN_BALLOONSHOW: {
-        DebugPrint(L"Tip type: " + ToWSTR(Taiga.current_tip_type) + L"\n");
+        debug::Print(L"Tip type: " + ToWstr(Taiga.current_tip_type) + L"\n");
         break;
       }
       case NIN_BALLOONTIMEOUT: {
@@ -751,10 +757,10 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case WM_RBUTTONDOWN: {
-        UpdateAllMenus(AnimeList.index > -1 ? &AnimeList.items[AnimeList.index] : nullptr);
+        UpdateAllMenus(AnimeDatabase.GetCurrentItem());
         SetForegroundWindow();
         ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"Tray"));
-        RefreshMenubar(AnimeList.index);
+        RefreshMenubar(AnimeDatabase.GetCurrentId());
         break;
       }
     }
@@ -765,11 +771,11 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
 
 void MainDialog::ChangeStatus(wstring str) {
   // Change status text
-  if (str.empty() && CurrentEpisode.anime_id > 0) {
-    Anime* anime = AnimeList.FindItem(CurrentEpisode.anime_id);
-    str = L"Watching: " + anime->series_title + PushString(L" #", CurrentEpisode.number);
+  if (str.empty() && CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
+    auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+    str = L"Watching: " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
     if (Settings.Account.Update.out_of_range && 
-      GetEpisodeLow(CurrentEpisode.number) > anime->GetLastWatchedEpisode() + 1) {
+      GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
         str += L" (out of range)";
     }
   }
@@ -786,10 +792,9 @@ void MainDialog::EnableInput(bool enable) {
 }
 
 int MainDialog::GetListIndex(int anime_id) {
-  Anime* anime;
   for (int i = 0; i < listview.GetItemCount(); i++) {
-    anime = reinterpret_cast<Anime*>(listview.GetItemParam(i));
-    if (anime && anime->series_id == anime_id) return i;
+    auto anime_item = reinterpret_cast<anime::Item*>(listview.GetItemParam(i));
+    if (anime_item && anime_item->GetId() == anime_id) return i;
   }
   return -1;
 }
@@ -817,19 +822,20 @@ void MainDialog::RefreshList(int index) {
   // Add items
   int group_index = -1, icon_index = 0, status = 0;
   vector<int> group_count(6);
-  for (auto it = AnimeList.items.begin() + 1; it != AnimeList.items.end(); ++it) {
-    status = it->GetStatus();
-    if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->GetRewatching())) {
-      if (AnimeList.filters.Check(*it)) {
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (!it->IsInList()) continue;
+    status = it->GetMyStatus();
+    if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->GetMyRewatching())) {
+      if (AnimeFilters.CheckItem(*it)) {
         group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
-        icon_index = it->playing ? ICON16_PLAY : StatusToIcon(it->GetAiringStatus());
+        icon_index = it->GetPlaying() ? ICON16_PLAY : StatusToIcon(it->GetAiringStatus());
         group_count.at(status - 1)++;
         int i = listview.GetItemCount();
         listview.InsertItem(i, group_index, icon_index, 
           0, nullptr, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
-        listview.SetItem(i, 2, mal::TranslateNumber(it->GetScore()).c_str());
-        listview.SetItem(i, 3, mal::TranslateType(it->series_type).c_str());
-        listview.SetItem(i, 4, mal::TranslateDateToSeason(it->series_start).c_str());
+        listview.SetItem(i, 2, mal::TranslateNumber(it->GetMyScore()).c_str());
+        listview.SetItem(i, 3, mal::TranslateType(it->GetType()).c_str());
+        listview.SetItem(i, 4, mal::TranslateDateToSeason(it->GetDate(anime::DATE_START)).c_str());
       }
     }
   }
@@ -838,7 +844,7 @@ void MainDialog::RefreshList(int index) {
   for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
     if (index == 0 && i != mal::MYSTATUS_UNKNOWN) {
       wstring text = mal::TranslateMyStatus(i, false);
-      text += group_count.at(i - 1) > 0 ? L" (" + ToWSTR(group_count.at(i - 1)) + L")" : L"";
+      text += group_count.at(i - 1) > 0 ? L" (" + ToWstr(group_count.at(i - 1)) + L")" : L"";
       listview.SetGroupText(i, text.c_str());
     }
   }
@@ -853,7 +859,7 @@ void MainDialog::RefreshList(int index) {
 
 void MainDialog::RefreshMenubar(int anime_id, bool show) {
   if (show) {
-    UpdateAllMenus(AnimeList.FindItem(anime_id));
+    UpdateAllMenus(AnimeDatabase.FindItem(anime_id));
     vector<HMENU> hMenu;
     UI.Menus.CreateNewMenu(L"Main", hMenu);
     if (!hMenu.empty()) {
@@ -905,7 +911,7 @@ void MainDialog::UpdateStatusTimer() {
   
   int seconds = Settings.Account.Update.delay - Taiga.ticker_media;
 
-  if (CurrentEpisode.anime_id > ANIMEID_UNKNOWN && 
+  if (CurrentEpisode.anime_id > anime::ID_UNKNOWN && 
     seconds > 0 && seconds < Settings.Account.Update.delay) {
       wstring str = L"List update in " + ToTimeString(seconds);
       statusbar.SetPartText(1, str.c_str());
@@ -923,11 +929,11 @@ void MainDialog::UpdateStatusTimer() {
 void MainDialog::UpdateTip() {
   wstring tip = APP_TITLE;
   if (Taiga.logged_in) {
-    tip += L"\n" + AnimeList.user.name + L" is logged in.";
+    tip += L"\n" + AnimeDatabase.user.GetName() + L" is logged in.";
   }
   if (CurrentEpisode.anime_id > 0) {
-    Anime* anime = AnimeList.FindItem(CurrentEpisode.anime_id);
-    tip += L"\nWatching: " + anime->series_title + 
+    auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+    tip += L"\nWatching: " + anime_item->GetTitle() + 
       (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
   }
   Taskbar.Modify(tip.c_str());

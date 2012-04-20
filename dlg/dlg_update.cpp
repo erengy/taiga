@@ -17,12 +17,15 @@
 */
 
 #include "../std.h"
-#include "../common.h"
+
 #include "dlg_main.h"
 #include "dlg_update.h"
+
+#include "../common.h"
 #include "../http.h"
 #include "../resource.h"
 #include "../taiga.h"
+
 #include "../win32/win_gdi.h"
 #include "../win32/win_taskdialog.h"
 
@@ -49,11 +52,11 @@ BOOL UpdateDialog::OnInitDialog() {
   progressbar.SetMarquee(true);
 
   // Check updates
-  #ifdef _DEBUG
+#ifdef _DEBUG
   PostMessage(WM_CLOSE);
-  #else
+#else
   Taiga.Updater.Check(L"taiga.erengy.com/update.php", Taiga, HTTP_UpdateCheck);
-  #endif
+#endif
 
   // Success
   return TRUE;

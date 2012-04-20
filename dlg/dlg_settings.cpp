@@ -17,14 +17,17 @@
 */
 
 #include "../std.h"
-#include "../animelist.h"
-#include "../announce.h"
-#include "../common.h"
+
 #include "dlg_event.h"
 #include "dlg_input.h"
 #include "dlg_main.h"
 #include "dlg_search.h"
 #include "dlg_settings.h"
+
+#include "../anime_db.h"
+#include "../anime_filter.h"
+#include "../announce.h"
+#include "../common.h"
 #include "../http.h"
 #include "../media.h"
 #include "../monitor.h"
@@ -33,6 +36,7 @@
 #include "../settings.h"
 #include "../string.h"
 #include "../theme.h"
+
 #include "../win32/win_control.h"
 
 const WCHAR* PAGE_TITLE[PAGE_COUNT] = {
@@ -193,13 +197,13 @@ void SettingsDialog::OnOK() {
   }
   Settings.Folders.watch_enabled = pages[PAGE_FOLDERS_ROOT].IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH);
   // Folders > Specific
-  Anime* anime; wstring folder;
   List.SetWindowHandle(pages[PAGE_FOLDERS_ANIME].GetDlgItem(IDC_LIST_FOLDERS_ANIME));
   for (int i = 0; i < List.GetItemCount(); i++) {
-    anime = reinterpret_cast<Anime*>(List.GetItemParam(i));
-    if (anime) {
+    auto anime_item = reinterpret_cast<anime::Item*>(List.GetItemParam(i));
+    if (anime_item) {
+      wstring folder;
       List.GetItemText(i, 1, folder);
-      anime->SetFolder(folder, true, false);
+      anime_item->SetFolder(folder, true);
     }
   }
   List.SetWindowHandle(nullptr);
@@ -223,7 +227,7 @@ void SettingsDialog::OnOK() {
   // Program > List
   Settings.Program.List.double_click = pages[PAGE_LIST].GetComboSelection(IDC_COMBO_DBLCLICK);
   Settings.Program.List.middle_click = pages[PAGE_LIST].GetComboSelection(IDC_COMBO_MDLCLICK);
-  AnimeList.filters.new_episodes = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS) == TRUE;
+  AnimeFilters.new_episodes = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS) == TRUE;
   Settings.Program.List.highlight = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
   Settings.Program.List.progress_mode = pages[PAGE_LIST].GetCheckedRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2);
   Settings.Program.List.progress_show_eps = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
@@ -282,8 +286,8 @@ void SettingsDialog::OnOK() {
 
   // Refresh other windows
   if (Settings.Account.MAL.user != mal_user_old) {
-    AnimeList.Load();
-    CurrentEpisode.Set(ANIMEID_UNKNOWN);
+    AnimeDatabase.LoadList();
+    CurrentEpisode.Set(anime::ID_UNKNOWN);
     MainDialog.RefreshList(mal::MYSTATUS_WATCHING);
     MainDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     EventDialog.RefreshList();

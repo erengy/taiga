@@ -17,10 +17,11 @@
 */
 
 #include "std.h"
-#include "animedb.h"
-#include "animelist.h"
+
+#include "taiga.h"
+
+#include "anime_db.h"
 #include "common.h"
-#include "dlg/dlg_update.h"
 #include "gfx.h"
 #include "media.h"
 #include "monitor.h"
@@ -30,8 +31,11 @@
 #include "resource.h"
 #include "settings.h"
 #include "string.h"
-#include "taiga.h"
 #include "theme.h"
+#include "version.h"
+
+#include "dlg/dlg_update.h"
+
 #include "win32/win_taskdialog.h"
 
 HINSTANCE g_hInstance;
@@ -40,12 +44,15 @@ class Taiga Taiga;
 
 // =============================================================================
 
-Taiga::Taiga() : 
-  is_recognition_enabled(true), logged_in(false), 
-  current_tip_type(TIPTYPE_NORMAL), play_status(PLAYSTATUS_STOPPED), 
-  ticker_media(0), ticker_new_episodes(0), ticker_queue(0)
-{
-  SetVersionInfo(APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_REVISION);
+Taiga::Taiga()
+    : is_recognition_enabled(true), 
+      logged_in(false), 
+      current_tip_type(TIPTYPE_NORMAL), 
+      play_status(PLAYSTATUS_STOPPED), 
+      ticker_media(0), 
+      ticker_new_episodes(0), 
+      ticker_queue(0) {
+  SetVersionInfo(VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
 }
 
 Taiga::~Taiga() {
@@ -82,14 +89,14 @@ BOOL Taiga::InitInstance() {
 
 wstring Taiga::GetDataPath() {
   // Return current working directory in debug mode
-  #ifdef _DEBUG
+#ifdef _DEBUG
   return CheckSlash(GetCurrentDirectory()) + L"data\\";
-  #endif
+#endif
   
   // Return current path in portable mode
-  #ifdef PORTABLE
+#ifdef PORTABLE
   return CheckSlash(GetPathOnly(GetModulePath())) + L"data\\";
-  #endif
+#endif
   
   // Return %APPDATA% folder
   WCHAR buffer[MAX_PATH];
@@ -113,10 +120,10 @@ void Taiga::LoadData() {
   UI.LoadImages();
 
   // Load anime database
-  AnimeDatabase.Load();
+  AnimeDatabase.LoadDatabase();
   
   // Load anime list
-  AnimeList.Load();
+  AnimeDatabase.LoadList();
 }
 
 // =============================================================================

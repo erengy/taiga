@@ -17,6 +17,7 @@
 */
 
 #include "std.h"
+
 #include "string.h"
 
 #define MIN_LENGHT 16

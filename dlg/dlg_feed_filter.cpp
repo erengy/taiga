@@ -18,14 +18,18 @@
 
 #include "../std.h"
 #include <algorithm>
+
 #include "dlg_feed_condition.h"
 #include "dlg_feed_filter.h"
+
+#include "../anime_db.h"
 #include "../common.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
+
 #include "../win32/win_gdi.h"
 #include "../win32/win_taskdialog.h"
 
@@ -33,10 +37,11 @@ class FeedFilterDialog FeedFilterDialog;
 
 // =============================================================================
 
-FeedFilterDialog::FeedFilterDialog() : 
-  current_page_(0), icon_(nullptr), 
-  header_font_(nullptr), main_instructions_font_(nullptr)
-{
+FeedFilterDialog::FeedFilterDialog()
+    : current_page_(0), 
+      icon_(nullptr), 
+      header_font_(nullptr), 
+      main_instructions_font_(nullptr) {
   RegisterDlgClass(L"TaigaFeedFilterW");
 }
 
@@ -396,8 +401,8 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   condition_toolbar.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
   condition_toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
   // Add toolbar items
-  condition_toolbar.InsertButton(0, ICON16_PLUS,      100, true,  0, 0, nullptr, L"Add new condition...");
-  condition_toolbar.InsertButton(1, ICON16_MINUS,     101, false, 0, 1, nullptr, L"Delete condition");
+  condition_toolbar.InsertButton(0, ICON16_PLUS,       100, true,  0, 0, nullptr, L"Add new condition...");
+  condition_toolbar.InsertButton(1, ICON16_MINUS,      101, false, 0, 1, nullptr, L"Delete condition");
   condition_toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   condition_toolbar.InsertButton(3, ICON16_ARROW_UP,   103, false, 0, 3, nullptr, L"Move up");
   condition_toolbar.InsertButton(4, ICON16_ARROW_DOWN, 104, false, 0, 4, nullptr, L"Move down");
@@ -586,13 +591,14 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   }
   
   // Add anime to list
-  for (int i = 1; i <= AnimeList.count; i++) {
-    anime_list.InsertItem(i - 1, AnimeList.items[i].GetStatus(), 
-      StatusToIcon(AnimeList.items[i].GetAiringStatus()), 0, nullptr, 
-      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeList.items[i]));
+  for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
+    if (!AnimeDatabase.items.at(i).IsInList()) continue;
+    anime_list.InsertItem(i, AnimeDatabase.items[i].GetMyStatus(), 
+      StatusToIcon(AnimeDatabase.items[i].GetAiringStatus()), 0, nullptr, 
+      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeDatabase.items[i]));
     for (auto it = parent->filter.anime_ids.begin(); it != parent->filter.anime_ids.end(); ++it) {
-      if (*it == AnimeList.items[i].series_id) {
-        anime_list.SetCheckState(i - 1, TRUE);
+      if (*it == AnimeDatabase.items[i].GetId()) {
+        anime_list.SetCheckState(i, TRUE);
         break;
       }
     }
@@ -612,11 +618,11 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Text callback
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
-          Anime* anime = reinterpret_cast<Anime*>(plvdi->item.lParam);
-          if (!anime) break;
+          auto anime_item = reinterpret_cast<anime::Item*>(plvdi->item.lParam);
+          if (!anime_item) break;
           switch (plvdi->item.iSubItem) {
             case 0: // Anime title
-              plvdi->item.pszText = const_cast<LPWSTR>(anime->series_title.data());
+              plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
               break;
           }
           break;
@@ -627,9 +633,9 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
             wstring text;
             for (int i = 0; i < anime_list.GetItemCount(); i++) {
-              Anime* anime = reinterpret_cast<Anime*>(anime_list.GetItemParam(i));
-              if (anime && anime_list.GetCheckState(i)) {
-                AppendString(text, anime->series_title);
+              auto anime_item = reinterpret_cast<anime::Item*>(anime_list.GetItemParam(i));
+              if (anime_item && anime_list.GetCheckState(i)) {
+                AppendString(text, anime_item->GetTitle());
               }
             }
             if (text.empty()) text = L"(nothing)";
@@ -650,8 +656,8 @@ bool FeedFilterDialog::DialogPage2::BuildFilter(FeedFilter& filter) {
 
   for (int i = 0; i < anime_list.GetItemCount(); i++) {
     if (anime_list.GetCheckState(i)) {
-      Anime* anime = reinterpret_cast<Anime*>(anime_list.GetItemParam(i));
-      if (anime) filter.anime_ids.push_back(anime->series_id);
+      auto anime_item = reinterpret_cast<anime::Item*>(anime_list.GetItemParam(i));
+      if (anime_item) filter.anime_ids.push_back(anime_item->GetId());
     }
   }
   

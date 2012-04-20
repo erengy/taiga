@@ -17,19 +17,21 @@
 */
 
 #include "../std.h"
-#include "../animedb.h"
-#include "../animelist.h"
+
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
+
+#include "../anime.h"
+#include "../anime_db.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../string.h"
 
 // =============================================================================
 
-AnimeInfoPage::AnimeInfoPage() :
-  anime_(nullptr), header_font_(nullptr)
-{
+AnimeInfoPage::AnimeInfoPage()
+    : anime_id_(anime::ID_UNKNOWN), 
+      header_font_(nullptr) {
 }
 
 AnimeInfoPage::~AnimeInfoPage() {
@@ -60,26 +62,27 @@ BOOL AnimeInfoPage::OnInitDialog() {
 }
 
 BOOL AnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+
   switch (LOWORD(wParam)) {
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
-        if (!anime_) break;
         win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
         win32::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value; m_Spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if (anime_->GetStatus() == mal::MYSTATUS_COMPLETED && episode_value == anime_->series_episodes) {
+          if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED && episode_value == anime_item->GetEpisodeCount()) {
             m_Spin.SetPos32(0);
           }
           m_Combo.Enable(FALSE);
           m_Combo.SetCurSel(mal::MYSTATUS_COMPLETED - 1);
         } else {
           if (episode_value == 0) {
-            m_Spin.SetPos32(anime_->GetLastWatchedEpisode());
+            m_Spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
           }
           m_Combo.Enable();
-          m_Combo.SetCurSel(anime_->GetStatus() - 1);
+          m_Combo.SetCurSel(anime_item->GetMyStatus() - 1);
         }
         m_Spin.SetWindowHandle(nullptr);
         m_Combo.SetWindowHandle(nullptr);
@@ -93,8 +96,8 @@ BOOL AnimeInfoPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Selected "Completed"
         win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
         if (m_Combo.GetItemData(m_Combo.GetCurSel()) == mal::MYSTATUS_COMPLETED) {
-          if (anime_ && anime_->GetStatus() != mal::MYSTATUS_COMPLETED && anime_->series_episodes > 0) {
-            SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_->series_episodes);
+          if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED && anime_item->GetEpisodeCount() > 0) {
+            SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
           }
         }
         m_Combo.SetWindowHandle(nullptr);
@@ -111,11 +114,9 @@ LRESULT AnimeInfoPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case IDC_LINK_ANIME_FANSUB:
       switch (pnmh->code) {
         case NM_CLICK: {
-          if (anime_) {
-            // Set/change fansub group preference
-            if (anime_->SetFansubFilter()) {
-              RefreshFansubPreference();
-            }
+          // Set/change fansub group preference
+          if (anime::SetFansubFilter(anime_id_, L"TaigaSubs (change this)")) {
+            RefreshFansubPreference();
           }
           return TRUE;
         }
@@ -127,78 +128,65 @@ LRESULT AnimeInfoPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
 // =============================================================================
 
-void AnimeInfoPage::Refresh(Anime* anime) {
-  if (!anime) return;
+void AnimeInfoPage::Refresh(int anime_id) {
+  if (anime_id <= anime::ID_UNKNOWN) return;
 
-  // Store pointer to current anime item
-  anime_ = anime;
-  
+  anime_id_ = anime_id;
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
   switch (index) {
     // Series information
-    case TAB_SERIESINFO: {
+    case INFOPAGE_SERIESINFO: {
       // Set synonyms
-      wstring text;
-      if (!anime->series_synonyms.empty()) {
-        text = anime->series_synonyms;
-        Replace(text, L"; ", L", ", true);
-        TrimLeft(text, L", ");
-      }
+      wstring text = Join(anime_item->GetSynonyms(), L", ");
       if (text.empty()) text = L"-";
       SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
       
       // Set synopsis
-      bool must_update = false;
-      Anime* db_anime = AnimeDatabase.FindItem(anime->series_id);
-      if (db_anime != nullptr) {
-        must_update = db_anime->IsDataOld();
-      } else {
-        must_update = anime->synopsis.empty();
-      }
-      if (must_update) {
-        if (mal::SearchAnime(anime->series_title, anime)) {
+      if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty()) {
+        if (mal::SearchAnime(anime_id, anime_item->GetTitle())) {
           text = L"Retrieving...";
         } else {
           text = L"-";
         }
       } else {
-        text = anime->synopsis;
-        if (anime->genres.empty() || anime->score.empty()) {
-          mal::GetAnimeDetails(anime);
+        text = anime_item->GetSynopsis();
+        if (anime_item->GetGenres().empty() || anime_item->GetScore().empty()) {
+          mal::GetAnimeDetails(anime_id);
         }
       }
       SetDlgItemText(IDC_EDIT_ANIME_INFO, text.c_str());
       
       // Set information
-      text = mal::TranslateType(anime->series_type) + L"\n" + 
-             mal::TranslateNumber(anime->series_episodes, L"Unknown") + L"\n" + 
-             mal::TranslateStatus(anime->GetAiringStatus()) + L"\n" + 
-             mal::TranslateDateToSeason(anime->series_start);
+      text = mal::TranslateType(anime_item->GetType()) + L"\n" + 
+             mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" + 
+             mal::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" + 
+             mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START));
       SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
-      #define ADD_INFOLINE(x, y) (anime->x.empty() ? y : anime->x)
-      wstring genres = anime->genres; LimitText(anime->genres, 50); // TEMP
+      #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
+      wstring genres = anime_item->GetGenres();
+      LimitText(genres, 50); // TODO: Get rid of magic number
       text = ADD_INFOLINE(genres, L"-") + L"\n" +
-             ADD_INFOLINE(score, L"0.00") + L"\n" + 
-             ADD_INFOLINE(rank, L"#0") + L"\n" + 
-             ADD_INFOLINE(popularity, L"#0");
+             ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" + 
+             ADD_INFOLINE(anime_item->GetRank(), L"#0") + L"\n" + 
+             ADD_INFOLINE(anime_item->GetPopularity(), L"#0");
       #undef ADD_INFOLINE
-      anime->genres = genres;
       SetDlgItemText(IDC_STATIC_ANIME_INFO2, text.c_str());
-
       break;
     }
 
     // =========================================================================
 
     // My information
-    case TAB_MYINFO: {
+    case INFOPAGE_MYINFO: {
       // Episodes watched
       SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0, 
-        anime->series_episodes > 0 ? anime->series_episodes : 9999);
-      SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime->GetLastWatchedEpisode());
+        anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 9999);
+      SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetMyLastWatchedEpisode());
 
       // Re-watching
-      CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime->GetRewatching());
-      EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime->GetStatus() == mal::MYSTATUS_COMPLETED);
+      CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
+      EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED);
 
       // Status
       win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
@@ -209,10 +197,10 @@ void AnimeInfoPage::Refresh(Anime* anime) {
           }
         }
       }
-      int status = anime->GetStatus();
+      int status = anime_item->GetMyStatus();
       if (status == mal::MYSTATUS_PLANTOWATCH) status--;
       m_Combo.SetCurSel(status - 1);
-      m_Combo.Enable(!anime->GetRewatching());
+      m_Combo.Enable(!anime_item->GetMyRewatching());
       m_Combo.SetWindowHandle(nullptr);
 
       // Score
@@ -230,42 +218,38 @@ void AnimeInfoPage::Refresh(Anime* anime) {
         m_Combo.AddString(L"(1) Unwatchable");
         m_Combo.AddString(L"(0) No Score");
       }
-      m_Combo.SetCurSel(10 - anime->GetScore());
+      m_Combo.SetCurSel(10 - anime_item->GetMyScore());
       m_Combo.SetWindowHandle(nullptr);
 
       // Tags
       win32::Edit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
       m_Edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
-      m_Edit.SetText(anime->GetTags());
+      m_Edit.SetText(anime_item->GetMyTags());
       m_Edit.SetWindowHandle(nullptr);
       
       // Date limits and defaults
-      if (mal::IsValidDate(anime->series_start)) {
-        SYSTEMTIME stSeriesStart;
-        mal::ParseDateString(anime->series_start, stSeriesStart.wYear, stSeriesStart.wMonth, stSeriesStart.wDay);
+      if (mal::IsValidDate(anime_item->GetDate(anime::DATE_START))) {
+        SYSTEMTIME stSeriesStart = anime_item->GetDate(anime::DATE_START);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
       }
-      if (mal::IsValidDate(anime->series_end)) {
-        SYSTEMTIME stSeriesEnd;
-        mal::ParseDateString(anime->series_end, stSeriesEnd.wYear, stSeriesEnd.wMonth, stSeriesEnd.wDay);
+      if (mal::IsValidDate(anime_item->GetDate(anime::DATE_END))) {
+        SYSTEMTIME stSeriesEnd = anime_item->GetDate(anime::DATE_END);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesEnd);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesEnd);
       }
       // Start date
-      if (mal::IsValidDate(anime->my_start_date)) {
-        SYSTEMTIME stMyStart;
-        mal::ParseDateString(anime->my_start_date, stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
+      if (mal::IsValidDate(anime_item->GetMyDate(anime::DATE_START))) {
+        SYSTEMTIME stMyStart = anime_item->GetMyDate(anime::DATE_START);
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyStart);
       } else {
         SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, 0);
       }
       // Finish date
-      if (mal::IsValidDate(anime->my_finish_date)) {
-        SYSTEMTIME stMyFinish;
-        mal::ParseDateString(anime->my_finish_date, stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
+      if (mal::IsValidDate(anime_item->GetMyDate(anime::DATE_END))) {
+        SYSTEMTIME stMyFinish = anime_item->GetMyDate(anime::DATE_END);
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyFinish);
       } else {
         SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, 0);
@@ -274,7 +258,7 @@ void AnimeInfoPage::Refresh(Anime* anime) {
       // Alternative titles
       m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_ALT));
       m_Edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
-      m_Edit.SetText(anime->synonyms);
+      m_Edit.SetText(Join(anime_item->GetUserSynonyms(), L"; "));
       m_Edit.SetWindowHandle(nullptr);
 
       // Fansub group
@@ -286,12 +270,12 @@ void AnimeInfoPage::Refresh(Anime* anime) {
 }
 
 void AnimeInfoPage::RefreshFansubPreference() {
-  if (!anime_ || index != TAB_MYINFO) return;
+  if (anime_id_ <= anime::ID_UNKNOWN || index != INFOPAGE_MYINFO) return;
 
   wstring text;
   vector<wstring> groups;
   
-  if (anime_->GetFansubFilter(groups)) {
+  if (anime::GetFansubFilter(anime_id_, groups)) {
     for (auto it = groups.begin(); it != groups.end(); ++it) {
       if (!text.empty()) text += L" or ";
       text += L"\"" + *it + L"\"";

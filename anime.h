@@ -21,100 +21,94 @@
 
 #include "std.h"
 
+#include "time.h"
+
+namespace anime {
+
+class Episode;
+class Item;
+
+// =============================================================================
+
+// ID_NOTINLIST
+//   Used in Episode data to denote the item is not in user's list.
+//   Item may or may not be in the database.
+//
+// ID_UNKNOWN
+//   There's no item in the database with this ID.
+//   This is the default ID for all anime items.
+//
 enum AnimeId {
-  ANIMEID_NOTINLIST = -1,
-  ANIMEID_UNKNOWN = 0
+  ID_NOTINLIST = -1,
+  ID_UNKNOWN = 0
 };
 
-class EventItem;
-
-// =============================================================================
-
-class Episode {
-public:
-  Episode();
-  virtual ~Episode() {}
-
-  void Clear();
-  void Set(int anime_id);
-
-public:
-  int anime_id;
-  wstring file, folder, format, title, name, group, number, version, 
-    resolution, audio_type, video_type, checksum, extras;
+// GetDate() and SetDate() require a particular type.
+//
+// DATE_START
+//   Airing date of the first episode (i.e., season premiere for TV series).
+//
+// DATE_END
+//   Airing date of the last episode (i.e., season finale for TV series).
+//   The same as DATE_START for one-episode titles.
+//
+enum DateType {
+  DATE_START = 0,
+  DATE_END
 };
 
-extern Episode CurrentEpisode;
+// All anime items have series information.
+class SeriesInformation {
+ public:
+  SeriesInformation();
+  virtual ~SeriesInformation() {}
 
-// =============================================================================
+  int id;
+  int type;
+  int episodes;
+  int status;
+  wstring title;
+  vector<wstring> synonyms;
+  Date date_start;
+  Date date_end;
+  wstring image_url;
 
-class MalAnime {
-public:
-  MalAnime();
-  virtual ~MalAnime() {}
-
-public:
-  int series_id, series_type, series_episodes, series_status,
-    my_id, my_watched_episodes, my_score, my_status, my_rewatching, my_rewatching_ep;
-  wstring series_title, series_synonyms, series_start, series_end, series_image,
-    my_start_date, my_finish_date, my_last_updated, my_tags;
+  wstring genres;
+  wstring popularity;
+  wstring producers;
+  wstring rank;
+  wstring score;
+  wstring synopsis;
 };
 
-class Anime : public MalAnime {
-public:
-  Anime();
-  virtual ~Anime() {}
+// Invalid for anime items that are not in user's list.
+class MyInformation {
+ public:
+  MyInformation();
+  virtual ~MyInformation() {}
 
-  int Ask(Episode episode);
-  void End(Episode episode, bool end_watching, bool update_list);
-  void Start(Episode episode);
-  void Update(Episode episode, bool change_status);
+  int watched_episodes;
+  int score;
+  int status;
+  int rewatching;
+  int rewatching_ep;
+  Date date_start;
+  Date date_finish;
+  wstring last_updated;
+  wstring tags;
   
-  bool CheckFolder();
-  void SetFolder(const wstring& folder, bool save_settings, bool check_episodes);
-  
-  bool CheckEpisodes(int number = -1, bool check_folder = false);
-  bool IsEpisodeAvailable(int number);
-  bool PlayEpisode(int number);
-  bool SetEpisodeAvailability(int number, bool available, const wstring& path = L"");
-  
-  wstring GetImagePath();
-  void SetLocalData(const wstring& folder, const wstring& titles);
-  
-  int GetIntValue(int mode) const;
-  wstring GetStrValue(int mode) const;
-
-  int GetLastWatchedEpisode() const;
-  int GetRewatching() const;
-  int GetScore() const;
-  int GetStatus() const;
-  wstring GetTags() const;
-  int GetTotalEpisodes() const;
-  
-  int GetAiringStatus();
-  bool IsAiredYet(bool strict = false) const;
-  bool IsFinishedAiring() const;
-  void SetFinishDate(const wstring& date, bool ignore_previous);
-  void SetStartDate(const wstring& date, bool ignore_previous);
-
-  bool Edit(EventItem& item, const wstring& data, int status_code);
-  bool IsDataOld();
-  bool Update(Anime& anime, bool modify = true);
-  
-  bool GetFansubFilter(vector<wstring>& groups);
-  bool SetFansubFilter(const wstring& group_name = L"TaigaSubs (change this)");
-  
-public:
-  int index;
-  bool new_episode_available, playing;
-  vector<bool> episode_available;
-  wstring next_episode_path;
-  wstring folder, synonyms;
-  int settings_keep_title;
-  time_t last_modified;
-
-public:
-  wstring genres, popularity, producers, rank, score, synopsis;
+  vector<bool> available_episodes;
+  wstring new_episode_path;
+  wstring folder;
+  vector<wstring> synonyms;
+  bool playing;
 };
+
+bool GetFansubFilter(int anime_id, vector<wstring>& groups);
+bool SetFansubFilter(int anime_id, const wstring& group_name);
+
+wstring GetImagePath(int anime_id);
+
+} // namespace anime
 
 #endif // ANIME_H

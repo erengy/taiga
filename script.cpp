@@ -17,7 +17,9 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "anime_db.h"
+#include "anime_episode.h"
 #include "common.h"
 #include "myanimelist.h"
 #include "settings.h"
@@ -92,10 +94,10 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
   if (body_parts.empty()) return L"";
   
   // $cut(string,len)
-  // Returns first len characters of string. 
+  //   Returns first len characters of string. 
   if (func_name == L"cut") {
     if (body_parts.size() > 1) {
-      int length = ToINT(body_parts[1]);
+      int length = ToInt(body_parts[1]);
       if (length >= 0 && length < static_cast<int>(body_parts[0].length())) {
         body_parts[0].resize(length);
       }
@@ -103,51 +105,51 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
     }
 
   // $equal(x,y)
-  // Returns true, if x is equal to y.
+  //   Returns true, if x is equal to y.
   } else if (func_name == L"equal") {
     if (body_parts.size() > 1) {
       if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
-        if (ToINT(body_parts[0]) == ToINT(body_parts[1])) return L"true";
+        if (ToInt(body_parts[0]) == ToInt(body_parts[1])) return L"true";
       } else {
         if (CompareStrings(body_parts[0], body_parts[1]) == 0) return L"true";
       }
     }
   // $gequal(x,y)
-  // Returns true, if x is greater as or equal to y.
+  //   Returns true, if x is greater as or equal to y.
   } else if (func_name == L"gequal") {
     if (body_parts.size() > 1) {
       if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
-        if (ToINT(body_parts[0]) >= ToINT(body_parts[1])) return L"true";
+        if (ToInt(body_parts[0]) >= ToInt(body_parts[1])) return L"true";
       } else {
         if (CompareStrings(body_parts[0], body_parts[1]) >= 0) return L"true";
       }
     }
   // $greater(x,y)
-  // Returns true, if x is greater than y.
+  //   Returns true, if x is greater than y.
   } else if (func_name == L"greater") {
     if (body_parts.size() > 1) {
       if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
-        if (ToINT(body_parts[0]) > ToINT(body_parts[1])) return L"true";
+        if (ToInt(body_parts[0]) > ToInt(body_parts[1])) return L"true";
       } else {
         if (CompareStrings(body_parts[0], body_parts[1]) > 0) return L"true";
       }
     }
   // $lequal(x,y)
-  // // Returns true, if x is less than or equal to y.
+  //   Returns true, if x is less than or equal to y.
   } else if (func_name == L"lequal") {
     if (body_parts.size() > 1) {
       if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
-        if (ToINT(body_parts[0]) <= ToINT(body_parts[1])) return L"true";
+        if (ToInt(body_parts[0]) <= ToInt(body_parts[1])) return L"true";
       } else {
         if (CompareStrings(body_parts[0], body_parts[1]) <= 0) return L"true";
       }
     }
   // $less(x,y)
-  // Returns true, if x is less than y.
+  //   Returns true, if x is less than y.
   } else if (func_name == L"less") {
     if (body_parts.size() > 1) {
       if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
-        if (ToINT(body_parts[0]) < ToINT(body_parts[1])) return L"true";
+        if (ToInt(body_parts[0]) < ToInt(body_parts[1])) return L"true";
       } else {
         if (CompareStrings(body_parts[0], body_parts[1]) < 0) return L"true";
       }
@@ -184,38 +186,38 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
     }
 
   // $len(string)
-  // Returns length of string in characters.
+  //   Returns length of string in characters.
   } else if (func_name == L"len") {
-    str = ToWSTR(static_cast<int>(body_parts[0].length()));
+    str = ToWstr(static_cast<int>(body_parts[0].length()));
 
   // $lower(string)
-  // Converts string to lowercase.
+  //   Converts string to lowercase.
   } else if (func_name == L"lower") {
     str = ToLower_Copy(body_parts[0]);
   // $upper(string)
-  // Converts string to uppercase.
+  //   Converts string to uppercase.
   } else if (func_name == L"upper") {
     str = ToUpper_Copy(body_parts[0]);
 
   // $num(n,len)
-  // Formats the integer number n in decimal notation with len characters.
-  // Pads with zeros from the left if necessary.
+  //   Formats the integer number n in decimal notation with len characters.
+  //   Pads with zeros from the left if necessary.
   } else if (func_name == L"num") {
     if (body_parts.size() > 1) {
-      int length = ToINT(body_parts[1]);
+      int length = ToInt(body_parts[1]);
       if (length > static_cast<int>(body_parts[0].length())) {
         str.append(length - body_parts[0].length(), '0');
       }
     }
     str += body_parts[0];
   // $pad(s,len,chars)
-  // Pads string from the left with chars to len characters.
-  // If length of chars is smaller than len, padding will repeat.
+  //   Pads string from the left with chars to len characters.
+  //   If length of chars is smaller than len, padding will repeat.
   } else if (func_name == L"pad") {
     if (body_parts.size() == 2) body_parts.push_back(L" ");
     if (body_parts.size() > 2) {
       if (body_parts[2].empty()) body_parts[2] = L" ";
-      int length = ToINT(body_parts[1]);
+      int length = ToInt(body_parts[1]);
       if (length > static_cast<int>(body_parts[0].length())) {
         for (size_t i = 0; i < length - body_parts[0].length(); i++) {
           str += body_parts[2].at(i % body_parts[2].length());
@@ -225,7 +227,7 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
     str += body_parts[0];
 
   // $replace(a,b,c)
-  // Replaces all occurrences of string b in string a with string c.
+  //   Replaces all occurrences of string b in string a with string c.
   } else if (func_name == L"replace") {
     if (body_parts.size() == 2) body_parts.push_back(L"");
     if (body_parts.size() > 2) {
@@ -234,16 +236,16 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
     }
 
   // $substr(s,pos,n)
-  // Returns substring of string s, starting from pos with a length of n characters.
+  //   Returns substring of string s, starting from pos with a length of n characters.
   } else if (func_name == L"substr") {
     if (body_parts.size() > 2) {
-      if (ToINT(body_parts[1]) <= static_cast<int>(body_parts[0].length())) {
-        str = body_parts[0].substr(ToINT(body_parts[1]), ToINT(body_parts[2]));
+      if (ToInt(body_parts[1]) <= static_cast<int>(body_parts[0].length())) {
+        str = body_parts[0].substr(ToInt(body_parts[1]), ToInt(body_parts[2]));
       }
     }
     
   // $triml()
-  // Removes leading characters from string.
+  //   Removes leading characters from string.
   } else if (func_name == L"triml") {
     // $triml(s,c)
     if (body_parts.size() > 1) {
@@ -253,7 +255,7 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
       TrimLeft(body_parts[0]);
     }
   // $trimr()
-  // Removes trailing characters from string.
+  //   Removes trailing characters from string.
   } else if (func_name == L"trimr") {
     // $trimr(s,c)
     if (body_parts.size() > 1) {
@@ -285,37 +287,57 @@ bool IsScriptVariable(const wstring& str) {
 
 // =============================================================================
 
-wstring ReplaceVariables(wstring str, const Episode& episode, bool url_encode) {
-  Anime* anime = AnimeList.FindItem(episode.anime_id);
+wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_encode) {
+  auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
 
-  #define VALIDATE(x, y) anime ? x : y
-  #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeURL(x)) : EscapeScriptEntities(x)
+  #define VALIDATE(x, y) anime_item ? x : y
+  #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeUrl(x)) : EscapeScriptEntities(x)
 
   // Prepare episode value
-  wstring episode_number = ToWSTR(GetEpisodeHigh(episode.number));
+  wstring episode_number = ToWstr(GetEpisodeHigh(episode.number));
   TrimLeft(episode_number, L"0");
 
   // Replace variables
-  Replace(str, L"%title%",   VALIDATE(ENCODE(anime->series_title), ENCODE(episode.title)));
-  Replace(str, L"%watched%", VALIDATE(ENCODE(mal::TranslateNumber(anime->GetLastWatchedEpisode(), L"")), L""));
-  Replace(str, L"%total%",   VALIDATE(ENCODE(mal::TranslateNumber(anime->series_episodes, L"")), L""));
-  Replace(str, L"%score%",   VALIDATE(ENCODE(mal::TranslateNumber(anime->GetScore(), L"")), L""));
-  Replace(str, L"%id%",      VALIDATE(ENCODE(ToWSTR(anime->series_id)), L""));
-  Replace(str, L"%image%",   VALIDATE(ENCODE(anime->series_image), L""));
-  Replace(str, L"%status%",  VALIDATE(ENCODE(ToWSTR(anime->GetStatus())), L""));
-  Replace(str, L"%rewatching%", VALIDATE(ENCODE(ToWSTR(anime->GetRewatching())), L""));
-  Replace(str, L"%name%",       ENCODE(episode.name));
-  Replace(str, L"%episode%",    ENCODE(episode_number));
-  Replace(str, L"%version%",    ENCODE(episode.version));
-  Replace(str, L"%group%",      ENCODE(episode.group));
-  Replace(str, L"%resolution%", ENCODE(episode.resolution));
-  Replace(str, L"%video%",      ENCODE(episode.video_type));
-  Replace(str, L"%audio%",      ENCODE(episode.audio_type));
-  Replace(str, L"%checksum%",   ENCODE(episode.checksum));
-  Replace(str, L"%extra%",      ENCODE(episode.extras));
-  Replace(str, L"%file%",       ENCODE(episode.file));
-  Replace(str, L"%folder%",     ENCODE(episode.folder));
-  Replace(str, L"%user%",       ENCODE(Settings.Account.MAL.user));
+  Replace(str, L"%title%", 
+    VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.title)));
+  Replace(str, L"%watched%", 
+    VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
+  Replace(str, L"%total%", 
+    VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
+  Replace(str, L"%score%", 
+    VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyScore(), L"")), L""));
+  Replace(str, L"%id%", 
+    VALIDATE(ENCODE(ToWstr(anime_item->GetId())), L""));
+  Replace(str, L"%image%", 
+    VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
+  Replace(str, L"%status%", 
+    VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));
+  Replace(str, L"%rewatching%", 
+    VALIDATE(ENCODE(ToWstr(anime_item->GetMyRewatching())), L""));
+  Replace(str, L"%name%", 
+    ENCODE(episode.name));
+  Replace(str, L"%episode%", 
+    ENCODE(episode_number));
+  Replace(str, L"%version%", 
+    ENCODE(episode.version));
+  Replace(str, L"%group%", 
+    ENCODE(episode.group));
+  Replace(str, L"%resolution%", 
+    ENCODE(episode.resolution));
+  Replace(str, L"%video%", 
+    ENCODE(episode.video_type));
+  Replace(str, L"%audio%", 
+    ENCODE(episode.audio_type));
+  Replace(str, L"%checksum%", 
+    ENCODE(episode.checksum));
+  Replace(str, L"%extra%", 
+    ENCODE(episode.extras));
+  Replace(str, L"%file%", 
+    ENCODE(episode.file));
+  Replace(str, L"%folder%", 
+    ENCODE(episode.folder));
+  Replace(str, L"%user%", 
+    ENCODE(Settings.Account.MAL.user));
   switch (Taiga.play_status) {
     case PLAYSTATUS_STOPPED:
       Replace(str, L"%playstatus%", L"stopped");
@@ -327,6 +349,8 @@ wstring ReplaceVariables(wstring str, const Episode& episode, bool url_encode) {
       Replace(str, L"%playstatus%", L"updated");
       break;
   }
+  #undef ENCODE
+  #undef VALIDATE
 
   // Replace special characters
   Replace(str, L"\\n", L"\n", true);
@@ -387,8 +411,6 @@ wstring ReplaceVariables(wstring str, const Episode& episode, bool url_encode) {
 
   // Return
   return str;
-  #undef VALIDATE
-  #undef ENCODE
 }
 
 wstring EscapeScriptEntities(wstring str) {

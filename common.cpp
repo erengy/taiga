@@ -17,15 +17,19 @@
 */
 
 #include "std.h"
-#include "animelist.h"
-#include "third_party/base64/base64.h"
+
 #include "common.h"
+
+#include "anime_db.h"
 #include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
 #include "theme.h"
-#include "win32/win_registry.h"
+
+#include "third_party/base64/base64.h"
 #include "third_party/zlib/zlib.h"
+
+#include "win32/win_registry.h"
 
 // =============================================================================
 
@@ -89,17 +93,17 @@ wstring CalculateCRC(const wstring& file) {
 int GetEpisodeHigh(const wstring& episode_number) {
   int value = 1, pos = InStrRev(episode_number, L"-", episode_number.length());
   if (pos == episode_number.length() - 1) {
-    value = ToINT(episode_number.substr(0, pos));
+    value = ToInt(episode_number.substr(0, pos));
   } else if (pos > -1) {
-    value = ToINT(episode_number.substr(pos + 1));
+    value = ToInt(episode_number.substr(pos + 1));
   } else {
-    value = ToINT(episode_number);
+    value = ToInt(episode_number);
   }
   return value;
 }
 
 int GetEpisodeLow(const wstring& episode_number) {
-  return ToINT(episode_number); // ToINT() stops at -
+  return ToInt(episode_number); // ToInt() stops at -
 }
 
 void SplitEpisodeNumbers(const wstring& input, vector<int>& output) {
@@ -107,7 +111,7 @@ void SplitEpisodeNumbers(const wstring& input, vector<int>& output) {
   vector<wstring> numbers;
   Split(input, L"-", numbers);
   for (auto it = numbers.begin(); it != numbers.end(); ++it) {
-    output.push_back(ToINT(*it));
+    output.push_back(ToInt(*it));
   }
 }
 
@@ -115,7 +119,7 @@ wstring JoinEpisodeNumbers(const vector<int>& input) {
   wstring output;
   for (auto it = input.begin(); it != input.end(); ++it) {
     if (!output.empty()) output += L"-";
-    output += ToWSTR(*it);
+    output += ToWstr(*it);
   }
   return output;
 }
@@ -129,7 +133,7 @@ int TranslateResolution(const wstring& str, bool return_validity) {
         if (i != pos && !IsNumeric(str.at(i))) return 0;
       }
       return return_validity ? 
-        TRUE : ToINT(str.substr(pos + 1));
+        TRUE : ToInt(str.substr(pos + 1));
     }
 
   // *###p
@@ -139,7 +143,7 @@ int TranslateResolution(const wstring& str, bool return_validity) {
         if (!IsNumeric(str.at(i))) return 0;
       }
       return return_validity ? 
-        TRUE : ToINT(str.substr(0, str.length() - 1));
+        TRUE : ToInt(str.substr(0, str.length() - 1));
     }
   }
 
@@ -183,7 +187,7 @@ wstring FormatError(DWORD dwError, LPCWSTR lpSource) {
       return buffer;
   } else {
     if (hInstance) FreeLibrary(hInstance);
-    return ToWSTR(dwError);
+    return ToWstr(dwError);
   }
 }
 
@@ -214,94 +218,6 @@ unsigned long GetFileAge(const wstring& path) {
 
   // Return difference in seconds
   return static_cast<unsigned long>((ul_now.QuadPart - ul_file.QuadPart) / 10000000);
-}
-
-void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
-  // Get current time, expressed in UTC
-  GetSystemTime(&st);
-  if (utc_offset == 0) return;
-  
-  // Convert to FILETIME
-  FILETIME ft;
-  SystemTimeToFileTime(&st, &ft);
-  // Convert to ULARGE_INTEGER
-  ULARGE_INTEGER ul;
-  ul.LowPart = ft.dwLowDateTime;
-  ul.HighPart = ft.dwHighDateTime;
-
-  // Apply UTC offset
-  ul.QuadPart += static_cast<ULONGLONG>(utc_offset) * 60 * 60 * 10000000;
-
-  // Convert back to SYSTEMTIME
-  ft.dwLowDateTime = ul.LowPart;
-  ft.dwHighDateTime = ul.HighPart;
-  FileTimeToSystemTime(&ft, &st);
-}
-
-wstring GetDate(LPCWSTR lpFormat) {
-  WCHAR buff[32];
-  GetDateFormat(LOCALE_SYSTEM_DEFAULT, 0, NULL, lpFormat, buff, 32);
-  return buff;
-}
-
-wstring GetTime(LPCWSTR lpFormat) {
-  WCHAR buff[32];
-  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, NULL, lpFormat, buff, 32);
-  return buff;
-}
-
-wstring GetDateJapan(LPCWSTR lpFormat) {
-  WCHAR buff[32];
-  SYSTEMTIME stJST;
-  GetSystemTime(stJST, 9); // JST is UTC+09
-  GetDateFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, lpFormat, buff, 32);
-  return buff;
-}
-
-wstring GetTimeJapan(LPCWSTR lpFormat) {
-  WCHAR buff[32];
-  SYSTEMTIME stJST;
-  GetSystemTime(stJST, 9); // JST is UTC+09
-  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, lpFormat, buff, 32);
-  return buff;
-}
-
-wstring ToDateString(time_t seconds) {
-  time_t days, hours, minutes;
-  wstring date;
-
-  if (seconds > 0) {
-    #define CALC_TIME(x, y) x = seconds / (y); seconds = seconds % (y);
-    CALC_TIME(days, 60 * 60 * 24);
-    CALC_TIME(hours, 60 * 60);
-    CALC_TIME(minutes, 60);
-    #undef CALC_TIME
-    date.clear();
-    #define ADD_TIME(x, y) \
-      if (x > 0) { \
-        if (!date.empty()) date += L" "; \
-        date += ToWSTR(x) + y; \
-        if (x > 1) date += L"s"; \
-      }
-    ADD_TIME(days, L" day");
-    ADD_TIME(hours, L" hour");
-    ADD_TIME(minutes, L" minute");
-    ADD_TIME(seconds, L" second");
-    #undef ADD_TIME
-  }
-
-  return date;
-}
-
-wstring ToTimeString(int seconds) {
-  int hours = seconds / 3600;
-  seconds = seconds % 3600;
-  int minutes = seconds / 60;
-  seconds = seconds % 60;
-  #define TWO_DIGIT(x) (x >= 10 ? ToWSTR(x) : L"0" + ToWSTR(x))
-  return (hours > 0 ? TWO_DIGIT(hours) + L":" : L"") + 
-    TWO_DIGIT(minutes) + L":" + TWO_DIGIT(seconds);
-  #undef TWO_DIGIT
 }
 
 // =============================================================================
@@ -488,16 +404,16 @@ wstring ToSizeString(QWORD qwSize) {
   wstring size, unit;
 
   if (qwSize > 1073741824) {      // 2^30
-    size = ToWSTR(static_cast<double>(qwSize) / 1073741824, 2);
+    size = ToWstr(static_cast<double>(qwSize) / 1073741824, 2);
     unit = L" GB";
   } else if (qwSize > 1048576) {  // 2^20
-    size = ToWSTR(static_cast<double>(qwSize) / 1048576, 2);
+    size = ToWstr(static_cast<double>(qwSize) / 1048576, 2);
     unit = L" MB";
   } else if (qwSize > 1024) {     // 2^10
-    size = ToWSTR(static_cast<double>(qwSize) / 1024, 2);
+    size = ToWstr(static_cast<double>(qwSize) / 1024, 2);
     unit = L" KB";
   } else {
-    size = ToWSTR(qwSize);
+    size = ToWstr(qwSize);
     unit = L" bytes";
   }
 

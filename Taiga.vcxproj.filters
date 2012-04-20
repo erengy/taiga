@@ -40,6 +40,9 @@
     <Filter Include="Third Party\zlib">
       <UniqueIdentifier>{c8d3c2ca-aff5-47eb-a494-791f8c819306}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Anime">
+      <UniqueIdentifier>{0728981d-66d0-4e99-8cf4-2cd1aae17e53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dlg\dlg_about.cpp">
@@ -85,12 +88,6 @@
       <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="action.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="anime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="animelist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="announce.cpp">
@@ -312,14 +309,32 @@
     <ClCompile Include="stats.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="animedb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dlg\dlg_season.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="accessibility.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anime.cpp">
+      <Filter>Anime</Filter>
+    </ClCompile>
+    <ClCompile Include="anime_db.cpp">
+      <Filter>Anime</Filter>
+    </ClCompile>
+    <ClCompile Include="anime_episode.cpp">
+      <Filter>Anime</Filter>
+    </ClCompile>
+    <ClCompile Include="time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anime_filter.cpp">
+      <Filter>Anime</Filter>
+    </ClCompile>
+    <ClCompile Include="anime_user.cpp">
+      <Filter>Anime</Filter>
+    </ClCompile>
+    <ClCompile Include="anime_item.cpp">
+      <Filter>Anime</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -361,12 +376,6 @@
     </ClInclude>
     <ClInclude Include="dlg\dlg_torrent.h">
       <Filter>Dialogs\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="anime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="animelist.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="announce.h">
       <Filter>Header Files</Filter>
@@ -521,9 +530,6 @@
     <ClInclude Include="stats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="animedb.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dlg\dlg_season.h">
       <Filter>Dialogs\Headers</Filter>
     </ClInclude>
@@ -533,9 +539,36 @@
     <ClInclude Include="debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anime.h">
+      <Filter>Anime</Filter>
+    </ClInclude>
+    <ClInclude Include="anime_db.h">
+      <Filter>Anime</Filter>
+    </ClInclude>
+    <ClInclude Include="anime_episode.h">
+      <Filter>Anime</Filter>
+    </ClInclude>
+    <ClInclude Include="time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anime_filter.h">
+      <Filter>Anime</Filter>
+    </ClInclude>
+    <ClInclude Include="anime_user.h">
+      <Filter>Anime</Filter>
+    </ClInclude>
+    <ClInclude Include="anime_item.h">
+      <Filter>Anime</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="version.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

@@ -17,27 +17,33 @@
 */
 
 #include "std.h"
-#include "animelist.h"
+
+#include "feed.h"
+
+#include "anime_db.h"
 #include "common.h"
 #include "debug.h"
-#include "dlg/dlg_torrent.h"
-#include "feed.h"
 #include "gfx.h"
 #include "recognition.h"
 #include "resource.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
-#include "win32/win_taskbar.h"
 #include "xml.h"
+
+#include "dlg/dlg_torrent.h"
+
+#include "win32/win_taskbar.h"
 
 class Aggregator Aggregator;
 
 // =============================================================================
 
-Feed::Feed() : 
-  category(0), download_index(-1), ticker(0), icon_(nullptr)
-{
+Feed::Feed()
+    : category(0), 
+      download_index(-1), 
+      ticker(0), 
+      icon_(nullptr) {
 }
 
 Feed::~Feed() {
@@ -59,15 +65,14 @@ bool Feed::Check(const wstring& source) {
       TorrentDialog.EnableInput(false);
       break;
   }
-  
-  win32::Url url(link);
-  return client.Get(url, GetDataPath() + L"feed.xml", 
+
+  return client.Get(win32::Url(link), GetDataPath() + L"feed.xml", 
     HTTP_Feed_Check, reinterpret_cast<LPARAM>(this));
 }
 
 bool Feed::Download(int index) {
   if (category != FEED_CATEGORY_LINK) {
-    DebugPrint(L"Feed::Download - How did we end up here?\n");
+    debug::Print(L"Feed::Download - How did we end up here?\n");
     return false;
   }
   
@@ -90,18 +95,19 @@ bool Feed::Download(int index) {
   wstring file = items[index].title + L".torrent";
   ValidateFileName(file);
   file = GetDataPath() + file;
-  
-  win32::Url url(items[index].link);
-  return client.Get(url, file, dwMode, reinterpret_cast<LPARAM>(this));
+
+  return client.Get(win32::Url(items[index].link), file, dwMode, 
+    reinterpret_cast<LPARAM>(this));
 }
 
 int Feed::ExamineData() {
   // Examine title and compare with anime list items
   for (size_t i = 0; i < items.size(); i++) {
     Meow.ExamineTitle(items[i].title, items[i].episode_data, true, true, true, true, false);
-    for (int j = AnimeList.count; j > 0; j--) {
-      if (Meow.CompareEpisode(items[i].episode_data, AnimeList.items[j])) {
-        items[i].episode_data.anime_id = AnimeList.items[j].series_id;
+    for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
+      if (!it->IsInList()) continue;
+      if (Meow.CompareEpisode(items[i].episode_data, *it)) {
+        items[i].episode_data.anime_id = it->GetId();
         break;
       }
     }
@@ -177,13 +183,12 @@ bool Feed::Load() {
     }
     
     // Clean up title
-    DecodeHTML(items.back().title);
+    items.back().title = DecodeHtml(items.back().title);
     Replace(items.back().title, L"\\'", L"'");
     // Clean up description
-    DecodeHTML(items.back().description);
     Replace(items.back().description, L"<br/>", L"\n");
     Replace(items.back().description, L"<br />", L"\n");
-    StripHTML(items.back().description);
+    items.back().description = StripHtml(DecodeHtml(items.back().description));
     Trim(items.back().description, L" \n");
     Aggregator.ParseDescription(items.back(), link);
     Replace(items.back().description, L"\n", L" | ");

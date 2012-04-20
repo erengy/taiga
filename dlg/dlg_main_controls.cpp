@@ -17,10 +17,13 @@
 */
 
 #include "../std.h"
-#include "../animelist.h"
+
+#include "dlg_main.h"
+
+#include "../anime_db.h"
+#include "../anime_filter.h"
 #include "../common.h"
 #include "../debug.h"
-#include "dlg_main.h"
 #include "../event.h"
 #include "../gfx.h"
 #include "../myanimelist.h"
@@ -29,6 +32,7 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
+
 #include "../win32/win_gdi.h"
 
 // =============================================================================
@@ -183,11 +187,11 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
     // Item select
     case LVN_ITEMCHANGED: {
       LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      Anime* anime = reinterpret_cast<Anime*>(lplv->lParam);
-      if (anime) {
-        AnimeList.index = anime->index;
+      auto anime_item = reinterpret_cast<anime::Item*>(lplv->lParam);
+      if (anime_item) {
+        AnimeDatabase.SetCurrentId(anime_item->GetId());
       } else {
-        AnimeList.index = 0;
+        AnimeDatabase.SetCurrentId(anime::ID_UNKNOWN);
       }
       break;
     }
@@ -209,10 +213,10 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
     case NM_RCLICK: {
       if (pnmh->hwndFrom == listview.GetWindowHandle()) {
         if (listview.GetSelectedCount() > 0) {
-          UpdateAllMenus(AnimeList.index > -1 ? &AnimeList.items[AnimeList.index] : nullptr);
+          UpdateAllMenus(AnimeDatabase.GetCurrentItem());
           int index = listview.HitTest(true);
           ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, index == 2 ? L"EditScore" : L"RightClick"));
-          RefreshMenubar(AnimeList.index);
+          RefreshMenubar(AnimeDatabase.GetCurrentId());
         }
       } else if (pnmh->hwndFrom == listview.GetHeader()) {
         HDHITTESTINFO hdhti;
@@ -221,7 +225,7 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
         if (::SendMessage(listview.GetHeader(), HDM_HITTEST, 0, reinterpret_cast<LPARAM>(&hdhti))) {
           if (hdhti.iItem == 3) {
             ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"FilterType"));
-            RefreshMenubar(AnimeList.index);
+            RefreshMenubar(AnimeDatabase.GetCurrentId());
             return TRUE;
           }
         }
@@ -232,11 +236,11 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
     // Text callback
     case LVN_GETDISPINFO: {
       NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-      Anime* anime = reinterpret_cast<Anime*>(plvdi->item.lParam);
-      if (!anime) break;
+      auto anime_item = reinterpret_cast<anime::Item*>(plvdi->item.lParam);
+      if (!anime_item) break;
       switch (plvdi->item.iSubItem) {
         case 0: // Anime title
-          plvdi->item.pszText = const_cast<LPWSTR>(anime->series_title.data());
+          plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
           break;
       }
       break;
@@ -284,22 +288,22 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
       return CDRF_NOTIFYPOSTERASE;
 
     case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-      Anime* anime = reinterpret_cast<Anime*>(pCD->nmcd.lItemlParam);
+      auto anime_item = reinterpret_cast<anime::Item*>(pCD->nmcd.lItemlParam);
       // Alternate background color
       if ((pCD->nmcd.dwItemSpec % 2) && !listview.IsGroupViewEnabled()) {
         pCD->clrTextBk = RGB(248, 248, 248);
       }
       // Change text color
-      if (!anime) return CDRF_NOTIFYPOSTPAINT;
-      if (anime->GetAiringStatus() == mal::STATUS_NOTYETAIRED) {
+      if (!anime_item) return CDRF_NOTIFYPOSTPAINT;
+      if (anime_item->GetAiringStatus() == mal::STATUS_NOTYETAIRED) {
         pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
-      } else if (anime->new_episode_available) {
+      } else if (anime_item->IsNewEpisodeAvailable()) {
         if (Settings.Program.List.highlight) {
           pCD->clrText = GetSysColor(pCD->iSubItem == 0 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
         }
       }
       // Indicate currently playing
-      if (anime->playing) {
+      if (anime_item->GetPlaying()) {
         pCD->clrTextBk = RGB(230, 255, 230);
         static HFONT hFontDefault = ChangeDCFont(pCD->nmcd.hdc, nullptr, -1, true, -1, -1);
         static HFONT hFontBold = reinterpret_cast<HFONT>(GetCurrentObject(pCD->nmcd.hdc, OBJ_FONT));
@@ -310,15 +314,15 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
     }
     
     case CDDS_ITEMPOSTPAINT | CDDS_SUBITEM: {
-      Anime* anime = reinterpret_cast<Anime*>(pCD->nmcd.lItemlParam);
-      if (!anime) return CDRF_DODEFAULT;
+      auto anime_item = reinterpret_cast<anime::Item*>(pCD->nmcd.lItemlParam);
+      if (!anime_item) return CDRF_DODEFAULT;
 
       // Draw progress bar
       if (pCD->iSubItem == 1) {
-        int eps_watched  = anime->my_watched_episodes;
-        int eps_total    = anime->series_episodes;
-        int eps_estimate = anime->GetTotalEpisodes();
-        int eps_buffer   = anime->GetLastWatchedEpisode();
+        int eps_buffer   = anime_item->GetMyLastWatchedEpisode(true);
+        int eps_watched  = anime_item->GetMyLastWatchedEpisode(false);
+        int eps_estimate = anime_item->GetEpisodeCount(true);
+        int eps_total    = anime_item->GetEpisodeCount(false);
         if (eps_watched > eps_buffer) eps_watched = -1;
         if (eps_buffer == eps_watched) eps_buffer = -1;
         if (eps_watched == 0) eps_watched = -1;
@@ -372,11 +376,11 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
           }
 
           // Draw progress
-          if (anime->GetStatus() == mal::MYSTATUS_WATCHING || anime->GetRewatching()) {
+          if (anime_item->GetMyStatus() == mal::MYSTATUS_WATCHING || anime_item->GetMyRewatching()) {
             UI.list_progress.watching.Draw(hdc.Get(), &rcItem);  // Watching
-          } else if (anime->GetStatus() == mal::MYSTATUS_COMPLETED) {
+          } else if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED) {
             UI.list_progress.completed.Draw(hdc.Get(), &rcItem); // Completed
-          } else if (anime->GetStatus() == mal::MYSTATUS_DROPPED) {
+          } else if (anime_item->GetMyStatus() == mal::MYSTATUS_DROPPED) {
             UI.list_progress.dropped.Draw(hdc.Get(), &rcItem);   // Dropped
           } else {
             UI.list_progress.completed.Draw(hdc.Get(), &rcItem); // Completed / On hold / Plan to watch
@@ -386,16 +390,16 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
         // Draw episode availability
         if (Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS) {
           if (eps_total > 0) {
-            float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(anime->series_episodes);
-            for (int i = max(eps_buffer, eps_watched); i < static_cast<int>(anime->episode_available.size()); i++) {
-              if (i > -1 && anime->episode_available[i]) {
+            float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(eps_total);
+            for (int i = max(eps_buffer, eps_watched); i < static_cast<int>(anime_item->GetAvailableEpisodeCount()); i++) {
+              if (i > -1 && anime_item->IsEpisodeAvailable(i)) {
                 rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
                 rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
                 UI.list_progress.buffer.Draw(hdc.Get(), &rcBuffer);
               }
             }
           } else {
-            if (anime->new_episode_available) {
+            if (anime_item->IsNewEpisodeAvailable()) {
               rcBuffer.left = eps_buffer > -1 ? rcBuffer.right : (eps_watched > -1 ? rcItem.right : rcItem.left);
               rcBuffer.right = rcBuffer.left + static_cast<int>((rcAvail.right - rcAvail.left) * 0.05f);
               UI.list_progress.buffer.Draw(hdc.Get(), &rcBuffer);
@@ -415,7 +419,7 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
           if (eps_watched == -1) eps_watched = 0;
           wstring text = mal::TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + mal::TranslateNumber(eps_total);
           if (!Settings.Program.List.progress_show_eps) text += L" episodes";
-          if (anime->GetRewatching()) text += L" (rw)";
+          if (anime_item->GetMyRewatching()) text += L" (rw)";
           hdc.EditFont(nullptr, 7);
           hdc.SetBkMode(TRANSPARENT);
           rcText.Offset(1, 1);
@@ -533,7 +537,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     // Debug
     case 112:
-      DebugTest();
+      debug::Test();
       return TRUE;
   }
 
@@ -552,7 +556,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       edit.GetText(text);
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
       if (search_bar.filter_list) {
-        AnimeList.filters.text = text;
+        AnimeFilters.text = text;
         RefreshList(text.empty() ? -1 : 0);
         return TRUE;
       }
@@ -586,7 +590,7 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
       }
       if (!action.empty()) {
         ExecuteAction(action);
-        RefreshMenubar(AnimeList.index);
+        RefreshMenubar(AnimeDatabase.GetCurrentId());
       }
       break;
     }

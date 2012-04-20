@@ -16,37 +16,41 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ANIME_INFO_PAGE_H
-#define DLG_ANIME_INFO_PAGE_H
+#ifndef ANIME_EPISODE_H
+#define ANIME_EPISODE_H
 
-#include "../std.h"
-#include "../win32/win_dialog.h"
+#include "std.h"
+
+namespace anime {
 
 // =============================================================================
 
-enum AnimeInfoPageType {
-  INFOPAGE_SERIESINFO,
-  INFOPAGE_MYINFO,
-  INFOPAGE_COUNT
-};
-
-class AnimeInfoPage : public win32::Dialog {
+class Episode {
  public:
-  AnimeInfoPage();
-  virtual ~AnimeInfoPage();
+  Episode();
+  virtual ~Episode() {}
 
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+  void Clear();
+  void Set(int anime_id);
 
-  void Refresh(int anime_id);
-  void RefreshFansubPreference();
-
-  int index;
-
- private:
-  int anime_id_;
-  HFONT header_font_;
+  int anime_id;
+  wstring file;
+  wstring folder;
+  wstring format;
+  wstring title;
+  wstring name;
+  wstring group;
+  wstring number;
+  wstring version;
+  wstring resolution;
+  wstring audio_type;
+  wstring video_type;
+  wstring checksum;
+  wstring extras;
 };
 
-#endif // DLG_ANIME_INFO_PAGE_H
+} // namespace anime
+
+extern anime::Episode CurrentEpisode;
+
+#endif // ANIME_EPISODE_H

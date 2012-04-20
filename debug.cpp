@@ -17,58 +17,62 @@
 */
 
 #include "std.h"
-#include "common.h"
+
 #include "debug.h"
-#include "dlg/dlg_main.h"
+
+#include "common.h"
 #include "string.h"
 
-// =============================================================================
+#include "dlg/dlg_main.h"
 
-DebugTester::DebugTester() : 
-  m_Freq(0.0), m_Value(0)
-{
-}
-
-void DebugTester::Start() {
-  LARGE_INTEGER li;
-  
-  if (m_Freq == 0.0) {
-    QueryPerformanceFrequency(&li);
-    m_Freq = double(li.QuadPart) / 1000.0;
-  }
-  
-  QueryPerformanceCounter(&li);
-  m_Value = li.QuadPart;
-}
-
-void DebugTester::End(wstring str, BOOL show) {
-  LARGE_INTEGER li;
-
-  QueryPerformanceCounter(&li);
-  double value = double(li.QuadPart - m_Value) / m_Freq;
-
-  if (show) {
-    str = ToWSTR(value, 2) + L" ms | Text: [" + str + L"]";
-    MainDialog.SetText(str.c_str());
-  }
-}
+namespace debug {
 
 // =============================================================================
 
-void DebugPrint(wstring text) {
-  #ifdef _DEBUG
+Tester::Tester()
+    : frequency_(0.0), value_(0) {
+}
+
+void Tester::Start() {
+  LARGE_INTEGER li;
+  
+  if (frequency_ == 0.0) {
+    ::QueryPerformanceFrequency(&li);
+    frequency_ = double(li.QuadPart) / 1000.0;
+  }
+  
+  ::QueryPerformanceCounter(&li);
+  value_ = li.QuadPart;
+}
+
+void Tester::End(wstring str, bool display_result) {
+  LARGE_INTEGER li;
+
+  ::QueryPerformanceCounter(&li);
+  double value = double(li.QuadPart - value_) / frequency_;
+
+  if (display_result) {
+    str = ToWstr(value, 2) + L"ms | Text: [" + str + L"]";
+    MainDialog.SetText(str);
+  }
+}
+
+// =============================================================================
+
+void Print(wstring text) {
+#ifdef _DEBUG
   ::OutputDebugString(text.c_str());
-  #else
+#else
   UNREFERENCED_PARAMETER(text);
-  #endif
+#endif
 }
 
-void DebugTest() {
+void Test() {
   // Define variables
   wstring str;
 
   // Start ticking
-  DebugTester test;
+  Tester test;
   test.Start();
 
   for (int i = 0; i < 10000; i++) {
@@ -86,3 +90,5 @@ void DebugTest() {
   // Default action
   ExecuteAction(L"RecognitionTest");
 }
+
+} // namespace debug

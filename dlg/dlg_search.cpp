@@ -17,9 +17,11 @@
 */
 
 #include "../std.h"
-#include "../animelist.h"
-#include "../common.h"
+
 #include "dlg_search.h"
+
+#include "../anime_db.h"
+#include "../common.h"
 #include "../http.h"
 #include "../myanimelist.h"
 #include "../resource.h"
@@ -27,8 +29,9 @@
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
-#include "../win32/win_taskdialog.h"
 #include "../xml.h"
+
+#include "../win32/win_taskdialog.h"
 
 class SearchDialog SearchDialog;
 
@@ -116,8 +119,7 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
         if (lpnmitem->iItem == -1) break;
         LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
-        if (!lParam) break;
-        UpdateSearchListMenu(reinterpret_cast<Anime*>(lParam)->index <= 0);
+        UpdateSearchListMenu(AnimeDatabase.FindItem(static_cast<int>(lParam)) != nullptr);
         ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SearchList"), 0, lParam);
         break;
       }
@@ -139,13 +141,12 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               pCD->clrTextBk = RGB(248, 248, 248);
             }
             // Change text color
-            Anime* anime = reinterpret_cast<Anime*>(pCD->nmcd.lItemlParam);
-            if (anime) {
-              if (anime->index > 0) {
-                pCD->clrText = RGB(180, 180, 180);
-              } else {
-                pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
-              }
+            int anime_id = static_cast<int>(pCD->nmcd.lItemlParam);
+            auto anime_item = AnimeDatabase.FindItem(anime_id);
+            if (anime_item->IsInList()) {
+              pCD->clrText = RGB(180, 180, 180);
+            } else {
+              pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
             }
             return CDRF_NOTIFYPOSTPAINT;
           }
@@ -205,39 +206,17 @@ void SearchDialog::ParseResults(const wstring& data) {
     dlg.Show(GetWindowHandle());
     return;
   }
-  anime_results_.clear();
+  anime_ids_.clear();
   
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
   if (result.status == status_ok) {
     xml_node anime = doc.child(L"anime");
     for (xml_node entry = anime.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
-      int i = anime_results_.size(); anime_results_.resize(i + 1);
-      int anime_id = XML_ReadIntValue(entry, L"id");
-      anime_results_[i].index = AnimeList.FindItemIndex(anime_id);
-      
-      if (anime_results_[i].index > -1) {
-        AnimeList.items[anime_results_[i].index].score = XML_ReadStrValue(entry, L"score");
-        AnimeList.items[anime_results_[i].index].synopsis = XML_ReadStrValue(entry, L"synopsis");
-        mal::DecodeText(AnimeList.items[anime_results_[i].index].synopsis);
-      } else {
-        anime_results_[i].series_id = anime_id;
-        anime_results_[i].series_title = XML_ReadStrValue(entry, L"title");
-        mal::DecodeText(anime_results_[i].series_title);
-        anime_results_[i].series_synonyms = XML_ReadStrValue(entry, L"synonyms");
-        mal::DecodeText(anime_results_[i].series_synonyms);
-        anime_results_[i].series_episodes = XML_ReadIntValue(entry, L"episodes");
-        anime_results_[i].score = XML_ReadStrValue(entry, L"score");
-        anime_results_[i].series_type = mal::TranslateType(XML_ReadStrValue(entry, L"type"));
-        anime_results_[i].series_status = mal::TranslateStatus(XML_ReadStrValue(entry, L"status"));
-        anime_results_[i].series_start = XML_ReadStrValue(entry, L"start_date");
-        anime_results_[i].series_end = XML_ReadStrValue(entry, L"end_date");
-        anime_results_[i].synopsis = XML_ReadStrValue(entry, L"synopsis");
-        mal::DecodeText(anime_results_[i].synopsis);
-        anime_results_[i].series_image = XML_ReadStrValue(entry, L"image");
-      }
+      anime_ids_.push_back(XML_ReadIntValue(entry, L"id"));
     }
   }
+  mal::ParseSearchResult(data);
 
   RefreshList();
 }
@@ -250,18 +229,16 @@ void SearchDialog::RefreshList() {
   list_.DeleteAllItems();
   
   // Add anime items to list
-  for (size_t i = 0; i < anime_results_.size(); i++) {
-    if (anime_results_[i].index == -1) {
-      anime_results_[i].index = AnimeList.FindItemIndex(anime_results_[i].series_id);
+  for (size_t i = 0; i < anime_ids_.size(); i++) {
+    auto anime_item = AnimeDatabase.FindItem(anime_ids_.at(i));
+    if (anime_item) {
+      list_.InsertItem(i, -1, StatusToIcon(anime_item->GetAiringStatus()), 0, nullptr, 
+        anime_item->GetTitle().c_str(), static_cast<LPARAM>(anime_item->GetId()));
+      list_.SetItem(i, 1, mal::TranslateType(anime_item->GetType()).c_str());
+      list_.SetItem(i, 2, mal::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
+      list_.SetItem(i, 3, anime_item->GetScore().c_str());
+      list_.SetItem(i, 4, mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)).c_str());
     }
-    Anime* item = anime_results_[i].index > -1 ? &AnimeList.items[anime_results_[i].index] : &anime_results_[i];
-    list_.InsertItem(i, -1, StatusToIcon(item->GetAiringStatus()), 0, nullptr, 
-      item->series_title.c_str(), 
-      reinterpret_cast<LPARAM>(item));
-    list_.SetItem(i, 1, mal::TranslateType(item->series_type).c_str());
-    list_.SetItem(i, 2, mal::TranslateNumber(item->series_episodes).c_str());
-    list_.SetItem(i, 3, item->score.c_str());
-    list_.SetItem(i, 4, mal::TranslateDateToSeason(item->series_start).c_str());
   }
 
   // Sort and show the list again
@@ -270,11 +247,11 @@ void SearchDialog::RefreshList() {
 }
 
 bool SearchDialog::Search(const wstring& title) {
-  if (mal::SearchAnime(title)) {
+  if (mal::SearchAnime(anime::ID_UNKNOWN, title)) {
     edit_.SetText(title.c_str());
     EnableInput(false);
     list_.DeleteAllItems();
-    anime_results_.clear();
+    anime_ids_.clear();
     return true;
   } else {
     return false;
