@@ -193,9 +193,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Shows anime information window.
   //   lParam is a pointer to an anime list item.
   } else if (action == L"Info") {
-    auto anime_item = lParam ? 
-      reinterpret_cast<anime::Item*>(lParam) : AnimeDatabase.GetCurrentItem();
-    AnimeDialog.Refresh(anime_item->GetId());
+    int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
+    AnimeDialog.Refresh(anime_id);
     AnimeDialog.SetCurrentPage(INFOPAGE_SERIESINFO);
     if (!AnimeDialog.IsWindow()) {
       AnimeDialog.Create(IDD_ANIME_INFO, g_hMain, false);

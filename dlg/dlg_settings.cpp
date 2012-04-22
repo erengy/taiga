@@ -199,7 +199,7 @@ void SettingsDialog::OnOK() {
   // Folders > Specific
   List.SetWindowHandle(pages[PAGE_FOLDERS_ANIME].GetDlgItem(IDC_LIST_FOLDERS_ANIME));
   for (int i = 0; i < List.GetItemCount(); i++) {
-    auto anime_item = reinterpret_cast<anime::Item*>(List.GetItemParam(i));
+    auto anime_item = AnimeDatabase.FindItem(static_cast<int>(List.GetItemParam(i)));
     if (anime_item) {
       wstring folder;
       List.GetItemText(i, 1, folder);

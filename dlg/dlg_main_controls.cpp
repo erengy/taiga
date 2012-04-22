@@ -387,10 +387,11 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
         if (Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS) {
           if (eps_total > 0) {
             float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(eps_total);
-            for (int i = max(eps_buffer, eps_watched); i < static_cast<int>(anime_item->GetAvailableEpisodeCount()); i++) {
-              if (i > -1 && anime_item->IsEpisodeAvailable(i)) {
-                rcBuffer.left = static_cast<int>(rcAvail.left + (i * width));
-                rcBuffer.right = static_cast<int>(rcBuffer.left + width) + 1;
+            int available_episode_count = static_cast<int>(anime_item->GetAvailableEpisodeCount());
+            for (int i = max(eps_buffer, eps_watched) + 1; i <= available_episode_count; i++) {
+              if (i > 0 && anime_item->IsEpisodeAvailable(i)) {
+                rcBuffer.left = static_cast<int>(rcAvail.left + (width * (i - 1)));
+                rcBuffer.right = static_cast<int>(rcBuffer.left + width + 1);
                 UI.list_progress.buffer.Draw(hdc.Get(), &rcBuffer);
               }
             }

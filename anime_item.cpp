@@ -379,6 +379,7 @@ wstring Item::GetNewEpisodePath() const {
 }
 
 bool Item::IsEpisodeAvailable(int number) const {
+  if (number < 1) number = 1;
   if (static_cast<size_t>(number) > my_info_->available_episodes.size())
     return false;
 

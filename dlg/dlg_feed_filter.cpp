@@ -596,7 +596,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
     if (!it->IsInList()) continue;
     anime_list.InsertItem(list_index, it->GetMyStatus(), 
       StatusToIcon(it->GetAiringStatus()), 0, nullptr, 
-      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
+      LPSTR_TEXTCALLBACK, static_cast<int>(it->GetId()));
     for (auto id = parent->filter.anime_ids.begin(); id != parent->filter.anime_ids.end(); ++id) {
       if (*id == it->GetId()) {
         anime_list.SetCheckState(list_index, TRUE);
@@ -620,7 +620,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Text callback
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
-          auto anime_item = reinterpret_cast<anime::Item*>(plvdi->item.lParam);
+          auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
           if (!anime_item) break;
           switch (plvdi->item.iSubItem) {
             case 0: // Anime title
@@ -635,7 +635,7 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
             wstring text;
             for (int i = 0; i < anime_list.GetItemCount(); i++) {
-              auto anime_item = reinterpret_cast<anime::Item*>(anime_list.GetItemParam(i));
+              auto anime_item = AnimeDatabase.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
               if (anime_item && anime_list.GetCheckState(i)) {
                 AppendString(text, anime_item->GetTitle());
               }
@@ -658,7 +658,7 @@ bool FeedFilterDialog::DialogPage2::BuildFilter(FeedFilter& filter) {
 
   for (int i = 0; i < anime_list.GetItemCount(); i++) {
     if (anime_list.GetCheckState(i)) {
-      auto anime_item = reinterpret_cast<anime::Item*>(anime_list.GetItemParam(i));
+      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
       if (anime_item) filter.anime_ids.push_back(anime_item->GetId());
     }
   }

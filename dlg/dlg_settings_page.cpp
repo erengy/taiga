@@ -110,7 +110,7 @@ BOOL SettingsPage::OnInitDialog() {
       for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
         if (!it->IsInList()) continue;
         List.InsertItem(i, it->GetMyStatus(), StatusToIcon(it->GetAiringStatus()), 
-          0, nullptr, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
+          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->GetId()));
         List.SetItem(i++, 1, it->GetFolder().c_str());
       }
       List.Sort(0, 1, 0, ListViewCompareProc);
@@ -541,7 +541,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         // Text callback
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-          auto anime_item = reinterpret_cast<anime::Item*>(plvdi->item.lParam);
+          auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
           if (!anime_item) break;
           switch (plvdi->item.iSubItem) {
             case 0: // Anime title
@@ -631,7 +631,8 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             } else if (answer == L"AnimeFolders_Clear()") {
               List.SetItem(lpnmitem->iItem, 1, L"");
             } else if (answer == L"AnimeFolders_Search()") {
-              auto anime_item = reinterpret_cast<anime::Item*>(List.GetItemParam(lpnmitem->iItem));
+              auto anime_item = AnimeDatabase.FindItem(
+                static_cast<int>(List.GetItemParam(lpnmitem->iItem)));
               if (anime_item) {
                 anime_item->CheckFolder();
                 if (!anime_item->GetFolder().empty()) {
