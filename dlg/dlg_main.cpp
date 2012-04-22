@@ -637,10 +637,10 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       if (Taiga.is_recognition_enabled) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
           for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-            if (!it->IsInList()) continue;
+            if (!it->IsInList()) continue; // TODO: Allow recognition for all items
             if (Meow.CompareEpisode(CurrentEpisode, *it)) {
               CurrentEpisode.Set(it->GetId());
-              it->Start(CurrentEpisode);
+              it->StartWatching(CurrentEpisode);
               return;
             }
           }
@@ -651,7 +651,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 #ifdef _DEBUG
           ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
 #endif
-        } else {
+        } else if (Settings.Program.Balloon.enabled) {
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
           wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);
@@ -672,20 +672,21 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           // Announce current episode
           Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_MIRC | ANNOUNCE_TO_SKYPE);
           // Update
-          if (Settings.Account.Update.time == UPDATE_MODE_AFTERDELAY && anime_item) {
-            anime_item->End(CurrentEpisode, false, true);
-          }
+          if (Settings.Account.Update.time == UPDATE_MODE_AFTERDELAY && anime_item)
+            anime_item->UpdateList(CurrentEpisode);
           return;
         }
         if (Settings.Account.Update.check_player == FALSE || 
-          MediaPlayers.items[media_index].window_handle == GetForegroundWindow()) {
-            Taiga.ticker_media++;
-        }
+            MediaPlayers.items[media_index].window_handle == GetForegroundWindow())
+          Taiga.ticker_media++;
       }
       // Caption changed?
       if (MediaPlayers.TitleChanged() == true) {
         CurrentEpisode.Set(anime::ID_UNKNOWN);
-        if (anime_item) anime_item->End(CurrentEpisode, true, true);
+        if (anime_item) {
+          anime_item->EndWatching(CurrentEpisode);
+          anime_item->UpdateList(CurrentEpisode);
+        }
         Taiga.ticker_media = 0;
       }
     }
@@ -703,8 +704,9 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     // Was running and watching
     } else {
       CurrentEpisode.Set(anime::ID_UNKNOWN);
-      anime_item->End(CurrentEpisode, true, 
-        Settings.Account.Update.time == UPDATE_MODE_WAITPLAYER);
+      anime_item->EndWatching(CurrentEpisode);
+      if (Settings.Account.Update.time == UPDATE_MODE_WAITPLAYER)
+        anime_item->UpdateList(CurrentEpisode);
       Taiga.ticker_media = 0;
     }
   }

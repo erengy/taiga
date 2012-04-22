@@ -58,7 +58,7 @@ bool Date::operator != (const Date& date) const {
 }
 
 bool Date::operator < (const Date& date) const {
-  return operator - (date) > 0;
+  return operator - (date) < 0;
 }
 
 bool Date::operator <= (const Date& date) const {
@@ -70,7 +70,7 @@ bool Date::operator >= (const Date& date) const {
 }
 
 bool Date::operator > (const Date& date) const {
-  return date.operator < (*this);
+  return operator - (date) > 0;
 }
 
 int Date::operator - (const Date& date) const {

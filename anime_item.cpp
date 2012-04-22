@@ -17,7 +17,6 @@
 */
 
 #include "std.h"
-#include <algorithm>
 
 #include "anime_db.h"
 #include "anime_episode.h"
@@ -228,13 +227,7 @@ void Item::SetTitle(const wstring& title) {
 void Item::SetSynonyms(const wstring& synonyms) {
   series_info_.synonyms.clear();
   Split(synonyms, L"; ", series_info_.synonyms);
-  
-  // Remove empty synonyms
-  if (!series_info_.synonyms.empty()) {
-    /*series_info_.synonyms.erase(
-      std::remove_if(series_info_.synonyms.begin(), series_info_.synonyms.end(),
-        [](const wstring& s) { return s.empty(); }));*/
-  }
+  RemoveEmptyStrings(series_info_.synonyms);
 }
 
 void Item::SetSynonyms(const vector<wstring>& synonyms) {
@@ -335,7 +328,11 @@ void Item::SetMyTags(const wstring& tags) {
 bool Item::IsAiredYet() const {
   if (series_info_.status != mal::STATUS_NOTYETAIRED) return true;
   if (!mal::IsValidDate(series_info_.date_start)) return false;
-  return GetDateJapan() >= series_info_.date_start;
+  if (!series_info_.date_start.month || !series_info_.date_start.day) {
+    return GetDateJapan() > series_info_.date_start;
+  } else {
+    return GetDateJapan() >= series_info_.date_start;
+  }
 }
 
 bool Item::IsFinishedAiring() const {
@@ -487,6 +484,7 @@ bool Item::CheckFolder() {
 }
 
 const wstring& Item::GetFolder() const {
+  assert(IsInList());
   return my_info_->folder;
 }
 
@@ -528,11 +526,8 @@ void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
 
 void Item::SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings) {
   my_info_->synonyms = synonyms;
-  
-  // Remove empty synonyms
-  /*my_info_->synonyms.erase(
-    std::remove_if(my_info_->synonyms.begin(), my_info_->synonyms.end(),
-      [](const wstring& s) { return s.empty(); }));*/
+
+  RemoveEmptyStrings(my_info_->synonyms);
 
   if (save_settings) {
     Settings.Anime.SetItem(GetId(), EMPTY_STR, Join(my_info_->synonyms, L"; "));
@@ -557,7 +552,9 @@ bool Item::IsInList() const {
 }
 
 void Item::RemoveFromUserList() {
+  assert(my_info_.use_count() <= 1);
   my_info_.reset();
+  assert(my_info_.use_count() == 0);
 }
 
 bool Item::IsOldEnough() const {

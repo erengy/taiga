@@ -135,10 +135,10 @@ class Item {
 
   // Following functions are called when a new episode is recognized. Actual
   // time depends on user settings.
-  int Ask(Episode episode);
-  void End(Episode episode, bool end_watching, bool update_list);
-  void Start(Episode episode);
-  void Update(Episode episode, bool change_status);
+  void StartWatching(Episode episode);
+  void EndWatching(Episode episode);
+  void UpdateList(Episode episode);
+  void AddToEventQueue(Episode episode, bool change_status);
 
   // MAL's API doesn't provide searching anime by ID, and some titles return
   // no result due to special characters. Season data provide safe-to-search

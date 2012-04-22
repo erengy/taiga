@@ -591,17 +591,19 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   }
   
   // Add anime to list
-  for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
-    if (!AnimeDatabase.items.at(i).IsInList()) continue;
-    anime_list.InsertItem(i, AnimeDatabase.items[i].GetMyStatus(), 
-      StatusToIcon(AnimeDatabase.items[i].GetAiringStatus()), 0, nullptr, 
-      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&AnimeDatabase.items[i]));
-    for (auto it = parent->filter.anime_ids.begin(); it != parent->filter.anime_ids.end(); ++it) {
-      if (*it == AnimeDatabase.items[i].GetId()) {
-        anime_list.SetCheckState(i, TRUE);
+  int list_index = 0;
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (!it->IsInList()) continue;
+    anime_list.InsertItem(list_index, it->GetMyStatus(), 
+      StatusToIcon(it->GetAiringStatus()), 0, nullptr, 
+      LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
+    for (auto id = parent->filter.anime_ids.begin(); id != parent->filter.anime_ids.end(); ++id) {
+      if (*id == it->GetId()) {
+        anime_list.SetCheckState(list_index, TRUE);
         break;
       }
     }
+    ++list_index;
   }
   
   // Sort items

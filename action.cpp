@@ -423,8 +423,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (!silent) TaskbarList.SetProgressState(TBPF_NORMAL);
     // If there's no anime folder set, we'll check them first
     bool check_folder = true;
-    for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
-      if (!AnimeDatabase.items.at(i).GetFolder().empty()) {
+    for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+      if (it->IsInList() && !it->GetFolder().empty()) {
         check_folder = false;
         break;
       }
@@ -478,7 +478,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       MainDialog.ChangeStatus(L"Automatic anime recognition is now disabled.");
       auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
       CurrentEpisode.Set(anime::ID_NOTINLIST);
-      if (anime_item) anime_item->End(CurrentEpisode, true, false);
+      if (anime_item) anime_item->EndWatching(CurrentEpisode);
     }
 
   // ===========================================================================
@@ -587,7 +587,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (dlg.result == IDOK && mal::IsValidEpisode(ToInt(dlg.text), 0, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = dlg.text;
-      anime_item->Update(episode, true);
+      anime_item->AddToEventQueue(episode, true);
     }
 
   // EditScore(value)

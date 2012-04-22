@@ -40,6 +40,7 @@ void EraseChars(wstring& str, const wchar_t chars[]);
 void EraseLeft(wstring& str1, const wstring str2, bool case_insensitive = false);
 void ErasePunctuation(wstring& str, bool keep_trailing = false);
 void EraseRight(wstring& str1, const wstring str2, bool case_insensitive = false);
+void RemoveEmptyStrings(vector<wstring>& input);
 wstring GetFileExtension(const wstring& str);
 wstring GetFileName(const wstring& str);
 wstring GetFileWithoutExtension(wstring str);

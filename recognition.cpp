@@ -72,7 +72,7 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   CleanTitle(episode_title);
   if (episode_title.empty()) return false;
   
-  bool found = true;
+  bool found = false;
   
   // Compare with main title
   if (CompareTitle(anime_item.GetTitle(), episode_title, episode, anime_item, strict))

@@ -106,13 +106,12 @@ BOOL SettingsPage::OnInitDialog() {
       List.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       List.SetImageList(UI.ImgList16.GetHandle());
       List.SetTheme();
-      for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
-        if (!AnimeDatabase.items.at(i).IsInList()) continue;
-        List.InsertItem(i, AnimeDatabase.items[i].GetMyStatus(), 
-                StatusToIcon(AnimeDatabase.items[i].GetAiringStatus()), 
-                0, nullptr, LPSTR_TEXTCALLBACK, 
-                reinterpret_cast<LPARAM>(&AnimeDatabase.items[i]));
-        List.SetItem(i, 1, AnimeDatabase.items[i].GetFolder().c_str());
+      int i = 0;
+      for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+        if (!it->IsInList()) continue;
+        List.InsertItem(i, it->GetMyStatus(), StatusToIcon(it->GetAiringStatus()), 
+          0, nullptr, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
+        List.SetItem(i++, 1, it->GetFolder().c_str());
       }
       List.Sort(0, 1, 0, ListViewCompareProc);
       List.SetWindowHandle(nullptr);

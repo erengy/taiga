@@ -94,6 +94,13 @@ void EraseRight(wstring& str1, const wstring str2, bool case_insensitive) {
   str1.resize(str1.length() - str2.length());
 }
 
+void RemoveEmptyStrings(vector<wstring>& input) {
+  if (input.empty()) return;
+  input.erase(std::remove_if(input.begin(), input.end(),
+    [](const wstring& s) -> bool { return s.empty(); }), 
+    input.end());
+}
+
 // =============================================================================
 
 /* Searching and comparison */

@@ -171,9 +171,12 @@ bool ParseSearchResult(const wstring& data, int anime_id) {
   if (result.status == status_ok) {
     xml_node node = doc.child(L"anime");
     for (xml_node entry = node.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
+      auto current_anime_item = AnimeDatabase.FindItem(anime_id);
+
       anime::Item anime_item;
       anime_item.SetId(XML_ReadIntValue(entry, L"id"));
-      anime_item.SetTitle(mal::DecodeText(XML_ReadStrValue(entry, L"title")));
+      if (!current_anime_item || !current_anime_item->keep_title)
+        anime_item.SetTitle(mal::DecodeText(XML_ReadStrValue(entry, L"title")));
       anime_item.SetSynonyms(mal::DecodeText(XML_ReadStrValue(entry, L"synonyms")));
       anime_item.SetEpisodeCount(XML_ReadIntValue(entry, L"episodes"));
       anime_item.SetScore(XML_ReadStrValue(entry, L"score"));
@@ -185,6 +188,7 @@ bool ParseSearchResult(const wstring& data, int anime_id) {
       anime_item.SetImageUrl(XML_ReadStrValue(entry, L"image"));
       anime_item.last_modified = time(nullptr);
       AnimeDatabase.UpdateItem(anime_item);
+      
       if (!anime_id || anime_id == anime_item.GetId()) {
         found_item = true;
       }

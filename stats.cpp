@@ -56,7 +56,12 @@ void Statistics::CalculateAll() {
 }
 
 int Statistics::CalculateAnimeCount() {
-  anime_count = static_cast<int>(AnimeDatabase.items.size());
+  anime_count = 0;
+
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it)
+    if (it->IsInList())
+      anime_count++;
+  
   return anime_count;
 }
 

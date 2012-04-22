@@ -301,6 +301,7 @@ bool Settings::Save() {
     xml_node items = anime.append_child();
     items.set_name(L"items");
     for (size_t i = 0; i < Anime.items.size(); i++) {
+      if (Anime.items[i].folder.empty() && Anime.items[i].titles.empty()) continue;
       xml_node item = items.append_child();
       item.set_name(L"item");
       item.append_attribute(L"id") = Anime.items[i].id;

@@ -62,7 +62,7 @@ MyInformation::MyInformation()
 
 // =============================================================================
 
-void Item::Start(Episode episode) {
+void Item::StartWatching(Episode episode) {
   // Change status
   Taiga.play_status = PLAYSTATUS_PLAYING;
   SetPlaying(true);
@@ -81,9 +81,11 @@ void Item::Start(Episode episode) {
   }
   
   // Show balloon tip
-  Taskbar.Tip(L"", L"", 0);
-  Taskbar.Tip(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), 
-    L"Watching:", NIIF_INFO);
+  if (Settings.Program.Balloon.enabled) {
+    Taskbar.Tip(L"", L"", 0);
+    Taskbar.Tip(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), 
+      L"Watching:", NIIF_INFO);
+  }
   
   // Check folder
   if (GetFolder().empty()) {
@@ -104,99 +106,95 @@ void Item::Start(Episode episode) {
   }
 
   // Get additional information
-  if (GetScore().empty() || GetSynopsis().empty()) {
+  if (GetScore().empty() || GetSynopsis().empty())
     mal::SearchAnime(GetId(), GetTitle());
-  }
   
-  // Update
-  if (Settings.Account.Update.time == UPDATE_TIME_INSTANT) {
-    End(episode, false, true);
-  }
-}
-
-void Item::End(Episode episode, bool end_watching, bool update_list) {
-  if (end_watching) {
-    // Change status
-    Taiga.play_status = PLAYSTATUS_STOPPED;
-    SetPlaying(false);
-    // Announce
-    episode.anime_id = GetId();
-    Announcer.Do(ANNOUNCE_TO_HTTP, &episode);
-    Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
-    // Update main window
-    episode.anime_id = anime::ID_UNKNOWN;
-    MainDialog.ChangeStatus();
-    MainDialog.UpdateTip();
-    int list_index = MainDialog.GetListIndex(GetId());
-    if (list_index > -1) {
-      MainDialog.listview.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
-      MainDialog.listview.RedrawItems(list_index, list_index, true);
-    }
-  }
-
   // Update list
-  if (update_list) {
-    if (GetMyStatus() == mal::MYSTATUS_COMPLETED && GetMyRewatching() == 0) return;
-    if (Settings.Account.Update.time == UPDATE_TIME_INSTANT || 
-      Taiga.ticker_media == -1 || Taiga.ticker_media >= Settings.Account.Update.delay) {
-        int number = GetEpisodeHigh(episode.number);
-        int number_low = GetEpisodeLow(episode.number);
-        int lastwatched = GetMyLastWatchedEpisode();
-        if (Settings.Account.Update.out_of_range) {
-          if (number_low > lastwatched + 1 || number < lastwatched + 1) return;
-        }
-        if (mal::IsValidEpisode(number, lastwatched, GetEpisodeCount())) {
-          switch (Settings.Account.Update.mode) {
-            case UPDATE_MODE_NONE:
-              break;
-            case UPDATE_MODE_AUTO:
-              Update(episode, true);
-              break;
-            case UPDATE_MODE_ASK:
-            default:
-              int choice = Ask(episode);
-              if (choice != IDNO) {
-                Update(episode, choice == IDCANCEL);
-              }
-          }
-        }
-    }
-  }
+  if (Settings.Account.Update.time == UPDATE_TIME_INSTANT)
+    UpdateList(episode);
 }
 
-int Item::Ask(Episode episode) {
-  // Set up dialog
-  win32::TaskDialog dlg;
-  wstring title = L"Anime title: " + GetTitle();
-  dlg.SetWindowTitle(APP_TITLE);
-  dlg.SetMainIcon(TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Do you want to update your anime list?");
-  dlg.SetContent(title.c_str());
-  dlg.UseCommandLinks(true);
-
-  // Add buttons
-  int number = GetEpisodeHigh(episode.number);
-  if (number == 0) number = 1;
-  if (GetEpisodeCount() == 1) { // Completed (1 eps.)
-    episode.number = L"1";
-    dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
-  } else if (GetEpisodeCount() == number) { // Completed (>1 eps.)
-    dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
-  } else if (GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
-    dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
-  }
-  wstring button = L"Update\nUpdate episode number from " + 
-    ToWstr(GetMyLastWatchedEpisode()) + L" to " + ToWstr(number);
-  dlg.AddButton(button.c_str(), IDYES);
-  dlg.AddButton(L"Cancel\nDon't update anything", IDNO);
+void Item::EndWatching(Episode episode) {
+  // Change status
+  Taiga.play_status = PLAYSTATUS_STOPPED;
+  SetPlaying(false);
   
-  // Show dialog
-  ActivateWindow(g_hMain);
-  dlg.Show(g_hMain);
-  return dlg.GetSelectedButtonID();
+  // Announce
+  episode.anime_id = GetId();
+  Announcer.Do(ANNOUNCE_TO_HTTP, &episode);
+  Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
+  
+  // Update main window
+  episode.anime_id = anime::ID_UNKNOWN;
+  MainDialog.ChangeStatus();
+  MainDialog.UpdateTip();
+  int list_index = MainDialog.GetListIndex(GetId());
+  if (list_index > -1) {
+    MainDialog.listview.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
+    MainDialog.listview.RedrawItems(list_index, list_index, true);
+  }
 }
 
-void Item::Update(Episode episode, bool change_status) {
+void Item::UpdateList(Episode episode) {
+  if (Settings.Account.Update.mode == UPDATE_MODE_NONE)
+    return;
+
+  if (GetMyStatus() == mal::MYSTATUS_COMPLETED && GetMyRewatching() == 0)
+    return;
+
+  if (Settings.Account.Update.time != UPDATE_TIME_INSTANT && 
+      Settings.Account.Update.delay > Taiga.ticker_media &&
+      Taiga.ticker_media > -1)
+    return;
+  
+  bool change_status = true;
+  int number = GetEpisodeHigh(episode.number);
+  int number_low = GetEpisodeLow(episode.number);
+  int last_watched = GetMyLastWatchedEpisode();
+    
+  if (Settings.Account.Update.out_of_range)
+    if (number_low > last_watched + 1 || number < last_watched + 1)
+      return;
+
+  if (!mal::IsValidEpisode(number, last_watched, GetEpisodeCount()))
+    return;
+
+  if (Settings.Account.Update.mode == UPDATE_MODE_ASK) {
+      // Set up dialog
+      win32::TaskDialog dlg;
+      wstring title = L"Anime title: " + GetTitle();
+      dlg.SetWindowTitle(APP_TITLE);
+      dlg.SetMainIcon(TD_ICON_INFORMATION);
+      dlg.SetMainInstruction(L"Do you want to update your anime list?");
+      dlg.SetContent(title.c_str());
+      dlg.UseCommandLinks(true);
+
+      // Add buttons
+      int number = GetEpisodeHigh(episode.number);
+      if (number == 0) number = 1;
+      if (GetEpisodeCount() == 1) episode.number = L"1";
+      if (GetEpisodeCount() == number) { // Completed
+        dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
+      } else if (GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
+        dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
+      }
+      wstring button = L"Update\nUpdate episode number from " + 
+        ToWstr(GetMyLastWatchedEpisode()) + L" to " + ToWstr(number);
+      dlg.AddButton(button.c_str(), IDYES);
+      dlg.AddButton(L"Cancel\nDon't update anything", IDNO);
+  
+      // Show dialog
+      ActivateWindow(g_hMain);
+      dlg.Show(g_hMain);
+      int choice = dlg.GetSelectedButtonID();
+      if (choice == IDNO) return;
+      change_status = choice == IDCANCEL;
+  }
+
+  AddToEventQueue(episode, change_status);
+}
+
+void Item::AddToEventQueue(Episode episode, bool change_status) {
   // Create event item
   EventItem event_item;
   event_item.anime_id = GetId();
