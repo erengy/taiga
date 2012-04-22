@@ -257,8 +257,8 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
     case NM_RCLICK: {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
       if (lpnmitem->iItem == -1) break;
-      auto anime_item = 
-        reinterpret_cast<anime::Item*>(list_.GetItemParam(lpnmitem->iItem));
+      auto anime_item = AnimeDatabase.FindItem(
+        static_cast<int>(list_.GetItemParam(lpnmitem->iItem)));
       if (anime_item) {
         UpdateSeasonListMenu(!anime_item->IsInList());
         ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SeasonList"), 0, 
@@ -293,7 +293,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       break;
     }
     case CDDS_ITEMPOSTPAINT: {
-      auto anime_item = reinterpret_cast<anime::Item*>(pCD->nmcd.lItemlParam);
+      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item) break;
       
       // Draw border
@@ -484,19 +484,19 @@ void SeasonDialog::RefreshData(bool connect, int anime_id) {
     images.resize(size);
   }
 
-  for (auto i = SeasonDatabase.items.begin(); i != SeasonDatabase.items.end(); ++i) {
-    if (anime_id && anime_id != *i) continue;
-    auto anime_item = AnimeDatabase.FindItem(*i);
-    size_t index = i - SeasonDatabase.items.begin();
+  for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
+    if (anime_id && anime_id != *id) continue;
+    auto anime_item = AnimeDatabase.FindItem(*id);
+    size_t index = id - SeasonDatabase.items.begin();
     // Load available image
-    images.at(index).data = *i;
-    images.at(index).Load(anime::GetImagePath(*i));
+    images.at(index).data = *id;
+    images.at(index).Load(anime::GetImagePath(*id));
     // Download missing image
     if (connect && images.at(index).dc.Get() == nullptr)
-      mal::DownloadImage(*i, anime_item->GetImageUrl(), &image_clients_.at(index));
+      mal::DownloadImage(*id, anime_item->GetImageUrl(), &image_clients_.at(index));
     // Get details
     if (connect)
-      mal::SearchAnime(*i, anime_item->GetTitle(), &info_clients_.at(index));
+      mal::SearchAnime(*id, anime_item->GetTitle(), &info_clients_.at(index));
   }
 
   if (connect) {
@@ -551,6 +551,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   edit_.GetText(filter_text);
   vector<wstring> filters;
   Split(filter_text, L" ", filters);
+  RemoveEmptyStrings(filters);
 
   // Add items
   list_.DeleteAllItems();
@@ -561,8 +562,8 @@ void SeasonDialog::RefreshList(bool redraw_only) {
       if (InStr(anime_item->GetGenres(), *j, 0, true) == -1 && 
           InStr(anime_item->GetProducers(), *j, 0, true) == -1 && 
           InStr(anime_item->GetTitle(), *j, 0, true) == -1) {
-            passed_filters = false;
-            break;
+        passed_filters = false;
+        break;
       }
     }
     if (!passed_filters) continue;
@@ -581,7 +582,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     }
     list_.InsertItem(i - SeasonDatabase.items.begin(), 
       group, -1, 0, nullptr, anime_item->GetTitle().c_str(), 
-      reinterpret_cast<LPARAM>(anime_item));
+      static_cast<LPARAM>(anime_item->GetId()));
   }
   
   // Sort items

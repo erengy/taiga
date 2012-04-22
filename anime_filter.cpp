@@ -57,24 +57,18 @@ bool Filters::CheckItem(Item& item) {
   // Filter text
   vector<wstring> words;
   Split(text, L" ", words);
+  RemoveEmptyStrings(words);
   for (auto it = words.begin(); it != words.end(); ++it) {
     if (InStr(item.GetTitle(), *it, 0, true) == -1 && 
+        InStr(item.GetGenres(), *it, 0, true) == -1 && 
         InStr(item.GetMyTags(), *it, 0, true) == -1) {
       bool found = false;
       for (auto synonym = item.GetSynonyms().begin(); 
-           synonym != item.GetSynonyms().end(); ++synonym) {
-        if (InStr(*synonym, *it, 0, true)) {
-          found = true;
-          break;
-        }
-      }
+           !found && synonym != item.GetSynonyms().end(); ++synonym)
+        if (InStr(*synonym, *it, 0, true) > -1) found = true;
       for (auto synonym = item.GetUserSynonyms().begin(); 
-           synonym != item.GetUserSynonyms().end(); ++synonym) {
-        if (InStr(*synonym, *it, 0, true)) {
-          found = true;
-          break;
-        }
-      }
+           !found && synonym != item.GetUserSynonyms().end(); ++synonym)
+        if (InStr(*synonym, *it, 0, true) > -1) found = true;
       if (!found) return false;
     }
   }

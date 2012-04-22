@@ -794,10 +794,9 @@ void MainDialog::EnableInput(bool enable) {
 }
 
 int MainDialog::GetListIndex(int anime_id) {
-  for (int i = 0; i < listview.GetItemCount(); i++) {
-    auto anime_item = reinterpret_cast<anime::Item*>(listview.GetItemParam(i));
-    if (anime_item && anime_item->GetId() == anime_id) return i;
-  }
+  for (int i = 0; i < listview.GetItemCount(); i++)
+    if (static_cast<int>(listview.GetItemParam(i)) == anime_id)
+      return i;
   return -1;
 }
 
@@ -834,7 +833,7 @@ void MainDialog::RefreshList(int index) {
         group_count.at(status - 1)++;
         int i = listview.GetItemCount();
         listview.InsertItem(i, group_index, icon_index, 
-          0, nullptr, LPSTR_TEXTCALLBACK, reinterpret_cast<LPARAM>(&(*it)));
+          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->GetId()));
         listview.SetItem(i, 2, mal::TranslateNumber(it->GetMyScore()).c_str());
         listview.SetItem(i, 3, mal::TranslateType(it->GetType()).c_str());
         listview.SetItem(i, 4, mal::TranslateDateToSeason(it->GetDate(anime::DATE_START)).c_str());

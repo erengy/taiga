@@ -187,12 +187,8 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
     // Item select
     case LVN_ITEMCHANGED: {
       LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      auto anime_item = reinterpret_cast<anime::Item*>(lplv->lParam);
-      if (anime_item) {
-        AnimeDatabase.SetCurrentId(anime_item->GetId());
-      } else {
-        AnimeDatabase.SetCurrentId(anime::ID_UNKNOWN);
-      }
+      auto anime_id = static_cast<int>(lplv->lParam);
+      AnimeDatabase.SetCurrentId(anime_id);
       break;
     }
 
@@ -236,7 +232,7 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
     // Text callback
     case LVN_GETDISPINFO: {
       NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-      auto anime_item = reinterpret_cast<anime::Item*>(plvdi->item.lParam);
+      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
       if (!anime_item) break;
       switch (plvdi->item.iSubItem) {
         case 0: // Anime title
@@ -288,7 +284,7 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
       return CDRF_NOTIFYPOSTERASE;
 
     case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-      auto anime_item = reinterpret_cast<anime::Item*>(pCD->nmcd.lItemlParam);
+      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       // Alternate background color
       if ((pCD->nmcd.dwItemSpec % 2) && !listview.IsGroupViewEnabled()) {
         pCD->clrTextBk = RGB(248, 248, 248);
@@ -314,7 +310,7 @@ LRESULT MainDialog::OnListCustomDraw(LPARAM lParam) {
     }
     
     case CDDS_ITEMPOSTPAINT | CDDS_SUBITEM: {
-      auto anime_item = reinterpret_cast<anime::Item*>(pCD->nmcd.lItemlParam);
+      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item) return CDRF_DODEFAULT;
 
       // Draw progress bar
