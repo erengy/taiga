@@ -132,7 +132,7 @@ void AnimeInfoPage::Refresh(int anime_id) {
   if (anime_id <= anime::ID_UNKNOWN) return;
 
   anime_id_ = anime_id;
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
   switch (index) {
     // Series information
@@ -144,7 +144,7 @@ void AnimeInfoPage::Refresh(int anime_id) {
       
       // Set synopsis
       if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty()) {
-        if (mal::SearchAnime(anime_id, anime_item->GetTitle())) {
+        if (mal::SearchAnime(anime_id_, anime_item->GetTitle())) {
           text = L"Retrieving...";
         } else {
           text = L"-";
@@ -152,7 +152,7 @@ void AnimeInfoPage::Refresh(int anime_id) {
       } else {
         text = anime_item->GetSynopsis();
         if (anime_item->GetGenres().empty() || anime_item->GetScore().empty()) {
-          mal::GetAnimeDetails(anime_id);
+          mal::GetAnimeDetails(anime_id_);
         }
       }
       SetDlgItemText(IDC_EDIT_ANIME_INFO, text.c_str());
@@ -179,6 +179,8 @@ void AnimeInfoPage::Refresh(int anime_id) {
 
     // My information
     case INFOPAGE_MYINFO: {
+      if (!anime_item->IsInList()) break;
+
       // Episodes watched
       SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0, 
         anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 9999);

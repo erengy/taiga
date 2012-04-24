@@ -134,7 +134,6 @@ void EventList::Add(EventItem& item) {
 
     // Check new episode
     if (item.episode > -1) {
-      anime->SetNewEpisodeAvailability(false);
       anime->SetNewEpisodePath(L"");
       anime->CheckEpisodes(0);
     }

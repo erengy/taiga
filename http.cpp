@@ -444,11 +444,11 @@ BOOL HttpClient::OnReadComplete() {
 
     // Download image
     case HTTP_MAL_Image: {
+      int anime_id = static_cast<int>(GetParam());
       if (AnimeDialog.IsWindow()) {
-        AnimeDialog.Refresh(NULL, false, false);
+        AnimeDialog.Refresh(anime::ID_UNKNOWN, false, false);
       }
       if (SeasonDialog.IsWindow()) {
-        int anime_id = static_cast<int>(GetParam());
         for (auto it = SeasonDialog.images.begin(); it != SeasonDialog.images.end(); ++it) {
           if (it->data == anime_id) {
             if (it->Load(anime::GetImagePath(anime_id))) {

@@ -297,35 +297,35 @@ void AnimeDialog::SetCurrentPage(int index) {
 void AnimeDialog::Refresh(int anime_id, bool series_info, bool my_info) {
   // Set anime index
   if (anime_id > anime::ID_UNKNOWN) anime_id_ = anime_id;
-  if (anime_id <= anime::ID_UNKNOWN || !IsWindow()) return;
+  if (anime_id_ <= anime::ID_UNKNOWN || !IsWindow()) return;
 
   // Set title
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  auto anime_item = AnimeDatabase.FindItem(anime_id_);
   SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
 
   // Load image
-  if (image_.Load(anime::GetImagePath(anime_id))) {
+  if (image_.Load(anime::GetImagePath(anime_id_))) {
     win32::Window img = GetDlgItem(IDC_STATIC_ANIME_IMG);
     img.SetPosition(nullptr, image_.rect);
     img.SetWindowHandle(nullptr);
     // Refresh if current file is too old
     if (anime_item->GetAiringStatus() != mal::STATUS_FINISHED) {
       // Check last modified date (>= 7 days)
-      if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
-        mal::DownloadImage(anime_id, anime_item->GetImageUrl());
+      if (GetFileAge(anime::GetImagePath(anime_id_)) / (60 * 60 * 24) >= 7) {
+        mal::DownloadImage(anime_id_, anime_item->GetImageUrl());
       }
     }
   } else {
-    mal::DownloadImage(anime_id, anime_item->GetImageUrl());
+    mal::DownloadImage(anime_id_, anime_item->GetImageUrl());
   }
   InvalidateRect(&image_.rect);
 
   // Refresh pages
   if (series_info) {
-    pages[INFOPAGE_SERIESINFO].Refresh(anime_id);
+    pages[INFOPAGE_SERIESINFO].Refresh(anime_id_);
   }
   if (my_info) {
-    pages[INFOPAGE_MYINFO].Refresh(anime_id);
+    pages[INFOPAGE_MYINFO].Refresh(anime_id_);
   }
 }
 

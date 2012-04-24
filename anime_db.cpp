@@ -356,7 +356,13 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
     case EDIT_ANIME: {
       for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
         if (XML_ReadIntValue(node, L"series_animedb_id") == item->GetId()) {
-          node.child(child.c_str()).first_child().set_value(value.c_str());
+          xml_node child_node = node.child(child.c_str());
+          if (wstring(child_node.first_child().value()).empty()) {
+            child_node = child_node.append_child(node_pcdata);
+          } else {
+            child_node = child_node.first_child();
+          }
+          child_node.set_value(value.c_str());
           doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
           return true;
         }

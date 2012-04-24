@@ -348,7 +348,7 @@ bool Item::CheckEpisodes(int number, bool check_folder) {
   // Check folder
   if (check_folder) CheckFolder();
   if (GetFolder().empty()) {
-    for (int i = 1; i <= GetEpisodeCount(); i++)
+    for (int i = 1; i <= GetAvailableEpisodeCount(); i++)
       SetEpisodeAvailability(i, false, L"");
     return false;
   }
@@ -437,7 +437,6 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
     }
     my_info_->available_episodes.at(number - 1) = available;
     if (number == GetMyLastWatchedEpisode() + 1) {
-      SetNewEpisodeAvailability(available);
       SetNewEpisodePath(path);
     }
     if (!my_info_->playing) {
@@ -450,10 +449,6 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
   }
   
   return false;
-}
-
-void Item::SetNewEpisodeAvailability(bool available) {
-  my_info_->available_episodes.at(GetMyLastWatchedEpisode()) = available;
 }
 
 void Item::SetNewEpisodePath(const wstring& path) {

@@ -103,7 +103,6 @@ class Item {
   bool IsNewEpisodeAvailable() const;
   bool PlayEpisode(int number);
   bool SetEpisodeAvailability(int number, bool available, const wstring& path);
-  void SetNewEpisodeAvailability(bool available);
   void SetNewEpisodePath(const wstring& path);
 
   // For anime-specific folders on user's computer

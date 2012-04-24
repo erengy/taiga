@@ -363,6 +363,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     // Set item properties
+    anime_item->AddtoUserList();
     anime_item->SetMyStatus(status);
     if (status == mal::MYSTATUS_COMPLETED) {
       anime_item->SetMyLastWatchedEpisode(anime_item->GetEpisodeCount());
