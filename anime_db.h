@@ -61,8 +61,8 @@ class Database {
   bool DeleteItem(int anime_id);
   // called from everywhere!
   Item* FindItem(int anime_id);
-  // do we need this at all?
-  int FindItemIndex(int anime_id) const;
+  //
+  Item* FindSequel(int anime_id);
   // called after parsing search results
   // called from Load functions
   // called from AddToListAs action (from search and season dialogs)

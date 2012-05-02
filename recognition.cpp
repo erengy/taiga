@@ -62,7 +62,16 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   // Leave if episode number is out of range
   if (check_episode && anime_item.GetEpisodeCount() > 1) {
     int number = GetEpisodeHigh(episode.number);
-    if (number > anime_item.GetEpisodeCount()) return false;
+    if (number > anime_item.GetEpisodeCount()) {
+      // Check sequels
+      auto sequel = AnimeDatabase.FindSequel(anime_item.GetId());
+      if (sequel) {
+        episode.anime_id = sequel->GetId();
+        episode.number = ToWstr(number - anime_item.GetEpisodeCount());
+        return true;
+      }
+      return false;
+    }
   }
   // Leave if not yet aired
   if (check_date && !anime_item.IsAiredYet()) return false;
@@ -72,41 +81,27 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   CleanTitle(episode_title);
   if (episode_title.empty()) return false;
   
-  bool found = false;
-  
   // Compare with main title
-  if (CompareTitle(anime_item.GetTitle(), episode_title, episode, anime_item, strict))
-    found = true;
+  bool found = CompareTitle(anime_item.GetTitle(), episode_title, episode, anime_item, strict);
   
   // Compare with synonyms
-  if (!found) {
-    for (auto it = anime_item.GetSynonyms().begin();
-         it != anime_item.GetSynonyms().end(); ++it) {
-      if (CompareTitle(*it, episode_title, episode, anime_item, strict)) {
-        found = true;
-        break;
-      }
-    }
+  for (auto it = anime_item.GetSynonyms().begin();
+       !found && it != anime_item.GetSynonyms().end(); ++it) {
+    found = CompareTitle(*it, episode_title, episode, anime_item, strict);
   }
-  if (!found) {
-    for (auto it = anime_item.GetUserSynonyms().begin();
-         it != anime_item.GetUserSynonyms().end(); ++it) {
-      if (CompareTitle(*it, episode_title, episode, anime_item, strict)) {
-        found = true;
-        break;
-      }
-    }
+  for (auto it = anime_item.GetUserSynonyms().begin();
+       !found && it != anime_item.GetUserSynonyms().end(); ++it) {
+    found = CompareTitle(*it, episode_title, episode, anime_item, strict);
   }
 
   if (found) {
+    episode.anime_id = anime_item.GetId();
     // Assume episode 1 if matched one-episode series
     if (episode.number.empty() && anime_item.GetEpisodeCount() == 1)
       episode.number = L"1";
-    return true;
   }
 
-  // Failed
-  return false;
+  return found;
 }
 
 bool RecognitionEngine::CompareTitle(wstring anime_title, 

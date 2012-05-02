@@ -639,7 +639,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
             if (!it->IsInList()) continue; // TODO: Allow recognition for all items
             if (Meow.CompareEpisode(CurrentEpisode, *it)) {
-              CurrentEpisode.Set(it->GetId());
+              CurrentEpisode.Set(CurrentEpisode.anime_id);
               it->StartWatching(CurrentEpisode);
               return;
             }

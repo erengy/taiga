@@ -142,13 +142,19 @@ Item* Database::FindItem(int anime_id) {
   return nullptr;
 }
 
-int Database::FindItemIndex(int anime_id) const {
-  if (anime_id > ID_UNKNOWN)
-    for (size_t i = 0; i < items.size(); i++)
-      if (items.at(i).GetId() == anime_id)
-        return i;
+Item* Database::FindSequel(int anime_id) {
+  int sequel_id = ID_UNKNOWN;
 
-  return -1;
+  switch (anime_id) {
+    // Gintama -> Gintama'
+    case 918: sequel_id = 9969; break;
+    // Tegami Bachi -> Tegami Bachi Reverse
+    case 6444: sequel_id = 8311; break;
+    // Fate/Zero -> Fate/Zero 2nd Season
+    case 10087: sequel_id = 11741; break;
+  }
+
+  return FindItem(sequel_id);
 }
 
 void Database::UpdateItem(Item& new_item) {

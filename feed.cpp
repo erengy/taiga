@@ -107,7 +107,6 @@ int Feed::ExamineData() {
     for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
       if (!it->IsInList()) continue;
       if (Meow.CompareEpisode(items[i].episode_data, *it)) {
-        items[i].episode_data.anime_id = it->GetId();
         break;
       }
     }

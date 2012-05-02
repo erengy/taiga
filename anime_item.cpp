@@ -516,7 +516,7 @@ const vector<wstring>& Item::GetUserSynonyms() const {
 void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
   if (synonyms == EMPTY_STR) return;
   vector<wstring> temp;
-  Split(synonyms, L", ", temp);
+  Split(synonyms, L"; ", temp);
   SetUserSynonyms(temp, save_settings);
 }
 
