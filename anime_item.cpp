@@ -92,7 +92,8 @@ int Item::GetEpisodeCount(bool estimation) const {
   return 0;
 }
 
-int Item::GetAiringStatus() const {
+int Item::GetAiringStatus(bool check_date) const {
+  if (!check_date) return series_info_.status;
   if (IsFinishedAiring()) return mal::STATUS_FINISHED;
   if (IsAiredYet()) return mal::STATUS_AIRING;
   return mal::STATUS_NOTYETAIRED;
@@ -615,7 +616,7 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
   // Delete
   if (item.mode == HTTP_MAL_AnimeDelete) {
     MainDialog.ChangeStatus(L"Item deleted. (" + GetTitle() + L")");
-    database_->DeleteItem(GetId());
+    database_->DeleteListItem(GetId());
     MainDialog.RefreshList();
     MainDialog.RefreshTabs();
     SearchDialog.PostMessage(WM_CLOSE);

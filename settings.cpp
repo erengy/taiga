@@ -48,7 +48,7 @@ class Settings Settings;
 bool Settings::Load() {
   // Initialize
   folder_ = Taiga.GetDataPath();
-  file_ = folder_ + L"Settings.xml";
+  file_ = folder_ + L"settings.xml";
   CreateDirectory(folder_.c_str(), NULL);
   
   // Load XML file

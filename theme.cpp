@@ -38,7 +38,7 @@ Theme::Theme() {
 
 bool Theme::Load(const wstring& name) {
   // Initialize
-  folder_ = Taiga.GetDataPath() + L"Theme\\" + name + L"\\";
+  folder_ = Taiga.GetDataPath() + L"theme\\" + name + L"\\";
   file_ = folder_ + L"Theme.xml";
   
   // Load XML file

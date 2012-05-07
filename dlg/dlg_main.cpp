@@ -636,13 +636,11 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       // Recognized?
       if (Taiga.is_recognition_enabled) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
-          for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-            if (!it->IsInList()) continue; // TODO: Allow recognition for all items
-            if (Meow.CompareEpisode(CurrentEpisode, *it)) {
-              CurrentEpisode.Set(CurrentEpisode.anime_id);
-              it->StartWatching(CurrentEpisode);
-              return;
-            }
+          anime_item = Meow.MatchDatabase(CurrentEpisode, true, true);
+          if (anime_item) {
+            CurrentEpisode.Set(CurrentEpisode.anime_id);
+            anime_item->StartWatching(CurrentEpisode);
+            return;
           }
         }
         // Not recognized
@@ -824,19 +822,19 @@ void MainDialog::RefreshList(int index) {
   int group_index = -1, icon_index = 0, status = 0;
   vector<int> group_count(6);
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->IsInList()) continue;
-    status = it->GetMyStatus();
-    if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->GetMyRewatching())) {
-      if (AnimeFilters.CheckItem(*it)) {
+    if (!it->second.IsInList()) continue;
+    status = it->second.GetMyStatus();
+    if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->second.GetMyRewatching())) {
+      if (AnimeFilters.CheckItem(it->second)) {
         group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
-        icon_index = it->GetPlaying() ? ICON16_PLAY : StatusToIcon(it->GetAiringStatus());
+        icon_index = it->second.GetPlaying() ? ICON16_PLAY : StatusToIcon(it->second.GetAiringStatus());
         group_count.at(status - 1)++;
         int i = listview.GetItemCount();
         listview.InsertItem(i, group_index, icon_index, 
-          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->GetId()));
-        listview.SetItem(i, 2, mal::TranslateNumber(it->GetMyScore()).c_str());
-        listview.SetItem(i, 3, mal::TranslateType(it->GetType()).c_str());
-        listview.SetItem(i, 4, mal::TranslateDateToSeason(it->GetDate(anime::DATE_START)).c_str());
+          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->second.GetId()));
+        listview.SetItem(i, 2, mal::TranslateNumber(it->second.GetMyScore()).c_str());
+        listview.SetItem(i, 3, mal::TranslateType(it->second.GetType()).c_str());
+        listview.SetItem(i, 4, mal::TranslateDateToSeason(it->second.GetDate(anime::DATE_START)).c_str());
       }
     }
   }

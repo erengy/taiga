@@ -593,12 +593,12 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   // Add anime to list
   int list_index = 0;
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->IsInList()) continue;
-    anime_list.InsertItem(list_index, it->GetMyStatus(), 
-      StatusToIcon(it->GetAiringStatus()), 0, nullptr, 
-      LPSTR_TEXTCALLBACK, static_cast<int>(it->GetId()));
+    if (!it->second.IsInList()) continue;
+    anime_list.InsertItem(list_index, it->second.GetMyStatus(), 
+      StatusToIcon(it->second.GetAiringStatus()), 0, nullptr, 
+      LPSTR_TEXTCALLBACK, static_cast<int>(it->second.GetId()));
     for (auto id = parent->filter.anime_ids.begin(); id != parent->filter.anime_ids.end(); ++id) {
-      if (*id == it->GetId()) {
+      if (*id == it->second.GetId()) {
         anime_list.SetCheckState(list_index, TRUE);
         break;
       }

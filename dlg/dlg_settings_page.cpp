@@ -108,10 +108,10 @@ BOOL SettingsPage::OnInitDialog() {
       List.SetTheme();
       int i = 0;
       for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-        if (!it->IsInList()) continue;
-        List.InsertItem(i, it->GetMyStatus(), StatusToIcon(it->GetAiringStatus()), 
-          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->GetId()));
-        List.SetItem(i++, 1, it->GetFolder().c_str());
+        if (!it->second.IsInList()) continue;
+        List.InsertItem(i, it->second.GetMyStatus(), StatusToIcon(it->second.GetAiringStatus()), 
+          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->second.GetId()));
+        List.SetItem(i++, 1, it->second.GetFolder().c_str());
       }
       List.Sort(0, 1, 0, ListViewCompareProc);
       List.SetWindowHandle(nullptr);

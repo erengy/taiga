@@ -424,7 +424,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     // If there's no anime folder set, we'll check them first
     bool check_folder = true;
     for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-      if (it->IsInList() && !it->GetFolder().empty()) {
+      if (it->second.IsInList() && !it->second.GetFolder().empty()) {
         check_folder = false;
         break;
       }

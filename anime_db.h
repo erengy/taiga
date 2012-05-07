@@ -30,7 +30,6 @@ namespace anime {
 
 // =============================================================================
 
-// Used in Database::SaveList()
 enum ListSaveMode {
   ADD_ANIME,
   DELETE_ANIME,
@@ -42,47 +41,55 @@ class Database {
  public:
   Database();
   virtual ~Database() {}
-
-  // called only once on program startup
-  // returns false if no local database exists.
+  
+  // Loads local anime database on program startup from db/anime.xml, returns
+  // false if no such database exists.
   bool LoadDatabase();
-  // called everytime the database is updated?
-  // is there a performance issue?
+  // Saves local anime database on program exit to db/anime.xml, returns false
+  // if the database is empty.
   bool SaveDatabase();
 
+  // Deletes all user information from anime items.
   void ClearUserData();
-  // done on startup and when list is refreshed
+  // Loads anime list on startup and list-refresh from
+  // user\<username>\anime.xml, returns false if no such list exists.
   bool LoadList();
-  // done everytime an item is updated
-  bool SaveList(int anime_id, const wstring& child, const wstring& value, 
+  // Saves anime list everytime an item is updated to
+  // user\<username>\anime.xml, returns false if no such item exists with given
+  // ID in the database or the relevant XML node doesn't exist.
+  bool SaveList(int anime_id, 
+                const wstring& child, const wstring& value, 
                 ListSaveMode mode = EDIT_ANIME);
-
-  // called from Item::Edit (after HTTP_MAL_AnimeDelete succeeds)
-  bool DeleteItem(int anime_id);
-  // called from everywhere!
+  
+  // Searches the database for an item with given ID.
   Item* FindItem(int anime_id);
-  //
+  // Searches the database for an item with given ID, which has a sequel.
   Item* FindSequel(int anime_id);
-  // called after parsing search results
-  // called from Load functions
-  // called from AddToListAs action (from search and season dialogs)
+  // Updates anime information, or adds a new item if no such anime exists.
+  // New information may include both series and user information. Series
+  // information is updated depending on its last_modified value.
   void UpdateItem(Item& item);
 
-  // current item is the item selected on MainDialog's ListView
+  // Deletes user information from an item, after HTTP_MAL_AnimeDelete
+  // succeeds.
+  bool DeleteListItem(int anime_id);
+  // Current item is the item selected on MainDialog's ListView.
   int GetCurrentId();
   Item* GetCurrentItem();
   void SetCurrentId(int anime_id);
 
-  // should we use another container?
-  vector<Item> items;
+  // Anime items are mapped to their IDs.
+  std::map<int, Item> items;
 
-  // read from <username>.xml
+  // Read from user\<username>\anime.xml.
   ListUser user;
 
  private:
-  // thread safety
+  // Thread safety
   win32::CriticalSection critical_section_;
+  
   int current_id_;
+  
   wstring file_;
   wstring folder_;
 };
@@ -92,13 +99,17 @@ class SeasonDatabase {
   SeasonDatabase();
   virtual ~SeasonDatabase() {}
 
+  // Loads season data from db\season\<seasonname>.xml, returns false if no such
+  // file exists.
   bool Load(wstring file);
 
-  // only IDs are stored, actual info is stored in Database
+  // Only IDs are stored here, actual info is kept in Database.
   vector<int> items;
-  // not internally modified?
+
+  // TODO: Remove
   time_t last_modified;
-  // season name (e.g. Spring 2012)
+  
+  // Season name (e.g. Spring 2012)
   wstring name;
 
  private:

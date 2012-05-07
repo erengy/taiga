@@ -59,7 +59,7 @@ int Statistics::CalculateAnimeCount() {
   anime_count = 0;
 
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it)
-    if (it->IsInList())
+    if (it->second.IsInList())
       anime_count++;
   
   return anime_count;
@@ -69,11 +69,11 @@ int Statistics::CalculateEpisodeCount() {
   episode_count = 0;
   
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->IsInList()) continue;
-    episode_count += it->GetMyLastWatchedEpisode();
+    if (!it->second.IsInList()) continue;
+    episode_count += it->second.GetMyLastWatchedEpisode();
     // TODO: Implement times_rewatched when MAL adds to API
-    if (it->GetMyRewatching() == TRUE)
-      episode_count += it->GetEpisodeCount();
+    if (it->second.GetMyRewatching() == TRUE)
+      episode_count += it->second.GetEpisodeCount();
   }
 
   return episode_count;
@@ -83,9 +83,9 @@ wstring Statistics::CalculateLifeSpentWatching() {
   int duration, seconds = 0;
   
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->IsInList()) continue;
+    if (!it->second.IsInList()) continue;
     // Approximate duration in minutes
-    switch (it->GetType()) {
+    switch (it->second.GetType()) {
       default:
       case mal::TYPE_TV:      duration = 24;  break;
       case mal::TYPE_OVA:     duration = 24;  break;
@@ -94,9 +94,9 @@ wstring Statistics::CalculateLifeSpentWatching() {
       case mal::TYPE_ONA:     duration = 24;  break;
       case mal::TYPE_MUSIC:   duration = 5;   break;
     }
-    int episodes_watched = it->GetMyLastWatchedEpisode();
-    if (it->GetMyRewatching() == TRUE)
-      episodes_watched += it->GetEpisodeCount();
+    int episodes_watched = it->second.GetMyLastWatchedEpisode();
+    if (it->second.GetMyRewatching() == TRUE)
+      episodes_watched += it->second.GetEpisodeCount();
     seconds += (duration * 60) * episodes_watched;
   }
   
@@ -113,9 +113,9 @@ float Statistics::CalculateMeanScore() {
   float sum_scores = 0.0f, items_scored = 0.0f;
   
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->IsInList()) continue;
-    if (it->GetMyScore() > 0) {
-      sum_scores += static_cast<float>(it->GetMyScore());
+    if (!it->second.IsInList()) continue;
+    if (it->second.GetMyScore() > 0) {
+      sum_scores += static_cast<float>(it->second.GetMyScore());
       items_scored++;
     }
   }
@@ -129,9 +129,9 @@ float Statistics::CalculateScoreDeviation() {
   float sum_squares = 0.0f, items_scored = 0.0f;
   
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->IsInList()) continue;
-    if (it->GetMyScore() > 0) {
-      sum_squares += pow(static_cast<float>(it->GetMyScore()) - score_mean, 2);
+    if (!it->second.IsInList()) continue;
+    if (it->second.GetMyScore() > 0) {
+      sum_squares += pow(static_cast<float>(it->second.GetMyScore()) - score_mean, 2);
       items_scored++;
     }
   }

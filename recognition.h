@@ -35,6 +35,13 @@ public:
   virtual ~RecognitionEngine() {};
   
   void Initialize();
+
+  anime::Item* MatchDatabase(anime::Episode& episode, 
+                             bool in_list = true, 
+                             bool reverse = true, 
+                             bool strict = true, 
+                             bool check_episode = true, 
+                             bool check_date = true);
   
   bool CompareEpisode(anime::Episode& episode, 
                       const anime::Item& anime_item, 

@@ -132,7 +132,7 @@ bool DownloadImage(int anime_id, const wstring& image_url, class HttpClient* cli
 bool DownloadUserImage(bool thumb) {
   if (!AnimeDatabase.user.GetId()) return false;
   win32::Url url;
-  wstring path = Taiga.GetDataPath() + L"user\\image\\";
+  wstring path = Taiga.GetDataPath() + L"user\\" + AnimeDatabase.user.GetName() + L"\\";
   if (thumb) {
     url.Crack(L"http://myanimelist.net/images/userimages/thumbs/" + ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg");
     path += ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg";

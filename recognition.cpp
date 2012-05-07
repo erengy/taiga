@@ -54,6 +54,30 @@ RecognitionEngine::RecognitionEngine() {
 
 // =============================================================================
 
+anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode, 
+                                              bool in_list, bool reverse, 
+                                              bool strict, bool check_episode, bool check_date) {
+  if (reverse) {
+    for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
+      if (in_list && !it->second.IsInList())
+        continue;
+      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date))
+        return &it->second;
+    }
+  } else {
+    for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+      if (in_list && !it->second.IsInList())
+        continue;
+      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date))
+        return &it->second;
+    }
+  }
+  
+  return nullptr;
+}
+
+// =============================================================================
+
 bool RecognitionEngine::CompareEpisode(anime::Episode& episode, 
                                        const anime::Item& anime_item, 
                                        bool strict, bool check_episode, bool check_date) {

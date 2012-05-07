@@ -40,7 +40,7 @@ class Item {
   int GetId() const;
   int GetType() const;
   int GetEpisodeCount(bool estimation = false) const;
-  int GetAiringStatus() const;
+  int GetAiringStatus(bool check_date = true) const;
   const wstring& GetTitle() const;
   const vector<wstring>& GetSynonyms() const;
   const Date& GetDate(DateType type) const;
@@ -147,18 +147,18 @@ class Item {
   
   // An item's series information will only be updated only if last_modified
   // value is significantly older than the new one's. This helps us lower
-  // the number of requests we make from MAL.
+  // the number of requests we send to MAL.
   time_t last_modified;
 
  private:
   // Helper function
   EventItem* SearchEventQueue(int search_mode) const;
 
-  // Series information, stored in anime.xml
+  // Series information, stored in db\anime.xml
   SeriesInformation series_info_;
 
-  // User information, stored in <username>.xml - some items are not in user's
-  // list, thus this member is not valid for every item.
+  // User information, stored in user\<username>\anime.xml - some items are not
+  // in user's list, thus this member is not valid for every item.
   std::shared_ptr<MyInformation> my_info_;
 
   // Pointer to the parent database which holds this item

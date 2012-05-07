@@ -230,14 +230,14 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       typedef std::pair<int, wstring> anime_pair;
       vector<anime_pair> title_list;
       for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-        switch (it->GetMyStatus()) {
+        switch (it->second.GetMyStatus()) {
           case mal::MYSTATUS_NOTINLIST:
           case mal::MYSTATUS_COMPLETED:
           case mal::MYSTATUS_DROPPED:
             continue;
           default:
-            title_list.push_back(std::make_pair(it->GetId(), 
-              AnimeDatabase.FindItem(it->GetId())->GetTitle()));
+            title_list.push_back(std::make_pair(it->second.GetId(), 
+              AnimeDatabase.FindItem(it->second.GetId())->GetTitle()));
         }
       }
       std::sort(title_list.begin(), title_list.end(), 

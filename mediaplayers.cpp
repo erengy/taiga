@@ -42,7 +42,7 @@ MediaPlayers::MediaPlayers()
 
 BOOL MediaPlayers::Load() {
   // Initialize
-  wstring file = Taiga.GetDataPath() + L"Media.xml";
+  wstring file = Taiga.GetDataPath() + L"media.xml";
   items.clear();
   index = -1;
   
@@ -79,7 +79,7 @@ BOOL MediaPlayers::Load() {
 BOOL MediaPlayers::Save() {
   // Initialize
   wstring folder = Taiga.GetDataPath();
-  wstring file = folder + L"Media.xml";
+  wstring file = folder + L"media.xml";
   
   // Create XML document
   xml_document doc;

@@ -55,31 +55,26 @@ bool Database::LoadDatabase() {
   }
 
   // Read items
-  size_t anime_count = 0, i = 0;
   xml_node animedb_node = doc.child(L"animedb");
   for (xml_node node = animedb_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-    anime_count++;
-  }
-  if (anime_count > 0) {
-    items.resize(anime_count);
-  }
-  for (xml_node node = animedb_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-    items.at(i).SetId(XML_ReadIntValue(node, L"series_animedb_id"));
-    items.at(i).SetTitle(XML_ReadStrValue(node, L"series_title"));
-    items.at(i).SetSynonyms(XML_ReadStrValue(node, L"series_synonyms"));
-    items.at(i).SetType(XML_ReadIntValue(node, L"series_type"));
-    items.at(i).SetEpisodeCount(XML_ReadIntValue(node, L"series_episodes"));
-    items.at(i).SetAiringStatus(XML_ReadIntValue(node, L"series_status"));
-    items.at(i).SetDate(DATE_START, Date(XML_ReadStrValue(node, L"series_start")));
-    items.at(i).SetDate(DATE_END, Date(XML_ReadStrValue(node, L"series_end")));
-    items.at(i).SetImageUrl(XML_ReadStrValue(node, L"series_image"));
-    items.at(i).SetGenres(XML_ReadStrValue(node, L"genres"));
-    items.at(i).SetProducers(XML_ReadStrValue(node, L"producers"));
-    items.at(i).SetScore(XML_ReadStrValue(node, L"score"));
-    items.at(i).SetRank(XML_ReadStrValue(node, L"rank"));
-    items.at(i).SetPopularity(XML_ReadStrValue(node, L"popularity"));
-    items.at(i).SetSynopsis(XML_ReadStrValue(node, L"synopsis"));
-    items.at(i++).last_modified = _wtoi64(XML_ReadStrValue(node, L"last_modified").c_str());
+    Item item;
+    item.SetId(XML_ReadIntValue(node, L"series_animedb_id"));
+    item.SetTitle(XML_ReadStrValue(node, L"series_title"));
+    item.SetSynonyms(XML_ReadStrValue(node, L"series_synonyms"));
+    item.SetType(XML_ReadIntValue(node, L"series_type"));
+    item.SetEpisodeCount(XML_ReadIntValue(node, L"series_episodes"));
+    item.SetAiringStatus(XML_ReadIntValue(node, L"series_status"));
+    item.SetDate(DATE_START, Date(XML_ReadStrValue(node, L"series_start")));
+    item.SetDate(DATE_END, Date(XML_ReadStrValue(node, L"series_end")));
+    item.SetImageUrl(XML_ReadStrValue(node, L"series_image"));
+    item.SetGenres(XML_ReadStrValue(node, L"genres"));
+    item.SetProducers(XML_ReadStrValue(node, L"producers"));
+    item.SetScore(XML_ReadStrValue(node, L"score"));
+    item.SetRank(XML_ReadStrValue(node, L"rank"));
+    item.SetPopularity(XML_ReadStrValue(node, L"popularity"));
+    item.SetSynopsis(XML_ReadStrValue(node, L"synopsis"));
+    item.last_modified = _wtoi64(XML_ReadStrValue(node, L"last_modified").c_str());
+    items[item.GetId()] = item;
   }
 
   return true;
@@ -93,12 +88,6 @@ bool Database::SaveDatabase() {
   xml_node animedb_node = doc.append_child();
   animedb_node.set_name(L"animedb");
 
-  // Sort items by their ID
-  std::sort(items.begin(), items.end(), 
-    [](const Item& item1, const Item& item2) {
-      return item1.GetId() < item2.GetId();
-    });
-
   // Write items
   for (auto it = items.begin(); it != items.end(); ++it) {
     xml_node anime_node = animedb_node.append_child();
@@ -107,22 +96,22 @@ bool Database::SaveDatabase() {
       if (v) XML_WriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
       if (!v.empty()) XML_WriteStrValue(anime_node, n, v.c_str(), t)
-    XML_WI(L"series_animedb_id", it->GetId());
-    XML_WS(L"series_title", it->GetTitle(), node_cdata);
-    XML_WS(L"series_synonyms", Join(it->GetSynonyms(), L"; "), node_cdata);
-    XML_WI(L"series_type", it->GetType());
-    XML_WI(L"series_episodes", it->GetEpisodeCount());
-    XML_WI(L"series_status", it->GetAiringStatus());
-    XML_WS(L"series_start", wstring(it->GetDate(DATE_START)), node_pcdata);
-    XML_WS(L"series_end", wstring(it->GetDate(DATE_END)), node_pcdata);
-    XML_WS(L"series_image", it->GetImageUrl(), node_pcdata);
-    XML_WS(L"genres", it->GetGenres(), node_pcdata);
-    XML_WS(L"producers", it->GetProducers(), node_pcdata);
-    XML_WS(L"score", it->GetScore(), node_pcdata);
-    XML_WS(L"rank", it->GetRank(), node_pcdata);
-    XML_WS(L"popularity", it->GetPopularity(), node_pcdata);
-    XML_WS(L"synopsis", it->GetSynopsis(), node_cdata), node_pcdata;
-    XML_WS(L"last_modified", ToWstr(it->last_modified), node_pcdata);
+    XML_WI(L"series_animedb_id", it->second.GetId());
+    XML_WS(L"series_title", it->second.GetTitle(), node_cdata);
+    XML_WS(L"series_synonyms", Join(it->second.GetSynonyms(), L"; "), node_cdata);
+    XML_WI(L"series_type", it->second.GetType());
+    XML_WI(L"series_episodes", it->second.GetEpisodeCount());
+    XML_WI(L"series_status", it->second.GetAiringStatus());
+    XML_WS(L"series_start", wstring(it->second.GetDate(DATE_START)), node_pcdata);
+    XML_WS(L"series_end", wstring(it->second.GetDate(DATE_END)), node_pcdata);
+    XML_WS(L"series_image", it->second.GetImageUrl(), node_pcdata);
+    XML_WS(L"genres", it->second.GetGenres(), node_pcdata);
+    XML_WS(L"producers", it->second.GetProducers(), node_pcdata);
+    XML_WS(L"score", it->second.GetScore(), node_pcdata);
+    XML_WS(L"rank", it->second.GetRank(), node_pcdata);
+    XML_WS(L"popularity", it->second.GetPopularity(), node_pcdata);
+    XML_WS(L"synopsis", it->second.GetSynopsis(), node_cdata), node_pcdata;
+    XML_WS(L"last_modified", ToWstr(it->second.last_modified), node_pcdata);
     #undef XML_WS
     #undef XML_WI
   }
@@ -134,10 +123,10 @@ bool Database::SaveDatabase() {
 }
 
 Item* Database::FindItem(int anime_id) {
-  if (anime_id > ID_UNKNOWN)
-    for (size_t i = 0; i < items.size(); i++)
-      if (items.at(i).GetId() == anime_id)
-        return &items.at(i);
+  if (anime_id > ID_UNKNOWN) {
+    auto it = items.find(anime_id);
+    if (it != items.end()) return &it->second;
+  }
 
   return nullptr;
 }
@@ -163,8 +152,7 @@ void Database::UpdateItem(Item& new_item) {
   Item* item = FindItem(new_item.GetId());
   if (!item) {
     // Add a new item
-    items.push_back(new_item);
-    item = &items.back();
+    item = &items[new_item.GetId()];
   }
 
   // Update series information if new information is, well, new.
@@ -241,7 +229,7 @@ void Database::ClearUserData() {
   current_id_ = ID_UNKNOWN;
   
   for (auto it = items.begin(); it != items.end(); ++it) {
-    it->RemoveFromUserList();
+    it->second.RemoveFromUserList();
   }
   
   user.Clear();
@@ -251,7 +239,8 @@ bool Database::LoadList() {
   // Initialize
   ClearUserData();
   if (Settings.Account.MAL.user.empty()) return false;
-  wstring file = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L".xml";
+  wstring file = Taiga.GetDataPath() + 
+    L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
   
   // Load XML file
   xml_document doc;
@@ -318,8 +307,8 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
   }
   
   // Initialize
-  wstring folder = Taiga.GetDataPath() + L"user\\";
-  wstring file = folder + Settings.Account.MAL.user + L".xml";
+  wstring folder = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\";
+  wstring file = folder + L"anime.xml";
   if (!PathExists(folder)) CreateFolder(folder);
   
   // Load XML file
@@ -388,21 +377,13 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
 
 // =============================================================================
 
-bool Database::DeleteItem(int anime_id) {
+bool Database::DeleteListItem(int anime_id) {
   auto item = FindItem(anime_id);
   if (!item) return false;
   if (!item->IsInList()) return false;
-  
+
   user.DecreaseItemCount(item->GetMyStatus(false), true);
   SaveList(anime_id, L"", L"", DELETE_ANIME);
-
-  /*
-  items.erase(items.begin() + item->index);
-  for (size_t i = 0; i < items.size(); i++) {
-    items.at(i).index = i;
-  }
-  */
-
   item->RemoveFromUserList();
 
   return true;

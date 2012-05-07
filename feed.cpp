@@ -104,12 +104,7 @@ int Feed::ExamineData() {
   // Examine title and compare with anime list items
   for (size_t i = 0; i < items.size(); i++) {
     Meow.ExamineTitle(items[i].title, items[i].episode_data, true, true, true, true, false);
-    for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-      if (!it->IsInList()) continue;
-      if (Meow.CompareEpisode(items[i].episode_data, *it)) {
-        break;
-      }
-    }
+    Meow.MatchDatabase(items[i].episode_data, true, true);
   }
 
   // Filter

@@ -269,9 +269,9 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
     if (is_folder && !path_available) {
       int anime_id = 0;
       for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-        if (!it->IsInList()) continue;
-        if (!it->GetFolder().empty() && IsEqual(it->GetFolder(), path)) {
-          anime_id = it->GetId();
+        if (!it->second.IsInList()) continue;
+        if (!it->second.GetFolder().empty() && IsEqual(it->second.GetFolder(), path)) {
+          anime_id = it->second.GetId();
           break;
         }
       }
@@ -298,13 +298,8 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
     // Examine path and compare with list items
     if (Meow.ExamineTitle(path, episode)) {
       if (LIST[i].anime_id == 0 || is_folder == false) {
-        for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-          if (!it->IsInList()) continue;
-          if (Meow.CompareEpisode(episode, *it, true, false, false)) {
-            LIST[i].anime_id = it->GetId();
-            break;
-          }
-        }
+        auto anime_item = Meow.MatchDatabase(episode, true, true, true, false, false);
+        if (anime_item) LIST[i].anime_id = anime_item->GetId();
       }
       if (LIST[i].anime_id > 0) {
         auto anime_item = AnimeDatabase.FindItem(LIST[i].anime_id);
