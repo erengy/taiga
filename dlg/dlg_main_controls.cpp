@@ -505,45 +505,37 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
   switch (LOWORD(wParam)) {
     // Login
-    case 100:
+    case 200:
       ExecuteAction(L"LoginLogout");
       return TRUE;
     // Synchronize
-    case 101:
+    case 201:
       ExecuteAction(L"Synchronize");
       return TRUE;
     // MyAnimeList
-    case 102:
+    case 202:
       ExecuteAction(L"ViewPanel");
       return TRUE;
     // Season browser
-    case 105:
+    case 205:
       ExecuteAction(L"SeasonBrowser");
       return TRUE;
     // Torrents
-    case 107:
+    case 207:
       ExecuteAction(L"Torrents");
       return TRUE;
     // Filter
-    case 109:
+    case 209:
       ExecuteAction(L"Filter");
       return TRUE;
     // Settings
-    case 110:
+    case 210:
       ExecuteAction(L"Settings");
       return TRUE;
     // Debug
-    case 112:
+    case 212:
       debug::Test();
       return TRUE;
-  }
-
-  // Menu
-  if (wParam != 0 && lParam == 0) {
-    wstring* str = reinterpret_cast<wstring*>(wParam);
-    ExecuteAction(*str);
-    RefreshMenubar();
-    return TRUE;
   }
   
   // Search text
@@ -572,16 +564,32 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
       MapWindowPoints(nmt->hdr.hwndFrom, HWND_DESKTOP, reinterpret_cast<LPPOINT>(&rect), 2);
       wstring action;
       switch (LOWORD(nmt->iItem)) {
+        // File
+        case 100:
+          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"File");
+          break;
+        // Account
+        case 101:
+          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"Account");
+          break;
+        // List
+        case 102:
+          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"List");
+          break;
+        // Help
+        case 103:
+          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"Help");
+          break;
         // Folders
-        case 104:
+        case 204:
           action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"Folders");
           break;
         // Tools
-        case 106:
+        case 206:
           action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"Tools");
           break;
         // Search
-        case 200:
+        case 300:
           action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"SearchBar");
           break;
       }
@@ -597,8 +605,8 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
       NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(lParam);
       git->cchTextMax = INFOTIPSIZE;
       // Main toolbar
-      if (git->hdr.hwndFrom == toolbar.GetWindowHandle()) {
-        git->pszText = (LPWSTR)(toolbar.GetButtonTooltip(git->lParam));
+      if (git->hdr.hwndFrom == toolbar_main.GetWindowHandle()) {
+        git->pszText = (LPWSTR)(toolbar_main.GetButtonTooltip(git->lParam));
       // Search toolbar
       } else if (git->hdr.hwndFrom == toolbar_search.GetWindowHandle()) {
         git->pszText = (LPWSTR)(toolbar_search.GetButtonTooltip(git->lParam));

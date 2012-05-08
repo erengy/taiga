@@ -25,6 +25,7 @@
 #include "common.h"
 #include "event.h"
 #include "myanimelist.h"
+#include "recognition.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -99,12 +100,12 @@ int Item::GetAiringStatus(bool check_date) const {
   return mal::STATUS_NOTYETAIRED;
 }
 
-const wstring& Item::GetTitle() const {
-  return series_info_.title;
+const wstring& Item::GetTitle(bool clean) const {
+  return clean ? series_info_.clean_title : series_info_.title;
 }
 
-const vector<wstring>& Item::GetSynonyms() const {
-  return series_info_.synonyms;
+const vector<wstring>& Item::GetSynonyms(bool clean) const {
+  return clean ? series_info_.clean_synonyms : series_info_.synonyms;
 }
 
 const Date& Item::GetDate(DateType type) const {
@@ -223,16 +224,26 @@ void Item::SetAiringStatus(int status) {
 
 void Item::SetTitle(const wstring& title) {
   series_info_.title = title;
+  series_info_.clean_title = title;
+  Meow.CleanTitle(series_info_.clean_title);
 }
 
 void Item::SetSynonyms(const wstring& synonyms) {
-  series_info_.synonyms.clear();
-  Split(synonyms, L"; ", series_info_.synonyms);
-  RemoveEmptyStrings(series_info_.synonyms);
+  vector<wstring> temp;
+  Split(synonyms, L"; ", temp);
+  SetSynonyms(temp);
 }
 
 void Item::SetSynonyms(const vector<wstring>& synonyms) {
   series_info_.synonyms = synonyms;
+  
+  RemoveEmptyStrings(series_info_.synonyms);
+
+  series_info_.clean_synonyms = series_info_.synonyms;
+  for (auto it = series_info_.clean_synonyms.begin(); 
+       it != series_info_.clean_synonyms.end(); ++it) {
+    Meow.CleanTitle(*it);
+  }
 }
 
 void Item::SetDate(DateType type, const Date& date) {
@@ -510,12 +521,13 @@ void Item::SetPlaying(bool playing) {
 
 // =============================================================================
 
-const vector<wstring>& Item::GetUserSynonyms() const {
-  return my_info_->synonyms;
+const vector<wstring>& Item::GetUserSynonyms(bool clean) const {
+  return clean ? my_info_->clean_synonyms : my_info_->synonyms;
 }
 
 void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
   if (synonyms == EMPTY_STR) return;
+  
   vector<wstring> temp;
   Split(synonyms, L"; ", temp);
   SetUserSynonyms(temp, save_settings);
@@ -525,6 +537,12 @@ void Item::SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings) 
   my_info_->synonyms = synonyms;
 
   RemoveEmptyStrings(my_info_->synonyms);
+
+  my_info_->clean_synonyms = my_info_->synonyms;
+  for (auto it = my_info_->clean_synonyms.begin(); 
+       it != my_info_->clean_synonyms.end(); ++it) {
+    Meow.CleanTitle(*it);
+  }
 
   if (save_settings) {
     Settings.Anime.SetItem(GetId(), EMPTY_STR, Join(my_info_->synonyms, L"; "));

@@ -58,6 +58,13 @@ public:
                     bool check_extension = true);
 
   void ExamineToken(Token& token, anime::Episode& episode, bool compare_extras);
+  
+  void CleanTitle(wstring& title);
+
+  vector<int> GetScores(size_t number);
+
+  // Mapped as <anime_id, score>
+  std::map<int, int> scores;
 
   vector<wstring> audio_keywords;
   vector<wstring> video_keywords;
@@ -69,15 +76,15 @@ public:
   vector<wstring> episode_prefixes;
 
  private:
-  bool CompareTitle(wstring anime_title, 
-                    const wstring& episode_title, 
+  bool CompareTitle(const wstring& anime_title, 
                     anime::Episode& episode, 
                     const anime::Item& anime_item, 
                     bool strict = true);
+  bool ScoreTitle(const wstring& episode_title, 
+                  const anime::Item& anime_item);
 
   void AppendKeyword(wstring& str, const wstring& keyword);
   bool CompareKeys(const wstring& str, const vector<wstring>& keys);
-  void CleanTitle(wstring& title);
   void EraseUnnecessary(wstring& str);
   void TransliterateSpecial(wstring& str);
   bool IsEpisodeFormat(const wstring& str, anime::Episode& episode, const wchar_t separator = ' ');

@@ -42,6 +42,7 @@
 #define IDD_UPDATE                              146
 #define IDC_BUTTON_ADDFOLDER                    1000
 #define IDC_BUTTON_CANCELFILTER                 1001
+#define IDC_TOOLBAR_MENU                        1001
 #define IDC_BUTTON_CANCELSEARCH                 1002
 #define IDC_BUTTON_EVENT_CLEAR                  1003
 #define IDC_BUTTON_FILTERLIST                   1004

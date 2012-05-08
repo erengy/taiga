@@ -57,6 +57,10 @@ RecognitionEngine::RecognitionEngine() {
 anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode, 
                                               bool in_list, bool reverse, 
                                               bool strict, bool check_episode, bool check_date) {
+  for (auto it = scores.begin(); it != scores.end(); ++it) {
+    it->second = 0;
+  }
+
   if (reverse) {
     for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
       if (in_list && !it->second.IsInList())
@@ -72,7 +76,7 @@ anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
         return &it->second;
     }
   }
-  
+
   return nullptr;
 }
 
@@ -81,29 +85,35 @@ anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
 bool RecognitionEngine::CompareEpisode(anime::Episode& episode, 
                                        const anime::Item& anime_item, 
                                        bool strict, bool check_episode, bool check_date) {
+  // Leave if title is empty
+  if (episode.clean_title.empty()) return false;
+
   // Leave if not yet aired
   if (check_date && !anime_item.IsAiredYet()) return false;
 
-  // Remove unnecessary characters
-  wstring episode_title = episode.title;
-  CleanTitle(episode_title);
-  if (episode_title.empty()) return false;
-
   // Compare with main title
-  bool found = CompareTitle(anime_item.GetTitle(), episode_title, episode, anime_item, strict);
+  bool found = CompareTitle(anime_item.GetTitle(true), episode, anime_item, strict);
 
   // Compare with synonyms
-  for (auto it = anime_item.GetSynonyms().begin();
-       !found && it != anime_item.GetSynonyms().end(); ++it) {
-    found = CompareTitle(*it, episode_title, episode, anime_item, strict);
+  for (auto it = anime_item.GetSynonyms(true).begin();
+       !found && it != anime_item.GetSynonyms(true).end(); ++it) {
+    found = CompareTitle(*it, episode, anime_item, strict);
   }
-  for (auto it = anime_item.GetUserSynonyms().begin();
-       !found && it != anime_item.GetUserSynonyms().end(); ++it) {
-    found = CompareTitle(*it, episode_title, episode, anime_item, strict);
+  if (anime_item.IsInList()) {
+    for (auto it = anime_item.GetUserSynonyms(true).begin();
+         !found && it != anime_item.GetUserSynonyms(true).end(); ++it) {
+      found = CompareTitle(*it, episode, anime_item, strict);
+    }
   }
 
-  // Leave if not found
-  if (!found) return false;
+  if (!found) {
+#ifdef _DEBUG
+    // Score title in case we need it later on
+    ScoreTitle(episode.title, anime_item);
+#endif
+    // Leave if not found
+    return false;
+  }
 
   if (check_episode && anime_item.GetEpisodeCount() > 1) {
     int number = GetEpisodeHigh(episode.number);
@@ -132,18 +142,13 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   return true;
 }
 
-bool RecognitionEngine::CompareTitle(wstring anime_title, 
-                                     const wstring& episode_title, 
+bool RecognitionEngine::CompareTitle(const wstring& anime_title, 
                                      anime::Episode& episode, 
                                      const anime::Item& anime_item, 
                                      bool strict) {
-  // Remove unnecessary characters
-  CleanTitle(anime_title);
-  if (anime_title.empty()) return false;
-  
   // Compare with title + number
   if (strict && anime_item.GetEpisodeCount() == 1 && !episode.number.empty()) {
-    if (IsEqual(episode_title + episode.number, anime_title)) {
+    if (IsEqual(episode.clean_title + episode.number, anime_title)) {
       episode.title += episode.number;
       episode.number.clear();
       return true;
@@ -151,12 +156,47 @@ bool RecognitionEngine::CompareTitle(wstring anime_title,
   }
   // Compare with title
   if (strict) {
-    if (IsEqual(anime_title, episode_title)) return true;
+    if (IsEqual(anime_title, episode.clean_title)) return true;
   } else {
-    if (InStr(anime_title, episode_title, 0, true) > -1) return true;
+    if (InStr(anime_title, episode.clean_title, 0, true) > -1) return true;
   }
 
   // Failed
+  return false;
+}
+
+vector<int> RecognitionEngine::GetScores(size_t number) {
+  std::multimap<int, int> reverse_map;
+  vector<int> output;
+
+  for (auto it = scores.begin(); it != scores.end(); ++it) {
+    if (it->second == 0) continue;
+    reverse_map.insert(std::pair<int, int>(it->second, it->first));
+  }
+
+  size_t i = 0;
+  for (auto it = reverse_map.begin(); it != reverse_map.end(); ++it) {
+    if (i++ > number) break;
+    output.push_back(it->second);
+  }
+
+  return output;
+}
+
+bool RecognitionEngine::ScoreTitle(const wstring& episode_title, const anime::Item& anime_item) {
+  int score = 0;
+  
+  score += LevenshteinDistance(episode_title, anime_item.GetTitle());
+
+  if (InStr(anime_item.GetTitle(), episode_title, 0, true) > -1 ||
+      InStr(episode_title, anime_item.GetTitle(), 0, true) > -1)
+    score += 10;
+  
+  if (score < 10) {
+    scores[anime_item.GetId()] = score;
+    return true;
+  }
+
   return false;
 }
 
@@ -459,20 +499,23 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
 
   // Set the final title, hopefully name of the anime
   episode.title = title;
+  episode.clean_title = title;
+  CleanTitle(episode.clean_title);
+
   return !title.empty();
 }
 
 // =============================================================================
 
 void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode, bool compare_extras) {
-  // Split into words
-  // The most common non-alphanumeric character is the separator
+  // Split into words. The most common non-alphanumeric character is the 
+  // separator.
   vector<wstring> words;
   token.separator = GetMostCommonCharacter(token.content);
   Split(token.content, wstring(1, token.separator), words);
   
-  // Revert if there are words that are too short
-  // This prevents splitting group names like "m.3.3.w" and keywords like "H.264"
+  // Revert if there are words that are too short. This prevents splitting some
+  // group names (e.g. "m.3.3.w") and keywords (e.g. "H.264").
   if (IsTokenEnclosed(token)) {
     for (unsigned int i = 0; i < words.size(); i++) {
       if (words[i].length() == 1) {
@@ -549,7 +592,7 @@ void RecognitionEngine::EraseUnnecessary(wstring& str) {
   Replace(str, L" the ", L" ", false, true);
   Erase(str, L"episode ", true);
   Erase(str, L" ep.", true);
-  Replace(str, L" specials", L" special",false,true);
+  Replace(str, L" specials", L" special", false, true);
 }
 
 void RecognitionEngine::TransliterateSpecial(wstring& str) {

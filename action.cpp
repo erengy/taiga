@@ -89,9 +89,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"Logout") {
     if (Taiga.logged_in) {
       Taiga.logged_in = false;
-      MainDialog.toolbar.SetButtonImage(0, ICON24_OFFLINE);
-      MainDialog.toolbar.SetButtonText(0, L"Log in");
-      MainDialog.toolbar.SetButtonTooltip(0, L"Log in");
+      MainDialog.toolbar_main.SetButtonImage(0, ICON24_OFFLINE);
+      MainDialog.toolbar_main.SetButtonText(0, L"Log in");
+      MainDialog.toolbar_main.SetButtonTooltip(0, L"Log in");
       MainDialog.ChangeStatus((body.empty() ? Settings.Account.MAL.user : body) + L" is now logged out.");
       MainDialog.RefreshMenubar();
       MainDialog.UpdateTip();
@@ -441,16 +441,17 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
     // Search for all list items
     if (body.empty()) {
-      for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
-        if (!silent) TaskbarList.SetProgressValue(i, AnimeDatabase.items.size());
-        switch (AnimeDatabase.items.at(i).GetMyStatus()) {
+      size_t i = 0;
+      for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+        if (!silent) TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
+        switch (it->second.GetMyStatus()) {
           case mal::MYSTATUS_WATCHING:
           case mal::MYSTATUS_ONHOLD:
           case mal::MYSTATUS_PLANTOWATCH:
             if (!silent) {
-              MainDialog.ChangeStatus(L"Searching... (" + AnimeDatabase.items[i].GetTitle() + L")");
+              MainDialog.ChangeStatus(L"Searching... (" + it->second.GetTitle() + L")");
             }
-            AnimeDatabase.items[i].CheckEpisodes(
+            it->second.CheckEpisodes(
               Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS ? -1 : 0, 
               check_folder);
         }

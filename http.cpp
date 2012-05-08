@@ -279,9 +279,9 @@ BOOL HttpClient::OnReadComplete() {
       }
       if (Taiga.logged_in) {
         status = L"Logged in as " + Settings.Account.MAL.user + L".";
-        MainDialog.toolbar.SetButtonImage(0, ICON24_ONLINE);
-        MainDialog.toolbar.SetButtonText(0, L"Log out");
-        MainDialog.toolbar.SetButtonTooltip(0, L"Log out");
+        MainDialog.toolbar_main.SetButtonImage(0, ICON24_ONLINE);
+        MainDialog.toolbar_main.SetButtonText(0, L"Log out");
+        MainDialog.toolbar_main.SetButtonTooltip(0, L"Log out");
       } else {
         status = L"Failed to log in.";
         switch (Settings.Account.MAL.api) {

@@ -45,6 +45,7 @@ void Episode::Clear() {
   number.clear();
   resolution.clear();
   title.clear();
+  clean_title.clear();
   version.clear();
   video_type.clear();
 }

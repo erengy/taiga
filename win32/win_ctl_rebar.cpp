@@ -43,8 +43,8 @@ BOOL Rebar::InsertBand(LPREBARBANDINFO lpBarInfo) {
 }
 
 BOOL Rebar::InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UINT cxMinChild, 
-                        UINT cyChild, UINT cyIntegral, UINT cyMaxChild, UINT cyMinChild, 
-                        UINT fMask, UINT fStyle) {
+                       UINT cyChild, UINT cyIntegral, UINT cyMaxChild, UINT cyMinChild, 
+                       UINT fMask, UINT fStyle) {
   REBARBANDINFO rbi = {0};
   rbi.cbSize     = REBARBANDINFO_V6_SIZE;
   rbi.cx         = cx;

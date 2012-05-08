@@ -38,6 +38,7 @@ class Episode {
   wstring folder;
   wstring format;
   wstring title;
+  wstring clean_title;
   wstring name;
   wstring group;
   wstring number;

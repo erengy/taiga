@@ -65,7 +65,7 @@ DWORD Toolbar::GetPadding() {
 }
 
 BOOL Toolbar::InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled, 
-                            BYTE fsStyle, DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip) {
+                           BYTE fsStyle, DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip) {
   TBBUTTON tbb  = {0};
   tbb.iBitmap   = iBitmap;
   tbb.idCommand = idCommand;

@@ -126,10 +126,13 @@ BOOL MainDialog::OnInitDialog() {
 void MainDialog::CreateDialogControls() {
   // Create rebar
   rebar.Attach(GetDlgItem(IDC_REBAR_MAIN));
+  // Create menu toolbar
+  toolbar_menu.Attach(GetDlgItem(IDC_TOOLBAR_MENU));
+  toolbar_menu.SetImageList(nullptr, 0, 0);
   // Create main toolbar
-  toolbar.Attach(GetDlgItem(IDC_TOOLBAR_MAIN));
-  toolbar.SetImageList(UI.ImgList24.GetHandle(), 24, 24);
-  toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
+  toolbar_main.Attach(GetDlgItem(IDC_TOOLBAR_MAIN));
+  toolbar_main.SetImageList(UI.ImgList24.GetHandle(), 24, 24);
+  toolbar_main.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Create search toolbar
   toolbar_search.Attach(GetDlgItem(IDC_TOOLBAR_SEARCH));
   toolbar_search.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
@@ -145,7 +148,6 @@ void MainDialog::CreateDialogControls() {
   cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
   cancel_button.SetParent(edit.GetWindowHandle());
   cancel_button.SetPosition(nullptr, rcEdit.right + 1, 0, 16, 16);
-  //cancel_button.SetClassLong(GCL_HCURSOR, reinterpret_cast<LONG>(::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
   // Create treeview control
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
   treeview.SetItemHeight(20);
@@ -174,35 +176,50 @@ void MainDialog::CreateDialogControls() {
   listview.InsertColumn(3,  62,  62, LVCFMT_CENTER, L"Type");
   listview.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
 
+  // Insert menu toolbar buttons
+  BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
+  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"File", nullptr);
+  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"Account", nullptr);
+  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"List", nullptr);
+  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"Help", nullptr);
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar.InsertButton(0,  ICON24_OFFLINE,  100, 1, fsStyle1,  0, nullptr, L"Log in");
-  toolbar.InsertButton(1,  ICON24_SYNC,     101, 1, fsStyle1,  1, nullptr, L"Synchronize list");
-  toolbar.InsertButton(2,  ICON24_MAL,      102, 1, fsStyle1,  2, nullptr, L"View your panel at MyAnimeList");
-  toolbar.InsertButton(3,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar.InsertButton(4,  ICON24_FOLDERS,  104, 1, fsStyle2,  4, nullptr, L"Anime folders");
-  toolbar.InsertButton(5,  ICON24_CALENDAR, 105, 1, fsStyle1,  5, nullptr, L"Season browser");
-  toolbar.InsertButton(6,  ICON24_TOOLS,    106, 1, fsStyle2,  6, nullptr, L"Tools");
-  toolbar.InsertButton(7,  ICON24_RSS,      107, 1, fsStyle1,  7, nullptr, L"Torrents");
-  toolbar.InsertButton(8,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar.InsertButton(9,  ICON24_FILTER,   109, 1, fsStyle1,  9, nullptr, L"Filter list");
-  toolbar.InsertButton(10, ICON24_SETTINGS, 110, 1, fsStyle1, 10, nullptr, L"Change program settings");
+  toolbar_main.InsertButton(0,  ICON24_OFFLINE,  200, 1, fsStyle1,  0, nullptr, L"Log in");
+  toolbar_main.InsertButton(1,  ICON24_SYNC,     201, 1, fsStyle1,  1, nullptr, L"Synchronize list");
+  toolbar_main.InsertButton(2,  ICON24_MAL,      202, 1, fsStyle1,  2, nullptr, L"View your panel at MyAnimeList");
+  toolbar_main.InsertButton(3,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(4,  ICON24_FOLDERS,  204, 1, fsStyle2,  4, nullptr, L"Anime folders");
+  toolbar_main.InsertButton(5,  ICON24_CALENDAR, 205, 1, fsStyle1,  5, nullptr, L"Season browser");
+  toolbar_main.InsertButton(6,  ICON24_TOOLS,    206, 1, fsStyle2,  6, nullptr, L"Tools");
+  toolbar_main.InsertButton(7,  ICON24_RSS,      207, 1, fsStyle1,  7, nullptr, L"Torrents");
+  toolbar_main.InsertButton(8,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(9,  ICON24_FILTER,   209, 1, fsStyle1,  9, nullptr, L"Filter list");
+  toolbar_main.InsertButton(10, ICON24_SETTINGS, 210, 1, fsStyle1, 10, nullptr, L"Change program settings");
 #ifdef _DEBUG
-  toolbar.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar.InsertButton(12, ICON24_ABOUT,    112, 1, fsStyle1, 12, nullptr, L"Debug");
+  toolbar_main.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(12, ICON24_ABOUT,    212, 1, fsStyle1, 12, nullptr, L"Debug");
 #endif
   // Insert search toolbar button
-  toolbar_search.InsertButton(0, ICON16_SEARCH, 200, 1, fsStyle2, 0, nullptr, L"Search");
+  toolbar_search.InsertButton(0, ICON16_SEARCH, 300, 1, fsStyle2, 0, nullptr, L"Search");
 
   // Insert rebar bands
-  UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
+  UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_HEADERSIZE | RBBIM_SIZE | RBBIM_STYLE;
   UINT fStyle = RBBS_NOGRIPPER;
-  rebar.InsertBand(nullptr, 0, 0, 0, 0, 0, 0, 0, 0, fMask, fStyle);
-  rebar.InsertBand(toolbar.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
-    HIWORD(toolbar.GetButtonSize()) + (HIWORD(toolbar.GetPadding()) / 2), fMask, fStyle);
-  rebar.InsertBand(toolbar_search.GetWindowHandle(), 0, 0, 0, 240, 0, 0, 0, 
-    HIWORD(toolbar_search.GetButtonSize()), fMask, fStyle);
+  rebar.InsertBand(toolbar_menu.GetWindowHandle(), 
+    GetSystemMetrics(SM_CXSCREEN), 
+    WIN_CONTROL_MARGIN, 0, 0, 0, 0, 0,
+    HIWORD(toolbar_menu.GetButtonSize()), 
+    fMask, fStyle);
+  rebar.InsertBand(toolbar_main.GetWindowHandle(), 
+    GetSystemMetrics(SM_CXSCREEN), 
+    WIN_CONTROL_MARGIN, 0, 0, 0, 0, 0, 
+    HIWORD(toolbar_main.GetButtonSize()) + 2, 
+    fMask, fStyle | RBBS_BREAK);
+  rebar.InsertBand(toolbar_search.GetWindowHandle(), 
+    WIN_CONTROL_MARGIN, 0, 0, 240, 0, 0, 0, 
+    HIWORD(toolbar_search.GetButtonSize()), 
+    fMask, fStyle);
 
   // Insert tabs and list groups
   for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
@@ -505,7 +522,7 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
     return OnTabNotify(reinterpret_cast<LPARAM>(pnmh));
 
   // Toolbar controls
-  } else if (idCtrl == IDC_TOOLBAR_MAIN || idCtrl == IDC_TOOLBAR_SEARCH) {
+  } else if (idCtrl == IDC_TOOLBAR_MENU || idCtrl == IDC_TOOLBAR_MAIN || idCtrl == IDC_TOOLBAR_SEARCH) {
     return OnToolbarNotify(reinterpret_cast<LPARAM>(pnmh));
 
   // Tree control
@@ -636,7 +653,11 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       // Recognized?
       if (Taiga.is_recognition_enabled) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
+#ifdef _DEBUG
+          anime_item = Meow.MatchDatabase(CurrentEpisode, false, true);
+#else
           anime_item = Meow.MatchDatabase(CurrentEpisode, true, true);
+#endif
           if (anime_item) {
             CurrentEpisode.Set(CurrentEpisode.anime_id);
             anime_item->StartWatching(CurrentEpisode);
@@ -644,6 +665,14 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           }
         }
         // Not recognized
+#ifdef _DEBUG
+        vector<int> anime_ids = Meow.GetScores(5); // top 5
+        debug::Print(L"Not recognized: " + CurrentEpisode.title + L"\n");
+        debug::Print(L"Could be:\n");
+        for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
+          debug::Print(L"* " + AnimeDatabase.items[*it].GetTitle() + L"\n");
+        }
+#endif  
         CurrentEpisode.Set(anime::ID_NOTINLIST);
         if (CurrentEpisode.title.empty()) {
 #ifdef _DEBUG
@@ -785,8 +814,8 @@ void MainDialog::ChangeStatus(wstring str) {
 
 void MainDialog::EnableInput(bool enable) {
   // Enable/disable toolbar buttons
-  toolbar.EnableButton(0, enable);
-  toolbar.EnableButton(1, enable);
+  toolbar_main.EnableButton(0, enable);
+  toolbar_main.EnableButton(1, enable);
   // Enable/disable list
   listview.Enable(enable);
 }
@@ -857,17 +886,7 @@ void MainDialog::RefreshList(int index) {
 }
 
 void MainDialog::RefreshMenubar(int anime_id, bool show) {
-  if (show) {
-    UpdateAllMenus(AnimeDatabase.FindItem(anime_id));
-    vector<HMENU> hMenu;
-    UI.Menus.CreateNewMenu(L"Main", hMenu);
-    if (!hMenu.empty()) {
-      DestroyMenu(GetMenu());
-      SetMenu(hMenu[0]);
-    }
-  } else {
-    SetMenu(nullptr);
-  }
+  UpdateAllMenus(AnimeDatabase.FindItem(anime_id));
 }
 
 void MainDialog::RefreshTabs(int index, bool redraw) {

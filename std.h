@@ -35,6 +35,7 @@
 #include <winhttp.h>
 
 #include <list>
+#include <map>
 #include <string>
 #include <vector>
 using std::list;

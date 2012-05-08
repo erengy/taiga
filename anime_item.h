@@ -41,8 +41,8 @@ class Item {
   int GetType() const;
   int GetEpisodeCount(bool estimation = false) const;
   int GetAiringStatus(bool check_date = true) const;
-  const wstring& GetTitle() const;
-  const vector<wstring>& GetSynonyms() const;
+  const wstring& GetTitle(bool clean = false) const;
+  const vector<wstring>& GetSynonyms(bool clean = false) const;
   const Date& GetDate(DateType type) const;
   const wstring& GetImageUrl() const;
   const wstring& GetGenres() const;
@@ -115,7 +115,7 @@ class Item {
   void SetPlaying(bool playing);
   
   // For alternative titles provided by user
-  const vector<wstring>& GetUserSynonyms() const;
+  const vector<wstring>& GetUserSynonyms(bool clean = false) const;
   void SetUserSynonyms(const wstring& synonyms, bool save_settings);
   void SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings);
   

@@ -79,6 +79,9 @@ class SeriesInformation {
   wstring rank;
   wstring score;
   wstring synopsis;
+
+  wstring clean_title;
+  vector<wstring> clean_synonyms;
 };
 
 // Invalid for anime items that are not in user's list.
@@ -101,6 +104,7 @@ class MyInformation {
   wstring new_episode_path;
   wstring folder;
   vector<wstring> synonyms;
+  vector<wstring> clean_synonyms;
   bool playing;
 };
 

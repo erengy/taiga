@@ -98,7 +98,7 @@ public:
   win32::Rebar rebar;
   win32::StatusBar statusbar;
   win32::Tab tab;
-  win32::Toolbar toolbar, toolbar_search;
+  win32::Toolbar toolbar_menu, toolbar_main, toolbar_search;
 
   // Search bar
   class SearchBar {
