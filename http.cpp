@@ -430,7 +430,7 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_AnimeDetails: {
       int anime_id = static_cast<int>(GetParam());
       if (mal::ParseAnimeDetails(GetData())) {
-        if (AnimeDialog.IsWindow()) {
+        if (AnimeDialog.IsWindow() && anime_id == AnimeDialog.GetAnimeID()) {
           AnimeDialog.Refresh(anime_id, true, false);
         }
         if (SeasonDialog.IsWindow()) {
@@ -445,7 +445,7 @@ BOOL HttpClient::OnReadComplete() {
     // Download image
     case HTTP_MAL_Image: {
       int anime_id = static_cast<int>(GetParam());
-      if (AnimeDialog.IsWindow()) {
+      if (AnimeDialog.IsWindow() && anime_id == AnimeDialog.GetAnimeID()) {
         AnimeDialog.Refresh(anime::ID_UNKNOWN, false, false);
       }
       if (SeasonDialog.IsWindow()) {
@@ -473,7 +473,7 @@ BOOL HttpClient::OnReadComplete() {
       int anime_id = static_cast<int>(GetParam());
       if (anime_id) {
         if (mal::ParseSearchResult(GetData(), anime_id)) {
-          AnimeDialog.Refresh(anime_id, true, false);
+          if(anime_id == AnimeDialog.GetAnimeID()) AnimeDialog.Refresh(anime_id, true, false);
           SeasonDialog.RefreshList(true);
           if (mal::GetAnimeDetails(anime_id, this)) return TRUE;
         } else {

@@ -294,6 +294,10 @@ void AnimeDialog::SetCurrentPage(int index) {
   }
 }
 
+int AnimeDialog::GetAnimeID() const {
+  return anime_id_;
+}
+
 void AnimeDialog::Refresh(int anime_id, bool series_info, bool my_info) {
   // Set anime index
   if (anime_id > anime::ID_UNKNOWN) anime_id_ = anime_id;
