@@ -212,7 +212,7 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
           UpdateAllMenus(AnimeDatabase.GetCurrentItem());
           int index = listview.HitTest(true);
           ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, index == 2 ? L"EditScore" : L"RightClick"));
-          RefreshMenubar(AnimeDatabase.GetCurrentId());
+          UpdateAllMenus(AnimeDatabase.GetCurrentItem());
         }
       } else if (pnmh->hwndFrom == listview.GetHeader()) {
         HDHITTESTINFO hdhti;
@@ -221,7 +221,7 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
         if (::SendMessage(listview.GetHeader(), HDM_HITTEST, 0, reinterpret_cast<LPARAM>(&hdhti))) {
           if (hdhti.iItem == 3) {
             ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"FilterType"));
-            RefreshMenubar(AnimeDatabase.GetCurrentId());
+            UpdateAllMenus(AnimeDatabase.GetCurrentItem());
             return TRUE;
           }
         }
@@ -595,7 +595,7 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
       }
       if (!action.empty()) {
         ExecuteAction(action);
-        RefreshMenubar(AnimeDatabase.GetCurrentId());
+        UpdateAllMenus(AnimeDatabase.GetCurrentItem());
       }
       break;
     }

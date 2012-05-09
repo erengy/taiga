@@ -87,7 +87,7 @@ bool UncompressGzippedString(const string& input, string& output);
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 // menu.cpp
-void UpdateAllMenus(anime::Item* anime_item);
+void UpdateAllMenus(anime::Item* anime_item = nullptr);
 void UpdateAccountMenu();
 void UpdateAnimeMenu(anime::Item* anime_item);
 void UpdateAnnounceMenu();

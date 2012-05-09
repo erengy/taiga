@@ -217,6 +217,7 @@
     <ClInclude Include="media.h" />
     <ClInclude Include="monitor.h" />
     <ClInclude Include="myanimelist.h" />
+    <ClInclude Include="optional.h" />
     <ClInclude Include="process.h" />
     <ClInclude Include="recognition.h" />
     <ClInclude Include="resource.h" />

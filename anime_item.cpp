@@ -149,59 +149,68 @@ const wstring& Item::GetSynopsis() const {
 // =============================================================================
 
 int Item::GetMyLastWatchedEpisode(bool check_events) const {
-  assert(IsInList());
+  assert(my_info_.get());
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_EPISODE) : nullptr;
-  return event_item ? event_item->episode : my_info_->watched_episodes;
+  return event_item ? *event_item->episode : my_info_->watched_episodes;
 }
 
 int Item::GetMyScore(bool check_events) const {
-  assert(IsInList());
+  assert(my_info_.get());
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_SCORE) : nullptr;
-  return event_item ? event_item->score : my_info_->score;
+  return event_item ? *event_item->score : my_info_->score;
 }
 
 int Item::GetMyStatus(bool check_events) const {
   if (!IsInList()) return mal::MYSTATUS_NOTINLIST;
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_STATUS) : nullptr;
-  return event_item ? event_item->status : my_info_->status;
+  return event_item ? *event_item->status : my_info_->status;
 }
 
 int Item::GetMyRewatching(bool check_events) const {
-  assert(IsInList());
+  assert(my_info_.get());
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_REWATCH) : nullptr;
-  return event_item ? event_item->enable_rewatching : my_info_->rewatching;
+  return event_item ? *event_item->enable_rewatching : my_info_->rewatching;
 }
 
 int Item::GetMyRewatchingEp() const {
-  assert(IsInList());
+  assert(my_info_.get());
   return my_info_->rewatching_ep;
 }
 
-const Date& Item::GetMyDate(DateType type) const {
-  assert(IsInList());
+const Date Item::GetMyDate(DateType type, bool check_events) const {
+  assert(my_info_.get());
+  EventItem* event_item = nullptr;
   switch (type) {
     case DATE_START:
     default:
-      return my_info_->date_start;
+      event_item = check_events ? 
+        SearchEventQueue(EVENT_SEARCH_DATE_START) : nullptr;
+      return event_item ? 
+        mal::TranslateDateFromApi(*event_item->date_start) : 
+        my_info_->date_start;
     case DATE_END:
-      return my_info_->date_finish;
+      event_item = check_events ? 
+        SearchEventQueue(EVENT_SEARCH_DATE_END) : nullptr;
+      return event_item ? 
+        mal::TranslateDateFromApi(*event_item->date_finish) : 
+        my_info_->date_finish;
   }
 }
 
-const wstring& Item::GetMyLastUpdated() const {
-  assert(IsInList());
+const wstring Item::GetMyLastUpdated() const {
+  assert(my_info_.get());
   return my_info_->last_updated;
 }
 
-const wstring& Item::GetMyTags(bool check_events) const {
-  assert(IsInList());
+const wstring Item::GetMyTags(bool check_events) const {
+  assert(my_info_.get());
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_TAGS) : nullptr;
-  return event_item ? event_item->tags : my_info_->tags;
+  return event_item ? *event_item->tags : my_info_->tags;
 }
 
 // =============================================================================
@@ -307,22 +316,13 @@ void Item::SetMyRewatchingEp(int rewatching_ep) {
   my_info_->rewatching_ep = rewatching_ep;
 }
 
-void Item::SetMyDate(DateType type, const Date& date, 
-                     bool ignore_previous, bool save_settings) {
+void Item::SetMyDate(DateType type, const Date& date) {
   switch (type) {
     case DATE_START:
-      if (ignore_previous || !mal::IsValidDate(my_info_->date_start)) {
-        my_info_->date_start = date;
-        if (save_settings)
-          database_->SaveList(GetId(), L"my_start_date", date, EDIT_ANIME);
-      }
+      my_info_->date_start = date;
       break;
     case DATE_END:
-      if (ignore_previous || !mal::IsValidDate(my_info_->date_finish)) {
-        my_info_->date_finish = date;
-        if (save_settings)
-          database_->SaveList(GetId(), L"my_finish_date", date, EDIT_ANIME);
-      }
+      my_info_->date_finish = date;
       break;
   }
 }
@@ -492,19 +492,17 @@ bool Item::CheckFolder() {
 }
 
 const wstring& Item::GetFolder() const {
-  assert(IsInList());
+  assert(my_info_.get());
   return my_info_->folder;
 }
 
 void Item::SetFolder(const wstring& folder, bool save_settings) {
-  if (folder == EMPTY_STR || folder == my_info_->folder) {
-    return;
-  }
+  if (folder == my_info_->folder) return;
 
   my_info_->folder = folder;
 
   if (save_settings) {
-    Settings.Anime.SetItem(GetId(), folder, EMPTY_STR);
+    Settings.Anime.SetItem(GetId(), folder, Optional<wstring>());
     Settings.Save();
   }
 }
@@ -526,8 +524,6 @@ const vector<wstring>& Item::GetUserSynonyms(bool clean) const {
 }
 
 void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
-  if (synonyms == EMPTY_STR) return;
-  
   vector<wstring> temp;
   Split(synonyms, L"; ", temp);
   SetUserSynonyms(temp, save_settings);
@@ -545,7 +541,7 @@ void Item::SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings) 
   }
 
   if (save_settings) {
-    Settings.Anime.SetItem(GetId(), EMPTY_STR, Join(my_info_->synonyms, L"; "));
+    Settings.Anime.SetItem(GetId(), Optional<wstring>(), Join(my_info_->synonyms, L"; "));
     Settings.Save();
   }
 
@@ -599,26 +595,26 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
   }
 
   // Edit episode
-  if (item.episode > -1) {
-    SetMyLastWatchedEpisode(item.episode);
-    database_->SaveList(GetId(), L"my_watched_episodes", ToWstr(item.episode));
+  if (item.episode) {
+    SetMyLastWatchedEpisode(*item.episode);
+    database_->SaveList(GetId(), L"my_watched_episodes", ToWstr(*item.episode));
   }
   // Edit score
-  if (item.score > -1) {
-    SetMyScore(item.score);
-    database_->SaveList(GetId(), L"my_score", ToWstr(item.score));
+  if (item.score) {
+    SetMyScore(*item.score);
+    database_->SaveList(GetId(), L"my_score", ToWstr(*item.score));
   }
   // Edit status
-  if (item.status > 0) {
-    database_->user.IncreaseItemCount(item.status, false);
+  if (item.status) {
+    database_->user.IncreaseItemCount(*item.status, false);
     database_->user.DecreaseItemCount(GetMyStatus(false), true);
-    SetMyStatus(item.status);
-    database_->SaveList(GetId(), L"my_status", ToWstr(item.status));
+    SetMyStatus(*item.status);
+    database_->SaveList(GetId(), L"my_status", ToWstr(*item.status));
   }
   // Edit re-watching status
-  if (item.enable_rewatching > -1) {
-    SetMyRewatching(item.enable_rewatching);
-    database_->SaveList(GetId(), L"my_rewatching", ToWstr(item.enable_rewatching));
+  if (item.enable_rewatching) {
+    SetMyRewatching(*item.enable_rewatching);
+    database_->SaveList(GetId(), L"my_rewatching", ToWstr(*item.enable_rewatching));
   }
   // Edit ID (Add)
   if (item.mode == HTTP_MAL_AnimeAdd) {
@@ -627,9 +623,20 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
     }
   }
   // Edit tags
-  if (item.tags != EMPTY_STR) {
-    SetMyTags(item.tags);
-    database_->SaveList(GetId(), L"my_tags", item.tags);
+  if (item.tags) {
+    SetMyTags(*item.tags);
+    database_->SaveList(GetId(), L"my_tags", *item.tags);
+  }
+  // Edit dates
+  if (item.date_start) {
+    Date date_start = mal::TranslateDateFromApi(*item.date_start);
+    SetMyDate(anime::DATE_START, date_start);
+    database_->SaveList(GetId(), L"my_start_date", date_start, EDIT_ANIME);
+  }
+  if (item.date_finish) {
+    Date date_finish = mal::TranslateDateFromApi(*item.date_finish);
+    SetMyDate(anime::DATE_END, date_finish);
+    database_->SaveList(GetId(), L"my_finish_date", date_finish, EDIT_ANIME);
   }
   // Delete
   if (item.mode == HTTP_MAL_AnimeDelete) {

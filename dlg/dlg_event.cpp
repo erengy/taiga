@@ -156,15 +156,19 @@ void EventDialog::RefreshList() {
         AppendString(details, L"Add to list");
       if (it->mode == HTTP_MAL_AnimeDelete)
         AppendString(details, L"Remove from list");
-      if (it->episode > -1)
-        AppendString(details, L"Episode: " + mal::TranslateNumber(it->episode));
-      if (it->score > -1)
-        AppendString(details, L"Score: " + mal::TranslateNumber(it->score));
-      if (it->status > -1)
-        AppendString(details, it->enable_rewatching != TRUE ? 
-          L"Status: " + mal::TranslateMyStatus(it->status, false) : L"Re-watching");
-      if (it->tags != EMPTY_STR)
-        AppendString(details, L"Tags: \"" + it->tags + L"\""); 
+      if (it->episode)
+        AppendString(details, L"Episode: " + mal::TranslateNumber(*it->episode));
+      if (it->score)
+        AppendString(details, L"Score: " + mal::TranslateNumber(*it->score));
+      if (it->status)
+        AppendString(details, it->enable_rewatching && *it->enable_rewatching != TRUE ? 
+          L"Status: " + mal::TranslateMyStatus(*it->status, false) : L"Re-watching");
+      if (it->tags)
+        AppendString(details, L"Tags: \"" + *it->tags + L"\"");
+      if (it->date_start)
+        AppendString(details, L"Start date: " + *it->date_start);
+      if (it->date_finish)
+        AppendString(details, L"Finish date: " + *it->date_finish);
       list_.SetItem(i, 1, details.c_str());
       list_.SetItem(i, 2, it->time.c_str());
     }

@@ -90,12 +90,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (Taiga.logged_in) {
       Taiga.logged_in = false;
       MainDialog.toolbar_main.SetButtonImage(0, ICON24_OFFLINE);
-      MainDialog.toolbar_main.SetButtonText(0, L"Log in");
       MainDialog.toolbar_main.SetButtonTooltip(0, L"Log in");
       MainDialog.ChangeStatus((body.empty() ? Settings.Account.MAL.user : body) + L" is now logged out.");
-      MainDialog.RefreshMenubar();
       MainDialog.UpdateTip();
       MainClient.ClearCookies();
+      UpdateAllMenus();
     }
 
   // LoginLogout(), ToggleLogin()
@@ -362,31 +361,24 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int status = ToInt(body);
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    // Set item properties
-    anime_item->AddtoUserList();
-    anime_item->SetMyStatus(status);
-    if (status == mal::MYSTATUS_COMPLETED) {
-      anime_item->SetMyLastWatchedEpisode(anime_item->GetEpisodeCount());
-      anime_item->SetMyDate(anime::DATE_END, GetDate(), true, false);
-    }
     // Add item to list
-    AnimeDatabase.UpdateItem(*anime_item);
+    anime_item->AddtoUserList();
+    AnimeDatabase.user.IncreaseItemCount(status, true);
     AnimeDatabase.SaveList(anime_id, L"", L"", anime::ADD_ANIME);
-    // Refresh
-    if (CurrentEpisode.anime_id == anime::ID_NOTINLIST) {
-      CurrentEpisode.Set(anime::ID_UNKNOWN);
+    // Add item to event queue
+    EventItem event_item;
+    event_item.anime_id = anime_id;
+    event_item.status = status;
+    if (status == mal::MYSTATUS_COMPLETED) {
+      event_item.episode = anime_item->GetEpisodeCount();
+      event_item.date_finish = mal::TranslateDateForApi(GetDate());
     }
+    event_item.mode = HTTP_MAL_AnimeAdd;
+    EventQueue.Add(event_item);
+    // Refresh
     MainDialog.RefreshList(status);
     MainDialog.RefreshTabs(status);
     SearchDialog.RefreshList();
-    // Add item to event queue
-    EventItem item;
-    item.anime_id = anime_id;
-    item.episode = anime_item->GetMyLastWatchedEpisode(false) ? 
-      anime_item->GetMyLastWatchedEpisode(false) : -1;
-    item.status = status;
-    item.mode = HTTP_MAL_AnimeAdd;
-    EventQueue.Add(item);
 
   // ViewAnimePage
   //   Opens up anime page on MAL.
@@ -605,10 +597,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Changes anime status of user.
   //   Value must be 1, 2, 3, 4 or 6, and different from current status.
   } else if (action == L"EditStatus") {
-    int episode = -1, status = ToInt(body);
+    EventItem event_item;
+    event_item.status = ToInt(body);
     switch (AnimeDatabase.GetCurrentItem()->GetAiringStatus()) {
       case mal::STATUS_AIRING:
-        if (status == mal::MYSTATUS_COMPLETED) {
+        if (*event_item.status == mal::MYSTATUS_COMPLETED) {
           MessageBox(g_hMain, 
             L"This anime is still airing, you cannot set it as completed.", 
             AnimeDatabase.GetCurrentItem()->GetTitle().c_str(), MB_ICONERROR);
@@ -618,7 +611,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       case mal::STATUS_FINISHED:
         break;
       case mal::STATUS_NOTYETAIRED:
-        if (status != mal::MYSTATUS_PLANTOWATCH) {
+        if (*event_item.status != mal::MYSTATUS_PLANTOWATCH) {
           MessageBox(g_hMain, 
             L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
             AnimeDatabase.GetCurrentItem()->GetTitle().c_str(), MB_ICONERROR);
@@ -628,19 +621,17 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       default:
         return;
     }
-    switch (status) {
+    switch (*event_item.status) {
       case mal::MYSTATUS_COMPLETED:
-        AnimeDatabase.GetCurrentItem()->SetMyDate(anime::DATE_END, GetDate(), false, true);
-        episode = AnimeDatabase.GetCurrentItem()->GetEpisodeCount();
-        if (episode == 0) episode = -1;
+        event_item.episode = AnimeDatabase.GetCurrentItem()->GetEpisodeCount();
+        if (*event_item.episode == 0) event_item.episode.Reset();
+        if (!mal::IsValidDate(AnimeDatabase.GetCurrentItem()->GetMyDate(anime::DATE_END)))
+          event_item.date_finish = mal::TranslateDateForApi(GetDate());
         break;
     }
-    EventItem item;
-    item.anime_id = AnimeDatabase.GetCurrentId();
-    item.episode = episode;
-    item.status = status;
-    item.mode = episode == -1 ? HTTP_MAL_StatusUpdate : HTTP_MAL_AnimeEdit;
-    EventQueue.Add(item);
+    event_item.anime_id = AnimeDatabase.GetCurrentId();
+    event_item.mode = event_item.episode ? HTTP_MAL_AnimeEdit : HTTP_MAL_StatusUpdate;
+    EventQueue.Add(event_item);
 
   // EditTags(tags)
   //   Changes anime tags.

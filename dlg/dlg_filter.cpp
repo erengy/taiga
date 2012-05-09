@@ -52,7 +52,6 @@ BOOL FilterDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   }
   
   UpdateFilterMenu();
-  MainDialog.RefreshMenubar();
   MainDialog.RefreshList();
   
   return FALSE;

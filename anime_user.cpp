@@ -86,8 +86,8 @@ int ListUser::GetItemCount(int status, bool check_events) const {
   if (check_events && event_list) {
     for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
       if (it->mode == HTTP_MAL_AnimeAdd) continue;
-      if (it->status > -1) {
-        if (status == it->status) {
+      if (it->status) {
+        if (status == *it->status) {
           count++;
         } else {
           auto anime_item = database_->FindItem(it->anime_id);

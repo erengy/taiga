@@ -61,7 +61,7 @@ public:
   
   void CleanTitle(wstring& title);
 
-  vector<int> GetScores(size_t number);
+  std::multimap<int, int> GetScores();
 
   // Mapped as <anime_id, score>
   std::map<int, int> scores;

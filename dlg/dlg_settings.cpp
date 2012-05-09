@@ -281,7 +281,7 @@ void SettingsDialog::OnOK() {
     UI.Load(Settings.Program.General.theme);
     UI.LoadImages();
     MainDialog.rebar.RedrawWindow();
-    MainDialog.RefreshMenubar();
+    UpdateAllMenus();
   }
 
   // Refresh other windows

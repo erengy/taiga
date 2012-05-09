@@ -41,9 +41,9 @@ public:
   void OnOK();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
   BOOL PreTranslateMessage(MSG* pMsg);
-  int GetAnimeID() const;
 
 public:
+  int GetCurrentId() const;
   void SetCurrentPage(int index);
   void Refresh(int anime_id, bool series_info = true, bool my_info = true);
 

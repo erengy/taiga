@@ -120,13 +120,13 @@ void AnimeDialog::OnOK() {
   }
 
   // Create item
-  EventItem item;
-  item.anime_id = anime_id_;
-  item.mode = HTTP_MAL_AnimeEdit;
+  EventItem event_item;
+  event_item.anime_id = anime_id_;
+  event_item.mode = HTTP_MAL_AnimeEdit;
 
   // Episodes watched
-  item.episode = pages[INFOPAGE_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!mal::IsValidEpisode(item.episode, -1, anime_item->GetEpisodeCount())) {
+  event_item.episode = pages[INFOPAGE_MYINFO].GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
+  if (!mal::IsValidEpisode(*event_item.episode, -1, anime_item->GetEpisodeCount())) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
       ToWstr(anime_item->GetEpisodeCount()) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
@@ -134,35 +134,37 @@ void AnimeDialog::OnOK() {
   }
 
   // Re-watching
-  item.enable_rewatching = pages[INFOPAGE_MYINFO].IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
+  event_item.enable_rewatching = pages[INFOPAGE_MYINFO].IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
   
   // Score
-  item.score = 10 - pages[INFOPAGE_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
+  event_item.score = 10 - pages[INFOPAGE_MYINFO].GetComboSelection(IDC_COMBO_ANIME_SCORE);
   
   // Status
-  item.status = pages[INFOPAGE_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
-  if (item.status == mal::MYSTATUS_UNKNOWN) item.status++;
+  event_item.status = pages[INFOPAGE_MYINFO].GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
+  if (*event_item.status == mal::MYSTATUS_UNKNOWN) event_item.status = *event_item.status + 1;
   
   // Tags
-  pages[INFOPAGE_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, item.tags);
+  wstring tags;
+  pages[INFOPAGE_MYINFO].GetDlgItemText(IDC_EDIT_ANIME_TAGS, tags);
+  event_item.tags = tags;
 
   // Start date
   SYSTEMTIME stMyStart;
   if (pages[INFOPAGE_MYINFO].SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
     reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
-      anime_item->SetMyDate(anime::DATE_START, Date(), true, true);
+      event_item.date_start = mal::TranslateDateForApi(Date());
   } else {
-    anime_item->SetMyDate(anime::DATE_START, 
-      Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay), true, true);
+    event_item.date_start = mal::TranslateDateForApi(
+      Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay));
   }
   // Finish date
   SYSTEMTIME stMyFinish;
   if (pages[INFOPAGE_MYINFO].SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
     reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
-      anime_item->SetMyDate(anime::DATE_END, Date(), true, true);
+      event_item.date_finish = mal::TranslateDateForApi(Date());
   } else {
-    anime_item->SetMyDate(anime::DATE_END, 
-      Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay), true, true);
+    event_item.date_finish = mal::TranslateDateForApi(
+      Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay));
   }
 
   // Alternative titles
@@ -171,7 +173,7 @@ void AnimeDialog::OnOK() {
   anime_item->SetUserSynonyms(titles, true);
 
   // Add item to event queue
-  EventQueue.Add(item);
+  EventQueue.Add(event_item);
 
   // Exit
   EndDialog(IDOK);
@@ -283,6 +285,10 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
 
 // =============================================================================
 
+int AnimeDialog::GetCurrentId() const {
+  return anime_id_;
+}
+
 void AnimeDialog::SetCurrentPage(int index) {
   current_page_ = index;
   if (IsWindow()) {
@@ -292,10 +298,6 @@ void AnimeDialog::SetCurrentPage(int index) {
     pages[index].Show();
     tab_.SetCurrentlySelected(index);
   }
-}
-
-int AnimeDialog::GetAnimeID() const {
-  return anime_id_;
 }
 
 void AnimeDialog::Refresh(int anime_id, bool series_info, bool my_info) {

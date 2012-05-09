@@ -280,7 +280,6 @@ BOOL HttpClient::OnReadComplete() {
       if (Taiga.logged_in) {
         status = L"Logged in as " + Settings.Account.MAL.user + L".";
         MainDialog.toolbar_main.SetButtonImage(0, ICON24_ONLINE);
-        MainDialog.toolbar_main.SetButtonText(0, L"Log out");
         MainDialog.toolbar_main.SetButtonTooltip(0, L"Log out");
       } else {
         status = L"Failed to log in.";
@@ -303,8 +302,8 @@ BOOL HttpClient::OnReadComplete() {
       }
       MainDialog.ChangeStatus(status);
       MainDialog.EnableInput(true);
-      MainDialog.RefreshMenubar();
       MainDialog.UpdateTip();
+      UpdateAllMenus();
       if (Taiga.logged_in) {
         switch (Settings.Account.MAL.api) {
           case MAL_API_OFFICIAL:
@@ -430,7 +429,7 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_AnimeDetails: {
       int anime_id = static_cast<int>(GetParam());
       if (mal::ParseAnimeDetails(GetData())) {
-        if (AnimeDialog.IsWindow() && anime_id == AnimeDialog.GetAnimeID()) {
+        if (AnimeDialog.IsWindow() && AnimeDialog.GetCurrentId() == anime_id) {
           AnimeDialog.Refresh(anime_id, true, false);
         }
         if (SeasonDialog.IsWindow()) {
@@ -445,7 +444,7 @@ BOOL HttpClient::OnReadComplete() {
     // Download image
     case HTTP_MAL_Image: {
       int anime_id = static_cast<int>(GetParam());
-      if (AnimeDialog.IsWindow() && anime_id == AnimeDialog.GetAnimeID()) {
+      if (AnimeDialog.IsWindow() && AnimeDialog.GetCurrentId() == anime_id) {
         AnimeDialog.Refresh(anime::ID_UNKNOWN, false, false);
       }
       if (SeasonDialog.IsWindow()) {
@@ -473,8 +472,10 @@ BOOL HttpClient::OnReadComplete() {
       int anime_id = static_cast<int>(GetParam());
       if (anime_id) {
         if (mal::ParseSearchResult(GetData(), anime_id)) {
-          if(anime_id == AnimeDialog.GetAnimeID()) AnimeDialog.Refresh(anime_id, true, false);
-          SeasonDialog.RefreshList(true);
+          if (AnimeDialog.GetCurrentId() == anime_id)
+            AnimeDialog.Refresh(anime_id, true, false);
+          if (SeasonDialog.IsWindow())
+            SeasonDialog.RefreshList(true);
           if (mal::GetAnimeDetails(anime_id, this)) return TRUE;
         } else {
           status = L"Could not read anime information.";

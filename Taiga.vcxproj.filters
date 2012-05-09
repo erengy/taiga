@@ -563,6 +563,9 @@
     <ClInclude Include="anime_item.h">
       <Filter>Anime</Filter>
     </ClInclude>
+    <ClInclude Include="optional.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

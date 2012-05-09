@@ -16,44 +16,39 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef OPTIONAL_H
+#define OPTIONAL_H
+
 #include "std.h"
 
-#include "anime.h"
-#include "anime_db.h"
-#include "anime_episode.h"
+template <typename T>
+class Optional {
+ public:
+  Optional() : initialized_(false) {}
+  Optional(const T& value) : initialized_(true), value_(value) {}
+  virtual ~Optional() {}
 
-#include "common.h"
+  void Reset() {
+    initialized_ = false;
+  }
 
-anime::Episode CurrentEpisode;
+  operator bool() const {
+    return initialized_;
+  }
 
-namespace anime {
+  const T& operator *() const {
+    return value_;
+  }
 
-// =============================================================================
+  T& operator =(const T& value) {
+    value_ = value;
+    initialized_ = true;
+    return value_;
+  }
 
-Episode::Episode()
-    : anime_id(ID_UNKNOWN) {
-}
+ private:
+  bool initialized_;
+  T value_;
+};
 
-void Episode::Clear() {
-  anime_id = ID_UNKNOWN;
-  audio_type.clear();
-  checksum.clear();
-  extras.clear();
-  file.clear();
-  format.clear();
-  group.clear();
-  name.clear();
-  number.clear();
-  resolution.clear();
-  title.clear();
-  clean_title.clear();
-  version.clear();
-  video_type.clear();
-}
-
-void Episode::Set(int anime_id) {
-  this->anime_id = anime_id;
-  UpdateAllMenus(AnimeDatabase.FindItem(anime_id));
-}
-
-} // namespace anime
+#endif // OPTIONAL_H

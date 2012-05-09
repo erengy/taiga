@@ -25,7 +25,9 @@
 // =============================================================================
 
 enum EventSearchMode {
-  EVENT_SEARCH_EPISODE = 1,
+  EVENT_SEARCH_DATE_START = 1,
+  EVENT_SEARCH_DATE_END,
+  EVENT_SEARCH_EPISODE,
   EVENT_SEARCH_REWATCH,
   EVENT_SEARCH_SCORE,
   EVENT_SEARCH_STATUS,

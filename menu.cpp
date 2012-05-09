@@ -55,6 +55,7 @@ void UpdateAccountMenu() {
 
 void UpdateAnimeMenu(anime::Item* anime_item) {
   if (!anime_item) return;
+  if (!anime_item->IsInList()) return;
   int item_index = 0, menu_index = 0;
 
   // Edit > Score

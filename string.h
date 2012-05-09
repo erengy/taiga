@@ -21,8 +21,6 @@
 
 #include "std.h"
 
-#define EMPTY_STR L"%empty%"
-
 // =============================================================================
 
 void AppendString(wstring& str0, const wstring& str1, const wstring& str2 = L", ");

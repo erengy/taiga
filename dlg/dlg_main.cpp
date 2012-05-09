@@ -89,8 +89,8 @@ BOOL MainDialog::OnInitDialog() {
   //search_bar.Index = Settings.Program.General.SearchIndex;
   search_bar.SetMode(2, SEARCH_MODE_MAL, L"Search MyAnimeList");
   
-  // Refresh menu bar
-  RefreshMenubar();
+  // Refresh menus
+  UpdateAllMenus();
 
   // Apply start-up settings
   if (Settings.Account.MAL.auto_login) {
@@ -178,10 +178,10 @@ void MainDialog::CreateDialogControls() {
 
   // Insert menu toolbar buttons
   BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
-  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"File", nullptr);
-  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"Account", nullptr);
-  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"List", nullptr);
-  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"Help", nullptr);
+  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  File", nullptr);
+  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  Account", nullptr);
+  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"  List", nullptr);
+  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"  Help", nullptr);
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
@@ -208,7 +208,7 @@ void MainDialog::CreateDialogControls() {
   UINT fStyle = RBBS_NOGRIPPER;
   rebar.InsertBand(toolbar_menu.GetWindowHandle(), 
     GetSystemMetrics(SM_CXSCREEN), 
-    WIN_CONTROL_MARGIN, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
     HIWORD(toolbar_menu.GetButtonSize()), 
     fMask, fStyle);
   rebar.InsertBand(toolbar_main.GetWindowHandle(), 
@@ -653,11 +653,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       // Recognized?
       if (Taiga.is_recognition_enabled) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
-#ifdef _DEBUG
           anime_item = Meow.MatchDatabase(CurrentEpisode, false, true);
-#else
-          anime_item = Meow.MatchDatabase(CurrentEpisode, true, true);
-#endif
           if (anime_item) {
             CurrentEpisode.Set(CurrentEpisode.anime_id);
             anime_item->StartWatching(CurrentEpisode);
@@ -666,11 +662,12 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         }
         // Not recognized
 #ifdef _DEBUG
-        vector<int> anime_ids = Meow.GetScores(5); // top 5
+        std::multimap<int, int> scores = Meow.GetScores();
         debug::Print(L"Not recognized: " + CurrentEpisode.title + L"\n");
         debug::Print(L"Could be:\n");
-        for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
-          debug::Print(L"* " + AnimeDatabase.items[*it].GetTitle() + L"\n");
+        for (auto it = scores.begin(); it != scores.end(); ++it) {
+          debug::Print(L"* " + AnimeDatabase.items[it->second].GetTitle() + 
+                       L" | Score: " + ToWstr(-it->first) + L"\n");
         }
 #endif  
         CurrentEpisode.Set(anime::ID_NOTINLIST);
@@ -789,7 +786,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         UpdateAllMenus(AnimeDatabase.GetCurrentItem());
         SetForegroundWindow();
         ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"Tray"));
-        RefreshMenubar(AnimeDatabase.GetCurrentId());
+        UpdateAllMenus(AnimeDatabase.GetCurrentItem());
         break;
       }
     }
@@ -883,10 +880,6 @@ void MainDialog::RefreshList(int index) {
 
   // Show again
   listview.Show(SW_SHOW);
-}
-
-void MainDialog::RefreshMenubar(int anime_id, bool show) {
-  UpdateAllMenus(AnimeDatabase.FindItem(anime_id));
 }
 
 void MainDialog::RefreshTabs(int index, bool redraw) {

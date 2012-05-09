@@ -35,27 +35,6 @@ namespace mal {
 
 // =============================================================================
 
-AnimeValues::AnimeValues()
-    : episode(-1),
-      status(-1),
-      score(-1),
-      downloaded_episodes(-1),
-      storage_type(-1),
-      storage_value(-1.0f),
-      times_rewatched(-1),
-      rewatch_value(-1),
-      date_start(EMPTY_STR),
-      date_finish(EMPTY_STR),
-      priority(-1),
-      enable_discussion(-1),
-      enable_rewatching(-1),
-      comments(EMPTY_STR),
-      fansub_group(EMPTY_STR),
-      tags(EMPTY_STR) {
-}
-
-// =============================================================================
-
 wstring GetUserPassEncoded() {
   return Base64Encode(Settings.Account.MAL.user + L":" + Settings.Account.MAL.password);
 }
@@ -234,12 +213,12 @@ bool SearchAnime(int anime_id, wstring title, class HttpClient* client) {
 }
 
 bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
-  #define ADD_DATA_F(name, value) \
-    if (value > -1.0f) { data += L"\r\n\t<" ##name L">" + ToWstr(value) + L"</" ##name L">"; }
-  #define ADD_DATA_I(name, value) \
-    if (value > -1) { data += L"\r\n\t<" ##name L">" + ToWstr(value) + L"</" ##name L">"; }
+  #define ADD_DATA_N(name, value) \
+    if (anime_values.value) \
+      data += L"\r\n\t<" ##name L">" + ToWstr(*anime_values.value) + L"</" ##name L">";
   #define ADD_DATA_S(name, value) \
-    if (value != EMPTY_STR) { data += L"\r\n\t<" ##name L">" + value + L"</" ##name L">"; }
+    if (anime_values.value) \
+      data += L"\r\n\t<" ##name L">" + *anime_values.value + L"</" ##name L">";
   
   auto anime_item = AnimeDatabase.FindItem(anime_id);
   if (!anime_item) return false;
@@ -248,41 +227,27 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
     // Use official MAL API
     case MAL_API_OFFICIAL: {
       // Build XML data
-      wstring data = L"data=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<entry>";
-      ADD_DATA_I(L"episode", anime_values.episode);
-      ADD_DATA_I(L"status", anime_values.status);
-      ADD_DATA_I(L"score", anime_values.score);
-      ADD_DATA_I(L"downloaded_episodes", anime_values.downloaded_episodes);
-      ADD_DATA_I(L"storage_type", anime_values.storage_type);
-      ADD_DATA_F(L"storage_value", anime_values.storage_value);
-      ADD_DATA_I(L"times_rewatched", anime_values.times_rewatched);
-      ADD_DATA_I(L"rewatch_value", anime_values.rewatch_value);
-      switch (update_mode) { // TODO: Move to EventList::Check() or somewhere else
-        case HTTP_MAL_AnimeEdit: {
-          const Date& date_start = anime_item->GetDate(anime::DATE_START);
-          const Date& date_end = anime_item->GetDate(anime::DATE_END);
-          if (mal::IsValidDate(date_start)) {
-            anime_values.date_start = PadChar(ToWstr(date_start.month), '0', 2) + 
-                                      PadChar(ToWstr(date_start.day),   '0', 2) + 
-                                      PadChar(ToWstr(date_start.year),  '0', 4);
-          }
-          if (mal::IsValidDate(date_end)) {
-            anime_values.date_finish = PadChar(ToWstr(date_end.month), '0', 2) + 
-                                       PadChar(ToWstr(date_end.day),   '0', 2) + 
-                                       PadChar(ToWstr(date_end.year),  '0', 4);
-          }
-          break;
-        }
+      wstring data;
+      if (update_mode != HTTP_MAL_AnimeDelete) {
+        data = L"data=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<entry>";
+        ADD_DATA_N(L"episode", episode);
+        ADD_DATA_N(L"status", status);
+        ADD_DATA_N(L"score", score);
+        ADD_DATA_N(L"downloaded_episodes", downloaded_episodes);
+        ADD_DATA_N(L"storage_type", storage_type);
+        ADD_DATA_N(L"storage_value", storage_value);
+        ADD_DATA_N(L"times_rewatched", times_rewatched);
+        ADD_DATA_N(L"rewatch_value", rewatch_value);
+        ADD_DATA_S(L"date_start", date_start);
+        ADD_DATA_S(L"date_finish", date_finish);
+        ADD_DATA_N(L"priority", priority);
+        ADD_DATA_N(L"enable_discussion", enable_discussion);
+        ADD_DATA_N(L"enable_rewatching", enable_rewatching);
+        ADD_DATA_S(L"comments", comments);
+        ADD_DATA_S(L"fansub_group", fansub_group);
+        ADD_DATA_S(L"tags", tags);
+        data += L"\r\n</entry>";
       }
-      ADD_DATA_S(L"date_start", anime_values.date_start);
-      ADD_DATA_S(L"date_finish", anime_values.date_finish);
-      ADD_DATA_I(L"priority", anime_values.priority);
-      ADD_DATA_I(L"enable_discussion", anime_values.enable_discussion);
-      ADD_DATA_I(L"enable_rewatching", anime_values.enable_rewatching);
-      ADD_DATA_S(L"comments", anime_values.comments);
-      ADD_DATA_S(L"fansub_group", anime_values.fansub_group);
-      ADD_DATA_S(L"tags", anime_values.tags);
-      data += L"\r\n</entry>";
       
       win32::Url url;
       switch (update_mode) {
@@ -317,7 +282,7 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
           MainClient.Post(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=79", 
             L"anime_id=" + ToWstr(anime_id) + 
-            L"&ep_val="  + ToWstr(anime_values.episode), 
+            L"&ep_val="  + ToWstr(*anime_values.episode), 
             L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Update score
@@ -325,7 +290,7 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
           MainClient.Post(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=63", 
             L"id="     + ToWstr(anime_id) + 
-            L"&score=" + ToWstr(anime_values.score), 
+            L"&score=" + ToWstr(*anime_values.score), 
             L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Update tags
@@ -333,7 +298,7 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
           MainClient.Get(L"myanimelist.net", 
             L"/includes/ajax.inc.php?t=22" \
             L"&aid="  + ToWstr(anime_id) + 
-            L"&tags=" + EncodeUrl(anime_values.tags), 
+            L"&tags=" + EncodeUrl(*anime_values.tags), 
             L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Add anime
@@ -342,8 +307,8 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
             L"/includes/ajax.inc.php?t=61", 
             L"aid="      + ToWstr(anime_id) + 
             L"&score=0"
-            L"&status="  + ToWstr(anime_values.status) + 
-            L"&epsseen=" + ToWstr(anime_values.episode), 
+            L"&status="  + ToWstr(*anime_values.status) + 
+            L"&epsseen=" + ToWstr(*anime_values.episode), 
             L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Delete anime
@@ -364,8 +329,8 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
             L"aid="      + ToWstr(anime_id) + 
             L"&alistid=" + ToWstr(anime_id) + 
             L"&score="   + ToWstr(anime_item->GetMyScore(false)) + 
-            L"&status="  + ToWstr(anime_values.status) + 
-            L"&epsseen=" + ToWstr(anime_values.episode > -1 ? anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)), 
+            L"&status="  + ToWstr(*anime_values.status) + 
+            L"&epsseen=" + ToWstr(anime_values.episode ? *anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)), 
             L"", update_mode, static_cast<LPARAM>(anime_id));
           break;
         // Edit anime
@@ -377,19 +342,19 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
             L"&aeps="               + ToWstr(anime_item->GetEpisodeCount(false)) + 
             L"&astatus="            + ToWstr(anime_item->GetAiringStatus()) + 
             L"&close_on_update=true"
-            L"&status="             + ToWstr(anime_values.status);
-          if (anime_values.enable_rewatching > -1) {
+            L"&status="             + ToWstr(*anime_values.status);
+          if (anime_values.enable_rewatching) {
             buffer += 
-            L"&rewatching="         + ToWstr(anime_values.enable_rewatching);
+            L"&rewatching="         + ToWstr(*anime_values.enable_rewatching);
           }
           buffer += 
             L"&last_status="        + ToWstr(anime_item->GetMyStatus(false)) + 
-            L"&completed_eps="      + ToWstr(anime_values.episode > -1 ? anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)) + 
+            L"&completed_eps="      + ToWstr(anime_values.episode ? *anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)) + 
             L"&last_completed_eps=" + ToWstr(anime_item->GetMyLastWatchedEpisode(false)) + 
-            L"&score="              + ToWstr(anime_values.score > -1 ? anime_values.score : anime_item->GetMyScore(false));
-          if (anime_values.tags != EMPTY_STR) {
+            L"&score="              + ToWstr(anime_values.score ? *anime_values.score : anime_item->GetMyScore(false));
+          if (anime_values.tags) {
             buffer += 
-            L"&tags=" + EncodeUrl(anime_values.tags);
+            L"&tags=" + EncodeUrl(*anime_values.tags);
           }
           const Date& date_start = anime_item->GetMyDate(anime::DATE_START);
           if (mal::IsValidDate(date_start)) {
@@ -422,8 +387,7 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
     }
   }
 
-  #undef ADD_DATA_F
-  #undef ADD_DATA_I
+  #undef ADD_DATA_N
   #undef ADD_DATA_S
   #undef ANIME
 
@@ -460,13 +424,13 @@ bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
           success = (InStr(data, L"Success", 0) > -1) || (InStr(data, L"This is not your entry", 0) > -1);
           break;
         case HTTP_MAL_AnimeUpdate:
-          success = ToInt(data) == item.episode;
+          success = ToInt(data) == *item.episode;
           break;
         case HTTP_MAL_ScoreUpdate:
           success = InStr(data, L"Updated score", 0) > -1;
           break;
         case HTTP_MAL_TagUpdate:
-          success = item.tags.empty() ? data.empty() : InStr(data, L"/animelist/", 0) > -1;
+          success = (*item.tags).empty() ? data.empty() : InStr(data, L"/animelist/", 0) > -1;
           break;
         case HTTP_MAL_AnimeEdit:
         case HTTP_MAL_StatusUpdate:
@@ -616,6 +580,21 @@ wstring TranslateDate(const Date& date) {
   result += ToWstr(date.year);
 
   return result;
+}
+
+wstring TranslateDateForApi(const Date& date) {
+  if (!mal::IsValidDate(date)) return L"";
+
+  return PadChar(ToWstr(date.month), '0', 2) + // MM
+         PadChar(ToWstr(date.day),   '0', 2) + // DD
+         PadChar(ToWstr(date.year),  '0', 4);  // YYYY
+}
+Date TranslateDateFromApi(const wstring& date) {
+  if (date.size() == 8) return Date();
+
+  return Date(ToInt(date.substr(4, 4)), 
+              ToInt(date.substr(0, 2)), 
+              ToInt(date.substr(2, 2)));
 }
 
 wstring TranslateDateToSeason(const Date& date) {

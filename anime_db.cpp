@@ -201,8 +201,8 @@ void Database::UpdateItem(Item& new_item) {
     item->SetMyStatus(new_item.GetMyStatus(false));
     item->SetMyRewatching(new_item.GetMyRewatching(false));
     item->SetMyRewatchingEp(new_item.GetMyRewatchingEp());
-    item->SetMyDate(DATE_START, new_item.GetMyDate(DATE_START), true, false);
-    item->SetMyDate(DATE_END, new_item.GetMyDate(DATE_END), true, false);
+    item->SetMyDate(DATE_START, new_item.GetMyDate(DATE_START));
+    item->SetMyDate(DATE_END, new_item.GetMyDate(DATE_END));
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
     
@@ -285,8 +285,8 @@ bool Database::LoadList() {
     anime_item.SetImageUrl(XML_ReadStrValue(node, L"series_image"));
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XML_ReadIntValue(node, L"my_watched_episodes"));
-    anime_item.SetMyDate(DATE_START, XML_ReadStrValue(node, L"my_start_date"), true, false);
-    anime_item.SetMyDate(DATE_END, XML_ReadStrValue(node, L"my_finish_date"), true, false);
+    anime_item.SetMyDate(DATE_START, XML_ReadStrValue(node, L"my_start_date"));
+    anime_item.SetMyDate(DATE_END, XML_ReadStrValue(node, L"my_finish_date"));
     anime_item.SetMyScore(XML_ReadIntValue(node, L"my_score"));
     anime_item.SetMyStatus(XML_ReadIntValue(node, L"my_status"));
     anime_item.SetMyRewatching(XML_ReadIntValue(node, L"my_rewatching"));

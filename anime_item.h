@@ -59,9 +59,9 @@ class Item {
   int GetMyStatus(bool check_events = true) const;
   int GetMyRewatching(bool check_events = true) const;
   int GetMyRewatchingEp() const;
-  const Date& GetMyDate(DateType type) const;
-  const wstring& GetMyLastUpdated() const;
-  const wstring& GetMyTags(bool check_events = true) const;
+  const Date GetMyDate(DateType type, bool check_events = true) const;
+  const wstring GetMyLastUpdated() const;
+  const wstring GetMyTags(bool check_events = true) const;
 
   // Mutators for series information
   void SetId(int anime_id);
@@ -86,8 +86,7 @@ class Item {
   void SetMyStatus(int status);
   void SetMyRewatching(int rewatching);
   void SetMyRewatchingEp(int rewatching_ep);
-  void SetMyDate(DateType type, const Date& date, 
-                 bool ignore_previous, bool save_settings);
+  void SetMyDate(DateType type, const Date& date);
   void SetMyLastUpdated(const wstring& last_updated);
   void SetMyTags(const wstring& tags);
   

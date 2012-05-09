@@ -165,34 +165,27 @@ bool RecognitionEngine::CompareTitle(const wstring& anime_title,
   return false;
 }
 
-vector<int> RecognitionEngine::GetScores(size_t number) {
+std::multimap<int, int> RecognitionEngine::GetScores() {
   std::multimap<int, int> reverse_map;
-  vector<int> output;
 
   for (auto it = scores.begin(); it != scores.end(); ++it) {
     if (it->second == 0) continue;
-    reverse_map.insert(std::pair<int, int>(it->second, it->first));
+    reverse_map.insert(std::pair<int, int>(-it->second, it->first));
   }
 
-  size_t i = 0;
-  for (auto it = reverse_map.begin(); it != reverse_map.end(); ++it) {
-    if (i++ > number) break;
-    output.push_back(it->second);
-  }
-
-  return output;
+  return reverse_map;
 }
 
 bool RecognitionEngine::ScoreTitle(const wstring& episode_title, const anime::Item& anime_item) {
-  int score = 0;
+  int score = 100;
   
-  score += LevenshteinDistance(episode_title, anime_item.GetTitle());
+  score -= LevenshteinDistance(episode_title, anime_item.GetTitle());
 
   if (InStr(anime_item.GetTitle(), episode_title, 0, true) > -1 ||
       InStr(episode_title, anime_item.GetTitle(), 0, true) > -1)
     score += 10;
   
-  if (score < 10) {
+  if (score > 90) {
     scores[anime_item.GetId()] = score;
     return true;
   }

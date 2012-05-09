@@ -63,6 +63,9 @@ MyInformation::MyInformation()
 // =============================================================================
 
 void Item::StartWatching(Episode episode) {
+  // Make sure item is in list
+  if (!IsInList()) AddtoUserList();
+
   // Change status
   Taiga.play_status = PLAYSTATUS_PLAYING;
   SetPlaying(true);
@@ -71,8 +74,10 @@ void Item::StartWatching(Episode episode) {
   MainDialog.ChangeStatus();
   MainDialog.UpdateTip();
   int status = GetMyRewatching() ? mal::MYSTATUS_WATCHING : GetMyStatus();
-  MainDialog.RefreshList(status);
-  MainDialog.RefreshTabs(status);
+  if (status != mal::MYSTATUS_NOTINLIST) {
+    MainDialog.RefreshList(status);
+    MainDialog.RefreshTabs(status);
+  }
   int list_index = MainDialog.GetListIndex(GetId());
   if (list_index > -1) {
     MainDialog.listview.SetItemIcon(list_index, ICON16_PLAY);
@@ -201,38 +206,41 @@ void Item::AddToEventQueue(Episode episode, bool change_status) {
 
   // Set episode number
   event_item.episode = GetEpisodeHigh(episode.number);
-  if (event_item.episode == 0 || GetEpisodeCount() == 1) event_item.episode = 1;
+  if (*event_item.episode == 0 || GetEpisodeCount() == 1) event_item.episode = 1;
   episode.anime_id = GetId();
   
   // Set start/finish date
-  if (event_item.episode == 1)
-    SetMyDate(DATE_START, ::GetDate(), false, true);
-  if (event_item.episode == GetEpisodeCount())
-    SetMyDate(DATE_END, ::GetDate(), false, true);
+  if (*event_item.episode == 1 && !mal::IsValidDate(GetMyDate(DATE_START)))
+    event_item.date_start = ::GetDate();
+  if (*event_item.episode == GetEpisodeCount() && !mal::IsValidDate(GetMyDate(DATE_END)))
+    event_item.date_finish = ::GetDate();
+
+  // Set update mode
+  if (GetMyStatus() == mal::MYSTATUS_NOTINLIST) {
+    event_item.mode = HTTP_MAL_AnimeAdd;
+  } else if (change_status) {
+    event_item.mode = HTTP_MAL_AnimeEdit;
+  } else {
+    event_item.mode = HTTP_MAL_AnimeUpdate;
+  }
 
   if (change_status) {
-    event_item.mode = HTTP_MAL_AnimeEdit;
     // Move to completed
-    if (GetEpisodeCount() == event_item.episode) {
+    if (GetEpisodeCount() == *event_item.episode) {
       event_item.status = mal::MYSTATUS_COMPLETED;
       if (GetMyRewatching()) {
         event_item.enable_rewatching = FALSE;
         //event_item.times_rewatched++; // TODO: Enable when MAL adds to API
       }
-      EventQueue.Add(event_item);
-      return;
     // Move to watching
-    } else if (GetMyStatus() != mal::MYSTATUS_WATCHING || event_item.episode == 1) {
+    } else if (GetMyStatus() != mal::MYSTATUS_WATCHING || *event_item.episode == 1) {
       if (!GetMyRewatching()) {
         event_item.status = mal::MYSTATUS_WATCHING;
-        EventQueue.Add(event_item);
-        return;
       }
     }
   }
 
-  // Update normally
-  event_item.mode = HTTP_MAL_AnimeUpdate;
+  // Add event to queue
   EventQueue.Add(event_item);
 }
 

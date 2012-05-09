@@ -120,9 +120,11 @@ bool Settings::Load() {
   wstring folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
-    folder = item.attribute(L"folder").value(EMPTY_STR);
-    titles = item.attribute(L"titles").value(EMPTY_STR);
-    Anime.SetItem(item.attribute(L"id").as_int(), folder, titles);
+    folder = item.attribute(L"folder").value();
+    titles = item.attribute(L"titles").value();
+    Anime.SetItem(item.attribute(L"id").as_int(), 
+      folder.empty() ? Optional<wstring>() : folder, 
+      titles.empty() ? Optional<wstring>() : titles);
   }
 
   // Program
@@ -240,11 +242,16 @@ bool Settings::Load() {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
       EventItem event_item;
       event_item.anime_id = item.attribute(L"id").as_int(anime::ID_NOTINLIST);
-      event_item.episode = item.attribute(L"episode").as_int(-1);
-      event_item.score = item.attribute(L"score").as_int(-1);
-      event_item.status = item.attribute(L"status").as_int(-1);
-      event_item.enable_rewatching = item.attribute(L"rewatch").as_int(-1);
-      event_item.tags = item.attribute(L"tags").value(EMPTY_STR);
+      int episode = item.attribute(L"episode").as_int(-1);
+      int score = item.attribute(L"score").as_int(-1);
+      int status = item.attribute(L"status").as_int(-1);
+      int enable_rewatching = item.attribute(L"rewatch").as_int(-1);
+      wstring tags = item.attribute(L"tags").value(L"%empty%");
+      if (episode > -1) event_item.episode = episode;
+      if (score > -1) event_item.score = score;
+      if (status > -1) event_item.status = status;
+      if (enable_rewatching > -1) event_item.enable_rewatching = enable_rewatching;
+      if (tags != L"%empty%") event_item.tags = tags;
       event_item.time = item.attribute(L"time").value();
       event_item.mode = item.attribute(L"mode").as_int();
       EventQueue.Add(event_item, false, user.attribute(L"name").value());
@@ -509,17 +516,17 @@ bool Settings::Save() {
         xml_node item = user.append_child();
         item.set_name(L"event");
         #define APPEND_ATTRIBUTE_INT(x, y) \
-          if (j->y > -1) item.append_attribute(x) = j->y;
+          if (y) item.append_attribute(x) = *y;
         #define APPEND_ATTRIBUTE_STR(x, y) \
-          if (j->y != EMPTY_STR) item.append_attribute(x) = j->y.c_str();
-        APPEND_ATTRIBUTE_INT(L"mode", mode);
-        APPEND_ATTRIBUTE_INT(L"id", anime_id);
-        APPEND_ATTRIBUTE_INT(L"episode", episode);
-        APPEND_ATTRIBUTE_INT(L"score", score);
-        APPEND_ATTRIBUTE_INT(L"status", status);
-        APPEND_ATTRIBUTE_INT(L"rewatch", enable_rewatching);
-        APPEND_ATTRIBUTE_STR(L"tags", tags);
-        APPEND_ATTRIBUTE_STR(L"time", time);
+          if (y) item.append_attribute(x) = (*y).c_str();
+        item.append_attribute(L"mode") = j->mode;
+        item.append_attribute(L"id") = j->anime_id;
+        APPEND_ATTRIBUTE_INT(L"episode", j->episode);
+        APPEND_ATTRIBUTE_INT(L"score", j->score);
+        APPEND_ATTRIBUTE_INT(L"status", j->status);
+        APPEND_ATTRIBUTE_INT(L"rewatch", j->enable_rewatching);
+        APPEND_ATTRIBUTE_STR(L"tags", j->tags);
+        item.append_attribute(L"time") = j->time.c_str();
         #undef APPEND_ATTRIBUTE_STR
         #undef APPEND_ATTRIBUTE_INT
       }
@@ -533,9 +540,9 @@ bool Settings::Save() {
 
 // =============================================================================
 
-void Settings::Anime::SetItem(int id, wstring folder, wstring titles) {
+void Settings::Anime::SetItem(int id, Optional<wstring> folder, Optional<wstring> titles) {
   int index = -1;
-  for (unsigned int i = 0; i < items.size(); i++) {
+  for (size_t i = 0; i < items.size(); i++) {
     if (items[i].id == id) {
       index = static_cast<int>(i);
       break;
@@ -546,6 +553,6 @@ void Settings::Anime::SetItem(int id, wstring folder, wstring titles) {
     items.resize(index + 1);
   }
   items[index].id = id;
-  if (folder != EMPTY_STR) items[index].folder = folder;
-  if (titles != EMPTY_STR) items[index].titles = titles;
+  if (folder) items[index].folder = *folder;
+  if (titles) items[index].titles = *titles;
 }

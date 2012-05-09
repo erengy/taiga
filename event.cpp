@@ -55,41 +55,49 @@ void EventList::Add(EventItem& item) {
   
   // Validate values
   if (anime && item.mode != HTTP_MAL_AnimeAdd) {
-    if (anime->GetMyLastWatchedEpisode() == item.episode || item.episode < 0) {
-      item.episode = -1;
-    }
-    if (anime->GetMyScore() == item.score || item.score < 0 || item.score > 10) {
-      item.score = -1;
-    }
-    if (anime->GetMyStatus() == item.status || item.status < 1 || item.status == 5 || item.status > 6) {
-      item.status = -1;
-    }
-    if (anime->GetMyRewatching() == item.enable_rewatching) {
-      item.enable_rewatching = -1;
-    }
-    if (anime->GetMyTags() == item.tags) {
-      item.tags = EMPTY_STR;
-    }
+    if (item.episode)
+      if (anime->GetMyLastWatchedEpisode() == *item.episode || *item.episode < 0)
+        item.episode.Reset();
+    if (item.score)
+      if (anime->GetMyScore() == *item.score || *item.score < 0 || *item.score > 10)
+        item.score.Reset();
+    if (item.status)
+      if (anime->GetMyStatus() == *item.status || *item.status < 1 || *item.status == 5 || *item.status > 6)
+        item.status.Reset();
+    if (item.enable_rewatching)
+      if (anime->GetMyRewatching() == *item.enable_rewatching)
+        item.enable_rewatching.Reset();
+    if (item.tags)
+      if (anime->GetMyTags() == *item.tags)
+        item.tags.Reset();
+    if (item.date_start)
+      if (anime->GetDate(anime::DATE_START) == mal::TranslateDateFromApi(*item.date_start))
+        item.date_start.Reset();
+    if (item.date_finish)
+      if (anime->GetDate(anime::DATE_END) == mal::TranslateDateFromApi(*item.date_finish))
+        item.date_finish.Reset();
   }
   switch (item.mode) {
     case HTTP_MAL_AnimeEdit:
-      if (item.episode == -1 && 
-          item.score == -1 && 
-          item.status == -1 && 
-          item.enable_rewatching == -1 && 
-          item.tags == EMPTY_STR) return;
+      if (!item.episode && 
+          !item.score && 
+          !item.status && 
+          !item.enable_rewatching && 
+          !item.tags && 
+          !item.date_start && 
+          !item.date_finish) return;
       break;
     case HTTP_MAL_AnimeUpdate:
-      if (item.episode == -1) return;
+      if (!item.episode) return;
       break;
     case HTTP_MAL_ScoreUpdate:
-      if (item.score == -1) return;
+      if (!item.score) return;
       break;
     case HTTP_MAL_StatusUpdate:
-      if (item.status == -1) return;
+      if (!item.status) return;
       break;
     case HTTP_MAL_TagUpdate:
-      if (item.tags == EMPTY_STR) return;
+      if (!item.tags) return;
       break;
   }
 
@@ -99,12 +107,14 @@ void EventList::Add(EventItem& item) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id) {
         if (it->mode != HTTP_MAL_AnimeAdd && it->mode != HTTP_MAL_AnimeDelete) {
-          if (item.episode == -1 || (it->episode == -1 && it == items.rbegin())) {
-            if (item.episode > -1) it->episode = item.episode;
-            if (item.score > -1) it->score = item.score;
-            if (item.status > -1) it->status = item.status;
-            if (item.enable_rewatching > -1) it->enable_rewatching = item.enable_rewatching;
-            if (item.tags != EMPTY_STR) it->tags = item.tags;
+          if (!item.episode || (!it->episode && it == items.rbegin())) {
+            if (item.episode) it->episode = *item.episode;
+            if (item.score) it->score = *item.score;
+            if (item.status) it->status = *item.status;
+            if (item.enable_rewatching) it->enable_rewatching = *item.enable_rewatching;
+            if (item.tags) it->tags = *item.tags;
+            if (item.date_start) it->date_start = *item.date_start;
+            if (item.date_finish) it->date_finish = *item.date_finish;
             add_new_item = false;
           }
           if (!add_new_item) {
@@ -124,16 +134,16 @@ void EventList::Add(EventItem& item) {
 
   if (anime) {
     // Announce
-    if (Taiga.logged_in && item.episode > 0) {
+    if (Taiga.logged_in && item.episode) {
       anime::Episode episode;
       episode.anime_id = anime->GetId();
-      episode.number = ToWstr(item.episode);
+      episode.number = ToWstr(*item.episode);
       Taiga.play_status = PLAYSTATUS_UPDATED;
       Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_TWITTER, &episode);
     }
 
     // Check new episode
-    if (item.episode > -1) {
+    if (item.episode) {
       anime->SetNewEpisodePath(L"");
       anime->CheckEpisodes(0);
     }
@@ -197,25 +207,32 @@ EventItem* EventList::FindItem(int anime_id, int search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     if (it->anime_id == anime_id) {
       switch (search_mode) {
+        // Date
+        case EVENT_SEARCH_DATE_START:
+          if (it->date_start) return &(*it);
+          break;
+        case EVENT_SEARCH_DATE_END:
+          if (it->date_finish) return &(*it);
+          break;
         // Episode
         case EVENT_SEARCH_EPISODE:
-          if (it->episode > -1) return &(*it);
+          if (it->episode) return &(*it);
           break;
         // Re-watching
         case EVENT_SEARCH_REWATCH:
-          if (it->enable_rewatching > -1) return &(*it);
+          if (it->enable_rewatching) return &(*it);
           break;
         // Score
         case EVENT_SEARCH_SCORE:
-          if (it->score > -1) return &(*it);
+          if (it->score) return &(*it);
           break;
         // Status
         case EVENT_SEARCH_STATUS:
-          if (it->status > -1) return &(*it);
+          if (it->status) return &(*it);
           break;
         // Tags
         case EVENT_SEARCH_TAGS:
-          if (it->tags != EMPTY_STR) return &(*it);
+          if (it->tags) return &(*it);
           break;
         // Default
         default:

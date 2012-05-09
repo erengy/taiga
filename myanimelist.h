@@ -20,6 +20,7 @@
 #define MYANIMELIST_H
 
 #include "std.h"
+#include "optional.h"
 
 namespace anime {
 class ListItem;
@@ -81,25 +82,22 @@ enum Type {
 
 class AnimeValues {
 public:
-  AnimeValues();
-  virtual ~AnimeValues() {};
-  
-  int episode;
-  int status;
-  int score;
-  int downloaded_episodes;
-  int storage_type;
-  float storage_value;
-  int times_rewatched;
-  int rewatch_value;
-  wstring date_start;
-  wstring date_finish;
-  int priority;
-  int enable_discussion;
-  int enable_rewatching;
-  wstring comments;
-  wstring fansub_group;
-  wstring tags;
+  Optional<int> episode;
+  Optional<int> status;
+  Optional<int> score;
+  Optional<int> downloaded_episodes;
+  Optional<int> storage_type;
+  Optional<float> storage_value;
+  Optional<int> times_rewatched;
+  Optional<int> rewatch_value;
+  Optional<wstring> date_start;
+  Optional<wstring> date_finish;
+  Optional<int> priority;
+  Optional<int> enable_discussion;
+  Optional<int> enable_rewatching;
+  Optional<wstring> comments;
+  Optional<wstring> fansub_group;
+  Optional<wstring> tags;
 };
 
 // =============================================================================
@@ -124,6 +122,8 @@ bool IsValidEpisode(int episode, int watched, int total);
 Date ParseDateString(const wstring& str);
 
 wstring TranslateDate(const Date& date);
+wstring TranslateDateForApi(const Date& date);
+Date TranslateDateFromApi(const wstring& date);
 wstring TranslateDateToSeason(const Date& date);
 wstring TranslateMyStatus(int value, bool add_count);
 wstring TranslateNumber(int value, const wstring& default_char = L"-");

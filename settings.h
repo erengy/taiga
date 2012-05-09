@@ -21,6 +21,7 @@
 
 #include "std.h"
 #include "feed.h"
+#include "optional.h"
 
 enum MalApi {
   MAL_API_NONE     = 1,
@@ -73,7 +74,7 @@ public:
   // Anime
   class Anime {
   public:
-    void SetItem(int id, wstring folder, wstring titles);
+    void SetItem(int id, Optional<wstring> folder, Optional<wstring> titles);
     class Item {
     public:
       int id;
