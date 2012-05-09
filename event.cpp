@@ -71,10 +71,10 @@ void EventList::Add(EventItem& item) {
       if (anime->GetMyTags() == *item.tags)
         item.tags.Reset();
     if (item.date_start)
-      if (anime->GetDate(anime::DATE_START) == mal::TranslateDateFromApi(*item.date_start))
+      if (anime->GetMyDate(anime::DATE_START) == mal::TranslateDateFromApi(*item.date_start))
         item.date_start.Reset();
     if (item.date_finish)
-      if (anime->GetDate(anime::DATE_END) == mal::TranslateDateFromApi(*item.date_finish))
+      if (anime->GetMyDate(anime::DATE_END) == mal::TranslateDateFromApi(*item.date_finish))
         item.date_finish.Reset();
   }
   switch (item.mode) {

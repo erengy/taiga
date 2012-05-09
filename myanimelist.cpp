@@ -590,7 +590,7 @@ wstring TranslateDateForApi(const Date& date) {
          PadChar(ToWstr(date.year),  '0', 4);  // YYYY
 }
 Date TranslateDateFromApi(const wstring& date) {
-  if (date.size() == 8) return Date();
+  if (date.size() != 8) return Date();
 
   return Date(ToInt(date.substr(4, 4)), 
               ToInt(date.substr(0, 2)), 

@@ -217,7 +217,7 @@ void MainDialog::CreateDialogControls() {
     HIWORD(toolbar_main.GetButtonSize()) + 2, 
     fMask, fStyle | RBBS_BREAK);
   rebar.InsertBand(toolbar_search.GetWindowHandle(), 
-    WIN_CONTROL_MARGIN, 0, 0, 240, 0, 0, 0, 
+    0, WIN_CONTROL_MARGIN, 0, 240, 0, 0, 0, 
     HIWORD(toolbar_search.GetButtonSize()), 
     fMask, fStyle);
 

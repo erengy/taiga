@@ -247,11 +247,15 @@ bool Settings::Load() {
       int status = item.attribute(L"status").as_int(-1);
       int enable_rewatching = item.attribute(L"rewatch").as_int(-1);
       wstring tags = item.attribute(L"tags").value(L"%empty%");
+      wstring date_start = item.attribute(L"date_start").value(L"%empty%");
+      wstring date_finish = item.attribute(L"date_finish").value(L"%empty%");
       if (episode > -1) event_item.episode = episode;
       if (score > -1) event_item.score = score;
       if (status > -1) event_item.status = status;
       if (enable_rewatching > -1) event_item.enable_rewatching = enable_rewatching;
       if (tags != L"%empty%") event_item.tags = tags;
+      if (date_start != L"%empty%") event_item.date_start = date_start;
+      if (date_finish != L"%empty%") event_item.date_finish = date_finish;
       event_item.time = item.attribute(L"time").value();
       event_item.mode = item.attribute(L"mode").as_int();
       EventQueue.Add(event_item, false, user.attribute(L"name").value());
@@ -526,6 +530,8 @@ bool Settings::Save() {
         APPEND_ATTRIBUTE_INT(L"status", j->status);
         APPEND_ATTRIBUTE_INT(L"rewatch", j->enable_rewatching);
         APPEND_ATTRIBUTE_STR(L"tags", j->tags);
+        APPEND_ATTRIBUTE_STR(L"date_start", j->date_start);
+        APPEND_ATTRIBUTE_STR(L"date_finish", j->date_finish);
         item.append_attribute(L"time") = j->time.c_str();
         #undef APPEND_ATTRIBUTE_STR
         #undef APPEND_ATTRIBUTE_INT
