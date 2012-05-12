@@ -141,6 +141,12 @@ Item* Database::FindSequel(int anime_id) {
     case 6444: sequel_id = 8311; break;
     // Fate/Zero -> Fate/Zero 2nd Season
     case 10087: sequel_id = 11741; break;
+    // Towa no Qwon
+    case 10294: sequel_id = 10713; break;
+    case 10713: sequel_id = 10714; break;
+    case 10714: sequel_id = 10715; break;
+    case 10715: sequel_id = 10716; break;
+    case 10716: sequel_id = 10717; break;
   }
 
   return FindItem(sequel_id);
@@ -325,8 +331,8 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
       node.set_name(L"anime");
       XML_WriteIntValue(node, L"series_animedb_id", item->GetId());
       XML_WriteIntValue(node, L"my_watched_episodes", item->GetMyLastWatchedEpisode(false));
-      XML_WriteStrValue(node, L"my_start_date", wstring(item->GetDate(DATE_START)).c_str());
-      XML_WriteStrValue(node, L"my_finish_date", wstring(item->GetDate(DATE_END)).c_str());
+      XML_WriteStrValue(node, L"my_start_date", wstring(item->GetMyDate(DATE_START)).c_str());
+      XML_WriteStrValue(node, L"my_finish_date", wstring(item->GetMyDate(DATE_END)).c_str());
       XML_WriteIntValue(node, L"my_score", item->GetMyScore(false));
       XML_WriteIntValue(node, L"my_status", item->GetMyStatus(false));
       XML_WriteIntValue(node, L"my_rewatching", item->GetMyRewatching(false));
@@ -421,8 +427,7 @@ void Database::SetCurrentId(int anime_id) {
 
 // =============================================================================
 
-SeasonDatabase::SeasonDatabase()
-    : last_modified(0) {
+SeasonDatabase::SeasonDatabase() {
   folder_ = Taiga.GetDataPath() + L"db\\season\\";
 }
 
@@ -443,7 +448,7 @@ bool SeasonDatabase::Load(wstring file) {
   // Read information
   xml_node season_node = doc.child(L"season");
   name = XML_ReadStrValue(season_node.child(L"info"), L"name");
-  last_modified = _wtoi64(XML_ReadStrValue(season_node.child(L"info"), L"last_modified").c_str());
+  time_t last_modified = _wtoi64(XML_ReadStrValue(season_node.child(L"info"), L"last_modified").c_str());
 
   // Read items
   for (xml_node node = season_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {

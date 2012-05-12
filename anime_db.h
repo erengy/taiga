@@ -105,9 +105,6 @@ class SeasonDatabase {
 
   // Only IDs are stored here, actual info is kept in Database.
   vector<int> items;
-
-  // TODO: Remove
-  time_t last_modified;
   
   // Season name (e.g. Spring 2012)
   wstring name;

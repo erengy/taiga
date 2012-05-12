@@ -334,7 +334,13 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       FolderMonitor.OnChange(reinterpret_cast<FolderInfo*>(lParam));
       return TRUE;
     }
-    
+
+    // Show menu
+    case WM_TAIGA_SHOWMENU: {
+      toolbar_wm.ShowMenu();
+      return TRUE;
+    }
+
     // External programs
     case WM_COPYDATA: {
       PCOPYDATASTRUCT pCDS = (PCOPYDATASTRUCT)lParam;
@@ -655,7 +661,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
           anime_item = Meow.MatchDatabase(CurrentEpisode, false, true);
           if (anime_item) {
-            CurrentEpisode.Set(CurrentEpisode.anime_id);
+            CurrentEpisode.Set(anime_item->GetId());
             anime_item->StartWatching(CurrentEpisode);
             return;
           }

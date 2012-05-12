@@ -66,14 +66,14 @@ anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
       if (in_list && !it->second.IsInList())
         continue;
       if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date))
-        return &it->second;
+        return AnimeDatabase.FindItem(episode.anime_id);
     }
   } else {
     for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
       if (in_list && !it->second.IsInList())
         continue;
       if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date))
-        return &it->second;
+        return AnimeDatabase.FindItem(episode.anime_id);
     }
   }
 
@@ -115,7 +115,7 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
     return false;
   }
 
-  if (check_episode && anime_item.GetEpisodeCount() > 1) {
+  if (check_episode && anime_item.GetEpisodeCount() > 0) {
     int number = GetEpisodeHigh(episode.number);
     if (number > anime_item.GetEpisodeCount()) {
       // Check sequels
@@ -179,11 +179,11 @@ std::multimap<int, int> RecognitionEngine::GetScores() {
 bool RecognitionEngine::ScoreTitle(const wstring& episode_title, const anime::Item& anime_item) {
   int score = 100;
   
-  score -= LevenshteinDistance(episode_title, anime_item.GetTitle());
+  score -= LevenshteinDistance(episode_title, anime_item.GetTitle()) * 2;
 
   if (InStr(anime_item.GetTitle(), episode_title, 0, true) > -1 ||
       InStr(episode_title, anime_item.GetTitle(), 0, true) > -1)
-    score += 10;
+    score += 40;
   
   if (score > 90) {
     scores[anime_item.GetId()] = score;

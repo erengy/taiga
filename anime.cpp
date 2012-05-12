@@ -211,9 +211,9 @@ void Item::AddToEventQueue(Episode episode, bool change_status) {
   
   // Set start/finish date
   if (*event_item.episode == 1 && !mal::IsValidDate(GetMyDate(DATE_START)))
-    event_item.date_start = ::GetDate();
+    event_item.date_start = mal::TranslateDateForApi(::GetDate());
   if (*event_item.episode == GetEpisodeCount() && !mal::IsValidDate(GetMyDate(DATE_END)))
-    event_item.date_finish = ::GetDate();
+    event_item.date_finish = mal::TranslateDateForApi(::GetDate());
 
   // Set update mode
   if (GetMyStatus() == mal::MYSTATUS_NOTINLIST) {

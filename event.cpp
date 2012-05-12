@@ -194,7 +194,7 @@ void EventList::Check() {
   // Update
   EventQueue.updating = true;
   MainDialog.ChangeStatus(L"Updating list...");
-  mal::AnimeValues* anime_values = reinterpret_cast<mal::AnimeValues*>(&items[index]);
+  mal::AnimeValues* anime_values = static_cast<mal::AnimeValues*>(&items[index]);
   mal::Update(*anime_values, items[index].anime_id, items[index].mode);
 }
 

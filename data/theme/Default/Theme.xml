@@ -100,32 +100,13 @@
 		</menu>
 		<!-- Tools -->
 		<menu name="Tools">
-			<item name="Fansub groups" sub="Fansub"/>
-			<item name="Useful links"  sub="Links"/>
+			<item name="Anime Recommendation Finder" action="URL(http://www.animerecs.com/)"/>
+			<item name="MALgraph" action="URL(http://mal.oko.im/)"/>
+			<item type="separator"/>
+			<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
+			<item name="Spring 2012 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
+			<item name="The Fansub Wiki" action="URL(http://www.fansubwiki.com/)"/>
 		</menu>
-			<!-- Fansub groups -->
-			<menu name="Fansub">
-				<!-- Note: This is just another example of custom menus. You can add your favorite groups here. -->
-				<item name="ANBU"         action="URL(http://anbudom.net/)"/>
-				<item name="AniYoshi"     action="URL(http://www.animeyoshi.net/)"/>
-				<item name="Dattebayo"    action="URL(http://www.dattebayo.com/)"/>
-				<item name="Eclipse"      action="URL(http://eclipse.speedsubs.org/)"/>
-				<item name="Frostii"      action="URL(http://frostii.com/)"/>
-				<item name="gg"           action="URL(http://www.ggkthx.org/)"/>
-				<item name="m.3.3.w"      action="URL(http://m33w-fansubs.com/)"/>
-				<item name="Menclave"     action="URL(http://www.mymenclave.com/)"/>
-				<item name="Shinsen-Subs" action="URL(http://www.shinsen-subs.org/)"/>
-				<item name="Static-Subs"  action="URL(http://www.staticsubs.org/)"/>
-				<item name="THORA"        action="URL(http://www.thoranime.org/)"/>
-			</menu>
-			<!-- Useful links -->
-			<menu name="Links">
-				<item name="How to Watch Anime" action="URL(http://myanimelist.net/clubs.php?cid=8711)"/>
-				<item name="Spring 2012 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
-				<item type="separator"/>
-				<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
-				<item name="The Fansub Wiki"  action="URL(http://www.fansubwiki.com/)"/>
-			</menu>
 		<!-- Help -->
 		<menu name="Help">
 			<item name="About Taiga" action="About()"/>

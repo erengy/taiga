@@ -161,7 +161,7 @@ void EventDialog::RefreshList() {
       if (it->score)
         AppendString(details, L"Score: " + mal::TranslateNumber(*it->score));
       if (it->status)
-        AppendString(details, it->enable_rewatching && *it->enable_rewatching != TRUE ? 
+        AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ? 
           L"Status: " + mal::TranslateMyStatus(*it->status, false) : L"Re-watching");
       if (it->tags)
         AppendString(details, L"Tags: \"" + *it->tags + L"\"");

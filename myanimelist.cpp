@@ -72,7 +72,7 @@ bool GetList(bool login) {
   return MainClient.Connect(L"myanimelist.net", 
     L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all", 
     L"", L"GET", L"Accept-Encoding: gzip", L"",
-    Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L".xml",
+    Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml",
     login ? HTTP_MAL_RefreshAndLogin : HTTP_MAL_RefreshList);
 }
 

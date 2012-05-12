@@ -163,7 +163,7 @@ int Item::GetMyScore(bool check_events) const {
 }
 
 int Item::GetMyStatus(bool check_events) const {
-  if (!IsInList()) return mal::MYSTATUS_NOTINLIST;
+  if (!my_info_.get()) return mal::MYSTATUS_NOTINLIST;
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_STATUS) : nullptr;
   return event_item ? *event_item->status : my_info_->status;
@@ -559,7 +559,7 @@ void Item::AddtoUserList() {
 }
 
 bool Item::IsInList() const {
-  return my_info_.get() && my_info_->status != mal::MYSTATUS_NOTINLIST;
+  return my_info_.get() && GetMyStatus() != mal::MYSTATUS_NOTINLIST;
 }
 
 void Item::RemoveFromUserList() {

@@ -500,7 +500,6 @@ void SeasonDialog::RefreshData(bool connect, int anime_id) {
   }
 
   if (connect) {
-    SeasonDatabase.last_modified = time(nullptr);
     RefreshStatus();
   }
 
@@ -611,16 +610,26 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 }
 
 void SeasonDialog::RefreshStatus() {
-  // Set status
-  if (!SeasonDatabase.last_modified) {
+  time_t last_modified = 0;
+
+  for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
+    auto anime_item = AnimeDatabase.FindItem(*id);
+    if (anime_item) {
+      if (id == SeasonDatabase.items.begin() || 
+          anime_item->last_modified < last_modified)
+        last_modified = anime_item->last_modified;
+    }
+  }
+  
+  if (!last_modified) {
     statusbar_.SetText(L"");
   } else {
     time_t time_now = time(nullptr);
-    time_t time_last = SeasonDatabase.last_modified;
-    if (time_now == time_last) {
+    if (time_now == last_modified) {
       statusbar_.SetText(L"  Last updated: Now");
     } else {
-      statusbar_.SetText(L"  Last updated: " + ToDateString(time_now - time_last) + L" ago");
+      statusbar_.SetText(L"  Last updated: " + 
+        ToDateString(time_now - last_modified) + L" ago");
     }
   }
 }

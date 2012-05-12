@@ -23,6 +23,8 @@
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
+#define WM_TAIGA_SHOWMENU WM_USER + 1337
+
 enum SearchMode {
   SEARCH_MODE_MAL,
   SEARCH_MODE_TORRENT,
@@ -66,6 +68,16 @@ public:
 private:
   void CreateDialogControls();
   void InitWindowPosition();
+
+  class ToolbarWithMenu {
+  public:
+    ToolbarWithMenu() : button_index(-1), hook(nullptr), toolbar(nullptr) {}
+    static LRESULT CALLBACK HookProc(int code, WPARAM wParam, LPARAM lParam);
+    void ShowMenu();
+    int button_index;
+    HHOOK hook;
+    win32::Toolbar* toolbar;
+  } toolbar_wm;
 
 public:
   // Tree-view control
