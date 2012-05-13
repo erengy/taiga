@@ -52,8 +52,22 @@ int Toolbar::GetHeight() {
   return rect.bottom;
 }
 
+BOOL Toolbar::GetButton(int nIndex, TBBUTTON& tbb) {
+  return ::SendMessage(m_hWindow, TB_GETBUTTON, nIndex, reinterpret_cast<LPARAM>(&tbb)); 
+}
+
+int Toolbar::GetButtonCount() {
+  return ::SendMessage(m_hWindow, TB_BUTTONCOUNT, 0, 0);
+}
+
 DWORD Toolbar::GetButtonSize() {
   return ::SendMessage(m_hWindow, TB_GETBUTTONSIZE, 0, 0);
+}
+
+DWORD Toolbar::GetButtonStyle(int nIndex) {
+  TBBUTTON tbb = {0};
+  ::SendMessage(m_hWindow, TB_GETBUTTON, nIndex, reinterpret_cast<LPARAM>(&tbb));
+  return tbb.fsStyle;
 }
 
 LPCWSTR Toolbar::GetButtonTooltip(int nIndex) {
@@ -62,6 +76,10 @@ LPCWSTR Toolbar::GetButtonTooltip(int nIndex) {
 
 DWORD Toolbar::GetPadding() {
   return ::SendMessage(m_hWindow, TB_GETPADDING, 0, 0);
+}
+
+int Toolbar::HitTest(POINT& pt) {
+  return ::SendMessage(m_hWindow, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt));
 }
 
 BOOL Toolbar::InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled, 
@@ -76,6 +94,10 @@ BOOL Toolbar::InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled
 
   m_TooltipText.push_back(lpTooltip);
   return ::SendMessage(m_hWindow, TB_INSERTBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbb));
+}
+
+BOOL Toolbar::PressButton(int idCommand, BOOL bPress) {
+  return ::SendMessage(m_hWindow, TB_PRESSBUTTON, idCommand, MAKELPARAM(bPress, 0));
 }
 
 BOOL Toolbar::SetButtonImage(int nIndex, int iImage) {

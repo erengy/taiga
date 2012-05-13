@@ -26,6 +26,8 @@
 #include "string.h"
 #include "taiga.h"
 
+#include "dlg/dlg_format.h"
+
 #define SCRIPT_FUNCTION_COUNT 17
 const wchar_t* script_functions[] = {
   L"cut", 
@@ -47,7 +49,7 @@ const wchar_t* script_functions[] = {
   L"upper"
 };
 
-#define SCRIPT_VARIABLE_COUNT 21
+#define SCRIPT_VARIABLE_COUNT 22
 const wchar_t* script_variables[] = {
   L"audio", 
   L"checksum", 
@@ -58,6 +60,7 @@ const wchar_t* script_variables[] = {
   L"group", 
   L"id", 
   L"image", 
+  L"manual", 
   L"name", 
   L"playstatus", 
   L"resolution", 
@@ -287,68 +290,63 @@ bool IsScriptVariable(const wstring& str) {
 
 // =============================================================================
 
-wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_encode) {
+wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_encode, bool is_manual, bool is_preview) {
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+  if (!anime_item && is_preview) anime_item = &PreviewAnime;
 
   #define VALIDATE(x, y) anime_item ? x : y
   #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeUrl(x)) : EscapeScriptEntities(x)
+  #define REPLACE(x, y) if (var == x) { str.replace(pos_var, var.length() + 2, y); continue; }
 
   // Prepare episode value
   wstring episode_number = ToWstr(GetEpisodeHigh(episode.number));
   TrimLeft(episode_number, L"0");
 
   // Replace variables
-  Replace(str, L"%title%", 
-    VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.title)));
-  Replace(str, L"%watched%", 
-    VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
-  Replace(str, L"%total%", 
-    VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
-  Replace(str, L"%score%", 
-    VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyScore(), L"")), L""));
-  Replace(str, L"%id%", 
-    VALIDATE(ENCODE(ToWstr(anime_item->GetId())), L""));
-  Replace(str, L"%image%", 
-    VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
-  Replace(str, L"%status%", 
-    VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));
-  Replace(str, L"%rewatching%", 
-    VALIDATE(ENCODE(ToWstr(anime_item->GetMyRewatching())), L""));
-  Replace(str, L"%name%", 
-    ENCODE(episode.name));
-  Replace(str, L"%episode%", 
-    ENCODE(episode_number));
-  Replace(str, L"%version%", 
-    ENCODE(episode.version));
-  Replace(str, L"%group%", 
-    ENCODE(episode.group));
-  Replace(str, L"%resolution%", 
-    ENCODE(episode.resolution));
-  Replace(str, L"%video%", 
-    ENCODE(episode.video_type));
-  Replace(str, L"%audio%", 
-    ENCODE(episode.audio_type));
-  Replace(str, L"%checksum%", 
-    ENCODE(episode.checksum));
-  Replace(str, L"%extra%", 
-    ENCODE(episode.extras));
-  Replace(str, L"%file%", 
-    ENCODE(episode.file));
-  Replace(str, L"%folder%", 
-    ENCODE(episode.folder));
-  Replace(str, L"%user%", 
-    ENCODE(Settings.Account.MAL.user));
-  switch (Taiga.play_status) {
-    case PLAYSTATUS_STOPPED:
-      Replace(str, L"%playstatus%", L"stopped");
-      break;
-    case PLAYSTATUS_PLAYING:
-      Replace(str, L"%playstatus%", L"playing");
-      break;
-    case PLAYSTATUS_UPDATED:
-      Replace(str, L"%playstatus%", L"updated");
-      break;
-  }
+  int pos_var = 0;
+  do {
+    pos_var = InStr(str, L"%", pos_var);
+    if (pos_var > -1) {
+      int pos_end = InStr(str, L"%", pos_var + 1);
+      if (pos_end > -1) {
+        wstring var = str.substr(pos_var + 1, pos_end - pos_var - 1);
+        if (IsScriptVariable(var)) {
+          REPLACE(L"title", VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.title)));
+          REPLACE(L"watched", VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
+          REPLACE(L"total", VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
+          REPLACE(L"score", VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyScore(), L"")), L""));
+          REPLACE(L"id", VALIDATE(ENCODE(ToWstr(anime_item->GetId())), L""));
+          REPLACE(L"image", VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
+          REPLACE(L"status", VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));
+          REPLACE(L"rewatching", VALIDATE(ENCODE(ToWstr(anime_item->GetMyRewatching())), L""));
+          REPLACE(L"name", ENCODE(episode.name));
+          REPLACE(L"episode", ENCODE(episode_number));
+          REPLACE(L"version", ENCODE(episode.version));
+          REPLACE(L"group", ENCODE(episode.group));
+          REPLACE(L"resolution", ENCODE(episode.resolution));
+          REPLACE(L"video", ENCODE(episode.video_type));
+          REPLACE(L"audio", ENCODE(episode.audio_type));
+          REPLACE(L"checksum", ENCODE(episode.checksum));
+          REPLACE(L"extra", ENCODE(episode.extras));
+          REPLACE(L"file", ENCODE(episode.file));
+          REPLACE(L"folder", ENCODE(episode.folder));
+          REPLACE(L"user", ENCODE(Settings.Account.MAL.user));
+          REPLACE(L"manual", is_manual ? L"true" : L"");
+          switch (Taiga.play_status) {
+            case PLAYSTATUS_STOPPED: REPLACE(L"playstatus", L"stopped"); break;
+            case PLAYSTATUS_PLAYING: REPLACE(L"playstatus", L"playing"); break;
+            case PLAYSTATUS_UPDATED: REPLACE(L"playstatus", L"updated"); break;
+          }
+        } else {
+          pos_var = pos_end + 1;
+        }
+      } else {
+        pos_var++;
+      }
+    }
+  } while (pos_var > -1);
+
+  #undef REPLACE
   #undef ENCODE
   #undef VALIDATE
 
@@ -413,10 +411,10 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
   return str;
 }
 
-wstring EscapeScriptEntities(wstring str) {
+wstring EscapeScriptEntities(const wstring& str) {
   wstring escaped;
   size_t entity_pos;
-  for (size_t pos = 0; pos <= str.length();) {
+  for (size_t pos = 0; pos <= str.length(); ) {
     entity_pos = InStrChars(str, L"$,()%\\", pos);
     if (entity_pos != -1) {
       escaped.append(str, pos, entity_pos - pos);
@@ -431,10 +429,10 @@ wstring EscapeScriptEntities(wstring str) {
   return escaped;
 }
 
-wstring UnescapeScriptEntities(wstring str) {
+wstring UnescapeScriptEntities(const wstring& str) {
   wstring unescaped;
   size_t entity_pos;
-  for (size_t pos = 0; pos <= str.length();) {
+  for (size_t pos = 0; pos <= str.length(); ) {
     entity_pos = InStr(str, L"\\", pos);
     if (entity_pos == -1) entity_pos = str.length();
     unescaped.append(str, pos, entity_pos - pos);

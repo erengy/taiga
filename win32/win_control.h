@@ -317,12 +317,17 @@ public:
 
   BOOL    EnableButton(int nIndex, bool bEnabled);
   int     GetHeight();
+  BOOL    GetButton(int nIndex, TBBUTTON& tbb);
+  int     GetButtonCount();
   DWORD   GetButtonSize();
+  DWORD   GetButtonStyle(int nIndex);
   LPCWSTR GetButtonTooltip(int nIndex);
   DWORD   GetPadding();
+  int     HitTest(POINT& pt);
   BOOL    InsertButton(int iIndex, int iBitmap, int idCommand, 
                        bool bEnabled, BYTE fsStyle, DWORD_PTR dwData, 
                        LPCWSTR lpText, LPCWSTR lpTooltip);
+  BOOL    PressButton(int idCommand, BOOL bPress);
   BOOL    SetButtonImage(int nIndex, int iImage);
   BOOL    SetButtonText(int nIndex, LPCWSTR lpText);
   BOOL    SetButtonTooltip(int nIndex, LPCWSTR lpTooltip);

@@ -253,13 +253,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     MainDialog.search_bar.filter_list = !MainDialog.search_bar.filter_list;
     if (!MainDialog.search_bar.filter_list) {
       AnimeFilters.text.clear();
-      MainDialog.RefreshList();
     } else {
       MainDialog.edit.GetText(AnimeFilters.text);
-      if (!AnimeFilters.text.empty()) {
-        MainDialog.RefreshList(0);
-      }
     }
+    MainDialog.RefreshList();
+    MainDialog.RefreshTabs();
 
   // Settings()
   //   Shows settings window.

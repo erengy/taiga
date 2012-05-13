@@ -22,12 +22,15 @@
 
 #include "../anime_db.h"
 #include "../common.h"
+#include "../myanimelist.h"
+#include "../recognition.h"
 #include "../resource.h"
 #include "../settings.h"
 #include "../string.h"
 #include "../theme.h"
 
-anime::Episode Example;
+anime::Episode PreviewEpisode;
+anime::Item PreviewAnime;
 class FormatDialog FormatDialog;
 vector<wstring> functions, keywords;
 
@@ -44,24 +47,32 @@ BOOL FormatDialog::OnInitDialog() {
   rich_edit_.Attach(GetDlgItem(IDC_RICHEDIT_FORMAT));
   rich_edit_.SetEventMask(ENM_CHANGE);
 
-  // Create temporary episode
+  // Create preview episode
   if (CurrentEpisode.anime_id > 0) {
-    Example = CurrentEpisode;
+    PreviewEpisode = CurrentEpisode;
   } else {
-    Example.anime_id   = -4224;
-    Example.audio_type = L"AAC";
-    Example.checksum   = L"ABCD1234";
-    Example.extras     = L"DVD";
-    Example.file       = L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv";
-    Example.folder     = L"D:\\Anime\\";
-    Example.format     = L"MKV";
-    Example.group      = L"TaigaSubs";
-    Example.name       = L"Tiger and Dragon";
-    Example.number     = L"01";
-    Example.resolution = L"1280x720";
-    Example.title      = L"Toradora!";
-    Example.version    = L"2";
-    Example.video_type = L"H264";
+    PreviewEpisode.anime_id = -4224;
+    PreviewEpisode.folder = L"D:\\Anime\\";
+    PreviewEpisode.file = L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv";
+    Meow.ExamineTitle(PreviewEpisode.file, PreviewEpisode);
+  }
+  // Create preview anime
+  if (!PreviewAnime.GetId()) {
+    PreviewAnime.SetId(-4224);
+    PreviewAnime.SetTitle(L"Toradora!");
+    PreviewAnime.SetSynonyms(L"Tiger X Dragon");
+    PreviewAnime.SetType(mal::TYPE_TV);
+    PreviewAnime.SetEpisodeCount(25);
+    PreviewAnime.SetAiringStatus(mal::STATUS_FINISHED);
+    PreviewAnime.SetDate(anime::DATE_START, Date(2008, 10, 01));
+    PreviewAnime.SetDate(anime::DATE_END, Date(2009, 03, 25));
+    PreviewAnime.SetImageUrl(L"http://cdn.myanimelist.net/images/anime/5/22125.jpg");
+    PreviewAnime.SetEpisodeCount(26);
+    PreviewAnime.AddtoUserList();
+    PreviewAnime.SetMyLastWatchedEpisode(25);
+    PreviewAnime.SetMyScore(10);
+    PreviewAnime.SetMyStatus(mal::MYSTATUS_COMPLETED);
+    PreviewAnime.SetMyTags(L"comedy, romance, drama");
   }
 
   // Set text
@@ -211,7 +222,7 @@ void FormatDialog::RefreshPreviewText() {
   // Replace variables
   wstring str;
   GetDlgItemText(IDC_RICHEDIT_FORMAT, str);
-  str = ReplaceVariables(str, Example);
+  str = ReplaceVariables(str, PreviewEpisode, false, false, true);
   
   switch (mode) {
     case FORMAT_MODE_MIRC: {

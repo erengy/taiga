@@ -74,7 +74,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     if (Settings.Announce.HTTP.enabled || force) {
       debug::Print(L"ANNOUNCE_TO_HTTP\n");
       ToHttp(Settings.Announce.HTTP.url, 
-        ReplaceVariables(Settings.Announce.HTTP.format, *episode, true));
+        ReplaceVariables(Settings.Announce.HTTP.format, *episode, true, force));
     }
   }
 
@@ -87,7 +87,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     if (Settings.Announce.MSN.enabled || force) {
       debug::Print(L"ANNOUNCE_TO_MESSENGER\n");
       ToMessenger(L"Taiga", L"MyAnimeList", 
-        ReplaceVariables(Settings.Announce.MSN.format, *episode), true);
+        ReplaceVariables(Settings.Announce.MSN.format, *episode, false, force), true);
     }
   }
 
@@ -96,7 +96,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
       debug::Print(L"ANNOUNCE_TO_MIRC\n");
       ToMirc(Settings.Announce.MIRC.service, 
         Settings.Announce.MIRC.channels, 
-        ReplaceVariables(Settings.Announce.MIRC.format, *episode), 
+        ReplaceVariables(Settings.Announce.MIRC.format, *episode, false, force), 
         Settings.Announce.MIRC.mode, 
         Settings.Announce.MIRC.use_action, 
         Settings.Announce.MIRC.multi_server);
@@ -106,14 +106,14 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (modes & ANNOUNCE_TO_SKYPE) {
     if (Settings.Announce.Skype.enabled || force) {
       debug::Print(L"ANNOUNCE_TO_SKYPE\n");
-      ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode));
+      ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode, false, force));
     }
   }
 
   if (modes & ANNOUNCE_TO_TWITTER) {
     if (Settings.Announce.Twitter.enabled || force) {
       debug::Print(L"ANNOUNCE_TO_TWITTER\n");
-      ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode));
+      ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode, false, force));
     }
   }
 }

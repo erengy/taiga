@@ -20,6 +20,7 @@
 #define DLG_FORMAT_H
 
 #include "../std.h"
+#include "../anime_item.h"
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
@@ -55,5 +56,6 @@ private:
 };
 
 extern class FormatDialog FormatDialog;
+extern anime::Item PreviewAnime;
 
 #endif // DLG_FORMAT_H

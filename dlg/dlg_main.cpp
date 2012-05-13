@@ -839,16 +839,17 @@ void MainDialog::RefreshList(int index) {
     title += L" Anime List";
   }
   SetText(title.c_str());
+  
+  // Remember last index
+  static int last_index = 1;
+  if (index > 0) last_index = index;
+  if (index == -1) index = last_index;
+  if (!AnimeFilters.text.empty()) index = 0;
 
   // Hide list to avoid visual defects and gain performance
   listview.Hide();
   listview.EnableGroupView(index == 0 && win32::GetWinVersion() > win32::VERSION_XP);
   listview.DeleteAllItems();
-
-  // Remember last index
-  static int last_index = 0;
-  if (index == -1) index = last_index;
-  if (index > 0) last_index = index;
 
   // Add items
   int group_index = -1, icon_index = 0, status = 0;
@@ -891,9 +892,12 @@ void MainDialog::RefreshList(int index) {
 void MainDialog::RefreshTabs(int index, bool redraw) {
   // Remember last index
   static int last_index = 1;
-  if (index == -1) index = last_index;
   if (index == 6) index--;
-  last_index = index;
+  if (index == last_index) redraw = false;
+  if (index > 0) last_index = index;
+  if (index == -1) index = last_index;
+  if (!AnimeFilters.text.empty()) index = 0;
+  
   if (!redraw) return;
   
   // Hide

@@ -546,7 +546,8 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
       if (search_bar.filter_list) {
         AnimeFilters.text = text;
-        RefreshList(text.empty() ? -1 : 0);
+        RefreshList();
+        RefreshTabs();
         return TRUE;
       }
     }
@@ -556,35 +557,34 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, LPARAM lParam) {
-  switch (code) {
-    case MSGF_MENU: {
-      MSG* msg = reinterpret_cast<MSG*>(lParam);
+  if (code == MSGF_MENU) {
+    MSG* msg = reinterpret_cast<MSG*>(lParam);
 
-      if (msg->message == WM_MOUSEMOVE) {
+    switch (msg->message) {
+      case WM_LBUTTONDOWN:
+      case WM_RBUTTONDOWN: {
+        break;
+      }
+
+      case WM_MOUSEMOVE: {
         POINT pt = {LOWORD(msg->lParam), HIWORD(msg->lParam)};
         ScreenToClient(::MainDialog.toolbar_wm.toolbar->GetWindowHandle(), &pt);
 
-        int button_index = 
-          ::MainDialog.toolbar_wm.toolbar->SendMessage(TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt));
-        int button_count = 
-          ::MainDialog.toolbar_wm.toolbar->SendMessage(TB_BUTTONCOUNT);
-
+        int button_index = ::MainDialog.toolbar_wm.toolbar->HitTest(pt);
+        int button_count = ::MainDialog.toolbar_wm.toolbar->GetButtonCount();
+        DWORD button_style = ::MainDialog.toolbar_wm.toolbar->GetButtonStyle(button_index);
+        
         if (button_index > -1 && 
             button_index < button_count && 
             button_index != ::MainDialog.toolbar_wm.button_index) {
-          TBBUTTON tbb = {0};
-          ::MainDialog.toolbar_wm.toolbar->SendMessage(
-            TB_GETBUTTON, button_index, reinterpret_cast<LPARAM>(&tbb));
-
-          if (tbb.fsStyle & BTNS_DROPDOWN || tbb.fsStyle & BTNS_WHOLEDROPDOWN) {
+          if (button_style & BTNS_DROPDOWN || button_style & BTNS_WHOLEDROPDOWN) {
             ::MainDialog.toolbar_wm.toolbar->SendMessage(TB_SETHOTITEM, button_index, 0);
-            ::MainDialog.SendMessage(WM_CANCELMODE);
-            ::MainDialog.PostMessage(WM_TAIGA_SHOWMENU);
             return 0L;
           }
         }
+
+        break;
       }
-      break;
     }
   }
   
@@ -629,7 +629,13 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
     // Hot-tracking
     case TBN_HOTITEMCHANGE: {
       LPNMTBHOTITEM lpnmhi = reinterpret_cast<LPNMTBHOTITEM>(lParam);
-      debug::Print(L"Old: " + ToWstr(lpnmhi->idOld) + L" | New: " + ToWstr(lpnmhi->idNew) + L"\n");
+      if (toolbar_wm.hook && lpnmhi->idNew > 0) {
+        debug::Print(L"Old: " + ToWstr(lpnmhi->idOld) + L" | New: " + ToWstr(lpnmhi->idNew) + L"\n");
+        toolbar_wm.toolbar->PressButton(lpnmhi->idOld, FALSE);
+        toolbar_wm.toolbar->SendMessage(lpnmhi->idNew, TRUE);
+        SendMessage(WM_CANCELMODE);
+        PostMessage(WM_TAIGA_SHOWMENU);
+      }
       break;
     }
   }
@@ -640,8 +646,9 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
 void MainDialog::ToolbarWithMenu::ShowMenu() {
   button_index = toolbar->SendMessage(TB_GETHOTITEM);
 
-  TBBUTTON tbb = {0};
-  toolbar->SendMessage(TB_GETBUTTON, button_index, reinterpret_cast<LPARAM>(&tbb));
+  TBBUTTON tbb;
+  toolbar->GetButton(button_index, tbb);
+  toolbar->PressButton(tbb.idCommand, TRUE);
   
   // Calculate point
   RECT rect;
@@ -650,61 +657,35 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   ClientToScreen(toolbar->GetWindowHandle(), &pt);
 
   // Hook
-  if (hook) {
-    UnhookWindowsHookEx(hook);
-  }
+  if (hook) UnhookWindowsHookEx(hook);
   hook = SetWindowsHookEx(WH_MSGFILTER, &HookProc, NULL, GetCurrentThreadId());
-  if (!hook) {
-    DWORD dwError = ::GetLastError();
-    debug::Print(L"Error #" + ToWstr(dwError) + L"\n");
-  } else {
-    debug::Print(L"Hook initiated.\n");
-  }
 
   // Display menu
   wstring action;
   HWND hwnd = ::MainDialog.GetWindowHandle();
+  #define SHOWUIMENU(id, name) \
+    case id: action = UI.Menus.Show(hwnd, pt.x, pt.y, name); break;
   switch (tbb.idCommand) {
-    // File
-    case 100:
-      action = UI.Menus.Show(hwnd, pt.x, pt.y, L"File");
-      break;
-    // Account
-    case 101:
-      action = UI.Menus.Show(hwnd, pt.x, pt.y, L"Account");
-      break;
-    // List
-    case 102:
-      action = UI.Menus.Show(hwnd, pt.x, pt.y, L"List");
-      break;
-    // Help
-    case 103:
-      action = UI.Menus.Show(hwnd, pt.x, pt.y, L"Help");
-      break;
-    // Folders
-    case 204:
-      action = UI.Menus.Show(hwnd, pt.x, pt.y, L"Folders");
-      break;
-    // Tools
-    case 206:
-      action = UI.Menus.Show(hwnd, pt.x, pt.y, L"Tools");
-      break;
-    // Search
-    case 300:
-      action = UI.Menus.Show(hwnd, pt.x, pt.y, L"SearchBar");
-      break;
+    SHOWUIMENU(100, L"File");
+    SHOWUIMENU(101, L"Account");
+    SHOWUIMENU(102, L"List");
+    SHOWUIMENU(103, L"Help");
+    SHOWUIMENU(204, L"Folders");
+    SHOWUIMENU(206, L"Tools");
+    SHOWUIMENU(300, L"SearchBar");
   }
-
-  //
-  if (!action.empty()) {
-    ExecuteAction(action);
-    UpdateAllMenus(AnimeDatabase.GetCurrentItem());
-  }
+  #undef SHOWUIMENU
 
   // Unhook
   if (hook) {
     UnhookWindowsHookEx(hook);
     hook = nullptr;
-    debug::Print(L"Unhook succeeded.\n");
+  }
+
+  toolbar->PressButton(tbb.idCommand, FALSE);
+
+  if (!action.empty()) {
+    ExecuteAction(action);
+    UpdateAllMenus(AnimeDatabase.GetCurrentItem());
   }
 }

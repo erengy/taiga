@@ -103,9 +103,10 @@ void UpdateTrayMenu();
 wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
 bool IsScriptFunction(const wstring& str);
 bool IsScriptVariable(const wstring& str);
-wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_encode = false);
-wstring EscapeScriptEntities(wstring str);
-wstring UnescapeScriptEntities(wstring str);
+wstring ReplaceVariables(wstring str, const anime::Episode& episode, 
+  bool url_encode = false, bool is_manual = false, bool is_preview = false);
+wstring EscapeScriptEntities(const wstring& str);
+wstring UnescapeScriptEntities(const wstring& str);
 
 // search.cpp
 wstring SearchFileFolder(anime::Item& anime_item, wstring root, int episode_number, bool search_folder);
