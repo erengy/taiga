@@ -336,6 +336,9 @@
     <ClCompile Include="anime_item.cpp">
       <Filter>Anime</Filter>
     </ClCompile>
+    <ClCompile Include="api.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -564,6 +567,9 @@
       <Filter>Anime</Filter>
     </ClInclude>
     <ClInclude Include="optional.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

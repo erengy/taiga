@@ -93,6 +93,7 @@
     <ClCompile Include="anime_filter.cpp" />
     <ClCompile Include="anime_user.cpp" />
     <ClCompile Include="announce.cpp" />
+    <ClCompile Include="api.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="dde.cpp" />
     <ClCompile Include="debug.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="anime_filter.h" />
     <ClInclude Include="anime_user.h" />
     <ClInclude Include="announce.h" />
+    <ClInclude Include="api.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="dde.h" />
     <ClInclude Include="debug.h" />
