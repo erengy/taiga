@@ -35,10 +35,6 @@ Api::Api() {
   wm_detach = ::RegisterWindowMessage(L"TaigaApiDetach");
   wm_ready = ::RegisterWindowMessage(L"TaigaApiReady");
   wm_quit = ::RegisterWindowMessage(L"TaigaApiQuit");
-
-  // Create API window
-  window.Create();
-  TaigaApi.BroadcastMessage(TaigaApi.wm_ready);
 }
 
 Api::~Api() {
@@ -77,6 +73,12 @@ void Api::BroadcastMessage(UINT message) {
   SendMessageTimeout(HWND_BROADCAST, message, 
                      reinterpret_cast<WPARAM>(window.GetWindowHandle()), 
                      0, SMTO_NORMAL, 1000, result);
+}
+
+void Api::Create() {
+  // Create API window
+  window.Create();
+  TaigaApi.BroadcastMessage(TaigaApi.wm_ready);
 }
 
 // =============================================================================
@@ -119,8 +121,8 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     string format = reinterpret_cast<char*>(cds->lpData);
     TaigaApi.handles[hwnd_app] = ToUTF8(format);
     debug::Print(L"API - New format for " + 
-      ToWstr(reinterpret_cast<int>(hwnd_app)) + L":" + 
-      TaigaApi.handles[hwnd_app] + L"\n");
+      ToWstr(reinterpret_cast<int>(hwnd_app)) + L": \"" + 
+      TaigaApi.handles[hwnd_app] + L"\"\n");
     return TRUE;
   }
   

@@ -20,7 +20,8 @@
 #define TAIGA_API_H
 
 #include "std.h"
-#include "win32/win_main.h"
+
+#include "win32/win_window.h"
 
 namespace anime {
 class Episode;
@@ -33,6 +34,7 @@ public:
 
   void Announce(anime::Episode& episode);
   void BroadcastMessage(UINT message);
+  void Create();
 
 private:
   std::map<HWND, wstring> handles;

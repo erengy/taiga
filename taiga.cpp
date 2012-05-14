@@ -21,6 +21,7 @@
 #include "taiga.h"
 
 #include "anime_db.h"
+#include "api.h"
 #include "common.h"
 #include "gfx.h"
 #include "media.h"
@@ -73,6 +74,9 @@ BOOL Taiga::InitInstance() {
 
   // Load data
   LoadData();
+
+  // Create API window
+  TaigaApi.Create();
   
   if (Settings.Program.StartUp.check_new_version) {
     // Create update dialog

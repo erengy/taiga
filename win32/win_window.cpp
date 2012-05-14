@@ -22,7 +22,7 @@
 
 namespace win32 {
 
-static LPCWSTR PROP_CWINDOW = L"PROP_CWINDOW";
+Window* m_CurrentWindow;
 
 // =============================================================================
 
@@ -31,6 +31,8 @@ Window::Window() :
   m_hMenu(NULL), m_hParent(NULL), m_hWindow(NULL), 
   m_hInstance(::GetModuleHandle(NULL))
 {
+  m_CurrentWindow = NULL;
+
   ::ZeroMemory(&m_CreateStruct, sizeof(CREATESTRUCT));
   ::ZeroMemory(&m_WndClass, sizeof(WNDCLASSEX));
 
@@ -53,6 +55,7 @@ Window::Window(HWND hWnd) :
   m_hMenu(NULL), m_hParent(NULL), m_hWindow(NULL), 
   m_hInstance(::GetModuleHandle(NULL))
 {
+  m_CurrentWindow = NULL;
   m_hWindow = hWnd;
 }
 
@@ -101,6 +104,8 @@ HWND Window::Create(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, 
                      HWND hWndParent, HMENU hMenu, LPVOID lpParam) {
   Destroy();
   
+  m_CurrentWindow = this;
+  
   m_hMenu = hMenu;
   m_hParent = hWndParent;
   m_hWindow = ::CreateWindowEx(dwExStyle, lpClassName, lpWindowName, dwStyle, 
@@ -113,6 +118,8 @@ HWND Window::Create(DWORD dwExStyle, LPCWSTR lpClassName, LPCWSTR lpWindowName, 
     Subclass(m_hWindow);
     OnCreate(m_hWindow, &m_CreateStruct);
   }
+
+  m_CurrentWindow = NULL;
 
   return m_hWindow;
 }
@@ -499,7 +506,6 @@ void Window::Subclass(HWND hWnd) {
   if (current_proc != reinterpret_cast<WNDPROC>(WindowProcStatic)) {
     m_PrevWindowProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(hWnd, GWLP_WNDPROC, 
       reinterpret_cast<LONG_PTR>(WindowProcStatic)));
-    ::SetProp(hWnd, PROP_CWINDOW, this);
     m_hWindow = hWnd;
   }
 }
@@ -508,7 +514,6 @@ void Window::UnSubclass() {
   WNDPROC current_proc = reinterpret_cast<WNDPROC>(::GetWindowLongPtr(m_hWindow, GWLP_WNDPROC));
   if (current_proc == reinterpret_cast<WNDPROC>(WindowProcStatic)) {
     ::SetWindowLongPtr(m_hWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(m_PrevWindowProc));
-    ::RemoveProp(m_hWindow, PROP_CWINDOW);
     m_PrevWindowProc = NULL;
   }
 }
@@ -516,7 +521,7 @@ void Window::UnSubclass() {
 LRESULT CALLBACK Window::WindowProcStatic(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   Window* window = WindowMap.GetWindow(hwnd);
   if (!window) {
-    window = reinterpret_cast<Window*>(::GetProp(hwnd, PROP_CWINDOW));
+    window = m_CurrentWindow;
     if (window) {
       window->SetWindowHandle(hwnd);
       WindowMap.Add(hwnd, window);

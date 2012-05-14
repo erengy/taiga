@@ -27,13 +27,13 @@
 #include <string>
 #include <vector>
 
-#include "win_window.h"
-
 using std::string;
 using std::vector;
 using std::wstring;
 
 namespace win32 {
+
+class Window;
 
 // =============================================================================
 

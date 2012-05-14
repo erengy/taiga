@@ -119,7 +119,7 @@ HANDLE Mutex::Open(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCTSTR lpName) {
 bool Mutex::Release() {
   BOOL value = TRUE;
   if (m_hMutex) {
-    BOOL value = ::ReleaseMutex(m_hMutex);
+    value = ::ReleaseMutex(m_hMutex);
     m_hMutex = NULL;
   }
   return value != FALSE;

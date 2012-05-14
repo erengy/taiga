@@ -20,6 +20,7 @@
 #define WIN_DIALOG_H
 
 #include "win_main.h"
+#include "win_window.h"
 
 namespace win32 {
 
