@@ -28,19 +28,28 @@
 
 #include "dlg/dlg_format.h"
 
-#define SCRIPT_FUNCTION_COUNT 17
+// The idea behind Taiga's script functions is borrowed from Mp3tag, which
+// itself got it from foobar2000. See the following links for more information:
+// * http://wiki.hydrogenaudio.org/index.php?title=Foobar2000:Title_Formatting_Reference
+// * http://help.mp3tag.de/main_scripting.html
+
+#define SCRIPT_FUNCTION_COUNT 21
 const wchar_t* script_functions[] = {
+  L"and", 
   L"cut", 
   L"equal", 
   L"gequal", 
   L"greater", 
   L"if", 
+  L"if2", 
   L"ifequal", 
   L"lequal", 
   L"len", 
   L"less", 
   L"lower", 
+  L"not", 
   L"num", 
+  L"or", 
   L"pad", 
   L"replace", 
   L"substr", 
@@ -96,9 +105,33 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
   // All functions should have parameters
   if (body_parts.empty()) return L"";
   
+  // $and(x,y)
+  //   Returns true, if all arguments evaluate to true.
+  if (func_name == L"and") {
+    for (size_t i = 0; i < body_parts.size(); i++) {
+      if (body_parts[i].empty()) {
+        return L"";
+      }
+    }
+    return L"true";
+  // $not(x)
+  //   Returns true, if x is false.
+  } else if (func_name == L"not") {
+    if (body_parts.empty() || body_parts[0].empty()) {
+      return L"true";
+    }
+  // $or(x,y)
+  //   Returns true, if at least one argument evaluates to true.
+  } else if (func_name == L"or") {
+    for (size_t i = 0; i < body_parts.size(); i++) {
+      if (!body_parts[i].empty()) {
+        return L"true";
+      }
+    }
+  
   // $cut(string,len)
-  //   Returns first len characters of string. 
-  if (func_name == L"cut") {
+  //   Returns first len characters of string.
+  } else if (func_name == L"cut") {
     if (body_parts.size() > 1) {
       int length = ToInt(body_parts[1]);
       if (length >= 0 && length < static_cast<int>(body_parts[0].length())) {
@@ -174,7 +207,11 @@ wstring EvaluateFunction(const wstring& func_name, const wstring& func_body) {
         str = !body_parts[0].empty() ? body_parts[1] : body_parts[2];
         break;
     }
-  
+  // $if2(a,else)
+  } else if (func_name == L"if2") {
+    if (body_parts.size() > 1) {
+      str = !body_parts[0].empty() ? body_parts[0] : body_parts[1];
+    }
   // $ifequal()
   } else if (func_name == L"ifequal") {
     switch (body_parts.size()) {

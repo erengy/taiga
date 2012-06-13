@@ -241,12 +241,13 @@ void Database::ClearUserData() {
   user.Clear();
 }
 
-bool Database::LoadList() {
+bool Database::LoadList(bool set_last_modified) {
   // Initialize
   ClearUserData();
   if (Settings.Account.MAL.user.empty()) return false;
   wstring file = Taiga.GetDataPath() + 
     L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+  time_t last_modified = set_last_modified ? time(nullptr) : 0;
   
   // Load XML file
   xml_document doc;
@@ -289,6 +290,7 @@ bool Database::LoadList() {
     anime_item.SetDate(DATE_START, XML_ReadStrValue(node, L"series_start"));
     anime_item.SetDate(DATE_END, XML_ReadStrValue(node, L"series_end"));
     anime_item.SetImageUrl(XML_ReadStrValue(node, L"series_image"));
+    anime_item.last_modified = last_modified;
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XML_ReadIntValue(node, L"my_watched_episodes"));
     anime_item.SetMyDate(DATE_START, XML_ReadStrValue(node, L"my_start_date"));

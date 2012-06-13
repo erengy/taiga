@@ -61,7 +61,7 @@
 			<item name="Play random anime" action="PlayRandomAnime()"/>
 			<item name="Show statistics" action="ShowListStats()"/>
 			<item type="separator"/>
-			<item name="Filter" sub="Filter"/>
+			<item name="Filters" sub="Filters"/>
 		</menu>
 			<!-- Announce -->
 			<menu name="Announce">
@@ -72,7 +72,7 @@
 				<item name="Twitter"   action="AnnounceToTwitter(true)"/>
 			</menu>
 			<!-- Filter -->
-			<menu name="Filter">
+			<menu name="Filters">
 				<item name="Status" sub="FilterStatus"/>
 				<item name="Type"   sub="FilterType"/>
 				<item type="separator"/>
@@ -323,22 +323,26 @@
 						<item name="15 - Light grey"  action="&#3;15"/>
 					</menu>
 			<menu name="ScriptAddFunction">
+				<item name="and()"     action="$and(x,y)"/>
 				<item name="cut()"     action="$cut(string,len)"/>
 				<item name="equal()"   action="$equal(x,y)"/>
 				<item name="gequal()"  action="$gequal(x,y)"/>
 				<item name="greater()" action="$greater(x,y)"/>
 				<item name="if()"      action="$if(cond,then,else)"/>
+				<item name="if2()"     action="$if(a,else)"/>
 				<item name="ifequal()" action="$ifequal(n1,n2,then,else)"/>
 				<item name="lequal()"  action="$lequal(x,y)"/>
 				<item name="len()"     action="$len(string)"/>
 				<item name="less()"    action="$less(x,y)"/>
 				<item name="lower()"   action="$lower(string)"/>
+				<item name="not()"     action="$not(x)"/>
 				<item name="num()"     action="$num(n,len)"/>
-				<item name="pad()"     action="pad$(s,len,chars)"/>
-				<item name="replace()" action="replace$(a,b,c)"/>
-				<item name="substr()"  action="substr$(s,pos,n)"/>
-				<item name="triml()"   action="triml$(s,c)"/>
-				<item name="trimr()"   action="trimr$(s,c)"/>
+				<item name="or()"      action="$or(x,y)"/>
+				<item name="pad()"     action="$pad(s,len,chars)"/>
+				<item name="replace()" action="$replace(a,b,c)"/>
+				<item name="substr()"  action="$substr(s,pos,n)"/>
+				<item name="triml()"   action="$triml(s,c)"/>
+				<item name="trimr()"   action="$trimr(s,c)"/>
 				<item name="upper()"   action="$upper(string)"/>
 			</menu>
 			<menu name="ScriptAddVariable">

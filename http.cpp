@@ -249,7 +249,7 @@ BOOL HttpClient::OnReadComplete() {
     // List
     case HTTP_MAL_RefreshList:
     case HTTP_MAL_RefreshAndLogin: {
-      AnimeDatabase.LoadList();
+      AnimeDatabase.LoadList(true); // Here we assume that MAL provides up-to-date series information in malappinfo.php
       MainDialog.ChangeStatus(L"List download completed.");
       MainDialog.RefreshList(mal::MYSTATUS_WATCHING);
       MainDialog.RefreshTabs(mal::MYSTATUS_WATCHING);

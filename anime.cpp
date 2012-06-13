@@ -207,7 +207,6 @@ void Item::AddToEventQueue(Episode episode, bool change_status) {
   // Set episode number
   event_item.episode = GetEpisodeHigh(episode.number);
   if (*event_item.episode == 0 || GetEpisodeCount() == 1) event_item.episode = 1;
-  episode.anime_id = GetId();
   
   // Set start/finish date
   if (*event_item.episode == 1 && !mal::IsValidDate(GetMyDate(DATE_START)))

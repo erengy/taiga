@@ -734,15 +734,16 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // PlayRandomAnime()
   //   Searches for a random episode of a random anime and plays it.
   } else if (action == L"PlayRandomAnime") {
+    srand(static_cast<unsigned int>(GetTickCount()));
     for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
-      srand(static_cast<unsigned int>(GetTickCount()));
-      int anime_index = rand() % AnimeDatabase.items.size() + 1;
-      anime::Item& anime_item = AnimeDatabase.items.at(anime_index);
-      int total = anime_item.GetEpisodeCount();
-      if (total == 0) total = anime_item.GetMyLastWatchedEpisode() + 1;
-      int episode_number = rand() % total + 1;
-      anime_item.CheckFolder();
-      wstring file = SearchFileFolder(anime_item, anime_item.GetFolder(), episode_number, false);
+      int max_anime_id = AnimeDatabase.items.rbegin()->first;
+      int anime_id = rand() % max_anime_id + 1;
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (!anime_item || !anime_item->IsInList()) continue;
+      int episode_count = anime_item->GetMyLastWatchedEpisode() + 1;
+      int episode_number = rand() % episode_count  + 1;
+      anime_item->CheckFolder();
+      wstring file = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode_number, false);
       if (!file.empty()) {
         Execute(file);
         break;

@@ -667,21 +667,21 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           }
         }
         // Not recognized
-#ifdef _DEBUG
-        std::multimap<int, int> scores = Meow.GetScores();
-        debug::Print(L"Not recognized: " + CurrentEpisode.title + L"\n");
-        debug::Print(L"Could be:\n");
-        for (auto it = scores.begin(); it != scores.end(); ++it) {
-          debug::Print(L"* " + AnimeDatabase.items[it->second].GetTitle() + 
-                       L" | Score: " + ToWstr(-it->first) + L"\n");
-        }
-#endif  
         CurrentEpisode.Set(anime::ID_NOTINLIST);
         if (CurrentEpisode.title.empty()) {
 #ifdef _DEBUG
           ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
 #endif
         } else if (Settings.Program.Balloon.enabled) {
+#ifdef _DEBUG
+          std::multimap<int, int> scores = Meow.GetScores();
+          debug::Print(L"Not recognized: " + CurrentEpisode.title + L"\n");
+          debug::Print(L"Could be:\n");
+          for (auto it = scores.begin(); it != scores.end(); ++it) {
+            debug::Print(L"* " + AnimeDatabase.items[it->second].GetTitle() + 
+                         L" | Score: " + ToWstr(-it->first) + L"\n");
+          }
+#endif  
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
           wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);

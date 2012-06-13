@@ -230,13 +230,14 @@ void ActivateWindow(HWND hwnd) {
 
 bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name) {
   if (CreateMutex(NULL, FALSE, mutex_name) == NULL ||
-      GetLastError() == ERROR_ALREADY_EXISTS || GetLastError() == ERROR_ACCESS_DENIED) {
-        HWND hwnd = FindWindow(class_name, NULL);
-        if (IsWindow(hwnd)) {
-          ActivateWindow(hwnd);
-          FlashWindow(hwnd, TRUE);
-        }
-        return TRUE;
+      GetLastError() == ERROR_ALREADY_EXISTS ||
+      GetLastError() == ERROR_ACCESS_DENIED) {
+    HWND hwnd = FindWindow(class_name, NULL);
+    if (IsWindow(hwnd)) {
+      ActivateWindow(hwnd);
+      FlashWindow(hwnd, TRUE);
+    }
+    return TRUE;
   }
   return FALSE;
 }
