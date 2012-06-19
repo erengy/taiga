@@ -149,14 +149,14 @@ const wstring& Item::GetSynopsis() const {
 // =============================================================================
 
 int Item::GetMyLastWatchedEpisode(bool check_events) const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return 0;
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_EPISODE) : nullptr;
   return event_item ? *event_item->episode : my_info_->watched_episodes;
 }
 
 int Item::GetMyScore(bool check_events) const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return 0;
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_SCORE) : nullptr;
   return event_item ? *event_item->score : my_info_->score;
@@ -170,19 +170,19 @@ int Item::GetMyStatus(bool check_events) const {
 }
 
 int Item::GetMyRewatching(bool check_events) const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return FALSE;
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_REWATCH) : nullptr;
   return event_item ? *event_item->enable_rewatching : my_info_->rewatching;
 }
 
 int Item::GetMyRewatchingEp() const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return 0;
   return my_info_->rewatching_ep;
 }
 
 const Date Item::GetMyDate(DateType type, bool check_events) const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return Date();
   EventItem* event_item = nullptr;
   switch (type) {
     case DATE_START:
@@ -202,12 +202,12 @@ const Date Item::GetMyDate(DateType type, bool check_events) const {
 }
 
 const wstring Item::GetMyLastUpdated() const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return wstring();
   return my_info_->last_updated;
 }
 
 const wstring Item::GetMyTags(bool check_events) const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return wstring();
   EventItem* event_item = check_events ? 
     SearchEventQueue(EVENT_SEARCH_TAGS) : nullptr;
   return event_item ? *event_item->tags : my_info_->tags;
@@ -297,26 +297,32 @@ void Item::SetSynopsis(const wstring& synopsis) {
 // =============================================================================
 
 void Item::SetMyLastWatchedEpisode(int number) {
+  assert(my_info_.get());
   my_info_->watched_episodes = number;
 }
 
 void Item::SetMyScore(int score) {
+  assert(my_info_.get());
   my_info_->score = score;
 }
 
 void Item::SetMyStatus(int status) {
+  assert(my_info_.get());
   my_info_->status = status;
 }
 
 void Item::SetMyRewatching(int rewatching) {
+  assert(my_info_.get());
   my_info_->rewatching = rewatching;
 }
 
 void Item::SetMyRewatchingEp(int rewatching_ep) {
+  assert(my_info_.get());
   my_info_->rewatching_ep = rewatching_ep;
 }
 
 void Item::SetMyDate(DateType type, const Date& date) {
+  assert(my_info_.get());
   switch (type) {
     case DATE_START:
       my_info_->date_start = date;
@@ -328,10 +334,12 @@ void Item::SetMyDate(DateType type, const Date& date) {
 }
 
 void Item::SetMyLastUpdated(const wstring& last_updated) {
+  assert(my_info_.get());
   my_info_->last_updated = last_updated;
 }
 
 void Item::SetMyTags(const wstring& tags) {
+  assert(my_info_.get());
   my_info_->tags = tags;
 }
 
@@ -383,14 +391,18 @@ bool Item::CheckEpisodes(int number, bool check_folder) {
 }
 
 int Item::GetAvailableEpisodeCount() const {
+  if (!my_info_.get()) return 0;
   return static_cast<int>(my_info_->available_episodes.size());
 }
 
 wstring Item::GetNewEpisodePath() const {
+  if (!my_info_.get()) return wstring();
   return my_info_->new_episode_path;
 }
 
 bool Item::IsEpisodeAvailable(int number) const {
+  if (!my_info_.get()) return false;
+
   if (number < 1) number = 1;
   if (static_cast<size_t>(number) > my_info_->available_episodes.size())
     return false;
@@ -441,6 +453,8 @@ bool Item::PlayEpisode(int number) {
 }
 
 bool Item::SetEpisodeAvailability(int number, bool available, const wstring& path) {
+  assert(my_info_.get());
+
   if (number == 0) number = 1;
   
   if (number <= GetEpisodeCount() || GetEpisodeCount() == 0) {
@@ -464,6 +478,7 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
 }
 
 void Item::SetNewEpisodePath(const wstring& path) {
+  assert(my_info_.get());
   my_info_->new_episode_path = path;
 }
 
@@ -492,11 +507,13 @@ bool Item::CheckFolder() {
 }
 
 const wstring& Item::GetFolder() const {
-  assert(my_info_.get());
+  if (!my_info_.get()) return wstring();
   return my_info_->folder;
 }
 
 void Item::SetFolder(const wstring& folder, bool save_settings) {
+  assert(my_info_.get());
+
   if (folder == my_info_->folder) return;
 
   my_info_->folder = folder;
@@ -510,16 +527,19 @@ void Item::SetFolder(const wstring& folder, bool save_settings) {
 // =============================================================================
 
 bool Item::GetPlaying() const {
+  if (!my_info_.get()) return false;
   return my_info_->playing;
 }
 
 void Item::SetPlaying(bool playing) {
+  assert(my_info_.get());
   my_info_->playing = playing;
 }
 
 // =============================================================================
 
 const vector<wstring>& Item::GetUserSynonyms(bool clean) const {
+  assert(my_info_.get());
   return clean ? my_info_->clean_synonyms : my_info_->synonyms;
 }
 
@@ -530,6 +550,8 @@ void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
 }
 
 void Item::SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings) {
+  assert(my_info_.get());
+
   my_info_->synonyms = synonyms;
 
   RemoveEmptyStrings(my_info_->synonyms);

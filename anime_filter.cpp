@@ -37,7 +37,7 @@ Filters::Filters()
 bool Filters::CheckItem(Item& item) {
   // Filter my status
   for (size_t i = 0; i < my_status.size(); i++)
-    if (!my_status.at(i) && item.GetMyStatus() == i + 1)
+    if (!my_status.at(i) && item.GetMyStatus() == i)
       return false;
 
   // Filter airing status
@@ -66,9 +66,10 @@ bool Filters::CheckItem(Item& item) {
       for (auto synonym = item.GetSynonyms().begin(); 
            !found && synonym != item.GetSynonyms().end(); ++synonym)
         if (InStr(*synonym, *it, 0, true) > -1) found = true;
-      for (auto synonym = item.GetUserSynonyms().begin(); 
-           !found && synonym != item.GetUserSynonyms().end(); ++synonym)
-        if (InStr(*synonym, *it, 0, true) > -1) found = true;
+      if (item.IsInList())
+        for (auto synonym = item.GetUserSynonyms().begin(); 
+             !found && synonym != item.GetUserSynonyms().end(); ++synonym)
+          if (InStr(*synonym, *it, 0, true) > -1) found = true;
       if (!found) return false;
     }
   }
@@ -82,7 +83,7 @@ void Filters::Reset() {
   status.clear();
   type.clear();
 
-  my_status.resize(6, true);
+  my_status.resize(7, true);
   status.resize(3, true);
   type.resize(6, true);
 

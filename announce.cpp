@@ -78,9 +78,8 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     }
   }
 
-  if (episode->anime_id == anime::ID_NOTINLIST || 
-      episode->anime_id <= anime::ID_UNKNOWN) {
-        return;
+  if (episode->anime_id <= anime::ID_UNKNOWN) {
+    return;
   }
 
   if (modes & ANNOUNCE_TO_MESSENGER) {

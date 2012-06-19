@@ -209,10 +209,17 @@ LRESULT MainDialog::OnListNotify(LPARAM lParam) {
     case NM_RCLICK: {
       if (pnmh->hwndFrom == listview.GetWindowHandle()) {
         if (listview.GetSelectedCount() > 0) {
-          UpdateAllMenus(AnimeDatabase.GetCurrentItem());
+          auto anime_item = AnimeDatabase.GetCurrentItem();
+          UpdateAllMenus(anime_item);
           int index = listview.HitTest(true);
-          ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, index == 2 ? L"EditScore" : L"RightClick"));
-          UpdateAllMenus(AnimeDatabase.GetCurrentItem());
+          if (anime_item->IsInList()) {
+            ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, index == 2 ? L"EditScore" : L"RightClick"));
+            UpdateAllMenus(anime_item);
+          } else {
+            UpdateSearchListMenu(true);
+            ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"SearchList"), 
+              0, static_cast<LPARAM>(anime_item->GetId()));
+          }
         }
       } else if (pnmh->hwndFrom == listview.GetHeader()) {
         HDHITTESTINFO hdhti;

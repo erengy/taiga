@@ -222,6 +222,7 @@ void MainDialog::CreateDialogControls() {
     fMask, fStyle);
 
   // Insert tabs and list groups
+  listview.InsertGroup(mal::MYSTATUS_NOTINLIST, mal::TranslateMyStatus(mal::MYSTATUS_NOTINLIST, false).c_str());
   for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
     if (i != mal::MYSTATUS_UNKNOWN) {
       tab.InsertItem(i - 1, mal::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
@@ -853,15 +854,14 @@ void MainDialog::RefreshList(int index) {
 
   // Add items
   int group_index = -1, icon_index = 0, status = 0;
-  vector<int> group_count(6);
+  vector<int> group_count(7);
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->second.IsInList()) continue;
     status = it->second.GetMyStatus();
     if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->second.GetMyRewatching())) {
       if (AnimeFilters.CheckItem(it->second)) {
         group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
         icon_index = it->second.GetPlaying() ? ICON16_PLAY : StatusToIcon(it->second.GetAiringStatus());
-        group_count.at(status - 1)++;
+        group_count.at(status)++;
         int i = listview.GetItemCount();
         listview.InsertItem(i, group_index, icon_index, 
           0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->second.GetId()));
@@ -873,10 +873,10 @@ void MainDialog::RefreshList(int index) {
   }
 
   // Set group headers
-  for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
+  for (int i = mal::MYSTATUS_NOTINLIST; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
     if (index == 0 && i != mal::MYSTATUS_UNKNOWN) {
       wstring text = mal::TranslateMyStatus(i, false);
-      text += group_count.at(i - 1) > 0 ? L" (" + ToWstr(group_count.at(i - 1)) + L")" : L"";
+      text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
       listview.SetGroupText(i, text.c_str());
     }
   }
