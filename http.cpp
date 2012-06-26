@@ -60,7 +60,7 @@ HttpClient::HttpClient() {
 BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
     FormatError(dwError, L"winhttp.dll");
-  debug::Print(error_text + L"\n");
+  debug::Print(error_text + L"Client mode: " + ToWstr(GetClientMode()) + L"\n");
 
   switch (GetClientMode()) {
     case HTTP_MAL_Login:
@@ -430,7 +430,7 @@ BOOL HttpClient::OnReadComplete() {
       int anime_id = static_cast<int>(GetParam());
       if (mal::ParseAnimeDetails(GetData())) {
         if (AnimeDialog.IsWindow() && AnimeDialog.GetCurrentId() == anime_id) {
-          AnimeDialog.Refresh(anime_id, true, false);
+          AnimeDialog.Refresh(anime_id, false, true, false);
         }
         if (SeasonDialog.IsWindow()) {
           SeasonDialog.RefreshList(true);
@@ -445,7 +445,7 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_Image: {
       int anime_id = static_cast<int>(GetParam());
       if (AnimeDialog.IsWindow() && AnimeDialog.GetCurrentId() == anime_id) {
-        AnimeDialog.Refresh(anime::ID_UNKNOWN, false, false);
+        AnimeDialog.Refresh(anime_id, true, false, false);
       }
       if (SeasonDialog.IsWindow()) {
         for (auto it = SeasonDialog.images.begin(); it != SeasonDialog.images.end(); ++it) {
@@ -473,7 +473,7 @@ BOOL HttpClient::OnReadComplete() {
       if (anime_id) {
         if (mal::ParseSearchResult(GetData(), anime_id)) {
           if (AnimeDialog.GetCurrentId() == anime_id)
-            AnimeDialog.Refresh(anime_id, true, false);
+            AnimeDialog.Refresh(anime_id, false, true, false);
           if (SeasonDialog.IsWindow())
             SeasonDialog.RefreshList(true);
           if (mal::GetAnimeDetails(anime_id, this)) return TRUE;

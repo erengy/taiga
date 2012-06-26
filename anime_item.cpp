@@ -506,7 +506,7 @@ bool Item::CheckFolder() {
   return !GetFolder().empty();
 }
 
-const wstring& Item::GetFolder() const {
+const wstring Item::GetFolder() const {
   if (!my_info_.get()) return wstring();
   return my_info_->folder;
 }

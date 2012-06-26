@@ -457,6 +457,10 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
       // Clean up
       TrimRight(title, L" -");
       TrimLeft(episode.name, L" -");
+      if (StartsWith(episode.name, L"'") && EndsWith(episode.name, L"'"))
+        Trim(episode.name, L"'");
+      TrimLeft(episode.name, L"\u300C"); // Japanese left quotation mark
+      TrimRight(episode.name, L"\u300D"); // Japanese right quotation mark
     }
   }
 
@@ -668,6 +672,11 @@ bool RecognitionEngine::IsEpisodeFormat(const wstring& str, anime::Episode& epis
           episode.number.clear();
           return false;
         }
+
+      // Japanese counter
+      } else if (str.at(i) == L'\u8A71') {
+        episode.number = str.substr(numstart, i - 1);
+        return true;
 
       } else {
         episode.number.clear();

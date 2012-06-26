@@ -673,7 +673,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 #ifdef _DEBUG
           ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
 #endif
-        } else if (Settings.Program.Balloon.enabled) {
+        } else {
 #ifdef _DEBUG
           std::multimap<int, int> scores = Meow.GetScores();
           debug::Print(L"Not recognized: " + CurrentEpisode.title + L"\n");
@@ -685,11 +685,13 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 #endif  
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
-          wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);
-          tip_text += L"\nClick here to search MyAnimeList for this anime.";
-          Taiga.current_tip_type = TIPTYPE_SEARCH;
-          Taskbar.Tip(L"", L"", 0);
-          Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
+          if (Settings.Program.Balloon.enabled) {
+            wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);
+            tip_text += L"\nClick here to search MyAnimeList for this anime.";
+            Taiga.current_tip_type = TIPTYPE_SEARCH;
+            Taskbar.Tip(L"", L"", 0);
+            Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
+          }
         }
       }
 

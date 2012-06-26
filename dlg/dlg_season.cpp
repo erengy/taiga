@@ -27,6 +27,7 @@
 #include "../gfx.h"
 #include "../myanimelist.h"
 #include "../resource.h"
+#include "../settings.h"
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
@@ -480,6 +481,12 @@ void SeasonDialog::RefreshData(bool connect, int anime_id) {
     }
     if (image_clients_.size() != size) image_clients_.resize(size);
     if (info_clients_.size() != size) info_clients_.resize(size);
+    for (size_t i = 0; i < size; i++) {
+      image_clients_.at(i).SetProxy(Settings.Program.Proxy.host, 
+        Settings.Program.Proxy.user, Settings.Program.Proxy.password);
+      info_clients_.at(i).SetProxy(Settings.Program.Proxy.host, 
+        Settings.Program.Proxy.user, Settings.Program.Proxy.password);
+    }
     images.clear();
     images.resize(size);
   }

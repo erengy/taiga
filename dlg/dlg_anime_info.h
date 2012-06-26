@@ -45,7 +45,7 @@ public:
 public:
   int GetCurrentId() const;
   void SetCurrentPage(int index);
-  void Refresh(int anime_id, bool series_info = true, bool my_info = true);
+  void Refresh(int anime_id, bool image = true, bool series_info = true, bool my_info = true);
 
 public:
   vector<AnimeInfoPage> pages;

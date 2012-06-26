@@ -35,7 +35,7 @@ Date::Date(const wstring& date) {
   *this = mal::ParseDateString(date);
 }
 
-Date::Date(int year, int month, int day)
+Date::Date(unsigned short year, unsigned short month, unsigned short day)
     : year(year), 
       month(month), 
       day(day) {

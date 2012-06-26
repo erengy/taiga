@@ -33,7 +33,7 @@ class Date {
  public:
   Date();
   Date(const wstring& date);
-  Date(int year, int month, int day);
+  Date(unsigned short year, unsigned short month, unsigned short day);
   virtual ~Date() {}
 
   Date& operator = (const Date& date);

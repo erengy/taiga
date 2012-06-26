@@ -106,7 +106,7 @@ class Item {
 
   // For anime-specific folders on user's computer
   bool CheckFolder();
-  const wstring& GetFolder() const;
+  const wstring GetFolder() const;
   void SetFolder(const wstring& folder, bool save_settings);
   
   // More than one anime may have their playing flag on.

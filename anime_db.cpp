@@ -169,13 +169,13 @@ void Database::UpdateItem(Item& new_item) {
     // Update only if a value is non-empty
     if (new_item.GetType() > 0)
       item->SetType(new_item.GetType());
-    if (new_item.GetEpisodeCount() > 0)
+    if (new_item.GetEpisodeCount(false) > 0)
       item->SetEpisodeCount(new_item.GetEpisodeCount());
-    if (new_item.GetAiringStatus() > 0)
+    if (new_item.GetAiringStatus(false) > 0)
       item->SetAiringStatus(new_item.GetAiringStatus());
-    if (!new_item.GetTitle().empty())
+    if (!new_item.GetTitle(false).empty())
       item->SetTitle(new_item.GetTitle());
-    if (!new_item.GetSynonyms().empty())
+    if (!new_item.GetSynonyms(false).empty())
       item->SetSynonyms(new_item.GetSynonyms());
     if (mal::IsValidDate(new_item.GetDate(DATE_START)))
       item->SetDate(DATE_START, new_item.GetDate(DATE_START));
