@@ -33,7 +33,8 @@ Statistics::Statistics()
     : anime_count(0), 
       episode_count(0), 
       score_mean(0.0f), 
-      score_deviation(0.0f) {
+      score_deviation(0.0f),
+      score_distribution(11) {
 }
 
 // =============================================================================
@@ -53,6 +54,9 @@ void Statistics::CalculateAll() {
 
   // Standard deviation of score
   CalculateScoreDeviation();
+
+  // Score histogram information
+  CalculateScoreDistribution();
 }
 
 int Statistics::CalculateAnimeCount() {
@@ -139,4 +143,24 @@ float Statistics::CalculateScoreDeviation() {
   score_deviation = items_scored > 0 ? sqrt(sum_squares / items_scored) : 0.0f;
 
   return score_deviation;
+}
+
+
+vector<float> Statistics::CalculateScoreDistribution() {
+  int score;
+  int extreme_value = 1;
+
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    score = it->second.GetMyScore();
+    if (score > 0) {
+      score_distribution[score]++;
+      extreme_value = max(score_distribution[score],extreme_value);
+    }
+  }
+
+  for (auto it = score_distribution.begin(); it != score_distribution.end(); ++it) {
+    *it = *it / extreme_value;
+  }
+
+  return score_distribution;
 }

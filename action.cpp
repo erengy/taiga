@@ -322,6 +322,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       content += L"\n\u2022 Life spent watching: \t" + Stats.life_spent_watching;
       content += L"\n\u2022 Mean score: \t\t" + ToWstr(Stats.score_mean, 2);
       content += L"\n\u2022 Score deviation: \t\t" + ToWstr(Stats.score_deviation, 2);
+      content += L"\n\n";
+      for (int score = 10; score > 0; --score) {
+        if (score < 10) content += L"0";
+        content += ToWstr(score) + L" \u2502 ";
+        for (int i = 0; i < 75 * Stats.score_distribution[score]; ++i) {
+          content += L"|";
+        }
+        content += L"\n";
+      }
       win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(main_instruction.c_str());
       dlg.SetContent(content.c_str());

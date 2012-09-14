@@ -34,6 +34,7 @@ public:
   wstring CalculateLifeSpentWatching();
   float CalculateMeanScore();
   float CalculateScoreDeviation();
+  vector<float> CalculateScoreDistribution();
 
 public:
   int anime_count;
@@ -41,6 +42,7 @@ public:
   wstring life_spent_watching;
   float score_mean;
   float score_deviation;
+  vector<float> score_distribution;
 };
 
 extern Statistics Stats;
