@@ -605,14 +605,14 @@ BOOL HttpClient::OnReadComplete() {
       break;
     }
     case HTTP_Twitter_Post: {
-      if (InStr(GetData(), L"<error>", 0) == -1) {
+      if (InStr(GetData(), L"\"errors\"", 0) == -1) {
         status = L"Twitter status updated.";
       } else {
         status = L"Twitter status update failed.";
-        int index_begin = InStr(GetData(), L"<error>", 0);
-        int index_end = InStr(GetData(), L"</error>", index_begin);
+        int index_begin = InStr(GetData(), L"\"message\":\"", 0);
+        int index_end = InStr(GetData(), L"\",\"", index_begin);
         if (index_begin > -1 && index_end > -1) {
-          index_begin += 7;
+          index_begin += 11;
           status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
         }
       }

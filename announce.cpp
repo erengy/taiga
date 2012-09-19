@@ -326,11 +326,11 @@ Twitter::Twitter() {
 bool Twitter::RequestToken() {
   wstring header = TwitterClient.GetDefaultHeader() + 
     oauth.BuildHeader(
-    L"http://twitter.com/oauth/request_token", 
+    L"http://api.twitter.com/oauth/request_token", 
     L"GET", NULL);
 
   return TwitterClient.Connect(
-    L"twitter.com", L"oauth/request_token",
+    L"api.twitter.com", L"oauth/request_token",
     L"", L"GET", header, L"myanimelist.net", L"",
     HTTP_Twitter_Request);
 }
@@ -338,12 +338,12 @@ bool Twitter::RequestToken() {
 bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
   wstring header = TwitterClient.GetDefaultHeader() + 
     oauth.BuildHeader(
-    L"http://twitter.com/oauth/access_token", 
+    L"http://api.twitter.com/oauth/access_token", 
     L"POST", NULL, 
     key, secret, pin);
 
   return TwitterClient.Connect(
-    L"twitter.com", L"oauth/access_token",
+    L"api.twitter.com", L"oauth/access_token",
     L"", L"GET", header, L"myanimelist.net", L"",
     HTTP_Twitter_Auth);
 }
@@ -352,7 +352,7 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   if (Settings.Announce.Twitter.oauth_key.empty() || Settings.Announce.Twitter.oauth_secret.empty()) {
     return false;
   }
-  if (status_text.empty() || status_text == status_text_) {
+  if (status_text.empty()) {
     return false;
   }
   status_text_ = status_text;
@@ -362,13 +362,13 @@ bool Twitter::SetStatusText(const wstring& status_text) {
 
   wstring header = TwitterClient.GetDefaultHeader() + 
     oauth.BuildHeader(
-    L"http://twitter.com/statuses/update.xml", 
+    L"http://api.twitter.com/1.1/statuses/update.json", 
     L"POST", &post_parameters, 
     Settings.Announce.Twitter.oauth_key, 
     Settings.Announce.Twitter.oauth_secret);
 
   return TwitterClient.Connect(
-    L"twitter.com", L"/statuses/update.xml", 
+    L"api.twitter.com", L"1.1/statuses/update.json", 
     L"status=" + post_parameters[L"status"],
     L"POST", header, L"myanimelist.net", L"", 
     HTTP_Twitter_Post);
