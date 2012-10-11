@@ -22,6 +22,7 @@
 #include "../std.h"
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
+#include "../win32/win_gdi.h"
 
 #define WM_TAIGA_SHOWMENU WM_USER + 1337
 
@@ -29,6 +30,18 @@ enum SearchMode {
   SEARCH_MODE_MAL,
   SEARCH_MODE_TORRENT,
   SEARCH_MODE_WEB
+};
+
+enum SidebarItems {
+  SIDEBAR_ITEM_DASHBOARD = 0,
+  SIDEBAR_ITEM_NOWPLAYING = 1,
+  SIDEBAR_ITEM_ANIMELIST = 3,
+  SIDEBAR_ITEM_MANGALIST = 4,
+  SIDEBAR_ITEM_HISTORY = 6,
+  SIDEBAR_ITEM_STATS = 7,
+  SIDEBAR_ITEM_SEARCH = 9,
+  SIDEBAR_ITEM_SEASONS = 10,
+  SIDEBAR_ITEM_FEEDS = 12
 };
 
 // =============================================================================
@@ -46,12 +59,10 @@ public:
   void OnDropFiles(HDROP hDropInfo);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   void OnTaskbarCallback(UINT uMsg, LPARAM lParam);
   void OnTimer(UINT_PTR nIDEvent);
-  LRESULT OnListCustomDraw(LPARAM lParam);
-  LRESULT OnListNotify(LPARAM lParam);
-  LRESULT OnTabNotify(LPARAM lParam);
   LRESULT OnToolbarNotify(LPARAM lParam);
   LRESULT OnTreeNotify(LPARAM lParam);
   BOOL PreTranslateMessage(MSG* pMsg);
@@ -59,9 +70,9 @@ public:
 public:
   void ChangeStatus(wstring str = L"");
   void EnableInput(bool enable = true);
-  int GetListIndex(int anime_id);
-  void RefreshList(int index = -1);
-  void RefreshTabs(int index = -1, bool redraw = true);
+  int GetCurrentPage();
+  void SetCurrentPage(int page);
+  void UpdateControlPositions(const SIZE* size = nullptr);
   void UpdateStatusTimer();
   void UpdateTip();
 
@@ -84,20 +95,8 @@ public:
   class CMainTree : public win32::TreeView {
   public:
     void RefreshItems();
-  private:
-    HTREEITEM htItem[7];
+    vector<HTREEITEM> hti;
   } treeview;
-  
-  // List-view control
-  class ListView : public win32::ListView {
-  public:
-    ListView() { dragging = false; };
-    int GetSortType(int column);
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    bool dragging;
-    win32::ImageList drag_image;
-    MainDialog* parent;
-  } listview;
 
   // Edit control
   class EditSearch : public win32::Edit {
@@ -108,19 +107,22 @@ public:
   win32::Window cancel_button;
   win32::Rebar rebar;
   win32::StatusBar statusbar;
-  win32::Tab tab;
   win32::Toolbar toolbar_menu, toolbar_main, toolbar_search;
 
   // Search bar
   class SearchBar {
   public:
-    SearchBar() : filter_list(true), index(2), mode(SEARCH_MODE_MAL) {}
-    bool filter_list;
+    SearchBar() : filter_content(true), index(2), mode(SEARCH_MODE_MAL) {}
+    bool filter_content;
     UINT index, mode;
     wstring cue_text, url;
     MainDialog* parent;
     void SetMode(UINT index, UINT mode, wstring cue_text = L"Search", wstring url = L"");
   } search_bar;
+
+private:
+  int current_page_;
+  win32::Rect rect_content_, rect_sidebar_;
 };
 
 extern class MainDialog MainDialog;

@@ -18,7 +18,8 @@
 
 #include "../std.h"
 
-#include "dlg_event.h"
+#include "dlg_anime_list.h"
+#include "dlg_history.h"
 #include "dlg_input.h"
 #include "dlg_main.h"
 #include "dlg_search.h"
@@ -48,7 +49,7 @@ const WCHAR* PAGE_TITLE[PAGE_COUNT] = {
   L" Skype announcement",
   L" Twitter announcement",
   L" Root folders",
-  L" Specific folders",
+  L" Subfolders",
   L" Program",
   L" List",
   L" Notifications",
@@ -121,7 +122,7 @@ BOOL SettingsDialog::OnInitDialog() {
   // Folders
   HTREEITEM htFolders = tree_.InsertItem(L"Anime folders", -1, reinterpret_cast<LPARAM>(&pages[PAGE_FOLDERS_ROOT]), nullptr);
   pages[PAGE_FOLDERS_ROOT].CreateItem(L"Root", htFolders);
-  pages[PAGE_FOLDERS_ANIME].CreateItem(L"Specific", htFolders);
+  pages[PAGE_FOLDERS_ANIME].CreateItem(L"Sub", htFolders);
   tree_.Expand(htFolders);
   // Announcements
   HTREEITEM htAnnounce = tree_.InsertItem(L"Announcements", -1, reinterpret_cast<LPARAM>(&pages[PAGE_HTTP]), nullptr);
@@ -288,13 +289,13 @@ void SettingsDialog::OnOK() {
   if (Settings.Account.MAL.user != mal_user_old) {
     AnimeDatabase.LoadList();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
-    MainDialog.RefreshList(mal::MYSTATUS_WATCHING);
-    MainDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
-    EventDialog.RefreshList();
+    AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
+    AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
+    HistoryDialog.RefreshList();
     SearchDialog.PostMessage(WM_CLOSE);
     ExecuteAction(L"Logout(" + mal_user_old + L")");
   } else {
-    MainDialog.RefreshList();
+    AnimeListDialog.RefreshList();
   }
 
   // Enable/disable folder monitor

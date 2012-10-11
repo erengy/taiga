@@ -115,6 +115,7 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
     return false;
   }
 
+  // Validate episode number
   if (check_episode && anime_item.GetEpisodeCount() > 0) {
     int number = GetEpisodeHigh(episode.number);
     if (number > anime_item.GetEpisodeCount()) {
@@ -133,7 +134,6 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
       return false;
     }
   }
-
   // Assume episode 1 if matched one-episode series
   if (episode.number.empty() && anime_item.GetEpisodeCount() == 1)
     episode.number = L"1";
@@ -178,13 +178,13 @@ std::multimap<int, int> RecognitionEngine::GetScores() {
 
 bool RecognitionEngine::ScoreTitle(const wstring& episode_title, const anime::Item& anime_item) {
   int score = 100;
-  
+
   score -= LevenshteinDistance(episode_title, anime_item.GetTitle()) * 2;
 
   if (InStr(anime_item.GetTitle(), episode_title, 0, true) > -1 ||
       InStr(episode_title, anime_item.GetTitle(), 0, true) > -1)
     score += 40;
-  
+
   if (score > 90) {
     scores[anime_item.GetId()] = score;
     return true;
@@ -592,6 +592,7 @@ void RecognitionEngine::EraseUnnecessary(wstring& str) {
   Replace(str, L" specials", L" special", false, true);
 }
 
+// TODO: make faster
 void RecognitionEngine::TransliterateSpecial(wstring& str) {
   // Character equivalencies
   ReplaceChar(str, L'\u00E9', L'e'); // small e acute accent

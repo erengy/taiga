@@ -21,9 +21,13 @@
 #include "dlg_main.h"
 
 #include "dlg_anime_info.h"
+#include "dlg_anime_list.h"
+#include "dlg_history.h"
+#include "dlg_manga_list.h"
 #include "dlg_search.h"
 #include "dlg_season.h"
 #include "dlg_settings.h"
+#include "dlg_stats.h"
 #include "dlg_test_recognition.h"
 #include "dlg_torrent.h"
 
@@ -32,8 +36,8 @@
 #include "../announce.h"
 #include "../common.h"
 #include "../debug.h"
-#include "../event.h"
 #include "../gfx.h"
+#include "../history.h"
 #include "../http.h"
 #include "../media.h"
 #include "../monitor.h"
@@ -54,7 +58,8 @@ class MainDialog MainDialog;
 
 // =============================================================================
 
-MainDialog::MainDialog() {
+MainDialog::MainDialog()
+    : current_page_(-1) {
   RegisterDlgClass(L"TaigaMainW");
 }
 
@@ -83,7 +88,7 @@ BOOL MainDialog::OnInitDialog() {
   ChangeStatus();
   
   // Refresh list
-  RefreshList(mal::MYSTATUS_WATCHING);
+  AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
   
   // Set search bar mode
   //search_bar.Index = Settings.Program.General.SearchIndex;
@@ -150,16 +155,9 @@ void MainDialog::CreateDialogControls() {
   cancel_button.SetPosition(nullptr, rcEdit.right + 1, 0, 16, 16);
   // Create treeview control
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
+  treeview.SetImageList(UI.ImgList16.GetHandle());
   treeview.SetItemHeight(20);
   treeview.SetTheme();
-  // Create tab control
-  tab.Attach(GetDlgItem(IDC_TAB_MAIN));
-  // Create main list
-  listview.Attach(GetDlgItem(IDC_LIST_MAIN));
-  listview.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  listview.SetImageList(UI.ImgList16.GetHandle());
-  listview.Sort(0, 1, 0, ListViewCompareProc);
-  listview.SetTheme();
   // Create status bar
   statusbar.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
   statusbar.SetImageList(UI.ImgList16.GetHandle());
@@ -169,37 +167,29 @@ void MainDialog::CreateDialogControls() {
   // Insert treeview items
   treeview.RefreshItems();
 
-  // Insert list columns
-  listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");
-  listview.InsertColumn(1, 160, 160, LVCFMT_CENTER, L"Progress");
-  listview.InsertColumn(2,  62,  62, LVCFMT_CENTER, L"Score");
-  listview.InsertColumn(3,  62,  62, LVCFMT_CENTER, L"Type");
-  listview.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
-
   // Insert menu toolbar buttons
   BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
-  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  File", nullptr);
-  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  Account", nullptr);
-  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"  List", nullptr);
-  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"  Help", nullptr);
+  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  Account", nullptr);
+  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  Library", nullptr);
+  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"  Tools", nullptr);
+  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"  View", nullptr);
+  toolbar_menu.InsertButton(4, I_IMAGENONE, 104, 1, fsStyle0, 0, L"  Help", nullptr);
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0,  ICON24_OFFLINE,  200, 1, fsStyle1,  0, nullptr, L"Log in");
-  toolbar_main.InsertButton(1,  ICON24_SYNC,     201, 1, fsStyle1,  1, nullptr, L"Synchronize list");
-  toolbar_main.InsertButton(2,  ICON24_MAL,      202, 1, fsStyle1,  2, nullptr, L"View your panel at MyAnimeList");
-  toolbar_main.InsertButton(3,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(4,  ICON24_FOLDERS,  204, 1, fsStyle2,  4, nullptr, L"Anime folders");
-  toolbar_main.InsertButton(5,  ICON24_CALENDAR, 205, 1, fsStyle1,  5, nullptr, L"Season browser");
-  toolbar_main.InsertButton(6,  ICON24_TOOLS,    206, 1, fsStyle2,  6, nullptr, L"Tools");
-  toolbar_main.InsertButton(7,  ICON24_RSS,      207, 1, fsStyle1,  7, nullptr, L"Torrents");
-  toolbar_main.InsertButton(8,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(9,  ICON24_FILTER,   209, 1, fsStyle1,  9, nullptr, L"Filter list");
-  toolbar_main.InsertButton(10, ICON24_SETTINGS, 210, 1, fsStyle1, 10, nullptr, L"Change program settings");
+  toolbar_main.InsertButton(0, ICON24_SYNC,     200, 1, fsStyle1,  0, nullptr, L"Synchronize list");
+  toolbar_main.InsertButton(1, ICON24_MAL,      201, 1, fsStyle1,  1, nullptr, L"View your panel at MyAnimeList");
+  toolbar_main.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(3, ICON24_FOLDERS,  203, 1, fsStyle2,  3, nullptr, L"Anime folders");
+  toolbar_main.InsertButton(4, ICON24_SHARE,    204, 1, fsStyle2,  4, nullptr, L"Share");
+  toolbar_main.InsertButton(5, ICON24_TOOLS,    205, 1, fsStyle2,  5, nullptr, L"Tools");
+  toolbar_main.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(7, ICON24_SETTINGS, 207, 1, fsStyle1,  7, nullptr, L"Change program settings");
 #ifdef _DEBUG
-  toolbar_main.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(12, ICON24_ABOUT,    212, 1, fsStyle1, 12, nullptr, L"Debug");
+  //toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  //toolbar_main.InsertButton(9, ICON24_ABOUT,    209, 1, fsStyle1, 9, nullptr, L"Debug");
 #endif
+  toolbar_main.EnableButton(4, false);
   // Insert search toolbar button
   toolbar_search.InsertButton(0, ICON16_SEARCH, 300, 1, fsStyle2, 0, nullptr, L"Search");
 
@@ -221,16 +211,6 @@ void MainDialog::CreateDialogControls() {
     HIWORD(toolbar_search.GetButtonSize()), 
     fMask, fStyle);
 
-  // Insert tabs and list groups
-  listview.InsertGroup(mal::MYSTATUS_NOTINLIST, mal::TranslateMyStatus(mal::MYSTATUS_NOTINLIST, false).c_str());
-  for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
-    if (i != mal::MYSTATUS_UNKNOWN) {
-      tab.InsertItem(i - 1, mal::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-      listview.InsertGroup(i, mal::TranslateMyStatus(i, false).c_str());
-    }
-  }
-
-  listview.parent = this;
   search_bar.parent = this;
 }
 
@@ -286,54 +266,23 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       return FALSE;
     }
 
-    // Drag list item
-    case WM_MOUSEMOVE: {
-      if (listview.dragging) {
-        listview.drag_image.DragMove(LOWORD(lParam) + 16, HIWORD(lParam) + 24);
-        SetCursor(LoadCursor(nullptr, tab.HitTest() > -1 ? IDC_ARROW : IDC_NO));
-      }
-      break;
-    }
-    case WM_LBUTTONUP: {
-      if (listview.dragging) {
-        listview.drag_image.DragLeave(g_hMain);
-        listview.drag_image.EndDrag();
-        listview.drag_image.Destroy();
-        listview.dragging = false;
-        ReleaseCapture();
-        int tab_index = tab.HitTest();
-        if (tab_index > -1) {
-          int status = tab.GetItemParam(tab_index);
-          ExecuteAction(L"EditStatus(" + ToWstr(status) + L")");
-        }
-      }
-      break;
-    }
-
-    // Forward mouse wheel messages to the list
-    case WM_MOUSEWHEEL: {
-      return listview.SendMessage(uMsg, wParam, lParam);
-    }
-
-    // Back & forward buttons
-    case WM_XBUTTONUP: {
-      int index = tab.GetCurrentlySelected();
-      int count = tab.GetItemCount();
-      switch (HIWORD(wParam)) {
-        case XBUTTON1: index--; break;
-        case XBUTTON2: index++; break;
-      }
-      if (index < 0 || index > count - 1) return TRUE;
-      tab.SetCurrentlySelected(index);
-      index++; if (index == 5) index = 6;
-      RefreshList(index);
-      return TRUE;
-    }
-
     // Monitor anime folders
     case WM_MONITORCALLBACK: {
       FolderMonitor.OnChange(reinterpret_cast<FolderInfo*>(lParam));
       return TRUE;
+    }
+                             
+    // Forward mouse wheel messages to the active page
+    case WM_MOUSEWHEEL: {
+      switch (GetCurrentPage()) {
+        case SIDEBAR_ITEM_ANIMELIST:
+          return AnimeListDialog.SendMessage(uMsg, wParam, lParam);
+        case SIDEBAR_ITEM_SEASONS:
+          return SeasonDialog.SendMessage(uMsg, wParam, lParam);
+        case SIDEBAR_ITEM_FEEDS:
+          return TorrentDialog.SendMessage(uMsg, wParam, lParam);
+      }
+      break;
     }
 
     // Show menu
@@ -520,16 +469,8 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
 }
 
 LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
-  // ListView control
-  if (idCtrl == IDC_LIST_MAIN || pnmh->hwndFrom == listview.GetHeader()) {
-    return OnListNotify(reinterpret_cast<LPARAM>(pnmh));
-  
-  // Tab control
-  } else if (idCtrl == IDC_TAB_MAIN) {
-    return OnTabNotify(reinterpret_cast<LPARAM>(pnmh));
-
   // Toolbar controls
-  } else if (idCtrl == IDC_TOOLBAR_MENU || idCtrl == IDC_TOOLBAR_MAIN || idCtrl == IDC_TOOLBAR_SEARCH) {
+  if (idCtrl == IDC_TOOLBAR_MENU || idCtrl == IDC_TOOLBAR_MAIN || idCtrl == IDC_TOOLBAR_SEARCH) {
     return OnToolbarNotify(reinterpret_cast<LPARAM>(pnmh));
 
   // Tree control
@@ -544,6 +485,19 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   }
   
   return 0;
+}
+
+void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+  win32::Dc dc = hdc;
+  win32::Rect rect;
+
+  // Paint sidebar
+  if (treeview.IsVisible()) {
+    rect.Copy(rect_sidebar_);
+    dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+    rect.left = rect.right - 1;
+    dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
+  }
 }
 
 void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
@@ -565,30 +519,8 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
         if (Settings.Program.General.minimize) Hide();
         return;
       }
-
-      // Set client area
-      win32::Rect rcWindow(0, 0, size.cx, size.cy);
-      rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
-      // Resize rebar
-      rebar.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += rebar.GetBarHeight() + 2;
-      // Resize status bar
-      win32::Rect rcStatus;
-      statusbar.GetClientRect(&rcStatus);
-      statusbar.SendMessage(WM_SIZE, 0, 0);
-      UpdateStatusTimer();
-      rcWindow.bottom -= rcStatus.Height();
-      // Resize treeview
-      if (treeview.IsVisible()) {
-        treeview.SetPosition(nullptr, rcWindow.left, rcWindow.top, 200 /* TEMP */, rcWindow.Height());
-        rcWindow.left += 200 + WIN_CONTROL_MARGIN;
-      }
-      // Resize tab
-      tab.SetPosition(nullptr, rcWindow);
-      // Resize list
-      tab.AdjustRect(nullptr, FALSE, &rcWindow);
-      rcWindow.left -= 3; rcWindow.top -= 1;
-      listview.SetPosition(nullptr, rcWindow, 0);
+      UpdateControlPositions(&size);
+      break;
     }
   }
 }
@@ -605,8 +537,8 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   Taiga.ticker_queue++;
   if (Taiga.ticker_queue >= 5 * 60) { // 5 minutes
     Taiga.ticker_queue = 0;
-    if (EventQueue.updating == false) {
-      EventQueue.Check();
+    if (History.queue.updating == false) {
+      History.queue.Check();
     }
   }
 
@@ -781,7 +713,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             ExecuteAction(L"Torrents");
             break;
           case TIPTYPE_UPDATEFAILED:
-            EventQueue.Check();
+            History.queue.Check();
             break;
         }
         Taiga.current_tip_type = TIPTYPE_NORMAL;
@@ -821,102 +753,75 @@ void MainDialog::ChangeStatus(wstring str) {
 void MainDialog::EnableInput(bool enable) {
   // Enable/disable toolbar buttons
   toolbar_main.EnableButton(0, enable);
-  toolbar_main.EnableButton(1, enable);
-  // Enable/disable list
-  listview.Enable(enable);
+  // Enable/disable content
+  AnimeListDialog.Enable(enable);
 }
 
-int MainDialog::GetListIndex(int anime_id) {
-  for (int i = 0; i < listview.GetItemCount(); i++)
-    if (static_cast<int>(listview.GetItemParam(i)) == anime_id)
-      return i;
-  return -1;
+int MainDialog::GetCurrentPage() {
+  return current_page_;
 }
 
-void MainDialog::RefreshList(int index) {
-  // Change window title
-  wstring title = APP_TITLE;
-  if (!Settings.Account.MAL.user.empty()) {
-    title += L" - " + Settings.Account.MAL.user + L"'";
-    title += EndsWith(Settings.Account.MAL.user, L"s") ? L"" : L"s";
-    title += L" Anime List";
-  }
-  SetText(title.c_str());
+void MainDialog::SetCurrentPage(int page) {
+  if (page == current_page_)
+    return;
   
-  // Remember last index
-  static int last_index = 1;
-  if (index > 0) last_index = index;
-  if (index == -1) index = last_index;
-  if (!AnimeFilters.text.empty()) index = 0;
-
-  // Hide list to avoid visual defects and gain performance
-  listview.Hide();
-  listview.EnableGroupView(index == 0 && win32::GetWinVersion() > win32::VERSION_XP);
-  listview.DeleteAllItems();
-
-  // Add items
-  int group_index = -1, icon_index = 0, status = 0;
-  vector<int> group_count(7);
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    status = it->second.GetMyStatus();
-    if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->second.GetMyRewatching())) {
-      if (AnimeFilters.CheckItem(it->second)) {
-        group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
-        icon_index = it->second.GetPlaying() ? ICON16_PLAY : StatusToIcon(it->second.GetAiringStatus());
-        group_count.at(status)++;
-        int i = listview.GetItemCount();
-        listview.InsertItem(i, group_index, icon_index, 
-          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->second.GetId()));
-        listview.SetItem(i, 2, mal::TranslateNumber(it->second.GetMyScore()).c_str());
-        listview.SetItem(i, 3, mal::TranslateType(it->second.GetType()).c_str());
-        listview.SetItem(i, 4, mal::TranslateDateToSeason(it->second.GetDate(anime::DATE_START)).c_str());
-      }
+  if (search_bar.filter_content) {
+    wstring filter_text;
+    edit.GetText(filter_text);
+    edit.SetText(L"");
+    switch (current_page_) {
+      case SIDEBAR_ITEM_ANIMELIST:
+        AnimeFilters.text = filter_text;
+        break;
+      case SIDEBAR_ITEM_SEASONS:
+        SeasonDialog.filter_text = filter_text;
+        break;
     }
   }
+  
+  current_page_ = page;
 
-  // Set group headers
-  for (int i = mal::MYSTATUS_NOTINLIST; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
-    if (index == 0 && i != mal::MYSTATUS_UNKNOWN) {
-      wstring text = mal::TranslateMyStatus(i, false);
-      text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
-      listview.SetGroupText(i, text.c_str());
+  AnimeListDialog.Hide();
+  HistoryDialog.Hide();
+  MangaListDialog.Hide();
+  SearchDialog.Hide();
+  SeasonDialog.Hide();
+  StatsDialog.Hide();
+  TorrentDialog.Hide();
+
+  #define DISPLAY_PAGE(item, dialog, resource_id) \
+    case item: \
+      if (dialog.IsWindow()) { \
+        UpdateControlPositions(); \
+        dialog.Show(); \
+      } else { \
+        dialog.Create(resource_id, m_hWindow, false); \
+        UpdateControlPositions(); \
+      } \
+      break;
+  switch (current_page_) {
+    DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, AnimeListDialog, IDD_ANIME_LIST);
+    DISPLAY_PAGE(SIDEBAR_ITEM_MANGALIST, MangaListDialog, IDD_MANGA_LIST);
+    DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, HistoryDialog, IDD_HISTORY);
+    DISPLAY_PAGE(SIDEBAR_ITEM_STATS, StatsDialog, IDD_STATS);
+    DISPLAY_PAGE(SIDEBAR_ITEM_SEARCH, SearchDialog, IDD_SEARCH);
+    DISPLAY_PAGE(SIDEBAR_ITEM_SEASONS, SeasonDialog, IDD_SEASON);
+    DISPLAY_PAGE(SIDEBAR_ITEM_FEEDS, TorrentDialog, IDD_TORRENT);
+  }
+  #undef DISPLAY_PAGE
+
+  treeview.SelectItem(treeview.hti.at(current_page_));
+
+  if (search_bar.filter_content) {
+    switch (current_page_) {
+      case SIDEBAR_ITEM_ANIMELIST:
+        edit.SetText(AnimeFilters.text);
+        break;
+      case SIDEBAR_ITEM_SEASONS:
+        edit.SetText(SeasonDialog.filter_text);
+        break;
     }
   }
-
-  // Sort items
-  listview.Sort(listview.GetSortColumn(), listview.GetSortOrder(), 
-    listview.GetSortType(listview.GetSortColumn()), ListViewCompareProc);
-
-  // Show again
-  listview.Show(SW_SHOW);
-}
-
-void MainDialog::RefreshTabs(int index, bool redraw) {
-  // Remember last index
-  static int last_index = 1;
-  if (index == 6) index--;
-  if (index == last_index) redraw = false;
-  if (index > 0) last_index = index;
-  if (index == -1) index = last_index;
-  if (!AnimeFilters.text.empty()) index = 0;
-  
-  if (!redraw) return;
-  
-  // Hide
-  tab.Hide();
-
-  // Refresh text
-  for (int i = 1; i <= 6; i++) {
-    if (i != 5) {
-      tab.SetItemText(i == 6 ? 4 : i - 1, mal::TranslateMyStatus(i, true).c_str());
-    }
-  }
-
-  // Select related tab
-  tab.SetCurrentlySelected(--index);
-
-  // Show again
-  tab.Show(SW_SHOW);
 }
 
 void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wstring url) {
@@ -926,6 +831,53 @@ void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wst
   this->cue_text = cue_text;
   parent->edit.SetCueBannerText(cue_text.c_str());
   Settings.Program.General.search_index = index;
+}
+
+void MainDialog::UpdateControlPositions(const SIZE* size) {
+  // Set client area
+  win32::Rect rect_client;
+  if (size == nullptr) {
+    GetClientRect(&rect_client);
+  } else {
+    rect_client.Set(0, 0, size->cx, size->cy);
+  }
+
+  // Resize rebar
+  rebar.SendMessage(WM_SIZE, 0, 0);
+  rect_client.top += rebar.GetBarHeight() + 2;
+  
+  // Resize status bar
+  win32::Rect rcStatus;
+  statusbar.GetClientRect(&rcStatus);
+  statusbar.SendMessage(WM_SIZE, 0, 0);
+  UpdateStatusTimer();
+  rect_client.bottom -= rcStatus.Height();
+  
+  // Set sidebar
+  rect_sidebar_.Set(0, rect_client.top, 140, rect_client.bottom);
+  // Resize treeview
+  if (treeview.IsVisible()) {
+    win32::Rect rect_tree(rect_sidebar_);
+    rect_tree.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
+    treeview.SetPosition(nullptr, rect_tree);
+  }
+
+  // Set content
+  if (treeview.IsVisible()) {
+    rect_content_.Subtract(rect_client, rect_sidebar_);
+    rect_content_.Inflate(-ScaleX(WIN_CONTROL_MARGIN / 2), 0);
+  } else {
+    rect_content_ = rect_client;
+  }
+  
+  // Resize content
+  AnimeListDialog.SetPosition(nullptr, rect_content_);
+  HistoryDialog.SetPosition(nullptr, rect_content_);
+  MangaListDialog.SetPosition(nullptr, rect_content_);
+  SearchDialog.SetPosition(nullptr, rect_content_);
+  SeasonDialog.SetPosition(nullptr, rect_content_);
+  StatsDialog.SetPosition(nullptr, rect_content_);
+  TorrentDialog.SetPosition(nullptr, rect_content_);
 }
 
 void MainDialog::UpdateStatusTimer() {

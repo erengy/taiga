@@ -352,7 +352,7 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   if (Settings.Announce.Twitter.oauth_key.empty() || Settings.Announce.Twitter.oauth_secret.empty()) {
     return false;
   }
-  if (status_text.empty()) {
+  if (status_text.empty() || status_text == status_text_) {
     return false;
   }
   status_text_ = status_text;

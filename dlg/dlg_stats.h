@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SEARCH_H
-#define DLG_SEARCH_H
+#ifndef DLG_STATS_H
+#define DLG_STATS_H
 
 #include "../std.h"
 #include "../win32/win_control.h"
@@ -25,27 +25,21 @@
 
 // =============================================================================
 
-class SearchDialog : public win32::Dialog {
+class StatsDialog : public win32::Dialog {
 public:
-  SearchDialog() {};
-  virtual ~SearchDialog() {};
-  
+  StatsDialog();
+  virtual ~StatsDialog();
+
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
-  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-  void OnSize(UINT uMsg, UINT nType, SIZE size);
 
 public:
-  void EnableInput(bool enable);
-  void ParseResults(const wstring& data);
-  void RefreshList();
-  bool Search(const wstring& title);
+  void Refresh();
 
 private:
-  vector<int> anime_ids_;
-  win32::ListView list_;
+  HFONT header_font_;
 };
 
-extern class SearchDialog SearchDialog;
+extern class StatsDialog StatsDialog;
 
-#endif // DLG_SEARCH_H
+#endif // DLG_STATS_H

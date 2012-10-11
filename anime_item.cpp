@@ -23,7 +23,7 @@
 #include "anime_item.h"
 
 #include "common.h"
-#include "event.h"
+#include "history.h"
 #include "myanimelist.h"
 #include "recognition.h"
 #include "settings.h"
@@ -31,6 +31,7 @@
 #include "taiga.h"
 #include "time.h"
 
+#include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_search.h"
 
@@ -151,28 +152,28 @@ const wstring& Item::GetSynopsis() const {
 int Item::GetMyLastWatchedEpisode(bool check_events) const {
   if (!my_info_.get()) return 0;
   EventItem* event_item = check_events ? 
-    SearchEventQueue(EVENT_SEARCH_EPISODE) : nullptr;
+    SearchHistory(EVENT_SEARCH_EPISODE) : nullptr;
   return event_item ? *event_item->episode : my_info_->watched_episodes;
 }
 
 int Item::GetMyScore(bool check_events) const {
   if (!my_info_.get()) return 0;
   EventItem* event_item = check_events ? 
-    SearchEventQueue(EVENT_SEARCH_SCORE) : nullptr;
+    SearchHistory(EVENT_SEARCH_SCORE) : nullptr;
   return event_item ? *event_item->score : my_info_->score;
 }
 
 int Item::GetMyStatus(bool check_events) const {
   if (!my_info_.get()) return mal::MYSTATUS_NOTINLIST;
   EventItem* event_item = check_events ? 
-    SearchEventQueue(EVENT_SEARCH_STATUS) : nullptr;
+    SearchHistory(EVENT_SEARCH_STATUS) : nullptr;
   return event_item ? *event_item->status : my_info_->status;
 }
 
 int Item::GetMyRewatching(bool check_events) const {
   if (!my_info_.get()) return FALSE;
   EventItem* event_item = check_events ? 
-    SearchEventQueue(EVENT_SEARCH_REWATCH) : nullptr;
+    SearchHistory(EVENT_SEARCH_REWATCH) : nullptr;
   return event_item ? *event_item->enable_rewatching : my_info_->rewatching;
 }
 
@@ -188,13 +189,13 @@ const Date Item::GetMyDate(DateType type, bool check_events) const {
     case DATE_START:
     default:
       event_item = check_events ? 
-        SearchEventQueue(EVENT_SEARCH_DATE_START) : nullptr;
+        SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
       return event_item ? 
         mal::TranslateDateFromApi(*event_item->date_start) : 
         my_info_->date_start;
     case DATE_END:
       event_item = check_events ? 
-        SearchEventQueue(EVENT_SEARCH_DATE_END) : nullptr;
+        SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
       return event_item ? 
         mal::TranslateDateFromApi(*event_item->date_finish) : 
         my_info_->date_finish;
@@ -209,7 +210,7 @@ const wstring Item::GetMyLastUpdated() const {
 const wstring Item::GetMyTags(bool check_events) const {
   if (!my_info_.get()) return wstring();
   EventItem* event_item = check_events ? 
-    SearchEventQueue(EVENT_SEARCH_TAGS) : nullptr;
+    SearchHistory(EVENT_SEARCH_TAGS) : nullptr;
   return event_item ? *event_item->tags : my_info_->tags;
 }
 
@@ -418,38 +419,38 @@ bool Item::PlayEpisode(int number) {
   if (number > GetEpisodeCount() && GetEpisodeCount() != 0)
     return false;
 
-  wstring file;
+  wstring file_path;
 
   // Check saved episode path
   if (number == GetMyLastWatchedEpisode() + 1)
     if (!GetNewEpisodePath().empty())
       if (FileExists(GetNewEpisodePath()))
-        file = GetNewEpisodePath();
+        file_path = GetNewEpisodePath();
   
   // Check anime folder
-  if (file.empty()) {
+  if (file_path.empty()) {
     CheckFolder();
     if (!GetFolder().empty()) {
-      file = SearchFileFolder(*this, GetFolder(), number, false);
+      file_path = SearchFileFolder(*this, GetFolder(), number, false);
     }
   }
 
   // Check other folders
-  if (file.empty()) {
-    for (unsigned int i = 0; i < Settings.Folders.root.size(); i++) {
-      file = SearchFileFolder(*this, Settings.Folders.root[i], number, false);
-      if (!file.empty()) break;
+  if (file_path.empty()) {
+    for (auto it = Settings.Folders.root.begin(); 
+         file_path.empty() && it != Settings.Folders.root.end(); ++it) {
+      file_path = SearchFileFolder(*this, *it, number, false);
     }
   }
 
-  if (file.empty()) {
+  if (file_path.empty()) {
     if (number == 0) number = 1;
     MainDialog.ChangeStatus(
       L"Could not find episode #" + ToWstr(number) + L" (" + GetTitle() + L").");
   } else {
-    Execute(file);
+    Execute(file_path);
   }
-  return !file.empty();
+  return !file_path.empty();
 }
 
 bool Item::SetEpisodeAvailability(int number, bool available, const wstring& path) {
@@ -466,9 +467,9 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
       SetNewEpisodePath(path);
     }
     if (!my_info_->playing) {
-      int list_index = MainDialog.GetListIndex(GetId());
+      int list_index = AnimeListDialog.GetListIndex(GetId());
       if (list_index > -1) {
-        MainDialog.listview.RedrawItems(list_index, list_index, true);
+        AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
       }
     }
     return true;
@@ -664,8 +665,8 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
   if (item.mode == HTTP_MAL_AnimeDelete) {
     MainDialog.ChangeStatus(L"Item deleted. (" + GetTitle() + L")");
     database_->DeleteListItem(GetId());
-    MainDialog.RefreshList();
-    MainDialog.RefreshTabs();
+    AnimeListDialog.RefreshList();
+    AnimeListDialog.RefreshTabs();
     SearchDialog.PostMessage(WM_CLOSE);
     if (CurrentEpisode.anime_id == item.anime_id) {
       CurrentEpisode.Set(anime::ID_NOTINLIST);
@@ -673,14 +674,14 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
   }
 
   // Remove item from event queue
-  EventQueue.Remove();
+  History.queue.Remove();
   // Check for more events
-  EventQueue.Check();
+  History.queue.Check();
 
   // Redraw main list item
-  int list_index = MainDialog.GetListIndex(GetId());
+  int list_index = AnimeListDialog.GetListIndex(GetId());
   if (list_index > -1) {
-    MainDialog.listview.RedrawItems(list_index, list_index, true);
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
   }
 
   return true;
@@ -688,8 +689,8 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
 
 // =============================================================================
 
-EventItem* Item::SearchEventQueue(int search_mode) const {
-  return EventQueue.FindItem(series_info_.id, search_mode);
+EventItem* Item::SearchHistory(int search_mode) const {
+  return History.queue.FindItem(series_info_.id, search_mode);
 }
 
 } // namespace anime

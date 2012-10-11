@@ -282,8 +282,8 @@ bool Database::LoadList(bool set_last_modified) {
   for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
     Item anime_item;
     anime_item.SetId(XML_ReadIntValue(node, L"series_animedb_id"));
-    anime_item.SetTitle(DecodeHtml(XML_ReadStrValue(node, L"series_title")));
-    anime_item.SetSynonyms(DecodeHtml(XML_ReadStrValue(node, L"series_synonyms")));
+    anime_item.SetTitle(XML_ReadStrValue(node, L"series_title"));
+    anime_item.SetSynonyms(XML_ReadStrValue(node, L"series_synonyms"));
     anime_item.SetType(XML_ReadIntValue(node, L"series_type"));
     anime_item.SetEpisodeCount(XML_ReadIntValue(node, L"series_episodes"));
     anime_item.SetAiringStatus(XML_ReadIntValue(node, L"series_status"));
@@ -425,6 +425,39 @@ void Database::SetCurrentId(int anime_id) {
   }
 
   current_id_ = anime_id;
+}
+
+// =============================================================================
+
+FansubDatabase::FansubDatabase() {
+  file_ = L"fansub.xml";
+  folder_ = Taiga.GetDataPath() + L"db\\";
+}
+
+bool FansubDatabase::Load() {
+  // Initialize
+  wstring file = folder_ + file_;
+  items.clear();
+  
+  // Load XML file
+  xml_document doc;
+  xml_parse_result result = doc.load_file(file.c_str());
+  if (result.status != status_ok && result.status != status_file_not_found) {
+    MessageBox(NULL, L"Could not read fansub data.", file.c_str(), MB_OK | MB_ICONERROR);
+    return false;
+  }
+
+  // Read items
+  xml_node fansub_node = doc.child(L"fansub_groups");
+  for (xml_node node = fansub_node.child(L"fansub"); node; node = node.next_sibling(L"fansub")) {
+    items.push_back(XML_ReadStrValue(node, L"name"));
+  }
+
+  return true;
+}
+
+void FansubDatabase::Save() {
+  // TODO
 }
 
 // =============================================================================

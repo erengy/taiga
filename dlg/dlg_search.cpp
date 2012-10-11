@@ -22,6 +22,7 @@
 
 #include "../anime_db.h"
 #include "../common.h"
+#include "../gfx.h"
 #include "../http.h"
 #include "../myanimelist.h"
 #include "../resource.h"
@@ -37,10 +38,6 @@ class SearchDialog SearchDialog;
 
 // =============================================================================
 
-SearchDialog::SearchDialog() {
-  RegisterDlgClass(L"TaigaSearchW");
-}
-
 BOOL SearchDialog::OnInitDialog() {
   // Create list control
   list_.Attach(GetDlgItem(IDC_LIST_SEARCH));
@@ -52,18 +49,9 @@ BOOL SearchDialog::OnInitDialog() {
   list_.InsertColumn(2,  60,  60, LVCFMT_RIGHT,  L"Episodes");
   list_.InsertColumn(3,  60,  60, LVCFMT_RIGHT,  L"Score");
   list_.InsertColumn(4, 100, 100, LVCFMT_RIGHT,  L"Season");
-
-  // Create edit control
-  edit_.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   
   // Success
   return TRUE;
-}
-
-void SearchDialog::OnOK() {
-  wstring text;
-  edit_.GetText(text);
-  Search(text);
 }
 
 INT_PTR SearchDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -158,25 +146,15 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-BOOL SearchDialog::PreTranslateMessage(MSG* pMsg) {
-  if (pMsg->message == WM_KEYDOWN) {
-    switch (pMsg->wParam) {
-      // Close window
-      case VK_ESCAPE: {
-        Destroy();
-        return TRUE;
-      }
-      // Search
-      case VK_RETURN: {
-        if (::GetFocus() == edit_.GetWindowHandle()) {
-          OnOK();
-          return TRUE;
-        }
-        break;
-      }
+void SearchDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
+  switch (uMsg) {
+    case WM_SIZE: {
+      win32::Rect rcWindow;
+      rcWindow.Set(0, 0, size.cx, size.cy);
+      // Resize list
+      list_.SetPosition(nullptr, rcWindow);
     }
   }
-  return FALSE;
 }
 
 // =============================================================================
@@ -189,7 +167,7 @@ void SearchDialog::EnableInput(bool enable) {
 void SearchDialog::ParseResults(const wstring& data) {
   if (data.empty()) {
     wstring msg;
-    edit_.GetText(msg);
+    //edit_.GetText(msg);
     msg = L"No results found for \"" + msg + L"\".";
     win32::TaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
@@ -248,7 +226,6 @@ void SearchDialog::RefreshList() {
 
 bool SearchDialog::Search(const wstring& title) {
   if (mal::SearchAnime(anime::ID_UNKNOWN, title)) {
-    edit_.SetText(title.c_str());
     EnableInput(false);
     list_.DeleteAllItems();
     anime_ids_.clear();

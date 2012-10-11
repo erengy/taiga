@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef EVENT_H
-#define EVENT_H
+#ifndef HISTORY_H
+#define HISTORY_H
 
 #include "std.h"
 #include "myanimelist.h"
@@ -84,6 +84,11 @@ public:
   bool updating;
 };
 
-extern EventQueue EventQueue;
+class History {
+public:
+  EventQueue queue;
+};
 
-#endif // EVENT_H
+extern class History History;
+
+#endif // HISTORY_H

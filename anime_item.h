@@ -136,7 +136,7 @@ class Item {
   void StartWatching(Episode episode);
   void EndWatching(Episode episode);
   void UpdateList(Episode episode);
-  void AddToEventQueue(Episode episode, bool change_status);
+  void AddToQueue(Episode episode, bool change_status);
 
   // MAL's API doesn't provide searching anime by ID, and some titles return
   // no result due to special characters. Season data provide safe-to-search
@@ -151,7 +151,7 @@ class Item {
 
  private:
   // Helper function
-  EventItem* SearchEventQueue(int search_mode) const;
+  EventItem* SearchHistory(int search_mode) const;
 
   // Series information, stored in db\anime.xml
   SeriesInformation series_info_;

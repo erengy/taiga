@@ -394,14 +394,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
         // ================================================================================
 
-        // Filter list
-        case IDC_BUTTON_FILTERLIST: {
-          ExecuteAction(L"Filter");
-          return TRUE;
-        }
-
-        // ================================================================================
-
         // Browse for torrent application
         case IDC_BUTTON_TORRENT_BROWSE: {
           wstring path, current_directory;

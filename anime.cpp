@@ -24,8 +24,8 @@
 
 #include "announce.h"
 #include "common.h"
-#include "event.h"
 #include "feed.h"
+#include "history.h"
 #include "media.h"
 #include "myanimelist.h"
 #include "process.h"
@@ -34,6 +34,7 @@
 #include "taiga.h"
 #include "theme.h"
 
+#include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_feed_filter.h"
 #include "dlg/dlg_main.h"
 
@@ -75,14 +76,14 @@ void Item::StartWatching(Episode episode) {
   MainDialog.UpdateTip();
   int status = GetMyRewatching() ? mal::MYSTATUS_WATCHING : GetMyStatus();
   if (status != mal::MYSTATUS_NOTINLIST) {
-    MainDialog.RefreshList(status);
-    MainDialog.RefreshTabs(status);
+    AnimeListDialog.RefreshList(status);
+    AnimeListDialog.RefreshTabs(status);
   }
-  int list_index = MainDialog.GetListIndex(GetId());
+  int list_index = AnimeListDialog.GetListIndex(GetId());
   if (list_index > -1) {
-    MainDialog.listview.SetItemIcon(list_index, ICON16_PLAY);
-    MainDialog.listview.RedrawItems(list_index, list_index, true);
-    MainDialog.listview.EnsureVisible(list_index);
+    AnimeListDialog.listview.SetItemIcon(list_index, ICON16_PLAY);
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+    AnimeListDialog.listview.EnsureVisible(list_index);
   }
   
   // Show balloon tip
@@ -133,10 +134,10 @@ void Item::EndWatching(Episode episode) {
   episode.anime_id = anime::ID_UNKNOWN;
   MainDialog.ChangeStatus();
   MainDialog.UpdateTip();
-  int list_index = MainDialog.GetListIndex(GetId());
+  int list_index = AnimeListDialog.GetListIndex(GetId());
   if (list_index > -1) {
-    MainDialog.listview.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
-    MainDialog.listview.RedrawItems(list_index, list_index, true);
+    AnimeListDialog.listview.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
   }
 }
 
@@ -196,10 +197,10 @@ void Item::UpdateList(Episode episode) {
       change_status = choice == IDCANCEL;
   }
 
-  AddToEventQueue(episode, change_status);
+  AddToQueue(episode, change_status);
 }
 
-void Item::AddToEventQueue(Episode episode, bool change_status) {
+void Item::AddToQueue(Episode episode, bool change_status) {
   // Create event item
   EventItem event_item;
   event_item.anime_id = GetId();
@@ -240,7 +241,7 @@ void Item::AddToEventQueue(Episode episode, bool change_status) {
   }
 
   // Add event to queue
-  EventQueue.Add(event_item);
+  History.queue.Add(event_item);
 }
 
 // =============================================================================
@@ -307,7 +308,9 @@ bool SetFansubFilter(int anime_id, const wstring& group_name) {
 // =============================================================================
 
 wstring GetImagePath(int anime_id) {
-  return Taiga.GetDataPath() + L"db\\image\\" + ToWstr(anime_id) + L".jpg";
+  wstring path = Taiga.GetDataPath() + L"db\\image\\";
+  if (anime_id > 0) path += ToWstr(anime_id) + L".jpg";
+  return path;
 }
 
 } // namespace anime

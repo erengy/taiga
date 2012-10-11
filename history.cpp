@@ -18,7 +18,7 @@
 
 #include "std.h"
 
-#include "event.h"
+#include "history.h"
 
 #include "anime_db.h"
 #include "announce.h"
@@ -31,12 +31,13 @@
 #include "string.h"
 #include "taiga.h"
 
-#include "dlg/dlg_event.h"
+#include "dlg/dlg_anime_list.h"
+#include "dlg/dlg_history.h"
 #include "dlg/dlg_main.h"
 
 #include "win32/win_taskdialog.h"
 
-class EventQueue EventQueue;
+class History History;
 
 // =============================================================================
 
@@ -103,7 +104,7 @@ void EventList::Add(EventItem& item) {
 
   // Edit previous item with the same ID...
   bool add_new_item = true;
-  if (!EventQueue.updating) {
+  if (!History.queue.updating) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id) {
         if (it->mode != HTTP_MAL_AnimeAdd && it->mode != HTTP_MAL_AnimeDelete) {
@@ -149,16 +150,17 @@ void EventList::Add(EventItem& item) {
     }
     
     // Refresh event window
-    EventDialog.RefreshList();
+    HistoryDialog.RefreshList();
     
     // Refresh main window
-    MainDialog.RefreshList();
-    MainDialog.RefreshTabs();
+    AnimeListDialog.RefreshList();
+    AnimeListDialog.RefreshTabs();
     
     // Change status
     if (!Taiga.logged_in) {
       MainDialog.ChangeStatus(L"Item added to the event queue. (" + 
         anime->GetTitle() + L")");
+      MainDialog.treeview.RefreshItems();
     }
 
     // Update
@@ -192,7 +194,7 @@ void EventList::Check() {
   }
   
   // Update
-  EventQueue.updating = true;
+  History.queue.updating = true;
   MainDialog.ChangeStatus(L"Updating list...");
   mal::AnimeValues* anime_values = static_cast<mal::AnimeValues*>(&items[index]);
   mal::Update(*anime_values, items[index].anime_id, items[index].mode);
@@ -247,7 +249,7 @@ void EventList::Remove(unsigned int index, bool refresh) {
   // Remove item
   if (index < items.size()) {
     items.erase(items.begin() + index);
-    if (refresh) EventDialog.RefreshList();
+    if (refresh) HistoryDialog.RefreshList();
   }
 }
 
@@ -321,7 +323,7 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
 }
 
 void EventQueue::Show() {
-  if (GetItemCount() == 0) {
+  /*if (GetItemCount() == 0) {
     win32::TaskDialog dlg(L"Previously on Taiga...", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"There are no events in the queue.");
     dlg.AddButton(L"OK", IDOK);
@@ -329,9 +331,9 @@ void EventQueue::Show() {
     return;
   }
   
-  if (EventDialog.IsWindow()) {
-    EventDialog.Show();
+  if (HistoryDialog.IsWindow()) {
+    HistoryDialog.Show();
   } else {
-    EventDialog.Create(IDD_EVENT, g_hMain, false);
-  }
+    HistoryDialog.Create(IDD_EVENT, g_hMain, false);
+  }*/
 }

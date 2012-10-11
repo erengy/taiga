@@ -48,7 +48,6 @@ public:
   SeasonDialog();
   virtual ~SeasonDialog() {}
 
-  LRESULT OnButtonCustomDraw(LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
   BOOL OnInitDialog();
@@ -57,7 +56,6 @@ public:
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   LRESULT OnToolbarNotify(LPARAM lParam);
-  BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
   void RefreshData(bool connect = true, int anime_id = 0);
@@ -66,6 +64,7 @@ public:
   void RefreshToolbar();
 
 public:
+  wstring filter_text;
   int group_by, sort_by;
   vector<Image> images;
 
@@ -73,15 +72,10 @@ private:
   vector<class HttpClient> image_clients_, info_clients_;
 
 private:
-  class CEditFilter : public win32::Edit {
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  } edit_;
-  
   win32::Window cancel_button_;
   win32::ListView list_;
   win32::Rebar rebar_;
-  win32::StatusBar statusbar_;
-  win32::Toolbar toolbar_, toolbar_filter_;
+  win32::Toolbar toolbar_;
 };
 
 extern class SeasonDialog SeasonDialog;

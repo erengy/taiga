@@ -113,6 +113,19 @@ HIMAGELIST TreeView::SetImageList(HIMAGELIST himl, INT iImage) {
   return TreeView_SetImageList(m_hWindow, himl, iImage);
 }
 
+BOOL TreeView::SetItem(HTREEITEM hItem, LPCWSTR pszText) {
+  TVITEM tvi = {0};
+  tvi.mask   = TVIF_HANDLE;
+  tvi.hItem  = hItem;
+
+  if (!TreeView_GetItem(m_hWindow, &tvi))
+    return FALSE;
+
+  tvi.mask |= TVIF_TEXT;
+  tvi.pszText = (LPWSTR)pszText;
+  return TreeView_SetItem(m_hWindow, &tvi);
+}
+
 int TreeView::SetItemHeight(SHORT cyItem) {
   return TreeView_SetItemHeight(m_hWindow, cyItem);
 }

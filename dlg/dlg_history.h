@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SEARCH_H
-#define DLG_SEARCH_H
+#ifndef DLG_HISTORY_H
+#define DLG_HISTORY_H
 
 #include "../std.h"
 #include "../win32/win_control.h"
@@ -25,27 +25,25 @@
 
 // =============================================================================
 
-class SearchDialog : public win32::Dialog {
+class HistoryDialog : public win32::Dialog {
 public:
-  SearchDialog() {};
-  virtual ~SearchDialog() {};
-  
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  HistoryDialog() {}
+  virtual ~HistoryDialog() {}
+
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
+  BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
-  void EnableInput(bool enable);
-  void ParseResults(const wstring& data);
   void RefreshList();
-  bool Search(const wstring& title);
+  bool MoveItems(int pos);
+  bool RemoveItems();
 
 private:
-  vector<int> anime_ids_;
   win32::ListView list_;
 };
 
-extern class SearchDialog SearchDialog;
+extern class HistoryDialog HistoryDialog;
 
-#endif // DLG_SEARCH_H
+#endif // DLG_HISTORY_H

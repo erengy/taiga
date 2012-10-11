@@ -31,6 +31,8 @@
 
 #include "win32/win_registry.h"
 
+#define MAKEQWORD(a, b)	((QWORD)( ((QWORD) ((DWORD) (a))) << 32 | ((DWORD) (b))))
+
 // =============================================================================
 
 wstring Base64Decode(const wstring& str, bool for_filename) {
@@ -218,6 +220,43 @@ unsigned long GetFileAge(const wstring& path) {
 
   // Return difference in seconds
   return static_cast<unsigned long>((ul_now.QuadPart - ul_file.QuadPart) / 10000000);
+}
+
+QWORD GetFileSize(const wstring& path) {
+  QWORD file_size = 0;
+  HANDLE hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, 
+    NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+  if (hFile != INVALID_HANDLE_VALUE) {
+    DWORD size_low = 0, size_high = 0;
+    size_low = ::GetFileSize(hFile, &size_high);
+    file_size = (size_low == INVALID_FILE_SIZE) ? 0 : MAKEQWORD(size_high, size_low);
+    CloseHandle(hFile);
+  }
+
+  return file_size;
+}
+
+QWORD GetFolderSize(const wstring& path, bool recursive) {
+  QWORD folder_size = 0;
+  WIN32_FIND_DATA wfd;
+  wstring folder = path + L"*.*";
+  
+  HANDLE hFind = FindFirstFile(folder.c_str(), &wfd);
+  if (hFind == INVALID_HANDLE_VALUE) return 0;
+
+  do {
+    if (recursive && wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+      if (wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
+        folder = path + wfd.cFileName + L"\\";
+        folder_size += GetFolderSize(folder, recursive);
+      }
+    }
+    folder_size += GetFileSize(path + wfd.cFileName);
+  } while (FindNextFile(hFind, &wfd));
+	
+  FindClose(hFind);
+  return folder_size;
 }
 
 // =============================================================================

@@ -41,7 +41,6 @@ class SeasonDialog SeasonDialog;
 SeasonDialog::SeasonDialog()
     : group_by(SEASON_GROUPBY_TYPE), 
       sort_by(SEASON_SORTBY_TITLE) {
-  RegisterDlgClass(L"TaigaSeasonW");
 }
 
 BOOL SeasonDialog::OnInitDialog() {
@@ -63,20 +62,6 @@ BOOL SeasonDialog::OnInitDialog() {
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_SEASON));
   toolbar_.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
   toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
-  // Create search toolbar
-  toolbar_filter_.Attach(GetDlgItem(IDC_TOOLBAR_SEARCH));
-  toolbar_filter_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
-  // Create search text
-  edit_.Attach(GetDlgItem(IDC_EDIT_SEASON_FILTER));
-  edit_.SetCueBannerText(L"Filter");
-  edit_.SetParent(toolbar_filter_.GetWindowHandle());
-  edit_.SetPosition(nullptr, 0, 0, 160, 20);
-  edit_.SetMargins(1, 16);
-  win32::Rect rect_edit; edit_.GetRect(&rect_edit);
-  // Create cancel filter button
-  cancel_button_.Attach(GetDlgItem(IDC_BUTTON_CANCELFILTER));
-  cancel_button_.SetParent(edit_.GetWindowHandle());
-  cancel_button_.SetPosition(nullptr, rect_edit.right + 1, 0, 16, 16);
 
   // Insert toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
@@ -97,11 +82,6 @@ BOOL SeasonDialog::OnInitDialog() {
   rebar_.InsertBand(nullptr, 0, 0, 0, 0, 0, 0, 0, 0, fMask, fStyle);
   rebar_.InsertBand(toolbar_.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
     HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), fMask, fStyle);
-  rebar_.InsertBand(toolbar_filter_.GetWindowHandle(), 0, 0, 0, 170, 0, 0, 0, 20, fMask, fStyle);
-
-  // Create status bar
-  statusbar_.Attach(GetDlgItem(IDC_STATUSBAR_SEASON));
-  statusbar_.SetImageList(UI.ImgList16.GetHandle());
 
   // Refresh
   RefreshData(false);
@@ -127,17 +107,6 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
   }
 
-  // Filter text
-  if (HIWORD(wParam) == EN_CHANGE) {
-    if (LOWORD(wParam) == IDC_EDIT_SEASON_FILTER) {
-      wstring filter_text;
-      edit_.GetText(filter_text);
-      cancel_button_.Show(filter_text.empty() ? SW_HIDE : SW_SHOWNORMAL);
-      RefreshList();
-      return TRUE;
-    }
-  }
-
   return FALSE;
 }
 
@@ -153,11 +122,6 @@ LRESULT SeasonDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // Toolbar
   } else if (idCtrl == IDC_TOOLBAR_SEASON) {
     return OnToolbarNotify(reinterpret_cast<LPARAM>(pnmh));
-  // Button
-  } else if (idCtrl == IDC_BUTTON_CANCELFILTER) {
-    if (pnmh->code == NM_CUSTOMDRAW) {
-      return OnButtonCustomDraw(reinterpret_cast<LPARAM>(pnmh));
-    }
   }
   
   return 0;
@@ -168,71 +132,13 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win32::Rect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
-      rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
       rcWindow.top += rebar_.GetBarHeight() + ScaleY(WIN_CONTROL_MARGIN / 2);
-      // Resize status bar
-      win32::Rect rcStatus;
-      statusbar_.GetClientRect(&rcStatus);
-      statusbar_.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.bottom -= rcStatus.Height();
       // Resize list
       list_.SetPosition(nullptr, rcWindow);
     }
   }
-}
-
-BOOL SeasonDialog::PreTranslateMessage(MSG* pMsg) {
-  switch (pMsg->message) {
-    case WM_KEYDOWN: {
-      if (::GetFocus() == edit_.GetWindowHandle()) {
-        switch (pMsg->wParam) {
-          // Clear filter text
-          case VK_ESCAPE: {
-            edit_.SetText(L"");
-            return TRUE;
-          }
-        }
-      }
-      break;
-    }
-  }
-
-  return FALSE;
-}
-
-LRESULT SeasonDialog::CEditFilter::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uMsg) {
-    case WM_COMMAND: {
-      if (HIWORD(wParam) == BN_CLICKED) {
-        // Clear filter text
-        if (LOWORD(wParam) == IDC_BUTTON_CANCELFILTER) {
-          SetText(L"");
-          return TRUE;
-        }
-      }
-      break;
-    }
-  }
-  
-  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT SeasonDialog::OnButtonCustomDraw(LPARAM lParam) {
-  LPNMCUSTOMDRAW pCD = reinterpret_cast<LPNMCUSTOMDRAW>(lParam);
-
-  switch (pCD->dwDrawStage) {
-    case CDDS_PREPAINT: {
-      win32::Dc dc = pCD->hdc;
-      dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
-      UI.ImgList16.Draw(ICON16_CROSS, dc.Get(), 0, 0);
-      dc.DetachDC();
-      return CDRF_SKIPDEFAULT;
-    }
-  }
-
-  return 0;
 }
 
 // =============================================================================
@@ -312,9 +218,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       hdc.FillRect(rect, RGB(250, 250, 250));
 
       // Calculate text height
-      SIZE size = {0};
-      GetTextExtentPoint32(hdc.Get(), L"T", 1, &size);
-      int text_height = size.cy;
+      int text_height = GetTextHeight(hdc.Get());
 
       // Calculate areas
       win32::Rect rect_image(
@@ -553,8 +457,6 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   }
 
   // Filter
-  wstring filter_text;
-  edit_.GetText(filter_text);
   vector<wstring> filters;
   Split(filter_text, L" ", filters);
   RemoveEmptyStrings(filters);
@@ -628,7 +530,7 @@ void SeasonDialog::RefreshStatus() {
     }
   }
   
-  if (!last_modified) {
+  /*if (!last_modified) {
     statusbar_.SetText(L"");
   } else {
     time_t time_now = time(nullptr);
@@ -638,7 +540,7 @@ void SeasonDialog::RefreshStatus() {
       statusbar_.SetText(L"  Last updated: " + 
         ToDateString(time_now - last_modified) + L" ago");
     }
-  }
+  }*/
 }
 
 void SeasonDialog::RefreshToolbar() {

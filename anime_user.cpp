@@ -21,7 +21,7 @@
 #include "anime_db.h"
 #include "anime_user.h"
 
-#include "event.h"
+#include "history.h"
 #include "http.h"
 #include "myanimelist.h"
 #include "string.h"
@@ -82,7 +82,7 @@ int ListUser::GetItemCount(int status, bool check_events) const {
   }
 
   // Search event queue for status changes
-  EventList* event_list = EventQueue.FindList();
+  EventList* event_list = History.queue.FindList();
   if (check_events && event_list) {
     for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
       if (it->mode == HTTP_MAL_AnimeAdd) continue;

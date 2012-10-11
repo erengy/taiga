@@ -136,6 +136,19 @@
 		<edit mode="2">Media Player Classic</edit>
 		<edit mode="2">MPC-HC</edit>
 	</player>
+	<!-- Media Player Classic - BE -->
+	<player>
+		<name>Media Player Classic - BE</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>0</mode>
+		<class>MediaPlayerClassicW</class>
+		<file>mpc-be.exe</file>
+		<file>mpc-be64.exe</file>
+		<folder>%ProgramFiles%\MPC-BE\</folder>
+		<folder>%ProgramW6432%\MPC-BE\</folder>
+		<edit mode="2">MPC-BE</edit>
+	</player>
 	<!-- Miro -->
 	<player>
 		<name>Miro</name>

@@ -54,12 +54,6 @@
     <ClCompile Include="dlg\dlg_anime_info_page.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="dlg\dlg_event.cpp">
-      <Filter>Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="dlg\dlg_filter.cpp">
-      <Filter>Dialogs</Filter>
-    </ClCompile>
     <ClCompile Include="dlg\dlg_format.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
@@ -103,9 +97,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="encryption.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gfx.cpp">
@@ -339,6 +330,21 @@
     <ClCompile Include="api.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dlg\dlg_anime_list.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="history.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlg\dlg_history.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="dlg\dlg_stats.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="dlg\dlg_manga_list.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -348,12 +354,6 @@
       <Filter>Dialogs\Headers</Filter>
     </ClInclude>
     <ClInclude Include="dlg\dlg_anime_info_page.h">
-      <Filter>Dialogs\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="dlg\dlg_event.h">
-      <Filter>Dialogs\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="dlg\dlg_filter.h">
       <Filter>Dialogs\Headers</Filter>
     </ClInclude>
     <ClInclude Include="dlg\dlg_format.h">
@@ -387,9 +387,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dde.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gfx.h">
@@ -571,6 +568,21 @@
     </ClInclude>
     <ClInclude Include="api.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_anime_list.h">
+      <Filter>Dialogs\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="history.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_history.h">
+      <Filter>Dialogs\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_stats.h">
+      <Filter>Dialogs\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_manga_list.h">
+      <Filter>Dialogs\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

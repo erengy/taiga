@@ -44,7 +44,6 @@ public:
 private:
   win32::ListView list_;
   win32::Rebar rebar_;
-  win32::StatusBar statusbar_;
   win32::Toolbar toolbar_;
 };
 

@@ -34,7 +34,7 @@ Statistics::Statistics()
       episode_count(0), 
       score_mean(0.0f), 
       score_deviation(0.0f),
-      score_distribution(11) {
+      score_distribution(11, 0.0f) {
 }
 
 // =============================================================================
@@ -145,16 +145,15 @@ float Statistics::CalculateScoreDeviation() {
   return score_deviation;
 }
 
-
 vector<float> Statistics::CalculateScoreDistribution() {
-  int score;
-  int extreme_value = 1;
+  int score = 0;
+  float extreme_value = 1.0f;
 
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
     score = it->second.GetMyScore();
     if (score > 0) {
       score_distribution[score]++;
-      extreme_value = max(score_distribution[score],extreme_value);
+      extreme_value = max(score_distribution[score], extreme_value);
     }
   }
 

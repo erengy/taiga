@@ -16,28 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_FILTER_H
-#define DLG_FILTER_H
-
 #include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
 
-// =============================================================================
+#include "dlg_manga_list.h"
 
-class FilterDialog : public win32::Dialog {
-public:
-  FilterDialog();
-  ~FilterDialog() {}
-  
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  BOOL PreTranslateMessage(MSG* pMsg);
-
-public:
-  void RefreshFilters();
-};
-
-extern class FilterDialog FilterDialog;
-
-#endif // DLG_FILTER_H
+class MangaListDialog MangaListDialog;

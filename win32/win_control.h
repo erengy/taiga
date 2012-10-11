@@ -387,6 +387,7 @@ public:
   BOOL       SelectItem(HTREEITEM hItem);
   UINT       SetCheckState(HTREEITEM hItem, BOOL fCheck);
   HIMAGELIST SetImageList(HIMAGELIST himl, INT iImage = TVSIL_NORMAL);
+  BOOL       SetItem(HTREEITEM hItem, LPCWSTR pszText);
   int        SetItemHeight(SHORT cyItem);
 
 protected:

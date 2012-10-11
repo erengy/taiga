@@ -45,6 +45,12 @@ HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bIta
   return reinterpret_cast<HFONT>(SelectObject(hdc, hFont));
 }
 
+int GetTextHeight(HDC hdc) {
+  SIZE size = {0};
+  GetTextExtentPoint32(hdc, L"T", 1, &size);
+  return size.cy;
+}
+
 BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, bool bVertical) { 
   TRIVERTEX vertex[2];
   vertex[0].x     = lpRect->left;

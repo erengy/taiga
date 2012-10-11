@@ -30,7 +30,7 @@ bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list
 void CheckSlash(wstring& str);
 wstring CheckSlash(const wstring& str);
 int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensitive = true, size_t max_count = MAX_PATH);
-wstring DecodeHtml(wstring str);
+void DecodeHtmlEntities(wstring& str);
 wstring EncodeUrl(const wstring& str, bool encode_unreserved = false);
 bool EndsWith(const wstring& str, const wstring& search);
 size_t LevenshteinDistance(const wstring& str1, const wstring& str2);
@@ -69,7 +69,7 @@ void ReplaceChars(wstring& str, const wchar_t chars[], const wstring replace_wit
 wstring Join(const vector<wstring>& join_vector, const wstring& separator);
 void Split(const wstring& str, const wstring& separator, std::vector<wstring>& split_vector);
 bool StartsWith(const wstring& str, const wstring& search);
-wstring StripHtml(wstring str);
+void StripHtmlTags(wstring& str);
 wstring SubStr(const wstring& str, const wstring& sub_begin, const wstring& sub_end);
 size_t Tokenize(const wstring& str, const wstring& delimiters, vector<wstring>& tokens);
 const char* ToANSI(const wstring& str, UINT code_page = CP_UTF8);

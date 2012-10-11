@@ -33,26 +33,6 @@
 
 // =============================================================================
 
-void UpdateAccountMenu() {
-  int menu_index = UI.Menus.GetIndex(L"Account");
-  if (menu_index > -1) {
-    // Account > Log in
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].Action == L"LoginLogout()") {
-        MENU.Items[i].Name = Taiga.logged_in ? L"Log out" : L"Log in";
-        break;
-      }
-    }
-    // Account > Enable recognition
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].Action == L"ToggleRecognition()") {
-        MENU.Items[i].Checked = Taiga.is_recognition_enabled;
-        break;
-      }
-    }
-  }
-}
-
 void UpdateAnimeMenu(anime::Item* anime_item) {
   if (!anime_item) return;
   if (!anime_item->IsInList()) return;
@@ -188,7 +168,7 @@ void UpdateSearchMenu() {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       MENU.Items[i].Checked = false;
     }
-    MENU.Items[0].Checked = MainDialog.search_bar.filter_list;
+    MENU.Items[0].Checked = MainDialog.search_bar.filter_content;
     if (MainDialog.search_bar.index < MENU.Items.size()) {
       MENU.Items[MainDialog.search_bar.index].Checked = true;
     }
@@ -249,6 +229,19 @@ void UpdateSeasonMenu() {
   }
 }
 
+void UpdateToolsMenu() {
+  int menu_index = UI.Menus.GetIndex(L"Tools");
+  if (menu_index > -1) {
+    // Tools > Enable anime recognition
+    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+      if (MENU.Items[i].Action == L"ToggleRecognition()") {
+        MENU.Items[i].Checked = Taiga.is_recognition_enabled;
+        break;
+      }
+    }
+  }
+}
+
 void UpdateTrayMenu() {
   int menu_index = UI.Menus.GetIndex(L"Tray");
   if (menu_index > -1) {
@@ -262,12 +255,32 @@ void UpdateTrayMenu() {
   }
 }
 
+void UpdateViewMenu() {
+  int item_index, menu_index = -1;
+
+  menu_index = UI.Menus.GetIndex(L"View");
+  if (menu_index > -1) {
+    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+      MENU.Items[i].Checked = false;
+    }
+    item_index = MainDialog.GetCurrentPage();
+    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+      if (MENU.Items[i].Action == L"ViewContent(" + ToWstr(item_index) + L")") {
+        MENU.Items[i].Checked = true;
+        break;
+      }
+    }
+    MENU.Items.back().Checked = MainDialog.treeview.IsVisible() == TRUE;
+  }
+}
+
 void UpdateAllMenus(anime::Item* anime_item) {
-  UpdateAccountMenu();
   UpdateAnimeMenu(anime_item);
   UpdateAnnounceMenu();
   UpdateFilterMenu();
   UpdateFoldersMenu();
   UpdateSearchMenu();
+  UpdateToolsMenu();
   UpdateTrayMenu();
+  UpdateViewMenu();
 }

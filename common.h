@@ -58,6 +58,8 @@ int TranslateResolution(const wstring& str, bool return_validity = false);
 int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 unsigned long GetFileAge(const wstring& path);
+QWORD GetFileSize(const wstring& path);
+QWORD GetFolderSize(const wstring& path, bool recursive);
 bool Execute(const wstring& path, const wstring& parameters = L"");
 BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");
 void ExecuteLink(const wstring& link);
@@ -88,7 +90,6 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
 // menu.cpp
 void UpdateAllMenus(anime::Item* anime_item = nullptr);
-void UpdateAccountMenu();
 void UpdateAnimeMenu(anime::Item* anime_item);
 void UpdateAnnounceMenu();
 void UpdateFilterMenu();
@@ -97,7 +98,9 @@ void UpdateSearchMenu();
 void UpdateSearchListMenu(bool enabled = false);
 void UpdateSeasonListMenu(bool enabled = false);
 void UpdateSeasonMenu();
+void UpdateToolsMenu();
 void UpdateTrayMenu();
+void UpdateViewMenu();
 
 // script.cpp
 wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);

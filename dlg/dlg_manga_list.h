@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SEARCH_H
-#define DLG_SEARCH_H
+#ifndef DLG_MANGA_LIST_H
+#define DLG_MANGA_LIST_H
 
 #include "../std.h"
 #include "../win32/win_control.h"
@@ -25,27 +25,12 @@
 
 // =============================================================================
 
-class SearchDialog : public win32::Dialog {
+class MangaListDialog : public win32::Dialog {
 public:
-  SearchDialog() {};
-  virtual ~SearchDialog() {};
-  
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
-  void OnSize(UINT uMsg, UINT nType, SIZE size);
-
-public:
-  void EnableInput(bool enable);
-  void ParseResults(const wstring& data);
-  void RefreshList();
-  bool Search(const wstring& title);
-
-private:
-  vector<int> anime_ids_;
-  win32::ListView list_;
+  MangaListDialog() {}
+  virtual ~MangaListDialog() {}
 };
 
-extern class SearchDialog SearchDialog;
+extern class MangaListDialog MangaListDialog;
 
-#endif // DLG_SEARCH_H
+#endif // DLG_MANGA_LIST_H

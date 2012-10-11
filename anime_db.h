@@ -96,6 +96,24 @@ class Database {
   wstring folder_;
 };
 
+class FansubDatabase {
+ public:
+  FansubDatabase();
+  virtual ~FansubDatabase() {}
+
+  // Loads fansub data from db\fansub.xml, returns false if no such file exists.
+  bool Load();
+
+  // Saves fansub data to db\fansub.xml.
+  void Save();
+  
+  list<wstring> items;
+
+ private:
+  wstring file_;
+  wstring folder_;
+};
+
 class SeasonDatabase {
  public:
   SeasonDatabase();

@@ -19,34 +19,32 @@
 #include "../std.h"
 #include <algorithm>
 
-#include "dlg_event.h"
+#include "dlg_anime_list.h"
+#include "dlg_history.h"
 #include "dlg_main.h"
 
 #include "../anime_db.h"
 #include "../common.h"
-#include "../event.h"
+#include "../gfx.h"
+#include "../history.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../settings.h"
 #include "../string.h"
 #include "../taiga.h"
 
-class EventDialog EventDialog;
+class HistoryDialog HistoryDialog;
 
 // =============================================================================
 
-EventDialog::EventDialog() {
-  RegisterDlgClass(L"TaigaEventW");
-}
-
-BOOL EventDialog::OnInitDialog() {
+BOOL HistoryDialog::OnInitDialog() {
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_EVENT));
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetTheme();
   
   // Insert list columns
-  list_.InsertColumn(0, 190, 190, LVCFMT_LEFT, L"Anime title");
+  list_.InsertColumn(0, 250, 250, LVCFMT_LEFT, L"Anime title");
   list_.InsertColumn(1, 325, 325, LVCFMT_LEFT, L"Details");
   list_.InsertColumn(2, 120, 120, LVCFMT_LEFT, L"Last modified");
   list_.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
@@ -56,26 +54,13 @@ BOOL EventDialog::OnInitDialog() {
   return TRUE;
 }
 
-BOOL EventDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
-  switch (LOWORD(wParam)) {
-    // Clear all items
-    case IDC_BUTTON_EVENT_CLEAR: {
-      if (RemoveItems()) {
-        return TRUE;
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-LRESULT EventDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
+LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   if (pnmh->hwndFrom == list_.GetWindowHandle()) {
     switch (pnmh->code) {
       // List item select
       case LVN_ITEMCHANGED: {
-        SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, 
-          list_.GetSelectedCount() > 0 ? L"Remove selected items" : L"Remove all items");
+        /*SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, 
+          list_.GetSelectedCount() > 0 ? L"Remove selected items" : L"Remove all items");*/
         break;
       }
       // Custom draw
@@ -97,15 +82,17 @@ LRESULT EventDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   return 0;
 }
 
-void EventDialog::OnOK() {
-  if (!Taiga.logged_in) {
-    ExecuteAction(L"Login");
-  } else {
-    EventQueue.Check();
+void HistoryDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
+  switch (uMsg) {
+    case WM_SIZE: {
+      win32::Rect rcWindow(0, 0, size.cx, size.cy);
+      list_.SetPosition(nullptr, rcWindow, 0);
+      break;
+    }
   }
 }
 
-BOOL EventDialog::PreTranslateMessage(MSG* pMsg) {
+BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
   switch (pMsg->message) {
     case WM_KEYDOWN: {
       if (::GetFocus() == list_.GetWindowHandle()) {
@@ -137,14 +124,14 @@ BOOL EventDialog::PreTranslateMessage(MSG* pMsg) {
 
 // =============================================================================
 
-void EventDialog::RefreshList() {
+void HistoryDialog::RefreshList() {
   if (!IsWindow()) return;
   
   // Clear list
   list_.DeleteAllItems();
   
   // Add items
-  EventList* event_list = EventQueue.FindList();
+  EventList* event_list = History.queue.FindList();
   if (event_list) {
     for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
       int i = list_.GetItemCount();
@@ -177,10 +164,10 @@ void EventDialog::RefreshList() {
   }
 
   // Enable/disable update button
-  EnableDlgItem(IDOK, EventQueue.GetItemCount() > 0 ? TRUE : FALSE);
+  EnableDlgItem(IDOK, History.queue.GetItemCount() > 0 ? TRUE : FALSE);
 
   // Set title
-  switch (EventQueue.GetItemCount()) {
+  /*switch (History.queue.GetItemCount()) {
     case 0:
       SetText(L"Event Queue");
       break;
@@ -188,18 +175,18 @@ void EventDialog::RefreshList() {
       SetText(L"Event Queue (1 item)");
       break;
     default:
-      SetText(L"Event Queue (" + ToWstr(EventQueue.GetItemCount()) + L" items)");
+      SetText(L"Event Queue (" + ToWstr(History.queue.GetItemCount()) + L" items)");
       break;
-  }
+  }*/
 }
 
-bool EventDialog::MoveItems(int pos) {
-  if (EventQueue.updating) {
+bool HistoryDialog::MoveItems(int pos) {
+  if (History.queue.updating) {
     MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;
   }
 
-  EventList* event_list = EventQueue.FindList();
+  EventList* event_list = History.queue.FindList();
   if (event_list == nullptr) return false;
   
   int index = -1;
@@ -226,8 +213,8 @@ bool EventDialog::MoveItems(int pos) {
   return true;
 }
 
-bool EventDialog::RemoveItems() {
-  if (EventQueue.updating) {
+bool HistoryDialog::RemoveItems() {
+  if (History.queue.updating) {
     MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;
   }
@@ -235,18 +222,18 @@ bool EventDialog::RemoveItems() {
   if (list_.GetSelectedCount() > 0) {
     while (list_.GetSelectedCount() > 0) {
       int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
-      EventQueue.Remove(item_index, false, false);
+      History.queue.Remove(item_index, false, false);
       list_.DeleteItem(item_index);
     }
     Settings.Save();
   } else {
-    EventQueue.Clear();
+    History.queue.Clear();
   }
   
   RefreshList();
-  SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, L"Remove all items");
-  MainDialog.RefreshList();
-  MainDialog.RefreshTabs();
+  //SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, L"Remove all items");
+  AnimeListDialog.RefreshList();
+  AnimeListDialog.RefreshTabs();
 
   return true;
 }

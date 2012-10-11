@@ -217,7 +217,7 @@ void FeedFilterDialog::ChoosePage(int index) {
             L"There must be at least one condition in order to create a filter.");
           dlg.SetContent(
             L"You may add a condition using the Add New Condition button, "
-            L"or choose a preset from the previous page.");
+            L"or by choosing a preset from the previous page.");
           dlg.AddButton(L"OK", IDOK);
           dlg.Show(GetWindowHandle());
           return;

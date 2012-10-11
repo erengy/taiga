@@ -248,7 +248,7 @@ void FormatDialog::RefreshPreviewText() {
     }
     case FORMAT_MODE_SKYPE: {
       // Strip HTML codes
-      str = StripHtml(str);
+      StripHtmlTags(str);
     }
   }
   

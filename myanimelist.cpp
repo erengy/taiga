@@ -23,7 +23,7 @@
 #include "anime.h"
 #include "anime_db.h"
 #include "common.h"
-#include "event.h"
+#include "history.h"
 #include "http.h"
 #include "settings.h"
 #include "string.h"
@@ -133,7 +133,9 @@ bool ParseAnimeDetails(const wstring& data) {
   anime_item.SetGenres(InStr(data, L"Genres:</span> ", L"<br />"));
   anime_item.SetRank(InStr(data, L"Ranked:</span> ", L"<br />"));
   anime_item.SetPopularity(InStr(data, L"Popularity:</span> ", L"<br />"));
-  anime_item.SetScore(StripHtml(InStr(data, L"Score:</span> ", L"<br />")));
+  wstring score = InStr(data, L"Score:</span> ", L"<br />");
+  StripHtmlTags(score);
+  anime_item.SetScore(score);
   anime_item.last_modified = time(nullptr);
   AnimeDatabase.UpdateItem(anime_item);
 
@@ -156,7 +158,10 @@ bool ParseSearchResult(const wstring& data, int anime_id) {
       anime_item.SetId(XML_ReadIntValue(entry, L"id"));
       if (!current_anime_item || !current_anime_item->keep_title)
         anime_item.SetTitle(mal::DecodeText(XML_ReadStrValue(entry, L"title")));
-      anime_item.SetSynonyms(mal::DecodeText(XML_ReadStrValue(entry, L"synonyms")));
+      wstring synonyms = mal::DecodeText(XML_ReadStrValue(entry, L"synonyms"));
+      wstring english = mal::DecodeText(XML_ReadStrValue(entry, L"english"));
+      AppendString(synonyms, english, L"; ");
+      anime_item.SetSynonyms(synonyms);
       anime_item.SetEpisodeCount(XML_ReadIntValue(entry, L"episodes"));
       anime_item.SetScore(XML_ReadStrValue(entry, L"score"));
       anime_item.SetType(mal::TranslateType(XML_ReadStrValue(entry, L"type")));
@@ -459,75 +464,17 @@ bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
       }
   }
   Replace(item.reason, L"</div><div>", L"\r\n");
-  item.reason = StripHtml(item.reason);
+  StripHtmlTags(item.reason);
   return false;
 }
 
 // =============================================================================
 
 wstring DecodeText(wstring text) {
-  // TODO: Remove when MAL fixes its encoding >_<
-  #define HTMLCHARCOUNT 36
-  static const wchar_t* html_chars[HTMLCHARCOUNT][2] = {
-    /* Extreme measures */
-    // black star (black and white stars are encoded the same in API >_<)
-    {L"k&acirc;\uFFFD\uFFFDR", L"k\u2605R"},
-    // right single quotation mark (followed by an 's')
-    {L"&acirc;\uFFFD\uFFFDs ", L"\u2019s "},
-    // surname of the Yellow Emperor (don't ask why, I just got the name from FileFormat.info)
-    {L"&egrave;&raquo;\uFFFD&aring;", L"\u8ED2"},
-    // Onegai My Melody Kirara complete encode (spare the star, because I can't crack that damn encoding 
-    // so it will work with the rest of this crappy encoding mal employs in their API)...
-    {L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD"
-     L"&atilde;\uFFFD&curren;&atilde;\uFFFD&iexcl;&atilde;\uFFFD&shy;&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound; "
-     L"&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD\uFFFD&atilde;\uFFFD&pound;", 
-     L"\u304A\u306D\u304C\u3044\u30DE\u30A4\u30E1\u30ED\u30C7\u30A3 \u304D\u3089\u3089\u3063"},
-    /* Characters are sorted by their Unicode value */
-    {L"&Acirc;&sup2;",          L"\u00B2"},   // superscript 2
-    {L"&Acirc;&sup3;",          L"\u00B3"},   // superscript 3
-    {L"&Acirc;&frac12;",        L"\u00BD"},   // fraction 1/2
-    {L"&Atilde;&cent;",         L"\u00E2"},   // small a, circumflex accent
-    {L"&Atilde;&curren;",       L"\u00E4"},   // small a, umlaut mark
-    {L"&Atilde;&brvbar",        L"\u00E6"},   // latin small letter ae
-    {L"&Atilde;&uml;",          L"\u00E8"},   // small e, grave accent
-    {L"&Atilde;&copy;",         L"\u00E9"},   // small e, acute accent
-    {L"&Atilde;&frac14;",       L"\u00FC"},   // small u, umlaut mark
-    {L"&Aring;&laquo;",         L"\u016B"},   // small u, macron mark
-    {L"&Icirc;&nbsp;",          L"\u03A0"},   // greek capital letter pi
-    {L"&Icirc;&pound;",         L"\u03A3"},   // greek capital letter sigma
-    {L"&acirc;\uFFFD&frac14;",  L"\u203C"},   // double exclamation mark
-    {L"&acirc;\uFFFD&yen;",     L"\u2665"},   // heart
-    {L"&acirc;\uFFFD&ordf;",    L"\u266A"},   // eighth note
-    {L"&acirc;\uFFFD\uFFFD",    L"\u2729"},   // white star
-    {L"&atilde;\uFFFD&ordf;",   L"\u30AA"},   // katakana letter o
-    {L"&atilde;\uFFFD&not;",    L"\u30AC"},   // katakana letter ga
-    {L"&atilde;\uFFFD&macr;",   L"\u30AF"},   // katakana letter ku
-    {L"&atilde;\uFFFD&iquest;", L"\u30BF"},   // katakana letter ta
-    {L"&atilde;\uFFFD\uFFFD",   L"\u30CD"},   // katakana letter ne
-    {L"&atilde;\uFFFD&iexcl;",  L"\u30E1"},   // katakana letter me
-    {L"&aring;\uFFFD&shy;",     L"\u516D"},   // han character 'number six'
-    {L"&sup3;&para;",           L"\u5CF6"},   // han character 'island'
-    {L"&aring;&iquest;\uFFFD",  L"\u5FCD"},   // endure
-    {L"&aelig;\uFFFD\uFFFD",    L"\u624B"},   // hand
-    {L"&aelig;\uFFFD&frac14;",  L"\u62BC"},   // mortgage
-    {L"&ccedil;&copy;&ordm;",   L"\u7A7A"},   // empty
-    {L"&eacute;\uFFFD&uml;",    L"\u90E8"},   // division
-    /* Keep these at the end so they get replaced after others that include \uFFFD */
-    {L"&Atilde;\uFFFD",         L"\u00DF"},   // small sharp s, German
-    {L"&Aring;\uFFFD",          L"\u014D"},   // small o, macron mark
-    {L"&acirc;\uFFFD",          L"\u2020"},   // dagger
-  };
-  if (InStr(text, L"&") > -1) {
-    for (int i = 0; i < HTMLCHARCOUNT; i++) {
-      Replace(text, html_chars[i][0], html_chars[i][1], true, false);
-    }
-  }
-  #undef HTMLCHARCOUNT
-  
   Replace(text, L"<br />", L"\r", true);
   Replace(text, L"\n\n", L"\r\n\r\n", true);
-  text = DecodeHtml(StripHtml(text));
-
+  StripHtmlTags(text);
+  DecodeHtmlEntities(text);
   return text;
 }
 
@@ -544,7 +491,7 @@ bool IsValidEpisode(int episode, int watched, int total) {
       (episode < watched) ||
       (episode == watched && total != 1) ||
       (episode > total && total != 0)) {
-        return false;
+    return false;
   }
   return true;
 }

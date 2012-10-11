@@ -177,12 +177,13 @@ bool Feed::Load() {
     }
     
     // Clean up title
-    items.back().title = DecodeHtml(items.back().title);
+    DecodeHtmlEntities(items.back().title);
     Replace(items.back().title, L"\\'", L"'");
     // Clean up description
     Replace(items.back().description, L"<br/>", L"\n");
     Replace(items.back().description, L"<br />", L"\n");
-    items.back().description = StripHtml(DecodeHtml(items.back().description));
+    StripHtmlTags(items.back().description);
+    DecodeHtmlEntities(items.back().description);
     Trim(items.back().description, L" \n");
     Aggregator.ParseDescription(items.back(), link);
     Replace(items.back().description, L"\n", L" | ");

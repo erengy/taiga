@@ -39,7 +39,6 @@ class TorrentDialog TorrentDialog;
 // =============================================================================
 
 TorrentDialog::TorrentDialog() {
-  RegisterDlgClass(L"TaigaTorrentW");
 }
 
 TorrentDialog::~TorrentDialog() {
@@ -91,9 +90,6 @@ BOOL TorrentDialog::OnInitDialog() {
   rebar_.InsertBand(toolbar_.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
     HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), 
     RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE, RBBS_NOGRIPPER);
-
-  // Create status bar
-  statusbar_.Attach(GetDlgItem(IDC_STATUSBAR_TORRENT));
 
   // Refresh list
   RefreshList();
@@ -285,15 +281,9 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win32::Rect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
-      rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
       rcWindow.top += rebar_.GetBarHeight() + ScaleY(WIN_CONTROL_MARGIN / 2);
-      // Resize status bar
-      win32::Rect rcStatus;
-      statusbar_.GetClientRect(&rcStatus);
-      statusbar_.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.bottom -= rcStatus.Height();
       // Resize list
       list_.SetPosition(NULL, rcWindow);
     }
@@ -305,7 +295,7 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 void TorrentDialog::ChangeStatus(wstring text, int panel_index) {
   // Change status text
   if (panel_index == 0) text = L"  " + text;
-  statusbar_.SetPartText(panel_index, text.c_str());
+  //statusbar_.SetPartText(panel_index, text.c_str());
 }
 
 void TorrentDialog::EnableInput(bool enable) {

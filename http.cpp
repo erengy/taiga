@@ -24,8 +24,8 @@
 #include "announce.h"
 #include "common.h"
 #include "debug.h"
-#include "event.h"
 #include "feed.h"
+#include "history.h"
 #include "myanimelist.h"
 #include "resource.h"
 #include "settings.h"
@@ -36,7 +36,8 @@
 
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_info_page.h"
-#include "dlg/dlg_event.h"
+#include "dlg/dlg_anime_list.h"
+#include "dlg/dlg_history.h"
 #include "dlg/dlg_input.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_search.h"
@@ -93,7 +94,7 @@ BOOL HttpClient::OnError(DWORD dwError) {
       UpdateDialog.PostMessage(WM_CLOSE);
       break;
     default:
-      EventQueue.updating = false;
+      History.queue.updating = false;
       MainDialog.ChangeStatus(error_text);
       MainDialog.EnableInput(true);
       break;
@@ -251,9 +252,9 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_RefreshAndLogin: {
       AnimeDatabase.LoadList(true); // Here we assume that MAL provides up-to-date series information in malappinfo.php
       MainDialog.ChangeStatus(L"List download completed.");
-      MainDialog.RefreshList(mal::MYSTATUS_WATCHING);
-      MainDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
-      EventDialog.RefreshList();
+      AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
+      AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
+      HistoryDialog.RefreshList();
       SearchDialog.PostMessage(WM_CLOSE);
       if (GetClientMode() == HTTP_MAL_RefreshList) {
         MainDialog.EnableInput(true);
@@ -279,8 +280,6 @@ BOOL HttpClient::OnReadComplete() {
       }
       if (Taiga.logged_in) {
         status = L"Logged in as " + Settings.Account.MAL.user + L".";
-        MainDialog.toolbar_main.SetButtonImage(0, ICON24_ONLINE);
-        MainDialog.toolbar_main.SetButtonTooltip(0, L"Log out");
       } else {
         status = L"Failed to log in.";
         switch (Settings.Account.MAL.api) {
@@ -307,7 +306,7 @@ BOOL HttpClient::OnReadComplete() {
       if (Taiga.logged_in) {
         switch (Settings.Account.MAL.api) {
           case MAL_API_OFFICIAL:
-            EventQueue.Check();
+            History.queue.Check();
             return TRUE;
           case MAL_API_NONE:
             mal::CheckProfile();
@@ -366,7 +365,7 @@ BOOL HttpClient::OnReadComplete() {
           }
         }
 
-        EventQueue.Check();
+        History.queue.Check();
         return TRUE;
       }
       break;
@@ -382,12 +381,12 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_ScoreUpdate:
     case HTTP_MAL_StatusUpdate:
     case HTTP_MAL_TagUpdate: {
-      EventQueue.updating = false;
+      History.queue.updating = false;
       MainDialog.ChangeStatus();
       int anime_id = static_cast<int>(GetParam());
       auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (anime_item && EventQueue.GetItemCount() > 0) {
-        EventList* event_list = EventQueue.FindList();
+      if (anime_item && History.queue.GetItemCount() > 0) {
+        EventList* event_list = History.queue.FindList();
         if (event_list) {
           anime_item->Edit(event_list->items[event_list->index], GetData(), GetResponseStatusCode());
           return TRUE;
@@ -404,7 +403,7 @@ BOOL HttpClient::OnReadComplete() {
       if (InStr(data, L"trueEp") > -1) {
         wstring url = InStr(data, L"self.parent.document.location='", L"';");
         int anime_id = static_cast<int>(GetParam());
-        EventList* event_list = EventQueue.FindList();
+        EventList* event_list = History.queue.FindList();
         if (!url.empty() && event_list) {
           int episode_number = event_list->items.at(event_list->index).episode;
           wstring title = AnimeDatabase.FindItem(anime_id)->GetTitle();

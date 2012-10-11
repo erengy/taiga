@@ -23,8 +23,8 @@
 #include "anime.h"
 #include "anime_filter.h"
 #include "common.h"
-#include "event.h"
 #include "gfx.h"
+#include "history.h"
 #include "http.h"
 #include "string.h"
 #include "taiga.h"
@@ -237,7 +237,7 @@ bool Settings::Load() {
       PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
     
   // Events
-  EventQueue.list.clear();
+  History.queue.list.clear();
   for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
     for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
       EventItem event_item;
@@ -258,7 +258,7 @@ bool Settings::Load() {
       if (date_finish != L"%empty%") event_item.date_finish = date_finish;
       event_item.time = item.attribute(L"time").value();
       event_item.mode = item.attribute(L"mode").as_int();
-      EventQueue.Add(event_item, false, user.attribute(L"name").value());
+      History.queue.Add(event_item, false, user.attribute(L"name").value());
     }
   }
 
@@ -348,7 +348,7 @@ bool Settings::Save() {
     mirc.append_attribute(L"channels") = Announce.MIRC.channels.c_str();
     // Skype
     xml_node skype = announce.append_child();
-    skype.set_name(L"http");
+    skype.set_name(L"skype");
     skype.append_attribute(L"enabled") = Announce.Skype.enabled;
     skype.append_attribute(L"format") = Announce.Skype.format.c_str();
     // Twitter
@@ -508,10 +508,10 @@ bool Settings::Save() {
   reg.CloseKey();
 
   // Write event queue
-  if (Program.Exit.save_event_queue && !EventQueue.IsEmpty()) {
+  if (Program.Exit.save_event_queue && !History.queue.IsEmpty()) {
     xml_node events = doc.append_child();
     events.set_name(L"events");
-    for (auto i = EventQueue.list.begin(); i != EventQueue.list.end(); ++i) {
+    for (auto i = History.queue.list.begin(); i != History.queue.list.end(); ++i) {
       if (i->items.empty()) continue;
       xml_node user = events.append_child();
       user.set_name(L"user");

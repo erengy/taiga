@@ -193,13 +193,10 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   size_t index = 0;
 
   if (!anime_ids.empty()) {
-    auto anime_item = AnimeDatabase.FindItem(item.episode_data.anime_id);
-    if (anime_item) {
-      for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
-        if (*it == anime_item->GetId()) {
-          condition = true;
-          break;
-        }
+    for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
+      if (*it == item.episode_data.anime_id) {
+        condition = true;
+        break;
       }
     }
     if (!condition) {

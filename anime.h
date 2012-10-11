@@ -111,7 +111,7 @@ class MyInformation {
 bool GetFansubFilter(int anime_id, vector<wstring>& groups);
 bool SetFansubFilter(int anime_id, const wstring& group_name);
 
-wstring GetImagePath(int anime_id);
+wstring GetImagePath(int anime_id = -1);
 
 } // namespace anime
 

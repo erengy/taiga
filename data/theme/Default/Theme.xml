@@ -20,31 +20,16 @@
 	<menus>
 		<!-- Main -->
 		<menu name="Main" type="menubar">
-			<item name="File"    sub="File"/>
 			<item name="Account" sub="Account"/>
-			<item name="List"    sub="List"/>
+			<item name="Library" sub="Library"/>
+			<item name="Tools"   sub="Tools"/>
+			<item name="View"    sub="View"/>
 			<item name="Help"    sub="Help"/>
 		</menu>
 		
-		<!-- File -->
-		<menu name="File">
-			<item name="Folders" sub="Folders"/>
-			<item type="separator"/>
-			<item name="Settings" action="Settings()"/>
-			<item type="separator"/>
-			<item name="Season browser" action="SeasonBrowser()"/>
-			<item name="Tools" sub="Tools"/>
-			<item name="Torrents" action="Torrents()"/>
-			<item type="separator"/>
-			<item name="Exit" action="Exit()"/>
-		</menu>
 		<!-- Account -->
 		<menu name="Account">
-			<item name="Log in" action="LoginLogout()"/>
-			<item name="Synchronize list" action="Synchronize()"/>
-			<item type="separator"/>
-			<item name="Check queued events" action="CheckEventBuffer()"/>
-			<item name="Enable recognition" action="ToggleRecognition()" checked="1"/>
+			<item name="Synchronize lists" action="Synchronize()"/>
 			<item type="separator"/>
 			<item name="MyAnimeList" sub="MyAnimeList"/>
 		</menu>
@@ -54,58 +39,58 @@
 				<item name="View my profile" action="ViewProfile()"/>
 				<item name="View my history" action="ViewHistory()"/>
 			</menu>
-		<!-- List -->
-		<menu name="List">
-			<item name="Announce current episode" sub="Announce"/>
-			<item name="Check available episodes" action="CheckEpisodes()"/>
-			<item name="Play random anime" action="PlayRandomAnime()"/>
-			<item name="Show statistics" action="ShowListStats()"/>
+		<!-- Library -->
+		<menu name="Library">
+			<item name="Anime folders" sub="Folders"/>
 			<item type="separator"/>
-			<item name="Filters" sub="Filters"/>
+			<item name="Play random anime" action="PlayRandomAnime()"/>
+			<item name="Scan available episodes" action="CheckEpisodes()"/>
 		</menu>
-			<!-- Announce -->
-			<menu name="Announce">
-				<item name="HTTP"      action="AnnounceToHTTP(true)"/>
-				<item name="Messenger" action="AnnounceToMessenger(true)"/>
-				<item name="mIRC"      action="AnnounceToMIRC(true)"/>
-				<item name="Skype"     action="AnnounceToSkype(true)"/>
-				<item name="Twitter"   action="AnnounceToTwitter(true)"/>
-			</menu>
-			<!-- Filter -->
-			<menu name="Filters">
-				<item name="Status" sub="FilterStatus"/>
-				<item name="Type"   sub="FilterType"/>
+		<!-- Share -->
+		<menu name="Announce">
+			<item name="HTTP"      action="AnnounceToHTTP(true)"/>
+			<item name="Messenger" action="AnnounceToMessenger(true)"/>
+			<item name="mIRC"      action="AnnounceToMIRC(true)"/>
+			<item name="Skype"     action="AnnounceToSkype(true)"/>
+			<item name="Twitter"   action="AnnounceToTwitter(true)"/>
+		</menu>
+		<!-- Tools -->
+		<menu name="Tools">
+			<item name="External services" sub="Services"/>
+			<item type="separator"/>
+			<item name="Enable anime recognition" action="ToggleRecognition()" checked="1"/>
+			<item name="Enable auto sharing" action="" checked="1" disabled="1"/>
+			<item name="Enable auto updates" action="" checked="1" disabled="1"/>
+			<item type="separator"/>
+			<item name="Settings" action="Settings()"/>
+		</menu>
+			<!-- Services -->
+			<menu name="Services">
+				<item name="Anime Recommendation Finder" action="URL(http://www.animerecs.com/)"/>
+				<item name="MALgraph" action="URL(http://mal.oko.im/)"/>
 				<item type="separator"/>
-				<item name="Reset" action="FilterReset"/>
+				<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
+				<item name="Fall 2012 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
+				<item name="The Fansub Wiki" action="URL(http://www.fansubwiki.com/)"/>
 			</menu>
-				<!-- Status -->
-				<menu name="FilterStatus">
-					<item name="Currently airing" action="FilterStatus(1)"/>
-					<item name="Finished airing"  action="FilterStatus(2)"/>
-					<item name="Not yet aired"    action="FilterStatus(3)"/>
-				</menu>
-				<!-- Type -->
-				<menu name="FilterType">
-					<item name="TV"      action="FilterType(1)"/>
-					<item name="OVA"     action="FilterType(2)"/>
-					<item name="Movie"   action="FilterType(3)"/>
-					<item name="Special" action="FilterType(4)"/>
-					<item name="ONA"     action="FilterType(5)"/>
-					<item name="Music"   action="FilterType(6)"/>
-				</menu>
+		<!-- View -->
+		<menu name="View">
+			<item name="Dashboard"   action="ViewContent(0)"/>
+			<item name="Now Playing" action="ViewContent(1)"/>
+			<item name="Anime List"  action="ViewContent(3)" checked="1" radio="1"/>
+			<item name="Manga List"  action="ViewContent(4)"/>
+			<item name="History"     action="ViewContent(6)"/>
+			<item name="Statistics"  action="ViewContent(7)"/>
+			<item name="Search"      action="ViewContent(9)"/>
+			<item name="Seasons"     action="ViewContent(10)"/>
+			<item name="Torrents"    action="ViewContent(12)"/>
+			<item type="separator"/>
+			<item name="Show sidebar" action="ShowSidebar()" checked="1"/>
+		</menu>
 		<!-- Folders -->
 		<menu name="Folders">
 			<!-- Note: Overwritten -->
 			<item name="Add new folder..." action="AddFolder()"/>
-		</menu>
-		<!-- Tools -->
-		<menu name="Tools">
-			<item name="Anime Recommendation Finder" action="URL(http://www.animerecs.com/)"/>
-			<item name="MALgraph" action="URL(http://mal.oko.im/)"/>
-			<item type="separator"/>
-			<item name="Currently Airing" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
-			<item name="Summer 2012 Anime Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
-			<item name="The Fansub Wiki" action="URL(http://www.fansubwiki.com/)"/>
 		</menu>
 		<!-- Help -->
 		<menu name="Help">
@@ -116,7 +101,7 @@
 		
 		<!-- Search bar -->
 		<menu name="SearchBar">
-			<item name="Filter list" action="ToggleListSearch()"/>
+			<item name="Filter current page" action="ToggleListSearch()"/>
 			<item type="separator"/>
 			<item name="Search MyAnimeList"  action="SetSearchMode(2, MAL, Search MyAnimeList)" radio="1"/>
 			<item name="Search NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaa.eu/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%search%)" radio="1"/>
@@ -242,6 +227,7 @@
 			<item name="2011" sub="Season2011"/>
 		</menu>
 			<menu name="Season2012">
+				<item name="Fall 2012"   action="Season_Load(2012_fall.xml)"/>
 				<item name="Summer 2012" action="Season_Load(2012_summer.xml)"/>
 				<item name="Spring 2012" action="Season_Load(2012_spring.xml)"/>
 			</menu>

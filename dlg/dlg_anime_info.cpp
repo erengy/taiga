@@ -23,8 +23,8 @@
 
 #include "../anime_db.h"
 #include "../common.h"
-#include "../event.h"
 #include "../gfx.h"
+#include "../history.h"
 #include "../http.h"
 #include "../myanimelist.h"
 #include "../resource.h"
@@ -173,7 +173,7 @@ void AnimeDialog::OnOK() {
   anime_item->SetUserSynonyms(titles, true);
 
   // Add item to event queue
-  EventQueue.Add(event_item);
+  History.queue.Add(event_item);
 
   // Exit
   EndDialog(IDOK);
