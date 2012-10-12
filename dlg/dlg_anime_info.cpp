@@ -86,16 +86,14 @@ BOOL AnimeDialog::OnInitDialog() {
   }
 
   // Set image position
+  image_label_.Attach(GetDlgItem(IDC_STATIC_ANIME_IMG));
   if (image_.rect.IsEmpty()) {
     win32::Rect rcTemp;
-    ::GetWindowRect(GetDlgItem(IDC_STATIC_ANIME_IMG), &rcTemp);
-    ::GetWindowRect(GetDlgItem(IDC_STATIC_ANIME_IMG), &image_.rect);
+    image_label_.GetWindowRect(&rcTemp);
+    image_label_.GetWindowRect(&image_.rect);
     ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rcTemp));
     image_.rect.Offset(rcTemp.left - image_.rect.left, rcTemp.top - image_.rect.top);
   }
-  // Change image mouse pointer
-  ::SetClassLong(GetDlgItem(IDC_STATIC_ANIME_IMG), GCL_HCURSOR, 
-    reinterpret_cast<LONG>(::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
 
   // Create pages
   win32::Rect rcPage; tab_.AdjustRect(m_hWindow, FALSE, &rcPage);
@@ -247,6 +245,18 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
+LRESULT AnimeDialog::ImageLabel::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_SETCURSOR: {
+      ::SetCursor(reinterpret_cast<HCURSOR>(
+        ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+      return TRUE;
+    }
+  }
+  
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
 BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG) {
     if (HIWORD(wParam) == STN_CLICKED) {
@@ -312,9 +322,8 @@ void AnimeDialog::Refresh(int anime_id, bool image, bool series_info, bool my_in
   // Load image
   if (image) {
     if (image_.Load(anime::GetImagePath(anime_id_))) {
-      win32::Window img = GetDlgItem(IDC_STATIC_ANIME_IMG);
-      img.SetPosition(nullptr, image_.rect);
-      img.SetWindowHandle(nullptr);
+      image_label_.SetPosition(nullptr, image_.rect);
+      image_label_.SetWindowHandle(nullptr);
       // Refresh if current file is too old
       if (anime_item->GetAiringStatus() != mal::STATUS_FINISHED) {
         // Check last modified date (>= 7 days)

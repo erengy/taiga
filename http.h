@@ -28,7 +28,6 @@ enum HttpClientMode {
   // MyAnimeList
   HTTP_MAL_Login,
   HTTP_MAL_RefreshList,
-  HTTP_MAL_RefreshAndLogin,
   HTTP_MAL_AnimeAdd,
   HTTP_MAL_AnimeAskToDiscuss,
   HTTP_MAL_AnimeDelete,

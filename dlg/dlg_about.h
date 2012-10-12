@@ -25,27 +25,19 @@
 
 // =============================================================================
 
-class AboutPage: public win32::Dialog {
-public:
-  AboutPage() {}
-  virtual ~AboutPage() {}
-
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  BOOL OnInitDialog();
-  void OnTimer(UINT_PTR nIDEvent);
-};
-
 class AboutDialog : public win32::Dialog {
 public:
   AboutDialog();
   ~AboutDialog() {}
   
+  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
   BOOL OnInitDialog();
-  
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+  void OnTimer(UINT_PTR nIDEvent);
+
 private:
-  AboutPage page_taiga_;
-  win32::Tab tab_;
+  win32::RichEdit rich_edit_;
 };
 
 extern class AboutDialog AboutDialog;

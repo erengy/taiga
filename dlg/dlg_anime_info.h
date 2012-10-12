@@ -57,6 +57,11 @@ private:
   Image image_;
   win32::Tab tab_;
   HFONT title_font_;
+
+  class ImageLabel : public win32::Window {
+  public:
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  } image_label_;
 };
 
 extern class AnimeDialog AnimeDialog;

@@ -98,9 +98,6 @@ BOOL MainDialog::OnInitDialog() {
   UpdateAllMenus();
 
   // Apply start-up settings
-  if (Settings.Account.MAL.auto_login) {
-    ExecuteAction(L"Login");
-  }
   if (Settings.Program.StartUp.check_new_episodes) {
     ExecuteAction(L"CheckEpisodes()", TRUE);
   }
@@ -186,8 +183,8 @@ void MainDialog::CreateDialogControls() {
   toolbar_main.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(7, ICON24_SETTINGS, 207, 1, fsStyle1,  7, nullptr, L"Change program settings");
 #ifdef _DEBUG
-  //toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  //toolbar_main.InsertButton(9, ICON24_ABOUT,    209, 1, fsStyle1, 9, nullptr, L"Debug");
+  toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(9, ICON24_ABOUT,    209, 1, fsStyle1, 9, nullptr, L"Debug");
 #endif
   toolbar_main.EnableButton(4, false);
   // Insert search toolbar button
@@ -480,7 +477,7 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // Button control
   } else if (idCtrl == IDC_BUTTON_CANCELSEARCH) {
     if (pnmh->code == NM_CUSTOMDRAW) {
-      return OnButtonCustomDraw(reinterpret_cast<LPARAM>(pnmh));
+      return cancel_button.OnCustomDraw(reinterpret_cast<LPARAM>(pnmh));
     }
   }
   
@@ -755,6 +752,7 @@ void MainDialog::EnableInput(bool enable) {
   toolbar_main.EnableButton(0, enable);
   // Enable/disable content
   AnimeListDialog.Enable(enable);
+  HistoryDialog.Enable(enable);
 }
 
 int MainDialog::GetCurrentPage() {

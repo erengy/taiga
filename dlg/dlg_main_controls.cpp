@@ -134,7 +134,19 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
 
 /* Button control */
 
-LRESULT MainDialog::OnButtonCustomDraw(LPARAM lParam) {
+LRESULT MainDialog::CancelButton::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_SETCURSOR: {
+      ::SetCursor(reinterpret_cast<HCURSOR>(
+        ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+      return TRUE;
+    }
+  }
+  
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT MainDialog::CancelButton::OnCustomDraw(LPARAM lParam) {
   LPNMCUSTOMDRAW pCD = reinterpret_cast<LPNMCUSTOMDRAW>(lParam);
 
   switch (pCD->dwDrawStage) {

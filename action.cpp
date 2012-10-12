@@ -71,58 +71,26 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // ===========================================================================
 
-  // Login()
-  //   Logs in to MyAnimeList.
-  if (action == L"Login") {
-    if (AnimeDatabase.items.size() > 0) {
+  // Synchronize()
+  //   Synchronizes local and remote lists.
+  if (action == L"Synchronize") {
+    if (!Taiga.logged_in) {
+      // Log in
       MainDialog.ChangeStatus(L"Logging in...");
       bool result = mal::Login();
       MainDialog.EnableInput(!result);
       if (!result) MainDialog.ChangeStatus();
     } else {
-      // Retrieve anime list and log in afterwards
-      ExecuteAction(L"Synchronize", TRUE);
-    }
-
-  // Logout()
-  //   Logs out of MyAnimeList.
-  } else if (action == L"Logout") {
-    if (Taiga.logged_in) {
-      Taiga.logged_in = false;
-      MainDialog.ChangeStatus((body.empty() ? Settings.Account.MAL.user : body) + L" is now logged out.");
-      MainDialog.UpdateTip();
-      MainClient.ClearCookies();
-      UpdateAllMenus();
-    }
-
-  // LoginLogout(), ToggleLogin()
-  //   Logs in or out depending on status.
-  } else if (action == L"LoginLogout" || action == L"ToggleLogin") {
-    ExecuteAction(Taiga.logged_in ? L"Logout" : L"Login");
-
-  // Synchronize()
-  //   Synchronizes local and remote lists.
-  //   wParam is a BOOL value that activates HTTP_MAL_RefreshAndLogin mode.
-  } else if (action == L"Synchronize") {
-    if (Taiga.logged_in && History.queue.GetItemCount() > 0) {
-      History.queue.Check();
-    } else {
-      EventList* event_list = History.queue.FindList();
-      if (event_list) {
-        for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
-          if (it->mode == HTTP_MAL_AnimeAdd) {
-            // Refreshing list would cause this item to disappear
-            // We must first log in and process the event queue
-            ExecuteAction(L"Login");
-            return;
-          }
-        }
+      if (History.queue.GetItemCount() > 0) {
+        // Update items in queue
+        History.queue.Check();
+      } else {
+        // Retrieve list
+        MainDialog.ChangeStatus(L"Synchronizing anime list...");
+        bool result = mal::GetList();
+        MainDialog.EnableInput(!result);
+        if (!result) MainDialog.ChangeStatus();
       }
-      // We can safely refresh our list
-      MainDialog.ChangeStatus(L"Refreshing list...");
-      bool result = mal::GetList(wParam == TRUE);
-      MainDialog.EnableInput(!result);
-      if (!result) MainDialog.ChangeStatus();
     }
 
   // ViewContent(page)

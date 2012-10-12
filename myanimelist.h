@@ -107,7 +107,7 @@ void CheckProfile();
 bool DownloadImage(int anime_id, const wstring& image_url, class HttpClient* client = nullptr);
 bool DownloadUserImage(bool thumb);
 bool GetAnimeDetails(int anime_id, class HttpClient* client = nullptr);
-bool GetList(bool login);
+bool GetList();
 bool Login();
 bool ParseAnimeDetails(const wstring& data);
 bool ParseSearchResult(const wstring& data, int anime_id = 0);

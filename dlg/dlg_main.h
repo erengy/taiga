@@ -52,7 +52,6 @@ public:
   virtual ~MainDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  LRESULT OnButtonCustomDraw(LPARAM lParam);
   BOOL OnClose();
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
@@ -103,8 +102,14 @@ public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } edit;
 
+  // Cancel button
+  class CancelButton : public win32::Window {
+  public:
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnCustomDraw(LPARAM lParam);
+  } cancel_button;
+
   // Other controls
-  win32::Window cancel_button;
   win32::Rebar rebar;
   win32::StatusBar statusbar;
   win32::Toolbar toolbar_menu, toolbar_main, toolbar_search;

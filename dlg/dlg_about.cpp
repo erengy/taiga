@@ -22,7 +22,9 @@
 #include "dlg_about.h"
 
 #include "../common.h"
+#include "../gfx.h"
 #include "../resource.h"
+#include "../string.h"
 #include "../taiga.h"
 #include "../time.h"
 
@@ -87,24 +89,42 @@ BOOL AboutDialog::OnDestroy() {
 }
 
 BOOL AboutDialog::OnInitDialog() {
-  // Initialize
-  tab_.Attach(GetDlgItem(IDC_TAB_ABOUT));
+  rich_edit_.Attach(GetDlgItem(IDC_RICHEDIT_ABOUT));
+  rich_edit_.SendMessage(EM_AUTOURLDETECT, TRUE /* AURL_ENABLEURL */);
+  rich_edit_.SetEventMask(ENM_LINK);
 
-  // Create about page
-  page_taiga_.Create(IDD_ABOUT_TAIGA, m_hWindow, false);
-  win32::Rect rect; tab_.AdjustRect(m_hWindow, FALSE, &rect);
-  page_taiga_.SetPosition(nullptr, rect, 0);
-  EnableThemeDialogTexture(page_taiga_.GetWindowHandle(), ETDT_ENABLETAB);
+  wstring text = 
+    L"{\\rtf1\\ansi\\deff0"
+    L"{\\fonttbl"
+    L"{\\f0 Tahoma;}"
+    L"}"
+    L"\\deflang1024\\fs16"
+    L"\\b " APP_NAME L"\\b0\\line "
+    L"version " APP_VERSION L"\\line "
+    L"built on " APP_BUILD L"\\line\\line "
+    L"\\b Author:\\b0\\line "
+    L"Eren 'erengy' Okka\\line\\line "
+    L"\\b Committers and other contributors:\\b0\\line "
+    L"saka, Diablofan, slevir\\line\\line "
+    L"\\b Third party stuff used by Taiga:\\b0\\line "
+    L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
+    L"- OAuth class is based on codebrook-twitter-oauth example code, Copyright (c) 2010, Brook Miles\\line "
+    L"- pugixml parser version 1.0, Copyright (c) 2006-2010, Arseny Kapoulkine\\line "
+    L"- zlib version 1.2.5, Copyright (c) 1995-2010, Jean-loup Gailly and Mark Adler\\line\\line "
+    L"\\b Links:\\b0\\line "
+    L"- Google Code {\\field{\\*\\fldinst HYPERLINK \"http://code.google.com/p/taiga/\"}{\\fldrslt http://code.google.com/p/taiga/}}\\line "
+    L"- MyAnimeList club {\\field{\\*\\fldinst HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}{\\fldrslt http://myanimelist.net/clubs.php?cid=21400}}\\line "
+    L"- IRC channel {\\field{\\*\\fldinst HYPERLINK \"irc://irc.rizon.net/taiga\"}{\\fldrslt irc://irc.rizon.net/taiga}}"
+    L"}";
+  rich_edit_.SetTextEx(ToANSI(text));
 
   return TRUE;
 }
 
-// =============================================================================
-
-BOOL AboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+BOOL AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
-    // Icon click
     case WM_COMMAND: {
+      // Icon click
       if (HIWORD(wParam) == STN_DBLCLK) {
         SetTimer(hwnd, TIMER_TAIGA, 100, nullptr);
         note_index = 0;
@@ -113,14 +133,16 @@ BOOL AboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
       break;
     }
 
-    // Execute link
     case WM_NOTIFY: {
       switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
-        case NM_CLICK:
-        case NM_RETURN: {
-          PNMLINK pNMLink = reinterpret_cast<PNMLINK>(lParam);
-          ExecuteAction(pNMLink->item.szUrl);
-          return TRUE;
+        // Execute link
+        case EN_LINK: {
+          auto en_link = reinterpret_cast<ENLINK*>(lParam);
+          if (en_link->msg == WM_LBUTTONUP) {
+            ExecuteLink(rich_edit_.GetTextRange(&en_link->chrg));
+            return TRUE;
+          }
+          break;
         }
       }
       break;
@@ -130,25 +152,23 @@ BOOL AboutPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-BOOL AboutPage::OnInitDialog() {
-  // Set information text
-  wstring text = APP_NAME;
-  SetDlgItemText(IDC_STATIC_ABOUT_TITLE, text.c_str());
-  text = L"Version "; text += APP_VERSION;
-  SetDlgItemText(IDC_STATIC_ABOUT_VERSION, text.c_str());
-  text = L"Built on "; text += APP_BUILD;
-  SetDlgItemText(IDC_STATIC_ABOUT_BUILD, text.c_str());
+void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+  win32::Dc dc = hdc;
+  win32::Rect rect;
 
-  return TRUE;
+  // Paint background
+  GetClientRect(&rect);
+  rect.left = ScaleX(48 + 20);
+  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 }
 
-void AboutPage::OnTimer(UINT_PTR nIDEvent) {
+void AboutDialog::OnTimer(UINT_PTR nIDEvent) {
   if (note_index == NOTE_COUNT) {
     KillTimer(GetWindowHandle(), TIMER_TAIGA);
-    AboutDialog.SetText(L"About");
+    SetText(L"About");
     note_index = 0;
   } else {
-    if (note_index == 0) AboutDialog.SetText(L"Orange");
+    if (note_index == 0) SetText(L"Orange");
     Beep((DWORD)NoteToFrequency(note_list[note_index][0]), 800 / note_list[note_index][1]);
     note_index++;
   }

@@ -48,6 +48,19 @@ void RichEdit::GetSel(CHARRANGE* cr) {
   ::SendMessage(m_hWindow, EM_EXGETSEL, 0, reinterpret_cast<LPARAM>(cr));
 }
 
+wstring RichEdit::GetTextRange(CHARRANGE* cr) {
+  wstring str(1024, '\0');
+
+  TEXTRANGE tr;
+  tr.chrg.cpMax = cr->cpMax;
+  tr.chrg.cpMin = cr->cpMin;
+  tr.lpstrText = (LPWSTR)str.data();
+
+  ::SendMessage(m_hWindow, EM_GETTEXTRANGE , 0, reinterpret_cast<LPARAM>(&tr));
+  
+  return str;
+}
+
 void RichEdit::HideSelection(BOOL bHide) {
   ::SendMessage(m_hWindow, EM_HIDESELECTION, bHide, 0);
 }
@@ -66,6 +79,13 @@ void RichEdit::SetSel(int ichStart, int ichEnd) {
 
 void RichEdit::SetSel(CHARRANGE* cr) {
   ::SendMessage(m_hWindow, EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(cr));
+}
+
+UINT RichEdit::SetTextEx(const string& str) {
+  SETTEXTEX ste;
+  return ::SendMessage(m_hWindow, EM_SETTEXTEX, 
+                       reinterpret_cast<WPARAM>(&ste), 
+                       reinterpret_cast<LPARAM>(str.data()));
 }
 
 } // namespace win32

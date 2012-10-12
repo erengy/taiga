@@ -66,7 +66,6 @@ BOOL HttpClient::OnError(DWORD dwError) {
   switch (GetClientMode()) {
     case HTTP_MAL_Login:
     case HTTP_MAL_RefreshList:
-    case HTTP_MAL_RefreshAndLogin:
       MainDialog.ChangeStatus(error_text);
       MainDialog.EnableInput(true);
       break;
@@ -172,7 +171,6 @@ BOOL HttpClient::OnReadData() {
 
   switch (GetClientMode()) {
     case HTTP_MAL_RefreshList:
-    case HTTP_MAL_RefreshAndLogin:
       status = L"Downloading anime list...";
       break;
     case HTTP_MAL_Login:
@@ -248,21 +246,14 @@ BOOL HttpClient::OnReadComplete() {
   
   switch (GetClientMode()) {
     // List
-    case HTTP_MAL_RefreshList:
-    case HTTP_MAL_RefreshAndLogin: {
+    case HTTP_MAL_RefreshList: {
       AnimeDatabase.LoadList(true); // Here we assume that MAL provides up-to-date series information in malappinfo.php
       MainDialog.ChangeStatus(L"List download completed.");
       AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
       AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
       HistoryDialog.RefreshList();
       SearchDialog.PostMessage(WM_CLOSE);
-      if (GetClientMode() == HTTP_MAL_RefreshList) {
-        MainDialog.EnableInput(true);
-        ExecuteAction(L"CheckEpisodes()", TRUE);
-      } else if (GetClientMode() == HTTP_MAL_RefreshAndLogin) {
-        mal::Login();
-        return TRUE;
-      }
+      MainDialog.EnableInput(true);
       break;
     }
 
@@ -306,7 +297,7 @@ BOOL HttpClient::OnReadComplete() {
       if (Taiga.logged_in) {
         switch (Settings.Account.MAL.api) {
           case MAL_API_OFFICIAL:
-            History.queue.Check();
+            ExecuteAction(L"Synchronize");
             return TRUE;
           case MAL_API_NONE:
             mal::CheckProfile();

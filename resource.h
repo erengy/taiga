@@ -4,7 +4,6 @@
 
 #define IDI_MAIN                                101
 #define IDD_ABOUT                               110
-#define IDD_ABOUT_TAIGA                         111
 #define IDD_ANIME_INFO                          112
 #define IDD_ANIME_INFO_PAGE01                   113
 #define IDD_ANIME_INFO_PAGE02                   114
@@ -123,7 +122,6 @@
 #define IDC_EDIT_TORRENT_APP                    1086
 #define IDC_EDIT_TORRENT_INTERVAL               1087
 #define IDC_EDIT_USER                           1088
-#define IDC_LINK_ABOUT                          1089
 #define IDC_LINK_ANIME_FANSUB                   1090
 #define IDC_LINK_MAL                            1091
 #define IDC_LINK_TWITTER                        1092
@@ -167,9 +165,6 @@
 #define IDC_SPIN_INPUT                          1130
 #define IDC_SPIN_PROGRESS                       1131
 #define IDC_SPIN_TORRENT_INTERVAL               1132
-#define IDC_STATIC_ABOUT_BUILD                  1133
-#define IDC_STATIC_ABOUT_TITLE                  1134
-#define IDC_STATIC_ABOUT_VERSION                1135
 #define IDC_STATIC_ANIME_IMG                    1136
 #define IDC_STATIC_ANIME_INFO1                  1137
 #define IDC_STATIC_ANIME_INFO2                  1138
@@ -183,7 +178,6 @@
 #define IDC_STATIC_TITLE                        1146
 #define IDC_STATIC_UPDATE_PROGRESS              1147
 #define IDC_STATUSBAR_MAIN                      1148
-#define IDC_TAB_ABOUT                           1151
 #define IDC_TAB_ANIME                           1152
 #define IDC_TAB_MAIN                            1153
 #define IDC_TOOLBAR_FEED_FILTER                 1154
@@ -200,4 +194,5 @@
 #define IDS_KEYWORD_VERSION                     40004
 #define IDS_KEYWORD_VIDEO                       40005
 #define IDS_KEYWORD_EPISODE                     40006
+#define IDC_RICHEDIT_ABOUT                      40007
 #define IDS_KEYWORD_EPISODE_PREFIX              40007

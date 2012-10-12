@@ -223,12 +223,14 @@ public:
   RichEdit(HWND hWnd) { SetWindowHandle(hWnd); }
   virtual ~RichEdit();
 
-  void  GetSel(CHARRANGE* cr);
-  void  HideSelection(BOOL bHide);
-  BOOL  SetCharFormat(DWORD dwFormat, CHARFORMAT* cf);
-  DWORD SetEventMask(DWORD dwFlags);
-  void  SetSel(int ichStart, int ichEnd);
-  void  SetSel(CHARRANGE* cr);
+  void    GetSel(CHARRANGE* cr);
+  wstring GetTextRange(CHARRANGE* cr);
+  void    HideSelection(BOOL bHide);
+  BOOL    SetCharFormat(DWORD dwFormat, CHARFORMAT* cf);
+  DWORD   SetEventMask(DWORD dwFlags);
+  void    SetSel(int ichStart, int ichEnd);
+  void    SetSel(CHARRANGE* cr);
+  UINT    SetTextEx(const string& str);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
