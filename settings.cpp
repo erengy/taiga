@@ -79,29 +79,29 @@ bool Settings::Load() {
     // HTTP
     xml_node http = announce.child(L"http");
     Announce.HTTP.enabled = http.attribute(L"enabled").as_int();
-    Announce.HTTP.format = http.attribute(L"format").value(DEFAULT_FORMAT_HTTP);
+    Announce.HTTP.format = http.attribute(L"format").as_string(DEFAULT_FORMAT_HTTP);
     Announce.HTTP.url = http.attribute(L"url").value();
     // MSN
     xml_node messenger = announce.child(L"messenger");
     Announce.MSN.enabled = messenger.attribute(L"enabled").as_int();
-    Announce.MSN.format = messenger.attribute(L"format").value(DEFAULT_FORMAT_MESSENGER);
+    Announce.MSN.format = messenger.attribute(L"format").as_string(DEFAULT_FORMAT_MESSENGER);
     // mIRC
     xml_node mirc = announce.child(L"mirc");
-    Announce.MIRC.channels = mirc.attribute(L"channels").value(L"#myanimelist, #taiga");
+    Announce.MIRC.channels = mirc.attribute(L"channels").as_string(L"#myanimelist, #taiga");
     Announce.MIRC.enabled = mirc.attribute(L"enabled").as_int();
-    Announce.MIRC.format = mirc.attribute(L"format").value(DEFAULT_FORMAT_MIRC);
+    Announce.MIRC.format = mirc.attribute(L"format").as_string(DEFAULT_FORMAT_MIRC);
     Announce.MIRC.mode = mirc.attribute(L"mode").as_int(1);
     Announce.MIRC.multi_server = mirc.attribute(L"multiserver").as_int(FALSE);
-    Announce.MIRC.service = mirc.attribute(L"service").value(L"mIRC");
+    Announce.MIRC.service = mirc.attribute(L"service").as_string(L"mIRC");
     Announce.MIRC.use_action = mirc.attribute(L"useaction").as_int(TRUE);
     // Skype
     xml_node skype = announce.child(L"skype");
     Announce.Skype.enabled = skype.attribute(L"enabled").as_int();
-    Announce.Skype.format = skype.attribute(L"format").value(DEFAULT_FORMAT_SKYPE);
+    Announce.Skype.format = skype.attribute(L"format").as_string(DEFAULT_FORMAT_SKYPE);
     // Twitter
     xml_node twitter = announce.child(L"twitter");
     Announce.Twitter.enabled = twitter.attribute(L"enabled").as_int();
-    Announce.Twitter.format = twitter.attribute(L"format").value(DEFAULT_FORMAT_TWITTER);
+    Announce.Twitter.format = twitter.attribute(L"format").as_string(DEFAULT_FORMAT_TWITTER);
     Announce.Twitter.oauth_key = twitter.attribute(L"oauth_token").value();
     Announce.Twitter.oauth_secret = twitter.attribute(L"oauth_secret").value();
     Announce.Twitter.user = twitter.attribute(L"user").value();
@@ -135,7 +135,7 @@ bool Settings::Load() {
     Program.General.close = general.attribute(L"close").as_int();
     Program.General.minimize = general.attribute(L"minimize").as_int();
     Program.General.search_index = general.attribute(L"searchindex").as_int();
-    Program.General.theme = general.attribute(L"theme").value(L"Default");
+    Program.General.theme = general.attribute(L"theme").as_string(L"Default");
     // Position
     xml_node position = program.child(L"position");
     Program.Position.x = position.attribute(L"x").as_int(-1);
@@ -178,7 +178,7 @@ bool Settings::Load() {
     // Notifications
     xml_node notifications = program.child(L"notifications");
     Program.Balloon.enabled = notifications.child(L"balloon").attribute(L"enabled").as_int(TRUE);
-    Program.Balloon.format = notifications.child(L"balloon").attribute(L"format").value(DEFAULT_FORMAT_BALLOON);
+    Program.Balloon.format = notifications.child(L"balloon").attribute(L"format").as_string(DEFAULT_FORMAT_BALLOON);
 
   // Recognition
   xml_node recognition = settings.child(L"recognition");
@@ -205,7 +205,7 @@ bool Settings::Load() {
       RSS.Torrent.hide_unidentified = torrent.child(L"options").attribute(L"hideunidentified").as_int(FALSE);
       RSS.Torrent.new_action = torrent.child(L"options").attribute(L"newaction").as_int(1);
       RSS.Torrent.set_folder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
-      RSS.Torrent.source = torrent.child(L"source").attribute(L"address").value(DEFAULT_TORRENT_SOURCE);
+      RSS.Torrent.source = torrent.child(L"source").attribute(L"address").as_string(DEFAULT_TORRENT_SOURCE);
       // Filters
       xml_node filter = torrent.child(L"filter");
       RSS.Torrent.Filters.global_enabled = filter.attribute(L"enabled").as_int(TRUE);
@@ -246,9 +246,9 @@ bool Settings::Load() {
       int score = item.attribute(L"score").as_int(-1);
       int status = item.attribute(L"status").as_int(-1);
       int enable_rewatching = item.attribute(L"rewatch").as_int(-1);
-      wstring tags = item.attribute(L"tags").value(L"%empty%");
-      wstring date_start = item.attribute(L"date_start").value(L"%empty%");
-      wstring date_finish = item.attribute(L"date_finish").value(L"%empty%");
+      wstring tags = item.attribute(L"tags").as_string(L"%empty%");
+      wstring date_start = item.attribute(L"date_start").as_string(L"%empty%");
+      wstring date_finish = item.attribute(L"date_finish").as_string(L"%empty%");
       if (episode > -1) event_item.episode = episode;
       if (score > -1) event_item.score = score;
       if (status > -1) event_item.status = status;

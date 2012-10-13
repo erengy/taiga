@@ -30,11 +30,15 @@ Statistics Stats;
 // =============================================================================
 
 Statistics::Statistics()
-    : anime_count(0), 
-      episode_count(0), 
-      score_mean(0.0f), 
+    : anime_count(0),
+      episode_count(0),
+      image_count(0),
+      image_size(0),
+      score_mean(0.0f),
       score_deviation(0.0f),
-      score_distribution(11, 0.0f) {
+      score_distribution(11, 0.0f),
+      tigers_harmed(0),
+      uptime(0) {
 }
 
 // =============================================================================
@@ -48,6 +52,9 @@ void Statistics::CalculateAll() {
 
   // Life spent watching
   CalculateLifeSpentWatching();
+
+  // Calculate image count and size
+  CalculateLocalData();
 
   // Mean score
   CalculateMeanScore();
@@ -111,6 +118,13 @@ wstring Statistics::CalculateLifeSpentWatching() {
   }
 
   return life_spent_watching;
+}
+
+void Statistics::CalculateLocalData() {
+  vector<wstring> file_list;
+
+  image_count = PopulateFiles(file_list, anime::GetImagePath());
+  image_size = GetFolderSize(anime::GetImagePath(), false);
 }
 
 float Statistics::CalculateMeanScore() {

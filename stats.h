@@ -32,6 +32,7 @@ public:
   int CalculateAnimeCount();
   int CalculateEpisodeCount();
   wstring CalculateLifeSpentWatching();
+  void CalculateLocalData();
   float CalculateMeanScore();
   float CalculateScoreDeviation();
   vector<float> CalculateScoreDistribution();
@@ -39,10 +40,14 @@ public:
 public:
   int anime_count;
   int episode_count;
+  int image_count;
+  int image_size;
   wstring life_spent_watching;
   float score_mean;
   float score_deviation;
   vector<float> score_distribution;
+  int tigers_harmed;
+  int uptime;
 };
 
 extern Statistics Stats;

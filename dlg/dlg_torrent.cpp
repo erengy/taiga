@@ -38,12 +38,6 @@ class TorrentDialog TorrentDialog;
 
 // =============================================================================
 
-TorrentDialog::TorrentDialog() {
-}
-
-TorrentDialog::~TorrentDialog() {
-}
-
 BOOL TorrentDialog::OnInitDialog() {
   // Set properties
   SetSizeMin(470, 260);
@@ -291,12 +285,6 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 }
 
 // =============================================================================
-
-void TorrentDialog::ChangeStatus(wstring text, int panel_index) {
-  // Change status text
-  if (panel_index == 0) text = L"  " + text;
-  //statusbar_.SetPartText(panel_index, text.c_str());
-}
 
 void TorrentDialog::EnableInput(bool enable) {
   // Enable/disable toolbar buttons

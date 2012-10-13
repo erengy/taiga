@@ -31,6 +31,7 @@
 #include "taiga.h"
 #include "xml.h"
 
+#include "dlg/dlg_main.h"
 #include "dlg/dlg_torrent.h"
 
 #include "win32/win_taskbar.h"
@@ -89,7 +90,7 @@ bool Feed::Download(int index) {
   if (index < 0 || index > static_cast<int>(items.size())) return false;
   download_index = index;
 
-  TorrentDialog.ChangeStatus(L"Downloading \"" + items[index].title + L"\"...");
+  MainDialog.ChangeStatus(L"Downloading \"" + items[index].title + L"\"...");
   TorrentDialog.EnableInput(false);
   
   wstring file = items[index].title + L".torrent";

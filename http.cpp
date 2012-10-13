@@ -84,7 +84,7 @@ BOOL HttpClient::OnError(DWORD dwError) {
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentDialog.ChangeStatus(error_text);
+      MainDialog.ChangeStatus(error_text);
       TorrentDialog.EnableInput();
       break;
     case HTTP_UpdateCheck:
@@ -110,7 +110,7 @@ BOOL HttpClient::OnSendRequestComplete() {
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentDialog.ChangeStatus(status);
+      MainDialog.ChangeStatus(status);
       break;
     default:
 #ifdef _DEBUG
@@ -154,7 +154,7 @@ BOOL HttpClient::OnRedirect(wstring address) {
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentDialog.ChangeStatus(status);
+      MainDialog.ChangeStatus(status);
       break;
     default:
 #ifdef _DEBUG
@@ -230,7 +230,7 @@ BOOL HttpClient::OnReadData() {
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
-      TorrentDialog.ChangeStatus(status);
+      MainDialog.ChangeStatus(status);
       break;
     default:
       MainDialog.ChangeStatus(status);
@@ -252,7 +252,7 @@ BOOL HttpClient::OnReadComplete() {
       AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
       AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
       HistoryDialog.RefreshList();
-      SearchDialog.PostMessage(WM_CLOSE);
+      SearchDialog.RefreshList();
       MainDialog.EnableInput(true);
       break;
     }
@@ -497,7 +497,7 @@ BOOL HttpClient::OnReadComplete() {
           status = L"No new torrents found.";
         }
         if (TorrentDialog.IsWindow()) {
-          TorrentDialog.ChangeStatus(status);
+          MainDialog.ChangeStatus(status);
           TorrentDialog.RefreshList();
           TorrentDialog.EnableInput();
           // TODO: GetIcon() fails if we don't return TRUE here
@@ -552,7 +552,7 @@ BOOL HttpClient::OnReadComplete() {
           if (feed->Download(-1)) return TRUE;
         }
       }
-      TorrentDialog.ChangeStatus(L"Successfully downloaded all torrents.");
+      MainDialog.ChangeStatus(L"Successfully downloaded all torrents.");
       TorrentDialog.EnableInput();
       break;
     }

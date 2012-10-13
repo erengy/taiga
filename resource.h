@@ -48,6 +48,7 @@
 #define IDC_TOOLBAR_MENU                        1001
 #define IDC_BUTTON_CANCELSEARCH                 1002
 #define IDC_STATIC_ANIME_STAT3                  1002
+#define IDC_STATIC_ANIME_STAT4                  1004
 #define IDC_BUTTON_FORMAT_BALLOON               1005
 #define IDC_BUTTON_FORMAT_HTTP                  1006
 #define IDC_BUTTON_FORMAT_MIRC                  1007
@@ -174,6 +175,7 @@
 #define IDC_STATIC_HEADER1                      1142
 #define IDC_STATIC_HEADER2                      1143
 #define IDC_STATIC_HEADER3                      1144
+#define IDC_STATIC_HEADER4                      1145
 #define IDC_STATIC_INPUTINFO                    1145
 #define IDC_STATIC_TITLE                        1146
 #define IDC_STATIC_UPDATE_PROGRESS              1147

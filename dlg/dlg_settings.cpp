@@ -292,7 +292,7 @@ void SettingsDialog::OnOK() {
     AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     HistoryDialog.RefreshList();
-    SearchDialog.PostMessage(WM_CLOSE);
+    SearchDialog.RefreshList();
     ExecuteAction(L"Logout(" + mal_user_old + L")");
   } else {
     AnimeListDialog.RefreshList();

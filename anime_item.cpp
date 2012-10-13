@@ -667,7 +667,7 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
     database_->DeleteListItem(GetId());
     AnimeListDialog.RefreshList();
     AnimeListDialog.RefreshTabs();
-    SearchDialog.PostMessage(WM_CLOSE);
+    SearchDialog.RefreshList();
     if (CurrentEpisode.anime_id == item.anime_id) {
       CurrentEpisode.Set(anime::ID_NOTINLIST);
     }

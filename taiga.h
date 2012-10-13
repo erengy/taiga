@@ -21,12 +21,14 @@
 
 #include "std.h"
 #include "update.h"
+#include "version.h"
+
 #include "win32/win_main.h"
 
 #define APP_NAME    L"Taiga"
 #define APP_TITLE   L"Taiga 1.0a"
-#define APP_VERSION L"1.0.171 alpha"
-#define APP_BUILD   L"2012-10-12"
+#define APP_VERSION L"1.0.172 alpha"
+#define APP_BUILD   L"2012-10-13"
 
 #ifndef PORTABLE
 #define PORTABLE

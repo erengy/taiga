@@ -32,6 +32,7 @@ public:
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
 public:
   void Refresh();

@@ -27,8 +27,8 @@
 
 class TorrentDialog : public win32::Dialog {
 public:
-  TorrentDialog();
-  ~TorrentDialog();
+  TorrentDialog() {};
+  virtual ~TorrentDialog() {};
 
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
@@ -36,7 +36,6 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
 public:
-  void ChangeStatus(wstring text, int panel_index = 0);
   void EnableInput(bool enable = true);
   void RefreshList();
   void SetTimerText(const wstring& text);

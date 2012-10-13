@@ -52,11 +52,11 @@ BOOL UpdateDialog::OnInitDialog() {
   progressbar.SetMarquee(true);
 
   // Check updates
-#ifdef _DEBUG
+//#ifdef _DEBUG
   PostMessage(WM_CLOSE);
-#else
-  Taiga.Updater.Check(L"taiga.erengy.com/update.php", Taiga, HTTP_UpdateCheck);
-#endif
+//#else
+//  Taiga.Updater.Check(L"taiga.erengy.com/update.php", Taiga, HTTP_UpdateCheck);
+//#endif
 
   // Success
   return TRUE;

@@ -93,22 +93,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
 
-  // ViewContent(page)
-  //   Selects a page from sidebar.
-  } else if (action == L"ViewContent") {
-    int page = ToInt(body);
-    MainDialog.SetCurrentPage(page);
-    UpdateViewMenu();
-
-  // ViewPanel(), ViewProfile(), ViewHistory()
-  //   Opens up MyAnimeList user pages.
-  } else if (action == L"ViewPanel") {
-    mal::ViewPanel();
-  } else if (action == L"ViewProfile") {
-    mal::ViewProfile();
-  } else if (action == L"ViewHistory") {
-    mal::ViewHistory();
-
   // ===========================================================================
 
   // Execute(path)
@@ -183,15 +167,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       ActivateWindow(RecognitionTest.GetWindowHandle());
     }
 
-  // SeasonBrowser()
-  //   Shows season browser window.
-  } else if (action == L"SeasonBrowser") {
-    if (!SeasonDialog.IsWindow()) {
-      SeasonDialog.Create(IDD_SEASON, nullptr, false);
-    } else {
-      ActivateWindow(SeasonDialog.GetWindowHandle());
-    }
-
   // SetSearchMode()
   //   Changes search bar mode.
   //   Body text has 4 parameters: Menu index, search mode, cue text, search URL
@@ -239,10 +214,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     } else {
       ActivateWindow(SettingsDialog.GetWindowHandle());
     }
-
-  // SaveSettings()
-  } else if (action == L"SaveSettings") {
-    Settings.Save();
   
   // SearchAnime()
   } else if (action == L"SearchAnime") {
@@ -271,36 +242,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (feed) {
       anime::Episode episode;
       episode.anime_id = AnimeDatabase.GetCurrentId();
-      ExecuteAction(L"Torrents");
-      TorrentDialog.ChangeStatus(L"Searching torrents for \"" + 
+      MainDialog.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+      MainDialog.ChangeStatus(L"Searching torrents for \"" + 
         AnimeDatabase.GetCurrentItem()->GetTitle() + L"\"...");
       feed->Check(ReplaceVariables(body, episode));
-    }
-
-  // ShowListStats()
-  } else if (action == L"ShowListStats") {
-    Stats.CalculateAll();
-    if (!AnimeDatabase.user.GetName().empty()) {
-      wstring main_instruction, content;
-      main_instruction = AnimeDatabase.user.GetName() + L"'s anime list stats:";
-      content += L"\u2022 Anime count: \t\t" + ToWstr(Stats.anime_count);
-      content += L"\n\u2022 Episode count: \t\t" + ToWstr(Stats.episode_count);
-      content += L"\n\u2022 Life spent watching: \t" + Stats.life_spent_watching;
-      content += L"\n\u2022 Mean score: \t\t" + ToWstr(Stats.score_mean, 2);
-      content += L"\n\u2022 Score deviation: \t\t" + ToWstr(Stats.score_deviation, 2);
-      content += L"\n\u2022 Score distribution:\n";
-      for (int score = 10; score > 0; --score) {
-        if (score < 10) content += L"0";
-        content += ToWstr(score) + L" \u2502 ";
-        size_t count = static_cast<size_t>(75.0f * Stats.score_distribution[score]);
-        content.append(count, '|');
-        content += L"\n";
-      }
-      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-      dlg.SetMainInstruction(main_instruction.c_str());
-      dlg.SetContent(content.c_str());
-      dlg.AddButton(L"OK", IDOK);
-      dlg.Show(g_hMain);
     }
 
   // ShowSidebar()
@@ -308,15 +253,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     MainDialog.treeview.Show(!MainDialog.treeview.IsVisible());
     MainDialog.UpdateControlPositions();
     UpdateViewMenu();
-
-  // Torrents()
-  //   Shows torrents window.
-  } else if (action == L"Torrents") {
-    if (!TorrentDialog.IsWindow()) {
-      TorrentDialog.Create(IDD_TORRENT, NULL, false);
-    } else {
-      ActivateWindow(TorrentDialog.GetWindowHandle());
-    }
 
   // TorrentAddFilter()
   //   Shows add new filter window.
@@ -329,6 +265,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     } else {
       ActivateWindow(FeedFilterDialog.GetWindowHandle());
     }
+
+  // ViewContent(page)
+  //   Selects a page from sidebar.
+  } else if (action == L"ViewContent") {
+    int page = ToInt(body);
+    MainDialog.SetCurrentPage(page);
+    UpdateViewMenu();
 
   // ===========================================================================
   
@@ -365,6 +308,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
     mal::ViewAnimePage(anime_id);
 
+  // ViewPanel(), ViewProfile(), ViewHistory()
+  //   Opens up MyAnimeList user pages.
+  } else if (action == L"ViewPanel") {
+    mal::ViewPanel();
+  } else if (action == L"ViewProfile") {
+    mal::ViewProfile();
+  } else if (action == L"ViewHistory") {
+    mal::ViewHistory();
+
   // ===========================================================================
 
   // AddFolder()
@@ -377,11 +329,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         if (Settings.Folders.watch_enabled) FolderMonitor.Enable();
         ExecuteAction(L"Settings", 0, PAGE_FOLDERS_ROOT);
     }
-
-  // CheckEventBuffer()
-  //   Checks for queued events and shows related window.
-  } else if (action == L"CheckEventBuffer") {
-    History.queue.Show();
 
   // CheckEpisodes()
   //   Checks new episodes or episode availability.
@@ -522,7 +469,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (!AnimeDialog.IsWindow()) {
       AnimeDialog.Create(IDD_ANIME_INFO, g_hMain, false);
     } else {
-       ActivateWindow(AnimeDialog.GetWindowHandle());
+      ActivateWindow(AnimeDialog.GetWindowHandle());
     }
 
   // EditDelete()

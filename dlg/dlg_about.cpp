@@ -24,6 +24,7 @@
 #include "../common.h"
 #include "../gfx.h"
 #include "../resource.h"
+#include "../stats.h"
 #include "../string.h"
 #include "../taiga.h"
 #include "../time.h"
@@ -109,7 +110,7 @@ BOOL AboutDialog::OnInitDialog() {
     L"\\b Third party stuff used by Taiga:\\b0\\line "
     L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
     L"- OAuth class is based on codebrook-twitter-oauth example code, Copyright (c) 2010, Brook Miles\\line "
-    L"- pugixml parser version 1.0, Copyright (c) 2006-2010, Arseny Kapoulkine\\line "
+    L"- pugixml parser version 1.2, Copyright (c) 2006-2012, Arseny Kapoulkine\\line "
     L"- zlib version 1.2.5, Copyright (c) 1995-2010, Jean-loup Gailly and Mark Adler\\line\\line "
     L"\\b Links:\\b0\\line "
     L"- Google Code {\\field{\\*\\fldinst HYPERLINK \"http://code.google.com/p/taiga/\"}{\\fldrslt http://code.google.com/p/taiga/}}\\line "
@@ -126,6 +127,7 @@ BOOL AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND: {
       // Icon click
       if (HIWORD(wParam) == STN_DBLCLK) {
+        Stats.tigers_harmed++;
         SetTimer(hwnd, TIMER_TAIGA, 100, nullptr);
         note_index = 0;
         return TRUE;

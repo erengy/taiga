@@ -55,7 +55,7 @@ BOOL StatsDialog::OnInitDialog() {
     header_font_ = ::CreateFontIndirect(&lFont);
   }
   // Set new font for headers
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 4; i++) {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
       reinterpret_cast<WPARAM>(header_font_), FALSE);
   }
@@ -69,16 +69,21 @@ BOOL StatsDialog::OnInitDialog() {
 
 INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
+    case WM_CTLCOLORSTATIC:
+      return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
+
     case WM_DRAWITEM: {
       // Draw score bars
       if (wParam == IDC_STATIC_ANIME_STAT2) {
         LPDRAWITEMSTRUCT dis = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
         win32::Rect rect = dis->rcItem;
         win32::Dc dc = dis->hDC;
+
+        dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
         
         int bar_height = GetTextHeight(dc.Get());
         int bar_left = rect.left;
-        int bar_max = rect.Width();
+        int bar_max = rect.Width() * 3 / 4;
         
         for (int i = 10; i > 0; i--) {
           int bar_width = static_cast<int>(bar_max * Stats.score_distribution[i]);
@@ -98,6 +103,16 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
+void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+  win32::Dc dc = hdc;
+  win32::Rect rect;
+
+  // Paint background
+  rect.Copy(lpps->rcPaint);
+  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+  rect.right = 1;
+  dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
+}
 
 // =============================================================================
 
@@ -119,8 +134,12 @@ void StatsDialog::Refresh() {
   // Database
   text.clear();
   text += ToWstr(static_cast<int>(AnimeDatabase.items.size())) + L"\n";
-  vector<wstring> file_list;
-  text += ToWstr(PopulateFiles(file_list, anime::GetImagePath())) + L" (" + 
-    ToSizeString(GetFolderSize(anime::GetImagePath(), false)) + L")";
+  text += ToWstr(Stats.image_count) + L" (" + ToSizeString(Stats.image_size) + L")";
   SetDlgItemText(IDC_STATIC_ANIME_STAT3, text.c_str());
+
+  // Taiga
+  text.clear();
+  text += ToDateString(Stats.uptime) + L"\n";
+  text += ToWstr(Stats.tigers_harmed);
+  SetDlgItemText(IDC_STATIC_ANIME_STAT4, text.c_str());
 }

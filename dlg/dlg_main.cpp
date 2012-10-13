@@ -46,6 +46,7 @@
 #include "../recognition.h"
 #include "../resource.h"
 #include "../settings.h"
+#include "../stats.h"
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
@@ -365,8 +366,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                 if (feed) {
                   wstring search_url = search_bar.url;
                   Replace(search_url, L"%search%", text);
-                  ExecuteAction(L"Torrents");
-                  TorrentDialog.ChangeStatus(L"Searching torrents for \"" + text + L"\"...");
+                  SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+                  ChangeStatus(L"Searching torrents for \"" + text + L"\"...");
                   feed->Check(search_url);
                   return TRUE;
                 }
@@ -530,6 +531,18 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 // Please be careful with what you change.
 
 void MainDialog::OnTimer(UINT_PTR nIDEvent) {
+  // Measure stability
+  Stats.uptime++;
+  // Refresh statistics window
+  if (StatsDialog.IsVisible()) {
+    if (Stats.uptime % 10 == 0) { // Recalculate every 10 seconds
+      Stats.CalculateAll();
+    }
+    StatsDialog.Refresh();
+  }
+
+  // ===========================================================================
+
   // Check event queue
   Taiga.ticker_queue++;
   if (Taiga.ticker_queue >= 5 * 60) { // 5 minutes
@@ -707,7 +720,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
             break;
           case TIPTYPE_TORRENT:
-            ExecuteAction(L"Torrents");
+            SetCurrentPage(SIDEBAR_ITEM_FEEDS);
             break;
           case TIPTYPE_UPDATEFAILED:
             History.queue.Check();
@@ -842,7 +855,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
 
   // Resize rebar
   rebar.SendMessage(WM_SIZE, 0, 0);
-  rect_client.top += rebar.GetBarHeight() + 2;
+  rect_client.top += rebar.GetBarHeight();
   
   // Resize status bar
   win32::Rect rcStatus;

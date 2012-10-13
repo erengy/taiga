@@ -44,7 +44,7 @@ BOOL SearchDialog::OnInitDialog() {
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetImageList(UI.ImgList16.GetHandle());
   list_.SetTheme();
-  list_.InsertColumn(0, 280, 280, LVCFMT_LEFT,   L"Anime title");
+  list_.InsertColumn(0, 400, 400, LVCFMT_LEFT,   L"Anime title");
   list_.InsertColumn(1,  60,  60, LVCFMT_CENTER, L"Type");
   list_.InsertColumn(2,  60,  60, LVCFMT_RIGHT,  L"Episodes");
   list_.InsertColumn(3,  60,  60, LVCFMT_RIGHT,  L"Score");

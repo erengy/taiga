@@ -75,15 +75,15 @@
 			</menu>
 		<!-- View -->
 		<menu name="View">
-			<item name="Dashboard"   action="ViewContent(0)"/>
-			<item name="Now Playing" action="ViewContent(1)"/>
+			<item name="Dashboard"   action="ViewContent(0)" radio="1"/>
+			<item name="Now Playing" action="ViewContent(1)" radio="1"/>
 			<item name="Anime List"  action="ViewContent(3)" checked="1" radio="1"/>
-			<item name="Manga List"  action="ViewContent(4)"/>
-			<item name="History"     action="ViewContent(6)"/>
-			<item name="Statistics"  action="ViewContent(7)"/>
-			<item name="Search"      action="ViewContent(9)"/>
-			<item name="Seasons"     action="ViewContent(10)"/>
-			<item name="Torrents"    action="ViewContent(12)"/>
+			<item name="Manga List"  action="ViewContent(4)" radio="1"/>
+			<item name="History"     action="ViewContent(6)" radio="1"/>
+			<item name="Statistics"  action="ViewContent(7)" radio="1"/>
+			<item name="Search"      action="ViewContent(9)" radio="1"/>
+			<item name="Seasons"     action="ViewContent(10)" radio="1"/>
+			<item name="Torrents"    action="ViewContent(12)" radio="1"/>
 			<item type="separator"/>
 			<item name="Show sidebar" action="ShowSidebar()" checked="1"/>
 		</menu>
