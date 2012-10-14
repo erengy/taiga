@@ -138,7 +138,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // Info()
   //   Shows anime information window.
-  //   lParam is a pointer to an anime list item.
+  //   lParam is an anime ID.
   } else if (action == L"Info") {
     int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
     AnimeDialog.Refresh(anime_id);
@@ -511,6 +511,24 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (mal::IsValidEpisode(value, 0, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(value);
+      anime_item->AddToQueue(episode, true);
+    }
+  // DecrementEpisode()
+  } else if (action == L"DecrementEpisode") {
+    auto anime_item = AnimeDatabase.GetCurrentItem();
+    int watched = anime_item->GetMyLastWatchedEpisode();
+    if (mal::IsValidEpisode(watched - 1, 0, anime_item->GetEpisodeCount())) {
+      anime::Episode episode;
+      episode.number = ToWstr(watched - 1);
+      anime_item->AddToQueue(episode, true);
+    }
+  // IncrementEpisode()
+  } else if (action == L"IncrementEpisode") {
+    auto anime_item = AnimeDatabase.GetCurrentItem();
+    int watched = anime_item->GetMyLastWatchedEpisode();
+    if (mal::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
+      anime::Episode episode;
+      episode.number = ToWstr(watched + 1);
       anime_item->AddToQueue(episode, true);
     }
 

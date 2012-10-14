@@ -77,7 +77,6 @@ public:
   int GetItemCount();
   bool IsEmpty();
   void Remove(int index = -1, bool save = true, bool refresh = true);
-  void Show();
 
 public:
   vector<EventList> list;

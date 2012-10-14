@@ -153,6 +153,9 @@ void EventList::Add(EventItem& item) {
     HistoryDialog.RefreshList();
     
     // Refresh main window
+    MainDialog.treeview.RefreshItems();
+
+    // Refresh anime window
     AnimeListDialog.RefreshList();
     AnimeListDialog.RefreshTabs();
     
@@ -160,7 +163,6 @@ void EventList::Add(EventItem& item) {
     if (!Taiga.logged_in) {
       MainDialog.ChangeStatus(L"Item added to the event queue. (" + 
         anime->GetTitle() + L")");
-      MainDialog.treeview.RefreshItems();
     }
 
     // Update
@@ -203,6 +205,8 @@ void EventList::Check() {
 void EventList::Clear() {
   items.clear();
   index = 0;
+
+  MainDialog.treeview.RefreshItems();
 }
 
 EventItem* EventList::FindItem(int anime_id, int search_mode) {
@@ -249,7 +253,10 @@ void EventList::Remove(unsigned int index, bool refresh) {
   // Remove item
   if (index < items.size()) {
     items.erase(items.begin() + index);
-    if (refresh) HistoryDialog.RefreshList();
+    if (refresh) {
+      MainDialog.treeview.RefreshItems();
+      HistoryDialog.RefreshList();
+    }
   }
 }
 
@@ -320,20 +327,4 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
     }
     if (save) Settings.Save();
   }
-}
-
-void EventQueue::Show() {
-  /*if (GetItemCount() == 0) {
-    win32::TaskDialog dlg(L"Previously on Taiga...", TD_ICON_INFORMATION);
-    dlg.SetMainInstruction(L"There are no events in the queue.");
-    dlg.AddButton(L"OK", IDOK);
-    dlg.Show(g_hMain);
-    return;
-  }
-  
-  if (HistoryDialog.IsWindow()) {
-    HistoryDialog.Show();
-  } else {
-    HistoryDialog.Create(IDD_EVENT, g_hMain, false);
-  }*/
 }

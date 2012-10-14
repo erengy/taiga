@@ -231,7 +231,7 @@ bool HistoryDialog::RemoveItems() {
   }
   
   RefreshList();
-  //SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, L"Remove all items");
+  MainDialog.treeview.RefreshItems();
   AnimeListDialog.RefreshList();
   AnimeListDialog.RefreshTabs();
 

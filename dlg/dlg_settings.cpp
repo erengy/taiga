@@ -289,6 +289,7 @@ void SettingsDialog::OnOK() {
   if (Settings.Account.MAL.user != mal_user_old) {
     AnimeDatabase.LoadList();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
+    MainDialog.treeview.RefreshItems();
     AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     HistoryDialog.RefreshList();

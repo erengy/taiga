@@ -263,6 +263,7 @@
 		<!-- Torrent list right click -->
 		<menu name="TorrentListRightClick">
 			<item name="Download" action="DownloadTorrent" default="1"/>
+			<item name="Information" action="Info"/>
 			<item type="separator"/>
 			<item name="Discard" action="DiscardTorrent"/>
 			<item name="Discard all torrents for this title" action="DiscardTorrents"/>

@@ -71,7 +71,11 @@ void MainDialog::CMainTree::RefreshItems() {
   }
 
   // Select item
-  ::MainDialog.SetCurrentPage(SIDEBAR_ITEM_ANIMELIST); // TEMP
+  if (::MainDialog.GetCurrentPage() == -1) {
+    ::MainDialog.SetCurrentPage(SIDEBAR_ITEM_ANIMELIST);
+  } else {
+    SelectItem(hti.at(::MainDialog.GetCurrentPage()));
+  }
 }
 
 LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
@@ -108,21 +112,24 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
     // Item select
     case TVN_SELCHANGING: {
       LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(lParam);
-      // Prevent selection of separators
-      if (pnmtv->itemNew.lParam == -1) {
-        // TODO: Should work upwards too
-        if (pnmtv->action == TVC_BYKEYBOARD) {
-          HTREEITEM hti = TreeView_GetNextItem(treeview.GetWindowHandle(), 
-                                               pnmtv->itemNew.hItem, TVGN_NEXT);
-          SetCurrentPage(treeview.GetItemData(hti));
-        }
-        return TRUE;
+      switch (pnmtv->action) {
+        case TVC_UNKNOWN:
+          break;
+        case TVC_BYMOUSE:
+        case TVC_BYKEYBOARD:
+          // Prevent selection of separators
+          if (pnmtv->itemNew.lParam == -1) {
+            if (pnmtv->action == TVC_BYKEYBOARD) {
+              // TODO: Should work upwards too
+              HTREEITEM hti = TreeView_GetNextItem(treeview.GetWindowHandle(), 
+                                                   pnmtv->itemNew.hItem, TVGN_NEXT);
+              SetCurrentPage(treeview.GetItemData(hti));
+            }
+            return TRUE;
+          }
+          SetCurrentPage(pnmtv->itemNew.lParam);
+          break;
       }
-      break;
-    }
-    case TVN_SELCHANGED: {
-      LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(lParam);
-      SetCurrentPage(pnmtv->itemNew.lParam);
       break;
     }
   }

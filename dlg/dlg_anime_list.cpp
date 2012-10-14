@@ -193,6 +193,28 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       break;
     }
 
+    // Set cursor
+    case WM_SETCURSOR: {
+      POINT pt;
+      ::GetCursorPos(&pt);
+      ::ScreenToClient(GetWindowHandle(), &pt);
+        
+      win32::Rect rect_item;
+      GetSubItemRect(GetNextItem(-1, LVIS_SELECTED), 1, &rect_item);
+      win32::Rect rect_button[2];
+      rect_button[0].Copy(rect_item);
+      rect_button[1].Copy(rect_item);
+      rect_button[0].right = rect_button[0].left + 16;
+      rect_button[1].left = rect_button[1].right - 16;
+
+      if (rect_button[0].PtIn(pt) || rect_button[1].PtIn(pt)) {
+        ::SetCursor(reinterpret_cast<HCURSOR>(
+          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        return TRUE;
+      }
+      break;
+    }
+
     // Back & forward buttons
     case WM_XBUTTONUP: {
       return parent->DialogProc(hwnd, uMsg, wParam, lParam);
@@ -237,7 +259,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       break;
     }
 
-      // Double click
+    // Double click
     case NM_DBLCLK: {
       if (listview.GetSelectedCount() > 0) {
         switch (Settings.Program.List.double_click) {
@@ -245,6 +267,32 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           case 2: ExecuteAction(L"OpenFolder"); break;
           case 3: ExecuteAction(L"PlayNext");   break;
           case 4: ExecuteAction(L"Info");       break;
+        }
+      }
+      break;
+    }
+
+    // Left click
+    case NM_CLICK: {
+      if (pnmh->hwndFrom == listview.GetWindowHandle()) {
+        if (listview.GetSelectedCount() > 0) {
+          POINT pt;
+          ::GetCursorPos(&pt);
+          ::ScreenToClient(listview.GetWindowHandle(), &pt);
+        
+          win32::Rect rect_item;
+          listview.GetSubItemRect(listview.GetNextItem(-1, LVIS_SELECTED), 1, &rect_item);
+          win32::Rect rect_button[2];
+          rect_button[0].Copy(rect_item);
+          rect_button[1].Copy(rect_item);
+          rect_button[0].right = rect_button[0].left + 16;
+          rect_button[1].left = rect_button[1].right - 16;
+
+          if (rect_button[0].PtIn(pt)) {
+            ExecuteAction(L"DecrementEpisode");
+          } else if (rect_button[1].PtIn(pt)) {
+            ExecuteAction(L"IncrementEpisode");
+          }
         }
       }
       break;
@@ -258,23 +306,19 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           UpdateAllMenus(anime_item);
           int index = listview.HitTest(true);
           if (anime_item->IsInList()) {
-            ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, index == 2 ? L"EditScore" : L"RightClick"));
+            switch (index) {
+              case 2:
+                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"EditScore"));
+                break;
+              default:
+                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"RightClick"));
+                break;
+            }
             UpdateAllMenus(anime_item);
           } else {
             UpdateSearchListMenu(true);
             ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"SearchList"), 
               0, static_cast<LPARAM>(anime_item->GetId()));
-          }
-        }
-      } else if (pnmh->hwndFrom == listview.GetHeader()) {
-        HDHITTESTINFO hdhti;
-        ::GetCursorPos(&hdhti.pt);
-        ::ScreenToClient(listview.GetHeader(), &hdhti.pt);
-        if (::SendMessage(listview.GetHeader(), HDM_HITTEST, 0, reinterpret_cast<LPARAM>(&hdhti))) {
-          if (hdhti.iItem == 3) {
-            ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"FilterType"));
-            UpdateAllMenus(AnimeDatabase.GetCurrentItem());
-            return TRUE;
           }
         }
       }
@@ -417,6 +461,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         UI.list_progress.background.Draw(hdc.Get(), &rcItem);
         win32::Rect rcAvail = rcItem;
         win32::Rect rcBuffer = rcItem;
+        win32::Rect rcButton = rcItem;
         
         // Draw progress
         if (eps_watched > -1 || eps_buffer > -1) {
@@ -485,6 +530,21 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
           rcBuffer.left = rcItem.right;
           rcBuffer.right = rcItem.right + 1;
           UI.list_progress.separator.Draw(hdc.Get(), &rcBuffer);
+        }
+
+        // Draw buttons
+        if (pCD->nmcd.uItemState & CDIS_SELECTED) {
+          rcButton.Inflate(3, 1);
+          // Draw decrement button
+          if (eps_watched > 0) {
+            rcButton.left += 1;
+            UI.ImgList16.Draw(ICON16_MINUS_SMALL, hdc.Get(), rcButton.left, rcButton.top);
+          }
+          // Draw increment button
+          if (eps_total > eps_watched) {
+            rcButton.left = rcButton.right - 16;
+            UI.ImgList16.Draw(ICON16_PLUS_SMALL, hdc.Get(), rcButton.left, rcButton.top);
+          }
         }
 
         // Draw text

@@ -202,6 +202,13 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
             feed->Download(feed_item->index);
+          } else if (answer == L"Info") {
+            auto anime_id = feed_item->episode_data.anime_id;
+            if (anime_id) {
+              ExecuteAction(L"Info", 0, anime_id);
+            } else {
+              ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
+            }
           } else if (answer == L"DiscardTorrent") {
             feed_item->download = false;
             list_.SetCheckState(lpnmitem->iItem, FALSE);
