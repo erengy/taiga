@@ -40,15 +40,17 @@ public:
 
   int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
+  void RefreshListItem(int anime_id);
   void RefreshTabs(int index = -1, bool redraw = true);
 
 public:
   // List-view control
   class ListView : public win32::ListView {
   public:
-    ListView() { dragging = false; };
+    ListView() { dragging = false; button_visible[0] = false; button_visible[1] = false; }
     int GetSortType(int column);
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    bool button_visible[2];
     bool dragging;
     win32::ImageList drag_image;
     AnimeListDialog* parent;

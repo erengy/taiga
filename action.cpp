@@ -41,6 +41,7 @@
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_info_page.h"
 #include "dlg/dlg_anime_list.h"
+#include "dlg/dlg_history.h"
 #include "dlg/dlg_input.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_search.h"
@@ -271,7 +272,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"ViewContent") {
     int page = ToInt(body);
     MainDialog.SetCurrentPage(page);
-    UpdateViewMenu();
 
   // ===========================================================================
   
@@ -517,10 +517,16 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"DecrementEpisode") {
     auto anime_item = AnimeDatabase.GetCurrentItem();
     int watched = anime_item->GetMyLastWatchedEpisode();
-    if (mal::IsValidEpisode(watched - 1, 0, anime_item->GetEpisodeCount())) {
-      anime::Episode episode;
-      episode.number = ToWstr(watched - 1);
-      anime_item->AddToQueue(episode, true);
+    auto event_item = History.queue.FindItem(anime_item->GetId(), EVENT_SEARCH_EPISODE);
+    if (event_item && *event_item->episode == watched) {
+      event_item->enabled = false;
+      History.queue.RemoveDisabled();
+    } else {
+      if (mal::IsValidEpisode(watched - 1, 0, anime_item->GetEpisodeCount())) {
+        anime::Episode episode;
+        episode.number = ToWstr(watched - 1);
+        anime_item->AddToQueue(episode, true);
+      }
     }
   // IncrementEpisode()
   } else if (action == L"IncrementEpisode") {

@@ -166,9 +166,7 @@ void SearchDialog::EnableInput(bool enable) {
 
 void SearchDialog::ParseResults(const wstring& data) {
   if (data.empty()) {
-    wstring msg;
-    //edit_.GetText(msg);
-    msg = L"No results found for \"" + msg + L"\".";
+    wstring msg = L"No results found for \"" + search_text + L"\".";
     win32::TaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
     dlg.AddButton(L"OK", IDOK);
@@ -229,6 +227,7 @@ bool SearchDialog::Search(const wstring& title) {
     EnableInput(false);
     list_.DeleteAllItems();
     anime_ids_.clear();
+    search_text = title;
     return true;
   } else {
     return false;

@@ -45,37 +45,11 @@
 
 /* TreeView control */
 
-void MainDialog::CMainTree::RefreshItems() {
-  // Clear items
-  DeleteAllItems();
-  hti.clear();
-  
-  // Add items
-  hti.push_back(InsertItem(L"Dashboard", ICON16_HOME, SIDEBAR_ITEM_DASHBOARD, nullptr));
-  hti.push_back(InsertItem(L"Now Playing", ICON16_PLAY, SIDEBAR_ITEM_NOWPLAYING, nullptr));
-  hti.push_back(InsertItem(nullptr, -1, -1, nullptr));
-  hti.push_back(InsertItem(L"Anime List", ICON16_DOCUMENT_A, SIDEBAR_ITEM_ANIMELIST, nullptr));
-  hti.push_back(InsertItem(L"Manga List", ICON16_DOCUMENT_M, SIDEBAR_ITEM_MANGALIST, nullptr));
-  hti.push_back(InsertItem(nullptr, -1, -1, nullptr));
-  hti.push_back(InsertItem(L"History", ICON16_CLOCK, SIDEBAR_ITEM_HISTORY, nullptr));
-  hti.push_back(InsertItem(L"Statistics", ICON16_CHART, SIDEBAR_ITEM_STATS, nullptr));
-  hti.push_back(InsertItem(nullptr, -1, -1, nullptr));
-  hti.push_back(InsertItem(L"Search", ICON16_SEARCH, SIDEBAR_ITEM_SEARCH, nullptr));
-  hti.push_back(InsertItem(L"Seasons", ICON16_CALENDAR, SIDEBAR_ITEM_SEASONS, nullptr));
-  hti.push_back(InsertItem(nullptr, -1, -1, nullptr));
-  hti.push_back(InsertItem(L"Torrents", ICON16_FEED, SIDEBAR_ITEM_FEEDS, nullptr));
-
-  if (History.queue.GetItemCount() > 0) {
-    wstring text = L"History (" + ToWstr(History.queue.GetItemCount()) + L")";
-    SetItem(hti.at(SIDEBAR_ITEM_HISTORY), text.c_str());
-  }
-
-  // Select item
-  if (::MainDialog.GetCurrentPage() == -1) {
-    ::MainDialog.SetCurrentPage(SIDEBAR_ITEM_ANIMELIST);
-  } else {
-    SelectItem(hti.at(::MainDialog.GetCurrentPage()));
-  }
+void MainDialog::CMainTree::RefreshHistoryCounter() {
+  wstring text = L"History";
+  int count = History.queue.GetItemCount();
+  if (count > 0) text += L" (" + ToWstr(count) + L")";
+  SetItem(hti.at(SIDEBAR_ITEM_HISTORY), text.c_str());
 }
 
 LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {

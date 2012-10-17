@@ -55,6 +55,7 @@ public:
   void Clear();
   EventItem* FindItem(int anime_id, int search_mode = 0);
   void Remove(unsigned int index, bool refresh = true);
+  void RemoveDisabled(bool refresh = true);
   
 public:
   unsigned int index;
@@ -77,6 +78,7 @@ public:
   int GetItemCount();
   bool IsEmpty();
   void Remove(int index = -1, bool save = true, bool refresh = true);
+  void RemoveDisabled(bool save = true, bool refresh = true);
 
 public:
   vector<EventList> list;

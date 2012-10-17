@@ -93,7 +93,7 @@ public:
   // Tree-view control
   class CMainTree : public win32::TreeView {
   public:
-    void RefreshItems();
+    void RefreshHistoryCounter();
     vector<HTREEITEM> hti;
   } treeview;
 

@@ -165,19 +165,6 @@ void HistoryDialog::RefreshList() {
 
   // Enable/disable update button
   EnableDlgItem(IDOK, History.queue.GetItemCount() > 0 ? TRUE : FALSE);
-
-  // Set title
-  /*switch (History.queue.GetItemCount()) {
-    case 0:
-      SetText(L"Event Queue");
-      break;
-    case 1:
-      SetText(L"Event Queue (1 item)");
-      break;
-    default:
-      SetText(L"Event Queue (" + ToWstr(History.queue.GetItemCount()) + L" items)");
-      break;
-  }*/
 }
 
 bool HistoryDialog::MoveItems(int pos) {
@@ -231,7 +218,8 @@ bool HistoryDialog::RemoveItems() {
   }
   
   RefreshList();
-  MainDialog.treeview.RefreshItems();
+
+  MainDialog.treeview.RefreshHistoryCounter();
   AnimeListDialog.RefreshList();
   AnimeListDialog.RefreshTabs();
 

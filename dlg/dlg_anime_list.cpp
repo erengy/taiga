@@ -207,7 +207,8 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       rect_button[0].right = rect_button[0].left + 16;
       rect_button[1].left = rect_button[1].right - 16;
 
-      if (rect_button[0].PtIn(pt) || rect_button[1].PtIn(pt)) {
+      if ((button_visible[0] && rect_button[0].PtIn(pt)) || 
+          (button_visible[1] && rect_button[1].PtIn(pt))) {
         ::SetCursor(reinterpret_cast<HCURSOR>(
           ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
         return TRUE;
@@ -230,7 +231,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Item drag
     case LVN_BEGINDRAG: {
       POINT pt = {};
-      LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
+      auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       listview.drag_image = listview.CreateDragImage(lplv->iItem, &pt);
       if (listview.drag_image.GetHandle()) {
         pt = lplv->ptAction;
@@ -244,7 +245,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     
     // Column click
     case LVN_COLUMNCLICK: {
-      LPNMLISTVIEW lplv = (LPNMLISTVIEW)lParam;
+      auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       int order = 1;
       if (lplv->iSubItem == listview.GetSortColumn()) order = listview.GetSortOrder() * -1;
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ListViewCompareProc);
@@ -253,9 +254,21 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
 
     // Item select
     case LVN_ITEMCHANGED: {
-      LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
+      auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       auto anime_id = static_cast<int>(lplv->lParam);
       AnimeDatabase.SetCurrentId(anime_id);
+      listview.button_visible[0] = false;
+      listview.button_visible[1] = false;
+      if (lplv->uNewState != 0) {
+        auto anime_item = AnimeDatabase.FindItem(anime_id);
+        if (anime_item) {
+          if (anime_item->GetMyLastWatchedEpisode() > 0)
+            listview.button_visible[0] = true;
+          if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
+              anime_item->GetEpisodeCount() == 0)
+            listview.button_visible[1] = true;
+        }
+      }
       break;
     }
 
@@ -288,9 +301,9 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           rect_button[0].right = rect_button[0].left + 16;
           rect_button[1].left = rect_button[1].right - 16;
 
-          if (rect_button[0].PtIn(pt)) {
+          if (listview.button_visible[0] && rect_button[0].PtIn(pt)) {
             ExecuteAction(L"DecrementEpisode");
-          } else if (rect_button[1].PtIn(pt)) {
+          } else if (listview.button_visible[1] && rect_button[1].PtIn(pt)) {
             ExecuteAction(L"IncrementEpisode");
           }
         }
@@ -536,12 +549,12 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         if (pCD->nmcd.uItemState & CDIS_SELECTED) {
           rcButton.Inflate(3, 1);
           // Draw decrement button
-          if (eps_watched > 0) {
+          if (listview.button_visible[0]) {
             rcButton.left += 1;
             UI.ImgList16.Draw(ICON16_MINUS_SMALL, hdc.Get(), rcButton.left, rcButton.top);
           }
           // Draw increment button
-          if (eps_total > eps_watched) {
+          if (listview.button_visible[1]) {
             rcButton.left = rcButton.right - 16;
             UI.ImgList16.Draw(ICON16_PLUS_SMALL, hdc.Get(), rcButton.left, rcButton.top);
           }
@@ -660,6 +673,13 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Show again
   listview.Show(SW_SHOW);
+}
+
+void AnimeListDialog::RefreshListItem(int anime_id) {
+  int index = GetListIndex(anime_id);
+  if (index > -1) {
+    listview.RedrawItems(index, index, true);
+  }
 }
 
 void AnimeListDialog::RefreshTabs(int index, bool redraw) {

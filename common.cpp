@@ -252,7 +252,7 @@ QWORD GetFolderSize(const wstring& path, bool recursive) {
         folder_size += GetFolderSize(folder, recursive);
       }
     }
-    folder_size += GetFileSize(path + wfd.cFileName);
+    folder_size += (wfd.nFileSizeHigh * (MAXDWORD + 1)) + wfd.nFileSizeLow;
   } while (FindNextFile(hFind, &wfd));
 	
   FindClose(hFind);

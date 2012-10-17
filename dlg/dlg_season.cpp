@@ -257,19 +257,22 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       }
       
       // Draw title background
-      if (true) {
-        COLORREF color;
-        switch (anime_item->GetAiringStatus()) {
-          case mal::STATUS_AIRING:
-            color = RGB(225, 245, 231); break;
-          case mal::STATUS_FINISHED: default:
-            color = mal::COLOR_LIGHTBLUE; break;
-          case mal::STATUS_NOTYETAIRED:
-            color = RGB(245, 225, 231); break;
-        }
-        hdc.FillRect(rect_title, color);
-      } else {
-        hdc.FillRect(rect_title, anime_item->IsInList() ? RGB(225, 245, 231) : mal::COLOR_LIGHTBLUE);
+      COLORREF color;
+      switch (anime_item->GetAiringStatus()) {
+        case mal::STATUS_AIRING:
+          color = RGB(225, 245, 231); break;
+        case mal::STATUS_FINISHED: default:
+          color = mal::COLOR_LIGHTBLUE; break;
+        case mal::STATUS_NOTYETAIRED:
+          color = RGB(245, 225, 231); break;
+      }
+      hdc.FillRect(rect_title, color);
+      
+      // Draw anime list indicator
+      if (anime_item->IsInList()) {
+        UI.ImgList16.Draw(ICON16_DOCUMENT_A, hdc.Get(),
+          rect_title.right - 20, rect_title.top + 2);
+        rect_title.right -= 20;
       }
 
       // Draw title

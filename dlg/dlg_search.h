@@ -41,6 +41,9 @@ public:
   void RefreshList();
   bool Search(const wstring& title);
 
+public:
+  wstring search_text;
+
 private:
   vector<int> anime_ids_;
   win32::ListView list_;

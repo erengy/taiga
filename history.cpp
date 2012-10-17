@@ -106,7 +106,7 @@ void EventList::Add(EventItem& item) {
   bool add_new_item = true;
   if (!History.queue.updating) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
-      if (it->anime_id == item.anime_id) {
+      if (it->anime_id == item.anime_id && it->enabled) {
         if (it->mode != HTTP_MAL_AnimeAdd && it->mode != HTTP_MAL_AnimeDelete) {
           if (!item.episode || (!it->episode && it == items.rbegin())) {
             if (item.episode) it->episode = *item.episode;
@@ -149,19 +149,22 @@ void EventList::Add(EventItem& item) {
       anime->CheckEpisodes(0);
     }
     
-    // Refresh event window
+    // Refresh history
+    MainDialog.treeview.RefreshHistoryCounter();
     HistoryDialog.RefreshList();
-    
-    // Refresh main window
-    MainDialog.treeview.RefreshItems();
 
     // Refresh anime window
-    AnimeListDialog.RefreshList();
-    AnimeListDialog.RefreshTabs();
+    if (item.mode == HTTP_MAL_AnimeAdd || item.mode == HTTP_MAL_AnimeDelete || 
+        item.status || item.enable_rewatching) {
+      AnimeListDialog.RefreshList();
+      AnimeListDialog.RefreshTabs();
+    } else {
+      AnimeListDialog.RefreshListItem(item.anime_id);
+    }
     
     // Change status
     if (!Taiga.logged_in) {
-      MainDialog.ChangeStatus(L"Item added to the event queue. (" + 
+      MainDialog.ChangeStatus(L"Item added to the queue. (" + 
         anime->GetTitle() + L")");
     }
 
@@ -206,12 +209,12 @@ void EventList::Clear() {
   items.clear();
   index = 0;
 
-  MainDialog.treeview.RefreshItems();
+  MainDialog.treeview.RefreshHistoryCounter();
 }
 
 EventItem* EventList::FindItem(int anime_id, int search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
-    if (it->anime_id == anime_id) {
+    if (it->anime_id == anime_id && it->enabled) {
       switch (search_mode) {
         // Date
         case EVENT_SEARCH_DATE_START:
@@ -254,9 +257,26 @@ void EventList::Remove(unsigned int index, bool refresh) {
   if (index < items.size()) {
     items.erase(items.begin() + index);
     if (refresh) {
-      MainDialog.treeview.RefreshItems();
+      MainDialog.treeview.RefreshHistoryCounter();
       HistoryDialog.RefreshList();
     }
+  }
+}
+
+void EventList::RemoveDisabled(bool refresh) {
+  bool needs_refresh = false;
+  
+  for (size_t i = 0; i < items.size(); i++) {
+    if (!items.at(i).enabled) {
+      items.erase(items.begin() + i);
+      needs_refresh = true;
+      i--;
+    }
+  }
+
+  if (refresh && needs_refresh) {
+    MainDialog.treeview.RefreshHistoryCounter();
+    HistoryDialog.RefreshList();
   }
 }
 
@@ -306,7 +326,12 @@ EventList* EventQueue::FindList(wstring user) {
 
 int EventQueue::GetItemCount() {
   EventList* event_list = FindList();
-  if (event_list) return event_list->items.size();
+  if (event_list) {
+    int count = 0;
+    for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it)
+      if (it->enabled) count++;
+    return count;
+  }
   return 0;
 }
 
@@ -325,6 +350,14 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
     } else {
       event_list->Remove(event_list->index, refresh);
     }
+    if (save) Settings.Save();
+  }
+}
+
+void EventQueue::RemoveDisabled(bool save, bool refresh) {
+  EventList* event_list = FindList();
+  if (event_list) {
+    event_list->RemoveDisabled(refresh);
     if (save) Settings.Save();
   }
 }
