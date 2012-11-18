@@ -40,7 +40,6 @@
 #define IDD_ANIME_LIST                          150
 #define IDD_HISTORY                             151
 #define IDD_STATS                               153
-#define IDD_NOWPLAYING                          154
 #define IDD_MANGA_LIST                          157
 #define IDC_BUTTON_ADDFOLDER                    1000
 #define IDC_STATIC_ANIME_STAT1                  1000
@@ -169,7 +168,6 @@
 #define IDC_STATIC_ANIME_IMG                    1136
 #define IDC_STATIC_ANIME_INFO1                  1137
 #define IDC_STATIC_ANIME_INFO2                  1138
-#define IDC_STATIC_ANIME_TITLE                  1139
 #define IDC_STATIC_FEED_FILTER_LIMIT            1140
 #define IDC_STATIC_HEADER                       1141
 #define IDC_STATIC_HEADER1                      1142

@@ -168,17 +168,15 @@ bool Image::Load(const wstring& path) {
   }
 
   Gdiplus::Bitmap bmp(path.c_str());
-  width = bmp.GetWidth();
-  height = bmp.GetHeight();
+  rect.right = bmp.GetWidth();
+  rect.bottom = bmp.GetHeight();
   bmp.GetHBITMAP(NULL, &hbmp);
   
-  if (!hbmp || !width || !height) {
+  if (!hbmp || !rect.right || !rect.bottom) {
     ::DeleteObject(hbmp);
     ::DeleteDC(dc.DetachDC());
     return false;
   } else {
-    rect.bottom = rect.top + static_cast<int>(rect.Width() * // TODO: Move to dlg_anime_info
-      (static_cast<float>(height) / static_cast<float>(width)));
     dc.AttachBitmap(hbmp);
     return true;
   }

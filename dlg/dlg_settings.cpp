@@ -24,17 +24,20 @@
 #include "dlg_main.h"
 #include "dlg_search.h"
 #include "dlg_settings.h"
+#include "dlg_stats.h"
 
 #include "../anime_db.h"
 #include "../anime_filter.h"
 #include "../announce.h"
 #include "../common.h"
+#include "../history.h"
 #include "../http.h"
 #include "../media.h"
 #include "../monitor.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../settings.h"
+#include "../stats.h"
 #include "../string.h"
 #include "../theme.h"
 
@@ -63,22 +66,14 @@ class SettingsDialog SettingsDialog;
 
 // =============================================================================
 
-SettingsDialog::SettingsDialog() :
-  static_font_(nullptr), current_page_(PAGE_ACCOUNT)
-{
+SettingsDialog::SettingsDialog()
+    : current_page_(PAGE_ACCOUNT) {
   RegisterDlgClass(L"TaigaSettingsW");
 
   pages.resize(PAGE_COUNT);
   for (size_t i = 0; i < PAGE_COUNT; i++) {
     pages[i].index = i;
     pages[i].parent = this;
-  }
-}
-
-SettingsDialog::~SettingsDialog() {
-  if (static_font_) {
-    ::DeleteObject(static_font_);
-    static_font_ = nullptr;
   }
 }
 
@@ -91,14 +86,8 @@ void SettingsDialog::SetCurrentPage(int index) {
 
 BOOL SettingsDialog::OnInitDialog() {
   // Set title font
-  if (!static_font_) {
-    LOGFONT lFont;
-    static_font_ = GetFont();
-    ::GetObject(static_font_, sizeof(LOGFONT), &lFont);
-    lFont.lfWeight = FW_BOLD;
-    static_font_ = ::CreateFontIndirect(&lFont);
-  }
-  SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, reinterpret_cast<WPARAM>(static_font_), TRUE);
+  SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, 
+    reinterpret_cast<WPARAM>(UI.font_bold.Get()), TRUE);
   
   // Create pages
   RECT rcWindow, rcClient;
@@ -288,12 +277,15 @@ void SettingsDialog::OnOK() {
   // Refresh other windows
   if (Settings.Account.MAL.user != mal_user_old) {
     AnimeDatabase.LoadList();
+    History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     MainDialog.treeview.RefreshHistoryCounter();
     AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     HistoryDialog.RefreshList();
     SearchDialog.RefreshList();
+    Stats.CalculateAll();
+    StatsDialog.Refresh();
     ExecuteAction(L"Logout(" + mal_user_old + L")");
   } else {
     AnimeListDialog.RefreshList();

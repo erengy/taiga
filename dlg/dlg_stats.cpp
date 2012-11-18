@@ -27,37 +27,17 @@
 #include "../resource.h"
 #include "../stats.h"
 #include "../string.h"
+#include "../theme.h"
 
 class StatsDialog StatsDialog;
 
 // =============================================================================
 
-StatsDialog::StatsDialog()
-    : header_font_(nullptr) {
-}
-
-StatsDialog::~StatsDialog() {
-  if (header_font_) {
-    ::DeleteObject(header_font_);
-    header_font_ = nullptr;
-  }
-}
-
-// =============================================================================
-
 BOOL StatsDialog::OnInitDialog() {
-  // Create bold header font
-  if (!header_font_) {
-    LOGFONT lFont;
-    ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
-    lFont.lfCharSet = DEFAULT_CHARSET;
-    lFont.lfWeight = FW_BOLD;
-    header_font_ = ::CreateFontIndirect(&lFont);
-  }
   // Set new font for headers
   for (int i = 0; i < 4; i++) {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-      reinterpret_cast<WPARAM>(header_font_), FALSE);
+      reinterpret_cast<WPARAM>(UI.font_bold.Get()), FALSE);
   }
 
   // Calculate and display statistics
@@ -114,6 +94,16 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
 }
 
+void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
+  switch (uMsg) {
+    case WM_SIZE: {
+      win32::Rect rcWindow;
+      rcWindow.Set(0, 0, size.cx, size.cy);
+      // TODO: Resize horizontally
+    }
+  }
+}
+
 // =============================================================================
 
 void StatsDialog::Refresh() {
@@ -134,11 +124,16 @@ void StatsDialog::Refresh() {
   // Database
   text.clear();
   text += ToWstr(static_cast<int>(AnimeDatabase.items.size())) + L"\n";
-  text += ToWstr(Stats.image_count) + L" (" + ToSizeString(Stats.image_size) + L")";
+  text += ToWstr(Stats.image_count) + L" (" + ToSizeString(Stats.image_size) + L")\n";
+  text += ToWstr(Stats.torrent_count) + L" (" + ToSizeString(Stats.torrent_size) + L")";
   SetDlgItemText(IDC_STATIC_ANIME_STAT3, text.c_str());
 
   // Taiga
   text.clear();
+  text += ToWstr(Stats.connections_succeeded + Stats.connections_failed);
+  if (Stats.connections_failed > 0)
+    text += L" (" + ToWstr(Stats.connections_failed) + L" failed)";
+  text += L"\n";
   text += ToDateString(Stats.uptime) + L"\n";
   text += ToWstr(Stats.tigers_harmed);
   SetDlgItemText(IDC_STATIC_ANIME_STAT4, text.c_str());

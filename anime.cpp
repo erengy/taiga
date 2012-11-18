@@ -34,6 +34,7 @@
 #include "taiga.h"
 #include "theme.h"
 
+#include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_feed_filter.h"
 #include "dlg/dlg_main.h"
@@ -71,9 +72,10 @@ void Item::StartWatching(Episode episode) {
   Taiga.play_status = PLAYSTATUS_PLAYING;
   SetPlaying(true);
 
-  // Update main window
-  MainDialog.ChangeStatus();
-  MainDialog.UpdateTip();
+  // Update now playing window
+  NowPlayingDialog.SetCurrentId(GetId());
+  
+  // Update anime list window
   int status = GetMyRewatching() ? mal::MYSTATUS_WATCHING : GetMyStatus();
   if (status != mal::MYSTATUS_NOTINLIST) {
     AnimeListDialog.RefreshList(status);
@@ -85,6 +87,12 @@ void Item::StartWatching(Episode episode) {
     AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
     AnimeListDialog.listview.EnsureVisible(list_index);
   }
+
+  // Update main window
+  MainDialog.ChangeStatus();
+  MainDialog.EnableSharing();
+  MainDialog.UpdateTip();
+  MainDialog.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
   
   // Show balloon tip
   if (Settings.Program.Balloon.enabled) {
@@ -129,10 +137,14 @@ void Item::EndWatching(Episode episode) {
   episode.anime_id = GetId();
   Announcer.Do(ANNOUNCE_TO_HTTP, &episode);
   Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
+
+  // Update now playing window
+  NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);
   
   // Update main window
   episode.anime_id = anime::ID_UNKNOWN;
   MainDialog.ChangeStatus();
+  MainDialog.EnableSharing(false);
   MainDialog.UpdateTip();
   int list_index = AnimeListDialog.GetListIndex(GetId());
   if (list_index > -1) {

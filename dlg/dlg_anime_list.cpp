@@ -44,6 +44,7 @@ BOOL AnimeListDialog::OnInitDialog() {
   tab.Attach(GetDlgItem(IDC_TAB_MAIN));
 
   // Create main list
+  listview.parent = this;
   listview.Attach(GetDlgItem(IDC_LIST_MAIN));
   listview.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   listview.SetImageList(UI.ImgList16.GetHandle());
@@ -66,7 +67,9 @@ BOOL AnimeListDialog::OnInitDialog() {
     }
   }
 
-  listview.parent = this;
+  // Refresh
+  RefreshList(mal::MYSTATUS_WATCHING);
+  RefreshTabs(mal::MYSTATUS_WATCHING);
 
   // Success
   return TRUE;
@@ -678,6 +681,8 @@ void AnimeListDialog::RefreshList(int index) {
 void AnimeListDialog::RefreshListItem(int anime_id) {
   int index = GetListIndex(anime_id);
   if (index > -1) {
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    listview.SetItem(index, 2, mal::TranslateNumber(anime_item->GetMyScore()).c_str());
     listview.RedrawItems(index, index, true);
   }
 }

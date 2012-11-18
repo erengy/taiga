@@ -24,15 +24,19 @@
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
-class Anime;
-class AnimeInfoPage;
+#include "dlg_anime_info_page.h"
+
+enum AnimeDialogMode {
+  DIALOG_MODE_ANIME_INFORMATION,
+  DIALOG_MODE_NOW_PLAYING
+};
 
 // =============================================================================
 
 class AnimeDialog : public win32::Dialog {
 public:
   AnimeDialog();
-  virtual ~AnimeDialog();
+  virtual ~AnimeDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -40,30 +44,40 @@ public:
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnOK();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+  void OnSize(UINT uMsg, UINT nType, SIZE size);
   BOOL PreTranslateMessage(MSG* pMsg);
 
-public:
   int GetCurrentId() const;
+  void SetCurrentId(int anime_id);
   void SetCurrentPage(int index);
-  void Refresh(int anime_id, bool image = true, bool series_info = true, bool my_info = true);
+  void Refresh(bool image = true, bool series_info = true, bool my_info = true);
 
 public:
-  vector<AnimeInfoPage> pages;
+  PageSeriesInfo page_series_info;
+  PageMyInfo page_my_info;
 
-private:
+protected:
   int anime_id_;
-  HBRUSH brush_darkblue_, brush_lightblue_;
   int current_page_;
   Image image_;
-  win32::Tab tab_;
-  HFONT title_font_;
+  int mode_;
 
   class ImageLabel : public win32::Window {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } image_label_;
+
+  win32::Edit edit_title_;
+  win32::Tab tab_;
+};
+
+class NowPlayingDialog : public AnimeDialog {
+public:
+  NowPlayingDialog();
+  virtual ~NowPlayingDialog() {}
 };
 
 extern class AnimeDialog AnimeDialog;
+extern class NowPlayingDialog NowPlayingDialog;
 
 #endif // DLG_ANIME_INFO_H

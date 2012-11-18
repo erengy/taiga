@@ -244,15 +244,15 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       }
       if (image_index > -1 && images.at(image_index).dc.Get()) {
         rect_image = ResizeRect(rect_image, 
-          images.at(image_index).width,
-          images.at(image_index).height,
+          images.at(image_index).rect.Width(),
+          images.at(image_index).rect.Height(),
           true, true, false);
         hdc.SetStretchBltMode(HALFTONE);
         hdc.StretchBlt(rect_image.left, rect_image.top, 
           rect_image.Width(), rect_image.Height(), 
           images.at(image_index).dc.Get(), 0, 0, 
-          images.at(image_index).width, 
-          images.at(image_index).height, 
+          images.at(image_index).rect.Width(), 
+          images.at(image_index).rect.Height(), 
           SRCCOPY);
       }
       

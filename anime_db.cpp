@@ -85,13 +85,11 @@ bool Database::SaveDatabase() {
 
   // Initialize
   xml_document doc;
-  xml_node animedb_node = doc.append_child();
-  animedb_node.set_name(L"animedb");
+  xml_node animedb_node = doc.append_child(L"animedb");
 
   // Write items
   for (auto it = items.begin(); it != items.end(); ++it) {
-    xml_node anime_node = animedb_node.append_child();
-    anime_node.set_name(L"anime");
+    xml_node anime_node = animedb_node.append_child(L"anime");
     #define XML_WI(n, v) \
       if (v) XML_WriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
@@ -329,8 +327,7 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
   switch (mode) {
     // Add anime item
     case ADD_ANIME: {
-      xml_node node = myanimelist.append_child();
-      node.set_name(L"anime");
+      xml_node node = myanimelist.append_child(L"anime");
       XML_WriteIntValue(node, L"series_animedb_id", item->GetId());
       XML_WriteIntValue(node, L"my_watched_episodes", item->GetMyLastWatchedEpisode(false));
       XML_WriteStrValue(node, L"my_start_date", wstring(item->GetMyDate(DATE_START)).c_str());

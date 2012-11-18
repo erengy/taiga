@@ -235,32 +235,6 @@ bool Settings::Load() {
       // File archive
       Aggregator.file_archive.clear();
       PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
-    
-  // Events
-  History.queue.list.clear();
-  for (xml_node user = doc.child(L"events").child(L"user"); user; user = user.next_sibling(L"user")) {
-    for (xml_node item = user.child(L"event"); item; item = item.next_sibling(L"event")) {
-      EventItem event_item;
-      event_item.anime_id = item.attribute(L"id").as_int(anime::ID_NOTINLIST);
-      int episode = item.attribute(L"episode").as_int(-1);
-      int score = item.attribute(L"score").as_int(-1);
-      int status = item.attribute(L"status").as_int(-1);
-      int enable_rewatching = item.attribute(L"rewatch").as_int(-1);
-      wstring tags = item.attribute(L"tags").as_string(L"%empty%");
-      wstring date_start = item.attribute(L"date_start").as_string(L"%empty%");
-      wstring date_finish = item.attribute(L"date_finish").as_string(L"%empty%");
-      if (episode > -1) event_item.episode = episode;
-      if (score > -1) event_item.score = score;
-      if (status > -1) event_item.status = status;
-      if (enable_rewatching > -1) event_item.enable_rewatching = enable_rewatching;
-      if (tags != L"%empty%") event_item.tags = tags;
-      if (date_start != L"%empty%") event_item.date_start = date_start;
-      if (date_finish != L"%empty%") event_item.date_finish = date_finish;
-      event_item.time = item.attribute(L"time").value();
-      event_item.mode = item.attribute(L"mode").as_int();
-      History.queue.Add(event_item, false, user.attribute(L"name").value());
-    }
-  }
 
   return result.status == status_ok;
 }
@@ -270,23 +244,19 @@ bool Settings::Load() {
 bool Settings::Save() {
   // Initialize
   xml_document doc;
-  xml_node settings = doc.append_child();
-  settings.set_name(L"settings");
+  xml_node settings = doc.append_child(L"settings");
 
   // Account
   settings.append_child(node_comment).set_value(L" Account ");
-  xml_node account = settings.append_child();
-  account.set_name(L"account");
+  xml_node account = settings.append_child(L"account");
     // MyAnimeList
-    xml_node mal = account.append_child();
-    mal.set_name(L"myanimelist");
+    xml_node mal = account.append_child(L"myanimelist");
     mal.append_attribute(L"username") = Account.MAL.user.c_str();
     mal.append_attribute(L"password") = SimpleEncrypt(Account.MAL.password).c_str();
     mal.append_attribute(L"api") = Account.MAL.api;
     mal.append_attribute(L"login") = Account.MAL.auto_login;
     // Update
-    xml_node update = account.append_child();
-    update.set_name(L"update");
+    xml_node update = account.append_child(L"update");
     update.append_attribute(L"mode") = Account.Update.mode;
     update.append_attribute(L"time") = Account.Update.time;
     update.append_attribute(L"delay") = Account.Update.delay;
@@ -295,26 +265,20 @@ bool Settings::Save() {
   
   // Anime
   settings.append_child(node_comment).set_value(L" Anime list ");
-  xml_node anime = settings.append_child();
-  anime.set_name(L"anime");
+  xml_node anime = settings.append_child(L"anime");
     // Root folders  
-    xml_node folders = anime.append_child();
-    folders.set_name(L"folders");  
+    xml_node folders = anime.append_child(L"folders");  
     for (size_t i = 0; i < Folders.root.size(); i++) {
-      xml_node root = folders.append_child();
-      root.set_name(L"root");
+      xml_node root = folders.append_child(L"root");
       root.append_attribute(L"folder") = Folders.root[i].c_str();
     }
-    xml_node watch = folders.append_child();
-    watch.set_name(L"watch");
+    xml_node watch = folders.append_child(L"watch");
     watch.append_attribute(L"enabled") = Folders.watch_enabled;
     // Items
-    xml_node items = anime.append_child();
-    items.set_name(L"items");
+    xml_node items = anime.append_child(L"items");
     for (size_t i = 0; i < Anime.items.size(); i++) {
       if (Anime.items[i].folder.empty() && Anime.items[i].titles.empty()) continue;
-      xml_node item = items.append_child();
-      item.set_name(L"item");
+      xml_node item = items.append_child(L"item");
       item.append_attribute(L"id") = Anime.items[i].id;
       if (!Anime.items[i].folder.empty())
         item.append_attribute(L"folder") = Anime.items[i].folder.c_str();
@@ -324,21 +288,18 @@ bool Settings::Save() {
 
   // Announcements
   settings.append_child(node_comment).set_value(L" Announcements ");
-  xml_node announce = settings.append_child();
-  announce.set_name(L"announce");
+  xml_node announce = settings.append_child(L"announce");
     // HTTP
-    xml_node http = announce.append_child();
-    http.set_name(L"http");
+    xml_node http = announce.append_child(L"http");
     http.append_attribute(L"enabled") = Announce.HTTP.enabled;
     http.append_attribute(L"format") = Announce.HTTP.format.c_str();
     http.append_attribute(L"url") = Announce.HTTP.url.c_str();
     // Messenger
-    settings.child(L"announce").append_child().set_name(L"messenger");
+    settings.child(L"announce").append_child(L"messenger");
     settings.child(L"announce").child(L"messenger").append_attribute(L"enabled") = Announce.MSN.enabled;
     settings.child(L"announce").child(L"messenger").append_attribute(L"format") = Announce.MSN.format.c_str();
     // mIRC
-    xml_node mirc = announce.append_child();
-    mirc.set_name(L"mirc");
+    xml_node mirc = announce.append_child(L"mirc");
     mirc.append_attribute(L"enabled") = Announce.MIRC.enabled;
     mirc.append_attribute(L"format") = Announce.MIRC.format.c_str();
     mirc.append_attribute(L"service") = Announce.MIRC.service.c_str();
@@ -347,13 +308,11 @@ bool Settings::Save() {
     mirc.append_attribute(L"multiserver") = Announce.MIRC.multi_server;
     mirc.append_attribute(L"channels") = Announce.MIRC.channels.c_str();
     // Skype
-    xml_node skype = announce.append_child();
-    skype.set_name(L"skype");
+    xml_node skype = announce.append_child(L"skype");
     skype.append_attribute(L"enabled") = Announce.Skype.enabled;
     skype.append_attribute(L"format") = Announce.Skype.format.c_str();
     // Twitter
-    xml_node twitter = announce.append_child();
-    twitter.set_name(L"twitter");
+    xml_node twitter = announce.append_child(L"twitter");
     twitter.append_attribute(L"enabled") = Announce.Twitter.enabled;
     twitter.append_attribute(L"format") = Announce.Twitter.format.c_str();
     twitter.append_attribute(L"oauth_token") = Announce.Twitter.oauth_key.c_str();
@@ -362,89 +321,75 @@ bool Settings::Save() {
 
   // Program
   settings.append_child(node_comment).set_value(L" Program ");
-  xml_node program = settings.append_child();
-  program.set_name(L"program");
+  xml_node program = settings.append_child(L"program");
     // General
-    xml_node general = program.append_child();
-    general.set_name(L"general");
+    xml_node general = program.append_child(L"general");
     general.append_attribute(L"autostart") = Program.General.auto_start;
     general.append_attribute(L"close") = Program.General.close;
     general.append_attribute(L"minimize") = Program.General.minimize;
     general.append_attribute(L"searchindex") = Program.General.search_index;
     general.append_attribute(L"theme") = Program.General.theme.c_str();
     // Position
-    xml_node position = program.append_child();
-    position.set_name(L"position");
+    xml_node position = program.append_child(L"position");
     position.append_attribute(L"x") = Program.Position.x;
     position.append_attribute(L"y") = Program.Position.y;
     position.append_attribute(L"w") = Program.Position.w;
     position.append_attribute(L"h") = Program.Position.h;
     position.append_attribute(L"maximized") = Program.Position.maximized;
     // Startup
-    xml_node startup = program.append_child();
-    startup.set_name(L"startup");
+    xml_node startup = program.append_child(L"startup");
     startup.append_attribute(L"checkversion") = Program.StartUp.check_new_version;
     startup.append_attribute(L"checkeps") = Program.StartUp.check_new_episodes;
     startup.append_attribute(L"minimize") = Program.StartUp.minimize;
     // Exit
-    xml_node exit = program.append_child();
-    exit.set_name(L"exit");
+    xml_node exit = program.append_child(L"exit");
     exit.append_attribute(L"ask") = Program.Exit.ask;
     exit.append_attribute(L"remember_pos_size") = Program.Exit.remember_pos_size;
     exit.append_attribute(L"savebuffer") = Program.Exit.save_event_queue;
     // Proxy
-    xml_node proxy = program.append_child();
-    proxy.set_name(L"proxy");
+    xml_node proxy = program.append_child(L"proxy");
     proxy.append_attribute(L"host") = Program.Proxy.host.c_str();
     proxy.append_attribute(L"username") = Program.Proxy.user.c_str();
     proxy.append_attribute(L"password") = SimpleEncrypt(Program.Proxy.password).c_str();
     // List
-    xml_node list = program.append_child();
-    list.set_name(L"list");
+    xml_node list = program.append_child(L"list");
       // Actions  
-      xml_node action = list.append_child();
-      action.set_name(L"action");
+      xml_node action = list.append_child(L"action");
       action.append_attribute(L"doubleclick") = Program.List.double_click;
       action.append_attribute(L"middleclick") = Program.List.middle_click;
       // Filter
-      xml_node filter = list.append_child();
-      filter.set_name(L"filter");
-      filter.append_child().set_name(L"status");
+      xml_node filter = list.append_child(L"filter");
+      filter.append_child(L"status");
       filter.child(L"status").append_attribute(L"s1") = AnimeFilters.status[0];
       filter.child(L"status").append_attribute(L"s2") = AnimeFilters.status[1];
       filter.child(L"status").append_attribute(L"s3") = AnimeFilters.status[2];
-      filter.append_child().set_name(L"type");
+      filter.append_child(L"type");
       filter.child(L"type").append_attribute(L"t1") = AnimeFilters.type[0];
       filter.child(L"type").append_attribute(L"t2") = AnimeFilters.type[1];
       filter.child(L"type").append_attribute(L"t3") = AnimeFilters.type[2];
       filter.child(L"type").append_attribute(L"t4") = AnimeFilters.type[3];
       filter.child(L"type").append_attribute(L"t5") = AnimeFilters.type[4];
       filter.child(L"type").append_attribute(L"t6") = AnimeFilters.type[5];
-      filter.append_child().set_name(L"episodes");
+      filter.append_child(L"episodes");
       filter.child(L"episodes").append_attribute(L"highlight") = Program.List.highlight;
       filter.child(L"episodes").append_attribute(L"new") = AnimeFilters.new_episodes;
       // Progress
-      xml_node progress = list.append_child();
-      progress.set_name(L"progress");
+      xml_node progress = list.append_child(L"progress");
       progress.append_attribute(L"mode") = Program.List.progress_mode;
       progress.append_attribute(L"showeps") = Program.List.progress_show_eps;
     // Notifications
-    xml_node notifications = program.append_child();
-    notifications.set_name(L"notifications");
-    notifications.append_child().set_name(L"balloon");
+    xml_node notifications = program.append_child(L"notifications");
+    notifications.append_child(L"balloon");
     notifications.child(L"balloon").append_attribute(L"enabled") = Program.Balloon.enabled;
     notifications.child(L"balloon").append_attribute(L"format") = Program.Balloon.format.c_str();
 
   // Recognition
   settings.append_child(node_comment).set_value(L" Recognition ");
-  xml_node recognition = settings.append_child();
-  recognition.set_name(L"recognition");
+  xml_node recognition = settings.append_child(L"recognition");
     // Streaming
-    xml_node streaming = recognition.append_child();
-    streaming.set_name(L"streaming");
+    xml_node streaming = recognition.append_child(L"streaming");
       // Providers
-      xml_node providers = streaming.append_child();
-      providers.set_name(L"providers");
+      xml_node providers = streaming.append_child(L"providers");
         providers.append_attribute(L"ann") = Recognition.Streaming.ann_enabled;
         providers.append_attribute(L"crunchyroll") = Recognition.Streaming.crunchyroll_enabled;
         providers.append_attribute(L"veoh") = Recognition.Streaming.veoh_enabled;
@@ -453,42 +398,36 @@ bool Settings::Save() {
 
   // RSS
   settings.append_child(node_comment).set_value(L" RSS ");
-  xml_node rss = settings.append_child();
-  rss.set_name(L"rss");
+  xml_node rss = settings.append_child(L"rss");
     // Torrent
-    xml_node torrent = rss.append_child();
-    torrent.set_name(L"torrent");
+    xml_node torrent = rss.append_child(L"torrent");
       // General
-      torrent.append_child().set_name(L"application");
+      torrent.append_child(L"application");
       torrent.child(L"application").append_attribute(L"mode") = RSS.Torrent.app_mode;
       torrent.child(L"application").append_attribute(L"path") = RSS.Torrent.app_path.c_str();
-      torrent.append_child().set_name(L"source");
+      torrent.append_child(L"source");
       torrent.child(L"source").append_attribute(L"address") = RSS.Torrent.source.c_str();
-      torrent.append_child().set_name(L"options");
+      torrent.append_child(L"options");
       torrent.child(L"options").append_attribute(L"autocheck") = RSS.Torrent.check_enabled;
       torrent.child(L"options").append_attribute(L"checkinterval") = RSS.Torrent.check_interval;
       torrent.child(L"options").append_attribute(L"autosetfolder") = RSS.Torrent.set_folder;
       torrent.child(L"options").append_attribute(L"hideunidentified") = RSS.Torrent.hide_unidentified;
       torrent.child(L"options").append_attribute(L"newaction") = RSS.Torrent.new_action;
       // Filter
-      xml_node torrent_filter = torrent.append_child();
-      torrent_filter.set_name(L"filter");
+      xml_node torrent_filter = torrent.append_child(L"filter");
       torrent_filter.append_attribute(L"enabled") = RSS.Torrent.Filters.global_enabled;
       for (auto it = Aggregator.filter_manager.filters.begin(); it != Aggregator.filter_manager.filters.end(); ++it) {
-        xml_node item = torrent_filter.append_child();
-        item.set_name(L"item");
+        xml_node item = torrent_filter.append_child(L"item");
         item.append_attribute(L"action") = it->action;
         item.append_attribute(L"match") = it->match;
         item.append_attribute(L"enabled") = it->enabled;
         item.append_attribute(L"name") = it->name.c_str();
         for (auto ita = it->anime_ids.begin(); ita != it->anime_ids.end(); ++ita) {
-          xml_node anime = item.append_child();
-          anime.set_name(L"anime");
+          xml_node anime = item.append_child(L"anime");
           anime.append_attribute(L"id") = *ita;
         }
         for (auto itc = it->conditions.begin(); itc != it->conditions.end(); ++itc) {
-          xml_node condition = item.append_child();
-          condition.set_name(L"condition");
+          xml_node condition = item.append_child(L"condition");
           condition.append_attribute(L"element") = itc->element;
           condition.append_attribute(L"op") = itc->op;
           condition.append_attribute(L"value") = itc->value.c_str();
@@ -506,38 +445,6 @@ bool Settings::Save() {
     reg.DeleteValue(APP_NAME);
   }
   reg.CloseKey();
-
-  // Write event queue
-  if (Program.Exit.save_event_queue && !History.queue.IsEmpty()) {
-    xml_node events = doc.append_child();
-    events.set_name(L"events");
-    for (auto i = History.queue.list.begin(); i != History.queue.list.end(); ++i) {
-      if (i->items.empty()) continue;
-      xml_node user = events.append_child();
-      user.set_name(L"user");
-      user.append_attribute(L"name") = i->user.c_str();
-      for (auto j = i->items.begin(); j != i->items.end(); ++j) {
-        xml_node item = user.append_child();
-        item.set_name(L"event");
-        #define APPEND_ATTRIBUTE_INT(x, y) \
-          if (y) item.append_attribute(x) = *y;
-        #define APPEND_ATTRIBUTE_STR(x, y) \
-          if (y) item.append_attribute(x) = (*y).c_str();
-        item.append_attribute(L"mode") = j->mode;
-        item.append_attribute(L"id") = j->anime_id;
-        APPEND_ATTRIBUTE_INT(L"episode", j->episode);
-        APPEND_ATTRIBUTE_INT(L"score", j->score);
-        APPEND_ATTRIBUTE_INT(L"status", j->status);
-        APPEND_ATTRIBUTE_INT(L"rewatch", j->enable_rewatching);
-        APPEND_ATTRIBUTE_STR(L"tags", j->tags);
-        APPEND_ATTRIBUTE_STR(L"date_start", j->date_start);
-        APPEND_ATTRIBUTE_STR(L"date_finish", j->date_finish);
-        item.append_attribute(L"time") = j->time.c_str();
-        #undef APPEND_ATTRIBUTE_STR
-        #undef APPEND_ATTRIBUTE_INT
-      }
-    }
-  }
 
   // Save file
   ::CreateDirectory(folder_.c_str(), NULL);

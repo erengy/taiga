@@ -24,6 +24,7 @@
 #include "api.h"
 #include "common.h"
 #include "gfx.h"
+#include "history.h"
 #include "media.h"
 #include "monitor.h"
 #include "myanimelist.h"
@@ -118,6 +119,9 @@ void Taiga::LoadData() {
   
   // Load settings
   Settings.Load();
+
+  // Load history
+  History.Load();
   
   // Load theme data
   UI.Load(Settings.Program.General.theme);

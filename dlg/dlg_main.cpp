@@ -68,15 +68,17 @@ BOOL MainDialog::OnInitDialog() {
   // Set global variables
   g_hMain = GetWindowHandle();
   
-  // Initialize window position
+  // Initialize window properties
   InitWindowPosition();
-
-  // Set icons
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
+
+  // Create default fonts
+  UI.CreateFonts(GetDC());
   
   // Create controls
   CreateDialogControls();
+  EnableSharing(false);
 
   // Select default content page
   SetCurrentPage(SIDEBAR_ITEM_ANIMELIST);
@@ -202,7 +204,6 @@ void MainDialog::CreateDialogControls() {
   toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(9, ICON24_ABOUT,    209, 1, fsStyle1, 9, nullptr, L"Debug");
 #endif
-  toolbar_main.EnableButton(4, false);
   // Insert search toolbar button
   toolbar_search.InsertButton(0, ICON16_SEARCH, 300, 1, fsStyle2, 0, nullptr, L"Search");
 
@@ -288,6 +289,8 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     // Forward mouse wheel messages to the active page
     case WM_MOUSEWHEEL: {
       switch (GetCurrentPage()) {
+        case SIDEBAR_ITEM_NOWPLAYING:
+          return NowPlayingDialog.SendMessage(uMsg, wParam, lParam);
         case SIDEBAR_ITEM_ANIMELIST:
           return AnimeListDialog.SendMessage(uMsg, wParam, lParam);
         case SIDEBAR_ITEM_SEASONS:
@@ -453,7 +456,7 @@ BOOL MainDialog::OnDestroy() {
       bool invisible = !IsVisible();
       if (invisible) ActivateWindow(GetWindowHandle());
       win32::Rect rcWindow; GetWindowRect(&rcWindow);
-      if (invisible ) Hide();
+      if (invisible) Hide();
       Settings.Program.Position.x = rcWindow.left;
       Settings.Program.Position.y = rcWindow.top;
       Settings.Program.Position.w = rcWindow.Width();
@@ -776,11 +779,16 @@ void MainDialog::ChangeStatus(wstring str) {
 }
 
 void MainDialog::EnableInput(bool enable) {
-  // Enable/disable toolbar buttons
+  // Toolbar buttons
   toolbar_main.EnableButton(0, enable);
-  // Enable/disable content
+  // Content
   AnimeListDialog.Enable(enable);
   HistoryDialog.Enable(enable);
+}
+
+void MainDialog::EnableSharing(bool enable) {
+  // Toolbar buttons
+  toolbar_main.EnableButton(4, enable);
 }
 
 int MainDialog::GetCurrentPage() {
@@ -804,12 +812,13 @@ void MainDialog::SetCurrentPage(int page) {
         break;
     }
   }
-  
+
   current_page_ = page;
 
   AnimeListDialog.Hide();
   HistoryDialog.Hide();
   MangaListDialog.Hide();
+  NowPlayingDialog.Hide();
   SearchDialog.Hide();
   SeasonDialog.Hide();
   StatsDialog.Hide();
@@ -817,15 +826,12 @@ void MainDialog::SetCurrentPage(int page) {
 
   #define DISPLAY_PAGE(item, dialog, resource_id) \
     case item: \
-      if (dialog.IsWindow()) { \
-        UpdateControlPositions(); \
-        dialog.Show(); \
-      } else { \
-        dialog.Create(resource_id, m_hWindow, false); \
-        UpdateControlPositions(); \
-      } \
+      if (!dialog.IsWindow()) dialog.Create(resource_id, m_hWindow, false); \
+      UpdateControlPositions(); \
+      dialog.Show(); \
       break;
   switch (current_page_) {
+    DISPLAY_PAGE(SIDEBAR_ITEM_NOWPLAYING, NowPlayingDialog, IDD_ANIME_INFO);
     DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, AnimeListDialog, IDD_ANIME_LIST);
     DISPLAY_PAGE(SIDEBAR_ITEM_MANGALIST, MangaListDialog, IDD_MANGA_LIST);
     DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, HistoryDialog, IDD_HISTORY);
@@ -905,6 +911,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   AnimeListDialog.SetPosition(nullptr, rect_content_);
   HistoryDialog.SetPosition(nullptr, rect_content_);
   MangaListDialog.SetPosition(nullptr, rect_content_);
+  NowPlayingDialog.SetPosition(nullptr, rect_content_);
   SearchDialog.SetPosition(nullptr, rect_content_);
   SeasonDialog.SetPosition(nullptr, rect_content_);
   StatsDialog.SetPosition(nullptr, rect_content_);

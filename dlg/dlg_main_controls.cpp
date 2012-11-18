@@ -196,14 +196,20 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       if (search_bar.filter_content) {
         switch (GetCurrentPage()) {
           case SIDEBAR_ITEM_ANIMELIST:
-            AnimeFilters.text = text;
-            AnimeListDialog.RefreshList();
-            AnimeListDialog.RefreshTabs();
-            return TRUE;
+            if (AnimeFilters.text != text) {
+              AnimeFilters.text = text;
+              AnimeListDialog.RefreshList();
+              AnimeListDialog.RefreshTabs();
+              return TRUE;
+            }
+            break;
           case SIDEBAR_ITEM_SEASONS:
-            SeasonDialog.filter_text = text;
-            SeasonDialog.RefreshList();
-            return TRUE;
+            if (SeasonDialog.filter_text != text) {
+              SeasonDialog.filter_text = text;
+              SeasonDialog.RefreshList();
+              return TRUE;
+            }
+            break;
         }
       }
     }

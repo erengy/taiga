@@ -142,7 +142,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"Info") {
     int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
-    AnimeDialog.Refresh(anime_id);
+    AnimeDialog.SetCurrentId(anime_id);
     AnimeDialog.SetCurrentPage(INFOPAGE_SERIESINFO);
     if (!AnimeDialog.IsWindow()) {
       AnimeDialog.Create(IDD_ANIME_INFO, g_hMain, false);
@@ -464,7 +464,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"EditAll") {
     int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
-    AnimeDialog.Refresh(anime_id);
+    AnimeDialog.SetCurrentId(anime_id);
     AnimeDialog.SetCurrentPage(INFOPAGE_MYINFO);
     if (!AnimeDialog.IsWindow()) {
       AnimeDialog.Create(IDD_ANIME_INFO, g_hMain, false);

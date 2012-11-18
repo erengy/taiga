@@ -40,20 +40,17 @@ void XML_ReadChildNodes(xml_node& parent_node, vector<wstring>& str_vector, cons
 
 void XML_WriteChildNodes(xml_node& parent_node, vector<wstring>& str_vector, const wchar_t* name) {
   for (size_t i = 0; i < str_vector.size(); i++) {
-    xml_node child_node = parent_node.append_child();
-    child_node.set_name(name);
+    xml_node child_node = parent_node.append_child(name);
     child_node.append_child(node_pcdata).set_value(str_vector[i].c_str());
   }
 }
 
 void XML_WriteIntValue(xml_node& node, const wchar_t* name, int value) {
-  xml_node child = node.append_child();
-  child.set_name(name);
+  xml_node child = node.append_child(name);
   child.append_child(node_pcdata).set_value(ToWstr(value).c_str());
 }
 
 void XML_WriteStrValue(xml_node& node, const wchar_t* name, const wchar_t* value, xml_node_type node_type) {
-  xml_node child = node.append_child();
-  child.set_name(name);
+  xml_node child = node.append_child(name);
   child.append_child(node_type).set_value(value);
 }

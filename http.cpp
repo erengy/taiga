@@ -29,6 +29,7 @@
 #include "myanimelist.h"
 #include "resource.h"
 #include "settings.h"
+#include "stats.h"
 #include "string.h"
 #include "taiga.h"
 #include "theme.h"
@@ -62,6 +63,8 @@ BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
     FormatError(dwError, L"winhttp.dll");
   debug::Print(error_text + L"Client mode: " + ToWstr(GetClientMode()) + L"\n");
+
+  Stats.connections_failed++;
 
   switch (GetClientMode()) {
     case HTTP_MAL_Login:
@@ -243,6 +246,8 @@ BOOL HttpClient::OnReadData() {
 BOOL HttpClient::OnReadComplete() {
   TaskbarList.SetProgressState(TBPF_NOPROGRESS);
   wstring status;
+
+  Stats.connections_succeeded++;
   
   switch (GetClientMode()) {
     // List
@@ -376,12 +381,10 @@ BOOL HttpClient::OnReadComplete() {
       MainDialog.ChangeStatus();
       int anime_id = static_cast<int>(GetParam());
       auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (anime_item && History.queue.GetItemCount() > 0) {
-        EventList* event_list = History.queue.FindList();
-        if (event_list) {
-          anime_item->Edit(event_list->items[event_list->index], GetData(), GetResponseStatusCode());
-          return TRUE;
-        }
+      auto event_item = History.queue.GetCurrentItem();
+      if (anime_item && event_item) {
+        anime_item->Edit(*event_item, GetData(), GetResponseStatusCode());
+        return TRUE;
       }
       break;
     }
@@ -394,9 +397,8 @@ BOOL HttpClient::OnReadComplete() {
       if (InStr(data, L"trueEp") > -1) {
         wstring url = InStr(data, L"self.parent.document.location='", L"';");
         int anime_id = static_cast<int>(GetParam());
-        EventList* event_list = History.queue.FindList();
-        if (!url.empty() && event_list) {
-          int episode_number = event_list->items.at(event_list->index).episode;
+        if (!url.empty()) {
+          int episode_number = 0; // TODO
           wstring title = AnimeDatabase.FindItem(anime_id)->GetTitle();
           if (episode_number) title += L" #" + ToWstr(episode_number);
           win32::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
@@ -419,12 +421,12 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_AnimeDetails: {
       int anime_id = static_cast<int>(GetParam());
       if (mal::ParseAnimeDetails(GetData())) {
-        if (AnimeDialog.IsWindow() && AnimeDialog.GetCurrentId() == anime_id) {
-          AnimeDialog.Refresh(anime_id, false, true, false);
-        }
-        if (SeasonDialog.IsWindow()) {
+        if (AnimeDialog.GetCurrentId() == anime_id)
+          AnimeDialog.Refresh(false, true, false);
+        if (NowPlayingDialog.GetCurrentId() == anime_id)
+          NowPlayingDialog.Refresh(false, true, false);
+        if (SeasonDialog.IsWindow())
           SeasonDialog.RefreshList(true);
-        }
       }
       break;
     }
@@ -434,9 +436,10 @@ BOOL HttpClient::OnReadComplete() {
     // Download image
     case HTTP_MAL_Image: {
       int anime_id = static_cast<int>(GetParam());
-      if (AnimeDialog.IsWindow() && AnimeDialog.GetCurrentId() == anime_id) {
-        AnimeDialog.Refresh(anime_id, true, false, false);
-      }
+      if (AnimeDialog.GetCurrentId() == anime_id)
+        AnimeDialog.Refresh(true, false, false);
+      if (NowPlayingDialog.GetCurrentId() == anime_id)
+        NowPlayingDialog.Refresh(true, false, false);
       if (SeasonDialog.IsWindow()) {
         for (auto it = SeasonDialog.images.begin(); it != SeasonDialog.images.end(); ++it) {
           if (it->data == anime_id) {
@@ -463,13 +466,15 @@ BOOL HttpClient::OnReadComplete() {
       if (anime_id) {
         if (mal::ParseSearchResult(GetData(), anime_id)) {
           if (AnimeDialog.GetCurrentId() == anime_id)
-            AnimeDialog.Refresh(anime_id, false, true, false);
+            AnimeDialog.Refresh(false, true, false);
+          if (NowPlayingDialog.GetCurrentId() == anime_id)
+            NowPlayingDialog.Refresh(false, true, false);
           if (SeasonDialog.IsWindow())
             SeasonDialog.RefreshList(true);
           if (mal::GetAnimeDetails(anime_id, this)) return TRUE;
         } else {
           status = L"Could not read anime information.";
-          AnimeDialog.pages[INFOPAGE_SERIESINFO].SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
+          AnimeDialog.page_series_info.SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
         }
 #ifdef _DEBUG
         MainDialog.ChangeStatus(status);

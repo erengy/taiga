@@ -24,6 +24,7 @@
 #include "common.h"
 #include "myanimelist.h"
 #include "string.h"
+#include "taiga.h"
 
 Statistics Stats;
 
@@ -31,6 +32,8 @@ Statistics Stats;
 
 Statistics::Statistics()
     : anime_count(0),
+      connections_failed(0),
+      connections_succeeded(0),
       episode_count(0),
       image_count(0),
       image_size(0),
@@ -38,31 +41,20 @@ Statistics::Statistics()
       score_deviation(0.0f),
       score_distribution(11, 0.0f),
       tigers_harmed(0),
+      torrent_count(0),
+      torrent_size(0),
       uptime(0) {
 }
 
 // =============================================================================
 
 void Statistics::CalculateAll() {
-  // Anime count
   CalculateAnimeCount();
-
-  // Episode count
   CalculateEpisodeCount();
-
-  // Life spent watching
   CalculateLifeSpentWatching();
-
-  // Calculate image count and size
   CalculateLocalData();
-
-  // Mean score
   CalculateMeanScore();
-
-  // Standard deviation of score
   CalculateScoreDeviation();
-
-  // Score histogram information
   CalculateScoreDistribution();
 }
 
@@ -125,6 +117,10 @@ void Statistics::CalculateLocalData() {
 
   image_count = PopulateFiles(file_list, anime::GetImagePath());
   image_size = GetFolderSize(anime::GetImagePath(), false);
+
+  file_list.clear();
+  torrent_count = PopulateFiles(file_list, Taiga.GetDataPath() + L"feed\\", L"torrent", true);
+  torrent_size = GetFolderSize(Taiga.GetDataPath() + L"feed\\", true);
 }
 
 float Statistics::CalculateMeanScore() {

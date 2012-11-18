@@ -34,33 +34,16 @@ enum EventSearchMode {
   EVENT_SEARCH_TAGS
 };
 
+class History;
+
 class EventItem : public mal::AnimeValues {
 public:
   EventItem();
   virtual ~EventItem() {}
-  
-public:
+
   bool enabled;
   int anime_id, mode;
   wstring reason, time;
-};
-
-class EventList {
-public:
-  EventList();
-  virtual ~EventList() {}
-  
-  void Add(EventItem& item);
-  void Check();
-  void Clear();
-  EventItem* FindItem(int anime_id, int search_mode = 0);
-  void Remove(unsigned int index, bool refresh = true);
-  void RemoveDisabled(bool refresh = true);
-  
-public:
-  unsigned int index;
-  vector<EventItem> items;
-  wstring user;
 };
 
 class EventQueue {
@@ -68,25 +51,29 @@ public:
   EventQueue();
   virtual ~EventQueue() {}
 
-  void Add(EventItem& item, bool save = true, wstring user = L"");
+  void Add(EventItem& item, bool save = true);
   void Check();
   void Clear(bool save = true);
-  
   EventItem* FindItem(int anime_id, int search_mode = 0);
-  EventList* FindList(wstring user = L"");
-  
+  EventItem* GetCurrentItem();
   int GetItemCount();
-  bool IsEmpty();
   void Remove(int index = -1, bool save = true, bool refresh = true);
   void RemoveDisabled(bool save = true, bool refresh = true);
 
-public:
-  vector<EventList> list;
+  size_t index;
+  vector<EventItem> items;
+  History* history;
   bool updating;
 };
 
 class History {
 public:
+  History();
+  virtual ~History() {}
+
+  bool Load();
+  bool Save();
+
   EventQueue queue;
 };
 

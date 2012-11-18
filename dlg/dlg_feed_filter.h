@@ -45,7 +45,6 @@ public:
 
 private:
   int current_page_;
-  HFONT header_font_, main_instructions_font_;
   HICON icon_;
   win32::Window main_instructions_label_;
 

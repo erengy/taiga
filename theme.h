@@ -77,20 +77,39 @@ enum Icons24px {
 
 // =============================================================================
 
+class Font {
+public:
+  Font();
+  Font(HFONT font);
+  ~Font();
+
+  HFONT Get() const;
+  void Set(HFONT font);
+
+  operator HFONT() const;
+
+private:
+  HFONT font_;
+};
+
 class Theme {
 public:
   Theme();
   ~Theme() {}
   
-  bool LoadImages();
+  bool CreateFonts(HDC hdc);
   bool Load(const wstring& name);
+  bool LoadImages();
 
 public:
   win32::MenuList Menus;
 
   win32::ImageList ImgList16;
   win32::ImageList ImgList24;
-  
+
+  Font font_bold;
+  Font font_header;
+
   class ListProgress {
   public:
     class Item {

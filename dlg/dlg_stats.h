@@ -27,18 +27,15 @@
 
 class StatsDialog : public win32::Dialog {
 public:
-  StatsDialog();
-  virtual ~StatsDialog();
+  StatsDialog() {}
+  virtual ~StatsDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+  void OnSize(UINT uMsg, UINT nType, SIZE size);
 
-public:
   void Refresh();
-
-private:
-  HFONT header_font_;
 };
 
 extern class StatsDialog StatsDialog;

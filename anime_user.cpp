@@ -82,9 +82,8 @@ int ListUser::GetItemCount(int status, bool check_events) const {
   }
 
   // Search event queue for status changes
-  EventList* event_list = History.queue.FindList();
-  if (check_events && event_list) {
-    for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
+  if (check_events) {
+    for (auto it = History.queue.items.begin(); it != History.queue.items.end(); ++it) {
       if (it->mode == HTTP_MAL_AnimeAdd) continue;
       if (it->status) {
         if (status == *it->status) {

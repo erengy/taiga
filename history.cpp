@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
+#include "xml.h"
 
 #include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_history.h"
@@ -42,20 +43,22 @@ class History History;
 // =============================================================================
 
 EventItem::EventItem()
-    : anime_id(0), 
-      enabled(true), 
+    : anime_id(anime::ID_UNKNOWN),
+      enabled(true),
       mode(0) {
 }
 
-EventList::EventList()
-    : index(0) {
+EventQueue::EventQueue()
+    : index(0),
+      history(nullptr),
+      updating(false) {
 }
 
-void EventList::Add(EventItem& item) {
+void EventQueue::Add(EventItem& item, bool save) {
   auto anime = AnimeDatabase.FindItem(item.anime_id);
   
   // Validate values
-  if (anime && item.mode != HTTP_MAL_AnimeAdd) {
+  if (anime && anime->IsInList()) {
     if (item.episode)
       if (anime->GetMyLastWatchedEpisode() == *item.episode || *item.episode < 0)
         item.episode.Reset();
@@ -133,7 +136,10 @@ void EventList::Add(EventItem& item) {
     items.push_back(item);
   }
 
-  if (anime) {
+  if (anime && save) {
+    // Save
+    history->Save();
+
     // Announce
     if (Taiga.logged_in && item.episode) {
       anime::Episode episode;
@@ -165,7 +171,7 @@ void EventList::Add(EventItem& item) {
     // Change status
     if (!Taiga.logged_in) {
       MainDialog.ChangeStatus(L"Item added to the queue. (" + 
-        anime->GetTitle() + L")");
+                              anime->GetTitle() + L")");
     }
 
     // Update
@@ -173,7 +179,7 @@ void EventList::Add(EventItem& item) {
   }
 }
 
-void EventList::Check() {
+void EventQueue::Check() {
   // Check
   if (items.empty()) {
     return;
@@ -205,14 +211,16 @@ void EventList::Check() {
   mal::Update(*anime_values, items[index].anime_id, items[index].mode);
 }
 
-void EventList::Clear() {
+void EventQueue::Clear(bool save) {
   items.clear();
   index = 0;
 
   MainDialog.treeview.RefreshHistoryCounter();
+
+  if (save) history->Save();
 }
 
-EventItem* EventList::FindItem(int anime_id, int search_mode) {
+EventItem* EventQueue::FindItem(int anime_id, int search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     if (it->anime_id == anime_id && it->enabled) {
       switch (search_mode) {
@@ -252,18 +260,35 @@ EventItem* EventList::FindItem(int anime_id, int search_mode) {
   return nullptr;
 }
 
-void EventList::Remove(unsigned int index, bool refresh) {
-  // Remove item
-  if (index < items.size()) {
+EventItem* EventQueue::GetCurrentItem() {
+  if (!items.empty()) {
+    return &items.at(index);
+  }
+  return nullptr;
+}
+
+int EventQueue::GetItemCount() {
+  int count = 0;
+  for (auto it = items.begin(); it != items.end(); ++it)
+    if (it->enabled) count++;
+  return count;
+}
+
+void EventQueue::Remove(int index, bool save, bool refresh) {
+  if (index == -1) index = this->index;
+  
+  if (index < static_cast<int>(items.size())) {
     items.erase(items.begin() + index);
     if (refresh) {
       MainDialog.treeview.RefreshHistoryCounter();
       HistoryDialog.RefreshList();
     }
   }
+
+  if (save) history->Save();
 }
 
-void EventList::RemoveDisabled(bool refresh) {
+void EventQueue::RemoveDisabled(bool save, bool refresh) {
   bool needs_refresh = false;
   
   for (size_t i = 0; i < items.size(); i++) {
@@ -278,86 +303,79 @@ void EventList::RemoveDisabled(bool refresh) {
     MainDialog.treeview.RefreshHistoryCounter();
     HistoryDialog.RefreshList();
   }
+
+  if (save) history->Save();
 }
 
 // =============================================================================
 
-EventQueue::EventQueue()
-    : updating(false) {
+History::History() {
+  queue.history = this;
 }
 
-void EventQueue::Add(EventItem& item, bool save, wstring user) {
-  EventList* event_list = FindList(user);
-  if (event_list == nullptr) {
-    list.resize(list.size() + 1);
-    list.back().user = user.empty() ? Settings.Account.MAL.user : user;
-    event_list = &list.back();
+bool History::Load() {
+  // Initialize
+  wstring file = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\history.xml";
+  
+  // Load XML file
+  xml_document doc;
+  xml_parse_result result = doc.load_file(file.c_str());
+    
+  // Queue events
+  queue.items.clear();
+  xml_node node_queue = doc.child(L"history").child(L"queue");
+  for (xml_node item = node_queue.child(L"item"); item; item = item.next_sibling(L"item")) {
+    EventItem event_item;
+    event_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
+    event_item.mode = item.attribute(L"mode").as_int();
+    event_item.time = item.attribute(L"time").value();
+    #define READ_ATTRIBUTE_INT(x, y) \
+      if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
+    #define READ_ATTRIBUTE_STR(x, y) \
+      if (!item.attribute(y).empty()) x = item.attribute(y).as_string();
+    READ_ATTRIBUTE_INT(event_item.episode, L"episode");
+    READ_ATTRIBUTE_INT(event_item.score, L"score");
+    READ_ATTRIBUTE_INT(event_item.status, L"status");
+    READ_ATTRIBUTE_INT(event_item.enable_rewatching, L"enable_rewatching");
+    READ_ATTRIBUTE_STR(event_item.tags, L"tags");
+    READ_ATTRIBUTE_STR(event_item.date_start, L"date_start");
+    READ_ATTRIBUTE_STR(event_item.date_finish, L"date_finish");
+    #undef READ_ATTRIBUTE_STR
+    #undef READ_ATTRIBUTE_INT
+    queue.Add(event_item, false);
   }
-  event_list->Add(item);
-  if (save) Settings.Save();
+
+  return result.status == status_ok;
 }
 
-void EventQueue::Check() {
-  EventList* event_list = FindList();
-  if (event_list) event_list->Check();
-}
+bool History::Save() {
+  // Initialize
+  wstring file = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\history.xml";
+  xml_document doc;
+  xml_node node_history = doc.append_child(L"history");
 
-void EventQueue::Clear(bool save) {
-  EventList* event_list = FindList();
-  if (event_list) {
-    event_list->Clear();
-    if (save) Settings.Save();
+  // Write event queue
+  xml_node node_queue = node_history.append_child(L"queue");
+  for (auto j = queue.items.begin(); j != queue.items.end(); ++j) {
+    xml_node node_item = node_queue.append_child(L"item");
+    #define APPEND_ATTRIBUTE_INT(x, y) \
+      if (y) node_item.append_attribute(x) = *y;
+    #define APPEND_ATTRIBUTE_STR(x, y) \
+      if (y) node_item.append_attribute(x) = (*y).c_str();
+    node_item.append_attribute(L"anime_id") = j->anime_id;
+    node_item.append_attribute(L"mode") = j->mode;
+    node_item.append_attribute(L"time") = j->time.c_str();
+    APPEND_ATTRIBUTE_INT(L"episode", j->episode);
+    APPEND_ATTRIBUTE_INT(L"score", j->score);
+    APPEND_ATTRIBUTE_INT(L"status", j->status);
+    APPEND_ATTRIBUTE_INT(L"enable_rewatching", j->enable_rewatching);
+    APPEND_ATTRIBUTE_STR(L"tags", j->tags);
+    APPEND_ATTRIBUTE_STR(L"date_start", j->date_start);
+    APPEND_ATTRIBUTE_STR(L"date_finish", j->date_finish);
+    #undef APPEND_ATTRIBUTE_STR
+    #undef APPEND_ATTRIBUTE_INT
   }
-}
 
-EventItem* EventQueue::FindItem(int anime_id, int search_mode) {
-  EventList* event_list = FindList();
-  if (event_list) return event_list->FindItem(anime_id, search_mode);
-  return nullptr;
-}
-
-EventList* EventQueue::FindList(wstring user) {
-  if (user.empty()) user = Settings.Account.MAL.user;
-  for (unsigned int i = 0; i < list.size(); i++) {
-    if (list[i].user == user) return &list[i];
-  }
-  return nullptr;
-}
-
-int EventQueue::GetItemCount() {
-  EventList* event_list = FindList();
-  if (event_list) {
-    int count = 0;
-    for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it)
-      if (it->enabled) count++;
-    return count;
-  }
-  return 0;
-}
-
-bool EventQueue::IsEmpty() {
-  for (unsigned int i = 0; i < list.size(); i++) {
-    if (list[i].items.size() > 0) return false;
-  }
-  return true;
-}
-
-void EventQueue::Remove(int index, bool save, bool refresh) {
-  EventList* event_list = FindList();
-  if (event_list) {
-    if (index > -1) {
-      event_list->Remove(static_cast<unsigned int>(index), refresh);
-    } else {
-      event_list->Remove(event_list->index, refresh);
-    }
-    if (save) Settings.Save();
-  }
-}
-
-void EventQueue::RemoveDisabled(bool save, bool refresh) {
-  EventList* event_list = FindList();
-  if (event_list) {
-    event_list->RemoveDisabled(refresh);
-    if (save) Settings.Save();
-  }
+  // Save file
+  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
 }

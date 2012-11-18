@@ -281,6 +281,9 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
         feed_item.episode_data.file_size = it->substr(size_str.length());
       } else if (StartsWith(*it, comment_str)) {
         feed_item.description = it->substr(comment_str.length());
+      } else if (InStr(*it, L"magnet:?") > -1) {
+        feed_item.magnet_link = L"magnet:?" + 
+          InStr(*it, L"<a href=\"magnet:?", L"\">Magnet Link</a>");
       }
     }
 

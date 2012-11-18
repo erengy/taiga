@@ -83,29 +83,26 @@ BOOL MediaPlayers::Save() {
   
   // Create XML document
   xml_document doc;
-  xml_node players = doc.append_child();
-  players.set_name(L"media_players");
+  xml_node players = doc.append_child(L"media_players");
 
   // Write player list
   for (unsigned int i = 0; i < items.size(); i++) {
     wstring comment = L" " + items[i].name + L" ";
     players.append_child(node_comment).set_value(comment.c_str());
-    xml_node player = players.append_child();
-    player.set_name(L"player");
-    player.append_child().set_name(L"name");
+    xml_node player = players.append_child(L"player");
+    player.append_child(L"name");
     player.child(L"name").append_child(node_pcdata).set_value(items[i].name.c_str());
-    player.append_child().set_name(L"enabled");
+    player.append_child(L"enabled");
     player.child(L"enabled").append_child(node_pcdata).set_value(ToWstr(items[i].enabled).c_str());
-    player.append_child().set_name(L"visible");
+    player.append_child(L"visible");
     player.child(L"visible").append_child(node_pcdata).set_value(ToWstr(items[i].visible).c_str());
-    player.append_child().set_name(L"mode");
+    player.append_child(L"mode");
     player.child(L"mode").append_child(node_pcdata).set_value(ToWstr(items[i].mode).c_str());
     XML_WriteChildNodes(player, items[i].classes, L"class");
     XML_WriteChildNodes(player, items[i].files, L"file");
     XML_WriteChildNodes(player, items[i].folders, L"folder");
     for (unsigned int j = 0; j < items[i].edits.size(); j++) {
-      xml_node edit = player.append_child();
-      edit.set_name(L"edit");
+      xml_node edit = player.append_child(L"edit");
       edit.append_attribute(L"mode") = items[i].edits[j].mode;
       edit.append_child(node_pcdata).set_value(items[i].edits[j].value.c_str());
     }

@@ -39,12 +39,11 @@ int ScaleY(int value);
 
 class Image {
 public:
-  Image() : height(0), width(0), data(0) {}
+  Image() : data(0) {}
   bool Load(const wstring& file);
   win32::Dc dc;
   win32::Rect rect;
   LPARAM data;
-  int height, width;
 };
 
 #endif // GFX_H

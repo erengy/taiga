@@ -30,7 +30,7 @@
 class SettingsDialog : public win32::Dialog {
 public:
   SettingsDialog();
-  virtual ~SettingsDialog();
+  virtual ~SettingsDialog() {}
 
   friend class SettingsPage;
 
@@ -52,7 +52,6 @@ private:
 private:
   int current_page_;
   vector<FeedFilter> feed_filters_;
-  HFONT static_font_;
   vector<SettingsPage> pages;
 };
 

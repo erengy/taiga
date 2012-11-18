@@ -42,6 +42,7 @@ public:
 
   bool download;
   int index;
+  wstring magnet_link;
   
   class EpisodeData : public anime::Episode {
   public:

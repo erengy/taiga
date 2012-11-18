@@ -30,23 +30,34 @@ enum AnimeInfoPageType {
   INFOPAGE_COUNT
 };
 
-class AnimeInfoPage : public win32::Dialog {
+class PageBaseInfo : public win32::Dialog {
  public:
-  AnimeInfoPage();
-  virtual ~AnimeInfoPage();
-
-  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+  PageBaseInfo();
+  virtual ~PageBaseInfo() {}
+  
+  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+
+ protected:
+  int anime_id_;
+};
+
+class PageSeriesInfo : public PageBaseInfo {
+ public:
+  void OnSize(UINT uMsg, UINT nType, SIZE size);
+
+  void Refresh(int anime_id);
+};
+
+class PageMyInfo : public PageBaseInfo {
+ public:
+  BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
+  bool Save();
 
   void Refresh(int anime_id);
   void RefreshFansubPreference();
-
-  int index;
-
- private:
-  int anime_id_;
-  HFONT header_font_;
 };
 
 #endif // DLG_ANIME_INFO_PAGE_H

@@ -69,6 +69,7 @@ public:
 public:
   void ChangeStatus(wstring str = L"");
   void EnableInput(bool enable = true);
+  void EnableSharing(bool enable = true);
   int GetCurrentPage();
   void SetCurrentPage(int page);
   void UpdateControlPositions(const SIZE* size = nullptr);

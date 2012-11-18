@@ -112,6 +112,57 @@ bool Theme::LoadImages() {
 
 // =============================================================================
 
+Font::Font()
+    : font_(nullptr) {
+}
+
+Font::Font(HFONT font)
+    : font_(font) {
+}
+
+Font::~Font() {
+  Set(nullptr);
+}
+
+HFONT Font::Get() const {
+  return font_;
+}
+
+void Font::Set(HFONT font) {
+  if (font_)
+    ::DeleteObject(font_);
+  font_ = font;
+}
+
+Font::operator HFONT() const {
+  return font_;
+}
+
+bool Theme::CreateFonts(HDC hdc) {
+  LOGFONT lFont = {0};
+  lFont.lfCharSet = DEFAULT_CHARSET;
+  lFont.lfOutPrecision = OUT_STRING_PRECIS;
+  lFont.lfClipPrecision = CLIP_STROKE_PRECIS;
+  lFont.lfQuality = PROOF_QUALITY;
+  lFont.lfPitchAndFamily = VARIABLE_PITCH;
+
+  // Bold font
+  lFont.lfHeight = -MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+  lFont.lfWeight = FW_BOLD;
+  lstrcpy(lFont.lfFaceName, L"Tahoma");
+  font_bold.Set(::CreateFontIndirect(&lFont));
+
+  // Header font
+  lFont.lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+  lFont.lfWeight = FW_NORMAL;
+  lstrcpy(lFont.lfFaceName, L"Segoe UI");
+  font_header.Set(::CreateFontIndirect(&lFont));
+
+  return true;
+}
+
+// =============================================================================
+
 void Theme::ListProgress::Item::Draw(HDC hdc, const LPRECT rect) {
   // Solid
   if (type == L"solid") {

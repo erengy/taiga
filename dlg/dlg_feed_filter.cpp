@@ -39,21 +39,11 @@ class FeedFilterDialog FeedFilterDialog;
 
 FeedFilterDialog::FeedFilterDialog()
     : current_page_(0), 
-      icon_(nullptr), 
-      header_font_(nullptr), 
-      main_instructions_font_(nullptr) {
+      icon_(nullptr) {
   RegisterDlgClass(L"TaigaFeedFilterW");
 }
 
 FeedFilterDialog::~FeedFilterDialog() {
-  if (header_font_) {
-    ::DeleteObject(header_font_);
-    header_font_ = nullptr;
-  }
-  if (main_instructions_font_) {
-    ::DeleteObject(main_instructions_font_);
-    main_instructions_font_ = nullptr;
-  }
   if (icon_) {
     ::DeleteObject(icon_);
     icon_ = nullptr;
@@ -100,25 +90,6 @@ void FeedFilterDialog::OnCancel() {
 }
 
 BOOL FeedFilterDialog::OnInitDialog() {
-  // Create main instructions font
-  if (!main_instructions_font_) {
-    LOGFONT lFont;
-    HDC hdc = GetDC();
-    ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
-    lFont.lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-    lFont.lfCharSet = DEFAULT_CHARSET;
-    lstrcpy(lFont.lfFaceName, L"Segoe UI");
-    main_instructions_font_ = ::CreateFontIndirect(&lFont);
-    ReleaseDC(m_hWindow, hdc);
-  }
-  // Create bold header font
-  if (!header_font_) {
-    LOGFONT lFont;
-    ::GetObject(GetFont(), sizeof(LOGFONT), &lFont);
-    lFont.lfCharSet = DEFAULT_CHARSET;
-    lFont.lfWeight = FW_BOLD;
-    header_font_ = ::CreateFontIndirect(&lFont);
-  }
   // Set icon_
   if (!icon_) {
     icon_ = UI.ImgList16.GetIcon(ICON16_FUNNEL);
@@ -128,7 +99,7 @@ BOOL FeedFilterDialog::OnInitDialog() {
   // Set main instruction font
   main_instructions_label_.Attach(GetDlgItem(IDC_STATIC_HEADER));
   main_instructions_label_.SendMessage(WM_SETFONT, 
-    reinterpret_cast<WPARAM>(main_instructions_font_), FALSE);
+    reinterpret_cast<WPARAM>(UI.font_header.Get()), FALSE);
   
   // Calculate page area
   win32::Rect page_area; main_instructions_label_.GetWindowRect(&page_area);
@@ -379,7 +350,7 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 3; i++) {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-      reinterpret_cast<WPARAM>(parent->header_font_), FALSE);
+      reinterpret_cast<WPARAM>(UI.font_bold.Get()), FALSE);
   }
   
   // Initialize name

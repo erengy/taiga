@@ -39,6 +39,8 @@ public:
 
 public:
   int anime_count;
+  int connections_failed;
+  int connections_succeeded;
   int episode_count;
   int image_count;
   int image_size;
@@ -47,6 +49,8 @@ public:
   float score_deviation;
   vector<float> score_distribution;
   int tigers_harmed;
+  int torrent_count;
+  int torrent_size;
   int uptime;
 };
 

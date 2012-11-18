@@ -131,40 +131,34 @@ void HistoryDialog::RefreshList() {
   list_.DeleteAllItems();
   
   // Add items
-  EventList* event_list = History.queue.FindList();
-  if (event_list) {
-    for (auto it = event_list->items.begin(); it != event_list->items.end(); ++it) {
-      int i = list_.GetItemCount();
-      list_.InsertItem(i, -1, -1, 0, nullptr, 
-        AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(), 
-        static_cast<LPARAM>(it->anime_id));
-      wstring details;
-      if (it->mode == HTTP_MAL_AnimeAdd)
-        AppendString(details, L"Add to list");
-      if (it->mode == HTTP_MAL_AnimeDelete)
-        AppendString(details, L"Remove from list");
-      if (it->episode)
-        AppendString(details, L"Episode: " + mal::TranslateNumber(*it->episode));
-      if (it->score)
-        AppendString(details, L"Score: " + mal::TranslateNumber(*it->score));
-      if (it->status)
-        AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ? 
-          L"Status: " + mal::TranslateMyStatus(*it->status, false) : L"Re-watching");
-      if (it->tags)
-        AppendString(details, L"Tags: \"" + *it->tags + L"\"");
-      if (it->date_start)
-        AppendString(details, L"Start date: " + 
-          wstring(mal::TranslateDateFromApi(*it->date_start)));
-      if (it->date_finish)
-        AppendString(details, L"Finish date: " + 
-          wstring(mal::TranslateDateFromApi(*it->date_finish)));
-      list_.SetItem(i, 1, details.c_str());
-      list_.SetItem(i, 2, it->time.c_str());
-    }
+  for (auto it = History.queue.items.begin(); it != History.queue.items.end(); ++it) {
+    int i = list_.GetItemCount();
+    list_.InsertItem(i, -1, -1, 0, nullptr, 
+      AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(), 
+      static_cast<LPARAM>(it->anime_id));
+    wstring details;
+    if (it->mode == HTTP_MAL_AnimeAdd)
+      AppendString(details, L"Add to list");
+    if (it->mode == HTTP_MAL_AnimeDelete)
+      AppendString(details, L"Remove from list");
+    if (it->episode)
+      AppendString(details, L"Episode: " + mal::TranslateNumber(*it->episode));
+    if (it->score)
+      AppendString(details, L"Score: " + mal::TranslateNumber(*it->score));
+    if (it->status)
+      AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ? 
+        L"Status: " + mal::TranslateMyStatus(*it->status, false) : L"Re-watching");
+    if (it->tags)
+      AppendString(details, L"Tags: \"" + *it->tags + L"\"");
+    if (it->date_start)
+      AppendString(details, L"Start date: " + 
+        wstring(mal::TranslateDateFromApi(*it->date_start)));
+    if (it->date_finish)
+      AppendString(details, L"Finish date: " + 
+        wstring(mal::TranslateDateFromApi(*it->date_finish)));
+    list_.SetItem(i, 1, details.c_str());
+    list_.SetItem(i, 2, it->time.c_str());
   }
-
-  // Enable/disable update button
-  EnableDlgItem(IDOK, History.queue.GetItemCount() > 0 ? TRUE : FALSE);
 }
 
 bool HistoryDialog::MoveItems(int pos) {
@@ -172,9 +166,6 @@ bool HistoryDialog::MoveItems(int pos) {
     MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;
   }
-
-  EventList* event_list = History.queue.FindList();
-  if (event_list == nullptr) return false;
   
   int index = -1;
   vector<bool> item_selected(list_.GetItemCount());
@@ -188,7 +179,7 @@ bool HistoryDialog::MoveItems(int pos) {
     if (!item_selected.at(j)) continue;
     if (j == (pos < 0 ? 0 : item_selected.size() - 1)) { item_selected_new.at(j) = true; continue; }
     if (item_selected_new.at(j + pos)) { item_selected_new.at(j) = true; continue; }
-    std::iter_swap(event_list->items.begin() + j, event_list->items.begin() + j + pos);
+    std::iter_swap(History.queue.items.begin() + j, History.queue.items.begin() + j + pos);
     item_selected_new.at(j + pos) = true;
   }
 
@@ -212,7 +203,7 @@ bool HistoryDialog::RemoveItems() {
       History.queue.Remove(item_index, false, false);
       list_.DeleteItem(item_index);
     }
-    Settings.Save();
+    History.Save();
   } else {
     History.queue.Clear();
   }
