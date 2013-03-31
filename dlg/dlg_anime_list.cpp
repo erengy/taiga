@@ -201,23 +201,27 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       POINT pt;
       ::GetCursorPos(&pt);
       ::ScreenToClient(GetWindowHandle(), &pt);
-        
+           
       win32::Rect rect_item;
-      GetSubItemRect(GetNextItem(-1, LVIS_SELECTED), 1, &rect_item);
-      win32::Rect rect_button[2];
-      rect_button[0].Copy(rect_item);
-      rect_button[1].Copy(rect_item);
-      rect_button[0].right = rect_button[0].left + 16;
-      rect_button[1].left = rect_button[1].right - 16;
-
-      if ((button_visible[0] && rect_button[0].PtIn(pt)) || 
-          (button_visible[1] && rect_button[1].PtIn(pt))) {
-        ::SetCursor(reinterpret_cast<HCURSOR>(
-          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
-        return TRUE;
+      int item_index = GetNextItem(-1, LVIS_SELECTED);
+       
+      if (item_index > -1) {
+        GetSubItemRect(item_index, 1, &rect_item);
+		win32::Rect rect_button[2];
+        rect_button[0].Copy(rect_item);
+        rect_button[1].Copy(rect_item);
+        rect_button[0].right = rect_button[0].left + 16;
+        rect_button[1].left = rect_button[1].right - 16;
+     
+        if ((button_visible[0] && rect_button[0].PtIn(pt)) ||
+            (button_visible[1] && rect_button[1].PtIn(pt))) {
+          ::SetCursor(reinterpret_cast<HCURSOR>(
+            ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+          return TRUE;
+        }
       }
       break;
-    }
+     }
 
     // Back & forward buttons
     case WM_XBUTTONUP: {
@@ -638,7 +642,7 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Hide list to avoid visual defects and gain performance
   listview.Hide();
-  listview.EnableGroupView(index == 0 && win32::GetWinVersion() > win32::VERSION_XP);
+  listview.EnableGroupView(win32::GetWinVersion() > win32::VERSION_XP && index == 0);
   listview.DeleteAllItems();
 
   // Add items

@@ -38,6 +38,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 using std::list;
 using std::string;
 using std::vector;
