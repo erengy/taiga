@@ -25,9 +25,9 @@
 // =============================================================================
 
 enum AnimeInfoPageType {
+  INFOPAGE_NONE,
   INFOPAGE_SERIESINFO,
-  INFOPAGE_MYINFO,
-  INFOPAGE_COUNT
+  INFOPAGE_MYINFO
 };
 
 class PageBaseInfo : public win32::Dialog {

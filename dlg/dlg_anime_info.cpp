@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <set>
+
 #include "../std.h"
 
 #include "dlg_anime_info.h"
@@ -24,6 +26,7 @@
 #include "../anime_db.h"
 #include "../common.h"
 #include "../gfx.h"
+#include "../history.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../settings.h"
@@ -43,6 +46,7 @@ AnimeDialog::AnimeDialog()
 }
 
 NowPlayingDialog::NowPlayingDialog() {
+  current_page_ = INFOPAGE_NONE;
   mode_ = DIALOG_MODE_NOW_PLAYING;
 }
 
@@ -61,6 +65,10 @@ BOOL AnimeDialog::OnInitDialog() {
   // Initialize title
   edit_title_.Attach(GetDlgItem(IDC_EDIT_ANIME_TITLE));
   edit_title_.SendMessage(WM_SETFONT, reinterpret_cast<WPARAM>(UI.font_header.Get()), FALSE);
+
+  // Initialize
+  sys_link_.Attach(GetDlgItem(IDC_LINK_NOWPLAYING));
+  sys_link_.Hide();
   
   // Initialize tabs
   tab_.Attach(GetDlgItem(IDC_TAB_ANIME));
@@ -120,9 +128,8 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
         SetBkMode(hdc, TRANSPARENT);
         SetTextColor(hdc, RGB(0x00, 0x33, 0x99));
-        return reinterpret_cast<INT_PTR>(::GetStockObject(WHITE_BRUSH));
       }
-      break;
+      return reinterpret_cast<INT_PTR>(::GetStockObject(WHITE_BRUSH));
     }
 
     case WM_DRAWITEM: {
@@ -184,13 +191,28 @@ BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
-  if (idCtrl == IDC_TAB_ANIME) {
-    switch (pnmh->code) {
-      // Tab select
-      case TCN_SELCHANGE: {
-        SetCurrentPage(tab_.GetCurrentlySelected());
-        break;
+  switch (idCtrl) {
+    case IDC_LINK_NOWPLAYING: {
+      switch (pnmh->code) {
+        // Link click
+        case NM_CLICK: {
+          PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
+          ExecuteAction(pNMLink->item.szUrl);
+          return TRUE;
+        }
       }
+      break;
+    }
+
+    case IDC_TAB_ANIME: {
+      switch (pnmh->code) {
+        // Tab select
+        case TCN_SELCHANGE: {
+          SetCurrentPage(tab_.GetCurrentlySelected() + 1);
+          break;
+        }
+      }
+      break;
     }
   }
   
@@ -218,6 +240,16 @@ int AnimeDialog::GetCurrentId() const {
 
 void AnimeDialog::SetCurrentId(int anime_id) {
   anime_id_ = anime_id;
+  
+  switch (anime_id_) {
+    case anime::ID_UNKNOWN:
+      SetCurrentPage(INFOPAGE_NONE);
+      break;
+    default:
+      SetCurrentPage(INFOPAGE_SERIESINFO);
+      break;
+  }
+
   Refresh();
 }
 
@@ -226,16 +258,26 @@ void AnimeDialog::SetCurrentPage(int index) {
   
   if (IsWindow()) {
     switch (index) {
+      case INFOPAGE_NONE:
+        image_label_.Hide();
+        page_my_info.Hide();
+        page_series_info.Hide();
+        sys_link_.Show();
+        break;
       case INFOPAGE_SERIESINFO:
+        image_label_.Show();
         page_my_info.Hide();
         page_series_info.Show();
+        sys_link_.Hide();
         break;
       case INFOPAGE_MYINFO:
+        image_label_.Show();
         page_series_info.Hide();
         page_my_info.Show();
+        sys_link_.Hide();
         break;
     }
-    tab_.SetCurrentlySelected(index);
+    tab_.SetCurrentlySelected(index - 1);
   }
 }
 
@@ -243,23 +285,6 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
   if (!IsWindow()) return;
 
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
-
-  // Set title
-  if (anime_item) {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
-  } else if (anime_id_ == anime::ID_NOTINLIST) {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.title.c_str());
-  } else {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Recently watched:");
-  }
-
-  // Toggle tabs
-  if (anime_item && anime_item->IsInList() && 
-      mode_ == DIALOG_MODE_ANIME_INFORMATION) {
-    tab_.Show();
-  } else {
-    tab_.Hide();
-  }
 
   // Load image
   if (image) {
@@ -281,6 +306,54 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
     SIZE size = {rect.Width(), rect.Height()};
     OnSize(WM_SIZE, 0, size);
     InvalidateRect();
+  }
+
+  // Set title
+  if (anime_item) {
+    SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
+  } else if (anime_id_ == anime::ID_NOTINLIST) {
+    SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.title.c_str());
+  } else {
+    SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Recently watched:");
+  }
+
+  // Set content
+  if (anime_id_ == anime::ID_UNKNOWN) {
+    wstring text;
+    std::set<int> anime_ids;
+    for (auto it = History.queue.items.rbegin(); it != History.queue.items.rend(); ++it) {
+      if (it->episode)
+        anime_ids.insert(it->anime_id);
+    }
+    for (auto it = History.items.rbegin(); it != History.items.rend(); ++it) {
+      if (it->episode)
+        anime_ids.insert(it->anime_id);
+    }
+    for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
+      auto anime_item = AnimeDatabase.FindItem(*it);
+      text += anime_item->GetTitle();
+      if (anime_item->GetEpisodeCount() > 0 && 
+          anime_item->GetEpisodeCount() == anime_item->GetMyLastWatchedEpisode()) {
+        if (anime_item->GetMyScore() == 0)
+          text += L" - <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
+      } else {
+        text += L" - <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
+      }
+      text += L"\n";
+    }
+    if (text.empty()) {
+      text = L"You haven't watched anything recently. "
+             L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?";
+    }
+    sys_link_.SetText(text);
+  }
+
+  // Toggle tabs
+  if (anime_item && anime_item->IsInList() && 
+      mode_ == DIALOG_MODE_ANIME_INFORMATION) {
+    tab_.Show();
+  } else {
+    tab_.Hide();
   }
 
   // Refresh pages
@@ -310,7 +383,7 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rect.Set(0, 0, size.cx, size.cy);
       rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, -ScaleY(WIN_CONTROL_MARGIN) * 2);
       // Image
-      if (anime_id_ != anime::ID_UNKNOWN) {
+      if (image_label_.IsVisible()) {
         win32::Rect rect_image = rect;
         rect_image.right = rect_image.left + ScaleX(150);
         switch (mode_) {
@@ -337,6 +410,10 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
         win32::Rect rect_button;
         ::GetWindowRect(GetDlgItem(IDOK), &rect_button);
         rect.bottom -= rect_button.Height() + ScaleY(WIN_CONTROL_MARGIN);
+      }
+      // Content
+      if (sys_link_.IsVisible()) {
+        sys_link_.SetPosition(nullptr, rect);
       }
       // Pages
       win32::Rect rect_page = rect;

@@ -21,3 +21,10 @@
 #include "dlg_manga_list.h"
 
 class MangaListDialog MangaListDialog;
+
+// =============================================================================
+
+INT_PTR MangaListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  ResizeProc(hwnd, uMsg, wParam, lParam);
+  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}

@@ -36,9 +36,10 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
+
 using std::list;
 using std::string;
 using std::vector;

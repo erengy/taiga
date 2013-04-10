@@ -61,6 +61,9 @@ class MainDialog MainDialog;
 
 MainDialog::MainDialog()
     : current_page_(-1) {
+  navigation_history.parent = this;
+  search_bar.parent = this;
+  
   RegisterDlgClass(L"TaigaMainW");
 }
 
@@ -192,17 +195,20 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0, ICON24_SYNC,     200, 1, fsStyle1,  0, nullptr, L"Synchronize list");
-  toolbar_main.InsertButton(1, ICON24_MAL,      201, 1, fsStyle1,  1, nullptr, L"View your panel at MyAnimeList");
-  toolbar_main.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(3, ICON24_FOLDERS,  203, 1, fsStyle2,  3, nullptr, L"Anime folders");
-  toolbar_main.InsertButton(4, ICON24_SHARE,    204, 1, fsStyle2,  4, nullptr, L"Share");
-  toolbar_main.InsertButton(5, ICON24_TOOLS,    205, 1, fsStyle2,  5, nullptr, L"Tools");
-  toolbar_main.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(7, ICON24_SETTINGS, 207, 1, fsStyle1,  7, nullptr, L"Change program settings");
+  toolbar_main.InsertButton(0,  ICON24_ARROW_LEFT,  200, 0, fsStyle1,  0, nullptr, L"Back");
+  toolbar_main.InsertButton(1,  ICON24_ARROW_RIGHT, 201, 0, fsStyle1,  1, nullptr, L"Forward");
+  toolbar_main.InsertButton(2,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(3,  ICON24_SYNC,        203, 1, fsStyle1,  3, nullptr, L"Synchronize list");
+  toolbar_main.InsertButton(4,  ICON24_MAL,         204, 1, fsStyle1,  4, nullptr, L"View your panel at MyAnimeList");
+  toolbar_main.InsertButton(5,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(6,  ICON24_FOLDERS,     206, 1, fsStyle2,  6, nullptr, L"Anime folders");
+  toolbar_main.InsertButton(7,  ICON24_SHARE,       207, 0, fsStyle2,  7, nullptr, L"Share");
+  toolbar_main.InsertButton(8,  ICON24_TOOLS,       208, 1, fsStyle2,  8, nullptr, L"Tools");
+  toolbar_main.InsertButton(9,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(10, ICON24_SETTINGS,    210, 1, fsStyle1, 10, nullptr, L"Change program settings");
 #ifdef _DEBUG
-  toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(9, ICON24_ABOUT,    209, 1, fsStyle1, 9, nullptr, L"Debug");
+  toolbar_main.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(12, ICON24_ABOUT,       212, 1, fsStyle1, 12, nullptr, L"Debug");
 #endif
   // Insert search toolbar button
   toolbar_search.InsertButton(0, ICON16_SEARCH, 300, 1, fsStyle2, 0, nullptr, L"Search");
@@ -224,8 +230,6 @@ void MainDialog::CreateDialogControls() {
     0, WIN_CONTROL_MARGIN, 0, 240, 0, 0, 0, 
     HIWORD(toolbar_search.GetButtonSize()), 
     fMask, fStyle);
-
-  search_bar.parent = this;
 }
 
 void MainDialog::InitWindowPosition() {
@@ -289,8 +293,8 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     // Forward mouse wheel messages to the active page
     case WM_MOUSEWHEEL: {
       switch (GetCurrentPage()) {
-        case SIDEBAR_ITEM_NOWPLAYING:
-          return NowPlayingDialog.SendMessage(uMsg, wParam, lParam);
+        //case SIDEBAR_ITEM_NOWPLAYING:
+        //  return NowPlayingDialog.SendMessage(uMsg, wParam, lParam);
         case SIDEBAR_ITEM_ANIMELIST:
           return AnimeListDialog.SendMessage(uMsg, wParam, lParam);
         case SIDEBAR_ITEM_SEASONS:
@@ -780,7 +784,7 @@ void MainDialog::ChangeStatus(wstring str) {
 
 void MainDialog::EnableInput(bool enable) {
   // Toolbar buttons
-  toolbar_main.EnableButton(0, enable);
+  toolbar_main.EnableButton(3, enable);
   // Content
   AnimeListDialog.Enable(enable);
   HistoryDialog.Enable(enable);
@@ -788,7 +792,7 @@ void MainDialog::EnableInput(bool enable) {
 
 void MainDialog::EnableSharing(bool enable) {
   // Toolbar buttons
-  toolbar_main.EnableButton(4, enable);
+  toolbar_main.EnableButton(7, enable);
 }
 
 int MainDialog::GetCurrentPage() {
@@ -950,4 +954,11 @@ void MainDialog::UpdateTip() {
       (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
   }
   Taskbar.Modify(tip.c_str());
+}
+
+void MainDialog::NavigationHistory::Refresh() {
+  bool enable_back = false, enable_forward = false;
+
+  parent->toolbar_main.EnableButton(0, enable_back);
+  parent->toolbar_main.EnableButton(1, enable_forward);
 }

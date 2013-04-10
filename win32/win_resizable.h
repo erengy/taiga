@@ -16,24 +16,31 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_MANGA_LIST_H
-#define DLG_MANGA_LIST_H
+#ifndef WIN_RESIZABLE_H
+#define WIN_RESIZABLE_H
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
-#include "../win32/win_resizable.h"
+#include "win_main.h"
+
+namespace win32 {
 
 // =============================================================================
 
-class MangaListDialog : public win32::Dialog, public win32::Resizable {
+class Resizable {
 public:
-  MangaListDialog() {}
-  virtual ~MangaListDialog() {}
+  Resizable();
+  virtual ~Resizable() {}
 
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  void ResizeProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+private:
+  void OnInitDialog(HWND hwnd);
+  void OnScroll(HWND hwnd, int nBar, UINT code);
+  void OnSize(HWND hwnd, UINT nType, SIZE size);
+  void ScrollClient(HWND hwnd, int nBar, int pos);
+
+  int x_, y_;
 };
 
-extern class MangaListDialog MangaListDialog;
+} // namespace win32
 
-#endif // DLG_MANGA_LIST_H
+#endif // WIN_RESIZABLE_H

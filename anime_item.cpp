@@ -105,6 +105,12 @@ const wstring& Item::GetTitle(bool clean) const {
   return clean ? series_info_.clean_title : series_info_.title;
 }
 
+const wstring& Item::GetEnglishTitle(bool clean, bool fallback) const {
+  if (series_info_.english_title.empty() && fallback)
+    return clean ? series_info_.clean_title : series_info_.title;
+  return clean ? series_info_.clean_english_title : series_info_.english_title;
+}
+
 const vector<wstring>& Item::GetSynonyms(bool clean) const {
   return clean ? series_info_.clean_synonyms : series_info_.synonyms;
 }
@@ -236,6 +242,12 @@ void Item::SetTitle(const wstring& title) {
   series_info_.title = title;
   series_info_.clean_title = title;
   Meow.CleanTitle(series_info_.clean_title);
+}
+
+void Item::SetEnglishTitle(const wstring& title) {
+  series_info_.english_title = title;
+  series_info_.clean_english_title = title;
+  Meow.CleanTitle(series_info_.clean_english_title);
 }
 
 void Item::SetSynonyms(const wstring& synonyms) {

@@ -42,11 +42,14 @@
 #define IDD_STATS                               153
 #define IDD_MANGA_LIST                          157
 #define IDC_BUTTON_ADDFOLDER                    1000
+#define IDC_LINK_NOWPLAYING                     1000
 #define IDC_STATIC_ANIME_STAT1                  1000
+#define IDC_EDIT_ANIME_FOLDER                   1001
 #define IDC_STATIC_ANIME_STAT2                  1001
 #define IDC_TOOLBAR_MENU                        1001
 #define IDC_BUTTON_CANCELSEARCH                 1002
 #define IDC_STATIC_ANIME_STAT3                  1002
+#define IDC_BUTTON_BROWSE                       1003
 #define IDC_STATIC_ANIME_STAT4                  1004
 #define IDC_BUTTON_FORMAT_BALLOON               1005
 #define IDC_BUTTON_FORMAT_HTTP                  1006

@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <ctime>
 
+#include "dlg_main.h"
 #include "dlg_season.h"
 
 #include "../anime_db.h"
@@ -93,6 +94,17 @@ BOOL SeasonDialog::OnInitDialog() {
 }
 
 // =============================================================================
+
+INT_PTR SeasonDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    // Forward mouse wheel messages to the list
+    case WM_MOUSEWHEEL: {
+      return list_.SendMessage(uMsg, wParam, lParam);
+    }
+  }
+  
+  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
 
 BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
@@ -522,8 +534,11 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 }
 
 void SeasonDialog::RefreshStatus() {
-  time_t last_modified = 0;
+  if (SeasonDatabase.items.empty()) return;
 
+  wstring text = L"  " + SeasonDatabase.name;
+
+  time_t last_modified = 0;
   for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
     auto anime_item = AnimeDatabase.FindItem(*id);
     if (anime_item) {
@@ -532,18 +547,17 @@ void SeasonDialog::RefreshStatus() {
         last_modified = anime_item->last_modified;
     }
   }
-  
-  /*if (!last_modified) {
-    statusbar_.SetText(L"");
-  } else {
+
+  if (last_modified) {
     time_t time_now = time(nullptr);
     if (time_now == last_modified) {
-      statusbar_.SetText(L"  Last updated: Now");
+      text += L" (Last updated: Now)";
     } else {
-      statusbar_.SetText(L"  Last updated: " + 
-        ToDateString(time_now - last_modified) + L" ago");
+      text += L" (Last updated: " + ToDateString(time_now - last_modified) + L" ago)";
     }
-  }*/
+  }
+
+  MainDialog.statusbar.SetText(text);
 }
 
 void SeasonDialog::RefreshToolbar() {

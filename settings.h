@@ -160,6 +160,7 @@ public:
     class List {
     public:
       int double_click, middle_click;
+      BOOL english_titles;
       BOOL highlight;
       int progress_mode;
       BOOL progress_show_eps;

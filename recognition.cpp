@@ -94,6 +94,10 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   // Compare with main title
   bool found = CompareTitle(anime_item.GetTitle(true), episode, anime_item, strict);
 
+  // Compare with English title
+  if (!found && !anime_item.GetEnglishTitle(true).empty())
+    CompareTitle(anime_item.GetEnglishTitle(true), episode, anime_item, strict);
+
   // Compare with synonyms
   for (auto it = anime_item.GetSynonyms(true).begin();
        !found && it != anime_item.GetSynonyms(true).end(); ++it) {

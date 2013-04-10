@@ -93,6 +93,17 @@ BOOL TorrentDialog::OnInitDialog() {
 
 // =============================================================================
 
+INT_PTR TorrentDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    // Forward mouse wheel messages to the list
+    case WM_MOUSEWHEEL: {
+      return list_.SendMessage(uMsg, wParam, lParam);
+    }
+  }
+  
+  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
 BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
   if (!feed) return 0;

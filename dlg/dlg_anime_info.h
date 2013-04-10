@@ -68,6 +68,7 @@ protected:
   } image_label_;
 
   win32::Edit edit_title_;
+  win32::Window sys_link_;
   win32::Tab tab_;
 };
 

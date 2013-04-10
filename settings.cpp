@@ -163,6 +163,7 @@ bool Settings::Load() {
     xml_node list = program.child(L"list");
     Program.List.double_click = list.child(L"action").attribute(L"doubleclick").as_int(4);
     Program.List.middle_click = list.child(L"action").attribute(L"middleclick").as_int(3);
+    Program.List.english_titles = list.child(L"action").attribute(L"englishtitles").as_bool();
     for (int i = 0; i < 3; i++) {
       wstring name = L"s" + ToWstr(i + 1);
       AnimeFilters.status[i] = list.child(L"filter").child(L"status").attribute(name.c_str()).as_bool(true);
@@ -357,6 +358,7 @@ bool Settings::Save() {
       xml_node action = list.append_child(L"action");
       action.append_attribute(L"doubleclick") = Program.List.double_click;
       action.append_attribute(L"middleclick") = Program.List.middle_click;
+      action.append_attribute(L"englishtitles") = Program.List.english_titles;
       // Filter
       xml_node filter = list.append_child(L"filter");
       filter.append_child(L"status");

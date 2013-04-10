@@ -278,7 +278,15 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
   if (index == -1) index = this->index;
   
   if (index < static_cast<int>(items.size())) {
-    items.erase(items.begin() + index);
+    auto event_item = items.begin() + index;
+    
+    history->items.push_back(*event_item);
+    if (history->items.size() > 10) { // Limited to 10 items
+      history->items.erase(history->items.begin());
+    }
+    
+    items.erase(event_item);
+
     if (refresh) {
       MainDialog.treeview.RefreshHistoryCounter();
       HistoryDialog.RefreshList();
@@ -320,7 +328,16 @@ bool History::Load() {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-    
+
+  // Items
+  items.clear();
+  xml_node node_items = doc.child(L"history").child(L"items");
+  for (xml_node item = node_items.child(L"item"); item; item = item.next_sibling(L"item")) {
+    EventItem event_item;
+    event_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
+    event_item.episode = item.attribute(L"episode").as_int();
+    items.push_back(event_item);
+  }
   // Queue events
   queue.items.clear();
   xml_node node_queue = doc.child(L"history").child(L"queue");
@@ -354,6 +371,13 @@ bool History::Save() {
   xml_document doc;
   xml_node node_history = doc.append_child(L"history");
 
+  // Write event items
+  xml_node node_items = node_history.append_child(L"items");
+  for (auto j = items.begin(); j != items.end(); ++j) {
+    xml_node node_item = node_items.append_child(L"item");
+    node_item.append_attribute(L"anime_id") = j->anime_id;
+    node_item.append_attribute(L"episode") = j->episode;
+  }
   // Write event queue
   xml_node node_queue = node_history.append_child(L"queue");
   for (auto j = queue.items.begin(); j != queue.items.end(); ++j) {

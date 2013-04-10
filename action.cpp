@@ -459,11 +459,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   
   // ===========================================================================
 
-  // EditAll()
+  // EditAll([anime_id])
   //   Shows a dialog to edit details of an anime.
-  //   lParam is an anime ID.
   } else if (action == L"EditAll") {
-    int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
+    int anime_id = body.empty() ? AnimeDatabase.GetCurrentId() : ToInt(body);
     AnimeDialog.SetCurrentId(anime_id);
     AnimeDialog.SetCurrentPage(INFOPAGE_MYINFO);
     if (!AnimeDialog.IsWindow()) {
@@ -659,14 +658,16 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int number = AnimeDatabase.GetCurrentItem()->GetMyLastWatchedEpisode();
     AnimeDatabase.GetCurrentItem()->PlayEpisode(number);
   
-  // PlayNext()
+  // PlayNext([anime_id])
   //   Searches for the next episode of an anime and plays it.
   } else if (action == L"PlayNext") {
-    int number = 1;
-    if (AnimeDatabase.GetCurrentItem()->GetEpisodeCount() != 1) {
-      number = AnimeDatabase.GetCurrentItem()->GetMyLastWatchedEpisode() + 1;
+    int anime_id = body.empty() ? AnimeDatabase.GetCurrentId() : ToInt(body);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (anime_item->GetEpisodeCount() != 1) {
+      anime_item->PlayEpisode(anime_item->GetMyLastWatchedEpisode() + 1);
+    } else {
+      anime_item->PlayEpisode(1);
     }
-    AnimeDatabase.GetCurrentItem()->PlayEpisode(number);
   
   // PlayRandom()
   //   Searches for a random episode of an anime and plays it.

@@ -60,6 +60,7 @@ bool Database::LoadDatabase() {
     Item item;
     item.SetId(XML_ReadIntValue(node, L"series_animedb_id"));
     item.SetTitle(XML_ReadStrValue(node, L"series_title"));
+    item.SetEnglishTitle(XML_ReadStrValue(node, L"series_english"));
     item.SetSynonyms(XML_ReadStrValue(node, L"series_synonyms"));
     item.SetType(XML_ReadIntValue(node, L"series_type"));
     item.SetEpisodeCount(XML_ReadIntValue(node, L"series_episodes"));
@@ -96,6 +97,7 @@ bool Database::SaveDatabase() {
       if (!v.empty()) XML_WriteStrValue(anime_node, n, v.c_str(), t)
     XML_WI(L"series_animedb_id", it->second.GetId());
     XML_WS(L"series_title", it->second.GetTitle(), node_cdata);
+    XML_WS(L"series_english", it->second.GetEnglishTitle(), node_cdata);
     XML_WS(L"series_synonyms", Join(it->second.GetSynonyms(), L"; "), node_cdata);
     XML_WI(L"series_type", it->second.GetType());
     XML_WI(L"series_episodes", it->second.GetEpisodeCount());
@@ -173,6 +175,8 @@ void Database::UpdateItem(Item& new_item) {
       item->SetAiringStatus(new_item.GetAiringStatus());
     if (!new_item.GetTitle(false).empty())
       item->SetTitle(new_item.GetTitle());
+    if (!new_item.GetEnglishTitle(false).empty())
+      item->SetEnglishTitle(new_item.GetEnglishTitle());
     if (!new_item.GetSynonyms(false).empty())
       item->SetSynonyms(new_item.GetSynonyms());
     if (mal::IsValidDate(new_item.GetDate(DATE_START)))

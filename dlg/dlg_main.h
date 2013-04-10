@@ -90,6 +90,16 @@ private:
     win32::Toolbar* toolbar;
   } toolbar_wm;
 
+  class NavigationHistory {
+  public:
+    void GoBack();
+    void GoForward();
+    void Refresh();
+    MainDialog* parent;
+  private:
+    vector<int> items;
+  } navigation_history;
+
 public:
   // Tree-view control
   class CMainTree : public win32::TreeView {

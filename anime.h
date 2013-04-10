@@ -73,6 +73,7 @@ class SeriesInformation {
   Date date_end;
   wstring image_url;
 
+  wstring english_title;
   wstring genres;
   wstring popularity;
   wstring producers;
@@ -80,6 +81,7 @@ class SeriesInformation {
   wstring score;
   wstring synopsis;
 
+  wstring clean_english_title;
   wstring clean_title;
   vector<wstring> clean_synonyms;
 };

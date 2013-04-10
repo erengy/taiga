@@ -82,13 +82,18 @@ HTREEITEM TreeView::HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos) {
 
 HTREEITEM TreeView::InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
   TVITEM tvi  = {0};
-  tvi.mask    = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+  tvi.mask    = TVIF_TEXT | TVIF_PARAM;
   tvi.pszText = (LPWSTR)pszText;
-  tvi.iImage  = tvi.iSelectedImage = iImage;
   tvi.lParam  = lParam;
 
+  if (iImage > -1) {
+    tvi.mask |= TVIF_IMAGE | TVIF_SELECTEDIMAGE;
+    tvi.iImage = iImage;
+    tvi.iSelectedImage = iImage;
+  }
+
   TVINSERTSTRUCT tvis = {0};
-  tvis.item           = tvi; 
+  tvis.item           = tvi;
   tvis.hInsertAfter   = hInsertAfter;
   tvis.hParent        = htiParent;
 

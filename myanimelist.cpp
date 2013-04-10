@@ -158,10 +158,8 @@ bool ParseSearchResult(const wstring& data, int anime_id) {
       anime_item.SetId(XML_ReadIntValue(entry, L"id"));
       if (!current_anime_item || !current_anime_item->keep_title)
         anime_item.SetTitle(mal::DecodeText(XML_ReadStrValue(entry, L"title")));
-      wstring synonyms = mal::DecodeText(XML_ReadStrValue(entry, L"synonyms"));
-      wstring english = mal::DecodeText(XML_ReadStrValue(entry, L"english"));
-      AppendString(synonyms, english, L"; ");
-      anime_item.SetSynonyms(synonyms);
+      anime_item.SetEnglishTitle(mal::DecodeText(XML_ReadStrValue(entry, L"english")));
+      anime_item.SetSynonyms(mal::DecodeText(XML_ReadStrValue(entry, L"synonyms")));
       anime_item.SetEpisodeCount(XML_ReadIntValue(entry, L"episodes"));
       anime_item.SetScore(XML_ReadStrValue(entry, L"score"));
       anime_item.SetType(mal::TranslateType(XML_ReadStrValue(entry, L"type")));

@@ -179,6 +179,7 @@
     <ClCompile Include="win32\win_main.cpp" />
     <ClCompile Include="win32\win_menu.cpp" />
     <ClCompile Include="win32\win_registry.cpp" />
+    <ClCompile Include="win32\win_resizable.cpp" />
     <ClCompile Include="win32\win_taskbar.cpp" />
     <ClCompile Include="win32\win_taskdialog.cpp" />
     <ClCompile Include="win32\win_thread.cpp" />
@@ -260,6 +261,7 @@
     <ClInclude Include="win32\win_main.h" />
     <ClInclude Include="win32\win_menu.h" />
     <ClInclude Include="win32\win_registry.h" />
+    <ClInclude Include="win32\win_resizable.h" />
     <ClInclude Include="win32\win_taskbar.h" />
     <ClInclude Include="win32\win_taskdialog.h" />
     <ClInclude Include="win32\win_thread.h" />

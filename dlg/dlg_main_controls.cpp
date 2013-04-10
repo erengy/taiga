@@ -169,20 +169,26 @@ LRESULT MainDialog::EditSearch::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
   switch (LOWORD(wParam)) {
-    // Synchronize
+    // Go back
     case 200:
+      return TRUE;
+    // Go forward
+    case 201:
+      return TRUE;
+    // Synchronize
+    case 203:
       ExecuteAction(L"Synchronize");
       return TRUE;
     // MyAnimeList
-    case 201:
+    case 204:
       ExecuteAction(L"ViewPanel");
       return TRUE;
     // Settings
-    case 207:
+    case 210:
       ExecuteAction(L"Settings");
       return TRUE;
     // Debug
-    case 209:
+    case 212:
       debug::Test();
       return TRUE;
   }
@@ -333,9 +339,9 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
     SHOWUIMENU(102, L"Tools");
     SHOWUIMENU(103, L"View");
     SHOWUIMENU(104, L"Help");
-    SHOWUIMENU(203, L"Folders");
-    SHOWUIMENU(204, L"Announce");
-    SHOWUIMENU(205, L"Services");
+    SHOWUIMENU(206, L"Folders");
+    SHOWUIMENU(207, L"Announce");
+    SHOWUIMENU(208, L"Services");
     SHOWUIMENU(300, L"SearchBar");
   }
   #undef SHOWUIMENU

@@ -48,6 +48,7 @@ public:
   SeasonDialog();
   virtual ~SeasonDialog() {}
 
+  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
   BOOL OnInitDialog();

@@ -201,24 +201,23 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       POINT pt;
       ::GetCursorPos(&pt);
       ::ScreenToClient(GetWindowHandle(), &pt);
-           
+
       win32::Rect rect_item;
       int item_index = GetNextItem(-1, LVIS_SELECTED);
-       
-      if (item_index > -1) {
-        GetSubItemRect(item_index, 1, &rect_item);
-		win32::Rect rect_button[2];
-        rect_button[0].Copy(rect_item);
-        rect_button[1].Copy(rect_item);
-        rect_button[0].right = rect_button[0].left + 16;
-        rect_button[1].left = rect_button[1].right - 16;
-     
-        if ((button_visible[0] && rect_button[0].PtIn(pt)) ||
-            (button_visible[1] && rect_button[1].PtIn(pt))) {
-          ::SetCursor(reinterpret_cast<HCURSOR>(
-            ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
-          return TRUE;
-        }
+      if (item_index < 0) break;
+
+      GetSubItemRect(item_index, 1, &rect_item);
+      win32::Rect rect_button[2];
+      rect_button[0].Copy(rect_item);
+      rect_button[1].Copy(rect_item);
+      rect_button[0].right = rect_button[0].left + 16;
+      rect_button[1].left = rect_button[1].right - 16;
+
+      if ((button_visible[0] && rect_button[0].PtIn(pt)) || 
+          (button_visible[1] && rect_button[1].PtIn(pt))) {
+        ::SetCursor(reinterpret_cast<HCURSOR>(
+          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        return TRUE;
       }
       break;
      }
@@ -268,7 +267,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       listview.button_visible[1] = false;
       if (lplv->uNewState != 0) {
         auto anime_item = AnimeDatabase.FindItem(anime_id);
-        if (anime_item) {
+        if (anime_item && anime_item->IsInList()) {
           if (anime_item->GetMyLastWatchedEpisode() > 0)
             listview.button_visible[0] = true;
           if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
@@ -352,7 +351,13 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (!anime_item) break;
       switch (plvdi->item.iSubItem) {
         case 0: // Anime title
-          plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
+          if (Settings.Program.List.english_titles) {
+            plvdi->item.pszText = const_cast<LPWSTR>(
+              anime_item->GetEnglishTitle(false, true).data());
+          } else {
+            plvdi->item.pszText = const_cast<LPWSTR>(
+              anime_item->GetTitle().data());
+          }
           break;
       }
       break;
@@ -642,7 +647,7 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Hide list to avoid visual defects and gain performance
   listview.Hide();
-  listview.EnableGroupView(win32::GetWinVersion() > win32::VERSION_XP && index == 0);
+  listview.EnableGroupView(index == 0 && win32::GetWinVersion() > win32::VERSION_XP);
   listview.DeleteAllItems();
 
   // Add items

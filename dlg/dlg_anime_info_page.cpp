@@ -23,6 +23,7 @@
 
 #include "../anime.h"
 #include "../anime_db.h"
+#include "../common.h"
 #include "../history.h"
 #include "../http.h"
 #include "../myanimelist.h"
@@ -132,6 +133,16 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
   switch (LOWORD(wParam)) {
+    // Add folders
+    case IDC_BUTTON_BROWSE: {
+      wstring path;
+      if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
+                          BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
+        SetDlgItemText(IDC_EDIT_ANIME_FOLDER, path.c_str());
+      }
+      return TRUE;
+    }
+
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
@@ -283,6 +294,11 @@ void PageMyInfo::Refresh(int anime_id) {
   m_Edit.SetText(Join(anime_item->GetUserSynonyms(), L"; "));
   m_Edit.SetWindowHandle(nullptr);
 
+  // Folder
+  m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_FOLDER));
+  m_Edit.SetText(anime_item->GetFolder());
+  m_Edit.SetWindowHandle(nullptr);
+
   // Fansub group
   RefreshFansubPreference();
 }
@@ -362,6 +378,11 @@ bool PageMyInfo::Save() {
   wstring titles;
   GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
   anime_item->SetUserSynonyms(titles, true);
+
+  // Folder
+  wstring folder;
+  GetDlgItemText(IDC_EDIT_ANIME_FOLDER, folder);
+  anime_item->SetFolder(folder, true);
 
   // Add item to event queue
   History.queue.Add(event_item);

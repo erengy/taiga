@@ -42,6 +42,7 @@ class Item {
   int GetEpisodeCount(bool estimation = false) const;
   int GetAiringStatus(bool check_date = true) const;
   const wstring& GetTitle(bool clean = false) const;
+  const wstring& GetEnglishTitle(bool clean = false, bool fallback = false) const;
   const vector<wstring>& GetSynonyms(bool clean = false) const;
   const Date& GetDate(DateType type) const;
   const wstring& GetImageUrl() const;
@@ -69,6 +70,7 @@ class Item {
   void SetEpisodeCount(int number);
   void SetAiringStatus(int status);
   void SetTitle(const wstring& title);
+  void SetEnglishTitle(const wstring& title);
   void SetSynonyms(const wstring& synonyms);
   void SetSynonyms(const vector<wstring>& synonyms);
   void SetDate(DateType type, const Date& date);

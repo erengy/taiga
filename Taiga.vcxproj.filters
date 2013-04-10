@@ -345,6 +345,9 @@
     <ClCompile Include="dlg\dlg_manga_list.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="win32\win_resizable.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -583,6 +586,9 @@
     </ClInclude>
     <ClInclude Include="dlg\dlg_manga_list.h">
       <Filter>Dialogs\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\win_resizable.h">
+      <Filter>Win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

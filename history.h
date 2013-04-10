@@ -74,6 +74,7 @@ public:
   bool Load();
   bool Save();
 
+  vector<EventItem> items;
   EventQueue queue;
 };
 
