@@ -284,8 +284,16 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_RADIO_TORRENT_APP1 + Settings.RSS.Torrent.app_mode - 1, TRUE);
       SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_path.c_str());
       EnableDlgItem(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_mode > 1);
-      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE, Settings.RSS.Torrent.app_mode > 1);
+      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, Settings.RSS.Torrent.app_mode > 1);
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, Settings.RSS.Torrent.set_folder);
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.RSS.Torrent.create_folder);
+      for (size_t i = 0; i < Settings.Folders.root.size(); i++) {
+        AddComboString(IDC_COMBO_TORRENT_FOLDER, Settings.Folders.root[i].c_str());
+      }
+      SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, Settings.RSS.Torrent.download_path.c_str());
+      EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.RSS.Torrent.set_folder);
+      EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, Settings.RSS.Torrent.set_folder && Settings.RSS.Torrent.create_folder);
+      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, Settings.RSS.Torrent.set_folder && Settings.RSS.Torrent.create_folder);
       break;
     }
     // Torrent > Filters
@@ -395,7 +403,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // ================================================================================
 
         // Browse for torrent application
-        case IDC_BUTTON_TORRENT_BROWSE: {
+        case IDC_BUTTON_TORRENT_BROWSE_APP: {
           wstring path, current_directory;
           current_directory = Taiga.GetCurrentDirectory();
           path = BrowseForFile(m_hWindow, L"Please select a torrent application", 
@@ -406,6 +414,30 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (!path.empty()) {
             SetDlgItemText(IDC_EDIT_TORRENT_APP, path.c_str());
           }
+          return TRUE;
+        }
+        // Browse for torrent download path
+        case IDC_BUTTON_TORRENT_BROWSE_FOLDER: {
+          wstring path;
+          if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
+            BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
+              SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, path.c_str());
+          }
+          return TRUE;
+        }
+        // Enable/disable controls
+        case IDC_CHECK_TORRENT_AUTOSETFOLDER: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enable);
+          enable = enable && IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER);
+          EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, enable);
+          EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enable);
+          return TRUE;
+        }
+        case IDC_CHECK_TORRENT_AUTOCREATEFOLDER: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, enable);
+          EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enable);
           return TRUE;
         }
         // Add global filter
@@ -490,7 +522,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_RADIO_TORRENT_APP2: {
           CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2, LOWORD(wParam));
           EnableDlgItem(IDC_EDIT_TORRENT_APP, LOWORD(wParam) == IDC_RADIO_TORRENT_APP2);
-          EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE, LOWORD(wParam) == IDC_RADIO_TORRENT_APP2);
+          EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, LOWORD(wParam) == IDC_RADIO_TORRENT_APP2);
           return TRUE;
         }
       }

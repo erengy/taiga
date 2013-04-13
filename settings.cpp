@@ -203,6 +203,8 @@ bool Settings::Load() {
       }
       RSS.Torrent.check_enabled = torrent.child(L"options").attribute(L"autocheck").as_int(TRUE);
       RSS.Torrent.check_interval = torrent.child(L"options").attribute(L"checkinterval").as_int(60);
+      RSS.Torrent.create_folder = torrent.child(L"options").attribute(L"autocreatefolder").as_int(FALSE);
+      RSS.Torrent.download_path = torrent.child(L"options").attribute(L"downloadpath").as_string();
       RSS.Torrent.hide_unidentified = torrent.child(L"options").attribute(L"hideunidentified").as_int(FALSE);
       RSS.Torrent.new_action = torrent.child(L"options").attribute(L"newaction").as_int(1);
       RSS.Torrent.set_folder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
@@ -413,6 +415,8 @@ bool Settings::Save() {
       torrent.child(L"options").append_attribute(L"autocheck") = RSS.Torrent.check_enabled;
       torrent.child(L"options").append_attribute(L"checkinterval") = RSS.Torrent.check_interval;
       torrent.child(L"options").append_attribute(L"autosetfolder") = RSS.Torrent.set_folder;
+      torrent.child(L"options").append_attribute(L"autocreatefolder") = RSS.Torrent.create_folder;
+      torrent.child(L"options").append_attribute(L"downloadpath") = RSS.Torrent.download_path.c_str();
       torrent.child(L"options").append_attribute(L"hideunidentified") = RSS.Torrent.hide_unidentified;
       torrent.child(L"options").append_attribute(L"newaction") = RSS.Torrent.new_action;
       // Filter

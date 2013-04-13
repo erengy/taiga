@@ -190,9 +190,9 @@ public:
     // Torrent
     class Torrent {
     public:
-      BOOL check_enabled, hide_unidentified, set_folder;
+      BOOL check_enabled, create_folder, hide_unidentified, set_folder;
       int app_mode, check_interval, new_action;
-      wstring app_path, source;
+      wstring app_path, download_path, source;
       class Filters {
       public:
         BOOL global_enabled;

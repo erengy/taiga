@@ -539,8 +539,19 @@ BOOL HttpClient::OnReadComplete() {
           }
           if (Settings.RSS.Torrent.set_folder && InStr(app_path, L"utorrent", 0, true) > -1) {
             auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
-            if (anime_item && !anime_item->GetFolder().empty()) {
-              cmd = L"/directory \"" + anime_item->GetFolder() + L"\" ";
+            if (anime_item) {
+              wstring anime_folder = anime_item->GetFolder();
+              if (anime_folder.empty() && 
+                  Settings.RSS.Torrent.create_folder &&
+                  FolderExists(Settings.RSS.Torrent.download_path)) {
+                anime_folder = anime_item->GetTitle();
+                ValidateFileName(anime_folder);
+                CheckSlash(Settings.RSS.Torrent.download_path);
+                anime_folder = Settings.RSS.Torrent.download_path + anime_folder;
+                CreateDirectory(anime_folder.c_str(), nullptr);
+              }
+              if (!anime_folder.empty())
+                cmd = L"/directory \"" + anime_folder + L"\" ";
             }
           }
           cmd += L"\"" + file + L"\"";

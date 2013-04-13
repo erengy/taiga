@@ -52,7 +52,7 @@ const WCHAR* PAGE_TITLE[PAGE_COUNT] = {
   L" Skype announcement",
   L" Twitter announcement",
   L" Root folders",
-  L" Subfolders",
+  L" Anime folders",
   L" Program",
   L" List",
   L" Notifications",
@@ -109,9 +109,9 @@ BOOL SettingsDialog::OnInitDialog() {
   pages[PAGE_UPDATE].CreateItem(L"Update", htAccount);
   tree_.Expand(htAccount);
   // Folders
-  HTREEITEM htFolders = tree_.InsertItem(L"Anime folders", -1, reinterpret_cast<LPARAM>(&pages[PAGE_FOLDERS_ROOT]), nullptr);
-  pages[PAGE_FOLDERS_ROOT].CreateItem(L"Root", htFolders);
-  pages[PAGE_FOLDERS_ANIME].CreateItem(L"Sub", htFolders);
+  HTREEITEM htFolders = tree_.InsertItem(L"Anime library", -1, reinterpret_cast<LPARAM>(&pages[PAGE_FOLDERS_ROOT]), nullptr);
+  pages[PAGE_FOLDERS_ROOT].CreateItem(L"Root folders", htFolders);
+  pages[PAGE_FOLDERS_ANIME].CreateItem(L"Anime folders", htFolders);
   tree_.Expand(htFolders);
   // Announcements
   HTREEITEM htAnnounce = tree_.InsertItem(L"Announcements", -1, reinterpret_cast<LPARAM>(&pages[PAGE_HTTP]), nullptr);
@@ -249,6 +249,8 @@ void SettingsDialog::OnOK() {
   Settings.RSS.Torrent.new_action = pages[PAGE_TORRENT1].GetCheckedRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2) + 1;
   pages[PAGE_TORRENT1].GetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_path);
   Settings.RSS.Torrent.set_folder = pages[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER);
+  Settings.RSS.Torrent.create_folder = pages[PAGE_TORRENT1].IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER);
+  pages[PAGE_TORRENT1].GetDlgItemText(IDC_COMBO_TORRENT_FOLDER, Settings.RSS.Torrent.download_path);
   // Torrent > Filters
   Settings.RSS.Torrent.Filters.global_enabled = pages[PAGE_TORRENT2].IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTER);
   List.SetWindowHandle(pages[PAGE_TORRENT2].GetDlgItem(IDC_LIST_TORRENT_FILTER));
