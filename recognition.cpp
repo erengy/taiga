@@ -613,8 +613,9 @@ void RecognitionEngine::TransliterateSpecial(wstring& str) {
   Replace(str, L"\u014C", L"Ou"); // O macron
   Replace(str, L"\u014D", L"ou"); // o macron
   Replace(str, L"\u016B", L"uu"); // u macron
-  Replace(str, L" o ", L" wo "); // hepburn to wapuro
+  Replace(str, L" wa ", L" ha "); // hepburn to wapuro
   Replace(str, L" e ", L" he "); // hepburn to wapuro
+  Replace(str, L" o ", L" wo "); // hepburn to wapuro
 
   // Abbreviations
   Replace(str, L" & ", L" and ", true, false);

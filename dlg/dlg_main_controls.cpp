@@ -45,11 +45,17 @@
 
 /* TreeView control */
 
-void MainDialog::CMainTree::RefreshHistoryCounter() {
+void MainDialog::MainTree::RefreshHistoryCounter() {
   wstring text = L"History";
   int count = History.queue.GetItemCount();
   if (count > 0) text += L" (" + ToWstr(count) + L")";
   SetItem(hti.at(SIDEBAR_ITEM_HISTORY), text.c_str());
+}
+
+BOOL MainDialog::MainTree::IsVisible() {
+  // This hack ensures that the sidebar is considered visible on startup
+  if (!::MainDialog.IsVisible()) return TRUE;
+  return TreeView::IsVisible();
 }
 
 LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
@@ -97,11 +103,11 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
               // TODO: Should work upwards too
               HTREEITEM hti = TreeView_GetNextItem(treeview.GetWindowHandle(), 
                                                    pnmtv->itemNew.hItem, TVGN_NEXT);
-              SetCurrentPage(treeview.GetItemData(hti));
+              navigation.SetCurrentPage(treeview.GetItemData(hti));
             }
             return TRUE;
           }
-          SetCurrentPage(pnmtv->itemNew.lParam);
+          navigation.SetCurrentPage(pnmtv->itemNew.lParam);
           break;
       }
       break;
@@ -171,9 +177,11 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Go back
     case 200:
+      navigation.GoBack();
       return TRUE;
     // Go forward
     case 201:
+      navigation.GoForward();
       return TRUE;
     // Synchronize
     case 203:
@@ -200,7 +208,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       edit.GetText(text);
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
       if (search_bar.filter_content) {
-        switch (GetCurrentPage()) {
+        switch (navigation.GetCurrentPage()) {
           case SIDEBAR_ITEM_ANIMELIST:
             if (AnimeFilters.text != text) {
               AnimeFilters.text = text;

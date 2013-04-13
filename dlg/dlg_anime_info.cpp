@@ -145,11 +145,12 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         rect.Inflate(-1, -1);
         // Paint image
         dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
-        if (anime_id_ > anime::ID_UNKNOWN) {
+        auto image = ImageDatabase.GetImage(anime_id_);
+        if (anime_id_ > anime::ID_UNKNOWN && image) {
           dc.SetStretchBltMode(HALFTONE);
           dc.StretchBlt(rect.left, rect.top, rect.Width(), rect.Height(), 
-                        image_.dc.Get(), 
-                        0, 0, image_.rect.Width(), image_.rect.Height(), 
+                        image->dc.Get(), 
+                        0, 0, image->rect.Width(), image->rect.Height(), 
                         SRCCOPY);
         } else {
           dc.EditFont(nullptr, 64, TRUE);
@@ -288,19 +289,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
 
   // Load image
   if (image) {
-    if (anime_item) {
-      if (image_.Load(anime::GetImagePath(anime_id_))) {
-        // Refresh if current file is too old
-        if (anime_item->GetAiringStatus() != mal::STATUS_FINISHED) {
-          // Check last modified date (>= 7 days)
-          if (GetFileAge(anime::GetImagePath(anime_id_)) / (60 * 60 * 24) >= 7) {
-            mal::DownloadImage(anime_id_, anime_item->GetImageUrl());
-          }
-        }
-      } else {
-        mal::DownloadImage(anime_id_, anime_item->GetImageUrl());
-      }
-    }
+    ImageDatabase.Load(anime_id_, true, true);
     win32::Rect rect;
     GetClientRect(&rect);
     SIZE size = {rect.Width(), rect.Height()};
@@ -386,10 +375,13 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       if (image_label_.IsVisible()) {
         win32::Rect rect_image = rect;
         rect_image.right = rect_image.left + ScaleX(150);
+        auto image = ImageDatabase.GetImage(anime_id_);
         switch (mode_) {
           case DIALOG_MODE_ANIME_INFORMATION:
-            rect_image = ResizeRect(rect_image, image_.rect.Width(), image_.rect.Height(), 
-                                    true, true, false);
+            if (image) {
+              rect_image = ResizeRect(rect_image, image->rect.Width(), image->rect.Height(), 
+                                      true, true, false);
+            }
             break;
           case DIALOG_MODE_NOW_PLAYING:
             rect_image.bottom = rect_image.top + ScaleY(200);

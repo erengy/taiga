@@ -92,7 +92,7 @@ void Item::StartWatching(Episode episode) {
   MainDialog.ChangeStatus();
   MainDialog.EnableSharing();
   MainDialog.UpdateTip();
-  MainDialog.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+  MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
   
   // Show balloon tip
   if (Settings.Program.Balloon.enabled) {

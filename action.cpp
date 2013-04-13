@@ -75,6 +75,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Synchronize()
   //   Synchronizes local and remote lists.
   if (action == L"Synchronize") {
+#ifdef _DEBUG
+    // Retrieve list
+    MainDialog.ChangeStatus(L"Downloading anime list...");
+    bool result = mal::GetList();
+    MainDialog.EnableInput(!result);
+    if (!result) MainDialog.ChangeStatus();
+#else
     if (!Taiga.logged_in) {
       // Log in
       MainDialog.ChangeStatus(L"Logging in...");
@@ -93,6 +100,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         if (!result) MainDialog.ChangeStatus();
       }
     }
+#endif
 
   // ===========================================================================
 
@@ -193,7 +201,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     wstring filter_text;
     MainDialog.search_bar.filter_content = !MainDialog.search_bar.filter_content;
     if (MainDialog.search_bar.filter_content) MainDialog.edit.GetText(filter_text);
-    switch (MainDialog.GetCurrentPage()) {
+    switch (MainDialog.navigation.GetCurrentPage()) {
       case SIDEBAR_ITEM_ANIMELIST:
         AnimeFilters.text = filter_text;
         AnimeListDialog.RefreshList();
@@ -234,7 +242,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         return;
       }
     }
-    MainDialog.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
+    MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
     SearchDialog.Search(body);
 
   // SearchTorrents()
@@ -243,7 +251,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (feed) {
       anime::Episode episode;
       episode.anime_id = AnimeDatabase.GetCurrentId();
-      MainDialog.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+      MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
       MainDialog.ChangeStatus(L"Searching torrents for \"" + 
         AnimeDatabase.GetCurrentItem()->GetTitle() + L"\"...");
       feed->Check(ReplaceVariables(body, episode));
@@ -271,7 +279,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Selects a page from sidebar.
   } else if (action == L"ViewContent") {
     int page = ToInt(body);
-    MainDialog.SetCurrentPage(page);
+    MainDialog.navigation.SetCurrentPage(page);
 
   // ===========================================================================
   

@@ -59,7 +59,6 @@ public:
 protected:
   int anime_id_;
   int current_page_;
-  Image image_;
   int mode_;
 
   class ImageLabel : public win32::Window {

@@ -23,6 +23,7 @@
 
 #include "anime_item.h"
 #include "anime_user.h"
+#include "gfx.h"
 
 #include "win32/win_thread.h"
 
@@ -114,6 +115,18 @@ class FansubDatabase {
   wstring folder_;
 };
 
+class ImageDatabase {
+ public:
+  ImageDatabase() {}
+  virtual ~ImageDatabase() {}
+
+  bool Load(int anime_id, bool load, bool download);
+  Image* GetImage(int anime_id);
+
+ private:
+  std::map<int, Image> items_;
+};
+
 class SeasonDatabase {
  public:
   SeasonDatabase();
@@ -138,6 +151,7 @@ class SeasonDatabase {
 
 // Global objects
 extern anime::Database AnimeDatabase;
+extern anime::ImageDatabase ImageDatabase;
 extern anime::SeasonDatabase SeasonDatabase;
 
 #endif // ANIMEDB_H

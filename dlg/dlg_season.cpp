@@ -123,7 +123,6 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 BOOL SeasonDialog::OnDestroy() {
-  images.clear(); // Free some memory
   return TRUE;
 }
 
@@ -247,24 +246,18 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect_details.right, rect_image.bottom);
 
       // Draw image
-      int image_index = -1;
-      for (size_t i = 0; i < images.size(); i++) {
-        if (images.at(i).data == anime_item->GetId()) {
-          image_index = static_cast<int>(i);
-          break;
-        }
-      }
-      if (image_index > -1 && images.at(image_index).dc.Get()) {
+      if (ImageDatabase.Load(anime_item->GetId(), false, false)) {
+        auto image = ImageDatabase.GetImage(anime_item->GetId());
         rect_image = ResizeRect(rect_image, 
-          images.at(image_index).rect.Width(),
-          images.at(image_index).rect.Height(),
+          image->rect.Width(),
+          image->rect.Height(),
           true, true, false);
         hdc.SetStretchBltMode(HALFTONE);
         hdc.StretchBlt(rect_image.left, rect_image.top, 
           rect_image.Width(), rect_image.Height(), 
-          images.at(image_index).dc.Get(), 0, 0, 
-          images.at(image_index).rect.Width(), 
-          images.at(image_index).rect.Height(), 
+          image->dc.Get(), 0, 0, 
+          image->rect.Width(), 
+          image->rect.Height(), 
           SRCCOPY);
       }
       
@@ -393,7 +386,7 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
 void SeasonDialog::RefreshData(bool connect, int anime_id) {
   size_t size = SeasonDatabase.items.size();
   
-  if (!anime_id && images.size() != size) {
+  if (!anime_id) {
     for (size_t i = 0; i < size; i++) {
       if (i < image_clients_.size()) image_clients_.at(i).Cleanup();
       if (i < info_clients_.size()) info_clients_.at(i).Cleanup();
@@ -406,19 +399,14 @@ void SeasonDialog::RefreshData(bool connect, int anime_id) {
       info_clients_.at(i).SetProxy(Settings.Program.Proxy.host, 
         Settings.Program.Proxy.user, Settings.Program.Proxy.password);
     }
-    images.clear();
-    images.resize(size);
   }
 
   for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
     if (anime_id && anime_id != *id) continue;
     auto anime_item = AnimeDatabase.FindItem(*id);
     size_t index = id - SeasonDatabase.items.begin();
-    // Load available image
-    images.at(index).data = *id;
-    images.at(index).Load(anime::GetImagePath(*id));
     // Download missing image
-    if (connect && images.at(index).dc.Get() == nullptr)
+    if (connect && ImageDatabase.GetImage(*id) == nullptr)
       mal::DownloadImage(*id, anime_item->GetImageUrl(), &image_clients_.at(index));
     // Get details
     if (connect)

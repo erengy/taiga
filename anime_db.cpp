@@ -31,6 +31,7 @@
 #include "xml.h"
 
 anime::Database AnimeDatabase;
+anime::ImageDatabase ImageDatabase;
 anime::SeasonDatabase SeasonDatabase;
 
 namespace anime {
@@ -459,6 +460,52 @@ bool FansubDatabase::Load() {
 
 void FansubDatabase::Save() {
   // TODO
+}
+
+// =============================================================================
+
+bool ImageDatabase::Load(int anime_id, bool load, bool download) {
+  if (anime_id <= anime::ID_UNKNOWN)
+    return false;
+  
+  if (items_.find(anime_id) != items_.end()) {
+    if (items_[anime_id].data > anime::ID_UNKNOWN) {
+      return true;
+    } else if (!load) {
+      return false;
+    }
+  }
+  
+  if (items_[anime_id].Load(anime::GetImagePath(anime_id))) {
+    items_[anime_id].data = anime_id;
+    if (download) {
+      // Refresh if current file is too old
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (anime_item->GetAiringStatus() != mal::STATUS_FINISHED) {
+        // Check last modified date (>= 7 days)
+        if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
+          mal::DownloadImage(anime_id, anime_item->GetImageUrl());
+        }
+      }
+    }
+    return true;
+  } else {
+    items_[anime_id].data = -1;
+  }
+
+  if (download) {
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    mal::DownloadImage(anime_id, anime_item->GetImageUrl());
+  }
+  
+  return false;
+}
+
+Image* ImageDatabase::GetImage(int anime_id) {
+  if (items_.find(anime_id) != items_.end())
+    if (items_[anime_id].data > 0)
+      return &items_[anime_id];
+  return nullptr;
 }
 
 // =============================================================================

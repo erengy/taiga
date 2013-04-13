@@ -361,11 +361,17 @@ void Item::SetMyTags(const wstring& tags) {
 bool Item::IsAiredYet() const {
   if (series_info_.status != mal::STATUS_NOTYETAIRED) return true;
   if (!mal::IsValidDate(series_info_.date_start)) return false;
-  if (!series_info_.date_start.month || !series_info_.date_start.day) {
-    return GetDateJapan() > series_info_.date_start;
-  } else {
-    return GetDateJapan() >= series_info_.date_start;
-  }
+  
+  Date date_japan = GetDateJapan();
+  Date date_start = series_info_.date_start;
+  
+  // Assume the worst case
+  if (!series_info_.date_start.month)
+    date_start.month = 12;
+  if (!series_info_.date_start.day)
+    date_start.day = 31;
+  
+  return date_japan >= date_start;
 }
 
 bool Item::IsFinishedAiring() const {

@@ -70,11 +70,24 @@ public:
   void ChangeStatus(wstring str = L"");
   void EnableInput(bool enable = true);
   void EnableSharing(bool enable = true);
-  int GetCurrentPage();
-  void SetCurrentPage(int page);
   void UpdateControlPositions(const SIZE* size = nullptr);
   void UpdateStatusTimer();
   void UpdateTip();
+
+  class Navigation {
+  public:
+    Navigation() : current_page_(-1), index_(-1) {}
+    int GetCurrentPage();
+    void SetCurrentPage(int page, bool reorder = true);
+    void GoBack();
+    void GoForward();
+    void Refresh(bool add_to_history);
+    MainDialog* parent;
+  private:
+    int current_page_;
+    int index_;
+    vector<int> items_;
+  } navigation;
 
 private:
   void CreateDialogControls();
@@ -90,20 +103,11 @@ private:
     win32::Toolbar* toolbar;
   } toolbar_wm;
 
-  class NavigationHistory {
-  public:
-    void GoBack();
-    void GoForward();
-    void Refresh();
-    MainDialog* parent;
-  private:
-    vector<int> items;
-  } navigation_history;
-
 public:
-  // Tree-view control
-  class CMainTree : public win32::TreeView {
+  // TreeView control
+  class MainTree : public win32::TreeView {
   public:
+    BOOL IsVisible();
     void RefreshHistoryCounter();
     vector<HTREEITEM> hti;
   } treeview;
@@ -137,7 +141,6 @@ public:
   } search_bar;
 
 private:
-  int current_page_;
   win32::Rect rect_content_, rect_sidebar_;
 };
 

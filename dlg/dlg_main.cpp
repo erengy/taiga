@@ -17,6 +17,7 @@
 */
 
 #include "../std.h"
+#include <algorithm>
 
 #include "dlg_main.h"
 
@@ -59,9 +60,8 @@ class MainDialog MainDialog;
 
 // =============================================================================
 
-MainDialog::MainDialog()
-    : current_page_(-1) {
-  navigation_history.parent = this;
+MainDialog::MainDialog() {
+  navigation.parent = this;
   search_bar.parent = this;
   
   RegisterDlgClass(L"TaigaMainW");
@@ -84,7 +84,7 @@ BOOL MainDialog::OnInitDialog() {
   EnableSharing(false);
 
   // Select default content page
-  SetCurrentPage(SIDEBAR_ITEM_ANIMELIST);
+  navigation.SetCurrentPage(SIDEBAR_ITEM_ANIMELIST);
 
   // Start process timer
   SetTimer(g_hMain, TIMER_MAIN, 1000, nullptr);
@@ -195,8 +195,8 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0,  ICON24_ARROW_LEFT,  200, 0, fsStyle1,  0, nullptr, L"Back");
-  toolbar_main.InsertButton(1,  ICON24_ARROW_RIGHT, 201, 0, fsStyle1,  1, nullptr, L"Forward");
+  toolbar_main.InsertButton(0,  ICON24_ARROW_LEFT,  200, 0, fsStyle1,  0, nullptr, L"Go back");
+  toolbar_main.InsertButton(1,  ICON24_ARROW_RIGHT, 201, 0, fsStyle1,  1, nullptr, L"Go forward");
   toolbar_main.InsertButton(2,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(3,  ICON24_SYNC,        203, 1, fsStyle1,  3, nullptr, L"Synchronize list");
   toolbar_main.InsertButton(4,  ICON24_MAL,         204, 1, fsStyle1,  4, nullptr, L"View your panel at MyAnimeList");
@@ -292,7 +292,7 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                              
     // Forward mouse wheel messages to the active page
     case WM_MOUSEWHEEL: {
-      switch (GetCurrentPage()) {
+      switch (navigation.GetCurrentPage()) {
         //case SIDEBAR_ITEM_NOWPLAYING:
         //  return NowPlayingDialog.SendMessage(uMsg, wParam, lParam);
         case SIDEBAR_ITEM_ANIMELIST:
@@ -303,6 +303,19 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
           return TorrentDialog.SendMessage(uMsg, wParam, lParam);
       }
       break;
+    }
+
+    // Back & forward buttons are used for navigation
+    case WM_XBUTTONUP: {
+      switch (HIWORD(wParam)) {
+        case XBUTTON1:
+          navigation.GoBack();
+          break;
+        case XBUTTON2:
+          navigation.GoForward();
+          break;
+      }
+      return TRUE;
     }
 
     // Show menu
@@ -388,7 +401,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                 if (feed) {
                   wstring search_url = search_bar.url;
                   Replace(search_url, L"%search%", text);
-                  SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+                  navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
                   ChangeStatus(L"Searching torrents for \"" + text + L"\"...");
                   feed->Check(search_url);
                   return TRUE;
@@ -742,7 +755,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
             break;
           case TIPTYPE_TORRENT:
-            SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+            navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
             break;
           case TIPTYPE_UPDATEFAILED:
             History.queue.Check();
@@ -793,76 +806,6 @@ void MainDialog::EnableInput(bool enable) {
 void MainDialog::EnableSharing(bool enable) {
   // Toolbar buttons
   toolbar_main.EnableButton(7, enable);
-}
-
-int MainDialog::GetCurrentPage() {
-  return current_page_;
-}
-
-void MainDialog::SetCurrentPage(int page) {
-  if (page == current_page_)
-    return;
-  
-  if (search_bar.filter_content) {
-    wstring filter_text;
-    edit.GetText(filter_text);
-    edit.SetText(L"");
-    switch (current_page_) {
-      case SIDEBAR_ITEM_ANIMELIST:
-        AnimeFilters.text = filter_text;
-        break;
-      case SIDEBAR_ITEM_SEASONS:
-        SeasonDialog.filter_text = filter_text;
-        break;
-    }
-  }
-
-  current_page_ = page;
-
-  AnimeListDialog.Hide();
-  HistoryDialog.Hide();
-  MangaListDialog.Hide();
-  NowPlayingDialog.Hide();
-  SearchDialog.Hide();
-  SeasonDialog.Hide();
-  StatsDialog.Hide();
-  TorrentDialog.Hide();
-
-  #define DISPLAY_PAGE(item, dialog, resource_id) \
-    case item: \
-      if (!dialog.IsWindow()) dialog.Create(resource_id, m_hWindow, false); \
-      UpdateControlPositions(); \
-      dialog.Show(); \
-      break;
-  switch (current_page_) {
-    DISPLAY_PAGE(SIDEBAR_ITEM_NOWPLAYING, NowPlayingDialog, IDD_ANIME_INFO);
-    DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, AnimeListDialog, IDD_ANIME_LIST);
-    DISPLAY_PAGE(SIDEBAR_ITEM_MANGALIST, MangaListDialog, IDD_MANGA_LIST);
-    DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, HistoryDialog, IDD_HISTORY);
-    DISPLAY_PAGE(SIDEBAR_ITEM_STATS, StatsDialog, IDD_STATS);
-    DISPLAY_PAGE(SIDEBAR_ITEM_SEARCH, SearchDialog, IDD_SEARCH);
-    DISPLAY_PAGE(SIDEBAR_ITEM_SEASONS, SeasonDialog, IDD_SEASON);
-    DISPLAY_PAGE(SIDEBAR_ITEM_FEEDS, TorrentDialog, IDD_TORRENT);
-  }
-  #undef DISPLAY_PAGE
-
-  treeview.SelectItem(treeview.hti.at(current_page_));
-
-  UpdateViewMenu();
-
-  if (search_bar.filter_content) {
-    switch (current_page_) {
-      case SIDEBAR_ITEM_ANIMELIST:
-        edit.SetText(AnimeFilters.text);
-        break;
-      case SIDEBAR_ITEM_SEARCH:
-        edit.SetText(SearchDialog.search_text);
-        break;
-      case SIDEBAR_ITEM_SEASONS:
-        edit.SetText(SeasonDialog.filter_text);
-        break;
-    }
-  }
 }
 
 void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wstring url) {
@@ -956,8 +899,105 @@ void MainDialog::UpdateTip() {
   Taskbar.Modify(tip.c_str());
 }
 
-void MainDialog::NavigationHistory::Refresh() {
-  bool enable_back = false, enable_forward = false;
+// =============================================================================
+
+int MainDialog::Navigation::GetCurrentPage() {
+  return current_page_;
+}
+
+void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
+  if (page == current_page_)
+    return;
+  
+  if (parent->search_bar.filter_content) {
+    wstring filter_text;
+    parent->edit.GetText(filter_text);
+    parent->edit.SetText(L"");
+    switch (current_page_) {
+      case SIDEBAR_ITEM_ANIMELIST:
+        AnimeFilters.text = filter_text;
+        break;
+      case SIDEBAR_ITEM_SEASONS:
+        SeasonDialog.filter_text = filter_text;
+        break;
+    }
+  }
+
+  current_page_ = page;
+
+  AnimeListDialog.Hide();
+  HistoryDialog.Hide();
+  MangaListDialog.Hide();
+  NowPlayingDialog.Hide();
+  SearchDialog.Hide();
+  SeasonDialog.Hide();
+  StatsDialog.Hide();
+  TorrentDialog.Hide();
+
+  #define DISPLAY_PAGE(item, dialog, resource_id) \
+    case item: \
+      if (!dialog.IsWindow()) dialog.Create(resource_id, parent->GetWindowHandle(), false); \
+      parent->UpdateControlPositions(); \
+      dialog.Show(); \
+      break;
+  switch (current_page_) {
+    DISPLAY_PAGE(SIDEBAR_ITEM_NOWPLAYING, NowPlayingDialog, IDD_ANIME_INFO);
+    DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, AnimeListDialog, IDD_ANIME_LIST);
+    DISPLAY_PAGE(SIDEBAR_ITEM_MANGALIST, MangaListDialog, IDD_MANGA_LIST);
+    DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, HistoryDialog, IDD_HISTORY);
+    DISPLAY_PAGE(SIDEBAR_ITEM_STATS, StatsDialog, IDD_STATS);
+    DISPLAY_PAGE(SIDEBAR_ITEM_SEARCH, SearchDialog, IDD_SEARCH);
+    DISPLAY_PAGE(SIDEBAR_ITEM_SEASONS, SeasonDialog, IDD_SEASON);
+    DISPLAY_PAGE(SIDEBAR_ITEM_FEEDS, TorrentDialog, IDD_TORRENT);
+  }
+  #undef DISPLAY_PAGE
+
+  parent->treeview.SelectItem(parent->treeview.hti.at(current_page_));
+
+  UpdateViewMenu();
+  Refresh(add_to_history);
+
+  if (parent->search_bar.filter_content) {
+    switch (current_page_) {
+      case SIDEBAR_ITEM_ANIMELIST:
+        parent->edit.SetText(AnimeFilters.text);
+        break;
+      case SIDEBAR_ITEM_SEARCH:
+        parent->edit.SetText(SearchDialog.search_text);
+        break;
+      case SIDEBAR_ITEM_SEASONS:
+        parent->edit.SetText(SeasonDialog.filter_text);
+        break;
+    }
+  }
+}
+
+void MainDialog::Navigation::GoBack() {
+  if (index_ > 0) {
+    index_--;
+    SetCurrentPage(items_.at(index_), false);
+  }
+}
+
+void MainDialog::Navigation::GoForward() {
+  if (index_ < items_.size() - 1) {
+    index_++;
+    SetCurrentPage(items_.at(index_), false);
+  }
+}
+
+void MainDialog::Navigation::Refresh(bool add_to_history) {
+  if (add_to_history) {
+    auto it = std::find(items_.begin(), items_.end(), current_page_);
+    if (it != items_.end())
+      items_.erase(it);
+
+    items_.push_back(current_page_);
+    index_ = items_.size() - 1;
+  }
+  
+  bool enable_back = index_ > 0;
+  bool enable_forward = index_ < items_.size() - 1;
 
   parent->toolbar_main.EnableButton(0, enable_back);
   parent->toolbar_main.EnableButton(1, enable_forward);

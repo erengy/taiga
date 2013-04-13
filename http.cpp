@@ -436,19 +436,15 @@ BOOL HttpClient::OnReadComplete() {
     // Download image
     case HTTP_MAL_Image: {
       int anime_id = static_cast<int>(GetParam());
-      if (AnimeDialog.GetCurrentId() == anime_id)
-        AnimeDialog.Refresh(true, false, false);
-      if (NowPlayingDialog.GetCurrentId() == anime_id)
-        NowPlayingDialog.Refresh(true, false, false);
-      if (SeasonDialog.IsWindow()) {
-        for (auto it = SeasonDialog.images.begin(); it != SeasonDialog.images.end(); ++it) {
-          if (it->data == anime_id) {
-            if (it->Load(anime::GetImagePath(anime_id))) {
-              SeasonDialog.RefreshList(true);
-              break;
-            }
-          }
-        }
+      if (ImageDatabase.Load(anime_id, true, false)) {
+        if (AnimeDialog.GetCurrentId() == anime_id)
+          AnimeDialog.Refresh(true, false, false);
+        if (AnimeListDialog.IsWindow())
+          AnimeListDialog.RefreshListItem(anime_id);
+        if (NowPlayingDialog.GetCurrentId() == anime_id)
+          NowPlayingDialog.Refresh(true, false, false);
+        if (SeasonDialog.IsWindow())
+          SeasonDialog.RefreshList(true);
       }
       break;
     }

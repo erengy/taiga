@@ -21,7 +21,6 @@
 
 #include "../std.h"
 
-#include "../gfx.h"
 #include "../http.h"
 
 #include "../win32/win_control.h"
@@ -67,7 +66,6 @@ public:
 public:
   wstring filter_text;
   int group_by, sort_by;
-  vector<Image> images;
 
 private:
   vector<class HttpClient> image_clients_, info_clients_;

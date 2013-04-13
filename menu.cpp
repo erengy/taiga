@@ -263,7 +263,7 @@ void UpdateViewMenu() {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       MENU.Items[i].Checked = false;
     }
-    item_index = MainDialog.GetCurrentPage();
+    item_index = MainDialog.navigation.GetCurrentPage();
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       if (MENU.Items[i].Action == L"ViewContent(" + ToWstr(item_index) + L")") {
         MENU.Items[i].Checked = true;

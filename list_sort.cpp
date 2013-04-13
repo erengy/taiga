@@ -116,9 +116,15 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
-        const Date& date1 = pItem1->GetDate(anime::DATE_START);
-        const Date& date2 = pItem2->GetDate(anime::DATE_START);
+        Date date1 = pItem1->GetDate(anime::DATE_START);
+        Date date2 = pItem2->GetDate(anime::DATE_START);
         if (date1 != date2) {
+          if (!date1.year) date1.year = static_cast<unsigned short>(-1); // Hello.
+          if (!date2.year) date2.year = static_cast<unsigned short>(-1); // We come from the future.
+          if (!date1.month) date1.month = 12;
+          if (!date2.month) date2.month = 12;
+          if (!date1.day) date1.day = 31;
+          if (!date2.day) date2.day = 31;
           return_value = date2 > date1 ? 1 : -1;
         }
       }
