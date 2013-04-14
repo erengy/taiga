@@ -137,6 +137,7 @@ class Item {
   // time depends on user settings.
   void StartWatching(Episode episode);
   void EndWatching(Episode episode);
+  bool IsUpdateAllowed(const Episode& episode, bool ignore_update_time);
   void UpdateList(Episode episode);
   void AddToQueue(Episode episode, bool change_status);
 

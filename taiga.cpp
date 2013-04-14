@@ -119,9 +119,6 @@ void Taiga::LoadData() {
   
   // Load settings
   Settings.Load();
-
-  // Load history
-  History.Load();
   
   // Load theme data
   UI.Load(Settings.Program.General.theme);
@@ -132,6 +129,9 @@ void Taiga::LoadData() {
   
   // Load anime list
   AnimeDatabase.LoadList();
+
+  // Load history
+  History.Load();
 }
 
 // =============================================================================

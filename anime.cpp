@@ -153,29 +153,37 @@ void Item::EndWatching(Episode episode) {
   }
 }
 
-void Item::UpdateList(Episode episode) {
+bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
   if (Settings.Account.Update.mode == UPDATE_MODE_NONE)
-    return;
+    return false;
+
+  if (!ignore_update_time)
+    if (Settings.Account.Update.time != UPDATE_TIME_INSTANT)
+      if (Settings.Account.Update.delay > Taiga.ticker_media)
+        if (Taiga.ticker_media > -1)
+          return false;
 
   if (GetMyStatus() == mal::MYSTATUS_COMPLETED && GetMyRewatching() == 0)
-    return;
-
-  if (Settings.Account.Update.time != UPDATE_TIME_INSTANT && 
-      Settings.Account.Update.delay > Taiga.ticker_media &&
-      Taiga.ticker_media > -1)
-    return;
+    return false;
   
-  bool change_status = true;
   int number = GetEpisodeHigh(episode.number);
   int number_low = GetEpisodeLow(episode.number);
   int last_watched = GetMyLastWatchedEpisode();
     
   if (Settings.Account.Update.out_of_range)
     if (number_low > last_watched + 1 || number < last_watched + 1)
-      return;
+      return false;
 
   if (!mal::IsValidEpisode(number, last_watched, GetEpisodeCount()))
-    return;
+    return false;
+
+  return true;
+}
+
+void Item::UpdateList(Episode episode) {
+  if (!IsUpdateAllowed(episode, false)) return;
+  
+  bool change_status = true;
 
   if (Settings.Account.Update.mode == UPDATE_MODE_ASK) {
       // Set up dialog

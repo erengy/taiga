@@ -293,8 +293,6 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     // Forward mouse wheel messages to the active page
     case WM_MOUSEWHEEL: {
       switch (navigation.GetCurrentPage()) {
-        //case SIDEBAR_ITEM_NOWPLAYING:
-        //  return NowPlayingDialog.SendMessage(uMsg, wParam, lParam);
         case SIDEBAR_ITEM_ANIMELIST:
           return AnimeListDialog.SendMessage(uMsg, wParam, lParam);
         case SIDEBAR_ITEM_SEASONS:
@@ -868,18 +866,19 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
 void MainDialog::UpdateStatusTimer() {
   win32::Rect rect;
   GetClientRect(&rect);
-  
+
   int seconds = Settings.Account.Update.delay - Taiga.ticker_media;
 
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN && 
-    seconds > 0 && seconds < Settings.Account.Update.delay) {
-      wstring str = L"List update in " + ToTimeString(seconds);
-      statusbar.SetPartText(1, str.c_str());
-      statusbar.SetPartTipText(1, str.c_str());
+      seconds > 0 && seconds < Settings.Account.Update.delay &&
+      AnimeDatabase.FindItem(CurrentEpisode.anime_id)->IsUpdateAllowed(CurrentEpisode, true)) {
+    wstring str = L"List update in " + ToTimeString(seconds);
+    statusbar.SetPartText(1, str.c_str());
+    statusbar.SetPartTipText(1, str.c_str());
 
-      statusbar.SetPartWidth(0, rect.Width() - ScaleX(160));
-      statusbar.SetPartWidth(1, ScaleX(160));
-  
+    statusbar.SetPartWidth(0, rect.Width() - ScaleX(160));
+    statusbar.SetPartWidth(1, ScaleX(160));
+
   } else {
     statusbar.SetPartWidth(0, rect.Width());
     statusbar.SetPartWidth(1, 0);

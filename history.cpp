@@ -32,6 +32,7 @@
 #include "taiga.h"
 #include "xml.h"
 
+#include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_history.h"
 #include "dlg/dlg_main.h"
@@ -56,6 +57,11 @@ EventQueue::EventQueue()
 
 void EventQueue::Add(EventItem& item, bool save) {
   auto anime = AnimeDatabase.FindItem(item.anime_id);
+
+  // Add to user list
+  if (anime && !anime->IsInList())
+    if (item.mode != HTTP_MAL_AnimeDelete)
+      anime->AddtoUserList();
   
   // Validate values
   if (anime && anime->IsInList()) {
@@ -167,6 +173,9 @@ void EventQueue::Add(EventItem& item, bool save) {
     } else {
       AnimeListDialog.RefreshListItem(item.anime_id);
     }
+
+    // Refresh now playing
+    NowPlayingDialog.Refresh(false, false, false);
     
     // Change status
     if (!Taiga.logged_in) {
@@ -216,6 +225,7 @@ void EventQueue::Clear(bool save) {
   index = 0;
 
   MainDialog.treeview.RefreshHistoryCounter();
+  NowPlayingDialog.Refresh(false, false, false);
 
   if (save) history->Save();
 }
@@ -289,6 +299,7 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
 
     if (refresh) {
       MainDialog.treeview.RefreshHistoryCounter();
+      NowPlayingDialog.Refresh(false, false, false);
       HistoryDialog.RefreshList();
     }
   }
@@ -309,6 +320,7 @@ void EventQueue::RemoveDisabled(bool save, bool refresh) {
 
   if (refresh && needs_refresh) {
     MainDialog.treeview.RefreshHistoryCounter();
+    NowPlayingDialog.Refresh(false, false, false);
     HistoryDialog.RefreshList();
   }
 
@@ -376,7 +388,7 @@ bool History::Save() {
   for (auto j = items.begin(); j != items.end(); ++j) {
     xml_node node_item = node_items.append_child(L"item");
     node_item.append_attribute(L"anime_id") = j->anime_id;
-    node_item.append_attribute(L"episode") = j->episode;
+    node_item.append_attribute(L"episode") = *j->episode;
   }
   // Write event queue
   xml_node node_queue = node_history.append_child(L"queue");
