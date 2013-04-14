@@ -372,21 +372,15 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rect.Set(0, 0, size.cx, size.cy);
       rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, -ScaleY(WIN_CONTROL_MARGIN) * 2);
       // Image
-      if (image_label_.IsVisible()) {
+      if (current_page_ != INFOPAGE_NONE) {
         win32::Rect rect_image = rect;
         rect_image.right = rect_image.left + ScaleX(150);
+        rect_image.bottom = rect_image.top + ScaleY(200);
         auto image = ImageDatabase.GetImage(anime_id_);
-        switch (mode_) {
-          case DIALOG_MODE_ANIME_INFORMATION:
-            if (image) {
-              rect_image = ResizeRect(rect_image, image->rect.Width(), image->rect.Height(), 
-                                      true, true, false);
-            }
-            break;
-          case DIALOG_MODE_NOW_PLAYING:
-            rect_image.bottom = rect_image.top + ScaleY(200);
-            break;
-        }
+        if (image)
+          rect_image = ResizeRect(rect_image, 
+                                  image->rect.Width(), image->rect.Height(), 
+                                  true, true, false);
         image_label_.SetPosition(nullptr, rect_image);
         rect.left = rect_image.right + ScaleX(WIN_CONTROL_MARGIN) * 2;
       }

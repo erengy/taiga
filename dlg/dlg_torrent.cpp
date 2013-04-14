@@ -18,6 +18,7 @@
 
 #include "../std.h"
 
+#include "dlg_main.h"
 #include "dlg_settings.h"
 #include "dlg_torrent.h"
 
@@ -187,6 +188,24 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           default:
             list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
             break;
+        }
+        break;
+      }
+
+      // Check/uncheck
+      case LVN_ITEMCHANGED: {
+        if (!list_.IsVisible()) break;
+        LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
+        if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
+          int checked_count = 0;
+          for (int i = 0; i < list_.GetItemCount(); i++) {
+            if (list_.GetCheckState(i)) checked_count++;
+          }
+          if (checked_count == 1) {
+            MainDialog.ChangeStatus(L"Marked 1 torrent.");
+          } else {
+            MainDialog.ChangeStatus(L"Marked " + ToWstr(checked_count) + L" torrents.");
+          }
         }
         break;
       }

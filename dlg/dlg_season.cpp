@@ -524,8 +524,9 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 void SeasonDialog::RefreshStatus() {
   if (SeasonDatabase.items.empty()) return;
 
-  wstring text = L"  " + SeasonDatabase.name;
-
+  wstring text = SeasonDatabase.name + L", from " + 
+                 mal::TranslateSeasonToMonths(SeasonDatabase.name);
+  
   time_t last_modified = 0;
   for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
     auto anime_item = AnimeDatabase.FindItem(*id);
@@ -535,7 +536,6 @@ void SeasonDialog::RefreshStatus() {
         last_modified = anime_item->last_modified;
     }
   }
-
   if (last_modified) {
     time_t time_now = time(nullptr);
     if (time_now == last_modified) {
@@ -545,7 +545,7 @@ void SeasonDialog::RefreshStatus() {
     }
   }
 
-  MainDialog.statusbar.SetText(text);
+  MainDialog.ChangeStatus(text);
 }
 
 void SeasonDialog::RefreshToolbar() {

@@ -47,6 +47,7 @@ class Date {
 
   int operator - (const Date& date) const;
 
+  operator bool() const;
   operator SYSTEMTIME() const;
   operator wstring() const;
 

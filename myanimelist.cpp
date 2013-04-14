@@ -568,6 +568,35 @@ wstring TranslateDateToSeason(const Date& date) {
   }
 }
 
+wstring TranslateSeasonToMonths(const wstring& season) {
+  std::map<wstring, std::pair<int, int>> interval;
+  interval[L"Spring"] = std::make_pair<int, int>(3, 5);
+  interval[L"Summer"] = std::make_pair<int, int>(6, 8);
+  interval[L"Fall"] = std::make_pair<int, int>(9, 11);
+  interval[L"Winter"] = std::make_pair<int, int>(12, 2);
+
+  const wchar_t* months[] = {
+    L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
+    L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
+  };
+
+  vector<wstring> season_year;
+  Split(season, L" ", season_year);
+
+  Date date_start, date_end;
+  date_start.month = interval[season_year.at(0)].first;
+  date_end.month = interval[season_year.at(0)].second;
+  date_start.year = ToInt(season_year.at(1));
+  date_end.year = ToInt(season_year.at(1));
+  if (season_year.at(0) == L"Winter") date_end.year++;
+
+  wstring result = months[date_start.month - 1];
+  result += L" " + ToWstr(date_start.year) + L" to ";
+  result += months[date_end.month - 1];
+  result += L" " + ToWstr(date_end.year);
+  return result;
+}
+
 wstring TranslateMyStatus(int value, bool add_count) {
   #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.user.GetItemCount(value)) + L")" : L"")
   switch (value) {

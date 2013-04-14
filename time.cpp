@@ -78,6 +78,10 @@ int Date::operator - (const Date& date) const {
     ((date.year * 365) + (date.month * 30) + date.day);
 }
 
+Date::operator bool() const {
+  return year != 0 || month != 0 || day != 0;
+}
+
 Date::operator SYSTEMTIME() const {
   SYSTEMTIME st;
   st.wYear = year;

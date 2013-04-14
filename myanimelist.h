@@ -125,6 +125,7 @@ wstring TranslateDate(const Date& date);
 wstring TranslateDateForApi(const Date& date);
 Date TranslateDateFromApi(const wstring& date);
 wstring TranslateDateToSeason(const Date& date);
+wstring TranslateSeasonToMonths(const wstring& season);
 wstring TranslateMyStatus(int value, bool add_count);
 wstring TranslateNumber(int value, const wstring& default_char = L"-");
 wstring TranslateRewatchValue(int value);

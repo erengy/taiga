@@ -283,6 +283,7 @@ void SettingsDialog::OnOK() {
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     MainDialog.treeview.RefreshHistoryCounter();
     AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
+    AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     HistoryDialog.RefreshList();
     SearchDialog.RefreshList();
