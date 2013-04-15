@@ -98,7 +98,7 @@ BOOL FeedConditionDialog::OnInitDialog() {
 INT_PTR FeedConditionDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC:
-      return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
+      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
   }
 
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);

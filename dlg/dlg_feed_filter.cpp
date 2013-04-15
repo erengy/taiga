@@ -59,7 +59,7 @@ INT_PTR FeedFilterDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
       if (hwnd_control == GetDlgItem(IDC_STATIC_HEADER)) {
         SetBkMode(hdc, TRANSPARENT);
         SetTextColor(hdc, RGB(0x00, 0x33, 0x99));
-        return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
+        return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
       }
       break;
     }
@@ -232,7 +232,7 @@ INT_PTR FeedFilterDialog::DialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wP
   switch (uMsg) {
     case WM_CTLCOLORDLG:
     case WM_CTLCOLORSTATIC:
-      return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
+      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);

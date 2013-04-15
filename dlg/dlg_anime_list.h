@@ -23,6 +23,10 @@
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
+namespace anime {
+class Item;
+}
+
 // =============================================================================
 
 class AnimeListDialog : public win32::Dialog {
@@ -48,6 +52,7 @@ public:
   class ListView : public win32::ListView {
   public:
     ListView() { dragging = false; button_visible[0] = false; button_visible[1] = false; }
+    void DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, const anime::Item* anime_item);
     int GetSortType(int column);
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool button_visible[2];

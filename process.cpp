@@ -185,11 +185,16 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
       continue;
     }
     objectNameInfo = malloc(0x1000);
+
+    UINT errorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
+    SetErrorMode(errorMode | SEM_FAILCRITICALERRORS);
+    
     if (!NT_SUCCESS(NtQueryObject(dupHandle, ObjectNameInformation, objectNameInfo, 0x1000, &returnLength))) {
       if (returnLength > 0x10000) {
         free(objectTypeInfo);
         free(objectNameInfo);
         CloseHandle(dupHandle);
+        SetErrorMode(errorMode);
         continue;
       }
       // Reallocate the buffer and try again
@@ -198,9 +203,16 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
         free(objectTypeInfo);
         free(objectNameInfo);
         CloseHandle(dupHandle);
+        SetErrorMode(errorMode);
         continue;
       }
     }
+
+    DWORD errorCode = GetLastError();
+    if (errorCode != ERROR_SUCCESS) {
+      SetLastError(ERROR_SUCCESS);
+    }
+    SetErrorMode(errorMode);
 
     // Cast our buffer into a UNICODE_STRING
     objectName = *reinterpret_cast<PUNICODE_STRING>(objectNameInfo);

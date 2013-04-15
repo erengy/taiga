@@ -16,9 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <set>
-
 #include "../std.h"
+#include <algorithm>
 
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
@@ -309,14 +308,16 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
   // Set content
   if (anime_id_ == anime::ID_UNKNOWN) {
     wstring text;
-    std::set<int> anime_ids;
+    vector<int> anime_ids;
     for (auto it = History.queue.items.rbegin(); it != History.queue.items.rend(); ++it) {
-      if (it->episode)
-        anime_ids.insert(it->anime_id);
+      if (it->episode && 
+          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end())
+        anime_ids.push_back(it->anime_id);
     }
     for (auto it = History.items.rbegin(); it != History.items.rend(); ++it) {
-      if (it->episode)
-        anime_ids.insert(it->anime_id);
+      if (it->episode && 
+          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end())
+        anime_ids.push_back(it->anime_id);
     }
     for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
       auto anime_item = AnimeDatabase.FindItem(*it);
