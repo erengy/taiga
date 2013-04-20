@@ -195,23 +195,32 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0,  ICON24_ARROW_LEFT,  200, 0, fsStyle1,  0, nullptr, L"Go back");
-  toolbar_main.InsertButton(1,  ICON24_ARROW_RIGHT, 201, 0, fsStyle1,  1, nullptr, L"Go forward");
-  toolbar_main.InsertButton(2,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(3,  ICON24_SYNC,        203, 1, fsStyle1,  3, nullptr, L"Synchronize list");
-  toolbar_main.InsertButton(4,  ICON24_MAL,         204, 1, fsStyle1,  4, nullptr, L"View your panel at MyAnimeList");
-  toolbar_main.InsertButton(5,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(6,  ICON24_FOLDERS,     206, 1, fsStyle2,  6, nullptr, L"Anime folders");
-  toolbar_main.InsertButton(7,  ICON24_SHARE,       207, 0, fsStyle2,  7, nullptr, L"Share");
-  toolbar_main.InsertButton(8,  ICON24_TOOLS,       208, 1, fsStyle2,  8, nullptr, L"Tools");
-  toolbar_main.InsertButton(9,  0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(10, ICON24_SETTINGS,    210, 1, fsStyle1, 10, nullptr, L"Change program settings");
+  toolbar_main.InsertButton(0, ICON24_ARROW_LEFT, TOOLBAR_BUTTON_GOBACK, 
+                            0, fsStyle1, 0, nullptr, L"Go back");
+  toolbar_main.InsertButton(1, ICON24_ARROW_RIGHT, TOOLBAR_BUTTON_GOFORWARD, 
+                            0, fsStyle1, 1, nullptr, L"Go forward");
+  toolbar_main.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(3, ICON24_SYNC, TOOLBAR_BUTTON_SYNCHRONIZE, 
+                            1, fsStyle1, 3, nullptr, L"Synchronize list");
+  toolbar_main.InsertButton(4, ICON24_MAL, TOOLBAR_BUTTON_MAL, 
+                            1, fsStyle1, 4, nullptr, L"View your panel at MyAnimeList");
+  toolbar_main.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(6, ICON24_FOLDERS, TOOLBAR_BUTTON_FOLDERS, 
+                            1, fsStyle2, 6, nullptr, L"Anime folders");
+  toolbar_main.InsertButton(7, ICON24_SHARE, TOOLBAR_BUTTON_SHARE, 
+                            0, fsStyle2, 7, nullptr, L"Share");
+  toolbar_main.InsertButton(8, ICON24_TOOLS, TOOLBAR_BUTTON_TOOLS, 
+                            1, fsStyle2, 8, nullptr, L"Tools");
+  toolbar_main.InsertButton(9, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(10, ICON24_SETTINGS, TOOLBAR_BUTTON_SETTINGS, 
+                            1, fsStyle1, 10, nullptr, L"Change program settings");
 #ifdef _DEBUG
   toolbar_main.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(12, ICON24_ABOUT,       212, 1, fsStyle1, 12, nullptr, L"Debug");
+  toolbar_main.InsertButton(12, ICON24_ABOUT, TOOLBAR_BUTTON_ABOUT, 
+                            1, fsStyle1, 12, nullptr, L"Debug");
 #endif
   // Insert search toolbar button
-  toolbar_search.InsertButton(0, ICON16_SEARCH, 300, 1, fsStyle2, 0, nullptr, L"Search");
+  toolbar_search.InsertButton(0, ICON16_SEARCH, TOOLBAR_BUTTON_SEARCH, 1, fsStyle2, 0, nullptr, L"Search");
 
   // Insert rebar bands
   UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_HEADERSIZE | RBBIM_SIZE | RBBIM_STYLE;

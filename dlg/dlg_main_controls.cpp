@@ -176,27 +176,27 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
   switch (LOWORD(wParam)) {
     // Go back
-    case 200:
+    case TOOLBAR_BUTTON_GOBACK:
       navigation.GoBack();
       return TRUE;
     // Go forward
-    case 201:
+    case TOOLBAR_BUTTON_GOFORWARD:
       navigation.GoForward();
       return TRUE;
     // Synchronize
-    case 203:
+    case TOOLBAR_BUTTON_SYNCHRONIZE:
       ExecuteAction(L"Synchronize");
       return TRUE;
     // MyAnimeList
-    case 204:
+    case TOOLBAR_BUTTON_MAL:
       ExecuteAction(L"ViewPanel");
       return TRUE;
     // Settings
-    case 210:
+    case TOOLBAR_BUTTON_SETTINGS:
       ExecuteAction(L"Settings");
       return TRUE;
     // Debug
-    case 212:
+    case TOOLBAR_BUTTON_ABOUT:
       debug::Test();
       return TRUE;
   }
@@ -347,10 +347,10 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
     SHOWUIMENU(102, L"Tools");
     SHOWUIMENU(103, L"View");
     SHOWUIMENU(104, L"Help");
-    SHOWUIMENU(206, L"Folders");
-    SHOWUIMENU(207, L"Announce");
-    SHOWUIMENU(208, L"Services");
-    SHOWUIMENU(300, L"SearchBar");
+    SHOWUIMENU(TOOLBAR_BUTTON_FOLDERS, L"Folders");
+    SHOWUIMENU(TOOLBAR_BUTTON_SHARE, L"Announce");
+    SHOWUIMENU(TOOLBAR_BUTTON_TOOLS, L"Services");
+    SHOWUIMENU(TOOLBAR_BUTTON_SEARCH, L"SearchBar");
   }
   #undef SHOWUIMENU
 

@@ -506,6 +506,28 @@ Date ParseDateString(const wstring& str) {
   return date;
 }
 
+void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) {
+  std::map<wstring, std::pair<int, int>> interval;
+  interval[L"Spring"] = std::make_pair<int, int>(3, 5);
+  interval[L"Summer"] = std::make_pair<int, int>(6, 8);
+  interval[L"Fall"] = std::make_pair<int, int>(9, 11);
+  interval[L"Winter"] = std::make_pair<int, int>(12, 2);
+
+  const int days_in_months[] = 
+    {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+  vector<wstring> season_year;
+  Split(season, L" ", season_year);
+  
+  date_start.year = ToInt(season_year.at(1));
+  date_end.year = ToInt(season_year.at(1));
+  if (season_year.at(0) == L"Winter") date_end.year++;
+  date_start.month = interval[season_year.at(0)].first;
+  date_end.month = interval[season_year.at(0)].second;
+  date_start.day = 1;
+  date_end.day = days_in_months[date_end.month - 1];
+}
+
 // =============================================================================
 
 wstring TranslateDate(const Date& date) {
@@ -569,26 +591,13 @@ wstring TranslateDateToSeason(const Date& date) {
 }
 
 wstring TranslateSeasonToMonths(const wstring& season) {
-  std::map<wstring, std::pair<int, int>> interval;
-  interval[L"Spring"] = std::make_pair<int, int>(3, 5);
-  interval[L"Summer"] = std::make_pair<int, int>(6, 8);
-  interval[L"Fall"] = std::make_pair<int, int>(9, 11);
-  interval[L"Winter"] = std::make_pair<int, int>(12, 2);
-
   const wchar_t* months[] = {
     L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
     L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
   };
-
-  vector<wstring> season_year;
-  Split(season, L" ", season_year);
-
+  
   Date date_start, date_end;
-  date_start.month = interval[season_year.at(0)].first;
-  date_end.month = interval[season_year.at(0)].second;
-  date_start.year = ToInt(season_year.at(1));
-  date_end.year = ToInt(season_year.at(1));
-  if (season_year.at(0) == L"Winter") date_end.year++;
+  GetSeasonInterval(season, date_start, date_end);
 
   wstring result = months[date_start.month - 1];
   result += L" " + ToWstr(date_start.year) + L" to ";

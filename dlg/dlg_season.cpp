@@ -157,6 +157,15 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
   switch (pnmh->code) {
+    // Empty text
+    case LVN_GETEMPTYMARKUP: {
+      auto pnmMarkup = reinterpret_cast<NMLVEMPTYMARKUP*>(lParam);
+      wstring text = L"No season selected. Please choose one from above.";
+      wcsncpy_s(pnmMarkup->szMarkup, text.data(), text.size());
+      pnmMarkup->dwFlags = EMF_CENTERED;
+      return TRUE;
+    }
+
     // Custom draw
     case NM_CUSTOMDRAW: {
       return OnListCustomDraw(lParam);

@@ -56,7 +56,8 @@ enum RewatchValue {
 };
 
 enum Status {
-  STATUS_AIRING = 1,
+  STATUS_UNKNOWN,
+  STATUS_AIRING,
   STATUS_FINISHED,
   STATUS_NOTYETAIRED
 };
@@ -72,7 +73,8 @@ enum StorageType {
 };
 
 enum Type {
-  TYPE_TV = 1,
+  TYPE_UNKNOWN,
+  TYPE_TV,
   TYPE_OVA,
   TYPE_MOVIE,
   TYPE_SPECIAL,
@@ -120,6 +122,7 @@ bool IsValidDate(const Date& date);
 bool IsValidDate(const wstring& date);
 bool IsValidEpisode(int episode, int watched, int total);
 Date ParseDateString(const wstring& str);
+void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end);
 
 wstring TranslateDate(const Date& date);
 wstring TranslateDateForApi(const Date& date);

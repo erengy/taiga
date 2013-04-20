@@ -302,7 +302,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
   } else if (anime_id_ == anime::ID_NOTINLIST) {
     SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.title.c_str());
   } else {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Recently watched:");
+    SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Recently watched");
   }
 
   // Set content
@@ -321,7 +321,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
     }
     for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
       auto anime_item = AnimeDatabase.FindItem(*it);
-      text += anime_item->GetTitle();
+      text += L"\u2022 " + anime_item->GetTitle();
       if (anime_item->GetEpisodeCount() > 0 && 
           anime_item->GetEpisodeCount() == anime_item->GetMyLastWatchedEpisode()) {
         if (anime_item->GetMyScore() == 0)

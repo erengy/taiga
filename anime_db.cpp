@@ -24,6 +24,7 @@
 #include "anime_db.h"
 
 #include "common.h"
+#include "debug.h"
 #include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
@@ -170,7 +171,7 @@ void Database::UpdateItem(Item& new_item) {
     // Update only if a value is non-empty
     if (new_item.GetType() > 0)
       item->SetType(new_item.GetType());
-    if (new_item.GetEpisodeCount(false) > 0)
+    if (new_item.GetEpisodeCount(false) > -1)
       item->SetEpisodeCount(new_item.GetEpisodeCount());
     if (new_item.GetAiringStatus(false) > 0)
       item->SetAiringStatus(new_item.GetAiringStatus());
@@ -539,9 +540,8 @@ bool SeasonDatabase::Load(wstring file) {
     items.push_back(anime_id);
     
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item && anime_item->last_modified >= last_modified) {
+    if (anime_item && anime_item->last_modified >= last_modified)
       continue;
-    }
 
     Item item;
     item.SetId(XML_ReadIntValue(node, L"series_animedb_id"));
@@ -556,6 +556,47 @@ bool SeasonDatabase::Load(wstring file) {
   }
 
   return true;
+}
+
+void SeasonDatabase::Review(bool hide_hentai) {
+  Date date_start, date_end;
+  mal::GetSeasonInterval(name, date_start, date_end);
+
+  // Check for invalid items
+  for (int i = 0; i < items.size(); i++) {
+    bool invalid = false;
+    int anime_id = items.at(i);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (anime_item) {
+      // Airing date must be within the interval
+      const Date& anime_start = anime_item->GetDate(anime::DATE_START);
+      if (anime_start < date_start || anime_start > date_end)
+        invalid = true;
+      if (hide_hentai && InStr(anime_item->GetGenres(), L"Hentai", 0, true) > -1)
+        invalid = true;
+      if (invalid) {
+        items.erase(items.begin() + i--);
+        debug::Print(L"SeasonDatabase::Review :: Removed item: \"" + 
+                     anime_item->GetTitle() + L"\" (" + 
+                     wstring(anime_start) + L")\n");
+      }
+    }
+  }
+
+  // Check for missing items
+  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
+      continue;
+    if (hide_hentai && InStr(it->second.GetGenres(), L"Hentai", 0, true) > -1)
+      continue;
+    const Date& anime_start = it->second.GetDate(anime::DATE_START);
+    if (anime_start >= date_start && anime_start <= date_end) {
+      items.push_back(it->second.GetId());
+      debug::Print(L"SeasonDatabase::Review :: Added item: \"" + 
+                   it->second.GetTitle() + L"\" (" + 
+                   wstring(anime_start) + L")\n");
+    }
+  }
 }
 
 } // namespace anime

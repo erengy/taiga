@@ -578,11 +578,12 @@ FONT 8, "Tahoma", 400, 0, 162
     GROUPBOX        "RSS source", IDC_STATIC, 10, 5, 295, 40
     LTEXT           "When there are new torrents:", IDC_STATIC, 160, 65, 125, 8, SS_LEFT
     LTEXT           "(minutes)", IDC_STATIC, 80, 79, 30, 8, SS_LEFT
-    GROUPBOX        "Downloading options", IDC_STATIC, 10, 115, 295, 100
+    GROUPBOX        "Downloading options", IDC_STATIC, 10, 115, 295, 105
     GROUPBOX        "Checking options", IDC_STATIC, 10, 50, 295, 60
     AUTOCHECKBOX    "If no anime folder is set, create one using the series' title under:", IDC_CHECK_TORRENT_AUTOCREATEFOLDER, 30, 180, 245, 10
     COMBOBOX        IDC_COMBO_TORRENT_FOLDER, 40, 190, 235, 30, WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_HASSTRINGS
     PUSHBUTTON      "...", IDC_BUTTON_TORRENT_BROWSE_FOLDER, 280, 190, 16, 12
+    LTEXT           "Tip: Currently this feature is only supported by uTorrent.", IDC_STATIC, 30, 205, 275, 8, SS_LEFT
 }
 
 

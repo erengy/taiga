@@ -48,9 +48,9 @@ namespace anime {
 
 SeriesInformation::SeriesInformation()
     : id(ID_UNKNOWN), 
-      type(0), 
-      episodes(0), 
-      status(0) {
+      type(mal::TYPE_UNKNOWN), 
+      episodes(-1), 
+      status(mal::STATUS_UNKNOWN) {
 }
 
 MyInformation::MyInformation()

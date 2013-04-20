@@ -58,7 +58,9 @@ bool Date::operator != (const Date& date) const {
 }
 
 bool Date::operator < (const Date& date) const {
-  return operator - (date) < 0;
+  if (year != date.year) return year < date.year;
+  if (month != date.month) return month < date.month;
+  return day < date.day;
 }
 
 bool Date::operator <= (const Date& date) const {
@@ -70,7 +72,9 @@ bool Date::operator >= (const Date& date) const {
 }
 
 bool Date::operator > (const Date& date) const {
-  return operator - (date) > 0;
+  if (year != date.year) return year > date.year;
+  if (month != date.month) return month > date.month;
+  return day > date.day;
 }
 
 int Date::operator - (const Date& date) const {
