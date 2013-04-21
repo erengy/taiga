@@ -37,6 +37,13 @@ GdiPlus::~GdiPlus() {
   m_Token = NULL;
 }
 
+void GdiPlus::DrawRectangle(const HDC hdc, const RECT& rect, Gdiplus::ARGB color) {
+  const Gdiplus::SolidBrush brush = Gdiplus::Color(color);
+  Gdiplus::Graphics graphics(hdc);
+  graphics.FillRectangle(&brush, 
+    rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+}
+
 HICON GdiPlus::LoadIcon(const wstring& file) {
   HICON hIcon = NULL;
   

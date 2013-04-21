@@ -20,6 +20,7 @@
 
 #include "anime_db.h"
 #include "common.h"
+#include "settings.h"
 #include "string.h"
 #include "time.h"
 
@@ -184,7 +185,21 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       }
       break;
     }
-    
+
+    // Title
+    case LIST_SORTTYPE_TITLE: {
+      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
+      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
+      if (pItem1 && pItem2) {
+        if (Settings.Program.List.english_titles) {
+          return_value = CompareStrings(pItem1->GetEnglishTitle(false, true), pItem2->GetEnglishTitle(false, true));
+        } else {
+          return_value = CompareStrings(pItem1->GetTitle(), pItem2->GetTitle());
+        }
+      }
+      break;
+    }
+
     // Text
     case LIST_SORTTYPE_DEFAULT:
     default:

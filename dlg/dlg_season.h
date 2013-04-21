@@ -42,6 +42,11 @@ enum SeasonSortBy {
   SEASON_SORTBY_TITLE
 };
 
+enum SeasonViewAs {
+  SEASON_VIEWAS_IMAGES,
+  SEASON_VIEWAS_TILES
+};
+
 class SeasonDialog : public win32::Dialog {
 public:
   SeasonDialog();
@@ -62,17 +67,21 @@ public:
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();
   void RefreshToolbar();
+  void SetViewMode(int mode);
 
 public:
   wstring filter_text;
-  int group_by, sort_by;
+  int group_by, sort_by, view_as;
 
 private:
   vector<class HttpClient> image_clients_, info_clients_;
 
 private:
   win32::Window cancel_button_;
-  win32::ListView list_;
+  class ListView : public win32::ListView {
+  public:
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  } list_;
   win32::Rebar rebar_;
   win32::Toolbar toolbar_;
 };

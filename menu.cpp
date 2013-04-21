@@ -227,6 +227,18 @@ void UpdateSeasonMenu() {
       MENU.Items[item_index].Checked = true;
     }
   }
+
+  // View as
+  menu_index = UI.Menus.GetIndex(L"SeasonView");
+  if (menu_index > -1) {
+    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+      MENU.Items[i].Checked = false;
+    }
+    item_index = SeasonDialog.view_as;
+    if (item_index < static_cast<int>(MENU.Items.size())) {
+      MENU.Items[item_index].Checked = true;
+    }
+  }
 }
 
 void UpdateToolsMenu() {

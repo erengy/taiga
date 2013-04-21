@@ -570,8 +570,10 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (anime_item) {
       // Airing date must be within the interval
       const Date& anime_start = anime_item->GetDate(anime::DATE_START);
-      if (anime_start < date_start || anime_start > date_end)
+      if (!anime_start.year || !anime_start.month || 
+          anime_start < date_start || anime_start > date_end)
         invalid = true;
+      // TODO: Filter by rating instead if made possible in API
       if (hide_hentai && InStr(anime_item->GetGenres(), L"Hentai", 0, true) > -1)
         invalid = true;
       if (invalid) {
@@ -587,10 +589,13 @@ void SeasonDatabase::Review(bool hide_hentai) {
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
     if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
       continue;
+    // TODO: Filter by rating instead if made possible in API
     if (hide_hentai && InStr(it->second.GetGenres(), L"Hentai", 0, true) > -1)
       continue;
+    // Airing date must be within the interval
     const Date& anime_start = it->second.GetDate(anime::DATE_START);
-    if (anime_start >= date_start && anime_start <= date_end) {
+    if (anime_start.year && anime_start.month &&
+        anime_start >= date_start && anime_start <= date_end) {
       items.push_back(it->second.GetId());
       debug::Print(L"SeasonDatabase::Review :: Added item: \"" + 
                    it->second.GetTitle() + L"\" (" + 

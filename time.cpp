@@ -58,8 +58,16 @@ bool Date::operator != (const Date& date) const {
 }
 
 bool Date::operator < (const Date& date) const {
+  if (year && !date.year) return true;
+  if (!year && date.year) return false;
   if (year != date.year) return year < date.year;
+  
+  if (month && !date.month) return true;
+  if (!month && date.month) return false;
   if (month != date.month) return month < date.month;
+  
+  if (day && !date.day) return true;
+  if (!day && date.day) return false;
   return day < date.day;
 }
 
@@ -72,8 +80,16 @@ bool Date::operator >= (const Date& date) const {
 }
 
 bool Date::operator > (const Date& date) const {
+  if (!year && date.year) return true;
+  if (year && !date.year) return false;
   if (year != date.year) return year > date.year;
+  
+  if (!month && date.month) return true;
+  if (month && !date.month) return false;
   if (month != date.month) return month > date.month;
+  
+  if (!day && date.day) return true;
+  if (day && !date.day) return false;
   return day > date.day;
 }
 

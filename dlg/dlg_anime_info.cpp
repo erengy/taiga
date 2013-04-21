@@ -360,10 +360,6 @@ void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   rect.Copy(lpps->rcPaint);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
-  if (mode_ == DIALOG_MODE_NOW_PLAYING) {
-    rect.right = 1;
-    dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
-  }
 }
 
 void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {

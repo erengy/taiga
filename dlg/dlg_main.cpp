@@ -528,13 +528,14 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  win32::Dc dc = hdc;
-  win32::Rect rect;
-
   // Paint sidebar
   if (treeview.IsVisible()) {
+    win32::Dc dc = hdc;
+    win32::Rect rect;
+
     rect.Copy(rect_sidebar_);
     dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+
     rect.left = rect.right - 1;
     dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
   }
@@ -856,7 +857,6 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   // Set content
   if (treeview.IsVisible()) {
     rect_content_.Subtract(rect_client, rect_sidebar_);
-    rect_content_.Inflate(-ScaleX(WIN_CONTROL_MARGIN / 2), 0);
   } else {
     rect_content_ = rect_client;
   }

@@ -290,9 +290,11 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
   if (index < static_cast<int>(items.size())) {
     auto event_item = items.begin() + index;
     
-    history->items.push_back(*event_item);
-    if (history->items.size() > 10) { // Limited to 10 items
-      history->items.erase(history->items.begin());
+    if (event_item->episode) {
+      history->items.push_back(*event_item);
+      if (history->items.size() > 10) { // Limited to 10 items
+        history->items.erase(history->items.begin());
+      }
     }
     
     items.erase(event_item);
@@ -348,6 +350,7 @@ bool History::Load() {
     EventItem event_item;
     event_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
     event_item.episode = item.attribute(L"episode").as_int();
+    event_item.time = item.attribute(L"time").value();
     items.push_back(event_item);
   }
   // Queue events
@@ -389,6 +392,7 @@ bool History::Save() {
     xml_node node_item = node_items.append_child(L"item");
     node_item.append_attribute(L"anime_id") = j->anime_id;
     node_item.append_attribute(L"episode") = *j->episode;
+    node_item.append_attribute(L"time") = j->time.c_str();
   }
   // Write event queue
   xml_node node_queue = node_history.append_child(L"queue");

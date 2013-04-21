@@ -747,5 +747,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Refreshes an individual season item data.
   } else if (action == L"Season_RefreshItemData") {
     SeasonDialog.RefreshData(true, static_cast<int>(lParam));
+
+  // Season_ViewAs(mode)
+  //   Changes view mode.
+  } else if (action == L"Season_ViewAs") {
+    SeasonDialog.SetViewMode(ToInt(body));
+    SeasonDialog.RefreshList();
+    SeasonDialog.RefreshToolbar();
   }
 }

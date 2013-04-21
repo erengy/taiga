@@ -209,12 +209,16 @@ void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       // Set client area
       win32::Rect rcWindow(0, 0, size.cx, size.cy);
-      //rcWindow.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       // Resize tab
+      rcWindow.left -= 1;
+      rcWindow.top -= 1;
+      rcWindow.right += 3;
+      rcWindow.bottom += 2;
       tab.SetPosition(nullptr, rcWindow);
       // Resize list
       tab.AdjustRect(nullptr, FALSE, &rcWindow);
-      rcWindow.left -= 3; rcWindow.top -= 1;
+      rcWindow.left -= 3;
+      rcWindow.top -= 1;
       listview.SetPosition(nullptr, rcWindow, 0);
     }
   }

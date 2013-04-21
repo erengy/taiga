@@ -55,9 +55,8 @@ BOOL SeasonDialog::OnInitDialog() {
   list_.EnableGroupView(true);
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
   list_.SetTheme();
-  SIZE size = {520, 200};
-  list_.SetTileViewInfo(0, LVTVIF_FIXEDSIZE, nullptr, &size);
   list_.SetView(LV_VIEW_TILE);
+  SetViewMode(SEASON_VIEWAS_TILES);
 
   // Create main toolbar
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_SEASON));
@@ -72,8 +71,9 @@ BOOL SeasonDialog::OnInitDialog() {
   toolbar_.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_.InsertButton(3, ICON16_CATEGORY, 103, 1, fsStyle2, 3, L"Group by", nullptr);
   toolbar_.InsertButton(4, ICON16_SORT,     104, 1, fsStyle2, 4, L"Sort by", nullptr);
-  toolbar_.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_.InsertButton(6, ICON16_BALLOON,  106, 1, fsStyle1, 6, L"Discuss", L"");
+  toolbar_.InsertButton(5, ICON16_DETAILS,  105, 1, fsStyle2, 5, L"View", nullptr);
+  toolbar_.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_.InsertButton(7, ICON16_BALLOON,  107, 1, fsStyle1, 7, L"Discuss", L"");
 
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_SEASON));
@@ -114,7 +114,7 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       RefreshData(true);
       return TRUE;
     // Discuss
-    case 106:
+    case 107:
       mal::ViewSeasonGroup();
       return TRUE;
   }
@@ -154,6 +154,23 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 // =============================================================================
 
+LRESULT SeasonDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_MOUSEWHEEL: {
+      /*if (this->GetItemCount() > 0) {
+        short delta = GET_WHEEL_DELTA_WPARAM(wParam);
+        short value = 200;
+        if (delta > 0) value = -value;
+        SendMessage(LVM_SCROLL, 0, value);
+        return 0;
+      }*/
+      break;
+    }
+  }
+
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
 LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
   switch (pnmh->code) {
@@ -176,7 +193,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
       if (lpnmitem->iItem == -1) break;
       LPARAM param = list_.GetItemParam(lpnmitem->iItem);
-      if (param) ExecuteAction(L"ViewAnimePage", 0, param);
+      if (param) ExecuteAction(L"Info", 0, param);
       break;
     }
 
@@ -246,7 +263,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect.left + 124, rect.bottom - 4);
       win32::Rect rect_title(
         rect_image.right + 4, rect_image.top, 
-        rect.right - 4, rect_image.top + 20);
+        rect.right - 4, rect_image.top + text_height + 8);
       win32::Rect rect_details(
         rect_title.left + 4, rect_title.bottom + 8, 
         rect_title.right, rect_title.bottom + 8 + (7 * (text_height + 2)));
@@ -280,6 +297,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         case mal::STATUS_NOTYETAIRED:
           color = RGB(245, 225, 231); break;
       }
+      if (view_as == SEASON_VIEWAS_IMAGES) {
+        rect_title.Copy(rect);
+        rect_title.top = rect_title.bottom - (text_height + 8);
+      }
       hdc.FillRect(rect_title, color);
       
       // Draw anime list indicator
@@ -297,6 +318,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
 
       // Draw details
+      if (view_as == SEASON_VIEWAS_IMAGES) break;
       int text_top = rect_details.top;
       wstring text;
       #define DRAWLINE(t) \
@@ -368,6 +390,10 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
         // Sort by
         case 104:
           action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonSort");
+          break;
+        // View as
+        case 105:
+          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonView");
           break;
       }
       if (!action.empty()) {
@@ -501,8 +527,8 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         break;
     }
     list_.InsertItem(i - SeasonDatabase.items.begin(), 
-      group, -1, 0, nullptr, anime_item->GetTitle().c_str(), 
-      static_cast<LPARAM>(anime_item->GetId()));
+                     group, -1, 0, nullptr, LPSTR_TEXTCALLBACK, 
+                     static_cast<LPARAM>(anime_item->GetId()));
   }
   
   // Sort items
@@ -520,14 +546,14 @@ void SeasonDialog::RefreshList(bool redraw_only) {
       list_.Sort(0, -1, LIST_SORTTYPE_SCORE, ListViewCompareProc);
       break;
     case SEASON_SORTBY_TITLE:
-      list_.Sort(0, 1, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
+      list_.Sort(0, 1, LIST_SORTTYPE_TITLE, ListViewCompareProc);
       break;
   }
 
   // Redraw
   list_.SetRedraw(TRUE);
   list_.RedrawWindow(nullptr, nullptr, 
-    RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
+                     RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void SeasonDialog::RefreshStatus() {
@@ -593,4 +619,26 @@ void SeasonDialog::RefreshToolbar() {
       break;
   }
   toolbar_.SetButtonText(4, text.c_str());
+
+  text = L"View: ";
+  switch (view_as) {
+    case SEASON_VIEWAS_IMAGES:
+      text += L"Images";
+      break;
+    case SEASON_VIEWAS_TILES:
+      text += L"Details";
+      break;
+  }
+  toolbar_.SetButtonText(5, text.c_str());
+}
+
+void SeasonDialog::SetViewMode(int mode) {
+  if (mode == view_as) return;
+  
+  SIZE size;
+  size.cx = mode == SEASON_VIEWAS_IMAGES ? 142 : 500;
+  size.cy = 200;
+  list_.SetTileViewInfo(0, LVTVIF_FIXEDSIZE, nullptr, &size);
+
+  view_as = mode;
 }

@@ -90,8 +90,6 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   rect.Copy(lpps->rcPaint);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
-  rect.right = 1;
-  dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
 }
 
 void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {

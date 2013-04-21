@@ -30,6 +30,7 @@ public:
   GdiPlus();
   ~GdiPlus();
 
+  void DrawRectangle(const HDC hdc, const RECT& rect, DWORD color);
   HICON LoadIcon(const wstring& file);
   HBITMAP LoadImage(const wstring& file);
 
