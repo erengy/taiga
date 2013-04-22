@@ -298,32 +298,6 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       FolderMonitor.OnChange(reinterpret_cast<FolderInfo*>(lParam));
       return TRUE;
     }
-                             
-    // Forward mouse wheel messages to the active page
-    case WM_MOUSEWHEEL: {
-      switch (navigation.GetCurrentPage()) {
-        case SIDEBAR_ITEM_ANIMELIST:
-          return AnimeListDialog.SendMessage(uMsg, wParam, lParam);
-        case SIDEBAR_ITEM_SEASONS:
-          return SeasonDialog.SendMessage(uMsg, wParam, lParam);
-        case SIDEBAR_ITEM_FEEDS:
-          return TorrentDialog.SendMessage(uMsg, wParam, lParam);
-      }
-      break;
-    }
-
-    // Back & forward buttons are used for navigation
-    case WM_XBUTTONUP: {
-      switch (HIWORD(wParam)) {
-        case XBUTTON1:
-          navigation.GoBack();
-          break;
-        case XBUTTON2:
-          navigation.GoForward();
-          break;
-      }
-      return TRUE;
-    }
 
     // Show menu
     case WM_TAIGA_SHOWMENU: {
@@ -427,6 +401,35 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         }
       }
       break;
+    }
+
+    // Forward mouse wheel messages to the active page
+    case WM_MOUSEWHEEL: {
+      switch (navigation.GetCurrentPage()) {
+        case SIDEBAR_ITEM_ANIMELIST:
+          return AnimeListDialog.SendMessage(
+            pMsg->message, pMsg->wParam, pMsg->lParam);
+        case SIDEBAR_ITEM_SEASONS:
+          return SeasonDialog.SendMessage(
+            pMsg->message, pMsg->wParam, pMsg->lParam);
+        case SIDEBAR_ITEM_FEEDS:
+          return TorrentDialog.SendMessage(
+            pMsg->message, pMsg->wParam, pMsg->lParam);
+      }
+      break;
+    }
+
+    // Back & forward buttons are used for navigation
+    case WM_XBUTTONUP: {
+      switch (HIWORD(pMsg->wParam)) {
+        case XBUTTON1:
+          navigation.GoBack();
+          break;
+        case XBUTTON2:
+          navigation.GoForward();
+          break;
+      }
+      return TRUE;
     }
   }
 
@@ -582,6 +585,15 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       Stats.CalculateAll();
     }
     StatsDialog.Refresh();
+  }
+
+  // ===========================================================================
+
+  // Free memory
+  Taiga.ticker_memory++;
+  if (Taiga.ticker_memory >= 10 * 60) { // 10 minutes
+    Taiga.ticker_memory = 0;
+    ImageDatabase.FreeMemory();
   }
 
   // ===========================================================================

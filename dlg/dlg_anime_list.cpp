@@ -179,11 +179,6 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_MOUSEWHEEL: {
       return listview.SendMessage(uMsg, wParam, lParam);
     }
-
-    // Forward navigation button messages to parent window
-    case WM_XBUTTONUP: {
-      return MainDialog.SendMessage(uMsg, wParam, lParam);
-    }
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
@@ -287,11 +282,6 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       }
       break;
      }
-
-    // Back & forward buttons
-    case WM_XBUTTONUP: {
-      return parent->DialogProc(hwnd, uMsg, wParam, lParam);
-    }
   }
   
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);

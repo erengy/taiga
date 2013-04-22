@@ -47,12 +47,13 @@ class Taiga Taiga;
 // =============================================================================
 
 Taiga::Taiga()
-    : is_recognition_enabled(true), 
-      logged_in(false), 
-      current_tip_type(TIPTYPE_NORMAL), 
-      play_status(PLAYSTATUS_STOPPED), 
-      ticker_media(0), 
-      ticker_new_episodes(0), 
+    : is_recognition_enabled(true),
+      logged_in(false),
+      current_tip_type(TIPTYPE_NORMAL),
+      play_status(PLAYSTATUS_STOPPED),
+      ticker_media(0),
+      ticker_memory(0),
+      ticker_new_episodes(0),
       ticker_queue(0) {
   SetVersionInfo(VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
 }

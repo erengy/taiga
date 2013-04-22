@@ -727,6 +727,20 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       SeasonDialog.RefreshList();
       SeasonDialog.RefreshStatus();
       SeasonDialog.RefreshToolbar();
+      if (SeasonDatabase.IsRefreshRequired()) {
+        win32::TaskDialog dlg;
+        wstring title = L"Season - " + SeasonDatabase.name;
+        dlg.SetWindowTitle(title.c_str());
+        dlg.SetMainIcon(TD_ICON_INFORMATION);
+        dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
+        dlg.SetContent(L"It seems that we don't know much about some anime titles in this season. "
+                       L"Taiga will connect to MyAnimeList to retrieve missing information and images.");
+        dlg.AddButton(L"Yes", IDYES);
+        dlg.AddButton(L"No", IDNO);
+        dlg.Show(g_hMain);
+        if (dlg.GetSelectedButtonID() == IDYES)
+          SeasonDialog.RefreshData(true);
+      }
     }
 
   // Season_GroupBy(group)

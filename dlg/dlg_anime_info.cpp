@@ -281,14 +281,14 @@ void AnimeDialog::SetCurrentPage(int index) {
   }
 }
 
-void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
+void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool connect) {
   if (!IsWindow()) return;
 
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
   // Load image
   if (image) {
-    ImageDatabase.Load(anime_id_, true, true);
+    ImageDatabase.Load(anime_id_, true, connect);
     win32::Rect rect;
     GetClientRect(&rect);
     SIZE size = {rect.Width(), rect.Height()};
@@ -298,7 +298,11 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
 
   // Set title
   if (anime_item) {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
+    if (Settings.Program.List.english_titles) {
+      SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetEnglishTitle(false, true).c_str());
+    } else {
+      SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
+    }
   } else if (anime_id_ == anime::ID_NOTINLIST) {
     SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.title.c_str());
   } else {
@@ -347,7 +351,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info) {
   }
 
   // Refresh pages
-  if (series_info) page_series_info.Refresh(anime_id_);
+  if (series_info) page_series_info.Refresh(anime_id_, connect);
   if (my_info) page_my_info.Refresh(anime_id_);
 }
 

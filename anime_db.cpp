@@ -31,6 +31,10 @@
 #include "taiga.h"
 #include "xml.h"
 
+#include "dlg/dlg_anime_info.h"
+#include "dlg/dlg_anime_list.h"
+#include "dlg/dlg_season.h"
+
 anime::Database AnimeDatabase;
 anime::ImageDatabase ImageDatabase;
 anime::SeasonDatabase SeasonDatabase;
@@ -94,7 +98,7 @@ bool Database::SaveDatabase() {
   for (auto it = items.begin(); it != items.end(); ++it) {
     xml_node anime_node = animedb_node.append_child(L"anime");
     #define XML_WI(n, v) \
-      if (v) XML_WriteIntValue(anime_node, n, v)
+      if (v > 0) XML_WriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
       if (!v.empty()) XML_WriteStrValue(anime_node, n, v.c_str(), t)
     XML_WI(L"series_animedb_id", it->second.GetId());
@@ -502,6 +506,32 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
   return false;
 }
 
+void ImageDatabase::FreeMemory() {
+  for (auto it = ::AnimeDatabase.items.begin(); it != ::AnimeDatabase.items.end(); ++it) {
+    bool erase = true;
+    int anime_id = it->first;
+
+    if (items_.find(anime_id) == items_.end())
+      continue;
+
+    if (::AnimeDialog.GetCurrentId() == anime_id ||
+        ::NowPlayingDialog.GetCurrentId() == anime_id)
+      erase = false;
+
+    if (!::SeasonDatabase.items.empty())
+      if (std::find(::SeasonDatabase.items.begin(), ::SeasonDatabase.items.end(), 
+                    anime_id) != ::SeasonDatabase.items.end())
+        if (SeasonDialog.IsVisible())
+          erase = false;
+
+    if (erase) {
+      items_.erase(anime_id);
+      debug::Print(L"ImageDatabase::FreeMemory :: Erased item #" + ToWstr(anime_id) + 
+                   L" - \"" + it->second.GetTitle() + L"\"\n");
+    }
+  }
+}
+
 Image* ImageDatabase::GetImage(int anime_id) {
   if (items_.find(anime_id) != items_.end())
     if (items_[anime_id].data > 0)
@@ -558,6 +588,27 @@ bool SeasonDatabase::Load(wstring file) {
   return true;
 }
 
+bool SeasonDatabase::IsRefreshRequired() {
+  int count = 0;
+  bool required = false;
+
+  for (int i = 0; i < items.size(); i++) {
+    int anime_id = items.at(i);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (anime_item) {
+      const Date& date_start = anime_item->GetDate(anime::DATE_START);
+      if (!mal::IsValidDate(date_start) || anime_item->GetSynopsis().empty())
+        count++;
+    }
+    if (count > 20) {
+      required = true;
+      break;
+    }
+  }
+
+  return required;
+}
+
 void SeasonDatabase::Review(bool hide_hentai) {
   Date date_start, date_end;
   mal::GetSeasonInterval(name, date_start, date_end);
@@ -570,9 +621,9 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (anime_item) {
       // Airing date must be within the interval
       const Date& anime_start = anime_item->GetDate(anime::DATE_START);
-      if (!anime_start.year || !anime_start.month || 
-          anime_start < date_start || anime_start > date_end)
-        invalid = true;
+      if (mal::IsValidDate(anime_start))
+        if (anime_start < date_start || anime_start > date_end)
+          invalid = true;
       // TODO: Filter by rating instead if made possible in API
       if (hide_hentai && InStr(anime_item->GetGenres(), L"Hentai", 0, true) > -1)
         invalid = true;

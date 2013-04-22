@@ -61,7 +61,7 @@ HttpClient::HttpClient() {
 
 BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
-    FormatError(dwError, L"winhttp.dll");
+                       FormatError(dwError, L"winhttp.dll");
   debug::Print(error_text + L"Client mode: " + ToWstr(GetClientMode()) + L"\n");
 
   Stats.connections_failed++;
@@ -92,7 +92,7 @@ BOOL HttpClient::OnError(DWORD dwError) {
       break;
     case HTTP_UpdateCheck:
       MessageBox(UpdateDialog.GetWindowHandle(), 
-        error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
+                 error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
       UpdateDialog.PostMessage(WM_CLOSE);
       break;
     default:
@@ -462,12 +462,16 @@ BOOL HttpClient::OnReadComplete() {
       if (anime_id) {
         if (mal::ParseSearchResult(GetData(), anime_id)) {
           if (AnimeDialog.GetCurrentId() == anime_id)
-            AnimeDialog.Refresh(false, true, false);
+            AnimeDialog.Refresh(false, true, false, false);
           if (NowPlayingDialog.GetCurrentId() == anime_id)
-            NowPlayingDialog.Refresh(false, true, false);
+            NowPlayingDialog.Refresh(false, true, false, false);
           if (SeasonDialog.IsWindow())
             SeasonDialog.RefreshList(true);
-          if (mal::GetAnimeDetails(anime_id, this)) return TRUE;
+          auto anime_item = AnimeDatabase.FindItem(anime_id);
+          if (anime_item)
+            if (anime_item->GetGenres().empty() || anime_item->GetScore().empty())
+              if (mal::GetAnimeDetails(anime_id, this))
+                return TRUE;
         } else {
           status = L"Could not read anime information.";
           AnimeDialog.page_series_info.SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());

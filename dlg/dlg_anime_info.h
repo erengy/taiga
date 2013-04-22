@@ -50,7 +50,10 @@ public:
   int GetCurrentId() const;
   void SetCurrentId(int anime_id);
   void SetCurrentPage(int index);
-  void Refresh(bool image = true, bool series_info = true, bool my_info = true);
+  void Refresh(bool image = true,
+               bool series_info = true,
+               bool my_info = true,
+               bool connect = true);
 
 public:
   PageSeriesInfo page_series_info;

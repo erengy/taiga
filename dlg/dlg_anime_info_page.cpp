@@ -84,7 +84,7 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
   }
 }
 
-void PageSeriesInfo::Refresh(int anime_id) {
+void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   if (anime_id <= anime::ID_UNKNOWN) return;
 
   anime_id_ = anime_id;
@@ -96,7 +96,7 @@ void PageSeriesInfo::Refresh(int anime_id) {
   SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
       
   // Set synopsis
-  if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty()) {
+  if (connect && (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty())) {
     if (mal::SearchAnime(anime_id_, anime_item->GetTitle())) {
       text = L"Retrieving...";
     } else {
@@ -104,8 +104,9 @@ void PageSeriesInfo::Refresh(int anime_id) {
     }
   } else {
     text = anime_item->GetSynopsis();
-    if (anime_item->GetGenres().empty() || anime_item->GetScore().empty()) {
-      mal::GetAnimeDetails(anime_id_);
+    if (connect)
+      if (anime_item->GetGenres().empty() || anime_item->GetScore().empty()) {
+        mal::GetAnimeDetails(anime_id_);
     }
   }
   SetDlgItemText(IDC_EDIT_ANIME_INFO, text.c_str());

@@ -120,7 +120,13 @@ class ImageDatabase {
   ImageDatabase() {}
   virtual ~ImageDatabase() {}
 
+  // Loads a picture into memory, downloads a new file if requested.
   bool Load(int anime_id, bool load, bool download);
+
+  // Releases image data from memory if an image is not in sight.
+  void FreeMemory();
+
+  // Returns a pointer to requested image if available.
   Image* GetImage(int anime_id);
 
  private:
@@ -135,6 +141,10 @@ class SeasonDatabase {
   // Loads season data from db\season\<seasonname>.xml, returns false if no such
   // file exists.
   bool Load(wstring file);
+
+  // Checkes if a significant portion of season data is empty and requires 
+  // refreshing.
+  bool IsRefreshRequired();
 
   // Improves season data by excluding invalid items (i.e. postpones series) and 
   // adding missing ones from the anime database.

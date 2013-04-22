@@ -47,7 +47,7 @@ class PageSeriesInfo : public PageBaseInfo {
  public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
-  void Refresh(int anime_id);
+  void Refresh(int anime_id, bool connect);
 };
 
 class PageMyInfo : public PageBaseInfo {

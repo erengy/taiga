@@ -636,7 +636,7 @@ int TranslateMyStatus(const wstring& value) {
 }
 
 wstring TranslateNumber(int value, const wstring& default_char) {
-  return value == 0 ? default_char : ToWstr(value);
+  return value > 0 ? ToWstr(value) : default_char;
 }
 
 wstring TranslateRewatchValue(int value) {
