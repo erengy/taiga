@@ -28,6 +28,7 @@
 #include "http.h"
 #include "settings.h"
 #include "string.h"
+#include "taiga.h"
 
 #include "dlg/dlg_main.h"
 
@@ -68,7 +69,11 @@ void Announcer::Clear(int modes, bool force) {
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
-  if (!episode) episode = &CurrentEpisode;
+  if (!Taiga.is_sharing_enabled)
+    return;
+
+  if (!episode)
+    episode = &CurrentEpisode;
 
   if (modes & ANNOUNCE_TO_HTTP) {
     if (Settings.Announce.HTTP.enabled || force) {
@@ -78,9 +83,8 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     }
   }
 
-  if (episode->anime_id <= anime::ID_UNKNOWN) {
+  if (episode->anime_id <= anime::ID_UNKNOWN)
     return;
-  }
 
   if (modes & ANNOUNCE_TO_MESSENGER) {
     if (Settings.Announce.MSN.enabled || force) {

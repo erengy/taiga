@@ -25,6 +25,8 @@
 
 namespace anime {
 class Database;
+class Episode;
+class Item;
 }
 class Date;
 class EventItem;

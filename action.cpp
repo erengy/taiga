@@ -394,7 +394,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // ToggleRecognition()
-  //   Enables or disables list updates.
+  //   Enables or disables anime recognition.
   } else if (action == L"ToggleRecognition") {
     Taiga.is_recognition_enabled = !Taiga.is_recognition_enabled;
     if (Taiga.is_recognition_enabled) {
@@ -405,6 +405,28 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
       CurrentEpisode.Set(anime::ID_NOTINLIST);
       if (anime_item) anime_item->EndWatching(CurrentEpisode);
+    }
+
+  // ToggleSharing()
+  //   Enables or disables announcements.
+  } else if (action == L"ToggleSharing") {
+    Taiga.is_sharing_enabled = !Taiga.is_sharing_enabled;
+    UpdateToolsMenu();
+    if (Taiga.is_sharing_enabled) {
+      MainDialog.ChangeStatus(L"Automatic sharing is now enabled.");
+    } else {
+      MainDialog.ChangeStatus(L"Automatic sharing is now disabled.");
+    }
+
+  // ToggleListUpdate()
+  //   Enables or disables list updates.
+  } else if (action == L"ToggleListUpdate") {
+    Taiga.is_update_enabled = !Taiga.is_update_enabled;
+    UpdateToolsMenu();
+    if (Taiga.is_update_enabled) {
+      MainDialog.ChangeStatus(L"Automatic list update is now enabled.");
+    } else {
+      MainDialog.ChangeStatus(L"Automatic list update is now disabled.");
     }
 
   // ===========================================================================

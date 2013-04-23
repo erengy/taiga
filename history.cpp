@@ -203,6 +203,10 @@ void EventQueue::Check() {
     items[index].reason = L"Not logged in";
     return;
   }
+  if (!Taiga.is_update_enabled) {
+    items[index].reason = L"List update is disabled";
+    return;
+  }
   
   // Compare ID with anime list
   auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);

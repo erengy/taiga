@@ -24,7 +24,6 @@
 #include "dlg_anime_info.h"
 #include "dlg_anime_list.h"
 #include "dlg_history.h"
-#include "dlg_manga_list.h"
 #include "dlg_search.h"
 #include "dlg_season.h"
 #include "dlg_settings.h"
@@ -172,8 +171,6 @@ void MainDialog::CreateDialogControls() {
   treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ICON16_PLAY, SIDEBAR_ITEM_NOWPLAYING, nullptr));
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Anime List", ICON16_DOCUMENT_A, SIDEBAR_ITEM_ANIMELIST, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Manga List", ICON16_DOCUMENT_M, SIDEBAR_ITEM_MANGALIST, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"History", ICON16_CLOCK, SIDEBAR_ITEM_HISTORY, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Statistics", ICON16_CHART, SIDEBAR_ITEM_STATS, nullptr));
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
@@ -876,7 +873,6 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   // Resize content
   AnimeListDialog.SetPosition(nullptr, rect_content_);
   HistoryDialog.SetPosition(nullptr, rect_content_);
-  MangaListDialog.SetPosition(nullptr, rect_content_);
   NowPlayingDialog.SetPosition(nullptr, rect_content_);
   SearchDialog.SetPosition(nullptr, rect_content_);
   SeasonDialog.SetPosition(nullptr, rect_content_);
@@ -947,7 +943,6 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
 
   AnimeListDialog.Hide();
   HistoryDialog.Hide();
-  MangaListDialog.Hide();
   NowPlayingDialog.Hide();
   SearchDialog.Hide();
   SeasonDialog.Hide();
@@ -963,7 +958,6 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   switch (current_page_) {
     DISPLAY_PAGE(SIDEBAR_ITEM_NOWPLAYING, NowPlayingDialog, IDD_ANIME_INFO);
     DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, AnimeListDialog, IDD_ANIME_LIST);
-    DISPLAY_PAGE(SIDEBAR_ITEM_MANGALIST, MangaListDialog, IDD_MANGA_LIST);
     DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, HistoryDialog, IDD_HISTORY);
     DISPLAY_PAGE(SIDEBAR_ITEM_STATS, StatsDialog, IDD_STATS);
     DISPLAY_PAGE(SIDEBAR_ITEM_SEARCH, SearchDialog, IDD_SEARCH);

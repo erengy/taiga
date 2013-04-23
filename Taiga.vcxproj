@@ -107,7 +107,6 @@
     <ClCompile Include="dlg\dlg_input.cpp" />
     <ClCompile Include="dlg\dlg_main.cpp" />
     <ClCompile Include="dlg\dlg_main_controls.cpp" />
-    <ClCompile Include="dlg\dlg_manga_list.cpp" />
     <ClCompile Include="dlg\dlg_search.cpp" />
     <ClCompile Include="dlg\dlg_season.cpp" />
     <ClCompile Include="dlg\dlg_settings.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="dlg\dlg_history.h" />
     <ClInclude Include="dlg\dlg_input.h" />
     <ClInclude Include="dlg\dlg_main.h" />
-    <ClInclude Include="dlg\dlg_manga_list.h" />
     <ClInclude Include="dlg\dlg_search.h" />
     <ClInclude Include="dlg\dlg_season.h" />
     <ClInclude Include="dlg\dlg_settings.h" />

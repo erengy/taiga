@@ -244,12 +244,16 @@ void UpdateSeasonMenu() {
 void UpdateToolsMenu() {
   int menu_index = UI.Menus.GetIndex(L"Tools");
   if (menu_index > -1) {
-    // Tools > Enable anime recognition
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].Action == L"ToggleRecognition()") {
+      // Tools > Enable anime recognition
+      if (MENU.Items[i].Action == L"ToggleRecognition()")
         MENU.Items[i].Checked = Taiga.is_recognition_enabled;
-        break;
-      }
+      // Tools > Enable auto sharing
+      if (MENU.Items[i].Action == L"ToggleSharing()")
+        MENU.Items[i].Checked = Taiga.is_sharing_enabled;
+      // Tools > Enable auto list update
+      if (MENU.Items[i].Action == L"ToggleListUpdate()")
+        MENU.Items[i].Checked = Taiga.is_update_enabled;
     }
   }
 }

@@ -25,9 +25,6 @@
 
 namespace anime {
 
-class Episode;
-class Item;
-
 // =============================================================================
 
 // ID_NOTINLIST

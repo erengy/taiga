@@ -51,8 +51,18 @@ bool Theme::Load(const wstring& name) {
   
   // Read theme
   xml_node theme = doc.child(L"theme");
+  xml_node icons16 = theme.child(L"icons").child(L"set_16px");
+  xml_node icons24 = theme.child(L"icons").child(L"set_24px");
   xml_node progress = theme.child(L"list").child(L"progress");
   xml_node menus = theme.child(L"menus");
+
+  // Read icons
+  icons16_.clear();
+  icons24_.clear();
+  for (xml_node icon = icons16.child(L"icon"); icon; icon = icon.next_sibling(L"icon"))
+    icons16_.push_back(icon.attribute(L"name").value());
+  for (xml_node icon = icons24.child(L"icon"); icon; icon = icon.next_sibling(L"icon"))
+    icons24_.push_back(icon.attribute(L"name").value());
 
   // Read list
   #define READ_PROGRESS_DATA(x, name) \
@@ -96,13 +106,13 @@ bool Theme::LoadImages() {
   
   // Populate image lists
   HBITMAP hBitmap;
-  for (int i = 1; i <= ICONCOUNT_16PX; i++) {
-    hBitmap = GdiPlus.LoadImage(folder_ + L"16px\\" + (i < 10 ? L"0" : L"") + ToWstr(i) + L".png");
+  for (int i = 0; i < ICONCOUNT_16PX && i < icons16_.size(); i++) {
+    hBitmap = GdiPlus.LoadImage(folder_ + L"16px\\" + icons16_.at(i) + L".png");
     ImgList16.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }
-  for (int i = 1; i <= ICONCOUNT_24PX; i++) {
-    hBitmap = GdiPlus.LoadImage(folder_ + L"24px\\" + (i < 10 ? L"0" : L"") + ToWstr(i) + L".png");
+  for (int i = 0; i < ICONCOUNT_24PX && i < icons24_.size(); i++) {
+    hBitmap = GdiPlus.LoadImage(folder_ + L"24px\\" + icons24_.at(i) + L".png");
     ImgList24.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }

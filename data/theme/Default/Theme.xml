@@ -2,6 +2,55 @@
 <theme>
 	<!-- Icons -->
 	<!-- Fugue Icons by Yusuke Kamiyamane - http://p.yusukekamiyamane.com -->
+	<icons>
+		<set_16px>
+			<icon name="square-small-green"/>
+			<icon name="square-small-blue"/>
+			<icon name="square-small-red"/>
+			<icon name="square-small-gray"/>
+			<icon name="film"/>
+			<icon name="magnifier-left"/>
+			<icon name="folder-small-horizontal"/>
+			<icon name="application-small-blue"/>
+			<icon name="application-small"/>
+			<icon name="arrow-circle-315"/>
+			<icon name="navigation-270-button"/>
+			<icon name="gear"/>
+			<icon name="cross"/>
+			<icon name="plus"/>
+			<icon name="plus-small"/>
+			<icon name="minus"/>
+			<icon name="minus-small"/>
+			<icon name="arrow-090"/>
+			<icon name="arrow-270"/>
+			<icon name="funnel-small"/>
+			<icon name="funnel-tick"/>
+			<icon name="funnel-cross"/>
+			<icon name="funnel-plus"/>
+			<icon name="funnel-pencil"/>
+			<icon name="calendar-month"/>
+			<icon name="category"/>
+			<icon name="sort-quantity-descending"/>
+			<icon name="balloon-left"/>
+			<icon name="clock"/>
+			<icon name="home"/>
+			<icon name="document-attribute"/>
+			<icon name="chart"/>
+			<icon name="feed"/>
+			<icon name="ui-scroll-pane-detail"/>
+		</set_16px>
+		<set_24px>
+			<icon name="arrow-circle-double-135"/>
+			<icon name="myanimelist"/>
+			<icon name="folder-open"/>
+			<icon name="megaphone"/>
+			<icon name="application-export"/>
+			<icon name="gear"/>
+			<icon name="taiga"/>
+			<icon name="navigation-180"/>
+			<icon name="navigation"/>
+		</set_24px>
+	</icons>
 
 	<!-- List -->
 	<list>
@@ -59,8 +108,8 @@
 			<item name="External services" sub="Services"/>
 			<item type="separator"/>
 			<item name="Enable anime recognition" action="ToggleRecognition()" checked="1"/>
-			<item name="Enable auto sharing" action="" checked="1" disabled="1"/>
-			<item name="Enable auto updates" action="" checked="1" disabled="1"/>
+			<item name="Enable auto sharing"      action="ToggleSharing()" checked="1"/>
+			<item name="Enable auto list update"  action="ToggleListUpdate()" checked="1"/>
 			<item type="separator"/>
 			<item name="Settings" action="Settings()"/>
 		</menu>
@@ -78,12 +127,11 @@
 			<item name="Dashboard"   action="ViewContent(0)" radio="1"/>
 			<item name="Now Playing" action="ViewContent(1)" radio="1"/>
 			<item name="Anime List"  action="ViewContent(3)" checked="1" radio="1"/>
-			<item name="Manga List"  action="ViewContent(4)" radio="1"/>
-			<item name="History"     action="ViewContent(6)" radio="1"/>
-			<item name="Statistics"  action="ViewContent(7)" radio="1"/>
-			<item name="Search"      action="ViewContent(9)" radio="1"/>
-			<item name="Seasons"     action="ViewContent(10)" radio="1"/>
-			<item name="Torrents"    action="ViewContent(12)" radio="1"/>
+			<item name="History"     action="ViewContent(4)" radio="1"/>
+			<item name="Statistics"  action="ViewContent(5)" radio="1"/>
+			<item name="Search"      action="ViewContent(7)" radio="1"/>
+			<item name="Seasons"     action="ViewContent(8)" radio="1"/>
+			<item name="Torrents"    action="ViewContent(10)" radio="1"/>
 			<item type="separator"/>
 			<item name="Show sidebar" action="ShowSidebar()" checked="1"/>
 		</menu>
@@ -254,10 +302,14 @@
 			<item name="Score"       action="Season_SortBy(3)" radio="1"/>
 			<item name="Title"       action="Season_SortBy(4)" radio="1"/>
 		</menu>
+		<menu name="SeasonView">
+			<item name="Images"  action="Season_ViewAs(0)" radio="1"/>
+			<item name="Details" action="Season_ViewAs(1)" radio="1"/>
+		</menu>
 		
 		<!-- Season list -->
 		<menu name="SeasonList">
-			<item name="Information" action="Info()"/>
+			<item name="Information" action="Info()" default="1"/>
 			<item name="View on MAL" action="ViewAnimePage()"/>
 			<item type="separator"/>
 			<item name="Refresh data" action="Season_RefreshItemData()"/>

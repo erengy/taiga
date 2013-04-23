@@ -29,9 +29,6 @@ enum Icons16px {
   ICON16_RED,
   ICON16_GRAY,
   ICON16_PLAY,
-  ICON16_ASTERISK,
-  ICON16_TICK,
-  ICON16_ERROR,
   ICON16_SEARCH,
   ICON16_FOLDER,
   ICON16_APP_BLUE,
@@ -58,7 +55,6 @@ enum Icons16px {
   ICON16_CLOCK,
   ICON16_HOME,
   ICON16_DOCUMENT_A,
-  ICON16_DOCUMENT_M,
   ICON16_CHART,
   ICON16_FEED,
   ICON16_DETAILS,
@@ -132,6 +128,7 @@ public:
 
 private:
   wstring file_, folder_;
+  vector<wstring> icons16_, icons24_;
 };
 
 extern Theme UI;

@@ -27,8 +27,8 @@
 
 #define APP_NAME    L"Taiga"
 #define APP_TITLE   L"Taiga 1.0a"
-#define APP_VERSION L"1.0.187 alpha"
-#define APP_BUILD   L"2013-04-22"
+#define APP_VERSION L"1.0.188 alpha"
+#define APP_BUILD   L"2013-04-23"
 
 #ifndef PORTABLE
 #define PORTABLE
@@ -62,7 +62,8 @@ public:
 
 public:
   int current_tip_type, play_status;
-  bool is_recognition_enabled, logged_in;
+  bool is_recognition_enabled, is_sharing_enabled, is_update_enabled;
+  bool logged_in;
   int ticker_media, ticker_memory, ticker_new_episodes, ticker_queue;
 
   class Updater : public UpdateHelper {
