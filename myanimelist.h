@@ -27,7 +27,6 @@ class ListItem;
 }
 class Date;
 class EventItem;
-class HttpClient;
 
 namespace mal {
 
@@ -106,14 +105,14 @@ public:
 
 bool AskToDiscuss(int anime_id, int episode_number);
 void CheckProfile();
-bool DownloadImage(int anime_id, const wstring& image_url, class HttpClient* client = nullptr);
+bool DownloadImage(int anime_id, const wstring& image_url);
 bool DownloadUserImage(bool thumb);
-bool GetAnimeDetails(int anime_id, class HttpClient* client = nullptr);
+bool GetAnimeDetails(int anime_id);
 bool GetList();
 bool Login();
 bool ParseAnimeDetails(const wstring& data);
 bool ParseSearchResult(const wstring& data, int anime_id = 0);
-bool SearchAnime(int anime_id, wstring title, class HttpClient* client = nullptr);
+bool SearchAnime(int anime_id, wstring title);
 bool Update(AnimeValues& anime_values, int anime_id, int update_mode);
 bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code);
 

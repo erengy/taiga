@@ -58,8 +58,14 @@ void CheckProfile() {
     HTTP_MAL_Profile);
 }
 
-bool GetAnimeDetails(int anime_id, class HttpClient* client) {
-  if (!client) client = &SearchClient;
+bool GetAnimeDetails(int anime_id) {
+  HttpClient* client;
+  if (anime_id > anime::ID_UNKNOWN) {
+    client = AnimeClients.GetClient(HTTP_Client_Search, anime_id);
+  } else {
+    client = &SearchClient;
+  }
+  
   return client->Connect(L"myanimelist.net", 
     L"/includes/ajax.inc.php?t=64&id=" + ToWstr(anime_id), 
     L"", L"GET", L"", L"myanimelist.net", L"", 
@@ -99,9 +105,16 @@ bool Login() {
   return false;
 }
 
-bool DownloadImage(int anime_id, const wstring& image_url, class HttpClient* client) {
+bool DownloadImage(int anime_id, const wstring& image_url) {
   if (image_url.empty()) return false;
-  if (!client) client = &ImageClient;
+  
+  HttpClient* client;
+  if (anime_id > anime::ID_UNKNOWN) {
+    client = AnimeClients.GetClient(HTTP_Client_Image, anime_id);
+  } else {
+    client = &ImageClient;
+  }
+  
   return client->Get(win32::Url(image_url), 
     anime::GetImagePath(anime_id), 
     HTTP_MAL_Image, 
@@ -180,8 +193,14 @@ bool ParseSearchResult(const wstring& data, int anime_id) {
   return found_item;
 }
 
-bool SearchAnime(int anime_id, wstring title, class HttpClient* client) {
-  if (!client) client = &SearchClient;
+bool SearchAnime(int anime_id, wstring title) {
+  HttpClient* client;
+  if (anime_id > anime::ID_UNKNOWN) {
+    client = AnimeClients.GetClient(HTTP_Client_Search, anime_id);
+  } else {
+    client = &SearchClient;
+  }
+
   if (title.empty()) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     title = anime_item->GetTitle();

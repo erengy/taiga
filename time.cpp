@@ -193,6 +193,10 @@ wstring ToDateString(time_t seconds) {
   return date;
 }
 
+unsigned int ToDayCount(const Date& date) {
+  return (date.year * 365) + (date.month * 30) + date.day;
+}
+
 wstring ToTimeString(int seconds) {
   int hours = seconds / 3600;
   seconds = seconds % 3600;

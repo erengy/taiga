@@ -56,6 +56,11 @@ enum HttpClientMode {
   HTTP_UpdateDownload
 };
 
+enum HttpClientType {
+  HTTP_Client_Image = 1,
+  HTTP_Client_Search
+};
+
 // =============================================================================
 
 class HttpClient : public win32::Http {
@@ -72,7 +77,21 @@ protected:
   BOOL OnRedirect(wstring address);
 };
 
-extern HttpClient HttpClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
+class HttpClients {
+public:
+  HttpClients();
+  virtual ~HttpClients();
+
+  void Cleanup(bool force);
+  HttpClient* GetClient(int type, int anime_id);
+  void UpdateProxy(const wstring& proxy, const wstring& user, const wstring& pass);
+
+private:
+  std::map<int, std::map<int, HttpClient*>> clients_;
+};
+
+extern HttpClient HttpAnnounceClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
+extern HttpClients AnimeClients;
 
 // =============================================================================
 

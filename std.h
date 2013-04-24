@@ -37,10 +37,10 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
-using std::list;
 using std::string;
 using std::vector;
 using std::wstring;

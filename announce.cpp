@@ -128,7 +128,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 void Announcer::ToHttp(wstring address, wstring data) {
   if (address.empty() || data.empty()) return;
 
-  HttpClient.Post(win32::Url(address), data, L"", HTTP_Silent);
+  HttpAnnounceClient.Post(win32::Url(address), data, L"", HTTP_Silent);
 }
 
 // =============================================================================

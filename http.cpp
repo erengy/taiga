@@ -50,7 +50,8 @@
 #include "win32/win_taskbar.h"
 #include "win32/win_taskdialog.h"
 
-class HttpClient HttpClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
+HttpClient HttpAnnounceClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
+HttpClients AnimeClients;
 
 // =============================================================================
 
@@ -470,7 +471,7 @@ BOOL HttpClient::OnReadComplete() {
           auto anime_item = AnimeDatabase.FindItem(anime_id);
           if (anime_item)
             if (anime_item->GetGenres().empty() || anime_item->GetScore().empty())
-              if (mal::GetAnimeDetails(anime_id, this))
+              if (mal::GetAnimeDetails(anime_id))
                 return TRUE;
         } else {
           status = L"Could not read anime information.";
@@ -668,7 +669,7 @@ BOOL HttpClient::OnReadComplete() {
 
 void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) {
   #define SET_PROXY(client) client.SetProxy(proxy, user, pass);
-  SET_PROXY(HttpClient);
+  SET_PROXY(HttpAnnounceClient);
   SET_PROXY(ImageClient);
   SET_PROXY(MainClient);
   SET_PROXY(SearchClient);
@@ -679,4 +680,62 @@ void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) 
   }
   SET_PROXY(Taiga.Updater.client);
   #undef SET_PROXY
+  AnimeClients.UpdateProxy(proxy, user, pass);
+}
+
+// =============================================================================
+
+HttpClients::HttpClients() {
+  clients_[HTTP_Client_Image];
+  clients_[HTTP_Client_Search];
+}
+
+HttpClients::~HttpClients() {
+  Cleanup(true);
+}
+
+void HttpClients::Cleanup(bool force) {
+  for (auto it = clients_.begin(); it != clients_.end(); ++it) {
+    std::set<int> ids;
+    for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+      if (force || it2->second->GetClientMode() == 0) {
+        ids.insert(it2->first);
+      }
+    }
+    for (auto id = ids.begin(); id != ids.end(); ++id) {
+      delete it->second[*id];
+      it->second.erase(*id);
+    }
+  }
+}
+
+class HttpClient* HttpClients::GetClient(int type, int anime_id) {
+  if (anime_id <= anime::ID_UNKNOWN)
+    return nullptr;
+
+  if (clients_.find(type) == clients_.end())
+    return nullptr;
+
+  auto clients = clients_[type];
+
+  if (clients.find(anime_id) == clients.end()) {
+    clients[anime_id] = new class HttpClient;
+    clients[anime_id]->SetProxy(Settings.Program.Proxy.host,
+                                Settings.Program.Proxy.user,
+                                Settings.Program.Proxy.password);
+#ifdef _DEBUG
+    clients[anime_id]->SetUserAgent(L"Taiga/1.0 (Debug; Type " + ToWstr(type) + 
+                                    L"; ID " + ToWstr(anime_id) + L")");
+#endif
+  }
+
+  return clients[anime_id];
+}
+
+void HttpClients::UpdateProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
+  for (auto it = clients_.begin(); it != clients_.end(); ++it) {
+    for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+      it2->second->SetProxy(proxy, user, pass);
+    }
+  }
 }

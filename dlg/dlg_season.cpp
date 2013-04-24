@@ -85,7 +85,6 @@ BOOL SeasonDialog::OnInitDialog() {
     HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), fMask, fStyle);
 
   // Refresh
-  RefreshData(false);
   RefreshList();
   RefreshStatus();
   RefreshToolbar();
@@ -111,7 +110,7 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Refresh data
     case 101:
-      RefreshData(true);
+      RefreshData();
       return TRUE;
     // Discuss
     case 107:
@@ -174,15 +173,6 @@ LRESULT SeasonDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
   switch (pnmh->code) {
-    // Empty text
-    case LVN_GETEMPTYMARKUP: {
-      auto pnmMarkup = reinterpret_cast<NMLVEMPTYMARKUP*>(lParam);
-      wstring text = L"No season selected. Please choose one from above.";
-      wcsncpy_s(pnmMarkup->szMarkup, text.data(), text.size());
-      pnmMarkup->dwFlags = EMF_CENTERED;
-      return TRUE;
-    }
-
     // Custom draw
     case NM_CUSTOMDRAW: {
       return OnListCustomDraw(lParam);
@@ -229,13 +219,30 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
 
   switch (pCD->nmcd.dwDrawStage) {
     case CDDS_PREPAINT: {
+      // LVN_GETEMPTYMARKUP notification is sent only once, so we paint our own
+      // markup text when the control has no items.
+      if (list_.GetItemCount() == 0) {
+        wstring text;
+        if (SeasonDatabase.items.empty()) {
+          text = L"No season selected. Please choose one from above.";
+        } else {
+          text = L"No matching items for \"" + filter_text + L"\".";
+        }
+        hdc.EditFont(L"Segoe UI", 9, -1, TRUE);
+        hdc.SetBkMode(TRANSPARENT);
+        hdc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+        hdc.DrawText(text.c_str(), text.length(), rect, 
+                     DT_CENTER | DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+      }
       result = CDRF_NOTIFYITEMDRAW;
       break;
     }
+
     case CDDS_ITEMPREPAINT: {
       result = CDRF_NOTIFYPOSTPAINT;
       break;
     }
+
     case CDDS_ITEMPOSTPAINT: {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item) break;
@@ -418,41 +425,22 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
 
 // =============================================================================
 
-void SeasonDialog::RefreshData(bool connect, int anime_id) {
-  size_t size = SeasonDatabase.items.size();
-  
-  if (!anime_id) {
-    for (size_t i = 0; i < size; i++) {
-      if (i < image_clients_.size()) image_clients_.at(i).Cleanup();
-      if (i < info_clients_.size()) info_clients_.at(i).Cleanup();
-    }
-    if (image_clients_.size() != size) image_clients_.resize(size);
-    if (info_clients_.size() != size) info_clients_.resize(size);
-    for (size_t i = 0; i < size; i++) {
-      image_clients_.at(i).SetProxy(Settings.Program.Proxy.host, 
-        Settings.Program.Proxy.user, Settings.Program.Proxy.password);
-      info_clients_.at(i).SetProxy(Settings.Program.Proxy.host, 
-        Settings.Program.Proxy.user, Settings.Program.Proxy.password);
-    }
-  }
-
+void SeasonDialog::RefreshData(int anime_id) {
   for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
-    if (anime_id && anime_id != *id) continue;
+    if (anime_id > 0 && anime_id != *id)
+      continue;
+    
     auto anime_item = AnimeDatabase.FindItem(*id);
-    size_t index = id - SeasonDatabase.items.begin();
+    if (!anime_item)
+      continue;
+    
     // Download missing image
-    if (connect && ImageDatabase.GetImage(*id) == nullptr)
-      mal::DownloadImage(*id, anime_item->GetImageUrl(), &image_clients_.at(index));
+    ImageDatabase.Load(*id, true, true);
+    
     // Get details
-    if (connect)
-      mal::SearchAnime(*id, anime_item->GetTitle(), &info_clients_.at(index));
+    if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty())
+      mal::SearchAnime(*id, anime_item->GetTitle());
   }
-
-  if (connect) {
-    RefreshStatus();
-  }
-
-  list_.RedrawWindow();
 }
 
 void SeasonDialog::RefreshList(bool redraw_only) {

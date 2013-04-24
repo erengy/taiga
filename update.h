@@ -55,7 +55,7 @@ public:
 
 public:
   vector<wstring> actions;
-  class HttpClient client;
+  HttpClient client;
   vector<UpdateFile> files;
   bool restart_app, update_available;
   VersionInfo version_info;

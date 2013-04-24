@@ -21,8 +21,6 @@
 
 #include "../std.h"
 
-#include "../http.h"
-
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
@@ -63,7 +61,7 @@ public:
   LRESULT OnToolbarNotify(LPARAM lParam);
 
 public:
-  void RefreshData(bool connect = true, int anime_id = 0);
+  void RefreshData(int anime_id = 0);
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();
   void RefreshToolbar();
@@ -72,9 +70,6 @@ public:
 public:
   wstring filter_text;
   int group_by, sort_by, view_as;
-
-private:
-  vector<class HttpClient> image_clients_, info_clients_;
 
 private:
   win32::Window cancel_button_;

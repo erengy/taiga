@@ -65,6 +65,7 @@ Date GetDateJapan();
 wstring GetTimeJapan(LPCWSTR lpFormat = L"HH':'mm':'ss");
 
 wstring ToDateString(time_t seconds);
+unsigned int ToDayCount(const Date& date);
 wstring ToTimeString(int seconds);
 
 #endif // TIME_H

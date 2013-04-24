@@ -1,6 +1,6 @@
 /*
 ** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,18 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VERSION_H
-#define VERSION_H
+#ifndef FOREACH_H
+#define FOREACH_H
 
-#define XSTRINGIFY(s) STRINGIFY(s)
-#define STRINGIFY(s) #s
+// iterator
+#define foreach_(item, container) \
+  for (auto item = (container).begin(); item != (container).end(); ++item)
 
-#define VERSION_MAJOR    1
-#define VERSION_MINOR    0
-#define VERSION_REVISION 189
-#define VERSION_BUILD    0
+// reverse iterator
+#define foreach_r_(item, container) \
+  for (auto item = (container).rbegin(); item != (container).rend(); ++item)
 
-#define VERSION_VALUE_DIGITAL VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, VERSION_BUILD
-#define VERSION_VALUE_STRING XSTRINGIFY(VERSION_MAJOR) "." XSTRINGIFY(VERSION_MINOR) "." XSTRINGIFY(VERSION_REVISION) "\0"
+// const iterator
+#define foreach_c_(item, container) \
+  for (auto item = (container).cbegin(); item != (container).cend(); ++item)
 
-#endif // VERSION_H
+// const reverse iterator
+#define foreach_cr_(item, container) \
+  for (auto item = (container).crbegin(); item != (container).crend(); ++item)
+
+#endif // FOREACH_H

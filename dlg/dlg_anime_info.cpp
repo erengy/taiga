@@ -95,10 +95,13 @@ BOOL AnimeDialog::OnInitDialog() {
   }
 
   // Initialize buttons
-  if (mode_ == DIALOG_MODE_NOW_PLAYING) {
-    HideDlgItem(IDOK);
-    HideDlgItem(IDCANCEL);
+  int show = SW_SHOW;
+  if (mode_ == DIALOG_MODE_NOW_PLAYING ||
+      !AnimeDatabase.FindItem(anime_id_)->IsInList()) {
+    show = SW_HIDE;
   }
+  ShowDlgItem(IDOK, show);
+  ShowDlgItem(IDCANCEL, show);
 
   // Refresh
   SetCurrentPage(current_page_);

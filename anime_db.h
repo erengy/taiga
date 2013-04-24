@@ -108,7 +108,7 @@ class FansubDatabase {
   // Saves fansub data to db\fansub.xml.
   void Save();
   
-  list<wstring> items;
+  std::list<wstring> items;
 
  private:
   wstring file_;

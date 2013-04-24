@@ -745,7 +745,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"Season_Load") {
     if (SeasonDatabase.Load(body)) {
       SeasonDatabase.Review();
-      SeasonDialog.RefreshData(false);
       SeasonDialog.RefreshList();
       SeasonDialog.RefreshStatus();
       SeasonDialog.RefreshToolbar();
@@ -761,7 +760,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         dlg.AddButton(L"No", IDNO);
         dlg.Show(g_hMain);
         if (dlg.GetSelectedButtonID() == IDYES)
-          SeasonDialog.RefreshData(true);
+          SeasonDialog.RefreshData();
       }
     }
 
@@ -782,7 +781,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Season_RefreshItemData()
   //   Refreshes an individual season item data.
   } else if (action == L"Season_RefreshItemData") {
-    SeasonDialog.RefreshData(true, static_cast<int>(lParam));
+    SeasonDialog.RefreshData(static_cast<int>(lParam));
 
   // Season_ViewAs(mode)
   //   Changes view mode.

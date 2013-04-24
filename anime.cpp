@@ -25,6 +25,7 @@
 #include "announce.h"
 #include "common.h"
 #include "feed.h"
+#include "foreach.h"
 #include "history.h"
 #include "media.h"
 #include "myanimelist.h"
@@ -325,12 +326,27 @@ bool SetFansubFilter(int anime_id, const wstring& group_name) {
   }
 }
 
-// =============================================================================
-
 wstring GetImagePath(int anime_id) {
   wstring path = Taiga.GetDataPath() + L"db\\image\\";
   if (anime_id > 0) path += ToWstr(anime_id) + L".jpg";
   return path;
+}
+
+void GetUpcomingTitles(vector<int>& anime_ids) {
+  foreach_c_(item, AnimeDatabase.items) {
+    const anime::Item& anime_item = item->second;
+    
+    const Date& date_start = anime_item.GetDate(anime::DATE_START);
+    const Date& date_now = GetDateJapan();
+
+    if (!date_start.year || !date_start.month || !date_start.day)
+      continue;
+
+    if (date_start > date_now &&
+        ToDayCount(date_start) < ToDayCount(date_now) + 7) { // Same week
+      anime_ids.push_back(anime_item.GetId());
+    }
+  }
 }
 
 } // namespace anime

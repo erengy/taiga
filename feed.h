@@ -101,7 +101,7 @@ public:
 public:
   int category, download_index, ticker;
   wstring title, link;
-  class HttpClient client;
+  HttpClient client;
 
 private:
   HICON icon_;

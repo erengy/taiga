@@ -216,6 +216,7 @@
     <ClInclude Include="dlg\dlg_torrent.h" />
     <ClInclude Include="dlg\dlg_feed_filter.h" />
     <ClInclude Include="dlg\dlg_update.h" />
+    <ClInclude Include="foreach.h" />
     <ClInclude Include="gfx.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="http.h" />
