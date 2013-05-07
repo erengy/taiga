@@ -325,8 +325,8 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 void TorrentDialog::EnableInput(bool enable) {
   // Enable/disable toolbar buttons
-  toolbar_.EnableButton(0, enable);
-  toolbar_.EnableButton(2, enable);
+  toolbar_.EnableButton(100, enable);
+  toolbar_.EnableButton(102, enable);
   // Enable/disable list
   list_.Enable(enable);
 }

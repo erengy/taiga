@@ -53,7 +53,7 @@ enum SidebarItems {
   SIDEBAR_ITEM_STATS = 5,
   SIDEBAR_ITEM_SEARCH = 7,
   SIDEBAR_ITEM_SEASONS = 8,
-  SIDEBAR_ITEM_FEEDS = 10
+  SIDEBAR_ITEM_FEEDS = 9
 };
 
 // =============================================================================

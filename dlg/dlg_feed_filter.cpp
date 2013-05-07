@@ -455,9 +455,9 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case LVN_ITEMCHANGED: {
           int index = condition_list.GetNextItem(-1, LVNI_SELECTED);
           int count = condition_list.GetItemCount();
-          condition_toolbar.EnableButton(1, index > -1);
-          condition_toolbar.EnableButton(3, index > 0);
-          condition_toolbar.EnableButton(4, index > -1 && index < count - 1);
+          condition_toolbar.EnableButton(101, index > -1);
+          condition_toolbar.EnableButton(103, index > 0);
+          condition_toolbar.EnableButton(104, index > -1 && index < count - 1);
           break;
         }
         // Key press

@@ -572,7 +572,7 @@ void SeasonDialog::RefreshStatus() {
 }
 
 void SeasonDialog::RefreshToolbar() {
-  toolbar_.EnableButton(1, !SeasonDatabase.items.empty());
+  toolbar_.EnableButton(101, !SeasonDatabase.items.empty());
   
   wstring text = L"Group by: ";
   switch (group_by) {

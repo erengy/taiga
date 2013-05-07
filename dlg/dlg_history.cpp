@@ -17,7 +17,6 @@
 */
 
 #include "../std.h"
-#include <algorithm>
 
 #include "dlg_anime_list.h"
 #include "dlg_history.h"
@@ -25,6 +24,7 @@
 
 #include "../anime_db.h"
 #include "../common.h"
+#include "../foreach.h"
 #include "../gfx.h"
 #include "../history.h"
 #include "../myanimelist.h"
@@ -40,6 +40,7 @@ class HistoryDialog HistoryDialog;
 BOOL HistoryDialog::OnInitDialog() {
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_EVENT));
+  list_.EnableGroupView(true);
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetTheme();
   
@@ -48,6 +49,10 @@ BOOL HistoryDialog::OnInitDialog() {
   list_.InsertColumn(1, 325, 325, LVCFMT_LEFT, L"Details");
   list_.InsertColumn(2, 120, 120, LVCFMT_LEFT, L"Last modified");
   list_.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
+
+  // Insert list groups
+  list_.InsertGroup(0, L"Queued for update");
+  list_.InsertGroup(1, L"Recently watched");
   
   // Refresh list
   RefreshList();
@@ -130,10 +135,10 @@ void HistoryDialog::RefreshList() {
   // Clear list
   list_.DeleteAllItems();
   
-  // Add items
-  for (auto it = History.queue.items.begin(); it != History.queue.items.end(); ++it) {
+  // Add queued items
+  foreach_cr_(it, History.queue.items) {
     int i = list_.GetItemCount();
-    list_.InsertItem(i, -1, -1, 0, nullptr, 
+    list_.InsertItem(i, 0, -1, 0, nullptr, 
       AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(), 
       static_cast<LPARAM>(it->anime_id));
     wstring details;
@@ -159,9 +164,24 @@ void HistoryDialog::RefreshList() {
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }
+
+  // Add recently watched
+  foreach_cr_(it, History.items) {
+    int i = list_.GetItemCount();
+    list_.InsertItem(i, 1, -1, 0, nullptr,
+      AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
+      static_cast<LPARAM>(it->anime_id));
+    wstring details;
+    AppendString(details, L"Episode: " + mal::TranslateNumber(*it->episode));
+    list_.SetItem(i, 1, details.c_str());
+    list_.SetItem(i, 2, it->time.c_str());
+  }
 }
 
 bool HistoryDialog::MoveItems(int pos) {
+  // TODO: Re-enable
+  return false;
+
   if (History.queue.updating) {
     MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;
@@ -192,6 +212,9 @@ bool HistoryDialog::MoveItems(int pos) {
 }
 
 bool HistoryDialog::RemoveItems() {
+  // TODO: Re-enable
+  return false;
+
   if (History.queue.updating) {
     MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;

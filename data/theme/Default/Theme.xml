@@ -78,7 +78,7 @@
 		
 		<!-- Account -->
 		<menu name="Account">
-			<item name="Synchronize lists" action="Synchronize()"/>
+			<item name="Synchronize list" action="Synchronize()"/>
 			<item type="separator"/>
 			<item name="MyAnimeList" sub="MyAnimeList"/>
 		</menu>
@@ -131,7 +131,7 @@
 			<item name="Statistics"  action="ViewContent(5)" radio="1"/>
 			<item name="Search"      action="ViewContent(7)" radio="1"/>
 			<item name="Seasons"     action="ViewContent(8)" radio="1"/>
-			<item name="Torrents"    action="ViewContent(10)" radio="1"/>
+			<item name="Torrents"    action="ViewContent(9)" radio="1"/>
 			<item type="separator"/>
 			<item name="Show sidebar" action="ShowSidebar()" checked="1"/>
 		</menu>

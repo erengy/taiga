@@ -76,6 +76,7 @@ public:
 
   vector<EventItem> items;
   EventQueue queue;
+  int limit;
 };
 
 extern class History History;

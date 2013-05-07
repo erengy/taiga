@@ -176,7 +176,6 @@ void MainDialog::CreateDialogControls() {
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Search", ICON16_SEARCH, SIDEBAR_ITEM_SEARCH, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Seasons", ICON16_CALENDAR, SIDEBAR_ITEM_SEASONS, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Torrents", ICON16_FEED, SIDEBAR_ITEM_FEEDS, nullptr));
   if (History.queue.GetItemCount() > 0) {
     treeview.RefreshHistoryCounter();
@@ -402,16 +401,19 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
 
     // Forward mouse wheel messages to the active page
     case WM_MOUSEWHEEL: {
+      // Ignoring the low-order word of wParam to avoid falling into an infinite
+      // message-forwarding loop
+      WPARAM wParam = MAKEWPARAM(0, HIWORD(pMsg->wParam));
       switch (navigation.GetCurrentPage()) {
         case SIDEBAR_ITEM_ANIMELIST:
           return AnimeListDialog.SendMessage(
-            pMsg->message, pMsg->wParam, pMsg->lParam);
+            pMsg->message, wParam, pMsg->lParam);
         case SIDEBAR_ITEM_SEASONS:
           return SeasonDialog.SendMessage(
-            pMsg->message, pMsg->wParam, pMsg->lParam);
+            pMsg->message, wParam, pMsg->lParam);
         case SIDEBAR_ITEM_FEEDS:
           return TorrentDialog.SendMessage(
-            pMsg->message, pMsg->wParam, pMsg->lParam);
+            pMsg->message, wParam, pMsg->lParam);
       }
       break;
     }
@@ -814,7 +816,7 @@ void MainDialog::ChangeStatus(wstring str) {
 
 void MainDialog::EnableInput(bool enable) {
   // Toolbar buttons
-  toolbar_main.EnableButton(3, enable);
+  toolbar_main.EnableButton(TOOLBAR_BUTTON_SYNCHRONIZE, enable);
   // Content
   AnimeListDialog.Enable(enable);
   HistoryDialog.Enable(enable);
@@ -822,7 +824,7 @@ void MainDialog::EnableInput(bool enable) {
 
 void MainDialog::EnableSharing(bool enable) {
   // Toolbar buttons
-  toolbar_main.EnableButton(7, enable);
+  toolbar_main.EnableButton(TOOLBAR_BUTTON_SHARE, enable);
 }
 
 void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wstring url) {
@@ -1013,6 +1015,6 @@ void MainDialog::Navigation::Refresh(bool add_to_history) {
   bool enable_back = index_ > 0;
   bool enable_forward = index_ < items_.size() - 1;
 
-  parent->toolbar_main.EnableButton(0, enable_back);
-  parent->toolbar_main.EnableButton(1, enable_forward);
+  parent->toolbar_main.EnableButton(TOOLBAR_BUTTON_GOBACK, enable_back);
+  parent->toolbar_main.EnableButton(TOOLBAR_BUTTON_GOFORWARD, enable_forward);
 }

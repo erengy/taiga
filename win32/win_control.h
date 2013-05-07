@@ -317,7 +317,7 @@ public:
   Toolbar(HWND hWnd) { SetWindowHandle(hWnd); }
   virtual ~Toolbar() {}
 
-  BOOL    EnableButton(int nIndex, bool bEnabled);
+  BOOL    EnableButton(int idCommand, bool bEnabled);
   int     GetHeight();
   BOOL    GetButton(int nIndex, TBBUTTON& tbb);
   int     GetButtonCount();

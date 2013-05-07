@@ -38,12 +38,12 @@ void Toolbar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
 // =============================================================================
 
-BOOL Toolbar::EnableButton(int nIndex, bool bEnabled) {
+BOOL Toolbar::EnableButton(int idCommand, bool bEnabled) {
   TBBUTTONINFO tbbi = {0};
   tbbi.cbSize  = sizeof(TBBUTTONINFO);
-  tbbi.dwMask  = TBIF_BYINDEX | TBIF_STATE;
+  tbbi.dwMask  = TBIF_STATE;
   tbbi.fsState = bEnabled ? TBSTATE_ENABLED : TBSTATE_INDETERMINATE;
-  return ::SendMessage(m_hWindow, TB_SETBUTTONINFO, nIndex, reinterpret_cast<LPARAM>(&tbbi));
+  return ::SendMessage(m_hWindow, TB_SETBUTTONINFO, idCommand, reinterpret_cast<LPARAM>(&tbbi));
 }
 
 int Toolbar::GetHeight() {

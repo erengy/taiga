@@ -296,7 +296,7 @@ void EventQueue::Remove(int index, bool save, bool refresh) {
     
     if (event_item->episode) {
       history->items.push_back(*event_item);
-      if (history->items.size() > 10) { // Limited to 10 items
+      if (history->limit > 0 && history->items.size() > history->limit) {
         history->items.erase(history->items.begin());
       }
     }
@@ -335,7 +335,8 @@ void EventQueue::RemoveDisabled(bool save, bool refresh) {
 
 // =============================================================================
 
-History::History() {
+History::History()
+    : limit(100) { // Limit of history items
   queue.history = this;
 }
 
