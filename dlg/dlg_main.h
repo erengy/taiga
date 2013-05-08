@@ -20,6 +20,9 @@
 #define DLG_MAIN_H
 
 #include "../std.h"
+
+#include "../anime_filter.h"
+
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 #include "../win32/win_gdi.h"
@@ -40,9 +43,9 @@ enum MainToolbarButtons {
 };
 
 enum SearchMode {
+  SEARCH_MODE_NONE,
   SEARCH_MODE_MAL,
-  SEARCH_MODE_TORRENT,
-  SEARCH_MODE_WEB
+  SEARCH_MODE_FEED
 };
 
 enum SidebarItems {
@@ -85,6 +88,7 @@ public:
   void UpdateControlPositions(const SIZE* size = nullptr);
   void UpdateStatusTimer();
   void UpdateTip();
+  void UpdateTitle();
 
   class Navigation {
   public:
@@ -144,12 +148,10 @@ public:
   // Search bar
   class SearchBar {
   public:
-    SearchBar() : filter_content(true), index(2), mode(SEARCH_MODE_MAL) {}
-    bool filter_content;
-    UINT index, mode;
-    wstring cue_text, url;
+    SearchBar() : mode(SEARCH_MODE_NONE) {}
+    int mode;
     MainDialog* parent;
-    void SetMode(UINT index, UINT mode, wstring cue_text = L"Search", wstring url = L"");
+    anime::Filters filters;
   } search_bar;
 
 private:

@@ -90,14 +90,10 @@ BOOL MainDialog::OnInitDialog() {
   
   // Add icon to taskbar
   Taskbar.Create(g_hMain, nullptr, APP_TITLE);
-  UpdateTip();
-  
-  // Change status
+
   ChangeStatus();
-  
-  // Set search bar mode
-  //search_bar.Index = Settings.Program.General.SearchIndex;
-  search_bar.SetMode(2, SEARCH_MODE_MAL, L"Search MyAnimeList");
+  UpdateTip();
+  UpdateTitle();
   
   // Refresh menus
   UpdateAllMenus();
@@ -148,7 +144,7 @@ void MainDialog::CreateDialogControls() {
   edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   edit.SetCueBannerText(L"Search list");
   edit.SetParent(toolbar_search.GetWindowHandle());
-  edit.SetPosition(nullptr, ScaleX(32), 1, 200, 20);
+  edit.SetPosition(nullptr, 0, 1, 200, 20);
   edit.SetMargins(1, 16);
   win32::Rect rcEdit; edit.GetRect(&rcEdit);
   // Create cancel search button
@@ -216,7 +212,7 @@ void MainDialog::CreateDialogControls() {
                             1, fsStyle1, 12, nullptr, L"Debug");
 #endif
   // Insert search toolbar button
-  toolbar_search.InsertButton(0, ICON16_SEARCH, TOOLBAR_BUTTON_SEARCH, 1, fsStyle2, 0, nullptr, L"Search");
+  //toolbar_search.InsertButton(0, ICON16_SEARCH, TOOLBAR_BUTTON_SEARCH, 1, fsStyle2, 0, nullptr, L"Search");
 
   // Insert rebar bands
   UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_HEADERSIZE | RBBIM_SIZE | RBBIM_STYLE;
@@ -232,7 +228,7 @@ void MainDialog::CreateDialogControls() {
     HIWORD(toolbar_main.GetButtonSize()) + 2, 
     fMask, fStyle | RBBS_BREAK);
   rebar.InsertBand(toolbar_search.GetWindowHandle(), 
-    0, WIN_CONTROL_MARGIN, 0, 240, 0, 0, 0, 
+    0, WIN_CONTROL_MARGIN, 0, 208, 0, 0, 0, 
     HIWORD(toolbar_search.GetButtonSize()), 
     fMask, fStyle);
 }
@@ -373,23 +369,16 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                 }
                 break;
               }
-              case SEARCH_MODE_TORRENT: {
+              case SEARCH_MODE_FEED: {
                 Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
                 if (feed) {
-                  wstring search_url = search_bar.url;
+                  wstring search_url = Settings.RSS.Torrent.search_url;
                   Replace(search_url, L"%search%", text);
-                  navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
                   ChangeStatus(L"Searching torrents for \"" + text + L"\"...");
                   feed->Check(search_url);
                   return TRUE;
                 }
                 break;
-              }
-              case SEARCH_MODE_WEB: {
-                wstring search_url = search_bar.url;
-                Replace(search_url, L"%search%", text);
-                ExecuteLink(search_url);
-                return TRUE;
               }
             }
             break;
@@ -407,6 +396,12 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
       switch (navigation.GetCurrentPage()) {
         case SIDEBAR_ITEM_ANIMELIST:
           return AnimeListDialog.SendMessage(
+            pMsg->message, wParam, pMsg->lParam);
+        case SIDEBAR_ITEM_HISTORY:
+          return HistoryDialog.SendMessage(
+            pMsg->message, wParam, pMsg->lParam);
+        case SIDEBAR_ITEM_SEARCH:
+          return SearchDialog.SendMessage(
             pMsg->message, wParam, pMsg->lParam);
         case SIDEBAR_ITEM_SEASONS:
           return SeasonDialog.SendMessage(
@@ -801,15 +796,6 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
 // =============================================================================
 
 void MainDialog::ChangeStatus(wstring str) {
-  // Change status text
-  if (str.empty() && CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
-    auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
-    str = L"Watching: " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
-    if (Settings.Account.Update.out_of_range && 
-      GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
-        str += L" (out of range)";
-    }
-  }
   if (!str.empty()) str = L"  " + str;
   statusbar.SetText(str.c_str());
 }
@@ -825,15 +811,6 @@ void MainDialog::EnableInput(bool enable) {
 void MainDialog::EnableSharing(bool enable) {
   // Toolbar buttons
   toolbar_main.EnableButton(TOOLBAR_BUTTON_SHARE, enable);
-}
-
-void MainDialog::SearchBar::SetMode(UINT index, UINT mode, wstring cue_text, wstring url) {
-  this->index = index;
-  this->mode = mode;
-  this->url = url;
-  this->cue_text = cue_text;
-  parent->edit.SetCueBannerText(cue_text.c_str());
-  Settings.Program.General.search_index = index;
 }
 
 void MainDialog::UpdateControlPositions(const SIZE* size) {
@@ -909,12 +886,28 @@ void MainDialog::UpdateTip() {
   if (Taiga.logged_in) {
     tip += L"\n" + AnimeDatabase.user.GetName() + L" is logged in.";
   }
-  if (CurrentEpisode.anime_id > 0) {
+  if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     tip += L"\nWatching: " + anime_item->GetTitle() + 
       (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
   }
   Taskbar.Modify(tip.c_str());
+}
+
+void MainDialog::UpdateTitle() {
+  wstring title = APP_TITLE;
+  if (!Settings.Account.MAL.user.empty()) {
+    title += L" \u2013 " + Settings.Account.MAL.user;
+  }
+  if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
+    auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+    title += L" \u2013 " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
+    if (Settings.Account.Update.out_of_range && 
+        GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
+      title += L" (out of range)";
+    }
+  }
+  SetText(title);
 }
 
 // =============================================================================
@@ -927,21 +920,31 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   if (page == current_page_)
     return;
   
-  if (parent->search_bar.filter_content) {
-    wstring filter_text;
-    parent->edit.GetText(filter_text);
-    parent->edit.SetText(L"");
-    switch (current_page_) {
-      case SIDEBAR_ITEM_ANIMELIST:
-        AnimeFilters.text = filter_text;
-        break;
-      case SIDEBAR_ITEM_SEASONS:
-        SeasonDialog.filter_text = filter_text;
-        break;
-    }
-  }
-
   current_page_ = page;
+
+  wstring cue_text;
+  switch (current_page_) {
+    case SIDEBAR_ITEM_ANIMELIST:
+    case SIDEBAR_ITEM_SEASONS:
+      parent->search_bar.mode = SEARCH_MODE_NONE;
+      cue_text = L"Filter list";
+      break;
+    case SIDEBAR_ITEM_DASHBOARD:
+    case SIDEBAR_ITEM_NOWPLAYING:
+    case SIDEBAR_ITEM_HISTORY:
+    case SIDEBAR_ITEM_STATS:
+    case SIDEBAR_ITEM_SEARCH:
+      parent->search_bar.mode = SEARCH_MODE_MAL;
+      cue_text = L"Search MyAnimeList";
+      break;
+    case SIDEBAR_ITEM_FEEDS:
+      parent->search_bar.mode = SEARCH_MODE_FEED;
+      cue_text = L"Search torrents";
+      break;
+  }
+  parent->edit.SetCueBannerText(cue_text.c_str());
+  parent->search_bar.filters.text.clear();
+  parent->edit.SetText(L"");
 
   AnimeListDialog.Hide();
   HistoryDialog.Hide();
@@ -972,20 +975,6 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
 
   UpdateViewMenu();
   Refresh(add_to_history);
-
-  if (parent->search_bar.filter_content) {
-    switch (current_page_) {
-      case SIDEBAR_ITEM_ANIMELIST:
-        parent->edit.SetText(AnimeFilters.text);
-        break;
-      case SIDEBAR_ITEM_SEARCH:
-        parent->edit.SetText(SearchDialog.search_text);
-        break;
-      case SIDEBAR_ITEM_SEASONS:
-        parent->edit.SetText(SeasonDialog.filter_text);
-        break;
-    }
-  }
 }
 
 void MainDialog::Navigation::GoBack() {

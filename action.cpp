@@ -176,43 +176,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       ActivateWindow(RecognitionTest.GetWindowHandle());
     }
 
-  // SetSearchMode()
-  //   Changes search bar mode.
-  //   Body text has 4 parameters: Menu index, search mode, cue text, search URL
-  } else if (action == L"SetSearchMode") {
-    vector<wstring> body_vector;
-    Split(body, L", ", body_vector);
-    if (body_vector.size() > 2) {
-      if (body_vector[1] == L"MAL") {
-        MainDialog.search_bar.SetMode(
-          ToInt(body_vector[0]), SEARCH_MODE_MAL, body_vector[2]);
-      } else if (body_vector[1] == L"Torrent" && body_vector.size() > 3) {
-        MainDialog.search_bar.SetMode(
-          ToInt(body_vector[0]), SEARCH_MODE_TORRENT, body_vector[2], body_vector[3]);
-      } else if (body_vector[1] == L"Web" && body_vector.size() > 3) {
-        MainDialog.search_bar.SetMode(
-          ToInt(body_vector[0]), SEARCH_MODE_WEB, body_vector[2], body_vector[3]);
-      }
-    }
-
-  // ToggleListSearch()
-  //   Enables or disables list filtering for search bar.
-  } else if (action == L"ToggleListSearch") {
-    wstring filter_text;
-    MainDialog.search_bar.filter_content = !MainDialog.search_bar.filter_content;
-    if (MainDialog.search_bar.filter_content) MainDialog.edit.GetText(filter_text);
-    switch (MainDialog.navigation.GetCurrentPage()) {
-      case SIDEBAR_ITEM_ANIMELIST:
-        AnimeFilters.text = filter_text;
-        AnimeListDialog.RefreshList();
-        AnimeListDialog.RefreshTabs();
-        break;
-      case SIDEBAR_ITEM_SEASONS:
-        SeasonDialog.filter_text = filter_text;
-        SeasonDialog.RefreshList();
-        break;
-    }
-
   // Settings()
   //   Shows settings window.
   //   lParam is the initial page number.
@@ -252,6 +215,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       anime::Episode episode;
       episode.anime_id = AnimeDatabase.GetCurrentId();
       MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+      MainDialog.edit.SetText(AnimeDatabase.GetCurrentItem()->GetTitle());
       MainDialog.ChangeStatus(L"Searching torrents for \"" + 
         AnimeDatabase.GetCurrentItem()->GetTitle() + L"\"...");
       feed->Check(ReplaceVariables(body, episode));
@@ -431,36 +395,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // ===========================================================================
 
-  // FilterReset()
-  //   Resets list filters to their default values.
-  } else if (action == L"FilterReset") {
-    AnimeFilters.Reset();
-    if (!MainDialog.edit.SetText(L"")) {
-      AnimeListDialog.RefreshList();
-    }
-
-  // FilterStatus(value)
-  //   Filters list by status.
-  //   Value must be between 1-3.
-  } else if (action == L"FilterStatus") {
-    int index = ToInt(body) - 1;
-    if (index > -1 && index < 3) {
-      AnimeFilters.status[index] = !AnimeFilters.status[index];
-      AnimeListDialog.RefreshList();
-    }
-  
-  // FilterType(value)
-  //   Filters list by type.
-  //   Value must be between 1-6.
-  } else if (action == L"FilterType") {
-    int index = ToInt(body) - 1;
-    if (index > -1 && index < 6) {
-      AnimeFilters.type[index] = !AnimeFilters.type[index];
-      AnimeListDialog.RefreshList();
-    }
-
-  // ===========================================================================
-
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
   } else if (action == L"AnnounceToHTTP") {
@@ -493,6 +427,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Shows a dialog to edit details of an anime.
   } else if (action == L"EditAll") {
     int anime_id = body.empty() ? AnimeDatabase.GetCurrentId() : ToInt(body);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (!anime_item || !anime_item->IsInList()) return;
     AnimeDialog.SetCurrentId(anime_id);
     AnimeDialog.SetCurrentPage(INFOPAGE_MYINFO);
     if (!AnimeDialog.IsWindow()) {
@@ -653,6 +589,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Searches for anime folder and opens it.
   } else if (action == L"OpenFolder") {
     auto anime_item = AnimeDatabase.GetCurrentItem();
+    if (!anime_item || !anime_item->IsInList()) return;
     if (anime_item->GetFolder().empty()) {
       MainDialog.ChangeStatus(L"Searching for folder...");
       if (anime_item->CheckFolder()) {

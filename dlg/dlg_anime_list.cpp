@@ -693,19 +693,12 @@ int AnimeListDialog::GetListIndex(int anime_id) {
 
 void AnimeListDialog::RefreshList(int index) {
   if (!IsWindow()) return;
-
-  // Change window title
-  wstring title = APP_TITLE;
-  if (!Settings.Account.MAL.user.empty()) {
-    title += L" \u2013 " + Settings.Account.MAL.user;
-  }
-  MainDialog.SetText(title.c_str());
   
   // Remember last index
   static int last_index = 1;
   if (index > 0) last_index = index;
   if (index == -1) index = last_index;
-  if (!AnimeFilters.text.empty()) index = 0;
+  if (!MainDialog.search_bar.filters.text.empty()) index = 0;
 
   // Hide list to avoid visual defects and gain performance
   listview.Hide();
@@ -718,7 +711,8 @@ void AnimeListDialog::RefreshList(int index) {
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
     status = it->second.GetMyStatus();
     if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->second.GetMyRewatching())) {
-      if (AnimeFilters.CheckItem(it->second)) {
+      if (MainDialog.search_bar.filters.CheckItem(it->second) &&
+          (!Settings.Program.List.new_episodes || it->second.IsNewEpisodeAvailable())) {
         group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
         icon_index = it->second.GetPlaying() ? ICON16_PLAY : StatusToIcon(it->second.GetAiringStatus());
         group_count.at(status)++;
@@ -767,7 +761,7 @@ void AnimeListDialog::RefreshTabs(int index, bool redraw) {
   if (index == last_index) redraw = false;
   if (index > 0) last_index = index;
   if (index == -1) index = last_index;
-  if (!AnimeFilters.text.empty()) index = 0;
+  if (!MainDialog.search_bar.filters.text.empty()) index = 0;
   
   if (!redraw) return;
   

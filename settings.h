@@ -132,7 +132,6 @@ public:
     class General {
     public:
       BOOL auto_start, close, minimize;
-      int search_index;
       wstring theme;
     } General;
     // Position
@@ -162,6 +161,7 @@ public:
       int double_click, middle_click;
       BOOL english_titles;
       BOOL highlight;
+      BOOL new_episodes;
       int progress_mode;
       BOOL progress_show_eps;
     } List;
@@ -192,7 +192,7 @@ public:
     public:
       BOOL check_enabled, create_folder, hide_unidentified, set_folder;
       int app_mode, check_interval, new_action;
-      wstring app_path, download_path, source;
+      wstring app_path, download_path, search_url, source;
       class Filters {
       public:
         BOOL global_enabled;

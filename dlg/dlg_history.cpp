@@ -59,6 +59,18 @@ BOOL HistoryDialog::OnInitDialog() {
   return TRUE;
 }
 
+INT_PTR HistoryDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    // Forward mouse wheel messages to the list
+    case WM_MOUSEWHEEL: {
+      return list_.SendMessage(uMsg, wParam, lParam);
+    }
+  }
+  
+  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+
 LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   if (pnmh->hwndFrom == list_.GetWindowHandle()) {
     switch (pnmh->code) {
@@ -133,6 +145,7 @@ void HistoryDialog::RefreshList() {
   if (!IsWindow()) return;
   
   // Clear list
+  list_.Hide();
   list_.DeleteAllItems();
   
   // Add queued items
@@ -176,6 +189,8 @@ void HistoryDialog::RefreshList() {
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }
+
+  list_.Show();
 }
 
 bool HistoryDialog::MoveItems(int pos) {

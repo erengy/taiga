@@ -90,9 +90,9 @@ void Item::StartWatching(Episode episode) {
   }
 
   // Update main window
-  MainDialog.ChangeStatus();
   MainDialog.EnableSharing();
   MainDialog.UpdateTip();
+  MainDialog.UpdateTitle();
   MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
   
   // Show balloon tip
@@ -144,9 +144,9 @@ void Item::EndWatching(Episode episode) {
   
   // Update main window
   episode.anime_id = anime::ID_UNKNOWN;
-  MainDialog.ChangeStatus();
   MainDialog.EnableSharing(false);
   MainDialog.UpdateTip();
+  MainDialog.UpdateTitle();
   int list_index = AnimeListDialog.GetListIndex(GetId());
   if (list_index > -1) {
     AnimeListDialog.listview.SetItemIcon(list_index, StatusToIcon(GetAiringStatus()));

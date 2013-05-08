@@ -197,7 +197,7 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_MDLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.Program.List.middle_click);
-      CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, AnimeFilters.new_episodes);
+      CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, Settings.Program.List.new_episodes);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.highlight);
       CheckDlgButton(IDC_RADIO_LIST_PROGRESS1 + Settings.Program.List.progress_mode, TRUE);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.progress_show_eps);

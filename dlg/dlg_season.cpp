@@ -226,7 +226,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         if (SeasonDatabase.items.empty()) {
           text = L"No season selected. Please choose one from above.";
         } else {
-          text = L"No matching items for \"" + filter_text + L"\".";
+          text = L"No matching items for \"" + MainDialog.search_bar.filters.text + L"\".";
         }
         hdc.EditFont(L"Segoe UI", 9, -1, TRUE);
         hdc.SetBkMode(TRANSPARENT);
@@ -484,7 +484,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 
   // Filter
   vector<wstring> filters;
-  Split(filter_text, L" ", filters);
+  Split(MainDialog.search_bar.filters.text, L" ", filters);
   RemoveEmptyStrings(filters);
 
   // Add items

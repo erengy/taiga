@@ -217,7 +217,7 @@ void SettingsDialog::OnOK() {
   // Program > List
   Settings.Program.List.double_click = pages[PAGE_LIST].GetComboSelection(IDC_COMBO_DBLCLICK);
   Settings.Program.List.middle_click = pages[PAGE_LIST].GetComboSelection(IDC_COMBO_MDLCLICK);
-  AnimeFilters.new_episodes = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS) == TRUE;
+  Settings.Program.List.new_episodes = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS) == TRUE;
   Settings.Program.List.highlight = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
   Settings.Program.List.progress_mode = pages[PAGE_LIST].GetCheckedRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2);
   Settings.Program.List.progress_show_eps = pages[PAGE_LIST].IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
@@ -282,6 +282,7 @@ void SettingsDialog::OnOK() {
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     MainDialog.treeview.RefreshHistoryCounter();
+    MainDialog.UpdateTitle();
     AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);

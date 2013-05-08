@@ -23,14 +23,11 @@
 
 #include "string.h"
 
-anime::Filters AnimeFilters;
-
 namespace anime {
 
 // =============================================================================
 
-Filters::Filters()
-    : new_episodes(false) {
+Filters::Filters() {
   Reset();
 }
 
@@ -49,10 +46,6 @@ bool Filters::CheckItem(Item& item) {
   for (size_t i = 0; i < type.size(); i++)
     if (!type.at(i) && item.GetType() == i + 1)
       return false;
-
-  // Filter new episodes
-  if (new_episodes && !item.IsNewEpisodeAvailable())
-    return false;
 
   // Filter text
   vector<wstring> words;
@@ -87,7 +80,6 @@ void Filters::Reset() {
   status.resize(3, true);
   type.resize(6, true);
 
-  new_episodes = false;
   text = L"";
 }
 

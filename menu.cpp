@@ -125,23 +125,6 @@ void UpdateAnnounceMenu() {
   }
 }
 
-void UpdateFilterMenu() {
-  // Filter > Status
-  int menu_index = UI.Menus.GetIndex(L"FilterStatus");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = AnimeFilters.status[i] == TRUE;
-    }
-  }
-  // Filter > Type
-  menu_index = UI.Menus.GetIndex(L"FilterType");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = AnimeFilters.type[i] == TRUE;
-    }
-  }
-}
-
 void UpdateFoldersMenu() {
   int menu_index = UI.Menus.GetIndex(L"Folders");
   if (menu_index > -1) {
@@ -165,13 +148,13 @@ void UpdateFoldersMenu() {
 void UpdateSearchMenu() {
   int menu_index = UI.Menus.GetIndex(L"SearchBar");
   if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+    /*for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       MENU.Items[i].Checked = false;
     }
     MENU.Items[0].Checked = MainDialog.search_bar.filter_content;
     if (MainDialog.search_bar.index < MENU.Items.size()) {
       MENU.Items[MainDialog.search_bar.index].Checked = true;
-    }
+    }*/
   }
 }
 
@@ -293,7 +276,6 @@ void UpdateViewMenu() {
 void UpdateAllMenus(anime::Item* anime_item) {
   UpdateAnimeMenu(anime_item);
   UpdateAnnounceMenu();
-  UpdateFilterMenu();
   UpdateFoldersMenu();
   UpdateSearchMenu();
   UpdateToolsMenu();

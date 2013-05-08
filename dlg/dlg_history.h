@@ -30,6 +30,7 @@ public:
   HistoryDialog() {}
   virtual ~HistoryDialog() {}
 
+  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);

@@ -148,13 +148,7 @@
 		</menu>
 		
 		<!-- Search bar -->
-		<menu name="SearchBar">
-			<item name="Filter current page" action="ToggleListSearch()"/>
-			<item type="separator"/>
-			<item name="Search MyAnimeList"  action="SetSearchMode(2, MAL, Search MyAnimeList)" radio="1"/>
-			<item name="Search NyaaTorrents" action="SetSearchMode(3, Torrent, Search NyaaTorrents, http://www.nyaa.eu/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%search%)" radio="1"/>
-			<item name="Search TokyoTosho"   action="SetSearchMode(4, Torrent, Search TokyoTosho, http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%search%&amp;_id=7b99f981c5b1f02354642f4e271cca43&amp;_render=rss)" radio="1"/>
-		</menu>
+		<menu name="SearchBar"/>
 		
 		<!-- Search list -->
 		<menu name="SearchList">

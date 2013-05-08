@@ -39,6 +39,7 @@
 #define DEFAULT_FORMAT_TWITTER   L"$ifequal(%episode%,%total%,Just completed: %title%$if(%score%, (Score: %score%/10)) www.myanimelist.net/anime/%id%)"
 #define DEFAULT_FORMAT_BALLOON   L"$if(%title%,Title: \\t%title%)\\n$if(%name%,Name: \\t%name%)\\n$if(%episode%,Episode: \\t%episode%$if(%total%,/%total%))\\n$if(%group%,Group: \\t%group%)\\n$if(%resolution%,Res.: \\t%resolution%)\\n$if(%video%,Video: \\t%video%)\\n$if(%audio%,Audio: \\t%audio%)\\n$if(%extra%,Extra: \\t%extra%)"
 #define DEFAULT_TORRENT_APPPATH  L"C:\\Program Files\\uTorrent\\uTorrent.exe"
+#define DEFAULT_TORRENT_SEARCH   L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%search%"
 #define DEFAULT_TORRENT_SOURCE   L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0"
 
 class Settings Settings;
@@ -134,7 +135,6 @@ bool Settings::Load() {
     Program.General.auto_start = general.attribute(L"autostart").as_int();
     Program.General.close = general.attribute(L"close").as_int();
     Program.General.minimize = general.attribute(L"minimize").as_int();
-    Program.General.search_index = general.attribute(L"searchindex").as_int();
     Program.General.theme = general.attribute(L"theme").as_string(L"Default");
     // Position
     xml_node position = program.child(L"position");
@@ -164,16 +164,8 @@ bool Settings::Load() {
     Program.List.double_click = list.child(L"action").attribute(L"doubleclick").as_int(4);
     Program.List.middle_click = list.child(L"action").attribute(L"middleclick").as_int(3);
     Program.List.english_titles = list.child(L"action").attribute(L"englishtitles").as_bool();
-    for (int i = 0; i < 3; i++) {
-      wstring name = L"s" + ToWstr(i + 1);
-      AnimeFilters.status[i] = list.child(L"filter").child(L"status").attribute(name.c_str()).as_bool(true);
-    }
-    for (int i = 0; i < 6; i++) {
-      wstring name = L"t" + ToWstr(i + 1);
-      AnimeFilters.type[i] = list.child(L"filter").child(L"type").attribute(name.c_str()).as_bool(true);
-    }
     Program.List.highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
-    AnimeFilters.new_episodes = list.child(L"filter").child(L"episodes").attribute(L"new").as_bool();
+    Program.List.new_episodes = list.child(L"filter").child(L"episodes").attribute(L"new").as_bool();
     Program.List.progress_mode = list.child(L"progress").attribute(L"mode").as_int(1);
     Program.List.progress_show_eps = list.child(L"progress").attribute(L"showeps").as_int();
     // Notifications
@@ -208,6 +200,7 @@ bool Settings::Load() {
       RSS.Torrent.hide_unidentified = torrent.child(L"options").attribute(L"hideunidentified").as_int(FALSE);
       RSS.Torrent.new_action = torrent.child(L"options").attribute(L"newaction").as_int(1);
       RSS.Torrent.set_folder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
+      RSS.Torrent.search_url = torrent.child(L"search").attribute(L"address").as_string(DEFAULT_TORRENT_SEARCH);
       RSS.Torrent.source = torrent.child(L"source").attribute(L"address").as_string(DEFAULT_TORRENT_SOURCE);
       // Filters
       xml_node filter = torrent.child(L"filter");
@@ -330,7 +323,6 @@ bool Settings::Save() {
     general.append_attribute(L"autostart") = Program.General.auto_start;
     general.append_attribute(L"close") = Program.General.close;
     general.append_attribute(L"minimize") = Program.General.minimize;
-    general.append_attribute(L"searchindex") = Program.General.search_index;
     general.append_attribute(L"theme") = Program.General.theme.c_str();
     // Position
     xml_node position = program.append_child(L"position");
@@ -363,20 +355,9 @@ bool Settings::Save() {
       action.append_attribute(L"englishtitles") = Program.List.english_titles;
       // Filter
       xml_node filter = list.append_child(L"filter");
-      filter.append_child(L"status");
-      filter.child(L"status").append_attribute(L"s1") = AnimeFilters.status[0];
-      filter.child(L"status").append_attribute(L"s2") = AnimeFilters.status[1];
-      filter.child(L"status").append_attribute(L"s3") = AnimeFilters.status[2];
-      filter.append_child(L"type");
-      filter.child(L"type").append_attribute(L"t1") = AnimeFilters.type[0];
-      filter.child(L"type").append_attribute(L"t2") = AnimeFilters.type[1];
-      filter.child(L"type").append_attribute(L"t3") = AnimeFilters.type[2];
-      filter.child(L"type").append_attribute(L"t4") = AnimeFilters.type[3];
-      filter.child(L"type").append_attribute(L"t5") = AnimeFilters.type[4];
-      filter.child(L"type").append_attribute(L"t6") = AnimeFilters.type[5];
       filter.append_child(L"episodes");
       filter.child(L"episodes").append_attribute(L"highlight") = Program.List.highlight;
-      filter.child(L"episodes").append_attribute(L"new") = AnimeFilters.new_episodes;
+      filter.child(L"episodes").append_attribute(L"new") = Program.List.new_episodes;
       // Progress
       xml_node progress = list.append_child(L"progress");
       progress.append_attribute(L"mode") = Program.List.progress_mode;
@@ -409,6 +390,8 @@ bool Settings::Save() {
       torrent.append_child(L"application");
       torrent.child(L"application").append_attribute(L"mode") = RSS.Torrent.app_mode;
       torrent.child(L"application").append_attribute(L"path") = RSS.Torrent.app_path.c_str();
+      torrent.append_child(L"search");
+      torrent.child(L"search").append_attribute(L"address") = RSS.Torrent.search_url.c_str();
       torrent.append_child(L"source");
       torrent.child(L"source").append_attribute(L"address") = RSS.Torrent.source.c_str();
       torrent.append_child(L"options");

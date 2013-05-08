@@ -207,24 +207,22 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       wstring text;
       edit.GetText(text);
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
-      if (search_bar.filter_content) {
-        switch (navigation.GetCurrentPage()) {
-          case SIDEBAR_ITEM_ANIMELIST:
-            if (AnimeFilters.text != text) {
-              AnimeFilters.text = text;
-              AnimeListDialog.RefreshList();
-              AnimeListDialog.RefreshTabs();
-              return TRUE;
-            }
-            break;
-          case SIDEBAR_ITEM_SEASONS:
-            if (SeasonDialog.filter_text != text) {
-              SeasonDialog.filter_text = text;
-              SeasonDialog.RefreshList();
-              return TRUE;
-            }
-            break;
-        }
+      switch (navigation.GetCurrentPage()) {
+        case SIDEBAR_ITEM_ANIMELIST:
+          if (search_bar.filters.text != text) {
+            search_bar.filters.text = text;
+            AnimeListDialog.RefreshList();
+            AnimeListDialog.RefreshTabs();
+            return TRUE;
+          }
+          break;
+        case SIDEBAR_ITEM_SEASONS:
+          if (search_bar.filters.text != text) {
+            search_bar.filters.text = text;
+            SeasonDialog.RefreshList();
+            return TRUE;
+          }
+          break;
       }
     }
   }

@@ -68,7 +68,6 @@ public:
   void SetViewMode(int mode);
 
 public:
-  wstring filter_text;
   int group_by, sort_by, view_as;
 
 private:

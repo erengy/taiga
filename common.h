@@ -93,7 +93,6 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 void UpdateAllMenus(anime::Item* anime_item = nullptr);
 void UpdateAnimeMenu(anime::Item* anime_item);
 void UpdateAnnounceMenu();
-void UpdateFilterMenu();
 void UpdateFoldersMenu();
 void UpdateSearchMenu();
 void UpdateSearchListMenu(bool enabled = false);

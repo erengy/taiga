@@ -25,7 +25,6 @@ namespace anime {
 
 class Item;
 
-// Active filters for main dialog's ListView
 class Filters {
  public:
   Filters();
@@ -37,12 +36,9 @@ class Filters {
   vector<bool> my_status;
   vector<bool> status;
   vector<bool> type;
-  bool new_episodes;
   wstring text;
 };
 
 } // namespace anime
-
-extern anime::Filters AnimeFilters;
 
 #endif // ANIME_FILTER_H

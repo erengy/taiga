@@ -299,6 +299,7 @@ BOOL HttpClient::OnReadComplete() {
       MainDialog.ChangeStatus(status);
       MainDialog.EnableInput(true);
       MainDialog.UpdateTip();
+      MainDialog.UpdateTitle();
       UpdateAllMenus();
       if (Taiga.logged_in) {
         switch (Settings.Account.MAL.api) {
