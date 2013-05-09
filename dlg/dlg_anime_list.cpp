@@ -425,9 +425,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       switch (pnkd->wVKey) {
         // Delete item
         case VK_DELETE: {
-          if (listview.GetSelectedCount() > 0) {
+          if (listview.GetSelectedCount() > 0)
             ExecuteAction(L"EditDelete()");
-          }
           break;
         }
         // Check episodes
@@ -436,7 +435,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           break;
         }
         default: {
-          if (GetKeyState(VK_CONTROL) & 0x8000) {
+          if (listview.GetSelectedCount() > 0 &&
+              GetKeyState(VK_CONTROL) & 0x8000) {
             // Edit episode
             if (pnkd->wVKey == VK_ADD) {
               auto anime_item = AnimeDatabase.GetCurrentItem();

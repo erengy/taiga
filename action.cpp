@@ -289,6 +289,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"ViewHistory") {
     mal::ViewHistory();
 
+  // ViewUpcomingAnime
+  //   Opens up upcoming anime page on MAL.
+  } else if (action == L"ViewUpcomingAnime") {
+    mal::ViewUpcomingAnime();
+
   // ===========================================================================
 
   // AddFolder()

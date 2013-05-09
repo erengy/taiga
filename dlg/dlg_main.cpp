@@ -163,7 +163,6 @@ void MainDialog::CreateDialogControls() {
   statusbar.InsertPart(ICON16_CLOCK, 0, 0,  32, nullptr, nullptr);
 
   // Insert treeview items
-  treeview.hti.push_back(treeview.InsertItem(L"Dashboard", ICON16_HOME, SIDEBAR_ITEM_DASHBOARD, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ICON16_PLAY, SIDEBAR_ITEM_NOWPLAYING, nullptr));
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Anime List", ICON16_DOCUMENT_A, SIDEBAR_ITEM_ANIMELIST, nullptr));
@@ -179,8 +178,8 @@ void MainDialog::CreateDialogControls() {
 
   // Insert menu toolbar buttons
   BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
-  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  Account", nullptr);
-  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  Library", nullptr);
+  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  Library", nullptr);
+  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  MyAnimeList", nullptr);
   toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"  Tools", nullptr);
   toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"  View", nullptr);
   toolbar_menu.InsertButton(4, I_IMAGENONE, 104, 1, fsStyle0, 0, L"  Help", nullptr);
@@ -929,7 +928,6 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
       parent->search_bar.mode = SEARCH_MODE_NONE;
       cue_text = L"Filter list";
       break;
-    case SIDEBAR_ITEM_DASHBOARD:
     case SIDEBAR_ITEM_NOWPLAYING:
     case SIDEBAR_ITEM_HISTORY:
     case SIDEBAR_ITEM_STATS:
@@ -945,7 +943,7 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   parent->edit.SetCueBannerText(cue_text.c_str());
   parent->search_bar.filters.text.clear();
   parent->edit.SetText(L"");
-
+  
   AnimeListDialog.Hide();
   HistoryDialog.Hide();
   NowPlayingDialog.Hide();

@@ -64,8 +64,8 @@ void ErasePunctuation(wstring& str, bool keep_trailing) {
     [](int c) -> bool {
       // Control codes, white-space and punctuation characters
       if (c <= 255 && !isalnum(c)) return true;
-      // Unicode stars, hearts, notes, etc. (0x2500-0x2767)
-      if (c > 9472 && c < 10087) return true;
+      // Unicode stars, hearts, notes, etc. (0x2000-0x2767)
+      if (c > 8192 && c < 10087) return true;
       // Valid character
       return false;
     });

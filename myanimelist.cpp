@@ -761,4 +761,13 @@ void ViewSeasonGroup() {
   ExecuteLink(L"http://myanimelist.net/clubs.php?cid=743");
 }
 
+void ViewUpcomingAnime() {
+  Date date = GetDate();
+  ExecuteLink(L"http://myanimelist.net/anime.php"
+              L"?sd=" + ToWstr(date.day) + 
+              L"&sm=" + ToWstr(date.month) + 
+              L"&sy=" + ToWstr(date.year) + 
+              L"&em=0&ed=0&ey=0&o=2&w=&c[]=a&c[]=d&cv=1");
+}
+
 } // namespace mal

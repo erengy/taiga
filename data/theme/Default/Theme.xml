@@ -69,31 +69,27 @@
 	<menus>
 		<!-- Main -->
 		<menu name="Main" type="menubar">
-			<item name="Account" sub="Account"/>
-			<item name="Library" sub="Library"/>
-			<item name="Tools"   sub="Tools"/>
-			<item name="View"    sub="View"/>
-			<item name="Help"    sub="Help"/>
+			<item name="Library"     sub="Library"/>
+			<item name="MyAnimeList" sub="MyAnimeList"/>
+			<item name="Tools"       sub="Tools"/>
+			<item name="View"        sub="View"/>
+			<item name="Help"        sub="Help"/>
 		</menu>
 		
-		<!-- Account -->
-		<menu name="Account">
-			<item name="Synchronize list" action="Synchronize()"/>
-			<item type="separator"/>
-			<item name="MyAnimeList" sub="MyAnimeList"/>
-		</menu>
-			<!-- MyAnimeList -->
-			<menu name="MyAnimeList">
-				<item name="View my panel" 	 action="ViewPanel()"/>
-				<item name="View my profile" action="ViewProfile()"/>
-				<item name="View my history" action="ViewHistory()"/>
-			</menu>
 		<!-- Library -->
 		<menu name="Library">
 			<item name="Anime folders" sub="Folders"/>
 			<item type="separator"/>
 			<item name="Play random anime" action="PlayRandomAnime()"/>
 			<item name="Scan available episodes" action="CheckEpisodes()"/>
+		</menu>
+		<!-- MyAnimeList -->
+		<menu name="MyAnimeList">
+			<item name="Synchronize list" action="Synchronize()"/>
+			<item type="separator"/>
+			<item name="View my panel" 	 action="ViewPanel()"/>
+			<item name="View my profile" action="ViewProfile()"/>
+			<item name="View my history" action="ViewHistory()"/>
 		</menu>
 		<!-- Share -->
 		<menu name="Announce">
@@ -124,14 +120,13 @@
 			</menu>
 		<!-- View -->
 		<menu name="View">
-			<item name="Dashboard"   action="ViewContent(0)" radio="1"/>
-			<item name="Now Playing" action="ViewContent(1)" radio="1"/>
-			<item name="Anime List"  action="ViewContent(3)" checked="1" radio="1"/>
-			<item name="History"     action="ViewContent(4)" radio="1"/>
-			<item name="Statistics"  action="ViewContent(5)" radio="1"/>
-			<item name="Search"      action="ViewContent(7)" radio="1"/>
-			<item name="Seasons"     action="ViewContent(8)" radio="1"/>
-			<item name="Torrents"    action="ViewContent(9)" radio="1"/>
+			<item name="Now Playing" action="ViewContent(0)" radio="1"/>
+			<item name="Anime List"  action="ViewContent(2)" checked="1" radio="1"/>
+			<item name="History"     action="ViewContent(3)" radio="1"/>
+			<item name="Statistics"  action="ViewContent(4)" radio="1"/>
+			<item name="Search"      action="ViewContent(6)" radio="1"/>
+			<item name="Seasons"     action="ViewContent(7)" radio="1"/>
+			<item name="Torrents"    action="ViewContent(8)" radio="1"/>
 			<item type="separator"/>
 			<item name="Show sidebar" action="ShowSidebar()" checked="1"/>
 		</menu>

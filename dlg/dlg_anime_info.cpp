@@ -24,6 +24,7 @@
 
 #include "../anime_db.h"
 #include "../common.h"
+#include "../foreach.h"
 #include "../gfx.h"
 #include "../history.h"
 #include "../myanimelist.h"
@@ -309,40 +310,116 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   } else if (anime_id_ == anime::ID_NOTINLIST) {
     SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.title.c_str());
   } else {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Recently watched");
+    SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Now Playing");
   }
 
   // Set content
   if (anime_id_ == anime::ID_UNKNOWN) {
-    wstring text;
+    wstring content;
+    Date date_now = GetDate();
+    int date_diff = 0;
+    const int day_limit = 7;
+    
+    // Recently watched
     vector<int> anime_ids;
-    for (auto it = History.queue.items.rbegin(); it != History.queue.items.rend(); ++it) {
+    foreach_cr_(it, History.queue.items) {
       if (it->episode && 
           std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end())
         anime_ids.push_back(it->anime_id);
     }
-    for (auto it = History.items.rbegin(); it != History.items.rend(); ++it) {
+    foreach_cr_(it, History.items) {
       if (it->episode && 
           std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end())
         anime_ids.push_back(it->anime_id);
     }
-    for (auto it = anime_ids.begin(); it != anime_ids.end(); ++it) {
+    foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
-      text += L"\u2022 " + anime_item->GetTitle();
+      content += L"  \u2022 " + anime_item->GetTitle();
       if (anime_item->GetEpisodeCount() > 0 && 
           anime_item->GetEpisodeCount() == anime_item->GetMyLastWatchedEpisode()) {
         if (anime_item->GetMyScore() == 0)
-          text += L" - <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
+          content += L" - <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
       } else {
-        text += L" - <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
+        content += L" - <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
       }
-      text += L"\n";
+      content += L"\n";
     }
-    if (text.empty()) {
-      text = L"You haven't watched anything recently. "
-             L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?";
+    if (content.empty()) {
+      content = L"You haven't watched anything recently. "
+                L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?";
+    } else {
+      content = L"Recently watched:\n" + content + L"\n";
+      int recently_watched = 0;
+      foreach_c_(it, History.queue.items) {
+        date_diff = date_now - (Date)(it->time.substr(0, 10));
+        if (date_diff <= day_limit)
+          recently_watched++;
+      }
+      foreach_c_(it, History.items) {
+        date_diff = date_now - (Date)(it->time.substr(0, 10));
+        if (date_diff <= day_limit)
+          recently_watched++;
+      }
+      if (recently_watched > 0)
+        content += L"You've watched " + ToWstr(recently_watched) + L" episodes in the last week.\n\n";
     }
-    sys_link_.SetText(text);
+
+    // Available episodes
+    int available_episodes = 0;
+    foreach_c_(it, AnimeDatabase.items) {
+      if (it->second.IsInList() && it->second.IsNewEpisodeAvailable())
+        available_episodes ++;
+    }
+    if (available_episodes > 0)
+      content += L"There are at least " + ToWstr(available_episodes) + L" new episodes available on your computer.\n\n";
+
+    // Airing times
+    vector<int> recently_started, recently_finished, upcoming;
+    foreach_c_(it, AnimeDatabase.items) {
+      const Date& date_start = it->second.GetDate(anime::DATE_START);
+      const Date& date_end = it->second.GetDate(anime::DATE_END);
+      if (date_start.year && date_start.month && date_start.day) {
+        date_diff = date_now - date_start;
+        if (date_diff > 0 && date_diff <= day_limit) {
+          recently_started.push_back(it->first);
+          continue;
+        }
+        date_diff = date_start - date_now;
+        if (date_diff > 0 && date_diff <= day_limit) {
+          upcoming.push_back(it->first);
+          continue;
+        }
+      }
+      if (date_end.year && date_end.month && date_end.day) {
+        date_diff = date_end - date_now;
+        if (date_diff > 0 && date_diff <= day_limit) {
+          recently_finished.push_back(it->first);
+          continue;
+        }
+      }
+    }
+    if (!recently_started.empty()) {
+      content += L"Recently started airing:\n";
+      foreach_c_(it, recently_started)
+        content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
+      content += L"\n";
+    }
+    if (!recently_finished.empty()) {
+      content += L"Recently finished airing:\n";
+      foreach_c_(it, recently_finished)
+        content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
+      content += L"\n";
+    }
+    if (!recently_finished.empty()) {
+      content += L"Upcoming:\n";
+      foreach_c_(it, recently_finished)
+        content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
+      content += L"\n";
+    } else {
+      content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
+    }
+
+    sys_link_.SetText(content);
   }
 
   // Toggle tabs
@@ -379,7 +456,6 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       if (current_page_ != INFOPAGE_NONE) {
         win32::Rect rect_image = rect;
         rect_image.right = rect_image.left + ScaleX(150);
-        rect_image.bottom = rect_image.top + ScaleY(200);
         auto image = ImageDatabase.GetImage(anime_id_);
         if (image)
           rect_image = ResizeRect(rect_image, 

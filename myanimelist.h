@@ -146,6 +146,7 @@ void ViewMessages();
 void ViewPanel();
 void ViewProfile();
 void ViewSeasonGroup();
+void ViewUpcomingAnime();
 
 } // namespace mal
 

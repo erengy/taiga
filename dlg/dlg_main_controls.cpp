@@ -340,8 +340,8 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   #define SHOWUIMENU(id, name) \
     case id: action = UI.Menus.Show(hwnd, pt.x, pt.y, name); break;
   switch (tbb.idCommand) {
-    SHOWUIMENU(100, L"Account");
-    SHOWUIMENU(101, L"Library");
+    SHOWUIMENU(100, L"Library");
+    SHOWUIMENU(101, L"MyAnimeList");
     SHOWUIMENU(102, L"Tools");
     SHOWUIMENU(103, L"View");
     SHOWUIMENU(104, L"Help");
