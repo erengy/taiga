@@ -167,7 +167,6 @@
 #define IDC_SPIN_TORRENT_INTERVAL               1124
 #define IDC_STATIC_ANIME_IMG                    1125
 #define IDC_STATIC_ANIME_INFO1                  1126
-#define IDC_STATIC_ANIME_INFO2                  1127
 #define IDC_STATIC_ANIME_STAT1                  1128
 #define IDC_STATIC_ANIME_STAT2                  1129
 #define IDC_STATIC_ANIME_STAT3                  1130

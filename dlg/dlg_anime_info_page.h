@@ -38,6 +38,7 @@ class PageBaseInfo : public win32::Dialog {
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+  void OnSize(UINT uMsg, UINT nType, SIZE size);
 
  protected:
   int anime_id_;

@@ -63,23 +63,75 @@ void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   rect.Copy(lpps->rcPaint);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+
+  // Paint header lines
+  for (int i = 0; i < 3; i++) {
+    win32::Rect rect_header;
+    win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+    header.GetWindowRect(m_hWindow, &rect_header);
+    rect_header.top = rect_header.bottom + 3;
+    rect_header.bottom =  rect_header.top + 1;
+    dc.FillRect(rect_header, ::GetSysColor(COLOR_ACTIVEBORDER));
+    rect_header.Offset(0, 1);
+    dc.FillRect(rect_header, ::GetSysColor(COLOR_WINDOW));
+    header.SetWindowHandle(nullptr);
+  }
 }
 
-// =============================================================================
-
-void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
+void PageBaseInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
       win32::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
       rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
-      
-      /*win32::Rect rect_edit;
-      win32::Edit edit = GetDlgItem(IDC_EDIT_ANIME_INFO);
-      edit.GetClientRect(&rect_edit);
-      rect_edit.bottom = rect.bottom;
-      edit.SetPosition(nullptr, rect_edit);
-      edit.SetWindowHandle(nullptr);*/
+
+      // Headers
+      for (int i = 0; i < 3; i++) {
+        win32::Rect rect_header;
+        win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+        header.GetWindowRect(m_hWindow, &rect_header);
+        rect_header.right = rect.right;
+        header.SetPosition(nullptr, rect_header);
+        header.SetWindowHandle(nullptr);
+      }
+
+      // Redraw
+      InvalidateRect();
+    }
+  }
+}
+
+// =============================================================================
+
+void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
+  PageBaseInfo::OnSize(uMsg, nType, size);
+
+  switch (uMsg) {
+    case WM_SIZE: {
+      win32::Rect rect;
+      rect.Set(0, 0, size.cx, size.cy);
+      rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
+
+      // Synonyms
+      win32::Rect rect_child;
+      win32::Window window = GetDlgItem(IDC_EDIT_ANIME_ALT);
+      window.GetWindowRect(m_hWindow, &rect_child);
+      rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
+      window.SetPosition(nullptr, rect_child);
+
+      // Information
+      window.SetWindowHandle(GetDlgItem(IDC_STATIC_ANIME_INFO1));
+      window.GetWindowRect(m_hWindow, &rect_child);
+      rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
+      window.SetPosition(nullptr, rect_child);
+
+      // Synopsis
+      window.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_INFO));
+      window.GetWindowRect(m_hWindow, &rect_child);
+      rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
+      rect_child.bottom = rect.bottom;
+      window.SetPosition(nullptr, rect_child);
+      window.SetWindowHandle(nullptr);
     }
   }
 }
@@ -110,22 +162,19 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
     }
   }
   SetDlgItemText(IDC_EDIT_ANIME_INFO, text.c_str());
-      
+
   // Set information
+  #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
   text = mal::TranslateType(anime_item->GetType()) + L"\n" + 
          mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" + 
          mal::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" + 
-         mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START));
-  SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
-  #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
-  wstring genres = anime_item->GetGenres();
-  LimitText(genres, 50); // TODO: Get rid of magic number
-  text = ADD_INFOLINE(genres, L"-") + L"\n" +
+         mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
+         ADD_INFOLINE(anime_item->GetGenres(), L"-") + L"\n" +
          ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" + 
          ADD_INFOLINE(anime_item->GetRank(), L"#0") + L"\n" + 
          ADD_INFOLINE(anime_item->GetPopularity(), L"#0");
   #undef ADD_INFOLINE
-  SetDlgItemText(IDC_STATIC_ANIME_INFO2, text.c_str());
+  SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
 }
 
 // =============================================================================

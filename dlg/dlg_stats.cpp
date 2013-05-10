@@ -90,14 +90,40 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   rect.Copy(lpps->rcPaint);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+
+  // Paint header lines
+  for (int i = 0; i < 4; i++) {
+    win32::Rect rect_header;
+    win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+    header.GetWindowRect(m_hWindow, &rect_header);
+    rect_header.top = rect_header.bottom + 3;
+    rect_header.bottom =  rect_header.top + 1;
+    dc.FillRect(rect_header, ::GetSysColor(COLOR_ACTIVEBORDER));
+    rect_header.Offset(0, 1);
+    dc.FillRect(rect_header, ::GetSysColor(COLOR_WINDOW));
+    header.SetWindowHandle(nullptr);
+  }
 }
 
 void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rcWindow;
-      rcWindow.Set(0, 0, size.cx, size.cy);
-      // TODO: Resize horizontally
+      win32::Rect rect;
+      rect.Set(0, 0, size.cx, size.cy);
+      rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, -ScaleY(WIN_CONTROL_MARGIN));
+
+      // Headers
+      for (int i = 0; i < 4; i++) {
+        win32::Rect rect_header;
+        win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+        header.GetWindowRect(m_hWindow, &rect_header);
+        rect_header.right = rect.right;
+        header.SetPosition(nullptr, rect_header);
+        header.SetWindowHandle(nullptr);
+      }
+
+      // Redraw
+      InvalidateRect();
     }
   }
 }

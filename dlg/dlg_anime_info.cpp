@@ -272,7 +272,7 @@ void AnimeDialog::SetCurrentPage(int index) {
         image_label_.Show();
         page_my_info.Hide();
         page_series_info.Show();
-        sys_link_.Hide();
+        sys_link_.Show(mode_ == DIALOG_MODE_NOW_PLAYING);
         break;
       case INFOPAGE_MYINFO:
         image_label_.Show();
@@ -420,6 +420,16 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     }
 
     sys_link_.SetText(content);
+  
+  } else {
+    int episode_number = GetEpisodeLow(CurrentEpisode.number);
+    if (episode_number == 0) episode_number = 1;
+    wstring content = L"Now playing: Episode " + ToWstr(episode_number);
+    if (!CurrentEpisode.group.empty())
+      content += L" by " + CurrentEpisode.group;
+    content += L"\n";
+    content += L"<a href=\"#\">Share</a> | <a href=\"#\">Watch next episode</a>";
+    sys_link_.SetText(content);
   }
 
   // Toggle tabs
@@ -479,13 +489,24 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       }
       // Content
       if (sys_link_.IsVisible()) {
-        sys_link_.SetPosition(nullptr, rect);
+        if (anime_id_ == anime::ID_UNKNOWN) {
+          sys_link_.SetPosition(nullptr, rect);
+        } else {
+          win32::Dc dc = sys_link_.GetDC();
+          int text_height = GetTextHeight(dc.Get());
+          win32::Rect rect_content = rect;
+          rect_content.Inflate(-ScaleX(WIN_CONTROL_MARGIN), 0);
+          rect_content.bottom = rect_content.top + text_height * 2;
+          sys_link_.SetPosition(nullptr, rect_content);
+          rect.top = rect_content.bottom + ScaleY(WIN_CONTROL_MARGIN) * 3;
+        }
       }
       // Pages
       win32::Rect rect_page = rect;
       if (tab_.IsVisible()) {
         tab_.SetPosition(nullptr, rect_page);
         tab_.AdjustRect(m_hWindow, FALSE, &rect_page);
+        rect_page.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
       }
       page_series_info.SetPosition(nullptr, rect_page);
       page_my_info.SetPosition(nullptr, rect_page);

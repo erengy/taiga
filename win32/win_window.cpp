@@ -320,6 +320,18 @@ BOOL Window::GetWindowRect(LPRECT lpRect) const {
   return ::GetWindowRect(m_hWindow, lpRect);
 }
 
+void Window::GetWindowRect(HWND hWndTo, LPRECT lpRect) const {
+  ::GetClientRect(m_hWindow, lpRect);
+  int width = lpRect->right;
+  int height = lpRect->bottom;
+  
+  ::GetWindowRect(m_hWindow, lpRect);
+  ::ScreenToClient(hWndTo, reinterpret_cast<LPPOINT>(lpRect));
+  
+  lpRect->right = lpRect->left + width;
+  lpRect->bottom = lpRect->top + height;
+}
+
 BOOL Window::Hide() const {
   return ::ShowWindow(m_hWindow, SW_HIDE);
 }
