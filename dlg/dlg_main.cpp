@@ -80,7 +80,6 @@ BOOL MainDialog::OnInitDialog() {
   
   // Create controls
   CreateDialogControls();
-  EnableSharing(false);
 
   // Select default content page
   navigation.SetCurrentPage(SIDEBAR_ITEM_ANIMELIST);
@@ -198,20 +197,16 @@ void MainDialog::CreateDialogControls() {
   toolbar_main.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(6, ICON24_FOLDERS, TOOLBAR_BUTTON_FOLDERS, 
                             1, fsStyle2, 6, nullptr, L"Anime folders");
-  toolbar_main.InsertButton(7, ICON24_SHARE, TOOLBAR_BUTTON_SHARE, 
-                            0, fsStyle2, 7, nullptr, L"Share");
-  toolbar_main.InsertButton(8, ICON24_TOOLS, TOOLBAR_BUTTON_TOOLS, 
-                            1, fsStyle2, 8, nullptr, L"Tools");
-  toolbar_main.InsertButton(9, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(10, ICON24_SETTINGS, TOOLBAR_BUTTON_SETTINGS, 
-                            1, fsStyle1, 10, nullptr, L"Change program settings");
+  toolbar_main.InsertButton(7, ICON24_TOOLS, TOOLBAR_BUTTON_TOOLS, 
+                            1, fsStyle2, 7, nullptr, L"Tools");
+  toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(9, ICON24_SETTINGS, TOOLBAR_BUTTON_SETTINGS, 
+                            1, fsStyle1, 9, nullptr, L"Change program settings");
 #ifdef _DEBUG
-  toolbar_main.InsertButton(11, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(12, ICON24_ABOUT, TOOLBAR_BUTTON_ABOUT, 
-                            1, fsStyle1, 12, nullptr, L"Debug");
+  toolbar_main.InsertButton(10, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(11, ICON24_ABOUT, TOOLBAR_BUTTON_ABOUT, 
+                            1, fsStyle1, 11, nullptr, L"Debug");
 #endif
-  // Insert search toolbar button
-  //toolbar_search.InsertButton(0, ICON16_SEARCH, TOOLBAR_BUTTON_SEARCH, 1, fsStyle2, 0, nullptr, L"Search");
 
   // Insert rebar bands
   UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_HEADERSIZE | RBBIM_SIZE | RBBIM_STYLE;
@@ -369,15 +364,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                 break;
               }
               case SEARCH_MODE_FEED: {
-                Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-                if (feed) {
-                  wstring search_url = Settings.RSS.Torrent.search_url;
-                  Replace(search_url, L"%search%", text);
-                  ChangeStatus(L"Searching torrents for \"" + text + L"\"...");
-                  feed->Check(search_url);
-                  return TRUE;
-                }
-                break;
+                TorrentDialog.Search(Settings.RSS.Torrent.search_url, text);
+                return TRUE;
               }
             }
             break;
@@ -398,6 +386,9 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             pMsg->message, wParam, pMsg->lParam);
         case SIDEBAR_ITEM_HISTORY:
           return HistoryDialog.SendMessage(
+            pMsg->message, wParam, pMsg->lParam);
+        case SIDEBAR_ITEM_STATS:
+          return StatsDialog.SendMessage(
             pMsg->message, wParam, pMsg->lParam);
         case SIDEBAR_ITEM_SEARCH:
           return SearchDialog.SendMessage(
@@ -807,11 +798,6 @@ void MainDialog::EnableInput(bool enable) {
   HistoryDialog.Enable(enable);
 }
 
-void MainDialog::EnableSharing(bool enable) {
-  // Toolbar buttons
-  toolbar_main.EnableButton(TOOLBAR_BUTTON_SHARE, enable);
-}
-
 void MainDialog::UpdateControlPositions(const SIZE* size) {
   // Set client area
   win32::Rect rect_client;
@@ -919,9 +905,10 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   if (page == current_page_)
     return;
   
+  int previous_page = current_page_;
   current_page_ = page;
 
-  wstring cue_text;
+  wstring cue_text, search_text;
   switch (current_page_) {
     case SIDEBAR_ITEM_ANIMELIST:
     case SIDEBAR_ITEM_SEASONS:
@@ -934,15 +921,28 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
     case SIDEBAR_ITEM_SEARCH:
       parent->search_bar.mode = SEARCH_MODE_MAL;
       cue_text = L"Search MyAnimeList";
+      if (current_page_ == SIDEBAR_ITEM_SEARCH)
+        search_text = SearchDialog.search_text;
       break;
     case SIDEBAR_ITEM_FEEDS:
       parent->search_bar.mode = SEARCH_MODE_FEED;
       cue_text = L"Search torrents";
       break;
   }
+  if (!parent->search_bar.filters.text.empty()) {
+    parent->search_bar.filters.text.clear();
+    switch (previous_page) {
+      case SIDEBAR_ITEM_ANIMELIST:
+        AnimeListDialog.RefreshList();
+        AnimeListDialog.RefreshTabs();
+        break;
+      case SIDEBAR_ITEM_SEASONS:
+        SeasonDialog.RefreshList();
+        break;
+    }
+  }
   parent->edit.SetCueBannerText(cue_text.c_str());
-  parent->search_bar.filters.text.clear();
-  parent->edit.SetText(L"");
+  parent->edit.SetText(search_text);
   
   AnimeListDialog.Hide();
   HistoryDialog.Hide();

@@ -157,9 +157,9 @@ bool Theme::CreateFonts(HDC hdc) {
   lFont.lfPitchAndFamily = VARIABLE_PITCH;
 
   // Bold font
-  lFont.lfHeight = -MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+  lFont.lfHeight = -MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72);
   lFont.lfWeight = FW_BOLD;
-  lstrcpy(lFont.lfFaceName, L"Tahoma");
+  lstrcpy(lFont.lfFaceName, L"Segoe UI");
   font_bold.Set(::CreateFontIndirect(&lFont));
 
   // Header font

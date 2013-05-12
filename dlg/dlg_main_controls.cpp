@@ -346,9 +346,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
     SHOWUIMENU(103, L"View");
     SHOWUIMENU(104, L"Help");
     SHOWUIMENU(TOOLBAR_BUTTON_FOLDERS, L"Folders");
-    SHOWUIMENU(TOOLBAR_BUTTON_SHARE, L"Announce");
     SHOWUIMENU(TOOLBAR_BUTTON_TOOLS, L"Services");
-    SHOWUIMENU(TOOLBAR_BUTTON_SEARCH, L"SearchBar");
   }
   #undef SHOWUIMENU
 

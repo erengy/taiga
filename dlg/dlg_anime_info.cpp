@@ -201,7 +201,10 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Link click
         case NM_CLICK: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
-          ExecuteAction(pNMLink->item.szUrl);
+          wstring action = pNMLink->item.szUrl;
+          if (IsEqual(pNMLink->item.szID, L"menu"))
+            action = UI.Menus.Show(m_hWindow, 0, 0, pNMLink->item.szUrl);
+          ExecuteAction(action, 0, GetCurrentId());
           return TRUE;
         }
       }
@@ -221,6 +224,24 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   }
   
   return 0;
+}
+
+void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+  win32::Dc dc = hdc;
+  win32::Rect rect;
+
+  // Paint background
+  rect.Copy(lpps->rcPaint);
+  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+}
+
+void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
+  switch (uMsg) {
+    case WM_SIZE: {
+      UpdateControlPositions(&size);
+      break;
+    }
+  }
 }
 
 BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
@@ -338,9 +359,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (anime_item->GetEpisodeCount() > 0 && 
           anime_item->GetEpisodeCount() == anime_item->GetMyLastWatchedEpisode()) {
         if (anime_item->GetMyScore() == 0)
-          content += L" - <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
+          content += L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
       } else {
-        content += L" - <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
+        content += L" \u2014 <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
       }
       content += L"\n";
     }
@@ -428,7 +449,12 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     if (!CurrentEpisode.group.empty())
       content += L" by " + CurrentEpisode.group;
     content += L"\n";
-    content += L"<a href=\"#\">Share</a> | <a href=\"#\">Watch next episode</a>";
+    content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
+    content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
+    if (anime_item->GetEpisodeCount() == 0 || 
+        anime_item->GetEpisodeCount() > episode_number) {
+      content += L" \u2022 <a href=\"PlayEpisode(" + ToWstr(episode_number + 1) + L"\">Watch next episode</a>";
+    }
     sys_link_.SetText(content);
   }
 
@@ -443,73 +469,73 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   // Refresh pages
   if (series_info) page_series_info.Refresh(anime_id_, connect);
   if (my_info) page_my_info.Refresh(anime_id_);
+
+  // Update controls
+  UpdateControlPositions();
 }
 
-// =============================================================================
-
-void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  win32::Dc dc = hdc;
+void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   win32::Rect rect;
+  if (size == nullptr) {
+    GetClientRect(&rect);
+  } else {
+    rect.Set(0, 0, size->cx, size->cy);
+  }
 
-  // Paint background
-  rect.Copy(lpps->rcPaint);
-  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
-}
+  rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, 
+               -ScaleY(WIN_CONTROL_MARGIN) * 2);
+  
+  // Image
+  if (current_page_ != INFOPAGE_NONE) {
+    win32::Rect rect_image = rect;
+    rect_image.right = rect_image.left + ScaleX(150);
+    auto image = ImageDatabase.GetImage(anime_id_);
+    if (image)
+      rect_image = ResizeRect(rect_image, 
+                              image->rect.Width(), image->rect.Height(), 
+                              true, true, false);
+    image_label_.SetPosition(nullptr, rect_image);
+    rect.left = rect_image.right + ScaleX(WIN_CONTROL_MARGIN) * 2;
+  }
 
-void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
-  switch (uMsg) {
-    case WM_SIZE: {
-      win32::Rect rect;
-      rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, -ScaleY(WIN_CONTROL_MARGIN) * 2);
-      // Image
-      if (current_page_ != INFOPAGE_NONE) {
-        win32::Rect rect_image = rect;
-        rect_image.right = rect_image.left + ScaleX(150);
-        auto image = ImageDatabase.GetImage(anime_id_);
-        if (image)
-          rect_image = ResizeRect(rect_image, 
-                                  image->rect.Width(), image->rect.Height(), 
-                                  true, true, false);
-        image_label_.SetPosition(nullptr, rect_image);
-        rect.left = rect_image.right + ScaleX(WIN_CONTROL_MARGIN) * 2;
-      }
-      // Title
-      win32::Rect rect_title;
-      edit_title_.GetWindowRect(&rect_title);
-      rect_title.Set(rect.left, rect.top,
-                     rect.right, rect.top + rect_title.Height());
-      edit_title_.SetPosition(nullptr, rect_title);
-      rect.top = rect_title.bottom + ScaleY(WIN_CONTROL_MARGIN);
-      // Buttons
-      if (mode_ == DIALOG_MODE_ANIME_INFORMATION) {
-        win32::Rect rect_button;
-        ::GetWindowRect(GetDlgItem(IDOK), &rect_button);
-        rect.bottom -= rect_button.Height() + ScaleY(WIN_CONTROL_MARGIN);
-      }
-      // Content
-      if (sys_link_.IsVisible()) {
-        if (anime_id_ == anime::ID_UNKNOWN) {
-          sys_link_.SetPosition(nullptr, rect);
-        } else {
-          win32::Dc dc = sys_link_.GetDC();
-          int text_height = GetTextHeight(dc.Get());
-          win32::Rect rect_content = rect;
-          rect_content.Inflate(-ScaleX(WIN_CONTROL_MARGIN), 0);
-          rect_content.bottom = rect_content.top + text_height * 2;
-          sys_link_.SetPosition(nullptr, rect_content);
-          rect.top = rect_content.bottom + ScaleY(WIN_CONTROL_MARGIN) * 3;
-        }
-      }
-      // Pages
-      win32::Rect rect_page = rect;
-      if (tab_.IsVisible()) {
-        tab_.SetPosition(nullptr, rect_page);
-        tab_.AdjustRect(m_hWindow, FALSE, &rect_page);
-        rect_page.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
-      }
-      page_series_info.SetPosition(nullptr, rect_page);
-      page_my_info.SetPosition(nullptr, rect_page);
+  // Title
+  win32::Rect rect_title;
+  edit_title_.GetWindowRect(&rect_title);
+  rect_title.Set(rect.left, rect.top,
+                  rect.right, rect.top + rect_title.Height());
+  edit_title_.SetPosition(nullptr, rect_title);
+  rect.top = rect_title.bottom + ScaleY(WIN_CONTROL_MARGIN);
+
+  // Buttons
+  if (mode_ == DIALOG_MODE_ANIME_INFORMATION) {
+    win32::Rect rect_button;
+    ::GetWindowRect(GetDlgItem(IDOK), &rect_button);
+    rect.bottom -= rect_button.Height() + ScaleY(WIN_CONTROL_MARGIN);
+  }
+
+  // Content
+  if (mode_ == DIALOG_MODE_NOW_PLAYING) {
+    if (anime_id_ == anime::ID_UNKNOWN) {
+      rect.left += ScaleX(WIN_CONTROL_MARGIN);
+      sys_link_.SetPosition(nullptr, rect);
+    } else {
+      win32::Dc dc = sys_link_.GetDC();
+      int text_height = GetTextHeight(dc.Get());
+      win32::Rect rect_content = rect;
+      rect_content.Inflate(-ScaleX(WIN_CONTROL_MARGIN), 0);
+      rect_content.bottom = rect_content.top + text_height * 2;
+      sys_link_.SetPosition(nullptr, rect_content);
+      rect.top = rect_content.bottom + ScaleY(WIN_CONTROL_MARGIN) * 3;
     }
   }
+
+  // Pages
+  win32::Rect rect_page = rect;
+  if (tab_.IsVisible()) {
+    tab_.SetPosition(nullptr, rect_page);
+    tab_.AdjustRect(m_hWindow, FALSE, &rect_page);
+    rect_page.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
+  }
+  page_series_info.SetPosition(nullptr, rect_page);
+  page_my_info.SetPosition(nullptr, rect_page);
 }

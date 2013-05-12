@@ -48,6 +48,8 @@ BOOL StatsDialog::OnInitDialog() {
 }
 
 INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  ResizeProc(hwnd, uMsg, wParam, lParam);
+
   switch (uMsg) {
     case WM_CTLCOLORSTATIC:
       return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));

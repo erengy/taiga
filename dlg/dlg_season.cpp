@@ -272,8 +272,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect_image.right + 4, rect_image.top, 
         rect.right - 4, rect_image.top + text_height + 8);
       win32::Rect rect_details(
-        rect_title.left + 4, rect_title.bottom + 8, 
-        rect_title.right, rect_title.bottom + 8 + (7 * (text_height + 2)));
+        rect_title.left + 4, rect_title.bottom + 4, 
+        rect_title.right, rect_title.bottom + 4 + (6 * (text_height + 2)));
       win32::Rect rect_synopsis(
         rect_details.left, rect_details.bottom + 4, 
         rect_details.right, rect_image.bottom);
@@ -313,21 +313,50 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw anime list indicator
       if (anime_item->IsInList()) {
         UI.ImgList16.Draw(ICON16_DOCUMENT_A, hdc.Get(),
-          rect_title.right - 20, rect_title.top + 2);
+          rect_title.right - 20, rect_title.top + 4);
         rect_title.right -= 20;
+      }
+
+      // Set title
+      wstring text = anime_item->GetTitle();
+      if (view_as == SEASON_VIEWAS_IMAGES) {
+        switch (sort_by) {
+          case SEASON_SORTBY_AIRINGDATE:
+            text = mal::TranslateDate(anime_item->GetDate(anime::DATE_START));
+            break;
+          case SEASON_SORTBY_EPISODES:
+            text = mal::TranslateNumber(anime_item->GetEpisodeCount(), L"");
+            if (text.empty()) {
+              text = L"Unknown";
+            } else {
+              text += text == L"1" ? L" episode" : L" episodes";
+            }
+            break;
+          case SEASON_SORTBY_POPULARITY:
+            text = anime_item->GetPopularity();
+            if (text.empty()) text = L"#0";
+            break;
+          case SEASON_SORTBY_SCORE:
+            text = anime_item->GetScore();
+            if (InStr(text, L"scored by") > -1)
+              text = text.substr(0, 4);
+            if (text.empty()) text = L"0.00";
+            break;
+        }
       }
 
       // Draw title
       rect_title.Inflate(-4, 0);
       hdc.EditFont(nullptr, -1, TRUE);
       hdc.SetBkMode(TRANSPARENT);
-      hdc.DrawText(anime_item->GetTitle().c_str(), anime_item->GetTitle().length(), rect_title, 
-        DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+      UINT nFormat = DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER;
+      if (view_as == SEASON_VIEWAS_IMAGES)
+        nFormat |= DT_CENTER;
+      hdc.DrawText(text.c_str(), text.length(), rect_title, nFormat);
 
       // Draw details
       if (view_as == SEASON_VIEWAS_IMAGES) break;
       int text_top = rect_details.top;
-      wstring text;
       #define DRAWLINE(t) \
         text = t; \
         hdc.DrawText(text.c_str(), text.length(), rect_details, \
@@ -339,7 +368,6 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(L"Genres:");
       DRAWLINE(L"Producers:");
       DRAWLINE(L"Score:");
-      DRAWLINE(L"Rank:");
       DRAWLINE(L"Popularity:");
 
       rect_details.Set(rect_details.left + 75, text_top, 
@@ -355,17 +383,18 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : anime_item->GetGenres());
       DRAWLINE(anime_item->GetProducers().empty() ? L"?" : anime_item->GetProducers());
       DRAWLINE(anime_item->GetScore().empty() ? L"0.00" : anime_item->GetScore());
-      DRAWLINE(anime_item->GetRank().empty() ? L"#0" : anime_item->GetRank());
       DRAWLINE(anime_item->GetPopularity().empty() ? L"#0" : anime_item->GetPopularity());
 
       #undef DRAWLINE
       
       // Draw synopsis
       if (!StartsWith(anime_item->GetSynopsis(), L"No synopsis has been added for this series yet.")) {
+        // DT_WORDBREAK doesn't go well with DT_*_ELLIPSIS, so we need to make
+        // sure our text ends with ellipses by clipping that extra pixel.
         rect_synopsis.bottom -= (rect_synopsis.Height() % text_height) + 1;
         text = anime_item->GetSynopsis();
         hdc.DrawText(text.c_str(), text.length(), rect_synopsis, 
-          DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK | DT_WORD_ELLIPSIS);
+          DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK);
       }
 
       break;

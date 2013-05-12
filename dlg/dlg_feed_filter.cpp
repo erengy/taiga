@@ -258,7 +258,7 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   preset_list.InsertColumn(1, 350, 350, 0, L"Details");
   
   // Enable tile view
-  SIZE size = {580, 40};
+  SIZE size = {660, 40};
   RECT rect = {5, 0, 5, 0};
   preset_list.SetTileViewInfo(1, LVTVIF_FIXEDSIZE, &rect, &size);
   preset_list.SetView(LV_VIEW_TILE);

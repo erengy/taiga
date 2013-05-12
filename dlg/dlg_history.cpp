@@ -41,12 +41,12 @@ BOOL HistoryDialog::OnInitDialog() {
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_EVENT));
   list_.EnableGroupView(true);
-  list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  list_.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetTheme();
   
   // Insert list columns
-  list_.InsertColumn(0, 250, 250, LVCFMT_LEFT, L"Anime title");
-  list_.InsertColumn(1, 325, 325, LVCFMT_LEFT, L"Details");
+  list_.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 250, LVCFMT_LEFT, L"Anime title");
+  list_.InsertColumn(1, 400, 400, LVCFMT_LEFT, L"Details");
   list_.InsertColumn(2, 120, 120, LVCFMT_LEFT, L"Last modified");
   list_.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
 

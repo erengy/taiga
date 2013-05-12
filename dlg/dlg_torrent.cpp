@@ -113,6 +113,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Check new torrents
     case 100: {
+      MainDialog.edit.SetText(L"");
       feed->Check(Settings.RSS.Torrent.source);
       /**
       #ifdef _DEBUG
@@ -261,9 +262,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
                 ToWstr(anime_item->GetId()));
             }
           } else if (answer == L"MoreTorrents") {
-            feed->Check(ReplaceVariables(
-              L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%", // TEMP
-              feed_item->episode_data));
+            Search(Settings.RSS.Torrent.search_url, feed_item->episode_data.title);
           } else if (answer == L"SearchMAL") {
             ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
           }
@@ -403,6 +402,18 @@ void TorrentDialog::RefreshList() {
     title += L" - " + feed->description;
   }
   SetText(title.c_str());
+}
+
+void TorrentDialog::Search(wstring url, wstring title) {
+  Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
+  if (!feed) return;
+
+  MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+  MainDialog.edit.SetText(title);
+  MainDialog.ChangeStatus(L"Searching torrents for \"" + title + L"\"...");
+
+  Replace(url, L"%title%", title);
+  feed->Check(url);
 }
 
 void TorrentDialog::SetTimerText(const wstring& text) {

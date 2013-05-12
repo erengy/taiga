@@ -206,20 +206,14 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
     MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
+    MainDialog.edit.SetText(body);
+    MainDialog.ChangeStatus(L"Searching MyAnimeList for \"" + body + L"\"...");
     SearchDialog.Search(body);
 
-  // SearchTorrents()
+  // SearchTorrents(source)
+  //   Searches torrents from specified source URL.
   } else if (action == L"SearchTorrents") {
-    Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-    if (feed) {
-      anime::Episode episode;
-      episode.anime_id = AnimeDatabase.GetCurrentId();
-      MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
-      MainDialog.edit.SetText(AnimeDatabase.GetCurrentItem()->GetTitle());
-      MainDialog.ChangeStatus(L"Searching torrents for \"" + 
-        AnimeDatabase.GetCurrentItem()->GetTitle() + L"\"...");
-      feed->Check(ReplaceVariables(body, episode));
-    }
+    TorrentDialog.Search(body, AnimeDatabase.GetCurrentItem()->GetTitle());
 
   // ShowSidebar()
   } else if (action == L"ShowSidebar") {
@@ -622,7 +616,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Searches for an episode of an anime and plays it.
   } else if (action == L"PlayEpisode") {
     int number = ToInt(body);
-    AnimeDatabase.GetCurrentItem()->PlayEpisode(number);
+    int anime_id = lParam ? lParam : AnimeDatabase.GetCurrentId();
+    AnimeDatabase.FindItem(anime_id)->PlayEpisode(number);
   
   // PlayLast()
   //   Searches for the last watched episode of an anime and plays it.

@@ -35,11 +35,9 @@ enum MainToolbarButtons {
   TOOLBAR_BUTTON_SYNCHRONIZE = 203,
   TOOLBAR_BUTTON_MAL = 204,
   TOOLBAR_BUTTON_FOLDERS = 206,
-  TOOLBAR_BUTTON_SHARE = 207,
-  TOOLBAR_BUTTON_TOOLS = 208,
-  TOOLBAR_BUTTON_SETTINGS = 210,
-  TOOLBAR_BUTTON_ABOUT = 212,
-  TOOLBAR_BUTTON_SEARCH = 300
+  TOOLBAR_BUTTON_TOOLS = 207,
+  TOOLBAR_BUTTON_SETTINGS = 209,
+  TOOLBAR_BUTTON_ABOUT = 211
 };
 
 enum SearchMode {
@@ -83,7 +81,6 @@ public:
 public:
   void ChangeStatus(wstring str = L"");
   void EnableInput(bool enable = true);
-  void EnableSharing(bool enable = true);
   void UpdateControlPositions(const SIZE* size = nullptr);
   void UpdateStatusTimer();
   void UpdateTip();

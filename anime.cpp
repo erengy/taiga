@@ -90,7 +90,6 @@ void Item::StartWatching(Episode episode) {
   }
 
   // Update main window
-  MainDialog.EnableSharing();
   MainDialog.UpdateTip();
   MainDialog.UpdateTitle();
   MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
@@ -144,7 +143,6 @@ void Item::EndWatching(Episode episode) {
   
   // Update main window
   episode.anime_id = anime::ID_UNKNOWN;
-  MainDialog.EnableSharing(false);
   MainDialog.UpdateTip();
   MainDialog.UpdateTitle();
   int list_index = AnimeListDialog.GetListIndex(GetId());

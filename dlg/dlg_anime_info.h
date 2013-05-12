@@ -54,6 +54,7 @@ public:
                bool series_info = true,
                bool my_info = true,
                bool connect = true);
+  void UpdateControlPositions(const SIZE* size = nullptr);
 
 public:
   PageSeriesInfo page_series_info;

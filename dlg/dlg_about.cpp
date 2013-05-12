@@ -97,9 +97,9 @@ BOOL AboutDialog::OnInitDialog() {
   wstring text = 
     L"{\\rtf1\\ansi\\deff0"
     L"{\\fonttbl"
-    L"{\\f0 Tahoma;}"
+    L"{\\f0 Segoe UI;}"
     L"}"
-    L"\\deflang1024\\fs16"
+    L"\\deflang1024\\fs18"
     L"\\b " APP_NAME L"\\b0\\line "
     L"version " APP_VERSION L"\\line "
     L"built on " APP_BUILD L"\\line\\line "
@@ -160,7 +160,7 @@ void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint background
   GetClientRect(&rect);
-  rect.left = ScaleX(48 + 20);
+  rect.left = ScaleX(48 * 1.5f);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 }
 

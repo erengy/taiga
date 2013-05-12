@@ -22,10 +22,11 @@
 #include "../std.h"
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
+#include "../win32/win_resizable.h"
 
 // =============================================================================
 
-class StatsDialog : public win32::Dialog {
+class StatsDialog : public win32::Dialog, public win32::Resizable {
 public:
   StatsDialog() {}
   virtual ~StatsDialog() {}

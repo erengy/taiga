@@ -39,6 +39,7 @@ public:
 public:
   void EnableInput(bool enable = true);
   void RefreshList();
+  void Search(wstring url, wstring title);
   void SetTimerText(const wstring& text);
 
 private:
