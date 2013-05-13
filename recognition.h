@@ -60,11 +60,14 @@ public:
   void ExamineToken(Token& token, anime::Episode& episode, bool compare_extras);
   
   void CleanTitle(wstring& title);
+  void UpdateCleanTitles(int anime_id);
 
   std::multimap<int, int> GetScores();
 
   // Mapped as <anime_id, score>
   std::map<int, int> scores;
+
+  std::map<int, vector<wstring>> clean_titles;
 
   vector<wstring> audio_keywords;
   vector<wstring> video_keywords;

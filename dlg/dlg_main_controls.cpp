@@ -175,14 +175,6 @@ LRESULT MainDialog::EditSearch::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
 BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
   switch (LOWORD(wParam)) {
-    // Go back
-    case TOOLBAR_BUTTON_GOBACK:
-      navigation.GoBack();
-      return TRUE;
-    // Go forward
-    case TOOLBAR_BUTTON_GOFORWARD:
-      navigation.GoForward();
-      return TRUE;
     // Synchronize
     case TOOLBAR_BUTTON_SYNCHRONIZE:
       ExecuteAction(L"Synchronize");

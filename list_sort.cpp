@@ -192,7 +192,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
         if (Settings.Program.List.english_titles) {
-          return_value = CompareStrings(pItem1->GetEnglishTitle(false, true), pItem2->GetEnglishTitle(false, true));
+          return_value = CompareStrings(pItem1->GetEnglishTitle(true), pItem2->GetEnglishTitle(true));
         } else {
           return_value = CompareStrings(pItem1->GetTitle(), pItem2->GetTitle());
         }

@@ -91,23 +91,13 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   // Leave if not yet aired
   if (check_date && !anime_item.IsAiredYet()) return false;
 
-  // Compare with main title
-  bool found = CompareTitle(anime_item.GetTitle(true), episode, anime_item, strict);
-
-  // Compare with English title
-  if (!found && !anime_item.GetEnglishTitle(true).empty())
-    CompareTitle(anime_item.GetEnglishTitle(true), episode, anime_item, strict);
-
-  // Compare with synonyms
-  for (auto it = anime_item.GetSynonyms(true).begin();
-       !found && it != anime_item.GetSynonyms(true).end(); ++it) {
+  // Compare with titles
+  bool found = false;
+  if (clean_titles[anime_item.GetId()].empty())
+    UpdateCleanTitles(anime_item.GetId());
+  for (auto it = clean_titles[anime_item.GetId()].begin();
+       !found && it != clean_titles[anime_item.GetId()].end(); ++it) {
     found = CompareTitle(*it, episode, anime_item, strict);
-  }
-  if (anime_item.IsInList()) {
-    for (auto it = anime_item.GetUserSynonyms(true).begin();
-         !found && it != anime_item.GetUserSynonyms(true).end(); ++it) {
-      found = CompareTitle(*it, episode, anime_item, strict);
-    }
   }
 
   if (!found) {
@@ -586,6 +576,38 @@ void RecognitionEngine::CleanTitle(wstring& title) {
   EraseUnnecessary(title);
   TransliterateSpecial(title);
   ErasePunctuation(title, true);
+}
+
+void RecognitionEngine::UpdateCleanTitles(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  
+  clean_titles[anime_id].clear();
+
+  // Main title
+  clean_titles[anime_id].push_back(anime_item->GetTitle());
+  CleanTitle(clean_titles[anime_id].back());
+
+  // English title
+  if (!anime_item->GetEnglishTitle().empty()) {
+    clean_titles[anime_id].push_back(anime_item->GetEnglishTitle());
+    CleanTitle(clean_titles[anime_id].back());
+  }
+
+  // Synonyms
+  if (!anime_item->GetSynonyms().empty()) {
+    for (auto it = anime_item->GetSynonyms().begin();
+         it != anime_item->GetSynonyms().end(); ++it) {
+      clean_titles[anime_id].push_back(*it);
+      CleanTitle(clean_titles[anime_id].back());
+    }
+  }
+  if (anime_item->IsInList() && !anime_item->GetUserSynonyms().empty()) {
+    for (auto it = anime_item->GetUserSynonyms().begin();
+         it != anime_item->GetUserSynonyms().end(); ++it) {
+      clean_titles[anime_id].push_back(*it);
+      CleanTitle(clean_titles[anime_id].back());
+    }
+  }
 }
 
 void RecognitionEngine::EraseUnnecessary(wstring& str) {

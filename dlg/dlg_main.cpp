@@ -185,27 +185,22 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0, ICON24_ARROW_LEFT, TOOLBAR_BUTTON_GOBACK, 
-                            0, fsStyle1, 0, nullptr, L"Go back");
-  toolbar_main.InsertButton(1, ICON24_ARROW_RIGHT, TOOLBAR_BUTTON_GOFORWARD, 
-                            0, fsStyle1, 1, nullptr, L"Go forward");
+  toolbar_main.InsertButton(0, ICON24_SYNC, TOOLBAR_BUTTON_SYNCHRONIZE, 
+                            1, fsStyle1, 0, nullptr, L"Synchronize list");
+  toolbar_main.InsertButton(1, ICON24_MAL, TOOLBAR_BUTTON_MAL, 
+                            1, fsStyle1, 1, nullptr, L"View your panel at MyAnimeList");
   toolbar_main.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(3, ICON24_SYNC, TOOLBAR_BUTTON_SYNCHRONIZE, 
-                            1, fsStyle1, 3, nullptr, L"Synchronize list");
-  toolbar_main.InsertButton(4, ICON24_MAL, TOOLBAR_BUTTON_MAL, 
-                            1, fsStyle1, 4, nullptr, L"View your panel at MyAnimeList");
+  toolbar_main.InsertButton(3, ICON24_FOLDERS, TOOLBAR_BUTTON_FOLDERS, 
+                            1, fsStyle2, 3, nullptr, L"Root folders");
+  toolbar_main.InsertButton(4, ICON24_TOOLS, TOOLBAR_BUTTON_TOOLS, 
+                            1, fsStyle2, 4, nullptr, L"External services");
   toolbar_main.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(6, ICON24_FOLDERS, TOOLBAR_BUTTON_FOLDERS, 
-                            1, fsStyle2, 6, nullptr, L"Anime folders");
-  toolbar_main.InsertButton(7, ICON24_TOOLS, TOOLBAR_BUTTON_TOOLS, 
-                            1, fsStyle2, 7, nullptr, L"Tools");
-  toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(9, ICON24_SETTINGS, TOOLBAR_BUTTON_SETTINGS, 
-                            1, fsStyle1, 9, nullptr, L"Change program settings");
+  toolbar_main.InsertButton(6, ICON24_SETTINGS, TOOLBAR_BUTTON_SETTINGS, 
+                            1, fsStyle1, 6, nullptr, L"Change program settings");
 #ifdef _DEBUG
-  toolbar_main.InsertButton(10, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(11, ICON24_ABOUT, TOOLBAR_BUTTON_ABOUT, 
-                            1, fsStyle1, 11, nullptr, L"Debug");
+  toolbar_main.InsertButton(7, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(8, ICON24_ABOUT, TOOLBAR_BUTTON_ABOUT, 
+                            1, fsStyle1, 8, nullptr, L"Debug");
 #endif
 
   // Insert rebar bands
@@ -998,10 +993,4 @@ void MainDialog::Navigation::Refresh(bool add_to_history) {
     items_.push_back(current_page_);
     index_ = items_.size() - 1;
   }
-  
-  bool enable_back = index_ > 0;
-  bool enable_forward = index_ < items_.size() - 1;
-
-  parent->toolbar_main.EnableButton(TOOLBAR_BUTTON_GOBACK, enable_back);
-  parent->toolbar_main.EnableButton(TOOLBAR_BUTTON_GOFORWARD, enable_forward);
 }

@@ -324,7 +324,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   // Set title
   if (anime_item) {
     if (Settings.Program.List.english_titles) {
-      SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetEnglishTitle(false, true).c_str());
+      SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetEnglishTitle(true).c_str());
     } else {
       SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
     }

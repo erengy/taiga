@@ -409,7 +409,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         case 0: // Anime title
           if (Settings.Program.List.english_titles) {
             plvdi->item.pszText = const_cast<LPWSTR>(
-              anime_item->GetEnglishTitle(false, true).data());
+              anime_item->GetEnglishTitle(true).data());
           } else {
             plvdi->item.pszText = const_cast<LPWSTR>(
               anime_item->GetTitle().data());
@@ -585,7 +585,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
     wstring text = mal::TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + mal::TranslateNumber(eps_total);
     if (!Settings.Program.List.progress_show_eps) text += L" episodes";
     if (anime_item->GetMyRewatching()) text += L" (rw)";
-    dc.EditFont(nullptr, 7);
+    dc.EditFont(nullptr, 8);
     dc.SetBkMode(TRANSPARENT);
     rcText.Offset(1, 1);
     dc.SetTextColor(RGB(255, 255, 255));

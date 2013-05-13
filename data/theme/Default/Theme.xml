@@ -24,8 +24,8 @@
 			<icon name="arrow-090"/>
 			<icon name="arrow-270"/>
 			<icon name="funnel-small"/>
-			<icon name="funnel-tick"/>
 			<icon name="funnel-cross"/>
+			<icon name="funnel-tick"/>
 			<icon name="funnel-plus"/>
 			<icon name="funnel-pencil"/>
 			<icon name="calendar-month"/>
@@ -78,7 +78,7 @@
 		
 		<!-- Library -->
 		<menu name="Library">
-			<item name="Anime folders" sub="Folders"/>
+			<item name="Root folders" sub="Folders"/>
 			<item type="separator"/>
 			<item name="Play random anime" action="PlayRandomAnime()"/>
 			<item name="Scan available episodes" action="CheckEpisodes()"/>

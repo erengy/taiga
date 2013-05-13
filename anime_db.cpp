@@ -179,11 +179,11 @@ void Database::UpdateItem(Item& new_item) {
       item->SetEpisodeCount(new_item.GetEpisodeCount());
     if (new_item.GetAiringStatus(false) > 0)
       item->SetAiringStatus(new_item.GetAiringStatus());
-    if (!new_item.GetTitle(false).empty())
+    if (!new_item.GetTitle().empty())
       item->SetTitle(new_item.GetTitle());
     if (!new_item.GetEnglishTitle(false).empty())
       item->SetEnglishTitle(new_item.GetEnglishTitle());
-    if (!new_item.GetSynonyms(false).empty())
+    if (!new_item.GetSynonyms().empty())
       item->SetSynonyms(new_item.GetSynonyms());
     if (mal::IsValidDate(new_item.GetDate(DATE_START)))
       item->SetDate(DATE_START, new_item.GetDate(DATE_START));
