@@ -152,6 +152,7 @@ void MainDialog::CreateDialogControls() {
   cancel_button.SetPosition(nullptr, rcEdit.right + 1, 0, 16, 16);
   // Create treeview control
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
+  treeview.SendMessage(TVM_SETBKCOLOR, 0, ::GetSysColor(COLOR_3DFACE));
   treeview.SetImageList(UI.ImgList16.GetHandle());
   treeview.SetItemHeight(20);
   treeview.SetTheme();
@@ -177,7 +178,7 @@ void MainDialog::CreateDialogControls() {
 
   // Insert menu toolbar buttons
   BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
-  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  Library", nullptr);
+  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  File", nullptr);
   toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  MyAnimeList", nullptr);
   toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"  Tools", nullptr);
   toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"  View", nullptr);
@@ -516,7 +517,7 @@ void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
     win32::Rect rect;
 
     rect.Copy(rect_sidebar_);
-    dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+    dc.FillRect(rect, ::GetSysColor(COLOR_3DFACE));
 
     rect.left = rect.right - 1;
     dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));

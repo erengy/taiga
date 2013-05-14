@@ -72,7 +72,12 @@ protected:
 
   win32::Edit edit_title_;
   win32::Window sys_link_;
-  win32::Tab tab_;
+  
+  class Tab : public win32::Tab {
+  public:
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+  } tab_;
 };
 
 class NowPlayingDialog : public AnimeDialog {

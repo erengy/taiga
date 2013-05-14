@@ -64,7 +64,7 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
   switch (pnmh->code) {
     // Custom draw
     case NM_CUSTOMDRAW: {
-      LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(lParam);
+      LPNMTVCUSTOMDRAW pCD = reinterpret_cast<LPNMTVCUSTOMDRAW>(lParam);
       switch (pCD->nmcd.dwDrawStage) {
         case CDDS_PREPAINT:
           return CDRF_NOTIFYITEMDRAW;
@@ -75,13 +75,13 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
           if (pCD->nmcd.lItemlParam == -1) {
             win32::Rect rcItem = pCD->nmcd.rc;
             win32::Dc hdc = pCD->nmcd.hdc;
-            hdc.FillRect(rcItem, RGB(255, 255, 255));
+            hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DFACE));
             rcItem.top += (rcItem.bottom - rcItem.top) / 2;
-            GradientRect(hdc.Get(), &rcItem, RGB(245, 245 ,245), RGB(255, 255, 255), true);
+            //GradientRect(hdc.Get(), &rcItem, ::GetSysColor(COLOR_3DLIGHT), ::GetSysColor(COLOR_3DFACE), true);
             rcItem.bottom = rcItem.top + 2;
-            hdc.FillRect(rcItem, RGB(255, 255, 255));
+            hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DHIGHLIGHT));
             rcItem.bottom -= 1;
-            hdc.FillRect(rcItem, RGB(230, 230, 230));
+            hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DLIGHT));
             hdc.DetachDC();
           }
           return CDRF_DODEFAULT;
@@ -332,7 +332,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   #define SHOWUIMENU(id, name) \
     case id: action = UI.Menus.Show(hwnd, pt.x, pt.y, name); break;
   switch (tbb.idCommand) {
-    SHOWUIMENU(100, L"Library");
+    SHOWUIMENU(100, L"File");
     SHOWUIMENU(101, L"MyAnimeList");
     SHOWUIMENU(102, L"Tools");
     SHOWUIMENU(103, L"View");

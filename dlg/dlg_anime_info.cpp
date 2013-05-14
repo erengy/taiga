@@ -132,7 +132,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         SetBkMode(hdc, TRANSPARENT);
         SetTextColor(hdc, RGB(0x00, 0x33, 0x99));
       }
-      return reinterpret_cast<INT_PTR>(::GetStockObject(WHITE_BRUSH));
+      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }
 
     case WM_DRAWITEM: {
@@ -255,6 +255,103 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
     }
   }
   return FALSE;
+}
+
+LRESULT AnimeDialog::Tab::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_PAINT: {
+      if (::GetUpdateRect(hwnd, NULL, FALSE)) {
+        PAINTSTRUCT ps;
+        HDC hdc = ::BeginPaint(hwnd, &ps);
+        OnPaint(hdc, &ps);
+        ::EndPaint(hwnd, &ps);
+      } else {
+        HDC hdc = ::GetDC(hwnd);
+        OnPaint(hdc, NULL);
+        ::ReleaseDC(hwnd, hdc);
+      }
+      break;
+    }
+  }
+  
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+  // Adapted from Paul Sanders' example code, located at:
+  // http://www.glennslayden.com/code/win32/tab-control-background-brush
+
+  ::CallWindowProc(m_PrevWindowProc, m_hWindow, WM_PRINTCLIENT, 
+                   reinterpret_cast<WPARAM>(hdc), PRF_CLIENT);
+
+  HRGN region = ::CreateRectRgn(0, 0, 0, 0);
+  RECT rect, lh_corner = {0}, rh_corner = {0};
+
+  int item_count = GetItemCount();
+  int current_item = GetCurrentlySelected();
+  int tab_height = 0;
+  
+  bool is_vista = win32::GetWinVersion() >= win32::VERSION_VISTA;
+  bool is_themed_xp = !is_vista && ::IsThemeActive();
+
+  for (int i = 0; i < item_count; ++i) {
+    TabCtrl_GetItemRect(m_hWindow, i, &rect);
+    if (i == current_item) {
+      tab_height = (rect.bottom - rect.top) + 2;
+      rect.left -= 1;
+      rect.right += 1;
+      rect.top -= 2;
+      if (i == 0) {
+        rect.left -= 1;
+        if (!is_themed_xp)
+          rect.right += 1;
+      }
+      if (i == item_count - 1)
+        rect.right += 1;
+    } else {
+      rect.right -= 1;
+      if ((is_themed_xp || is_vista) && i == item_count - 1)
+        rect.right -= 1;
+    }
+
+    if (is_themed_xp) {
+      if (i != current_item + 1) {
+        lh_corner = rect;
+        lh_corner.bottom = lh_corner.top + 1;
+        lh_corner.right = lh_corner.left + 1;
+      }
+      rh_corner = rect;
+      rh_corner.bottom = rh_corner.top + 1;
+      rh_corner.left = rh_corner.right - 1;
+    }
+
+    HRGN tab_region = ::CreateRectRgn(rect.left, rect.top, rect.right, rect.bottom);
+    ::CombineRgn(region, region, tab_region, RGN_OR);
+    ::DeleteObject(tab_region);
+
+    if (lh_corner.right > lh_corner.left) {
+      HRGN rounded_corner = ::CreateRectRgn(
+        lh_corner.left, lh_corner.top, lh_corner.right, lh_corner.bottom);
+      ::CombineRgn(region, region, rounded_corner, RGN_DIFF);
+      ::DeleteObject(rounded_corner);
+    }
+    if (rh_corner.right > rh_corner.left) {
+      HRGN rounded_corner = ::CreateRectRgn(
+        rh_corner.left, rh_corner.top, rh_corner.right, rh_corner.bottom);
+      ::CombineRgn(region, region, rounded_corner, RGN_DIFF);
+      ::DeleteObject(rounded_corner);
+    }
+  }
+
+  GetClientRect(&rect);
+  HRGN fill_region = ::CreateRectRgn(
+    rect.left, rect.top, rect.right, rect.top + tab_height);
+  ::CombineRgn(fill_region, fill_region, region, RGN_DIFF);
+  ::SelectClipRgn(hdc, fill_region);
+  HBRUSH hBGBrush = ::GetSysColorBrush(COLOR_WINDOW);
+  ::FillRgn(hdc, fill_region, hBGBrush);
+  ::DeleteObject(fill_region);
+  ::DeleteObject(region);
 }
 
 // =============================================================================
@@ -510,7 +607,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   if (mode_ == DIALOG_MODE_ANIME_INFORMATION) {
     win32::Rect rect_button;
     ::GetWindowRect(GetDlgItem(IDOK), &rect_button);
-    rect.bottom -= rect_button.Height() + ScaleY(WIN_CONTROL_MARGIN);
+    rect.bottom -= rect_button.Height() + ScaleY(WIN_CONTROL_MARGIN) * 2;
   }
 
   // Content

@@ -69,19 +69,21 @@
 	<menus>
 		<!-- Main -->
 		<menu name="Main" type="menubar">
-			<item name="Library"     sub="Library"/>
+			<item name="File"        sub="File"/>
 			<item name="MyAnimeList" sub="MyAnimeList"/>
 			<item name="Tools"       sub="Tools"/>
 			<item name="View"        sub="View"/>
 			<item name="Help"        sub="Help"/>
 		</menu>
 		
-		<!-- Library -->
-		<menu name="Library">
+		<!-- File -->
+		<menu name="File">
 			<item name="Root folders" sub="Folders"/>
 			<item type="separator"/>
 			<item name="Play random anime" action="PlayRandomAnime()"/>
 			<item name="Scan available episodes" action="CheckEpisodes()"/>
+			<item type="separator"/>
+			<item name="Exit" action="Exit()"/>
 		</menu>
 		<!-- MyAnimeList -->
 		<menu name="MyAnimeList">
