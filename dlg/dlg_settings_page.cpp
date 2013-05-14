@@ -60,7 +60,6 @@ BOOL SettingsPage::OnInitDialog() {
     case PAGE_ACCOUNT: {
       SetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.user.c_str());
       SetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.password.c_str());
-      CheckDlgButton(IDC_RADIO_API1 + Settings.Account.MAL.api - 1, TRUE);
       CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.Account.MAL.auto_login);
       break;
     }

@@ -150,7 +150,6 @@ void SettingsDialog::OnOK() {
   wstring mal_user_old = Settings.Account.MAL.user;
   pages[PAGE_ACCOUNT].GetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.user);
   pages[PAGE_ACCOUNT].GetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.password);
-  Settings.Account.MAL.api = pages[PAGE_ACCOUNT].GetCheckedRadioButton(IDC_RADIO_API1, IDC_RADIO_API2) + 1;
   Settings.Account.MAL.auto_login = pages[PAGE_ACCOUNT].IsDlgButtonChecked(IDC_CHECK_START_LOGIN);
 
   // Update

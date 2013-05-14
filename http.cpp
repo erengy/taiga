@@ -150,11 +150,6 @@ BOOL HttpClient::OnHeadersAvailable(win32::http_header_t& headers) {
 BOOL HttpClient::OnRedirect(wstring address) {
   wstring status = L"Redirecting... (" + address + L")";
   switch (GetClientMode()) {
-    case HTTP_MAL_Login:
-      if (Settings.Account.MAL.api == MAL_API_NONE) {
-        return TRUE; // Disable auto-redirection to panel.php
-      }
-      break;
     case HTTP_Feed_Check:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
@@ -267,34 +262,16 @@ BOOL HttpClient::OnReadComplete() {
     
     // Login
     case HTTP_MAL_Login: {
-      switch (Settings.Account.MAL.api) {
-        case MAL_API_OFFICIAL:
-          Taiga.logged_in = InStr(GetData(), L"<username>" + Settings.Account.MAL.user + L"</username>", 0) > -1;
-          break;
-        case MAL_API_NONE:
-          Taiga.logged_in = !(GetCookie().empty());
-          break;
-      }
+      Taiga.logged_in = InStr(GetData(), L"<username>" + Settings.Account.MAL.user + L"</username>", 0) > -1;
       if (Taiga.logged_in) {
         status = L"Logged in as " + Settings.Account.MAL.user + L".";
       } else {
         status = L"Failed to log in.";
-        switch (Settings.Account.MAL.api) {
-          case MAL_API_OFFICIAL:
 #ifdef _DEBUG
-            status += L" (" + GetData() + L")";
+        status += L" (" + GetData() + L")";
 #else
-            status += L" (Invalid user name or password)";
+        status += L" (Invalid user name or password)";
 #endif
-            break;
-          case MAL_API_NONE:
-            if (InStr(GetData(), L"Could not find that user name", 1) > -1) {
-              status += L" (Invalid user name)";
-            } else if (InStr(GetData(), L"Error: Invalid password", 1) > -1) {
-              status += L" (Invalid password)";
-            }
-            break;
-        }
       }
       MainDialog.ChangeStatus(status);
       MainDialog.EnableInput(true);
@@ -302,14 +279,8 @@ BOOL HttpClient::OnReadComplete() {
       MainDialog.UpdateTitle();
       UpdateAllMenus();
       if (Taiga.logged_in) {
-        switch (Settings.Account.MAL.api) {
-          case MAL_API_OFFICIAL:
-            ExecuteAction(L"Synchronize");
-            return TRUE;
-          case MAL_API_NONE:
-            mal::CheckProfile();
-            return TRUE;
-        }
+        ExecuteAction(L"Synchronize");
+        return TRUE;
       }
       break;
     }
@@ -318,54 +289,6 @@ BOOL HttpClient::OnReadComplete() {
 
     // Check profile
     case HTTP_MAL_Profile: {
-      if (Settings.Account.MAL.api == MAL_API_NONE) {
-        int pos = 0;
-        wstring data = GetData();
-
-        #define CHECK_PROFILE_ITEM(new_item, page) \
-        new_item = false; \
-        pos = InStr(data, L"<a href=\"/" page L".php", 0); \
-        if (pos > -1) { \
-          if (IsEqual(data.substr(pos - 18, 18), L"<span class=\"new\">")) { \
-            new_item = true; \
-          } \
-        }
-        // Check messages
-        bool new_message = false;
-        CHECK_PROFILE_ITEM(new_message, L"mymessages");
-        // Check friend requests
-        bool new_friend_request = false;
-        CHECK_PROFILE_ITEM(new_friend_request, L"myfriends");
-        // Check club invitations
-        bool new_club_invitation = false;
-        CHECK_PROFILE_ITEM(new_club_invitation, L"clubs");
-        #undef CHECK_PROFILE_ITEM
-
-        if (new_message || new_friend_request || new_club_invitation) {
-          status.clear();
-          if (new_message)
-            AppendString(status, L"messages");
-          if (new_friend_request)
-            AppendString(status, L"friend requests");
-          if (new_club_invitation)
-            AppendString(status, L"club invitations");
-          status = L"You have new " + status + L" waiting on your profile.";
-          MainDialog.ChangeStatus(status);
-
-          win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-          dlg.SetMainInstruction(status.c_str());
-          dlg.UseCommandLinks(true);
-          dlg.AddButton(L"Check\nView your profile now", IDYES);
-          dlg.AddButton(L"Cancel\nCheck them later", IDNO);
-          dlg.Show(g_hMain);
-          if (dlg.GetSelectedButtonID() == IDYES) {
-            mal::ViewProfile();
-          }
-        }
-
-        History.queue.Check();
-        return TRUE;
-      }
       break;
     }
 

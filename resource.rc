@@ -298,16 +298,14 @@ STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI"
 {
-    GROUPBOX        "Account", IDC_STATIC, 10, 5, 295, 65
-    LTEXT           "User name:", IDC_STATIC, 20, 20, 55, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_USER, 20, 30, 130, 12, ES_AUTOHSCROLL
-    LTEXT           "Password:", IDC_STATIC, 165, 20, 60, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_PASS, 165, 30, 130, 12, ES_AUTOHSCROLL | ES_PASSWORD
-    CONTROL         "<a href=""URL(http://myanimelist.net/register.php)"">Create a new account</a>", IDC_LINK_MAL, "SysLink", 0x50010000, 20, 50, 130, 10
-    AUTORADIOBUTTON "Default", IDC_RADIO_API1, 20, 90, 50, 10
-    AUTORADIOBUTTON "Official API (recommended)", IDC_RADIO_API2, 20, 100, 120, 10
-    AUTOCHECKBOX    "Automatically login at start-up", IDC_CHECK_START_LOGIN, 165, 95, 130, 10
-    GROUPBOX        "Connection", IDC_STATIC, 10, 75, 295, 45
+    GROUPBOX        "Account", IDC_STATIC, 7, 7, 295, 56
+    LTEXT           "User name:", IDC_STATIC, 12, 18, 55, 8, SS_LEFT
+    EDITTEXT        IDC_EDIT_USER, 12, 28, 130, 12, ES_AUTOHSCROLL
+    LTEXT           "Password:", IDC_STATIC, 149, 18, 60, 8, SS_LEFT
+    EDITTEXT        IDC_EDIT_PASS, 149, 28, 130, 12, ES_AUTOHSCROLL | ES_PASSWORD
+    CONTROL         "<a href=""URL(http://myanimelist.net/register.php)"">Create a new account</a>", IDC_LINK_MAL, "SysLink", 0x50010000, 13, 47, 129, 8
+    AUTOCHECKBOX    "Automatically login at start-up", IDC_CHECK_START_LOGIN, 12, 81, 130, 9
+    GROUPBOX        "Connection", IDC_STATIC, 7, 70, 295, 26
 }
 
 

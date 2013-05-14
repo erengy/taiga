@@ -140,8 +140,6 @@
 #define IDC_LIST_TORRENT                        1097
 #define IDC_LIST_TORRENT_FILTER                 1098
 #define IDC_PROGRESS_UPDATE                     1099
-#define IDC_RADIO_API1                          1100
-#define IDC_RADIO_API2                          1101
 #define IDC_RADIO_LIST_PROGRESS1                1102
 #define IDC_RADIO_LIST_PROGRESS2                1103
 #define IDC_RADIO_MIRC_CHANNEL1                 1104

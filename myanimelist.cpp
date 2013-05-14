@@ -83,26 +83,16 @@ bool GetList() {
 }
 
 bool Login() {
-  if (Taiga.logged_in || Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty()) return false;
-  switch (Settings.Account.MAL.api) {
-    case MAL_API_OFFICIAL: {
-      return MainClient.Connect(L"myanimelist.net", 
-        L"/api/account/verify_credentials.xml", 
-        L"", 
-        L"GET", 
-        MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-        L"myanimelist.net", L"", 
-        HTTP_MAL_Login);
-    }
-    case MAL_API_NONE: {
-      return MainClient.Post(L"myanimelist.net", L"/login.php",
-        L"username=" + Settings.Account.MAL.user + 
-        L"&password=" + Settings.Account.MAL.password + 
-        L"&cookie=1&sublogin=Login", L"", 
-        HTTP_MAL_Login);
-    }
-  }
-  return false;
+  if (Taiga.logged_in || Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty())
+    return false;
+
+  return MainClient.Connect(L"myanimelist.net", 
+    L"/api/account/verify_credentials.xml", 
+    L"", 
+    L"GET", 
+    MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
+    L"myanimelist.net", L"", 
+    HTTP_MAL_Login);
 }
 
 bool DownloadImage(int anime_id, const wstring& image_url) {
@@ -209,27 +199,17 @@ bool SearchAnime(int anime_id, wstring title) {
   Replace(title, L"+", L"%2B", true);
   ReplaceChar(title, L'\u2729', L'\u2606'); // stress outlined white star to white star
 
-  switch (Settings.Account.MAL.api) {
-    case MAL_API_OFFICIAL: {
-      if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty()) {
-        return false;
-      }
-      return client->Connect(L"myanimelist.net", 
-        L"/api/anime/search.xml?q=" + title, 
-        L"", 
-        L"GET", 
-        client->GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-        L"myanimelist.net", 
-        L"", HTTP_MAL_SearchAnime, 
-        static_cast<LPARAM>(anime_id));
-    }
-    case MAL_API_NONE: {
-      if (anime_id <= anime::ID_UNKNOWN) {
-        ViewAnimeSearch(title); // TEMP
-      }
-      return true;
-    }
-  }
+  if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty())
+    return false;
+
+  return client->Connect(L"myanimelist.net", 
+    L"/api/anime/search.xml?q=" + title, 
+    L"", 
+    L"GET", 
+    client->GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
+    L"myanimelist.net", 
+    L"", HTTP_MAL_SearchAnime, 
+    static_cast<LPARAM>(anime_id));
 
   return false;
 }
@@ -245,169 +225,48 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
   if (!anime_item) return false;
 
-  switch (Settings.Account.MAL.api) {
-    // Use official MAL API
-    case MAL_API_OFFICIAL: {
-      // Build XML data
-      wstring data;
-      if (update_mode != HTTP_MAL_AnimeDelete) {
-        data = L"data=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<entry>";
-        ADD_DATA_N(L"episode", episode);
-        ADD_DATA_N(L"status", status);
-        ADD_DATA_N(L"score", score);
-        ADD_DATA_N(L"downloaded_episodes", downloaded_episodes);
-        ADD_DATA_N(L"storage_type", storage_type);
-        ADD_DATA_N(L"storage_value", storage_value);
-        ADD_DATA_N(L"times_rewatched", times_rewatched);
-        ADD_DATA_N(L"rewatch_value", rewatch_value);
-        ADD_DATA_S(L"date_start", date_start);
-        ADD_DATA_S(L"date_finish", date_finish);
-        ADD_DATA_N(L"priority", priority);
-        ADD_DATA_N(L"enable_discussion", enable_discussion);
-        ADD_DATA_N(L"enable_rewatching", enable_rewatching);
-        ADD_DATA_S(L"comments", comments);
-        ADD_DATA_S(L"fansub_group", fansub_group);
-        ADD_DATA_S(L"tags", tags);
-        data += L"\r\n</entry>";
-      }
-      
-      win32::Url url;
-      switch (update_mode) {
-        // Add anime
-        case HTTP_MAL_AnimeAdd: {
-          url = L"myanimelist.net/api/animelist/add/" + ToWstr(anime_id) + L".xml";
-          break;
-        }
-        // Delete anime
-        case HTTP_MAL_AnimeDelete: {
-          url = L"myanimelist.net/api/animelist/delete/" + ToWstr(anime_id) + L".xml";
-          break;
-        }
-        // Update anime
-        default: {
-          url = L"myanimelist.net/api/animelist/update/" + ToWstr(anime_id) + L".xml";
-          break;
-        }
-      }
-
-      MainClient.Connect(url, data, L"POST", 
-        MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-        L"myanimelist.net", L"", update_mode, static_cast<LPARAM>(anime_id));
-      break;
-    }
-  
-    // Use default update method  
-    case MAL_API_NONE: {
-      switch (update_mode) {
-        // Update episode
-        case HTTP_MAL_AnimeUpdate:
-          MainClient.Post(L"myanimelist.net", 
-            L"/includes/ajax.inc.php?t=79", 
-            L"anime_id=" + ToWstr(anime_id) + 
-            L"&ep_val="  + ToWstr(*anime_values.episode), 
-            L"", update_mode, static_cast<LPARAM>(anime_id));
-          break;
-        // Update score
-        case HTTP_MAL_ScoreUpdate:
-          MainClient.Post(L"myanimelist.net", 
-            L"/includes/ajax.inc.php?t=63", 
-            L"id="     + ToWstr(anime_id) + 
-            L"&score=" + ToWstr(*anime_values.score), 
-            L"", update_mode, static_cast<LPARAM>(anime_id));
-          break;
-        // Update tags
-        case HTTP_MAL_TagUpdate:
-          MainClient.Get(L"myanimelist.net", 
-            L"/includes/ajax.inc.php?t=22" \
-            L"&aid="  + ToWstr(anime_id) + 
-            L"&tags=" + EncodeUrl(*anime_values.tags), 
-            L"", update_mode, static_cast<LPARAM>(anime_id));
-          break;
-        // Add anime
-        case HTTP_MAL_AnimeAdd:
-          MainClient.Post(L"myanimelist.net", 
-            L"/includes/ajax.inc.php?t=61", 
-            L"aid="      + ToWstr(anime_id) + 
-            L"&score=0"
-            L"&status="  + ToWstr(*anime_values.status) + 
-            L"&epsseen=" + ToWstr(*anime_values.episode), 
-            L"", update_mode, static_cast<LPARAM>(anime_id));
-          break;
-        // Delete anime
-        case HTTP_MAL_AnimeDelete: 
-          MainClient.Post(L"myanimelist.net", 
-            L"/editlist.php?type=anime&id=" + ToWstr(anime_id), 
-            L"series_id=" + ToWstr(anime_id) +
-            L"&anime_db_series_id=" + ToWstr(anime_id) + 
-            L"&series_title=" + ToWstr(anime_id) + 
-            L"&submitIt=3" + 
-            L"&hideLayout",
-            L"", update_mode, static_cast<LPARAM>(anime_id));
-          break;
-        // Update status
-        case HTTP_MAL_StatusUpdate:
-          MainClient.Post(L"myanimelist.net", 
-            L"/includes/ajax.inc.php?t=62", 
-            L"aid="      + ToWstr(anime_id) + 
-            L"&alistid=" + ToWstr(anime_id) + 
-            L"&score="   + ToWstr(anime_item->GetMyScore(false)) + 
-            L"&status="  + ToWstr(*anime_values.status) + 
-            L"&epsseen=" + ToWstr(anime_values.episode ? *anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)), 
-            L"", update_mode, static_cast<LPARAM>(anime_id));
-          break;
-        // Edit anime
-        case HTTP_MAL_AnimeEdit: {
-          wstring buffer = 
-            L"series_id="           + ToWstr(anime_id) + 
-            L"&anime_db_series_id=" + ToWstr(anime_id) + 
-            L"&series_title="       + ToWstr(anime_id) + 
-            L"&aeps="               + ToWstr(anime_item->GetEpisodeCount(false)) + 
-            L"&astatus="            + ToWstr(anime_item->GetAiringStatus()) + 
-            L"&close_on_update=true"
-            L"&status="             + ToWstr(*anime_values.status);
-          if (anime_values.enable_rewatching) {
-            buffer += 
-            L"&rewatching="         + ToWstr(*anime_values.enable_rewatching);
-          }
-          buffer += 
-            L"&last_status="        + ToWstr(anime_item->GetMyStatus(false)) + 
-            L"&completed_eps="      + ToWstr(anime_values.episode ? *anime_values.episode : anime_item->GetMyLastWatchedEpisode(false)) + 
-            L"&last_completed_eps=" + ToWstr(anime_item->GetMyLastWatchedEpisode(false)) + 
-            L"&score="              + ToWstr(anime_values.score ? *anime_values.score : anime_item->GetMyScore(false));
-          if (anime_values.tags) {
-            buffer += 
-            L"&tags=" + EncodeUrl(*anime_values.tags);
-          }
-          const Date& date_start = anime_item->GetMyDate(anime::DATE_START);
-          if (mal::IsValidDate(date_start)) {
-            buffer += 
-            L"&startMonth=" + ToWstr(date_start.month) + 
-            L"&startDay="   + ToWstr(date_start.day) + 
-            L"&startYear="  + ToWstr(date_start.year);
-          } else {
-            buffer += 
-            L"&unknownStart=1";
-          }
-          const Date& date_end = anime_item->GetMyDate(anime::DATE_END);
-          if (mal::IsValidDate(date_end)) {
-            buffer += 
-            L"&endMonth=" + ToWstr(date_end.month) + 
-            L"&endDay="   + ToWstr(date_end.day) + 
-            L"&endYear="  + ToWstr(date_end.year);
-          } else {
-            buffer += 
-            L"&unknownEnd=1";
-          }
-          buffer += L"&submitIt=2";
-          MainClient.Post(L"myanimelist.net", 
-            L"/editlist.php?type=anime&id=" + ToWstr(anime_id) + L"&hideLayout=true", 
-            buffer, L"", update_mode, static_cast<LPARAM>(anime_id));
-          break;
-        }
-      }
-      break;
-    }
+  // Build XML data
+  wstring data;
+  if (update_mode != HTTP_MAL_AnimeDelete) {
+    data = L"data=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<entry>";
+    ADD_DATA_N(L"episode", episode);
+    ADD_DATA_N(L"status", status);
+    ADD_DATA_N(L"score", score);
+    ADD_DATA_N(L"downloaded_episodes", downloaded_episodes);
+    ADD_DATA_N(L"storage_type", storage_type);
+    ADD_DATA_N(L"storage_value", storage_value);
+    ADD_DATA_N(L"times_rewatched", times_rewatched);
+    ADD_DATA_N(L"rewatch_value", rewatch_value);
+    ADD_DATA_S(L"date_start", date_start);
+    ADD_DATA_S(L"date_finish", date_finish);
+    ADD_DATA_N(L"priority", priority);
+    ADD_DATA_N(L"enable_discussion", enable_discussion);
+    ADD_DATA_N(L"enable_rewatching", enable_rewatching);
+    ADD_DATA_S(L"comments", comments);
+    ADD_DATA_S(L"fansub_group", fansub_group);
+    ADD_DATA_S(L"tags", tags);
+    data += L"\r\n</entry>";
   }
+      
+  win32::Url url;
+  switch (update_mode) {
+    // Add anime
+    case HTTP_MAL_AnimeAdd:
+      url = L"myanimelist.net/api/animelist/add/" + ToWstr(anime_id) + L".xml";
+      break;
+    // Delete anime
+    case HTTP_MAL_AnimeDelete:
+      url = L"myanimelist.net/api/animelist/delete/" + ToWstr(anime_id) + L".xml";
+      break;
+    // Update anime
+    default:
+      url = L"myanimelist.net/api/animelist/update/" + ToWstr(anime_id) + L".xml";
+      break;
+  }
+
+  MainClient.Connect(url, data, L"POST", 
+    MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
+    L"myanimelist.net", L"", update_mode, static_cast<LPARAM>(anime_id));
 
   #undef ADD_DATA_N
   #undef ADD_DATA_S
@@ -419,67 +278,25 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
 bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
   int update_mode = item.mode;
   bool success = false;
-  
-  switch (Settings.Account.MAL.api) {
-    case MAL_API_OFFICIAL: {
-      switch (update_mode) {
-        case HTTP_MAL_AnimeAdd:
-          success = IsNumeric(data) || 
-            InStr(data, L"This anime is already on your list") > -1 || 
-            InStr(data, L"<title>201 Created</title>") > -1; // TODO: Remove when MAL fixes its API
-          break;
-        case HTTP_MAL_AnimeDelete:
-          success = data == L"Deleted";
-          break;
-        default:
-          success = data == L"Updated";
-          break;
-      }
+
+  switch (update_mode) {
+    case HTTP_MAL_AnimeAdd:
+      success = IsNumeric(data) || 
+        InStr(data, L"This anime is already on your list") > -1 || 
+        InStr(data, L"<title>201 Created</title>") > -1; // TODO: Remove when MAL fixes its API
       break;
-    }
-    case MAL_API_NONE: {
-      switch (update_mode) {
-        case HTTP_MAL_AnimeAdd:
-          success = true; // TODO
-          break;
-        case HTTP_MAL_AnimeDelete:
-          success = (InStr(data, L"Success", 0) > -1) || (InStr(data, L"This is not your entry", 0) > -1);
-          break;
-        case HTTP_MAL_AnimeUpdate:
-          success = ToInt(data) == *item.episode;
-          break;
-        case HTTP_MAL_ScoreUpdate:
-          success = InStr(data, L"Updated score", 0) > -1;
-          break;
-        case HTTP_MAL_TagUpdate:
-          success = (*item.tags).empty() ? data.empty() : InStr(data, L"/animelist/", 0) > -1;
-          break;
-        case HTTP_MAL_AnimeEdit:
-        case HTTP_MAL_StatusUpdate:
-          success = InStr(data, L"Success", 0) > -1;
-          break;
-      }
+    case HTTP_MAL_AnimeDelete:
+      success = data == L"Deleted";
       break;
-    }
+    default:
+      success = data == L"Updated";
+      break;
   }
+
   if (success) return true;
 
   // Set error message on failure     
-  switch (Settings.Account.MAL.api) {
-    case MAL_API_OFFICIAL:
-      item.reason = data;
-      break;
-    case MAL_API_NONE:
-      switch (update_mode) {
-        case HTTP_MAL_AnimeDelete:
-          item.reason = InStr(data, L"class=\"badresult\">", L"</div>");
-          if (item.reason.empty()) item.reason = data;
-          break;
-        default:
-          item.reason = data;
-          break;
-      }
-  }
+  item.reason = data;
   Replace(item.reason, L"</div><div>", L"\r\n");
   StripHtmlTags(item.reason);
   return false;

@@ -347,17 +347,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             if (text.empty()) break;
             switch (search_bar.mode) {
               case SEARCH_MODE_MAL: {
-                switch (Settings.Account.MAL.api) {
-                  case MAL_API_OFFICIAL: {
-                    ExecuteAction(L"SearchAnime(" + text + L")");
-                    return TRUE;
-                  }
-                  case MAL_API_NONE: {
-                    mal::ViewAnimeSearch(text); // TEMP
-                    return TRUE;
-                  }
-                }
-                break;
+                ExecuteAction(L"SearchAnime(" + text + L")");
+                return TRUE;
               }
               case SEARCH_MODE_FEED: {
                 TorrentDialog.Search(Settings.RSS.Torrent.search_url, text);

@@ -190,20 +190,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // SearchAnime()
   } else if (action == L"SearchAnime") {
     if (body.empty()) return;
-    if (Settings.Account.MAL.api == MAL_API_OFFICIAL) {
-      if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty()) {
-        win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-        dlg.SetMainInstruction(L"Would you like to set your account information first?");
-        dlg.SetContent(L"Anime search requires authentication, which means, "
-          L"you need to enter a valid user name and password to search MyAnimeList.");
-        dlg.AddButton(L"Yes", IDYES);
-        dlg.AddButton(L"No", IDNO);
-        dlg.Show(g_hMain);
-        if (dlg.GetSelectedButtonID() == IDYES) {
-          ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
-        }
-        return;
+    if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty()) {
+      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+      dlg.SetMainInstruction(L"Would you like to set your account information first?");
+      dlg.SetContent(L"Anime search requires authentication, which means, "
+        L"you need to enter a valid user name and password to search MyAnimeList.");
+      dlg.AddButton(L"Yes", IDYES);
+      dlg.AddButton(L"No", IDNO);
+      dlg.Show(g_hMain);
+      if (dlg.GetSelectedButtonID() == IDYES) {
+        ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
       }
+      return;
     }
     MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
     MainDialog.edit.SetText(body);

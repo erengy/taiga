@@ -23,11 +23,6 @@
 #include "feed.h"
 #include "optional.h"
 
-enum MalApi {
-  MAL_API_NONE     = 1,
-  MAL_API_OFFICIAL = 2
-};
-
 enum UpdateMode {
   UPDATE_MODE_NONE = 1,
   UPDATE_MODE_AUTO = 2,
@@ -52,112 +47,91 @@ public:
   bool Load();
   bool Save();
 
-public:
   // Account
-  class Account {
-  public:
+  struct Account {
     // MyAnimeList
-    class Mal {
-    public:
-      int api;
+    struct Mal {
       BOOL auto_login;
       wstring password, user;
     } MAL;
     // Update
-    class Update {
-    public:
+    struct Update {
       int delay, mode, time;
       BOOL check_player, out_of_range;
     } Update;
   } Account;
 
   // Anime
-  class Anime {
-  public:
+  struct Anime {
     void SetItem(int id, Optional<wstring> folder, Optional<wstring> titles);
-    class Item {
-    public:
+    struct Item {
       int id;
       wstring folder, titles;
     };
     vector<Item> items;
   } Anime;
   // Folders
-  class Folders {
-  public:
+  struct Folders {
     vector<wstring> root;
     BOOL watch_enabled;
   } Folders;
   
   // Announcements
-  class Announce {
-  public:
+  struct Announce {
     // HTTP
-    class Http {
-    public:
+    struct Http {
       BOOL enabled;
       wstring format, url;
     } HTTP;
     // Messenger
-    class Msn {
-    public:
+    struct Msn {
       BOOL enabled;
       wstring format;
     } MSN;
     // mIRC
-    class Mirc {
-    public:
+    struct Mirc {
       BOOL enabled, multi_server, use_action;
       int mode;
       wstring channels, format, service;
     } MIRC;
     // Skype
-    class Skype {
-    public:
+    struct Skype {
       BOOL enabled;
       wstring format;
     } Skype;
     // Twitter
-    class Twitter {
-    public:
+    struct Twitter {
       BOOL enabled;
       wstring format, oauth_key, oauth_secret, user;
     } Twitter;
   } Announce;
 
   // Program
-  class Program {
-  public:
+  struct Program {
     // General
-    class General {
-    public:
+    struct General {
       BOOL auto_start, close, minimize;
       wstring theme;
     } General;
     // Position
-    class Position {
-    public:
+    struct Position {
       int x, y, w, h;
       BOOL maximized;
     } Position;
     // Start-up
-    class StartUp {
-    public:
+    struct StartUp {
       BOOL check_new_episodes, check_new_version, minimize;
     } StartUp;
     // Exit
-    class Exit {
-    public:
+    struct Exit {
       BOOL ask, remember_pos_size, save_event_queue;
     } Exit;
     // Proxy
-    class Proxy {
-    public:
+    struct Proxy {
       wstring host, password, user;
     } Proxy;
     // List
-    class List {
-    public:
+    struct List {
       int double_click, middle_click;
       BOOL english_titles;
       BOOL highlight;
@@ -166,35 +140,29 @@ public:
       BOOL progress_show_eps;
     } List;
     // Balloon
-    class Balloon {
-    public:
+    struct Balloon {
       BOOL enabled;
       wstring format;
     } Balloon;
   } Program;
 
   // Recognition
-  class Recognition {
-  public:
+  struct Recognition {
     // Streaming
-    class Streaming {
-    public:
+    struct Streaming {
       bool ann_enabled, crunchyroll_enabled, veoh_enabled,
         viz_enabled, youtube_enabled;
     } Streaming;
   } Recognition;
 
   // RSS
-  class Rss {
-  public:
+  struct Rss {
     // Torrent
-    class Torrent {
-    public:
+    struct Torrent {
       BOOL check_enabled, create_folder, hide_unidentified, set_folder;
       int app_mode, check_interval, new_action;
       wstring app_path, download_path, search_url, source;
-      class Filters {
-      public:
+      struct Filters {
         BOOL global_enabled;
       } Filters;
     } Torrent;

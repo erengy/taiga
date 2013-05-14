@@ -63,7 +63,6 @@ bool Settings::Load() {
   xml_node account = settings.child(L"account");
     // MyAnimeList
     xml_node mal = account.child(L"myanimelist");
-    Account.MAL.api = mal.attribute(L"api").as_int(2);
     Account.MAL.auto_login = mal.attribute(L"login").as_int();
     Account.MAL.password = SimpleDecrypt(mal.attribute(L"password").value());
     Account.MAL.user = mal.attribute(L"username").value();
@@ -249,7 +248,6 @@ bool Settings::Save() {
     xml_node mal = account.append_child(L"myanimelist");
     mal.append_attribute(L"username") = Account.MAL.user.c_str();
     mal.append_attribute(L"password") = SimpleEncrypt(Account.MAL.password).c_str();
-    mal.append_attribute(L"api") = Account.MAL.api;
     mal.append_attribute(L"login") = Account.MAL.auto_login;
     // Update
     xml_node update = account.append_child(L"update");
