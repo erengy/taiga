@@ -124,7 +124,7 @@ public:
     } StartUp;
     // Exit
     struct Exit {
-      BOOL ask, remember_pos_size, save_event_queue;
+      BOOL remember_pos_size;
     } Exit;
     // Proxy
     struct Proxy {

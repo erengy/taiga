@@ -160,7 +160,7 @@ void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint background
   GetClientRect(&rect);
-  rect.left = ScaleX(48 * 1.5f);
+  rect.left = ScaleX(static_cast<int>(48 * 1.5f));
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 }
 

@@ -145,19 +145,6 @@ void UpdateFoldersMenu() {
   }
 }
 
-void UpdateSearchMenu() {
-  int menu_index = UI.Menus.GetIndex(L"SearchBar");
-  if (menu_index > -1) {
-    /*for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = false;
-    }
-    MENU.Items[0].Checked = MainDialog.search_bar.filter_content;
-    if (MainDialog.search_bar.index < MENU.Items.size()) {
-      MENU.Items[MainDialog.search_bar.index].Checked = true;
-    }*/
-  }
-}
-
 void UpdateSearchListMenu(bool enabled) {
   int menu_index = UI.Menus.GetIndex(L"SearchList");
   if (menu_index > -1) {
@@ -234,9 +221,9 @@ void UpdateToolsMenu() {
       // Tools > Enable auto sharing
       if (MENU.Items[i].Action == L"ToggleSharing()")
         MENU.Items[i].Checked = Taiga.is_sharing_enabled;
-      // Tools > Enable auto list update
-      if (MENU.Items[i].Action == L"ToggleListUpdate()")
-        MENU.Items[i].Checked = Taiga.is_update_enabled;
+      // Tools > Enable auto synchronization
+      if (MENU.Items[i].Action == L"ToggleSynchronization()")
+        MENU.Items[i].Checked = Taiga.is_sync_enabled;
     }
   }
 }
@@ -277,7 +264,6 @@ void UpdateAllMenus(anime::Item* anime_item) {
   UpdateAnimeMenu(anime_item);
   UpdateAnnounceMenu();
   UpdateFoldersMenu();
-  UpdateSearchMenu();
   UpdateToolsMenu();
   UpdateTrayMenu();
   UpdateViewMenu();

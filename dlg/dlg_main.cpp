@@ -112,9 +112,8 @@ BOOL MainDialog::OnInitDialog() {
     dlg.AddButton(L"Yes", IDYES);
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
-    if (dlg.GetSelectedButtonID() == IDYES) {
-      ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
-    }
+    if (dlg.GetSelectedButtonID() == IDYES)
+      ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAL);
   }
   if (Settings.Folders.watch_enabled) {
     FolderMonitor.SetWindowHandle(GetWindowHandle());
@@ -413,15 +412,6 @@ BOOL MainDialog::OnClose() {
   if (Settings.Program.General.close) {
     Hide();
     return TRUE;
-  }
-  
-  if (Settings.Program.Exit.ask) {
-    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-    dlg.SetMainInstruction(L"Are you sure you want to exit?");
-    dlg.AddButton(L"Yes", IDYES);
-    dlg.AddButton(L"No", IDNO);
-    dlg.Show(g_hMain);
-    if (dlg.GetSelectedButtonID() != IDYES) return TRUE;
   }
 
   return FALSE;

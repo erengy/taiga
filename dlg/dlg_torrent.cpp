@@ -156,7 +156,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Settings
     case 103: {
-      ExecuteAction(L"Settings", 0, PAGE_TORRENT1);
+      ExecuteAction(L"Settings", SECTION_TORRENTS, PAGE_TORRENTS_DISCOVERY);
       return TRUE;
     }
   }

@@ -292,7 +292,7 @@ public:
   virtual ~Tab() {}
 
   void   AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect);
-  int    Clear();
+  int    DeleteAllItems();
   int    DeleteItem(int nIndex);
   int    InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam);
   int    GetCurrentlySelected();

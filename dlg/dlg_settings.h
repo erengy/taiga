@@ -25,6 +25,14 @@
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
+enum SettingsSections {
+  SECTION_SERVICES,
+  SECTION_LIBRARY,
+  SECTION_APPLICATION,
+  SECTION_RECOGNITION,
+  SECTION_SHARING,
+  SECTION_TORRENTS
+};
 // =============================================================================
 
 class SettingsDialog : public win32::Dialog {
@@ -37,9 +45,10 @@ public:
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnOK();
+
+  void SetCurrentSection(int index);
   void SetCurrentPage(int index);
 
-public:
   int AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter);
   void RefreshTorrentFilterList(HWND hwnd_list);
   void RefreshTwitterLink();
@@ -48,8 +57,10 @@ private:
   class TreeView : public win32::TreeView {
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } tree_;
+  win32::Tab tab_;
 
 private:
+  int current_section_;
   int current_page_;
   vector<FeedFilter> feed_filters_;
   vector<SettingsPage> pages;

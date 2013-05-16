@@ -49,7 +49,7 @@ void Tab::AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect) {
   TabCtrl_AdjustRect(m_hWindow, fLarger, lpRect);
 }
 
-int Tab::Clear() {
+int Tab::DeleteAllItems() {
   return TabCtrl_DeleteAllItems(m_hWindow);
 }
 

@@ -43,12 +43,9 @@
 			<icon name="arrow-circle-double-135"/>
 			<icon name="myanimelist"/>
 			<icon name="folder-open"/>
-			<icon name="megaphone"/>
 			<icon name="application-export"/>
 			<icon name="gear"/>
 			<icon name="taiga"/>
-			<icon name="navigation-180"/>
-			<icon name="navigation"/>
 		</set_24px>
 	</icons>
 
@@ -89,9 +86,9 @@
 		<menu name="MyAnimeList">
 			<item name="Synchronize list" action="Synchronize()"/>
 			<item type="separator"/>
-			<item name="View my panel" 	 action="ViewPanel()"/>
-			<item name="View my profile" action="ViewProfile()"/>
-			<item name="View my history" action="ViewHistory()"/>
+			<item name="Go to my panel" 	action="ViewPanel()"/>
+			<item name="Go to my profile" action="ViewProfile()"/>
+			<item name="Go to my history" action="ViewHistory()"/>
 		</menu>
 		<!-- Share -->
 		<menu name="Announce">
@@ -105,9 +102,9 @@
 		<menu name="Tools">
 			<item name="External services" sub="Services"/>
 			<item type="separator"/>
-			<item name="Enable anime recognition" action="ToggleRecognition()" checked="1"/>
-			<item name="Enable auto sharing"      action="ToggleSharing()" checked="1"/>
-			<item name="Enable auto list update"  action="ToggleListUpdate()" checked="1"/>
+			<item name="Enable anime recognition"    action="ToggleRecognition()" checked="1"/>
+			<item name="Enable auto sharing"         action="ToggleSharing()" checked="1"/>
+			<item name="Enable auto synchronization" action="ToggleSynchronization()" checked="1"/>
 			<item type="separator"/>
 			<item name="Settings" action="Settings()"/>
 		</menu>
@@ -123,7 +120,7 @@
 		<!-- View -->
 		<menu name="View">
 			<item name="Now Playing" action="ViewContent(0)" radio="1"/>
-			<item name="Anime List"  action="ViewContent(2)" checked="1" radio="1"/>
+			<item name="Anime List"  action="ViewContent(2)" radio="1" checked="1"/>
 			<item name="History"     action="ViewContent(3)" radio="1"/>
 			<item name="Statistics"  action="ViewContent(4)" radio="1"/>
 			<item name="Search"      action="ViewContent(6)" radio="1"/>
@@ -143,9 +140,6 @@
 			<item type="separator"/>
 			<item name="Check for updates" action="CheckUpdates()"/>
 		</menu>
-		
-		<!-- Search bar -->
-		<menu name="SearchBar"/>
 		
 		<!-- Search list -->
 		<menu name="SearchList">
@@ -249,15 +243,6 @@
 		<menu name="GenericList">
 			<item name="Select all"   action="SelectAll()"/>
 			<item name="Deselect all" action="DeselectAll()"/>
-		</menu>
-		
-		<!-- Anime folders editing -->
-		<menu name="AnimeFoldersEdit">
-			<item name="Browse..." action="AnimeFolders_Browse()" default="1"/>
-			<item name="Clear"     action="AnimeFolders_Clear()"/>
-			<item name="Search"    action="AnimeFolders_Search()"/>
-			<item type="separator"/>
-			<item name="Clear all folders" action="AnimeFolders_ClearAll()"/>
 		</menu>
 		
 		<!-- Season browser -->

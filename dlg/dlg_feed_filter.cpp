@@ -366,6 +366,7 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   condition_list.InsertColumn(0, 170, 170, 0, L"Element");
   condition_list.InsertColumn(1, 170, 170, 0, L"Operator");
   condition_list.InsertColumn(2, 170, 170, 0, L"Value");
+  condition_list.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
 
   // Initialize toolbar
   condition_toolbar.Attach(GetDlgItem(IDC_TOOLBAR_FEED_FILTER));
@@ -552,7 +553,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   anime_list.SetTheme();
   
   // Insert list columns
-  anime_list.InsertColumn(0, 543, 543, 0, L"Title");
+  anime_list.InsertColumn(0, 0, 0, 0, L"Title");
   
   // Insert list groups
   for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
@@ -579,6 +580,9 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   
   // Sort items
   anime_list.Sort(0, 1, 0, ListViewCompareProc);
+
+  // Resize header
+  anime_list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
 
   return TRUE;
 }

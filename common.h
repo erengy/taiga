@@ -94,7 +94,6 @@ void UpdateAllMenus(anime::Item* anime_item = nullptr);
 void UpdateAnimeMenu(anime::Item* anime_item);
 void UpdateAnnounceMenu();
 void UpdateFoldersMenu();
-void UpdateSearchMenu();
 void UpdateSearchListMenu(bool enabled = false);
 void UpdateSeasonListMenu(bool enabled = false);
 void UpdateSeasonMenu();

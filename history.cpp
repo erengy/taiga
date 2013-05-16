@@ -203,8 +203,8 @@ void EventQueue::Check() {
     items[index].reason = L"Not logged in";
     return;
   }
-  if (!Taiga.is_update_enabled) {
-    items[index].reason = L"List update is disabled";
+  if (!Taiga.is_sync_enabled) {
+    items[index].reason = L"Synchronization is disabled";
     return;
   }
   

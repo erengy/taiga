@@ -178,8 +178,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // Settings()
   //   Shows settings window.
-  //   lParam is the initial page number.
+  //   wParam is the initial section.
+  //   lParam is the initial page.
   } else if (action == L"Settings") {
+    SettingsDialog.SetCurrentSection(wParam);
     SettingsDialog.SetCurrentPage(lParam);
     if (!SettingsDialog.IsWindow()) {
       SettingsDialog.Create(IDD_SETTINGS, g_hMain, true);
@@ -198,9 +200,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       dlg.AddButton(L"Yes", IDYES);
       dlg.AddButton(L"No", IDNO);
       dlg.Show(g_hMain);
-      if (dlg.GetSelectedButtonID() == IDYES) {
-        ExecuteAction(L"Settings", 0, PAGE_ACCOUNT);
-      }
+      if (dlg.GetSelectedButtonID() == IDYES)
+        ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAL);
       return;
     }
     MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
@@ -296,7 +297,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
         Settings.Folders.root.push_back(path);
         if (Settings.Folders.watch_enabled) FolderMonitor.Enable();
-        ExecuteAction(L"Settings", 0, PAGE_FOLDERS_ROOT);
+        ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
     }
 
   // CheckEpisodes()
@@ -369,7 +370,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   // ToggleSharing()
-  //   Enables or disables announcements.
+  //   Enables or disables automatic sharing.
   } else if (action == L"ToggleSharing") {
     Taiga.is_sharing_enabled = !Taiga.is_sharing_enabled;
     UpdateToolsMenu();
@@ -379,15 +380,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       MainDialog.ChangeStatus(L"Automatic sharing is now disabled.");
     }
 
-  // ToggleListUpdate()
-  //   Enables or disables list updates.
-  } else if (action == L"ToggleListUpdate") {
-    Taiga.is_update_enabled = !Taiga.is_update_enabled;
+  // ToggleSynchronization()
+  //   Enables or disables automatic list synchronization.
+  } else if (action == L"ToggleSynchronization") {
+    Taiga.is_sync_enabled = !Taiga.is_sync_enabled;
     UpdateToolsMenu();
-    if (Taiga.is_update_enabled) {
-      MainDialog.ChangeStatus(L"Automatic list update is now enabled.");
+    if (Taiga.is_sync_enabled) {
+      MainDialog.ChangeStatus(L"Automatic synchronization is now enabled.");
     } else {
-      MainDialog.ChangeStatus(L"Automatic list update is now disabled.");
+      MainDialog.ChangeStatus(L"Automatic synchronization is now disabled.");
     }
 
   // ===========================================================================

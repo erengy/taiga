@@ -149,9 +149,7 @@ bool Settings::Load() {
     Program.StartUp.minimize = startup.attribute(L"minimize").as_int();
     // Exit
     xml_node exit = program.child(L"exit");
-    Program.Exit.ask = exit.attribute(L"ask").as_int();
-    Program.Exit.remember_pos_size = exit.attribute(L"remember_pos_size").as_int();
-    Program.Exit.save_event_queue = exit.attribute(L"savebuffer").as_int(1);
+    Program.Exit.remember_pos_size = exit.attribute(L"remember_pos_size").as_int(TRUE);
     // Proxy
     xml_node proxy = program.child(L"proxy");
     Program.Proxy.host = proxy.attribute(L"host").value();
@@ -336,9 +334,7 @@ bool Settings::Save() {
     startup.append_attribute(L"minimize") = Program.StartUp.minimize;
     // Exit
     xml_node exit = program.append_child(L"exit");
-    exit.append_attribute(L"ask") = Program.Exit.ask;
     exit.append_attribute(L"remember_pos_size") = Program.Exit.remember_pos_size;
-    exit.append_attribute(L"savebuffer") = Program.Exit.save_event_queue;
     // Proxy
     xml_node proxy = program.append_child(L"proxy");
     proxy.append_attribute(L"host") = Program.Proxy.host.c_str();

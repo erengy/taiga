@@ -214,6 +214,7 @@ void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       tab.AdjustRect(nullptr, FALSE, &rcWindow);
       rcWindow.left -= 3;
       rcWindow.top -= 1;
+      rcWindow.bottom += 2;
       listview.SetPosition(nullptr, rcWindow, 0);
     }
   }
