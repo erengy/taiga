@@ -889,15 +889,15 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   switch (current_page_) {
     case SIDEBAR_ITEM_ANIMELIST:
     case SIDEBAR_ITEM_SEASONS:
-      parent->search_bar.mode = SEARCH_MODE_NONE;
-      cue_text = L"Filter list";
+      parent->search_bar.mode = SEARCH_MODE_MAL;
+      cue_text = L"Filter list or search anime";
       break;
     case SIDEBAR_ITEM_NOWPLAYING:
     case SIDEBAR_ITEM_HISTORY:
     case SIDEBAR_ITEM_STATS:
     case SIDEBAR_ITEM_SEARCH:
       parent->search_bar.mode = SEARCH_MODE_MAL;
-      cue_text = L"Search MyAnimeList";
+      cue_text = L"Search anime";
       if (current_page_ == SIDEBAR_ITEM_SEARCH)
         search_text = SearchDialog.search_text;
       break;

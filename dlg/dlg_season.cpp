@@ -298,11 +298,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       COLORREF color;
       switch (anime_item->GetAiringStatus()) {
         case mal::STATUS_AIRING:
-          color = RGB(225, 245, 231); break;
+          color = theme::COLOR_LIGHTGREEN; break;
         case mal::STATUS_FINISHED: default:
-          color = mal::COLOR_LIGHTBLUE; break;
+          color = theme::COLOR_LIGHTBLUE; break;
         case mal::STATUS_NOTYETAIRED:
-          color = RGB(245, 225, 231); break;
+          color = theme::COLOR_LIGHTRED; break;
       }
       if (view_as == SEASON_VIEWAS_IMAGES) {
         rect_title.Copy(rect);

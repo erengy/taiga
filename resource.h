@@ -47,6 +47,7 @@
 #define IDC_BUTTON_BROWSE                       1001
 #define IDC_CHECK_LIST_ENGLISH                  1001
 #define IDC_COMBO_TORRENT_SEARCH                1001
+#define IDC_LINK_THEMES                         1001
 #define IDC_TAB_PAGES                           1001
 #define IDC_BUTTON_CANCELSEARCH                 1002
 #define IDC_TREE_SECTIONS                       1002

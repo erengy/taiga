@@ -98,7 +98,7 @@ void Item::StartWatching(Episode episode) {
   if (Settings.Program.Balloon.enabled) {
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), 
-      L"Watching:", NIIF_INFO);
+                L"Now Playing", NIIF_INFO);
   }
   
   // Check folder

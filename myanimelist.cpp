@@ -42,20 +42,24 @@ wstring GetUserPassEncoded() {
 // =============================================================================
 
 bool AskToDiscuss(int anime_id, int episode_number) {
+  wstring data = L"epNum=" + ToWstr(episode_number) +
+                 L"&aid=" + ToWstr(anime_id) +
+                 L"&id=" + ToWstr(anime_id);
+  
   return MainClient.Post(L"myanimelist.net",
-    L"/includes/ajax.inc.php?t=50",
-    L"epNum=" + ToWstr(episode_number) + 
-    L"&aid=" + ToWstr(anime_id) + 
-    L"&id=" + ToWstr(anime_id), L"", 
-    HTTP_MAL_AnimeAskToDiscuss, 
-    anime_id);
+                         L"/includes/ajax.inc.php?t=50",
+                         data, L"",
+                         HTTP_MAL_AnimeAskToDiscuss,
+                         anime_id);
 }
 
 void CheckProfile() {
-  if (!Taiga.logged_in) return;
-  MainClient.Get(L"myanimelist.net", 
-    L"/editprofile.php?go=privacy", L"", 
-    HTTP_MAL_Profile);
+  if (!Taiga.logged_in)
+    return;
+
+  MainClient.Get(L"myanimelist.net",
+                 L"/editprofile.php?go=privacy", L"",
+                 HTTP_MAL_Profile);
 }
 
 bool GetAnimeDetails(int anime_id) {
@@ -66,37 +70,43 @@ bool GetAnimeDetails(int anime_id) {
     client = &SearchClient;
   }
   
-  return client->Connect(L"myanimelist.net", 
-    L"/includes/ajax.inc.php?t=64&id=" + ToWstr(anime_id), 
-    L"", L"GET", L"", L"myanimelist.net", L"", 
-    HTTP_MAL_AnimeDetails, 
-    anime_id);
+  return client->Connect(L"myanimelist.net",
+                         L"/includes/ajax.inc.php?t=64&id=" + ToWstr(anime_id),
+                         L"", L"GET", L"", L"myanimelist.net", L"",
+                         HTTP_MAL_AnimeDetails,
+                         anime_id);
 }
 
 bool GetList() {
-  if (Settings.Account.MAL.user.empty()) return false;
-  return MainClient.Connect(L"myanimelist.net", 
-    L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all", 
-    L"", L"GET", L"Accept-Encoding: gzip", L"",
-    Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml",
-    HTTP_MAL_RefreshList);
+  if (Settings.Account.MAL.user.empty())
+    return false;
+  
+  wstring path = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+
+  return MainClient.Connect(L"myanimelist.net",
+                            L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all",
+                            L"", L"GET", L"Accept-Encoding: gzip", L"", path,
+                            HTTP_MAL_RefreshList);
 }
 
 bool Login() {
-  if (Taiga.logged_in || Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty())
+  if (Taiga.logged_in || 
+      Settings.Account.MAL.user.empty() || 
+      Settings.Account.MAL.password.empty())
     return false;
 
+  wstring header = MainClient.GetDefaultHeader() +
+                   L"Authorization: Basic " + GetUserPassEncoded();
+
   return MainClient.Connect(L"myanimelist.net", 
-    L"/api/account/verify_credentials.xml", 
-    L"", 
-    L"GET", 
-    MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-    L"myanimelist.net", L"", 
-    HTTP_MAL_Login);
+                            L"/api/account/verify_credentials.xml", 
+                            L"", L"GET", header, L"myanimelist.net", L"", 
+                            HTTP_MAL_Login);
 }
 
 bool DownloadImage(int anime_id, const wstring& image_url) {
-  if (image_url.empty()) return false;
+  if (image_url.empty())
+    return false;
   
   HttpClient* client;
   if (anime_id > anime::ID_UNKNOWN) {
@@ -106,15 +116,18 @@ bool DownloadImage(int anime_id, const wstring& image_url) {
   }
   
   return client->Get(win32::Url(image_url), 
-    anime::GetImagePath(anime_id), 
-    HTTP_MAL_Image, 
-    anime_id);
+                     anime::GetImagePath(anime_id), 
+                     HTTP_MAL_Image, 
+                     anime_id);
 }
 
 bool DownloadUserImage(bool thumb) {
-  if (!AnimeDatabase.user.GetId()) return false;
+  if (!AnimeDatabase.user.GetId())
+    return false;
+  
   win32::Url url;
   wstring path = Taiga.GetDataPath() + L"user\\" + AnimeDatabase.user.GetName() + L"\\";
+  
   if (thumb) {
     url.Crack(L"http://myanimelist.net/images/userimages/thumbs/" + ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg");
     path += ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg";
@@ -122,14 +135,17 @@ bool DownloadUserImage(bool thumb) {
     url.Crack(L"http://cdn.myanimelist.net/images/userimages/" + ToWstr(AnimeDatabase.user.GetId()) + L".jpg");
     path += ToWstr(AnimeDatabase.user.GetId()) + L".jpg";
   }
+  
   return ImageClient.Get(url, path, HTTP_MAL_UserImage);
 }
 
 bool ParseAnimeDetails(const wstring& data) {
-  if (data.empty()) return false;
+  if (data.empty())
+    return false;
 
   int anime_id = ToInt(InStr(data, L"myanimelist.net/anime/", L"/"));
-  if (!anime_id) return false;
+  if (!anime_id)
+    return false;
 
   anime::Item anime_item;
   anime_item.SetId(anime_id);
@@ -146,7 +162,9 @@ bool ParseAnimeDetails(const wstring& data) {
 }
 
 bool ParseSearchResult(const wstring& data, int anime_id) {
-  if (data.empty()) return false;
+  if (data.empty())
+    return false;
+  
   bool found_item = false;
   
   xml_document doc;
@@ -174,9 +192,8 @@ bool ParseSearchResult(const wstring& data, int anime_id) {
       anime_item.last_modified = time(nullptr);
       AnimeDatabase.UpdateItem(anime_item);
       
-      if (!anime_id || anime_id == anime_item.GetId()) {
+      if (!anime_id || anime_id == anime_item.GetId())
         found_item = true;
-      }
     }
   }
   
@@ -199,31 +216,31 @@ bool SearchAnime(int anime_id, wstring title) {
   Replace(title, L"+", L"%2B", true);
   ReplaceChar(title, L'\u2729', L'\u2606'); // stress outlined white star to white star
 
-  if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty())
+  if (Settings.Account.MAL.user.empty() || 
+      Settings.Account.MAL.password.empty())
     return false;
 
-  return client->Connect(L"myanimelist.net", 
-    L"/api/anime/search.xml?q=" + title, 
-    L"", 
-    L"GET", 
-    client->GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-    L"myanimelist.net", 
-    L"", HTTP_MAL_SearchAnime, 
-    static_cast<LPARAM>(anime_id));
+  wstring header = client->GetDefaultHeader() + 
+                   L"Authorization: Basic " + GetUserPassEncoded();
 
-  return false;
+  return client->Connect(L"myanimelist.net",
+                         L"/api/anime/search.xml?q=" + title,
+                         L"", L"GET", header, L"myanimelist.net", L"",
+                         HTTP_MAL_SearchAnime,
+                         anime_id);
 }
 
 bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  if (!anime_item)
+    return false;
+
   #define ADD_DATA_N(name, value) \
     if (anime_values.value) \
       data += L"\r\n\t<" ##name L">" + ToWstr(*anime_values.value) + L"</" ##name L">";
   #define ADD_DATA_S(name, value) \
     if (anime_values.value) \
       data += L"\r\n\t<" ##name L">" + *anime_values.value + L"</" ##name L">";
-  
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
-  if (!anime_item) return false;
 
   // Build XML data
   wstring data;
@@ -247,7 +264,11 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
     ADD_DATA_S(L"tags", tags);
     data += L"\r\n</entry>";
   }
-      
+
+  #undef ADD_DATA_N
+  #undef ADD_DATA_S
+  #undef ANIME
+
   win32::Url url;
   switch (update_mode) {
     // Add anime
@@ -264,13 +285,11 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
       break;
   }
 
-  MainClient.Connect(url, data, L"POST", 
-    MainClient.GetDefaultHeader() + L"Authorization: Basic " + GetUserPassEncoded(), 
-    L"myanimelist.net", L"", update_mode, static_cast<LPARAM>(anime_id));
+  wstring header = MainClient.GetDefaultHeader() + 
+                   L"Authorization: Basic " + GetUserPassEncoded();
 
-  #undef ADD_DATA_N
-  #undef ADD_DATA_S
-  #undef ANIME
+  MainClient.Connect(url, data, L"POST", header, L"myanimelist.net", L"", 
+                     update_mode, static_cast<LPARAM>(anime_id));
 
   return true;
 }
@@ -293,12 +312,14 @@ bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
       break;
   }
 
-  if (success) return true;
+  if (success)
+    return true;
 
   // Set error message on failure     
   item.reason = data;
   Replace(item.reason, L"</div><div>", L"\r\n");
   StripHtmlTags(item.reason);
+  
   return false;
 }
 
@@ -307,8 +328,10 @@ bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
 wstring DecodeText(wstring text) {
   Replace(text, L"<br />", L"\r", true);
   Replace(text, L"\n\n", L"\r\n\r\n", true);
+  
   StripHtmlTags(text);
   DecodeHtmlEntities(text);
+  
   return text;
 }
 
@@ -324,9 +347,9 @@ bool IsValidEpisode(int episode, int watched, int total) {
   if ((episode < 0) ||
       (episode < watched) ||
       (episode == watched && total != 1) ||
-      (episode > total && total != 0)) {
+      (episode > total && total != 0))
     return false;
-  }
+
   return true;
 }
 
@@ -367,7 +390,8 @@ void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) 
 // =============================================================================
 
 wstring TranslateDate(const Date& date) {
-  if (!mal::IsValidDate(date)) return L"?";
+  if (!mal::IsValidDate(date))
+    return L"?";
 
   wstring result;
   
@@ -379,21 +403,24 @@ wstring TranslateDate(const Date& date) {
     result += months[date.month - 1];
     result += L" ";
   }
-  if (date.day > 0) result += ToWstr(date.day) + L", ";
+  if (date.day > 0)
+    result += ToWstr(date.day) + L", ";
   result += ToWstr(date.year);
 
   return result;
 }
 
 wstring TranslateDateForApi(const Date& date) {
-  if (!mal::IsValidDate(date)) return L"";
+  if (!mal::IsValidDate(date))
+    return L"";
 
   return PadChar(ToWstr(date.month), '0', 2) + // MM
          PadChar(ToWstr(date.day),   '0', 2) + // DD
          PadChar(ToWstr(date.year),  '0', 4);  // YYYY
 }
 Date TranslateDateFromApi(const wstring& date) {
-  if (date.size() != 8) return Date();
+  if (date.size() != 8)
+    return Date();
 
   return Date(ToInt(date.substr(4, 4)), 
               ToInt(date.substr(0, 2)), 
@@ -401,29 +428,28 @@ Date TranslateDateFromApi(const wstring& date) {
 }
 
 wstring TranslateDateToSeason(const Date& date) {
-  if (!mal::IsValidDate(date)) {
+  if (!mal::IsValidDate(date))
     return L"Unknown";
-  } else {
-    wstring season;
-    unsigned short year = date.year;
 
-    if (date.month == 0) {
-      season = L"Unknown";
-    } else if (date.month < 3) {  // Jan-Feb
-      season = L"Winter";
-      year--;
-    } else if (date.month < 6) {  // Mar-May
-      season = L"Spring";
-    } else if (date.month < 9) {  // Jun-Aug
-      season = L"Summer";
-    } else if (date.month < 12) { // Sep-Nov
-      season = L"Fall";
-    } else {                      // Dec
-      season = L"Winter";
-    }
-    
-    return season + L" " + ToWstr(year);
+  wstring season;
+  unsigned short year = date.year;
+
+  if (date.month == 0) {
+    season = L"Unknown";
+  } else if (date.month < 3) {  // Jan-Feb
+    season = L"Winter";
+    year--;
+  } else if (date.month < 6) {  // Mar-May
+    season = L"Spring";
+  } else if (date.month < 9) {  // Jun-Aug
+    season = L"Summer";
+  } else if (date.month < 12) { // Sep-Nov
+    season = L"Fall";
+  } else {                      // Dec
+    season = L"Winter";
   }
+    
+  return season + L" " + ToWstr(year);
 }
 
 wstring TranslateSeasonToMonths(const wstring& season) {
@@ -439,6 +465,7 @@ wstring TranslateSeasonToMonths(const wstring& season) {
   result += L" " + ToWstr(date_start.year) + L" to ";
   result += months[date_end.month - 1];
   result += L" " + ToWstr(date_end.year);
+  
   return result;
 }
 
@@ -580,6 +607,7 @@ void ViewSeasonGroup() {
 
 void ViewUpcomingAnime() {
   Date date = GetDate();
+
   ExecuteLink(L"http://myanimelist.net/anime.php"
               L"?sd=" + ToWstr(date.day) + 
               L"&sm=" + ToWstr(date.month) + 

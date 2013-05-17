@@ -441,23 +441,32 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     // Recently watched
     vector<int> anime_ids;
     foreach_cr_(it, History.queue.items) {
-      if (it->episode && 
-          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end())
-        anime_ids.push_back(it->anime_id);
+      if (it->episode &&
+          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end()) {
+        auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+        if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED ||
+            anime_item->GetMyScore() == 0)
+          anime_ids.push_back(it->anime_id);
+      }
     }
     foreach_cr_(it, History.items) {
-      if (it->episode && 
-          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end())
-        anime_ids.push_back(it->anime_id);
+      if (it->episode &&
+          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end()) {
+        auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+        if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED ||
+            anime_item->GetMyScore() == 0)
+          anime_ids.push_back(it->anime_id);
+      }
     }
     foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
       content += L"  \u2022 " + anime_item->GetTitle();
-      if (anime_item->GetEpisodeCount() > 0 && 
-          anime_item->GetEpisodeCount() == anime_item->GetMyLastWatchedEpisode()) {
-        if (anime_item->GetMyScore() == 0)
-          content += L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
+      if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED) {
+        content += L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
       } else {
+        int last_watched = anime_item->GetMyLastWatchedEpisode();
+        if (last_watched > 0)
+          content += L" #" + ToWstr(last_watched);
         content += L" \u2014 <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
       }
       content += L"\n";
@@ -509,7 +518,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         }
       }
       if (date_end.year && date_end.month && date_end.day) {
-        date_diff = date_end - date_now;
+        date_diff = date_now - date_end;
         if (date_diff > 0 && date_diff <= day_limit) {
           recently_finished.push_back(it->first);
           continue;
@@ -528,9 +537,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
       content += L"\n";
     }
-    if (!recently_finished.empty()) {
+    if (!upcoming.empty()) {
       content += L"Upcoming:\n";
-      foreach_c_(it, recently_finished)
+      foreach_c_(it, upcoming)
         content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
       content += L"\n";
     } else {

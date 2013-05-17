@@ -168,6 +168,18 @@ BOOL SettingsPage::OnInitDialog() {
 
     // =========================================================================
 
+    // Recognition > List updates
+    case PAGE_RECOGNITION_UPDATE: {
+      CheckDlgButton(IDC_RADIO_UPDATE_MODE1 + Settings.Account.Update.mode - 1, TRUE);
+      CheckDlgButton(IDC_RADIO_UPDATE_TIME1 + Settings.Account.Update.time - 1, TRUE);
+      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETRANGE32, 0, 3600);
+      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, Settings.Account.Update.delay);
+      EnableDlgItem(IDC_EDIT_DELAY, Settings.Account.Update.time > 1);
+      EnableDlgItem(IDC_SPIN_DELAY, Settings.Account.Update.time > 1);
+      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.Account.Update.check_player);
+      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.Account.Update.out_of_range);
+      break;
+    }
     // Recognition > Media players
     case PAGE_RECOGNITION_MEDIA: {
       win32::ListView list = GetDlgItem(IDC_LIST_MEDIA);
@@ -228,16 +240,6 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetWindowHandle(nullptr);
       break;
     }
-    // Recognition > Update
-    case PAGE_RECOGNITION_UPDATE: {
-      CheckDlgButton(IDC_RADIO_UPDATE_MODE1 + Settings.Account.Update.mode - 1, TRUE);
-      CheckDlgButton(IDC_RADIO_UPDATE_TIME1 + Settings.Account.Update.time - 1, TRUE);
-      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETRANGE32, 0, 3600);
-      SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, Settings.Account.Update.delay);
-      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.Account.Update.check_player);
-      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.Account.Update.out_of_range);
-      break;
-    }
 
     // =========================================================================
 
@@ -260,6 +262,7 @@ BOOL SettingsPage::OnInitDialog() {
       SetDlgItemText(IDC_EDIT_MIRC_SERVICE, Settings.Announce.MIRC.service.c_str());
       CheckDlgButton(IDC_RADIO_MIRC_CHANNEL1 + Settings.Announce.MIRC.mode - 1, TRUE);
       SetDlgItemText(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.channels.c_str());
+      EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.mode == 3);
       break;
     }
     // Sharing > Skype
@@ -501,11 +504,14 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_RADIO_UPDATE_TIME2:
         case IDC_RADIO_UPDATE_TIME3:
           CheckRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3, LOWORD(wParam));
+          EnableDlgItem(IDC_EDIT_DELAY, LOWORD(wParam) != IDC_RADIO_UPDATE_TIME1);
+          EnableDlgItem(IDC_SPIN_DELAY, LOWORD(wParam) != IDC_RADIO_UPDATE_TIME1);
           return TRUE;
         case IDC_RADIO_MIRC_CHANNEL1:
         case IDC_RADIO_MIRC_CHANNEL2:
         case IDC_RADIO_MIRC_CHANNEL3:
           CheckRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3, LOWORD(wParam));
+          EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, LOWORD(wParam) == IDC_RADIO_MIRC_CHANNEL3);
           return TRUE;
         case IDC_RADIO_LIST_PROGRESS1:
         case IDC_RADIO_LIST_PROGRESS2:
@@ -542,6 +548,14 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
             case IDC_LINK_TWITTER: {
               PNMLINK pNMLink = reinterpret_cast<PNMLINK>(lParam);
               ExecuteAction(pNMLink->item.szUrl);
+              return TRUE;
+            }
+            // Open themes folder
+            case IDC_LINK_THEMES: {
+              wstring theme_name;
+              GetDlgItemText(IDC_COMBO_THEME, theme_name);
+              wstring path = Taiga.GetDataPath() + L"theme\\" + theme_name;
+              Execute(path);
               return TRUE;
             }
           }

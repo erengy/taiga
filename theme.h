@@ -71,6 +71,14 @@ enum Icons24px {
   ICONCOUNT_24PX
 };
 
+namespace theme {
+const COLORREF COLOR_DARKBLUE = RGB(46, 81, 162);
+const COLORREF COLOR_LIGHTBLUE = RGB(225, 231, 245);
+const COLORREF COLOR_LIGHTGRAY = RGB(246, 246, 246);
+const COLORREF COLOR_LIGHTGREEN = RGB(225, 245, 231);
+const COLORREF COLOR_LIGHTRED = RGB(245, 225, 231);
+}
+
 // =============================================================================
 
 class Font {

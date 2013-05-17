@@ -46,6 +46,8 @@ class Settings {
 public:
   bool Load();
   bool Save();
+  void ApplyChanges(bool user_changed, bool theme_changed);
+  void RestoreDefaults();
 
   // Account
   struct Account {

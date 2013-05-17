@@ -40,9 +40,11 @@
 #include "../settings.h"
 #include "../stats.h"
 #include "../string.h"
+#include "../taiga.h"
 #include "../theme.h"
 
 #include "../win32/win_control.h"
+#include "../win32/win_taskdialog.h"
 
 const WCHAR* SECTION_TITLE[] = {
   L" Services",
@@ -96,9 +98,9 @@ void SettingsDialog::SetCurrentSection(int index) {
       tab_.InsertItem(4, L"Notifications", PAGE_APP_NOTIFICATIONS);
       break;
     case SECTION_RECOGNITION:
-      tab_.InsertItem(0, L"Media players", PAGE_RECOGNITION_MEDIA);
-      tab_.InsertItem(1, L"Media providers", PAGE_RECOGNITION_STREAM);
-      tab_.InsertItem(2, L"Update", PAGE_RECOGNITION_UPDATE);
+      tab_.InsertItem(0, L"List updates", PAGE_RECOGNITION_UPDATE);
+      tab_.InsertItem(1, L"Media players", PAGE_RECOGNITION_MEDIA);
+      tab_.InsertItem(2, L"Media providers", PAGE_RECOGNITION_STREAM);
       break;
     case SECTION_SHARING:
       tab_.InsertItem(0, L"HTTP", PAGE_SHARING_HTTP);
@@ -236,7 +238,16 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     Settings.Program.Balloon.enabled = page->IsDlgButtonChecked(IDC_CHECK_BALLOON);
   }
-
+  
+  // Recognition > List updates
+  page = &pages[PAGE_RECOGNITION_UPDATE];
+  if (page->IsWindow()) {
+    Settings.Account.Update.mode = page->GetCheckedRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3) + 1;
+    Settings.Account.Update.time = page->GetCheckedRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3) + 1;
+    Settings.Account.Update.delay = page->GetDlgItemInt(IDC_EDIT_DELAY);
+    Settings.Account.Update.check_player = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP);
+    Settings.Account.Update.out_of_range = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_RANGE);
+  }
   // Recognition > Media players
   page = &pages[PAGE_RECOGNITION_MEDIA];
   if (page->IsWindow()) {
@@ -255,15 +266,6 @@ void SettingsDialog::OnOK() {
     Settings.Recognition.Streaming.viz_enabled = list.GetCheckState(3) == TRUE;
     Settings.Recognition.Streaming.youtube_enabled = list.GetCheckState(4) == TRUE;
     list.SetWindowHandle(nullptr);
-  }
-  // Recognition > Update
-  page = &pages[PAGE_RECOGNITION_UPDATE];
-  if (page->IsWindow()) {
-    Settings.Account.Update.mode = page->GetCheckedRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3) + 1;
-    Settings.Account.Update.time = page->GetCheckedRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3) + 1;
-    Settings.Account.Update.delay = page->GetDlgItemInt(IDC_EDIT_DELAY);
-    Settings.Account.Update.check_player = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP);
-    Settings.Account.Update.out_of_range = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_RANGE);
   }
 
   // Sharing > HTTP
@@ -336,40 +338,9 @@ void SettingsDialog::OnOK() {
   MediaPlayers.Save();
   Settings.Save();
 
-  // Change theme
-  if (Settings.Program.General.theme != theme_old) {
-    UI.Load(Settings.Program.General.theme);
-    UI.LoadImages();
-    MainDialog.rebar.RedrawWindow();
-    UpdateAllMenus();
-  }
-
-  // Refresh other windows
-  if (Settings.Account.MAL.user != mal_user_old) {
-    AnimeDatabase.LoadList();
-    History.Load();
-    CurrentEpisode.Set(anime::ID_UNKNOWN);
-    MainDialog.treeview.RefreshHistoryCounter();
-    MainDialog.UpdateTitle();
-    AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
-    AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
-    AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
-    HistoryDialog.RefreshList();
-    SearchDialog.RefreshList();
-    Stats.CalculateAll();
-    StatsDialog.Refresh();
-    ExecuteAction(L"Logout(" + mal_user_old + L")");
-  } else {
-    AnimeListDialog.RefreshList();
-  }
-
-  // Enable/disable folder monitor
-  FolderMonitor.Enable(Settings.Folders.watch_enabled == TRUE);
-
-  // Setup proxy
-  SetProxies(Settings.Program.Proxy.host, 
-             Settings.Program.Proxy.user, 
-             Settings.Program.Proxy.password);
+  // Apply changes
+  Settings.ApplyChanges(Settings.Account.MAL.user != mal_user_old,
+                        Settings.Program.General.theme != theme_old);
 
   // End dialog
   EndDialog(IDOK);
@@ -415,37 +386,62 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
             IDC_LIST_TORRENT_FILTER, uMsg, wParam, lParam);
       }
       break;
-    
-    case WM_NOTIFY: {
-      LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
-      // Select section
-      if (pnmh->hwndFrom == GetDlgItem(IDC_TREE_SECTIONS)) {
-        switch (pnmh->code) {
-          case TVN_SELCHANGED: {
-            LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(lParam);
-            int section_new = pnmtv->itemNew.lParam;
-            int section_old = pnmtv->itemOld.lParam;
-            if (section_new != section_old)
-              SetCurrentSection(section_new);
-          }
-          break;
-        }
-      // Select tab
-      } else if (pnmh->hwndFrom == GetDlgItem(IDC_TAB_PAGES)) {
-        switch (pnmh->code) {
-          case TCN_SELCHANGE: {
-            int index = static_cast<int>(tab_.GetItemParam(tab_.GetCurrentlySelected()));
-            SetCurrentPage(index);
-            break;
-          }
+  }
+  
+  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  switch (idCtrl) {
+    case IDC_TREE_SECTIONS: {
+      switch (pnmh->code) {
+        // Select section
+        case TVN_SELCHANGED: {
+          LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(pnmh);
+          int section_new = pnmtv->itemNew.lParam;
+          int section_old = pnmtv->itemOld.lParam;
+          if (section_new != section_old)
+            SetCurrentSection(section_new);
           break;
         }
       }
       break;
     }
+
+    case IDC_TAB_PAGES: {
+      switch (pnmh->code) {
+        // Select tab
+        case TCN_SELCHANGE: {
+          int index = static_cast<int>(tab_.GetItemParam(tab_.GetCurrentlySelected()));
+          SetCurrentPage(index);
+          break;
+        }
+      }
+      break;
+    }
+
+    case IDC_LINK_DEFAULTS: {
+      switch (pnmh->code) {
+        // Restore default settings
+        case NM_CLICK: {
+          win32::TaskDialog dlg;
+          dlg.SetWindowTitle(APP_NAME);
+          dlg.SetMainIcon(TD_ICON_INFORMATION);
+          dlg.SetMainInstruction(L"Are you sure you want to restore default settings?");
+          dlg.SetContent(L"All your current settings will be lost.");
+          dlg.AddButton(L"Yes", IDYES);
+          dlg.AddButton(L"No", IDNO);
+          dlg.Show(GetWindowHandle());
+          if (dlg.GetSelectedButtonID() == IDYES)
+            Settings.RestoreDefaults();
+          return TRUE;
+        }
+      }
+      break;
+    }
   }
-  
-  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+
+  return 0;
 }
 
 LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {

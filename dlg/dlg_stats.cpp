@@ -72,7 +72,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
           if (i < 10) rect.top += bar_height;
           rect.bottom = rect.top + bar_height - 2;
           rect.right = rect.left + bar_width;
-          dc.FillRect(rect, mal::COLOR_DARKBLUE);
+          dc.FillRect(rect, theme::COLOR_DARKBLUE);
         }
         
         dc.DetachDC();

@@ -20,6 +20,8 @@
 
 #include "settings.h"
 
+#include "dlg/dlg_settings.h"
+
 #include "anime.h"
 #include "anime_filter.h"
 #include "common.h"
@@ -432,6 +434,56 @@ bool Settings::Save() {
   // Save file
   ::CreateDirectory(folder_.c_str(), NULL);
   return doc.save_file(file_.c_str(), L"\x09", format_default | format_write_bom);
+}
+
+void Settings::ApplyChanges(bool user_changed, bool theme_changed) {
+  //if (theme_changed) {
+  //  UI.Load(Program.General.theme);
+  //  UI.LoadImages();
+  //  MainDialog.rebar.RedrawWindow();
+  //  UpdateAllMenus();
+  //}
+
+  //if (user_changed) {
+  //  AnimeDatabase.LoadList();
+  //  History.Load();
+  //  CurrentEpisode.Set(anime::ID_UNKNOWN);
+  //  MainDialog.treeview.RefreshHistoryCounter();
+  //  MainDialog.UpdateTitle();
+  //  AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
+  //  AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
+  //  AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
+  //  HistoryDialog.RefreshList();
+  //  SearchDialog.RefreshList();
+  //  Stats.CalculateAll();
+  //  StatsDialog.Refresh();
+  //  ExecuteAction(L"Logout(" + mal_user_old + L")");
+  //} else {
+  //  AnimeListDialog.RefreshList();
+  //}
+
+  //FolderMonitor.Enable(Folders.watch_enabled == TRUE);
+
+  //SetProxies(Program.Proxy.host, 
+  //           Program.Proxy.user, 
+  //           Program.Proxy.password);
+}
+
+void Settings::RestoreDefaults() {
+  // Take a backup
+  wstring backup = file_ + L".bak";
+  DWORD flags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
+  MoveFileEx(file_.c_str(), backup.c_str(), flags);
+  
+  // Reload settings
+  Load();
+  ApplyChanges(true, true);
+
+  // Reload settings dialog
+  if (SettingsDialog.IsWindow()) {
+    SettingsDialog.Destroy();
+    ExecuteAction(L"Settings");
+  }
 }
 
 // =============================================================================

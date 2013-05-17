@@ -32,12 +32,8 @@ namespace mal {
 
 // =============================================================================
 
-const COLORREF COLOR_DARKBLUE = RGB(46, 81, 162);
-const COLORREF COLOR_LIGHTBLUE = RGB(225, 231, 245);
-const COLORREF COLOR_LIGHTGRAY = RGB(246, 246, 246);
-
 enum MyStatus {
-  MYSTATUS_NOTINLIST = 0,
+  MYSTATUS_NOTINLIST,
   MYSTATUS_WATCHING,
   MYSTATUS_COMPLETED,
   MYSTATUS_ONHOLD,
