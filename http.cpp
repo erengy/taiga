@@ -50,8 +50,7 @@
 #include "win32/win_taskbar.h"
 #include "win32/win_taskdialog.h"
 
-HttpClient HttpAnnounceClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
-HttpClients AnimeClients;
+HttpClients Clients;
 
 // =============================================================================
 
@@ -176,11 +175,7 @@ BOOL HttpClient::OnReadData() {
       status = L"Reading account information...";
       break;
     case HTTP_MAL_AnimeAdd:
-    case HTTP_MAL_AnimeEdit:
     case HTTP_MAL_AnimeUpdate:
-    case HTTP_MAL_ScoreUpdate:
-    case HTTP_MAL_StatusUpdate:
-    case HTTP_MAL_TagUpdate:
       status = L"Updating list...";
       break;
     case HTTP_MAL_AnimeAskToDiscuss:
@@ -287,21 +282,10 @@ BOOL HttpClient::OnReadComplete() {
 
     // =========================================================================
 
-    // Check profile
-    case HTTP_MAL_Profile: {
-      break;
-    }
-
-    // =========================================================================
-
     // Update list
     case HTTP_MAL_AnimeAdd:
     case HTTP_MAL_AnimeDelete:
-    case HTTP_MAL_AnimeEdit:
-    case HTTP_MAL_AnimeUpdate:
-    case HTTP_MAL_ScoreUpdate:
-    case HTTP_MAL_StatusUpdate:
-    case HTTP_MAL_TagUpdate: {
+    case HTTP_MAL_AnimeUpdate: {
       History.queue.updating = false;
       MainDialog.ChangeStatus();
       int anime_id = static_cast<int>(GetParam());
@@ -398,8 +382,8 @@ BOOL HttpClient::OnReadComplete() {
               if (mal::GetAnimeDetails(anime_id))
                 return TRUE;
         } else {
-          status = L"Could not read anime information.";
-          AnimeDialog.page_series_info.SetDlgItemText(IDC_EDIT_ANIME_INFO, status.c_str());
+          status = L"Could not find anime information.";
+          AnimeDialog.page_series_info.SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, status.c_str());
         }
 #ifdef _DEBUG
         MainDialog.ChangeStatus(status);
@@ -592,33 +576,33 @@ BOOL HttpClient::OnReadComplete() {
 // =============================================================================
 
 void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) {
+  Clients.anime.UpdateProxy(proxy, user, pass);
   #define SET_PROXY(client) client.SetProxy(proxy, user, pass);
-  SET_PROXY(HttpAnnounceClient);
-  SET_PROXY(ImageClient);
-  SET_PROXY(MainClient);
-  SET_PROXY(SearchClient);
-  SET_PROXY(TwitterClient);
-  SET_PROXY(VersionClient);
+  SET_PROXY(Clients.application);
+  SET_PROXY(Clients.service.image);
+  SET_PROXY(Clients.service.list);
+  SET_PROXY(Clients.service.search);
+  SET_PROXY(Clients.sharing.http);
+  SET_PROXY(Clients.sharing.twitter);
   for (unsigned int i = 0; i < Aggregator.feeds.size(); i++) {
     SET_PROXY(Aggregator.feeds[i].client);
   }
   SET_PROXY(Taiga.Updater.client);
   #undef SET_PROXY
-  AnimeClients.UpdateProxy(proxy, user, pass);
 }
 
 // =============================================================================
 
-HttpClients::HttpClients() {
+AnimeClients::AnimeClients() {
   clients_[HTTP_Client_Image];
   clients_[HTTP_Client_Search];
 }
 
-HttpClients::~HttpClients() {
+AnimeClients::~AnimeClients() {
   Cleanup(true);
 }
 
-void HttpClients::Cleanup(bool force) {
+void AnimeClients::Cleanup(bool force) {
   for (auto it = clients_.begin(); it != clients_.end(); ++it) {
     std::set<int> ids;
     for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
@@ -633,7 +617,7 @@ void HttpClients::Cleanup(bool force) {
   }
 }
 
-class HttpClient* HttpClients::GetClient(int type, int anime_id) {
+class HttpClient* AnimeClients::GetClient(int type, int anime_id) {
   if (anime_id <= anime::ID_UNKNOWN)
     return nullptr;
 
@@ -656,7 +640,7 @@ class HttpClient* HttpClients::GetClient(int type, int anime_id) {
   return clients[anime_id];
 }
 
-void HttpClients::UpdateProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
+void AnimeClients::UpdateProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
   for (auto it = clients_.begin(); it != clients_.end(); ++it) {
     for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
       it2->second->SetProxy(proxy, user, pass);

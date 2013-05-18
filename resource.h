@@ -42,10 +42,14 @@
 #define IDD_SETTINGS_RECOGNITION_MEDIA          193
 #define IDD_SETTINGS_RECOGNITION_UPDATE         194
 #define IDD_SETTINGS_RECOGNITION_STREAM         195
+#define IDD_SETTINGS_LIBRARY_CACHE              197
 #define IDC_BUTTON_ADDFOLDER                    1000
+#define IDC_CHECK_NOTIFY_RECOGNIZED             1000
 #define IDC_LINK_DEFAULTS                       1000
+#define IDC_STATIC_ANIME_DETAILS                1000
 #define IDC_BUTTON_BROWSE                       1001
 #define IDC_CHECK_LIST_ENGLISH                  1001
+#define IDC_CHECK_NOTIFY_NOTRECOGNIZED          1001
 #define IDC_COMBO_TORRENT_SEARCH                1001
 #define IDC_LINK_THEMES                         1001
 #define IDC_TAB_PAGES                           1001
@@ -66,7 +70,6 @@
 #define IDC_BUTTON_TWITTER_AUTH                 1015
 #define IDC_CHECK_ANIME_REWATCH                 1016
 #define IDC_CHECK_AUTOSTART                     1017
-#define IDC_CHECK_BALLOON                       1018
 #define IDC_CHECK_FILTER_NEWEPS                 1022
 #define IDC_CHECK_FOLDERS_WATCH                 1023
 #define IDC_CHECK_GENERAL_CLOSE                 1024
@@ -107,7 +110,6 @@
 #define IDC_DATETIME_START                      1059
 #define IDC_EDIT_ANIME_ALT                      1060
 #define IDC_EDIT_ANIME_FOLDER                   1061
-#define IDC_EDIT_ANIME_INFO                     1062
 #define IDC_EDIT_ANIME_PROGRESS                 1063
 #define IDC_EDIT_ANIME_TAGS                     1064
 #define IDC_EDIT_ANIME_TITLE                    1065
@@ -168,7 +170,6 @@
 #define IDC_SPIN_PROGRESS                       1123
 #define IDC_SPIN_TORRENT_INTERVAL               1124
 #define IDC_STATIC_ANIME_IMG                    1125
-#define IDC_STATIC_ANIME_INFO1                  1126
 #define IDC_STATIC_ANIME_STAT1                  1128
 #define IDC_STATIC_ANIME_STAT2                  1129
 #define IDC_STATIC_ANIME_STAT3                  1130
@@ -199,5 +200,6 @@
 #define IDS_KEYWORD_VERSION                     40004
 #define IDS_KEYWORD_VIDEO                       40005
 #define IDS_KEYWORD_EPISODE                     40006
+#define IDC_EDIT_ANIME_SYNOPSIS                 40007
 #define IDC_RICHEDIT_ABOUT                      40007
 #define IDS_KEYWORD_EPISODE_PREFIX              40007

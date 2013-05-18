@@ -119,14 +119,14 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
       window.SetPosition(nullptr, rect_child);
 
-      // Information
-      window.SetWindowHandle(GetDlgItem(IDC_STATIC_ANIME_INFO1));
+      // Details
+      window.SetWindowHandle(GetDlgItem(IDC_STATIC_ANIME_DETAILS));
       window.GetWindowRect(m_hWindow, &rect_child);
       rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
       window.SetPosition(nullptr, rect_child);
 
       // Synopsis
-      window.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_INFO));
+      window.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_SYNOPSIS));
       window.GetWindowRect(m_hWindow, &rect_child);
       rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
       rect_child.bottom = rect.bottom;
@@ -146,6 +146,19 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   wstring text = Join(anime_item->GetSynonyms(), L", ");
   if (text.empty()) text = L"-";
   SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
+
+  // Set information
+  #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
+  text = mal::TranslateType(anime_item->GetType()) + L"\n" + 
+         mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" + 
+         mal::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" + 
+         mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
+         ADD_INFOLINE(anime_item->GetGenres(), L"-") + L"\n" +
+         ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" + 
+         ADD_INFOLINE(anime_item->GetRank(), L"#0") + L"\n" + 
+         ADD_INFOLINE(anime_item->GetPopularity(), L"#0");
+  #undef ADD_INFOLINE
+  SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
       
   // Set synopsis
   if (connect && (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty())) {
@@ -161,20 +174,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
         mal::GetAnimeDetails(anime_id_);
     }
   }
-  SetDlgItemText(IDC_EDIT_ANIME_INFO, text.c_str());
-
-  // Set information
-  #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
-  text = mal::TranslateType(anime_item->GetType()) + L"\n" + 
-         mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" + 
-         mal::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" + 
-         mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
-         ADD_INFOLINE(anime_item->GetGenres(), L"-") + L"\n" +
-         ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" + 
-         ADD_INFOLINE(anime_item->GetRank(), L"#0") + L"\n" + 
-         ADD_INFOLINE(anime_item->GetPopularity(), L"#0");
-  #undef ADD_INFOLINE
-  SetDlgItemText(IDC_STATIC_ANIME_INFO1, text.c_str());
+  SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, text.c_str());
 }
 
 // =============================================================================
@@ -378,7 +378,7 @@ bool PageMyInfo::Save() {
   // Create item
   EventItem event_item;
   event_item.anime_id = anime_id_;
-  event_item.mode = HTTP_MAL_AnimeEdit;
+  event_item.mode = HTTP_MAL_AnimeUpdate;
 
   // Episodes watched
   event_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);

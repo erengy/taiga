@@ -508,7 +508,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     EventItem item;
     item.anime_id = AnimeDatabase.GetCurrentId();
     item.score = ToInt(body);
-    item.mode = HTTP_MAL_ScoreUpdate;
+    item.mode = HTTP_MAL_AnimeUpdate;
     History.queue.Add(item);
 
   // EditStatus(value)
@@ -548,7 +548,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         break;
     }
     event_item.anime_id = AnimeDatabase.GetCurrentId();
-    event_item.mode = event_item.episode ? HTTP_MAL_AnimeEdit : HTTP_MAL_StatusUpdate;
+    event_item.mode = HTTP_MAL_AnimeUpdate;
     History.queue.Add(event_item);
 
   // EditTags(tags)
@@ -564,7 +564,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       EventItem item;
       item.anime_id = AnimeDatabase.GetCurrentId();
       item.tags = dlg.text;
-      item.mode = HTTP_MAL_TagUpdate;
+      item.mode = HTTP_MAL_AnimeUpdate;
       History.queue.Add(item);
     }
 

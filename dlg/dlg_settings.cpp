@@ -89,6 +89,7 @@ void SettingsDialog::SetCurrentSection(int index) {
       break;
     case SECTION_LIBRARY:
       tab_.InsertItem(0, L"Folders", PAGE_LIBRARY_FOLDERS);
+      tab_.InsertItem(1, L"Cache", PAGE_LIBRARY_CACHE);
       break;
     case SECTION_APPLICATION:
       tab_.InsertItem(0, L"Behavior", PAGE_APP_BEHAVIOR);
@@ -175,15 +176,15 @@ void SettingsDialog::OnOK() {
   win32::ListView list;
   SettingsPage* page = nullptr;
 
-  wstring mal_user_old = Settings.Account.MAL.user;
-  wstring theme_old = Settings.Program.General.theme;
+  wstring previous_user = Settings.Account.MAL.user;
+  wstring previous_theme = Settings.Program.General.theme;
 
   // Services > MyAnimeList
   page = &pages[PAGE_SERVICES_MAL];
   if (page->IsWindow()) {
     page->GetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.user);
     page->GetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.password);
-    Settings.Account.MAL.auto_login = page->IsDlgButtonChecked(IDC_CHECK_START_LOGIN);
+    Settings.Account.MAL.auto_sync = page->IsDlgButtonChecked(IDC_CHECK_START_LOGIN);
   }
 
   // Library > Folders
@@ -236,7 +237,8 @@ void SettingsDialog::OnOK() {
   // Application > Notifications
   page = &pages[PAGE_APP_NOTIFICATIONS];
   if (page->IsWindow()) {
-    Settings.Program.Balloon.enabled = page->IsDlgButtonChecked(IDC_CHECK_BALLOON);
+    Settings.Program.Notifications.recognized = page->IsDlgButtonChecked(IDC_CHECK_NOTIFY_RECOGNIZED);
+    Settings.Program.Notifications.notrecognized = page->IsDlgButtonChecked(IDC_CHECK_NOTIFY_NOTRECOGNIZED);
   }
   
   // Recognition > List updates
@@ -339,8 +341,7 @@ void SettingsDialog::OnOK() {
   Settings.Save();
 
   // Apply changes
-  Settings.ApplyChanges(Settings.Account.MAL.user != mal_user_old,
-                        Settings.Program.General.theme != theme_old);
+  Settings.ApplyChanges(previous_user, previous_theme);
 
   // End dialog
   EndDialog(IDOK);
@@ -426,7 +427,7 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case NM_CLICK: {
           win32::TaskDialog dlg;
           dlg.SetWindowTitle(APP_NAME);
-          dlg.SetMainIcon(TD_ICON_INFORMATION);
+          dlg.SetMainIcon(TD_ICON_WARNING);
           dlg.SetMainInstruction(L"Are you sure you want to restore default settings?");
           dlg.SetContent(L"All your current settings will be lost.");
           dlg.AddButton(L"Yes", IDYES);

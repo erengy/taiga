@@ -99,7 +99,7 @@ BOOL FormatDialog::OnInitDialog() {
       break;
     case FORMAT_MODE_BALLOON:
       SetText(L"Edit format - Balloon tooltips");
-      rich_edit_.SetText(Settings.Program.Balloon.format.c_str());
+      rich_edit_.SetText(Settings.Program.Notifications.format.c_str());
       break;
   }
 
@@ -124,7 +124,7 @@ void FormatDialog::OnOK() {
       rich_edit_.GetText(Settings.Announce.Twitter.format);
       break;
     case FORMAT_MODE_BALLOON:
-      rich_edit_.GetText(Settings.Program.Balloon.format);
+      rich_edit_.GetText(Settings.Program.Notifications.format);
       break;
   }
   

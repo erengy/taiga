@@ -100,7 +100,6 @@ public:
 // =============================================================================
 
 bool AskToDiscuss(int anime_id, int episode_number);
-void CheckProfile();
 bool DownloadImage(int anime_id, const wstring& image_url);
 bool DownloadUserImage(bool thumb);
 bool GetAnimeDetails(int anime_id);

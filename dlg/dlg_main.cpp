@@ -98,6 +98,9 @@ BOOL MainDialog::OnInitDialog() {
   UpdateAllMenus();
 
   // Apply start-up settings
+  if (Settings.Account.MAL.auto_sync) { 		
+    ExecuteAction(L"Synchronize"); 		
+  }
   if (Settings.Program.StartUp.check_new_episodes) {
     ExecuteAction(L"CheckEpisodes()", TRUE);
   }
@@ -433,7 +436,7 @@ BOOL MainDialog::OnDestroy() {
   TorrentDialog.Destroy();
   
   // Cleanup
-  MainClient.Cleanup();
+  Clients.service.list.Cleanup();
   Taskbar.Destroy();
   TaskbarList.Release();
   
@@ -467,7 +470,7 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
     anime::Episode episode;
     Meow.ExamineTitle(buffer, episode); 
-    MessageBox(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), APP_TITLE, MB_OK);
+    MessageBox(ReplaceVariables(Settings.Program.Notifications.format, episode).c_str(), APP_TITLE, MB_OK);
   }
 #endif
 }
@@ -643,8 +646,8 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 #endif  
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
-          if (Settings.Program.Balloon.enabled) {
-            wstring tip_text = ReplaceVariables(Settings.Program.Balloon.format, CurrentEpisode);
+          if (Settings.Program.Notifications.notrecognized) {
+            wstring tip_text = ReplaceVariables(Settings.Program.Notifications.format, CurrentEpisode);
             tip_text += L"\nClick here to search MyAnimeList for this anime.";
             Taiga.current_tip_type = TIPTYPE_SEARCH;
             Taskbar.Tip(L"", L"", 0);

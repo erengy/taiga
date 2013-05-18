@@ -32,13 +32,7 @@ enum HttpClientMode {
   HTTP_MAL_AnimeAskToDiscuss,
   HTTP_MAL_AnimeDelete,
   HTTP_MAL_AnimeDetails,
-  HTTP_MAL_AnimeEdit,
   HTTP_MAL_AnimeUpdate,
-  HTTP_MAL_ScoreUpdate,
-  HTTP_MAL_StatusUpdate,
-  HTTP_MAL_TagUpdate,
-  HTTP_MAL_Friends,
-  HTTP_MAL_Profile,
   HTTP_MAL_SearchAnime,
   HTTP_MAL_Image,
   HTTP_MAL_UserImage,
@@ -77,10 +71,10 @@ protected:
   BOOL OnRedirect(wstring address);
 };
 
-class HttpClients {
+class AnimeClients {
 public:
-  HttpClients();
-  virtual ~HttpClients();
+  AnimeClients();
+  virtual ~AnimeClients();
 
   void Cleanup(bool force);
   HttpClient* GetClient(int type, int anime_id);
@@ -90,8 +84,24 @@ private:
   std::map<int, std::map<int, HttpClient*>> clients_;
 };
 
-extern HttpClient HttpAnnounceClient, ImageClient, MainClient, SearchClient, TwitterClient, VersionClient;
-extern HttpClients AnimeClients;
+struct HttpClients {
+  AnimeClients anime;
+
+  HttpClient application;
+
+  struct Service {
+    HttpClient image;
+    HttpClient list;
+    HttpClient search;
+  } service;
+
+  struct Sharing {
+    HttpClient http;
+    HttpClient twitter;
+  } sharing;
+};
+
+extern HttpClients Clients;
 
 // =============================================================================
 

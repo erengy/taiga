@@ -74,9 +74,9 @@ BOOL AnimeDialog::OnInitDialog() {
   tab_.Attach(GetDlgItem(IDC_TAB_ANIME));
   switch (mode_) {
     case DIALOG_MODE_ANIME_INFORMATION:
-      tab_.InsertItem(0, L"Series information", 0);
+      tab_.InsertItem(0, L"Main information", 0);
       if (AnimeDatabase.FindItem(anime_id_)->IsInList())
-        tab_.InsertItem(1, L"My information", 0);
+        tab_.InsertItem(1, L"My list and settings", 0);
       break;
     case DIALOG_MODE_NOW_PLAYING:
       tab_.Hide();

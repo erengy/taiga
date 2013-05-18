@@ -81,7 +81,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         break;
       }
       // Custom draw
-      case NM_CUSTOMDRAW:
+      case NM_CUSTOMDRAW: {
         LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(pnmh);
         switch (pCD->nmcd.dwDrawStage) {
           case CDDS_PREPAINT:
@@ -93,6 +93,18 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             if (pCD->nmcd.dwItemSpec % 2) pCD->clrTextBk = RGB(248, 248, 248);
             return CDRF_DODEFAULT;
         }
+        break;
+      }
+      // Double click
+      case NM_DBLCLK: {
+        if (list_.GetSelectedCount() > 0) {
+          auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
+          int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
+          int anime_id = list_.GetItemParam(item_index);
+          ExecuteAction(L"Info", 0, anime_id);
+        }
+        break;
+      }
     }
   }
   

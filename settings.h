@@ -46,14 +46,14 @@ class Settings {
 public:
   bool Load();
   bool Save();
-  void ApplyChanges(bool user_changed, bool theme_changed);
+  void ApplyChanges(const wstring& previous_user, const wstring& previous_theme);
   void RestoreDefaults();
 
   // Account
   struct Account {
     // MyAnimeList
     struct Mal {
-      BOOL auto_login;
+      BOOL auto_sync;
       wstring password, user;
     } MAL;
     // Update
@@ -141,11 +141,11 @@ public:
       int progress_mode;
       BOOL progress_show_eps;
     } List;
-    // Balloon
-    struct Balloon {
-      BOOL enabled;
+    // Notifications
+    struct Notifications {
+      BOOL recognized, notrecognized;
       wstring format;
-    } Balloon;
+    } Notifications;
   } Program;
 
   // Recognition

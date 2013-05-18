@@ -196,7 +196,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
       if (anime_item) {
         UpdateSeasonListMenu(!anime_item->IsInList());
         ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SeasonList"), 0, 
-          static_cast<LPARAM>(anime_item->GetId()));
+                      static_cast<LPARAM>(anime_item->GetId()));
         list_.RedrawWindow();
       }
       break;
@@ -251,7 +251,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (win32::GetWinVersion() > win32::VERSION_XP) {
         rect.Inflate(-4, -4);
       }
-      if (win32::GetWinVersion() < win32::VERSION_VISTA && pCD->nmcd.uItemState & CDIS_SELECTED) {
+      if (win32::GetWinVersion() < win32::VERSION_VISTA && 
+          pCD->nmcd.uItemState & CDIS_SELECTED) {
         hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
       } else {
         hdc.FillRect(rect, RGB(230, 230, 230));
@@ -282,16 +283,16 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (ImageDatabase.Load(anime_item->GetId(), false, false)) {
         auto image = ImageDatabase.GetImage(anime_item->GetId());
         rect_image = ResizeRect(rect_image, 
-          image->rect.Width(),
-          image->rect.Height(),
-          true, true, false);
+                                image->rect.Width(),
+                                image->rect.Height(),
+                                true, true, false);
         hdc.SetStretchBltMode(HALFTONE);
         hdc.StretchBlt(rect_image.left, rect_image.top, 
-          rect_image.Width(), rect_image.Height(), 
-          image->dc.Get(), 0, 0, 
-          image->rect.Width(), 
-          image->rect.Height(), 
-          SRCCOPY);
+                       rect_image.Width(), rect_image.Height(), 
+                       image->dc.Get(), 0, 0, 
+                       image->rect.Width(), 
+                       image->rect.Height(), 
+                       SRCCOPY);
       }
       
       // Draw title background
@@ -313,7 +314,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw anime list indicator
       if (anime_item->IsInList()) {
         UI.ImgList16.Draw(ICON16_DOCUMENT_A, hdc.Get(),
-          rect_title.right - 20, rect_title.top + 4);
+                          rect_title.right - 20, rect_title.top + 4);
         rect_title.right -= 20;
       }
 
@@ -360,7 +361,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       #define DRAWLINE(t) \
         text = t; \
         hdc.DrawText(text.c_str(), text.length(), rect_details, \
-          DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE); \
+                     DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE); \
         rect_details.Offset(0, text_height + 2);
 
       DRAWLINE(L"Aired:");
@@ -376,7 +377,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
 
       text = mal::TranslateDate(anime_item->GetDate(anime::DATE_START));
       text += anime_item->GetDate(anime::DATE_END) != anime_item->GetDate(anime::DATE_START) ? 
-        L" to " + mal::TranslateDate(anime_item->GetDate(anime::DATE_END)) : L"";
+              L" to " + mal::TranslateDate(anime_item->GetDate(anime::DATE_END)) : L"";
       text += L" (" + mal::TranslateStatus(anime_item->GetAiringStatus()) + L")";
       DRAWLINE(text);
       DRAWLINE(mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
@@ -388,13 +389,13 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       #undef DRAWLINE
       
       // Draw synopsis
-      if (!StartsWith(anime_item->GetSynopsis(), L"No synopsis has been added for this series yet.")) {
+      if (!anime_item->GetSynopsis().empty()) {
+        text = anime_item->GetSynopsis();
         // DT_WORDBREAK doesn't go well with DT_*_ELLIPSIS, so we need to make
         // sure our text ends with ellipses by clipping that extra pixel.
         rect_synopsis.bottom -= (rect_synopsis.Height() % text_height) + 1;
-        text = anime_item->GetSynopsis();
         hdc.DrawText(text.c_str(), text.length(), rect_synopsis, 
-          DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK);
+                     DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK);
       }
 
       break;
@@ -589,12 +590,17 @@ void SeasonDialog::RefreshStatus() {
     }
   }
   if (last_modified) {
-    time_t time_now = time(nullptr);
-    if (time_now == last_modified) {
-      text += L" (Last updated: Now)";
+    time_t time_diff = time(nullptr) - last_modified;
+    text += L" (Last updated: ";
+    if (time_diff < 60) {
+      text += L"Now";
+    } else if (time_diff > 60 * 60 * 24) {
+      time_t days = time_diff / (60 * 60 * 24);
+      text += ToWstr(days) + (days == 1 ? L" day ago" : L" days ago");
     } else {
-      text += L" (Last updated: " + ToDateString(time_now - last_modified) + L" ago)";
+      text += L"Today";
     }
+    text += L")";
   }
 
   MainDialog.ChangeStatus(text);

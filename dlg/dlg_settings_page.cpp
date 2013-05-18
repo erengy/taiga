@@ -56,6 +56,7 @@ void SettingsPage::Create() {
     SETRESOURCEID(PAGE_APP_LIST, IDD_SETTINGS_APP_LIST);
     SETRESOURCEID(PAGE_APP_NOTIFICATIONS, IDD_SETTINGS_APP_NOTIFICATIONS);
     SETRESOURCEID(PAGE_LIBRARY_FOLDERS, IDD_SETTINGS_LIBRARY_FOLDERS);
+    SETRESOURCEID(PAGE_LIBRARY_CACHE, IDD_SETTINGS_LIBRARY_CACHE);
     SETRESOURCEID(PAGE_RECOGNITION_MEDIA, IDD_SETTINGS_RECOGNITION_MEDIA);
     SETRESOURCEID(PAGE_RECOGNITION_STREAM, IDD_SETTINGS_RECOGNITION_STREAM);
     SETRESOURCEID(PAGE_RECOGNITION_UPDATE, IDD_SETTINGS_RECOGNITION_UPDATE);
@@ -84,7 +85,7 @@ BOOL SettingsPage::OnInitDialog() {
     case PAGE_SERVICES_MAL: {
       SetDlgItemText(IDC_EDIT_USER, Settings.Account.MAL.user.c_str());
       SetDlgItemText(IDC_EDIT_PASS, Settings.Account.MAL.password.c_str());
-      CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.Account.MAL.auto_login);
+      CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.Account.MAL.auto_sync);
       break;
     }
 
@@ -162,7 +163,8 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Application > Notifications
     case PAGE_APP_NOTIFICATIONS: {
-      CheckDlgButton(IDC_CHECK_BALLOON, Settings.Program.Balloon.enabled);
+      CheckDlgButton(IDC_CHECK_NOTIFY_RECOGNIZED, Settings.Program.Notifications.recognized);
+      CheckDlgButton(IDC_CHECK_NOTIFY_NOTRECOGNIZED, Settings.Program.Notifications.notrecognized);
       break;
     }
 

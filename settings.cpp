@@ -20,16 +20,25 @@
 
 #include "settings.h"
 
+#include "dlg/dlg_anime_list.h"
+#include "dlg/dlg_main.h"
+#include "dlg/dlg_history.h"
+#include "dlg/dlg_search.h"
 #include "dlg/dlg_settings.h"
+#include "dlg/dlg_stats.h"
 
 #include "anime.h"
+#include "anime_db.h"
 #include "anime_filter.h"
 #include "common.h"
 #include "gfx.h"
 #include "history.h"
 #include "http.h"
+#include "monitor.h"
+#include "stats.h"
 #include "string.h"
 #include "taiga.h"
+#include "theme.h"
 #include "xml.h"
 
 #include "win32/win_registry.h"
@@ -65,7 +74,7 @@ bool Settings::Load() {
   xml_node account = settings.child(L"account");
     // MyAnimeList
     xml_node mal = account.child(L"myanimelist");
-    Account.MAL.auto_login = mal.attribute(L"login").as_int();
+    Account.MAL.auto_sync = mal.attribute(L"login").as_int();
     Account.MAL.password = SimpleDecrypt(mal.attribute(L"password").value());
     Account.MAL.user = mal.attribute(L"username").value();
     // Update
@@ -169,8 +178,9 @@ bool Settings::Load() {
     Program.List.progress_show_eps = list.child(L"progress").attribute(L"showeps").as_int();
     // Notifications
     xml_node notifications = program.child(L"notifications");
-    Program.Balloon.enabled = notifications.child(L"balloon").attribute(L"enabled").as_int(TRUE);
-    Program.Balloon.format = notifications.child(L"balloon").attribute(L"format").as_string(DEFAULT_FORMAT_BALLOON);
+    Program.Notifications.recognized = notifications.child(L"balloon").attribute(L"recognized").as_int(TRUE);
+    Program.Notifications.notrecognized = notifications.child(L"balloon").attribute(L"notrecognized").as_int(TRUE);
+    Program.Notifications.format = notifications.child(L"balloon").attribute(L"format").as_string(DEFAULT_FORMAT_BALLOON);
 
   // Recognition
   xml_node recognition = settings.child(L"recognition");
@@ -248,7 +258,7 @@ bool Settings::Save() {
     xml_node mal = account.append_child(L"myanimelist");
     mal.append_attribute(L"username") = Account.MAL.user.c_str();
     mal.append_attribute(L"password") = SimpleEncrypt(Account.MAL.password).c_str();
-    mal.append_attribute(L"login") = Account.MAL.auto_login;
+    mal.append_attribute(L"login") = Account.MAL.auto_sync;
     // Update
     xml_node update = account.append_child(L"update");
     update.append_attribute(L"mode") = Account.Update.mode;
@@ -361,8 +371,9 @@ bool Settings::Save() {
     // Notifications
     xml_node notifications = program.append_child(L"notifications");
     notifications.append_child(L"balloon");
-    notifications.child(L"balloon").append_attribute(L"enabled") = Program.Balloon.enabled;
-    notifications.child(L"balloon").append_attribute(L"format") = Program.Balloon.format.c_str();
+    notifications.child(L"balloon").append_attribute(L"recognized") = Program.Notifications.recognized;
+    notifications.child(L"balloon").append_attribute(L"notrecognized") = Program.Notifications.notrecognized;
+    notifications.child(L"balloon").append_attribute(L"format") = Program.Notifications.format.c_str();
 
   // Recognition
   settings.append_child(node_comment).set_value(L" Recognition ");
@@ -436,37 +447,37 @@ bool Settings::Save() {
   return doc.save_file(file_.c_str(), L"\x09", format_default | format_write_bom);
 }
 
-void Settings::ApplyChanges(bool user_changed, bool theme_changed) {
-  //if (theme_changed) {
-  //  UI.Load(Program.General.theme);
-  //  UI.LoadImages();
-  //  MainDialog.rebar.RedrawWindow();
-  //  UpdateAllMenus();
-  //}
+void Settings::ApplyChanges(const wstring& previous_user, const wstring& previous_theme) {
+  if (Program.General.theme != previous_theme) {
+    UI.Load(Program.General.theme);
+    UI.LoadImages();
+    MainDialog.rebar.RedrawWindow();
+    UpdateAllMenus();
+  }
 
-  //if (user_changed) {
-  //  AnimeDatabase.LoadList();
-  //  History.Load();
-  //  CurrentEpisode.Set(anime::ID_UNKNOWN);
-  //  MainDialog.treeview.RefreshHistoryCounter();
-  //  MainDialog.UpdateTitle();
-  //  AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
-  //  AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
-  //  AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
-  //  HistoryDialog.RefreshList();
-  //  SearchDialog.RefreshList();
-  //  Stats.CalculateAll();
-  //  StatsDialog.Refresh();
-  //  ExecuteAction(L"Logout(" + mal_user_old + L")");
-  //} else {
-  //  AnimeListDialog.RefreshList();
-  //}
+  if (Account.MAL.user != previous_user) {
+    AnimeDatabase.LoadList();
+    History.Load();
+    CurrentEpisode.Set(anime::ID_UNKNOWN);
+    MainDialog.treeview.RefreshHistoryCounter();
+    MainDialog.UpdateTitle();
+    AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
+    AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
+    AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
+    HistoryDialog.RefreshList();
+    SearchDialog.RefreshList();
+    Stats.CalculateAll();
+    StatsDialog.Refresh();
+    ExecuteAction(L"Logout(" + previous_user + L")");
+  } else {
+    AnimeListDialog.RefreshList();
+  }
 
-  //FolderMonitor.Enable(Folders.watch_enabled == TRUE);
+  FolderMonitor.Enable(Folders.watch_enabled == TRUE);
 
-  //SetProxies(Program.Proxy.host, 
-  //           Program.Proxy.user, 
-  //           Program.Proxy.password);
+  SetProxies(Program.Proxy.host, 
+             Program.Proxy.user, 
+             Program.Proxy.password);
 }
 
 void Settings::RestoreDefaults() {
@@ -476,8 +487,10 @@ void Settings::RestoreDefaults() {
   MoveFileEx(file_.c_str(), backup.c_str(), flags);
   
   // Reload settings
+  wstring previous_user = Account.MAL.user;
+  wstring previous_theme = Program.General.theme;
   Load();
-  ApplyChanges(true, true);
+  ApplyChanges(previous_user, previous_theme);
 
   // Reload settings dialog
   if (SettingsDialog.IsWindow()) {

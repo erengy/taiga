@@ -88,7 +88,7 @@ void EventQueue::Add(EventItem& item, bool save) {
         item.date_finish.Reset();
   }
   switch (item.mode) {
-    case HTTP_MAL_AnimeEdit:
+    case HTTP_MAL_AnimeUpdate:
       if (!item.episode && 
           !item.score && 
           !item.status && 
@@ -96,18 +96,6 @@ void EventQueue::Add(EventItem& item, bool save) {
           !item.tags && 
           !item.date_start && 
           !item.date_finish) return;
-      break;
-    case HTTP_MAL_AnimeUpdate:
-      if (!item.episode) return;
-      break;
-    case HTTP_MAL_ScoreUpdate:
-      if (!item.score) return;
-      break;
-    case HTTP_MAL_StatusUpdate:
-      if (!item.status) return;
-      break;
-    case HTTP_MAL_TagUpdate:
-      if (!item.tags) return;
       break;
   }
 
@@ -128,7 +116,7 @@ void EventQueue::Add(EventItem& item, bool save) {
             add_new_item = false;
           }
           if (!add_new_item) {
-            it->mode = HTTP_MAL_AnimeEdit;
+            it->mode = HTTP_MAL_AnimeUpdate;
             it->time = (wstring)GetDate() + L" " + GetTime();
           }
           break;

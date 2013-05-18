@@ -128,7 +128,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 void Announcer::ToHttp(wstring address, wstring data) {
   if (address.empty() || data.empty()) return;
 
-  HttpAnnounceClient.Post(win32::Url(address), data, L"", HTTP_Silent);
+  Clients.sharing.http.Post(win32::Url(address), data, L"", HTTP_Silent);
 }
 
 // =============================================================================
@@ -328,25 +328,27 @@ Twitter::Twitter() {
 }
 
 bool Twitter::RequestToken() {
-  wstring header = TwitterClient.GetDefaultHeader() + 
+  wstring header = 
+    Clients.sharing.twitter.GetDefaultHeader() + 
     oauth.BuildHeader(
-    L"http://api.twitter.com/oauth/request_token", 
-    L"GET", NULL);
+      L"http://api.twitter.com/oauth/request_token", 
+      L"GET", NULL);
 
-  return TwitterClient.Connect(
+  return Clients.sharing.twitter.Connect(
     L"api.twitter.com", L"oauth/request_token",
     L"", L"GET", header, L"myanimelist.net", L"",
     HTTP_Twitter_Request);
 }
 
 bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
-  wstring header = TwitterClient.GetDefaultHeader() + 
+  wstring header = 
+    Clients.sharing.twitter.GetDefaultHeader() + 
     oauth.BuildHeader(
-    L"http://api.twitter.com/oauth/access_token", 
-    L"POST", NULL, 
-    key, secret, pin);
+      L"http://api.twitter.com/oauth/access_token", 
+      L"POST", NULL, 
+      key, secret, pin);
 
-  return TwitterClient.Connect(
+  return Clients.sharing.twitter.Connect(
     L"api.twitter.com", L"oauth/access_token",
     L"", L"GET", header, L"myanimelist.net", L"",
     HTTP_Twitter_Auth);
@@ -364,14 +366,15 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   OAuthParameters post_parameters;
   post_parameters[L"status"] = EncodeUrl(status_text_);
 
-  wstring header = TwitterClient.GetDefaultHeader() + 
+  wstring header = 
+    Clients.sharing.twitter.GetDefaultHeader() + 
     oauth.BuildHeader(
-    L"http://api.twitter.com/1.1/statuses/update.json", 
-    L"POST", &post_parameters, 
-    Settings.Announce.Twitter.oauth_key, 
-    Settings.Announce.Twitter.oauth_secret);
+      L"http://api.twitter.com/1.1/statuses/update.json", 
+      L"POST", &post_parameters, 
+      Settings.Announce.Twitter.oauth_key, 
+      Settings.Announce.Twitter.oauth_secret);
 
-  return TwitterClient.Connect(
+  return Clients.sharing.twitter.Connect(
     L"api.twitter.com", L"1.1/statuses/update.json", 
     L"status=" + post_parameters[L"status"],
     L"POST", header, L"myanimelist.net", L"", 

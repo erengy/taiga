@@ -95,9 +95,9 @@ void Item::StartWatching(Episode episode) {
   MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
   
   // Show balloon tip
-  if (Settings.Program.Balloon.enabled) {
+  if (Settings.Program.Notifications.recognized) {
     Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(ReplaceVariables(Settings.Program.Balloon.format, episode).c_str(), 
+    Taskbar.Tip(ReplaceVariables(Settings.Program.Notifications.format, episode).c_str(), 
                 L"Now Playing", NIIF_INFO);
   }
   
@@ -237,8 +237,6 @@ void Item::AddToQueue(Episode episode, bool change_status) {
   // Set update mode
   if (GetMyStatus() == mal::MYSTATUS_NOTINLIST) {
     event_item.mode = HTTP_MAL_AnimeAdd;
-  } else if (change_status) {
-    event_item.mode = HTTP_MAL_AnimeEdit;
   } else {
     event_item.mode = HTTP_MAL_AnimeUpdate;
   }
