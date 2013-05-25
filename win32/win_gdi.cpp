@@ -157,6 +157,10 @@ int Dc::DrawText(LPCWSTR lpszString, int nCount, const RECT& rc, UINT nFormat) c
   return ::DrawText(m_hDC, lpszString, nCount, (LPRECT)&rc, nFormat);
 }
 
+COLORREF Dc::GetTextColor() const {
+  return ::GetTextColor(m_hDC);
+}
+
 COLORREF Dc::SetBkColor(COLORREF crColor) const {
   return ::SetBkColor(m_hDC, crColor);
 }

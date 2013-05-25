@@ -101,11 +101,13 @@ class Item {
   // Functions related to episode availability
   bool CheckEpisodes(int number = -1, bool check_folder = false);
   int GetAvailableEpisodeCount() const;
+  int GetLastAiredEpisodeNumber(bool estimate = false) const;
   wstring GetNewEpisodePath() const;
   bool IsEpisodeAvailable(int number) const;
   bool IsNewEpisodeAvailable() const;
   bool PlayEpisode(int number);
   bool SetEpisodeAvailability(int number, bool available, const wstring& path);
+  void SetLastAiredEpisodeNumber(int number);
   void SetNewEpisodePath(const wstring& path);
 
   // For anime-specific folders on user's computer

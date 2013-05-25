@@ -102,11 +102,25 @@ bool Feed::Download(int index) {
 }
 
 int Feed::ExamineData() {
-  // Examine title and compare with anime list items
   for (size_t i = 0; i < items.size(); i++) {
+    // Examine title and compare with anime list items
     Meow.ExamineTitle(items[i].title, items[i].episode_data, true, true, true, true, false);
     Meow.MatchDatabase(items[i].episode_data, true, true);
+    
+    // Update last aired episode number
+    if (items[i].episode_data.anime_id > anime::ID_UNKNOWN) {
+      auto anime_item = AnimeDatabase.FindItem(items[i].episode_data.anime_id);
+      int episode_number = GetEpisodeHigh(items[i].episode_data.number);
+      anime_item->SetLastAiredEpisodeNumber(episode_number);
+    }
   }
+
+  // Sort items by their anime ID, giving priority to identified items, while
+  // preserving the order for unidentified ones.
+  std::stable_sort(items.begin(), items.end(),
+    [](const FeedItem& a, const FeedItem& b) {
+      return a.episode_data.anime_id > b.episode_data.anime_id;
+    });
 
   // Filter
   int count = Aggregator.filter_manager.Filter(*this);

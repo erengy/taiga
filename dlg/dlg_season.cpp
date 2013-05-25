@@ -17,7 +17,6 @@
 */
 
 #include "../std.h"
-#include <algorithm>
 #include <ctime>
 
 #include "dlg_main.h"

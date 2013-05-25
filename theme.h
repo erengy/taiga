@@ -38,9 +38,7 @@ enum Icons16px {
   ICON16_SETTINGS,
   ICON16_CROSS,
   ICON16_PLUS,
-  ICON16_PLUS_SMALL,
   ICON16_MINUS,
-  ICON16_MINUS_SMALL,
   ICON16_ARROW_UP,
   ICON16_ARROW_DOWN,
   ICON16_FUNNEL,
@@ -122,9 +120,11 @@ public:
       COLORREF value[3];
       wstring type;
     }
+      aired,
+      available,
       background,
       border,
-      buffer,
+      button,
       completed,
       dropped,
       separator,

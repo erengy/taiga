@@ -283,6 +283,19 @@ private:
 
 // =============================================================================
 
+/* SysLink */
+
+class SysLink : public Window {
+public:
+  SysLink() {}
+  SysLink(HWND hWnd) { SetWindowHandle(hWnd); }
+  virtual ~SysLink() {}
+
+  void SetItemState(int item, UINT states);
+};
+
+// =============================================================================
+
 /* Tab */
 
 class Tab : public Window {

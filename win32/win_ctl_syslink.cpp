@@ -16,37 +16,21 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef STD_H
-#define STD_H
+#include "win_control.h"
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4996)
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-#endif
+namespace win32 {
 
-#include <assert.h>
-#include <windows.h>
-#include <commctrl.h>
-#include <gdiplus.h>
-#include <psapi.h>
-#include <shlobj.h>
-#include <winhttp.h>
+// =============================================================================
 
-#include <algorithm>
-#include <list>
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <vector>
+void SysLink::SetItemState(int item, UINT states) {
+  LITEM li = {0};
+  
+  li.iLink = item;
+  li.mask = LIF_ITEMINDEX | LIF_STATE;
+  li.state = states;
+  li.stateMask = states;
+  
+  ::SendMessage(m_hWindow, LM_SETITEM, 0, reinterpret_cast<LPARAM>(&li));
+}
 
-using std::string;
-using std::vector;
-using std::wstring;
-
-extern HINSTANCE g_hInstance;
-extern HWND g_hMain;
-
-#endif // STD_H
+} // namespace win32

@@ -35,11 +35,6 @@ enum UpdateTime {
   UPDATE_MODE_AFTERDELAY = 3
 };
 
-enum ListProgressMode {
-  LIST_PROGRESS_AVAILABLEEPS = 0,
-  LIST_PROGRESS_QUEUEDEPS    = 1
-};
-
 // =============================================================================
 
 class Settings {
@@ -138,7 +133,8 @@ public:
       BOOL english_titles;
       BOOL highlight;
       BOOL new_episodes;
-      int progress_mode;
+      BOOL progress_show_aired;
+      BOOL progress_show_available;
       BOOL progress_show_eps;
     } List;
     // Notifications

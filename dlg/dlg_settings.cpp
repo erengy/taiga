@@ -231,7 +231,8 @@ void SettingsDialog::OnOK() {
     Settings.Program.List.english_titles = page->IsDlgButtonChecked(IDC_CHECK_LIST_ENGLISH);
     Settings.Program.List.new_episodes = page->IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS);
     Settings.Program.List.highlight = page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
-    Settings.Program.List.progress_mode = page->GetCheckedRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2);
+    Settings.Program.List.progress_show_aired = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AIRED);
+    Settings.Program.List.progress_show_available = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AVAILABLE);
     Settings.Program.List.progress_show_eps = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
   }
   // Application > Notifications

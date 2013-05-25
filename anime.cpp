@@ -55,7 +55,8 @@ SeriesInformation::SeriesInformation()
 }
 
 MyInformation::MyInformation()
-    : watched_episodes(0), 
+    : last_aired_episode(0), 
+      watched_episodes(0), 
       score(0), 
       status(mal::MYSTATUS_NOTINLIST), 
       rewatching(FALSE), 

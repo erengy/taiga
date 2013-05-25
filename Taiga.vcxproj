@@ -167,6 +167,7 @@
     <ClCompile Include="win32\win_ctl_richedit.cpp" />
     <ClCompile Include="win32\win_ctl_spin.cpp" />
     <ClCompile Include="win32\win_ctl_statusbar.cpp" />
+    <ClCompile Include="win32\win_ctl_syslink.cpp" />
     <ClCompile Include="win32\win_ctl_tab.cpp" />
     <ClCompile Include="win32\win_ctl_toolbar.cpp" />
     <ClCompile Include="win32\win_ctl_tooltip.cpp" />

@@ -61,6 +61,7 @@ public:
 
   // Text
   int      DrawText(LPCWSTR lpszString, int nCount, const RECT& rc, UINT nFormat) const;
+  COLORREF GetTextColor() const;
   COLORREF SetBkColor(COLORREF crColor) const;
   int      SetBkMode(int iBkMode) const;
   COLORREF SetTextColor(COLORREF crColor) const;

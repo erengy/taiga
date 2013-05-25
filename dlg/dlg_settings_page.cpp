@@ -157,7 +157,8 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_LIST_ENGLISH, Settings.Program.List.english_titles);
       CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, Settings.Program.List.new_episodes);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.highlight);
-      CheckDlgButton(IDC_RADIO_LIST_PROGRESS1 + Settings.Program.List.progress_mode, TRUE);
+      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AIRED, Settings.Program.List.progress_show_aired);
+      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AVAILABLE, Settings.Program.List.progress_show_available);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.progress_show_eps);
       break;
     }
@@ -295,6 +296,8 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.RSS.Torrent.check_enabled);
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETRANGE32, 0, 3600);
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETPOS32, 0, Settings.RSS.Torrent.check_interval);
+      EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, Settings.RSS.Torrent.check_enabled);
+      EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, Settings.RSS.Torrent.check_enabled);
       CheckDlgButton(IDC_RADIO_TORRENT_NEW1 + Settings.RSS.Torrent.new_action - 1, TRUE);
       break;
     }
@@ -435,6 +438,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         }
         // Enable/disable controls
+        case IDC_CHECK_TORRENT_AUTOCHECK: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, enable);
+          EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, enable);
+          return TRUE;
+        }
         case IDC_CHECK_TORRENT_AUTOSETFOLDER: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
           EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enable);
@@ -514,10 +523,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_RADIO_MIRC_CHANNEL3:
           CheckRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3, LOWORD(wParam));
           EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, LOWORD(wParam) == IDC_RADIO_MIRC_CHANNEL3);
-          return TRUE;
-        case IDC_RADIO_LIST_PROGRESS1:
-        case IDC_RADIO_LIST_PROGRESS2:
-          CheckRadioButton(IDC_RADIO_LIST_PROGRESS1, IDC_RADIO_LIST_PROGRESS2, LOWORD(wParam));
           return TRUE;
         case IDC_RADIO_TORRENT_NEW1:
         case IDC_RADIO_TORRENT_NEW2:

@@ -341,7 +341,8 @@ void TorrentDialog::RefreshList() {
 
   // Add items
   for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
-    if (Settings.RSS.Torrent.hide_unidentified && it->episode_data.anime_id == anime::ID_NOTINLIST) {
+    if (Settings.RSS.Torrent.hide_unidentified &&
+        it->episode_data.anime_id <= anime::ID_UNKNOWN) {
       continue;
     }
     wstring title, number, video;

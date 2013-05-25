@@ -94,7 +94,8 @@ class MyInformation {
   Date date_finish;
   wstring last_updated;
   wstring tags;
-  
+
+  int last_aired_episode;
   vector<bool> available_episodes;
   wstring new_episode_path;
   wstring folder;

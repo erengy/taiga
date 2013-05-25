@@ -18,7 +18,6 @@
 
 #include "std.h"
 #include "string.h"
-#include <algorithm>
 #include <functional>
 #include <iomanip>
 #include <locale>

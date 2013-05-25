@@ -17,7 +17,6 @@
 */
 
 #include "../std.h"
-#include <algorithm>
 
 #include "dlg_feed_condition.h"
 

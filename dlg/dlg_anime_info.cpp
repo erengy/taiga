@@ -17,7 +17,6 @@
 */
 
 #include "../std.h"
-#include <algorithm>
 
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
@@ -206,6 +205,11 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             action = UI.Menus.Show(m_hWindow, 0, 0, pNMLink->item.szUrl);
           ExecuteAction(action, 0, GetCurrentId());
           return TRUE;
+        }
+
+        // Custom draw
+        case NM_CUSTOMDRAW: {
+          return CDRF_DODEFAULT;
         }
       }
       break;
@@ -437,7 +441,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     Date date_now = GetDate();
     int date_diff = 0;
     const int day_limit = 7;
-    
+    int link_count = 0;
+
     // Recently watched
     vector<int> anime_ids;
     foreach_cr_(it, History.queue.items) {
@@ -463,26 +468,31 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"  \u2022 " + anime_item->GetTitle();
       if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED) {
         content += L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
+        link_count++;
       } else {
         int last_watched = anime_item->GetMyLastWatchedEpisode();
         if (last_watched > 0)
           content += L" #" + ToWstr(last_watched);
         content += L" \u2014 <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
+        link_count++;
       }
       content += L"\n";
     }
     if (content.empty()) {
       content = L"You haven't watched anything recently. "
                 L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?";
+      link_count++;
     } else {
       content = L"Recently watched:\n" + content + L"\n";
       int recently_watched = 0;
       foreach_c_(it, History.queue.items) {
+        if (!it->episode) continue;
         date_diff = date_now - (Date)(it->time.substr(0, 10));
         if (date_diff <= day_limit)
           recently_watched++;
       }
       foreach_c_(it, History.items) {
+        if (!it->episode) continue;
         date_diff = date_now - (Date)(it->time.substr(0, 10));
         if (date_diff <= day_limit)
           recently_watched++;
@@ -544,9 +554,13 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"\n";
     } else {
       content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
+      link_count++;
     }
 
     sys_link_.SetText(content);
+    
+    /*for (int i = 0; i < link_count; i++)
+      sys_link_.SetItemState(i, LIS_ENABLED | LIS_HOTTRACK | LIS_DEFAULTCOLORS);*/
   
   } else {
     int episode_number = GetEpisodeLow(CurrentEpisode.number);

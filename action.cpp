@@ -162,7 +162,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"MainDialog") {
     if (!MainDialog.IsWindow()) {
       MainDialog.Create(IDD_MAIN, NULL, false);
-      //Taiga.Updater.RunActions();
     } else {
       ActivateWindow(MainDialog.GetWindowHandle());
     }
@@ -339,14 +338,14 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
               MainDialog.ChangeStatus(L"Searching... (" + it->second.GetTitle() + L")");
             }
             it->second.CheckEpisodes(
-              Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS ? -1 : 0, 
+              Settings.Program.List.progress_show_available ? -1 : 0, 
               check_folder);
         }
       }
     // Search only for selected list item
     } else {
       AnimeDatabase.GetCurrentItem()->CheckEpisodes(
-        Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS ? -1 : 0,
+        Settings.Program.List.progress_show_available ? -1 : 0,
         true);
     }
     // We're done

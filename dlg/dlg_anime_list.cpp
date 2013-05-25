@@ -53,7 +53,7 @@ BOOL AnimeListDialog::OnInitDialog() {
 
   // Insert list columns
   listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");
-  listview.InsertColumn(1, 160, 160, LVCFMT_CENTER, L"Progress");
+  listview.InsertColumn(1, 200, 200, LVCFMT_CENTER, L"Progress");
   listview.InsertColumn(2,  62,  62, LVCFMT_CENTER, L"Score");
   listview.InsertColumn(3,  62,  62, LVCFMT_CENTER, L"Type");
   listview.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
@@ -269,11 +269,14 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       if (item_index < 0) break;
 
       GetSubItemRect(item_index, 1, &rect_item);
+      if (Settings.Program.List.progress_show_eps)
+        rect_item.right -= 50;
+      rect_item.Inflate(-5, -5);
       win32::Rect rect_button[2];
       rect_button[0].Copy(rect_item);
       rect_button[1].Copy(rect_item);
-      rect_button[0].right = rect_button[0].left + 16;
-      rect_button[1].left = rect_button[1].right - 16;
+      rect_button[0].right = rect_button[0].left + 9;
+      rect_button[1].left = rect_button[1].right - 9;
 
       if ((button_visible[0] && rect_button[0].PtIn(pt)) || 
           (button_visible[1] && rect_button[1].PtIn(pt))) {
@@ -358,11 +361,14 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         
           win32::Rect rect_item;
           listview.GetSubItemRect(listview.GetNextItem(-1, LVIS_SELECTED), 1, &rect_item);
+          if (Settings.Program.List.progress_show_eps)
+            rect_item.right -= 50;
+          rect_item.Inflate(-5, -5);
           win32::Rect rect_button[2];
           rect_button[0].Copy(rect_item);
           rect_button[1].Copy(rect_item);
-          rect_button[0].right = rect_button[0].left + 16;
-          rect_button[1].left = rect_button[1].right - 16;
+          rect_button[0].right = rect_button[0].left + 9;
+          rect_button[1].left = rect_button[1].right - 9;
 
           if (listview.button_visible[0] && rect_button[0].PtIn(pt)) {
             ExecuteAction(L"DecrementEpisode");
@@ -474,130 +480,185 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
 }
 
 void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, const anime::Item* anime_item) {
-  int eps_buffer   = anime_item->GetMyLastWatchedEpisode(true);
-  int eps_watched  = anime_item->GetMyLastWatchedEpisode(false);
-  int eps_estimate = anime_item->GetEpisodeCount(true);
-  int eps_total    = anime_item->GetEpisodeCount(false);
-  if (eps_watched > eps_buffer) eps_watched = -1;
-  if (eps_buffer == eps_watched) eps_buffer = -1;
-  if (eps_watched == 0) eps_watched = -1;
-  
   win32::Dc dc = hdc;
-  win32::Rect rcItem = *rc;
-  win32::Rect rcText = *rc;
-        
+  win32::Rect rcBar = *rc;
+
+  int eps_aired = anime_item->GetLastAiredEpisodeNumber(true);
+  int eps_watched = anime_item->GetMyLastWatchedEpisode(true);
+  int eps_estimate = anime_item->GetEpisodeCount(true);
+  int eps_total = anime_item->GetEpisodeCount(false);
+
+  if (eps_watched > eps_aired) eps_aired = -1;
+  if (eps_aired == eps_total) eps_aired = -1;
+  if (eps_watched == 0) eps_watched = -1;
+
+  bool draw_text = Settings.Program.List.progress_show_eps == TRUE;
+  if (draw_text)
+    rcBar.right -= 50;
+
   // Draw border
-  rcItem.Inflate(-2, -2);
-  UI.list_progress.border.Draw(dc.Get(), &rcItem);
+  rcBar.Inflate(-4, -4);
+  UI.list_progress.border.Draw(dc.Get(), &rcBar);
   // Draw background
-  rcItem.Inflate(-1, -1);
-  UI.list_progress.background.Draw(dc.Get(), &rcItem);
-  win32::Rect rcAvail = rcItem;
-  win32::Rect rcBuffer = rcItem;
-  win32::Rect rcButton = rcItem;
-        
+  rcBar.Inflate(-1, -1);
+  UI.list_progress.background.Draw(dc.Get(), &rcBar);
+
+  win32::Rect rcAired = rcBar;
+  win32::Rect rcAvail = rcBar;
+  win32::Rect rcButton = rcBar;
+  win32::Rect rcSeparator = rcBar;
+  win32::Rect rcWatched = rcBar;
+
   // Draw progress
-  if (eps_watched > -1 || eps_buffer > -1) {
-    float ratio_watched = 0.0f, ratio_buffer = 0.0f;
+  if (eps_watched > -1 || eps_aired > -1) {
+    float ratio_watched = 0.0f;
+    float ratio_buffer = 0.0f;
     if (eps_estimate) {
       if (eps_watched > 0) {
         ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
       }
-      if (eps_buffer > 0) {
-        ratio_buffer = static_cast<float>(eps_buffer) / static_cast<float>(eps_estimate);
+      if (eps_aired > 0) {
+        ratio_buffer = static_cast<float>(eps_aired) / static_cast<float>(eps_estimate);
       }
     } else {
-      ratio_watched = eps_buffer > -1 ? 0.75f : 0.8f;
-      ratio_buffer = eps_buffer > -1 ? 0.8f : 0.0f;
+      ratio_watched = eps_aired > -1 ? 0.75f : 0.8f;
+      ratio_buffer = eps_aired > -1 ? 0.8f : 0.0f;
     }
 
-    if (eps_buffer > -1) {
-      rcBuffer.right = static_cast<int>((rcBuffer.right - rcBuffer.left) * ratio_buffer) + rcBuffer.left;
+    if (eps_aired > -1) {
+      rcAired.right = static_cast<int>((rcAired.Width()) * ratio_buffer) + rcAired.left;
     }
-    if (Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS && eps_buffer > -1) {
-      rcItem.right = rcBuffer.right;
-    } else {
-      rcItem.right = static_cast<int>((rcItem.right - rcItem.left) * ratio_watched) + rcItem.left;
+    if (ratio_watched > -1) {
+      rcWatched.right = static_cast<int>((rcWatched.Width()) * ratio_watched) + rcWatched.left;
     }
 
-    // Draw buffer
-    if (Settings.Program.List.progress_mode == LIST_PROGRESS_QUEUEDEPS && eps_buffer > 0) {
-      UI.list_progress.buffer.Draw(dc.Get(), &rcBuffer);
+    // Draw aired episodes
+    if (Settings.Program.List.progress_show_aired && eps_aired > 0) {
+      UI.list_progress.aired.Draw(dc.Get(), &rcAired);
     }
 
     // Draw progress
     if (anime_item->GetMyStatus() == mal::MYSTATUS_WATCHING || anime_item->GetMyRewatching()) {
-      UI.list_progress.watching.Draw(dc.Get(), &rcItem);  // Watching
+      UI.list_progress.watching.Draw(dc.Get(), &rcWatched);  // Watching
     } else if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED) {
-      UI.list_progress.completed.Draw(dc.Get(), &rcItem); // Completed
+      UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed
     } else if (anime_item->GetMyStatus() == mal::MYSTATUS_DROPPED) {
-      UI.list_progress.dropped.Draw(dc.Get(), &rcItem);   // Dropped
+      UI.list_progress.dropped.Draw(dc.Get(), &rcWatched);   // Dropped
     } else {
-      UI.list_progress.completed.Draw(dc.Get(), &rcItem); // Completed / On hold / Plan to watch
+      UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed / On hold / Plan to watch
     }
   }
 
   // Draw episode availability
-  if (Settings.Program.List.progress_mode == LIST_PROGRESS_AVAILABLEEPS) {
+  if (Settings.Program.List.progress_show_available) {
     if (eps_total > 0) {
-      float width = static_cast<float>(rcAvail.Width()) / static_cast<float>(eps_total);
+      float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_total);
       int available_episode_count = static_cast<int>(anime_item->GetAvailableEpisodeCount());
-      for (int i = max(eps_buffer, eps_watched) + 1; i <= available_episode_count; i++) {
+      for (int i = eps_watched + 1; i <= available_episode_count; i++) {
         if (i > 0 && anime_item->IsEpisodeAvailable(i)) {
-          rcBuffer.left = static_cast<int>(rcAvail.left + (width * (i - 1)));
-          rcBuffer.right = static_cast<int>(rcBuffer.left + width + 1);
-          UI.list_progress.buffer.Draw(dc.Get(), &rcBuffer);
+          rcAvail.left = static_cast<int>(rcBar.left + (width * (i - 1)));
+          rcAvail.right = static_cast<int>(rcAvail.left + width + 1);
+          UI.list_progress.available.Draw(dc.Get(), &rcAvail);
         }
       }
     } else {
       if (anime_item->IsNewEpisodeAvailable()) {
-        rcBuffer.left = eps_buffer > -1 ? rcBuffer.right : (eps_watched > -1 ? rcItem.right : rcItem.left);
-        rcBuffer.right = rcBuffer.left + static_cast<int>((rcAvail.right - rcAvail.left) * 0.05f);
-        UI.list_progress.buffer.Draw(dc.Get(), &rcBuffer);
+        rcAvail.left = eps_watched > -1 ? rcWatched.right : rcWatched.left;
+        rcAvail.right = rcAvail.left + static_cast<int>((rcBar.Width()) * 0.05f);
+        UI.list_progress.available.Draw(dc.Get(), &rcAvail);
       }
     }
   }
 
-  // Draw separator
-  if (eps_watched > -1 || eps_buffer > -1) {
-    rcBuffer.left = rcItem.right;
-    rcBuffer.right = rcItem.right + 1;
-    UI.list_progress.separator.Draw(dc.Get(), &rcBuffer);
+  // Draw separators
+  if (eps_watched > -1) {
+    rcSeparator.left = rcWatched.right;
+    rcSeparator.right = rcWatched.right + 1;
+    UI.list_progress.separator.Draw(dc.Get(), &rcSeparator);
+  }
+  if (eps_aired > -1) {
+    rcSeparator.left = rcAired.right;
+    rcSeparator.right = rcAired.right + 1;
+    UI.list_progress.separator.Draw(dc.Get(), &rcSeparator);
   }
 
   // Draw buttons
   if (uItemState & CDIS_SELECTED) {
-    rcButton.Inflate(3, 1);
     // Draw decrement button
     if (button_visible[0]) {
-      rcButton.left += 1;
-      UI.ImgList16.Draw(ICON16_MINUS_SMALL, dc.Get(), rcButton.left, rcButton.top);
+      rcButton = rcBar;
+      rcButton.right = rcButton.left + 9;
+      dc.FillRect(rcButton, UI.list_progress.button.value[0]);
+      rcButton.Inflate(-1, -4);
+      dc.FillRect(rcButton, UI.list_progress.background.value[0]);
     }
     // Draw increment button
     if (button_visible[1]) {
-      rcButton.left = rcButton.right - 16;
-      UI.ImgList16.Draw(ICON16_PLUS_SMALL, dc.Get(), rcButton.left, rcButton.top);
+      rcButton = rcBar;
+      rcButton.right = rcBar.right;
+      rcButton.left = rcButton.right - 9;
+      dc.FillRect(rcButton, UI.list_progress.button.value[0]);
+      rcButton.Inflate(-1, -4);
+      dc.FillRect(rcButton, UI.list_progress.background.value[0]);
+      rcButton.Inflate(-3, 3);
+      dc.FillRect(rcButton, UI.list_progress.background.value[0]);
     }
   }
 
   // Draw text
-  if (uItemState & CDIS_SELECTED || uItemState & CDIS_HOT || Settings.Program.List.progress_show_eps) {
-    if (eps_watched == -1) eps_watched = 0;
-    wstring text = mal::TranslateNumber(eps_buffer > -1 ? eps_buffer : eps_watched) + L"/" + mal::TranslateNumber(eps_total);
-    if (!Settings.Program.List.progress_show_eps) text += L" episodes";
-    if (anime_item->GetMyRewatching()) text += L" (rw)";
-    dc.EditFont(nullptr, 8);
+  if (draw_text) {
+    /*win32::Dc dcText;
+    if (eps_watched > -1) {
+      dcText = CreateCompatibleDC(dc.Get());
+      dcText.AttachBitmap(CreateCompatibleBitmap(dc.Get(), rcText.Width(), rcText.Height()));
+      dcText.BitBlt(0, 0, rcText.Width(), rcText.Height(),
+                    dc.Get(), rcText.left, rcText.top, SRCCOPY);
+      dcText.EditFont(L"Segoe UI", 9);
+      dcText.SetBkMode(TRANSPARENT);
+      dcText.SetTextColor(RGB(255, 255, 255));
+      rcText.Offset(-rcText.left, -rcText.top);
+      dcText.DrawText(text.c_str(), text.length(), rcText,
+                      DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    }*/
+
+    wstring text;
+    win32::Rect rcText = *rc;
+    COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
-    rcText.Offset(1, 1);
-    dc.SetTextColor(RGB(255, 255, 255));
-    dc.DrawText(text.c_str(), text.length(), rcText, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
-    rcText.Offset(-1, -1);
-    dc.SetTextColor(RGB(0, 0, 0));
-    dc.DrawText(text.c_str(), text.length(), rcText, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
-    DeleteObject(dc.DetachFont());
+
+    // Separator
+    rcText.left = rcBar.right;
+    dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+    dc.DrawText(L"/", 1, rcText,
+                DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+    dc.SetTextColor(text_color);
+
+    // Episodes watched
+    text = mal::TranslateNumber(eps_watched, L"0");
+    rcText.right -= (rcText.Width() / 2) + 4;
+    if (eps_watched < 1)
+      dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+    dc.DrawText(text.c_str(), text.length(), rcText,
+                DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+    dc.SetTextColor(text_color);
+
+    // Total episodes
+    text = mal::TranslateNumber(eps_total, L"?");
+    rcText.left = rcText.right + 8;
+    rcText.right = rc->right;
+    if (eps_total < 1)
+      dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+    dc.DrawText(text.c_str(), text.length(), rcText,
+                DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+    dc.SetTextColor(text_color);
+
+    /*if (eps_watched > -1) {
+      dc.BitBlt(rcText.left, rcText.top, rcItem.Width() + 5, rcText.Height(),
+                dcText.Get(), 0, 0, SRCCOPY);
+    }*/
   }
 
-  // Return
+  // Don't destroy the DC
   dc.DetachDC();
 }
 
@@ -621,9 +682,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       }
       // Change text color
       if (!anime_item) return CDRF_NOTIFYPOSTPAINT;
-      if (anime_item->GetAiringStatus() == mal::STATUS_NOTYETAIRED) {
-        pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
-      } else if (anime_item->IsNewEpisodeAvailable()) {
+      if (anime_item->IsNewEpisodeAvailable()) {
         if (Settings.Program.List.highlight) {
           pCD->clrText = GetSysColor(pCD->iSubItem == 0 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
         }

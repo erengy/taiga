@@ -402,6 +402,52 @@ int Item::GetAvailableEpisodeCount() const {
   return static_cast<int>(my_info_->available_episodes.size());
 }
 
+int Item::GetLastAiredEpisodeNumber(bool estimate) const {
+  if (!my_info_.get())
+    return 0;
+
+  if (my_info_->last_aired_episode)
+    return my_info_->last_aired_episode;
+
+  // No need to estimate if the series isn't currently airing
+  switch (GetAiringStatus()) {
+    case mal::STATUS_FINISHED:
+      my_info_->last_aired_episode = GetEpisodeCount();
+      return my_info_->last_aired_episode;
+    case mal::STATUS_NOTYETAIRED:
+    case mal::STATUS_UNKNOWN:
+      return 0;
+  }
+  
+  if (!estimate)
+    return 0;
+
+  // Can't estimate for other types of anime
+  if (GetType() != mal::TYPE_TV)
+    return 0;
+
+  // TV series air weekly, so the number of weeks that has passed since the day
+  // the series started airing gives us the last aired episode. Note that
+  // irregularities such as broadcasts being postponed due to sports events make
+  // this method unreliable.
+  const Date& date_start = GetDate(anime::DATE_START);
+  if (date_start.year && date_start.month && date_start.day) { 
+    // To compensate for the fact that we don't know the airing hour,
+    // we substract one more day.
+    int date_diff = GetDateJapan() - date_start - 1;
+    if (date_diff > -1) {
+      int number_of_weeks = date_diff / 7;
+      if (number_of_weeks < GetEpisodeCount()) {
+        my_info_->last_aired_episode = number_of_weeks + 1;
+      } else {
+        my_info_->last_aired_episode = GetEpisodeCount();
+      }
+    }
+  }
+
+  return my_info_->last_aired_episode;
+}
+
 wstring Item::GetNewEpisodePath() const {
   if (!my_info_.get()) return wstring();
   return my_info_->new_episode_path;
@@ -482,6 +528,12 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
   }
   
   return false;
+}
+
+void Item::SetLastAiredEpisodeNumber(int number) {
+  assert(my_info_.get());
+  if (number > my_info_->last_aired_episode)
+    my_info_->last_aired_episode = number;
 }
 
 void Item::SetNewEpisodePath(const wstring& path) {

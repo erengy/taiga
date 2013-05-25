@@ -17,7 +17,6 @@
 */
 
 #include "std.h"
-#include <algorithm>
 #include <ctime>
 
 #include "anime.h"

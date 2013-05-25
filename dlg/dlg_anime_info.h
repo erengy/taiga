@@ -71,7 +71,7 @@ protected:
   } image_label_;
 
   win32::Edit edit_title_;
-  win32::Window sys_link_;
+  win32::SysLink sys_link_;
   
   class Tab : public win32::Tab {
   public:

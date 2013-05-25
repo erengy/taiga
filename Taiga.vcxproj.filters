@@ -345,6 +345,9 @@
     <ClCompile Include="win32\win_resizable.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
+    <ClCompile Include="win32\win_ctl_syslink.cpp">
+      <Filter>Win32\Controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
