@@ -73,13 +73,14 @@ BOOL FeedConditionDialog::OnInitDialog() {
       }
       break;
     }
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS: {
+    case FEED_FILTER_ELEMENT_ANIME_MY_STATUS: {
       int value = ToInt(condition.value);
       if (value == 6) value--;
       value_combo_.SetCurSel(value);
       break;
     }
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
       value_combo_.SetCurSel(ToInt(condition.value) - 1);
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
@@ -119,8 +120,9 @@ void FeedConditionDialog::OnOK() {
   condition.op = operator_combo_.GetCurSel();
   switch (condition.element) {
     case FEED_FILTER_ELEMENT_ANIME_ID:
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
+    case FEED_FILTER_ELEMENT_ANIME_MY_STATUS:
       condition.value = ToWstr(value_combo_.GetItemData(value_combo_.GetCurSel()));
       break;
     default:
@@ -176,14 +178,18 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   switch (element_index) {
     case FEED_FILTER_ELEMENT_ANIME_ID:
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_START:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_END:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_EPISODES:
       ADD_OPERATOR(FEED_FILTER_OPERATOR_IS);
       ADD_OPERATOR(FEED_FILTER_OPERATOR_ISNOT);
       ADD_OPERATOR(FEED_FILTER_OPERATOR_ISGREATERTHAN);
       ADD_OPERATOR(FEED_FILTER_OPERATOR_ISLESSTHAN);
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
+    case FEED_FILTER_ELEMENT_ANIME_MY_STATUS:
       ADD_OPERATOR(FEED_FILTER_OPERATOR_IS);
       ADD_OPERATOR(FEED_FILTER_OPERATOR_ISNOT);
       break;
@@ -251,13 +257,27 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       }
       break;
     }
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_START:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_END:
+      RECREATE_COMBO(CBS_DROPDOWN);
+      value_combo_.AddString(static_cast<wstring>(GetDate()).c_str());
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
       value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_AIRING).c_str(), mal::STATUS_AIRING);
       value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_FINISHED).c_str(), mal::STATUS_FINISHED);
       value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_NOTYETAIRED).c_str(), mal::STATUS_NOTYETAIRED);
       break;
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
+      RECREATE_COMBO(CBS_DROPDOWNLIST);
+      value_combo_.AddItem(mal::TranslateType(mal::TYPE_TV).c_str(), mal::TYPE_TV);
+      value_combo_.AddItem(mal::TranslateType(mal::TYPE_OVA).c_str(), mal::TYPE_OVA);
+      value_combo_.AddItem(mal::TranslateType(mal::TYPE_MOVIE).c_str(), mal::TYPE_MOVIE);
+      value_combo_.AddItem(mal::TranslateType(mal::TYPE_SPECIAL).c_str(), mal::TYPE_SPECIAL);
+      value_combo_.AddItem(mal::TranslateType(mal::TYPE_ONA).c_str(), mal::TYPE_ONA);
+      value_combo_.AddItem(mal::TranslateType(mal::TYPE_MUSIC).c_str(), mal::TYPE_MUSIC);
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_MY_STATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
       value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_NOTINLIST, false).c_str(), mal::MYSTATUS_NOTINLIST);
       value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_WATCHING, false).c_str(), mal::MYSTATUS_WATCHING);
@@ -267,6 +287,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_PLANTOWATCH, false).c_str(), mal::MYSTATUS_PLANTOWATCH);
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_EPISODES:
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(L"%watched%");
       value_combo_.AddString(L"%total%");

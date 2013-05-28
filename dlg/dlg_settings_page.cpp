@@ -19,6 +19,7 @@
 #include "../std.h"
 
 #include "dlg_format.h"
+#include "dlg_history.h"
 #include "dlg_settings.h"
 #include "dlg_settings_page.h"
 #include "dlg_feed_filter.h"
@@ -27,11 +28,13 @@
 #include "../anime_filter.h"
 #include "../announce.h"
 #include "../common.h"
+#include "../history.h"
 #include "../http.h"
 #include "../media.h"
 #include "../myanimelist.h"
 #include "../resource.h"
 #include "../settings.h"
+#include "../stats.h"
 #include "../string.h"
 #include "../taiga.h"
 #include "../theme.h"
@@ -105,6 +108,11 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, Settings.Folders.watch_enabled);
       break;
     }
+    // Library > Cache
+    case PAGE_LIBRARY_CACHE: {
+      parent->RefreshCache();
+      break;
+    }
 
     // =========================================================================
 
@@ -155,7 +163,6 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.Program.List.middle_click);
       CheckDlgButton(IDC_CHECK_LIST_ENGLISH, Settings.Program.List.english_titles);
-      CheckDlgButton(IDC_CHECK_FILTER_NEWEPS, Settings.Program.List.new_episodes);
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.highlight);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AIRED, Settings.Program.List.progress_show_aired);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AVAILABLE, Settings.Program.List.progress_show_available);
@@ -400,6 +407,32 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
         // ================================================================================
 
+        // Clear cache
+        case IDC_BUTTON_CACHE_CLEAR: {
+          if (IsDlgButtonChecked(IDC_CHECK_CACHE1)) {
+            History.items.clear();
+            History.Save();
+            HistoryDialog.RefreshList();
+          }
+          if (IsDlgButtonChecked(IDC_CHECK_CACHE2)) {
+            wstring path = Taiga.GetDataPath() + L"db\\image";
+            DeleteFolder(path);
+            ImageDatabase.FreeMemory();
+          }
+          if (IsDlgButtonChecked(IDC_CHECK_CACHE3)) {
+            wstring path = Taiga.GetDataPath() + L"feed";
+            DeleteFolder(path);
+          }
+          parent->RefreshCache();
+          CheckDlgButton(IDC_CHECK_CACHE1, FALSE);
+          CheckDlgButton(IDC_CHECK_CACHE2, FALSE);
+          CheckDlgButton(IDC_CHECK_CACHE3, FALSE);
+          EnableDlgItem(IDC_BUTTON_CACHE_CLEAR, FALSE);
+          return TRUE;
+        }
+
+        // ================================================================================
+
         // Test DDE connection
         case IDC_BUTTON_MIRC_TEST: {
           wstring service;
@@ -438,6 +471,15 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         }
         // Enable/disable controls
+        case IDC_CHECK_CACHE1:
+        case IDC_CHECK_CACHE2:
+        case IDC_CHECK_CACHE3: {
+          bool enable = IsDlgButtonChecked(IDC_CHECK_CACHE1) ||
+                        IsDlgButtonChecked(IDC_CHECK_CACHE2) ||
+                        IsDlgButtonChecked(IDC_CHECK_CACHE3);
+          EnableDlgItem(IDC_BUTTON_CACHE_CLEAR, enable);
+          return TRUE;
+        }
         case IDC_CHECK_TORRENT_AUTOCHECK: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
           EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, enable);

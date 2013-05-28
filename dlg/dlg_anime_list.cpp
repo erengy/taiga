@@ -21,6 +21,7 @@
 #include "dlg_anime_list.h"
 
 #include "dlg_main.h"
+#include "dlg_torrent.h"
 
 #include "../anime_db.h"
 #include "../anime_filter.h"
@@ -79,25 +80,89 @@ BOOL AnimeListDialog::OnInitDialog() {
 
 INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
-    // Drag list item
     case WM_MOUSEMOVE: {
+      // Drag list item
       if (listview.dragging) {
-        listview.drag_image.DragMove(LOWORD(lParam) + 8, HIWORD(lParam) + 8);
-        SetCursor(LoadCursor(nullptr, tab.HitTest() > -1 ? IDC_ARROW : IDC_NO));
+        bool allow_drop = false;
+        
+        if (tab.HitTest() > -1)
+          allow_drop = true;
+
+        if (!allow_drop) {
+          POINT pt;
+          GetCursorPos(&pt);
+          win32::Rect rect_edit;
+          MainDialog.edit.GetWindowRect(&rect_edit);
+          if (rect_edit.PtIn(pt))
+            allow_drop = true;
+        }
+
+        if (!allow_drop) {
+          TVHITTESTINFO ht = {0};
+          MainDialog.treeview.HitTest(&ht, true);
+          if (ht.flags & TVHT_ONITEM) {
+            int index = MainDialog.treeview.GetItemData(ht.hItem);
+            switch (index) {
+              case SIDEBAR_ITEM_SEARCH:
+              case SIDEBAR_ITEM_FEEDS:
+                allow_drop = true;
+                break;
+            }
+          }
+        }
+        
+        POINT pt;
+        GetCursorPos(&pt);
+        ::ScreenToClient(MainDialog.GetWindowHandle(), &pt);
+        listview.drag_image.DragMove(pt.x + 16, pt.y + 32);
+        SetCursor(LoadCursor(nullptr, allow_drop ? IDC_ARROW : IDC_NO));
       }
       break;
     }
+
     case WM_LBUTTONUP: {
+      // Drop list item
       if (listview.dragging) {
-        listview.drag_image.DragLeave(g_hMain);
+        listview.drag_image.DragLeave(MainDialog.GetWindowHandle());
         listview.drag_image.EndDrag();
         listview.drag_image.Destroy();
         listview.dragging = false;
         ReleaseCapture();
+        
         int tab_index = tab.HitTest();
         if (tab_index > -1) {
           int status = tab.GetItemParam(tab_index);
           ExecuteAction(L"EditStatus(" + ToWstr(status) + L")");
+          break;
+        }
+        
+        auto anime_item = AnimeDatabase.GetCurrentItem();
+        if (!anime_item)
+          break;
+        wstring text = Settings.Program.List.english_titles ? 
+          anime_item->GetEnglishTitle(true) : anime_item->GetTitle();
+
+        POINT pt;
+        GetCursorPos(&pt);
+        win32::Rect rect_edit;
+        MainDialog.edit.GetWindowRect(&rect_edit);
+        if (rect_edit.PtIn(pt)) {
+          MainDialog.edit.SetText(text);
+          break;
+        }
+
+        TVHITTESTINFO ht = {0};
+        MainDialog.treeview.HitTest(&ht, true);
+        if (ht.flags & TVHT_ONITEM) {
+          int index = MainDialog.treeview.GetItemData(ht.hItem);
+          switch (index) {
+            case SIDEBAR_ITEM_SEARCH:
+              ExecuteAction(L"SearchAnime(" + text + L")");
+              break;
+            case SIDEBAR_ITEM_FEEDS:
+              TorrentDialog.Search(Settings.RSS.Torrent.search_url, text);
+              break;
+          }
         }
       }
       break;
@@ -302,7 +367,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (listview.drag_image.GetHandle()) {
         pt = lplv->ptAction;
         listview.drag_image.BeginDrag(0, 0, 0);
-        listview.drag_image.DragEnter(GetWindowHandle(), pt.x, pt.y);
+        listview.drag_image.DragEnter(MainDialog.GetWindowHandle(), pt.x, pt.y);
         listview.dragging = true;
         SetCapture();
       }
@@ -389,9 +454,15 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           int index = listview.HitTest(true);
           if (anime_item->IsInList()) {
             switch (index) {
+              // Progress
+              case 1:
+                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"PlayEpisode"));
+                break;
+              // Score
               case 2:
                 ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"EditScore"));
                 break;
+              // Other
               default:
                 ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"RightClick"));
                 break;
@@ -511,22 +582,22 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
 
   // Draw progress
   if (eps_watched > -1 || eps_aired > -1) {
+    float ratio_aired = 0.0f;
     float ratio_watched = 0.0f;
-    float ratio_buffer = 0.0f;
     if (eps_estimate) {
+      if (eps_aired > 0) {
+        ratio_aired = static_cast<float>(eps_aired) / static_cast<float>(eps_estimate);
+      }
       if (eps_watched > 0) {
         ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
       }
-      if (eps_aired > 0) {
-        ratio_buffer = static_cast<float>(eps_aired) / static_cast<float>(eps_estimate);
-      }
     } else {
-      ratio_watched = eps_aired > -1 ? 0.75f : 0.8f;
-      ratio_buffer = eps_aired > -1 ? 0.8f : 0.0f;
+      ratio_aired = eps_aired > -1 ? 0.8f : 0.0f;
+      ratio_watched = eps_watched > 0 ? (eps_aired > -1 ? 0.75f : 0.8f) : 0.0f;
     }
 
     if (eps_aired > -1) {
-      rcAired.right = static_cast<int>((rcAired.Width()) * ratio_buffer) + rcAired.left;
+      rcAired.right = static_cast<int>((rcAired.Width()) * ratio_aired) + rcAired.left;
     }
     if (ratio_watched > -1) {
       rcWatched.right = static_cast<int>((rcWatched.Width()) * ratio_watched) + rcWatched.left;
@@ -607,20 +678,6 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
 
   // Draw text
   if (draw_text) {
-    /*win32::Dc dcText;
-    if (eps_watched > -1) {
-      dcText = CreateCompatibleDC(dc.Get());
-      dcText.AttachBitmap(CreateCompatibleBitmap(dc.Get(), rcText.Width(), rcText.Height()));
-      dcText.BitBlt(0, 0, rcText.Width(), rcText.Height(),
-                    dc.Get(), rcText.left, rcText.top, SRCCOPY);
-      dcText.EditFont(L"Segoe UI", 9);
-      dcText.SetBkMode(TRANSPARENT);
-      dcText.SetTextColor(RGB(255, 255, 255));
-      rcText.Offset(-rcText.left, -rcText.top);
-      dcText.DrawText(text.c_str(), text.length(), rcText,
-                      DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-    }*/
-
     wstring text;
     win32::Rect rcText = *rc;
     COLORREF text_color = dc.GetTextColor();
@@ -651,11 +708,6 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
     dc.DrawText(text.c_str(), text.length(), rcText,
                 DT_LEFT | DT_VCENTER | DT_SINGLELINE);
     dc.SetTextColor(text_color);
-
-    /*if (eps_watched > -1) {
-      dc.BitBlt(rcText.left, rcText.top, rcItem.Width() + 5, rcText.Height(),
-                dcText.Get(), 0, 0, SRCCOPY);
-    }*/
   }
 
   // Don't destroy the DC
@@ -689,7 +741,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       }
       // Indicate currently playing
       if (anime_item->GetPlaying()) {
-        pCD->clrTextBk = RGB(230, 255, 230);
+        pCD->clrTextBk = theme::COLOR_LIGHTGREEN;
         static HFONT hFontDefault = ChangeDCFont(pCD->nmcd.hdc, nullptr, -1, true, -1, -1);
         static HFONT hFontBold = reinterpret_cast<HFONT>(GetCurrentObject(pCD->nmcd.hdc, OBJ_FONT));
         SelectObject(pCD->nmcd.hdc, pCD->iSubItem == 0 ? hFontBold : hFontDefault);
@@ -771,8 +823,7 @@ void AnimeListDialog::RefreshList(int index) {
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
     status = it->second.GetMyStatus();
     if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->second.GetMyRewatching())) {
-      if (MainDialog.search_bar.filters.CheckItem(it->second) &&
-          (!Settings.Program.List.new_episodes || it->second.IsNewEpisodeAvailable())) {
+      if (MainDialog.search_bar.filters.CheckItem(it->second)) {
         group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
         icon_index = it->second.GetPlaying() ? ICON16_PLAY : StatusToIcon(it->second.GetAiringStatus());
         group_count.at(status)++;

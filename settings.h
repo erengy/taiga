@@ -132,7 +132,6 @@ public:
       int double_click, middle_click;
       BOOL english_titles;
       BOOL highlight;
-      BOOL new_episodes;
       BOOL progress_show_aired;
       BOOL progress_show_available;
       BOOL progress_show_eps;

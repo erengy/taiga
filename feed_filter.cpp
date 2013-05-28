@@ -67,11 +67,25 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
     case FEED_FILTER_ELEMENT_ANIME_TITLE:
       element = item.episode_data.title;
       break;
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_START:
+      if (anime) element = anime->GetDate(anime::DATE_START);
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_END:
+      if (anime) element = anime->GetDate(anime::DATE_END);
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_EPISODES:
+      if (anime) element = ToWstr(anime->GetEpisodeCount());
+      is_numeric = true;
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
       if (anime) element = ToWstr(anime->GetAiringStatus());
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
+      if (anime) element = ToWstr(anime->GetType());
+      is_numeric = true;
+      break;
+    case FEED_FILTER_ELEMENT_ANIME_MY_STATUS:
       if (anime) element = ToWstr(anime->GetMyStatus());
       is_numeric = true;
       break;
@@ -338,13 +352,13 @@ FeedFilterManager::FeedFilterManager() {
   ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
     L"Discard completed titles", 
     L"Discards files that belong to anime you've already finished");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWstr(mal::MYSTATUS_COMPLETED));
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MY_STATUS, FEED_FILTER_OPERATOR_IS, ToWstr(mal::MYSTATUS_COMPLETED));
   
   // Discard dropped titles
   ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
     L"Discard dropped titles", 
     L"Discards files that belong to anime you've dropped");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MYSTATUS, FEED_FILTER_OPERATOR_IS, ToWstr(mal::MYSTATUS_DROPPED));
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_MY_STATUS, FEED_FILTER_OPERATOR_IS, ToWstr(mal::MYSTATUS_DROPPED));
   
   // Select new episodes only
   ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ALL, true, 
@@ -486,9 +500,17 @@ wstring FeedFilterManager::TranslateElement(int element) {
       return L"Anime ID";
     case FEED_FILTER_ELEMENT_ANIME_TITLE:
       return L"Anime title";
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_START:
+      return L"Anime date started";
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_END:
+      return L"Anime date finished";
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_EPISODES:
+      return L"Anime episode count";
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
       return L"Anime airing status";
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
+      return L"Anime type";
+    case FEED_FILTER_ELEMENT_ANIME_MY_STATUS:
       return L"Anime watching status";
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
       return L"Episode number";
@@ -544,10 +566,12 @@ wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) 
         }
       }
     }
-    case FEED_FILTER_ELEMENT_ANIME_MYSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_MY_STATUS:
       return mal::TranslateMyStatus(ToInt(condition.value), false);
-    case FEED_FILTER_ELEMENT_ANIME_SERIESSTATUS:
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
       return mal::TranslateStatus(ToInt(condition.value));
+    case FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
+      return mal::TranslateType(ToInt(condition.value));
     default:
       return condition.value;
   }

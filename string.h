@@ -62,6 +62,7 @@ bool IsWhitespace(const wchar_t c);
 void LimitText(wstring& str, unsigned int limit, const wstring& tail = L"...");
 wstring PadChar(wstring str, const wchar_t ch, const size_t len);
 wstring PushString(const wstring& str1, const wstring& str2);
+void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output);
 void ReadStringTable(UINT uID, wstring& str);
 void Replace(wstring& str1, wstring str2, wstring replace_with, bool replace_all = false, bool case_insensitive = false);
 void ReplaceChar(wstring& str, const wchar_t c, const wchar_t replace_with);

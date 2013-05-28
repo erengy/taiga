@@ -173,7 +173,6 @@ bool Settings::Load() {
     Program.List.middle_click = list.child(L"action").attribute(L"middleclick").as_int(3);
     Program.List.english_titles = list.child(L"action").attribute(L"englishtitles").as_bool();
     Program.List.highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
-    Program.List.new_episodes = list.child(L"filter").child(L"episodes").attribute(L"new").as_bool();
     Program.List.progress_show_aired = list.child(L"progress").attribute(L"showaired").as_int(TRUE);
     Program.List.progress_show_available = list.child(L"progress").attribute(L"showavailable").as_int(TRUE);
     Program.List.progress_show_eps = list.child(L"progress").attribute(L"showeps").as_int(TRUE);
@@ -364,7 +363,6 @@ bool Settings::Save() {
       xml_node filter = list.append_child(L"filter");
       filter.append_child(L"episodes");
       filter.child(L"episodes").append_attribute(L"highlight") = Program.List.highlight;
-      filter.child(L"episodes").append_attribute(L"new") = Program.List.new_episodes;
       // Progress
       xml_node progress = list.append_child(L"progress");
       progress.append_attribute(L"showaired") = Program.List.progress_show_aired;

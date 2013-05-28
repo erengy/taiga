@@ -54,7 +54,6 @@ bool Theme::Load(const wstring& name) {
   xml_node icons16 = theme.child(L"icons").child(L"set_16px");
   xml_node icons24 = theme.child(L"icons").child(L"set_24px");
   xml_node progress = theme.child(L"list").child(L"progress");
-  xml_node menus = theme.child(L"menus");
 
   // Read icons
   icons16_.clear();
@@ -83,6 +82,10 @@ bool Theme::Load(const wstring& name) {
 
   // Read menus
   Menus.Menu.clear();
+  wstring menu_resource;
+  ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
+  result = doc.load(menu_resource.data());
+  xml_node menus = doc.child(L"menus");
   for (xml_node menu = menus.child(L"menu"); menu; menu = menu.next_sibling(L"menu")) {
     Menus.Create(menu.attribute(L"name").value(), menu.attribute(L"type").value());
     for (xml_node item = menu.child(L"item"); item; item = item.next_sibling(L"item")) {

@@ -229,7 +229,6 @@ void SettingsDialog::OnOK() {
     Settings.Program.List.double_click = page->GetComboSelection(IDC_COMBO_DBLCLICK);
     Settings.Program.List.middle_click = page->GetComboSelection(IDC_COMBO_MDLCLICK);
     Settings.Program.List.english_titles = page->IsDlgButtonChecked(IDC_CHECK_LIST_ENGLISH);
-    Settings.Program.List.new_episodes = page->IsDlgButtonChecked(IDC_CHECK_FILTER_NEWEPS);
     Settings.Program.List.highlight = page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
     Settings.Program.List.progress_show_aired = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AIRED);
     Settings.Program.List.progress_show_available = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AVAILABLE);
@@ -478,6 +477,24 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
   list.SetWindowHandle(nullptr);
 
   return index;
+}
+
+void SettingsDialog::RefreshCache() {
+  wstring text;
+  Stats.CalculateLocalData();
+  SettingsPage& page = pages[PAGE_LIBRARY_CACHE];
+
+  // History
+  text = ToWstr(static_cast<int>(History.items.size())) + L" item(s)";
+  page.SetDlgItemText(IDC_STATIC_CACHE1, text.c_str());
+
+  // Image files
+  text = ToWstr(Stats.image_count) + L" item(s), " + ToSizeString(Stats.image_size);
+  page.SetDlgItemText(IDC_STATIC_CACHE2, text.c_str());
+
+  // Torrent files
+  text = ToWstr(Stats.torrent_count) + L" item(s), " + ToSizeString(Stats.torrent_size);
+  page.SetDlgItemText(IDC_STATIC_CACHE3, text.c_str());
 }
 
 void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {

@@ -63,16 +63,14 @@ int Item::GetType() const {
 
 int Item::GetEpisodeCount(bool estimation) const {
   // Generally we want an exact number without estimation
-  if (!estimation || series_info_.episodes > 0) {
+  if (!estimation || series_info_.episodes > 0)
     return series_info_.episodes;
-  }
 
   int number = 0;
 
   // Estimate using user information
-  if (IsInList()) {
+  if (IsInList())
     number = max(GetMyLastWatchedEpisode(), GetAvailableEpisodeCount());
-  }
 
   // Estimate using airing dates of TV series
   if (series_info_.type == mal::TYPE_TV) {
@@ -86,10 +84,31 @@ int Item::GetEpisodeCount(bool estimation) const {
     }
   }
 
-  // Normalize estimated number
+  // Given all TV series aired since 2000, most them have their episodes
+  // spanning one or two seasons. Following is a table of top ten values:
+  //
+  //   Episodes    Seasons    Percent
+  //   ------------------------------
+  //         12          1      23.6%
+  //         13          1      20.2%
+  //         26          2      15.4%
+  //         24          2       6.4%
+  //         25          2       5.0%
+  //         52          4       4.4%
+  //         51          4       3.1%
+  //         11          1       2.6%
+  //         50          4       2.3%
+  //         39          3       1.4%
+  //   ------------------------------
+  //   Total:                   84.6%
+  //
+  // With that in mind, we can normalize our output at several points.
   if (number < 12) return 13;
   if (number < 24) return 26;
-  if (number < 50) return 51;
+  if (number < 50) return 52;
+  
+  // This is a series that has aired for more than a year, which means we cannot
+  // estimate for how long it is going to continue.
   return 0;
 }
 

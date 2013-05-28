@@ -927,6 +927,18 @@ wstring PushString(const wstring& str1, const wstring& str2) {
   }
 }
 
+void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output) {
+  HRSRC hResInfo = FindResource(nullptr, name,  type);
+  HGLOBAL hResHandle = LoadResource(nullptr, hResInfo);
+  DWORD dwSize = SizeofResource(nullptr, hResInfo);
+  
+  const char* lpData = static_cast<char*>(LockResource(hResHandle));
+  string temp(lpData, dwSize);
+  output = ToUTF8(temp);
+
+  FreeResource(hResInfo);
+}
+
 void ReadStringTable(UINT uID, wstring& str) {
   wchar_t buffer[2048];
   LoadString(g_hInstance, uID, buffer, 2048);

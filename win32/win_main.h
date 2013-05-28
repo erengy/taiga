@@ -31,6 +31,13 @@ using std::string;
 using std::vector;
 using std::wstring;
 
+#ifndef GET_X_LPARAM
+#define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
+#endif
+#ifndef GET_Y_LPARAM
+#define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
+#endif
+
 namespace win32 {
 
 class Window;

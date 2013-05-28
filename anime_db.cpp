@@ -25,6 +25,7 @@
 #include "common.h"
 #include "debug.h"
 #include "myanimelist.h"
+#include "recognition.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -170,7 +171,7 @@ void Database::UpdateItem(Item& new_item) {
   if (!item->last_modified || new_item.last_modified > item->last_modified) {
     item->SetId(new_item.GetId());
     item->last_modified = new_item.last_modified;
-    
+
     // Update only if a value is non-empty
     if (new_item.GetType() > 0)
       item->SetType(new_item.GetType());
@@ -202,6 +203,12 @@ void Database::UpdateItem(Item& new_item) {
       item->SetScore(new_item.GetScore());
     if (!new_item.GetSynopsis().empty())
       item->SetSynopsis(new_item.GetSynopsis());
+
+    // Update clean titles, if necessary
+    if (!new_item.GetTitle().empty() ||
+        !new_item.GetSynonyms().empty() ||
+        !new_item.GetEnglishTitle(false).empty())
+      Meow.UpdateCleanTitles(new_item.GetId());
   }
 
   // Update user information

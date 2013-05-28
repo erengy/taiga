@@ -367,26 +367,26 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
     case WM_MOUSEWHEEL: {
       // Ignoring the low-order word of wParam to avoid falling into an infinite
       // message-forwarding loop
-      WPARAM wParam = MAKEWPARAM(0, HIWORD(pMsg->wParam));
+      pMsg->wParam = MAKEWPARAM(0, HIWORD(pMsg->wParam));
       switch (navigation.GetCurrentPage()) {
         case SIDEBAR_ITEM_ANIMELIST:
           return AnimeListDialog.SendMessage(
-            pMsg->message, wParam, pMsg->lParam);
+            pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_HISTORY:
           return HistoryDialog.SendMessage(
-            pMsg->message, wParam, pMsg->lParam);
+            pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_STATS:
           return StatsDialog.SendMessage(
-            pMsg->message, wParam, pMsg->lParam);
+            pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_SEARCH:
           return SearchDialog.SendMessage(
-            pMsg->message, wParam, pMsg->lParam);
+            pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_SEASONS:
           return SeasonDialog.SendMessage(
-            pMsg->message, wParam, pMsg->lParam);
+            pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_FEEDS:
           return TorrentDialog.SendMessage(
-            pMsg->message, wParam, pMsg->lParam);
+            pMsg->message, pMsg->wParam, pMsg->lParam);
       }
       break;
     }
