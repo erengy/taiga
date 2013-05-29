@@ -334,15 +334,18 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
   switch (pMsg->message) {
     case WM_KEYDOWN: {
-      if (::GetFocus() == edit.GetWindowHandle()) {
-        switch (pMsg->wParam) {
-          // Clear search text
-          case VK_ESCAPE: {
+      switch (pMsg->wParam) {
+        // Clear search text
+        case VK_ESCAPE: {
+          if (::GetFocus() == edit.GetWindowHandle()) {
             edit.SetText(L"");
             return TRUE;
           }
-          // Search
-          case VK_RETURN: {
+          break;
+        }
+        // Search
+        case VK_RETURN: {
+          if (::GetFocus() == edit.GetWindowHandle()) {
             wstring text;
             edit.GetText(text);
             if (text.empty()) break;
@@ -356,8 +359,55 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                 return TRUE;
               }
             }
-            break;
           }
+          break;
+        }
+        // Focus search box
+        case 'F': {
+          if (GetKeyState(VK_CONTROL) & 0x8000) {
+            edit.SetFocus();
+            edit.SetSel(0, -1);
+            return TRUE;
+          }
+          break;
+        }
+        case VK_F3: {
+          edit.SetFocus();
+          edit.SetSel(0, -1);
+          return TRUE;
+        }
+        case VK_F5: {
+          switch (navigation.GetCurrentPage()) {
+            case SIDEBAR_ITEM_ANIMELIST:
+              // Scan available episodes
+              ExecuteAction(L"CheckEpisodes()");
+              return TRUE;
+            case SIDEBAR_ITEM_HISTORY:
+              // Refresh history
+              HistoryDialog.RefreshList();
+              treeview.RefreshHistoryCounter();
+              return TRUE;
+            case SIDEBAR_ITEM_STATS:
+              // Refresh stats
+              Stats.CalculateAll();
+              StatsDialog.Refresh();
+              return TRUE;
+            case SIDEBAR_ITEM_SEASONS:
+              // Refresh season data
+              SeasonDialog.RefreshData();
+              return TRUE;
+            case SIDEBAR_ITEM_FEEDS: {
+              // Check new torrents
+              Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
+              if (feed) {
+                edit.SetText(L"");
+                feed->Check(Settings.RSS.Torrent.source);
+                return TRUE;
+              }
+              break;
+            }
+          }
+          break;
         }
       }
       break;

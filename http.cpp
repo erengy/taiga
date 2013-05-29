@@ -389,6 +389,7 @@ BOOL HttpClient::OnReadComplete() {
         MainDialog.ChangeStatus(status);
 #endif
       } else {
+        MainDialog.ChangeStatus();
         if (SearchDialog.IsWindow()) {
           SearchDialog.ParseResults(GetData());
           SearchDialog.EnableInput(true);

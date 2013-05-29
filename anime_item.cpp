@@ -25,6 +25,7 @@
 #include "common.h"
 #include "history.h"
 #include "myanimelist.h"
+#include "recognition.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -632,6 +633,8 @@ void Item::SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings) 
 
   my_info_->synonyms = synonyms;
   RemoveEmptyStrings(my_info_->synonyms);
+
+  Meow.UpdateCleanTitles(GetId());
 
   if (save_settings) {
     Settings.Anime.SetItem(GetId(), Optional<wstring>(), Join(my_info_->synonyms, L"; "));

@@ -58,6 +58,7 @@ public:
     bool button_visible[2];
     bool dragging;
     win32::ImageList drag_image;
+    win32::Tooltip tooltips;
     AnimeListDialog* parent;
   } listview;
 

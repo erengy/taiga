@@ -52,6 +52,9 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.Sort(0, 1, 0, ListViewCompareProc);
   listview.SetTheme();
 
+  // Create list tooltips
+  listview.tooltips.Create(listview.GetWindowHandle());
+
   // Insert list columns
   listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");
   listview.InsertColumn(1, 200, 200, LVCFMT_CENTER, L"Progress");
@@ -347,7 +350,12 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
           (button_visible[1] && rect_button[1].PtIn(pt))) {
         ::SetCursor(reinterpret_cast<HCURSOR>(
           ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        tooltips.AddTip(0, L"-1 episode", nullptr, &rect_button[0], false);
+        tooltips.AddTip(1, L"+1 episode", nullptr, &rect_button[1], false);
         return TRUE;
+      } else {
+        tooltips.DeleteTip(0);
+        tooltips.DeleteTip(1);
       }
       break;
      }
@@ -505,11 +513,6 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         case VK_DELETE: {
           if (listview.GetSelectedCount() > 0)
             ExecuteAction(L"EditDelete()");
-          break;
-        }
-        // Check episodes
-        case VK_F5: {
-          ExecuteAction(L"CheckEpisodes()");
           break;
         }
         default: {

@@ -324,7 +324,7 @@ void EventQueue::RemoveDisabled(bool save, bool refresh) {
 // =============================================================================
 
 History::History()
-    : limit(100) { // Limit of history items
+    : limit(0) { // Limit of history items
   queue.history = this;
 }
 

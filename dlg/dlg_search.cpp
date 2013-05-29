@@ -19,6 +19,7 @@
 #include "../std.h"
 
 #include "dlg_search.h"
+#include "dlg_main.h"
 
 #include "../anime_db.h"
 #include "../common.h"
@@ -224,12 +225,14 @@ void SearchDialog::RefreshList() {
 
 bool SearchDialog::Search(const wstring& title) {
   if (mal::SearchAnime(anime::ID_UNKNOWN, title)) {
+    MainDialog.ChangeStatus(L"Searching MyAnimeList for \"" + title + L"\"...");
     EnableInput(false);
     list_.DeleteAllItems();
     anime_ids_.clear();
     search_text = title;
     return true;
   } else {
+    MainDialog.ChangeStatus(L"An error occured while searching MyAnimeList for \"" + title + L"\"...");
     return false;
   }
 }

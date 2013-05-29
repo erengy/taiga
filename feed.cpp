@@ -121,6 +121,9 @@ int Feed::ExamineData() {
     [](const FeedItem& a, const FeedItem& b) {
       return a.episode_data.anime_id > b.episode_data.anime_id;
     });
+  // Re-assign item indexes
+  for (size_t i = 0; i < items.size(); i++)
+    items.at(i).index = i;
 
   // Filter
   int count = Aggregator.filter_manager.Filter(*this);

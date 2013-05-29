@@ -347,9 +347,8 @@ void TorrentDialog::RefreshList() {
     }
     wstring title, number, video;
     int group = TORRENT_ANIME, icon = StatusToIcon(0);
-    if (it->category == L"Batch" || 
-      !IsNumeric(it->episode_data.number)) {
-        group = TORRENT_BATCH;
+    if (it->category == L"Batch" || !IsNumeric(it->episode_data.number)) {
+      group = TORRENT_BATCH;
     }
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
     if (anime_item) {
@@ -372,8 +371,9 @@ void TorrentDialog::RefreshList() {
       if (!video.empty()) video += L" ";
       video += it->episode_data.resolution;
     }
-    int index = list_.InsertItem(it - feed->items.begin(), 
-      group, icon, 0, NULL, title.c_str(), reinterpret_cast<LPARAM>(&(*it)));
+    int index = list_.InsertItem(it - feed->items.begin(),
+                                 group, icon, 0, NULL, title.c_str(),
+                                 reinterpret_cast<LPARAM>(&(*it)));
     list_.SetItem(index, 1, number.c_str());
     list_.SetItem(index, 2, it->episode_data.group.c_str());
     list_.SetItem(index, 3, it->episode_data.file_size.c_str());

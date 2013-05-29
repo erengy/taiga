@@ -205,7 +205,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
     MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
     MainDialog.edit.SetText(body);
-    MainDialog.ChangeStatus(L"Searching MyAnimeList for \"" + body + L"\"...");
     SearchDialog.Search(body);
 
   // SearchTorrents(source)
