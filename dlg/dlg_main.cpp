@@ -646,7 +646,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
               ToTimeString(Settings.RSS.Torrent.check_interval * 60 - Aggregator.feeds[i].ticker) + L"]");
           }
           if (Aggregator.feeds[i].ticker >= Settings.RSS.Torrent.check_interval * 60) {
-            Aggregator.feeds[i].Check(Settings.RSS.Torrent.source);
+            Aggregator.feeds[i].Check(Settings.RSS.Torrent.source, true);
           }
         } else {
           if (TorrentDialog.IsWindow()) {

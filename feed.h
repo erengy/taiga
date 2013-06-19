@@ -91,7 +91,7 @@ public:
   Feed();
   virtual ~Feed();
 
-  bool Check(const wstring& source);
+  bool Check(const wstring& source, bool automatic = false);
   bool Download(int index);
   int ExamineData();
   wstring GetDataPath();

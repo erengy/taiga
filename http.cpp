@@ -85,6 +85,7 @@ BOOL HttpClient::OnError(DWORD dwError) {
       SearchDialog.EnableInput(true);
       break;
     case HTTP_Feed_Check:
+    case HTTP_Feed_CheckAuto:
     case HTTP_Feed_Download:
     case HTTP_Feed_DownloadAll:
       MainDialog.ChangeStatus(error_text);
@@ -107,20 +108,9 @@ BOOL HttpClient::OnError(DWORD dwError) {
 }
 
 BOOL HttpClient::OnSendRequestComplete() {
-  wstring status = L"Connecting...";
-  
-  switch (GetClientMode()) {
-    case HTTP_Feed_Check:
-    case HTTP_Feed_Download:
-    case HTTP_Feed_DownloadAll:
-      MainDialog.ChangeStatus(status);
-      break;
-    default:
 #ifdef _DEBUG
-      MainDialog.ChangeStatus(status);
+      MainDialog.ChangeStatus(L"Connecting...");
 #endif
-      break;
-  }
 
   return 0;
 }
@@ -147,19 +137,9 @@ BOOL HttpClient::OnHeadersAvailable(win32::http_header_t& headers) {
 }
 
 BOOL HttpClient::OnRedirect(wstring address) {
-  wstring status = L"Redirecting... (" + address + L")";
-  switch (GetClientMode()) {
-    case HTTP_Feed_Check:
-    case HTTP_Feed_Download:
-    case HTTP_Feed_DownloadAll:
-      MainDialog.ChangeStatus(status);
-      break;
-    default:
 #ifdef _DEBUG
-      MainDialog.ChangeStatus(status);
+      MainDialog.ChangeStatus(L"Redirecting... (" + address + L")");
 #endif
-      break;
-  }
 
   return 0;
 }
@@ -187,6 +167,7 @@ BOOL HttpClient::OnReadData() {
     case HTTP_Silent:
       return 0;
     case HTTP_Feed_Check:
+    case HTTP_Feed_CheckAuto:
       status = L"Checking new torrents...";
       break;
     case HTTP_Feed_Download:
@@ -220,16 +201,7 @@ BOOL HttpClient::OnReadData() {
     status += L" (" + ToSizeString(m_dwDownloaded) + L")";
   }
 
-  switch (GetClientMode()) {
-    case HTTP_Feed_Check:
-    case HTTP_Feed_Download:
-    case HTTP_Feed_DownloadAll:
-      MainDialog.ChangeStatus(status);
-      break;
-    default:
-      MainDialog.ChangeStatus(status);
-      break;
-  }
+  MainDialog.ChangeStatus(status);
 
   return 0;
 }
@@ -401,7 +373,8 @@ BOOL HttpClient::OnReadComplete() {
     // =========================================================================
 
     // Torrent
-    case HTTP_Feed_Check: {
+    case HTTP_Feed_Check:
+    case HTTP_Feed_CheckAuto: {
       Feed* feed = reinterpret_cast<Feed*>(GetParam());
       if (feed) {
         feed->Load();
@@ -411,12 +384,10 @@ BOOL HttpClient::OnReadComplete() {
         } else {
           status = L"No new torrents found.";
         }
-        if (MainDialog.IsVisible() &&
-            MainDialog.navigation.GetCurrentPage() == SIDEBAR_ITEM_FEEDS) {
-          MainDialog.ChangeStatus(status);
-          TorrentDialog.RefreshList();
-          TorrentDialog.EnableInput();
-        } else {
+        MainDialog.ChangeStatus(status);
+        TorrentDialog.RefreshList();
+        TorrentDialog.EnableInput();
+        if (GetClientMode() == HTTP_Feed_CheckAuto) {
           switch (Settings.RSS.Torrent.new_action) {
             // Notify
             case 1:

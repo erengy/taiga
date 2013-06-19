@@ -54,7 +54,7 @@ Feed::~Feed() {
   }
 }
 
-bool Feed::Check(const wstring& source) {
+bool Feed::Check(const wstring& source, bool automatic) {
   // Reset ticker before checking the source so we don't fall into a loop
   ticker = 0;
   if (source.empty()) return false;
@@ -67,8 +67,9 @@ bool Feed::Check(const wstring& source) {
       break;
   }
 
-  return client.Get(win32::Url(link), GetDataPath() + L"feed.xml", 
-    HTTP_Feed_Check, reinterpret_cast<LPARAM>(this));
+  return client.Get(win32::Url(link), GetDataPath() + L"feed.xml",
+                    automatic ? HTTP_Feed_CheckAuto : HTTP_Feed_Check,
+                    reinterpret_cast<LPARAM>(this));
 }
 
 bool Feed::Download(int index) {

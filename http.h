@@ -38,6 +38,7 @@ enum HttpClientMode {
   HTTP_MAL_UserImage,
   // Feed
   HTTP_Feed_Check,
+  HTTP_Feed_CheckAuto,
   HTTP_Feed_Download,
   HTTP_Feed_DownloadAll,
   HTTP_Feed_DownloadIcon,

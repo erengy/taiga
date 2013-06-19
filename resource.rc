@@ -342,6 +342,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     LTEXT           "Theme:", IDC_STATIC, 7, 7, 141, 8, SS_LEFT
     COMBOBOX        IDC_COMBO_THEME, 7, 17, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS
     CONTROL         "<a id=""Themes"">Open theme folder</a>", IDC_LINK_THEMES, "SysLink", 0x50010000, 155, 19, 90, 8
+    LTEXT           "Tip: With themes, you can change icons and progress bar colors.", IDC_STATIC, 7, 37, 301, 8, SS_LEFT | SS_NOPREFIX
 }
 
 

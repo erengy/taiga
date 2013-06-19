@@ -430,11 +430,20 @@ int FeedFilterManager::Filter(Feed& feed) {
 
     // Apply filters
     if (Settings.RSS.Torrent.Filters.global_enabled) {
-      for (size_t j = 0; j < filters.size(); j++) {
-        if (!filters[j].Filter(feed, *item, true)) {
+      // Preferences have lower priority, so we need to handle other filters
+      // first in order to avoid discarding items that we actually want.
+      for (auto filter = filters.begin(); download && filter != filters.end(); ++filter) {
+        if (filter->action == FEED_FILTER_ACTION_PREFER)
+          continue;
+        if (!filter->Filter(feed, *item, true))
           download = false;
-          break;
-        }
+      }
+      // Handle preferences
+      for (auto filter = filters.begin(); download && filter != filters.end(); ++filter) {
+        if (filter->action != FEED_FILTER_ACTION_PREFER)
+          continue;
+        if (!filter->Filter(feed, *item, true))
+          download = false;
       }
     }
     
