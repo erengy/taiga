@@ -226,8 +226,8 @@ void MainDialog::CreateDialogControls() {
 
 void MainDialog::InitWindowPosition() {
   UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
-  const LONG min_w = ScaleX(786);
-  const LONG min_h = ScaleX(568);
+  const LONG min_w = ScaleX(960);
+  const LONG min_h = ScaleX(640);
   
   win32::Rect rcParent, rcWindow;
   ::GetWindowRect(GetParent(), &rcParent);
@@ -239,7 +239,7 @@ void MainDialog::InitWindowPosition() {
 
   if (rcWindow.left < 0 || rcWindow.left >= rcParent.right || 
       rcWindow.top < 0 || rcWindow.top >= rcParent.bottom) {
-        flags |= SWP_NOMOVE;
+    flags |= SWP_NOMOVE;
   }
   if (rcWindow.Width() < min_w) {
     rcWindow.right = rcWindow.left + min_w;
@@ -254,12 +254,12 @@ void MainDialog::InitWindowPosition() {
     rcWindow.bottom = rcParent.top + rcParent.Height();
   }
   if (rcWindow.Width() > 0 && rcWindow.Height() > 0 && 
-    Settings.Program.Position.maximized == FALSE &&
-    Settings.Program.Exit.remember_pos_size == TRUE) {
-      SetPosition(nullptr, rcWindow, flags);
-      if (flags & SWP_NOMOVE) {
-        CenterOwner();
-      }
+      Settings.Program.Position.maximized == FALSE &&
+      Settings.Program.Exit.remember_pos_size == TRUE) {
+    SetPosition(nullptr, rcWindow, flags);
+    if (flags & SWP_NOMOVE) {
+      CenterOwner();
+    }
   }
 
   SetSizeMin(min_w, min_h);
@@ -972,14 +972,6 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   }
   parent->edit.SetCueBannerText(cue_text.c_str());
   parent->edit.SetText(search_text);
-  
-  AnimeListDialog.Hide();
-  HistoryDialog.Hide();
-  NowPlayingDialog.Hide();
-  SearchDialog.Hide();
-  SeasonDialog.Hide();
-  StatsDialog.Hide();
-  TorrentDialog.Hide();
 
   #define DISPLAY_PAGE(item, dialog, resource_id) \
     case item: \
@@ -997,6 +989,14 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
     DISPLAY_PAGE(SIDEBAR_ITEM_FEEDS, TorrentDialog, IDD_TORRENT);
   }
   #undef DISPLAY_PAGE
+  
+  if (current_page_ != SIDEBAR_ITEM_NOWPLAYING) NowPlayingDialog.Hide();
+  if (current_page_ != SIDEBAR_ITEM_ANIMELIST) AnimeListDialog.Hide();
+  if (current_page_ != SIDEBAR_ITEM_HISTORY) HistoryDialog.Hide();
+  if (current_page_ != SIDEBAR_ITEM_STATS) StatsDialog.Hide();
+  if (current_page_ != SIDEBAR_ITEM_SEARCH) SearchDialog.Hide();
+  if (current_page_ != SIDEBAR_ITEM_SEASONS) SeasonDialog.Hide();
+  if (current_page_ != SIDEBAR_ITEM_FEEDS) TorrentDialog.Hide();
 
   parent->treeview.SelectItem(parent->treeview.hti.at(current_page_));
 

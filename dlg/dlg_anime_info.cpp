@@ -129,7 +129,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       HWND hwnd_control = reinterpret_cast<HWND>(lParam);
       if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
         SetBkMode(hdc, TRANSPARENT);
-        SetTextColor(hdc, RGB(0x00, 0x33, 0x99));
+        SetTextColor(hdc, theme::COLOR_MAININSTRUCTION);
       }
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }

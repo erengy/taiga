@@ -117,6 +117,7 @@ public:
   // TreeView control
   class MainTree : public win32::TreeView {
   public:
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     BOOL IsVisible();
     void RefreshHistoryCounter();
     vector<HTREEITEM> hti;

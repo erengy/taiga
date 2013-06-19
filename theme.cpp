@@ -53,6 +53,7 @@ bool Theme::Load(const wstring& name) {
   xml_node theme = doc.child(L"theme");
   xml_node icons16 = theme.child(L"icons").child(L"set_16px");
   xml_node icons24 = theme.child(L"icons").child(L"set_24px");
+  xml_node image = theme.child(L"list").child(L"background").child(L"image");
   xml_node progress = theme.child(L"list").child(L"progress");
 
   // Read icons
@@ -64,6 +65,19 @@ bool Theme::Load(const wstring& name) {
     icons24_.push_back(icon.attribute(L"name").value());
 
   // Read list
+  if (list_background.bitmap) {
+    DeleteObject(list_background.bitmap);
+    list_background.bitmap = nullptr;
+  }
+  list_background.name = image.attribute(L"name").value();
+  list_background.flags = image.attribute(L"flags").as_int();
+  list_background.offset_x = image.attribute(L"offset_x").as_int();
+  list_background.offset_y = image.attribute(L"offset_y").as_int();
+  if (!list_background.name.empty()) {
+    wstring path = folder_ + list_background.name + L".png";
+    Gdiplus::Bitmap bmp(path.c_str());
+    bmp.GetHBITMAP(NULL, &list_background.bitmap);
+  }
   #define READ_PROGRESS_DATA(x, name) \
     list_progress.x.type = progress.child(name).attribute(L"type").value(); \
     list_progress.x.value[0] = HexToARGB(progress.child(name).attribute(L"value_1").value()); \
@@ -177,6 +191,17 @@ bool Theme::CreateFonts(HDC hdc) {
 }
 
 // =============================================================================
+
+Theme::ListBackground::ListBackground()
+    : bitmap(nullptr) {
+}
+
+Theme::ListBackground::~ListBackground() {
+  if (bitmap) {
+    ::DeleteObject(bitmap);
+    bitmap = nullptr;
+  }
+}
 
 void Theme::ListProgress::Item::Draw(HDC hdc, const LPRECT rect) {
   // Solid

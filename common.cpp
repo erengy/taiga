@@ -314,21 +314,102 @@ wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter) {
   }
 }
 
-BOOL BrowseForFolder(HWND hwndOwner, LPCWSTR lpszTitle, UINT ulFlags, wstring& output) {
+bool BrowseForFolderVista(HWND hwnd, const wstring& title, const wstring& default_folder, wstring& output) {
+  IFileDialog* pFileDialog;
+  bool result = false;
+
+  HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog,
+                                nullptr,
+                                CLSCTX_INPROC_SERVER,
+                                IID_PPV_ARGS(&pFileDialog));
+
+  if (SUCCEEDED(hr)) {
+    FILEOPENDIALOGOPTIONS fos;
+    pFileDialog->GetOptions(&fos);
+    fos |= FOS_PICKFOLDERS;
+    pFileDialog->SetOptions(fos);
+
+    if (!title.empty())
+      pFileDialog->SetTitle(title.c_str());
+
+    if (!default_folder.empty()) {
+      IShellItem* pShellItem;
+      HRESULT hr = SHCreateItemFromParsingName(default_folder.c_str(),
+                                               nullptr,
+                                               IID_IShellItem,
+                                               reinterpret_cast<void**>(&pShellItem));
+      if (SUCCEEDED(hr)) {
+        pFileDialog->SetDefaultFolder(pShellItem);
+        pShellItem->Release();
+      }
+    }
+
+    hr = pFileDialog->Show(hwnd);
+    if (SUCCEEDED(hr)) {
+      IShellItem* pShellItem;
+      hr = pFileDialog->GetFolder(&pShellItem);
+      if (SUCCEEDED(hr)) {
+        LPWSTR path = nullptr;
+        hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &path);
+        if (SUCCEEDED(hr)) {
+          output.assign(path);
+          CoTaskMemFree(path);
+          result = true;
+        }
+        pShellItem->Release();
+      }
+    }
+  
+    pFileDialog->Release();
+  }
+
+  return result;
+}
+
+static int CALLBACK BrowseForFolderXPProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
+  switch (uMsg) {
+    case BFFM_INITIALIZED:
+      if (lpData != 0)
+        SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
+      break;
+  }
+  return 0;
+}
+
+bool BrowseForFolderXP(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output) {
   BROWSEINFO bi = {0};
-  bi.hwndOwner  = hwndOwner;
-  bi.lpszTitle  = lpszTitle;
-  bi.ulFlags    = ulFlags;
+  bi.hwndOwner = hwnd;
+  bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON;
+  
+  if (!title.empty())
+    bi.lpszTitle = title.c_str();
+  
+  if (!default_path.empty()) {
+    WCHAR lpszDefault[MAX_PATH] = {'\0'};
+    default_path.copy(lpszDefault, MAX_PATH);
+    bi.lParam = reinterpret_cast<LPARAM>(lpszDefault);
+    bi.lpfn = BrowseForFolderXPProc;
+  }
   
   PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
-  if (pidl == NULL) return FALSE;
+  if (pidl == nullptr)
+    return false;
   
   WCHAR path[MAX_PATH];
   SHGetPathFromIDList(pidl, path);
   output = path;
-  
-  if (output.empty()) return FALSE;
-  return TRUE;
+  if (output.empty())
+    return false;
+
+  return true;
+}
+
+BOOL BrowseForFolder(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output) {
+  if (win32::GetWinVersion() >= win32::VERSION_VISTA) {
+    return BrowseForFolderVista(hwnd, title, default_path, output);
+  } else {
+    return BrowseForFolderXP(hwnd, title, default_path, output);
+  }
 }
 
 bool CreateFolder(const wstring& path) {

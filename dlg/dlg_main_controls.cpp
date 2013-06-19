@@ -45,6 +45,24 @@
 
 /* TreeView control */
 
+LRESULT MainDialog::MainTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_SETCURSOR: {
+      TVHITTESTINFO ht = {0};
+      HitTest(&ht, true);
+      int index = GetItemData(ht.hItem);
+      if (index == -1) {
+        ::SetCursor(reinterpret_cast<HCURSOR>(
+          ::LoadImage(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        return TRUE;
+      }
+      break;
+    }
+  }
+  
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
 void MainDialog::MainTree::RefreshHistoryCounter() {
   wstring text = L"History";
   int count = History.queue.GetItemCount();

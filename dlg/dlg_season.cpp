@@ -254,12 +254,12 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           pCD->nmcd.uItemState & CDIS_SELECTED) {
         hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
       } else {
-        hdc.FillRect(rect, RGB(230, 230, 230));
+        hdc.FillRect(rect, theme::COLOR_GRAY);
       }
 
       // Draw background
       rect.Inflate(-1, -1);
-      hdc.FillRect(rect, RGB(250, 250, 250));
+      hdc.FillRect(rect, theme::COLOR_LIGHTGRAY);
 
       // Calculate text height
       int text_height = GetTextHeight(hdc.Get());

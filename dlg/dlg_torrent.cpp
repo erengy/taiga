@@ -285,13 +285,13 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             // Alternate background color
             if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled()) {
-              pCD->clrTextBk = RGB(248, 248, 248);
+              pCD->clrTextBk = theme::COLOR_LIGHTGRAY;
             }
             // Change text color
             FeedItem* feed_item = reinterpret_cast<FeedItem*>(pCD->nmcd.lItemlParam);
             if (feed_item) {
               if (feed_item->episode_data.anime_id < 1) {
-                pCD->clrText = RGB(180, 180, 180);
+                pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
               } else if (feed_item->episode_data.new_episode) {
                 pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
               }

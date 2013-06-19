@@ -386,8 +386,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Add folders
         case IDC_BUTTON_ADDFOLDER: {
           wstring path;
-          if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
-                              BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
+          if (BrowseForFolder(m_hWindow, L"Please select a folder:", L"", path)) {
             win32::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
             list.InsertItem(list.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, path.c_str(), 0);
             list.SetSelectedItem(list.GetItemCount() - 1);
@@ -465,8 +464,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Browse for torrent download path
         case IDC_BUTTON_TORRENT_BROWSE_FOLDER: {
           wstring path;
-          if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
-                              BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path))
+          if (BrowseForFolder(m_hWindow, L"Please select a folder:", L"", path))
             SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, path.c_str());
           return TRUE;
         }

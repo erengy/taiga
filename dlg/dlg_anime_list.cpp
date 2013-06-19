@@ -48,6 +48,7 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.parent = this;
   listview.Attach(GetDlgItem(IDC_LIST_MAIN));
   listview.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  listview.SetBkImage(UI.list_background.bitmap, UI.list_background.flags, UI.list_background.offset_x, UI.list_background.offset_y);
   listview.SetImageList(UI.ImgList16.GetHandle());
   listview.Sort(0, 1, 0, ListViewCompareProc);
   listview.SetTheme();
@@ -191,15 +192,15 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (!anime_item) return TRUE;
 
         if ((dis->itemState & ODS_SELECTED) == ODS_SELECTED) {
-          dc.FillRect(rect, RGB(230, 230, 255));
+          dc.FillRect(rect, theme::COLOR_LIGHTBLUE);
         }
         rect.Inflate(-2, -2);
-        dc.FillRect(rect, RGB(250, 250, 250));
+        dc.FillRect(rect, theme::COLOR_LIGHTGRAY);
 
         // Draw image
         win32::Rect rect_image = rect;
         rect_image.right = rect_image.left + static_cast<int>(rect_image.Height() / 1.4);
-        dc.FillRect(rect_image, RGB(230, 230, 230));
+        dc.FillRect(rect_image, theme::COLOR_GRAY);
         if (ImageDatabase.Load(anime_id, false, false)) {
           auto image = ImageDatabase.GetImage(anime_id);
           int sbm = dc.SetStretchBltMode(HALFTONE);
@@ -222,7 +223,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         // Draw second line of information
         rect.top += 20;
-        COLORREF text_color = dc.SetTextColor(RGB(128, 128, 128));
+        COLORREF text_color = dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
         wstring text = /*L"Watched " +*/ ToWstr(anime_item->GetMyLastWatchedEpisode()) + 
                        L"/" + ToWstr(anime_item->GetEpisodeCount());
         dc.DrawText(text.c_str(), -1, rect, 
@@ -332,26 +333,49 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       ::GetCursorPos(&pt);
       ::ScreenToClient(GetWindowHandle(), &pt);
 
-      win32::Rect rect_item;
       int item_index = GetNextItem(-1, LVIS_SELECTED);
       if (item_index < 0) break;
-
+      
+      win32::Rect rect_item;
       GetSubItemRect(item_index, 1, &rect_item);
       if (Settings.Program.List.progress_show_eps)
         rect_item.right -= 50;
       rect_item.Inflate(-5, -5);
+      
       win32::Rect rect_button[2];
       rect_button[0].Copy(rect_item);
       rect_button[1].Copy(rect_item);
       rect_button[0].right = rect_button[0].left + 9;
       rect_button[1].left = rect_button[1].right - 9;
 
+      if (button_visible[0])
+        rect_item.left += 9;
+      if (button_visible[1])
+        rect_item.right -= 9;
+      if (rect_item.PtIn(pt) && true) {
+        auto anime_item = AnimeDatabase.GetCurrentItem();
+        if (anime_item->IsInList()) {
+          wstring text;
+          if (anime_item->IsNewEpisodeAvailable())
+            AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L" is on computer");
+          if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
+            AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) + L" is available for download");
+          if (!text.empty()) {
+            tooltips.AddTip(2, text.c_str(), nullptr, &rect_item, false);
+          } else {
+            tooltips.DeleteTip(2);
+          }
+        }
+      } else {
+        tooltips.DeleteTip(2);
+      }
+
       if ((button_visible[0] && rect_button[0].PtIn(pt)) || 
           (button_visible[1] && rect_button[1].PtIn(pt))) {
-        ::SetCursor(reinterpret_cast<HCURSOR>(
-          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
         tooltips.AddTip(0, L"-1 episode", nullptr, &rect_button[0], false);
         tooltips.AddTip(1, L"+1 episode", nullptr, &rect_button[1], false);
+        ::SetCursor(reinterpret_cast<HCURSOR>(
+          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
         return TRUE;
       } else {
         tooltips.DeleteTip(0);
@@ -399,8 +423,12 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       listview.button_visible[0] = false;
       listview.button_visible[1] = false;
       if (lplv->uNewState != 0) {
-        auto anime_item = AnimeDatabase.FindItem(anime_id);
+        auto anime_item = AnimeDatabase.GetCurrentItem();
         if (anime_item && anime_item->IsInList()) {
+          int my_status = anime_item->GetMyStatus();
+          if (my_status == mal::MYSTATUS_COMPLETED ||
+              my_status == mal::MYSTATUS_DROPPED)
+            break;
           if (anime_item->GetMyLastWatchedEpisode() > 0)
             listview.button_visible[0] = true;
           if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
@@ -462,10 +490,6 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           int index = listview.HitTest(true);
           if (anime_item->IsInList()) {
             switch (index) {
-              // Progress
-              case 1:
-                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"PlayEpisode"));
-                break;
               // Score
               case 2:
                 ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"EditScore"));
@@ -733,7 +757,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       // Alternate background color
       if ((pCD->nmcd.dwItemSpec % 2) && !listview.IsGroupViewEnabled()) {
-        pCD->clrTextBk = RGB(248, 248, 248);
+        pCD->clrTextBk = theme::COLOR_LIGHTGRAY;
       }
       // Change text color
       if (!anime_item) return CDRF_NOTIFYPOSTPAINT;
@@ -741,6 +765,9 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         if (Settings.Program.List.highlight) {
           pCD->clrText = GetSysColor(pCD->iSubItem == 0 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
         }
+      }
+      if (!anime_item->GetMyScore()) {
+        pCD->clrText = GetSysColor(pCD->iSubItem == 2 ? COLOR_GRAYTEXT : COLOR_WINDOWTEXT);
       }
       // Indicate currently playing
       if (anime_item->GetPlaying()) {

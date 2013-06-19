@@ -28,6 +28,7 @@
 #include "../http.h"
 #include "../myanimelist.h"
 #include "../resource.h"
+#include "../settings.h"
 #include "../string.h"
 #include "../theme.h"
 
@@ -183,11 +184,15 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
   switch (LOWORD(wParam)) {
-    // Add folders
+    // Browse anime folder
     case IDC_BUTTON_BROWSE: {
-      wstring path;
-      if (BrowseForFolder(m_hWindow, L"Please select a folder:", 
-                          BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
+      wstring default_path, path;
+      if (!anime_item->GetFolder().empty()) {
+        default_path = anime_item->GetFolder();
+      } else if (!Settings.Folders.root.empty()) {
+        default_path = Settings.Folders.root.front();
+      }
+      if (BrowseForFolder(m_hWindow, L"Choose an anime folder", default_path, path)) {
         SetDlgItemText(IDC_EDIT_ANIME_FOLDER, path.c_str());
       }
       return TRUE;

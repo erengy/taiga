@@ -127,13 +127,13 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             // Alternate background color
             if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled()) {
-              pCD->clrTextBk = RGB(248, 248, 248);
+              pCD->clrTextBk = theme::COLOR_LIGHTGRAY;
             }
             // Change text color
             int anime_id = static_cast<int>(pCD->nmcd.lItemlParam);
             auto anime_item = AnimeDatabase.FindItem(anime_id);
             if (anime_item->IsInList()) {
-              pCD->clrText = RGB(180, 180, 180);
+              pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
             } else {
               pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
             }

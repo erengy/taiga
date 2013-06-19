@@ -67,23 +67,36 @@ void UpdateAnimeMenu(anime::Item* anime_item) {
   }
 
   // Play
-  menu_index = UI.Menus.GetIndex(L"Play");
+  menu_index = UI.Menus.GetIndex(L"RightClick");
   if (menu_index > -1) {
-    // Clear menu
-    MENU.Items.clear();
-
-    // Add items
-    MENU.CreateItem(L"PlayLast()", 
-      L"Last watched (#" + ToWstr(anime_item->GetMyLastWatchedEpisode()) + L")", 
-      L"", false, false, 
-      anime_item->GetMyLastWatchedEpisode() > 0);
-    MENU.CreateItem(L"PlayNext()", 
-      L"Next episode (#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")", 
-      L"", false, false, 
-      anime_item->GetMyLastWatchedEpisode() < anime_item->GetEpisodeCount() || anime_item->GetEpisodeCount() == 0);
-    MENU.CreateItem(L"PlayRandom()", L"Random episode");
-    MENU.CreateItem();
-    MENU.CreateItem(L"", L"Episode", L"PlayEpisode");
+    for (int i = static_cast<int>(MENU.Items.size()) - 1; i > 0; i--) {
+      if (MENU.Items[i].Type == win32::MENU_ITEM_SEPARATOR) {
+        // Clear items
+        MENU.Items.resize(i + 1);
+        // Play episode
+        if (anime_item->GetEpisodeCount() != 1) {
+          MENU.CreateItem(L"", L"Play episode", L"PlayEpisode");
+        }
+        // Play last episode
+        if (anime_item->GetMyLastWatchedEpisode() > 0) {
+          MENU.CreateItem(
+            L"PlayLast()", 
+            L"Play last episode (#" + ToWstr(anime_item->GetMyLastWatchedEpisode()) + L")");
+        }
+        // Play next episode
+        if (anime_item->GetEpisodeCount() == 0 ||
+            anime_item->GetMyLastWatchedEpisode() < anime_item->GetEpisodeCount()) {
+          MENU.CreateItem(
+            L"PlayNext()", 
+            L"Play next episode (#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")");
+        }
+        // Play random episode
+        if (anime_item->GetEpisodeCount() != 1) {
+          MENU.CreateItem(L"PlayRandom()", L"Play random episode");
+        }
+        break;
+      }
+    }
   }
 
   // Play > Episode

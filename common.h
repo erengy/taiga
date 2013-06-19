@@ -66,7 +66,7 @@ BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");
 void ExecuteLink(const wstring& link);
 wstring ExpandEnvironmentStrings(const wstring& path);
 wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter = NULL);
-BOOL BrowseForFolder(HWND hwndOwner, LPCWSTR lpszTitle, UINT ulFlags, wstring& output);
+BOOL BrowseForFolder(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output);
 bool CreateFolder(const wstring& path);
 int DeleteFolder(wstring path);
 bool FileExists(const wstring& file);

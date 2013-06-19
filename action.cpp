@@ -291,11 +291,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Opens up a dialog to add new root folder.
   } else if (action == L"AddFolder") {
     wstring path;
-    if (BrowseForFolder(g_hMain, L"Please select a folder:", 
-      BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
-        Settings.Folders.root.push_back(path);
-        if (Settings.Folders.watch_enabled) FolderMonitor.Enable();
-        ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+    if (BrowseForFolder(g_hMain, L"Please select a folder:", L"", path)) {
+      Settings.Folders.root.push_back(path);
+      if (Settings.Folders.watch_enabled) FolderMonitor.Enable();
+      ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
     }
 
   // CheckEpisodes()
@@ -601,10 +600,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Lets user set an anime folder.
   } else if (action == L"SetFolder") {
     wstring path, title = L"Anime title: " + AnimeDatabase.GetCurrentItem()->GetTitle();
-    if (BrowseForFolder(MainDialog.GetWindowHandle(), title.c_str(), 
-      BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON, path)) {
-        AnimeDatabase.GetCurrentItem()->SetFolder(path, true);
-        AnimeDatabase.GetCurrentItem()->CheckEpisodes();
+    if (BrowseForFolder(MainDialog.GetWindowHandle(), title.c_str(), L"", path)) {
+      AnimeDatabase.GetCurrentItem()->SetFolder(path, true);
+      AnimeDatabase.GetCurrentItem()->CheckEpisodes();
     }
 
   // ===========================================================================

@@ -32,6 +32,7 @@
 #include "../settings.h"
 #include "../string.h"
 #include "../taiga.h"
+#include "../theme.h"
 
 class HistoryDialog HistoryDialog;
 
@@ -90,7 +91,8 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             return CDRF_NOTIFYSUBITEMDRAW;
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
             // Alternate background color
-            if (pCD->nmcd.dwItemSpec % 2) pCD->clrTextBk = RGB(248, 248, 248);
+            if (pCD->nmcd.dwItemSpec % 2)
+              pCD->clrTextBk = theme::COLOR_LIGHTGRAY;
             return CDRF_DODEFAULT;
         }
         break;

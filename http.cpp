@@ -460,6 +460,7 @@ BOOL HttpClient::OnReadComplete() {
                   FolderExists(Settings.RSS.Torrent.download_path)) {
                 anime_folder = anime_item->GetTitle();
                 ValidateFileName(anime_folder);
+                TrimRight(anime_folder, L".");
                 CheckSlash(Settings.RSS.Torrent.download_path);
                 anime_folder = Settings.RSS.Torrent.download_path + anime_folder;
                 CreateDirectory(anime_folder.c_str(), nullptr);

@@ -2,11 +2,11 @@
 <menus>
 	<!-- Main -->
 	<menu name="Main" type="menubar">
-		<item name="File"        sub="File"/>
+		<item name="File" sub="File"/>
 		<item name="MyAnimeList" sub="MyAnimeList"/>
-		<item name="Tools"       sub="Tools"/>
-		<item name="View"        sub="View"/>
-		<item name="Help"        sub="Help"/>
+		<item name="Tools" sub="Tools"/>
+		<item name="View" sub="View"/>
+		<item name="Help" sub="Help"/>
 	</menu>
 	
 	<!-- File -->
@@ -95,25 +95,29 @@
 	<menu name="RightClick">
 		<item name="Information" action="Info()"/>
 		<item type="separator"/>
-		<item name="Edit"        sub="Edit"/>
-		<item name="Search"      sub="Search"/>
+		<item name="Edit" sub="Edit"/>
+		<item name="Search" sub="Search"/>
 		<item type="separator"/>
 		<item name="Check available episodes" action="CheckEpisodes(%item%)"/>
 		<item name="Open folder" action="OpenFolder()"/>
 		<item type="separator"/>
-		<item name="Play" sub="Play"/>
+		<!-- Note: Overwritten -->
+		<item name="Play episode"           sub="PlayEpisode"/>
+		<item name="Play last episode"   action="PlayLast()"/>
+		<item name="Play next episode"   action="PlayNext()"/>
+		<item name="Play random episode" action="PlayRandom()"/>
 	</menu>
 		<!-- Edit -->
 	<menu name="Edit">
 		<item name="Edit all..." action="EditAll()"/>
 		<item type="separator"/>
-		<item name="Episode..." action="EditEpisode()"/>
-		<item name="Score"      sub="EditScore"/>
-		<item name="Status"     sub="EditStatus"/>
-		<item name="Tags..."    action="EditTags()"/>
-		<item name="Titles..."  action="EditTitles()"/>
+		<item name="Episode..."  action="EditEpisode()"/>
+		<item name="Score"          sub="EditScore"/>
+		<item name="Status"         sub="EditStatus"/>
+		<item name="Tags..."     action="EditTags()"/>
+		<item name="Titles..."   action="EditTitles()"/>
 		<item type="separator"/>
-		<item name="Delete"  action="EditDelete()"/>
+		<item name="Delete"      action="EditDelete()"/>
 	</menu>
 	<!-- Score -->
 	<menu name="EditScore">
@@ -149,16 +153,7 @@
 		<item name="NyaaTorrents" action="SearchTorrents(http://www.nyaa.eu/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%title%)"/>
 		<item name="TokyoTosho"   action="SearchTorrents(http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&amp;_id=7b99f981c5b1f02354642f4e271cca43&amp;_render=rss)"/>
 	</menu>
-	<!-- Play -->
-	<menu name="Play">
-		<!-- Note: Overwritten -->
-		<item name="Last watched"   action="PlayLast()"/>
-		<item name="Next episode"   action="PlayNext()"/>
-		<item name="Random episode" action="PlayRandom()"/>
-		<item type="separator"/>
-		<item name="Episode" sub="PlayEpisode"/>
-	</menu>
-	<!-- Play > Episode -->
+	<!-- Play episode -->
 	<menu name="PlayEpisode">
 		<!-- Note: Overwritten -->
 		<item name="#1" action="PlayEpisode(1)"/>
