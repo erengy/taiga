@@ -57,7 +57,7 @@ public:
   EventItem* FindItem(int anime_id, int search_mode = 0);
   EventItem* GetCurrentItem();
   int GetItemCount();
-  void Remove(int index = -1, bool save = true, bool refresh = true);
+  void Remove(int index = -1, bool save = true, bool refresh = true, bool to_history = true);
   void RemoveDisabled(bool save = true, bool refresh = true);
 
   size_t index;

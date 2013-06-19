@@ -411,11 +411,11 @@ BOOL HttpClient::OnReadComplete() {
         } else {
           status = L"No new torrents found.";
         }
-        if (TorrentDialog.IsWindow()) {
+        if (MainDialog.IsVisible() &&
+            MainDialog.navigation.GetCurrentPage() == SIDEBAR_ITEM_FEEDS) {
           MainDialog.ChangeStatus(status);
           TorrentDialog.RefreshList();
           TorrentDialog.EnableInput();
-          // TODO: GetIcon() fails if we don't return TRUE here
         } else {
           switch (Settings.RSS.Torrent.new_action) {
             // Notify

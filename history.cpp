@@ -167,8 +167,8 @@ void EventQueue::Add(EventItem& item, bool save) {
     
     // Change status
     if (!Taiga.logged_in) {
-      MainDialog.ChangeStatus(L"Item added to the queue. (" + 
-                              anime->GetTitle() + L")");
+      MainDialog.ChangeStatus(L"\"" + anime->GetTitle() +
+                              L"\" is queued for update.");
     }
 
     // Update
@@ -276,13 +276,13 @@ int EventQueue::GetItemCount() {
   return count;
 }
 
-void EventQueue::Remove(int index, bool save, bool refresh) {
+void EventQueue::Remove(int index, bool save, bool refresh, bool to_history) {
   if (index == -1) index = this->index;
   
   if (index < static_cast<int>(items.size())) {
     auto event_item = items.begin() + index;
     
-    if (event_item->episode) {
+    if (to_history && event_item->episode) {
       history->items.push_back(*event_item);
       if (history->limit > 0 && history->items.size() > history->limit) {
         history->items.erase(history->items.begin());

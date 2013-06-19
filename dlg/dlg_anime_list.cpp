@@ -55,6 +55,7 @@ BOOL AnimeListDialog::OnInitDialog() {
 
   // Create list tooltips
   listview.tooltips.Create(listview.GetWindowHandle());
+  listview.tooltips.SetDelayTime(30000, -1, 0);
 
   // Insert list columns
   listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");

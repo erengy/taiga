@@ -148,17 +148,17 @@ void SettingsDialog::SetCurrentPage(int index) {
 BOOL SettingsDialog::OnInitDialog() {
   // Initialize controls
   tree_.Attach(GetDlgItem(IDC_TREE_SECTIONS));
-  tree_.SetImageList(UI.ImgList16.GetHandle(), 16);
+  tree_.SetImageList(UI.ImgList24.GetHandle());
   tree_.SetTheme();
   tab_.Attach(GetDlgItem(IDC_TAB_PAGES));
   
   // Add tree items
-  tree_.InsertItem(L"Services", 0, SECTION_SERVICES, nullptr);
-  tree_.InsertItem(L"Library", 0, SECTION_LIBRARY, nullptr);
-  tree_.InsertItem(L"Application", 0, SECTION_APPLICATION, nullptr);
-  tree_.InsertItem(L"Recognition", 0, SECTION_RECOGNITION, nullptr);
-  tree_.InsertItem(L"Sharing", 0, SECTION_SHARING, nullptr);
-  tree_.InsertItem(L"Torrents", 0, SECTION_TORRENTS, nullptr);
+  tree_.InsertItem(L"Services", ICON24_GLOBE, SECTION_SERVICES, nullptr);
+  tree_.InsertItem(L"Library", ICON24_LIBRARY, SECTION_LIBRARY, nullptr);
+  tree_.InsertItem(L"Application", ICON24_APPLICATION, SECTION_APPLICATION, nullptr);
+  tree_.InsertItem(L"Recognition", ICON24_RECOGNITION, SECTION_RECOGNITION, nullptr);
+  tree_.InsertItem(L"Sharing", ICON24_SHARING, SECTION_SHARING, nullptr);
+  tree_.InsertItem(L"Torrents", ICON24_FEED, SECTION_TORRENTS, nullptr);
 
   // Set title font
   SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, 

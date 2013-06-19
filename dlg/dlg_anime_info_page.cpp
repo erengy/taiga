@@ -162,20 +162,15 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
       
   // Set synopsis
-  if (connect && (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty())) {
-    if (mal::SearchAnime(anime_id_, anime_item->GetTitle())) {
-      text = L"Retrieving...";
-    } else {
-      text = L"-";
-    }
-  } else {
-    text = anime_item->GetSynopsis();
-    if (connect)
-      if (anime_item->GetGenres().empty() || anime_item->GetScore().empty()) {
-        mal::GetAnimeDetails(anime_id_);
+  text = anime_item->GetSynopsis();
+  SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, text.c_str());
+  if (connect) {
+    if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty()) {
+      mal::SearchAnime(anime_id_, anime_item->GetTitle());
+    } else if (anime_item->GetGenres().empty() || anime_item->GetScore().empty()) {
+      mal::GetAnimeDetails(anime_id_);
     }
   }
-  SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, text.c_str());
 }
 
 // =============================================================================

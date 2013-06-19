@@ -75,12 +75,6 @@ INT_PTR HistoryDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   if (pnmh->hwndFrom == list_.GetWindowHandle()) {
     switch (pnmh->code) {
-      // List item select
-      case LVN_ITEMCHANGED: {
-        /*SetDlgItemText(IDC_BUTTON_EVENT_CLEAR, 
-          list_.GetSelectedCount() > 0 ? L"Remove selected items" : L"Remove all items");*/
-        break;
-      }
       // Custom draw
       case NM_CUSTOMDRAW: {
         LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(pnmh);
@@ -241,9 +235,6 @@ bool HistoryDialog::MoveItems(int pos) {
 }
 
 bool HistoryDialog::RemoveItems() {
-  // TODO: Re-enable
-  return false;
-
   if (History.queue.updating) {
     MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;
@@ -252,8 +243,15 @@ bool HistoryDialog::RemoveItems() {
   if (list_.GetSelectedCount() > 0) {
     while (list_.GetSelectedCount() > 0) {
       int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
-      History.queue.Remove(item_index, false, false);
       list_.DeleteItem(item_index);
+      if (item_index < History.queue.items.size()) {
+        item_index = History.queue.items.size() - item_index - 1;
+        History.queue.Remove(item_index, false, false, false);
+      } else {
+        item_index -= History.queue.items.size();
+        item_index = History.items.size() - item_index - 1;
+        History.items.erase(History.items.begin() + item_index);
+      }
     }
     History.Save();
   } else {

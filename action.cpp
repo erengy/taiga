@@ -587,14 +587,29 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (!anime_item || !anime_item->IsInList()) return;
     if (anime_item->GetFolder().empty()) {
       MainDialog.ChangeStatus(L"Searching for folder...");
-      if (anime_item->CheckFolder()) {
-        MainDialog.ChangeStatus(L"Folder found.");
-      } else {
-        MainDialog.ChangeStatus(L"Folder not found.");
-        return;
+      if (!anime_item->CheckFolder()) {
+        win32::TaskDialog dlg;
+        dlg.SetWindowTitle(L"Folder Not Found");
+        dlg.SetMainIcon(TD_ICON_INFORMATION);
+        dlg.SetMainInstruction(L"Taiga couldn't find the folder of this anime. "
+                               L"Would you like to set it manually?");
+        dlg.AddButton(L"Yes", IDYES);
+        dlg.AddButton(L"No", IDNO);
+        dlg.Show(g_hMain);
+        if (dlg.GetSelectedButtonID() == IDYES) {
+          wstring default_path, path;
+          if (!Settings.Folders.root.empty())
+            default_path = Settings.Folders.root.front();
+          if (BrowseForFolder(g_hMain, L"Choose an anime folder", default_path, path)) {
+            anime_item->SetFolder(path, true);
+          }
+        }
+        MainDialog.ChangeStatus();
       }
     }
-    Execute(anime_item->GetFolder());
+    if (!anime_item->GetFolder().empty()) {
+      Execute(anime_item->GetFolder());
+    }
 
   // SetFolder()
   //   Lets user set an anime folder.
@@ -665,8 +680,23 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       anime_item->CheckFolder();
       wstring file = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode_number, false);
       if (!file.empty()) {
-        Execute(file);
-        break;
+        win32::TaskDialog dlg;
+        dlg.SetWindowTitle(L"Play Random Anime");
+        dlg.SetMainIcon(TD_ICON_INFORMATION);
+        dlg.SetMainInstruction(L"Would you like to watch this episode?");
+        wstring content = anime_item->GetTitle() + L"\nEpisode " + ToWstr(episode_number);
+        dlg.SetContent(content.c_str());
+        dlg.AddButton(L"Play", IDYES);
+        dlg.AddButton(L"Skip", IDNO);
+        dlg.AddButton(L"Cancel", IDCANCEL);
+        dlg.Show(g_hMain);
+        switch (dlg.GetSelectedButtonID()) {
+          case IDYES:
+            Execute(file);
+            return;
+          case IDCANCEL:
+            return;
+        }
       }
     }
 

@@ -294,10 +294,10 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION:
       RECREATE_COMBO(CBS_DROPDOWN);
-      value_combo_.AddString(L"v2");
-      value_combo_.AddString(L"v3");
-      value_combo_.AddString(L"v4");
-      value_combo_.AddString(L"v0");
+      value_combo_.AddString(L"2");
+      value_combo_.AddString(L"3");
+      value_combo_.AddString(L"4");
+      value_combo_.AddString(L"0");
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
