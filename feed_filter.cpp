@@ -477,8 +477,8 @@ wstring FeedFilterManager::CreateNameFromConditions(const FeedFilter& filter) {
 
 wstring FeedFilterManager::TranslateCondition(const FeedFilterCondition& condition) {
   return TranslateElement(condition.element) + L" " + 
-    TranslateOperator(condition.op) + L" \"" + 
-    TranslateValue(condition) + L"\"";
+         TranslateOperator(condition.op) + L" \"" + 
+         TranslateValue(condition) + L"\"";
 }
 
 wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, size_t index) {
@@ -589,9 +589,9 @@ wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) 
 wstring FeedFilterManager::TranslateMatching(int match) {
   switch (match) {
     case FEED_FILTER_MATCH_ALL:
-      return L"Match all conditions";
+      return L"All conditions";
     case FEED_FILTER_MATCH_ANY:
-      return L"Match any condition";
+      return L"Any condition";
     default:
       return L"?";
   }

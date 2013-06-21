@@ -138,6 +138,29 @@ void UpdateAnnounceMenu() {
   }
 }
 
+void UpdateExternalLinksMenu() {
+  int menu_index = UI.Menus.GetIndex(L"ExternalLinks");
+  if (menu_index > -1) {
+    // Clear menu
+    MENU.Items.clear();
+
+    vector<wstring> lines;
+    Split(Settings.Program.General.external_links, L"\r\n", lines);
+    for (auto line = lines.begin(); line != lines.end(); ++line) {
+      if (IsEqual(*line, L"-")) {
+        // Add separator
+        MENU.CreateItem();
+      } else {
+        vector<wstring> content;
+        Split(*line, L"|", content);
+        if (content.size() > 1) {
+          MENU.CreateItem(L"URL(" + content.at(1) + L")", content.at(0));
+        }
+      }
+    }
+  }
+}
+
 void UpdateFoldersMenu() {
   int menu_index = UI.Menus.GetIndex(L"Folders");
   if (menu_index > -1) {
@@ -276,6 +299,7 @@ void UpdateViewMenu() {
 void UpdateAllMenus(anime::Item* anime_item) {
   UpdateAnimeMenu(anime_item);
   UpdateAnnounceMenu();
+  UpdateExternalLinksMenu();
   UpdateFoldersMenu();
   UpdateToolsMenu();
   UpdateTrayMenu();

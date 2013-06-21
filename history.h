@@ -52,7 +52,7 @@ public:
   virtual ~EventQueue() {}
 
   void Add(EventItem& item, bool save = true);
-  void Check();
+  void Check(bool automatic = true);
   void Clear(bool save = true);
   EventItem* FindItem(int anime_id, int search_mode = 0);
   EventItem* GetCurrentItem();

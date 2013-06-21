@@ -642,7 +642,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
       win32::Dc dc = sys_link_.GetDC();
       int text_height = GetTextHeight(dc.Get());
       win32::Rect rect_content = rect;
-      rect_content.Inflate(-ScaleX(WIN_CONTROL_MARGIN), 0);
+      rect_content.Inflate(-ScaleX(WIN_CONTROL_MARGIN * 2), 0);
       rect_content.bottom = rect_content.top + text_height * 2;
       sys_link_.SetPosition(nullptr, rect_content);
       rect.top = rect_content.bottom + ScaleY(WIN_CONTROL_MARGIN) * 3;

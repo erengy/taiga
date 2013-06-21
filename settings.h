@@ -108,7 +108,7 @@ public:
     // General
     struct General {
       BOOL auto_start, close, minimize;
-      wstring theme;
+      wstring external_links, theme;
     } General;
     // Position
     struct Position {

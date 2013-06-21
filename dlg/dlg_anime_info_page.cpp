@@ -21,6 +21,8 @@
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
 
+#include "dlg_input.h"
+
 #include "../anime.h"
 #include "../anime_db.h"
 #include "../common.h"
@@ -243,9 +245,17 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
       switch (pnmh->code) {
         case NM_CLICK: {
           // Set/change fansub group preference
-          if (anime::SetFansubFilter(anime_id_, L"TaigaSubs (change this)")) {
-            RefreshFansubPreference();
-          }
+          vector<wstring> groups;
+          anime::GetFansubFilter(anime_id_, groups);
+          wstring text = Join(groups, L", ");
+          InputDialog dlg;
+          dlg.title = AnimeDatabase.GetCurrentItem()->GetTitle();
+          dlg.info = L"Please enter your fansub group preference for this title:";
+          dlg.text = text;
+          dlg.Show(AnimeDialog.GetWindowHandle());
+          if (dlg.result == IDOK)
+            if (anime::SetFansubFilter(anime_id_, dlg.text))
+              RefreshFansubPreference();
           return TRUE;
         }
       }
@@ -358,7 +368,7 @@ void PageMyInfo::RefreshFansubPreference() {
 
   wstring text;
   vector<wstring> groups;
-  
+
   if (anime::GetFansubFilter(anime_id_, groups)) {
     for (auto it = groups.begin(); it != groups.end(); ++it) {
       if (!text.empty()) text += L" or ";

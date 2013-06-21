@@ -36,7 +36,7 @@
 	</menu>
 	<!-- Tools -->
 	<menu name="Tools">
-		<item name="External services" sub="Services"/>
+		<item name="External links" sub="ExternalLinks"/>
 		<item type="separator"/>
 		<item name="Enable anime recognition"    action="ToggleRecognition()" checked="1"/>
 		<item name="Enable auto sharing"         action="ToggleSharing()" checked="1"/>
@@ -44,8 +44,9 @@
 		<item type="separator"/>
 		<item name="Settings" action="Settings()"/>
 	</menu>
-	<!-- Services -->
-	<menu name="Services">
+	<!-- External links -->
+	<menu name="ExternalLinks">
+		<!-- Note: Overwritten -->
 		<item name="Anime Recommendation Finder" action="URL(http://www.animerecs.com/)"/>
 		<item name="MALgraph" action="URL(http://mal.oko.im/)"/>
 		<item type="separator"/>
@@ -232,10 +233,14 @@
 		<item name="Information" action="Info"/>
 		<item type="separator"/>
 		<item name="Discard" action="DiscardTorrent"/>
-		<item name="Discard all torrents for this title" action="DiscardTorrents"/>
+		<item name="Quick filters" sub="QuickFilters"/>
 		<item type="separator"/>
 		<item name="Search more torrents for this title" action="MoreTorrents"/>
 		<item name="Search MyAnimeList for this title" action="SearchMAL"/>
+	</menu>
+	<menu name="QuickFilters">
+		<item name="Discard all torrents for this title" action="DiscardTorrents"/>
+		<item name="Select this fansub group for this title" action="SelectFansub"/>
 	</menu>
 	
 	<!-- Script functions and variables -->

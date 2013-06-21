@@ -176,7 +176,7 @@ void EventQueue::Add(EventItem& item, bool save) {
   }
 }
 
-void EventQueue::Check() {
+void EventQueue::Check(bool automatic) {
   // Check
   if (items.empty()) {
     return;
@@ -191,7 +191,7 @@ void EventQueue::Check() {
     items[index].reason = L"Not logged in";
     return;
   }
-  if (!Taiga.is_sync_enabled) {
+  if (automatic && !Taiga.is_sync_enabled) {
     items[index].reason = L"Synchronization is disabled";
     return;
   }

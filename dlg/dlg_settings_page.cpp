@@ -146,6 +146,7 @@ BOOL SettingsPage::OnInitDialog() {
             SetComboSelection(IDC_COMBO_THEME, i);
         }
       }
+      SetDlgItemText(IDC_EDIT_EXTERNALLINKS, Settings.Program.General.external_links.c_str());
       break;
     }
     // Application > List

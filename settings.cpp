@@ -43,6 +43,7 @@
 
 #include "win32/win_registry.h"
 
+#define DEFAULT_EXTERNALLINKS    L"Anime Recommendation Finder|http://www.animerecs.com\r\nMALgraph|http://mal.oko.im\r\n-\r\nAnime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\nMahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\nThe Fansub Wiki|http://www.fansubwiki.com"
 #define DEFAULT_FORMAT_HTTP      L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%"
 #define DEFAULT_FORMAT_MESSENGER L"Watching: %title%$if(%episode%, #%episode%$if(%total%,/%total%)) ~ www.myanimelist.net/anime/%id%"
 #define DEFAULT_FORMAT_MIRC      L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 $if(%score%,\00314[Score: %score%/10]\003) \00312www.myanimelist.net/anime/%id%"
@@ -146,6 +147,7 @@ bool Settings::Load() {
     Program.General.close = general.attribute(L"close").as_int();
     Program.General.minimize = general.attribute(L"minimize").as_int();
     Program.General.theme = general.attribute(L"theme").as_string(L"Default");
+    Program.General.external_links = general.attribute(L"externallinks").as_string(DEFAULT_EXTERNALLINKS);
     // Position
     xml_node position = program.child(L"position");
     Program.Position.x = position.attribute(L"x").as_int(-1);
@@ -332,6 +334,7 @@ bool Settings::Save() {
     general.append_attribute(L"close") = Program.General.close;
     general.append_attribute(L"minimize") = Program.General.minimize;
     general.append_attribute(L"theme") = Program.General.theme.c_str();
+    general.append_attribute(L"externallinks") = Program.General.external_links.c_str();
     // Position
     xml_node position = program.append_child(L"position");
     position.append_attribute(L"x") = Program.Position.x;
@@ -478,6 +481,8 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
   SetProxies(Program.Proxy.host, 
              Program.Proxy.user, 
              Program.Proxy.password);
+
+  UpdateExternalLinksMenu();
 }
 
 void Settings::RestoreDefaults() {

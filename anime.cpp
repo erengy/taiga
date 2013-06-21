@@ -37,7 +37,6 @@
 
 #include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_list.h"
-#include "dlg/dlg_feed_filter.h"
 #include "dlg/dlg_main.h"
 
 #include "win32/win_taskbar.h"
@@ -266,61 +265,48 @@ void Item::AddToQueue(Episode episode, bool change_status) {
 
 bool GetFansubFilter(int anime_id, vector<wstring>& groups) {
   bool found = false;
-  for (auto i = Aggregator.filter_manager.filters.begin(); 
-       i != Aggregator.filter_manager.filters.end(); ++i) {
+  
+  foreach_(i, Aggregator.filter_manager.filters) {
     if (found) break;
-    for (auto j = i->anime_ids.begin(); j != i->anime_ids.end(); ++j) {
+    foreach_(j, i->anime_ids) {
       if (*j != anime_id) continue;
       if (found) break;
-      for (auto k = i->conditions.begin(); k != i->conditions.end(); ++k) {
-        if (k->element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
-        groups.push_back(k->value);
-        found = true;
+      foreach_(k, i->conditions) {
+        if (k->element == FEED_FILTER_ELEMENT_ANIME_GROUP) {
+          groups.push_back(k->value);
+          found = true;
+        }
       }
     }
   }
+
   return found;
 }
 
 bool SetFansubFilter(int anime_id, const wstring& group_name) {
-  FeedFilter* filter = nullptr;
-
-  for (auto i = Aggregator.filter_manager.filters.begin(); 
-       i != Aggregator.filter_manager.filters.end(); ++i) {
-    if (filter) break;
-    for (auto j = i->anime_ids.begin(); j != i->anime_ids.end(); ++j) {
+  // Check existing filters
+  foreach_(i, Aggregator.filter_manager.filters) {
+    foreach_(j, i->anime_ids) {
       if (*j != anime_id) continue;
-      for (auto k = i->conditions.begin(); k != i->conditions.end(); ++k) {
-        if (k->element != FEED_FILTER_ELEMENT_ANIME_GROUP) continue;
-        filter = &(*i); break;
+      foreach_(k, i->conditions) {
+        if (k->element == FEED_FILTER_ELEMENT_ANIME_GROUP) {
+          k->value = group_name;
+          return true;
+        }
       }
     }
   }
-  
-  if (filter) {
-    FeedFilterDialog.filter = *filter;
-  } else {
-    FeedFilterDialog.filter.Reset();
-    FeedFilterDialog.filter.name = L"[Fansub] " + AnimeDatabase.FindItem(anime_id)->GetTitle();
-    FeedFilterDialog.filter.match = FEED_FILTER_MATCH_ANY;
-    FeedFilterDialog.filter.action = FEED_FILTER_ACTION_SELECT;
-    FeedFilterDialog.filter.anime_ids.push_back(anime_id);
-    FeedFilterDialog.filter.AddCondition(FEED_FILTER_ELEMENT_ANIME_GROUP, 
-      FEED_FILTER_OPERATOR_IS, group_name);
-  }
 
-  ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(g_hMain));
-  
-  if (!FeedFilterDialog.filter.conditions.empty()) {
-    if (filter) {
-      *filter = FeedFilterDialog.filter;
-    } else {
-      Aggregator.filter_manager.filters.push_back(FeedFilterDialog.filter);
-    }
-    return true;
-  } else {
-    return false;
-  }
+  // Create new filter
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  Aggregator.filter_manager.AddFilter(
+    FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ANY, true, 
+    L"[Fansub] " + anime_item->GetTitle());
+  Aggregator.filter_manager.filters.back().AddCondition(
+    FEED_FILTER_ELEMENT_ANIME_GROUP, FEED_FILTER_OPERATOR_IS, 
+    group_name);
+  Aggregator.filter_manager.filters.back().anime_ids.push_back(anime_id);
+  return true;
 }
 
 wstring GetImagePath(int anime_id) {

@@ -91,7 +91,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     } else {
       if (History.queue.GetItemCount() > 0) {
         // Update items in queue
-        History.queue.Check();
+        History.queue.Check(false);
       } else {
         // Retrieve list
         MainDialog.ChangeStatus(L"Synchronizing anime list...");

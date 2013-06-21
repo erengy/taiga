@@ -222,6 +222,7 @@ void SettingsDialog::OnOK() {
   page = &pages[PAGE_APP_INTERFACE];
   if (page->IsWindow()) {
     page->GetDlgItemText(IDC_COMBO_THEME, Settings.Program.General.theme);
+    page->GetDlgItemText(IDC_EDIT_EXTERNALLINKS, Settings.Program.General.external_links);
   }
   // Application > List
   page = &pages[PAGE_APP_LIST];

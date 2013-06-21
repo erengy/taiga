@@ -261,6 +261,19 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
                 FEED_FILTER_ELEMENT_ANIME_ID, FEED_FILTER_OPERATOR_IS, 
                 ToWstr(anime_item->GetId()));
             }
+          } else if (answer == L"SelectFansub") {
+            int anime_id = feed_item->episode_data.anime_id;
+            wstring group_name = feed_item->episode_data.group;
+            if (anime_id > anime::ID_UNKNOWN && !group_name.empty()) {
+              for (int i = 0; i < list_.GetItemCount(); i++) {
+                feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
+                if (feed_item && !IsEqual(feed_item->episode_data.group, group_name)) {
+                  feed_item->download = false;
+                  list_.SetCheckState(i, FALSE);
+                }
+              }
+              anime::SetFansubFilter(anime_id, group_name);
+            }
           } else if (answer == L"MoreTorrents") {
             Search(Settings.RSS.Torrent.search_url, feed_item->episode_data.title);
           } else if (answer == L"SearchMAL") {
