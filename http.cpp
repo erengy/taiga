@@ -229,15 +229,17 @@ BOOL HttpClient::OnReadComplete() {
     
     // Login
     case HTTP_MAL_Login: {
-      Taiga.logged_in = InStr(GetData(), L"<username>" + Settings.Account.MAL.user + L"</username>", 0) > -1;
+      wstring username = InStr(GetData(), L"<username>", L"</username>");
+      Taiga.logged_in = IsEqual(Settings.Account.MAL.user, username);
       if (Taiga.logged_in) {
+        Settings.Account.MAL.user = username;
         status = L"Logged in as " + Settings.Account.MAL.user + L".";
       } else {
         status = L"Failed to log in.";
 #ifdef _DEBUG
         status += L" (" + GetData() + L")";
 #else
-        status += L" (Invalid user name or password)";
+        status += L" (Invalid username or password)";
 #endif
       }
       MainDialog.ChangeStatus(status);

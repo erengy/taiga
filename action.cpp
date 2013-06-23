@@ -195,7 +195,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"Would you like to set your account information first?");
       dlg.SetContent(L"Anime search requires authentication, which means, "
-        L"you need to enter a valid user name and password to search MyAnimeList.");
+        L"you need to enter a valid username and password to search MyAnimeList.");
       dlg.AddButton(L"Yes", IDYES);
       dlg.AddButton(L"No", IDNO);
       dlg.Show(g_hMain);

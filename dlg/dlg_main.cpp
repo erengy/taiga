@@ -110,7 +110,7 @@ BOOL MainDialog::OnInitDialog() {
   if (Settings.Account.MAL.user.empty()) {
     win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
-    dlg.SetContent(L"User name is not set. Would you like to open settings window to set it now?");
+    dlg.SetContent(L"Username is not set. Would you like to open settings window to set it now?");
     dlg.AddButton(L"Yes", IDYES);
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
