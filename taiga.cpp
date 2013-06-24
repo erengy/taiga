@@ -21,6 +21,7 @@
 #include "taiga.h"
 
 #include "anime_db.h"
+#include "announce.h"
 #include "api.h"
 #include "common.h"
 #include "gfx.h"
@@ -38,6 +39,7 @@
 
 #include "dlg/dlg_update.h"
 
+#include "win32/win_taskbar.h"
 #include "win32/win_taskdialog.h"
 
 HINSTANCE g_hInstance;
@@ -81,7 +83,7 @@ BOOL Taiga::InitInstance() {
 
   // Create API window
   TaigaApi.Create();
-  
+
   if (Settings.Program.StartUp.check_new_version) {
     // Create update dialog
     ExecuteAction(L"CheckUpdates");
@@ -91,6 +93,27 @@ BOOL Taiga::InitInstance() {
   }
 
   return TRUE;
+}
+
+void Taiga::Uninitialize() {
+  // Announce
+  if (play_status == PLAYSTATUS_PLAYING) {
+    play_status = PLAYSTATUS_STOPPED;
+    Announcer.Do(ANNOUNCE_TO_HTTP);
+  }
+  Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
+
+  // Cleanup
+  Clients.service.list.Cleanup();
+  Taskbar.Destroy();
+  TaskbarList.Release();
+
+  // Save
+  Settings.Save();
+  AnimeDatabase.SaveDatabase();
+
+  // Exit
+  PostQuitMessage();
 }
 
 // =============================================================================
@@ -108,9 +131,9 @@ wstring Taiga::GetDataPath() {
   
   // Return %APPDATA% folder
   WCHAR buffer[MAX_PATH];
-  if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, 
-    NULL, SHGFP_TYPE_CURRENT, buffer))) {
-      return CheckSlash(buffer) + APP_NAME + L"\\";
+  if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                                NULL, SHGFP_TYPE_CURRENT, buffer))) {
+    return CheckSlash(buffer) + APP_NAME + L"\\";
   }
 
   return L"";
@@ -135,40 +158,4 @@ void Taiga::LoadData() {
 
   // Load history
   History.Load();
-}
-
-// =============================================================================
-
-void Taiga::Updater::OnCheck() {
-  //
-}
-
-void Taiga::Updater::OnCRCCheck(const wstring& path, wstring& crc) {
-  wstring text = L"Checking file integrity... (" + GetFileName(path) + L")";
-  UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, text.c_str());
-  crc = CalculateCRC(path);
-  ToUpper(crc);
-}
-
-void Taiga::Updater::OnDone() {
-  UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Done!");
-}
-
-void Taiga::Updater::OnProgress(int file_index) {
-  wstring text = L"Downloading file... (" + files[file_index].path + L")";
-  UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, text.c_str());
-}
-
-bool Taiga::Updater::OnRestartApp() {
-  if (g_hMain) {
-    Settings.Save();
-  }
-
-  return true;
-}
-
-void Taiga::Updater::OnRunActions() {
-  for (unsigned int i = 0; i < actions.size(); i++) {
-    ExecuteAction(actions[i]);
-  }
 }

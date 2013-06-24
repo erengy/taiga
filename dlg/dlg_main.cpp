@@ -20,6 +20,7 @@
 
 #include "dlg_main.h"
 
+#include "dlg_about.h"
 #include "dlg_anime_info.h"
 #include "dlg_anime_list.h"
 #include "dlg_history.h"
@@ -29,6 +30,7 @@
 #include "dlg_stats.h"
 #include "dlg_test_recognition.h"
 #include "dlg_torrent.h"
+#include "dlg_update.h"
 
 #include "../anime_db.h"
 #include "../anime_filter.h"
@@ -470,26 +472,6 @@ BOOL MainDialog::OnClose() {
 }
 
 BOOL MainDialog::OnDestroy() {
-  // Announce
-  if (Taiga.play_status == PLAYSTATUS_PLAYING) {
-    Taiga.play_status = PLAYSTATUS_STOPPED;
-    Announcer.Do(ANNOUNCE_TO_HTTP);
-  }
-  Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
-  
-  // Close other dialogs
-  AnimeDialog.Destroy();
-  RecognitionTest.Destroy();
-  SearchDialog.Destroy();
-  SeasonDialog.Destroy();
-  TorrentDialog.Destroy();
-  
-  // Cleanup
-  Clients.service.list.Cleanup();
-  Taskbar.Destroy();
-  TaskbarList.Release();
-  
-  // Save settings
   if (Settings.Program.Exit.remember_pos_size) {
     Settings.Program.Position.maximized = (GetWindowLong() & WS_MAXIMIZE) ? TRUE : FALSE;
     if (Settings.Program.Position.maximized == FALSE) {
@@ -503,13 +485,15 @@ BOOL MainDialog::OnDestroy() {
       Settings.Program.Position.h = rcWindow.Height();
     }
   }
-  Settings.Save();
 
-  // Save anime database
-  AnimeDatabase.SaveDatabase();
-  
-  // Exit
-  Taiga.PostQuitMessage();
+  AboutDialog.Destroy();
+  AnimeDialog.Destroy();
+  RecognitionTest.Destroy();
+  SettingsDialog.Destroy();
+  UpdateDialog.Destroy();
+
+  Taiga.Uninitialize();
+
   return TRUE;
 }
 
@@ -526,7 +510,9 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
 
 LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // Toolbar controls
-  if (idCtrl == IDC_TOOLBAR_MENU || idCtrl == IDC_TOOLBAR_MAIN || idCtrl == IDC_TOOLBAR_SEARCH) {
+  if (idCtrl == IDC_TOOLBAR_MENU ||
+      idCtrl == IDC_TOOLBAR_MAIN ||
+      idCtrl == IDC_TOOLBAR_SEARCH) {
     return OnToolbarNotify(reinterpret_cast<LPARAM>(pnmh));
 
   // Tree control

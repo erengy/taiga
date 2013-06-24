@@ -17,7 +17,7 @@
 */
 
 #include "../std.h"
-#include <math.h>
+#include <cmath>
 
 #include "dlg_about.h"
 

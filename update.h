@@ -20,48 +20,35 @@
 #define UPDATE_H
 
 #include "std.h"
+#include "feed.h"
 #include "http.h"
 
 // =============================================================================
-
-class VersionInfo {
-public:
-  wstring major, minor, revision, build, url;
-};
-
-class UpdateFile {
-public:
-  bool download;
-  wstring path, checksum;
-};
 
 class UpdateHelper {
 public:
   UpdateHelper();
   virtual ~UpdateHelper() {}
 
-  virtual void OnCheck() {}
-  virtual void OnCRCCheck(const wstring& path, wstring& crc) {}
-  virtual void OnDone() {}
-  virtual void OnProgress(int file_index) {}
-  virtual bool OnRestartApp() { return true; }
-  virtual void OnRunActions() {}
+  bool Check(win32::App& app);
+  bool Download();
+  bool IsDownloadAllowed() const;
+  bool IsRestartRequired() const;
+  bool IsUpdateAvailable() const;
+  bool ParseData(wstring data);
+  bool RunInstaller();
 
-  bool Check(const wstring& address, win32::App& app, DWORD client_mode);
-  bool DownloadNextFile(DWORD client_mode);
-  bool ParseData(wstring data, DWORD client_mode);
-  bool RestartApplication(const wstring& updatehelper_exe, 
-    const wstring& current_exe, const wstring& new_exe);
-
-public:
-  vector<wstring> actions;
   HttpClient client;
-  vector<UpdateFile> files;
-  bool restart_app, update_available;
-  VersionInfo version_info;
 
 private:
+  const GenericFeedItem* FindItem(const wstring& guid) const;
+  unsigned long GetVersionValue(int major, int minor, int revision) const;
+
   win32::App* app_;
+  vector<GenericFeedItem> items_;
+  wstring latest_guid_;
+  bool restart_required_;
+  bool update_available_;
 };
 
 #endif // UPDATE_H

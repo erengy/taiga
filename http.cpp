@@ -127,6 +127,9 @@ BOOL HttpClient::OnHeadersAvailable(win32::http_header_t& headers) {
       } else {
         UpdateDialog.progressbar.SetMarquee(true);
       }
+      if (GetClientMode() == HTTP_UpdateDownload) {
+        UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Downloading updates...");
+      }
       break;
     default:
       TaskbarList.SetProgressState(m_dwTotal > 0 ? TBPF_NORMAL : TBPF_INDETERMINATE);
@@ -515,23 +518,18 @@ BOOL HttpClient::OnReadComplete() {
 
     // Check updates
     case HTTP_UpdateCheck: {
-      if (Taiga.Updater.ParseData(GetData(), HTTP_UpdateDownload)) {
-        return TRUE;
-      } else {
-        UpdateDialog.PostMessage(WM_CLOSE);
-      }
+      if (Taiga.Updater.ParseData(GetData()))
+        if (Taiga.Updater.IsDownloadAllowed())
+          if (Taiga.Updater.Download())
+            return TRUE;
+      UpdateDialog.PostMessage(WM_CLOSE);
       break;
     }
 
     // Download updates
     case HTTP_UpdateDownload: {
-      UpdateFile* file = reinterpret_cast<UpdateFile*>(GetParam());
-      file->download = false;
-      if (Taiga.Updater.DownloadNextFile(HTTP_UpdateDownload)) {
-        return TRUE;
-      } else {
-        UpdateDialog.PostMessage(WM_CLOSE);
-      }
+      Taiga.Updater.RunInstaller();
+      UpdateDialog.PostMessage(WM_CLOSE);
       break;
     }
 

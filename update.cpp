@@ -17,64 +17,43 @@
 */
 
 #include "std.h"
+#include <cmath>
 
 #include "update.h"
 
 #include "common.h"
+#include "foreach.h"
 #include "string.h"
+#include "taiga.h"
 #include "xml.h"
+
+#include "dlg/dlg_update.h"
+
+#include "win32/win_taskdialog.h"
 
 // =============================================================================
 
 UpdateHelper::UpdateHelper()
-    : restart_app(false), 
-      update_available(false), 
-      app_(nullptr) {
+    : app_(nullptr),
+      restart_required_(false),
+      update_available_(false) {
 }
 
 // =============================================================================
 
-bool UpdateHelper::Check(const wstring& address, win32::App& app, DWORD client_mode) {
-  OnCheck();
+bool UpdateHelper::Check(win32::App& app) {
   app_ = &app;
-  if (app_ == nullptr || address.empty()) return false;
-
-  win32::Url url(address);
-  return client.Get(url, L"", client_mode);
+  //win32::Url url(L"taiga.erengy.com/update.php");
+  win32::Url url(L"dl.dropboxusercontent.com/u/2298899/Taiga/update_beta.xml"); // TEMP
+  return client.Get(url, L"", HTTP_UpdateCheck);
 }
 
-bool UpdateHelper::DownloadNextFile(DWORD client_mode) {
-  // Check files
-  for (unsigned int i = 0; i < files.size(); i++) {
-    if (files[i].download) {
-      OnProgress(i);
-
-      // Get file path
-      wstring path = CheckSlash(GetPathOnly(app_->GetModulePath())) + files[i].path;
-      ReplaceChar(path, '/', '\\');
-      CreateFolder(GetPathOnly(path));
-      if (!restart_app) {
-        if (IsEqual(files[i].path, GetFileName(app_->GetModulePath()))) {
-          path += L".new";
-          restart_app = true;
-        }
-      }
-
-      // Download file
-      win32::Url url(version_info.url + files[i].path);
-      return client.Get(url, path, client_mode, reinterpret_cast<LPARAM>(&files[i]));
-    }
-  }
-
-  OnDone();
-  return false;
-}
-
-bool UpdateHelper::ParseData(wstring data, DWORD client_mode) {
+bool UpdateHelper::ParseData(wstring data) {
   // Reset values
-  actions.clear();
-  files.clear();
-  update_available = false;
+  items_.clear();
+  latest_guid_.clear();
+  restart_required_ = false;
+  update_available_ = false;
   
   // Load XML data
   xml_document doc;
@@ -82,71 +61,117 @@ bool UpdateHelper::ParseData(wstring data, DWORD client_mode) {
   if (result.status != status_ok) {
     return false;
   }
-  
-  // Read startup actions
-  xml_node actions_node = doc.child(L"actions");
-  for (xml_node action = actions_node.child(L"action"); action; action = action.next_sibling(L"action")) {
-    actions.push_back(action.child_value());
+
+  // Read channel information
+  xml_node channel = doc.child(L"rss").child(L"channel");
+
+  // Read items
+  for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
+    items_.resize(items_.size() + 1);
+    items_.back().guid = XML_ReadStrValue(item, L"guid");
+    items_.back().category = XML_ReadStrValue(item, L"category");
+    items_.back().link = XML_ReadStrValue(item, L"link");
+    items_.back().description = XML_ReadStrValue(item, L"description");
+    items_.back().pub_date = XML_ReadStrValue(item, L"pubDate");
   }
 
-  // Read version information
-  xml_node version = doc.child(L"version");
-  version_info.major = version.child_value(L"major");
-  version_info.minor = version.child_value(L"minor");
-  version_info.revision = version.child_value(L"revision");
-  version_info.build = version.child_value(L"build");
-  version_info.url = version.child_value(L"url");
+  // Get version information
+  auto current_version = GetVersionValue(app_->GetVersionMajor(),
+                                         app_->GetVersionMinor(),
+                                         app_->GetVersionRevision());
+  auto latest_version = current_version;
+  foreach_(item, items_) {
+    vector<wstring> numbers;
+    Split(item->guid, L".", numbers);
+    auto item_version = GetVersionValue(ToInt(numbers.at(0)),
+                                        ToInt(numbers.at(1)),
+                                        ToInt(numbers.at(2)));
+    if (item_version > latest_version) {
+      latest_guid_ = item->guid;
+      latest_version = item_version;
+    }
+  }
 
   // Compare version information
-  // TODO: fix (0.9 > 1.0 because 9 > 0)
-  if (ToInt(version_info.major) > app_->GetVersionMajor() || 
-      ToInt(version_info.minor) > app_->GetVersionMinor() || 
-      ToInt(version_info.revision) > app_->GetVersionRevision()) {
-        update_available = true;
-  }
+  if (latest_version > current_version)
+    update_available_ = true;
 
-  // Read files
-  xml_node files_node = doc.child(L"files");
-  for (xml_node file = files_node.child(L"file"); file; file = file.next_sibling(L"file")) {
-    files.resize(files.size() + 1);
-    files.back().path = file.child_value(L"path");
-    files.back().checksum = file.child_value(L"checksum");
-  }
-
-  // Check files
-  for (unsigned int i = 0; i < files.size(); i++) {
-    if (files[i].checksum.empty()) {
-      files[i].download = true;
-    } else {
-      wstring path = CheckSlash(GetPathOnly(app_->GetModulePath())) + files[i].path;
-      ReplaceChar(path, '/', '\\');
-      wstring crc;
-      OnCRCCheck(path, crc);
-      if (crc.empty() || !IsEqual(crc, files[i].checksum)) {
-        files[i].download = true;
-      } else {
-        files[i].download = false;
-      }
-    }
-  }
-
-  if (update_available && DownloadNextFile(client_mode)) {
-    return true;
-  } else {
-    return false;
-  }
+  return true;
 }
 
-bool UpdateHelper::RestartApplication(const wstring& updatehelper_exe, const wstring& current_exe, const wstring& new_exe) {
-  if (restart_app) {
-    if (FileExists(CheckSlash(app_->GetCurrentDirectory()) + new_exe)) {
-      if (OnRestartApp()) {
-        Execute(updatehelper_exe, current_exe + L" " + new_exe + L" " + ToWstr(GetCurrentProcessId()));
-        app_->PostQuitMessage();
-        return true;
-      }
-    }
+bool UpdateHelper::IsRestartRequired() const {
+  return restart_required_;
+}
+
+bool UpdateHelper::IsUpdateAvailable() const {
+  return update_available_;
+}
+
+bool UpdateHelper::IsDownloadAllowed() const {
+  win32::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
+  dlg.SetFooter(L"Current version: " APP_VERSION);
+
+  if (IsUpdateAvailable()) {
+    auto feed_item = FindItem(latest_guid_);
+    if (!feed_item) return false;
+
+    dlg.SetMainInstruction(L"A new version of Taiga is available!");
+    wstring content = L"Latest version: " + latest_guid_;
+    dlg.SetContent(content.c_str());
+    dlg.SetExpandedInformation(feed_item->description.c_str());
+    
+    dlg.AddButton(L"Download", IDYES);
+    dlg.AddButton(L"Cancel", IDNO);
+    dlg.Show(UpdateDialog.GetWindowHandle());
+    if (dlg.GetSelectedButtonID() != IDYES)
+      return false;
+  
+  } else {
+    dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
+    dlg.AddButton(L"OK", IDOK);
+    dlg.Show(g_hMain);
+    return false;
   }
 
-  return false;
+  return true;
+}
+
+bool UpdateHelper::Download() {
+  auto feed_item = FindItem(latest_guid_);
+  if (!feed_item) return false;
+
+  // TODO: Use TEMP folder path
+  wstring path = CheckSlash(app_->GetCurrentDirectory());
+  path += GetFileName(feed_item->link);
+
+  win32::Url url(feed_item->link);
+  
+  return client.Get(url, path, HTTP_UpdateDownload);
+}
+
+bool UpdateHelper::RunInstaller() {
+  auto feed_item = FindItem(latest_guid_);
+  if (!feed_item) return false;
+  
+  // TODO: Use TEMP folder path
+  wstring path = CheckSlash(app_->GetCurrentDirectory());
+  path += GetFileName(feed_item->link);
+
+  wstring parameters = L"/S /D=" + app_->GetCurrentDirectory();
+  restart_required_ = Execute(path, parameters);
+  return restart_required_;
+}
+
+const GenericFeedItem* UpdateHelper::FindItem(const wstring& guid) const {
+  foreach_(item, items_)
+    if (IsEqual(item->guid, latest_guid_))
+      return &(*item);
+
+  return nullptr;
+}
+
+unsigned long UpdateHelper::GetVersionValue(int major, int minor, int revision) const {
+  return (major * static_cast<unsigned long>(pow(10.0, 12))) +
+         (minor * static_cast<unsigned long>(pow(10.0, 8))) +
+         revision;
 }

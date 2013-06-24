@@ -52,13 +52,8 @@ BOOL UpdateDialog::OnInitDialog() {
   progressbar.SetMarquee(true);
 
   // Check updates
-//#ifdef _DEBUG
-  PostMessage(WM_CLOSE);
-//#else
-//  Taiga.Updater.Check(L"taiga.erengy.com/update.php", Taiga, HTTP_UpdateCheck);
-//#endif
+  Taiga.Updater.Check(Taiga);
 
-  // Success
   return TRUE;
 }
 
@@ -76,27 +71,18 @@ INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 BOOL UpdateDialog::OnDestroy() {
   // Clean up
   Taiga.Updater.client.Cleanup();
-  
-  if (Taiga.Updater.update_available) {
-    // Restart application
-    if (Taiga.Updater.RestartApplication(L"UpdateHelper.exe", L"Taiga.exe", L"Taiga.exe.new")) {
-      return TRUE;
+
+  if (Taiga.Updater.IsRestartRequired()) {
+    if (MainDialog.IsWindow()) {
+      MainDialog.PostMessage(WM_CLOSE);
     } else {
-      // Load data again
-      Taiga.LoadData();
+      Taiga.Uninitialize();
     }
   } else {
-    if (g_hMain) {
-      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-      dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
-      dlg.SetExpandedInformation(L"Current version: " APP_VERSION);
-      dlg.AddButton(L"OK", IDOK);
-      dlg.Show(g_hMain);
-    }
+    // Create/activate main window
+    ExecuteAction(L"MainDialog");
   }
 
-  // Create/activate main window
-  ExecuteAction(L"MainDialog");
   return TRUE;
 }
 
