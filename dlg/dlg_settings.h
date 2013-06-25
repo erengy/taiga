@@ -57,7 +57,9 @@ public:
 
 private:
   class TreeView : public win32::TreeView {
+  public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    std::map<int, HTREEITEM> items;
   } tree_;
   win32::Tab tab_;
 

@@ -613,4 +613,33 @@
 		<resolution>720p</resolution>
 		<title>Macross Frontier - Sayonara no Tsubasa</title>
 	</file>
+	<file>
+		<file>[Nubles] Space Battleship Yamato 2199 (2012) episode 18 (720p 8 bit AAC)[BA70BA9C]</file>
+		<audio>AAC</audio>
+		<checksum>BA70BA9C</checksum>
+		<group>Nubles</group>
+		<number>18</number>
+		<resolution>720p</resolution>
+		<title>Space Battleship Yamato 2199 (2012)</title>
+		<video>8 bit</video>
+	</file>
+	<file>
+		<file>[Nubles] Space Battleship Yamato 2199 (2012) episode 18 (720p 10 bit AAC)[1F56D642]</file>
+		<audio>AAC</audio>
+		<checksum>1F56D642</checksum>
+		<group>Nubles</group>
+		<number>18</number>
+		<resolution>720p</resolution>
+		<title>Space Battleship Yamato 2199 (2012)</title>
+		<video>10 bit</video>
+	</file>
+	<file>
+		<file>[FFF] Red Data Girl - 10v0 [29EA865B].mkv</file>
+		<checksum>29EA865B</checksum>
+		<format>MKV</format>
+		<group>FFF</group>
+		<number>10</number>
+		<title>Red Data Girl</title>
+		<version>0</version>
+	</file>
 </recognition>

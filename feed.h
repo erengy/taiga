@@ -93,7 +93,7 @@ public:
 
   bool Check(const wstring& source, bool automatic = false);
   bool Download(int index);
-  int ExamineData();
+  bool ExamineData();
   wstring GetDataPath();
   HICON GetIcon();
   bool Load();
@@ -202,7 +202,9 @@ public:
   void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
     bool enabled = true, const wstring& name = L"");
   void Cleanup();
-  int Filter(Feed& feed);
+  void Filter(Feed& feed, bool preferences);
+  bool IsItemDownloadAvailable(Feed& feed);
+  void MarkNewEpisodes(Feed& feed);
 
   wstring CreateNameFromConditions(const FeedFilter& filter);
   wstring TranslateCondition(const FeedFilterCondition& condition);

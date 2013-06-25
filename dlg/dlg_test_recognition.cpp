@@ -33,7 +33,7 @@ RecognitionTestDialog RecognitionTest;
 
 BOOL RecognitionTestDialog::OnInitDialog() {
   // Initialize
-  wstring file = Taiga.GetDataPath() + L"RecognitionTest.xml";
+  wstring file = Taiga.GetDataPath() + L"test\\recognition.xml";
   episodes_.clear();
   test_episodes_.clear();
   list_.DeleteAllItems();

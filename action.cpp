@@ -243,7 +243,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"AddToListAs") {
     int status = ToInt(body);
-    int anime_id = static_cast<int>(lParam);
+    int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     // Add item to list
     anime_item->AddtoUserList();
@@ -326,7 +326,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     // Search for all list items
     if (body.empty()) {
       size_t i = 0;
-      for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+      // Search is made in reverse to give new items priority. The user is
+      // probably more interested in them than the older titles.
+      for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
         if (!silent) TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
         switch (it->second.GetMyStatus()) {
           case mal::MYSTATUS_WATCHING:
@@ -514,12 +516,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditStatus") {
     EventItem event_item;
     event_item.status = ToInt(body);
-    switch (AnimeDatabase.GetCurrentItem()->GetAiringStatus()) {
+    auto anime_item = AnimeDatabase.GetCurrentItem();
+    switch (anime_item->GetAiringStatus()) {
       case mal::STATUS_AIRING:
         if (*event_item.status == mal::MYSTATUS_COMPLETED) {
           MessageBox(g_hMain, 
             L"This anime is still airing, you cannot set it as completed.", 
-            AnimeDatabase.GetCurrentItem()->GetTitle().c_str(), MB_ICONERROR);
+            anime_item->GetTitle().c_str(), MB_ICONERROR);
           return;
         }
         break;
@@ -529,7 +532,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         if (*event_item.status != mal::MYSTATUS_PLANTOWATCH) {
           MessageBox(g_hMain, 
             L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
-            AnimeDatabase.GetCurrentItem()->GetTitle().c_str(), MB_ICONERROR);
+            anime_item->GetTitle().c_str(), MB_ICONERROR);
           return;
         }
         break;
@@ -538,9 +541,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
     switch (*event_item.status) {
       case mal::MYSTATUS_COMPLETED:
-        event_item.episode = AnimeDatabase.GetCurrentItem()->GetEpisodeCount();
+        event_item.episode = anime_item->GetEpisodeCount();
         if (*event_item.episode == 0) event_item.episode.Reset();
-        if (!mal::IsValidDate(AnimeDatabase.GetCurrentItem()->GetMyDate(anime::DATE_END)))
+        if (!mal::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
           event_item.date_finish = mal::TranslateDateForApi(GetDate());
         break;
     }

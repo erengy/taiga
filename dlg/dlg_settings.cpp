@@ -153,19 +153,25 @@ BOOL SettingsDialog::OnInitDialog() {
   tab_.Attach(GetDlgItem(IDC_TAB_PAGES));
   
   // Add tree items
-  tree_.InsertItem(L"Services", ICON24_GLOBE, SECTION_SERVICES, nullptr);
-  tree_.InsertItem(L"Library", ICON24_LIBRARY, SECTION_LIBRARY, nullptr);
-  tree_.InsertItem(L"Application", ICON24_APPLICATION, SECTION_APPLICATION, nullptr);
-  tree_.InsertItem(L"Recognition", ICON24_RECOGNITION, SECTION_RECOGNITION, nullptr);
-  tree_.InsertItem(L"Sharing", ICON24_SHARING, SECTION_SHARING, nullptr);
-  tree_.InsertItem(L"Torrents", ICON24_FEED, SECTION_TORRENTS, nullptr);
+  #define TREE_INSERTITEM(s, t, i) \
+    tree_.items[s] = tree_.InsertItem(t, i, s, nullptr);
+  TREE_INSERTITEM(SECTION_SERVICES, L"Services", ICON24_GLOBE);
+  TREE_INSERTITEM(SECTION_LIBRARY, L"Library", ICON24_LIBRARY);
+  TREE_INSERTITEM(SECTION_APPLICATION, L"Application", ICON24_APPLICATION);
+  TREE_INSERTITEM(SECTION_RECOGNITION, L"Recognition", ICON24_RECOGNITION);
+  TREE_INSERTITEM(SECTION_SHARING, L"Sharing", ICON24_SHARING);
+  TREE_INSERTITEM(SECTION_TORRENTS, L"Torrents", ICON24_FEED);
+  #undef TREE_INSERTITEM
 
   // Set title font
   SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, 
                      reinterpret_cast<WPARAM>(UI.font_bold.Get()), TRUE);
 
-  // Select current section
+  // Select current section and page
+  int current_page = current_page_;
+  tree_.SelectItem(tree_.items[current_section_]);
   SetCurrentSection(current_section_);
+  SetCurrentPage(current_page);
   
   return TRUE;
 }

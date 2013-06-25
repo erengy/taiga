@@ -134,16 +134,21 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         listview.dragging = false;
         ReleaseCapture();
         
-        int tab_index = tab.HitTest();
-        if (tab_index > -1) {
-          int status = tab.GetItemParam(tab_index);
-          ExecuteAction(L"EditStatus(" + ToWstr(status) + L")");
-          break;
-        }
-        
         auto anime_item = AnimeDatabase.GetCurrentItem();
         if (!anime_item)
           break;
+
+        int tab_index = tab.HitTest();
+        if (tab_index > -1) {
+          int status = tab.GetItemParam(tab_index);
+          if (anime_item->IsInList()) {
+            ExecuteAction(L"EditStatus(" + ToWstr(status) + L")");
+          } else {
+            ExecuteAction(L"AddToListAs(" + ToWstr(status) + L")");
+          }
+          break;
+        }
+
         wstring text = Settings.Program.List.english_titles ? 
           anime_item->GetEnglishTitle(true) : anime_item->GetTitle();
 
@@ -423,7 +428,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       AnimeDatabase.SetCurrentId(anime_id);
       listview.button_visible[0] = false;
       listview.button_visible[1] = false;
-      if (lplv->uNewState != 0) {
+      if (lplv->iItem > -1 && lplv->uNewState & LVIS_SELECTED) {
         auto anime_item = AnimeDatabase.GetCurrentItem();
         if (anime_item && anime_item->IsInList()) {
           int my_status = anime_item->GetMyStatus();
@@ -682,7 +687,10 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
   }
 
   // Draw buttons
-  if (uItemState & CDIS_SELECTED) {
+  if (uItemState & CDIS_SELECTED ||
+      // When the list loses its focus, uItemState becomes 0 but LVN_ITEMCHANGED
+      // is not sent. This is why we compare the IDs as a secondary measure.
+      AnimeDatabase.GetCurrentId() == anime_item->GetId()) {
     // Draw decrement button
     if (button_visible[0]) {
       rcButton = rcBar;

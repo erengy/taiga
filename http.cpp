@@ -383,8 +383,7 @@ BOOL HttpClient::OnReadComplete() {
       Feed* feed = reinterpret_cast<Feed*>(GetParam());
       if (feed) {
         feed->Load();
-        int torrent_count = feed->ExamineData();
-        if (torrent_count > 0) {
+        if (feed->ExamineData()) {
           status = L"There are new torrents available!";
         } else {
           status = L"No new torrents found.";

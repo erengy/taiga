@@ -99,10 +99,10 @@ bool Feed::Download(int index) {
   file = GetDataPath() + file;
 
   return client.Get(win32::Url(items[index].link), file, dwMode, 
-    reinterpret_cast<LPARAM>(this));
+                    reinterpret_cast<LPARAM>(this));
 }
 
-int Feed::ExamineData() {
+bool Feed::ExamineData() {
   for (size_t i = 0; i < items.size(); i++) {
     // Examine title and compare with anime list items
     Meow.ExamineTitle(items[i].title, items[i].episode_data, true, true, true, true, false);
@@ -127,8 +127,13 @@ int Feed::ExamineData() {
     items.at(i).index = i;
 
   // Filter
-  int count = Aggregator.filter_manager.Filter(*this);
-  return count;
+  Aggregator.filter_manager.MarkNewEpisodes(*this);
+  // Preferences have lower priority, so we need to handle other filters
+  // first in order to avoid discarding items that we actually want.
+  Aggregator.filter_manager.Filter(*this, false);
+  Aggregator.filter_manager.Filter(*this, true);
+  
+  return Aggregator.filter_manager.IsItemDownloadAvailable(*this);
 }
 
 wstring Feed::GetDataPath() {

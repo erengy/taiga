@@ -23,6 +23,7 @@
 #include "anime.h"
 #include "anime_db.h"
 #include "common.h"
+#include "foreach.h"
 #include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
@@ -95,6 +96,8 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION:
       element = item.episode_data.version;
+      if (element.empty()) element = L"1";
+      is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
       if (anime) element = ToWstr(anime->IsEpisodeAvailable(
@@ -338,7 +341,7 @@ FeedFilterManager::FeedFilterManager() {
   ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, false, 
     L"Prefer new versions", 
     L"Prefers v2 files when there are earlier releases of the same episode as well");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION, FEED_FILTER_OPERATOR_IS, L"v2");
+  ADD_CONDITION(FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION, FEED_FILTER_OPERATOR_ISGREATERTHAN, L"1");
 
   /* Default filters */
 
@@ -412,56 +415,42 @@ void FeedFilterManager::Cleanup() {
   }
 }
 
-int FeedFilterManager::Filter(Feed& feed) {
-  bool download = true;
-  anime::Item* anime_item = nullptr;
-  int count = 0, number = 0;
-  
+void FeedFilterManager::Filter(Feed& feed, bool preferences) {
   for (auto item = feed.items.begin(); item != feed.items.end(); ++item) {
-    download = true;
-    anime_item = AnimeDatabase.FindItem(item->episode_data.anime_id);
-    number = GetEpisodeHigh(item->episode_data.number);
-    
-    if (anime_item && number > anime_item->GetMyLastWatchedEpisode()) {
-      item->episode_data.new_episode = true;
-    }
+    if (!item->download)
+      continue;
 
-    if (!item->download) continue;
-
-    // Apply filters
     if (Settings.RSS.Torrent.Filters.global_enabled) {
-      // Preferences have lower priority, so we need to handle other filters
-      // first in order to avoid discarding items that we actually want.
-      for (auto filter = filters.begin(); download && filter != filters.end(); ++filter) {
-        if (filter->action == FEED_FILTER_ACTION_PREFER)
+      for (auto filter = filters.begin(); item->download && filter != filters.end(); ++filter) {
+        if (preferences != (filter->action == FEED_FILTER_ACTION_PREFER))
           continue;
         if (!filter->Filter(feed, *item, true))
-          download = false;
+          item->download = false;
       }
-      // Handle preferences
-      for (auto filter = filters.begin(); download && filter != filters.end(); ++filter) {
-        if (filter->action != FEED_FILTER_ACTION_PREFER)
-          continue;
-        if (!filter->Filter(feed, *item, true))
-          download = false;
-      }
-    }
-    
-    // Check archive
-    if (download) {
-      download = !Aggregator.SearchArchive(item->title);
     }
 
-    // Mark item
-    if (download) {
-      item->download = true;
-      count++;
-    } else {
-      item->download = false;
+    if (item->download)
+      item->download = !Aggregator.SearchArchive(item->title);
+  }
+}
+
+bool FeedFilterManager::IsItemDownloadAvailable(Feed& feed) {
+  foreach_c_(item, feed.items)
+    if (item->download)
+      return true;
+
+  return false;
+}
+
+void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
+  for (auto item = feed.items.begin(); item != feed.items.end(); ++item) {
+    auto anime_item = AnimeDatabase.FindItem(item->episode_data.anime_id);
+    if (anime_item) {
+      int number = GetEpisodeHigh(item->episode_data.number);
+      if (number > anime_item->GetMyLastWatchedEpisode())
+        item->episode_data.new_episode = true;
     }
   }
-
-  return count;
 }
 
 // =============================================================================
