@@ -132,6 +132,8 @@ bool Feed::ExamineData() {
   // first in order to avoid discarding items that we actually want.
   Aggregator.filter_manager.Filter(*this, false);
   Aggregator.filter_manager.Filter(*this, true);
+  // Archived items must be discarded after other filters are processed.
+  Aggregator.filter_manager.FilterArchived(*this);
   
   return Aggregator.filter_manager.IsItemDownloadAvailable(*this);
 }

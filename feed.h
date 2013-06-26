@@ -203,6 +203,7 @@ public:
     bool enabled = true, const wstring& name = L"");
   void Cleanup();
   void Filter(Feed& feed, bool preferences);
+  void FilterArchived(Feed& feed);
   bool IsItemDownloadAvailable(Feed& feed);
   void MarkNewEpisodes(Feed& feed);
 

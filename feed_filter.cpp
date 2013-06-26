@@ -416,22 +416,26 @@ void FeedFilterManager::Cleanup() {
 }
 
 void FeedFilterManager::Filter(Feed& feed, bool preferences) {
+  if (!Settings.RSS.Torrent.Filters.global_enabled)
+    return;
+
   for (auto item = feed.items.begin(); item != feed.items.end(); ++item) {
     if (!item->download)
       continue;
 
-    if (Settings.RSS.Torrent.Filters.global_enabled) {
-      for (auto filter = filters.begin(); item->download && filter != filters.end(); ++filter) {
-        if (preferences != (filter->action == FEED_FILTER_ACTION_PREFER))
-          continue;
-        if (!filter->Filter(feed, *item, true))
-          item->download = false;
-      }
+    for (auto filter = filters.begin(); item->download && filter != filters.end(); ++filter) {
+      if (preferences != (filter->action == FEED_FILTER_ACTION_PREFER))
+        continue;
+      if (!filter->Filter(feed, *item, true))
+        item->download = false;
     }
+  }
+}
 
+void FeedFilterManager::FilterArchived(Feed& feed) {
+  for (auto item = feed.items.begin(); item != feed.items.end(); ++item)
     if (item->download)
       item->download = !Aggregator.SearchArchive(item->title);
-  }
 }
 
 bool FeedFilterManager::IsItemDownloadAvailable(Feed& feed) {
