@@ -46,14 +46,15 @@ BOOL PageBaseInfo::OnInitDialog() {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
       reinterpret_cast<WPARAM>(UI.font_bold.Get()), FALSE);
   }
-  
+
   return TRUE;
 }
 
 INT_PTR PageBaseInfo::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC:
-      return reinterpret_cast<INT_PTR>(::GetStockObject(WHITE_BRUSH));
+      if (!parent->IsTabVisible())
+        return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
@@ -65,7 +66,8 @@ void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint background
   rect.Copy(lpps->rcPaint);
-  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+  if (!parent->IsTabVisible())
+    dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 
   // Paint header lines
   for (int i = 0; i < 3; i++) {

@@ -47,6 +47,7 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   BOOL PreTranslateMessage(MSG* pMsg);
 
+  bool IsTabVisible() const;
   int GetCurrentId() const;
   void SetCurrentId(int anime_id);
   void SetCurrentPage(int index);

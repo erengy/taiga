@@ -334,10 +334,21 @@ bool BrowseForFolderVista(HWND hwnd, const wstring& title, const wstring& defaul
 
     if (!default_folder.empty()) {
       IShellItem* pShellItem;
-      HRESULT hr = SHCreateItemFromParsingName(default_folder.c_str(),
-                                               nullptr,
-                                               IID_IShellItem,
-                                               reinterpret_cast<void**>(&pShellItem));
+      HRESULT hr = NULL;
+
+      typedef HRESULT (WINAPI *_SHCreateItemFromParsingName)(
+        PCWSTR pszPath, IBindCtx *pbc, REFIID riid, void **ppv);
+      HMODULE hShell32 = LoadLibrary(L"shell32.dll");
+      if (hShell32 != NULL) {
+        _SHCreateItemFromParsingName proc = 
+          (_SHCreateItemFromParsingName)GetProcAddress(hShell32, "SHCreateItemFromParsingName");
+        if (proc != NULL) {
+          hr = (proc)(default_folder.c_str(), nullptr, IID_IShellItem,
+                      reinterpret_cast<void**>(&pShellItem));
+        }
+        FreeLibrary(hShell32);
+      }
+
       if (SUCCEEDED(hr)) {
         pFileDialog->SetDefaultFolder(pShellItem);
         pShellItem->Release();

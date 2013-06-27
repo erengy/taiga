@@ -432,8 +432,9 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         auto anime_item = AnimeDatabase.GetCurrentItem();
         if (anime_item && anime_item->IsInList()) {
           int my_status = anime_item->GetMyStatus();
-          if (my_status == mal::MYSTATUS_COMPLETED ||
-              my_status == mal::MYSTATUS_DROPPED)
+          if (my_status == mal::MYSTATUS_DROPPED)
+            break;
+          if (my_status == mal::MYSTATUS_COMPLETED && !anime_item->GetMyRewatching())
             break;
           if (anime_item->GetMyLastWatchedEpisode() > 0)
             listview.button_visible[0] = true;

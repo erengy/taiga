@@ -30,6 +30,8 @@ enum AnimeInfoPageType {
   INFOPAGE_MYINFO
 };
 
+class AnimeDialog;
+
 class PageBaseInfo : public win32::Dialog {
  public:
   PageBaseInfo();
@@ -39,6 +41,8 @@ class PageBaseInfo : public win32::Dialog {
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
+
+  AnimeDialog* parent;
 
  protected:
   int anime_id_;

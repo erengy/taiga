@@ -221,6 +221,7 @@ BOOL HttpClient::OnReadComplete() {
       AnimeDatabase.LoadList(true); // Here we assume that MAL provides up-to-date series information in malappinfo.php
       MainDialog.ChangeStatus(L"List download completed.");
       AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
+      AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
       AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
       HistoryDialog.RefreshList();
       SearchDialog.RefreshList();

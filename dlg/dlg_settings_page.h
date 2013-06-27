@@ -23,7 +23,7 @@
 #include "../win32/win_dialog.h"
 
 enum SettingsPages {
-  PAGE_APP_BEHAVIOR,
+  PAGE_APP_BEHAVIOR = 1,
   PAGE_APP_CONNECTION,
   PAGE_APP_INTERFACE,
   PAGE_APP_LIST,

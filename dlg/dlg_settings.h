@@ -26,7 +26,7 @@
 #include "../win32/win_dialog.h"
 
 enum SettingsSections {
-  SECTION_SERVICES,
+  SECTION_SERVICES = 1,
   SECTION_LIBRARY,
   SECTION_APPLICATION,
   SECTION_RECOGNITION,

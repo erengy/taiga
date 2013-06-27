@@ -180,8 +180,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   wParam is the initial section.
   //   lParam is the initial page.
   } else if (action == L"Settings") {
-    SettingsDialog.SetCurrentSection(wParam);
-    SettingsDialog.SetCurrentPage(lParam);
+    if (wParam > 0)
+      SettingsDialog.SetCurrentSection(wParam);
+    if (lParam > 0)
+      SettingsDialog.SetCurrentPage(lParam);
     if (!SettingsDialog.IsWindow()) {
       SettingsDialog.Create(IDD_SETTINGS, g_hMain, true);
     } else {

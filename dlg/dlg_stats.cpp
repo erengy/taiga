@@ -52,7 +52,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
   switch (uMsg) {
     case WM_CTLCOLORSTATIC:
-      return reinterpret_cast<INT_PTR>(GetStockObject(WHITE_BRUSH));
+      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
 
     case WM_DRAWITEM: {
       // Draw score bars

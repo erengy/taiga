@@ -83,6 +83,8 @@ BOOL AnimeDialog::OnInitDialog() {
   }
 
   // Initialize pages
+  page_series_info.parent = this;
+  page_my_info.parent = this;
   page_series_info.Create(IDD_ANIME_INFO_PAGE01, m_hWindow, false);
   switch (mode_) {
     case DIALOG_MODE_ANIME_INFORMATION:
@@ -360,6 +362,10 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
 // =============================================================================
 
+bool AnimeDialog::IsTabVisible() const {
+  return tab_.IsVisible();
+}
+
 int AnimeDialog::GetCurrentId() const {
   return anime_id_;
 }
@@ -480,7 +486,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     }
     if (content.empty()) {
       content = L"You haven't watched anything recently. "
-                L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?";
+                L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?\n\n";
       link_count++;
     } else {
       content = L"Recently watched:\n" + content + L"\n";

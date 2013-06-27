@@ -80,7 +80,7 @@ void SettingsDialog::SetCurrentSection(int index) {
   if (!IsWindow())
     return;
 
-  SetDlgItemText(IDC_STATIC_TITLE, SECTION_TITLE[index]);
+  SetDlgItemText(IDC_STATIC_TITLE, SECTION_TITLE[index - 1]);
 
   tab_.DeleteAllItems();
   switch (index) {
