@@ -363,7 +363,7 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 // =============================================================================
 
 bool AnimeDialog::IsTabVisible() const {
-  return tab_.IsVisible();
+  return tab_.IsVisible() != FALSE;
 }
 
 int AnimeDialog::GetCurrentId() const {

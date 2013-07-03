@@ -140,6 +140,15 @@ BOOL HttpClient::OnHeadersAvailable(win32::http_header_t& headers) {
 }
 
 BOOL HttpClient::OnRedirect(wstring address) {
+  switch (GetClientMode()) {
+    case HTTP_UpdateDownload: {
+      wstring file = address.substr(address.find_last_of(L"/") + 1);
+      m_File = GetPathOnly(m_File) + file;
+      Taiga.Updater.SetDownloadPath(m_File);
+      break;
+    }
+  }
+
 #ifdef _DEBUG
       MainDialog.ChangeStatus(L"Redirecting... (" + address + L")");
 #endif

@@ -23,10 +23,12 @@
 
 #include "common.h"
 #include "foreach.h"
+#include "settings.h"
 #include "string.h"
 #include "taiga.h"
 #include "xml.h"
 
+#include "dlg/dlg_main.h"
 #include "dlg/dlg_update.h"
 
 #include "win32/win_taskdialog.h"
@@ -43,14 +45,24 @@ UpdateHelper::UpdateHelper()
 
 bool UpdateHelper::Check(win32::App& app) {
   app_ = &app;
-  //win32::Url url(L"taiga.erengy.com/update.php");
-  win32::Url url(L"dl.dropboxusercontent.com/u/2298899/Taiga/update_beta.xml"); // TEMP
-  return client.Get(url, L"", HTTP_UpdateCheck);
+
+  wstring address = L"taiga.erengy.com/update.php?";
+  std::map<wstring, wstring> parameters;
+  parameters[L"username"] = Settings.Account.MAL.user;
+  parameters[L"version"] = APP_VERSION;
+  parameters[L"check"] = MainDialog.IsWindow() ? L"manual" : L"auto";
+  foreach_c_(parameter, parameters) {
+    if (parameter != parameters.begin()) address += L"&";
+    address += parameter->first + L"=" + EncodeUrl(parameter->second);
+  }
+  
+  return client.Get(win32::Url(address), L"", HTTP_UpdateCheck);
 }
 
 bool UpdateHelper::ParseData(wstring data) {
   // Reset values
   items_.clear();
+  download_path_.clear();
   latest_guid_.clear();
   restart_required_ = false;
   update_available_ = false;
@@ -127,9 +139,11 @@ bool UpdateHelper::IsDownloadAllowed() const {
       return false;
   
   } else {
-    dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
-    dlg.AddButton(L"OK", IDOK);
-    dlg.Show(g_hMain);
+    if (MainDialog.IsWindow()) {
+      dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
+      dlg.AddButton(L"OK", IDOK);
+      dlg.Show(g_hMain);
+    }
     return false;
   }
 
@@ -141,25 +155,25 @@ bool UpdateHelper::Download() {
   if (!feed_item) return false;
 
   // TODO: Use TEMP folder path
-  wstring path = CheckSlash(app_->GetCurrentDirectory());
-  path += GetFileName(feed_item->link);
+  download_path_ = CheckSlash(app_->GetCurrentDirectory());
+  download_path_ += GetFileName(feed_item->link);
 
   win32::Url url(feed_item->link);
   
-  return client.Get(url, path, HTTP_UpdateDownload);
+  return client.Get(url, download_path_, HTTP_UpdateDownload);
 }
 
 bool UpdateHelper::RunInstaller() {
   auto feed_item = FindItem(latest_guid_);
   if (!feed_item) return false;
-  
-  // TODO: Use TEMP folder path
-  wstring path = CheckSlash(app_->GetCurrentDirectory());
-  path += GetFileName(feed_item->link);
 
   wstring parameters = L"/S /D=" + app_->GetCurrentDirectory();
-  restart_required_ = Execute(path, parameters);
+  restart_required_ = Execute(download_path_, parameters);
   return restart_required_;
+}
+
+void UpdateHelper::SetDownloadPath(const wstring& path) {
+  download_path_ = path;
 }
 
 const GenericFeedItem* UpdateHelper::FindItem(const wstring& guid) const {

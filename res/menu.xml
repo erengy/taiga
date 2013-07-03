@@ -186,6 +186,7 @@
 		<item name="2011" sub="Season2011"/>
 	</menu>
 	<menu name="Season2013">
+		<item name="Summer 2013" action="Season_Load(2013_summer.xml)"/>
 		<item name="Spring 2013" action="Season_Load(2013_spring.xml)"/>
 	</menu>
 	<menu name="Season2012">

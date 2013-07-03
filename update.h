@@ -37,6 +37,7 @@ public:
   bool IsUpdateAvailable() const;
   bool ParseData(wstring data);
   bool RunInstaller();
+  void SetDownloadPath(const wstring& path);
 
   HttpClient client;
 
@@ -46,6 +47,7 @@ private:
 
   win32::App* app_;
   vector<GenericFeedItem> items_;
+  wstring download_path_;
   wstring latest_guid_;
   bool restart_required_;
   bool update_available_;
