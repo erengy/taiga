@@ -982,9 +982,9 @@ wchar_t GetMostCommonCharacter(const wstring& str) {
   
   char_index = 0;
   for (auto it = char_map.begin(); it != char_map.end(); ++it) {
-    if (it->second * 2 >= char_map.at(char_index).second &&
-      GetCommonCharIndex(it->first) < GetCommonCharIndex(char_map.at(char_index).first)) {
-        char_index = it - char_map.begin();
+    if (it->second * 1.8f >= char_map.at(char_index).second &&
+        GetCommonCharIndex(it->first) < GetCommonCharIndex(char_map.at(char_index).first)) {
+      char_index = it - char_map.begin();
     }
   }
 

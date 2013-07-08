@@ -575,7 +575,11 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     if (!CurrentEpisode.group.empty())
       content += L" by " + CurrentEpisode.group;
     content += L"\n";
-    content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
+    if (anime_item->IsInList()) {
+      content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
+    } else {
+      content += L"<a href=\"AddToListAs(1)\">Add to list</a>";
+    }
     content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
     if (anime_item->GetEpisodeCount() == 0 || 
         anime_item->GetEpisodeCount() > episode_number) {

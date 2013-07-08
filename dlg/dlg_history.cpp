@@ -244,7 +244,7 @@ bool HistoryDialog::RemoveItems() {
     while (list_.GetSelectedCount() > 0) {
       int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
       list_.DeleteItem(item_index);
-      if (item_index < History.queue.items.size()) {
+      if (item_index < static_cast<int>(History.queue.items.size())) {
         item_index = History.queue.items.size() - item_index - 1;
         History.queue.Remove(item_index, false, false, false);
       } else {

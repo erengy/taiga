@@ -284,7 +284,7 @@ void EventQueue::Remove(int index, bool save, bool refresh, bool to_history) {
     
     if (to_history && event_item->episode) {
       history->items.push_back(*event_item);
-      if (history->limit > 0 && history->items.size() > history->limit) {
+      if (history->limit > 0 && static_cast<int>(history->items.size()) > history->limit) {
         history->items.erase(history->items.begin());
       }
     }

@@ -333,7 +333,12 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
 
   #define VALIDATE(x, y) anime_item ? x : y
   #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeUrl(x)) : EscapeScriptEntities(x)
-  #define REPLACE(x, y) if (var == x) { str.replace(pos_var, var.length() + 2, y); continue; }
+  #define REPLACE(x, y) \
+    if (var == x) { \
+      str.replace(pos_var, var.length() + 2, y); \
+      pos_var +=  int(wstring(y).length()) - int(wstring(x).length()) + 1; \
+      continue; \
+    }
 
   // Prepare episode value
   wstring episode_number = ToWstr(GetEpisodeHigh(episode.number));

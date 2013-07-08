@@ -61,18 +61,32 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         win32::Rect rect = dis->rcItem;
         win32::Dc dc = dis->hDC;
 
-        dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+        dc.FillRect(dis->rcItem, ::GetSysColor(COLOR_WINDOW));
         
         int bar_height = GetTextHeight(dc.Get());
-        int bar_left = rect.left;
         int bar_max = rect.Width() * 3 / 4;
         
         for (int i = 10; i > 0; i--) {
-          int bar_width = static_cast<int>(bar_max * Stats.score_distribution[i]);
-          if (i < 10) rect.top += bar_height;
-          rect.bottom = rect.top + bar_height - 2;
-          rect.right = rect.left + bar_width;
-          dc.FillRect(rect, theme::COLOR_DARKBLUE);
+          if (i < 10)
+            rect.top += bar_height;
+
+          if (Stats.score_distribution[i] > 0.0f) {
+            int bar_width = static_cast<int>(bar_max * Stats.score_distribution[i]);
+            rect.bottom = rect.top + bar_height - 2;
+            rect.right = rect.left + bar_width;
+            dc.FillRect(rect, theme::COLOR_DARKBLUE);
+          }
+
+          if (Stats.score_count[i] > 0.0f) {
+            wstring text = ToWstr(Stats.score_count[i]);
+            win32::Rect rect_text = rect;
+            rect_text.left = rect_text.right += 8;
+            rect_text.right = dis->rcItem.right;
+            dc.EditFont(nullptr, 7);
+            dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+            dc.DrawText(text.c_str(), text.length(), rect_text,
+                        DT_SINGLELINE | DT_VCENTER);
+          }
         }
         
         dc.DetachDC();

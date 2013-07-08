@@ -27,8 +27,8 @@
 
 #define APP_NAME    L"Taiga"
 #define APP_TITLE   L"Taiga 1.0b"
-#define APP_VERSION L"1.0.215 beta"
-#define APP_BUILD   L"2013-07-03"
+#define APP_VERSION L"1.0.216 beta"
+#define APP_BUILD   L"2013-07-08"
 
 #ifndef PORTABLE
 #define PORTABLE
@@ -41,7 +41,8 @@ enum PlayStatus {
 };
 
 enum TipType {
-  TIPTYPE_NORMAL,
+  TIPTYPE_DEFAULT,
+  TIPTYPE_NOWPLAYING,
   TIPTYPE_SEARCH,
   TIPTYPE_TORRENT,
   TIPTYPE_UPDATEFAILED

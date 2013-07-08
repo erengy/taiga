@@ -411,13 +411,21 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       }
       break;
     }
-    
+
     // Column click
     case LVN_COLUMNCLICK: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       int order = 1;
       if (lplv->iSubItem == listview.GetSortColumn()) order = listview.GetSortOrder() * -1;
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ListViewCompareProc);
+      break;
+    }
+
+    // Delete all items
+    case LVN_DELETEALLITEMS: {
+      AnimeDatabase.SetCurrentId(anime::ID_UNKNOWN);
+      listview.button_visible[0] = false;
+      listview.button_visible[1] = false;
       break;
     }
 

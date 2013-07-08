@@ -53,7 +53,7 @@ Taiga::Taiga()
       is_sharing_enabled(true),
       is_sync_enabled(true),
       logged_in(false),
-      current_tip_type(TIPTYPE_NORMAL),
+      current_tip_type(TIPTYPE_DEFAULT),
       play_status(PLAYSTATUS_STOPPED),
       ticker_media(0),
       ticker_memory(0),

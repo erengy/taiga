@@ -76,7 +76,7 @@ void SettingsPage::Create() {
   }
 
   win32::Dialog::Create(resource_id, parent->GetWindowHandle(), false);
-  SetPosition(nullptr, rect_page);
+  SetPosition(nullptr, rect_page, 0);
   EnableThemeDialogTexture(GetWindowHandle(), ETDT_ENABLETAB);
 }
 
@@ -585,149 +585,147 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
 // =============================================================================
 
-INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uMsg) {
-    case WM_NOTIFY: {
-      switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
-        case NM_CLICK: {
-          switch (reinterpret_cast<LPNMHDR>(lParam)->idFrom) {
-            // Execute link
-            case IDC_LINK_MAL:
-            case IDC_LINK_TWITTER: {
-              PNMLINK pNMLink = reinterpret_cast<PNMLINK>(lParam);
-              ExecuteAction(pNMLink->item.szUrl);
-              return TRUE;
-            }
-            // Open themes folder
-            case IDC_LINK_THEMES: {
-              wstring theme_name;
-              GetDlgItemText(IDC_COMBO_THEME, theme_name);
-              wstring path = Taiga.GetDataPath() + L"theme\\" + theme_name;
-              Execute(path);
-              return TRUE;
-            }
-          }
-        }
+void SettingsPage::OnDropFiles(HDROP hDropInfo) {
+  if (index != PAGE_LIBRARY_FOLDERS)
+    return;
+  
+  WCHAR szFileName[MAX_PATH + 1];
+  UINT nFiles = DragQueryFile(hDropInfo, static_cast<UINT>(-1), nullptr, 0);
+  win32::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
+  for (UINT i = 0; i < nFiles; i++) {
+    ZeroMemory(szFileName, MAX_PATH + 1);
+    DragQueryFile(hDropInfo, i, (LPWSTR)szFileName, MAX_PATH + 1);
+    if (GetFileAttributes(szFileName) & FILE_ATTRIBUTE_DIRECTORY) {
+      list.InsertItem(list.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, szFileName, 0);
+      list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
+    }
+  }
+  list.SetWindowHandle(nullptr);
+}
 
-        // List item select
-        case LVN_ITEMCHANGED: {
-          LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-          if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
-            EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
-          } else if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
-            EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
-          }
-          break;
-        }
+LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  switch (pnmh->code) {
+    case HDN_ITEMSTATEICONCLICK: {
+      auto nmh = reinterpret_cast<LPNMHEADER>(pnmh);
+      SetText(ToWstr(nmh->iItem));
+      break;
+    }
 
-        // Text callback
-        case LVN_GETDISPINFO: {
-          NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
-          auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
-          if (!anime_item) break;
-          switch (plvdi->item.iSubItem) {
-            case 0: // Anime title
-              plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
-              break;
-          }
-          break;
-        }
-
-        // Double click
-        case NM_DBLCLK: {
-          LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
-          if (lpnmitem->iItem == -1) break;
-          // Anime folders
-          if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
-            win32::ListView list = lpnmitem->hdr.hwndFrom;
-            WCHAR buffer[MAX_PATH];
-            list.GetItemText(lpnmitem->iItem, 0, buffer);
-            Execute(buffer);
-            list.SetWindowHandle(nullptr);
-          // Media players
-          } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-            Execute(MediaPlayers.items[lpnmitem->iItem].GetPath());
-          // Streaming media providers
-          } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
-            switch (lpnmitem->iItem) {
-              case 0:
-                ExecuteLink(L"http://www.animenewsnetwork.com/video/");
-                break;
-              case 1:
-                ExecuteLink(L"http://www.crunchyroll.com");
-                break;
-              case 2:
-                ExecuteLink(L"http://www.veoh.com");
-                break;
-              case 3:
-                ExecuteLink(L"http://www.vizanime.com");
-                break;
-              case 4:
-                ExecuteLink(L"http://www.youtube.com");
-                break;
-            }
-          // Torrent filters
-          } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
-            win32::ListView list = lpnmitem->hdr.hwndFrom;
-            FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(lpnmitem->iItem));
-            if (feed_filter) {
-              FeedFilterDialog.filter = *feed_filter;
-              FeedFilterDialog.Create(IDD_FEED_FILTER, parent->GetWindowHandle());
-              if (!FeedFilterDialog.filter.conditions.empty()) {
-                *feed_filter = FeedFilterDialog.filter;
-                parent->RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
-                list.SetSelectedItem(lpnmitem->iItem);
-              }
-            }
-            list.SetWindowHandle(nullptr);
-          }
+    case NM_CLICK: {
+      switch (pnmh->idFrom) {
+        // Execute link
+        case IDC_LINK_MAL:
+        case IDC_LINK_TWITTER: {
+          PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
+          ExecuteAction(pNMLink->item.szUrl);
           return TRUE;
         }
-
-        // Right click
-        case NM_RCLICK: {
-          LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
-          if (lpnmitem->iItem == -1) break;
-          win32::ListView list = lpnmitem->hdr.hwndFrom;
-          // Media players
-          if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-            wstring answer = UI.Menus.Show(hwnd, 0, 0, L"GenericList");
-            for (int i = 0; i < list.GetItemCount(); i++) {
-              if (answer == L"SelectAll()") {
-                list.SetCheckState(i, TRUE);
-              } else if (answer == L"DeselectAll()") {
-                list.SetCheckState(i, FALSE);
-              }
-            }
-          }
-          list.SetWindowHandle(nullptr);
+        // Open themes folder
+        case IDC_LINK_THEMES: {
+          wstring theme_name;
+          GetDlgItemText(IDC_COMBO_THEME, theme_name);
+          wstring path = Taiga.GetDataPath() + L"theme\\" + theme_name;
+          Execute(path);
           return TRUE;
         }
       }
+    }
+
+    // List item select
+    case LVN_ITEMCHANGED: {
+      LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
+      if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
+        EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
+      } else if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
+        EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
+      }
       break;
     }
-    
-    // Drop folders
-    case WM_DROPFILES: {
-      HDROP hDrop = reinterpret_cast<HDROP>(wParam);
-      if (hDrop && index == PAGE_LIBRARY_FOLDERS) {
-        WCHAR szFileName[MAX_PATH + 1];
-        UINT nFiles = DragQueryFile(hDrop, static_cast<UINT>(-1), nullptr, 0);
-        win32::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
-        for (UINT i = 0; i < nFiles; i++) {
-          ZeroMemory(szFileName, MAX_PATH + 1);
-          DragQueryFile(hDrop, i, (LPWSTR)szFileName, MAX_PATH + 1);
-          if (GetFileAttributes(szFileName) & FILE_ATTRIBUTE_DIRECTORY) {
-            list.InsertItem(list.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, szFileName, 0);
-            list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
+
+    // Text callback
+    case LVN_GETDISPINFO: {
+      NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
+      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
+      if (!anime_item) break;
+      switch (plvdi->item.iSubItem) {
+        case 0: // Anime title
+          plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
+          break;
+      }
+      break;
+    }
+
+    // Double click
+    case NM_DBLCLK: {
+      LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
+      if (lpnmitem->iItem == -1) break;
+      // Anime folders
+      if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
+        win32::ListView list = lpnmitem->hdr.hwndFrom;
+        WCHAR buffer[MAX_PATH];
+        list.GetItemText(lpnmitem->iItem, 0, buffer);
+        Execute(buffer);
+        list.SetWindowHandle(nullptr);
+      // Media players
+      } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
+        Execute(MediaPlayers.items[lpnmitem->iItem].GetPath());
+      // Streaming media providers
+      } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
+        switch (lpnmitem->iItem) {
+          case 0:
+            ExecuteLink(L"http://www.animenewsnetwork.com/video/");
+            break;
+          case 1:
+            ExecuteLink(L"http://www.crunchyroll.com");
+            break;
+          case 2:
+            ExecuteLink(L"http://www.veoh.com");
+            break;
+          case 3:
+            ExecuteLink(L"http://www.vizanime.com");
+            break;
+          case 4:
+            ExecuteLink(L"http://www.youtube.com");
+            break;
+        }
+      // Torrent filters
+      } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
+        win32::ListView list = lpnmitem->hdr.hwndFrom;
+        FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(lpnmitem->iItem));
+        if (feed_filter) {
+          FeedFilterDialog.filter = *feed_filter;
+          FeedFilterDialog.Create(IDD_FEED_FILTER, parent->GetWindowHandle());
+          if (!FeedFilterDialog.filter.conditions.empty()) {
+            *feed_filter = FeedFilterDialog.filter;
+            parent->RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
+            list.SetSelectedItem(lpnmitem->iItem);
           }
         }
         list.SetWindowHandle(nullptr);
-        return TRUE;
       }
-      break;
+      return TRUE;
+    }
+
+    // Right click
+    case NM_RCLICK: {
+      LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
+      if (lpnmitem->iItem == -1) break;
+      win32::ListView list = lpnmitem->hdr.hwndFrom;
+      // Media players
+      if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
+        wstring answer = UI.Menus.Show(GetWindowHandle(), 0, 0, L"GenericList");
+        for (int i = 0; i < list.GetItemCount(); i++) {
+          if (answer == L"SelectAll()") {
+            list.SetCheckState(i, TRUE);
+          } else if (answer == L"DeselectAll()") {
+            list.SetCheckState(i, FALSE);
+          }
+        }
+      }
+      list.SetWindowHandle(nullptr);
+      return TRUE;
     }
   }
   
-  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+  return 0;
 }

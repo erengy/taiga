@@ -598,7 +598,7 @@ bool SeasonDatabase::IsRefreshRequired() {
   int count = 0;
   bool required = false;
 
-  for (int i = 0; i < items.size(); i++) {
+  for (size_t i = 0; i < items.size(); i++) {
     int anime_id = items.at(i);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
@@ -620,7 +620,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
   mal::GetSeasonInterval(name, date_start, date_end);
 
   // Check for invalid items
-  for (int i = 0; i < items.size(); i++) {
+  for (size_t i = 0; i < items.size(); i++) {
     bool invalid = false;
     int anime_id = items.at(i);
     auto anime_item = AnimeDatabase.FindItem(anime_id);

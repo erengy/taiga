@@ -47,6 +47,7 @@ public:
   wstring life_spent_watching;
   float score_mean;
   float score_deviation;
+  vector<int> score_count;
   vector<float> score_distribution;
   int tigers_harmed;
   int torrent_count;

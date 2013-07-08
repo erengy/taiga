@@ -22,6 +22,7 @@
 
 #include "anime_db.h"
 #include "common.h"
+#include "foreach.h"
 #include "myanimelist.h"
 #include "string.h"
 #include "taiga.h"
@@ -39,6 +40,7 @@ Statistics::Statistics()
       image_size(0),
       score_mean(0.0f),
       score_deviation(0.0f),
+      score_count(11, 0),
       score_distribution(11, 0.0f),
       tigers_harmed(0),
       torrent_count(0),
@@ -159,9 +161,15 @@ vector<float> Statistics::CalculateScoreDistribution() {
   int score = 0;
   float extreme_value = 1.0f;
 
+  foreach_(item, score_count)
+    *item = 0;
+  foreach_(item, score_distribution)
+    *item = 0.0f;
+
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
     score = it->second.GetMyScore();
     if (score > 0) {
+      score_count[score]++;
       score_distribution[score]++;
       extreme_value = max(score_distribution[score], extreme_value);
     }

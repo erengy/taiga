@@ -197,7 +197,7 @@ void MainDialog::CreateDialogControls() {
   toolbar_main.InsertButton(3, ICON24_FOLDERS, TOOLBAR_BUTTON_FOLDERS, 
                             1, fsStyle2, 3, nullptr, L"Root folders");
   toolbar_main.InsertButton(4, ICON24_TOOLS, TOOLBAR_BUTTON_TOOLS, 
-                            1, fsStyle2, 4, nullptr, L"External services");
+                            1, fsStyle2, 4, nullptr, L"External links");
   toolbar_main.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(6, ICON24_SETTINGS, TOOLBAR_BUTTON_SETTINGS, 
                             1, fsStyle1, 6, nullptr, L"Change program settings");
@@ -765,11 +765,15 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case NIN_BALLOONTIMEOUT: {
-        Taiga.current_tip_type = TIPTYPE_NORMAL;
+        Taiga.current_tip_type = TIPTYPE_DEFAULT;
         break;
       }
       case NIN_BALLOONUSERCLICK: {
         switch (Taiga.current_tip_type) {
+          case TIPTYPE_NOWPLAYING:
+            navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+            ActivateWindow(GetWindowHandle());
+            break;
           case TIPTYPE_SEARCH:
             ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
             break;
@@ -780,7 +784,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             History.queue.Check();
             break;
         }
-        Taiga.current_tip_type = TIPTYPE_NORMAL;
+        Taiga.current_tip_type = TIPTYPE_DEFAULT;
         break;
       }
       case WM_LBUTTONDBLCLK: {

@@ -96,6 +96,7 @@ void Item::StartWatching(Episode episode) {
   
   // Show balloon tip
   if (Settings.Program.Notifications.recognized) {
+    Taiga.current_tip_type = TIPTYPE_NOWPLAYING;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(ReplaceVariables(Settings.Program.Notifications.format, episode).c_str(), 
                 L"Now Playing", NIIF_INFO);
@@ -290,12 +291,19 @@ bool SetFansubFilter(int anime_id, const wstring& group_name) {
       if (*j != anime_id) continue;
       foreach_(k, i->conditions) {
         if (k->element == FEED_FILTER_ELEMENT_ANIME_GROUP) {
-          k->value = group_name;
+          if (group_name.empty()) {
+            Aggregator.filter_manager.filters.erase(i);
+          } else {
+            k->value = group_name;
+          }
           return true;
         }
       }
     }
   }
+
+  if (group_name.empty())
+    return false;
 
   // Create new filter
   auto anime_item = AnimeDatabase.FindItem(anime_id);

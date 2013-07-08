@@ -265,6 +265,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     AnimeListDialog.RefreshList(status);
     AnimeListDialog.RefreshTabs(status);
     SearchDialog.RefreshList();
+    if (AnimeDialog.GetCurrentId() == anime_id)
+      AnimeDialog.Refresh();
+    if (NowPlayingDialog.GetCurrentId() == anime_id)
+      NowPlayingDialog.Refresh();
 
   // ViewAnimePage
   //   Opens up anime page on MAL.

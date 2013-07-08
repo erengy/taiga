@@ -291,9 +291,10 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
     feed_item.description = feed_item.description.substr(index_begin, index_end);
 
   // NyaaTorrents
-  } else if (InStr(source, L"nyaatorrents", 0, true) > -1) {
-    Erase(feed_item.description, L"None\n");
-    Replace(feed_item.description, L"\n\n", L"\n", true);
+  } else if (InStr(source, L"nyaa", 0, true) > -1) {
+    feed_item.episode_data.file_size = InStr(feed_item.description, L" - ", L" - ");
+    Erase(feed_item.description, feed_item.episode_data.file_size);
+    Replace(feed_item.description, L"-  -", L"-");
 
   // TokyoTosho
   } else if (InStr(source, L"tokyotosho", 0, true) > -1) {

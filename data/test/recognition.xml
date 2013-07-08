@@ -642,4 +642,20 @@
 		<title>Red Data Girl</title>
 		<version>0</version>
 	</file>
+	<file>
+		<file>[CMS] Magical☆Star Kanon 100% OVA[DVD][E9F43685].mkv</file>
+		<checksum>E9F43685</checksum>
+		<extra>OVA DVD</extra>
+		<format>MKV</format>
+		<group>CMS</group>
+		<title>Magical☆Star Kanon 100% OVA</title>
+	</file>
+	<file>
+		<file>[Doremi].Ro-Kyu-Bu!.SS.01.[C1B5CE5D].mkv</file>
+		<checksum>C1B5CE5D</checksum>
+		<format>MKV</format>
+		<group>Doremi</group>
+		<number>01</number>
+		<title>Ro-Kyu-Bu! SS</title>
+	</file>
 </recognition>

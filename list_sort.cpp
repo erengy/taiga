@@ -158,8 +158,13 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
         TrimRight(item[i], L".\r");
         EraseChars(item[i], L" ");
         if (item[i].length() >= 2) {
-          unit[i] = item[i].substr(item[i].length() - 2);
-          item[i].resize(item[i].length() - 2);
+          for (auto it = item[i].rbegin(); it != item[i].rend(); ++it) {
+            if (IsNumeric(*it))
+              break;
+            unit[i].insert(unit[i].begin(), *it);
+          }
+          item[i].resize(item[i].length() - unit[i].length());
+          Trim(unit[i]);
         }
         int index = InStr(item[i], L".");
         if (index > -1) {
@@ -171,10 +176,16 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
         }
         if (IsEqual(unit[i], L"KB")) {
           size[i] *= 1000;
+        } else if (IsEqual(unit[i], L"KiB")) {
+          size[i] *= 1024;
         } else if (IsEqual(unit[i], L"MB")) {
           size[i] *= 1000 * 1000;
+        } else if (IsEqual(unit[i], L"MiB")) {
+          size[i] *= 1024 * 1024;
         } else if (IsEqual(unit[i], L"GB")) {
           size[i] *= 1000 * 1000 * 1000;
+        } else if (IsEqual(unit[i], L"GiB")) {
+          size[i] *= 1024 * 1024 * 1024;
         }
         size[i] *= _wtoi(item[i].c_str());
       }
