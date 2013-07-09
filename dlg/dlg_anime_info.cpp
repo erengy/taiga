@@ -148,7 +148,6 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
         rect.Inflate(-1, -1);
         // Paint image
-        dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
         auto image = ImageDatabase.GetImage(anime_id_);
         if (anime_id_ > anime::ID_UNKNOWN && image) {
           dc.SetStretchBltMode(HALFTONE);
@@ -425,7 +424,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     GetClientRect(&rect);
     SIZE size = {rect.Width(), rect.Height()};
     OnSize(WM_SIZE, 0, size);
-    InvalidateRect();
+    RedrawWindow();
   }
 
   // Set title
@@ -620,10 +619,13 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
     win32::Rect rect_image = rect;
     rect_image.right = rect_image.left + ScaleX(150);
     auto image = ImageDatabase.GetImage(anime_id_);
-    if (image)
+    if (image) {
       rect_image = ResizeRect(rect_image, 
                               image->rect.Width(), image->rect.Height(), 
                               true, true, false);
+    } else {
+      rect_image.bottom = rect_image.top + ScaleY(230);
+    }
     image_label_.SetPosition(nullptr, rect_image);
     rect.left = rect_image.right + ScaleX(WIN_CONTROL_MARGIN) * 2;
   }

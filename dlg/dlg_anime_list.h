@@ -22,6 +22,7 @@
 #include "../std.h"
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
+#include "../win32/win_gdi.h"
 
 namespace anime {
 class Item;
@@ -51,10 +52,15 @@ public:
   // List-view control
   class ListView : public win32::ListView {
   public:
-    ListView() { dragging = false; button_visible[0] = false; button_visible[1] = false; }
+    ListView();
+    
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
     void DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, const anime::Item* anime_item);
     int GetSortType(int column);
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void RefreshProgressButtons(const anime::Item* anime_item);
+    
+    win32::Rect button_rect[2];
     bool button_visible[2];
     bool dragging;
     win32::ImageList drag_image;

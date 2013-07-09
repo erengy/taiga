@@ -299,6 +299,12 @@ void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 /* ListView control */
 
+AnimeListDialog::ListView::ListView()
+    : dragging(false) {
+  button_visible[0] = false;
+  button_visible[1] = false;
+}
+
 int AnimeListDialog::ListView::GetSortType(int column) {
   switch (column) {
     // Progress
@@ -314,6 +320,37 @@ int AnimeListDialog::ListView::GetSortType(int column) {
     default:
       return LIST_SORTTYPE_DEFAULT;
   }
+}
+
+void AnimeListDialog::ListView::RefreshProgressButtons(const anime::Item* anime_item) {
+  button_rect[0].SetEmpty();
+  button_rect[1].SetEmpty();
+
+  button_visible[0] = false;
+  button_visible[1] = false;
+      
+  if (!anime_item || !anime_item->IsInList())
+    return;
+  if (anime_item->GetMyStatus() == mal::MYSTATUS_DROPPED)
+    return;
+  if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED && !anime_item->GetMyRewatching())
+    return;
+  
+  if (anime_item->GetMyLastWatchedEpisode() > 0)
+    button_visible[0] = true;
+  if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
+      anime_item->GetEpisodeCount() == 0)
+    button_visible[1] = true;
+  
+  win32::Rect rect_item;
+  GetSubItemRect(GetNextItem(-1, LVIS_SELECTED), 1, &rect_item);
+  if (Settings.Program.List.progress_show_eps)
+    rect_item.right -= 50;
+  rect_item.Inflate(-5, -5);
+  button_rect[0].Copy(rect_item);
+  button_rect[0].right = button_rect[0].left + 9;
+  button_rect[1].Copy(rect_item);
+  button_rect[1].left = button_rect[1].right - 9;
 }
 
 LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -340,24 +377,19 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       ::ScreenToClient(GetWindowHandle(), &pt);
 
       int item_index = GetNextItem(-1, LVIS_SELECTED);
-      if (item_index < 0) break;
-      
+      if (item_index < 0) {
+        tooltips.DeleteTip(0);
+        tooltips.DeleteTip(1);
+        tooltips.DeleteTip(2);
+        break;
+      }
+
+      RefreshProgressButtons(AnimeDatabase.GetCurrentItem());
+
       win32::Rect rect_item;
       GetSubItemRect(item_index, 1, &rect_item);
-      if (Settings.Program.List.progress_show_eps)
-        rect_item.right -= 50;
-      rect_item.Inflate(-5, -5);
-      
-      win32::Rect rect_button[2];
-      rect_button[0].Copy(rect_item);
-      rect_button[1].Copy(rect_item);
-      rect_button[0].right = rect_button[0].left + 9;
-      rect_button[1].left = rect_button[1].right - 9;
-
-      if (button_visible[0])
-        rect_item.left += 9;
-      if (button_visible[1])
-        rect_item.right -= 9;
+      if (button_visible[0]) rect_item.left += 9;
+      if (button_visible[1]) rect_item.right -= 9;
       if (rect_item.PtIn(pt) && true) {
         auto anime_item = AnimeDatabase.GetCurrentItem();
         if (anime_item->IsInList()) {
@@ -376,10 +408,10 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
         tooltips.DeleteTip(2);
       }
 
-      if ((button_visible[0] && rect_button[0].PtIn(pt)) || 
-          (button_visible[1] && rect_button[1].PtIn(pt))) {
-        tooltips.AddTip(0, L"-1 episode", nullptr, &rect_button[0], false);
-        tooltips.AddTip(1, L"+1 episode", nullptr, &rect_button[1], false);
+      if ((button_visible[0] && button_rect[0].PtIn(pt)) || 
+          (button_visible[1] && button_rect[1].PtIn(pt))) {
+        tooltips.AddTip(0, L"-1 episode", nullptr, &button_rect[0], false);
+        tooltips.AddTip(1, L"+1 episode", nullptr, &button_rect[1], false);
         ::SetCursor(reinterpret_cast<HCURSOR>(
           ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
         return TRUE;
@@ -388,7 +420,7 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
         tooltips.DeleteTip(1);
       }
       break;
-     }
+    }
   }
   
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
@@ -434,23 +466,10 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       auto anime_id = static_cast<int>(lplv->lParam);
       AnimeDatabase.SetCurrentId(anime_id);
-      listview.button_visible[0] = false;
-      listview.button_visible[1] = false;
-      if (lplv->iItem > -1 && lplv->uNewState & LVIS_SELECTED) {
-        auto anime_item = AnimeDatabase.GetCurrentItem();
-        if (anime_item && anime_item->IsInList()) {
-          int my_status = anime_item->GetMyStatus();
-          if (my_status == mal::MYSTATUS_DROPPED)
-            break;
-          if (my_status == mal::MYSTATUS_COMPLETED && !anime_item->GetMyRewatching())
-            break;
-          if (anime_item->GetMyLastWatchedEpisode() > 0)
-            listview.button_visible[0] = true;
-          if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
-              anime_item->GetEpisodeCount() == 0)
-            listview.button_visible[1] = true;
-        }
-      }
+      anime::Item* anime_item = nullptr; 
+      if (lplv->iItem > -1 && lplv->uNewState & LVIS_SELECTED)
+        anime_item = AnimeDatabase.GetCurrentItem();
+      listview.RefreshProgressButtons(anime_item);
       break;
     }
 
@@ -474,23 +493,15 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           POINT pt;
           ::GetCursorPos(&pt);
           ::ScreenToClient(listview.GetWindowHandle(), &pt);
-        
-          win32::Rect rect_item;
-          listview.GetSubItemRect(listview.GetNextItem(-1, LVIS_SELECTED), 1, &rect_item);
-          if (Settings.Program.List.progress_show_eps)
-            rect_item.right -= 50;
-          rect_item.Inflate(-5, -5);
-          win32::Rect rect_button[2];
-          rect_button[0].Copy(rect_item);
-          rect_button[1].Copy(rect_item);
-          rect_button[0].right = rect_button[0].left + 9;
-          rect_button[1].left = rect_button[1].right - 9;
-
-          if (listview.button_visible[0] && rect_button[0].PtIn(pt)) {
+          listview.RefreshProgressButtons(AnimeDatabase.GetCurrentItem());
+          if (listview.button_visible[0] && listview.button_rect[0].PtIn(pt)) {
             ExecuteAction(L"DecrementEpisode");
-          } else if (listview.button_visible[1] && rect_button[1].PtIn(pt)) {
+          } else if (listview.button_visible[1] && listview.button_rect[1].PtIn(pt)) {
             ExecuteAction(L"IncrementEpisode");
           }
+          int list_index = GetListIndex(AnimeDatabase.GetCurrentId());
+          listview.RefreshProgressButtons(AnimeDatabase.GetCurrentItem());
+          listview.RedrawItems(list_index, list_index, true);
         }
       }
       break;

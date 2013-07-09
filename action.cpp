@@ -490,7 +490,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       event_item->enabled = false;
       History.queue.RemoveDisabled();
     } else {
-      if (mal::IsValidEpisode(watched - 1, 0, anime_item->GetEpisodeCount())) {
+      if (mal::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
         anime::Episode episode;
         episode.number = ToWstr(watched - 1);
         anime_item->AddToQueue(episode, true);

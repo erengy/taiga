@@ -195,7 +195,11 @@ BOOL SettingsPage::OnInitDialog() {
     case PAGE_RECOGNITION_MEDIA: {
       win32::ListView list = GetDlgItem(IDC_LIST_MEDIA);
       list.EnableGroupView(true);
-      list.InsertColumn(0, 0, 0, 0, L"Supported players");
+      if (win32::GetWinVersion() >= win32::VERSION_VISTA) {
+        list.InsertColumn(0, 0, 0, 0, L"Select/deselect all");
+      } else {
+        list.InsertColumn(0, 0, 0, 0, L"Supported players");
+      }
       list.InsertGroup(0, L"Media players");
       list.InsertGroup(1, L"Web browsers");
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
@@ -605,9 +609,18 @@ void SettingsPage::OnDropFiles(HDROP hDropInfo) {
 
 LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
   switch (pnmh->code) {
-    case HDN_ITEMSTATEICONCLICK: {
-      auto nmh = reinterpret_cast<LPNMHEADER>(pnmh);
-      SetText(ToWstr(nmh->iItem));
+    // Header checkbox click
+    case HDN_ITEMCHANGED: {
+      win32::ListView list = GetDlgItem(IDC_LIST_MEDIA);
+      if (pnmh->hwndFrom == list.GetHeader()) {
+        auto nmh = reinterpret_cast<LPNMHEADER>(pnmh);
+        if (nmh->pitem->mask & HDI_FORMAT) {
+          BOOL checked = nmh->pitem->fmt & HDF_CHECKED ? TRUE : FALSE;
+          for (size_t i = 0; i < MediaPlayers.items.size(); i++)
+            list.SetCheckState(i, checked);
+        }
+      }
+      list.SetWindowHandle(nullptr);
       break;
     }
 

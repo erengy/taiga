@@ -99,17 +99,17 @@ COLORREF HexToARGB(const wstring& text) {
 win32::Rect ResizeRect(const win32::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y) {
   win32::Rect rect = rect_dest;
 
-  float dest_width   = static_cast<float>(rect_dest.Width());
-  float dest_height  = static_cast<float>(rect_dest.Height());
-  float image_width  = static_cast<float>(src_width);
+  float dest_width = static_cast<float>(rect_dest.Width());
+  float dest_height = static_cast<float>(rect_dest.Height());
+  float image_width = static_cast<float>(src_width);
   float image_Height = static_cast<float>(src_height);
   
   // Source < Destination (No need to resize)
   if ((image_width < dest_width) && (image_Height < dest_height) && !stretch) {
     rect.right = rect.left + src_width;
     rect.bottom = rect.top + src_height;
-    if (center_x) rect.Offset(static_cast<int>((image_width - image_width) / 2), 0);
-    if (center_y) rect.Offset(0, static_cast<int>((dest_height - image_Height) / 2));
+    if (center_x) rect.Offset(static_cast<int>((image_width - image_width) / 2.0f), 0);
+    if (center_y) rect.Offset(0, static_cast<int>((dest_height - image_Height) / 2.0f));
 
   // Source > Destination (Resize)
   } else {
