@@ -251,7 +251,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
           anime::GetFansubFilter(anime_id_, groups);
           wstring text = Join(groups, L", ");
           InputDialog dlg;
-          dlg.title = AnimeDatabase.GetCurrentItem()->GetTitle();
+          dlg.title = AnimeDatabase.FindItem(anime_id_)->GetTitle();
           dlg.info = L"Please enter your fansub group preference for this title:";
           dlg.text = text;
           dlg.Show(AnimeDialog.GetWindowHandle());

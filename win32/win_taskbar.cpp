@@ -80,7 +80,7 @@ BOOL Taskbar::Modify(LPCWSTR lpTip) {
   if (!m_hApp) return FALSE;
 
   m_NID.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-  wcscpy_s(m_NID.szTip, lpTip);
+  wcsncpy_s(m_NID.szTip, 128, lpTip, _TRUNCATE);
 
   return ::Shell_NotifyIcon(NIM_MODIFY, &m_NID);
 }
