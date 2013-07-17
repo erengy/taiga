@@ -792,10 +792,10 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case WM_RBUTTONDOWN: {
-        UpdateAllMenus(AnimeDatabase.GetCurrentItem());
+        UpdateAllMenus(AnimeListDialog.GetCurrentItem());
         SetForegroundWindow();
         ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"Tray"));
-        UpdateAllMenus(AnimeDatabase.GetCurrentItem());
+        UpdateAllMenus(AnimeListDialog.GetCurrentItem());
         break;
       }
     }

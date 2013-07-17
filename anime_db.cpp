@@ -43,8 +43,7 @@ namespace anime {
 
 // =============================================================================
 
-Database::Database()
-    : current_id_(ID_UNKNOWN) {
+Database::Database() {
   folder_ = Taiga.GetDataPath() + L"db\\";
   file_ = L"anime.xml";
 }
@@ -246,7 +245,7 @@ void Database::UpdateItem(Item& new_item) {
 // =============================================================================
 
 void Database::ClearUserData() {
-  current_id_ = ID_UNKNOWN;
+  AnimeListDialog.SetCurrentId(ID_UNKNOWN);
   
   for (auto it = items.begin(); it != items.end(); ++it) {
     it->second.RemoveFromUserList();
@@ -408,36 +407,6 @@ bool Database::DeleteListItem(int anime_id) {
   item->RemoveFromUserList();
 
   return true;
-}
-
-int Database::GetCurrentId() {
-  if (current_id_ > ID_UNKNOWN) {
-    auto item = FindItem(current_id_);
-    if (!item) current_id_ = ID_UNKNOWN;
-  }
-
-  return current_id_;
-}
-
-Item* Database::GetCurrentItem() {
-  Item* item = nullptr;
-
-  if (current_id_ > ID_UNKNOWN) {
-    item = FindItem(current_id_);
-    if (!item) current_id_ = ID_UNKNOWN;
-  }
-
-  return item;
-}
-
-void Database::SetCurrentId(int anime_id) {
-  // may not be necessary
-  if (anime_id > ID_UNKNOWN) {
-    auto item = FindItem(anime_id);
-    if (!item) anime_id = ID_UNKNOWN;
-  }
-
-  current_id_ = anime_id;
 }
 
 // =============================================================================

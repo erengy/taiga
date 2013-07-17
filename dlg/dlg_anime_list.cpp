@@ -40,6 +40,10 @@ class AnimeListDialog AnimeListDialog;
 
 // =============================================================================
 
+AnimeListDialog::AnimeListDialog()
+    : current_id_(anime::ID_UNKNOWN) {
+}
+
 BOOL AnimeListDialog::OnInitDialog() {
   // Create tab control
   tab.Attach(GetDlgItem(IDC_TAB_MAIN));
@@ -134,7 +138,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         listview.dragging = false;
         ReleaseCapture();
         
-        auto anime_item = AnimeDatabase.GetCurrentItem();
+        auto anime_item = GetCurrentItem();
         if (!anime_item)
           break;
 
@@ -384,14 +388,14 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
         break;
       }
 
-      RefreshProgressButtons(AnimeDatabase.GetCurrentItem());
+      RefreshProgressButtons(parent->GetCurrentItem());
 
       win32::Rect rect_item;
       GetSubItemRect(item_index, 1, &rect_item);
       if (button_visible[0]) rect_item.left += 9;
       if (button_visible[1]) rect_item.right -= 9;
       if (rect_item.PtIn(pt) && true) {
-        auto anime_item = AnimeDatabase.GetCurrentItem();
+        auto anime_item = parent->GetCurrentItem();
         if (anime_item->IsInList()) {
           wstring text;
           if (anime_item->IsNewEpisodeAvailable())
@@ -455,7 +459,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
 
     // Delete all items
     case LVN_DELETEALLITEMS: {
-      AnimeDatabase.SetCurrentId(anime::ID_UNKNOWN);
+      SetCurrentId(anime::ID_UNKNOWN);
       listview.button_visible[0] = false;
       listview.button_visible[1] = false;
       break;
@@ -465,10 +469,10 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case LVN_ITEMCHANGED: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       auto anime_id = static_cast<int>(lplv->lParam);
-      AnimeDatabase.SetCurrentId(anime_id);
+      SetCurrentId(anime_id);
       anime::Item* anime_item = nullptr; 
       if (lplv->iItem > -1 && lplv->uNewState & LVIS_SELECTED)
-        anime_item = AnimeDatabase.GetCurrentItem();
+        anime_item = GetCurrentItem();
       listview.RefreshProgressButtons(anime_item);
       break;
     }
@@ -493,14 +497,14 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           POINT pt;
           ::GetCursorPos(&pt);
           ::ScreenToClient(listview.GetWindowHandle(), &pt);
-          listview.RefreshProgressButtons(AnimeDatabase.GetCurrentItem());
+          listview.RefreshProgressButtons(GetCurrentItem());
           if (listview.button_visible[0] && listview.button_rect[0].PtIn(pt)) {
             ExecuteAction(L"DecrementEpisode");
           } else if (listview.button_visible[1] && listview.button_rect[1].PtIn(pt)) {
             ExecuteAction(L"IncrementEpisode");
           }
-          int list_index = GetListIndex(AnimeDatabase.GetCurrentId());
-          listview.RefreshProgressButtons(AnimeDatabase.GetCurrentItem());
+          int list_index = GetListIndex(GetCurrentId());
+          listview.RefreshProgressButtons(GetCurrentItem());
           listview.RedrawItems(list_index, list_index, true);
         }
       }
@@ -511,25 +515,25 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case NM_RCLICK: {
       if (pnmh->hwndFrom == listview.GetWindowHandle()) {
         if (listview.GetSelectedCount() > 0) {
-          auto anime_item = AnimeDatabase.GetCurrentItem();
+          LPARAM anime_id = static_cast<LPARAM>(GetCurrentId());
+          auto anime_item = GetCurrentItem();
           UpdateAllMenus(anime_item);
           int index = listview.HitTest(true);
           if (anime_item->IsInList()) {
             switch (index) {
               // Score
               case 2:
-                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"EditScore"));
+                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"EditScore"), 0, anime_id);
                 break;
               // Other
               default:
-                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"RightClick"));
+                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"RightClick"), 0, anime_id);
                 break;
             }
             UpdateAllMenus(anime_item);
           } else {
             UpdateSearchListMenu(true);
-            ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"SearchList"), 
-              0, static_cast<LPARAM>(anime_item->GetId()));
+            ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"SearchList"), 0, anime_id);
           }
         }
       }
@@ -570,13 +574,13 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               GetKeyState(VK_CONTROL) & 0x8000) {
             // Edit episode
             if (pnkd->wVKey == VK_ADD) {
-              auto anime_item = AnimeDatabase.GetCurrentItem();
+              auto anime_item = GetCurrentItem();
               if (anime_item) {
                 int value = anime_item->GetMyLastWatchedEpisode();
                 ExecuteAction(L"EditEpisode(" + ToWstr(value + 1) + L")");
               }
             } else if (pnkd->wVKey == VK_SUBTRACT) {
-              auto anime_item = AnimeDatabase.GetCurrentItem();
+              auto anime_item = GetCurrentItem();
               if (anime_item) {
                 int value = anime_item->GetMyLastWatchedEpisode();
                 ExecuteAction(L"EditEpisode(" + ToWstr(value - 1) + L")");
@@ -710,7 +714,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
   if (uItemState & CDIS_SELECTED ||
       // When the list loses its focus, uItemState becomes 0 but LVN_ITEMCHANGED
       // is not sent. This is why we compare the IDs as a secondary measure.
-      AnimeDatabase.GetCurrentId() == anime_item->GetId()) {
+      parent->GetCurrentId() == anime_item->GetId()) {
     // Draw decrement button
     if (button_visible[0]) {
       rcButton = rcBar;
@@ -790,13 +794,16 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       }
       // Change text color
       if (!anime_item) return CDRF_NOTIFYPOSTPAINT;
-      if (anime_item->IsNewEpisodeAvailable()) {
-        if (Settings.Program.List.highlight) {
-          pCD->clrText = GetSysColor(pCD->iSubItem == 0 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
-        }
-      }
-      if (!anime_item->GetMyScore()) {
-        pCD->clrText = GetSysColor(pCD->iSubItem == 2 ? COLOR_GRAYTEXT : COLOR_WINDOWTEXT);
+      pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
+      switch (pCD->iSubItem) {
+        case 0:
+          if (anime_item->IsNewEpisodeAvailable() && Settings.Program.List.highlight)
+            pCD->clrText = GetSysColor(COLOR_HIGHLIGHT);
+          break;
+        case 2:
+          if (!anime_item->GetMyScore())
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
       }
       // Indicate currently playing
       if (anime_item->GetPlaying()) {
@@ -854,11 +861,39 @@ LRESULT AnimeListDialog::OnTabNotify(LPARAM lParam) {
 
 // =============================================================================
 
+int AnimeListDialog::GetCurrentId() {
+  if (current_id_ > anime::ID_UNKNOWN)
+    if (!AnimeDatabase.FindItem(current_id_))
+      current_id_ = anime::ID_UNKNOWN;
+
+  return current_id_;
+}
+
+anime::Item* AnimeListDialog::GetCurrentItem() {
+  anime::Item* item = nullptr;
+
+  if (current_id_ > anime::ID_UNKNOWN) {
+    item = AnimeDatabase.FindItem(current_id_);
+    if (!item) current_id_ = anime::ID_UNKNOWN;
+  }
+
+  return item;
+}
+
+void AnimeListDialog::SetCurrentId(int anime_id) {
+  if (anime_id > anime::ID_UNKNOWN)
+    if (!AnimeDatabase.FindItem(anime_id))
+      anime_id = anime::ID_UNKNOWN;
+
+  current_id_ = anime_id;
+}
+
 int AnimeListDialog::GetListIndex(int anime_id) {
   if (IsWindow())
     for (int i = 0; i < listview.GetItemCount(); i++)
       if (static_cast<int>(listview.GetItemParam(i)) == anime_id)
         return i;
+  
   return -1;
 }
 

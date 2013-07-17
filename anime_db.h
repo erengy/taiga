@@ -76,10 +76,6 @@ class Database {
   // Deletes user information from an item, after HTTP_MAL_AnimeDelete
   // succeeds.
   bool DeleteListItem(int anime_id);
-  // Current item is the item selected on MainDialog's ListView.
-  int GetCurrentId();
-  Item* GetCurrentItem();
-  void SetCurrentId(int anime_id);
 
   // Anime items are mapped to their IDs.
   std::map<int, Item> items;
@@ -90,8 +86,6 @@ class Database {
  private:
   // Thread safety
   win32::CriticalSection critical_section_;
-  
-  int current_id_;
   
   wstring file_;
   wstring folder_;

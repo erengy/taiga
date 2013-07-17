@@ -111,9 +111,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // URL(address)
   //   Opens a web page.
+  //   lParam is an anime ID.
   } else if (action == L"URL") {
-    if (AnimeDatabase.GetCurrentId() > anime::ID_UNKNOWN) {
-      wstring title = AnimeDatabase.GetCurrentItem()->GetTitle();
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (anime_item) {
+      wstring title = anime_item->GetTitle();
       EraseChars(title, L"_!?.,:;~+");
       Erase(title, L" -");
       Replace(body, L"%title%", title);
@@ -149,7 +152,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Shows anime information window.
   //   lParam is an anime ID.
   } else if (action == L"Info") {
-    int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
+    int anime_id = static_cast<int>(lParam);
     AnimeDialog.SetCurrentId(anime_id);
     AnimeDialog.SetCurrentPage(INFOPAGE_SERIESINFO);
     if (!AnimeDialog.IsWindow()) {
@@ -211,8 +214,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // SearchTorrents(source)
   //   Searches torrents from specified source URL.
+  //   lParam is an anime ID.
   } else if (action == L"SearchTorrents") {
-    TorrentDialog.Search(body, AnimeDatabase.GetCurrentItem()->GetTitle());
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (anime_item)
+      TorrentDialog.Search(body, anime_item->GetTitle());
 
   // ShowSidebar()
   } else if (action == L"ShowSidebar") {
@@ -245,7 +252,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"AddToListAs") {
     int status = ToInt(body);
-    int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
+    int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     // Add item to list
     anime_item->AddtoUserList();
@@ -274,7 +281,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Opens up anime page on MAL.
   //   lParam is an anime ID.
   } else if (action == L"ViewAnimePage") {
-    int anime_id = lParam ? static_cast<int>(lParam) : AnimeDatabase.GetCurrentId();
+    int anime_id = static_cast<int>(lParam);
     mal::ViewAnimePage(anime_id);
 
   // ViewPanel(), ViewProfile(), ViewHistory()
@@ -350,7 +357,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
     // Search only for selected list item
     } else {
-      AnimeDatabase.GetCurrentItem()->CheckEpisodes(
+      int anime_id = static_cast<int>(lParam);
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      anime_item->CheckEpisodes(
         Settings.Program.List.progress_show_available ? -1 : 0,
         true);
     }
@@ -428,8 +437,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditAll([anime_id])
   //   Shows a dialog to edit details of an anime.
+  //   lParam is an anime ID.
   } else if (action == L"EditAll") {
-    int anime_id = body.empty() ? AnimeDatabase.GetCurrentId() : ToInt(body);
+    int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (!anime_item || !anime_item->IsInList()) return;
     AnimeDialog.SetCurrentId(anime_id);
@@ -442,9 +452,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditDelete()
   //   Removes an anime from list.
+  //   lParam is an anime ID.
   } else if (action == L"EditDelete") {
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     win32::TaskDialog dlg;
-    dlg.SetWindowTitle(AnimeDatabase.GetCurrentItem()->GetTitle().c_str());
+    dlg.SetWindowTitle(anime_item->GetTitle().c_str());
     dlg.SetMainIcon(TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Are you sure you want to delete this title from your list?");
     dlg.AddButton(L"Yes", IDYES);
@@ -452,7 +465,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() == IDYES) {
       EventItem item;
-      item.anime_id = AnimeDatabase.GetCurrentId();
+      item.anime_id = anime_id;
       item.mode = HTTP_MAL_AnimeDelete;
       History.queue.Add(item);
     }
@@ -460,8 +473,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // EditEpisode(value)
   //   Changes watched episode value of an anime.
   //   Value is optional.
+  //   lParam is an anime ID.
   } else if (action == L"EditEpisode") {
-    auto anime_item = AnimeDatabase.GetCurrentItem();
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     int value = -1;
     if (body.empty()) {
       InputDialog dlg;
@@ -482,8 +497,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       anime_item->AddToQueue(episode, true);
     }
   // DecrementEpisode()
+  //   lParam is an anime ID.
   } else if (action == L"DecrementEpisode") {
-    auto anime_item = AnimeDatabase.GetCurrentItem();
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     int watched = anime_item->GetMyLastWatchedEpisode();
     auto event_item = History.queue.FindItem(anime_item->GetId(), EVENT_SEARCH_EPISODE);
     if (event_item && *event_item->episode == watched) {
@@ -497,8 +514,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
   // IncrementEpisode()
+  //   lParam is an anime ID.
   } else if (action == L"IncrementEpisode") {
-    auto anime_item = AnimeDatabase.GetCurrentItem();
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     int watched = anime_item->GetMyLastWatchedEpisode();
     if (mal::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
@@ -509,9 +528,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // EditScore(value)
   //   Changes anime score.
   //   Value must be between 0-10 and different from current score.
+  //   lParam is an anime ID.
   } else if (action == L"EditScore") {
+    int anime_id = static_cast<int>(lParam);
     EventItem item;
-    item.anime_id = AnimeDatabase.GetCurrentId();
+    item.anime_id = anime_id;
     item.score = ToInt(body);
     item.mode = HTTP_MAL_AnimeUpdate;
     History.queue.Add(item);
@@ -519,10 +540,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // EditStatus(value)
   //   Changes anime status of user.
   //   Value must be 1, 2, 3, 4 or 6, and different from current status.
+  //   lParam is an anime ID.
   } else if (action == L"EditStatus") {
     EventItem event_item;
     event_item.status = ToInt(body);
-    auto anime_item = AnimeDatabase.GetCurrentItem();
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     switch (anime_item->GetAiringStatus()) {
       case mal::STATUS_AIRING:
         if (*event_item.status == mal::MYSTATUS_COMPLETED) {
@@ -553,22 +576,25 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
           event_item.date_finish = mal::TranslateDateForApi(GetDate());
         break;
     }
-    event_item.anime_id = AnimeDatabase.GetCurrentId();
+    event_item.anime_id = anime_id;
     event_item.mode = HTTP_MAL_AnimeUpdate;
     History.queue.Add(event_item);
 
   // EditTags(tags)
   //   Changes anime tags.
   //   Tags must be separated by a comma.
+  //   lParam is an anime ID.
   } else if (action == L"EditTags") {
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     InputDialog dlg;
-    dlg.title = AnimeDatabase.GetCurrentItem()->GetTitle();
+    dlg.title = anime_item->GetTitle();
     dlg.info = L"Please enter tags for this title, separated by a comma:";
-    dlg.text = AnimeDatabase.GetCurrentItem()->GetMyTags();
+    dlg.text = anime_item->GetMyTags();
     dlg.Show(g_hMain);
     if (dlg.result == IDOK) {
       EventItem item;
-      item.anime_id = AnimeDatabase.GetCurrentId();
+      item.anime_id = anime_id;
       item.tags = dlg.text;
       item.mode = HTTP_MAL_AnimeUpdate;
       History.queue.Add(item);
@@ -577,22 +603,27 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // EditTitles(titles)
   //   Changes alternative titles of an anime.
   //   Titles must be separated by "; ".
+  //   lParam is an anime ID.
   } else if (action == L"EditTitles") {
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     InputDialog dlg;
-    dlg.title = AnimeDatabase.GetCurrentItem()->GetTitle();
+    dlg.title = anime_item->GetTitle();
     dlg.info = L"Please enter alternative titles, separated by a semicolon:";
-    dlg.text = Join(AnimeDatabase.GetCurrentItem()->GetUserSynonyms(), L"; ");
+    dlg.text = Join(anime_item->GetUserSynonyms(), L"; ");
     dlg.Show(g_hMain);
     if (dlg.result == IDOK) {
-      AnimeDatabase.GetCurrentItem()->SetUserSynonyms(dlg.text, true);
+      anime_item->SetUserSynonyms(dlg.text, true);
     }
   
   // ===========================================================================
   
   // OpenFolder()
   //   Searches for anime folder and opens it.
+  //   lParam is an anime ID.
   } else if (action == L"OpenFolder") {
-    auto anime_item = AnimeDatabase.GetCurrentItem();
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (!anime_item || !anime_item->IsInList()) return;
     if (anime_item->GetFolder().empty()) {
       MainDialog.ChangeStatus(L"Searching for folder...");
@@ -622,32 +653,41 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // SetFolder()
   //   Lets user set an anime folder.
+  //   lParam is an anime ID.
   } else if (action == L"SetFolder") {
-    wstring path, title = L"Anime title: " + AnimeDatabase.GetCurrentItem()->GetTitle();
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    wstring path, title = L"Anime title: " + anime_item->GetTitle();
     if (BrowseForFolder(MainDialog.GetWindowHandle(), title.c_str(), L"", path)) {
-      AnimeDatabase.GetCurrentItem()->SetFolder(path, true);
-      AnimeDatabase.GetCurrentItem()->CheckEpisodes();
+      anime_item->SetFolder(path, true);
+      anime_item->CheckEpisodes();
     }
 
   // ===========================================================================
 
   // PlayEpisode(value)
   //   Searches for an episode of an anime and plays it.
+  //   lParam is an anime ID.
   } else if (action == L"PlayEpisode") {
     int number = ToInt(body);
-    int anime_id = lParam ? lParam : AnimeDatabase.GetCurrentId();
-    AnimeDatabase.FindItem(anime_id)->PlayEpisode(number);
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    anime_item->PlayEpisode(number);
   
   // PlayLast()
   //   Searches for the last watched episode of an anime and plays it.
+  //   lParam is an anime ID.
   } else if (action == L"PlayLast") {
-    int number = AnimeDatabase.GetCurrentItem()->GetMyLastWatchedEpisode();
-    AnimeDatabase.GetCurrentItem()->PlayEpisode(number);
+    int anime_id = static_cast<int>(lParam);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    int number = anime_item->GetMyLastWatchedEpisode();
+    anime_item->PlayEpisode(number);
   
   // PlayNext([anime_id])
   //   Searches for the next episode of an anime and plays it.
+  //   lParam is an anime ID.
   } else if (action == L"PlayNext") {
-    int anime_id = body.empty() ? AnimeDatabase.GetCurrentId() : ToInt(body);
+    int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item->GetEpisodeCount() != 1) {
       anime_item->PlayEpisode(anime_item->GetMyLastWatchedEpisode() + 1);
@@ -657,9 +697,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   
   // PlayRandom()
   //   Searches for a random episode of an anime and plays it.
+  //   lParam is an anime ID.
   } else if (action == L"PlayRandom") {
-    int anime_id = ToInt(body);
-    auto anime_item = anime_id ? AnimeDatabase.FindItem(anime_id) : AnimeDatabase.GetCurrentItem();
+    int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       int total = anime_item->GetEpisodeCount();
       if (total == 0) total = anime_item->GetMyLastWatchedEpisode() + 1;

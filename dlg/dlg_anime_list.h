@@ -32,7 +32,7 @@ class Item;
 
 class AnimeListDialog : public win32::Dialog {
 public:
-  AnimeListDialog() {}
+  AnimeListDialog();
   virtual ~AnimeListDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -43,6 +43,9 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   LRESULT OnTabNotify(LPARAM lParam);
 
+  int GetCurrentId();
+  anime::Item* GetCurrentItem();
+  void SetCurrentId(int anime_id);
   int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
   void RefreshListItem(int anime_id);
@@ -70,6 +73,9 @@ public:
 
   // Other controls
   win32::Tab tab;
+
+private:
+  int current_id_;
 };
 
 extern class AnimeListDialog AnimeListDialog;

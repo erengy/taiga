@@ -370,6 +370,6 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
 
   if (!action.empty()) {
     ExecuteAction(action);
-    UpdateAllMenus(AnimeDatabase.GetCurrentItem());
+    UpdateAllMenus(AnimeListDialog.GetCurrentItem());
   }
 }
