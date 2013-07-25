@@ -380,6 +380,12 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
         SetTransparency(255);
       break;
 
+    // Taiga, help! Only you can save us!
+    case WM_HELP: {
+      OnHelp(reinterpret_cast<LPHELPINFO>(lParam));
+      return TRUE;
+    }
+
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL:
       switch (current_page_) {
@@ -397,6 +403,38 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+void SettingsDialog::OnHelp(LPHELPINFO lphi) {
+  wstring message, text;
+  pages.at(current_page_).GetDlgItemText(lphi->iCtrlId, text);
+
+  #define SET_HELP_TEXT(i, m) \
+    case i: message = m; break;
+  switch (lphi->iCtrlId) {
+    // Library > Folders
+    SET_HELP_TEXT(IDC_LIST_FOLDERS_ROOT,
+      L"These folders will be scanned and monitored for new episodes.\n\n"
+      L"Suppose that you have an HDD like this:\n\n"
+      L"    D:\\\n"
+      L"    \u2514 Anime\n"
+      L"        \u2514 Bleach\n"
+      L"        \u2514 Naruto\n"
+      L"        \u2514 One Piece\n"
+      L"    \u2514 Games\n"
+      L"    \u2514 Music\n\n"
+      L"In this case, \"D:\\Anime\" is the root folder you should add.");
+    SET_HELP_TEXT(IDC_CHECK_FOLDERS_WATCH,
+      L"With this feature on, Taiga instantly detects when a file is added, removed, or renamed under root folders and their subfolders.\n\n"
+      L"Enabling this feature is recommended.");
+    // Not available
+    default:
+      message = L"There's no help message associated with this item.";
+      break;
+  }
+  #undef SET_HELP_TEXT
+
+  MessageBox(message.c_str(), L"Help", MB_ICONINFORMATION | MB_OK);
 }
 
 LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {

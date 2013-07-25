@@ -138,6 +138,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         listview.dragging = false;
         ReleaseCapture();
         
+        int anime_id = GetCurrentId();
         auto anime_item = GetCurrentItem();
         if (!anime_item)
           break;
@@ -146,9 +147,9 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (tab_index > -1) {
           int status = tab.GetItemParam(tab_index);
           if (anime_item->IsInList()) {
-            ExecuteAction(L"EditStatus(" + ToWstr(status) + L")");
+            ExecuteAction(L"EditStatus(" + ToWstr(status) + L")", 0, anime_id);
           } else {
-            ExecuteAction(L"AddToListAs(" + ToWstr(status) + L")");
+            ExecuteAction(L"AddToListAs(" + ToWstr(status) + L")", 0, anime_id);
           }
           break;
         }
@@ -364,11 +365,20 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       int item_index = HitTest();
       if (item_index > -1) {
         SetSelectedItem(item_index);
+        int anime_id = parent->GetCurrentId();
         switch (Settings.Program.List.middle_click) {
-          case 1: ExecuteAction(L"EditAll");    break;
-          case 2: ExecuteAction(L"OpenFolder"); break;
-          case 3: ExecuteAction(L"PlayNext");   break;
-          case 4: ExecuteAction(L"Info");       break;
+          case 1:
+            ExecuteAction(L"EditAll", 0, anime_id);
+            break;
+          case 2:
+            ExecuteAction(L"OpenFolder", 0, anime_id);
+            break;
+          case 3:
+            ExecuteAction(L"PlayNext", 0, anime_id);
+            break;
+          case 4:
+            ExecuteAction(L"Info", 0, anime_id);
+            break;
         }
       }
       break;
@@ -480,11 +490,20 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Double click
     case NM_DBLCLK: {
       if (listview.GetSelectedCount() > 0) {
+        int anime_id = GetCurrentId();
         switch (Settings.Program.List.double_click) {
-          case 1: ExecuteAction(L"EditAll");    break;
-          case 2: ExecuteAction(L"OpenFolder"); break;
-          case 3: ExecuteAction(L"PlayNext");   break;
-          case 4: ExecuteAction(L"Info");       break;
+          case 1:
+            ExecuteAction(L"EditAll", 0, anime_id);
+            break;
+          case 2:
+            ExecuteAction(L"OpenFolder", 0, anime_id);
+            break;
+          case 3:
+            ExecuteAction(L"PlayNext", 0, anime_id);
+            break;
+          case 4:
+            ExecuteAction(L"Info", 0, anime_id);
+            break;
         }
       }
       break;
@@ -498,10 +517,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           ::GetCursorPos(&pt);
           ::ScreenToClient(listview.GetWindowHandle(), &pt);
           listview.RefreshProgressButtons(GetCurrentItem());
+          int anime_id = GetCurrentId();
           if (listview.button_visible[0] && listview.button_rect[0].PtIn(pt)) {
-            ExecuteAction(L"DecrementEpisode");
+            ExecuteAction(L"DecrementEpisode", 0, anime_id);
           } else if (listview.button_visible[1] && listview.button_rect[1].PtIn(pt)) {
-            ExecuteAction(L"IncrementEpisode");
+            ExecuteAction(L"IncrementEpisode", 0, anime_id);
           }
           int list_index = GetListIndex(GetCurrentId());
           listview.RefreshProgressButtons(GetCurrentItem());
@@ -515,7 +535,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case NM_RCLICK: {
       if (pnmh->hwndFrom == listview.GetWindowHandle()) {
         if (listview.GetSelectedCount() > 0) {
-          LPARAM anime_id = static_cast<LPARAM>(GetCurrentId());
+          int anime_id = GetCurrentId();
           auto anime_item = GetCurrentItem();
           UpdateAllMenus(anime_item);
           int index = listview.HitTest(true);
@@ -562,11 +582,13 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Key press
     case LVN_KEYDOWN: {
       LPNMLVKEYDOWN pnkd = reinterpret_cast<LPNMLVKEYDOWN>(lParam);
+      int anime_id = GetCurrentId();
+      auto anime_item = GetCurrentItem();
       switch (pnkd->wVKey) {
         // Delete item
         case VK_DELETE: {
           if (listview.GetSelectedCount() > 0)
-            ExecuteAction(L"EditDelete()");
+            ExecuteAction(L"EditDelete()", 0, anime_id);
           break;
         }
         default: {
@@ -574,22 +596,20 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               GetKeyState(VK_CONTROL) & 0x8000) {
             // Edit episode
             if (pnkd->wVKey == VK_ADD) {
-              auto anime_item = GetCurrentItem();
               if (anime_item) {
                 int value = anime_item->GetMyLastWatchedEpisode();
-                ExecuteAction(L"EditEpisode(" + ToWstr(value + 1) + L")");
+                ExecuteAction(L"EditEpisode(" + ToWstr(value + 1) + L")", 0, anime_id);
               }
             } else if (pnkd->wVKey == VK_SUBTRACT) {
-              auto anime_item = GetCurrentItem();
               if (anime_item) {
                 int value = anime_item->GetMyLastWatchedEpisode();
-                ExecuteAction(L"EditEpisode(" + ToWstr(value - 1) + L")");
+                ExecuteAction(L"EditEpisode(" + ToWstr(value - 1) + L")", 0, anime_id);
               }
             // Edit score
             } else if (pnkd->wVKey >= '0' && pnkd->wVKey <= '9') {
-              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - '0') + L")");
+              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - '0') + L")", 0, anime_id);
             } else if (pnkd->wVKey >= VK_NUMPAD0 && pnkd->wVKey <= VK_NUMPAD9) {
-              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - VK_NUMPAD0) + L")");
+              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - VK_NUMPAD0) + L")", 0, anime_id);
             }
           }
           break;

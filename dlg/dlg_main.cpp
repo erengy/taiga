@@ -772,7 +772,6 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         switch (Taiga.current_tip_type) {
           case TIPTYPE_NOWPLAYING:
             navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
-            ActivateWindow(GetWindowHandle());
             break;
           case TIPTYPE_SEARCH:
             ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
@@ -784,6 +783,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             History.queue.Check();
             break;
         }
+        ActivateWindow(GetWindowHandle());
         Taiga.current_tip_type = TIPTYPE_DEFAULT;
         break;
       }

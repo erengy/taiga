@@ -625,28 +625,26 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (!anime_item || !anime_item->IsInList()) return;
-    if (anime_item->GetFolder().empty()) {
-      MainDialog.ChangeStatus(L"Searching for folder...");
-      if (!anime_item->CheckFolder()) {
-        win32::TaskDialog dlg;
-        dlg.SetWindowTitle(L"Folder Not Found");
-        dlg.SetMainIcon(TD_ICON_INFORMATION);
-        dlg.SetMainInstruction(L"Taiga couldn't find the folder of this anime. "
-                               L"Would you like to set it manually?");
-        dlg.AddButton(L"Yes", IDYES);
-        dlg.AddButton(L"No", IDNO);
-        dlg.Show(g_hMain);
-        if (dlg.GetSelectedButtonID() == IDYES) {
-          wstring default_path, path;
-          if (!Settings.Folders.root.empty())
-            default_path = Settings.Folders.root.front();
-          if (BrowseForFolder(g_hMain, L"Choose an anime folder", default_path, path)) {
-            anime_item->SetFolder(path, true);
-          }
+    MainDialog.ChangeStatus(L"Searching for folder...");
+    if (!anime_item->CheckFolder()) {
+      win32::TaskDialog dlg;
+      dlg.SetWindowTitle(L"Folder Not Found");
+      dlg.SetMainIcon(TD_ICON_INFORMATION);
+      dlg.SetMainInstruction(L"Taiga couldn't find the folder of this anime. "
+                             L"Would you like to set it manually?");
+      dlg.AddButton(L"Yes", IDYES);
+      dlg.AddButton(L"No", IDNO);
+      dlg.Show(g_hMain);
+      if (dlg.GetSelectedButtonID() == IDYES) {
+        wstring default_path, path;
+        if (!Settings.Folders.root.empty())
+          default_path = Settings.Folders.root.front();
+        if (BrowseForFolder(g_hMain, L"Choose an anime folder", default_path, path)) {
+          anime_item->SetFolder(path, true);
         }
-        MainDialog.ChangeStatus();
       }
     }
+    MainDialog.ChangeStatus();
     if (!anime_item->GetFolder().empty()) {
       Execute(anime_item->GetFolder());
     }

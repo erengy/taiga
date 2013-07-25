@@ -43,6 +43,7 @@ public:
   friend class SettingsPage;
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  void OnHelp(LPHELPINFO lphi);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnOK();
