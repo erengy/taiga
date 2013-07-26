@@ -191,7 +191,7 @@ void EventQueue::Check(bool automatic) {
     items[index].reason = L"Not logged in";
     return;
   }
-  if (automatic && !Taiga.is_sync_enabled) {
+  if (automatic && !Settings.Program.General.enable_sync) {
     items[index].reason = L"Synchronization is disabled";
     return;
   }

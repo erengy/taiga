@@ -253,13 +253,13 @@ void UpdateToolsMenu() {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       // Tools > Enable anime recognition
       if (MENU.Items[i].Action == L"ToggleRecognition()")
-        MENU.Items[i].Checked = Taiga.is_recognition_enabled;
+        MENU.Items[i].Checked = Settings.Program.General.enable_recognition == TRUE;
       // Tools > Enable auto sharing
       if (MENU.Items[i].Action == L"ToggleSharing()")
-        MENU.Items[i].Checked = Taiga.is_sharing_enabled;
+        MENU.Items[i].Checked = Settings.Program.General.enable_sharing == TRUE;
       // Tools > Enable auto synchronization
       if (MENU.Items[i].Action == L"ToggleSynchronization()")
-        MENU.Items[i].Checked = Taiga.is_sync_enabled;
+        MENU.Items[i].Checked = Settings.Program.General.enable_sync == TRUE;
     }
   }
 }
@@ -270,7 +270,7 @@ void UpdateTrayMenu() {
     // Tray > Enable recognition
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       if (MENU.Items[i].Action == L"ToggleRecognition()") {
-        MENU.Items[i].Checked = Taiga.is_recognition_enabled;
+        MENU.Items[i].Checked = Settings.Program.General.enable_recognition == TRUE;
         break;
       }
     }
@@ -292,7 +292,7 @@ void UpdateViewMenu() {
         break;
       }
     }
-    MENU.Items.back().Checked = MainDialog.treeview.IsVisible() == TRUE;
+    MENU.Items.back().Checked = Settings.Program.General.hide_sidebar == FALSE;
   }
 }
 

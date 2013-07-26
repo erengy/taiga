@@ -92,7 +92,8 @@ void Item::StartWatching(Episode episode) {
   // Update main window
   MainDialog.UpdateTip();
   MainDialog.UpdateTitle();
-  MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+  if (Settings.Account.Update.go_to_nowplaying)
+    MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
   
   // Show balloon tip
   if (Settings.Program.Notifications.recognized) {
@@ -125,7 +126,7 @@ void Item::StartWatching(Episode episode) {
     mal::SearchAnime(GetId(), GetTitle());
   
   // Update list
-  if (Settings.Account.Update.time == UPDATE_TIME_INSTANT)
+  if (Settings.Account.Update.delay == 0 && !Settings.Account.Update.wait_mp)
     UpdateList(episode);
 }
 
@@ -154,24 +155,24 @@ void Item::EndWatching(Episode episode) {
 }
 
 bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
-  if (Settings.Account.Update.mode == UPDATE_MODE_NONE)
-    return false;
-
   if (!ignore_update_time)
-    if (Settings.Account.Update.time != UPDATE_TIME_INSTANT)
-      if (Settings.Account.Update.delay > Taiga.ticker_media)
-        if (Taiga.ticker_media > -1)
-          return false;
+    if (Settings.Account.Update.delay > Taiga.ticker_media)
+      if (Taiga.ticker_media > -1)
+        return false;
 
   if (GetMyStatus() == mal::MYSTATUS_COMPLETED && GetMyRewatching() == 0)
     return false;
-  
+
   int number = GetEpisodeHigh(episode.number);
   int number_low = GetEpisodeLow(episode.number);
   int last_watched = GetMyLastWatchedEpisode();
-    
+
   if (Settings.Account.Update.out_of_range)
     if (number_low > last_watched + 1 || number < last_watched + 1)
+      return false;
+
+  if (Settings.Account.Update.out_of_root)
+    if (!IsInsideRootFolders(episode.folder))
       return false;
 
   if (!mal::IsValidEpisode(number, last_watched, GetEpisodeCount()))
@@ -185,7 +186,7 @@ void Item::UpdateList(Episode episode) {
   
   bool change_status = true;
 
-  if (Settings.Account.Update.mode == UPDATE_MODE_ASK) {
+  if (Settings.Account.Update.ask_to_confirm) {
       // Set up dialog
       win32::TaskDialog dlg;
       wstring title = L"Anime title: " + GetTitle();
@@ -200,14 +201,18 @@ void Item::UpdateList(Episode episode) {
       if (number == 0) number = 1;
       if (GetEpisodeCount() == 1) episode.number = L"1";
       if (GetEpisodeCount() == number) { // Completed
-        dlg.AddButton(L"Update and move\nUpdate and set as completed", IDCANCEL);
+        dlg.AddButton(L"Update and move\n"
+                      L"Update and set as completed", IDCANCEL);
       } else if (GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
-        dlg.AddButton(L"Update and move\nUpdate and set as watching", IDCANCEL);
+        dlg.AddButton(L"Update and move\n"
+                      L"Update and set as watching", IDCANCEL);
       }
-      wstring button = L"Update\nUpdate episode number from " + 
-        ToWstr(GetMyLastWatchedEpisode()) + L" to " + ToWstr(number);
+      wstring button = L"Update\n"
+                       L"Update episode number from " + ToWstr(GetMyLastWatchedEpisode()) + 
+                       L" to " + ToWstr(number);
       dlg.AddButton(button.c_str(), IDYES);
-      dlg.AddButton(L"Cancel\nDon't update anything", IDNO);
+      dlg.AddButton(L"Cancel\n"
+                    L"Don't update anything", IDNO);
   
       // Show dialog
       ActivateWindow(g_hMain);
@@ -338,6 +343,17 @@ void GetUpcomingTitles(vector<int>& anime_ids) {
       anime_ids.push_back(anime_item.GetId());
     }
   }
+}
+
+bool IsInsideRootFolders(const wstring& path) {
+  if (path.empty() || Settings.Folders.root.empty())
+    return true;
+
+  foreach_c_(folder, Settings.Folders.root)
+    if (StartsWith(path, *folder))
+      return true;
+
+  return false;
 }
 
 } // namespace anime

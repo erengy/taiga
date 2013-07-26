@@ -159,6 +159,9 @@ void MainDialog::CreateDialogControls() {
   treeview.SetImageList(UI.ImgList16.GetHandle());
   treeview.SetItemHeight(20);
   treeview.SetTheme();
+  if (Settings.Program.General.hide_sidebar) {
+    treeview.Hide();
+  }
   // Create status bar
   statusbar.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
   statusbar.SetImageList(UI.ImgList16.GetHandle());
@@ -654,7 +657,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     // Started to watch?
     if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
       // Recognized?
-      if (Taiga.is_recognition_enabled) {
+      if (Settings.Program.General.enable_recognition) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
           anime_item = Meow.MatchDatabase(CurrentEpisode, false, true);
           if (anime_item) {
@@ -701,8 +704,9 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           // Announce current episode
           Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_MIRC | ANNOUNCE_TO_SKYPE);
           // Update
-          if (Settings.Account.Update.time == UPDATE_MODE_AFTERDELAY && anime_item)
-            anime_item->UpdateList(CurrentEpisode);
+          if (!Settings.Account.Update.wait_mp)
+            if (anime_item)
+              anime_item->UpdateList(CurrentEpisode);
           return;
         }
         if (Settings.Account.Update.check_player == FALSE || 
@@ -734,7 +738,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     } else {
       CurrentEpisode.Set(anime::ID_UNKNOWN);
       anime_item->EndWatching(CurrentEpisode);
-      if (Settings.Account.Update.time == UPDATE_MODE_WAITPLAYER)
+      if (Settings.Account.Update.wait_mp)
         anime_item->UpdateList(CurrentEpisode);
       Taiga.ticker_media = 0;
     }
@@ -906,9 +910,12 @@ void MainDialog::UpdateTitle() {
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     title += L" \u2013 " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
-    if (Settings.Account.Update.out_of_range && 
+    if (Settings.Account.Update.out_of_range &&
         GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
       title += L" (out of range)";
+    } else if (Settings.Account.Update.out_of_root &&
+               !anime::IsInsideRootFolders(CurrentEpisode.folder)) {
+      title += L" (out of root folders)";
     }
   }
   SetText(title);

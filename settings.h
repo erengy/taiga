@@ -23,18 +23,6 @@
 #include "feed.h"
 #include "optional.h"
 
-enum UpdateMode {
-  UPDATE_MODE_NONE = 1,
-  UPDATE_MODE_AUTO = 2,
-  UPDATE_MODE_ASK  = 3
-};
-
-enum UpdateTime {
-  UPDATE_TIME_INSTANT    = 1,
-  UPDATE_MODE_WAITPLAYER = 2,
-  UPDATE_MODE_AFTERDELAY = 3
-};
-
 // =============================================================================
 
 class Settings {
@@ -53,8 +41,8 @@ public:
     } MAL;
     // Update
     struct Update {
-      int delay, mode, time;
-      BOOL check_player, out_of_range;
+      int delay;
+      BOOL ask_to_confirm, check_player, go_to_nowplaying, out_of_range, out_of_root, wait_mp;
     } Update;
   } Account;
 
@@ -107,6 +95,8 @@ public:
   struct Program {
     // General
     struct General {
+      BOOL hide_sidebar;
+      BOOL enable_recognition, enable_sharing, enable_sync;
       BOOL auto_start, close, minimize;
       wstring external_links, theme;
     } General;

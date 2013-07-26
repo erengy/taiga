@@ -94,7 +94,7 @@ wstring Statistics::CalculateLifeSpentWatching() {
       default:
       case mal::TYPE_TV:      duration = 24;  break;
       case mal::TYPE_OVA:     duration = 24;  break;
-      case mal::TYPE_MOVIE:   duration = 130; break;
+      case mal::TYPE_MOVIE:   duration = 90; break;
       case mal::TYPE_SPECIAL: duration = 12;  break;
       case mal::TYPE_ONA:     duration = 24;  break;
       case mal::TYPE_MUSIC:   duration = 5;   break;

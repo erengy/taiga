@@ -69,7 +69,7 @@ void Announcer::Clear(int modes, bool force) {
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
-  if (!force && !Taiga.is_sharing_enabled)
+  if (!force && !Settings.Program.General.enable_sharing)
     return;
 
   if (!episode)

@@ -223,7 +223,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // ShowSidebar()
   } else if (action == L"ShowSidebar") {
-    MainDialog.treeview.Show(!MainDialog.treeview.IsVisible());
+    Settings.Program.General.hide_sidebar = !Settings.Program.General.hide_sidebar;
+    MainDialog.treeview.Show(!Settings.Program.General.hide_sidebar);
     MainDialog.UpdateControlPositions();
     UpdateViewMenu();
 
@@ -372,8 +373,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleRecognition()
   //   Enables or disables anime recognition.
   } else if (action == L"ToggleRecognition") {
-    Taiga.is_recognition_enabled = !Taiga.is_recognition_enabled;
-    if (Taiga.is_recognition_enabled) {
+    Settings.Program.General.enable_recognition = !Settings.Program.General.enable_recognition;
+    if (Settings.Program.General.enable_recognition) {
       MainDialog.ChangeStatus(L"Automatic anime recognition is now enabled.");
       CurrentEpisode.Set(anime::ID_UNKNOWN);
     } else {
@@ -386,9 +387,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleSharing()
   //   Enables or disables automatic sharing.
   } else if (action == L"ToggleSharing") {
-    Taiga.is_sharing_enabled = !Taiga.is_sharing_enabled;
+    Settings.Program.General.enable_sharing = !Settings.Program.General.enable_sharing;
     UpdateToolsMenu();
-    if (Taiga.is_sharing_enabled) {
+    if (Settings.Program.General.enable_sharing) {
       MainDialog.ChangeStatus(L"Automatic sharing is now enabled.");
     } else {
       MainDialog.ChangeStatus(L"Automatic sharing is now disabled.");
@@ -397,9 +398,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleSynchronization()
   //   Enables or disables automatic list synchronization.
   } else if (action == L"ToggleSynchronization") {
-    Taiga.is_sync_enabled = !Taiga.is_sync_enabled;
+    Settings.Program.General.enable_sync = !Settings.Program.General.enable_sync;
     UpdateToolsMenu();
-    if (Taiga.is_sync_enabled) {
+    if (Settings.Program.General.enable_sync) {
       MainDialog.ChangeStatus(L"Automatic synchronization is now enabled.");
     } else {
       MainDialog.ChangeStatus(L"Automatic synchronization is now disabled.");

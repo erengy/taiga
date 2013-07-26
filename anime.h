@@ -110,6 +110,8 @@ wstring GetImagePath(int anime_id = -1);
 
 void GetUpcomingTitles(vector<int>& anime_ids);
 
+bool IsInsideRootFolders(const wstring& path);
+
 } // namespace anime
 
 #endif // ANIME_H

@@ -27,8 +27,8 @@
 
 #define APP_NAME    L"Taiga"
 #define APP_TITLE   L"Taiga 1.0b"
-#define APP_VERSION L"1.0.220 beta"
-#define APP_BUILD   L"2013-07-26"
+#define APP_VERSION L"1.0.221 beta"
+#define APP_BUILD   L"2013-07-27"
 
 #ifndef PORTABLE
 #define PORTABLE
@@ -64,7 +64,6 @@ public:
 
 public:
   int current_tip_type, play_status;
-  bool is_recognition_enabled, is_sharing_enabled, is_sync_enabled;
   bool logged_in;
   int ticker_media, ticker_memory, ticker_new_episodes, ticker_queue;
 

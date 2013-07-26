@@ -80,11 +80,13 @@ bool Settings::Load() {
     Account.MAL.user = mal.attribute(L"username").value();
     // Update
     xml_node update = account.child(L"update");
+    Account.Update.ask_to_confirm = update.attribute(L"asktoconfirm").as_int(TRUE);
     Account.Update.check_player = update.attribute(L"checkplayer").as_int(TRUE);
     Account.Update.delay = update.attribute(L"delay").as_int(60);
-    Account.Update.mode = update.attribute(L"mode").as_int(3);
+    Account.Update.go_to_nowplaying = update.attribute(L"gotonowplaying").as_int(TRUE);
     Account.Update.out_of_range = update.attribute(L"outofrange").as_int();
-    Account.Update.time = update.attribute(L"time").as_int(2);
+    Account.Update.out_of_root = update.attribute(L"outofroot").as_int();
+    Account.Update.wait_mp = update.attribute(L"waitplayer").as_int();
 
   // Announcements
   xml_node announce = settings.child(L"announce");
@@ -148,6 +150,10 @@ bool Settings::Load() {
     Program.General.minimize = general.attribute(L"minimize").as_int();
     Program.General.theme = general.attribute(L"theme").as_string(L"Default");
     Program.General.external_links = general.attribute(L"externallinks").as_string(DEFAULT_EXTERNALLINKS);
+    Program.General.hide_sidebar = general.attribute(L"hidesidebar").as_int();
+    Program.General.enable_recognition = general.attribute(L"enablerecognition").as_int(TRUE);
+    Program.General.enable_sharing = general.attribute(L"enablesharing").as_int(TRUE);
+    Program.General.enable_sync = general.attribute(L"enablesync").as_int(TRUE);
     // Position
     xml_node position = program.child(L"position");
     Program.Position.x = position.attribute(L"x").as_int(-1);
@@ -263,11 +269,13 @@ bool Settings::Save() {
     mal.append_attribute(L"login") = Account.MAL.auto_sync;
     // Update
     xml_node update = account.append_child(L"update");
-    update.append_attribute(L"mode") = Account.Update.mode;
-    update.append_attribute(L"time") = Account.Update.time;
+    update.append_attribute(L"asktoconfirm") = Account.Update.ask_to_confirm;
     update.append_attribute(L"delay") = Account.Update.delay;
     update.append_attribute(L"checkplayer") = Account.Update.check_player;
+    update.append_attribute(L"gotonowplaying") = Account.Update.go_to_nowplaying;
     update.append_attribute(L"outofrange") = Account.Update.out_of_range;
+    update.append_attribute(L"outofroot") = Account.Update.out_of_root;
+    update.append_attribute(L"waitplayer") = Account.Update.wait_mp;
   
   // Anime
   settings.append_child(node_comment).set_value(L" Anime list ");
@@ -335,6 +343,10 @@ bool Settings::Save() {
     general.append_attribute(L"minimize") = Program.General.minimize;
     general.append_attribute(L"theme") = Program.General.theme.c_str();
     general.append_attribute(L"externallinks") = Program.General.external_links.c_str();
+    general.append_attribute(L"hidesidebar") = Program.General.hide_sidebar;
+    general.append_attribute(L"enablerecognition") = Program.General.enable_recognition;
+    general.append_attribute(L"enablesharing") = Program.General.enable_sharing;
+    general.append_attribute(L"enablesync") = Program.General.enable_sync;
     // Position
     xml_node position = program.append_child(L"position");
     position.append_attribute(L"x") = Program.Position.x;

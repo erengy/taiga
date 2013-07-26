@@ -95,11 +95,10 @@ void SettingsDialog::SetCurrentSection(int index) {
       tab_.InsertItem(0, L"Behavior", PAGE_APP_BEHAVIOR);
       tab_.InsertItem(1, L"Connection", PAGE_APP_CONNECTION);
       tab_.InsertItem(2, L"Interface", PAGE_APP_INTERFACE);
-      tab_.InsertItem(3, L"List", PAGE_APP_LIST);
-      tab_.InsertItem(4, L"Notifications", PAGE_APP_NOTIFICATIONS);
+      tab_.InsertItem(3, L"Anime list", PAGE_APP_LIST);
       break;
     case SECTION_RECOGNITION:
-      tab_.InsertItem(0, L"List updates", PAGE_RECOGNITION_UPDATE);
+      tab_.InsertItem(0, L"General", PAGE_RECOGNITION_GENERAL);
       tab_.InsertItem(1, L"Media players", PAGE_RECOGNITION_MEDIA);
       tab_.InsertItem(2, L"Media providers", PAGE_RECOGNITION_STREAM);
       break;
@@ -241,21 +240,19 @@ void SettingsDialog::OnOK() {
     Settings.Program.List.progress_show_available = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AVAILABLE);
     Settings.Program.List.progress_show_eps = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
   }
-  // Application > Notifications
-  page = &pages[PAGE_APP_NOTIFICATIONS];
+  
+  // Recognition > General
+  page = &pages[PAGE_RECOGNITION_GENERAL];
   if (page->IsWindow()) {
+    Settings.Account.Update.ask_to_confirm = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CONFIRM);
+    Settings.Account.Update.check_player = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP);
+    Settings.Account.Update.go_to_nowplaying = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_GOTO);
+    Settings.Account.Update.out_of_range = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_RANGE);
+    Settings.Account.Update.out_of_root = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_ROOT);
+    Settings.Account.Update.wait_mp = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_WAITMP);
+    Settings.Account.Update.delay = page->GetDlgItemInt(IDC_EDIT_DELAY);
     Settings.Program.Notifications.recognized = page->IsDlgButtonChecked(IDC_CHECK_NOTIFY_RECOGNIZED);
     Settings.Program.Notifications.notrecognized = page->IsDlgButtonChecked(IDC_CHECK_NOTIFY_NOTRECOGNIZED);
-  }
-  
-  // Recognition > List updates
-  page = &pages[PAGE_RECOGNITION_UPDATE];
-  if (page->IsWindow()) {
-    Settings.Account.Update.mode = page->GetCheckedRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3) + 1;
-    Settings.Account.Update.time = page->GetCheckedRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3) + 1;
-    Settings.Account.Update.delay = page->GetDlgItemInt(IDC_EDIT_DELAY);
-    Settings.Account.Update.check_player = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP);
-    Settings.Account.Update.out_of_range = page->IsDlgButtonChecked(IDC_CHECK_UPDATE_RANGE);
   }
   // Recognition > Media players
   page = &pages[PAGE_RECOGNITION_MEDIA];

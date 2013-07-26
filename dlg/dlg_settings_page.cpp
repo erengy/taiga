@@ -57,12 +57,11 @@ void SettingsPage::Create() {
     SETRESOURCEID(PAGE_APP_CONNECTION, IDD_SETTINGS_APP_CONNECTION);
     SETRESOURCEID(PAGE_APP_INTERFACE, IDD_SETTINGS_APP_INTERFACE);
     SETRESOURCEID(PAGE_APP_LIST, IDD_SETTINGS_APP_LIST);
-    SETRESOURCEID(PAGE_APP_NOTIFICATIONS, IDD_SETTINGS_APP_NOTIFICATIONS);
     SETRESOURCEID(PAGE_LIBRARY_FOLDERS, IDD_SETTINGS_LIBRARY_FOLDERS);
     SETRESOURCEID(PAGE_LIBRARY_CACHE, IDD_SETTINGS_LIBRARY_CACHE);
+    SETRESOURCEID(PAGE_RECOGNITION_GENERAL, IDD_SETTINGS_RECOGNITION_GENERAL);
     SETRESOURCEID(PAGE_RECOGNITION_MEDIA, IDD_SETTINGS_RECOGNITION_MEDIA);
     SETRESOURCEID(PAGE_RECOGNITION_STREAM, IDD_SETTINGS_RECOGNITION_STREAM);
-    SETRESOURCEID(PAGE_RECOGNITION_UPDATE, IDD_SETTINGS_RECOGNITION_UPDATE);
     SETRESOURCEID(PAGE_SERVICES_MAL, IDD_SETTINGS_SERVICES_MAL);
     SETRESOURCEID(PAGE_SHARING_HTTP, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(PAGE_SHARING_MESSENGER, IDD_SETTINGS_SHARING_MESSENGER);
@@ -170,25 +169,21 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.progress_show_eps);
       break;
     }
-    // Application > Notifications
-    case PAGE_APP_NOTIFICATIONS: {
-      CheckDlgButton(IDC_CHECK_NOTIFY_RECOGNIZED, Settings.Program.Notifications.recognized);
-      CheckDlgButton(IDC_CHECK_NOTIFY_NOTRECOGNIZED, Settings.Program.Notifications.notrecognized);
-      break;
-    }
 
     // =========================================================================
 
-    // Recognition > List updates
-    case PAGE_RECOGNITION_UPDATE: {
-      CheckDlgButton(IDC_RADIO_UPDATE_MODE1 + Settings.Account.Update.mode - 1, TRUE);
-      CheckDlgButton(IDC_RADIO_UPDATE_TIME1 + Settings.Account.Update.time - 1, TRUE);
+    // Recognition > General
+    case PAGE_RECOGNITION_GENERAL: {
+      CheckDlgButton(IDC_CHECK_UPDATE_CONFIRM, Settings.Account.Update.ask_to_confirm);
+      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.Account.Update.check_player);
+      CheckDlgButton(IDC_CHECK_UPDATE_GOTO, Settings.Account.Update.go_to_nowplaying);
+      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.Account.Update.out_of_range);
+      CheckDlgButton(IDC_CHECK_UPDATE_ROOT, Settings.Account.Update.out_of_root);
+      CheckDlgButton(IDC_CHECK_UPDATE_WAITMP, Settings.Account.Update.wait_mp);
       SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETRANGE32, 0, 3600);
       SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, Settings.Account.Update.delay);
-      EnableDlgItem(IDC_EDIT_DELAY, Settings.Account.Update.time > 1);
-      EnableDlgItem(IDC_SPIN_DELAY, Settings.Account.Update.time > 1);
-      CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.Account.Update.check_player);
-      CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.Account.Update.out_of_range);
+      CheckDlgButton(IDC_CHECK_NOTIFY_RECOGNIZED, Settings.Program.Notifications.recognized);
+      CheckDlgButton(IDC_CHECK_NOTIFY_NOTRECOGNIZED, Settings.Program.Notifications.notrecognized);
       break;
     }
     // Recognition > Media players
@@ -551,18 +546,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // ================================================================================
 
         // Check radio buttons
-        case IDC_RADIO_UPDATE_MODE1:
-        case IDC_RADIO_UPDATE_MODE2:
-        case IDC_RADIO_UPDATE_MODE3:
-          CheckRadioButton(IDC_RADIO_UPDATE_MODE1, IDC_RADIO_UPDATE_MODE3, LOWORD(wParam));
-          return TRUE;
-        case IDC_RADIO_UPDATE_TIME1:
-        case IDC_RADIO_UPDATE_TIME2:
-        case IDC_RADIO_UPDATE_TIME3:
-          CheckRadioButton(IDC_RADIO_UPDATE_TIME1, IDC_RADIO_UPDATE_TIME3, LOWORD(wParam));
-          EnableDlgItem(IDC_EDIT_DELAY, LOWORD(wParam) != IDC_RADIO_UPDATE_TIME1);
-          EnableDlgItem(IDC_SPIN_DELAY, LOWORD(wParam) != IDC_RADIO_UPDATE_TIME1);
-          return TRUE;
         case IDC_RADIO_MIRC_CHANNEL1:
         case IDC_RADIO_MIRC_CHANNEL2:
         case IDC_RADIO_MIRC_CHANNEL3:
