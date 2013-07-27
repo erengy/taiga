@@ -44,6 +44,11 @@ HRESULT CALLBACK TaskDialog::Callback(HWND hwnd, UINT uNotification, WPARAM wPar
     case TDN_HYPERLINK_CLICKED:
       ::ShellExecute(NULL, NULL, (LPCWSTR)lParam, NULL, NULL, SW_SHOWNORMAL);
       break;
+    case TDN_VERIFICATION_CLICKED: {
+      auto dlg = reinterpret_cast<TaskDialog*>(dwRefData);
+      dlg->m_VerificationChecked = static_cast<BOOL>(wParam) == TRUE;
+      break;
+    }
   }
   return S_OK;
 }
@@ -59,6 +64,7 @@ void TaskDialog::Initialize() {
   m_Config.lpCallbackData = reinterpret_cast<LONG_PTR>(this);
   m_Config.pfCallback = Callback;
   m_SelectedButtonID = 0;
+  m_VerificationChecked = false;
 }
 
 // =============================================================================
@@ -71,6 +77,10 @@ void TaskDialog::AddButton(LPCWSTR text, int id) {
 
 int TaskDialog::GetSelectedButtonID() const {
   return m_SelectedButtonID;
+}
+
+bool TaskDialog::GetVerificationCheck() const {
+  return m_VerificationChecked;
 }
 
 void TaskDialog::SetCollapsedControlText(LPCWSTR text) {
@@ -107,6 +117,10 @@ void TaskDialog::SetMainInstruction(LPCWSTR text) {
   m_Config.pszMainInstruction = text;
 }
 
+void TaskDialog::SetVerificationText(LPCWSTR text) {
+  m_Config.pszVerificationText = text;
+}
+
 void TaskDialog::SetWindowTitle(LPCWSTR text) {
   m_Config.pszWindowTitle = text;
 }
@@ -133,7 +147,8 @@ HRESULT TaskDialog::Show(HWND hParent) {
 
   // Show task dialog, if available
   if (GetWinVersion() >= VERSION_VISTA) {
-    return ::TaskDialogIndirect(&m_Config, &m_SelectedButtonID, NULL, NULL);
+    BOOL VerificationFlagChecked = TRUE;
+    return ::TaskDialogIndirect(&m_Config, &m_SelectedButtonID, NULL, &VerificationFlagChecked);
   
   // Fall back to normal message box
   } else {

@@ -43,6 +43,7 @@ public:
   
   void    AddButton(LPCWSTR text, int id);
   int     GetSelectedButtonID() const;
+  bool    GetVerificationCheck() const;
   void    SetCollapsedControlText(LPCWSTR text);
   void    SetContent(LPCWSTR text);
   void    SetExpandedControlText(LPCWSTR text);
@@ -51,6 +52,7 @@ public:
   void    SetFooterIcon(LPWSTR icon);
   void    SetMainIcon(LPWSTR icon);
   void    SetMainInstruction(LPCWSTR text);
+  void    SetVerificationText(LPCWSTR text);
   void    SetWindowTitle(LPCWSTR text);
   HRESULT Show(HWND hParent);
   void    UseCommandLinks(bool use);
@@ -63,6 +65,7 @@ protected:
   vector<TASKDIALOG_BUTTON> m_Buttons;
   TASKDIALOGCONFIG m_Config;
   int m_SelectedButtonID;
+  bool m_VerificationChecked;
 };
 
 } // namespace win32

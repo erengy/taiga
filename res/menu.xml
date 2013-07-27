@@ -99,8 +99,8 @@
 		<item name="Edit" sub="Edit"/>
 		<item name="Search" sub="Search"/>
 		<item type="separator"/>
-		<item name="Check available episodes" action="CheckEpisodes(%item%)"/>
 		<item name="Open folder" action="OpenFolder()"/>
+		<item name="Scan available episodes" action="CheckEpisodes(%item%)"/>
 		<item type="separator"/>
 		<!-- Note: Overwritten -->
 		<item name="Play episode"           sub="PlayEpisode"/>

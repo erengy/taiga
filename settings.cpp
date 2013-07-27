@@ -81,8 +81,8 @@ bool Settings::Load() {
     // Update
     xml_node update = account.child(L"update");
     Account.Update.ask_to_confirm = update.attribute(L"asktoconfirm").as_int(TRUE);
-    Account.Update.check_player = update.attribute(L"checkplayer").as_int(TRUE);
-    Account.Update.delay = update.attribute(L"delay").as_int(60);
+    Account.Update.check_player = update.attribute(L"checkplayer").as_int();
+    Account.Update.delay = update.attribute(L"delay").as_int(120);
     Account.Update.go_to_nowplaying = update.attribute(L"gotonowplaying").as_int(TRUE);
     Account.Update.out_of_range = update.attribute(L"outofrange").as_int();
     Account.Update.out_of_root = update.attribute(L"outofroot").as_int();
@@ -127,7 +127,7 @@ bool Settings::Load() {
     Folders.root.push_back(folder.attribute(L"folder").value());
   }
   xml_node watch = folders.child(L"watch");
-  Folders.watch_enabled = watch.attribute(L"enabled").as_int();
+  Folders.watch_enabled = watch.attribute(L"enabled").as_int(TRUE);
 
   // Anime items
   Anime.items.clear();

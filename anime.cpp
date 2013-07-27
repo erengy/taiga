@@ -194,6 +194,7 @@ void Item::UpdateList(Episode episode) {
       dlg.SetMainIcon(TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"Do you want to update your anime list?");
       dlg.SetContent(title.c_str());
+      dlg.SetVerificationText(L"Don't ask again, update automatically");
       dlg.UseCommandLinks(true);
 
       // Add buttons
@@ -217,6 +218,8 @@ void Item::UpdateList(Episode episode) {
       // Show dialog
       ActivateWindow(g_hMain);
       dlg.Show(g_hMain);
+      if (dlg.GetVerificationCheck())
+        Settings.Account.Update.ask_to_confirm = FALSE;
       int choice = dlg.GetSelectedButtonID();
       if (choice == IDNO) return;
       change_status = choice == IDCANCEL;
