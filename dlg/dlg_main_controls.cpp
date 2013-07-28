@@ -22,7 +22,6 @@
 
 #include "dlg_anime_list.h"
 #include "dlg_history.h"
-#include "dlg_search.h"
 #include "dlg_season.h"
 #include "dlg_stats.h"
 

@@ -206,6 +206,10 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
   }
   episode.file = title;
 
+  // Ignore if the file is outside of root folders
+  if (!anime::IsInsideRootFolders(episode.folder))
+    return false;
+
   // Check and trim file extension
   wstring extension = GetFileExtension(title);
   if (!extension.empty() && extension.length() < title.length() && extension.length() <= 5) {

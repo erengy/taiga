@@ -50,6 +50,9 @@ BOOL SearchDialog::OnInitDialog() {
   list_.InsertColumn(2,  60,  60, LVCFMT_RIGHT,  L"Episodes");
   list_.InsertColumn(3,  60,  60, LVCFMT_RIGHT,  L"Score");
   list_.InsertColumn(4, 100, 100, LVCFMT_RIGHT,  L"Season");
+  list_.EnableGroupView(true);
+  list_.InsertGroup(0, L"Not in list");
+  list_.InsertGroup(1, L"In list");
   
   // Success
   return TRUE;
@@ -108,38 +111,10 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
         if (lpnmitem->iItem == -1) break;
         LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
-        UpdateSearchListMenu(AnimeDatabase.FindItem(static_cast<int>(lParam)) != nullptr);
+        auto anime_item = AnimeDatabase.FindItem(static_cast<int>(lParam));
+        UpdateSearchListMenu(!anime_item->IsInList());
         ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SearchList"), 0, lParam);
         break;
-      }
-
-      // Custom draw
-      case NM_CUSTOMDRAW: {
-        LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(pnmh);
-        switch (pCD->nmcd.dwDrawStage) {
-          case CDDS_PREPAINT:
-            return CDRF_NOTIFYITEMDRAW;
-          case CDDS_ITEMPREPAINT:
-            return CDRF_NOTIFYSUBITEMDRAW;
-          case CDDS_PREERASE:
-          case CDDS_ITEMPREERASE:
-            return CDRF_NOTIFYPOSTERASE;
-          case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-            // Alternate background color
-            if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled()) {
-              pCD->clrTextBk = theme::COLOR_LIGHTGRAY;
-            }
-            // Change text color
-            int anime_id = static_cast<int>(pCD->nmcd.lItemlParam);
-            auto anime_item = AnimeDatabase.FindItem(anime_id);
-            if (anime_item->IsInList()) {
-              pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
-            } else {
-              pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
-            }
-            return CDRF_NOTIFYPOSTPAINT;
-          }
-        }
       }
     }
   }
@@ -160,11 +135,6 @@ void SearchDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 // =============================================================================
 
-void SearchDialog::EnableInput(bool enable) {
-  EnableDlgItem(IDOK, enable);
-  SetDlgItemText(IDOK, enable ? L"Search" : L"Searching...");
-}
-
 void SearchDialog::ParseResults(const wstring& data) {
   if (data.empty()) {
     wstring msg = L"No results found for \"" + search_text + L"\".";
@@ -174,17 +144,18 @@ void SearchDialog::ParseResults(const wstring& data) {
     dlg.Show(GetWindowHandle());
     return;
   }
+
   if (data == L"Invalid credentials") {
     win32::TaskDialog dlg(L"Search Anime", TD_ERROR_ICON);
     dlg.SetMainInstruction(L"Invalid username or password.");
-    dlg.SetContent(L"Anime search requires authentication, which means, "
-      L"you need to enter a valid username and password to search MyAnimeList.");
+    dlg.SetContent(L"Anime search requires authentication, which means, you need to "
+                   L"enter a valid username and password to search MyAnimeList.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(GetWindowHandle());
     return;
   }
+
   anime_ids_.clear();
-  
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
   if (result.status == status_ok) {
@@ -193,9 +164,26 @@ void SearchDialog::ParseResults(const wstring& data) {
       anime_ids_.push_back(XML_ReadIntValue(entry, L"id"));
     }
   }
+
   mal::ParseSearchResult(data);
 
   RefreshList();
+}
+
+void SearchDialog::AddAnimeToList(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (anime_item) {
+    int i = list_.GetItemCount();
+    list_.InsertItem(i, anime_item->IsInList() ? 1 : 0,
+                     StatusToIcon(anime_item->GetAiringStatus()), 0, nullptr,
+                     anime_item->GetTitle().c_str(),
+                     static_cast<LPARAM>(anime_item->GetId()));
+    list_.SetItem(i, 1, mal::TranslateType(anime_item->GetType()).c_str());
+    list_.SetItem(i, 2, mal::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
+    list_.SetItem(i, 3, anime_item->GetScore().c_str());
+    list_.SetItem(i, 4, mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)).c_str());
+  }
 }
 
 void SearchDialog::RefreshList() {
@@ -207,29 +195,27 @@ void SearchDialog::RefreshList() {
   
   // Add anime items to list
   for (size_t i = 0; i < anime_ids_.size(); i++) {
-    auto anime_item = AnimeDatabase.FindItem(anime_ids_.at(i));
-    if (anime_item) {
-      list_.InsertItem(i, -1, StatusToIcon(anime_item->GetAiringStatus()), 0, nullptr, 
-        anime_item->GetTitle().c_str(), static_cast<LPARAM>(anime_item->GetId()));
-      list_.SetItem(i, 1, mal::TranslateType(anime_item->GetType()).c_str());
-      list_.SetItem(i, 2, mal::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
-      list_.SetItem(i, 3, anime_item->GetScore().c_str());
-      list_.SetItem(i, 4, mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)).c_str());
-    }
+    AddAnimeToList(anime_ids_.at(i));
   }
+  /*for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (std::find(anime_ids_.begin(), anime_ids_.end(), it->second.GetId()) == anime_ids_.end())
+      if (filters_.CheckItem(it->second))
+        AddAnimeToList(it->second.GetId());
+  }*/
 
   // Sort and show the list again
-  list_.Sort(0, 1, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
-  list_.Show();
+  //list_.Sort(0, 1, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
+  list_.Show(SW_SHOW);
 }
 
 bool SearchDialog::Search(const wstring& title) {
+  anime_ids_.clear();
+  search_text = title;
+  filters_.text = title;
+  //RefreshList();
+  
   if (mal::SearchAnime(anime::ID_UNKNOWN, title)) {
     MainDialog.ChangeStatus(L"Searching MyAnimeList for \"" + title + L"\"...");
-    EnableInput(false);
-    list_.DeleteAllItems();
-    anime_ids_.clear();
-    search_text = title;
     return true;
   } else {
     MainDialog.ChangeStatus(L"An error occured while searching MyAnimeList for \"" + title + L"\"...");

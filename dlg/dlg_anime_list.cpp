@@ -935,6 +935,7 @@ void AnimeListDialog::RefreshList(int index) {
   int group_index = -1, icon_index = 0, status = 0;
   vector<int> group_count(7);
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    if (!it->second.IsInList()) continue;
     status = it->second.GetMyStatus();
     if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->second.GetMyRewatching())) {
       if (MainDialog.search_bar.filters.CheckItem(it->second)) {

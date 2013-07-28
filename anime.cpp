@@ -171,10 +171,6 @@ bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
     if (number_low > last_watched + 1 || number < last_watched + 1)
       return false;
 
-  if (Settings.Account.Update.out_of_root)
-    if (!IsInsideRootFolders(episode.folder))
-      return false;
-
   if (!mal::IsValidEpisode(number, last_watched, GetEpisodeCount()))
     return false;
 
@@ -349,6 +345,9 @@ void GetUpcomingTitles(vector<int>& anime_ids) {
 }
 
 bool IsInsideRootFolders(const wstring& path) {
+  if (!Settings.Account.Update.out_of_root)
+    return true;
+
   if (path.empty() || Settings.Folders.root.empty())
     return true;
 

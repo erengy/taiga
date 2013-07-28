@@ -20,6 +20,9 @@
 #define DLG_SEARCH_H
 
 #include "../std.h"
+
+#include "../anime_filter.h"
+
 #include "../win32/win_control.h"
 #include "../win32/win_dialog.h"
 
@@ -36,7 +39,7 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
 public:
-  void EnableInput(bool enable);
+  void AddAnimeToList(int anime_id);
   void ParseResults(const wstring& data);
   void RefreshList();
   bool Search(const wstring& title);
@@ -46,6 +49,7 @@ public:
 
 private:
   vector<int> anime_ids_;
+  anime::Filters filters_;
   win32::ListView list_;
 };
 

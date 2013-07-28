@@ -913,9 +913,6 @@ void MainDialog::UpdateTitle() {
     if (Settings.Account.Update.out_of_range &&
         GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
       title += L" (out of range)";
-    } else if (Settings.Account.Update.out_of_root &&
-               !anime::IsInsideRootFolders(CurrentEpisode.folder)) {
-      title += L" (out of root folders)";
     }
   }
   SetText(title);

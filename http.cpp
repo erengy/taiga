@@ -75,14 +75,12 @@ BOOL HttpClient::OnError(DWORD dwError) {
     case HTTP_MAL_AnimeAskToDiscuss:
     case HTTP_MAL_AnimeDetails:
     case HTTP_MAL_Image:
+    case HTTP_MAL_SearchAnime:
     case HTTP_MAL_UserImage:
     case HTTP_Feed_DownloadIcon:
 #ifdef _DEBUG
       MainDialog.ChangeStatus(error_text);
 #endif
-      break;
-    case HTTP_MAL_SearchAnime:
-      SearchDialog.EnableInput(true);
       break;
     case HTTP_Feed_Check:
     case HTTP_Feed_CheckAuto:
@@ -379,7 +377,6 @@ BOOL HttpClient::OnReadComplete() {
         MainDialog.ChangeStatus();
         if (SearchDialog.IsWindow()) {
           SearchDialog.ParseResults(GetData());
-          SearchDialog.EnableInput(true);
         }
       }
       break;

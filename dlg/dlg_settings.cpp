@@ -22,7 +22,6 @@
 #include "dlg_history.h"
 #include "dlg_input.h"
 #include "dlg_main.h"
-#include "dlg_search.h"
 #include "dlg_settings.h"
 #include "dlg_stats.h"
 
@@ -92,10 +91,10 @@ void SettingsDialog::SetCurrentSection(int index) {
       tab_.InsertItem(1, L"Cache", PAGE_LIBRARY_CACHE);
       break;
     case SECTION_APPLICATION:
-      tab_.InsertItem(0, L"Behavior", PAGE_APP_BEHAVIOR);
-      tab_.InsertItem(1, L"Connection", PAGE_APP_CONNECTION);
-      tab_.InsertItem(2, L"Interface", PAGE_APP_INTERFACE);
-      tab_.InsertItem(3, L"Anime list", PAGE_APP_LIST);
+      tab_.InsertItem(0, L"Anime list", PAGE_APP_LIST);
+      tab_.InsertItem(1, L"Behavior", PAGE_APP_BEHAVIOR);
+      tab_.InsertItem(2, L"Connection", PAGE_APP_CONNECTION);
+      tab_.InsertItem(3, L"Interface", PAGE_APP_INTERFACE);
       break;
     case SECTION_RECOGNITION:
       tab_.InsertItem(0, L"General", PAGE_RECOGNITION_GENERAL);
