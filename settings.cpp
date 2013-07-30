@@ -477,7 +477,6 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
     MainDialog.treeview.RefreshHistoryCounter();
     MainDialog.UpdateTitle();
     AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
-    AnimeListDialog.RefreshTabs(mal::MYSTATUS_UNKNOWN, false); // We need this to refresh the numbers
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     HistoryDialog.RefreshList();
     SearchDialog.RefreshList();

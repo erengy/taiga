@@ -49,7 +49,7 @@ public:
   int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
   void RefreshListItem(int anime_id);
-  void RefreshTabs(int index = -1, bool redraw = true);
+  void RefreshTabs(int index = -1);
 
 public:
   // List-view control
@@ -76,6 +76,7 @@ public:
 
 private:
   int current_id_;
+  int current_status_;
 };
 
 extern class AnimeListDialog AnimeListDialog;

@@ -41,7 +41,8 @@ class AnimeListDialog AnimeListDialog;
 // =============================================================================
 
 AnimeListDialog::AnimeListDialog()
-    : current_id_(anime::ID_UNKNOWN) {
+    : current_id_(anime::ID_UNKNOWN),
+      current_status_(mal::MYSTATUS_WATCHING) {
 }
 
 BOOL AnimeListDialog::OnInitDialog() {
@@ -869,9 +870,9 @@ LRESULT AnimeListDialog::OnTabNotify(LPARAM lParam) {
   switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
     // Tab select
     case TCN_SELCHANGE: {
-      int index = static_cast<int>(tab.GetItemParam(tab.GetCurrentlySelected()));
+      int tab_index = tab.GetCurrentlySelected();
+      int index = static_cast<int>(tab.GetItemParam(tab_index));
       RefreshList(index);
-      RefreshTabs(index, false);
       break;
     }
   }
@@ -920,50 +921,65 @@ int AnimeListDialog::GetListIndex(int anime_id) {
 void AnimeListDialog::RefreshList(int index) {
   if (!IsWindow()) return;
   
-  // Remember last index
-  static int last_index = 1;
-  if (index > 0) last_index = index;
-  if (index == -1) index = last_index;
-  if (!MainDialog.search_bar.filters.text.empty()) index = 0;
+  // Remember current status
+  if (index > mal::MYSTATUS_NOTINLIST)
+    current_status_ = index;
 
   // Hide list to avoid visual defects and gain performance
   listview.Hide();
-  listview.EnableGroupView(index == 0 && win32::GetWinVersion() > win32::VERSION_XP);
   listview.DeleteAllItems();
 
-  // Add items
-  int group_index = -1, icon_index = 0, status = 0;
+  // Enable group view
+  bool group_view = !MainDialog.search_bar.filters.text.empty() &&
+                    win32::GetWinVersion() > win32::VERSION_XP;
+  listview.EnableGroupView(group_view);
+
+  // Add items to list
   vector<int> group_count(7);
+  int group_index = -1;
+  int icon_index = 0;
+  int i = 0;
   for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->second.IsInList()) continue;
-    status = it->second.GetMyStatus();
-    if (status == index || index == 0 || (index == mal::MYSTATUS_WATCHING && it->second.GetMyRewatching())) {
-      if (MainDialog.search_bar.filters.CheckItem(it->second)) {
-        group_index = win32::GetWinVersion() > win32::VERSION_XP ? status : -1;
-        icon_index = it->second.GetPlaying() ? ICON16_PLAY : StatusToIcon(it->second.GetAiringStatus());
-        group_count.at(status)++;
-        int i = listview.GetItemCount();
-        listview.InsertItem(i, group_index, icon_index, 
-          0, nullptr, LPSTR_TEXTCALLBACK, static_cast<LPARAM>(it->second.GetId()));
-        listview.SetItem(i, 2, mal::TranslateNumber(it->second.GetMyScore()).c_str());
-        listview.SetItem(i, 3, mal::TranslateType(it->second.GetType()).c_str());
-        listview.SetItem(i, 4, mal::TranslateDateToSeason(it->second.GetDate(anime::DATE_START)).c_str());
+    anime::Item& anime_item = it->second;
+    
+    if (!anime_item.IsInList())
+      continue;
+    if (!group_view)
+      if (current_status_ != anime_item.GetMyStatus())
+        if (current_status_ != mal::MYSTATUS_WATCHING || !it->second.GetMyRewatching())
+          continue;
+    if (!MainDialog.search_bar.filters.CheckItem(anime_item))
+      continue;
+    
+    group_count.at(anime_item.GetMyStatus())++;
+    group_index = group_view ? anime_item.GetMyStatus() : -1;
+    icon_index = anime_item.GetPlaying() ? ICON16_PLAY : StatusToIcon(anime_item.GetAiringStatus());
+    i = listview.GetItemCount();
+    
+    listview.InsertItem(i, group_index, icon_index, 
+                        0, nullptr, LPSTR_TEXTCALLBACK,
+                        static_cast<LPARAM>(anime_item.GetId()));
+    listview.SetItem(i, 2, mal::TranslateNumber(anime_item.GetMyScore()).c_str());
+    listview.SetItem(i, 3, mal::TranslateType(anime_item.GetType()).c_str());
+    listview.SetItem(i, 4, mal::TranslateDateToSeason(anime_item.GetDate(anime::DATE_START)).c_str());
+  }
+
+  // Set group headers
+  if (group_view) {
+    for (int i = mal::MYSTATUS_NOTINLIST; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
+      if (i != mal::MYSTATUS_UNKNOWN) {
+        wstring text = mal::TranslateMyStatus(i, false);
+        text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
+        listview.SetGroupText(i, text.c_str());
       }
     }
   }
 
-  // Set group headers
-  for (int i = mal::MYSTATUS_NOTINLIST; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
-    if (index == 0 && i != mal::MYSTATUS_UNKNOWN) {
-      wstring text = mal::TranslateMyStatus(i, false);
-      text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
-      listview.SetGroupText(i, text.c_str());
-    }
-  }
-
   // Sort items
-  listview.Sort(listview.GetSortColumn(), listview.GetSortOrder(), 
-    listview.GetSortType(listview.GetSortColumn()), ListViewCompareProc);
+  listview.Sort(listview.GetSortColumn(),
+                listview.GetSortOrder(),
+                listview.GetSortType(listview.GetSortColumn()),
+                ListViewCompareProc);
 
   // Show again
   listview.Show(SW_SHOW);
@@ -978,31 +994,32 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
   }
 }
 
-void AnimeListDialog::RefreshTabs(int index, bool redraw) {
+void AnimeListDialog::RefreshTabs(int index) {
   if (!IsWindow()) return;
 
   // Remember last index
-  static int last_index = 1;
-  if (index == 6) index--;
-  if (index == last_index) redraw = false;
-  if (index > 0) last_index = index;
-  if (index == -1) index = last_index;
-  if (!MainDialog.search_bar.filters.text.empty()) index = 0;
-  
-  if (!redraw) return;
+  if (index > mal::MYSTATUS_NOTINLIST)
+    current_status_ = index;
   
   // Hide
   tab.Hide();
 
   // Refresh text
-  for (int i = 1; i <= 6; i++) {
-    if (i != 5) {
+  for (int i = 1; i <= 6; i++)
+    if (i != 5)
       tab.SetItemText(i == 6 ? 4 : i - 1, mal::TranslateMyStatus(i, true).c_str());
-    }
-  }
 
   // Select related tab
-  tab.SetCurrentlySelected(--index);
+  bool group_view = !MainDialog.search_bar.filters.text.empty();
+  int tab_index = current_status_;
+  if (group_view) {
+    tab_index = -1;
+  } else if (tab_index == 6) {
+    current_status_ = 4;
+  } else {
+    tab_index--;
+  }
+  tab.SetCurrentlySelected(tab_index);
 
   // Show again
   tab.Show(SW_SHOW);

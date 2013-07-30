@@ -143,10 +143,12 @@
 		<visible>1</visible>
 		<mode>0</mode>
 		<class>MediaPlayerClassicW</class>
+		<class>MPC-BE</class>
 		<file>mpc-be.exe</file>
 		<file>mpc-be64.exe</file>
 		<folder>%ProgramFiles%\MPC-BE\</folder>
 		<folder>%ProgramW6432%\MPC-BE\</folder>
+		<folder>%ProgramW6432%\MPC-BE x64\</folder>
 		<edit mode="2">MPC-BE</edit>
 	</player>
 	<!-- Miro -->

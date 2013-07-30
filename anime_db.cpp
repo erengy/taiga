@@ -54,7 +54,8 @@ bool Database::LoadDatabase() {
   
   // Load XML file
   xml_document doc;
-  xml_parse_result result = doc.load_file(path.c_str());
+  unsigned int options = parse_default & ~parse_eol;
+  xml_parse_result result = doc.load_file(path.c_str(), options);
   if (result.status != status_ok && result.status != status_file_not_found) {
     return false;
   }

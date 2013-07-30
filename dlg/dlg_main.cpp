@@ -195,7 +195,7 @@ void MainDialog::CreateDialogControls() {
   toolbar_main.InsertButton(0, ICON24_SYNC, TOOLBAR_BUTTON_SYNCHRONIZE, 
                             1, fsStyle1, 0, nullptr, L"Synchronize list");
   toolbar_main.InsertButton(1, ICON24_MAL, TOOLBAR_BUTTON_MAL, 
-                            1, fsStyle1, 1, nullptr, L"Go to your panel at MyAnimeList");
+                            1, fsStyle1, 1, nullptr, L"Go to my panel at MyAnimeList");
   toolbar_main.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(3, ICON24_FOLDERS, TOOLBAR_BUTTON_FOLDERS, 
                             1, fsStyle2, 3, nullptr, L"Root folders");
