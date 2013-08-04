@@ -101,6 +101,18 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         }
         break;
       }
+      // Right click
+      case NM_RCLICK: {
+        wstring action = UI.Menus.Show(g_hMain, 0, 0, L"HistoryList");
+        if (action == L"Delete()") {
+          RemoveItems();
+        } else if (action == L"ClearHistory()") {
+          History.items.clear();
+          History.Save();
+          RefreshList();
+        }
+        break;
+      }
     }
   }
   
@@ -122,6 +134,14 @@ BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
     case WM_KEYDOWN: {
       if (::GetFocus() == list_.GetWindowHandle()) {
         switch (pMsg->wParam) {
+          // Select all items
+          case 'A': {
+            if (::GetKeyState(VK_CONTROL) & 0xFF80) {
+              list_.SetSelectedItem(-1);
+              return TRUE;
+            }
+            break;
+          }
           // Delete selected items
           case VK_DELETE: {
             if (RemoveItems()) {
@@ -206,7 +226,7 @@ bool HistoryDialog::MoveItems(int pos) {
   return false;
 
   if (History.queue.updating) {
-    MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
+    MessageBox(L"History cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;
   }
   
@@ -236,7 +256,7 @@ bool HistoryDialog::MoveItems(int pos) {
 
 bool HistoryDialog::RemoveItems() {
   if (History.queue.updating) {
-    MessageBox(L"Event queue cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
+    MessageBox(L"History cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
     return false;
   }
 

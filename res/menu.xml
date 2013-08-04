@@ -108,7 +108,7 @@
 		<item name="Play next episode"   action="PlayNext()"/>
 		<item name="Play random episode" action="PlayRandom()"/>
 	</menu>
-		<!-- Edit -->
+	<!-- Edit -->
 	<menu name="Edit">
 		<item name="Edit all..." action="EditAll()"/>
 		<item type="separator"/>
@@ -177,6 +177,13 @@
 	<menu name="GenericList">
 		<item name="Select all"   action="SelectAll()"/>
 		<item name="Deselect all" action="DeselectAll()"/>
+	</menu>
+	
+	<!-- History list menu -->
+	<menu name="HistoryList">
+		<item name="Delete" action="Delete()"/>
+		<item type="separator"/>
+		<item name="Clear history" action="ClearHistory()"/>
 	</menu>
 	
 	<!-- Season browser -->
