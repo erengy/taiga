@@ -327,12 +327,11 @@
 		<enabled>0</enabled>
 		<visible>1</visible>
 		<mode>5</mode>
-		<class>Chrome_OmniboxView</class>
-		<class>Chrome_RenderWidgetHostHWND</class>
-		<class>Chrome_WidgetWin_0</class>
+		<class>Chrome_WidgetWin_1</class>
 		<file>chrome.exe</file>
 		<folder>%LocalAppData%\Google\Chrome\Application\</folder>
 		<edit mode="2">Google Chrome</edit>
+		<engine>WebKit</engine>
 	</player>
 	<!-- Mozilla Firefox -->
 	<player>
@@ -346,6 +345,7 @@
 		<folder>%ProgramFiles%\Mozilla Firefox\</folder>
 		<folder>%ProgramW6432%\Mozilla Firefox\</folder>
 		<edit mode="2">Mozilla Firefox</edit>
+		<engine>Gecko</engine>
 	</player>
 	<!-- Opera -->
 	<player>
@@ -353,10 +353,10 @@
 		<enabled>0</enabled>
 		<visible>1</visible>
 		<mode>5</mode>
-		<class>OperaWindowClass</class>
+		<class>Chrome_WidgetWin_0</class>
 		<file>opera.exe</file>
-		<folder>%ProgramFiles%\Opera\</folder>
-		<folder>%ProgramW6432%\Opera\</folder>
+		<folder>%ProgramFiles(x86)%\Opera\</folder>
 		<edit mode="2">Opera</edit>
+		<engine>WebKit</engine>
 	</player>
 </media_players>

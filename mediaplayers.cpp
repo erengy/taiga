@@ -60,6 +60,7 @@ BOOL MediaPlayers::Load() {
     items.resize(items.size() + 1);
     items.back().name = XML_ReadStrValue(player, L"name");
     items.back().enabled = XML_ReadIntValue(player, L"enabled");
+    items.back().engine = XML_ReadStrValue(player, L"engine");
     items.back().visible = XML_ReadIntValue(player, L"visible");
     items.back().mode = XML_ReadIntValue(player, L"mode");
     XML_ReadChildNodes(player, items.back().classes, L"class");
@@ -73,44 +74,6 @@ BOOL MediaPlayers::Load() {
     }
   }
   
-  return TRUE;
-}
-
-BOOL MediaPlayers::Save() {
-  // Initialize
-  wstring folder = Taiga.GetDataPath();
-  wstring file = folder + L"media.xml";
-  
-  // Create XML document
-  xml_document doc;
-  xml_node players = doc.append_child(L"media_players");
-
-  // Write player list
-  for (unsigned int i = 0; i < items.size(); i++) {
-    wstring comment = L" " + items[i].name + L" ";
-    players.append_child(node_comment).set_value(comment.c_str());
-    xml_node player = players.append_child(L"player");
-    player.append_child(L"name");
-    player.child(L"name").append_child(node_pcdata).set_value(items[i].name.c_str());
-    player.append_child(L"enabled");
-    player.child(L"enabled").append_child(node_pcdata).set_value(ToWstr(items[i].enabled).c_str());
-    player.append_child(L"visible");
-    player.child(L"visible").append_child(node_pcdata).set_value(ToWstr(items[i].visible).c_str());
-    player.append_child(L"mode");
-    player.child(L"mode").append_child(node_pcdata).set_value(ToWstr(items[i].mode).c_str());
-    XML_WriteChildNodes(player, items[i].classes, L"class");
-    XML_WriteChildNodes(player, items[i].files, L"file");
-    XML_WriteChildNodes(player, items[i].folders, L"folder");
-    for (unsigned int j = 0; j < items[i].edits.size(); j++) {
-      xml_node edit = player.append_child(L"edit");
-      edit.append_attribute(L"mode") = items[i].edits[j].mode;
-      edit.append_child(node_pcdata).set_value(items[i].edits[j].value.c_str());
-    }
-  }
-
-  // Save file
-  CreateDirectory(folder.c_str(), NULL);
-  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
   return TRUE;
 }
 
@@ -353,12 +316,16 @@ enum StreamingVideoProviders {
   STREAM_YOUTUBE
 };
 
-enum WebBrowsers {
-  WEBBROWSER_UNKNOWN = -1,
-  WEBBROWSER_CHROME,
-  WEBBROWSER_FIREFOX,
-  WEBBROWSER_IE,
-  WEBBROWSER_OPERA
+enum WebBrowserEngines {
+  WEBENGINE_UNKNOWN = -1,
+  // Google Chrome (and other browsers based on Chromium)
+  WEBENGINE_WEBKIT,
+  // Mozilla Firefox
+  WEBENGINE_GECKO,
+  // Internet Explorer
+  WEBENGINE_TRIDENT,
+  // Opera (older versions)
+  WEBENGINE_PRESTO
 };
 
 AccessibleChild* FindAccessibleChild(vector<AccessibleChild>& children, const wstring& name, const wstring& role) {
@@ -393,18 +360,16 @@ void BuildTreeString(vector<AccessibleChild>& children, wstring& str, int indent
 
 wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   int stream_provider = STREAM_UNKNOWN;
-  int web_browser = WEBBROWSER_UNKNOWN;
+  int web_engine = WEBENGINE_UNKNOWN;
 
   // Get window title
   wstring title = GetWindowTitle(hwnd);
   EditTitle(title, index);
 
   // Return current title if the same web page is still open
-  if (CurrentEpisode.anime_id > 0) {
-    if (InStr(title, current_title) > -1) {
+  if (CurrentEpisode.anime_id > 0)
+    if (InStr(title, current_title) > -1)
       return current_title;
-    }
-  }
 
   // Delay operation to save some CPU
   static int counter = 0;
@@ -415,17 +380,15 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     counter = 0;
   }
 
-  // Detect web browser
-  if (InStr(items.at(index).name, L"Chrome") > -1) {
-    web_browser = WEBBROWSER_CHROME;
-  } else if (InStr(items.at(index).name, L"Firefox") > -1) {
-    web_browser = WEBBROWSER_FIREFOX;
-  /*
-  } else if (InStr(items.at(index).name, L"Explorer") > -1) {
-    web_browser = WEBBROWSER_IE;
-  */
-  } else if (InStr(items.at(index).name, L"Opera") > -1) {
-    web_browser = WEBBROWSER_OPERA;
+  // Select web browser engine
+  if (items.at(index).engine == L"WebKit") {
+    web_engine = WEBENGINE_WEBKIT;
+  } else if (items.at(index).engine == L"Gecko") {
+    web_engine = WEBENGINE_GECKO;
+  } else if (items.at(index).engine == L"Trident") {
+    web_engine = WEBENGINE_TRIDENT;
+  } else if (items.at(index).engine == L"Presto") {
+    web_engine = WEBENGINE_PRESTO;
   } else {
     return L"";
   }
@@ -433,22 +396,22 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   // Build accessibility data
   acc_obj.children.clear();
   if (acc_obj.FromWindow(hwnd) == S_OK) {
-    acc_obj.BuildChildren(acc_obj.children, nullptr, web_browser);
+    acc_obj.BuildChildren(acc_obj.children, nullptr, web_engine);
     acc_obj.Release();
   }
 
   // Check other tabs
   if (CurrentEpisode.anime_id > 0) {
     AccessibleChild* child = nullptr;
-    switch (web_browser) {
-      case WEBBROWSER_CHROME:
-      case WEBBROWSER_FIREFOX:
+    switch (web_engine) {
+      case WEBENGINE_WEBKIT:
+      case WEBENGINE_GECKO:
         child = FindAccessibleChild(acc_obj.children, L"", L"page tab list");
         break;
-      case WEBBROWSER_IE:
+      case WEBENGINE_TRIDENT:
         child = FindAccessibleChild(acc_obj.children, L"Tab Row", L"");
         break;
-      case WEBBROWSER_OPERA:
+      case WEBENGINE_PRESTO:
         child = FindAccessibleChild(acc_obj.children, L"", L"client");
         break;
     }
@@ -466,26 +429,29 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 
   // Find URL
   AccessibleChild* child = nullptr;
-  switch (web_browser) {
-    case WEBBROWSER_CHROME:
-      child = FindAccessibleChild(acc_obj.children, L"Address", L"grouping");
-      if (child == nullptr) {
+  switch (web_engine) {
+    case WEBENGINE_WEBKIT:
+      child = FindAccessibleChild(acc_obj.children, L"Address and search bar", L"grouping");
+      if (child == nullptr)
+        child = FindAccessibleChild(acc_obj.children, L"Address", L"grouping");
+      if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children, L"Location", L"grouping");
-      }
+      if (child == nullptr)
+        child = FindAccessibleChild(acc_obj.children, L"Address field", L"editable text");
       break;
-    case WEBBROWSER_FIREFOX:
-      child = FindAccessibleChild(acc_obj.children, L"Go to a Website", L"editable text");
-      if (child == nullptr) {
+    case WEBENGINE_GECKO:
+      child = FindAccessibleChild(acc_obj.children, L"Search or enter address", L"editable text");
+      if (child == nullptr)
+        child = FindAccessibleChild(acc_obj.children, L"Go to a Website", L"editable text");
+      if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children, L"Go to a Web Site", L"editable text");
-      }
       break;
-    case WEBBROWSER_IE:
+    case WEBENGINE_TRIDENT:
       child = FindAccessibleChild(acc_obj.children, L"Address and search using Bing", L"editable text");
-      if (child == nullptr) {
+      if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children, L"Address and search using Google", L"editable text");
-      }
       break;
-    case WEBBROWSER_OPERA:
+    case WEBENGINE_PRESTO:
       child = FindAccessibleChild(acc_obj.children, L"", L"client");
       if (child && !child->children.empty()) {
         child = FindAccessibleChild(child->children.at(0).children, L"", L"tool bar");
@@ -502,13 +468,13 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   // Check URL for known streaming video providers
   if (child) {
     // Anime News Network
-    if (Settings.Recognition.Streaming.ann_enabled && 
-      InStr(child->value, L"animenewsnetwork.com/video") > -1) {
-        stream_provider = STREAM_ANN;
+    if (Settings.Recognition.Streaming.ann_enabled &&
+        InStr(child->value, L"animenewsnetwork.com/video") > -1) {
+      stream_provider = STREAM_ANN;
     // Crunchyroll
-    } else if (Settings.Recognition.Streaming.crunchyroll_enabled && 
-      InStr(child->value, L"crunchyroll.com/") > -1) {
-        stream_provider = STREAM_CRUNCHYROLL;
+    } else if (Settings.Recognition.Streaming.crunchyroll_enabled &&
+               InStr(child->value, L"crunchyroll.com/") > -1) {
+       stream_provider = STREAM_CRUNCHYROLL;
     // Hulu
     /*
     } else if (InStr(child->value, L"hulu.com/watch") > -1) {
@@ -516,16 +482,16 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     */
     // Veoh
     } else if (Settings.Recognition.Streaming.veoh_enabled && 
-      InStr(child->value, L"veoh.com/watch") > -1) {
-        stream_provider = STREAM_VEOH;
+               InStr(child->value, L"veoh.com/watch") > -1) {
+      stream_provider = STREAM_VEOH;
     // Viz Anime
     } else if (Settings.Recognition.Streaming.viz_enabled && 
-      InStr(child->value, L"vizanime.com/ep") > -1) {
-        stream_provider = STREAM_VIZANIME;
+               InStr(child->value, L"vizanime.com/ep") > -1) {
+      stream_provider = STREAM_VIZANIME;
     // YouTube
     } else if (Settings.Recognition.Streaming.youtube_enabled && 
-      InStr(child->value, L"youtube.com/watch") > -1) {
-        stream_provider = STREAM_YOUTUBE;
+               InStr(child->value, L"youtube.com/watch") > -1) {
+      stream_provider = STREAM_YOUTUBE;
     }
   }
 
@@ -568,16 +534,19 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 
 bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(AccessibleChild& child, LPARAM param) {
   switch (param) {
-    case WEBBROWSER_UNKNOWN:
+    case WEBENGINE_UNKNOWN:
       return false;
-    case WEBBROWSER_FIREFOX:
-      if (IsEqual(child.role, L"document")) return false;
+    case WEBENGINE_GECKO:
+      if (IsEqual(child.role, L"document"))
+        return false;
       break;
-    case WEBBROWSER_IE:
-      if (IsEqual(child.role, L"pane") || IsEqual(child.role, L"scroll bar")) return false;
+    case WEBENGINE_TRIDENT:
+      if (IsEqual(child.role, L"pane") || IsEqual(child.role, L"scroll bar"))
+        return false;
       break;
-    case WEBBROWSER_OPERA:
-      if (IsEqual(child.role, L"document") || IsEqual(child.role, L"pane")) return false;
+    case WEBENGINE_PRESTO:
+      if (IsEqual(child.role, L"document") || IsEqual(child.role, L"pane"))
+        return false;
       break;
   }
 

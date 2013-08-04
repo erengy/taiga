@@ -31,9 +31,11 @@
 #include "anime_db.h"
 #include "anime_filter.h"
 #include "common.h"
+#include "foreach.h"
 #include "gfx.h"
 #include "history.h"
 #include "http.h"
+#include "media.h"
 #include "monitor.h"
 #include "stats.h"
 #include "string.h"
@@ -192,6 +194,18 @@ bool Settings::Load() {
 
   // Recognition
   xml_node recognition = settings.child(L"recognition");
+    // Media players
+    xml_node mediaplayers = recognition.child(L"mediaplayers");
+      for (xml_node player = mediaplayers.child(L"player"); player; player = player.next_sibling(L"player")) {
+        wstring name = player.attribute(L"name").value();
+        bool enabled = player.attribute(L"enabled").as_bool();
+        foreach_(it, MediaPlayers.items) {
+          if (it->name == name) {
+            it->enabled = enabled;
+            break;
+          }
+        }
+      }
     // Streaming
     xml_node streaming = recognition.child(L"streaming");
       Recognition.Streaming.ann_enabled = streaming.child(L"providers").attribute(L"ann").as_bool();
@@ -393,6 +407,13 @@ bool Settings::Save() {
   // Recognition
   settings.append_child(node_comment).set_value(L" Recognition ");
   xml_node recognition = settings.append_child(L"recognition");
+    // Media players
+    xml_node mediaplayers = recognition.append_child(L"mediaplayers");
+      foreach_(it, MediaPlayers.items) {
+        xml_node player = mediaplayers.append_child(L"player");
+        player.append_attribute(L"name") = it->name.c_str();
+        player.append_attribute(L"enabled") = it->enabled;
+      }
     // Streaming
     xml_node streaming = recognition.append_child(L"streaming");
       // Providers

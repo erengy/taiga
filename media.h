@@ -41,7 +41,6 @@ public:
   virtual ~MediaPlayers() {}
 
   BOOL Load();
-  BOOL Save();
   int Check();
 
   void EditTitle(wstring& str, int player_index);
@@ -60,7 +59,7 @@ public:
 
   class MediaPlayer {
   public:
-    wstring name;
+    wstring engine, name;
     BOOL enabled, visible;
     int mode;
     HWND window_handle;

@@ -340,7 +340,6 @@ void SettingsDialog::OnOK() {
   }
 
   // Save settings
-  MediaPlayers.Save();
   Settings.Save();
 
   // Apply changes
