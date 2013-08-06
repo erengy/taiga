@@ -20,7 +20,10 @@
 #define ANNOUNCE_H
 
 #include "std.h"
+
 #include "third_party/oauth/oauth.h"
+
+#include "win32/win_window.h"
 
 namespace anime {
 class Episode;
@@ -71,19 +74,43 @@ enum MircChannelMode {
 
 /* Skype */
 
+enum SkypeConnectionStatus {
+  SKYPECONTROLAPI_ATTACH_SUCCESS = 0,
+  SKYPECONTROLAPI_ATTACH_PENDING_AUTHORIZATION,
+  SKYPECONTROLAPI_ATTACH_REFUSED,
+  SKYPECONTROLAPI_ATTACH_NOT_AVAILABLE,
+  SKYPECONTROLAPI_ATTACH_API_AVAILABLE = 0x8001
+};
+
 class Skype {
 public:
   Skype();
-  virtual ~Skype() {}
-  
-  BOOL Attach();
-  BOOL ChangeMood();
+  virtual ~Skype();
+
+  void Create();
+  BOOL Discover();
+  LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+  BOOL SendCommand(const wstring& command);
+  BOOL GetMoodText();
+  BOOL SetMoodText(const wstring& mood);
+
+  static const UINT wm_attach;
+  static const UINT wm_discover;
 
 public:
-  HWND api_window_handle;
-  wstring mood;
-  UINT control_api_attach;
-  UINT control_api_discover;
+  HWND hwnd, hwnd_skype;
+  wstring current_mood, previous_mood;
+
+private:
+  class Window : public win32::Window {
+  public:
+    Window() {}
+    virtual ~Window() {}
+  private:
+    void PreRegisterClass(WNDCLASSEX& wc);
+    void PreCreate(CREATESTRUCT& cs);
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  } window_;
 };
 
 extern Skype Skype;

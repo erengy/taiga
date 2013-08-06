@@ -78,7 +78,8 @@ BOOL Taiga::InitInstance() {
   // Load data
   LoadData();
 
-  // Create API window
+  // Create API windows
+  Skype.Create();
   TaigaApi.Create();
 
   if (Settings.Program.StartUp.check_new_version) {

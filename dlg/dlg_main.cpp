@@ -295,41 +295,17 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
     // External programs
     case WM_COPYDATA: {
-      PCOPYDATASTRUCT pCDS = (PCOPYDATASTRUCT)lParam;
-      // Skype
-      if (reinterpret_cast<HWND>(wParam) == Skype.api_window_handle) {
-        return TRUE; // pCDS->lpData is the response
-
+      auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
       // JetAudio
-      } else if (pCDS->dwData == 0x3000 /* JRC_COPYDATA_ID_TRACK_FILENAME */) {
+      if (pCDS->dwData == 0x3000 /* JRC_COPYDATA_ID_TRACK_FILENAME */) {
         MediaPlayers.new_title = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
         return TRUE;
-
       // Media Portal
       } else if (pCDS->dwData == 0x1337) {
         MediaPlayers.new_title = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
         return TRUE;
       }
       break;
-    }
-    default: {
-      // Skype
-      if (uMsg == Skype.control_api_attach) {
-        switch (lParam) {
-          case 0: // ATTACH_SUCCESS
-#ifdef _DEBUG
-            ChangeStatus(L"Skype attach succeeded.");
-#endif
-            Skype.api_window_handle = reinterpret_cast<HWND>(wParam);
-            Skype.ChangeMood();
-            return TRUE;
-          case 1: // ATTACH_PENDING_AUTHORIZATION
-#ifdef _DEBUG
-            ChangeStatus(L"Skype is pending authorization...");
-#endif
-            return TRUE;
-        }
-      }
     }
   }
   
