@@ -401,11 +401,6 @@ void TorrentDialog::RefreshList() {
   // Show again
   list_.Show();
 
-  // Set icon
-  HICON hIcon = feed->GetIcon();
-  if (hIcon) hIcon = CopyIcon(hIcon);
-  SetIconSmall(hIcon);
-
   // Set title
   wstring title = L"Torrents";
   if (!feed->title.empty()) {

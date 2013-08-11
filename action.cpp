@@ -318,57 +318,65 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"CheckEpisodes") {
     // Check silent operation mode
     bool silent = (wParam == TRUE);
-    if (!silent) TaskbarList.SetProgressState(TBPF_NORMAL);
-    // If there's no anime folder set, we'll check them first
-    bool check_folder = true;
-    for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-      if (it->second.IsInList() && !it->second.GetFolder().empty()) {
-        check_folder = false;
-        break;
-      }
-    }
-    if (check_folder && !silent && !Settings.Folders.root.empty()) {
+    // Check if any root folder is available
+    if (!silent && Settings.Folders.root.empty()) {
       win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-      dlg.SetMainInstruction(L"Would you like to search for anime folders first?");
-      dlg.SetContent(L"This feature only checks specific anime folders for new episodes. "
-        L"As you have none set at the moment, searching for folders is highly recommended.");
+      dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
+      dlg.SetContent(L"You need to have at least one root folder set before scanning available episodes.");
       dlg.AddButton(L"Yes", IDYES);
       dlg.AddButton(L"No", IDNO);
       dlg.Show(g_hMain);
-      check_folder = (dlg.GetSelectedButtonID() == IDYES);
+      if (dlg.GetSelectedButtonID() == IDYES)
+        ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+      return;
     }
     // Search for all list items
     if (body.empty()) {
       size_t i = 0;
       // Search is made in reverse to give new items priority. The user is
       // probably more interested in them than the older titles.
+      if (!silent) {
+        TaskbarList.SetProgressState(TBPF_NORMAL);
+        ::SetCursor(reinterpret_cast<HCURSOR>(
+          ::LoadImage(nullptr, IDC_WAIT, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+      }
       for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-        if (!silent) TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
+        if (!silent)
+          TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
         switch (it->second.GetMyStatus()) {
           case mal::MYSTATUS_WATCHING:
+            if (!silent)
+              MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
+            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
+        }
+      }
+      if (!silent)
+        TaskbarList.SetProgressValue(0, AnimeDatabase.items.size());
+      for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
+        if (!silent)
+          TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
+        switch (it->second.GetMyStatus()) {
           case mal::MYSTATUS_ONHOLD:
           case mal::MYSTATUS_PLANTOWATCH:
-            if (!silent) {
-              MainDialog.ChangeStatus(L"Searching... (" + it->second.GetTitle() + L")");
-            }
-            it->second.CheckEpisodes(
-              Settings.Program.List.progress_show_available ? -1 : 0, 
-              check_folder);
+            if (!silent)
+              MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
+            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
         }
+      }
+      if (!silent) {
+        TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+        ::SetCursor(reinterpret_cast<HCURSOR>(
+          ::LoadImage(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED)));
       }
     // Search only for selected list item
     } else {
       int anime_id = static_cast<int>(lParam);
       auto anime_item = AnimeDatabase.FindItem(anime_id);
-      anime_item->CheckEpisodes(
-        Settings.Program.List.progress_show_available ? -1 : 0,
-        true);
+      anime_item->CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
     }
     // We're done
-    if (!silent) {
-      TaskbarList.SetProgressState(TBPF_NOPROGRESS);
-      MainDialog.ChangeStatus(L"Search finished.");
-    }
+    if (!silent)
+      MainDialog.ChangeStatus(L"Scan finished.");
 
   // ToggleRecognition()
   //   Enables or disables anime recognition.
@@ -700,40 +708,50 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"PlayRandom") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item) {
+    if (anime_item && anime_item->CheckFolder()) {
       int total = anime_item->GetEpisodeCount();
-      if (total == 0) total = anime_item->GetMyLastWatchedEpisode() + 1;
+      if (total == 0)
+        total = anime_item->GetMyLastWatchedEpisode() + 1;
+      wstring path;
+      srand(static_cast<unsigned int>(GetTickCount()));
       for (int i = 0; i < total; i++) {
-        srand(static_cast<unsigned int>(GetTickCount()));
-        int episode = rand() % total + 1;
-        anime_item->CheckFolder();
-        wstring file = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode, false);
-        if (!file.empty()) {
-          Execute(file);
-          break;
+        int episode_number = rand() % total + 1;
+        path = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode_number, false);
+        if (!path.empty()) {
+          Execute(path);
+          return;
         }
       }
     }
+    win32::TaskDialog dlg;
+    dlg.SetWindowTitle(L"Play Random Episode");
+    dlg.SetMainIcon(TD_ICON_ERROR);
+    dlg.SetMainInstruction(L"Could not find any episode to play.");
+    dlg.Show(g_hMain);
   
   // PlayRandomAnime()
   //   Searches for a random episode of a random anime and plays it.
   } else if (action == L"PlayRandomAnime") {
+    wstring path;
+    int max_anime_id = AnimeDatabase.items.rbegin()->first;
     srand(static_cast<unsigned int>(GetTickCount()));
     for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
-      int max_anime_id = AnimeDatabase.items.rbegin()->first;
       int anime_id = rand() % max_anime_id + 1;
       auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (!anime_item || !anime_item->IsInList()) continue;
+      if (!anime_item || !anime_item->IsInList())
+        continue;
+      if (anime_item->CheckFolder())
+        continue;
       int episode_count = anime_item->GetMyLastWatchedEpisode() + 1;
-      int episode_number = rand() % episode_count  + 1;
-      anime_item->CheckFolder();
-      wstring file = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode_number, false);
-      if (!file.empty()) {
+      int episode_number = rand() % episode_count + 1;
+      path = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode_number, false);
+      if (!path.empty()) {
         win32::TaskDialog dlg;
         dlg.SetWindowTitle(L"Play Random Anime");
         dlg.SetMainIcon(TD_ICON_INFORMATION);
         dlg.SetMainInstruction(L"Would you like to watch this episode?");
-        wstring content = anime_item->GetTitle() + L"\nEpisode " + ToWstr(episode_number);
+        wstring content = anime_item->GetTitle() +
+                          L"\nEpisode " + ToWstr(episode_number);
         dlg.SetContent(content.c_str());
         dlg.AddButton(L"Play", IDYES);
         dlg.AddButton(L"Skip", IDNO);
@@ -741,13 +759,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         dlg.Show(g_hMain);
         switch (dlg.GetSelectedButtonID()) {
           case IDYES:
-            Execute(file);
+            Execute(path);
             return;
           case IDCANCEL:
             return;
         }
       }
     }
+    win32::TaskDialog dlg;
+    dlg.SetWindowTitle(L"Play Random Anime");
+    dlg.SetMainIcon(TD_ICON_ERROR);
+    dlg.SetMainInstruction(L"Could not find any episode to play.");
+    dlg.Show(g_hMain);
 
   // ===========================================================================
 

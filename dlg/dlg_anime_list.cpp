@@ -491,20 +491,35 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Double click
     case NM_DBLCLK: {
       if (listview.GetSelectedCount() > 0) {
+        bool on_button = false;
         int anime_id = GetCurrentId();
-        switch (Settings.Program.List.double_click) {
-          case 1:
-            ExecuteAction(L"EditAll", 0, anime_id);
-            break;
-          case 2:
-            ExecuteAction(L"OpenFolder", 0, anime_id);
-            break;
-          case 3:
-            ExecuteAction(L"PlayNext", 0, anime_id);
-            break;
-          case 4:
-            ExecuteAction(L"Info", 0, anime_id);
-            break;
+        auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
+        if (listview.button_visible[0] && listview.button_rect[0].PtIn(lpnmitem->ptAction)) {
+          ExecuteAction(L"DecrementEpisode", 0, anime_id);
+          on_button = true;
+        } else if (listview.button_visible[1] && listview.button_rect[1].PtIn(lpnmitem->ptAction)) {
+          ExecuteAction(L"IncrementEpisode", 0, anime_id);
+          on_button = true;
+        }
+        if (on_button) {
+          int list_index = GetListIndex(GetCurrentId());
+          listview.RefreshProgressButtons(GetCurrentItem());
+          listview.RedrawItems(list_index, list_index, true);
+        } else {
+          switch (Settings.Program.List.double_click) {
+            case 1:
+              ExecuteAction(L"EditAll", 0, anime_id);
+              break;
+            case 2:
+              ExecuteAction(L"OpenFolder", 0, anime_id);
+              break;
+            case 3:
+              ExecuteAction(L"PlayNext", 0, anime_id);
+              break;
+            case 4:
+              ExecuteAction(L"Info", 0, anime_id);
+              break;
+          }
         }
       }
       break;
@@ -514,14 +529,12 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case NM_CLICK: {
       if (pnmh->hwndFrom == listview.GetWindowHandle()) {
         if (listview.GetSelectedCount() > 0) {
-          POINT pt;
-          ::GetCursorPos(&pt);
-          ::ScreenToClient(listview.GetWindowHandle(), &pt);
-          listview.RefreshProgressButtons(GetCurrentItem());
           int anime_id = GetCurrentId();
-          if (listview.button_visible[0] && listview.button_rect[0].PtIn(pt)) {
+          auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
+          listview.RefreshProgressButtons(GetCurrentItem());
+          if (listview.button_visible[0] && listview.button_rect[0].PtIn(lpnmitem->ptAction)) {
             ExecuteAction(L"DecrementEpisode", 0, anime_id);
-          } else if (listview.button_visible[1] && listview.button_rect[1].PtIn(pt)) {
+          } else if (listview.button_visible[1] && listview.button_rect[1].PtIn(lpnmitem->ptAction)) {
             ExecuteAction(L"IncrementEpisode", 0, anime_id);
           }
           int list_index = GetListIndex(GetCurrentId());
