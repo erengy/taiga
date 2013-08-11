@@ -22,7 +22,6 @@
 
 #define NT_SUCCESS(x) ((x) >= 0)
 #define STATUS_INFO_LENGTH_MISMATCH 0xc0000004
-#define OBJECT_TYPE_FILE 0x1c
 
 #define ObjectBasicInformation    0
 #define ObjectNameInformation     1
@@ -152,6 +151,11 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
   }
   if (!NT_SUCCESS(status)) return FALSE;
 
+  unsigned short objectTypeFile = 0x1c;
+  // Type index for files is different on Windows 8 and Windows Server 2012
+  if (win32::GetWinVersion() >= win32::VERSION_WIN8)
+    objectTypeFile = 0x1f;
+
   for (ULONG_PTR i = 0; i < handleInfo->HandleCount; i++) {
     SYSTEM_HANDLE_EX handle = handleInfo->Handles[i];
     HANDLE dupHandle = NULL;
@@ -165,7 +169,7 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
       continue;
     }
     // Skip if the handle does not belong to a file
-    if (handle.ObjectTypeIndex != OBJECT_TYPE_FILE) {
+    if (handle.ObjectTypeIndex != objectTypeFile) {
       continue;
     }
     // Skip access codes which can cause NtDuplicateObject() or NtQueryObject() to hang
@@ -217,7 +221,7 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
     // Cast our buffer into a UNICODE_STRING
     objectName = *reinterpret_cast<PUNICODE_STRING>(objectNameInfo);
     // Add file path to our list
-    if (objectName.Length && handle.ObjectTypeIndex == OBJECT_TYPE_FILE) {
+    if (objectName.Length && handle.ObjectTypeIndex == objectTypeFile) {
       files_vector.push_back(wstring(objectName.Buffer));
     }
 
