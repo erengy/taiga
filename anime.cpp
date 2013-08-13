@@ -65,7 +65,7 @@ MyInformation::MyInformation()
 
 // =============================================================================
 
-void Item::StartWatching(Episode episode) {
+void Item::StartWatching(Episode& episode) {
   // Make sure item is in list
   if (!IsInList()) AddtoUserList();
 
@@ -155,6 +155,9 @@ void Item::EndWatching(Episode episode) {
 }
 
 bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
+  if (episode.processed)
+    return false;
+
   if (!ignore_update_time)
     if (Settings.Account.Update.delay > Taiga.ticker_media)
       if (Taiga.ticker_media > -1)
@@ -177,54 +180,21 @@ bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
   return true;
 }
 
-void Item::UpdateList(Episode episode) {
-  if (!IsUpdateAllowed(episode, false)) return;
-  
-  bool change_status = true;
+void Item::UpdateList(Episode& episode) {
+  if (!IsUpdateAllowed(episode, false))
+    return;
+
+  episode.processed = true;
 
   if (Settings.Account.Update.ask_to_confirm) {
-      // Set up dialog
-      win32::TaskDialog dlg;
-      wstring title = L"Anime title: " + GetTitle();
-      dlg.SetWindowTitle(APP_TITLE);
-      dlg.SetMainIcon(TD_ICON_INFORMATION);
-      dlg.SetMainInstruction(L"Do you want to update your anime list?");
-      dlg.SetContent(title.c_str());
-      dlg.SetVerificationText(L"Don't ask again, update automatically");
-      dlg.UseCommandLinks(true);
-
-      // Add buttons
-      int number = GetEpisodeHigh(episode.number);
-      if (number == 0) number = 1;
-      if (GetEpisodeCount() == 1) episode.number = L"1";
-      if (GetEpisodeCount() == number) { // Completed
-        dlg.AddButton(L"Update and move\n"
-                      L"Update and set as completed", IDCANCEL);
-      } else if (GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
-        dlg.AddButton(L"Update and move\n"
-                      L"Update and set as watching", IDCANCEL);
-      }
-      wstring button = L"Update\n"
-                       L"Update episode number from " + ToWstr(GetMyLastWatchedEpisode()) + 
-                       L" to " + ToWstr(number);
-      dlg.AddButton(button.c_str(), IDYES);
-      dlg.AddButton(L"Cancel\n"
-                    L"Don't update anything", IDNO);
-  
-      // Show dialog
-      ActivateWindow(g_hMain);
-      dlg.Show(g_hMain);
-      if (dlg.GetVerificationCheck())
-        Settings.Account.Update.ask_to_confirm = FALSE;
-      int choice = dlg.GetSelectedButtonID();
-      if (choice == IDNO) return;
-      change_status = choice == IDCANCEL;
+    ConfirmationQueue.Add(episode);
+    ConfirmationQueue.Process();
+  } else {
+    AddToQueue(episode, true);
   }
-
-  AddToQueue(episode, change_status);
 }
 
-void Item::AddToQueue(Episode episode, bool change_status) {
+void Item::AddToQueue(const Episode& episode, bool change_status) {
   // Create event item
   EventItem event_item;
   event_item.anime_id = GetId();

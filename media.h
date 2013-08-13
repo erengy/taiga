@@ -45,7 +45,8 @@ public:
 
   void EditTitle(wstring& str, int player_index);
   wstring GetTitle(HWND hwnd, const wstring& class_name, int mode);
-  bool TitleChanged() { return title_changed_; }
+  bool TitleChanged() const;
+  void SetTitleChanged(bool title_changed);
 
   wstring GetTitleFromProcessHandle(HWND hwnd, ULONG process_id = 0);
   wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);

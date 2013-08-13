@@ -31,7 +31,7 @@ namespace anime {
 // =============================================================================
 
 Episode::Episode()
-    : anime_id(ID_UNKNOWN) {
+    : anime_id(ID_UNKNOWN), processed(false) {
 }
 
 void Episode::Clear() {
@@ -49,10 +49,12 @@ void Episode::Clear() {
   clean_title.clear();
   version.clear();
   video_type.clear();
+  processed = false;
 }
 
 void Episode::Set(int anime_id) {
   this->anime_id = anime_id;
+  this->processed = false;
   UpdateAllMenus(AnimeDatabase.FindItem(anime_id));
 }
 

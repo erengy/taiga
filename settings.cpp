@@ -160,8 +160,8 @@ bool Settings::Load() {
     xml_node position = program.child(L"position");
     Program.Position.x = position.attribute(L"x").as_int(-1);
     Program.Position.y = position.attribute(L"y").as_int(-1);
-    Program.Position.w = position.attribute(L"w").as_int(-1);
-    Program.Position.h = position.attribute(L"h").as_int(-1);
+    Program.Position.w = position.attribute(L"w").as_int(960);
+    Program.Position.h = position.attribute(L"h").as_int(640);
     Program.Position.maximized = position.attribute(L"maximized").as_int();
     // Start-up
     xml_node startup = program.child(L"startup");

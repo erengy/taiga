@@ -20,6 +20,10 @@
 #define HISTORY_H
 
 #include "std.h"
+
+#include <queue>
+
+#include "anime_episode.h"
 #include "myanimelist.h"
 
 // =============================================================================
@@ -80,5 +84,20 @@ public:
 };
 
 extern class History History;
+
+class ConfirmationQueue {
+public:
+  ConfirmationQueue();
+  virtual ~ConfirmationQueue() {}
+
+  void Add(const anime::Episode& episode);
+  void Process();
+
+private:
+  bool in_process;
+  std::queue<anime::Episode> queue_;
+};
+
+extern class ConfirmationQueue ConfirmationQueue;
 
 #endif // HISTORY_H

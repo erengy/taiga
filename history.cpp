@@ -39,6 +39,7 @@
 
 #include "win32/win_taskdialog.h"
 
+class ConfirmationQueue ConfirmationQueue;
 class History History;
 
 // =============================================================================
@@ -411,4 +412,73 @@ bool History::Save() {
 
   // Save file
   return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+}
+
+// =============================================================================
+
+ConfirmationQueue::ConfirmationQueue()
+    : in_process(false) {
+}
+
+void ConfirmationQueue::Add(const anime::Episode& episode) {
+  queue_.push(episode);
+}
+
+int AskForConfirmation(anime::Episode& episode) {
+  auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+
+  // Set up dialog
+  win32::TaskDialog dlg;
+  wstring title = L"Anime title: " + anime_item->GetTitle();
+  dlg.SetWindowTitle(APP_TITLE);
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Do you want to update your anime list?");
+  dlg.SetContent(title.c_str());
+  dlg.SetVerificationText(L"Don't ask again, update automatically");
+  dlg.UseCommandLinks(true);
+
+  // Get episode number
+  int number = GetEpisodeHigh(episode.number);
+  if (number == 0) number = 1;
+  if (anime_item->GetEpisodeCount() == 1) episode.number = L"1";
+
+  // Add buttons
+  if (anime_item->GetEpisodeCount() == number) { // Completed
+    dlg.AddButton(L"Update and move\n"
+                  L"Update and set as completed", IDCANCEL);
+  } else if (anime_item->GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
+    dlg.AddButton(L"Update and move\n"
+                  L"Update and set as watching", IDCANCEL);
+  }
+  wstring button = L"Update\n"
+                   L"Update episode number from " +
+                   ToWstr(anime_item->GetMyLastWatchedEpisode()) +
+                   L" to " + ToWstr(number);
+  dlg.AddButton(button.c_str(), IDYES);
+  dlg.AddButton(L"Cancel\n"
+                L"Don't update anything", IDNO);
+
+  // Show dialog
+  dlg.Show(g_hMain);
+  if (dlg.GetVerificationCheck())
+    Settings.Account.Update.ask_to_confirm = FALSE;
+  return dlg.GetSelectedButtonID();
+}
+
+void ConfirmationQueue::Process() {
+  if (in_process) return;
+  in_process = true;
+
+  while (!queue_.empty()) {
+    anime::Episode& episode = queue_.front();
+    int choice = AskForConfirmation(episode);
+    if (choice != IDNO) {
+      bool change_status = (choice == IDCANCEL);
+      auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+      anime_item->AddToQueue(episode, change_status);
+    }
+    queue_.pop();
+  }
+
+  in_process = false;
 }

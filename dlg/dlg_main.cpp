@@ -231,8 +231,8 @@ void MainDialog::CreateDialogControls() {
 
 void MainDialog::InitWindowPosition() {
   UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
-  const LONG min_w = ScaleX(960);
-  const LONG min_h = ScaleX(640);
+  const LONG min_w = ScaleX(710);
+  const LONG min_h = ScaleX(480);
   
   win32::Rect rcParent, rcWindow;
   ::GetWindowRect(GetParent(), &rcParent);
@@ -637,6 +637,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
           anime_item = Meow.MatchDatabase(CurrentEpisode, false, true);
           if (anime_item) {
+            MediaPlayers.SetTitleChanged(false);
             CurrentEpisode.Set(anime_item->GetId());
             anime_item->StartWatching(CurrentEpisode);
             return;
@@ -690,10 +691,13 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           Taiga.ticker_media++;
       }
       // Caption changed?
-      if (MediaPlayers.TitleChanged() == true) {
+      if (MediaPlayers.TitleChanged()) {
+        MediaPlayers.SetTitleChanged(false);
+        bool processed = CurrentEpisode.processed; // TODO: not a good solution...
         CurrentEpisode.Set(anime::ID_UNKNOWN);
         if (anime_item) {
           anime_item->EndWatching(CurrentEpisode);
+          CurrentEpisode.processed = processed;
           anime_item->UpdateList(CurrentEpisode);
         }
         Taiga.ticker_media = 0;

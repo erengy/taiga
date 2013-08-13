@@ -80,21 +80,26 @@ BOOL MediaPlayers::Load() {
 // =============================================================================
 
 int MediaPlayers::Check() {
-  title_changed_ = false;
   index = -1;
+  bool recognized = CurrentEpisode.anime_id > anime::ID_UNKNOWN;
 
+  // Go through windows, starting with the highest in the Z order
   HWND hwnd = GetWindow(g_hMain, GW_HWNDFIRST);
-  while (hwnd != NULL) {
+  while (hwnd != nullptr) {
     for (auto item = items.begin(); item != items.end(); ++item) {
-      if (item->enabled == FALSE) continue;
-      if (item->visible == FALSE || IsWindowVisible(hwnd)) {
-        // Compare window classes
-        for (auto c = item->classes.begin(); c != item->classes.end(); ++c) {
-          if (*c == GetWindowClass(hwnd)) {
-            // Compare file names
-            for (auto f = item->files.begin(); f != item->files.end(); ++f) {
-              if (IsEqual(*f, GetFileName(GetWindowPath(hwnd)))) {
-                if (item->mode != MEDIA_MODE_WEBBROWSER || !GetWindowTitle(hwnd).empty()) {
+      if (!item->enabled)
+        continue;
+      if (item->visible && !IsWindowVisible(hwnd))
+        continue;
+      // Compare window classes
+      for (auto c = item->classes.begin(); c != item->classes.end(); ++c) {
+        if (*c == GetWindowClass(hwnd)) {
+          // Compare file names
+          for (auto f = item->files.begin(); f != item->files.end(); ++f) {
+            if (IsEqual(*f, GetFileName(GetWindowPath(hwnd)))) {
+              if (item->mode != MEDIA_MODE_WEBBROWSER || !GetWindowTitle(hwnd).empty()) {
+                // Stick with the previously recognized window, if there is one
+                if (!recognized || item->window_handle == hwnd) {
                   // We have a match!
                   index = index_old = item - items.begin();
                   new_title = GetTitle(hwnd, *c, item->mode);
@@ -173,6 +178,14 @@ wstring MediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) {
     default:
       return GetWindowTitle(hwnd);
   }
+}
+
+bool MediaPlayers::TitleChanged() const {
+  return title_changed_;
+}
+
+void MediaPlayers::SetTitleChanged(bool title_changed) {
+  title_changed_ = title_changed;
 }
 
 // =============================================================================

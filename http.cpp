@@ -90,6 +90,7 @@ BOOL HttpClient::OnError(DWORD dwError) {
       TorrentDialog.EnableInput();
       break;
     case HTTP_UpdateCheck:
+    case HTTP_UpdateDownload:
       MessageBox(UpdateDialog.GetWindowHandle(), 
                  error_text.c_str(), L"Update", MB_ICONERROR | MB_OK);
       UpdateDialog.PostMessage(WM_CLOSE);
