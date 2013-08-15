@@ -697,8 +697,10 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         CurrentEpisode.Set(anime::ID_UNKNOWN);
         if (anime_item) {
           anime_item->EndWatching(CurrentEpisode);
+          CurrentEpisode.anime_id = anime_item->GetId();
           CurrentEpisode.processed = processed;
           anime_item->UpdateList(CurrentEpisode);
+          CurrentEpisode.anime_id = anime::ID_UNKNOWN;
         }
         Taiga.ticker_media = 0;
       }
@@ -716,10 +718,15 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     
     // Was running and watching
     } else {
+      bool processed = CurrentEpisode.processed; // TODO: temporary solution...
       CurrentEpisode.Set(anime::ID_UNKNOWN);
       anime_item->EndWatching(CurrentEpisode);
-      if (Settings.Account.Update.wait_mp)
+      if (Settings.Account.Update.wait_mp) {
+        CurrentEpisode.anime_id = anime_item->GetId();
+        CurrentEpisode.processed = processed;
         anime_item->UpdateList(CurrentEpisode);
+        CurrentEpisode.anime_id = anime::ID_UNKNOWN;
+      }
       Taiga.ticker_media = 0;
     }
   }

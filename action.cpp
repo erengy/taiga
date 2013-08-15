@@ -740,7 +740,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(anime_id);
       if (!anime_item || !anime_item->IsInList())
         continue;
-      if (anime_item->CheckFolder())
+      if (!anime_item->CheckFolder())
         continue;
       int episode_count = anime_item->GetMyLastWatchedEpisode() + 1;
       int episode_number = rand() % episode_count + 1;
