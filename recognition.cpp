@@ -101,10 +101,8 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   }
 
   if (!found) {
-#ifdef _DEBUG
     // Score title in case we need it later on
-    ScoreTitle(episode.title, anime_item);
-#endif
+    ScoreTitle(episode, anime_item);
     // Leave if not found
     return false;
   }
@@ -159,27 +157,50 @@ bool RecognitionEngine::CompareTitle(const wstring& anime_title,
   return false;
 }
 
-std::multimap<int, int> RecognitionEngine::GetScores() {
-  std::multimap<int, int> reverse_map;
+std::multimap<int, int, std::greater<int>> RecognitionEngine::GetScores() {
+  std::multimap<int, int, std::greater<int>> reverse_map;
 
   for (auto it = scores.begin(); it != scores.end(); ++it) {
     if (it->second == 0) continue;
-    reverse_map.insert(std::pair<int, int>(-it->second, it->first));
+    reverse_map.insert(std::pair<int, int>(it->second, it->first));
   }
 
   return reverse_map;
 }
 
-bool RecognitionEngine::ScoreTitle(const wstring& episode_title, const anime::Item& anime_item) {
-  int score = 100;
+bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::Item& anime_item) {
+  const wstring& episode_title = episode.clean_title;
+  const wstring& anime_title = clean_titles[anime_item.GetId()].front();
 
-  score -= LevenshteinDistance(episode_title, anime_item.GetTitle()) * 2;
+  const int score_bonus_small = 1;
+  const int score_bonus_big = 5;
+  const int score_min = std::abs(static_cast<int>(episode_title.length()) -
+                                 static_cast<int>(anime_title.length()));
+  const int score_max = episode_title.length() + anime_title.length();
 
-  if (InStr(anime_item.GetTitle(), episode_title, 0, true) > -1 ||
-      InStr(episode_title, anime_item.GetTitle(), 0, true) > -1)
-    score += 40;
+  int score = score_max;
 
-  if (score > 90) {
+  score -= LevenshteinDistance(episode_title, anime_title);
+
+  if (InStr(anime_title, episode_title, 0, true) > -1)
+    score += episode_title.length();
+  if (InStr(episode_title, anime_title, 0, true) > -1)
+    score += anime_title.length();
+
+  if (score <= score_min)
+    return false;
+
+  if (anime_item.IsInList()) {
+    score += score_bonus_big;
+    switch (anime_item.GetMyStatus()) {
+      case mal::MYSTATUS_WATCHING:
+      case mal::MYSTATUS_PLANTOWATCH:
+        score += score_bonus_small;
+        break;
+    }
+  }
+
+  if (score > score_min) {
     scores[anime_item.GetId()] = score;
     return true;
   }

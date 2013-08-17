@@ -62,7 +62,7 @@ public:
   void CleanTitle(wstring& title);
   void UpdateCleanTitles(int anime_id);
 
-  std::multimap<int, int> GetScores();
+  std::multimap<int, int, std::greater<int>> GetScores();
 
   // Mapped as <anime_id, score>
   std::map<int, int> scores;
@@ -83,7 +83,7 @@ public:
                     anime::Episode& episode, 
                     const anime::Item& anime_item, 
                     bool strict = true);
-  bool ScoreTitle(const wstring& episode_title, 
+  bool ScoreTitle(const anime::Episode& episode, 
                   const anime::Item& anime_item);
 
   void AppendKeyword(wstring& str, const wstring& keyword);

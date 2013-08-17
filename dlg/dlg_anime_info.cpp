@@ -20,6 +20,7 @@
 
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
+#include "dlg_main.h"
 
 #include "../anime_db.h"
 #include "../common.h"
@@ -27,6 +28,7 @@
 #include "../gfx.h"
 #include "../history.h"
 #include "../myanimelist.h"
+#include "../recognition.h"
 #include "../resource.h"
 #include "../settings.h"
 #include "../string.h"
@@ -42,6 +44,7 @@ AnimeDialog::AnimeDialog()
     : anime_id_(anime::ID_UNKNOWN),
       current_page_(INFOPAGE_SERIESINFO),
       mode_(DIALOG_MODE_ANIME_INFORMATION) {
+  image_label_.parent = this;
 }
 
 NowPlayingDialog::NowPlayingDialog() {
@@ -175,9 +178,12 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 LRESULT AnimeDialog::ImageLabel::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_SETCURSOR: {
-      ::SetCursor(reinterpret_cast<HCURSOR>(
-        ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
-      return TRUE;
+      if (parent->anime_id_ > anime::ID_UNKNOWN) {
+        ::SetCursor(reinterpret_cast<HCURSOR>(
+          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        return TRUE;
+      }
+      break;
     }
   }
   
@@ -187,8 +193,10 @@ LRESULT AnimeDialog::ImageLabel::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG &&
       HIWORD(wParam) == STN_CLICKED) {
-    mal::ViewAnimePage(anime_id_);
-    return TRUE;
+    if (anime_id_ > anime::ID_UNKNOWN) {
+      mal::ViewAnimePage(anime_id_);
+      return TRUE;
+    }
   }
   
   return FALSE;
@@ -202,8 +210,23 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case NM_CLICK: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
           wstring action = pNMLink->item.szUrl;
-          if (IsEqual(pNMLink->item.szID, L"menu"))
+          if (IsEqual(pNMLink->item.szID, L"menu")) {
             action = UI.Menus.Show(m_hWindow, 0, 0, pNMLink->item.szUrl);
+          } else if (IsEqual(pNMLink->item.szID, L"search")) {
+            action = L"SearchAnime(" + CurrentEpisode.title + L")";
+          } else if (IsEqual(pNMLink->item.szUrl, L"score")) {
+            action = L"";
+            CurrentEpisode.anime_id = ToInt(pNMLink->item.szID);
+            auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+            if (anime_item) {
+              anime_item->AddtoUserList();
+              auto synonyms = anime_item->GetUserSynonyms();
+              synonyms.push_back(CurrentEpisode.title);
+              anime_item->SetUserSynonyms(synonyms, true);
+              anime_item->StartWatching(CurrentEpisode);
+              MainDialog.ChangeStatus();
+            }
+          }
           ExecuteAction(action, 0, GetCurrentId());
           return TRUE;
         }
@@ -373,6 +396,9 @@ void AnimeDialog::SetCurrentId(int anime_id) {
   anime_id_ = anime_id;
   
   switch (anime_id_) {
+    case anime::ID_NOTINLIST:
+      SetCurrentPage(INFOPAGE_NOTRECOGNIZED);
+      break;
     case anime::ID_UNKNOWN:
       SetCurrentPage(INFOPAGE_NONE);
       break;
@@ -406,6 +432,12 @@ void AnimeDialog::SetCurrentPage(int index) {
         page_series_info.Hide();
         page_my_info.Show();
         sys_link_.Hide();
+        break;
+      case INFOPAGE_NOTRECOGNIZED:
+        image_label_.Show();
+        page_my_info.Hide();
+        page_series_info.Hide();
+        sys_link_.Show();
         break;
     }
     tab_.SetCurrentlySelected(index - 1);
@@ -441,7 +473,29 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   }
 
   // Set content
-  if (anime_id_ == anime::ID_UNKNOWN) {
+  if (anime_id_ == anime::ID_NOTINLIST) {
+    wstring content = L"Taiga was unable to recognize this title, and needs your help.\n\n";
+    auto scores = Meow.GetScores();
+    if (!scores.empty()) {
+      int count = 0;
+      content += L"Please choose the correct one from the list below:\n\n";
+      foreach_c_(it, scores) {
+        content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->second) + L"\">" +
+                   AnimeDatabase.items[it->second].GetTitle() + L"</a>"
+#ifdef _DEBUG
+                   L" [Score: " + ToWstr(it->first) + L"]"
+#endif
+                   L"\n";
+        if (++count >= 10)
+          break;
+      }
+      content += L"\nNot in the list? <a id=\"search\">Search MyAnimeList</a> for more.";
+    } else {
+      content += L"<a id=\"search\">Search MyAnimeList</a> for this title.";
+    }
+    sys_link_.SetText(content);
+
+  } else if (anime_id_ == anime::ID_UNKNOWN) {
     wstring content;
     Date date_now = GetDate();
     int date_diff = 0;
@@ -647,7 +701,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
 
   // Content
   if (mode_ == DIALOG_MODE_NOW_PLAYING) {
-    if (anime_id_ == anime::ID_UNKNOWN) {
+    if (anime_id_ <= anime::ID_UNKNOWN) {
       rect.left += ScaleX(WIN_CONTROL_MARGIN);
       sys_link_.SetPosition(nullptr, rect);
     } else {

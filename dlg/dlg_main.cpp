@@ -650,21 +650,14 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
 #endif
         } else {
-#ifdef _DEBUG
-          std::multimap<int, int> scores = Meow.GetScores();
-          debug::Print(L"Not recognized: " + CurrentEpisode.title + L"\n");
-          debug::Print(L"Could be:\n");
-          for (auto it = scores.begin(); it != scores.end(); ++it) {
-            debug::Print(L"* " + AnimeDatabase.items[it->second].GetTitle() + 
-                         L" | Score: " + ToWstr(-it->first) + L"\n");
-          }
-#endif  
+          MediaPlayers.SetTitleChanged(false);
+          NowPlayingDialog.SetCurrentId(anime::ID_NOTINLIST);
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
           if (Settings.Program.Notifications.notrecognized) {
             wstring tip_text = ReplaceVariables(Settings.Program.Notifications.format, CurrentEpisode);
-            tip_text += L"\nClick here to search MyAnimeList for this anime.";
-            Taiga.current_tip_type = TIPTYPE_SEARCH;
+            tip_text += L"\nClick here to view similar titles for this anime.";
+            Taiga.current_tip_type = TIPTYPE_NOWPLAYING;
             Taskbar.Tip(L"", L"", 0);
             Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
           }
@@ -714,6 +707,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         ChangeStatus();
         CurrentEpisode.Set(anime::ID_UNKNOWN);
         MediaPlayers.index_old = 0;
+        NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);
       }
     
     // Was running and watching
@@ -878,9 +872,6 @@ void MainDialog::UpdateStatusTimer() {
 
 void MainDialog::UpdateTip() {
   wstring tip = APP_TITLE;
-  if (Taiga.logged_in) {
-    tip += L"\n" + AnimeDatabase.user.GetName() + L" is logged in.";
-  }
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     tip += L"\nWatching: " + anime_item->GetTitle() + 

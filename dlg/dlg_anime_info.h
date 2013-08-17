@@ -69,6 +69,7 @@ protected:
   class ImageLabel : public win32::Window {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    AnimeDialog* parent;
   } image_label_;
 
   win32::Edit edit_title_;

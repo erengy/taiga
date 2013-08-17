@@ -1028,7 +1028,7 @@ void AnimeListDialog::RefreshTabs(int index) {
   if (group_view) {
     tab_index = -1;
   } else if (tab_index == 6) {
-    current_status_ = 4;
+    tab_index = 4;
   } else {
     tab_index--;
   }
