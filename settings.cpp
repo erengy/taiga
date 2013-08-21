@@ -51,7 +51,7 @@
 #define DEFAULT_FORMAT_MIRC      L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 $if(%score%,\00314[Score: %score%/10]\003) \00312www.myanimelist.net/anime/%id%"
 #define DEFAULT_FORMAT_SKYPE     L"Watching: <a href=\"http://myanimelist.net/anime/%id%\">%title%</a>$if(%episode%, #%episode%$if(%total%,/%total%))"
 #define DEFAULT_FORMAT_TWITTER   L"$ifequal(%episode%,%total%,Just completed: %title%$if(%score%, (Score: %score%/10)) www.myanimelist.net/anime/%id%)"
-#define DEFAULT_FORMAT_BALLOON   L"$if(%title%,Title: \\t%title%)\\n$if(%name%,Name: \\t%name%)\\n$if(%episode%,Episode: \\t%episode%$if(%total%,/%total%))\\n$if(%group%,Group: \\t%group%)\\n$if(%resolution%,Res.: \\t%resolution%)\\n$if(%video%,Video: \\t%video%)\\n$if(%audio%,Audio: \\t%audio%)\\n$if(%extra%,Extra: \\t%extra%)"
+#define DEFAULT_FORMAT_BALLOON   L"$if(%title%,%title%)\\n$if(%name%,%name%)\\n$if(%episode%,Episode %episode%$if(%total%,/%total%) )$if(%group%,by %group%)"
 #define DEFAULT_TORRENT_APPPATH  L"C:\\Program Files\\uTorrent\\uTorrent.exe"
 #define DEFAULT_TORRENT_SEARCH   L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%"
 #define DEFAULT_TORRENT_SOURCE   L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0"

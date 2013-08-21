@@ -193,6 +193,11 @@ wstring FormatError(DWORD dwError, LPCWSTR lpSource) {
   }
 }
 
+void SetSharedCursor(LPCWSTR name) {
+  SetCursor(reinterpret_cast<HCURSOR>(LoadImage(nullptr, name, IMAGE_CURSOR,
+                                                0, 0, LR_SHARED)));
+}
+
 // =============================================================================
 
 unsigned long GetFileAge(const wstring& path) {

@@ -125,7 +125,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         GetCursorPos(&pt);
         ::ScreenToClient(MainDialog.GetWindowHandle(), &pt);
         listview.drag_image.DragMove(pt.x + 16, pt.y + 32);
-        SetCursor(LoadCursor(nullptr, allow_drop ? IDC_ARROW : IDC_NO));
+        SetSharedCursor(allow_drop ? IDC_ARROW : IDC_NO);
       }
       break;
     }
@@ -427,8 +427,7 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
           (button_visible[1] && button_rect[1].PtIn(pt))) {
         tooltips.AddTip(0, L"-1 episode", nullptr, &button_rect[0], false);
         tooltips.AddTip(1, L"+1 episode", nullptr, &button_rect[1], false);
-        ::SetCursor(reinterpret_cast<HCURSOR>(
-          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        SetSharedCursor(IDC_HAND);
         return TRUE;
       } else {
         tooltips.DeleteTip(0);

@@ -490,6 +490,8 @@ bool Item::PlayEpisode(int number) {
 
   wstring file_path;
 
+  SetSharedCursor(IDC_WAIT);
+
   // Check saved episode path
   if (number == GetMyLastWatchedEpisode() + 1)
     if (!GetNewEpisodePath().empty())
@@ -519,6 +521,9 @@ bool Item::PlayEpisode(int number) {
   } else {
     Execute(file_path);
   }
+
+  SetSharedCursor(IDC_ARROW);
+
   return !file_path.empty();
 }
 

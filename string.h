@@ -33,6 +33,8 @@ int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensiti
 void DecodeHtmlEntities(wstring& str);
 wstring EncodeUrl(const wstring& str, bool encode_unreserved = false);
 bool EndsWith(const wstring& str, const wstring& search);
+size_t LongestCommonSubsequenceLength(const wstring& str1, const wstring& str2);
+size_t LongestCommonSubstringLength(const wstring& str1, const wstring& str2);
 size_t LevenshteinDistance(const wstring& str1, const wstring& str2);
 void Erase(wstring& str1, const wstring& str2, bool case_insensitive = false);
 void EraseChars(wstring& str, const wchar_t chars[]);

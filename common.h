@@ -58,6 +58,7 @@ wstring JoinEpisodeNumbers(const vector<int>& input);
 int TranslateResolution(const wstring& str, bool return_validity = false);
 int StatusToIcon(int status);
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
+void SetSharedCursor(LPCWSTR name);
 unsigned long GetFileAge(const wstring& path);
 QWORD GetFileSize(const wstring& path);
 QWORD GetFolderSize(const wstring& path, bool recursive);

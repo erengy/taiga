@@ -179,8 +179,7 @@ LRESULT AnimeDialog::ImageLabel::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
   switch (uMsg) {
     case WM_SETCURSOR: {
       if (parent->anime_id_ > anime::ID_UNKNOWN) {
-        ::SetCursor(reinterpret_cast<HCURSOR>(
-          ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        SetSharedCursor(IDC_HAND);
         return TRUE;
       }
       break;

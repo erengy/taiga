@@ -50,6 +50,7 @@ void Episode::Clear() {
   clean_title.clear();
   version.clear();
   video_type.clear();
+  year.clear();
   processed = false;
 }
 

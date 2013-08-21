@@ -55,9 +55,10 @@ RecognitionEngine::RecognitionEngine() {
 
 // =============================================================================
 
-anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode, 
-                                              bool in_list, bool reverse, 
-                                              bool strict, bool check_episode, bool check_date) {
+anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
+                                              bool in_list, bool reverse,
+                                              bool strict, bool check_episode,
+                                              bool check_date, bool give_score) {
   for (auto it = scores.begin(); it != scores.end(); ++it) {
     it->second = 0;
   }
@@ -66,14 +67,14 @@ anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
     for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
       if (in_list && !it->second.IsInList())
         continue;
-      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date))
+      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date, give_score))
         return AnimeDatabase.FindItem(episode.anime_id);
     }
   } else {
     for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
       if (in_list && !it->second.IsInList())
         continue;
-      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date))
+      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date, give_score))
         return AnimeDatabase.FindItem(episode.anime_id);
     }
   }
@@ -83,9 +84,12 @@ anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
 
 // =============================================================================
 
-bool RecognitionEngine::CompareEpisode(anime::Episode& episode, 
-                                       const anime::Item& anime_item, 
-                                       bool strict, bool check_episode, bool check_date) {
+bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
+                                       const anime::Item& anime_item,
+                                       bool strict,
+                                       bool check_episode,
+                                       bool check_date,
+                                       bool give_score) {
   // Leave if title is empty
   if (episode.clean_title.empty()) return false;
 
@@ -104,7 +108,8 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
 
   if (!found) {
     // Score title in case we need it later on
-    ScoreTitle(episode, anime_item);
+    if (give_score)
+      ScoreTitle(episode, anime_item);
     // Leave if not found
     return false;
   }
@@ -184,10 +189,8 @@ bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::I
 
   score -= LevenshteinDistance(episode_title, anime_title);
 
-  if (InStr(anime_title, episode_title, 0, true) > -1)
-    score += episode_title.length();
-  if (InStr(episode_title, anime_title, 0, true) > -1)
-    score += anime_title.length();
+  score += LongestCommonSubsequenceLength(episode_title, anime_title) * 2;
+  score += LongestCommonSubstringLength(episode_title, anime_title) * 4;
 
   if (score <= score_min)
     return false;
@@ -199,6 +202,16 @@ bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::I
       case mal::MYSTATUS_PLANTOWATCH:
         score += score_bonus_small;
         break;
+    }
+  }
+  switch (anime_item.GetType()) {
+    case mal::TYPE_TV:
+      score += score_bonus_small;
+      break;
+  }
+  if (!episode.year.empty()) {
+    if (anime_item.GetDate(anime::DATE_START).year == ToInt(episode.year)) {
+      score += score_bonus_big;
     }
   }
 
@@ -805,7 +818,7 @@ bool RecognitionEngine::ValidateEpisodeNumber(anime::Episode& episode) {
   int number = ToInt(episode.number);
   if (number <= 0 || number > 1000) {
     if (number > 1950 && number < 2050) {
-      AppendKeyword(episode.extras, L"Year: " + episode.number);
+      episode.year = episode.number;
     }
     episode.number.clear();
     return false;

@@ -337,8 +337,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       // probably more interested in them than the older titles.
       if (!silent) {
         TaskbarList.SetProgressState(TBPF_NORMAL);
-        ::SetCursor(reinterpret_cast<HCURSOR>(
-          ::LoadImage(nullptr, IDC_WAIT, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        SetSharedCursor(IDC_WAIT);
       }
       for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
         if (!silent)
@@ -364,14 +363,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       }
       if (!silent) {
         TaskbarList.SetProgressState(TBPF_NOPROGRESS);
-        ::SetCursor(reinterpret_cast<HCURSOR>(
-          ::LoadImage(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        SetSharedCursor(IDC_ARROW);
       }
     // Search only for selected list item
     } else {
       int anime_id = static_cast<int>(lParam);
+      SetSharedCursor(IDC_WAIT);
       auto anime_item = AnimeDatabase.FindItem(anime_id);
       anime_item->CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
+      SetSharedCursor(IDC_ARROW);
     }
     // We're done
     if (!silent)

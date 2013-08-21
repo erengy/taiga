@@ -216,18 +216,79 @@ bool EndsWith(const wstring& str1, const wstring& str2) {
   return str1.compare(str1.length() - str2.length(), str2.length(), str2) == 0;
 }
 
-size_t LevenshteinDistance(const wstring& str1, const wstring& str2) {
-  const size_t len1 = str1.size(), len2 = str2.size();
-  vector<size_t> col(len2 + 1), prev_col(len2 + 1);
+size_t LongestCommonSubsequenceLength(const wstring& str1, const wstring& str2) {
+  if (str1.empty() || str2.empty())
+    return 0;
 
+  const size_t len1 = str1.length();
+  const size_t len2 = str2.length();
+
+  vector<vector<size_t>> table(len1 + 1);
+  for (auto it = table.begin(); it != table.end(); ++it)
+    it->resize(len2 + 1);
+
+  for (size_t i = 0; i < len1; i++) {
+    for (size_t j = 0; j < len2; j++) {
+      if (str1[i] == str2[j]) {
+        table[i + 1][j + 1] = table[i][j] + 1;
+      } else {
+        table[i + 1][j + 1] = max(table[i + 1][j], table[i][j + 1]);
+      }
+    }
+  }
+
+  return table.back().back();
+}
+
+size_t LongestCommonSubstringLength(const wstring& str1, const wstring& str2) {
+  if (str1.empty() || str2.empty())
+    return 0;
+
+  const size_t len1 = str1.length();
+  const size_t len2 = str2.length();
+
+  vector<vector<size_t>> table(len1);
+  for (auto it = table.begin(); it != table.end(); ++it)
+    it->resize(len2);
+
+  size_t longest_length = 0;
+
+  for (size_t i = 0; i < len1; i++) {
+    for (size_t j = 0; j < len2; j++) {
+      if (str1[i] == str2[j]) {
+        if (i == 0 || j == 0) {
+          table[i][j] = 1;
+        } else {
+          table[i][j] = table[i - 1][j - 1] + 1;
+        }
+        if (table[i][j] > longest_length) {
+          longest_length = table[i][j];
+        }
+      } else {
+        table[i][j] = 0;
+      }
+    }
+  }
+
+  return longest_length;
+}
+
+size_t LevenshteinDistance(const wstring& str1, const wstring& str2) {
+  const size_t len1 = str1.size();
+  const size_t len2 = str2.size();
+
+  vector<size_t> prev_col(len2 + 1);
   for (size_t i = 0; i < prev_col.size(); i++)
     prev_col[i] = i;
+
+  vector<size_t> col(len2 + 1);
 
   for (size_t i = 0; i < len1; i++) {
     col[0] = i + 1;
 
     for (size_t j = 0; j < len2; j++)
-      col[j + 1] = min(min(1 + col[j], 1 + prev_col[1 + j]), prev_col[j] + (str1[i] == str2[j] ? 0 : 1));
+      col[j + 1] = min(min(1 + col[j], 1 + prev_col[1 + j]),
+                       prev_col[j] + (str1[i] == str2[j] ? 0 : 1));
 
     col.swap(prev_col);
   }

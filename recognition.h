@@ -41,13 +41,15 @@ public:
                              bool reverse = true, 
                              bool strict = true, 
                              bool check_episode = true, 
-                             bool check_date = true);
+                             bool check_date = true,
+                             bool give_score = false);
   
   bool CompareEpisode(anime::Episode& episode, 
                       const anime::Item& anime_item, 
                       bool strict = true, 
                       bool check_episode = true, 
-                      bool check_date = true);
+                      bool check_date = true,
+                      bool give_score = false);
   
   bool ExamineTitle(wstring title, 
                     anime::Episode& episode, 

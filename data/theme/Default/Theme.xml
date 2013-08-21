@@ -56,10 +56,10 @@
 	<!-- List -->
 	<list>
 		<progress>
-			<border     type="solid" value_1="EBEBEB"/>
+			<border     type="solid" value_1="E0E0E0"/>
 			<background type="solid" value_1="FFFFFF"/>
 			<button     type="solid" value_1="646464"/>
-			<separator  type="solid" value_1="EBEBEB"/>
+			<separator  type="solid" value_1="E0E0E0"/>
 			<watching   type="solid" value_1="60C653"/>
 			<completed  type="solid" value_1="60C653"/>
 			<dropped    type="solid" value_1="60C653"/>

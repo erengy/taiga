@@ -635,7 +635,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       // Recognized?
       if (Settings.Program.General.enable_recognition) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
-          anime_item = Meow.MatchDatabase(CurrentEpisode, false, true);
+          anime_item = Meow.MatchDatabase(CurrentEpisode, false, true, true, true, true, true);
           if (anime_item) {
             MediaPlayers.SetTitleChanged(false);
             CurrentEpisode.Set(anime_item->GetId());

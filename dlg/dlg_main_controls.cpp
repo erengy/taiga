@@ -51,8 +51,7 @@ LRESULT MainDialog::MainTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
       HitTest(&ht, true);
       int index = GetItemData(ht.hItem);
       if (index == -1) {
-        ::SetCursor(reinterpret_cast<HCURSOR>(
-          ::LoadImage(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+        SetSharedCursor(IDC_ARROW);
         return TRUE;
       }
       break;
@@ -141,8 +140,7 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
 LRESULT MainDialog::CancelButton::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_SETCURSOR: {
-      ::SetCursor(reinterpret_cast<HCURSOR>(
-        ::LoadImage(nullptr, IDC_HAND, IMAGE_CURSOR, 0, 0, LR_SHARED)));
+      SetSharedCursor(IDC_HAND);
       return TRUE;
     }
   }

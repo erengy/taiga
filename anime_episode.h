@@ -48,6 +48,7 @@ class Episode {
   wstring video_type;
   wstring checksum;
   wstring extras;
+  wstring year;
   bool processed;
 };
 
