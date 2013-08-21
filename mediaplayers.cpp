@@ -222,7 +222,7 @@ wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
         if (files_vector[i].at(1) == L':') {
           WCHAR buffer[4096] = {0};
           GetLongPathName(files_vector[i].c_str(), buffer, 4096);
-          return GetFileName(buffer);
+          return wstring(buffer);
         } else {
           return GetFileName(files_vector[i]);
         }

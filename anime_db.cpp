@@ -225,20 +225,12 @@ void Database::UpdateItem(Item& new_item) {
     item->SetMyDate(DATE_END, new_item.GetMyDate(DATE_END));
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
-    
-    if (item->GetEpisodeCount() > 0)
-      item->SetEpisodeAvailability(item->GetEpisodeCount(), false, L"");
 
     user.IncreaseItemCount(item->GetMyStatus(false), false);
-
-    for (size_t i = 0; i < Settings.Anime.items.size(); i++) {
-      if (item->GetId() == Settings.Anime.items[i].id) {
-        item->SetFolder(Settings.Anime.items[i].folder, false);
-        item->SetUserSynonyms(Settings.Anime.items[i].titles, false);
-        break;
-      }
-    }
   }
+
+  // Update local information
+  UpdateItemFromSettings(item->GetId());
 
   critical_section_.Leave();
 }

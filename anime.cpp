@@ -54,12 +54,15 @@ SeriesInformation::SeriesInformation()
 }
 
 MyInformation::MyInformation()
-    : last_aired_episode(0), 
-      watched_episodes(0), 
+    : watched_episodes(0), 
       score(0), 
       status(mal::MYSTATUS_NOTINLIST), 
       rewatching(FALSE), 
-      rewatching_ep(0), 
+      rewatching_ep(0) {
+}
+
+LocalInformation::LocalInformation()
+    : last_aired_episode(0),
       playing(false) {
 }
 
@@ -110,14 +113,9 @@ void Item::StartWatching(Episode& episode) {
       episode.folder = MediaPlayers.GetTitleFromProcessHandle(hwnd);
       episode.folder = GetPathOnly(episode.folder);
     }
-    if (!episode.folder.empty()) {
-      for (size_t i = 0; i < Settings.Folders.root.size(); i++) {
-        // Set the folder if only it is under a root folder
-        if (StartsWith(episode.folder, Settings.Folders.root[i])) {
-          SetFolder(episode.folder, true);
-          break;
-        }
-      }
+    if (IsInsideRootFolders(episode.folder)) {
+      // Set the folder if only it is under a root folder
+      SetFolder(episode.folder, true);
     }
   }
 
@@ -315,15 +313,26 @@ void GetUpcomingTitles(vector<int>& anime_ids) {
 }
 
 bool IsInsideRootFolders(const wstring& path) {
-  if (!Settings.Account.Update.out_of_root)
-    return true;
-
-  if (path.empty() || Settings.Folders.root.empty())
-    return true;
-
-  foreach_c_(folder, Settings.Folders.root)
-    if (StartsWith(path, *folder))
+  foreach_c_(root_folder, Settings.Folders.root)
+    if (StartsWith(path, *root_folder))
       return true;
+
+  return false;
+}
+
+bool UpdateItemFromSettings(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  foreach_c_(it, Settings.Anime.items) {
+    if (it->id == anime_id) {
+      anime_item->SetFolder(it->folder, false);
+      anime_item->SetUserSynonyms(it->titles, false);
+      return true;
+    }
+  }
 
   return false;
 }

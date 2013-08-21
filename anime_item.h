@@ -101,7 +101,7 @@ class Item {
   // Functions related to episode availability
   bool CheckEpisodes(int number = -1, bool check_folder = false);
   int GetAvailableEpisodeCount() const;
-  int GetLastAiredEpisodeNumber(bool estimate = false) const;
+  int GetLastAiredEpisodeNumber(bool estimate = false);
   wstring GetNewEpisodePath() const;
   bool IsEpisodeAvailable(int number) const;
   bool IsNewEpisodeAvailable() const;
@@ -166,6 +166,9 @@ class Item {
   // User information, stored in user\<username>\anime.xml - some items are not
   // in user's list, thus this member is not valid for every item.
   std::shared_ptr<MyInformation> my_info_;
+
+  // Local information, stored temporarily
+  LocalInformation local_info_;
 
   // Pointer to the parent database which holds this item
   static Database* database_;

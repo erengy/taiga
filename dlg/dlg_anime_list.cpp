@@ -641,7 +641,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
   return 0;
 }
 
-void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, const anime::Item* anime_item) {
+void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, anime::Item* anime_item) {
   win32::Dc dc = hdc;
   win32::Rect rcBar = *rc;
 
@@ -651,7 +651,6 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
   int eps_total = anime_item->GetEpisodeCount(false);
 
   if (eps_watched > eps_aired) eps_aired = -1;
-  if (eps_aired == eps_total) eps_aired = -1;
   if (eps_watched == 0) eps_watched = -1;
 
   bool draw_text = Settings.Program.List.progress_show_eps == TRUE;
@@ -733,12 +732,12 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, UINT uItemSta
   }
 
   // Draw separators
-  if (eps_watched > -1) {
+  if (eps_watched > 0 && (eps_watched < eps_total || eps_total == 0)) {
     rcSeparator.left = rcWatched.right;
     rcSeparator.right = rcWatched.right + 1;
     UI.list_progress.separator.Draw(dc.Get(), &rcSeparator);
   }
-  if (eps_aired > -1) {
+  if (eps_aired > 0 && (eps_aired < eps_total || eps_total == 0)) {
     rcSeparator.left = rcAired.right;
     rcSeparator.right = rcAired.right + 1;
     UI.list_progress.separator.Draw(dc.Get(), &rcSeparator);

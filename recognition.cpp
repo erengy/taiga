@@ -26,6 +26,7 @@
 #include "media.h"
 #include "myanimelist.h"
 #include "resource.h"
+#include "settings.h"
 #include "string.h"
 
 RecognitionEngine Meow;
@@ -93,6 +94,7 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
 
   // Compare with titles
   bool found = false;
+
   if (clean_titles[anime_item.GetId()].empty())
     UpdateCleanTitles(anime_item.GetId());
   for (auto it = clean_titles[anime_item.GetId()].begin();
@@ -228,8 +230,10 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
   episode.file = title;
 
   // Ignore if the file is outside of root folders
-  if (!anime::IsInsideRootFolders(episode.folder))
-    return false;
+  if (Settings.Account.Update.out_of_root)
+    if (!episode.folder.empty() && !Settings.Folders.root.empty())
+      if (!anime::IsInsideRootFolders(episode.folder))
+        return false;
 
   // Check and trim file extension
   wstring extension = GetFileExtension(title);
@@ -626,7 +630,7 @@ void RecognitionEngine::UpdateCleanTitles(int anime_id) {
       CleanTitle(clean_titles[anime_id].back());
     }
   }
-  if (anime_item->IsInList() && !anime_item->GetUserSynonyms().empty()) {
+  if (!anime_item->GetUserSynonyms().empty()) {
     for (auto it = anime_item->GetUserSynonyms().begin();
          it != anime_item->GetUserSynonyms().end(); ++it) {
       clean_titles[anime_id].push_back(*it);

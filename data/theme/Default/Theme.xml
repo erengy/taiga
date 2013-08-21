@@ -57,14 +57,14 @@
 	<list>
 		<progress>
 			<border     type="solid" value_1="EBEBEB"/>
-			<background type="solid" value_1="EBEBEB"/>
+			<background type="solid" value_1="FFFFFF"/>
 			<button     type="solid" value_1="646464"/>
 			<separator  type="solid" value_1="EBEBEB"/>
 			<watching   type="solid" value_1="60C653"/>
 			<completed  type="solid" value_1="60C653"/>
 			<dropped    type="solid" value_1="60C653"/>
-			<available  type="solid" value_1="ABABAB"/>
-			<aired      type="solid" value_1="CBCBCB"/>
+			<available  type="solid" value_1="CBCBCB"/>
+			<aired      type="solid" value_1="EBEBEB"/>
 		</progress>
 	</list>
 </theme>

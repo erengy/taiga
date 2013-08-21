@@ -40,6 +40,7 @@ void Episode::Clear() {
   checksum.clear();
   extras.clear();
   file.clear();
+  folder.clear();
   format.clear();
   group.clear();
   name.clear();

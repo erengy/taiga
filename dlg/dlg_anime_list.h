@@ -59,7 +59,7 @@ public:
     
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, const anime::Item* anime_item);
+    void DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, anime::Item* anime_item);
     int GetSortType(int column);
     void RefreshProgressButtons(const anime::Item* anime_item);
     

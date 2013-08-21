@@ -370,6 +370,12 @@ bool History::Load() {
     #undef READ_ATTRIBUTE_INT
     queue.Add(event_item, false);
   }
+  for (auto it = queue.items.begin(); it != queue.items.end(); ++it) {
+    // Make sure local information is updated for new list items
+    if (it->mode == HTTP_MAL_AnimeAdd) {
+      anime::UpdateItemFromSettings(it->anime_id);
+    }
+  }
 
   return result.status == status_ok;
 }

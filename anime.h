@@ -94,6 +94,13 @@ class MyInformation {
   Date date_finish;
   wstring last_updated;
   wstring tags;
+};
+
+// For all kinds of other temporary information
+class LocalInformation {
+ public:
+  LocalInformation();
+  virtual ~LocalInformation() {}
 
   int last_aired_episode;
   vector<bool> available_episodes;
@@ -111,6 +118,8 @@ wstring GetImagePath(int anime_id = -1);
 void GetUpcomingTitles(vector<int>& anime_ids);
 
 bool IsInsideRootFolders(const wstring& path);
+
+bool UpdateItemFromSettings(int anime_id);
 
 } // namespace anime
 

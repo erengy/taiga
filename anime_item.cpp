@@ -251,6 +251,10 @@ void Item::SetType(int type) {
 
 void Item::SetEpisodeCount(int number) {
   series_info_.episodes = number;
+
+  if (number >= 0)
+    if (static_cast<size_t>(number) != local_info_.available_episodes.size())
+      local_info_.available_episodes.resize(number);
 }
 
 void Item::SetAiringStatus(int status) {
@@ -418,22 +422,18 @@ bool Item::CheckEpisodes(int number, bool check_folder) {
 }
 
 int Item::GetAvailableEpisodeCount() const {
-  if (!my_info_.get()) return 0;
-  return static_cast<int>(my_info_->available_episodes.size());
+  return static_cast<int>(local_info_.available_episodes.size());
 }
 
-int Item::GetLastAiredEpisodeNumber(bool estimate) const {
-  if (!my_info_.get())
-    return 0;
-
-  if (my_info_->last_aired_episode)
-    return my_info_->last_aired_episode;
+int Item::GetLastAiredEpisodeNumber(bool estimate) {
+  if (local_info_.last_aired_episode)
+    return local_info_.last_aired_episode;
 
   // No need to estimate if the series isn't currently airing
   switch (GetAiringStatus()) {
     case mal::STATUS_FINISHED:
-      my_info_->last_aired_episode = GetEpisodeCount();
-      return my_info_->last_aired_episode;
+      local_info_.last_aired_episode = GetEpisodeCount();
+      return local_info_.last_aired_episode;
     case mal::STATUS_NOTYETAIRED:
     case mal::STATUS_UNKNOWN:
       return 0;
@@ -458,29 +458,26 @@ int Item::GetLastAiredEpisodeNumber(bool estimate) const {
     if (date_diff > -1) {
       int number_of_weeks = date_diff / 7;
       if (number_of_weeks < GetEpisodeCount()) {
-        my_info_->last_aired_episode = number_of_weeks + 1;
+        local_info_.last_aired_episode = number_of_weeks + 1;
       } else {
-        my_info_->last_aired_episode = GetEpisodeCount();
+        local_info_.last_aired_episode = GetEpisodeCount();
       }
     }
   }
 
-  return my_info_->last_aired_episode;
+  return local_info_.last_aired_episode;
 }
 
 wstring Item::GetNewEpisodePath() const {
-  if (!my_info_.get()) return wstring();
-  return my_info_->new_episode_path;
+  return local_info_.new_episode_path;
 }
 
 bool Item::IsEpisodeAvailable(int number) const {
-  if (!my_info_.get()) return false;
-
   if (number < 1) number = 1;
-  if (static_cast<size_t>(number) > my_info_->available_episodes.size())
+  if (static_cast<size_t>(number) > local_info_.available_episodes.size())
     return false;
 
-  return my_info_->available_episodes.at(number - 1);
+  return local_info_.available_episodes.at(number - 1);
 }
 
 bool Item::IsNewEpisodeAvailable() const {
@@ -526,19 +523,17 @@ bool Item::PlayEpisode(int number) {
 }
 
 bool Item::SetEpisodeAvailability(int number, bool available, const wstring& path) {
-  assert(my_info_.get());
-
   if (number == 0) number = 1;
   
   if (number <= GetEpisodeCount() || GetEpisodeCount() == 0) {
-    if (static_cast<size_t>(number) > my_info_->available_episodes.size()) {
-      my_info_->available_episodes.resize(number);
+    if (static_cast<size_t>(number) > local_info_.available_episodes.size()) {
+      local_info_.available_episodes.resize(number);
     }
-    my_info_->available_episodes.at(number - 1) = available;
+    local_info_.available_episodes.at(number - 1) = available;
     if (number == GetMyLastWatchedEpisode() + 1) {
       SetNewEpisodePath(path);
     }
-    if (!my_info_->playing) {
+    if (!local_info_.playing) {
       int list_index = AnimeListDialog.GetListIndex(GetId());
       if (list_index > -1) {
         AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
@@ -551,14 +546,12 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
 }
 
 void Item::SetLastAiredEpisodeNumber(int number) {
-  assert(my_info_.get());
-  if (number > my_info_->last_aired_episode)
-    my_info_->last_aired_episode = number;
+  if (number > local_info_.last_aired_episode)
+    local_info_.last_aired_episode = number;
 }
 
 void Item::SetNewEpisodePath(const wstring& path) {
-  assert(my_info_.get());
-  my_info_->new_episode_path = path;
+  local_info_.new_episode_path = path;
 }
 
 // =============================================================================
@@ -586,16 +579,13 @@ bool Item::CheckFolder() {
 }
 
 const wstring Item::GetFolder() const {
-  if (!my_info_.get()) return wstring();
-  return my_info_->folder;
+  return local_info_.folder;
 }
 
 void Item::SetFolder(const wstring& folder, bool save_settings) {
-  assert(my_info_.get());
+  if (folder == local_info_.folder) return;
 
-  if (folder == my_info_->folder) return;
-
-  my_info_->folder = folder;
+  local_info_.folder = folder;
 
   if (save_settings) {
     Settings.Anime.SetItem(GetId(), folder, Optional<wstring>());
@@ -606,20 +596,17 @@ void Item::SetFolder(const wstring& folder, bool save_settings) {
 // =============================================================================
 
 bool Item::GetPlaying() const {
-  if (!my_info_.get()) return false;
-  return my_info_->playing;
+  return local_info_.playing;
 }
 
 void Item::SetPlaying(bool playing) {
-  assert(my_info_.get());
-  my_info_->playing = playing;
+  local_info_.playing = playing;
 }
 
 // =============================================================================
 
 const vector<wstring>& Item::GetUserSynonyms() const {
-  assert(my_info_.get());
-  return my_info_->synonyms;
+  return local_info_.synonyms;
 }
 
 void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
@@ -629,15 +616,13 @@ void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
 }
 
 void Item::SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings) {
-  assert(my_info_.get());
-
-  my_info_->synonyms = synonyms;
-  RemoveEmptyStrings(my_info_->synonyms);
+  local_info_.synonyms = synonyms;
+  RemoveEmptyStrings(local_info_.synonyms);
 
   Meow.UpdateCleanTitles(GetId());
 
   if (save_settings) {
-    Settings.Anime.SetItem(GetId(), Optional<wstring>(), Join(my_info_->synonyms, L"; "));
+    Settings.Anime.SetItem(GetId(), Optional<wstring>(), Join(local_info_.synonyms, L"; "));
     Settings.Save();
   }
 

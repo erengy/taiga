@@ -350,8 +350,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
             it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
         }
       }
-      if (!silent)
-        TaskbarList.SetProgressValue(0, AnimeDatabase.items.size());
+      i = 0;
       for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
         if (!silent)
           TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
