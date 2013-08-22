@@ -132,15 +132,16 @@ bool Settings::Load() {
   Folders.watch_enabled = watch.attribute(L"enabled").as_int(TRUE);
 
   // Anime items
-  Anime.items.clear();
-  wstring folder, titles;
   xml_node items = settings.child(L"anime").child(L"items");
   for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
-    folder = item.attribute(L"folder").value();
-    titles = item.attribute(L"titles").value();
-    Anime.SetItem(item.attribute(L"id").as_int(), 
-      folder.empty() ? Optional<wstring>() : folder, 
-      titles.empty() ? Optional<wstring>() : titles);
+    int anime_id = item.attribute(L"id").as_int();
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (!anime_item) {
+      anime_item = &AnimeDatabase.items[anime_id];
+    }
+    anime_item->SetFolder(item.attribute(L"folder").value());
+    anime_item->SetUserSynonyms(item.attribute(L"titles").value());
+    anime_item->SetUseAlternative(item.attribute(L"use_alternative").as_bool());
   }
 
   // Program
@@ -304,14 +305,20 @@ bool Settings::Save() {
     watch.append_attribute(L"enabled") = Folders.watch_enabled;
     // Items
     xml_node items = anime.append_child(L"items");
-    for (size_t i = 0; i < Anime.items.size(); i++) {
-      if (Anime.items[i].folder.empty() && Anime.items[i].titles.empty()) continue;
+    foreach_(it, AnimeDatabase.items) {
+      anime::Item& anime_item = it->second;
+      if (anime_item.GetFolder().empty() &&
+          !anime_item.UserSynonymsAvailable() &&
+          !anime_item.GetUseAlternative())
+        continue;
       xml_node item = items.append_child(L"item");
-      item.append_attribute(L"id") = Anime.items[i].id;
-      if (!Anime.items[i].folder.empty())
-        item.append_attribute(L"folder") = Anime.items[i].folder.c_str();
-      if (!Anime.items[i].titles.empty())
-        item.append_attribute(L"titles") = Anime.items[i].titles.c_str();
+      item.append_attribute(L"id") = anime_item.GetId();
+      if (!anime_item.GetFolder().empty())
+        item.append_attribute(L"folder") = anime_item.GetFolder().c_str();
+      if (anime_item.UserSynonymsAvailable())
+        item.append_attribute(L"titles") = Join(anime_item.GetUserSynonyms(), L"; ").c_str();
+      if (anime_item.GetUseAlternative())
+        item.append_attribute(L"use_alternative") = anime_item.GetUseAlternative();
     }
 
   // Announcements
@@ -534,23 +541,4 @@ void Settings::RestoreDefaults() {
     SettingsDialog.Destroy();
     ExecuteAction(L"Settings");
   }
-}
-
-// =============================================================================
-
-void Settings::Anime::SetItem(int id, Optional<wstring> folder, Optional<wstring> titles) {
-  int index = -1;
-  for (size_t i = 0; i < items.size(); i++) {
-    if (items[i].id == id) {
-      index = static_cast<int>(i);
-      break;
-    }
-  }
-  if (index == -1) {
-    index = items.size();
-    items.resize(index + 1);
-  }
-  items[index].id = id;
-  if (folder) items[index].folder = *folder;
-  if (titles) items[index].titles = *titles;
 }

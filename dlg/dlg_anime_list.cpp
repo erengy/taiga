@@ -176,7 +176,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
               ExecuteAction(L"SearchAnime(" + text + L")");
               break;
             case SIDEBAR_ITEM_FEEDS:
-              TorrentDialog.Search(Settings.RSS.Torrent.search_url, text);
+              TorrentDialog.Search(Settings.RSS.Torrent.search_url, anime_id);
               break;
           }
         }

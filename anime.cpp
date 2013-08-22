@@ -63,7 +63,8 @@ MyInformation::MyInformation()
 
 LocalInformation::LocalInformation()
     : last_aired_episode(0),
-      playing(false) {
+      playing(false),
+      use_alternative(false) {
 }
 
 // =============================================================================
@@ -115,7 +116,8 @@ void Item::StartWatching(Episode& episode) {
     }
     if (IsInsideRootFolders(episode.folder)) {
       // Set the folder if only it is under a root folder
-      SetFolder(episode.folder, true);
+      SetFolder(episode.folder);
+      Settings.Save();
     }
   }
 
@@ -316,23 +318,6 @@ bool IsInsideRootFolders(const wstring& path) {
   foreach_c_(root_folder, Settings.Folders.root)
     if (StartsWith(path, *root_folder))
       return true;
-
-  return false;
-}
-
-bool UpdateItemFromSettings(int anime_id) {
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
-
-  if (!anime_item)
-    return false;
-
-  foreach_c_(it, Settings.Anime.items) {
-    if (it->id == anime_id) {
-      anime_item->SetFolder(it->folder, false);
-      anime_item->SetUserSynonyms(it->titles, false);
-      return true;
-    }
-  }
 
   return false;
 }

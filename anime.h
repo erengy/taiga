@@ -108,6 +108,7 @@ class LocalInformation {
   wstring folder;
   vector<wstring> synonyms;
   bool playing;
+  bool use_alternative;
 };
 
 bool GetFansubFilter(int anime_id, vector<wstring>& groups);
@@ -118,8 +119,6 @@ wstring GetImagePath(int anime_id = -1);
 void GetUpcomingTitles(vector<int>& anime_ids);
 
 bool IsInsideRootFolders(const wstring& path);
-
-bool UpdateItemFromSettings(int anime_id);
 
 } // namespace anime
 

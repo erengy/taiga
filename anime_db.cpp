@@ -63,8 +63,9 @@ bool Database::LoadDatabase() {
   // Read items
   xml_node animedb_node = doc.child(L"animedb");
   for (xml_node node = animedb_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-    Item item;
-    item.SetId(XML_ReadIntValue(node, L"series_animedb_id"));
+    int id = XML_ReadIntValue(node, L"series_animedb_id");
+    Item& item = items[id]; // Creates the item if it doesn't exist
+    item.SetId(id);
     item.SetTitle(XML_ReadStrValue(node, L"series_title"));
     item.SetEnglishTitle(XML_ReadStrValue(node, L"series_english"));
     item.SetSynonyms(XML_ReadStrValue(node, L"series_synonyms"));
@@ -81,7 +82,6 @@ bool Database::LoadDatabase() {
     item.SetPopularity(XML_ReadStrValue(node, L"popularity"));
     item.SetSynopsis(XML_ReadStrValue(node, L"synopsis"));
     item.last_modified = _wtoi64(XML_ReadStrValue(node, L"last_modified").c_str());
-    items[item.GetId()] = item;
   }
 
   return true;
@@ -228,9 +228,6 @@ void Database::UpdateItem(Item& new_item) {
 
     user.IncreaseItemCount(item->GetMyStatus(false), false);
   }
-
-  // Update local information
-  UpdateItemFromSettings(item->GetId());
 
   critical_section_.Leave();
 }

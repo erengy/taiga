@@ -415,6 +415,20 @@ void TorrentDialog::RefreshList() {
   SetText(title.c_str());
 }
 
+void TorrentDialog::Search(wstring url, int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  
+  if (!anime_item)
+    return;
+
+  wstring title = anime_item->GetTitle();
+  if (anime_item->GetUseAlternative() &&
+      anime_item->UserSynonymsAvailable())
+    title = anime_item->GetUserSynonyms().front();
+  
+  Search(url, title);
+}
+
 void TorrentDialog::Search(wstring url, wstring title) {
   Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
   if (!feed) return;

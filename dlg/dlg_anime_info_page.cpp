@@ -29,6 +29,7 @@
 #include "../history.h"
 #include "../http.h"
 #include "../myanimelist.h"
+#include "../recognition.h"
 #include "../resource.h"
 #include "../settings.h"
 #include "../string.h"
@@ -355,6 +356,7 @@ void PageMyInfo::Refresh(int anime_id) {
   m_Edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
   m_Edit.SetText(Join(anime_item->GetUserSynonyms(), L"; "));
   m_Edit.SetWindowHandle(nullptr);
+  CheckDlgButton(IDC_CHECK_ANIME_ALT, anime_item->GetUseAlternative());
 
   // Folder
   m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_FOLDER));
@@ -439,12 +441,17 @@ bool PageMyInfo::Save() {
   // Alternative titles
   wstring titles;
   GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
-  anime_item->SetUserSynonyms(titles, true);
+  anime_item->SetUserSynonyms(titles);
+  anime_item->SetUseAlternative(IsDlgButtonChecked(IDC_CHECK_ANIME_ALT) == TRUE);
+  Meow.UpdateCleanTitles(anime_id_);
 
   // Folder
   wstring folder;
   GetDlgItemText(IDC_EDIT_ANIME_FOLDER, folder);
-  anime_item->SetFolder(folder, true);
+  anime_item->SetFolder(folder);
+
+  // Save settings
+  Settings.Save();
 
   // Add item to event queue
   History.queue.Add(event_item);

@@ -288,7 +288,8 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
     // Change anime folder
     if (is_folder && LIST[i].anime_id > 0) {
       auto anime_item = AnimeDatabase.FindItem(LIST[i].anime_id);
-      anime_item->SetFolder(path_available ? path : L"", true);
+      anime_item->SetFolder(path_available ? path : L"");
+      Settings.Save();
       anime_item->CheckEpisodes();
       debug::Print(L"FolderMonitor :: Change anime folder: " + 
         anime_item->GetTitle() + L" -> " + anime_item->GetFolder() + L"\n");
@@ -307,12 +308,14 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
         // Set anime folder
         if (path_available && anime_item->GetFolder().empty()) {
           if (is_folder) {
-            anime_item->SetFolder(path, true);
+            anime_item->SetFolder(path);
+            Settings.Save();
           } else if (!episode.folder.empty()) {
             anime::Episode temp_episode;
             temp_episode.title = episode.folder;
             if (Meow.CompareEpisode(temp_episode, *anime_item)) {
-              anime_item->SetFolder(episode.folder, true);
+              anime_item->SetFolder(episode.folder);
+              Settings.Save();
               anime_item->CheckEpisodes();
             }
           }

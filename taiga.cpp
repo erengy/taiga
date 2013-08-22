@@ -138,22 +138,15 @@ wstring Taiga::GetDataPath() {
 }
 
 void Taiga::LoadData() {
-  // Load media player data
   MediaPlayers.Load();
-  
-  // Load settings
+
   Settings.Load();
-  
-  // Load theme data
+
   UI.Load(Settings.Program.General.theme);
   UI.LoadImages();
 
-  // Load anime database
   AnimeDatabase.LoadDatabase();
-  
-  // Load anime list
   AnimeDatabase.LoadList();
 
-  // Load history
   History.Load();
 }

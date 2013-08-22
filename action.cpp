@@ -30,6 +30,7 @@
 #include "monitor.h"
 #include "myanimelist.h"
 #include "process.h"
+#include "recognition.h"
 #include "resource.h"
 #include "settings.h"
 #include "stats.h"
@@ -217,9 +218,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"SearchTorrents") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item)
-      TorrentDialog.Search(body, anime_item->GetTitle());
+    TorrentDialog.Search(body, anime_id);
 
   // ShowSidebar()
   } else if (action == L"ShowSidebar") {
@@ -621,7 +620,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.text = Join(anime_item->GetUserSynonyms(), L"; ");
     dlg.Show(g_hMain);
     if (dlg.result == IDOK) {
-      anime_item->SetUserSynonyms(dlg.text, true);
+      anime_item->SetUserSynonyms(dlg.text);
+      Meow.UpdateCleanTitles(anime_id);
+      Settings.Save();
     }
   
   // ===========================================================================
@@ -648,7 +649,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         if (!Settings.Folders.root.empty())
           default_path = Settings.Folders.root.front();
         if (BrowseForFolder(g_hMain, L"Choose an anime folder", default_path, path)) {
-          anime_item->SetFolder(path, true);
+          anime_item->SetFolder(path);
+          Settings.Save();
         }
       }
     }
@@ -665,7 +667,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     wstring path, title = L"Anime title: " + anime_item->GetTitle();
     if (BrowseForFolder(MainDialog.GetWindowHandle(), title.c_str(), L"", path)) {
-      anime_item->SetFolder(path, true);
+      anime_item->SetFolder(path);
+      Settings.Save();
       anime_item->CheckEpisodes();
     }
 

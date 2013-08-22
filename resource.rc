@@ -87,13 +87,14 @@ FONT 9, "Segoe UI", 400, 0, 0
     CONTROL         "", IDC_DATETIME_START, DATETIMEPICK_CLASS, WS_TABSTOP | DTS_SHOWNONE | DTS_RIGHTALIGN, 7, 115, 100, 14
     LTEXT           "Finish date:", IDC_STATIC, 122, 105, 90, 8, SS_LEFT
     CONTROL         "", IDC_DATETIME_FINISH, DATETIMEPICK_CLASS, WS_TABSTOP | DTS_SHOWNONE | DTS_RIGHTALIGN, 122, 115, 100, 14
-    LTEXT           "My settings", IDC_STATIC_HEADER2, 0, 145, 340, 8, SS_LEFT
-    LTEXT           "Alternative titles:", IDC_STATIC, 7, 160, 85, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_ANIME_ALT, 7, 170, 341, 14, ES_AUTOHSCROLL
-    LTEXT           "Folder:", IDC_STATIC, 7, 190, 85, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_ANIME_FOLDER, 7, 200, 322, 14, ES_AUTOHSCROLL
-    PUSHBUTTON      "...", IDC_BUTTON_BROWSE, 333, 200, 15, 14
-    CONTROL         "Fansub group preference: None <a href=""URL()"">(Change)</a>", IDC_LINK_ANIME_FANSUB, "SysLink", 0x50010000, 7, 220, 335, 10
+    LTEXT           "My settings", IDC_STATIC_HEADER2, 0, 136, 340, 8, SS_LEFT
+    LTEXT           "Alternative titles:", IDC_STATIC, 7, 151, 85, 8, SS_LEFT
+    EDITTEXT        IDC_EDIT_ANIME_ALT, 7, 161, 341, 14, ES_AUTOHSCROLL
+    AUTOCHECKBOX    "Use the first alternative title to search for torrents", IDC_CHECK_ANIME_ALT, 7, 179, 215, 8
+    LTEXT           "Folder:", IDC_STATIC, 7, 194, 85, 8, SS_LEFT
+    EDITTEXT        IDC_EDIT_ANIME_FOLDER, 7, 204, 322, 14, ES_AUTOHSCROLL
+    PUSHBUTTON      "...", IDC_BUTTON_BROWSE, 333, 204, 15, 14
+    CONTROL         "Fansub group preference: None <a href=""URL()"">(Change)</a>", IDC_LINK_ANIME_FANSUB, "SysLink", 0x50010000, 7, 224, 335, 10
 }
 
 
@@ -590,7 +591,7 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     GROUPBOX        "Application", IDC_STATIC, 7, 7, 301, 54
-    RADIOBUTTON     "Use the default application", IDC_RADIO_TORRENT_APP1, 12, 18, 105, 10, WS_TABSTOP
+    RADIOBUTTON     "Use the default application associated with .torrent files", IDC_RADIO_TORRENT_APP1, 12, 18, 210, 10, WS_TABSTOP
     RADIOBUTTON     "Use a custom application:", IDC_RADIO_TORRENT_APP2, 12, 30, 105, 10, WS_TABSTOP
     EDITTEXT        IDC_EDIT_TORRENT_APP, 21, 42, 260, 12, ES_AUTOHSCROLL
     PUSHBUTTON      "...", IDC_BUTTON_TORRENT_BROWSE_APP, 285, 42, 16, 12

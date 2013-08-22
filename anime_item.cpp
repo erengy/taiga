@@ -25,7 +25,6 @@
 #include "common.h"
 #include "history.h"
 #include "myanimelist.h"
-#include "recognition.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -564,7 +563,7 @@ void Item::SetNewEpisodePath(const wstring& path) {
 bool Item::CheckFolder() {
   // Check if current folder still exists
   if (!GetFolder().empty() && !FolderExists(GetFolder())) {
-    SetFolder(L"", false);
+    SetFolder(L"");
   }
 
   // Search root folders
@@ -574,7 +573,8 @@ bool Item::CheckFolder() {
          it != Settings.Folders.root.end(); ++it) {
       new_folder = SearchFileFolder(*this, *it, 0, true);
       if (!new_folder.empty()) {
-        SetFolder(new_folder, true);
+        SetFolder(new_folder);
+        Settings.Save();
         break;
       }
     }
@@ -587,15 +587,8 @@ const wstring Item::GetFolder() const {
   return local_info_.folder;
 }
 
-void Item::SetFolder(const wstring& folder, bool save_settings) {
-  if (folder == local_info_.folder) return;
-
+void Item::SetFolder(const wstring& folder) {
   local_info_.folder = folder;
-
-  if (save_settings) {
-    Settings.Anime.SetItem(GetId(), folder, Optional<wstring>());
-    Settings.Save();
-  }
 }
 
 // =============================================================================
@@ -614,26 +607,31 @@ const vector<wstring>& Item::GetUserSynonyms() const {
   return local_info_.synonyms;
 }
 
-void Item::SetUserSynonyms(const wstring& synonyms, bool save_settings) {
+void Item::SetUserSynonyms(const wstring& synonyms) {
   vector<wstring> temp;
   Split(synonyms, L"; ", temp);
-  SetUserSynonyms(temp, save_settings);
+  SetUserSynonyms(temp);
 }
 
-void Item::SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings) {
+void Item::SetUserSynonyms(const vector<wstring>& synonyms) {
   local_info_.synonyms = synonyms;
   RemoveEmptyStrings(local_info_.synonyms);
-
-  Meow.UpdateCleanTitles(GetId());
-
-  if (save_settings) {
-    Settings.Anime.SetItem(GetId(), Optional<wstring>(), Join(local_info_.synonyms, L"; "));
-    Settings.Save();
-  }
 
   if (!synonyms.empty() && CurrentEpisode.anime_id == anime::ID_NOTINLIST) {
     CurrentEpisode.Set(anime::ID_UNKNOWN);
   }
+}
+
+bool Item::UserSynonymsAvailable() const {
+  return !local_info_.synonyms.empty();
+}
+
+bool Item::GetUseAlternative() const {
+  return local_info_.use_alternative;
+}
+
+void Item::SetUseAlternative(bool use_alternative) {
+  local_info_.use_alternative = use_alternative;
 }
 
 // =============================================================================

@@ -221,7 +221,9 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               anime_item->AddtoUserList();
               auto synonyms = anime_item->GetUserSynonyms();
               synonyms.push_back(CurrentEpisode.title);
-              anime_item->SetUserSynonyms(synonyms, true);
+              anime_item->SetUserSynonyms(synonyms);
+              Meow.UpdateCleanTitles(anime_item->GetId());
+              Settings.Save();
               anime_item->StartWatching(CurrentEpisode);
               MainDialog.ChangeStatus();
             }

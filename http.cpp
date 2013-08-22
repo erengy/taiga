@@ -446,7 +446,8 @@ BOOL HttpClient::OnReadComplete() {
                 CheckSlash(Settings.RSS.Torrent.download_path);
                 anime_folder = Settings.RSS.Torrent.download_path + anime_folder;
                 CreateDirectory(anime_folder.c_str(), nullptr);
-                anime_item->SetFolder(anime_folder, true);
+                anime_item->SetFolder(anime_folder);
+                Settings.Save();
               }
               if (!anime_folder.empty())
                 cmd = L"/directory \"" + anime_folder + L"\" ";

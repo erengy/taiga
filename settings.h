@@ -46,15 +46,6 @@ public:
     } Update;
   } Account;
 
-  // Anime
-  struct Anime {
-    void SetItem(int id, Optional<wstring> folder, Optional<wstring> titles);
-    struct Item {
-      int id;
-      wstring folder, titles;
-    };
-    vector<Item> items;
-  } Anime;
   // Folders
   struct Folders {
     vector<wstring> root;

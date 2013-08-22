@@ -113,7 +113,7 @@ class Item {
   // For anime-specific folders on user's computer
   bool CheckFolder();
   const wstring GetFolder() const;
-  void SetFolder(const wstring& folder, bool save_settings);
+  void SetFolder(const wstring& folder);
   
   // More than one anime may have their playing flag on.
   bool GetPlaying() const;
@@ -121,8 +121,11 @@ class Item {
   
   // For alternative titles provided by user
   const vector<wstring>& GetUserSynonyms() const;
-  void SetUserSynonyms(const wstring& synonyms, bool save_settings);
-  void SetUserSynonyms(const vector<wstring>& synonyms, bool save_settings);
+  void SetUserSynonyms(const wstring& synonyms);
+  void SetUserSynonyms(const vector<wstring>& synonyms);
+  bool UserSynonymsAvailable() const;
+  bool GetUseAlternative() const;
+  void SetUseAlternative(bool use_alternative);
   
   // A database item may not be in user's list.
   void AddtoUserList();
