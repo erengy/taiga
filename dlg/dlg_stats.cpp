@@ -37,7 +37,7 @@ BOOL StatsDialog::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 4; i++) {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-      reinterpret_cast<WPARAM>(UI.font_bold.Get()), FALSE);
+                       reinterpret_cast<WPARAM>(UI.font_bold.Get()), FALSE);
   }
 
   // Calculate and display statistics
@@ -94,6 +94,9 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
       }
       break;
     }
+
+    case WM_ERASEBKGND:
+      return TRUE;
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
@@ -159,7 +162,11 @@ void StatsDialog::Refresh() {
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());
 
   // Score distribution
-  RedrawWindow();
+  win32::Window window = GetDlgItem(IDC_STATIC_ANIME_STAT2);
+  win32::Rect rect;
+  window.GetWindowRect(GetWindowHandle(), &rect);
+  InvalidateRect(&rect);
+  window.SetWindowHandle(nullptr);
 
   // Database
   text.clear();

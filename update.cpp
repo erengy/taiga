@@ -155,7 +155,7 @@ bool UpdateHelper::Download() {
   if (!feed_item) return false;
 
   // TODO: Use TEMP folder path
-  download_path_ = CheckSlash(app_->GetCurrentDirectory());
+  download_path_ = CheckSlash(GetPathOnly(app_->GetModulePath()));
   download_path_ += GetFileName(feed_item->link);
 
   win32::Url url(feed_item->link);
@@ -167,7 +167,11 @@ bool UpdateHelper::RunInstaller() {
   auto feed_item = FindItem(latest_guid_);
   if (!feed_item) return false;
 
-  wstring parameters = L"/S /D=" + app_->GetCurrentDirectory();
+  // /S runs the installer silently, /D overrides the default installation
+  // directory. Do not rely on the current directory here, as it isn't
+  // guaranteed to be the same as the module path.
+  wstring parameters = L"/S /D=" + GetPathOnly(app_->GetModulePath());
+
   restart_required_ = Execute(download_path_, parameters);
   return restart_required_;
 }

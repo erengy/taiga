@@ -155,6 +155,82 @@ int ScaleY(int value) {
   return MulDiv(value, dpi_y, 96);
 }
 
+void RgbToHsv(float r, float g, float b, float& h, float& s, float& v) {
+  float rgb_min = min(r, min(g, b));
+  float rgb_max = max(r, max(g, b));
+  float rgb_delta = rgb_max - rgb_min;
+
+  s = rgb_delta / (rgb_max + 1e-20f);
+  v = rgb_max;
+
+  if (r == rgb_max) {
+    h = (g - b) / (rgb_delta + 1e-20f);
+  } else if (g == rgb_max) {
+    h = 2 + (b - r) / (rgb_delta + 1e-20f);
+  } else {
+    h = 4 + (r - g) / (rgb_delta + 1e-20f);
+  }
+
+  if (h < 0)
+    h += 6.0f;
+  h *= (1.0f / 6.0f);
+}
+
+void HsvToRgb(float& r, float& g, float& b, float h, float s, float v) {
+  if (s == 0) {
+    r = g = b = v;
+    return;
+  }
+
+  h /= 60;
+  int i = static_cast<int>(floor(h));
+  float f = h - i;
+  float p = v * (1 - s);
+  float q = v * (1 - s * f);
+  float t = v * (1 - s * (1 - f));
+
+  switch (i) {
+    case 0:
+      r = v; g = t; b = p;
+      break;
+    case 1:
+      r = q; g = v; b = p;
+      break;
+    case 2:
+      r = p; g = v; b = t;
+      break;
+    case 3:
+      r = p; g = q; b = v;
+      break;
+    case 4:
+      r = t; g = p; b = v;
+      break;
+    default:
+      r = v; g = p; b = q;
+      break;
+  }
+}
+
+COLORREF ChangeColorBrightness(COLORREF color, float modifier) {
+  float r = static_cast<float>(GetRValue(color)) / 255.0f;
+  float g = static_cast<float>(GetGValue(color)) / 255.0f;
+  float b = static_cast<float>(GetBValue(color)) / 255.0f;
+
+  float h, s, v;
+
+  RgbToHsv(r, g, b, h, s, v);
+
+  v += modifier;
+  if (v < 0.0f) v = 0.0f;
+  if (v > 1.0f) v = 1.0f;
+
+  HsvToRgb(r, g, b, h, s, v);
+
+  return RGB(static_cast<BYTE>(r * 255),
+             static_cast<BYTE>(g * 255),
+             static_cast<BYTE>(b * 255));
+}
+
 // =============================================================================
 
 bool Image::Load(const wstring& path) {

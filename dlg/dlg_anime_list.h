@@ -59,14 +59,17 @@ public:
     
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void DrawProgressBar(HDC hdc, RECT* rc, UINT uItemState, anime::Item* anime_item);
+    void DrawProgressBar(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
+    void DrawScoreBox(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
+
     int GetSortType(int column);
-    void RefreshProgressButtons(const anime::Item* anime_item);
+    void RefreshItem(int index);
     
-    win32::Rect button_rect[2];
-    bool button_visible[2];
+    win32::Rect button_rect[3];
+    bool button_visible[3];
     bool dragging;
     win32::ImageList drag_image;
+    int hot_item;
     win32::Tooltip tooltips;
     AnimeListDialog* parent;
   } listview;

@@ -247,6 +247,10 @@ void ListView::SetExtendedStyle(DWORD dwExStyle) {
   ListView_SetExtendedListViewStyle(m_hWindow, dwExStyle);
 }
 
+DWORD ListView::SetHoverTime(DWORD dwHoverTime) {
+  return ::SendMessage(m_hWindow, LVM_SETHOVERTIME, 0, dwHoverTime);
+}
+
 void ListView::SetImageList(HIMAGELIST hImageList, int iImageList) {
   ListView_SetImageList(m_hWindow, hImageList, iImageList);
 }

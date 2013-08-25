@@ -297,9 +297,8 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             // Alternate background color
-            if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled()) {
-              pCD->clrTextBk = theme::COLOR_LIGHTGRAY;
-            }
+            if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled())
+              pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);
             // Change text color
             FeedItem* feed_item = reinterpret_cast<FeedItem*>(pCD->nmcd.lItemlParam);
             if (feed_item) {

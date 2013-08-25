@@ -154,6 +154,7 @@ public:
   BOOL       SetColumnWidth(int iCol, int cx);
   void       SetExtendedStyle(DWORD dwExStyle);
   int        SetGroupText(int nIndex, LPCWSTR szText);
+  DWORD      SetHoverTime(DWORD dwHoverTime);
   void       SetImageList(HIMAGELIST hImageList, int iImageList = LVSIL_SMALL);
   BOOL       SetItem(int nIndex, int nSubItem, LPCWSTR szText);
   BOOL       SetItemIcon(int nIndex, int nIcon);

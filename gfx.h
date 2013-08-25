@@ -36,6 +36,9 @@ COLORREF HexToARGB(const wstring& text);
 win32::Rect ResizeRect(const win32::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y);
 int ScaleX(int value);
 int ScaleY(int value);
+void RgbToHsv(float r, float g, float b, float& h, float& s, float& v);
+void HsvToRgb(float& r, float& g, float& b, float h, float s, float v);
+COLORREF ChangeColorBrightness(COLORREF color, float modifier);
 
 class Image {
 public:
