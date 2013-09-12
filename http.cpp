@@ -23,9 +23,9 @@
 #include "anime_db.h"
 #include "announce.h"
 #include "common.h"
-#include "debug.h"
 #include "feed.h"
 #include "history.h"
+#include "logger.h"
 #include "myanimelist.h"
 #include "resource.h"
 #include "settings.h"
@@ -62,7 +62,9 @@ HttpClient::HttpClient() {
 BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
                        FormatError(dwError, L"winhttp.dll");
-  debug::Print(error_text + L"Client mode: " + ToWstr(GetClientMode()) + L"\n");
+
+  LOG(LevelError, error_text);
+  LOG(LevelError, L"Client mode: " + ToWstr(GetClientMode()));
 
   Stats.connections_failed++;
 
@@ -443,7 +445,7 @@ BOOL HttpClient::OnReadComplete() {
                 anime_folder = anime_item->GetTitle();
                 ValidateFileName(anime_folder);
                 TrimRight(anime_folder, L".");
-                CheckSlash(Settings.RSS.Torrent.download_path);
+                AddTrailingSlash(Settings.RSS.Torrent.download_path);
                 anime_folder = Settings.RSS.Torrent.download_path + anime_folder;
                 CreateDirectory(anime_folder.c_str(), nullptr);
                 anime_item->SetFolder(anime_folder);

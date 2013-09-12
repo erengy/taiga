@@ -123,6 +123,7 @@
     <ClCompile Include="history.cpp" />
     <ClCompile Include="http.cpp" />
     <ClCompile Include="list_sort.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mediaplayers.cpp" />
     <ClCompile Include="menu.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="gfx.h" />
     <ClInclude Include="history.h" />
     <ClInclude Include="http.h" />
+    <ClInclude Include="logger.h" />
     <ClInclude Include="media.h" />
     <ClInclude Include="monitor.h" />
     <ClInclude Include="myanimelist.h" />

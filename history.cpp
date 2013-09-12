@@ -23,8 +23,8 @@
 #include "anime_db.h"
 #include "announce.h"
 #include "common.h"
-#include "debug.h"
 #include "http.h"
+#include "logger.h"
 #include "myanimelist.h"
 #include "resource.h"
 #include "settings.h"
@@ -183,7 +183,7 @@ void EventQueue::Check(bool automatic) {
     return;
   }
   if (!items[index].enabled) {
-    debug::Print(L"EventList::Check :: Item is disabled, removing...\n");
+    LOG(LevelDebug, L"Item is disabled, removing...");
     Remove(index);
     Check();
     return;
@@ -200,7 +200,8 @@ void EventQueue::Check(bool automatic) {
   // Compare ID with anime list
   auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);
   if (!anime_item) {
-    debug::Print(L"EventList::Check :: Item not found in list, removing...\n");
+    LOG(LevelWarning, L"Item not found in list, removing... ID: " +
+                      ToWstr(items[index].anime_id));
     Remove(index);
     Check();
     return;

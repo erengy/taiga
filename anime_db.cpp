@@ -23,7 +23,7 @@
 #include "anime_db.h"
 
 #include "common.h"
-#include "debug.h"
+#include "logger.h"
 #include "myanimelist.h"
 #include "recognition.h"
 #include "settings.h"
@@ -489,11 +489,8 @@ void ImageDatabase::FreeMemory() {
         if (SeasonDialog.IsVisible())
           erase = false;
 
-    if (erase) {
+    if (erase)
       items_.erase(anime_id);
-      debug::Print(L"ImageDatabase::FreeMemory :: Erased item #" + ToWstr(anime_id) + 
-                   L" - \"" + it->second.GetTitle() + L"\"\n");
-    }
   }
 }
 
@@ -594,9 +591,8 @@ void SeasonDatabase::Review(bool hide_hentai) {
         invalid = true;
       if (invalid) {
         items.erase(items.begin() + i--);
-        debug::Print(L"SeasonDatabase::Review :: Removed item: \"" + 
-                     anime_item->GetTitle() + L"\" (" + 
-                     wstring(anime_start) + L")\n");
+        LOG(LevelDebug, L"Removed item: \"" + anime_item->GetTitle() +
+                        L"\" (" + wstring(anime_start) + L")");
       }
     }
   }
@@ -613,9 +609,8 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (anime_start.year && anime_start.month &&
         anime_start >= date_start && anime_start <= date_end) {
       items.push_back(it->second.GetId());
-      debug::Print(L"SeasonDatabase::Review :: Added item: \"" + 
-                   it->second.GetTitle() + L"\" (" + 
-                   wstring(anime_start) + L")\n");
+      LOG(LevelDebug, L"Added item: \"" + it->second.GetTitle() +
+                      L"\" (" + wstring(anime_start) + L")");
     }
   }
 }

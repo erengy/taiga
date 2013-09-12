@@ -23,10 +23,10 @@
 #include "anime_filter.h"
 #include "announce.h"
 #include "common.h"
-#include "debug.h"
 #include "feed.h"
 #include "history.h"
 #include "http.h"
+#include "logger.h"
 #include "monitor.h"
 #include "myanimelist.h"
 #include "process.h"
@@ -59,7 +59,7 @@
 // =============================================================================
 
 void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
-  debug::Print(L"Action :: " + action + L"\n");
+  LOG(LevelDebug, action);
   
   wstring body;
   size_t pos = action.find('(');

@@ -26,6 +26,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "history.h"
+#include "logger.h"
 #include "media.h"
 #include "monitor.h"
 #include "myanimelist.h"
@@ -75,6 +76,15 @@ BOOL Taiga::InitInstance() {
   InitCommonControls(ICC_STANDARD_CLASSES);
   OleInitialize(NULL);
 
+  // Initialize logger
+#ifdef _DEBUG
+  Logger.SetOutputPath(AddTrailingSlash(GetCurrentDirectory()) + L"Taiga_debug.log");
+  Logger.SetSeverityLevel(LevelDebug);
+#else
+  Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) + L"Taiga.log");
+  Logger.SetSeverityLevel(LevelWarning);
+#endif
+
   // Load data
   LoadData();
 
@@ -119,19 +129,19 @@ void Taiga::Uninitialize() {
 wstring Taiga::GetDataPath() {
   // Return current working directory in debug mode
 #ifdef _DEBUG
-  return CheckSlash(GetCurrentDirectory()) + L"data\\";
+  return AddTrailingSlash(GetCurrentDirectory()) + L"data\\";
 #endif
   
   // Return current path in portable mode
 #ifdef PORTABLE
-  return CheckSlash(GetPathOnly(GetModulePath())) + L"data\\";
+  return AddTrailingSlash(GetPathOnly(GetModulePath())) + L"data\\";
 #endif
   
-  // Return %APPDATA% folder
+  // Return %AppData% folder
   WCHAR buffer[MAX_PATH];
   if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                                 NULL, SHGFP_TYPE_CURRENT, buffer))) {
-    return CheckSlash(buffer) + APP_NAME + L"\\";
+    return AddTrailingSlash(buffer) + APP_NAME + L"\\";
   }
 
   return L"";

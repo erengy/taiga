@@ -348,6 +348,9 @@
     <ClCompile Include="win32\win_ctl_syslink.cpp">
       <Filter>Win32\Controls</Filter>
     </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -588,6 +591,9 @@
       <Filter>Win32</Filter>
     </ClInclude>
     <ClInclude Include="foreach.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

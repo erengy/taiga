@@ -23,12 +23,12 @@
 
 // =============================================================================
 
+void AddTrailingSlash(wstring& str);
+wstring AddTrailingSlash(const wstring& str);
 void AppendString(wstring& str0, const wstring& str1, const wstring& str2 = L", ");
 wstring CharLeft(const wstring& str, int length);
 wstring CharRight(const wstring& str, int length);
 bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list);
-void CheckSlash(wstring& str);
-wstring CheckSlash(const wstring& str);
 int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensitive = true, size_t max_count = MAX_PATH);
 void DecodeHtmlEntities(wstring& str);
 wstring EncodeUrl(const wstring& str, bool encode_unreserved = false);

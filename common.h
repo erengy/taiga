@@ -113,6 +113,6 @@ wstring EscapeScriptEntities(const wstring& str);
 wstring UnescapeScriptEntities(const wstring& str);
 
 // search.cpp
-wstring SearchFileFolder(anime::Item& anime_item, wstring root, int episode_number, bool search_folder);
+wstring SearchFileFolder(anime::Item& anime_item, const wstring& root, int episode_number, bool search_folder);
 
 #endif // COMMON_H

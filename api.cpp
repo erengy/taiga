@@ -22,7 +22,7 @@
 
 #include "anime_episode.h"
 #include "common.h"
-#include "debug.h"
+#include "logger.h"
 #include "string.h"
 
 class Api TaigaApi;
@@ -98,8 +98,7 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
   // Attach a handle
   if (uMsg == TaigaApi.wm_attach) {
     TaigaApi.handles[hwnd_app] = L"";
-    debug::Print(L"API - Attached handle: " + 
-      ToWstr(reinterpret_cast<int>(hwnd_app)) + L"\n");
+    LOG(LevelDebug, L"Attached handle: " + ToWstr(reinterpret_cast<int>(hwnd_app)));
     return TRUE;
   }
   // Detach a handle
@@ -107,8 +106,7 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     auto it = TaigaApi.handles.find(hwnd_app);
     if (it != TaigaApi.handles.end()) {
       TaigaApi.handles.erase(it);
-      debug::Print(L"API - Detached handle: " + 
-        ToWstr(reinterpret_cast<int>(hwnd_app)) + L"\n");
+      LOG(LevelDebug, L"Detached handle: " + ToWstr(reinterpret_cast<int>(hwnd_app)));
       return TRUE;
     } else {
       return FALSE;
@@ -120,9 +118,8 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     auto cds = reinterpret_cast<COPYDATASTRUCT*>(lParam);
     string format = reinterpret_cast<char*>(cds->lpData);
     TaigaApi.handles[hwnd_app] = ToUTF8(format);
-    debug::Print(L"API - New format for " + 
-      ToWstr(reinterpret_cast<int>(hwnd_app)) + L": \"" + 
-      TaigaApi.handles[hwnd_app] + L"\"\n");
+    LOG(LevelDebug, L"New format for " + ToWstr(reinterpret_cast<int>(hwnd_app)) +
+                    L": \"" + TaigaApi.handles[hwnd_app] + L"\"");
     return TRUE;
   }
   

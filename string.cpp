@@ -917,6 +917,19 @@ void TrimRight(wstring& str, const wchar_t trim_chars[]) {
 
 /* File and folder related */
 
+void AddTrailingSlash(wstring& str) {
+  if (str.length() > 0 && str[str.length() - 1] != '\\')
+    str += L"\\";
+}
+
+wstring AddTrailingSlash(const wstring& str) {
+  if (str.length() > 0 && str[str.length() - 1] != '\\') {
+    return str + L"\\";
+  } else {
+    return str;
+  }
+}
+
 bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list) {
   if (extension.empty() || extension_list.empty()) return false;
   for (size_t i = 0; i < extension.length(); i++) {
@@ -926,18 +939,6 @@ bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list
     if (extension == extension_list[i]) return true;
   }
   return false;
-}
-
-void CheckSlash(wstring& str) {
-  if (str.length() > 0 && str[str.length() - 1] != '\\') str += L"\\";
-}
-
-wstring CheckSlash(const wstring& str) {
-  if (str.length() > 0 && str[str.length() - 1] != '\\') {
-    return str + L"\\";
-  } else {
-    return str;
-  }
 }
 
 wstring GetFileExtension(const wstring& str) {

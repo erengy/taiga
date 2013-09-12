@@ -22,7 +22,6 @@
 
 #include "anime_db.h"
 #include "common.h"
-#include "debug.h"
 #include "gfx.h"
 #include "recognition.h"
 #include "resource.h"
@@ -73,10 +72,8 @@ bool Feed::Check(const wstring& source, bool automatic) {
 }
 
 bool Feed::Download(int index) {
-  if (category != FEED_CATEGORY_LINK) {
-    debug::Print(L"Feed::Download - How did we end up here?\n");
+  if (category != FEED_CATEGORY_LINK)
     return false;
-  }
   
   DWORD dwMode = HTTP_Feed_Download;
   if (index == -1) {

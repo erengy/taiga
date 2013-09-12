@@ -155,7 +155,7 @@ bool UpdateHelper::Download() {
   if (!feed_item) return false;
 
   // TODO: Use TEMP folder path
-  download_path_ = CheckSlash(GetPathOnly(app_->GetModulePath()));
+  download_path_ = AddTrailingSlash(GetPathOnly(app_->GetModulePath()));
   download_path_ += GetFileName(feed_item->link);
 
   win32::Url url(feed_item->link);

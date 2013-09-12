@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "history.h"
+#include "logger.h"
 #include "myanimelist.h"
 #include "settings.h"
 #include "string.h"
@@ -396,7 +397,8 @@ bool Item::IsFinishedAiring() const {
 
 bool Item::CheckEpisodes(int number, bool check_folder) {
   // Check folder
-  if (check_folder) CheckFolder();
+  if (check_folder)
+    CheckFolder();
   if (GetFolder().empty()) {
     for (int i = 1; i <= GetAvailableEpisodeCount(); i++)
       SetEpisodeAvailability(i, false, L"");
@@ -563,6 +565,8 @@ void Item::SetNewEpisodePath(const wstring& path) {
 bool Item::CheckFolder() {
   // Check if current folder still exists
   if (!GetFolder().empty() && !FolderExists(GetFolder())) {
+    LOG(LevelWarning, L"Folder doesn't exist anymore.");
+    LOG(LevelWarning, L"Path: " + GetFolder());
     SetFolder(L"");
   }
 
