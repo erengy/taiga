@@ -498,7 +498,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     } else {
       value = ToInt(body);
     }
-    if (mal::IsValidEpisode(value, 0, anime_item->GetEpisodeCount())) {
+    if (mal::IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(value);
       anime_item->AddToQueue(episode, true);

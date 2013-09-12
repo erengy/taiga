@@ -741,7 +741,7 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
   // Remove item from event queue
   History.queue.Remove();
   // Check for more events
-  History.queue.Check();
+  History.queue.Check(false);
 
   // Redraw main list item
   int list_index = AnimeListDialog.GetListIndex(GetId());

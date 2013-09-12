@@ -20,6 +20,7 @@
 
 #include "settings.h"
 
+#include "dlg/dlg_anime_info.h"
 #include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_history.h"
@@ -507,6 +508,7 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
     AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
     AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
     HistoryDialog.RefreshList();
+    NowPlayingDialog.Refresh();
     SearchDialog.RefreshList();
     Stats.CalculateAll();
     StatsDialog.Refresh();

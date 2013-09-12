@@ -201,8 +201,7 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
 
   // Set episode number
   event_item.episode = GetEpisodeHigh(episode.number);
-  if (*event_item.episode == 0 || GetEpisodeCount() == 1) event_item.episode = 1;
-  
+
   // Set start/finish date
   if (*event_item.episode == 1 && !mal::IsValidDate(GetMyDate(DATE_START)))
     event_item.date_start = mal::TranslateDateForApi(::GetDate());

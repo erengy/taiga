@@ -581,7 +581,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   if (Taiga.ticker_queue >= 5 * 60) { // 5 minutes
     Taiga.ticker_queue = 0;
     if (History.queue.updating == false) {
-      History.queue.Check();
+      History.queue.Check(true);
     }
   }
 
@@ -765,7 +765,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
             break;
           case TIPTYPE_UPDATEFAILED:
-            History.queue.Check();
+            History.queue.Check(false);
             break;
         }
         ActivateWindow(GetWindowHandle());
