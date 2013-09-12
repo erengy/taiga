@@ -385,7 +385,7 @@ void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) 
 
   date_start.year = ToInt(season_year.at(1));
   date_end.year = ToInt(season_year.at(1));
-  if (season_year.at(0) == L"Winter") date_end.year++;
+  if (season_year.at(0) == L"Winter") date_start.year--;
   date_start.month = interval[season_year.at(0)].first;
   date_end.month = interval[season_year.at(0)].second;
   date_start.day = 1;
@@ -443,7 +443,6 @@ wstring TranslateDateToSeason(const Date& date) {
     season = L"Unknown";
   } else if (date.month < 3) {  // Jan-Feb
     season = L"Winter";
-    year--;
   } else if (date.month < 6) {  // Mar-May
     season = L"Spring";
   } else if (date.month < 9) {  // Jun-Aug
@@ -452,6 +451,7 @@ wstring TranslateDateToSeason(const Date& date) {
     season = L"Fall";
   } else {                      // Dec
     season = L"Winter";
+    year++;
   }
     
   return season + L" " + ToWstr(year);
