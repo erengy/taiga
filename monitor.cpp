@@ -184,8 +184,6 @@ DWORD FolderMonitor::ThreadProc() {
             // Retrieve changed file name
             WCHAR file_name[MAX_PATH + 1] = {'\0'};
             CopyMemory(file_name, pfni->FileName, pfni->FileNameLength);
-            LOG(LevelDebug, L"Change detected: (" + ToWstr(pfni->Action) + L") " +
-                            folder_info->path + L"\\" + file_name);
             // Add item to list
             folder_info->change_list.resize(folder_info->change_list.size() + 1);
             folder_info->change_list.back().action = pfni->Action;
@@ -252,7 +250,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
       default:
         continue;
     }
-    
+
     anime::Episode episode;
     AddTrailingSlash(folder_info->path);
     wstring path = folder_info->path + LIST[i].file_name;
@@ -263,6 +261,21 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
       is_folder = FolderExists(path);
     } else {
       is_folder = !ValidateFileExtension(GetFileExtension(LIST[i].file_name), 4);
+    }
+
+    switch (folder_info->change_list[i].action) {
+      case FILE_ACTION_ADDED:
+        LOG(LevelDebug, L"Added: " + path);
+        break;
+      case FILE_ACTION_REMOVED:
+        LOG(LevelDebug, L"Removed: " + path);
+        break;
+      case FILE_ACTION_RENAMED_OLD_NAME:
+        LOG(LevelDebug, L"Renamed (old): " + path);
+        break;
+      case FILE_ACTION_RENAMED_NEW_NAME:
+        LOG(LevelDebug, L"Renamed (new): " + path);
+        break;
     }
 
     // Compare with list item folders
@@ -291,8 +304,8 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
       anime_item->SetFolder(path_available ? path : L"");
       Settings.Save();
       anime_item->CheckEpisodes();
-      LOG(LevelDebug, L"Anime folder changed: " + anime_item->GetTitle() +
-                      L" -> " + anime_item->GetFolder());
+      LOG(LevelDebug, L"Anime folder changed: " + anime_item->GetTitle());
+      LOG(LevelDebug, L"Path: " + anime_item->GetFolder());
       continue;
     }
 
@@ -300,7 +313,8 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
     if (Meow.ExamineTitle(path, episode)) {
       if (LIST[i].anime_id == 0 || is_folder == false) {
         auto anime_item = Meow.MatchDatabase(episode, true, true, true, false, false);
-        if (anime_item) LIST[i].anime_id = anime_item->GetId();
+        if (anime_item)
+          LIST[i].anime_id = anime_item->GetId();
       }
       if (LIST[i].anime_id > 0) {
         auto anime_item = AnimeDatabase.FindItem(LIST[i].anime_id);
@@ -320,8 +334,8 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
             }
           }
           if (!anime_item->GetFolder().empty()) {
-            LOG(LevelDebug, L"Set anime folder: " + anime_item->GetTitle() +
-                            L" -> " + anime_item->GetFolder());
+            LOG(LevelDebug, L"Anime folder changed: " + anime_item->GetTitle());
+            LOG(LevelDebug, L"Path: " + anime_item->GetFolder());
           }
         }
 
@@ -329,13 +343,10 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
         if (!is_folder) {
           int number = GetEpisodeHigh(episode.number);
           int numberlow = GetEpisodeLow(episode.number);
-          if (path_available) {
-            path_available = IsEqual(GetPathOnly(path), anime_item->GetFolder());
-          }
           for (int j = numberlow; j <= number; j++) {
             if (anime_item->SetEpisodeAvailability(number, path_available, path)) {
-              LOG(LevelDebug, L"Episode: (" + ToWstr(path_available) + L") " +
-                              anime_item->GetTitle() + L" -> " + ToWstr(j));
+              LOG(LevelDebug, anime_item->GetTitle() + L" #" + ToWstr(j) + L" is " +
+                              (path_available ? L"available." : L"unavailable."));
             }
           }
         }

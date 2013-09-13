@@ -636,16 +636,16 @@ void RecognitionEngine::UpdateCleanTitles(int anime_id) {
   }
 
   // Synonyms
-  if (!anime_item->GetSynonyms().empty()) {
-    for (auto it = anime_item->GetSynonyms().begin();
-         it != anime_item->GetSynonyms().end(); ++it) {
+  if (!anime_item->GetUserSynonyms().empty()) {
+    for (auto it = anime_item->GetUserSynonyms().begin();
+         it != anime_item->GetUserSynonyms().end(); ++it) {
       clean_titles[anime_id].push_back(*it);
       CleanTitle(clean_titles[anime_id].back());
     }
   }
-  if (!anime_item->GetUserSynonyms().empty()) {
-    for (auto it = anime_item->GetUserSynonyms().begin();
-         it != anime_item->GetUserSynonyms().end(); ++it) {
+  if (!anime_item->GetSynonyms().empty()) {
+    for (auto it = anime_item->GetSynonyms().begin();
+         it != anime_item->GetSynonyms().end(); ++it) {
       clean_titles[anime_id].push_back(*it);
       CleanTitle(clean_titles[anime_id].back());
     }

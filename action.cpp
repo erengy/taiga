@@ -510,7 +510,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     int watched = anime_item->GetMyLastWatchedEpisode();
     auto event_item = History.queue.FindItem(anime_item->GetId(), EVENT_SEARCH_EPISODE);
-    if (event_item && *event_item->episode == watched) {
+    if (event_item && *event_item->episode == watched &&
+        watched > anime_item->GetMyLastWatchedEpisode(false)) {
       event_item->enabled = false;
       History.queue.RemoveDisabled();
     } else {
