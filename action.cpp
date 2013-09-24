@@ -331,6 +331,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     }
     // Search for all list items
     if (body.empty()) {
+      bool check_folder = (lParam == TRUE);
       size_t i = 0;
       // Search is made in reverse to give new items priority. The user is
       // probably more interested in them than the older titles.
@@ -345,7 +346,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
           case mal::MYSTATUS_WATCHING:
             if (!silent)
               MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
-            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
+            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, check_folder);
         }
       }
       i = 0;
@@ -357,7 +358,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
           case mal::MYSTATUS_PLANTOWATCH:
             if (!silent)
               MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
-            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
+            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, check_folder);
         }
       }
       if (!silent) {

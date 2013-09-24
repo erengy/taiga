@@ -103,7 +103,7 @@ BOOL MainDialog::OnInitDialog() {
     ExecuteAction(L"Synchronize"); 		
   }
   if (Settings.Program.StartUp.check_new_episodes) {
-    ExecuteAction(L"CheckEpisodes()", TRUE);
+    ExecuteAction(L"CheckEpisodes", TRUE, FALSE);
   }
   if (!Settings.Program.StartUp.minimize) {
     Show(Settings.Program.Exit.remember_pos_size && Settings.Program.Position.maximized ? 
@@ -361,7 +361,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           switch (navigation.GetCurrentPage()) {
             case SIDEBAR_ITEM_ANIMELIST:
               // Scan available episodes
-              ExecuteAction(L"CheckEpisodes()");
+              ExecuteAction(L"CheckEpisodes", FALSE, TRUE);
               return TRUE;
             case SIDEBAR_ITEM_HISTORY:
               // Refresh history
@@ -592,7 +592,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     Taiga.ticker_new_episodes++;
     if (Taiga.ticker_new_episodes >= 30 * 60) { // 30 minutes
       Taiga.ticker_new_episodes = 0;
-      ExecuteAction(L"CheckEpisodes()", TRUE);
+      ExecuteAction(L"CheckEpisodes()", TRUE, FALSE);
     }
   }
 
@@ -772,11 +772,12 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         Taiga.current_tip_type = TIPTYPE_DEFAULT;
         break;
       }
+      case WM_LBUTTONUP:
       case WM_LBUTTONDBLCLK: {
         ActivateWindow(m_hWindow);
         break;
       }
-      case WM_RBUTTONDOWN: {
+      case WM_RBUTTONUP: {
         UpdateAllMenus(AnimeListDialog.GetCurrentItem());
         SetForegroundWindow();
         ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"Tray"));

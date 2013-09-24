@@ -27,8 +27,8 @@
 
 #define APP_NAME    L"Taiga"
 #define APP_TITLE   L"Taiga 1.0b"
-#define APP_VERSION L"1.0.240 beta"
-#define APP_BUILD   L"2013-09-13"
+#define APP_VERSION L"1.0.241 beta"
+#define APP_BUILD   L"2013-09-24"
 
 #ifndef PORTABLE
 #define PORTABLE

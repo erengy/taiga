@@ -71,9 +71,6 @@ SettingsDialog::SettingsDialog()
 }
 
 void SettingsDialog::SetCurrentSection(int index) {
-  debug::Print(L"SettingsDialog::SetCurrentSection :: " + 
-               ToWstr(current_section_) + L" -> " + ToWstr(index) + L"\n");
-
   current_section_ = index;
   
   if (!IsWindow())
@@ -114,14 +111,9 @@ void SettingsDialog::SetCurrentSection(int index) {
       tab_.InsertItem(2, L"Filters", PAGE_TORRENTS_FILTERS);
       break;
   }
-
-  SetCurrentPage(tab_.GetItemParam(0));
 }
 
 void SettingsDialog::SetCurrentPage(int index) {
-  debug::Print(L"SettingsDialog::SetCurrentPage :: " + 
-               ToWstr(current_page_) + L" -> " + ToWstr(index) + L"\n");
-
   pages.at(current_page_).Hide();
 
   current_page_ = index;
@@ -441,8 +433,10 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(pnmh);
           int section_new = pnmtv->itemNew.lParam;
           int section_old = pnmtv->itemOld.lParam;
-          if (section_new != section_old)
+          if (section_new != section_old) {
             SetCurrentSection(section_new);
+            SetCurrentPage(tab_.GetItemParam(0));
+          }
           break;
         }
       }

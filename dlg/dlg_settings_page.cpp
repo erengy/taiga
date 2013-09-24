@@ -270,7 +270,8 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_MIRC_MULTISERVER, Settings.Announce.MIRC.multi_server);
       CheckDlgButton(IDC_CHECK_MIRC_ACTION, Settings.Announce.MIRC.use_action);
       SetDlgItemText(IDC_EDIT_MIRC_SERVICE, Settings.Announce.MIRC.service.c_str());
-      CheckDlgButton(IDC_RADIO_MIRC_CHANNEL1 + Settings.Announce.MIRC.mode - 1, TRUE);
+      CheckRadioButton(IDC_RADIO_MIRC_CHANNEL1, IDC_RADIO_MIRC_CHANNEL3,
+                       IDC_RADIO_MIRC_CHANNEL1 + Settings.Announce.MIRC.mode - 1);
       SetDlgItemText(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.channels.c_str());
       EnableDlgItem(IDC_EDIT_MIRC_CHANNELS, Settings.Announce.MIRC.mode == 3);
       break;
@@ -305,12 +306,14 @@ BOOL SettingsPage::OnInitDialog() {
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETPOS32, 0, Settings.RSS.Torrent.check_interval);
       EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, Settings.RSS.Torrent.check_enabled);
       EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, Settings.RSS.Torrent.check_enabled);
-      CheckDlgButton(IDC_RADIO_TORRENT_NEW1 + Settings.RSS.Torrent.new_action - 1, TRUE);
+      CheckRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2,
+                       IDC_RADIO_TORRENT_NEW1 + Settings.RSS.Torrent.new_action - 1);
       break;
     }
     // Torrents > Downloads
     case PAGE_TORRENTS_DOWNLOADS: {
-      CheckDlgButton(IDC_RADIO_TORRENT_APP1 + Settings.RSS.Torrent.app_mode - 1, TRUE);
+      CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2,
+                       IDC_RADIO_TORRENT_APP1 + Settings.RSS.Torrent.app_mode - 1);
       SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_path.c_str());
       EnableDlgItem(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_mode > 1);
       EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, Settings.RSS.Torrent.app_mode > 1);
