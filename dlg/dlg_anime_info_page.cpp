@@ -155,17 +155,17 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
 
   // Set information
   #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
-  text = mal::TranslateType(anime_item->GetType()) + L"\n" + 
-         mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" + 
-         mal::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" + 
+  text = mal::TranslateType(anime_item->GetType()) + L"\n" +
+         mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
+         mal::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
          mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
-         ADD_INFOLINE(anime_item->GetGenres(), L"-") + L"\n" +
-         ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" + 
-         ADD_INFOLINE(anime_item->GetRank(), L"#0") + L"\n" + 
+         ADD_INFOLINE(anime_item->GetGenres(), L"Unknown") + L"\n" +
+         ADD_INFOLINE(anime_item->GetProducers(), L"Unknown") + L"\n" +
+         ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" +
          ADD_INFOLINE(anime_item->GetPopularity(), L"#0");
   #undef ADD_INFOLINE
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
-      
+
   // Set synopsis
   text = anime_item->GetSynopsis();
   SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, text.c_str());

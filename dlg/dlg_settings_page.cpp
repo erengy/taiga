@@ -166,7 +166,6 @@ BOOL SettingsPage::OnInitDialog() {
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.Program.List.highlight);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AIRED, Settings.Program.List.progress_show_aired);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AVAILABLE, Settings.Program.List.progress_show_available);
-      CheckDlgButton(IDC_CHECK_LIST_PROGRESS_EPS, Settings.Program.List.progress_show_eps);
       break;
     }
 

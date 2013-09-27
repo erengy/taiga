@@ -73,7 +73,6 @@
 #define IDC_CHECK_LIST_ENGLISH                  1028
 #define IDC_CHECK_LIST_PROGRESS_AIRED           1029
 #define IDC_CHECK_LIST_PROGRESS_AVAILABLE       1030
-#define IDC_CHECK_LIST_PROGRESS_EPS             1031
 #define IDC_CHECK_MESSENGER                     1032
 #define IDC_CHECK_MIRC                          1033
 #define IDC_CHECK_MIRC_ACTION                   1034

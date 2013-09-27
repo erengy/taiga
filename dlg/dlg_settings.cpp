@@ -229,7 +229,6 @@ void SettingsDialog::OnOK() {
     Settings.Program.List.highlight = page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT);
     Settings.Program.List.progress_show_aired = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AIRED);
     Settings.Program.List.progress_show_available = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AVAILABLE);
-    Settings.Program.List.progress_show_eps = page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_EPS);
   }
   
   // Recognition > General

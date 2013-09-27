@@ -24,6 +24,7 @@
 #include "announce.h"
 #include "common.h"
 #include "feed.h"
+#include "foreach.h"
 #include "history.h"
 #include "http.h"
 #include "logger.h"
@@ -736,39 +737,35 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // PlayRandomAnime()
   //   Searches for a random episode of a random anime and plays it.
   } else if (action == L"PlayRandomAnime") {
-    wstring path;
-    int max_anime_id = AnimeDatabase.items.rbegin()->first;
-    srand(static_cast<unsigned int>(GetTickCount()));
-    for (size_t i = 0; i < AnimeDatabase.items.size(); i++) {
-      int anime_id = rand() % max_anime_id + 1;
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (!anime_item || !anime_item->IsInList())
+    static time_t time_last_checked = 0;
+    time_t time_now = time(nullptr);
+    if (time_now > time_last_checked + (60 * 2)) { // 2 minutes
+      ExecuteAction(L"CheckEpisodes", FALSE, FALSE);
+      time_last_checked = time_now;
+    }
+    std::vector<int> valid_ids;
+    foreach_(it, AnimeDatabase.items) {
+      anime::Item& anime_item = it->second;
+      if (!anime_item.IsInList())
         continue;
-      if (!anime_item->CheckFolder())
+      if (!anime_item.IsNewEpisodeAvailable())
         continue;
-      int episode_count = anime_item->GetMyLastWatchedEpisode() + 1;
-      int episode_number = rand() % episode_count + 1;
-      path = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode_number, false);
-      if (!path.empty()) {
-        win32::TaskDialog dlg;
-        dlg.SetWindowTitle(L"Play Random Anime");
-        dlg.SetMainIcon(TD_ICON_INFORMATION);
-        dlg.SetMainInstruction(L"Would you like to watch this episode?");
-        wstring content = anime_item->GetTitle() +
-                          L"\nEpisode " + ToWstr(episode_number);
-        dlg.SetContent(content.c_str());
-        dlg.AddButton(L"Play", IDYES);
-        dlg.AddButton(L"Skip", IDNO);
-        dlg.AddButton(L"Cancel", IDCANCEL);
-        dlg.Show(g_hMain);
-        switch (dlg.GetSelectedButtonID()) {
-          case IDYES:
-            Execute(path);
-            return;
-          case IDCANCEL:
-            return;
-        }
+      switch (anime_item.GetMyStatus()) {
+        case mal::MYSTATUS_NOTINLIST:
+        case mal::MYSTATUS_COMPLETED:
+        case mal::MYSTATUS_DROPPED:
+          continue;
       }
+      valid_ids.push_back(anime_item.GetId());
+    }
+    foreach_ (id, valid_ids) {
+      srand(static_cast<unsigned int>(GetTickCount()));
+      size_t max_value = valid_ids.size();
+      size_t index = rand() % max_value + 1;
+      int anime_id = valid_ids.at(index);
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (anime_item->PlayEpisode(anime_item->GetMyLastWatchedEpisode() + 1))
+        return;
     }
     win32::TaskDialog dlg;
     dlg.SetWindowTitle(L"Play Random Anime");

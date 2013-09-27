@@ -115,7 +115,6 @@ public:
       BOOL highlight;
       BOOL progress_show_aired;
       BOOL progress_show_available;
-      BOOL progress_show_eps;
     } List;
     // Notifications
     struct Notifications {

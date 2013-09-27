@@ -187,7 +187,6 @@ bool Settings::Load() {
     Program.List.highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
     Program.List.progress_show_aired = list.child(L"progress").attribute(L"showaired").as_int(TRUE);
     Program.List.progress_show_available = list.child(L"progress").attribute(L"showavailable").as_int(TRUE);
-    Program.List.progress_show_eps = list.child(L"progress").attribute(L"showeps").as_int(TRUE);
     // Notifications
     xml_node notifications = program.child(L"notifications");
     Program.Notifications.recognized = notifications.child(L"balloon").attribute(L"recognized").as_int(TRUE);
@@ -404,7 +403,6 @@ bool Settings::Save() {
       xml_node progress = list.append_child(L"progress");
       progress.append_attribute(L"showaired") = Program.List.progress_show_aired;
       progress.append_attribute(L"showavailable") = Program.List.progress_show_available;
-      progress.append_attribute(L"showeps") = Program.List.progress_show_eps;
     // Notifications
     xml_node notifications = program.append_child(L"notifications");
     notifications.append_child(L"balloon");

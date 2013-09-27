@@ -58,8 +58,8 @@ FONT 9, "Segoe UI", 400, 0, 0
     LTEXT           "Alternative titles", IDC_STATIC_HEADER1, 0, 0, 340, 8, SS_LEFT
     EDITTEXT        IDC_EDIT_ANIME_ALT, 5, 15, 340, 12, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "Details", IDC_STATIC_HEADER2, 0, 30, 340, 8, SS_LEFT
-    LTEXT           "Type:\nEpisodes:\nStatus:\nSeason:\nGenres:\nScore:\nRanked:\nPopularity:", IDC_STATIC, 7, 45, 50, 70, SS_LEFT
-    LTEXT           "TV\n0\nFinished Airing\n2011 Winter\nAction, Adventure\n0.00\n#0\n#0", IDC_STATIC_ANIME_DETAILS, 57, 45, 285, 70, SS_LEFT | SS_NOPREFIX
+    LTEXT           "Type:\nEpisodes:\nStatus:\nSeason:\nGenres:\nProducers:\nScore:\nPopularity:", IDC_STATIC, 7, 45, 50, 70, SS_LEFT
+    LTEXT           "TV\n0\nFinished Airing\n2011 Winter\nAction, Adventure\nUnknown\n0.00\n#0", IDC_STATIC_ANIME_DETAILS, 57, 45, 285, 70, SS_LEFT | SS_NOPREFIX
     LTEXT           "Synopsis", IDC_STATIC_HEADER3, 0, 115, 340, 8, SS_LEFT
     EDITTEXT        IDC_EDIT_ANIME_SYNOPSIS, 5, 130, 340, 95, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOVSCROLL | ES_MULTILINE | ES_READONLY
 }
@@ -366,10 +366,9 @@ FONT 9, "Segoe UI"
     GROUPBOX        "Appearance", IDC_STATIC, 7, 55, 301, 40
     AUTOCHECKBOX    "Display English titles, if available", IDC_CHECK_LIST_ENGLISH, 12, 66, 125, 10
     AUTOCHECKBOX    "Highlight new episodes", IDC_CHECK_HIGHLIGHT, 12, 78, 90, 10
-    GROUPBOX        "Progress bars", IDC_STATIC, 7, 102, 301, 52
+    GROUPBOX        "Progress bars", IDC_STATIC, 7, 102, 301, 40
     AUTOCHECKBOX    "Display aired episodes (estimated)", IDC_CHECK_LIST_PROGRESS_AIRED, 12, 113, 200, 10
     AUTOCHECKBOX    "Display available episodes on my computer", IDC_CHECK_LIST_PROGRESS_AVAILABLE, 12, 125, 170, 10
-    AUTOCHECKBOX    "Display episode count", IDC_CHECK_LIST_PROGRESS_EPS, 12, 137, 141, 10
 }
 
 
@@ -689,7 +688,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 STRINGTABLE
 {
     IDS_KEYWORD_AUDIO             "2CH, 5.1CH, 5.1, AAC, AC3, DTS, DTS5.1, DTS-ES, DUALAUDIO, DUAL AUDIO, FLAC, MP3, OGG, TRUEHD5.1, VORBIS"
-    IDS_KEYWORD_EXTENSION         "AVI, MKV, MP4, OGM, RM, RMVB, WMV, DIVX, MOV, FLV, MPG"
+    IDS_KEYWORD_EXTENSION         "MKV, AVI, MP4, OGM, RM, RMVB, WMV, DIVX, MOV, FLV, MPG, 3GP"
     IDS_KEYWORD_EXTRA             "ASS, BATCH, BD, BLURAY, BLU-RAY, COMPLETE, DIRECTOR'S CUT, DVD, DVD5, DVD9, DVD-R2J, DVDRIP, ENG, ENGLISH, HARDSUB, PS3, R2DVD, R2J, R2JDVD, RAW, REMASTERED, SOFTSUB, SUBBED, SUB, UNCENSORED, UNCUT, VOSTFR, WEBCAST, WIDESCREEN, WS"
     IDS_KEYWORD_EXTRA_UNSAFE      "END, FINAL, OAV, ONA, OVA"
     IDS_KEYWORD_VERSION           "V0, V2, V3, V4"
