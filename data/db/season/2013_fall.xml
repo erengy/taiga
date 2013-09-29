@@ -1,0 +1,546 @@
+<?xml version="1.0"?>
+<season>
+	<info>
+		<name>Fall 2013</name>
+		<last_modified>1380467405</last_modified>
+	</info>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>17549</series_animedb_id>
+		<producers>Lantis, Media Factory, Silver Link</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/51581.jpg</series_image>
+		<series_title>Non Non Biyori</series_title>
+	</anime>
+	<anime>
+		<series_type>4</series_type>
+		<series_animedb_id>19889</series_animedb_id>
+		<producers>Production I.G, Starchild Records</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/54119.jpg</series_image>
+		<series_title>Genshiken Nidaime Specials</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19843</series_animedb_id>
+		<producers>Oriental Light and Magic</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/12/52925.jpg</series_image>
+		<series_title>Tamagotchi! Miracle Friends</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>17269</series_animedb_id>
+		<producers>Toei Animation</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/52045.jpg</series_image>
+		<series_title>Captain Harlock</series_title>
+	</anime>
+	<anime>
+		<series_type>4</series_type>
+		<series_animedb_id>19671</series_animedb_id>
+		<producers>Kyoto Animation, Lantis, Animation Do</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/53643.jpg</series_image>
+		<series_title>Free! Specials</series_title>
+	</anime>
+	<anime>
+		<series_type>2</series_type>
+		<series_animedb_id>18745</series_animedb_id>
+		<producers>VAP</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/13/54451.jpg</series_image>
+		<series_title>Chihayafuru 2 OVA</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>19535</series_animedb_id>
+		<producers>DLE</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/9/54453.jpg</series_image>
+		<series_title>Takanotsume GO: Utsukushiki Elleair Shoushuu Plus</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>19021</series_animedb_id>
+		<producers>Kyoto Animation</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/50991.jpg</series_image>
+		<series_title>Takanashi Rikka Kai: Chuunibyou demo Koi ga Shitai! Movie</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>15197</series_animedb_id>
+		<producers>Sunrise, FUNimation Entertainment</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/46265.jpg</series_image>
+		<series_title>Code Geass: Boukoku no Akito 2 - Hikisakareshi Yokuryuu</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19841</series_animedb_id>
+		<producers>AIC, AIC Plus+</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/53807.jpg</series_image>
+		<series_title>Super Seisyun Brothers</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>17247</series_animedb_id>
+		<producers>Genco, Media Factory, Lerche</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/52801.jpg</series_image>
+		<series_title>Machine-Doll wa Kizutsukanai</series_title>
+	</anime>
+	<anime>
+		<series_type>5</series_type>
+		<series_animedb_id>20581</series_animedb_id>
+		<producers>CoMix Wave</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/54617.jpg</series_image>
+		<series_title>Passionate Detective Agency</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>17513</series_animedb_id>
+		<producers>Frontier Works, Idea Factory, Zexcs, Showgate</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/9/51989.jpg</series_image>
+		<series_title>Diabolik Lovers</series_title>
+	</anime>
+	<anime>
+		<series_type>2</series_type>
+		<series_animedb_id>18753</series_animedb_id>
+		<producers>Brains Base</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/11/50107.jpg</series_image>
+		<series_title>Yahari Ore no Seishun Love Comedy wa Machigatteiru. OVA</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19825</series_animedb_id>
+		<producers>Sunrise, Asatsu DK</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/52895.jpg</series_image>
+		<series_title>Saikyou Ginga Ultimate Zero: Battle Spirits</series_title>
+	</anime>
+	<anime>
+		<series_type>6</series_type>
+		<series_animedb_id>20613</series_animedb_id>
+		<producers>Bones</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/54659.jpg</series_image>
+		<series_title>Viva Namida</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18115</series_animedb_id>
+		<producers>Aniplex, A-1 Pictures, Aniplex of America</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/54533.jpg</series_image>
+		<series_title>Magi: The Kingdom of Magic</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>17895</series_animedb_id>
+		<producers>J.C. Staff, Genco, Starchild Records</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/12/52091.jpg</series_image>
+		<series_title>Golden Time</series_title>
+	</anime>
+	<anime>
+		<series_type>4</series_type>
+		<series_animedb_id>19109</series_animedb_id>
+		<producers>Silver Link</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/51235.jpg</series_image>
+		<series_title>Fate/kaleid liner Prisma☆Illya Specials</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>16067</series_animedb_id>
+		<producers>Geneon Universal Entertainment, P.A. Works, Rondo Robe</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/53549.jpg</series_image>
+		<series_title>Nagi no Asukara</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19257</series_animedb_id>
+		<producers>Studio Deen</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/52073.jpg</series_image>
+		<series_title>Meganebu!</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18497</series_animedb_id>
+		<producers>Tatsunoko Productions</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/52563.jpg</series_image>
+		<series_title>Yozakura Quartet: Hana no Uta</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>14807</series_animedb_id>
+		<producers>ufotable, Notes</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/52559.jpg</series_image>
+		<series_title>Kara no Kyoukai: Mirai Fukuin</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18679</series_animedb_id>
+		<producers>Aniplex, Aniplex of America, Trigger</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/54379.jpg</series_image>
+		<series_title>Kill la Kill</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18001</series_animedb_id>
+		<producers>Media Factory, A.C.G.T.</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/11/52089.jpg</series_image>
+		<series_title>Freezing Vibration</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18411</series_animedb_id>
+		<producers>Diomedea, Pony Canyon</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/8/49313.jpg</series_image>
+		<series_title>Gingitsune</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19755</series_animedb_id>
+		<producers>Kinema Citrus</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/9/52771.jpg</series_image>
+		<series_title>Oshiri Kajiri Mushi 2</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19315</series_animedb_id>
+		<producers>Studio Deen, Earth Star Entertainment, Pupa Production Committee</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/54395.jpg</series_image>
+		<series_title>Pupa</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>9479</series_animedb_id>
+		<producers>Starchild Records, GoHands</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/6/51997.jpg</series_image>
+		<series_title>Coppelion</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>20033</series_animedb_id>
+		<producers>TV Tokyo, Starchild Records, SANZIGEN, LIDEN FILMS</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/53559.jpg</series_image>
+		<series_title>Miss Monochrome</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19871</series_animedb_id>
+		<producers>Studio Pierrot</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/53241.jpg</series_image>
+		<series_title>Gaist Crusher</series_title>
+	</anime>
+	<anime>
+		<series_type>4</series_type>
+		<series_animedb_id>20159</series_animedb_id>
+		<producers>Production I.G, Xebec, Oriental Light and Magic</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/53701.jpg</series_image>
+		<series_title>Pokemon: The Origin</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>20181</series_animedb_id>
+		<producers>Sunrise, TV Tokyo, Bandai Visual, Dentsu</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/53737.jpg</series_image>
+		<series_title>Aikatsu! 2</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18153</series_animedb_id>
+		<producers>Kyoto Animation</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/53111.jpg</series_image>
+		<series_title>Kyoukai no Kanata</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19703</series_animedb_id>
+		<producers>Toei Animation</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/53417.jpg</series_image>
+		<series_title>Kyousou Giga (TV)</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18247</series_animedb_id>
+		<producers>Lantis, TBS, 8bit, Sony Music Communications, Project IS</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/12/49359.jpg</series_image>
+		<series_title>IS: Infinite Stratos 2</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18277</series_animedb_id>
+		<producers>Silver Link, Connect</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/54273.jpg</series_image>
+		<series_title>Strike the Blood</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19369</series_animedb_id>
+		<producers>Feel, Pony Canyon</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/54343.jpg</series_image>
+		<series_title>Outbreak Company</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18195</series_animedb_id>
+		<producers>J.C. Staff, Warner Bros.</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/48895.jpg</series_image>
+		<series_title>Little Busters!: Refrain</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>17265</series_animedb_id>
+		<producers>Satelight, NHK, NHK Enterprises</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/54267.jpg</series_image>
+		<series_title>Log Horizon</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18677</series_animedb_id>
+		<producers>Asread</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/13/54389.jpg</series_image>
+		<series_title>Yuusha ni Narenakatta Ore wa Shibushibu Shuushoku wo Ketsui Shimashita.</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18689</series_animedb_id>
+		<producers>Production I.G, Madhouse Studios, TV Tokyo</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/54235.jpg</series_image>
+		<series_title>Diamond no Ace</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>15651</series_animedb_id>
+		<producers>Sunrise, NHK, NHK Enterprises</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/12/54099.jpg</series_image>
+		<series_title>Phi Brain: Kami no Puzzle 3rd Season</series_title>
+	</anime>
+	<anime>
+		<series_type>4</series_type>
+		<series_animedb_id>19759</series_animedb_id>
+		<producers></producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/8/52773.jpg</series_image>
+		<series_title>Ansatsu Kyoushitsu</series_title>
+	</anime>
+	<anime>
+		<series_type>4</series_type>
+		<series_animedb_id>19511</series_animedb_id>
+		<producers>Studio Pierrot</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/52343.jpg</series_image>
+		<series_title>Naruto: Shippuuden - Jump Super Anime Tour 2013 Special</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18245</series_animedb_id>
+		<producers>Satelight, Starchild Records</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/53561.jpg</series_image>
+		<series_title>White Album 2</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19647</series_animedb_id>
+		<producers>Madhouse Studios, VAP, MAPPA</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/12/52629.jpg</series_image>
+		<series_title>Hajime no Ippo: Rising</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19919</series_animedb_id>
+		<producers>Tesagure! Production Committee</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/53431.jpg</series_image>
+		<series_title>Tesagure! Bukatsumono</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>11763</series_animedb_id>
+		<producers>Arms, Movic, Earth Star Entertainment</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/11/52633.jpg</series_image>
+		<series_title>Sekai de Ichiban Tsuyoku Naritai!</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>20473</series_animedb_id>
+		<producers>MAPPA, Earth Star Entertainment</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/54455.jpg</series_image>
+		<series_title>Teekyuu 3</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>16894</series_animedb_id>
+		<producers>Production I.G</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/13/52265.jpg</series_image>
+		<series_title>Kuroko no Basket 2</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19319</series_animedb_id>
+		<producers>Sunrise, TV Tokyo, Sotsu Agency</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/51815.jpg</series_image>
+		<series_title>Gundam Build Fighters</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19151</series_animedb_id>
+		<producers>Lantis, Pony Canyon, 8bit</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/54377.jpg</series_image>
+		<series_title>Walkure Romanze</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18179</series_animedb_id>
+		<producers>TMS Entertainment, Toho Company</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/53211.jpg</series_image>
+		<series_title>Yowamushi Pedal</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18893</series_animedb_id>
+		<producers>SANZIGEN</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/13/50625.jpg</series_image>
+		<series_title>Aoki Hagane no Arpeggio: Ars Nova</series_title>
+	</anime>
+	<anime>
+		<series_type>2</series_type>
+		<series_animedb_id>18499</series_animedb_id>
+		<producers></producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/49489.jpg</series_image>
+		<series_title>Yozakura Quartet: Tsuki ni Naku</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18767</series_animedb_id>
+		<producers>Lantis, Hoods Entertainment, Studio Mausu, teamKG</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/50159.jpg</series_image>
+		<series_title>BlazBlue: Alter Memory</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>16011</series_animedb_id>
+		<producers>8bit</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/53229.jpg</series_image>
+		<series_title>Tokyo Ravens</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19221</series_animedb_id>
+		<producers>Diomedea, DAX Production, Studio Jack, Mages</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/53235.jpg</series_image>
+		<series_title>Ore no Nounai Sentakushi ga, Gakuen Love Comedy wo Zenryoku de Jama Shiteiru</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>20329</series_animedb_id>
+		<producers>The Klock Worx, Studio Mausu, Opera House</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/54067.jpg</series_image>
+		<series_title>Koroshiya-san: The Hired Gun</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>18295</series_animedb_id>
+		<producers>Sunrise, Aniplex, Aniplex of America</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/8/54439.jpg</series_image>
+		<series_title>Kakumeiki Valvrave 2nd Season</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19365</series_animedb_id>
+		<producers>Aniplex, Manglobe, Fuji TV, Aniplex of America</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/9/53817.jpg</series_image>
+		<series_title>Samurai Flamenco</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19367</series_animedb_id>
+		<producers>Aniplex, A-1 Pictures, Fuji TV</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/11/53239.jpg</series_image>
+		<series_title>Galilei Donna</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>20671</series_animedb_id>
+		<producers>Studio Colorido</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/54725.jpg</series_image>
+		<series_title>Shashinkan</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>20673</series_animedb_id>
+		<producers>Studio Colorido</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/4/54727.jpg</series_image>
+		<series_title>Hinata no Aoshigure</series_title>
+	</anime>
+	<anime>
+		<series_type>2</series_type>
+		<series_animedb_id>20039</series_animedb_id>
+		<producers>J.C. Staff, Pony Canyon</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/10/53427.jpg</series_image>
+		<series_title>Kill Me Baby OVA</series_title>
+	</anime>
+	<anime>
+		<series_type>1</series_type>
+		<series_animedb_id>19291</series_animedb_id>
+		<producers>TV Tokyo, Oriental Light and Magic</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/12/54549.jpg</series_image>
+		<series_title>Pokemon XY</series_title>
+	</anime>
+	<anime>
+		<series_type>2</series_type>
+		<series_animedb_id>18359</series_animedb_id>
+		<producers>Ordet</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/6/49149.jpg</series_image>
+		<series_title>Miyakawa-ke no Kuufuku OVA</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>11981</series_animedb_id>
+		<producers>Aniplex, Shaft, Mainichi Broadcasting, Movic, Nitroplus, Aniplex of America, Madoka Partners, Hobunsha</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/3/52585.jpg</series_image>
+		<series_title>Mahou Shoujo Madoka★Magica Movie 3: Hangyaku no Monogatari</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>17357</series_animedb_id>
+		<producers>Toei Animation</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/7/51775.jpg</series_image>
+		<series_title>DokiDoki! Precure Movie: Mana Kekkon!!? Mirai ni Tsunagu Kibou no Dress</series_title>
+	</anime>
+	<anime>
+		<series_type>2</series_type>
+		<series_animedb_id>20045</series_animedb_id>
+		<producers>Lantis, 8bit</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/2/54323.jpg</series_image>
+		<series_title>IS: Infinite Stratos 2 - Hitonatsu no Omoide</series_title>
+	</anime>
+	<anime>
+		<series_type>4</series_type>
+		<series_animedb_id>20141</series_animedb_id>
+		<producers>TMS Entertainment</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/4/53665.jpg</series_image>
+		<series_title>Lupin III: Princess of the Breeze - Kakusareta Kuuchuu Toshi</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>16664</series_animedb_id>
+		<producers>Studio Ghibli</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/4/46511.jpg</series_image>
+		<series_title>Kaguya-hime no Monogatari</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>20543</series_animedb_id>
+		<producers>Gonzo, Pony Canyon</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/5/54567.jpg</series_image>
+		<series_title>Bayonetta: Bloody Fate</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>14407</series_animedb_id>
+		<producers>AIC A.S.T.A.</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/11/47949.jpg</series_image>
+		<series_title>Persona 3 the Movie</series_title>
+	</anime>
+	<anime>
+		<series_type>2</series_type>
+		<series_animedb_id>17739</series_animedb_id>
+		<producers>Shaft</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/6/47273.jpg</series_image>
+		<series_title>Hidamari Sketch: Sae Hiro Sotsugyou-hen</series_title>
+	</anime>
+	<anime>
+		<series_type>3</series_type>
+		<series_animedb_id>19191</series_animedb_id>
+		<producers>Production I.G, FUNimation Entertainment</producers>
+		<series_image>http://cdn.myanimelist.net/images/anime/8/52135.jpg</series_image>
+		<series_title>Ghost in the Shell: Arise - Border:2 Ghost Whispers</series_title>
+	</anime>
+</season>
