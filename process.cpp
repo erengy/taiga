@@ -17,7 +17,8 @@
 */
 
 #include "std.h"
-
+#include "logger.h"
+#include "string.h"
 #include "win32/win_main.h"
 
 #define NT_SUCCESS(x) ((x) >= 0)
@@ -135,7 +136,7 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
     (GetLibraryProcAddress("ntdll.dll", "NtDuplicateObject"));
   _NtQueryObject NtQueryObject = reinterpret_cast<_NtQueryObject>
     (GetLibraryProcAddress("ntdll.dll", "NtQueryObject"));
-  
+
   HANDLE processHandle;
   if (!(processHandle = OpenProcess(PROCESS_DUP_HANDLE, FALSE, process_id))) {
     return FALSE;
@@ -151,10 +152,21 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
   }
   if (!NT_SUCCESS(status)) return FALSE;
 
-  unsigned short objectTypeFile = 0x1c;
-  // Type index for files is different on Windows 8 and Windows Server 2012
-  if (win32::GetWinVersion() >= win32::VERSION_WIN8)
-    objectTypeFile = 0x1f;
+  // Type index for files varies between OS versions
+  static unsigned short objectTypeFile = 0;
+  /*
+  switch (win32::GetWinVersion()) {
+    case win32::VERSION_VISTA:
+      objectTypeFile = 25;
+      break;
+    case win32::VERSION_WIN8:
+      objectTypeFile = 31;
+      break;
+    default:
+      objectTypeFile = 28;
+      break;
+  }
+  */
 
   for (ULONG_PTR i = 0; i < handleInfo->HandleCount; i++) {
     SYSTEM_HANDLE_EX handle = handleInfo->Handles[i];
@@ -169,13 +181,13 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
       continue;
     }
     // Skip if the handle does not belong to a file
-    if (handle.ObjectTypeIndex != objectTypeFile) {
+    if (objectTypeFile > 0 && handle.ObjectTypeIndex != objectTypeFile) {
       continue;
     }
     // Skip access codes which can cause NtDuplicateObject() or NtQueryObject() to hang
-    if (handle.GrantedAccess == 0x00100000 || handle.GrantedAccess == 0x00120189 || 
+    if (handle.GrantedAccess == 0x00100000 || handle.GrantedAccess == 0x00120189 ||
         handle.GrantedAccess == 0x0012019f || handle.GrantedAccess == 0x001a019f) {
-          continue;
+      continue;
     }
 
     // Duplicate the handle so we can query it
@@ -188,6 +200,17 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
       CloseHandle(dupHandle);
       continue;
     }
+    // Determine the type index for files
+    if (objectTypeFile == 0) {
+      wstring type_name(objectTypeInfo->Name.Buffer, objectTypeInfo->Name.Length / 2);
+      if (IsEqual(type_name, L"File")) {
+        objectTypeFile = handle.ObjectTypeIndex;
+        LOG(LevelDebug, L"objectTypeFile is set to " + ToWstr(objectTypeFile) + L".");
+      } else {
+        continue;
+      }
+    }
+
     objectNameInfo = malloc(0x1000);
 
     UINT errorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
@@ -221,8 +244,9 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
     // Cast our buffer into a UNICODE_STRING
     objectName = *reinterpret_cast<PUNICODE_STRING>(objectNameInfo);
     // Add file path to our list
-    if (objectName.Length && handle.ObjectTypeIndex == objectTypeFile) {
-      files_vector.push_back(wstring(objectName.Buffer));
+    if (objectName.Length) {
+      wstring object_name(objectName.Buffer, objectName.Length / 2);
+      files_vector.push_back(object_name);
     }
 
     free(objectTypeInfo);

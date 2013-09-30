@@ -249,7 +249,7 @@ bool Aggregator::Notify(const Feed& feed) {
   } else {
     tip_text += L"Click to see all.";
     tip_title = L"New torrents available";
-    LimitText(tip_text, 255);
+    tip_text = LimitText(tip_text, 255);
     Taiga.current_tip_type = TIPTYPE_TORRENT;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);

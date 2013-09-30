@@ -61,7 +61,7 @@ bool IsHex(const wstring& str);
 bool IsNumeric(const wchar_t c);
 bool IsNumeric(const wstring& str);
 bool IsWhitespace(const wchar_t c);
-void LimitText(wstring& str, unsigned int limit, const wstring& tail = L"...");
+wstring LimitText(const wstring& str, unsigned int limit, const wstring& tail = L"...");
 wstring PadChar(wstring str, const wchar_t ch, const size_t len);
 wstring PushString(const wstring& str1, const wstring& str2);
 void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output);

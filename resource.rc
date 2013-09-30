@@ -59,7 +59,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     EDITTEXT        IDC_EDIT_ANIME_ALT, 5, 15, 340, 12, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "Details", IDC_STATIC_HEADER2, 0, 30, 340, 8, SS_LEFT
     LTEXT           "Type:\nEpisodes:\nStatus:\nSeason:\nGenres:\nProducers:\nScore:\nPopularity:", IDC_STATIC, 7, 45, 50, 70, SS_LEFT
-    LTEXT           "TV\n0\nFinished Airing\n2011 Winter\nAction, Adventure\nUnknown\n0.00\n#0", IDC_STATIC_ANIME_DETAILS, 57, 45, 285, 70, SS_LEFT | SS_NOPREFIX
+    CONTROL         "TV\n0\nFinished Airing\n2011 Winter\nAction, Adventure\nUnknown\n0.00\n#0", IDC_STATIC_ANIME_DETAILS, WC_STATIC, SS_LEFTNOWORDWRAP | SS_NOPREFIX, 57, 45, 285, 70
     LTEXT           "Synopsis", IDC_STATIC_HEADER3, 0, 115, 340, 8, SS_LEFT
     EDITTEXT        IDC_EDIT_ANIME_SYNOPSIS, 5, 130, 340, 95, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOVSCROLL | ES_MULTILINE | ES_READONLY
 }

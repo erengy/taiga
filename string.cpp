@@ -884,12 +884,15 @@ void StripHtmlTags(wstring& str) {
 
 /* Trimming */
 
-void LimitText(wstring& str, unsigned int limit, const wstring& tail) {
+wstring LimitText(const wstring& str, unsigned int limit, const wstring& tail) {
   if (str.length() > limit) {
-    str.resize(limit);
-    if (!tail.empty() && str.length() > tail.length()) {
-      str.replace(str.length() - tail.length(), tail.length(), tail);
+    wstring limit_str = str.substr(0, limit);
+    if (!tail.empty() && limit_str.length() > tail.length()) {
+      limit_str.replace(limit_str.length() - tail.length(), tail.length(), tail);
     }
+    return limit_str;
+  } else {
+    return str;
   }
 }
 

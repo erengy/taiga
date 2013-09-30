@@ -194,8 +194,10 @@ WinVersion GetWinVersion() {
             win_version = VERSION_WIN7;
             break;
           case 2:
-          default:
             win_version = VERSION_WIN8;
+            break;
+          default:
+            win_version = VERSION_WIN8_1;
             break;
         }
       }
