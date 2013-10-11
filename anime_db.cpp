@@ -244,6 +244,17 @@ void Database::ClearUserData() {
   user.Clear();
 }
 
+void Database::ClearInvalidItems() {
+  for (auto it = items.begin(); it != items.end(); ) {
+    if (!it->second.GetId() || it->first != it->second.GetId()) {
+      LOG(LevelDebug, L"ID: " + ToWstr(it->first));
+      items.erase(it++);
+    } else {
+      ++it;
+    }
+  }
+}
+
 bool Database::LoadList(bool set_last_modified) {
   // Initialize
   ClearUserData();

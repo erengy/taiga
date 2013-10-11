@@ -50,6 +50,8 @@ class Database {
   // if the database is empty.
   bool SaveDatabase();
 
+  // Deletes invalid anime items.
+  void ClearInvalidItems();
   // Deletes all user information from anime items.
   void ClearUserData();
   // Loads anime list on startup and list-refresh from

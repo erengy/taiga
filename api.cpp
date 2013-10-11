@@ -72,7 +72,7 @@ void Api::BroadcastMessage(UINT message) {
   PDWORD_PTR result = nullptr;
   SendMessageTimeout(HWND_BROADCAST, message, 
                      reinterpret_cast<WPARAM>(window.GetWindowHandle()), 
-                     0, SMTO_NORMAL, 1000, result);
+                     0, SMTO_NORMAL, 100, result);
 }
 
 void Api::Create() {

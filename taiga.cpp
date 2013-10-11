@@ -157,6 +157,7 @@ void Taiga::LoadData() {
 
   AnimeDatabase.LoadDatabase();
   AnimeDatabase.LoadList();
+  AnimeDatabase.ClearInvalidItems();
 
   History.Load();
 }
