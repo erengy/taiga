@@ -22,6 +22,7 @@
 
 #include "anime_db.h"
 #include "common.h"
+#include "foreach.h"
 #include "gfx.h"
 #include "recognition.h"
 #include "resource.h"
@@ -78,7 +79,7 @@ bool Feed::Download(int index) {
   DWORD dwMode = HTTP_Feed_Download;
   if (index == -1) {
     for (size_t i = 0; i < items.size(); i++) {
-      if (items[i].download) {
+      if (items[i].state == FEEDITEM_SELECTED) {
         dwMode = HTTP_Feed_DownloadAll;
         index = i;
         break;
@@ -228,39 +229,39 @@ Aggregator::Aggregator() {
 }
 
 Feed* Aggregator::Get(int category) {
-  for (unsigned int i = 0; i < feeds.size(); i++) {
-    if (feeds[i].category == category) return &feeds[i];
-  }
+  foreach_(it, feeds)
+    if (it->category == category)
+      return &(*it);
+
   return nullptr;
 }
 
 bool Aggregator::Notify(const Feed& feed) {
-  wstring tip_text, tip_title;
+  wstring tip_text;
+  wstring tip_title = L"New torrents available";
+  wstring tip_format = L"%title%$if(%episode%, #%episode%)\n";
 
-  for (size_t i = 0; i < feed.items.size(); i++) {
-    if (feed.items[i].download) {
-      tip_text += L"\u00BB " + ReplaceVariables(L"%title%$if(%episode%, #%episode%)\n", 
-        feed.items[i].episode_data);
-    }
-  }
+  foreach_(it, feed.items)
+    if (it->state == FEEDITEM_SELECTED)
+      tip_text += L"\u00BB " + ReplaceVariables(tip_format, it->episode_data);
 
-  if (tip_text.empty()) {
+  if (tip_text.empty())
     return false;
-  } else {
-    tip_text += L"Click to see all.";
-    tip_title = L"New torrents available";
-    tip_text = LimitText(tip_text, 255);
-    Taiga.current_tip_type = TIPTYPE_TORRENT;
-    Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
-    return true;
-  }
+
+  tip_text += L"Click to see all.";
+  tip_text = LimitText(tip_text, 255);
+  Taiga.current_tip_type = TIPTYPE_TORRENT;
+  Taskbar.Tip(L"", L"", 0);
+  Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
+  
+  return true;
 }
 
 bool Aggregator::SearchArchive(const wstring& file) {
-  for (size_t i = 0; i < file_archive.size(); i++) {
-    if (file_archive[i] == file) return true;
-  }
+  for (size_t i = 0; i < file_archive.size(); i++)
+    if (file_archive[i] == file)
+      return true;
+
   return false;
 }
 

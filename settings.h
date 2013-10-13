@@ -30,7 +30,15 @@ public:
   bool Load();
   bool Save();
   void ApplyChanges(const wstring& previous_user, const wstring& previous_theme);
+  void HandleCompatibility();
   void RestoreDefaults();
+
+  // Meta
+  struct Meta {
+    struct Version {
+      int major, minor, revision;
+    } Version;
+  } Meta;
 
   // Account
   struct Account {

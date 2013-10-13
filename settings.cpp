@@ -36,6 +36,7 @@
 #include "gfx.h"
 #include "history.h"
 #include "http.h"
+#include "logger.h"
 #include "media.h"
 #include "monitor.h"
 #include "stats.h"
@@ -45,6 +46,7 @@
 #include "xml.h"
 
 #include "win32/win_registry.h"
+#include "win32/win_taskdialog.h"
 
 #define DEFAULT_EXTERNALLINKS    L"Anime Recommendation Finder|http://www.animerecs.com\r\nMALgraph|http://mal.oko.im\r\n-\r\nAnime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\nMahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\nThe Fansub Wiki|http://www.fansubwiki.com"
 #define DEFAULT_FORMAT_HTTP      L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%"
@@ -73,6 +75,14 @@ bool Settings::Load() {
   
   // Read settings
   xml_node settings = doc.child(L"settings");
+  
+  // Meta
+  xml_node meta = settings.child(L"meta");
+    // Version
+    xml_node version = meta.child(L"version");
+    Meta.Version.major = version.attribute(L"major").as_int();
+    Meta.Version.minor = version.attribute(L"minor").as_int();
+    Meta.Version.revision = version.attribute(L"revision").as_int();
   
   // Account
   xml_node account = settings.child(L"account");
@@ -240,17 +250,17 @@ bool Settings::Load() {
       Aggregator.filter_manager.filters.clear();
       for (xml_node item = filter.child(L"item"); item; item = item.next_sibling(L"item")) {
         Aggregator.filter_manager.AddFilter(
-          item.attribute(L"action").as_int(), 
-          item.attribute(L"match").as_int(), 
-          item.attribute(L"enabled").as_bool(), 
+          Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_ACTION, item.attribute(L"action").value()),
+          Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_MATCH, item.attribute(L"match").value()),
+          item.attribute(L"enabled").as_bool(),
           item.attribute(L"name").value());
         for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
           Aggregator.filter_manager.filters.back().anime_ids.push_back(anime.attribute(L"id").as_int());
         }
         for (xml_node condition = item.child(L"condition"); condition; condition = condition.next_sibling(L"condition")) {
           Aggregator.filter_manager.filters.back().AddCondition(
-            condition.attribute(L"element").as_int(), 
-            condition.attribute(L"op").as_int(), 
+            Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_ELEMENT, condition.attribute(L"element").value()),
+            Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_OPERATOR, condition.attribute(L"operator").value()),
             condition.attribute(L"value").value());
         }
       }
@@ -273,6 +283,15 @@ bool Settings::Save() {
   // Initialize
   xml_document doc;
   xml_node settings = doc.append_child(L"settings");
+
+  // Meta
+  settings.append_child(node_comment).set_value(L" Meta ");
+  xml_node meta = settings.append_child(L"meta");
+    // Version
+    xml_node version = meta.append_child(L"version");
+    version.append_attribute(L"major") = VERSION_MAJOR;
+    version.append_attribute(L"minor") = VERSION_MINOR;
+    version.append_attribute(L"revision") = VERSION_REVISION;
 
   // Account
   settings.append_child(node_comment).set_value(L" Account ");
@@ -456,8 +475,8 @@ bool Settings::Save() {
       torrent_filter.append_attribute(L"enabled") = RSS.Torrent.Filters.global_enabled;
       for (auto it = Aggregator.filter_manager.filters.begin(); it != Aggregator.filter_manager.filters.end(); ++it) {
         xml_node item = torrent_filter.append_child(L"item");
-        item.append_attribute(L"action") = it->action;
-        item.append_attribute(L"match") = it->match;
+        item.append_attribute(L"action") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_ACTION, it->action).c_str();
+        item.append_attribute(L"match") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_MATCH, it->match).c_str();
         item.append_attribute(L"enabled") = it->enabled;
         item.append_attribute(L"name") = it->name.c_str();
         for (auto ita = it->anime_ids.begin(); ita != it->anime_ids.end(); ++ita) {
@@ -466,8 +485,8 @@ bool Settings::Save() {
         }
         for (auto itc = it->conditions.begin(); itc != it->conditions.end(); ++itc) {
           xml_node condition = item.append_child(L"condition");
-          condition.append_attribute(L"element") = itc->element;
-          condition.append_attribute(L"op") = itc->op;
+          condition.append_attribute(L"element") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_ELEMENT, itc->element).c_str();
+          condition.append_attribute(L"operator") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_OPERATOR, itc->op).c_str();
           condition.append_attribute(L"value") = itc->value.c_str();
         }
       }
@@ -488,6 +507,8 @@ bool Settings::Save() {
   ::CreateDirectory(folder_.c_str(), NULL);
   return doc.save_file(file_.c_str(), L"\x09", format_default | format_write_bom);
 }
+
+// =============================================================================
 
 void Settings::ApplyChanges(const wstring& previous_user, const wstring& previous_theme) {
   if (Program.General.theme != previous_theme) {
@@ -522,6 +543,148 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
              Program.Proxy.password);
 
   UpdateExternalLinksMenu();
+}
+
+void Settings::HandleCompatibility() {
+  if (Meta.Version.revision == VERSION_REVISION)
+    return;
+
+  // Convert old torrent filters to the new format
+  if (Meta.Version.revision < 246) {
+    LOG(LevelWarning, L"Converting torrent filters to the new format...");
+
+    xml_document doc;
+    xml_parse_result result = doc.load_file(file_.c_str());
+    xml_node settings = doc.child(L"settings");
+    xml_node rss = settings.child(L"rss");
+    xml_node torrent = rss.child(L"torrent");
+    xml_node filter = torrent.child(L"filter");
+
+    Aggregator.filter_manager.filters.clear();
+
+    for (xml_node item = filter.child(L"item"); item; item = item.next_sibling(L"item")) {
+      int action = item.attribute(L"action").as_int();
+      int match = item.attribute(L"match").as_int();
+      bool enabled = item.attribute(L"enabled").as_bool();
+      wstring value = item.attribute(L"name").value();
+      Aggregator.filter_manager.AddFilter(action, match, enabled, value);
+      
+      for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
+        Aggregator.filter_manager.filters.back().anime_ids.push_back(anime.attribute(L"id").as_int());
+      }
+      
+      for (xml_node condition = item.child(L"condition"); condition; condition = condition.next_sibling(L"condition")) {
+        int element = condition.attribute(L"element").as_int();
+        switch (element) {
+          case 0: // FEED_FILTER_ELEMENT_TITLE:
+            element = FEED_FILTER_ELEMENT_FILE_TITLE; break;
+          case 1: // FEED_FILTER_ELEMENT_CATEGORY:
+            element = FEED_FILTER_ELEMENT_FILE_CATEGORY; break;
+          case 2: // FEED_FILTER_ELEMENT_DESCRIPTION:
+            element = FEED_FILTER_ELEMENT_FILE_DESCRIPTION; break;
+          case 3: // FEED_FILTER_ELEMENT_LINK:
+            element = FEED_FILTER_ELEMENT_FILE_LINK; break;
+          case 4: // FEED_FILTER_ELEMENT_ANIME_ID:
+            element = FEED_FILTER_ELEMENT_META_ID; break;
+          case 5: // FEED_FILTER_ELEMENT_ANIME_TITLE:
+            element = FEED_FILTER_ELEMENT_EPISODE_TITLE; break;
+          case 6: // FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS:
+            element = FEED_FILTER_ELEMENT_META_STATUS; break;
+          case 7: // FEED_FILTER_ELEMENT_ANIME_MY_STATUS:
+            element = FEED_FILTER_ELEMENT_USER_STATUS; break;
+          case 8: // FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER:
+            element = FEED_FILTER_ELEMENT_EPISODE_NUMBER; break;
+          case 9: // FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION:
+            element = FEED_FILTER_ELEMENT_EPISODE_VERSION; break;
+          case 10: // FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE:
+            element = FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE; break;
+          case 11: // FEED_FILTER_ELEMENT_ANIME_GROUP:
+            element = FEED_FILTER_ELEMENT_EPISODE_GROUP; break;
+          case 12: // FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION:
+            element = FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION; break;
+          case 13: // FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE:
+            element = FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE; break;
+          case 14: // FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_START:
+            element = FEED_FILTER_ELEMENT_META_DATE_START; break;
+          case 15: // FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_END:
+            element = FEED_FILTER_ELEMENT_META_DATE_END; break;
+          case 16: // FEED_FILTER_ELEMENT_ANIME_SERIES_EPISODES:
+            element = FEED_FILTER_ELEMENT_META_EPISODES; break;
+          case 17: // FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE:
+            element = FEED_FILTER_ELEMENT_META_TYPE; break;
+        }
+
+        int op = condition.attribute(L"op").as_int();
+        switch (op) {
+          case 0: // FEED_FILTER_OPERATOR_IS
+            op = FEED_FILTER_OPERATOR_EQUALS; break;
+          case 1: // FEED_FILTER_OPERATOR_ISNOT
+            op = FEED_FILTER_OPERATOR_NOTEQUALS; break;
+          case 2: // FEED_FILTER_OPERATOR_ISGREATERTHAN
+            op = FEED_FILTER_OPERATOR_ISGREATERTHAN; break;
+          case 3: // FEED_FILTER_OPERATOR_ISLESSTHAN
+            op = FEED_FILTER_OPERATOR_ISLESSTHAN; break;
+          case 4: // FEED_FILTER_OPERATOR_BEGINSWITH
+            op = FEED_FILTER_OPERATOR_BEGINSWITH; break;
+          case 5: // FEED_FILTER_OPERATOR_ENDSWITH
+            op = FEED_FILTER_OPERATOR_ENDSWITH; break;
+          case 6: // FEED_FILTER_OPERATOR_CONTAINS
+            op = FEED_FILTER_OPERATOR_CONTAINS; break;
+          case 7: // FEED_FILTER_OPERATOR_CONTAINSNOT
+            op = FEED_FILTER_OPERATOR_NOTCONTAINS; break;
+        }
+        
+        wstring value = condition.attribute(L"value").value();
+
+        Aggregator.filter_manager.filters.back().AddCondition(element, op, value);
+      }
+    }
+
+    // Fix default filters
+    foreach_(filter, Aggregator.filter_manager.filters) {
+      if (InStr(filter->name, L"Select new episodes only") > -1) {
+        filter->name = L"Discard watched and available episodes";
+        filter->action = FEED_FILTER_ACTION_DISCARD;
+        filter->match = FEED_FILTER_MATCH_ANY;
+        foreach_(condition, filter->conditions) {
+          switch (condition->element) {
+            case FEED_FILTER_ELEMENT_EPISODE_NUMBER:
+              condition->op = FEED_FILTER_OPERATOR_ISLESSTHANOREQUALTO;
+              break;
+            case FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE:
+              condition->value = L"True";
+              break;
+          }
+        }
+      }
+    }
+
+    // Fix fansub filters
+    foreach_(filter, Aggregator.filter_manager.filters) {
+      if (InStr(filter->name, L"[Fansub]") > -1) {
+        filter->action = FEED_FILTER_ACTION_PREFER;
+      }
+    }
+
+    LOG(LevelWarning, L"Torrent filters are converted.");
+
+    // Display notice
+    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    dlg.SetMainInstruction(L"A friendly notice for torrent downloaders");
+    wstring content =
+        L"In this update, torrent filters work a bit differently. Basically, all torrents are now in a blank state by default, "
+        L"then they're selected or discarded via filters. Before this update, they were all selected by default, and filters were used to discard them.\n\n"
+        L"Taiga did her best at converting your old filters to the new format, but you should still review them in case something's wrong. "
+        L"If you have any questions or something else to share, let us know through our MyAnimeList club.\n\n";
+    if (!Account.MAL.user.empty()) {
+      content += L"Thank you, " + Account.MAL.user + L", for participating in the beta!";
+    } else {
+      content += L"Thank you all for participating in the beta!";
+    }
+    dlg.SetContent(content.c_str());
+    dlg.AddButton(L"OK", IDOK);
+    dlg.Show(nullptr);
+  }
 }
 
 void Settings::RestoreDefaults() {

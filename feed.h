@@ -25,6 +25,12 @@
 
 // =============================================================================
 
+enum FeedItemState {
+  FEEDITEM_DISCARDED = -1,
+  FEEDITEM_BLANK = 0,
+  FEEDITEM_SELECTED = 1
+};
+
 class GenericFeedItem {
 public:
   GenericFeedItem() : is_permalink(true) {}
@@ -37,13 +43,13 @@ public:
 
 class FeedItem : public GenericFeedItem {
 public:
-  FeedItem() : download(true) {}
+  FeedItem() : state(FEEDITEM_BLANK) {}
   virtual ~FeedItem() {};
 
-  bool download;
   int index;
   wstring magnet_link;
-  
+  FeedItemState state;
+
   class EpisodeData : public anime::Episode {
   public:
     EpisodeData() : new_episode(false) {}
@@ -110,36 +116,38 @@ private:
 // =============================================================================
 
 enum FeedFilterElement {
-  FEED_FILTER_ELEMENT_TITLE,
-  FEED_FILTER_ELEMENT_CATEGORY,
-  FEED_FILTER_ELEMENT_DESCRIPTION,
-  FEED_FILTER_ELEMENT_LINK,
-  FEED_FILTER_ELEMENT_ANIME_ID,
-  FEED_FILTER_ELEMENT_ANIME_TITLE,
-  FEED_FILTER_ELEMENT_ANIME_SERIES_STATUS,
-  FEED_FILTER_ELEMENT_ANIME_MY_STATUS,
-  FEED_FILTER_ELEMENT_ANIME_EPISODE_NUMBER,
-  FEED_FILTER_ELEMENT_ANIME_EPISODE_VERSION,
-  FEED_FILTER_ELEMENT_ANIME_EPISODE_AVAILABLE,
-  FEED_FILTER_ELEMENT_ANIME_GROUP,
-  FEED_FILTER_ELEMENT_ANIME_VIDEO_RESOLUTION,
-  FEED_FILTER_ELEMENT_ANIME_VIDEO_TYPE,
-  FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_START,
-  FEED_FILTER_ELEMENT_ANIME_SERIES_DATE_END,
-  FEED_FILTER_ELEMENT_ANIME_SERIES_EPISODES,
-  FEED_FILTER_ELEMENT_ANIME_SERIES_TYPE,
+  FEED_FILTER_ELEMENT_META_ID,
+  FEED_FILTER_ELEMENT_META_STATUS,
+  FEED_FILTER_ELEMENT_META_TYPE,
+  FEED_FILTER_ELEMENT_META_EPISODES,
+  FEED_FILTER_ELEMENT_META_DATE_START,
+  FEED_FILTER_ELEMENT_META_DATE_END,
+  FEED_FILTER_ELEMENT_USER_STATUS,
+  FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE,
+  FEED_FILTER_ELEMENT_EPISODE_TITLE,
+  FEED_FILTER_ELEMENT_EPISODE_NUMBER,
+  FEED_FILTER_ELEMENT_EPISODE_VERSION,
+  FEED_FILTER_ELEMENT_EPISODE_GROUP,
+  FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION,
+  FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE,
+  FEED_FILTER_ELEMENT_FILE_TITLE,
+  FEED_FILTER_ELEMENT_FILE_CATEGORY,
+  FEED_FILTER_ELEMENT_FILE_DESCRIPTION,
+  FEED_FILTER_ELEMENT_FILE_LINK,
   FEED_FILTER_ELEMENT_COUNT
 };
 
 enum FeedFilterOperator {
-  FEED_FILTER_OPERATOR_IS,
-  FEED_FILTER_OPERATOR_ISNOT,
+  FEED_FILTER_OPERATOR_EQUALS,
+  FEED_FILTER_OPERATOR_NOTEQUALS,
   FEED_FILTER_OPERATOR_ISGREATERTHAN,
+  FEED_FILTER_OPERATOR_ISGREATERTHANOREQUALTO,
   FEED_FILTER_OPERATOR_ISLESSTHAN,
+  FEED_FILTER_OPERATOR_ISLESSTHANOREQUALTO,
   FEED_FILTER_OPERATOR_BEGINSWITH,
   FEED_FILTER_OPERATOR_ENDSWITH,
   FEED_FILTER_OPERATOR_CONTAINS,
-  FEED_FILTER_OPERATOR_CONTAINSNOT,
+  FEED_FILTER_OPERATOR_NOTCONTAINS,
   FEED_FILTER_OPERATOR_COUNT
 };
 
@@ -175,7 +183,7 @@ public:
   FeedFilter& operator=(const FeedFilter& filter);
 
   void AddCondition(int element, int op, const wstring& value);
-  bool Filter(Feed& feed, FeedItem& item, bool recursive);
+  void Filter(Feed& feed, FeedItem& item, bool recursive);
   void Reset();
 
 public:
@@ -194,9 +202,19 @@ public:
   bool is_default;
 };
 
+enum FeedFilterShortcodeType {
+  FEED_FILTER_SHORTCODE_ACTION,
+  FEED_FILTER_SHORTCODE_ELEMENT,
+  FEED_FILTER_SHORTCODE_MATCH,
+  FEED_FILTER_SHORTCODE_OPERATOR,
+};
+
 class FeedFilterManager {
 public:
   FeedFilterManager();
+
+  void InitializePresets();
+  void InitializeShortcodes();
 
   void AddPresets();
   void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
@@ -215,10 +233,19 @@ public:
   wstring TranslateValue(const FeedFilterCondition& condition);
   wstring TranslateMatching(int match);
   wstring TranslateAction(int action);
-  
+
+  wstring GetShortcodeFromIndex(FeedFilterShortcodeType type, int index);
+  int GetIndexFromShortcode(FeedFilterShortcodeType type, const wstring& shortcode);
+
 public:
   vector<FeedFilter> filters;
   vector<FeedFilterPreset> presets;
+
+private:
+  std::map<int, wstring> action_shortcodes_;
+  std::map<int, wstring> element_shortcodes_;
+  std::map<int, wstring> match_shortcodes_;
+  std::map<int, wstring> operator_shortcodes_;
 };
 
 // =============================================================================

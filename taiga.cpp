@@ -150,7 +150,8 @@ wstring Taiga::GetDataPath() {
 void Taiga::LoadData() {
   MediaPlayers.Load();
 
-  Settings.Load();
+  if (Settings.Load())
+    Settings.HandleCompatibility();
 
   UI.Load(Settings.Program.General.theme);
   UI.LoadImages();

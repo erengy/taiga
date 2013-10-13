@@ -458,7 +458,7 @@ BOOL HttpClient::OnReadComplete() {
           }
           cmd += L"\"" + file + L"\"";
           Execute(app_path, cmd);
-          feed_item->download = FALSE;
+          feed_item->state = FEEDITEM_DISCARDED;
           TorrentDialog.RefreshList();
         }
         feed->download_index = -1;
