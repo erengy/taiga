@@ -207,6 +207,11 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else {
             MainDialog.ChangeStatus(L"Marked " + ToWstr(checked_count) + L" torrents.");
           }
+          bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
+          FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(pnmv->iItem));
+          if (feed_item) {
+            feed_item->state = checked ? FEEDITEM_SELECTED : FEEDITEM_DISCARDED;
+          }
         }
         break;
       }

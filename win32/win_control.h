@@ -45,6 +45,7 @@ public:
   LRESULT GetItemData(int index);
   int     GetCurSel();
   void    ResetContent();
+  BOOL    SetCueBannerText(LPCWSTR lpcwText);
   int     SetCurSel(int index);
   BOOL    SetEditSel(int ichStart, int ichEnd);
   int     SetItemData(int index, LPARAM data);

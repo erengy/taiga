@@ -56,8 +56,6 @@
 #define IDC_BUTTON_REMOVEFOLDER                 1011
 #define IDC_BUTTON_TORRENT_BROWSE_APP           1012
 #define IDC_BUTTON_TORRENT_BROWSE_FOLDER        1013
-#define IDC_BUTTON_TORRENT_FILTER_ADD           1014
-#define IDC_BUTTON_TORRENT_FILTER_DELETE        1015
 #define IDC_BUTTON_TWITTER_AUTH                 1016
 #define IDC_CHECK_ANIME_ALT                     1017
 #define IDC_CHECK_ANIME_REWATCH                 1018

@@ -64,6 +64,10 @@ void ComboBox::ResetContent() {
   ComboBox_ResetContent(m_hWindow);
 }
 
+BOOL ComboBox::SetCueBannerText(LPCWSTR lpcwText) {
+  return ComboBox_SetCueBannerText(m_hWindow, lpcwText);
+}
+
 int ComboBox::SetCurSel(int index) {
   return ComboBox_SetCurSel(m_hWindow, index);
 }

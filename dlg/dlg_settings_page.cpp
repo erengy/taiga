@@ -344,6 +344,17 @@ BOOL SettingsPage::OnInitDialog() {
                 parent->feed_filters_.begin());
       parent->RefreshTorrentFilterList(list.GetWindowHandle());
       list.SetWindowHandle(nullptr);
+      // Initialize toolbar
+      win32::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
+      toolbar.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+      toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
+      // Add toolbar items
+      toolbar.InsertButton(0, ICON16_PLUS,       100, true,  0, 0, nullptr, L"Add new filter...");
+      toolbar.InsertButton(1, ICON16_MINUS,      101, false, 0, 1, nullptr, L"Delete filter");
+      toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+      toolbar.InsertButton(3, ICON16_ARROW_UP,   103, false, 0, 3, nullptr, L"Move up");
+      toolbar.InsertButton(4, ICON16_ARROW_DOWN, 104, false, 0, 4, nullptr, L"Move down");
+      toolbar.SetWindowHandle(nullptr);
       break;
     }
   }
@@ -500,8 +511,15 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enable);
           return TRUE;
         }
+        // Enable/disable filters
+        case IDC_CHECK_TORRENT_FILTER: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
+          EnableDlgItem(IDC_TOOLBAR_FEED_FILTER, enable);
+          return TRUE;
+        }
         // Add global filter
-        case IDC_BUTTON_TORRENT_FILTER_ADD: {
+        case 100: {
           FeedFilterDialog.filter.Reset();
           ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
           if (!FeedFilterDialog.filter.conditions.empty()) {
@@ -516,7 +534,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         }
         // Remove global filter
-        case IDC_BUTTON_TORRENT_FILTER_DELETE: {
+        case 101: {
           win32::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
           int item_index = list.GetNextItem(-1, LVNI_SELECTED);
           FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(item_index));
@@ -527,21 +545,33 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
               break;
             }
           }
-          EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, FALSE);
           list.SetWindowHandle(nullptr);
           return TRUE;
         }
-        // Enable/disable filters
-        case IDC_CHECK_TORRENT_FILTER: {
-          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
-          EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
-          EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_ADD, enable);
-          if (enable) {
-            win32::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
-            enable = list.GetNextItem(-1, LVNI_SELECTED) > -1;
-            list.SetWindowHandle(nullptr);
+        // Move filter up
+        case 103: {
+          win32::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+          int index = list.GetNextItem(-1, LVNI_SELECTED);
+          if (index > 0) {
+            iter_swap(parent->feed_filters_.begin() + index, 
+                      parent->feed_filters_.begin() + index - 1);
+            parent->RefreshTorrentFilterList(list.GetWindowHandle());
+            list.SetSelectedItem(index - 1);
           }
-          EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, enable);
+          list.SetWindowHandle(nullptr);
+          return TRUE;
+        }
+        // Move filter down
+        case 104: {
+          win32::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+          int index = list.GetNextItem(-1, LVNI_SELECTED);
+          if (index > -1 && index < list.GetItemCount() - 1) {
+            iter_swap(parent->feed_filters_.begin() + index, 
+                      parent->feed_filters_.begin() + index + 1);
+            parent->RefreshTorrentFilterList(list.GetWindowHandle());
+            list.SetSelectedItem(index + 1);
+          }
+          list.SetWindowHandle(nullptr);
           return TRUE;
         }
 
@@ -635,7 +665,15 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
         EnableDlgItem(IDC_BUTTON_REMOVEFOLDER, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
       } else if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
-        EnableDlgItem(IDC_BUTTON_TORRENT_FILTER_DELETE, ListView_GetSelectedCount(lplv->hdr.hwndFrom) > 0);
+        win32::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
+        win32::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
+        int index = list.GetNextItem(-1, LVNI_SELECTED);
+        int count = list.GetItemCount();
+        toolbar.EnableButton(101, index > -1);
+        toolbar.EnableButton(103, index > 0);
+        toolbar.EnableButton(104, index > -1 && index < count - 1);
+        list.SetWindowHandle(nullptr);
+        toolbar.SetWindowHandle(nullptr);
       }
       break;
     }
@@ -649,6 +687,16 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case 0: // Anime title
           plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
           break;
+      }
+      break;
+    }
+    case TBN_GETINFOTIP: {
+      if (pnmh->hwndFrom == GetDlgItem(IDC_TOOLBAR_FEED_FILTER)) {
+        win32::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
+        NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(pnmh);
+        git->cchTextMax = INFOTIPSIZE;
+        git->pszText = (LPWSTR)(toolbar.GetButtonTooltip(git->lParam));
+        toolbar.SetWindowHandle(nullptr);
       }
       break;
     }
