@@ -513,15 +513,18 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     // Anime News Network
     case STREAM_ANN:
       EraseRight(title, L" - Anime News Network");
+      Erase(title, L" (s)");
+      Erase(title, L" (d)");
       break;
     // Crunchyroll
     case STREAM_CRUNCHYROLL:
-      EraseLeft(title, L"Watch ");
+      EraseLeft(title, L"Crunchyroll - Watch ");
       break;
     // Hulu
     case STREAM_HULU:
-      EraseLeft(title, L"Hulu - ");
-      EraseRight(title, L" - Watch the full episode now.");
+      EraseLeft(title, L"Watch ");
+      EraseRight(title, L" online | Free | Hulu");
+      EraseRight(title, L" online | Plus | Hulu");
       break;
     // Veoh
     case STREAM_VEOH:
