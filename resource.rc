@@ -59,7 +59,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     EDITTEXT        IDC_EDIT_ANIME_ALT, 5, 15, 340, 12, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "Details", IDC_STATIC_HEADER2, 0, 30, 340, 8, SS_LEFT
     LTEXT           "Type:\nEpisodes:\nStatus:\nSeason:\nGenres:\nProducers:\nScore:\nPopularity:", IDC_STATIC, 7, 45, 50, 70, SS_LEFT
-    CONTROL         "TV\n0\nFinished Airing\n2011 Winter\nAction, Adventure\nUnknown\n0.00\n#0", IDC_STATIC_ANIME_DETAILS, WC_STATIC, SS_LEFTNOWORDWRAP | SS_NOPREFIX, 57, 45, 285, 70
+    CONTROL         "TV\n0\nFinished Airing\n2011 Winter\nAction, Adventure\nUnknown\n0.00\n#0", IDC_STATIC_ANIME_DETAILS, WC_STATIC, NOT WS_GROUP | SS_LEFTNOWORDWRAP | SS_NOPREFIX, 57, 45, 285, 70
     LTEXT           "Synopsis", IDC_STATIC_HEADER3, 0, 115, 340, 8, SS_LEFT
     EDITTEXT        IDC_EDIT_ANIME_SYNOPSIS, 5, 130, 340, 95, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOVSCROLL | ES_MULTILINE | ES_READONLY
 }
@@ -594,12 +594,13 @@ FONT 9, "Segoe UI", 400, 0, 0
     RADIOBUTTON     "Use a custom application:", IDC_RADIO_TORRENT_APP2, 12, 30, 105, 10, WS_TABSTOP
     EDITTEXT        IDC_EDIT_TORRENT_APP, 21, 42, 260, 12, ES_AUTOHSCROLL
     PUSHBUTTON      "...", IDC_BUTTON_TORRENT_BROWSE_APP, 285, 42, 16, 12
-    GROUPBOX        "Location", IDC_STATIC, 7, 68, 301, 70
+    GROUPBOX        "Location", IDC_STATIC, 7, 68, 301, 80
     AUTOCHECKBOX    "Use anime folders as the download folder", IDC_CHECK_TORRENT_AUTOSETFOLDER, 12, 79, 160, 10
-    AUTOCHECKBOX    "If no anime folder is set, create one using the anime title under this root folder:", IDC_CHECK_TORRENT_AUTOCREATEFOLDER, 21, 91, 260, 10
+    AUTOCHECKBOX    "If no anime folder is set, use this folder instead:", IDC_CHECK_TORRENT_AUTOUSEFOLDER, 21, 91, 201, 10
     COMBOBOX        IDC_COMBO_TORRENT_FOLDER, 30, 103, 251, 101, WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_HASSTRINGS
     PUSHBUTTON      "...", IDC_BUTTON_TORRENT_BROWSE_FOLDER, 285, 103, 16, 12
-    LTEXT           "Tip: Currently this feature is only supported by uTorrent.", IDC_STATIC, 12, 122, 289, 8, SS_LEFT
+    AUTOCHECKBOX    "Create a subfolder using the anime title as its name", IDC_CHECK_TORRENT_AUTOCREATEFOLDER, 30, 118, 192, 8
+    LTEXT           "Tip: Currently this feature is only supported by uTorrent.", IDC_STATIC, 12, 133, 289, 8, SS_LEFT
 }
 
 

@@ -311,72 +311,13 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
     }
 
-  // CheckEpisodes()
-  //   Checks new episodes or episode availability.
-  //   wParam is a BOOL value that activates silent operation mode.
-  //   If body text is empty, search is made for all list items.
-  } else if (action == L"CheckEpisodes") {
-    // Check silent operation mode
-    bool silent = (wParam == TRUE);
-    // Check if any root folder is available
-    if (!silent && Settings.Folders.root.empty()) {
-      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-      dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
-      dlg.SetContent(L"You need to have at least one root folder set before scanning available episodes.");
-      dlg.AddButton(L"Yes", IDYES);
-      dlg.AddButton(L"No", IDNO);
-      dlg.Show(g_hMain);
-      if (dlg.GetSelectedButtonID() == IDYES)
-        ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
-      return;
-    }
-    // Search for all list items
-    if (body.empty()) {
-      bool check_folder = (lParam == TRUE);
-      size_t i = 0;
-      // Search is made in reverse to give new items priority. The user is
-      // probably more interested in them than the older titles.
-      if (!silent) {
-        TaskbarList.SetProgressState(TBPF_NORMAL);
-        SetSharedCursor(IDC_WAIT);
-      }
-      for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-        if (!silent)
-          TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
-        switch (it->second.GetMyStatus()) {
-          case mal::MYSTATUS_WATCHING:
-            if (!silent)
-              MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
-            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, check_folder);
-        }
-      }
-      i = 0;
-      for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
-        if (!silent)
-          TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
-        switch (it->second.GetMyStatus()) {
-          case mal::MYSTATUS_ONHOLD:
-          case mal::MYSTATUS_PLANTOWATCH:
-            if (!silent)
-              MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
-            it->second.CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, check_folder);
-        }
-      }
-      if (!silent) {
-        TaskbarList.SetProgressState(TBPF_NOPROGRESS);
-        SetSharedCursor(IDC_ARROW);
-      }
-    // Search only for selected list item
-    } else {
-      int anime_id = static_cast<int>(lParam);
-      SetSharedCursor(IDC_WAIT);
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
-      anime_item->CheckEpisodes(Settings.Program.List.progress_show_available ? -1 : 0, true);
-      SetSharedCursor(IDC_ARROW);
-    }
-    // We're done
-    if (!silent)
-      MainDialog.ChangeStatus(L"Scan finished.");
+  // ScanEpisodes(), ScanEpisodesAll()
+  //   Checks episode availability.
+  } else if (action == L"ScanEpisodes") {
+    int anime_id = static_cast<int>(lParam);
+    ScanAvailableEpisodes(anime_id, true, false);
+  } else if (action == L"ScanEpisodesAll") {
+    ScanAvailableEpisodes(anime::ID_UNKNOWN, true, false);
 
   // ToggleRecognition()
   //   Enables or disables anime recognition.
@@ -740,7 +681,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     static time_t time_last_checked = 0;
     time_t time_now = time(nullptr);
     if (time_now > time_last_checked + (60 * 2)) { // 2 minutes
-      ExecuteAction(L"CheckEpisodes", FALSE, FALSE);
+      ScanAvailableEpisodes(anime::ID_UNKNOWN, false, false);
       time_last_checked = time_now;
     }
     std::vector<int> valid_ids;
@@ -824,5 +765,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     SeasonDialog.SetViewMode(ToInt(body));
     SeasonDialog.RefreshList();
     SeasonDialog.RefreshToolbar();
+  
+  // Unknown
+  } else {
+    LOG(LevelWarning, L"Unknown action: " + action);
   }
 }

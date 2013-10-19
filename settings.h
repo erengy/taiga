@@ -144,7 +144,7 @@ public:
   struct Rss {
     // Torrent
     struct Torrent {
-      BOOL check_enabled, create_folder, hide_unidentified, set_folder;
+      BOOL check_enabled, create_folder, hide_unidentified, set_folder, use_folder;
       int app_mode, check_interval, new_action;
       wstring app_path, download_path, search_url, source;
       struct Filters {

@@ -437,24 +437,29 @@ BOOL HttpClient::OnReadComplete() {
               break;
           }
           if (Settings.RSS.Torrent.set_folder && InStr(app_path, L"utorrent", 0, true) > -1) {
+            wstring download_path;
+            if (Settings.RSS.Torrent.use_folder &&
+                FolderExists(Settings.RSS.Torrent.download_path)) {
+              download_path = Settings.RSS.Torrent.download_path;
+            }
             auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
             if (anime_item) {
               wstring anime_folder = anime_item->GetFolder();
-              if (anime_folder.empty() && 
-                  Settings.RSS.Torrent.create_folder &&
-                  FolderExists(Settings.RSS.Torrent.download_path)) {
+              if (!anime_folder.empty() && FolderExists(anime_folder)) {
+                download_path = anime_folder;
+              } else if (Settings.RSS.Torrent.create_folder && !download_path.empty()) {
                 anime_folder = anime_item->GetTitle();
                 ValidateFileName(anime_folder);
                 TrimRight(anime_folder, L".");
-                AddTrailingSlash(Settings.RSS.Torrent.download_path);
-                anime_folder = Settings.RSS.Torrent.download_path + anime_folder;
-                CreateDirectory(anime_folder.c_str(), nullptr);
-                anime_item->SetFolder(anime_folder);
+                AddTrailingSlash(download_path);
+                download_path += anime_folder;
+                CreateDirectory(download_path.c_str(), nullptr);
+                anime_item->SetFolder(download_path);
                 Settings.Save();
               }
-              if (!anime_folder.empty())
-                cmd = L"/directory \"" + anime_folder + L"\" ";
             }
+            if (!download_path.empty())
+              cmd = L"/directory \"" + download_path + L"\" ";
           }
           cmd += L"\"" + file + L"\"";
           Execute(app_path, cmd);

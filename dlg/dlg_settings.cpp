@@ -312,8 +312,9 @@ void SettingsDialog::OnOK() {
     Settings.RSS.Torrent.app_mode = page->GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1;
     page->GetDlgItemText(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_path);
     Settings.RSS.Torrent.set_folder = page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER);
-    Settings.RSS.Torrent.create_folder = page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER);
+    Settings.RSS.Torrent.use_folder = page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOUSEFOLDER);
     page->GetDlgItemText(IDC_COMBO_TORRENT_FOLDER, Settings.RSS.Torrent.download_path);
+    Settings.RSS.Torrent.create_folder = page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER);
   }
   // Torrents > Filters
   page = &pages[PAGE_TORRENTS_FILTERS];

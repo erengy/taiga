@@ -103,7 +103,7 @@ BOOL MainDialog::OnInitDialog() {
     ExecuteAction(L"Synchronize"); 		
   }
   if (Settings.Program.StartUp.check_new_episodes) {
-    ExecuteAction(L"CheckEpisodes", TRUE, FALSE);
+    ScanAvailableEpisodes(anime::ID_UNKNOWN, false, true);
   }
   if (!Settings.Program.StartUp.minimize) {
     Show(Settings.Program.Exit.remember_pos_size && Settings.Program.Position.maximized ? 
@@ -361,7 +361,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           switch (navigation.GetCurrentPage()) {
             case SIDEBAR_ITEM_ANIMELIST:
               // Scan available episodes
-              ExecuteAction(L"CheckEpisodes", FALSE, TRUE);
+              ScanAvailableEpisodes(anime::ID_UNKNOWN, true, false);
               return TRUE;
             case SIDEBAR_ITEM_HISTORY:
               // Refresh history
@@ -592,7 +592,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     Taiga.ticker_new_episodes++;
     if (Taiga.ticker_new_episodes >= 30 * 60) { // 30 minutes
       Taiga.ticker_new_episodes = 0;
-      ExecuteAction(L"CheckEpisodes()", TRUE, FALSE);
+      ScanAvailableEpisodes(anime::ID_UNKNOWN, false, true);
     }
   }
 

@@ -719,8 +719,8 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
         ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
       }
     } else {
-      ratio_aired = eps_aired > -1 ? 0.8f : 0.0f;
-      ratio_watched = eps_watched > 0 ? (eps_aired > -1 ? 0.75f : 0.8f) : 0.0f;
+      ratio_aired = eps_aired > -1 ? 0.85f : 0.0f;
+      ratio_watched = eps_watched > 0 ? 0.8f : 0.0f;
     }
     if (ratio_watched > 1.0f) {
       // The number of watched episodes is greater than the number of total episodes
@@ -753,8 +753,8 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 
   // Draw episode availability
   if (Settings.Program.List.progress_show_available) {
-    if (eps_total > 0) {
-      float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_total);
+    if (eps_estimate > 0) {
+      float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
       int available_episode_count = static_cast<int>(anime_item.GetAvailableEpisodeCount());
       for (int i = eps_watched + 1; i <= available_episode_count; i++) {
         if (i > 0 && anime_item.IsEpisodeAvailable(i)) {
@@ -765,8 +765,9 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
       }
     } else {
       if (anime_item.IsNewEpisodeAvailable()) {
-        rcAvail.left = eps_watched > -1 ? rcWatched.right : rcWatched.left;
-        rcAvail.right = rcAvail.left + static_cast<int>((rcBar.Width()) * 0.05f);
+        float ratio_avail = anime_item.IsEpisodeAvailable(eps_aired) ? 0.85f : 0.83f;
+        rcAvail.right = rcAvail.left + static_cast<int>((rcAvail.Width()) * ratio_avail);
+        rcAvail.left = rcWatched.right;
         UI.list_progress.available.Draw(dc.Get(), &rcAvail);
       }
     }

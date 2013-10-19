@@ -539,11 +539,9 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
     if (number == GetMyLastWatchedEpisode() + 1) {
       SetNewEpisodePath(path);
     }
-    if (!local_info_.playing) {
-      int list_index = AnimeListDialog.GetListIndex(GetId());
-      if (list_index > -1) {
-        AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
-      }
+    int list_index = AnimeListDialog.GetListIndex(GetId());
+    if (list_index > -1) {
+      AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
     }
     return true;
   }

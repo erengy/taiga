@@ -294,9 +294,9 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.animesuki.com/rss.php?link=enclosure");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.baka-updates.com/rss.php");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings.RSS.Torrent.source.c_str());
-      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%");
+      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%");
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&_id=7b99f981c5b1f02354642f4e271cca43&_render=rss");
       SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings.RSS.Torrent.search_url.c_str());
       CheckDlgButton(IDC_CHECK_TORRENT_HIDE, Settings.RSS.Torrent.hide_unidentified);
@@ -317,13 +317,15 @@ BOOL SettingsPage::OnInitDialog() {
       EnableDlgItem(IDC_EDIT_TORRENT_APP, Settings.RSS.Torrent.app_mode > 1);
       EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, Settings.RSS.Torrent.app_mode > 1);
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, Settings.RSS.Torrent.set_folder);
+      CheckDlgButton(IDC_CHECK_TORRENT_AUTOUSEFOLDER, Settings.RSS.Torrent.use_folder);
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.RSS.Torrent.create_folder);
       for (size_t i = 0; i < Settings.Folders.root.size(); i++)
         AddComboString(IDC_COMBO_TORRENT_FOLDER, Settings.Folders.root[i].c_str());
       SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, Settings.RSS.Torrent.download_path.c_str());
-      EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.RSS.Torrent.set_folder);
-      EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, Settings.RSS.Torrent.set_folder && Settings.RSS.Torrent.create_folder);
-      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, Settings.RSS.Torrent.set_folder && Settings.RSS.Torrent.create_folder);
+      EnableDlgItem(IDC_CHECK_TORRENT_AUTOUSEFOLDER, Settings.RSS.Torrent.set_folder);
+      EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, Settings.RSS.Torrent.set_folder && Settings.RSS.Torrent.use_folder);
+      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, Settings.RSS.Torrent.set_folder && Settings.RSS.Torrent.use_folder);
+      EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.RSS.Torrent.set_folder && Settings.RSS.Torrent.use_folder);
       break;
     }
     // Torrents > Filters
@@ -499,16 +501,18 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         case IDC_CHECK_TORRENT_AUTOSETFOLDER: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
-          EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enable);
-          enable = enable && IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER);
+          EnableDlgItem(IDC_CHECK_TORRENT_AUTOUSEFOLDER, enable);
+          enable = enable && IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOUSEFOLDER);
           EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, enable);
           EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enable);
+          EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enable);
           return TRUE;
         }
-        case IDC_CHECK_TORRENT_AUTOCREATEFOLDER: {
+        case IDC_CHECK_TORRENT_AUTOUSEFOLDER: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
           EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, enable);
           EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enable);
+          EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enable);
           return TRUE;
         }
         // Enable/disable filters

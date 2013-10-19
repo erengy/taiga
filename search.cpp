@@ -19,12 +19,23 @@
 #include "std.h"
 
 #include "anime.h"
+#include "anime_db.h"
 #include "anime_episode.h"
 #include "anime_item.h"
 #include "common.h"
+#include "foreach.h"
 #include "logger.h"
+#include "myanimelist.h"
 #include "recognition.h"
+#include "settings.h"
 #include "string.h"
+#include "taiga.h"
+
+#include "dlg/dlg_main.h"
+#include "dlg/dlg_settings.h"
+
+#include "win32/win_taskbar.h"
+#include "win32/win_taskdialog.h"
 
 // =============================================================================
 
@@ -127,4 +138,72 @@ wstring SearchFileFolder(anime::Item& anime_item, const wstring& root,
   
   FindClose(handle);
   return wstring();
+}
+
+// =============================================================================
+
+void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
+  // Check if any root folder is available
+  if (!silent && Settings.Folders.root.empty()) {
+    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
+    dlg.SetContent(L"You need to have at least one root folder set before scanning available episodes.");
+    dlg.AddButton(L"Yes", IDYES);
+    dlg.AddButton(L"No", IDNO);
+    dlg.Show(g_hMain);
+    if (dlg.GetSelectedButtonID() == IDYES)
+      ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+    return;
+  }
+
+  int episode_number = Settings.Program.List.progress_show_available ? -1 : 0;
+
+  // Search for all list items
+  if (!anime_id) {
+    size_t i = 0;
+    // Search is made in reverse to give new items priority. The user is
+    // probably more interested in them than the older titles.
+    if (!silent) {
+      TaskbarList.SetProgressState(TBPF_NORMAL);
+      SetSharedCursor(IDC_WAIT);
+    }
+    foreach_r_(it, AnimeDatabase.items) {
+      if (!silent)
+        TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
+      switch (it->second.GetMyStatus()) {
+        case mal::MYSTATUS_WATCHING:
+          if (!silent)
+            MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
+          it->second.CheckEpisodes(episode_number, check_folder);
+      }
+    }
+    i = 0;
+    foreach_r_(it, AnimeDatabase.items) {
+      if (!silent)
+        TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
+      switch (it->second.GetMyStatus()) {
+        case mal::MYSTATUS_ONHOLD:
+        case mal::MYSTATUS_PLANTOWATCH:
+          if (!silent)
+            MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
+          it->second.CheckEpisodes(episode_number, check_folder);
+      }
+    }
+    if (!silent) {
+      TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+      SetSharedCursor(IDC_ARROW);
+    }
+
+  // Search for a single item
+  } else {
+    SetSharedCursor(IDC_WAIT);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (anime_item)
+      anime_item->CheckEpisodes(episode_number, true);
+    SetSharedCursor(IDC_ARROW);
+  }
+
+  // We're done
+  if (!silent)
+    MainDialog.ChangeStatus(L"Scan finished.");
 }

@@ -54,9 +54,9 @@
 #define DEFAULT_FORMAT_MIRC      L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 $if(%score%,\00314[Score: %score%/10]\003) \00312www.myanimelist.net/anime/%id%"
 #define DEFAULT_FORMAT_SKYPE     L"Watching: <a href=\"http://myanimelist.net/anime/%id%\">%title%</a>$if(%episode%, #%episode%$if(%total%,/%total%))"
 #define DEFAULT_FORMAT_TWITTER   L"$ifequal(%episode%,%total%,Just completed: %title%$if(%score%, (Score: %score%/10)) www.myanimelist.net/anime/%id%)"
-#define DEFAULT_FORMAT_BALLOON   L"$if(%title%,%title%)\\n$if(%name%,%name%)\\n$if(%episode%,Episode %episode%$if(%total%,/%total%) )$if(%group%,by %group%)"
+#define DEFAULT_FORMAT_BALLOON   L"$if(%title%,%title%)\\n$if(%episode%,Episode %episode%$if(%total%,/%total%) )$if(%group%,by %group%)\\n$if(%name%,%name%)"
 #define DEFAULT_TORRENT_APPPATH  L"C:\\Program Files\\uTorrent\\uTorrent.exe"
-#define DEFAULT_TORRENT_SEARCH   L"http://www.nyaa.eu/?page=rss&cats=1_37&filter=2&term=%title%"
+#define DEFAULT_TORRENT_SEARCH   L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%"
 #define DEFAULT_TORRENT_SOURCE   L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0"
 
 class Settings Settings;
@@ -244,6 +244,7 @@ bool Settings::Load() {
       RSS.Torrent.set_folder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
       RSS.Torrent.search_url = torrent.child(L"search").attribute(L"address").as_string(DEFAULT_TORRENT_SEARCH);
       RSS.Torrent.source = torrent.child(L"source").attribute(L"address").as_string(DEFAULT_TORRENT_SOURCE);
+      RSS.Torrent.use_folder = torrent.child(L"options").attribute(L"autousefolder").as_int(FALSE);
       // Filters
       xml_node filter = torrent.child(L"filter");
       RSS.Torrent.Filters.global_enabled = filter.attribute(L"enabled").as_int(TRUE);
@@ -466,6 +467,7 @@ bool Settings::Save() {
       torrent.child(L"options").append_attribute(L"autocheck") = RSS.Torrent.check_enabled;
       torrent.child(L"options").append_attribute(L"checkinterval") = RSS.Torrent.check_interval;
       torrent.child(L"options").append_attribute(L"autosetfolder") = RSS.Torrent.set_folder;
+      torrent.child(L"options").append_attribute(L"autousefolder") = RSS.Torrent.use_folder;
       torrent.child(L"options").append_attribute(L"autocreatefolder") = RSS.Torrent.create_folder;
       torrent.child(L"options").append_attribute(L"downloadpath") = RSS.Torrent.download_path.c_str();
       torrent.child(L"options").append_attribute(L"hideunidentified") = RSS.Torrent.hide_unidentified;
@@ -531,7 +533,7 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
     SearchDialog.RefreshList();
     Stats.CalculateAll();
     StatsDialog.Refresh();
-    ExecuteAction(L"Logout(" + previous_user + L")");
+    Taiga.logged_in = false;
   } else {
     AnimeListDialog.RefreshList();
   }
@@ -684,6 +686,11 @@ void Settings::HandleCompatibility() {
     dlg.SetContent(content.c_str());
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(nullptr);
+  }
+
+  // Make sure torrent downloading options are right
+  if (Meta.Version.revision < 248) {
+    RSS.Torrent.use_folder = RSS.Torrent.create_folder;
   }
 }
 
