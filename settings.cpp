@@ -273,9 +273,7 @@ bool Settings::Load() {
       Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
       if (feed) feed->link = RSS.Torrent.source;
       // File archive
-      Aggregator.file_archive.clear();
       Aggregator.LoadArchive();
-      //PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
 
   return result.status == status_ok;
 }
@@ -694,6 +692,12 @@ void Settings::HandleCompatibility() {
   // Make sure torrent downloading options are right
   if (Meta.Version.revision < 248) {
     RSS.Torrent.use_folder = RSS.Torrent.create_folder;
+  }
+
+  // Load torrent archive
+  if (Meta.Version.revision < 250) {
+    Aggregator.file_archive.clear();
+    PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
   }
 }
 

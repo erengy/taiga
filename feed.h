@@ -258,10 +258,11 @@ public:
   Feed* Get(int category);
 
   bool Notify(const Feed& feed);
-  bool SearchArchive(const wstring& file);
   void ParseDescription(FeedItem& feed_item, const wstring& source);
-  bool SaveArchive();
+
   bool LoadArchive();
+  bool SaveArchive();
+  bool SearchArchive(const wstring& file);
 
 private:
   bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);

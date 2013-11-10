@@ -317,11 +317,10 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
   }
 }
 
-bool Aggregator::LoadArchive()
-{
+bool Aggregator::LoadArchive() {
   // Initialize
   wstring folder = Taiga.GetDataPath() + L"feed\\";
-  wstring file = folder + L"discarded.xml";
+  wstring file = folder + L"history.xml";
   CreateDirectory(folder.c_str(), NULL);
   
   // Load XML file
@@ -329,38 +328,34 @@ bool Aggregator::LoadArchive()
   xml_parse_result result = doc.load_file(file.c_str());
 
   // Read discarded
-  xml_node discarded = doc.child(L"discarded");
-
-  for (xml_node item = discarded.child(L"item"); item; item = item.next_sibling(L"item")) {
+  file_archive.clear();
+  xml_node archive = doc.child(L"archive");
+  for (xml_node item = archive.child(L"item"); item; item = item.next_sibling(L"item")) {
     file_archive.push_back(item.attribute(L"title").value());
   }
 
   return result.status == status_ok;
 }
 
-bool Aggregator::SaveArchive()
-{
-
+bool Aggregator::SaveArchive() {
   // Initialize
   xml_document doc;
-  xml_node discarded = doc.append_child(L"discarded");
+  xml_node archive = doc.append_child(L"archive");
 
-  if(Settings.RSS.Torrent.Filters.archive_maxcount > 0)
-  {
+  if (Settings.RSS.Torrent.Filters.archive_maxcount > 0) {
     // Items
     size_t length = file_archive.size();
     size_t i = 0;
-    if(length > Settings.RSS.Torrent.Filters.archive_maxcount)
+    if (length > Settings.RSS.Torrent.Filters.archive_maxcount)
       i = length - Settings.RSS.Torrent.Filters.archive_maxcount;
-
-    for (; i < file_archive.size(); i++) {
-      xml_node xml_item = discarded.append_child(L"item");
+    for ( ; i < file_archive.size(); i++) {
+      xml_node xml_item = archive.append_child(L"item");
       xml_item.append_attribute(L"title") = file_archive[i].c_str();
     }
   }
 
   // Save file
-  wstring file = Taiga.GetDataPath() + L"feed\\discarded.xml";
+  wstring file = Taiga.GetDataPath() + L"feed\\history.xml";
   return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
 }
 

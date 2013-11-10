@@ -106,7 +106,7 @@ BOOL AboutDialog::OnInitDialog() {
     L"\\b Author:\\b0\\line "
     L"Eren 'erengy' Okka\\line\\line "
     L"\\b Committers and other contributors:\\b0\\line "
-    L"saka, Diablofan, slevir\\line\\line "
+    L"saka, Diablofan, slevir, LordGravewish\\line\\line "
     L"\\b Third party stuff that is used by Taiga:\\b0\\line "
     L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
     L"- OAuth class is based on codebrook-twitter-oauth example code, Copyright (c) 2010, Brook Miles\\line "

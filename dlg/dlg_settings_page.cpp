@@ -330,8 +330,6 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Torrents > Filters
     case PAGE_TORRENTS_FILTERS: {
-      SendDlgItemMessage(IDC_SPIN_TORRENT_ARCHIVE_COUNT, UDM_SETRANGE32, 0, 3600);
-      SendDlgItemMessage(IDC_SPIN_TORRENT_ARCHIVE_COUNT, UDM_SETPOS32, 0, Settings.RSS.Torrent.Filters.archive_maxcount);
       CheckDlgButton(IDC_CHECK_TORRENT_FILTER, Settings.RSS.Torrent.Filters.global_enabled);
       win32::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
       list.EnableGroupView(true);

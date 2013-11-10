@@ -149,7 +149,7 @@ public:
       wstring app_path, download_path, search_url, source;
       struct Filters {
         BOOL global_enabled;
-        int  archive_maxcount;
+        int archive_maxcount;
       } Filters;
     } Torrent;
   } RSS;
