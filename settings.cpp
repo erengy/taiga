@@ -248,6 +248,7 @@ bool Settings::Load() {
       // Filters
       xml_node filter = torrent.child(L"filter");
       RSS.Torrent.Filters.global_enabled = filter.attribute(L"enabled").as_int(TRUE);
+      RSS.Torrent.Filters.archive_maxcount = filter.attribute(L"archive_maxcount").as_int(100);
       Aggregator.filter_manager.filters.clear();
       for (xml_node item = filter.child(L"item"); item; item = item.next_sibling(L"item")) {
         Aggregator.filter_manager.AddFilter(
@@ -273,7 +274,8 @@ bool Settings::Load() {
       if (feed) feed->link = RSS.Torrent.source;
       // File archive
       Aggregator.file_archive.clear();
-      PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
+      Aggregator.LoadArchive();
+      //PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
 
   return result.status == status_ok;
 }
@@ -475,6 +477,7 @@ bool Settings::Save() {
       // Filter
       xml_node torrent_filter = torrent.append_child(L"filter");
       torrent_filter.append_attribute(L"enabled") = RSS.Torrent.Filters.global_enabled;
+      torrent_filter.append_attribute(L"archive_maxcount") = RSS.Torrent.Filters.archive_maxcount;
       for (auto it = Aggregator.filter_manager.filters.begin(); it != Aggregator.filter_manager.filters.end(); ++it) {
         xml_node item = torrent_filter.append_child(L"item");
         item.append_attribute(L"action") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_ACTION, it->action).c_str();

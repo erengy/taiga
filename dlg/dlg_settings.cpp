@@ -319,6 +319,7 @@ void SettingsDialog::OnOK() {
   // Torrents > Filters
   page = &pages[PAGE_TORRENTS_FILTERS];
   if (page->IsWindow()) {
+    Settings.RSS.Torrent.Filters.archive_maxcount = page->GetDlgItemInt(IDC_EDIT_TORRENT_ARCHIVE_COUNT);
     Settings.RSS.Torrent.Filters.global_enabled = page->IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTER);
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_TORRENT_FILTER));
     for (int i = 0; i < list.GetItemCount(); i++) {

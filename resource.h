@@ -198,6 +198,8 @@
 #define IDC_TOOLBAR_TORRENT                     1153
 #define IDC_TREE_MAIN                           1154
 #define IDC_TREE_SECTIONS                       1155
+#define IDC_EDIT_TORRENT_ARCHIVE_COUNT          1156
+#define IDC_SPIN_TORRENT_ARCHIVE_COUNT          1157
 #define IDS_KEYWORD_AUDIO                       40000
 #define IDS_KEYWORD_EXTENSION                   40001
 #define IDS_KEYWORD_EXTRA                       40002

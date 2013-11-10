@@ -119,6 +119,7 @@ void Taiga::Uninitialize() {
   // Save
   Settings.Save();
   AnimeDatabase.SaveDatabase();
+  Aggregator.SaveArchive();
 
   // Exit
   PostQuitMessage();
