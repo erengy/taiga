@@ -79,7 +79,13 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
         int total2 = pItem2->GetEpisodeCount();
         int watched1 = pItem1->GetMyLastWatchedEpisode();
         int watched2 = pItem2->GetMyLastWatchedEpisode();
-        if (total1 && total2) {
+        bool available1 = pItem1->IsNewEpisodeAvailable();
+        bool available2 = pItem2->IsNewEpisodeAvailable();
+        if (available1 && !available2) {
+          return_value = -1;
+        } else if (!available1 && available2) {
+          return_value = 1;
+        } else if (total1 && total2) {
           float ratio1 = static_cast<float>(watched1) / static_cast<float>(total1);
           float ratio2 = static_cast<float>(watched2) / static_cast<float>(total2);
           if (ratio1 > ratio2) {

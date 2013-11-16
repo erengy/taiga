@@ -62,7 +62,7 @@ HttpClient::HttpClient() {
 BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
                        FormatError(dwError, L"winhttp.dll");
-  TrimRight(error_text, L"\n");
+  TrimRight(error_text, L"\r\n");
 
   LOG(LevelError, error_text);
   LOG(LevelError, L"Client mode: " + ToWstr(GetClientMode()));

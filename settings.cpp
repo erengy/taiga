@@ -248,7 +248,7 @@ bool Settings::Load() {
       // Filters
       xml_node filter = torrent.child(L"filter");
       RSS.Torrent.Filters.global_enabled = filter.attribute(L"enabled").as_int(TRUE);
-      RSS.Torrent.Filters.archive_maxcount = filter.attribute(L"archive_maxcount").as_int(100);
+      RSS.Torrent.Filters.archive_maxcount = filter.attribute(L"archive_maxcount").as_int(1000);
       Aggregator.filter_manager.filters.clear();
       for (xml_node item = filter.child(L"item"); item; item = item.next_sibling(L"item")) {
         Aggregator.filter_manager.AddFilter(
