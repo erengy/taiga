@@ -75,14 +75,11 @@ bool GetAnimeDetails(int anime_id) {
 bool GetList() {
   if (Settings.Account.MAL.user.empty())
     return false;
-  
-  wstring path = Taiga.GetDataPath() + L"user\\" + 
-                 Settings.Account.MAL.user + L"\\anime.xml";
 
   return Clients.service.list.Connect(
     L"myanimelist.net",
     L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all",
-    L"", L"GET", L"Accept-Encoding: gzip", L"", path,
+    L"", L"GET", L"Accept-Encoding: gzip", L"", L"",
     HTTP_MAL_RefreshList);
 }
 

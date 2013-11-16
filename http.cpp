@@ -229,12 +229,31 @@ BOOL HttpClient::OnReadComplete() {
   switch (GetClientMode()) {
     // List
     case HTTP_MAL_RefreshList: {
-      AnimeDatabase.LoadList(true); // Here we assume that MAL provides up-to-date series information in malappinfo.php
-      MainDialog.ChangeStatus(L"List download completed.");
-      AnimeListDialog.RefreshList();
-      AnimeListDialog.RefreshTabs();
-      HistoryDialog.RefreshList();
-      SearchDialog.RefreshList();
+      wstring data = GetData();
+      if (InStr(data, L"<myanimelist>", 0, true) > -1 &&
+          InStr(data, L"<myinfo>", 0, true) > -1) {
+        wstring path = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+        // Take a backup of the previous list just in case
+        wstring new_path = path + L".bak";
+        MoveFileEx(path.c_str(), new_path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
+        // Save the current list
+        HANDLE hFile = ::CreateFile(path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile != INVALID_HANDLE_VALUE) {
+          DWORD dwBytesWritten = 0;
+          ::WriteFile(hFile, (LPCVOID)m_Buffer, m_dwDownloaded, &dwBytesWritten, NULL);
+          ::CloseHandle(hFile);
+        }
+        // Load the list and refresh
+        AnimeDatabase.LoadList(true); // Here we assume that MAL provides up-to-date series information in malappinfo.php
+        AnimeListDialog.RefreshList();
+        AnimeListDialog.RefreshTabs();
+        HistoryDialog.RefreshList();
+        SearchDialog.RefreshList();
+        status = L"Successfully downloaded the list.";
+      } else {
+        status = L"MyAnimeList returned an invalid response.";
+      }
+      MainDialog.ChangeStatus(status);
       MainDialog.EnableInput(true);
       break;
     }
