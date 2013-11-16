@@ -686,6 +686,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       // Caption changed?
       if (MediaPlayers.TitleChanged()) {
         MediaPlayers.SetTitleChanged(false);
+        ChangeStatus();
         bool processed = CurrentEpisode.processed; // TODO: not a good solution...
         CurrentEpisode.Set(anime::ID_UNKNOWN);
         if (anime_item) {

@@ -333,12 +333,12 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     }
   }
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
   wstring filter_text =
       (item.state == FEEDITEM_DISCARDED ? L"!FILTER :: " : L"FILTER :: ") +
       Aggregator.filter_manager.TranslateConditions(*this, condition_index);
   item.description = filter_text + L" -- " + item.description;
-//#endif
+#endif
 }
 
 void FeedFilter::Reset() {
@@ -413,10 +413,10 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       bool found = Aggregator.SearchArchive(item->title);
       if (found) {
         item->state = FEEDITEM_DISCARDED;
-//#ifdef _DEBUG
+#ifdef _DEBUG
         wstring filter_text = L"!FILTER :: Archived";
         item->description = filter_text + L" -- " + item->description;
-//#endif
+#endif
       }
     }
   }
