@@ -233,6 +233,8 @@ BOOL HttpClient::OnReadComplete() {
       if (InStr(data, L"<myanimelist>", 0, true) > -1 &&
           InStr(data, L"<myinfo>", 0, true) > -1) {
         wstring path = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+        // Make sure the path is available
+        CreateFolder(GetPathOnly(path));
         // Take a backup of the previous list just in case
         wstring new_path = path + L".bak";
         MoveFileEx(path.c_str(), new_path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
