@@ -11,7 +11,7 @@
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDR_MENU           DATA           ".\\res\\menu.xml"
+IDR_MENU           DATA           "..\\res\\menu.xml"
 
 
 
@@ -703,4 +703,4 @@ STRINGTABLE
 // Icon resources
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDI_MAIN           ICON           ".\\res\\Taiga.ico"
+IDI_MAIN           ICON           "..\\res\\Taiga.ico"

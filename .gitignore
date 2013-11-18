@@ -1,2 +1,6 @@
 bin/*
-build
+build/*
+
+src/*.opensdf
+src/*.sdf
+src/*.user
