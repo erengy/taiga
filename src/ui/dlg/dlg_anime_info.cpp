@@ -143,8 +143,8 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       // Draw anime image
       if (wParam == IDC_STATIC_ANIME_IMG) {
         LPDRAWITEMSTRUCT dis = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-        win32::Rect rect = dis->rcItem;
-        win32::Dc dc = dis->hDC;
+        win::Rect rect = dis->rcItem;
+        win::Dc dc = dis->hDC;
         // Paint border
         dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
         rect.Inflate(-1, -1);
@@ -256,8 +256,8 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  win32::Dc dc = hdc;
-  win32::Rect rect;
+  win::Dc dc = hdc;
+  win::Rect rect;
 
   // Paint background
   rect.Copy(lpps->rcPaint);
@@ -320,7 +320,7 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   int current_item = GetCurrentlySelected();
   int tab_height = 0;
   
-  bool is_vista = win32::GetWinVersion() >= win32::VERSION_VISTA;
+  bool is_vista = win::GetWinVersion() >= win::VERSION_VISTA;
   bool is_themed_xp = !is_vista && ::IsThemeActive();
 
   for (int i = 0; i < item_count; ++i) {
@@ -453,7 +453,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   // Load image
   if (image) {
     ImageDatabase.Load(anime_id_, true, connect);
-    win32::Rect rect;
+    win::Rect rect;
     GetClientRect(&rect);
     SIZE size = {rect.Width(), rect.Height()};
     OnSize(WM_SIZE, 0, size);
@@ -659,7 +659,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 }
 
 void AnimeDialog::UpdateControlPositions(const SIZE* size) {
-  win32::Rect rect;
+  win::Rect rect;
   if (size == nullptr) {
     GetClientRect(&rect);
   } else {
@@ -671,7 +671,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   
   // Image
   if (current_page_ != INFOPAGE_NONE) {
-    win32::Rect rect_image = rect;
+    win::Rect rect_image = rect;
     rect_image.right = rect_image.left + ScaleX(150);
     auto image = ImageDatabase.GetImage(anime_id_);
     if (image) {
@@ -686,7 +686,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   }
 
   // Title
-  win32::Rect rect_title;
+  win::Rect rect_title;
   edit_title_.GetWindowRect(&rect_title);
   rect_title.Set(rect.left, rect.top,
                   rect.right, rect.top + rect_title.Height());
@@ -695,7 +695,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
 
   // Buttons
   if (mode_ == DIALOG_MODE_ANIME_INFORMATION) {
-    win32::Rect rect_button;
+    win::Rect rect_button;
     ::GetWindowRect(GetDlgItem(IDOK), &rect_button);
     rect.bottom -= rect_button.Height() + ScaleY(WIN_CONTROL_MARGIN) * 2;
   }
@@ -706,9 +706,9 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
       rect.left += ScaleX(WIN_CONTROL_MARGIN);
       sys_link_.SetPosition(nullptr, rect);
     } else {
-      win32::Dc dc = sys_link_.GetDC();
+      win::Dc dc = sys_link_.GetDC();
       int text_height = GetTextHeight(dc.Get());
-      win32::Rect rect_content = rect;
+      win::Rect rect_content = rect;
       rect_content.Inflate(-ScaleX(WIN_CONTROL_MARGIN * 2), 0);
       rect_content.bottom = rect_content.top + text_height * 2;
       sys_link_.SetPosition(nullptr, rect_content);
@@ -717,7 +717,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   }
 
   // Pages
-  win32::Rect rect_page = rect;
+  win::Rect rect_page = rect;
   if (tab_.IsVisible()) {
     tab_.SetPosition(nullptr, rect_page);
     tab_.AdjustRect(m_hWindow, FALSE, &rect_page);

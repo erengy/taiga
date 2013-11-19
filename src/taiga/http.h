@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef HTTP_H
-#define HTTP_H
+#ifndef TAIGA_TAIGA_HTTP_H
+#define TAIGA_TAIGA_HTTP_H
 
 #include "base/std.h"
-
-#include "win32/win_http.h"
+#include "base/types.h"
+#include "win/http/win_http.h"
 
 enum HttpClientMode {
   HTTP_Silent = 0,
@@ -58,18 +58,26 @@ enum HttpClientType {
 
 // =============================================================================
 
-class HttpClient : public win32::Http {
+class HttpClient : public win::http::Client {
 public:
   HttpClient();
   virtual ~HttpClient() {}
 
+  DWORD GetClientMode() const;
+  void SetClientMode(DWORD mode);
+  LPARAM GetParam() const;
+
 protected:
-  BOOL OnError(DWORD dwError);
-  BOOL OnSendRequestComplete();
-  BOOL OnHeadersAvailable(win32::http_header_t& headers);
-  BOOL OnReadData();
-  BOOL OnReadComplete();
-  BOOL OnRedirect(wstring address);
+  void OnError(DWORD error);
+  bool OnSendRequestComplete();
+  bool OnHeadersAvailable();
+  bool OnDataAvailable();
+  bool OnReadData();
+  bool OnReadComplete();
+  bool OnRedirect(const std::wstring& address);
+
+private:
+  DWORD mode_;
 };
 
 class AnimeClients {
@@ -108,4 +116,4 @@ extern HttpClients Clients;
 
 void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass);
 
-#endif // HTTP_H
+#endif  // TAIGA_TAIGA_HTTP_H

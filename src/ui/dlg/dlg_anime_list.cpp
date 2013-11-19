@@ -34,7 +34,7 @@
 #include "taiga/taiga.h"
 #include "ui/theme.h"
 
-#include "win32/win_gdi.h"
+#include "win/win_gdi.h"
 
 class AnimeListDialog AnimeListDialog;
 
@@ -115,7 +115,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (!allow_drop) {
           POINT pt;
           GetCursorPos(&pt);
-          win32::Rect rect_edit;
+          win::Rect rect_edit;
           MainDialog.edit.GetWindowRect(&rect_edit);
           if (rect_edit.PtIn(pt))
             allow_drop = true;
@@ -174,7 +174,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         POINT pt;
         GetCursorPos(&pt);
-        win32::Rect rect_edit;
+        win::Rect rect_edit;
         MainDialog.edit.GetWindowRect(&rect_edit);
         if (rect_edit.PtIn(pt)) {
           MainDialog.edit.SetText(text);
@@ -210,8 +210,8 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_DRAWITEM: {
       if (wParam == IDC_LIST_MAIN) {
         auto dis = reinterpret_cast<DRAWITEMSTRUCT*>(lParam);
-        win32::Dc dc = dis->hDC;
-        win32::Rect rect = dis->rcItem;
+        win::Dc dc = dis->hDC;
+        win::Rect rect = dis->rcItem;
 
         int anime_id = dis->itemData;
         auto anime_item = AnimeDatabase.FindItem(anime_id);
@@ -224,7 +224,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         dc.FillRect(rect, theme::COLOR_LIGHTGRAY);
 
         // Draw image
-        win32::Rect rect_image = rect;
+        win::Rect rect_image = rect;
         rect_image.right = rect_image.left + static_cast<int>(rect_image.Height() / 1.4);
         dc.FillRect(rect_image, theme::COLOR_GRAY);
         if (ImageDatabase.Load(anime_id, false, false)) {
@@ -298,7 +298,7 @@ void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
       // Set client area
-      win32::Rect rcWindow(0, 0, size.cx, size.cy);
+      win::Rect rcWindow(0, 0, size.cx, size.cy);
       // Resize tab
       rcWindow.left -= 1;
       rcWindow.top -= 1;
@@ -372,7 +372,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
           anime_item->GetEpisodeCount() == 0)
         button_visible[1] = true;
 
-      win32::Rect rect_item;
+      win::Rect rect_item;
       GetSubItemRect(index, 1, &rect_item);
       rect_item.right -= 50;
       rect_item.Inflate(-5, -5);
@@ -413,7 +413,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
   button_visible[2] = true;
 
-  win32::Rect rect_item;
+  win::Rect rect_item;
   GetSubItemRect(index, 2, &rect_item);
   rect_item.Inflate(-8, -2);
   button_rect[2].Copy(rect_item);
@@ -682,8 +682,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
 
 void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
                                                 UINT uItemState, anime::Item& anime_item) {
-  win32::Dc dc = hdc;
-  win32::Rect rcBar = *rc;
+  win::Dc dc = hdc;
+  win::Rect rcBar = *rc;
 
   int eps_aired = anime_item.GetLastAiredEpisodeNumber(true);
   int eps_watched = anime_item.GetMyLastWatchedEpisode(true);
@@ -702,11 +702,11 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   rcBar.Inflate(-1, -1);
   UI.list_progress.background.Draw(dc.Get(), &rcBar);
 
-  win32::Rect rcAired = rcBar;
-  win32::Rect rcAvail = rcBar;
-  win32::Rect rcButton = rcBar;
-  win32::Rect rcSeparator = rcBar;
-  win32::Rect rcWatched = rcBar;
+  win::Rect rcAired = rcBar;
+  win::Rect rcAvail = rcBar;
+  win::Rect rcButton = rcBar;
+  win::Rect rcSeparator = rcBar;
+  win::Rect rcWatched = rcBar;
 
   if (eps_watched > -1 || eps_aired > -1) {
     float ratio_aired = 0.0f;
@@ -810,7 +810,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 
   // Draw text
   wstring text;
-  win32::Rect rcText = *rc;
+  win::Rect rcText = *rc;
   COLORREF text_color = dc.GetTextColor();
   dc.SetBkMode(TRANSPARENT);
 
@@ -851,8 +851,8 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 
 void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
                                              UINT uItemState, anime::Item& anime_item) {
-  win32::Dc dc = hdc;
-  win32::Rect rcBox = *rc;
+  win::Dc dc = hdc;
+  win::Rect rcBox = *rc;
 
   if (index > -1 && index == hot_item) {
     rcBox.Inflate(-8, -2);
@@ -922,8 +922,8 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item) return CDRF_DODEFAULT;
       if (pCD->iSubItem == 1 || pCD->iSubItem == 2) {
-        win32::Rect rcItem;
-        if (win32::GetWinVersion() < win32::VERSION_VISTA) {
+        win::Rect rcItem;
+        if (win::GetWinVersion() < win::VERSION_VISTA) {
           listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
         } else {
           rcItem = pCD->nmcd.rc;
@@ -1017,7 +1017,7 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Enable group view
   bool group_view = !MainDialog.search_bar.filters.text.empty() &&
-                    win32::GetWinVersion() > win32::VERSION_XP;
+                    win::GetWinVersion() > win::VERSION_XP;
   listview.EnableGroupView(group_view);
 
   // Add items to list

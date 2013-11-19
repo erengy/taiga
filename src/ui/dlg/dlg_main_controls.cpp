@@ -38,7 +38,7 @@
 #include "taiga/taiga.h"
 #include "ui/theme.h"
 
-#include "win32/win_gdi.h"
+#include "win/win_gdi.h"
 
 // =============================================================================
 
@@ -89,8 +89,8 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
         case CDDS_ITEMPOSTPAINT: {
           // Draw separator
           if (pCD->nmcd.lItemlParam == -1) {
-            win32::Rect rcItem = pCD->nmcd.rc;
-            win32::Dc hdc = pCD->nmcd.hdc;
+            win::Rect rcItem = pCD->nmcd.rc;
+            win::Dc hdc = pCD->nmcd.hdc;
             hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DFACE));
             rcItem.top += (rcItem.bottom - rcItem.top) / 2;
             //GradientRect(hdc.Get(), &rcItem, ::GetSysColor(COLOR_3DLIGHT), ::GetSysColor(COLOR_3DFACE), true);
@@ -153,7 +153,7 @@ LRESULT MainDialog::CancelButton::OnCustomDraw(LPARAM lParam) {
 
   switch (pCD->dwDrawStage) {
     case CDDS_PREPAINT: {
-      win32::Dc dc = pCD->hdc;
+      win::Dc dc = pCD->hdc;
       dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
       UI.ImgList16.Draw(ICON16_CROSS, dc.Get(), 0, 0);
       dc.DetachDC();

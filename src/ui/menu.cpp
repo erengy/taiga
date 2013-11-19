@@ -70,7 +70,7 @@ void UpdateAnimeMenu(anime::Item* anime_item) {
   menu_index = UI.Menus.GetIndex(L"RightClick");
   if (menu_index > -1) {
     for (int i = static_cast<int>(MENU.Items.size()) - 1; i > 0; i--) {
-      if (MENU.Items[i].Type == win32::MENU_ITEM_SEPARATOR) {
+      if (MENU.Items[i].Type == win::MENU_ITEM_SEPARATOR) {
         // Clear items
         MENU.Items.resize(i + 1);
         // Play episode

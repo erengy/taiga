@@ -21,7 +21,7 @@
 
 #include "base/std.h"
 
-#include "win32/win_thread.h"
+#include "win/win_thread.h"
 
 #define WM_MONITORCALLBACK (WM_APP + 0x32)
 #define MONITOR_BUFFER_SIZE 4096
@@ -66,7 +66,7 @@ private:
 
 // =============================================================================
 
-class FolderMonitor : public win32::Thread {
+class FolderMonitor : public win::Thread {
 public:
   FolderMonitor();
   virtual ~FolderMonitor();
@@ -90,7 +90,7 @@ private:
   BOOL ReadDirectoryChanges(FolderInfo* folder_info);
 
 private:
-  win32::CriticalSection critical_section_;
+  win::CriticalSection critical_section_;
   vector<FolderInfo> folders_;
   HANDLE completion_port_;
   HWND window_handle_;

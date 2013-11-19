@@ -21,12 +21,12 @@
 
 #include "base/std.h"
 #include "track/feed.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class FeedFilterDialog : public win32::Dialog {
+class FeedFilterDialog : public win::Dialog {
 public:
   FeedFilterDialog();
   virtual ~FeedFilterDialog();
@@ -46,10 +46,10 @@ public:
 private:
   int current_page_;
   HICON icon_;
-  win32::Window main_instructions_label_;
+  win::Window main_instructions_label_;
 
   // Page
-  class DialogPage : public win32::Dialog {
+  class DialogPage : public win::Dialog {
   public:
     void Create(UINT uResourceID, FeedFilterDialog* parent, const RECT& rect);
     INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -64,7 +64,7 @@ private:
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     bool BuildFilter(FeedFilter& filter);
   public:
-    win32::ListView preset_list;
+    win::ListView preset_list;
   } page_0_;
 
   // Page #1
@@ -77,10 +77,10 @@ private:
     void AddConditionToList(const FeedFilterCondition& condition, int index = -1);
     void RefreshConditionList();
   public:
-    win32::ComboBox action_combo, match_combo;
-    win32::Edit name_text;
-    win32::ListView condition_list;
-    win32::Toolbar condition_toolbar;
+    win::ComboBox action_combo, match_combo;
+    win::Edit name_text;
+    win::ListView condition_list;
+    win::Toolbar condition_toolbar;
   } page_1_;
 
   // Page #2
@@ -90,7 +90,7 @@ private:
     LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
     bool BuildFilter(FeedFilter& filter);
   public:
-    win32::ListView anime_list;
+    win::ListView anime_list;
   } page_2_;
 };
 

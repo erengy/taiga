@@ -21,8 +21,8 @@
 
 #include "base/std.h"
 #include "base/gfx.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 #include "dlg_anime_info_page.h"
 
@@ -33,7 +33,7 @@ enum AnimeDialogMode {
 
 // =============================================================================
 
-class AnimeDialog : public win32::Dialog {
+class AnimeDialog : public win::Dialog {
 public:
   AnimeDialog();
   virtual ~AnimeDialog() {}
@@ -66,16 +66,16 @@ protected:
   int current_page_;
   int mode_;
 
-  class ImageLabel : public win32::Window {
+  class ImageLabel : public win::Window {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     AnimeDialog* parent;
   } image_label_;
 
-  win32::Edit edit_title_;
-  win32::SysLink sys_link_;
+  win::Edit edit_title_;
+  win::SysLink sys_link_;
   
-  class Tab : public win32::Tab {
+  class Tab : public win::Tab {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);

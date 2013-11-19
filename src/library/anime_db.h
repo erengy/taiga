@@ -25,7 +25,7 @@
 #include "anime_user.h"
 #include "base/gfx.h"
 
-#include "win32/win_thread.h"
+#include "win/win_thread.h"
 
 namespace anime {
 
@@ -87,7 +87,7 @@ class Database {
 
  private:
   // Thread safety
-  win32::CriticalSection critical_section_;
+  win::CriticalSection critical_section_;
   
   wstring file_;
   wstring folder_;

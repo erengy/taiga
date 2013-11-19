@@ -45,8 +45,8 @@
 #include "ui/theme.h"
 #include "base/xml.h"
 
-#include "win32/win_registry.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_registry.h"
+#include "win/win_taskdialog.h"
 
 #define DEFAULT_EXTERNALLINKS    L"Anime Recommendation Finder|http://www.animerecs.com\r\nMALgraph|http://mal.oko.im\r\n-\r\nAnime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\nMahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\nThe Fansub Wiki|http://www.fansubwiki.com"
 #define DEFAULT_FORMAT_HTTP      L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%"
@@ -495,7 +495,7 @@ bool Settings::Save() {
       }
   
   // Write registry
-  win32::Registry reg;
+  win::Registry reg;
   reg.OpenKey(HKEY_CURRENT_USER, 
     L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_SET_VALUE);
   if (Program.General.auto_start) {
@@ -672,7 +672,7 @@ void Settings::HandleCompatibility() {
     LOG(LevelWarning, L"Torrent filters are converted.");
 
     // Display notice
-    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"A friendly notice for torrent downloaders");
     wstring content =
         L"In this update, torrent filters work a bit differently. Basically, all torrents are now in a blank state by default, "

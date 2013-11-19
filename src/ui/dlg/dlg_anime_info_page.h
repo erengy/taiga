@@ -20,7 +20,7 @@
 #define DLG_ANIME_INFO_PAGE_H
 
 #include "base/std.h"
-#include "win32/win_dialog.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
@@ -33,7 +33,7 @@ enum AnimeInfoPageType {
 
 class AnimeDialog;
 
-class PageBaseInfo : public win32::Dialog {
+class PageBaseInfo : public win::Dialog {
  public:
   PageBaseInfo();
   virtual ~PageBaseInfo() {}

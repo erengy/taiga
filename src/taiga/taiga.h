@@ -23,7 +23,7 @@
 #include "update.h"
 #include "version.h"
 
-#include "win32/win_main.h"
+#include "win/win_main.h"
 
 #define APP_NAME    L"Taiga"
 #define APP_TITLE   L"Taiga 1.1a"
@@ -50,7 +50,7 @@ enum TipType {
 
 // =============================================================================
 
-class Taiga : public win32::App {
+class Taiga : public win::App {
 public:
   Taiga();
   ~Taiga();

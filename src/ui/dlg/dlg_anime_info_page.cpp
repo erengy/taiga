@@ -62,8 +62,8 @@ INT_PTR PageBaseInfo::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 }
 
 void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  win32::Dc dc = hdc;
-  win32::Rect rect;
+  win::Dc dc = hdc;
+  win::Rect rect;
 
   // Paint background
   rect.Copy(lpps->rcPaint);
@@ -72,8 +72,8 @@ void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint header lines
   for (int i = 0; i < 3; i++) {
-    win32::Rect rect_header;
-    win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+    win::Rect rect_header;
+    win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
     header.GetWindowRect(m_hWindow, &rect_header);
     rect_header.top = rect_header.bottom + 3;
     rect_header.bottom =  rect_header.top + 1;
@@ -87,14 +87,14 @@ void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 void PageBaseInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rect;
+      win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
       rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
 
       // Headers
       for (int i = 0; i < 3; i++) {
-        win32::Rect rect_header;
-        win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+        win::Rect rect_header;
+        win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
         header.GetWindowRect(m_hWindow, &rect_header);
         rect_header.right = rect.right;
         header.SetPosition(nullptr, rect_header);
@@ -114,13 +114,13 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rect;
+      win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
       rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
 
       // Synonyms
-      win32::Rect rect_child;
-      win32::Window window = GetDlgItem(IDC_EDIT_ANIME_ALT);
+      win::Rect rect_child;
+      win::Window window = GetDlgItem(IDC_EDIT_ANIME_ALT);
       window.GetWindowRect(m_hWindow, &rect_child);
       rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
       window.SetPosition(nullptr, rect_child);
@@ -201,8 +201,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
-        win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        win32::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
+        win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        win::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value; m_Spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
           if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED && episode_value == anime_item->GetEpisodeCount()) {
@@ -227,7 +227,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     case IDC_COMBO_ANIME_STATUS:
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
-        win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
         if (m_Combo.GetItemData(m_Combo.GetCurSel()) == mal::MYSTATUS_COMPLETED) {
           if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED && anime_item->GetEpisodeCount() > 0) {
             SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
@@ -285,7 +285,7 @@ void PageMyInfo::Refresh(int anime_id) {
   EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED);
 
   // Status
-  win32::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+  win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
   if (m_Combo.GetCount() == 0) {
     for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
       if (i != mal::MYSTATUS_UNKNOWN) {
@@ -318,7 +318,7 @@ void PageMyInfo::Refresh(int anime_id) {
   m_Combo.SetWindowHandle(nullptr);
 
   // Tags
-  win32::Edit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
+  win::Edit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
   m_Edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
   m_Edit.SetText(anime_item->GetMyTags());
   m_Edit.SetWindowHandle(nullptr);

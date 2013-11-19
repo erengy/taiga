@@ -23,9 +23,9 @@
 
 #include "library/anime_filter.h"
 
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
-#include "win32/win_gdi.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
+#include "win/win_gdi.h"
 
 #define WM_TAIGA_SHOWMENU WM_USER + 1337
 
@@ -56,7 +56,7 @@ enum SidebarItems {
 
 // =============================================================================
 
-class MainDialog : public win32::Dialog {
+class MainDialog : public win::Dialog {
 public:
   MainDialog();
   virtual ~MainDialog() {}
@@ -110,12 +110,12 @@ private:
     void ShowMenu();
     int button_index;
     HHOOK hook;
-    win32::Toolbar* toolbar;
+    win::Toolbar* toolbar;
   } toolbar_wm;
 
 public:
   // TreeView control
-  class MainTree : public win32::TreeView {
+  class MainTree : public win::TreeView {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     BOOL IsVisible();
@@ -124,21 +124,21 @@ public:
   } treeview;
 
   // Edit control
-  class EditSearch : public win32::Edit {
+  class EditSearch : public win::Edit {
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } edit;
 
   // Cancel button
-  class CancelButton : public win32::Window {
+  class CancelButton : public win::Window {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT OnCustomDraw(LPARAM lParam);
   } cancel_button;
 
   // Other controls
-  win32::Rebar rebar;
-  win32::StatusBar statusbar;
-  win32::Toolbar toolbar_menu, toolbar_main, toolbar_search;
+  win::Rebar rebar;
+  win::StatusBar statusbar;
+  win::Toolbar toolbar_menu, toolbar_main, toolbar_search;
 
   // Search bar
   class SearchBar {
@@ -150,7 +150,7 @@ public:
   } search_bar;
 
 private:
-  win32::Rect rect_content_, rect_sidebar_;
+  win::Rect rect_content_, rect_sidebar_;
 };
 
 extern class MainDialog MainDialog;

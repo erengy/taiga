@@ -42,8 +42,8 @@
 #include "taiga/taiga.h"
 #include "ui/theme.h"
 
-#include "win32/win_control.h"
-#include "win32/win_taskdialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_taskdialog.h"
 
 const WCHAR* SECTION_TITLE[] = {
   L" Services",
@@ -169,7 +169,7 @@ BOOL SettingsDialog::OnInitDialog() {
 // =============================================================================
 
 void SettingsDialog::OnOK() {
-  win32::ListView list;
+  win::ListView list;
   SettingsPage* page = nullptr;
 
   wstring previous_user = Settings.Account.MAL.user;
@@ -359,11 +359,11 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 
     // Drag window
     case WM_ENTERSIZEMOVE:
-      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA)
+      if (::IsAppThemed() && win::GetWinVersion() >= win::VERSION_VISTA)
         SetTransparency(200);
       break;
     case WM_EXITSIZEMOVE:
-      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA)
+      if (::IsAppThemed() && win::GetWinVersion() >= win::VERSION_VISTA)
         SetTransparency(255);
       break;
 
@@ -459,7 +459,7 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       switch (pnmh->code) {
         // Restore default settings
         case NM_CLICK: {
-          win32::TaskDialog dlg;
+          win::TaskDialog dlg;
           dlg.SetWindowTitle(APP_NAME);
           dlg.SetMainIcon(TD_ICON_WARNING);
           dlg.SetMainInstruction(L"Are you sure you want to restore default settings?");
@@ -493,7 +493,7 @@ LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter) {
   wstring text;
-  win32::ListView list = hwnd_list;
+  win::ListView list = hwnd_list;
   int index = list.GetItemCount();
   int group = filter.anime_ids.empty() ? 0 : 1;
   
@@ -532,7 +532,7 @@ void SettingsDialog::RefreshCache() {
 }
 
 void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {
-  win32::ListView list = hwnd_list;
+  win::ListView list = hwnd_list;
   list.DeleteAllItems();
 
   for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it) {

@@ -20,12 +20,12 @@
 #define DLG_TORRENT_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class TorrentDialog : public win32::Dialog {
+class TorrentDialog : public win::Dialog {
 public:
   TorrentDialog() {};
   virtual ~TorrentDialog() {};
@@ -44,9 +44,9 @@ public:
   void SetTimerText(const wstring& text);
 
 private:
-  win32::ListView list_;
-  win32::Rebar rebar_;
-  win32::Toolbar toolbar_;
+  win::ListView list_;
+  win::Rebar rebar_;
+  win::Toolbar toolbar_;
 };
 
 extern class TorrentDialog TorrentDialog;

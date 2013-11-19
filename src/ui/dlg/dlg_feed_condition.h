@@ -21,12 +21,12 @@
 
 #include "base/std.h"
 #include "track/feed.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class FeedConditionDialog : public win32::Dialog {
+class FeedConditionDialog : public win::Dialog {
 public:
   FeedConditionDialog();
   virtual ~FeedConditionDialog();
@@ -45,7 +45,7 @@ public:
   FeedFilterCondition condition;
 
 private:
-  win32::ComboBox element_combo_, operator_combo_, value_combo_;
+  win::ComboBox element_combo_, operator_combo_, value_combo_;
 };
 
 extern class FeedConditionDialog FeedConditionDialog;

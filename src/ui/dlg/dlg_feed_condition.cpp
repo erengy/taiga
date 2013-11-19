@@ -26,7 +26,7 @@
 #include "taiga/resource.h"
 #include "base/string.h"
 
-#include "win32/win_gdi.h"
+#include "win/win_gdi.h"
 
 class FeedConditionDialog FeedConditionDialog;
 
@@ -147,15 +147,15 @@ BOOL FeedConditionDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 void FeedConditionDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  win32::Dc dc = hdc;
-  win32::Rect rect;
+  win::Dc dc = hdc;
+  win::Rect rect;
 
   // Paint background
   GetClientRect(&rect);
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 
   // Paint bottom area
-  win32::Rect rect_button;
+  win::Rect rect_button;
   ::GetClientRect(GetDlgItem(IDCANCEL), &rect_button);
   rect.top = rect.bottom - (rect_button.Height() * 2);
   dc.FillRect(rect, ::GetSysColor(COLOR_BTNFACE));

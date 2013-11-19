@@ -39,8 +39,8 @@
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 
-#include "win32/win_taskbar.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_taskbar.h"
+#include "win/win_taskdialog.h"
 
 namespace anime {
 

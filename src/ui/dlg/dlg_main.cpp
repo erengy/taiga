@@ -52,9 +52,9 @@
 #include "taiga/taiga.h"
 #include "ui/theme.h"
 
-#include "win32/win_gdi.h"
-#include "win32/win_taskbar.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_gdi.h"
+#include "win/win_taskbar.h"
+#include "win/win_taskdialog.h"
 
 class MainDialog MainDialog;
 
@@ -110,7 +110,7 @@ BOOL MainDialog::OnInitDialog() {
       SW_MAXIMIZE : SW_SHOWNORMAL);
   }
   if (Settings.Account.MAL.user.empty()) {
-    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
     dlg.SetContent(L"Username is not set. Would you like to open settings window to set it now?");
     dlg.AddButton(L"Yes", IDYES);
@@ -148,7 +148,7 @@ void MainDialog::CreateDialogControls() {
   edit.SetParent(toolbar_search.GetWindowHandle());
   edit.SetPosition(nullptr, 0, 1, 200, 20);
   edit.SetMargins(1, 16);
-  win32::Rect rcEdit; edit.GetRect(&rcEdit);
+  win::Rect rcEdit; edit.GetRect(&rcEdit);
   // Create cancel search button
   cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
   cancel_button.SetParent(edit.GetWindowHandle());
@@ -234,7 +234,7 @@ void MainDialog::InitWindowPosition() {
   const LONG min_w = ScaleX(710);
   const LONG min_h = ScaleX(480);
   
-  win32::Rect rcParent, rcWindow;
+  win::Rect rcParent, rcWindow;
   ::GetWindowRect(GetParent(), &rcParent);
   rcWindow.Set(
     Settings.Program.Position.x, 
@@ -456,7 +456,7 @@ BOOL MainDialog::OnDestroy() {
     if (Settings.Program.Position.maximized == FALSE) {
       bool invisible = !IsVisible();
       if (invisible) ActivateWindow(GetWindowHandle());
-      win32::Rect rcWindow; GetWindowRect(&rcWindow);
+      win::Rect rcWindow; GetWindowRect(&rcWindow);
       if (invisible) Hide();
       Settings.Program.Position.x = rcWindow.left;
       Settings.Program.Position.y = rcWindow.top;
@@ -511,8 +511,8 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint sidebar
   if (treeview.IsVisible()) {
-    win32::Dc dc = hdc;
-    win32::Rect rect;
+    win::Dc dc = hdc;
+    win::Rect rect;
 
     rect.Copy(rect_sidebar_);
     dc.FillRect(rect, ::GetSysColor(COLOR_3DFACE));
@@ -525,13 +525,13 @@ void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_ENTERSIZEMOVE: {
-      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
+      if (::IsAppThemed() && win::GetWinVersion() >= win::VERSION_VISTA) {
         SetTransparency(200);
       }
       break;
     }
     case WM_EXITSIZEMOVE: {
-      if (::IsAppThemed() && win32::GetWinVersion() >= win32::VERSION_VISTA) {
+      if (::IsAppThemed() && win::GetWinVersion() >= win::VERSION_VISTA) {
         SetTransparency(255);
       }
       break;
@@ -806,7 +806,7 @@ void MainDialog::EnableInput(bool enable) {
 
 void MainDialog::UpdateControlPositions(const SIZE* size) {
   // Set client area
-  win32::Rect rect_client;
+  win::Rect rect_client;
   if (size == nullptr) {
     GetClientRect(&rect_client);
   } else {
@@ -818,7 +818,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   rect_client.top += rebar.GetBarHeight();
   
   // Resize status bar
-  win32::Rect rcStatus;
+  win::Rect rcStatus;
   statusbar.GetClientRect(&rcStatus);
   statusbar.SendMessage(WM_SIZE, 0, 0);
   UpdateStatusTimer();
@@ -828,7 +828,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   rect_sidebar_.Set(0, rect_client.top, 140, rect_client.bottom);
   // Resize treeview
   if (treeview.IsVisible()) {
-    win32::Rect rect_tree(rect_sidebar_);
+    win::Rect rect_tree(rect_sidebar_);
     rect_tree.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
     treeview.SetPosition(nullptr, rect_tree);
   }
@@ -851,7 +851,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
 }
 
 void MainDialog::UpdateStatusTimer() {
-  win32::Rect rect;
+  win::Rect rect;
   GetClientRect(&rect);
 
   int seconds = Settings.Account.Update.delay - Taiga.ticker_media;

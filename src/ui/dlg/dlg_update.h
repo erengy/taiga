@@ -20,12 +20,12 @@
 #define DLG_UPDATE_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class UpdateDialog : public win32::Dialog {
+class UpdateDialog : public win::Dialog {
 public:
   UpdateDialog();
   virtual ~UpdateDialog() {}
@@ -36,7 +36,7 @@ public:
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
 public:
-  win32::ProgressBar progressbar;
+  win::ProgressBar progressbar;
 };
 
 extern class UpdateDialog UpdateDialog;

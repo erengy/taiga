@@ -37,7 +37,7 @@
 #include "ui/dlg/dlg_history.h"
 #include "ui/dlg/dlg_main.h"
 
-#include "win32/win_taskdialog.h"
+#include "win/win_taskdialog.h"
 
 class ConfirmationQueue ConfirmationQueue;
 class History History;
@@ -429,7 +429,7 @@ int AskForConfirmation(anime::Episode& episode) {
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
 
   // Set up dialog
-  win32::TaskDialog dlg;
+  win::TaskDialog dlg;
   wstring title = L"Anime title: " + anime_item->GetTitle();
   dlg.SetWindowTitle(APP_TITLE);
   dlg.SetMainIcon(TD_ICON_INFORMATION);

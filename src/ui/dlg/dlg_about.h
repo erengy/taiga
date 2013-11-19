@@ -20,12 +20,12 @@
 #define DLG_ABOUT_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class AboutDialog : public win32::Dialog {
+class AboutDialog : public win::Dialog {
 public:
   AboutDialog();
   ~AboutDialog() {}
@@ -37,7 +37,7 @@ public:
   void OnTimer(UINT_PTR nIDEvent);
 
 private:
-  win32::RichEdit rich_edit_;
+  win::RichEdit rich_edit_;
 };
 
 extern class AboutDialog AboutDialog;

@@ -23,12 +23,12 @@
 
 #include "library/anime_episode.h"
 
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class RecognitionTestDialog : public win32::Dialog {
+class RecognitionTestDialog : public win::Dialog {
 public:
   RecognitionTestDialog() {};
   ~RecognitionTestDialog() {};
@@ -45,7 +45,7 @@ private:
   };
   vector<EpisodeTest> episodes_, test_episodes_;
 
-  win32::ListView list_;
+  win::ListView list_;
 };
 
 extern RecognitionTestDialog RecognitionTest;

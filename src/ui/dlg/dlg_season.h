@@ -21,8 +21,8 @@
 
 #include "base/std.h"
 
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
@@ -45,7 +45,7 @@ enum SeasonViewAs {
   SEASON_VIEWAS_TILES
 };
 
-class SeasonDialog : public win32::Dialog {
+class SeasonDialog : public win::Dialog {
 public:
   SeasonDialog();
   virtual ~SeasonDialog() {}
@@ -71,13 +71,13 @@ public:
   int group_by, sort_by, view_as;
 
 private:
-  win32::Window cancel_button_;
-  class ListView : public win32::ListView {
+  win::Window cancel_button_;
+  class ListView : public win::ListView {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   } list_;
-  win32::Rebar rebar_;
-  win32::Toolbar toolbar_;
+  win::Rebar rebar_;
+  win::Toolbar toolbar_;
 };
 
 extern class SeasonDialog SeasonDialog;

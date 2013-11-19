@@ -122,7 +122,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void HistoryDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rcWindow(0, 0, size.cx, size.cy);
+      win::Rect rcWindow(0, 0, size.cx, size.cy);
       list_.SetPosition(nullptr, rcWindow, 0);
       break;
     }

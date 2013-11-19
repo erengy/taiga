@@ -26,8 +26,8 @@
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
 
-#include "win32/win_gdi.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_gdi.h"
+#include "win/win_taskdialog.h"
 
 class UpdateDialog UpdateDialog;
 
@@ -88,6 +88,6 @@ BOOL UpdateDialog::OnDestroy() {
 
 void UpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
-  win32::Dc dc = hdc;
+  win::Dc dc = hdc;
   dc.FillRect(lpps->rcPaint, ::GetSysColor(COLOR_WINDOW));
 }

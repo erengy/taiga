@@ -21,8 +21,8 @@
 
 #include "base/std.h"
 #include "library/anime_item.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 enum {
   FORMAT_MODE_HTTP,
@@ -35,7 +35,7 @@ enum {
 
 // =============================================================================
 
-class FormatDialog : public win32::Dialog {
+class FormatDialog : public win::Dialog {
 public:
   FormatDialog();
   ~FormatDialog() {}
@@ -52,7 +52,7 @@ public:
   int mode;
 
 private:
-  win32::RichEdit rich_edit_;
+  win::RichEdit rich_edit_;
 };
 
 extern class FormatDialog FormatDialog;

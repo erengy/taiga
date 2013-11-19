@@ -34,8 +34,8 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
 
-#include "win32/win_taskbar.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_taskbar.h"
+#include "win/win_taskdialog.h"
 
 // =============================================================================
 
@@ -145,7 +145,7 @@ wstring SearchFileFolder(anime::Item& anime_item, const wstring& root,
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
   // Check if any root folder is available
   if (!silent && Settings.Folders.root.empty()) {
-    win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
     dlg.SetContent(L"You need to have at least one root folder set before scanning available episodes.");
     dlg.AddButton(L"Yes", IDYES);

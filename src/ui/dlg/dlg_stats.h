@@ -20,13 +20,13 @@
 #define DLG_STATS_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
-#include "win32/win_resizable.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
+#include "win/win_resizable.h"
 
 // =============================================================================
 
-class StatsDialog : public win32::Dialog, public win32::Resizable {
+class StatsDialog : public win::Dialog, public win::Resizable {
 public:
   StatsDialog() {}
   virtual ~StatsDialog() {}

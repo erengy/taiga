@@ -19,7 +19,7 @@
 #include "std.h"
 #include "logger.h"
 #include "string.h"
-#include "win32/win_main.h"
+#include "win/win_main.h"
 
 #define NT_SUCCESS(x) ((x) >= 0)
 #define STATUS_INFO_LENGTH_MISMATCH 0xc0000004
@@ -155,11 +155,11 @@ BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector) {
   // Type index for files varies between OS versions
   static unsigned short objectTypeFile = 0;
   /*
-  switch (win32::GetWinVersion()) {
-    case win32::VERSION_VISTA:
+  switch (win::GetWinVersion()) {
+    case win::VERSION_VISTA:
       objectTypeFile = 25;
       break;
-    case win32::VERSION_WIN8:
+    case win::VERSION_WIN8:
       objectTypeFile = 31;
       break;
     default:
@@ -307,7 +307,7 @@ wstring GetWindowPath(HWND hwnd) {
 
   if (hProcess != NULL) {
     bool success = false;
-    if (win32::GetWinVersion() >= win32::VERSION_VISTA) {
+    if (win::GetWinVersion() >= win::VERSION_VISTA) {
       HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
       if (hKernel32 != NULL) {
         _QueryFullProcessImageName proc = 

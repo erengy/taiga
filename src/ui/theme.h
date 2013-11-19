@@ -20,8 +20,8 @@
 #define THEME_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_menu.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_menu.h"
 
 enum Icons16px {
   ICON16_GREEN,
@@ -112,10 +112,10 @@ public:
   bool LoadImages();
 
 public:
-  win32::MenuList Menus;
+  win::MenuList Menus;
 
-  win32::ImageList ImgList16;
-  win32::ImageList ImgList24;
+  win::ImageList ImgList16;
+  win::ImageList ImgList24;
 
   Font font_bold;
   Font font_header;

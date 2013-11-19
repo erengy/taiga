@@ -29,7 +29,7 @@
 #include "third_party/base64/base64.h"
 #include "third_party/zlib/zlib.h"
 
-#include "win32/win_registry.h"
+#include "win/win_registry.h"
 
 #define MAKEQWORD(a, b)	((QWORD)( ((QWORD) ((DWORD) (a))) << 32 | ((DWORD) (b))))
 
@@ -421,7 +421,7 @@ bool BrowseForFolderXP(HWND hwnd, const wstring& title, const wstring& default_p
 }
 
 BOOL BrowseForFolder(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output) {
-  if (win32::GetWinVersion() >= win32::VERSION_VISTA) {
+  if (win::GetWinVersion() >= win::VERSION_VISTA) {
     return BrowseForFolderVista(hwnd, title, default_path, output);
   } else {
     return BrowseForFolderXP(hwnd, title, default_path, output);
@@ -467,7 +467,7 @@ void ValidateFileName(wstring& file) {
 }
 
 wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value) {
-  win32::Registry reg;
+  win::Registry reg;
   reg.OpenKey(HKEY_CLASSES_ROOT, extension, 0, KEY_QUERY_VALUE);
   wstring path = reg.QueryValue(L"");
   

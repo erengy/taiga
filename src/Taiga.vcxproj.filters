@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="win32">
-      <UniqueIdentifier>{4e9ae2e0-3d79-4f76-a2cb-14d890049aca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="win32\controls">
-      <UniqueIdentifier>{965e89b5-8902-466c-a26f-ab39814e4991}</UniqueIdentifier>
-    </Filter>
     <Filter Include="base">
       <UniqueIdentifier>{e85a9970-6550-4a11-880f-1926a77e59dc}</UniqueIdentifier>
     </Filter>
@@ -43,76 +37,25 @@
     <Filter Include="include\pugixml">
       <UniqueIdentifier>{69e5923a-3694-4a7d-834b-59c61bb1fa00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="win">
+      <UniqueIdentifier>{5a049f3c-a24c-4b07-9a18-368feca131b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="win\http">
+      <UniqueIdentifier>{58c20329-c357-4173-bd3b-a89d0287f9a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="win\ctrl">
+      <UniqueIdentifier>{c5f2befa-8552-490e-bddd-e1a6eea6d47a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
       <Filter>include\pugixml</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_dialog.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_gdi.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_main.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_menu.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_taskbar.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_taskdialog.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_window.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_treeview.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_combobox.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_edit.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_imagelist.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_listview.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_rebar.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_richedit.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_spin.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_statusbar.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_tab.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_toolbar.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_tooltip.cpp">
-      <Filter>win32\Controls</Filter>
     </ClCompile>
     <ClCompile Include="third_party\oauth\oauth.cpp">
       <Filter>include\oauth</Filter>
     </ClCompile>
     <ClCompile Include="third_party\base64\base64.cpp">
       <Filter>include\base64</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_thread.cpp">
-      <Filter>win32</Filter>
     </ClCompile>
     <ClCompile Include="third_party\zlib\adler32.c">
       <Filter>include\zlib</Filter>
@@ -158,24 +101,6 @@
     </ClCompile>
     <ClCompile Include="third_party\zlib\zutil.c">
       <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_progressbar.cpp">
-      <Filter>win32\Controls</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_gdiplus.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_http.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_registry.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_resizable.cpp">
-      <Filter>win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\win_ctl_syslink.cpp">
-      <Filter>win32\Controls</Filter>
     </ClCompile>
     <ClCompile Include="ui\dlg\dlg_about.cpp">
       <Filter>ui\dlg</Filter>
@@ -349,6 +274,96 @@
       <Filter>track</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="win\win_dialog.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_gdi.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_gdiplus.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_main.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_menu.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_registry.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_resizable.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_taskbar.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_taskdialog.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_thread.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\win_window.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
+    <ClCompile Include="win\http\win_http.cpp">
+      <Filter>win\http</Filter>
+    </ClCompile>
+    <ClCompile Include="win\http\win_http_url.cpp">
+      <Filter>win\http</Filter>
+    </ClCompile>
+    <ClCompile Include="win\http\win_http_callback.cpp">
+      <Filter>win\http</Filter>
+    </ClCompile>
+    <ClCompile Include="win\http\win_http_request.cpp">
+      <Filter>win\http</Filter>
+    </ClCompile>
+    <ClCompile Include="win\http\win_http_response.cpp">
+      <Filter>win\http</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_combobox.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_edit.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_imagelist.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_listview.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_progressbar.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_rebar.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_richedit.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_spin.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_statusbar.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_syslink.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_tab.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_toolbar.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_tooltip.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="win\ctrl\win_ctrl_treeview.cpp">
+      <Filter>win\ctrl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -357,38 +372,11 @@
     <ClInclude Include="third_party\pugixml\pugiconfig.hpp">
       <Filter>include\pugixml</Filter>
     </ClInclude>
-    <ClInclude Include="win32\win_dialog.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_gdi.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_main.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_menu.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_taskbar.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_taskdialog.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_window.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_control.h">
-      <Filter>win32\Controls</Filter>
-    </ClInclude>
     <ClInclude Include="third_party\oauth\oauth.h">
       <Filter>include\oauth</Filter>
     </ClInclude>
     <ClInclude Include="third_party\base64\base64.h">
       <Filter>include\base64</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_thread.h">
-      <Filter>win32</Filter>
     </ClInclude>
     <ClInclude Include="third_party\zlib\crc32.h">
       <Filter>include\zlib</Filter>
@@ -422,18 +410,6 @@
     </ClInclude>
     <ClInclude Include="third_party\zlib\zutil.h">
       <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_gdiplus.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_http.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_registry.h">
-      <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\win_resizable.h">
-      <Filter>win32</Filter>
     </ClInclude>
     <ClInclude Include="ui\dlg\dlg_update.h">
       <Filter>ui\dlg</Filter>
@@ -593,6 +569,51 @@
     </ClInclude>
     <ClInclude Include="track\recognition.h">
       <Filter>track</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_dialog.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_gdi.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_gdiplus.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_main.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_menu.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_registry.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_resizable.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_taskbar.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_taskdialog.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_thread.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\win_window.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="win\http\win_http.h">
+      <Filter>win\http</Filter>
+    </ClInclude>
+    <ClInclude Include="win\ctrl\win_ctrl.h">
+      <Filter>win\ctrl</Filter>
+    </ClInclude>
+    <ClInclude Include="base\gzip.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\types.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

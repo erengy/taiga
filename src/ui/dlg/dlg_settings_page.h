@@ -20,7 +20,7 @@
 #define DLG_SETTINGS_PAGE_H
 
 #include "base/std.h"
-#include "win32/win_dialog.h"
+#include "win/win_dialog.h"
 
 enum SettingsPages {
   PAGE_APP_BEHAVIOR = 1,
@@ -48,7 +48,7 @@ class SettingsDialog;
 
 // =============================================================================
 
-class SettingsPage : public win32::Dialog {
+class SettingsPage : public win::Dialog {
 public:
   SettingsPage();
   virtual ~SettingsPage() {}

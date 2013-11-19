@@ -35,7 +35,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 
-#include "win32/win_taskbar.h"
+#include "win/win_taskbar.h"
 
 anime::Database* anime::Item::database_ = &AnimeDatabase;
 

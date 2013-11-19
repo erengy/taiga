@@ -33,7 +33,7 @@
 #include "ui/theme.h"
 #include "base/xml.h"
 
-#include "win32/win_taskdialog.h"
+#include "win/win_taskdialog.h"
 
 class SearchDialog SearchDialog;
 
@@ -125,7 +125,7 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void SearchDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rcWindow;
+      win::Rect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize list
       list_.SetPosition(nullptr, rcWindow);
@@ -138,7 +138,7 @@ void SearchDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 void SearchDialog::ParseResults(const wstring& data) {
   if (data.empty()) {
     wstring msg = L"No results found for \"" + search_text + L"\".";
-    win32::TaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
+    win::TaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(GetWindowHandle());
@@ -146,7 +146,7 @@ void SearchDialog::ParseResults(const wstring& data) {
   }
 
   if (data == L"Invalid credentials") {
-    win32::TaskDialog dlg(L"Search Anime", TD_ERROR_ICON);
+    win::TaskDialog dlg(L"Search Anime", TD_ERROR_ICON);
     dlg.SetMainInstruction(L"Invalid username or password.");
     dlg.SetContent(L"Anime search requires authentication, which means, you need to "
                    L"enter a valid username and password to search MyAnimeList.");

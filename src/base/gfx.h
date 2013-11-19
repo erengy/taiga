@@ -20,10 +20,10 @@
 #define GFX_H
 
 #include "std.h"
-#include "win32/win_gdi.h"
-#include "win32/win_gdiplus.h"
+#include "win/win_gdi.h"
+#include "win/win_gdiplus.h"
 
-extern win32::GdiPlus GdiPlus;
+extern win::GdiPlus GdiPlus;
 
 // =============================================================================
 
@@ -33,7 +33,7 @@ BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, 
 BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, DWORD dwColor3);
 
 COLORREF HexToARGB(const wstring& text);
-win32::Rect ResizeRect(const win32::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y);
+win::Rect ResizeRect(const win::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y);
 int ScaleX(int value);
 int ScaleY(int value);
 void RgbToHsv(float r, float g, float b, float& h, float& s, float& v);
@@ -44,8 +44,8 @@ class Image {
 public:
   Image() : data(0) {}
   bool Load(const wstring& file);
-  win32::Dc dc;
-  win32::Rect rect;
+  win::Dc dc;
+  win::Rect rect;
   LPARAM data;
 };
 

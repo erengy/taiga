@@ -20,7 +20,7 @@
 #define LOGGER_H
 
 #include "std.h"
-#include "win32/win_thread.h"
+#include "win/win_thread.h"
 
 enum SeverityLevels {
   LevelEmergency,
@@ -44,7 +44,7 @@ public:
   void SetSeverityLevel(int severity_level);
 
 private:
-  win32::CriticalSection critical_section_;
+  win::CriticalSection critical_section_;
   wstring output_path_;
   int severity_level_;
 };

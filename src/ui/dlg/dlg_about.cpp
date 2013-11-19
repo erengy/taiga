@@ -29,7 +29,7 @@
 #include "taiga/taiga.h"
 #include "base/time.h"
 
-#include "win32/win_gdi.h"
+#include "win/win_gdi.h"
 
 class AboutDialog AboutDialog;
 
@@ -156,8 +156,8 @@ BOOL AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  win32::Dc dc = hdc;
-  win32::Rect rect;
+  win::Dc dc = hdc;
+  win::Rect rect;
 
   // Paint background
   GetClientRect(&rect);

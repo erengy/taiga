@@ -22,6 +22,7 @@
 #include "base/std.h"
 #include "track/feed.h"
 #include "http.h"
+#include "win/win_main.h"
 
 // =============================================================================
 
@@ -30,7 +31,7 @@ public:
   UpdateHelper();
   virtual ~UpdateHelper() {}
 
-  bool Check(win32::App& app);
+  bool Check(win::App& app);
   bool Download();
   bool IsDownloadAllowed() const;
   bool IsRestartRequired() const;
@@ -45,7 +46,7 @@ private:
   const GenericFeedItem* FindItem(const wstring& guid) const;
   unsigned long GetVersionValue(int major, int minor, int revision) const;
 
-  win32::App* app_;
+  win::App* app_;
   vector<GenericFeedItem> items_;
   wstring download_path_;
   wstring latest_guid_;

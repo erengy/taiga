@@ -23,7 +23,7 @@
 
 #include "third_party/oauth/oauth.h"
 
-#include "win32/win_window.h"
+#include "win/win_window.h"
 
 namespace anime {
 class Episode;
@@ -102,7 +102,7 @@ public:
   wstring current_mood, previous_mood;
 
 private:
-  class Window : public win32::Window {
+  class Window : public win::Window {
   public:
     Window() {}
     virtual ~Window() {}

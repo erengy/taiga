@@ -20,9 +20,9 @@
 #define DLG_ANIME_LIST_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
-#include "win32/win_gdi.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
+#include "win/win_gdi.h"
 
 namespace anime {
 class Item;
@@ -30,7 +30,7 @@ class Item;
 
 // =============================================================================
 
-class AnimeListDialog : public win32::Dialog {
+class AnimeListDialog : public win::Dialog {
 public:
   AnimeListDialog();
   virtual ~AnimeListDialog() {}
@@ -53,7 +53,7 @@ public:
 
 public:
   // List-view control
-  class ListView : public win32::ListView {
+  class ListView : public win::ListView {
   public:
     ListView();
     
@@ -65,17 +65,17 @@ public:
     int GetSortType(int column);
     void RefreshItem(int index);
     
-    win32::Rect button_rect[3];
+    win::Rect button_rect[3];
     bool button_visible[3];
     bool dragging;
-    win32::ImageList drag_image;
+    win::ImageList drag_image;
     int hot_item;
-    win32::Tooltip tooltips;
+    win::Tooltip tooltips;
     AnimeListDialog* parent;
   } listview;
 
   // Other controls
-  win32::Tab tab;
+  win::Tab tab;
 
 private:
   int current_id_;

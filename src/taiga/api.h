@@ -21,7 +21,7 @@
 
 #include "base/std.h"
 
-#include "win32/win_window.h"
+#include "win/win_window.h"
 
 namespace anime {
 class Episode;
@@ -44,7 +44,7 @@ private:
   UINT wm_ready;
   UINT wm_quit;
 
-  class Window : public win32::Window {
+  class Window : public win::Window {
   public:
     Window() {}
     virtual ~Window() {}

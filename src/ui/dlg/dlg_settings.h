@@ -22,8 +22,8 @@
 #include "base/std.h"
 #include "dlg_settings_page.h"
 #include "track/feed.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 enum SettingsSections {
   SECTION_SERVICES = 1,
@@ -35,7 +35,7 @@ enum SettingsSections {
 };
 // =============================================================================
 
-class SettingsDialog : public win32::Dialog {
+class SettingsDialog : public win::Dialog {
 public:
   SettingsDialog();
   virtual ~SettingsDialog() {}
@@ -57,12 +57,12 @@ public:
   void RefreshTwitterLink();
 
 private:
-  class TreeView : public win32::TreeView {
+  class TreeView : public win::TreeView {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     std::map<int, HTREEITEM> items;
   } tree_;
-  win32::Tab tab_;
+  win::Tab tab_;
 
 private:
   int current_section_;

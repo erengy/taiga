@@ -33,7 +33,7 @@
 #include "taiga/taiga.h"
 #include "ui/theme.h"
 
-#include "win32/win_gdi.h"
+#include "win/win_gdi.h"
 
 class TorrentDialog TorrentDialog;
 
@@ -340,7 +340,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rcWindow;
+      win::Rect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
@@ -424,8 +424,8 @@ void TorrentDialog::RefreshList() {
   if (!feed->title.empty()) {
     title = feed->title;
   } else if (!feed->link.empty()) {
-    win32::Url url(feed->link);
-    title += L" (" + url.Host + L")";
+    win::http::Url url(feed->link);
+    title += L" (" + url.host + L")";
   }
   if (!feed->description.empty()) {
     title += L" - " + feed->description;

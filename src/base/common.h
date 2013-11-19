@@ -83,10 +83,6 @@ wstring ToSizeString(QWORD qwSize);
 wstring SimpleEncrypt(wstring str);
 wstring SimpleDecrypt(wstring str);
 
-// gzip.cpp
-bool UncompressGzippedFile(const string& file, string& output);
-bool UncompressGzippedString(const string& input, string& output);
-
 // list_sort.cpp
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 

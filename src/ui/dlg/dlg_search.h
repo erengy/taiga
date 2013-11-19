@@ -23,12 +23,12 @@
 
 #include "library/anime_filter.h"
 
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class SearchDialog : public win32::Dialog {
+class SearchDialog : public win::Dialog {
 public:
   SearchDialog() {};
   virtual ~SearchDialog() {};
@@ -50,7 +50,7 @@ public:
 private:
   vector<int> anime_ids_;
   anime::Filters filters_;
-  win32::ListView list_;
+  win::ListView list_;
 };
 
 extern class SearchDialog SearchDialog;

@@ -58,8 +58,8 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
       // Draw score bars
       if (wParam == IDC_STATIC_ANIME_STAT2) {
         LPDRAWITEMSTRUCT dis = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-        win32::Rect rect = dis->rcItem;
-        win32::Dc dc = dis->hDC;
+        win::Rect rect = dis->rcItem;
+        win::Dc dc = dis->hDC;
 
         dc.FillRect(dis->rcItem, ::GetSysColor(COLOR_WINDOW));
         
@@ -79,7 +79,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
           if (Stats.score_count[i] > 0.0f) {
             wstring text = ToWstr(Stats.score_count[i]);
-            win32::Rect rect_text = rect;
+            win::Rect rect_text = rect;
             rect_text.left = rect_text.right += 8;
             rect_text.right = dis->rcItem.right;
             dc.EditFont(nullptr, 7);
@@ -103,8 +103,8 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 }
 
 void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
-  win32::Dc dc = hdc;
-  win32::Rect rect;
+  win::Dc dc = hdc;
+  win::Rect rect;
 
   // Paint background
   rect.Copy(lpps->rcPaint);
@@ -112,8 +112,8 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint header lines
   for (int i = 0; i < 4; i++) {
-    win32::Rect rect_header;
-    win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+    win::Rect rect_header;
+    win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
     header.GetWindowRect(m_hWindow, &rect_header);
     rect_header.top = rect_header.bottom + 3;
     rect_header.bottom =  rect_header.top + 1;
@@ -127,14 +127,14 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rect;
+      win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
       rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, -ScaleY(WIN_CONTROL_MARGIN));
 
       // Headers
       for (int i = 0; i < 4; i++) {
-        win32::Rect rect_header;
-        win32::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
+        win::Rect rect_header;
+        win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
         header.GetWindowRect(m_hWindow, &rect_header);
         rect_header.right = rect.right;
         header.SetPosition(nullptr, rect_header);
@@ -162,8 +162,8 @@ void StatsDialog::Refresh() {
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());
 
   // Score distribution
-  win32::Window window = GetDlgItem(IDC_STATIC_ANIME_STAT2);
-  win32::Rect rect;
+  win::Window window = GetDlgItem(IDC_STATIC_ANIME_STAT2);
+  win::Rect rect;
   window.GetWindowRect(GetWindowHandle(), &rect);
   InvalidateRect(&rect);
   window.SetWindowHandle(nullptr);

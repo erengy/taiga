@@ -54,8 +54,8 @@
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/dlg/dlg_update.h"
 
-#include "win32/win_taskbar.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_taskbar.h"
+#include "win/win_taskdialog.h"
 
 // =============================================================================
 
@@ -199,7 +199,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"SearchAnime") {
     if (body.empty()) return;
     if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty()) {
-      win32::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+      win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"Would you like to set your account information first?");
       dlg.SetContent(L"Anime search requires authentication, which means, "
         L"you need to enter a valid username and password to search MyAnimeList.");
@@ -406,7 +406,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditDelete") {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    win32::TaskDialog dlg;
+    win::TaskDialog dlg;
     dlg.SetWindowTitle(anime_item->GetTitle().c_str());
     dlg.SetMainIcon(TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Are you sure you want to delete this title from your list?");
@@ -580,7 +580,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (!anime_item || !anime_item->IsInList()) return;
     MainDialog.ChangeStatus(L"Searching for folder...");
     if (!anime_item->CheckFolder()) {
-      win32::TaskDialog dlg;
+      win::TaskDialog dlg;
       dlg.SetWindowTitle(L"Folder Not Found");
       dlg.SetMainIcon(TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"Taiga couldn't find the folder of this anime. "
@@ -669,7 +669,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         }
       }
     }
-    win32::TaskDialog dlg;
+    win::TaskDialog dlg;
     dlg.SetWindowTitle(L"Play Random Episode");
     dlg.SetMainIcon(TD_ICON_ERROR);
     dlg.SetMainInstruction(L"Could not find any episode to play.");
@@ -708,7 +708,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       if (anime_item->PlayEpisode(anime_item->GetMyLastWatchedEpisode() + 1))
         return;
     }
-    win32::TaskDialog dlg;
+    win::TaskDialog dlg;
     dlg.SetWindowTitle(L"Play Random Anime");
     dlg.SetMainIcon(TD_ICON_ERROR);
     dlg.SetMainInstruction(L"Could not find any episode to play.");
@@ -725,7 +725,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       SeasonDialog.RefreshStatus();
       SeasonDialog.RefreshToolbar();
       if (SeasonDatabase.IsRefreshRequired()) {
-        win32::TaskDialog dlg;
+        win::TaskDialog dlg;
         wstring title = L"Season - " + SeasonDatabase.name;
         dlg.SetWindowTitle(title.c_str());
         dlg.SetMainIcon(TD_ICON_INFORMATION);

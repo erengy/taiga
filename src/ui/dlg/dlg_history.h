@@ -20,12 +20,12 @@
 #define DLG_HISTORY_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class HistoryDialog : public win32::Dialog {
+class HistoryDialog : public win::Dialog {
 public:
   HistoryDialog() {}
   virtual ~HistoryDialog() {}
@@ -42,7 +42,7 @@ public:
   bool RemoveItems();
 
 private:
-  win32::ListView list_;
+  win::ListView list_;
 };
 
 extern class HistoryDialog HistoryDialog;

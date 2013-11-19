@@ -20,12 +20,12 @@
 #define DLG_INPUT_H
 
 #include "base/std.h"
-#include "win32/win_control.h"
-#include "win32/win_dialog.h"
+#include "win/ctrl/win_ctrl.h"
+#include "win/win_dialog.h"
 
 // =============================================================================
 
-class InputDialog : public win32::Dialog {
+class InputDialog : public win::Dialog {
 public:
   InputDialog();
   virtual ~InputDialog() {}
@@ -45,8 +45,8 @@ public:
 private:
   int current_value_, min_value_, max_value_;
   bool numbers_only_;
-  win32::Edit edit_;
-  win32::Spin spin_;
+  win::Edit edit_;
+  win::Spin spin_;
 };
 
 #endif // DLG_INPUT_H

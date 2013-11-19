@@ -40,8 +40,8 @@
 
 #include "ui/dlg/dlg_update.h"
 
-#include "win32/win_taskbar.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_taskbar.h"
+#include "win/win_taskdialog.h"
 
 HINSTANCE g_hInstance;
 HWND g_hMain;

@@ -32,7 +32,7 @@
 #include "taiga/taiga.h"
 #include "ui/theme.h"
 
-#include "win32/win_gdi.h"
+#include "win/win_gdi.h"
 
 class SeasonDialog SeasonDialog;
 
@@ -139,7 +139,7 @@ LRESULT SeasonDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      win32::Rect rcWindow;
+      win::Rect rcWindow;
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
@@ -209,10 +209,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
   LRESULT result = CDRF_DODEFAULT;
   LPNMLVCUSTOMDRAW pCD = reinterpret_cast<LPNMLVCUSTOMDRAW>(lParam);
 
-  win32::Dc hdc = pCD->nmcd.hdc;
-  win32::Rect rect = pCD->nmcd.rc;
+  win::Dc hdc = pCD->nmcd.hdc;
+  win::Rect rect = pCD->nmcd.rc;
 
-  if (win32::GetWinVersion() < win32::VERSION_VISTA) {
+  if (win::GetWinVersion() < win::VERSION_VISTA) {
     list_.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rect);
   }
 
@@ -247,10 +247,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (!anime_item) break;
       
       // Draw border
-      if (win32::GetWinVersion() > win32::VERSION_XP) {
+      if (win::GetWinVersion() > win::VERSION_XP) {
         rect.Inflate(-4, -4);
       }
-      if (win32::GetWinVersion() < win32::VERSION_VISTA && 
+      if (win::GetWinVersion() < win::VERSION_VISTA && 
           pCD->nmcd.uItemState & CDIS_SELECTED) {
         hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
       } else {
@@ -265,16 +265,16 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       int text_height = GetTextHeight(hdc.Get());
 
       // Calculate areas
-      win32::Rect rect_image(
+      win::Rect rect_image(
         rect.left + 4, rect.top + 4, 
         rect.left + 124, rect.bottom - 4);
-      win32::Rect rect_title(
+      win::Rect rect_title(
         rect_image.right + 4, rect_image.top, 
         rect.right - 4, rect_image.top + text_height + 8);
-      win32::Rect rect_details(
+      win::Rect rect_details(
         rect_title.left + 4, rect_title.bottom + 4, 
         rect_title.right, rect_title.bottom + 4 + (6 * (text_height + 2)));
-      win32::Rect rect_synopsis(
+      win::Rect rect_synopsis(
         rect_details.left, rect_details.bottom + 4, 
         rect_details.right, rect_image.bottom);
 
