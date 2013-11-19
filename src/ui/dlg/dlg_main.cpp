@@ -874,6 +874,9 @@ void MainDialog::UpdateStatusTimer() {
 
 void MainDialog::UpdateTip() {
   wstring tip = APP_TITLE;
+#ifdef _DEBUG
+  tip += L" [debug]";
+#endif
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     tip += L"\nWatching: " + anime_item->GetTitle() + 
@@ -884,6 +887,9 @@ void MainDialog::UpdateTip() {
 
 void MainDialog::UpdateTitle() {
   wstring title = APP_TITLE;
+#ifdef _DEBUG
+  title += L" [debug]";
+#endif
   if (!Settings.Account.MAL.user.empty()) {
     title += L" \u2013 " + Settings.Account.MAL.user;
   }

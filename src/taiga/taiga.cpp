@@ -77,11 +77,10 @@ BOOL Taiga::InitInstance() {
   OleInitialize(NULL);
 
   // Initialize logger
+  Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) + APP_NAME L".log");
 #ifdef _DEBUG
-  Logger.SetOutputPath(AddTrailingSlash(GetCurrentDirectory()) + L"Taiga_debug.log");
   Logger.SetSeverityLevel(LevelDebug);
 #else
-  Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) + L"Taiga.log");
   Logger.SetSeverityLevel(LevelWarning);
 #endif
 
@@ -128,11 +127,6 @@ void Taiga::Uninitialize() {
 // =============================================================================
 
 wstring Taiga::GetDataPath() {
-  // Return current working directory in debug mode
-#ifdef _DEBUG
-  return AddTrailingSlash(GetCurrentDirectory()) + L"data\\";
-#endif
-  
   // Return current path in portable mode
 #ifdef PORTABLE
   return AddTrailingSlash(GetPathOnly(GetModulePath())) + L"data\\";
