@@ -41,6 +41,8 @@ public:
   Request();
   virtual ~Request() {}
 
+  void Clear();
+
   std::wstring method;
   std::wstring host;
   std::wstring path;
@@ -57,6 +59,8 @@ public:
   Response();
   virtual ~Response() {}
 
+  void Clear();
+
   unsigned int code;
   header_t header;
   std::wstring body;
@@ -71,7 +75,7 @@ public:
   virtual ~Client();
 
   void Cleanup();
-  bool MakeRequest(const Request& request);
+  bool MakeRequest(Request request);
 
   const Request& request() const;
   const Response& response() const;
@@ -95,11 +99,12 @@ protected:
   Request request_;
   Response response_;
 
-  bool auto_redirect_;
   LPSTR buffer_;
   ContentEncoding content_encoding_;
   DWORD content_length_;
   DWORD current_length_;
+
+  bool auto_redirect_;
   std::wstring download_path_;
   std::wstring proxy_host_;
   std::wstring proxy_password_;

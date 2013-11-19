@@ -17,6 +17,7 @@
 */
 
 #include "win_http.h"
+#include "base/common.h"
 #include "base/string.h"
 
 namespace win {
@@ -24,12 +25,28 @@ namespace http {
 
 Request::Request()
     : method(L"GET"), parameter(0) {
-  // TODO: Generate a UUID
-  uuid = L"test-1234567890";
+  // TODO: Generate a real UUID
+  static int counter = 0;
+  uuid = L"test-" + PadChar(ToWstr(counter++), L'0', 8);
 }
 
 Response::Response()
     : code(0), parameter(0) {
+}
+
+void Request::Clear() {
+  method = L"GET";
+  host.clear();
+  path.clear();
+  query.clear();
+  header.clear();
+  body.clear();
+}
+
+void Response::Clear() {
+  code = 0;
+  header.clear();
+  body.clear();
 }
 
 Client::Client()
@@ -66,6 +83,10 @@ void Client::Cleanup() {
     session_handle_ = nullptr;
   }
 
+  // Clear request and response
+  request_.Clear();
+  response_.Clear();
+
   // Clear buffer
   if (buffer_) {
     delete [] buffer_;
@@ -94,6 +115,10 @@ void Client::set_auto_redirect(bool enabled) {
 
 void Client::set_download_path(const std::wstring& download_path) {
   download_path_ = download_path;
+
+  // Make sure the path is available
+  if (!download_path.empty())
+    CreateFolder(GetPathOnly(download_path));
 }
 
 void Client::set_proxy(const std::wstring& host,

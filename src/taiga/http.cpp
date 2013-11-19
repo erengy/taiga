@@ -171,9 +171,7 @@ bool HttpClient::OnRedirect(const std::wstring& address) {
     }
   }
 
-#ifdef _DEBUG
-      MainDialog.ChangeStatus(L"Redirecting... (" + address + L")");
-#endif
+  LOG(LevelDebug, L"Redirecting... (" + address + L")");
 
   return false;
 }

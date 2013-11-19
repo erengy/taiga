@@ -82,6 +82,7 @@ bool Client::ParseResponseHeader() {
       content_encoding_ = kContentEncodingNone;
       content_length_ = 0;
       current_length_ = 0;
+      response_.Clear();
     }
   }
 

@@ -23,7 +23,7 @@
 namespace win {
 namespace http {
 
-bool Client::MakeRequest(const Request& request) {
+bool Client::MakeRequest(Request request) {
   Cleanup();  // Close any previous connection
 
   // Set the new request
