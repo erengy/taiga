@@ -40,7 +40,7 @@ public:
 
   wstring ConsumerKey, ConsumerSecret;
 
-  wstring BuildHeader(
+  wstring BuildAuthorizationHeader(
     const wstring& url, 
     const wstring& http_method, 
     const OAuthParameters* post_parameters = NULL, 

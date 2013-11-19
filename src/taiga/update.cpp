@@ -25,13 +25,14 @@
 #include "base/foreach.h"
 #include "settings.h"
 #include "base/string.h"
+#include "base/types.h"
 #include "taiga.h"
 #include "base/xml.h"
 
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_update.h"
 
-#include "win32/win_taskdialog.h"
+#include "win/win_taskdialog.h"
 
 // =============================================================================
 
@@ -43,20 +44,20 @@ UpdateHelper::UpdateHelper()
 
 // =============================================================================
 
-bool UpdateHelper::Check(win32::App& app) {
+bool UpdateHelper::Check(win::App& app) {
   app_ = &app;
 
-  wstring address = L"taiga.erengy.com/update.php?";
-  std::map<wstring, wstring> parameters;
-  parameters[L"username"] = Settings.Account.MAL.user;
-  parameters[L"version"] = APP_VERSION;
-  parameters[L"check"] = MainDialog.IsWindow() ? L"manual" : L"auto";
-  foreach_c_(parameter, parameters) {
-    if (parameter != parameters.begin()) address += L"&";
-    address += parameter->first + L"=" + EncodeUrl(parameter->second);
-  }
-  
-  return client.Get(win32::Url(address), L"", HTTP_UpdateCheck);
+  HttpRequest http_request;
+  http_request.host = L"taiga.erengy.com";
+  http_request.path = L"/update.php";
+  http_request.query.insert(std::make_pair(L"username", Settings.Account.MAL.user));
+  http_request.query.insert(std::make_pair(L"version", APP_VERSION));
+  http_request.query.insert(std::make_pair(L"check", MainDialog.IsWindow() ? L"manual" : L"auto"));
+
+  client.set_download_path(L"");
+  client.SetClientMode(HTTP_UpdateCheck);
+
+  return client.MakeRequest(http_request);
 }
 
 bool UpdateHelper::ParseData(wstring data) {
@@ -120,7 +121,7 @@ bool UpdateHelper::IsUpdateAvailable() const {
 }
 
 bool UpdateHelper::IsDownloadAllowed() const {
-  win32::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
+  win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
   dlg.SetFooter(L"Current version: " APP_VERSION);
 
   if (IsUpdateAvailable()) {
@@ -158,9 +159,16 @@ bool UpdateHelper::Download() {
   download_path_ = AddTrailingSlash(GetPathOnly(app_->GetModulePath()));
   download_path_ += GetFileName(feed_item->link);
 
-  win32::Url url(feed_item->link);
+  win::http::Url url(feed_item->link);
   
-  return client.Get(url, download_path_, HTTP_UpdateDownload);
+  HttpRequest http_request;
+  http_request.host = url.host;
+  http_request.path = url.path;
+
+  client.set_download_path(download_path_);
+  client.SetClientMode(HTTP_UpdateDownload);
+
+  return client.MakeRequest(http_request);
 }
 
 bool UpdateHelper::RunInstaller() {

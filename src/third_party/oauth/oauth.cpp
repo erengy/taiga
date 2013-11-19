@@ -37,7 +37,7 @@ using std::wstring;
 
 // =============================================================================
 
-wstring COAuth::BuildHeader(
+wstring COAuth::BuildAuthorizationHeader(
   const wstring& url, 
   const wstring& http_method, 
   const OAuthParameters* post_parameters, 
@@ -54,7 +54,7 @@ wstring COAuth::BuildHeader(
       oauth_token, oauth_token_secret, pin);
 
   // Build and return OAuth header
-  wstring oauth_header = L"Authorization: OAuth ";
+  wstring oauth_header = L"OAuth ";
   for (OAuthParameters::const_iterator it = signed_parameters.begin(); 
        it != signed_parameters.end(); ++it) {
          if (it != signed_parameters.begin()) oauth_header += L", ";

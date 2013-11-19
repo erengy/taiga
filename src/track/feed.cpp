@@ -28,13 +28,14 @@
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"
+#include "base/types.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
 
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_torrent.h"
 
-#include "win32/win_taskbar.h"
+#include "win/win_taskbar.h"
 
 class Aggregator Aggregator;
 
@@ -67,9 +68,17 @@ bool Feed::Check(const wstring& source, bool automatic) {
       break;
   }
 
-  return client.Get(win32::Url(link), GetDataPath() + L"feed.xml",
-                    automatic ? HTTP_Feed_CheckAuto : HTTP_Feed_Check,
-                    reinterpret_cast<LPARAM>(this));
+  win::http::Url url(link);
+  
+  HttpRequest http_request;
+  http_request.host = url.host;
+  http_request.path = url.path;
+  http_request.parameter = reinterpret_cast<LPARAM>(this);
+
+  client.set_download_path(GetDataPath() + L"feed.xml");
+  client.SetClientMode(automatic ? HTTP_Feed_CheckAuto : HTTP_Feed_Check);
+  
+  return client.MakeRequest(http_request);
 }
 
 bool Feed::Download(int index) {
@@ -96,8 +105,17 @@ bool Feed::Download(int index) {
   ValidateFileName(file);
   file = GetDataPath() + file;
 
-  return client.Get(win32::Url(items[index].link), file, dwMode, 
-                    reinterpret_cast<LPARAM>(this));
+  win::http::Url url(items[index].link);
+  
+  HttpRequest http_request;
+  http_request.host = url.host;
+  http_request.path = url.path;
+  http_request.parameter = reinterpret_cast<LPARAM>(this);
+
+  client.set_download_path(file);
+  client.SetClientMode(dwMode);
+  
+  return client.MakeRequest(http_request);
 }
 
 bool Feed::ExamineData() {
@@ -139,8 +157,8 @@ bool Feed::ExamineData() {
 wstring Feed::GetDataPath() {
   wstring path = Taiga.GetDataPath() + L"feed\\";
   if (!link.empty()) {
-    win32::Url url(link);
-    path += Base64Encode(url.Host, true) + L"\\";
+    win::http::Url url(link);
+    path += Base64Encode(url.host, true) + L"\\";
   }
   return path;
 }
@@ -158,8 +176,14 @@ HICON Feed::GetIcon() {
     icon_ = GdiPlus.LoadIcon(path);
     return icon_;
   } else {
-    win32::Url url(link + L"/favicon.ico");
-    client.Get(url, path, HTTP_Feed_DownloadIcon, reinterpret_cast<LPARAM>(this));
+    win::http::Url url(link + L"/favicon.ico");
+    HttpRequest http_request;
+    http_request.host = url.host;
+    http_request.path = url.path;
+    http_request.parameter = reinterpret_cast<LPARAM>(this);
+    client.set_download_path(path);
+    client.SetClientMode(HTTP_Feed_DownloadIcon);
+    client.MakeRequest(http_request);
     return NULL;
   }
 }

@@ -27,6 +27,7 @@
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "base/string.h"
+#include "base/types.h"
 #include "taiga/taiga.h"
 #include "base/time.h"
 #include "base/xml.h"
@@ -48,12 +49,17 @@ bool AskToDiscuss(int anime_id, int episode_number) {
     L"&aid=" + ToWstr(anime_id) +
     L"&id=" + ToWstr(anime_id);
 
-  return Clients.service.list.Post(
-    L"myanimelist.net",
-    L"/includes/ajax.inc.php?t=50",
-    data, L"",
-    HTTP_MAL_AnimeAskToDiscuss,
-    anime_id);
+  HttpRequest http_request;
+  http_request.method = L"POST";
+  http_request.host = L"myanimelist.net";
+  http_request.path = L"/includes/ajax.inc.php?t=50";
+  http_request.body = data;
+  http_request.parameter = anime_id;
+
+  Clients.service.list.set_download_path(L"");
+  Clients.service.list.SetClientMode(HTTP_MAL_AnimeAskToDiscuss);
+
+  return Clients.service.list.MakeRequest(http_request);
 }
 
 bool GetAnimeDetails(int anime_id) {
@@ -63,24 +69,31 @@ bool GetAnimeDetails(int anime_id) {
   } else {
     client = &Clients.service.search;
   }
-  
-  return client->Connect(
-    L"myanimelist.net",
-    L"/includes/ajax.inc.php?t=64&id=" + ToWstr(anime_id),
-    L"", L"GET", L"", L"myanimelist.net", L"",
-    HTTP_MAL_AnimeDetails,
-    anime_id);
+
+  HttpRequest http_request;
+  http_request.host = L"myanimelist.net";
+  http_request.path = L"/includes/ajax.inc.php?t=64&id=" + ToWstr(anime_id);
+  http_request.parameter = anime_id;
+
+  client->set_download_path(L"");
+  client->SetClientMode(HTTP_MAL_AnimeDetails);
+
+  return client->MakeRequest(http_request);
 }
 
 bool GetList() {
   if (Settings.Account.MAL.user.empty())
     return false;
 
-  return Clients.service.list.Connect(
-    L"myanimelist.net",
-    L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all",
-    L"", L"GET", L"Accept-Encoding: gzip", L"", L"",
-    HTTP_MAL_RefreshList);
+  HttpRequest http_request;
+  http_request.host = L"myanimelist.net";
+  http_request.path = L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all";
+  http_request.header.insert(std::make_pair(L"Accept-Encoding", L"gzip"));
+
+  Clients.service.list.set_download_path(L"");
+  Clients.service.list.SetClientMode(HTTP_MAL_RefreshList);
+
+  return Clients.service.list.MakeRequest(http_request);
 }
 
 bool Login() {
@@ -89,14 +102,15 @@ bool Login() {
       Settings.Account.MAL.password.empty())
     return false;
 
-  wstring header = Clients.service.list.GetDefaultHeader() +
-                   L"Authorization: Basic " + GetUserPassEncoded();
+  HttpRequest http_request;
+  http_request.host = L"myanimelist.net";
+  http_request.path = L"/api/account/verify_credentials.xml";
+  http_request.header.insert(std::make_pair(L"Authorization", L"Basic " + GetUserPassEncoded()));
 
-  return Clients.service.list.Connect(
-    L"myanimelist.net", 
-    L"/api/account/verify_credentials.xml", 
-    L"", L"GET", header, L"myanimelist.net", L"", 
-    HTTP_MAL_Login);
+  Clients.service.list.set_download_path(L"");
+  Clients.service.list.SetClientMode(HTTP_MAL_Login);
+
+  return Clients.service.list.MakeRequest(http_request);
 }
 
 bool DownloadImage(int anime_id, const wstring& image_url) {
@@ -110,17 +124,24 @@ bool DownloadImage(int anime_id, const wstring& image_url) {
     client = &Clients.service.image;
   }
   
-  return client->Get(win32::Url(image_url), 
-                     anime::GetImagePath(anime_id), 
-                     HTTP_MAL_Image, 
-                     anime_id);
+  win::http::Url url(image_url);
+  
+  HttpRequest http_request;
+  http_request.host = url.host;
+  http_request.path = url.path;
+  http_request.parameter = anime_id;
+
+  client->set_download_path(anime::GetImagePath(anime_id));
+  client->SetClientMode(HTTP_MAL_Image);
+
+  return client->MakeRequest(http_request);
 }
 
 bool DownloadUserImage(bool thumb) {
   if (!AnimeDatabase.user.GetId())
     return false;
   
-  win32::Url url;
+  win::http::Url url;
   wstring path = Taiga.GetDataPath() + L"user\\" + 
                  AnimeDatabase.user.GetName() + L"\\";
   
@@ -133,8 +154,15 @@ bool DownloadUserImage(bool thumb) {
               ToWstr(AnimeDatabase.user.GetId()) + L".jpg");
     path += ToWstr(AnimeDatabase.user.GetId()) + L".jpg";
   }
-  
-  return Clients.service.image.Get(url, path, HTTP_MAL_UserImage);
+
+  HttpRequest http_request;
+  http_request.host = url.host;
+  http_request.path = url.path;
+
+  Clients.service.image.set_download_path(path);
+  Clients.service.image.SetClientMode(HTTP_MAL_UserImage);
+
+  return Clients.service.image.MakeRequest(http_request);
 }
 
 bool ParseAnimeDetails(const wstring& data) {
@@ -220,15 +248,16 @@ bool SearchAnime(int anime_id, wstring title) {
       Settings.Account.MAL.password.empty())
     return false;
 
-  wstring header = client->GetDefaultHeader() + 
-                   L"Authorization: Basic " + GetUserPassEncoded();
+  HttpRequest http_request;
+  http_request.host = L"myanimelist.net";
+  http_request.path = L"/api/anime/search.xml?q=" + title;
+  http_request.header.insert(std::make_pair(L"Authorization", L"Basic " + GetUserPassEncoded()));
+  http_request.parameter = anime_id;
 
-  return client->Connect(
-    L"myanimelist.net",
-    L"/api/anime/search.xml?q=" + title,
-    L"", L"GET", header, L"myanimelist.net", L"",
-    HTTP_MAL_SearchAnime,
-    anime_id);
+  client->set_download_path(L"");
+  client->SetClientMode(HTTP_MAL_SearchAnime);
+
+  return client->MakeRequest(http_request);
 }
 
 bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
@@ -270,7 +299,7 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
   #undef ADD_DATA_S
   #undef ANIME
 
-  win32::Url url;
+  win::http::Url url;
   switch (update_mode) {
     // Add anime
     case HTTP_MAL_AnimeAdd:
@@ -286,14 +315,18 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
       break;
   }
 
-  wstring header = Clients.service.list.GetDefaultHeader() + 
-                   L"Authorization: Basic " + GetUserPassEncoded();
+  HttpRequest http_request;
+  http_request.method = L"POST";
+  http_request.host = url.host;
+  http_request.path = url.path;
+  http_request.body = data;
+  http_request.parameter = static_cast<LPARAM>(anime_id);
+  http_request.header.insert(std::make_pair(L"Authorization", L"Basic " + GetUserPassEncoded()));
 
-  Clients.service.list.Connect(
-    url, data, L"POST", header, L"myanimelist.net", L"", 
-    update_mode, static_cast<LPARAM>(anime_id));
+  Clients.service.list.set_download_path(L"");
+  Clients.service.list.SetClientMode(update_mode);
 
-  return true;
+  return Clients.service.list.MakeRequest(http_request);
 }
 
 bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {

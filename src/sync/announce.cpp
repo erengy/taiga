@@ -32,7 +32,7 @@
 
 #include "ui/dlg/dlg_main.h"
 
-#include "win32/win_taskdialog.h"
+#include "win/win_taskdialog.h"
 
 class Announcer Announcer;
 class Skype Skype;
@@ -128,7 +128,17 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 void Announcer::ToHttp(wstring address, wstring data) {
   if (address.empty() || data.empty()) return;
 
-  Clients.sharing.http.Post(win32::Url(address), data, L"", HTTP_Silent);
+  win::http::Url url(address);
+
+  HttpRequest http_request;
+  http_request.method = L"POST";
+  http_request.host = url.host;
+  http_request.path = url.path;
+  http_request.body = data;
+
+  Clients.sharing.http.SetClientMode(HTTP_Silent);
+
+  Clients.sharing.http.MakeRequest(http_request);
 }
 
 // =============================================================================
@@ -168,7 +178,7 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
   // Initialize
   DynamicDataExchange DDE;
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
-    win32::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
+    win::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);
@@ -205,7 +215,7 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
 
   // Connect
   if (!DDE.Connect(service, L"COMMAND")) {
-    win32::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
+    win::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE connection failed.");
     dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
     dlg.AddButton(L"OK", IDOK);
@@ -231,7 +241,7 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
 
 bool Announcer::TestMircConnection(wstring service) {
   wstring content;
-  win32::TaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
+  win::TaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
   dlg.AddButton(L"OK", IDOK);
   
   // Search for mIRC window
@@ -426,30 +436,29 @@ Twitter::Twitter() {
 }
 
 bool Twitter::RequestToken() {
-  wstring header = 
-    Clients.sharing.twitter.GetDefaultHeader() + 
-    oauth.BuildHeader(
-      L"http://api.twitter.com/oauth/request_token", 
-      L"GET", NULL);
+  HttpRequest http_request;
+  http_request.host = L"api.twitter.com";
+  http_request.path = L"oauth/request_token";
+  http_request.header.insert(std::make_pair(L"Authorization",
+      oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/request_token",
+                                     L"GET", NULL)));
 
-  return Clients.sharing.twitter.Connect(
-    L"api.twitter.com", L"oauth/request_token",
-    L"", L"GET", header, L"myanimelist.net", L"",
-    HTTP_Twitter_Request);
+  Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Request);
+
+  return Clients.sharing.twitter.MakeRequest(http_request);
 }
 
 bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
-  wstring header = 
-    Clients.sharing.twitter.GetDefaultHeader() + 
-    oauth.BuildHeader(
-      L"http://api.twitter.com/oauth/access_token", 
-      L"POST", NULL, 
-      key, secret, pin);
+  HttpRequest http_request;
+  http_request.host = L"api.twitter.com";
+  http_request.path = L"oauth/access_token";
+  http_request.header.insert(std::make_pair(L"Authorization",
+      oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/access_token",
+                                     L"POST", NULL, key, secret, pin)));
 
-  return Clients.sharing.twitter.Connect(
-    L"api.twitter.com", L"oauth/access_token",
-    L"", L"GET", header, L"myanimelist.net", L"",
-    HTTP_Twitter_Auth);
+  Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Auth);
+
+  return Clients.sharing.twitter.MakeRequest(http_request);
 }
 
 bool Twitter::SetStatusText(const wstring& status_text) {
@@ -464,19 +473,20 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   OAuthParameters post_parameters;
   post_parameters[L"status"] = EncodeUrl(status_text_);
 
-  wstring header = 
-    Clients.sharing.twitter.GetDefaultHeader() + 
-    oauth.BuildHeader(
-      L"http://api.twitter.com/1.1/statuses/update.json", 
-      L"POST", &post_parameters, 
-      Settings.Announce.Twitter.oauth_key, 
-      Settings.Announce.Twitter.oauth_secret);
+  HttpRequest http_request;
+  http_request.method = L"POST";
+  http_request.host = L"api.twitter.com";
+  http_request.path = L"1.1/statuses/update.json";
+  http_request.body = L"status=" + post_parameters[L"status"];
+  http_request.header.insert(std::make_pair(L"Authorization",
+      oauth.BuildAuthorizationHeader(L"http://api.twitter.com/1.1/statuses/update.json",
+                                     L"POST", &post_parameters,
+                                     Settings.Announce.Twitter.oauth_key,
+                                     Settings.Announce.Twitter.oauth_secret)));
 
-  return Clients.sharing.twitter.Connect(
-    L"api.twitter.com", L"1.1/statuses/update.json", 
-    L"status=" + post_parameters[L"status"],
-    L"POST", header, L"myanimelist.net", L"", 
-    HTTP_Twitter_Post);
+  Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Post);
+
+  return Clients.sharing.twitter.MakeRequest(http_request);
 }
 
 void Announcer::ToTwitter(const wstring& status_text) {

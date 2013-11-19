@@ -47,21 +47,42 @@
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
 
-#include "win32/win_taskbar.h"
-#include "win32/win_taskdialog.h"
+#include "win/win_taskbar.h"
+#include "win/win_taskdialog.h"
 
 HttpClients Clients;
 
 // =============================================================================
 
-HttpClient::HttpClient() {
-  SetAutoRedirect(FALSE);
-  SetUserAgent(APP_NAME L"/" + ToWstr(VERSION_MAJOR) + L"." + ToWstr(VERSION_MINOR));
+HttpClient::HttpClient()
+    : mode_(HTTP_Silent) {
+  set_auto_redirect(false);
+
+  set_user_agent(
+      APP_NAME L"/" + ToWstr(VERSION_MAJOR) + L"." + ToWstr(VERSION_MINOR));
+
+  set_proxy(Settings.Program.Proxy.host,
+            Settings.Program.Proxy.user,
+            Settings.Program.Proxy.password);
 }
 
-BOOL HttpClient::OnError(DWORD dwError) {
-  wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
-                       FormatError(dwError, L"winhttp.dll");
+DWORD HttpClient::GetClientMode() const {
+  return mode_;
+}
+
+void HttpClient::SetClientMode(DWORD mode) {
+  mode_ = mode;
+}
+
+LPARAM HttpClient::GetParam() const {
+  return request_.parameter;
+}
+
+// =============================================================================
+
+void HttpClient::OnError(DWORD error) {
+  wstring error_text = L"HTTP error #" + ToWstr(error) + L": " +
+                       FormatError(error, L"winhttp.dll");
   TrimRight(error_text, L"\r\n");
 
   LOG(LevelError, error_text);
@@ -106,26 +127,25 @@ BOOL HttpClient::OnError(DWORD dwError) {
   }
   
   TaskbarList.SetProgressState(TBPF_NOPROGRESS);
-  return 0;
 }
 
-BOOL HttpClient::OnSendRequestComplete() {
+bool HttpClient::OnSendRequestComplete() {
 #ifdef _DEBUG
   MainDialog.ChangeStatus(L"Connecting...");
 #endif
 
-  return 0;
+  return false;
 }
 
-BOOL HttpClient::OnHeadersAvailable(win32::http_header_t& headers) {
+bool HttpClient::OnHeadersAvailable() {
   switch (GetClientMode()) {
     case HTTP_Silent:
       break;
     case HTTP_UpdateCheck:
     case HTTP_UpdateDownload:
-      if (m_dwTotal > 0) {
+      if (content_length_ > 0) {
         UpdateDialog.progressbar.SetMarquee(false);
-        UpdateDialog.progressbar.SetRange(0, m_dwTotal);
+        UpdateDialog.progressbar.SetRange(0, content_length_);
       } else {
         UpdateDialog.progressbar.SetMarquee(true);
       }
@@ -134,19 +154,19 @@ BOOL HttpClient::OnHeadersAvailable(win32::http_header_t& headers) {
       }
       break;
     default:
-      TaskbarList.SetProgressState(m_dwTotal > 0 ? TBPF_NORMAL : TBPF_INDETERMINATE);
+      TaskbarList.SetProgressState(content_length_ > 0 ? TBPF_NORMAL : TBPF_INDETERMINATE);
       break;
   }
 
-  return 0;
+  return false;
 }
 
-BOOL HttpClient::OnRedirect(wstring address) {
+bool HttpClient::OnRedirect(const std::wstring& address) {
   switch (GetClientMode()) {
     case HTTP_UpdateDownload: {
       wstring file = address.substr(address.find_last_of(L"/") + 1);
-      m_File = GetPathOnly(m_File) + file;
-      Taiga.Updater.SetDownloadPath(m_File);
+      download_path_ = GetPathOnly(download_path_) + file;
+      Taiga.Updater.SetDownloadPath(download_path_);
       break;
     }
   }
@@ -155,10 +175,14 @@ BOOL HttpClient::OnRedirect(wstring address) {
       MainDialog.ChangeStatus(L"Redirecting... (" + address + L")");
 #endif
 
-  return 0;
+  return false;
 }
 
-BOOL HttpClient::OnReadData() {
+bool HttpClient::OnDataAvailable() {
+  return false;
+}
+
+bool HttpClient::OnReadData() {
   wstring status;
 
   switch (GetClientMode()) {
@@ -179,7 +203,7 @@ BOOL HttpClient::OnReadData() {
     case HTTP_MAL_Image:
     case HTTP_MAL_UserImage:
     case HTTP_Silent:
-      return 0;
+      return false;
     case HTTP_Feed_Check:
     case HTTP_Feed_CheckAuto:
       status = L"Checking new torrents...";
@@ -199,28 +223,28 @@ BOOL HttpClient::OnReadData() {
       break;
     case HTTP_UpdateCheck:
     case HTTP_UpdateDownload:
-      if (m_dwTotal > 0) {
-        UpdateDialog.progressbar.SetPosition(m_dwDownloaded);
+      if (content_length_ > 0) {
+        UpdateDialog.progressbar.SetPosition(current_length_);
       }
-      return 0;
+      return false;
     default:
       status = L"Downloading data...";
       break;
   }
 
-  if (m_dwTotal > 0) {
-    TaskbarList.SetProgressValue(m_dwDownloaded, m_dwTotal);
-    status += L" (" + ToWstr(static_cast<int>(((float)m_dwDownloaded / (float)m_dwTotal) * 100)) + L"%)";
+  if (content_length_ > 0) {
+    TaskbarList.SetProgressValue(current_length_, content_length_);
+    status += L" (" + ToWstr(static_cast<int>(((float)current_length_ / (float)content_length_) * 100)) + L"%)";
   } else {
-    status += L" (" + ToSizeString(m_dwDownloaded) + L")";
+    status += L" (" + ToSizeString(current_length_) + L")";
   }
 
   MainDialog.ChangeStatus(status);
 
-  return 0;
+  return false;
 }
 
-BOOL HttpClient::OnReadComplete() {
+bool HttpClient::OnReadComplete() {
   TaskbarList.SetProgressState(TBPF_NOPROGRESS);
   wstring status;
 
@@ -229,10 +253,12 @@ BOOL HttpClient::OnReadComplete() {
   switch (GetClientMode()) {
     // List
     case HTTP_MAL_RefreshList: {
-      wstring data = GetData();
+      wstring data = response_.body;
       if (InStr(data, L"<myanimelist>", 0, true) > -1 &&
           InStr(data, L"<myinfo>", 0, true) > -1) {
         wstring path = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+        // Make sure the path is available
+        CreateFolder(GetPathOnly(path));
         // Take a backup of the previous list just in case
         wstring new_path = path + L".bak";
         MoveFileEx(path.c_str(), new_path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
@@ -240,7 +266,7 @@ BOOL HttpClient::OnReadComplete() {
         HANDLE hFile = ::CreateFile(path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hFile != INVALID_HANDLE_VALUE) {
           DWORD dwBytesWritten = 0;
-          ::WriteFile(hFile, (LPCVOID)m_Buffer, m_dwDownloaded, &dwBytesWritten, NULL);
+          ::WriteFile(hFile, (LPCVOID)buffer_, current_length_, &dwBytesWritten, NULL);
           ::CloseHandle(hFile);
         }
         // Load the list and refresh
@@ -262,7 +288,7 @@ BOOL HttpClient::OnReadComplete() {
     
     // Login
     case HTTP_MAL_Login: {
-      wstring username = InStr(GetData(), L"<username>", L"</username>");
+      wstring username = InStr(response_.body, L"<username>", L"</username>");
       Taiga.logged_in = IsEqual(Settings.Account.MAL.user, username);
       if (Taiga.logged_in) {
         Settings.Account.MAL.user = username;
@@ -270,7 +296,7 @@ BOOL HttpClient::OnReadComplete() {
       } else {
         status = L"Failed to log in.";
 #ifdef _DEBUG
-        status += L" (" + GetData() + L")";
+        status += L" (" + response_.body + L")";
 #else
         status += L" (Invalid username or password)";
 #endif
@@ -299,7 +325,7 @@ BOOL HttpClient::OnReadComplete() {
       auto anime_item = AnimeDatabase.FindItem(anime_id);
       auto event_item = History.queue.GetCurrentItem();
       if (anime_item && event_item) {
-        anime_item->Edit(*event_item, GetData(), GetResponseStatusCode());
+        anime_item->Edit(*event_item, response_.body, response_.code);
         return TRUE;
       }
       break;
@@ -309,7 +335,7 @@ BOOL HttpClient::OnReadComplete() {
 
     // Ask to discuss
     case HTTP_MAL_AnimeAskToDiscuss: {
-      wstring data = GetData();
+      wstring data = response_.body;
       if (InStr(data, L"trueEp") > -1) {
         wstring url = InStr(data, L"self.parent.document.location='", L"';");
         int anime_id = static_cast<int>(GetParam());
@@ -317,7 +343,7 @@ BOOL HttpClient::OnReadComplete() {
           int episode_number = 0; // TODO
           wstring title = AnimeDatabase.FindItem(anime_id)->GetTitle();
           if (episode_number) title += L" #" + ToWstr(episode_number);
-          win32::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
+          win::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
           dlg.SetMainInstruction(L"Someone has already made a discussion topic for this episode!");
           dlg.UseCommandLinks(true);
           dlg.AddButton(L"Discuss it", IDYES);
@@ -336,7 +362,7 @@ BOOL HttpClient::OnReadComplete() {
     // Anime details
     case HTTP_MAL_AnimeDetails: {
       int anime_id = static_cast<int>(GetParam());
-      if (mal::ParseAnimeDetails(GetData())) {
+      if (mal::ParseAnimeDetails(response_.body)) {
         if (AnimeDialog.GetCurrentId() == anime_id)
           AnimeDialog.Refresh(false, true, false);
         if (NowPlayingDialog.GetCurrentId() == anime_id)
@@ -376,7 +402,7 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_MAL_SearchAnime: {
       int anime_id = static_cast<int>(GetParam());
       if (anime_id) {
-        if (mal::ParseSearchResult(GetData(), anime_id)) {
+        if (mal::ParseSearchResult(response_.body, anime_id)) {
           if (AnimeDialog.GetCurrentId() == anime_id)
             AnimeDialog.Refresh(false, true, false, false);
           if (NowPlayingDialog.GetCurrentId() == anime_id)
@@ -398,7 +424,7 @@ BOOL HttpClient::OnReadComplete() {
       } else {
         MainDialog.ChangeStatus();
         if (SearchDialog.IsWindow()) {
-          SearchDialog.ParseResults(GetData());
+          SearchDialog.ParseResults(response_.body);
         }
       }
       break;
@@ -502,7 +528,7 @@ BOOL HttpClient::OnReadComplete() {
 
     // Twitter
     case HTTP_Twitter_Request: {
-      OAuthParameters response = Twitter.oauth.ParseQueryString(GetData());
+      OAuthParameters response = Twitter.oauth.ParseQueryString(response_.body);
       if (!response[L"oauth_token"].empty()) {
         ExecuteLink(L"http://api.twitter.com/oauth/authorize?oauth_token=" + response[L"oauth_token"]);
         InputDialog dlg;
@@ -518,7 +544,7 @@ BOOL HttpClient::OnReadComplete() {
       break;
     }
 	case HTTP_Twitter_Auth: {
-      OAuthParameters access = Twitter.oauth.ParseQueryString(GetData());
+      OAuthParameters access = Twitter.oauth.ParseQueryString(response_.body);
       if (!access[L"oauth_token"].empty() && !access[L"oauth_token_secret"].empty()) {
         Settings.Announce.Twitter.oauth_key = access[L"oauth_token"];
         Settings.Announce.Twitter.oauth_secret = access[L"oauth_token_secret"];
@@ -533,15 +559,15 @@ BOOL HttpClient::OnReadComplete() {
       break;
     }
     case HTTP_Twitter_Post: {
-      if (InStr(GetData(), L"\"errors\"", 0) == -1) {
+      if (InStr(response_.body, L"\"errors\"", 0) == -1) {
         status = L"Twitter status updated.";
       } else {
         status = L"Twitter status update failed.";
-        int index_begin = InStr(GetData(), L"\"message\":\"", 0);
-        int index_end = InStr(GetData(), L"\",\"", index_begin);
+        int index_begin = InStr(response_.body, L"\"message\":\"", 0);
+        int index_end = InStr(response_.body, L"\",\"", index_begin);
         if (index_begin > -1 && index_end > -1) {
           index_begin += 11;
-          status += L" (" + GetData().substr(index_begin, index_end - index_begin) + L")";
+          status += L" (" + response_.body.substr(index_begin, index_end - index_begin) + L")";
         }
       }
       MainDialog.ChangeStatus(status);
@@ -552,7 +578,7 @@ BOOL HttpClient::OnReadComplete() {
 
     // Check updates
     case HTTP_UpdateCheck: {
-      if (Taiga.Updater.ParseData(GetData()))
+      if (Taiga.Updater.ParseData(response_.body))
         if (Taiga.Updater.IsDownloadAllowed())
           if (Taiga.Updater.Download())
             return TRUE;
@@ -572,19 +598,19 @@ BOOL HttpClient::OnReadComplete() {
     // Debug
     default: {
 #ifdef _DEBUG
-      ::MessageBox(0, GetData().c_str(), 0, 0);
+      ::MessageBox(0, response_.body.c_str(), 0, 0);
 #endif
     }
   }
 
-  return FALSE;
+  return false;
 }
 
 // =============================================================================
 
 void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass) {
   Clients.anime.UpdateProxy(proxy, user, pass);
-  #define SET_PROXY(client) client.SetProxy(proxy, user, pass);
+  #define SET_PROXY(client) client.set_proxy(proxy, user, pass);
   SET_PROXY(Clients.application);
   SET_PROXY(Clients.service.image);
   SET_PROXY(Clients.service.list);
@@ -635,13 +661,9 @@ class HttpClient* AnimeClients::GetClient(int type, int anime_id) {
 
   if (clients.find(anime_id) == clients.end()) {
     clients[anime_id] = new class HttpClient;
-    clients[anime_id]->SetProxy(Settings.Program.Proxy.host,
-                                Settings.Program.Proxy.user,
-                                Settings.Program.Proxy.password);
-#ifdef _DEBUG
-    clients[anime_id]->SetUserAgent(L"Taiga/1.0 (Debug; Type " + ToWstr(type) + 
-                                    L"; ID " + ToWstr(anime_id) + L")");
-#endif
+    clients[anime_id]->set_proxy(Settings.Program.Proxy.host,
+                                 Settings.Program.Proxy.user,
+                                 Settings.Program.Proxy.password);
   }
 
   return clients[anime_id];
@@ -650,7 +672,7 @@ class HttpClient* AnimeClients::GetClient(int type, int anime_id) {
 void AnimeClients::UpdateProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
   for (auto it = clients_.begin(); it != clients_.end(); ++it) {
     for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-      it2->second->SetProxy(proxy, user, pass);
+      it2->second->set_proxy(proxy, user, pass);
     }
   }
 }
