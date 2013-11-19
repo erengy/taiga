@@ -16,17 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_feed_condition.h"
 
-#include "../anime_db.h"
-#include "../feed.h"
-#include "../myanimelist.h"
-#include "../resource.h"
-#include "../string.h"
+#include "library/anime_db.h"
+#include "track/feed.h"
+#include "sync/myanimelist.h"
+#include "taiga/resource.h"
+#include "base/string.h"
 
-#include "../win32/win_gdi.h"
+#include "win32/win_gdi.h"
 
 class FeedConditionDialog FeedConditionDialog;
 

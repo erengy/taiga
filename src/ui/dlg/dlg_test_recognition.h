@@ -19,12 +19,12 @@
 #ifndef DLG_TEST_RECOGNITOIN_H
 #define DLG_TEST_RECOGNITOIN_H
 
-#include "../std.h"
+#include "base/std.h"
 
-#include "../anime_episode.h"
+#include "library/anime_episode.h"
 
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 // =============================================================================
 

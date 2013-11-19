@@ -16,15 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "anime_db.h"
 #include "anime_user.h"
 
 #include "history.h"
-#include "http.h"
-#include "myanimelist.h"
-#include "string.h"
+#include "taiga/http.h"
+#include "sync/myanimelist.h"
+#include "base/string.h"
 
 anime::Database* anime::ListUser::database_ = &AnimeDatabase;
 

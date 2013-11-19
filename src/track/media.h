@@ -19,8 +19,8 @@
 #ifndef MEDIA_H
 #define MEDIA_H
 
-#include "std.h"
-#include "accessibility.h"
+#include "base/std.h"
+#include "base/accessibility.h"
 
 // =============================================================================
 

@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "anime_filter.h"
 #include "anime_item.h"
 
-#include "string.h"
+#include "base/string.h"
 
 namespace anime {
 

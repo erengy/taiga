@@ -19,11 +19,11 @@
 #ifndef DLG_SETTINGS_H
 #define DLG_SETTINGS_H
 
-#include "../std.h"
+#include "base/std.h"
 #include "dlg_settings_page.h"
-#include "../feed.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "track/feed.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 enum SettingsSections {
   SECTION_SERVICES = 1,

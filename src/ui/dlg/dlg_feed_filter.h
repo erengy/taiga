@@ -19,10 +19,10 @@
 #ifndef DLG_FEED_FILTER_H
 #define DLG_FEED_FILTER_H
 
-#include "../std.h"
-#include "../feed.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "base/std.h"
+#include "track/feed.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 // =============================================================================
 

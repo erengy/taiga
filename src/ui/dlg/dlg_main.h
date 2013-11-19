@@ -19,13 +19,13 @@
 #ifndef DLG_MAIN_H
 #define DLG_MAIN_H
 
-#include "../std.h"
+#include "base/std.h"
 
-#include "../anime_filter.h"
+#include "library/anime_filter.h"
 
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
-#include "../win32/win_gdi.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
+#include "win32/win_gdi.h"
 
 #define WM_TAIGA_SHOWMENU WM_USER + 1337
 

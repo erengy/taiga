@@ -19,8 +19,8 @@
 #ifndef DLG_ANIME_INFO_PAGE_H
 #define DLG_ANIME_INFO_PAGE_H
 
-#include "../std.h"
-#include "../win32/win_dialog.h"
+#include "base/std.h"
+#include "win32/win_dialog.h"
 
 // =============================================================================
 

@@ -16,19 +16,19 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "monitor.h"
 
-#include "anime_db.h"
-#include "anime_episode.h"
-#include "common.h"
-#include "logger.h"
+#include "library/anime_db.h"
+#include "library/anime_episode.h"
+#include "base/common.h"
+#include "base/logger.h"
 #include "recognition.h"
-#include "settings.h"
-#include "string.h"
+#include "taiga/settings.h"
+#include "base/string.h"
 
-#include "dlg/dlg_main.h"
+#include "ui/dlg/dlg_main.h"
 
 class FolderMonitor FolderMonitor;
 

@@ -20,7 +20,7 @@
 #define XML_H
 
 #include "std.h"
-#include "third_party\pugixml\pugixml.hpp"
+#include "third_party/pugixml/pugixml.hpp"
 
 using namespace pugi;
 

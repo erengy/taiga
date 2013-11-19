@@ -16,16 +16,16 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_test_recognition.h"
 
-#include "../common.h"
-#include "../recognition.h"
-#include "../resource.h"
-#include "../string.h"
-#include "../taiga.h"
-#include "../xml.h"
+#include "base/common.h"
+#include "track/recognition.h"
+#include "taiga/resource.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/xml.h"
 
 RecognitionTestDialog RecognitionTest;
 

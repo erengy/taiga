@@ -19,8 +19,8 @@
 #ifndef MYANIMELIST_H
 #define MYANIMELIST_H
 
-#include "std.h"
-#include "optional.h"
+#include "base/std.h"
+#include "base/optional.h"
 
 namespace anime {
 class ListItem;

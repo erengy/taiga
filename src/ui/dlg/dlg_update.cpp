@@ -16,18 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_main.h"
 #include "dlg_update.h"
 
-#include "../common.h"
-#include "../http.h"
-#include "../resource.h"
-#include "../taiga.h"
+#include "base/common.h"
+#include "taiga/http.h"
+#include "taiga/resource.h"
+#include "taiga/taiga.h"
 
-#include "../win32/win_gdi.h"
-#include "../win32/win_taskdialog.h"
+#include "win32/win_gdi.h"
+#include "win32/win_taskdialog.h"
 
 class UpdateDialog UpdateDialog;
 

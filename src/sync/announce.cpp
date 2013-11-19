@@ -16,21 +16,21 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "announce.h"
 
-#include "anime.h"
-#include "anime_episode.h"
-#include "common.h"
-#include "dde.h"
-#include "http.h"
-#include "logger.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
+#include "library/anime.h"
+#include "library/anime_episode.h"
+#include "base/common.h"
+#include "base/dde.h"
+#include "taiga/http.h"
+#include "base/logger.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
 
-#include "dlg/dlg_main.h"
+#include "ui/dlg/dlg_main.h"
 
 #include "win32/win_taskdialog.h"
 

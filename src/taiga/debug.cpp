@@ -16,16 +16,16 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "debug.h"
 
-#include "anime_db.h"
-#include "common.h"
-#include "myanimelist.h"
-#include "string.h"
+#include "library/anime_db.h"
+#include "base/common.h"
+#include "sync/myanimelist.h"
+#include "base/string.h"
 
-#include "dlg/dlg_main.h"
+#include "ui/dlg/dlg_main.h"
 
 namespace debug {
 

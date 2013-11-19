@@ -16,11 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_input.h"
 
-#include "../resource.h"
+#include "taiga/resource.h"
 
 // =============================================================================
 

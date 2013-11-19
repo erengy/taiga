@@ -19,10 +19,10 @@
 #ifndef DLG_ANIME_INFO_H
 #define DLG_ANIME_INFO_H
 
-#include "../std.h"
-#include "../gfx.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "base/std.h"
+#include "base/gfx.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 #include "dlg_anime_info_page.h"
 

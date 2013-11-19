@@ -19,9 +19,9 @@
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "base/std.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 // =============================================================================
 

@@ -16,14 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "theme.h"
 
-#include "gfx.h"
-#include "string.h"
-#include "taiga.h"
-#include "xml.h"
+#include "base/gfx.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/xml.h"
 
 Theme UI;
 

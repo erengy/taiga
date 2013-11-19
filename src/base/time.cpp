@@ -20,7 +20,7 @@
 
 #include "time.h"
 
-#include "myanimelist.h"
+#include "sync/myanimelist.h"
 #include "string.h"
 
 // =============================================================================

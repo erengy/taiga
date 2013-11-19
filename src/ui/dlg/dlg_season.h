@@ -19,10 +19,10 @@
 #ifndef DLG_SEASON_H
 #define DLG_SEASON_H
 
-#include "../std.h"
+#include "base/std.h"
 
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 // =============================================================================
 

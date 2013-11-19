@@ -16,24 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 #include <ctime>
 
 #include "anime.h"
 #include "anime_db.h"
 
-#include "common.h"
-#include "logger.h"
-#include "myanimelist.h"
-#include "recognition.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
-#include "xml.h"
+#include "base/common.h"
+#include "base/logger.h"
+#include "sync/myanimelist.h"
+#include "track/recognition.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/xml.h"
 
-#include "dlg/dlg_anime_info.h"
-#include "dlg/dlg_anime_list.h"
-#include "dlg/dlg_season.h"
+#include "ui/dlg/dlg_anime_info.h"
+#include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_season.h"
 
 anime::Database AnimeDatabase;
 anime::ImageDatabase ImageDatabase;

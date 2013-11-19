@@ -16,13 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "anime.h"
 #include "anime_db.h"
 #include "anime_episode.h"
 
-#include "common.h"
+#include "base/common.h"
 
 anime::Episode CurrentEpisode;
 

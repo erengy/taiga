@@ -16,24 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_search.h"
 #include "dlg_main.h"
 
-#include "../anime_db.h"
-#include "../common.h"
-#include "../gfx.h"
-#include "../http.h"
-#include "../myanimelist.h"
-#include "../resource.h"
-#include "../settings.h"
-#include "../string.h"
-#include "../taiga.h"
-#include "../theme.h"
-#include "../xml.h"
+#include "library/anime_db.h"
+#include "base/common.h"
+#include "base/gfx.h"
+#include "taiga/http.h"
+#include "sync/myanimelist.h"
+#include "taiga/resource.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "ui/theme.h"
+#include "base/xml.h"
 
-#include "../win32/win_taskdialog.h"
+#include "win32/win_taskdialog.h"
 
 class SearchDialog SearchDialog;
 

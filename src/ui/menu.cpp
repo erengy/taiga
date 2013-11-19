@@ -16,14 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
-#include "anime_db.h"
-#include "anime_filter.h"
-#include "myanimelist.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
+#include "library/anime_db.h"
+#include "library/anime_filter.h"
+#include "sync/myanimelist.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
 #include "theme.h"
 
 #include "dlg/dlg_main.h"

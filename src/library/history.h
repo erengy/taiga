@@ -19,12 +19,12 @@
 #ifndef HISTORY_H
 #define HISTORY_H
 
-#include "std.h"
+#include "base/std.h"
 
 #include <queue>
 
 #include "anime_episode.h"
-#include "myanimelist.h"
+#include "sync/myanimelist.h"
 
 // =============================================================================
 

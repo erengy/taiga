@@ -19,8 +19,8 @@
 #ifndef UPDATE_H
 #define UPDATE_H
 
-#include "std.h"
-#include "feed.h"
+#include "base/std.h"
+#include "track/feed.h"
 #include "http.h"
 
 // =============================================================================

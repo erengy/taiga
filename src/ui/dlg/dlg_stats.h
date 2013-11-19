@@ -19,10 +19,10 @@
 #ifndef DLG_STATS_H
 #define DLG_STATS_H
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
-#include "../win32/win_resizable.h"
+#include "base/std.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
+#include "win32/win_resizable.h"
 
 // =============================================================================
 

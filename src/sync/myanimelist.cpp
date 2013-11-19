@@ -16,20 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "myanimelist.h"
 
-#include "anime.h"
-#include "anime_db.h"
-#include "common.h"
-#include "history.h"
-#include "http.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
-#include "time.h"
-#include "xml.h"
+#include "library/anime.h"
+#include "library/anime_db.h"
+#include "base/common.h"
+#include "library/history.h"
+#include "taiga/http.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/time.h"
+#include "base/xml.h"
 
 namespace mal {
 

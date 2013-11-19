@@ -17,8 +17,8 @@
 */
 
 #include "win_http.h"
-#include "../common.h"
-#include "../string.h"
+#include "base/common.h"
+#include "base/string.h"
 
 namespace win32 {
 

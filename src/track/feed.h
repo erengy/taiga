@@ -19,9 +19,9 @@
 #ifndef FEED_H
 #define FEED_H
 
-#include "std.h"
-#include "anime_episode.h"
-#include "http.h"
+#include "base/std.h"
+#include "library/anime_episode.h"
+#include "taiga/http.h"
 
 // =============================================================================
 

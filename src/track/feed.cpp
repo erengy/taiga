@@ -16,23 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "feed.h"
 
-#include "anime_db.h"
-#include "common.h"
-#include "foreach.h"
-#include "gfx.h"
+#include "library/anime_db.h"
+#include "base/common.h"
+#include "base/foreach.h"
+#include "base/gfx.h"
 #include "recognition.h"
-#include "resource.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
-#include "xml.h"
+#include "taiga/resource.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/xml.h"
 
-#include "dlg/dlg_main.h"
-#include "dlg/dlg_torrent.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_torrent.h"
 
 #include "win32/win_taskbar.h"
 

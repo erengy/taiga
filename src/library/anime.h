@@ -19,9 +19,9 @@
 #ifndef ANIME_H
 #define ANIME_H
 
-#include "std.h"
+#include "base/std.h"
 
-#include "time.h"
+#include "base/time.h"
 
 namespace anime {
 

@@ -19,8 +19,8 @@
 #ifndef DLG_SETTINGS_PAGE_H
 #define DLG_SETTINGS_PAGE_H
 
-#include "../std.h"
-#include "../win32/win_dialog.h"
+#include "base/std.h"
+#include "win32/win_dialog.h"
 
 enum SettingsPages {
   PAGE_APP_BEHAVIOR = 1,

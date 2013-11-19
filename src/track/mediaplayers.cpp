@@ -16,19 +16,19 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 #include <tlhelp32.h>
 
 #include "media.h"
 
-#include "anime.h"
-#include "common.h"
-#include "process.h"
+#include "library/anime.h"
+#include "base/common.h"
+#include "base/process.h"
 #include "recognition.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
-#include "xml.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/xml.h"
 
 class MediaPlayers MediaPlayers;
 

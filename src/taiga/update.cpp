@@ -16,20 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 #include <cmath>
 
 #include "update.h"
 
-#include "common.h"
-#include "foreach.h"
+#include "base/common.h"
+#include "base/foreach.h"
 #include "settings.h"
-#include "string.h"
+#include "base/string.h"
 #include "taiga.h"
-#include "xml.h"
+#include "base/xml.h"
 
-#include "dlg/dlg_main.h"
-#include "dlg/dlg_update.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_update.h"
 
 #include "win32/win_taskdialog.h"
 

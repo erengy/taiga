@@ -16,24 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
 #include "anime_db.h"
 #include "anime_episode.h"
 #include "anime_item.h"
 
-#include "common.h"
+#include "base/common.h"
 #include "history.h"
-#include "logger.h"
-#include "myanimelist.h"
-#include "settings.h"
-#include "string.h"
-#include "taiga.h"
-#include "time.h"
+#include "base/logger.h"
+#include "sync/myanimelist.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/time.h"
 
-#include "dlg/dlg_anime_list.h"
-#include "dlg/dlg_main.h"
-#include "dlg/dlg_search.h"
+#include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_search.h"
 
 #include "win32/win_taskbar.h"
 

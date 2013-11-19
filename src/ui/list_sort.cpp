@@ -16,13 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
-#include "anime_db.h"
-#include "common.h"
-#include "settings.h"
-#include "string.h"
-#include "time.h"
+#include "library/anime_db.h"
+#include "base/common.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "base/time.h"
 
 #include "win32/win_control.h"
 

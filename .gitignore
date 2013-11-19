@@ -1,6 +1,7 @@
 bin/*
 build/*
 
+src/ipch
 src/*.opensdf
 src/*.sdf
 src/*.user

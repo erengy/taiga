@@ -19,10 +19,10 @@
 #ifndef DLG_FORMAT_H
 #define DLG_FORMAT_H
 
-#include "../std.h"
-#include "../anime_item.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "base/std.h"
+#include "library/anime_item.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 enum {
   FORMAT_MODE_HTTP,

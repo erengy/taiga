@@ -19,10 +19,10 @@
 #ifndef DLG_ANIME_LIST_H
 #define DLG_ANIME_LIST_H
 
-#include "../std.h"
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
-#include "../win32/win_gdi.h"
+#include "base/std.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
+#include "win32/win_gdi.h"
 
 namespace anime {
 class Item;

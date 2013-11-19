@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_main.h"
 
@@ -32,29 +32,29 @@
 #include "dlg_torrent.h"
 #include "dlg_update.h"
 
-#include "../anime_db.h"
-#include "../anime_filter.h"
-#include "../announce.h"
-#include "../common.h"
-#include "../debug.h"
-#include "../gfx.h"
-#include "../history.h"
-#include "../http.h"
-#include "../media.h"
-#include "../monitor.h"
-#include "../myanimelist.h"
-#include "../process.h"
-#include "../recognition.h"
-#include "../resource.h"
-#include "../settings.h"
-#include "../stats.h"
-#include "../string.h"
-#include "../taiga.h"
-#include "../theme.h"
+#include "library/anime_db.h"
+#include "library/anime_filter.h"
+#include "sync/announce.h"
+#include "base/common.h"
+#include "taiga/debug.h"
+#include "base/gfx.h"
+#include "library/history.h"
+#include "taiga/http.h"
+#include "track/media.h"
+#include "track/monitor.h"
+#include "sync/myanimelist.h"
+#include "base/process.h"
+#include "track/recognition.h"
+#include "taiga/resource.h"
+#include "taiga/settings.h"
+#include "taiga/stats.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "ui/theme.h"
 
-#include "../win32/win_gdi.h"
-#include "../win32/win_taskbar.h"
-#include "../win32/win_taskdialog.h"
+#include "win32/win_gdi.h"
+#include "win32/win_taskbar.h"
+#include "win32/win_taskdialog.h"
 
 class MainDialog MainDialog;
 

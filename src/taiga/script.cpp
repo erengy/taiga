@@ -16,17 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include "base/std.h"
 
-#include "anime_db.h"
-#include "anime_episode.h"
-#include "common.h"
-#include "myanimelist.h"
+#include "library/anime_db.h"
+#include "library/anime_episode.h"
+#include "base/common.h"
+#include "sync/myanimelist.h"
 #include "settings.h"
-#include "string.h"
+#include "base/string.h"
 #include "taiga.h"
 
-#include "dlg/dlg_format.h"
+#include "ui/dlg/dlg_format.h"
 
 // The idea behind Taiga's script functions is borrowed from Mp3tag, which
 // itself got it from foobar2000. See the following links for more information:

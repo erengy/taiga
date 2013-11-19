@@ -16,20 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 #include <cmath>
 
 #include "dlg_about.h"
 
-#include "../common.h"
-#include "../gfx.h"
-#include "../resource.h"
-#include "../stats.h"
-#include "../string.h"
-#include "../taiga.h"
-#include "../time.h"
+#include "base/common.h"
+#include "base/gfx.h"
+#include "taiga/resource.h"
+#include "taiga/stats.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "base/time.h"
 
-#include "../win32/win_gdi.h"
+#include "win32/win_gdi.h"
 
 class AboutDialog AboutDialog;
 

@@ -16,24 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_anime_info.h"
 #include "dlg_anime_info_page.h"
 
 #include "dlg_input.h"
 
-#include "../anime.h"
-#include "../anime_db.h"
-#include "../common.h"
-#include "../history.h"
-#include "../http.h"
-#include "../myanimelist.h"
-#include "../recognition.h"
-#include "../resource.h"
-#include "../settings.h"
-#include "../string.h"
-#include "../theme.h"
+#include "library/anime.h"
+#include "library/anime_db.h"
+#include "base/common.h"
+#include "library/history.h"
+#include "taiga/http.h"
+#include "sync/myanimelist.h"
+#include "track/recognition.h"
+#include "taiga/resource.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "ui/theme.h"
 
 // =============================================================================
 

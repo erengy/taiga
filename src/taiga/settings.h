@@ -19,9 +19,9 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "std.h"
-#include "feed.h"
-#include "optional.h"
+#include "base/std.h"
+#include "track/feed.h"
+#include "base/optional.h"
 
 // =============================================================================
 

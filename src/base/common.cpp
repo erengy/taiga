@@ -20,11 +20,11 @@
 
 #include "common.h"
 
-#include "anime_db.h"
-#include "myanimelist.h"
-#include "settings.h"
+#include "library/anime_db.h"
+#include "sync/myanimelist.h"
+#include "taiga/settings.h"
 #include "string.h"
-#include "theme.h"
+#include "ui/theme.h"
 
 #include "third_party/base64/base64.h"
 #include "third_party/zlib/zlib.h"

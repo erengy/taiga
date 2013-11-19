@@ -19,7 +19,7 @@
 #ifndef TAIGA_API_H
 #define TAIGA_API_H
 
-#include "std.h"
+#include "base/std.h"
 
 #include "win32/win_window.h"
 

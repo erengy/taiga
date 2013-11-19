@@ -16,24 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../std.h"
+#include "base/std.h"
 
 #include "dlg_main.h"
 #include "dlg_settings.h"
 #include "dlg_torrent.h"
 
-#include "../anime_db.h"
-#include "../common.h"
-#include "../feed.h"
-#include "../gfx.h"
-#include "../http.h"
-#include "../resource.h"
-#include "../settings.h"
-#include "../string.h"
-#include "../taiga.h"
-#include "../theme.h"
+#include "library/anime_db.h"
+#include "base/common.h"
+#include "track/feed.h"
+#include "base/gfx.h"
+#include "taiga/http.h"
+#include "taiga/resource.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/taiga.h"
+#include "ui/theme.h"
 
-#include "../win32/win_gdi.h"
+#include "win32/win_gdi.h"
 
 class TorrentDialog TorrentDialog;
 

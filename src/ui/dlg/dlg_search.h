@@ -19,12 +19,12 @@
 #ifndef DLG_SEARCH_H
 #define DLG_SEARCH_H
 
-#include "../std.h"
+#include "base/std.h"
 
-#include "../anime_filter.h"
+#include "library/anime_filter.h"
 
-#include "../win32/win_control.h"
-#include "../win32/win_dialog.h"
+#include "win32/win_control.h"
+#include "win32/win_dialog.h"
 
 // =============================================================================
 

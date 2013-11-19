@@ -19,11 +19,11 @@
 #ifndef ANIMEDB_H
 #define ANIMEDB_H
 
-#include "std.h"
+#include "base/std.h"
 
 #include "anime_item.h"
 #include "anime_user.h"
-#include "gfx.h"
+#include "base/gfx.h"
 
 #include "win32/win_thread.h"
 

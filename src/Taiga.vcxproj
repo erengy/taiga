@@ -41,11 +41,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\bin\$(Configuration)\</OutDir>
     <IntDir>..\build\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\bin\$(Configuration)\</OutDir>
     <IntDir>..\build\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,61 +90,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="accessibility.cpp" />
-    <ClCompile Include="action.cpp" />
-    <ClCompile Include="anime.cpp" />
-    <ClCompile Include="anime_db.cpp" />
-    <ClCompile Include="anime_item.cpp" />
-    <ClCompile Include="anime_episode.cpp" />
-    <ClCompile Include="anime_filter.cpp" />
-    <ClCompile Include="anime_user.cpp" />
-    <ClCompile Include="announce.cpp" />
-    <ClCompile Include="api.cpp" />
-    <ClCompile Include="common.cpp" />
-    <ClCompile Include="dde.cpp" />
-    <ClCompile Include="debug.cpp" />
-    <ClCompile Include="dlg\dlg_about.cpp" />
-    <ClCompile Include="dlg\dlg_anime_info.cpp" />
-    <ClCompile Include="dlg\dlg_anime_info_page.cpp" />
-    <ClCompile Include="dlg\dlg_anime_list.cpp" />
-    <ClCompile Include="dlg\dlg_feed_condition.cpp" />
-    <ClCompile Include="dlg\dlg_format.cpp" />
-    <ClCompile Include="dlg\dlg_history.cpp" />
-    <ClCompile Include="dlg\dlg_input.cpp" />
-    <ClCompile Include="dlg\dlg_main.cpp" />
-    <ClCompile Include="dlg\dlg_main_controls.cpp" />
-    <ClCompile Include="dlg\dlg_search.cpp" />
-    <ClCompile Include="dlg\dlg_season.cpp" />
-    <ClCompile Include="dlg\dlg_settings.cpp" />
-    <ClCompile Include="dlg\dlg_settings_page.cpp" />
-    <ClCompile Include="dlg\dlg_stats.cpp" />
-    <ClCompile Include="dlg\dlg_test_recognition.cpp" />
-    <ClCompile Include="dlg\dlg_torrent.cpp" />
-    <ClCompile Include="dlg\dlg_feed_filter.cpp" />
-    <ClCompile Include="dlg\dlg_update.cpp" />
-    <ClCompile Include="encryption.cpp" />
-    <ClCompile Include="feed_filter.cpp" />
-    <ClCompile Include="gfx.cpp" />
-    <ClCompile Include="gzip.cpp" />
-    <ClCompile Include="history.cpp" />
-    <ClCompile Include="http.cpp" />
-    <ClCompile Include="list_sort.cpp" />
-    <ClCompile Include="logger.cpp" />
+    <ClCompile Include="base\accessibility.cpp" />
+    <ClCompile Include="base\common.cpp" />
+    <ClCompile Include="base\dde.cpp" />
+    <ClCompile Include="base\encryption.cpp" />
+    <ClCompile Include="base\gfx.cpp" />
+    <ClCompile Include="base\gzip.cpp" />
+    <ClCompile Include="base\logger.cpp" />
+    <ClCompile Include="base\process.cpp" />
+    <ClCompile Include="base\string.cpp" />
+    <ClCompile Include="base\time.cpp" />
+    <ClCompile Include="base\xml.cpp" />
+    <ClCompile Include="library\anime.cpp" />
+    <ClCompile Include="library\anime_db.cpp" />
+    <ClCompile Include="library\anime_episode.cpp" />
+    <ClCompile Include="library\anime_filter.cpp" />
+    <ClCompile Include="library\anime_item.cpp" />
+    <ClCompile Include="library\anime_user.cpp" />
+    <ClCompile Include="library\history.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="mediaplayers.cpp" />
-    <ClCompile Include="menu.cpp" />
-    <ClCompile Include="monitor.cpp" />
-    <ClCompile Include="myanimelist.cpp" />
-    <ClCompile Include="process.cpp" />
-    <ClCompile Include="recognition.cpp" />
-    <ClCompile Include="feed.cpp" />
-    <ClCompile Include="script.cpp" />
-    <ClCompile Include="search.cpp" />
-    <ClCompile Include="settings.cpp" />
-    <ClCompile Include="stats.cpp" />
-    <ClCompile Include="string.cpp" />
-    <ClCompile Include="taiga.cpp" />
-    <ClCompile Include="theme.cpp" />
+    <ClCompile Include="sync\announce.cpp" />
+    <ClCompile Include="sync\myanimelist.cpp" />
+    <ClCompile Include="taiga\action.cpp" />
+    <ClCompile Include="taiga\api.cpp" />
+    <ClCompile Include="taiga\debug.cpp" />
+    <ClCompile Include="taiga\http.cpp" />
+    <ClCompile Include="taiga\script.cpp" />
+    <ClCompile Include="taiga\settings.cpp" />
+    <ClCompile Include="taiga\stats.cpp" />
+    <ClCompile Include="taiga\taiga.cpp" />
+    <ClCompile Include="taiga\update.cpp" />
     <ClCompile Include="third_party\base64\base64.cpp" />
     <ClCompile Include="third_party\oauth\oauth.cpp" />
     <ClCompile Include="third_party\pugixml\pugixml.cpp" />
@@ -161,8 +138,34 @@
     <ClCompile Include="third_party\zlib\trees.c" />
     <ClCompile Include="third_party\zlib\uncompr.c" />
     <ClCompile Include="third_party\zlib\zutil.c" />
-    <ClCompile Include="time.cpp" />
-    <ClCompile Include="update.cpp" />
+    <ClCompile Include="track\feed.cpp" />
+    <ClCompile Include="track\feed_filter.cpp" />
+    <ClCompile Include="track\mediaplayers.cpp" />
+    <ClCompile Include="track\monitor.cpp" />
+    <ClCompile Include="track\recognition.cpp" />
+    <ClCompile Include="track\search.cpp" />
+    <ClCompile Include="ui\dlg\dlg_about.cpp" />
+    <ClCompile Include="ui\dlg\dlg_anime_info.cpp" />
+    <ClCompile Include="ui\dlg\dlg_anime_info_page.cpp" />
+    <ClCompile Include="ui\dlg\dlg_anime_list.cpp" />
+    <ClCompile Include="ui\dlg\dlg_feed_condition.cpp" />
+    <ClCompile Include="ui\dlg\dlg_feed_filter.cpp" />
+    <ClCompile Include="ui\dlg\dlg_format.cpp" />
+    <ClCompile Include="ui\dlg\dlg_history.cpp" />
+    <ClCompile Include="ui\dlg\dlg_input.cpp" />
+    <ClCompile Include="ui\dlg\dlg_main.cpp" />
+    <ClCompile Include="ui\dlg\dlg_main_controls.cpp" />
+    <ClCompile Include="ui\dlg\dlg_search.cpp" />
+    <ClCompile Include="ui\dlg\dlg_season.cpp" />
+    <ClCompile Include="ui\dlg\dlg_settings.cpp" />
+    <ClCompile Include="ui\dlg\dlg_settings_page.cpp" />
+    <ClCompile Include="ui\dlg\dlg_stats.cpp" />
+    <ClCompile Include="ui\dlg\dlg_test_recognition.cpp" />
+    <ClCompile Include="ui\dlg\dlg_torrent.cpp" />
+    <ClCompile Include="ui\dlg\dlg_update.cpp" />
+    <ClCompile Include="ui\list_sort.cpp" />
+    <ClCompile Include="ui\menu.cpp" />
+    <ClCompile Include="ui\theme.cpp" />
     <ClCompile Include="win32\win_ctl_combobox.cpp" />
     <ClCompile Include="win32\win_ctl_edit.cpp" />
     <ClCompile Include="win32\win_ctl_imagelist.cpp" />
@@ -189,58 +192,38 @@
     <ClCompile Include="win32\win_taskdialog.cpp" />
     <ClCompile Include="win32\win_thread.cpp" />
     <ClCompile Include="win32\win_window.cpp" />
-    <ClCompile Include="xml.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="accessibility.h" />
-    <ClInclude Include="anime.h" />
-    <ClInclude Include="anime_db.h" />
-    <ClInclude Include="anime_item.h" />
-    <ClInclude Include="anime_episode.h" />
-    <ClInclude Include="anime_filter.h" />
-    <ClInclude Include="anime_user.h" />
-    <ClInclude Include="announce.h" />
-    <ClInclude Include="api.h" />
-    <ClInclude Include="common.h" />
-    <ClInclude Include="dde.h" />
-    <ClInclude Include="debug.h" />
-    <ClInclude Include="dlg\dlg_about.h" />
-    <ClInclude Include="dlg\dlg_anime_info.h" />
-    <ClInclude Include="dlg\dlg_anime_info_page.h" />
-    <ClInclude Include="dlg\dlg_anime_list.h" />
-    <ClInclude Include="dlg\dlg_feed_condition.h" />
-    <ClInclude Include="dlg\dlg_format.h" />
-    <ClInclude Include="dlg\dlg_history.h" />
-    <ClInclude Include="dlg\dlg_input.h" />
-    <ClInclude Include="dlg\dlg_main.h" />
-    <ClInclude Include="dlg\dlg_search.h" />
-    <ClInclude Include="dlg\dlg_season.h" />
-    <ClInclude Include="dlg\dlg_settings.h" />
-    <ClInclude Include="dlg\dlg_settings_page.h" />
-    <ClInclude Include="dlg\dlg_stats.h" />
-    <ClInclude Include="dlg\dlg_test_recognition.h" />
-    <ClInclude Include="dlg\dlg_torrent.h" />
-    <ClInclude Include="dlg\dlg_feed_filter.h" />
-    <ClInclude Include="dlg\dlg_update.h" />
-    <ClInclude Include="foreach.h" />
-    <ClInclude Include="gfx.h" />
-    <ClInclude Include="history.h" />
-    <ClInclude Include="http.h" />
-    <ClInclude Include="logger.h" />
-    <ClInclude Include="media.h" />
-    <ClInclude Include="monitor.h" />
-    <ClInclude Include="myanimelist.h" />
-    <ClInclude Include="optional.h" />
-    <ClInclude Include="process.h" />
-    <ClInclude Include="recognition.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="feed.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="stats.h" />
-    <ClInclude Include="std.h" />
-    <ClInclude Include="string.h" />
-    <ClInclude Include="taiga.h" />
-    <ClInclude Include="theme.h" />
+    <ClInclude Include="base\accessibility.h" />
+    <ClInclude Include="base\common.h" />
+    <ClInclude Include="base\dde.h" />
+    <ClInclude Include="base\foreach.h" />
+    <ClInclude Include="base\gfx.h" />
+    <ClInclude Include="base\logger.h" />
+    <ClInclude Include="base\optional.h" />
+    <ClInclude Include="base\process.h" />
+    <ClInclude Include="base\std.h" />
+    <ClInclude Include="base\string.h" />
+    <ClInclude Include="base\time.h" />
+    <ClInclude Include="base\xml.h" />
+    <ClInclude Include="library\anime.h" />
+    <ClInclude Include="library\anime_db.h" />
+    <ClInclude Include="library\anime_episode.h" />
+    <ClInclude Include="library\anime_filter.h" />
+    <ClInclude Include="library\anime_item.h" />
+    <ClInclude Include="library\anime_user.h" />
+    <ClInclude Include="library\history.h" />
+    <ClInclude Include="sync\announce.h" />
+    <ClInclude Include="sync\myanimelist.h" />
+    <ClInclude Include="taiga\api.h" />
+    <ClInclude Include="taiga\debug.h" />
+    <ClInclude Include="taiga\http.h" />
+    <ClInclude Include="taiga\resource.h" />
+    <ClInclude Include="taiga\settings.h" />
+    <ClInclude Include="taiga\stats.h" />
+    <ClInclude Include="taiga\taiga.h" />
+    <ClInclude Include="taiga\update.h" />
+    <ClInclude Include="taiga\version.h" />
     <ClInclude Include="third_party\base64\base64.h" />
     <ClInclude Include="third_party\oauth\oauth.h" />
     <ClInclude Include="third_party\pugixml\pugiconfig.hpp" />
@@ -256,9 +239,29 @@
     <ClInclude Include="third_party\zlib\zconf.h" />
     <ClInclude Include="third_party\zlib\zlib.h" />
     <ClInclude Include="third_party\zlib\zutil.h" />
-    <ClInclude Include="time.h" />
-    <ClInclude Include="update.h" />
-    <ClInclude Include="version.h" />
+    <ClInclude Include="track\feed.h" />
+    <ClInclude Include="track\media.h" />
+    <ClInclude Include="track\monitor.h" />
+    <ClInclude Include="track\recognition.h" />
+    <ClInclude Include="ui\dlg\dlg_about.h" />
+    <ClInclude Include="ui\dlg\dlg_anime_info.h" />
+    <ClInclude Include="ui\dlg\dlg_anime_info_page.h" />
+    <ClInclude Include="ui\dlg\dlg_anime_list.h" />
+    <ClInclude Include="ui\dlg\dlg_feed_condition.h" />
+    <ClInclude Include="ui\dlg\dlg_feed_filter.h" />
+    <ClInclude Include="ui\dlg\dlg_format.h" />
+    <ClInclude Include="ui\dlg\dlg_history.h" />
+    <ClInclude Include="ui\dlg\dlg_input.h" />
+    <ClInclude Include="ui\dlg\dlg_main.h" />
+    <ClInclude Include="ui\dlg\dlg_search.h" />
+    <ClInclude Include="ui\dlg\dlg_season.h" />
+    <ClInclude Include="ui\dlg\dlg_settings.h" />
+    <ClInclude Include="ui\dlg\dlg_settings_page.h" />
+    <ClInclude Include="ui\dlg\dlg_stats.h" />
+    <ClInclude Include="ui\dlg\dlg_test_recognition.h" />
+    <ClInclude Include="ui\dlg\dlg_torrent.h" />
+    <ClInclude Include="ui\dlg\dlg_update.h" />
+    <ClInclude Include="ui\theme.h" />
     <ClInclude Include="win32\win_control.h" />
     <ClInclude Include="win32\win_dialog.h" />
     <ClInclude Include="win32\win_gdi.h" />
@@ -272,11 +275,10 @@
     <ClInclude Include="win32\win_taskdialog.h" />
     <ClInclude Include="win32\win_thread.h" />
     <ClInclude Include="win32\win_window.h" />
-    <ClInclude Include="xml.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="resource.rc" />
-    <ResourceCompile Include="version.rc" />
+    <ResourceCompile Include="taiga\resource.rc" />
+    <ResourceCompile Include="taiga\version.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

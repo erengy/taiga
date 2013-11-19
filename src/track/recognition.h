@@ -19,7 +19,7 @@
 #ifndef RECOGNITION_H
 #define RECOGNITION_H
 
-#include "std.h"
+#include "base/std.h"
 
 namespace anime {
 class Episode;
