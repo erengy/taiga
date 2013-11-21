@@ -54,34 +54,34 @@ bool Database::LoadDatabase() {
   
   // Load XML file
   xml_document doc;
-  unsigned int options = parse_default & ~parse_eol;
+  unsigned int options = pugi::parse_default & ~pugi::parse_eol;
   xml_parse_result result = doc.load_file(path.c_str(), options);
-  if (result.status != status_ok && result.status != status_file_not_found) {
+  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
     return false;
   }
 
   // Read items
   xml_node animedb_node = doc.child(L"animedb");
   for (xml_node node = animedb_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-    int id = XML_ReadIntValue(node, L"series_animedb_id");
+    int id = XmlReadIntValue(node, L"series_animedb_id");
     Item& item = items[id]; // Creates the item if it doesn't exist
     item.SetId(id);
-    item.SetTitle(XML_ReadStrValue(node, L"series_title"));
-    item.SetEnglishTitle(XML_ReadStrValue(node, L"series_english"));
-    item.SetSynonyms(XML_ReadStrValue(node, L"series_synonyms"));
-    item.SetType(XML_ReadIntValue(node, L"series_type"));
-    item.SetEpisodeCount(XML_ReadIntValue(node, L"series_episodes"));
-    item.SetAiringStatus(XML_ReadIntValue(node, L"series_status"));
-    item.SetDate(DATE_START, Date(XML_ReadStrValue(node, L"series_start")));
-    item.SetDate(DATE_END, Date(XML_ReadStrValue(node, L"series_end")));
-    item.SetImageUrl(XML_ReadStrValue(node, L"series_image"));
-    item.SetGenres(XML_ReadStrValue(node, L"genres"));
-    item.SetProducers(XML_ReadStrValue(node, L"producers"));
-    item.SetScore(XML_ReadStrValue(node, L"score"));
-    item.SetRank(XML_ReadStrValue(node, L"rank"));
-    item.SetPopularity(XML_ReadStrValue(node, L"popularity"));
-    item.SetSynopsis(XML_ReadStrValue(node, L"synopsis"));
-    item.last_modified = _wtoi64(XML_ReadStrValue(node, L"last_modified").c_str());
+    item.SetTitle(XmlReadStrValue(node, L"series_title"));
+    item.SetEnglishTitle(XmlReadStrValue(node, L"series_english"));
+    item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
+    item.SetType(XmlReadIntValue(node, L"series_type"));
+    item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
+    item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
+    item.SetDate(DATE_START, Date(XmlReadStrValue(node, L"series_start")));
+    item.SetDate(DATE_END, Date(XmlReadStrValue(node, L"series_end")));
+    item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    item.SetGenres(XmlReadStrValue(node, L"genres"));
+    item.SetProducers(XmlReadStrValue(node, L"producers"));
+    item.SetScore(XmlReadStrValue(node, L"score"));
+    item.SetRank(XmlReadStrValue(node, L"rank"));
+    item.SetPopularity(XmlReadStrValue(node, L"popularity"));
+    item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
+    item.last_modified = _wtoi64(XmlReadStrValue(node, L"last_modified").c_str());
   }
 
   return true;
@@ -98,26 +98,26 @@ bool Database::SaveDatabase() {
   for (auto it = items.begin(); it != items.end(); ++it) {
     xml_node anime_node = animedb_node.append_child(L"anime");
     #define XML_WI(n, v) \
-      if (v > 0) XML_WriteIntValue(anime_node, n, v)
+      if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
-      if (!v.empty()) XML_WriteStrValue(anime_node, n, v.c_str(), t)
+      if (!v.empty()) XmlWriteStrValue(anime_node, n, v.c_str(), t)
     XML_WI(L"series_animedb_id", it->second.GetId());
-    XML_WS(L"series_title", it->second.GetTitle(), node_cdata);
-    XML_WS(L"series_english", it->second.GetEnglishTitle(), node_cdata);
-    XML_WS(L"series_synonyms", Join(it->second.GetSynonyms(), L"; "), node_cdata);
+    XML_WS(L"series_title", it->second.GetTitle(), pugi::node_cdata);
+    XML_WS(L"series_english", it->second.GetEnglishTitle(), pugi::node_cdata);
+    XML_WS(L"series_synonyms", Join(it->second.GetSynonyms(), L"; "), pugi::node_cdata);
     XML_WI(L"series_type", it->second.GetType());
     XML_WI(L"series_episodes", it->second.GetEpisodeCount());
     XML_WI(L"series_status", it->second.GetAiringStatus());
-    XML_WS(L"series_start", wstring(it->second.GetDate(DATE_START)), node_pcdata);
-    XML_WS(L"series_end", wstring(it->second.GetDate(DATE_END)), node_pcdata);
-    XML_WS(L"series_image", it->second.GetImageUrl(), node_pcdata);
-    XML_WS(L"genres", it->second.GetGenres(), node_pcdata);
-    XML_WS(L"producers", it->second.GetProducers(), node_pcdata);
-    XML_WS(L"score", it->second.GetScore(), node_pcdata);
-    XML_WS(L"rank", it->second.GetRank(), node_pcdata);
-    XML_WS(L"popularity", it->second.GetPopularity(), node_pcdata);
-    XML_WS(L"synopsis", it->second.GetSynopsis(), node_cdata), node_pcdata;
-    XML_WS(L"last_modified", ToWstr(it->second.last_modified), node_pcdata);
+    XML_WS(L"series_start", wstring(it->second.GetDate(DATE_START)), pugi::node_pcdata);
+    XML_WS(L"series_end", wstring(it->second.GetDate(DATE_END)), pugi::node_pcdata);
+    XML_WS(L"series_image", it->second.GetImageUrl(), pugi::node_pcdata);
+    XML_WS(L"genres", it->second.GetGenres(), pugi::node_pcdata);
+    XML_WS(L"producers", it->second.GetProducers(), pugi::node_pcdata);
+    XML_WS(L"score", it->second.GetScore(), pugi::node_pcdata);
+    XML_WS(L"rank", it->second.GetRank(), pugi::node_pcdata);
+    XML_WS(L"popularity", it->second.GetPopularity(), pugi::node_pcdata);
+    XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
+    XML_WS(L"last_modified", ToWstr(it->second.last_modified), pugi::node_pcdata);
     #undef XML_WS
     #undef XML_WI
   }
@@ -125,7 +125,7 @@ bool Database::SaveDatabase() {
   // Save
   CreateFolder(folder_);
   wstring file = folder_ + file_;
-  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+  return doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
 }
 
 Item* Database::FindItem(int anime_id) {
@@ -266,7 +266,7 @@ bool Database::LoadList(bool set_last_modified) {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok && result.status != status_file_not_found) {
+  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
     MessageBox(NULL, L"Could not read anime list.", file.c_str(), MB_OK | MB_ICONERROR);
     return false;
   }
@@ -274,47 +274,47 @@ bool Database::LoadList(bool set_last_modified) {
   // Read user info
   xml_node myanimelist = doc.child(L"myanimelist");
   xml_node myinfo = myanimelist.child(L"myinfo");
-  user.SetId(XML_ReadIntValue(myinfo, L"user_id"));
-  user.SetName(XML_ReadStrValue(myinfo, L"user_name"));
+  user.SetId(XmlReadIntValue(myinfo, L"user_id"));
+  user.SetName(XmlReadStrValue(myinfo, L"user_name"));
   // Since MAL can be too slow to update these values, we'll be counting by 
   // ourselves at Database::UpdateItem().
   /*
   user.SetItemCount(mal::MYSTATUS_WATCHING, 
-    XML_ReadIntValue(myinfo, L"user_watching"), false);
+    XmlReadIntValue(myinfo, L"user_watching"), false);
   user.SetItemCount(mal::MYSTATUS_COMPLETED, 
-    XML_ReadIntValue(myinfo, L"user_completed"), false);
+    XmlReadIntValue(myinfo, L"user_completed"), false);
   user.SetItemCount(mal::MYSTATUS_ONHOLD, 
-    XML_ReadIntValue(myinfo, L"user_onhold"), false);
+    XmlReadIntValue(myinfo, L"user_onhold"), false);
   user.SetItemCount(mal::MYSTATUS_DROPPED, 
-    XML_ReadIntValue(myinfo, L"user_dropped"), false);
+    XmlReadIntValue(myinfo, L"user_dropped"), false);
   user.SetItemCount(mal::MYSTATUS_PLANTOWATCH, 
-    XML_ReadIntValue(myinfo, L"user_plantowatch"), false);
+    XmlReadIntValue(myinfo, L"user_plantowatch"), false);
   */
-  user.SetDaysSpentWatching(XML_ReadStrValue(myinfo, L"user_days_spent_watching"));
+  user.SetDaysSpentWatching(XmlReadStrValue(myinfo, L"user_days_spent_watching"));
 
   // Read anime list
   for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
     Item anime_item;
-    anime_item.SetId(XML_ReadIntValue(node, L"series_animedb_id"));
-    anime_item.SetTitle(XML_ReadStrValue(node, L"series_title"));
-    anime_item.SetSynonyms(XML_ReadStrValue(node, L"series_synonyms"));
-    anime_item.SetType(XML_ReadIntValue(node, L"series_type"));
-    anime_item.SetEpisodeCount(XML_ReadIntValue(node, L"series_episodes"));
-    anime_item.SetAiringStatus(XML_ReadIntValue(node, L"series_status"));
-    anime_item.SetDate(DATE_START, XML_ReadStrValue(node, L"series_start"));
-    anime_item.SetDate(DATE_END, XML_ReadStrValue(node, L"series_end"));
-    anime_item.SetImageUrl(XML_ReadStrValue(node, L"series_image"));
+    anime_item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
+    anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
+    anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
+    anime_item.SetType(XmlReadIntValue(node, L"series_type"));
+    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
+    anime_item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
+    anime_item.SetDate(DATE_START, XmlReadStrValue(node, L"series_start"));
+    anime_item.SetDate(DATE_END, XmlReadStrValue(node, L"series_end"));
+    anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
     anime_item.last_modified = last_modified;
     anime_item.AddtoUserList();
-    anime_item.SetMyLastWatchedEpisode(XML_ReadIntValue(node, L"my_watched_episodes"));
-    anime_item.SetMyDate(DATE_START, XML_ReadStrValue(node, L"my_start_date"));
-    anime_item.SetMyDate(DATE_END, XML_ReadStrValue(node, L"my_finish_date"));
-    anime_item.SetMyScore(XML_ReadIntValue(node, L"my_score"));
-    anime_item.SetMyStatus(XML_ReadIntValue(node, L"my_status"));
-    anime_item.SetMyRewatching(XML_ReadIntValue(node, L"my_rewatching"));
-    anime_item.SetMyRewatchingEp(XML_ReadIntValue(node, L"my_rewatching_ep"));
-    anime_item.SetMyLastUpdated(XML_ReadStrValue(node, L"my_last_updated"));
-    anime_item.SetMyTags(XML_ReadStrValue(node, L"my_tags"));
+    anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
+    anime_item.SetMyDate(DATE_START, XmlReadStrValue(node, L"my_start_date"));
+    anime_item.SetMyDate(DATE_END, XmlReadStrValue(node, L"my_finish_date"));
+    anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
+    anime_item.SetMyStatus(XmlReadIntValue(node, L"my_status"));
+    anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
+    anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));
+    anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"my_last_updated"));
+    anime_item.SetMyTags(XmlReadStrValue(node, L"my_tags"));
     UpdateItem(anime_item);
   }
 
@@ -336,7 +336,7 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok) return false;
+  if (result.status != pugi::status_ok) return false;
 
   // Read anime list
   xml_node myanimelist = doc.child(L"myanimelist");
@@ -344,25 +344,25 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
     // Add anime item
     case ADD_ANIME: {
       xml_node node = myanimelist.append_child(L"anime");
-      XML_WriteIntValue(node, L"series_animedb_id", item->GetId());
-      XML_WriteIntValue(node, L"my_watched_episodes", item->GetMyLastWatchedEpisode(false));
-      XML_WriteStrValue(node, L"my_start_date", wstring(item->GetMyDate(DATE_START)).c_str());
-      XML_WriteStrValue(node, L"my_finish_date", wstring(item->GetMyDate(DATE_END)).c_str());
-      XML_WriteIntValue(node, L"my_score", item->GetMyScore(false));
-      XML_WriteIntValue(node, L"my_status", item->GetMyStatus(false));
-      XML_WriteIntValue(node, L"my_rewatching", item->GetMyRewatching(false));
-      XML_WriteIntValue(node, L"my_rewatching_ep", item->GetMyRewatchingEp());
-      XML_WriteStrValue(node, L"my_last_updated", item->GetMyLastUpdated().c_str());
-      XML_WriteStrValue(node, L"my_tags", item->GetMyTags(false).c_str());
-      doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+      XmlWriteIntValue(node, L"series_animedb_id", item->GetId());
+      XmlWriteIntValue(node, L"my_watched_episodes", item->GetMyLastWatchedEpisode(false));
+      XmlWriteStrValue(node, L"my_start_date", wstring(item->GetMyDate(DATE_START)).c_str());
+      XmlWriteStrValue(node, L"my_finish_date", wstring(item->GetMyDate(DATE_END)).c_str());
+      XmlWriteIntValue(node, L"my_score", item->GetMyScore(false));
+      XmlWriteIntValue(node, L"my_status", item->GetMyStatus(false));
+      XmlWriteIntValue(node, L"my_rewatching", item->GetMyRewatching(false));
+      XmlWriteIntValue(node, L"my_rewatching_ep", item->GetMyRewatchingEp());
+      XmlWriteStrValue(node, L"my_last_updated", item->GetMyLastUpdated().c_str());
+      XmlWriteStrValue(node, L"my_tags", item->GetMyTags(false).c_str());
+      doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
       return true;
     }
     // Delete anime item
     case DELETE_ANIME: {
       for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-        if (XML_ReadIntValue(node, L"series_animedb_id") == item->GetId()) {
+        if (XmlReadIntValue(node, L"series_animedb_id") == item->GetId()) {
           myanimelist.remove_child(node);
-          doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+          doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
           return true;
         }
       }
@@ -371,15 +371,15 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
     // Edit anime data
     case EDIT_ANIME: {
       for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-        if (XML_ReadIntValue(node, L"series_animedb_id") == item->GetId()) {
+        if (XmlReadIntValue(node, L"series_animedb_id") == item->GetId()) {
           xml_node child_node = node.child(child.c_str());
           if (wstring(child_node.first_child().value()).empty()) {
-            child_node = child_node.append_child(node_pcdata);
+            child_node = child_node.append_child(pugi::node_pcdata);
           } else {
             child_node = child_node.first_child();
           }
           child_node.set_value(value.c_str());
-          doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+          doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
           return true;
         }
       }
@@ -388,7 +388,7 @@ bool Database::SaveList(int anime_id, const wstring& child, const wstring& value
     // Edit user data
     case EDIT_USER: {
       myanimelist.child(L"myinfo").child(child.c_str()).first_child().set_value(value.c_str());
-      doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+      doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
       return true;
     }
   }
@@ -425,7 +425,7 @@ bool FansubDatabase::Load() {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok && result.status != status_file_not_found) {
+  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
     MessageBox(NULL, L"Could not read fansub data.", file.c_str(), MB_OK | MB_ICONERROR);
     return false;
   }
@@ -433,7 +433,7 @@ bool FansubDatabase::Load() {
   // Read items
   xml_node fansub_node = doc.child(L"fansub_groups");
   for (xml_node node = fansub_node.child(L"fansub"); node; node = node.next_sibling(L"fansub")) {
-    items.push_back(XML_ReadStrValue(node, L"name"));
+    items.push_back(XmlReadStrValue(node, L"name"));
   }
 
   return true;
@@ -527,19 +527,19 @@ bool SeasonDatabase::Load(wstring file) {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok && result.status != status_file_not_found) {
+  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
     MessageBox(NULL, L"Could not read season data.", file.c_str(), MB_OK | MB_ICONERROR);
     return false;
   }
 
   // Read information
   xml_node season_node = doc.child(L"season");
-  name = XML_ReadStrValue(season_node.child(L"info"), L"name");
-  time_t last_modified = _wtoi64(XML_ReadStrValue(season_node.child(L"info"), L"last_modified").c_str());
+  name = XmlReadStrValue(season_node.child(L"info"), L"name");
+  time_t last_modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"), L"last_modified").c_str());
 
   // Read items
   for (xml_node node = season_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-    int anime_id = XML_ReadIntValue(node, L"series_animedb_id");
+    int anime_id = XmlReadIntValue(node, L"series_animedb_id");
     items.push_back(anime_id);
     
     auto anime_item = AnimeDatabase.FindItem(anime_id);
@@ -547,13 +547,13 @@ bool SeasonDatabase::Load(wstring file) {
       continue;
 
     Item item;
-    item.SetId(XML_ReadIntValue(node, L"series_animedb_id"));
-    item.SetTitle(XML_ReadStrValue(node, L"series_title"));
-    item.SetType(XML_ReadIntValue(node, L"series_type"));
-    item.SetImageUrl(XML_ReadStrValue(node, L"series_image"));
-    item.SetProducers(XML_ReadStrValue(node, L"producers"));
+    item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
+    item.SetTitle(XmlReadStrValue(node, L"series_title"));
+    item.SetType(XmlReadIntValue(node, L"series_type"));
+    item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    item.SetProducers(XmlReadStrValue(node, L"producers"));
     xml_node settings_node = node.child(L"settings");
-    item.keep_title = XML_ReadIntValue(settings_node, L"keep_title") != 0;
+    item.keep_title = XmlReadIntValue(settings_node, L"keep_title") != 0;
     item.last_modified = last_modified;
     AnimeDatabase.UpdateItem(item);
   }

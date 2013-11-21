@@ -49,7 +49,7 @@ BOOL MediaPlayers::Load() {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok) {
+  if (result.status != pugi::status_ok) {
     MessageBox(NULL, L"Could not read media list.", file.c_str(), MB_OK | MB_ICONERROR);
     return FALSE;
   }
@@ -58,14 +58,14 @@ BOOL MediaPlayers::Load() {
   xml_node mediaplayers = doc.child(L"media_players");
   for (xml_node player = mediaplayers.child(L"player"); player; player = player.next_sibling(L"player")) {
     items.resize(items.size() + 1);
-    items.back().name = XML_ReadStrValue(player, L"name");
-    items.back().enabled = XML_ReadIntValue(player, L"enabled");
-    items.back().engine = XML_ReadStrValue(player, L"engine");
-    items.back().visible = XML_ReadIntValue(player, L"visible");
-    items.back().mode = XML_ReadIntValue(player, L"mode");
-    XML_ReadChildNodes(player, items.back().classes, L"class");
-    XML_ReadChildNodes(player, items.back().files, L"file");
-    XML_ReadChildNodes(player, items.back().folders, L"folder");
+    items.back().name = XmlReadStrValue(player, L"name");
+    items.back().enabled = XmlReadIntValue(player, L"enabled");
+    items.back().engine = XmlReadStrValue(player, L"engine");
+    items.back().visible = XmlReadIntValue(player, L"visible");
+    items.back().mode = XmlReadIntValue(player, L"mode");
+    XmlReadChildNodes(player, items.back().classes, L"class");
+    XmlReadChildNodes(player, items.back().files, L"file");
+    XmlReadChildNodes(player, items.back().folders, L"folder");
     for (xml_node child_node = player.child(L"edit"); child_node; child_node = child_node.next_sibling(L"edit")) {
       MediaPlayer::EditTitle edit;
       edit.mode = child_node.attribute(L"mode").as_int();

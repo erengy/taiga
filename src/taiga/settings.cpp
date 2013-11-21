@@ -276,7 +276,7 @@ bool Settings::Load() {
       // File archive
       Aggregator.LoadArchive();
 
-  return result.status == status_ok;
+  return result.status == pugi::status_ok;
 }
 
 // =============================================================================
@@ -287,7 +287,7 @@ bool Settings::Save() {
   xml_node settings = doc.append_child(L"settings");
 
   // Meta
-  settings.append_child(node_comment).set_value(L" Meta ");
+  settings.append_child(pugi::node_comment).set_value(L" Meta ");
   xml_node meta = settings.append_child(L"meta");
     // Version
     xml_node version = meta.append_child(L"version");
@@ -296,7 +296,7 @@ bool Settings::Save() {
     version.append_attribute(L"revision") = VERSION_REVISION;
 
   // Account
-  settings.append_child(node_comment).set_value(L" Account ");
+  settings.append_child(pugi::node_comment).set_value(L" Account ");
   xml_node account = settings.append_child(L"account");
     // MyAnimeList
     xml_node mal = account.append_child(L"myanimelist");
@@ -314,7 +314,7 @@ bool Settings::Save() {
     update.append_attribute(L"waitplayer") = Account.Update.wait_mp;
   
   // Anime
-  settings.append_child(node_comment).set_value(L" Anime list ");
+  settings.append_child(pugi::node_comment).set_value(L" Anime list ");
   xml_node anime = settings.append_child(L"anime");
     // Root folders  
     xml_node folders = anime.append_child(L"folders");  
@@ -343,7 +343,7 @@ bool Settings::Save() {
     }
 
   // Announcements
-  settings.append_child(node_comment).set_value(L" Announcements ");
+  settings.append_child(pugi::node_comment).set_value(L" Announcements ");
   xml_node announce = settings.append_child(L"announce");
     // HTTP
     xml_node http = announce.append_child(L"http");
@@ -376,7 +376,7 @@ bool Settings::Save() {
     twitter.append_attribute(L"user") = Announce.Twitter.user.c_str();
 
   // Program
-  settings.append_child(node_comment).set_value(L" Program ");
+  settings.append_child(pugi::node_comment).set_value(L" Program ");
   xml_node program = settings.append_child(L"program");
     // General
     xml_node general = program.append_child(L"general");
@@ -432,7 +432,7 @@ bool Settings::Save() {
     notifications.child(L"balloon").append_attribute(L"format") = Program.Notifications.format.c_str();
 
   // Recognition
-  settings.append_child(node_comment).set_value(L" Recognition ");
+  settings.append_child(pugi::node_comment).set_value(L" Recognition ");
   xml_node recognition = settings.append_child(L"recognition");
     // Media players
     xml_node mediaplayers = recognition.append_child(L"mediaplayers");
@@ -452,7 +452,7 @@ bool Settings::Save() {
         providers.append_attribute(L"youtube") = Recognition.Streaming.youtube_enabled;
 
   // RSS
-  settings.append_child(node_comment).set_value(L" RSS ");
+  settings.append_child(pugi::node_comment).set_value(L" RSS ");
   xml_node rss = settings.append_child(L"rss");
     // Torrent
     xml_node torrent = rss.append_child(L"torrent");
@@ -509,7 +509,7 @@ bool Settings::Save() {
 
   // Save file
   ::CreateDirectory(folder_.c_str(), NULL);
-  return doc.save_file(file_.c_str(), L"\x09", format_default | format_write_bom);
+  return doc.save_file(file_.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
 }
 
 // =============================================================================

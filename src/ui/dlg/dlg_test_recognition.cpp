@@ -41,7 +41,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok) {
+  if (result.status != pugi::status_ok) {
     ::MessageBox(NULL, L"Could not read recognition test file.", file.c_str(), MB_OK | MB_ICONERROR);
     return FALSE;
   }
@@ -50,19 +50,19 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   xml_node recognition = doc.child(L"recognition");
   for (xml_node file_node = recognition.child(L"file"); file_node; file_node = file_node.next_sibling(L"file")) {
     EpisodeTest new_episode;
-    new_episode.audio_type = XML_ReadStrValue(file_node, L"audio");
-    new_episode.checksum   = XML_ReadStrValue(file_node, L"checksum");
-    new_episode.extras     = XML_ReadStrValue(file_node, L"extra");
-    new_episode.file       = XML_ReadStrValue(file_node, L"file");
-    new_episode.format     = XML_ReadStrValue(file_node, L"format");
-    new_episode.group      = XML_ReadStrValue(file_node, L"group");
-    new_episode.name       = XML_ReadStrValue(file_node, L"name");
-    new_episode.number     = XML_ReadStrValue(file_node, L"number");
-    new_episode.priority   = XML_ReadIntValue(file_node, L"priority");
-    new_episode.resolution = XML_ReadStrValue(file_node, L"resolution");
-    new_episode.title      = XML_ReadStrValue(file_node, L"title");
-    new_episode.version    = XML_ReadStrValue(file_node, L"version");
-    new_episode.video_type = XML_ReadStrValue(file_node, L"video");
+    new_episode.audio_type = XmlReadStrValue(file_node, L"audio");
+    new_episode.checksum   = XmlReadStrValue(file_node, L"checksum");
+    new_episode.extras     = XmlReadStrValue(file_node, L"extra");
+    new_episode.file       = XmlReadStrValue(file_node, L"file");
+    new_episode.format     = XmlReadStrValue(file_node, L"format");
+    new_episode.group      = XmlReadStrValue(file_node, L"group");
+    new_episode.name       = XmlReadStrValue(file_node, L"name");
+    new_episode.number     = XmlReadStrValue(file_node, L"number");
+    new_episode.priority   = XmlReadIntValue(file_node, L"priority");
+    new_episode.resolution = XmlReadStrValue(file_node, L"resolution");
+    new_episode.title      = XmlReadStrValue(file_node, L"title");
+    new_episode.version    = XmlReadStrValue(file_node, L"version");
+    new_episode.video_type = XmlReadStrValue(file_node, L"video");
     episodes_.push_back(new_episode);
   }
 

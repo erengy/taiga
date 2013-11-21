@@ -71,7 +71,7 @@ bool UpdateHelper::ParseData(wstring data) {
   // Load XML data
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
-  if (result.status != status_ok) {
+  if (result.status != pugi::status_ok) {
     return false;
   }
 
@@ -81,11 +81,11 @@ bool UpdateHelper::ParseData(wstring data) {
   // Read items
   for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
     items_.resize(items_.size() + 1);
-    items_.back().guid = XML_ReadStrValue(item, L"guid");
-    items_.back().category = XML_ReadStrValue(item, L"category");
-    items_.back().link = XML_ReadStrValue(item, L"link");
-    items_.back().description = XML_ReadStrValue(item, L"description");
-    items_.back().pub_date = XML_ReadStrValue(item, L"pubDate");
+    items_.back().guid = XmlReadStrValue(item, L"guid");
+    items_.back().category = XmlReadStrValue(item, L"category");
+    items_.back().link = XmlReadStrValue(item, L"link");
+    items_.back().description = XmlReadStrValue(item, L"description");
+    items_.back().pub_date = XmlReadStrValue(item, L"pubDate");
   }
 
   // Get version information

@@ -197,27 +197,27 @@ bool ParseSearchResult(const wstring& data, int anime_id) {
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
   
-  if (result.status == status_ok) {
+  if (result.status == pugi::status_ok) {
     xml_node node = doc.child(L"anime");
     for (xml_node entry = node.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
       auto current_anime_item = AnimeDatabase.FindItem(anime_id);
 
       anime::Item anime_item;
-      anime_item.SetId(XML_ReadIntValue(entry, L"id"));
+      anime_item.SetId(XmlReadIntValue(entry, L"id"));
       if (!current_anime_item || !current_anime_item->keep_title)
-        anime_item.SetTitle(mal::DecodeText(XML_ReadStrValue(entry, L"title")));
-      anime_item.SetEnglishTitle(mal::DecodeText(XML_ReadStrValue(entry, L"english")));
-      anime_item.SetSynonyms(mal::DecodeText(XML_ReadStrValue(entry, L"synonyms")));
-      anime_item.SetEpisodeCount(XML_ReadIntValue(entry, L"episodes"));
-      anime_item.SetScore(XML_ReadStrValue(entry, L"score"));
-      anime_item.SetType(mal::TranslateType(XML_ReadStrValue(entry, L"type")));
-      anime_item.SetAiringStatus(mal::TranslateStatus(XML_ReadStrValue(entry, L"status")));
-      anime_item.SetDate(anime::DATE_START, XML_ReadStrValue(entry, L"start_date"));
-      anime_item.SetDate(anime::DATE_END, XML_ReadStrValue(entry, L"end_date"));
-      wstring synopsis = mal::DecodeText(XML_ReadStrValue(entry, L"synopsis"));
+        anime_item.SetTitle(mal::DecodeText(XmlReadStrValue(entry, L"title")));
+      anime_item.SetEnglishTitle(mal::DecodeText(XmlReadStrValue(entry, L"english")));
+      anime_item.SetSynonyms(mal::DecodeText(XmlReadStrValue(entry, L"synonyms")));
+      anime_item.SetEpisodeCount(XmlReadIntValue(entry, L"episodes"));
+      anime_item.SetScore(XmlReadStrValue(entry, L"score"));
+      anime_item.SetType(mal::TranslateType(XmlReadStrValue(entry, L"type")));
+      anime_item.SetAiringStatus(mal::TranslateStatus(XmlReadStrValue(entry, L"status")));
+      anime_item.SetDate(anime::DATE_START, XmlReadStrValue(entry, L"start_date"));
+      anime_item.SetDate(anime::DATE_END, XmlReadStrValue(entry, L"end_date"));
+      wstring synopsis = mal::DecodeText(XmlReadStrValue(entry, L"synopsis"));
       if (!StartsWith(synopsis, L"No synopsis has been added for this series yet."))
         anime_item.SetSynopsis(synopsis);
-      anime_item.SetImageUrl(XML_ReadStrValue(entry, L"image"));
+      anime_item.SetImageUrl(XmlReadStrValue(entry, L"image"));
       anime_item.last_modified = time(nullptr);
       AnimeDatabase.UpdateItem(anime_item);
       

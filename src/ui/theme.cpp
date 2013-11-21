@@ -44,7 +44,7 @@ bool Theme::Load(const wstring& name) {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file_.c_str());
-  if (result.status != status_ok) {
+  if (result.status != pugi::status_ok) {
     MessageBox(NULL, L"Could not read theme file.", file_.c_str(), MB_OK | MB_ICONERROR);
     return false;
   }

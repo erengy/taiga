@@ -197,25 +197,25 @@ bool Feed::Load() {
   // Load XML file
   xml_document doc;
   xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != status_ok) {
+  if (result.status != pugi::status_ok) {
     return false;
   }
 
   // Read channel information
   xml_node channel = doc.child(L"rss").child(L"channel");
-  title = XML_ReadStrValue(channel, L"title");
-  link = XML_ReadStrValue(channel, L"link");
-  description = XML_ReadStrValue(channel, L"description");
+  title = XmlReadStrValue(channel, L"title");
+  link = XmlReadStrValue(channel, L"link");
+  description = XmlReadStrValue(channel, L"description");
 
   // Read items
   for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
     // Read data
     items.resize(items.size() + 1);
     items.back().index = items.size() - 1;
-    items.back().category = XML_ReadStrValue(item, L"category");
-    items.back().title = XML_ReadStrValue(item, L"title");
-    items.back().link = XML_ReadStrValue(item, L"link");
-    items.back().description = XML_ReadStrValue(item, L"description");
+    items.back().category = XmlReadStrValue(item, L"category");
+    items.back().title = XmlReadStrValue(item, L"title");
+    items.back().link = XmlReadStrValue(item, L"link");
+    items.back().description = XmlReadStrValue(item, L"description");
     
     // Remove if title or link is empty
     if (category == FEED_CATEGORY_LINK) {
@@ -359,7 +359,7 @@ bool Aggregator::LoadArchive() {
     file_archive.push_back(item.attribute(L"title").value());
   }
 
-  return result.status == status_ok;
+  return result.status == pugi::status_ok;
 }
 
 bool Aggregator::SaveArchive() {
@@ -381,7 +381,7 @@ bool Aggregator::SaveArchive() {
 
   // Save file
   wstring file = Taiga.GetDataPath() + L"feed\\history.xml";
-  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+  return doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
 }
 
 // =============================================================================

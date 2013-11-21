@@ -158,10 +158,10 @@ void SearchDialog::ParseResults(const wstring& data) {
   anime_ids_.clear();
   xml_document doc;
   xml_parse_result result = doc.load(data.c_str());
-  if (result.status == status_ok) {
+  if (result.status == pugi::status_ok) {
     xml_node anime = doc.child(L"anime");
     for (xml_node entry = anime.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
-      anime_ids_.push_back(XML_ReadIntValue(entry, L"id"));
+      anime_ids_.push_back(XmlReadIntValue(entry, L"id"));
     }
   }
 

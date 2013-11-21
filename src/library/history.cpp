@@ -372,7 +372,7 @@ bool History::Load() {
     queue.Add(event_item, false);
   }
 
-  return result.status == status_ok;
+  return result.status == pugi::status_ok;
 }
 
 bool History::Save() {
@@ -412,7 +412,7 @@ bool History::Save() {
   }
 
   // Save file
-  return doc.save_file(file.c_str(), L"\x09", format_default | format_write_bom);
+  return doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
 }
 
 // =============================================================================

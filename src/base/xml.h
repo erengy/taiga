@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,21 +16,36 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef XML_H
-#define XML_H
+#ifndef TAIGA_BASE_XML_H
+#define TAIGA_BASE_XML_H
 
-#include "std.h"
+#include <string>
+#include <vector>
 #include "third_party/pugixml/pugixml.hpp"
 
-using namespace pugi;
+using pugi::xml_document;
+using pugi::xml_node;
+using pugi::xml_parse_result;
 
-// =============================================================================
+#define foreach_xmlnode_(node, parent, name) \
+    for (pugi::xml_node node = parent.child(name); node; \
+         node = node.next_sibling(name))
 
-int XML_ReadIntValue(xml_node& node, const wchar_t* name);
-wstring XML_ReadStrValue(xml_node& node, const wchar_t* name);
-void XML_ReadChildNodes(xml_node& parent_node, vector<wstring>& str_vector, const wchar_t* name);
-void XML_WriteChildNodes(xml_node& parent_node, vector<wstring>& str_vector, const wchar_t* name);
-void XML_WriteIntValue(xml_node& node, const wchar_t* name, int value);
-void XML_WriteStrValue(xml_node& node, const wchar_t* name, const wchar_t* value, xml_node_type node_type = node_pcdata);
+std::wstring XmlGetNodeAsString(pugi::xml_node node);
 
-#endif // XML_H
+int XmlReadIntValue(pugi::xml_node& node, const wchar_t* name);
+std::wstring XmlReadStrValue(pugi::xml_node& node, const wchar_t* name);
+
+void XmlReadChildNodes(pugi::xml_node& parent_node,
+                       std::vector<std::wstring>& output,
+                       const wchar_t* name);
+void XmlWriteChildNodes(pugi::xml_node& parent_node,
+                        std::vector<std::wstring>& output,
+                        const wchar_t* name);
+
+void XmlWriteIntValue(pugi::xml_node& node, const wchar_t* name, int value);
+void XmlWriteStrValue(pugi::xml_node& node, const wchar_t* name,
+                      const wchar_t* value,
+                      pugi::xml_node_type node_type = pugi::node_pcdata);
+
+#endif  // TAIGA_BASE_XML_H
