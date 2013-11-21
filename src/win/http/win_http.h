@@ -21,15 +21,15 @@
 
 #include <windows.h>
 #include <winhttp.h>
-#include <map>
 #include <string>
 #include <vector>
+#include "base/map.h"
 
 namespace win {
 namespace http {
 
-typedef std::multimap<std::wstring, std::wstring> header_t;
-typedef std::multimap<std::wstring, std::wstring> query_t;
+typedef base::multimap<std::wstring, std::wstring> header_t;
+typedef base::multimap<std::wstring, std::wstring> query_t;
 
 enum ContentEncoding {
   kContentEncodingNone,

@@ -615,6 +615,9 @@
     <ClInclude Include="base\types.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="base\map.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="taiga\version.rc">

@@ -144,13 +144,12 @@ BOOL Client::SendRequest() {
 std::wstring Client::BuildRequestHeader() {
   // Set acceptable types for the response
   if (!request_.header.count(L"Accept"))
-    request_.header.insert(std::make_pair(L"Accept", L"*/*"));
+    request_.header[L"Accept"] = L"*/*";
 
   // Set content type for POST and PUT requests
   if (request_.method == L"POST" || request_.method == L"PUT")
     if (!request_.header.count(L"Content-Type"))
-      request_.header.insert(std::make_pair(
-          L"Content-Type", L"application/x-www-form-urlencoded"));
+      request_.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
 
   std::wstring header;
 

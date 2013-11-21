@@ -439,9 +439,9 @@ bool Twitter::RequestToken() {
   HttpRequest http_request;
   http_request.host = L"api.twitter.com";
   http_request.path = L"oauth/request_token";
-  http_request.header.insert(std::make_pair(L"Authorization",
+  http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/request_token",
-                                     L"GET", NULL)));
+                                     L"GET", NULL);
 
   Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Request);
 
@@ -452,9 +452,9 @@ bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstri
   HttpRequest http_request;
   http_request.host = L"api.twitter.com";
   http_request.path = L"oauth/access_token";
-  http_request.header.insert(std::make_pair(L"Authorization",
+  http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/access_token",
-                                     L"POST", NULL, key, secret, pin)));
+                                     L"POST", NULL, key, secret, pin);
 
   Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Auth);
 
@@ -478,11 +478,11 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   http_request.host = L"api.twitter.com";
   http_request.path = L"1.1/statuses/update.json";
   http_request.body = L"status=" + post_parameters[L"status"];
-  http_request.header.insert(std::make_pair(L"Authorization",
+  http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/1.1/statuses/update.json",
                                      L"POST", &post_parameters,
                                      Settings.Announce.Twitter.oauth_key,
-                                     Settings.Announce.Twitter.oauth_secret)));
+                                     Settings.Announce.Twitter.oauth_secret);
 
   Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Post);
 

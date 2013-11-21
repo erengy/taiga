@@ -88,7 +88,7 @@ bool GetList() {
   HttpRequest http_request;
   http_request.host = L"myanimelist.net";
   http_request.path = L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all";
-  http_request.header.insert(std::make_pair(L"Accept-Encoding", L"gzip"));
+  http_request.header[L"Accept-Encoding"] = L"gzip";
 
   Clients.service.list.set_download_path(L"");
   Clients.service.list.SetClientMode(HTTP_MAL_RefreshList);
@@ -105,7 +105,7 @@ bool Login() {
   HttpRequest http_request;
   http_request.host = L"myanimelist.net";
   http_request.path = L"/api/account/verify_credentials.xml";
-  http_request.header.insert(std::make_pair(L"Authorization", L"Basic " + GetUserPassEncoded()));
+  http_request.header[L"Authorization"] = L"Basic " + GetUserPassEncoded();
 
   Clients.service.list.set_download_path(L"");
   Clients.service.list.SetClientMode(HTTP_MAL_Login);
@@ -251,7 +251,7 @@ bool SearchAnime(int anime_id, wstring title) {
   HttpRequest http_request;
   http_request.host = L"myanimelist.net";
   http_request.path = L"/api/anime/search.xml?q=" + title;
-  http_request.header.insert(std::make_pair(L"Authorization", L"Basic " + GetUserPassEncoded()));
+  http_request.header[L"Authorization"] = L"Basic " + GetUserPassEncoded();
   http_request.parameter = anime_id;
 
   client->set_download_path(L"");
@@ -321,7 +321,7 @@ bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
   http_request.path = url.path;
   http_request.body = data;
   http_request.parameter = static_cast<LPARAM>(anime_id);
-  http_request.header.insert(std::make_pair(L"Authorization", L"Basic " + GetUserPassEncoded()));
+  http_request.header[L"Authorization"] = L"Basic " + GetUserPassEncoded();
 
   Clients.service.list.set_download_path(L"");
   Clients.service.list.SetClientMode(update_mode);

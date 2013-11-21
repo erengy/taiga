@@ -205,6 +205,7 @@
     <ClInclude Include="base\gfx.h" />
     <ClInclude Include="base\gzip.h" />
     <ClInclude Include="base\logger.h" />
+    <ClInclude Include="base\map.h" />
     <ClInclude Include="base\optional.h" />
     <ClInclude Include="base\process.h" />
     <ClInclude Include="base\std.h" />
