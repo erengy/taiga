@@ -26,42 +26,11 @@
 #include "string.h"
 #include "ui/theme.h"
 
-#include "third_party/base64/base64.h"
 #include "third_party/zlib/zlib.h"
 
 #include "win/win_registry.h"
 
 #define MAKEQWORD(a, b)	((QWORD)( ((QWORD) ((DWORD) (a))) << 32 | ((DWORD) (b))))
-
-// =============================================================================
-
-wstring Base64Decode(const wstring& str, bool for_filename) {
-  if (str.empty()) return L"";
-  Base64Coder coder;
-  string buff = ToANSI(str);
-  coder.Decode((BYTE*)buff.c_str(), buff.length());
-  if (for_filename) {
-    wstring msg = ToUTF8(coder.DecodedMessage());
-    ReplaceChar(msg, '-', '/');
-    return msg;
-  } else {
-    return ToUTF8(coder.DecodedMessage());
-  }
-}
-
-wstring Base64Encode(const wstring& str, bool for_filename) {
-  if (str.empty()) return L"";
-  Base64Coder coder;
-  string buff = ToANSI(str);
-  coder.Encode((BYTE*)buff.c_str(), buff.length());
-  if (for_filename) {
-    wstring msg = ToUTF8(coder.EncodedMessage());
-    ReplaceChar(msg, '/', '-');
-    return msg;
-  } else {
-    return ToUTF8(coder.EncodedMessage());
-  }
-}
 
 // =============================================================================
 

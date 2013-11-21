@@ -23,6 +23,7 @@
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "base/common.h"
+#include "base/encryption.h"
 #include "library/history.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"

@@ -618,6 +618,9 @@
     <ClInclude Include="base\map.h">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="base\encryption.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="taiga\version.rc">

@@ -48,8 +48,6 @@ class Item;
 void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 
 // common.cpp
-wstring Base64Decode(const wstring& str, bool for_filename = false);
-wstring Base64Encode(const wstring& str, bool for_filename = false);
 wstring CalculateCRC(const wstring& file);
 int GetEpisodeHigh(const wstring& episode_number);
 int GetEpisodeLow(const wstring& episode_number);
@@ -78,10 +76,6 @@ wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value
 int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = L"", bool recursive = false, bool trim_extension = false);
 int PopulateFolders(vector<wstring>& folder_list, wstring path);
 wstring ToSizeString(QWORD qwSize);
-
-// encryption.cpp
-wstring SimpleEncrypt(wstring str);
-wstring SimpleDecrypt(wstring str);
 
 // list_sort.cpp
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);

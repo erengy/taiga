@@ -32,6 +32,7 @@
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
 #include "base/common.h"
+#include "base/encryption.h"
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "library/history.h"
