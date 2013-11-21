@@ -25,6 +25,7 @@
 #include "../http.h"
 #include "../resource.h"
 #include "../taiga.h"
+#include "../theme.h"
 
 #include "../win32/win_gdi.h"
 #include "../win32/win_taskdialog.h"
@@ -41,6 +42,9 @@ BOOL UpdateDialog::OnInitDialog() {
   // Set icon
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
+
+  // Create default fonts
+  UI.CreateFonts(GetDC());
 
   // Set title
   SetText(APP_TITLE);

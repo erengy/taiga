@@ -351,6 +351,9 @@
     <ClCompile Include="logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dlg\dlg_update_new.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dlg\dlg_about.h">
@@ -595,6 +598,9 @@
     </ClInclude>
     <ClInclude Include="logger.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dlg\dlg_update_new.h">
+      <Filter>Dialogs\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

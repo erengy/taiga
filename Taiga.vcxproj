@@ -116,6 +116,7 @@
     <ClCompile Include="dlg\dlg_torrent.cpp" />
     <ClCompile Include="dlg\dlg_feed_filter.cpp" />
     <ClCompile Include="dlg\dlg_update.cpp" />
+    <ClCompile Include="dlg\dlg_update_new.cpp" />
     <ClCompile Include="encryption.cpp" />
     <ClCompile Include="feed_filter.cpp" />
     <ClCompile Include="gfx.cpp" />
@@ -218,6 +219,7 @@
     <ClInclude Include="dlg\dlg_torrent.h" />
     <ClInclude Include="dlg\dlg_feed_filter.h" />
     <ClInclude Include="dlg\dlg_update.h" />
+    <ClInclude Include="dlg\dlg_update_new.h" />
     <ClInclude Include="foreach.h" />
     <ClInclude Include="gfx.h" />
     <ClInclude Include="history.h" />

@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "foreach.h"
+#include "resource.h"
 #include "settings.h"
 #include "string.h"
 #include "taiga.h"
@@ -30,6 +31,7 @@
 
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_update.h"
+#include "dlg/dlg_update_new.h"
 
 #include "win32/win_taskdialog.h"
 
@@ -61,7 +63,7 @@ bool UpdateHelper::Check(win32::App& app) {
 
 bool UpdateHelper::ParseData(wstring data) {
   // Reset values
-  items_.clear();
+  items.clear();
   download_path_.clear();
   latest_guid_.clear();
   restart_required_ = false;
@@ -79,12 +81,12 @@ bool UpdateHelper::ParseData(wstring data) {
 
   // Read items
   for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
-    items_.resize(items_.size() + 1);
-    items_.back().guid = XML_ReadStrValue(item, L"guid");
-    items_.back().category = XML_ReadStrValue(item, L"category");
-    items_.back().link = XML_ReadStrValue(item, L"link");
-    items_.back().description = XML_ReadStrValue(item, L"description");
-    items_.back().pub_date = XML_ReadStrValue(item, L"pubDate");
+    items.resize(items.size() + 1);
+    items.back().guid = XML_ReadStrValue(item, L"guid");
+    items.back().category = XML_ReadStrValue(item, L"category");
+    items.back().link = XML_ReadStrValue(item, L"link");
+    items.back().description = XML_ReadStrValue(item, L"description");
+    items.back().pub_date = XML_ReadStrValue(item, L"pubDate");
   }
 
   // Get version information
@@ -92,7 +94,7 @@ bool UpdateHelper::ParseData(wstring data) {
                                          app_->GetVersionMinor(),
                                          app_->GetVersionRevision());
   auto latest_version = current_version;
-  foreach_(item, items_) {
+  foreach_(item, items) {
     vector<wstring> numbers;
     Split(item->guid, L".", numbers);
     auto item_version = GetVersionValue(ToInt(numbers.at(0)),
@@ -120,34 +122,20 @@ bool UpdateHelper::IsUpdateAvailable() const {
 }
 
 bool UpdateHelper::IsDownloadAllowed() const {
-  win32::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-  dlg.SetFooter(L"Current version: " APP_VERSION);
-
   if (IsUpdateAvailable()) {
-    auto feed_item = FindItem(latest_guid_);
-    if (!feed_item) return false;
+    NewUpdateDialog.Create(IDD_UPDATE_NEW, UpdateDialog.GetWindowHandle(), true);
+    return true;
 
-    dlg.SetMainInstruction(L"A new version of Taiga is available!");
-    wstring content = L"Latest version: " + latest_guid_;
-    dlg.SetContent(content.c_str());
-    dlg.SetExpandedInformation(feed_item->description.c_str());
-    
-    dlg.AddButton(L"Download", IDYES);
-    dlg.AddButton(L"Cancel", IDNO);
-    dlg.Show(UpdateDialog.GetWindowHandle());
-    if (dlg.GetSelectedButtonID() != IDYES)
-      return false;
-  
   } else {
     if (MainDialog.IsWindow()) {
+      win32::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
+      dlg.SetFooter(L"Current version: " APP_VERSION);
       dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
       dlg.AddButton(L"OK", IDOK);
-      dlg.Show(g_hMain);
+      dlg.Show(UpdateDialog.GetWindowHandle());
     }
     return false;
   }
-
-  return true;
 }
 
 bool UpdateHelper::Download() {
@@ -181,7 +169,7 @@ void UpdateHelper::SetDownloadPath(const wstring& path) {
 }
 
 const GenericFeedItem* UpdateHelper::FindItem(const wstring& guid) const {
-  foreach_(item, items_)
+  foreach_(item, items)
     if (IsEqual(item->guid, latest_guid_))
       return &(*item);
 

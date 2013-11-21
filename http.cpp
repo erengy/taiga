@@ -556,8 +556,7 @@ BOOL HttpClient::OnReadComplete() {
     case HTTP_UpdateCheck: {
       if (Taiga.Updater.ParseData(GetData()))
         if (Taiga.Updater.IsDownloadAllowed())
-          if (Taiga.Updater.Download())
-            return TRUE;
+          return TRUE;
       UpdateDialog.PostMessage(WM_CLOSE);
       break;
     }

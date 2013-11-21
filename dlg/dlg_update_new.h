@@ -16,41 +16,28 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UPDATE_H
-#define UPDATE_H
+#ifndef DLG_UPDATE_NEW_H
+#define DLG_UPDATE_NEW_H
 
-#include "std.h"
-#include "feed.h"
-#include "http.h"
+#include "../std.h"
+#include "../win32/win_control.h"
+#include "../win32/win_dialog.h"
 
 // =============================================================================
 
-class UpdateHelper {
+class NewUpdateDialog : public win32::Dialog {
 public:
-  UpdateHelper();
-  virtual ~UpdateHelper() {}
+  NewUpdateDialog();
+  virtual ~NewUpdateDialog() {}
 
-  bool Check(win32::App& app);
-  bool Download();
-  bool IsDownloadAllowed() const;
-  bool IsRestartRequired() const;
-  bool IsUpdateAvailable() const;
-  bool ParseData(wstring data);
-  bool RunInstaller();
-  void SetDownloadPath(const wstring& path);
+  BOOL OnInitDialog();
+  void OnOK();
+  void OnCancel();
 
-  const GenericFeedItem* FindItem(const wstring& guid) const;
-  unsigned long GetVersionValue(int major, int minor, int revision) const;
-
-  HttpClient client;
-  vector<GenericFeedItem> items;
-
-private:
-  win32::App* app_;
-  wstring download_path_;
-  wstring latest_guid_;
-  bool restart_required_;
-  bool update_available_;
+public:
+  win32::ProgressBar progressbar;
 };
 
-#endif // UPDATE_H
+extern class NewUpdateDialog NewUpdateDialog;
+
+#endif // DLG_UPDATE_NEW_H
