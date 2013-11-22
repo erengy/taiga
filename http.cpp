@@ -59,6 +59,35 @@ HttpClient::HttpClient() {
   SetUserAgent(APP_NAME L"/" + ToWstr(VERSION_MAJOR) + L"." + ToWstr(VERSION_MINOR));
 }
 
+void HttpClient::OnInitialize() {
+  switch (GetClientMode()) {
+    case HTTP_MAL_Login:
+    case HTTP_MAL_RefreshList:
+    case HTTP_MAL_AnimeAdd:
+    case HTTP_MAL_AnimeAskToDiscuss:
+    case HTTP_MAL_AnimeDelete:
+    case HTTP_MAL_AnimeDetails:
+    case HTTP_MAL_AnimeUpdate:
+    case HTTP_MAL_SearchAnime:
+    case HTTP_MAL_Image:
+    case HTTP_MAL_UserImage:
+      //
+      //       wow                           such
+      //               no spoof            security
+      //
+      //   so obscure           hyper txt plz
+      //
+      SetUserAgent(
+        L"api-"
+                                L"taiga-"
+          L"32864c09"
+                                                L"ef538453"
+                           L"b4d81107"
+        L"34ee355b");
+      break;
+  }
+}
+
 BOOL HttpClient::OnError(DWORD dwError) {
   wstring error_text = L"HTTP error #" + ToWstr(dwError) + L": " + 
                        FormatError(dwError, L"winhttp.dll");

@@ -77,6 +77,9 @@ bool Http::Connect(wstring szServer, wstring szObject, wstring szData, wstring s
   m_RequestHeader = szHeader;
   wstring header = BuildRequestHeader(szHeader);
 
+  // Last chance to modify things
+  OnInitialize();
+
   // Create a session handle
   m_hSession = ::WinHttpOpen(m_UserAgent.c_str(), 
     WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, 

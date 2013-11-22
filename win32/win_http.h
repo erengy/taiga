@@ -84,6 +84,7 @@ public:
   bool Post(const Url& url, wstring szData, wstring szFile, 
     DWORD dwClientMode = 0, LPARAM lParam = 0);
 
+  virtual void OnInitialize() {}
   virtual BOOL OnError(DWORD dwError) { return FALSE; }
   virtual BOOL OnSendRequestComplete() { return FALSE; }
   virtual BOOL OnHeadersAvailable(http_header_t& headers) { return FALSE; }

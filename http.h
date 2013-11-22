@@ -64,6 +64,7 @@ public:
   virtual ~HttpClient() {}
 
 protected:
+  void OnInitialize();
   BOOL OnError(DWORD dwError);
   BOOL OnSendRequestComplete();
   BOOL OnHeadersAvailable(win32::http_header_t& headers);
