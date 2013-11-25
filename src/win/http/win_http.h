@@ -79,6 +79,8 @@ public:
 
   const Request& request() const;
   const Response& response() const;
+  DWORD content_length() const;
+  DWORD current_length() const;
 
   void set_auto_redirect(bool enabled);
   void set_download_path(const std::wstring& download_path);

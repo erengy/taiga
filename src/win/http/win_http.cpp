@@ -113,6 +113,14 @@ const Response& Client::response() const {
   return response_;
 }
 
+DWORD Client::content_length() const {
+  return content_length_;
+}
+
+DWORD Client::current_length() const {
+  return current_length_;
+}
+
 void Client::set_auto_redirect(bool enabled) {
   auto_redirect_ = enabled;
 }
