@@ -31,6 +31,7 @@ public:
   UpdateHelper();
   virtual ~UpdateHelper() {}
 
+  void Cancel();
   bool Check(win::App& app);
   bool Download();
   bool IsDownloadAllowed() const;
@@ -39,8 +40,6 @@ public:
   bool ParseData(wstring data);
   bool RunInstaller();
   void SetDownloadPath(const wstring& path);
-
-  HttpClient client;
 
 private:
   const GenericFeedItem* FindItem(const wstring& guid) const;
@@ -52,6 +51,7 @@ private:
   wstring latest_guid_;
   bool restart_required_;
   bool update_available_;
+  wstring client_uuid_;
 };
 
 #endif // UPDATE_H

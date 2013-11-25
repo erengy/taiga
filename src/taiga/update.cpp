@@ -44,6 +44,10 @@ UpdateHelper::UpdateHelper()
 
 // =============================================================================
 
+void UpdateHelper::Cancel() {
+  ConnectionManager.CancelRequest(client_uuid_);
+}
+
 bool UpdateHelper::Check(win::App& app) {
   app_ = &app;
 
@@ -54,10 +58,10 @@ bool UpdateHelper::Check(win::App& app) {
   http_request.query[L"version"] = APP_VERSION;
   http_request.query[L"check"] = MainDialog.IsWindow() ? L"manual" : L"auto";
 
-  client.set_download_path(L"");
-  client.SetClientMode(HTTP_UpdateCheck);
+  client_uuid_ = http_request.uuid;
 
-  return client.MakeRequest(http_request);
+  ConnectionManager.MakeRequest(http_request, taiga::kHttpTaigaUpdateCheck);
+  return true;
 }
 
 bool UpdateHelper::ParseData(wstring data) {
@@ -165,10 +169,13 @@ bool UpdateHelper::Download() {
   http_request.host = url.host;
   http_request.path = url.path;
 
-  client.set_download_path(download_path_);
-  client.SetClientMode(HTTP_UpdateDownload);
+  client_uuid_ = http_request.uuid;
 
-  return client.MakeRequest(http_request);
+  auto& client = ConnectionManager.GetNewClient(http_request.uuid);
+  client.set_download_path(download_path_);
+  ConnectionManager.MakeRequest(client, http_request,
+                                taiga::kHttpTaigaUpdateDownload);
+  return true;
 }
 
 bool UpdateHelper::RunInstaller() {
