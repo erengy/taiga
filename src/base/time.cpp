@@ -32,7 +32,7 @@ Date::Date()
 }
 
 Date::Date(const wstring& date) {
-  *this = mal::ParseDateString(date);
+  *this = sync::myanimelist::ParseDateString(date);
 }
 
 Date::Date(unsigned short year, unsigned short month, unsigned short day)

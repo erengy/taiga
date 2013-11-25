@@ -25,15 +25,22 @@
 #include <vector>
 #include "win/http/win_http.h"
 
-// Dictionary types
-typedef std::map<std::wstring, std::wstring> dictionary_t;
-typedef std::map<std::wstring, std::vector<std::wstring>> multidictionary_t;
+namespace base {
+
+// UUID type
+typedef std::wstring uuid_t;
+
+}  // namespace base
 
 // Default enumeration type
 typedef unsigned char enum_t;
 
 // Default string type
 typedef std::wstring string_t;
+
+// Dictionary types
+typedef std::map<string_t, string_t> dictionary_t;
+typedef std::map<string_t, std::vector<string_t>> multidictionary_t;
 
 // HTTP request and response
 typedef win::http::Request HttpRequest;

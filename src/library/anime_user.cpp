@@ -64,19 +64,19 @@ int ListUser::GetItemCount(int status, bool check_events) const {
   
   // Get current count
   switch (status) {
-    case mal::MYSTATUS_WATCHING:
+    case sync::myanimelist::kWatching:
       count = user_.watching;
       break;
-    case mal::MYSTATUS_COMPLETED:
+    case sync::myanimelist::kCompleted:
       count = user_.completed;
       break;
-    case mal::MYSTATUS_ONHOLD:
+    case sync::myanimelist::kOnHold:
       count = user_.on_hold;
       break;
-    case mal::MYSTATUS_DROPPED:
+    case sync::myanimelist::kDropped:
       count = user_.dropped;
       break;
-    case mal::MYSTATUS_PLANTOWATCH:
+    case sync::myanimelist::kPlanToWatch:
       count = user_.plan_to_watch;
       break;
   }
@@ -84,7 +84,7 @@ int ListUser::GetItemCount(int status, bool check_events) const {
   // Search event queue for status changes
   if (check_events) {
     for (auto it = History.queue.items.begin(); it != History.queue.items.end(); ++it) {
-      if (it->mode == HTTP_MAL_AnimeAdd) continue;
+      if (it->mode == taiga::kHttpServiceAddLibraryEntry) continue;
       if (it->status) {
         if (status == *it->status) {
           count++;
@@ -117,27 +117,27 @@ void ListUser::IncreaseItemCount(int status, bool save_list) {
 
 void ListUser::SetItemCount(int status, int count, bool save_list) {
   switch (status) {
-    case mal::MYSTATUS_WATCHING:
+    case sync::myanimelist::kWatching:
       user_.watching = count;
       if (save_list) database_->SaveList(
         -1, L"user_watching", ToWstr(user_.watching), EDIT_USER);
       break;
-    case mal::MYSTATUS_COMPLETED:
+    case sync::myanimelist::kCompleted:
       user_.completed = count;
       if (save_list) database_->SaveList(
         -1, L"user_completed", ToWstr(user_.completed), EDIT_USER);
       break;
-    case mal::MYSTATUS_ONHOLD:
+    case sync::myanimelist::kOnHold:
       user_.on_hold = count;
       if (save_list) database_->SaveList(
         -1, L"user_onhold", ToWstr(user_.on_hold), EDIT_USER);
       break;
-    case mal::MYSTATUS_DROPPED:
+    case sync::myanimelist::kDropped:
       user_.dropped = count;
       if (save_list) database_->SaveList(
         -1, L"user_dropped", ToWstr(user_.dropped), EDIT_USER);
       break;
-    case mal::MYSTATUS_PLANTOWATCH:
+    case sync::myanimelist::kPlanToWatch:
       user_.plan_to_watch = count;
       if (save_list) database_->SaveList(
         -1, L"user_plantowatch", ToWstr(user_.plan_to_watch), EDIT_USER);

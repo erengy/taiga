@@ -22,13 +22,14 @@
 #include "anime_db.h"
 #include "anime_episode.h"
 
-#include "sync/announce.h"
+#include "taiga/announce.h"
 #include "base/common.h"
 #include "track/feed.h"
 #include "base/foreach.h"
 #include "history.h"
 #include "track/media.h"
 #include "sync/myanimelist.h"
+#include "sync/sync.h"
 #include "base/process.h"
 #include "taiga/settings.h"
 #include "base/string.h"
@@ -48,15 +49,15 @@ namespace anime {
 
 SeriesInformation::SeriesInformation()
     : id(ID_UNKNOWN), 
-      type(mal::TYPE_UNKNOWN), 
+      type(sync::myanimelist::kUnknownType), 
       episodes(-1), 
-      status(mal::STATUS_UNKNOWN) {
+      status(sync::myanimelist::kUnknownStatus) {
 }
 
 MyInformation::MyInformation()
     : watched_episodes(0), 
       score(0), 
-      status(mal::MYSTATUS_NOTINLIST), 
+      status(sync::myanimelist::kNotInList), 
       rewatching(FALSE), 
       rewatching_ep(0) {
 }
@@ -81,8 +82,8 @@ void Item::StartWatching(Episode& episode) {
   NowPlayingDialog.SetCurrentId(GetId());
   
   // Update anime list window
-  int status = GetMyRewatching() ? mal::MYSTATUS_WATCHING : GetMyStatus();
-  if (status != mal::MYSTATUS_NOTINLIST) {
+  int status = GetMyRewatching() ? sync::myanimelist::kWatching : GetMyStatus();
+  if (status != sync::myanimelist::kNotInList) {
     AnimeListDialog.RefreshList(status);
     AnimeListDialog.RefreshTabs(status);
   }
@@ -123,7 +124,7 @@ void Item::StartWatching(Episode& episode) {
 
   // Get additional information
   if (GetScore().empty() || GetSynopsis().empty())
-    mal::SearchAnime(GetId(), GetTitle());
+    sync::GetMetadataById(GetId());
   
   // Update list
   if (Settings.Account.Update.delay == 0 && !Settings.Account.Update.wait_mp)
@@ -163,7 +164,7 @@ bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
       if (Taiga.ticker_media > -1)
         return false;
 
-  if (GetMyStatus() == mal::MYSTATUS_COMPLETED && GetMyRewatching() == 0)
+  if (GetMyStatus() == sync::myanimelist::kCompleted && GetMyRewatching() == 0)
     return false;
 
   int number = GetEpisodeHigh(episode.number);
@@ -174,7 +175,7 @@ bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
     if (number_low > last_watched + 1 || number < last_watched + 1)
       return false;
 
-  if (!mal::IsValidEpisode(number, last_watched, GetEpisodeCount()))
+  if (!sync::myanimelist::IsValidEpisode(number, last_watched, GetEpisodeCount()))
     return false;
 
   return true;
@@ -203,30 +204,30 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
   event_item.episode = GetEpisodeHigh(episode.number);
 
   // Set start/finish date
-  if (*event_item.episode == 1 && !mal::IsValidDate(GetMyDate(DATE_START)))
-    event_item.date_start = mal::TranslateDateForApi(::GetDate());
-  if (*event_item.episode == GetEpisodeCount() && !mal::IsValidDate(GetMyDate(DATE_END)))
-    event_item.date_finish = mal::TranslateDateForApi(::GetDate());
+  if (*event_item.episode == 1 && !sync::myanimelist::IsValidDate(GetMyDate(DATE_START)))
+    event_item.date_start = sync::myanimelist::TranslateDateForApi(::GetDate());
+  if (*event_item.episode == GetEpisodeCount() && !sync::myanimelist::IsValidDate(GetMyDate(DATE_END)))
+    event_item.date_finish = sync::myanimelist::TranslateDateForApi(::GetDate());
 
   // Set update mode
-  if (GetMyStatus() == mal::MYSTATUS_NOTINLIST) {
-    event_item.mode = HTTP_MAL_AnimeAdd;
+  if (GetMyStatus() == sync::myanimelist::kNotInList) {
+    event_item.mode = taiga::kHttpServiceAddLibraryEntry;
   } else {
-    event_item.mode = HTTP_MAL_AnimeUpdate;
+    event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
   }
 
   if (change_status) {
     // Move to completed
     if (GetEpisodeCount() == *event_item.episode) {
-      event_item.status = mal::MYSTATUS_COMPLETED;
+      event_item.status = sync::myanimelist::kCompleted;
       if (GetMyRewatching()) {
         event_item.enable_rewatching = FALSE;
         //event_item.times_rewatched++; // TODO: Enable when MAL adds to API
       }
     // Move to watching
-    } else if (GetMyStatus() != mal::MYSTATUS_WATCHING || *event_item.episode == 1) {
+    } else if (GetMyStatus() != sync::myanimelist::kWatching || *event_item.episode == 1) {
       if (!GetMyRewatching()) {
-        event_item.status = mal::MYSTATUS_WATCHING;
+        event_item.status = sync::myanimelist::kWatching;
       }
     }
   }

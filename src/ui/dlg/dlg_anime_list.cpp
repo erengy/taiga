@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 #include "win/win_gdi.h"
@@ -42,7 +43,7 @@ class AnimeListDialog AnimeListDialog;
 
 AnimeListDialog::AnimeListDialog()
     : current_id_(anime::ID_UNKNOWN),
-      current_status_(mal::MYSTATUS_WATCHING) {
+      current_status_(sync::myanimelist::kWatching) {
 }
 
 BOOL AnimeListDialog::OnInitDialog() {
@@ -77,11 +78,11 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
 
   // Insert tabs and list groups
-  listview.InsertGroup(mal::MYSTATUS_NOTINLIST, mal::TranslateMyStatus(mal::MYSTATUS_NOTINLIST, false).c_str());
-  for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
-    if (i != mal::MYSTATUS_UNKNOWN) {
-      tab.InsertItem(i - 1, mal::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-      listview.InsertGroup(i, mal::TranslateMyStatus(i, false).c_str());
+  listview.InsertGroup(sync::myanimelist::kNotInList, sync::myanimelist::TranslateMyStatus(sync::myanimelist::kNotInList, false).c_str());
+  for (int i = sync::myanimelist::kWatching; i <= sync::myanimelist::kPlanToWatch; i++) {
+    if (i != sync::myanimelist::kUnknownMyStatus) {
+      tab.InsertItem(i - 1, sync::myanimelist::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
+      listview.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str());
     }
   }
 
@@ -93,8 +94,8 @@ BOOL AnimeListDialog::OnInitDialog() {
   TrackMouseEvent(&tme);
 
   // Refresh
-  RefreshList(mal::MYSTATUS_WATCHING);
-  RefreshTabs(mal::MYSTATUS_WATCHING);
+  RefreshList(sync::myanimelist::kWatching);
+  RefreshTabs(sync::myanimelist::kWatching);
 
   // Success
   return TRUE;
@@ -364,8 +365,8 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   if (!anime_item || !anime_item->IsInList())
     return;
 
-  if (anime_item->GetMyStatus() != mal::MYSTATUS_DROPPED) {
-    if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED || anime_item->GetMyRewatching()) {
+  if (anime_item->GetMyStatus() != sync::myanimelist::kDropped) {
+    if (anime_item->GetMyStatus() != sync::myanimelist::kCompleted || anime_item->GetMyRewatching()) {
       if (anime_item->GetMyLastWatchedEpisode() > 0)
         button_visible[0] = true;
       if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
@@ -740,11 +741,11 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     }
 
     // Draw progress
-    if (anime_item.GetMyStatus() == mal::MYSTATUS_WATCHING || anime_item.GetMyRewatching()) {
+    if (anime_item.GetMyStatus() == sync::myanimelist::kWatching || anime_item.GetMyRewatching()) {
       UI.list_progress.watching.Draw(dc.Get(), &rcWatched);  // Watching
-    } else if (anime_item.GetMyStatus() == mal::MYSTATUS_COMPLETED) {
+    } else if (anime_item.GetMyStatus() == sync::myanimelist::kCompleted) {
       UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed
-    } else if (anime_item.GetMyStatus() == mal::MYSTATUS_DROPPED) {
+    } else if (anime_item.GetMyStatus() == sync::myanimelist::kDropped) {
       UI.list_progress.dropped.Draw(dc.Get(), &rcWatched);   // Dropped
     } else {
       UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed / On hold / Plan to watch
@@ -822,13 +823,13 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   dc.SetTextColor(text_color);
 
   // Episodes watched
-  text = mal::TranslateNumber(eps_watched, L"0");
+  text = sync::myanimelist::TranslateNumber(eps_watched, L"0");
   rcText.right -= (rcText.Width() / 2) + 4;
   if (eps_watched < 1) {
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
   } else if (eps_watched > eps_total && eps_total) {
     dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
-  } else if (eps_watched < eps_total && anime_item.GetMyStatus() == mal::MYSTATUS_COMPLETED) {
+  } else if (eps_watched < eps_total && anime_item.GetMyStatus() == sync::myanimelist::kCompleted) {
     dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
   }
   dc.DrawText(text.c_str(), text.length(), rcText,
@@ -836,7 +837,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   dc.SetTextColor(text_color);
 
   // Total episodes
-  text = mal::TranslateNumber(eps_total, L"?");
+  text = sync::myanimelist::TranslateNumber(eps_total, L"?");
   rcText.left = rcText.right + 8;
   rcText.right = rc->right;
   if (eps_total < 1)
@@ -864,7 +865,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    wstring text = mal::TranslateNumber(anime_item.GetMyScore());
+    wstring text = sync::myanimelist::TranslateNumber(anime_item.GetMyScore());
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
@@ -1007,7 +1008,7 @@ void AnimeListDialog::RefreshList(int index) {
   if (!IsWindow()) return;
   
   // Remember current status
-  if (index > mal::MYSTATUS_NOTINLIST)
+  if (index > sync::myanimelist::kNotInList)
     current_status_ = index;
 
   // Hide list to avoid visual defects and gain performance
@@ -1032,7 +1033,7 @@ void AnimeListDialog::RefreshList(int index) {
       continue;
     if (!group_view)
       if (current_status_ != anime_item.GetMyStatus())
-        if (current_status_ != mal::MYSTATUS_WATCHING || !it->second.GetMyRewatching())
+        if (current_status_ != sync::myanimelist::kWatching || !it->second.GetMyRewatching())
           continue;
     if (!MainDialog.search_bar.filters.CheckItem(anime_item))
       continue;
@@ -1045,16 +1046,16 @@ void AnimeListDialog::RefreshList(int index) {
     listview.InsertItem(i, group_index, icon_index, 
                         0, nullptr, LPSTR_TEXTCALLBACK,
                         static_cast<LPARAM>(anime_item.GetId()));
-    listview.SetItem(i, 2, mal::TranslateNumber(anime_item.GetMyScore()).c_str());
-    listview.SetItem(i, 3, mal::TranslateType(anime_item.GetType()).c_str());
-    listview.SetItem(i, 4, mal::TranslateDateToSeason(anime_item.GetDate(anime::DATE_START)).c_str());
+    listview.SetItem(i, 2, sync::myanimelist::TranslateNumber(anime_item.GetMyScore()).c_str());
+    listview.SetItem(i, 3, sync::myanimelist::TranslateType(anime_item.GetType()).c_str());
+    listview.SetItem(i, 4, sync::myanimelist::TranslateDateToSeason(anime_item.GetDate(anime::DATE_START)).c_str());
   }
 
   // Set group headers
   if (group_view) {
-    for (int i = mal::MYSTATUS_NOTINLIST; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
-      if (i != mal::MYSTATUS_UNKNOWN) {
-        wstring text = mal::TranslateMyStatus(i, false);
+    for (int i = sync::myanimelist::kNotInList; i <= sync::myanimelist::kPlanToWatch; i++) {
+      if (i != sync::myanimelist::kUnknownMyStatus) {
+        wstring text = sync::myanimelist::TranslateMyStatus(i, false);
         text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
         listview.SetGroupText(i, text.c_str());
       }
@@ -1075,7 +1076,7 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
   int index = GetListIndex(anime_id);
   if (index > -1) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    listview.SetItem(index, 2, mal::TranslateNumber(anime_item->GetMyScore()).c_str());
+    listview.SetItem(index, 2, sync::myanimelist::TranslateNumber(anime_item->GetMyScore()).c_str());
     listview.RedrawItems(index, index, true);
   }
 }
@@ -1084,7 +1085,7 @@ void AnimeListDialog::RefreshTabs(int index) {
   if (!IsWindow()) return;
 
   // Remember last index
-  if (index > mal::MYSTATUS_NOTINLIST)
+  if (index > sync::myanimelist::kNotInList)
     current_status_ = index;
   
   // Hide
@@ -1093,7 +1094,7 @@ void AnimeListDialog::RefreshTabs(int index) {
   // Refresh text
   for (int i = 1; i <= 6; i++)
     if (i != 5)
-      tab.SetItemText(i == 6 ? 4 : i - 1, mal::TranslateMyStatus(i, true).c_str());
+      tab.SetItemText(i == 6 ? 4 : i - 1, sync::myanimelist::TranslateMyStatus(i, true).c_str());
 
   // Select related tab
   bool group_view = !MainDialog.search_bar.filters.text.empty();

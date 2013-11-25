@@ -27,7 +27,7 @@
 
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
-#include "sync/announce.h"
+#include "taiga/announce.h"
 #include "base/common.h"
 #include "taiga/debug.h"
 #include "library/history.h"

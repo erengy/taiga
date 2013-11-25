@@ -40,7 +40,7 @@ enum EventSearchMode {
 
 class History;
 
-class EventItem : public mal::AnimeValues {
+class EventItem : public sync::myanimelist::AnimeValues {
 public:
   EventItem();
   virtual ~EventItem() {}

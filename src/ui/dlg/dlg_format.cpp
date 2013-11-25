@@ -61,9 +61,9 @@ BOOL FormatDialog::OnInitDialog() {
     PreviewAnime.SetId(-4224);
     PreviewAnime.SetTitle(L"Toradora!");
     PreviewAnime.SetSynonyms(L"Tiger X Dragon");
-    PreviewAnime.SetType(mal::TYPE_TV);
+    PreviewAnime.SetType(sync::myanimelist::kTv);
     PreviewAnime.SetEpisodeCount(25);
-    PreviewAnime.SetAiringStatus(mal::STATUS_FINISHED);
+    PreviewAnime.SetAiringStatus(sync::myanimelist::kFinishedAiring);
     PreviewAnime.SetDate(anime::DATE_START, Date(2008, 10, 01));
     PreviewAnime.SetDate(anime::DATE_END, Date(2009, 03, 25));
     PreviewAnime.SetImageUrl(L"http://cdn.myanimelist.net/images/anime/5/22125.jpg");
@@ -71,7 +71,7 @@ BOOL FormatDialog::OnInitDialog() {
     PreviewAnime.AddtoUserList();
     PreviewAnime.SetMyLastWatchedEpisode(25);
     PreviewAnime.SetMyScore(10);
-    PreviewAnime.SetMyStatus(mal::MYSTATUS_COMPLETED);
+    PreviewAnime.SetMyStatus(sync::myanimelist::kCompleted);
     PreviewAnime.SetMyTags(L"comedy, romance, drama");
   }
 

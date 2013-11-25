@@ -70,7 +70,7 @@ INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 BOOL UpdateDialog::OnDestroy() {
   // Clean up
-  Taiga.Updater.client.Cleanup();
+  Taiga.Updater.Cancel();
 
   if (Taiga.Updater.IsRestartRequired()) {
     if (MainDialog.IsWindow()) {

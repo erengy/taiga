@@ -23,8 +23,10 @@
 #include "anime_db.h"
 
 #include "base/common.h"
+#include "base/foreach.h"
 #include "base/logger.h"
 #include "sync/myanimelist.h"
+#include "sync/sync.h"
 #include "track/recognition.h"
 #include "taiga/settings.h"
 #include "base/string.h"
@@ -185,9 +187,9 @@ void Database::UpdateItem(Item& new_item) {
       item->SetEnglishTitle(new_item.GetEnglishTitle());
     if (!new_item.GetSynonyms().empty())
       item->SetSynonyms(new_item.GetSynonyms());
-    if (mal::IsValidDate(new_item.GetDate(DATE_START)))
+    if (sync::myanimelist::IsValidDate(new_item.GetDate(DATE_START)))
       item->SetDate(DATE_START, new_item.GetDate(DATE_START));
-    if (mal::IsValidDate(new_item.GetDate(DATE_END)))
+    if (sync::myanimelist::IsValidDate(new_item.GetDate(DATE_END)))
       item->SetDate(DATE_END, new_item.GetDate(DATE_END));
     if (!new_item.GetImageUrl().empty())
       item->SetImageUrl(new_item.GetImageUrl());
@@ -278,15 +280,15 @@ bool Database::LoadList() {
   // Since MAL can be too slow to update these values, we'll be counting by 
   // ourselves at Database::UpdateItem().
   /*
-  user.SetItemCount(mal::MYSTATUS_WATCHING, 
+  user.SetItemCount(sync::myanimelist::kWatching, 
     XmlReadIntValue(myinfo, L"user_watching"), false);
-  user.SetItemCount(mal::MYSTATUS_COMPLETED, 
+  user.SetItemCount(sync::myanimelist::kCompleted, 
     XmlReadIntValue(myinfo, L"user_completed"), false);
-  user.SetItemCount(mal::MYSTATUS_ONHOLD, 
+  user.SetItemCount(sync::myanimelist::kOnHold, 
     XmlReadIntValue(myinfo, L"user_onhold"), false);
-  user.SetItemCount(mal::MYSTATUS_DROPPED, 
+  user.SetItemCount(sync::myanimelist::kDropped, 
     XmlReadIntValue(myinfo, L"user_dropped"), false);
-  user.SetItemCount(mal::MYSTATUS_PLANTOWATCH, 
+  user.SetItemCount(sync::myanimelist::kPlanToWatch, 
     XmlReadIntValue(myinfo, L"user_plantowatch"), false);
   */
   user.SetDaysSpentWatching(XmlReadStrValue(myinfo, L"user_days_spent_watching"));
@@ -493,10 +495,10 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
     if (download) {
       // Refresh if current file is too old
       auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (anime_item->GetAiringStatus() != mal::STATUS_FINISHED) {
+      if (anime_item->GetAiringStatus() != sync::myanimelist::kFinishedAiring) {
         // Check last modified date (>= 7 days)
         if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
-          mal::DownloadImage(anime_id, anime_item->GetImageUrl());
+          sync::DownloadImage(anime_id, anime_item->GetImageUrl());
         }
       }
     }
@@ -507,7 +509,7 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
 
   if (download) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    mal::DownloadImage(anime_id, anime_item->GetImageUrl());
+    sync::DownloadImage(anime_id, anime_item->GetImageUrl());
   }
   
   return false;
@@ -601,7 +603,7 @@ bool SeasonDatabase::IsRefreshRequired() {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       const Date& date_start = anime_item->GetDate(anime::DATE_START);
-      if (!mal::IsValidDate(date_start) || anime_item->GetSynopsis().empty())
+      if (!sync::myanimelist::IsValidDate(date_start) || anime_item->GetSynopsis().empty())
         count++;
     }
     if (count > 20) {
@@ -615,7 +617,7 @@ bool SeasonDatabase::IsRefreshRequired() {
 
 void SeasonDatabase::Review(bool hide_hentai) {
   Date date_start, date_end;
-  mal::GetSeasonInterval(name, date_start, date_end);
+  sync::myanimelist::GetSeasonInterval(name, date_start, date_end);
 
   // Check for invalid items
   for (size_t i = 0; i < items.size(); i++) {
@@ -625,7 +627,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (anime_item) {
       // Airing date must be within the interval
       const Date& anime_start = anime_item->GetDate(anime::DATE_START);
-      if (mal::IsValidDate(anime_start))
+      if (sync::myanimelist::IsValidDate(anime_start))
         if (anime_start < date_start || anime_start > date_end)
           invalid = true;
       // TODO: Filter by rating instead if made possible in API

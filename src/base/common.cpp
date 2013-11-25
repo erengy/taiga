@@ -125,11 +125,11 @@ int TranslateResolution(const wstring& str, bool return_validity) {
 
 int StatusToIcon(int status) {  
   switch (status) {
-    case mal::STATUS_AIRING:
+    case sync::myanimelist::kAiring:
       return ICON16_GREEN;
-    case mal::STATUS_FINISHED:
+    case sync::myanimelist::kFinishedAiring:
       return ICON16_BLUE;
-    case mal::STATUS_NOTYETAIRED:
+    case sync::myanimelist::kNotYetAired:
       return ICON16_RED;
     default:
       return ICON16_GRAY;

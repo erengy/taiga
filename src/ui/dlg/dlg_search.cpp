@@ -23,13 +23,16 @@
 
 #include "library/anime_db.h"
 #include "base/common.h"
+#include "base/foreach.h"
 #include "base/gfx.h"
 #include "taiga/http.h"
 #include "sync/myanimelist.h"
+#include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 #include "base/xml.h"
 
@@ -135,8 +138,11 @@ void SearchDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 // =============================================================================
 
-void SearchDialog::ParseResults(const wstring& data) {
-  if (data.empty()) {
+void SearchDialog::ParseResults(const vector<int>& ids) {
+  if (!IsWindow())
+    return;
+
+  if (ids.empty()) {
     wstring msg = L"No results found for \"" + search_text + L"\".";
     win::TaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
@@ -145,27 +151,10 @@ void SearchDialog::ParseResults(const wstring& data) {
     return;
   }
 
-  if (data == L"Invalid credentials") {
-    win::TaskDialog dlg(L"Search Anime", TD_ERROR_ICON);
-    dlg.SetMainInstruction(L"Invalid username or password.");
-    dlg.SetContent(L"Anime search requires authentication, which means, you need to "
-                   L"enter a valid username and password to search MyAnimeList.");
-    dlg.AddButton(L"OK", IDOK);
-    dlg.Show(GetWindowHandle());
-    return;
-  }
-
   anime_ids_.clear();
-  xml_document doc;
-  xml_parse_result result = doc.load(data.c_str());
-  if (result.status == pugi::status_ok) {
-    xml_node anime = doc.child(L"anime");
-    for (xml_node entry = anime.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
-      anime_ids_.push_back(XmlReadIntValue(entry, L"id"));
-    }
+  foreach_(id, ids) {
+    anime_ids_.push_back(*id);
   }
-
-  mal::ParseSearchResult(data);
 
   RefreshList();
 }
@@ -179,10 +168,10 @@ void SearchDialog::AddAnimeToList(int anime_id) {
                      StatusToIcon(anime_item->GetAiringStatus()), 0, nullptr,
                      anime_item->GetTitle().c_str(),
                      static_cast<LPARAM>(anime_item->GetId()));
-    list_.SetItem(i, 1, mal::TranslateType(anime_item->GetType()).c_str());
-    list_.SetItem(i, 2, mal::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
+    list_.SetItem(i, 1, sync::myanimelist::TranslateType(anime_item->GetType()).c_str());
+    list_.SetItem(i, 2, sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
     list_.SetItem(i, 3, anime_item->GetScore().c_str());
-    list_.SetItem(i, 4, mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)).c_str());
+    list_.SetItem(i, 4, sync::myanimelist::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)).c_str());
   }
 }
 
@@ -214,11 +203,8 @@ bool SearchDialog::Search(const wstring& title) {
   filters_.text = title;
   //RefreshList();
   
-  if (mal::SearchAnime(anime::ID_UNKNOWN, title)) {
-    MainDialog.ChangeStatus(L"Searching MyAnimeList for \"" + title + L"\"...");
-    return true;
-  } else {
-    MainDialog.ChangeStatus(L"An error occured while searching MyAnimeList for \"" + title + L"\"...");
-    return false;
-  }
+  sync::SearchTitle(title);
+  MainDialog.ChangeStatus(L"Searching MyAnimeList for \"" + title + L"\"...");
+  
+  return true;
 }

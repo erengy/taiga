@@ -26,10 +26,12 @@
 #include "base/common.h"
 #include "base/gfx.h"
 #include "sync/myanimelist.h"
+#include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 #include "win/win_gdi.h"
@@ -113,7 +115,7 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     // Discuss
     case 107:
-      mal::ViewSeasonGroup();
+      sync::myanimelist::ViewSeasonGroup();
       return TRUE;
   }
 
@@ -297,11 +299,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw title background
       COLORREF color;
       switch (anime_item->GetAiringStatus()) {
-        case mal::STATUS_AIRING:
+        case sync::myanimelist::kAiring:
           color = theme::COLOR_LIGHTGREEN; break;
-        case mal::STATUS_FINISHED: default:
+        case sync::myanimelist::kFinishedAiring: default:
           color = theme::COLOR_LIGHTBLUE; break;
-        case mal::STATUS_NOTYETAIRED:
+        case sync::myanimelist::kNotYetAired:
           color = theme::COLOR_LIGHTRED; break;
       }
       if (view_as == SEASON_VIEWAS_IMAGES) {
@@ -322,10 +324,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (view_as == SEASON_VIEWAS_IMAGES) {
         switch (sort_by) {
           case SEASON_SORTBY_AIRINGDATE:
-            text = mal::TranslateDate(anime_item->GetDate(anime::DATE_START));
+            text = sync::myanimelist::TranslateDate(anime_item->GetDate(anime::DATE_START));
             break;
           case SEASON_SORTBY_EPISODES:
-            text = mal::TranslateNumber(anime_item->GetEpisodeCount(), L"");
+            text = sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount(), L"");
             if (text.empty()) {
               text = L"Unknown";
             } else {
@@ -374,12 +376,12 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
-      text = mal::TranslateDate(anime_item->GetDate(anime::DATE_START));
+      text = sync::myanimelist::TranslateDate(anime_item->GetDate(anime::DATE_START));
       text += anime_item->GetDate(anime::DATE_END) != anime_item->GetDate(anime::DATE_START) ? 
-              L" to " + mal::TranslateDate(anime_item->GetDate(anime::DATE_END)) : L"";
-      text += L" (" + mal::TranslateStatus(anime_item->GetAiringStatus()) + L")";
+              L" to " + sync::myanimelist::TranslateDate(anime_item->GetDate(anime::DATE_END)) : L"";
+      text += L" (" + sync::myanimelist::TranslateStatus(anime_item->GetAiringStatus()) + L")";
       DRAWLINE(text);
-      DRAWLINE(mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
+      DRAWLINE(sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : anime_item->GetGenres());
       DRAWLINE(anime_item->GetProducers().empty() ? L"?" : anime_item->GetProducers());
       DRAWLINE(anime_item->GetScore().empty() ? L"0.00" : anime_item->GetScore());
@@ -468,7 +470,7 @@ void SeasonDialog::RefreshData(int anime_id) {
     
     // Get details
     if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty())
-      mal::SearchAnime(*id, anime_item->GetTitle());
+      sync::GetMetadataById(*id);
   }
 }
 
@@ -495,18 +497,18 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   list_.EnableGroupView(true); // Required for XP
   switch (group_by) {
     case SEASON_GROUPBY_AIRINGSTATUS:
-      for (int i = mal::STATUS_AIRING; i <= mal::STATUS_NOTYETAIRED; i++) {
-        list_.InsertGroup(i, mal::TranslateStatus(i).c_str(), true, false);
+      for (int i = sync::myanimelist::kAiring; i <= sync::myanimelist::kNotYetAired; i++) {
+        list_.InsertGroup(i, sync::myanimelist::TranslateStatus(i).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_LISTSTATUS:
-      for (int i = mal::MYSTATUS_NOTINLIST; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
-        list_.InsertGroup(i, mal::TranslateMyStatus(i, false).c_str(), true, false);
+      for (int i = sync::myanimelist::kNotInList; i <= sync::myanimelist::kPlanToWatch; i++) {
+        list_.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_TYPE:
-      for (int i = mal::TYPE_TV; i <= mal::TYPE_MUSIC; i++) {
-        list_.InsertGroup(i, mal::TranslateType(i).c_str(), true, false);
+      for (int i = sync::myanimelist::kTv; i <= sync::myanimelist::kMusic; i++) {
+        list_.InsertGroup(i, sync::myanimelist::TranslateType(i).c_str(), true, false);
       }
       break;
   }
@@ -577,7 +579,7 @@ void SeasonDialog::RefreshStatus() {
   if (SeasonDatabase.items.empty()) return;
 
   wstring text = SeasonDatabase.name + L", from " + 
-                 mal::TranslateSeasonToMonths(SeasonDatabase.name);
+                 sync::myanimelist::TranslateSeasonToMonths(SeasonDatabase.name);
   
   time_t last_modified = 0;
   for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {

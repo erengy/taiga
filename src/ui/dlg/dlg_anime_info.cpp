@@ -193,7 +193,7 @@ BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG &&
       HIWORD(wParam) == STN_CLICKED) {
     if (anime_id_ > anime::ID_UNKNOWN) {
-      mal::ViewAnimePage(anime_id_);
+      sync::myanimelist::ViewAnimePage(anime_id_);
       return TRUE;
     }
   }
@@ -509,7 +509,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (it->episode &&
           std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end()) {
         auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-        if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED ||
+        if (anime_item->GetMyStatus() != sync::myanimelist::kCompleted ||
             anime_item->GetMyScore() == 0)
           anime_ids.push_back(it->anime_id);
       }
@@ -518,7 +518,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (it->episode &&
           std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end()) {
         auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-        if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED ||
+        if (anime_item->GetMyStatus() != sync::myanimelist::kCompleted ||
             anime_item->GetMyScore() == 0)
           anime_ids.push_back(it->anime_id);
       }
@@ -526,7 +526,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
       content += L"  \u2022 " + anime_item->GetTitle();
-      if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED) {
+      if (anime_item->GetMyStatus() == sync::myanimelist::kCompleted) {
         content += L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
         link_count++;
       } else {

@@ -34,7 +34,7 @@
 
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
-#include "sync/announce.h"
+#include "taiga/announce.h"
 #include "base/common.h"
 #include "taiga/debug.h"
 #include "base/gfx.h"
@@ -50,6 +50,7 @@
 #include "taiga/stats.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 #include "win/win_gdi.h"

@@ -252,9 +252,9 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       vector<anime_pair> title_list;
       for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
         switch (it->second.GetMyStatus()) {
-          case mal::MYSTATUS_NOTINLIST:
-          case mal::MYSTATUS_COMPLETED:
-          case mal::MYSTATUS_DROPPED:
+          case sync::myanimelist::kNotInList:
+          case sync::myanimelist::kCompleted:
+          case sync::myanimelist::kDropped:
             continue;
           default:
             title_list.push_back(std::make_pair(it->second.GetId(), 
@@ -281,27 +281,27 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       break;
     case FEED_FILTER_ELEMENT_META_STATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_AIRING).c_str(), mal::STATUS_AIRING);
-      value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_FINISHED).c_str(), mal::STATUS_FINISHED);
-      value_combo_.AddItem(mal::TranslateStatus(mal::STATUS_NOTYETAIRED).c_str(), mal::STATUS_NOTYETAIRED);
+      value_combo_.AddItem(sync::myanimelist::TranslateStatus(sync::myanimelist::kAiring).c_str(), sync::myanimelist::kAiring);
+      value_combo_.AddItem(sync::myanimelist::TranslateStatus(sync::myanimelist::kFinishedAiring).c_str(), sync::myanimelist::kFinishedAiring);
+      value_combo_.AddItem(sync::myanimelist::TranslateStatus(sync::myanimelist::kNotYetAired).c_str(), sync::myanimelist::kNotYetAired);
       break;
     case FEED_FILTER_ELEMENT_META_TYPE:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(mal::TranslateType(mal::TYPE_TV).c_str(), mal::TYPE_TV);
-      value_combo_.AddItem(mal::TranslateType(mal::TYPE_OVA).c_str(), mal::TYPE_OVA);
-      value_combo_.AddItem(mal::TranslateType(mal::TYPE_MOVIE).c_str(), mal::TYPE_MOVIE);
-      value_combo_.AddItem(mal::TranslateType(mal::TYPE_SPECIAL).c_str(), mal::TYPE_SPECIAL);
-      value_combo_.AddItem(mal::TranslateType(mal::TYPE_ONA).c_str(), mal::TYPE_ONA);
-      value_combo_.AddItem(mal::TranslateType(mal::TYPE_MUSIC).c_str(), mal::TYPE_MUSIC);
+      value_combo_.AddItem(sync::myanimelist::TranslateType(sync::myanimelist::kTv).c_str(), sync::myanimelist::kTv);
+      value_combo_.AddItem(sync::myanimelist::TranslateType(sync::myanimelist::kOva).c_str(), sync::myanimelist::kOva);
+      value_combo_.AddItem(sync::myanimelist::TranslateType(sync::myanimelist::kMovie).c_str(), sync::myanimelist::kMovie);
+      value_combo_.AddItem(sync::myanimelist::TranslateType(sync::myanimelist::kSpecial).c_str(), sync::myanimelist::kSpecial);
+      value_combo_.AddItem(sync::myanimelist::TranslateType(sync::myanimelist::kOna).c_str(), sync::myanimelist::kOna);
+      value_combo_.AddItem(sync::myanimelist::TranslateType(sync::myanimelist::kMusic).c_str(), sync::myanimelist::kMusic);
       break;
     case FEED_FILTER_ELEMENT_USER_STATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_NOTINLIST, false).c_str(), mal::MYSTATUS_NOTINLIST);
-      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_WATCHING, false).c_str(), mal::MYSTATUS_WATCHING);
-      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_COMPLETED, false).c_str(), mal::MYSTATUS_COMPLETED);
-      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_ONHOLD, false).c_str(), mal::MYSTATUS_ONHOLD);
-      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_DROPPED, false).c_str(), mal::MYSTATUS_DROPPED);
-      value_combo_.AddItem(mal::TranslateMyStatus(mal::MYSTATUS_PLANTOWATCH, false).c_str(), mal::MYSTATUS_PLANTOWATCH);
+      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(sync::myanimelist::kNotInList, false).c_str(), sync::myanimelist::kNotInList);
+      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(sync::myanimelist::kWatching, false).c_str(), sync::myanimelist::kWatching);
+      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(sync::myanimelist::kCompleted, false).c_str(), sync::myanimelist::kCompleted);
+      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(sync::myanimelist::kOnHold, false).c_str(), sync::myanimelist::kOnHold);
+      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(sync::myanimelist::kDropped, false).c_str(), sync::myanimelist::kDropped);
+      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(sync::myanimelist::kPlanToWatch, false).c_str(), sync::myanimelist::kPlanToWatch);
       break;
     case FEED_FILTER_ELEMENT_EPISODE_NUMBER:
     case FEED_FILTER_ELEMENT_META_EPISODES:

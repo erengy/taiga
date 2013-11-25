@@ -74,12 +74,12 @@ int Item::GetEpisodeCount(bool estimation) const {
     number = max(GetMyLastWatchedEpisode(), GetAvailableEpisodeCount());
 
   // Estimate using airing dates of TV series
-  if (series_info_.type == mal::TYPE_TV) {
+  if (series_info_.type == sync::myanimelist::kTv) {
     Date date_start = GetDate(DATE_START);
-    if (mal::IsValidDate(date_start)) {
+    if (sync::myanimelist::IsValidDate(date_start)) {
       Date date_end = GetDate(DATE_END);
       // Use current date in Japan if ending date is unknown
-      if (!mal::IsValidDate(date_end)) date_end = GetDateJapan();
+      if (!sync::myanimelist::IsValidDate(date_end)) date_end = GetDateJapan();
       // Assuming the series is aired weekly
       number = max(number, (date_end - date_start) / 7);
     }
@@ -115,9 +115,9 @@ int Item::GetEpisodeCount(bool estimation) const {
 
 int Item::GetAiringStatus(bool check_date) const {
   if (!check_date) return series_info_.status;
-  if (IsFinishedAiring()) return mal::STATUS_FINISHED;
-  if (IsAiredYet()) return mal::STATUS_AIRING;
-  return mal::STATUS_NOTYETAIRED;
+  if (IsFinishedAiring()) return sync::myanimelist::kFinishedAiring;
+  if (IsAiredYet()) return sync::myanimelist::kAiring;
+  return sync::myanimelist::kNotYetAired;
 }
 
 const wstring& Item::GetTitle() const {
@@ -189,7 +189,7 @@ int Item::GetMyScore(bool check_events) const {
 }
 
 int Item::GetMyStatus(bool check_events) const {
-  if (!my_info_.get()) return mal::MYSTATUS_NOTINLIST;
+  if (!my_info_.get()) return sync::myanimelist::kNotInList;
   EventItem* event_item = check_events ? 
     SearchHistory(EVENT_SEARCH_STATUS) : nullptr;
   return event_item ? *event_item->status : my_info_->status;
@@ -216,13 +216,13 @@ const Date Item::GetMyDate(DateType type, bool check_events) const {
       event_item = check_events ? 
         SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
       return event_item ? 
-        mal::TranslateDateFromApi(*event_item->date_start) : 
+        sync::myanimelist::TranslateDateFromApi(*event_item->date_start) : 
         my_info_->date_start;
     case DATE_END:
       event_item = check_events ? 
         SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
       return event_item ? 
-        mal::TranslateDateFromApi(*event_item->date_finish) : 
+        sync::myanimelist::TranslateDateFromApi(*event_item->date_finish) : 
         my_info_->date_finish;
   }
 }
@@ -371,8 +371,8 @@ void Item::SetMyTags(const wstring& tags) {
 // =============================================================================
 
 bool Item::IsAiredYet() const {
-  if (series_info_.status != mal::STATUS_NOTYETAIRED) return true;
-  if (!mal::IsValidDate(series_info_.date_start)) return false;
+  if (series_info_.status != sync::myanimelist::kNotYetAired) return true;
+  if (!sync::myanimelist::IsValidDate(series_info_.date_start)) return false;
   
   Date date_japan = GetDateJapan();
   Date date_start = series_info_.date_start;
@@ -387,8 +387,8 @@ bool Item::IsAiredYet() const {
 }
 
 bool Item::IsFinishedAiring() const {
-  if (series_info_.status == mal::STATUS_FINISHED) return true;
-  if (!mal::IsValidDate(series_info_.date_end)) return false;
+  if (series_info_.status == sync::myanimelist::kFinishedAiring) return true;
+  if (!sync::myanimelist::IsValidDate(series_info_.date_end)) return false;
   if (!IsAiredYet()) return false;
   return GetDateJapan() > series_info_.date_end;
 }
@@ -432,11 +432,11 @@ int Item::GetLastAiredEpisodeNumber(bool estimate) {
 
   // No need to estimate if the series isn't currently airing
   switch (GetAiringStatus()) {
-    case mal::STATUS_FINISHED:
+    case sync::myanimelist::kFinishedAiring:
       local_info_.last_aired_episode = GetEpisodeCount();
       return local_info_.last_aired_episode;
-    case mal::STATUS_NOTYETAIRED:
-    case mal::STATUS_UNKNOWN:
+    case sync::myanimelist::kNotYetAired:
+    case sync::myanimelist::kUnknownStatus:
       return 0;
   }
   
@@ -444,7 +444,7 @@ int Item::GetLastAiredEpisodeNumber(bool estimate) {
     return 0;
 
   // Can't estimate for other types of anime
-  if (GetType() != mal::TYPE_TV)
+  if (GetType() != sync::myanimelist::kTv)
     return 0;
 
   // TV series air weekly, so the number of weeks that has passed since the day
@@ -645,7 +645,7 @@ void Item::AddtoUserList() {
 }
 
 bool Item::IsInList() const {
-  return my_info_.get() && GetMyStatus() != mal::MYSTATUS_NOTINLIST;
+  return my_info_.get() && GetMyStatus() != sync::myanimelist::kNotInList;
 }
 
 void Item::RemoveFromUserList() {
@@ -659,7 +659,7 @@ bool Item::IsOldEnough() const {
 
   time_t time_diff = time(nullptr) - last_modified;
 
-  if (GetAiringStatus() == mal::STATUS_FINISHED) {
+  if (GetAiringStatus() == sync::myanimelist::kFinishedAiring) {
     return time_diff >= 60 * 60 * 24 * 7; // 1 week
   } else {
     return time_diff >= 60 * 60; // 1 hour

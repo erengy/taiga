@@ -21,11 +21,12 @@
 #include "history.h"
 
 #include "anime_db.h"
-#include "sync/announce.h"
+#include "taiga/announce.h"
 #include "base/common.h"
 #include "taiga/http.h"
 #include "base/logger.h"
 #include "sync/myanimelist.h"
+#include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"
@@ -61,7 +62,7 @@ void EventQueue::Add(EventItem& item, bool save) {
 
   // Add to user list
   if (anime && !anime->IsInList())
-    if (item.mode != HTTP_MAL_AnimeDelete)
+    if (item.mode != taiga::kHttpServiceDeleteLibraryEntry)
       anime->AddtoUserList();
   
   // Validate values
@@ -82,14 +83,14 @@ void EventQueue::Add(EventItem& item, bool save) {
       if (anime->GetMyTags() == *item.tags)
         item.tags.Reset();
     if (item.date_start)
-      if (anime->GetMyDate(anime::DATE_START) == mal::TranslateDateFromApi(*item.date_start))
+      if (anime->GetMyDate(anime::DATE_START) == sync::myanimelist::TranslateDateFromApi(*item.date_start))
         item.date_start.Reset();
     if (item.date_finish)
-      if (anime->GetMyDate(anime::DATE_END) == mal::TranslateDateFromApi(*item.date_finish))
+      if (anime->GetMyDate(anime::DATE_END) == sync::myanimelist::TranslateDateFromApi(*item.date_finish))
         item.date_finish.Reset();
   }
   switch (item.mode) {
-    case HTTP_MAL_AnimeUpdate:
+    case taiga::kHttpServiceUpdateLibraryEntry:
       if (!item.episode && 
           !item.score && 
           !item.status && 
@@ -105,7 +106,7 @@ void EventQueue::Add(EventItem& item, bool save) {
   if (!History.queue.updating) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id && it->enabled) {
-        if (it->mode != HTTP_MAL_AnimeAdd && it->mode != HTTP_MAL_AnimeDelete) {
+        if (it->mode != taiga::kHttpServiceAddLibraryEntry && it->mode != taiga::kHttpServiceDeleteLibraryEntry) {
           if (!item.episode || (!it->episode && it == items.rbegin())) {
             if (item.episode) it->episode = *item.episode;
             if (item.score) it->score = *item.score;
@@ -117,7 +118,7 @@ void EventQueue::Add(EventItem& item, bool save) {
             add_new_item = false;
           }
           if (!add_new_item) {
-            it->mode = HTTP_MAL_AnimeUpdate;
+            it->mode = taiga::kHttpServiceUpdateLibraryEntry;
             it->time = (wstring)GetDate() + L" " + GetTime();
           }
           break;
@@ -155,8 +156,10 @@ void EventQueue::Add(EventItem& item, bool save) {
     HistoryDialog.RefreshList();
 
     // Refresh anime window
-    if (item.mode == HTTP_MAL_AnimeAdd || item.mode == HTTP_MAL_AnimeDelete || 
-        item.status || item.enable_rewatching) {
+    if (item.mode == taiga::kHttpServiceAddLibraryEntry ||
+        item.mode == taiga::kHttpServiceDeleteLibraryEntry || 
+        item.status ||
+        item.enable_rewatching) {
       AnimeListDialog.RefreshList();
       AnimeListDialog.RefreshTabs();
     } else {
@@ -210,8 +213,10 @@ void EventQueue::Check(bool automatic) {
   // Update
   History.queue.updating = true;
   MainDialog.ChangeStatus(L"Updating list...");
-  mal::AnimeValues* anime_values = static_cast<mal::AnimeValues*>(&items[index]);
-  mal::Update(*anime_values, items[index].anime_id, items[index].mode);
+  sync::myanimelist::AnimeValues* anime_values =
+      static_cast<sync::myanimelist::AnimeValues*>(&items[index]);
+  sync::UpdateLibraryEntry(*anime_values, items[index].anime_id,
+      static_cast<taiga::HttpClientMode>(items[index].mode));
 }
 
 void EventQueue::Clear(bool save) {
@@ -447,7 +452,7 @@ int AskForConfirmation(anime::Episode& episode) {
   if (anime_item->GetEpisodeCount() == number) { // Completed
     dlg.AddButton(L"Update and move\n"
                   L"Update and set as completed", IDCANCEL);
-  } else if (anime_item->GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
+  } else if (anime_item->GetMyStatus() != sync::myanimelist::kWatching) { // Watching
     dlg.AddButton(L"Update and move\n"
                   L"Update and set as watching", IDCANCEL);
   }

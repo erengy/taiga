@@ -190,7 +190,6 @@ bool Settings::Load() {
     Program.Proxy.host = proxy.attribute(L"host").value();
     Program.Proxy.password = SimpleDecrypt(proxy.attribute(L"password").value());
     Program.Proxy.user = proxy.attribute(L"username").value();
-    SetProxies(Program.Proxy.host, Program.Proxy.user, Program.Proxy.password);
     // List
     xml_node list = program.child(L"list");
     Program.List.double_click = list.child(L"action").attribute(L"doubleclick").as_int(4);
@@ -529,8 +528,8 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     MainDialog.treeview.RefreshHistoryCounter();
     MainDialog.UpdateTitle();
-    AnimeListDialog.RefreshList(mal::MYSTATUS_WATCHING);
-    AnimeListDialog.RefreshTabs(mal::MYSTATUS_WATCHING);
+    AnimeListDialog.RefreshList(sync::myanimelist::kWatching);
+    AnimeListDialog.RefreshTabs(sync::myanimelist::kWatching);
     HistoryDialog.RefreshList();
     NowPlayingDialog.Refresh();
     SearchDialog.RefreshList();
@@ -542,10 +541,6 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
   }
 
   FolderMonitor.Enable(Folders.watch_enabled == TRUE);
-
-  SetProxies(Program.Proxy.host, 
-             Program.Proxy.user, 
-             Program.Proxy.password);
 
   UpdateExternalLinksMenu();
 }

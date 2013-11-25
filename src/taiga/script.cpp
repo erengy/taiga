@@ -354,9 +354,9 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
         wstring var = str.substr(pos_var + 1, pos_end - pos_var - 1);
         if (IsScriptVariable(var)) {
           REPLACE(L"title", VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.title)));
-          REPLACE(L"watched", VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
-          REPLACE(L"total", VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
-          REPLACE(L"score", VALIDATE(ENCODE(mal::TranslateNumber(anime_item->GetMyScore(), L"")), L""));
+          REPLACE(L"watched", VALIDATE(ENCODE(sync::myanimelist::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
+          REPLACE(L"total", VALIDATE(ENCODE(sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
+          REPLACE(L"score", VALIDATE(ENCODE(sync::myanimelist::TranslateNumber(anime_item->GetMyScore(), L"")), L""));
           REPLACE(L"id", VALIDATE(ENCODE(ToWstr(anime_item->GetId())), L""));
           REPLACE(L"image", VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
           REPLACE(L"status", VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));

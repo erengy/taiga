@@ -21,7 +21,8 @@
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
-#include "sync/announce.h"
+#include "taiga/announce.h"
+#include "sync/sync.h"
 #include "base/common.h"
 #include "track/feed.h"
 #include "base/foreach.h"
@@ -78,32 +79,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Synchronize()
   //   Synchronizes local and remote lists.
   if (action == L"Synchronize") {
-#ifdef _DEBUG
-    // Retrieve list
-    MainDialog.ChangeStatus(L"Downloading anime list...");
-    bool result = mal::GetList();
-    MainDialog.EnableInput(!result);
-    if (!result) MainDialog.ChangeStatus();
-#else
-    if (!Taiga.logged_in) {
-      // Log in
-      MainDialog.ChangeStatus(L"Logging in...");
-      bool result = mal::Login();
-      MainDialog.EnableInput(!result);
-      if (!result) MainDialog.ChangeStatus();
-    } else {
-      if (History.queue.GetItemCount() > 0) {
-        // Update items in queue
-        History.queue.Check(false);
-      } else {
-        // Retrieve list
-        MainDialog.ChangeStatus(L"Synchronizing anime list...");
-        bool result = mal::GetList();
-        MainDialog.EnableInput(!result);
-        if (!result) MainDialog.ChangeStatus();
-      }
-    }
-#endif
+    sync::Synchronize();
 
   // ===========================================================================
 
@@ -264,11 +240,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     EventItem event_item;
     event_item.anime_id = anime_id;
     event_item.status = status;
-    if (status == mal::MYSTATUS_COMPLETED) {
+    if (status == sync::myanimelist::kCompleted) {
       event_item.episode = anime_item->GetEpisodeCount();
-      event_item.date_finish = mal::TranslateDateForApi(GetDate());
+      event_item.date_finish = sync::myanimelist::TranslateDateForApi(GetDate());
     }
-    event_item.mode = HTTP_MAL_AnimeAdd;
+    event_item.mode = taiga::kHttpServiceAddLibraryEntry;
     History.queue.Add(event_item);
     // Refresh
     AnimeListDialog.RefreshList(status);
@@ -284,21 +260,21 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"ViewAnimePage") {
     int anime_id = static_cast<int>(lParam);
-    mal::ViewAnimePage(anime_id);
+    sync::myanimelist::ViewAnimePage(anime_id);
 
   // ViewPanel(), ViewProfile(), ViewHistory()
   //   Opens up MyAnimeList user pages.
   } else if (action == L"ViewPanel") {
-    mal::ViewPanel();
+    sync::myanimelist::ViewPanel();
   } else if (action == L"ViewProfile") {
-    mal::ViewProfile();
+    sync::myanimelist::ViewProfile();
   } else if (action == L"ViewHistory") {
-    mal::ViewHistory();
+    sync::myanimelist::ViewHistory();
 
   // ViewUpcomingAnime
   //   Opens up upcoming anime page on MAL.
   } else if (action == L"ViewUpcomingAnime") {
-    mal::ViewUpcomingAnime();
+    sync::myanimelist::ViewUpcomingAnime();
 
   // ===========================================================================
 
@@ -417,7 +393,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (dlg.GetSelectedButtonID() == IDYES) {
       EventItem item;
       item.anime_id = anime_id;
-      item.mode = HTTP_MAL_AnimeDelete;
+      item.mode = taiga::kHttpServiceDeleteLibraryEntry;
       History.queue.Add(item);
     }
 
@@ -442,7 +418,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     } else {
       value = ToInt(body);
     }
-    if (mal::IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
+    if (sync::myanimelist::IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(value);
       anime_item->AddToQueue(episode, true);
@@ -459,7 +435,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       event_item->enabled = false;
       History.queue.RemoveDisabled();
     } else {
-      if (mal::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
+      if (sync::myanimelist::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
         anime::Episode episode;
         episode.number = ToWstr(watched - 1);
         anime_item->AddToQueue(episode, true);
@@ -471,7 +447,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     int watched = anime_item->GetMyLastWatchedEpisode();
-    if (mal::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
+    if (sync::myanimelist::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(watched + 1);
       anime_item->AddToQueue(episode, true);
@@ -486,7 +462,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     EventItem item;
     item.anime_id = anime_id;
     item.score = ToInt(body);
-    item.mode = HTTP_MAL_AnimeUpdate;
+    item.mode = taiga::kHttpServiceUpdateLibraryEntry;
     History.queue.Add(item);
 
   // EditStatus(value)
@@ -499,18 +475,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     switch (anime_item->GetAiringStatus()) {
-      case mal::STATUS_AIRING:
-        if (*event_item.status == mal::MYSTATUS_COMPLETED) {
+      case sync::myanimelist::kAiring:
+        if (*event_item.status == sync::myanimelist::kCompleted) {
           MessageBox(g_hMain, 
             L"This anime is still airing, you cannot set it as completed.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
           return;
         }
         break;
-      case mal::STATUS_FINISHED:
+      case sync::myanimelist::kFinishedAiring:
         break;
-      case mal::STATUS_NOTYETAIRED:
-        if (*event_item.status != mal::MYSTATUS_PLANTOWATCH) {
+      case sync::myanimelist::kNotYetAired:
+        if (*event_item.status != sync::myanimelist::kPlanToWatch) {
           MessageBox(g_hMain, 
             L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
@@ -521,15 +497,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         return;
     }
     switch (*event_item.status) {
-      case mal::MYSTATUS_COMPLETED:
+      case sync::myanimelist::kCompleted:
         event_item.episode = anime_item->GetEpisodeCount();
         if (*event_item.episode == 0) event_item.episode.Reset();
-        if (!mal::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
-          event_item.date_finish = mal::TranslateDateForApi(GetDate());
+        if (!sync::myanimelist::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
+          event_item.date_finish = sync::myanimelist::TranslateDateForApi(GetDate());
         break;
     }
     event_item.anime_id = anime_id;
-    event_item.mode = HTTP_MAL_AnimeUpdate;
+    event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
     History.queue.Add(event_item);
 
   // EditTags(tags)
@@ -548,7 +524,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       EventItem item;
       item.anime_id = anime_id;
       item.tags = dlg.text;
-      item.mode = HTTP_MAL_AnimeUpdate;
+      item.mode = taiga::kHttpServiceUpdateLibraryEntry;
       History.queue.Add(item);
     }
 
@@ -693,9 +669,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       if (!anime_item.IsNewEpisodeAvailable())
         continue;
       switch (anime_item.GetMyStatus()) {
-        case mal::MYSTATUS_NOTINLIST:
-        case mal::MYSTATUS_COMPLETED:
-        case mal::MYSTATUS_DROPPED:
+        case sync::myanimelist::kNotInList:
+        case sync::myanimelist::kCompleted:
+        case sync::myanimelist::kDropped:
           continue;
       }
       valid_ids.push_back(anime_item.GetId());

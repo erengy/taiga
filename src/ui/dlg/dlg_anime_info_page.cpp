@@ -29,6 +29,7 @@
 #include "library/history.h"
 #include "taiga/http.h"
 #include "sync/myanimelist.h"
+#include "sync/sync.h"
 #include "track/recognition.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -155,10 +156,10 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
 
   // Set information
   #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
-  text = mal::TranslateType(anime_item->GetType()) + L"\n" +
-         mal::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
-         mal::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
-         mal::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
+  text = sync::myanimelist::TranslateType(anime_item->GetType()) + L"\n" +
+         sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
+         sync::myanimelist::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
+         sync::myanimelist::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
          ADD_INFOLINE(anime_item->GetGenres(), L"Unknown") + L"\n" +
          ADD_INFOLINE(anime_item->GetProducers(), L"Unknown") + L"\n" +
          ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" +
@@ -170,10 +171,11 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   text = anime_item->GetSynopsis();
   SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, text.c_str());
   if (connect) {
-    if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty()) {
-      mal::SearchAnime(anime_id_, anime_item->GetTitle());
-    } else if (anime_item->GetGenres().empty() || anime_item->GetScore().empty()) {
-      mal::GetAnimeDetails(anime_id_);
+    if (anime_item->IsOldEnough() ||
+        anime_item->GetSynopsis().empty() ||
+        anime_item->GetGenres().empty() ||
+        anime_item->GetScore().empty()) {
+      sync::GetMetadataById(anime_id_);
     }
   }
 }
@@ -205,11 +207,11 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
         win::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value; m_Spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED && episode_value == anime_item->GetEpisodeCount()) {
+          if (anime_item->GetMyStatus() == sync::myanimelist::kCompleted && episode_value == anime_item->GetEpisodeCount()) {
             m_Spin.SetPos32(0);
           }
           m_Combo.Enable(FALSE);
-          m_Combo.SetCurSel(mal::MYSTATUS_COMPLETED - 1);
+          m_Combo.SetCurSel(sync::myanimelist::kCompleted - 1);
         } else {
           if (episode_value == 0) {
             m_Spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
@@ -228,8 +230,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
         win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == mal::MYSTATUS_COMPLETED) {
-          if (anime_item->GetMyStatus() != mal::MYSTATUS_COMPLETED && anime_item->GetEpisodeCount() > 0) {
+        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == sync::myanimelist::kCompleted) {
+          if (anime_item->GetMyStatus() != sync::myanimelist::kCompleted && anime_item->GetEpisodeCount() > 0) {
             SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
           }
         }
@@ -282,19 +284,19 @@ void PageMyInfo::Refresh(int anime_id) {
 
   // Re-watching
   CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
-  EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED);
+  EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == sync::myanimelist::kCompleted);
 
   // Status
   win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
   if (m_Combo.GetCount() == 0) {
-    for (int i = mal::MYSTATUS_WATCHING; i <= mal::MYSTATUS_PLANTOWATCH; i++) {
-      if (i != mal::MYSTATUS_UNKNOWN) {
-        m_Combo.AddItem(mal::TranslateMyStatus(i, false).c_str(), i);
+    for (int i = sync::myanimelist::kWatching; i <= sync::myanimelist::kPlanToWatch; i++) {
+      if (i != sync::myanimelist::kUnknownMyStatus) {
+        m_Combo.AddItem(sync::myanimelist::TranslateMyStatus(i, false).c_str(), i);
       }
     }
   }
   int status = anime_item->GetMyStatus();
-  if (status == mal::MYSTATUS_PLANTOWATCH) status--;
+  if (status == sync::myanimelist::kPlanToWatch) status--;
   m_Combo.SetCurSel(status - 1);
   m_Combo.Enable(!anime_item->GetMyRewatching());
   m_Combo.SetWindowHandle(nullptr);
@@ -324,27 +326,27 @@ void PageMyInfo::Refresh(int anime_id) {
   m_Edit.SetWindowHandle(nullptr);
       
   // Date limits and defaults
-  if (mal::IsValidDate(anime_item->GetDate(anime::DATE_START))) {
+  if (sync::myanimelist::IsValidDate(anime_item->GetDate(anime::DATE_START))) {
     SYSTEMTIME stSeriesStart = anime_item->GetDate(anime::DATE_START);
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
   }
-  if (mal::IsValidDate(anime_item->GetDate(anime::DATE_END))) {
+  if (sync::myanimelist::IsValidDate(anime_item->GetDate(anime::DATE_END))) {
     SYSTEMTIME stSeriesEnd = anime_item->GetDate(anime::DATE_END);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesEnd);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesEnd);
   }
   // Start date
-  if (mal::IsValidDate(anime_item->GetMyDate(anime::DATE_START))) {
+  if (sync::myanimelist::IsValidDate(anime_item->GetMyDate(anime::DATE_START))) {
     SYSTEMTIME stMyStart = anime_item->GetMyDate(anime::DATE_START);
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyStart);
   } else {
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, 0);
   }
   // Finish date
-  if (mal::IsValidDate(anime_item->GetMyDate(anime::DATE_END))) {
+  if (sync::myanimelist::IsValidDate(anime_item->GetMyDate(anime::DATE_END))) {
     SYSTEMTIME stMyFinish = anime_item->GetMyDate(anime::DATE_END);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyFinish);
   } else {
@@ -392,11 +394,11 @@ bool PageMyInfo::Save() {
   // Create item
   EventItem event_item;
   event_item.anime_id = anime_id_;
-  event_item.mode = HTTP_MAL_AnimeUpdate;
+  event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
 
   // Episodes watched
   event_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!mal::IsValidEpisode(*event_item.episode, -1, anime_item->GetEpisodeCount())) {
+  if (!sync::myanimelist::IsValidEpisode(*event_item.episode, -1, anime_item->GetEpisodeCount())) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
                   ToWstr(anime_item->GetEpisodeCount()) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
@@ -411,7 +413,7 @@ bool PageMyInfo::Save() {
   
   // Status
   event_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
-  if (*event_item.status == mal::MYSTATUS_UNKNOWN)
+  if (*event_item.status == sync::myanimelist::kUnknownMyStatus)
     event_item.status = *event_item.status + 1;
   
   // Tags
@@ -423,18 +425,18 @@ bool PageMyInfo::Save() {
   SYSTEMTIME stMyStart;
   if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
                          reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
-    event_item.date_start = mal::TranslateDateForApi(Date());
+    event_item.date_start = sync::myanimelist::TranslateDateForApi(Date());
   } else {
-    event_item.date_start = mal::TranslateDateForApi(
+    event_item.date_start = sync::myanimelist::TranslateDateForApi(
       Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay));
   }
   // Finish date
   SYSTEMTIME stMyFinish;
   if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
                          reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
-    event_item.date_finish = mal::TranslateDateForApi(Date());
+    event_item.date_finish = sync::myanimelist::TranslateDateForApi(Date());
   } else {
-    event_item.date_finish = mal::TranslateDateForApi(
+    event_item.date_finish = sync::myanimelist::TranslateDateForApi(
       Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay));
   }
 

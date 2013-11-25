@@ -21,7 +21,7 @@
 #include "taiga.h"
 
 #include "library/anime_db.h"
-#include "sync/announce.h"
+#include "taiga/announce.h"
 #include "api.h"
 #include "base/common.h"
 #include "base/gfx.h"
@@ -111,7 +111,6 @@ void Taiga::Uninitialize() {
   Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
 
   // Cleanup
-  Clients.service.list.Cleanup();
   Taskbar.Destroy();
   TaskbarList.Release();
 
