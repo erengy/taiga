@@ -169,6 +169,7 @@
     <ClCompile Include="ui\list_sort.cpp" />
     <ClCompile Include="ui\menu.cpp" />
     <ClCompile Include="ui\theme.cpp" />
+    <ClCompile Include="ui\ui.cpp" />
     <ClCompile Include="win\ctrl\win_ctrl_combobox.cpp" />
     <ClCompile Include="win\ctrl\win_ctrl_edit.cpp" />
     <ClCompile Include="win\ctrl\win_ctrl_imagelist.cpp" />
@@ -276,7 +277,9 @@
     <ClInclude Include="ui\dlg\dlg_test_recognition.h" />
     <ClInclude Include="ui\dlg\dlg_torrent.h" />
     <ClInclude Include="ui\dlg\dlg_update.h" />
+    <ClInclude Include="ui\menu.h" />
     <ClInclude Include="ui\theme.h" />
+    <ClInclude Include="ui\ui.h" />
     <ClInclude Include="win\ctrl\win_ctrl.h" />
     <ClInclude Include="win\http\win_http.h" />
     <ClInclude Include="win\win_dialog.h" />

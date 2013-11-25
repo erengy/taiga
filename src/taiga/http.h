@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,101 +19,75 @@
 #ifndef TAIGA_TAIGA_HTTP_H
 #define TAIGA_TAIGA_HTTP_H
 
-#include "base/std.h"
 #include "base/types.h"
 #include "win/http/win_http.h"
 
+namespace taiga {
+
 enum HttpClientMode {
-  HTTP_Silent = 0,
-  // MyAnimeList
-  HTTP_MAL_Login,
-  HTTP_MAL_RefreshList,
-  HTTP_MAL_AnimeAdd,
-  HTTP_MAL_AnimeAskToDiscuss,
-  HTTP_MAL_AnimeDelete,
-  HTTP_MAL_AnimeDetails,
-  HTTP_MAL_AnimeUpdate,
-  HTTP_MAL_SearchAnime,
-  HTTP_MAL_Image,
-  HTTP_MAL_UserImage,
+  kHttpSilent,
+  // Service
+  kHttpServiceAuthenticateUser,
+  kHttpServiceGetMetadataById,
+  kHttpServiceSearchTitle,
+  kHttpServiceAddLibraryEntry,
+  kHttpServiceDeleteLibraryEntry,
+  kHttpServiceGetLibraryEntries,
+  kHttpServiceUpdateLibraryEntry,
+  // Library
+  kHttpGetLibraryEntryImage,
   // Feed
-  HTTP_Feed_Check,
-  HTTP_Feed_CheckAuto,
-  HTTP_Feed_Download,
-  HTTP_Feed_DownloadAll,
-  HTTP_Feed_DownloadIcon,
+  kHttpFeedCheck,
+  kHttpFeedCheckAuto,
+  kHttpFeedDownload,
+  kHttpFeedDownloadAll,
   // Twitter
-  HTTP_Twitter_Request,
-  HTTP_Twitter_Auth,
-  HTTP_Twitter_Post,
+  kHttpTwitterRequest,
+  kHttpTwitterAuth,
+  kHttpTwitterPost,
   // Taiga
-  HTTP_UpdateCheck,
-  HTTP_UpdateDownload
+  kHttpTaigaUpdateCheck,
+  kHttpTaigaUpdateDownload
 };
-
-enum HttpClientType {
-  HTTP_Client_Image = 1,
-  HTTP_Client_Search
-};
-
-// =============================================================================
 
 class HttpClient : public win::http::Client {
 public:
+  friend class HttpManager;
+
   HttpClient();
   virtual ~HttpClient() {}
-
-  DWORD GetClientMode() const;
-  void SetClientMode(DWORD mode);
-  LPARAM GetParam() const;
+  
+  HttpClientMode mode() const;
+  void set_mode(HttpClientMode mode);
 
 protected:
   void OnError(DWORD error);
-  bool OnSendRequestComplete();
   bool OnHeadersAvailable();
-  bool OnDataAvailable();
   bool OnReadData();
   bool OnReadComplete();
   bool OnRedirect(const std::wstring& address);
 
 private:
-  DWORD mode_;
+  HttpClientMode mode_;
 };
 
-class AnimeClients {
+class HttpManager {
 public:
-  AnimeClients();
-  virtual ~AnimeClients();
+  HttpClient& GetNewClient(const base::uuid_t& uuid);
 
-  void Cleanup(bool force);
-  HttpClient* GetClient(int type, int anime_id);
-  void UpdateProxy(const wstring& proxy, const wstring& user, const wstring& pass);
+  void CancelRequest(base::uuid_t uuid);
+  void MakeRequest(HttpRequest& request, HttpClientMode mode);
+  void MakeRequest(HttpClient& client, HttpRequest& request, HttpClientMode mode);
+
+  void HandleError(HttpResponse& response, const string_t& error);
+  void HandleResponse(HttpResponse& response);
 
 private:
-  std::map<int, std::map<int, HttpClient*>> clients_;
+  std::map<std::wstring, HttpClient> clients_;
 };
 
-struct HttpClients {
-  AnimeClients anime;
+}  // namespace taiga
 
-  HttpClient application;
-
-  struct Service {
-    HttpClient image;
-    HttpClient list;
-    HttpClient search;
-  } service;
-
-  struct Sharing {
-    HttpClient http;
-    HttpClient twitter;
-  } sharing;
-};
-
-extern HttpClients Clients;
-
-// =============================================================================
-
-void SetProxies(const wstring& proxy, const wstring& user, const wstring& pass);
+extern taiga::HttpManager ConnectionManager;
 
 #endif  // TAIGA_TAIGA_HTTP_H

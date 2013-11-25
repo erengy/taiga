@@ -37,6 +37,7 @@
 #include "stats.h"
 #include "base/string.h"
 #include "taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 #include "ui/dlg/dlg_about.h"

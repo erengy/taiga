@@ -23,6 +23,7 @@
 #include "anime_episode.h"
 
 #include "base/common.h"
+#include "ui/menu.h"
 
 anime::Episode CurrentEpisode;
 

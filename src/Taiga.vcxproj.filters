@@ -370,6 +370,9 @@
     <ClCompile Include="sync\manager.cpp">
       <Filter>sync</Filter>
     </ClCompile>
+    <ClCompile Include="ui\ui.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
     <ClCompile Include="sync\myanimelist.cpp">
       <Filter>sync\myanimelist</Filter>
     </ClCompile>
@@ -635,6 +638,12 @@
     </ClInclude>
     <ClInclude Include="sync\manager.h">
       <Filter>sync</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\ui.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\menu.h">
+      <Filter>ui</Filter>
     </ClInclude>
     <ClInclude Include="sync\myanimelist_util.h">
       <Filter>sync\myanimelist</Filter>

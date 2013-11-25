@@ -75,23 +75,11 @@ void ValidateFileName(wstring& path);
 wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value);
 int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = L"", bool recursive = false, bool trim_extension = false);
 int PopulateFolders(vector<wstring>& folder_list, wstring path);
+bool SaveToFile(LPCVOID data, DWORD length, const wstring& path, bool take_backup = false);
 wstring ToSizeString(QWORD qwSize);
 
 // list_sort.cpp
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
-
-// menu.cpp
-void UpdateAllMenus(anime::Item* anime_item = nullptr);
-void UpdateAnimeMenu(anime::Item* anime_item);
-void UpdateAnnounceMenu();
-void UpdateExternalLinksMenu();
-void UpdateFoldersMenu();
-void UpdateSearchListMenu(bool enabled = false);
-void UpdateSeasonListMenu(bool enabled = false);
-void UpdateSeasonMenu();
-void UpdateToolsMenu();
-void UpdateTrayMenu();
-void UpdateViewMenu();
 
 // script.cpp
 wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
