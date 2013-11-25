@@ -492,7 +492,7 @@ void FeedFilterManager::InitializePresets() {
   ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ANY, true, 
       L"Select currently watching", 
       L"Selects files that belong to anime that you're currently watching");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_USER_STATUS, FEED_FILTER_OPERATOR_EQUALS, ToWstr(mal::MYSTATUS_WATCHING));
+  ADD_CONDITION(FEED_FILTER_ELEMENT_USER_STATUS, FEED_FILTER_OPERATOR_EQUALS, ToWstr(sync::myanimelist::kWatching));
 
   // Discard unknown titles
   ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, 
@@ -666,11 +666,11 @@ wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) 
       }
     }
     case FEED_FILTER_ELEMENT_USER_STATUS:
-      return mal::TranslateMyStatus(ToInt(condition.value), false);
+      return sync::myanimelist::TranslateMyStatus(ToInt(condition.value), false);
     case FEED_FILTER_ELEMENT_META_STATUS:
-      return mal::TranslateStatus(ToInt(condition.value));
+      return sync::myanimelist::TranslateStatus(ToInt(condition.value));
     case FEED_FILTER_ELEMENT_META_TYPE:
-      return mal::TranslateType(ToInt(condition.value));
+      return sync::myanimelist::TranslateType(ToInt(condition.value));
     default:
       return condition.value;
   }

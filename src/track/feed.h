@@ -95,22 +95,17 @@ public:
 class Feed : public GenericFeed {
 public:
   Feed();
-  virtual ~Feed();
+  virtual ~Feed() {}
 
   bool Check(const wstring& source, bool automatic = false);
   bool Download(int index);
   bool ExamineData();
   wstring GetDataPath();
-  HICON GetIcon();
   bool Load();
 
 public:
   int category, download_index, ticker;
   wstring title, link;
-  HttpClient client;
-
-private:
-  HICON icon_;
 };
 
 // =============================================================================

@@ -45,15 +45,7 @@ class Aggregator Aggregator;
 Feed::Feed()
     : category(0), 
       download_index(-1), 
-      ticker(0), 
-      icon_(nullptr) {
-}
-
-Feed::~Feed() {
-  if (icon_) {
-    DestroyIcon(icon_);
-    icon_ = nullptr;
-  }
+      ticker(0) {
 }
 
 bool Feed::Check(const wstring& source, bool automatic) {
@@ -75,22 +67,23 @@ bool Feed::Check(const wstring& source, bool automatic) {
   http_request.host = url.host;
   http_request.path = url.path;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
-
-  client.set_download_path(GetDataPath() + L"feed.xml");
-  client.SetClientMode(automatic ? HTTP_Feed_CheckAuto : HTTP_Feed_Check);
   
-  return client.MakeRequest(http_request);
+  auto client_mode = automatic ? taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
+  auto& client = ConnectionManager.GetNewClient(http_request.uuid);
+  client.set_download_path(GetDataPath() + L"feed.xml");
+  ConnectionManager.MakeRequest(client, http_request, client_mode);
+  return true;
 }
 
 bool Feed::Download(int index) {
   if (category != FEED_CATEGORY_LINK)
     return false;
   
-  DWORD dwMode = HTTP_Feed_Download;
+  auto client_mode = taiga::kHttpFeedDownload;
   if (index == -1) {
     for (size_t i = 0; i < items.size(); i++) {
       if (items[i].state == FEEDITEM_SELECTED) {
-        dwMode = HTTP_Feed_DownloadAll;
+        client_mode = taiga::kHttpFeedDownloadAll;
         index = i;
         break;
       }
@@ -113,10 +106,10 @@ bool Feed::Download(int index) {
   http_request.path = url.path;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
 
+  auto& client = ConnectionManager.GetNewClient(http_request.uuid);
   client.set_download_path(file);
-  client.SetClientMode(dwMode);
-  
-  return client.MakeRequest(http_request);
+  ConnectionManager.MakeRequest(client, http_request, client_mode);
+  return true;
 }
 
 bool Feed::ExamineData() {
@@ -162,31 +155,6 @@ wstring Feed::GetDataPath() {
     path += Base64Encode(url.host, true) + L"\\";
   }
   return path;
-}
-
-HICON Feed::GetIcon() {
-  if (link.empty()) return NULL;
-  if (icon_) {
-    DestroyIcon(icon_);
-    icon_ = nullptr;
-  }
-
-  wstring path = GetDataPath() + L"favicon.ico";
-
-  if (FileExists(path)) {
-    icon_ = GdiPlus.LoadIcon(path);
-    return icon_;
-  } else {
-    win::http::Url url(link + L"/favicon.ico");
-    HttpRequest http_request;
-    http_request.host = url.host;
-    http_request.path = url.path;
-    http_request.parameter = reinterpret_cast<LPARAM>(this);
-    client.set_download_path(path);
-    client.SetClientMode(HTTP_Feed_DownloadIcon);
-    client.MakeRequest(http_request);
-    return NULL;
-  }
 }
 
 bool Feed::Load() {
