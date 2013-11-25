@@ -264,9 +264,6 @@
     <ClCompile Include="track\feed.cpp">
       <Filter>track</Filter>
     </ClCompile>
-    <ClCompile Include="sync\announce.cpp">
-      <Filter>sync</Filter>
-    </ClCompile>
     <ClCompile Include="library\history.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -370,8 +367,14 @@
     <ClCompile Include="sync\manager.cpp">
       <Filter>sync</Filter>
     </ClCompile>
+    <ClCompile Include="sync\sync.cpp">
+      <Filter>sync</Filter>
+    </ClCompile>
     <ClCompile Include="ui\ui.cpp">
       <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="taiga\announce.cpp">
+      <Filter>taiga</Filter>
     </ClCompile>
     <ClCompile Include="sync\myanimelist.cpp">
       <Filter>sync\myanimelist</Filter>
@@ -537,9 +540,6 @@
     <ClInclude Include="base\xml.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="sync\announce.h">
-      <Filter>sync</Filter>
-    </ClInclude>
     <ClInclude Include="taiga\api.h">
       <Filter>taiga</Filter>
     </ClInclude>
@@ -639,11 +639,17 @@
     <ClInclude Include="sync\manager.h">
       <Filter>sync</Filter>
     </ClInclude>
+    <ClInclude Include="sync\sync.h">
+      <Filter>sync</Filter>
+    </ClInclude>
     <ClInclude Include="ui\ui.h">
       <Filter>ui</Filter>
     </ClInclude>
     <ClInclude Include="ui\menu.h">
       <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="taiga\announce.h">
+      <Filter>taiga</Filter>
     </ClInclude>
     <ClInclude Include="sync\myanimelist_util.h">
       <Filter>sync\myanimelist</Filter>

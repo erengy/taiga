@@ -136,9 +136,7 @@ void Announcer::ToHttp(wstring address, wstring data) {
   http_request.path = url.path;
   http_request.body = data;
 
-  Clients.sharing.http.SetClientMode(HTTP_Silent);
-
-  Clients.sharing.http.MakeRequest(http_request);
+  ConnectionManager.MakeRequest(http_request, taiga::kHttpSilent);
 }
 
 // =============================================================================
@@ -443,9 +441,8 @@ bool Twitter::RequestToken() {
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/request_token",
                                      L"GET", NULL);
 
-  Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Request);
-
-  return Clients.sharing.twitter.MakeRequest(http_request);
+  ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterRequest);
+  return true;
 }
 
 bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
@@ -456,9 +453,8 @@ bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstri
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/access_token",
                                      L"POST", NULL, key, secret, pin);
 
-  Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Auth);
-
-  return Clients.sharing.twitter.MakeRequest(http_request);
+  ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterAuth);
+  return true;
 }
 
 bool Twitter::SetStatusText(const wstring& status_text) {
@@ -484,9 +480,8 @@ bool Twitter::SetStatusText(const wstring& status_text) {
                                      Settings.Announce.Twitter.oauth_key,
                                      Settings.Announce.Twitter.oauth_secret);
 
-  Clients.sharing.twitter.SetClientMode(HTTP_Twitter_Post);
-
-  return Clients.sharing.twitter.MakeRequest(http_request);
+  ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterPost);
+  return true;
 }
 
 void Announcer::ToTwitter(const wstring& status_text) {
