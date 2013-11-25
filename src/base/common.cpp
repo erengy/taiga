@@ -505,6 +505,30 @@ int PopulateFolders(vector<wstring>& folder_list, wstring path) {
   return found;
 }
 
+bool SaveToFile(LPCVOID data, DWORD length, const string_t& path, bool take_backup) {
+  // Make sure the path is available
+  CreateFolder(GetPathOnly(path));
+
+  // Take a backup if needed
+  if (take_backup) {
+    wstring new_path = path + L".bak";
+    MoveFileEx(path.c_str(), new_path.c_str(),
+               MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
+  }
+
+  // Save the data
+  BOOL result = FALSE;
+  HANDLE file_Handle = ::CreateFile(path.c_str(), GENERIC_WRITE, 0, NULL,
+                                    CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+  if (file_Handle != INVALID_HANDLE_VALUE) {
+    DWORD bytes_written = 0;
+    result = ::WriteFile(file_Handle, (LPCVOID)data, length, &bytes_written, NULL);
+    ::CloseHandle(file_Handle);
+  }
+
+  return result != FALSE;
+}
+
 wstring ToSizeString(QWORD qwSize) {
   wstring size, unit;
 
