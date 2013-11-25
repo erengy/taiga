@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,133 +16,42 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MYANIMELIST_H
-#define MYANIMELIST_H
+#ifndef TAIGA_SYNC_MYANIMELIST_H
+#define TAIGA_SYNC_MYANIMELIST_H
 
-#include "base/std.h"
-#include "base/optional.h"
+#include "myanimelist_types.h"
+#include "myanimelist_util.h"
+#include "service.h"
+#include "base/types.h"
 
-namespace anime {
-class ListItem;
-}
-class Date;
-class EventItem;
+namespace sync {
+namespace myanimelist {
 
-namespace mal {
+// API documentation:
+// http://myanimelist.net/modules.php?go=api
 
-// =============================================================================
-
-enum MyStatus {
-  MYSTATUS_NOTINLIST,
-  MYSTATUS_WATCHING,
-  MYSTATUS_COMPLETED,
-  MYSTATUS_ONHOLD,
-  MYSTATUS_DROPPED,
-  MYSTATUS_UNKNOWN,
-  MYSTATUS_PLANTOWATCH
-};
-
-enum RewatchValue {
-  REWATCH_VERYLOW = 1,
-  REWATCH_LOW,
-  REWATCH_MEDIUM,
-  REWATCH_HIGH,
-  REWATCH_VERYHIGH
-};
-
-enum Status {
-  STATUS_UNKNOWN,
-  STATUS_AIRING,
-  STATUS_FINISHED,
-  STATUS_NOTYETAIRED
-};
-
-enum StorageType {
-  STORAGE_HARDDRIVE = 1,
-  STORAGE_DVDCD,
-  STORAGE_NONE,
-  STORAGE_RETAILDVD,
-  STORAGE_VHS,
-  STORAGE_EXTERNALHD,
-  STORAGE_NAS
-};
-
-enum Type {
-  TYPE_UNKNOWN,
-  TYPE_TV,
-  TYPE_OVA,
-  TYPE_MOVIE,
-  TYPE_SPECIAL,
-  TYPE_ONA,
-  TYPE_MUSIC
-};
-
-class AnimeValues {
+class Service : public sync::Service {
 public:
-  Optional<int> episode;
-  Optional<int> status;
-  Optional<int> score;
-  Optional<int> downloaded_episodes;
-  Optional<int> storage_type;
-  Optional<float> storage_value;
-  Optional<int> times_rewatched;
-  Optional<int> rewatch_value;
-  Optional<wstring> date_start;
-  Optional<wstring> date_finish;
-  Optional<int> priority;
-  Optional<int> enable_discussion;
-  Optional<int> enable_rewatching;
-  Optional<wstring> comments;
-  Optional<wstring> fansub_group;
-  Optional<wstring> tags;
+  Service();
+  ~Service() {}
+
+  void BuildRequest(Request& request, HttpRequest& http_request);
+  void HandleResponse(Response& response, HttpResponse& http_response);
+  bool RequestNeedsAuthentication(RequestType request_type) const;
+
+private:
+  REQUEST_AND_RESPONSE(AddLibraryEntry);
+  REQUEST_AND_RESPONSE(AuthenticateUser);
+  REQUEST_AND_RESPONSE(DeleteLibraryEntry);
+  REQUEST_AND_RESPONSE(GetLibraryEntries);
+  REQUEST_AND_RESPONSE(GetMetadataById);
+  REQUEST_AND_RESPONSE(SearchTitle);
+  REQUEST_AND_RESPONSE(UpdateLibraryEntry);
+
+  bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 };
 
-// =============================================================================
+}  // namespace myanimelist
+}  // namespace sync
 
-bool AskToDiscuss(int anime_id, int episode_number);
-bool DownloadImage(int anime_id, const wstring& image_url);
-bool DownloadUserImage(bool thumb);
-bool GetAnimeDetails(int anime_id);
-bool GetList();
-bool Login();
-bool ParseAnimeDetails(const wstring& data);
-bool ParseSearchResult(const wstring& data, int anime_id = 0);
-bool SearchAnime(int anime_id, wstring title);
-bool Update(AnimeValues& anime_values, int anime_id, int update_mode);
-bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code);
-
-wstring DecodeText(wstring text);
-bool IsValidDate(const Date& date);
-bool IsValidDate(const wstring& date);
-bool IsValidEpisode(int episode, int watched, int total);
-Date ParseDateString(const wstring& str);
-void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end);
-
-wstring TranslateDate(const Date& date);
-wstring TranslateDateForApi(const Date& date);
-Date TranslateDateFromApi(const wstring& date);
-wstring TranslateDateToSeason(const Date& date);
-wstring TranslateSeasonToMonths(const wstring& season);
-wstring TranslateMyStatus(int value, bool add_count);
-wstring TranslateNumber(int value, const wstring& default_char = L"-");
-wstring TranslateRewatchValue(int value);
-wstring TranslateStatus(int value);
-wstring TranslateStorageType(int value);
-wstring TranslateType(int value);
-
-int TranslateMyStatus(const wstring& value);
-int TranslateStatus(const wstring& value);
-int TranslateType(const wstring& value);
-
-void ViewAnimePage(int anime_id);
-void ViewAnimeSearch(const wstring& title);
-void ViewHistory();
-void ViewMessages();
-void ViewPanel();
-void ViewProfile();
-void ViewSeasonGroup();
-void ViewUpcomingAnime();
-
-} // namespace mal
-
-#endif // MYANIMELIST_H
+#endif  // TAIGA_SYNC_MYANIMELIST_H

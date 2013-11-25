@@ -110,7 +110,10 @@
     <ClCompile Include="library\history.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sync\announce.cpp" />
+    <ClCompile Include="sync\manager.cpp" />
     <ClCompile Include="sync\myanimelist.cpp" />
+    <ClCompile Include="sync\myanimelist_util.cpp" />
+    <ClCompile Include="sync\service.cpp" />
     <ClCompile Include="taiga\action.cpp" />
     <ClCompile Include="taiga\api.cpp" />
     <ClCompile Include="taiga\debug.cpp" />
@@ -222,7 +225,11 @@
     <ClInclude Include="library\anime_user.h" />
     <ClInclude Include="library\history.h" />
     <ClInclude Include="sync\announce.h" />
+    <ClInclude Include="sync\manager.h" />
     <ClInclude Include="sync\myanimelist.h" />
+    <ClInclude Include="sync\myanimelist_types.h" />
+    <ClInclude Include="sync\myanimelist_util.h" />
+    <ClInclude Include="sync\service.h" />
     <ClInclude Include="taiga\api.h" />
     <ClInclude Include="taiga\debug.h" />
     <ClInclude Include="taiga\http.h" />

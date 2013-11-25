@@ -46,6 +46,9 @@
     <Filter Include="win\ctrl">
       <UniqueIdentifier>{c5f2befa-8552-490e-bddd-e1a6eea6d47a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sync\myanimelist">
+      <UniqueIdentifier>{496cb38d-e9ef-4695-845c-2264442a9835}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
@@ -264,9 +267,6 @@
     <ClCompile Include="sync\announce.cpp">
       <Filter>sync</Filter>
     </ClCompile>
-    <ClCompile Include="sync\myanimelist.cpp">
-      <Filter>sync</Filter>
-    </ClCompile>
     <ClCompile Include="library\history.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -363,6 +363,18 @@
     </ClCompile>
     <ClCompile Include="win\ctrl\win_ctrl_treeview.cpp">
       <Filter>win\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="sync\service.cpp">
+      <Filter>sync</Filter>
+    </ClCompile>
+    <ClCompile Include="sync\manager.cpp">
+      <Filter>sync</Filter>
+    </ClCompile>
+    <ClCompile Include="sync\myanimelist.cpp">
+      <Filter>sync\myanimelist</Filter>
+    </ClCompile>
+    <ClCompile Include="sync\myanimelist_util.cpp">
+      <Filter>sync\myanimelist</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -525,9 +537,6 @@
     <ClInclude Include="sync\announce.h">
       <Filter>sync</Filter>
     </ClInclude>
-    <ClInclude Include="sync\myanimelist.h">
-      <Filter>sync</Filter>
-    </ClInclude>
     <ClInclude Include="taiga\api.h">
       <Filter>taiga</Filter>
     </ClInclude>
@@ -620,6 +629,21 @@
     </ClInclude>
     <ClInclude Include="base\encryption.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\service.h">
+      <Filter>sync</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\manager.h">
+      <Filter>sync</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\myanimelist_util.h">
+      <Filter>sync\myanimelist</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\myanimelist.h">
+      <Filter>sync\myanimelist</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\myanimelist_types.h">
+      <Filter>sync\myanimelist</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

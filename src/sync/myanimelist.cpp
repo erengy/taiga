@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,639 +16,459 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
 #include "myanimelist.h"
+#include "myanimelist_types.h"
+#include "myanimelist_util.h"
 
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "base/common.h"
 #include "base/encryption.h"
-#include "library/history.h"
-#include "taiga/http.h"
-#include "taiga/settings.h"
+#include "base/foreach.h"
 #include "base/string.h"
-#include "base/types.h"
-#include "taiga/taiga.h"
-#include "base/time.h"
 #include "base/xml.h"
+#include "library/anime_db.h"
+#include "library/anime_item.h"
 
-namespace mal {
+namespace sync {
+namespace myanimelist {
 
-// =============================================================================
+Service::Service() {
+  host_ = L"myanimelist.net";
 
-wstring GetUserPassEncoded() {
-  return Base64Encode(Settings.Account.MAL.user + L":" + 
-                      Settings.Account.MAL.password);
+  canonical_name_ = L"myanimelist";
+  name_ = L"MyAnimeList";
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-bool AskToDiscuss(int anime_id, int episode_number) {
-  wstring data =
-    L"epNum=" + ToWstr(episode_number) +
-    L"&aid=" + ToWstr(anime_id) +
-    L"&id=" + ToWstr(anime_id);
+void Service::BuildRequest(Request& request, HttpRequest& http_request) {
+  http_request.host = host_;
 
-  HttpRequest http_request;
-  http_request.method = L"POST";
-  http_request.host = L"myanimelist.net";
-  http_request.path = L"/includes/ajax.inc.php?t=50";
-  http_request.body = data;
-  http_request.parameter = anime_id;
+  // This doesn't quite help; MAL returns whatever it pleases
+  http_request.header[L"Accept"] = L"text/xml, text/*";
+  http_request.header[L"Accept-Charset"] = L"utf-8";
 
-  Clients.service.list.set_download_path(L"");
-  Clients.service.list.SetClientMode(HTTP_MAL_AnimeAskToDiscuss);
+  // Taiga has a unique user-agent string that is whitelisted by MAL. This will
+  // overwrite the default value (e.g. "Taiga/1.0") for all requests.
+  // If you want your own user-agent whitelisted by MAL, refer to the official
+  // MAL API club page for the registration link.
+  http_request.header[L"User-Agent"] =
+      L"api-taiga-32864c09ef538453b4d8110734ee355b";
 
-  return Clients.service.list.MakeRequest(http_request);
-}
-
-bool GetAnimeDetails(int anime_id) {
-  HttpClient* client;
-  if (anime_id > anime::ID_UNKNOWN) {
-    client = Clients.anime.GetClient(HTTP_Client_Search, anime_id);
-  } else {
-    client = &Clients.service.search;
+  if (RequestNeedsAuthentication(request.type)) {
+    // TODO: Make sure username and password are available
+    http_request.header[L"Authorization"] = L"Basic " +
+        Base64Encode(request.data[canonical_name_ + L"-username"] + L":" +
+                     request.data[canonical_name_ + L"-password"]);
   }
 
-  HttpRequest http_request;
-  http_request.host = L"myanimelist.net";
-  http_request.path = L"/includes/ajax.inc.php?t=64&id=" + ToWstr(anime_id);
-  http_request.parameter = anime_id;
-
-  client->set_download_path(L"");
-  client->SetClientMode(HTTP_MAL_AnimeDetails);
-
-  return client->MakeRequest(http_request);
-}
-
-bool GetList() {
-  if (Settings.Account.MAL.user.empty())
-    return false;
-
-  HttpRequest http_request;
-  http_request.host = L"myanimelist.net";
-  http_request.path = L"/malappinfo.php?u=" + Settings.Account.MAL.user + L"&status=all";
-  http_request.header[L"Accept-Encoding"] = L"gzip";
-
-  Clients.service.list.set_download_path(L"");
-  Clients.service.list.SetClientMode(HTTP_MAL_RefreshList);
-
-  return Clients.service.list.MakeRequest(http_request);
-}
-
-bool Login() {
-  if (Taiga.logged_in || 
-      Settings.Account.MAL.user.empty() || 
-      Settings.Account.MAL.password.empty())
-    return false;
-
-  HttpRequest http_request;
-  http_request.host = L"myanimelist.net";
-  http_request.path = L"/api/account/verify_credentials.xml";
-  http_request.header[L"Authorization"] = L"Basic " + GetUserPassEncoded();
-
-  Clients.service.list.set_download_path(L"");
-  Clients.service.list.SetClientMode(HTTP_MAL_Login);
-
-  return Clients.service.list.MakeRequest(http_request);
-}
-
-bool DownloadImage(int anime_id, const wstring& image_url) {
-  if (image_url.empty())
-    return false;
-  
-  HttpClient* client;
-  if (anime_id > anime::ID_UNKNOWN) {
-    client = Clients.anime.GetClient(HTTP_Client_Image, anime_id);
-  } else {
-    client = &Clients.service.image;
-  }
-  
-  win::http::Url url(image_url);
-  
-  HttpRequest http_request;
-  http_request.host = url.host;
-  http_request.path = url.path;
-  http_request.parameter = anime_id;
-
-  client->set_download_path(anime::GetImagePath(anime_id));
-  client->SetClientMode(HTTP_MAL_Image);
-
-  return client->MakeRequest(http_request);
-}
-
-bool DownloadUserImage(bool thumb) {
-  if (!AnimeDatabase.user.GetId())
-    return false;
-  
-  win::http::Url url;
-  wstring path = Taiga.GetDataPath() + L"user\\" + 
-                 AnimeDatabase.user.GetName() + L"\\";
-  
-  if (thumb) {
-    url.Crack(L"http://myanimelist.net/images/userimages/thumbs/" + 
-              ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg");
-    path += ToWstr(AnimeDatabase.user.GetId()) + L"_thumb.jpg";
-  } else {
-    url.Crack(L"http://cdn.myanimelist.net/images/userimages/" + 
-              ToWstr(AnimeDatabase.user.GetId()) + L".jpg");
-    path += ToWstr(AnimeDatabase.user.GetId()) + L".jpg";
+  switch (request.type) {
+    case kGetLibraryEntries:
+      // Compressed lists save us a lot of bandwidth and time
+      // TODO: Make sure username is available
+      http_request.header[L"Accept-Encoding"] = L"gzip";
+      break;
   }
 
-  HttpRequest http_request;
-  http_request.host = url.host;
-  http_request.path = url.path;
-
-  Clients.service.image.set_download_path(path);
-  Clients.service.image.SetClientMode(HTTP_MAL_UserImage);
-
-  return Clients.service.image.MakeRequest(http_request);
+  switch (request.type) {
+    BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
+    BUILD_HTTP_REQUEST(kAuthenticateUser, AuthenticateUser);
+    BUILD_HTTP_REQUEST(kDeleteLibraryEntry, DeleteLibraryEntry);
+    BUILD_HTTP_REQUEST(kGetLibraryEntries, GetLibraryEntries);
+    BUILD_HTTP_REQUEST(kGetMetadataById, GetMetadataById);
+    BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
+    BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
+  }
 }
 
-bool ParseAnimeDetails(const wstring& data) {
-  if (data.empty())
-    return false;
-
-  int anime_id = ToInt(InStr(data, L"myanimelist.net/anime/", L"/"));
-  if (!anime_id)
-    return false;
-
-  anime::Item anime_item;
-  anime_item.SetId(anime_id);
-  anime_item.SetGenres(InStr(data, L"Genres:</span> ", L"<br />"));
-  anime_item.SetRank(InStr(data, L"Ranked:</span> ", L"<br />"));
-  anime_item.SetPopularity(InStr(data, L"Popularity:</span> ", L"<br />"));
-  wstring score = InStr(data, L"Score:</span> ", L"<br />");
-  StripHtmlTags(score);
-  anime_item.SetScore(score);
-  anime_item.last_modified = time(nullptr);
-  AnimeDatabase.UpdateItem(anime_item);
-
-  return true;
-}
-
-bool ParseSearchResult(const wstring& data, int anime_id) {
-  if (data.empty())
-    return false;
-  
-  bool found_item = false;
-  
-  xml_document doc;
-  xml_parse_result result = doc.load(data.c_str());
-  
-  if (result.status == pugi::status_ok) {
-    xml_node node = doc.child(L"anime");
-    for (xml_node entry = node.child(L"entry"); entry; entry = entry.next_sibling(L"entry")) {
-      auto current_anime_item = AnimeDatabase.FindItem(anime_id);
-
-      anime::Item anime_item;
-      anime_item.SetId(XmlReadIntValue(entry, L"id"));
-      if (!current_anime_item || !current_anime_item->keep_title)
-        anime_item.SetTitle(mal::DecodeText(XmlReadStrValue(entry, L"title")));
-      anime_item.SetEnglishTitle(mal::DecodeText(XmlReadStrValue(entry, L"english")));
-      anime_item.SetSynonyms(mal::DecodeText(XmlReadStrValue(entry, L"synonyms")));
-      anime_item.SetEpisodeCount(XmlReadIntValue(entry, L"episodes"));
-      anime_item.SetScore(XmlReadStrValue(entry, L"score"));
-      anime_item.SetType(mal::TranslateType(XmlReadStrValue(entry, L"type")));
-      anime_item.SetAiringStatus(mal::TranslateStatus(XmlReadStrValue(entry, L"status")));
-      anime_item.SetDate(anime::DATE_START, XmlReadStrValue(entry, L"start_date"));
-      anime_item.SetDate(anime::DATE_END, XmlReadStrValue(entry, L"end_date"));
-      wstring synopsis = mal::DecodeText(XmlReadStrValue(entry, L"synopsis"));
-      if (!StartsWith(synopsis, L"No synopsis has been added for this series yet."))
-        anime_item.SetSynopsis(synopsis);
-      anime_item.SetImageUrl(XmlReadStrValue(entry, L"image"));
-      anime_item.last_modified = time(nullptr);
-      AnimeDatabase.UpdateItem(anime_item);
-      
-      if (!anime_id || anime_id == anime_item.GetId())
-        found_item = true;
+void Service::HandleResponse(Response& response, HttpResponse& http_response) {
+  if (RequestSucceeded(response, http_response)) {
+    switch (response.type) {
+      HANDLE_HTTP_RESPONSE(kAddLibraryEntry, AddLibraryEntry);
+      HANDLE_HTTP_RESPONSE(kAuthenticateUser, AuthenticateUser);
+      HANDLE_HTTP_RESPONSE(kDeleteLibraryEntry, DeleteLibraryEntry);
+      HANDLE_HTTP_RESPONSE(kGetLibraryEntries, GetLibraryEntries);
+      HANDLE_HTTP_RESPONSE(kGetMetadataById, GetMetadataById);
+      HANDLE_HTTP_RESPONSE(kSearchTitle, SearchTitle);
+      HANDLE_HTTP_RESPONSE(kUpdateLibraryEntry, UpdateLibraryEntry);
     }
   }
-  
-  return found_item;
 }
 
-bool SearchAnime(int anime_id, wstring title) {
-  HttpClient* client;
-  if (anime_id > anime::ID_UNKNOWN) {
-    client = Clients.anime.GetClient(HTTP_Client_Search, anime_id);
-  } else {
-    client = &Clients.service.search;
-  }
+////////////////////////////////////////////////////////////////////////////////
+// Request builders
 
-  if (title.empty()) {
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    title = anime_item->GetTitle();
-  }
-
-  Replace(title, L"+", L"%2B", true);
-  ReplaceChar(title, L'\u2729', L'\u2606'); // stress outlined white star to white star
-
-  if (Settings.Account.MAL.user.empty() || 
-      Settings.Account.MAL.password.empty())
-    return false;
-
-  HttpRequest http_request;
-  http_request.host = L"myanimelist.net";
-  http_request.path = L"/api/anime/search.xml?q=" + title;
-  http_request.header[L"Authorization"] = L"Basic " + GetUserPassEncoded();
-  http_request.parameter = anime_id;
-
-  client->set_download_path(L"");
-  client->SetClientMode(HTTP_MAL_SearchAnime);
-
-  return client->MakeRequest(http_request);
+void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
+  http_request.path = L"/api/account/verify_credentials.xml";
 }
 
-bool Update(AnimeValues& anime_values, int anime_id, int update_mode) {
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
-  if (!anime_item)
-    return false;
+void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
+  // malappinfo.php is an undocumented feature of MAL. While it's not a part
+  // of their official API, it's the easiest way to get user lists.
+  http_request.path = L"/malappinfo.php";
+  http_request.query[L"u"] = request.data[canonical_name_ + L"-username"];
+  // Changing the status parameter to some other value such as "1" or "watching"
+  // doesn't seem to make any difference.
+  http_request.query[L"status"] = L"all";
+}
 
-  #define ADD_DATA_N(name, value) \
-    if (anime_values.value) \
-      data += L"\r\n\t<" ##name L">" + ToWstr(*anime_values.value) + L"</" ##name L">";
-  #define ADD_DATA_S(name, value) \
-    if (anime_values.value) \
-      data += L"\r\n\t<" ##name L">" + *anime_values.value + L"</" ##name L">";
+void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
+  // As MAL API doesn't have a method to get information by ID, we're using an
+  // undocumented call that is normally used to display information bubbles
+  // when hovering over anime/manga titles at the website. The downside is,
+  // it doesn't provide all the information we need.
+  http_request.path = L"/includes/ajax.inc.php";
+  http_request.query[L"t"] = L"64";
+  http_request.query[L"id"] = request.data[canonical_name_ + L"-id"];
+}
 
-  // Build XML data
-  wstring data;
-  if (update_mode != HTTP_MAL_AnimeDelete) {
-    data = L"data=<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<entry>";
-    ADD_DATA_N(L"episode", episode);
-    ADD_DATA_N(L"status", status);
-    ADD_DATA_N(L"score", score);
-    ADD_DATA_N(L"downloaded_episodes", downloaded_episodes);
-    ADD_DATA_N(L"storage_type", storage_type);
-    ADD_DATA_N(L"storage_value", storage_value);
-    ADD_DATA_N(L"times_rewatched", times_rewatched);
-    ADD_DATA_N(L"rewatch_value", rewatch_value);
-    ADD_DATA_S(L"date_start", date_start);
-    ADD_DATA_S(L"date_finish", date_finish);
-    ADD_DATA_N(L"priority", priority);
-    ADD_DATA_N(L"enable_discussion", enable_discussion);
-    ADD_DATA_N(L"enable_rewatching", enable_rewatching);
-    ADD_DATA_S(L"comments", comments);
-    ADD_DATA_S(L"fansub_group", fansub_group);
-    ADD_DATA_S(L"tags", tags);
-    data += L"\r\n</entry>";
-  }
+void Service::SearchTitle(Request& request, HttpRequest& http_request) {
+  // MAL's search method is far from perfect. Missing a punctuation mark
+  // (e.g. "A B" instead of "A: B") or searching for a title that is too short
+  // (e.g. "C", "K") can return irrelevant or no results.
+  http_request.path = L"/api/anime/search.xml";
+  // TODO: We might have to do some encoding on the title here
+  http_request.query[L"q"] = request.data[L"title"];
+}
 
-  #undef ADD_DATA_N
-  #undef ADD_DATA_S
-  #undef ANIME
+void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
+  request.data[L"action"] = L"add";
+  UpdateLibraryEntry(request, http_request);
+}
 
-  win::http::Url url;
-  switch (update_mode) {
-    // Add anime
-    case HTTP_MAL_AnimeAdd:
-      url = L"myanimelist.net/api/animelist/add/" + ToWstr(anime_id) + L".xml";
-      break;
-    // Delete anime
-    case HTTP_MAL_AnimeDelete:
-      url = L"myanimelist.net/api/animelist/delete/" + ToWstr(anime_id) + L".xml";
-      break;
-    // Update anime
-    default:
-      url = L"myanimelist.net/api/animelist/update/" + ToWstr(anime_id) + L".xml";
-      break;
-  }
+void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
+  request.data[L"action"] = L"delete";
+  UpdateLibraryEntry(request, http_request);
+}
 
-  HttpRequest http_request;
+void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
-  http_request.host = url.host;
-  http_request.path = url.path;
-  http_request.body = data;
-  http_request.parameter = static_cast<LPARAM>(anime_id);
-  http_request.header[L"Authorization"] = L"Basic " + GetUserPassEncoded();
+  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
 
-  Clients.service.list.set_download_path(L"");
-  Clients.service.list.SetClientMode(update_mode);
+  if (!request.data.count(L"action"))
+    request.data[L"action"] = L"update";
 
-  return Clients.service.list.MakeRequest(http_request);
-}
+  http_request.path = L"/api/animelist/" + request.data[L"action"] + L"/" +
+                      request.data[canonical_name_ + L"-id"] + L".xml";
 
-bool UpdateSucceeded(EventItem& item, const wstring& data, int status_code) {
-  int update_mode = item.mode;
-  bool success = false;
+  // Delete method doesn't require us to provide additional data
+  if (request.data[L"action"] == L"delete")
+    return;
 
-  switch (update_mode) {
-    case HTTP_MAL_AnimeAdd:
-      success = IsNumeric(data) || 
-        InStr(data, L"This anime is already on your list") > -1 || 
-        InStr(data, L"<title>201 Created</title>") > -1; // TODO: Remove when MAL fixes its API
-      break;
-    case HTTP_MAL_AnimeDelete:
-      success = data == L"Deleted";
-      break;
-    default:
-      success = data == L"Updated";
-      break;
+  xml_document document;
+  xml_node node_declaration = document.append_child(pugi::node_declaration);
+  node_declaration.append_attribute(L"version") = L"1.0";
+  node_declaration.append_attribute(L"encoding") = L"UTF-8";
+  xml_node node_entry = document.append_child(L"entry");
+
+  // MAL allows setting a new value to "times_rewatched" and others, but
+  // there's no way to get the current value. So we avoid them altogether.
+  const wchar_t* tags[] = {
+      L"episode",
+      L"status",
+      L"score",
+//    L"downloaded_episodes",
+//    L"storage_type",
+//    L"storage_value",
+//    L"times_rewatched",
+//    L"rewatch_value",
+      L"date_start",
+      L"date_finish",
+//    L"priority",
+//    L"enable_discussion",
+      L"enable_rewatching",
+//    L"comments",
+//    L"fansub_group",
+      L"tags"
+  };
+  std::set<std::wstring> valid_tags(tags, tags + sizeof(tags) / sizeof(*tags));
+  foreach_(it, request.data) {
+    // TODO: Our keys will be different than the tags listed above, once we
+    // add support for multiple services
+    if (valid_tags.find(it->first) != valid_tags.end())
+      XmlWriteStrValue(node_entry, it->first.c_str(), it->second.c_str());
   }
 
-  if (success)
-    return true;
+  http_request.body = L"data=" + XmlGetNodeAsString(document);
+}
 
-  // Set error message on failure     
-  item.reason = data;
-  Replace(item.reason, L"</div><div>", L"\r\n");
-  StripHtmlTags(item.reason);
+////////////////////////////////////////////////////////////////////////////////
+// Response handlers
+
+void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
+  wstring username = InStr(http_response.body, L"<username>", L"</username>");
+  response.data[canonical_name_ + L"username"] = username;
+}
+
+void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
+  xml_document document;
+  xml_parse_result parse_result = document.load(http_response.body.c_str());
+
+  if (parse_result.status != pugi::status_ok) {
+    response.data[L"error"] = L"Could not parse the list";
+    return;
+  }
+
+  xml_node node_myanimelist = document.child(L"myanimelist");
+  
+  // Available tags:
+  // - user_id
+  // - user_name
+  // - user_watching
+  // - user_completed
+  // - user_onhold
+  // - user_dropped
+  // - user_plantowatch
+  // - user_days_spent_watching
+  xml_node node_myinfo = node_myanimelist.child(L"myinfo");
+  user_.id = XmlReadStrValue(node_myinfo, L"user_id");
+  user_.username = XmlReadStrValue(node_myinfo, L"user_name");
+  // We ignore the remaining tags, because MAL can be very slow at updating
+  // their values, and we can easily calculate them ourselves anyway.
+
+  // Available tags:
+  // - series_animedb_id
+  // - series_title
+  // - series_synonyms (separated by "; ")
+  // - series_type
+  // - series_episodes
+  // - series_status
+  // - series_start
+  // - series_end
+  // - series_image
+  // - my_id (deprecated)
+  // - my_watched_episodes
+  // - my_start_date
+  // - my_finish_date
+  // - my_score
+  // - my_status
+  // - my_rewatching
+  // - my_rewatching_ep
+  // - my_last_updated
+  // - my_tags
+  foreach_xmlnode_(node, node_myanimelist, L"anime") {
+    ::anime::Item anime_item;
+    anime_item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
+    anime_item.last_modified = time(nullptr);  // current time
+
+    anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
+    anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
+    anime_item.SetType(XmlReadIntValue(node, L"series_type"));
+    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
+    anime_item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
+    anime_item.SetDate(::anime::DATE_START, XmlReadStrValue(node, L"series_start"));
+    anime_item.SetDate(::anime::DATE_END, XmlReadStrValue(node, L"series_end"));
+    anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+
+    anime_item.AddtoUserList();
+    anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
+    anime_item.SetMyDate(::anime::DATE_START, XmlReadStrValue(node, L"my_start_date"));
+    anime_item.SetMyDate(::anime::DATE_END, XmlReadStrValue(node, L"my_finish_date"));
+    anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
+    anime_item.SetMyStatus(XmlReadIntValue(node, L"my_status"));
+    anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
+    anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));
+    anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"my_last_updated"));
+    anime_item.SetMyTags(XmlReadStrValue(node, L"my_tags"));
+
+    AnimeDatabase.UpdateItem(anime_item);
+  }
+}
+
+void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
+  // Available data:
+  // - ID
+  // - Title (truncated, followed by year aired)
+  // - Synopsis (limited to 200 characters)
+  // - Genres
+  // - Status (in string form)
+  // - Type (in string form)
+  // - Episodes
+  // - Score
+  // - Rank
+  // - Popularity
+  // - Members
+  string_t id = InStr(http_response.body,
+      L"myanimelist.net/anime/", L"/");
+  string_t title = InStr(http_response.body,
+      L"class=\"hovertitle\">", L"</a>");
+  string_t genres = InStr(http_response.body,
+      L"Genres:</span> ", L"<br />");
+  string_t rank = InStr(http_response.body,
+      L"Ranked:</span> ", L"<br />");
+  string_t score = InStr(http_response.body,
+      L"Score:</span> ", L"<br />");
+  string_t popularity = InStr(http_response.body,
+      L"Popularity:</span> ", L"<br />");
+
+  if (EndsWith(title, L")") && title.length() > 7)
+    title = title.substr(0, title.length() - 7);
+  if (EndsWith(title, L"...") && title.length() > 3)
+    title = title.substr(0, title.length() - 3);
+
+  StripHtmlTags(score);
+
+  ::anime::Item anime_item;
+  anime_item.SetId(ToInt(id));
+//anime_item.SetTitle(title);  // unsafe, may be truncated
+  anime_item.SetGenres(genres);
+  anime_item.SetRank(rank);
+  anime_item.SetPopularity(popularity);
+  anime_item.SetScore(score);
+  anime_item.last_modified = time(nullptr);  // current time
+
+  AnimeDatabase.UpdateItem(anime_item);
+}
+
+void Service::SearchTitle(Response& response, HttpResponse& http_response) {
+  xml_document document;
+  xml_parse_result parse_result = document.load(http_response.body.c_str());
+
+  if (parse_result.status != pugi::status_ok) {
+    response.data[L"error"] = L"Could not parse search results";
+    return;
+  }
+
+  xml_node node_anime = document.child(L"anime");
+
+  // Available tags:
+  // - id
+  // - title (must be decoded)
+  // - english (must be decoded)
+  // - synonyms (must be decoded)
+  // - episodes
+  // - score
+  // - type
+  // - status
+  // - start_date
+  // - end_date
+  // - synopsis (must be decoded)
+  // - image
+  foreach_xmlnode_(node, node_anime, L"entry") {
+    ::anime::Item anime_item;
+    int anime_id = XmlReadIntValue(node, L"id");
+
+    anime_item.SetId(anime_id);
+    anime_item.SetTitle(DecodeText(XmlReadStrValue(node, L"title")));
+    anime_item.SetEnglishTitle(DecodeText(XmlReadStrValue(node, L"english")));
+    anime_item.SetSynonyms(DecodeText(XmlReadStrValue(node, L"synonyms")));
+    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"episodes"));
+    anime_item.SetScore(XmlReadStrValue(node, L"score"));
+    anime_item.SetType(TranslateType(XmlReadStrValue(node, L"type")));
+    anime_item.SetAiringStatus(TranslateStatus(XmlReadStrValue(node, L"status")));
+    anime_item.SetDate(::anime::DATE_START, XmlReadStrValue(node, L"start_date"));
+    anime_item.SetDate(::anime::DATE_END, XmlReadStrValue(node, L"end_date"));
+    wstring synopsis = DecodeText(XmlReadStrValue(node, L"synopsis"));
+    if (!StartsWith(synopsis, L"No synopsis has been added for this series yet"))
+      anime_item.SetSynopsis(synopsis);
+    anime_item.SetImageUrl(XmlReadStrValue(node, L"image"));
+    anime_item.last_modified = time(nullptr);  // current time
+
+    AnimeDatabase.UpdateItem(anime_item);
+
+    // We return a list of IDs so that we can display the results afterwards
+    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
+  }
+}
+
+void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
+  // Nothing to do here
+}
+
+void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response) {
+  // Nothing to do here
+}
+
+void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
+  // Nothing to do here
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool Service::RequestNeedsAuthentication(RequestType request_type) const {
+  switch (request_type) {
+    case kAddLibraryEntry:
+    case kAuthenticateUser:
+    case kDeleteLibraryEntry:
+    case kSearchTitle:
+    case kUpdateLibraryEntry:
+      return true;
+  }
 
   return false;
 }
 
-// =============================================================================
-
-wstring DecodeText(wstring text) {
-  Replace(text, L"<br />", L"\r", true);
-  Replace(text, L"\n\n", L"\r\n\r\n", true);
-  
-  StripHtmlTags(text);
-  DecodeHtmlEntities(text);
-  
-  return text;
-}
-
-bool IsValidDate(const Date& date) {
-  return date.year > 0;
-}
-
-bool IsValidDate(const wstring& date) {
-  return date.length() == 10 && !StartsWith(date, L"0000");
-}
-
-bool IsValidEpisode(int episode, int watched, int total) {
-  if ((episode < 0) ||
-      (episode < watched) ||
-      (episode == watched && total != 1) ||
-      (episode > total && total != 0))
+bool Service::RequestSucceeded(Response& response,
+                               const HttpResponse& http_response) {
+  // No content
+  if (http_response.code == 204 || http_response.body.empty()) {
+    response.data[L"error"] = name() + L" returned an empty response";
     return false;
-
-  return true;
-}
-
-Date ParseDateString(const wstring& str) {
-  Date date;
-
-  if (IsValidDate(str)) {
-    date.year  = ToInt(str.substr(0, 4));
-    date.month = ToInt(str.substr(5, 2));
-    date.day   = ToInt(str.substr(8, 2));
   }
 
-  return date;
-}
-
-void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) {
-  std::map<wstring, std::pair<int, int>> interval;
-  interval[L"Spring"] = std::make_pair<int, int>(3, 5);
-  interval[L"Summer"] = std::make_pair<int, int>(6, 8);
-  interval[L"Fall"] = std::make_pair<int, int>(9, 11);
-  interval[L"Winter"] = std::make_pair<int, int>(12, 2);
-
-  const int days_in_months[] = 
-    {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-  vector<wstring> season_year;
-  Split(season, L" ", season_year);
-
-  date_start.year = ToInt(season_year.at(1));
-  date_end.year = ToInt(season_year.at(1));
-  if (season_year.at(0) == L"Winter") date_start.year--;
-  date_start.month = interval[season_year.at(0)].first;
-  date_end.month = interval[season_year.at(0)].second;
-  date_start.day = 1;
-  date_end.day = days_in_months[date_end.month - 1];
-}
-
-// =============================================================================
-
-wstring TranslateDate(const Date& date) {
-  if (!mal::IsValidDate(date))
-    return L"?";
-
-  wstring result;
-
-  if (date.month > 0 && date.month <= 12) {
-    const wchar_t* months[] = {
-      L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
-      L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
-    };
-    result += months[date.month - 1];
-    result += L" ";
+  // Unauthorized
+  if (http_response.code == 401) {
+    // MAL doesn't return a meaningful explanation, so we'll just assume that
+    // either the username or the password is wrong
+    response.data[L"error"] =
+        L"Authorization failed (invalid username or password)";
+    return false;
   }
-  if (date.day > 0)
-    result += ToWstr(date.day) + L", ";
-  result += ToWstr(date.year);
 
-  return result;
-}
-
-wstring TranslateDateForApi(const Date& date) {
-  if (!mal::IsValidDate(date))
-    return L"";
-
-  return PadChar(ToWstr(date.month), '0', 2) + // MM
-         PadChar(ToWstr(date.day),   '0', 2) + // DD
-         PadChar(ToWstr(date.year),  '0', 4);  // YYYY
-}
-Date TranslateDateFromApi(const wstring& date) {
-  if (date.size() != 8)
-    return Date();
-
-  return Date(ToInt(date.substr(4, 4)), 
-              ToInt(date.substr(0, 2)), 
-              ToInt(date.substr(2, 2)));
-}
-
-wstring TranslateDateToSeason(const Date& date) {
-  if (!mal::IsValidDate(date))
-    return L"Unknown";
-
-  wstring season;
-  unsigned short year = date.year;
-
-  if (date.month == 0) {
-    season = L"Unknown";
-  } else if (date.month < 3) {  // Jan-Feb
-    season = L"Winter";
-  } else if (date.month < 6) {  // Mar-May
-    season = L"Spring";
-  } else if (date.month < 9) {  // Jun-Aug
-    season = L"Summer";
-  } else if (date.month < 12) { // Sep-Nov
-    season = L"Fall";
-  } else {                      // Dec
-    season = L"Winter";
-    year++;
+  switch (response.type) {
+    case kAddLibraryEntry:
+      if (IsNumeric(http_response.body))
+        return true;
+      if (InStr(http_response.body, L"This anime is already on your list") > -1)
+        return true;
+      // TODO: Remove when MAL fixes its API
+      if (InStr(http_response.body, L"<title>201 Created</title>") > -1)
+        return true;
+      break;
+    case kAuthenticateUser:
+      if (InStr(http_response.body, L"<username>") > -1)
+        return true;
+      break;
+    case kDeleteLibraryEntry:
+      if (IsEqual(http_response.body, L"Deleted"))
+        return true;
+      break;
+    case kGetLibraryEntries:
+      if (InStr(http_response.body, L"<myanimelist>", 0, true) > -1 &&
+          InStr(http_response.body, L"<myinfo>", 0, true) > -1)
+        return true;
+      break;
+    case kGetMetadataById:
+      if (!InStr(http_response.body, L"myanimelist.net/anime/", L"/").empty())
+        return true;
+      break;
+    case kSearchTitle:
+      return true;
+    case kUpdateLibraryEntry:
+      if (IsEqual(http_response.body, L"Updated"))
+        return true;
+      break;
   }
-    
-  return season + L" " + ToWstr(year);
-}
 
-wstring TranslateSeasonToMonths(const wstring& season) {
-  const wchar_t* months[] = {
-    L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
-    L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
-  };
-
-  Date date_start, date_end;
-  GetSeasonInterval(season, date_start, date_end);
-
-  wstring result = months[date_start.month - 1];
-  result += L" " + ToWstr(date_start.year) + L" to ";
-  result += months[date_end.month - 1];
-  result += L" " + ToWstr(date_end.year);
-  
-  return result;
-}
-
-wstring TranslateMyStatus(int value, bool add_count) {
-  #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.user.GetItemCount(value)) + L")" : L"")
-  switch (value) {
-    case mal::MYSTATUS_NOTINLIST: return L"Not in list";
-    case mal::MYSTATUS_WATCHING: return L"Currently watching" + ADD_COUNT();
-    case mal::MYSTATUS_COMPLETED: return L"Completed" + ADD_COUNT();
-    case mal::MYSTATUS_ONHOLD: return L"On hold" + ADD_COUNT();
-    case mal::MYSTATUS_DROPPED: return L"Dropped" + ADD_COUNT();
-    case mal::MYSTATUS_PLANTOWATCH: return L"Plan to watch" + ADD_COUNT();
-    default: return L"";
+  // Set the error message on failure
+  switch (response.type) {
+    case kAddLibraryEntry:
+    case kDeleteLibraryEntry:
+    case kUpdateLibraryEntry: {
+      std::wstring error_message = http_response.body;
+      Replace(error_message, L"</div><div>", L"\r\n");
+      StripHtmlTags(error_message);
+      response.data[L"error"] = error_message;
+      break;
+    }
+    case kGetLibraryEntries:
+      response.data[L"error"] = name() + L" returned an invalid response";
+      break;
+    default:
+      response.data[L"error"] = L"Request failed for an unknown reason";
+      break;
   }
-  #undef ADD_COUNT
-}
-int TranslateMyStatus(const wstring& value) {
-  if (IsEqual(value, L"Currently watching")) {
-    return mal::MYSTATUS_WATCHING;
-  } else if (IsEqual(value, L"Completed")) {
-    return mal::MYSTATUS_COMPLETED;
-  } else if (IsEqual(value, L"On hold")) {
-    return mal::MYSTATUS_ONHOLD;
-  } else if (IsEqual(value, L"Dropped")) {
-    return mal::MYSTATUS_DROPPED;
-  } else if (IsEqual(value, L"Plan to watch")) {
-    return mal::MYSTATUS_PLANTOWATCH;
-  } else {
-    return 0;
-  }
+
+  return false;
 }
 
-wstring TranslateNumber(int value, const wstring& default_char) {
-  return value > 0 ? ToWstr(value) : default_char;
-}
-
-wstring TranslateRewatchValue(int value) {
-  switch (value) {
-    case mal::REWATCH_VERYLOW: return L"Very low";
-    case mal::REWATCH_LOW: return L"Low";
-    case mal::REWATCH_MEDIUM: return L"Medium";
-    case mal::REWATCH_HIGH: return L"High";
-    case mal::REWATCH_VERYHIGH: return L"Very high";
-    default: return L"";
-  }
-}
-
-wstring TranslateStatus(int value) {
-  switch (value) {
-    case mal::STATUS_AIRING: return L"Currently airing";
-    case mal::STATUS_FINISHED: return L"Finished airing";
-    case mal::STATUS_NOTYETAIRED: return L"Not yet aired";
-    default: return ToWstr(value);
-  }
-}
-int TranslateStatus(const wstring& value) {
-  if (IsEqual(value, L"Currently airing")) {
-    return mal::STATUS_AIRING;
-  } else if (IsEqual(value, L"Finished airing")) {
-    return mal::STATUS_FINISHED;
-  } else if (IsEqual(value, L"Not yet aired")) {
-    return mal::STATUS_NOTYETAIRED;
-  } else {
-    return 0;
-  }
-}
-
-wstring TranslateStorageType(int value) {
-  switch (value) {
-    case mal::STORAGE_HARDDRIVE: return L"Hard drive";
-    case mal::STORAGE_DVDCD: return L"DVD/CD";
-    case mal::STORAGE_NONE: return L"None";
-    case mal::STORAGE_RETAILDVD: return L"Retail DVD";
-    case mal::STORAGE_VHS: return L"VHS";
-    case mal::STORAGE_EXTERNALHD: return L"External HD";
-    case mal::STORAGE_NAS: return L"NAS";
-    default: return L"";
-  }
-}
-
-wstring TranslateType(int value) {
-  switch (value) {
-    case mal::TYPE_TV: return L"TV";
-    case mal::TYPE_OVA: return L"OVA";
-    case mal::TYPE_MOVIE: return L"Movie";
-    case mal::TYPE_SPECIAL: return L"Special";
-    case mal::TYPE_ONA: return L"ONA";
-    case mal::TYPE_MUSIC: return L"Music";
-    default: return L"";
-  }
-}
-int TranslateType(const wstring& value) {
-  if (IsEqual(value, L"TV")) {
-    return mal::TYPE_TV;
-  } else if (IsEqual(value, L"OVA")) {
-    return mal::TYPE_OVA;
-  } else if (IsEqual(value, L"Movie")) {
-    return mal::TYPE_MOVIE;
-  } else if (IsEqual(value, L"Special")) {
-    return mal::TYPE_SPECIAL;
-  } else if (IsEqual(value, L"ONA")) {
-    return mal::TYPE_ONA;
-  } else if (IsEqual(value, L"Music")) {
-    return mal::TYPE_MUSIC;
-  } else {
-    return 0;
-  }
-}
-
-// =============================================================================
-
-void ViewAnimePage(int anime_id) {
-  ExecuteLink(L"http://myanimelist.net/anime/" + ToWstr(anime_id) + L"/");
-}
-
-void ViewAnimeSearch(const wstring& title) {
-  ExecuteLink(L"http://myanimelist.net/anime.php?q=" + title + L"&referer=" + APP_NAME);
-}
-
-void ViewHistory() {
-  ExecuteLink(L"http://myanimelist.net/history/" + Settings.Account.MAL.user);
-}
-
-void ViewMessages() {
-  ExecuteLink(L"http://myanimelist.net/mymessages.php");
-}
-
-void ViewPanel() {
-  ExecuteLink(L"http://myanimelist.net/panel.php");
-}
-
-void ViewProfile() {
-  ExecuteLink(L"http://myanimelist.net/profile/" + Settings.Account.MAL.user);
-}
-
-void ViewSeasonGroup() {
-  ExecuteLink(L"http://myanimelist.net/clubs.php?cid=743");
-}
-
-void ViewUpcomingAnime() {
-  Date date = GetDate();
-
-  ExecuteLink(L"http://myanimelist.net/anime.php"
-              L"?sd=" + ToWstr(date.day) + 
-              L"&sm=" + ToWstr(date.month) + 
-              L"&sy=" + ToWstr(date.year) + 
-              L"&em=0&ed=0&ey=0&o=2&w=&c[]=a&c[]=d&cv=1");
-}
-
-} // namespace mal
+}  // namespace myanimelist
+}  // namespace sync
