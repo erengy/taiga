@@ -668,64 +668,40 @@ bool Item::IsOldEnough() const {
 
 // =============================================================================
 
-bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
-  if (!mal::UpdateSucceeded(item, data, status_code)) {
-    // Show balloon tip on failure
-    wstring text = L"Title: " + GetTitle();
-    text += L"\nReason: " + (item.reason.empty() ? L"Unknown" : item.reason);
-    text += L"\nClick to try again.";
-    Taiga.current_tip_type = TIPTYPE_UPDATEFAILED;
-    Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
-    return false;
-  }
-
+void Item::Edit(const EventItem& item) {
   // Edit episode
   if (item.episode) {
     SetMyLastWatchedEpisode(*item.episode);
-    database_->SaveList(GetId(), L"my_watched_episodes", ToWstr(*item.episode));
   }
   // Edit score
   if (item.score) {
     SetMyScore(*item.score);
-    database_->SaveList(GetId(), L"my_score", ToWstr(*item.score));
   }
   // Edit status
   if (item.status) {
     database_->user.IncreaseItemCount(*item.status, false);
     database_->user.DecreaseItemCount(GetMyStatus(false), true);
     SetMyStatus(*item.status);
-    database_->SaveList(GetId(), L"my_status", ToWstr(*item.status));
   }
   // Edit re-watching status
   if (item.enable_rewatching) {
     SetMyRewatching(*item.enable_rewatching);
-    database_->SaveList(GetId(), L"my_rewatching", ToWstr(*item.enable_rewatching));
-  }
-  // Edit ID (Add)
-  if (item.mode == HTTP_MAL_AnimeAdd) {
-    if (IsNumeric(data)) {
-      database_->SaveList(GetId(), L"my_id", data); // deprecated
-    }
   }
   // Edit tags
   if (item.tags) {
     SetMyTags(*item.tags);
-    database_->SaveList(GetId(), L"my_tags", *item.tags);
   }
   // Edit dates
   if (item.date_start) {
-    Date date_start = mal::TranslateDateFromApi(*item.date_start);
+    Date date_start = sync::myanimelist::TranslateDateFromApi(*item.date_start);
     SetMyDate(anime::DATE_START, date_start);
-    database_->SaveList(GetId(), L"my_start_date", date_start, EDIT_ANIME);
   }
   if (item.date_finish) {
-    Date date_finish = mal::TranslateDateFromApi(*item.date_finish);
+    Date date_finish = sync::myanimelist::TranslateDateFromApi(*item.date_finish);
     SetMyDate(anime::DATE_END, date_finish);
-    database_->SaveList(GetId(), L"my_finish_date", date_finish, EDIT_ANIME);
   }
   // Delete
-  if (item.mode == HTTP_MAL_AnimeDelete) {
+  if (item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
     MainDialog.ChangeStatus(L"Item deleted. (" + GetTitle() + L")");
     database_->DeleteListItem(GetId());
     AnimeListDialog.RefreshList();
@@ -735,6 +711,9 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
       CurrentEpisode.Set(anime::ID_NOTINLIST);
     }
   }
+
+  // Save list
+  database_->SaveList();
 
   // Remove item from event queue
   History.queue.Remove();
@@ -746,8 +725,6 @@ bool Item::Edit(EventItem& item, const wstring& data, int status_code) {
   if (list_index > -1) {
     AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
   }
-
-  return true;
 }
 
 // =============================================================================

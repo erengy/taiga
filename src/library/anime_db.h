@@ -56,12 +56,11 @@ class Database {
   void ClearUserData();
   // Loads anime list on startup and list-refresh from
   // user\<username>\anime.xml, returns false if no such list exists.
-  // last_modified values of all list items are set to current time if
-  // set_last_modified is true.
-  bool LoadList(bool set_last_modified = false);
+  bool LoadList();
   // Saves anime list everytime an item is updated to
   // user\<username>\anime.xml, returns false if no such item exists with given
   // ID in the database or the relevant XML node doesn't exist.
+  bool SaveList();
   bool SaveList(int anime_id, 
                 const wstring& child, const wstring& value, 
                 ListSaveMode mode = EDIT_ANIME);

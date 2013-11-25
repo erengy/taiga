@@ -255,13 +255,12 @@ void Database::ClearInvalidItems() {
   }
 }
 
-bool Database::LoadList(bool set_last_modified) {
+bool Database::LoadList() {
   // Initialize
   ClearUserData();
   if (Settings.Account.MAL.user.empty()) return false;
   wstring file = Taiga.GetDataPath() + 
     L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
-  time_t last_modified = set_last_modified ? time(nullptr) : 0;
   
   // Load XML file
   xml_document doc;
@@ -304,7 +303,6 @@ bool Database::LoadList(bool set_last_modified) {
     anime_item.SetDate(DATE_START, XmlReadStrValue(node, L"series_start"));
     anime_item.SetDate(DATE_END, XmlReadStrValue(node, L"series_end"));
     anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
-    anime_item.last_modified = last_modified;
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
     anime_item.SetMyDate(DATE_START, XmlReadStrValue(node, L"my_start_date"));
@@ -319,6 +317,39 @@ bool Database::LoadList(bool set_last_modified) {
   }
 
   return true;
+}
+
+bool Database::SaveList() {
+  if (items.empty())
+    return false;
+
+  // Initialize
+  xml_document document;
+  xml_node myanimelist_node = document.append_child(L"myanimelist");
+
+  // Write items
+  foreach_(it, items) {
+    Item* item = &it->second;
+    if (item->IsInList()) {
+      xml_node node = myanimelist_node.append_child(L"anime");
+      XmlWriteIntValue(node, L"series_animedb_id", item->GetId());
+      XmlWriteIntValue(node, L"my_watched_episodes", item->GetMyLastWatchedEpisode(false));
+      XmlWriteStrValue(node, L"my_start_date", wstring(item->GetMyDate(DATE_START)).c_str());
+      XmlWriteStrValue(node, L"my_finish_date", wstring(item->GetMyDate(DATE_END)).c_str());
+      XmlWriteIntValue(node, L"my_score", item->GetMyScore(false));
+      XmlWriteIntValue(node, L"my_status", item->GetMyStatus(false));
+      XmlWriteIntValue(node, L"my_rewatching", item->GetMyRewatching(false));
+      XmlWriteIntValue(node, L"my_rewatching_ep", item->GetMyRewatchingEp());
+      XmlWriteStrValue(node, L"my_last_updated", item->GetMyLastUpdated().c_str());
+      XmlWriteStrValue(node, L"my_tags", item->GetMyTags(false).c_str());
+    }
+  }
+
+  // Save
+  wstring folder = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\";
+  if (!PathExists(folder)) CreateFolder(folder);
+  wstring file = folder + L"anime.xml";
+  return document.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
 }
 
 bool Database::SaveList(int anime_id, const wstring& child, const wstring& value, ListSaveMode mode) {

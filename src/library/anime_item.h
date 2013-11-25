@@ -138,7 +138,7 @@ class Item {
 
   // After a successful update, an event item is removed from the queue and the
   // relevant anime item is edited.
-  bool Edit(EventItem& item, const wstring& data, int status_code);
+  void Edit(const EventItem& item);
 
   // Following functions are called when a new episode is recognized. Actual
   // time depends on user settings.
