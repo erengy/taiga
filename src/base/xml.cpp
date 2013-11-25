@@ -20,11 +20,11 @@
 #include "foreach.h"
 #include "string.h"
 
-struct xml_string_writer: public pugi::xml_writer {
-  std::wstring result;
+struct xml_string_writer: pugi::xml_writer {
+  std::string result;
 
   virtual void write(const void* data, size_t size) {
-    result += std::wstring(static_cast<const wchar_t*>(data), size);
+    result += std::string(static_cast<const char*>(data), size);
   }
 };
 
@@ -32,7 +32,7 @@ std::wstring XmlGetNodeAsString(pugi::xml_node node) {
   xml_string_writer writer;
   node.print(writer);
 
-  return writer.result;
+  return ToUTF8(writer.result);
 }
 
 int XmlReadIntValue(pugi::xml_node& node, const wchar_t* name) {
