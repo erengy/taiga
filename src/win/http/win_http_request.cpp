@@ -127,15 +127,20 @@ BOOL Client::SetRequestOptions() {
 
 BOOL Client::SendRequest() {
   std::wstring header = BuildRequestHeader();
-  std::string body = ToANSI(request_.body);
+
+  // This buffer must remain available until the request handle is closed or the
+  // call to WinHttpReceiveResponse has completed
+  optional_data_ = ToANSI(request_.body);
+  LPVOID optional_data = optional_data_.empty() ?
+      WINHTTP_NO_REQUEST_DATA : (LPVOID)optional_data_.c_str();
 
   // Send the request to the HTTP server
   return ::WinHttpSendRequest(request_handle_,
                               header.c_str(),
                               header.length(),
-                              (LPVOID)body.c_str(),
-                              body.length(),
-                              body.length(),
+                              optional_data,
+                              optional_data_.length(),
+                              optional_data_.length(),
                               reinterpret_cast<DWORD_PTR>(this));
 }
 

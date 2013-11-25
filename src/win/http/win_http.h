@@ -138,6 +138,8 @@ private:
   HINTERNET connection_handle_;
   HINTERNET request_handle_;
   HINTERNET session_handle_;
+
+  std::string optional_data_;
 };
 
 class Url {
