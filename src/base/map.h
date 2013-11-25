@@ -30,7 +30,7 @@ template<class key_type, class mapped_type>
 class multimap : public std::multimap<key_type, mapped_type> {
 public:
   mapped_type& operator[] (const key_type& key) {
-    auto it = this->lower_bound(key);
+    auto it = this->find(key);
     if (it == this->end())
       it = this->insert(std::pair<key_type, mapped_type>(key, mapped_type()));
     return it->second;
