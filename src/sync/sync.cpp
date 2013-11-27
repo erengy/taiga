@@ -59,7 +59,9 @@ void SearchTitle(string_t title) {
 }
 
 void Synchronize() {
+#ifdef _DEBUG
   Taiga.logged_in = true;
+#endif
   if (!Taiga.logged_in) {
     if (!Settings.Account.MAL.user.empty() &&
         !Settings.Account.MAL.password.empty()) {

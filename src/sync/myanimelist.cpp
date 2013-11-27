@@ -32,7 +32,7 @@ namespace myanimelist {
 
 Service::Service() {
   host_ = L"myanimelist.net";
-
+  
   canonical_name_ = L"myanimelist";
   name_ = L"MyAnimeList";
 }

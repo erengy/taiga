@@ -17,7 +17,6 @@
 */
 
 #include "service.h"
-#include "base/foreach.h"
 
 namespace sync {
 

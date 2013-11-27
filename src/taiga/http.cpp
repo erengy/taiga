@@ -273,7 +273,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       }
       break;
     }
-	case kHttpTwitterAuth: {
+    case kHttpTwitterAuth: {
       bool success = false;
       OAuthParameters parameters = Twitter.oauth.ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty() && !parameters[L"oauth_token_secret"].empty()) {
