@@ -109,6 +109,7 @@
     <ClCompile Include="library\anime_user.cpp" />
     <ClCompile Include="library\history.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="sync\herro.cpp" />
     <ClCompile Include="sync\manager.cpp" />
     <ClCompile Include="sync\myanimelist.cpp" />
     <ClCompile Include="sync\myanimelist_util.cpp" />
@@ -226,6 +227,8 @@
     <ClInclude Include="library\anime_item.h" />
     <ClInclude Include="library\anime_user.h" />
     <ClInclude Include="library\history.h" />
+    <ClInclude Include="sync\herro.h" />
+    <ClInclude Include="sync\herro_types.h" />
     <ClInclude Include="sync\manager.h" />
     <ClInclude Include="sync\myanimelist.h" />
     <ClInclude Include="sync\myanimelist_types.h" />

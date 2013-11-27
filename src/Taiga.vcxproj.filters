@@ -49,6 +49,9 @@
     <Filter Include="sync\myanimelist">
       <UniqueIdentifier>{496cb38d-e9ef-4695-845c-2264442a9835}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sync\herro">
+      <UniqueIdentifier>{a6128b60-172a-4c28-89ce-4d6a193462c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
@@ -382,6 +385,9 @@
     <ClCompile Include="sync\myanimelist_util.cpp">
       <Filter>sync\myanimelist</Filter>
     </ClCompile>
+    <ClCompile Include="sync\herro.cpp">
+      <Filter>sync\herro</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -659,6 +665,12 @@
     </ClInclude>
     <ClInclude Include="sync\myanimelist_types.h">
       <Filter>sync\myanimelist</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\herro.h">
+      <Filter>sync\herro</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\herro_types.h">
+      <Filter>sync\herro</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
