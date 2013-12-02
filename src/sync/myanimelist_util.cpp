@@ -176,7 +176,7 @@ wstring TranslateSeasonToMonths(const wstring& season) {
 }
 
 wstring TranslateMyStatus(int value, bool add_count) {
-  #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.user.GetItemCount(value)) + L")" : L"")
+  #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.GetItemCount(value)) + L")" : L"")
   switch (value) {
     case kNotInList: return L"Not in list";
     case kWatching: return L"Currently watching" + ADD_COUNT();

@@ -22,7 +22,6 @@
 #include "base/std.h"
 
 #include "anime_item.h"
-#include "anime_user.h"
 #include "base/gfx.h"
 
 #include "win/win_thread.h"
@@ -47,6 +46,9 @@ class Database {
   void ClearInvalidItems();
   // Deletes all user information from anime items.
   void ClearUserData();
+  // Deletes user information from an item, after HTTP_MAL_AnimeDelete
+  // succeeds.
+  bool DeleteListItem(int anime_id);
   // Loads anime list on startup and list-refresh from
   // user\<username>\anime.xml, returns false if no such list exists.
   bool LoadList();
@@ -58,20 +60,15 @@ class Database {
   Item* FindItem(int anime_id);
   // Searches the database for an item with given ID, which has a sequel.
   Item* FindSequel(int anime_id);
+  // Calculates the number of items that belong to the specified status.
+  int GetItemCount(int status, bool check_events = true);
   // Updates anime information, or adds a new item if no such anime exists.
   // New information may include both series and user information. Series
   // information is updated depending on its last_modified value.
   void UpdateItem(Item& item);
 
-  // Deletes user information from an item, after HTTP_MAL_AnimeDelete
-  // succeeds.
-  bool DeleteListItem(int anime_id);
-
   // Anime items are mapped to their IDs.
   std::map<int, Item> items;
-
-  // Read from user\<username>\anime.xml.
-  ListUser user;
 
  private:
   // Thread safety

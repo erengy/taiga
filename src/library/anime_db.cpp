@@ -21,6 +21,7 @@
 
 #include "anime.h"
 #include "anime_db.h"
+#include "history.h"
 
 #include "base/common.h"
 #include "base/foreach.h"
@@ -160,6 +161,34 @@ Item* Database::FindSequel(int anime_id) {
   return FindItem(sequel_id);
 }
 
+int Database::GetItemCount(int status, bool check_events) {
+  int count = 0;
+
+  // Get current count
+  foreach_(it, items)
+    if (it->second.GetMyStatus(false) == status)
+      count++;
+
+  // Search event queue for status changes
+  if (check_events) {
+    foreach_(it, History.queue.items) {
+      if (it->mode == taiga::kHttpServiceAddLibraryEntry)
+        continue;
+      if (it->status) {
+        if (status == *it->status) {
+          count++;
+        } else {
+          auto anime_item = FindItem(it->anime_id);
+          if (anime_item && status == anime_item->GetMyStatus(false))
+            count--;
+        }
+      }
+    }
+  }
+
+  return count;
+}
+
 void Database::UpdateItem(Item& new_item) {
   critical_section_.Enter();
   
@@ -240,8 +269,6 @@ void Database::ClearUserData() {
   for (auto it = items.begin(); it != items.end(); ++it) {
     it->second.RemoveFromUserList();
   }
-  
-  user.Clear();
 }
 
 void Database::ClearInvalidItems() {
@@ -280,11 +307,7 @@ bool Database::LoadList() {
     return false;
   }
 
-  // Read user info
   xml_node myanimelist = doc.child(L"myanimelist");
-  xml_node myinfo = myanimelist.child(L"myinfo");
-  user.SetId(XmlReadIntValue(myinfo, L"user_id"));
-  user.SetName(XmlReadStrValue(myinfo, L"user_name"));
 
   // Read anime list
   for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {

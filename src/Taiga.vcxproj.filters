@@ -177,9 +177,6 @@
     <ClCompile Include="library\anime.cpp">
       <Filter>library</Filter>
     </ClCompile>
-    <ClCompile Include="library\anime_user.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
     <ClCompile Include="library\anime_db.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -493,9 +490,6 @@
       <Filter>ui</Filter>
     </ClInclude>
     <ClInclude Include="library\anime.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="library\anime_user.h">
       <Filter>library</Filter>
     </ClInclude>
     <ClInclude Include="library\anime_db.h">
