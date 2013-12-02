@@ -234,8 +234,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     // Add item to list
     anime_item->AddtoUserList();
-    AnimeDatabase.user.IncreaseItemCount(status, true);
-    AnimeDatabase.SaveList(anime_id, L"", L"", anime::ADD_ANIME);
+    AnimeDatabase.user.IncreaseItemCount(status);
+    AnimeDatabase.SaveList();
     // Add item to event queue
     EventItem event_item;
     event_item.anime_id = anime_id;

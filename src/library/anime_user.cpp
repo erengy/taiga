@@ -105,42 +105,32 @@ const wstring& ListUser::GetName() const {
   return user_.name;
 }
 
-void ListUser::DecreaseItemCount(int status, bool save_list) {
+void ListUser::DecreaseItemCount(int status) {
   int count = GetItemCount(status, false) - 1;
-  SetItemCount(status, count, save_list);
+  SetItemCount(status, count);
 }
 
-void ListUser::IncreaseItemCount(int status, bool save_list) {
+void ListUser::IncreaseItemCount(int status) {
   int count = GetItemCount(status, false) + 1;
-  SetItemCount(status, count, save_list);
+  SetItemCount(status, count);
 }
 
-void ListUser::SetItemCount(int status, int count, bool save_list) {
+void ListUser::SetItemCount(int status, int count) {
   switch (status) {
     case sync::myanimelist::kWatching:
       user_.watching = count;
-      if (save_list) database_->SaveList(
-        -1, L"user_watching", ToWstr(user_.watching), EDIT_USER);
       break;
     case sync::myanimelist::kCompleted:
       user_.completed = count;
-      if (save_list) database_->SaveList(
-        -1, L"user_completed", ToWstr(user_.completed), EDIT_USER);
       break;
     case sync::myanimelist::kOnHold:
       user_.on_hold = count;
-      if (save_list) database_->SaveList(
-        -1, L"user_onhold", ToWstr(user_.on_hold), EDIT_USER);
       break;
     case sync::myanimelist::kDropped:
       user_.dropped = count;
-      if (save_list) database_->SaveList(
-        -1, L"user_dropped", ToWstr(user_.dropped), EDIT_USER);
       break;
     case sync::myanimelist::kPlanToWatch:
       user_.plan_to_watch = count;
-      if (save_list) database_->SaveList(
-        -1, L"user_plantowatch", ToWstr(user_.plan_to_watch), EDIT_USER);
       break;
   }
 }

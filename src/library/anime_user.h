@@ -51,11 +51,11 @@ class ListUser {
   int GetItemCount(int status, bool check_events = true) const;
   const wstring& GetName() const;
   
-  void DecreaseItemCount(int status, bool save_list = true);
-  void IncreaseItemCount(int status, bool save_list = true);
+  void DecreaseItemCount(int status);
+  void IncreaseItemCount(int status);
 
   void SetId(int id);
-  void SetItemCount(int status, int count, bool save_list = true);
+  void SetItemCount(int status, int count);
   void SetName(const wstring& name);
   void SetDaysSpentWatching(const wstring& days_spent_watching);
 

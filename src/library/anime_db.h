@@ -31,13 +31,6 @@ namespace anime {
 
 // =============================================================================
 
-enum ListSaveMode {
-  ADD_ANIME,
-  DELETE_ANIME,
-  EDIT_ANIME,
-  EDIT_USER
-};
-
 class Database {
  public:
   Database();
@@ -57,13 +50,9 @@ class Database {
   // Loads anime list on startup and list-refresh from
   // user\<username>\anime.xml, returns false if no such list exists.
   bool LoadList();
-  // Saves anime list everytime an item is updated to
-  // user\<username>\anime.xml, returns false if no such item exists with given
-  // ID in the database or the relevant XML node doesn't exist.
+  // Saves anime list to user\<username>\anime.xml, returns false if the file
+  // cannot be saved.
   bool SaveList();
-  bool SaveList(int anime_id, 
-                const wstring& child, const wstring& value, 
-                ListSaveMode mode = EDIT_ANIME);
   
   // Searches the database for an item with given ID.
   Item* FindItem(int anime_id);

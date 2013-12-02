@@ -228,7 +228,7 @@ void Database::UpdateItem(Item& new_item) {
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
 
-    user.IncreaseItemCount(item->GetMyStatus(false), false);
+    user.IncreaseItemCount(item->GetMyStatus(false));
   }
 
   critical_section_.Leave();
@@ -257,6 +257,17 @@ void Database::ClearInvalidItems() {
   }
 }
 
+bool Database::DeleteListItem(int anime_id) {
+  auto item = FindItem(anime_id);
+  if (!item) return false;
+  if (!item->IsInList()) return false;
+
+  user.DecreaseItemCount(item->GetMyStatus(false));
+  item->RemoveFromUserList();
+
+  return true;
+}
+
 bool Database::LoadList() {
   // Initialize
   ClearUserData();
@@ -277,20 +288,6 @@ bool Database::LoadList() {
   xml_node myinfo = myanimelist.child(L"myinfo");
   user.SetId(XmlReadIntValue(myinfo, L"user_id"));
   user.SetName(XmlReadStrValue(myinfo, L"user_name"));
-  // Since MAL can be too slow to update these values, we'll be counting by 
-  // ourselves at Database::UpdateItem().
-  /*
-  user.SetItemCount(sync::myanimelist::kWatching, 
-    XmlReadIntValue(myinfo, L"user_watching"), false);
-  user.SetItemCount(sync::myanimelist::kCompleted, 
-    XmlReadIntValue(myinfo, L"user_completed"), false);
-  user.SetItemCount(sync::myanimelist::kOnHold, 
-    XmlReadIntValue(myinfo, L"user_onhold"), false);
-  user.SetItemCount(sync::myanimelist::kDropped, 
-    XmlReadIntValue(myinfo, L"user_dropped"), false);
-  user.SetItemCount(sync::myanimelist::kPlanToWatch, 
-    XmlReadIntValue(myinfo, L"user_plantowatch"), false);
-  */
   user.SetDaysSpentWatching(XmlReadStrValue(myinfo, L"user_days_spent_watching"));
 
   // Read anime list
@@ -352,95 +349,6 @@ bool Database::SaveList() {
   if (!PathExists(folder)) CreateFolder(folder);
   wstring file = folder + L"anime.xml";
   return document.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
-}
-
-bool Database::SaveList(int anime_id, const wstring& child, const wstring& value, ListSaveMode mode) {
-  auto item = FindItem(anime_id);
-
-  if (mode != EDIT_USER && !item) {
-    return false;
-  }
-  
-  // Initialize
-  wstring folder = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\";
-  wstring file = folder + L"anime.xml";
-  if (!PathExists(folder)) CreateFolder(folder);
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != pugi::status_ok) return false;
-
-  // Read anime list
-  xml_node myanimelist = doc.child(L"myanimelist");
-  switch (mode) {
-    // Add anime item
-    case ADD_ANIME: {
-      xml_node node = myanimelist.append_child(L"anime");
-      XmlWriteIntValue(node, L"series_animedb_id", item->GetId());
-      XmlWriteIntValue(node, L"my_watched_episodes", item->GetMyLastWatchedEpisode(false));
-      XmlWriteStrValue(node, L"my_start_date", wstring(item->GetMyDate(DATE_START)).c_str());
-      XmlWriteStrValue(node, L"my_finish_date", wstring(item->GetMyDate(DATE_END)).c_str());
-      XmlWriteIntValue(node, L"my_score", item->GetMyScore(false));
-      XmlWriteIntValue(node, L"my_status", item->GetMyStatus(false));
-      XmlWriteIntValue(node, L"my_rewatching", item->GetMyRewatching(false));
-      XmlWriteIntValue(node, L"my_rewatching_ep", item->GetMyRewatchingEp());
-      XmlWriteStrValue(node, L"my_last_updated", item->GetMyLastUpdated().c_str());
-      XmlWriteStrValue(node, L"my_tags", item->GetMyTags(false).c_str());
-      doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
-      return true;
-    }
-    // Delete anime item
-    case DELETE_ANIME: {
-      for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-        if (XmlReadIntValue(node, L"series_animedb_id") == item->GetId()) {
-          myanimelist.remove_child(node);
-          doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
-          return true;
-        }
-      }
-      break;
-    }
-    // Edit anime data
-    case EDIT_ANIME: {
-      for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
-        if (XmlReadIntValue(node, L"series_animedb_id") == item->GetId()) {
-          xml_node child_node = node.child(child.c_str());
-          if (wstring(child_node.first_child().value()).empty()) {
-            child_node = child_node.append_child(pugi::node_pcdata);
-          } else {
-            child_node = child_node.first_child();
-          }
-          child_node.set_value(value.c_str());
-          doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
-          return true;
-        }
-      }
-      break;
-    }
-    // Edit user data
-    case EDIT_USER: {
-      myanimelist.child(L"myinfo").child(child.c_str()).first_child().set_value(value.c_str());
-      doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
-      return true;
-    }
-  }
-
-  return false;
-}
-
-// =============================================================================
-
-bool Database::DeleteListItem(int anime_id) {
-  auto item = FindItem(anime_id);
-  if (!item) return false;
-  if (!item->IsInList()) return false;
-
-  user.DecreaseItemCount(item->GetMyStatus(false), true);
-  SaveList(anime_id, L"", L"", DELETE_ANIME);
-  item->RemoveFromUserList();
-
-  return true;
 }
 
 // =============================================================================
