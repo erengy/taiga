@@ -34,7 +34,6 @@
 #include "taiga/http.h"
 #include "track/media.h"
 #include "track/monitor.h"
-#include "sync/myanimelist.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"

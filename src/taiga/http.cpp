@@ -26,7 +26,6 @@
 #include "library/history.h"
 #include "base/logger.h"
 #include "sync/manager.h"
-#include "sync/myanimelist.h"
 #include "resource.h"
 #include "settings.h"
 #include "stats.h"

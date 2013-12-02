@@ -31,7 +31,6 @@
 #include "taiga/debug.h"
 #include "base/gfx.h"
 #include "library/history.h"
-#include "sync/myanimelist.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"

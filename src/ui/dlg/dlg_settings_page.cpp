@@ -31,7 +31,6 @@
 #include "library/history.h"
 #include "taiga/http.h"
 #include "track/media.h"
-#include "sync/myanimelist.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"

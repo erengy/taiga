@@ -22,7 +22,6 @@
 
 #include "library/anime_db.h"
 #include "base/common.h"
-#include "sync/myanimelist.h"
 #include "track/recognition.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"

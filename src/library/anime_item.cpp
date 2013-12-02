@@ -26,7 +26,6 @@
 #include "base/common.h"
 #include "history.h"
 #include "base/logger.h"
-#include "sync/myanimelist.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"

@@ -24,7 +24,6 @@
 #include "library/anime_episode.h"
 #include "base/common.h"
 #include "media.h"
-#include "sync/myanimelist.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"

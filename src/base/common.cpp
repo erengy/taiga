@@ -21,7 +21,6 @@
 #include "common.h"
 
 #include "library/anime_db.h"
-#include "sync/myanimelist.h"
 #include "taiga/settings.h"
 #include "string.h"
 #include "ui/theme.h"

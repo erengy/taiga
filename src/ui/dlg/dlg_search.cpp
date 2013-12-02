@@ -27,7 +27,6 @@
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "taiga/http.h"
-#include "sync/myanimelist.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"

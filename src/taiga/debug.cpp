@@ -22,7 +22,6 @@
 
 #include "library/anime_db.h"
 #include "base/common.h"
-#include "sync/myanimelist.h"
 #include "base/string.h"
 
 #include "ui/dlg/dlg_main.h"

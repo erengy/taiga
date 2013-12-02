@@ -25,7 +25,6 @@
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/logger.h"
-#include "sync/myanimelist.h"
 #include "recognition.h"
 #include "taiga/settings.h"
 #include "base/string.h"

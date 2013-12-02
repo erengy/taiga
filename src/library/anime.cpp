@@ -29,7 +29,6 @@
 #include "base/foreach.h"
 #include "history.h"
 #include "track/media.h"
-#include "sync/myanimelist.h"
 #include "sync/sync.h"
 #include "base/process.h"
 #include "taiga/settings.h"

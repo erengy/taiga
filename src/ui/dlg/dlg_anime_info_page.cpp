@@ -29,7 +29,6 @@
 #include "base/common.h"
 #include "library/history.h"
 #include "taiga/http.h"
-#include "sync/myanimelist.h"
 #include "sync/sync.h"
 #include "track/recognition.h"
 #include "taiga/resource.h"

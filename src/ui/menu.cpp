@@ -20,7 +20,6 @@
 
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
-#include "sync/myanimelist.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"

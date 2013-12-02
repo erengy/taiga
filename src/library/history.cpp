@@ -26,7 +26,6 @@
 #include "base/common.h"
 #include "taiga/http.h"
 #include "base/logger.h"
-#include "sync/myanimelist.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"

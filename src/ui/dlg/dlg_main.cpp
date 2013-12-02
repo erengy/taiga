@@ -42,7 +42,6 @@
 #include "taiga/http.h"
 #include "track/media.h"
 #include "track/monitor.h"
-#include "sync/myanimelist.h"
 #include "base/process.h"
 #include "track/recognition.h"
 #include "taiga/resource.h"
