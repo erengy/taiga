@@ -679,8 +679,6 @@ void Item::Edit(const EventItem& item) {
   }
   // Edit status
   if (item.status) {
-    database_->user.IncreaseItemCount(*item.status);
-    database_->user.DecreaseItemCount(GetMyStatus(false));
     SetMyStatus(*item.status);
   }
   // Edit re-watching status

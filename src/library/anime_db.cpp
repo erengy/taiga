@@ -227,8 +227,6 @@ void Database::UpdateItem(Item& new_item) {
     item->SetMyDate(DATE_END, new_item.GetMyDate(DATE_END));
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
-
-    user.IncreaseItemCount(item->GetMyStatus(false));
   }
 
   critical_section_.Leave();
@@ -262,7 +260,6 @@ bool Database::DeleteListItem(int anime_id) {
   if (!item) return false;
   if (!item->IsInList()) return false;
 
-  user.DecreaseItemCount(item->GetMyStatus(false));
   item->RemoveFromUserList();
 
   return true;
@@ -288,7 +285,6 @@ bool Database::LoadList() {
   xml_node myinfo = myanimelist.child(L"myinfo");
   user.SetId(XmlReadIntValue(myinfo, L"user_id"));
   user.SetName(XmlReadStrValue(myinfo, L"user_name"));
-  user.SetDaysSpentWatching(XmlReadStrValue(myinfo, L"user_days_spent_watching"));
 
   // Read anime list
   for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {

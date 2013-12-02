@@ -31,13 +31,7 @@ class User {
   virtual ~User() {}
 
   int id;
-  int watching;
-  int completed;
-  int on_hold;
-  int dropped;
-  int plan_to_watch;
   wstring name;
-  wstring days_spent_watching;
 };
 
 class ListUser {
@@ -50,14 +44,9 @@ class ListUser {
   int GetId() const;
   int GetItemCount(int status, bool check_events = true) const;
   const wstring& GetName() const;
-  
-  void DecreaseItemCount(int status);
-  void IncreaseItemCount(int status);
 
   void SetId(int id);
-  void SetItemCount(int status, int count);
   void SetName(const wstring& name);
-  void SetDaysSpentWatching(const wstring& days_spent_watching);
 
  private:
   User user_;
