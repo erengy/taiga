@@ -422,7 +422,7 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
     if (download) {
       // Refresh if current file is too old
       auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (anime_item->GetAiringStatus() != sync::myanimelist::kFinishedAiring) {
+      if (anime_item->GetAiringStatus() != kFinishedAiring) {
         // Check last modified date (>= 7 days)
         if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
           sync::DownloadImage(anime_id, anime_item->GetImageUrl());

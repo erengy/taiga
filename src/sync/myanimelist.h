@@ -19,7 +19,6 @@
 #ifndef TAIGA_SYNC_MYANIMELIST_H
 #define TAIGA_SYNC_MYANIMELIST_H
 
-#include "myanimelist_types.h"
 #include "myanimelist_util.h"
 #include "service.h"
 #include "base/types.h"

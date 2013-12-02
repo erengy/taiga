@@ -92,12 +92,12 @@ wstring Statistics::CalculateLifeSpentWatching() {
     // Approximate duration in minutes
     switch (it->second.GetType()) {
       default:
-      case sync::myanimelist::kTv:      duration = 24;  break;
-      case sync::myanimelist::kOva:     duration = 24;  break;
-      case sync::myanimelist::kMovie:   duration = 90; break;
-      case sync::myanimelist::kSpecial: duration = 12;  break;
-      case sync::myanimelist::kOna:     duration = 24;  break;
-      case sync::myanimelist::kMusic:   duration = 5;   break;
+      case anime::kTv:      duration = 24;  break;
+      case anime::kOva:     duration = 24;  break;
+      case anime::kMovie:   duration = 90; break;
+      case anime::kSpecial: duration = 12;  break;
+      case anime::kOna:     duration = 24;  break;
+      case anime::kMusic:   duration = 5;   break;
     }
     int episodes_watched = it->second.GetMyLastWatchedEpisode();
     if (it->second.GetMyRewatching() == TRUE)

@@ -59,7 +59,7 @@ void UpdateAnimeMenu(anime::Item* anime_item) {
       MENU.Items[i].Default = false;
     }
     item_index = anime_item->GetMyStatus();
-    if (item_index == sync::myanimelist::kPlanToWatch) item_index--;
+    if (item_index == anime::kPlanToWatch) item_index--;
     if (item_index - 1 < static_cast<int>(MENU.Items.size())) {
       MENU.Items[item_index - 1].Checked = true;
       MENU.Items[item_index - 1].Default = true;

@@ -555,9 +555,9 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   anime_list.InsertColumn(0, 0, 0, 0, L"Title");
   
   // Insert list groups
-  for (int i = sync::myanimelist::kWatching; i <= sync::myanimelist::kPlanToWatch; i++) {
-    if (i != sync::myanimelist::kUnknownMyStatus) {
-      anime_list.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str(), true, i != sync::myanimelist::kWatching);
+  for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++) {
+    if (i != anime::kUnknownMyStatus) {
+      anime_list.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str(), true, i != anime::kWatching);
     }
   }
   

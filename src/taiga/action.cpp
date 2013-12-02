@@ -239,7 +239,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     EventItem event_item;
     event_item.anime_id = anime_id;
     event_item.status = status;
-    if (status == sync::myanimelist::kCompleted) {
+    if (status == anime::kCompleted) {
       event_item.episode = anime_item->GetEpisodeCount();
       event_item.date_finish = sync::myanimelist::TranslateDateForApi(GetDate());
     }
@@ -474,18 +474,18 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     switch (anime_item->GetAiringStatus()) {
-      case sync::myanimelist::kAiring:
-        if (*event_item.status == sync::myanimelist::kCompleted) {
+      case anime::kAiring:
+        if (*event_item.status == anime::kCompleted) {
           MessageBox(g_hMain, 
             L"This anime is still airing, you cannot set it as completed.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
           return;
         }
         break;
-      case sync::myanimelist::kFinishedAiring:
+      case anime::kFinishedAiring:
         break;
-      case sync::myanimelist::kNotYetAired:
-        if (*event_item.status != sync::myanimelist::kPlanToWatch) {
+      case anime::kNotYetAired:
+        if (*event_item.status != anime::kPlanToWatch) {
           MessageBox(g_hMain, 
             L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
@@ -496,7 +496,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         return;
     }
     switch (*event_item.status) {
-      case sync::myanimelist::kCompleted:
+      case anime::kCompleted:
         event_item.episode = anime_item->GetEpisodeCount();
         if (*event_item.episode == 0) event_item.episode.Reset();
         if (!sync::myanimelist::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
@@ -668,9 +668,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       if (!anime_item.IsNewEpisodeAvailable())
         continue;
       switch (anime_item.GetMyStatus()) {
-        case sync::myanimelist::kNotInList:
-        case sync::myanimelist::kCompleted:
-        case sync::myanimelist::kDropped:
+        case anime::kNotInList:
+        case anime::kCompleted:
+        case anime::kDropped:
           continue;
       }
       valid_ids.push_back(anime_item.GetId());

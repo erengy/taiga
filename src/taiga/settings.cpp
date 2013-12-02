@@ -528,8 +528,8 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     MainDialog.treeview.RefreshHistoryCounter();
     MainDialog.UpdateTitle();
-    AnimeListDialog.RefreshList(sync::myanimelist::kWatching);
-    AnimeListDialog.RefreshTabs(sync::myanimelist::kWatching);
+    AnimeListDialog.RefreshList(anime::kWatching);
+    AnimeListDialog.RefreshTabs(anime::kWatching);
     HistoryDialog.RefreshList();
     NowPlayingDialog.Refresh();
     SearchDialog.RefreshList();

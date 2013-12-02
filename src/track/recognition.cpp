@@ -198,14 +198,14 @@ bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::I
   if (anime_item.IsInList()) {
     score += score_bonus_big;
     switch (anime_item.GetMyStatus()) {
-      case sync::myanimelist::kWatching:
-      case sync::myanimelist::kPlanToWatch:
+      case anime::kWatching:
+      case anime::kPlanToWatch:
         score += score_bonus_small;
         break;
     }
   }
   switch (anime_item.GetType()) {
-    case sync::myanimelist::kTv:
+    case anime::kTv:
       score += score_bonus_small;
       break;
   }

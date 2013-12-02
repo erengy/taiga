@@ -171,7 +171,7 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
       if (!silent)
         TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
       switch (it->second.GetMyStatus()) {
-        case sync::myanimelist::kWatching:
+        case anime::kWatching:
           if (!silent)
             MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
           it->second.CheckEpisodes(episode_number, check_folder);
@@ -182,8 +182,8 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
       if (!silent)
         TaskbarList.SetProgressValue(i++, AnimeDatabase.items.size());
       switch (it->second.GetMyStatus()) {
-        case sync::myanimelist::kOnHold:
-        case sync::myanimelist::kPlanToWatch:
+        case anime::kOnHold:
+        case anime::kPlanToWatch:
           if (!silent)
             MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
           it->second.CheckEpisodes(episode_number, check_folder);

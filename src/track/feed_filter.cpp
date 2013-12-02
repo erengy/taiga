@@ -492,7 +492,7 @@ void FeedFilterManager::InitializePresets() {
   ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ANY, true, 
       L"Select currently watching", 
       L"Selects files that belong to anime that you're currently watching");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_USER_STATUS, FEED_FILTER_OPERATOR_EQUALS, ToWstr(sync::myanimelist::kWatching));
+  ADD_CONDITION(FEED_FILTER_ELEMENT_USER_STATUS, FEED_FILTER_OPERATOR_EQUALS, ToWstr(anime::kWatching));
 
   // Discard unknown titles
   ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, 

@@ -54,6 +54,33 @@ enum DateType {
   DATE_END
 };
 
+enum SeriesStatus {
+  kUnknownStatus,
+  kAiring,
+  kFinishedAiring,
+  kNotYetAired
+};
+
+enum SeriesType {
+  kUnknownType,
+  kTv,
+  kOva,
+  kMovie,
+  kSpecial,
+  kOna,
+  kMusic
+};
+
+enum MyStatus {
+  kNotInList,
+  kWatching,
+  kCompleted,
+  kOnHold,
+  kDropped,
+  kUnknownMyStatus,
+  kPlanToWatch
+};
+
 // All anime items have series information.
 class SeriesInformation {
  public:

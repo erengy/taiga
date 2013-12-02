@@ -452,7 +452,7 @@ int AskForConfirmation(anime::Episode& episode) {
   if (anime_item->GetEpisodeCount() == number) { // Completed
     dlg.AddButton(L"Update and move\n"
                   L"Update and set as completed", IDCANCEL);
-  } else if (anime_item->GetMyStatus() != sync::myanimelist::kWatching) { // Watching
+  } else if (anime_item->GetMyStatus() != anime::kWatching) { // Watching
     dlg.AddButton(L"Update and move\n"
                   L"Update and set as watching", IDCANCEL);
   }

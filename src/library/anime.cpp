@@ -49,15 +49,15 @@ namespace anime {
 
 SeriesInformation::SeriesInformation()
     : id(ID_UNKNOWN), 
-      type(sync::myanimelist::kUnknownType), 
+      type(kUnknownType), 
       episodes(-1), 
-      status(sync::myanimelist::kUnknownStatus) {
+      status(kUnknownStatus) {
 }
 
 MyInformation::MyInformation()
     : watched_episodes(0), 
       score(0), 
-      status(sync::myanimelist::kNotInList), 
+      status(kNotInList), 
       rewatching(FALSE), 
       rewatching_ep(0) {
 }
@@ -82,8 +82,8 @@ void Item::StartWatching(Episode& episode) {
   NowPlayingDialog.SetCurrentId(GetId());
   
   // Update anime list window
-  int status = GetMyRewatching() ? sync::myanimelist::kWatching : GetMyStatus();
-  if (status != sync::myanimelist::kNotInList) {
+  int status = GetMyRewatching() ? kWatching : GetMyStatus();
+  if (status != kNotInList) {
     AnimeListDialog.RefreshList(status);
     AnimeListDialog.RefreshTabs(status);
   }
@@ -164,7 +164,7 @@ bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
       if (Taiga.ticker_media > -1)
         return false;
 
-  if (GetMyStatus() == sync::myanimelist::kCompleted && GetMyRewatching() == 0)
+  if (GetMyStatus() == kCompleted && GetMyRewatching() == 0)
     return false;
 
   int number = GetEpisodeHigh(episode.number);
@@ -210,7 +210,7 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
     event_item.date_finish = sync::myanimelist::TranslateDateForApi(::GetDate());
 
   // Set update mode
-  if (GetMyStatus() == sync::myanimelist::kNotInList) {
+  if (GetMyStatus() == kNotInList) {
     event_item.mode = taiga::kHttpServiceAddLibraryEntry;
   } else {
     event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
@@ -219,15 +219,15 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
   if (change_status) {
     // Move to completed
     if (GetEpisodeCount() == *event_item.episode) {
-      event_item.status = sync::myanimelist::kCompleted;
+      event_item.status = kCompleted;
       if (GetMyRewatching()) {
         event_item.enable_rewatching = FALSE;
         //event_item.times_rewatched++; // TODO: Enable when MAL adds to API
       }
     // Move to watching
-    } else if (GetMyStatus() != sync::myanimelist::kWatching || *event_item.episode == 1) {
+    } else if (GetMyStatus() != kWatching || *event_item.episode == 1) {
       if (!GetMyRewatching()) {
-        event_item.status = sync::myanimelist::kWatching;
+        event_item.status = kWatching;
       }
     }
   }

@@ -299,11 +299,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw title background
       COLORREF color;
       switch (anime_item->GetAiringStatus()) {
-        case sync::myanimelist::kAiring:
+        case anime::kAiring:
           color = theme::COLOR_LIGHTGREEN; break;
-        case sync::myanimelist::kFinishedAiring: default:
+        case anime::kFinishedAiring: default:
           color = theme::COLOR_LIGHTBLUE; break;
-        case sync::myanimelist::kNotYetAired:
+        case anime::kNotYetAired:
           color = theme::COLOR_LIGHTRED; break;
       }
       if (view_as == SEASON_VIEWAS_IMAGES) {
@@ -497,17 +497,17 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   list_.EnableGroupView(true); // Required for XP
   switch (group_by) {
     case SEASON_GROUPBY_AIRINGSTATUS:
-      for (int i = sync::myanimelist::kAiring; i <= sync::myanimelist::kNotYetAired; i++) {
+      for (int i = anime::kAiring; i <= anime::kNotYetAired; i++) {
         list_.InsertGroup(i, sync::myanimelist::TranslateStatus(i).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_LISTSTATUS:
-      for (int i = sync::myanimelist::kNotInList; i <= sync::myanimelist::kPlanToWatch; i++) {
+      for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
         list_.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_TYPE:
-      for (int i = sync::myanimelist::kTv; i <= sync::myanimelist::kMusic; i++) {
+      for (int i = anime::kTv; i <= anime::kMusic; i++) {
         list_.InsertGroup(i, sync::myanimelist::TranslateType(i).c_str(), true, false);
       }
       break;

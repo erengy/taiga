@@ -207,11 +207,11 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
         win::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value; m_Spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if (anime_item->GetMyStatus() == sync::myanimelist::kCompleted && episode_value == anime_item->GetEpisodeCount()) {
+          if (anime_item->GetMyStatus() == anime::kCompleted && episode_value == anime_item->GetEpisodeCount()) {
             m_Spin.SetPos32(0);
           }
           m_Combo.Enable(FALSE);
-          m_Combo.SetCurSel(sync::myanimelist::kCompleted - 1);
+          m_Combo.SetCurSel(anime::kCompleted - 1);
         } else {
           if (episode_value == 0) {
             m_Spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
@@ -230,8 +230,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
         win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == sync::myanimelist::kCompleted) {
-          if (anime_item->GetMyStatus() != sync::myanimelist::kCompleted && anime_item->GetEpisodeCount() > 0) {
+        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == anime::kCompleted) {
+          if (anime_item->GetMyStatus() != anime::kCompleted && anime_item->GetEpisodeCount() > 0) {
             SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
           }
         }
@@ -284,19 +284,19 @@ void PageMyInfo::Refresh(int anime_id) {
 
   // Re-watching
   CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
-  EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == sync::myanimelist::kCompleted);
+  EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == anime::kCompleted);
 
   // Status
   win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
   if (m_Combo.GetCount() == 0) {
-    for (int i = sync::myanimelist::kWatching; i <= sync::myanimelist::kPlanToWatch; i++) {
-      if (i != sync::myanimelist::kUnknownMyStatus) {
+    for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++) {
+      if (i != anime::kUnknownMyStatus) {
         m_Combo.AddItem(sync::myanimelist::TranslateMyStatus(i, false).c_str(), i);
       }
     }
   }
   int status = anime_item->GetMyStatus();
-  if (status == sync::myanimelist::kPlanToWatch) status--;
+  if (status == anime::kPlanToWatch) status--;
   m_Combo.SetCurSel(status - 1);
   m_Combo.Enable(!anime_item->GetMyRewatching());
   m_Combo.SetWindowHandle(nullptr);
@@ -413,7 +413,7 @@ bool PageMyInfo::Save() {
   
   // Status
   event_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
-  if (*event_item.status == sync::myanimelist::kUnknownMyStatus)
+  if (*event_item.status == anime::kUnknownMyStatus)
     event_item.status = *event_item.status + 1;
   
   // Tags
