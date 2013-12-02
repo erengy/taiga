@@ -21,6 +21,7 @@
 #include "dlg_feed_condition.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "track/feed.h"
 #include "sync/myanimelist.h"
 #include "taiga/resource.h"
@@ -281,27 +282,27 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       break;
     case FEED_FILTER_ELEMENT_META_STATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(sync::myanimelist::TranslateStatus(anime::kAiring).c_str(), anime::kAiring);
-      value_combo_.AddItem(sync::myanimelist::TranslateStatus(anime::kFinishedAiring).c_str(), anime::kFinishedAiring);
-      value_combo_.AddItem(sync::myanimelist::TranslateStatus(anime::kNotYetAired).c_str(), anime::kNotYetAired);
+      value_combo_.AddItem(anime::TranslateStatus(anime::kAiring).c_str(), anime::kAiring);
+      value_combo_.AddItem(anime::TranslateStatus(anime::kFinishedAiring).c_str(), anime::kFinishedAiring);
+      value_combo_.AddItem(anime::TranslateStatus(anime::kNotYetAired).c_str(), anime::kNotYetAired);
       break;
     case FEED_FILTER_ELEMENT_META_TYPE:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(sync::myanimelist::TranslateType(anime::kTv).c_str(), anime::kTv);
-      value_combo_.AddItem(sync::myanimelist::TranslateType(anime::kOva).c_str(), anime::kOva);
-      value_combo_.AddItem(sync::myanimelist::TranslateType(anime::kMovie).c_str(), anime::kMovie);
-      value_combo_.AddItem(sync::myanimelist::TranslateType(anime::kSpecial).c_str(), anime::kSpecial);
-      value_combo_.AddItem(sync::myanimelist::TranslateType(anime::kOna).c_str(), anime::kOna);
-      value_combo_.AddItem(sync::myanimelist::TranslateType(anime::kMusic).c_str(), anime::kMusic);
+      value_combo_.AddItem(anime::TranslateType(anime::kTv).c_str(), anime::kTv);
+      value_combo_.AddItem(anime::TranslateType(anime::kOva).c_str(), anime::kOva);
+      value_combo_.AddItem(anime::TranslateType(anime::kMovie).c_str(), anime::kMovie);
+      value_combo_.AddItem(anime::TranslateType(anime::kSpecial).c_str(), anime::kSpecial);
+      value_combo_.AddItem(anime::TranslateType(anime::kOna).c_str(), anime::kOna);
+      value_combo_.AddItem(anime::TranslateType(anime::kMusic).c_str(), anime::kMusic);
       break;
     case FEED_FILTER_ELEMENT_USER_STATUS:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(anime::kNotInList, false).c_str(), anime::kNotInList);
-      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(anime::kWatching, false).c_str(), anime::kWatching);
-      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(anime::kCompleted, false).c_str(), anime::kCompleted);
-      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(anime::kOnHold, false).c_str(), anime::kOnHold);
-      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(anime::kDropped, false).c_str(), anime::kDropped);
-      value_combo_.AddItem(sync::myanimelist::TranslateMyStatus(anime::kPlanToWatch, false).c_str(), anime::kPlanToWatch);
+      value_combo_.AddItem(anime::TranslateMyStatus(anime::kNotInList, false).c_str(), anime::kNotInList);
+      value_combo_.AddItem(anime::TranslateMyStatus(anime::kWatching, false).c_str(), anime::kWatching);
+      value_combo_.AddItem(anime::TranslateMyStatus(anime::kCompleted, false).c_str(), anime::kCompleted);
+      value_combo_.AddItem(anime::TranslateMyStatus(anime::kOnHold, false).c_str(), anime::kOnHold);
+      value_combo_.AddItem(anime::TranslateMyStatus(anime::kDropped, false).c_str(), anime::kDropped);
+      value_combo_.AddItem(anime::TranslateMyStatus(anime::kPlanToWatch, false).c_str(), anime::kPlanToWatch);
       break;
     case FEED_FILTER_ELEMENT_EPISODE_NUMBER:
     case FEED_FILTER_ELEMENT_META_EPISODES:

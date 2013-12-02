@@ -23,9 +23,10 @@
 #include "dlg_season.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/gfx.h"
-#include "sync/myanimelist.h"
+#include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -324,10 +325,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (view_as == SEASON_VIEWAS_IMAGES) {
         switch (sort_by) {
           case SEASON_SORTBY_AIRINGDATE:
-            text = sync::myanimelist::TranslateDate(anime_item->GetDate(anime::DATE_START));
+            text = anime::TranslateDate(anime_item->GetDate(anime::DATE_START));
             break;
           case SEASON_SORTBY_EPISODES:
-            text = sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount(), L"");
+            text = anime::TranslateNumber(anime_item->GetEpisodeCount(), L"");
             if (text.empty()) {
               text = L"Unknown";
             } else {
@@ -376,12 +377,12 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
-      text = sync::myanimelist::TranslateDate(anime_item->GetDate(anime::DATE_START));
+      text = anime::TranslateDate(anime_item->GetDate(anime::DATE_START));
       text += anime_item->GetDate(anime::DATE_END) != anime_item->GetDate(anime::DATE_START) ? 
-              L" to " + sync::myanimelist::TranslateDate(anime_item->GetDate(anime::DATE_END)) : L"";
-      text += L" (" + sync::myanimelist::TranslateStatus(anime_item->GetAiringStatus()) + L")";
+              L" to " + anime::TranslateDate(anime_item->GetDate(anime::DATE_END)) : L"";
+      text += L" (" + anime::TranslateStatus(anime_item->GetAiringStatus()) + L")";
       DRAWLINE(text);
-      DRAWLINE(sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
+      DRAWLINE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : anime_item->GetGenres());
       DRAWLINE(anime_item->GetProducers().empty() ? L"?" : anime_item->GetProducers());
       DRAWLINE(anime_item->GetScore().empty() ? L"0.00" : anime_item->GetScore());
@@ -498,17 +499,17 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   switch (group_by) {
     case SEASON_GROUPBY_AIRINGSTATUS:
       for (int i = anime::kAiring; i <= anime::kNotYetAired; i++) {
-        list_.InsertGroup(i, sync::myanimelist::TranslateStatus(i).c_str(), true, false);
+        list_.InsertGroup(i, anime::TranslateStatus(i).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_LISTSTATUS:
       for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
-        list_.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str(), true, false);
+        list_.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(), true, false);
       }
       break;
     case SEASON_GROUPBY_TYPE:
       for (int i = anime::kTv; i <= anime::kMusic; i++) {
-        list_.InsertGroup(i, sync::myanimelist::TranslateType(i).c_str(), true, false);
+        list_.InsertGroup(i, anime::TranslateType(i).c_str(), true, false);
       }
       break;
   }
@@ -579,7 +580,7 @@ void SeasonDialog::RefreshStatus() {
   if (SeasonDatabase.items.empty()) return;
 
   wstring text = SeasonDatabase.name + L", from " + 
-                 sync::myanimelist::TranslateSeasonToMonths(SeasonDatabase.name);
+                 anime::TranslateSeasonToMonths(SeasonDatabase.name);
   
   time_t last_modified = 0;
   for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {

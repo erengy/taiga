@@ -22,6 +22,7 @@
 #include "dlg_main.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/gfx.h"
@@ -168,10 +169,10 @@ void SearchDialog::AddAnimeToList(int anime_id) {
                      StatusToIcon(anime_item->GetAiringStatus()), 0, nullptr,
                      anime_item->GetTitle().c_str(),
                      static_cast<LPARAM>(anime_item->GetId()));
-    list_.SetItem(i, 1, sync::myanimelist::TranslateType(anime_item->GetType()).c_str());
-    list_.SetItem(i, 2, sync::myanimelist::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
+    list_.SetItem(i, 1, anime::TranslateType(anime_item->GetType()).c_str());
+    list_.SetItem(i, 2, anime::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
     list_.SetItem(i, 3, anime_item->GetScore().c_str());
-    list_.SetItem(i, 4, sync::myanimelist::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)).c_str());
+    list_.SetItem(i, 4, anime::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)).c_str());
   }
 }
 

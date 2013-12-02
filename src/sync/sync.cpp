@@ -91,8 +91,8 @@ void Synchronize() {
   }
 }
 
-void UpdateLibraryEntry(myanimelist::AnimeValues& anime_values,
-                        int id, taiga::HttpClientMode http_client_mode) {
+void UpdateLibraryEntry(AnimeValues& anime_values, int id,
+                        taiga::HttpClientMode http_client_mode) {
   RequestType request_type = ClientModeToRequestType(http_client_mode);
 
   Request request(request_type);

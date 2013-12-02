@@ -20,11 +20,11 @@
 #define HISTORY_H
 
 #include "base/std.h"
+#include "base/optional.h"
 
 #include <queue>
 
 #include "anime_episode.h"
-#include "sync/myanimelist.h"
 
 // =============================================================================
 
@@ -40,7 +40,27 @@ enum EventSearchMode {
 
 class History;
 
-class EventItem : public sync::myanimelist::AnimeValues {
+class AnimeValues {
+public:
+  Optional<int> episode;
+  Optional<int> status;
+  Optional<int> score;
+  Optional<int> downloaded_episodes;
+  Optional<int> storage_type;
+  Optional<float> storage_value;
+  Optional<int> times_rewatched;
+  Optional<int> rewatch_value;
+  Optional<wstring> date_start;
+  Optional<wstring> date_finish;
+  Optional<int> priority;
+  Optional<int> enable_discussion;
+  Optional<int> enable_rewatching;
+  Optional<wstring> comments;
+  Optional<wstring> fansub_group;
+  Optional<wstring> tags;
+};
+
+class EventItem : public AnimeValues {
 public:
   EventItem();
   virtual ~EventItem() {}

@@ -21,6 +21,7 @@
 #include "anime.h"
 #include "anime_db.h"
 #include "anime_episode.h"
+#include "anime_util.h"
 
 #include "taiga/announce.h"
 #include "base/common.h"
@@ -175,7 +176,7 @@ bool Item::IsUpdateAllowed(const Episode& episode, bool ignore_update_time) {
     if (number_low > last_watched + 1 || number < last_watched + 1)
       return false;
 
-  if (!sync::myanimelist::IsValidEpisode(number, last_watched, GetEpisodeCount()))
+  if (!IsValidEpisode(number, last_watched, GetEpisodeCount()))
     return false;
 
   return true;
@@ -204,10 +205,10 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
   event_item.episode = GetEpisodeHigh(episode.number);
 
   // Set start/finish date
-  if (*event_item.episode == 1 && !sync::myanimelist::IsValidDate(GetMyDate(DATE_START)))
-    event_item.date_start = sync::myanimelist::TranslateDateForApi(::GetDate());
-  if (*event_item.episode == GetEpisodeCount() && !sync::myanimelist::IsValidDate(GetMyDate(DATE_END)))
-    event_item.date_finish = sync::myanimelist::TranslateDateForApi(::GetDate());
+  if (*event_item.episode == 1 && !IsValidDate(GetMyDate(DATE_START)))
+    event_item.date_start = TranslateDateForApi(::GetDate());
+  if (*event_item.episode == GetEpisodeCount() && !IsValidDate(GetMyDate(DATE_END)))
+    event_item.date_finish = TranslateDateForApi(::GetDate());
 
   // Set update mode
   if (GetMyStatus() == kNotInList) {

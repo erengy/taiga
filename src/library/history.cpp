@@ -21,6 +21,7 @@
 #include "history.h"
 
 #include "anime_db.h"
+#include "anime_util.h"
 #include "taiga/announce.h"
 #include "base/common.h"
 #include "taiga/http.h"
@@ -83,10 +84,10 @@ void EventQueue::Add(EventItem& item, bool save) {
       if (anime->GetMyTags() == *item.tags)
         item.tags.Reset();
     if (item.date_start)
-      if (anime->GetMyDate(anime::DATE_START) == sync::myanimelist::TranslateDateFromApi(*item.date_start))
+      if (anime->GetMyDate(anime::DATE_START) == anime::TranslateDateFromApi(*item.date_start))
         item.date_start.Reset();
     if (item.date_finish)
-      if (anime->GetMyDate(anime::DATE_END) == sync::myanimelist::TranslateDateFromApi(*item.date_finish))
+      if (anime->GetMyDate(anime::DATE_END) == anime::TranslateDateFromApi(*item.date_finish))
         item.date_finish.Reset();
   }
   switch (item.mode) {
@@ -213,8 +214,7 @@ void EventQueue::Check(bool automatic) {
   // Update
   History.queue.updating = true;
   MainDialog.ChangeStatus(L"Updating list...");
-  sync::myanimelist::AnimeValues* anime_values =
-      static_cast<sync::myanimelist::AnimeValues*>(&items[index]);
+  AnimeValues* anime_values = static_cast<AnimeValues*>(&items[index]);
   sync::UpdateLibraryEntry(*anime_values, items[index].anime_id,
       static_cast<taiga::HttpClientMode>(items[index].mode));
 }

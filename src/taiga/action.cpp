@@ -21,6 +21,7 @@
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
+#include "library/anime_util.h"
 #include "taiga/announce.h"
 #include "sync/sync.h"
 #include "base/common.h"
@@ -30,7 +31,7 @@
 #include "http.h"
 #include "base/logger.h"
 #include "track/monitor.h"
-#include "sync/myanimelist.h"
+#include "sync/myanimelist_util.h"
 #include "base/process.h"
 #include "track/recognition.h"
 #include "resource.h"
@@ -241,7 +242,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     event_item.status = status;
     if (status == anime::kCompleted) {
       event_item.episode = anime_item->GetEpisodeCount();
-      event_item.date_finish = sync::myanimelist::TranslateDateForApi(GetDate());
+      event_item.date_finish = anime::TranslateDateForApi(GetDate());
     }
     event_item.mode = taiga::kHttpServiceAddLibraryEntry;
     History.queue.Add(event_item);
@@ -417,7 +418,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     } else {
       value = ToInt(body);
     }
-    if (sync::myanimelist::IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
+    if (anime::IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(value);
       anime_item->AddToQueue(episode, true);
@@ -434,7 +435,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       event_item->enabled = false;
       History.queue.RemoveDisabled();
     } else {
-      if (sync::myanimelist::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
+      if (anime::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
         anime::Episode episode;
         episode.number = ToWstr(watched - 1);
         anime_item->AddToQueue(episode, true);
@@ -446,7 +447,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     int watched = anime_item->GetMyLastWatchedEpisode();
-    if (sync::myanimelist::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
+    if (anime::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(watched + 1);
       anime_item->AddToQueue(episode, true);
@@ -499,8 +500,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       case anime::kCompleted:
         event_item.episode = anime_item->GetEpisodeCount();
         if (*event_item.episode == 0) event_item.episode.Reset();
-        if (!sync::myanimelist::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
-          event_item.date_finish = sync::myanimelist::TranslateDateForApi(GetDate());
+        if (!anime::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
+          event_item.date_finish = anime::TranslateDateForApi(GetDate());
         break;
     }
     event_item.anime_id = anime_id;

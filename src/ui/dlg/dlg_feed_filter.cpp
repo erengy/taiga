@@ -22,6 +22,7 @@
 #include "dlg_feed_filter.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "sync/myanimelist.h"
 #include "taiga/resource.h"
@@ -557,7 +558,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   // Insert list groups
   for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++) {
     if (i != anime::kUnknownMyStatus) {
-      anime_list.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str(), true, i != anime::kWatching);
+      anime_list.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(), true, i != anime::kWatching);
     }
   }
   

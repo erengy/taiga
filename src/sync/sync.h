@@ -19,9 +19,9 @@
 #ifndef TAIGA_SYNC_SYNC_H
 #define TAIGA_SYNC_SYNC_H
 
-#include "myanimelist_util.h"
 #include "service.h"
 #include "base/types.h"
+#include "library/history.h"
 #include "taiga/http.h"
 
 namespace sync {
@@ -31,8 +31,8 @@ void GetLibraryEntries();
 void GetMetadataById(int id);
 void SearchTitle(string_t title);
 void Synchronize();
-void UpdateLibraryEntry(myanimelist::AnimeValues& anime_values,
-                        int id, taiga::HttpClientMode http_client_mode);
+void UpdateLibraryEntry(AnimeValues& anime_values, int id,
+                        taiga::HttpClientMode http_client_mode);
 
 void DownloadImage(int id, const wstring& image_url);
 

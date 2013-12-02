@@ -21,6 +21,7 @@
 
 #include "anime.h"
 #include "anime_db.h"
+#include "anime_util.h"
 #include "history.h"
 
 #include "base/common.h"
@@ -216,9 +217,9 @@ void Database::UpdateItem(Item& new_item) {
       item->SetEnglishTitle(new_item.GetEnglishTitle());
     if (!new_item.GetSynonyms().empty())
       item->SetSynonyms(new_item.GetSynonyms());
-    if (sync::myanimelist::IsValidDate(new_item.GetDate(DATE_START)))
+    if (IsValidDate(new_item.GetDate(DATE_START)))
       item->SetDate(DATE_START, new_item.GetDate(DATE_START));
-    if (sync::myanimelist::IsValidDate(new_item.GetDate(DATE_END)))
+    if (IsValidDate(new_item.GetDate(DATE_END)))
       item->SetDate(DATE_END, new_item.GetDate(DATE_END));
     if (!new_item.GetImageUrl().empty())
       item->SetImageUrl(new_item.GetImageUrl());
@@ -530,7 +531,7 @@ bool SeasonDatabase::IsRefreshRequired() {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       const Date& date_start = anime_item->GetDate(anime::DATE_START);
-      if (!sync::myanimelist::IsValidDate(date_start) || anime_item->GetSynopsis().empty())
+      if (!IsValidDate(date_start) || anime_item->GetSynopsis().empty())
         count++;
     }
     if (count > 20) {
@@ -544,7 +545,7 @@ bool SeasonDatabase::IsRefreshRequired() {
 
 void SeasonDatabase::Review(bool hide_hentai) {
   Date date_start, date_end;
-  sync::myanimelist::GetSeasonInterval(name, date_start, date_end);
+  GetSeasonInterval(name, date_start, date_end);
 
   // Check for invalid items
   for (size_t i = 0; i < items.size(); i++) {
@@ -554,7 +555,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (anime_item) {
       // Airing date must be within the interval
       const Date& anime_start = anime_item->GetDate(anime::DATE_START);
-      if (sync::myanimelist::IsValidDate(anime_start))
+      if (IsValidDate(anime_start))
         if (anime_start < date_start || anime_start > date_end)
           invalid = true;
       // TODO: Filter by rating instead if made possible in API

@@ -20,7 +20,7 @@
 
 #include "time.h"
 
-#include "sync/myanimelist.h"
+#include "library/anime_util.h"
 #include "string.h"
 
 // =============================================================================
@@ -32,7 +32,7 @@ Date::Date()
 }
 
 Date::Date(const wstring& date) {
-  *this = sync::myanimelist::ParseDateString(date);
+  *this = anime::ParseDateString(date);
 }
 
 Date::Date(unsigned short year, unsigned short month, unsigned short day)

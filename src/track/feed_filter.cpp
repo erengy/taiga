@@ -22,6 +22,7 @@
 
 #include "library/anime.h"
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "sync/myanimelist.h"
@@ -666,11 +667,11 @@ wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) 
       }
     }
     case FEED_FILTER_ELEMENT_USER_STATUS:
-      return sync::myanimelist::TranslateMyStatus(ToInt(condition.value), false);
+      return anime::TranslateMyStatus(ToInt(condition.value), false);
     case FEED_FILTER_ELEMENT_META_STATUS:
-      return sync::myanimelist::TranslateStatus(ToInt(condition.value));
+      return anime::TranslateStatus(ToInt(condition.value));
     case FEED_FILTER_ELEMENT_META_TYPE:
-      return sync::myanimelist::TranslateType(ToInt(condition.value));
+      return anime::TranslateType(ToInt(condition.value));
     default:
       return condition.value;
   }

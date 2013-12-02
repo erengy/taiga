@@ -23,6 +23,7 @@
 #include "dlg_main.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/gfx.h"
@@ -188,20 +189,20 @@ void HistoryDialog::RefreshList() {
     if (it->mode == taiga::kHttpServiceDeleteLibraryEntry)
       AppendString(details, L"Remove from list");
     if (it->episode)
-      AppendString(details, L"Episode: " + sync::myanimelist::TranslateNumber(*it->episode));
+      AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
     if (it->score)
-      AppendString(details, L"Score: " + sync::myanimelist::TranslateNumber(*it->score));
+      AppendString(details, L"Score: " + anime::TranslateNumber(*it->score));
     if (it->status)
       AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ? 
-        L"Status: " + sync::myanimelist::TranslateMyStatus(*it->status, false) : L"Re-watching");
+        L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Re-watching");
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
     if (it->date_start)
       AppendString(details, L"Start date: " + 
-        wstring(sync::myanimelist::TranslateDateFromApi(*it->date_start)));
+        wstring(anime::TranslateDateFromApi(*it->date_start)));
     if (it->date_finish)
       AppendString(details, L"Finish date: " + 
-        wstring(sync::myanimelist::TranslateDateFromApi(*it->date_finish)));
+        wstring(anime::TranslateDateFromApi(*it->date_finish)));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }
@@ -213,7 +214,7 @@ void HistoryDialog::RefreshList() {
       AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
       static_cast<LPARAM>(it->anime_id));
     wstring details;
-    AppendString(details, L"Episode: " + sync::myanimelist::TranslateNumber(*it->episode));
+    AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }

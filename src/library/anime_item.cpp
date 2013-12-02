@@ -21,6 +21,7 @@
 #include "anime_db.h"
 #include "anime_episode.h"
 #include "anime_item.h"
+#include "anime_util.h"
 
 #include "base/common.h"
 #include "history.h"
@@ -76,10 +77,10 @@ int Item::GetEpisodeCount(bool estimation) const {
   // Estimate using airing dates of TV series
   if (series_info_.type == kTv) {
     Date date_start = GetDate(DATE_START);
-    if (sync::myanimelist::IsValidDate(date_start)) {
+    if (IsValidDate(date_start)) {
       Date date_end = GetDate(DATE_END);
       // Use current date in Japan if ending date is unknown
-      if (!sync::myanimelist::IsValidDate(date_end)) date_end = GetDateJapan();
+      if (!IsValidDate(date_end)) date_end = GetDateJapan();
       // Assuming the series is aired weekly
       number = max(number, (date_end - date_start) / 7);
     }
@@ -216,13 +217,13 @@ const Date Item::GetMyDate(DateType type, bool check_events) const {
       event_item = check_events ? 
         SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
       return event_item ? 
-        sync::myanimelist::TranslateDateFromApi(*event_item->date_start) : 
+        TranslateDateFromApi(*event_item->date_start) : 
         my_info_->date_start;
     case DATE_END:
       event_item = check_events ? 
         SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
       return event_item ? 
-        sync::myanimelist::TranslateDateFromApi(*event_item->date_finish) : 
+        TranslateDateFromApi(*event_item->date_finish) : 
         my_info_->date_finish;
   }
 }
@@ -372,7 +373,7 @@ void Item::SetMyTags(const wstring& tags) {
 
 bool Item::IsAiredYet() const {
   if (series_info_.status != kNotYetAired) return true;
-  if (!sync::myanimelist::IsValidDate(series_info_.date_start)) return false;
+  if (!IsValidDate(series_info_.date_start)) return false;
   
   Date date_japan = GetDateJapan();
   Date date_start = series_info_.date_start;
@@ -388,7 +389,7 @@ bool Item::IsAiredYet() const {
 
 bool Item::IsFinishedAiring() const {
   if (series_info_.status == kFinishedAiring) return true;
-  if (!sync::myanimelist::IsValidDate(series_info_.date_end)) return false;
+  if (!IsValidDate(series_info_.date_end)) return false;
   if (!IsAiredYet()) return false;
   return GetDateJapan() > series_info_.date_end;
 }
@@ -691,11 +692,11 @@ void Item::Edit(const EventItem& item) {
   }
   // Edit dates
   if (item.date_start) {
-    Date date_start = sync::myanimelist::TranslateDateFromApi(*item.date_start);
+    Date date_start = TranslateDateFromApi(*item.date_start);
     SetMyDate(anime::DATE_START, date_start);
   }
   if (item.date_finish) {
-    Date date_finish = sync::myanimelist::TranslateDateFromApi(*item.date_finish);
+    Date date_finish = TranslateDateFromApi(*item.date_finish);
     SetMyDate(anime::DATE_END, date_finish);
   }
   // Delete

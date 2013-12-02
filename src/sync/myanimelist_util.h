@@ -20,53 +20,11 @@
 #define TAIGA_SYNC_MYANIMELIST_UTIL_H
 
 #include "base/std.h"
-#include "base/optional.h"
-
-class Date;
 
 namespace sync {
 namespace myanimelist {
 
-class AnimeValues {
-public:
-  Optional<int> episode;
-  Optional<int> status;
-  Optional<int> score;
-  Optional<int> downloaded_episodes;
-  Optional<int> storage_type;
-  Optional<float> storage_value;
-  Optional<int> times_rewatched;
-  Optional<int> rewatch_value;
-  Optional<wstring> date_start;
-  Optional<wstring> date_finish;
-  Optional<int> priority;
-  Optional<int> enable_discussion;
-  Optional<int> enable_rewatching;
-  Optional<wstring> comments;
-  Optional<wstring> fansub_group;
-  Optional<wstring> tags;
-};
-
 wstring DecodeText(wstring text);
-bool IsValidDate(const Date& date);
-bool IsValidDate(const wstring& date);
-bool IsValidEpisode(int episode, int watched, int total);
-Date ParseDateString(const wstring& str);
-void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end);
-
-wstring TranslateDate(const Date& date);
-wstring TranslateDateForApi(const Date& date);
-Date TranslateDateFromApi(const wstring& date);
-wstring TranslateDateToSeason(const Date& date);
-wstring TranslateSeasonToMonths(const wstring& season);
-wstring TranslateMyStatus(int value, bool add_count);
-wstring TranslateNumber(int value, const wstring& default_char = L"-");
-wstring TranslateStatus(int value);
-wstring TranslateType(int value);
-
-int TranslateMyStatus(const wstring& value);
-int TranslateStatus(const wstring& value);
-int TranslateType(const wstring& value);
 
 void ViewAnimePage(int anime_id);
 void ViewAnimeSearch(const wstring& title);

@@ -17,7 +17,6 @@
 */
 
 #include "myanimelist.h"
-#include "myanimelist_types.h"
 #include "myanimelist_util.h"
 
 #include "base/encryption.h"
@@ -26,6 +25,7 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
+#include "library/anime_util.h"
 
 namespace sync {
 namespace myanimelist {
@@ -352,8 +352,8 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     anime_item.SetSynonyms(DecodeText(XmlReadStrValue(node, L"synonyms")));
     anime_item.SetEpisodeCount(XmlReadIntValue(node, L"episodes"));
     anime_item.SetScore(XmlReadStrValue(node, L"score"));
-    anime_item.SetType(TranslateType(XmlReadStrValue(node, L"type")));
-    anime_item.SetAiringStatus(TranslateStatus(XmlReadStrValue(node, L"status")));
+    anime_item.SetType(anime::TranslateType(XmlReadStrValue(node, L"type")));
+    anime_item.SetAiringStatus(anime::TranslateStatus(XmlReadStrValue(node, L"status")));
     anime_item.SetDate(::anime::DATE_START, XmlReadStrValue(node, L"start_date"));
     anime_item.SetDate(::anime::DATE_END, XmlReadStrValue(node, L"end_date"));
     wstring synopsis = DecodeText(XmlReadStrValue(node, L"synopsis"));

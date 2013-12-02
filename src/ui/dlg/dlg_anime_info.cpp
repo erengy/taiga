@@ -27,7 +27,7 @@
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "library/history.h"
-#include "sync/myanimelist.h"
+#include "sync/myanimelist_util.h"
 #include "track/recognition.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"

@@ -25,6 +25,7 @@
 
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/gfx.h"
 #include "sync/myanimelist.h"
@@ -78,11 +79,11 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
 
   // Insert tabs and list groups
-  listview.InsertGroup(anime::kNotInList, sync::myanimelist::TranslateMyStatus(anime::kNotInList, false).c_str());
+  listview.InsertGroup(anime::kNotInList, anime::TranslateMyStatus(anime::kNotInList, false).c_str());
   for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++) {
     if (i != anime::kUnknownMyStatus) {
-      tab.InsertItem(i - 1, sync::myanimelist::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-      listview.InsertGroup(i, sync::myanimelist::TranslateMyStatus(i, false).c_str());
+      tab.InsertItem(i - 1, anime::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
+      listview.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str());
     }
   }
 
@@ -823,7 +824,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   dc.SetTextColor(text_color);
 
   // Episodes watched
-  text = sync::myanimelist::TranslateNumber(eps_watched, L"0");
+  text = anime::TranslateNumber(eps_watched, L"0");
   rcText.right -= (rcText.Width() / 2) + 4;
   if (eps_watched < 1) {
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
@@ -837,7 +838,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   dc.SetTextColor(text_color);
 
   // Total episodes
-  text = sync::myanimelist::TranslateNumber(eps_total, L"?");
+  text = anime::TranslateNumber(eps_total, L"?");
   rcText.left = rcText.right + 8;
   rcText.right = rc->right;
   if (eps_total < 1)
@@ -865,7 +866,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    wstring text = sync::myanimelist::TranslateNumber(anime_item.GetMyScore());
+    wstring text = anime::TranslateNumber(anime_item.GetMyScore());
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
@@ -1046,16 +1047,16 @@ void AnimeListDialog::RefreshList(int index) {
     listview.InsertItem(i, group_index, icon_index, 
                         0, nullptr, LPSTR_TEXTCALLBACK,
                         static_cast<LPARAM>(anime_item.GetId()));
-    listview.SetItem(i, 2, sync::myanimelist::TranslateNumber(anime_item.GetMyScore()).c_str());
-    listview.SetItem(i, 3, sync::myanimelist::TranslateType(anime_item.GetType()).c_str());
-    listview.SetItem(i, 4, sync::myanimelist::TranslateDateToSeason(anime_item.GetDate(anime::DATE_START)).c_str());
+    listview.SetItem(i, 2, anime::TranslateNumber(anime_item.GetMyScore()).c_str());
+    listview.SetItem(i, 3, anime::TranslateType(anime_item.GetType()).c_str());
+    listview.SetItem(i, 4, anime::TranslateDateToSeason(anime_item.GetDate(anime::DATE_START)).c_str());
   }
 
   // Set group headers
   if (group_view) {
     for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
       if (i != anime::kUnknownMyStatus) {
-        wstring text = sync::myanimelist::TranslateMyStatus(i, false);
+        wstring text = anime::TranslateMyStatus(i, false);
         text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
         listview.SetGroupText(i, text.c_str());
       }
@@ -1076,7 +1077,7 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
   int index = GetListIndex(anime_id);
   if (index > -1) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    listview.SetItem(index, 2, sync::myanimelist::TranslateNumber(anime_item->GetMyScore()).c_str());
+    listview.SetItem(index, 2, anime::TranslateNumber(anime_item->GetMyScore()).c_str());
     listview.RedrawItems(index, index, true);
   }
 }
@@ -1094,7 +1095,7 @@ void AnimeListDialog::RefreshTabs(int index) {
   // Refresh text
   for (int i = 1; i <= 6; i++)
     if (i != 5)
-      tab.SetItemText(i == 6 ? 4 : i - 1, sync::myanimelist::TranslateMyStatus(i, true).c_str());
+      tab.SetItemText(i == 6 ? 4 : i - 1, anime::TranslateMyStatus(i, true).c_str());
 
   // Select related tab
   bool group_view = !MainDialog.search_bar.filters.text.empty();
