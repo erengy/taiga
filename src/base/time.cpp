@@ -207,3 +207,8 @@ wstring ToTimeString(int seconds) {
     TWO_DIGIT(minutes) + L":" + TWO_DIGIT(seconds);
   #undef TWO_DIGIT
 }
+
+const Date& EmptyDate() {
+  static const Date date;
+  return date;
+}

@@ -978,6 +978,11 @@ void AppendString(wstring& str0, const wstring& str1, const wstring& str2) {
   str0.append(str1);
 }
 
+const wstring& EmptyString() {
+  static const wstring str;
+  return str;
+}
+
 wstring PadChar(wstring str, const wchar_t ch, const size_t len) {
   if (len > str.length())
     str.insert(0, len - str.length(), ch);

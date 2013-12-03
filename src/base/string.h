@@ -31,6 +31,7 @@ wstring CharRight(const wstring& str, int length);
 bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list);
 int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensitive = true, size_t max_count = MAX_PATH);
 void DecodeHtmlEntities(wstring& str);
+const wstring& EmptyString();
 wstring EncodeUrl(const wstring& str, bool encode_unreserved = false);
 bool EndsWith(const wstring& str, const wstring& search);
 size_t LongestCommonSubsequenceLength(const wstring& str1, const wstring& str2);
