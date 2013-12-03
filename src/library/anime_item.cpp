@@ -70,6 +70,13 @@ int Item::GetEpisodeCount() const {
   return -1;
 }
 
+int Item::GetEpisodeLength() const {
+  if (metadata_.extent.size() > 1)
+    return metadata_.extent.at(1);
+
+  return -1;
+}
+
 int Item::GetAiringStatus(bool check_date) const {
   if (!check_date) return metadata_.status;
   if (IsFinishedAiring()) return kFinishedAiring;
@@ -230,6 +237,13 @@ void Item::SetEpisodeCount(int number) {
   if (number >= 0)
     if (static_cast<size_t>(number) != local_info_.available_episodes.size())
       local_info_.available_episodes.resize(number);
+}
+
+void Item::SetEpisodeLength(int number) {
+  if (metadata_.extent.size() < 2)
+    metadata_.extent.resize(2);
+
+  metadata_.extent.at(1) = number;
 }
 
 void Item::SetAiringStatus(int status) {

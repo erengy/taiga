@@ -43,6 +43,7 @@ class Item {
   int GetId() const;
   int GetType() const;
   int GetEpisodeCount() const;
+  int GetEpisodeLength() const;
   int GetAiringStatus(bool check_date = true) const;
   const wstring& GetTitle() const;
   const wstring& GetEnglishTitle(bool fallback = false) const;
@@ -70,6 +71,7 @@ class Item {
   void SetId(int anime_id);
   void SetType(int type);
   void SetEpisodeCount(int number);
+  void SetEpisodeLength(int number);
   void SetAiringStatus(int status);
   void SetTitle(const wstring& title);
   void SetEnglishTitle(const wstring& title);
