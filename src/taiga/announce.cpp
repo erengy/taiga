@@ -28,6 +28,7 @@
 #include "base/logger.h"
 #include "taiga/settings.h"
 #include "base/string.h"
+#include "taiga/script.h"
 #include "taiga/taiga.h"
 
 #include "ui/dlg/dlg_main.h"

@@ -46,6 +46,7 @@
 #include "track/recognition.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
+#include "taiga/script.h"
 #include "taiga/stats.h"
 #include "base/string.h"
 #include "taiga/taiga.h"

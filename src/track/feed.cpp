@@ -30,6 +30,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "base/types.h"
+#include "taiga/script.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
 

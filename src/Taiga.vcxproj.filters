@@ -681,6 +681,9 @@
     <ClInclude Include="ui\list.h">
       <Filter>ui</Filter>
     </ClInclude>
+    <ClInclude Include="taiga\script.h">
+      <Filter>taiga</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="taiga\version.rc">

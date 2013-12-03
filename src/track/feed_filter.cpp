@@ -25,6 +25,7 @@
 #include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 

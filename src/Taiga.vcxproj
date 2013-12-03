@@ -242,6 +242,7 @@
     <ClInclude Include="taiga\debug.h" />
     <ClInclude Include="taiga\http.h" />
     <ClInclude Include="taiga\resource.h" />
+    <ClInclude Include="taiga\script.h" />
     <ClInclude Include="taiga\settings.h" />
     <ClInclude Include="taiga\stats.h" />
     <ClInclude Include="taiga\taiga.h" />

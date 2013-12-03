@@ -24,11 +24,8 @@
 typedef unsigned __int64 QWORD, *LPQWORD;
 
 namespace anime {
-class Episode;
 class Item;
 }
-
-// =============================================================================
 
 // action.cpp
 void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
@@ -63,15 +60,6 @@ int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = 
 int PopulateFolders(vector<wstring>& folder_list, wstring path);
 bool SaveToFile(LPCVOID data, DWORD length, const wstring& path, bool take_backup = false);
 wstring ToSizeString(QWORD qwSize);
-
-// script.cpp
-wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
-bool IsScriptFunction(const wstring& str);
-bool IsScriptVariable(const wstring& str);
-wstring ReplaceVariables(wstring str, const anime::Episode& episode, 
-  bool url_encode = false, bool is_manual = false, bool is_preview = false);
-wstring EscapeScriptEntities(const wstring& str);
-wstring UnescapeScriptEntities(const wstring& str);
 
 // search.cpp
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent);

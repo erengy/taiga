@@ -24,6 +24,7 @@
 #include "base/common.h"
 #include "track/recognition.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "ui/theme.h"

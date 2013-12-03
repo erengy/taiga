@@ -24,6 +24,7 @@
 #include "base/common.h"
 #include "base/logger.h"
 #include "base/string.h"
+#include "taiga/script.h"
 
 class Api TaigaApi;
 
