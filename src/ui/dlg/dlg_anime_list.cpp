@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 
@@ -63,7 +64,7 @@ BOOL AnimeListDialog::OnInitDialog() {
                       UI.list_background.offset_x, UI.list_background.offset_y);
   listview.SetHoverTime(60 * 1000);
   listview.SetImageList(UI.ImgList16.GetHandle());
-  listview.Sort(0, 1, 0, ListViewCompareProc);
+  listview.Sort(0, 1, 0, ui::ListViewCompareProc);
   listview.SetTheme();
 
   // Create list tooltips
@@ -331,16 +332,16 @@ int AnimeListDialog::ListView::GetSortType(int column) {
   switch (column) {
     // Progress
     case 1:
-      return LIST_SORTTYPE_PROGRESS;
+      return ui::kListSortProgress;
     // Score
     case 2:
-      return LIST_SORTTYPE_NUMBER;
+      return ui::kListSortNumber;
     // Season
     case 4:
-      return LIST_SORTTYPE_STARTDATE;
+      return ui::kListSortStartDate;
     // Other columns
     default:
-      return LIST_SORTTYPE_DEFAULT;
+      return ui::kListSortDefault;
   }
 }
 
@@ -495,7 +496,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       int order = 1;
       if (lplv->iSubItem == listview.GetSortColumn()) order = listview.GetSortOrder() * -1;
-      listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ListViewCompareProc);
+      listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ui::ListViewCompareProc);
       break;
     }
 
@@ -1066,7 +1067,7 @@ void AnimeListDialog::RefreshList(int index) {
   listview.Sort(listview.GetSortColumn(),
                 listview.GetSortOrder(),
                 listview.GetSortType(listview.GetSortColumn()),
-                ListViewCompareProc);
+                ui::ListViewCompareProc);
 
   // Show again
   listview.Show(SW_SHOW);

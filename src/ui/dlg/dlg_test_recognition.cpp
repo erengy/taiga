@@ -26,6 +26,7 @@
 #include "base/string.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
+#include "ui/list.h"
 
 RecognitionTestDialog RecognitionTest;
 
@@ -108,7 +109,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
     list_.SetItem(i, 10, test_episodes_[i].name.c_str());
     list_.SetItem(i, 11, test_episodes_[i].format.c_str());
   }
-  list_.Sort(1, 1, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
+  list_.Sort(1, 1, ui::kListSortDefault, ui::ListViewCompareProc);
 
   // Set title
   int success_count = 0, total_items = episodes_.size();
@@ -139,14 +140,14 @@ LRESULT RecognitionTestDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         int order = 1;
         if (lplv->iSubItem == list_.GetSortColumn()) order = list_.GetSortOrder() * -1;
-        int type = LIST_SORTTYPE_DEFAULT;
+        int type = ui::kListSortDefault;
         switch (lplv->iSubItem) {
           case 3:
           case 4:
-            type = LIST_SORTTYPE_NUMBER;
+            type = ui::kListSortNumber;
             break;
         }
-        list_.Sort(lplv->iSubItem, order, type, ListViewCompareProc);
+        list_.Sort(lplv->iSubItem, order, type, ui::ListViewCompareProc);
         break;
       }
 

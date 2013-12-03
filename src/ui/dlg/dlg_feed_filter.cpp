@@ -27,6 +27,7 @@
 #include "taiga/resource.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/list.h"
 #include "ui/theme.h"
 
 #include "win/win_gdi.h"
@@ -578,7 +579,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   }
   
   // Sort items
-  anime_list.Sort(0, 1, 0, ListViewCompareProc);
+  anime_list.Sort(0, 1, 0, ui::ListViewCompareProc);
 
   // Resize header
   anime_list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);

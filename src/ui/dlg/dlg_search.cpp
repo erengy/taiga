@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "base/xml.h"
@@ -84,15 +85,15 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         switch (lplv->iSubItem) {
           // Episode
           case 2:
-            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_NUMBER, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortNumber, ui::ListViewCompareProc);
             break;
           // Season
           case 4:
-            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_STARTDATE, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortStartDate, ui::ListViewCompareProc);
             break;
           // Other columns
           default:
-            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortDefault, ui::ListViewCompareProc);
             break;
         }
         break;
@@ -193,7 +194,7 @@ void SearchDialog::RefreshList() {
   }*/
 
   // Sort and show the list again
-  //list_.Sort(0, 1, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
+  //list_.Sort(0, 1, LIST_SORTTYPE_DEFAULT, ui::ListViewCompareProc);
   list_.Show(SW_SHOW);
 }
 

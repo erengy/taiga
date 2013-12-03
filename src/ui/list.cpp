@@ -16,17 +16,16 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
+#include "list.h"
 
 #include "library/anime_db.h"
-#include "base/common.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "base/time.h"
 
 #include "win/ctrl/win_ctrl.h"
 
-// =============================================================================
+namespace ui {
 
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) {
   if (!lParamSort) return 0;
@@ -36,7 +35,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
   switch (m_List->GetSortType()) {
     // Number
-    case LIST_SORTTYPE_NUMBER: {
+    case kListSortNumber: {
       WCHAR szItem1[MAX_PATH], szItem2[MAX_PATH];
       m_List->GetItemText(lParam1, m_List->GetSortColumn(), szItem1);
       m_List->GetItemText(lParam2, m_List->GetSortColumn(), szItem2);
@@ -51,7 +50,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Popularity
-    case LIST_SORTTYPE_POPULARITY: {
+    case kListSortPopularity: {
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
@@ -71,7 +70,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Progress
-    case LIST_SORTTYPE_PROGRESS: {
+    case kListSortProgress: {
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
@@ -105,7 +104,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Episodes
-    case LIST_SORTTYPE_EPISODES: {
+    case kListSortEpisodes: {
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
@@ -119,7 +118,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Score
-    case LIST_SORTTYPE_SCORE: {
+    case kListSortScore: {
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
@@ -129,7 +128,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
     
     // Start date
-    case LIST_SORTTYPE_STARTDATE: {
+    case kListSortStartDate: {
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
@@ -149,7 +148,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Last updated
-    case LIST_SORTTYPE_LASTUPDATED: {
+    case kListSortLastUpdated: {
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
@@ -165,7 +164,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // File size
-    case LIST_SORTTYPE_FILESIZE: {
+    case kListSortFileSize: {
       wstring item[2], unit[2];
       UINT64 size[2] = {1, 1};
       m_List->GetItemText(lParam1, m_List->GetSortColumn(), item[0]);
@@ -214,7 +213,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Title
-    case LIST_SORTTYPE_TITLE: {
+    case kListSortTitle: {
       auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
       auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
       if (pItem1 && pItem2) {
@@ -228,7 +227,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
     }
 
     // Text
-    case LIST_SORTTYPE_DEFAULT:
+    case kListSortDefault:
     default:
       WCHAR szItem1[MAX_PATH], szItem2[MAX_PATH];
       m_List->GetItemText(lParam1, m_List->GetSortColumn(), szItem1);
@@ -238,3 +237,5 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSo
 
   return return_value * m_List->GetSortOrder();
 }
+
+}  // namespace ui

@@ -33,6 +33,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 
@@ -557,19 +558,19 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   // Sort items
   switch (sort_by) {
     case SEASON_SORTBY_AIRINGDATE:
-      list_.Sort(0, -1, LIST_SORTTYPE_STARTDATE, ListViewCompareProc);
+      list_.Sort(0, -1, ui::kListSortStartDate, ui::ListViewCompareProc);
       break;
     case SEASON_SORTBY_EPISODES:
-      list_.Sort(0, -1, LIST_SORTTYPE_EPISODES, ListViewCompareProc);
+      list_.Sort(0, -1, ui::kListSortEpisodes, ui::ListViewCompareProc);
       break;
     case SEASON_SORTBY_POPULARITY:
-      list_.Sort(0, 1, LIST_SORTTYPE_POPULARITY, ListViewCompareProc);
+      list_.Sort(0, 1, ui::kListSortPopularity, ui::ListViewCompareProc);
       break;
     case SEASON_SORTBY_SCORE:
-      list_.Sort(0, -1, LIST_SORTTYPE_SCORE, ListViewCompareProc);
+      list_.Sort(0, -1, ui::kListSortScore, ui::ListViewCompareProc);
       break;
     case SEASON_SORTBY_TITLE:
-      list_.Sort(0, 1, LIST_SORTTYPE_TITLE, ListViewCompareProc);
+      list_.Sort(0, 1, ui::kListSortTitle, ui::ListViewCompareProc);
       break;
   }
 

@@ -31,6 +31,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/list.h"
 #include "ui/theme.h"
 
 #include "win/win_gdi.h"
@@ -179,15 +180,15 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         switch (lplv->iSubItem) {
           // Episode
           case 1:
-            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_NUMBER, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortNumber, ui::ListViewCompareProc);
             break;
           // File size
           case 3:
-            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_FILESIZE, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortFileSize, ui::ListViewCompareProc);
             break;
           // Other columns
           default:
-            list_.Sort(lplv->iSubItem, order, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortDefault, ui::ListViewCompareProc);
             break;
         }
         break;

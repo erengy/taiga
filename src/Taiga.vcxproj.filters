@@ -165,9 +165,6 @@
     <ClCompile Include="ui\dlg\dlg_update.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
-    <ClCompile Include="ui\list_sort.cpp">
-      <Filter>ui</Filter>
-    </ClCompile>
     <ClCompile Include="ui\menu.cpp">
       <Filter>ui</Filter>
     </ClCompile>
@@ -390,6 +387,9 @@
     </ClCompile>
     <ClCompile Include="library\metadata.cpp">
       <Filter>library</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\list.cpp">
+      <Filter>ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -677,6 +677,9 @@
     </ClInclude>
     <ClInclude Include="library\metadata.h">
       <Filter>library</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\list.h">
+      <Filter>ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

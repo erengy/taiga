@@ -21,20 +21,6 @@
 
 #include "std.h"
 
-// ListView sort types
-enum ListSortType {
-  LIST_SORTTYPE_DEFAULT,
-  LIST_SORTTYPE_EPISODES,
-  LIST_SORTTYPE_FILESIZE,
-  LIST_SORTTYPE_LASTUPDATED,
-  LIST_SORTTYPE_NUMBER,
-  LIST_SORTTYPE_POPULARITY,
-  LIST_SORTTYPE_PROGRESS,
-  LIST_SORTTYPE_SCORE,
-  LIST_SORTTYPE_STARTDATE,
-  LIST_SORTTYPE_TITLE
-};
-
 typedef unsigned __int64 QWORD, *LPQWORD;
 
 namespace anime {
@@ -77,9 +63,6 @@ int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = 
 int PopulateFolders(vector<wstring>& folder_list, wstring path);
 bool SaveToFile(LPCVOID data, DWORD length, const wstring& path, bool take_backup = false);
 wstring ToSizeString(QWORD qwSize);
-
-// list_sort.cpp
-int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 // script.cpp
 wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
