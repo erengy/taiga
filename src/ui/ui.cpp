@@ -222,8 +222,11 @@ void OnLibrarySearchTitle(const string_t& results) {
   Split(results, L",", split_vector);
 
   std::vector<int> ids;
-  foreach_(it, split_vector)
-    ids.push_back(ToInt(*it));
+  foreach_(it, split_vector) {
+    int id = ToInt(*it);
+    ids.push_back(id);
+    OnLibraryEntryChange(id);
+  }
 
   SearchDialog.ParseResults(ids);
 }
