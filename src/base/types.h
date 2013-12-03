@@ -46,4 +46,7 @@ typedef std::map<string_t, std::vector<string_t>> multidictionary_t;
 typedef win::http::Request HttpRequest;
 typedef win::http::Response HttpResponse;
 
+// 64-bit value
+typedef unsigned __int64 QWORD, *LPQWORD;
+
 #endif  // TAIGA_BASE_TYPES_H

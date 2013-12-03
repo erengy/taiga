@@ -20,8 +20,7 @@
 #define COMMON_H
 
 #include "std.h"
-
-typedef unsigned __int64 QWORD, *LPQWORD;
+#include "types.h"
 
 namespace anime {
 class Item;
