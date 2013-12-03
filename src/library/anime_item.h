@@ -43,7 +43,6 @@ class Item {
   int GetId() const;
   int GetType() const;
   int GetEpisodeCount() const;
-  int GetEpisodeCountWithEstimation() const;
   int GetAiringStatus(bool check_date = true) const;
   const wstring& GetTitle() const;
   const wstring& GetEnglishTitle(bool fallback = false) const;

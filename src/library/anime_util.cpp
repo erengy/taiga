@@ -77,7 +77,61 @@ void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) 
   date_end.day = days_in_months[date_end.month - 1];
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+
+int EstimateEpisodeCount(const Item& item) {
+  // If we already know the number, we don't need to estimate
+  if (item.GetEpisodeCount() > 0)
+    return item.GetEpisodeCount();
+
+  int number = 0;
+
+  // Estimate using user information
+  if (item.IsInList())
+    number = max(item.GetMyLastWatchedEpisode(),
+                 item.GetAvailableEpisodeCount());
+
+  // Estimate using airing dates of TV series
+  if (item.GetType() == kTv) {
+    Date date_start = item.GetDate(DATE_START);
+    if (IsValidDate(date_start)) {
+      Date date_end = item.GetDate(DATE_END);
+      // Use current date in Japan if ending date is unknown
+      if (!IsValidDate(date_end)) date_end = GetDateJapan();
+      // Assuming the series is aired weekly
+      number = max(number, (date_end - date_start) / 7);
+    }
+  }
+
+  // Given all TV series aired since 2000, most them have their episodes
+  // spanning one or two seasons. Following is a table of top ten values:
+  //
+  //   Episodes    Seasons    Percent
+  //   ------------------------------
+  //         12          1      23.6%
+  //         13          1      20.2%
+  //         26          2      15.4%
+  //         24          2       6.4%
+  //         25          2       5.0%
+  //         52          4       4.4%
+  //         51          4       3.1%
+  //         11          1       2.6%
+  //         50          4       2.3%
+  //         39          3       1.4%
+  //   ------------------------------
+  //   Total:                   84.6%
+  //
+  // With that in mind, we can normalize our output at several points.
+  if (number < 12) return 13;
+  if (number < 24) return 26;
+  if (number < 50) return 52;
+
+  // This is a series that has aired for more than a year, which means we cannot
+  // estimate for how long it is going to continue.
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 wstring TranslateDate(const Date& date) {
   if (!IsValidDate(date))

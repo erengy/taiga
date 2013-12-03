@@ -25,11 +25,15 @@ class Date;
 
 namespace anime {
 
+class Item;
+
 bool IsValidDate(const Date& date);
 bool IsValidDate(const wstring& date);
 bool IsValidEpisode(int episode, int watched, int total);
 Date ParseDateString(const wstring& str);
 void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end);
+
+int EstimateEpisodeCount(const Item& item);
 
 wstring TranslateDate(const Date& date);
 wstring TranslateDateForApi(const Date& date);
