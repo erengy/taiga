@@ -23,6 +23,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "base/common.h"
+#include "base/foreach.h"
 #include "media.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -636,15 +637,14 @@ void RecognitionEngine::UpdateCleanTitles(int anime_id) {
 
   // Synonyms
   if (!anime_item->GetUserSynonyms().empty()) {
-    for (auto it = anime_item->GetUserSynonyms().begin();
-         it != anime_item->GetUserSynonyms().end(); ++it) {
+    foreach_(it, anime_item->GetUserSynonyms()) {
       clean_titles[anime_id].push_back(*it);
       CleanTitle(clean_titles[anime_id].back());
     }
   }
   if (!anime_item->GetSynonyms().empty()) {
-    for (auto it = anime_item->GetSynonyms().begin();
-         it != anime_item->GetSynonyms().end(); ++it) {
+    auto synonyms = anime_item->GetSynonyms();
+    foreach_(it, synonyms) {
       clean_titles[anime_id].push_back(*it);
       CleanTitle(clean_titles[anime_id].back());
     }

@@ -688,8 +688,8 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 
   int eps_aired = anime_item.GetLastAiredEpisodeNumber(true);
   int eps_watched = anime_item.GetMyLastWatchedEpisode(true);
-  int eps_estimate = anime_item.GetEpisodeCount(true);
-  int eps_total = anime_item.GetEpisodeCount(false);
+  int eps_estimate = anime_item.GetEpisodeCountWithEstimation();
+  int eps_total = anime_item.GetEpisodeCount();
 
   if (eps_watched > eps_aired) eps_aired = -1;
   if (eps_watched == 0) eps_watched = -1;

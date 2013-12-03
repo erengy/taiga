@@ -22,6 +22,7 @@
 #include "base/std.h"
 
 #include "anime.h"
+#include "metadata.h"
 
 namespace anime {
 class Database;
@@ -41,17 +42,17 @@ class Item {
   // Accessors for series information
   int GetId() const;
   int GetType() const;
-  int GetEpisodeCount(bool estimation = false) const;
+  int GetEpisodeCount() const;
+  int GetEpisodeCountWithEstimation() const;
   int GetAiringStatus(bool check_date = true) const;
   const wstring& GetTitle() const;
   const wstring& GetEnglishTitle(bool fallback = false) const;
-  const vector<wstring>& GetSynonyms() const;
+  vector<wstring> GetSynonyms() const;
   const Date& GetDate(DateType type) const;
   const wstring& GetImageUrl() const;
-  const wstring& GetGenres() const;
+  const vector<wstring>& GetGenres() const;
   const wstring& GetPopularity() const;
-  const wstring& GetProducers() const;
-  const wstring& GetRank() const;
+  const vector<wstring>& GetProducers() const;
   const wstring& GetScore() const;
   const wstring& GetSynopsis() const;
 
@@ -78,9 +79,10 @@ class Item {
   void SetDate(DateType type, const Date& date);
   void SetImageUrl(const wstring& url);
   void SetGenres(const wstring& genres);
+  void SetGenres(const vector<wstring>& genres);
   void SetPopularity(const wstring& popularity);
   void SetProducers(const wstring& producers);
-  void SetRank(const wstring& rank);
+  void SetProducers(const vector<wstring>& producers);
   void SetScore(const wstring& score);
   void SetSynopsis(const wstring& synopsis);
   
@@ -164,7 +166,7 @@ class Item {
   EventItem* SearchHistory(int search_mode) const;
 
   // Series information, stored in db\anime.xml
-  SeriesInformation series_info_;
+  library::Metadata metadata_;
 
   // User information, stored in user\<username>\anime.xml - some items are not
   // in user's list, thus this member is not valid for every item.

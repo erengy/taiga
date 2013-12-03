@@ -25,6 +25,7 @@
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "base/common.h"
+#include "base/foreach.h"
 #include "base/gfx.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -383,8 +384,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       text += L" (" + anime::TranslateStatus(anime_item->GetAiringStatus()) + L")";
       DRAWLINE(text);
       DRAWLINE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
-      DRAWLINE(anime_item->GetGenres().empty() ? L"?" : anime_item->GetGenres());
-      DRAWLINE(anime_item->GetProducers().empty() ? L"?" : anime_item->GetProducers());
+      DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
+      DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
       DRAWLINE(anime_item->GetScore().empty() ? L"0.00" : anime_item->GetScore());
       DRAWLINE(anime_item->GetPopularity().empty() ? L"#0" : anime_item->GetPopularity());
 
@@ -524,9 +525,11 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   for (auto i = SeasonDatabase.items.begin(); i != SeasonDatabase.items.end(); ++i) {
     auto anime_item = AnimeDatabase.FindItem(*i);
     bool passed_filters = true;
-    for (auto j = filters.begin(); j != filters.end(); ++j) {
-      if (InStr(anime_item->GetGenres(), *j, 0, true) == -1 && 
-          InStr(anime_item->GetProducers(), *j, 0, true) == -1 && 
+    wstring genres = Join(anime_item->GetGenres(), L", ");
+    wstring producers = Join(anime_item->GetProducers(), L", ");
+    for (auto j = filters.begin(); passed_filters && j != filters.end(); ++j) {
+      if (InStr(genres, *j, 0, true) == -1 &&
+          InStr(producers, *j, 0, true) == -1 &&
           InStr(anime_item->GetTitle(), *j, 0, true) == -1) {
         passed_filters = false;
         break;

@@ -81,7 +81,6 @@ bool Database::LoadDatabase() {
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetScore(XmlReadStrValue(node, L"score"));
-    item.SetRank(XmlReadStrValue(node, L"rank"));
     item.SetPopularity(XmlReadStrValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.last_modified = _wtoi64(XmlReadStrValue(node, L"last_modified").c_str());
@@ -114,10 +113,9 @@ bool Database::SaveDatabase() {
     XML_WS(L"series_start", wstring(it->second.GetDate(DATE_START)), pugi::node_pcdata);
     XML_WS(L"series_end", wstring(it->second.GetDate(DATE_END)), pugi::node_pcdata);
     XML_WS(L"series_image", it->second.GetImageUrl(), pugi::node_pcdata);
-    XML_WS(L"genres", it->second.GetGenres(), pugi::node_pcdata);
-    XML_WS(L"producers", it->second.GetProducers(), pugi::node_pcdata);
+    XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
+    XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
     XML_WS(L"score", it->second.GetScore(), pugi::node_pcdata);
-    XML_WS(L"rank", it->second.GetRank(), pugi::node_pcdata);
     XML_WS(L"popularity", it->second.GetPopularity(), pugi::node_pcdata);
     XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
     XML_WS(L"last_modified", ToWstr(it->second.last_modified), pugi::node_pcdata);
@@ -206,7 +204,7 @@ void Database::UpdateItem(Item& new_item) {
     // Update only if a value is non-empty
     if (new_item.GetType() > 0)
       item->SetType(new_item.GetType());
-    if (new_item.GetEpisodeCount(false) > -1)
+    if (new_item.GetEpisodeCount() > -1)
       item->SetEpisodeCount(new_item.GetEpisodeCount());
     if (new_item.GetAiringStatus(false) > 0)
       item->SetAiringStatus(new_item.GetAiringStatus());
@@ -228,8 +226,6 @@ void Database::UpdateItem(Item& new_item) {
       item->SetPopularity(new_item.GetPopularity());
     if (!new_item.GetProducers().empty())
       item->SetProducers(new_item.GetProducers());
-    if (!new_item.GetRank().empty())
-      item->SetRank(new_item.GetRank());
     if (!new_item.GetScore().empty())
       item->SetScore(new_item.GetScore());
     if (!new_item.GetSynopsis().empty())
@@ -558,7 +554,8 @@ void SeasonDatabase::Review(bool hide_hentai) {
         if (anime_start < date_start || anime_start > date_end)
           invalid = true;
       // TODO: Filter by rating instead if made possible in API
-      if (hide_hentai && InStr(anime_item->GetGenres(), L"Hentai", 0, true) > -1)
+      wstring genres = Join(anime_item->GetGenres(), L", ");
+      if (hide_hentai && InStr(genres, L"Hentai", 0, true) > -1)
         invalid = true;
       if (invalid) {
         items.erase(items.begin() + i--);
@@ -573,7 +570,8 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
       continue;
     // TODO: Filter by rating instead if made possible in API
-    if (hide_hentai && InStr(it->second.GetGenres(), L"Hentai", 0, true) > -1)
+    wstring genres = Join(it->second.GetGenres(), L", ");
+    if (hide_hentai && InStr(genres, L"Hentai", 0, true) > -1)
       continue;
     // Airing date must be within the interval
     const Date& anime_start = it->second.GetDate(anime::DATE_START);

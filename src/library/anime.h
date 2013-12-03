@@ -81,31 +81,6 @@ enum MyStatus {
   kPlanToWatch
 };
 
-// All anime items have series information.
-class SeriesInformation {
- public:
-  SeriesInformation();
-  virtual ~SeriesInformation() {}
-
-  int id;
-  int type;
-  int episodes;
-  int status;
-  wstring title;
-  vector<wstring> synonyms;
-  Date date_start;
-  Date date_end;
-  wstring image_url;
-
-  wstring english_title;
-  wstring genres;
-  wstring popularity;
-  wstring producers;
-  wstring rank;
-  wstring score;
-  wstring synopsis;
-};
-
 // Invalid for anime items that are not in user's list.
 class MyInformation {
  public:

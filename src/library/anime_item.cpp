@@ -17,6 +17,7 @@
 */
 
 #include "base/std.h"
+#include "base/foreach.h"
 
 #include "anime_db.h"
 #include "anime_episode.h"
@@ -55,17 +56,24 @@ Item::~Item() {
 // =============================================================================
 
 int Item::GetId() const {
-  return series_info_.id;
+  return metadata_.uid;
 }
 
 int Item::GetType() const {
-  return series_info_.type;
+  return metadata_.type;
 }
 
-int Item::GetEpisodeCount(bool estimation) const {
+int Item::GetEpisodeCount() const {
+  if (metadata_.extent.size() > 0)
+    return metadata_.extent.at(0);
+
+  return -1;
+}
+
+int Item::GetEpisodeCountWithEstimation() const {
   // Generally we want an exact number without estimation
-  if (!estimation || series_info_.episodes > 0)
-    return series_info_.episodes;
+  if (GetEpisodeCount() > 0)
+    return GetEpisodeCount();
 
   int number = 0;
 
@@ -74,7 +82,7 @@ int Item::GetEpisodeCount(bool estimation) const {
     number = max(GetMyLastWatchedEpisode(), GetAvailableEpisodeCount());
 
   // Estimate using airing dates of TV series
-  if (series_info_.type == kTv) {
+  if (metadata_.type == kTv) {
     Date date_start = GetDate(DATE_START);
     if (IsValidDate(date_start)) {
       Date date_end = GetDate(DATE_END);
@@ -114,62 +122,77 @@ int Item::GetEpisodeCount(bool estimation) const {
 }
 
 int Item::GetAiringStatus(bool check_date) const {
-  if (!check_date) return series_info_.status;
+  if (!check_date) return metadata_.status;
   if (IsFinishedAiring()) return kFinishedAiring;
   if (IsAiredYet()) return kAiring;
   return kNotYetAired;
 }
 
 const wstring& Item::GetTitle() const {
-  return series_info_.title;
+  return metadata_.title;
 }
 
 const wstring& Item::GetEnglishTitle(bool fallback) const {
-  if (series_info_.english_title.empty() && fallback)
-    return series_info_.title;
-  return series_info_.english_title;
+  foreach_(it, metadata_.alternative)
+    if (it->type == library::kTitleTypeLangEnglish)
+      return it->value;
+
+  if (fallback)
+    return metadata_.title;
+
+  return EmptyString();
 }
 
-const vector<wstring>& Item::GetSynonyms() const {
-  return series_info_.synonyms;
+vector<wstring> Item::GetSynonyms() const {
+  vector<wstring> synonyms;
+
+  foreach_(it, metadata_.alternative)
+    if (it->type == library::kTitleTypeSynonym)
+      synonyms.push_back(it->value);
+  
+  return synonyms;
 }
 
 const Date& Item::GetDate(DateType type) const {
-  switch (type) {
-    case DATE_START:
-    default:
-      return series_info_.date_start;
-    case DATE_END:
-      return series_info_.date_end;
-  }
+  auto index = static_cast<size_t>(type);
+
+  if (metadata_.date.size() > index)
+    return metadata_.date.at(index);
+
+  return EmptyDate();
 }
 
 const wstring& Item::GetImageUrl() const {
-  return series_info_.image_url;
+  if (metadata_.resource.size() > 0)
+    return metadata_.resource.at(0);
+
+  return EmptyString();
 }
 
-const wstring& Item::GetGenres() const {
-  return series_info_.genres;
+const vector<wstring>& Item::GetGenres() const {
+  return metadata_.subject;
 }
 
 const wstring& Item::GetPopularity() const {
-  return series_info_.popularity;
+  if (metadata_.community.size() > 1)
+    return metadata_.community.at(1);
+
+  return EmptyString();
 }
 
-const wstring& Item::GetProducers() const {
-  return series_info_.producers;
-}
-
-const wstring& Item::GetRank() const {
-  return series_info_.rank;
+const vector<wstring>& Item::GetProducers() const {
+  return metadata_.creator;
 }
 
 const wstring& Item::GetScore() const {
-  return series_info_.score;
+  if (metadata_.community.size() > 0)
+    return metadata_.community.at(0);
+
+  return EmptyString();
 }
 
 const wstring& Item::GetSynopsis() const {
-  return series_info_.synopsis;
+  return metadata_.description;
 }
 
 // =============================================================================
@@ -242,15 +265,18 @@ const wstring Item::GetMyTags(bool check_events) const {
 // =============================================================================
 
 void Item::SetId(int anime_id) {
-  series_info_.id = anime_id;
+  metadata_.uid = anime_id;
 }
 
 void Item::SetType(int type) {
-  series_info_.type = type;
+  metadata_.type = type;
 }
 
 void Item::SetEpisodeCount(int number) {
-  series_info_.episodes = number;
+  if (metadata_.extent.size() < 1)
+    metadata_.extent.resize(1);
+
+  metadata_.extent.at(0) = number;
 
   if (number >= 0)
     if (static_cast<size_t>(number) != local_info_.available_episodes.size())
@@ -258,65 +284,105 @@ void Item::SetEpisodeCount(int number) {
 }
 
 void Item::SetAiringStatus(int status) {
-  series_info_.status = status;
+  metadata_.status = status;
 }
 
 void Item::SetTitle(const wstring& title) {
-  series_info_.title = title;
+  metadata_.title = title;
 }
 
 void Item::SetEnglishTitle(const wstring& title) {
-  series_info_.english_title = title;
+  foreach_(it, metadata_.alternative) {
+    if (it->type == library::kTitleTypeLangEnglish) {
+      it->value = title;
+      return;
+    }
+  }
+
+  library::Title new_title;
+  new_title.type = library::kTitleTypeLangEnglish;
+  new_title.value = title;
+  metadata_.alternative.push_back(new_title);
 }
 
 void Item::SetSynonyms(const wstring& synonyms) {
   vector<wstring> temp;
   Split(synonyms, L"; ", temp);
+  RemoveEmptyStrings(temp);
   SetSynonyms(temp);
 }
 
 void Item::SetSynonyms(const vector<wstring>& synonyms) {
-  series_info_.synonyms = synonyms;
-  RemoveEmptyStrings(series_info_.synonyms);
+  std::vector<library::Title> alternative;
+
+  foreach_(it, metadata_.alternative)
+    if (it->type != library::kTitleTypeSynonym)
+      alternative.push_back(*it);
+
+  foreach_(it, synonyms) {
+    library::Title new_title;
+    new_title.type = library::kTitleTypeSynonym;
+    new_title.value = *it;
+    alternative.push_back(new_title);
+  }
+
+  metadata_.alternative = alternative;
 }
 
 void Item::SetDate(DateType type, const Date& date) {
-  switch (type) {
-    case DATE_START:
-      series_info_.date_start = date;
-      break;
-    case DATE_END:
-      series_info_.date_end = date;
-      break;
-  }
+  auto index = static_cast<size_t>(type);
+
+  if (metadata_.date.size() <= index)
+    metadata_.date.resize(index + 1);
+
+  metadata_.date.at(type) = date;
 }
 
 void Item::SetImageUrl(const wstring& url) {
-  series_info_.image_url = url;
+  if (metadata_.resource.size() < 1)
+    metadata_.resource.resize(1);
+
+  metadata_.resource.at(0) = url;
 }
 
 void Item::SetGenres(const wstring& genres) {
-  series_info_.genres = genres;
+  vector<wstring> temp;
+  Split(genres, L", ", temp);
+  RemoveEmptyStrings(temp);
+  SetGenres(temp);
+}
+
+void Item::SetGenres(const vector<wstring>& genres) {
+  metadata_.subject = genres;
 }
 
 void Item::SetPopularity(const wstring& popularity) {
-  series_info_.popularity = popularity;
+  if (metadata_.community.size() < 2)
+    metadata_.community.resize(2);
+
+  metadata_.community.at(1) = popularity;
 }
 
 void Item::SetProducers(const wstring& producers) {
-  series_info_.producers = producers;
+  vector<wstring> temp;
+  Split(producers, L", ", temp);
+  RemoveEmptyStrings(temp);
+  SetProducers(temp);
 }
 
-void Item::SetRank(const wstring& rank) {
-  series_info_.rank = rank;
+void Item::SetProducers(const vector<wstring>& producers) {
+  metadata_.creator = producers;
 }
 
 void Item::SetScore(const wstring& score) {
-  series_info_.score = score;
+  if (metadata_.community.size() < 1)
+    metadata_.community.resize(1);
+
+  metadata_.community.at(0) = score;
 }
 
 void Item::SetSynopsis(const wstring& synopsis) {
-  series_info_.synopsis = synopsis;
+  metadata_.description = synopsis;
 }
 
 // =============================================================================
@@ -371,26 +437,26 @@ void Item::SetMyTags(const wstring& tags) {
 // =============================================================================
 
 bool Item::IsAiredYet() const {
-  if (series_info_.status != kNotYetAired) return true;
-  if (!IsValidDate(series_info_.date_start)) return false;
+  if (metadata_.status != kNotYetAired) return true;
+  if (!IsValidDate(GetDate(DATE_START))) return false;
   
   Date date_japan = GetDateJapan();
-  Date date_start = series_info_.date_start;
+  Date date_start = GetDate(DATE_START);
   
   // Assume the worst case
-  if (!series_info_.date_start.month)
+  if (!date_start.month)
     date_start.month = 12;
-  if (!series_info_.date_start.day)
+  if (!date_start.day)
     date_start.day = 31;
   
   return date_japan >= date_start;
 }
 
 bool Item::IsFinishedAiring() const {
-  if (series_info_.status == kFinishedAiring) return true;
-  if (!IsValidDate(series_info_.date_end)) return false;
+  if (metadata_.status == kFinishedAiring) return true;
+  if (!IsValidDate(GetDate(DATE_END))) return false;
   if (!IsAiredYet()) return false;
-  return GetDateJapan() > series_info_.date_end;
+  return GetDateJapan() > GetDate(DATE_END);
 }
 
 // =============================================================================
@@ -728,7 +794,7 @@ void Item::Edit(const EventItem& item) {
 // =============================================================================
 
 EventItem* Item::SearchHistory(int search_mode) const {
-  return History.queue.FindItem(series_info_.id, search_mode);
+  return History.queue.FindItem(metadata_.uid, search_mode);
 }
 
 } // namespace anime

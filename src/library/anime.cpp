@@ -47,13 +47,6 @@ namespace anime {
 
 // =============================================================================
 
-SeriesInformation::SeriesInformation()
-    : id(ID_UNKNOWN), 
-      type(kUnknownType), 
-      episodes(-1), 
-      status(kUnknownStatus) {
-}
-
 MyInformation::MyInformation()
     : watched_episodes(0), 
       score(0), 

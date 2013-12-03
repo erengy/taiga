@@ -160,8 +160,8 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
          anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
          anime::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
          anime::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
-         ADD_INFOLINE(anime_item->GetGenres(), L"Unknown") + L"\n" +
-         ADD_INFOLINE(anime_item->GetProducers(), L"Unknown") + L"\n" +
+         (anime_item->GetGenres().empty() ? L"Unknown" : Join(anime_item->GetGenres(), L", ")) + L"\n" +
+         (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
          ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" +
          ADD_INFOLINE(anime_item->GetPopularity(), L"#0");
   #undef ADD_INFOLINE

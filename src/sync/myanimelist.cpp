@@ -292,8 +292,6 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
       L"class=\"hovertitle\">", L"</a>");
   string_t genres = InStr(http_response.body,
       L"Genres:</span> ", L"<br />");
-  string_t rank = InStr(http_response.body,
-      L"Ranked:</span> ", L"<br />");
   string_t score = InStr(http_response.body,
       L"Score:</span> ", L"<br />");
   string_t popularity = InStr(http_response.body,
@@ -304,13 +302,15 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   if (EndsWith(title, L"...") && title.length() > 3)
     title = title.substr(0, title.length() - 3);
 
+  std::vector<std::wstring> genres_vector;
+  Split(genres, L", ", genres_vector);
+
   StripHtmlTags(score);
 
   ::anime::Item anime_item;
   anime_item.SetId(ToInt(id));
 //anime_item.SetTitle(title);  // unsafe, may be truncated
-  anime_item.SetGenres(genres);
-  anime_item.SetRank(rank);
+  anime_item.SetGenres(genres_vector);
   anime_item.SetPopularity(popularity);
   anime_item.SetScore(score);
   anime_item.last_modified = time(nullptr);  // current time

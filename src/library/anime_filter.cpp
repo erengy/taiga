@@ -51,13 +51,15 @@ bool Filters::CheckItem(Item& item) {
   vector<wstring> words;
   Split(text, L" ", words);
   RemoveEmptyStrings(words);
+  wstring genres = Join(item.GetGenres(), L", ");
+  auto synonyms = item.GetSynonyms();
   for (auto it = words.begin(); it != words.end(); ++it) {
     if (InStr(item.GetTitle(), *it, 0, true) == -1 && 
-        InStr(item.GetGenres(), *it, 0, true) == -1 && 
+        InStr(genres, *it, 0, true) == -1 && 
         InStr(item.GetMyTags(), *it, 0, true) == -1) {
       bool found = false;
-      for (auto synonym = item.GetSynonyms().begin(); 
-           !found && synonym != item.GetSynonyms().end(); ++synonym)
+      for (auto synonym = synonyms.begin(); 
+           !found && synonym != synonyms.end(); ++synonym)
         if (InStr(*synonym, *it, 0, true) > -1) found = true;
       if (item.IsInList())
         for (auto synonym = item.GetUserSynonyms().begin(); 

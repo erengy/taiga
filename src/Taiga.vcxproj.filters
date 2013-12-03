@@ -388,6 +388,9 @@
     <ClCompile Include="library\anime_util.cpp">
       <Filter>library</Filter>
     </ClCompile>
+    <ClCompile Include="library\metadata.cpp">
+      <Filter>library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -670,6 +673,9 @@
       <Filter>sync\herro</Filter>
     </ClInclude>
     <ClInclude Include="library\anime_util.h">
+      <Filter>library</Filter>
+    </ClInclude>
+    <ClInclude Include="library\metadata.h">
       <Filter>library</Filter>
     </ClInclude>
   </ItemGroup>
