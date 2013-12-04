@@ -20,47 +20,27 @@
 #define COMMON_H
 
 #include "std.h"
-#include "types.h"
 
 namespace anime {
 class Item;
 }
 
-// action.cpp
+wstring CalculateCRC(const wstring& file);
+
 void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 
-// common.cpp
-wstring CalculateCRC(const wstring& file);
+wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
+
 int GetEpisodeHigh(const wstring& episode_number);
 int GetEpisodeLow(const wstring& episode_number);
 void SplitEpisodeNumbers(const wstring& input, vector<int>& output);
 wstring JoinEpisodeNumbers(const vector<int>& input);
 int TranslateResolution(const wstring& str, bool return_validity = false);
-int StatusToIcon(int status);
-wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
-void SetSharedCursor(LPCWSTR name);
-unsigned long GetFileAge(const wstring& path);
-QWORD GetFileSize(const wstring& path);
-QWORD GetFolderSize(const wstring& path, bool recursive);
-bool Execute(const wstring& path, const wstring& parameters = L"");
-BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");
-void ExecuteLink(const wstring& link);
-wstring ExpandEnvironmentStrings(const wstring& path);
-wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter = NULL);
-BOOL BrowseForFolder(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output);
-bool CreateFolder(const wstring& path);
-int DeleteFolder(wstring path);
-bool FileExists(const wstring& file);
-bool FolderExists(const wstring& folder);
-bool PathExists(const wstring& path);
-void ValidateFileName(wstring& path);
-wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value);
-int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = L"", bool recursive = false, bool trim_extension = false);
-int PopulateFolders(vector<wstring>& folder_list, wstring path);
-bool SaveToFile(LPCVOID data, DWORD length, const wstring& path, bool take_backup = false);
-wstring ToSizeString(QWORD qwSize);
 
-// search.cpp
+void SetSharedCursor(LPCWSTR name);
+
+int StatusToIcon(int status);
+
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent);
 wstring SearchFileFolder(anime::Item& anime_item, const wstring& root, int episode_number, bool search_folder);
 

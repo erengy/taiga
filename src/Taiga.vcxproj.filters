@@ -391,6 +391,9 @@
     <ClCompile Include="ui\list.cpp">
       <Filter>ui</Filter>
     </ClCompile>
+    <ClCompile Include="base\file.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -683,6 +686,9 @@
     </ClInclude>
     <ClInclude Include="taiga\script.h">
       <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="base\file.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

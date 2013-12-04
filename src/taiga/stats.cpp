@@ -22,6 +22,7 @@
 
 #include "library/anime_db.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "taiga.h"

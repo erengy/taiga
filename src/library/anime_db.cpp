@@ -25,6 +25,7 @@
 #include "history.h"
 
 #include "base/common.h"
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "sync/sync.h"

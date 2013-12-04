@@ -23,6 +23,7 @@
 
 #include "library/anime.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "base/process.h"
 #include "recognition.h"
 #include "taiga/settings.h"

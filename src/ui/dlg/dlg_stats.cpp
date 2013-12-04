@@ -22,6 +22,7 @@
 
 #include "library/anime_db.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "base/gfx.h"
 #include "taiga/resource.h"
 #include "taiga/stats.h"

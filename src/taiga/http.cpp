@@ -22,6 +22,7 @@
 #include "library/anime_db.h"
 #include "taiga/announce.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "track/feed.h"
 #include "library/history.h"
 #include "base/logger.h"

@@ -25,6 +25,7 @@
 #include "anime_util.h"
 
 #include "base/common.h"
+#include "base/file.h"
 #include "history.h"
 #include "base/logger.h"
 #include "taiga/settings.h"

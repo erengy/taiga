@@ -25,6 +25,7 @@
 #include "taiga/announce.h"
 #include "sync/sync.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "track/feed.h"
 #include "base/foreach.h"
 #include "library/history.h"

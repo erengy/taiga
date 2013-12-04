@@ -22,6 +22,7 @@
 #include "update.h"
 
 #include "base/common.h"
+#include "base/file.h"
 #include "base/foreach.h"
 #include "settings.h"
 #include "base/string.h"

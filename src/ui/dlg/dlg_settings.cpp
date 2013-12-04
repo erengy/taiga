@@ -29,6 +29,7 @@
 #include "library/anime_filter.h"
 #include "taiga/announce.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "taiga/debug.h"
 #include "library/history.h"
 #include "taiga/http.h"

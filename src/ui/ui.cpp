@@ -19,6 +19,7 @@
 #include "ui.h"
 #include "menu.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "base/types.h"

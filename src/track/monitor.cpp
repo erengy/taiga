@@ -23,6 +23,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "base/common.h"
+#include "base/file.h"
 #include "base/logger.h"
 #include "recognition.h"
 #include "taiga/settings.h"
