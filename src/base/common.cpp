@@ -19,35 +19,7 @@
 #include "common.h"
 #include "string.h"
 #include "library/anime.h"
-#include "third_party/zlib/zlib.h"
 #include "ui/theme.h"
-
-// =============================================================================
-
-wstring CalculateCRC(const wstring& file) {
-  BYTE buffer[0x10000];
-  DWORD dwBytesRead = 0;
-  
-  HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
-  if (hFile == INVALID_HANDLE_VALUE) return L"";
-
-  ULONG crc = crc32(0L, Z_NULL, 0);
-  BOOL bSuccess = ReadFile(hFile, buffer, sizeof(buffer), &dwBytesRead, NULL);
-  while (bSuccess && dwBytesRead) {
-    crc = crc32(crc, buffer, dwBytesRead);
-    bSuccess = ReadFile(hFile, buffer, sizeof(buffer), &dwBytesRead, NULL);
-  }
-
-  if (hFile != NULL) CloseHandle(hFile);
-
-  wchar_t val[16] = {0};
-  _ultow_s(crc, val, 16, 16);
-  wstring value = val;
-  if (value.length() < 8) {
-    value.insert(0, 8 - value.length(), '0');
-  }
-  return value;
-}
 
 // =============================================================================
 

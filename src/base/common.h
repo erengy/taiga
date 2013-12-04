@@ -25,8 +25,6 @@ namespace anime {
 class Item;
 }
 
-wstring CalculateCRC(const wstring& file);
-
 void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 
 wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
