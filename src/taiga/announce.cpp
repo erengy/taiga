@@ -24,6 +24,7 @@
 #include "library/anime_episode.h"
 #include "base/common.h"
 #include "base/dde.h"
+#include "base/encoding.h"
 #include "taiga/http.h"
 #include "base/logger.h"
 #include "taiga/settings.h"

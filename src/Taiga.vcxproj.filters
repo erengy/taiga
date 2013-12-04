@@ -397,6 +397,9 @@
     <ClCompile Include="base\crc.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="base\encoding.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -694,6 +697,9 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\crc.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\encoding.h">
       <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>

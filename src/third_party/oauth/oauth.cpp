@@ -25,9 +25,10 @@
 #include <list>
 #include <vector>
 
-#include "third_party/base64/base64.h"
 #include "oauth.h"
+#include "base/encoding.h"
 #include "base/string.h"
+#include "third_party/base64/base64.h"
 
 #define SIZEOF(x) (sizeof(x)/sizeof(*x))
 

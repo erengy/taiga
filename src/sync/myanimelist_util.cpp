@@ -18,6 +18,7 @@
 
 #include "myanimelist_util.h"
 
+#include "base/encoding.h"
 #include "base/file.h"
 #include "base/string.h"
 #include "base/time.h"

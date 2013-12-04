@@ -18,44 +18,11 @@
 
 #include "encryption.h"
 #include "string.h"
-#include "third_party/base64/base64.h"
 
 #define MIN_LENGHT 16
 #define SIMPLE_KEY L"Tenori Taiga"
 
 using std::wstring;
-
-////////////////////////////////////////////////////////////////////////////////
-
-wstring Base64Decode(const wstring& str, bool for_filename) {
-  if (str.empty()) return L"";
-  Base64Coder coder;
-  string buff = ToANSI(str);
-  coder.Decode((BYTE*)buff.c_str(), buff.length());
-  if (for_filename) {
-    wstring msg = ToUTF8(coder.DecodedMessage());
-    ReplaceChar(msg, '-', '/');
-    return msg;
-  } else {
-    return ToUTF8(coder.DecodedMessage());
-  }
-}
-
-wstring Base64Encode(const wstring& str, bool for_filename) {
-  if (str.empty()) return L"";
-  Base64Coder coder;
-  string buff = ToANSI(str);
-  coder.Encode((BYTE*)buff.c_str(), buff.length());
-  if (for_filename) {
-    wstring msg = ToUTF8(coder.EncodedMessage());
-    ReplaceChar(msg, '/', '-');
-    return msg;
-  } else {
-    return ToUTF8(coder.EncodedMessage());
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 wstring XOR(wstring str, wstring key) {
   for (unsigned int i = 0; i < str.length(); i++) {

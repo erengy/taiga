@@ -22,6 +22,7 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "base/common.h"
+#include "base/encoding.h"
 #include "settings.h"
 #include "base/string.h"
 #include "taiga.h"

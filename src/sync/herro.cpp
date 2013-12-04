@@ -19,7 +19,7 @@
 #include "herro.h"
 #include "herro_types.h"
 
-#include "base/encryption.h"
+#include "base/encoding.h"
 
 namespace sync {
 namespace herro {

@@ -94,6 +94,7 @@
     <ClCompile Include="base\common.cpp" />
     <ClCompile Include="base\crc.cpp" />
     <ClCompile Include="base\dde.cpp" />
+    <ClCompile Include="base\encoding.cpp" />
     <ClCompile Include="base\encryption.cpp" />
     <ClCompile Include="base\file.cpp" />
     <ClCompile Include="base\gfx.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="base\common.h" />
     <ClInclude Include="base\crc.h" />
     <ClInclude Include="base\dde.h" />
+    <ClInclude Include="base\encoding.h" />
     <ClInclude Include="base\encryption.h" />
     <ClInclude Include="base\file.h" />
     <ClInclude Include="base\foreach.h" />

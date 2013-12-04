@@ -19,7 +19,7 @@
 #include "myanimelist.h"
 #include "myanimelist_util.h"
 
-#include "base/encryption.h"
+#include "base/encoding.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "base/xml.h"

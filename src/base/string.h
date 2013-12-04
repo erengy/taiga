@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,12 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef STRING_H
-#define STRING_H
+#ifndef TAIGA_BASE_STRING_H
+#define TAIGA_BASE_STRING_H
 
 #include "std.h"
-
-// =============================================================================
 
 void AddTrailingSlash(wstring& str);
 wstring AddTrailingSlash(const wstring& str);
@@ -30,9 +28,7 @@ wstring CharLeft(const wstring& str, int length);
 wstring CharRight(const wstring& str, int length);
 bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list);
 int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensitive = true, size_t max_count = MAX_PATH);
-void DecodeHtmlEntities(wstring& str);
 const wstring& EmptyString();
-wstring EncodeUrl(const wstring& str, bool encode_unreserved = false);
 bool EndsWith(const wstring& str, const wstring& search);
 size_t LongestCommonSubsequenceLength(const wstring& str1, const wstring& str2);
 size_t LongestCommonSubstringLength(const wstring& str1, const wstring& str2);
@@ -93,4 +89,4 @@ void TrimLeft(wstring& str, const wchar_t trim_chars[] = L" ");
 void TrimRight(wstring& str, const wchar_t trim_chars[] = L" ");
 bool ValidateFileExtension(const wstring& extension, unsigned int max_length = 0);
 
-#endif // STRING_H
+#endif  // TAIGA_BASE_STRING_H
