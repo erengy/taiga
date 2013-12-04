@@ -43,7 +43,7 @@ public:
 
 class FeedItem : public GenericFeedItem {
 public:
-  FeedItem() : state(FEEDITEM_BLANK) {}
+  FeedItem() : index(-1), state(FEEDITEM_BLANK) {}
   virtual ~FeedItem() {};
 
   int index;
@@ -105,7 +105,6 @@ public:
 
 public:
   int category, download_index, ticker;
-  wstring title, link;
 };
 
 // =============================================================================

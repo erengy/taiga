@@ -42,7 +42,7 @@
 // =============================================================================
 
 SettingsPage::SettingsPage()
-    : parent(nullptr) {
+    : index(-1), parent(nullptr) {
 }
 
 void SettingsPage::Create() {

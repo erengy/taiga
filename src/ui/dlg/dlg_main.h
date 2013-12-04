@@ -86,7 +86,7 @@ public:
 
   class Navigation {
   public:
-    Navigation() : current_page_(-1), index_(-1) {}
+    Navigation() : current_page_(-1), index_(-1), parent(nullptr) {}
     int GetCurrentPage();
     void SetCurrentPage(int page, bool reorder = true);
     void GoBack();
@@ -143,7 +143,7 @@ public:
   // Search bar
   class SearchBar {
   public:
-    SearchBar() : mode(SEARCH_MODE_NONE) {}
+    SearchBar() : mode(SEARCH_MODE_NONE), parent(nullptr) {}
     int mode;
     MainDialog* parent;
     anime::Filters filters;

@@ -28,6 +28,14 @@ ListView::ListView() {
   m_iSortType = 0;
 }
 
+ListView::ListView(HWND hWnd) {
+  m_iSortColumn = -1;
+  m_iSortOrder = 1;
+  m_iSortType = 0;
+
+  SetWindowHandle(hWnd);
+}
+
 // =============================================================================
 
 void ListView::PreCreate(CREATESTRUCT &cs) {

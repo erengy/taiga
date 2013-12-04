@@ -322,7 +322,7 @@ void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 /* ListView control */
 
 AnimeListDialog::ListView::ListView()
-    : dragging(false), hot_item(-1) {
+    : dragging(false), hot_item(-1), parent(nullptr) {
   button_visible[0] = false;
   button_visible[1] = false;
   button_visible[2] = false;

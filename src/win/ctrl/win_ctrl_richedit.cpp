@@ -26,6 +26,11 @@ RichEdit::RichEdit() {
   m_hInstRichEdit = ::LoadLibrary(L"riched20.dll");
 }
 
+RichEdit::RichEdit(HWND hWnd) {
+  m_hInstRichEdit = ::LoadLibrary(L"riched20.dll");
+  SetWindowHandle(hWnd);
+}
+
 RichEdit::~RichEdit() {
   if (m_hInstRichEdit) {
     ::FreeLibrary(m_hInstRichEdit);

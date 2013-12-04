@@ -44,8 +44,9 @@ class SeasonDialog SeasonDialog;
 // =============================================================================
 
 SeasonDialog::SeasonDialog()
-    : group_by(SEASON_GROUPBY_TYPE), 
-      sort_by(SEASON_SORTBY_TITLE) {
+    : group_by(SEASON_GROUPBY_TYPE),
+      sort_by(SEASON_SORTBY_TITLE),
+      view_as(SEASON_VIEWAS_TILES) {
 }
 
 BOOL SeasonDialog::OnInitDialog() {

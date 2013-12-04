@@ -61,7 +61,6 @@ INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
   switch (uMsg) {
     case WM_CTLCOLORSTATIC: {
       return ::GetSysColor(COLOR_WINDOW);
-      break;
     }
   }
 

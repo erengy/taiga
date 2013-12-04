@@ -118,7 +118,7 @@ private:
 class ListView : public Window {
 public:
   ListView();
-  ListView(HWND hWnd) { SetWindowHandle(hWnd); }
+  ListView(HWND hWnd);
   virtual ~ListView() {}
   
   HIMAGELIST CreateDragImage(int iItem, LPPOINT lpptUpLeft);
@@ -222,7 +222,7 @@ protected:
 class RichEdit : public Window {
 public:
   RichEdit();
-  RichEdit(HWND hWnd) { SetWindowHandle(hWnd); }
+  RichEdit(HWND hWnd);
   virtual ~RichEdit();
 
   void    GetSel(CHARRANGE* cr);

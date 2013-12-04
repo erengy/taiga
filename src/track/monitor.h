@@ -48,7 +48,7 @@ public:
   
   class FolderChangeInfo {
   public:
-    FolderChangeInfo() : anime_id(0) {}
+    FolderChangeInfo() : action(0), anime_id(0) {}
     DWORD action;
     int anime_id;
     wstring file_name;

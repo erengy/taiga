@@ -545,10 +545,10 @@ void SeasonDatabase::Review(bool hide_hentai) {
 
   // Check for invalid items
   for (size_t i = 0; i < items.size(); i++) {
-    bool invalid = false;
     int anime_id = items.at(i);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
+      bool invalid = false;
       // Airing date must be within the interval
       const Date& anime_start = anime_item->GetDate(anime::DATE_START);
       if (IsValidDate(anime_start))

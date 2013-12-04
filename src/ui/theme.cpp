@@ -193,7 +193,7 @@ bool Theme::CreateFonts(HDC hdc) {
 // =============================================================================
 
 Theme::ListBackground::ListBackground()
-    : bitmap(nullptr) {
+    : bitmap(nullptr), flags(0), offset_x(0), offset_y(0) {
 }
 
 Theme::ListBackground::~ListBackground() {

@@ -40,7 +40,7 @@
 // =============================================================================
 
 PageBaseInfo::PageBaseInfo()
-    : anime_id_(anime::ID_UNKNOWN) {
+    : anime_id_(anime::ID_UNKNOWN), parent(nullptr) {
 }
 
 BOOL PageBaseInfo::OnInitDialog() {
