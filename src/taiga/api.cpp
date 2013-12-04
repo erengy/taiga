@@ -56,7 +56,8 @@ void Api::Announce(anime::Episode& episode) {
       continue;
     }
 
-    const char* format = ToANSI(ReplaceVariables(it->second, episode));
+    string str = WstrToStr(ReplaceVariables(it->second, episode));
+    const char* format = str.c_str();
     
     COPYDATASTRUCT cds;
     cds.dwData = 0;
@@ -118,7 +119,7 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
   if (uMsg == WM_COPYDATA) {
     auto cds = reinterpret_cast<COPYDATASTRUCT*>(lParam);
     string format = reinterpret_cast<char*>(cds->lpData);
-    TaigaApi.handles[hwnd_app] = ToUTF8(format);
+    TaigaApi.handles[hwnd_app] = StrToWstr(format);
     LOG(LevelDebug, L"New format for " + ToWstr(reinterpret_cast<int>(hwnd_app)) +
                     L": \"" + TaigaApi.handles[hwnd_app] + L"\"");
     return TRUE;

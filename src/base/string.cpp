@@ -412,30 +412,30 @@ size_t Tokenize(const wstring& str, const wstring& delimiters, vector<wstring>& 
 
 // =============================================================================
 
-/* ANSI <-> Unicode conversion */
+/* std::string <-> std::wstring conversion */
 
-const char* ToANSI(const wstring& str, UINT code_page) {
-  if (str.empty()) return "";
-  int length = WideCharToMultiByte(code_page, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
-  if (length > 0) {
-    char* output = new char[length + 1];
-    WideCharToMultiByte(code_page, 0, str.c_str(), -1, output, length, NULL, NULL);
-    return output;
-  } else {
-    return "";
+wstring StrToWstr(const string& str, UINT code_page) {
+  if (!str.empty()) {
+    int length = MultiByteToWideChar(code_page, 0, str.c_str(), -1, NULL, 0);
+    if (length > 0) {
+      vector<wchar_t> output(length);
+      MultiByteToWideChar(code_page, 0, str.c_str(), -1, &output[0], length);
+      return &output[0];
+    }
   }
+  return wstring();
 }
 
-wstring ToUTF8(const string& str, UINT code_page) {
-  if (str.empty()) return L"";
-  int length = MultiByteToWideChar(code_page, 0, str.c_str(), -1, NULL, 0);
-  if (length > 0) {
-    vector<wchar_t> output(length);
-    MultiByteToWideChar(code_page, 0, str.c_str(), -1, &output[0], length);
-    return &output[0];
-  } else {
-    return L"";
+string WstrToStr(const wstring& str, UINT code_page) {
+  if (!str.empty()) {
+    int length = WideCharToMultiByte(code_page, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
+    if (length > 0) {
+      vector<char> output(length);
+      WideCharToMultiByte(code_page, 0, str.c_str(), -1, &output[0], length, NULL, NULL);
+      return &output[0];
+    }
   }
+  return string();
 }
 
 // =============================================================================
@@ -636,7 +636,7 @@ void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output) {
   
   const char* lpData = static_cast<char*>(LockResource(hResHandle));
   string temp(lpData, dwSize);
-  output = ToUTF8(temp);
+  output = StrToWstr(temp);
 
   FreeResource(hResInfo);
 }

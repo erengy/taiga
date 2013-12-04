@@ -51,7 +51,7 @@ std::wstring CalculateCrcFromFile(const std::wstring& file) {
 }
 
 std::wstring CalculateCrcFromString(const std::wstring& str) {
-  std::string text = ToANSI(str);
+  std::string text = WstrToStr(str);
 
   ULONG crc = crc32(0L, Z_NULL, 0);
   crc = crc32(crc, (BYTE*)text.data(), text.size());

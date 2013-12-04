@@ -70,10 +70,9 @@ wstring Join(const vector<wstring>& join_vector, const wstring& separator);
 void Split(const wstring& str, const wstring& separator, std::vector<wstring>& split_vector);
 bool StartsWith(const wstring& str, const wstring& search);
 void StripHtmlTags(wstring& str);
+wstring StrToWstr(const string& str, UINT code_page = CP_UTF8);
 wstring SubStr(const wstring& str, const wstring& sub_begin, const wstring& sub_end);
 size_t Tokenize(const wstring& str, const wstring& delimiters, vector<wstring>& tokens);
-const char* ToANSI(const wstring& str, UINT code_page = CP_UTF8);
-wstring ToUTF8(const string& str, UINT code_page = CP_UTF8);
 void ToLower(wstring& str, bool use_locale = false);
 wstring ToLower_Copy(wstring str, bool use_locale = false);
 void ToUpper(wstring& str, bool use_locale = false);
@@ -88,5 +87,6 @@ void Trim(wstring& str, const wchar_t trim_chars[] = L" ", bool trim_left = true
 void TrimLeft(wstring& str, const wchar_t trim_chars[] = L" ");
 void TrimRight(wstring& str, const wchar_t trim_chars[] = L" ");
 bool ValidateFileExtension(const wstring& extension, unsigned int max_length = 0);
+string WstrToStr(const wstring& str, UINT code_page = CP_UTF8);
 
 #endif  // TAIGA_BASE_STRING_H

@@ -27,28 +27,28 @@
 wstring Base64Decode(const wstring& str, bool for_filename) {
   if (str.empty()) return L"";
   Base64Coder coder;
-  string buff = ToANSI(str);
+  string buff = WstrToStr(str);
   coder.Decode((BYTE*)buff.c_str(), buff.length());
   if (for_filename) {
-    wstring msg = ToUTF8(coder.DecodedMessage());
+    wstring msg = StrToWstr(coder.DecodedMessage());
     ReplaceChar(msg, '-', '/');
     return msg;
   } else {
-    return ToUTF8(coder.DecodedMessage());
+    return StrToWstr(coder.DecodedMessage());
   }
 }
 
 wstring Base64Encode(const wstring& str, bool for_filename) {
   if (str.empty()) return L"";
   Base64Coder coder;
-  string buff = ToANSI(str);
+  string buff = WstrToStr(str);
   coder.Encode((BYTE*)buff.c_str(), buff.length());
   if (for_filename) {
-    wstring msg = ToUTF8(coder.EncodedMessage());
+    wstring msg = StrToWstr(coder.EncodedMessage());
     ReplaceChar(msg, '/', '-');
     return msg;
   } else {
-    return ToUTF8(coder.EncodedMessage());
+    return StrToWstr(coder.EncodedMessage());
   }
 }
 
@@ -72,7 +72,7 @@ wstring EncodeUrl(const wstring& str, bool encode_unreserved) {
         output.append(&digits[(x >> 4) & 0x0F], 1); \
         output.append(&digits[x & 0x0F], 1);
       if (str[i] > 255) {
-        string buffer = ToANSI(wstring(&str[i], 1));
+        string buffer = WstrToStr(wstring(&str[i], 1));
         for (unsigned int j = 0; j < buffer.length(); j++) {
           PercentEncode(buffer[j]);
         }

@@ -47,10 +47,10 @@ void Logger::Log(int severity_level, const wstring& file, int line,
   if (severity_level <= severity_level_) {
     string output_text;
 
-    output_text += ToANSI(wstring(GetDate()) + L" " + GetTime() + L" ");
+    output_text += WstrToStr(wstring(GetDate()) + L" " + GetTime() + L" ");
     output_text += "[" + string(SeverityLevels[severity_level]) + "] ";
-    output_text += ToANSI(GetFileName(file) + L":" + ToWstr(line) + L" " + function + L" | ");
-    output_text += ToANSI(text + L"\r\n");
+    output_text += WstrToStr(GetFileName(file) + L":" + ToWstr(line) + L" " + function + L" | ");
+    output_text += WstrToStr(text + L"\r\n");
 
 #ifdef _DEBUG
     OutputDebugStringA(output_text.c_str());

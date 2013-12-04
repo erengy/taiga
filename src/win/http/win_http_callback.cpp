@@ -122,7 +122,7 @@ void Client::StatusCallback(HINTERNET hInternet,
             ::CloseHandle(hFile);
           }
         }
-        response_.body = ToUTF8(buffer_);
+        response_.body = StrToWstr(buffer_);
         if (!OnReadComplete()) {
           Cleanup();
         }

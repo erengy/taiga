@@ -119,7 +119,7 @@ BOOL AboutDialog::OnInitDialog() {
     L"- MyAnimeList club {\\field{\\*\\fldinst HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}{\\fldrslt http://myanimelist.net/clubs.php?cid=21400}}\\line "
     L"- IRC channel {\\field{\\*\\fldinst HYPERLINK \"irc://irc.rizon.net/taiga\"}{\\fldrslt irc://irc.rizon.net/taiga}}"
     L"}";
-  rich_edit_.SetTextEx(ToANSI(text));
+  rich_edit_.SetTextEx(WstrToStr(text));
 
   return TRUE;
 }

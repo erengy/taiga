@@ -254,7 +254,7 @@ wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
             ReadProcessMemory(hwnd_winamp, reinterpret_cast<LPCVOID>(base_address), 
               file_name, MAX_PATH, NULL);
             CloseHandle(hwnd_winamp);
-            return ToUTF8(file_name);
+            return StrToWstr(file_name);
           }
         }
       }
@@ -275,7 +275,7 @@ wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class
       cds.cbData = 4;
       SendMessage(hwnd, WM_COPYDATA, reinterpret_cast<WPARAM>(g_hMain), 
         reinterpret_cast<LPARAM>(&cds));
-      return ToUTF8(file_name);
+      return StrToWstr(file_name);
     }
   
   // JetAudio  

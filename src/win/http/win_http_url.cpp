@@ -79,7 +79,7 @@ std::wstring GetUrlEncodedString(const std::wstring& str,
       output.push_back(str[i]);
     } else {
       if (str[i] > 255) {
-        std::string buffer = ToANSI(std::wstring(&str[i], 1));
+        std::string buffer = WstrToStr(std::wstring(&str[i], 1));
         for (unsigned int j = 0; j < buffer.length(); j++) {
           PercentEncode(buffer[j]);
         }

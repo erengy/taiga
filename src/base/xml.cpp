@@ -32,7 +32,7 @@ std::wstring XmlGetNodeAsString(pugi::xml_node node) {
   xml_string_writer writer;
   node.print(writer);
 
-  return ToUTF8(writer.result);
+  return StrToWstr(writer.result);
 }
 
 int XmlReadIntValue(pugi::xml_node& node, const wchar_t* name) {

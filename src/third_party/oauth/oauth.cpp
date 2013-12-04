@@ -144,12 +144,12 @@ wstring COAuth::CreateNonce() {
 wstring COAuth::CreateSignature(const wstring& signature_base, const wstring& oauth_token_secret) {
   // Create a SHA-1 hash of signature
   wstring key = EncodeUrl(ConsumerSecret) + L"&" + EncodeUrl(oauth_token_secret);
-  string hash = Crypt_HMACSHA1(ToANSI(key), ToANSI(signature_base));
+  string hash = Crypt_HMACSHA1(WstrToStr(key), WstrToStr(signature_base));
 
   // Encode signature in Base64
   Base64Coder coder;
   coder.Encode((BYTE*)hash.c_str(), hash.size());
-  wstring signature = ToUTF8(coder.EncodedMessage());
+  wstring signature = StrToWstr(coder.EncodedMessage());
 
   // Return URL-encoded signature
   return EncodeUrl(signature);

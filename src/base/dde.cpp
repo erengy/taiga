@@ -46,7 +46,7 @@ BOOL DynamicDataExchange::ClientTransaction(const wstring& item, const wstring& 
     hData = ::DdeClientTransaction((LPBYTE)data.data(), (data.size() + 1) * sizeof(WCHAR), conversation_, 
       hszItem, CF_UNICODETEXT, wType, 3000, &dwResult);
   } else {
-    string item_ansi = ToANSI(item), data_ansi = ToANSI(data);
+    string item_ansi = WstrToStr(item), data_ansi = WstrToStr(data);
     if (wType != XTYP_EXECUTE) {
       hszItem = ::DdeCreateStringHandleA(instance_, item_ansi.c_str(), CP_WINANSI);
     }
@@ -57,7 +57,7 @@ BOOL DynamicDataExchange::ClientTransaction(const wstring& item, const wstring& 
   if (output) {
     char szResult[255];
     ::DdeGetData(hData, (unsigned char*)szResult, 255, 0);
-    output->assign(ToUTF8(szResult));
+    output->assign(StrToWstr(szResult));
   }
   return hData != 0;
 }
@@ -69,8 +69,8 @@ BOOL DynamicDataExchange::Connect(const wstring& service, const wstring& topic) 
       hszService = ::DdeCreateStringHandleW(instance_, service.c_str(), CP_WINUNICODE);
       hszTopic = ::DdeCreateStringHandleW(instance_, topic.c_str(), CP_WINUNICODE);
     } else {
-      hszService = ::DdeCreateStringHandleA(instance_, ToANSI(service), CP_WINANSI);
-      hszTopic = ::DdeCreateStringHandleA(instance_, ToANSI(topic), CP_WINANSI);
+      hszService = ::DdeCreateStringHandleA(instance_, WstrToStr(service).c_str(), CP_WINANSI);
+      hszTopic = ::DdeCreateStringHandleA(instance_, WstrToStr(topic).c_str(), CP_WINANSI);
     }
     conversation_ = ::DdeConnect(instance_, hszService, hszTopic, NULL);
     ::DdeFreeStringHandle(instance_, hszService);
@@ -107,7 +107,7 @@ BOOL DynamicDataExchange::NameService(const wstring& service, UINT afCmd) {
   if (is_unicode_) {
     hszService = ::DdeCreateStringHandleW(instance_, service.c_str(), CP_WINUNICODE);
   } else {
-    hszService = ::DdeCreateStringHandleA(instance_, ToANSI(service), CP_WINANSI);
+    hszService = ::DdeCreateStringHandleA(instance_, WstrToStr(service).c_str(), CP_WINANSI);
   }
   HDDEDATA result = ::DdeNameService(instance_, hszService, 0, afCmd);
   ::DdeFreeStringHandle(instance_, hszService);

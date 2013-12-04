@@ -310,7 +310,8 @@ BOOL Skype::Discover() {
 }
 
 BOOL Skype::SendCommand(const wstring& command) {
-  const char* buffer = ToANSI(command);
+  string str = WstrToStr(command);
+  const char* buffer = str.c_str();
 
   COPYDATASTRUCT cds;
   cds.dwData = 0;
@@ -363,7 +364,7 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
       return FALSE;
     
     auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
-    wstring command = ToUTF8(reinterpret_cast<LPCSTR>(pCDS->lpData));
+    wstring command = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
     LOG(LevelDebug, L"Received WM_COPYDATA: " + command);
 
     wstring profile_command = L"PROFILE RICH_MOOD_TEXT ";

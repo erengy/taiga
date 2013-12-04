@@ -130,7 +130,7 @@ BOOL Client::SendRequest() {
 
   // This buffer must remain available until the request handle is closed or the
   // call to WinHttpReceiveResponse has completed
-  optional_data_ = ToANSI(request_.body);
+  optional_data_ = WstrToStr(request_.body);
   LPVOID optional_data = optional_data_.empty() ?
       WINHTTP_NO_REQUEST_DATA : (LPVOID)optional_data_.c_str();
 
