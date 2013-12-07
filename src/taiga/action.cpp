@@ -22,6 +22,7 @@
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
 #include "library/anime_util.h"
+#include "library/discover.h"
 #include "taiga/announce.h"
 #include "sync/sync.h"
 #include "base/common.h"

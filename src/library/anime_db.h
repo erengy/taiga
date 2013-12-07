@@ -95,40 +95,10 @@ class ImageDatabase {
  private:
   std::map<int, Image> items_;
 };
-
-class SeasonDatabase {
- public:
-  SeasonDatabase();
-  virtual ~SeasonDatabase() {}
-
-  // Loads season data from db\season\<seasonname>.xml, returns false if no such
-  // file exists.
-  bool Load(wstring file);
-
-  // Checkes if a significant portion of season data is empty and requires 
-  // refreshing.
-  bool IsRefreshRequired();
-
-  // Improves season data by excluding invalid items (i.e. postpones series) and 
-  // adding missing ones from the anime database.
-  void Review(bool hide_hentai = true);
-
-  // Only IDs are stored here, actual info is kept in Database.
-  vector<int> items;
-  
-  // Season name (e.g. Spring 2012)
-  wstring name;
-
- private:
-  wstring file_;
-  wstring folder_;
-};
-
 } // namespace anime
 
 // Global objects
 extern anime::Database AnimeDatabase;
 extern anime::ImageDatabase ImageDatabase;
-extern anime::SeasonDatabase SeasonDatabase;
 
 #endif // ANIMEDB_H

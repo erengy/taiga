@@ -400,6 +400,9 @@
     <ClCompile Include="base\encoding.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="library\discover.cpp">
+      <Filter>library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -701,6 +704,9 @@
     </ClInclude>
     <ClInclude Include="base\encoding.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="library\discover.h">
+      <Filter>library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
