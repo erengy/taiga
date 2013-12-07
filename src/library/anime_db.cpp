@@ -287,24 +287,26 @@ bool Database::DeleteListItem(int anime_id) {
 }
 
 bool Database::LoadList() {
-  // Initialize
   ClearUserData();
-  if (Settings.Account.MAL.user.empty()) return false;
-  wstring file = Taiga.GetDataPath() + 
-    L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
-    MessageBox(NULL, L"Could not read anime list.", file.c_str(), MB_OK | MB_ICONERROR);
+
+  if (Settings.Account.MAL.user.empty())
+    return false;
+
+  xml_document document;
+  wstring file = Taiga.GetDataPath() + L"user\\" +
+                 Settings.Account.MAL.user + L"\\anime.xml";
+  xml_parse_result parse_result = document.load_file(file.c_str());
+
+  if (parse_result.status != pugi::status_ok &&
+      parse_result.status != pugi::status_file_not_found) {
+    MessageBox(nullptr, L"Could not read anime list.", file.c_str(),
+               MB_OK | MB_ICONERROR);
     return false;
   }
 
-  xml_node myanimelist = doc.child(L"myanimelist");
+  xml_node node_myanimelist = document.child(L"myanimelist");
 
-  // Read anime list
-  for (xml_node node = myanimelist.child(L"anime"); node; node = node.next_sibling(L"anime")) {
+  foreach_xmlnode_(node, node_myanimelist, L"anime") {
     Item anime_item;
     anime_item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
     anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
@@ -315,6 +317,7 @@ bool Database::LoadList() {
     anime_item.SetDate(DATE_START, XmlReadStrValue(node, L"series_start"));
     anime_item.SetDate(DATE_END, XmlReadStrValue(node, L"series_end"));
     anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
     anime_item.SetMyDate(DATE_START, XmlReadStrValue(node, L"my_start_date"));
@@ -325,6 +328,7 @@ bool Database::LoadList() {
     anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));
     anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"my_last_updated"));
     anime_item.SetMyTags(XmlReadStrValue(node, L"my_tags"));
+
     UpdateItem(anime_item);
   }
 
@@ -335,11 +339,9 @@ bool Database::SaveList() {
   if (items.empty())
     return false;
 
-  // Initialize
   xml_document document;
   xml_node myanimelist_node = document.append_child(L"myanimelist");
 
-  // Write items
   foreach_(it, items) {
     Item* item = &it->second;
     if (item->IsInList()) {
@@ -357,11 +359,8 @@ bool Database::SaveList() {
     }
   }
 
-  // Save
-  wstring folder = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\";
-  if (!PathExists(folder)) CreateFolder(folder);
-  wstring file = folder + L"anime.xml";
-  return document.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
+  wstring path = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+  return XmlWriteDocumentToFile(document, path);
 }
 
 // =============================================================================
