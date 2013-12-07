@@ -45,28 +45,25 @@ anime::ImageDatabase ImageDatabase;
 
 namespace anime {
 
-// =============================================================================
-
 Database::Database() {
   folder_ = Taiga.GetDataPath() + L"db\\";
   file_ = L"anime.xml";
 }
 
 bool Database::LoadDatabase() {
-  // Initialize
+  xml_document document;
   wstring path = folder_ + file_;
-  
-  // Load XML file
-  xml_document doc;
   unsigned int options = pugi::parse_default & ~pugi::parse_eol;
-  xml_parse_result result = doc.load_file(path.c_str(), options);
-  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
+  xml_parse_result parse_result = document.load_file(path.c_str(), options);
+
+  if (parse_result.status != pugi::status_ok &&
+      parse_result.status != pugi::status_file_not_found) {
     return false;
   }
 
-  // Read items
-  xml_node animedb_node = doc.child(L"animedb");
-  for (xml_node node = animedb_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
+  xml_node animedb_node = document.child(L"animedb");
+
+  foreach_xmlnode_(node, animedb_node, L"anime") {
     int id = XmlReadIntValue(node, L"series_animedb_id");
     Item& item = items[id]; // Creates the item if it doesn't exist
     item.SetId(id);
@@ -91,14 +88,13 @@ bool Database::LoadDatabase() {
 }
 
 bool Database::SaveDatabase() {
-  if (items.empty()) return false;
+  if (items.empty())
+    return false;
 
-  // Initialize
-  xml_document doc;
-  xml_node animedb_node = doc.append_child(L"animedb");
+  xml_document document;
+  xml_node animedb_node = document.append_child(L"animedb");
 
-  // Write items
-  for (auto it = items.begin(); it != items.end(); ++it) {
+  foreach_(it, items) {
     xml_node anime_node = animedb_node.append_child(L"anime");
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
@@ -124,16 +120,15 @@ bool Database::SaveDatabase() {
     #undef XML_WI
   }
 
-  // Save
-  CreateFolder(folder_);
-  wstring file = folder_ + file_;
-  return doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
+  wstring path = folder_ + file_;
+  return XmlWriteDocumentToFile(document, path);
 }
 
 Item* Database::FindItem(int anime_id) {
   if (anime_id > ID_UNKNOWN) {
     auto it = items.find(anime_id);
-    if (it != items.end()) return &it->second;
+    if (it != items.end())
+      return &it->second;
   }
 
   return nullptr;
@@ -143,24 +138,26 @@ Item* Database::FindSequel(int anime_id) {
   int sequel_id = ID_UNKNOWN;
 
   switch (anime_id) {
+    #define SEQUEL_ID(p, s) case p: sequel_id = s; break;
     // Gintama -> Gintama'
-    case 918: sequel_id = 9969; break;
+    SEQUEL_ID(918, 9969);
     // Tegami Bachi -> Tegami Bachi Reverse
-    case 6444: sequel_id = 8311; break;
+    SEQUEL_ID(6444, 8311);
     // Fate/Zero -> Fate/Zero 2nd Season
-    case 10087: sequel_id = 11741; break;
+    SEQUEL_ID(10087, 11741);
     // Towa no Qwon
-    case 10294: sequel_id = 10713; break;
-    case 10713: sequel_id = 10714; break;
-    case 10714: sequel_id = 10715; break;
-    case 10715: sequel_id = 10716; break;
-    case 10716: sequel_id = 10717; break;
+    SEQUEL_ID(10294, 10713);
+    SEQUEL_ID(10713, 10714);
+    SEQUEL_ID(10714, 10715);
+    SEQUEL_ID(10715, 10716);
+    SEQUEL_ID(10716, 10717);
+    #undef SEQUEL_ID
   }
 
   return FindItem(sequel_id);
 }
 
-int Database::GetItemCount(int status, bool check_events) {
+int Database::GetItemCount(int status, bool check_history) {
   int count = 0;
 
   // Get current count
@@ -168,12 +165,12 @@ int Database::GetItemCount(int status, bool check_events) {
     if (it->second.GetMyStatus(false) == status)
       count++;
 
-  // Search event queue for status changes
-  if (check_events) {
+  // Search queued items for status changes
+  if (check_history) {
     foreach_(it, History.queue.items) {
-      if (it->mode == taiga::kHttpServiceAddLibraryEntry)
-        continue;
       if (it->status) {
+        if (it->mode == taiga::kHttpServiceAddLibraryEntry)
+          continue;  // counted already
         if (status == *it->status) {
           count++;
         } else {
@@ -190,7 +187,7 @@ int Database::GetItemCount(int status, bool check_events) {
 
 void Database::UpdateItem(Item& new_item) {
   critical_section_.Enter();
-  
+
   Item* item = FindItem(new_item.GetId());
   if (!item) {
     // Add a new item

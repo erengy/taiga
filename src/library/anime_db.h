@@ -61,7 +61,7 @@ class Database {
   // Searches the database for an item with given ID, which has a sequel.
   Item* FindSequel(int anime_id);
   // Calculates the number of items that belong to the specified status.
-  int GetItemCount(int status, bool check_events = true);
+  int GetItemCount(int status, bool check_history = true);
   // Updates anime information, or adds a new item if no such anime exists.
   // New information may include both series and user information. Series
   // information is updated depending on its last_modified value.
