@@ -24,6 +24,7 @@
 #include "base/logger.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "taiga/path.h"
 #include "taiga/taiga.h"
 
 library::SeasonDatabase SeasonDatabase;
@@ -34,12 +35,12 @@ bool SeasonDatabase::Load(wstring file) {
   items.clear();
 
   xml_document document;
-  file = Taiga.GetDataPath() + L"db\\season\\" + file;
-  xml_parse_result parse_result = document.load_file(file.c_str());
+  wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + file;
+  xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok &&
       parse_result.status != pugi::status_file_not_found) {
-    MessageBox(nullptr, L"Could not read season data.", file.c_str(),
+    MessageBox(nullptr, L"Could not read season data.", path.c_str(),
                MB_OK | MB_ICONERROR);
     return false;
   }

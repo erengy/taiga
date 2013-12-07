@@ -27,6 +27,7 @@
 #include "taiga/http.h"
 #include "base/logger.h"
 #include "sync/sync.h"
+#include "taiga/path.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"
@@ -335,16 +336,18 @@ History::History()
 }
 
 bool History::Load() {
-  // Initialize
-  wstring file = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\history.xml";
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
+  items.clear();
+  queue.items.clear();
+
+  xml_document document;
+  wstring path = taiga::GetPath(taiga::kPathUserHistory);
+  xml_parse_result parse_result = document.load_file(path.c_str());
+
+  if (parse_result.status != pugi::status_ok)
+    return false;
 
   // Items
-  items.clear();
-  xml_node node_items = doc.child(L"history").child(L"items");
+  xml_node node_items = document.child(L"history").child(L"items");
   for (xml_node item = node_items.child(L"item"); item; item = item.next_sibling(L"item")) {
     EventItem event_item;
     event_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
@@ -353,8 +356,7 @@ bool History::Load() {
     items.push_back(event_item);
   }
   // Queue events
-  queue.items.clear();
-  xml_node node_queue = doc.child(L"history").child(L"queue");
+  xml_node node_queue = document.child(L"history").child(L"queue");
   for (xml_node item = node_queue.child(L"item"); item; item = item.next_sibling(L"item")) {
     EventItem event_item;
     event_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
@@ -376,16 +378,15 @@ bool History::Load() {
     queue.Add(event_item, false);
   }
 
-  return result.status == pugi::status_ok;
+  return true;
 }
 
 bool History::Save() {
-  // Initialize
-  wstring file = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\history.xml";
-  xml_document doc;
-  xml_node node_history = doc.append_child(L"history");
+  xml_document document;
+  wstring path = taiga::GetPath(taiga::kPathUserHistory);
+  xml_node node_history = document.append_child(L"history");
 
-  // Write event items
+  // Write items
   xml_node node_items = node_history.append_child(L"items");
   for (auto j = items.begin(); j != items.end(); ++j) {
     xml_node node_item = node_items.append_child(L"item");
@@ -393,7 +394,7 @@ bool History::Save() {
     node_item.append_attribute(L"episode") = *j->episode;
     node_item.append_attribute(L"time") = j->time.c_str();
   }
-  // Write event queue
+  // Write queue
   xml_node node_queue = node_history.append_child(L"queue");
   for (auto j = queue.items.begin(); j != queue.items.end(); ++j) {
     xml_node node_item = node_queue.append_child(L"item");
@@ -415,8 +416,7 @@ bool History::Save() {
     #undef APPEND_ATTRIBUTE_INT
   }
 
-  // Save file
-  return doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
+  return XmlWriteDocumentToFile(document, path);
 }
 
 // =============================================================================

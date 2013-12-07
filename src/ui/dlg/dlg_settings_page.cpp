@@ -36,6 +36,7 @@
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "base/string.h"
+#include "taiga/path.h"
 #include "taiga/taiga.h"
 #include "ui/theme.h"
 
@@ -135,7 +136,7 @@ BOOL SettingsPage::OnInitDialog() {
     // Application > Interface
     case PAGE_APP_INTERFACE: {
       vector<wstring> theme_list;
-      PopulateFolders(theme_list, Taiga.GetDataPath() + L"Theme\\");
+      PopulateFolders(theme_list, taiga::GetPath(taiga::kPathTheme));
       if (theme_list.empty()) {
         EnableDlgItem(IDC_COMBO_THEME, FALSE);
       } else {
@@ -429,12 +430,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             HistoryDialog.RefreshList();
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE2)) {
-            wstring path = Taiga.GetDataPath() + L"db\\image";
+            wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
             DeleteFolder(path);
             ImageDatabase.FreeMemory();
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE3)) {
-            wstring path = Taiga.GetDataPath() + L"feed";
+            wstring path = taiga::GetPath(taiga::kPathFeed);
             DeleteFolder(path);
           }
           parent->RefreshCache();
@@ -656,7 +657,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case IDC_LINK_THEMES: {
           wstring theme_name;
           GetDlgItemText(IDC_COMBO_THEME, theme_name);
-          wstring path = Taiga.GetDataPath() + L"theme\\" + theme_name;
+          wstring path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
           Execute(path);
           return TRUE;
         }

@@ -124,29 +124,13 @@ void Taiga::Uninitialize() {
 
 // =============================================================================
 
-wstring Taiga::GetDataPath() {
-  // Return current path in portable mode
-#ifdef PORTABLE
-  return AddTrailingSlash(GetPathOnly(GetModulePath())) + L"data\\";
-#endif
-  
-  // Return %AppData% folder
-  WCHAR buffer[MAX_PATH];
-  if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                NULL, SHGFP_TYPE_CURRENT, buffer))) {
-    return AddTrailingSlash(buffer) + APP_NAME + L"\\";
-  }
-
-  return L"";
-}
-
 void Taiga::LoadData() {
   MediaPlayers.Load();
 
   if (Settings.Load())
     Settings.HandleCompatibility();
 
-  UI.Load(Settings.Program.General.theme);
+  UI.Load();
   UI.LoadImages();
 
   AnimeDatabase.LoadDatabase();

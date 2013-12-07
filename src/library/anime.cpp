@@ -33,6 +33,7 @@
 #include "base/process.h"
 #include "taiga/settings.h"
 #include "base/string.h"
+#include "taiga/path.h"
 #include "taiga/script.h"
 #include "taiga/taiga.h"
 #include "ui/theme.h"
@@ -286,7 +287,7 @@ bool SetFansubFilter(int anime_id, const wstring& group_name) {
 }
 
 wstring GetImagePath(int anime_id) {
-  wstring path = Taiga.GetDataPath() + L"db\\image\\";
+  wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
   if (anime_id > 0) path += ToWstr(anime_id) + L".jpg";
   return path;
 }

@@ -108,7 +108,7 @@ public:
   ~Theme() {}
   
   bool CreateFonts(HDC hdc);
-  bool Load(const wstring& name);
+  bool Load();
   bool LoadImages();
 
 public:
@@ -150,7 +150,6 @@ public:
   } list_progress;
 
 private:
-  wstring file_, folder_;
   vector<wstring> icons16_, icons24_;
 };
 

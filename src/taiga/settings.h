@@ -153,9 +153,6 @@ public:
       } Filters;
     } Torrent;
   } RSS;
-
-private:
-  wstring file_, folder_;
 };
 
 extern Settings Settings;

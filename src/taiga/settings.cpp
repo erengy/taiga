@@ -43,6 +43,7 @@
 #include "track/monitor.h"
 #include "stats.h"
 #include "base/string.h"
+#include "path.h"
 #include "taiga.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -67,17 +68,12 @@ class Settings Settings;
 // =============================================================================
 
 bool Settings::Load() {
-  // Initialize
-  folder_ = Taiga.GetDataPath();
-  file_ = folder_ + L"settings.xml";
-  CreateDirectory(folder_.c_str(), NULL);
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file_.c_str());
+  xml_document document;
+  wstring path = taiga::GetPath(taiga::kPathSettings);
+  xml_parse_result result = document.load_file(path.c_str());
   
   // Read settings
-  xml_node settings = doc.child(L"settings");
+  xml_node settings = document.child(L"settings");
   
   // Meta
   xml_node meta = settings.child(L"meta");
@@ -147,7 +143,7 @@ bool Settings::Load() {
 
   // Anime items
   xml_node items = settings.child(L"anime").child(L"items");
-  for (xml_node item = items.child(L"item"); item; item = item.next_sibling(L"item")) {
+  foreach_xmlnode_(item, items, L"item") {
     int anime_id = item.attribute(L"id").as_int();
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (!anime_item) {
@@ -209,7 +205,7 @@ bool Settings::Load() {
   xml_node recognition = settings.child(L"recognition");
     // Media players
     xml_node mediaplayers = recognition.child(L"mediaplayers");
-      for (xml_node player = mediaplayers.child(L"player"); player; player = player.next_sibling(L"player")) {
+      foreach_xmlnode_(player, mediaplayers, L"player") {
         wstring name = player.attribute(L"name").value();
         bool enabled = player.attribute(L"enabled").as_bool();
         foreach_(it, MediaPlayers.items) {
@@ -252,16 +248,16 @@ bool Settings::Load() {
       RSS.Torrent.Filters.global_enabled = filter.attribute(L"enabled").as_int(TRUE);
       RSS.Torrent.Filters.archive_maxcount = filter.attribute(L"archive_maxcount").as_int(1000);
       Aggregator.filter_manager.filters.clear();
-      for (xml_node item = filter.child(L"item"); item; item = item.next_sibling(L"item")) {
+      foreach_xmlnode_(item, filter, L"item") {
         Aggregator.filter_manager.AddFilter(
           Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_ACTION, item.attribute(L"action").value()),
           Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_MATCH, item.attribute(L"match").value()),
           item.attribute(L"enabled").as_bool(),
           item.attribute(L"name").value());
-        for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
+        foreach_xmlnode_(anime, item, L"anime") {
           Aggregator.filter_manager.filters.back().anime_ids.push_back(anime.attribute(L"id").as_int());
         }
-        for (xml_node condition = item.child(L"condition"); condition; condition = condition.next_sibling(L"condition")) {
+        foreach_xmlnode_(condition, item, L"condition") {
           Aggregator.filter_manager.filters.back().AddCondition(
             Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_ELEMENT, condition.attribute(L"element").value()),
             Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_OPERATOR, condition.attribute(L"operator").value()),
@@ -284,8 +280,8 @@ bool Settings::Load() {
 
 bool Settings::Save() {
   // Initialize
-  xml_document doc;
-  xml_node settings = doc.append_child(L"settings");
+  xml_document document;
+  xml_node settings = document.append_child(L"settings");
 
   // Meta
   settings.append_child(pugi::node_comment).set_value(L" Meta ");
@@ -509,15 +505,15 @@ bool Settings::Save() {
   reg.CloseKey();
 
   // Save file
-  ::CreateDirectory(folder_.c_str(), NULL);
-  return doc.save_file(file_.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
+  wstring path = taiga::GetPath(taiga::kPathSettings);
+  return XmlWriteDocumentToFile(document, path);
 }
 
 // =============================================================================
 
 void Settings::ApplyChanges(const wstring& previous_user, const wstring& previous_theme) {
   if (Program.General.theme != previous_theme) {
-    UI.Load(Program.General.theme);
+    UI.Load();
     UI.LoadImages();
     MainDialog.rebar.RedrawWindow();
     UpdateAllMenus();
@@ -554,9 +550,10 @@ void Settings::HandleCompatibility() {
   if (Meta.Version.revision < 246) {
     LOG(LevelWarning, L"Converting torrent filters to the new format...");
 
-    xml_document doc;
-    xml_parse_result result = doc.load_file(file_.c_str());
-    xml_node settings = doc.child(L"settings");
+    xml_document document;
+    wstring path = taiga::GetPath(taiga::kPathSettings);
+    xml_parse_result parse_result = document.load_file(path.c_str());
+    xml_node settings = document.child(L"settings");
     xml_node rss = settings.child(L"rss");
     xml_node torrent = rss.child(L"torrent");
     xml_node filter = torrent.child(L"filter");
@@ -695,15 +692,16 @@ void Settings::HandleCompatibility() {
   // Load torrent archive
   if (Meta.Version.revision < 250) {
     Aggregator.file_archive.clear();
-    PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
+    PopulateFiles(Aggregator.file_archive, taiga::GetPath(taiga::kPathFeed), L"torrent", true, true);
   }
 }
 
 void Settings::RestoreDefaults() {
   // Take a backup
-  wstring backup = file_ + L".bak";
+  wstring file = taiga::GetPath(taiga::kPathSettings);
+  wstring backup = file + L".bak";
   DWORD flags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
-  MoveFileEx(file_.c_str(), backup.c_str(), flags);
+  MoveFileEx(file.c_str(), backup.c_str(), flags);
   
   // Reload settings
   wstring previous_user = Account.MAL.user;

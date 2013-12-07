@@ -22,6 +22,7 @@
 
 #include "base/gfx.h"
 #include "base/string.h"
+#include "taiga/path.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
 
@@ -36,21 +37,19 @@ Theme::Theme() {
   Menus.SetImageList(ImgList16.GetHandle());
 }
 
-bool Theme::Load(const wstring& name) {
-  // Initialize
-  folder_ = Taiga.GetDataPath() + L"theme\\" + name + L"\\";
-  file_ = folder_ + L"Theme.xml";
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file_.c_str());
-  if (result.status != pugi::status_ok) {
-    MessageBox(NULL, L"Could not read theme file.", file_.c_str(), MB_OK | MB_ICONERROR);
+bool Theme::Load() {
+  xml_document document;
+  wstring path = taiga::GetPath(taiga::kPathThemeCurrent);
+  xml_parse_result parse_result = document.load_file(path.c_str());
+
+  if (parse_result.status != pugi::status_ok) {
+    MessageBox(nullptr, L"Could not read theme file.", path.c_str(),
+               MB_OK | MB_ICONERROR);
     return false;
   }
   
   // Read theme
-  xml_node theme = doc.child(L"theme");
+  xml_node theme = document.child(L"theme");
   xml_node icons16 = theme.child(L"icons").child(L"set_16px");
   xml_node icons24 = theme.child(L"icons").child(L"set_24px");
   xml_node image = theme.child(L"list").child(L"background").child(L"image");
@@ -74,7 +73,7 @@ bool Theme::Load(const wstring& name) {
   list_background.offset_x = image.attribute(L"offset_x").as_int();
   list_background.offset_y = image.attribute(L"offset_y").as_int();
   if (!list_background.name.empty()) {
-    wstring path = folder_ + list_background.name + L".png";
+    wstring path = GetPathOnly(path) + list_background.name + L".png";
     Gdiplus::Bitmap bmp(path.c_str());
     bmp.GetHBITMAP(NULL, &list_background.bitmap);
   }
@@ -98,11 +97,11 @@ bool Theme::Load(const wstring& name) {
   Menus.Menu.clear();
   wstring menu_resource;
   ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
-  result = doc.load(menu_resource.data());
-  xml_node menus = doc.child(L"menus");
-  for (xml_node menu = menus.child(L"menu"); menu; menu = menu.next_sibling(L"menu")) {
+  parse_result = document.load(menu_resource.data());
+  xml_node menus = document.child(L"menus");
+  foreach_xmlnode_(menu, menus, L"menu") {
     Menus.Create(menu.attribute(L"name").value(), menu.attribute(L"type").value());
-    for (xml_node item = menu.child(L"item"); item; item = item.next_sibling(L"item")) {
+    foreach_xmlnode_(item, menu, L"item") {
       UI.Menus.Menu.back().CreateItem(
         item.attribute(L"action").value(), 
         item.attribute(L"name").value(), 
@@ -122,16 +121,18 @@ bool Theme::LoadImages() {
   // Clear image lists
   ImgList16.Remove(-1);
   ImgList24.Remove(-1);
+
+  wstring path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
   
   // Populate image lists
   HBITMAP hBitmap;
   for (size_t i = 0; i < ICONCOUNT_16PX && i < icons16_.size(); i++) {
-    hBitmap = GdiPlus.LoadImage(folder_ + L"16px\\" + icons16_.at(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(path + L"16px\\" + icons16_.at(i) + L".png");
     ImgList16.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }
   for (size_t i = 0; i < ICONCOUNT_24PX && i < icons24_.size(); i++) {
-    hBitmap = GdiPlus.LoadImage(folder_ + L"24px\\" + icons24_.at(i) + L".png");
+    hBitmap = GdiPlus.LoadImage(path + L"24px\\" + icons24_.at(i) + L".png");
     ImgList24.AddBitmap(hBitmap, CLR_NONE);
     DeleteObject(hBitmap);
   }

@@ -24,6 +24,7 @@
 #include "track/recognition.h"
 #include "taiga/resource.h"
 #include "base/string.h"
+#include "taiga/path.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
 #include "ui/list.h"
@@ -33,22 +34,22 @@ RecognitionTestDialog RecognitionTest;
 // =============================================================================
 
 BOOL RecognitionTestDialog::OnInitDialog() {
-  // Initialize
-  wstring file = Taiga.GetDataPath() + L"test\\recognition.xml";
   episodes_.clear();
   test_episodes_.clear();
   list_.DeleteAllItems();
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != pugi::status_ok) {
-    ::MessageBox(NULL, L"Could not read recognition test file.", file.c_str(), MB_OK | MB_ICONERROR);
+
+  xml_document document;
+  wstring path = taiga::GetPath(taiga::kPathTestRecognition);
+  xml_parse_result parse_result = document.load_file(path.c_str());
+
+  if (parse_result.status != pugi::status_ok) {
+    ::MessageBox(nullptr, L"Could not read recognition test file.", path.c_str(),
+                 MB_OK | MB_ICONERROR);
     return FALSE;
   }
 
   // Fill episode data
-  xml_node recognition = doc.child(L"recognition");
+  xml_node recognition = document.child(L"recognition");
   for (xml_node file_node = recognition.child(L"file"); file_node; file_node = file_node.next_sibling(L"file")) {
     EpisodeTest new_episode;
     new_episode.audio_type = XmlReadStrValue(file_node, L"audio");

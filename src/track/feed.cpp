@@ -28,6 +28,7 @@
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "recognition.h"
+#include "taiga/path.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "base/string.h"
@@ -152,11 +153,13 @@ bool Feed::ExamineData() {
 }
 
 wstring Feed::GetDataPath() {
-  wstring path = Taiga.GetDataPath() + L"feed\\";
+  wstring path = taiga::GetPath(taiga::kPathFeed);
+
   if (!link.empty()) {
     win::http::Url url(link);
     path += Base64Encode(url.host, true) + L"\\";
   }
+
   return path;
 }
 
@@ -314,45 +317,40 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
 }
 
 bool Aggregator::LoadArchive() {
-  // Initialize
-  wstring folder = Taiga.GetDataPath() + L"feed\\";
-  wstring file = folder + L"history.xml";
-  CreateDirectory(folder.c_str(), NULL);
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
+  xml_document document;
+  wstring path = taiga::GetPath(taiga::kPathFeedHistory);
+  xml_parse_result parse_result = document.load_file(path.c_str());
+
+  if (parse_result.status != pugi::status_ok)
+    return false;
 
   // Read discarded
   file_archive.clear();
-  xml_node archive = doc.child(L"archive");
-  for (xml_node item = archive.child(L"item"); item; item = item.next_sibling(L"item")) {
-    file_archive.push_back(item.attribute(L"title").value());
+  xml_node archive_node = document.child(L"archive");
+  foreach_xmlnode_(node, archive_node, L"item") {
+    file_archive.push_back(node.attribute(L"title").value());
   }
 
-  return result.status == pugi::status_ok;
+  return true;
 }
 
 bool Aggregator::SaveArchive() {
-  // Initialize
-  xml_document doc;
-  xml_node archive = doc.append_child(L"archive");
+  xml_document document;
+  xml_node archive_node = document.append_child(L"archive");
 
   if (Settings.RSS.Torrent.Filters.archive_maxcount > 0) {
-    // Items
     size_t length = file_archive.size();
     size_t i = 0;
     if (length > Settings.RSS.Torrent.Filters.archive_maxcount)
       i = length - Settings.RSS.Torrent.Filters.archive_maxcount;
     for ( ; i < file_archive.size(); i++) {
-      xml_node xml_item = archive.append_child(L"item");
+      xml_node xml_item = archive_node.append_child(L"item");
       xml_item.append_attribute(L"title") = file_archive[i].c_str();
     }
   }
 
-  // Save file
-  wstring file = Taiga.GetDataPath() + L"feed\\history.xml";
-  return doc.save_file(file.c_str(), L"\x09", pugi::format_default | pugi::format_write_bom);
+  wstring path = taiga::GetPath(taiga::kPathFeedHistory);
+  return XmlWriteDocumentToFile(document, path);
 }
 
 // =============================================================================

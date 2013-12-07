@@ -28,6 +28,7 @@
 #include "recognition.h"
 #include "taiga/settings.h"
 #include "base/string.h"
+#include "taiga/path.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
 
@@ -42,22 +43,22 @@ MediaPlayers::MediaPlayers()
 }
 
 BOOL MediaPlayers::Load() {
-  // Initialize
-  wstring file = Taiga.GetDataPath() + L"media.xml";
   items.clear();
   index = -1;
   
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != pugi::status_ok) {
-    MessageBox(NULL, L"Could not read media list.", file.c_str(), MB_OK | MB_ICONERROR);
+  xml_document document;
+  wstring path = taiga::GetPath(taiga::kPathMedia);
+  xml_parse_result parse_result = document.load_file(path.c_str());
+
+  if (parse_result.status != pugi::status_ok) {
+    MessageBox(nullptr, L"Could not read media list.",
+               path.c_str(), MB_OK | MB_ICONERROR);
     return FALSE;
   }
 
   // Read player list
-  xml_node mediaplayers = doc.child(L"media_players");
-  for (xml_node player = mediaplayers.child(L"player"); player; player = player.next_sibling(L"player")) {
+  xml_node mediaplayers = document.child(L"media_players");
+  foreach_xmlnode_(player, mediaplayers, L"player") {
     items.resize(items.size() + 1);
     items.back().name = XmlReadStrValue(player, L"name");
     items.back().enabled = XmlReadIntValue(player, L"enabled");

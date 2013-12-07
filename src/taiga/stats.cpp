@@ -25,6 +25,7 @@
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
+#include "path.h"
 #include "taiga.h"
 
 Statistics Stats;
@@ -121,8 +122,9 @@ void Statistics::CalculateLocalData() {
   image_size = GetFolderSize(anime::GetImagePath(), false);
 
   file_list.clear();
-  torrent_count = PopulateFiles(file_list, Taiga.GetDataPath() + L"feed\\", L"torrent", true);
-  torrent_size = GetFolderSize(Taiga.GetDataPath() + L"feed\\", true);
+  wstring path = taiga::GetPath(taiga::kPathFeed);
+  torrent_count = PopulateFiles(file_list, path, L"torrent", true);
+  torrent_size = GetFolderSize(path, true);
 }
 
 float Statistics::CalculateMeanScore() {

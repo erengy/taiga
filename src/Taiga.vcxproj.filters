@@ -403,6 +403,9 @@
     <ClCompile Include="library\discover.cpp">
       <Filter>library</Filter>
     </ClCompile>
+    <ClCompile Include="taiga\path.cpp">
+      <Filter>taiga</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -707,6 +710,9 @@
     </ClInclude>
     <ClInclude Include="library\discover.h">
       <Filter>library</Filter>
+    </ClInclude>
+    <ClInclude Include="taiga\path.h">
+      <Filter>taiga</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

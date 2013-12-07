@@ -59,7 +59,6 @@ public:
   void Uninitialize();
   
 public:
-  wstring GetDataPath();
   void LoadData();
 
 public:

@@ -33,6 +33,7 @@
 #include "track/recognition.h"
 #include "taiga/settings.h"
 #include "base/string.h"
+#include "taiga/path.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
 
@@ -45,14 +46,9 @@ anime::ImageDatabase ImageDatabase;
 
 namespace anime {
 
-Database::Database() {
-  folder_ = Taiga.GetDataPath() + L"db\\";
-  file_ = L"anime.xml";
-}
-
 bool Database::LoadDatabase() {
   xml_document document;
-  wstring path = folder_ + file_;
+  wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
   unsigned int options = pugi::parse_default & ~pugi::parse_eol;
   xml_parse_result parse_result = document.load_file(path.c_str(), options);
 
@@ -120,7 +116,7 @@ bool Database::SaveDatabase() {
     #undef XML_WI
   }
 
-  wstring path = folder_ + file_;
+  wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
   return XmlWriteDocumentToFile(document, path);
 }
 
@@ -293,13 +289,12 @@ bool Database::LoadList() {
     return false;
 
   xml_document document;
-  wstring file = Taiga.GetDataPath() + L"user\\" +
-                 Settings.Account.MAL.user + L"\\anime.xml";
-  xml_parse_result parse_result = document.load_file(file.c_str());
+  wstring path = taiga::GetPath(taiga::kPathUserLibrary);
+  xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok &&
       parse_result.status != pugi::status_file_not_found) {
-    MessageBox(nullptr, L"Could not read anime list.", file.c_str(),
+    MessageBox(nullptr, L"Could not read anime list.", path.c_str(),
                MB_OK | MB_ICONERROR);
     return false;
   }
@@ -359,7 +354,7 @@ bool Database::SaveList() {
     }
   }
 
-  wstring path = Taiga.GetDataPath() + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+  wstring path = taiga::GetPath(taiga::kPathUserLibrary);
   return XmlWriteDocumentToFile(document, path);
 }
 

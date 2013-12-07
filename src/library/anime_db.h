@@ -28,13 +28,8 @@
 
 namespace anime {
 
-// =============================================================================
-
 class Database {
- public:
-  Database();
-  virtual ~Database() {}
-  
+public:
   // Loads local anime database on program startup from db/anime.xml, returns
   // false if no such database exists.
   bool LoadDatabase();
@@ -70,16 +65,13 @@ class Database {
   // Anime items are mapped to their IDs.
   std::map<int, Item> items;
 
- private:
+private:
   // Thread safety
   win::CriticalSection critical_section_;
-  
-  wstring file_;
-  wstring folder_;
 };
 
 class ImageDatabase {
- public:
+public:
   ImageDatabase() {}
   virtual ~ImageDatabase() {}
 
@@ -92,7 +84,7 @@ class ImageDatabase {
   // Returns a pointer to requested image if available.
   Image* GetImage(int anime_id);
 
- private:
+private:
   std::map<int, Image> items_;
 };
 } // namespace anime
