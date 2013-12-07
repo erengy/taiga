@@ -17,6 +17,8 @@
 */
 
 #include "xml.h"
+
+#include "file.h"
 #include "foreach.h"
 #include "string.h"
 
@@ -69,4 +71,13 @@ void XmlWriteStrValue(pugi::xml_node& node, const wchar_t* name,
                       const wchar_t* value, pugi::xml_node_type node_type) {
   xml_node child = node.append_child(name);
   child.append_child(node_type).set_value(value);
+}
+
+bool XmlWriteDocumentToFile(const pugi::xml_document& document,
+                            const std::wstring& path) {
+  CreateFolder(path);
+
+  const pugi::char_t* indent = L"\x09";  // horizontal tab
+  unsigned int flags = pugi::format_default | pugi::format_write_bom;
+  return document.save_file(path.c_str(), indent, flags);
 }

@@ -48,4 +48,7 @@ void XmlWriteStrValue(pugi::xml_node& node, const wchar_t* name,
                       const wchar_t* value,
                       pugi::xml_node_type node_type = pugi::node_pcdata);
 
+bool XmlWriteDocumentToFile(const pugi::xml_document& document,
+                            const std::wstring& path);
+
 #endif  // TAIGA_BASE_XML_H
