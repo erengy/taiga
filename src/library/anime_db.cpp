@@ -369,39 +369,6 @@ bool Database::SaveList() {
 
 // =============================================================================
 
-FansubDatabase::FansubDatabase() {
-  file_ = L"fansub.xml";
-  folder_ = Taiga.GetDataPath() + L"db\\";
-}
-
-bool FansubDatabase::Load() {
-  // Initialize
-  wstring file = folder_ + file_;
-  items.clear();
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
-    MessageBox(NULL, L"Could not read fansub data.", file.c_str(), MB_OK | MB_ICONERROR);
-    return false;
-  }
-
-  // Read items
-  xml_node fansub_node = doc.child(L"fansub_groups");
-  for (xml_node node = fansub_node.child(L"fansub"); node; node = node.next_sibling(L"fansub")) {
-    items.push_back(XmlReadStrValue(node, L"name"));
-  }
-
-  return true;
-}
-
-void FansubDatabase::Save() {
-  // TODO
-}
-
-// =============================================================================
-
 bool ImageDatabase::Load(int anime_id, bool load, bool download) {
   if (anime_id <= anime::ID_UNKNOWN)
     return false;
