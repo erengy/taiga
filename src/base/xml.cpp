@@ -75,7 +75,7 @@ void XmlWriteStrValue(pugi::xml_node& node, const wchar_t* name,
 
 bool XmlWriteDocumentToFile(const pugi::xml_document& document,
                             const std::wstring& path) {
-  CreateFolder(path);
+  CreateFolder(GetPathOnly(path));
 
   const pugi::char_t* indent = L"\x09";  // horizontal tab
   unsigned int flags = pugi::format_default | pugi::format_write_bom;
