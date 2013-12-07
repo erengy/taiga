@@ -20,6 +20,7 @@
 #include "anime_item.h"
 #include "anime_util.h"
 #include "discover.h"
+#include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -29,31 +30,27 @@ library::SeasonDatabase SeasonDatabase;
 
 namespace library {
 
-SeasonDatabase::SeasonDatabase() {
-  folder_ = Taiga.GetDataPath() + L"db\\season\\";
-}
-
 bool SeasonDatabase::Load(wstring file) {
-  // Initialize
-  file_ = file;
-  file = folder_ + file;
   items.clear();
-  
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != pugi::status_ok && result.status != pugi::status_file_not_found) {
-    MessageBox(NULL, L"Could not read season data.", file.c_str(), MB_OK | MB_ICONERROR);
+
+  xml_document document;
+  file = Taiga.GetDataPath() + L"db\\season\\" + file;
+  xml_parse_result parse_result = document.load_file(file.c_str());
+
+  if (parse_result.status != pugi::status_ok &&
+      parse_result.status != pugi::status_file_not_found) {
+    MessageBox(nullptr, L"Could not read season data.", file.c_str(),
+               MB_OK | MB_ICONERROR);
     return false;
   }
 
-  // Read information
-  xml_node season_node = doc.child(L"season");
-  name = XmlReadStrValue(season_node.child(L"info"), L"name");
-  time_t last_modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"), L"last_modified").c_str());
+  xml_node season_node = document.child(L"season");
 
-  // Read items
-  for (xml_node node = season_node.child(L"anime"); node; node = node.next_sibling(L"anime")) {
+  name = XmlReadStrValue(season_node.child(L"info"), L"name");
+  time_t last_modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
+                                                 L"last_modified").c_str());
+
+  foreach_xmlnode_(node, season_node, L"anime") {
     int anime_id = XmlReadIntValue(node, L"series_animedb_id");
     items.push_back(anime_id);
     
@@ -67,9 +64,11 @@ bool SeasonDatabase::Load(wstring file) {
     item.SetType(XmlReadIntValue(node, L"series_type"));
     item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
+
     xml_node settings_node = node.child(L"settings");
     item.keep_title = XmlReadIntValue(settings_node, L"keep_title") != 0;
     item.last_modified = last_modified;
+
     AnimeDatabase.UpdateItem(item);
   }
 
@@ -80,8 +79,8 @@ bool SeasonDatabase::IsRefreshRequired() {
   int count = 0;
   bool required = false;
 
-  for (size_t i = 0; i < items.size(); i++) {
-    int anime_id = items.at(i);
+  foreach_(it, items) {
+    int anime_id = *it;
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       const Date& date_start = anime_item->GetDate(anime::DATE_START);
@@ -125,7 +124,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
   }
 
   // Check for missing items
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+  foreach_(it, AnimeDatabase.items) {
     if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
       continue;
     // TODO: Filter by rating instead if made possible in API

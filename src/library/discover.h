@@ -25,9 +25,6 @@ namespace library {
 
 class SeasonDatabase {
 public:
-  SeasonDatabase();
-  virtual ~SeasonDatabase() {}
-
   // Loads season data from db\season\<seasonname>.xml, returns false if no such
   // file exists.
   bool Load(std::wstring file);
@@ -40,15 +37,11 @@ public:
   // adding missing ones from the anime database.
   void Review(bool hide_hentai = true);
 
-  // Only IDs are stored here, actual info is kept in Database.
+  // Only IDs are stored here, actual info is kept in anime::Database.
   vector<int> items;
   
-  // Season name (e.g. Spring 2012)
+  // Season name (e.g. "Spring 2012")
   std::wstring name;
-
-private:
-  std::wstring file_;
-  std::wstring folder_;
 };
 
 }  // namespace library
