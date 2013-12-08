@@ -176,7 +176,7 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
   if (service.empty() || channels.empty() || data.empty()) return FALSE;
 
   // Initialize
-  DynamicDataExchange DDE;
+  base::DynamicDataExchange DDE;
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     win::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE initialization failed.");
@@ -252,7 +252,7 @@ bool Announcer::TestMircConnection(wstring service) {
   }
 
   // Initialize
-  DynamicDataExchange DDE;
+  base::DynamicDataExchange DDE;
   if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.Show(g_hMain);

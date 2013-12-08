@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,37 +16,50 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DDE_H
-#define DDE_H
+#ifndef TAIGA_BASE_DDE_H
+#define TAIGA_BASE_DDE_H
 
-#include "std.h"
+#include <string>
+#include <windows.h>
 
-// =============================================================================
+namespace base {
+
+// A helper class to use Dynamic Data Exchange (DDE) protocol
 
 class DynamicDataExchange {
 public:
   DynamicDataExchange();
   ~DynamicDataExchange();
-  
-  BOOL ClientTransaction(const wstring& item, const wstring& data, wstring* output, UINT wType);
-  BOOL Connect(const wstring& service, const wstring& topic);
-  void Disconnect();
-  BOOL Initialize(DWORD afCmd = APPCLASS_STANDARD | APPCMD_CLIENTONLY, BOOL unicode = FALSE);
-  BOOL IsAvailable();
-  BOOL NameService(const wstring& service, UINT afCmd = DNS_REGISTER);
+
+  BOOL Initialize(DWORD afCmd = APPCLASS_STANDARD | APPCMD_CLIENTONLY,
+                  bool unicode = false);
   void UnInitialize();
+
+  BOOL Connect(const std::wstring& service, const std::wstring& topic);
+  void Disconnect();
+
+  BOOL ClientTransaction(const std::wstring& item,
+                         const std::wstring& data,
+                         std::wstring* output,
+                         UINT wType);
+  BOOL IsAvailable();
+  BOOL NameService(const std::wstring& service, UINT afCmd = DNS_REGISTER);
 
   virtual BOOL OnConnect() { return TRUE; }
   virtual void OnPoke() {}
   virtual void OnRequest() {}
 
 private:
+  HSZ CreateStringHandle(const std::wstring& str);
+  void FreeStringHandle(HSZ str);
+
   static FNCALLBACK DdeCallback;
 
-private:
   HCONV conversation_;
   DWORD instance_;
-  BOOL is_unicode_;
+  bool is_unicode_;
 };
 
-#endif // DDE_H
+}  // namespace base
+
+#endif  // TAIGA_BASE_DDE_H
