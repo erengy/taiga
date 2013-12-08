@@ -303,7 +303,6 @@ void SettingsDialog::OnOK() {
     page->GetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings.RSS.Torrent.search_url);
     Settings.RSS.Torrent.check_enabled = page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCHECK);
     Settings.RSS.Torrent.check_interval = page->GetDlgItemInt(IDC_EDIT_TORRENT_INTERVAL);
-    Settings.RSS.Torrent.hide_unidentified = page->IsDlgButtonChecked(IDC_CHECK_TORRENT_HIDE);
     Settings.RSS.Torrent.new_action = page->GetCheckedRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2) + 1;
   }
   // Torrents > Downloads
@@ -499,12 +498,9 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
   
   int icon = ICON16_FUNNEL;
   switch (filter.action) {
-    // TODO: Change icons for ACTION_DISCARD_GRAYOUT and ACTION_DISCARD_HIDE
-    case FEED_FILTER_ACTION_DISCARD:         icon = ICON16_FUNNEL_CROSS; break;
-    case FEED_FILTER_ACTION_DISCARD_GRAYOUT: icon = ICON16_FUNNEL_CROSS; break;
-    case FEED_FILTER_ACTION_DISCARD_HIDE:    icon = ICON16_FUNNEL_CROSS; break;
-    case FEED_FILTER_ACTION_SELECT:          icon = ICON16_FUNNEL_TICK;  break;
-    case FEED_FILTER_ACTION_PREFER:          icon = ICON16_FUNNEL_PLUS;  break;
+    case FEED_FILTER_ACTION_DISCARD: icon = ICON16_FUNNEL_CROSS; break;
+    case FEED_FILTER_ACTION_SELECT:  icon = ICON16_FUNNEL_TICK;  break;
+    case FEED_FILTER_ACTION_PREFER:  icon = ICON16_FUNNEL_PLUS;  break;
   }
 
   // Insert item

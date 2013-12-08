@@ -26,15 +26,11 @@
 // =============================================================================
 
 enum FeedItemState {
-  FEEDITEM_DISCARDED = -1,
-  FEEDITEM_BLANK = 0,
-  FEEDITEM_SELECTED = 1
-};
-
-enum ItemDiscardType {
-  DISCARDTYPE_NORMAL = 0,
-  DISCARDTYPE_GRAYOUT,
-  DISCARDTYPE_HIDE
+  FEEDITEM_BLANK,
+  FEEDITEM_DISCARDED_NORMAL,
+  FEEDITEM_DISCARDED_INACTIVE,
+  FEEDITEM_DISCARDED_HIDDEN,
+  FEEDITEM_SELECTED
 };
 
 class GenericFeedItem {
@@ -49,14 +45,15 @@ public:
 
 class FeedItem : public GenericFeedItem {
 public:
-  FeedItem() : state(FEEDITEM_BLANK), discard_type(DISCARDTYPE_NORMAL) {}
+  FeedItem() : state(FEEDITEM_BLANK) {}
   virtual ~FeedItem() {};
+
+  void Discard(int option);
+  bool IsDiscarded();
 
   int index;
   wstring magnet_link;
-
   FeedItemState state;
-  ItemDiscardType discard_type;
 
   class EpisodeData : public anime::Episode {
   public:
@@ -180,15 +177,19 @@ public:
 
 enum FeedFilterAction {
   FEED_FILTER_ACTION_DISCARD,
-  FEED_FILTER_ACTION_DISCARD_GRAYOUT,
-  FEED_FILTER_ACTION_DISCARD_HIDE,
   FEED_FILTER_ACTION_SELECT,
   FEED_FILTER_ACTION_PREFER
 };
 
+enum FeedFilterOption {
+  FEED_FILTER_OPTION_DEFAULT,
+  FEED_FILTER_OPTION_DEACTIVATE,
+  FEED_FILTER_OPTION_HIDE
+};
+
 class FeedFilter {
 public:
-  FeedFilter() : action(0), enabled(true), match(FEED_FILTER_MATCH_ALL) {}
+  FeedFilter() : action(0), enabled(true), match(FEED_FILTER_MATCH_ALL), option(FEED_FILTER_OPTION_DEFAULT) {}
   virtual ~FeedFilter() {}
   FeedFilter& operator=(const FeedFilter& filter);
 
@@ -199,7 +200,7 @@ public:
 public:
   wstring name;
   bool enabled;
-  int action, match;
+  int action, match, option;
   vector<int> anime_ids;
   vector<FeedFilterCondition> conditions;
 };
@@ -217,6 +218,7 @@ enum FeedFilterShortcodeType {
   FEED_FILTER_SHORTCODE_ELEMENT,
   FEED_FILTER_SHORTCODE_MATCH,
   FEED_FILTER_SHORTCODE_OPERATOR,
+  FEED_FILTER_SHORTCODE_OPTION
 };
 
 class FeedFilterManager {
@@ -227,8 +229,7 @@ public:
   void InitializeShortcodes();
 
   void AddPresets();
-  void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
-    bool enabled = true, const wstring& name = L"");
+  void AddFilter(int action, int match, int option, bool enabled, const wstring& name);
   void Cleanup();
   void Filter(Feed& feed, bool preferences);
   void FilterArchived(Feed& feed);
@@ -243,6 +244,7 @@ public:
   wstring TranslateValue(const FeedFilterCondition& condition);
   wstring TranslateMatching(int match);
   wstring TranslateAction(int action);
+  wstring TranslateOption(int option);
 
   wstring GetShortcodeFromIndex(FeedFilterShortcodeType type, int index);
   int GetIndexFromShortcode(FeedFilterShortcodeType type, const wstring& shortcode);
@@ -256,6 +258,7 @@ private:
   std::map<int, wstring> element_shortcodes_;
   std::map<int, wstring> match_shortcodes_;
   std::map<int, wstring> operator_shortcodes_;
+  std::map<int, wstring> option_shortcodes_;
 };
 
 // =============================================================================

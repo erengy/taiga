@@ -342,7 +342,7 @@ public:
   DWORD   GetPadding();
   int     HitTest(POINT& pt);
   BOOL    InsertButton(int iIndex, int iBitmap, int idCommand, 
-                       bool bEnabled, BYTE fsStyle, DWORD_PTR dwData, 
+                       BYTE fsState, BYTE fsStyle, DWORD_PTR dwData, 
                        LPCWSTR lpText, LPCWSTR lpTooltip);
   BOOL    PressButton(int idCommand, BOOL bPress);
   BOOL    SetButtonImage(int nIndex, int iImage);

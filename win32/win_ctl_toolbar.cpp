@@ -42,7 +42,17 @@ BOOL Toolbar::EnableButton(int idCommand, bool bEnabled) {
   TBBUTTONINFO tbbi = {0};
   tbbi.cbSize  = sizeof(TBBUTTONINFO);
   tbbi.dwMask  = TBIF_STATE;
-  tbbi.fsState = bEnabled ? TBSTATE_ENABLED : TBSTATE_INDETERMINATE;
+
+  ::SendMessage(m_hWindow, TB_GETBUTTONINFO, idCommand, reinterpret_cast<LPARAM>(&tbbi));
+
+  if (bEnabled) {
+    tbbi.fsState |= TBSTATE_ENABLED;
+    tbbi.fsState &= ~TBSTATE_INDETERMINATE;
+  } else {
+    tbbi.fsState |= TBSTATE_INDETERMINATE;
+    tbbi.fsState &= ~TBSTATE_ENABLED;
+  }
+
   return ::SendMessage(m_hWindow, TB_SETBUTTONINFO, idCommand, reinterpret_cast<LPARAM>(&tbbi));
 }
 
@@ -82,13 +92,13 @@ int Toolbar::HitTest(POINT& pt) {
   return ::SendMessage(m_hWindow, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt));
 }
 
-BOOL Toolbar::InsertButton(int iIndex, int iBitmap, int idCommand, bool bEnabled, 
-                           BYTE fsStyle, DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip) {
+BOOL Toolbar::InsertButton(int iIndex, int iBitmap, int idCommand, BYTE fsState, BYTE fsStyle,
+                           DWORD_PTR dwData, LPCWSTR lpText, LPCWSTR lpTooltip) {                    
   TBBUTTON tbb  = {0};
   tbb.iBitmap   = iBitmap;
   tbb.idCommand = idCommand;
   tbb.iString   = reinterpret_cast<INT_PTR>(lpText);
-  tbb.fsState   = bEnabled ? TBSTATE_ENABLED : TBSTATE_INDETERMINATE;
+  tbb.fsState   = fsState;
   tbb.fsStyle   = fsStyle;
   tbb.dwData    = dwData;
 

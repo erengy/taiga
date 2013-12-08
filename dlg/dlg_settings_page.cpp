@@ -299,7 +299,6 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%");
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&_id=7b99f981c5b1f02354642f4e271cca43&_render=rss");
       SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings.RSS.Torrent.search_url.c_str());
-      CheckDlgButton(IDC_CHECK_TORRENT_HIDE, Settings.RSS.Torrent.hide_unidentified);
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.RSS.Torrent.check_enabled);
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETRANGE32, 0, 3600);
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETPOS32, 0, Settings.RSS.Torrent.check_interval);
@@ -351,11 +350,13 @@ BOOL SettingsPage::OnInitDialog() {
       toolbar.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
       toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
       // Add toolbar items
-      toolbar.InsertButton(0, ICON16_PLUS,       100, true,  0, 0, nullptr, L"Add new filter...");
-      toolbar.InsertButton(1, ICON16_MINUS,      101, false, 0, 1, nullptr, L"Delete filter");
+      BYTE fsState1 = TBSTATE_ENABLED;
+      BYTE fsState2 = TBSTATE_INDETERMINATE;
+      toolbar.InsertButton(0, ICON16_PLUS,       100, fsState1, 0, 0, nullptr, L"Add new filter...");
+      toolbar.InsertButton(1, ICON16_MINUS,      101, fsState2, 0, 1, nullptr, L"Delete filter");
       toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-      toolbar.InsertButton(3, ICON16_ARROW_UP,   103, false, 0, 3, nullptr, L"Move up");
-      toolbar.InsertButton(4, ICON16_ARROW_DOWN, 104, false, 0, 4, nullptr, L"Move down");
+      toolbar.InsertButton(3, ICON16_ARROW_UP,   103, fsState2, 0, 3, nullptr, L"Move up");
+      toolbar.InsertButton(4, ICON16_ARROW_DOWN, 104, fsState2, 0, 4, nullptr, L"Move down");
       toolbar.SetWindowHandle(nullptr);
       break;
     }

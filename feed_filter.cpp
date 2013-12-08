@@ -25,6 +25,7 @@
 #include "common.h"
 #include "foreach.h"
 #include "myanimelist.h"
+#include "logger.h"
 #include "settings.h"
 #include "string.h"
 
@@ -201,6 +202,7 @@ FeedFilter& FeedFilter::operator=(const FeedFilter& filter) {
   enabled = filter.enabled;
   match = filter.match;
   name = filter.name;
+  option = filter.option;
 
   conditions.resize(filter.conditions.size());
   std::copy(filter.conditions.begin(), filter.conditions.end(), conditions.begin());
@@ -223,7 +225,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     return;
 
   // No need to filter if the item was discarded before
-  if (item.state == FEEDITEM_DISCARDED)
+  if (item.IsDiscarded())
     return;
 
   if (!anime_ids.empty()) {
@@ -268,28 +270,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     case FEED_FILTER_ACTION_DISCARD:
       if (matched) {
         // Discard matched items, regardless of their previous state
-        item.state = FEEDITEM_DISCARDED;
-        item.discard_type = DISCARDTYPE_NORMAL;
-      } else {
-        return; // Filter doesn't apply to this item
-      }
-      break;
-
-    case FEED_FILTER_ACTION_DISCARD_GRAYOUT:
-      if (matched) {
-        // Discard matched items, regardless of their previous state
-        item.state = FEEDITEM_DISCARDED;
-        item.discard_type = DISCARDTYPE_GRAYOUT;
-      } else {
-        return; // Filter doesn't apply to this item
-      }
-      break;
-
-    case FEED_FILTER_ACTION_DISCARD_HIDE:
-      if (matched) {
-        // Discard matched items, regardless of their previous state
-        item.state = FEEDITEM_DISCARDED;
-        item.discard_type = DISCARDTYPE_HIDE;
+        item.Discard(option);
       } else {
         return; // Filter doesn't apply to this item
       }
@@ -309,7 +290,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         if (matched) {
           foreach_(it, feed.items) {
             // Do not bother if the item was discarded before
-            if (it->state == FEEDITEM_DISCARDED) continue;
+            if (it->IsDiscarded()) continue;
             // Do not filter the same item again
             if (it->index == item.index) continue;
             // Is it the same title?
@@ -334,8 +315,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
             item.state = FEEDITEM_SELECTED;
           } else {
             // Discard mismatched items, regardless of their previous state
-            item.state = FEEDITEM_DISCARDED;
-            item.discard_type = DISCARDTYPE_NORMAL;
+            item.Discard(option);
           }
         } else {
           return; // Filter doesn't apply to this item
@@ -346,8 +326,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         // this point, we don't care whether the preference is weak or strong.
         if (!matched) {
           // Discard mismatched items, regardless of their previous state
-          item.state = FEEDITEM_DISCARDED;
-          item.discard_type = DISCARDTYPE_NORMAL;
+          item.Discard(option);
         } else {
           return; // Filter doesn't apply to this item
         }
@@ -358,7 +337,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
 
 #ifdef _DEBUG
   wstring filter_text =
-      (item.state == FEEDITEM_DISCARDED ? L"!FILTER :: " : L"FILTER :: ") +
+      (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
       Aggregator.filter_manager.TranslateConditions(*this, condition_index);
   item.description = filter_text + L" -- " + item.description;
 #endif
@@ -383,7 +362,7 @@ FeedFilterManager::FeedFilterManager() {
 void FeedFilterManager::AddPresets() {
   foreach_(preset, presets) {
     if (!preset->is_default) continue;
-    AddFilter(preset->filter.action, preset->filter.match,
+    AddFilter(preset->filter.action, preset->filter.match, preset->filter.option,
               preset->filter.enabled, preset->filter.name);
     foreach_(condition, preset->filter.conditions) {
       filters.back().AddCondition(condition->element,
@@ -393,12 +372,13 @@ void FeedFilterManager::AddPresets() {
   }
 }
 
-void FeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
+void FeedFilterManager::AddFilter(int action, int match, int option, bool enabled, const wstring& name) {
   filters.resize(filters.size() + 1);
   filters.back().action = action;
   filters.back().enabled = enabled;
   filters.back().match = match;
   filters.back().name = name;
+  filters.back().option = option;
 }
 
 void FeedFilterManager::Cleanup() {
@@ -432,11 +412,10 @@ void FeedFilterManager::Filter(Feed& feed, bool preferences) {
 
 void FeedFilterManager::FilterArchived(Feed& feed) {
   foreach_(item, feed.items) {
-    if (item->state != FEEDITEM_DISCARDED) {
+    if (!item->IsDiscarded()) {
       bool found = Aggregator.SearchArchive(item->title);
       if (found) {
-        item->state = FEEDITEM_DISCARDED;
-        item->discard_type = DISCARDTYPE_NORMAL;
+        item->state = FEEDITEM_DISCARDED_NORMAL;
 
 #ifdef _DEBUG
         wstring filter_text = L"!FILTER :: Archived";
@@ -469,13 +448,14 @@ void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
 // =============================================================================
 
 void FeedFilterManager::InitializePresets() {
-  #define ADD_PRESET(action_, match_, is_default_, name_, description_) \
+  #define ADD_PRESET(action_, match_, is_default_, option_, name_, description_) \
       presets.resize(presets.size() + 1); \
       presets.back().description = description_; \
       presets.back().is_default = is_default_; \
       presets.back().filter.action = action_; \
       presets.back().filter.enabled = true; \
       presets.back().filter.match = match_; \
+      presets.back().filter.option = option_; \
       presets.back().filter.name = name_;
   #define ADD_CONDITION(e, o, v) \
       presets.back().filter.AddCondition(e, o, v);
@@ -483,18 +463,18 @@ void FeedFilterManager::InitializePresets() {
   /* Preset filters */
 
   // Custom
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, false, 
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, false, FEED_FILTER_OPTION_DEFAULT,
       L"(Custom)", 
       L"Lets you create a custom filter from scratch");
 
   // Fansub group
-  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ALL, false, 
+  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ALL, false, FEED_FILTER_OPTION_DEFAULT,
       L"[Fansub] Anime", 
       L"Lets you choose a fansub group for one or more anime");
   ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_GROUP, FEED_FILTER_OPERATOR_EQUALS, L"TaigaSubs (change this)");
 
   // Discard bad video keywords
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, false, 
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, false, FEED_FILTER_OPTION_DEFAULT,
       L"Discard bad video keywords", 
       L"Discards everything that is AVI, DIVX, LQ, RMVB, SD, WMV or XVID");
   ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"AVI");
@@ -506,7 +486,7 @@ void FeedFilterManager::InitializePresets() {
   ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"XVID");
 
   // Prefer new versions
-  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, false, 
+  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, false, FEED_FILTER_OPTION_DEFAULT,
       L"Prefer new versions", 
       L"Prefers v2 files and above when there are earlier releases of the same episode as well");
   ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VERSION, FEED_FILTER_OPERATOR_ISGREATERTHAN, L"1");
@@ -514,26 +494,26 @@ void FeedFilterManager::InitializePresets() {
   /* Default filters */
 
   // Select currently watching
-  ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ANY, true, 
+  ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEFAULT,
       L"Select currently watching", 
       L"Selects files that belong to anime that you're currently watching");
   ADD_CONDITION(FEED_FILTER_ELEMENT_USER_STATUS, FEED_FILTER_OPERATOR_EQUALS, ToWstr(mal::MYSTATUS_WATCHING));
 
   // Discard unknown titles
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, 
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEACTIVATE,
       L"Discard unknown titles", 
       L"Discards files that do not belong to any anime in your list");
   ADD_CONDITION(FEED_FILTER_ELEMENT_META_ID, FEED_FILTER_OPERATOR_EQUALS, L"");
 
   // Discard watched and available episodes
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, 
+  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEFAULT,
       L"Discard watched and available episodes", 
       L"Discards episodes you've already watched or downloaded");
   ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_NUMBER, FEED_FILTER_OPERATOR_ISLESSTHANOREQUALTO, L"%watched%");
   ADD_CONDITION(FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE, FEED_FILTER_OPERATOR_EQUALS, L"True");
 
   // Prefer high-resolution files
-  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, 
+  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEFAULT,
       L"Prefer high-resolution files", 
       L"Prefers 720p files when there are other files of the same episode as well");
   ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION, FEED_FILTER_OPERATOR_EQUALS, L"720p");
@@ -544,8 +524,6 @@ void FeedFilterManager::InitializePresets() {
 
 void FeedFilterManager::InitializeShortcodes() {
   action_shortcodes_[FEED_FILTER_ACTION_DISCARD] = L"discard";
-  action_shortcodes_[FEED_FILTER_ACTION_DISCARD_GRAYOUT] = L"grayout";
-  action_shortcodes_[FEED_FILTER_ACTION_DISCARD_HIDE] = L"hide";
   action_shortcodes_[FEED_FILTER_ACTION_SELECT] = L"select";
   action_shortcodes_[FEED_FILTER_ACTION_PREFER] = L"prefer";
 
@@ -581,6 +559,10 @@ void FeedFilterManager::InitializeShortcodes() {
   operator_shortcodes_[FEED_FILTER_OPERATOR_ENDSWITH] = L"endswith";
   operator_shortcodes_[FEED_FILTER_OPERATOR_CONTAINS] = L"contains";
   operator_shortcodes_[FEED_FILTER_OPERATOR_NOTCONTAINS] = L"notcontains";
+
+  option_shortcodes_[FEED_FILTER_OPTION_DEFAULT] = L"default";
+  option_shortcodes_[FEED_FILTER_OPTION_DEACTIVATE] = L"deactivate";
+  option_shortcodes_[FEED_FILTER_OPTION_HIDE] = L"hide";
 }
 
 wstring FeedFilterManager::CreateNameFromConditions(const FeedFilter& filter) {
@@ -718,14 +700,24 @@ wstring FeedFilterManager::TranslateAction(int action) {
   switch (action) {
     case FEED_FILTER_ACTION_DISCARD:
       return L"Discard matched items";
-    case FEED_FILTER_ACTION_DISCARD_GRAYOUT:
-      return L"Discard and Gray-out matched items";
-    case FEED_FILTER_ACTION_DISCARD_HIDE:
-      return L"Discard and Hide matched items";
     case FEED_FILTER_ACTION_SELECT:
       return L"Select matched items";
     case FEED_FILTER_ACTION_PREFER:
       return L"Prefer matched items to similar ones";
+    default:
+      return L"?";
+  }
+}
+
+
+wstring FeedFilterManager::TranslateOption(int option) {
+  switch (option) {
+    case FEED_FILTER_OPTION_DEFAULT:
+      return L"Default";
+    case FEED_FILTER_OPTION_DEACTIVATE:
+      return L"Deactivate discarded items";
+    case FEED_FILTER_OPTION_HIDE:
+      return L"Hide discarded items";
     default:
       return L"?";
   }
@@ -742,6 +734,8 @@ wstring FeedFilterManager::GetShortcodeFromIndex(FeedFilterShortcodeType type,
       return match_shortcodes_[index];
     case FEED_FILTER_SHORTCODE_OPERATOR:
       return operator_shortcodes_[index];
+    case FEED_FILTER_SHORTCODE_OPTION:
+      return option_shortcodes_[index];
   }
 
   return wstring();
@@ -763,11 +757,17 @@ int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
     case FEED_FILTER_SHORTCODE_OPERATOR:
       shortcodes = &operator_shortcodes_;
       break;
+    case FEED_FILTER_SHORTCODE_OPTION:
+      shortcodes = &option_shortcodes_;
+      break;
   }
 
   foreach_(it, *shortcodes)
     if (IsEqual(it->second, shortcode))
       return it->first;
 
+  LOG(LevelDebug, L"Shortcode: \"" + shortcode +
+                  L"\" for type \"" + ToWstr(type) + L"\" is not found.");
+  
   return -1;
 }

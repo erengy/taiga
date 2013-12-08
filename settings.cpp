@@ -239,7 +239,6 @@ bool Settings::Load() {
       RSS.Torrent.check_interval = torrent.child(L"options").attribute(L"checkinterval").as_int(60);
       RSS.Torrent.create_folder = torrent.child(L"options").attribute(L"autocreatefolder").as_int(FALSE);
       RSS.Torrent.download_path = torrent.child(L"options").attribute(L"downloadpath").as_string();
-      RSS.Torrent.hide_unidentified = torrent.child(L"options").attribute(L"hideunidentified").as_int(FALSE);
       RSS.Torrent.new_action = torrent.child(L"options").attribute(L"newaction").as_int(1);
       RSS.Torrent.set_folder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
       RSS.Torrent.search_url = torrent.child(L"search").attribute(L"address").as_string(DEFAULT_TORRENT_SEARCH);
@@ -254,6 +253,7 @@ bool Settings::Load() {
         Aggregator.filter_manager.AddFilter(
           Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_ACTION, item.attribute(L"action").value()),
           Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_MATCH, item.attribute(L"match").value()),
+          Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_OPTION, item.attribute(L"option").value()),
           item.attribute(L"enabled").as_bool(),
           item.attribute(L"name").value());
         for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
@@ -470,7 +470,6 @@ bool Settings::Save() {
       torrent.child(L"options").append_attribute(L"autousefolder") = RSS.Torrent.use_folder;
       torrent.child(L"options").append_attribute(L"autocreatefolder") = RSS.Torrent.create_folder;
       torrent.child(L"options").append_attribute(L"downloadpath") = RSS.Torrent.download_path.c_str();
-      torrent.child(L"options").append_attribute(L"hideunidentified") = RSS.Torrent.hide_unidentified;
       torrent.child(L"options").append_attribute(L"newaction") = RSS.Torrent.new_action;
       // Filter
       xml_node torrent_filter = torrent.append_child(L"filter");
@@ -480,6 +479,7 @@ bool Settings::Save() {
         xml_node item = torrent_filter.append_child(L"item");
         item.append_attribute(L"action") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_ACTION, it->action).c_str();
         item.append_attribute(L"match") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_MATCH, it->match).c_str();
+        item.append_attribute(L"option") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_OPTION, it->option).c_str();
         item.append_attribute(L"enabled") = it->enabled;
         item.append_attribute(L"name") = it->name.c_str();
         for (auto ita = it->anime_ids.begin(); ita != it->anime_ids.end(); ++ita) {
@@ -570,7 +570,7 @@ void Settings::HandleCompatibility() {
       int match = item.attribute(L"match").as_int();
       bool enabled = item.attribute(L"enabled").as_bool();
       wstring value = item.attribute(L"name").value();
-      Aggregator.filter_manager.AddFilter(action, match, enabled, value);
+      Aggregator.filter_manager.AddFilter(action, match, FEED_FILTER_OPTION_DEFAULT, enabled, value);
       
       for (xml_node anime = item.child(L"anime"); anime; anime = anime.next_sibling(L"anime")) {
         Aggregator.filter_manager.filters.back().anime_ids.push_back(anime.attribute(L"id").as_int());
@@ -698,6 +698,23 @@ void Settings::HandleCompatibility() {
   if (Meta.Version.revision < 250) {
     Aggregator.file_archive.clear();
     PopulateFiles(Aggregator.file_archive, Taiga.GetDataPath() + L"feed\\", L"torrent", true, true);
+  }
+
+  // Set default torrent filter options
+  if (Meta.Version.revision < 259) {
+    foreach_(filter, Aggregator.filter_manager.filters) {
+      if (filter->option = -1) {
+        if (filter->action == FEED_FILTER_ACTION_DISCARD &&
+            !filter->conditions.empty() &&
+            filter->conditions.front().element == FEED_FILTER_ELEMENT_META_ID &&
+            filter->conditions.front().op == FEED_FILTER_OPERATOR_EQUALS &&
+            filter->conditions.front().value.empty()) {
+          filter->option = FEED_FILTER_OPTION_DEACTIVATE;
+        } else {
+          filter->option = FEED_FILTER_OPTION_DEFAULT;
+        }
+      }
+    }
   }
 }
 

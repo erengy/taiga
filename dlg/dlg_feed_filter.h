@@ -76,8 +76,9 @@ private:
     bool BuildFilter(FeedFilter& filter);
     void AddConditionToList(const FeedFilterCondition& condition, int index = -1);
     void RefreshConditionList();
+    void ChangeAction();
   public:
-    win32::ComboBox action_combo, match_combo;
+    win32::ComboBox action_combo, match_combo, option_combo;
     win32::Edit name_text;
     win32::ListView condition_list;
     win32::Toolbar condition_toolbar;

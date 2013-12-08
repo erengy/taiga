@@ -63,16 +63,17 @@ BOOL SeasonDialog::OnInitDialog() {
   toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
 
   // Insert toolbar buttons
+  BYTE fsState = TBSTATE_ENABLED;
   BYTE fsStyle1 = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_WHOLEDROPDOWN;
-  toolbar_.InsertButton(0, ICON16_CALENDAR, 100, 1, fsStyle2, 0, L"Select season", nullptr);
-  toolbar_.InsertButton(1, ICON16_REFRESH,  101, 1, fsStyle1, 1, L"Refresh data", L"Download anime details and missing images");
+  toolbar_.InsertButton(0, ICON16_CALENDAR, 100, fsState, fsStyle2, 0, L"Select season", nullptr);
+  toolbar_.InsertButton(1, ICON16_REFRESH,  101, fsState, fsStyle1, 1, L"Refresh data", L"Download anime details and missing images");
   toolbar_.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_.InsertButton(3, ICON16_CATEGORY, 103, 1, fsStyle2, 3, L"Group by", nullptr);
-  toolbar_.InsertButton(4, ICON16_SORT,     104, 1, fsStyle2, 4, L"Sort by", nullptr);
-  toolbar_.InsertButton(5, ICON16_DETAILS,  105, 1, fsStyle2, 5, L"View", nullptr);
+  toolbar_.InsertButton(3, ICON16_CATEGORY, 103, fsState, fsStyle2, 3, L"Group by", nullptr);
+  toolbar_.InsertButton(4, ICON16_SORT,     104, fsState, fsStyle2, 4, L"Sort by", nullptr);
+  toolbar_.InsertButton(5, ICON16_DETAILS,  105, fsState, fsStyle2, 5, L"View", nullptr);
   toolbar_.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_.InsertButton(7, ICON16_BALLOON,  107, 1, fsStyle1, 7, L"Discuss", L"");
+  toolbar_.InsertButton(7, ICON16_BALLOON,  107, fsState, fsStyle1, 7, L"Discuss", L"");
 
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_SEASON));

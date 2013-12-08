@@ -40,6 +40,34 @@ class Aggregator Aggregator;
 
 // =============================================================================
 
+void FeedItem::Discard(int option) {
+  switch (option) {
+    default:
+    case FEED_FILTER_OPTION_DEFAULT:
+      state = FEEDITEM_DISCARDED_NORMAL;
+      break;
+    case FEED_FILTER_OPTION_DEACTIVATE:
+      state = FEEDITEM_DISCARDED_INACTIVE;
+      break;
+    case FEED_FILTER_OPTION_HIDE:
+      state = FEEDITEM_DISCARDED_HIDDEN;
+      break;
+  }
+}
+
+bool FeedItem::IsDiscarded() {
+  switch (state) {
+    case FEEDITEM_DISCARDED_NORMAL:
+    case FEEDITEM_DISCARDED_INACTIVE:
+    case FEEDITEM_DISCARDED_HIDDEN:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// =============================================================================
+
 Feed::Feed()
     : category(0), 
       download_index(-1), 
@@ -113,7 +141,7 @@ bool Feed::ExamineData() {
       anime_item->SetLastAiredEpisodeNumber(episode_number);
     }
   }
-  
+
   // Filter
   Aggregator.filter_manager.MarkNewEpisodes(*this);
   // Preferences have lower priority, so we need to handle other filters
@@ -123,20 +151,17 @@ bool Feed::ExamineData() {
   // Archived items must be discarded after other filters are processed.
   Aggregator.filter_manager.FilterArchived(*this);
 
-  // Sort items by their anime ID, giving priority to identified items, while
-  // preserving the order for unidentified ones.
+  // Sort items
   std::stable_sort(items.begin(), items.end(),
     [](const FeedItem& a, const FeedItem& b) -> bool {
-      // Make sure that grayed out items are sorted below other (known) items
-      if (a.episode_data.anime_id > anime::ID_UNKNOWN && b.episode_data.anime_id > anime::ID_UNKNOWN) {
-        if (a.state == FEEDITEM_DISCARDED && a.discard_type == DISCARDTYPE_GRAYOUT
-            && (b.state != FEEDITEM_DISCARDED || b.discard_type != DISCARDTYPE_GRAYOUT))
-          return false;
-        else if (b.state == FEEDITEM_DISCARDED && b.discard_type == DISCARDTYPE_GRAYOUT
-                 && (a.state != FEEDITEM_DISCARDED || a.discard_type != DISCARDTYPE_GRAYOUT))
+      // Place inactive and hidden items below others
+      if (a.state != b.state) {
+        if (b.state == FEEDITEM_DISCARDED_INACTIVE ||
+            b.state == FEEDITEM_DISCARDED_HIDDEN)
           return true;
       }
-
+      // Give priority to identified items, while preserving the order for
+      // unidentified ones.
       return a.episode_data.anime_id > b.episode_data.anime_id;
     });
   // Re-assign item indexes
