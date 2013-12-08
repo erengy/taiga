@@ -499,9 +499,12 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
   
   int icon = ICON16_FUNNEL;
   switch (filter.action) {
-    case FEED_FILTER_ACTION_DISCARD: icon = ICON16_FUNNEL_CROSS; break;
-    case FEED_FILTER_ACTION_SELECT:  icon = ICON16_FUNNEL_TICK;  break;
-    case FEED_FILTER_ACTION_PREFER:  icon = ICON16_FUNNEL_PLUS;  break;
+    // TODO: Change icons for ACTION_DISCARD_GRAYOUT and ACTION_DISCARD_HIDE
+    case FEED_FILTER_ACTION_DISCARD:         icon = ICON16_FUNNEL_CROSS; break;
+    case FEED_FILTER_ACTION_DISCARD_GRAYOUT: icon = ICON16_FUNNEL_CROSS; break;
+    case FEED_FILTER_ACTION_DISCARD_HIDE:    icon = ICON16_FUNNEL_CROSS; break;
+    case FEED_FILTER_ACTION_SELECT:          icon = ICON16_FUNNEL_TICK;  break;
+    case FEED_FILTER_ACTION_PREFER:          icon = ICON16_FUNNEL_PLUS;  break;
   }
 
   // Insert item

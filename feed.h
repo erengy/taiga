@@ -31,6 +31,12 @@ enum FeedItemState {
   FEEDITEM_SELECTED = 1
 };
 
+enum ItemDiscardType {
+  DISCARDTYPE_NORMAL = 0,
+  DISCARDTYPE_GRAYOUT,
+  DISCARDTYPE_HIDE
+};
+
 class GenericFeedItem {
 public:
   GenericFeedItem() : is_permalink(true) {}
@@ -43,12 +49,14 @@ public:
 
 class FeedItem : public GenericFeedItem {
 public:
-  FeedItem() : state(FEEDITEM_BLANK) {}
+  FeedItem() : state(FEEDITEM_BLANK), discard_type(DISCARDTYPE_NORMAL) {}
   virtual ~FeedItem() {};
 
   int index;
   wstring magnet_link;
+
   FeedItemState state;
+  ItemDiscardType discard_type;
 
   class EpisodeData : public anime::Episode {
   public:
@@ -172,6 +180,8 @@ public:
 
 enum FeedFilterAction {
   FEED_FILTER_ACTION_DISCARD,
+  FEED_FILTER_ACTION_DISCARD_GRAYOUT,
+  FEED_FILTER_ACTION_DISCARD_HIDE,
   FEED_FILTER_ACTION_SELECT,
   FEED_FILTER_ACTION_PREFER
 };

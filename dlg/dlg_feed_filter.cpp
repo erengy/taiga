@@ -268,9 +268,12 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
     if (it->is_default) continue;
     int icon_ = ICON16_FUNNEL;
     switch (it->filter.action) {
-      case FEED_FILTER_ACTION_DISCARD: icon_ = ICON16_FUNNEL_CROSS; break;
-      case FEED_FILTER_ACTION_SELECT:  icon_ = ICON16_FUNNEL_TICK;  break;
-      case FEED_FILTER_ACTION_PREFER:  icon_ = ICON16_FUNNEL_PLUS;  break;
+      // TODO: Change icons for ACTION_DISCARD_GRAYOUT and ACTION_DISCARD_HIDE
+      case FEED_FILTER_ACTION_DISCARD:         icon_ = ICON16_FUNNEL_CROSS; break;
+      case FEED_FILTER_ACTION_DISCARD_GRAYOUT: icon_ = ICON16_FUNNEL_CROSS; break;
+      case FEED_FILTER_ACTION_DISCARD_HIDE:    icon_ = ICON16_FUNNEL_CROSS; break;
+      case FEED_FILTER_ACTION_SELECT:          icon_ = ICON16_FUNNEL_TICK;  break;
+      case FEED_FILTER_ACTION_PREFER:          icon_ = ICON16_FUNNEL_PLUS;  break;
     }
     if (it->filter.conditions.empty()) icon_ = ICON16_FUNNEL_PENCIL;
     preset_list.InsertItem(it - Aggregator.filter_manager.presets.begin(), 
@@ -384,6 +387,8 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   match_combo.AddString(Aggregator.filter_manager.TranslateMatching(FEED_FILTER_MATCH_ANY).c_str());
   action_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_ACTION));
   action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_DISCARD).c_str());
+  action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_DISCARD_GRAYOUT).c_str());
+  action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_DISCARD_HIDE).c_str());
   action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_SELECT).c_str());
   action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_PREFER).c_str());
 

@@ -321,7 +321,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               }
 #endif
               // Change text color
-              if (feed_item->episode_data.anime_id < 1) {
+              if (feed_item->episode_data.anime_id < 1 || (feed_item->state == FEEDITEM_DISCARDED && feed_item->discard_type == DISCARDTYPE_GRAYOUT)) {
                 pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
               } else if (feed_item->episode_data.new_episode) {
                 pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
@@ -376,6 +376,11 @@ void TorrentDialog::RefreshList() {
         it->episode_data.anime_id <= anime::ID_UNKNOWN) {
       continue;
     }
+
+    // Skip item if it was filtered by "Discard and Hide"
+    if(it->state == FEEDITEM_DISCARDED && it->discard_type == DISCARDTYPE_HIDE)
+      continue;
+
     wstring title, number, video;
     int group = TORRENT_ANIME, icon = StatusToIcon(0);
     if (it->category == L"Batch" ||

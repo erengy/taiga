@@ -269,6 +269,27 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
       if (matched) {
         // Discard matched items, regardless of their previous state
         item.state = FEEDITEM_DISCARDED;
+        item.discard_type = DISCARDTYPE_NORMAL;
+      } else {
+        return; // Filter doesn't apply to this item
+      }
+      break;
+
+    case FEED_FILTER_ACTION_DISCARD_GRAYOUT:
+      if (matched) {
+        // Discard matched items, regardless of their previous state
+        item.state = FEEDITEM_DISCARDED;
+        item.discard_type = DISCARDTYPE_GRAYOUT;
+      } else {
+        return; // Filter doesn't apply to this item
+      }
+      break;
+
+    case FEED_FILTER_ACTION_DISCARD_HIDE:
+      if (matched) {
+        // Discard matched items, regardless of their previous state
+        item.state = FEEDITEM_DISCARDED;
+        item.discard_type = DISCARDTYPE_HIDE;
       } else {
         return; // Filter doesn't apply to this item
       }
@@ -314,6 +335,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
           } else {
             // Discard mismatched items, regardless of their previous state
             item.state = FEEDITEM_DISCARDED;
+            item.discard_type = DISCARDTYPE_NORMAL;
           }
         } else {
           return; // Filter doesn't apply to this item
@@ -325,6 +347,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         if (!matched) {
           // Discard mismatched items, regardless of their previous state
           item.state = FEEDITEM_DISCARDED;
+          item.discard_type = DISCARDTYPE_NORMAL;
         } else {
           return; // Filter doesn't apply to this item
         }
@@ -413,6 +436,8 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       bool found = Aggregator.SearchArchive(item->title);
       if (found) {
         item->state = FEEDITEM_DISCARDED;
+        item->discard_type = DISCARDTYPE_NORMAL;
+
 #ifdef _DEBUG
         wstring filter_text = L"!FILTER :: Archived";
         item->description = filter_text + L" -- " + item->description;
@@ -519,6 +544,8 @@ void FeedFilterManager::InitializePresets() {
 
 void FeedFilterManager::InitializeShortcodes() {
   action_shortcodes_[FEED_FILTER_ACTION_DISCARD] = L"discard";
+  action_shortcodes_[FEED_FILTER_ACTION_DISCARD_GRAYOUT] = L"grayout";
+  action_shortcodes_[FEED_FILTER_ACTION_DISCARD_HIDE] = L"hide";
   action_shortcodes_[FEED_FILTER_ACTION_SELECT] = L"select";
   action_shortcodes_[FEED_FILTER_ACTION_PREFER] = L"prefer";
 
@@ -691,6 +718,10 @@ wstring FeedFilterManager::TranslateAction(int action) {
   switch (action) {
     case FEED_FILTER_ACTION_DISCARD:
       return L"Discard matched items";
+    case FEED_FILTER_ACTION_DISCARD_GRAYOUT:
+      return L"Discard and Gray-out matched items";
+    case FEED_FILTER_ACTION_DISCARD_HIDE:
+      return L"Discard and Hide matched items";
     case FEED_FILTER_ACTION_SELECT:
       return L"Select matched items";
     case FEED_FILTER_ACTION_PREFER:

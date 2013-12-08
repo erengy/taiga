@@ -113,17 +113,7 @@ bool Feed::ExamineData() {
       anime_item->SetLastAiredEpisodeNumber(episode_number);
     }
   }
-
-  // Sort items by their anime ID, giving priority to identified items, while
-  // preserving the order for unidentified ones.
-  std::stable_sort(items.begin(), items.end(),
-    [](const FeedItem& a, const FeedItem& b) {
-      return a.episode_data.anime_id > b.episode_data.anime_id;
-    });
-  // Re-assign item indexes
-  for (size_t i = 0; i < items.size(); i++)
-    items.at(i).index = i;
-
+  
   // Filter
   Aggregator.filter_manager.MarkNewEpisodes(*this);
   // Preferences have lower priority, so we need to handle other filters
@@ -132,6 +122,26 @@ bool Feed::ExamineData() {
   Aggregator.filter_manager.Filter(*this, true);
   // Archived items must be discarded after other filters are processed.
   Aggregator.filter_manager.FilterArchived(*this);
+
+  // Sort items by their anime ID, giving priority to identified items, while
+  // preserving the order for unidentified ones.
+  std::stable_sort(items.begin(), items.end(),
+    [](const FeedItem& a, const FeedItem& b) -> bool {
+      // Make sure that grayed out items are sorted below other (known) items
+      if (a.episode_data.anime_id > anime::ID_UNKNOWN && b.episode_data.anime_id > anime::ID_UNKNOWN) {
+        if (a.state == FEEDITEM_DISCARDED && a.discard_type == DISCARDTYPE_GRAYOUT
+            && (b.state != FEEDITEM_DISCARDED || b.discard_type != DISCARDTYPE_GRAYOUT))
+          return false;
+        else if (b.state == FEEDITEM_DISCARDED && b.discard_type == DISCARDTYPE_GRAYOUT
+                 && (a.state != FEEDITEM_DISCARDED || a.discard_type != DISCARDTYPE_GRAYOUT))
+          return true;
+      }
+
+      return a.episode_data.anime_id > b.episode_data.anime_id;
+    });
+  // Re-assign item indexes
+  for (size_t i = 0; i < items.size(); i++)
+    items.at(i).index = i;
   
   return Aggregator.filter_manager.IsItemDownloadAvailable(*this);
 }
