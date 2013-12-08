@@ -343,8 +343,9 @@ enum WebBrowserEngines {
   WEBENGINE_PRESTO
 };
 
-AccessibleChild* FindAccessibleChild(vector<AccessibleChild>& children, const wstring& name, const wstring& role) {
-  AccessibleChild* child = nullptr;
+base::AccessibleChild* FindAccessibleChild(vector<base::AccessibleChild>& children,
+                                           const wstring& name, const wstring& role) {
+  base::AccessibleChild* child = nullptr;
   
   for (auto it = children.begin(); it != children.end(); ++it) {
     if (name.empty() || IsEqual(name, it->name)) {
@@ -364,7 +365,7 @@ AccessibleChild* FindAccessibleChild(vector<AccessibleChild>& children, const ws
 }
 
 #ifdef _DEBUG
-void BuildTreeString(vector<AccessibleChild>& children, wstring& str, int indent) {
+void BuildTreeString(vector<base::AccessibleChild>& children, wstring& str, int indent) {
   for (auto it = children.begin(); it != children.end(); ++it) {
     str.append(indent * 4, L' ');
     str += L"[" + it->role + L"] " + it->name + L" = " + it->value + L"\n";
@@ -417,7 +418,7 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 
   // Check other tabs
   if (CurrentEpisode.anime_id > 0) {
-    AccessibleChild* child = nullptr;
+    base::AccessibleChild* child = nullptr;
     switch (web_engine) {
       case WEBENGINE_WEBKIT:
       case WEBENGINE_GECKO:
@@ -443,7 +444,7 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   }
 
   // Find URL
-  AccessibleChild* child = nullptr;
+  base::AccessibleChild* child = nullptr;
   switch (web_engine) {
     case WEBENGINE_WEBKIT:
       child = FindAccessibleChild(acc_obj.children, L"Address and search bar", L"grouping");
@@ -550,7 +551,7 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   return title;
 }
 
-bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(AccessibleChild& child, LPARAM param) {
+bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(base::AccessibleChild& child, LPARAM param) {
   switch (param) {
     case WEBENGINE_UNKNOWN:
       return false;

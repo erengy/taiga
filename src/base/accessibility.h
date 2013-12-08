@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,20 +16,21 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ACCESSIBILITY_H
-#define ACCESSIBILITY_H
+#ifndef TAIGA_BASE_ACCESSIBILITY_H
+#define TAIGA_BASE_ACCESSIBILITY_H
 
-#include "std.h"
+#include <string>
 #include <OleAcc.h>
+#include <vector>
 
-// =============================================================================
+namespace base {
 
 class AccessibleChild {
 public:
-  wstring name, role, value;
+  std::wstring name, role, value;
 
 public:
-  vector<AccessibleChild> children;
+  std::vector<AccessibleChild> children;
 };
 
 class AccessibleObject {
@@ -38,29 +39,36 @@ public:
   virtual ~AccessibleObject();
 
   HRESULT FromWindow(HWND hwnd, DWORD object_id = OBJID_CLIENT);
-  
-  HRESULT BuildChildren(vector<AccessibleChild>& children, IAccessible* acc = nullptr, LPARAM param = 0L);
-  HRESULT GetChildCount(long* child_count, IAccessible* acc = nullptr);
-  virtual bool AllowChildTraverse(AccessibleChild& child, LPARAM param = 0L);
-
-  HRESULT GetName(wstring& name, long child_id = CHILDID_SELF, IAccessible* acc = nullptr);
-  HRESULT GetRole(wstring& role, long child_id = CHILDID_SELF, IAccessible* acc = nullptr);
-  HRESULT GetValue(wstring& value, long child_id = CHILDID_SELF, IAccessible* acc = nullptr);
-
-  HWINEVENTHOOK Hook(DWORD eventMin, DWORD eventMax, 
-    HMODULE hmodWinEventProc, WINEVENTPROC pfnWinEventProc,
-    DWORD idProcess, DWORD idThread, DWORD dwFlags);
-  bool IsHooked();
-  void Unhook();
-
   void Release();
 
-public:
-  vector<AccessibleChild> children;
+  HRESULT GetName(std::wstring& name, long child_id = CHILDID_SELF,
+                  IAccessible* acc = nullptr);
+  HRESULT GetRole(std::wstring& role, long child_id = CHILDID_SELF,
+                  IAccessible* acc = nullptr);
+  HRESULT GetValue(std::wstring& value, long child_id = CHILDID_SELF,
+                   IAccessible* acc = nullptr);
+
+  HRESULT BuildChildren(std::vector<AccessibleChild>& children,
+                        IAccessible* acc = nullptr, LPARAM param = 0L);
+  HRESULT GetChildCount(long* child_count, IAccessible* acc = nullptr);
+
+  virtual bool AllowChildTraverse(AccessibleChild& child, LPARAM param = 0L);
+
+#ifdef _DEBUG
+  HWINEVENTHOOK Hook(DWORD eventMin, DWORD eventMax, 
+                     HMODULE hmodWinEventProc, WINEVENTPROC pfnWinEventProc,
+                     DWORD idProcess, DWORD idThread, DWORD dwFlags);
+  bool IsHooked();
+  void Unhook();
+#endif
+
+  std::vector<AccessibleChild> children;
 
 private:
   IAccessible* acc_;
   HWINEVENTHOOK win_event_hook_;
 };
 
-#endif // ACCESSIBILITY_H
+}  // namespace base
+
+#endif  // TAIGA_BASE_ACCESSIBILITY_H

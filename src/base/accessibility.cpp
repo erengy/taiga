@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,10 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
 #include "accessibility.h"
 
-// =============================================================================
+namespace base {
 
 AccessibleObject::AccessibleObject()
     : acc_(nullptr), 
@@ -27,28 +26,47 @@ AccessibleObject::AccessibleObject()
 }
 
 AccessibleObject::~AccessibleObject() {
+#ifdef _DEBUG
   Unhook();
+#endif
   Release();
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 HRESULT AccessibleObject::FromWindow(HWND hwnd, DWORD object_id) {
-  if (hwnd == nullptr) return E_INVALIDARG;
+  if (hwnd == nullptr)
+    return E_INVALIDARG;
 
   Release();
 
-  return AccessibleObjectFromWindow(hwnd, object_id, IID_IAccessible, (void**)&acc_);
+  return AccessibleObjectFromWindow(hwnd, object_id, IID_IAccessible,
+                                    (void**)&acc_);
 }
 
-HRESULT AccessibleObject::GetName(wstring& name, long child_id, IAccessible* acc) {
-  if (acc == nullptr) acc = acc_;
-  if (acc == nullptr) return E_INVALIDARG;
+void AccessibleObject::Release() {
+  if (acc_ != nullptr) {
+    acc_->Release();
+    acc_ = nullptr;
+  }
+}
 
-  BSTR buffer;
+////////////////////////////////////////////////////////////////////////////////
+
+HRESULT AccessibleObject::GetName(std::wstring& name, long child_id,
+                                  IAccessible* acc) {
+  if (acc == nullptr)
+    acc = acc_;
+  if (acc == nullptr)
+    return E_INVALIDARG;
+
   VARIANT var_child;
   var_child.vt = VT_I4;
   var_child.lVal = child_id;
-  
+
+  BSTR buffer;
   HRESULT hr = acc->get_accName(var_child, &buffer);
+
   if (buffer) {
     name = buffer;
   } else {
@@ -59,14 +77,18 @@ HRESULT AccessibleObject::GetName(wstring& name, long child_id, IAccessible* acc
   return hr;
 }
 
-HRESULT AccessibleObject::GetRole(wstring& role, long child_id, IAccessible* acc) {
-  if (acc == nullptr) acc = acc_;
-  if (acc == nullptr) return E_INVALIDARG;
-  
-  VARIANT var_child, var_result;
+HRESULT AccessibleObject::GetRole(std::wstring& role, long child_id,
+                                  IAccessible* acc) {
+  if (acc == nullptr)
+    acc = acc_;
+  if (acc == nullptr)
+    return E_INVALIDARG;
+
+  VARIANT var_child;
   var_child.vt = VT_I4;
   var_child.lVal = child_id;
-  
+
+  VARIANT var_result;
   HRESULT hr = acc->get_accRole(var_child, &var_result);
   
   if (hr == S_OK && var_result.vt == VT_I4) {
@@ -90,16 +112,20 @@ HRESULT AccessibleObject::GetRole(wstring& role, long child_id, IAccessible* acc
   return S_OK;
 }
 
-HRESULT AccessibleObject::GetValue(wstring& value, long child_id, IAccessible* acc) {
-  if (acc == nullptr) acc = acc_;
-  if (acc == nullptr) return E_INVALIDARG;
+HRESULT AccessibleObject::GetValue(std::wstring& value, long child_id,
+                                   IAccessible* acc) {
+  if (acc == nullptr)
+    acc = acc_;
+  if (acc == nullptr)
+    return E_INVALIDARG;
 
-  BSTR buffer;
   VARIANT var_child;
   var_child.vt = VT_I4;
   var_child.lVal = child_id;
-  
+
+  BSTR buffer;
   HRESULT hr = acc->get_accValue(var_child, &buffer);
+
   if (buffer) {
     value = buffer;
   } else {
@@ -110,13 +136,88 @@ HRESULT AccessibleObject::GetValue(wstring& value, long child_id, IAccessible* a
   return hr;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+HRESULT AccessibleObject::GetChildCount(long* child_count, IAccessible* acc) {
+  if (acc == nullptr)
+    acc = acc_;
+  if (acc == nullptr)
+    return E_INVALIDARG;
+
+  return acc->get_accChildCount(child_count);
+}
+
+HRESULT AccessibleObject::BuildChildren(std::vector<AccessibleChild>& children,
+                                        IAccessible* acc, LPARAM param) {
+  if (acc == nullptr)
+    acc = acc_;
+  if (acc == nullptr)
+    return E_INVALIDARG;
+
+  long child_count = 0;
+  HRESULT hr = acc->get_accChildCount(&child_count);
+
+  if (FAILED(hr))
+    return hr;
+  if (child_count == 0)
+    return S_FALSE;
+
+  long obtained_count = 0;
+  std::vector<VARIANT> var_array(child_count);
+  hr = AccessibleChildren(acc, 0L, child_count, var_array.data(),
+                          &obtained_count);
+
+  if (FAILED(hr))
+    return hr;
+
+  children.resize(obtained_count);
+  for (int i = 0; i < obtained_count; i++) {
+    VARIANT var_child = var_array[i];
+
+    if (var_child.vt == VT_DISPATCH) {
+      IDispatch* dispatch = var_child.pdispVal;
+      IAccessible* child = nullptr;
+      hr = dispatch->QueryInterface(IID_IAccessible, (void**)&child);
+      if (hr == S_OK) {
+        GetName(children.at(i).name, CHILDID_SELF, child);
+        GetRole(children.at(i).role, CHILDID_SELF, child);
+        GetValue(children.at(i).value, CHILDID_SELF, child);
+        if (AllowChildTraverse(children.at(i), param))
+          BuildChildren(children.at(i).children, child, param);
+        child->Release();
+      }
+      dispatch->Release();
+
+    } else {
+      GetName(children.at(i).name, var_child.lVal, acc);
+      GetRole(children.at(i).role, var_child.lVal, acc);
+      GetValue(children.at(i).value, var_child.lVal, acc);
+    }
+  }
+
+  return S_OK;
+}
+
+bool AccessibleObject::AllowChildTraverse(AccessibleChild& child,
+                                          LPARAM param) {
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#ifdef _DEBUG
 HWINEVENTHOOK AccessibleObject::Hook(DWORD eventMin, DWORD eventMax, 
-                                     HMODULE hmodWinEventProc, WINEVENTPROC pfnWinEventProc,
-                                     DWORD idProcess, DWORD idThread, DWORD dwFlags) {
+                                     HMODULE hmodWinEventProc,
+                                     WINEVENTPROC pfnWinEventProc,
+                                     DWORD idProcess, DWORD idThread,
+                                     DWORD dwFlags) {
   Unhook();
 
-  win_event_hook_ = SetWinEventHook(eventMin, eventMax, hmodWinEventProc, 
-    pfnWinEventProc, idProcess, idThread, dwFlags);
+  win_event_hook_ = SetWinEventHook(eventMin, eventMax,
+                                    hmodWinEventProc, 
+                                    pfnWinEventProc,
+                                    idProcess, idThread,
+                                    dwFlags);
 
   return win_event_hook_;
 }
@@ -132,75 +233,13 @@ void AccessibleObject::Unhook() {
   }
 }
 
-void AccessibleObject::Release() {
-  if (acc_ != nullptr) {
-    acc_->Release();
-    acc_ = nullptr;
-  }
-}
-
-HRESULT AccessibleObject::GetChildCount(long* child_count, IAccessible* acc) {
-  if (acc == nullptr) acc = acc_;
-  if (acc == nullptr) return E_INVALIDARG;
-
-  return acc->get_accChildCount(child_count);
-}
-
-HRESULT AccessibleObject::BuildChildren(vector<AccessibleChild>& children, IAccessible* acc, LPARAM param) {
-  if (acc == nullptr) acc = acc_;
-  if (acc == nullptr) return E_INVALIDARG;
-
-  long child_count, obtained_count;
-
-  HRESULT hr = acc->get_accChildCount(&child_count);
-  if (FAILED(hr)) return hr;
-  if (child_count == 0) return S_FALSE;
-
-  vector<VARIANT> var_array(child_count);
-  hr = AccessibleChildren(acc, 0L, child_count, var_array.data(), &obtained_count);
-  if (FAILED(hr)) return hr;
-
-  children.resize(obtained_count);
-  for (int i = 0; i < obtained_count; i++) {
-    VARIANT var_child = var_array[i];
-
-    if (var_child.vt == VT_DISPATCH) {
-      IDispatch* dispatch = var_child.pdispVal;
-      IAccessible* child = nullptr;
-      hr = dispatch->QueryInterface(IID_IAccessible, (void**)&child);
-      if (hr == S_OK) {
-        GetName(children.at(i).name, CHILDID_SELF, child);
-        GetRole(children.at(i).role, CHILDID_SELF, child);
-        GetValue(children.at(i).value, CHILDID_SELF, child);
-        if (AllowChildTraverse(children.at(i), param)) {
-          BuildChildren(children.at(i).children, child, param);
-        }
-        child->Release();
-      }
-      dispatch->Release();
-
-    } else {
-      GetName(children.at(i).name, var_child.lVal, acc);
-      GetRole(children.at(i).role, var_child.lVal, acc);
-      GetValue(children.at(i).value, var_child.lVal, acc);
-    }
-  }
-
-  return S_OK;
-}
-
-bool AccessibleObject::AllowChildTraverse(AccessibleChild& child, LPARAM param) {
-  return true;
-}
-
-// =============================================================================
-
 void CALLBACK WinEventFunc(HWINEVENTHOOK hook, DWORD dwEvent, HWND hwnd, 
                            LONG idObject, LONG idChild, 
                            DWORD dwEventThread, DWORD dwmsEventTime) {
   IAccessible* acc = nullptr;
   VARIANT var_child;
-  HRESULT hr = AccessibleObjectFromEvent(hwnd, idObject, idChild, &acc, &var_child);  
+  HRESULT hr = AccessibleObjectFromEvent(hwnd, idObject, idChild, &acc,
+                                         &var_child);
   
   if (hr == S_OK && acc != nullptr) {
     BSTR name;
@@ -214,8 +253,11 @@ void CALLBACK WinEventFunc(HWINEVENTHOOK hook, DWORD dwEvent, HWND hwnd,
       case EVENT_OBJECT_VALUECHANGE:
         break;
     }
-    
+
     SysFreeString(name);
     acc->Release();
   }
 }
+#endif
+
+}  // namespace base

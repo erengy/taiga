@@ -75,9 +75,9 @@ public:
   };
   vector<MediaPlayer> items;
 
-  class BrowserAccessibleObject : public AccessibleObject {
+  class BrowserAccessibleObject : public base::AccessibleObject {
   public:
-    bool AllowChildTraverse(AccessibleChild& child, LPARAM param = 0L);
+    bool AllowChildTraverse(base::AccessibleChild& child, LPARAM param = 0L);
   } acc_obj;
 
 private:
