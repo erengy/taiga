@@ -165,7 +165,8 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     float content_length = static_cast<float>(http_client.content_length());
     int percentage = static_cast<int>((current_length / content_length) * 100);
     status += L" (" + ToWstr(percentage) + L"%)";
-    TaskbarList.SetProgressValue(current_length, content_length);
+    TaskbarList.SetProgressValue(static_cast<ULONGLONG>(current_length),
+                                 static_cast<ULONGLONG>(content_length));
   } else {
     status += L" (" + ToSizeString(http_client.current_length()) + L")";
   }

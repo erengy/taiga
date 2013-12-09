@@ -21,6 +21,7 @@
 */
 
 #include <windows.h>
+#include <winhttp.h>
 #include <time.h>
 #include <list>
 #include <vector>
@@ -68,11 +69,11 @@ wstring COAuth::BuildAuthorizationHeader(
 OAuthParameters COAuth::ParseQueryString(const wstring& url) {
   OAuthParameters parsed_parameters;
 
-  vector<wstring> parameters;
+  std::vector<std::wstring> parameters;
   Split(url, L"&", parameters);
 
   for (size_t i = 0; i < parameters.size(); ++i) {
-    vector<wstring> elements;
+    std::vector<std::wstring> elements;
     Split(parameters[i], L"=", elements);
     if (elements.size() == 2) {
       parsed_parameters[elements[0]] = elements[1];

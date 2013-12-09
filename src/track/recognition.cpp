@@ -790,6 +790,12 @@ bool RecognitionEngine::IsTokenEnclosed(const Token& token) {
   return token.encloser == '[' || token.encloser == '(' || token.encloser == '{';
 }
 
+void ReadStringTable(UINT uID, wstring& str) {
+  wchar_t buffer[2048];
+  LoadString(g_hInstance, uID, buffer, 2048);
+  str.append(buffer);
+}
+
 void RecognitionEngine::ReadKeyword(unsigned int id, vector<wstring>& str) {
   wstring str_buff; 
   ReadStringTable(id, str_buff); 

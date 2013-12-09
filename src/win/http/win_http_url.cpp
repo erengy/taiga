@@ -41,7 +41,7 @@ void Url::operator=(const std::wstring& url) {
 void Url::Crack(std::wstring url) {
   // Get scheme
   size_t i = url.find(L"://", 0);
-  if (i != wstring::npos) {
+  if (i != std::wstring::npos) {
     scheme = url.substr(0, i);
     url = url.substr(i + 3);
   } else {
@@ -50,7 +50,7 @@ void Url::Crack(std::wstring url) {
 
   // Get host and path
   i = url.find(L"/", 0);
-  if (i == wstring::npos)
+  if (i == std::wstring::npos)
     i = url.length();
   host = url.substr(0, i);
   path = url.substr(i);
