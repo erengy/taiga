@@ -84,10 +84,10 @@ void EventQueue::Add(EventItem& item, bool save) {
       if (anime->GetMyTags() == *item.tags)
         item.tags.Reset();
     if (item.date_start)
-      if (anime->GetMyDate(anime::DATE_START) == anime::TranslateDateFromApi(*item.date_start))
+      if (anime->GetMyDateStart() == anime::TranslateDateFromApi(*item.date_start))
         item.date_start.Reset();
     if (item.date_finish)
-      if (anime->GetMyDate(anime::DATE_END) == anime::TranslateDateFromApi(*item.date_finish))
+      if (anime->GetMyDateEnd() == anime::TranslateDateFromApi(*item.date_finish))
         item.date_finish.Reset();
   }
   switch (item.mode) {

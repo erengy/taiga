@@ -40,20 +40,6 @@ enum AnimeId {
   ID_UNKNOWN = 0
 };
 
-// GetDate() and SetDate() require a particular type.
-//
-// DATE_START
-//   Airing date of the first episode (i.e., season premiere for TV series).
-//
-// DATE_END
-//   Airing date of the last episode (i.e., season finale for TV series).
-//   The same as DATE_START for one-episode titles.
-//
-enum DateType {
-  DATE_START = 0,
-  DATE_END
-};
-
 enum SeriesStatus {
   kUnknownStatus,
   kAiring,

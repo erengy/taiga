@@ -69,8 +69,8 @@ bool Database::LoadDatabase() {
     item.SetType(XmlReadIntValue(node, L"series_type"));
     item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
     item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
-    item.SetDate(DATE_START, Date(XmlReadStrValue(node, L"series_start")));
-    item.SetDate(DATE_END, Date(XmlReadStrValue(node, L"series_end")));
+    item.SetDateStart(Date(XmlReadStrValue(node, L"series_start")));
+    item.SetDateEnd(Date(XmlReadStrValue(node, L"series_end")));
     item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
@@ -103,8 +103,8 @@ bool Database::SaveDatabase() {
     XML_WI(L"series_type", it->second.GetType());
     XML_WI(L"series_episodes", it->second.GetEpisodeCount());
     XML_WI(L"series_status", it->second.GetAiringStatus());
-    XML_WS(L"series_start", wstring(it->second.GetDate(DATE_START)), pugi::node_pcdata);
-    XML_WS(L"series_end", wstring(it->second.GetDate(DATE_END)), pugi::node_pcdata);
+    XML_WS(L"series_start", wstring(it->second.GetDateStart()), pugi::node_pcdata);
+    XML_WS(L"series_end", wstring(it->second.GetDateEnd()), pugi::node_pcdata);
     XML_WS(L"series_image", it->second.GetImageUrl(), pugi::node_pcdata);
     XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
@@ -208,10 +208,10 @@ void Database::UpdateItem(Item& new_item) {
       item->SetEnglishTitle(new_item.GetEnglishTitle());
     if (!new_item.GetSynonyms().empty())
       item->SetSynonyms(new_item.GetSynonyms());
-    if (IsValidDate(new_item.GetDate(DATE_START)))
-      item->SetDate(DATE_START, new_item.GetDate(DATE_START));
-    if (IsValidDate(new_item.GetDate(DATE_END)))
-      item->SetDate(DATE_END, new_item.GetDate(DATE_END));
+    if (IsValidDate(new_item.GetDateStart()))
+      item->SetDateStart(new_item.GetDateStart());
+    if (IsValidDate(new_item.GetDateEnd()))
+      item->SetDateEnd(new_item.GetDateEnd());
     if (!new_item.GetImageUrl().empty())
       item->SetImageUrl(new_item.GetImageUrl());
     if (!new_item.GetGenres().empty())
@@ -242,8 +242,8 @@ void Database::UpdateItem(Item& new_item) {
     item->SetMyStatus(new_item.GetMyStatus(false));
     item->SetMyRewatching(new_item.GetMyRewatching(false));
     item->SetMyRewatchingEp(new_item.GetMyRewatchingEp());
-    item->SetMyDate(DATE_START, new_item.GetMyDate(DATE_START));
-    item->SetMyDate(DATE_END, new_item.GetMyDate(DATE_END));
+    item->SetMyDateStart(new_item.GetMyDateStart());
+    item->SetMyDateEnd(new_item.GetMyDateEnd());
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
   }
@@ -309,14 +309,14 @@ bool Database::LoadList() {
     anime_item.SetType(XmlReadIntValue(node, L"series_type"));
     anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
     anime_item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
-    anime_item.SetDate(DATE_START, XmlReadStrValue(node, L"series_start"));
-    anime_item.SetDate(DATE_END, XmlReadStrValue(node, L"series_end"));
+    anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
+    anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
     anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
 
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
-    anime_item.SetMyDate(DATE_START, XmlReadStrValue(node, L"my_start_date"));
-    anime_item.SetMyDate(DATE_END, XmlReadStrValue(node, L"my_finish_date"));
+    anime_item.SetMyDateStart(XmlReadStrValue(node, L"my_start_date"));
+    anime_item.SetMyDateEnd(XmlReadStrValue(node, L"my_finish_date"));
     anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
     anime_item.SetMyStatus(XmlReadIntValue(node, L"my_status"));
     anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
@@ -343,8 +343,8 @@ bool Database::SaveList() {
       xml_node node = myanimelist_node.append_child(L"anime");
       XmlWriteIntValue(node, L"series_animedb_id", item->GetId());
       XmlWriteIntValue(node, L"my_watched_episodes", item->GetMyLastWatchedEpisode(false));
-      XmlWriteStrValue(node, L"my_start_date", wstring(item->GetMyDate(DATE_START)).c_str());
-      XmlWriteStrValue(node, L"my_finish_date", wstring(item->GetMyDate(DATE_END)).c_str());
+      XmlWriteStrValue(node, L"my_start_date", wstring(item->GetMyDateStart()).c_str());
+      XmlWriteStrValue(node, L"my_finish_date", wstring(item->GetMyDateEnd()).c_str());
       XmlWriteIntValue(node, L"my_score", item->GetMyScore(false));
       XmlWriteIntValue(node, L"my_status", item->GetMyStatus(false));
       XmlWriteIntValue(node, L"my_rewatching", item->GetMyRewatching(false));

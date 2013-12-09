@@ -573,8 +573,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     // Airing times
     vector<int> recently_started, recently_finished, upcoming;
     foreach_c_(it, AnimeDatabase.items) {
-      const Date& date_start = it->second.GetDate(anime::DATE_START);
-      const Date& date_end = it->second.GetDate(anime::DATE_END);
+      const Date& date_start = it->second.GetDateStart();
+      const Date& date_end = it->second.GetDateEnd();
       if (date_start.year && date_start.month && date_start.day) {
         date_diff = date_now - date_start;
         if (date_diff > 0 && date_diff <= day_limit) {

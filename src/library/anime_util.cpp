@@ -93,9 +93,9 @@ int EstimateEpisodeCount(const Item& item) {
 
   // Estimate using airing dates of TV series
   if (item.GetType() == kTv) {
-    Date date_start = item.GetDate(DATE_START);
+    Date date_start = item.GetDateStart();
     if (IsValidDate(date_start)) {
-      Date date_end = item.GetDate(DATE_END);
+      Date date_end = item.GetDateEnd();
       // Use current date in Japan if ending date is unknown
       if (!IsValidDate(date_end)) date_end = GetDateJapan();
       // Assuming the series is aired weekly

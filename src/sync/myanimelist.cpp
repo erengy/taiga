@@ -254,14 +254,14 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     anime_item.SetType(XmlReadIntValue(node, L"series_type"));
     anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
     anime_item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
-    anime_item.SetDate(::anime::DATE_START, XmlReadStrValue(node, L"series_start"));
-    anime_item.SetDate(::anime::DATE_END, XmlReadStrValue(node, L"series_end"));
+    anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
+    anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
     anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
 
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
-    anime_item.SetMyDate(::anime::DATE_START, XmlReadStrValue(node, L"my_start_date"));
-    anime_item.SetMyDate(::anime::DATE_END, XmlReadStrValue(node, L"my_finish_date"));
+    anime_item.SetMyDateStart(XmlReadStrValue(node, L"my_start_date"));
+    anime_item.SetMyDateEnd(XmlReadStrValue(node, L"my_finish_date"));
     anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
     anime_item.SetMyStatus(XmlReadIntValue(node, L"my_status"));
     anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
@@ -354,8 +354,8 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     anime_item.SetScore(XmlReadStrValue(node, L"score"));
     anime_item.SetType(anime::TranslateType(XmlReadStrValue(node, L"type")));
     anime_item.SetAiringStatus(anime::TranslateStatus(XmlReadStrValue(node, L"status")));
-    anime_item.SetDate(::anime::DATE_START, XmlReadStrValue(node, L"start_date"));
-    anime_item.SetDate(::anime::DATE_END, XmlReadStrValue(node, L"end_date"));
+    anime_item.SetDateStart(XmlReadStrValue(node, L"start_date"));
+    anime_item.SetDateEnd(XmlReadStrValue(node, L"end_date"));
     wstring synopsis = DecodeText(XmlReadStrValue(node, L"synopsis"));
     if (!StartsWith(synopsis, L"No synopsis has been added for this series yet"))
       anime_item.SetSynopsis(synopsis);

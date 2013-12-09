@@ -64,8 +64,8 @@ BOOL FormatDialog::OnInitDialog() {
     PreviewAnime.SetType(anime::kTv);
     PreviewAnime.SetEpisodeCount(25);
     PreviewAnime.SetAiringStatus(anime::kFinishedAiring);
-    PreviewAnime.SetDate(anime::DATE_START, Date(2008, 10, 01));
-    PreviewAnime.SetDate(anime::DATE_END, Date(2009, 03, 25));
+    PreviewAnime.SetDateStart(Date(2008, 10, 01));
+    PreviewAnime.SetDateEnd(Date(2009, 03, 25));
     PreviewAnime.SetImageUrl(L"http://cdn.myanimelist.net/images/anime/5/22125.jpg");
     PreviewAnime.SetEpisodeCount(26);
     PreviewAnime.AddtoUserList();

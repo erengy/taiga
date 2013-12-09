@@ -1049,7 +1049,7 @@ void AnimeListDialog::RefreshList(int index) {
                         static_cast<LPARAM>(anime_item.GetId()));
     listview.SetItem(i, 2, anime::TranslateNumber(anime_item.GetMyScore()).c_str());
     listview.SetItem(i, 3, anime::TranslateType(anime_item.GetType()).c_str());
-    listview.SetItem(i, 4, anime::TranslateDateToSeason(anime_item.GetDate(anime::DATE_START)).c_str());
+    listview.SetItem(i, 4, anime::TranslateDateToSeason(anime_item.GetDateStart()).c_str());
   }
 
   // Set group headers

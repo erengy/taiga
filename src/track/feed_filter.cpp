@@ -57,10 +57,10 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
       element = item.episode_data.title;
       break;
     case FEED_FILTER_ELEMENT_META_DATE_START:
-      if (anime) element = anime->GetDate(anime::DATE_START);
+      if (anime) element = anime->GetDateStart();
       break;
     case FEED_FILTER_ELEMENT_META_DATE_END:
-      if (anime) element = anime->GetDate(anime::DATE_END);
+      if (anime) element = anime->GetDateEnd();
       break;
     case FEED_FILTER_ELEMENT_META_EPISODES:
       if (anime) element = ToWstr(anime->GetEpisodeCount());

@@ -329,7 +329,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (view_as == SEASON_VIEWAS_IMAGES) {
         switch (sort_by) {
           case SEASON_SORTBY_AIRINGDATE:
-            text = anime::TranslateDate(anime_item->GetDate(anime::DATE_START));
+            text = anime::TranslateDate(anime_item->GetDateStart());
             break;
           case SEASON_SORTBY_EPISODES:
             text = anime::TranslateNumber(anime_item->GetEpisodeCount(), L"");
@@ -381,9 +381,9 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
-      text = anime::TranslateDate(anime_item->GetDate(anime::DATE_START));
-      text += anime_item->GetDate(anime::DATE_END) != anime_item->GetDate(anime::DATE_START) ? 
-              L" to " + anime::TranslateDate(anime_item->GetDate(anime::DATE_END)) : L"";
+      text = anime::TranslateDate(anime_item->GetDateStart());
+      text += anime_item->GetDateEnd() != anime_item->GetDateStart() ? 
+              L" to " + anime::TranslateDate(anime_item->GetDateEnd()) : L"";
       text += L" (" + anime::TranslateStatus(anime_item->GetAiringStatus()) + L")";
       DRAWLINE(text);
       DRAWLINE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));

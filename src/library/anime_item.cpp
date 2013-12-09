@@ -110,11 +110,16 @@ vector<wstring> Item::GetSynonyms() const {
   return synonyms;
 }
 
-const Date& Item::GetDate(DateType type) const {
-  auto index = static_cast<size_t>(type);
+const Date& Item::GetDateStart() const {
+  if (metadata_.date.size() > 0)
+    return metadata_.date.at(0);
 
-  if (metadata_.date.size() > index)
-    return metadata_.date.at(index);
+  return EmptyDate();
+}
+
+const Date& Item::GetDateEnd() const {
+  if (metadata_.date.size() > 1)
+    return metadata_.date.at(1);
 
   return EmptyDate();
 }
@@ -187,24 +192,24 @@ int Item::GetMyRewatchingEp() const {
   return my_info_->rewatching_ep;
 }
 
-const Date Item::GetMyDate(DateType type, bool check_events) const {
+const Date Item::GetMyDateStart(bool check_events) const {
   if (!my_info_.get()) return Date();
   EventItem* event_item = nullptr;
-  switch (type) {
-    case DATE_START:
-    default:
-      event_item = check_events ? 
-        SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
-      return event_item ? 
-        TranslateDateFromApi(*event_item->date_start) : 
-        my_info_->date_start;
-    case DATE_END:
-      event_item = check_events ? 
-        SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
-      return event_item ? 
-        TranslateDateFromApi(*event_item->date_finish) : 
-        my_info_->date_finish;
-  }
+  event_item = check_events ? 
+    SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
+  return event_item ? 
+    TranslateDateFromApi(*event_item->date_start) : 
+    my_info_->date_start;
+}
+
+const Date Item::GetMyDateEnd(bool check_events) const {
+  if (!my_info_.get()) return Date();
+  EventItem* event_item = nullptr;
+  event_item = check_events ? 
+    SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
+  return event_item ? 
+    TranslateDateFromApi(*event_item->date_finish) : 
+    my_info_->date_finish;
 }
 
 const wstring Item::GetMyLastUpdated() const {
@@ -293,13 +298,18 @@ void Item::SetSynonyms(const vector<wstring>& synonyms) {
   metadata_.alternative = alternative;
 }
 
-void Item::SetDate(DateType type, const Date& date) {
-  auto index = static_cast<size_t>(type);
+void Item::SetDateStart(const Date& date) {
+  if (metadata_.date.size() < 1)
+    metadata_.date.resize(1);
 
-  if (metadata_.date.size() <= index)
-    metadata_.date.resize(index + 1);
+  metadata_.date.at(0) = date;
+}
 
-  metadata_.date.at(type) = date;
+void Item::SetDateEnd(const Date& date) {
+  if (metadata_.date.size() < 2)
+    metadata_.date.resize(2);
+
+  metadata_.date.at(1) = date;
 }
 
 void Item::SetImageUrl(const wstring& url) {
@@ -376,16 +386,14 @@ void Item::SetMyRewatchingEp(int rewatching_ep) {
   my_info_->rewatching_ep = rewatching_ep;
 }
 
-void Item::SetMyDate(DateType type, const Date& date) {
+void Item::SetMyDateStart(const Date& date) {
   assert(my_info_.get());
-  switch (type) {
-    case DATE_START:
-      my_info_->date_start = date;
-      break;
-    case DATE_END:
-      my_info_->date_finish = date;
-      break;
-  }
+  my_info_->date_start = date;
+}
+
+void Item::SetMyDateEnd(const Date& date) {
+  assert(my_info_.get());
+  my_info_->date_finish = date;
 }
 
 void Item::SetMyLastUpdated(const wstring& last_updated) {
@@ -402,10 +410,10 @@ void Item::SetMyTags(const wstring& tags) {
 
 bool Item::IsAiredYet() const {
   if (metadata_.status != kNotYetAired) return true;
-  if (!IsValidDate(GetDate(DATE_START))) return false;
+  if (!IsValidDate(GetDateStart())) return false;
   
   Date date_japan = GetDateJapan();
-  Date date_start = GetDate(DATE_START);
+  Date date_start = GetDateStart();
   
   // Assume the worst case
   if (!date_start.month)
@@ -418,9 +426,9 @@ bool Item::IsAiredYet() const {
 
 bool Item::IsFinishedAiring() const {
   if (metadata_.status == kFinishedAiring) return true;
-  if (!IsValidDate(GetDate(DATE_END))) return false;
+  if (!IsValidDate(GetDateEnd())) return false;
   if (!IsAiredYet()) return false;
-  return GetDateJapan() > GetDate(DATE_END);
+  return GetDateJapan() > GetDateEnd();
 }
 
 // =============================================================================
@@ -481,7 +489,7 @@ int Item::GetLastAiredEpisodeNumber(bool estimate) {
   // the series started airing gives us the last aired episode. Note that
   // irregularities such as broadcasts being postponed due to sports events make
   // this method unreliable.
-  const Date& date_start = GetDate(anime::DATE_START);
+  const Date& date_start = GetDateStart();
   if (date_start.year && date_start.month && date_start.day) { 
     // To compensate for the fact that we don't know the airing hour,
     // we substract one more day.
@@ -722,11 +730,11 @@ void Item::Edit(const EventItem& item) {
   // Edit dates
   if (item.date_start) {
     Date date_start = TranslateDateFromApi(*item.date_start);
-    SetMyDate(anime::DATE_START, date_start);
+    SetMyDateStart(date_start);
   }
   if (item.date_finish) {
     Date date_finish = TranslateDateFromApi(*item.date_finish);
-    SetMyDate(anime::DATE_END, date_finish);
+    SetMyDateEnd(date_finish);
   }
   // Delete
   if (item.mode == taiga::kHttpServiceDeleteLibraryEntry) {

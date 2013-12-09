@@ -502,7 +502,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       case anime::kCompleted:
         event_item.episode = anime_item->GetEpisodeCount();
         if (*event_item.episode == 0) event_item.episode.Reset();
-        if (!anime::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
+        if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
           event_item.date_finish = anime::TranslateDateForApi(GetDate());
         break;
     }

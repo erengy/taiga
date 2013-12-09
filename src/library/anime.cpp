@@ -199,9 +199,9 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
   event_item.episode = GetEpisodeHigh(episode.number);
 
   // Set start/finish date
-  if (*event_item.episode == 1 && !IsValidDate(GetMyDate(DATE_START)))
+  if (*event_item.episode == 1 && !IsValidDate(GetMyDateStart()))
     event_item.date_start = TranslateDateForApi(::GetDate());
-  if (*event_item.episode == GetEpisodeCount() && !IsValidDate(GetMyDate(DATE_END)))
+  if (*event_item.episode == GetEpisodeCount() && !IsValidDate(GetMyDateEnd()))
     event_item.date_finish = TranslateDateForApi(::GetDate());
 
   // Set update mode
@@ -296,7 +296,7 @@ void GetUpcomingTitles(vector<int>& anime_ids) {
   foreach_c_(item, AnimeDatabase.items) {
     const anime::Item& anime_item = item->second;
     
-    const Date& date_start = anime_item.GetDate(anime::DATE_START);
+    const Date& date_start = anime_item.GetDateStart();
     const Date& date_now = GetDateJapan();
 
     if (!date_start.year || !date_start.month || !date_start.day)

@@ -160,7 +160,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   text = anime::TranslateType(anime_item->GetType()) + L"\n" +
          anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
          anime::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
-         anime::TranslateDateToSeason(anime_item->GetDate(anime::DATE_START)) + L"\n" +
+         anime::TranslateDateToSeason(anime_item->GetDateStart()) + L"\n" +
          (anime_item->GetGenres().empty() ? L"Unknown" : Join(anime_item->GetGenres(), L", ")) + L"\n" +
          (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
          ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" +
@@ -327,28 +327,28 @@ void PageMyInfo::Refresh(int anime_id) {
   m_Edit.SetWindowHandle(nullptr);
       
   // Date limits and defaults
-  if (anime::IsValidDate(anime_item->GetDate(anime::DATE_START))) {
-    SYSTEMTIME stSeriesStart = anime_item->GetDate(anime::DATE_START);
+  if (anime::IsValidDate(anime_item->GetDateStart())) {
+    SYSTEMTIME stSeriesStart = anime_item->GetDateStart();
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
   }
-  if (anime::IsValidDate(anime_item->GetDate(anime::DATE_END))) {
-    SYSTEMTIME stSeriesEnd = anime_item->GetDate(anime::DATE_END);
+  if (anime::IsValidDate(anime_item->GetDateEnd())) {
+    SYSTEMTIME stSeriesEnd = anime_item->GetDateEnd();
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesEnd);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesEnd);
   }
   // Start date
-  if (anime::IsValidDate(anime_item->GetMyDate(anime::DATE_START))) {
-    SYSTEMTIME stMyStart = anime_item->GetMyDate(anime::DATE_START);
+  if (anime::IsValidDate(anime_item->GetMyDateStart())) {
+    SYSTEMTIME stMyStart = anime_item->GetMyDateStart();
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyStart);
   } else {
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, 0);
   }
   // Finish date
-  if (anime::IsValidDate(anime_item->GetMyDate(anime::DATE_END))) {
-    SYSTEMTIME stMyFinish = anime_item->GetMyDate(anime::DATE_END);
+  if (anime::IsValidDate(anime_item->GetMyDateEnd())) {
+    SYSTEMTIME stMyFinish = anime_item->GetMyDateEnd();
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyFinish);
   } else {
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, 0);

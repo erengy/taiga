@@ -210,7 +210,7 @@ bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::I
       break;
   }
   if (!episode.year.empty()) {
-    if (anime_item.GetDate(anime::DATE_START).year == ToInt(episode.year)) {
+    if (anime_item.GetDateStart().year == ToInt(episode.year)) {
       score += score_bonus_big;
     }
   }

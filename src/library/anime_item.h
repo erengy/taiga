@@ -48,7 +48,8 @@ class Item {
   const wstring& GetTitle() const;
   const wstring& GetEnglishTitle(bool fallback = false) const;
   vector<wstring> GetSynonyms() const;
-  const Date& GetDate(DateType type) const;
+  const Date& GetDateStart() const;
+  const Date& GetDateEnd() const;
   const wstring& GetImageUrl() const;
   const vector<wstring>& GetGenres() const;
   const wstring& GetPopularity() const;
@@ -63,7 +64,8 @@ class Item {
   int GetMyStatus(bool check_events = true) const;
   int GetMyRewatching(bool check_events = true) const;
   int GetMyRewatchingEp() const;
-  const Date GetMyDate(DateType type, bool check_events = true) const;
+  const Date GetMyDateStart(bool check_events = true) const;
+  const Date GetMyDateEnd(bool check_events = true) const;
   const wstring GetMyLastUpdated() const;
   const wstring GetMyTags(bool check_events = true) const;
 
@@ -77,7 +79,8 @@ class Item {
   void SetEnglishTitle(const wstring& title);
   void SetSynonyms(const wstring& synonyms);
   void SetSynonyms(const vector<wstring>& synonyms);
-  void SetDate(DateType type, const Date& date);
+  void SetDateStart(const Date& date);
+  void SetDateEnd(const Date& date);
   void SetImageUrl(const wstring& url);
   void SetGenres(const wstring& genres);
   void SetGenres(const vector<wstring>& genres);
@@ -93,7 +96,8 @@ class Item {
   void SetMyStatus(int status);
   void SetMyRewatching(int rewatching);
   void SetMyRewatchingEp(int rewatching_ep);
-  void SetMyDate(DateType type, const Date& date);
+  void SetMyDateStart(const Date& date);
+  void SetMyDateEnd(const Date& date);
   void SetMyLastUpdated(const wstring& last_updated);
   void SetMyTags(const wstring& tags);
   

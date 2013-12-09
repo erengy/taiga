@@ -84,7 +84,7 @@ bool SeasonDatabase::IsRefreshRequired() {
     int anime_id = *it;
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
-      const Date& date_start = anime_item->GetDate(anime::DATE_START);
+      const Date& date_start = anime_item->GetDateStart();
       if (!anime::IsValidDate(date_start) || anime_item->GetSynopsis().empty())
         count++;
     }
@@ -108,7 +108,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (anime_item) {
       bool invalid = false;
       // Airing date must be within the interval
-      const Date& anime_start = anime_item->GetDate(anime::DATE_START);
+      const Date& anime_start = anime_item->GetDateStart();
       if (anime::IsValidDate(anime_start))
         if (anime_start < date_start || anime_start > date_end)
           invalid = true;
@@ -133,7 +133,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (hide_hentai && InStr(genres, L"Hentai", 0, true) > -1)
       continue;
     // Airing date must be within the interval
-    const Date& anime_start = it->second.GetDate(anime::DATE_START);
+    const Date& anime_start = it->second.GetDateStart();
     if (anime_start.year && anime_start.month &&
         anime_start >= date_start && anime_start <= date_end) {
       items.push_back(it->second.GetId());
