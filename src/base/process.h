@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,20 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PROCESS_H
-#define PROCESS_H
+#ifndef TAIGA_BASE_PROCESS_H
+#define TAIGA_BASE_PROCESS_H
 
-#include "std.h"
+#include <string>
+#include <vector>
+#include <windows.h>
 
-// =============================================================================
+BOOL GetProcessFiles(ULONG process_id, std::vector<std::wstring>& files_vector);
+
+bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name);
 
 void ActivateWindow(HWND hwnd);
-bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name);
-BOOL GetProcessFiles(ULONG process_id, vector<wstring>& files_vector);
-wstring GetWindowClass(HWND hwnd);
-wstring GetWindowPath(HWND hwnd);
-wstring GetWindowTitle(HWND hwnd);
+std::wstring GetWindowClass(HWND hwnd);
+std::wstring GetWindowPath(HWND hwnd);
+std::wstring GetWindowTitle(HWND hwnd);
 bool IsFullscreen(HWND hwnd);
-bool TranslateDeviceName(wstring& path);
 
-#endif // PROCESS_H
+PVOID GetLibraryProcAddress(PSTR dll_module, PSTR proc_name);
+bool TranslateDeviceName(std::wstring& path);
+
+#endif  // TAIGA_BASE_PROCESS_H
