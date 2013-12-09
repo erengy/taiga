@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,92 +16,125 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
-#include "string.h"
+#include <algorithm>
 #include <functional>
 #include <iomanip>
 #include <locale>
 #include <sstream>
 
-// =============================================================================
+#include "string.h"
 
-/* Erasing */
+using std::string;
+using std::vector;
+using std::wstring;
+
+////////////////////////////////////////////////////////////////////////////////
+// Erasing
 
 void Erase(wstring& str1, const wstring& str2, bool case_insensitive) {
-  if (str2.empty() || str1.length() < str2.length()) return;
+  if (str2.empty() || str1.length() < str2.length())
+    return;
+
   auto it = str1.begin();
+
   do {
     if (case_insensitive) {
       it = std::search(it, str1.end(), str2.begin(), str2.end(), &IsCharsEqual);
     } else {
       it = std::search(it, str1.end(), str2.begin(), str2.end());
     }
-    if (it != str1.end()) str1.erase(it, it + str2.length());
+
+    if (it != str1.end())
+      str1.erase(it, it + str2.length());
+
   } while (it != str1.end());
 }
 
 void EraseChars(wstring& str, const wchar_t chars[]) {
   size_t pos = 0;
+
   do {
     pos = str.find_first_of(chars, pos);
-    if (pos != wstring::npos) str.erase(pos, 1);
+
+    if (pos != wstring::npos)
+      str.erase(pos, 1);
+
   } while (pos != wstring::npos);
 }
 
 void ErasePunctuation(wstring& str, bool keep_trailing) {
   auto rlast = str.rbegin();
-  if (keep_trailing) {
-    rlast = std::find_if(str.rbegin(), str.rend(), 
-    [](wchar_t c) -> bool {
-      return !(c == L'!' || // "Hayate no Gotoku!", "K-ON!"...
-               c == L'+' || // "Needless+"
-               c == L'\''); // "Gintama'"
-    });
-  }
 
-  auto it = std::remove_if(str.begin(), rlast.base(), 
-    [](int c) -> bool {
-      // Control codes, white-space and punctuation characters
-      if (c <= 255 && !isalnum(c)) return true;
-      // Unicode stars, hearts, notes, etc. (0x2000-0x2767)
-      if (c > 8192 && c < 10087) return true;
-      // Valid character
-      return false;
-    });
+  if (keep_trailing)
+    rlast = std::find_if(str.rbegin(), str.rend(),
+        [](wchar_t c) -> bool {
+          return !(c == L'!' || // "Hayate no Gotoku!", "K-ON!"...
+                   c == L'+' || // "Needless+"
+                   c == L'\''); // "Gintama'"
+        });
+
+  auto it = std::remove_if(str.begin(), rlast.base(),
+      [](int c) -> bool {
+        // Control codes, white-space and punctuation characters
+        if (c <= 255 && !isalnum(c))
+          return true;
+        // Unicode stars, hearts, notes, etc. (0x2000-0x2767)
+        if (c > 8192 && c < 10087)
+          return true;
+        // Valid character
+        return false;
+      });
   
-  if (keep_trailing) std::copy(rlast.base(), str.end(), it);
+  if (keep_trailing)
+    std::copy(rlast.base(), str.end(), it);
+
   str.resize(str.size() - (rlast.base() - it));
 }
 
 void EraseLeft(wstring& str1, const wstring str2, bool case_insensitive) {
-  if (str1.length() < str2.length()) return;
+  if (str1.length() < str2.length())
+    return;
+
   if (case_insensitive) {
-    if (!std::equal(str2.begin(), str2.end(), str1.begin(), &IsCharsEqual)) return;
+    if (!std::equal(str2.begin(), str2.end(), str1.begin(), &IsCharsEqual))
+      return;
   } else {
-    if (!std::equal(str2.begin(), str2.end(), str1.begin())) return;
+    if (!std::equal(str2.begin(), str2.end(), str1.begin()))
+      return;
   }
+
   str1.erase(str1.begin(), str1.begin() + str2.length());
 }
 
 void EraseRight(wstring& str1, const wstring str2, bool case_insensitive) {
-  if (str1.length() < str2.length()) return;
+  if (str1.length() < str2.length())
+    return;
+
   if (case_insensitive) {
-    if (!std::equal(str2.begin(), str2.end(), str1.end() - str2.length(), &IsCharsEqual)) return;
+    if (!std::equal(str2.begin(), str2.end(), str1.end() - str2.length(),
+                    &IsCharsEqual))
+      return;
   } else {
-    if (!std::equal(str2.begin(), str2.end(), str1.end() - str2.length())) return;
+    if (!std::equal(str2.begin(), str2.end(), str1.end() - str2.length()))
+      return;
   }
+
   str1.resize(str1.length() - str2.length());
 }
 
 void RemoveEmptyStrings(vector<wstring>& input) {
-  if (input.empty()) return;
+  if (input.empty())
+    return;
+
   input.erase(std::remove_if(input.begin(), input.end(),
-    [](const wstring& s) -> bool { return s.empty(); }), 
-    input.end());
+      [](const wstring& s) -> bool { return s.empty(); }),
+      input.end());
 }
 
 void StripHtmlTags(wstring& str) {
-  int index_begin, index_end;
+  int index_begin = -1;
+  int index_end = -1;
+
   do {
     index_begin = InStr(str, L"<", 0);
     if (index_begin > -1) {
@@ -115,9 +148,8 @@ void StripHtmlTags(wstring& str) {
   } while (index_begin > -1);
 }
 
-// =============================================================================
-
-/* Searching and comparison */
+////////////////////////////////////////////////////////////////////////////////
+// Searching and comparison
 
 wstring CharLeft(const wstring& str, int length) {
   return str.substr(0, length);
@@ -131,7 +163,8 @@ wstring CharRight(const wstring& str, int length) {
   }
 }
 
-int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensitive, size_t max_count) {
+int CompareStrings(const wstring& str1, const wstring& str2,
+                   bool case_insensitive, size_t max_count) {
   if (case_insensitive) {
     return _wcsnicmp(str1.c_str(), str2.c_str(), max_count);
   } else {
@@ -139,11 +172,19 @@ int CompareStrings(const wstring& str1, const wstring& str2, bool case_insensiti
   }
 }
 
-int InStr(const wstring& str1, const wstring str2, int pos, bool case_insensitive) {
-  if (str1.empty()) return -1; if (str2.empty()) return 0;
-  if (str1.length() < str2.length()) return -1;
+int InStr(const wstring& str1, const wstring str2, int pos,
+          bool case_insensitive) {
+  if (str1.empty())
+    return -1;
+  if (str2.empty())
+    return 0;
+  if (str1.length() < str2.length())
+    return -1;
+
   if (case_insensitive) {
-    auto i = std::search(str1.begin() + pos, str1.end(), str2.begin(), str2.end(), &IsCharsEqual);
+    auto i = std::search(str1.begin() + pos, str1.end(),
+                         str2.begin(), str2.end(),
+                         &IsCharsEqual);
     return (i == str1.end()) ? -1 : i - str1.begin();
   } else {
     size_t i = str1.find(str2, pos);
@@ -151,16 +192,19 @@ int InStr(const wstring& str1, const wstring str2, int pos, bool case_insensitiv
   }
 }
 
-wstring InStr(const wstring& str1, const wstring& str2_left, const wstring& str2_right) {
+wstring InStr(const wstring& str1, const wstring& str2_left,
+              const wstring& str2_right) {
   wstring output;
+
   int index_begin = InStr(str1, str2_left);
+
   if (index_begin > -1) {
     index_begin += str2_left.length();
     int index_end = InStr(str1, str2_right, index_begin);
-    if (index_end > -1) {
+    if (index_end > -1)
       output = str1.substr(index_begin, index_end - index_begin);
-    }
   }
+
   return output;
 }
 
@@ -180,12 +224,18 @@ int InStrCharsRev(const wstring& str1, const wstring str2, int pos) {
 }
 
 bool IsAlphanumeric(const wchar_t c) {
-  return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+  return (c >= '0' && c <= '9') ||
+         (c >= 'A' && c <= 'Z') ||
+         (c >= 'a' && c <= 'z');
 }
 bool IsAlphanumeric(const wstring& str) {
-  if (str.empty()) return false;
+  if (str.empty())
+    return false;
+
   for (size_t i = 0; i < str.length(); i++)
-    if (!IsAlphanumeric(str[i])) return false;
+    if (!IsAlphanumeric(str[i]))
+      return false;
+
   return true;
 }
 
@@ -194,17 +244,25 @@ inline bool IsCharsEqual(const wchar_t c1, const wchar_t c2) {
 }
 
 bool IsEqual(const wstring& str1, const wstring& str2) {
-  if (str1.length() != str2.length()) return false;
+  if (str1.length() != str2.length())
+    return false;
+
   return std::equal(str1.begin(), str1.end(), str2.begin(), &IsCharsEqual);
 }
 
 bool IsHex(const wchar_t c) {
-  return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
+  return (c >= '0' && c <= '9') ||
+         (c >= 'A' && c <= 'F') ||
+         (c >= 'a' && c <= 'f');
 }
 bool IsHex(const wstring& str) {
-  if (str.empty()) return false;
+  if (str.empty())
+    return false;
+
   for (size_t i = 0; i < str.length(); i++)
-    if (!IsHex(str[i])) return false;
+    if (!IsHex(str[i]))
+      return false;
+
   return true;
 }
 
@@ -212,9 +270,13 @@ bool IsNumeric(const wchar_t c) {
   return c >= '0' && c <= '9';
 }
 bool IsNumeric(const wstring& str) {
-  if (str.empty()) return false;
+  if (str.empty())
+    return false;
+
   for (size_t i = 0; i < str.length(); i++)
-    if (!IsNumeric(str[i])) return false;
+    if (!IsNumeric(str[i]))
+      return false;
+
   return true;
 }
 
@@ -227,11 +289,14 @@ bool StartsWith(const wstring& str1, const wstring& str2) {
 }
 
 bool EndsWith(const wstring& str1, const wstring& str2) {
-  if (str2.length() > str1.length()) return false;
+  if (str2.length() > str1.length())
+    return false;
+
   return str1.compare(str1.length() - str2.length(), str2.length(), str2) == 0;
 }
 
-size_t LongestCommonSubsequenceLength(const wstring& str1, const wstring& str2) {
+size_t LongestCommonSubsequenceLength(const wstring& str1,
+                                      const wstring& str2) {
   if (str1.empty() || str2.empty())
     return 0;
 
@@ -311,25 +376,31 @@ size_t LevenshteinDistance(const wstring& str1, const wstring& str2) {
   return prev_col[len2];
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+// Replace
 
-/* Replace */
+void Replace(wstring& input, wstring find, wstring replace_with,
+             bool replace_all, bool case_insensitive) {
+  if (find.empty() || find == replace_with || input.length() < find.length())
+    return;
 
-void Replace(wstring& input, wstring find, wstring replace_with, bool replace_all, bool case_insensitive) {
-  if (find.empty() || find == replace_with || input.length() < find.length()) return;
   if (!case_insensitive) {
-    for (size_t pos = input.find(find); pos != wstring::npos; pos = input.find(find, pos)) {
+    for (size_t pos = input.find(find); pos != wstring::npos;
+         pos = input.find(find, pos)) {
       input.replace(pos, find.length(), replace_with);
-      if (!replace_all) pos += replace_with.length();
+      if (!replace_all)
+        pos += replace_with.length();
     }
   } else {
     for (size_t i = 0; i < input.length() - find.length() + 1; i++) {
       for (size_t j = 0; j < find.length(); j++) {
-        if (input.length() < find.length()) return;
+        if (input.length() < find.length())
+          return;
         if (tolower(input[i + j]) == tolower(find[j])) {
           if (j == find.length() - 1) {
             input.replace(i--, find.length(), replace_with);
-            if (!replace_all) i += replace_with.length();
+            if (!replace_all)
+              i += replace_with.length();
             break;
           }
         } else {
@@ -342,61 +413,86 @@ void Replace(wstring& input, wstring find, wstring replace_with, bool replace_al
 }
 
 void ReplaceChar(wstring& str, const wchar_t c, const wchar_t replace_with) {
-  if (c == replace_with) return;
+  if (c == replace_with)
+    return;
+
   size_t pos = 0;
+
   do {
     pos = str.find_first_of(c, pos);
-    if (pos != wstring::npos) str.at(pos) = replace_with;
+    if (pos != wstring::npos)
+      str.at(pos) = replace_with;
   } while (pos != wstring::npos);
 }
 
-void ReplaceChars(wstring& str, const wchar_t chars[], const wstring replace_with) {
-  if (chars == replace_with) return;
+void ReplaceChars(wstring& str, const wchar_t chars[],
+                  const wstring replace_with) {
+  if (chars == replace_with)
+    return;
+
   size_t pos = 0;
+
   do {
     pos = str.find_first_of(chars, pos);
-    if (pos != wstring::npos) str.replace(pos, 1, replace_with);
+    if (pos != wstring::npos)
+      str.replace(pos, 1, replace_with);
   } while (pos != wstring::npos);
 }
 
-// =============================================================================
-
-/* Split, tokenize */
+////////////////////////////////////////////////////////////////////////////////
+// Split, tokenize
 
 wstring Join(const vector<wstring>& join_vector, const wstring& separator) {
   wstring str;
+
   for (auto it = join_vector.begin(); it != join_vector.end(); ++it) {
-    if (it != join_vector.begin()) str += separator;
+    if (it != join_vector.begin())
+      str += separator;
     str += *it;
   }
+
   return str;
 }
 
-void Split(const wstring& str, const wstring& separator, std::vector<wstring>& split_vector) {
+void Split(const wstring& str, const wstring& separator,
+           std::vector<wstring>& split_vector) {
   if (separator.empty()) {
     split_vector.push_back(str);
     return;
   }
+
   size_t index_begin = 0, index_end;
+
   do {
     index_end = str.find(separator, index_begin);
-    if (index_end == wstring::npos) index_end = str.length();
+    if (index_end == wstring::npos)
+      index_end = str.length();
+
     split_vector.push_back(str.substr(index_begin, index_end - index_begin));
+
     index_begin = index_end + separator.length();
   } while (index_begin <= str.length());
 }
 
-wstring SubStr(const wstring& str, const wstring& sub_begin, const wstring& sub_end) {
+wstring SubStr(const wstring& str, const wstring& sub_begin,
+               const wstring& sub_end) {
   size_t index_begin = str.find(sub_begin, 0);
-  if (index_begin == wstring::npos) return L"";
+  if (index_begin == wstring::npos)
+    return L"";
+
   size_t index_end = str.find(sub_end, index_begin);
-  if (index_end == wstring::npos) index_end = str.length();
+  if (index_end == wstring::npos)
+    index_end = str.length();
+
   return str.substr(index_begin + 1, index_end - index_begin - 1);
 }
 
-size_t Tokenize(const wstring& str, const wstring& delimiters, vector<wstring>& tokens) {
+size_t Tokenize(const wstring& str, const wstring& delimiters,
+                vector<wstring>& tokens) {
   tokens.clear();
+
   size_t index_begin = str.find_first_not_of(delimiters);
+
   while (index_begin != wstring::npos) {
     size_t index_end = str.find_first_of(delimiters, index_begin + 1);
     if (index_end == wstring::npos) {
@@ -407,48 +503,52 @@ size_t Tokenize(const wstring& str, const wstring& delimiters, vector<wstring>& 
       index_begin = str.find_first_not_of(delimiters, index_end + 1);
     }
   }
+
   return tokens.size();
 }
 
-// =============================================================================
-
-/* std::string <-> std::wstring conversion */
+////////////////////////////////////////////////////////////////////////////////
+// std::string <-> std::wstring conversion
 
 wstring StrToWstr(const string& str, UINT code_page) {
   if (!str.empty()) {
-    int length = MultiByteToWideChar(code_page, 0, str.c_str(), -1, NULL, 0);
+    int length = MultiByteToWideChar(code_page, 0, str.c_str(), -1, nullptr, 0);
     if (length > 0) {
       vector<wchar_t> output(length);
       MultiByteToWideChar(code_page, 0, str.c_str(), -1, &output[0], length);
       return &output[0];
     }
   }
+
   return wstring();
 }
 
 string WstrToStr(const wstring& str, UINT code_page) {
   if (!str.empty()) {
-    int length = WideCharToMultiByte(code_page, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
+    int length = WideCharToMultiByte(code_page, 0, str.c_str(), -1, nullptr, 0,
+                                     nullptr, nullptr);
     if (length > 0) {
       vector<char> output(length);
-      WideCharToMultiByte(code_page, 0, str.c_str(), -1, &output[0], length, NULL, NULL);
+      WideCharToMultiByte(code_page, 0, str.c_str(), -1, &output[0], length,
+                          nullptr, nullptr);
       return &output[0];
     }
   }
+
   return string();
 }
 
-// =============================================================================
-
-/* Case conversion */
+////////////////////////////////////////////////////////////////////////////////
+// Case conversion
 
 // System-default ANSI code page
 std::locale current_locale("");
 
 void ToLower(wstring& str, bool use_locale) {
   if (use_locale) {
-    std::transform(str.begin(), str.end(), str.begin(), 
-      std::bind2nd(std::ptr_fun(&std::tolower<wchar_t>), current_locale));
+    std::transform(str.begin(), str.end(), str.begin(),
+                   std::bind2nd(std::ptr_fun(&std::tolower<wchar_t>),
+                                current_locale));
   } else {
     std::transform(str.begin(), str.end(), str.begin(), towlower);
   }
@@ -462,7 +562,8 @@ wstring ToLower_Copy(wstring str, bool use_locale) {
 void ToUpper(wstring& str, bool use_locale) {
   if (use_locale) {
     std::transform(str.begin(), str.end(), str.begin(), 
-      std::bind2nd(std::ptr_fun(&std::toupper<wchar_t>), current_locale));
+                   std::bind2nd(std::ptr_fun(&std::toupper<wchar_t>),
+                                current_locale));
   } else {
     std::transform(str.begin(), str.end(), str.begin(), towupper);
   }
@@ -473,9 +574,8 @@ wstring ToUpper_Copy(wstring str, bool use_locale) {
   return str;
 }
 
-// =============================================================================
-
-/* Type conversion */
+////////////////////////////////////////////////////////////////////////////////
+// Type conversion
 
 int ToInt(const wstring& str) {
   return _wtoi(str.c_str());
@@ -511,33 +611,40 @@ wstring ToWstr(const double& value, int count) {
   return out.str();
 }
 
-
-// =============================================================================
-
-/* Trimming */
+////////////////////////////////////////////////////////////////////////////////
+// Trimming
 
 wstring LimitText(const wstring& str, unsigned int limit, const wstring& tail) {
   if (str.length() > limit) {
     wstring limit_str = str.substr(0, limit);
-    if (!tail.empty() && limit_str.length() > tail.length()) {
-      limit_str.replace(limit_str.length() - tail.length(), tail.length(), tail);
-    }
+    if (!tail.empty() && limit_str.length() > tail.length())
+      limit_str.replace(limit_str.length() - tail.length(),
+                        tail.length(), tail);
     return limit_str;
   } else {
     return str;
   }
 }
 
-void Trim(wstring& str, const wchar_t trim_chars[], bool trim_left, bool trim_right) {
-  if (str.empty()) return;
-  const size_t index_begin = trim_left ? str.find_first_not_of(trim_chars) : 0;
-  const size_t index_end = trim_right ? str.find_last_not_of(trim_chars) : str.length() - 1;
+void Trim(wstring& str, const wchar_t trim_chars[],
+          bool trim_left, bool trim_right) {
+  if (str.empty())
+    return;
+
+  const size_t index_begin =
+      trim_left ? str.find_first_not_of(trim_chars) : 0;
+  const size_t index_end =
+      trim_right ? str.find_last_not_of(trim_chars) : str.length() - 1;
+
   if (index_begin == wstring::npos || index_end == wstring::npos) {
     str.clear();
     return;
   }
-  if (trim_right) str.erase(index_end + 1, str.length() - index_end + 1);
-  if (trim_left) str.erase(0, index_begin);
+
+  if (trim_right)
+    str.erase(index_end + 1, str.length() - index_end + 1);
+  if (trim_left)
+    str.erase(0, index_begin);
 }
 
 void TrimLeft(wstring& str, const wchar_t trim_chars[]) {
@@ -548,9 +655,8 @@ void TrimRight(wstring& str, const wchar_t trim_chars[]) {
   Trim(str, trim_chars, false, true);
 }
 
-// =============================================================================
-
-/* File and folder related */
+////////////////////////////////////////////////////////////////////////////////
+// File and folder related
 
 void AddTrailingSlash(wstring& str) {
   if (str.length() > 0 && str[str.length() - 1] != '\\')
@@ -566,13 +672,16 @@ wstring AddTrailingSlash(const wstring& str) {
 }
 
 bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list) {
-  if (extension.empty() || extension_list.empty()) return false;
-  for (size_t i = 0; i < extension.length(); i++) {
+  if (extension.empty() || extension_list.empty())
+    return false;
+
+  for (size_t i = 0; i < extension.length(); i++)
     extension[i] = toupper(extension[i]);
-  }
-  for (size_t i = 0; i < extension_list.size(); i++) {
-    if (extension == extension_list[i]) return true;
-  }
+
+  for (size_t i = 0; i < extension_list.size(); i++)
+    if (extension == extension_list[i])
+      return true;
+
   return false;
 }
 
@@ -582,7 +691,10 @@ wstring GetFileExtension(const wstring& str) {
 
 wstring GetFileWithoutExtension(wstring str) {
   size_t pos = str.find_last_of(L".");
-  if (pos != wstring::npos) str.resize(pos);
+
+  if (pos != wstring::npos)
+    str.resize(pos);
+
   return str;
 }
 
@@ -595,18 +707,25 @@ wstring GetPathOnly(const wstring& str) {
 }
 
 bool ValidateFileExtension(const wstring& extension, unsigned int max_length) {
-  if (max_length > 0 && extension.length() > max_length) return false;
-  if (!IsAlphanumeric(extension)) return false;
+  if (max_length > 0 && extension.length() > max_length)
+    return false;
+
+  if (!IsAlphanumeric(extension))
+    return false;
+
   return true;
 }
 
-// =============================================================================
-
-/* Other */
+////////////////////////////////////////////////////////////////////////////////
+// Other
 
 void AppendString(wstring& str0, const wstring& str1, const wstring& str2) {
-  if (str1.empty()) return;
-  if (!str0.empty()) str0.append(str2);
+  if (str1.empty())
+    return;
+
+  if (!str0.empty())
+    str0.append(str2);
+
   str0.append(str1);
 }
 
@@ -618,6 +737,7 @@ const wstring& EmptyString() {
 wstring PadChar(wstring str, const wchar_t ch, const size_t len) {
   if (len > str.length())
     str.insert(0, len - str.length(), ch);
+
   return str;
 }
 
@@ -633,7 +753,7 @@ void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output) {
   HRSRC hResInfo = FindResource(nullptr, name,  type);
   HGLOBAL hResHandle = LoadResource(nullptr, hResInfo);
   DWORD dwSize = SizeofResource(nullptr, hResInfo);
-  
+
   const char* lpData = static_cast<char*>(LockResource(hResHandle));
   string temp(lpData, dwSize);
   output = StrToWstr(temp);
@@ -641,23 +761,18 @@ void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output) {
   FreeResource(hResInfo);
 }
 
-void ReadStringTable(UINT uID, wstring& str) {
-  wchar_t buffer[2048];
-  LoadString(g_hInstance, uID, buffer, 2048);
-  str.append(buffer);
-}
+////////////////////////////////////////////////////////////////////////////////
+// Returns the most common non-alphanumeric character in a string that is
+// included in the table. Note that characters in the table are listed by their
+// precedence.
 
-// =============================================================================
-
-// Returns the most common non-alphanumeric character in a string that is included in the table.
-// Characters in the table are listed by their precedence.
-
-const wchar_t* COMMON_CHAR_TABLE = L",_ -+;.&|~";
+const wchar_t* common_char_table = L",_ -+;.&|~";
 
 int GetCommonCharIndex(wchar_t c) {
   for (int i = 0; i < 10; i++)
-    if (COMMON_CHAR_TABLE[i] == c)
+    if (common_char_table[i] == c)
       return i;
+
   return -1;
 }
 
@@ -668,7 +783,9 @@ wchar_t GetMostCommonCharacter(const wstring& str) {
   for (size_t i = 0; i < str.length(); i++) {
     if (!IsAlphanumeric(str[i])) {
       char_index = GetCommonCharIndex(str[i]);
-      if (char_index == -1) continue;
+      if (char_index == -1)
+        continue;
+
       for (auto it = char_map.begin(); it != char_map.end(); ++it) {
         if (it->first == str[i]) {
           it->second++;
@@ -676,6 +793,7 @@ wchar_t GetMostCommonCharacter(const wstring& str) {
           break;
         }
       }
+
       if (char_index > -1) {
         char_map.push_back(std::make_pair(str[i], 1));
       }
