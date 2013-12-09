@@ -17,8 +17,8 @@
 */
 
 #include "common.h"
-#include "string.h"
 #include "library/anime.h"
+#include "string.h"
 #include "ui/theme.h"
 
 // =============================================================================

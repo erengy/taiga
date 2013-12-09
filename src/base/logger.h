@@ -16,10 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef TAIGA_BASE_LOGGER_H
+#define TAIGA_BASE_LOGGER_H
 
-#include "std.h"
+#include <string>
+
 #include "win/win_thread.h"
 
 enum SeverityLevels {
@@ -38,14 +39,14 @@ public:
   Logger();
   virtual ~Logger() {}
 
-  void Log(int severity_level, const wstring& file, int line,
-           const wstring& function, const wstring& text);
-  void SetOutputPath(const wstring& path);
+  void Log(int severity_level, const std::wstring& file, int line,
+           const std::wstring& function, const std::wstring& text);
+  void SetOutputPath(const std::wstring& path);
   void SetSeverityLevel(int severity_level);
 
 private:
   win::CriticalSection critical_section_;
-  wstring output_path_;
+  std::wstring output_path_;
   int severity_level_;
 };
 
@@ -56,4 +57,4 @@ extern class Logger Logger;
   Logger.Log(level, __FILEW__, __LINE__, __FUNCTIONW__, text)
 #endif
 
-#endif // LOGGER_H
+#endif  // TAIGA_BASE_LOGGER_H

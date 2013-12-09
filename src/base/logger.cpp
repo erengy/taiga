@@ -16,9 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
 #include <iostream>
 #include <fstream>
+
 #include "logger.h"
 #include "string.h"
 #include "time.h"
@@ -40,8 +40,8 @@ Logger::Logger()
     : severity_level_(LevelDebug) {
 }
 
-void Logger::Log(int severity_level, const wstring& file, int line,
-                 const wstring& function, const wstring& text) {
+void Logger::Log(int severity_level, const std::wstring& file, int line,
+                 const std::wstring& function, const std::wstring& text) {
   critical_section_.Enter();
 
   if (severity_level <= severity_level_) {
@@ -71,7 +71,7 @@ void Logger::Log(int severity_level, const wstring& file, int line,
   critical_section_.Leave();
 }
 
-void Logger::SetOutputPath(const wstring& path) {
+void Logger::SetOutputPath(const std::wstring& path) {
   output_path_ = path;
 }
 

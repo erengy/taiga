@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,13 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TIME_H
-#define TIME_H
+#ifndef TAIGA_BASE_TIME_H
+#define TAIGA_BASE_TIME_H
 
-#include "std.h"
 #include <ctime>
-
-// =============================================================================
+#include <string>
 
 enum TimerId {
   TIMER_MAIN = 1337,
@@ -32,7 +30,7 @@ enum TimerId {
 class Date {
  public:
   Date();
-  Date(const wstring& date);
+  Date(const std::wstring& date);
   Date(unsigned short year, unsigned short month, unsigned short day);
   virtual ~Date() {}
 
@@ -49,7 +47,7 @@ class Date {
 
   operator bool() const;
   operator SYSTEMTIME() const;
-  operator wstring() const;
+  operator std::wstring() const;
 
   unsigned short year;
   unsigned short month;
@@ -59,15 +57,15 @@ class Date {
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 
 Date GetDate();
-wstring GetTime(LPCWSTR lpFormat = L"HH':'mm':'ss");
+std::wstring GetTime(LPCWSTR format = L"HH':'mm':'ss");
 
 Date GetDateJapan();
-wstring GetTimeJapan(LPCWSTR lpFormat = L"HH':'mm':'ss");
+std::wstring GetTimeJapan(LPCWSTR format = L"HH':'mm':'ss");
 
-wstring ToDateString(time_t seconds);
+std::wstring ToDateString(time_t seconds);
 unsigned int ToDayCount(const Date& date);
-wstring ToTimeString(int seconds);
+std::wstring ToTimeString(int seconds);
 
 const Date& EmptyDate();
 
-#endif // TIME_H
+#endif  // TAIGA_BASE_TIME_H

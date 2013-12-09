@@ -17,6 +17,7 @@
 */
 
 #include <windows.h>
+
 #include "crc.h"
 #include "string.h"
 #include "third_party/zlib/zlib.h"
@@ -58,7 +59,7 @@ std::wstring CalculateCrcFromString(const std::wstring& str) {
 
   wchar_t crc_val[16] = {0};
   _ultow_s(crc, crc_val, 16, 16);
-  wstring value = crc_val;
+  std::wstring value = crc_val;
   if (value.length() < 8) {
     value.insert(0, 8 - value.length(), '0');
   }

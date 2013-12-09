@@ -16,17 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
-
+#include "gzip.h"
 #include "third_party/zlib/zlib.h"
-
-// =============================================================================
 
 bool UncompressGzippedFile(const string& file, string& output) {
   gzFile gzfile = gzopen(file.c_str(), "rb");
-  if (gzfile == NULL) return false;
+
+  if (gzfile == nullptr)
+    return false;
 
   char buffer[16384];
+
   while (true) {
     int len = gzread(gzfile, buffer, sizeof(buffer));
     if (len > 0) {
@@ -37,6 +37,7 @@ bool UncompressGzippedFile(const string& file, string& output) {
   }
 
   gzclose(gzfile);
+
   return true;
 }
 
@@ -49,12 +50,12 @@ bool UncompressGzippedString(const string& input, string& output) {
   stream.next_in = (BYTE*)&input[0];
   stream.avail_in = input.length();
 
-  if (inflateInit2(&stream, MAX_WBITS + 32) != Z_OK) {
+  if (inflateInit2(&stream, MAX_WBITS + 32) != Z_OK)
     return false;
-  }
 
   size_t buffer_length = input.length() * 2;
   char* buffer = (char*)GlobalAlloc(GMEM_ZEROINIT, buffer_length);
+
   size_t total_length = 0;
   int status = Z_OK;
 
@@ -70,5 +71,6 @@ bool UncompressGzippedString(const string& input, string& output) {
 
   GlobalFree(buffer);
   inflateEnd(&stream);
+
   return status == Z_STREAM_END;
 }

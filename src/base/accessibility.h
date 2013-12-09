@@ -25,11 +25,10 @@
 
 namespace base {
 
-class AccessibleChild {
-public:
-  std::wstring name, role, value;
-
-public:
+struct AccessibleChild {
+  std::wstring name;
+  std::wstring role;
+  std::wstring value;
   std::vector<AccessibleChild> children;
 };
 

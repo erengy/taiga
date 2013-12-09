@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,30 +16,32 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef TAIGA_BASE_COMMON_H
+#define TAIGA_BASE_COMMON_H
 
-#include "std.h"
+#include <string>
+#include <vector>
+#include <windows.h>
 
 namespace anime {
 class Item;
 }
 
-void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
+void ExecuteAction(std::wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 
-wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
+std::wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 
-int GetEpisodeHigh(const wstring& episode_number);
-int GetEpisodeLow(const wstring& episode_number);
-void SplitEpisodeNumbers(const wstring& input, vector<int>& output);
-wstring JoinEpisodeNumbers(const vector<int>& input);
-int TranslateResolution(const wstring& str, bool return_validity = false);
+int GetEpisodeHigh(const std::wstring& episode_number);
+int GetEpisodeLow(const std::wstring& episode_number);
+void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output);
+std::wstring JoinEpisodeNumbers(const std::vector<int>& input);
+int TranslateResolution(const std::wstring& str, bool return_validity = false);
 
 void SetSharedCursor(LPCWSTR name);
 
 int StatusToIcon(int status);
 
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent);
-wstring SearchFileFolder(anime::Item& anime_item, const wstring& root, int episode_number, bool search_folder);
+std::wstring SearchFileFolder(anime::Item& anime_item, const std::wstring& root, int episode_number, bool search_folder);
 
-#endif // COMMON_H
+#endif  // TAIGA_BASE_COMMON_H

@@ -16,11 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "xml.h"
-
 #include "file.h"
 #include "foreach.h"
 #include "string.h"
+#include "xml.h"
 
 struct xml_string_writer: pugi::xml_writer {
   std::string result;
@@ -41,7 +40,7 @@ int XmlReadIntValue(pugi::xml_node& node, const wchar_t* name) {
   return _wtoi(node.child_value(name));
 }
 
-wstring XmlReadStrValue(pugi::xml_node& node, const wchar_t* name) {
+std::wstring XmlReadStrValue(pugi::xml_node& node, const wchar_t* name) {
   return node.child_value(name);
 }
 

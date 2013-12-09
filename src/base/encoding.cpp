@@ -18,19 +18,26 @@
 
 #include <map>
 #include <string>
+
 #include "encoding.h"
 #include "string.h"
 #include "third_party/base64/base64.h"
 
+std::map<std::wstring, wchar_t> html_entities;
+
 ////////////////////////////////////////////////////////////////////////////////
 
-wstring Base64Decode(const wstring& str, bool for_filename) {
-  if (str.empty()) return L"";
+std::wstring Base64Decode(const std::wstring& str, bool for_filename) {
+  if (str.empty())
+    return str;
+
+  std::string buff = WstrToStr(str);
+
   Base64Coder coder;
-  string buff = WstrToStr(str);
   coder.Decode((BYTE*)buff.c_str(), buff.length());
+
   if (for_filename) {
-    wstring msg = StrToWstr(coder.DecodedMessage());
+    std::wstring msg = StrToWstr(coder.DecodedMessage());
     ReplaceChar(msg, '-', '/');
     return msg;
   } else {
@@ -38,13 +45,17 @@ wstring Base64Decode(const wstring& str, bool for_filename) {
   }
 }
 
-wstring Base64Encode(const wstring& str, bool for_filename) {
-  if (str.empty()) return L"";
+std::wstring Base64Encode(const std::wstring& str, bool for_filename) {
+  if (str.empty())
+    return str;
+
+  std::string buff = WstrToStr(str);
+
   Base64Coder coder;
-  string buff = WstrToStr(str);
   coder.Encode((BYTE*)buff.c_str(), buff.length());
+
   if (for_filename) {
-    wstring msg = StrToWstr(coder.EncodedMessage());
+    std::wstring msg = StrToWstr(coder.EncodedMessage());
     ReplaceChar(msg, '/', '-');
     return msg;
   } else {
@@ -54,41 +65,42 @@ wstring Base64Encode(const wstring& str, bool for_filename) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-wstring EncodeUrl(const wstring& str, bool encode_unreserved) {
-  static const wchar_t* digits = L"0123456789ABCDEF";
-  wstring output;
+std::wstring EncodeUrl(const std::wstring& str, bool encode_unreserved) {
+  std::wstring output;
+  output.reserve(str.size());
 
-  for (unsigned int i = 0; i < str.length(); i++) {
-    if ((str[i] >= '0' && str[i] <= '9') || 
-        (str[i] >= 'A' && str[i] <= 'Z') || 
-        (str[i] >= 'a' && str[i] <= 'z') || 
-        (!encode_unreserved && 
-        (str[i] == '-' || str[i] == '.' || 
-         str[i] == '_' || str[i] == '~'))) {
-           output.push_back(str[i]);
+  static const wchar_t* digits = L"0123456789ABCDEF";
+  #define PercentEncode(x) \
+      output.append(L"%"); \
+      output.append(&digits[(x >> 4) & 0x0F], 1); \
+      output.append(&digits[x & 0x0F], 1);
+
+  for (size_t i = 0; i < str.length(); i++) {
+    if ((str[i] >= '0' && str[i] <= '9') ||
+        (str[i] >= 'A' && str[i] <= 'Z') ||
+        (str[i] >= 'a' && str[i] <= 'z') ||
+        (!encode_unreserved &&
+         (str[i] == '-' || str[i] == '.' ||
+          str[i] == '_' || str[i] == '~'))) {
+      output.push_back(str[i]);
     } else {
-      #define PercentEncode(x) \
-        output.append(L"%"); \
-        output.append(&digits[(x >> 4) & 0x0F], 1); \
-        output.append(&digits[x & 0x0F], 1);
       if (str[i] > 255) {
-        string buffer = WstrToStr(wstring(&str[i], 1));
+        std::string buffer = WstrToStr(std::wstring(&str[i], 1));
         for (unsigned int j = 0; j < buffer.length(); j++) {
           PercentEncode(buffer[j]);
         }
       } else {
         PercentEncode(str[i]);
       }
-      #undef PercentEncode
     }
   }
+
+  #undef PercentEncode
 
   return output;
 }
 
 void DecodeHtmlEntities(std::wstring& str) {
-  static std::map<std::wstring, wchar_t> html_entities;
-
   // Build entity map
   // Source: http://www.w3.org/TR/html4/sgml/entities.html
   if (html_entities.empty()) {
@@ -362,9 +374,11 @@ void DecodeHtmlEntities(std::wstring& str) {
     html_entities[L"euro"] =     L'\u20AC';
   }
 
-  if (InStr(str, L"&") == -1) return;
+  if (InStr(str, L"&") == -1)
+    return;
   
-  size_t pos = 0, reference_pos = 0;
+  size_t pos = 0;
+  size_t reference_pos = 0;
   unsigned int character_value = -1;
 
   for (size_t i = 0; i < str.size(); i++) {
@@ -382,7 +396,8 @@ void DecodeHtmlEntities(std::wstring& str) {
           pos = i;
           while (i < str.size() && IsHex(str.at(i))) i++;
           if (i > pos && i < str.size() && str.at(i) == L';') {
-            character_value = wcstoul(str.substr(pos, i - pos).c_str(), nullptr, 16);
+            character_value = wcstoul(str.substr(pos, i - pos).c_str(),
+                                      nullptr, 16);
           }
         // Decimal (&#nnnn;)
         } else {
@@ -400,7 +415,7 @@ void DecodeHtmlEntities(std::wstring& str) {
         if (i > pos && i < str.size() && str.at(i) == L';') {
           size_t length = i - pos;
           if (length > 1 && length < 10) {
-            wstring entity_name = str.substr(pos, length);
+            std::wstring entity_name = str.substr(pos, length);
             if (html_entities.find(entity_name) != html_entities.end()) {
               character_value = html_entities[entity_name];
             }
@@ -410,7 +425,7 @@ void DecodeHtmlEntities(std::wstring& str) {
 
       if (character_value <= 0xFFFD) {
         str.replace(reference_pos, i - reference_pos + 1, 
-                    wstring(1, static_cast<wchar_t>(character_value)));
+                    std::wstring(1, static_cast<wchar_t>(character_value)));
         i = reference_pos - 1;
       } else {
         i = reference_pos;

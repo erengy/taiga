@@ -16,14 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
-
-#include "time.h"
-
 #include "library/anime_util.h"
 #include "string.h"
-
-// =============================================================================
+#include "time.h"
 
 Date::Date()
     : year(0), 
@@ -31,7 +26,7 @@ Date::Date()
       day(0) {
 }
 
-Date::Date(const wstring& date) {
+Date::Date(const std::wstring& date) {
   *this = anime::ParseDateString(date);
 }
 
@@ -110,19 +105,19 @@ Date::operator SYSTEMTIME() const {
   return st;
 }
 
-Date::operator wstring() const {
+Date::operator std::wstring() const {
   return PadChar(ToWstr(year), '0', 4) + L"-" + 
          PadChar(ToWstr(month), '0', 2) + L"-" + 
          PadChar(ToWstr(day), '0', 2);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
   // Get current time, expressed in UTC
   GetSystemTime(&st);
   if (utc_offset == 0) return;
-  
+
   // Convert to FILETIME
   FILETIME ft;
   SystemTimeToFileTime(&st, &ft);
@@ -146,29 +141,29 @@ Date GetDate() {
   return Date(st.wYear, st.wMonth, st.wDay);
 }
 
-wstring GetTime(LPCWSTR lpFormat) {
+std::wstring GetTime(LPCWSTR format) {
   WCHAR buff[32];
-  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, NULL, lpFormat, buff, 32);
+  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, NULL, format, buff, 32);
   return buff;
 }
 
 Date GetDateJapan() {
   SYSTEMTIME stJST;
-  GetSystemTime(stJST, 9); // JST is UTC+09
+  GetSystemTime(stJST, 9);  // JST is UTC+09
   return Date(stJST.wYear, stJST.wMonth, stJST.wDay);
 }
 
-wstring GetTimeJapan(LPCWSTR lpFormat) {
+std::wstring GetTimeJapan(LPCWSTR format) {
   WCHAR buff[32];
   SYSTEMTIME stJST;
-  GetSystemTime(stJST, 9); // JST is UTC+09
-  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, lpFormat, buff, 32);
+  GetSystemTime(stJST, 9);  // JST is UTC+09
+  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, format, buff, 32);
   return buff;
 }
 
-wstring ToDateString(time_t seconds) {
+std::wstring ToDateString(time_t seconds) {
   time_t days, hours, minutes;
-  wstring date;
+  std::wstring date;
 
   if (seconds > 0) {
     #define CALC_TIME(x, y) x = seconds / (y); seconds = seconds % (y);
@@ -197,7 +192,7 @@ unsigned int ToDayCount(const Date& date) {
   return (date.year * 365) + (date.month * 30) + date.day;
 }
 
-wstring ToTimeString(int seconds) {
+std::wstring ToTimeString(int seconds) {
   int hours = seconds / 3600;
   seconds = seconds % 3600;
   int minutes = seconds / 60;

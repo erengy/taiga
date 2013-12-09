@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,14 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OPTIONAL_H
-#define OPTIONAL_H
-
-#include "std.h"
+#ifndef TAIGA_BASE_OPTIONAL_H
+#define TAIGA_BASE_OPTIONAL_H
 
 template <typename T>
 class Optional {
- public:
+public:
   Optional() : initialized_(false) {}
   Optional(const T& value) : initialized_(true), value_(value) {}
   virtual ~Optional() {}
@@ -46,9 +44,9 @@ class Optional {
     return value_;
   }
 
- private:
+private:
   bool initialized_;
   T value_;
 };
 
-#endif // OPTIONAL_H
+#endif  // TAIGA_BASE_OPTIONAL_H
