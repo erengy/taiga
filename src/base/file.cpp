@@ -16,52 +16,77 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <shlobj.h>
+
 #include "file.h"
 #include "string.h"
 #include "win/win_main.h"
 #include "win/win_registry.h"
 
-#define MAKEQWORD(a, b)	((QWORD)( ((QWORD) ((DWORD) (a))) << 32 | ((DWORD) (b))))
+#ifdef _MSC_VER
+#pragma warning (disable: 4996)
+#endif
+
+#define MAKEQWORD(a, b)	((QWORD)(((QWORD)((DWORD)(a))) << 32 | ((DWORD)(b))))
+
+////////////////////////////////////////////////////////////////////////////////
+
+HANDLE OpenFileForGenericRead(const wstring& path) {
+  return ::CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
+                      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+}
+
+HANDLE OpenFileForGenericWrite(const wstring& path) {
+  return ::CreateFile(path.c_str(), GENERIC_WRITE, 0, nullptr,
+                      CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned long GetFileAge(const wstring& path) {
-  FILETIME ft_file, ft_now;
-  
+  HANDLE file_handle = OpenFileForGenericRead(path);
+
+  if (file_handle == INVALID_HANDLE_VALUE)
+    return 0;
+
   // Get the time the file was last modified
-  HANDLE hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, 
-    NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (hFile == INVALID_HANDLE_VALUE) return 0;
-  BOOL result = GetFileTime(hFile, NULL, NULL, &ft_file);
-  CloseHandle(hFile);
-  if (!result) return 0;
+  FILETIME ft_file;
+  BOOL result = GetFileTime(file_handle, nullptr, nullptr, &ft_file);
+  CloseHandle(file_handle);
+
+  if (!result)
+    return 0;
   
   // Get current time
   SYSTEMTIME st_now;
   GetSystemTime(&st_now);
+  FILETIME ft_now;
   SystemTimeToFileTime(&st_now, &ft_now);
 
   // Convert to ULARGE_INTEGER
-  ULARGE_INTEGER ul_file, ul_now;
+  ULARGE_INTEGER ul_file;
   ul_file.LowPart = ft_file.dwLowDateTime;
   ul_file.HighPart = ft_file.dwHighDateTime;
+  ULARGE_INTEGER ul_now;
   ul_now.LowPart = ft_now.dwLowDateTime;
   ul_now.HighPart = ft_now.dwHighDateTime;
 
   // Return difference in seconds
-  return static_cast<unsigned long>((ul_now.QuadPart - ul_file.QuadPart) / 10000000);
+  return static_cast<unsigned long>(
+      (ul_now.QuadPart - ul_file.QuadPart) / 10000000);
 }
 
 QWORD GetFileSize(const wstring& path) {
   QWORD file_size = 0;
-  HANDLE hFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, 
-    NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
-  if (hFile != INVALID_HANDLE_VALUE) {
-    DWORD size_low = 0, size_high = 0;
-    size_low = ::GetFileSize(hFile, &size_high);
-    file_size = (size_low == INVALID_FILE_SIZE) ? 0 : MAKEQWORD(size_high, size_low);
-    CloseHandle(hFile);
+  HANDLE file_handle = OpenFileForGenericRead(path);
+
+  if (file_handle != INVALID_HANDLE_VALUE) {
+    DWORD size_high = 0;
+    DWORD size_low = ::GetFileSize(file_handle, &size_high);
+    if (size_low != INVALID_FILE_SIZE)
+      file_size = MAKEQWORD(size_high, size_low);
+    CloseHandle(file_handle);
   }
 
   return file_size;
@@ -69,31 +94,42 @@ QWORD GetFileSize(const wstring& path) {
 
 QWORD GetFolderSize(const wstring& path, bool recursive) {
   QWORD folder_size = 0;
-  WIN32_FIND_DATA wfd;
-  wstring folder = path + L"*.*";
   
-  HANDLE hFind = FindFirstFile(folder.c_str(), &wfd);
-  if (hFind == INVALID_HANDLE_VALUE) return 0;
+  WIN32_FIND_DATA wfd;
+  wstring file_name = path + L"*.*";
+  HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
+
+  if (file_handle == INVALID_HANDLE_VALUE)
+    return 0;
+
+  QWORD max_dword = static_cast<QWORD>(MAXDWORD) + 1;
 
   do {
     if (recursive && wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-      if (wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
-        folder = path + wfd.cFileName + L"\\";
-        folder_size += GetFolderSize(folder, recursive);
+      if (wcscmp(wfd.cFileName, L".") != 0 &&
+          wcscmp(wfd.cFileName, L"..") != 0) {
+        file_name = path + wfd.cFileName + L"\\";
+        folder_size += GetFolderSize(file_name, recursive);
       }
     }
-    folder_size += (wfd.nFileSizeHigh * (MAXDWORD + 1)) + wfd.nFileSizeLow;
-  } while (FindNextFile(hFind, &wfd));
+    folder_size += static_cast<QWORD>(wfd.nFileSizeHigh) * max_dword +
+                   static_cast<QWORD>(wfd.nFileSizeLow);
+  } while (FindNextFile(file_handle, &wfd));
 	
-  FindClose(hFind);
+  FindClose(file_handle);
+
   return folder_size;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Execute(const wstring& path, const wstring& parameters) {
-  if (path.empty()) return false;
-  HINSTANCE value = ShellExecute(NULL, L"open", path.c_str(), parameters.c_str(), NULL, SW_SHOWNORMAL);
+  if (path.empty())
+    return false;
+
+  HINSTANCE value = ShellExecute(nullptr, L"open", path.c_str(),
+                                 parameters.c_str(), nullptr, SW_SHOWNORMAL);
+
   return reinterpret_cast<int>(value) > 32;
 }
 
@@ -105,39 +141,40 @@ BOOL ExecuteEx(const wstring& path, const wstring& parameters) {
   si.lpFile = path.c_str();
   si.lpParameters = parameters.c_str();
   si.nShow = SW_SHOWNORMAL;
+
   return ShellExecuteEx(&si);
 }
 
 void ExecuteLink(const wstring& link) {
-  ShellExecute(NULL, NULL, link.c_str(), NULL, NULL, SW_SHOWNORMAL);
+  ShellExecute(nullptr, nullptr, link.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter) {
+  if (!lpstrFilter)
+    lpstrFilter = L"All files (*.*)\0*.*\0";
+
   WCHAR szFile[MAX_PATH] = {'\0'};
 
-  if (!lpstrFilter) {
-    lpstrFilter = L"All files (*.*)\0*.*\0";
-  }
-
   OPENFILENAME ofn = {0};
-  ofn.lStructSize  = sizeof(OPENFILENAME);
-  ofn.hwndOwner    = hwndOwner;
-  ofn.lpstrFile    = szFile;
-  ofn.lpstrFilter  = lpstrFilter;
-  ofn.lpstrTitle   = lpstrTitle;
-  ofn.nMaxFile     = sizeof(szFile);
-  ofn.Flags        = OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST;
+  ofn.lStructSize = sizeof(OPENFILENAME);
+  ofn.hwndOwner = hwndOwner;
+  ofn.lpstrFile = szFile;
+  ofn.lpstrFilter = lpstrFilter;
+  ofn.lpstrTitle = lpstrTitle;
+  ofn.nMaxFile = sizeof(szFile);
+  ofn.Flags = OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST;
   
   if (GetOpenFileName(&ofn)) {
-    return szFile;
+    return wstring(szFile);
   } else {
-    return L"";
+    return wstring();
   }
 }
 
-bool BrowseForFolderVista(HWND hwnd, const wstring& title, const wstring& default_folder, wstring& output) {
+bool BrowseForFolderVista(HWND hwnd, const wstring& title,
+                          const wstring& default_folder, wstring& output) {
   IFileDialog* pFileDialog;
   bool result = false;
 
@@ -157,15 +194,15 @@ bool BrowseForFolderVista(HWND hwnd, const wstring& title, const wstring& defaul
 
     if (!default_folder.empty()) {
       IShellItem* pShellItem;
-      HRESULT hr = NULL;
+      HRESULT hr = 0;
 
       typedef HRESULT (WINAPI *_SHCreateItemFromParsingName)(
-        PCWSTR pszPath, IBindCtx *pbc, REFIID riid, void **ppv);
+          PCWSTR pszPath, IBindCtx *pbc, REFIID riid, void **ppv);
       HMODULE hShell32 = LoadLibrary(L"shell32.dll");
-      if (hShell32 != NULL) {
-        _SHCreateItemFromParsingName proc = 
-          (_SHCreateItemFromParsingName)GetProcAddress(hShell32, "SHCreateItemFromParsingName");
-        if (proc != NULL) {
+      if (hShell32 != nullptr) {
+        auto proc = reinterpret_cast<_SHCreateItemFromParsingName>(
+            GetProcAddress(hShell32, "SHCreateItemFromParsingName"));
+        if (proc != nullptr) {
           hr = (proc)(default_folder.c_str(), nullptr, IID_IShellItem,
                       reinterpret_cast<void**>(&pShellItem));
         }
@@ -193,91 +230,102 @@ bool BrowseForFolderVista(HWND hwnd, const wstring& title, const wstring& defaul
         pShellItem->Release();
       }
     }
-  
+
     pFileDialog->Release();
   }
 
   return result;
 }
 
-static int CALLBACK BrowseForFolderXPProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
+static int CALLBACK BrowseForFolderXpProc(HWND hwnd, UINT uMsg, LPARAM lParam,
+                                          LPARAM lpData) {
   switch (uMsg) {
     case BFFM_INITIALIZED:
       if (lpData != 0)
         SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
       break;
   }
+
   return 0;
 }
 
-bool BrowseForFolderXP(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output) {
+bool BrowseForFolderXp(HWND hwnd, const wstring& title,
+                       const wstring& default_path, wstring& output) {
   BROWSEINFO bi = {0};
   bi.hwndOwner = hwnd;
   bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON;
-  
+
   if (!title.empty())
     bi.lpszTitle = title.c_str();
-  
+
   if (!default_path.empty()) {
     WCHAR lpszDefault[MAX_PATH] = {'\0'};
     default_path.copy(lpszDefault, MAX_PATH);
     bi.lParam = reinterpret_cast<LPARAM>(lpszDefault);
-    bi.lpfn = BrowseForFolderXPProc;
+    bi.lpfn = BrowseForFolderXpProc;
   }
-  
+
   PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
   if (pidl == nullptr)
     return false;
-  
+
   WCHAR path[MAX_PATH];
   SHGetPathFromIDList(pidl, path);
   output = path;
-  if (output.empty())
-    return false;
 
-  return true;
+  return !output.empty();
 }
 
-BOOL BrowseForFolder(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output) {
+BOOL BrowseForFolder(HWND hwnd, const wstring& title,
+                     const wstring& default_path, wstring& output) {
   if (win::GetWinVersion() >= win::VERSION_VISTA) {
     return BrowseForFolderVista(hwnd, title, default_path, output);
   } else {
-    return BrowseForFolderXP(hwnd, title, default_path, output);
+    return BrowseForFolderXp(hwnd, title, default_path, output);
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool CreateFolder(const wstring& path) {
-  return SHCreateDirectoryEx(NULL, path.c_str(), NULL) == ERROR_SUCCESS;
+  return SHCreateDirectoryEx(nullptr, path.c_str(), nullptr) == ERROR_SUCCESS;
 }
 
 int DeleteFolder(wstring path) {
-  if (path.back() == '\\') path.pop_back();
+  if (path.back() == '\\')
+    path.pop_back();
+
   path.push_back('\0');
+
   SHFILEOPSTRUCT fos = {0};
   fos.wFunc = FO_DELETE;
   fos.pFrom = path.c_str();
   fos.fFlags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+
   return SHFileOperation(&fos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool FileExists(const wstring& file) {
-  if (file.empty()) return false;
-  HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, 
-    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (hFile != INVALID_HANDLE_VALUE) {
-    CloseHandle(hFile);
+  if (file.empty())
+    return false;
+
+  HANDLE file_handle = OpenFileForGenericRead(file);
+
+  if (file_handle != INVALID_HANDLE_VALUE) {
+    CloseHandle(file_handle);
     return true;
   }
+
   return false;
 }
 
 bool FolderExists(const wstring& path) {
   DWORD file_attr = GetFileAttributes(path.c_str());
-  return (file_attr != INVALID_FILE_ATTRIBUTES) && (file_attr & FILE_ATTRIBUTE_DIRECTORY);
+
+  return (file_attr != INVALID_FILE_ATTRIBUTES) &&
+         (file_attr & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 bool PathExists(const wstring& path) {
@@ -292,88 +340,111 @@ void ValidateFileName(wstring& file) {
 
 wstring ExpandEnvironmentStrings(const wstring& path) {
   WCHAR buff[MAX_PATH];
-  if (::ExpandEnvironmentStrings(path.c_str(), buff, MAX_PATH)) {
+
+  if (::ExpandEnvironmentStrings(path.c_str(), buff, MAX_PATH))
     return buff;
-  } else {
-    return path;
-  }
+
+  return path;
 }
 
-wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value) {
+wstring GetDefaultAppPath(const wstring& extension,
+                          const wstring& default_value) {
   win::Registry reg;
   reg.OpenKey(HKEY_CLASSES_ROOT, extension, 0, KEY_QUERY_VALUE);
+
   wstring path = reg.QueryValue(L"");
-  
+
   if (!path.empty()) {
     path += L"\\shell\\open\\command";
     reg.OpenKey(HKEY_CLASSES_ROOT, path, 0, KEY_QUERY_VALUE);
+
     path = reg.QueryValue(L"");
     Replace(path, L"\"", L"");
     Trim(path, L" %1");
   }
 
   reg.CloseKey();
+
   return path.empty() ? default_value : path;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension, bool recursive, bool trim_extension) {
-  if (path.empty()) return 0;
-  wstring folder = path + L"*.*";
-  int found = 0;
+unsigned int PopulateFiles(vector<wstring>& file_list,
+                           const wstring& path,
+                           const wstring& extension,
+                           bool recursive, bool trim_extension) {
+  if (path.empty())
+    return 0;
 
   WIN32_FIND_DATA wfd;
-  HANDLE hFind = FindFirstFile(folder.c_str(), &wfd);
-  if (hFind != INVALID_HANDLE_VALUE) {
-    do {
-      if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-        if (recursive && wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
-          folder = path + wfd.cFileName + L"\\";
-          found += PopulateFiles(file_list, folder, extension, recursive, trim_extension);
-        }
-      } else if (wfd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY) {
-        if (extension.empty() || IsEqual(GetFileExtension(wfd.cFileName), extension)) {
-          if (trim_extension) {
-            file_list.push_back(GetFileWithoutExtension(wfd.cFileName));
-          } else {
-            file_list.push_back(wfd.cFileName);
-          }
-          found++;
-        }
-      }
-    } while (FindNextFile(hFind, &wfd));
-    FindClose(hFind);
-  }
+  wstring file_name = path + L"*.*";
+  HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
 
-  return found;
+  if (file_handle == INVALID_HANDLE_VALUE)
+    return 0;
+
+  unsigned int file_count = 0;
+
+  do {
+    if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+      if (recursive &&
+          wcscmp(wfd.cFileName, L".") != 0 &&
+          wcscmp(wfd.cFileName, L"..") != 0) {
+        file_name = path + wfd.cFileName + L"\\";
+        file_count += PopulateFiles(file_list, file_name, extension, recursive,
+                                    trim_extension);
+      }
+    } else if (wfd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY) {
+      if (extension.empty() ||
+          IsEqual(GetFileExtension(wfd.cFileName), extension)) {
+        if (trim_extension) {
+          file_list.push_back(GetFileWithoutExtension(wfd.cFileName));
+        } else {
+          file_list.push_back(wfd.cFileName);
+        }
+        file_count++;
+      }
+    }
+  } while (FindNextFile(file_handle, &wfd));
+
+  FindClose(file_handle);
+
+  return file_count;
 }
 
-int PopulateFolders(vector<wstring>& folder_list, wstring path) {
-  if (path.empty()) return 0;
-  path += L"*.*";
-  int found = 0;
+int PopulateFolders(vector<wstring>& folder_list, const wstring& path) {
+  if (path.empty())
+    return 0;
 
   WIN32_FIND_DATA wfd;
-  HANDLE hFind = FindFirstFile(path.c_str(), &wfd);
-  if (hFind != INVALID_HANDLE_VALUE) {
-    do {
-      if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-        if (wcscmp(wfd.cFileName, L".") != 0 && wcscmp(wfd.cFileName, L"..") != 0) {
-          found++;
-          folder_list.push_back(wfd.cFileName);
-        }
-      }
-    } while (FindNextFile(hFind, &wfd));
-    FindClose(hFind);
-  }
+  wstring file_name = path + L"*.*";
+  HANDLE file_handle = FindFirstFile(path.c_str(), &wfd);
 
-  return found;
+  if (file_handle == INVALID_HANDLE_VALUE)
+    return 0;
+
+  int folder_count = 0;
+
+  do {
+    if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+      if (wcscmp(wfd.cFileName, L".") != 0 &&
+          wcscmp(wfd.cFileName, L"..") != 0) {
+        folder_count++;
+        folder_list.push_back(wfd.cFileName);
+      }
+    }
+  } while (FindNextFile(file_handle, &wfd));
+
+  FindClose(file_handle);
+
+  return folder_count;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool SaveToFile(LPCVOID data, DWORD length, const string_t& path, bool take_backup) {
+bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
+                bool take_backup) {
   // Make sure the path is available
   CreateFolder(GetPathOnly(path));
 
@@ -386,12 +457,12 @@ bool SaveToFile(LPCVOID data, DWORD length, const string_t& path, bool take_back
 
   // Save the data
   BOOL result = FALSE;
-  HANDLE file_Handle = ::CreateFile(path.c_str(), GENERIC_WRITE, 0, NULL,
-                                    CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-  if (file_Handle != INVALID_HANDLE_VALUE) {
+  HANDLE file_handle = OpenFileForGenericWrite(path);
+  if (file_handle != INVALID_HANDLE_VALUE) {
     DWORD bytes_written = 0;
-    result = ::WriteFile(file_Handle, (LPCVOID)data, length, &bytes_written, NULL);
-    ::CloseHandle(file_Handle);
+    result = ::WriteFile(file_handle, (LPCVOID)data, length, &bytes_written,
+                         nullptr);
+    ::CloseHandle(file_handle);
   }
 
   return result != FALSE;

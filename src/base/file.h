@@ -19,35 +19,38 @@
 #ifndef TAIGA_BASE_FILE_H
 #define TAIGA_BASE_FILE_H
 
-#include "std.h"
+#include <string>
+#include <vector>
+#include <windows.h>
+
 #include "types.h"
 
-unsigned long GetFileAge(const wstring& path);
-QWORD GetFileSize(const wstring& path);
-QWORD GetFolderSize(const wstring& path, bool recursive);
+unsigned long GetFileAge(const std::wstring& path);
+QWORD GetFileSize(const std::wstring& path);
+QWORD GetFolderSize(const std::wstring& path, bool recursive);
 
-bool Execute(const wstring& path, const wstring& parameters = L"");
-BOOL ExecuteEx(const wstring& path, const wstring& parameters = L"");
-void ExecuteLink(const wstring& link);
+bool Execute(const std::wstring& path, const std::wstring& parameters = L"");
+BOOL ExecuteEx(const std::wstring& path, const std::wstring& parameters = L"");
+void ExecuteLink(const std::wstring& link);
 
-wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter = NULL);
-BOOL BrowseForFolder(HWND hwnd, const wstring& title, const wstring& default_path, wstring& output);
+std::wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter = nullptr);
+BOOL BrowseForFolder(HWND hwnd, const std::wstring& title, const std::wstring& default_path, std::wstring& output);
 
-bool CreateFolder(const wstring& path);
-int DeleteFolder(wstring path);
+bool CreateFolder(const std::wstring& path);
+int DeleteFolder(std::wstring path);
 
-bool FileExists(const wstring& file);
-bool FolderExists(const wstring& folder);
-bool PathExists(const wstring& path);
-void ValidateFileName(wstring& path);
+bool FileExists(const std::wstring& file);
+bool FolderExists(const std::wstring& folder);
+bool PathExists(const std::wstring& path);
+void ValidateFileName(std::wstring& path);
 
-wstring ExpandEnvironmentStrings(const wstring& path);
-wstring GetDefaultAppPath(const wstring& extension, const wstring& default_value);
+std::wstring ExpandEnvironmentStrings(const std::wstring& path);
+std::wstring GetDefaultAppPath(const std::wstring& extension, const std::wstring& default_value);
 
-int PopulateFiles(vector<wstring>& file_list, wstring path, wstring extension = L"", bool recursive = false, bool trim_extension = false);
-int PopulateFolders(vector<wstring>& folder_list, wstring path);
-bool SaveToFile(LPCVOID data, DWORD length, const wstring& path, bool take_backup = false);
+unsigned int PopulateFiles(std::vector<std::wstring>& file_list, const std::wstring& path, const std::wstring& extension = L"", bool recursive = false, bool trim_extension = false);
+int PopulateFolders(std::vector<std::wstring>& folder_list, const std::wstring& path);
+bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path, bool take_backup = false);
 
-wstring ToSizeString(QWORD qwSize);
+std::wstring ToSizeString(QWORD qwSize);
 
 #endif  // TAIGA_BASE_FILE_H
