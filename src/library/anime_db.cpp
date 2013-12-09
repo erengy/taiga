@@ -420,7 +420,7 @@ void ImageDatabase::FreeMemory() {
   }
 }
 
-Image* ImageDatabase::GetImage(int anime_id) {
+base::Image* ImageDatabase::GetImage(int anime_id) {
   if (items_.find(anime_id) != items_.end())
     if (items_[anime_id].data > 0)
       return &items_[anime_id];

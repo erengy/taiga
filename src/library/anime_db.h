@@ -82,10 +82,10 @@ public:
   void FreeMemory();
 
   // Returns a pointer to requested image if available.
-  Image* GetImage(int anime_id);
+  base::Image* GetImage(int anime_id);
 
 private:
-  std::map<int, Image> items_;
+  std::map<int, base::Image> items_;
 };
 } // namespace anime
 

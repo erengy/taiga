@@ -16,17 +16,54 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "std.h"
+#include <windows.h>
+#include <gdiplus.h>
 
 #include "gfx.h"
 
 win::GdiPlus GdiPlus;
 
-// =============================================================================
+namespace base {
 
-HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bItalic, BOOL bUnderline) {
+Image::Image()
+    : data(0) {
+}
+
+bool Image::Load(const std::wstring& path) {
+  ::DeleteObject(dc.DetachBitmap());
+  
+  if (dc.Get() == nullptr) {
+    HDC hScreen = ::GetDC(nullptr);
+    dc = ::CreateCompatibleDC(hScreen);
+    ::ReleaseDC(NULL, hScreen);
+  }
+
+  Gdiplus::Bitmap bmp(path.c_str());
+  rect.right = bmp.GetWidth();
+  rect.bottom = bmp.GetHeight();
+
+  HBITMAP hbmp = nullptr;
+  bmp.GetHBITMAP(Gdiplus::Color::Transparent, &hbmp);
+
+  if (!hbmp || !rect.right || !rect.bottom) {
+    ::DeleteObject(hbmp);
+    ::DeleteDC(dc.DetachDC());
+    return false;
+  }
+
+  dc.AttachBitmap(hbmp);
+  return true;
+}
+
+}  // namespace base
+
+////////////////////////////////////////////////////////////////////////////////
+
+HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize,
+                   BOOL bBold, BOOL bItalic, BOOL bUnderline) {
+  LOGFONT lFont;
   HFONT hFont = reinterpret_cast<HFONT>(GetCurrentObject(hdc, OBJ_FONT));
-  LOGFONT lFont; GetObject(hFont, sizeof(LOGFONT), &lFont);
+  GetObject(hFont, sizeof(LOGFONT), &lFont);
   
   if (lpFaceName)
     lstrcpy(lFont.lfFaceName, lpFaceName);
@@ -51,7 +88,8 @@ int GetTextHeight(HDC hdc) {
   return size.cy;
 }
 
-BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, bool bVertical) { 
+BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2,
+                  bool bVertical) { 
   TRIVERTEX vertex[2];
   vertex[0].x     = lpRect->left;
   vertex[0].y     = lpRect->top;
@@ -65,28 +103,34 @@ BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, 
   vertex[1].Green = GetGValue(dwColor2) << 8;
   vertex[1].Blue  = GetBValue(dwColor2) << 8;
   vertex[1].Alpha = 0x0000;
+
   GRADIENT_RECT gRect = {0, 1};
-  return GdiGradientFill(hdc, vertex, 2, &gRect, 1, static_cast<ULONG>(bVertical));
+
+  return GdiGradientFill(hdc, vertex, 2, &gRect, 1,
+                         static_cast<ULONG>(bVertical));
 }
 
-BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, DWORD dwColor3) {
+BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2,
+                     DWORD dwColor3) {
   // Draw bottom rect
   RECT rect = *lpRect;
   rect.top += (rect.bottom - rect.top) / 2;
   HBRUSH brush = CreateSolidBrush(dwColor3);
   FillRect(hdc, &rect, brush);
   DeleteObject(brush);
+
   // Draw top gradient
   rect.bottom = rect.top;
   rect.top = lpRect->top;
   return GradientRect(hdc, &rect, dwColor1, dwColor2, true);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 COLORREF HexToARGB(const wstring& text) {
   int i = text.length() - 6;
-  if (i < 0) return 0;
+  if (i < 0)
+    return 0;
 
   unsigned int r, g, b;
   r = wcstoul(text.substr(i + 0, 2).c_str(), NULL, 16);
@@ -96,7 +140,10 @@ COLORREF HexToARGB(const wstring& text) {
   return RGB(r, g, b);
 }
 
-win::Rect ResizeRect(const win::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y) {
+win::Rect ResizeRect(const win::Rect& rect_dest,
+                     int src_width, int src_height,
+                     bool stretch,
+                     bool center_x, bool center_y) {
   win::Rect rect = rect_dest;
 
   float dest_width = static_cast<float>(rect_dest.Width());
@@ -104,14 +151,16 @@ win::Rect ResizeRect(const win::Rect& rect_dest, int src_width, int src_height, 
   float image_width = static_cast<float>(src_width);
   float image_Height = static_cast<float>(src_height);
   
-  // Source < Destination (No need to resize)
+  // Source < Destination (no need to resize)
   if ((image_width < dest_width) && (image_Height < dest_height) && !stretch) {
     rect.right = rect.left + src_width;
     rect.bottom = rect.top + src_height;
-    if (center_x) rect.Offset(static_cast<int>((image_width - image_width) / 2.0f), 0);
-    if (center_y) rect.Offset(0, static_cast<int>((dest_height - image_Height) / 2.0f));
+    if (center_x)
+      rect.Offset(static_cast<int>((image_width - image_width) / 2.0f), 0);
+    if (center_y)
+      rect.Offset(0, static_cast<int>((dest_height - image_Height) / 2.0f));
 
-  // Source > Destination (Resize)
+  // Source > Destination (resize)
   } else {
     // Calculate aspect ratios
     float dest_ratio = dest_width / dest_height;
@@ -119,12 +168,15 @@ win::Rect ResizeRect(const win::Rect& rect_dest, int src_width, int src_height, 
     
     // Width > Height
     if (image_ratio > dest_ratio) {
-      rect.bottom = rect.top + static_cast<int>(dest_width * (1.0f / image_ratio));
-      if (center_y) rect.Offset(0, static_cast<int>((dest_height - rect.Height()) / 2.0f));
+      rect.bottom = rect.top +
+          static_cast<int>(dest_width * (1.0f / image_ratio));
+      if (center_y)
+        rect.Offset(0, static_cast<int>((dest_height - rect.Height()) / 2.0f));
     // Height > Width
     } else if (image_ratio < dest_ratio) {
       rect.right = rect.left + static_cast<int>(dest_height * image_ratio);
-      if (center_x) rect.Offset(static_cast<int>((dest_width - rect.Width()) / 2.0f), 0);
+      if (center_x)
+        rect.Offset(static_cast<int>((dest_width - rect.Width()) / 2.0f), 0);
     }
   }
   
@@ -140,6 +192,7 @@ int ScaleX(int value) {
       ReleaseDC(NULL, hdc);
     }
   }
+
   return MulDiv(value, dpi_x, 96);
 }
 
@@ -152,6 +205,7 @@ int ScaleY(int value) {
       ReleaseDC(NULL, hdc);
     }
   }
+
   return MulDiv(value, dpi_y, 96);
 }
 
@@ -229,31 +283,4 @@ COLORREF ChangeColorBrightness(COLORREF color, float modifier) {
   return RGB(static_cast<BYTE>(r * 255),
              static_cast<BYTE>(g * 255),
              static_cast<BYTE>(b * 255));
-}
-
-// =============================================================================
-
-bool Image::Load(const wstring& path) {
-  ::DeleteObject(dc.DetachBitmap());
-  
-  HBITMAP hbmp = nullptr;
-  if (dc.Get() == nullptr) {
-    HDC hScreen = ::GetDC(nullptr);
-    dc = ::CreateCompatibleDC(hScreen);
-    ::ReleaseDC(NULL, hScreen);
-  }
-
-  Gdiplus::Bitmap bmp(path.c_str());
-  rect.right = bmp.GetWidth();
-  rect.bottom = bmp.GetHeight();
-  bmp.GetHBITMAP(NULL, &hbmp);
-  
-  if (!hbmp || !rect.right || !rect.bottom) {
-    ::DeleteObject(hbmp);
-    ::DeleteDC(dc.DetachDC());
-    return false;
-  } else {
-    dc.AttachBitmap(hbmp);
-    return true;
-  }
 }
