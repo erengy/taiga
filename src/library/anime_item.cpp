@@ -197,9 +197,7 @@ const Date Item::GetMyDateStart(bool check_events) const {
   EventItem* event_item = nullptr;
   event_item = check_events ? 
     SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
-  return event_item ? 
-    TranslateDateFromApi(*event_item->date_start) : 
-    my_info_->date_start;
+  return event_item ? *event_item->date_start : my_info_->date_start;
 }
 
 const Date Item::GetMyDateEnd(bool check_events) const {
@@ -207,9 +205,7 @@ const Date Item::GetMyDateEnd(bool check_events) const {
   EventItem* event_item = nullptr;
   event_item = check_events ? 
     SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
-  return event_item ? 
-    TranslateDateFromApi(*event_item->date_finish) : 
-    my_info_->date_finish;
+  return event_item ? *event_item->date_finish : my_info_->date_finish;
 }
 
 const wstring Item::GetMyLastUpdated() const {
@@ -729,12 +725,10 @@ void Item::Edit(const EventItem& item) {
   }
   // Edit dates
   if (item.date_start) {
-    Date date_start = TranslateDateFromApi(*item.date_start);
-    SetMyDateStart(date_start);
+    SetMyDateStart(*item.date_start);
   }
   if (item.date_finish) {
-    Date date_finish = TranslateDateFromApi(*item.date_finish);
-    SetMyDateEnd(date_finish);
+    SetMyDateEnd(*item.date_finish);
   }
   // Delete
   if (item.mode == taiga::kHttpServiceDeleteLibraryEntry) {

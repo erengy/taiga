@@ -197,11 +197,9 @@ void HistoryDialog::RefreshList() {
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
     if (it->date_start)
-      AppendString(details, L"Start date: " + 
-        wstring(anime::TranslateDateFromApi(*it->date_start)));
+      AppendString(details, L"Start date: " + wstring(*it->date_start));
     if (it->date_finish)
-      AppendString(details, L"Finish date: " + 
-        wstring(anime::TranslateDateFromApi(*it->date_finish)));
+      AppendString(details, L"Finish date: " + wstring(*it->date_finish));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }

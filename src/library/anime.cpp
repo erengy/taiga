@@ -200,9 +200,9 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
 
   // Set start/finish date
   if (*event_item.episode == 1 && !IsValidDate(GetMyDateStart()))
-    event_item.date_start = TranslateDateForApi(::GetDate());
+    event_item.date_start = GetDate();
   if (*event_item.episode == GetEpisodeCount() && !IsValidDate(GetMyDateEnd()))
-    event_item.date_finish = TranslateDateForApi(::GetDate());
+    event_item.date_finish = GetDate();
 
   // Set update mode
   if (GetMyStatus() == kNotInList) {

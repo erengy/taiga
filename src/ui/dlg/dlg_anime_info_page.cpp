@@ -426,19 +426,17 @@ bool PageMyInfo::Save() {
   SYSTEMTIME stMyStart;
   if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
                          reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
-    event_item.date_start = anime::TranslateDateForApi(Date());
+    event_item.date_start = Date();
   } else {
-    event_item.date_start = anime::TranslateDateForApi(
-      Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay));
+    event_item.date_start = Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
   }
   // Finish date
   SYSTEMTIME stMyFinish;
   if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
                          reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
-    event_item.date_finish = anime::TranslateDateForApi(Date());
+    event_item.date_finish = Date();
   } else {
-    event_item.date_finish = anime::TranslateDateForApi(
-      Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay));
+    event_item.date_finish = Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
   }
 
   // Alternative titles

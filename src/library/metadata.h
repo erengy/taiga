@@ -32,6 +32,7 @@ enum TitleType {
 
 struct Title {
   Title();
+  Title(TitleType type, const string_t& value);
   ~Title() {}
 
   TitleType type;

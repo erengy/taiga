@@ -21,6 +21,7 @@
 
 #include <ctime>
 #include <string>
+#include <windows.h>
 
 enum TimerId {
   TIMER_MAIN = 1337,

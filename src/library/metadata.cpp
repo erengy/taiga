@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "anime.h"
 #include "metadata.h"
 
 namespace library {
@@ -25,12 +24,16 @@ Title::Title()
     : type(kTitleTypeSynonym) {
 }
 
+Title::Title(TitleType type, const string_t& value)
+    : type(type), value(value) {
+}
+
 Metadata::Metadata()
     : audience(0),
       source(0),
-      status(anime::kUnknownStatus),
-      type(anime::kUnknownType),
-      uid(anime::ID_UNKNOWN) {
+      status(0),
+      type(0),
+      uid(0) {
 }
 
 }  // namespace library

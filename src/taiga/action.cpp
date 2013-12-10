@@ -244,7 +244,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     event_item.status = status;
     if (status == anime::kCompleted) {
       event_item.episode = anime_item->GetEpisodeCount();
-      event_item.date_finish = anime::TranslateDateForApi(GetDate());
+      event_item.date_finish = GetDate();
     }
     event_item.mode = taiga::kHttpServiceAddLibraryEntry;
     History.queue.Add(event_item);
@@ -503,7 +503,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         event_item.episode = anime_item->GetEpisodeCount();
         if (*event_item.episode == 0) event_item.episode.Reset();
         if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
-          event_item.date_finish = anime::TranslateDateForApi(GetDate());
+          event_item.date_finish = GetDate();
         break;
     }
     event_item.anime_id = anime_id;

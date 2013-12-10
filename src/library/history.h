@@ -20,6 +20,7 @@
 #define HISTORY_H
 
 #include "base/std.h"
+#include "base/time.h"
 #include "base/optional.h"
 
 #include <queue>
@@ -45,18 +46,9 @@ public:
   Optional<int> episode;
   Optional<int> status;
   Optional<int> score;
-  Optional<int> downloaded_episodes;
-  Optional<int> storage_type;
-  Optional<float> storage_value;
-  Optional<int> times_rewatched;
-  Optional<int> rewatch_value;
-  Optional<wstring> date_start;
-  Optional<wstring> date_finish;
-  Optional<int> priority;
-  Optional<int> enable_discussion;
+  Optional<Date> date_start;
+  Optional<Date> date_finish;
   Optional<int> enable_rewatching;
-  Optional<wstring> comments;
-  Optional<wstring> fansub_group;
   Optional<wstring> tags;
 };
 
