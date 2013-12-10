@@ -484,7 +484,7 @@ void ConfirmationQueue::Process() {
     if (choice != IDNO) {
       bool change_status = (choice == IDCANCEL);
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
-      anime_item->AddToQueue(episode, change_status);
+      AddToQueue(*anime_item, episode, change_status);
     }
     queue_.pop();
   }

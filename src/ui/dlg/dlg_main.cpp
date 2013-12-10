@@ -34,6 +34,7 @@
 
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
+#include "library/anime_util.h"
 #include "taiga/announce.h"
 #include "base/common.h"
 #include "taiga/debug.h"
@@ -640,7 +641,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           if (anime_item) {
             MediaPlayers.SetTitleChanged(false);
             CurrentEpisode.Set(anime_item->GetId());
-            anime_item->StartWatching(CurrentEpisode);
+            StartWatching(*anime_item, CurrentEpisode);
             return;
           }
         }
@@ -677,7 +678,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           // Update
           if (!Settings.Account.Update.wait_mp)
             if (anime_item)
-              anime_item->UpdateList(CurrentEpisode);
+              UpdateList(*anime_item, CurrentEpisode);
           return;
         }
         if (Settings.Account.Update.check_player == FALSE || 
@@ -691,10 +692,10 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         bool processed = CurrentEpisode.processed; // TODO: not a good solution...
         CurrentEpisode.Set(anime::ID_UNKNOWN);
         if (anime_item) {
-          anime_item->EndWatching(CurrentEpisode);
+          EndWatching(*anime_item, CurrentEpisode);
           CurrentEpisode.anime_id = anime_item->GetId();
           CurrentEpisode.processed = processed;
-          anime_item->UpdateList(CurrentEpisode);
+          UpdateList(*anime_item, CurrentEpisode);
           CurrentEpisode.anime_id = anime::ID_UNKNOWN;
         }
         Taiga.ticker_media = 0;
@@ -716,11 +717,11 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     } else {
       bool processed = CurrentEpisode.processed; // TODO: temporary solution...
       CurrentEpisode.Set(anime::ID_UNKNOWN);
-      anime_item->EndWatching(CurrentEpisode);
+      EndWatching(*anime_item, CurrentEpisode);
       if (Settings.Account.Update.wait_mp) {
         CurrentEpisode.anime_id = anime_item->GetId();
         CurrentEpisode.processed = processed;
-        anime_item->UpdateList(CurrentEpisode);
+        UpdateList(*anime_item, CurrentEpisode);
         CurrentEpisode.anime_id = anime::ID_UNKNOWN;
       }
       Taiga.ticker_media = 0;
@@ -859,7 +860,7 @@ void MainDialog::UpdateStatusTimer() {
 
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN && 
       seconds > 0 && seconds < Settings.Account.Update.delay &&
-      AnimeDatabase.FindItem(CurrentEpisode.anime_id)->IsUpdateAllowed(CurrentEpisode, true)) {
+      IsUpdateAllowed(*AnimeDatabase.FindItem(CurrentEpisode.anime_id), CurrentEpisode, true)) {
     wstring str = L"List update in " + ToTimeString(seconds);
     statusbar.SetPartText(1, str.c_str());
     statusbar.SetPartTipText(1, str.c_str());

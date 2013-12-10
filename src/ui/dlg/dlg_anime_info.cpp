@@ -23,6 +23,7 @@
 #include "dlg_main.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/gfx.h"
@@ -224,7 +225,7 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               anime_item->SetUserSynonyms(synonyms);
               Meow.UpdateCleanTitles(anime_item->GetId());
               Settings.Save();
-              anime_item->StartWatching(CurrentEpisode);
+              StartWatching(*anime_item, CurrentEpisode);
               MainDialog.ChangeStatus();
             }
           }

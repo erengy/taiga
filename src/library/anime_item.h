@@ -147,14 +147,6 @@ class Item {
   // relevant anime item is edited.
   void Edit(const EventItem& item);
 
-  // Following functions are called when a new episode is recognized. Actual
-  // time depends on user settings.
-  void StartWatching(Episode& episode);
-  void EndWatching(Episode episode);
-  bool IsUpdateAllowed(const Episode& episode, bool ignore_update_time);
-  void UpdateList(Episode& episode);
-  void AddToQueue(const Episode& episode, bool change_status);
-
   // MAL's API doesn't provide searching anime by ID, and some titles return
   // no result due to special characters. Season data provide safe-to-search
   // titles with keep_title flag on.

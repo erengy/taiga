@@ -309,7 +309,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       MainDialog.ChangeStatus(L"Automatic anime recognition is now disabled.");
       auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
       CurrentEpisode.Set(anime::ID_NOTINLIST);
-      if (anime_item) anime_item->EndWatching(CurrentEpisode);
+      if (anime_item) EndWatching(*anime_item, CurrentEpisode);
     }
 
   // ToggleSharing()
@@ -423,7 +423,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (anime::IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(value);
-      anime_item->AddToQueue(episode, true);
+      AddToQueue(*anime_item, episode, true);
     }
   // DecrementEpisode()
   //   lParam is an anime ID.
@@ -440,7 +440,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       if (anime::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
         anime::Episode episode;
         episode.number = ToWstr(watched - 1);
-        anime_item->AddToQueue(episode, true);
+        AddToQueue(*anime_item, episode, true);
       }
     }
   // IncrementEpisode()
@@ -452,7 +452,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (anime::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
       anime::Episode episode;
       episode.number = ToWstr(watched + 1);
-      anime_item->AddToQueue(episode, true);
+      AddToQueue(*anime_item, episode, true);
     }
 
   // EditScore(value)

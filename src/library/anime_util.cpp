@@ -18,16 +18,201 @@
 
 #include "anime.h"
 #include "anime_db.h"
+#include "anime_episode.h"
 #include "anime_util.h"
 
-#include "base/foreach.h"
-#include "base/string.h"
-#include "base/time.h"
-#include "taiga/path.h"
-#include "taiga/settings.h"
+#include "taiga/announce.h"
+#include "base/common.h"
 #include "track/feed.h"
+#include "base/foreach.h"
+#include "history.h"
+#include "track/media.h"
+#include "sync/sync.h"
+#include "base/process.h"
+#include "taiga/settings.h"
+#include "base/string.h"
+#include "taiga/path.h"
+#include "taiga/script.h"
+#include "taiga/taiga.h"
+#include "ui/theme.h"
+
+#include "ui/dlg/dlg_anime_info.h"
+#include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_main.h"
+
+#include "win/win_taskbar.h"
+#include "win/win_taskdialog.h"
 
 namespace anime {
+
+void StartWatching(Item& item, Episode& episode) {
+  // Make sure item is in list
+  if (!item.IsInList())
+    item.AddtoUserList();
+
+  // Change status
+  Taiga.play_status = PLAYSTATUS_PLAYING;
+  item.SetPlaying(true);
+
+  // Update now playing window
+  NowPlayingDialog.SetCurrentId(item.GetId());
+  
+  // Update anime list window
+  int status = item.GetMyRewatching() ? kWatching : item.GetMyStatus();
+  if (status != kNotInList) {
+    AnimeListDialog.RefreshList(status);
+    AnimeListDialog.RefreshTabs(status);
+  }
+  int list_index = AnimeListDialog.GetListIndex(item.GetId());
+  if (list_index > -1) {
+    AnimeListDialog.listview.SetItemIcon(list_index, ICON16_PLAY);
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+    AnimeListDialog.listview.EnsureVisible(list_index);
+  }
+
+  // Update main window
+  MainDialog.UpdateTip();
+  MainDialog.UpdateTitle();
+  if (Settings.Account.Update.go_to_nowplaying)
+    MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+  
+  // Show balloon tip
+  if (Settings.Program.Notifications.recognized) {
+    Taiga.current_tip_type = TIPTYPE_NOWPLAYING;
+    Taskbar.Tip(L"", L"", 0);
+    Taskbar.Tip(ReplaceVariables(Settings.Program.Notifications.format, episode).c_str(), 
+                L"Now Playing", NIIF_INFO);
+  }
+  
+  // Check folder
+  if (item.GetFolder().empty()) {
+    if (episode.folder.empty()) {
+      HWND hwnd = MediaPlayers.items[MediaPlayers.index].window_handle;
+      episode.folder = MediaPlayers.GetTitleFromProcessHandle(hwnd);
+      episode.folder = GetPathOnly(episode.folder);
+    }
+    if (IsInsideRootFolders(episode.folder)) {
+      // Set the folder if only it is under a root folder
+      item.SetFolder(episode.folder);
+      Settings.Save();
+    }
+  }
+
+  // Get additional information
+  if (item.GetScore().empty() || item.GetSynopsis().empty())
+    sync::GetMetadataById(item.GetId());
+  
+  // Update list
+  if (Settings.Account.Update.delay == 0 && !Settings.Account.Update.wait_mp)
+    UpdateList(item, episode);
+}
+
+void EndWatching(Item& item, Episode episode) {
+  // Change status
+  Taiga.play_status = PLAYSTATUS_STOPPED;
+  item.SetPlaying(false);
+  
+  // Announce
+  episode.anime_id = item.GetId();
+  Announcer.Do(ANNOUNCE_TO_HTTP, &episode);
+  Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
+
+  // Update now playing window
+  NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);
+  
+  // Update main window
+  episode.anime_id = anime::ID_UNKNOWN;
+  MainDialog.UpdateTip();
+  MainDialog.UpdateTitle();
+  int list_index = AnimeListDialog.GetListIndex(item.GetId());
+  if (list_index > -1) {
+    AnimeListDialog.listview.SetItemIcon(list_index, StatusToIcon(item.GetAiringStatus()));
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+  }
+}
+
+bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time) {
+  if (episode.processed)
+    return false;
+
+  if (!ignore_update_time)
+    if (Settings.Account.Update.delay > Taiga.ticker_media)
+      if (Taiga.ticker_media > -1)
+        return false;
+
+  if (item.GetMyStatus() == kCompleted && item.GetMyRewatching() == 0)
+    return false;
+
+  int number = GetEpisodeHigh(episode.number);
+  int number_low = GetEpisodeLow(episode.number);
+  int last_watched = item.GetMyLastWatchedEpisode();
+
+  if (Settings.Account.Update.out_of_range)
+    if (number_low > last_watched + 1 || number < last_watched + 1)
+      return false;
+
+  if (!IsValidEpisode(number, last_watched, item.GetEpisodeCount()))
+    return false;
+
+  return true;
+}
+
+void UpdateList(Item& item, Episode& episode) {
+  if (!IsUpdateAllowed(item, episode, false))
+    return;
+
+  episode.processed = true;
+
+  if (Settings.Account.Update.ask_to_confirm) {
+    ConfirmationQueue.Add(episode);
+    ConfirmationQueue.Process();
+  } else {
+    AddToQueue(item, episode, true);
+  }
+}
+
+void AddToQueue(Item& item, const Episode& episode, bool change_status) {
+  // Create event item
+  EventItem event_item;
+  event_item.anime_id = item.GetId();
+
+  // Set episode number
+  event_item.episode = GetEpisodeHigh(episode.number);
+
+  // Set start/finish date
+  if (*event_item.episode == 1 && !IsValidDate(item.GetMyDateStart()))
+    event_item.date_start = GetDate();
+  if (*event_item.episode == item.GetEpisodeCount() && !IsValidDate(item.GetMyDateEnd()))
+    event_item.date_finish = GetDate();
+
+  // Set update mode
+  if (item.GetMyStatus() == kNotInList) {
+    event_item.mode = taiga::kHttpServiceAddLibraryEntry;
+  } else {
+    event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+  }
+
+  if (change_status) {
+    // Move to completed
+    if (item.GetEpisodeCount() == *event_item.episode) {
+      event_item.status = kCompleted;
+      if (item.GetMyRewatching()) {
+        event_item.enable_rewatching = FALSE;
+        //event_item.times_rewatched++; // TODO: Enable when MAL adds to API
+      }
+    // Move to watching
+    } else if (item.GetMyStatus() != kWatching || *event_item.episode == 1) {
+      if (!item.GetMyRewatching()) {
+        event_item.status = kWatching;
+      }
+    }
+  }
+
+  // Add event to queue
+  History.queue.Add(event_item);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool GetFansubFilter(int anime_id, vector<wstring>& groups) {
   bool found = false;

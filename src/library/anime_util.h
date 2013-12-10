@@ -24,8 +24,17 @@
 class Date;
 
 namespace anime {
-
+  
+class Episode;
 class Item;
+
+// Following functions are called when a new episode is recognized. Actual
+// time depends on user settings.
+void StartWatching(Item& item, Episode& episode);
+void EndWatching(Item& item, Episode episode);
+bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time);
+void UpdateList(Item& item, Episode& episode);
+void AddToQueue(Item& item, const Episode& episode, bool change_status);
 
 bool GetFansubFilter(int anime_id, vector<wstring>& groups);
 bool SetFansubFilter(int anime_id, const wstring& group_name);
