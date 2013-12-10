@@ -52,6 +52,9 @@
     <Filter Include="sync\herro">
       <UniqueIdentifier>{a6128b60-172a-4c28-89ce-4d6a193462c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="library\anime">
+      <UniqueIdentifier>{34871dd8-76ae-4f8d-96d7-75b13d067a56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
@@ -170,21 +173,6 @@
     </ClCompile>
     <ClCompile Include="ui\theme.cpp">
       <Filter>ui</Filter>
-    </ClCompile>
-    <ClCompile Include="library\anime.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="library\anime_db.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="library\anime_episode.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="library\anime_filter.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
-    <ClCompile Include="library\anime_item.cpp">
-      <Filter>library</Filter>
     </ClCompile>
     <ClCompile Include="base\accessibility.cpp">
       <Filter>base</Filter>
@@ -382,9 +370,6 @@
     <ClCompile Include="sync\herro.cpp">
       <Filter>sync\herro</Filter>
     </ClCompile>
-    <ClCompile Include="library\anime_util.cpp">
-      <Filter>library</Filter>
-    </ClCompile>
     <ClCompile Include="library\metadata.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -405,6 +390,24 @@
     </ClCompile>
     <ClCompile Include="taiga\path.cpp">
       <Filter>taiga</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime_db.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime_episode.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime_filter.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime_item.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime_util.cpp">
+      <Filter>library\anime</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -509,21 +512,6 @@
     </ClInclude>
     <ClInclude Include="ui\theme.h">
       <Filter>ui</Filter>
-    </ClInclude>
-    <ClInclude Include="library\anime.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="library\anime_db.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="library\anime_episode.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="library\anime_filter.h">
-      <Filter>library</Filter>
-    </ClInclude>
-    <ClInclude Include="library\anime_item.h">
-      <Filter>library</Filter>
     </ClInclude>
     <ClInclude Include="base\accessibility.h">
       <Filter>base</Filter>
@@ -687,9 +675,6 @@
     <ClInclude Include="sync\herro_types.h">
       <Filter>sync\herro</Filter>
     </ClInclude>
-    <ClInclude Include="library\anime_util.h">
-      <Filter>library</Filter>
-    </ClInclude>
     <ClInclude Include="library\metadata.h">
       <Filter>library</Filter>
     </ClInclude>
@@ -713,6 +698,24 @@
     </ClInclude>
     <ClInclude Include="taiga\path.h">
       <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="library\anime_util.h">
+      <Filter>library\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="library\anime.h">
+      <Filter>library\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="library\anime_db.h">
+      <Filter>library\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="library\anime_episode.h">
+      <Filter>library\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="library\anime_filter.h">
+      <Filter>library\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="library\anime_item.h">
+      <Filter>library\anime</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

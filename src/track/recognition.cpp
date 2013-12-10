@@ -22,6 +22,7 @@
 
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "media.h"

@@ -23,6 +23,7 @@
 #include "dlg_torrent.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "track/feed.h"
 #include "base/gfx.h"

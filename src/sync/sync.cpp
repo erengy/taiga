@@ -22,6 +22,7 @@
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "library/history.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"

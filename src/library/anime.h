@@ -99,15 +99,6 @@ class LocalInformation {
   bool use_alternative;
 };
 
-bool GetFansubFilter(int anime_id, vector<wstring>& groups);
-bool SetFansubFilter(int anime_id, const wstring& group_name);
-
-wstring GetImagePath(int anime_id = -1);
-
-void GetUpcomingTitles(vector<int>& anime_ids);
-
-bool IsInsideRootFolders(const wstring& path);
-
 } // namespace anime
 
 #endif // ANIME_H

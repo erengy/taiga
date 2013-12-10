@@ -21,6 +21,7 @@
 #include "stats.h"
 
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/file.h"
 #include "base/foreach.h"

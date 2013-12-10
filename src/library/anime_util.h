@@ -27,6 +27,15 @@ namespace anime {
 
 class Item;
 
+bool GetFansubFilter(int anime_id, vector<wstring>& groups);
+bool SetFansubFilter(int anime_id, const wstring& group_name);
+
+wstring GetImagePath(int anime_id = -1);
+
+void GetUpcomingTitles(vector<int>& anime_ids);
+
+bool IsInsideRootFolders(const wstring& path);
+
 bool IsValidDate(const Date& date);
 bool IsValidDate(const wstring& date);
 bool IsValidEpisode(int episode, int watched, int total);
