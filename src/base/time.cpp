@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "library/anime_util.h"
 #include "string.h"
 #include "time.h"
 
@@ -27,7 +26,12 @@ Date::Date()
 }
 
 Date::Date(const std::wstring& date) {
-  *this = anime::ParseDateString(date);
+  // Convert from YYYY-MM-DD
+  if (date.length() == 10) {
+    year = ToInt(date.substr(0, 4));
+    month = ToInt(date.substr(5, 2));
+    day = ToInt(date.substr(8, 2));
+  }
 }
 
 Date::Date(unsigned short year, unsigned short month, unsigned short day)
@@ -106,6 +110,7 @@ Date::operator SYSTEMTIME() const {
 }
 
 Date::operator std::wstring() const {
+  // Convert to YYYY-MM-DD
   return PadChar(ToWstr(year), '0', 4) + L"-" + 
          PadChar(ToWstr(month), '0', 2) + L"-" + 
          PadChar(ToWstr(day), '0', 2);

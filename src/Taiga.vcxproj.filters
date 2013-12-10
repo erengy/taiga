@@ -391,9 +391,6 @@
     <ClCompile Include="taiga\path.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
-    <ClCompile Include="library\anime.cpp">
-      <Filter>library\anime</Filter>
-    </ClCompile>
     <ClCompile Include="library\anime_db.cpp">
       <Filter>library\anime</Filter>
     </ClCompile>
@@ -407,6 +404,12 @@
       <Filter>library\anime</Filter>
     </ClCompile>
     <ClCompile Include="library\anime_util.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime_util_time.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
+    <ClCompile Include="library\anime.cpp">
       <Filter>library\anime</Filter>
     </ClCompile>
   </ItemGroup>
@@ -699,9 +702,6 @@
     <ClInclude Include="taiga\path.h">
       <Filter>taiga</Filter>
     </ClInclude>
-    <ClInclude Include="library\anime_util.h">
-      <Filter>library\anime</Filter>
-    </ClInclude>
     <ClInclude Include="library\anime.h">
       <Filter>library\anime</Filter>
     </ClInclude>
@@ -715,6 +715,9 @@
       <Filter>library\anime</Filter>
     </ClInclude>
     <ClInclude Include="library\anime_item.h">
+      <Filter>library\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="library\anime_util.h">
       <Filter>library\anime</Filter>
     </ClInclude>
   </ItemGroup>

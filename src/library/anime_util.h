@@ -45,19 +45,9 @@ void GetUpcomingTitles(vector<int>& anime_ids);
 
 bool IsInsideRootFolders(const wstring& path);
 
-bool IsValidDate(const Date& date);
-bool IsValidDate(const wstring& date);
 bool IsValidEpisode(int episode, int watched, int total);
-Date ParseDateString(const wstring& str);
-void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end);
-
 int EstimateEpisodeCount(const Item& item);
 
-wstring TranslateDate(const Date& date);
-wstring TranslateDateForApi(const Date& date);
-Date TranslateDateFromApi(const wstring& date);
-wstring TranslateDateToSeason(const Date& date);
-wstring TranslateSeasonToMonths(const wstring& season);
 wstring TranslateMyStatus(int value, bool add_count);
 wstring TranslateNumber(int value, const wstring& default_char = L"-");
 wstring TranslateStatus(int value);
@@ -66,6 +56,14 @@ wstring TranslateType(int value);
 int TranslateMyStatus(const wstring& value);
 int TranslateStatus(const wstring& value);
 int TranslateType(const wstring& value);
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool IsValidDate(const Date& date);
+void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end);
+wstring TranslateDate(const Date& date);
+wstring TranslateDateToSeason(const Date& date);
+wstring TranslateSeasonToMonths(const wstring& season);
 
 }  // namespace anime
 
