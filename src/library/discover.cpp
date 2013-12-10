@@ -66,10 +66,6 @@ bool SeasonDatabase::Load(wstring file) {
     item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
 
-    xml_node settings_node = node.child(L"settings");
-    item.keep_title = XmlReadIntValue(settings_node, L"keep_title") != 0;
-    item.last_modified = last_modified;
-
     AnimeDatabase.UpdateItem(item);
   }
 

@@ -46,8 +46,7 @@ namespace anime {
 // =============================================================================
 
 Item::Item()
-    : keep_title(false), 
-      last_modified(0), 
+    : last_modified(0), 
       my_info_(nullptr) {
 }
 
