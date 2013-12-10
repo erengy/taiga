@@ -366,13 +366,15 @@ bool History::Load() {
       if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
     #define READ_ATTRIBUTE_STR(x, y) \
       if (!item.attribute(y).empty()) x = item.attribute(y).as_string();
+    #define READ_ATTRIBUTE_DATE(x, y) \
+      if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
     READ_ATTRIBUTE_INT(event_item.episode, L"episode");
     READ_ATTRIBUTE_INT(event_item.score, L"score");
     READ_ATTRIBUTE_INT(event_item.status, L"status");
     READ_ATTRIBUTE_INT(event_item.enable_rewatching, L"enable_rewatching");
     READ_ATTRIBUTE_STR(event_item.tags, L"tags");
-    READ_ATTRIBUTE_STR(event_item.date_start, L"date_start");
-    READ_ATTRIBUTE_STR(event_item.date_finish, L"date_finish");
+    READ_ATTRIBUTE_DATE(event_item.date_start, L"date_start");
+    READ_ATTRIBUTE_DATE(event_item.date_finish, L"date_finish");
     #undef READ_ATTRIBUTE_STR
     #undef READ_ATTRIBUTE_INT
     queue.Add(event_item, false);
@@ -402,6 +404,8 @@ bool History::Save() {
       if (y) node_item.append_attribute(x) = *y;
     #define APPEND_ATTRIBUTE_STR(x, y) \
       if (y) node_item.append_attribute(x) = (*y).c_str();
+    #define APPEND_ATTRIBUTE_DATE(x, y) \
+      if (y) node_item.append_attribute(x) = wstring(*y).c_str();
     node_item.append_attribute(L"anime_id") = j->anime_id;
     node_item.append_attribute(L"mode") = j->mode;
     node_item.append_attribute(L"time") = j->time.c_str();
@@ -410,8 +414,8 @@ bool History::Save() {
     APPEND_ATTRIBUTE_INT(L"status", j->status);
     APPEND_ATTRIBUTE_INT(L"enable_rewatching", j->enable_rewatching);
     APPEND_ATTRIBUTE_STR(L"tags", j->tags);
-    APPEND_ATTRIBUTE_STR(L"date_start", j->date_start);
-    APPEND_ATTRIBUTE_STR(L"date_finish", j->date_finish);
+    APPEND_ATTRIBUTE_DATE(L"date_start", j->date_start);
+    APPEND_ATTRIBUTE_DATE(L"date_finish", j->date_finish);
     #undef APPEND_ATTRIBUTE_STR
     #undef APPEND_ATTRIBUTE_INT
   }

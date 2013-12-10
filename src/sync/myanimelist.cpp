@@ -183,6 +183,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   foreach_(it, request.data) {
     // TODO: Our keys will be different than the tags listed above, once we
     // add support for multiple services
+    // TODO: Must translate dates into MMDDYYYY format
     if (valid_tags.find(it->first) != valid_tags.end())
       XmlWriteStrValue(node_entry, it->first.c_str(), it->second.c_str());
   }
