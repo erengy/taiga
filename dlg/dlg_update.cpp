@@ -43,7 +43,8 @@ BOOL UpdateDialog::OnInitDialog() {
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
 
-  // Create default fonts
+  // Create default brushes and fonts
+  UI.CreateBrushes();
   UI.CreateFonts(GetDC());
 
   // Set title
@@ -64,8 +65,10 @@ BOOL UpdateDialog::OnInitDialog() {
 INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC: {
-      return ::GetSysColor(COLOR_WINDOW);
-      break;
+      win32::Dc dc = reinterpret_cast<HDC>(wParam);
+      dc.SetBkMode(TRANSPARENT);
+      dc.DetachDC();
+      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }
   }
 

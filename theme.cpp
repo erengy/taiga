@@ -141,6 +141,41 @@ bool Theme::LoadImages() {
 
 // =============================================================================
 
+Brush::Brush()
+    : brush_(nullptr) {
+}
+
+Brush::Brush(HBRUSH brush)
+    : brush_(brush) {
+}
+
+Brush::~Brush() {
+  Set(nullptr);
+}
+
+HBRUSH Brush::Get() const {
+  return brush_;
+}
+
+void Brush::Set(HBRUSH brush) {
+  if (brush_)
+    ::DeleteObject(brush_);
+  brush_ = brush;
+}
+
+Brush::operator HBRUSH() const {
+  return brush_;
+}
+
+void Theme::CreateBrushes() {
+  if (brush_background.Get())
+    return;
+
+  brush_background.Set(CreateSolidBrush(GetSysColor(COLOR_WINDOW)));
+}
+
+// =============================================================================
+
 Font::Font()
     : font_(nullptr) {
 }
@@ -167,7 +202,10 @@ Font::operator HFONT() const {
   return font_;
 }
 
-bool Theme::CreateFonts(HDC hdc) {
+void Theme::CreateFonts(HDC hdc) {
+  if (font_bold.Get() && font_header.Get())
+    return;
+
   LOGFONT lFont = {0};
   lFont.lfCharSet = DEFAULT_CHARSET;
   lFont.lfOutPrecision = OUT_STRING_PRECIS;
@@ -186,8 +224,6 @@ bool Theme::CreateFonts(HDC hdc) {
   lFont.lfWeight = FW_NORMAL;
   lstrcpy(lFont.lfFaceName, L"Segoe UI");
   font_header.Set(::CreateFontIndirect(&lFont));
-
-  return true;
 }
 
 // =============================================================================

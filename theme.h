@@ -87,6 +87,21 @@ const COLORREF COLOR_MAININSTRUCTION = RGB(0x00, 0x33, 0x99);
 
 // =============================================================================
 
+class Brush {
+public:
+  Brush();
+  Brush(HBRUSH brush);
+  ~Brush();
+
+  HBRUSH Get() const;
+  void Set(HBRUSH brush);
+
+  operator HBRUSH() const;
+
+private:
+  HBRUSH brush_;
+};
+
 class Font {
 public:
   Font();
@@ -106,8 +121,9 @@ class Theme {
 public:
   Theme();
   ~Theme() {}
-  
-  bool CreateFonts(HDC hdc);
+
+  void CreateBrushes();
+  void CreateFonts(HDC hdc);
   bool Load(const wstring& name);
   bool LoadImages();
 
@@ -117,6 +133,7 @@ public:
   win32::ImageList ImgList16;
   win32::ImageList ImgList24;
 
+  Brush brush_background;
   Font font_bold;
   Font font_header;
   

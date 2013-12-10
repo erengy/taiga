@@ -51,8 +51,12 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
   ResizeProc(hwnd, uMsg, wParam, lParam);
 
   switch (uMsg) {
-    case WM_CTLCOLORSTATIC:
+    case WM_CTLCOLORSTATIC: {
+      win32::Dc dc = reinterpret_cast<HDC>(wParam);
+      dc.SetBkMode(TRANSPARENT);
+      dc.DetachDC();
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+    }
 
     case WM_DRAWITEM: {
       // Draw score bars
@@ -83,6 +87,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             rect_text.left = rect_text.right += 8;
             rect_text.right = dis->rcItem.right;
             dc.EditFont(nullptr, 7);
+            dc.SetBkMode(TRANSPARENT);
             dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
             dc.DrawText(text.c_str(), text.length(), rect_text,
                         DT_SINGLELINE | DT_VCENTER);
