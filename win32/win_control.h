@@ -41,6 +41,7 @@ public:
   int     AddItem(LPCWSTR lpsz, LPARAM data);
   int     AddString(LPCWSTR lpsz);
   int     DeleteString(int index);
+  int     FindItemData(LPARAM data);
   int     GetCount();
   LRESULT GetItemData(int index);
   int     GetCurSel();

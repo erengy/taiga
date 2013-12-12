@@ -48,6 +48,14 @@ int ComboBox::DeleteString(int index) {
   return ComboBox_DeleteString(m_hWindow, index);
 }
 
+int ComboBox::FindItemData(LPARAM data) {
+  for (int i = 0; i < GetCount(); i++)
+    if (data == GetItemData(i))
+      return i;
+
+  return CB_ERR;
+}
+
 int ComboBox::GetCount() {
   return ComboBox_GetCount(m_hWindow);
 }

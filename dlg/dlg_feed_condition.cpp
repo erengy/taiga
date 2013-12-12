@@ -54,13 +54,15 @@ BOOL FeedConditionDialog::OnInitDialog() {
 
   // Add elements
   for (int i = 0; i < FEED_FILTER_ELEMENT_COUNT; i++) {
-    element_combo_.AddString(Aggregator.filter_manager.TranslateElement(i).c_str());
+    element_combo_.AddItem(Aggregator.filter_manager.TranslateElement(i).c_str(), i);
   }
   
-  // Choose
+  // Set element
   element_combo_.SetCurSel(condition.element);
   ChooseElement(condition.element);
-  operator_combo_.SetCurSel(condition.op);
+  // Set operator
+  operator_combo_.SetCurSel(operator_combo_.FindItemData(condition.op));
+  // Set value
   switch (condition.element) {
     case FEED_FILTER_ELEMENT_META_ID: {
       value_combo_.SetCurSel(0);
@@ -121,7 +123,7 @@ void FeedConditionDialog::OnCancel() {
 void FeedConditionDialog::OnOK() {
   // Set values
   condition.element = element_combo_.GetCurSel();
-  condition.op = operator_combo_.GetCurSel();
+  condition.op = operator_combo_.GetItemData(operator_combo_.GetCurSel());
   switch (condition.element) {
     case FEED_FILTER_ELEMENT_META_ID:
     case FEED_FILTER_ELEMENT_META_STATUS:
@@ -173,11 +175,11 @@ void FeedConditionDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
 void FeedConditionDialog::ChooseElement(int element_index) {
   // Operator
-  int op_index = operator_combo_.GetCurSel();
+  LPARAM op_data = operator_combo_.GetItemData(operator_combo_.GetCurSel());
   operator_combo_.ResetContent();
 
   #define ADD_OPERATOR(op) \
-    operator_combo_.AddString(Aggregator.filter_manager.TranslateOperator(op).c_str())
+    operator_combo_.AddItem(Aggregator.filter_manager.TranslateOperator(op).c_str(), op);
 
   switch (element_index) {
     case FEED_FILTER_ELEMENT_META_ID:
@@ -220,7 +222,11 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   }
 
   #undef ADD_OPERATOR
-  operator_combo_.SetCurSel(op_index < 0 || op_index > operator_combo_.GetCount() - 1 ? 0 : op_index);
+
+  int op_index = operator_combo_.FindItemData(op_data);
+  if (op_index == CB_ERR)
+    op_index = 0;
+  operator_combo_.SetCurSel(op_index);
   
   // ===========================================================================
   
