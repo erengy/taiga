@@ -55,7 +55,7 @@ void FeedItem::Discard(int option) {
   }
 }
 
-bool FeedItem::IsDiscarded() {
+bool FeedItem::IsDiscarded() const {
   switch (state) {
     case FEEDITEM_DISCARDED_NORMAL:
     case FEEDITEM_DISCARDED_INACTIVE:
@@ -64,6 +64,14 @@ bool FeedItem::IsDiscarded() {
     default:
       return false;
   }
+}
+
+bool FeedItem::operator<(const FeedItem& item) const {
+  // Initialize priority list
+  static const int state_priorities[] = {1, 2, 3, 4, 0};
+
+  // Sort items by the priority of their state
+  return state_priorities[this->state] < state_priorities[item.state];
 }
 
 // =============================================================================
@@ -152,18 +160,7 @@ bool Feed::ExamineData() {
   Aggregator.filter_manager.FilterArchived(*this);
 
   // Sort items
-  std::stable_sort(items.begin(), items.end(),
-    [](const FeedItem& a, const FeedItem& b) -> bool {
-      // Place inactive and hidden items below others
-      if (a.state != b.state) {
-        if (b.state == FEEDITEM_DISCARDED_INACTIVE ||
-            b.state == FEEDITEM_DISCARDED_HIDDEN)
-          return true;
-      }
-      // Give priority to identified items, while preserving the order for
-      // unidentified ones.
-      return a.episode_data.anime_id > b.episode_data.anime_id;
-    });
+  std::stable_sort(items.begin(), items.end());
   // Re-assign item indexes
   for (size_t i = 0; i < items.size(); i++)
     items.at(i).index = i;

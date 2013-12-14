@@ -127,17 +127,6 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Download marked torrents
     case 101: {
-      for (int i = 0; i < list_.GetItemCount(); i++) {
-        FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-        if (feed_item) {
-          bool check_state = list_.GetCheckState(i) == TRUE;
-          if (feed_item->state == FEEDITEM_SELECTED && !check_state) {
-            // Discard items that have passed all filters but are unchecked by the user
-            Aggregator.file_archive.push_back(feed_item->title);
-          }
-          feed_item->state = check_state ? FEEDITEM_SELECTED : FEEDITEM_DISCARDED_NORMAL;
-        }
-      }
       feed->Download(-1);
       return TRUE;
     }
@@ -208,9 +197,9 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else {
             MainDialog.ChangeStatus(L"Marked " + ToWstr(checked_count) + L" torrents.");
           }
-          bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(pnmv->iItem));
           if (feed_item) {
+            bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
             feed_item->state = checked ? FEEDITEM_SELECTED : FEEDITEM_DISCARDED_NORMAL;
           }
         }

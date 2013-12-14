@@ -49,7 +49,9 @@ public:
   virtual ~FeedItem() {};
 
   void Discard(int option);
-  bool IsDiscarded();
+  bool IsDiscarded() const;
+
+  bool operator<(const FeedItem& item) const;
 
   int index;
   wstring magnet_link;
