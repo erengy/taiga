@@ -191,29 +191,29 @@ int Item::GetMyRewatchingEp() const {
   return my_info_->rewatching_ep;
 }
 
-const Date Item::GetMyDateStart(bool check_events) const {
-  if (!my_info_.get()) return Date();
+const Date& Item::GetMyDateStart(bool check_events) const {
+  if (!my_info_.get()) return EmptyDate();
   EventItem* event_item = nullptr;
   event_item = check_events ? 
     SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
   return event_item ? *event_item->date_start : my_info_->date_start;
 }
 
-const Date Item::GetMyDateEnd(bool check_events) const {
-  if (!my_info_.get()) return Date();
+const Date& Item::GetMyDateEnd(bool check_events) const {
+  if (!my_info_.get()) return EmptyDate();
   EventItem* event_item = nullptr;
   event_item = check_events ? 
     SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
   return event_item ? *event_item->date_finish : my_info_->date_finish;
 }
 
-const wstring Item::GetMyLastUpdated() const {
-  if (!my_info_.get()) return wstring();
+const wstring& Item::GetMyLastUpdated() const {
+  if (!my_info_.get()) return EmptyString();
   return my_info_->last_updated;
 }
 
-const wstring Item::GetMyTags(bool check_events) const {
-  if (!my_info_.get()) return wstring();
+const wstring& Item::GetMyTags(bool check_events) const {
+  if (!my_info_.get()) return EmptyString();
   EventItem* event_item = check_events ? 
     SearchHistory(EVENT_SEARCH_TAGS) : nullptr;
   return event_item ? *event_item->tags : my_info_->tags;
