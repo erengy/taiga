@@ -16,12 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ANIMEDB_H
-#define ANIMEDB_H
-
-#include "base/std.h"
+#ifndef TAIGA_LIBRARY_ANIME_DB_H
+#define TAIGA_LIBRARY_ANIME_DB_H
 
 #include "anime_item.h"
+
 #include "base/gfx.h"
 
 #include "win/win_thread.h"
@@ -32,46 +31,29 @@ namespace anime {
 
 class Database {
 public:
-  // Loads local anime database on program startup from db/anime.xml, returns
-  // false if no such database exists.
   bool LoadDatabase();
-  // Saves local anime database on program exit to db/anime.xml, returns false
-  // if the database is empty.
   bool SaveDatabase();
 
-  // Deletes invalid anime items.
-  void ClearInvalidItems();
-  // Deletes all user information from anime items.
-  void ClearUserData();
-  // Deletes user information from an item, after HTTP_MAL_AnimeDelete
-  // succeeds.
-  bool DeleteListItem(int anime_id);
-  // Loads anime list on startup and list-refresh from
-  // user\<username>\anime.xml, returns false if no such list exists.
-  bool LoadList();
-  // Saves anime list to user\<username>\anime.xml, returns false if the file
-  // cannot be saved.
-  bool SaveList();
-  
-  // Searches the database for an item with given ID.
   Item* FindItem(int anime_id);
-  // Searches the database for an item with given ID, which has a sequel.
   Item* FindSequel(int anime_id);
-  // Calculates the number of items that belong to the specified status.
-  int GetItemCount(int status, bool check_history = true);
-  // Updates anime information, or adds a new item if no such anime exists.
-  // New information may include both series and user information. Series
-  // information is updated depending on its last_modified value.
+
+  void ClearInvalidItems();
   void UpdateItem(const Item& item);
-  // After a successful update, an event item is removed from the queue and the
-  // relevant anime item is updated.
+
+public:
+  bool LoadList();
+  bool SaveList();
+
+  int GetItemCount(int status, bool check_history = true);
+
+  void ClearUserData();
+  bool DeleteListItem(int anime_id);
   void UpdateItem(const EventItem& event_item);
 
-  // Anime items are mapped to their IDs.
+public:
   std::map<int, Item> items;
 
 private:
-  // Thread safety
   win::CriticalSection critical_section_;
 };
 
@@ -92,10 +74,11 @@ public:
 private:
   std::map<int, base::Image> items_;
 };
-} // namespace anime
+
+}  // namespace anime
 
 // Global objects
 extern anime::Database AnimeDatabase;
 extern anime::ImageDatabase ImageDatabase;
 
-#endif // ANIMEDB_H
+#endif  // TAIGA_LIBRARY_ANIME_DB_H

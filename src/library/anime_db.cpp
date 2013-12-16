@@ -63,7 +63,7 @@ bool Database::LoadDatabase() {
 
   foreach_xmlnode_(node, animedb_node, L"anime") {
     int id = XmlReadIntValue(node, L"series_animedb_id");
-    Item& item = items[id]; // Creates the item if it doesn't exist
+    Item& item = items[id];  // Creates the item if it doesn't exist
     item.SetId(id);
     item.SetTitle(XmlReadStrValue(node, L"series_title"));
     item.SetEnglishTitle(XmlReadStrValue(node, L"series_english"));
@@ -122,6 +122,8 @@ bool Database::SaveDatabase() {
   return XmlWriteDocumentToFile(document, path);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 Item* Database::FindItem(int anime_id) {
   if (anime_id > ID_UNKNOWN) {
     auto it = items.find(anime_id);
@@ -155,32 +157,17 @@ Item* Database::FindSequel(int anime_id) {
   return FindItem(sequel_id);
 }
 
-int Database::GetItemCount(int status, bool check_history) {
-  int count = 0;
+////////////////////////////////////////////////////////////////////////////////
 
-  // Get current count
-  foreach_(it, items)
-    if (it->second.GetMyStatus(false) == status)
-      count++;
-
-  // Search queued items for status changes
-  if (check_history) {
-    foreach_(it, History.queue.items) {
-      if (it->status) {
-        if (it->mode == taiga::kHttpServiceAddLibraryEntry)
-          continue;  // counted already
-        if (status == *it->status) {
-          count++;
-        } else {
-          auto anime_item = FindItem(it->anime_id);
-          if (anime_item && status == anime_item->GetMyStatus(false))
-            count--;
-        }
-      }
+void Database::ClearInvalidItems() {
+  for (auto it = items.begin(); it != items.end(); ) {
+    if (!it->second.GetId() || it->first != it->second.GetId()) {
+      LOG(LevelDebug, L"ID: " + ToWstr(it->first));
+      items.erase(it++);
+    } else {
+      ++it;
     }
   }
-
-  return count;
 }
 
 void Database::UpdateItem(const Item& new_item) {
@@ -253,96 +240,8 @@ void Database::UpdateItem(const Item& new_item) {
   critical_section_.Leave();
 }
 
-void Database::UpdateItem(const EventItem& event_item) {
-  auto anime_item = FindItem(event_item.anime_id);
-
-  if (!anime_item)
-    return;
-
-  // Edit episode
-  if (event_item.episode) {
-    anime_item->SetMyLastWatchedEpisode(*event_item.episode);
-  }
-  // Edit score
-  if (event_item.score) {
-    anime_item->SetMyScore(*event_item.score);
-  }
-  // Edit status
-  if (event_item.status) {
-    anime_item->SetMyStatus(*event_item.status);
-  }
-  // Edit re-watching status
-  if (event_item.enable_rewatching) {
-    anime_item->SetMyRewatching(*event_item.enable_rewatching);
-  }
-  // Edit tags
-  if (event_item.tags) {
-    anime_item->SetMyTags(*event_item.tags);
-  }
-  // Edit dates
-  if (event_item.date_start) {
-    anime_item->SetMyDateStart(*event_item.date_start);
-  }
-  if (event_item.date_finish) {
-    anime_item->SetMyDateEnd(*event_item.date_finish);
-  }
-  // Delete
-  if (event_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
-    DeleteListItem(anime_item->GetId());
-    MainDialog.ChangeStatus(L"Item deleted. (" + anime_item->GetTitle() + L")");
-    AnimeListDialog.RefreshList();
-    AnimeListDialog.RefreshTabs();
-    SearchDialog.RefreshList();
-    if (CurrentEpisode.anime_id == event_item.anime_id) {
-      CurrentEpisode.Set(anime::ID_NOTINLIST);
-    }
-  }
-
-  // Save list
-  SaveList();
-
-  // Remove item from event queue
-  History.queue.Remove();
-  // Check for more events
-  History.queue.Check(false);
-
-  // Redraw main list item
-  int list_index = AnimeListDialog.GetListIndex(event_item.anime_id);
-  if (list_index > -1) {
-    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
-  }
-}
-
-// =============================================================================
-
-void Database::ClearUserData() {
-  AnimeListDialog.SetCurrentId(ID_UNKNOWN);
-  
-  for (auto it = items.begin(); it != items.end(); ++it) {
-    it->second.RemoveFromUserList();
-  }
-}
-
-void Database::ClearInvalidItems() {
-  for (auto it = items.begin(); it != items.end(); ) {
-    if (!it->second.GetId() || it->first != it->second.GetId()) {
-      LOG(LevelDebug, L"ID: " + ToWstr(it->first));
-      items.erase(it++);
-    } else {
-      ++it;
-    }
-  }
-}
-
-bool Database::DeleteListItem(int anime_id) {
-  auto item = FindItem(anime_id);
-  if (!item) return false;
-  if (!item->IsInList()) return false;
-
-  item->RemoveFromUserList();
-
-  return true;
-}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 bool Database::LoadList() {
   ClearUserData();
@@ -420,7 +319,125 @@ bool Database::SaveList() {
   return XmlWriteDocumentToFile(document, path);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+
+int Database::GetItemCount(int status, bool check_history) {
+  int count = 0;
+
+  // Get current count
+  foreach_(it, items)
+    if (it->second.GetMyStatus(false) == status)
+      count++;
+
+  // Search queued items for status changes
+  if (check_history) {
+    foreach_(it, History.queue.items) {
+      if (it->status) {
+        if (it->mode == taiga::kHttpServiceAddLibraryEntry)
+          continue;  // counted already
+        if (status == *it->status) {
+          count++;
+        } else {
+          auto anime_item = FindItem(it->anime_id);
+          if (anime_item && status == anime_item->GetMyStatus(false))
+            count--;
+        }
+      }
+    }
+  }
+
+  return count;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Database::ClearUserData() {
+  AnimeListDialog.SetCurrentId(ID_UNKNOWN);
+  
+  for (auto it = items.begin(); it != items.end(); ++it) {
+    it->second.RemoveFromUserList();
+  }
+}
+
+bool Database::DeleteListItem(int anime_id) {
+  auto item = FindItem(anime_id);
+
+  if (!item)
+    return false;
+  if (!item->IsInList())
+    return false;
+
+  item->RemoveFromUserList();
+
+  return true;
+}
+
+void Database::UpdateItem(const EventItem& event_item) {
+  critical_section_.Enter();
+
+  auto anime_item = FindItem(event_item.anime_id);
+
+  if (!anime_item)
+    return;
+
+  // Edit episode
+  if (event_item.episode) {
+    anime_item->SetMyLastWatchedEpisode(*event_item.episode);
+  }
+  // Edit score
+  if (event_item.score) {
+    anime_item->SetMyScore(*event_item.score);
+  }
+  // Edit status
+  if (event_item.status) {
+    anime_item->SetMyStatus(*event_item.status);
+  }
+  // Edit re-watching status
+  if (event_item.enable_rewatching) {
+    anime_item->SetMyRewatching(*event_item.enable_rewatching);
+  }
+  // Edit tags
+  if (event_item.tags) {
+    anime_item->SetMyTags(*event_item.tags);
+  }
+  // Edit dates
+  if (event_item.date_start) {
+    anime_item->SetMyDateStart(*event_item.date_start);
+  }
+  if (event_item.date_finish) {
+    anime_item->SetMyDateEnd(*event_item.date_finish);
+  }
+  // Delete
+  if (event_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+    DeleteListItem(anime_item->GetId());
+    MainDialog.ChangeStatus(L"Item deleted. (" + anime_item->GetTitle() + L")");
+    AnimeListDialog.RefreshList();
+    AnimeListDialog.RefreshTabs();
+    SearchDialog.RefreshList();
+    if (CurrentEpisode.anime_id == event_item.anime_id) {
+      CurrentEpisode.Set(anime::ID_NOTINLIST);
+    }
+  }
+
+  // Save list
+  SaveList();
+
+  // Remove item from event queue
+  History.queue.Remove();
+  // Check for more events
+  History.queue.Check(false);
+
+  // Redraw main list item
+  int list_index = AnimeListDialog.GetListIndex(event_item.anime_id);
+  if (list_index > -1) {
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+  }
+
+  critical_section_.Leave();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 bool ImageDatabase::Load(int anime_id, bool load, bool download) {
   if (anime_id <= anime::ID_UNKNOWN)
@@ -460,7 +477,7 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
 }
 
 void ImageDatabase::FreeMemory() {
-  for (auto it = ::AnimeDatabase.items.begin(); it != ::AnimeDatabase.items.end(); ++it) {
+  foreach_(it, ::AnimeDatabase.items) {
     bool erase = true;
     int anime_id = it->first;
 
@@ -472,7 +489,7 @@ void ImageDatabase::FreeMemory() {
       erase = false;
 
     if (!SeasonDatabase.items.empty())
-      if (std::find(SeasonDatabase.items.begin(), SeasonDatabase.items.end(), 
+      if (std::find(SeasonDatabase.items.begin(), SeasonDatabase.items.end(),
                     anime_id) != SeasonDatabase.items.end())
         if (SeasonDialog.IsVisible())
           erase = false;
@@ -486,6 +503,7 @@ base::Image* ImageDatabase::GetImage(int anime_id) {
   if (items_.find(anime_id) != items_.end())
     if (items_[anime_id].data > 0)
       return &items_[anime_id];
+
   return nullptr;
 }
 
