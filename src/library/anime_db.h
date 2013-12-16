@@ -26,6 +26,8 @@
 
 #include "win/win_thread.h"
 
+class EventItem;
+
 namespace anime {
 
 class Database {
@@ -60,7 +62,10 @@ public:
   // Updates anime information, or adds a new item if no such anime exists.
   // New information may include both series and user information. Series
   // information is updated depending on its last_modified value.
-  void UpdateItem(Item& item);
+  void UpdateItem(const Item& item);
+  // After a successful update, an event item is removed from the queue and the
+  // relevant anime item is updated.
+  void UpdateItem(const EventItem& event_item);
 
   // Anime items are mapped to their IDs.
   std::map<int, Item> items;

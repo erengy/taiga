@@ -138,10 +138,6 @@ public:
   // information.
   bool IsOldEnough() const;
 
-  // After a successful update, an event item is removed from the queue and the
-  // relevant anime item is edited.
-  void Edit(const EventItem& item);
-  
   // An item's series information will only be updated only if last_modified
   // value is significantly older than the new one's. This helps us lower
   // the number of requests we send to MAL.

@@ -39,6 +39,8 @@
 
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_search.h"
 #include "ui/dlg/dlg_season.h"
 
 anime::Database AnimeDatabase;
@@ -181,7 +183,7 @@ int Database::GetItemCount(int status, bool check_history) {
   return count;
 }
 
-void Database::UpdateItem(Item& new_item) {
+void Database::UpdateItem(const Item& new_item) {
   critical_section_.Enter();
 
   Item* item = FindItem(new_item.GetId());
@@ -249,6 +251,66 @@ void Database::UpdateItem(Item& new_item) {
   }
 
   critical_section_.Leave();
+}
+
+void Database::UpdateItem(const EventItem& event_item) {
+  auto anime_item = FindItem(event_item.anime_id);
+
+  if (!anime_item)
+    return;
+
+  // Edit episode
+  if (event_item.episode) {
+    anime_item->SetMyLastWatchedEpisode(*event_item.episode);
+  }
+  // Edit score
+  if (event_item.score) {
+    anime_item->SetMyScore(*event_item.score);
+  }
+  // Edit status
+  if (event_item.status) {
+    anime_item->SetMyStatus(*event_item.status);
+  }
+  // Edit re-watching status
+  if (event_item.enable_rewatching) {
+    anime_item->SetMyRewatching(*event_item.enable_rewatching);
+  }
+  // Edit tags
+  if (event_item.tags) {
+    anime_item->SetMyTags(*event_item.tags);
+  }
+  // Edit dates
+  if (event_item.date_start) {
+    anime_item->SetMyDateStart(*event_item.date_start);
+  }
+  if (event_item.date_finish) {
+    anime_item->SetMyDateEnd(*event_item.date_finish);
+  }
+  // Delete
+  if (event_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+    DeleteListItem(anime_item->GetId());
+    MainDialog.ChangeStatus(L"Item deleted. (" + anime_item->GetTitle() + L")");
+    AnimeListDialog.RefreshList();
+    AnimeListDialog.RefreshTabs();
+    SearchDialog.RefreshList();
+    if (CurrentEpisode.anime_id == event_item.anime_id) {
+      CurrentEpisode.Set(anime::ID_NOTINLIST);
+    }
+  }
+
+  // Save list
+  SaveList();
+
+  // Remove item from event queue
+  History.queue.Remove();
+  // Check for more events
+  History.queue.Check(false);
+
+  // Redraw main list item
+  int list_index = AnimeListDialog.GetListIndex(event_item.anime_id);
+  if (list_index > -1) {
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+  }
 }
 
 // =============================================================================

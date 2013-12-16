@@ -32,16 +32,12 @@
 #include "base/time.h"
 
 #include "ui/dlg/dlg_anime_list.h"
-#include "ui/dlg/dlg_main.h"
-#include "ui/dlg/dlg_search.h"
 
 #include "win/win_taskbar.h"
 
 anime::Database* anime::Item::database_ = &AnimeDatabase;
 
 namespace anime {
-
-////////////////////////////////////////////////////////////////////////////////
 
 Item::Item()
     : last_modified(0), 
@@ -598,63 +594,6 @@ bool Item::IsOldEnough() const {
     return time_diff >= 60 * 60 * 24 * 7; // 1 week
   } else {
     return time_diff >= 60 * 60; // 1 hour
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void Item::Edit(const EventItem& item) {
-  // Edit episode
-  if (item.episode) {
-    SetMyLastWatchedEpisode(*item.episode);
-  }
-  // Edit score
-  if (item.score) {
-    SetMyScore(*item.score);
-  }
-  // Edit status
-  if (item.status) {
-    SetMyStatus(*item.status);
-  }
-  // Edit re-watching status
-  if (item.enable_rewatching) {
-    SetMyRewatching(*item.enable_rewatching);
-  }
-  // Edit tags
-  if (item.tags) {
-    SetMyTags(*item.tags);
-  }
-  // Edit dates
-  if (item.date_start) {
-    SetMyDateStart(*item.date_start);
-  }
-  if (item.date_finish) {
-    SetMyDateEnd(*item.date_finish);
-  }
-  // Delete
-  if (item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
-    MainDialog.ChangeStatus(L"Item deleted. (" + GetTitle() + L")");
-    database_->DeleteListItem(GetId());
-    AnimeListDialog.RefreshList();
-    AnimeListDialog.RefreshTabs();
-    SearchDialog.RefreshList();
-    if (CurrentEpisode.anime_id == item.anime_id) {
-      CurrentEpisode.Set(anime::ID_NOTINLIST);
-    }
-  }
-
-  // Save list
-  database_->SaveList();
-
-  // Remove item from event queue
-  History.queue.Remove();
-  // Check for more events
-  History.queue.Check(false);
-
-  // Redraw main list item
-  int list_index = AnimeListDialog.GetListIndex(GetId());
-  if (list_index > -1) {
-    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
   }
 }
 

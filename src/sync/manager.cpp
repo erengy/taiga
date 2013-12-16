@@ -191,8 +191,8 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       ui::ClearStatusText();
 
       auto event_item = History.queue.GetCurrentItem();
-      if (anime_item && event_item)
-        anime_item->Edit(*event_item);
+      if (event_item)
+        AnimeDatabase.UpdateItem(*event_item);
 
       break;
     }
