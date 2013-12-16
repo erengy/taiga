@@ -95,7 +95,7 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   if (episode.clean_title.empty()) return false;
 
   // Leave if not yet aired
-  if (check_date && !anime_item.IsAiredYet()) return false;
+  if (check_date && !anime::IsAiredYet(anime_item)) return false;
 
   // Compare with titles
   bool found = false;

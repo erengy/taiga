@@ -28,8 +28,13 @@ namespace anime {
 class Episode;
 class Item;
 
-// Following functions are called when a new episode is recognized. Actual
-// time depends on user settings.
+bool IsAiredYet(const Item& item);
+bool IsFinishedAiring(const Item& item);
+int EstimateLastAiredEpisodeNumber(const Item& item);
+
+bool CheckEpisodes(Item& item, int number = -1, bool check_folder = false);
+bool CheckFolder(Item& item);
+bool PlayEpisode(Item& item, int number);
 void StartWatching(Item& item, Episode& episode);
 void EndWatching(Item& item, Episode episode);
 bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time);

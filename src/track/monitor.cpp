@@ -22,6 +22,7 @@
 
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/file.h"
 #include "base/logger.h"
@@ -304,7 +305,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
       auto anime_item = AnimeDatabase.FindItem(LIST[i].anime_id);
       anime_item->SetFolder(path_available ? path : L"");
       Settings.Save();
-      anime_item->CheckEpisodes();
+      anime::CheckEpisodes(*anime_item);
       LOG(LevelDebug, L"Anime folder changed: " + anime_item->GetTitle());
       LOG(LevelDebug, L"Path: " + anime_item->GetFolder());
       continue;
@@ -331,7 +332,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
             if (Meow.CompareEpisode(temp_episode, *anime_item)) {
               anime_item->SetFolder(episode.folder);
               Settings.Save();
-              anime_item->CheckEpisodes();
+              anime::CheckEpisodes(*anime_item);
             }
           }
           if (!anime_item->GetFolder().empty()) {

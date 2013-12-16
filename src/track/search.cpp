@@ -22,6 +22,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_item.h"
+#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/logger.h"
@@ -173,7 +174,7 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
         case anime::kWatching:
           if (!silent)
             MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
-          it->second.CheckEpisodes(episode_number, check_folder);
+          anime::CheckEpisodes(it->second, episode_number, check_folder);
       }
     }
     i = 0;
@@ -185,7 +186,7 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
         case anime::kPlanToWatch:
           if (!silent)
             MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
-          it->second.CheckEpisodes(episode_number, check_folder);
+          anime::CheckEpisodes(it->second, episode_number, check_folder);
       }
     }
     if (!silent) {
@@ -198,7 +199,7 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
     SetSharedCursor(IDC_WAIT);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item)
-      anime_item->CheckEpisodes(episode_number, true);
+      anime::CheckEpisodes(*anime_item, episode_number, true);
     SetSharedCursor(IDC_ARROW);
   }
 

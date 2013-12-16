@@ -23,6 +23,8 @@
 
 #include "taiga/announce.h"
 #include "base/common.h"
+#include "base/file.h"
+#include "base/logger.h"
 #include "track/feed.h"
 #include "base/foreach.h"
 #include "history.h"
@@ -44,6 +46,164 @@
 #include "win/win_taskdialog.h"
 
 namespace anime {
+
+bool IsAiredYet(const Item& item) {
+  if (item.GetAiringStatus(false) != kNotYetAired)
+    return true;
+
+  if (!IsValidDate(item.GetDateStart()))
+    return false;
+  
+  Date date_japan = GetDateJapan();
+  Date date_start = item.GetDateStart();
+  
+  // Assume the worst case
+  if (!date_start.month)
+    date_start.month = 12;
+  if (!date_start.day)
+    date_start.day = 31;
+  
+  return date_japan >= date_start;
+}
+
+bool IsFinishedAiring(const Item& item) {
+  if (item.GetAiringStatus(false) == kFinishedAiring)
+    return true;
+
+  if (!IsValidDate(item.GetDateEnd()))
+    return false;
+
+  if (!IsAiredYet(item))
+    return false;
+
+  return GetDateJapan() > item.GetDateEnd();
+}
+
+int EstimateLastAiredEpisodeNumber(const Item& item) {
+  // Can't estimate for other types of anime
+  if (item.GetType() != kTv)
+    return 0;
+
+  // TV series air weekly, so the number of weeks that has passed since the day
+  // the series started airing gives us the last aired episode. Note that
+  // irregularities such as broadcasts being postponed due to sports events make
+  // this method unreliable.
+  const Date& date_start = item.GetDateStart();
+  if (date_start.year && date_start.month && date_start.day) { 
+    // To compensate for the fact that we don't know the airing hour,
+    // we substract one more day.
+    int date_diff = GetDateJapan() - date_start - 1;
+    if (date_diff > -1) {
+      int number_of_weeks = date_diff / 7;
+      if (number_of_weeks < item.GetEpisodeCount()) {
+        return number_of_weeks + 1;
+      } else {
+        return item.GetEpisodeCount();
+      }
+    }
+  }
+
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool CheckEpisodes(Item& item, int number, bool check_folder) {
+  // Check folder
+  if (check_folder)
+    CheckFolder(item);
+  if (item.GetFolder().empty()) {
+    for (int i = 1; i <= item.GetAvailableEpisodeCount(); i++)
+      item.SetEpisodeAvailability(i, false, L"");
+    return false;
+  }
+  
+  // Check all episodes
+  if (number == -1) {
+    SearchFileFolder(item, item.GetFolder(), -1, false);
+    return true;
+
+  // Check single episode
+  } else {
+    if (number == 0) {
+      if (item.IsNewEpisodeAvailable())
+        return true;
+      item.SetNewEpisodePath(L"");
+      number = item.GetEpisodeCount() == 1 ? 0 : item.GetMyLastWatchedEpisode() + 1;
+    }
+    wstring file = SearchFileFolder(item, item.GetFolder(), number, false);
+    return !file.empty();
+  }
+}
+
+bool CheckFolder(Item& item) {
+  // Check if current folder still exists
+  if (!item.GetFolder().empty() && !FolderExists(item.GetFolder())) {
+    LOG(LevelWarning, L"Folder doesn't exist anymore.");
+    LOG(LevelWarning, L"Path: " + item.GetFolder());
+    item.SetFolder(L"");
+  }
+
+  // Search root folders
+  if (item.GetFolder().empty()) {
+    wstring new_folder;
+    foreach_(it, Settings.Folders.root) {
+      new_folder = SearchFileFolder(item, *it, 0, true);
+      if (!new_folder.empty()) {
+        item.SetFolder(new_folder);
+        Settings.Save();
+        break;
+      }
+    }
+  }
+
+  return !item.GetFolder().empty();
+}
+
+bool PlayEpisode(Item& item, int number) {
+  if (number > item.GetEpisodeCount() && item.GetEpisodeCount() != 0)
+    return false;
+
+  wstring file_path;
+
+  SetSharedCursor(IDC_WAIT);
+
+  // Check saved episode path
+  if (number == item.GetMyLastWatchedEpisode() + 1)
+    if (!item.GetNewEpisodePath().empty())
+      if (FileExists(item.GetNewEpisodePath()))
+        file_path = item.GetNewEpisodePath();
+  
+  // Check anime folder
+  if (file_path.empty()) {
+    CheckFolder(item);
+    if (!item.GetFolder().empty()) {
+      file_path = SearchFileFolder(item, item.GetFolder(), number, false);
+    }
+  }
+
+  // Check other folders
+  if (file_path.empty()) {
+    foreach_(it, Settings.Folders.root) {
+      file_path = SearchFileFolder(item, *it, number, false);
+      if (!file_path.empty())
+        break;
+    }
+  }
+
+  if (file_path.empty()) {
+    if (number == 0)
+      number = 1;
+    MainDialog.ChangeStatus(L"Could not find episode #" + ToWstr(number) +
+                            L" (" + item.GetTitle() + L").");
+  } else {
+    Execute(file_path);
+  }
+
+  SetSharedCursor(IDC_ARROW);
+
+  return !file_path.empty();
+}
 
 void StartWatching(Item& item, Episode& episode) {
   // Make sure item is in list

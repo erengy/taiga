@@ -16,10 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ANIME_ITEM_H
-#define ANIME_ITEM_H
+#ifndef TAIGA_LIBRARY_ANIME_ITEM_H
+#define TAIGA_LIBRARY_ANIME_ITEM_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
 
 #include "anime.h"
 #include "metadata.h"
@@ -35,30 +36,53 @@ class EventItem;
 namespace anime {
 
 class Item {
- public:
+public:
   Item();
   virtual ~Item();
 
-  // Accessors for series information
+  //////////////////////////////////////////////////////////////////////////////
+  // Metadata
+
   int GetId() const;
   int GetType() const;
   int GetEpisodeCount() const;
   int GetEpisodeLength() const;
   int GetAiringStatus(bool check_date = true) const;
-  const wstring& GetTitle() const;
-  const wstring& GetEnglishTitle(bool fallback = false) const;
-  vector<wstring> GetSynonyms() const;
+  const std::wstring& GetTitle() const;
+  const std::wstring& GetEnglishTitle(bool fallback = false) const;
+  std::vector<std::wstring> GetSynonyms() const;
   const Date& GetDateStart() const;
   const Date& GetDateEnd() const;
-  const wstring& GetImageUrl() const;
-  const vector<wstring>& GetGenres() const;
-  const wstring& GetPopularity() const;
-  const vector<wstring>& GetProducers() const;
-  const wstring& GetScore() const;
-  const wstring& GetSynopsis() const;
+  const std::wstring& GetImageUrl() const;
+  const std::vector<std::wstring>& GetGenres() const;
+  const std::wstring& GetPopularity() const;
+  const std::vector<std::wstring>& GetProducers() const;
+  const std::wstring& GetScore() const;
+  const std::wstring& GetSynopsis() const;
 
-  // Accessors for user information - if check_events flag is enabled, the
-  // latest relevant value in event queue is returned.
+  void SetId(int anime_id);
+  void SetType(int type);
+  void SetEpisodeCount(int number);
+  void SetEpisodeLength(int number);
+  void SetAiringStatus(int status);
+  void SetTitle(const std::wstring& title);
+  void SetEnglishTitle(const std::wstring& title);
+  void SetSynonyms(const std::wstring& synonyms);
+  void SetSynonyms(const std::vector<std::wstring>& synonyms);
+  void SetDateStart(const Date& date);
+  void SetDateEnd(const Date& date);
+  void SetImageUrl(const std::wstring& url);
+  void SetGenres(const std::wstring& genres);
+  void SetGenres(const std::vector<std::wstring>& genres);
+  void SetPopularity(const std::wstring& popularity);
+  void SetProducers(const std::wstring& producers);
+  void SetProducers(const std::vector<std::wstring>& producers);
+  void SetScore(const std::wstring& score);
+  void SetSynopsis(const std::wstring& synopsis);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Library data
+
   int GetMyLastWatchedEpisode(bool check_events = true) const;
   int GetMyScore(bool check_events = true) const;
   int GetMyStatus(bool check_events = true) const;
@@ -66,31 +90,9 @@ class Item {
   int GetMyRewatchingEp() const;
   const Date& GetMyDateStart(bool check_events = true) const;
   const Date& GetMyDateEnd(bool check_events = true) const;
-  const wstring& GetMyLastUpdated() const;
-  const wstring& GetMyTags(bool check_events = true) const;
+  const std::wstring& GetMyLastUpdated() const;
+  const std::wstring& GetMyTags(bool check_events = true) const;
 
-  // Mutators for series information
-  void SetId(int anime_id);
-  void SetType(int type);
-  void SetEpisodeCount(int number);
-  void SetEpisodeLength(int number);
-  void SetAiringStatus(int status);
-  void SetTitle(const wstring& title);
-  void SetEnglishTitle(const wstring& title);
-  void SetSynonyms(const wstring& synonyms);
-  void SetSynonyms(const vector<wstring>& synonyms);
-  void SetDateStart(const Date& date);
-  void SetDateEnd(const Date& date);
-  void SetImageUrl(const wstring& url);
-  void SetGenres(const wstring& genres);
-  void SetGenres(const vector<wstring>& genres);
-  void SetPopularity(const wstring& popularity);
-  void SetProducers(const wstring& producers);
-  void SetProducers(const vector<wstring>& producers);
-  void SetScore(const wstring& score);
-  void SetSynopsis(const wstring& synopsis);
-  
-  // Mutators for user information
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
   void SetMyStatus(int status);
@@ -98,41 +100,34 @@ class Item {
   void SetMyRewatchingEp(int rewatching_ep);
   void SetMyDateStart(const Date& date);
   void SetMyDateEnd(const Date& date);
-  void SetMyLastUpdated(const wstring& last_updated);
-  void SetMyTags(const wstring& tags);
-  
-  // Functions related to airing status
-  bool IsAiredYet() const;
-  bool IsFinishedAiring() const;
-  
-  // Functions related to episode availability
-  bool CheckEpisodes(int number = -1, bool check_folder = false);
+  void SetMyLastUpdated(const std::wstring& last_updated);
+  void SetMyTags(const std::wstring& tags);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Local data
+
   int GetAvailableEpisodeCount() const;
+  const std::wstring& GetFolder() const;
   int GetLastAiredEpisodeNumber(bool estimate = false);
-  wstring GetNewEpisodePath() const;
+  const std::wstring& GetNewEpisodePath() const;
+  bool GetPlaying() const;
+  bool GetUseAlternative() const;
+  const std::vector<std::wstring>& GetUserSynonyms() const;
+
+  bool SetEpisodeAvailability(int number, bool available, const std::wstring& path);
+  void SetFolder(const std::wstring& folder);
+  void SetLastAiredEpisodeNumber(int number);
+  void SetNewEpisodePath(const std::wstring& path);
+  void SetPlaying(bool playing);
+  void SetUseAlternative(bool use_alternative);
+  void SetUserSynonyms(const std::wstring& synonyms);
+  void SetUserSynonyms(const std::vector<std::wstring>& synonyms);
+
   bool IsEpisodeAvailable(int number) const;
   bool IsNewEpisodeAvailable() const;
-  bool PlayEpisode(int number);
-  bool SetEpisodeAvailability(int number, bool available, const wstring& path);
-  void SetLastAiredEpisodeNumber(int number);
-  void SetNewEpisodePath(const wstring& path);
-
-  // For anime-specific folders on user's computer
-  bool CheckFolder();
-  const wstring GetFolder() const;
-  void SetFolder(const wstring& folder);
-  
-  // More than one anime may have their playing flag on.
-  bool GetPlaying() const;
-  void SetPlaying(bool playing);
-  
-  // For alternative titles provided by user
-  const vector<wstring>& GetUserSynonyms() const;
-  void SetUserSynonyms(const wstring& synonyms);
-  void SetUserSynonyms(const vector<wstring>& synonyms);
   bool UserSynonymsAvailable() const;
-  bool GetUseAlternative() const;
-  void SetUseAlternative(bool use_alternative);
+
+  //////////////////////////////////////////////////////////////////////////////
   
   // A database item may not be in user's list.
   void AddtoUserList();
@@ -152,7 +147,7 @@ class Item {
   // the number of requests we send to MAL.
   time_t last_modified;
 
- private:
+private:
   // Helper function
   EventItem* SearchHistory(int search_mode) const;
 
@@ -170,6 +165,6 @@ class Item {
   static Database* database_;
 };
 
-} // namespace anime
+}  // namespace anime
 
-#endif // ANIME_ITEM_H
+#endif  // TAIGA_LIBRARY_ANIME_ITEM_H

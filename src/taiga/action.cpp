@@ -558,7 +558,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (!anime_item || !anime_item->IsInList()) return;
     MainDialog.ChangeStatus(L"Searching for folder...");
-    if (!anime_item->CheckFolder()) {
+    if (!anime::CheckFolder(*anime_item)) {
       win::TaskDialog dlg;
       dlg.SetWindowTitle(L"Folder Not Found");
       dlg.SetMainIcon(TD_ICON_INFORMATION);
@@ -592,7 +592,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (BrowseForFolder(MainDialog.GetWindowHandle(), title.c_str(), L"", path)) {
       anime_item->SetFolder(path);
       Settings.Save();
-      anime_item->CheckEpisodes();
+      anime::CheckEpisodes(*anime_item);
     }
 
   // ===========================================================================
@@ -604,7 +604,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int number = ToInt(body);
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    anime_item->PlayEpisode(number);
+    anime::PlayEpisode(*anime_item, number);
   
   // PlayLast()
   //   Searches for the last watched episode of an anime and plays it.
@@ -613,7 +613,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     int number = anime_item->GetMyLastWatchedEpisode();
-    anime_item->PlayEpisode(number);
+    anime::PlayEpisode(*anime_item, number);
   
   // PlayNext([anime_id])
   //   Searches for the next episode of an anime and plays it.
@@ -622,9 +622,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item->GetEpisodeCount() != 1) {
-      anime_item->PlayEpisode(anime_item->GetMyLastWatchedEpisode() + 1);
+      anime::PlayEpisode(*anime_item, anime_item->GetMyLastWatchedEpisode() + 1);
     } else {
-      anime_item->PlayEpisode(1);
+      anime::PlayEpisode(*anime_item, 1);
     }
   
   // PlayRandom()
@@ -633,7 +633,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"PlayRandom") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item && anime_item->CheckFolder()) {
+    if (anime_item && anime::CheckFolder(*anime_item)) {
       int total = anime_item->GetEpisodeCount();
       if (total == 0)
         total = anime_item->GetMyLastWatchedEpisode() + 1;
@@ -684,7 +684,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       size_t index = rand() % max_value + 1;
       int anime_id = valid_ids.at(index);
       auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (anime_item->PlayEpisode(anime_item->GetMyLastWatchedEpisode() + 1))
+      if (anime::PlayEpisode(*anime_item, anime_item->GetMyLastWatchedEpisode() + 1))
         return;
     }
     win::TaskDialog dlg;

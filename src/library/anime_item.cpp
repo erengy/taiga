@@ -25,9 +25,7 @@
 #include "anime_util.h"
 
 #include "base/common.h"
-#include "base/file.h"
 #include "history.h"
-#include "base/logger.h"
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
@@ -43,7 +41,7 @@ anime::Database* anime::Item::database_ = &AnimeDatabase;
 
 namespace anime {
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 Item::Item()
     : last_modified(0), 
@@ -53,7 +51,7 @@ Item::Item()
 Item::~Item() {
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 int Item::GetId() const {
   return metadata_.uid;
@@ -78,9 +76,15 @@ int Item::GetEpisodeLength() const {
 }
 
 int Item::GetAiringStatus(bool check_date) const {
-  if (!check_date) return metadata_.status;
-  if (IsFinishedAiring()) return kFinishedAiring;
-  if (IsAiredYet()) return kAiring;
+  if (!check_date)
+    return metadata_.status;
+
+  // TODO: Move
+  if (IsFinishedAiring(*this))
+    return kFinishedAiring;
+  if (IsAiredYet(*this))
+    return kAiring;
+
   return kNotYetAired;
 }
 
@@ -156,70 +160,7 @@ const wstring& Item::GetSynopsis() const {
   return metadata_.description;
 }
 
-// =============================================================================
-
-int Item::GetMyLastWatchedEpisode(bool check_events) const {
-  if (!my_info_.get()) return 0;
-  EventItem* event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_EPISODE) : nullptr;
-  return event_item ? *event_item->episode : my_info_->watched_episodes;
-}
-
-int Item::GetMyScore(bool check_events) const {
-  if (!my_info_.get()) return 0;
-  EventItem* event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_SCORE) : nullptr;
-  return event_item ? *event_item->score : my_info_->score;
-}
-
-int Item::GetMyStatus(bool check_events) const {
-  if (!my_info_.get()) return kNotInList;
-  EventItem* event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_STATUS) : nullptr;
-  return event_item ? *event_item->status : my_info_->status;
-}
-
-int Item::GetMyRewatching(bool check_events) const {
-  if (!my_info_.get()) return FALSE;
-  EventItem* event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_REWATCH) : nullptr;
-  return event_item ? *event_item->enable_rewatching : my_info_->rewatching;
-}
-
-int Item::GetMyRewatchingEp() const {
-  if (!my_info_.get()) return 0;
-  return my_info_->rewatching_ep;
-}
-
-const Date& Item::GetMyDateStart(bool check_events) const {
-  if (!my_info_.get()) return EmptyDate();
-  EventItem* event_item = nullptr;
-  event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
-  return event_item ? *event_item->date_start : my_info_->date_start;
-}
-
-const Date& Item::GetMyDateEnd(bool check_events) const {
-  if (!my_info_.get()) return EmptyDate();
-  EventItem* event_item = nullptr;
-  event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
-  return event_item ? *event_item->date_finish : my_info_->date_finish;
-}
-
-const wstring& Item::GetMyLastUpdated() const {
-  if (!my_info_.get()) return EmptyString();
-  return my_info_->last_updated;
-}
-
-const wstring& Item::GetMyTags(bool check_events) const {
-  if (!my_info_.get()) return EmptyString();
-  EventItem* event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_TAGS) : nullptr;
-  return event_item ? *event_item->tags : my_info_->tags;
-}
-
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void Item::SetId(int anime_id) {
   metadata_.uid = anime_id;
@@ -235,6 +176,7 @@ void Item::SetEpisodeCount(int number) {
 
   metadata_.extent.at(0) = number;
 
+  // TODO: Call it separately
   if (number >= 0)
     if (static_cast<size_t>(number) != local_info_.available_episodes.size())
       local_info_.available_episodes.resize(number);
@@ -266,6 +208,7 @@ void Item::SetEnglishTitle(const wstring& title) {
   library::Title new_title;
   new_title.type = library::kTitleTypeLangEnglish;
   new_title.value = title;
+
   metadata_.alternative.push_back(new_title);
 }
 
@@ -273,6 +216,7 @@ void Item::SetSynonyms(const wstring& synonyms) {
   vector<wstring> temp;
   Split(synonyms, L"; ", temp);
   RemoveEmptyStrings(temp);
+
   SetSynonyms(temp);
 }
 
@@ -318,6 +262,7 @@ void Item::SetGenres(const wstring& genres) {
   vector<wstring> temp;
   Split(genres, L", ", temp);
   RemoveEmptyStrings(temp);
+
   SetGenres(temp);
 }
 
@@ -336,6 +281,7 @@ void Item::SetProducers(const wstring& producers) {
   vector<wstring> temp;
   Split(producers, L", ", temp);
   RemoveEmptyStrings(temp);
+
   SetProducers(temp);
 }
 
@@ -354,109 +300,158 @@ void Item::SetSynopsis(const wstring& synopsis) {
   metadata_.description = synopsis;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+int Item::GetMyLastWatchedEpisode(bool check_events) const {
+  if (!my_info_.get())
+    return 0;
+
+  EventItem* event_item = check_events ? 
+      SearchHistory(EVENT_SEARCH_EPISODE) : nullptr;
+
+  return event_item ? *event_item->episode : my_info_->watched_episodes;
+}
+
+int Item::GetMyScore(bool check_events) const {
+  if (!my_info_.get())
+    return 0;
+
+  EventItem* event_item = check_events ? 
+      SearchHistory(EVENT_SEARCH_SCORE) : nullptr;
+
+  return event_item ? *event_item->score : my_info_->score;
+}
+
+int Item::GetMyStatus(bool check_events) const {
+  if (!my_info_.get())
+    return kNotInList;
+
+  EventItem* event_item = check_events ? 
+      SearchHistory(EVENT_SEARCH_STATUS) : nullptr;
+
+  return event_item ? *event_item->status : my_info_->status;
+}
+
+int Item::GetMyRewatching(bool check_events) const {
+  if (!my_info_.get())
+    return FALSE;
+
+  EventItem* event_item = check_events ? 
+    SearchHistory(EVENT_SEARCH_REWATCH) : nullptr;
+
+  return event_item ? *event_item->enable_rewatching : my_info_->rewatching;
+}
+
+int Item::GetMyRewatchingEp() const {
+  if (!my_info_.get())
+    return 0;
+
+  return my_info_->rewatching_ep;
+}
+
+const Date& Item::GetMyDateStart(bool check_events) const {
+  if (!my_info_.get())
+
+    return EmptyDate();
+  EventItem* event_item = check_events ? 
+      SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
+
+  return event_item ? *event_item->date_start : my_info_->date_start;
+}
+
+const Date& Item::GetMyDateEnd(bool check_events) const {
+  if (!my_info_.get())
+    return EmptyDate();
+
+  EventItem* event_item = check_events ? 
+      SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
+
+  return event_item ? *event_item->date_finish : my_info_->date_finish;
+}
+
+const wstring& Item::GetMyLastUpdated() const {
+  if (!my_info_.get())
+    return EmptyString();
+
+  return my_info_->last_updated;
+}
+
+const wstring& Item::GetMyTags(bool check_events) const {
+  if (!my_info_.get())
+    return EmptyString();
+
+  EventItem* event_item = check_events ? 
+    SearchHistory(EVENT_SEARCH_TAGS) : nullptr;
+
+  return event_item ? *event_item->tags : my_info_->tags;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 void Item::SetMyLastWatchedEpisode(int number) {
   assert(my_info_.get());
+
   my_info_->watched_episodes = number;
 }
 
 void Item::SetMyScore(int score) {
   assert(my_info_.get());
+
   my_info_->score = score;
 }
 
 void Item::SetMyStatus(int status) {
   assert(my_info_.get());
+
   my_info_->status = status;
 }
 
 void Item::SetMyRewatching(int rewatching) {
   assert(my_info_.get());
+
   my_info_->rewatching = rewatching;
 }
 
 void Item::SetMyRewatchingEp(int rewatching_ep) {
   assert(my_info_.get());
+
   my_info_->rewatching_ep = rewatching_ep;
 }
 
 void Item::SetMyDateStart(const Date& date) {
   assert(my_info_.get());
+
   my_info_->date_start = date;
 }
 
 void Item::SetMyDateEnd(const Date& date) {
   assert(my_info_.get());
+
   my_info_->date_finish = date;
 }
 
 void Item::SetMyLastUpdated(const wstring& last_updated) {
   assert(my_info_.get());
+
   my_info_->last_updated = last_updated;
 }
 
 void Item::SetMyTags(const wstring& tags) {
   assert(my_info_.get());
+
   my_info_->tags = tags;
 }
 
-// =============================================================================
-
-bool Item::IsAiredYet() const {
-  if (metadata_.status != kNotYetAired) return true;
-  if (!IsValidDate(GetDateStart())) return false;
-  
-  Date date_japan = GetDateJapan();
-  Date date_start = GetDateStart();
-  
-  // Assume the worst case
-  if (!date_start.month)
-    date_start.month = 12;
-  if (!date_start.day)
-    date_start.day = 31;
-  
-  return date_japan >= date_start;
-}
-
-bool Item::IsFinishedAiring() const {
-  if (metadata_.status == kFinishedAiring) return true;
-  if (!IsValidDate(GetDateEnd())) return false;
-  if (!IsAiredYet()) return false;
-  return GetDateJapan() > GetDateEnd();
-}
-
-// =============================================================================
-
-bool Item::CheckEpisodes(int number, bool check_folder) {
-  // Check folder
-  if (check_folder)
-    CheckFolder();
-  if (GetFolder().empty()) {
-    for (int i = 1; i <= GetAvailableEpisodeCount(); i++)
-      SetEpisodeAvailability(i, false, L"");
-    return false;
-  }
-  
-  // Check all episodes
-  if (number == -1) {
-    SearchFileFolder(*this, GetFolder(), -1, false);
-    return true;
-
-  // Check single episode
-  } else {
-    if (number == 0) {
-      if (IsNewEpisodeAvailable()) return true;
-      SetNewEpisodePath(L"");
-      number = GetEpisodeCount() == 1 ? 0 : GetMyLastWatchedEpisode() + 1;
-    }
-    wstring file = SearchFileFolder(*this, GetFolder(), number, false);
-    return !file.empty();
-  }
-}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 int Item::GetAvailableEpisodeCount() const {
   return static_cast<int>(local_info_.available_episodes.size());
+}
+
+const wstring& Item::GetFolder() const {
+  return local_info_.folder;
 }
 
 int Item::GetLastAiredEpisodeNumber(bool estimate) {
@@ -472,97 +467,34 @@ int Item::GetLastAiredEpisodeNumber(bool estimate) {
     case kUnknownStatus:
       return 0;
   }
-  
-  if (!estimate)
-    return 0;
 
-  // Can't estimate for other types of anime
-  if (GetType() != kTv)
-    return 0;
-
-  // TV series air weekly, so the number of weeks that has passed since the day
-  // the series started airing gives us the last aired episode. Note that
-  // irregularities such as broadcasts being postponed due to sports events make
-  // this method unreliable.
-  const Date& date_start = GetDateStart();
-  if (date_start.year && date_start.month && date_start.day) { 
-    // To compensate for the fact that we don't know the airing hour,
-    // we substract one more day.
-    int date_diff = GetDateJapan() - date_start - 1;
-    if (date_diff > -1) {
-      int number_of_weeks = date_diff / 7;
-      if (number_of_weeks < GetEpisodeCount()) {
-        local_info_.last_aired_episode = number_of_weeks + 1;
-      } else {
-        local_info_.last_aired_episode = GetEpisodeCount();
-      }
-    }
-  }
+  if (estimate)
+    return EstimateLastAiredEpisodeNumber(*this);
 
   return local_info_.last_aired_episode;
 }
 
-wstring Item::GetNewEpisodePath() const {
+const wstring& Item::GetNewEpisodePath() const {
   return local_info_.new_episode_path;
 }
 
-bool Item::IsEpisodeAvailable(int number) const {
-  if (number < 1) number = 1;
-  if (static_cast<size_t>(number) > local_info_.available_episodes.size())
-    return false;
-
-  return local_info_.available_episodes.at(number - 1);
+bool Item::GetPlaying() const {
+  return local_info_.playing;
 }
 
-bool Item::IsNewEpisodeAvailable() const {
-  return IsEpisodeAvailable(GetMyLastWatchedEpisode() + 1);
+bool Item::GetUseAlternative() const {
+  return local_info_.use_alternative;
 }
 
-bool Item::PlayEpisode(int number) {
-  if (number > GetEpisodeCount() && GetEpisodeCount() != 0)
-    return false;
-
-  wstring file_path;
-
-  SetSharedCursor(IDC_WAIT);
-
-  // Check saved episode path
-  if (number == GetMyLastWatchedEpisode() + 1)
-    if (!GetNewEpisodePath().empty())
-      if (FileExists(GetNewEpisodePath()))
-        file_path = GetNewEpisodePath();
-  
-  // Check anime folder
-  if (file_path.empty()) {
-    CheckFolder();
-    if (!GetFolder().empty()) {
-      file_path = SearchFileFolder(*this, GetFolder(), number, false);
-    }
-  }
-
-  // Check other folders
-  if (file_path.empty()) {
-    for (auto it = Settings.Folders.root.begin(); 
-         file_path.empty() && it != Settings.Folders.root.end(); ++it) {
-      file_path = SearchFileFolder(*this, *it, number, false);
-    }
-  }
-
-  if (file_path.empty()) {
-    if (number == 0) number = 1;
-    MainDialog.ChangeStatus(
-      L"Could not find episode #" + ToWstr(number) + L" (" + GetTitle() + L").");
-  } else {
-    Execute(file_path);
-  }
-
-  SetSharedCursor(IDC_ARROW);
-
-  return !file_path.empty();
+const vector<wstring>& Item::GetUserSynonyms() const {
+  return local_info_.synonyms;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool Item::SetEpisodeAvailability(int number, bool available, const wstring& path) {
-  if (number == 0) number = 1;
+  if (number == 0)
+    number = 1;
   
   if (number <= GetEpisodeCount() || GetEpisodeCount() == 0) {
     if (static_cast<size_t>(number) > local_info_.available_episodes.size()) {
@@ -582,6 +514,10 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
   return false;
 }
 
+void Item::SetFolder(const wstring& folder) {
+  local_info_.folder = folder;
+}
+
 void Item::SetLastAiredEpisodeNumber(int number) {
   if (number > local_info_.last_aired_episode)
     local_info_.last_aired_episode = number;
@@ -591,60 +527,18 @@ void Item::SetNewEpisodePath(const wstring& path) {
   local_info_.new_episode_path = path;
 }
 
-// =============================================================================
-
-bool Item::CheckFolder() {
-  // Check if current folder still exists
-  if (!GetFolder().empty() && !FolderExists(GetFolder())) {
-    LOG(LevelWarning, L"Folder doesn't exist anymore.");
-    LOG(LevelWarning, L"Path: " + GetFolder());
-    SetFolder(L"");
-  }
-
-  // Search root folders
-  if (GetFolder().empty()) {
-    wstring new_folder;
-    for (auto it = Settings.Folders.root.begin(); 
-         it != Settings.Folders.root.end(); ++it) {
-      new_folder = SearchFileFolder(*this, *it, 0, true);
-      if (!new_folder.empty()) {
-        SetFolder(new_folder);
-        Settings.Save();
-        break;
-      }
-    }
-  }
-
-  return !GetFolder().empty();
-}
-
-const wstring Item::GetFolder() const {
-  return local_info_.folder;
-}
-
-void Item::SetFolder(const wstring& folder) {
-  local_info_.folder = folder;
-}
-
-// =============================================================================
-
-bool Item::GetPlaying() const {
-  return local_info_.playing;
-}
-
 void Item::SetPlaying(bool playing) {
   local_info_.playing = playing;
 }
 
-// =============================================================================
-
-const vector<wstring>& Item::GetUserSynonyms() const {
-  return local_info_.synonyms;
+void Item::SetUseAlternative(bool use_alternative) {
+  local_info_.use_alternative = use_alternative;
 }
 
 void Item::SetUserSynonyms(const wstring& synonyms) {
   vector<wstring> temp;
   Split(synonyms, L"; ", temp);
+
   SetUserSynonyms(temp);
 }
 
@@ -657,19 +551,27 @@ void Item::SetUserSynonyms(const vector<wstring>& synonyms) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+bool Item::IsEpisodeAvailable(int number) const {
+  if (number < 1)
+    number = 1;
+  if (static_cast<size_t>(number) > local_info_.available_episodes.size())
+    return false;
+
+  return local_info_.available_episodes.at(number - 1);
+}
+
+bool Item::IsNewEpisodeAvailable() const {
+  return IsEpisodeAvailable(GetMyLastWatchedEpisode() + 1);
+}
+
 bool Item::UserSynonymsAvailable() const {
   return !local_info_.synonyms.empty();
 }
 
-bool Item::GetUseAlternative() const {
-  return local_info_.use_alternative;
-}
-
-void Item::SetUseAlternative(bool use_alternative) {
-  local_info_.use_alternative = use_alternative;
-}
-
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 void Item::AddtoUserList() {
   if (!my_info_.get()) {
@@ -699,7 +601,7 @@ bool Item::IsOldEnough() const {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void Item::Edit(const EventItem& item) {
   // Edit episode
@@ -756,10 +658,10 @@ void Item::Edit(const EventItem& item) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 EventItem* Item::SearchHistory(int search_mode) const {
   return History.queue.FindItem(metadata_.uid, search_mode);
 }
 
-} // namespace anime
+}  // namespace anime

@@ -149,7 +149,7 @@ void EventQueue::Add(EventItem& item, bool save) {
     // Check new episode
     if (item.episode) {
       anime->SetNewEpisodePath(L"");
-      anime->CheckEpisodes(0);
+      anime::CheckEpisodes(*anime, 0);
     }
     
     // Refresh history
