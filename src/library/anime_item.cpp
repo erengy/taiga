@@ -348,8 +348,8 @@ int Item::GetMyRewatchingEp() const {
 
 const Date& Item::GetMyDateStart(bool check_events) const {
   if (!my_info_.get())
-
     return EmptyDate();
+
   EventItem* event_item = check_events ? 
       SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
 
