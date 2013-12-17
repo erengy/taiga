@@ -51,11 +51,6 @@ SeasonDialog::SeasonDialog()
 }
 
 BOOL SeasonDialog::OnInitDialog() {
-  // Set properties
-  SetSizeMin(575, 310);
-  SetIconLarge(IDI_MAIN);
-  SetIconSmall(IDI_MAIN);
-
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_SEASON));
   list_.EnableGroupView(true);
@@ -664,8 +659,6 @@ void SeasonDialog::RefreshToolbar() {
 }
 
 void SeasonDialog::SetViewMode(int mode) {
-  if (mode == view_as) return;
-  
   SIZE size;
   size.cx = mode == SEASON_VIEWAS_IMAGES ? 142 : 500;
   size.cy = 200;
