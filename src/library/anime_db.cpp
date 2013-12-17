@@ -265,14 +265,6 @@ bool Database::LoadList() {
   foreach_xmlnode_(node, node_myanimelist, L"anime") {
     Item anime_item;
     anime_item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
-    anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
-    anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
-    anime_item.SetType(XmlReadIntValue(node, L"series_type"));
-    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
-    anime_item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
-    anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
-    anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
-    anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
 
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
