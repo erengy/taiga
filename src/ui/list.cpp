@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,224 +18,283 @@
 
 #include "list.h"
 
-#include "library/anime_db.h"
-#include "taiga/settings.h"
 #include "base/string.h"
 #include "base/time.h"
+#include "library/anime_db.h"
+#include "taiga/settings.h"
 
 #include "win/ctrl/win_ctrl.h"
 
 namespace ui {
 
-int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort) {
-  if (!lParamSort) return 0;
-  
-  win::ListView* m_List = reinterpret_cast<win::ListView*>(lParamSort);
-  int return_value = 0;
+int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
+  UINT64 size[2] = {1, 1};
 
-  switch (m_List->GetSortType()) {
-    // Number
-    case kListSortNumber: {
-      WCHAR szItem1[MAX_PATH], szItem2[MAX_PATH];
-      m_List->GetItemText(lParam1, m_List->GetSortColumn(), szItem1);
-      m_List->GetItemText(lParam2, m_List->GetSortColumn(), szItem2);
-      int iItem1 = _wtoi(szItem1);
-      int iItem2 = _wtoi(szItem2);
-      if (iItem1 > iItem2) {
-        return_value = 1;
-      } else if (iItem1 < iItem2) {
-        return_value = -1;
+  for (size_t i = 0; i < 2; i++) {
+    std::wstring value = i == 0 ? str1 : str2;
+    std::wstring unit;
+
+    TrimRight(value, L".\r");
+    EraseChars(value, L" ");
+
+    if (value.length() >= 2) {
+      for (auto it = value.rbegin(); it != value.rend(); ++it) {
+        if (IsNumeric(*it))
+          break;
+        unit.insert(unit.begin(), *it);
       }
-      break;
+      value.resize(value.length() - unit.length());
+      Trim(unit);
     }
 
-    // Popularity
-    case kListSortPopularity: {
-      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
-      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
-      if (pItem1 && pItem2) {
-        int iItem1 = pItem1->GetPopularity().empty() ? 0 : _wtoi(pItem1->GetPopularity().substr(1).c_str());
-        int iItem2 = pItem2->GetPopularity().empty() ? 0 : _wtoi(pItem2->GetPopularity().substr(1).c_str());
-        if (iItem2 == 0) {
-          return_value = -1;
-        } else if (iItem1 == 0) {
-          return_value = 1;
-        } else if (iItem1 > iItem2) {
-          return_value = 1;
-        } else if (iItem1 < iItem2) {
-          return_value = -1;
-        }
-      }
-      break;
+    int index = InStr(value, L".");
+    if (index > -1) {
+      int length = value.substr(index + 1).length();
+      if (length <= 2)
+        value.append(2 - length, '0');
+      EraseChars(value, L".");
+    } else {
+      value.append(2, '0');
     }
 
-    // Progress
-    case kListSortProgress: {
-      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
-      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
-      if (pItem1 && pItem2) {
-        int total1 = pItem1->GetEpisodeCount();
-        int total2 = pItem2->GetEpisodeCount();
-        int watched1 = pItem1->GetMyLastWatchedEpisode();
-        int watched2 = pItem2->GetMyLastWatchedEpisode();
-        bool available1 = pItem1->IsNewEpisodeAvailable();
-        bool available2 = pItem2->IsNewEpisodeAvailable();
-        if (available1 && !available2) {
-          return_value = -1;
-        } else if (!available1 && available2) {
-          return_value = 1;
-        } else if (total1 && total2) {
-          float ratio1 = static_cast<float>(watched1) / static_cast<float>(total1);
-          float ratio2 = static_cast<float>(watched2) / static_cast<float>(total2);
-          if (ratio1 > ratio2) {
-            return_value = -1;
-          } else if (ratio1 < ratio2) {
-            return_value = 1;
-          }
-        } else {
-          if (watched1 > watched2) {
-            return_value = -1;
-          } else if (watched1 < watched2) {
-            return_value = 1;
-          }
-        }
-      }
-      break;
+    if (IsEqual(unit, L"KB")) {
+      size[i] *= 1000;
+    } else if (IsEqual(unit, L"KiB")) {
+      size[i] *= 1024;
+    } else if (IsEqual(unit, L"MB")) {
+      size[i] *= 1000 * 1000;
+    } else if (IsEqual(unit, L"MiB")) {
+      size[i] *= 1024 * 1024;
+    } else if (IsEqual(unit, L"GB")) {
+      size[i] *= 1000 * 1000 * 1000;
+    } else if (IsEqual(unit, L"GiB")) {
+      size[i] *= 1024 * 1024 * 1024;
     }
 
-    // Episodes
-    case kListSortEpisodes: {
-      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
-      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
-      if (pItem1 && pItem2) {
-        if (pItem1->GetEpisodeCount() > pItem2->GetEpisodeCount()) {
-          return_value = 1;
-        } else if (pItem1->GetEpisodeCount() < pItem2->GetEpisodeCount()) {
-          return_value = -1;
-        }
-      }
-      break;
-    }
-
-    // Score
-    case kListSortScore: {
-      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
-      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
-      if (pItem1 && pItem2) {
-        return_value = lstrcmpi(pItem1->GetScore().c_str(), pItem2->GetScore().c_str());
-      }
-      break;
-    }
-    
-    // Start date
-    case kListSortStartDate: {
-      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
-      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
-      if (pItem1 && pItem2) {
-        Date date1 = pItem1->GetDateStart();
-        Date date2 = pItem2->GetDateStart();
-        if (date1 != date2) {
-          if (!date1.year) date1.year = static_cast<unsigned short>(-1); // Hello.
-          if (!date2.year) date2.year = static_cast<unsigned short>(-1); // We come from the future.
-          if (!date1.month) date1.month = 12;
-          if (!date2.month) date2.month = 12;
-          if (!date1.day) date1.day = 31;
-          if (!date2.day) date2.day = 31;
-          return_value = date2 > date1 ? 1 : -1;
-        }
-      }
-      break;
-    }
-
-    // Last updated
-    case kListSortLastUpdated: {
-      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
-      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
-      if (pItem1 && pItem2) {
-        time_t time1 = _wtoi64(pItem1->GetMyLastUpdated().c_str());
-        time_t time2 = _wtoi64(pItem2->GetMyLastUpdated().c_str());
-        if (time1 > time2) {
-          return_value = 1;
-        } else if (time1 < time2) {
-          return_value = -1;
-        }
-      }
-      break;
-    }
-
-    // File size
-    case kListSortFileSize: {
-      wstring item[2], unit[2];
-      UINT64 size[2] = {1, 1};
-      m_List->GetItemText(lParam1, m_List->GetSortColumn(), item[0]);
-      m_List->GetItemText(lParam2, m_List->GetSortColumn(), item[1]);
-      for (size_t i = 0; i < 2; i++) {
-        TrimRight(item[i], L".\r");
-        EraseChars(item[i], L" ");
-        if (item[i].length() >= 2) {
-          for (auto it = item[i].rbegin(); it != item[i].rend(); ++it) {
-            if (IsNumeric(*it))
-              break;
-            unit[i].insert(unit[i].begin(), *it);
-          }
-          item[i].resize(item[i].length() - unit[i].length());
-          Trim(unit[i]);
-        }
-        int index = InStr(item[i], L".");
-        if (index > -1) {
-          int length = item[i].substr(index + 1).length();
-          if (length <= 2) item[i].append(2 - length, '0');
-          EraseChars(item[i], L".");
-        } else {
-          item[i].append(2, '0');
-        }
-        if (IsEqual(unit[i], L"KB")) {
-          size[i] *= 1000;
-        } else if (IsEqual(unit[i], L"KiB")) {
-          size[i] *= 1024;
-        } else if (IsEqual(unit[i], L"MB")) {
-          size[i] *= 1000 * 1000;
-        } else if (IsEqual(unit[i], L"MiB")) {
-          size[i] *= 1024 * 1024;
-        } else if (IsEqual(unit[i], L"GB")) {
-          size[i] *= 1000 * 1000 * 1000;
-        } else if (IsEqual(unit[i], L"GiB")) {
-          size[i] *= 1024 * 1024 * 1024;
-        }
-        size[i] *= _wtoi(item[i].c_str());
-      }
-      if (size[0] > size[1]) {
-        return_value = 1;
-      } else if (size[0] < size[1]) {
-        return_value = -1;
-      }
-      break;
-    }
-
-    // Title
-    case kListSortTitle: {
-      auto pItem1 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam1)));
-      auto pItem2 = AnimeDatabase.FindItem(static_cast<int>(m_List->GetItemParam(lParam2)));
-      if (pItem1 && pItem2) {
-        if (Settings.Program.List.english_titles) {
-          return_value = CompareStrings(pItem1->GetEnglishTitle(true), pItem2->GetEnglishTitle(true));
-        } else {
-          return_value = CompareStrings(pItem1->GetTitle(), pItem2->GetTitle());
-        }
-      }
-      break;
-    }
-
-    // Text
-    case kListSortDefault:
-    default:
-      WCHAR szItem1[MAX_PATH], szItem2[MAX_PATH];
-      m_List->GetItemText(lParam1, m_List->GetSortColumn(), szItem1);
-      m_List->GetItemText(lParam2, m_List->GetSortColumn(), szItem2);
-      return_value = lstrcmpi(szItem1, szItem2);
+    size[i] *= _wtoi(value.c_str());
   }
 
-  return return_value * m_List->GetSortOrder();
+  if (size[0] > size[1]) {
+    return 1;
+  } else if (size[0] < size[1]) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
+  int num1 = _wtoi(str1);
+  int num2 = _wtoi(str2);
+
+  if (num1 > num2) {
+    return 1;
+  } else if (num1 < num2) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int SortAsText(LPCWSTR str1, LPCWSTR str2) {
+  return lstrcmpi(str1, str2);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
+  Date date1 = item1.GetDateStart();
+  Date date2 = item2.GetDateStart();
+
+  if (date1 != date2) {
+    if (!date1.year)
+      date1.year = static_cast<unsigned short>(-1);  // Hello.
+    if (!date2.year)
+      date2.year = static_cast<unsigned short>(-1);  // We come from the future.
+    if (!date1.month)
+      date1.month = 12;
+    if (!date2.month)
+      date2.month = 12;
+    if (!date1.day)
+      date1.day = 31;
+    if (!date2.day)
+      date2.day = 31;
+
+    return date2 > date1 ? 1 : -1;
+  }
+
+  return 0;
+}
+
+int SortListByEpisodeCount(const anime::Item& item1, const anime::Item& item2) {
+  if (item1.GetEpisodeCount() > item2.GetEpisodeCount()) {
+    return 1;
+  } else if (item1.GetEpisodeCount() < item2.GetEpisodeCount()) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
+  time_t time1 = _wtoi64(item1.GetMyLastUpdated().c_str());
+  time_t time2 = _wtoi64(item2.GetMyLastUpdated().c_str());
+
+  if (time1 > time2) {
+    return 1;
+  } else if (time1 < time2) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
+  int val1 = 0;
+  int val2 = 0;
+
+  if (!item1.GetPopularity().empty())
+    val1 = _wtoi(item1.GetPopularity().substr(1).c_str());
+  if (!item2.GetPopularity().empty())
+    val2 = _wtoi(item2.GetPopularity().substr(1).c_str());
+
+  if (val2 == 0) {
+    return -1;
+  } else if (val1 == 0) {
+    return 1;
+  } else if (val1 > val2) {
+    return 1;
+  } else if (val1 < val2) {
+    return -1;
+  }
+
+  return 0;
+}
+
+int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
+  int total1 = item1.GetEpisodeCount();
+  int total2 = item2.GetEpisodeCount();
+  int watched1 = item1.GetMyLastWatchedEpisode();
+  int watched2 = item2.GetMyLastWatchedEpisode();
+  bool available1 = item1.IsNewEpisodeAvailable();
+  bool available2 = item2.IsNewEpisodeAvailable();
+
+  if (available1 && !available2) {
+    return -1;
+  } else if (!available1 && available2) {
+    return 1;
+  } else if (total1 && total2) {
+    float ratio1 = static_cast<float>(watched1) / static_cast<float>(total1);
+    float ratio2 = static_cast<float>(watched2) / static_cast<float>(total2);
+    if (ratio1 > ratio2) {
+      return -1;
+    } else if (ratio1 < ratio2) {
+      return 1;
+    }
+  } else {
+    if (watched1 > watched2) {
+      return -1;
+    } else if (watched1 < watched2) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
+  return lstrcmpi(item1.GetScore().c_str(), item2.GetScore().c_str());
+}
+
+int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
+  if (Settings.Program.List.english_titles) {
+    return CompareStrings(item1.GetEnglishTitle(true),
+                          item2.GetEnglishTitle(true));
+  } else {
+    return CompareStrings(item1.GetTitle(), item2.GetTitle());
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
+  switch (type) {
+    case kListSortDefault:
+    default:
+      return SortAsText(str1, str2);
+    case kListSortFileSize:
+      return SortAsFileSize(str1, str2);
+    case kListSortNumber:
+      return SortAsNumber(str1, str2);
+  }
+
+  return 0;
+}
+
+int SortList(int type, int id1, int id2) {
+  auto item1 = AnimeDatabase.FindItem(id1);
+  auto item2 = AnimeDatabase.FindItem(id2);
+
+  if (item1 && item2) {
+    switch (type) {
+      case kListSortDateStart:
+        return SortListByDateStart(*item1, *item2);
+      case kListSortEpisodeCount:
+        return SortListByEpisodeCount(*item1, *item2);
+      case kListSortLastUpdated:
+        return SortListByLastUpdated(*item1, *item2);
+      case kListSortPopularity:
+        return SortListByPopularity(*item1, *item2);
+      case kListSortProgress:
+        return SortListByProgress(*item1, *item2);
+      case kListSortScore:
+        return SortListByScore(*item1, *item2);
+      case kListSortTitle:
+        return SortListByTitle(*item1, *item2);
+    }
+  }
+
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
+                                 LPARAM lParamSort) {
+  if (!lParamSort)
+    return 0;
+
+  win::ListView* list = reinterpret_cast<win::ListView*>(lParamSort);
+  int return_value = 0;
+
+  switch (list->GetSortType()) {
+    case kListSortDefault:
+    case kListSortFileSize:
+    case kListSortNumber:
+    default: {
+      WCHAR str1[MAX_PATH];
+      WCHAR str2[MAX_PATH];
+      list->GetItemText(lParam1, list->GetSortColumn(), str1);
+      list->GetItemText(lParam2, list->GetSortColumn(), str2);
+      return_value = SortList(list->GetSortType(), str1, str2);
+      break;
+    }
+
+    case kListSortDateStart:
+    case kListSortEpisodeCount:
+    case kListSortLastUpdated:
+    case kListSortPopularity:
+    case kListSortProgress:
+    case kListSortScore:
+    case kListSortTitle: {
+      return_value = SortList(list->GetSortType(),
+                              static_cast<int>(list->GetItemParam(lParam1)),
+                              static_cast<int>(list->GetItemParam(lParam2)));
+      break;
+    }
+  }
+
+  return return_value * list->GetSortOrder();
 }
 
 }  // namespace ui

@@ -25,14 +25,14 @@ namespace ui {
 
 enum ListSortType {
   kListSortDefault,
-  kListSortEpisodes,
   kListSortFileSize,
-  kListSortLastUpdated,
   kListSortNumber,
+  kListSortDateStart,
+  kListSortEpisodeCount,
+  kListSortLastUpdated,
   kListSortPopularity,
   kListSortProgress,
   kListSortScore,
-  kListSortStartDate,
   kListSortTitle
 };
 

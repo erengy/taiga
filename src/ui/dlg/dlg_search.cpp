@@ -89,7 +89,7 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             break;
           // Season
           case 4:
-            list_.Sort(lplv->iSubItem, order, ui::kListSortStartDate, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortDateStart, ui::ListViewCompareProc);
             break;
           // Other columns
           default:

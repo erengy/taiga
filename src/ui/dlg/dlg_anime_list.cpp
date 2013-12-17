@@ -338,7 +338,7 @@ int AnimeListDialog::ListView::GetSortType(int column) {
       return ui::kListSortNumber;
     // Season
     case 4:
-      return ui::kListSortStartDate;
+      return ui::kListSortDateStart;
     // Other columns
     default:
       return ui::kListSortDefault;
