@@ -190,12 +190,24 @@ int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
       return -1;
     } else if (ratio1 < ratio2) {
       return 1;
+    } else {
+      if (total1 > total2) {
+        return -1;
+      } else if (total1 < total2) {
+        return 1;
+      }
     }
   } else {
     if (watched1 > watched2) {
       return -1;
     } else if (watched1 < watched2) {
       return 1;
+    } else {
+      if (total1 > total2) {
+        return -1;
+      } else if (total1 < total2) {
+        return 1;
+      }
     }
   }
 
