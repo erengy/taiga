@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VERSION_H
-#define VERSION_H
+#ifndef TAIGA_TAIGA_VERSION_H
+#define TAIGA_TAIGA_VERSION_H
 
 #define XSTRINGIFY(s) STRINGIFY(s)
 #define STRINGIFY(s) #s
@@ -30,4 +30,4 @@
 #define VERSION_VALUE_DIGITAL VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, VERSION_BUILD
 #define VERSION_VALUE_STRING XSTRINGIFY(VERSION_MAJOR) "." XSTRINGIFY(VERSION_MINOR) "." XSTRINGIFY(VERSION_REVISION) "\0"
 
-#endif // VERSION_H
+#endif  // TAIGA_TAIGA_VERSION_H
