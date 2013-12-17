@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,58 +16,35 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
 #include "announce.h"
-
-#include "library/anime.h"
-#include "library/anime_episode.h"
-#include "base/common.h"
 #include "base/dde.h"
 #include "base/encoding.h"
-#include "taiga/http.h"
+#include "base/foreach.h"
 #include "base/logger.h"
-#include "taiga/settings.h"
 #include "base/string.h"
+#include "library/anime.h"
 #include "taiga/script.h"
-#include "taiga/taiga.h"
-
-#include "ui/dlg/dlg_main.h"
-
+#include "taiga/settings.h"
 #include "win/win_taskdialog.h"
 
-class Announcer Announcer;
-class Skype Skype;
-class Twitter Twitter;
+taiga::Announcer Announcer;
+taiga::Skype Skype;
+taiga::Twitter Twitter;
 
-// =============================================================================
+namespace taiga {
 
 void Announcer::Clear(int modes, bool force) {
-  if (modes & ANNOUNCE_TO_HTTP) {
-    if (Settings.Announce.HTTP.enabled || force) {
+  if (modes & kAnnounceToHttp)
+    if (Settings.Announce.HTTP.enabled || force)
       ToHttp(Settings.Announce.HTTP.url, L"");
-    }
-  }
-  
-  if (modes & ANNOUNCE_TO_MESSENGER) {
-    if (Settings.Announce.MSN.enabled || force) {
+
+  if (modes & kAnnounceToMessenger)
+    if (Settings.Announce.MSN.enabled || force)
       ToMessenger(L"", L"", L"", false);
-    }
-  }
-  
-  if (modes & ANNOUNCE_TO_MIRC) {
-    // Not available
-  }
-  
-  if (modes & ANNOUNCE_TO_SKYPE) {
-    if (Settings.Announce.Skype.enabled || force) {
-      ToSkype(Skype.previous_mood);
-    }
-  }
-  
-  if (modes & ANNOUNCE_TO_TWITTER) {
-    // Not available
-  }
+
+  if (modes & kAnnounceToSkype)
+    if (Settings.Announce.Skype.enabled || force)
+      ToSkype(::Skype.previous_mood);
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
@@ -77,58 +54,64 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (!episode)
     episode = &CurrentEpisode;
 
-  if (modes & ANNOUNCE_TO_HTTP) {
+  if (modes & kAnnounceToHttp) {
     if (Settings.Announce.HTTP.enabled || force) {
       LOG(LevelDebug, L"HTTP");
-      ToHttp(Settings.Announce.HTTP.url, 
-        ReplaceVariables(Settings.Announce.HTTP.format, *episode, true, force));
+      ToHttp(Settings.Announce.HTTP.url,
+             ReplaceVariables(Settings.Announce.HTTP.format,
+                              *episode, true, force));
     }
   }
 
   if (episode->anime_id <= anime::ID_UNKNOWN)
     return;
 
-  if (modes & ANNOUNCE_TO_MESSENGER) {
+  if (modes & kAnnounceToMessenger) {
     if (Settings.Announce.MSN.enabled || force) {
       LOG(LevelDebug, L"Messenger");
-      ToMessenger(L"Taiga", L"MyAnimeList", 
-        ReplaceVariables(Settings.Announce.MSN.format, *episode, false, force), true);
+      ToMessenger(L"Taiga", L"MyAnimeList",
+                  ReplaceVariables(Settings.Announce.MSN.format,
+                                   *episode, false, force),
+                  true);
     }
   }
 
-  if (modes & ANNOUNCE_TO_MIRC) {
+  if (modes & kAnnounceToMirc) {
     if (Settings.Announce.MIRC.enabled || force) {
       LOG(LevelDebug, L"mIRC");
-      ToMirc(Settings.Announce.MIRC.service, 
-        Settings.Announce.MIRC.channels, 
-        ReplaceVariables(Settings.Announce.MIRC.format, *episode, false, force), 
-        Settings.Announce.MIRC.mode, 
-        Settings.Announce.MIRC.use_action, 
-        Settings.Announce.MIRC.multi_server);
+      ToMirc(Settings.Announce.MIRC.service,
+             Settings.Announce.MIRC.channels,
+             ReplaceVariables(Settings.Announce.MIRC.format,
+                              *episode, false, force),
+             Settings.Announce.MIRC.mode,
+             Settings.Announce.MIRC.use_action,
+             Settings.Announce.MIRC.multi_server);
     }
   }
 
-  if (modes & ANNOUNCE_TO_SKYPE) {
+  if (modes & kAnnounceToSkype) {
     if (Settings.Announce.Skype.enabled || force) {
       LOG(LevelDebug, L"Skype");
-      ToSkype(ReplaceVariables(Settings.Announce.Skype.format, *episode, false, force));
+      ToSkype(ReplaceVariables(Settings.Announce.Skype.format,
+                               *episode, false, force));
     }
   }
 
-  if (modes & ANNOUNCE_TO_TWITTER) {
+  if (modes & kAnnounceToTwitter) {
     if (Settings.Announce.Twitter.enabled || force) {
       LOG(LevelDebug, L"Twitter");
-      ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format, *episode, false, force));
+      ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format,
+                                 *episode, false, force));
     }
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+// HTTP
 
-/* HTTP */
-
-void Announcer::ToHttp(wstring address, wstring data) {
-  if (address.empty() || data.empty()) return;
+void Announcer::ToHttp(const std::wstring& address, const std::wstring& data) {
+  if (address.empty() || data.empty())
+    return;
 
   win::http::Url url(address);
 
@@ -141,43 +124,50 @@ void Announcer::ToHttp(wstring address, wstring data) {
   ConnectionManager.MakeRequest(http_request, taiga::kHttpSilent);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+// Messenger
 
-/* Messenger */
+void Announcer::ToMessenger(const std::wstring& artist,
+                            const std::wstring& album,
+                            const std::wstring& title,
+                            BOOL show) {
+  if (title.empty() && show)
+    return;
 
-void Announcer::ToMessenger(wstring artist, wstring album, wstring title, BOOL show) {
-  if (title.empty() && show) return;
-  
   COPYDATASTRUCT cds;
   WCHAR buffer[256];
 
   wstring wstr = L"\\0Music\\0" + ToWstr(show) + L"\\0{1}\\0" + 
-    artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
+                 artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
   wcscpy_s(buffer, 256, wstr.c_str());
 
   cds.dwData = 0x547;
   cds.lpData = &buffer;
   cds.cbData = (lstrlenW(buffer) * 2) + 2;
 
-  HWND hMessenger = NULL;
-  while (hMessenger = FindWindowEx(NULL, hMessenger, L"MsnMsgrUIManager", NULL)) {
-    if (hMessenger > 0) {
-      SendMessage(hMessenger, WM_COPYDATA, NULL, (LPARAM)&cds);
-    }
-  }
+  HWND hwnd = nullptr;
+  while (hwnd = FindWindowEx(nullptr, hwnd, L"MsnMsgrUIManager", nullptr))
+    if (hwnd > 0)
+      SendMessage(hwnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&cds));
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+// mIRC
 
-/* mIRC */
-
-bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode, BOOL use_action, BOOL multi_server) {
-  if (!FindWindow(L"mIRC", NULL)) return FALSE;
-  if (service.empty() || channels.empty() || data.empty()) return FALSE;
+bool Announcer::ToMirc(const std::wstring& service,
+                       std::wstring channels,
+                       const std::wstring& data,
+                       int mode,
+                       BOOL use_action,
+                       BOOL multi_server) {
+  if (!FindWindow(L"mIRC", nullptr))
+    return false;
+  if (service.empty() || channels.empty() || data.empty())
+    return false;
 
   // Initialize
-  base::DynamicDataExchange DDE;
-  if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
+  base::DynamicDataExchange dde;
+  if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     win::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.AddButton(L"OK", IDOK);
@@ -186,90 +176,90 @@ bool Announcer::ToMirc(wstring service, wstring channels, wstring data, int mode
   }
 
   // List channels
-  if (mode != MIRC_CHANNELMODE_CUSTOM) {
-    if (DDE.Connect(service, L"CHANNELS")) {
-      DDE.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
-      DDE.Disconnect();
+  if (mode != kMircChannelModeCustom) {
+    if (dde.Connect(service, L"CHANNELS")) {
+      dde.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
+      dde.Disconnect();
     }
   }
-  vector<wstring> channel_list;
+  std::vector<std::wstring> channel_list;
   Tokenize(channels, L" ,;", channel_list);
-  for (size_t i = 0; i < channel_list.size(); i++) {
-    Trim(channel_list[i]);
-    if (channel_list[i].empty()) {
+  foreach_(it, channel_list) {
+    Trim(*it);
+    if (it->empty())
       continue;
-    }
-    if (channel_list[i].at(0) == '*') {
-      channel_list[i] = channel_list[i].substr(1);
-      if (mode == MIRC_CHANNELMODE_ACTIVE) {
-        wstring temp = channel_list[i];
+    if (it->at(0) == '*') {
+      *it = it->substr(1);
+      if (mode == kMircChannelModeActive) {
+        wstring temp = *it;
         channel_list.clear();
         channel_list.push_back(temp);
         break;
       }
     }
-    if (channel_list[i].at(0) != '#') {
-      channel_list[i].insert(channel_list[i].begin(), '#');
-    }
+    if (it->at(0) != '#')
+      it->insert(it->begin(), '#');
   }
 
   // Connect
-  if (!DDE.Connect(service, L"COMMAND")) {
+  if (!dde.Connect(service, L"COMMAND")) {
     win::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
     dlg.SetMainInstruction(L"DDE connection failed.");
     dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);
-    DDE.UnInitialize();
+    dde.UnInitialize();
     return false;
   }
-  
+
   // Send message to channels
-  for (size_t i = 0; i < channel_list.size(); i++) {
+  foreach_(it, channel_list) {
     wstring message;
     message += multi_server ? L"/scon -a " : L"";
     message += use_action ? L"/describe " : L"/msg ";
-    message += channel_list[i] + L" " + data;
-    DDE.ClientTransaction(L" ", message, NULL, XTYP_POKE);
+    message += *it + L" " + data;
+    dde.ClientTransaction(L" ", message, NULL, XTYP_POKE);
   }
 
   // Clean up
-  DDE.Disconnect();
-  DDE.UnInitialize();
+  dde.Disconnect();
+  dde.UnInitialize();
+
   return true;
 }
 
-bool Announcer::TestMircConnection(wstring service) {
+bool Announcer::TestMircConnection(const std::wstring& service) {
   wstring content;
   win::TaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
   dlg.AddButton(L"OK", IDOK);
-  
+
   // Search for mIRC window
-  if (!FindWindow(L"mIRC", NULL)) {
+  if (!FindWindow(L"mIRC", nullptr)) {
     dlg.SetMainInstruction(L"mIRC is not running.");
     dlg.Show(g_hMain);
     return false;
   }
 
   // Initialize
-  base::DynamicDataExchange DDE;
-  if (!DDE.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
+  base::DynamicDataExchange dde;
+  if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     dlg.SetMainInstruction(L"DDE initialization failed.");
     dlg.Show(g_hMain);
     return false;
   }
 
   // Try to connect
-  if (!DDE.Connect(service, L"CHANNELS")) {
+  if (!dde.Connect(service, L"CHANNELS")) {
     dlg.SetMainInstruction(L"DDE connection failed.");
     dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
     dlg.Show(g_hMain);
-    DDE.UnInitialize();
+    dde.UnInitialize();
     return false;
   } else {
     wstring channels;
-    DDE.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
-    if (!channels.empty()) content = L"Current channels: " + channels;
+    dde.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
+    if (!channels.empty())
+      content = L"Current channels: " + channels;
   }
 
   // Success
@@ -277,14 +267,14 @@ bool Announcer::TestMircConnection(wstring service) {
   dlg.SetMainInstruction(L"Successfuly connected to DDE server!");
   dlg.SetContent(content.c_str());
   dlg.Show(g_hMain);
-  DDE.Disconnect();
-  DDE.UnInitialize();
+  dde.Disconnect();
+  dde.UnInitialize();
+
   return true;
 }
 
-// =============================================================================
-
-/* Skype */
+////////////////////////////////////////////////////////////////////////////////
+// Skype
 
 const UINT Skype::wm_attach = ::RegisterWindowMessage(L"SkypeControlAPIAttach");
 const UINT Skype::wm_discover = ::RegisterWindowMessage(L"SkypeControlAPIDiscover");
@@ -309,7 +299,7 @@ BOOL Skype::Discover() {
                             0, SMTO_NORMAL, 1000, sendMessageResult);
 }
 
-BOOL Skype::SendCommand(const wstring& command) {
+bool Skype::SendCommand(const wstring& command) {
   string str = WstrToStr(command);
   const char* buffer = str.c_str();
 
@@ -323,19 +313,19 @@ BOOL Skype::SendCommand(const wstring& command) {
                   reinterpret_cast<LPARAM>(&cds)) == FALSE) {
     LOG(LevelError, L"WM_COPYDATA failed.");
     hwnd_skype = nullptr;
-    return FALSE;
+    return false;
   } else {
     LOG(LevelDebug, L"WM_COPYDATA succeeded.");
-    return TRUE;
+    return true;
   }
 }
 
-BOOL Skype::GetMoodText() {
+bool Skype::GetMoodText() {
   wstring command = L"GET PROFILE RICH_MOOD_TEXT";
   return SendCommand(command);
 }
 
-BOOL Skype::SetMoodText(const wstring& mood) {
+bool Skype::SetMoodText(const wstring& mood) {
   current_mood = mood;
   wstring command = L"SET PROFILE RICH_MOOD_TEXT " + mood;
   return SendCommand(command);
@@ -350,10 +340,11 @@ void Skype::Window::PreCreate(CREATESTRUCT& cs) {
   cs.style = WS_OVERLAPPEDWINDOW;
 }
 
-LRESULT Skype::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT Skype::Window::WindowProc(HWND hwnd, UINT uMsg,
+                                  WPARAM wParam, LPARAM lParam) {
   if (::Skype.HandleMessage(uMsg, wParam, lParam))
     return TRUE;
-  
+
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -362,7 +353,7 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (hwnd_skype == nullptr ||
         hwnd_skype != reinterpret_cast<HWND>(wParam))
       return FALSE;
-    
+
     auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
     wstring command = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
     LOG(LevelDebug, L"Received WM_COPYDATA: " + command);
@@ -380,25 +371,25 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
   } else if (uMsg == wm_attach) {
     hwnd_skype = nullptr;
-    
+
     switch (lParam) {
-      case SKYPECONTROLAPI_ATTACH_SUCCESS:
+      case kSkypeControlApiAttachSuccess:
         LOG(LevelDebug, L"Attach succeeded.");
         hwnd_skype = reinterpret_cast<HWND>(wParam);
         GetMoodText();
         if (!current_mood.empty())
           SetMoodText(current_mood);
         break;
-      case SKYPECONTROLAPI_ATTACH_PENDING_AUTHORIZATION:
+      case kSkypeControlApiAttachPendingAuthorization:
         LOG(LevelDebug, L"Waiting for user confirmation...");
         break;
-      case SKYPECONTROLAPI_ATTACH_REFUSED:
+      case kSkypeControlApiAttachRefused:
         LOG(LevelError, L"User denied access to client.");
         break;
-      case SKYPECONTROLAPI_ATTACH_NOT_AVAILABLE:
+      case kSkypeControlApiAttachNotAvailable:
         LOG(LevelError, L"API is not available.");
         break;
-      case SKYPECONTROLAPI_ATTACH_API_AVAILABLE:
+      case kSkypeControlApiAttachApiAvailable:
         LOG(LevelDebug, L"API is now available.");
         Discover();
         break;
@@ -417,18 +408,17 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 }
 
 void Announcer::ToSkype(const wstring& mood) {
-  Skype.current_mood = mood;
+  ::Skype.current_mood = mood;
 
-  if (Skype.hwnd_skype == nullptr) {
-    Skype.Discover();
+  if (::Skype.hwnd_skype == nullptr) {
+    ::Skype.Discover();
   } else {
-    Skype.SetMoodText(mood);
+    ::Skype.SetMoodText(mood);
   }
 }
 
-// =============================================================================
-
-/* Twitter */
+////////////////////////////////////////////////////////////////////////////////
+// Twitter
 
 Twitter::Twitter() {
   // These are unique values that identify Taiga
@@ -442,7 +432,7 @@ bool Twitter::RequestToken() {
   http_request.path = L"oauth/request_token";
   http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/request_token",
-                                     L"GET", NULL);
+                                     L"GET");
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterRequest);
   return true;
@@ -454,19 +444,19 @@ bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstri
   http_request.path = L"oauth/access_token";
   http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/access_token",
-                                     L"POST", NULL, key, secret, pin);
+                                     L"POST", nullptr, key, secret, pin);
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterAuth);
   return true;
 }
 
 bool Twitter::SetStatusText(const wstring& status_text) {
-  if (Settings.Announce.Twitter.oauth_key.empty() || Settings.Announce.Twitter.oauth_secret.empty()) {
+  if (Settings.Announce.Twitter.oauth_key.empty() ||
+      Settings.Announce.Twitter.oauth_secret.empty())
     return false;
-  }
-  if (status_text.empty() || status_text == status_text_) {
+  if (status_text.empty() || status_text == status_text_)
     return false;
-  }
+
   status_text_ = status_text;
 
   OAuthParameters post_parameters;
@@ -488,5 +478,7 @@ bool Twitter::SetStatusText(const wstring& status_text) {
 }
 
 void Announcer::ToTwitter(const wstring& status_text) {
-  Twitter.SetStatusText(status_text); 
+  ::Twitter.SetStatusText(status_text); 
 }
+
+}  // namespace taiga

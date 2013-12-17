@@ -339,28 +339,28 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
   } else if (action == L"AnnounceToHTTP") {
-    Announcer.Do(ANNOUNCE_TO_HTTP, nullptr, body == L"true");
+    Announcer.Do(taiga::kAnnounceToHttp, nullptr, body == L"true");
   
   // AnnounceToMessenger(force)
   //   Changes MSN Messenger status text.
   } else if (action == L"AnnounceToMessenger") {
-    Announcer.Do(ANNOUNCE_TO_MESSENGER, nullptr, body == L"true");
+    Announcer.Do(taiga::kAnnounceToMessenger, nullptr, body == L"true");
   
   // AnnounceToMIRC(force)
   //   Sends message to specified channels in mIRC.
   } else if (action == L"AnnounceToMIRC") {
-    Announcer.Do(ANNOUNCE_TO_MIRC, nullptr, body == L"true");
+    Announcer.Do(taiga::kAnnounceToMirc, nullptr, body == L"true");
   
   // AnnounceToSkype(force)
   //   Changes Skype mood text.
   //   Requires authorization.
   } else if (action == L"AnnounceToSkype") {
-    Announcer.Do(ANNOUNCE_TO_SKYPE, nullptr, body == L"true");
+    Announcer.Do(taiga::kAnnounceToSkype, nullptr, body == L"true");
 
   // AnnounceToTwitter(force)
   //   Changes Twitter status.
   } else if (action == L"AnnounceToTwitter") {
-    Announcer.Do(ANNOUNCE_TO_TWITTER, nullptr, body == L"true");
+    Announcer.Do(taiga::kAnnounceToTwitter, nullptr, body == L"true");
   
   // ===========================================================================
 

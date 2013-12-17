@@ -674,7 +674,8 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           // Disable ticker
           Taiga.ticker_media = -1;
           // Announce current episode
-          Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_MIRC | ANNOUNCE_TO_SKYPE);
+          Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToMessenger |
+                       taiga::kAnnounceToMirc | taiga::kAnnounceToSkype);
           // Update
           if (!Settings.Account.Update.wait_mp)
             if (anime_item)

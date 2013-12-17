@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,70 +16,61 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ANNOUNCE_H
-#define ANNOUNCE_H
+#ifndef TAIGA_TAIGA_ANNOUNCE_H
+#define TAIGA_TAIGA_ANNOUNCE_H
 
-#include "base/std.h"
+#include <string>
 
 #include "third_party/oauth/oauth.h"
-
 #include "win/win_window.h"
 
 namespace anime {
 class Episode;
 }
 
-// =============================================================================
+namespace taiga {
 
 enum AnnouncerModes {
-  ANNOUNCE_TO_HTTP      = 0x01,
-  ANNOUNCE_TO_MESSENGER = 0x02,
-  ANNOUNCE_TO_MIRC      = 0x04,
-  ANNOUNCE_TO_SKYPE     = 0x08,
-  ANNOUNCE_TO_TWITTER   = 0x10
+  kAnnounceToHttp      = 0x01,
+  kAnnounceToMessenger = 0x02,
+  kAnnounceToMirc      = 0x04,
+  kAnnounceToSkype     = 0x08,
+  kAnnounceToTwitter   = 0x10
 };
 
 class Announcer {
 public:
-  Announcer() {}
-  virtual ~Announcer() {}
-
   void Clear(int modes, bool force = false);
   void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
 
-public:
-  bool TestMircConnection(wstring service);
+  bool TestMircConnection(const std::wstring& service);
 
 private:
-  void ToHttp(wstring address, wstring data);
-  void ToMessenger(wstring artist, wstring album, wstring title, BOOL show);
-  bool ToMirc(wstring service, wstring channels, wstring data, int mode, BOOL use_action, BOOL multi_server);
-  void ToSkype(const wstring& mood);
-  void ToTwitter(const wstring& status_text);
+  void ToHttp(const std::wstring& address, const std::wstring& data);
+  void ToMessenger(const std::wstring& artist, const std::wstring& album, const std::wstring& title, BOOL show);
+  bool ToMirc(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, BOOL use_action, BOOL multi_server);
+  void ToSkype(const std::wstring& mood);
+  void ToTwitter(const std::wstring& status_text);
 };
 
-extern Announcer Announcer;
-
-// =============================================================================
-
-/* mIRC */
+////////////////////////////////////////////////////////////////////////////////
+// mIRC
 
 enum MircChannelMode {
-  MIRC_CHANNELMODE_ACTIVE = 1,
-  MIRC_CHANNELMODE_ALL    = 2,
-  MIRC_CHANNELMODE_CUSTOM = 3
+  kMircChannelModeActive,
+  kMircChannelModeAll,
+  kMircChannelModeCustom
 };
 
-// =============================================================================
-
-/* Skype */
+////////////////////////////////////////////////////////////////////////////////
+// Skype
 
 enum SkypeConnectionStatus {
-  SKYPECONTROLAPI_ATTACH_SUCCESS = 0,
-  SKYPECONTROLAPI_ATTACH_PENDING_AUTHORIZATION,
-  SKYPECONTROLAPI_ATTACH_REFUSED,
-  SKYPECONTROLAPI_ATTACH_NOT_AVAILABLE,
-  SKYPECONTROLAPI_ATTACH_API_AVAILABLE = 0x8001
+  kSkypeControlApiAttachSuccess,
+  kSkypeControlApiAttachPendingAuthorization,
+  kSkypeControlApiAttachRefused,
+  kSkypeControlApiAttachNotAvailable,
+  kSkypeControlApiAttachApiAvailable = 0x8001
 };
 
 class Skype {
@@ -90,9 +81,9 @@ public:
   void Create();
   BOOL Discover();
   LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-  BOOL SendCommand(const wstring& command);
-  BOOL GetMoodText();
-  BOOL SetMoodText(const wstring& mood);
+  bool SendCommand(const wstring& command);
+  bool GetMoodText();
+  bool SetMoodText(const wstring& mood);
 
   static const UINT wm_attach;
   static const UINT wm_discover;
@@ -103,9 +94,6 @@ public:
 
 private:
   class Window : public win::Window {
-  public:
-    Window() {}
-    virtual ~Window() {}
   private:
     void PreRegisterClass(WNDCLASSEX& wc);
     void PreCreate(CREATESTRUCT& cs);
@@ -113,20 +101,17 @@ private:
   } window_;
 };
 
-extern Skype Skype;
-
-// =============================================================================
-
-/* Twitter */
+////////////////////////////////////////////////////////////////////////////////
+// Twitter
 
 class Twitter {
 public:
   Twitter();
-  virtual ~Twitter() {}
+  ~Twitter() {}
 
   bool RequestToken();
-  bool AccessToken(const wstring& key, const wstring& secret, const wstring& pin);
-  bool SetStatusText(const wstring& status_text);
+  bool AccessToken(const std::wstring& key, const std::wstring& secret, const std::wstring& pin);
+  bool SetStatusText(const std::wstring& status_text);
 
 public:
   COAuth oauth;
@@ -135,6 +120,12 @@ private:
   wstring status_text_;
 };
 
-extern Twitter Twitter;
+}  // namespace taiga
 
-#endif // ANNOUNCE_H
+////////////////////////////////////////////////////////////////////////////////
+
+extern taiga::Announcer Announcer;
+extern taiga::Skype Skype;
+extern taiga::Twitter Twitter;
+
+#endif  // TAIGA_TAIGA_ANNOUNCE_H

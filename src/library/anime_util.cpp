@@ -274,8 +274,8 @@ void EndWatching(Item& item, Episode episode) {
   
   // Announce
   episode.anime_id = item.GetId();
-  Announcer.Do(ANNOUNCE_TO_HTTP, &episode);
-  Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
+  Announcer.Do(taiga::kAnnounceToHttp, &episode);
+  Announcer.Clear(taiga::kAnnounceToMessenger | taiga::kAnnounceToSkype);
 
   // Update now playing window
   NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);

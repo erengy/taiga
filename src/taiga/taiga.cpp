@@ -78,7 +78,7 @@ BOOL App::InitInstance() {
   LoadData();
 
   // Create API windows
-  Skype.Create();
+  ::Skype.Create();
   TaigaApi.Create();
 
   if (Settings.Program.StartUp.check_new_version) {
@@ -96,9 +96,9 @@ void App::Uninitialize() {
   // Announce
   if (play_status == kPlayStatusPlaying) {
     play_status = kPlayStatusStopped;
-    Announcer.Do(ANNOUNCE_TO_HTTP);
+    ::Announcer.Do(kAnnounceToHttp);
   }
-  Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
+  ::Announcer.Clear(kAnnounceToMessenger | kAnnounceToSkype);
 
   // Cleanup
   Taskbar.Destroy();

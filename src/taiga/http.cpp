@@ -261,21 +261,21 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     }
 
     case kHttpTwitterRequest: {
-      OAuthParameters parameters = Twitter.oauth.ParseQueryString(response.body);
+      OAuthParameters parameters = ::Twitter.oauth.ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty()) {
         ExecuteLink(L"http://api.twitter.com/oauth/authorize?oauth_token=" +
                     parameters[L"oauth_token"]);
         string_t auth_pin;
         if (ui::OnTwitterRequest(auth_pin))
-          Twitter.AccessToken(parameters[L"oauth_token"],
-                              parameters[L"oauth_token_secret"],
-                              auth_pin);
+          ::Twitter.AccessToken(parameters[L"oauth_token"],
+                                parameters[L"oauth_token_secret"],
+                                auth_pin);
       }
       break;
     }
     case kHttpTwitterAuth: {
       bool success = false;
-      OAuthParameters parameters = Twitter.oauth.ParseQueryString(response.body);
+      OAuthParameters parameters = ::Twitter.oauth.ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty() && !parameters[L"oauth_token_secret"].empty()) {
         Settings.Announce.Twitter.oauth_key = parameters[L"oauth_token"];
         Settings.Announce.Twitter.oauth_secret = parameters[L"oauth_token_secret"];
