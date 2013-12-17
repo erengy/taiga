@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,22 +16,16 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "stats.h"
-
-#include "library/anime_db.h"
-#include "library/anime_util.h"
-#include "base/common.h"
 #include "base/file.h"
 #include "base/foreach.h"
-#include "base/string.h"
+#include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "path.h"
-#include "taiga.h"
+#include "stats.h"
 
-Statistics Stats;
+taiga::Statistics Stats;
 
-// =============================================================================
+namespace taiga {
 
 Statistics::Statistics()
     : anime_count(0),
@@ -50,8 +44,6 @@ Statistics::Statistics()
       uptime(0) {
 }
 
-// =============================================================================
-
 void Statistics::CalculateAll() {
   CalculateAnimeCount();
   CalculateEpisodeCount();
@@ -65,19 +57,22 @@ void Statistics::CalculateAll() {
 int Statistics::CalculateAnimeCount() {
   anime_count = 0;
 
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it)
+  foreach_(it, AnimeDatabase.items)
     if (it->second.IsInList())
       anime_count++;
-  
+
   return anime_count;
 }
 
 int Statistics::CalculateEpisodeCount() {
   episode_count = 0;
   
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->second.IsInList()) continue;
+  foreach_(it, AnimeDatabase.items) {
+    if (!it->second.IsInList())
+      continue;
+
     episode_count += it->second.GetMyLastWatchedEpisode();
+
     // TODO: Implement times_rewatched when MAL adds to API
     if (it->second.GetMyRewatching() == TRUE)
       episode_count += it->second.GetEpisodeCount();
@@ -86,24 +81,30 @@ int Statistics::CalculateEpisodeCount() {
   return episode_count;
 }
 
-wstring Statistics::CalculateLifeSpentWatching() {
-  int duration, seconds = 0;
+const wstring& Statistics::CalculateLifeSpentWatching() {
+  int duration = 0;
+  int seconds = 0;
   
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->second.IsInList()) continue;
+  foreach_(it, AnimeDatabase.items) {
+    if (!it->second.IsInList())
+      continue;
+
     // Approximate duration in minutes
     switch (it->second.GetType()) {
       default:
-      case anime::kTv:      duration = 24;  break;
-      case anime::kOva:     duration = 24;  break;
+      case anime::kTv:      duration = 24; break;
+      case anime::kOva:     duration = 24; break;
       case anime::kMovie:   duration = 90; break;
-      case anime::kSpecial: duration = 12;  break;
-      case anime::kOna:     duration = 24;  break;
-      case anime::kMusic:   duration = 5;   break;
+      case anime::kSpecial: duration = 12; break;
+      case anime::kOna:     duration = 24; break;
+      case anime::kMusic:   duration =  5; break;
     }
+
     int episodes_watched = it->second.GetMyLastWatchedEpisode();
+
     if (it->second.GetMyRewatching() == TRUE)
       episodes_watched += it->second.GetEpisodeCount();
+
     seconds += (duration * 60) * episodes_watched;
   }
   
@@ -125,32 +126,40 @@ void Statistics::CalculateLocalData() {
   file_list.clear();
   wstring path = taiga::GetPath(taiga::kPathFeed);
   torrent_count = PopulateFiles(file_list, path, L"torrent", true);
+
   torrent_size = GetFolderSize(path, true);
 }
 
 float Statistics::CalculateMeanScore() {
-  float sum_scores = 0.0f, items_scored = 0.0f;
+  float items_scored = 0.0f;
+  float sum_scores = 0.0f;
   
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->second.IsInList()) continue;
+  foreach_(it, AnimeDatabase.items) {
+    if (!it->second.IsInList())
+      continue;
+
     if (it->second.GetMyScore() > 0) {
       sum_scores += static_cast<float>(it->second.GetMyScore());
       items_scored++;
     }
   }
   
-  score_mean = items_scored > 0 ? sum_scores / items_scored : 0.0f;
+  score_mean = items_scored > 0 ? (sum_scores / items_scored) : 0.0f;
   
   return score_mean;
 }
 
 float Statistics::CalculateScoreDeviation() {
-  float sum_squares = 0.0f, items_scored = 0.0f;
+  float items_scored = 0.0f;
+  float sum_squares = 0.0f;
   
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->second.IsInList()) continue;
+  foreach_(it, AnimeDatabase.items) {
+    if (!it->second.IsInList())
+      continue;
+
     if (it->second.GetMyScore() > 0) {
-      sum_squares += pow(static_cast<float>(it->second.GetMyScore()) - score_mean, 2);
+      float score = static_cast<float>(it->second.GetMyScore());
+      sum_squares += pow(score - score_mean, 2);
       items_scored++;
     }
   }
@@ -160,17 +169,16 @@ float Statistics::CalculateScoreDeviation() {
   return score_deviation;
 }
 
-vector<float> Statistics::CalculateScoreDistribution() {
-  int score = 0;
-  float extreme_value = 1.0f;
-
+const std::vector<float>& Statistics::CalculateScoreDistribution() {
   foreach_(item, score_count)
     *item = 0;
   foreach_(item, score_distribution)
     *item = 0.0f;
 
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    score = it->second.GetMyScore();
+  float extreme_value = 1.0f;
+
+  foreach_(it, AnimeDatabase.items) {
+    int score = it->second.GetMyScore();
     if (score > 0) {
       score_count[score]++;
       score_distribution[score]++;
@@ -178,9 +186,10 @@ vector<float> Statistics::CalculateScoreDistribution() {
     }
   }
 
-  for (auto it = score_distribution.begin(); it != score_distribution.end(); ++it) {
+  foreach_(it, score_distribution)
     *it = *it / extreme_value;
-  }
 
   return score_distribution;
 }
+
+}  // namespace taiga

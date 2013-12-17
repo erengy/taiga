@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,26 +16,27 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef STATS_H
-#define STATS_H
+#ifndef TAIGA_TAIGA_STATS_H
+#define TAIGA_TAIGA_STATS_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
 
-// =============================================================================
+namespace taiga {
 
 class Statistics {
 public:
   Statistics();
-  virtual ~Statistics() {}
+  ~Statistics() {}
 
   void CalculateAll();
   int CalculateAnimeCount();
   int CalculateEpisodeCount();
-  wstring CalculateLifeSpentWatching();
+  const std::wstring& CalculateLifeSpentWatching();
   void CalculateLocalData();
   float CalculateMeanScore();
   float CalculateScoreDeviation();
-  vector<float> CalculateScoreDistribution();
+  const std::vector<float>& CalculateScoreDistribution();
 
 public:
   int anime_count;
@@ -44,17 +45,19 @@ public:
   int episode_count;
   int image_count;
   int image_size;
-  wstring life_spent_watching;
+  std::wstring life_spent_watching;
   float score_mean;
   float score_deviation;
-  vector<int> score_count;
-  vector<float> score_distribution;
+  std::vector<int> score_count;
+  std::vector<float> score_distribution;
   int tigers_harmed;
   int torrent_count;
   int torrent_size;
   int uptime;
 };
 
-extern Statistics Stats;
+}  // namespace taiga
 
-#endif // STATS_H
+extern taiga::Statistics Stats;
+
+#endif  // TAIGA_TAIGA_STATS_H
