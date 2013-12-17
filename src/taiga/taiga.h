@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,13 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_H
-#define TAIGA_H
+#ifndef TAIGA_TAIGA_TAIGA_H
+#define TAIGA_TAIGA_TAIGA_H
 
-#include "base/std.h"
 #include "update.h"
-#include "version.h"
-
 #include "win/win_main.h"
 
 #define APP_NAME    L"Taiga"
@@ -34,45 +31,40 @@
 #define PORTABLE
 #endif
 
+namespace taiga {
+
 enum PlayStatus {
-  PLAYSTATUS_STOPPED,
-  PLAYSTATUS_PLAYING,
-  PLAYSTATUS_UPDATED
+  kPlayStatusStopped,
+  kPlayStatusPlaying,
+  kPlayStatusUpdated
 };
 
 enum TipType {
-  TIPTYPE_DEFAULT,
-  TIPTYPE_NOWPLAYING,
-  TIPTYPE_SEARCH,
-  TIPTYPE_TORRENT,
-  TIPTYPE_UPDATEFAILED
+  kTipTypeDefault,
+  kTipTypeNowPlaying,
+  kTipTypeSearch,
+  kTipTypeTorrent,
+  kTipTypeUpdateFailed
 };
 
-// =============================================================================
-
-class Taiga : public win::App {
+class App : public win::App {
 public:
-  Taiga();
-  ~Taiga();
+  App();
+  ~App();
 
   BOOL InitInstance();
   void Uninitialize();
-  
-public:
+
   void LoadData();
 
-public:
   int current_tip_type, play_status;
   bool logged_in;
   int ticker_media, ticker_memory, ticker_new_episodes, ticker_queue;
 
   class Updater : public UpdateHelper {
   public:
-    Updater() {}
-    virtual ~Updater() {}
-
     void OnCheck();
-    void OnCRCCheck(const wstring& path, wstring& crc);
+    void OnCRCCheck(const std::wstring& path, std::wstring& crc);
     void OnDone();
     void OnProgress(int file_index);
     bool OnRestartApp();
@@ -80,6 +72,8 @@ public:
   } Updater;
 };
 
-extern class Taiga Taiga;
+}  // namespace taiga
 
-#endif // TAIGA_H
+extern taiga::App Taiga;
+
+#endif  // TAIGA_TAIGA_TAIGA_H

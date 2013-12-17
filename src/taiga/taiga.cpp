@@ -16,42 +16,33 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "taiga.h"
-
-#include "library/anime_db.h"
-#include "taiga/announce.h"
 #include "api.h"
 #include "base/common.h"
-#include "base/gfx.h"
-#include "library/history.h"
 #include "base/logger.h"
-#include "track/media.h"
-#include "track/monitor.h"
 #include "base/process.h"
-#include "track/recognition.h"
+#include "base/string.h"
+#include "library/anime_db.h"
+#include "library/history.h"
 #include "resource.h"
 #include "settings.h"
-#include "base/string.h"
+#include "taiga.h"
+#include "taiga/announce.h"
+#include "track/media.h"
 #include "ui/theme.h"
 #include "version.h"
-
-#include "ui/dlg/dlg_update.h"
-
 #include "win/win_taskbar.h"
-#include "win/win_taskdialog.h"
 
 HINSTANCE g_hInstance;
 HWND g_hMain;
-class Taiga Taiga;
 
-// =============================================================================
+taiga::App Taiga;
 
-Taiga::Taiga()
+namespace taiga {
+
+App::App()
     : logged_in(false),
-      current_tip_type(TIPTYPE_DEFAULT),
-      play_status(PLAYSTATUS_STOPPED),
+      current_tip_type(kTipTypeDefault),
+      play_status(kPlayStatusStopped),
       ticker_media(0),
       ticker_memory(0),
       ticker_new_episodes(0),
@@ -59,24 +50,24 @@ Taiga::Taiga()
   SetVersionInfo(VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
 }
 
-Taiga::~Taiga() {
+App::~App() {
   OleUninitialize();
 }
 
-// =============================================================================
-
-BOOL Taiga::InitInstance() {
+BOOL App::InitInstance() {
   // Check another instance
-  if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258", L"TaigaMainW"))
+  if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258",
+                    L"TaigaMainW"))
     return FALSE;
   g_hInstance = GetInstanceHandle();
 
   // Initialize
   InitCommonControls(ICC_STANDARD_CLASSES);
-  OleInitialize(NULL);
+  OleInitialize(nullptr);
 
   // Initialize logger
-  Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) + APP_NAME L".log");
+  Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) +
+                       APP_NAME L".log");
 #ifdef _DEBUG
   Logger.SetSeverityLevel(LevelDebug);
 #else
@@ -101,10 +92,10 @@ BOOL Taiga::InitInstance() {
   return TRUE;
 }
 
-void Taiga::Uninitialize() {
+void App::Uninitialize() {
   // Announce
-  if (play_status == PLAYSTATUS_PLAYING) {
-    play_status = PLAYSTATUS_STOPPED;
+  if (play_status == kPlayStatusPlaying) {
+    play_status = kPlayStatusStopped;
     Announcer.Do(ANNOUNCE_TO_HTTP);
   }
   Announcer.Clear(ANNOUNCE_TO_MESSENGER | ANNOUNCE_TO_SKYPE);
@@ -122,9 +113,7 @@ void Taiga::Uninitialize() {
   PostQuitMessage();
 }
 
-// =============================================================================
-
-void Taiga::LoadData() {
+void App::LoadData() {
   MediaPlayers.Load();
 
   if (Settings.Load())
@@ -139,3 +128,5 @@ void Taiga::LoadData() {
 
   History.Load();
 }
+
+}  // namespace taiga

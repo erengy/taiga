@@ -142,7 +142,7 @@ void EventQueue::Add(EventItem& item, bool save) {
       anime::Episode episode;
       episode.anime_id = anime->GetId();
       episode.number = ToWstr(*item.episode);
-      Taiga.play_status = PLAYSTATUS_UPDATED;
+      Taiga.play_status = taiga::kPlayStatusUpdated;
       Announcer.Do(ANNOUNCE_TO_HTTP | ANNOUNCE_TO_TWITTER, &episode);
     }
 

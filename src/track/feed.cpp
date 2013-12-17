@@ -249,7 +249,7 @@ bool Aggregator::Notify(const Feed& feed) {
 
   tip_text += L"Click to see all.";
   tip_text = LimitText(tip_text, 255);
-  Taiga.current_tip_type = TIPTYPE_TORRENT;
+  Taiga.current_tip_type = taiga::kTipTypeTorrent;
   Taskbar.Tip(L"", L"", 0);
   Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
   

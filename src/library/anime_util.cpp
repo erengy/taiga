@@ -211,7 +211,7 @@ void StartWatching(Item& item, Episode& episode) {
     item.AddtoUserList();
 
   // Change status
-  Taiga.play_status = PLAYSTATUS_PLAYING;
+  Taiga.play_status = taiga::kPlayStatusPlaying;
   item.SetPlaying(true);
 
   // Update now playing window
@@ -238,7 +238,7 @@ void StartWatching(Item& item, Episode& episode) {
   
   // Show balloon tip
   if (Settings.Program.Notifications.recognized) {
-    Taiga.current_tip_type = TIPTYPE_NOWPLAYING;
+    Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
     Taskbar.Tip(L"", L"", 0);
     Taskbar.Tip(ReplaceVariables(Settings.Program.Notifications.format, episode).c_str(), 
                 L"Now Playing", NIIF_INFO);
@@ -269,7 +269,7 @@ void StartWatching(Item& item, Episode& episode) {
 
 void EndWatching(Item& item, Episode episode) {
   // Change status
-  Taiga.play_status = PLAYSTATUS_STOPPED;
+  Taiga.play_status = taiga::kPlayStatusStopped;
   item.SetPlaying(false);
   
   // Announce

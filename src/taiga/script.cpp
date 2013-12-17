@@ -376,9 +376,9 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
           REPLACE(L"user", ENCODE(Settings.Account.MAL.user));
           REPLACE(L"manual", is_manual ? L"true" : L"");
           switch (Taiga.play_status) {
-            case PLAYSTATUS_STOPPED: REPLACE(L"playstatus", L"stopped"); break;
-            case PLAYSTATUS_PLAYING: REPLACE(L"playstatus", L"playing"); break;
-            case PLAYSTATUS_UPDATED: REPLACE(L"playstatus", L"updated"); break;
+            case taiga::kPlayStatusStopped: REPLACE(L"playstatus", L"stopped"); break;
+            case taiga::kPlayStatusPlaying: REPLACE(L"playstatus", L"playing"); break;
+            case taiga::kPlayStatusUpdated: REPLACE(L"playstatus", L"updated"); break;
           }
         } else {
           pos_var = pos_end + 1;

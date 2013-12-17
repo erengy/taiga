@@ -45,6 +45,7 @@
 #include "base/string.h"
 #include "path.h"
 #include "taiga.h"
+#include "version.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "base/xml.h"

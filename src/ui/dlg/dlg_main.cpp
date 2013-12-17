@@ -659,7 +659,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           if (Settings.Program.Notifications.notrecognized) {
             wstring tip_text = ReplaceVariables(Settings.Program.Notifications.format, CurrentEpisode);
             tip_text += L"\nClick here to view similar titles for this anime.";
-            Taiga.current_tip_type = TIPTYPE_NOWPLAYING;
+            Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
             Taskbar.Tip(L"", L"", 0);
             Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
           }
@@ -753,26 +753,26 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case NIN_BALLOONTIMEOUT: {
-        Taiga.current_tip_type = TIPTYPE_DEFAULT;
+        Taiga.current_tip_type = taiga::kTipTypeDefault;
         break;
       }
       case NIN_BALLOONUSERCLICK: {
         switch (Taiga.current_tip_type) {
-          case TIPTYPE_NOWPLAYING:
+          case taiga::kTipTypeNowPlaying:
             navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
             break;
-          case TIPTYPE_SEARCH:
+          case taiga::kTipTypeSearch:
             ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
             break;
-          case TIPTYPE_TORRENT:
+          case taiga::kTipTypeTorrent:
             navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
             break;
-          case TIPTYPE_UPDATEFAILED:
+          case taiga::kTipTypeUpdateFailed:
             History.queue.Check(false);
             break;
         }
         ActivateWindow(GetWindowHandle());
-        Taiga.current_tip_type = TIPTYPE_DEFAULT;
+        Taiga.current_tip_type = taiga::kTipTypeDefault;
         break;
       }
       case WM_LBUTTONUP:

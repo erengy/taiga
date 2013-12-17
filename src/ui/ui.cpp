@@ -243,7 +243,7 @@ void OnLibraryUpdateFailure(int id, const string_t& reason) {
     text += L"Reason: " + reason + L"\n";
   text += L"Click to try again.";
 
-  Taiga.current_tip_type = TIPTYPE_UPDATEFAILED;
+  Taiga.current_tip_type = taiga::kTipTypeUpdateFailed;
 
   Taskbar.Tip(L"", L"", 0);  // clear previous tips
   Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
