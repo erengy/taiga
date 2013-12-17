@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,34 +16,28 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
 #include <cmath>
 
-#include "update.h"
-
-#include "base/common.h"
 #include "base/file.h"
 #include "base/foreach.h"
-#include "settings.h"
 #include "base/string.h"
-#include "base/types.h"
-#include "taiga.h"
 #include "base/xml.h"
+#include "settings.h"
+#include "taiga.h"
+#include "update.h"
 
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_update.h"
 
 #include "win/win_taskdialog.h"
 
-// =============================================================================
+namespace taiga {
 
 UpdateHelper::UpdateHelper()
     : app_(nullptr),
       restart_required_(false),
       update_available_(false) {
 }
-
-// =============================================================================
 
 void UpdateHelper::Cancel() {
   ConnectionManager.CancelRequest(client_uuid_);
@@ -66,25 +60,20 @@ bool UpdateHelper::Check(win::App& app) {
 }
 
 bool UpdateHelper::ParseData(wstring data) {
-  // Reset values
   items_.clear();
   download_path_.clear();
   latest_guid_.clear();
   restart_required_ = false;
   update_available_ = false;
-  
-  // Load XML data
-  xml_document doc;
-  xml_parse_result result = doc.load(data.c_str());
-  if (result.status != pugi::status_ok) {
+
+  xml_document document;
+  xml_parse_result parse_result = document.load(data.c_str());
+
+  if (parse_result.status != pugi::status_ok)
     return false;
-  }
 
-  // Read channel information
-  xml_node channel = doc.child(L"rss").child(L"channel");
-
-  // Read items
-  for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
+  xml_node channel = document.child(L"rss").child(L"channel");
+  foreach_xmlnode_(item, channel, L"item") {
     items_.resize(items_.size() + 1);
     items_.back().guid = XmlReadStrValue(item, L"guid");
     items_.back().category = XmlReadStrValue(item, L"category");
@@ -93,7 +82,6 @@ bool UpdateHelper::ParseData(wstring data) {
     items_.back().pub_date = XmlReadStrValue(item, L"pubDate");
   }
 
-  // Get version information
   auto current_version = GetVersionValue(app_->GetVersionMajor(),
                                          app_->GetVersionMinor(),
                                          app_->GetVersionRevision());
@@ -110,7 +98,6 @@ bool UpdateHelper::ParseData(wstring data) {
     }
   }
 
-  // Compare version information
   if (latest_version > current_version)
     update_available_ = true;
 
@@ -131,7 +118,8 @@ bool UpdateHelper::IsDownloadAllowed() const {
 
   if (IsUpdateAvailable()) {
     auto feed_item = FindItem(latest_guid_);
-    if (!feed_item) return false;
+    if (!feed_item)
+      return false;
 
     dlg.SetMainInstruction(L"A new version of Taiga is available!");
     wstring content = L"Latest version: " + latest_guid_;
@@ -143,7 +131,7 @@ bool UpdateHelper::IsDownloadAllowed() const {
     dlg.Show(UpdateDialog.GetWindowHandle());
     if (dlg.GetSelectedButtonID() != IDYES)
       return false;
-  
+
   } else {
     if (MainDialog.IsWindow()) {
       dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
@@ -158,14 +146,14 @@ bool UpdateHelper::IsDownloadAllowed() const {
 
 bool UpdateHelper::Download() {
   auto feed_item = FindItem(latest_guid_);
-  if (!feed_item) return false;
+  if (!feed_item)
+    return false;
 
-  // TODO: Use TEMP folder path
   download_path_ = AddTrailingSlash(GetPathOnly(app_->GetModulePath()));
   download_path_ += GetFileName(feed_item->link);
 
   win::http::Url url(feed_item->link);
-  
+
   HttpRequest http_request;
   http_request.host = url.host;
   http_request.path = url.path;
@@ -181,7 +169,8 @@ bool UpdateHelper::Download() {
 
 bool UpdateHelper::RunInstaller() {
   auto feed_item = FindItem(latest_guid_);
-  if (!feed_item) return false;
+  if (!feed_item)
+    return false;
 
   // /S runs the installer silently, /D overrides the default installation
   // directory. Do not rely on the current directory here, as it isn't
@@ -189,6 +178,7 @@ bool UpdateHelper::RunInstaller() {
   wstring parameters = L"/S /D=" + GetPathOnly(app_->GetModulePath());
 
   restart_required_ = Execute(download_path_, parameters);
+
   return restart_required_;
 }
 
@@ -209,3 +199,5 @@ unsigned long UpdateHelper::GetVersionValue(int major, int minor, int revision) 
          (minor * static_cast<unsigned long>(pow(10.0, 8))) +
          revision;
 }
+
+}  // namespace taiga

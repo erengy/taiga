@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,15 +16,19 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef UPDATE_H
-#define UPDATE_H
+#ifndef TAIGA_TAIGA_UPDATE_H
+#define TAIGA_TAIGA_UPDATE_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
+
 #include "track/feed.h"
-#include "http.h"
-#include "win/win_main.h"
 
-// =============================================================================
+namespace win {
+class App;
+}
+
+namespace taiga {
 
 class UpdateHelper {
 public:
@@ -39,19 +43,21 @@ public:
   bool IsUpdateAvailable() const;
   bool ParseData(wstring data);
   bool RunInstaller();
-  void SetDownloadPath(const wstring& path);
+  void SetDownloadPath(const std::wstring& path);
 
 private:
-  const GenericFeedItem* FindItem(const wstring& guid) const;
+  const GenericFeedItem* FindItem(const std::wstring& guid) const;
   unsigned long GetVersionValue(int major, int minor, int revision) const;
 
   win::App* app_;
-  vector<GenericFeedItem> items_;
-  wstring download_path_;
-  wstring latest_guid_;
+  std::vector<GenericFeedItem> items_;
+  std::wstring download_path_;
+  std::wstring latest_guid_;
   bool restart_required_;
   bool update_available_;
-  wstring client_uuid_;
+  std::wstring client_uuid_;
 };
 
-#endif // UPDATE_H
+}  // namespace taiga
+
+#endif  // TAIGA_TAIGA_UPDATE_H
