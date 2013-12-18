@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,36 +16,33 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
 #include "api.h"
-
-#include "library/anime_episode.h"
-#include "base/common.h"
+#include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
+#include "library/anime_episode.h"
 #include "taiga/script.h"
 
-class Api TaigaApi;
+taiga::Api TaigaApi;
 
-// =============================================================================
+namespace taiga {
 
 Api::Api() {
   // Register window messages
-  wm_attach = ::RegisterWindowMessage(L"TaigaApiAttach");
-  wm_detach = ::RegisterWindowMessage(L"TaigaApiDetach");
-  wm_ready = ::RegisterWindowMessage(L"TaigaApiReady");
-  wm_quit = ::RegisterWindowMessage(L"TaigaApiQuit");
+  wm_attach_ = ::RegisterWindowMessage(L"TaigaApiAttach");
+  wm_detach_ = ::RegisterWindowMessage(L"TaigaApiDetach");
+  wm_ready_ = ::RegisterWindowMessage(L"TaigaApiReady");
+  wm_quit_ = ::RegisterWindowMessage(L"TaigaApiQuit");
 }
 
 Api::~Api() {
   // Destroy API window
-  TaigaApi.BroadcastMessage(TaigaApi.wm_quit);
+  TaigaApi.BroadcastMessage(TaigaApi.wm_quit_);
   window.Destroy();
 }
 
 void Api::Announce(anime::Episode& episode) {
-  for (auto it = handles.begin(); it != handles.end(); ++it) {
+  foreach_(it, handles) {
     // Validate window
     if (!::IsWindow(it->first)) {
       it = handles.erase(it);
@@ -72,18 +69,18 @@ void Api::Announce(anime::Episode& episode) {
 
 void Api::BroadcastMessage(UINT message) {
   PDWORD_PTR result = nullptr;
-  SendMessageTimeout(HWND_BROADCAST, message, 
-                     reinterpret_cast<WPARAM>(window.GetWindowHandle()), 
+  SendMessageTimeout(HWND_BROADCAST, message,
+                     reinterpret_cast<WPARAM>(window.GetWindowHandle()),
                      0, SMTO_NORMAL, 100, result);
 }
 
 void Api::Create() {
   // Create API window
   window.Create();
-  TaigaApi.BroadcastMessage(TaigaApi.wm_ready);
+  TaigaApi.BroadcastMessage(TaigaApi.wm_ready_);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void Api::Window::PreRegisterClass(WNDCLASSEX& wc) {
   wc.lpszClassName = L"TaigaApiW";
@@ -94,21 +91,24 @@ void Api::Window::PreCreate(CREATESTRUCT& cs) {
   cs.style = WS_OVERLAPPEDWINDOW;
 }
 
-LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg,
+                                WPARAM wParam, LPARAM lParam) {
   HWND hwnd_app = reinterpret_cast<HWND>(wParam);
 
   // Attach a handle
-  if (uMsg == TaigaApi.wm_attach) {
+  if (uMsg == TaigaApi.wm_attach_) {
     TaigaApi.handles[hwnd_app] = L"";
-    LOG(LevelDebug, L"Attached handle: " + ToWstr(reinterpret_cast<int>(hwnd_app)));
+    LOG(LevelDebug, L"Attached handle: " +
+                    ToWstr(reinterpret_cast<int>(hwnd_app)));
     return TRUE;
   }
   // Detach a handle
-  if (uMsg == TaigaApi.wm_detach) {
+  if (uMsg == TaigaApi.wm_detach_) {
     auto it = TaigaApi.handles.find(hwnd_app);
     if (it != TaigaApi.handles.end()) {
       TaigaApi.handles.erase(it);
-      LOG(LevelDebug, L"Detached handle: " + ToWstr(reinterpret_cast<int>(hwnd_app)));
+      LOG(LevelDebug, L"Detached handle: " +
+                      ToWstr(reinterpret_cast<int>(hwnd_app)));
       return TRUE;
     } else {
       return FALSE;
@@ -120,10 +120,13 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     auto cds = reinterpret_cast<COPYDATASTRUCT*>(lParam);
     string format = reinterpret_cast<char*>(cds->lpData);
     TaigaApi.handles[hwnd_app] = StrToWstr(format);
-    LOG(LevelDebug, L"New format for " + ToWstr(reinterpret_cast<int>(hwnd_app)) +
+    LOG(LevelDebug, L"New format for " +
+                    ToWstr(reinterpret_cast<int>(hwnd_app)) +
                     L": \"" + TaigaApi.handles[hwnd_app] + L"\"");
     return TRUE;
   }
-  
+
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
+
+}  // namespace taiga

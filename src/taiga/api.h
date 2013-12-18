@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,10 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_API_H
-#define TAIGA_API_H
+#ifndef TAIGA_TAIGA_API_H
+#define TAIGA_TAIGA_API_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
 
 #include "win/win_window.h"
 
@@ -27,27 +28,26 @@ namespace anime {
 class Episode;
 }
 
+namespace taiga {
+
 class Api {
 public:
   Api();
-  virtual ~Api();
+  ~Api();
 
   void Announce(anime::Episode& episode);
   void BroadcastMessage(UINT message);
   void Create();
 
 private:
-  std::map<HWND, wstring> handles;
+  std::map<HWND, std::wstring> handles;
 
-  UINT wm_attach;
-  UINT wm_detach;
-  UINT wm_ready;
-  UINT wm_quit;
+  UINT wm_attach_;
+  UINT wm_detach_;
+  UINT wm_ready_;
+  UINT wm_quit_;
 
   class Window : public win::Window {
-  public:
-    Window() {}
-    virtual ~Window() {}
   private:
     void PreRegisterClass(WNDCLASSEX& wc);
     void PreCreate(CREATESTRUCT& cs);
@@ -55,6 +55,8 @@ private:
   } window;
 };
 
-extern class Api TaigaApi;
+}  // namespace taiga
 
-#endif // TAIGA_API_H
+extern taiga::Api TaigaApi;
+
+#endif  // TAIGA_TAIGA_API_H
