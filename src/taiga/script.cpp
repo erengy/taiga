@@ -373,7 +373,7 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
           REPLACE(L"extra", ENCODE(episode.extras));
           REPLACE(L"file", ENCODE(episode.file));
           REPLACE(L"folder", ENCODE(episode.folder));
-          REPLACE(L"user", ENCODE(Settings.Account.MAL.user));
+          REPLACE(L"user", ENCODE(Settings[taiga::kSync_Service_Mal_Username]));
           REPLACE(L"manual", is_manual ? L"true" : L"");
           switch (Taiga.play_status) {
             case taiga::kPlayStatusStopped: REPLACE(L"playstatus", L"stopped"); break;

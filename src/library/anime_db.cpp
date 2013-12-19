@@ -246,7 +246,7 @@ void Database::UpdateItem(const Item& new_item) {
 bool Database::LoadList() {
   ClearUserData();
 
-  if (Settings.Account.MAL.user.empty())
+  if (Settings[taiga::kSync_Service_Mal_Username].empty())
     return false;
 
   xml_document document;

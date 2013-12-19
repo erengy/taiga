@@ -19,6 +19,7 @@
 #include "sync.h"
 #include "manager.h"
 
+#include "base/encryption.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -41,7 +42,7 @@ void AuthenticateUser() {
 void GetLibraryEntries() {
   Request request(kGetLibraryEntries);
   AddAuthenticationToRequest(request);
-  request.data[L"myanimelist-username"] = Settings.Account.MAL.user;
+  request.data[L"myanimelist-username"] = Settings[taiga::kSync_Service_Mal_Username];
   ServiceManager.MakeRequest(request);
 }
 
@@ -64,13 +65,13 @@ void Synchronize() {
   Taiga.logged_in = true;
 #endif
   if (!Taiga.logged_in) {
-    if (!Settings.Account.MAL.user.empty() &&
-        !Settings.Account.MAL.password.empty()) {
+    if (!Settings[taiga::kSync_Service_Mal_Username].empty() &&
+        !Settings[taiga::kSync_Service_Mal_Password].empty()) {
       // Log in
       MainDialog.ChangeStatus(L"Logging in...");
       MainDialog.EnableInput(false);
       AuthenticateUser();
-    } else if (!Settings.Account.MAL.user.empty()) {
+    } else if (!Settings[taiga::kSync_Service_Mal_Username].empty()) {
       // Download list
       MainDialog.ChangeStatus(L"Downloading anime list...");
       MainDialog.EnableInput(false);
@@ -140,8 +141,10 @@ void AddAuthenticationToRequest(Request& request) {
   Service& service = ServiceManager.service(kMyAnimeList);
 
   if (RequestNeedsAuthentication(request.type, kMyAnimeList)) {
-    request.data[service.canonical_name() + L"-username"] = Settings.Account.MAL.user;
-    request.data[service.canonical_name() + L"-password"] = Settings.Account.MAL.password;
+    request.data[service.canonical_name() + L"-username"] =
+        Settings[taiga::kSync_Service_Mal_Username];
+    request.data[service.canonical_name() + L"-password"] =
+        SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]);
   }
 }
 

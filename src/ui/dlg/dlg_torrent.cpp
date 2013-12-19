@@ -116,7 +116,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Check new torrents
     case 100: {
       MainDialog.edit.SetText(L"");
-      feed->Check(Settings.RSS.Torrent.source);
+      feed->Check(Settings[taiga::kTorrent_Discovery_Source]);
       /**
       #ifdef _DEBUG
       feed->Load();
@@ -282,7 +282,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               anime::SetFansubFilter(anime_id, group_name);
             }
           } else if (answer == L"MoreTorrents") {
-            Search(Settings.RSS.Torrent.search_url, feed_item->episode_data.title);
+            Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.title);
           } else if (answer == L"SearchMAL") {
             ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
           }
@@ -374,10 +374,6 @@ void TorrentDialog::RefreshList() {
 
   // Add items
   for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
-    if (Settings.RSS.Torrent.hide_unidentified &&
-        it->episode_data.anime_id <= anime::ID_UNKNOWN) {
-      continue;
-    }
     wstring title, number, video;
     int group = TORRENT_ANIME, icon = StatusToIcon(0);
     if (it->category == L"Batch" ||

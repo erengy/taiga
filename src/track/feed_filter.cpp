@@ -396,7 +396,7 @@ void FeedFilterManager::Cleanup() {
 }
 
 void FeedFilterManager::Filter(Feed& feed, bool preferences) {
-  if (!Settings.RSS.Torrent.Filters.global_enabled)
+  if (!Settings.GetBool(taiga::kTorrent_Filter_Enabled))
     return;
 
   foreach_(item, feed.items) {

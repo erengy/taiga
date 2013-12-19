@@ -338,11 +338,13 @@ bool Aggregator::SaveArchive() {
   xml_document document;
   xml_node archive_node = document.append_child(L"archive");
 
-  if (Settings.RSS.Torrent.Filters.archive_maxcount > 0) {
+  int max_count = Settings.GetInt(taiga::kTorrent_Filter_ArchiveMaxCount);
+
+  if (max_count > 0) {
     size_t length = file_archive.size();
     size_t i = 0;
-    if (length > Settings.RSS.Torrent.Filters.archive_maxcount)
-      i = length - Settings.RSS.Torrent.Filters.archive_maxcount;
+    if (length > max_count)
+      i = length - max_count;
     for ( ; i < file_archive.size(); i++) {
       xml_node xml_item = archive_node.append_child(L"item");
       xml_item.append_attribute(L"title") = file_archive[i].c_str();

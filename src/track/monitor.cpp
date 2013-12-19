@@ -223,8 +223,8 @@ void FolderMonitor::Enable(bool enabled) {
     // Clear folder data
     ClearFolders();
     // Add new folders
-    for (unsigned int i = 0; i < Settings.Folders.root.size(); i++) {
-      AddFolder(Settings.Folders.root[i]);
+    for (unsigned int i = 0; i < Settings.root_folders.size(); i++) {
+      AddFolder(Settings.root_folders[i]);
     }
     // Start monitoring again
     Start();

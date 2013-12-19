@@ -16,23 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "http.h"
-
-#include "base/std.h"
-#include "library/anime_db.h"
-#include "taiga/announce.h"
 #include "base/common.h"
 #include "base/file.h"
-#include "track/feed.h"
-#include "library/history.h"
 #include "base/logger.h"
-#include "sync/manager.h"
-#include "resource.h"
+#include "base/string.h"
+#include "http.h"
+#include "library/anime_db.h"
 #include "settings.h"
 #include "stats.h"
-#include "base/string.h"
+#include "sync/manager.h"
 #include "taiga.h"
-#include "ui/theme.h"
+#include "taiga/announce.h"
 #include "ui/ui.h"
 #include "version.h"
 
@@ -51,9 +45,9 @@ HttpClient::HttpClient()
       APP_NAME L"/" + ToWstr(VERSION_MAJOR) + L"." + ToWstr(VERSION_MINOR));
 
   // Make sure all new clients use the proxy settings
-  set_proxy(Settings.Program.Proxy.host,
-            Settings.Program.Proxy.user,
-            Settings.Program.Proxy.password);
+  set_proxy(Settings[kApp_Connection_ProxyHost],
+            Settings[kApp_Connection_ProxyUsername],
+            Settings[kApp_Connection_ProxyPassword]);
 }
 
 HttpClientMode HttpClient::mode() const {
@@ -138,7 +132,8 @@ void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
   client.MakeRequest(request);
 }
 
-void HttpManager::MakeRequest(HttpClient& client, HttpRequest& request, HttpClientMode mode) {
+void HttpManager::MakeRequest(HttpClient& client, HttpRequest& request,
+                              HttpClientMode mode) {
   client.set_mode(mode);
   client.MakeRequest(request);
 }
@@ -191,7 +186,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         bool success = feed->ExamineData();
         ui::OnFeedCheck(success);
         if (client.mode() == kHttpFeedCheckAuto) {
-          switch (Settings.RSS.Torrent.new_action) {
+          switch (Settings.GetInt(kTorrent_Discovery_NewAction)) {
             case 1:  // Notify
               Aggregator.Notify(*feed);
               break;
@@ -213,26 +208,27 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         file = feed->GetDataPath() + file + L".torrent";
         Aggregator.file_archive.push_back(feed_item->title);
         if (FileExists(file)) {
-          switch (Settings.RSS.Torrent.app_mode) {
+          switch (Settings.GetInt(kTorrent_Download_AppMode)) {
             case 1:  // Default application
               app_path = GetDefaultAppPath(L".torrent", L"");
               break;
             case 2:  // Custom application
-              app_path = Settings.RSS.Torrent.app_path;
+              app_path = Settings[kTorrent_Download_AppPath];
               break;
           }
-          if (Settings.RSS.Torrent.set_folder && InStr(app_path, L"utorrent", 0, true) > -1) {
+          if (Settings.GetBool(kTorrent_Download_UseAnimeFolder) &&
+              InStr(app_path, L"utorrent", 0, true) > -1) {
             wstring download_path;
-            if (Settings.RSS.Torrent.use_folder &&
-                FolderExists(Settings.RSS.Torrent.download_path)) {
-              download_path = Settings.RSS.Torrent.download_path;
+            if (Settings.GetBool(kTorrent_Download_FallbackOnFolder) &&
+                FolderExists(Settings[kTorrent_Download_Location])) {
+              download_path = Settings[kTorrent_Download_Location];
             }
             auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
             if (anime_item) {
               wstring anime_folder = anime_item->GetFolder();
               if (!anime_folder.empty() && FolderExists(anime_folder)) {
                 download_path = anime_folder;
-              } else if (Settings.RSS.Torrent.create_folder && !download_path.empty()) {
+              } else if (Settings.GetBool(kTorrent_Download_CreateSubfolder) && !download_path.empty()) {
                 anime_folder = anime_item->GetTitle();
                 ValidateFileName(anime_folder);
                 TrimRight(anime_folder, L".");
@@ -277,9 +273,9 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       bool success = false;
       OAuthParameters parameters = ::Twitter.oauth.ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty() && !parameters[L"oauth_token_secret"].empty()) {
-        Settings.Announce.Twitter.oauth_key = parameters[L"oauth_token"];
-        Settings.Announce.Twitter.oauth_secret = parameters[L"oauth_token_secret"];
-        Settings.Announce.Twitter.user = parameters[L"screen_name"];
+        Settings.Set(kShare_Twitter_OauthToken, parameters[L"oauth_token"]);
+        Settings.Set(kShare_Twitter_OauthSecret, parameters[L"oauth_token_secret"]);
+        Settings.Set(kShare_Twitter_Username, parameters[L"screen_name"]);
         success = true;
       }
       ui::OnTwitterAuth(success);

@@ -276,7 +276,8 @@ bool OnTwitterRequest(string_t& auth_pin) {
 
   InputDialog dlg;
   dlg.title = L"Twitter Authorization";
-  dlg.info = L"Please enter the PIN shown on the page after logging into Twitter:";
+  dlg.info = L"Please enter the PIN shown on the page after logging into "
+             L"Twitter:";
   dlg.Show();
 
   if (dlg.result == IDOK && !dlg.text.empty()) {
@@ -289,7 +290,8 @@ bool OnTwitterRequest(string_t& auth_pin) {
 
 void OnTwitterAuth(bool success) {
   ChangeStatusText(success ?
-      L"Taiga is now authorized to post to this Twitter account: " + Settings.Announce.Twitter.user :
+      L"Taiga is now authorized to post to this Twitter account: " +
+      Settings[taiga::kShare_Twitter_Username] :
       L"Twitter authorization failed.");
 
   SettingsDialog.RefreshTwitterLink();
@@ -304,7 +306,7 @@ void OnTwitterPost(bool success, const string_t& error) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnLogin() {
-  ChangeStatusText(L"Logged in as " + Settings.Account.MAL.user);
+  ChangeStatusText(L"Logged in as " + Settings[taiga::kSync_Service_Mal_Username]);
   UpdateAllMenus();
 
   MainDialog.UpdateTip();

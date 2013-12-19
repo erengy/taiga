@@ -153,7 +153,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       string_t username = response.data[L"myanimelist-username"];
       if (response.service_id == kMyAnimeList && !username.empty()) {
         // Update settings with the returned value for the correct letter case
-        Settings.Account.MAL.user = username;
+        Settings.Set(taiga::kSync_Service_Mal_Username, username);
       }
       Taiga.logged_in = true;
       ui::OnLogin();

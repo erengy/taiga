@@ -196,7 +196,7 @@ void EventQueue::Check(bool automatic) {
     items[index].reason = L"Not logged in";
     return;
   }
-  if (automatic && !Settings.Program.General.enable_sync) {
+  if (automatic && !Settings.GetBool(taiga::kApp_Option_EnableSync)) {
     items[index].reason = L"Synchronization is disabled";
     return;
   }
@@ -470,7 +470,7 @@ int AskForConfirmation(anime::Episode& episode) {
   // Show dialog
   dlg.Show(g_hMain);
   if (dlg.GetVerificationCheck())
-    Settings.Account.Update.ask_to_confirm = FALSE;
+    Settings.Set(taiga::kSync_Update_AskToConfirm, false);
   return dlg.GetSelectedButtonID();
 }
 

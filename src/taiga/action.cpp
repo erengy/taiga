@@ -178,7 +178,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // SearchAnime()
   } else if (action == L"SearchAnime") {
     if (body.empty()) return;
-    if (Settings.Account.MAL.user.empty() || Settings.Account.MAL.password.empty()) {
+    if (Settings[taiga::kSync_Service_Mal_Username].empty() || Settings[taiga::kSync_Service_Mal_Password].empty()) {
       win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
       dlg.SetMainInstruction(L"Would you like to set your account information first?");
       dlg.SetContent(L"Anime search requires authentication, which means, "
@@ -203,8 +203,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
 
   // ShowSidebar()
   } else if (action == L"ShowSidebar") {
-    Settings.Program.General.hide_sidebar = !Settings.Program.General.hide_sidebar;
-    MainDialog.treeview.Show(!Settings.Program.General.hide_sidebar);
+    bool hide_sidebar = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
+    Settings.Set(taiga::kApp_Option_HideSidebar, hide_sidebar);
+    MainDialog.treeview.Show(hide_sidebar);
     MainDialog.UpdateControlPositions();
     UpdateViewMenu();
 
@@ -285,8 +286,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"AddFolder") {
     wstring path;
     if (BrowseForFolder(g_hMain, L"Please select a folder:", L"", path)) {
-      Settings.Folders.root.push_back(path);
-      if (Settings.Folders.watch_enabled) FolderMonitor.Enable();
+      Settings.root_folders.push_back(path);
+      if (Settings.GetBool(taiga::kLibrary_WatchFolders))
+        FolderMonitor.Enable();
       ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
     }
 
@@ -301,23 +303,26 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleRecognition()
   //   Enables or disables anime recognition.
   } else if (action == L"ToggleRecognition") {
-    Settings.Program.General.enable_recognition = !Settings.Program.General.enable_recognition;
-    if (Settings.Program.General.enable_recognition) {
+    bool enable_recognition = !Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+    Settings.Set(taiga::kApp_Option_EnableRecognition, enable_recognition);
+    if (enable_recognition) {
       MainDialog.ChangeStatus(L"Automatic anime recognition is now enabled.");
       CurrentEpisode.Set(anime::ID_UNKNOWN);
     } else {
       MainDialog.ChangeStatus(L"Automatic anime recognition is now disabled.");
       auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
       CurrentEpisode.Set(anime::ID_NOTINLIST);
-      if (anime_item) EndWatching(*anime_item, CurrentEpisode);
+      if (anime_item)
+        EndWatching(*anime_item, CurrentEpisode);
     }
 
   // ToggleSharing()
   //   Enables or disables automatic sharing.
   } else if (action == L"ToggleSharing") {
-    Settings.Program.General.enable_sharing = !Settings.Program.General.enable_sharing;
+    bool enable_sharing = !Settings.GetBool(taiga::kApp_Option_EnableSharing);
+    Settings.Set(taiga::kApp_Option_EnableSharing, enable_sharing);
     UpdateToolsMenu();
-    if (Settings.Program.General.enable_sharing) {
+    if (enable_sharing) {
       MainDialog.ChangeStatus(L"Automatic sharing is now enabled.");
     } else {
       MainDialog.ChangeStatus(L"Automatic sharing is now disabled.");
@@ -326,9 +331,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleSynchronization()
   //   Enables or disables automatic list synchronization.
   } else if (action == L"ToggleSynchronization") {
-    Settings.Program.General.enable_sync = !Settings.Program.General.enable_sync;
+    bool enable_sync = !Settings.GetBool(taiga::kApp_Option_EnableSync);
+    Settings.Set(taiga::kApp_Option_EnableSync, enable_sync);
     UpdateToolsMenu();
-    if (Settings.Program.General.enable_sync) {
+    if (enable_sync) {
       MainDialog.ChangeStatus(L"Automatic synchronization is now enabled.");
     } else {
       MainDialog.ChangeStatus(L"Automatic synchronization is now disabled.");
@@ -569,8 +575,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       dlg.Show(g_hMain);
       if (dlg.GetSelectedButtonID() == IDYES) {
         wstring default_path, path;
-        if (!Settings.Folders.root.empty())
-          default_path = Settings.Folders.root.front();
+        if (!Settings.root_folders.empty())
+          default_path = Settings.root_folders.front();
         if (BrowseForFolder(g_hMain, L"Choose an anime folder", default_path, path)) {
           anime_item->SetFolder(path);
           Settings.Save();

@@ -144,7 +144,7 @@ wstring SearchFileFolder(anime::Item& anime_item, const wstring& root,
 
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
   // Check if any root folder is available
-  if (!silent && Settings.Folders.root.empty()) {
+  if (!silent && Settings.root_folders.empty()) {
     win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
     dlg.SetContent(L"You need to have at least one root folder set before scanning available episodes.");
@@ -156,7 +156,7 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
     return;
   }
 
-  int episode_number = Settings.Program.List.progress_show_available ? -1 : 0;
+  int episode_number = Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable) ? -1 : 0;
 
   // Search for all list items
   if (!anime_id) {

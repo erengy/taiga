@@ -81,7 +81,7 @@ BOOL App::InitInstance() {
   ::Skype.Create();
   TaigaApi.Create();
 
-  if (Settings.Program.StartUp.check_new_version) {
+  if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
     // Create update dialog
     ExecuteAction(L"CheckUpdates");
   } else {

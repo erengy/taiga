@@ -68,13 +68,13 @@ std::wstring GetPath(PathType type) {
     case kPathTheme:
       return data_path + L"theme\\";
     case kPathThemeCurrent:
-      return data_path + L"theme\\" + Settings.Program.General.theme + L"\\theme.xml";
+      return data_path + L"theme\\" + Settings[kApp_Interface_Theme] + L"\\theme.xml";
     case kPathUser:
       return data_path + L"user\\";
     case kPathUserHistory:
-      return data_path + L"user\\" + Settings.Account.MAL.user + L"\\history.xml";
+      return data_path + L"user\\" + Settings[kSync_Service_Mal_Username] + L"\\history.xml";
     case kPathUserLibrary:
-      return data_path + L"user\\" + Settings.Account.MAL.user + L"\\anime.xml";
+      return data_path + L"user\\" + Settings[kSync_Service_Mal_Username] + L"\\anime.xml";
   }
 }
 

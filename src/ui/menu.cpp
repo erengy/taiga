@@ -144,7 +144,7 @@ void UpdateExternalLinksMenu() {
     MENU.Items.clear();
 
     vector<wstring> lines;
-    Split(Settings.Program.General.external_links, L"\r\n", lines);
+    Split(Settings[taiga::kApp_Interface_ExternalLinks], L"\r\n", lines);
     for (auto line = lines.begin(); line != lines.end(); ++line) {
       if (IsEqual(*line, L"-")) {
         // Add separator
@@ -166,10 +166,10 @@ void UpdateFoldersMenu() {
     // Clear menu
     MENU.Items.clear();
 
-    if (!Settings.Folders.root.empty()) {
+    if (!Settings.root_folders.empty()) {
       // Add folders
-      for (unsigned int i = 0; i < Settings.Folders.root.size(); i++) {
-        MENU.CreateItem(L"Execute(" + Settings.Folders.root[i] + L")", Settings.Folders.root[i]);
+      for (unsigned int i = 0; i < Settings.root_folders.size(); i++) {
+        MENU.CreateItem(L"Execute(" + Settings.root_folders[i] + L")", Settings.root_folders[i]);
       }
       // Add separator
       MENU.CreateItem();
@@ -252,13 +252,13 @@ void UpdateToolsMenu() {
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       // Tools > Enable anime recognition
       if (MENU.Items[i].Action == L"ToggleRecognition()")
-        MENU.Items[i].Checked = Settings.Program.General.enable_recognition == TRUE;
+        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
       // Tools > Enable auto sharing
       if (MENU.Items[i].Action == L"ToggleSharing()")
-        MENU.Items[i].Checked = Settings.Program.General.enable_sharing == TRUE;
+        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
       // Tools > Enable auto synchronization
       if (MENU.Items[i].Action == L"ToggleSynchronization()")
-        MENU.Items[i].Checked = Settings.Program.General.enable_sync == TRUE;
+        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
     }
   }
 }
@@ -269,7 +269,7 @@ void UpdateTrayMenu() {
     // Tray > Enable recognition
     for (unsigned int i = 0; i < MENU.Items.size(); i++) {
       if (MENU.Items[i].Action == L"ToggleRecognition()") {
-        MENU.Items[i].Checked = Settings.Program.General.enable_recognition == TRUE;
+        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
         break;
       }
     }
@@ -291,7 +291,7 @@ void UpdateViewMenu() {
         break;
       }
     }
-    MENU.Items.back().Checked = Settings.Program.General.hide_sidebar == FALSE;
+    MENU.Items.back().Checked = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
   }
 }
 

@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,145 +16,166 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef TAIGA_TAIGA_SETTINGS_H
+#define TAIGA_TAIGA_SETTINGS_H
 
-#include "base/std.h"
-#include "track/feed.h"
-#include "base/optional.h"
+#include <string>
+#include <vector>
 
-// =============================================================================
+namespace pugi {
+class xml_node;
+}
 
-class Settings {
+namespace taiga {
+
+enum AppSettingName {
+  kAppSettingNameFirst = 0,  // used for iteration
+
+  // Meta
+  kMeta_Version_Major = 0,
+  kMeta_Version_Minor,
+  kMeta_Version_Revision,
+
+  // Services
+  kSync_AutoOnStart,
+  kSync_Service_Mal_Username,
+  kSync_Service_Mal_Password,
+
+  // Library
+  kLibrary_WatchFolders,
+
+  // Application
+  kApp_List_DoubleClickAction,
+  kApp_List_MiddleClickAction,
+  kApp_List_DisplayEnglishTitles,
+  kApp_List_HighlightNewEpisodes,
+  kApp_List_ProgressDisplayAired,
+  kApp_List_ProgressDisplayAvailable,
+  kApp_Behavior_Autostart,
+  kApp_Behavior_StartMinimized,
+  kApp_Behavior_CheckForUpdates,
+  kApp_Behavior_ScanAvailableEpisodes,
+  kApp_Behavior_CloseToTray,
+  kApp_Behavior_MinimizeToTray,
+  kApp_Connection_ProxyHost,
+  kApp_Connection_ProxyUsername,
+  kApp_Connection_ProxyPassword,
+  kApp_Interface_Theme,
+  kApp_Interface_ExternalLinks,
+
+  // Recognition
+  kSync_Update_Delay,
+  kSync_Update_AskToConfirm,
+  kSync_Update_CheckPlayer,
+  kSync_Update_GoToNowPlaying,
+  kSync_Update_OutOfRange,
+  kSync_Update_OutOfRoot,
+  kSync_Update_WaitPlayer,
+  kSync_Notify_Recognized,
+  kSync_Notify_NotRecognized,
+  kSync_Notify_Format,
+  kStream_Ann,
+  kStream_Crunchyroll,
+  kStream_Veoh,
+  kStream_Viz,
+  kStream_Youtube,
+
+  // Sharing
+  kShare_Http_Enabled,
+  kShare_Http_Format,
+  kShare_Http_Url,
+  kShare_Messenger_Enabled,
+  kShare_Messenger_Format,
+  kShare_Mirc_Enabled,
+  kShare_Mirc_MultiServer,
+  kShare_Mirc_UseMeAction,
+  kShare_Mirc_Mode,
+  kShare_Mirc_Channels,
+  kShare_Mirc_Format,
+  kShare_Mirc_Service,
+  kShare_Skype_Enabled,
+  kShare_Skype_Format,
+  kShare_Twitter_Enabled,
+  kShare_Twitter_Format,
+  kShare_Twitter_OauthToken,
+  kShare_Twitter_OauthSecret,
+  kShare_Twitter_Username,
+
+  // Torrents
+  kTorrent_Discovery_Source,
+  kTorrent_Discovery_SearchUrl,
+  kTorrent_Discovery_AutoCheckEnabled,
+  kTorrent_Discovery_AutoCheckInterval,
+  kTorrent_Discovery_NewAction,
+  kTorrent_Download_AppMode,
+  kTorrent_Download_AppPath,
+  kTorrent_Download_Location,
+  kTorrent_Download_UseAnimeFolder,
+  kTorrent_Download_FallbackOnFolder,
+  kTorrent_Download_CreateSubfolder,
+  kTorrent_Filter_Enabled,
+  kTorrent_Filter_ArchiveMaxCount,
+
+  // Internal
+  kApp_Position_X,
+  kApp_Position_Y,
+  kApp_Position_W,
+  kApp_Position_H,
+  kApp_Position_Maximized,
+  kApp_Position_Remember,
+  kApp_Option_HideSidebar,
+  kApp_Option_EnableRecognition,
+  kApp_Option_EnableSharing,
+  kApp_Option_EnableSync,
+
+  kAppSettingNameLast  // used for iteration
+};
+
+class Setting {
 public:
+  Setting() {}
+  Setting(bool attribute, const std::wstring& path);
+  Setting(bool attribute, const std::wstring& default_value, const std::wstring& path);
+  ~Setting() {}
+
+  bool attribute;
+  std::wstring default_value;
+  std::wstring path;
+  std::wstring value;
+};
+
+class AppSettings {
+public:
+  const std::wstring& operator[](AppSettingName name) const;
+
   bool Load();
   bool Save();
-  void ApplyChanges(const wstring& previous_user, const wstring& previous_theme);
+
+  bool GetBool(AppSettingName name) const;
+  int GetInt(AppSettingName name) const;
+  const std::wstring& GetWstr(AppSettingName name) const;
+
+  void Set(AppSettingName name, bool value);
+  void Set(AppSettingName name, int value);
+  void Set(AppSettingName name, const std::wstring& value);
+
+  void ApplyChanges(const std::wstring& previous_user, const std::wstring& previous_theme);
   void HandleCompatibility();
   void RestoreDefaults();
 
-  // Meta
-  struct Meta {
-    struct Version {
-      int major, minor, revision;
-    } Version;
-  } Meta;
+  std::vector<std::wstring> root_folders;
 
-  // Account
-  struct Account {
-    // MyAnimeList
-    struct Mal {
-      BOOL auto_sync;
-      wstring password, user;
-    } MAL;
-    // Update
-    struct Update {
-      int delay;
-      BOOL ask_to_confirm, check_player, go_to_nowplaying, out_of_range, out_of_root, wait_mp;
-    } Update;
-  } Account;
+private:
+  void InitializeKey(AppSettingName name, const wchar_t* default_value, const std::wstring& path);
+  void InitializeMap();
+  void ReadValue(const pugi::xml_node& node_parent, AppSettingName name);
+  void WriteValue(const pugi::xml_node& node_parent, AppSettingName name);
 
-  // Folders
-  struct Folders {
-    vector<wstring> root;
-    BOOL watch_enabled;
-  } Folders;
-  
-  // Announcements
-  struct Announce {
-    // HTTP
-    struct Http {
-      BOOL enabled;
-      wstring format, url;
-    } HTTP;
-    // Messenger
-    struct Msn {
-      BOOL enabled;
-      wstring format;
-    } MSN;
-    // mIRC
-    struct Mirc {
-      BOOL enabled, multi_server, use_action;
-      int mode;
-      wstring channels, format, service;
-    } MIRC;
-    // Skype
-    struct Skype {
-      BOOL enabled;
-      wstring format;
-    } Skype;
-    // Twitter
-    struct Twitter {
-      BOOL enabled;
-      wstring format, oauth_key, oauth_secret, user;
-    } Twitter;
-  } Announce;
-
-  // Program
-  struct Program {
-    // General
-    struct General {
-      BOOL hide_sidebar;
-      BOOL enable_recognition, enable_sharing, enable_sync;
-      BOOL auto_start, close, minimize;
-      wstring external_links, theme;
-    } General;
-    // Position
-    struct Position {
-      int x, y, w, h;
-      BOOL maximized;
-    } Position;
-    // Start-up
-    struct StartUp {
-      BOOL check_new_episodes, check_new_version, minimize;
-    } StartUp;
-    // Exit
-    struct Exit {
-      BOOL remember_pos_size;
-    } Exit;
-    // Proxy
-    struct Proxy {
-      wstring host, password, user;
-    } Proxy;
-    // List
-    struct List {
-      int double_click, middle_click;
-      BOOL english_titles;
-      BOOL highlight;
-      BOOL progress_show_aired;
-      BOOL progress_show_available;
-    } List;
-    // Notifications
-    struct Notifications {
-      BOOL recognized, notrecognized;
-      wstring format;
-    } Notifications;
-  } Program;
-
-  // Recognition
-  struct Recognition {
-    // Streaming
-    struct Streaming {
-      bool ann_enabled, crunchyroll_enabled, veoh_enabled,
-        viz_enabled, youtube_enabled;
-    } Streaming;
-  } Recognition;
-
-  // RSS
-  struct Rss {
-    // Torrent
-    struct Torrent {
-      BOOL check_enabled, create_folder, hide_unidentified, set_folder, use_folder;
-      int app_mode, check_interval, new_action;
-      wstring app_path, download_path, search_url, source;
-      struct Filters {
-        BOOL global_enabled;
-        int archive_maxcount;
-      } Filters;
-    } Torrent;
-  } RSS;
+  std::map<AppSettingName, Setting> map_;
 };
 
-extern Settings Settings;
+}  // namespace taiga
 
-#endif // SETTINGS_H
+extern taiga::AppSettings Settings;
+
+#endif  // TAIGA_TAIGA_SETTINGS_H

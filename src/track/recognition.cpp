@@ -244,8 +244,8 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
   episode.file = title;
 
   // Ignore if the file is outside of root folders
-  if (Settings.Account.Update.out_of_root)
-    if (!episode.folder.empty() && !Settings.Folders.root.empty())
+  if (Settings.GetBool(taiga::kSync_Update_OutOfRoot))
+    if (!episode.folder.empty() && !Settings.root_folders.empty())
       if (!anime::IsInsideRootFolders(episode.folder))
         return false;
 

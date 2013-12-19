@@ -219,7 +219,7 @@ int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
-  if (Settings.Program.List.english_titles) {
+  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
     return CompareStrings(item1.GetEnglishTitle(true),
                           item2.GetEnglishTitle(true));
   } else {

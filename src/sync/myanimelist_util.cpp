@@ -48,7 +48,7 @@ void ViewAnimeSearch(const wstring& title) {
 }
 
 void ViewHistory() {
-  ExecuteLink(L"http://myanimelist.net/history/" + Settings.Account.MAL.user);
+  ExecuteLink(L"http://myanimelist.net/history/" + Settings[taiga::kSync_Service_Mal_Username]);
 }
 
 void ViewMessages() {
@@ -60,7 +60,7 @@ void ViewPanel() {
 }
 
 void ViewProfile() {
-  ExecuteLink(L"http://myanimelist.net/profile/" + Settings.Account.MAL.user);
+  ExecuteLink(L"http://myanimelist.net/profile/" + Settings[taiga::kSync_Service_Mal_Username]);
 }
 
 void ViewSeasonGroup() {

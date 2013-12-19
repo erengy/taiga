@@ -101,17 +101,17 @@ BOOL MainDialog::OnInitDialog() {
   UpdateAllMenus();
 
   // Apply start-up settings
-  if (Settings.Account.MAL.auto_sync) { 		
+  if (Settings.GetBool(taiga::kSync_AutoOnStart)) { 		
     ExecuteAction(L"Synchronize"); 		
   }
-  if (Settings.Program.StartUp.check_new_episodes) {
+  if (Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes)) {
     ScanAvailableEpisodes(anime::ID_UNKNOWN, false, true);
   }
-  if (!Settings.Program.StartUp.minimize) {
-    Show(Settings.Program.Exit.remember_pos_size && Settings.Program.Position.maximized ? 
+  if (!Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
+    Show(Settings.GetBool(taiga::kApp_Position_Remember) && Settings.GetBool(taiga::kApp_Position_Maximized) ? 
       SW_MAXIMIZE : SW_SHOWNORMAL);
   }
-  if (Settings.Account.MAL.user.empty()) {
+  if (Settings[taiga::kSync_Service_Mal_Username].empty()) {
     win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
     dlg.SetContent(L"Username is not set. Would you like to open settings window to set it now?");
@@ -121,7 +121,7 @@ BOOL MainDialog::OnInitDialog() {
     if (dlg.GetSelectedButtonID() == IDYES)
       ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAL);
   }
-  if (Settings.Folders.watch_enabled) {
+  if (Settings.GetBool(taiga::kLibrary_WatchFolders)) {
     FolderMonitor.SetWindowHandle(GetWindowHandle());
     FolderMonitor.Enable();
   }
@@ -161,7 +161,7 @@ void MainDialog::CreateDialogControls() {
   treeview.SetImageList(UI.ImgList16.GetHandle());
   treeview.SetItemHeight(20);
   treeview.SetTheme();
-  if (Settings.Program.General.hide_sidebar) {
+  if (Settings.GetBool(taiga::kApp_Option_HideSidebar)) {
     treeview.Hide();
   }
   // Create status bar
@@ -239,10 +239,10 @@ void MainDialog::InitWindowPosition() {
   win::Rect rcParent, rcWindow;
   ::GetWindowRect(GetParent(), &rcParent);
   rcWindow.Set(
-    Settings.Program.Position.x, 
-    Settings.Program.Position.y, 
-    Settings.Program.Position.x + Settings.Program.Position.w,
-    Settings.Program.Position.y + Settings.Program.Position.h);
+    Settings.GetInt(taiga::kApp_Position_X),
+    Settings.GetInt(taiga::kApp_Position_Y),
+    Settings.GetInt(taiga::kApp_Position_X) + Settings.GetInt(taiga::kApp_Position_W),
+    Settings.GetInt(taiga::kApp_Position_Y) + Settings.GetInt(taiga::kApp_Position_H));
 
   if (rcWindow.left < 0 || rcWindow.left >= rcParent.right || 
       rcWindow.top < 0 || rcWindow.top >= rcParent.bottom) {
@@ -261,8 +261,8 @@ void MainDialog::InitWindowPosition() {
     rcWindow.bottom = rcParent.top + rcParent.Height();
   }
   if (rcWindow.Width() > 0 && rcWindow.Height() > 0 && 
-      Settings.Program.Position.maximized == FALSE &&
-      Settings.Program.Exit.remember_pos_size == TRUE) {
+      !Settings.GetBool(taiga::kApp_Position_Maximized) &&
+      Settings.GetBool(taiga::kApp_Position_Remember)) {
     SetPosition(nullptr, rcWindow, flags);
     if (flags & SWP_NOMOVE) {
       CenterOwner();
@@ -338,7 +338,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
                 return TRUE;
               }
               case SEARCH_MODE_FEED: {
-                TorrentDialog.Search(Settings.RSS.Torrent.search_url, text);
+                TorrentDialog.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], text);
                 return TRUE;
               }
             }
@@ -384,7 +384,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
               if (feed) {
                 edit.SetText(L"");
-                feed->Check(Settings.RSS.Torrent.source);
+                feed->Check(Settings[taiga::kTorrent_Discovery_Source]);
                 return TRUE;
               }
               break;
@@ -444,7 +444,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
 // =============================================================================
 
 BOOL MainDialog::OnClose() {
-  if (Settings.Program.General.close) {
+  if (Settings.GetBool(taiga::kApp_Behavior_CloseToTray)) {
     Hide();
     return TRUE;
   }
@@ -453,17 +453,17 @@ BOOL MainDialog::OnClose() {
 }
 
 BOOL MainDialog::OnDestroy() {
-  if (Settings.Program.Exit.remember_pos_size) {
-    Settings.Program.Position.maximized = (GetWindowLong() & WS_MAXIMIZE) ? TRUE : FALSE;
-    if (Settings.Program.Position.maximized == FALSE) {
+  if (Settings.GetBool(taiga::kApp_Position_Remember)) {
+    Settings.Set(taiga::kApp_Position_Maximized, (GetWindowLong() & WS_MAXIMIZE) ? true : false);
+    if (!Settings.GetBool(taiga::kApp_Position_Maximized)) {
       bool invisible = !IsVisible();
       if (invisible) ActivateWindow(GetWindowHandle());
       win::Rect rcWindow; GetWindowRect(&rcWindow);
       if (invisible) Hide();
-      Settings.Program.Position.x = rcWindow.left;
-      Settings.Program.Position.y = rcWindow.top;
-      Settings.Program.Position.w = rcWindow.Width();
-      Settings.Program.Position.h = rcWindow.Height();
+      Settings.Set(taiga::kApp_Position_X, rcWindow.left);
+      Settings.Set(taiga::kApp_Position_Y, rcWindow.top);
+      Settings.Set(taiga::kApp_Position_W, rcWindow.Width());
+      Settings.Set(taiga::kApp_Position_H, rcWindow.Height());
     }
   }
 
@@ -484,7 +484,7 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
     anime::Episode episode;
     Meow.ExamineTitle(buffer, episode); 
-    MessageBox(ReplaceVariables(Settings.Program.Notifications.format, episode).c_str(), APP_TITLE, MB_OK);
+    MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), APP_TITLE, MB_OK);
   }
 #endif
 }
@@ -540,7 +540,8 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     }
     case WM_SIZE: {
       if (IsIconic()) {
-        if (Settings.Program.General.minimize) Hide();
+        if (Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray))
+          Hide();
         return;
       }
       UpdateControlPositions(&size);
@@ -590,7 +591,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   // ===========================================================================
   
   // Check new episodes (if folder monitor is disabled)
-  if (!Settings.Folders.watch_enabled) {
+  if (!Settings.GetBool(taiga::kLibrary_WatchFolders)) {
     Taiga.ticker_new_episodes++;
     if (Taiga.ticker_new_episodes >= 30 * 60) { // 30 minutes
       Taiga.ticker_new_episodes = 0;
@@ -604,16 +605,17 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   for (unsigned int i = 0; i < Aggregator.feeds.size(); i++) {
     switch (Aggregator.feeds[i].category) {
       case FEED_CATEGORY_LINK:
-        if (Settings.RSS.Torrent.check_enabled) {
+        if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled)) {
           Aggregator.feeds[i].ticker++;
         }
-        if (Settings.RSS.Torrent.check_enabled && Settings.RSS.Torrent.check_interval) {
+        if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled) &&
+            Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) > 0) {
           if (TorrentDialog.IsWindow()) {
             TorrentDialog.SetTimerText(L"Check new torrents [" + 
-              ToTimeString(Settings.RSS.Torrent.check_interval * 60 - Aggregator.feeds[i].ticker) + L"]");
+              ToTimeString(Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) * 60 - Aggregator.feeds[i].ticker) + L"]");
           }
-          if (Aggregator.feeds[i].ticker >= Settings.RSS.Torrent.check_interval * 60) {
-            Aggregator.feeds[i].Check(Settings.RSS.Torrent.source, true);
+          if (Aggregator.feeds[i].ticker >= Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) * 60) {
+            Aggregator.feeds[i].Check(Settings[taiga::kTorrent_Discovery_Source], true);
           }
         } else {
           if (TorrentDialog.IsWindow()) {
@@ -635,7 +637,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     // Started to watch?
     if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
       // Recognized?
-      if (Settings.Program.General.enable_recognition) {
+      if (Settings.GetBool(taiga::kApp_Option_EnableRecognition)) {
         if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
           anime_item = Meow.MatchDatabase(CurrentEpisode, false, true, true, true, true, true);
           if (anime_item) {
@@ -656,8 +658,8 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           NowPlayingDialog.SetCurrentId(anime::ID_NOTINLIST);
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
-          if (Settings.Program.Notifications.notrecognized) {
-            wstring tip_text = ReplaceVariables(Settings.Program.Notifications.format, CurrentEpisode);
+          if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
+            wstring tip_text = ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode);
             tip_text += L"\nClick here to view similar titles for this anime.";
             Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
             Taskbar.Tip(L"", L"", 0);
@@ -669,20 +671,20 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
     // Already watching or not recognized before
     } else {
       // Tick and compare with delay time
-      if (Taiga.ticker_media > -1 && Taiga.ticker_media <= Settings.Account.Update.delay) {
-        if (Taiga.ticker_media == Settings.Account.Update.delay) {
+      if (Taiga.ticker_media > -1 && Taiga.ticker_media <= Settings.GetInt(taiga::kSync_Update_Delay)) {
+        if (Taiga.ticker_media == Settings.GetInt(taiga::kSync_Update_Delay)) {
           // Disable ticker
           Taiga.ticker_media = -1;
           // Announce current episode
           Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToMessenger |
                        taiga::kAnnounceToMirc | taiga::kAnnounceToSkype);
           // Update
-          if (!Settings.Account.Update.wait_mp)
+          if (!Settings.GetBool(taiga::kSync_Update_WaitPlayer))
             if (anime_item)
               UpdateList(*anime_item, CurrentEpisode);
           return;
         }
-        if (Settings.Account.Update.check_player == FALSE || 
+        if (!Settings.GetBool(taiga::kSync_Update_CheckPlayer) ||
             MediaPlayers.items[media_index].window_handle == GetForegroundWindow())
           Taiga.ticker_media++;
       }
@@ -719,7 +721,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
       bool processed = CurrentEpisode.processed; // TODO: temporary solution...
       CurrentEpisode.Set(anime::ID_UNKNOWN);
       EndWatching(*anime_item, CurrentEpisode);
-      if (Settings.Account.Update.wait_mp) {
+      if (Settings.GetBool(taiga::kSync_Update_WaitPlayer)) {
         CurrentEpisode.anime_id = anime_item->GetId();
         CurrentEpisode.processed = processed;
         UpdateList(*anime_item, CurrentEpisode);
@@ -857,10 +859,10 @@ void MainDialog::UpdateStatusTimer() {
   win::Rect rect;
   GetClientRect(&rect);
 
-  int seconds = Settings.Account.Update.delay - Taiga.ticker_media;
+  int seconds = Settings.GetInt(taiga::kSync_Update_Delay) - Taiga.ticker_media;
 
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN && 
-      seconds > 0 && seconds < Settings.Account.Update.delay &&
+      seconds > 0 && seconds < Settings.GetInt(taiga::kSync_Update_Delay) &&
       IsUpdateAllowed(*AnimeDatabase.FindItem(CurrentEpisode.anime_id), CurrentEpisode, true)) {
     wstring str = L"List update in " + ToTimeString(seconds);
     statusbar.SetPartText(1, str.c_str());
@@ -893,13 +895,13 @@ void MainDialog::UpdateTitle() {
 #ifdef _DEBUG
   title += L" [debug]";
 #endif
-  if (!Settings.Account.MAL.user.empty()) {
-    title += L" \u2013 " + Settings.Account.MAL.user;
+  if (!Settings[taiga::kSync_Service_Mal_Username].empty()) {
+    title += L" \u2013 " + Settings[taiga::kSync_Service_Mal_Username];
   }
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     title += L" \u2013 " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
-    if (Settings.Account.Update.out_of_range &&
+    if (Settings.GetBool(taiga::kSync_Update_OutOfRange) &&
         GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
       title += L" (out of range)";
     }

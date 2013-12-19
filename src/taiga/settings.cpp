@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,9 +16,26 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
+#include "base/common.h"
+#include "base/file.h"
+#include "base/foreach.h"
+#include "base/logger.h"
+#include "base/string.h"
+#include "base/xml.h"
+#include "library/anime_db.h"
+#include "library/history.h"
+#include "path.h"
 #include "settings.h"
+#include "stats.h"
+#include "taiga.h"
+#include "track/media.h"
+#include "track/monitor.h"
+#include "ui/menu.h"
+#include "ui/theme.h"
+#include "version.h"
+
+#include "win/win_registry.h"
+#include "win/win_taskdialog.h"
 
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -28,476 +45,408 @@
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_stats.h"
 
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "library/anime_filter.h"
-#include "base/common.h"
-#include "base/encryption.h"
-#include "base/file.h"
-#include "base/foreach.h"
-#include "base/gfx.h"
-#include "library/history.h"
-#include "http.h"
-#include "base/logger.h"
-#include "track/media.h"
-#include "track/monitor.h"
-#include "stats.h"
-#include "base/string.h"
-#include "path.h"
-#include "taiga.h"
-#include "version.h"
-#include "ui/menu.h"
-#include "ui/theme.h"
-#include "base/xml.h"
+taiga::AppSettings Settings;
 
-#include "win/win_registry.h"
-#include "win/win_taskdialog.h"
+namespace taiga {
 
-#define DEFAULT_EXTERNALLINKS    L"Anime Recommendation Finder|http://www.animerecs.com\r\nMALgraph|http://mal.oko.im\r\n-\r\nAnime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\nMahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\nThe Fansub Wiki|http://www.fansubwiki.com"
-#define DEFAULT_FORMAT_HTTP      L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%"
-#define DEFAULT_FORMAT_MESSENGER L"Watching: %title%$if(%episode%, #%episode%$if(%total%,/%total%)) ~ www.myanimelist.net/anime/%id%"
-#define DEFAULT_FORMAT_MIRC      L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 $if(%score%,\00314[Score: %score%/10]\003) \00312www.myanimelist.net/anime/%id%"
-#define DEFAULT_FORMAT_SKYPE     L"Watching: <a href=\"http://myanimelist.net/anime/%id%\">%title%</a>$if(%episode%, #%episode%$if(%total%,/%total%))"
-#define DEFAULT_FORMAT_TWITTER   L"$ifequal(%episode%,%total%,Just completed: %title%$if(%score%, (Score: %score%/10)) www.myanimelist.net/anime/%id%)"
-#define DEFAULT_FORMAT_BALLOON   L"$if(%title%,%title%)\\n$if(%episode%,Episode %episode%$if(%total%,/%total%) )$if(%group%,by %group%)\\n$if(%name%,%name%)"
-#define DEFAULT_TORRENT_APPPATH  L"C:\\Program Files\\uTorrent\\uTorrent.exe"
-#define DEFAULT_TORRENT_SEARCH   L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%"
-#define DEFAULT_TORRENT_SOURCE   L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0"
+const std::wstring kDefaultExternalLinks = L"Anime Recommendation Finder|http://www.animerecs.com\r\nMALgraph|http://mal.oko.im\r\n-\r\nAnime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\nMahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\nThe Fansub Wiki|http://www.fansubwiki.com";
+const std::wstring kDefaultFormatHttp = L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%";
+const std::wstring kDefaultFormatMessenger = L"Watching: %title%$if(%episode%, #%episode%$if(%total%,/%total%)) ~ www.myanimelist.net/anime/%id%";
+const std::wstring kDefaultFormatMirc = L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 $if(%score%,\00314[Score: %score%/10]\003) \00312www.myanimelist.net/anime/%id%";
+const std::wstring kDefaultFormatSkype = L"Watching: <a href=\"http://myanimelist.net/anime/%id%\">%title%</a>$if(%episode%, #%episode%$if(%total%,/%total%))";
+const std::wstring kDefaultFormatTwitter = L"$ifequal(%episode%,%total%,Just completed: %title%$if(%score%, (Score: %score%/10)) www.myanimelist.net/anime/%id%)";
+const std::wstring kDefaultFormatBalloon = L"$if(%title%,%title%)\\n$if(%episode%,Episode %episode%$if(%total%,/%total%) )$if(%group%,by %group%)\\n$if(%name%,%name%)";
+const std::wstring kDefaultTorrentAppPath = L"C:\\Program Files\\uTorrent\\uTorrent.exe";
+const std::wstring kDefaultTorrentSearch = L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%";
+const std::wstring kDefaultTorrentSource = L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
 
-class Settings Settings;
+////////////////////////////////////////////////////////////////////////////////
 
-// =============================================================================
+Setting::Setting(bool attribute,
+                 const std::wstring& path)
+    : attribute(attribute),
+      path(path) {
+}
 
-bool Settings::Load() {
+Setting::Setting(bool attribute,
+                 const std::wstring& default_value,
+                 const std::wstring& path)
+    : attribute(attribute),
+      default_value(default_value),
+      path(path) {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+const std::wstring& AppSettings::operator[](AppSettingName name) const {
+  return GetWstr(name);
+}
+
+bool AppSettings::GetBool(AppSettingName name) const {
+  auto it = map_.find(name);
+
+  if (it != map_.end())
+    return ToBool(it->second.value);
+
+  return false;
+}
+
+int AppSettings::GetInt(AppSettingName name) const {
+  auto it = map_.find(name);
+
+  if (it != map_.end())
+    return ToInt(it->second.value);
+
+  return 0;
+}
+
+const std::wstring& AppSettings::GetWstr(AppSettingName name) const {
+  auto it = map_.find(name);
+
+  if (it != map_.end())
+    return it->second.value;
+
+  return EmptyString();
+}
+
+void AppSettings::Set(AppSettingName name, bool value) {
+  map_[name].value = value ? L"true" : L"false";
+}
+
+void AppSettings::Set(AppSettingName name, int value) {
+  map_[name].value = ToWstr(value);
+}
+
+void AppSettings::Set(AppSettingName name, const std::wstring& value) {
+  map_[name].value = value;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void AppSettings::InitializeKey(AppSettingName name,
+                                const wchar_t* default_value,
+                                const std::wstring& path) {
+  if (default_value) {
+    map_.insert(std::pair<AppSettingName, Setting>(name, Setting(true, default_value, path)));
+  } else {
+    map_.insert(std::pair<AppSettingName, Setting>(name, Setting(true, path)));
+  }
+}
+
+void AppSettings::InitializeMap() {
+  if (!map_.empty())
+    return;
+
+  #define INITKEY(name, def, path) InitializeKey(name, def, path);
+
+  // Meta
+  INITKEY(kMeta_Version_Major, nullptr, L"meta/version/major");
+  INITKEY(kMeta_Version_Minor, nullptr, L"meta/version/minor");
+  INITKEY(kMeta_Version_Revision, nullptr, L"meta/version/revision");
+
+  // Services
+  INITKEY(kSync_AutoOnStart, nullptr, L"account/myanimelist/login");
+  INITKEY(kSync_Service_Mal_Username, nullptr, L"account/myanimelist/username");
+  INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
+
+  // Library
+  INITKEY(kLibrary_WatchFolders, L"true", L"anime/folders/watch/enabled");
+
+  // Application
+  INITKEY(kApp_List_DoubleClickAction, L"4", L"program/list/action/doubleclick");
+  INITKEY(kApp_List_MiddleClickAction, L"3", L"program/list/action/middleclick");
+  INITKEY(kApp_List_DisplayEnglishTitles, nullptr, L"program/list/action/englishtitles");
+  INITKEY(kApp_List_HighlightNewEpisodes, L"true", L"program/list/filter/episodes/highlight");
+  INITKEY(kApp_List_ProgressDisplayAired, L"true", L"program/list/progress/showaired");
+  INITKEY(kApp_List_ProgressDisplayAvailable, L"true", L"program/list/progress/showavailable");
+  INITKEY(kApp_Behavior_Autostart, nullptr, L"program/general/autostart");
+  INITKEY(kApp_Behavior_StartMinimized, nullptr, L"program/startup/minimize");
+  INITKEY(kApp_Behavior_CheckForUpdates, L"true", L"program/startup/checkversion");
+  INITKEY(kApp_Behavior_ScanAvailableEpisodes, nullptr, L"program/startup/checkeps");
+  INITKEY(kApp_Behavior_CloseToTray, nullptr, L"program/general/close");
+  INITKEY(kApp_Behavior_MinimizeToTray, nullptr, L"program/general/minimize");
+  INITKEY(kApp_Connection_ProxyHost, nullptr, L"program/proxy/host");
+  INITKEY(kApp_Connection_ProxyUsername, nullptr, L"program/proxy/username");
+  INITKEY(kApp_Connection_ProxyPassword, nullptr, L"program/proxy/password");
+  INITKEY(kApp_Interface_Theme, L"Default", L"program/general/theme");
+  INITKEY(kApp_Interface_ExternalLinks, kDefaultExternalLinks.c_str(), L"program/general/externallinks");
+
+  // Recognition
+  INITKEY(kSync_Update_Delay, L"120", L"account/update/delay");
+  INITKEY(kSync_Update_AskToConfirm, L"true", L"account/update/asktoconfirm");
+  INITKEY(kSync_Update_CheckPlayer, nullptr, L"account/update/checkplayer");
+  INITKEY(kSync_Update_GoToNowPlaying, L"true", L"account/update/gotonowplaying");
+  INITKEY(kSync_Update_OutOfRange, nullptr, L"account/update/outofrange");
+  INITKEY(kSync_Update_OutOfRoot, nullptr, L"account/update/outofroot");
+  INITKEY(kSync_Update_WaitPlayer, nullptr, L"account/update/waitplayer");
+  INITKEY(kSync_Notify_Recognized, L"true", L"program/notifications/balloon/recognized");
+  INITKEY(kSync_Notify_NotRecognized, L"true", L"program/notifications/balloon/notrecognized");
+  INITKEY(kSync_Notify_Format, kDefaultFormatBalloon.c_str(), L"program/notifications/balloon/format");
+  INITKEY(kStream_Ann, nullptr, L"recognition/streaming/providers/ann");
+  INITKEY(kStream_Crunchyroll, nullptr, L"recognition/streaming/providers/crunchyroll");
+  INITKEY(kStream_Veoh, nullptr, L"recognition/streaming/providers/veoh");
+  INITKEY(kStream_Viz, nullptr, L"recognition/streaming/providers/viz");
+  INITKEY(kStream_Youtube, nullptr, L"recognition/streaming/providers/youtube");
+
+  // Sharing
+  INITKEY(kShare_Http_Enabled, nullptr, L"announce/http/enabled");
+  INITKEY(kShare_Http_Format, kDefaultFormatHttp.c_str(), L"announce/http/format");
+  INITKEY(kShare_Http_Url, nullptr, L"announce/http/url");
+  INITKEY(kShare_Messenger_Enabled, nullptr, L"announce/messenger/enabled");
+  INITKEY(kShare_Messenger_Format, kDefaultFormatMessenger.c_str(), L"announce/messenger/format");
+  INITKEY(kShare_Mirc_Enabled, nullptr, L"announce/mirc/enabled");
+  INITKEY(kShare_Mirc_MultiServer, nullptr, L"announce/mirc/multiserver");
+  INITKEY(kShare_Mirc_UseMeAction, L"true", L"announce/mirc/useaction");
+  INITKEY(kShare_Mirc_Mode, L"1", L"announce/mirc/mode");
+  INITKEY(kShare_Mirc_Channels, L"#myanimelist, #taiga", L"announce/mirc/channels");
+  INITKEY(kShare_Mirc_Format, kDefaultFormatMirc.c_str(), L"announce/mirc/format");
+  INITKEY(kShare_Mirc_Service, nullptr, L"announce/mirc/service");
+  INITKEY(kShare_Skype_Enabled, nullptr, L"announce/skype/enabled");
+  INITKEY(kShare_Skype_Format, kDefaultFormatSkype.c_str(), L"announce/skype/format");
+  INITKEY(kShare_Twitter_Enabled, nullptr, L"announce/twitter/enabled");
+  INITKEY(kShare_Twitter_Format, kDefaultFormatTwitter.c_str(), L"announce/twitter/format");
+  INITKEY(kShare_Twitter_OauthToken, nullptr, L"announce/twitter/oauth_token");
+  INITKEY(kShare_Twitter_OauthSecret, nullptr, L"announce/twitter/oauth_secret");
+  INITKEY(kShare_Twitter_Username, nullptr, L"announce/twitter/user");
+
+  // Torrents
+  INITKEY(kTorrent_Discovery_Source, kDefaultTorrentSource.c_str(), L"rss/torrent/source/address");
+  INITKEY(kTorrent_Discovery_SearchUrl, kDefaultTorrentSearch.c_str(), L"rss/torrent/search/address");
+  INITKEY(kTorrent_Discovery_AutoCheckEnabled, L"true", L"rss/torrent/options/autocheck");
+  INITKEY(kTorrent_Discovery_AutoCheckInterval, L"60", L"rss/torrent/options/checkinterval");
+  INITKEY(kTorrent_Discovery_NewAction, L"1", L"rss/torrent/options/newaction");
+  INITKEY(kTorrent_Download_AppMode, L"1", L"rss/torrent/application/mode");
+  INITKEY(kTorrent_Download_AppPath, nullptr, L"rss/torrent/application/path");
+  INITKEY(kTorrent_Download_Location, nullptr, L"rss/torrent/options/downloadpath");
+  INITKEY(kTorrent_Download_UseAnimeFolder, L"true", L"rss/torrent/options/autosetfolder");
+  INITKEY(kTorrent_Download_FallbackOnFolder, nullptr, L"rss/torrent/options/autousefolder");
+  INITKEY(kTorrent_Download_CreateSubfolder, nullptr, L"rss/torrent/options/autocreatefolder");
+  INITKEY(kTorrent_Filter_Enabled, L"true", L"rss/torrent/filter/enabled");
+  INITKEY(kTorrent_Filter_ArchiveMaxCount, L"1000", L"rss/torrent/filter/archive_maxcount");
+
+  // Internal
+  INITKEY(kApp_Position_X, L"-1", L"program/position/x");
+  INITKEY(kApp_Position_Y, L"-1", L"program/position/y");
+  INITKEY(kApp_Position_W, L"960", L"program/position/w");
+  INITKEY(kApp_Position_H, L"640", L"program/position/h");
+  INITKEY(kApp_Position_Maximized, nullptr, L"program/position/maximized");
+  INITKEY(kApp_Position_Remember, L"true", L"program/exit/remember_pos_size");
+  INITKEY(kApp_Option_HideSidebar, nullptr, L"program/general/hidesidebar");
+  INITKEY(kApp_Option_EnableRecognition, L"true", L"program/general/enablerecognition");
+  INITKEY(kApp_Option_EnableSharing, L"true", L"program/general/enablesharing");
+  INITKEY(kApp_Option_EnableSync, L"true", L"program/general/enablesync");
+
+  #undef INITKEY
+}
+
+void AppSettings::ReadValue(const xml_node& node_parent, AppSettingName name) {
+  Setting& item = map_[name];
+
+  std::vector<std::wstring> node_names;
+  Split(item.path, L"/", node_names);
+
+  const wchar_t* node_name = node_names.back().c_str();
+
+  xml_node current_node = node_parent;
+  for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++)
+    current_node = current_node.child(node_names.at(i).c_str());
+
+  if (item.attribute) {
+    const wchar_t* default_value = item.default_value.c_str();
+    item.value = current_node.attribute(node_name).as_string(default_value);
+  } else {
+    item.value = XmlReadStrValue(current_node, node_name);
+  }
+}
+
+void AppSettings::WriteValue(const xml_node& node_parent, AppSettingName name) {
+  Setting& item = map_[name];
+
+  std::vector<std::wstring> node_names;
+  Split(item.path, L"/", node_names);
+
+  const wchar_t* node_name = node_names.back().c_str();
+
+  xml_node current_node = node_parent;
+  for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++) {
+    std::wstring child_name = node_names.at(i);
+    if (!current_node.child(child_name.c_str())) {
+      current_node = current_node.append_child(child_name.c_str());
+    } else {
+      current_node = current_node.child(child_name.c_str());
+    }
+  }
+
+  if (item.attribute) {
+    current_node.append_attribute(node_name) = item.value.c_str();
+  } else {
+    XmlWriteStrValue(current_node, node_name, item.value.c_str());
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool AppSettings::Load() {
   xml_document document;
   wstring path = taiga::GetPath(taiga::kPathSettings);
   xml_parse_result result = document.load_file(path.c_str());
-  
-  // Read settings
-  xml_node settings = document.child(L"settings");
-  
-  // Meta
-  xml_node meta = settings.child(L"meta");
-    // Version
-    xml_node version = meta.child(L"version");
-    Meta.Version.major = version.attribute(L"major").as_int();
-    Meta.Version.minor = version.attribute(L"minor").as_int();
-    Meta.Version.revision = version.attribute(L"revision").as_int();
-  
-  // Account
-  xml_node account = settings.child(L"account");
-    // MyAnimeList
-    xml_node mal = account.child(L"myanimelist");
-    Account.MAL.auto_sync = mal.attribute(L"login").as_int();
-    Account.MAL.password = SimpleDecrypt(mal.attribute(L"password").value());
-    Account.MAL.user = mal.attribute(L"username").value();
-    // Update
-    xml_node update = account.child(L"update");
-    Account.Update.ask_to_confirm = update.attribute(L"asktoconfirm").as_int(TRUE);
-    Account.Update.check_player = update.attribute(L"checkplayer").as_int();
-    Account.Update.delay = update.attribute(L"delay").as_int(120);
-    Account.Update.go_to_nowplaying = update.attribute(L"gotonowplaying").as_int(TRUE);
-    Account.Update.out_of_range = update.attribute(L"outofrange").as_int();
-    Account.Update.out_of_root = update.attribute(L"outofroot").as_int();
-    Account.Update.wait_mp = update.attribute(L"waitplayer").as_int();
 
-  // Announcements
-  xml_node announce = settings.child(L"announce");
-    // HTTP
-    xml_node http = announce.child(L"http");
-    Announce.HTTP.enabled = http.attribute(L"enabled").as_int();
-    Announce.HTTP.format = http.attribute(L"format").as_string(DEFAULT_FORMAT_HTTP);
-    Announce.HTTP.url = http.attribute(L"url").value();
-    // MSN
-    xml_node messenger = announce.child(L"messenger");
-    Announce.MSN.enabled = messenger.attribute(L"enabled").as_int();
-    Announce.MSN.format = messenger.attribute(L"format").as_string(DEFAULT_FORMAT_MESSENGER);
-    // mIRC
-    xml_node mirc = announce.child(L"mirc");
-    Announce.MIRC.channels = mirc.attribute(L"channels").as_string(L"#myanimelist, #taiga");
-    Announce.MIRC.enabled = mirc.attribute(L"enabled").as_int();
-    Announce.MIRC.format = mirc.attribute(L"format").as_string(DEFAULT_FORMAT_MIRC);
-    Announce.MIRC.mode = mirc.attribute(L"mode").as_int(1);
-    Announce.MIRC.multi_server = mirc.attribute(L"multiserver").as_int(FALSE);
-    Announce.MIRC.service = mirc.attribute(L"service").as_string(L"mIRC");
-    Announce.MIRC.use_action = mirc.attribute(L"useaction").as_int(TRUE);
-    // Skype
-    xml_node skype = announce.child(L"skype");
-    Announce.Skype.enabled = skype.attribute(L"enabled").as_int();
-    Announce.Skype.format = skype.attribute(L"format").as_string(DEFAULT_FORMAT_SKYPE);
-    // Twitter
-    xml_node twitter = announce.child(L"twitter");
-    Announce.Twitter.enabled = twitter.attribute(L"enabled").as_int();
-    Announce.Twitter.format = twitter.attribute(L"format").as_string(DEFAULT_FORMAT_TWITTER);
-    Announce.Twitter.oauth_key = twitter.attribute(L"oauth_token").value();
-    Announce.Twitter.oauth_secret = twitter.attribute(L"oauth_secret").value();
-    Announce.Twitter.user = twitter.attribute(L"user").value();
+  xml_node settings = document.child(L"settings");
+
+  InitializeMap();
+
+  for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
+    ReadValue(settings, static_cast<AppSettingName>(i));
 
   // Folders
-  Folders.root.clear();
-  xml_node folders = settings.child(L"anime").child(L"folders");
-  for (xml_node folder = folders.child(L"root"); folder; folder = folder.next_sibling(L"root")) {
-    Folders.root.push_back(folder.attribute(L"folder").value());
-  }
-  xml_node watch = folders.child(L"watch");
-  Folders.watch_enabled = watch.attribute(L"enabled").as_int(TRUE);
+  root_folders.clear();
+  xml_node node_folders = settings.child(L"anime").child(L"folders");
+  foreach_xmlnode_(folder, node_folders, L"root")
+    root_folders.push_back(folder.attribute(L"folder").value());
 
   // Anime items
-  xml_node items = settings.child(L"anime").child(L"items");
-  foreach_xmlnode_(item, items, L"item") {
+  xml_node node_items = settings.child(L"anime").child(L"items");
+  foreach_xmlnode_(item, node_items, L"item") {
     int anime_id = item.attribute(L"id").as_int();
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (!anime_item) {
+    if (!anime_item)
       anime_item = &AnimeDatabase.items[anime_id];
-    }
     anime_item->SetFolder(item.attribute(L"folder").value());
     anime_item->SetUserSynonyms(item.attribute(L"titles").value());
     anime_item->SetUseAlternative(item.attribute(L"use_alternative").as_bool());
   }
 
-  // Program
-  xml_node program = settings.child(L"program");
-    // General
-    xml_node general = program.child(L"general");
-    Program.General.auto_start = general.attribute(L"autostart").as_int();
-    Program.General.close = general.attribute(L"close").as_int();
-    Program.General.minimize = general.attribute(L"minimize").as_int();
-    Program.General.theme = general.attribute(L"theme").as_string(L"Default");
-    Program.General.external_links = general.attribute(L"externallinks").as_string(DEFAULT_EXTERNALLINKS);
-    Program.General.hide_sidebar = general.attribute(L"hidesidebar").as_int();
-    Program.General.enable_recognition = general.attribute(L"enablerecognition").as_int(TRUE);
-    Program.General.enable_sharing = general.attribute(L"enablesharing").as_int(TRUE);
-    Program.General.enable_sync = general.attribute(L"enablesync").as_int(TRUE);
-    // Position
-    xml_node position = program.child(L"position");
-    Program.Position.x = position.attribute(L"x").as_int(-1);
-    Program.Position.y = position.attribute(L"y").as_int(-1);
-    Program.Position.w = position.attribute(L"w").as_int(960);
-    Program.Position.h = position.attribute(L"h").as_int(640);
-    Program.Position.maximized = position.attribute(L"maximized").as_int();
-    // Start-up
-    xml_node startup = program.child(L"startup");
-    Program.StartUp.check_new_episodes = startup.attribute(L"checkeps").as_int();
-    Program.StartUp.check_new_version = startup.attribute(L"checkversion").as_int(TRUE);
-    Program.StartUp.minimize = startup.attribute(L"minimize").as_int();
-    // Exit
-    xml_node exit = program.child(L"exit");
-    Program.Exit.remember_pos_size = exit.attribute(L"remember_pos_size").as_int(TRUE);
-    // Proxy
-    xml_node proxy = program.child(L"proxy");
-    Program.Proxy.host = proxy.attribute(L"host").value();
-    Program.Proxy.password = SimpleDecrypt(proxy.attribute(L"password").value());
-    Program.Proxy.user = proxy.attribute(L"username").value();
-    // List
-    xml_node list = program.child(L"list");
-    Program.List.double_click = list.child(L"action").attribute(L"doubleclick").as_int(4);
-    Program.List.middle_click = list.child(L"action").attribute(L"middleclick").as_int(3);
-    Program.List.english_titles = list.child(L"action").attribute(L"englishtitles").as_bool();
-    Program.List.highlight = list.child(L"filter").child(L"episodes").attribute(L"highlight").as_int(TRUE);
-    Program.List.progress_show_aired = list.child(L"progress").attribute(L"showaired").as_int(TRUE);
-    Program.List.progress_show_available = list.child(L"progress").attribute(L"showavailable").as_int(TRUE);
-    // Notifications
-    xml_node notifications = program.child(L"notifications");
-    Program.Notifications.recognized = notifications.child(L"balloon").attribute(L"recognized").as_int(TRUE);
-    Program.Notifications.notrecognized = notifications.child(L"balloon").attribute(L"notrecognized").as_int(TRUE);
-    Program.Notifications.format = notifications.child(L"balloon").attribute(L"format").as_string(DEFAULT_FORMAT_BALLOON);
+  // Media players
+  xml_node node_players = settings.child(L"recognition").child(L"mediaplayers");
+  foreach_xmlnode_(player, node_players, L"player") {
+    wstring name = player.attribute(L"name").value();
+    bool enabled = player.attribute(L"enabled").as_bool();
+    foreach_(it, MediaPlayers.items) {
+      if (it->name == name) {
+        it->enabled = enabled;
+        break;
+      }
+    }
+  }
 
-  // Recognition
-  xml_node recognition = settings.child(L"recognition");
-    // Media players
-    xml_node mediaplayers = recognition.child(L"mediaplayers");
-      foreach_xmlnode_(player, mediaplayers, L"player") {
-        wstring name = player.attribute(L"name").value();
-        bool enabled = player.attribute(L"enabled").as_bool();
-        foreach_(it, MediaPlayers.items) {
-          if (it->name == name) {
-            it->enabled = enabled;
-            break;
-          }
-        }
-      }
-    // Streaming
-    xml_node streaming = recognition.child(L"streaming");
-      Recognition.Streaming.ann_enabled = streaming.child(L"providers").attribute(L"ann").as_bool();
-      Recognition.Streaming.crunchyroll_enabled = streaming.child(L"providers").attribute(L"crunchyroll").as_bool();
-      Recognition.Streaming.veoh_enabled = streaming.child(L"providers").attribute(L"veoh").as_bool();
-      Recognition.Streaming.viz_enabled = streaming.child(L"providers").attribute(L"viz").as_bool();
-      Recognition.Streaming.youtube_enabled = streaming.child(L"providers").attribute(L"youtube").as_bool();
+  // Torrent application path
+  if (GetWstr(kTorrent_Download_AppPath).empty()) {
+    Set(kTorrent_Download_AppPath, GetDefaultAppPath(L".torrent", kDefaultTorrentAppPath));
+  }
 
-  // RSS
-  xml_node rss = settings.child(L"rss");
-    // Torrent  
-    xml_node torrent = rss.child(L"torrent");
-      // General
-      RSS.Torrent.app_mode = torrent.child(L"application").attribute(L"mode").as_int(1);
-      RSS.Torrent.app_path = torrent.child(L"application").attribute(L"path").value();
-      if (RSS.Torrent.app_path.empty()) {
-        RSS.Torrent.app_path = GetDefaultAppPath(L".torrent", DEFAULT_TORRENT_APPPATH);
-      }
-      RSS.Torrent.check_enabled = torrent.child(L"options").attribute(L"autocheck").as_int(TRUE);
-      RSS.Torrent.check_interval = torrent.child(L"options").attribute(L"checkinterval").as_int(60);
-      RSS.Torrent.create_folder = torrent.child(L"options").attribute(L"autocreatefolder").as_int(FALSE);
-      RSS.Torrent.download_path = torrent.child(L"options").attribute(L"downloadpath").as_string();
-      RSS.Torrent.hide_unidentified = torrent.child(L"options").attribute(L"hideunidentified").as_int(FALSE);
-      RSS.Torrent.new_action = torrent.child(L"options").attribute(L"newaction").as_int(1);
-      RSS.Torrent.set_folder = torrent.child(L"options").attribute(L"autosetfolder").as_int(TRUE);
-      RSS.Torrent.search_url = torrent.child(L"search").attribute(L"address").as_string(DEFAULT_TORRENT_SEARCH);
-      RSS.Torrent.source = torrent.child(L"source").attribute(L"address").as_string(DEFAULT_TORRENT_SOURCE);
-      RSS.Torrent.use_folder = torrent.child(L"options").attribute(L"autousefolder").as_int(FALSE);
-      // Filters
-      xml_node filter = torrent.child(L"filter");
-      RSS.Torrent.Filters.global_enabled = filter.attribute(L"enabled").as_int(TRUE);
-      RSS.Torrent.Filters.archive_maxcount = filter.attribute(L"archive_maxcount").as_int(1000);
-      Aggregator.filter_manager.filters.clear();
-      foreach_xmlnode_(item, filter, L"item") {
-        Aggregator.filter_manager.AddFilter(
-          Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_ACTION, item.attribute(L"action").value()),
-          Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_MATCH, item.attribute(L"match").value()),
-          item.attribute(L"enabled").as_bool(),
-          item.attribute(L"name").value());
-        foreach_xmlnode_(anime, item, L"anime") {
-          Aggregator.filter_manager.filters.back().anime_ids.push_back(anime.attribute(L"id").as_int());
-        }
-        foreach_xmlnode_(condition, item, L"condition") {
-          Aggregator.filter_manager.filters.back().AddCondition(
-            Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_ELEMENT, condition.attribute(L"element").value()),
-            Aggregator.filter_manager.GetIndexFromShortcode(FEED_FILTER_SHORTCODE_OPERATOR, condition.attribute(L"operator").value()),
-            condition.attribute(L"value").value());
-        }
-      }
-      if (Aggregator.filter_manager.filters.empty()) {
-        Aggregator.filter_manager.AddPresets();
-      }
-      // Torrent source
-      Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-      if (feed) feed->link = RSS.Torrent.source;
-      // File archive
-      Aggregator.LoadArchive();
+  // Torrent filters
+  xml_node node_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
+  Aggregator.filter_manager.filters.clear();
+  foreach_xmlnode_(item, node_filter, L"item") {
+    Aggregator.filter_manager.AddFilter(
+        Aggregator.filter_manager.GetIndexFromShortcode(
+            FEED_FILTER_SHORTCODE_ACTION, item.attribute(L"action").value()),
+        Aggregator.filter_manager.GetIndexFromShortcode(
+            FEED_FILTER_SHORTCODE_MATCH, item.attribute(L"match").value()),
+        item.attribute(L"enabled").as_bool(),
+        item.attribute(L"name").value());
+    foreach_xmlnode_(anime, item, L"anime") {
+      auto& filter = Aggregator.filter_manager.filters.back();
+      filter.anime_ids.push_back(anime.attribute(L"id").as_int());
+    }
+    foreach_xmlnode_(condition, item, L"condition") {
+      Aggregator.filter_manager.filters.back().AddCondition(
+          Aggregator.filter_manager.GetIndexFromShortcode(
+              FEED_FILTER_SHORTCODE_ELEMENT,
+              condition.attribute(L"element").value()),
+          Aggregator.filter_manager.GetIndexFromShortcode(
+              FEED_FILTER_SHORTCODE_OPERATOR,
+              condition.attribute(L"operator").value()),
+          condition.attribute(L"value").value());
+    }
+  }
+
+  if (Aggregator.filter_manager.filters.empty())
+    Aggregator.filter_manager.AddPresets();
+  auto feed = Aggregator.Get(FEED_CATEGORY_LINK);
+  if (feed)
+    feed->link = GetWstr(kTorrent_Discovery_Source);
+  Aggregator.LoadArchive();
 
   return result.status == pugi::status_ok;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-bool Settings::Save() {
-  // Initialize
+bool AppSettings::Save() {
   xml_document document;
   xml_node settings = document.append_child(L"settings");
 
-  // Meta
-  settings.append_child(pugi::node_comment).set_value(L" Meta ");
-  xml_node meta = settings.append_child(L"meta");
-    // Version
-    xml_node version = meta.append_child(L"version");
-    version.append_attribute(L"major") = VERSION_MAJOR;
-    version.append_attribute(L"minor") = VERSION_MINOR;
-    version.append_attribute(L"revision") = VERSION_REVISION;
+  for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
+    WriteValue(settings, static_cast<AppSettingName>(i));
 
-  // Account
-  settings.append_child(pugi::node_comment).set_value(L" Account ");
-  xml_node account = settings.append_child(L"account");
-    // MyAnimeList
-    xml_node mal = account.append_child(L"myanimelist");
-    mal.append_attribute(L"username") = Account.MAL.user.c_str();
-    mal.append_attribute(L"password") = SimpleEncrypt(Account.MAL.password).c_str();
-    mal.append_attribute(L"login") = Account.MAL.auto_sync;
-    // Update
-    xml_node update = account.append_child(L"update");
-    update.append_attribute(L"asktoconfirm") = Account.Update.ask_to_confirm;
-    update.append_attribute(L"delay") = Account.Update.delay;
-    update.append_attribute(L"checkplayer") = Account.Update.check_player;
-    update.append_attribute(L"gotonowplaying") = Account.Update.go_to_nowplaying;
-    update.append_attribute(L"outofrange") = Account.Update.out_of_range;
-    update.append_attribute(L"outofroot") = Account.Update.out_of_root;
-    update.append_attribute(L"waitplayer") = Account.Update.wait_mp;
-  
-  // Anime
-  settings.append_child(pugi::node_comment).set_value(L" Anime list ");
-  xml_node anime = settings.append_child(L"anime");
-    // Root folders  
-    xml_node folders = anime.append_child(L"folders");  
-    for (size_t i = 0; i < Folders.root.size(); i++) {
-      xml_node root = folders.append_child(L"root");
-      root.append_attribute(L"folder") = Folders.root[i].c_str();
+  // Root folders
+  xml_node folders = settings.append_child(L"anime").append_child(L"folders");  
+  foreach_(it, root_folders) {
+    xml_node root = folders.append_child(L"root");
+    root.append_attribute(L"folder") = it->c_str();
+  }
+
+  // Anime items
+  xml_node items = settings.append_child(L"anime").append_child(L"items");
+  foreach_(it, AnimeDatabase.items) {
+    anime::Item& anime_item = it->second;
+    if (anime_item.GetFolder().empty() &&
+        !anime_item.UserSynonymsAvailable() &&
+        !anime_item.GetUseAlternative())
+      continue;
+    xml_node item = items.append_child(L"item");
+    item.append_attribute(L"id") = anime_item.GetId();
+    if (!anime_item.GetFolder().empty())
+      item.append_attribute(L"folder") = anime_item.GetFolder().c_str();
+    if (anime_item.UserSynonymsAvailable())
+      item.append_attribute(L"titles") = Join(anime_item.GetUserSynonyms(), L"; ").c_str();
+    if (anime_item.GetUseAlternative())
+      item.append_attribute(L"use_alternative") = anime_item.GetUseAlternative();
+  }
+
+  // Media players
+  xml_node mediaplayers = settings.append_child(L"recognition").append_child(L"mediaplayers");
+  foreach_(it, MediaPlayers.items) {
+    xml_node player = mediaplayers.append_child(L"player");
+    player.append_attribute(L"name") = it->name.c_str();
+    player.append_attribute(L"enabled") = it->enabled;
+  }
+
+  // Torrent filters
+  xml_node torrent_filter = settings.append_child(L"rss").append_child(L"torrent").append_child(L"filter");
+  foreach_(it, Aggregator.filter_manager.filters) {
+    xml_node item = torrent_filter.append_child(L"item");
+    item.append_attribute(L"action") =
+        Aggregator.filter_manager.GetShortcodeFromIndex(
+            FEED_FILTER_SHORTCODE_ACTION, it->action).c_str();
+    item.append_attribute(L"match") =
+        Aggregator.filter_manager.GetShortcodeFromIndex(
+            FEED_FILTER_SHORTCODE_MATCH, it->match).c_str();
+    item.append_attribute(L"enabled") = it->enabled;
+    item.append_attribute(L"name") = it->name.c_str();
+    foreach_(ita, it->anime_ids) {
+      xml_node anime = item.append_child(L"anime");
+      anime.append_attribute(L"id") = *ita;
     }
-    xml_node watch = folders.append_child(L"watch");
-    watch.append_attribute(L"enabled") = Folders.watch_enabled;
-    // Items
-    xml_node items = anime.append_child(L"items");
-    foreach_(it, AnimeDatabase.items) {
-      anime::Item& anime_item = it->second;
-      if (anime_item.GetFolder().empty() &&
-          !anime_item.UserSynonymsAvailable() &&
-          !anime_item.GetUseAlternative())
-        continue;
-      xml_node item = items.append_child(L"item");
-      item.append_attribute(L"id") = anime_item.GetId();
-      if (!anime_item.GetFolder().empty())
-        item.append_attribute(L"folder") = anime_item.GetFolder().c_str();
-      if (anime_item.UserSynonymsAvailable())
-        item.append_attribute(L"titles") = Join(anime_item.GetUserSynonyms(), L"; ").c_str();
-      if (anime_item.GetUseAlternative())
-        item.append_attribute(L"use_alternative") = anime_item.GetUseAlternative();
+    foreach_(itc, it->conditions) {
+      xml_node condition = item.append_child(L"condition");
+      condition.append_attribute(L"element") =
+          Aggregator.filter_manager.GetShortcodeFromIndex(
+              FEED_FILTER_SHORTCODE_ELEMENT, itc->element).c_str();
+      condition.append_attribute(L"operator") =
+          Aggregator.filter_manager.GetShortcodeFromIndex(
+              FEED_FILTER_SHORTCODE_OPERATOR, itc->op).c_str();
+      condition.append_attribute(L"value") = itc->value.c_str();
     }
-
-  // Announcements
-  settings.append_child(pugi::node_comment).set_value(L" Announcements ");
-  xml_node announce = settings.append_child(L"announce");
-    // HTTP
-    xml_node http = announce.append_child(L"http");
-    http.append_attribute(L"enabled") = Announce.HTTP.enabled;
-    http.append_attribute(L"format") = Announce.HTTP.format.c_str();
-    http.append_attribute(L"url") = Announce.HTTP.url.c_str();
-    // Messenger
-    settings.child(L"announce").append_child(L"messenger");
-    settings.child(L"announce").child(L"messenger").append_attribute(L"enabled") = Announce.MSN.enabled;
-    settings.child(L"announce").child(L"messenger").append_attribute(L"format") = Announce.MSN.format.c_str();
-    // mIRC
-    xml_node mirc = announce.append_child(L"mirc");
-    mirc.append_attribute(L"enabled") = Announce.MIRC.enabled;
-    mirc.append_attribute(L"format") = Announce.MIRC.format.c_str();
-    mirc.append_attribute(L"service") = Announce.MIRC.service.c_str();
-    mirc.append_attribute(L"mode") = Announce.MIRC.mode;
-    mirc.append_attribute(L"useaction") = Announce.MIRC.use_action;
-    mirc.append_attribute(L"multiserver") = Announce.MIRC.multi_server;
-    mirc.append_attribute(L"channels") = Announce.MIRC.channels.c_str();
-    // Skype
-    xml_node skype = announce.append_child(L"skype");
-    skype.append_attribute(L"enabled") = Announce.Skype.enabled;
-    skype.append_attribute(L"format") = Announce.Skype.format.c_str();
-    // Twitter
-    xml_node twitter = announce.append_child(L"twitter");
-    twitter.append_attribute(L"enabled") = Announce.Twitter.enabled;
-    twitter.append_attribute(L"format") = Announce.Twitter.format.c_str();
-    twitter.append_attribute(L"oauth_token") = Announce.Twitter.oauth_key.c_str();
-    twitter.append_attribute(L"oauth_secret") = Announce.Twitter.oauth_secret.c_str();
-    twitter.append_attribute(L"user") = Announce.Twitter.user.c_str();
-
-  // Program
-  settings.append_child(pugi::node_comment).set_value(L" Program ");
-  xml_node program = settings.append_child(L"program");
-    // General
-    xml_node general = program.append_child(L"general");
-    general.append_attribute(L"autostart") = Program.General.auto_start;
-    general.append_attribute(L"close") = Program.General.close;
-    general.append_attribute(L"minimize") = Program.General.minimize;
-    general.append_attribute(L"theme") = Program.General.theme.c_str();
-    general.append_attribute(L"externallinks") = Program.General.external_links.c_str();
-    general.append_attribute(L"hidesidebar") = Program.General.hide_sidebar;
-    general.append_attribute(L"enablerecognition") = Program.General.enable_recognition;
-    general.append_attribute(L"enablesharing") = Program.General.enable_sharing;
-    general.append_attribute(L"enablesync") = Program.General.enable_sync;
-    // Position
-    xml_node position = program.append_child(L"position");
-    position.append_attribute(L"x") = Program.Position.x;
-    position.append_attribute(L"y") = Program.Position.y;
-    position.append_attribute(L"w") = Program.Position.w;
-    position.append_attribute(L"h") = Program.Position.h;
-    position.append_attribute(L"maximized") = Program.Position.maximized;
-    // Startup
-    xml_node startup = program.append_child(L"startup");
-    startup.append_attribute(L"checkversion") = Program.StartUp.check_new_version;
-    startup.append_attribute(L"checkeps") = Program.StartUp.check_new_episodes;
-    startup.append_attribute(L"minimize") = Program.StartUp.minimize;
-    // Exit
-    xml_node exit = program.append_child(L"exit");
-    exit.append_attribute(L"remember_pos_size") = Program.Exit.remember_pos_size;
-    // Proxy
-    xml_node proxy = program.append_child(L"proxy");
-    proxy.append_attribute(L"host") = Program.Proxy.host.c_str();
-    proxy.append_attribute(L"username") = Program.Proxy.user.c_str();
-    proxy.append_attribute(L"password") = SimpleEncrypt(Program.Proxy.password).c_str();
-    // List
-    xml_node list = program.append_child(L"list");
-      // Actions  
-      xml_node action = list.append_child(L"action");
-      action.append_attribute(L"doubleclick") = Program.List.double_click;
-      action.append_attribute(L"middleclick") = Program.List.middle_click;
-      action.append_attribute(L"englishtitles") = Program.List.english_titles;
-      // Filter
-      xml_node filter = list.append_child(L"filter");
-      filter.append_child(L"episodes");
-      filter.child(L"episodes").append_attribute(L"highlight") = Program.List.highlight;
-      // Progress
-      xml_node progress = list.append_child(L"progress");
-      progress.append_attribute(L"showaired") = Program.List.progress_show_aired;
-      progress.append_attribute(L"showavailable") = Program.List.progress_show_available;
-    // Notifications
-    xml_node notifications = program.append_child(L"notifications");
-    notifications.append_child(L"balloon");
-    notifications.child(L"balloon").append_attribute(L"recognized") = Program.Notifications.recognized;
-    notifications.child(L"balloon").append_attribute(L"notrecognized") = Program.Notifications.notrecognized;
-    notifications.child(L"balloon").append_attribute(L"format") = Program.Notifications.format.c_str();
-
-  // Recognition
-  settings.append_child(pugi::node_comment).set_value(L" Recognition ");
-  xml_node recognition = settings.append_child(L"recognition");
-    // Media players
-    xml_node mediaplayers = recognition.append_child(L"mediaplayers");
-      foreach_(it, MediaPlayers.items) {
-        xml_node player = mediaplayers.append_child(L"player");
-        player.append_attribute(L"name") = it->name.c_str();
-        player.append_attribute(L"enabled") = it->enabled;
-      }
-    // Streaming
-    xml_node streaming = recognition.append_child(L"streaming");
-      // Providers
-      xml_node providers = streaming.append_child(L"providers");
-        providers.append_attribute(L"ann") = Recognition.Streaming.ann_enabled;
-        providers.append_attribute(L"crunchyroll") = Recognition.Streaming.crunchyroll_enabled;
-        providers.append_attribute(L"veoh") = Recognition.Streaming.veoh_enabled;
-        providers.append_attribute(L"viz") = Recognition.Streaming.viz_enabled;
-        providers.append_attribute(L"youtube") = Recognition.Streaming.youtube_enabled;
-
-  // RSS
-  settings.append_child(pugi::node_comment).set_value(L" RSS ");
-  xml_node rss = settings.append_child(L"rss");
-    // Torrent
-    xml_node torrent = rss.append_child(L"torrent");
-      // General
-      torrent.append_child(L"application");
-      torrent.child(L"application").append_attribute(L"mode") = RSS.Torrent.app_mode;
-      torrent.child(L"application").append_attribute(L"path") = RSS.Torrent.app_path.c_str();
-      torrent.append_child(L"search");
-      torrent.child(L"search").append_attribute(L"address") = RSS.Torrent.search_url.c_str();
-      torrent.append_child(L"source");
-      torrent.child(L"source").append_attribute(L"address") = RSS.Torrent.source.c_str();
-      torrent.append_child(L"options");
-      torrent.child(L"options").append_attribute(L"autocheck") = RSS.Torrent.check_enabled;
-      torrent.child(L"options").append_attribute(L"checkinterval") = RSS.Torrent.check_interval;
-      torrent.child(L"options").append_attribute(L"autosetfolder") = RSS.Torrent.set_folder;
-      torrent.child(L"options").append_attribute(L"autousefolder") = RSS.Torrent.use_folder;
-      torrent.child(L"options").append_attribute(L"autocreatefolder") = RSS.Torrent.create_folder;
-      torrent.child(L"options").append_attribute(L"downloadpath") = RSS.Torrent.download_path.c_str();
-      torrent.child(L"options").append_attribute(L"hideunidentified") = RSS.Torrent.hide_unidentified;
-      torrent.child(L"options").append_attribute(L"newaction") = RSS.Torrent.new_action;
-      // Filter
-      xml_node torrent_filter = torrent.append_child(L"filter");
-      torrent_filter.append_attribute(L"enabled") = RSS.Torrent.Filters.global_enabled;
-      torrent_filter.append_attribute(L"archive_maxcount") = RSS.Torrent.Filters.archive_maxcount;
-      for (auto it = Aggregator.filter_manager.filters.begin(); it != Aggregator.filter_manager.filters.end(); ++it) {
-        xml_node item = torrent_filter.append_child(L"item");
-        item.append_attribute(L"action") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_ACTION, it->action).c_str();
-        item.append_attribute(L"match") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_MATCH, it->match).c_str();
-        item.append_attribute(L"enabled") = it->enabled;
-        item.append_attribute(L"name") = it->name.c_str();
-        for (auto ita = it->anime_ids.begin(); ita != it->anime_ids.end(); ++ita) {
-          xml_node anime = item.append_child(L"anime");
-          anime.append_attribute(L"id") = *ita;
-        }
-        for (auto itc = it->conditions.begin(); itc != it->conditions.end(); ++itc) {
-          xml_node condition = item.append_child(L"condition");
-          condition.append_attribute(L"element") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_ELEMENT, itc->element).c_str();
-          condition.append_attribute(L"operator") = Aggregator.filter_manager.GetShortcodeFromIndex(FEED_FILTER_SHORTCODE_OPERATOR, itc->op).c_str();
-          condition.append_attribute(L"value") = itc->value.c_str();
-        }
-      }
+  }
   
-  // Write registry
+  // Write to registry
   win::Registry reg;
-  reg.OpenKey(HKEY_CURRENT_USER, 
-    L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_SET_VALUE);
-  if (Program.General.auto_start) {
+  reg.OpenKey(HKEY_CURRENT_USER,
+              L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+              0, KEY_SET_VALUE);
+  if (GetBool(kApp_Behavior_Autostart)) {
     wstring app_path = Taiga.GetModulePath();
     reg.SetValue(APP_NAME, app_path.c_str());
   } else {
@@ -505,22 +454,22 @@ bool Settings::Save() {
   }
   reg.CloseKey();
 
-  // Save file
   wstring path = taiga::GetPath(taiga::kPathSettings);
   return XmlWriteDocumentToFile(document, path);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-void Settings::ApplyChanges(const wstring& previous_user, const wstring& previous_theme) {
-  if (Program.General.theme != previous_theme) {
+void AppSettings::ApplyChanges(const wstring& previous_user,
+                            const wstring& previous_theme) {
+  if (GetWstr(kApp_Interface_Theme) != previous_theme) {
     UI.Load();
     UI.LoadImages();
     MainDialog.rebar.RedrawWindow();
     UpdateAllMenus();
   }
 
-  if (Account.MAL.user != previous_user) {
+  if (GetWstr(kSync_Service_Mal_Username) != previous_user) {
     AnimeDatabase.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -538,17 +487,20 @@ void Settings::ApplyChanges(const wstring& previous_user, const wstring& previou
     AnimeListDialog.RefreshList();
   }
 
-  FolderMonitor.Enable(Folders.watch_enabled == TRUE);
+  bool enable_monitor = GetBool(kLibrary_WatchFolders);
+  FolderMonitor.Enable(enable_monitor);
 
   UpdateExternalLinksMenu();
 }
 
-void Settings::HandleCompatibility() {
-  if (Meta.Version.revision == VERSION_REVISION)
+void AppSettings::HandleCompatibility() {
+  int version_revision = GetInt(kMeta_Version_Revision);
+  
+  if (version_revision == VERSION_REVISION)
     return;
 
   // Convert old torrent filters to the new format
-  if (Meta.Version.revision < 246) {
+  if (version_revision < 246) {
     LOG(LevelWarning, L"Converting torrent filters to the new format...");
 
     xml_document document;
@@ -675,8 +627,8 @@ void Settings::HandleCompatibility() {
         L"then they're selected or discarded via filters. Before this update, they were all selected by default, and filters were used to discard them.\n\n"
         L"Taiga did her best at converting your old filters to the new format, but you should still review them in case something's wrong. "
         L"If you have any questions or something else to share, let us know through our MyAnimeList club.\n\n";
-    if (!Account.MAL.user.empty()) {
-      content += L"Thank you, " + Account.MAL.user + L", for participating in the beta!";
+    if (!GetWstr(kSync_Service_Mal_Username).empty()) {
+      content += L"Thank you, " + GetWstr(kSync_Service_Mal_Username) + L", for participating in the beta!";
     } else {
       content += L"Thank you all for participating in the beta!";
     }
@@ -686,18 +638,18 @@ void Settings::HandleCompatibility() {
   }
 
   // Make sure torrent downloading options are right
-  if (Meta.Version.revision < 248) {
-    RSS.Torrent.use_folder = RSS.Torrent.create_folder;
+  if (version_revision < 248) {
+    Set(kTorrent_Download_UseAnimeFolder, GetWstr(kTorrent_Download_CreateSubfolder));
   }
 
   // Load torrent archive
-  if (Meta.Version.revision < 250) {
+  if (version_revision < 250) {
     Aggregator.file_archive.clear();
     PopulateFiles(Aggregator.file_archive, taiga::GetPath(taiga::kPathFeed), L"torrent", true, true);
   }
 }
 
-void Settings::RestoreDefaults() {
+void AppSettings::RestoreDefaults() {
   // Take a backup
   wstring file = taiga::GetPath(taiga::kPathSettings);
   wstring backup = file + L".bak";
@@ -705,8 +657,8 @@ void Settings::RestoreDefaults() {
   MoveFileEx(file.c_str(), backup.c_str(), flags);
   
   // Reload settings
-  wstring previous_user = Account.MAL.user;
-  wstring previous_theme = Program.General.theme;
+  wstring previous_user = GetWstr(kSync_Service_Mal_Username);
+  wstring previous_theme = GetWstr(kApp_Interface_Theme);
   Load();
   ApplyChanges(previous_user, previous_theme);
 
@@ -716,3 +668,5 @@ void Settings::RestoreDefaults() {
     ExecuteAction(L"Settings");
   }
 }
+
+}  // namespace taiga

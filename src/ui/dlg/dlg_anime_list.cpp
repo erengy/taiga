@@ -171,7 +171,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           break;
         }
 
-        wstring text = Settings.Program.List.english_titles ? 
+        wstring text = Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles) ? 
           anime_item->GetEnglishTitle(true) : anime_item->GetTitle();
 
         POINT pt;
@@ -192,7 +192,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
               ExecuteAction(L"SearchAnime(" + text + L")");
               break;
             case SIDEBAR_ITEM_FEEDS:
-              TorrentDialog.Search(Settings.RSS.Torrent.search_url, anime_id);
+              TorrentDialog.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], anime_id);
               break;
           }
         }
@@ -429,7 +429,7 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       if (item_index > -1) {
         SetSelectedItem(item_index);
         int anime_id = parent->GetCurrentId();
-        switch (Settings.Program.List.middle_click) {
+        switch (Settings.GetInt(taiga::kApp_List_MiddleClickAction)) {
           case 1:
             ExecuteAction(L"EditAll", 0, anime_id);
             break;
@@ -543,7 +543,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           listview.RefreshItem(list_index);
           listview.RedrawItems(list_index, list_index, true);
         } else {
-          switch (Settings.Program.List.double_click) {
+          switch (Settings.GetInt(taiga::kApp_List_DoubleClickAction)) {
             case 1:
               ExecuteAction(L"EditAll", 0, anime_id);
               break;
@@ -622,7 +622,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (!anime_item) break;
       switch (plvdi->item.iSubItem) {
         case 0: // Anime title
-          if (Settings.Program.List.english_titles) {
+          if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
             plvdi->item.pszText = const_cast<LPWSTR>(
               anime_item->GetEnglishTitle(true).data());
           } else {
@@ -737,7 +737,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     }
 
     // Draw aired episodes
-    if (Settings.Program.List.progress_show_aired && eps_aired > 0) {
+    if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAired) && eps_aired > 0) {
       UI.list_progress.aired.Draw(dc.Get(), &rcAired);
     }
 
@@ -754,7 +754,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   }
 
   // Draw episode availability
-  if (Settings.Program.List.progress_show_available) {
+  if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable)) {
     if (eps_estimate > 0) {
       float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
       int available_episode_count = static_cast<int>(anime_item.GetAvailableEpisodeCount());
@@ -901,7 +901,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
       switch (pCD->iSubItem) {
         case 0:
-          if (anime_item->IsNewEpisodeAvailable() && Settings.Program.List.highlight)
+          if (anime_item->IsNewEpisodeAvailable() && Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes))
             pCD->clrText = GetSysColor(COLOR_HIGHLIGHT);
           break;
         case 2:

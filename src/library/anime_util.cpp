@@ -147,7 +147,7 @@ bool CheckFolder(Item& item) {
   // Search root folders
   if (item.GetFolder().empty()) {
     wstring new_folder;
-    foreach_(it, Settings.Folders.root) {
+    foreach_(it, Settings.root_folders) {
       new_folder = SearchFileFolder(item, *it, 0, true);
       if (!new_folder.empty()) {
         item.SetFolder(new_folder);
@@ -184,7 +184,7 @@ bool PlayEpisode(Item& item, int number) {
 
   // Check other folders
   if (file_path.empty()) {
-    foreach_(it, Settings.Folders.root) {
+    foreach_(it, Settings.root_folders) {
       file_path = SearchFileFolder(item, *it, number, false);
       if (!file_path.empty())
         break;
@@ -233,14 +233,14 @@ void StartWatching(Item& item, Episode& episode) {
   // Update main window
   MainDialog.UpdateTip();
   MainDialog.UpdateTitle();
-  if (Settings.Account.Update.go_to_nowplaying)
+  if (Settings.GetBool(taiga::kSync_Update_GoToNowPlaying))
     MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
   
   // Show balloon tip
-  if (Settings.Program.Notifications.recognized) {
+  if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
     Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
     Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(ReplaceVariables(Settings.Program.Notifications.format, episode).c_str(), 
+    Taskbar.Tip(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(),
                 L"Now Playing", NIIF_INFO);
   }
   
@@ -263,7 +263,8 @@ void StartWatching(Item& item, Episode& episode) {
     sync::GetMetadataById(item.GetId());
   
   // Update list
-  if (Settings.Account.Update.delay == 0 && !Settings.Account.Update.wait_mp)
+  if (Settings.GetInt(taiga::kSync_Update_Delay) == 0 &&
+      !Settings.GetBool(taiga::kSync_Update_WaitPlayer))
     UpdateList(item, episode);
 }
 
@@ -296,7 +297,7 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
     return false;
 
   if (!ignore_update_time)
-    if (Settings.Account.Update.delay > Taiga.ticker_media)
+    if (Settings.GetInt(taiga::kSync_Update_Delay) > Taiga.ticker_media)
       if (Taiga.ticker_media > -1)
         return false;
 
@@ -307,7 +308,7 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
   int number_low = GetEpisodeLow(episode.number);
   int last_watched = item.GetMyLastWatchedEpisode();
 
-  if (Settings.Account.Update.out_of_range)
+  if (Settings.GetBool(taiga::kSync_Update_OutOfRange))
     if (number_low > last_watched + 1 || number < last_watched + 1)
       return false;
 
@@ -323,7 +324,7 @@ void UpdateList(Item& item, Episode& episode) {
 
   episode.processed = true;
 
-  if (Settings.Account.Update.ask_to_confirm) {
+  if (Settings.GetBool(taiga::kSync_Update_AskToConfirm)) {
     ConfirmationQueue.Add(episode);
     ConfirmationQueue.Process();
   } else {
@@ -451,7 +452,7 @@ void GetUpcomingTitles(vector<int>& anime_ids) {
 }
 
 bool IsInsideRootFolders(const wstring& path) {
-  foreach_c_(root_folder, Settings.Folders.root)
+  foreach_c_(root_folder, Settings.root_folders)
     if (StartsWith(path, *root_folder))
       return true;
 

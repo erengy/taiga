@@ -484,11 +484,11 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   // Check URL for known streaming video providers
   if (child) {
     // Anime News Network
-    if (Settings.Recognition.Streaming.ann_enabled &&
+    if (Settings.GetBool(taiga::kStream_Ann) &&
         InStr(child->value, L"animenewsnetwork.com/video") > -1) {
       stream_provider = STREAM_ANN;
     // Crunchyroll
-    } else if (Settings.Recognition.Streaming.crunchyroll_enabled &&
+    } else if (Settings.GetBool(taiga::kStream_Crunchyroll) &&
                InStr(child->value, L"crunchyroll.com/") > -1) {
        stream_provider = STREAM_CRUNCHYROLL;
     // Hulu
@@ -497,15 +497,15 @@ wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
       stream_provider = STREAM_HULU;
     */
     // Veoh
-    } else if (Settings.Recognition.Streaming.veoh_enabled && 
+    } else if (Settings.GetBool(taiga::kStream_Veoh) &&
                InStr(child->value, L"veoh.com/watch") > -1) {
       stream_provider = STREAM_VEOH;
     // Viz Anime
-    } else if (Settings.Recognition.Streaming.viz_enabled && 
+    } else if (Settings.GetBool(taiga::kStream_Viz) &&
                InStr(child->value, L"vizanime.com/ep") > -1) {
       stream_provider = STREAM_VIZANIME;
     // YouTube
-    } else if (Settings.Recognition.Streaming.youtube_enabled && 
+    } else if (Settings.GetBool(taiga::kStream_Youtube) &&
                InStr(child->value, L"youtube.com/watch") > -1) {
       stream_provider = STREAM_YOUTUBE;
     }

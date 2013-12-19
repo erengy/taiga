@@ -21,6 +21,7 @@
 #include "dlg_format.h"
 
 #include "library/anime_db.h"
+#include "library/anime_episode.h"
 #include "base/common.h"
 #include "track/recognition.h"
 #include "taiga/resource.h"
@@ -79,27 +80,27 @@ BOOL FormatDialog::OnInitDialog() {
   switch (mode) {
     case FORMAT_MODE_HTTP:
       SetText(L"Edit format - HTTP request");
-      rich_edit_.SetText(Settings.Announce.HTTP.format.c_str());
+      rich_edit_.SetText(Settings[taiga::kShare_Http_Format].c_str());
       break;    
     case FORMAT_MODE_MESSENGER:
       SetText(L"Edit format - Messenger");
-      rich_edit_.SetText(Settings.Announce.MSN.format.c_str());
+      rich_edit_.SetText(Settings[taiga::kShare_Messenger_Format].c_str());
       break;
     case FORMAT_MODE_MIRC:
       SetText(L"Edit format - mIRC");
-      rich_edit_.SetText(Settings.Announce.MIRC.format.c_str());
+      rich_edit_.SetText(Settings[taiga::kShare_Mirc_Format].c_str());
       break;
     case FORMAT_MODE_SKYPE:
       SetText(L"Edit format - Skype");
-      rich_edit_.SetText(Settings.Announce.Skype.format.c_str());
+      rich_edit_.SetText(Settings[taiga::kShare_Skype_Format].c_str());
       break;
     case FORMAT_MODE_TWITTER:
       SetText(L"Edit format - Twitter");
-      rich_edit_.SetText(Settings.Announce.Twitter.format.c_str());
+      rich_edit_.SetText(Settings[taiga::kShare_Twitter_Format].c_str());
       break;
     case FORMAT_MODE_BALLOON:
       SetText(L"Edit format - Balloon tooltips");
-      rich_edit_.SetText(Settings.Program.Notifications.format.c_str());
+      rich_edit_.SetText(Settings[taiga::kSync_Notify_Format].c_str());
       break;
   }
 
@@ -109,22 +110,22 @@ BOOL FormatDialog::OnInitDialog() {
 void FormatDialog::OnOK() {
   switch (mode) {
     case FORMAT_MODE_HTTP:
-      rich_edit_.GetText(Settings.Announce.HTTP.format);
+      Settings.Set(taiga::kShare_Http_Format, rich_edit_.GetText());
       break;
     case FORMAT_MODE_MESSENGER:
-      rich_edit_.GetText(Settings.Announce.MSN.format);
+      Settings.Set(taiga::kShare_Messenger_Format, rich_edit_.GetText());
       break;
     case FORMAT_MODE_MIRC:
-      rich_edit_.GetText(Settings.Announce.MIRC.format);
+      Settings.Set(taiga::kShare_Mirc_Format, rich_edit_.GetText());
       break;
     case FORMAT_MODE_SKYPE:
-      rich_edit_.GetText(Settings.Announce.Skype.format);
+      Settings.Set(taiga::kShare_Skype_Format, rich_edit_.GetText());
       break;
     case FORMAT_MODE_TWITTER:
-      rich_edit_.GetText(Settings.Announce.Twitter.format);
+      Settings.Set(taiga::kShare_Twitter_Format, rich_edit_.GetText());
       break;
     case FORMAT_MODE_BALLOON:
-      rich_edit_.GetText(Settings.Program.Notifications.format);
+      Settings.Set(taiga::kSync_Notify_Format, rich_edit_.GetText());
       break;
   }
   

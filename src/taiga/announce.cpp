@@ -23,7 +23,9 @@
 #include "base/logger.h"
 #include "base/string.h"
 #include "library/anime.h"
+#include "library/anime_episode.h"
 #include "taiga/script.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "win/win_taskdialog.h"
 
@@ -35,30 +37,30 @@ namespace taiga {
 
 void Announcer::Clear(int modes, bool force) {
   if (modes & kAnnounceToHttp)
-    if (Settings.Announce.HTTP.enabled || force)
-      ToHttp(Settings.Announce.HTTP.url, L"");
+    if (Settings.GetBool(kShare_Http_Enabled) || force)
+      ToHttp(Settings[kShare_Http_Url], L"");
 
   if (modes & kAnnounceToMessenger)
-    if (Settings.Announce.MSN.enabled || force)
+    if (Settings.GetBool(kShare_Messenger_Enabled) || force)
       ToMessenger(L"", L"", L"", false);
 
   if (modes & kAnnounceToSkype)
-    if (Settings.Announce.Skype.enabled || force)
+    if (Settings.GetBool(kShare_Skype_Enabled) || force)
       ToSkype(::Skype.previous_mood);
 }
 
 void Announcer::Do(int modes, anime::Episode* episode, bool force) {
-  if (!force && !Settings.Program.General.enable_sharing)
+  if (!force && !Settings.GetBool(kApp_Option_EnableSharing))
     return;
 
   if (!episode)
     episode = &CurrentEpisode;
 
   if (modes & kAnnounceToHttp) {
-    if (Settings.Announce.HTTP.enabled || force) {
+    if (Settings.GetBool(kShare_Http_Enabled) || force) {
       LOG(LevelDebug, L"HTTP");
-      ToHttp(Settings.Announce.HTTP.url,
-             ReplaceVariables(Settings.Announce.HTTP.format,
+      ToHttp(Settings[kShare_Http_Url],
+             ReplaceVariables(Settings[kShare_Http_Format],
                               *episode, true, force));
     }
   }
@@ -67,40 +69,40 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     return;
 
   if (modes & kAnnounceToMessenger) {
-    if (Settings.Announce.MSN.enabled || force) {
+    if (Settings.GetBool(kShare_Messenger_Enabled) || force) {
       LOG(LevelDebug, L"Messenger");
       ToMessenger(L"Taiga", L"MyAnimeList",
-                  ReplaceVariables(Settings.Announce.MSN.format,
+                  ReplaceVariables(Settings[kShare_Messenger_Format],
                                    *episode, false, force),
                   true);
     }
   }
 
   if (modes & kAnnounceToMirc) {
-    if (Settings.Announce.MIRC.enabled || force) {
+    if (Settings.GetBool(kShare_Mirc_Enabled) || force) {
       LOG(LevelDebug, L"mIRC");
-      ToMirc(Settings.Announce.MIRC.service,
-             Settings.Announce.MIRC.channels,
-             ReplaceVariables(Settings.Announce.MIRC.format,
+      ToMirc(Settings[kShare_Mirc_Service],
+             Settings[kShare_Mirc_Channels],
+             ReplaceVariables(Settings[kShare_Mirc_Format],
                               *episode, false, force),
-             Settings.Announce.MIRC.mode,
-             Settings.Announce.MIRC.use_action,
-             Settings.Announce.MIRC.multi_server);
+             Settings.GetInt(kShare_Mirc_Mode),
+             Settings.GetBool(kShare_Mirc_UseMeAction),
+             Settings.GetBool(kShare_Mirc_MultiServer));
     }
   }
 
   if (modes & kAnnounceToSkype) {
-    if (Settings.Announce.Skype.enabled || force) {
+    if (Settings.GetBool(kShare_Skype_Enabled) || force) {
       LOG(LevelDebug, L"Skype");
-      ToSkype(ReplaceVariables(Settings.Announce.Skype.format,
+      ToSkype(ReplaceVariables(Settings[kShare_Skype_Format],
                                *episode, false, force));
     }
   }
 
   if (modes & kAnnounceToTwitter) {
-    if (Settings.Announce.Twitter.enabled || force) {
+    if (Settings.GetBool(kShare_Twitter_Enabled) || force) {
       LOG(LevelDebug, L"Twitter");
-      ToTwitter(ReplaceVariables(Settings.Announce.Twitter.format,
+      ToTwitter(ReplaceVariables(Settings[kShare_Twitter_Format],
                                  *episode, false, force));
     }
   }
@@ -451,8 +453,8 @@ bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstri
 }
 
 bool Twitter::SetStatusText(const wstring& status_text) {
-  if (Settings.Announce.Twitter.oauth_key.empty() ||
-      Settings.Announce.Twitter.oauth_secret.empty())
+  if (Settings[kShare_Twitter_OauthToken].empty() ||
+      Settings[kShare_Twitter_OauthSecret].empty())
     return false;
   if (status_text.empty() || status_text == status_text_)
     return false;
@@ -470,8 +472,8 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"http://api.twitter.com/1.1/statuses/update.json",
                                      L"POST", &post_parameters,
-                                     Settings.Announce.Twitter.oauth_key,
-                                     Settings.Announce.Twitter.oauth_secret);
+                                     Settings[kShare_Twitter_OauthToken],
+                                     Settings[kShare_Twitter_OauthSecret]);
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterPost);
   return true;
