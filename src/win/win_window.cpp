@@ -308,6 +308,13 @@ void Window::GetText(wstring& str) const {
   str.assign(&buffer[0]);
 }
 
+wstring Window::GetText() const {
+  int len = ::GetWindowTextLength(m_hWindow) + 1;
+  vector<wchar_t> buffer(len);
+  ::GetWindowText(m_hWindow, &buffer[0], len);
+  return wstring(&buffer[0]);
+}
+
 INT Window::GetTextLength() const {
   return ::GetWindowTextLength(m_hWindow);
 }

@@ -47,6 +47,7 @@ public:
   virtual UINT GetDlgItemInt(int nIDDlgItem);
   virtual void GetDlgItemText(int nIDDlgItem, LPWSTR lpString, int cchMax = MAX_PATH);
   virtual void GetDlgItemText(int nIDDlgItem, wstring& str);
+  virtual wstring GetDlgItemText(int nIDDlgItem);
   virtual BOOL HideDlgItem(int nIDDlgItem);
   virtual BOOL IsDlgButtonChecked(int nIDButton);
   virtual BOOL SendDlgItemMessage(int nIDDlgItem, UINT uMsg, WPARAM wParam, LPARAM lParam);

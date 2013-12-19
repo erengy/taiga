@@ -81,6 +81,7 @@ public:
   HWND    GetParent();
   void    GetText(LPWSTR lpszString, int nMaxCount = MAX_PATH) const;
   void    GetText(std::wstring& str) const;
+  wstring GetText() const;
   INT     GetTextLength() const;
   DWORD   GetWindowLong(int nIndex = GWL_STYLE) const;
   BOOL    GetWindowRect(LPRECT lpRect) const;

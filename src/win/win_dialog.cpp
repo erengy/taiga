@@ -197,6 +197,13 @@ void Dialog::GetDlgItemText(int nIDDlgItem, wstring& str) {
   str.assign(&buffer[0]);
 }
 
+wstring Dialog::GetDlgItemText(int nIDDlgItem) {
+  int len = ::GetWindowTextLength(::GetDlgItem(m_hWindow, nIDDlgItem)) + 1;
+  vector<wchar_t> buffer(len);
+  ::GetDlgItemText(m_hWindow, nIDDlgItem, &buffer[0], len);
+  return wstring(&buffer[0]);
+}
+
 BOOL Dialog::HideDlgItem(int nIDDlgItem) {
   return ::ShowWindow(::GetDlgItem(m_hWindow, nIDDlgItem), SW_HIDE);
 }
