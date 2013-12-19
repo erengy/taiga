@@ -577,6 +577,15 @@ wstring ToUpper_Copy(wstring str, bool use_locale) {
 ////////////////////////////////////////////////////////////////////////////////
 // Type conversion
 
+bool ToBool(const wstring& str) {
+  if (str.empty())
+    return false;
+
+  const wchar_t c = str.front();
+
+  return (c == '1' || c == 't' || c == 'T' || c == 'y' || c == 'Y');
+}
+
 int ToInt(const wstring& str) {
   return _wtoi(str.c_str());
 }
