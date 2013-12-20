@@ -33,6 +33,7 @@
 #include "base/string.h"
 #include "taiga/taiga.h"
 #include "ui/list.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 #include "win/win_gdi.h"
@@ -237,7 +238,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (lpnmitem->iItem == -1) break;
         FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
         if (feed_item) {
-          wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
+          wstring answer = ui::Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
             feed->Download(feed_item->index);
           } else if (answer == L"Info") {

@@ -34,6 +34,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 class AnimeDialog AnimeDialog;
@@ -211,7 +212,7 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
           wstring action = pNMLink->item.szUrl;
           if (IsEqual(pNMLink->item.szID, L"menu")) {
-            action = UI.Menus.Show(m_hWindow, 0, 0, pNMLink->item.szUrl);
+            action = ui::Menus.Show(m_hWindow, 0, 0, pNMLink->item.szUrl);
           } else if (IsEqual(pNMLink->item.szID, L"search")) {
             action = L"SearchAnime(" + CurrentEpisode.title + L")";
           } else if (IsEqual(pNMLink->item.szUrl, L"score")) {

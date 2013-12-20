@@ -24,40 +24,38 @@ namespace win {
 
 HMENU MenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
   // Initialize
-  int menu_index = GetIndex(lpName);
-  if (menu_index == -1) return NULL;
+  auto menu = FindMenu(lpName);
+  if (!menu)
+    return NULL;
   int nMenu = hMenu.size();
   hMenu.resize(nMenu + 1);
 
   // Create menu
-  if (Menu[menu_index].Type == L"menubar") {
+  if (menu->type == L"menubar") {
     hMenu[nMenu] = ::CreateMenu();
   } else {
     hMenu[nMenu] = ::CreatePopupMenu();
   }
-  if (!hMenu[nMenu]) return NULL;
+  if (!hMenu[nMenu])
+    return NULL;
 
   // Add items
-  for (unsigned int i = 0; i < Menu[menu_index].Items.size(); i++) {
-    UINT uFlags = (Menu[menu_index].Items[i].Checked ? MF_CHECKED : NULL) | 
-      (Menu[menu_index].Items[i].Default ? MF_DEFAULT : NULL) | 
-      (Menu[menu_index].Items[i].Enabled ? MF_ENABLED : MF_GRAYED) | 
-      (Menu[menu_index].Items[i].NewColumn ? MF_MENUBARBREAK : NULL) | 
-      (Menu[menu_index].Items[i].Radio ? MFT_RADIOCHECK : NULL);
+  for (auto item = menu->items.begin(); item != menu->items.end(); ++item) {
+    UINT uFlags = (item->Checked ? MF_CHECKED : NULL) |
+                  (item->Default ? MF_DEFAULT : NULL) |
+                  (item->Enabled ? MF_ENABLED : MF_GRAYED) |
+                  (item->NewColumn ? MF_MENUBARBREAK : NULL) |
+                  (item->Radio ? MFT_RADIOCHECK : NULL);
     
-    switch (Menu[menu_index].Items[i].Type) {
+    switch (item->Type) {
       // Normal item      
       case MENU_ITEM_NORMAL: {
-        UINT_PTR uIDNewItem = (UINT_PTR)&Menu[menu_index].Items[i].Action;
-        ::AppendMenu(hMenu[nMenu], MF_STRING | uFlags, uIDNewItem, 
-          Menu[menu_index].Items[i].Name.c_str());
-        if (Menu[menu_index].Items[i].Default) {
+        UINT_PTR uIDNewItem = (UINT_PTR)&item->Action;
+        ::AppendMenu(hMenu[nMenu], MF_STRING | uFlags, uIDNewItem,
+                     item->Name.c_str());
+        if (item->Default) {
           ::SetMenuDefaultItem(hMenu[nMenu], uIDNewItem, FALSE);
         }
-        // TEMP
-        /*Menu[menu_index].Items[i].Icon.Load(ImageList_GetIcon(m_hImageList, 1, ILD_NORMAL));
-        BOOL bReturn = ::SetMenuItemBitmaps(hMenu[nMenu], uIDNewItem, MF_BITMAP | MF_BYCOMMAND, 
-          Menu[menu_index].Items[i].Icon.Handle, NULL);*/
         break;
       }
       // Separator
@@ -67,11 +65,11 @@ HMENU MenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
       }
       // Sub menu
       case MENU_ITEM_SUBMENU: {
-        int sub_index = GetIndex(Menu[menu_index].Items[i].SubMenu.c_str());
-        if (sub_index > -1 && sub_index != menu_index) {
-          HMENU hSubMenu = CreateNewMenu(Menu[sub_index].Name.c_str(), hMenu);
+        auto submenu = FindMenu(item->SubMenu.c_str());
+        if (submenu && submenu != menu) {
+          HMENU hSubMenu = CreateNewMenu(submenu->name.c_str(), hMenu);
           ::AppendMenu(hMenu[nMenu], MF_POPUP | uFlags, 
-            (UINT_PTR)hSubMenu, Menu[menu_index].Items[i].Name.c_str());
+                       (UINT_PTR)hSubMenu, item->Name.c_str());
         }
         break;
       }
@@ -85,13 +83,15 @@ wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
   // Create menu
   vector<HMENU> hMenu;
   CreateNewMenu(lpName, hMenu);
-  if (!hMenu.size()) return L"";
+  if (!hMenu.size())
+    return L"";
 
   // Set position
   if (x == 0 && y == 0) {
     POINT point;
     ::GetCursorPos(&point);
-    x = point.x; y = point.y;
+    x = point.x;
+    y = point.y;
   }
   
   // Show menu
@@ -103,11 +103,6 @@ wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
   for (unsigned int i = 0; i < hMenu.size(); i++) {
     ::DestroyMenu(hMenu[i]);
   }
-  /*for (int i = 1; i < Count; i++) {
-    for (int j = 1; j < Menu[i].Count; i++) {
-      Menu[i].Items[j].Icon.Destroy();
-    }
-  }*/
 
   // Return action
   if (index > 0) {
@@ -118,82 +113,44 @@ wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
   }
 }
 
-// =============================================================================
-
 void MenuList::Create(LPCWSTR lpName, LPCWSTR lpType) {
-  Menu.resize(Menu.size() + 1);
-  Menu.back().Name = lpName;
-  Menu.back().Type = lpType;
+  menus.resize(menus.size() + 1);
+  menus.back().name = lpName;
+  menus.back().type = lpType;
 }
 
-int MenuList::GetIndex(LPCWSTR lpName) {
-  for (unsigned int i = 0; i < Menu.size(); i++) {
-    if (Menu[i].Name == lpName) return i;
-  }
-  return -1;
-}
+Menu* MenuList::FindMenu(LPCWSTR lpName) {
+  for (auto it = menus.begin(); it != menus.end(); ++it)
+    if (it->name == lpName)
+      return &(*it);
 
-void MenuList::SetImageList(HIMAGELIST hImageList) {
-  m_hImageList = hImageList;
+  return nullptr;
 }
 
 // =============================================================================
 
-void MenuList::Menu::CreateItem(wstring action, wstring name, wstring sub,
-                                bool checked, bool def, bool enabled, 
-                                bool newcolumn, bool radio) {
-  unsigned int i = Items.size();
-  Items.resize(i + 1);
+void Menu::CreateItem(wstring action, wstring name, wstring sub,
+                      bool checked, bool def, bool enabled,
+                      bool newcolumn, bool radio) {
+  unsigned int i = items.size();
+  items.resize(i + 1);
   
-  Items[i].Action    = action;
-  Items[i].Checked   = checked;
-  Items[i].Default   = def;
-  Items[i].Enabled   = enabled;
-  Items[i].Name      = name;
-  Items[i].NewColumn = newcolumn;
-  Items[i].Radio     = radio;
-  Items[i].SubMenu   = sub;
+  items[i].Action    = action;
+  items[i].Checked   = checked;
+  items[i].Default   = def;
+  items[i].Enabled   = enabled;
+  items[i].Name      = name;
+  items[i].NewColumn = newcolumn;
+  items[i].Radio     = radio;
+  items[i].SubMenu   = sub;
 
   if (!sub.empty()) {
-    Items[i].Type = MENU_ITEM_SUBMENU;
+    items[i].Type = MENU_ITEM_SUBMENU;
   } else if (name.empty()) {
-    Items[i].Type = MENU_ITEM_SEPARATOR;
+    items[i].Type = MENU_ITEM_SEPARATOR;
   } else {
-    Items[i].Type = MENU_ITEM_NORMAL;
+    items[i].Type = MENU_ITEM_NORMAL;
   }
-
-  Items[i].Icon.Index = 0;
-  Items[i].Icon.Destroy();
-}
-
-// =============================================================================
-
-void MenuList::Menu::MenuItem::CMenuIcon::Destroy() {
-  ::DeleteObject(Handle);
-  Handle = NULL;
-}
-
-void MenuList::Menu::MenuItem::CMenuIcon::Load(HICON hIcon) {
-  Destroy();
-  
-  RECT rect = {0};
-  rect.right = ::GetSystemMetrics(SM_CXMENUCHECK);
-  rect.bottom = ::GetSystemMetrics(SM_CYMENUCHECK);
-
-  HWND hDesktop = ::GetDesktopWindow();
-  HDC hScreen = ::GetDC(hDesktop);
-  HDC hDC = ::CreateCompatibleDC(hScreen);
-  Handle = ::CreateCompatibleBitmap(hScreen, rect.right, rect.bottom);
-  HBITMAP hOld = (HBITMAP)::SelectObject(hDC, Handle);
-  
-  ::SetBkColor(hDC, ::GetSysColor(COLOR_MENU));
-  ::ExtTextOut(hDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
-  ::DrawIconEx(hDC, 0, 0, hIcon, rect.right, rect.bottom, 0, NULL, DI_NORMAL);
-
-  ::DeleteObject(hOld);
-  ::DeleteDC(hDC);
-  ::ReleaseDC(hDesktop, hScreen);
-  ::DestroyIcon(hIcon);
 }
 
 }  // namespace win

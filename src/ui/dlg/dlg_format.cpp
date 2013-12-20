@@ -28,6 +28,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "base/string.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 anime::Episode PreviewEpisode;
@@ -136,7 +137,7 @@ BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Add button    
     case IDHELP: {
-      wstring answer = UI.Menus.Show(m_hWindow, 0, 0, L"ScriptAdd");
+      wstring answer = ui::Menus.Show(m_hWindow, 0, 0, L"ScriptAdd");
       wstring str; rich_edit_.GetText(str);
       CHARRANGE cr = {0};
       rich_edit_.GetSel(&cr);

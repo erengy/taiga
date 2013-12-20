@@ -34,7 +34,6 @@ Theme::Theme() {
   // Create image lists
   ImgList16.Create(16, 16);
   ImgList24.Create(24, 24);
-  Menus.SetImageList(ImgList16.GetHandle());
 }
 
 bool Theme::Load() {
@@ -92,27 +91,6 @@ bool Theme::Load() {
   READ_PROGRESS_DATA(separator,  L"separator");
   READ_PROGRESS_DATA(watching,   L"watching");
   #undef READ_PROGRESS_DATA
-
-  // Read menus
-  Menus.Menu.clear();
-  wstring menu_resource;
-  ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
-  parse_result = document.load(menu_resource.data());
-  xml_node menus = document.child(L"menus");
-  foreach_xmlnode_(menu, menus, L"menu") {
-    Menus.Create(menu.attribute(L"name").value(), menu.attribute(L"type").value());
-    foreach_xmlnode_(item, menu, L"item") {
-      UI.Menus.Menu.back().CreateItem(
-        item.attribute(L"action").value(), 
-        item.attribute(L"name").value(), 
-        item.attribute(L"sub").value(), 
-        item.attribute(L"checked").as_bool(), 
-        item.attribute(L"default").as_bool(), 
-        !item.attribute(L"disabled").as_bool(), 
-        item.attribute(L"column").as_bool(), 
-        item.attribute(L"radio").as_bool());
-    }
-  }
 
   return true;
 }

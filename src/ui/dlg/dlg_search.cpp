@@ -116,8 +116,8 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (lpnmitem->iItem == -1) break;
         LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
         auto anime_item = AnimeDatabase.FindItem(static_cast<int>(lParam));
-        UpdateSearchListMenu(!anime_item->IsInList());
-        ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SearchList"), 0, lParam);
+        ui::Menus.UpdateSearchList(!anime_item->IsInList());
+        ExecuteAction(ui::Menus.Show(pnmh->hwndFrom, 0, 0, L"SearchList"), 0, lParam);
         break;
       }
     }

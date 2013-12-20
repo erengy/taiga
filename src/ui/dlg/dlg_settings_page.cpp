@@ -39,6 +39,7 @@
 #include "base/string.h"
 #include "taiga/path.h"
 #include "taiga/taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 // =============================================================================
@@ -766,7 +767,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       win::ListView list = lpnmitem->hdr.hwndFrom;
       // Media players
       if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-        wstring answer = UI.Menus.Show(GetWindowHandle(), 0, 0, L"GenericList");
+        wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"GenericList");
         for (int i = 0; i < list.GetItemCount(); i++) {
           if (answer == L"SelectAll()") {
             list.SetCheckState(i, TRUE);

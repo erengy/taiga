@@ -466,7 +466,7 @@ void AppSettings::ApplyChanges(const wstring& previous_user,
     UI.Load();
     UI.LoadImages();
     MainDialog.rebar.RedrawWindow();
-    UpdateAllMenus();
+    ui::Menus.UpdateAll();
   }
 
   if (GetWstr(kSync_Service_Mal_Username) != previous_user) {
@@ -490,7 +490,7 @@ void AppSettings::ApplyChanges(const wstring& previous_user,
   bool enable_monitor = GetBool(kLibrary_WatchFolders);
   FolderMonitor.Enable(enable_monitor);
 
-  UpdateExternalLinksMenu();
+  ui::Menus.UpdateExternalLinks();
 }
 
 void AppSettings::HandleCompatibility() {

@@ -21,7 +21,6 @@
 
 #include "base/std.h"
 #include "win/ctrl/win_ctrl.h"
-#include "win/win_menu.h"
 
 enum Icons16px {
   ICON16_GREEN,
@@ -112,8 +111,6 @@ public:
   bool LoadImages();
 
 public:
-  win::MenuList Menus;
-
   win::ImageList ImgList16;
   win::ImageList ImgList24;
 

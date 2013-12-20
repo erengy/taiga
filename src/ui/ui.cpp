@@ -307,7 +307,7 @@ void OnTwitterPost(bool success, const string_t& error) {
 
 void OnLogin() {
   ChangeStatusText(L"Logged in as " + Settings[taiga::kSync_Service_Mal_Username]);
-  UpdateAllMenus();
+  Menus.UpdateAll();
 
   MainDialog.UpdateTip();
   MainDialog.UpdateTitle();

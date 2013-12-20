@@ -575,8 +575,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           } else if (listview.button_visible[2] && listview.button_rect[2].PtIn(lpnmitem->ptAction)) {
             POINT pt = {listview.button_rect[2].left, listview.button_rect[2].bottom};
             ClientToScreen(listview.GetWindowHandle(), &pt);
-            UpdateAnimeMenu(GetCurrentItem());
-            ExecuteAction(UI.Menus.Show(GetWindowHandle(), pt.x, pt.y, L"EditScore"), 0, anime_id);
+            ui::Menus.UpdateAnime(GetCurrentItem());
+            ExecuteAction(ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"EditScore"), 0, anime_id);
           }
           int list_index = GetListIndex(GetCurrentId());
           listview.RefreshItem(list_index);
@@ -592,23 +592,23 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         if (listview.GetSelectedCount() > 0) {
           int anime_id = GetCurrentId();
           auto anime_item = GetCurrentItem();
-          UpdateAllMenus(anime_item);
+          ui::Menus.UpdateAll(anime_item);
           int index = listview.HitTest(true);
           if (anime_item->IsInList()) {
             switch (index) {
               // Score
               case 2:
-                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"EditScore"), 0, anime_id);
+                ExecuteAction(ui::Menus.Show(g_hMain, 0, 0, L"EditScore"), 0, anime_id);
                 break;
               // Other
               default:
-                ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"RightClick"), 0, anime_id);
+                ExecuteAction(ui::Menus.Show(g_hMain, 0, 0, L"RightClick"), 0, anime_id);
                 break;
             }
-            UpdateAllMenus(anime_item);
+            ui::Menus.UpdateAll(anime_item);
           } else {
-            UpdateSearchListMenu(true);
-            ExecuteAction(UI.Menus.Show(g_hMain, 0, 0, L"SearchList"), 0, anime_id);
+            ui::Menus.UpdateSearchList(true);
+            ExecuteAction(ui::Menus.Show(g_hMain, 0, 0, L"SearchList"), 0, anime_id);
           }
         }
       }

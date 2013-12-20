@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 
 class HistoryDialog HistoryDialog;
@@ -103,7 +104,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       }
       // Right click
       case NM_RCLICK: {
-        wstring action = UI.Menus.Show(g_hMain, 0, 0, L"HistoryList");
+        wstring action = ui::Menus.Show(g_hMain, 0, 0, L"HistoryList");
         if (action == L"Delete()") {
           RemoveItems();
         } else if (action == L"ClearHistory()") {

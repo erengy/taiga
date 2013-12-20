@@ -19,20 +19,40 @@
 #ifndef TAIGA_UI_MENU_H
 #define TAIGA_UI_MENU_H
 
+#include <string>
+
+#include "win/win_menu.h"
+
 namespace anime {
 class Item;
 }
 
-void UpdateAllMenus(anime::Item* anime_item = nullptr);
-void UpdateAnimeMenu(anime::Item* anime_item);
-void UpdateAnnounceMenu();
-void UpdateExternalLinksMenu();
-void UpdateFoldersMenu();
-void UpdateSearchListMenu(bool enabled = false);
-void UpdateSeasonListMenu(bool enabled = false);
-void UpdateSeasonMenu();
-void UpdateToolsMenu();
-void UpdateTrayMenu();
-void UpdateViewMenu();
+namespace ui {
+
+class MenuList {
+public:
+  void Load();
+
+  std::wstring Show(HWND hwnd, int x, int y, LPCWSTR lpName);
+
+  void UpdateAll(const anime::Item* anime_item = nullptr);
+  void UpdateAnime(const anime::Item* anime_item);
+  void UpdateAnnounce();
+  void UpdateExternalLinks();
+  void UpdateFolders();
+  void UpdateSearchList(bool enabled = false);
+  void UpdateSeasonList(bool enabled = false);
+  void UpdateSeason();
+  void UpdateTools();
+  void UpdateTray();
+  void UpdateView();
+
+private:
+  win::MenuList menu_list_;
+};
+
+extern MenuList Menus;
+
+}  // namespace ui
 
 #endif  // TAIGA_UI_MENU_H

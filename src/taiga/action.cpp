@@ -207,7 +207,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     Settings.Set(taiga::kApp_Option_HideSidebar, hide_sidebar);
     MainDialog.treeview.Show(hide_sidebar);
     MainDialog.UpdateControlPositions();
-    UpdateViewMenu();
+    ui::Menus.UpdateView();
 
   // TorrentAddFilter()
   //   Shows add new filter window.
@@ -321,7 +321,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"ToggleSharing") {
     bool enable_sharing = !Settings.GetBool(taiga::kApp_Option_EnableSharing);
     Settings.Set(taiga::kApp_Option_EnableSharing, enable_sharing);
-    UpdateToolsMenu();
+    ui::Menus.UpdateTools();
     if (enable_sharing) {
       MainDialog.ChangeStatus(L"Automatic sharing is now enabled.");
     } else {
@@ -333,7 +333,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"ToggleSynchronization") {
     bool enable_sync = !Settings.GetBool(taiga::kApp_Option_EnableSync);
     Settings.Set(taiga::kApp_Option_EnableSync, enable_sync);
-    UpdateToolsMenu();
+    ui::Menus.UpdateTools();
     if (enable_sync) {
       MainDialog.ChangeStatus(L"Automatic synchronization is now enabled.");
     } else {

@@ -28,6 +28,7 @@
 #include "taiga.h"
 #include "taiga/announce.h"
 #include "track/media.h"
+#include "ui/menu.h"
 #include "ui/theme.h"
 #include "version.h"
 #include "win/win_taskbar.h"
@@ -121,6 +122,7 @@ void App::LoadData() {
 
   UI.Load();
   UI.LoadImages();
+  ui::Menus.Load();
 
   AnimeDatabase.LoadDatabase();
   AnimeDatabase.LoadList();

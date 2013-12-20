@@ -98,7 +98,7 @@ BOOL MainDialog::OnInitDialog() {
   UpdateTitle();
   
   // Refresh menus
-  UpdateAllMenus();
+  ui::Menus.UpdateAll();
 
   // Apply start-up settings
   if (Settings.GetBool(taiga::kSync_AutoOnStart)) { 		
@@ -784,10 +784,10 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case WM_RBUTTONUP: {
-        UpdateAllMenus(AnimeListDialog.GetCurrentItem());
+        ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
         SetForegroundWindow();
-        ExecuteAction(UI.Menus.Show(m_hWindow, 0, 0, L"Tray"));
-        UpdateAllMenus(AnimeListDialog.GetCurrentItem());
+        ExecuteAction(ui::Menus.Show(m_hWindow, 0, 0, L"Tray"));
+        ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
         break;
       }
     }
@@ -985,7 +985,7 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
 
   parent->treeview.SelectItem(parent->treeview.hti.at(current_page_));
 
-  UpdateViewMenu();
+  ui::Menus.UpdateView();
   Refresh(add_to_history);
 }
 

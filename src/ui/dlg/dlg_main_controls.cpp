@@ -345,7 +345,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   wstring action;
   HWND hwnd = ::MainDialog.GetWindowHandle();
   #define SHOWUIMENU(id, name) \
-    case id: action = UI.Menus.Show(hwnd, pt.x, pt.y, name); break;
+    case id: action = ui::Menus.Show(hwnd, pt.x, pt.y, name); break;
   switch (tbb.idCommand) {
     SHOWUIMENU(100, L"File");
     SHOWUIMENU(101, L"MyAnimeList");
@@ -367,6 +367,6 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
 
   if (!action.empty()) {
     ExecuteAction(action);
-    UpdateAllMenus(AnimeListDialog.GetCurrentItem());
+    ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
   }
 }

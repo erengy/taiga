@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,82 +16,115 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "library/anime_db.h"
-#include "library/anime_filter.h"
-#include "taiga/settings.h"
+#include "base/foreach.h"
 #include "base/string.h"
-#include "taiga/taiga.h"
-#include "theme.h"
+#include "base/xml.h"
+#include "library/anime_db.h"
+#include "library/anime_episode.h"
+#include "taiga/settings.h"
+#include "ui/menu.h"
 
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_season.h"
 
-#define MENU UI.Menus.Menu[menu_index]
+namespace ui {
 
-// =============================================================================
+MenuList Menus;
 
-void UpdateAnimeMenu(anime::Item* anime_item) {
-  if (!anime_item) return;
-  if (!anime_item->IsInList()) return;
-  int item_index = 0, menu_index = 0;
+void MenuList::Load() {
+  menu_list_.menus.clear();
+
+  wstring menu_resource;
+  ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
+
+  xml_document document;
+  xml_parse_result parse_result = document.load(menu_resource.data());
+
+  xml_node menus = document.child(L"menus");
+
+  foreach_xmlnode_(menu, menus, L"menu") {
+    menu_list_.Create(menu.attribute(L"name").value(),
+                      menu.attribute(L"type").value());
+    foreach_xmlnode_(item, menu, L"item") {
+      menu_list_.menus.back().CreateItem(
+          item.attribute(L"action").value(),
+          item.attribute(L"name").value(),
+          item.attribute(L"sub").value(),
+          item.attribute(L"checked").as_bool(),
+          item.attribute(L"default").as_bool(),
+          !item.attribute(L"disabled").as_bool(),
+          item.attribute(L"column").as_bool(),
+          item.attribute(L"radio").as_bool());
+    }
+  }
+}
+
+std::wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
+  return menu_list_.Show(hwnd, x, y, lpName);
+}
+
+void MenuList::UpdateAnime(const anime::Item* anime_item) {
+  if (!anime_item)
+    return;
+  if (!anime_item->IsInList())
+    return;
 
   // Edit > Score
-  menu_index = UI.Menus.GetIndex(L"EditScore");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = false;
-      MENU.Items[i].Default = false;
+  auto menu = menu_list_.FindMenu(L"EditScore");
+  if (menu) {
+    foreach_(it, menu->items) {
+      it->Checked = false;
+      it->Default = false;
     }
-    item_index = anime_item->GetMyScore();
-    if (item_index < static_cast<int>(MENU.Items.size())) {
-      MENU.Items[item_index].Checked = true;
-      MENU.Items[item_index].Default = true;
+    int item_index = anime_item->GetMyScore();
+    if (item_index < static_cast<int>(menu->items.size())) {
+      menu->items[item_index].Checked = true;
+      menu->items[item_index].Default = true;
     }
   }
   // Edit > Status
-  menu_index = UI.Menus.GetIndex(L"EditStatus");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = false;
-      MENU.Items[i].Default = false;
+  menu = menu_list_.FindMenu(L"EditStatus");
+  if (menu) {
+    foreach_(it, menu->items) {
+      it->Checked = false;
+      it->Default = false;
     }
-    item_index = anime_item->GetMyStatus();
-    if (item_index == anime::kPlanToWatch) item_index--;
-    if (item_index - 1 < static_cast<int>(MENU.Items.size())) {
-      MENU.Items[item_index - 1].Checked = true;
-      MENU.Items[item_index - 1].Default = true;
+    int item_index = anime_item->GetMyStatus();
+    if (item_index == anime::kPlanToWatch)
+      item_index--;
+    if (item_index - 1 < static_cast<int>(menu->items.size())) {
+      menu->items[item_index - 1].Checked = true;
+      menu->items[item_index - 1].Default = true;
     }
   }
 
   // Play
-  menu_index = UI.Menus.GetIndex(L"RightClick");
-  if (menu_index > -1) {
-    for (int i = static_cast<int>(MENU.Items.size()) - 1; i > 0; i--) {
-      if (MENU.Items[i].Type == win::MENU_ITEM_SEPARATOR) {
+  menu = menu_list_.FindMenu(L"RightClick");
+  if (menu) {
+    for (int i = static_cast<int>(menu->items.size()) - 1; i > 0; i--) {
+      if (menu->items[i].Type == win::MENU_ITEM_SEPARATOR) {
         // Clear items
-        MENU.Items.resize(i + 1);
+        menu->items.resize(i + 1);
         // Play episode
         if (anime_item->GetEpisodeCount() != 1) {
-          MENU.CreateItem(L"", L"Play episode", L"PlayEpisode");
+          menu->CreateItem(L"", L"Play episode", L"PlayEpisode");
         }
         // Play last episode
         if (anime_item->GetMyLastWatchedEpisode() > 0) {
-          MENU.CreateItem(
-            L"PlayLast()", 
-            L"Play last episode (#" + ToWstr(anime_item->GetMyLastWatchedEpisode()) + L")");
+          menu->CreateItem(L"PlayLast()",
+                           L"Play last episode (#" +
+                           ToWstr(anime_item->GetMyLastWatchedEpisode()) + L")");
         }
         // Play next episode
         if (anime_item->GetEpisodeCount() == 0 ||
             anime_item->GetMyLastWatchedEpisode() < anime_item->GetEpisodeCount()) {
-          MENU.CreateItem(
-            L"PlayNext()", 
-            L"Play next episode (#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")");
+          menu->CreateItem(L"PlayNext()",
+                           L"Play next episode (#" +
+                           ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")");
         }
         // Play random episode
         if (anime_item->GetEpisodeCount() != 1) {
-          MENU.CreateItem(L"PlayRandom()", L"Play random episode");
+          menu->CreateItem(L"PlayRandom()", L"Play random episode");
         }
         break;
       }
@@ -99,13 +132,14 @@ void UpdateAnimeMenu(anime::Item* anime_item) {
   }
 
   // Play > Episode
-  menu_index = UI.Menus.GetIndex(L"PlayEpisode");
-  if (menu_index > -1) {
+  menu = menu_list_.FindMenu(L"PlayEpisode");
+  if (menu) {
     // Clear menu
-    MENU.Items.clear();
+    menu->items.clear();
 
     // Add episode numbers
-    int count_max, count_column;
+    int count_max = 0;
+    int count_column = 0;
     if (anime_item->GetEpisodeCount() > 0) {
       count_max = anime_item->GetEpisodeCount();
     } else {
@@ -116,191 +150,195 @@ void UpdateAnimeMenu(anime::Item* anime_item) {
     }
     for (int i = 1; i <= count_max; i++) {
       count_column = count_max % 12 == 0 ? 12 : 13;
-      if (count_max > 52) count_column *= 2;
-      MENU.CreateItem(L"PlayEpisode(" + ToWstr(i) + L")", L"#" + ToWstr(i), L"", 
-        i <= anime_item->GetMyLastWatchedEpisode(), 
-        false, true, (i > 1) && (i % count_column == 1), false);
+      if (count_max > 52)
+        count_column *= 2;
+      menu->CreateItem(L"PlayEpisode(" + ToWstr(i) + L")",
+                       L"#" + ToWstr(i),
+                       L"",
+                       i <= anime_item->GetMyLastWatchedEpisode(),
+                       false,
+                       true,
+                       (i > 1) && (i % count_column == 1),
+                       false);
     }
   }
 }
 
-void UpdateAnnounceMenu() {
+void MenuList::UpdateAnnounce() {
   // List > Announce current episode
-  int menu_index = UI.Menus.GetIndex(L"List");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].SubMenu == L"Announce") {
-        MENU.Items[i].Enabled = CurrentEpisode.anime_id > 0;
+  auto menu = menu_list_.FindMenu(L"List");
+  if (menu) {
+    foreach_(it, menu->items) {
+      if (it->SubMenu == L"Announce") {
+        it->Enabled = CurrentEpisode.anime_id > 0;
         break;
       }
     }
   }
 }
 
-void UpdateExternalLinksMenu() {
-  int menu_index = UI.Menus.GetIndex(L"ExternalLinks");
-  if (menu_index > -1) {
+void MenuList::UpdateExternalLinks() {
+  auto menu = menu_list_.FindMenu(L"ExternalLinks");
+  if (menu) {
     // Clear menu
-    MENU.Items.clear();
+    menu->items.clear();
 
     vector<wstring> lines;
     Split(Settings[taiga::kApp_Interface_ExternalLinks], L"\r\n", lines);
-    for (auto line = lines.begin(); line != lines.end(); ++line) {
+    foreach_(line, lines) {
       if (IsEqual(*line, L"-")) {
         // Add separator
-        MENU.CreateItem();
+        menu->CreateItem();
       } else {
         vector<wstring> content;
         Split(*line, L"|", content);
         if (content.size() > 1) {
-          MENU.CreateItem(L"URL(" + content.at(1) + L")", content.at(0));
+          menu->CreateItem(L"URL(" + content.at(1) + L")", content.at(0));
         }
       }
     }
   }
 }
 
-void UpdateFoldersMenu() {
-  int menu_index = UI.Menus.GetIndex(L"Folders");
-  if (menu_index > -1) {
+void MenuList::UpdateFolders() {
+  auto menu = menu_list_.FindMenu(L"Folders");
+  if (menu) {
     // Clear menu
-    MENU.Items.clear();
+    menu->items.clear();
 
     if (!Settings.root_folders.empty()) {
       // Add folders
-      for (unsigned int i = 0; i < Settings.root_folders.size(); i++) {
-        MENU.CreateItem(L"Execute(" + Settings.root_folders[i] + L")", Settings.root_folders[i]);
+      foreach_(it, Settings.root_folders) {
+        menu->CreateItem(L"Execute(" + *it + L")", *it);
       }
       // Add separator
-      MENU.CreateItem();
+      menu->CreateItem();
     }
 
     // Add default item
-    MENU.CreateItem(L"AddFolder()", L"Add new folder...");
+    menu->CreateItem(L"AddFolder()", L"Add new folder...");
   }
 }
 
-void UpdateSearchListMenu(bool enabled) {
-  int menu_index = UI.Menus.GetIndex(L"SearchList");
-  if (menu_index > -1) {
+void MenuList::UpdateSearchList(bool enabled) {
+  auto menu = menu_list_.FindMenu(L"SearchList");
+  if (menu) {
     // Add to list
-    for (size_t i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].SubMenu == L"AddToList") {
-        MENU.Items[i].Enabled = enabled;
+    foreach_(it, menu->items) {
+      if (it->SubMenu == L"AddToList") {
+        it->Enabled = enabled;
         break;
       }
     }
   }
 }
 
-void UpdateSeasonListMenu(bool enabled) {
-  int menu_index = UI.Menus.GetIndex(L"SeasonList");
-  if (menu_index > -1) {
+void MenuList::UpdateSeasonList(bool enabled) {
+  auto menu = menu_list_.FindMenu(L"SeasonList");
+  if (menu) {
     // Add to list
-    for (size_t i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].SubMenu == L"AddToList") {
-        MENU.Items[i].Enabled = enabled;
+    foreach_(it, menu->items) {
+      if (it->SubMenu == L"AddToList") {
+        it->Enabled = enabled;
         break;
       }
     }
   }
 }
 
-void UpdateSeasonMenu() {
-  int item_index, menu_index = -1;
-  
+void MenuList::UpdateSeason() {
   // Group by
-  menu_index = UI.Menus.GetIndex(L"SeasonGroup");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = false;
+  auto menu = menu_list_.FindMenu(L"SeasonGroup");
+  if (menu) {
+    foreach_(it, menu->items) {
+      it->Checked = false;
     }
-    item_index = SeasonDialog.group_by;
-    if (item_index < static_cast<int>(MENU.Items.size())) {
-      MENU.Items[item_index].Checked = true;
+    int item_index = SeasonDialog.group_by;
+    if (item_index < static_cast<int>(menu->items.size())) {
+      menu->items[item_index].Checked = true;
     }
   }
 
   // Sort by
-  menu_index = UI.Menus.GetIndex(L"SeasonSort");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = false;
+  menu = menu_list_.FindMenu(L"SeasonSort");
+  if (menu) {
+    foreach_(it, menu->items) {
+      it->Checked = false;
     }
-    item_index = SeasonDialog.sort_by;
-    if (item_index < static_cast<int>(MENU.Items.size())) {
-      MENU.Items[item_index].Checked = true;
+    int item_index = SeasonDialog.sort_by;
+    if (item_index < static_cast<int>(menu->items.size())) {
+      menu->items[item_index].Checked = true;
     }
   }
 
   // View as
-  menu_index = UI.Menus.GetIndex(L"SeasonView");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = false;
+  menu = menu_list_.FindMenu(L"SeasonView");
+  if (menu) {
+    foreach_(it, menu->items) {
+      it->Checked = false;
     }
-    item_index = SeasonDialog.view_as;
-    if (item_index < static_cast<int>(MENU.Items.size())) {
-      MENU.Items[item_index].Checked = true;
+    int item_index = SeasonDialog.view_as;
+    if (item_index < static_cast<int>(menu->items.size())) {
+      menu->items[item_index].Checked = true;
     }
   }
 }
 
-void UpdateToolsMenu() {
-  int menu_index = UI.Menus.GetIndex(L"Tools");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
+void MenuList::UpdateTools() {
+  auto menu = menu_list_.FindMenu(L"Tools");
+  if (menu) {
+    foreach_(it, menu->items) {
       // Tools > Enable anime recognition
-      if (MENU.Items[i].Action == L"ToggleRecognition()")
-        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+      if (it->Action == L"ToggleRecognition()")
+        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
       // Tools > Enable auto sharing
-      if (MENU.Items[i].Action == L"ToggleSharing()")
-        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
+      if (it->Action == L"ToggleSharing()")
+        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
       // Tools > Enable auto synchronization
-      if (MENU.Items[i].Action == L"ToggleSynchronization()")
-        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
+      if (it->Action == L"ToggleSynchronization()")
+        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
     }
   }
 }
 
-void UpdateTrayMenu() {
-  int menu_index = UI.Menus.GetIndex(L"Tray");
-  if (menu_index > -1) {
+void MenuList::UpdateTray() {
+  auto menu = menu_list_.FindMenu(L"Tray");
+  if (menu) {
     // Tray > Enable recognition
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].Action == L"ToggleRecognition()") {
-        MENU.Items[i].Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+    foreach_(it, menu->items) {
+      if (it->Action == L"ToggleRecognition()") {
+        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
         break;
       }
     }
   }
 }
 
-void UpdateViewMenu() {
-  int item_index, menu_index = -1;
-
-  menu_index = UI.Menus.GetIndex(L"View");
-  if (menu_index > -1) {
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      MENU.Items[i].Checked = false;
+void MenuList::UpdateView() {
+  auto menu = menu_list_.FindMenu(L"View");
+  if (menu) {
+    foreach_(it, menu->items) {
+      it->Checked = false;
     }
-    item_index = MainDialog.navigation.GetCurrentPage();
-    for (unsigned int i = 0; i < MENU.Items.size(); i++) {
-      if (MENU.Items[i].Action == L"ViewContent(" + ToWstr(item_index) + L")") {
-        MENU.Items[i].Checked = true;
+    int item_index = MainDialog.navigation.GetCurrentPage();
+    foreach_(it, menu->items) {
+      if (it->Action == L"ViewContent(" + ToWstr(item_index) + L")") {
+        it->Checked = true;
         break;
       }
     }
-    MENU.Items.back().Checked = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
+    menu->items.back().Checked = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
   }
 }
 
-void UpdateAllMenus(anime::Item* anime_item) {
-  UpdateAnimeMenu(anime_item);
-  UpdateAnnounceMenu();
-  UpdateExternalLinksMenu();
-  UpdateFoldersMenu();
-  UpdateToolsMenu();
-  UpdateTrayMenu();
-  UpdateViewMenu();
+void MenuList::UpdateAll(const anime::Item* anime_item) {
+  UpdateAnime(anime_item);
+  UpdateAnnounce();
+  UpdateExternalLinks();
+  UpdateFolders();
+  UpdateTools();
+  UpdateTray();
+  UpdateView();
 }
+
+}  // namespace ui

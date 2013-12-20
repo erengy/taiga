@@ -31,50 +31,37 @@ enum MenuItemType {
   MENU_ITEM_SUBMENU
 };
 
+class MenuItem {
+public:
+  bool     Checked, Default, Enabled, NewColumn, Radio;
+  wstring  Action, Name, SubMenu;
+  int      Type;
+};
+
+class Menu {
+public:
+  void CreateItem(wstring action = L"",
+                  wstring name = L"",
+                  wstring sub = L"",
+                  bool checked = false,
+                  bool def = false,
+                  bool enabled = true,
+                  bool newcolumn = false,
+                  bool radio = false);
+
+  vector<MenuItem> items;
+  wstring name;
+  wstring type;
+};
+
 class MenuList {
 public:
-  MenuList() : m_hImageList(NULL) {}
-  ~MenuList() {}
-
   void    Create(LPCWSTR lpName, LPCWSTR lpType);
   HMENU   CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu);
-  int     GetIndex(LPCWSTR lpName);
-  void    SetImageList(HIMAGELIST hImageList);
+  Menu*   FindMenu(LPCWSTR lpName);
   wstring Show(HWND hwnd, int x, int y, LPCWSTR lpName);
 
-  class Menu {
-  public:
-    void CreateItem(
-      wstring action = L"", 
-      wstring name   = L"", 
-      wstring sub    = L"",
-      bool checked   = false, 
-      bool def       = false, 
-      bool enabled   = true, 
-      bool newcolumn = false, 
-      bool radio     = false);
-
-    class MenuItem {
-    public:
-      bool    Checked, Default, Enabled, NewColumn, Radio;
-      wstring Action, Name, SubMenu;
-      int     Type;
-
-      class CMenuIcon {
-      public:
-        void    Destroy();
-        void    Load(HICON hIcon);
-        HBITMAP Handle;
-        int     Index;
-      } Icon;
-    };
-    vector<MenuItem> Items;
-    wstring Name, Type;
-  };
-  vector<Menu> Menu;
-
-private:
-  HIMAGELIST m_hImageList;
+  vector<Menu> menus;
 };
 
 }  // namespace win

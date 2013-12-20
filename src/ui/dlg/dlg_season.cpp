@@ -195,8 +195,8 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(
         static_cast<int>(list_.GetItemParam(lpnmitem->iItem)));
       if (anime_item) {
-        UpdateSeasonListMenu(!anime_item->IsInList());
-        ExecuteAction(UI.Menus.Show(pnmh->hwndFrom, 0, 0, L"SeasonList"), 0, 
+        ui::Menus.UpdateSeasonList(!anime_item->IsInList());
+        ExecuteAction(ui::Menus.Show(pnmh->hwndFrom, 0, 0, L"SeasonList"), 0, 
                       static_cast<LPARAM>(anime_item->GetId()));
         list_.RedrawWindow();
       }
@@ -414,24 +414,24 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
       RECT rect; LPNMTOOLBAR nmt = reinterpret_cast<LPNMTOOLBAR>(lParam);
       ::SendMessage(nmt->hdr.hwndFrom, TB_GETRECT, static_cast<WPARAM>(nmt->iItem), reinterpret_cast<LPARAM>(&rect));          
       MapWindowPoints(nmt->hdr.hwndFrom, HWND_DESKTOP, reinterpret_cast<LPPOINT>(&rect), 2);
-      UpdateSeasonMenu();
+      ui::Menus.UpdateSeason();
       wstring action;
       switch (LOWORD(nmt->iItem)) {
         // Select season
         case 100:
-          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonSelect");
+          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonSelect");
           break;
         // Group by
         case 103:
-          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonGroup");
+          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonGroup");
           break;
         // Sort by
         case 104:
-          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonSort");
+          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonSort");
           break;
         // View as
         case 105:
-          action = UI.Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonView");
+          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonView");
           break;
       }
       if (!action.empty()) {
