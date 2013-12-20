@@ -333,44 +333,44 @@ void UpdateList(Item& item, Episode& episode) {
 }
 
 void AddToQueue(Item& item, const Episode& episode, bool change_status) {
-  // Create event item
-  EventItem event_item;
-  event_item.anime_id = item.GetId();
+  // Create history item
+  HistoryItem history_item;
+  history_item.anime_id = item.GetId();
 
   // Set episode number
-  event_item.episode = GetEpisodeHigh(episode.number);
+  history_item.episode = GetEpisodeHigh(episode.number);
 
   // Set start/finish date
-  if (*event_item.episode == 1 && !IsValidDate(item.GetMyDateStart()))
-    event_item.date_start = GetDate();
-  if (*event_item.episode == item.GetEpisodeCount() && !IsValidDate(item.GetMyDateEnd()))
-    event_item.date_finish = GetDate();
+  if (*history_item.episode == 1 && !IsValidDate(item.GetMyDateStart()))
+    history_item.date_start = GetDate();
+  if (*history_item.episode == item.GetEpisodeCount() && !IsValidDate(item.GetMyDateEnd()))
+    history_item.date_finish = GetDate();
 
   // Set update mode
   if (item.GetMyStatus() == kNotInList) {
-    event_item.mode = taiga::kHttpServiceAddLibraryEntry;
+    history_item.mode = taiga::kHttpServiceAddLibraryEntry;
   } else {
-    event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+    history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
   }
 
   if (change_status) {
     // Move to completed
-    if (item.GetEpisodeCount() == *event_item.episode) {
-      event_item.status = kCompleted;
+    if (item.GetEpisodeCount() == *history_item.episode) {
+      history_item.status = kCompleted;
       if (item.GetMyRewatching()) {
-        event_item.enable_rewatching = FALSE;
-        //event_item.times_rewatched++; // TODO: Enable when MAL adds to API
+        history_item.enable_rewatching = FALSE;
+        //history_item.times_rewatched++; // TODO: Enable when MAL adds to API
       }
     // Move to watching
-    } else if (item.GetMyStatus() != kWatching || *event_item.episode == 1) {
+    } else if (item.GetMyStatus() != kWatching || *history_item.episode == 1) {
       if (!item.GetMyRewatching()) {
-        event_item.status = kWatching;
+        history_item.status = kWatching;
       }
     }
   }
 
-  // Add event to queue
-  History.queue.Add(event_item);
+  // Add to queue
+  History.queue.Add(history_item);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

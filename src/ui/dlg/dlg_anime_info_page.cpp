@@ -393,13 +393,13 @@ bool PageMyInfo::Save() {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
   // Create item
-  EventItem event_item;
-  event_item.anime_id = anime_id_;
-  event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+  HistoryItem history_item;
+  history_item.anime_id = anime_id_;
+  history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
 
   // Episodes watched
-  event_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!anime::IsValidEpisode(*event_item.episode, -1, anime_item->GetEpisodeCount())) {
+  history_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
+  if (!anime::IsValidEpisode(*history_item.episode, -1, anime_item->GetEpisodeCount())) {
     wstring msg = L"Please enter a valid episode number between 0-" + 
                   ToWstr(anime_item->GetEpisodeCount()) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
@@ -407,36 +407,36 @@ bool PageMyInfo::Save() {
   }
 
   // Re-watching
-  event_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
+  history_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
   
   // Score
-  event_item.score = 10 - GetComboSelection(IDC_COMBO_ANIME_SCORE);
+  history_item.score = 10 - GetComboSelection(IDC_COMBO_ANIME_SCORE);
   
   // Status
-  event_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
-  if (*event_item.status == anime::kUnknownMyStatus)
-    event_item.status = *event_item.status + 1;
+  history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
+  if (*history_item.status == anime::kUnknownMyStatus)
+    history_item.status = *history_item.status + 1;
   
   // Tags
   wstring tags;
   GetDlgItemText(IDC_EDIT_ANIME_TAGS, tags);
-  event_item.tags = tags;
+  history_item.tags = tags;
 
   // Start date
   SYSTEMTIME stMyStart;
   if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
                          reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
-    event_item.date_start = Date();
+    history_item.date_start = Date();
   } else {
-    event_item.date_start = Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
+    history_item.date_start = Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
   }
   // Finish date
   SYSTEMTIME stMyFinish;
   if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
                          reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
-    event_item.date_finish = Date();
+    history_item.date_finish = Date();
   } else {
-    event_item.date_finish = Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
+    history_item.date_finish = Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
   }
 
   // Alternative titles
@@ -454,7 +454,7 @@ bool PageMyInfo::Save() {
   // Save settings
   Settings.Save();
 
-  // Add item to event queue
-  History.queue.Add(event_item);
+  // Add item to queue
+  History.queue.Add(history_item);
   return true;
 }

@@ -31,7 +31,7 @@ class Episode;
 class Item;
 }
 class Date;
-class EventItem;
+class HistoryItem;
 
 namespace anime {
 
@@ -83,15 +83,15 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Library data
 
-  int GetMyLastWatchedEpisode(bool check_events = true) const;
-  int GetMyScore(bool check_events = true) const;
-  int GetMyStatus(bool check_events = true) const;
-  int GetMyRewatching(bool check_events = true) const;
+  int GetMyLastWatchedEpisode(bool check_queue = true) const;
+  int GetMyScore(bool check_queue = true) const;
+  int GetMyStatus(bool check_queue = true) const;
+  int GetMyRewatching(bool check_queue = true) const;
   int GetMyRewatchingEp() const;
-  const Date& GetMyDateStart(bool check_events = true) const;
-  const Date& GetMyDateEnd(bool check_events = true) const;
+  const Date& GetMyDateStart(bool check_queue = true) const;
+  const Date& GetMyDateEnd(bool check_queue = true) const;
   const std::wstring& GetMyLastUpdated() const;
-  const std::wstring& GetMyTags(bool check_events = true) const;
+  const std::wstring& GetMyTags(bool check_queue = true) const;
 
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
@@ -145,7 +145,7 @@ public:
 
 private:
   // Helper function
-  EventItem* SearchHistory(int search_mode) const;
+  HistoryItem* SearchHistory(int search_mode) const;
 
   // Series information, stored in db\anime.xml
   library::Metadata metadata_;

@@ -239,16 +239,16 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     // Add item to list
     anime_item->AddtoUserList();
     AnimeDatabase.SaveList();
-    // Add item to event queue
-    EventItem event_item;
-    event_item.anime_id = anime_id;
-    event_item.status = status;
+    // Add item to queue
+    HistoryItem history_item;
+    history_item.anime_id = anime_id;
+    history_item.status = status;
     if (status == anime::kCompleted) {
-      event_item.episode = anime_item->GetEpisodeCount();
-      event_item.date_finish = GetDate();
+      history_item.episode = anime_item->GetEpisodeCount();
+      history_item.date_finish = GetDate();
     }
-    event_item.mode = taiga::kHttpServiceAddLibraryEntry;
-    History.queue.Add(event_item);
+    history_item.mode = taiga::kHttpServiceAddLibraryEntry;
+    History.queue.Add(history_item);
     // Refresh
     AnimeListDialog.RefreshList(status);
     AnimeListDialog.RefreshTabs(status);
@@ -399,10 +399,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() == IDYES) {
-      EventItem item;
-      item.anime_id = anime_id;
-      item.mode = taiga::kHttpServiceDeleteLibraryEntry;
-      History.queue.Add(item);
+      HistoryItem history_item;
+      history_item.anime_id = anime_id;
+      history_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
+      History.queue.Add(history_item);
     }
 
   // EditEpisode(value)
@@ -437,10 +437,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     int watched = anime_item->GetMyLastWatchedEpisode();
-    auto event_item = History.queue.FindItem(anime_item->GetId(), EVENT_SEARCH_EPISODE);
-    if (event_item && *event_item->episode == watched &&
+    auto history_item = History.queue.FindItem(anime_item->GetId(), kQueueSearchEpisode);
+    if (history_item && *history_item->episode == watched &&
         watched > anime_item->GetMyLastWatchedEpisode(false)) {
-      event_item->enabled = false;
+      history_item->enabled = false;
       History.queue.RemoveDisabled();
     } else {
       if (anime::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
@@ -467,24 +467,24 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"EditScore") {
     int anime_id = static_cast<int>(lParam);
-    EventItem item;
-    item.anime_id = anime_id;
-    item.score = ToInt(body);
-    item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-    History.queue.Add(item);
+    HistoryItem history_item;
+    history_item.anime_id = anime_id;
+    history_item.score = ToInt(body);
+    history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+    History.queue.Add(history_item);
 
   // EditStatus(value)
   //   Changes anime status of user.
   //   Value must be 1, 2, 3, 4 or 6, and different from current status.
   //   lParam is an anime ID.
   } else if (action == L"EditStatus") {
-    EventItem event_item;
-    event_item.status = ToInt(body);
+    HistoryItem history_item;
+    history_item.status = ToInt(body);
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     switch (anime_item->GetAiringStatus()) {
       case anime::kAiring:
-        if (*event_item.status == anime::kCompleted) {
+        if (*history_item.status == anime::kCompleted) {
           MessageBox(g_hMain, 
             L"This anime is still airing, you cannot set it as completed.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
@@ -494,7 +494,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       case anime::kFinishedAiring:
         break;
       case anime::kNotYetAired:
-        if (*event_item.status != anime::kPlanToWatch) {
+        if (*history_item.status != anime::kPlanToWatch) {
           MessageBox(g_hMain, 
             L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
@@ -504,17 +504,17 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       default:
         return;
     }
-    switch (*event_item.status) {
+    switch (*history_item.status) {
       case anime::kCompleted:
-        event_item.episode = anime_item->GetEpisodeCount();
-        if (*event_item.episode == 0) event_item.episode.Reset();
+        history_item.episode = anime_item->GetEpisodeCount();
+        if (*history_item.episode == 0) history_item.episode.Reset();
         if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
-          event_item.date_finish = GetDate();
+          history_item.date_finish = GetDate();
         break;
     }
-    event_item.anime_id = anime_id;
-    event_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-    History.queue.Add(event_item);
+    history_item.anime_id = anime_id;
+    history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+    History.queue.Add(history_item);
 
   // EditTags(tags)
   //   Changes anime tags.
@@ -529,11 +529,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     dlg.text = anime_item->GetMyTags();
     dlg.Show(g_hMain);
     if (dlg.result == IDOK) {
-      EventItem item;
-      item.anime_id = anime_id;
-      item.tags = dlg.text;
-      item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-      History.queue.Add(item);
+      HistoryItem history_item;
+      history_item.anime_id = anime_id;
+      history_item.tags = dlg.text;
+      history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      History.queue.Add(history_item);
     }
 
   // EditTitles(titles)

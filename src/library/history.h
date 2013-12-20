@@ -16,30 +16,26 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef HISTORY_H
-#define HISTORY_H
+#ifndef TAIGA_LIBRARY_HISTORY_H
+#define TAIGA_LIBRARY_HISTORY_H
 
-#include "base/std.h"
-#include "base/time.h"
-#include "base/optional.h"
-
+#include <string>
 #include <queue>
+#include <vector>
 
-#include "anime_episode.h"
+#include "base/optional.h"
+#include "base/time.h"
+#include "library/anime_episode.h"
 
-// =============================================================================
-
-enum EventSearchMode {
-  EVENT_SEARCH_DATE_START = 1,
-  EVENT_SEARCH_DATE_END,
-  EVENT_SEARCH_EPISODE,
-  EVENT_SEARCH_REWATCH,
-  EVENT_SEARCH_SCORE,
-  EVENT_SEARCH_STATUS,
-  EVENT_SEARCH_TAGS
+enum QueueSearchMode {
+  kQueueSearchDateStart = 1,
+  kQueueSearchDateEnd,
+  kQueueSearchEpisode,
+  kQueueSearchRewatching,
+  kQueueSearchScore,
+  kQueueSearchStatus,
+  kQueueSearchTags
 };
-
-class History;
 
 class AnimeValues {
 public:
@@ -52,32 +48,36 @@ public:
   Optional<wstring> tags;
 };
 
-class EventItem : public AnimeValues {
+class HistoryItem : public AnimeValues {
 public:
-  EventItem();
-  virtual ~EventItem() {}
+  HistoryItem();
+  virtual ~HistoryItem() {}
 
   bool enabled;
-  int anime_id, mode;
-  wstring reason, time;
+  int anime_id;
+  int mode;
+  std::wstring reason;
+  std::wstring time;
 };
 
-class EventQueue {
-public:
-  EventQueue();
-  virtual ~EventQueue() {}
+class History;
 
-  void Add(EventItem& item, bool save = true);
+class HistoryQueue {
+public:
+  HistoryQueue();
+  ~HistoryQueue() {}
+
+  void Add(HistoryItem& item, bool save = true);
   void Check(bool automatic = true);
   void Clear(bool save = true);
-  EventItem* FindItem(int anime_id, int search_mode = 0);
-  EventItem* GetCurrentItem();
+  HistoryItem* FindItem(int anime_id, int search_mode = 0);
+  HistoryItem* GetCurrentItem();
   int GetItemCount();
   void Remove(int index = -1, bool save = true, bool refresh = true, bool to_history = true);
   void RemoveDisabled(bool save = true, bool refresh = true);
 
   size_t index;
-  vector<EventItem> items;
+  vector<HistoryItem> items;
   History* history;
   bool updating;
 };
@@ -85,17 +85,15 @@ public:
 class History {
 public:
   History();
-  virtual ~History() {}
+  ~History() {}
 
   bool Load();
   bool Save();
 
-  vector<EventItem> items;
-  EventQueue queue;
+  std::vector<HistoryItem> items;
+  HistoryQueue queue;
   int limit;
 };
-
-extern class History History;
 
 class ConfirmationQueue {
 public:
@@ -106,10 +104,11 @@ public:
   void Process();
 
 private:
-  bool in_process;
+  bool in_process_;
   std::queue<anime::Episode> queue_;
 };
 
+extern class History History;
 extern class ConfirmationQueue ConfirmationQueue;
 
-#endif // HISTORY_H
+#endif  // TAIGA_LIBRARY_HISTORY_H

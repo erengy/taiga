@@ -579,7 +579,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 
   // ===========================================================================
 
-  // Check event queue
+  // Check queue
   Taiga.ticker_queue++;
   if (Taiga.ticker_queue >= 5 * 60) { // 5 minutes
     Taiga.ticker_queue = 0;

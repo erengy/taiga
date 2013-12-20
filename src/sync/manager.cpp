@@ -190,9 +190,9 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       History.queue.updating = false;
       ui::ClearStatusText();
 
-      auto event_item = History.queue.GetCurrentItem();
-      if (event_item)
-        AnimeDatabase.UpdateItem(*event_item);
+      auto history_item = History.queue.GetCurrentItem();
+      if (history_item)
+        AnimeDatabase.UpdateItem(*history_item);
 
       break;
     }

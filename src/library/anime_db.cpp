@@ -364,49 +364,49 @@ bool Database::DeleteListItem(int anime_id) {
   return true;
 }
 
-void Database::UpdateItem(const EventItem& event_item) {
+void Database::UpdateItem(const HistoryItem& history_item) {
   critical_section_.Enter();
 
-  auto anime_item = FindItem(event_item.anime_id);
+  auto anime_item = FindItem(history_item.anime_id);
 
   if (!anime_item)
     return;
 
   // Edit episode
-  if (event_item.episode) {
-    anime_item->SetMyLastWatchedEpisode(*event_item.episode);
+  if (history_item.episode) {
+    anime_item->SetMyLastWatchedEpisode(*history_item.episode);
   }
   // Edit score
-  if (event_item.score) {
-    anime_item->SetMyScore(*event_item.score);
+  if (history_item.score) {
+    anime_item->SetMyScore(*history_item.score);
   }
   // Edit status
-  if (event_item.status) {
-    anime_item->SetMyStatus(*event_item.status);
+  if (history_item.status) {
+    anime_item->SetMyStatus(*history_item.status);
   }
   // Edit re-watching status
-  if (event_item.enable_rewatching) {
-    anime_item->SetMyRewatching(*event_item.enable_rewatching);
+  if (history_item.enable_rewatching) {
+    anime_item->SetMyRewatching(*history_item.enable_rewatching);
   }
   // Edit tags
-  if (event_item.tags) {
-    anime_item->SetMyTags(*event_item.tags);
+  if (history_item.tags) {
+    anime_item->SetMyTags(*history_item.tags);
   }
   // Edit dates
-  if (event_item.date_start) {
-    anime_item->SetMyDateStart(*event_item.date_start);
+  if (history_item.date_start) {
+    anime_item->SetMyDateStart(*history_item.date_start);
   }
-  if (event_item.date_finish) {
-    anime_item->SetMyDateEnd(*event_item.date_finish);
+  if (history_item.date_finish) {
+    anime_item->SetMyDateEnd(*history_item.date_finish);
   }
   // Delete
-  if (event_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+  if (history_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
     DeleteListItem(anime_item->GetId());
     MainDialog.ChangeStatus(L"Item deleted. (" + anime_item->GetTitle() + L")");
     AnimeListDialog.RefreshList();
     AnimeListDialog.RefreshTabs();
     SearchDialog.RefreshList();
-    if (CurrentEpisode.anime_id == event_item.anime_id) {
+    if (CurrentEpisode.anime_id == history_item.anime_id) {
       CurrentEpisode.Set(anime::ID_NOTINLIST);
     }
   }
@@ -414,13 +414,13 @@ void Database::UpdateItem(const EventItem& event_item) {
   // Save list
   SaveList();
 
-  // Remove item from event queue
+  // Remove item from queue
   History.queue.Remove();
   // Check for more events
   History.queue.Check(false);
 
   // Redraw main list item
-  int list_index = AnimeListDialog.GetListIndex(event_item.anime_id);
+  int list_index = AnimeListDialog.GetListIndex(history_item.anime_id);
   if (list_index > -1) {
     AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
   }

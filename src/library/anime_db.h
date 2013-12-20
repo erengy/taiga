@@ -25,7 +25,7 @@
 
 #include "win/win_thread.h"
 
-class EventItem;
+class HistoryItem;
 
 namespace anime {
 
@@ -48,7 +48,7 @@ public:
 
   void ClearUserData();
   bool DeleteListItem(int anime_id);
-  void UpdateItem(const EventItem& event_item);
+  void UpdateItem(const HistoryItem& history_item);
 
 public:
   std::map<int, Item> items;

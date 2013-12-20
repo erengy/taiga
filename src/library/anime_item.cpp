@@ -299,44 +299,44 @@ void Item::SetSynopsis(const wstring& synopsis) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-int Item::GetMyLastWatchedEpisode(bool check_events) const {
+int Item::GetMyLastWatchedEpisode(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  EventItem* event_item = check_events ? 
-      SearchHistory(EVENT_SEARCH_EPISODE) : nullptr;
+  HistoryItem* history_item = check_queue ? 
+      SearchHistory(kQueueSearchEpisode) : nullptr;
 
-  return event_item ? *event_item->episode : my_info_->watched_episodes;
+  return history_item ? *history_item->episode : my_info_->watched_episodes;
 }
 
-int Item::GetMyScore(bool check_events) const {
+int Item::GetMyScore(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  EventItem* event_item = check_events ? 
-      SearchHistory(EVENT_SEARCH_SCORE) : nullptr;
+  HistoryItem* history_item = check_queue ? 
+      SearchHistory(kQueueSearchScore) : nullptr;
 
-  return event_item ? *event_item->score : my_info_->score;
+  return history_item ? *history_item->score : my_info_->score;
 }
 
-int Item::GetMyStatus(bool check_events) const {
+int Item::GetMyStatus(bool check_queue) const {
   if (!my_info_.get())
     return kNotInList;
 
-  EventItem* event_item = check_events ? 
-      SearchHistory(EVENT_SEARCH_STATUS) : nullptr;
+  HistoryItem* history_item = check_queue ? 
+      SearchHistory(kQueueSearchStatus) : nullptr;
 
-  return event_item ? *event_item->status : my_info_->status;
+  return history_item ? *history_item->status : my_info_->status;
 }
 
-int Item::GetMyRewatching(bool check_events) const {
+int Item::GetMyRewatching(bool check_queue) const {
   if (!my_info_.get())
     return FALSE;
 
-  EventItem* event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_REWATCH) : nullptr;
+  HistoryItem* history_item = check_queue ? 
+    SearchHistory(kQueueSearchRewatching) : nullptr;
 
-  return event_item ? *event_item->enable_rewatching : my_info_->rewatching;
+  return history_item ? *history_item->enable_rewatching : my_info_->rewatching;
 }
 
 int Item::GetMyRewatchingEp() const {
@@ -346,24 +346,24 @@ int Item::GetMyRewatchingEp() const {
   return my_info_->rewatching_ep;
 }
 
-const Date& Item::GetMyDateStart(bool check_events) const {
+const Date& Item::GetMyDateStart(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  EventItem* event_item = check_events ? 
-      SearchHistory(EVENT_SEARCH_DATE_START) : nullptr;
+  HistoryItem* history_item = check_queue ? 
+      SearchHistory(kQueueSearchDateStart) : nullptr;
 
-  return event_item ? *event_item->date_start : my_info_->date_start;
+  return history_item ? *history_item->date_start : my_info_->date_start;
 }
 
-const Date& Item::GetMyDateEnd(bool check_events) const {
+const Date& Item::GetMyDateEnd(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  EventItem* event_item = check_events ? 
-      SearchHistory(EVENT_SEARCH_DATE_END) : nullptr;
+  HistoryItem* history_item = check_queue ? 
+      SearchHistory(kQueueSearchDateEnd) : nullptr;
 
-  return event_item ? *event_item->date_finish : my_info_->date_finish;
+  return history_item ? *history_item->date_finish : my_info_->date_finish;
 }
 
 const wstring& Item::GetMyLastUpdated() const {
@@ -373,14 +373,14 @@ const wstring& Item::GetMyLastUpdated() const {
   return my_info_->last_updated;
 }
 
-const wstring& Item::GetMyTags(bool check_events) const {
+const wstring& Item::GetMyTags(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
 
-  EventItem* event_item = check_events ? 
-    SearchHistory(EVENT_SEARCH_TAGS) : nullptr;
+  HistoryItem* history_item = check_queue ? 
+    SearchHistory(kQueueSearchTags) : nullptr;
 
-  return event_item ? *event_item->tags : my_info_->tags;
+  return history_item ? *history_item->tags : my_info_->tags;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -599,7 +599,7 @@ bool Item::IsOldEnough() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-EventItem* Item::SearchHistory(int search_mode) const {
+HistoryItem* Item::SearchHistory(int search_mode) const {
   return History.queue.FindItem(metadata_.uid, search_mode);
 }
 

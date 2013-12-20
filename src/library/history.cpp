@@ -16,56 +16,49 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "history.h"
-
-#include "anime_db.h"
-#include "anime_util.h"
-#include "taiga/announce.h"
 #include "base/common.h"
-#include "taiga/http.h"
+#include "base/foreach.h"
 #include "base/logger.h"
-#include "sync/sync.h"
-#include "taiga/path.h"
-#include "taiga/resource.h"
-#include "taiga/settings.h"
 #include "base/string.h"
-#include "taiga/taiga.h"
 #include "base/xml.h"
+#include "library/anime_db.h"
+#include "library/anime_util.h"
+#include "library/history.h"
+#include "sync/sync.h"
+#include "taiga/announce.h"
+#include "taiga/path.h"
+#include "taiga/settings.h"
+#include "taiga/taiga.h"
+#include "win/win_taskdialog.h"
 
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_history.h"
 #include "ui/dlg/dlg_main.h"
 
-#include "win/win_taskdialog.h"
-
 class ConfirmationQueue ConfirmationQueue;
 class History History;
 
-// =============================================================================
-
-EventItem::EventItem()
+HistoryItem::HistoryItem()
     : anime_id(anime::ID_UNKNOWN),
       enabled(true),
       mode(0) {
 }
 
-EventQueue::EventQueue()
+HistoryQueue::HistoryQueue()
     : index(0),
       history(nullptr),
       updating(false) {
 }
 
-void EventQueue::Add(EventItem& item, bool save) {
+void HistoryQueue::Add(HistoryItem& item, bool save) {
   auto anime = AnimeDatabase.FindItem(item.anime_id);
 
   // Add to user list
   if (anime && !anime->IsInList())
     if (item.mode != taiga::kHttpServiceDeleteLibraryEntry)
       anime->AddtoUserList();
-  
+
   // Validate values
   if (anime && anime->IsInList()) {
     if (item.episode)
@@ -92,13 +85,14 @@ void EventQueue::Add(EventItem& item, bool save) {
   }
   switch (item.mode) {
     case taiga::kHttpServiceUpdateLibraryEntry:
-      if (!item.episode && 
-          !item.score && 
-          !item.status && 
-          !item.enable_rewatching && 
-          !item.tags && 
-          !item.date_start && 
-          !item.date_finish) return;
+      if (!item.episode &&
+          !item.score &&
+          !item.status &&
+          !item.enable_rewatching &&
+          !item.tags &&
+          !item.date_start &&
+          !item.date_finish)
+        return;
       break;
   }
 
@@ -107,15 +101,23 @@ void EventQueue::Add(EventItem& item, bool save) {
   if (!History.queue.updating) {
     for (auto it = items.rbegin(); it != items.rend(); ++it) {
       if (it->anime_id == item.anime_id && it->enabled) {
-        if (it->mode != taiga::kHttpServiceAddLibraryEntry && it->mode != taiga::kHttpServiceDeleteLibraryEntry) {
+        if (it->mode != taiga::kHttpServiceAddLibraryEntry &&
+            it->mode != taiga::kHttpServiceDeleteLibraryEntry) {
           if (!item.episode || (!it->episode && it == items.rbegin())) {
-            if (item.episode) it->episode = *item.episode;
-            if (item.score) it->score = *item.score;
-            if (item.status) it->status = *item.status;
-            if (item.enable_rewatching) it->enable_rewatching = *item.enable_rewatching;
-            if (item.tags) it->tags = *item.tags;
-            if (item.date_start) it->date_start = *item.date_start;
-            if (item.date_finish) it->date_finish = *item.date_finish;
+            if (item.episode)
+              it->episode = *item.episode;
+            if (item.score)
+              it->score = *item.score;
+            if (item.status)
+              it->status = *item.status;
+            if (item.enable_rewatching)
+              it->enable_rewatching = *item.enable_rewatching;
+            if (item.tags)
+              it->tags = *item.tags;
+            if (item.date_start)
+              it->date_start = *item.date_start;
+            if (item.date_finish)
+              it->date_finish = *item.date_finish;
             add_new_item = false;
           }
           if (!add_new_item) {
@@ -151,14 +153,14 @@ void EventQueue::Add(EventItem& item, bool save) {
       anime->SetNewEpisodePath(L"");
       anime::CheckEpisodes(*anime, 0);
     }
-    
+
     // Refresh history
     MainDialog.treeview.RefreshHistoryCounter();
     HistoryDialog.RefreshList();
 
     // Refresh anime window
     if (item.mode == taiga::kHttpServiceAddLibraryEntry ||
-        item.mode == taiga::kHttpServiceDeleteLibraryEntry || 
+        item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
         item.status ||
         item.enable_rewatching) {
       AnimeListDialog.RefreshList();
@@ -181,7 +183,7 @@ void EventQueue::Add(EventItem& item, bool save) {
   }
 }
 
-void EventQueue::Check(bool automatic) {
+void HistoryQueue::Check(bool automatic) {
   // Check
   if (items.empty()) {
     return;
@@ -200,7 +202,7 @@ void EventQueue::Check(bool automatic) {
     items[index].reason = L"Synchronization is disabled";
     return;
   }
-  
+
   // Compare ID with anime list
   auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);
   if (!anime_item) {
@@ -210,7 +212,7 @@ void EventQueue::Check(bool automatic) {
     Check();
     return;
   }
-  
+
   // Update
   History.queue.updating = true;
   MainDialog.ChangeStatus(L"Updating list...");
@@ -219,46 +221,54 @@ void EventQueue::Check(bool automatic) {
       static_cast<taiga::HttpClientMode>(items[index].mode));
 }
 
-void EventQueue::Clear(bool save) {
+void HistoryQueue::Clear(bool save) {
   items.clear();
   index = 0;
 
   MainDialog.treeview.RefreshHistoryCounter();
   NowPlayingDialog.Refresh(false, false, false);
 
-  if (save) history->Save();
+  if (save)
+    history->Save();
 }
 
-EventItem* EventQueue::FindItem(int anime_id, int search_mode) {
+HistoryItem* HistoryQueue::FindItem(int anime_id, int search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     if (it->anime_id == anime_id && it->enabled) {
       switch (search_mode) {
         // Date
-        case EVENT_SEARCH_DATE_START:
-          if (it->date_start) return &(*it);
+        case kQueueSearchDateStart:
+          if (it->date_start)
+            return &(*it);
           break;
-        case EVENT_SEARCH_DATE_END:
-          if (it->date_finish) return &(*it);
+        case kQueueSearchDateEnd:
+          if (it->date_finish)
+            return &(*it);
           break;
         // Episode
-        case EVENT_SEARCH_EPISODE:
-          if (it->episode) return &(*it);
+        case kQueueSearchEpisode:
+          if (it->episode)
+            return &(*it);
           break;
         // Re-watching
-        case EVENT_SEARCH_REWATCH:
-          if (it->enable_rewatching) return &(*it);
+        case kQueueSearchRewatching:
+          if (it->enable_rewatching)
+            return &(*it);
           break;
         // Score
-        case EVENT_SEARCH_SCORE:
-          if (it->score) return &(*it);
+        case kQueueSearchScore:
+          if (it->score)
+            return &(*it);
           break;
         // Status
-        case EVENT_SEARCH_STATUS:
-          if (it->status) return &(*it);
+        case kQueueSearchStatus:
+          if (it->status)
+            return &(*it);
           break;
         // Tags
-        case EVENT_SEARCH_TAGS:
-          if (it->tags) return &(*it);
+        case kQueueSearchTags:
+          if (it->tags)
+            return &(*it);
           break;
         // Default
         default:
@@ -269,34 +279,39 @@ EventItem* EventQueue::FindItem(int anime_id, int search_mode) {
   return nullptr;
 }
 
-EventItem* EventQueue::GetCurrentItem() {
-  if (!items.empty()) {
+HistoryItem* HistoryQueue::GetCurrentItem() {
+  if (!items.empty())
     return &items.at(index);
-  }
+
   return nullptr;
 }
 
-int EventQueue::GetItemCount() {
+int HistoryQueue::GetItemCount() {
   int count = 0;
+
   for (auto it = items.begin(); it != items.end(); ++it)
-    if (it->enabled) count++;
+    if (it->enabled)
+      count++;
+
   return count;
 }
 
-void EventQueue::Remove(int index, bool save, bool refresh, bool to_history) {
-  if (index == -1) index = this->index;
-  
+void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
+  if (index == -1)
+    index = this->index;
+
   if (index < static_cast<int>(items.size())) {
-    auto event_item = items.begin() + index;
+    auto history_item = items.begin() + index;
     
-    if (to_history && event_item->episode) {
-      history->items.push_back(*event_item);
-      if (history->limit > 0 && static_cast<int>(history->items.size()) > history->limit) {
+    if (to_history && history_item->episode) {
+      history->items.push_back(*history_item);
+      if (history->limit > 0 &&
+          static_cast<int>(history->items.size()) > history->limit) {
         history->items.erase(history->items.begin());
       }
     }
-    
-    items.erase(event_item);
+
+    items.erase(history_item);
 
     if (refresh) {
       MainDialog.treeview.RefreshHistoryCounter();
@@ -308,9 +323,9 @@ void EventQueue::Remove(int index, bool save, bool refresh, bool to_history) {
   if (save) history->Save();
 }
 
-void EventQueue::RemoveDisabled(bool save, bool refresh) {
+void HistoryQueue::RemoveDisabled(bool save, bool refresh) {
   bool needs_refresh = false;
-  
+
   for (size_t i = 0; i < items.size(); i++) {
     if (!items.at(i).enabled) {
       items.erase(items.begin() + i);
@@ -325,13 +340,14 @@ void EventQueue::RemoveDisabled(bool save, bool refresh) {
     HistoryDialog.RefreshList();
   }
 
-  if (save) history->Save();
+  if (save)
+    history->Save();
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 History::History()
-    : limit(0) { // Limit of history items
+    : limit(0) {  // Limit of history items (0 for unlimited)
   queue.history = this;
 }
 
@@ -348,36 +364,37 @@ bool History::Load() {
 
   // Items
   xml_node node_items = document.child(L"history").child(L"items");
-  for (xml_node item = node_items.child(L"item"); item; item = item.next_sibling(L"item")) {
-    EventItem event_item;
-    event_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
-    event_item.episode = item.attribute(L"episode").as_int();
-    event_item.time = item.attribute(L"time").value();
-    items.push_back(event_item);
+  foreach_xmlnode_(item, node_items, L"item") {
+    HistoryItem history_item;
+    history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
+    history_item.episode = item.attribute(L"episode").as_int();
+    history_item.time = item.attribute(L"time").value();
+    items.push_back(history_item);
   }
   // Queue events
   xml_node node_queue = document.child(L"history").child(L"queue");
-  for (xml_node item = node_queue.child(L"item"); item; item = item.next_sibling(L"item")) {
-    EventItem event_item;
-    event_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
-    event_item.mode = item.attribute(L"mode").as_int();
-    event_item.time = item.attribute(L"time").value();
+  foreach_xmlnode_(item, node_queue, L"item") {
+    HistoryItem history_item;
+    history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
+    history_item.mode = item.attribute(L"mode").as_int();
+    history_item.time = item.attribute(L"time").value();
     #define READ_ATTRIBUTE_INT(x, y) \
-      if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
+        if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
     #define READ_ATTRIBUTE_STR(x, y) \
-      if (!item.attribute(y).empty()) x = item.attribute(y).as_string();
+        if (!item.attribute(y).empty()) x = item.attribute(y).as_string();
     #define READ_ATTRIBUTE_DATE(x, y) \
-      if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
-    READ_ATTRIBUTE_INT(event_item.episode, L"episode");
-    READ_ATTRIBUTE_INT(event_item.score, L"score");
-    READ_ATTRIBUTE_INT(event_item.status, L"status");
-    READ_ATTRIBUTE_INT(event_item.enable_rewatching, L"enable_rewatching");
-    READ_ATTRIBUTE_STR(event_item.tags, L"tags");
-    READ_ATTRIBUTE_DATE(event_item.date_start, L"date_start");
-    READ_ATTRIBUTE_DATE(event_item.date_finish, L"date_finish");
+        if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
+    READ_ATTRIBUTE_INT(history_item.episode, L"episode");
+    READ_ATTRIBUTE_INT(history_item.score, L"score");
+    READ_ATTRIBUTE_INT(history_item.status, L"status");
+    READ_ATTRIBUTE_INT(history_item.enable_rewatching, L"enable_rewatching");
+    READ_ATTRIBUTE_STR(history_item.tags, L"tags");
+    READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
+    READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
+    #undef READ_ATTRIBUTE_DATE
     #undef READ_ATTRIBUTE_STR
     #undef READ_ATTRIBUTE_INT
-    queue.Add(event_item, false);
+    queue.Add(history_item, false);
   }
 
   return true;
@@ -390,32 +407,33 @@ bool History::Save() {
 
   // Write items
   xml_node node_items = node_history.append_child(L"items");
-  for (auto j = items.begin(); j != items.end(); ++j) {
+  foreach_(it, items) {
     xml_node node_item = node_items.append_child(L"item");
-    node_item.append_attribute(L"anime_id") = j->anime_id;
-    node_item.append_attribute(L"episode") = *j->episode;
-    node_item.append_attribute(L"time") = j->time.c_str();
+    node_item.append_attribute(L"anime_id") = it->anime_id;
+    node_item.append_attribute(L"episode") = *it->episode;
+    node_item.append_attribute(L"time") = it->time.c_str();
   }
   // Write queue
   xml_node node_queue = node_history.append_child(L"queue");
-  for (auto j = queue.items.begin(); j != queue.items.end(); ++j) {
+  foreach_(it, queue.items) {
     xml_node node_item = node_queue.append_child(L"item");
     #define APPEND_ATTRIBUTE_INT(x, y) \
-      if (y) node_item.append_attribute(x) = *y;
+        if (y) node_item.append_attribute(x) = *y;
     #define APPEND_ATTRIBUTE_STR(x, y) \
-      if (y) node_item.append_attribute(x) = (*y).c_str();
+        if (y) node_item.append_attribute(x) = (*y).c_str();
     #define APPEND_ATTRIBUTE_DATE(x, y) \
-      if (y) node_item.append_attribute(x) = wstring(*y).c_str();
-    node_item.append_attribute(L"anime_id") = j->anime_id;
-    node_item.append_attribute(L"mode") = j->mode;
-    node_item.append_attribute(L"time") = j->time.c_str();
-    APPEND_ATTRIBUTE_INT(L"episode", j->episode);
-    APPEND_ATTRIBUTE_INT(L"score", j->score);
-    APPEND_ATTRIBUTE_INT(L"status", j->status);
-    APPEND_ATTRIBUTE_INT(L"enable_rewatching", j->enable_rewatching);
-    APPEND_ATTRIBUTE_STR(L"tags", j->tags);
-    APPEND_ATTRIBUTE_DATE(L"date_start", j->date_start);
-    APPEND_ATTRIBUTE_DATE(L"date_finish", j->date_finish);
+        if (y) node_item.append_attribute(x) = wstring(*y).c_str();
+    node_item.append_attribute(L"anime_id") = it->anime_id;
+    node_item.append_attribute(L"mode") = it->mode;
+    node_item.append_attribute(L"time") = it->time.c_str();
+    APPEND_ATTRIBUTE_INT(L"episode", it->episode);
+    APPEND_ATTRIBUTE_INT(L"score", it->score);
+    APPEND_ATTRIBUTE_INT(L"status", it->status);
+    APPEND_ATTRIBUTE_INT(L"enable_rewatching", it->enable_rewatching);
+    APPEND_ATTRIBUTE_STR(L"tags", it->tags);
+    APPEND_ATTRIBUTE_DATE(L"date_start", it->date_start);
+    APPEND_ATTRIBUTE_DATE(L"date_finish", it->date_finish);
+    #undef APPEND_ATTRIBUTE_DATE
     #undef APPEND_ATTRIBUTE_STR
     #undef APPEND_ATTRIBUTE_INT
   }
@@ -426,7 +444,7 @@ bool History::Save() {
 // =============================================================================
 
 ConfirmationQueue::ConfirmationQueue()
-    : in_process(false) {
+    : in_process_(false) {
 }
 
 void ConfirmationQueue::Add(const anime::Episode& episode) {
@@ -448,14 +466,16 @@ int AskForConfirmation(anime::Episode& episode) {
 
   // Get episode number
   int number = GetEpisodeHigh(episode.number);
-  if (number == 0) number = 1;
-  if (anime_item->GetEpisodeCount() == 1) episode.number = L"1";
+  if (number == 0)
+    number = 1;
+  if (anime_item->GetEpisodeCount() == 1)
+    episode.number = L"1";
 
   // Add buttons
-  if (anime_item->GetEpisodeCount() == number) { // Completed
+  if (anime_item->GetEpisodeCount() == number) {  // Completed
     dlg.AddButton(L"Update and move\n"
                   L"Update and set as completed", IDCANCEL);
-  } else if (anime_item->GetMyStatus() != anime::kWatching) { // Watching
+  } else if (anime_item->GetMyStatus() != anime::kWatching) {  // Watching
     dlg.AddButton(L"Update and move\n"
                   L"Update and set as watching", IDCANCEL);
   }
@@ -475,8 +495,9 @@ int AskForConfirmation(anime::Episode& episode) {
 }
 
 void ConfirmationQueue::Process() {
-  if (in_process) return;
-  in_process = true;
+  if (in_process_)
+    return;
+  in_process_ = true;
 
   while (!queue_.empty()) {
     anime::Episode& episode = queue_.front();
@@ -489,5 +510,5 @@ void ConfirmationQueue::Process() {
     queue_.pop();
   }
 
-  in_process = false;
+  in_process_ = false;
 }
