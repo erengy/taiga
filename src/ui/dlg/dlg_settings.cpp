@@ -139,24 +139,24 @@ void SettingsDialog::SetCurrentPage(int index) {
 BOOL SettingsDialog::OnInitDialog() {
   // Initialize controls
   tree_.Attach(GetDlgItem(IDC_TREE_SECTIONS));
-  tree_.SetImageList(UI.ImgList24.GetHandle());
+  tree_.SetImageList(ui::Theme.GetImageList24().GetHandle());
   tree_.SetTheme();
   tab_.Attach(GetDlgItem(IDC_TAB_PAGES));
   
   // Add tree items
   #define TREE_INSERTITEM(s, t, i) \
     tree_.items[s] = tree_.InsertItem(t, i, s, nullptr);
-  TREE_INSERTITEM(SECTION_SERVICES, L"Services", ICON24_GLOBE);
-  TREE_INSERTITEM(SECTION_LIBRARY, L"Library", ICON24_LIBRARY);
-  TREE_INSERTITEM(SECTION_APPLICATION, L"Application", ICON24_APPLICATION);
-  TREE_INSERTITEM(SECTION_RECOGNITION, L"Recognition", ICON24_RECOGNITION);
-  TREE_INSERTITEM(SECTION_SHARING, L"Sharing", ICON24_SHARING);
-  TREE_INSERTITEM(SECTION_TORRENTS, L"Torrents", ICON24_FEED);
+  TREE_INSERTITEM(SECTION_SERVICES, L"Services", ui::kIcon24_Globe);
+  TREE_INSERTITEM(SECTION_LIBRARY, L"Library", ui::kIcon24_Library);
+  TREE_INSERTITEM(SECTION_APPLICATION, L"Application", ui::kIcon24_Application);
+  TREE_INSERTITEM(SECTION_RECOGNITION, L"Recognition", ui::kIcon24_Recognition);
+  TREE_INSERTITEM(SECTION_SHARING, L"Sharing", ui::kIcon24_Sharing);
+  TREE_INSERTITEM(SECTION_TORRENTS, L"Torrents", ui::kIcon24_Feed);
   #undef TREE_INSERTITEM
 
   // Set title font
   SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, 
-                     reinterpret_cast<WPARAM>(UI.font_bold.Get()), TRUE);
+                     reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), TRUE);
 
   // Select current section and page
   int current_page = current_page_;
@@ -497,11 +497,11 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
   int index = list.GetItemCount();
   int group = filter.anime_ids.empty() ? 0 : 1;
   
-  int icon = ICON16_FUNNEL;
+  int icon = ui::kIcon16_Funnel;
   switch (filter.action) {
-    case FEED_FILTER_ACTION_DISCARD: icon = ICON16_FUNNEL_CROSS; break;
-    case FEED_FILTER_ACTION_SELECT:  icon = ICON16_FUNNEL_TICK;  break;
-    case FEED_FILTER_ACTION_PREFER:  icon = ICON16_FUNNEL_PLUS;  break;
+    case FEED_FILTER_ACTION_DISCARD: icon = ui::kIcon16_FunnelCross; break;
+    case FEED_FILTER_ACTION_SELECT:  icon = ui::kIcon16_FunnelTick;  break;
+    case FEED_FILTER_ACTION_PREFER:  icon = ui::kIcon16_FunnelPlus;  break;
   }
 
   // Insert item

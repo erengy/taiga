@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,140 +16,122 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef THEME_H
-#define THEME_H
+#ifndef TAIGA_UI_THEME_H
+#define TAIGA_UI_THEME_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
+
 #include "win/ctrl/win_ctrl.h"
+#include "win/win_gdi.h"
+
+namespace ui {
 
 enum Icons16px {
-  ICON16_GREEN,
-  ICON16_BLUE,
-  ICON16_RED,
-  ICON16_GRAY,
-  ICON16_PLAY,
-  ICON16_SEARCH,
-  ICON16_FOLDER,
-  ICON16_APP_BLUE,
-  ICON16_APP_GRAY,
-  ICON16_REFRESH,
-  ICON16_DOWNLOAD,
-  ICON16_SETTINGS,
-  ICON16_CROSS,
-  ICON16_PLUS,
-  ICON16_MINUS,
-  ICON16_ARROW_UP,
-  ICON16_ARROW_DOWN,
-  ICON16_FUNNEL,
-  ICON16_FUNNEL_CROSS,
-  ICON16_FUNNEL_TICK,
-  ICON16_FUNNEL_PLUS,
-  ICON16_FUNNEL_PENCIL,
-  ICON16_CALENDAR,
-  ICON16_CATEGORY,
-  ICON16_SORT,
-  ICON16_BALLOON,
-  ICON16_CLOCK,
-  ICON16_HOME,
-  ICON16_DOCUMENT_A,
-  ICON16_CHART,
-  ICON16_FEED,
-  ICON16_DETAILS,
-  ICONCOUNT_16PX
+  kIcon16_Green,
+  kIcon16_Blue,
+  kIcon16_Red,
+  kIcon16_Gray,
+  kIcon16_Play,
+  kIcon16_Search,
+  kIcon16_Folder,
+  kIcon16_AppBlue,
+  kIcon16_AppGray,
+  kIcon16_Refresh,
+  kIcon16_Download,
+  kIcon16_Settings,
+  kIcon16_Cross,
+  kIcon16_Plus,
+  kIcon16_Minus,
+  kIcon16_ArrowUp,
+  kIcon16_ArrowDown,
+  kIcon16_Funnel,
+  kIcon16_FunnelCross,
+  kIcon16_FunnelTick,
+  kIcon16_FunnelPlus,
+  kIcon16_FunnelPencil,
+  kIcon16_Calendar,
+  kIcon16_Category,
+  kIcon16_Sort,
+  kIcon16_Balloon,
+  kIcon16_Clock,
+  kIcon16_Home,
+  kIcon16_DocumentA,
+  kIcon16_Chart,
+  kIcon16_Feed,
+  kIcon16_Details,
+  kIconCount16px
 };
 
 enum Icons24px {
-  ICON24_SYNC,
-  ICON24_MAL,
-  ICON24_FOLDERS,
-  ICON24_TOOLS,
-  ICON24_SETTINGS,
-  ICON24_ABOUT,
-  ICON24_GLOBE,
-  ICON24_LIBRARY,
-  ICON24_APPLICATION,
-  ICON24_RECOGNITION,
-  ICON24_SHARING,
-  ICON24_FEED,
-  ICONCOUNT_24PX
+  kIcon24_Sync,
+  kIcon24_Mal,
+  kIcon24_Folders,
+  kIcon24_Tools,
+  kIcon24_Settings,
+  kIcon24_About,
+  kIcon24_Globe,
+  kIcon24_Library,
+  kIcon24_Application,
+  kIcon24_Recognition,
+  kIcon24_Sharing,
+  kIcon24_Feed,
+  kIconCount24px
 };
 
-namespace theme {
-const COLORREF COLOR_DARKBLUE = RGB(46, 81, 162);
-const COLORREF COLOR_GRAY = RGB(230, 230, 230);
-const COLORREF COLOR_LIGHTBLUE = RGB(225, 231, 245);
-const COLORREF COLOR_LIGHTGRAY = RGB(248, 248, 248);
-const COLORREF COLOR_LIGHTGREEN = RGB(225, 245, 231);
-const COLORREF COLOR_LIGHTRED = RGB(245, 225, 231);
-const COLORREF COLOR_MAININSTRUCTION = RGB(0x00, 0x33, 0x99);
-}
-
-// =============================================================================
-
-class Font {
-public:
-  Font();
-  Font(HFONT font);
-  ~Font();
-
-  HFONT Get() const;
-  void Set(HFONT font);
-
-  operator HFONT() const;
-
-private:
-  HFONT font_;
+enum ListProgressType {
+  kListProgressAired,
+  kListProgressAvailable,
+  kListProgressBackground,
+  kListProgressBorder,
+  kListProgressButton,
+  kListProgressCompleted,
+  kListProgressDropped,
+  kListProgressSeparator,
+  kListProgressWatching
 };
 
-class Theme {
+const COLORREF kColorDarkBlue = RGB(46, 81, 162);
+const COLORREF kColorGray = RGB(230, 230, 230);
+const COLORREF kColorLightBlue = RGB(225, 231, 245);
+const COLORREF kColorLightGray = RGB(248, 248, 248);
+const COLORREF kColorLightGreen = RGB(225, 245, 231);
+const COLORREF kColorLightRed = RGB(245, 225, 231);
+const COLORREF kColorMainInstruction = RGB(0x00, 0x33, 0x99);
+
+class ThemeManager {
 public:
-  Theme();
-  ~Theme() {}
-  
-  bool CreateFonts(HDC hdc);
+  ThemeManager();
+  ~ThemeManager() {}
+
   bool Load();
-  bool LoadImages();
 
-public:
-  win::ImageList ImgList16;
-  win::ImageList ImgList24;
+  void CreateFonts(HDC hdc);
+  HFONT GetBoldFont() const;
+  HFONT GetHeaderFont() const;
 
-  Font font_bold;
-  Font font_header;
-  
-  class ListBackground {
-  public:
-    ListBackground();
-    ~ListBackground();
-    wstring name;
-    DWORD flags;
-    int offset_x, offset_y;
-    HBITMAP bitmap;
-  } list_background;
+  win::ImageList& GetImageList16();
+  win::ImageList& GetImageList24();
 
-  class ListProgress {
-  public:
-    class Item {
-    public:
-      void Draw(HDC hdc, const LPRECT rect);
-      COLORREF value[3];
-      wstring type;
-    }
-      aired,
-      available,
-      background,
-      border,
-      button,
-      completed,
-      dropped,
-      separator,
-      watching;
-  } list_progress;
+  void DrawListProgress(HDC hdc, const LPRECT rect, ListProgressType type);
+  COLORREF GetListProgressColor(ListProgressType type);
 
 private:
-  vector<wstring> icons16_, icons24_;
+  win::Font font_bold_;
+  win::Font font_header_;
+
+  win::ImageList icons16_;
+  win::ImageList icons24_;
+
+  struct Progress {
+    COLORREF value[3];
+    std::wstring type;
+  };
+  std::map<ListProgressType, Progress> list_progress_;
 };
 
-extern Theme UI;
+extern ThemeManager Theme;
 
-#endif // THEME_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_THEME_H

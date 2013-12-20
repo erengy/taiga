@@ -225,7 +225,7 @@ void StartWatching(Item& item, Episode& episode) {
   }
   int list_index = AnimeListDialog.GetListIndex(item.GetId());
   if (list_index > -1) {
-    AnimeListDialog.listview.SetItemIcon(list_index, ICON16_PLAY);
+    AnimeListDialog.listview.SetItemIcon(list_index, ui::kIcon16_Play);
     AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
     AnimeListDialog.listview.EnsureVisible(list_index);
   }

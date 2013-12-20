@@ -37,7 +37,7 @@ BOOL StatsDialog::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 4; i++) {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-                       reinterpret_cast<WPARAM>(UI.font_bold.Get()), FALSE);
+                       reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), FALSE);
   }
 
   // Calculate and display statistics
@@ -74,7 +74,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             int bar_width = static_cast<int>(bar_max * Stats.score_distribution[i]);
             rect.bottom = rect.top + bar_height - 2;
             rect.right = rect.left + bar_width;
-            dc.FillRect(rect, theme::COLOR_DARKBLUE);
+            dc.FillRect(rect, ui::kColorDarkBlue);
           }
 
           if (Stats.score_count[i] > 0.0f) {

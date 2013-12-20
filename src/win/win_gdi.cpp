@@ -175,6 +175,34 @@ COLORREF Dc::SetTextColor(COLORREF crColor) const {
 
 // =============================================================================
 
+Font::Font()
+    : font_(nullptr) {
+}
+
+Font::Font(HFONT font)
+    : font_(font) {
+}
+
+Font::~Font() {
+  Set(nullptr);
+}
+
+HFONT Font::Get() const {
+  return font_;
+}
+
+void Font::Set(HFONT font) {
+  if (font_)
+    ::DeleteObject(font_);
+  font_ = font;
+}
+
+Font::operator HFONT() const {
+  return font_;
+}
+
+// =============================================================================
+
 Rect::Rect() {
   left = 0; top = 0; right = 0; bottom = 0;
 }

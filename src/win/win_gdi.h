@@ -75,6 +75,23 @@ private:
 
 // =============================================================================
 
+class Font {
+public:
+  Font();
+  Font(HFONT font);
+  ~Font();
+
+  HFONT Get() const;
+  void Set(HFONT font);
+
+  operator HFONT() const;
+
+private:
+  HFONT font_;
+};
+
+// =============================================================================
+
 class Rect : public RECT {
 public:
   Rect();

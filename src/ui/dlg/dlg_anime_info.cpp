@@ -68,7 +68,7 @@ BOOL AnimeDialog::OnInitDialog() {
 
   // Initialize title
   edit_title_.Attach(GetDlgItem(IDC_EDIT_ANIME_TITLE));
-  edit_title_.SendMessage(WM_SETFONT, reinterpret_cast<WPARAM>(UI.font_header.Get()), FALSE);
+  edit_title_.SendMessage(WM_SETFONT, reinterpret_cast<WPARAM>(ui::Theme.GetHeaderFont()), FALSE);
 
   // Initialize
   sys_link_.Attach(GetDlgItem(IDC_LINK_NOWPLAYING));
@@ -136,7 +136,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       HWND hwnd_control = reinterpret_cast<HWND>(lParam);
       if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
         SetBkMode(hdc, TRANSPARENT);
-        SetTextColor(hdc, theme::COLOR_MAININSTRUCTION);
+        SetTextColor(hdc, ui::kColorMainInstruction);
       }
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }

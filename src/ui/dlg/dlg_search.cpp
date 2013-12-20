@@ -47,7 +47,7 @@ BOOL SearchDialog::OnInitDialog() {
   // Create list control
   list_.Attach(GetDlgItem(IDC_LIST_SEARCH));
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  list_.SetImageList(UI.ImgList16.GetHandle());
+  list_.SetImageList(ui::Theme.GetImageList16().GetHandle());
   list_.SetTheme();
   list_.InsertColumn(0, 400, 400, LVCFMT_LEFT,   L"Anime title");
   list_.InsertColumn(1,  60,  60, LVCFMT_CENTER, L"Type");

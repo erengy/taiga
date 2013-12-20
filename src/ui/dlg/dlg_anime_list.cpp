@@ -60,10 +60,8 @@ BOOL AnimeListDialog::OnInitDialog() {
                             LVS_EX_INFOTIP |
                             LVS_EX_LABELTIP |
                             LVS_EX_TRACKSELECT);
-  listview.SetBkImage(UI.list_background.bitmap, UI.list_background.flags,
-                      UI.list_background.offset_x, UI.list_background.offset_y);
   listview.SetHoverTime(60 * 1000);
-  listview.SetImageList(UI.ImgList16.GetHandle());
+  listview.SetImageList(ui::Theme.GetImageList16().GetHandle());
   listview.Sort(0, 1, 0, ui::ListViewCompareProc);
   listview.SetTheme();
 
@@ -220,15 +218,15 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (!anime_item) return TRUE;
 
         if ((dis->itemState & ODS_SELECTED) == ODS_SELECTED) {
-          dc.FillRect(rect, theme::COLOR_LIGHTBLUE);
+          dc.FillRect(rect, ui::kColorLightBlue);
         }
         rect.Inflate(-2, -2);
-        dc.FillRect(rect, theme::COLOR_LIGHTGRAY);
+        dc.FillRect(rect, ui::kColorLightGray);
 
         // Draw image
         win::Rect rect_image = rect;
         rect_image.right = rect_image.left + static_cast<int>(rect_image.Height() / 1.4);
-        dc.FillRect(rect_image, theme::COLOR_GRAY);
+        dc.FillRect(rect_image, ui::kColorGray);
         if (ImageDatabase.Load(anime_id, false, false)) {
           auto image = ImageDatabase.GetImage(anime_id);
           int sbm = dc.SetStretchBltMode(HALFTONE);
@@ -244,7 +242,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         // Draw title
         rect.left += rect_image.Width() + 8;
         int bk_mode = dc.SetBkMode(TRANSPARENT);
-        dc.AttachFont(UI.font_header);
+        dc.AttachFont(ui::Theme.GetHeaderFont());
         dc.DrawText(anime_item->GetTitle().c_str(), anime_item->GetTitle().length(), rect, 
                     DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE);
         dc.DetachFont();
@@ -699,10 +697,10 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 
   // Draw border
   rcBar.Inflate(-4, -4);
-  UI.list_progress.border.Draw(dc.Get(), &rcBar);
+  ui::Theme.DrawListProgress(dc.Get(), &rcBar, ui::kListProgressBorder);
   // Draw background
   rcBar.Inflate(-1, -1);
-  UI.list_progress.background.Draw(dc.Get(), &rcBar);
+  ui::Theme.DrawListProgress(dc.Get(), &rcBar, ui::kListProgressBackground);
 
   win::Rect rcAired = rcBar;
   win::Rect rcAvail = rcBar;
@@ -738,18 +736,18 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 
     // Draw aired episodes
     if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAired) && eps_aired > 0) {
-      UI.list_progress.aired.Draw(dc.Get(), &rcAired);
+      ui::Theme.DrawListProgress(dc.Get(), &rcAired, ui::kListProgressAired);
     }
 
     // Draw progress
     if (anime_item.GetMyStatus() == anime::kWatching || anime_item.GetMyRewatching()) {
-      UI.list_progress.watching.Draw(dc.Get(), &rcWatched);  // Watching
+      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressWatching);  // Watching
     } else if (anime_item.GetMyStatus() == anime::kCompleted) {
-      UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed
+      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressCompleted); // Completed
     } else if (anime_item.GetMyStatus() == anime::kDropped) {
-      UI.list_progress.dropped.Draw(dc.Get(), &rcWatched);   // Dropped
+      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressDropped);   // Dropped
     } else {
-      UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed / On hold / Plan to watch
+      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressCompleted); // Completed / On hold / Plan to watch
     }
   }
 
@@ -762,7 +760,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
         if (i > 0 && anime_item.IsEpisodeAvailable(i)) {
           rcAvail.left = static_cast<int>(rcBar.left + (width * (i - 1)));
           rcAvail.right = static_cast<int>(rcAvail.left + width + 1);
-          UI.list_progress.available.Draw(dc.Get(), &rcAvail);
+          ui::Theme.DrawListProgress(dc.Get(), &rcAvail, ui::kListProgressAvailable);
         }
       }
     } else {
@@ -770,7 +768,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
         float ratio_avail = anime_item.IsEpisodeAvailable(eps_aired) ? 0.85f : 0.83f;
         rcAvail.right = rcAvail.left + static_cast<int>((rcAvail.Width()) * ratio_avail);
         rcAvail.left = rcWatched.right;
-        UI.list_progress.available.Draw(dc.Get(), &rcAvail);
+        ui::Theme.DrawListProgress(dc.Get(), &rcAvail, ui::kListProgressAvailable);
       }
     }
   }
@@ -779,12 +777,12 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (eps_watched > 0 && (eps_watched < eps_total || eps_total == 0)) {
     rcSeparator.left = rcWatched.right;
     rcSeparator.right = rcWatched.right + 1;
-    UI.list_progress.separator.Draw(dc.Get(), &rcSeparator);
+    ui::Theme.DrawListProgress(dc.Get(), &rcSeparator, ui::kListProgressSeparator);
   }
   if (eps_aired > 0 && (eps_aired < eps_total || eps_total == 0)) {
     rcSeparator.left = rcAired.right;
     rcSeparator.right = rcAired.right + 1;
-    UI.list_progress.separator.Draw(dc.Get(), &rcSeparator);
+    ui::Theme.DrawListProgress(dc.Get(), &rcSeparator, ui::kListProgressSeparator);
   }
 
   // Draw buttons
@@ -793,20 +791,20 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     if (button_visible[0]) {
       rcButton = rcBar;
       rcButton.right = rcButton.left + 9;
-      dc.FillRect(rcButton, UI.list_progress.button.value[0]);
+      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressButton));
       rcButton.Inflate(-1, -4);
-      dc.FillRect(rcButton, UI.list_progress.background.value[0]);
+      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
     }
     // Draw increment button
     if (button_visible[1]) {
       rcButton = rcBar;
       rcButton.right = rcBar.right;
       rcButton.left = rcButton.right - 9;
-      dc.FillRect(rcButton, UI.list_progress.button.value[0]);
+      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressButton));
       rcButton.Inflate(-1, -4);
-      dc.FillRect(rcButton, UI.list_progress.background.value[0]);
+      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
       rcButton.Inflate(-3, 3);
-      dc.FillRect(rcButton, UI.list_progress.background.value[0]);
+      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
     }
   }
 
@@ -858,9 +856,9 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
 
   if (index > -1 && index == hot_item) {
     rcBox.Inflate(-8, -2);
-    UI.list_progress.border.Draw(dc.Get(), &rcBox);
+    ui::Theme.DrawListProgress(dc.Get(), &rcBox, ui::kListProgressBorder);
     rcBox.Inflate(-1, -1);
-    UI.list_progress.background.Draw(dc.Get(), &rcBox);
+    ui::Theme.DrawListProgress(dc.Get(), &rcBox, ui::kListProgressBackground);
     rcBox.Inflate(-4, 0);
 
     COLORREF text_color = dc.GetTextColor();
@@ -911,7 +909,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       }
       // Indicate currently playing
       if (anime_item->GetPlaying()) {
-        pCD->clrTextBk = theme::COLOR_LIGHTGREEN;
+        pCD->clrTextBk = ui::kColorLightGreen;
         static HFONT hFontDefault = ChangeDCFont(pCD->nmcd.hdc, nullptr, -1, true, -1, -1);
         static HFONT hFontBold = reinterpret_cast<HFONT>(GetCurrentObject(pCD->nmcd.hdc, OBJ_FONT));
         SelectObject(pCD->nmcd.hdc, pCD->iSubItem == 0 ? hFontBold : hFontDefault);
@@ -1041,7 +1039,7 @@ void AnimeListDialog::RefreshList(int index) {
     
     group_count.at(anime_item.GetMyStatus())++;
     group_index = group_view ? anime_item.GetMyStatus() : -1;
-    icon_index = anime_item.GetPlaying() ? ICON16_PLAY : StatusToIcon(anime_item.GetAiringStatus());
+    icon_index = anime_item.GetPlaying() ? ui::kIcon16_Play : StatusToIcon(anime_item.GetAiringStatus());
     i = listview.GetItemCount();
     
     listview.InsertItem(i, group_index, icon_index, 

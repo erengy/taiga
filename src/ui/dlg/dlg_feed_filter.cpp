@@ -58,7 +58,7 @@ INT_PTR FeedFilterDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
       HWND hwnd_control = reinterpret_cast<HWND>(lParam);
       if (hwnd_control == GetDlgItem(IDC_STATIC_HEADER)) {
         SetBkMode(hdc, TRANSPARENT);
-        SetTextColor(hdc, theme::COLOR_MAININSTRUCTION);
+        SetTextColor(hdc, ui::kColorMainInstruction);
         return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
       }
       break;
@@ -92,14 +92,14 @@ void FeedFilterDialog::OnCancel() {
 BOOL FeedFilterDialog::OnInitDialog() {
   // Set icon_
   if (!icon_) {
-    icon_ = UI.ImgList16.GetIcon(ICON16_FUNNEL);
+    icon_ = ui::Theme.GetImageList16().GetIcon(ui::kIcon16_Funnel);
   }
   //SetIconSmall(icon_);
 
   // Set main instruction font
   main_instructions_label_.Attach(GetDlgItem(IDC_STATIC_HEADER));
   main_instructions_label_.SendMessage(WM_SETFONT, 
-    reinterpret_cast<WPARAM>(UI.font_header.Get()), FALSE);
+    reinterpret_cast<WPARAM>(ui::Theme.GetHeaderFont()), FALSE);
   
   // Calculate page area
   win::Rect page_area; main_instructions_label_.GetWindowRect(&page_area);
@@ -246,7 +246,7 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   // Initialize presets list
   preset_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_PRESETS));
   preset_list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
-  preset_list.SetImageList(UI.ImgList16.GetHandle(), LVSIL_NORMAL);
+  preset_list.SetImageList(ui::Theme.GetImageList16().GetHandle(), LVSIL_NORMAL);
   preset_list.SetTheme();
   
   // Insert list groups
@@ -267,13 +267,13 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   for (auto it = Aggregator.filter_manager.presets.begin(); 
        it != Aggregator.filter_manager.presets.end(); ++it) {
     if (it->is_default) continue;
-    int icon_ = ICON16_FUNNEL;
+    int icon_ = ui::kIcon16_Funnel;
     switch (it->filter.action) {
-      case FEED_FILTER_ACTION_DISCARD: icon_ = ICON16_FUNNEL_CROSS; break;
-      case FEED_FILTER_ACTION_SELECT:  icon_ = ICON16_FUNNEL_TICK;  break;
-      case FEED_FILTER_ACTION_PREFER:  icon_ = ICON16_FUNNEL_PLUS;  break;
+      case FEED_FILTER_ACTION_DISCARD: icon_ = ui::kIcon16_FunnelCross; break;
+      case FEED_FILTER_ACTION_SELECT:  icon_ = ui::kIcon16_FunnelTick;  break;
+      case FEED_FILTER_ACTION_PREFER:  icon_ = ui::kIcon16_FunnelPlus;  break;
     }
-    if (it->filter.conditions.empty()) icon_ = ICON16_FUNNEL_PENCIL;
+    if (it->filter.conditions.empty()) icon_ = ui::kIcon16_FunnelPencil;
     preset_list.InsertItem(it - Aggregator.filter_manager.presets.begin(), 
       0, icon_, I_COLUMNSCALLBACK, nullptr, LPSTR_TEXTCALLBACK, 
       reinterpret_cast<LPARAM>(&(*it)));
@@ -350,7 +350,7 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 3; i++) {
     SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-      reinterpret_cast<WPARAM>(UI.font_bold.Get()), FALSE);
+      reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), FALSE);
   }
   
   // Initialize name
@@ -360,7 +360,7 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   // Initialize condition list
   condition_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_CONDITIONS));
   condition_list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  condition_list.SetImageList(UI.ImgList16.GetHandle());
+  condition_list.SetImageList(ui::Theme.GetImageList16().GetHandle());
   condition_list.SetTheme();
   // Insert list columns
   condition_list.InsertColumn(0, 170, 170, 0, L"Element");
@@ -370,14 +370,14 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
 
   // Initialize toolbar
   condition_toolbar.Attach(GetDlgItem(IDC_TOOLBAR_FEED_FILTER));
-  condition_toolbar.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  condition_toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
   condition_toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
   // Add toolbar items
-  condition_toolbar.InsertButton(0, ICON16_PLUS,       100, true,  0, 0, nullptr, L"Add new condition...");
-  condition_toolbar.InsertButton(1, ICON16_MINUS,      101, false, 0, 1, nullptr, L"Delete condition");
+  condition_toolbar.InsertButton(0, ui::kIcon16_Plus,      100, true,  0, 0, nullptr, L"Add new condition...");
+  condition_toolbar.InsertButton(1, ui::kIcon16_Minus,     101, false, 0, 1, nullptr, L"Delete condition");
   condition_toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  condition_toolbar.InsertButton(3, ICON16_ARROW_UP,   103, false, 0, 3, nullptr, L"Move up");
-  condition_toolbar.InsertButton(4, ICON16_ARROW_DOWN, 104, false, 0, 4, nullptr, L"Move down");
+  condition_toolbar.InsertButton(3, ui::kIcon16_ArrowUp,   103, false, 0, 3, nullptr, L"Move up");
+  condition_toolbar.InsertButton(4, ui::kIcon16_ArrowDown, 104, false, 0, 4, nullptr, L"Move down");
   
   // Initialize options
   match_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_MATCH));
@@ -526,7 +526,7 @@ bool FeedFilterDialog::DialogPage1::BuildFilter(FeedFilter& filter) {
 
 void FeedFilterDialog::DialogPage1::AddConditionToList(const FeedFilterCondition& condition, int index) {
   if (index == -1) index = condition_list.GetItemCount();
-  condition_list.InsertItem(index, -1, ICON16_FUNNEL, 0, nullptr, 
+  condition_list.InsertItem(index, -1, ui::kIcon16_Funnel, 0, nullptr, 
     Aggregator.filter_manager.TranslateElement(condition.element).c_str(), 
     reinterpret_cast<LPARAM>(&condition));
   condition_list.SetItem(index, 1, Aggregator.filter_manager.TranslateOperator(condition.op).c_str());
@@ -549,7 +549,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   anime_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_ANIME));
   anime_list.EnableGroupView(win::GetWinVersion() > win::VERSION_XP);
   anime_list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
-  anime_list.SetImageList(UI.ImgList16.GetHandle());
+  anime_list.SetImageList(ui::Theme.GetImageList16().GetHandle());
   anime_list.SetTheme();
   
   // Insert list columns

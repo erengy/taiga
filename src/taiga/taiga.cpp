@@ -120,8 +120,7 @@ void App::LoadData() {
   if (Settings.Load())
     Settings.HandleCompatibility();
 
-  UI.Load();
-  UI.LoadImages();
+  ui::Theme.Load();
   ui::Menus.Load();
 
   AnimeDatabase.LoadDatabase();

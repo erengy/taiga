@@ -155,7 +155,7 @@ LRESULT MainDialog::CancelButton::OnCustomDraw(LPARAM lParam) {
     case CDDS_PREPAINT: {
       win::Dc dc = pCD->hdc;
       dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
-      UI.ImgList16.Draw(ICON16_CROSS, dc.Get(), 0, 0);
+      ui::Theme.GetImageList16().Draw(ui::kIcon16_Cross, dc.Get(), 0, 0);
       dc.DetachDC();
       return CDRF_SKIPDEFAULT;
     }

@@ -102,10 +102,10 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertColumn(0, 0, 0, 0, L"Folder");
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER);
-      list.SetImageList(UI.ImgList16.GetHandle());
+      list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
       for (size_t i = 0; i < Settings.root_folders.size(); i++)
-        list.InsertItem(i, -1, ICON16_FOLDER, 0, nullptr, Settings.root_folders[i].c_str(), 0);
+        list.InsertItem(i, -1, ui::kIcon16_Folder, 0, nullptr, Settings.root_folders[i].c_str(), 0);
       list.SetWindowHandle(nullptr);
       CheckDlgButton(IDC_CHECK_FOLDERS_WATCH, Settings.GetBool(taiga::kLibrary_WatchFolders));
       break;
@@ -200,7 +200,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertGroup(0, L"Media players");
       list.InsertGroup(1, L"Web browsers");
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
-      list.SetImageList(UI.ImgList16.GetHandle());
+      list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
       if (win::GetWinVersion() >= win::VERSION_VISTA) {
         win::Window header = list.GetHeader();
@@ -215,7 +215,7 @@ BOOL SettingsPage::OnInitDialog() {
       for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
         BOOL player_available = MediaPlayers.items[i].GetPath().empty() ? FALSE : TRUE;
         list.InsertItem(i, MediaPlayers.items[i].mode == 5 ? 1 : 0, 
-                        ICON16_APP_GRAY - player_available, 0, nullptr, 
+                        ui::kIcon16_AppGray - player_available, 0, nullptr, 
                         MediaPlayers.items[i].name.c_str(), 0);
         if (MediaPlayers.items[i].enabled)
           list.SetCheckState(i, TRUE);
@@ -231,13 +231,13 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertColumn(0, 0, 0, 0, L"Media providers");
       list.InsertGroup(0, L"Media providers");
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
-      list.SetImageList(UI.ImgList16.GetHandle());
+      list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      list.InsertItem(0, 0, ICON16_APP_BLUE, 0, nullptr, L"Anime News Network", 0);
-      list.InsertItem(1, 0, ICON16_APP_BLUE, 0, nullptr, L"Crunchyroll", 1);
-      list.InsertItem(2, 0, ICON16_APP_BLUE, 0, nullptr, L"Veoh", 3);
-      list.InsertItem(3, 0, ICON16_APP_BLUE, 0, nullptr, L"Viz Anime", 4);
-      list.InsertItem(4, 0, ICON16_APP_BLUE, 0, nullptr, L"YouTube", 5);
+      list.InsertItem(0, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", 0);
+      list.InsertItem(1, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", 1);
+      list.InsertItem(2, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", 3);
+      list.InsertItem(3, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", 4);
+      list.InsertItem(4, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", 5);
       if (Settings.GetBool(taiga::kStream_Ann))
         list.SetCheckState(0, TRUE);
       if (Settings.GetBool(taiga::kStream_Crunchyroll))
@@ -338,7 +338,7 @@ BOOL SettingsPage::OnInitDialog() {
       win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
       list.EnableGroupView(true);
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-      list.SetImageList(UI.ImgList16.GetHandle());
+      list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
       list.InsertColumn(0, 0, 0, 0, L"Name");
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -352,14 +352,14 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetWindowHandle(nullptr);
       // Initialize toolbar
       win::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
-      toolbar.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+      toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
       toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
       // Add toolbar items
-      toolbar.InsertButton(0, ICON16_PLUS,       100, true,  0, 0, nullptr, L"Add new filter...");
-      toolbar.InsertButton(1, ICON16_MINUS,      101, false, 0, 1, nullptr, L"Delete filter");
+      toolbar.InsertButton(0, ui::kIcon16_Plus,      100, true,  0, 0, nullptr, L"Add new filter...");
+      toolbar.InsertButton(1, ui::kIcon16_Minus,     101, false, 0, 1, nullptr, L"Delete filter");
       toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-      toolbar.InsertButton(3, ICON16_ARROW_UP,   103, false, 0, 3, nullptr, L"Move up");
-      toolbar.InsertButton(4, ICON16_ARROW_DOWN, 104, false, 0, 4, nullptr, L"Move down");
+      toolbar.InsertButton(3, ui::kIcon16_ArrowUp,   103, false, 0, 3, nullptr, L"Move up");
+      toolbar.InsertButton(4, ui::kIcon16_ArrowDown, 104, false, 0, 4, nullptr, L"Move down");
       toolbar.SetWindowHandle(nullptr);
       break;
     }
@@ -407,7 +407,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           wstring path;
           if (BrowseForFolder(m_hWindow, L"Please select a folder:", L"", path)) {
             win::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
-            list.InsertItem(list.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, path.c_str(), 0);
+            list.InsertItem(list.GetItemCount(), -1, ui::kIcon16_Folder, 0, nullptr, path.c_str(), 0);
             list.SetSelectedItem(list.GetItemCount() - 1);
             list.SetWindowHandle(nullptr);
           }
@@ -623,7 +623,7 @@ void SettingsPage::OnDropFiles(HDROP hDropInfo) {
     ZeroMemory(szFileName, MAX_PATH + 1);
     DragQueryFile(hDropInfo, i, (LPWSTR)szFileName, MAX_PATH + 1);
     if (GetFileAttributes(szFileName) & FILE_ATTRIBUTE_DIRECTORY) {
-      list.InsertItem(list.GetItemCount(), -1, ICON16_FOLDER, 0, nullptr, szFileName, 0);
+      list.InsertItem(list.GetItemCount(), -1, ui::kIcon16_Folder, 0, nullptr, szFileName, 0);
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
     }
   }

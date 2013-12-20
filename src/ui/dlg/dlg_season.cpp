@@ -61,20 +61,20 @@ BOOL SeasonDialog::OnInitDialog() {
 
   // Create main toolbar
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_SEASON));
-  toolbar_.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  toolbar_.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
   toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
 
   // Insert toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_WHOLEDROPDOWN;
-  toolbar_.InsertButton(0, ICON16_CALENDAR, 100, 1, fsStyle2, 0, L"Select season", nullptr);
-  toolbar_.InsertButton(1, ICON16_REFRESH,  101, 1, fsStyle1, 1, L"Refresh data", L"Download anime details and missing images");
+  toolbar_.InsertButton(0, ui::kIcon16_Calendar, 100, 1, fsStyle2, 0, L"Select season", nullptr);
+  toolbar_.InsertButton(1, ui::kIcon16_Refresh,  101, 1, fsStyle1, 1, L"Refresh data", L"Download anime details and missing images");
   toolbar_.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_.InsertButton(3, ICON16_CATEGORY, 103, 1, fsStyle2, 3, L"Group by", nullptr);
-  toolbar_.InsertButton(4, ICON16_SORT,     104, 1, fsStyle2, 4, L"Sort by", nullptr);
-  toolbar_.InsertButton(5, ICON16_DETAILS,  105, 1, fsStyle2, 5, L"View", nullptr);
+  toolbar_.InsertButton(3, ui::kIcon16_Category, 103, 1, fsStyle2, 3, L"Group by", nullptr);
+  toolbar_.InsertButton(4, ui::kIcon16_Sort,     104, 1, fsStyle2, 4, L"Sort by", nullptr);
+  toolbar_.InsertButton(5, ui::kIcon16_Details,  105, 1, fsStyle2, 5, L"View", nullptr);
   toolbar_.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_.InsertButton(7, ICON16_BALLOON,  107, 1, fsStyle1, 7, L"Discuss", L"");
+  toolbar_.InsertButton(7, ui::kIcon16_Balloon,  107, 1, fsStyle1, 7, L"Discuss", L"");
 
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_SEASON));
@@ -256,12 +256,12 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           pCD->nmcd.uItemState & CDIS_SELECTED) {
         hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
       } else {
-        hdc.FillRect(rect, theme::COLOR_GRAY);
+        hdc.FillRect(rect, ui::kColorGray);
       }
 
       // Draw background
       rect.Inflate(-1, -1);
-      hdc.FillRect(rect, theme::COLOR_LIGHTGRAY);
+      hdc.FillRect(rect, ui::kColorLightGray);
 
       // Calculate text height
       int text_height = GetTextHeight(hdc.Get());
@@ -300,11 +300,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       COLORREF color;
       switch (anime_item->GetAiringStatus()) {
         case anime::kAiring:
-          color = theme::COLOR_LIGHTGREEN; break;
+          color = ui::kColorLightGreen; break;
         case anime::kFinishedAiring: default:
-          color = theme::COLOR_LIGHTBLUE; break;
+          color = ui::kColorLightBlue; break;
         case anime::kNotYetAired:
-          color = theme::COLOR_LIGHTRED; break;
+          color = ui::kColorLightRed; break;
       }
       if (view_as == SEASON_VIEWAS_IMAGES) {
         rect_title.Copy(rect);
@@ -314,7 +314,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       
       // Draw anime list indicator
       if (anime_item->IsInList()) {
-        UI.ImgList16.Draw(ICON16_DOCUMENT_A, hdc.Get(),
+        ui::Theme.GetImageList16().Draw(ui::kIcon16_DocumentA, hdc.Get(),
                           rect_title.right - 20, rect_title.top + 4);
         rect_title.right -= 20;
       }

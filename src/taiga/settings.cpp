@@ -463,8 +463,7 @@ bool AppSettings::Save() {
 void AppSettings::ApplyChanges(const wstring& previous_user,
                             const wstring& previous_theme) {
   if (GetWstr(kApp_Interface_Theme) != previous_theme) {
-    UI.Load();
-    UI.LoadImages();
+    ui::Theme.Load();
     MainDialog.rebar.RedrawWindow();
     ui::Menus.UpdateAll();
   }

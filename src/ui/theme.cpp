@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,137 +16,94 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "theme.h"
-
 #include "base/gfx.h"
 #include "base/string.h"
+#include "base/xml.h"
 #include "taiga/path.h"
 #include "taiga/taiga.h"
-#include "base/xml.h"
+#include "ui/theme.h"
 
-Theme UI;
+namespace ui {
 
-// =============================================================================
+ThemeManager Theme;
 
-Theme::Theme() {
-  // Create image lists
-  ImgList16.Create(16, 16);
-  ImgList24.Create(24, 24);
+ThemeManager::ThemeManager() {
+  icons16_.Create(16, 16);  // 16px
+  icons24_.Create(24, 24);  // 24px
 }
 
-bool Theme::Load() {
+bool ThemeManager::Load() {
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathThemeCurrent);
+  std::wstring path = taiga::GetPath(taiga::kPathThemeCurrent);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
-    MessageBox(nullptr, L"Could not read theme file.", path.c_str(),
-               MB_OK | MB_ICONERROR);
+    std::wstring message = L"Could not read theme file:\n" + path;
+    MessageBox(nullptr, message.c_str(), APP_TITLE, MB_OK | MB_ICONERROR);
     return false;
   }
-  
-  // Read theme
-  xml_node theme = document.child(L"theme");
-  xml_node icons16 = theme.child(L"icons").child(L"set_16px");
-  xml_node icons24 = theme.child(L"icons").child(L"set_24px");
-  xml_node image = theme.child(L"list").child(L"background").child(L"image");
-  xml_node progress = theme.child(L"list").child(L"progress");
 
-  // Read icons
-  icons16_.clear();
-  icons24_.clear();
-  for (xml_node icon = icons16.child(L"icon"); icon; icon = icon.next_sibling(L"icon"))
-    icons16_.push_back(icon.attribute(L"name").value());
-  for (xml_node icon = icons24.child(L"icon"); icon; icon = icon.next_sibling(L"icon"))
-    icons24_.push_back(icon.attribute(L"name").value());
+  xml_node node_icons16 =
+      document.child(L"theme").child(L"icons").child(L"set_16px");
+  xml_node node_icons24 =
+      document.child(L"theme").child(L"icons").child(L"set_24px");
+  xml_node node_image =
+      document.child(L"theme").child(L"list").child(L"background").child(L"image");
+  xml_node node_progress =
+      document.child(L"theme").child(L"list").child(L"progress");
 
-  // Read list
-  if (list_background.bitmap) {
-    DeleteObject(list_background.bitmap);
-    list_background.bitmap = nullptr;
-  }
-  list_background.name = image.attribute(L"name").value();
-  list_background.flags = image.attribute(L"flags").as_int();
-  list_background.offset_x = image.attribute(L"offset_x").as_int();
-  list_background.offset_y = image.attribute(L"offset_y").as_int();
-  if (!list_background.name.empty()) {
-    wstring path = GetPathOnly(path) + list_background.name + L".png";
-    Gdiplus::Bitmap bmp(path.c_str());
-    bmp.GetHBITMAP(NULL, &list_background.bitmap);
-  }
+  // Icons
+  std::vector<std::wstring> icons16;
+  foreach_xmlnode_(node_icon, node_icons16, L"icon")
+    icons16.push_back(node_icon.attribute(L"name").value());
+  std::vector<std::wstring> icons24;
+  foreach_xmlnode_(node_icon, node_icons24, L"icon")
+    icons24.push_back(node_icon.attribute(L"name").value());
+
+  // List
   #define READ_PROGRESS_DATA(x, name) \
-    list_progress.x.type = progress.child(name).attribute(L"type").value(); \
-    list_progress.x.value[0] = HexToARGB(progress.child(name).attribute(L"value_1").value()); \
-    list_progress.x.value[1] = HexToARGB(progress.child(name).attribute(L"value_2").value()); \
-    list_progress.x.value[2] = HexToARGB(progress.child(name).attribute(L"value_3").value());
-  READ_PROGRESS_DATA(aired,      L"aired");
-  READ_PROGRESS_DATA(available,  L"available");
-  READ_PROGRESS_DATA(background, L"background");
-  READ_PROGRESS_DATA(border,     L"border");
-  READ_PROGRESS_DATA(button,     L"button");
-  READ_PROGRESS_DATA(completed,  L"completed");
-  READ_PROGRESS_DATA(dropped,    L"dropped");
-  READ_PROGRESS_DATA(separator,  L"separator");
-  READ_PROGRESS_DATA(watching,   L"watching");
+      list_progress_[x].type = node_progress.child(name).attribute(L"type").value(); \
+      list_progress_[x].value[0] = HexToARGB(node_progress.child(name).attribute(L"value_1").value()); \
+      list_progress_[x].value[1] = HexToARGB(node_progress.child(name).attribute(L"value_2").value()); \
+      list_progress_[x].value[2] = HexToARGB(node_progress.child(name).attribute(L"value_3").value());
+  READ_PROGRESS_DATA(kListProgressAired, L"aired");
+  READ_PROGRESS_DATA(kListProgressAvailable, L"available");
+  READ_PROGRESS_DATA(kListProgressBackground, L"background");
+  READ_PROGRESS_DATA(kListProgressBorder, L"border");
+  READ_PROGRESS_DATA(kListProgressButton, L"button");
+  READ_PROGRESS_DATA(kListProgressCompleted, L"completed");
+  READ_PROGRESS_DATA(kListProgressDropped, L"dropped");
+  READ_PROGRESS_DATA(kListProgressSeparator, L"separator");
+  READ_PROGRESS_DATA(kListProgressWatching, L"watching");
   #undef READ_PROGRESS_DATA
 
-  return true;
-}
-
-bool Theme::LoadImages() {
-  // Clear image lists
-  ImgList16.Remove(-1);
-  ImgList24.Remove(-1);
-
-  wstring path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
-  
-  // Populate image lists
-  HBITMAP hBitmap;
-  for (size_t i = 0; i < ICONCOUNT_16PX && i < icons16_.size(); i++) {
-    hBitmap = GdiPlus.LoadImage(path + L"16px\\" + icons16_.at(i) + L".png");
-    ImgList16.AddBitmap(hBitmap, CLR_NONE);
-    DeleteObject(hBitmap);
+  // Load icons
+  icons16_.Remove(-1);
+  icons24_.Remove(-1);
+  path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
+  HBITMAP bitmap_handle;
+  for (size_t i = 0; i < kIconCount16px && i < icons16.size(); i++) {
+    bitmap_handle = GdiPlus.LoadImage(path + L"16px\\" +
+                                      icons16.at(i) + L".png");
+    icons16_.AddBitmap(bitmap_handle, CLR_NONE);
+    DeleteObject(bitmap_handle);
   }
-  for (size_t i = 0; i < ICONCOUNT_24PX && i < icons24_.size(); i++) {
-    hBitmap = GdiPlus.LoadImage(path + L"24px\\" + icons24_.at(i) + L".png");
-    ImgList24.AddBitmap(hBitmap, CLR_NONE);
-    DeleteObject(hBitmap);
+  for (size_t i = 0; i < kIconCount24px && i < icons24.size(); i++) {
+    bitmap_handle = GdiPlus.LoadImage(path + L"24px\\" +
+                                      icons24.at(i) + L".png");
+    icons24_.AddBitmap(bitmap_handle, CLR_NONE);
+    DeleteObject(bitmap_handle);
   }
 
   return true;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-Font::Font()
-    : font_(nullptr) {
-}
+void ThemeManager::CreateFonts(HDC hdc) {
+  if (font_bold_.Get() && font_header_.Get())
+    return;
 
-Font::Font(HFONT font)
-    : font_(font) {
-}
-
-Font::~Font() {
-  Set(nullptr);
-}
-
-HFONT Font::Get() const {
-  return font_;
-}
-
-void Font::Set(HFONT font) {
-  if (font_)
-    ::DeleteObject(font_);
-  font_ = font;
-}
-
-Font::operator HFONT() const {
-  return font_;
-}
-
-bool Theme::CreateFonts(HDC hdc) {
   LOGFONT lFont = {0};
   lFont.lfCharSet = DEFAULT_CHARSET;
   lFont.lfOutPrecision = OUT_STRING_PRECIS;
@@ -158,43 +115,53 @@ bool Theme::CreateFonts(HDC hdc) {
   lFont.lfHeight = -MulDiv(9, GetDeviceCaps(hdc, LOGPIXELSY), 72);
   lFont.lfWeight = FW_BOLD;
   lstrcpy(lFont.lfFaceName, L"Segoe UI");
-  font_bold.Set(::CreateFontIndirect(&lFont));
+  font_bold_.Set(::CreateFontIndirect(&lFont));
 
   // Header font
   lFont.lfHeight = -MulDiv(12, GetDeviceCaps(hdc, LOGPIXELSY), 72);
   lFont.lfWeight = FW_NORMAL;
   lstrcpy(lFont.lfFaceName, L"Segoe UI");
-  font_header.Set(::CreateFontIndirect(&lFont));
-
-  return true;
+  font_header_.Set(::CreateFontIndirect(&lFont));
 }
 
-// =============================================================================
-
-Theme::ListBackground::ListBackground()
-    : bitmap(nullptr), flags(0), offset_x(0), offset_y(0) {
+HFONT ThemeManager::GetBoldFont() const {
+  return font_bold_.Get();
 }
 
-Theme::ListBackground::~ListBackground() {
-  if (bitmap) {
-    ::DeleteObject(bitmap);
-    bitmap = nullptr;
-  }
+HFONT ThemeManager::GetHeaderFont() const {
+  return font_header_.Get();
 }
 
-void Theme::ListProgress::Item::Draw(HDC hdc, const LPRECT rect) {
+win::ImageList& ThemeManager::GetImageList16() {
+  return icons16_;
+}
+
+win::ImageList& ThemeManager::GetImageList24() {
+  return icons24_;
+}
+
+void ThemeManager::DrawListProgress(HDC hdc, const LPRECT rect,
+                                    ListProgressType type) {
+  auto& item = list_progress_[type];
+
   // Solid
-  if (type == L"solid") {
-    HBRUSH hbrSolid = CreateSolidBrush(value[0]);
+  if (item.type == L"solid") {
+    HBRUSH hbrSolid = CreateSolidBrush(item.value[0]);
     FillRect(hdc, rect, hbrSolid);
     DeleteObject(hbrSolid);
 
   // Gradient
-  } else if (type == L"gradient") {
-    GradientRect(hdc, rect, value[0], value[1], value[2] > 0);
+  } else if (item.type == L"gradient") {
+    GradientRect(hdc, rect, item.value[0], item.value[1], item.value[2] > 0);
 
   // Progress bar
-  } else if (type == L"progress") {
-    DrawProgressBar(hdc, rect, value[0], value[1], value[2]);
+  } else if (item.type == L"progress") {
+    DrawProgressBar(hdc, rect, item.value[0], item.value[1], item.value[2]);
   }
 }
+
+COLORREF ThemeManager::GetListProgressColor(ListProgressType type) {
+  return list_progress_[type].value[0];
+}
+
+}  // namespace ui

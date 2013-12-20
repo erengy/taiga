@@ -88,13 +88,13 @@ int TranslateResolution(const wstring& str, bool return_validity) {
 int StatusToIcon(int status) {  
   switch (status) {
     case anime::kAiring:
-      return ICON16_GREEN;
+      return ui::kIcon16_Green;
     case anime::kFinishedAiring:
-      return ICON16_BLUE;
+      return ui::kIcon16_Blue;
     case anime::kNotYetAired:
-      return ICON16_RED;
+      return ui::kIcon16_Red;
     default:
-      return ICON16_GRAY;
+      return ui::kIcon16_Gray;
   }
 }
 

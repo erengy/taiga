@@ -51,7 +51,7 @@ BOOL TorrentDialog::OnInitDialog() {
   list_.EnableGroupView(true);
   list_.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | 
     LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  list_.SetImageList(UI.ImgList16.GetHandle());
+  list_.SetImageList(ui::Theme.GetImageList16().GetHandle());
   list_.SetTheme();
   
   // Insert list columns
@@ -69,16 +69,16 @@ BOOL TorrentDialog::OnInitDialog() {
 
   // Create main toolbar
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_TORRENT));
-  toolbar_.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  toolbar_.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
   toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Insert toolbar buttons
   BYTE fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
-  toolbar_.InsertButton(0, ICON16_REFRESH,  100, 1, fsStyle, 0, L"Check new torrents", NULL);
+  toolbar_.InsertButton(0, ui::kIcon16_Refresh,  100, 1, fsStyle, 0, L"Check new torrents", NULL);
   toolbar_.InsertButton(1, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  toolbar_.InsertButton(2, ICON16_DOWNLOAD, 101, 1, fsStyle, 0, L"Download marked torrents", NULL);
-  toolbar_.InsertButton(3, ICON16_CROSS,    102, 1, fsStyle, 0, L"Discard all", NULL);
+  toolbar_.InsertButton(2, ui::kIcon16_Download, 101, 1, fsStyle, 0, L"Download marked torrents", NULL);
+  toolbar_.InsertButton(3, ui::kIcon16_Cross,    102, 1, fsStyle, 0, L"Discard all", NULL);
   toolbar_.InsertButton(4, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  toolbar_.InsertButton(5, ICON16_SETTINGS, 103, 1, fsStyle, 0, L"Settings", NULL);
+  toolbar_.InsertButton(5, ui::kIcon16_Settings, 103, 1, fsStyle, 0, L"Settings", NULL);
 
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_TORRENT));
@@ -313,10 +313,10 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               // Change background color
               switch (feed_item->state) {
                 case FEEDITEM_DISCARDED:
-                  pCD->clrTextBk = theme::COLOR_LIGHTRED;
+                  pCD->clrTextBk = ui::kColorLightRed;
                   break;
                 case FEEDITEM_SELECTED:
-                  pCD->clrTextBk = theme::COLOR_LIGHTGREEN;
+                  pCD->clrTextBk = ui::kColorLightGreen;
                   break;
                 default:
                   pCD->clrTextBk = GetSysColor(COLOR_WINDOW);

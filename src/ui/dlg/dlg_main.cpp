@@ -79,7 +79,7 @@ BOOL MainDialog::OnInitDialog() {
   SetIconSmall(IDI_MAIN);
 
   // Create default fonts
-  UI.CreateFonts(GetDC());
+  ui::Theme.CreateFonts(GetDC());
   
   // Create controls
   CreateDialogControls();
@@ -138,11 +138,11 @@ void MainDialog::CreateDialogControls() {
   toolbar_menu.SetImageList(nullptr, 0, 0);
   // Create main toolbar
   toolbar_main.Attach(GetDlgItem(IDC_TOOLBAR_MAIN));
-  toolbar_main.SetImageList(UI.ImgList24.GetHandle(), 24, 24);
+  toolbar_main.SetImageList(ui::Theme.GetImageList24().GetHandle(), 24, 24);
   toolbar_main.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Create search toolbar
   toolbar_search.Attach(GetDlgItem(IDC_TOOLBAR_SEARCH));
-  toolbar_search.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  toolbar_search.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
   toolbar_search.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Create search text
   edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
@@ -158,7 +158,7 @@ void MainDialog::CreateDialogControls() {
   // Create treeview control
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
   treeview.SendMessage(TVM_SETBKCOLOR, 0, ::GetSysColor(COLOR_3DFACE));
-  treeview.SetImageList(UI.ImgList16.GetHandle());
+  treeview.SetImageList(ui::Theme.GetImageList16().GetHandle());
   treeview.SetItemHeight(20);
   treeview.SetTheme();
   if (Settings.GetBool(taiga::kApp_Option_HideSidebar)) {
@@ -166,20 +166,20 @@ void MainDialog::CreateDialogControls() {
   }
   // Create status bar
   statusbar.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
-  statusbar.SetImageList(UI.ImgList16.GetHandle());
+  statusbar.SetImageList(ui::Theme.GetImageList16().GetHandle());
   statusbar.InsertPart(-1, 0, 0, 900, nullptr, nullptr);
-  statusbar.InsertPart(ICON16_CLOCK, 0, 0,  32, nullptr, nullptr);
+  statusbar.InsertPart(ui::kIcon16_Clock, 0, 0,  32, nullptr, nullptr);
 
   // Insert treeview items
-  treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ICON16_PLAY, SIDEBAR_ITEM_NOWPLAYING, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ui::kIcon16_Play, SIDEBAR_ITEM_NOWPLAYING, nullptr));
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Anime List", ICON16_DOCUMENT_A, SIDEBAR_ITEM_ANIMELIST, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"History", ICON16_CLOCK, SIDEBAR_ITEM_HISTORY, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Statistics", ICON16_CHART, SIDEBAR_ITEM_STATS, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Anime List", ui::kIcon16_DocumentA, SIDEBAR_ITEM_ANIMELIST, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"History", ui::kIcon16_Clock, SIDEBAR_ITEM_HISTORY, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Statistics", ui::kIcon16_Chart, SIDEBAR_ITEM_STATS, nullptr));
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Search", ICON16_SEARCH, SIDEBAR_ITEM_SEARCH, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Seasons", ICON16_CALENDAR, SIDEBAR_ITEM_SEASONS, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Torrents", ICON16_FEED, SIDEBAR_ITEM_FEEDS, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Search", ui::kIcon16_Search, SIDEBAR_ITEM_SEARCH, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Seasons", ui::kIcon16_Calendar, SIDEBAR_ITEM_SEASONS, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Torrents", ui::kIcon16_Feed, SIDEBAR_ITEM_FEEDS, nullptr));
   if (History.queue.GetItemCount() > 0) {
     treeview.RefreshHistoryCounter();
   }
@@ -194,21 +194,21 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0, ICON24_SYNC, TOOLBAR_BUTTON_SYNCHRONIZE, 
+  toolbar_main.InsertButton(0, ui::kIcon24_Sync, TOOLBAR_BUTTON_SYNCHRONIZE, 
                             1, fsStyle1, 0, nullptr, L"Synchronize list");
-  toolbar_main.InsertButton(1, ICON24_MAL, TOOLBAR_BUTTON_MAL, 
+  toolbar_main.InsertButton(1, ui::kIcon24_Mal, TOOLBAR_BUTTON_MAL, 
                             1, fsStyle1, 1, nullptr, L"Go to my panel at MyAnimeList");
   toolbar_main.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(3, ICON24_FOLDERS, TOOLBAR_BUTTON_FOLDERS, 
+  toolbar_main.InsertButton(3, ui::kIcon24_Folders, TOOLBAR_BUTTON_FOLDERS, 
                             1, fsStyle2, 3, nullptr, L"Root folders");
-  toolbar_main.InsertButton(4, ICON24_TOOLS, TOOLBAR_BUTTON_TOOLS, 
+  toolbar_main.InsertButton(4, ui::kIcon24_Tools, TOOLBAR_BUTTON_TOOLS, 
                             1, fsStyle2, 4, nullptr, L"External links");
   toolbar_main.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(6, ICON24_SETTINGS, TOOLBAR_BUTTON_SETTINGS, 
+  toolbar_main.InsertButton(6, ui::kIcon24_Settings, TOOLBAR_BUTTON_SETTINGS, 
                             1, fsStyle1, 6, nullptr, L"Change program settings");
 #ifdef _DEBUG
   toolbar_main.InsertButton(7, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(8, ICON24_ABOUT, TOOLBAR_BUTTON_ABOUT, 
+  toolbar_main.InsertButton(8, ui::kIcon24_About, TOOLBAR_BUTTON_ABOUT, 
                             1, fsStyle1, 8, nullptr, L"Debug");
 #endif
 
