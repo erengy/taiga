@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,12 +29,8 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "ui/ui.h"
 #include "win/win_taskdialog.h"
-
-#include "ui/dlg/dlg_anime_info.h"
-#include "ui/dlg/dlg_anime_list.h"
-#include "ui/dlg/dlg_history.h"
-#include "ui/dlg/dlg_main.h"
 
 class ConfirmationQueue ConfirmationQueue;
 class History History;
@@ -99,7 +95,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
   // Edit previous item with the same ID...
   bool add_new_item = true;
   if (!History.queue.updating) {
-    for (auto it = items.rbegin(); it != items.rend(); ++it) {
+    foreach_r_(it, items) {
       if (it->anime_id == item.anime_id && it->enabled) {
         if (it->mode != taiga::kHttpServiceAddLibraryEntry &&
             it->mode != taiga::kHttpServiceDeleteLibraryEntry) {
@@ -154,29 +150,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
       anime::CheckEpisodes(*anime, 0);
     }
 
-    // Refresh history
-    MainDialog.treeview.RefreshHistoryCounter();
-    HistoryDialog.RefreshList();
-
-    // Refresh anime window
-    if (item.mode == taiga::kHttpServiceAddLibraryEntry ||
-        item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
-        item.status ||
-        item.enable_rewatching) {
-      AnimeListDialog.RefreshList();
-      AnimeListDialog.RefreshTabs();
-    } else {
-      AnimeListDialog.RefreshListItem(item.anime_id);
-    }
-
-    // Refresh now playing
-    NowPlayingDialog.Refresh(false, false, false);
-    
-    // Change status
-    if (!Taiga.logged_in) {
-      MainDialog.ChangeStatus(L"\"" + anime->GetTitle() +
-                              L"\" is queued for update.");
-    }
+    ui::OnHistoryAddItem(item);
 
     // Update
     Check();
@@ -215,7 +189,7 @@ void HistoryQueue::Check(bool automatic) {
 
   // Update
   History.queue.updating = true;
-  MainDialog.ChangeStatus(L"Updating list...");
+  ui::ChangeStatusText(L"Updating list...");
   AnimeValues* anime_values = static_cast<AnimeValues*>(&items[index]);
   sync::UpdateLibraryEntry(*anime_values, items[index].anime_id,
       static_cast<taiga::HttpClientMode>(items[index].mode));
@@ -225,8 +199,7 @@ void HistoryQueue::Clear(bool save) {
   items.clear();
   index = 0;
 
-  MainDialog.treeview.RefreshHistoryCounter();
-  NowPlayingDialog.Refresh(false, false, false);
+  ui::OnHistoryChange();
 
   if (save)
     history->Save();
@@ -313,11 +286,8 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
 
     items.erase(history_item);
 
-    if (refresh) {
-      MainDialog.treeview.RefreshHistoryCounter();
-      NowPlayingDialog.Refresh(false, false, false);
-      HistoryDialog.RefreshList();
-    }
+    if (refresh)
+      ui::OnHistoryChange();
   }
 
   if (save) history->Save();
@@ -334,11 +304,8 @@ void HistoryQueue::RemoveDisabled(bool save, bool refresh) {
     }
   }
 
-  if (refresh && needs_refresh) {
-    MainDialog.treeview.RefreshHistoryCounter();
-    NowPlayingDialog.Refresh(false, false, false);
-    HistoryDialog.RefreshList();
-  }
+  if (refresh && needs_refresh)
+    ui::OnHistoryChange();
 
   if (save)
     history->Save();

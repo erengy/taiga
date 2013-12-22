@@ -19,7 +19,8 @@
 #ifndef TAIGA_LIBRARY_ANIME_UTIL_H
 #define TAIGA_LIBRARY_ANIME_UTIL_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
 
 class Date;
 
@@ -41,34 +42,34 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
 void UpdateList(Item& item, Episode& episode);
 void AddToQueue(Item& item, const Episode& episode, bool change_status);
 
-bool GetFansubFilter(int anime_id, vector<wstring>& groups);
-bool SetFansubFilter(int anime_id, const wstring& group_name);
+bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups);
+bool SetFansubFilter(int anime_id, const std::wstring& group_name);
 
-wstring GetImagePath(int anime_id = -1);
+std::wstring GetImagePath(int anime_id = -1);
 
-void GetUpcomingTitles(vector<int>& anime_ids);
+void GetUpcomingTitles(std::vector<int>& anime_ids);
 
-bool IsInsideRootFolders(const wstring& path);
+bool IsInsideRootFolders(const std::wstring& path);
 
 bool IsValidEpisode(int episode, int watched, int total);
 int EstimateEpisodeCount(const Item& item);
 
-wstring TranslateMyStatus(int value, bool add_count);
-wstring TranslateNumber(int value, const wstring& default_char = L"-");
-wstring TranslateStatus(int value);
-wstring TranslateType(int value);
+std::wstring TranslateMyStatus(int value, bool add_count);
+std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");
+std::wstring TranslateStatus(int value);
+std::wstring TranslateType(int value);
 
-int TranslateMyStatus(const wstring& value);
-int TranslateStatus(const wstring& value);
-int TranslateType(const wstring& value);
+int TranslateMyStatus(const std::wstring& value);
+int TranslateStatus(const std::wstring& value);
+int TranslateType(const std::wstring& value);
 
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsValidDate(const Date& date);
-void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end);
-wstring TranslateDate(const Date& date);
-wstring TranslateDateToSeason(const Date& date);
-wstring TranslateSeasonToMonths(const wstring& season);
+void GetSeasonInterval(const std::wstring& season, Date& date_start, Date& date_end);
+std::wstring TranslateDate(const Date& date);
+std::wstring TranslateDateToSeason(const Date& date);
+std::wstring TranslateSeasonToMonths(const std::wstring& season);
 
 }  // namespace anime
 

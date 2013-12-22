@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ public:
   Optional<Date> date_start;
   Optional<Date> date_finish;
   Optional<int> enable_rewatching;
-  Optional<wstring> tags;
+  Optional<std::wstring> tags;
 };
 
 class HistoryItem : public AnimeValues {
@@ -77,7 +77,7 @@ public:
   void RemoveDisabled(bool save = true, bool refresh = true);
 
   size_t index;
-  vector<HistoryItem> items;
+  std::vector<HistoryItem> items;
   History* history;
   bool updating;
 };

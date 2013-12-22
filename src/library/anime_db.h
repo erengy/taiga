@@ -19,10 +19,9 @@
 #ifndef TAIGA_LIBRARY_ANIME_DB_H
 #define TAIGA_LIBRARY_ANIME_DB_H
 
-#include "anime_item.h"
+#include <map>
 
-#include "base/gfx.h"
-
+#include "library/anime_item.h"
 #include "win/win_thread.h"
 
 class HistoryItem;
@@ -57,28 +56,8 @@ private:
   win::CriticalSection critical_section_;
 };
 
-class ImageDatabase {
-public:
-  ImageDatabase() {}
-  virtual ~ImageDatabase() {}
-
-  // Loads a picture into memory, downloads a new file if requested.
-  bool Load(int anime_id, bool load, bool download);
-
-  // Releases image data from memory if an image is not in sight.
-  void FreeMemory();
-
-  // Returns a pointer to requested image if available.
-  base::Image* GetImage(int anime_id);
-
-private:
-  std::map<int, base::Image> items_;
-};
-
 }  // namespace anime
 
-// Global objects
 extern anime::Database AnimeDatabase;
-extern anime::ImageDatabase ImageDatabase;
 
 #endif  // TAIGA_LIBRARY_ANIME_DB_H

@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,35 +16,22 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-#include <ctime>
-
-#include "anime.h"
-#include "anime_db.h"
-#include "anime_util.h"
-#include "discover.h"
-#include "history.h"
-
-#include "base/common.h"
-#include "base/file.h"
 #include "base/foreach.h"
 #include "base/logger.h"
-#include "sync/sync.h"
-#include "track/recognition.h"
-#include "taiga/settings.h"
 #include "base/string.h"
-#include "taiga/path.h"
-#include "taiga/taiga.h"
 #include "base/xml.h"
-
-#include "ui/dlg/dlg_anime_info.h"
+#include "library/anime.h"
+#include "library/anime_db.h"
+#include "library/anime_util.h"
+#include "library/history.h"
+#include "taiga/http.h"
+#include "taiga/path.h"
+#include "taiga/settings.h"
+#include "track/recognition.h"
 #include "ui/dlg/dlg_anime_list.h"
-#include "ui/dlg/dlg_main.h"
-#include "ui/dlg/dlg_search.h"
-#include "ui/dlg/dlg_season.h"
+#include "ui/ui.h"
 
 anime::Database AnimeDatabase;
-anime::ImageDatabase ImageDatabase;
 
 namespace anime {
 
@@ -346,20 +333,22 @@ int Database::GetItemCount(int status, bool check_history) {
 void Database::ClearUserData() {
   AnimeListDialog.SetCurrentId(ID_UNKNOWN);
   
-  for (auto it = items.begin(); it != items.end(); ++it) {
+  foreach_(it, items)
     it->second.RemoveFromUserList();
-  }
 }
 
 bool Database::DeleteListItem(int anime_id) {
-  auto item = FindItem(anime_id);
+  auto anime_item = FindItem(anime_id);
 
-  if (!item)
+  if (!anime_item)
     return false;
-  if (!item->IsInList())
+  if (!anime_item->IsInList())
     return false;
 
-  item->RemoveFromUserList();
+  anime_item->RemoveFromUserList();
+
+  ui::ChangeStatusText(L"Item deleted. (" + anime_item->GetTitle() + L")");
+  ui::OnLibraryEntryDelete(anime_item->GetId());
 
   return true;
 }
@@ -402,101 +391,16 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   // Delete
   if (history_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
     DeleteListItem(anime_item->GetId());
-    MainDialog.ChangeStatus(L"Item deleted. (" + anime_item->GetTitle() + L")");
-    AnimeListDialog.RefreshList();
-    AnimeListDialog.RefreshTabs();
-    SearchDialog.RefreshList();
-    if (CurrentEpisode.anime_id == history_item.anime_id) {
-      CurrentEpisode.Set(anime::ID_NOTINLIST);
-    }
   }
 
-  // Save list
   SaveList();
 
-  // Remove item from queue
   History.queue.Remove();
-  // Check for more events
   History.queue.Check(false);
 
-  // Redraw main list item
-  int list_index = AnimeListDialog.GetListIndex(history_item.anime_id);
-  if (list_index > -1) {
-    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
-  }
+  ui::OnLibraryEntryChange(history_item.anime_id);
 
   critical_section_.Leave();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-bool ImageDatabase::Load(int anime_id, bool load, bool download) {
-  if (anime_id <= anime::ID_UNKNOWN)
-    return false;
-  
-  if (items_.find(anime_id) != items_.end()) {
-    if (items_[anime_id].data > anime::ID_UNKNOWN) {
-      return true;
-    } else if (!load) {
-      return false;
-    }
-  }
-  
-  if (items_[anime_id].Load(anime::GetImagePath(anime_id))) {
-    items_[anime_id].data = anime_id;
-    if (download) {
-      // Refresh if current file is too old
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (anime_item->GetAiringStatus() != kFinishedAiring) {
-        // Check last modified date (>= 7 days)
-        if (GetFileAge(anime::GetImagePath(anime_id)) / (60 * 60 * 24) >= 7) {
-          sync::DownloadImage(anime_id, anime_item->GetImageUrl());
-        }
-      }
-    }
-    return true;
-  } else {
-    items_[anime_id].data = -1;
-  }
-
-  if (download) {
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    sync::DownloadImage(anime_id, anime_item->GetImageUrl());
-  }
-  
-  return false;
-}
-
-void ImageDatabase::FreeMemory() {
-  foreach_(it, ::AnimeDatabase.items) {
-    bool erase = true;
-    int anime_id = it->first;
-
-    if (items_.find(anime_id) == items_.end())
-      continue;
-
-    if (::AnimeDialog.GetCurrentId() == anime_id ||
-        ::NowPlayingDialog.GetCurrentId() == anime_id)
-      erase = false;
-
-    if (!SeasonDatabase.items.empty())
-      if (std::find(SeasonDatabase.items.begin(), SeasonDatabase.items.end(),
-                    anime_id) != SeasonDatabase.items.end())
-        if (SeasonDialog.IsVisible())
-          erase = false;
-
-    if (erase)
-      items_.erase(anime_id);
-  }
-}
-
-base::Image* ImageDatabase::GetImage(int anime_id) {
-  if (items_.find(anime_id) != items_.end())
-    if (items_[anime_id].data > 0)
-      return &items_[anime_id];
-
-  return nullptr;
-}
-
-} // namespace anime
+}  // namespace anime

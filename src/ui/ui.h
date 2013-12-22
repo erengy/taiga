@@ -21,6 +21,8 @@
 
 #include "base/types.h"
 
+class HistoryItem;
+
 namespace taiga {
 class HttpClient;
 }
@@ -37,9 +39,13 @@ void OnHttpReadComplete(const taiga::HttpClient& http_client);
 
 void OnLibraryChange();
 void OnLibraryEntryChange(int id);
+void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
 void OnLibrarySearchTitle(const string_t& results);
 void OnLibraryUpdateFailure(int id, const string_t& reason);
+
+void OnHistoryAddItem(const HistoryItem& history_item);
+void OnHistoryChange();
 
 void OnFeedCheck(bool success);
 void OnFeedDownload(bool success);

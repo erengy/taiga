@@ -1,5 +1,5 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
+** Taiga
 ** Copyright (C) 2010-2012, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ANIME_EPISODE_H
-#define ANIME_EPISODE_H
+#ifndef TAIGA_LIBRARY_ANIME_EPISODE_H
+#define TAIGA_LIBRARY_ANIME_EPISODE_H
 
-#include "base/std.h"
+#include <string>
 
 namespace anime {
-
-// =============================================================================
 
 class Episode {
  public:
@@ -34,26 +32,26 @@ class Episode {
   void Set(int anime_id);
 
   int anime_id;
-  wstring file;
-  wstring folder;
-  wstring format;
-  wstring title;
-  wstring clean_title;
-  wstring name;
-  wstring group;
-  wstring number;
-  wstring version;
-  wstring resolution;
-  wstring audio_type;
-  wstring video_type;
-  wstring checksum;
-  wstring extras;
-  wstring year;
+  std::wstring file;
+  std::wstring folder;
+  std::wstring format;
+  std::wstring title;
+  std::wstring clean_title;
+  std::wstring name;
+  std::wstring group;
+  std::wstring number;
+  std::wstring version;
+  std::wstring resolution;
+  std::wstring audio_type;
+  std::wstring video_type;
+  std::wstring checksum;
+  std::wstring extras;
+  std::wstring year;
   bool processed;
 };
 
-} // namespace anime
+}  // namespace anime
 
 extern anime::Episode CurrentEpisode;
 
-#endif // ANIME_EPISODE_H
+#endif  // TAIGA_LIBRARY_ANIME_EPISODE_H

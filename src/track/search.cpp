@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,31 +16,22 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "library/anime.h"
-#include "library/anime_db.h"
-#include "library/anime_episode.h"
-#include "library/anime_item.h"
-#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/logger.h"
-#include "recognition.h"
-#include "taiga/settings.h"
 #include "base/string.h"
+#include "library/anime_db.h"
+#include "library/anime_util.h"
+#include "taiga/settings.h"
 #include "taiga/taiga.h"
-
-#include "ui/dlg/dlg_main.h"
+#include "track/recognition.h"
 #include "ui/dlg/dlg_settings.h"
-
+#include "ui/ui.h"
 #include "win/win_taskbar.h"
 #include "win/win_taskdialog.h"
 
-// =============================================================================
-
 // Extends the length limit from 260 to 32767 characters
-wstring GetExtendedLengthPath(const wstring& path) {
+std::wstring GetExtendedLengthPath(const std::wstring& path) {
   if (!StartsWith(path, L"\\\\?\\"))
     return L"\\\\?\\" + path;
   return path;
@@ -55,13 +46,13 @@ bool IsValidDirectory(const WIN32_FIND_DATA& win32_find_data) {
          wcscmp(win32_find_data.cFileName, L"..") != 0;
 }
 
-wstring SearchFileFolder(anime::Item& anime_item, const wstring& root,
-                         int episode_number, bool search_folder) {
+std::wstring SearchFileFolder(anime::Item& anime_item, const std::wstring& root,
+                              int episode_number, bool search_folder) {
   if (root.empty())
-    return wstring();
+    return std::wstring();
 
   anime::Episode episode;
-  wstring path = AddTrailingSlash(GetExtendedLengthPath(root)) + L"*";
+  std::wstring path = AddTrailingSlash(GetExtendedLengthPath(root)) + L"*";
 
   WIN32_FIND_DATA win32_find_data;
   HANDLE handle = FindFirstFile(path.c_str(), &win32_find_data);
@@ -82,9 +73,9 @@ wstring SearchFileFolder(anime::Item& anime_item, const wstring& root,
       }
       LOG(LevelError, L"Path: " + path);
       SetLastError(ERROR_SUCCESS);
-      return wstring();
+      return std::wstring();
     }
-    
+
     // Folders
     if (IsDirectory(win32_find_data)) {
       if (IsValidDirectory(win32_find_data)) {
@@ -100,7 +91,8 @@ wstring SearchFileFolder(anime::Item& anime_item, const wstring& root,
         }
         // Check sub folders
         path = AddTrailingSlash(root) + win32_find_data.cFileName;
-        path = SearchFileFolder(anime_item, path, episode_number, search_folder);
+        path = SearchFileFolder(anime_item, path, episode_number,
+                                search_folder);
         if (!path.empty()) {
           FindClose(handle);
           return path;
@@ -120,34 +112,39 @@ wstring SearchFileFolder(anime::Item& anime_item, const wstring& root,
               int number = GetEpisodeHigh(episode.number);
               int numberlow = GetEpisodeLow(episode.number);
               for (int i = numberlow; i <= number; i++) {
-                anime_item.SetEpisodeAvailability(i, true, root + win32_find_data.cFileName);
+                anime_item.SetEpisodeAvailability(
+                    i, true, root + win32_find_data.cFileName);
               }
-              if (episode_number == 0 || (episode_number >= numberlow && episode_number <= number)) {
+              if (episode_number == 0 ||
+                  (episode_number >= numberlow && episode_number <= number)) {
                 FindClose(handle);
                 return AddTrailingSlash(root) + win32_find_data.cFileName;
               }
             }
           }
         } else {
-          LOG(LevelDebug, L"File is ignored because its size does not meet the threshold.");
-          LOG(LevelDebug, L"Path: " + AddTrailingSlash(root) + win32_find_data.cFileName);
+          LOG(LevelDebug, L"File is ignored because its size does not meet "
+                          L"the threshold.");
+          LOG(LevelDebug, L"Path: " + AddTrailingSlash(root) +
+                          win32_find_data.cFileName);
         }
       }
     }
   } while (FindNextFile(handle, &win32_find_data));
   
   FindClose(handle);
-  return wstring();
+  return std::wstring();
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
   // Check if any root folder is available
   if (!silent && Settings.root_folders.empty()) {
     win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
-    dlg.SetContent(L"You need to have at least one root folder set before scanning available episodes.");
+    dlg.SetContent(L"You need to have at least one root folder set before "
+                   L"scanning available episodes.");
     dlg.AddButton(L"Yes", IDYES);
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
@@ -156,7 +153,8 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
     return;
   }
 
-  int episode_number = Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable) ? -1 : 0;
+  int episode_number =
+      Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable) ? -1 : 0;
 
   // Search for all list items
   if (!anime_id) {
@@ -173,7 +171,8 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
       switch (it->second.GetMyStatus()) {
         case anime::kWatching:
           if (!silent)
-            MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
+            ui::ChangeStatusText(L"Scanning... (" +
+                                 it->second.GetTitle() + L")");
           anime::CheckEpisodes(it->second, episode_number, check_folder);
       }
     }
@@ -185,7 +184,8 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
         case anime::kOnHold:
         case anime::kPlanToWatch:
           if (!silent)
-            MainDialog.ChangeStatus(L"Scanning... (" + it->second.GetTitle() + L")");
+            ui::ChangeStatusText(L"Scanning... (" +
+                                 it->second.GetTitle() + L")");
           anime::CheckEpisodes(it->second, episode_number, check_folder);
       }
     }
@@ -205,5 +205,5 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
 
   // We're done
   if (!silent)
-    MainDialog.ChangeStatus(L"Scan finished.");
+    ui::ChangeStatusText(L"Scan finished.");
 }

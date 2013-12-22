@@ -114,6 +114,7 @@
     <ClCompile Include="library\discover.cpp" />
     <ClCompile Include="library\history.cpp" />
     <ClCompile Include="library\metadata.cpp" />
+    <ClCompile Include="library\resource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sync\herro.cpp" />
     <ClCompile Include="sync\manager.cpp" />
@@ -239,6 +240,7 @@
     <ClInclude Include="library\discover.h" />
     <ClInclude Include="library\history.h" />
     <ClInclude Include="library\metadata.h" />
+    <ClInclude Include="library\resource.h" />
     <ClInclude Include="sync\herro.h" />
     <ClInclude Include="sync\herro_types.h" />
     <ClInclude Include="sync\manager.h" />

@@ -34,7 +34,7 @@ void Synchronize();
 void UpdateLibraryEntry(AnimeValues& anime_values, int id,
                         taiga::HttpClientMode http_client_mode);
 
-void DownloadImage(int id, const wstring& image_url);
+void DownloadImage(int id, const std::wstring& image_url);
 
 void AddAuthenticationToRequest(Request& request);
 bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id);

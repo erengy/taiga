@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,20 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "anime.h"
-#include "anime_db.h"
-#include "anime_episode.h"
-
-#include "base/common.h"
+#include "library/anime.h"
+#include "library/anime_db.h"
+#include "library/anime_episode.h"
 #include "ui/menu.h"
 
 anime::Episode CurrentEpisode;
 
 namespace anime {
-
-// =============================================================================
 
 Episode::Episode()
     : anime_id(ID_UNKNOWN), processed(false) {
@@ -61,4 +55,4 @@ void Episode::Set(int anime_id) {
   ui::Menus.UpdateAll(AnimeDatabase.FindItem(anime_id));
 }
 
-} // namespace anime
+}  // namespace anime

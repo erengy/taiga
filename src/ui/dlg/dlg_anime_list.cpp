@@ -26,6 +26,7 @@
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
 #include "library/anime_util.h"
+#include "library/resource.h"
 #include "base/common.h"
 #include "base/gfx.h"
 #include "taiga/resource.h"

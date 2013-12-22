@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,16 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "anime_filter.h"
-#include "anime_item.h"
-
 #include "base/string.h"
+#include "library/anime_filter.h"
+#include "library/anime_item.h"
 
 namespace anime {
-
-// =============================================================================
 
 Filters::Filters() {
   Reset();
@@ -85,4 +80,4 @@ void Filters::Reset() {
   text = L"";
 }
 
-} // namespace anime
+}  // namespace anime

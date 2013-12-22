@@ -16,9 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "anime_util.h"
+#include <map>
+
 #include "base/string.h"
 #include "base/time.h"
+#include "library/anime_util.h"
 
 namespace anime {
 
@@ -26,8 +28,9 @@ bool IsValidDate(const Date& date) {
   return date.year > 0;
 }
 
-void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) {
-  std::map<wstring, std::pair<int, int>> interval;
+void GetSeasonInterval(const std::wstring& season, Date& date_start,
+                       Date& date_end) {
+  std::map<std::wstring, std::pair<int, int>> interval;
   interval[L"Spring"] = std::make_pair<int, int>(3, 5);
   interval[L"Summer"] = std::make_pair<int, int>(6, 8);
   interval[L"Fall"] = std::make_pair<int, int>(9, 11);
@@ -36,7 +39,7 @@ void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) 
   const int days_in_months[] = 
     {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-  vector<wstring> season_year;
+  std::vector<std::wstring> season_year;
   Split(season, L" ", season_year);
 
   date_start.year = ToInt(season_year.at(1));
@@ -51,11 +54,11 @@ void GetSeasonInterval(const wstring& season, Date& date_start, Date& date_end) 
   date_end.day = days_in_months[date_end.month - 1];
 }
 
-wstring TranslateDate(const Date& date) {
+std::wstring TranslateDate(const Date& date) {
   if (!IsValidDate(date))
     return L"?";
 
-  wstring result;
+  std::wstring result;
 
   if (date.month > 0 && date.month <= 12) {
     const wchar_t* months[] = {
@@ -72,11 +75,11 @@ wstring TranslateDate(const Date& date) {
   return result;
 }
 
-wstring TranslateDateToSeason(const Date& date) {
+std::wstring TranslateDateToSeason(const Date& date) {
   if (!IsValidDate(date))
     return L"Unknown";
 
-  wstring season;
+  std::wstring season;
   unsigned short year = date.year;
 
   if (date.month == 0) {
@@ -97,7 +100,7 @@ wstring TranslateDateToSeason(const Date& date) {
   return season + L" " + ToWstr(year);
 }
 
-wstring TranslateSeasonToMonths(const wstring& season) {
+std::wstring TranslateSeasonToMonths(const std::wstring& season) {
   const wchar_t* months[] = {
     L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
     L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
@@ -106,7 +109,7 @@ wstring TranslateSeasonToMonths(const wstring& season) {
   Date date_start, date_end;
   GetSeasonInterval(season, date_start, date_end);
 
-  wstring result = months[date_start.month - 1];
+  std::wstring result = months[date_start.month - 1];
   result += L" " + ToWstr(date_start.year) + L" to ";
   result += months[date_end.month - 1];
   result += L" " + ToWstr(date_end.year);

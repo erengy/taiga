@@ -24,6 +24,7 @@
 #include "base/string.h"
 #include "base/types.h"
 #include "library/anime_db.h"
+#include "library/history.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -205,6 +206,22 @@ void OnLibraryEntryChange(int id) {
     SeasonDialog.RefreshList(true);
 }
 
+void OnLibraryEntryDelete(int id) {
+  if (AnimeDialog.GetCurrentId() == id)
+    AnimeDialog.Destroy();
+
+  AnimeListDialog.RefreshList();
+  AnimeListDialog.RefreshTabs();
+
+  SearchDialog.RefreshList();
+
+  if (SeasonDialog.IsWindow())
+    SeasonDialog.RefreshList(true);
+
+  if (CurrentEpisode.anime_id == id)
+    CurrentEpisode.Set(anime::ID_NOTINLIST);
+}
+
 void OnLibraryEntryImageChange(int id) {
   if (AnimeDialog.GetCurrentId() == id)
     AnimeDialog.Refresh(true, false, false, false);
@@ -249,6 +266,34 @@ void OnLibraryUpdateFailure(int id, const string_t& reason) {
   Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
 
   ChangeStatusText(L"Update failed: " + reason);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void OnHistoryAddItem(const HistoryItem& history_item) {
+  OnHistoryChange();
+
+  if (history_item.mode == taiga::kHttpServiceAddLibraryEntry ||
+      history_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
+      history_item.status ||
+      history_item.enable_rewatching) {
+    AnimeListDialog.RefreshList();
+    AnimeListDialog.RefreshTabs();
+  } else {
+    AnimeListDialog.RefreshListItem(history_item.anime_id);
+  }
+
+  if (!Taiga.logged_in) {
+    auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
+    ChangeStatusText(L"\"" + anime_item->GetTitle() +
+                     L"\" is queued for update.");
+  }
+}
+
+void OnHistoryChange() {
+  HistoryDialog.RefreshList();
+  MainDialog.treeview.RefreshHistoryCounter();
+  NowPlayingDialog.Refresh(false, false, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

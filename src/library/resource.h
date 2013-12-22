@@ -16,30 +16,35 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_FILTER_H
-#define TAIGA_LIBRARY_ANIME_FILTER_H
+#ifndef TAIGA_LIBRARY_RESOURCE_H
+#define TAIGA_LIBRARY_RESOURCE_H
 
-#include <string>
-#include <vector>
+#include <map>
+
+#include "base/gfx.h"
 
 namespace anime {
 
-class Item;
+class ImageDatabase {
+public:
+  ImageDatabase() {}
+  virtual ~ImageDatabase() {}
 
-class Filters {
- public:
-  Filters();
-  virtual ~Filters() {}
-  
-  bool CheckItem(Item& item);
-  void Reset();
-  
-  std::vector<bool> my_status;
-  std::vector<bool> status;
-  std::vector<bool> type;
-  std::wstring text;
+  // Loads a picture into memory, downloads a new file if requested.
+  bool Load(int anime_id, bool load, bool download);
+
+  // Releases image data from memory if an image is not in sight.
+  void FreeMemory();
+
+  // Returns a pointer to requested image if available.
+  base::Image* GetImage(int anime_id);
+
+private:
+  std::map<int, base::Image> items_;
 };
 
 }  // namespace anime
 
-#endif  // TAIGA_LIBRARY_ANIME_FILTER_H
+extern anime::ImageDatabase ImageDatabase;
+
+#endif  // TAIGA_LIBRARY_RESOURCE_H

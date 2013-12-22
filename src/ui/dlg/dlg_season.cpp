@@ -25,6 +25,7 @@
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
+#include "library/resource.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/gfx.h"

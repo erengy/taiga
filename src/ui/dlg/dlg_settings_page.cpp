@@ -26,6 +26,7 @@
 
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
+#include "library/resource.h"
 #include "taiga/announce.h"
 #include "base/common.h"
 #include "base/encryption.h"

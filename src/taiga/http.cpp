@@ -22,6 +22,7 @@
 #include "base/string.h"
 #include "http.h"
 #include "library/anime_db.h"
+#include "library/resource.h"
 #include "settings.h"
 #include "stats.h"
 #include "sync/manager.h"
