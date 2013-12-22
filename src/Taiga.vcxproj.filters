@@ -415,6 +415,9 @@
     <ClCompile Include="library\resource.cpp">
       <Filter>library</Filter>
     </ClCompile>
+    <ClCompile Include="taiga\dummy.cpp">
+      <Filter>taiga</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -725,6 +728,9 @@
     </ClInclude>
     <ClInclude Include="library\resource.h">
       <Filter>library</Filter>
+    </ClInclude>
+    <ClInclude Include="taiga\dummy.h">
+      <Filter>taiga</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

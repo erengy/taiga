@@ -56,6 +56,5 @@ private:
 };
 
 extern class FormatDialog FormatDialog;
-extern anime::Item PreviewAnime;
 
 #endif // DLG_FORMAT_H

@@ -16,18 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "script.h"
-
+#include "base/common.h"
+#include "base/encoding.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
-#include "base/common.h"
-#include "base/encoding.h"
-#include "settings.h"
-#include "base/string.h"
-#include "taiga.h"
-
-#include "ui/dlg/dlg_format.h"
+#include "taiga/dummy.h"
+#include "taiga/script.h"
+#include "taiga/settings.h"
+#include "taiga/taiga.h"
+#include "ui/ui.h"
 
 // The idea behind Taiga's script functions is borrowed from Mp3tag, which
 // itself got it from foobar2000. See the following links for more information:
@@ -330,7 +329,8 @@ bool IsScriptVariable(const wstring& str) {
 
 wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_encode, bool is_manual, bool is_preview) {
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
-  if (!anime_item && is_preview) anime_item = &PreviewAnime;
+  if (!anime_item && is_preview)
+    anime_item = &taiga::DummyAnime;
 
   #define VALIDATE(x, y) anime_item ? x : y
   #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeUrl(x)) : EscapeScriptEntities(x)

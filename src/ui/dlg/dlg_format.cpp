@@ -24,6 +24,7 @@
 #include "library/anime_episode.h"
 #include "base/common.h"
 #include "track/recognition.h"
+#include "taiga/dummy.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -31,8 +32,6 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 
-anime::Episode PreviewEpisode;
-anime::Item PreviewAnime;
 class FormatDialog FormatDialog;
 vector<wstring> functions, keywords;
 
@@ -48,34 +47,6 @@ BOOL FormatDialog::OnInitDialog() {
   // Set up rich edit control
   rich_edit_.Attach(GetDlgItem(IDC_RICHEDIT_FORMAT));
   rich_edit_.SetEventMask(ENM_CHANGE);
-
-  // Create preview episode
-  if (CurrentEpisode.anime_id > 0) {
-    PreviewEpisode = CurrentEpisode;
-  } else {
-    PreviewEpisode.anime_id = -4224;
-    PreviewEpisode.folder = L"D:\\Anime\\";
-    PreviewEpisode.file = L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv";
-    Meow.ExamineTitle(PreviewEpisode.file, PreviewEpisode);
-  }
-  // Create preview anime
-  if (!PreviewAnime.GetId()) {
-    PreviewAnime.SetId(-4224);
-    PreviewAnime.SetTitle(L"Toradora!");
-    PreviewAnime.SetSynonyms(L"Tiger X Dragon");
-    PreviewAnime.SetType(anime::kTv);
-    PreviewAnime.SetEpisodeCount(25);
-    PreviewAnime.SetAiringStatus(anime::kFinishedAiring);
-    PreviewAnime.SetDateStart(Date(2008, 10, 01));
-    PreviewAnime.SetDateEnd(Date(2009, 03, 25));
-    PreviewAnime.SetImageUrl(L"http://cdn.myanimelist.net/images/anime/5/22125.jpg");
-    PreviewAnime.SetEpisodeCount(26);
-    PreviewAnime.AddtoUserList();
-    PreviewAnime.SetMyLastWatchedEpisode(25);
-    PreviewAnime.SetMyScore(10);
-    PreviewAnime.SetMyStatus(anime::kCompleted);
-    PreviewAnime.SetMyTags(L"comedy, romance, drama");
-  }
 
   // Set text
   switch (mode) {
@@ -224,7 +195,10 @@ void FormatDialog::RefreshPreviewText() {
   // Replace variables
   wstring str;
   GetDlgItemText(IDC_RICHEDIT_FORMAT, str);
-  str = ReplaceVariables(str, PreviewEpisode, false, false, true);
+  anime::Episode* episode = &taiga::DummyEpisode;
+  if (CurrentEpisode.anime_id > 0)
+    episode = &CurrentEpisode;
+  str = ReplaceVariables(str, *episode, false, false, true);
   
   switch (mode) {
     case FORMAT_MODE_MIRC: {

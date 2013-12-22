@@ -17,6 +17,7 @@
 */
 
 #include "api.h"
+#include "dummy.h"
 #include "base/common.h"
 #include "base/logger.h"
 #include "base/process.h"
@@ -77,6 +78,9 @@ BOOL App::InitInstance() {
 
   // Load data
   LoadData();
+
+  DummyAnime.Initialize();
+  DummyEpisode.Initialize();
 
   // Create API windows
   ::Skype.Create();

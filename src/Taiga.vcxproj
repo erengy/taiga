@@ -126,6 +126,7 @@
     <ClCompile Include="taiga\announce.cpp" />
     <ClCompile Include="taiga\api.cpp" />
     <ClCompile Include="taiga\debug.cpp" />
+    <ClCompile Include="taiga\dummy.cpp" />
     <ClCompile Include="taiga\http.cpp" />
     <ClCompile Include="taiga\path.cpp" />
     <ClCompile Include="taiga\script.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="taiga\announce.h" />
     <ClInclude Include="taiga\api.h" />
     <ClInclude Include="taiga\debug.h" />
+    <ClInclude Include="taiga\dummy.h" />
     <ClInclude Include="taiga\http.h" />
     <ClInclude Include="taiga\path.h" />
     <ClInclude Include="taiga\resource.h" />
