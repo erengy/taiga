@@ -16,32 +16,34 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ui.h"
-#include "menu.h"
 #include "base/common.h"
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
-#include "base/types.h"
 #include "library/anime_db.h"
+#include "library/anime_episode.h"
 #include "library/history.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "win/win_taskbar.h"
-
-#include "dlg/dlg_anime_info.h"
-#include "dlg/dlg_anime_list.h"
-#include "dlg/dlg_history.h"
-#include "dlg/dlg_input.h"
-#include "dlg/dlg_main.h"
-#include "dlg/dlg_search.h"
-#include "dlg/dlg_season.h"
-#include "dlg/dlg_settings.h"
-#include "dlg/dlg_stats.h"
-#include "dlg/dlg_torrent.h"
-#include "dlg/dlg_update.h"
+#include "ui/dlg/dlg_anime_info.h"
+#include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_history.h"
+#include "ui/dlg/dlg_input.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_search.h"
+#include "ui/dlg/dlg_season.h"
+#include "ui/dlg/dlg_settings.h"
+#include "ui/dlg/dlg_stats.h"
+#include "ui/dlg/dlg_torrent.h"
+#include "ui/dlg/dlg_update.h"
+#include "ui/menu.h"
+#include "ui/theme.h"
+#include "ui/ui.h"
+#include "win/win_taskdialog.h"
 
 namespace ui {
 
@@ -251,9 +253,9 @@ void OnLibrarySearchTitle(const string_t& results) {
 }
 
 void OnLibraryUpdateFailure(int id, const string_t& reason) {
-  anime::Item* anime_item = AnimeDatabase.FindItem(id);
-  
-  wstring text;
+  auto anime_item = AnimeDatabase.FindItem(id);
+
+  std::wstring text;
   if (anime_item)
     text += L"Title: " + anime_item->GetTitle() + L"\n";
   if (!reason.empty())
@@ -294,6 +296,94 @@ void OnHistoryChange() {
   HistoryDialog.RefreshList();
   MainDialog.treeview.RefreshHistoryCounter();
   NowPlayingDialog.Refresh(false, false, false);
+}
+
+int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
+  auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+
+  win::TaskDialog dlg;
+  wstring title = L"Anime title: " + anime_item->GetTitle();
+  dlg.SetWindowTitle(APP_TITLE);
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Do you want to update your anime list?");
+  dlg.SetContent(title.c_str());
+  dlg.SetVerificationText(L"Don't ask again, update automatically");
+  dlg.UseCommandLinks(true);
+
+  int number = GetEpisodeHigh(episode.number);
+  if (number == 0)
+    number = 1;
+  if (anime_item->GetEpisodeCount() == 1)
+    episode.number = L"1";
+
+  if (anime_item->GetEpisodeCount() == number) {  // Completed
+    dlg.AddButton(L"Update and move\n"
+                  L"Update and set as completed", IDCANCEL);
+  } else if (anime_item->GetMyStatus() != anime::kWatching) {  // Watching
+    dlg.AddButton(L"Update and move\n"
+                  L"Update and set as watching", IDCANCEL);
+  }
+  wstring button = L"Update\n"
+                   L"Update episode number from " +
+                   ToWstr(anime_item->GetMyLastWatchedEpisode()) +
+                   L" to " + ToWstr(number);
+  dlg.AddButton(button.c_str(), IDYES);
+  dlg.AddButton(L"Cancel\n"
+                L"Don't update anything", IDNO);
+
+  dlg.Show(g_hMain);
+  if (dlg.GetVerificationCheck())
+    Settings.Set(taiga::kSync_Update_AskToConfirm, false);
+  return dlg.GetSelectedButtonID();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void OnAnimeWatchingStart(const anime::Item& anime_item,
+                          const anime::Episode& episode) {
+  NowPlayingDialog.SetCurrentId(anime_item.GetId());
+  
+  int list_status = anime_item.GetMyStatus();
+  if (anime_item.GetMyRewatching())
+    list_status = anime::kWatching;
+  if (list_status != anime::kNotInList) {
+    AnimeListDialog.RefreshList(list_status);
+    AnimeListDialog.RefreshTabs(list_status);
+  }
+  int list_index = AnimeListDialog.GetListIndex(anime_item.GetId());
+  if (list_index > -1) {
+    AnimeListDialog.listview.SetItemIcon(list_index, ui::kIcon16_Play);
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+    AnimeListDialog.listview.EnsureVisible(list_index);
+  }
+
+  MainDialog.UpdateTip();
+  MainDialog.UpdateTitle();
+  if (Settings.GetBool(taiga::kSync_Update_GoToNowPlaying))
+    MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+
+  if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
+    Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
+    std::wstring tip_text =
+        ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode);
+    Taskbar.Tip(L"", L"", 0);
+    Taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO);
+  }
+}
+
+void OnAnimeWatchingEnd(const anime::Item& anime_item,
+                        const anime::Episode& episode) {
+  NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);
+
+  MainDialog.UpdateTip();
+  MainDialog.UpdateTitle();
+
+  int list_index = AnimeListDialog.GetListIndex(anime_item.GetId());
+  if (list_index > -1) {
+    int icon_index = StatusToIcon(anime_item.GetAiringStatus());
+    AnimeListDialog.listview.SetItemIcon(list_index, icon_index);
+    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -351,7 +441,9 @@ void OnTwitterPost(bool success, const string_t& error) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnLogin() {
-  ChangeStatusText(L"Logged in as " + Settings[taiga::kSync_Service_Mal_Username]);
+  ChangeStatusText(L"Logged in as " +
+                   Settings[taiga::kSync_Service_Mal_Username]);
+
   Menus.UpdateAll();
 
   MainDialog.UpdateTip();

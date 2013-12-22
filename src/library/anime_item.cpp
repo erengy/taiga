@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,24 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
 #include "base/foreach.h"
-
-#include "anime_db.h"
-#include "anime_episode.h"
-#include "anime_item.h"
-#include "anime_util.h"
-
-#include "base/common.h"
-#include "history.h"
-#include "taiga/settings.h"
 #include "base/string.h"
-#include "taiga/taiga.h"
 #include "base/time.h"
-
-#include "ui/dlg/dlg_anime_list.h"
-
-#include "win/win_taskbar.h"
+#include "library/anime_db.h"
+#include "library/anime_item.h"
+#include "library/anime_util.h"
+#include "library/history.h"
+#include "ui/ui.h"
 
 anime::Database* anime::Item::database_ = &AnimeDatabase;
 
@@ -500,10 +490,9 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
     if (number == GetMyLastWatchedEpisode() + 1) {
       SetNewEpisodePath(path);
     }
-    int list_index = AnimeListDialog.GetListIndex(GetId());
-    if (list_index > -1) {
-      AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
-    }
+
+    ui::OnLibraryEntryChange(GetId());
+
     return true;
   }
   

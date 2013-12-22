@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
@@ -30,7 +29,6 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "ui/ui.h"
-#include "win/win_taskdialog.h"
 
 class ConfirmationQueue ConfirmationQueue;
 class History History;
@@ -408,7 +406,7 @@ bool History::Save() {
   return XmlWriteDocumentToFile(document, path);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 ConfirmationQueue::ConfirmationQueue()
     : in_process_(false) {
@@ -418,49 +416,6 @@ void ConfirmationQueue::Add(const anime::Episode& episode) {
   queue_.push(episode);
 }
 
-int AskForConfirmation(anime::Episode& episode) {
-  auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
-
-  // Set up dialog
-  win::TaskDialog dlg;
-  wstring title = L"Anime title: " + anime_item->GetTitle();
-  dlg.SetWindowTitle(APP_TITLE);
-  dlg.SetMainIcon(TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Do you want to update your anime list?");
-  dlg.SetContent(title.c_str());
-  dlg.SetVerificationText(L"Don't ask again, update automatically");
-  dlg.UseCommandLinks(true);
-
-  // Get episode number
-  int number = GetEpisodeHigh(episode.number);
-  if (number == 0)
-    number = 1;
-  if (anime_item->GetEpisodeCount() == 1)
-    episode.number = L"1";
-
-  // Add buttons
-  if (anime_item->GetEpisodeCount() == number) {  // Completed
-    dlg.AddButton(L"Update and move\n"
-                  L"Update and set as completed", IDCANCEL);
-  } else if (anime_item->GetMyStatus() != anime::kWatching) {  // Watching
-    dlg.AddButton(L"Update and move\n"
-                  L"Update and set as watching", IDCANCEL);
-  }
-  wstring button = L"Update\n"
-                   L"Update episode number from " +
-                   ToWstr(anime_item->GetMyLastWatchedEpisode()) +
-                   L" to " + ToWstr(number);
-  dlg.AddButton(button.c_str(), IDYES);
-  dlg.AddButton(L"Cancel\n"
-                L"Don't update anything", IDNO);
-
-  // Show dialog
-  dlg.Show(g_hMain);
-  if (dlg.GetVerificationCheck())
-    Settings.Set(taiga::kSync_Update_AskToConfirm, false);
-  return dlg.GetSelectedButtonID();
-}
-
 void ConfirmationQueue::Process() {
   if (in_process_)
     return;
@@ -468,7 +423,7 @@ void ConfirmationQueue::Process() {
 
   while (!queue_.empty()) {
     anime::Episode& episode = queue_.front();
-    int choice = AskForConfirmation(episode);
+    int choice = ui::OnHistoryProcessConfirmationQueue(episode);
     if (choice != IDNO) {
       bool change_status = (choice == IDCANCEL);
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);

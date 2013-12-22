@@ -21,8 +21,11 @@
 
 #include "base/types.h"
 
+namespace anime {
+class Episode;
+class Item;
+};
 class HistoryItem;
-
 namespace taiga {
 class HttpClient;
 }
@@ -46,6 +49,10 @@ void OnLibraryUpdateFailure(int id, const string_t& reason);
 
 void OnHistoryAddItem(const HistoryItem& history_item);
 void OnHistoryChange();
+int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
+
+void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
+void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& episode);
 
 void OnFeedCheck(bool success);
 void OnFeedDownload(bool success);

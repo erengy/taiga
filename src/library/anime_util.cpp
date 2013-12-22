@@ -16,34 +16,25 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "anime.h"
-#include "anime_db.h"
-#include "anime_episode.h"
-#include "anime_util.h"
-
-#include "taiga/announce.h"
 #include "base/common.h"
 #include "base/file.h"
-#include "base/logger.h"
-#include "track/feed.h"
 #include "base/foreach.h"
-#include "history.h"
-#include "track/media.h"
-#include "sync/sync.h"
+#include "base/logger.h"
 #include "base/process.h"
-#include "taiga/settings.h"
 #include "base/string.h"
+#include "library/anime.h"
+#include "library/anime_db.h"
+#include "library/anime_episode.h"
+#include "library/anime_util.h"
+#include "library/history.h"
+#include "sync/sync.h"
+#include "taiga/announce.h"
 #include "taiga/path.h"
-#include "taiga/script.h"
+#include "taiga/settings.h"
 #include "taiga/taiga.h"
-#include "ui/theme.h"
-
-#include "ui/dlg/dlg_anime_info.h"
-#include "ui/dlg/dlg_anime_list.h"
-#include "ui/dlg/dlg_main.h"
-
-#include "win/win_taskbar.h"
-#include "win/win_taskdialog.h"
+#include "track/feed.h"
+#include "track/media.h"
+#include "ui/ui.h"
 
 namespace anime {
 
@@ -194,8 +185,8 @@ bool PlayEpisode(Item& item, int number) {
   if (file_path.empty()) {
     if (number == 0)
       number = 1;
-    MainDialog.ChangeStatus(L"Could not find episode #" + ToWstr(number) +
-                            L" (" + item.GetTitle() + L").");
+    ui::ChangeStatusText(L"Could not find episode #" + ToWstr(number) +
+                         L" (" + item.GetTitle() + L").");
   } else {
     Execute(file_path);
   }
@@ -214,36 +205,8 @@ void StartWatching(Item& item, Episode& episode) {
   Taiga.play_status = taiga::kPlayStatusPlaying;
   item.SetPlaying(true);
 
-  // Update now playing window
-  NowPlayingDialog.SetCurrentId(item.GetId());
-  
-  // Update anime list window
-  int status = item.GetMyRewatching() ? kWatching : item.GetMyStatus();
-  if (status != kNotInList) {
-    AnimeListDialog.RefreshList(status);
-    AnimeListDialog.RefreshTabs(status);
-  }
-  int list_index = AnimeListDialog.GetListIndex(item.GetId());
-  if (list_index > -1) {
-    AnimeListDialog.listview.SetItemIcon(list_index, ui::kIcon16_Play);
-    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
-    AnimeListDialog.listview.EnsureVisible(list_index);
-  }
+  ui::OnAnimeWatchingStart(item, episode);
 
-  // Update main window
-  MainDialog.UpdateTip();
-  MainDialog.UpdateTitle();
-  if (Settings.GetBool(taiga::kSync_Update_GoToNowPlaying))
-    MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
-  
-  // Show balloon tip
-  if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
-    Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
-    Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(),
-                L"Now Playing", NIIF_INFO);
-  }
-  
   // Check folder
   if (item.GetFolder().empty()) {
     if (episode.folder.empty()) {
@@ -261,7 +224,7 @@ void StartWatching(Item& item, Episode& episode) {
   // Get additional information
   if (item.GetScore().empty() || item.GetSynopsis().empty())
     sync::GetMetadataById(item.GetId());
-  
+
   // Update list
   if (Settings.GetInt(taiga::kSync_Update_Delay) == 0 &&
       !Settings.GetBool(taiga::kSync_Update_WaitPlayer))
@@ -278,18 +241,9 @@ void EndWatching(Item& item, Episode episode) {
   Announcer.Do(taiga::kAnnounceToHttp, &episode);
   Announcer.Clear(taiga::kAnnounceToMessenger | taiga::kAnnounceToSkype);
 
-  // Update now playing window
-  NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);
-  
-  // Update main window
   episode.anime_id = anime::ID_UNKNOWN;
-  MainDialog.UpdateTip();
-  MainDialog.UpdateTitle();
-  int list_index = AnimeListDialog.GetListIndex(item.GetId());
-  if (list_index > -1) {
-    AnimeListDialog.listview.SetItemIcon(list_index, StatusToIcon(item.GetAiringStatus()));
-    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
-  }
+
+  ui::OnAnimeWatchingEnd(item, episode);
 }
 
 bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time) {
