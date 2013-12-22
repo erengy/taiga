@@ -16,20 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "sync.h"
-#include "manager.h"
-
 #include "base/encryption.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/manager.h"
+#include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
-
-#include "ui/dlg/dlg_main.h"
+#include "ui/ui.h"
 
 namespace sync {
 
@@ -68,16 +66,16 @@ void Synchronize() {
     if (!Settings[taiga::kSync_Service_Mal_Username].empty() &&
         !Settings[taiga::kSync_Service_Mal_Password].empty()) {
       // Log in
-      MainDialog.ChangeStatus(L"Logging in...");
-      MainDialog.EnableInput(false);
+      ui::ChangeStatusText(L"Logging in...");
+      ui::EnableDialogInput(ui::kDialogMain, false);
       AuthenticateUser();
     } else if (!Settings[taiga::kSync_Service_Mal_Username].empty()) {
       // Download list
-      MainDialog.ChangeStatus(L"Downloading anime list...");
-      MainDialog.EnableInput(false);
+      ui::ChangeStatusText(L"Downloading anime list...");
+      ui::EnableDialogInput(ui::kDialogMain, false);
       GetLibraryEntries();
     } else {
-      MainDialog.ChangeStatus(
+      ui::ChangeStatusText(
           L"Cannot synchronize, username and password not available");
     }
   } else {
@@ -86,8 +84,8 @@ void Synchronize() {
       History.queue.Check(false);
     } else {
       // Retrieve list
-      MainDialog.ChangeStatus(L"Synchronizing anime list...");
-      MainDialog.EnableInput(false);
+      ui::ChangeStatusText(L"Synchronizing anime list...");
+      ui::EnableDialogInput(ui::kDialogMain, false);
       GetLibraryEntries();
     }
   }

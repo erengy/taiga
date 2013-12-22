@@ -32,8 +32,23 @@ class HttpClient;
 
 namespace ui {
 
+enum Dialog {
+  kDialogAbout,
+  kDialogAnimeInformation,
+  kDialogAnimeList,
+  kDialogHistory,
+  kDialogMain,
+  kDialogSearch,
+  kDialogSeasons,
+  kDialogSettings,
+  kDialogStatistics,
+  kDialogTorrents,
+  kDialogUpdate
+};
+
 void ChangeStatusText(const string_t& status);
 void ClearStatusText();
+void EnableDialogInput(Dialog dialog, bool enable);
 
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error);
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client);

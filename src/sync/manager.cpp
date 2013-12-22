@@ -16,20 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "manager.h"
-#include "myanimelist.h"
-#include "sync.h"
-
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/history.h"
+#include "sync/manager.h"
+#include "sync/myanimelist.h"
+#include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
-
 #include "ui/ui.h"
-#include "ui/dlg/dlg_search.h"
 
 sync::Manager ServiceManager;
 

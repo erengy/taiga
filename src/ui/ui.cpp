@@ -55,6 +55,14 @@ void ClearStatusText() {
   MainDialog.ChangeStatus(L"");
 }
 
+void EnableDialogInput(Dialog dialog, bool enable) {
+  switch (dialog) {
+    case kDialogMain:
+      MainDialog.EnableInput(enable);
+      break;
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
