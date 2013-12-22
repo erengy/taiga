@@ -303,11 +303,11 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         if (Taiga.Updater.IsDownloadAllowed())
           if (Taiga.Updater.Download())
             return;
-      ui::OnUpdate();
+      ui::OnUpdateFinished();
       break;
     case kHttpTaigaUpdateDownload:
       Taiga.Updater.RunInstaller();
-      ui::OnUpdate();
+      ui::OnUpdateFinished();
       break;
   }
 

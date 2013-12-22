@@ -396,7 +396,18 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnRootFoldersEmpty() {
+void OnSettingsChange() {
+  AnimeListDialog.RefreshList();
+}
+
+void OnSettingsRestoreDefaults() {
+  if (SettingsDialog.IsWindow()) {
+    SettingsDialog.Destroy();
+    ExecuteAction(L"Settings");
+  }
+}
+
+void OnSettingsRootFoldersEmpty() {
   win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
   dlg.SetContent(L"You need to have at least one root folder set before "
@@ -406,6 +417,23 @@ void OnRootFoldersEmpty() {
   dlg.Show(g_hMain);
   if (dlg.GetSelectedButtonID() == IDYES)
     ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+}
+
+void OnSettingsThemeChange() {
+  Menus.UpdateAll();
+
+  MainDialog.rebar.RedrawWindow();
+}
+
+void OnSettingsUserChange() {
+  MainDialog.treeview.RefreshHistoryCounter();
+  MainDialog.UpdateTitle();
+  AnimeListDialog.RefreshList(anime::kWatching);
+  AnimeListDialog.RefreshTabs(anime::kWatching);
+  HistoryDialog.RefreshList();
+  NowPlayingDialog.Refresh();
+  SearchDialog.RefreshList();
+  StatsDialog.Refresh();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -445,6 +473,43 @@ bool OnFeedNotify(const Feed& feed) {
   Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
 
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void OnMircNotRunning(bool testing) {
+  std::wstring title = testing ? L"Test DDE connection" : L"Announce to mIRC";
+  win::TaskDialog dlg(title.c_str(), TD_ICON_ERROR);
+  dlg.SetMainInstruction(L"mIRC is not running.");
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(g_hMain);
+}
+
+void OnMircDdeInitFail(bool testing) {
+  std::wstring title = testing ? L"Test DDE connection" : L"Announce to mIRC";
+  win::TaskDialog dlg(title.c_str(), TD_ICON_ERROR);
+  dlg.SetMainInstruction(L"DDE initialization failed.");
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(g_hMain);
+}
+
+void OnMircDdeConnectionFail(bool testing) {
+  std::wstring title = testing ? L"Test DDE connection" : L"Announce to mIRC";
+  win::TaskDialog dlg(title.c_str(), TD_ICON_ERROR);
+  dlg.SetMainInstruction(L"DDE connection failed.");
+  dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(g_hMain);
+}
+
+void OnMircDdeConnectionSuccess(const std::wstring& channels, bool testing) {
+  std::wstring title = testing ? L"Test DDE connection" : L"Announce to mIRC";
+  win::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Successfuly connected to DDE server!");
+  std::wstring content = L"Current channels: " + channels;
+  dlg.SetContent(content.c_str());
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(g_hMain);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -497,7 +562,29 @@ void OnLogin() {
 void OnLogout() {
 }
 
-void OnUpdate() {
+////////////////////////////////////////////////////////////////////////////////
+
+int OnUpdateAvailable() {
+  win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
+  dlg.SetFooter(L"Current version: " APP_VERSION);
+  dlg.SetMainInstruction(L"A new version of Taiga is available!");
+  dlg.AddButton(L"Download", IDYES);
+  dlg.AddButton(L"Cancel", IDNO);
+  dlg.Show(UpdateDialog.GetWindowHandle());
+  return dlg.GetSelectedButtonID();
+}
+
+void OnUpdateNotAvailable() {
+  if (MainDialog.IsWindow()) {
+    win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
+    dlg.SetFooter(L"Current version: " APP_VERSION);
+    dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
+    dlg.AddButton(L"OK", IDOK);
+    dlg.Show(g_hMain);
+  }
+}
+
+void OnUpdateFinished() {
   UpdateDialog.PostMessage(WM_CLOSE);
 }
 

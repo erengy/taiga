@@ -24,26 +24,18 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/history.h"
-#include "path.h"
-#include "settings.h"
-#include "stats.h"
-#include "taiga.h"
+#include "taiga/path.h"
+#include "taiga/settings.h"
+#include "taiga/stats.h"
+#include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "track/media.h"
 #include "track/monitor.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
-#include "version.h"
-
+#include "ui/ui.h"
 #include "win/win_registry.h"
 #include "win/win_taskdialog.h"
-
-#include "ui/dlg/dlg_anime_info.h"
-#include "ui/dlg/dlg_anime_list.h"
-#include "ui/dlg/dlg_main.h"
-#include "ui/dlg/dlg_history.h"
-#include "ui/dlg/dlg_search.h"
-#include "ui/dlg/dlg_settings.h"
-#include "ui/dlg/dlg_stats.h"
 
 taiga::AppSettings Settings;
 
@@ -464,26 +456,18 @@ void AppSettings::ApplyChanges(const wstring& previous_user,
                             const wstring& previous_theme) {
   if (GetWstr(kApp_Interface_Theme) != previous_theme) {
     ui::Theme.Load();
-    MainDialog.rebar.RedrawWindow();
-    ui::Menus.UpdateAll();
+    ui::OnSettingsThemeChange();
   }
 
   if (GetWstr(kSync_Service_Mal_Username) != previous_user) {
     AnimeDatabase.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
-    MainDialog.treeview.RefreshHistoryCounter();
-    MainDialog.UpdateTitle();
-    AnimeListDialog.RefreshList(anime::kWatching);
-    AnimeListDialog.RefreshTabs(anime::kWatching);
-    HistoryDialog.RefreshList();
-    NowPlayingDialog.Refresh();
-    SearchDialog.RefreshList();
     Stats.CalculateAll();
-    StatsDialog.Refresh();
     Taiga.logged_in = false;
+    ui::OnSettingsUserChange();
   } else {
-    AnimeListDialog.RefreshList();
+    ui::OnSettingsChange();
   }
 
   bool enable_monitor = GetBool(kLibrary_WatchFolders);
@@ -662,10 +646,7 @@ void AppSettings::RestoreDefaults() {
   ApplyChanges(previous_user, previous_theme);
 
   // Reload settings dialog
-  if (SettingsDialog.IsWindow()) {
-    SettingsDialog.Destroy();
-    ExecuteAction(L"Settings");
-  }
+  ui::OnSettingsRestoreDefaults();
 }
 
 }  // namespace taiga

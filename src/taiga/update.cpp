@@ -22,14 +22,11 @@
 #include "base/foreach.h"
 #include "base/string.h"
 #include "base/xml.h"
-#include "settings.h"
-#include "taiga.h"
-#include "update.h"
-
+#include "taiga/settings.h"
+#include "taiga/taiga.h"
+#include "taiga/update.h"
 #include "ui/dlg/dlg_main.h"
-#include "ui/dlg/dlg_update.h"
-
-#include "win/win_taskdialog.h"
+#include "ui/ui.h"
 
 namespace taiga {
 
@@ -113,31 +110,16 @@ bool UpdateHelper::IsUpdateAvailable() const {
 }
 
 bool UpdateHelper::IsDownloadAllowed() const {
-  win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-  dlg.SetFooter(L"Current version: " APP_VERSION);
-
   if (IsUpdateAvailable()) {
     auto feed_item = FindItem(latest_guid_);
     if (!feed_item)
       return false;
 
-    dlg.SetMainInstruction(L"A new version of Taiga is available!");
-    wstring content = L"Latest version: " + latest_guid_;
-    dlg.SetContent(content.c_str());
-    dlg.SetExpandedInformation(feed_item->description.c_str());
-    
-    dlg.AddButton(L"Download", IDYES);
-    dlg.AddButton(L"Cancel", IDNO);
-    dlg.Show(UpdateDialog.GetWindowHandle());
-    if (dlg.GetSelectedButtonID() != IDYES)
+    if (ui::OnUpdateAvailable() != IDYES)
       return false;
 
   } else {
-    if (MainDialog.IsWindow()) {
-      dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
-      dlg.AddButton(L"OK", IDOK);
-      dlg.Show(g_hMain);
-    }
+    ui::OnUpdateNotAvailable();
     return false;
   }
 

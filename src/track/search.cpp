@@ -139,7 +139,7 @@ std::wstring SearchFileFolder(anime::Item& anime_item, const std::wstring& root,
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
   // Check if any root folder is available
   if (!silent && Settings.root_folders.empty()) {
-    ui::OnRootFoldersEmpty();
+    ui::OnSettingsRootFoldersEmpty();
     return;
   }
 

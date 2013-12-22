@@ -70,11 +70,20 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
 void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& episode);
 
-void OnRootFoldersEmpty();
+void OnSettingsChange();
+void OnSettingsRestoreDefaults();
+void OnSettingsRootFoldersEmpty();
+void OnSettingsThemeChange();
+void OnSettingsUserChange();
 
 void OnFeedCheck(bool success);
 void OnFeedDownload(bool success);
 bool OnFeedNotify(const Feed& feed);
+
+void OnMircNotRunning(bool testing = false);
+void OnMircDdeInitFail(bool testing = false);
+void OnMircDdeConnectionFail(bool testing = false);
+void OnMircDdeConnectionSuccess(const std::wstring& channels, bool testing = false);
 
 bool OnTwitterRequest(string_t& auth_pin);
 void OnTwitterAuth(bool success);
@@ -82,7 +91,10 @@ void OnTwitterPost(bool success, const string_t& error);
 
 void OnLogin();
 void OnLogout();
-void OnUpdate();
+
+int OnUpdateAvailable();
+void OnUpdateNotAvailable();
+void OnUpdateFinished();
 
 }  // namespace ui
 

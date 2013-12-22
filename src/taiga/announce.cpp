@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "announce.h"
 #include "base/dde.h"
 #include "base/encoding.h"
 #include "base/foreach.h"
@@ -24,10 +23,11 @@
 #include "base/string.h"
 #include "library/anime.h"
 #include "library/anime_episode.h"
-#include "taiga/script.h"
+#include "taiga/announce.h"
 #include "taiga/http.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
-#include "win/win_taskdialog.h"
+#include "ui/ui.h"
 
 taiga::Announcer Announcer;
 taiga::Skype Skype;
@@ -170,10 +170,7 @@ bool Announcer::ToMirc(const std::wstring& service,
   // Initialize
   base::DynamicDataExchange dde;
   if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
-    win::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
-    dlg.SetMainInstruction(L"DDE initialization failed.");
-    dlg.AddButton(L"OK", IDOK);
-    dlg.Show(g_hMain);
+    ui::OnMircDdeInitFail();
     return false;
   }
 
@@ -205,12 +202,8 @@ bool Announcer::ToMirc(const std::wstring& service,
 
   // Connect
   if (!dde.Connect(service, L"COMMAND")) {
-    win::TaskDialog dlg(L"Announce to mIRC", TD_ICON_ERROR);
-    dlg.SetMainInstruction(L"DDE connection failed.");
-    dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
-    dlg.AddButton(L"OK", IDOK);
-    dlg.Show(g_hMain);
     dde.UnInitialize();
+    ui::OnMircDdeConnectionFail();
     return false;
   }
 
@@ -231,46 +224,33 @@ bool Announcer::ToMirc(const std::wstring& service,
 }
 
 bool Announcer::TestMircConnection(const std::wstring& service) {
-  wstring content;
-  win::TaskDialog dlg(L"Test DDE connection", TD_ICON_ERROR);
-  dlg.AddButton(L"OK", IDOK);
-
   // Search for mIRC window
   if (!FindWindow(L"mIRC", nullptr)) {
-    dlg.SetMainInstruction(L"mIRC is not running.");
-    dlg.Show(g_hMain);
+    ui::OnMircNotRunning(true);
     return false;
   }
 
   // Initialize
   base::DynamicDataExchange dde;
   if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
-    dlg.SetMainInstruction(L"DDE initialization failed.");
-    dlg.Show(g_hMain);
+    ui::OnMircDdeInitFail(true);
     return false;
   }
 
   // Try to connect
   if (!dde.Connect(service, L"CHANNELS")) {
-    dlg.SetMainInstruction(L"DDE connection failed.");
-    dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
-    dlg.Show(g_hMain);
     dde.UnInitialize();
+    ui::OnMircDdeConnectionFail(true);
     return false;
-  } else {
-    wstring channels;
-    dde.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
-    if (!channels.empty())
-      content = L"Current channels: " + channels;
   }
 
+  wstring channels;
+  dde.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
+
   // Success
-  dlg.SetMainIcon(TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Successfuly connected to DDE server!");
-  dlg.SetContent(content.c_str());
-  dlg.Show(g_hMain);
   dde.Disconnect();
   dde.UnInitialize();
+  ui::OnMircDdeConnectionSuccess(channels, true);
 
   return true;
 }
