@@ -25,10 +25,8 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/recognition.h"
-#include "ui/dlg/dlg_settings.h"
 #include "ui/ui.h"
 #include "win/win_taskbar.h"
-#include "win/win_taskdialog.h"
 
 // Extends the length limit from 260 to 32767 characters
 std::wstring GetExtendedLengthPath(const std::wstring& path) {
@@ -141,15 +139,7 @@ std::wstring SearchFileFolder(anime::Item& anime_item, const std::wstring& root,
 void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
   // Check if any root folder is available
   if (!silent && Settings.root_folders.empty()) {
-    win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-    dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
-    dlg.SetContent(L"You need to have at least one root folder set before "
-                   L"scanning available episodes.");
-    dlg.AddButton(L"Yes", IDYES);
-    dlg.AddButton(L"No", IDNO);
-    dlg.Show(g_hMain);
-    if (dlg.GetSelectedButtonID() == IDYES)
-      ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+    ui::OnRootFoldersEmpty();
     return;
   }
 

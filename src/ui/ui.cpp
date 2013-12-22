@@ -396,6 +396,20 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void OnRootFoldersEmpty() {
+  win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
+  dlg.SetContent(L"You need to have at least one root folder set before "
+                 L"scanning available episodes.");
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(g_hMain);
+  if (dlg.GetSelectedButtonID() == IDYES)
+    ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void OnFeedCheck(bool success) {
   ChangeStatusText(success ?
       L"There are new torrents available!" : L"No new torrents found.");
@@ -410,6 +424,27 @@ void OnFeedDownload(bool success) {
 
   ChangeStatusText(L"Successfully downloaded all torrents.");
   TorrentDialog.EnableInput();
+}
+
+bool OnFeedNotify(const Feed& feed) {
+  std::wstring tip_text;
+  std::wstring tip_title = L"New torrents available";
+  std::wstring tip_format = L"%title%$if(%episode%, #%episode%)\n";
+
+  foreach_(it, feed.items)
+    if (it->state == FEEDITEM_SELECTED)
+      tip_text += L"\u00BB " + ReplaceVariables(tip_format, it->episode_data);
+
+  if (tip_text.empty())
+    return false;
+
+  tip_text += L"Click to see all.";
+  tip_text = LimitText(tip_text, 255);
+  Taiga.current_tip_type = taiga::kTipTypeTorrent;
+  Taskbar.Tip(L"", L"", 0);
+  Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

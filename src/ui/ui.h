@@ -29,6 +29,7 @@ class HistoryItem;
 namespace taiga {
 class HttpClient;
 }
+class Feed;
 
 namespace ui {
 
@@ -69,8 +70,11 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
 void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& episode);
 
+void OnRootFoldersEmpty();
+
 void OnFeedCheck(bool success);
 void OnFeedDownload(bool success);
+bool OnFeedNotify(const Feed& feed);
 
 bool OnTwitterRequest(string_t& auth_pin);
 void OnTwitterAuth(bool success);

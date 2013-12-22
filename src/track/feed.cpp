@@ -16,31 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "feed.h"
-
-#include "library/anime_db.h"
 #include "base/common.h"
-#include "base/file.h"
 #include "base/encoding.h"
 #include "base/encryption.h"
+#include "base/file.h"
 #include "base/foreach.h"
-#include "base/gfx.h"
-#include "recognition.h"
-#include "taiga/path.h"
-#include "taiga/resource.h"
-#include "taiga/settings.h"
 #include "base/string.h"
 #include "base/types.h"
-#include "taiga/script.h"
-#include "taiga/taiga.h"
 #include "base/xml.h"
-
-#include "ui/dlg/dlg_main.h"
-#include "ui/dlg/dlg_torrent.h"
-
-#include "win/win_taskbar.h"
+#include "library/anime_db.h"
+#include "taiga/path.h"
+#include "taiga/resource.h"
+#include "taiga/script.h"
+#include "taiga/settings.h"
+#include "taiga/taiga.h"
+#include "track/feed.h"
+#include "track/recognition.h"
+#include "ui/ui.h"
 
 class Aggregator Aggregator;
 
@@ -60,8 +52,7 @@ bool Feed::Check(const wstring& source, bool automatic) {
   
   switch (category) {
     case FEED_CATEGORY_LINK:
-      // Disable torrent dialog input
-      TorrentDialog.EnableInput(false);
+      ui::EnableDialogInput(ui::kDialogTorrents, false);
       break;
   }
 
@@ -96,8 +87,8 @@ bool Feed::Download(int index) {
   if (index < 0 || index > static_cast<int>(items.size())) return false;
   download_index = index;
 
-  MainDialog.ChangeStatus(L"Downloading \"" + items[index].title + L"\"...");
-  TorrentDialog.EnableInput(false);
+  ui::ChangeStatusText(L"Downloading \"" + items[index].title + L"\"...");
+  ui::EnableDialogInput(ui::kDialogTorrents, false);
   
   wstring file = items[index].title + L".torrent";
   ValidateFileName(file);
@@ -236,24 +227,7 @@ Feed* Aggregator::Get(int category) {
 }
 
 bool Aggregator::Notify(const Feed& feed) {
-  wstring tip_text;
-  wstring tip_title = L"New torrents available";
-  wstring tip_format = L"%title%$if(%episode%, #%episode%)\n";
-
-  foreach_(it, feed.items)
-    if (it->state == FEEDITEM_SELECTED)
-      tip_text += L"\u00BB " + ReplaceVariables(tip_format, it->episode_data);
-
-  if (tip_text.empty())
-    return false;
-
-  tip_text += L"Click to see all.";
-  tip_text = LimitText(tip_text, 255);
-  Taiga.current_tip_type = taiga::kTipTypeTorrent;
-  Taskbar.Tip(L"", L"", 0);
-  Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
-  
-  return true;
+  return ui::OnFeedNotify(feed);
 }
 
 bool Aggregator::SearchArchive(const wstring& file) {

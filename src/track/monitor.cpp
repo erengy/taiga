@@ -30,8 +30,6 @@
 #include "taiga/settings.h"
 #include "base/string.h"
 
-#include "ui/dlg/dlg_main.h"
-
 class FolderMonitor FolderMonitor;
 
 // =============================================================================
