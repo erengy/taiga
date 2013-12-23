@@ -122,7 +122,8 @@ void Client::StatusCallback(HINTERNET hInternet,
             ::CloseHandle(hFile);
           }
         }
-        response_.body = StrToWstr(buffer_);
+        if (buffer_)
+          response_.body = StrToWstr(buffer_);
         if (!OnReadComplete()) {
           Cleanup();
         }
