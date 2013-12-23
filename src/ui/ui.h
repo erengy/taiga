@@ -33,23 +33,8 @@ class Feed;
 
 namespace ui {
 
-enum Dialog {
-  kDialogAbout,
-  kDialogAnimeInformation,
-  kDialogAnimeList,
-  kDialogHistory,
-  kDialogMain,
-  kDialogSearch,
-  kDialogSeasons,
-  kDialogSettings,
-  kDialogStatistics,
-  kDialogTorrents,
-  kDialogUpdate
-};
-
 void ChangeStatusText(const string_t& status);
 void ClearStatusText();
-void EnableDialogInput(Dialog dialog, bool enable);
 
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error);
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client);
@@ -57,19 +42,30 @@ void OnHttpProgress(const taiga::HttpClient& http_client);
 void OnHttpReadComplete(const taiga::HttpClient& http_client);
 
 void OnLibraryChange();
+void OnLibraryEntryAdd(int id);
 void OnLibraryEntryChange(int id);
 void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
 void OnLibrarySearchTitle(const string_t& results);
 void OnLibraryUpdateFailure(int id, const string_t& reason);
 
+bool OnLibraryEntryEditDelete(int id);
+int OnLibraryEntryEditEpisode(int id);
+bool OnLibraryEntryEditTags(int id, std::wstring& tags);
+bool OnLibraryEntryEditTitles(int id, std::wstring& titles);
+
 void OnHistoryAddItem(const HistoryItem& history_item);
 void OnHistoryChange();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 
+void OnAnimeEpisodeNotFound();
+bool OnAnimeFolderNotFound();
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
 void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& episode);
 
+bool OnSeasonRefreshRequired();
+
+void OnSettingsAccountEmpty();
 void OnSettingsChange();
 void OnSettingsRestoreDefaults();
 void OnSettingsRootFoldersEmpty();
@@ -92,7 +88,7 @@ void OnTwitterPost(bool success, const string_t& error);
 void OnLogin();
 void OnLogout();
 
-int OnUpdateAvailable();
+bool OnUpdateAvailable();
 void OnUpdateNotAvailable();
 void OnUpdateFinished();
 

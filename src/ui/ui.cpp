@@ -22,6 +22,7 @@
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
+#include "library/discover.h"
 #include "library/history.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
@@ -53,14 +54,6 @@ void ChangeStatusText(const string_t& status) {
 
 void ClearStatusText() {
   MainDialog.ChangeStatus(L"");
-}
-
-void EnableDialogInput(Dialog dialog, bool enable) {
-  switch (dialog) {
-    case kDialogMain:
-      MainDialog.EnableInput(enable);
-      break;
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,6 +195,21 @@ void OnLibraryChange() {
   MainDialog.EnableInput(true);
 }
 
+void OnLibraryEntryAdd(int id) {
+  if (AnimeDialog.GetCurrentId() == id)
+    AnimeDialog.Refresh();
+
+  auto anime_item = AnimeDatabase.FindItem(id);
+  int status = anime_item->GetMyStatus();
+  AnimeListDialog.RefreshList(status);
+  AnimeListDialog.RefreshTabs(status);
+
+  if (NowPlayingDialog.GetCurrentId() == id)
+    NowPlayingDialog.Refresh();
+
+  SearchDialog.RefreshList();
+}
+
 void OnLibraryEntryChange(int id) {
   if (AnimeDialog.GetCurrentId() == id)
     AnimeDialog.Refresh(false, true, false, false);
@@ -280,6 +288,74 @@ void OnLibraryUpdateFailure(int id, const string_t& reason) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool OnLibraryEntryEditDelete(int id) {
+  auto anime_item = AnimeDatabase.FindItem(id);
+
+  win::TaskDialog dlg;
+  dlg.SetWindowTitle(anime_item->GetTitle().c_str());
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Are you sure you want to delete this title from "
+                         L"your list?");
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(g_hMain);
+
+  return dlg.GetSelectedButtonID() == IDYES;
+}
+
+int OnLibraryEntryEditEpisode(int id) {
+  auto anime_item = AnimeDatabase.FindItem(id);
+
+  InputDialog dlg;
+  dlg.SetNumbers(true, 0, anime_item->GetEpisodeCount(),
+                 anime_item->GetMyLastWatchedEpisode());
+  dlg.title = anime_item->GetTitle();
+  dlg.info = L"Please enter episode number for this title:";
+  dlg.text = ToWstr(anime_item->GetMyLastWatchedEpisode());
+  dlg.Show(g_hMain);
+
+  if (dlg.result == IDOK)
+    return ToInt(dlg.text);
+
+  return -1;
+}
+
+bool OnLibraryEntryEditTags(int id, std::wstring& tags) {
+  auto anime_item = AnimeDatabase.FindItem(id);
+
+  InputDialog dlg;
+  dlg.title = anime_item->GetTitle();
+  dlg.info = L"Please enter tags for this title, separated by a comma:";
+  dlg.text = anime_item->GetMyTags();
+  dlg.Show(g_hMain);
+
+  if (dlg.result == IDOK) {
+    tags = dlg.text;
+    return true;
+  }
+
+  return false;
+}
+
+bool OnLibraryEntryEditTitles(int id, std::wstring& titles) {
+  auto anime_item = AnimeDatabase.FindItem(id);
+
+  InputDialog dlg;
+  dlg.title = anime_item->GetTitle();
+  dlg.info = L"Please enter alternative titles, separated by a semicolon:";
+  dlg.text = Join(anime_item->GetUserSynonyms(), L"; ");
+  dlg.Show(g_hMain);
+
+  if (dlg.result == IDOK) {
+    titles = dlg.text;
+    return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void OnHistoryAddItem(const HistoryItem& history_item) {
   OnHistoryChange();
 
@@ -347,6 +423,27 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void OnAnimeEpisodeNotFound() {
+  win::TaskDialog dlg;
+  dlg.SetWindowTitle(L"Play Random Episode");
+  dlg.SetMainIcon(TD_ICON_ERROR);
+  dlg.SetMainInstruction(L"Could not find any episode to play.");
+  dlg.Show(g_hMain);
+}
+
+bool OnAnimeFolderNotFound() {
+  win::TaskDialog dlg;
+  dlg.SetWindowTitle(L"Folder Not Found");
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Taiga couldn't find the folder of this anime. "
+                          L"Would you like to set it manually?");
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(g_hMain);
+
+  return dlg.GetSelectedButtonID() == IDYES;
+}
+
 void OnAnimeWatchingStart(const anime::Item& anime_item,
                           const anime::Episode& episode) {
   NowPlayingDialog.SetCurrentId(anime_item.GetId());
@@ -395,6 +492,37 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+bool OnSeasonRefreshRequired() {
+  win::TaskDialog dlg;
+  wstring title = L"Season - " + SeasonDatabase.name;
+  dlg.SetWindowTitle(title.c_str());
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
+  dlg.SetContent(L"It seems that we don't know much about some anime titles in "
+                 L"this season. Taiga will connect to MyAnimeList to retrieve "
+                 L"missing information and images.");
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(g_hMain);
+
+  return dlg.GetSelectedButtonID() == IDYES;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void OnSettingsAccountEmpty() {
+  win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Would you like to set your account information?");
+  dlg.SetContent(L"Anime search requires authentication, which means, you need "
+                 L"to enter a valid username and password to search "
+                 L"MyAnimeList.");
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(g_hMain);
+  if (dlg.GetSelectedButtonID() == IDYES)
+    ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAL);
+}
 
 void OnSettingsChange() {
   AnimeListDialog.RefreshList();
@@ -564,14 +692,15 @@ void OnLogout() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int OnUpdateAvailable() {
+bool OnUpdateAvailable() {
   win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
   dlg.SetFooter(L"Current version: " APP_VERSION);
   dlg.SetMainInstruction(L"A new version of Taiga is available!");
   dlg.AddButton(L"Download", IDYES);
   dlg.AddButton(L"Cancel", IDNO);
   dlg.Show(UpdateDialog.GetWindowHandle());
-  return dlg.GetSelectedButtonID();
+
+  return dlg.GetSelectedButtonID() == IDYES;
 }
 
 void OnUpdateNotAvailable() {

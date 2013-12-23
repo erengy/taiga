@@ -32,6 +32,7 @@
 #include "taiga/taiga.h"
 #include "track/feed.h"
 #include "track/recognition.h"
+#include "ui/dialog.h"
 #include "ui/ui.h"
 
 class Aggregator Aggregator;

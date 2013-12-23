@@ -115,7 +115,7 @@ bool UpdateHelper::IsDownloadAllowed() const {
     if (!feed_item)
       return false;
 
-    if (ui::OnUpdateAvailable() != IDYES)
+    if (!ui::OnUpdateAvailable())
       return false;
 
   } else {

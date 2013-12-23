@@ -18,49 +18,41 @@
 
 #include "base/std.h"
 
+#include "base/common.h"
+#include "base/file.h"
+#include "base/foreach.h"
+#include "base/logger.h"
+#include "base/process.h"
+#include "base/string.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
-#include "taiga/announce.h"
-#include "sync/sync.h"
-#include "base/common.h"
-#include "base/file.h"
-#include "track/feed.h"
-#include "base/foreach.h"
 #include "library/history.h"
-#include "http.h"
-#include "base/logger.h"
-#include "track/monitor.h"
 #include "sync/myanimelist_util.h"
-#include "base/process.h"
+#include "sync/sync.h"
+#include "taiga/announce.h"
+#include "taiga/http.h"
+#include "taiga/resource.h"
+#include "taiga/settings.h"
+#include "taiga/stats.h"
+#include "taiga/taiga.h"
+#include "track/feed.h"
+#include "track/monitor.h"
 #include "track/recognition.h"
-#include "resource.h"
-#include "settings.h"
-#include "stats.h"
-#include "base/string.h"
-#include "taiga.h"
+#include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
-#include "ui/dlg/dlg_about.h"
 #include "ui/dlg/dlg_anime_info.h"
-#include "ui/dlg/dlg_anime_info_page.h"
-#include "ui/dlg/dlg_anime_list.h"
-#include "ui/dlg/dlg_history.h"
-#include "ui/dlg/dlg_input.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dlg/dlg_season.h"
 #include "ui/dlg/dlg_settings.h"
-#include "ui/dlg/dlg_test_recognition.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_feed_filter.h"
-#include "ui/dlg/dlg_update.h"
-
-#include "win/win_taskbar.h"
-#include "win/win_taskdialog.h"
 
 // =============================================================================
 
@@ -110,20 +102,12 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // About()
   //   Shows about window.
   } else if (action == L"About") {
-    if (!AboutDialog.IsWindow()) {
-      AboutDialog.Create(IDD_ABOUT, g_hMain, true);
-    } else {
-      ActivateWindow(AboutDialog.GetWindowHandle());
-    }
+    ui::ShowDialog(ui::kDialogAbout);
 
   // CheckUpdates()
   //   Checks for a new version of the program.
   } else if (action == L"CheckUpdates") {
-    if (!UpdateDialog.IsWindow()) {
-      UpdateDialog.Create(IDD_UPDATE, g_hMain, true);
-    } else {
-      ActivateWindow(UpdateDialog.GetWindowHandle());
-    }
+    ui::ShowDialog(ui::kDialogUpdate);
 
   // Exit(), Quit()
   //   Exits from Taiga.
@@ -137,28 +121,16 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     AnimeDialog.SetCurrentId(anime_id);
     AnimeDialog.SetCurrentPage(INFOPAGE_SERIESINFO);
-    if (!AnimeDialog.IsWindow()) {
-      AnimeDialog.Create(IDD_ANIME_INFO, g_hMain, false);
-    } else {
-      ActivateWindow(AnimeDialog.GetWindowHandle());
-    }
+    ui::ShowDialog(ui::kDialogAnimeInformation);
 
   // MainDialog()
   } else if (action == L"MainDialog") {
-    if (!MainDialog.IsWindow()) {
-      MainDialog.Create(IDD_MAIN, NULL, false);
-    } else {
-      ActivateWindow(MainDialog.GetWindowHandle());
-    }
+    ui::ShowDialog(ui::kDialogMain);
 
   // RecognitionTest()
   //   Shows recognition test window.
   } else if (action == L"RecognitionTest") {
-    if (!RecognitionTest.IsWindow()) {
-      RecognitionTest.Create(IDD_TEST_RECOGNITION, NULL, false);
-    } else {
-      ActivateWindow(RecognitionTest.GetWindowHandle());
-    }
+    ui::ShowDialog(ui::kDialogTestRecognition);
 
   // Settings()
   //   Shows settings window.
@@ -169,25 +141,14 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       SettingsDialog.SetCurrentSection(wParam);
     if (lParam > 0)
       SettingsDialog.SetCurrentPage(lParam);
-    if (!SettingsDialog.IsWindow()) {
-      SettingsDialog.Create(IDD_SETTINGS, g_hMain, true);
-    } else {
-      ActivateWindow(SettingsDialog.GetWindowHandle());
-    }
+    ui::ShowDialog(ui::kDialogSettings);
   
   // SearchAnime()
   } else if (action == L"SearchAnime") {
     if (body.empty()) return;
-    if (Settings[taiga::kSync_Service_Mal_Username].empty() || Settings[taiga::kSync_Service_Mal_Password].empty()) {
-      win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
-      dlg.SetMainInstruction(L"Would you like to set your account information first?");
-      dlg.SetContent(L"Anime search requires authentication, which means, "
-        L"you need to enter a valid username and password to search MyAnimeList.");
-      dlg.AddButton(L"Yes", IDYES);
-      dlg.AddButton(L"No", IDNO);
-      dlg.Show(g_hMain);
-      if (dlg.GetSelectedButtonID() == IDYES)
-        ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAL);
+    if (Settings[taiga::kSync_Service_Mal_Username].empty() ||
+        Settings[taiga::kSync_Service_Mal_Password].empty()) {
+      ui::OnSettingsAccountEmpty();
       return;
     }
     MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
@@ -250,13 +211,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     history_item.mode = taiga::kHttpServiceAddLibraryEntry;
     History.queue.Add(history_item);
     // Refresh
-    AnimeListDialog.RefreshList(status);
-    AnimeListDialog.RefreshTabs(status);
-    SearchDialog.RefreshList();
-    if (AnimeDialog.GetCurrentId() == anime_id)
-      AnimeDialog.Refresh();
-    if (NowPlayingDialog.GetCurrentId() == anime_id)
-      NowPlayingDialog.Refresh();
+    ui::OnLibraryEntryAdd(anime_id);
 
   // ViewAnimePage
   //   Opens up anime page on MAL.
@@ -306,10 +261,10 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     bool enable_recognition = !Settings.GetBool(taiga::kApp_Option_EnableRecognition);
     Settings.Set(taiga::kApp_Option_EnableRecognition, enable_recognition);
     if (enable_recognition) {
-      MainDialog.ChangeStatus(L"Automatic anime recognition is now enabled.");
+      ui::ChangeStatusText(L"Automatic anime recognition is now enabled.");
       CurrentEpisode.Set(anime::ID_UNKNOWN);
     } else {
-      MainDialog.ChangeStatus(L"Automatic anime recognition is now disabled.");
+      ui::ChangeStatusText(L"Automatic anime recognition is now disabled.");
       auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
       CurrentEpisode.Set(anime::ID_NOTINLIST);
       if (anime_item)
@@ -323,9 +278,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     Settings.Set(taiga::kApp_Option_EnableSharing, enable_sharing);
     ui::Menus.UpdateTools();
     if (enable_sharing) {
-      MainDialog.ChangeStatus(L"Automatic sharing is now enabled.");
+      ui::ChangeStatusText(L"Automatic sharing is now enabled.");
     } else {
-      MainDialog.ChangeStatus(L"Automatic sharing is now disabled.");
+      ui::ChangeStatusText(L"Automatic sharing is now disabled.");
     }
 
   // ToggleSynchronization()
@@ -335,9 +290,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     Settings.Set(taiga::kApp_Option_EnableSync, enable_sync);
     ui::Menus.UpdateTools();
     if (enable_sync) {
-      MainDialog.ChangeStatus(L"Automatic synchronization is now enabled.");
+      ui::ChangeStatusText(L"Automatic synchronization is now enabled.");
     } else {
-      MainDialog.ChangeStatus(L"Automatic synchronization is now disabled.");
+      ui::ChangeStatusText(L"Automatic synchronization is now disabled.");
     }
 
   // ===========================================================================
@@ -390,15 +345,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"EditDelete") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    win::TaskDialog dlg;
-    dlg.SetWindowTitle(anime_item->GetTitle().c_str());
-    dlg.SetMainIcon(TD_ICON_INFORMATION);
-    dlg.SetMainInstruction(L"Are you sure you want to delete this title from your list?");
-    dlg.AddButton(L"Yes", IDYES);
-    dlg.AddButton(L"No", IDNO);
-    dlg.Show(g_hMain);
-    if (dlg.GetSelectedButtonID() == IDYES) {
+    if (ui::OnLibraryEntryEditDelete(anime_id)) {
       HistoryItem history_item;
       history_item.anime_id = anime_id;
       history_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
@@ -414,15 +361,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     int value = -1;
     if (body.empty()) {
-      InputDialog dlg;
-      dlg.SetNumbers(true, 0, anime_item->GetEpisodeCount(), anime_item->GetMyLastWatchedEpisode());
-      dlg.title = anime_item->GetTitle();
-      dlg.info = L"Please enter episode number for this title:";
-      dlg.text = ToWstr(anime_item->GetMyLastWatchedEpisode());
-      dlg.Show(g_hMain);
-      if (dlg.result == IDOK) {
-        value = ToInt(dlg.text);
-      }
+      value = ui::OnLibraryEntryEditEpisode(anime_id);
     } else {
       value = ToInt(body);
     }
@@ -522,16 +461,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"EditTags") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    InputDialog dlg;
-    dlg.title = anime_item->GetTitle();
-    dlg.info = L"Please enter tags for this title, separated by a comma:";
-    dlg.text = anime_item->GetMyTags();
-    dlg.Show(g_hMain);
-    if (dlg.result == IDOK) {
+    wstring tags;
+    if (ui::OnLibraryEntryEditTags(anime_id, tags)) {
       HistoryItem history_item;
       history_item.anime_id = anime_id;
-      history_item.tags = dlg.text;
+      history_item.tags = tags;
       history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
       History.queue.Add(history_item);
     }
@@ -543,13 +477,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditTitles") {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    InputDialog dlg;
-    dlg.title = anime_item->GetTitle();
-    dlg.info = L"Please enter alternative titles, separated by a semicolon:";
-    dlg.text = Join(anime_item->GetUserSynonyms(), L"; ");
-    dlg.Show(g_hMain);
-    if (dlg.result == IDOK) {
-      anime_item->SetUserSynonyms(dlg.text);
+    wstring titles;
+    if (ui::OnLibraryEntryEditTitles(anime_id, titles)) {
+      anime_item->SetUserSynonyms(titles);
       Meow.UpdateCleanTitles(anime_id);
       Settings.Save();
     }
@@ -563,17 +493,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (!anime_item || !anime_item->IsInList()) return;
-    MainDialog.ChangeStatus(L"Searching for folder...");
+    ui::ChangeStatusText(L"Searching for folder...");
     if (!anime::CheckFolder(*anime_item)) {
-      win::TaskDialog dlg;
-      dlg.SetWindowTitle(L"Folder Not Found");
-      dlg.SetMainIcon(TD_ICON_INFORMATION);
-      dlg.SetMainInstruction(L"Taiga couldn't find the folder of this anime. "
-                             L"Would you like to set it manually?");
-      dlg.AddButton(L"Yes", IDYES);
-      dlg.AddButton(L"No", IDNO);
-      dlg.Show(g_hMain);
-      if (dlg.GetSelectedButtonID() == IDYES) {
+      if (ui::OnAnimeFolderNotFound()) {
         wstring default_path, path;
         if (!Settings.root_folders.empty())
           default_path = Settings.root_folders.front();
@@ -583,7 +505,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         }
       }
     }
-    MainDialog.ChangeStatus();
+    ui::ClearStatusText();
     if (!anime_item->GetFolder().empty()) {
       Execute(anime_item->GetFolder());
     }
@@ -654,11 +576,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         }
       }
     }
-    win::TaskDialog dlg;
-    dlg.SetWindowTitle(L"Play Random Episode");
-    dlg.SetMainIcon(TD_ICON_ERROR);
-    dlg.SetMainInstruction(L"Could not find any episode to play.");
-    dlg.Show(g_hMain);
+    ui::OnAnimeEpisodeNotFound();
   
   // PlayRandomAnime()
   //   Searches for a random episode of a random anime and plays it.
@@ -693,11 +611,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       if (anime::PlayEpisode(*anime_item, anime_item->GetMyLastWatchedEpisode() + 1))
         return;
     }
-    win::TaskDialog dlg;
-    dlg.SetWindowTitle(L"Play Random Anime");
-    dlg.SetMainIcon(TD_ICON_ERROR);
-    dlg.SetMainInstruction(L"Could not find any episode to play.");
-    dlg.Show(g_hMain);
+    ui::OnAnimeEpisodeNotFound();
 
   // ===========================================================================
 
@@ -709,20 +623,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       SeasonDialog.RefreshList();
       SeasonDialog.RefreshStatus();
       SeasonDialog.RefreshToolbar();
-      if (SeasonDatabase.IsRefreshRequired()) {
-        win::TaskDialog dlg;
-        wstring title = L"Season - " + SeasonDatabase.name;
-        dlg.SetWindowTitle(title.c_str());
-        dlg.SetMainIcon(TD_ICON_INFORMATION);
-        dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
-        dlg.SetContent(L"It seems that we don't know much about some anime titles in this season. "
-                       L"Taiga will connect to MyAnimeList to retrieve missing information and images.");
-        dlg.AddButton(L"Yes", IDYES);
-        dlg.AddButton(L"No", IDNO);
-        dlg.Show(g_hMain);
-        if (dlg.GetSelectedButtonID() == IDYES)
+      if (SeasonDatabase.IsRefreshRequired())
+        if (ui::OnSeasonRefreshRequired())
           SeasonDialog.RefreshData();
-      }
     }
 
   // Season_GroupBy(group)

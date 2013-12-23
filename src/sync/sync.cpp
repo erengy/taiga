@@ -27,6 +27,7 @@
 #include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "ui/dialog.h"
 #include "ui/ui.h"
 
 namespace sync {

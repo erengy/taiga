@@ -158,6 +158,7 @@
     <ClCompile Include="track\monitor.cpp" />
     <ClCompile Include="track\recognition.cpp" />
     <ClCompile Include="track\search.cpp" />
+    <ClCompile Include="ui\dialog.cpp" />
     <ClCompile Include="ui\dlg\dlg_about.cpp" />
     <ClCompile Include="ui\dlg\dlg_anime_info.cpp" />
     <ClCompile Include="ui\dlg\dlg_anime_info_page.cpp" />
@@ -282,6 +283,7 @@
     <ClInclude Include="track\media.h" />
     <ClInclude Include="track\monitor.h" />
     <ClInclude Include="track\recognition.h" />
+    <ClInclude Include="ui\dialog.h" />
     <ClInclude Include="ui\dlg\dlg_about.h" />
     <ClInclude Include="ui\dlg\dlg_anime_info.h" />
     <ClInclude Include="ui\dlg\dlg_anime_info_page.h" />

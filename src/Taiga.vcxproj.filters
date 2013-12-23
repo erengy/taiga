@@ -418,6 +418,9 @@
     <ClCompile Include="taiga\dummy.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
+    <ClCompile Include="ui\dialog.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -731,6 +734,9 @@
     </ClInclude>
     <ClInclude Include="taiga\dummy.h">
       <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\dialog.h">
+      <Filter>ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
