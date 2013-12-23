@@ -354,12 +354,12 @@ bool Database::DeleteListItem(int anime_id) {
 }
 
 void Database::UpdateItem(const HistoryItem& history_item) {
-  critical_section_.Enter();
-
   auto anime_item = FindItem(history_item.anime_id);
 
   if (!anime_item)
     return;
+
+  critical_section_.Enter();
 
   // Edit episode
   if (history_item.episode) {

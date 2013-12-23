@@ -118,8 +118,8 @@ HttpClient& HttpManager::GetNewClient(const base::uuid_t& uuid) {
 }
 
 void HttpManager::CancelRequest(base::uuid_t uuid) {
-  if (!clients_.count(uuid))
-    clients_.erase(uuid);
+  if (clients_.count(uuid))
+    clients_[uuid].Cleanup();
 }
 
 void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
@@ -153,9 +153,6 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
       ServiceManager.HandleHttpError(client.response_, error);
       break;
   }
-
-  // TODO: Fix bug
-  //clients_.erase(response.uuid);
 }
 
 void HttpManager::HandleResponse(HttpResponse& response) {
@@ -251,7 +248,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         feed->download_index = -1;
         if (client.mode() == kHttpFeedDownloadAll)
           if (feed->Download(-1))
-            return;
+            break;
       }
       ui::OnFeedDownload(false);
       break;
@@ -302,7 +299,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       if (Taiga.Updater.ParseData(response.body))
         if (Taiga.Updater.IsDownloadAllowed())
           if (Taiga.Updater.Download())
-            return;
+            break;
       ui::OnUpdateFinished();
       break;
     case kHttpTaigaUpdateDownload:
@@ -310,9 +307,6 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       ui::OnUpdateFinished();
       break;
   }
-
-  // TODO: Fix bug
-  //clients_.erase(response.uuid);
 }
 
 }  // namespace taiga

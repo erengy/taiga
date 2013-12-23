@@ -80,7 +80,8 @@ void Manager::HandleHttpError(HttpResponse& http_response, string_t error) {
 
   HandleError(response, http_response);
 
-  requests_.erase(http_response.uuid);
+  // FIXME: Not thread-safe. Invalidates iterators on other threads.
+//requests_.erase(http_response.uuid);
 }
 
 void Manager::HandleHttpResponse(HttpResponse& http_response) {
@@ -92,7 +93,8 @@ void Manager::HandleHttpResponse(HttpResponse& http_response) {
 
   HandleResponse(response, http_response);
 
-  requests_.erase(http_response.uuid);
+  // FIXME: Not thread-safe. Invalidates iterators on other threads.
+//requests_.erase(http_response.uuid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
