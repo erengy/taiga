@@ -61,7 +61,7 @@ int ListView::InsertColumn(int nIndex, int nWidth, int nWidthMin, int nAlign, LP
   lvc.mask     = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH | (nWidthMin ? LVCF_MINWIDTH : NULL);
   lvc.pszText  = const_cast<LPWSTR>(szText);
 
-  if (GetWinVersion() < VERSION_VISTA) {
+  if (GetVersion() < kVersionVista) {
     lvc.cx = lvc.cxMin;
   }
 
@@ -81,7 +81,7 @@ int ListView::InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable, bool bC
   lvg.mask      = LVGF_HEADER | LVGF_GROUPID;
   lvg.pszHeader = const_cast<LPWSTR>(szText);
   
-  if (bCollapsable && GetWinVersion() >= VERSION_VISTA) {
+  if (bCollapsable && GetVersion() >= kVersionVista) {
     lvg.mask |= LVGF_STATE;
     lvg.state = LVGS_COLLAPSIBLE;
     if (bCollapsed) lvg.state |= LVGS_COLLAPSED;
@@ -329,7 +329,7 @@ void ListView::Sort(int iColumn, int iOrder, int iType, PFNLVCOMPARE pfnCompare)
 
   ListView_SortItemsEx(m_hWindow, pfnCompare, this);
 
-  if (GetWinVersion() < VERSION_VISTA) {
+  if (GetVersion() < kVersionVista) {
     HDITEM hdi   = {0};
     hdi.mask     = HDI_FORMAT;
     HWND hHeader = ListView_GetHeader(m_hWindow);

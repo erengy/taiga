@@ -323,7 +323,7 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   int current_item = GetCurrentlySelected();
   int tab_height = 0;
   
-  bool is_vista = win::GetWinVersion() >= win::VERSION_VISTA;
+  bool is_vista = win::GetVersion() >= win::kVersionVista;
   bool is_themed_xp = !is_vista && ::IsThemeActive();
 
   for (int i = 0; i < item_count; ++i) {

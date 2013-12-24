@@ -146,7 +146,7 @@ HRESULT TaskDialog::Show(HWND hParent) {
   }
 
   // Show task dialog, if available
-  if (GetWinVersion() >= VERSION_VISTA) {
+  if (GetVersion() >= kVersionVista) {
     BOOL VerificationFlagChecked = TRUE;
     return ::TaskDialogIndirect(&m_Config, &m_SelectedButtonID, NULL, &VerificationFlagChecked);
   

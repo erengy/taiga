@@ -215,7 +215,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
   win::Dc hdc = pCD->nmcd.hdc;
   win::Rect rect = pCD->nmcd.rc;
 
-  if (win::GetWinVersion() < win::VERSION_VISTA) {
+  if (win::GetVersion() < win::kVersionVista) {
     list_.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rect);
   }
 
@@ -250,10 +250,10 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (!anime_item) break;
       
       // Draw border
-      if (win::GetWinVersion() > win::VERSION_XP) {
+      if (win::GetVersion() > win::kVersionXp) {
         rect.Inflate(-4, -4);
       }
-      if (win::GetWinVersion() < win::VERSION_VISTA && 
+      if (win::GetVersion() < win::kVersionVista && 
           pCD->nmcd.uItemState & CDIS_SELECTED) {
         hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
       } else {

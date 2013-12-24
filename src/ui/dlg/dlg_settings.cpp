@@ -359,11 +359,11 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 
     // Drag window
     case WM_ENTERSIZEMOVE:
-      if (::IsAppThemed() && win::GetWinVersion() >= win::VERSION_VISTA)
+      if (::IsAppThemed() && win::GetVersion() >= win::kVersionVista)
         SetTransparency(200);
       break;
     case WM_EXITSIZEMOVE:
-      if (::IsAppThemed() && win::GetWinVersion() >= win::VERSION_VISTA)
+      if (::IsAppThemed() && win::GetVersion() >= win::kVersionVista)
         SetTransparency(255);
       break;
 

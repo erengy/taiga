@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,65 +23,81 @@ namespace win {
 
 class WindowMap WindowMap;
 
-// =============================================================================
-
-void WindowMap::Add(HWND hWnd, Window* pWindow) {
-  if (hWnd != NULL) {
-    if (GetWindow(hWnd) == NULL) {
-      m_WindowMap.insert(std::make_pair(hWnd, pWindow));
+void WindowMap::Add(HWND hwnd, Window* window) {
+  if (hwnd != nullptr) {
+    if (!GetWindow(hwnd)) {
+      window_map_.insert(std::make_pair(hwnd, window));
     }
   }
 }
 
 void WindowMap::Clear() {
-  if (m_WindowMap.empty()) return;
-  for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
-    HWND hWnd = i->first;
-    if (::IsWindow(hWnd)) ::DestroyWindow(hWnd);
+  if (window_map_.empty())
+    return;
+
+  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
+    HWND hwnd = it->first;
+    if (::IsWindow(hwnd))
+      ::DestroyWindow(hwnd);
   }
-  m_WindowMap.clear();
+
+  window_map_.clear();
 }
 
-Window* WindowMap::GetWindow(HWND hWnd) {
-  if (m_WindowMap.empty()) return NULL;
-  WndMap::iterator i = m_WindowMap.find(hWnd);
-  if (i != m_WindowMap.end()) {
-    return i->second;
-  } else {
-    return NULL;
-  }
+Window* WindowMap::GetWindow(HWND hwnd) {
+  if (window_map_.empty())
+    return nullptr;
+
+  auto it = window_map_.find(hwnd);
+  if (it != window_map_.end())
+    return it->second;
+
+  return nullptr;
 }
 
-void WindowMap::Remove(HWND hWnd) {
-  if (m_WindowMap.empty()) return;
-  for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
-    if (hWnd == i->first) {
-      m_WindowMap.erase(i);
+void WindowMap::Remove(HWND hwnd) {
+  if (window_map_.empty())
+    return;
+
+  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
+    if (hwnd == it->first) {
+      window_map_.erase(it);
       return;
     }
   }
 }
 
-void WindowMap::Remove(Window* pWindow) {
-  if (m_WindowMap.empty()) return;
-  for (WndMap::iterator i = m_WindowMap.begin(); i != m_WindowMap.end(); ++i) {
-    if (pWindow == i->second) {
-      m_WindowMap.erase(i);
+void WindowMap::Remove(Window* window) {
+  if (window_map_.empty())
+    return;
+
+  for (auto it = window_map_.begin(); it != window_map_.end(); ++it) {
+    if (window == it->second) {
+      window_map_.erase(it);
       return;
     }
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-App::App() : 
-  m_VersionMajor(1), m_VersionMinor(0), m_VersionRevision(0)
-{
-  m_hInstance = ::GetModuleHandle(NULL);
+App::App()
+    : version_major_(1),
+      version_minor_(0),
+      version_revision_(0) {
+  instance_ = ::GetModuleHandle(nullptr);
 }
 
 App::~App() {
   WindowMap.Clear();
+}
+
+BOOL App::InitCommonControls(DWORD flags) const {
+  INITCOMMONCONTROLSEX icc;
+  icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
+  icc.dwICC = flags;
+
+  return ::InitCommonControlsEx(&icc);
 }
 
 BOOL App::InitInstance() {
@@ -90,28 +106,32 @@ BOOL App::InitInstance() {
 
 int App::MessageLoop() {
   MSG msg;
-  while (::GetMessage(&msg, NULL, 0, 0)) {
+
+  while (::GetMessage(&msg, nullptr, 0, 0)) {
     BOOL processed = FALSE;
-    if ((msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) || 
-      (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)) {
-        for (HWND hwnd = msg.hwnd; hwnd != NULL; hwnd = ::GetParent(hwnd)) {
-          Window* pWindow = WindowMap.GetWindow(hwnd);
-          if (pWindow) {
-            processed = pWindow->PreTranslateMessage(&msg);
-            if (processed) break;
-          }
+    if ((msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) ||
+        (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST)) {
+      for (HWND hwnd = msg.hwnd; hwnd != nullptr; hwnd = ::GetParent(hwnd)) {
+        auto window = WindowMap.GetWindow(hwnd);
+        if (window) {
+          processed = window->PreTranslateMessage(&msg);
+          if (processed)
+            break;
         }
+      }
     }
+
     if (!processed) {
       ::TranslateMessage(&msg);
       ::DispatchMessage(&msg);
     }
   }
+
   return static_cast<int>(LOWORD(msg.wParam));
 }
 
-void App::PostQuitMessage(int nExitCode) {
-  ::PostQuitMessage(nExitCode);
+void App::PostQuitMessage(int exit_code) {
+  ::PostQuitMessage(exit_code);
 }
 
 int App::Run() {
@@ -123,90 +143,98 @@ int App::Run() {
   }
 }
 
-void App::SetVersionInfo(int major, int minor, int revision) {
-  m_VersionMajor = major;
-  m_VersionMinor = minor;
-  m_VersionRevision = revision;
+int App::GetVersionMajor() const {
+  return version_major_;
 }
 
-wstring App::GetCurrentDirectory() {
-  WCHAR buff[MAX_PATH];
-  DWORD len = ::GetCurrentDirectory(MAX_PATH, buff);
-  if (len > 0 && len < MAX_PATH) {
-    return buff;
-  } else {
-    return L"";
-  }
+int App::GetVersionMinor() const {
+  return version_minor_;
+}
+
+int App::GetVersionRevision() const {
+  return version_revision_;
+}
+
+void App::SetVersion(int major, int minor, int revision) {
+  version_major_ = major;
+  version_minor_ = minor;
+  version_revision_ = revision;
+}
+
+std::wstring App::GetCurrentDirectory() const {
+  WCHAR path[MAX_PATH];
+  DWORD len = ::GetCurrentDirectory(MAX_PATH, path);
+  if (len > 0 && len < MAX_PATH)
+    return path;
+
+  return std::wstring();
 }
 
 HINSTANCE App::GetInstanceHandle() const {
-  return m_hInstance;
+  return instance_;
 }
 
-wstring App::GetModulePath() {
-  WCHAR buff[MAX_PATH];
-  ::GetModuleFileName(m_hInstance, buff, MAX_PATH);
-  return buff;
+std::wstring App::GetModulePath() const {
+  WCHAR path[MAX_PATH];
+  ::GetModuleFileName(instance_, path, MAX_PATH);
+  return path;
 }
 
-BOOL App::InitCommonControls(DWORD dwFlags) {
-  INITCOMMONCONTROLSEX icc;
-  icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
-  icc.dwICC = dwFlags;
-  return ::InitCommonControlsEx(&icc);
-}
-
-BOOL App::SetCurrentDirectory(const wstring& directory) {
+BOOL App::SetCurrentDirectory(const std::wstring& directory) {
   return ::SetCurrentDirectory(directory.c_str());
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-WinVersion GetWinVersion() {
-  static bool checked_version = false;
-  static WinVersion win_version = VERSION_PRE_XP;
-  if (!checked_version) {
+Version GetVersion() {
+  static bool checked = false;
+  static Version version = kVersionPreXp;
+
+  if (!checked) {
     OSVERSIONINFOEX version_info;
     version_info.dwOSVersionInfoSize = sizeof(version_info);
     GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&version_info));
+
     if (version_info.dwMajorVersion == 5) {
       switch (version_info.dwMinorVersion) {
         case 0:
-          win_version = VERSION_PRE_XP;
+          version = kVersionPreXp;
           break;
         case 1:
-          win_version = VERSION_XP;
+          version = kVersionXp;
           break;
         case 2:
         default:
-          win_version = VERSION_SERVER_2003;
+          version = kVersionServer2003;
           break;
         }
     } else if (version_info.dwMajorVersion == 6) {
       if (version_info.wProductType != VER_NT_WORKSTATION) {
-        win_version = VERSION_SERVER_2008;
+        version = kVersionServer2008;
       } else {
         switch (version_info.dwMinorVersion) {
           case 0:
-            win_version = VERSION_VISTA;
+            version = kVersionVista;
             break;
           case 1:
-            win_version = VERSION_WIN7;
+            version = kVersion7;
             break;
           case 2:
-            win_version = VERSION_WIN8;
+            version = kVersion8;
             break;
           default:
-            win_version = VERSION_WIN8_1;
+            version = kVersion8_1;
             break;
         }
       }
     } else if (version_info.dwMajorVersion > 6) {
-      win_version = VERSION_UNKNOWN;
+      version = kVersionUnknown;
     }
-    checked_version = true;
+
+    checked = true;
   }
-  return win_version;
+
+  return version;
 }
 
 }  // namespace win

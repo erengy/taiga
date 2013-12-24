@@ -547,7 +547,7 @@ void FeedFilterDialog::DialogPage1::RefreshConditionList() {
 BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   // Initialize anime list
   anime_list.Attach(GetDlgItem(IDC_LIST_FEED_FILTER_ANIME));
-  anime_list.EnableGroupView(win::GetWinVersion() > win::VERSION_XP);
+  anime_list.EnableGroupView(win::GetVersion() > win::kVersionXp);
   anime_list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
   anime_list.SetImageList(ui::Theme.GetImageList16().GetHandle());
   anime_list.SetTheme();

@@ -35,10 +35,10 @@ namespace win {
 Taskbar::Taskbar() :
   m_hApp(NULL)
 {
-  WinVersion win_version = GetWinVersion();
-  if (win_version >= VERSION_VISTA) {
+  Version version = GetVersion();
+  if (version >= kVersionVista) {
     m_NID.cbSize = sizeof(NOTIFYICONDATA);
-  } else if (win_version >= VERSION_XP) {
+  } else if (version >= kVersionXp) {
     m_NID.cbSize = NOTIFYICONDATA_V3_SIZE;
   } else {
     m_NID.cbSize = NOTIFYICONDATA_V2_SIZE;

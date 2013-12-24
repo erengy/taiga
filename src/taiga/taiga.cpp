@@ -49,7 +49,7 @@ App::App()
       ticker_memory(0),
       ticker_new_episodes(0),
       ticker_queue(0) {
-  SetVersionInfo(VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
+  SetVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
 }
 
 App::~App() {

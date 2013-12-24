@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_MAIN_H
-#define WIN_MAIN_H
+#ifndef TAIGA_WIN_MAIN_H
+#define TAIGA_WIN_MAIN_H
 
 #include <windows.h>
 #include <commctrl.h>
@@ -31,83 +31,70 @@ using std::string;
 using std::vector;
 using std::wstring;
 
-#ifndef GET_X_LPARAM
-#define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
-#endif
-#ifndef GET_Y_LPARAM
-#define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
-#endif
-
 namespace win {
 
 class Window;
 
-// =============================================================================
-
-/* Window map */
-
-typedef std::map<HWND, Window*> WndMap;
-
 class WindowMap {
 public:
-  void Add(HWND hWnd, Window* pWindow);
+  void Add(HWND hwnd, Window* window);
   void Clear();
-  Window* GetWindow(HWND hWnd);
-  void Remove(HWND hWnd);
-  void Remove(Window* pWindow);
+  Window* GetWindow(HWND hwnd);
+  void Remove(HWND hwnd);
+  void Remove(Window* window);
 
 private:
-  WndMap m_WindowMap;
+  std::map<HWND, Window*> window_map_;
 };
 
 extern class WindowMap WindowMap;
 
-// =============================================================================
-
-/* Application */
+////////////////////////////////////////////////////////////////////////////////
 
 class App {
 public:
   App();
   virtual ~App();
 
+  BOOL InitCommonControls(DWORD flags) const;
   virtual BOOL InitInstance();
   virtual int MessageLoop();
-  virtual void PostQuitMessage(int nExitCode = 0);
+  virtual void PostQuitMessage(int exit_code = 0);
   virtual int Run();
 
-  int GetVersionMajor() { return m_VersionMajor; }
-  int GetVersionMinor() { return m_VersionMinor; }
-  int GetVersionRevision() { return m_VersionRevision; }
-  void SetVersionInfo(int major, int minor, int revision);
+  int GetVersionMajor() const;
+  int GetVersionMinor() const;
+  int GetVersionRevision() const;
+  void SetVersion(int major, int minor, int revision);
 
-  wstring GetCurrentDirectory();
+  std::wstring GetCurrentDirectory() const;
   HINSTANCE GetInstanceHandle() const;
-  wstring GetModulePath();
-  BOOL InitCommonControls(DWORD dwFlags);
-  BOOL SetCurrentDirectory(const wstring& directory);
+  std::wstring GetModulePath() const;
+  BOOL SetCurrentDirectory(const std::wstring& directory);
 
 private:
-  HINSTANCE m_hInstance;
-  int m_VersionMajor, m_VersionMinor, m_VersionRevision;
+  HINSTANCE instance_;
+  int version_major_;
+  int version_minor_;
+  int version_revision_;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-enum WinVersion {
-  VERSION_PRE_XP = 0,
-  VERSION_XP,
-  VERSION_SERVER_2003,
-  VERSION_VISTA,
-  VERSION_SERVER_2008,
-  VERSION_WIN7,
-  VERSION_WIN8,
-  VERSION_WIN8_1,
-  VERSION_UNKNOWN
+enum Version {
+  kVersionPreXp = 0,
+  kVersionXp,
+  kVersionServer2003,
+  kVersionVista,
+  kVersionServer2008,
+  kVersion7,
+  kVersion8,
+  kVersion8_1,
+  kVersionUnknown
 };
 
-WinVersion GetWinVersion();
+Version GetVersion();
 
 }  // namespace win
 
-#endif // WIN_MAIN_H
+#endif  // TAIGA_WIN_MAIN_H

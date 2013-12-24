@@ -160,8 +160,8 @@ BOOL GetProcessFiles(ULONG process_id,
   // Type index for files varies between OS versions
   static unsigned short objectTypeFile = 0;
   /*
-  switch (win::GetWinVersion()) {
-    case win::VERSION_VISTA:
+  switch (win::GetVersion()) {
+    case win::kVersionVista:
       objectTypeFile = 25;
       break;
     case win::VERSION_WIN8:
@@ -329,7 +329,7 @@ std::wstring GetWindowPath(HWND hwnd) {
 
   if (hProcess != NULL) {
     bool success = false;
-    if (win::GetWinVersion() >= win::VERSION_VISTA) {
+    if (win::GetVersion() >= win::kVersionVista) {
       HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
       if (hKernel32 != NULL) {
         auto proc = reinterpret_cast<_QueryFullProcessImageName>(

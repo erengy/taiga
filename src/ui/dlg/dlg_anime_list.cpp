@@ -924,7 +924,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       if (!anime_item) return CDRF_DODEFAULT;
       if (pCD->iSubItem == 1 || pCD->iSubItem == 2) {
         win::Rect rcItem;
-        if (win::GetWinVersion() < win::VERSION_VISTA) {
+        if (win::GetVersion() < win::kVersionVista) {
           listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
         } else {
           rcItem = pCD->nmcd.rc;
@@ -1018,7 +1018,7 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Enable group view
   bool group_view = !MainDialog.search_bar.filters.text.empty() &&
-                    win::GetWinVersion() > win::VERSION_XP;
+                    win::GetVersion() > win::kVersionXp;
   listview.EnableGroupView(group_view);
 
   // Add items to list

@@ -193,7 +193,7 @@ BOOL SettingsPage::OnInitDialog() {
     case PAGE_RECOGNITION_MEDIA: {
       win::ListView list = GetDlgItem(IDC_LIST_MEDIA);
       list.EnableGroupView(true);
-      if (win::GetWinVersion() >= win::VERSION_VISTA) {
+      if (win::GetVersion() >= win::kVersionVista) {
         list.InsertColumn(0, 0, 0, 0, L"Select/deselect all");
       } else {
         list.InsertColumn(0, 0, 0, 0, L"Supported players");
@@ -203,7 +203,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      if (win::GetWinVersion() >= win::VERSION_VISTA) {
+      if (win::GetVersion() >= win::kVersionVista) {
         win::Window header = list.GetHeader();
         HDITEM hdi = {0};
         header.SetStyle(HDS_CHECKBOXES, 0);

@@ -278,7 +278,7 @@ bool BrowseForFolderXp(HWND hwnd, const wstring& title,
 
 BOOL BrowseForFolder(HWND hwnd, const wstring& title,
                      const wstring& default_path, wstring& output) {
-  if (win::GetWinVersion() >= win::VERSION_VISTA) {
+  if (win::GetVersion() >= win::kVersionVista) {
     return BrowseForFolderVista(hwnd, title, default_path, output);
   } else {
     return BrowseForFolderXp(hwnd, title, default_path, output);
