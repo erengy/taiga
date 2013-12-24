@@ -168,7 +168,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
           dc.DrawText(L"?", 1, rect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
           DeleteObject(dc.DetachFont());
         }
-        dc.DetachDC();
+        dc.DetachDc();
         return TRUE;
       }
       break;

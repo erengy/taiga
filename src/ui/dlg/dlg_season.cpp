@@ -404,7 +404,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
     }
   }
 
-  hdc.DetachDC();
+  hdc.DetachDc();
   return result;
 }
 

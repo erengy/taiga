@@ -98,7 +98,7 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
             hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DHIGHLIGHT));
             rcItem.bottom -= 1;
             hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DLIGHT));
-            hdc.DetachDC();
+            hdc.DetachDc();
           }
           return CDRF_DODEFAULT;
         }
@@ -156,7 +156,7 @@ LRESULT MainDialog::CancelButton::OnCustomDraw(LPARAM lParam) {
       win::Dc dc = pCD->hdc;
       dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
       ui::Theme.GetImageList16().Draw(ui::kIcon16_Cross, dc.Get(), 0, 0);
-      dc.DetachDC();
+      dc.DetachDc();
       return CDRF_SKIPDEFAULT;
     }
   }

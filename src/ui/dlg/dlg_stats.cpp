@@ -89,7 +89,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
           }
         }
         
-        dc.DetachDC();
+        dc.DetachDc();
         return TRUE;
       }
       break;

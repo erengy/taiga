@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,64 +16,61 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_GDI_H
-#define WIN_GDI_H
+#ifndef TAIGA_WIN_GDI_H
+#define TAIGA_WIN_GDI_H
 
 #include "win_main.h"
 
 namespace win {
 
-// =============================================================================
-
 class Dc {
 public:
-  Dc(HDC hDC = NULL);
+  Dc();
+  Dc(HDC hdc);
   virtual ~Dc();
 
-  void operator = (const HDC hDC) {
-    AttachDC(hDC);
-  }
+  void operator=(const HDC hdc);
 
-  void AttachDC(HDC hDC);
-  HDC  DetachDC();
+  void AttachDc(HDC hdc);
+  HDC  DetachDc();
   HDC  Get() const;
 
   // Brush
-  void   AttachBrush(HBRUSH hBrush);
+  void   AttachBrush(HBRUSH brush);
   void   CreateSolidBrush(COLORREF color);
   HBRUSH DetachBrush();
 
   // Font
-  void  AttachFont(HFONT hFont);
+  void  AttachFont(HFONT font);
   HFONT DetachFont();
-  void  EditFont(LPCWSTR lpFaceName = NULL, INT iSize = -1, BOOL bBold = -1, BOOL bItalic = -1, BOOL bUnderline = -1);
+  void  EditFont(LPCWSTR face_name = nullptr, INT size = -1, BOOL bold = -1, BOOL italic = -1, BOOL underline = -1);
 
   // Painting
-  BOOL FillRect(const RECT& rc, HBRUSH hbr) const;
-  void FillRect(const RECT& rc, COLORREF color) const;
-  
+  BOOL FillRect(const RECT& rect, HBRUSH brush) const;
+  void FillRect(const RECT& rect, COLORREF color) const;
+
   // Bitmap
-  void    AttachBitmap(HBITMAP hBitmap);
-  BOOL    BitBlt(int x, int y, int nWidth, int nHeight, HDC hSrcDC, int xSrc, int ySrc, DWORD dwRop) const;
+  void    AttachBitmap(HBITMAP bitmap);
+  BOOL    BitBlt(int x, int y, int width, int height, HDC dc_src, int x_src, int y_src, DWORD rop) const;
   HBITMAP DetachBitmap();
   int     SetStretchBltMode(int mode);
-  BOOL    StretchBlt(int x, int y, int nWidth, int nHeight, HDC hSrcDC, int xSrc, int ySrc, int nSrcWidth, int nSrcHeight, DWORD dwRop) const;
+  BOOL    StretchBlt(int x, int y, int width, int height, HDC dc_src, int x_src, int y_src, int width_src, int height_src, DWORD rop) const;
 
   // Text
-  int      DrawText(LPCWSTR lpszString, int nCount, const RECT& rc, UINT nFormat) const;
+  int      DrawText(LPCWSTR text, int count, const RECT& rect, UINT format) const;
   COLORREF GetTextColor() const;
-  COLORREF SetBkColor(COLORREF crColor) const;
-  int      SetBkMode(int iBkMode) const;
-  COLORREF SetTextColor(COLORREF crColor) const;
+  COLORREF SetBkColor(COLORREF color) const;
+  int      SetBkMode(int bk_mode) const;
+  COLORREF SetTextColor(COLORREF color) const;
 
 private:
-  HDC     m_hDC;
-  HBITMAP m_hBitmapOld;
-  HBRUSH  m_hBrushOld;
-  HFONT   m_hFontOld;
+  HDC     dc_;
+  HBITMAP bitmap_old_;
+  HBRUSH  brush_old_;
+  HFONT   font_old_;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 class Font {
 public:
@@ -90,45 +87,35 @@ private:
   HFONT font_;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 class Rect : public RECT {
 public:
   Rect();
   Rect(int l, int t, int r, int b);
-  Rect(const RECT& rc);
-  Rect(LPCRECT lprc);
+  Rect(const RECT& rect);
+  Rect(LPCRECT rect);
 
-  BOOL operator == (const RECT& rc) {
-    return ::EqualRect(this, &rc);
-  }
-  BOOL operator != (const RECT& rc) {
-    return !::EqualRect(this, &rc);
-  }
-  void operator = (const RECT& srcRect) {
-    ::CopyRect(this, &srcRect);
-  }
+  BOOL operator==(const RECT& rect) const;
+  BOOL operator!=(const RECT& rect) const;
+  void operator=(const RECT& rect);
 
-  int Height() const {
-    return bottom - top;
-  }
-  int Width() const {
-    return right - left;
-  }
+  int Height() const;
+  int Width() const;
 
-  void Copy(const RECT& rc);
-  BOOL Equal(const RECT& rc);
+  void Copy(const RECT& rect);
+  BOOL Equal(const RECT& rect) const;
   BOOL Inflate(int dx, int dy);
-  BOOL Intersect(const RECT& rc1, const RECT& rc2);
-  BOOL IsEmpty();
+  BOOL Intersect(const RECT& rect1, const RECT& rect2);
+  BOOL IsEmpty() const;
   BOOL Offset(int dx, int dy);
-  BOOL PtIn(POINT pt);
+  BOOL PtIn(POINT point) const;
   BOOL Set(int left, int top, int right, int bottom);
   BOOL SetEmpty();
-  BOOL Subtract(const RECT& rc1, const RECT& rc2);
-  BOOL Union(const RECT& rc1, const RECT& rc2);
+  BOOL Subtract(const RECT& rect1, const RECT& rect2);
+  BOOL Union(const RECT& rect1, const RECT& rect2);
 };
 
 }  // namespace win
 
-#endif // WIN_GDI_H
+#endif  // TAIGA_WIN_GDI_H

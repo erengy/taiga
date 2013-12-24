@@ -265,7 +265,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         rect.right -= 8;
         listview.DrawProgressBar(dc.Get(), &rect, dis->itemID, 0, *anime_item);
 
-        dc.DetachDC();
+        dc.DetachDc();
         return TRUE;
       }
       break;
@@ -847,7 +847,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   dc.SetTextColor(text_color);
 
   // Don't destroy the DC
-  dc.DetachDC();
+  dc.DetachDc();
 }
 
 void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
@@ -875,7 +875,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     dc.SetTextColor(text_color);
   }
 
-  dc.DetachDC();
+  dc.DetachDc();
 }
 
 LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {

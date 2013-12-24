@@ -47,7 +47,7 @@ bool Image::Load(const std::wstring& path) {
 
   if (!hbmp || !rect.right || !rect.bottom) {
     ::DeleteObject(hbmp);
-    ::DeleteDC(dc.DetachDC());
+    ::DeleteDC(dc.DetachDc());
     return false;
   }
 
