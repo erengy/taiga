@@ -65,13 +65,13 @@ int ListView::InsertColumn(int nIndex, int nWidth, int nWidthMin, int nAlign, LP
     lvc.cx = lvc.cxMin;
   }
 
-  return ListView_InsertColumn(m_hWindow, nIndex, &lvc);
+  return ListView_InsertColumn(window_, nIndex, &lvc);
 }
 
 // =============================================================================
 
 int ListView::EnableGroupView(bool bValue) {
-  return ListView_EnableGroupView(m_hWindow, bValue);
+  return ListView_EnableGroupView(window_, bValue);
 }
 
 int ListView::InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable, bool bCollapsed) {
@@ -87,11 +87,11 @@ int ListView::InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable, bool bC
     if (bCollapsed) lvg.state |= LVGS_COLLAPSED;
   }
   
-  return ListView_InsertGroup(m_hWindow, nIndex, &lvg);
+  return ListView_InsertGroup(window_, nIndex, &lvg);
 }
 
 BOOL ListView::IsGroupViewEnabled() {
-  return ListView_IsGroupViewEnabled(m_hWindow);
+  return ListView_IsGroupViewEnabled(window_);
 }
 
 int ListView::SetGroupText(int nIndex, LPCWSTR szText) {
@@ -99,37 +99,37 @@ int ListView::SetGroupText(int nIndex, LPCWSTR szText) {
   lvg.cbSize  = sizeof(LVGROUP);
   lvg.mask      = LVGF_HEADER;
   lvg.pszHeader = const_cast<LPWSTR>(szText);
-  return ListView_SetGroupInfo(m_hWindow, nIndex, &lvg);
+  return ListView_SetGroupInfo(window_, nIndex, &lvg);
 }
 
 // =============================================================================
 
 HIMAGELIST ListView::CreateDragImage(int iItem, LPPOINT lpptUpLeft) {
-  return ListView_CreateDragImage(m_hWindow, iItem, lpptUpLeft);
+  return ListView_CreateDragImage(window_, iItem, lpptUpLeft);
 }
 
 BOOL ListView::DeleteAllItems() {
-  return ListView_DeleteAllItems(m_hWindow);
+  return ListView_DeleteAllItems(window_);
 }
 
 BOOL ListView::DeleteItem(int iItem) {
-  return ListView_DeleteItem(m_hWindow, iItem);
+  return ListView_DeleteItem(window_, iItem);
 }
 
 BOOL ListView::EnsureVisible(int i) {
-  return ListView_EnsureVisible(m_hWindow, i, false);
+  return ListView_EnsureVisible(window_, i, false);
 }
 
 BOOL ListView::GetCheckState(UINT iIndex) {
-  return ListView_GetCheckState(m_hWindow, iIndex);
+  return ListView_GetCheckState(window_, iIndex);
 }
 
 HWND ListView::GetHeader() {
-  return ListView_GetHeader(m_hWindow);
+  return ListView_GetHeader(window_);
 }
 
 int ListView::GetItemCount() {
-  return ListView_GetItemCount(m_hWindow);
+  return ListView_GetItemCount(window_);
 }
 
 LPARAM ListView::GetItemParam(int i) {  
@@ -137,7 +137,7 @@ LPARAM ListView::GetItemParam(int i) {
   lvi.iItem  = i;
   lvi.mask   = LVIF_PARAM;
 
-  if (ListView_GetItem(m_hWindow, &lvi)) {
+  if (ListView_GetItem(window_, &lvi)) {
     return lvi.lParam;
   } else {
     return NULL;
@@ -145,24 +145,24 @@ LPARAM ListView::GetItemParam(int i) {
 }
 
 void ListView::GetItemText(int iItem, int iSubItem, LPWSTR pszText, int cchTextMax) {
-  ListView_GetItemText(m_hWindow, iItem, iSubItem, pszText, cchTextMax);
+  ListView_GetItemText(window_, iItem, iSubItem, pszText, cchTextMax);
 }
 
 void ListView::GetItemText(int iItem, int iSubItem, wstring& str, int cchTextMax) {
   vector<wchar_t> buffer(cchTextMax);
-  ListView_GetItemText(m_hWindow, iItem, iSubItem, &buffer[0], cchTextMax);
+  ListView_GetItemText(window_, iItem, iSubItem, &buffer[0], cchTextMax);
   str.assign(&buffer[0]);
 }
 
 INT ListView::GetNextItem(int iStart, UINT flags) {
-  return ListView_GetNextItem(m_hWindow, iStart, flags);
+  return ListView_GetNextItem(window_, iStart, flags);
 }
 
 INT ListView::GetNextItemIndex(int iItem, int iGroup, LPARAM flags) {
   LVITEMINDEX lvii;
   lvii.iItem = iItem;
   lvii.iGroup = iGroup;
-  if (ListView_GetNextItemIndex(m_hWindow, &lvii, flags)) {
+  if (ListView_GetNextItemIndex(window_, &lvii, flags)) {
     return lvii.iItem;
   } else {
     return -1;
@@ -170,38 +170,38 @@ INT ListView::GetNextItemIndex(int iItem, int iGroup, LPARAM flags) {
 }
 
 UINT ListView::GetSelectedCount() {
-  return ListView_GetSelectedCount(m_hWindow);
+  return ListView_GetSelectedCount(window_);
 }
 
 INT ListView::GetSelectionMark() {
-  return ListView_GetSelectionMark(m_hWindow);
+  return ListView_GetSelectionMark(window_);
 }
 
 BOOL ListView::GetSubItemRect(int iItem, int iSubItem, LPRECT lpRect) {
-  return ListView_GetSubItemRect(m_hWindow, iItem, iSubItem, LVIR_BOUNDS, lpRect);
+  return ListView_GetSubItemRect(window_, iItem, iSubItem, LVIR_BOUNDS, lpRect);
 }
 
 DWORD ListView::GetView() {
-  return ListView_GetView(m_hWindow);
+  return ListView_GetView(window_);
 }
 
 int ListView::HitTest(bool return_subitem) {
   LVHITTESTINFO lvhi;
   ::GetCursorPos(&lvhi.pt);
-  ::ScreenToClient(m_hWindow, &lvhi.pt);
-  ListView_SubItemHitTestEx(m_hWindow, &lvhi);
+  ::ScreenToClient(window_, &lvhi.pt);
+  ListView_SubItemHitTestEx(window_, &lvhi);
   return return_subitem ? lvhi.iSubItem : lvhi.iItem;
 }
 
 int ListView::HitTestEx(LPLVHITTESTINFO lplvhi) {
   ::GetCursorPos(&lplvhi->pt);
-  ::ScreenToClient(m_hWindow, &lplvhi->pt);
-  ListView_SubItemHitTestEx(m_hWindow, lplvhi);
+  ::ScreenToClient(window_, &lplvhi->pt);
+  ListView_SubItemHitTestEx(window_, lplvhi);
   return lplvhi->iItem;
 }
 
 int ListView::InsertItem(const LVITEM& lvi) {
-  return ListView_InsertItem(m_hWindow, &lvi);
+  return ListView_InsertItem(window_, &lvi);
 }
 
 int ListView::InsertItem(int iItem, int iGroupId, int iImage, UINT cColumns, PUINT puColumns, LPCWSTR pszText, LPARAM lParam) {
@@ -220,17 +220,17 @@ int ListView::InsertItem(int iItem, int iGroupId, int iImage, UINT cColumns, PUI
   if (lParam != 0)     lvi.mask |= LVIF_PARAM;
   if (pszText != NULL) lvi.mask |= LVIF_TEXT;
 
-  return ListView_InsertItem(m_hWindow, &lvi);
+  return ListView_InsertItem(window_, &lvi);
 }
 
 BOOL ListView::RedrawItems(int iFirst, int iLast, bool repaint) {
-  BOOL return_value = ListView_RedrawItems(m_hWindow, iFirst, iLast);
-  if (return_value && repaint) ::UpdateWindow(m_hWindow);
+  BOOL return_value = ListView_RedrawItems(window_, iFirst, iLast);
+  if (return_value && repaint) ::UpdateWindow(window_);
   return return_value;
 }
 
 void ListView::RemoveAllGroups() {
-  ListView_RemoveAllGroups(m_hWindow);
+  ListView_RemoveAllGroups(window_);
 }
 
 BOOL ListView::SetBkImage(HBITMAP hbmp, ULONG ulFlags, int xOffset, int yOffset) {
@@ -239,28 +239,28 @@ BOOL ListView::SetBkImage(HBITMAP hbmp, ULONG ulFlags, int xOffset, int yOffset)
   bki.ulFlags        = ulFlags;
   bki.xOffsetPercent = xOffset;
   bki.yOffsetPercent = yOffset;
-  return ListView_SetBkImage(m_hWindow, &bki);
+  return ListView_SetBkImage(window_, &bki);
 }
 
 void ListView::SetCheckState(int iIndex, BOOL fCheck) {
-  ListView_SetItemState(m_hWindow, iIndex, INDEXTOSTATEIMAGEMASK((fCheck==TRUE) ? 2 : 1), LVIS_STATEIMAGEMASK);
+  ListView_SetItemState(window_, iIndex, INDEXTOSTATEIMAGEMASK((fCheck==TRUE) ? 2 : 1), LVIS_STATEIMAGEMASK);
 }
 
 BOOL ListView::SetColumnWidth(int iCol, int cx) {
   // LVSCW_AUTOSIZE or LVSCW_AUTOSIZE_USEHEADER can be used as cx
-  return ListView_SetColumnWidth(m_hWindow, iCol, cx);
+  return ListView_SetColumnWidth(window_, iCol, cx);
 }
 
 void ListView::SetExtendedStyle(DWORD dwExStyle) {
-  ListView_SetExtendedListViewStyle(m_hWindow, dwExStyle);
+  ListView_SetExtendedListViewStyle(window_, dwExStyle);
 }
 
 DWORD ListView::SetHoverTime(DWORD dwHoverTime) {
-  return ::SendMessage(m_hWindow, LVM_SETHOVERTIME, 0, dwHoverTime);
+  return ::SendMessage(window_, LVM_SETHOVERTIME, 0, dwHoverTime);
 }
 
 void ListView::SetImageList(HIMAGELIST hImageList, int iImageList) {
-  ListView_SetImageList(m_hWindow, hImageList, iImageList);
+  ListView_SetImageList(window_, hImageList, iImageList);
 }
 
 BOOL ListView::SetItem(int nIndex, int nSubItem, LPCWSTR szText) {
@@ -270,7 +270,7 @@ BOOL ListView::SetItem(int nIndex, int nSubItem, LPCWSTR szText) {
   lvi.mask     = LVIF_TEXT;
   lvi.pszText  = const_cast<LPWSTR>(szText);
 
-  return ListView_SetItem(m_hWindow, &lvi);
+  return ListView_SetItem(window_, &lvi);
 }
 
 BOOL ListView::SetItemIcon(int nIndex, int nIcon) {
@@ -279,15 +279,15 @@ BOOL ListView::SetItemIcon(int nIndex, int nIcon) {
   lvi.iItem  = nIndex;
   lvi.mask   = LVIF_IMAGE;
 
-  return ListView_SetItem(m_hWindow, &lvi);
+  return ListView_SetItem(window_, &lvi);
 }
 
 void ListView::SetSelectedItem(int iIndex) {
-  ListView_SetItemState(m_hWindow, iIndex, LVIS_SELECTED, LVIS_SELECTED);
+  ListView_SetItemState(window_, iIndex, LVIS_SELECTED, LVIS_SELECTED);
 }
 
 BOOL ListView::SetTileViewInfo(PLVTILEVIEWINFO plvtvinfo) {
-  return ListView_SetTileViewInfo(m_hWindow, plvtvinfo);
+  return ListView_SetTileViewInfo(window_, plvtvinfo);
 }
 
 BOOL ListView::SetTileViewInfo(int cLines, DWORD dwFlags, RECT* rcLabelMargin, SIZE* sizeTile) {
@@ -309,11 +309,11 @@ BOOL ListView::SetTileViewInfo(int cLines, DWORD dwFlags, RECT* rcLabelMargin, S
     tvi.rcLabelMargin = *rcLabelMargin;
   }
 
-  return ListView_SetTileViewInfo(m_hWindow, &tvi);
+  return ListView_SetTileViewInfo(window_, &tvi);
 }
 
 int ListView::SetView(DWORD iView) {
-  return ListView_SetView(m_hWindow, iView);
+  return ListView_SetView(window_, iView);
 }
 
 // =============================================================================
@@ -327,12 +327,12 @@ void ListView::Sort(int iColumn, int iOrder, int iType, PFNLVCOMPARE pfnCompare)
   m_iSortOrder = (iOrder == 0)? 1 : iOrder;
   m_iSortType = iType;
 
-  ListView_SortItemsEx(m_hWindow, pfnCompare, this);
+  ListView_SortItemsEx(window_, pfnCompare, this);
 
   if (GetVersion() < kVersionVista) {
     HDITEM hdi   = {0};
     hdi.mask     = HDI_FORMAT;
-    HWND hHeader = ListView_GetHeader(m_hWindow);
+    HWND hHeader = ListView_GetHeader(window_);
     for (int i = 0; i < Header_GetItemCount(hHeader); ++i) {
       Header_GetItem(hHeader, i, &hdi);
       hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP);

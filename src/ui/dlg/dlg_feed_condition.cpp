@@ -227,13 +227,13 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   value_combo_.GetWindowRect(&rect);
   int width = rect.right - rect.left;
   int height = rect.bottom - rect.top;
-  ::ScreenToClient(m_hWindow, reinterpret_cast<LPPOINT>(&rect));
+  ::ScreenToClient(GetWindowHandle(), reinterpret_cast<LPPOINT>(&rect));
 
   #define RECREATE_COMBO(style) \
     value_combo_.Create(0, WC_COMBOBOX, nullptr, \
       style | CBS_AUTOHSCROLL | WS_CHILD | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL, \
       rect.left, rect.top, width, height * 2, \
-      m_hWindow, nullptr, nullptr);
+      GetWindowHandle(), nullptr, nullptr);
 
   switch (element_index) {
     case FEED_FILTER_ELEMENT_FILE_CATEGORY:

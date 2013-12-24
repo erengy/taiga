@@ -42,15 +42,15 @@ int StatusBar::InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPC
     m_iWidth.push_back(m_iWidth.back() + iWidth);
   }
   
-  int nParts = ::SendMessage(m_hWindow, SB_GETPARTS, 0, 0);
+  int nParts = ::SendMessage(window_, SB_GETPARTS, 0, 0);
 
-  ::SendMessage(m_hWindow, SB_SETPARTS,   nParts + 1, reinterpret_cast<LPARAM>(&m_iWidth[0]));
-  ::SendMessage(m_hWindow, SB_SETTEXT,    nParts - 1, reinterpret_cast<LPARAM>(lpText));
-  ::SendMessage(m_hWindow, SB_SETTIPTEXT, nParts - 1, reinterpret_cast<LPARAM>(lpTooltip));
+  ::SendMessage(window_, SB_SETPARTS,   nParts + 1, reinterpret_cast<LPARAM>(&m_iWidth[0]));
+  ::SendMessage(window_, SB_SETTEXT,    nParts - 1, reinterpret_cast<LPARAM>(lpText));
+  ::SendMessage(window_, SB_SETTIPTEXT, nParts - 1, reinterpret_cast<LPARAM>(lpTooltip));
 
   if (iImage > -1 && m_hImageList) {
     HICON hIcon = ::ImageList_GetIcon(m_hImageList, iImage, 0);
-    ::SendMessage(m_hWindow, SB_SETICON, nParts - 1, reinterpret_cast<LPARAM>(hIcon));
+    ::SendMessage(window_, SB_SETICON, nParts - 1, reinterpret_cast<LPARAM>(hIcon));
   }
 
   return nParts;
@@ -61,11 +61,11 @@ void StatusBar::SetImageList(HIMAGELIST hImageList) {
 }
 
 void StatusBar::SetPartText(int iPart, LPCWSTR lpText) {
-  ::SendMessage(m_hWindow, SB_SETTEXT, iPart, reinterpret_cast<LPARAM>(lpText));
+  ::SendMessage(window_, SB_SETTEXT, iPart, reinterpret_cast<LPARAM>(lpText));
 }
 
 void StatusBar::SetPartTipText(int iPart, LPCWSTR lpTipText) {
-  ::SendMessage(m_hWindow, SB_SETTIPTEXT, iPart, reinterpret_cast<LPARAM>(lpTipText));
+  ::SendMessage(window_, SB_SETTIPTEXT, iPart, reinterpret_cast<LPARAM>(lpTipText));
 }
 
 void StatusBar::SetPartWidth(int iPart, int iWidth) {
@@ -76,7 +76,7 @@ void StatusBar::SetPartWidth(int iPart, int iWidth) {
     m_iWidth.at(iPart) = m_iWidth.at(iPart - 1) + iWidth;
   }
   
-  ::SendMessage(m_hWindow, SB_SETPARTS, m_iWidth.size(), reinterpret_cast<LPARAM>(&m_iWidth[0]));
+  ::SendMessage(window_, SB_SETPARTS, m_iWidth.size(), reinterpret_cast<LPARAM>(&m_iWidth[0]));
 }
 
 }  // namespace win

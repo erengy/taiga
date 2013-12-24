@@ -114,7 +114,7 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   for (int i = 0; i < 4; i++) {
     win::Rect rect_header;
     win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
-    header.GetWindowRect(m_hWindow, &rect_header);
+    header.GetWindowRect(GetWindowHandle(), &rect_header);
     rect_header.top = rect_header.bottom + 3;
     rect_header.bottom =  rect_header.top + 1;
     dc.FillRect(rect_header, ::GetSysColor(COLOR_ACTIVEBORDER));
@@ -129,13 +129,13 @@ void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, -ScaleY(WIN_CONTROL_MARGIN));
+      rect.Inflate(-ScaleX(win::kControlMargin) * 2, -ScaleY(win::kControlMargin));
 
       // Headers
       for (int i = 0; i < 4; i++) {
         win::Rect rect_header;
         win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
-        header.GetWindowRect(m_hWindow, &rect_header);
+        header.GetWindowRect(GetWindowHandle(), &rect_header);
         rect_header.right = rect.right;
         header.SetPosition(nullptr, rect_header);
         header.SetWindowHandle(nullptr);

@@ -47,7 +47,7 @@ void InputDialog::Show(HWND parent) {
 
 BOOL InputDialog::OnInitDialog() {
   // Set dialog title
-  SetWindowText(m_hWindow, title.c_str());
+  SetWindowText(GetWindowHandle(), title.c_str());
 
   // Set information text
   SetDlgItemText(IDC_STATIC_INPUTINFO, info.c_str());

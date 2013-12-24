@@ -91,10 +91,10 @@ BOOL AnimeDialog::OnInitDialog() {
   // Initialize pages
   page_series_info.parent = this;
   page_my_info.parent = this;
-  page_series_info.Create(IDD_ANIME_INFO_PAGE01, m_hWindow, false);
+  page_series_info.Create(IDD_ANIME_INFO_PAGE01, GetWindowHandle(), false);
   switch (mode_) {
     case DIALOG_MODE_ANIME_INFORMATION:
-      page_my_info.Create(IDD_ANIME_INFO_PAGE02, m_hWindow, false);
+      page_my_info.Create(IDD_ANIME_INFO_PAGE02, GetWindowHandle(), false);
       EnableThemeDialogTexture(page_series_info.GetWindowHandle(), ETDT_ENABLETAB);
       EnableThemeDialogTexture(page_my_info.GetWindowHandle(), ETDT_ENABLETAB);
       break;
@@ -213,7 +213,7 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
           wstring action = pNMLink->item.szUrl;
           if (IsEqual(pNMLink->item.szID, L"menu")) {
-            action = ui::Menus.Show(m_hWindow, 0, 0, pNMLink->item.szUrl);
+            action = ui::Menus.Show(GetWindowHandle(), 0, 0, pNMLink->item.szUrl);
           } else if (IsEqual(pNMLink->item.szID, L"search")) {
             action = L"SearchAnime(" + CurrentEpisode.title + L")";
           } else if (IsEqual(pNMLink->item.szUrl, L"score")) {
@@ -313,7 +313,7 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Adapted from Paul Sanders' example code, located at:
   // http://www.glennslayden.com/code/win32/tab-control-background-brush
 
-  ::CallWindowProc(m_PrevWindowProc, m_hWindow, WM_PRINTCLIENT, 
+  ::CallWindowProc(prev_window_proc_, GetWindowHandle(), WM_PRINTCLIENT, 
                    reinterpret_cast<WPARAM>(hdc), PRF_CLIENT);
 
   HRGN region = ::CreateRectRgn(0, 0, 0, 0);
@@ -327,7 +327,7 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   bool is_themed_xp = !is_vista && ::IsThemeActive();
 
   for (int i = 0; i < item_count; ++i) {
-    TabCtrl_GetItemRect(m_hWindow, i, &rect);
+    TabCtrl_GetItemRect(GetWindowHandle(), i, &rect);
     if (i == current_item) {
       tab_height = (rect.bottom - rect.top) + 2;
       rect.left -= 1;
@@ -669,8 +669,8 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
     rect.Set(0, 0, size->cx, size->cy);
   }
 
-  rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN) * 2, 
-               -ScaleY(WIN_CONTROL_MARGIN) * 2);
+  rect.Inflate(-ScaleX(win::kControlMargin) * 2, 
+               -ScaleY(win::kControlMargin) * 2);
   
   // Image
   if (current_page_ != INFOPAGE_NONE) {
@@ -685,7 +685,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
       rect_image.bottom = rect_image.top + ScaleY(230);
     }
     image_label_.SetPosition(nullptr, rect_image);
-    rect.left = rect_image.right + ScaleX(WIN_CONTROL_MARGIN) * 2;
+    rect.left = rect_image.right + ScaleX(win::kControlMargin) * 2;
   }
 
   // Title
@@ -694,28 +694,28 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   rect_title.Set(rect.left, rect.top,
                   rect.right, rect.top + rect_title.Height());
   edit_title_.SetPosition(nullptr, rect_title);
-  rect.top = rect_title.bottom + ScaleY(WIN_CONTROL_MARGIN);
+  rect.top = rect_title.bottom + ScaleY(win::kControlMargin);
 
   // Buttons
   if (mode_ == DIALOG_MODE_ANIME_INFORMATION) {
     win::Rect rect_button;
     ::GetWindowRect(GetDlgItem(IDOK), &rect_button);
-    rect.bottom -= rect_button.Height() + ScaleY(WIN_CONTROL_MARGIN) * 2;
+    rect.bottom -= rect_button.Height() + ScaleY(win::kControlMargin) * 2;
   }
 
   // Content
   if (mode_ == DIALOG_MODE_NOW_PLAYING) {
     if (anime_id_ <= anime::ID_UNKNOWN) {
-      rect.left += ScaleX(WIN_CONTROL_MARGIN);
+      rect.left += ScaleX(win::kControlMargin);
       sys_link_.SetPosition(nullptr, rect);
     } else {
       win::Dc dc = sys_link_.GetDC();
       int text_height = GetTextHeight(dc.Get());
       win::Rect rect_content = rect;
-      rect_content.Inflate(-ScaleX(WIN_CONTROL_MARGIN * 2), 0);
+      rect_content.Inflate(-ScaleX(win::kControlMargin * 2), 0);
       rect_content.bottom = rect_content.top + text_height * 2;
       sys_link_.SetPosition(nullptr, rect_content);
-      rect.top = rect_content.bottom + ScaleY(WIN_CONTROL_MARGIN) * 3;
+      rect.top = rect_content.bottom + ScaleY(win::kControlMargin) * 3;
     }
   }
 
@@ -723,8 +723,8 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   win::Rect rect_page = rect;
   if (tab_.IsVisible()) {
     tab_.SetPosition(nullptr, rect_page);
-    tab_.AdjustRect(m_hWindow, FALSE, &rect_page);
-    rect_page.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
+    tab_.AdjustRect(GetWindowHandle(), FALSE, &rect_page);
+    rect_page.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
   }
   page_series_info.SetPosition(nullptr, rect_page);
   page_my_info.SetPosition(nullptr, rect_page);

@@ -108,7 +108,7 @@ BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Add button    
     case IDHELP: {
-      wstring answer = ui::Menus.Show(m_hWindow, 0, 0, L"ScriptAdd");
+      wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"ScriptAdd");
       wstring str; rich_edit_.GetText(str);
       CHARRANGE cr = {0};
       rich_edit_.GetSel(&cr);

@@ -39,14 +39,14 @@ Dialog::~Dialog() {
 INT_PTR Dialog::Create(UINT uResourceID, HWND hParent, bool bModal) {
   m_bModal = bModal;
   if (bModal) {
-    INT_PTR nResult = ::DialogBoxParam(m_hInstance, MAKEINTRESOURCE(uResourceID), 
+    INT_PTR nResult = ::DialogBoxParam(instance_, MAKEINTRESOURCE(uResourceID), 
       hParent, DialogProcStatic, reinterpret_cast<LPARAM>(this));
-    m_hWindow = NULL;
+    window_ = NULL;
     return nResult;
   } else {
-    m_hWindow = ::CreateDialogParam(m_hInstance, MAKEINTRESOURCE(uResourceID), 
+    window_ = ::CreateDialogParam(instance_, MAKEINTRESOURCE(uResourceID), 
       hParent, DialogProcStatic, reinterpret_cast<LPARAM>(this));
-    return reinterpret_cast<INT_PTR>(m_hWindow);
+    return reinterpret_cast<INT_PTR>(window_);
   }
 }
 
@@ -59,14 +59,14 @@ void Dialog::EndDialog(INT_PTR nResult) {
   m_SizeLast.cy = rect.bottom - rect.top;
 
   // Destroy window
-  if (::IsWindow(m_hWindow)) {
+  if (::IsWindow(window_)) {
     if (m_bModal) {
-      ::EndDialog(m_hWindow, nResult);
+      ::EndDialog(window_, nResult);
     } else {
       Destroy();
     }
   }
-  m_hWindow = NULL;
+  window_ = NULL;
 }
 
 void Dialog::SetSizeMax(LONG cx, LONG cy) {
@@ -100,7 +100,7 @@ void Dialog::SnapToEdges(LPWINDOWPOS lpWndPos) {
   // Get monitor info
   SystemParametersInfo(SPI_GETWORKAREA, NULL, &mon, NULL);
   if (GetSystemMetrics(SM_CMONITORS) > 1) {
-    hMonitor = MonitorFromWindow(m_hWindow, MONITOR_DEFAULTTONEAREST);
+    hMonitor = MonitorFromWindow(window_, MONITOR_DEFAULTTONEAREST);
     if (hMonitor) {
       mi.cbSize = sizeof(mi);
       GetMonitorInfo(hMonitor, &mi);
@@ -142,7 +142,7 @@ void Dialog::OnOK() {
 // Superclassing
 void Dialog::RegisterDlgClass(LPCWSTR lpszClassName) {
   WNDCLASS wc;
-  ::GetClassInfo(m_hInstance, WC_DIALOG, &wc); // WC_DIALOG is #32770
+  ::GetClassInfo(instance_, WC_DIALOG, &wc); // WC_DIALOG is #32770
   wc.lpszClassName = lpszClassName;
   ::RegisterClass(&wc);
 }
@@ -150,24 +150,24 @@ void Dialog::RegisterDlgClass(LPCWSTR lpszClassName) {
 // =============================================================================
 
 BOOL Dialog::AddComboString(int nIDDlgItem, LPCWSTR lpString) {
-  return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(lpString));
+  return ::SendDlgItemMessage(window_, nIDDlgItem, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(lpString));
 }
 
 BOOL Dialog::CheckDlgButton(int nIDButton, UINT uCheck) {
-  return ::CheckDlgButton(m_hWindow, nIDButton, uCheck);
+  return ::CheckDlgButton(window_, nIDButton, uCheck);
 }
 
 BOOL Dialog::CheckRadioButton(int nIDFirstButton, int nIDLastButton, int nIDCheckButton) {
-  return ::CheckRadioButton(m_hWindow, nIDFirstButton, nIDLastButton, nIDCheckButton);
+  return ::CheckRadioButton(window_, nIDFirstButton, nIDLastButton, nIDCheckButton);
 }
 
 BOOL Dialog::EnableDlgItem(int nIDDlgItem, BOOL bEnable) {
-  return ::EnableWindow(::GetDlgItem(m_hWindow, nIDDlgItem), bEnable);
+  return ::EnableWindow(::GetDlgItem(window_, nIDDlgItem), bEnable);
 }
 
 INT Dialog::GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton) {
   for (int i = 0; i <= nIDLastButton - nIDFirstButton; i++) {
-    if (::IsDlgButtonChecked(m_hWindow, nIDFirstButton + i)) {
+    if (::IsDlgButtonChecked(window_, nIDFirstButton + i)) {
       return i;
     }
   }
@@ -175,57 +175,57 @@ INT Dialog::GetCheckedRadioButton(int nIDFirstButton, int nIDLastButton) {
 }
 
 INT Dialog::GetComboSelection(int nIDDlgItem) {
-  return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_GETCURSEL, 0, 0);
+  return ::SendDlgItemMessage(window_, nIDDlgItem, CB_GETCURSEL, 0, 0);
 }
 
 HWND Dialog::GetDlgItem(int nIDDlgItem) {
-  return ::GetDlgItem(m_hWindow, nIDDlgItem);
+  return ::GetDlgItem(window_, nIDDlgItem);
 }
 
 UINT Dialog::GetDlgItemInt(int nIDDlgItem) {
-  return ::GetDlgItemInt(m_hWindow, nIDDlgItem, NULL, TRUE);
+  return ::GetDlgItemInt(window_, nIDDlgItem, NULL, TRUE);
 }
 
 void Dialog::GetDlgItemText(int nIDDlgItem, LPWSTR lpString, int cchMax) {
-  ::GetDlgItemText(m_hWindow, nIDDlgItem, lpString, cchMax);
+  ::GetDlgItemText(window_, nIDDlgItem, lpString, cchMax);
 }
 
 void Dialog::GetDlgItemText(int nIDDlgItem, wstring& str) {
-  int len = ::GetWindowTextLength(::GetDlgItem(m_hWindow, nIDDlgItem)) + 1;
+  int len = ::GetWindowTextLength(::GetDlgItem(window_, nIDDlgItem)) + 1;
   vector<wchar_t> buffer(len);
-  ::GetDlgItemText(m_hWindow, nIDDlgItem, &buffer[0], len);
+  ::GetDlgItemText(window_, nIDDlgItem, &buffer[0], len);
   str.assign(&buffer[0]);
 }
 
 wstring Dialog::GetDlgItemText(int nIDDlgItem) {
-  int len = ::GetWindowTextLength(::GetDlgItem(m_hWindow, nIDDlgItem)) + 1;
+  int len = ::GetWindowTextLength(::GetDlgItem(window_, nIDDlgItem)) + 1;
   vector<wchar_t> buffer(len);
-  ::GetDlgItemText(m_hWindow, nIDDlgItem, &buffer[0], len);
+  ::GetDlgItemText(window_, nIDDlgItem, &buffer[0], len);
   return wstring(&buffer[0]);
 }
 
 BOOL Dialog::HideDlgItem(int nIDDlgItem) {
-  return ::ShowWindow(::GetDlgItem(m_hWindow, nIDDlgItem), SW_HIDE);
+  return ::ShowWindow(::GetDlgItem(window_, nIDDlgItem), SW_HIDE);
 }
 
 BOOL Dialog::IsDlgButtonChecked(int nIDButton) {
-  return ::IsDlgButtonChecked(m_hWindow, nIDButton);
+  return ::IsDlgButtonChecked(window_, nIDButton);
 }
 
 BOOL Dialog::SendDlgItemMessage(int nIDDlgItem, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, uMsg, wParam, lParam);
+  return ::SendDlgItemMessage(window_, nIDDlgItem, uMsg, wParam, lParam);
 }
 
 BOOL Dialog::SetComboSelection(int nIDDlgItem, int iIndex) {
-  return ::SendDlgItemMessage(m_hWindow, nIDDlgItem, CB_SETCURSEL, iIndex, 0);
+  return ::SendDlgItemMessage(window_, nIDDlgItem, CB_SETCURSEL, iIndex, 0);
 }
 
 BOOL Dialog::SetDlgItemText(int nIDDlgItem, LPCWSTR lpString) {
-  return ::SetDlgItemText(m_hWindow, nIDDlgItem, lpString);
+  return ::SetDlgItemText(window_, nIDDlgItem, lpString);
 }
 
 BOOL Dialog::ShowDlgItem(int nIDDlgItem, int nCmdShow) {
-  return ::ShowWindow(::GetDlgItem(m_hWindow, nIDDlgItem), nCmdShow);
+  return ::ShowWindow(::GetDlgItem(window_, nIDDlgItem), nCmdShow);
 }
 
 // =============================================================================

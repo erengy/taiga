@@ -36,48 +36,48 @@ void ComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 // =============================================================================
 
 int ComboBox::AddItem(LPCWSTR lpsz, LPARAM data) {
-  int index = ComboBox_AddString(m_hWindow, lpsz);
-  return ComboBox_SetItemData(m_hWindow, index, data);
+  int index = ComboBox_AddString(window_, lpsz);
+  return ComboBox_SetItemData(window_, index, data);
 }
 
 int ComboBox::AddString(LPCWSTR lpsz) {
-  return ComboBox_AddString(m_hWindow, lpsz);
+  return ComboBox_AddString(window_, lpsz);
 }
 
 int ComboBox::DeleteString(int index) {
-  return ComboBox_DeleteString(m_hWindow, index);
+  return ComboBox_DeleteString(window_, index);
 }
 
 int ComboBox::GetCount() {
-  return ComboBox_GetCount(m_hWindow);
+  return ComboBox_GetCount(window_);
 }
 
 int ComboBox::GetCurSel() {
-  return ComboBox_GetCurSel(m_hWindow);
+  return ComboBox_GetCurSel(window_);
 }
 
 LRESULT ComboBox::GetItemData(int index) {
-  return ComboBox_GetItemData(m_hWindow, index);
+  return ComboBox_GetItemData(window_, index);
 }
 
 void ComboBox::ResetContent() {
-  ComboBox_ResetContent(m_hWindow);
+  ComboBox_ResetContent(window_);
 }
 
 BOOL ComboBox::SetCueBannerText(LPCWSTR lpcwText) {
-  return ComboBox_SetCueBannerText(m_hWindow, lpcwText);
+  return ComboBox_SetCueBannerText(window_, lpcwText);
 }
 
 int ComboBox::SetCurSel(int index) {
-  return ComboBox_SetCurSel(m_hWindow, index);
+  return ComboBox_SetCurSel(window_, index);
 }
 
 BOOL ComboBox::SetEditSel(int ichStart, int ichEnd) {
-  return ::SendMessage(m_hWindow, CB_SETEDITSEL, ichStart, ichEnd);
+  return ::SendMessage(window_, CB_SETEDITSEL, ichStart, ichEnd);
 }
 
 int ComboBox::SetItemData(int index, LPARAM data) {
-  return ComboBox_SetItemData(m_hWindow, index, data);
+  return ComboBox_SetItemData(window_, index, data);
 }
 
 }  // namespace win

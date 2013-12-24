@@ -146,7 +146,7 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += rebar_.GetBarHeight() + ScaleY(WIN_CONTROL_MARGIN / 2);
+      rcWindow.top += rebar_.GetBarHeight() + ScaleY(win::kControlMargin / 2);
       // Resize list
       list_.SetPosition(nullptr, rcWindow);
     }
@@ -420,19 +420,19 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
       switch (LOWORD(nmt->iItem)) {
         // Select season
         case 100:
-          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonSelect");
+          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSelect");
           break;
         // Group by
         case 103:
-          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonGroup");
+          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonGroup");
           break;
         // Sort by
         case 104:
-          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonSort");
+          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonSort");
           break;
         // View as
         case 105:
-          action = ui::Menus.Show(m_hWindow, rect.left, rect.bottom, L"SeasonView");
+          action = ui::Menus.Show(GetWindowHandle(), rect.left, rect.bottom, L"SeasonView");
           break;
       }
       if (!action.empty()) {

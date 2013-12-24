@@ -35,7 +35,7 @@ void ProgressBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 // =============================================================================
 
 UINT ProgressBar::GetPosition() {
-  return ::SendMessage(m_hWindow, PBM_GETPOS, 0, 0);
+  return ::SendMessage(window_, PBM_GETPOS, 0, 0);
 }
 
 void ProgressBar::SetMarquee(bool enabled) {
@@ -44,19 +44,19 @@ void ProgressBar::SetMarquee(bool enabled) {
   } else {
     SetStyle(0, PBS_MARQUEE);
   }
-  ::SendMessage(m_hWindow, PBM_SETMARQUEE, enabled, 0);
+  ::SendMessage(window_, PBM_SETMARQUEE, enabled, 0);
 }
 
 UINT ProgressBar::SetPosition(UINT position) {
-  return ::SendMessage(m_hWindow, PBM_SETPOS, position, 0);
+  return ::SendMessage(window_, PBM_SETPOS, position, 0);
 }
 
 DWORD ProgressBar::SetRange(UINT min, UINT max) {
-  return ::SendMessage(m_hWindow, PBM_SETRANGE32, min, max);
+  return ::SendMessage(window_, PBM_SETRANGE32, min, max);
 }
 
 UINT ProgressBar::SetState(UINT state) {
-  return ::SendMessage(m_hWindow, PBM_SETSTATE, state, 0);
+  return ::SendMessage(window_, PBM_SETSTATE, state, 0);
 }
 
 }  // namespace win

@@ -24,20 +24,20 @@ namespace win {
 
 bool Spin::GetPos32(int& value) {
   BOOL result;
-  value = ::SendMessage(m_hWindow, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&result));
+  value = ::SendMessage(window_, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&result));
   return result == 0;
 }
 
 HWND Spin::SetBuddy(HWND hwnd) {
-  return reinterpret_cast<HWND>(::SendMessage(m_hWindow, UDM_SETBUDDY, reinterpret_cast<WPARAM>(hwnd), 0));
+  return reinterpret_cast<HWND>(::SendMessage(window_, UDM_SETBUDDY, reinterpret_cast<WPARAM>(hwnd), 0));
 }
 
 int Spin::SetPos32(int position) {
-  return ::SendMessage(m_hWindow, UDM_SETPOS32, 0, position);
+  return ::SendMessage(window_, UDM_SETPOS32, 0, position);
 }
 
 void Spin::SetRange32(int lower_limit, int upper_limit) {
-  ::SendMessage(m_hWindow, UDM_SETRANGE32, lower_limit, upper_limit);
+  ::SendMessage(window_, UDM_SETRANGE32, lower_limit, upper_limit);
 }
 
 }  // namespace win

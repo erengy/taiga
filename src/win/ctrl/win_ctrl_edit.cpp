@@ -35,22 +35,22 @@ void Edit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 // =============================================================================
 
 void Edit::GetRect(LPRECT lprc) {
-  ::SendMessage(m_hWindow, EM_GETRECT, 0, reinterpret_cast<LPARAM>(lprc));
+  ::SendMessage(window_, EM_GETRECT, 0, reinterpret_cast<LPARAM>(lprc));
 }
 
 void Edit::LimitText(int cchMax) {
-  ::SendMessage(m_hWindow, EM_SETLIMITTEXT, cchMax, 0);
+  ::SendMessage(window_, EM_SETLIMITTEXT, cchMax, 0);
 }
 
 BOOL Edit::SetCueBannerText(LPCWSTR lpcwText, BOOL fDrawFocused) {
-  return ::SendMessage(m_hWindow, EM_SETCUEBANNER, fDrawFocused, reinterpret_cast<LPARAM>(lpcwText));
+  return ::SendMessage(window_, EM_SETCUEBANNER, fDrawFocused, reinterpret_cast<LPARAM>(lpcwText));
 }
 
 void Edit::SetMargins(int iLeft, int iRight) {
   DWORD flags = 0;
   if (iLeft > -1)  flags |= EC_LEFTMARGIN;
   if (iRight > -1) flags |= EC_RIGHTMARGIN;
-  ::SendMessage(m_hWindow, EM_SETMARGINS, flags, MAKELPARAM(iLeft, iRight));
+  ::SendMessage(window_, EM_SETMARGINS, flags, MAKELPARAM(iLeft, iRight));
 }
 
 void Edit::SetMultiLine(BOOL bEnabled) {
@@ -63,20 +63,20 @@ void Edit::SetMultiLine(BOOL bEnabled) {
 }
 
 void Edit::SetPasswordChar(UINT ch) {
-  ::SendMessage(m_hWindow, EM_SETPASSWORDCHAR, ch, 0);
+  ::SendMessage(window_, EM_SETPASSWORDCHAR, ch, 0);
 }
 
 void Edit::SetReadOnly(BOOL bReadOnly) {
-  ::SendMessage(m_hWindow, EM_SETREADONLY, bReadOnly, 0);
+  ::SendMessage(window_, EM_SETREADONLY, bReadOnly, 0);
 }
 
 void Edit::SetRect(LPRECT lprc) {
-  ::SendMessage(m_hWindow, EM_SETRECT, 0, reinterpret_cast<LPARAM>(lprc));
+  ::SendMessage(window_, EM_SETRECT, 0, reinterpret_cast<LPARAM>(lprc));
 }
 
 void Edit::SetSel(int ichStart, int ichEnd) {
-  ::SendMessage(m_hWindow, EM_SETSEL, ichStart, ichEnd);
-  ::SendMessage(m_hWindow, EM_SCROLLCARET, 0, 0);
+  ::SendMessage(window_, EM_SETSEL, ichStart, ichEnd);
+  ::SendMessage(window_, EM_SCROLLCARET, 0, 0);
 }
 
 BOOL Edit::ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon) {
@@ -85,7 +85,7 @@ BOOL Edit::ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon) {
   ebt.pszText  = pszText;
   ebt.pszTitle = pszTitle;
   ebt.ttiIcon  = ttiIcon;
-  return ::SendMessage(m_hWindow, EM_SHOWBALLOONTIP, 0, reinterpret_cast<LPARAM>(&ebt));
+  return ::SendMessage(window_, EM_SHOWBALLOONTIP, 0, reinterpret_cast<LPARAM>(&ebt));
 }
 
 }  // namespace win

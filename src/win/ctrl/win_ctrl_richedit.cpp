@@ -50,7 +50,7 @@ void RichEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 // =============================================================================
 
 void RichEdit::GetSel(CHARRANGE* cr) {
-  ::SendMessage(m_hWindow, EM_EXGETSEL, 0, reinterpret_cast<LPARAM>(cr));
+  ::SendMessage(window_, EM_EXGETSEL, 0, reinterpret_cast<LPARAM>(cr));
 }
 
 wstring RichEdit::GetTextRange(CHARRANGE* cr) {
@@ -61,34 +61,34 @@ wstring RichEdit::GetTextRange(CHARRANGE* cr) {
   tr.chrg.cpMin = cr->cpMin;
   tr.lpstrText = (LPWSTR)str.data();
 
-  ::SendMessage(m_hWindow, EM_GETTEXTRANGE , 0, reinterpret_cast<LPARAM>(&tr));
+  ::SendMessage(window_, EM_GETTEXTRANGE , 0, reinterpret_cast<LPARAM>(&tr));
   
   return str;
 }
 
 void RichEdit::HideSelection(BOOL bHide) {
-  ::SendMessage(m_hWindow, EM_HIDESELECTION, bHide, 0);
+  ::SendMessage(window_, EM_HIDESELECTION, bHide, 0);
 }
 
 BOOL RichEdit::SetCharFormat(DWORD dwFormat, CHARFORMAT* cf) {
-  return ::SendMessage(m_hWindow, EM_SETCHARFORMAT, dwFormat, reinterpret_cast<LPARAM>(cf));
+  return ::SendMessage(window_, EM_SETCHARFORMAT, dwFormat, reinterpret_cast<LPARAM>(cf));
 }
 
 DWORD RichEdit::SetEventMask(DWORD dwFlags) {
-  return ::SendMessage(m_hWindow, EM_SETEVENTMASK, 0, dwFlags);
+  return ::SendMessage(window_, EM_SETEVENTMASK, 0, dwFlags);
 }
 
 void RichEdit::SetSel(int ichStart, int ichEnd) {
-  ::SendMessage(m_hWindow, EM_SETSEL, ichStart, ichEnd);
+  ::SendMessage(window_, EM_SETSEL, ichStart, ichEnd);
 }
 
 void RichEdit::SetSel(CHARRANGE* cr) {
-  ::SendMessage(m_hWindow, EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(cr));
+  ::SendMessage(window_, EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(cr));
 }
 
 UINT RichEdit::SetTextEx(const string& str) {
   SETTEXTEX ste;
-  return ::SendMessage(m_hWindow, EM_SETTEXTEX, 
+  return ::SendMessage(window_, EM_SETTEXTEX, 
                        reinterpret_cast<WPARAM>(&ste), 
                        reinterpret_cast<LPARAM>(str.data()));
 }

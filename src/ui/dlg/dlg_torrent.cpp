@@ -238,7 +238,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (lpnmitem->iItem == -1) break;
         FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
         if (feed_item) {
-          wstring answer = ui::Menus.Show(m_hWindow, 0, 0, L"TorrentListRightClick");
+          wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
             feed->Download(feed_item->index);
           } else if (answer == L"Info") {
@@ -347,7 +347,7 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += rebar_.GetBarHeight() + ScaleY(WIN_CONTROL_MARGIN / 2);
+      rcWindow.top += rebar_.GetBarHeight() + ScaleY(win::kControlMargin / 2);
       // Resize list
       list_.SetPosition(NULL, rcWindow);
     }

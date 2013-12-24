@@ -30,7 +30,7 @@ void SysLink::SetItemState(int item, UINT states) {
   li.state = states;
   li.stateMask = states;
   
-  ::SendMessage(m_hWindow, LM_SETITEM, 0, reinterpret_cast<LPARAM>(&li));
+  ::SendMessage(window_, LM_SETITEM, 0, reinterpret_cast<LPARAM>(&li));
 }
 
 }  // namespace win

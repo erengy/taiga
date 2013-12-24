@@ -35,11 +35,11 @@ void Rebar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 // =============================================================================
 
 UINT Rebar::GetBarHeight() {
-  return ::SendMessage(m_hWindow, RB_GETBARHEIGHT, 0, 0);
+  return ::SendMessage(window_, RB_GETBARHEIGHT, 0, 0);
 }
 
 BOOL Rebar::InsertBand(LPREBARBANDINFO lpBarInfo) {
-  return ::SendMessage(m_hWindow, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(lpBarInfo));
+  return ::SendMessage(window_, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(lpBarInfo));
 }
 
 BOOL Rebar::InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UINT cxMinChild, 
@@ -59,7 +59,7 @@ BOOL Rebar::InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UIN
   rbi.fStyle     = fStyle;
   rbi.hwndChild  = hwndChild;
 
-  return ::SendMessage(m_hWindow, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(&rbi));
+  return ::SendMessage(window_, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(&rbi));
 }
 
 }  // namespace win

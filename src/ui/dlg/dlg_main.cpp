@@ -223,11 +223,11 @@ void MainDialog::CreateDialogControls() {
     fMask, fStyle);
   rebar.InsertBand(toolbar_main.GetWindowHandle(), 
     GetSystemMetrics(SM_CXSCREEN), 
-    WIN_CONTROL_MARGIN, 0, 0, 0, 0, 0, 
+    win::kControlMargin, 0, 0, 0, 0, 0, 
     HIWORD(toolbar_main.GetButtonSize()) + 2, 
     fMask, fStyle | RBBS_BREAK);
   rebar.InsertBand(toolbar_search.GetWindowHandle(), 
-    0, WIN_CONTROL_MARGIN, 0, 208, 0, 0, 0, 
+    0, win::kControlMargin, 0, 208, 0, 0, 0, 
     HIWORD(toolbar_search.GetButtonSize()), 
     fMask, fStyle);
 }
@@ -743,11 +743,11 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   // Taskbar creation notification
   if (uMsg == WM_TASKBARCREATED) {
-    Taskbar.Create(m_hWindow, nullptr, APP_TITLE);
+    Taskbar.Create(GetWindowHandle(), nullptr, APP_TITLE);
   
   // Windows 7 taskbar interface
   } else if (uMsg == WM_TASKBARBUTTONCREATED) {
-    TaskbarList.Initialize(m_hWindow);
+    TaskbarList.Initialize(GetWindowHandle());
 
   // Taskbar callback
   } else if (uMsg == WM_TASKBARCALLBACK) {
@@ -781,13 +781,13 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
       }
       case WM_LBUTTONUP:
       case WM_LBUTTONDBLCLK: {
-        ActivateWindow(m_hWindow);
+        ActivateWindow(GetWindowHandle());
         break;
       }
       case WM_RBUTTONUP: {
         ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
         SetForegroundWindow();
-        ExecuteAction(ui::Menus.Show(m_hWindow, 0, 0, L"Tray"));
+        ExecuteAction(ui::Menus.Show(GetWindowHandle(), 0, 0, L"Tray"));
         ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
         break;
       }
@@ -835,7 +835,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   // Resize treeview
   if (treeview.IsVisible()) {
     win::Rect rect_tree(rect_sidebar_);
-    rect_tree.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
+    rect_tree.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
     treeview.SetPosition(nullptr, rect_tree);
   }
 

@@ -103,7 +103,7 @@ BOOL FeedFilterDialog::OnInitDialog() {
   
   // Calculate page area
   win::Rect page_area; main_instructions_label_.GetWindowRect(&page_area);
-  MapWindowPoints(nullptr, m_hWindow, reinterpret_cast<LPPOINT>(&page_area), 2);
+  MapWindowPoints(nullptr, GetWindowHandle(), reinterpret_cast<LPPOINT>(&page_area), 2);
   page_area.top += page_area.bottom;
   page_area.left *= 2;
 

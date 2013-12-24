@@ -38,16 +38,16 @@ void Tooltip::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 BOOL Tooltip::AddTip(UINT uID, LPCWSTR lpText, LPCWSTR lpTitle, LPRECT rcArea, bool bWindowID) {
   TOOLINFO ti;
   ti.cbSize   = sizeof(TOOLINFO);
-  ti.hwnd     = m_hParent;
-  ti.hinst    = m_hInstance;
+  ti.hwnd     = parent_;
+  ti.hinst    = instance_;
   ti.lpszText = (LPWSTR)lpText;
   ti.uFlags   = TTF_SUBCLASS | (bWindowID ? TTF_IDISHWND : NULL);
   ti.uId      = (UINT_PTR)uID;
   if (rcArea) ti.rect = *rcArea;
 
-  BOOL lResult = ::SendMessage(m_hWindow, TTM_ADDTOOL, 0, (LPARAM)&ti);
+  BOOL lResult = ::SendMessage(window_, TTM_ADDTOOL, 0, (LPARAM)&ti);
   if (lResult && lpTitle) {
-    lResult = ::SendMessage(m_hWindow, TTM_SETTITLE, 1, (LPARAM)lpTitle);
+    lResult = ::SendMessage(window_, TTM_SETTITLE, 1, (LPARAM)lpTitle);
   }
   return lResult;
 }
@@ -55,35 +55,35 @@ BOOL Tooltip::AddTip(UINT uID, LPCWSTR lpText, LPCWSTR lpTitle, LPRECT rcArea, b
 BOOL Tooltip::DeleteTip(UINT uID) {
   TOOLINFO ti;
   ti.cbSize = sizeof(TOOLINFO);
-  ti.hwnd   = m_hParent;
+  ti.hwnd   = parent_;
   ti.uId    = (UINT_PTR)uID;
 
-  return ::SendMessage(m_hWindow, TTM_DELTOOL, 0, (LPARAM)&ti);
+  return ::SendMessage(window_, TTM_DELTOOL, 0, (LPARAM)&ti);
 }
 
 void Tooltip::SetDelayTime(long lAutopop, long lInitial, long lReshow) {
-  ::SendMessage(m_hWindow, TTM_SETDELAYTIME, TTDT_AUTOPOP, lAutopop);
-  ::SendMessage(m_hWindow, TTM_SETDELAYTIME, TTDT_INITIAL, lInitial);
-  ::SendMessage(m_hWindow, TTM_SETDELAYTIME, TTDT_RESHOW,  lReshow);
+  ::SendMessage(window_, TTM_SETDELAYTIME, TTDT_AUTOPOP, lAutopop);
+  ::SendMessage(window_, TTM_SETDELAYTIME, TTDT_INITIAL, lInitial);
+  ::SendMessage(window_, TTM_SETDELAYTIME, TTDT_RESHOW,  lReshow);
 }
 
 void Tooltip::SetMaxWidth(long lWidth) {
-  ::SendMessage(m_hWindow, TTM_SETMAXTIPWIDTH, NULL, lWidth);
+  ::SendMessage(window_, TTM_SETMAXTIPWIDTH, NULL, lWidth);
 }
 
 void Tooltip::UpdateText(UINT uID, LPCWSTR lpText) {
   TOOLINFO ti;
   ti.cbSize   = sizeof(TOOLINFO);
-  ti.hinst    = m_hInstance;
-  ti.hwnd     = m_hParent;
+  ti.hinst    = instance_;
+  ti.hwnd     = parent_;
   ti.lpszText = (LPWSTR)lpText;
   ti.uId      = (UINT_PTR)uID;
 
-  ::SendMessage(m_hWindow, TTM_UPDATETIPTEXT, NULL, (LPARAM)&ti);
+  ::SendMessage(window_, TTM_UPDATETIPTEXT, NULL, (LPARAM)&ti);
 }
 
 void Tooltip::UpdateTitle(LPCWSTR lpTitle) {
-  ::SendMessage(m_hWindow, TTM_SETTITLE, lpTitle ? 0 : 1, (LPARAM)lpTitle);
+  ::SendMessage(window_, TTM_SETTITLE, lpTitle ? 0 : 1, (LPARAM)lpTitle);
 }
 
 }  // namespace win

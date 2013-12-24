@@ -76,7 +76,7 @@ void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   for (int i = 0; i < 3; i++) {
     win::Rect rect_header;
     win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
-    header.GetWindowRect(m_hWindow, &rect_header);
+    header.GetWindowRect(GetWindowHandle(), &rect_header);
     rect_header.top = rect_header.bottom + 3;
     rect_header.bottom =  rect_header.top + 1;
     dc.FillRect(rect_header, ::GetSysColor(COLOR_ACTIVEBORDER));
@@ -91,13 +91,13 @@ void PageBaseInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
+      rect.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
 
       // Headers
       for (int i = 0; i < 3; i++) {
         win::Rect rect_header;
         win::Window header = GetDlgItem(IDC_STATIC_HEADER1 + i);
-        header.GetWindowRect(m_hWindow, &rect_header);
+        header.GetWindowRect(GetWindowHandle(), &rect_header);
         rect_header.right = rect.right;
         header.SetPosition(nullptr, rect_header);
         header.SetWindowHandle(nullptr);
@@ -118,25 +118,25 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(WIN_CONTROL_MARGIN), -ScaleY(WIN_CONTROL_MARGIN));
+      rect.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
 
       // Synonyms
       win::Rect rect_child;
       win::Window window = GetDlgItem(IDC_EDIT_ANIME_ALT);
-      window.GetWindowRect(m_hWindow, &rect_child);
-      rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
+      window.GetWindowRect(GetWindowHandle(), &rect_child);
+      rect_child.right = rect.right - ScaleX(win::kControlMargin);
       window.SetPosition(nullptr, rect_child);
 
       // Details
       window.SetWindowHandle(GetDlgItem(IDC_STATIC_ANIME_DETAILS));
-      window.GetWindowRect(m_hWindow, &rect_child);
-      rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
+      window.GetWindowRect(GetWindowHandle(), &rect_child);
+      rect_child.right = rect.right - ScaleX(win::kControlMargin);
       window.SetPosition(nullptr, rect_child);
 
       // Synopsis
       window.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_SYNOPSIS));
-      window.GetWindowRect(m_hWindow, &rect_child);
-      rect_child.right = rect.right - ScaleX(WIN_CONTROL_MARGIN);
+      window.GetWindowRect(GetWindowHandle(), &rect_child);
+      rect_child.right = rect.right - ScaleX(win::kControlMargin);
       rect_child.bottom = rect.bottom;
       window.SetPosition(nullptr, rect_child);
       window.SetWindowHandle(nullptr);
@@ -195,7 +195,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       } else if (!Settings.root_folders.empty()) {
         default_path = Settings.root_folders.front();
       }
-      if (BrowseForFolder(m_hWindow, L"Choose an anime folder", default_path, path)) {
+      if (BrowseForFolder(GetWindowHandle(), L"Choose an anime folder", default_path, path)) {
         SetDlgItemText(IDC_EDIT_ANIME_FOLDER, path.c_str());
       }
       return TRUE;

@@ -38,23 +38,23 @@ void Tab::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 void Tab::AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect) {
   if (hWindow) {
     RECT window_rect;
-    ::GetClientRect(m_hWindow, lpRect);
-    ::GetWindowRect(m_hWindow, &window_rect);
+    ::GetClientRect(window_, lpRect);
+    ::GetWindowRect(window_, &window_rect);
     ::ScreenToClient(hWindow, (LPPOINT)&window_rect);
     ::SetRect(lpRect, 
       window_rect.left, window_rect.top, 
       window_rect.left + lpRect->right, 
       window_rect.top + lpRect->bottom);
   }
-  TabCtrl_AdjustRect(m_hWindow, fLarger, lpRect);
+  TabCtrl_AdjustRect(window_, fLarger, lpRect);
 }
 
 int Tab::DeleteAllItems() {
-  return TabCtrl_DeleteAllItems(m_hWindow);
+  return TabCtrl_DeleteAllItems(window_);
 }
 
 int Tab::DeleteItem(int nIndex) {
-  return TabCtrl_DeleteItem(m_hWindow, nIndex);
+  return TabCtrl_DeleteItem(window_, nIndex);
 }
 
 int Tab::InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam) {
@@ -64,33 +64,33 @@ int Tab::InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam) {
   tci.lParam  = lParam;
   tci.iImage  = -1;
 
-  return TabCtrl_InsertItem(m_hWindow, nIndex, &tci);
+  return TabCtrl_InsertItem(window_, nIndex, &tci);
 }
 
 int Tab::GetCurrentlySelected() {
-  return TabCtrl_GetCurSel(m_hWindow);
+  return TabCtrl_GetCurSel(window_);
 }
 
 int Tab::GetItemCount() {
-  return TabCtrl_GetItemCount(m_hWindow);
+  return TabCtrl_GetItemCount(window_);
 }
 
 LPARAM Tab::GetItemParam(int nIndex) {
   TCITEM tci;
   tci.mask = TCIF_PARAM;
-  TabCtrl_GetItem(m_hWindow, nIndex, &tci);
+  TabCtrl_GetItem(window_, nIndex, &tci);
   return tci.lParam;
 }
 
 int Tab::HitTest() {
   TCHITTESTINFO tchti;
   ::GetCursorPos(&tchti.pt);
-  ::ScreenToClient(m_hWindow, &tchti.pt);
-  return TabCtrl_HitTest(m_hWindow, &tchti);
+  ::ScreenToClient(window_, &tchti.pt);
+  return TabCtrl_HitTest(window_, &tchti);
 }
 
 int Tab::SetCurrentlySelected(int iItem) {
-  return TabCtrl_SetCurSel(m_hWindow, iItem);
+  return TabCtrl_SetCurSel(window_, iItem);
 }
 
 int Tab::SetItemText(int iItem, LPCWSTR szText) {
@@ -98,7 +98,7 @@ int Tab::SetItemText(int iItem, LPCWSTR szText) {
   tci.mask = TCIF_TEXT;
   tci.pszText = (LPWSTR)szText;
 
-  return TabCtrl_SetItem(m_hWindow, iItem, &tci);
+  return TabCtrl_SetItem(window_, iItem, &tci);
 }
 
 }  // namespace win
