@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,14 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_GDIPLUS_H
-#define WIN_GDIPLUS_H
+#ifndef TAIGA_WIN_GDIPLUS_H
+#define TAIGA_WIN_GDIPLUS_H
 
 #include "win_main.h"
 
 namespace win {
-
-// =============================================================================
 
 class GdiPlus {
 public:
@@ -31,13 +29,13 @@ public:
   ~GdiPlus();
 
   void DrawRectangle(const HDC hdc, const RECT& rect, DWORD color);
-  HICON LoadIcon(const wstring& file);
-  HBITMAP LoadImage(const wstring& file);
+  HICON LoadIcon(const std::wstring& file);
+  HBITMAP LoadImage(const std::wstring& file);
 
 private:
-  ULONG_PTR m_Token;
+  ULONG_PTR token_;
 };
 
 }  // namespace win
 
-#endif // WIN_GDIPLUS_H
+#endif  // TAIGA_WIN_GDIPLUS_H

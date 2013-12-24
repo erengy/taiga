@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,51 +21,52 @@
 
 #pragma comment(lib, "gdiplus.lib")
 
-using namespace Gdiplus;
-
 namespace win {
 
-// =============================================================================
-
-GdiPlus::GdiPlus() {
+GdiPlus::GdiPlus()
+    : token_(0) {
   Gdiplus::GdiplusStartupInput input;
-  Gdiplus::GdiplusStartup(&m_Token, &input, NULL);
+  Gdiplus::GdiplusStartup(&token_, &input, nullptr);
 }
 
 GdiPlus::~GdiPlus() {
-  Gdiplus::GdiplusShutdown(m_Token);
-  m_Token = NULL;
+  Gdiplus::GdiplusShutdown(token_);
+  token_ = 0;
 }
 
-void GdiPlus::DrawRectangle(const HDC hdc, const RECT& rect, Gdiplus::ARGB color) {
+void GdiPlus::DrawRectangle(const HDC hdc, const RECT& rect,
+                            Gdiplus::ARGB color) {
   const Gdiplus::SolidBrush brush = Gdiplus::Color(color);
   Gdiplus::Graphics graphics(hdc);
-  graphics.FillRectangle(&brush, 
-    rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+  graphics.FillRectangle(&brush, rect.left, rect.top,
+                         rect.right - rect.left, rect.bottom - rect.top);
 }
 
-HICON GdiPlus::LoadIcon(const wstring& file) {
-  HICON hIcon = NULL;
-  
-  Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(file.c_str());
-  if (pBitmap) {
-    pBitmap->GetHICON(&hIcon);
-    delete pBitmap; pBitmap = NULL;
+HICON GdiPlus::LoadIcon(const std::wstring& file) {
+  HICON icon = nullptr;
+
+  Gdiplus::Bitmap* gp_bitmap = Gdiplus::Bitmap::FromFile(file.c_str());
+  if (gp_bitmap) {
+    gp_bitmap->GetHICON(&icon);
+    delete gp_bitmap;
+    gp_bitmap = nullptr;
   }
 
-  return hIcon;
+  return icon;
 }
 
-HBITMAP GdiPlus::LoadImage(const wstring& file) {
-  HBITMAP hBitmap = NULL;
-  
-  Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(file.c_str());
-  if (pBitmap) {
-    pBitmap->GetHBITMAP(NULL, &hBitmap);
-    delete pBitmap; pBitmap = NULL;
+HBITMAP GdiPlus::LoadImage(const std::wstring& file) {
+  HBITMAP bitmap = nullptr;
+
+  Gdiplus::Bitmap* gp_bitmap = Gdiplus::Bitmap::FromFile(file.c_str());
+  if (gp_bitmap) {
+    Gdiplus::Color color(Gdiplus::Color::AlphaMask);
+    gp_bitmap->GetHBITMAP(color, &bitmap);
+    delete gp_bitmap;
+    gp_bitmap = nullptr;
   }
 
-  return hBitmap;
+  return bitmap;
 }
 
 }  // namespace win
