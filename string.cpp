@@ -500,32 +500,25 @@ wstring ToWstr(const double& value, int count) {
 
 /* Encoding & Decoding */
 
-wstring EncodeUrl(const wstring& str, bool encode_unreserved) {
-  static const wchar_t* digits = L"0123456789ABCDEF";
-  wstring output;
+wstring EncodeUrl(const wstring& input, bool encode_unreserved) {
+  string str = ToANSI(input);
 
-  for (unsigned int i = 0; i < str.length(); i++) {
-    if ((str[i] >= '0' && str[i] <= '9') || 
-        (str[i] >= 'A' && str[i] <= 'Z') || 
-        (str[i] >= 'a' && str[i] <= 'z') || 
-        (!encode_unreserved && 
-        (str[i] == '-' || str[i] == '.' || 
-         str[i] == '_' || str[i] == '~'))) {
-           output.push_back(str[i]);
+  wstring output;
+  output.reserve(input.size() * 2);
+
+  for (size_t i = 0; i < str.length(); i++) {
+    if ((str[i] >= '0' && str[i] <= '9') ||
+        (str[i] >= 'A' && str[i] <= 'Z') ||
+        (str[i] >= 'a' && str[i] <= 'z') ||
+        (!encode_unreserved &&
+         (str[i] == '-' || str[i] == '.' ||
+          str[i] == '_' || str[i] == '~'))) {
+      output.append(1, static_cast<wchar_t>(str[i]));
     } else {
-      #define PercentEncode(x) \
-        output.append(L"%"); \
-        output.append(&digits[(x >> 4) & 0x0F], 1); \
-        output.append(&digits[x & 0x0F], 1);
-      if (str[i] > 255) {
-        string buffer = ToANSI(wstring(&str[i], 1));
-        for (unsigned int j = 0; j < buffer.length(); j++) {
-          PercentEncode(buffer[j]);
-        }
-      } else {
-        PercentEncode(str[i]);
-      }
-      #undef PercentEncode
+      static const wchar_t* digits = L"0123456789ABCDEF";
+      output.append(L"%");
+      output.append(&digits[(str[i] >> 4) & 0x0F], 1);
+      output.append(&digits[str[i] & 0x0F], 1);
     }
   }
 
