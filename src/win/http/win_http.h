@@ -16,13 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_HTTP_H
-#define WIN_HTTP_H
+#ifndef TAIGA_WIN_HTTP_H
+#define TAIGA_WIN_HTTP_H
 
 #include <windows.h>
 #include <winhttp.h>
 #include <string>
 #include <vector>
+
 #include "base/map.h"
 
 namespace win {
@@ -84,8 +85,10 @@ public:
 
   void set_auto_redirect(bool enabled);
   void set_download_path(const std::wstring& download_path);
-  void set_proxy(const std::wstring& host,
-                 const std::wstring& username, const std::wstring& password);
+  void set_proxy(
+      const std::wstring& host,
+      const std::wstring& username,
+      const std::wstring& password);
   void set_referer(const std::wstring& referer);
   void set_user_agent(const std::wstring& user_agent);
 
@@ -115,15 +118,17 @@ protected:
   std::wstring user_agent_;
 
 private:
-  static void CALLBACK Callback(HINTERNET hInternet,
-                                DWORD_PTR dwContext,
-                                DWORD dwInternetStatus,
-                                LPVOID lpvStatusInformation,
-                                DWORD dwStatusInformationLength);
-  void StatusCallback(HINTERNET hInternet,
-                      DWORD dwInternetStatus,
-                      LPVOID lpvStatusInformation,
-                      DWORD dwStatusInformationLength);
+  static void CALLBACK Callback(
+      HINTERNET hInternet,
+      DWORD_PTR dwContext,
+      DWORD dwInternetStatus,
+      LPVOID lpvStatusInformation,
+      DWORD dwStatusInformationLength);
+  void StatusCallback(
+      HINTERNET hInternet,
+      DWORD dwInternetStatus,
+      LPVOID lpvStatusInformation,
+      DWORD dwStatusInformationLength);
 
   HINTERNET OpenSession();
   HINTERNET ConnectToSession();
@@ -164,4 +169,4 @@ std::wstring GetUrlEncodedString(const std::wstring& str,
 }  // namespace http
 }  // namespace win
 
-#endif  // WIN_HTTP_H
+#endif  // TAIGA_WIN_HTTP_H
