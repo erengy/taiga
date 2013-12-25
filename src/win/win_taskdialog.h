@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,12 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_TASKDIALOG_H
-#define WIN_TASKDIALOG_H
+#ifndef TAIGA_WIN_TASKDIALOG_H
+#define TAIGA_WIN_TASKDIALOG_H
 
 #include "win_main.h"
-
-namespace win {
 
 #define TD_ICON_NONE         static_cast<PCWSTR>(0)
 #define TD_ICON_INFORMATION  TD_INFORMATION_ICON
@@ -33,41 +31,44 @@ namespace win {
 
 #define TDF_SIZE_TO_CONTENT 0x1000000
 
-// =============================================================================
+namespace win {
 
 class TaskDialog {
 public:
   TaskDialog();
   TaskDialog(LPCWSTR title, LPWSTR icon);
   virtual ~TaskDialog() {}
-  
-  void    AddButton(LPCWSTR text, int id);
-  int     GetSelectedButtonID() const;
-  bool    GetVerificationCheck() const;
-  void    SetCollapsedControlText(LPCWSTR text);
-  void    SetContent(LPCWSTR text);
-  void    SetExpandedControlText(LPCWSTR text);
-  void    SetExpandedInformation(LPCWSTR text);
-  void    SetFooter(LPCWSTR LPCWSTR);
-  void    SetFooterIcon(LPWSTR icon);
-  void    SetMainIcon(LPWSTR icon);
-  void    SetMainInstruction(LPCWSTR text);
-  void    SetVerificationText(LPCWSTR text);
-  void    SetWindowTitle(LPCWSTR text);
-  HRESULT Show(HWND hParent);
-  void    UseCommandLinks(bool use);
+
+  void AddButton(LPCWSTR text, int id);
+  int GetSelectedButtonID() const;
+  bool GetVerificationCheck() const;
+  void SetCollapsedControlText(LPCWSTR text);
+  void SetContent(LPCWSTR text);
+  void SetExpandedControlText(LPCWSTR text);
+  void SetExpandedInformation(LPCWSTR text);
+  void SetFooter(LPCWSTR LPCWSTR);
+  void SetFooterIcon(LPWSTR icon);
+  void SetMainIcon(LPWSTR icon);
+  void SetMainInstruction(LPCWSTR text);
+  void SetVerificationText(LPCWSTR text);
+  void SetWindowTitle(LPCWSTR text);
+  HRESULT Show(HWND parent);
+  void UseCommandLinks(bool use);
 
 protected:
-  static HRESULT CALLBACK Callback(HWND hwnd, UINT uNotification, 
-    WPARAM wParam, LPARAM lParam, LONG_PTR dwRefData);
+  static HRESULT CALLBACK Callback(
+      HWND hwnd, UINT uNotification,
+      WPARAM wParam, LPARAM lParam,
+      LONG_PTR dwRefData);
+
   void Initialize();
-  
-  vector<TASKDIALOG_BUTTON> m_Buttons;
-  TASKDIALOGCONFIG m_Config;
-  int m_SelectedButtonID;
-  bool m_VerificationChecked;
+
+  std::vector<TASKDIALOG_BUTTON> buttons_;
+  TASKDIALOGCONFIG config_;
+  int selected_button_id_;
+  bool verification_checked_;
 };
 
 }  // namespace win
 
-#endif // WIN_TASKDIALOG_H
+#endif  // TAIGA_WIN_TASKDIALOG_H
