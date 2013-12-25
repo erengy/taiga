@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,33 +16,31 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_MENU_H
-#define WIN_MENU_H
+#ifndef TAIGA_WIN_MENU_H
+#define TAIGA_WIN_MENU_H
 
 #include "win_main.h"
 
 namespace win {
 
-// =============================================================================
-
 enum MenuItemType {
-  MENU_ITEM_NORMAL = 0,
-  MENU_ITEM_SEPARATOR,
-  MENU_ITEM_SUBMENU
+  kMenuItemDefault = 0,
+  kMenuItemSeparator,
+  kMenuItemSubmenu
 };
 
 class MenuItem {
 public:
-  bool     Checked, Default, Enabled, NewColumn, Radio;
-  wstring  Action, Name, SubMenu;
-  int      Type;
+  bool checked, def, enabled, new_column, radio;
+  std::wstring action, name, submenu;
+  int type;
 };
 
 class Menu {
 public:
-  void CreateItem(wstring action = L"",
-                  wstring name = L"",
-                  wstring sub = L"",
+  void CreateItem(std::wstring action = L"",
+                  std::wstring name = L"",
+                  std::wstring submenu = L"",
                   bool checked = false,
                   bool def = false,
                   bool enabled = true,
@@ -50,20 +48,20 @@ public:
                   bool radio = false);
 
   vector<MenuItem> items;
-  wstring name;
-  wstring type;
+  std::wstring name;
+  std::wstring type;
 };
 
 class MenuList {
 public:
-  void    Create(LPCWSTR lpName, LPCWSTR lpType);
-  HMENU   CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu);
-  Menu*   FindMenu(LPCWSTR lpName);
-  wstring Show(HWND hwnd, int x, int y, LPCWSTR lpName);
+  void Create(LPCWSTR name, LPCWSTR type);
+  HMENU CreateNewMenu(LPCWSTR name, vector<HMENU>& menu_handles);
+  Menu* FindMenu(LPCWSTR name);
+  std::wstring Show(HWND hwnd, int x, int y, LPCWSTR name);
 
-  vector<Menu> menus;
+  std::vector<Menu> menus;
 };
 
 }  // namespace win
 
-#endif // WIN_MENU_H
+#endif  // TAIGA_WIN_MENU_H

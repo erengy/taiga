@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,137 +20,131 @@
 
 namespace win {
 
-// =============================================================================
+HMENU MenuList::CreateNewMenu(LPCWSTR name, vector<HMENU>& menu_handles) {
+  auto menu = FindMenu(name);
 
-HMENU MenuList::CreateNewMenu(LPCWSTR lpName, vector<HMENU>& hMenu) {
-  // Initialize
-  auto menu = FindMenu(lpName);
   if (!menu)
-    return NULL;
-  int nMenu = hMenu.size();
-  hMenu.resize(nMenu + 1);
+    return nullptr;
 
-  // Create menu
+  HMENU handle = nullptr;
   if (menu->type == L"menubar") {
-    hMenu[nMenu] = ::CreateMenu();
+    handle = ::CreateMenu();
   } else {
-    hMenu[nMenu] = ::CreatePopupMenu();
+    handle = ::CreatePopupMenu();
   }
-  if (!hMenu[nMenu])
-    return NULL;
 
-  // Add items
+  if (!handle)
+    return nullptr;
+
+  menu_handles.push_back(handle);
+
   for (auto item = menu->items.begin(); item != menu->items.end(); ++item) {
-    UINT uFlags = (item->Checked ? MF_CHECKED : NULL) |
-                  (item->Default ? MF_DEFAULT : NULL) |
-                  (item->Enabled ? MF_ENABLED : MF_GRAYED) |
-                  (item->NewColumn ? MF_MENUBARBREAK : NULL) |
-                  (item->Radio ? MFT_RADIOCHECK : NULL);
-    
-    switch (item->Type) {
-      // Normal item      
-      case MENU_ITEM_NORMAL: {
-        UINT_PTR uIDNewItem = (UINT_PTR)&item->Action;
-        ::AppendMenu(hMenu[nMenu], MF_STRING | uFlags, uIDNewItem,
-                     item->Name.c_str());
-        if (item->Default) {
-          ::SetMenuDefaultItem(hMenu[nMenu], uIDNewItem, FALSE);
-        }
+    static const UINT flags =
+        (item->checked ? MF_CHECKED : 0) |
+        (item->def ? MF_DEFAULT : 0) |
+        (item->enabled ? MF_ENABLED : MF_GRAYED) |
+        (item->new_column ? MF_MENUBARBREAK : 0) |
+        (item->radio ? MFT_RADIOCHECK : 0);
+    switch (item->type) {
+      case kMenuItemDefault: {
+        UINT_PTR id_new_item = reinterpret_cast<UINT_PTR>(&item->action);
+        ::AppendMenu(handle, MF_STRING | flags, id_new_item,
+                     item->name.c_str());
+        if (item->def)
+          ::SetMenuDefaultItem(handle, id_new_item, FALSE);
         break;
       }
-      // Separator
-      case MENU_ITEM_SEPARATOR: {
-        ::AppendMenu(hMenu[nMenu], MF_SEPARATOR, NULL, NULL);
+      case kMenuItemSeparator: {
+        ::AppendMenu(handle, MF_SEPARATOR, 0, nullptr);
         break;
       }
-      // Sub menu
-      case MENU_ITEM_SUBMENU: {
-        auto submenu = FindMenu(item->SubMenu.c_str());
+      case kMenuItemSubmenu: {
+        auto submenu = FindMenu(item->submenu.c_str());
         if (submenu && submenu != menu) {
-          HMENU hSubMenu = CreateNewMenu(submenu->name.c_str(), hMenu);
-          ::AppendMenu(hMenu[nMenu], MF_POPUP | uFlags, 
-                       (UINT_PTR)hSubMenu, item->Name.c_str());
+          HMENU submenu_handle = CreateNewMenu(submenu->name.c_str(),
+                                               menu_handles);
+          ::AppendMenu(handle, MF_POPUP | flags,
+                       reinterpret_cast<UINT_PTR>(submenu_handle),
+                       item->name.c_str());
         }
         break;
       }
     }
   }
 
-  return hMenu[nMenu];
+  return handle;
 }
 
-wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR lpName) {
-  // Create menu
-  vector<HMENU> hMenu;
-  CreateNewMenu(lpName, hMenu);
-  if (!hMenu.size())
-    return L"";
+wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR name) {
+  vector<HMENU> menu_handles;
+  CreateNewMenu(name, menu_handles);
 
-  // Set position
-  if (x == 0 && y == 0) {
+  if (menu_handles.empty())
+    return std::wstring();
+
+  if (!x && !y) {
     POINT point;
     ::GetCursorPos(&point);
     x = point.x;
     y = point.y;
   }
-  
-  // Show menu
-  UINT_PTR index = ::TrackPopupMenuEx(hMenu[0], 
-    TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD, 
-    x, y, hwnd, NULL);
 
-  // Clean-up
-  for (unsigned int i = 0; i < hMenu.size(); i++) {
-    ::DestroyMenu(hMenu[i]);
-  }
+  UINT flags = TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RETURNCMD;
+  UINT_PTR index = ::TrackPopupMenuEx(menu_handles.front(),
+                                      flags, x, y, hwnd, nullptr);
 
-  // Return action
+  for (auto it = menu_handles.begin(); it != menu_handles.end(); ++it) 
+    ::DestroyMenu(*it);
+
   if (index > 0) {
-    wstring* str = reinterpret_cast<wstring*>(index);
+    auto str = reinterpret_cast<wstring*>(index);
     return *str;
   } else {
-    return L"";
+    return std::wstring();
   }
 }
 
-void MenuList::Create(LPCWSTR lpName, LPCWSTR lpType) {
-  menus.resize(menus.size() + 1);
-  menus.back().name = lpName;
-  menus.back().type = lpType;
+void MenuList::Create(LPCWSTR name, LPCWSTR type) {
+  Menu menu;
+
+  menu.name = name;
+  menu.type = type;
+
+  menus.push_back(menu);
 }
 
-Menu* MenuList::FindMenu(LPCWSTR lpName) {
+Menu* MenuList::FindMenu(LPCWSTR name) {
   for (auto it = menus.begin(); it != menus.end(); ++it)
-    if (it->name == lpName)
+    if (it->name == name)
       return &(*it);
 
   return nullptr;
 }
 
-// =============================================================================
-
-void Menu::CreateItem(wstring action, wstring name, wstring sub,
+void Menu::CreateItem(std::wstring action, std::wstring name,
+                      std::wstring submenu,
                       bool checked, bool def, bool enabled,
                       bool newcolumn, bool radio) {
-  unsigned int i = items.size();
-  items.resize(i + 1);
-  
-  items[i].Action    = action;
-  items[i].Checked   = checked;
-  items[i].Default   = def;
-  items[i].Enabled   = enabled;
-  items[i].Name      = name;
-  items[i].NewColumn = newcolumn;
-  items[i].Radio     = radio;
-  items[i].SubMenu   = sub;
+  MenuItem item;
 
-  if (!sub.empty()) {
-    items[i].Type = MENU_ITEM_SUBMENU;
+  item.action = action;
+  item.checked = checked;
+  item.def = def;
+  item.enabled = enabled;
+  item.name = name;
+  item.new_column = newcolumn;
+  item.radio = radio;
+  item.submenu = submenu;
+
+  if (!submenu.empty()) {
+    item.type = kMenuItemSubmenu;
   } else if (name.empty()) {
-    items[i].Type = MENU_ITEM_SEPARATOR;
+    item.type = kMenuItemSeparator;
   } else {
-    items[i].Type = MENU_ITEM_NORMAL;
+    item.type = kMenuItemDefault;
   }
+
+  items.push_back(item);
 }
 
 }  // namespace win

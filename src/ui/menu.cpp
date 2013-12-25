@@ -73,28 +73,28 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   auto menu = menu_list_.FindMenu(L"EditScore");
   if (menu) {
     foreach_(it, menu->items) {
-      it->Checked = false;
-      it->Default = false;
+      it->checked = false;
+      it->def = false;
     }
     int item_index = anime_item->GetMyScore();
     if (item_index < static_cast<int>(menu->items.size())) {
-      menu->items[item_index].Checked = true;
-      menu->items[item_index].Default = true;
+      menu->items[item_index].checked = true;
+      menu->items[item_index].def = true;
     }
   }
   // Edit > Status
   menu = menu_list_.FindMenu(L"EditStatus");
   if (menu) {
     foreach_(it, menu->items) {
-      it->Checked = false;
-      it->Default = false;
+      it->checked = false;
+      it->def = false;
     }
     int item_index = anime_item->GetMyStatus();
     if (item_index == anime::kPlanToWatch)
       item_index--;
     if (item_index - 1 < static_cast<int>(menu->items.size())) {
-      menu->items[item_index - 1].Checked = true;
-      menu->items[item_index - 1].Default = true;
+      menu->items[item_index - 1].checked = true;
+      menu->items[item_index - 1].def = true;
     }
   }
 
@@ -102,7 +102,7 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   menu = menu_list_.FindMenu(L"RightClick");
   if (menu) {
     for (int i = static_cast<int>(menu->items.size()) - 1; i > 0; i--) {
-      if (menu->items[i].Type == win::MENU_ITEM_SEPARATOR) {
+      if (menu->items[i].type == win::kMenuItemSeparator) {
         // Clear items
         menu->items.resize(i + 1);
         // Play episode
@@ -169,8 +169,8 @@ void MenuList::UpdateAnnounce() {
   auto menu = menu_list_.FindMenu(L"List");
   if (menu) {
     foreach_(it, menu->items) {
-      if (it->SubMenu == L"Announce") {
-        it->Enabled = CurrentEpisode.anime_id > 0;
+      if (it->submenu == L"Announce") {
+        it->enabled = CurrentEpisode.anime_id > 0;
         break;
       }
     }
@@ -225,8 +225,8 @@ void MenuList::UpdateSearchList(bool enabled) {
   if (menu) {
     // Add to list
     foreach_(it, menu->items) {
-      if (it->SubMenu == L"AddToList") {
-        it->Enabled = enabled;
+      if (it->submenu == L"AddToList") {
+        it->enabled = enabled;
         break;
       }
     }
@@ -238,8 +238,8 @@ void MenuList::UpdateSeasonList(bool enabled) {
   if (menu) {
     // Add to list
     foreach_(it, menu->items) {
-      if (it->SubMenu == L"AddToList") {
-        it->Enabled = enabled;
+      if (it->submenu == L"AddToList") {
+        it->enabled = enabled;
         break;
       }
     }
@@ -251,11 +251,11 @@ void MenuList::UpdateSeason() {
   auto menu = menu_list_.FindMenu(L"SeasonGroup");
   if (menu) {
     foreach_(it, menu->items) {
-      it->Checked = false;
+      it->checked = false;
     }
     int item_index = SeasonDialog.group_by;
     if (item_index < static_cast<int>(menu->items.size())) {
-      menu->items[item_index].Checked = true;
+      menu->items[item_index].checked = true;
     }
   }
 
@@ -263,11 +263,11 @@ void MenuList::UpdateSeason() {
   menu = menu_list_.FindMenu(L"SeasonSort");
   if (menu) {
     foreach_(it, menu->items) {
-      it->Checked = false;
+      it->checked = false;
     }
     int item_index = SeasonDialog.sort_by;
     if (item_index < static_cast<int>(menu->items.size())) {
-      menu->items[item_index].Checked = true;
+      menu->items[item_index].checked = true;
     }
   }
 
@@ -275,11 +275,11 @@ void MenuList::UpdateSeason() {
   menu = menu_list_.FindMenu(L"SeasonView");
   if (menu) {
     foreach_(it, menu->items) {
-      it->Checked = false;
+      it->checked = false;
     }
     int item_index = SeasonDialog.view_as;
     if (item_index < static_cast<int>(menu->items.size())) {
-      menu->items[item_index].Checked = true;
+      menu->items[item_index].checked = true;
     }
   }
 }
@@ -289,14 +289,14 @@ void MenuList::UpdateTools() {
   if (menu) {
     foreach_(it, menu->items) {
       // Tools > Enable anime recognition
-      if (it->Action == L"ToggleRecognition()")
-        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+      if (it->action == L"ToggleRecognition()")
+        it->checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
       // Tools > Enable auto sharing
-      if (it->Action == L"ToggleSharing()")
-        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
+      if (it->action == L"ToggleSharing()")
+        it->checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
       // Tools > Enable auto synchronization
-      if (it->Action == L"ToggleSynchronization()")
-        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
+      if (it->action == L"ToggleSynchronization()")
+        it->checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
     }
   }
 }
@@ -306,8 +306,8 @@ void MenuList::UpdateTray() {
   if (menu) {
     // Tray > Enable recognition
     foreach_(it, menu->items) {
-      if (it->Action == L"ToggleRecognition()") {
-        it->Checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+      if (it->action == L"ToggleRecognition()") {
+        it->checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
         break;
       }
     }
@@ -318,16 +318,16 @@ void MenuList::UpdateView() {
   auto menu = menu_list_.FindMenu(L"View");
   if (menu) {
     foreach_(it, menu->items) {
-      it->Checked = false;
+      it->checked = false;
     }
     int item_index = MainDialog.navigation.GetCurrentPage();
     foreach_(it, menu->items) {
-      if (it->Action == L"ViewContent(" + ToWstr(item_index) + L")") {
-        it->Checked = true;
+      if (it->action == L"ViewContent(" + ToWstr(item_index) + L")") {
+        it->checked = true;
         break;
       }
     }
-    menu->items.back().Checked = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
+    menu->items.back().checked = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
   }
 }
 
