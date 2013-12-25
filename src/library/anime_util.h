@@ -59,10 +59,6 @@ std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-")
 std::wstring TranslateStatus(int value);
 std::wstring TranslateType(int value);
 
-int TranslateMyStatus(const std::wstring& value);
-int TranslateStatus(const std::wstring& value);
-int TranslateType(const std::wstring& value);
-
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsValidDate(const Date& date);

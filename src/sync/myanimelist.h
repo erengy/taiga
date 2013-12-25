@@ -19,8 +19,8 @@
 #ifndef TAIGA_SYNC_MYANIMELIST_H
 #define TAIGA_SYNC_MYANIMELIST_H
 
-#include "service.h"
 #include "base/types.h"
+#include "sync/service.h"
 
 namespace sync {
 namespace myanimelist {

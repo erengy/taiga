@@ -19,15 +19,26 @@
 #ifndef TAIGA_SYNC_MYANIMELIST_UTIL_H
 #define TAIGA_SYNC_MYANIMELIST_UTIL_H
 
-#include "base/std.h"
+#include <string>
+
+class Date;
 
 namespace sync {
 namespace myanimelist {
 
-wstring DecodeText(wstring text);
+std::wstring DecodeText(std::wstring text);
+
+int TranslateSeriesStatusFrom(int value);
+int TranslateSeriesStatusFrom(const std::wstring& value);
+int TranslateSeriesTypeFrom(int value);
+int TranslateSeriesTypeFrom(const std::wstring& value);
+std::wstring TranslateMyDateTo(const std::wstring& value);
+int TranslateMyStatusFrom(int value);
+int TranslateMyStatusTo(int value);
+std::wstring TranslateKeyTo(const std::wstring& key);
 
 void ViewAnimePage(int anime_id);
-void ViewAnimeSearch(const wstring& title);
+void ViewAnimeSearch(const std::wstring& title);
 void ViewHistory();
 void ViewMessages();
 void ViewPanel();

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "myanimelist.h"
-#include "myanimelist_util.h"
+#include <set>
 
 #include "base/encoding.h"
 #include "base/foreach.h"
@@ -26,6 +25,8 @@
 #include "library/anime_db.h"
 #include "library/anime_item.h"
 #include "library/anime_util.h"
+#include "sync/myanimelist.h"
+#include "sync/myanimelist_util.h"
 
 namespace sync {
 namespace myanimelist {
@@ -181,11 +182,16 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   };
   std::set<std::wstring> valid_tags(tags, tags + sizeof(tags) / sizeof(*tags));
   foreach_(it, request.data) {
-    // TODO: Our keys will be different than the tags listed above, once we
-    // add support for multiple services
-    // TODO: Must translate dates into MMDDYYYY format
-    if (valid_tags.find(it->first) != valid_tags.end())
-      XmlWriteStrValue(node_entry, it->first.c_str(), it->second.c_str());
+    auto tag = valid_tags.find(TranslateKeyTo(it->first));
+    if (tag != valid_tags.end()) {
+      std::wstring value = it->second;
+      if (*tag == L"status") {
+        value = ToWstr(TranslateMyStatusTo(ToInt(value)));
+      } else if (StartsWith(*tag, L"date")) {
+        value = TranslateMyDateTo(value);
+      }
+      XmlWriteStrValue(node_entry, tag->c_str(), value.c_str());
+    }
   }
 
   http_request.body = L"data=" + XmlGetNodeAsString(document);
@@ -196,7 +202,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 
 void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
   wstring username = InStr(http_response.body, L"<username>", L"</username>");
-  response.data[canonical_name_ + L"username"] = username;
+  response.data[canonical_name_ + L"-username"] = username;
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -252,9 +258,9 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
 
     anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
     anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
-    anime_item.SetType(XmlReadIntValue(node, L"series_type"));
+    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadIntValue(node, L"series_type")));
     anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
-    anime_item.SetAiringStatus(XmlReadIntValue(node, L"series_status"));
+    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadIntValue(node, L"series_status")));
     anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
     anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
     anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
@@ -264,7 +270,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     anime_item.SetMyDateStart(XmlReadStrValue(node, L"my_start_date"));
     anime_item.SetMyDateEnd(XmlReadStrValue(node, L"my_finish_date"));
     anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
-    anime_item.SetMyStatus(XmlReadIntValue(node, L"my_status"));
+    anime_item.SetMyStatus(TranslateMyStatusFrom(XmlReadIntValue(node, L"my_status")));
     anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
     anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));
     anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"my_last_updated"));
@@ -353,8 +359,8 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     anime_item.SetSynonyms(DecodeText(XmlReadStrValue(node, L"synonyms")));
     anime_item.SetEpisodeCount(XmlReadIntValue(node, L"episodes"));
     anime_item.SetScore(XmlReadStrValue(node, L"score"));
-    anime_item.SetType(anime::TranslateType(XmlReadStrValue(node, L"type")));
-    anime_item.SetAiringStatus(anime::TranslateStatus(XmlReadStrValue(node, L"status")));
+    anime_item.SetType(TranslateSeriesTypeFrom(XmlReadStrValue(node, L"type")));
+    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadStrValue(node, L"status")));
     anime_item.SetDateStart(XmlReadStrValue(node, L"start_date"));
     anime_item.SetDateEnd(XmlReadStrValue(node, L"end_date"));
     wstring synopsis = DecodeText(XmlReadStrValue(node, L"synopsis"));
