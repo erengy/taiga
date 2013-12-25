@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,8 @@
 
 namespace win {
 
-// =============================================================================
-
-Registry::Registry() :
-  m_Key(NULL)
-{
+Registry::Registry()
+    : key_(nullptr) {
 }
 
 Registry::~Registry() {
@@ -32,95 +29,129 @@ Registry::~Registry() {
 }
 
 LSTATUS Registry::CloseKey() {
-  if (m_Key) {
-    LSTATUS status = ::RegCloseKey(m_Key);
-    m_Key = NULL;
+  if (key_) {
+    LSTATUS status = ::RegCloseKey(key_);
+    key_ = nullptr;
     return status;
   } else {
     return ERROR_SUCCESS;
   }
 }
 
-LSTATUS Registry::CreateKey(HKEY key, const wstring& sub_key, LPWSTR lpClass, DWORD dwOptions, REGSAM samDesired, 
-                             LPSECURITY_ATTRIBUTES lpSecurityAttributes, LPDWORD lpdwDisposition) {
+LSTATUS Registry::CreateKey(HKEY key,
+                            const std::wstring& subkey,
+                            LPWSTR class_type,
+                            DWORD options,
+                            REGSAM sam_desired,
+                            LPSECURITY_ATTRIBUTES security_attributes,
+                            LPDWORD disposition) {
   CloseKey();
-  return ::RegCreateKeyEx(key, sub_key.c_str(), 0, lpClass, dwOptions, samDesired, 
-    lpSecurityAttributes, &m_Key, lpdwDisposition);
+
+  return ::RegCreateKeyEx(
+      key, subkey.c_str(), 0, class_type, options, sam_desired,
+      security_attributes, &key_, disposition);
 }
 
-LONG Registry::DeleteKey(const wstring& sub_key) {
-  return DeleteSubkeys(m_Key, sub_key);
+LONG Registry::DeleteKey(const std::wstring& subkey) {
+  return DeleteSubkeys(key_, subkey);
 }
 
-LSTATUS Registry::DeleteSubkeys(HKEY root_key, wstring sub_key) {
-  LSTATUS status = ::RegDeleteKey(root_key, sub_key.c_str());
-  if (status == ERROR_SUCCESS) return status;
+LSTATUS Registry::DeleteSubkeys(HKEY root_key, const std::wstring& subkey) {
+  LSTATUS status = ::RegDeleteKey(root_key, subkey.c_str());
+
+  if (status == ERROR_SUCCESS)
+    return status;
 
   HKEY key;
-  status = ::RegOpenKeyEx(root_key, sub_key.c_str(), 0, KEY_READ, &key);
-  if (status != ERROR_SUCCESS) return status;
-  DWORD cSubKeys = 0;
-  vector<wstring> keys;
-  WCHAR name[MAX_PATH] = {0};
-  if (::RegQueryInfoKey(key, NULL, NULL, NULL, &cSubKeys, NULL, NULL, NULL, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
-    for (DWORD i = 0; i < cSubKeys; i++) {
-      DWORD dwcName = MAX_PATH;
-      if (::RegEnumKeyEx(key, i, name, &dwcName, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+  status = ::RegOpenKeyEx(root_key, subkey.c_str(), 0, KEY_READ, &key);
+
+  if (status != ERROR_SUCCESS)
+    return status;
+
+  DWORD subkey_count = 0;
+  std::vector<std::wstring> keys;
+  WCHAR name[MAX_PATH] = {L'\0'};
+
+  if (::RegQueryInfoKey(key, nullptr, nullptr, nullptr, &subkey_count,
+                        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+                        nullptr) == ERROR_SUCCESS) {
+    for (DWORD i = 0; i < subkey_count; i++) {
+      DWORD name_length = MAX_PATH;
+      if (::RegEnumKeyEx(key, i, name, &name_length, nullptr, nullptr, nullptr,
+                         nullptr) == ERROR_SUCCESS) {
         keys.push_back(name);
       }
     }
   }
-  for (unsigned int i = 0; i < keys.size(); i++) {
-    DeleteSubkeys(key, keys[i].c_str());
+
+  for (auto it = keys.begin(); it != keys.end(); ++it) {
+    DeleteSubkeys(key, it->c_str());
   }
+
   ::RegCloseKey(key);
 
-  return ::RegDeleteKey(root_key, sub_key.c_str());
+  return ::RegDeleteKey(root_key, subkey.c_str());
 }
 
-LSTATUS Registry::DeleteValue(const wstring& value_name) {
-  return ::RegDeleteValue(m_Key, value_name.c_str());
+LSTATUS Registry::DeleteValue(const std::wstring& value_name) {
+  return ::RegDeleteValue(key_, value_name.c_str());
 }
 
-void Registry::EnumKeys(vector<wstring>& output) {
-  // samDesired must be: KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS
+void Registry::EnumKeys(vector<std::wstring>& output) {
+  // sam_desired must be: KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS
+
   WCHAR name[MAX_PATH] = {0};
-  DWORD cSubKeys = 0;
-  if (::RegQueryInfoKey(m_Key, NULL, NULL, NULL, &cSubKeys, NULL, NULL, NULL, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
-    for (DWORD i = 0; i < cSubKeys; i++) {
-      DWORD dwcName = MAX_PATH;
-      if (::RegEnumKeyEx(m_Key, i, name, &dwcName, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+  DWORD subkey_count = 0;
+
+  if (::RegQueryInfoKey(key_, nullptr, nullptr, nullptr, &subkey_count,
+                        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+                        nullptr) == ERROR_SUCCESS) {
+    for (DWORD i = 0; i < subkey_count; i++) {
+      DWORD name_length = MAX_PATH;
+      if (::RegEnumKeyEx(key_, i, name, &name_length, nullptr, nullptr, nullptr,
+                         nullptr) == ERROR_SUCCESS) {
         output.push_back(name);
       }
     }
   }
 }
 
-LSTATUS Registry::OpenKey(HKEY key, const wstring& sub_key, DWORD ulOptions, REGSAM samDesired) {
+LSTATUS Registry::OpenKey(HKEY key, const std::wstring& subkey, DWORD options,
+                          REGSAM sam_desired) {
   CloseKey();
-  return ::RegOpenKeyEx(key, sub_key.c_str(), ulOptions, samDesired, &m_Key);
+
+  return ::RegOpenKeyEx(key, subkey.c_str(), options, sam_desired, &key_);
 }
 
-LSTATUS Registry::QueryValue(const wstring& value_name, LPDWORD lpType, LPBYTE lpData, LPDWORD lpcbData) {
-  return ::RegQueryValueEx(m_Key, value_name.c_str(), NULL, lpType, lpData, lpcbData);
+LSTATUS Registry::QueryValue(const std::wstring& value_name, LPDWORD type,
+                             LPBYTE data, LPDWORD data_size) {
+  return ::RegQueryValueEx(key_, value_name.c_str(), nullptr, type,
+                           data, data_size);
 }
 
-LSTATUS Registry::SetValue(const wstring& value_name, DWORD dwType, CONST BYTE* lpData, DWORD cbData) {
-  return ::RegSetValueEx(m_Key, value_name.c_str(), 0, dwType, lpData, cbData);
+LSTATUS Registry::SetValue(const std::wstring& value_name, DWORD type,
+                           CONST BYTE* data, DWORD data_size) {
+  return ::RegSetValueEx(key_, value_name.c_str(), 0, type,
+                         data, data_size);
 }
 
-wstring Registry::QueryValue(const wstring& value_name) {
-  DWORD dwType = 0;
-  WCHAR szBuffer[MAX_PATH];
-  DWORD dwBufferSize = sizeof(szBuffer);
-  if (QueryValue(value_name.c_str(), &dwType, (LPBYTE)&szBuffer, &dwBufferSize) == ERROR_SUCCESS) {
-    if (dwType == REG_SZ) return szBuffer;
-  }
-  return L"";
+std::wstring Registry::QueryValue(const std::wstring& value_name) {
+  DWORD type = 0;
+  WCHAR buffer[MAX_PATH];
+  DWORD buffer_size = sizeof(buffer);
+
+  if (QueryValue(value_name.c_str(), &type, reinterpret_cast<LPBYTE>(&buffer),
+                 &buffer_size) == ERROR_SUCCESS)
+    if (type == REG_SZ)
+      return buffer;
+
+  return std::wstring();
 }
 
-void Registry::SetValue(const wstring& value_name, const wstring& value) {
-  SetValue(value_name.c_str(), REG_SZ, (LPBYTE)value.c_str(), value.length() * sizeof(WCHAR));
+void Registry::SetValue(const std::wstring& value_name,
+                        const std::wstring& value) {
+  SetValue(value_name.c_str(), REG_SZ, (LPBYTE)value.c_str(),
+           value.length() * sizeof(WCHAR));
 }
 
 }  // namespace win
