@@ -16,16 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ANIME_H
-#define ANIME_H
+#ifndef TAIGA_LIBRARY_ANIME_H
+#define TAIGA_LIBRARY_ANIME_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
 
 #include "base/time.h"
 
 namespace anime {
-
-// =============================================================================
 
 // ID_NOTINLIST
 //   Used in Episode data to denote the item is not in user's list.
@@ -63,11 +62,11 @@ enum MyStatus {
   kCompleted,
   kOnHold,
   kDropped,
-  kUnknownMyStatus,
+  kUnknownMyStatus,  // TODO: Remove after translation is available
   kPlanToWatch
 };
 
-// Invalid for anime items that are not in user's list.
+// Invalid for anime items that are not in user's list
 class MyInformation {
  public:
   MyInformation();
@@ -80,8 +79,8 @@ class MyInformation {
   int rewatching_ep;
   Date date_start;
   Date date_finish;
-  wstring last_updated;
-  wstring tags;
+  std::wstring last_updated;
+  std::wstring tags;
 };
 
 // For all kinds of other temporary information
@@ -91,14 +90,14 @@ class LocalInformation {
   virtual ~LocalInformation() {}
 
   int last_aired_episode;
-  vector<bool> available_episodes;
-  wstring new_episode_path;
-  wstring folder;
-  vector<wstring> synonyms;
+  std::vector<bool> available_episodes;
+  std::wstring new_episode_path;
+  std::wstring folder;
+  std::vector<std::wstring> synonyms;
   bool playing;
   bool use_alternative;
 };
 
-} // namespace anime
+}  // namespace anime
 
-#endif // ANIME_H
+#endif  // TAIGA_LIBRARY_ANIME_H

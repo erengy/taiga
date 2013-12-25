@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include "base/foreach.h"
 #include "base/string.h"
 #include "base/time.h"

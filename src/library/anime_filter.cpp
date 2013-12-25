@@ -43,10 +43,10 @@ bool Filters::CheckItem(Item& item) {
       return false;
 
   // Filter text
-  vector<wstring> words;
+  std::vector<std::wstring> words;
   Split(text, L" ", words);
   RemoveEmptyStrings(words);
-  wstring genres = Join(item.GetGenres(), L", ");
+  std::wstring genres = Join(item.GetGenres(), L", ");
   auto synonyms = item.GetSynonyms();
   for (auto it = words.begin(); it != words.end(); ++it) {
     if (InStr(item.GetTitle(), *it, 0, true) == -1 && 
