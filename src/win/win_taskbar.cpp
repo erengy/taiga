@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,26 +22,23 @@
 class win::Taskbar Taskbar;
 class win::TaskbarList TaskbarList;
 
-static const DWORD WM_TASKBARCALLBACK = WM_APP + 0x15;
-static const DWORD WM_TASKBARCREATED = ::RegisterWindowMessage(L"TaskbarCreated");
-static const DWORD WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(L"TaskbarButtonCreated");
+const DWORD WM_TASKBARCALLBACK = WM_APP + 0x15;
+const DWORD WM_TASKBARCREATED = ::RegisterWindowMessage(L"TaskbarCreated");
+const DWORD WM_TASKBARBUTTONCREATED = ::RegisterWindowMessage(L"TaskbarButtonCreated");
 
 namespace win {
 
-#define APP_SYSTRAY_ID 74164 // TAIGA ^_^
+const UINT kAppSysTrayId = 74164;  // TAIGA ^_^
 
-// =============================================================================
-
-Taskbar::Taskbar() :
-  m_hApp(NULL)
-{
+Taskbar::Taskbar()
+    : hwnd_(nullptr) {
   Version version = GetVersion();
   if (version >= kVersionVista) {
-    m_NID.cbSize = sizeof(NOTIFYICONDATA);
+    data_.cbSize = sizeof(NOTIFYICONDATA);
   } else if (version >= kVersionXp) {
-    m_NID.cbSize = NOTIFYICONDATA_V3_SIZE;
+    data_.cbSize = NOTIFYICONDATA_V3_SIZE;
   } else {
-    m_NID.cbSize = NOTIFYICONDATA_V2_SIZE;
+    data_.cbSize = NOTIFYICONDATA_V2_SIZE;
   }
 }
 
@@ -49,58 +46,64 @@ Taskbar::~Taskbar() {
   Destroy();
 }
 
-BOOL Taskbar::Create(HWND hwnd, HICON hIcon, LPCWSTR lpTip) {
+BOOL Taskbar::Create(HWND hwnd, HICON icon, LPCWSTR tip) {
   Destroy();
-  m_hApp = hwnd;
 
-  m_NID.hIcon = hIcon;
-  m_NID.hWnd = hwnd;
-  m_NID.szTip[0] = (WCHAR)'\0';
-  m_NID.uCallbackMessage = WM_TASKBARCALLBACK;
-  m_NID.uID = APP_SYSTRAY_ID;
-  m_NID.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+  hwnd_ = hwnd;
 
-  if (hIcon == NULL) {
-    m_NID.hIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(101), 
-      IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
-  }
-  if (lpTip) {
-    wcscpy_s(m_NID.szTip, lpTip);
-  }
+  data_.hIcon = icon;
+  data_.hWnd = hwnd;
+  data_.szTip[0] = (WCHAR)'\0';
+  data_.uCallbackMessage = WM_TASKBARCALLBACK;
+  data_.uID = kAppSysTrayId;
+  data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 
-  return ::Shell_NotifyIcon(NIM_ADD, &m_NID);
+  if (!icon)
+    data_.hIcon = reinterpret_cast<HICON>(LoadImage(
+        GetModuleHandle(nullptr), MAKEINTRESOURCE(101), IMAGE_ICON,
+        GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON),
+        LR_DEFAULTCOLOR));
+
+  if (tip)
+    wcscpy_s(data_.szTip, tip);
+
+  return ::Shell_NotifyIcon(NIM_ADD, &data_);
 }
 
 BOOL Taskbar::Destroy() {
-  if (!m_hApp) return FALSE;
-  return ::Shell_NotifyIcon(NIM_DELETE, &m_NID);
+  if (!hwnd_)
+    return FALSE;
+
+  return ::Shell_NotifyIcon(NIM_DELETE, &data_);
 }
 
-BOOL Taskbar::Modify(LPCWSTR lpTip) {
-  if (!m_hApp) return FALSE;
+BOOL Taskbar::Modify(LPCWSTR tip) {
+  if (!hwnd_)
+    return FALSE;
 
-  m_NID.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-  wcsncpy_s(m_NID.szTip, 128, lpTip, _TRUNCATE);
+  data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+  wcsncpy_s(data_.szTip, 128, tip, _TRUNCATE);
 
-  return ::Shell_NotifyIcon(NIM_MODIFY, &m_NID);
+  return ::Shell_NotifyIcon(NIM_MODIFY, &data_);
 }
 
 BOOL Taskbar::Tip(LPCWSTR lpText, LPCWSTR lpTitle, int iIconIndex) {
-  if (!m_hApp) return FALSE;
+  if (!hwnd_)
+    return FALSE;
 
-  m_NID.uFlags = NIF_INFO;
-  m_NID.dwInfoFlags = iIconIndex;
-  wcsncpy_s(m_NID.szInfo, 256, lpText, _TRUNCATE);
-  wcsncpy_s(m_NID.szInfoTitle, 64, lpTitle, _TRUNCATE);
+  data_.uFlags = NIF_INFO;
+  data_.dwInfoFlags = iIconIndex;
+  wcsncpy_s(data_.szInfo, 256, lpText, _TRUNCATE);
+  wcsncpy_s(data_.szInfoTitle, 64, lpTitle, _TRUNCATE);
 
-  return ::Shell_NotifyIcon(NIM_MODIFY, &m_NID);
+  return ::Shell_NotifyIcon(NIM_MODIFY, &data_);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-TaskbarList::TaskbarList() : 
-  m_hWnd(NULL), m_pTaskbarList(NULL)
-{
+TaskbarList::TaskbarList()
+    : hwnd_(nullptr),
+    taskbar_list_(nullptr) {
 }
 
 TaskbarList::~TaskbarList() {
@@ -109,29 +112,29 @@ TaskbarList::~TaskbarList() {
 
 void TaskbarList::Initialize(HWND hwnd) {
   Release();
-  m_hWnd = hwnd;
-  ::CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, 
-    __uuidof(ITaskbarList3), (void**)&m_pTaskbarList);
+
+  hwnd_ = hwnd;
+
+  ::CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER,
+                     __uuidof(ITaskbarList3), (void**)&taskbar_list_);
 }
 
 void TaskbarList::Release() {
-  if (m_pTaskbarList) {
-    m_pTaskbarList->Release();
-    m_pTaskbarList = NULL;
-    m_hWnd = NULL;
+  if (taskbar_list_) {
+    taskbar_list_->Release();
+    taskbar_list_ = nullptr;
+    hwnd_ = nullptr;
   }
 }
 
 void TaskbarList::SetProgressState(TBPFLAG flag) {
-  if (m_pTaskbarList) {
-    m_pTaskbarList->SetProgressState(m_hWnd, flag);
-  }
+  if (taskbar_list_)
+    taskbar_list_->SetProgressState(hwnd_, flag);
 }
 
-void TaskbarList::SetProgressValue(ULONGLONG ullValue, ULONGLONG ullTotal) {
-  if (m_pTaskbarList) {
-    m_pTaskbarList->SetProgressValue(m_hWnd, ullValue, ullTotal);
-  }
+void TaskbarList::SetProgressValue(ULONGLONG value, ULONGLONG total) {
+  if (taskbar_list_)
+    taskbar_list_->SetProgressValue(hwnd_, value, total);
 }
 
 }  // namespace win

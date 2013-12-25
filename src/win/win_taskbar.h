@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,50 +16,48 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_TASKBAR_H
-#define WIN_TASKBAR_H
+#ifndef TAIGA_WIN_TASKBAR_H
+#define TAIGA_WIN_TASKBAR_H
 
 #include <shobjidl.h>
 
 namespace win {
 
-// =============================================================================
-
-/* Taskbar */
-
 class Taskbar {
 public:
   Taskbar();
-  virtual ~Taskbar();
+  ~Taskbar();
 
-  BOOL Create(HWND hwnd, HICON hIcon, LPCWSTR lpTooltip);
+  BOOL Create(HWND hwnd, HICON icon, LPCWSTR tooltip);
   BOOL Destroy();
-  BOOL Modify(LPCWSTR lpTip);
-  BOOL Tip(LPCWSTR lpText, LPCWSTR lpTitle, int iIconIndex);
+  BOOL Modify(LPCWSTR tip);
+  BOOL Tip(LPCWSTR text, LPCWSTR title, int icon_index);
 
 private:
-  HWND m_hApp;
-  NOTIFYICONDATA m_NID;
+  HWND hwnd_;
+  NOTIFYICONDATA data_;
 };
 
-/* Taskbar list */
+////////////////////////////////////////////////////////////////////////////////
 
 class TaskbarList {
 public:
   TaskbarList();
-  virtual ~TaskbarList();
+  ~TaskbarList();
 
   void Initialize(HWND hwnd);
   void Release();
   void SetProgressState(TBPFLAG flag);
-  void SetProgressValue(ULONGLONG ullValue, ULONGLONG ullTotal);
+  void SetProgressValue(ULONGLONG value, ULONGLONG total);
 
 private:
-  HWND m_hWnd;
-  ITaskbarList3* m_pTaskbarList;
+  HWND hwnd_;
+  ITaskbarList3* taskbar_list_;
 };
 
 }  // namespace win
+
+////////////////////////////////////////////////////////////////////////////////
 
 extern class win::Taskbar Taskbar;
 extern class win::TaskbarList TaskbarList;
@@ -68,4 +66,4 @@ extern const DWORD WM_TASKBARCALLBACK;
 extern const DWORD WM_TASKBARCREATED;
 extern const DWORD WM_TASKBARBUTTONCREATED;
 
-#endif // WIN_TASKBAR_H
+#endif  // TAIGA_WIN_TASKBAR_H
