@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,37 +16,37 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_THREAD_H
-#define WIN_THREAD_H
+#ifndef TAIGA_WIN_THREAD_H
+#define TAIGA_WIN_THREAD_H
 
 #include "win_main.h"
 
 namespace win {
-
-// =============================================================================
 
 class Thread {
 public:
   Thread();
   virtual ~Thread();
 
-  virtual DWORD ThreadProc() { return 0; }
+  virtual DWORD ThreadProc();
 
   bool CloseThreadHandle();
-  bool CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, 
-    SIZE_T dwStackSize, DWORD dwCreationFlags);
-  
-  HANDLE GetThreadHandle() const { return m_hThread; }
-  int GetThreadId() const { return m_dwThreadId; }
+  bool CreateThread(
+      LPSECURITY_ATTRIBUTES thread_attributes,
+      SIZE_T stack_size,
+      DWORD creation_flags);
+
+  HANDLE GetThreadHandle() const;
+  int GetThreadId() const;
 
 private:
-  static DWORD WINAPI ThreadProcStatic(LPVOID pCThread);
+  static DWORD WINAPI ThreadProcStatic(LPVOID thread);
 
-  HANDLE m_hThread;
-  DWORD m_dwThreadId;
+  HANDLE thread_;
+  DWORD thread_id_;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 class CriticalSection {
 public:
@@ -59,40 +59,47 @@ public:
   void Wait();
 
 private:
-  CRITICAL_SECTION m_CriticalSection;
+  CRITICAL_SECTION critical_section_;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 class Event {
 public:
   Event();
   virtual ~Event();
 
-  HANDLE Create(LPSECURITY_ATTRIBUTES lpEventAttributes, 
-    BOOL bManualReset, BOOL bInitialState, LPCTSTR lpName);
+  HANDLE Create(
+      LPSECURITY_ATTRIBUTES event_attributes,
+      BOOL manual_reset,
+      BOOL initial_state,
+      LPCTSTR name);
 
 private:
-  HANDLE m_hEvent;
+  HANDLE event_;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 class Mutex {
 public:
   Mutex();
   virtual ~Mutex();
 
-  HANDLE Create(LPSECURITY_ATTRIBUTES lpMutexAttributes, 
-    BOOL bInitialOwner, LPCTSTR lpName);
-  HANDLE Open(DWORD dwDesiredAccess, 
-    BOOL bInheritHandle, LPCTSTR lpName);
+  HANDLE Create(
+      LPSECURITY_ATTRIBUTES mutex_attributes, 
+      BOOL initial_owner,
+      LPCTSTR name);
+  HANDLE Open(
+      DWORD desired_access, 
+      BOOL inherit_handle,
+      LPCTSTR name);
   bool Release();
 
 private:
-  HANDLE m_hMutex;
+  HANDLE mutex_;
 };
 
 }  // namespace win
 
-#endif // WIN_THREAD_H
+#endif  // TAIGA_WIN_THREAD_H

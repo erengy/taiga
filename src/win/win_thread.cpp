@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,11 @@
 
 namespace win {
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-Thread::Thread() : 
-  m_dwThreadId(0), m_hThread(NULL)
-{
+Thread::Thread()
+    : thread_(nullptr),
+      thread_id_(0) {
 }
 
 Thread::~Thread() {
@@ -34,94 +34,118 @@ Thread::~Thread() {
 
 bool Thread::CloseThreadHandle() {
   BOOL value = TRUE;
-  if (m_hThread) {
-    value = ::CloseHandle(m_hThread);
-    m_hThread = NULL;
+
+  if (thread_) {
+    value = ::CloseHandle(thread_);
+    thread_ = nullptr;
   }
+
   return value != FALSE;
 }
 
-bool Thread::CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize, DWORD dwCreationFlags) {
-  m_hThread = ::CreateThread(lpThreadAttributes, dwStackSize, ThreadProcStatic, this, dwCreationFlags, &m_dwThreadId);
-  return m_hThread != NULL;
+bool Thread::CreateThread(LPSECURITY_ATTRIBUTES thread_attributes,
+                          SIZE_T stack_size,
+                          DWORD creation_flags) {
+  thread_ = ::CreateThread(thread_attributes, stack_size, ThreadProcStatic,
+                           this, creation_flags, &thread_id_);
+
+  return thread_ != nullptr;
+}
+
+HANDLE Thread::GetThreadHandle() const {
+  return thread_;
+}
+
+int Thread::GetThreadId() const {
+  return thread_id_;
+}
+
+DWORD Thread::ThreadProc() {
+  return 0;
 }
 
 DWORD WINAPI Thread::ThreadProcStatic(LPVOID lpParam) {
-  Thread* pThread = reinterpret_cast<Thread*>(lpParam);
-  return pThread->ThreadProc();
+  Thread* thread = reinterpret_cast<Thread*>(lpParam);
+  return thread->ThreadProc();
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 CriticalSection::CriticalSection() {
-  ::InitializeCriticalSectionAndSpinCount(&m_CriticalSection, 0);
+  ::InitializeCriticalSectionAndSpinCount(&critical_section_, 0);
 }
 
 CriticalSection::~CriticalSection() {
-  ::DeleteCriticalSection(&m_CriticalSection);
+  ::DeleteCriticalSection(&critical_section_);
 }
 
 void CriticalSection::Enter() {
-  ::EnterCriticalSection(&m_CriticalSection);
+  ::EnterCriticalSection(&critical_section_);
 }
 
 void CriticalSection::Leave() {
-  ::LeaveCriticalSection(&m_CriticalSection);
+  ::LeaveCriticalSection(&critical_section_);
 }
 
 bool CriticalSection::TryEnter() {
-  return ::TryEnterCriticalSection(&m_CriticalSection) != FALSE;
+  return ::TryEnterCriticalSection(&critical_section_) != FALSE;
 }
 
 void CriticalSection::Wait() {
-  while (!TryEnter()) {
+  while (!TryEnter())
     ::Sleep(1);
-  }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-Event::Event() :
-  m_hEvent(NULL)
-{
+Event::Event()
+    : event_(nullptr) {
 }
 
 Event::~Event() {
-  if (m_hEvent) ::CloseHandle(m_hEvent);
+  if (event_)
+    ::CloseHandle(event_);
 }
 
-HANDLE Event::Create(LPSECURITY_ATTRIBUTES lpEventAttributes, BOOL bManualReset, BOOL bInitialState, LPCTSTR lpName) {
-  m_hEvent = ::CreateEvent(lpEventAttributes, bManualReset, bInitialState, lpName);
-  return m_hEvent;
+HANDLE Event::Create(LPSECURITY_ATTRIBUTES event_attributes, BOOL manual_reset,
+                     BOOL initial_state, LPCTSTR name) {
+  event_ = ::CreateEvent(event_attributes, manual_reset, initial_state, name);
+
+  return event_;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-Mutex::Mutex() :
-  m_hMutex(NULL)
-{
+Mutex::Mutex()
+    : mutex_(nullptr) {
 }
 
 Mutex::~Mutex() {
-  if (m_hMutex) ::CloseHandle(m_hMutex);
+  if (mutex_)
+    ::CloseHandle(mutex_);
 }
 
-HANDLE Mutex::Create(LPSECURITY_ATTRIBUTES lpMutexAttributes, BOOL bInitialOwner, LPCTSTR lpName) {
-  m_hMutex = ::CreateMutex(lpMutexAttributes, bInitialOwner, lpName);
-  return m_hMutex;
+HANDLE Mutex::Create(LPSECURITY_ATTRIBUTES mutex_attributes,
+                     BOOL initial_owner, LPCTSTR name) {
+  mutex_ = ::CreateMutex(mutex_attributes, initial_owner, name);
+
+  return mutex_;
 }
 
-HANDLE Mutex::Open(DWORD dwDesiredAccess, BOOL bInheritHandle, LPCTSTR lpName) {
-  m_hMutex = ::OpenMutex(dwDesiredAccess, bInheritHandle, lpName);
-  return m_hMutex;
+HANDLE Mutex::Open(DWORD desired_access, BOOL inherit_handle, LPCTSTR name) {
+  mutex_ = ::OpenMutex(desired_access, inherit_handle, name);
+
+  return mutex_;
 }
 
 bool Mutex::Release() {
   BOOL value = TRUE;
-  if (m_hMutex) {
-    value = ::ReleaseMutex(m_hMutex);
-    m_hMutex = NULL;
+
+  if (mutex_) {
+    value = ::ReleaseMutex(mutex_);
+    mutex_ = nullptr;
   }
+
   return value != FALSE;
 }
 
