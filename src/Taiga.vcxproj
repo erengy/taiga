@@ -227,6 +227,7 @@
     <ClInclude Include="base\foreach.h" />
     <ClInclude Include="base\gfx.h" />
     <ClInclude Include="base\gzip.h" />
+    <ClInclude Include="base\json.h" />
     <ClInclude Include="base\logger.h" />
     <ClInclude Include="base\map.h" />
     <ClInclude Include="base\optional.h" />

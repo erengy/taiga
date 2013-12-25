@@ -780,6 +780,9 @@
     <ClInclude Include="third_party\jsoncpp\json_tool.h">
       <Filter>include\jsoncpp</Filter>
     </ClInclude>
+    <ClInclude Include="base\json.h">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="taiga\version.rc">

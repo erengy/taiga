@@ -20,6 +20,10 @@
 #include "herro_types.h"
 
 #include "base/encoding.h"
+#include "base/json.h"
+#include "base/string.h"
+#include "library/anime_db.h"
+#include "library/anime_item.h"
 
 namespace sync {
 namespace herro {
@@ -125,11 +129,16 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 
   http_request.path = L"/list/anime/" + request.data[L"action"];
 
-  http_request.body = L"{\n";
-  http_request.body += L"\"_id\": \"" + request.data[canonical_name_ + L"-id"] + L"\"\n";
-  // TODO: Optional parameters: status, progress, score
-  // TODO: Find and use a proper JSON library
-  http_request.body += L"}";
+  Json::Value root;
+  root["_id"] = WstrToStr(request.data[canonical_name_ + L"-id"]);
+  if (request.data.count(L"status"))
+    root["status"] = WstrToStr(request.data[L"status"]);  // TODO: translate
+  if (request.data.count(L"progress"))
+    root["progress"] = WstrToStr(request.data[L"progress"]);
+  if (request.data.count(L"score"))
+    root["score"] = WstrToStr(request.data[L"score"]);
+  Json::StyledWriter writer;
+  http_request.body = StrToWstr(writer.write(root));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,15 +149,102 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
-  // TODO: Parse JSON data and update library
+  Json::Value root;
+  Json::Reader reader;
+  bool parsed = reader.parse(WstrToStr(http_response.body), root);
+
+  if (!parsed) {
+    response.data[L"error"] = L"Could not parse the list";
+    return;
+  }
+
+  // Available data:
+  // - _id
+  // - series_title
+  // - list_score
+  // - list_status
+  // - list_progress
+  // - series_total
+  // - series_type
+  // - series_status
+  for (int i = 0; i < root.size(); i++) {
+    auto& value = root[i];
+    ::anime::Item anime_item;
+//  anime_item.SetId(value["_id"].asString());  // TODO
+    anime_item.last_modified = time(nullptr);  // current time
+
+    anime_item.SetTitle(StrToWstr(value["series_title"].asString()));
+    anime_item.SetEpisodeCount(value["series_total"].asInt());
+    anime_item.SetType(value["series_type"].asInt());  // TODO: translate
+    anime_item.SetAiringStatus(value["series_status"].asInt());  // TODO: translate
+
+    anime_item.AddtoUserList();
+    anime_item.SetMyScore(value["list_score"].asInt());
+    anime_item.SetMyStatus(value["list_status"].asInt());  // TODO: translate
+    anime_item.SetMyLastWatchedEpisode(value["list_progress"].asInt());
+
+//  AnimeDatabase.UpdateItem(anime_item);
+  }
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
-  // TODO: Parse JSON data and update database
+  Json::Value root;
+  Json::Reader reader;
+  bool parsed = reader.parse(WstrToStr(http_response.body), root);
+
+  if (!parsed) {
+    response.data[L"error"] = L"Could not parse the anime object";
+    return;
+  }
+
+  // Available data:
+  // - title
+  // - slug
+  // - image_url
+  // - metadata
+  //   - title_aka
+  //   - title_english
+  //   - series_status
+  //   - series_type
+  //   - series_start
+  //   - series_end
+  //   - plot
+  //   - genres
+  //   - episodes_total
+  //   - episodes_length
+  ::anime::Item anime_item;
+  anime_item.SetTitle(StrToWstr(root["title"].asString()));
+  // ...
+  // TODO: Update database
+//AnimeDatabase.UpdateItem(anime_item);
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
-  // TODO: Parse JSON data and update database
+  Json::Value root;
+  Json::Reader reader;
+  bool parsed = reader.parse(WstrToStr(http_response.body), root);
+
+  if (!parsed) {
+    response.data[L"error"] = L"Could not parse search results";
+    return;
+  }
+
+  // Available data:
+  // - _id
+  // - title
+  // - slug
+  // - series_type
+  // - image_url
+  // - metadata
+  //   - title_aka
+  //   - title_english
+  //   - series_status
+  //   - series_start
+  //   - series_end
+  //   - plot
+  for (int i = 0; i < root.size(); i++) {
+    // TODO
+  }
 }
 
 void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
@@ -185,13 +281,22 @@ bool Service::RequestSucceeded(Response& response,
       return true;
 
     // Error
-    case 500:
-      // TODO: Read "response" from JSON data for the error description
-      response.data[L"error"] = name() + L" returned an error";
+    case 500: {
+      Json::Value root;
+      Json::Reader reader;
+      bool parsed = reader.parse(WstrToStr(http_response.body), root);
+      if (parsed) {
+        response.data[L"error"] = StrToWstr(root["response"].asString());
+      } else {
+        response.data[L"error"] = L"Unknown error";
+      }
       return false;
+    }
 
     default:
-      response.data[L"error"] = name() + L" returned an unknown response";
+      response.data[L"error"] =
+          name() + L" returned an unknown response (" +
+          ToWstr(static_cast<int>(http_response.code)) + L")";
       return false;
   }
 }
