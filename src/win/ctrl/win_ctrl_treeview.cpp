@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,49 +20,52 @@
 
 namespace win {
 
-// =============================================================================
+TreeView::TreeView(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 void TreeView::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_CLIENTEDGE;
   cs.lpszClass = WC_TREEVIEW;
-  cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT;
+  cs.style = WS_CHILD | WS_VISIBLE | WS_TABSTOP |
+             TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT;
 }
 
-void TreeView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  TreeView_SetExtendedStyle(hwnd, TVS_EX_DOUBLEBUFFER, NULL);
-  Window::OnCreate(hwnd, lpCreateStruct);
+void TreeView::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  TreeView_SetExtendedStyle(hwnd, TVS_EX_DOUBLEBUFFER, 0);
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL TreeView::DeleteAllItems() {
   return TreeView_DeleteAllItems(window_);
 }
 
-BOOL TreeView::DeleteItem(HTREEITEM hitem) {
-  return TreeView_DeleteItem(window_, hitem);
+BOOL TreeView::DeleteItem(HTREEITEM item) {
+  return TreeView_DeleteItem(window_, item);
 }
 
-BOOL TreeView::Expand(HTREEITEM hItem, bool bExpand) {
-  return TreeView_Expand(window_, hItem, bExpand ? TVE_EXPAND : TVE_COLLAPSE);
+BOOL TreeView::Expand(HTREEITEM item, bool expand) {
+  return TreeView_Expand(window_, item, expand ? TVE_EXPAND : TVE_COLLAPSE);
 }
 
-UINT TreeView::GetCheckState(HTREEITEM hItem) {
-  return TreeView_GetCheckState(window_, hItem);
+UINT TreeView::GetCheckState(HTREEITEM item) {
+  return TreeView_GetCheckState(window_, item);
 }
 
 UINT TreeView::GetCount() {
   return TreeView_GetCount(window_);
 }
 
-BOOL TreeView::GetItem(LPTVITEM pItem) {
-  return TreeView_GetItem(window_, pItem);
+BOOL TreeView::GetItem(LPTVITEM item) {
+  return TreeView_GetItem(window_, item);
 }
 
-LPARAM TreeView::GetItemData(HTREEITEM hItem) {
+LPARAM TreeView::GetItemData(HTREEITEM item) {
   TVITEM tvi = {0};
   tvi.mask = TVIF_PARAM;
-  tvi.hItem = hItem;
+  tvi.hItem = item;
   TreeView_GetItem(window_, &tvi);
 
   return tvi.lParam;
@@ -72,62 +75,64 @@ HTREEITEM TreeView::GetSelection() {
   return TreeView_GetSelection(window_);
 }
 
-HTREEITEM TreeView::HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos) {
-  if (bGetCursorPos) {
-    GetCursorPos(&lpht->pt);
-    ScreenToClient(window_, &lpht->pt);
+HTREEITEM TreeView::HitTest(LPTVHITTESTINFO hti, bool get_cursor_pos) {
+  if (get_cursor_pos) {
+    GetCursorPos(&hti->pt);
+    ScreenToClient(window_, &hti->pt);
   }
-  return TreeView_HitTest(window_, lpht);
+
+  return TreeView_HitTest(window_, hti);
 }
 
-HTREEITEM TreeView::InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, HTREEITEM htiParent, HTREEITEM hInsertAfter) {
-  TVITEM tvi  = {0};
-  tvi.mask    = TVIF_TEXT | TVIF_PARAM;
-  tvi.pszText = (LPWSTR)pszText;
-  tvi.lParam  = lParam;
+HTREEITEM TreeView::InsertItem(LPCWSTR text, int image, LPARAM param,
+                               HTREEITEM parent, HTREEITEM insert_after) {
+  TVITEM tvi = {0};
+  tvi.mask = TVIF_TEXT | TVIF_PARAM;
+  tvi.pszText = const_cast<LPWSTR>(text);
+  tvi.lParam = param;
 
-  if (iImage > -1) {
+  if (image > -1) {
     tvi.mask |= TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-    tvi.iImage = iImage;
-    tvi.iSelectedImage = iImage;
+    tvi.iImage = image;
+    tvi.iSelectedImage = image;
   }
 
   TVINSERTSTRUCT tvis = {0};
-  tvis.item           = tvi;
-  tvis.hInsertAfter   = hInsertAfter;
-  tvis.hParent        = htiParent;
+  tvis.item = tvi;
+  tvis.hInsertAfter = insert_after;
+  tvis.hParent = parent;
 
   return TreeView_InsertItem(window_, &tvis);
 }
 
-BOOL TreeView::SelectItem(HTREEITEM hItem) {
-  return TreeView_Select(window_, hItem, TVGN_CARET);
+BOOL TreeView::SelectItem(HTREEITEM item) {
+  return TreeView_Select(window_, item, TVGN_CARET);
 }
 
-UINT TreeView::SetCheckState(HTREEITEM hItem, BOOL fCheck) {
-  TVITEM tvi    = {0};
-  tvi.mask      = TVIF_HANDLE | TVIF_STATE;
-  tvi.hItem     = hItem;
+UINT TreeView::SetCheckState(HTREEITEM item, BOOL check) {
+  TVITEM tvi = {0};
+  tvi.mask = TVIF_HANDLE | TVIF_STATE;
+  tvi.hItem = item;
   tvi.stateMask = TVIS_STATEIMAGEMASK;
-  tvi.state     = INDEXTOSTATEIMAGEMASK(fCheck + 1);
+  tvi.state = INDEXTOSTATEIMAGEMASK(check + 1);
 
   return TreeView_SetItem(window_, &tvi);
 }
 
-HIMAGELIST TreeView::SetImageList(HIMAGELIST himl, INT iImage) {
-  return TreeView_SetImageList(window_, himl, iImage);
+HIMAGELIST TreeView::SetImageList(HIMAGELIST image_list, INT image) {
+  return TreeView_SetImageList(window_, image_list, image);
 }
 
-BOOL TreeView::SetItem(HTREEITEM hItem, LPCWSTR pszText) {
+BOOL TreeView::SetItem(HTREEITEM item, LPCWSTR text) {
   TVITEM tvi = {0};
-  tvi.mask   = TVIF_HANDLE;
-  tvi.hItem  = hItem;
+  tvi.mask = TVIF_HANDLE;
+  tvi.hItem = item;
 
   if (!TreeView_GetItem(window_, &tvi))
     return FALSE;
 
   tvi.mask |= TVIF_TEXT;
-  tvi.pszText = (LPWSTR)pszText;
+  tvi.pszText = const_cast<LPWSTR>(text);
   return TreeView_SetItem(window_, &tvi);
 }
 

@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,63 +20,72 @@
 
 namespace win {
 
-// =============================================================================
+StatusBar::StatusBar(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 void StatusBar::PreCreate(CREATESTRUCT &cs) {
-  cs.dwExStyle = NULL;
+  cs.dwExStyle = 0;
   cs.lpszClass = STATUSCLASSNAME;
-  cs.style     = WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS;
+  cs.style = WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP | SBARS_TOOLTIPS;
 }
 
-void StatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  m_iWidth.clear();
-  Window::OnCreate(hwnd, lpCreateStruct);
+void StatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  widths_.clear();
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-int StatusBar::InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPCWSTR lpText, LPCWSTR lpTooltip) {
-  if (m_iWidth.empty()) {
-    m_iWidth.push_back(iWidth);
+int StatusBar::InsertPart(int image, int style, int autosize, int width,
+                          LPCWSTR text, LPCWSTR tooltip) {
+  if (widths_.empty()) {
+    widths_.push_back(width);
   } else {
-    m_iWidth.push_back(m_iWidth.back() + iWidth);
+    widths_.push_back(widths_.back() + width);
+  }
+
+  int part_count = SendMessage(SB_GETPARTS, 0, 0);
+
+  SendMessage(SB_SETPARTS, part_count + 1,
+      reinterpret_cast<LPARAM>(&widths_[0]));
+  SendMessage(SB_SETTEXT, part_count - 1,
+      reinterpret_cast<LPARAM>(text));
+  SendMessage(SB_SETTIPTEXT, part_count - 1,
+      reinterpret_cast<LPARAM>(tooltip));
+
+  if (image > -1 && image_list_) {
+    HICON icon = ::ImageList_GetIcon(image_list_, image, 0);
+    SendMessage(SB_SETICON, part_count - 1, reinterpret_cast<LPARAM>(icon));
+  }
+
+  return part_count;
+}
+
+void StatusBar::SetImageList(HIMAGELIST image_list) {
+  image_list_ = image_list;
+}
+
+void StatusBar::SetPartText(int part, LPCWSTR text) {
+  SendMessage(SB_SETTEXT, part, reinterpret_cast<LPARAM>(text));
+}
+
+void StatusBar::SetPartTipText(int part, LPCWSTR tip_text) {
+  SendMessage(SB_SETTIPTEXT, part, reinterpret_cast<LPARAM>(tip_text));
+}
+
+void StatusBar::SetPartWidth(int part, int width) {
+  if (part > static_cast<int>(widths_.size()) - 1)
+    return;
+
+  if (part == 0) {
+    widths_.at(part) = width;
+  } else {
+    widths_.at(part) = widths_.at(part - 1) + width;
   }
   
-  int nParts = ::SendMessage(window_, SB_GETPARTS, 0, 0);
-
-  ::SendMessage(window_, SB_SETPARTS,   nParts + 1, reinterpret_cast<LPARAM>(&m_iWidth[0]));
-  ::SendMessage(window_, SB_SETTEXT,    nParts - 1, reinterpret_cast<LPARAM>(lpText));
-  ::SendMessage(window_, SB_SETTIPTEXT, nParts - 1, reinterpret_cast<LPARAM>(lpTooltip));
-
-  if (iImage > -1 && m_hImageList) {
-    HICON hIcon = ::ImageList_GetIcon(m_hImageList, iImage, 0);
-    ::SendMessage(window_, SB_SETICON, nParts - 1, reinterpret_cast<LPARAM>(hIcon));
-  }
-
-  return nParts;
-}
-
-void StatusBar::SetImageList(HIMAGELIST hImageList) {
-  m_hImageList = hImageList;
-}
-
-void StatusBar::SetPartText(int iPart, LPCWSTR lpText) {
-  ::SendMessage(window_, SB_SETTEXT, iPart, reinterpret_cast<LPARAM>(lpText));
-}
-
-void StatusBar::SetPartTipText(int iPart, LPCWSTR lpTipText) {
-  ::SendMessage(window_, SB_SETTIPTEXT, iPart, reinterpret_cast<LPARAM>(lpTipText));
-}
-
-void StatusBar::SetPartWidth(int iPart, int iWidth) {
-  if (iPart > static_cast<int>(m_iWidth.size()) - 1) return;
-  if (iPart == 0) {
-    m_iWidth.at(iPart) = iWidth;
-  } else {
-    m_iWidth.at(iPart) = m_iWidth.at(iPart - 1) + iWidth;
-  }
-  
-  ::SendMessage(window_, SB_SETPARTS, m_iWidth.size(), reinterpret_cast<LPARAM>(&m_iWidth[0]));
+  SendMessage(SB_SETPARTS, widths_.size(),
+              reinterpret_cast<LPARAM>(&widths_[0]));
 }
 
 }  // namespace win

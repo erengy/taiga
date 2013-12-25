@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,164 +23,158 @@
 #include <commctrl.h>
 #include <richedit.h>
 
-#include "../win_main.h"
-#include "../win_window.h"
+#include "win/win_main.h"
+#include "win/win_window.h"
 
 namespace win {
 
-// =============================================================================
-
-/* ComboBox */
+////////////////////////////////////////////////////////////////////////////////
+// ComboBox
 
 class ComboBox : public Window {
 public:
   ComboBox() {}
-  ComboBox(HWND hWnd) { SetWindowHandle(hWnd); }
+  ComboBox(HWND hwnd);
   virtual ~ComboBox() {}
 
-  int     AddItem(LPCWSTR lpsz, LPARAM data);
-  int     AddString(LPCWSTR lpsz);
+  int     AddItem(LPCWSTR text, LPARAM data);
+  int     AddString(LPCWSTR text);
   int     DeleteString(int index);
   int     GetCount();
   LRESULT GetItemData(int index);
   int     GetCurSel();
   void    ResetContent();
-  BOOL    SetCueBannerText(LPCWSTR lpcwText);
+  BOOL    SetCueBannerText(LPCWSTR text);
   int     SetCurSel(int index);
-  BOOL    SetEditSel(int ichStart, int ichEnd);
+  BOOL    SetEditSel(int start, int end);
   int     SetItemData(int index, LPARAM data);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 };
 
-// =============================================================================
-
-/* Edit */
+////////////////////////////////////////////////////////////////////////////////
+// Edit
 
 class Edit : public Window {
 public:
   Edit() {}
-  Edit(HWND hWnd) { SetWindowHandle(hWnd); }
+  Edit(HWND hwnd);
   virtual ~Edit() {}
 
-  void GetRect(LPRECT lprc);
-  void LimitText(int cchMax);
-  BOOL SetCueBannerText(LPCWSTR lpcwText, BOOL fDrawFocused = FALSE);
-  void SetMargins(int iLeft = -1, int iRight = -1);
-  void SetMultiLine(BOOL bEnabled);
+  void GetRect(LPRECT rect);
+  void LimitText(int limit);
+  BOOL SetCueBannerText(LPCWSTR text, BOOL draw_focused = FALSE);
+  void SetMargins(int left = -1, int right = -1);
+  void SetMultiLine(BOOL enabled);
   void SetPasswordChar(UINT ch);
-  void SetReadOnly(BOOL bReadOnly);
-  void SetRect(LPRECT lprc);
-  void SetSel(int ichStart, int ichEnd);
-  BOOL ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon);
+  void SetReadOnly(BOOL read_only);
+  void SetRect(LPRECT rect);
+  void SetSel(int start, int end);
+  BOOL ShowBalloonTip(LPCWSTR text, LPCWSTR title, INT icon);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 };
 
-// =============================================================================
-
-/* Image list */
+////////////////////////////////////////////////////////////////////////////////
+// Image list
 
 class ImageList {
 public:
-  ImageList() { m_hImageList = NULL; }
-  ~ImageList() { Destroy(); }
-  void operator = (const HIMAGELIST hImageList) {
-    SetHandle(hImageList);
-  }
-  
-  int        AddBitmap(HBITMAP hBitmap, COLORREF crMask);
-  BOOL       BeginDrag(int iTrack, int dxHotspot, int dyHotspot);
+  ImageList();
+  ~ImageList();
+
+  void operator=(const HIMAGELIST image_list);
+
+  int        AddBitmap(HBITMAP bitmap, COLORREF mask);
+  BOOL       BeginDrag(int track, int hotspot_x, int hotspot_y);
   BOOL       Create(int cx, int cy);
   VOID       Destroy();
-  BOOL       DragEnter(HWND hwndLock, int x, int y);
-  BOOL       DragLeave(HWND hwndLock);
+  BOOL       DragEnter(HWND hwnd_lock, int x, int y);
+  BOOL       DragLeave(HWND hwnd_lock);
   BOOL       DragMove(int x, int y);
-  BOOL       Draw(int nIndex, HDC hdcDest, int x, int y);
+  BOOL       Draw(int index, HDC hdc, int x, int y);
   VOID       EndDrag();
   HIMAGELIST GetHandle();
-  HICON      GetIcon(int nIndex);
+  HICON      GetIcon(int index);
   BOOL       Remove(int index);
-  VOID       SetHandle(HIMAGELIST hImageList);
+  VOID       SetHandle(HIMAGELIST image_list);
 
 private:
-  HIMAGELIST m_hImageList;
+  HIMAGELIST image_list_;
 };
 
-// =============================================================================
-
-/* List view */
+////////////////////////////////////////////////////////////////////////////////
+// List view
 
 class ListView : public Window {
 public:
   ListView();
-  ListView(HWND hWnd);
+  ListView(HWND hwnd);
   virtual ~ListView() {}
   
-  HIMAGELIST CreateDragImage(int iItem, LPPOINT lpptUpLeft);
+  HIMAGELIST CreateDragImage(int item, LPPOINT pt_up_left);
   BOOL       DeleteAllItems();
-  BOOL       DeleteItem(int iItem);
-  int        EnableGroupView(bool bValue);
-  BOOL       EnsureVisible(int i);
-  BOOL       GetCheckState(UINT iIndex);
+  BOOL       DeleteItem(int item);
+  int        EnableGroupView(bool enable);
+  BOOL       EnsureVisible(int item);
+  BOOL       GetCheckState(UINT index);
   HWND       GetHeader();
   int        GetItemCount();
   LPARAM     GetItemParam(int i);
-  void       GetItemText(int iItem, int iSubItem, LPWSTR pszText, int cchTextMax = MAX_PATH);
-  void       GetItemText(int iItem, int iSubItem, wstring& str, int cchTextMax = MAX_PATH);
-  INT        GetNextItem(int iStart, UINT flags);
-  INT        GetNextItemIndex(int iItem, int iGroup, LPARAM flags);
+  void       GetItemText(int item, int subitem, LPWSTR output, int max_length = MAX_PATH);
+  void       GetItemText(int item, int subitem, wstring& output, int max_length = MAX_PATH);
+  INT        GetNextItem(int start, UINT flags);
+  INT        GetNextItemIndex(int item, int group, LPARAM flags);
   UINT       GetSelectedCount();
   INT        GetSelectionMark();
   int        GetSortColumn();
   int        GetSortOrder();
   int        GetSortType();
-  BOOL       GetSubItemRect(int iItem, int iSubItem, LPRECT lpRect);
+  BOOL       GetSubItemRect(int item, int subitem, LPRECT rect);
   DWORD      GetView();
   int        HitTest(bool return_subitem = false);
   int        HitTestEx(LPLVHITTESTINFO lplvhi);
-  int        InsertColumn(int nIndex, int nWidth, int nWidthMin, int nAlign, LPCWSTR szText);
-  int        InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable = false, bool bCollapsed = false);
+  int        InsertColumn(int index, int width, int width_min, int align, LPCWSTR text);
+  int        InsertGroup(int index, LPCWSTR text, bool collapsable = false, bool collapsed = false);
   int        InsertItem(const LVITEM& lvi);
-  int        InsertItem(int nIndex, int nGroup, int nIcon, UINT cColumns, PUINT puColumns, LPCWSTR pszText, LPARAM lParam);
+  int        InsertItem(int index, int nGroup, int icon, UINT column_count, PUINT columns, LPCWSTR text, LPARAM lParam);
   BOOL       IsGroupViewEnabled();
-  BOOL       RedrawItems(int iFirst, int iLast, bool repaint);
+  BOOL       RedrawItems(int first, int last, bool repaint);
   void       RemoveAllGroups();
-  BOOL       SetBkImage(HBITMAP hbmp, ULONG ulFlags = LVBKIF_TYPE_WATERMARK, int xOffset = 100, int yOffset = 100);
-  void       SetCheckState(int iIndex, BOOL fCheck);
-  BOOL       SetColumnWidth(int iCol, int cx);
-  void       SetExtendedStyle(DWORD dwExStyle);
-  int        SetGroupText(int nIndex, LPCWSTR szText);
-  DWORD      SetHoverTime(DWORD dwHoverTime);
-  void       SetImageList(HIMAGELIST hImageList, int iImageList = LVSIL_SMALL);
-  BOOL       SetItem(int nIndex, int nSubItem, LPCWSTR szText);
-  BOOL       SetItemIcon(int nIndex, int nIcon);
-  void       SetSelectedItem(int iIndex);
-  BOOL       SetTileViewInfo(PLVTILEVIEWINFO plvtvinfo);
-  BOOL       SetTileViewInfo(int cLines, DWORD dwFlags, RECT* rcLabelMargin = NULL, SIZE* sizeTile = NULL);
-  int        SetView(DWORD iView);
-  void       Sort(int iColumn, int iOrder, int iType, PFNLVCOMPARE pfnCompare);
+  BOOL       SetBkImage(HBITMAP bitmap, ULONG flags = LVBKIF_TYPE_WATERMARK, int offset_x = 100, int offset_y = 100);
+  void       SetCheckState(int index, BOOL check);
+  BOOL       SetColumnWidth(int column, int cx);
+  void       SetExtendedStyle(DWORD ex_style);
+  int        SetGroupText(int index, LPCWSTR text);
+  DWORD      SetHoverTime(DWORD hover_time);
+  void       SetImageList(HIMAGELIST image_list, int type = LVSIL_SMALL);
+  BOOL       SetItem(int index, int subitem, LPCWSTR text);
+  BOOL       SetItemIcon(int index, int icon);
+  void       SetSelectedItem(int index);
+  BOOL       SetTileViewInfo(PLVTILEVIEWINFO tvi);
+  BOOL       SetTileViewInfo(int line_count, DWORD flags, RECT* rc_label_margin = nullptr, SIZE* size_tile = nullptr);
+  int        SetView(DWORD view);
+  void       Sort(int sort_column, int sort_order, int type, PFNLVCOMPARE compare);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  int m_iSortColumn, m_iSortOrder, m_iSortType;
+  int sort_column_, sort_order_, sort_type_;
 };
 
-// =============================================================================
-
-/* Progress bar */
+////////////////////////////////////////////////////////////////////////////////
+// Progress bar
 
 class ProgressBar : public Window {
 public:
   ProgressBar() {}
-  ProgressBar(HWND hWnd) { SetWindowHandle(hWnd); }
+  ProgressBar(HWND hwnd);
   virtual ~ProgressBar() {}
 
   UINT  GetPosition();
@@ -191,65 +185,66 @@ public:
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 };
 
-// =============================================================================
-
-/* Rebar */
+////////////////////////////////////////////////////////////////////////////////
+// Rebar
 
 class Rebar : public Window {
 public:
   Rebar() {}
-  Rebar(HWND hWnd) { SetWindowHandle(hWnd); }
+  Rebar(HWND hwnd);
   virtual ~Rebar() {}
 
   UINT GetBarHeight();
-  BOOL InsertBand(LPREBARBANDINFO lpBarInfo);
-  BOOL InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UINT cxMinChild, 
-                  UINT cyChild, UINT cyIntegral, UINT cyMaxChild, UINT cyMinChild, 
-                  UINT fMask, UINT fStyle);
+  BOOL InsertBand(LPREBARBANDINFO bar_info);
+  BOOL InsertBand(
+      HWND hwnd_child,
+      UINT cx, UINT cx_header, UINT cx_ideal,
+      UINT cx_min_child,
+      UINT cy_child, UINT cy_integral,
+      UINT cy_max_child, UINT cy_min_child,
+      UINT mask, UINT style);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 };
 
-// =============================================================================
-
-/* Rich edit */
+////////////////////////////////////////////////////////////////////////////////
+// Rich edit
 
 class RichEdit : public Window {
 public:
   RichEdit();
-  RichEdit(HWND hWnd);
+  RichEdit(HWND hwnd);
   virtual ~RichEdit();
 
   void    GetSel(CHARRANGE* cr);
   wstring GetTextRange(CHARRANGE* cr);
-  void    HideSelection(BOOL bHide);
-  BOOL    SetCharFormat(DWORD dwFormat, CHARFORMAT* cf);
-  DWORD   SetEventMask(DWORD dwFlags);
-  void    SetSel(int ichStart, int ichEnd);
+  void    HideSelection(BOOL hide);
+  BOOL    SetCharFormat(DWORD format, CHARFORMAT* cf);
+  DWORD   SetEventMask(DWORD flags);
+  void    SetSel(int start, int end);
   void    SetSel(CHARRANGE* cr);
-  UINT    SetTextEx(const string& str);
+  UINT    SetTextEx(const string& text);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  HMODULE m_hInstRichEdit;
+  HMODULE module_;
 };
 
-// =============================================================================
-
-/* Spin */
+////////////////////////////////////////////////////////////////////////////////
+// Spin
 
 class Spin : public Window {
 public:
   Spin() {}
-  Spin(HWND hWnd) { SetWindowHandle(hWnd); }
+  Spin(HWND hwnd);
   virtual ~Spin() {}
 
   bool GetPos32(int& value);
@@ -258,160 +253,154 @@ public:
   void SetRange32(int lower_limit, int upper_limit);
 };
 
-// =============================================================================
-
-/* Status bar */
+////////////////////////////////////////////////////////////////////////////////
+// Status bar
 
 class StatusBar : public Window {
 public:
   StatusBar() {}
-  StatusBar(HWND hWnd) { SetWindowHandle(hWnd); }
+  StatusBar(HWND hwnd);
   virtual ~StatusBar() {}
 
-  int  InsertPart(int iImage, int iStyle, int iAutosize, int iWidth, LPCWSTR lpText, LPCWSTR lpTooltip);
-  void SetImageList(HIMAGELIST hImageList);
-  void SetPartText(int iPart, LPCWSTR lpText);
-  void SetPartTipText(int iPart, LPCWSTR lpTipText);
-  void SetPartWidth(int iPart, int iWidth);
+  int  InsertPart(int image, int style, int autosize, int width, LPCWSTR text, LPCWSTR tooltip);
+  void SetImageList(HIMAGELIST image_list);
+  void SetPartText(int part, LPCWSTR text);
+  void SetPartTipText(int part, LPCWSTR tip_text);
+  void SetPartWidth(int part, int width);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  HIMAGELIST  m_hImageList;
-  vector<int> m_iWidth;
+  HIMAGELIST image_list_;
+  vector<int> widths_;
 };
 
-// =============================================================================
-
-/* SysLink */
+////////////////////////////////////////////////////////////////////////////////
+// SysLink
 
 class SysLink : public Window {
 public:
   SysLink() {}
-  SysLink(HWND hWnd) { SetWindowHandle(hWnd); }
+  SysLink(HWND hwnd);
   virtual ~SysLink() {}
 
   void SetItemState(int item, UINT states);
 };
 
-// =============================================================================
-
-/* Tab */
+////////////////////////////////////////////////////////////////////////////////
+// Tab
 
 class Tab : public Window {
 public:
   Tab() {}
-  Tab(HWND hWnd) { SetWindowHandle(hWnd); }
+  Tab(HWND hwnd);
   virtual ~Tab() {}
 
-  void   AdjustRect(HWND hWindow, BOOL fLarger, LPRECT lpRect);
+  void   AdjustRect(HWND hwnd, BOOL larger, LPRECT rect);
   int    DeleteAllItems();
-  int    DeleteItem(int nIndex);
-  int    InsertItem(int nIndex, LPCWSTR szText, LPARAM lParam);
+  int    DeleteItem(int index);
+  int    InsertItem(int index, LPCWSTR text, LPARAM param);
   int    GetCurrentlySelected();
   int    GetItemCount();
-  LPARAM GetItemParam(int nIndex);
+  LPARAM GetItemParam(int index);
   int    HitTest();
-  int    SetCurrentlySelected(int iItem);
-  int    SetItemText(int iItem, LPCWSTR szText);
+  int    SetCurrentlySelected(int item);
+  int    SetItemText(int item, LPCWSTR text);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 };
 
-// =============================================================================
-
-/* Toolbar */
+////////////////////////////////////////////////////////////////////////////////
+// Toolbar
 
 class Toolbar : public Window {
 public:
   Toolbar() {}
-  Toolbar(HWND hWnd) { SetWindowHandle(hWnd); }
+  Toolbar(HWND hwnd);
   virtual ~Toolbar() {}
 
-  BOOL    EnableButton(int idCommand, bool bEnabled);
+  BOOL    EnableButton(int command_id, bool enabled);
   int     GetHeight();
-  BOOL    GetButton(int nIndex, TBBUTTON& tbb);
+  BOOL    GetButton(int index, TBBUTTON& tbb);
   int     GetButtonCount();
   DWORD   GetButtonSize();
-  DWORD   GetButtonStyle(int nIndex);
-  LPCWSTR GetButtonTooltip(int nIndex);
+  DWORD   GetButtonStyle(int index);
+  LPCWSTR GetButtonTooltip(int index);
   DWORD   GetPadding();
-  int     HitTest(POINT& pt);
-  BOOL    InsertButton(int iIndex, int iBitmap, int idCommand, 
-                       bool bEnabled, BYTE fsStyle, DWORD_PTR dwData, 
-                       LPCWSTR lpText, LPCWSTR lpTooltip);
-  BOOL    PressButton(int idCommand, BOOL bPress);
-  BOOL    SetButtonImage(int nIndex, int iImage);
-  BOOL    SetButtonText(int nIndex, LPCWSTR lpText);
-  BOOL    SetButtonTooltip(int nIndex, LPCWSTR lpTooltip);
-  void    SetImageList(HIMAGELIST hImageList, int dxBitmap, int dyBitmap);
+  int     HitTest(POINT& point);
+  BOOL    InsertButton(int index, int bitmap, int command_id, 
+                       bool enabled, BYTE style, DWORD_PTR data, 
+                       LPCWSTR text, LPCWSTR tooltip);
+  BOOL    PressButton(int command_id, BOOL press);
+  BOOL    SetButtonImage(int index, int image);
+  BOOL    SetButtonText(int index, LPCWSTR text);
+  BOOL    SetButtonTooltip(int index, LPCWSTR tooltip);
+  void    SetImageList(HIMAGELIST image_list, int dx, int dy);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  vector<LPCWSTR> m_TooltipText;
+  vector<LPCWSTR> tooltip_text_;
 };
 
-// =============================================================================
-
-/* Tooltip */
+////////////////////////////////////////////////////////////////////////////////
+// Tooltip
 
 class Tooltip : public Window {
 public:
   Tooltip() {}
-  Tooltip(HWND hWnd) { SetWindowHandle(hWnd); }
+  Tooltip(HWND hwnd);
   virtual ~Tooltip() {}
   
-  BOOL AddTip(UINT uID, LPCWSTR lpText, LPCWSTR lpTitle, LPRECT rcArea, bool bWindowID);
-  BOOL DeleteTip(UINT uID);
-  void SetDelayTime(long lAutopop, long lInitial, long lReshow);
-  void SetMaxWidth(long lWidth);
-  void UpdateText(UINT uID, LPCWSTR lpText);
-  void UpdateTitle(LPCWSTR lpTitle);
+  BOOL AddTip(UINT id, LPCWSTR text, LPCWSTR title, LPRECT rect, bool window_id);
+  BOOL DeleteTip(UINT id);
+  void SetDelayTime(long autopop, long initial, long reshow);
+  void SetMaxWidth(long width);
+  void UpdateText(UINT id, LPCWSTR text);
+  void UpdateTitle(LPCWSTR title);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 };
 
-// =============================================================================
-
-/* Tree view */
+////////////////////////////////////////////////////////////////////////////////
+// Tree view
 
 class TreeView : public Window {
 public:
   TreeView() {}
-  TreeView(HWND hWnd) { SetWindowHandle(hWnd); }
+  TreeView(HWND hwnd);
   virtual ~TreeView() {}
 
   BOOL       DeleteAllItems();
-  BOOL       DeleteItem(HTREEITEM hitem);
-  BOOL       Expand(HTREEITEM hItem, bool bExpand = true);
-  UINT       GetCheckState(HTREEITEM hItem);
+  BOOL       DeleteItem(HTREEITEM item);
+  BOOL       Expand(HTREEITEM item, bool expand = true);
+  UINT       GetCheckState(HTREEITEM item);
   UINT       GetCount();
-  BOOL       GetItem(LPTVITEM pItem);
-  LPARAM     GetItemData(HTREEITEM hItem);
+  BOOL       GetItem(LPTVITEM item);
+  LPARAM     GetItemData(HTREEITEM item);
   HTREEITEM  GetSelection();
-  HTREEITEM  HitTest(LPTVHITTESTINFO lpht, bool bGetCursorPos = false);
-  HTREEITEM  InsertItem(LPCWSTR pszText, int iImage, LPARAM lParam, 
-                        HTREEITEM htiParent, HTREEITEM hInsertAfter = TVI_LAST);
-  BOOL       SelectItem(HTREEITEM hItem);
-  UINT       SetCheckState(HTREEITEM hItem, BOOL fCheck);
-  HIMAGELIST SetImageList(HIMAGELIST himl, INT iImage = TVSIL_NORMAL);
-  BOOL       SetItem(HTREEITEM hItem, LPCWSTR pszText);
+  HTREEITEM  HitTest(LPTVHITTESTINFO hti, bool get_cursor_pos = false);
+  HTREEITEM  InsertItem(LPCWSTR text, int image, LPARAM param,
+                        HTREEITEM parent, HTREEITEM insert_after = TVI_LAST);
+  BOOL       SelectItem(HTREEITEM item);
+  UINT       SetCheckState(HTREEITEM item, BOOL check);
+  HIMAGELIST SetImageList(HIMAGELIST image_list, INT image = TVSIL_NORMAL);
+  BOOL       SetItem(HTREEITEM item, LPCWSTR text);
   int        SetItemHeight(SHORT cyItem);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
-  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct);
+  virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 };
 
 }  // namespace win
 
-#endif // TAIGA_WIN_CTRL_H
+#endif  // TAIGA_WIN_CTRL_H

@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,17 +20,19 @@
 
 namespace win {
 
-// =============================================================================
+SysLink::SysLink(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 void SysLink::SetItemState(int item, UINT states) {
   LITEM li = {0};
-  
+
   li.iLink = item;
   li.mask = LIF_ITEMINDEX | LIF_STATE;
   li.state = states;
   li.stateMask = states;
   
-  ::SendMessage(window_, LM_SETITEM, 0, reinterpret_cast<LPARAM>(&li));
+  SendMessage(LM_SETITEM, 0, reinterpret_cast<LPARAM>(&li));
 }
 
 }  // namespace win

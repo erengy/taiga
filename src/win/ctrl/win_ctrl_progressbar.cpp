@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,22 +20,24 @@
 
 namespace win {
 
-// =============================================================================
+ProgressBar::ProgressBar(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 void ProgressBar::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = 0;
   cs.lpszClass = PROGRESS_CLASS;
-  cs.style     = WS_CHILD | WS_VISIBLE;
+  cs.style = WS_CHILD | WS_VISIBLE;
 }
 
-void ProgressBar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  Window::OnCreate(hwnd, lpCreateStruct);
+void ProgressBar::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 UINT ProgressBar::GetPosition() {
-  return ::SendMessage(window_, PBM_GETPOS, 0, 0);
+  return SendMessage(PBM_GETPOS, 0, 0);
 }
 
 void ProgressBar::SetMarquee(bool enabled) {
@@ -44,19 +46,20 @@ void ProgressBar::SetMarquee(bool enabled) {
   } else {
     SetStyle(0, PBS_MARQUEE);
   }
-  ::SendMessage(window_, PBM_SETMARQUEE, enabled, 0);
+
+  SendMessage(PBM_SETMARQUEE, enabled, 0);
 }
 
 UINT ProgressBar::SetPosition(UINT position) {
-  return ::SendMessage(window_, PBM_SETPOS, position, 0);
+  return SendMessage(PBM_SETPOS, position, 0);
 }
 
 DWORD ProgressBar::SetRange(UINT min, UINT max) {
-  return ::SendMessage(window_, PBM_SETRANGE32, min, max);
+  return SendMessage(PBM_SETRANGE32, min, max);
 }
 
 UINT ProgressBar::SetState(UINT state) {
-  return ::SendMessage(window_, PBM_SETSTATE, state, 0);
+  return SendMessage(PBM_SETSTATE, state, 0);
 }
 
 }  // namespace win

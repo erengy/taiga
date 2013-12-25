@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,27 +21,29 @@
 
 namespace win {
 
-// =============================================================================
+ComboBox::ComboBox(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 void ComboBox::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_CLIENTEDGE;
   cs.lpszClass = WC_COMBOBOX;
-  cs.style     = CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE;
+  cs.style = CBS_DROPDOWN | CBS_HASSTRINGS | WS_CHILD | WS_TABSTOP | WS_VISIBLE;
 }
 
-void ComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  Window::OnCreate(hwnd, lpCreateStruct);
+void ComboBox::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-int ComboBox::AddItem(LPCWSTR lpsz, LPARAM data) {
-  int index = ComboBox_AddString(window_, lpsz);
+int ComboBox::AddItem(LPCWSTR text, LPARAM data) {
+  int index = ComboBox_AddString(window_, text);
   return ComboBox_SetItemData(window_, index, data);
 }
 
-int ComboBox::AddString(LPCWSTR lpsz) {
-  return ComboBox_AddString(window_, lpsz);
+int ComboBox::AddString(LPCWSTR text) {
+  return ComboBox_AddString(window_, text);
 }
 
 int ComboBox::DeleteString(int index) {
@@ -64,16 +66,16 @@ void ComboBox::ResetContent() {
   ComboBox_ResetContent(window_);
 }
 
-BOOL ComboBox::SetCueBannerText(LPCWSTR lpcwText) {
-  return ComboBox_SetCueBannerText(window_, lpcwText);
+BOOL ComboBox::SetCueBannerText(LPCWSTR text) {
+  return ComboBox_SetCueBannerText(window_, text);
 }
 
 int ComboBox::SetCurSel(int index) {
   return ComboBox_SetCurSel(window_, index);
 }
 
-BOOL ComboBox::SetEditSel(int ichStart, int ichEnd) {
-  return ::SendMessage(window_, CB_SETEDITSEL, ichStart, ichEnd);
+BOOL ComboBox::SetEditSel(int start, int end) {
+  return ::SendMessage(window_, CB_SETEDITSEL, start, end);
 }
 
 int ComboBox::SetItemData(int index, LPARAM data) {

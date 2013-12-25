@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,46 +20,52 @@
 
 namespace win {
 
-// =============================================================================
+Rebar::Rebar(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 void Rebar::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = 0;
   cs.lpszClass = REBARCLASSNAME;
-  cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | CCS_NODIVIDER | RBS_BANDBORDERS | RBS_VARHEIGHT;
+  cs.style = WS_CHILD | WS_VISIBLE | WS_TABSTOP |
+             CCS_NODIVIDER | RBS_BANDBORDERS | RBS_VARHEIGHT;
 }
 
-void Rebar::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  Window::OnCreate(hwnd, lpCreateStruct);
+void Rebar::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 UINT Rebar::GetBarHeight() {
-  return ::SendMessage(window_, RB_GETBARHEIGHT, 0, 0);
+  return SendMessage(RB_GETBARHEIGHT, 0, 0);
 }
 
-BOOL Rebar::InsertBand(LPREBARBANDINFO lpBarInfo) {
-  return ::SendMessage(window_, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(lpBarInfo));
+BOOL Rebar::InsertBand(LPREBARBANDINFO bar_info) {
+  return SendMessage(RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(bar_info));
 }
 
-BOOL Rebar::InsertBand(HWND hwndChild, UINT cx, UINT cxHeader, UINT cxIdeal, UINT cxMinChild, 
-                       UINT cyChild, UINT cyIntegral, UINT cyMaxChild, UINT cyMinChild, 
-                       UINT fMask, UINT fStyle) {
+BOOL Rebar::InsertBand(HWND hwnd_child,
+                       UINT cx, UINT cx_header, UINT cx_ideal,
+                       UINT cx_min_child,
+                       UINT cy_child, UINT cy_integral,
+                       UINT cy_max_child, UINT cy_min_child,
+                       UINT mask, UINT style) {
   REBARBANDINFO rbi = {0};
-  rbi.cbSize     = REBARBANDINFO_V6_SIZE;
-  rbi.cx         = cx;
-  rbi.cxHeader   = cxHeader;
-  rbi.cxIdeal    = cxIdeal;
-  rbi.cxMinChild = cxMinChild;
-  rbi.cyChild    = cyChild;
-  rbi.cyIntegral = cyIntegral;
-  rbi.cyMaxChild = cyMaxChild;
-  rbi.cyMinChild = cyMinChild;
-  rbi.fMask      = fMask;
-  rbi.fStyle     = fStyle;
-  rbi.hwndChild  = hwndChild;
+  rbi.cbSize = REBARBANDINFO_V6_SIZE;
+  rbi.cx = cx;
+  rbi.cxHeader = cx_header;
+  rbi.cxIdeal = cx_ideal;
+  rbi.cxMinChild = cx_min_child;
+  rbi.cyChild = cy_child;
+  rbi.cyIntegral = cy_integral;
+  rbi.cyMaxChild = cy_max_child;
+  rbi.cyMinChild = cy_min_child;
+  rbi.fMask = mask;
+  rbi.fStyle = style;
+  rbi.hwndChild = hwnd_child;
 
-  return ::SendMessage(window_, RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(&rbi));
+  return SendMessage(RB_INSERTBAND, -1, reinterpret_cast<LPARAM>(&rbi));
 }
 
 }  // namespace win

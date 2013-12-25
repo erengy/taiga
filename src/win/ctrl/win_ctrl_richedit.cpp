@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,77 +20,75 @@
 
 namespace win {
 
-// =============================================================================
-
 RichEdit::RichEdit() {
-  m_hInstRichEdit = ::LoadLibrary(L"riched20.dll");
+  module_ = ::LoadLibrary(L"riched20.dll");
 }
 
-RichEdit::RichEdit(HWND hWnd) {
-  m_hInstRichEdit = ::LoadLibrary(L"riched20.dll");
-  SetWindowHandle(hWnd);
+RichEdit::RichEdit(HWND hwnd) {
+  module_ = ::LoadLibrary(L"riched20.dll");
+  SetWindowHandle(hwnd);
 }
 
 RichEdit::~RichEdit() {
-  if (m_hInstRichEdit) {
-    ::FreeLibrary(m_hInstRichEdit);
-  }
+  if (module_)
+    ::FreeLibrary(module_);
 }
 
 void RichEdit::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_STATICEDGE;
   cs.lpszClass = RICHEDIT_CLASS;
-  cs.style     = WS_CHILD | WS_CLIPCHILDREN | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL | ES_AUTOHSCROLL;
+  cs.style = WS_CHILD | WS_CLIPCHILDREN | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL |
+             ES_AUTOHSCROLL;
 }
 
-void RichEdit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  Window::OnCreate(hwnd, lpCreateStruct);
+void RichEdit::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void RichEdit::GetSel(CHARRANGE* cr) {
-  ::SendMessage(window_, EM_EXGETSEL, 0, reinterpret_cast<LPARAM>(cr));
+  SendMessage(EM_EXGETSEL, 0, reinterpret_cast<LPARAM>(cr));
 }
 
-wstring RichEdit::GetTextRange(CHARRANGE* cr) {
-  wstring str(1024, '\0');
+std::wstring RichEdit::GetTextRange(CHARRANGE* cr) {
+  std::wstring text(1024, L'\0');
 
   TEXTRANGE tr;
   tr.chrg.cpMax = cr->cpMax;
   tr.chrg.cpMin = cr->cpMin;
-  tr.lpstrText = (LPWSTR)str.data();
+  tr.lpstrText = const_cast<LPWSTR>(text.data());
 
-  ::SendMessage(window_, EM_GETTEXTRANGE , 0, reinterpret_cast<LPARAM>(&tr));
-  
-  return str;
+  SendMessage(EM_GETTEXTRANGE , 0, reinterpret_cast<LPARAM>(&tr));
+
+  return text;
 }
 
-void RichEdit::HideSelection(BOOL bHide) {
-  ::SendMessage(window_, EM_HIDESELECTION, bHide, 0);
+void RichEdit::HideSelection(BOOL hide) {
+  SendMessage(EM_HIDESELECTION, hide, 0);
 }
 
-BOOL RichEdit::SetCharFormat(DWORD dwFormat, CHARFORMAT* cf) {
-  return ::SendMessage(window_, EM_SETCHARFORMAT, dwFormat, reinterpret_cast<LPARAM>(cf));
+BOOL RichEdit::SetCharFormat(DWORD format, CHARFORMAT* cf) {
+  return SendMessage(EM_SETCHARFORMAT, format, reinterpret_cast<LPARAM>(cf));
 }
 
-DWORD RichEdit::SetEventMask(DWORD dwFlags) {
-  return ::SendMessage(window_, EM_SETEVENTMASK, 0, dwFlags);
+DWORD RichEdit::SetEventMask(DWORD flags) {
+  return SendMessage(EM_SETEVENTMASK, 0, flags);
 }
 
-void RichEdit::SetSel(int ichStart, int ichEnd) {
-  ::SendMessage(window_, EM_SETSEL, ichStart, ichEnd);
+void RichEdit::SetSel(int start, int end) {
+  SendMessage(EM_SETSEL, start, end);
 }
 
 void RichEdit::SetSel(CHARRANGE* cr) {
-  ::SendMessage(window_, EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(cr));
+  SendMessage(EM_EXSETSEL, 0, reinterpret_cast<LPARAM>(cr));
 }
 
-UINT RichEdit::SetTextEx(const string& str) {
+UINT RichEdit::SetTextEx(const string& text) {
   SETTEXTEX ste;
-  return ::SendMessage(window_, EM_SETTEXTEX, 
-                       reinterpret_cast<WPARAM>(&ste), 
-                       reinterpret_cast<LPARAM>(str.data()));
+  return SendMessage(EM_SETTEXTEX, 
+                     reinterpret_cast<WPARAM>(&ste), 
+                     reinterpret_cast<LPARAM>(text.data()));
 }
 
 }  // namespace win

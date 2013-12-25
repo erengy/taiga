@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,42 +20,49 @@
 
 namespace win {
 
-// =============================================================================
+Edit::Edit(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 void Edit::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_CLIENTEDGE;
   cs.lpszClass = L"EDIT";
-  cs.style     = WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL;
+  cs.style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL;
 }
 
-void Edit::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  Window::OnCreate(hwnd, lpCreateStruct);
+void Edit::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-void Edit::GetRect(LPRECT lprc) {
-  ::SendMessage(window_, EM_GETRECT, 0, reinterpret_cast<LPARAM>(lprc));
+void Edit::GetRect(LPRECT rect) {
+  SendMessage(EM_GETRECT, 0, reinterpret_cast<LPARAM>(rect));
 }
 
-void Edit::LimitText(int cchMax) {
-  ::SendMessage(window_, EM_SETLIMITTEXT, cchMax, 0);
+void Edit::LimitText(int limit) {
+  SendMessage(EM_SETLIMITTEXT, limit, 0);
 }
 
-BOOL Edit::SetCueBannerText(LPCWSTR lpcwText, BOOL fDrawFocused) {
-  return ::SendMessage(window_, EM_SETCUEBANNER, fDrawFocused, reinterpret_cast<LPARAM>(lpcwText));
+BOOL Edit::SetCueBannerText(LPCWSTR text, BOOL draw_focused) {
+  return SendMessage(EM_SETCUEBANNER, draw_focused,
+                     reinterpret_cast<LPARAM>(text));
 }
 
-void Edit::SetMargins(int iLeft, int iRight) {
+void Edit::SetMargins(int left, int right) {
   DWORD flags = 0;
-  if (iLeft > -1)  flags |= EC_LEFTMARGIN;
-  if (iRight > -1) flags |= EC_RIGHTMARGIN;
-  ::SendMessage(window_, EM_SETMARGINS, flags, MAKELPARAM(iLeft, iRight));
+
+  if (left > -1) 
+    flags |= EC_LEFTMARGIN;
+  if (right > -1)
+    flags |= EC_RIGHTMARGIN;
+
+  SendMessage(EM_SETMARGINS, flags, MAKELPARAM(left, right));
 }
 
-void Edit::SetMultiLine(BOOL bEnabled) {
+void Edit::SetMultiLine(BOOL enabled) {
   // TODO: We have to re-create the control, this does not work.
-  if (bEnabled) {
+  if (enabled) {
     SetStyle(ES_MULTILINE | ES_AUTOVSCROLL, ES_AUTOHSCROLL);
   } else {
     SetStyle(ES_AUTOHSCROLL, ES_MULTILINE | ES_AUTOVSCROLL);
@@ -63,29 +70,30 @@ void Edit::SetMultiLine(BOOL bEnabled) {
 }
 
 void Edit::SetPasswordChar(UINT ch) {
-  ::SendMessage(window_, EM_SETPASSWORDCHAR, ch, 0);
+  SendMessage(EM_SETPASSWORDCHAR, ch, 0);
 }
 
-void Edit::SetReadOnly(BOOL bReadOnly) {
-  ::SendMessage(window_, EM_SETREADONLY, bReadOnly, 0);
+void Edit::SetReadOnly(BOOL read_only) {
+  SendMessage(EM_SETREADONLY, read_only, 0);
 }
 
-void Edit::SetRect(LPRECT lprc) {
-  ::SendMessage(window_, EM_SETRECT, 0, reinterpret_cast<LPARAM>(lprc));
+void Edit::SetRect(LPRECT rect) {
+  SendMessage(EM_SETRECT, 0, reinterpret_cast<LPARAM>(rect));
 }
 
-void Edit::SetSel(int ichStart, int ichEnd) {
-  ::SendMessage(window_, EM_SETSEL, ichStart, ichEnd);
-  ::SendMessage(window_, EM_SCROLLCARET, 0, 0);
+void Edit::SetSel(int start, int end) {
+  SendMessage(EM_SETSEL, start, end);
+  SendMessage(EM_SCROLLCARET, 0, 0);
 }
 
-BOOL Edit::ShowBalloonTip(LPCWSTR pszText, LPCWSTR pszTitle, INT ttiIcon) {
+BOOL Edit::ShowBalloonTip(LPCWSTR text, LPCWSTR title, INT icon) {
   EDITBALLOONTIP ebt;
   ebt.cbStruct = sizeof(EDITBALLOONTIP);
-  ebt.pszText  = pszText;
-  ebt.pszTitle = pszTitle;
-  ebt.ttiIcon  = ttiIcon;
-  return ::SendMessage(window_, EM_SHOWBALLOONTIP, 0, reinterpret_cast<LPARAM>(&ebt));
+  ebt.pszText = text;
+  ebt.pszTitle = title;
+  ebt.ttiIcon = icon;
+
+  return SendMessage(EM_SHOWBALLOONTIP, 0, reinterpret_cast<LPARAM>(&ebt));
 }
 
 }  // namespace win

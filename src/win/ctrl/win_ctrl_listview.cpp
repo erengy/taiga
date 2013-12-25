@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,108 +20,109 @@
 
 namespace win {
 
-// =============================================================================
-
-ListView::ListView() {
-  m_iSortColumn = -1;
-  m_iSortOrder = 1;
-  m_iSortType = 0;
+ListView::ListView()
+    : sort_column_(-1),
+      sort_order_(1),
+      sort_type_(0) {
 }
 
-ListView::ListView(HWND hWnd) {
-  m_iSortColumn = -1;
-  m_iSortOrder = 1;
-  m_iSortType = 0;
-
-  SetWindowHandle(hWnd);
+ListView::ListView(HWND hwnd) 
+    : sort_column_(-1),
+      sort_order_(1),
+      sort_type_(0) {
+  SetWindowHandle(hwnd);
 }
-
-// =============================================================================
 
 void ListView::PreCreate(CREATESTRUCT &cs) {
   cs.dwExStyle = WS_EX_CLIENTEDGE;
   cs.lpszClass = WC_LISTVIEW;
-  cs.style     = WS_CHILD | WS_TABSTOP | WS_VISIBLE | LVS_ALIGNLEFT | LVS_AUTOARRANGE | 
-                 LVS_REPORT | LVS_SHAREIMAGELISTS | LVS_SINGLESEL;
+  cs.style = WS_CHILD | WS_TABSTOP | WS_VISIBLE |
+             LVS_ALIGNLEFT | LVS_AUTOARRANGE | LVS_REPORT |
+             LVS_SHAREIMAGELISTS | LVS_SINGLESEL;
 }
 
-void ListView::OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
-  ListView_SetExtendedListViewStyle(hwnd, LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | 
-    LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
-  Window::OnCreate(hwnd, lpCreateStruct);
+void ListView::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
+  ListView_SetExtendedListViewStyle(hwnd,
+      LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT |
+      LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  Window::OnCreate(hwnd, create_struct);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-int ListView::InsertColumn(int nIndex, int nWidth, int nWidthMin, int nAlign, LPCWSTR szText) {
+int ListView::InsertColumn(int index, int width, int width_min, int align,
+                           LPCWSTR text) {
   LVCOLUMN lvc = {0};
-  lvc.cx       = nWidth;
-  lvc.cxMin    = nWidthMin;
-  lvc.fmt      = nAlign;
-  lvc.mask     = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH | (nWidthMin ? LVCF_MINWIDTH : NULL);
-  lvc.pszText  = const_cast<LPWSTR>(szText);
+  lvc.cx = width;
+  lvc.cxMin = width_min;
+  lvc.fmt = align;
+  lvc.mask = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH |
+             (width_min ? LVCF_MINWIDTH : 0);
+  lvc.pszText = const_cast<LPWSTR>(text);
 
-  if (GetVersion() < kVersionVista) {
+  if (GetVersion() < kVersionVista)
     lvc.cx = lvc.cxMin;
-  }
 
-  return ListView_InsertColumn(window_, nIndex, &lvc);
+  return ListView_InsertColumn(window_, index, &lvc);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-int ListView::EnableGroupView(bool bValue) {
-  return ListView_EnableGroupView(window_, bValue);
+int ListView::EnableGroupView(bool enable) {
+  return ListView_EnableGroupView(window_, enable);
 }
 
-int ListView::InsertGroup(int nIndex, LPCWSTR szText, bool bCollapsable, bool bCollapsed) {
+int ListView::InsertGroup(int index, LPCWSTR text,
+                          bool collapsable, bool collapsed) {
   LVGROUP lvg = {0};
-  lvg.cbSize    = sizeof(LVGROUP);
-  lvg.iGroupId  = nIndex;
-  lvg.mask      = LVGF_HEADER | LVGF_GROUPID;
-  lvg.pszHeader = const_cast<LPWSTR>(szText);
+  lvg.cbSize = sizeof(LVGROUP);
+  lvg.iGroupId = index;
+  lvg.mask = LVGF_HEADER | LVGF_GROUPID;
+  lvg.pszHeader = const_cast<LPWSTR>(text);
   
-  if (bCollapsable && GetVersion() >= kVersionVista) {
+  if (collapsable && GetVersion() >= kVersionVista) {
     lvg.mask |= LVGF_STATE;
     lvg.state = LVGS_COLLAPSIBLE;
-    if (bCollapsed) lvg.state |= LVGS_COLLAPSED;
+    if (collapsed)
+      lvg.state |= LVGS_COLLAPSED;
   }
   
-  return ListView_InsertGroup(window_, nIndex, &lvg);
+  return ListView_InsertGroup(window_, index, &lvg);
 }
 
 BOOL ListView::IsGroupViewEnabled() {
   return ListView_IsGroupViewEnabled(window_);
 }
 
-int ListView::SetGroupText(int nIndex, LPCWSTR szText) {
+int ListView::SetGroupText(int index, LPCWSTR text) {
   LVGROUP lvg = {0};
   lvg.cbSize  = sizeof(LVGROUP);
-  lvg.mask      = LVGF_HEADER;
-  lvg.pszHeader = const_cast<LPWSTR>(szText);
-  return ListView_SetGroupInfo(window_, nIndex, &lvg);
+  lvg.mask = LVGF_HEADER;
+  lvg.pszHeader = const_cast<LPWSTR>(text);
+
+  return ListView_SetGroupInfo(window_, index, &lvg);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-HIMAGELIST ListView::CreateDragImage(int iItem, LPPOINT lpptUpLeft) {
-  return ListView_CreateDragImage(window_, iItem, lpptUpLeft);
+HIMAGELIST ListView::CreateDragImage(int item, LPPOINT pt_up_left) {
+  return ListView_CreateDragImage(window_, item, pt_up_left);
 }
 
 BOOL ListView::DeleteAllItems() {
   return ListView_DeleteAllItems(window_);
 }
 
-BOOL ListView::DeleteItem(int iItem) {
-  return ListView_DeleteItem(window_, iItem);
+BOOL ListView::DeleteItem(int item) {
+  return ListView_DeleteItem(window_, item);
 }
 
-BOOL ListView::EnsureVisible(int i) {
-  return ListView_EnsureVisible(window_, i, false);
+BOOL ListView::EnsureVisible(int item) {
+  return ListView_EnsureVisible(window_, item, false);
 }
 
-BOOL ListView::GetCheckState(UINT iIndex) {
-  return ListView_GetCheckState(window_, iIndex);
+BOOL ListView::GetCheckState(UINT index) {
+  return ListView_GetCheckState(window_, index);
 }
 
 HWND ListView::GetHeader() {
@@ -140,28 +141,31 @@ LPARAM ListView::GetItemParam(int i) {
   if (ListView_GetItem(window_, &lvi)) {
     return lvi.lParam;
   } else {
-    return NULL;
+    return 0;
   }
 }
 
-void ListView::GetItemText(int iItem, int iSubItem, LPWSTR pszText, int cchTextMax) {
-  ListView_GetItemText(window_, iItem, iSubItem, pszText, cchTextMax);
+void ListView::GetItemText(int item, int subitem,
+                           LPWSTR output, int max_length) {
+  ListView_GetItemText(window_, item, subitem, output, max_length);
 }
 
-void ListView::GetItemText(int iItem, int iSubItem, wstring& str, int cchTextMax) {
-  vector<wchar_t> buffer(cchTextMax);
-  ListView_GetItemText(window_, iItem, iSubItem, &buffer[0], cchTextMax);
-  str.assign(&buffer[0]);
+void ListView::GetItemText(int item, int subitem,
+                           std::wstring& output, int max_length) {
+  vector<wchar_t> buffer(max_length);
+  ListView_GetItemText(window_, item, subitem, &buffer[0], max_length);
+  output.assign(&buffer[0]);
 }
 
-INT ListView::GetNextItem(int iStart, UINT flags) {
-  return ListView_GetNextItem(window_, iStart, flags);
+INT ListView::GetNextItem(int start, UINT flags) {
+  return ListView_GetNextItem(window_, start, flags);
 }
 
-INT ListView::GetNextItemIndex(int iItem, int iGroup, LPARAM flags) {
+INT ListView::GetNextItemIndex(int item, int group, LPARAM flags) {
   LVITEMINDEX lvii;
-  lvii.iItem = iItem;
-  lvii.iGroup = iGroup;
+  lvii.iItem = item;
+  lvii.iGroup = group;
+
   if (ListView_GetNextItemIndex(window_, &lvii, flags)) {
     return lvii.iItem;
   } else {
@@ -177,8 +181,8 @@ INT ListView::GetSelectionMark() {
   return ListView_GetSelectionMark(window_);
 }
 
-BOOL ListView::GetSubItemRect(int iItem, int iSubItem, LPRECT lpRect) {
-  return ListView_GetSubItemRect(window_, iItem, iSubItem, LVIR_BOUNDS, lpRect);
+BOOL ListView::GetSubItemRect(int item, int subitem, LPRECT rect) {
+  return ListView_GetSubItemRect(window_, item, subitem, LVIR_BOUNDS, rect);
 }
 
 DWORD ListView::GetView() {
@@ -190,6 +194,7 @@ int ListView::HitTest(bool return_subitem) {
   ::GetCursorPos(&lvhi.pt);
   ::ScreenToClient(window_, &lvhi.pt);
   ListView_SubItemHitTestEx(window_, &lvhi);
+
   return return_subitem ? lvhi.iSubItem : lvhi.iItem;
 }
 
@@ -197,6 +202,7 @@ int ListView::HitTestEx(LPLVHITTESTINFO lplvhi) {
   ::GetCursorPos(&lplvhi->pt);
   ::ScreenToClient(window_, &lplvhi->pt);
   ListView_SubItemHitTestEx(window_, lplvhi);
+
   return lplvhi->iItem;
 }
 
@@ -204,28 +210,37 @@ int ListView::InsertItem(const LVITEM& lvi) {
   return ListView_InsertItem(window_, &lvi);
 }
 
-int ListView::InsertItem(int iItem, int iGroupId, int iImage, UINT cColumns, PUINT puColumns, LPCWSTR pszText, LPARAM lParam) {
-  LVITEM lvi    = {0};
-  lvi.cColumns  = cColumns;
-  lvi.iGroupId  = iGroupId;
-  lvi.iImage    = iImage;
-  lvi.iItem     = iItem;
-  lvi.lParam    = lParam;
-  lvi.puColumns = puColumns;
-  lvi.pszText   = const_cast<LPWSTR>(pszText);
+int ListView::InsertItem(int item, int group, int image, UINT column_count,
+                         PUINT columns, LPCWSTR text, LPARAM lParam) {
+  LVITEM lvi = {0};
+  lvi.cColumns = column_count;
+  lvi.iGroupId = group;
+  lvi.iImage = image;
+  lvi.iItem = item;
+  lvi.lParam = lParam;
+  lvi.puColumns = columns;
+  lvi.pszText = const_cast<LPWSTR>(text);
 
-  if (cColumns != 0)   lvi.mask |= LVIF_COLUMNS;
-  if (iGroupId > -1)   lvi.mask |= LVIF_GROUPID;
-  if (iImage > -1)     lvi.mask |= LVIF_IMAGE;
-  if (lParam != 0)     lvi.mask |= LVIF_PARAM;
-  if (pszText != NULL) lvi.mask |= LVIF_TEXT;
+  if (column_count != 0)
+    lvi.mask |= LVIF_COLUMNS;
+  if (group > -1)
+    lvi.mask |= LVIF_GROUPID;
+  if (image > -1)
+    lvi.mask |= LVIF_IMAGE;
+  if (lParam != 0)
+    lvi.mask |= LVIF_PARAM;
+  if (text != nullptr)
+    lvi.mask |= LVIF_TEXT;
 
   return ListView_InsertItem(window_, &lvi);
 }
 
-BOOL ListView::RedrawItems(int iFirst, int iLast, bool repaint) {
-  BOOL return_value = ListView_RedrawItems(window_, iFirst, iLast);
-  if (return_value && repaint) ::UpdateWindow(window_);
+BOOL ListView::RedrawItems(int first, int last, bool repaint) {
+  BOOL return_value = ListView_RedrawItems(window_, first, last);
+
+  if (return_value && repaint)
+    ::UpdateWindow(window_);
+
   return return_value;
 }
 
@@ -233,114 +248,129 @@ void ListView::RemoveAllGroups() {
   ListView_RemoveAllGroups(window_);
 }
 
-BOOL ListView::SetBkImage(HBITMAP hbmp, ULONG ulFlags, int xOffset, int yOffset) {
-  LVBKIMAGE bki      = {0};
-  bki.hbm            = hbmp;
-  bki.ulFlags        = ulFlags;
-  bki.xOffsetPercent = xOffset;
-  bki.yOffsetPercent = yOffset;
+BOOL ListView::SetBkImage(HBITMAP bitmap, ULONG flags,
+                          int offset_x, int offset_y) {
+  LVBKIMAGE bki= {0};
+  bki.hbm = bitmap;
+  bki.ulFlags = flags;
+  bki.xOffsetPercent = offset_x;
+  bki.yOffsetPercent = offset_y;
+
   return ListView_SetBkImage(window_, &bki);
 }
 
-void ListView::SetCheckState(int iIndex, BOOL fCheck) {
-  ListView_SetItemState(window_, iIndex, INDEXTOSTATEIMAGEMASK((fCheck==TRUE) ? 2 : 1), LVIS_STATEIMAGEMASK);
+void ListView::SetCheckState(int index, BOOL check) {
+  UINT state = INDEXTOSTATEIMAGEMASK((check == TRUE) ? 2 : 1);
+  ListView_SetItemState(window_, index, state, LVIS_STATEIMAGEMASK);
 }
 
-BOOL ListView::SetColumnWidth(int iCol, int cx) {
+BOOL ListView::SetColumnWidth(int column, int cx) {
   // LVSCW_AUTOSIZE or LVSCW_AUTOSIZE_USEHEADER can be used as cx
-  return ListView_SetColumnWidth(window_, iCol, cx);
+  return ListView_SetColumnWidth(window_, column, cx);
 }
 
-void ListView::SetExtendedStyle(DWORD dwExStyle) {
-  ListView_SetExtendedListViewStyle(window_, dwExStyle);
+void ListView::SetExtendedStyle(DWORD ex_style) {
+  ListView_SetExtendedListViewStyle(window_, ex_style);
 }
 
-DWORD ListView::SetHoverTime(DWORD dwHoverTime) {
-  return ::SendMessage(window_, LVM_SETHOVERTIME, 0, dwHoverTime);
+DWORD ListView::SetHoverTime(DWORD hover_time) {
+  return SendMessage(LVM_SETHOVERTIME, 0, hover_time);
 }
 
-void ListView::SetImageList(HIMAGELIST hImageList, int iImageList) {
-  ListView_SetImageList(window_, hImageList, iImageList);
+void ListView::SetImageList(HIMAGELIST image_list, int type) {
+  ListView_SetImageList(window_, image_list, type);
 }
 
-BOOL ListView::SetItem(int nIndex, int nSubItem, LPCWSTR szText) {
-  LVITEM lvi   = {0};
-  lvi.iItem    = nIndex;
-  lvi.iSubItem = nSubItem;
-  lvi.mask     = LVIF_TEXT;
-  lvi.pszText  = const_cast<LPWSTR>(szText);
-
-  return ListView_SetItem(window_, &lvi);
-}
-
-BOOL ListView::SetItemIcon(int nIndex, int nIcon) {
+BOOL ListView::SetItem(int index, int subitem, LPCWSTR text) {
   LVITEM lvi = {0};
-  lvi.iImage = nIcon;
-  lvi.iItem  = nIndex;
-  lvi.mask   = LVIF_IMAGE;
+  lvi.iItem = index;
+  lvi.iSubItem = subitem;
+  lvi.mask = LVIF_TEXT;
+  lvi.pszText = const_cast<LPWSTR>(text);
 
   return ListView_SetItem(window_, &lvi);
 }
 
-void ListView::SetSelectedItem(int iIndex) {
-  ListView_SetItemState(window_, iIndex, LVIS_SELECTED, LVIS_SELECTED);
+BOOL ListView::SetItemIcon(int index, int icon) {
+  LVITEM lvi = {0};
+  lvi.iImage = icon;
+  lvi.iItem = index;
+  lvi.mask = LVIF_IMAGE;
+
+  return ListView_SetItem(window_, &lvi);
 }
 
-BOOL ListView::SetTileViewInfo(PLVTILEVIEWINFO plvtvinfo) {
-  return ListView_SetTileViewInfo(window_, plvtvinfo);
+void ListView::SetSelectedItem(int index) {
+  ListView_SetItemState(window_, index, LVIS_SELECTED, LVIS_SELECTED);
 }
 
-BOOL ListView::SetTileViewInfo(int cLines, DWORD dwFlags, RECT* rcLabelMargin, SIZE* sizeTile) {
+BOOL ListView::SetTileViewInfo(PLVTILEVIEWINFO tvi) {
+  return ListView_SetTileViewInfo(window_, tvi);
+}
+
+BOOL ListView::SetTileViewInfo(int line_count, DWORD flags,
+                               RECT* rc_label_margin, SIZE* size_tile) {
   LVTILEVIEWINFO tvi = {0};
   tvi.cbSize = sizeof(LVTILEVIEWINFO);
   
-  tvi.dwFlags = dwFlags;
+  tvi.dwFlags = flags;
 
-  if (cLines) {
+  if (line_count) {
     tvi.dwMask |= LVTVIM_COLUMNS;
-    tvi.cLines = cLines;
+    tvi.cLines = line_count;
   }
-  if (sizeTile) {
+  if (size_tile) {
     tvi.dwMask |= LVTVIM_TILESIZE;
-    tvi.sizeTile = *sizeTile;
+    tvi.sizeTile = *size_tile;
   }
-  if (rcLabelMargin) {
+  if (rc_label_margin) {
     tvi.dwMask |= LVTVIM_LABELMARGIN;
-    tvi.rcLabelMargin = *rcLabelMargin;
+    tvi.rcLabelMargin = *rc_label_margin;
   }
 
   return ListView_SetTileViewInfo(window_, &tvi);
 }
 
-int ListView::SetView(DWORD iView) {
-  return ListView_SetView(window_, iView);
+int ListView::SetView(DWORD view) {
+  return ListView_SetView(window_, view);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-int ListView::GetSortColumn() { return m_iSortColumn; }
-int ListView::GetSortOrder() { return m_iSortOrder; }
-int ListView::GetSortType() { return m_iSortType; }
+int ListView::GetSortColumn() {
+  return sort_column_;
+}
 
-void ListView::Sort(int iColumn, int iOrder, int iType, PFNLVCOMPARE pfnCompare) {
-  m_iSortColumn = iColumn;
-  m_iSortOrder = (iOrder == 0)? 1 : iOrder;
-  m_iSortType = iType;
+int ListView::GetSortOrder() {
+  return sort_order_;
+}
 
-  ListView_SortItemsEx(window_, pfnCompare, this);
+int ListView::GetSortType() {
+  return sort_type_;
+}
+
+void ListView::Sort(int sort_column, int sort_order, int type,
+                    PFNLVCOMPARE compare) {
+  sort_column_ = sort_column;
+  sort_order_ = (sort_order == 0) ? 1 : sort_order;
+  sort_type_ = type;
+
+  ListView_SortItemsEx(window_, compare, this);
 
   if (GetVersion() < kVersionVista) {
-    HDITEM hdi   = {0};
-    hdi.mask     = HDI_FORMAT;
-    HWND hHeader = ListView_GetHeader(window_);
-    for (int i = 0; i < Header_GetItemCount(hHeader); ++i) {
-      Header_GetItem(hHeader, i, &hdi);
+    HDITEM hdi = {0};
+    hdi.mask = HDI_FORMAT;
+
+    HWND header = ListView_GetHeader(window_);
+    for (int i = 0; i < Header_GetItemCount(header); ++i) {
+      Header_GetItem(header, i, &hdi);
       hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP);
-      Header_SetItem(hHeader, i, &hdi);
+      Header_SetItem(header, i, &hdi);
     }
-    Header_GetItem(hHeader, iColumn, &hdi);
-    hdi.fmt |= (iOrder > -1 ? HDF_SORTUP : HDF_SORTDOWN);
-    Header_SetItem(hHeader, iColumn, &hdi);
+
+    Header_GetItem(header, sort_column, &hdi);
+    hdi.fmt |= (sort_order > -1 ? HDF_SORTUP : HDF_SORTDOWN);
+    Header_SetItem(header, sort_column, &hdi);
   }
 }
 

@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,24 +20,27 @@
 
 namespace win {
 
-// =============================================================================
+Spin::Spin(HWND hwnd) {
+  SetWindowHandle(hwnd);
+}
 
 bool Spin::GetPos32(int& value) {
   BOOL result;
-  value = ::SendMessage(window_, UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&result));
+  value = SendMessage(UDM_GETPOS32, 0, reinterpret_cast<LPARAM>(&result));
   return result == 0;
 }
 
 HWND Spin::SetBuddy(HWND hwnd) {
-  return reinterpret_cast<HWND>(::SendMessage(window_, UDM_SETBUDDY, reinterpret_cast<WPARAM>(hwnd), 0));
+  return reinterpret_cast<HWND>(SendMessage(
+      UDM_SETBUDDY, reinterpret_cast<WPARAM>(hwnd), 0));
 }
 
 int Spin::SetPos32(int position) {
-  return ::SendMessage(window_, UDM_SETPOS32, 0, position);
+  return SendMessage(UDM_SETPOS32, 0, position);
 }
 
 void Spin::SetRange32(int lower_limit, int upper_limit) {
-  ::SendMessage(window_, UDM_SETRANGE32, lower_limit, upper_limit);
+  SendMessage(UDM_SETRANGE32, lower_limit, upper_limit);
 }
 
 }  // namespace win

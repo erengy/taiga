@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,49 +20,61 @@
 
 namespace win {
 
-// =============================================================================
+ImageList::ImageList()
+    : image_list_(nullptr) {
+}
+
+ImageList::~ImageList() {
+  Destroy();
+}
+
+void ImageList::operator=(const HIMAGELIST image_list) {
+  SetHandle(image_list);
+}
 
 BOOL ImageList::Create(int cx, int cy) {
   Destroy();
-  m_hImageList = ::ImageList_Create(cx, cy, ILC_COLOR32 | ILC_MASK, 0, 0);
-  return m_hImageList != NULL;
+
+  image_list_ = ::ImageList_Create(cx, cy, ILC_COLOR32 | ILC_MASK, 0, 0);
+
+  return image_list_ != nullptr;
 }
 
 VOID ImageList::Destroy() {
-  if (m_hImageList) {
-    ::ImageList_Destroy(m_hImageList);
-    m_hImageList = NULL;
+  if (image_list_) {
+    ::ImageList_Destroy(image_list_);
+    image_list_ = nullptr;
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-int ImageList::AddBitmap(HBITMAP hBitmap, COLORREF crMask) {
-  if (crMask != CLR_NONE) {
-    return ::ImageList_AddMasked(m_hImageList, hBitmap, crMask);
+int ImageList::AddBitmap(HBITMAP bitmap, COLORREF mask) {
+  if (mask != CLR_NONE) {
+    return ::ImageList_AddMasked(image_list_, bitmap, mask);
   } else {
-    return ::ImageList_Add(m_hImageList, hBitmap, NULL);
+    return ::ImageList_Add(image_list_, bitmap, nullptr);
   }
 }
 
-BOOL ImageList::BeginDrag(int iTrack, int dxHotspot, int dyHotspot) {
-  return ::ImageList_BeginDrag(m_hImageList, iTrack, dxHotspot, dyHotspot);
+BOOL ImageList::BeginDrag(int track, int hotspot_x, int hotspot_y) {
+  return ::ImageList_BeginDrag(image_list_, track, hotspot_x, hotspot_y);
 }
 
-BOOL ImageList::DragEnter(HWND hwndLock, int x, int y) {
-  return ::ImageList_DragEnter(hwndLock, x, y);
+BOOL ImageList::DragEnter(HWND hwnd_lock, int x, int y) {
+  return ::ImageList_DragEnter(hwnd_lock, x, y);
 }
 
-BOOL ImageList::DragLeave(HWND hwndLock) {
-  return ::ImageList_DragLeave(hwndLock);
+BOOL ImageList::DragLeave(HWND hwnd_lock) {
+  return ::ImageList_DragLeave(hwnd_lock);
 }
 
 BOOL ImageList::DragMove(int x, int y) {
   return ::ImageList_DragMove(x, y);
 }
 
-BOOL ImageList::Draw(int nIndex, HDC hdcDest, int x, int y) {
-  return ::ImageList_Draw(m_hImageList, nIndex, hdcDest, x, y, ILD_NORMAL);
+BOOL ImageList::Draw(int index, HDC hdc, int x, int y) {
+  return ::ImageList_Draw(image_list_, index, hdc, x, y, ILD_NORMAL);
 }
 
 VOID ImageList::EndDrag() {
@@ -70,20 +82,21 @@ VOID ImageList::EndDrag() {
 }
 
 HIMAGELIST ImageList::GetHandle() {
-  return m_hImageList;
+  return image_list_;
 }
 
-HICON ImageList::GetIcon(int nIndex) {
-  return ::ImageList_GetIcon(m_hImageList, nIndex, ILD_NORMAL);
+HICON ImageList::GetIcon(int index) {
+  return ::ImageList_GetIcon(image_list_, index, ILD_NORMAL);
 }
 
 BOOL ImageList::Remove(int index) {
-  return ::ImageList_Remove(m_hImageList, index);
+  return ::ImageList_Remove(image_list_, index);
 }
 
-VOID ImageList::SetHandle(HIMAGELIST hImageList) {
+VOID ImageList::SetHandle(HIMAGELIST image_list) {
   Destroy();
-  m_hImageList = hImageList;
+
+  image_list_ = image_list;
 }
 
 }  // namespace win
