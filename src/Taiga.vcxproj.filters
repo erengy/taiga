@@ -55,6 +55,9 @@
     <Filter Include="library\anime">
       <UniqueIdentifier>{34871dd8-76ae-4f8d-96d7-75b13d067a56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\jsoncpp">
+      <UniqueIdentifier>{6efb0ffb-ce73-47bd-bfbc-3480db16ac1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
@@ -421,6 +424,15 @@
     <ClCompile Include="ui\dialog.cpp">
       <Filter>ui</Filter>
     </ClCompile>
+    <ClCompile Include="third_party\jsoncpp\json_reader.cpp">
+      <Filter>include\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\jsoncpp\json_value.cpp">
+      <Filter>include\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\jsoncpp\json_writer.cpp">
+      <Filter>include\jsoncpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -738,6 +750,36 @@
     <ClInclude Include="ui\dialog.h">
       <Filter>ui</Filter>
     </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\autolink.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\config.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\features.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\forwards.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\json.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\reader.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\value.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json\writer.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json_batchallocator.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\jsoncpp\json_tool.h">
+      <Filter>include\jsoncpp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="taiga\version.rc">
@@ -746,5 +788,16 @@
     <ResourceCompile Include="taiga\resource.rc">
       <Filter>taiga</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="third_party\jsoncpp\json_internalarray.inl">
+      <Filter>include\jsoncpp</Filter>
+    </None>
+    <None Include="third_party\jsoncpp\json_internalmap.inl">
+      <Filter>include\jsoncpp</Filter>
+    </None>
+    <None Include="third_party\jsoncpp\json_valueiterator.inl">
+      <Filter>include\jsoncpp</Filter>
+    </None>
   </ItemGroup>
 </Project>
