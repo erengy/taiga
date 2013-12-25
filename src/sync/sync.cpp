@@ -42,6 +42,7 @@ void GetLibraryEntries() {
   Request request(kGetLibraryEntries);
   AddAuthenticationToRequest(request);
   request.data[L"myanimelist-username"] = Settings[taiga::kSync_Service_Mal_Username];
+  request.data[L"herro-username"] = Settings[taiga::kSync_Service_Herro_Username];
   ServiceManager.MakeRequest(request);
 }
 
@@ -138,12 +139,19 @@ void DownloadImage(int id, const string_t& image_url) {
 
 void AddAuthenticationToRequest(Request& request) {
   Service& service = ServiceManager.service(kMyAnimeList);
-
   if (RequestNeedsAuthentication(request.type, kMyAnimeList)) {
     request.data[service.canonical_name() + L"-username"] =
         Settings[taiga::kSync_Service_Mal_Username];
     request.data[service.canonical_name() + L"-password"] =
         SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]);
+  }
+
+  service = ServiceManager.service(kHerro);
+  if (RequestNeedsAuthentication(request.type, kHerro)) {
+    request.data[service.canonical_name() + L"-username"] =
+        Settings[taiga::kSync_Service_Herro_Username];
+    request.data[service.canonical_name() + L"-apitoken"] =
+        Settings[taiga::kSync_Service_Herro_ApiToken];
   }
 }
 

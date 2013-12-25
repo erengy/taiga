@@ -20,6 +20,7 @@
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/history.h"
+#include "sync/herro.h"
 #include "sync/manager.h"
 #include "sync/myanimelist.h"
 #include "sync/sync.h"
@@ -35,6 +36,7 @@ namespace sync {
 Manager::Manager() {
   // Create services
   services_[kMyAnimeList].reset(new myanimelist::Service);
+//services_[kHerro].reset(new herro::Service);
 }
 
 Manager::~Manager() {

@@ -140,6 +140,8 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_AutoOnStart, nullptr, L"account/myanimelist/login");
   INITKEY(kSync_Service_Mal_Username, nullptr, L"account/myanimelist/username");
   INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
+  INITKEY(kSync_Service_Herro_Username, nullptr, L"account/herro/username");
+  INITKEY(kSync_Service_Herro_ApiToken, nullptr, L"account/herro/apitoken");
 
   // Library
   INITKEY(kLibrary_WatchFolders, L"true", L"anime/folders/watch/enabled");
