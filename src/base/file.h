@@ -49,6 +49,8 @@ std::wstring GetDefaultAppPath(const std::wstring& extension, const std::wstring
 
 unsigned int PopulateFiles(std::vector<std::wstring>& file_list, const std::wstring& path, const std::wstring& extension = L"", bool recursive = false, bool trim_extension = false);
 int PopulateFolders(std::vector<std::wstring>& folder_list, const std::wstring& path);
+
+bool ReadFromFile(const std::wstring& path, std::string& output);
 bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path, bool take_backup = false);
 
 std::wstring ToSizeString(QWORD qwSize);

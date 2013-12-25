@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <fstream>
 #include <shlobj.h>
 
 #include "file.h"
@@ -442,6 +443,23 @@ int PopulateFolders(vector<wstring>& folder_list, const wstring& path) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+bool ReadFromFile(const std::wstring& path, std::string& output) {
+  std::ifstream is;
+  is.open(WstrToStr(path).c_str(), std::ios::binary);
+
+  is.seekg(0, std::ios::end);
+  size_t len = static_cast<size_t>(is.tellg());
+
+  if (len != -1) {
+    output.resize(len);
+    is.seekg(0, std::ios::beg);
+    is.read((char*)output.data(), output.size());
+  }
+
+  is.close();
+  return len != -1;
+}
 
 bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
                 bool take_backup) {
