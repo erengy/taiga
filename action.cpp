@@ -523,6 +523,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       case mal::MYSTATUS_COMPLETED:
         event_item.episode = anime_item->GetEpisodeCount();
         if (*event_item.episode == 0) event_item.episode.Reset();
+        if (!mal::IsValidDate(anime_item->GetMyDate(anime::DATE_START)))
+          if (anime_item->GetEpisodeCount() == 1)
+            event_item.date_start = mal::TranslateDateForApi(GetDate());
         if (!mal::IsValidDate(anime_item->GetMyDate(anime::DATE_END)))
           event_item.date_finish = mal::TranslateDateForApi(GetDate());
         break;
