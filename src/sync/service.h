@@ -77,13 +77,14 @@ public:
   Service();
   virtual ~Service() {}
 
-  virtual void BuildRequest(Request& request, HttpRequest& http_request);
-  virtual void HandleResponse(Response& response, HttpResponse& http_response);
+  virtual void BuildRequest(Request& request, HttpRequest& http_request) = 0;
+  virtual void HandleResponse(Response& response, HttpResponse& http_response) = 0;
   virtual bool RequestNeedsAuthentication(RequestType request_type) const;
 
+  const string_t& host() const;
   enum_t id() const;
-  string_t canonical_name() const;
-  string_t name() const;
+  const string_t& canonical_name() const;
+  const string_t& name() const;
 
 protected:
   // API end-point

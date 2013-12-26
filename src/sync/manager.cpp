@@ -35,19 +35,22 @@ namespace sync {
 
 Manager::Manager() {
   // Create services
-  services_[kMyAnimeList].reset(new myanimelist::Service);
-  services_[kHerro].reset(new herro::Service);
+  services_[kMyAnimeList].reset(new myanimelist::Service());
+  services_[kHerro].reset(new herro::Service());
 }
 
 Manager::~Manager() {
   // Services will automatically free themselves
 }
 
-Service& Manager::service(ServiceId service_id) {
-  return *services_[service_id].get();
+const Service* Manager::service(ServiceId service_id) {
+  if (services_.count(service_id))
+    return services_[service_id].get();
+
+  return nullptr;
 }
 
-Service* Manager::service(const string_t& canonical_name) {
+const Service* Manager::service(const string_t& canonical_name) {
   foreach_(service, services_)
     if (canonical_name == service->second.get()->canonical_name())
       return service->second.get();

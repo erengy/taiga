@@ -40,8 +40,8 @@ public:
   void HandleHttpError(HttpResponse& http_response, string_t error);
   void HandleHttpResponse(HttpResponse& http_response);
 
-  Service& service(ServiceId service_id);
-  Service* service(const string_t& canonical_name);
+  const Service* service(ServiceId service_id);
+  const Service* service(const string_t& canonical_name);
 
 private:
   void HandleError(Response& response, HttpResponse& http_response);
