@@ -99,6 +99,7 @@
     <ClCompile Include="base\file.cpp" />
     <ClCompile Include="base\gfx.cpp" />
     <ClCompile Include="base\gzip.cpp" />
+    <ClCompile Include="base\json.cpp" />
     <ClCompile Include="base\logger.cpp" />
     <ClCompile Include="base\process.cpp" />
     <ClCompile Include="base\string.cpp" />
@@ -117,6 +118,7 @@
     <ClCompile Include="library\resource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sync\herro.cpp" />
+    <ClCompile Include="sync\herro_util.cpp" />
     <ClCompile Include="sync\manager.cpp" />
     <ClCompile Include="sync\myanimelist.cpp" />
     <ClCompile Include="sync\myanimelist_util.cpp" />
@@ -249,6 +251,7 @@
     <ClInclude Include="library\resource.h" />
     <ClInclude Include="sync\herro.h" />
     <ClInclude Include="sync\herro_types.h" />
+    <ClInclude Include="sync\herro_util.h" />
     <ClInclude Include="sync\manager.h" />
     <ClInclude Include="sync\myanimelist.h" />
     <ClInclude Include="sync\myanimelist_types.h" />

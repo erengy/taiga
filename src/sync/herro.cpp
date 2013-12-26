@@ -16,14 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "herro.h"
-#include "herro_types.h"
-
 #include "base/encoding.h"
 #include "base/json.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
+#include "sync/herro.h"
+#include "sync/herro_types.h"
+#include "sync/herro_util.h"
 
 namespace sync {
 namespace herro {
@@ -132,7 +132,8 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   Json::Value root;
   root["_id"] = WstrToStr(request.data[canonical_name_ + L"-id"]);
   if (request.data.count(L"status"))
-    root["status"] = WstrToStr(request.data[L"status"]);  // TODO: translate
+    root["status"] = WstrToStr(ToWstr(TranslateMyStatusTo(
+        ToInt(request.data[L"status"]))));
   if (request.data.count(L"progress"))
     root["progress"] = WstrToStr(request.data[L"progress"]);
   if (request.data.count(L"score"))
@@ -161,12 +162,12 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // Available data:
   // - _id
   // - series_title
-  // - list_score
-  // - list_status
-  // - list_progress
+  // - list_score (0-10)
+  // - list_status (1-5)
+  // - list_progress (0-n)
   // - series_total
-  // - series_type
-  // - series_status
+  // - series_type (in string form)
+  // - series_status (in string form)
   for (int i = 0; i < root.size(); i++) {
     auto& value = root[i];
     ::anime::Item anime_item;
@@ -175,15 +176,15 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
 
     anime_item.SetTitle(StrToWstr(value["series_title"].asString()));
     anime_item.SetEpisodeCount(value["series_total"].asInt());
-    anime_item.SetType(value["series_type"].asInt());  // TODO: translate
-    anime_item.SetAiringStatus(value["series_status"].asInt());  // TODO: translate
+    anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(value["series_type"].asString())));
+    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(StrToWstr(value["series_status"].asString())));
 
     anime_item.AddtoUserList();
     anime_item.SetMyScore(value["list_score"].asInt());
-    anime_item.SetMyStatus(value["list_status"].asInt());  // TODO: translate
+    anime_item.SetMyStatus(TranslateMyStatusFrom(value["list_status"].asInt()));
     anime_item.SetMyLastWatchedEpisode(value["list_progress"].asInt());
 
-//  AnimeDatabase.UpdateItem(anime_item);
+//  AnimeDatabase.UpdateItem(anime_item);  // TODO
   }
 }
 
@@ -202,19 +203,46 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   // - slug
   // - image_url
   // - metadata
-  //   - title_aka
-  //   - title_english
-  //   - series_status
-  //   - series_type
+  //   - title_aka (array)
+  //   - title_english (array)
+  //   - series_status (in string form)
+  //   - series_type (in string form)
   //   - series_start
   //   - series_end
   //   - plot
-  //   - genres
+  //   - genres (array)
   //   - episodes_total
   //   - episodes_length
+
   ::anime::Item anime_item;
+  // TODO: Set ID
+
   anime_item.SetTitle(StrToWstr(root["title"].asString()));
-  // ...
+  anime_item.SetImageUrl(StrToWstr(root["image_url"].asString()));
+
+  auto& metadata = root["metadata"];
+
+  std::vector<std::wstring> title_aka;
+  if (JsonReadArray(metadata, "title_aka", title_aka))
+    anime_item.SetSynonyms(title_aka);
+
+  std::vector<std::wstring> english;
+  if (JsonReadArray(metadata, "english", english))
+    anime_item.SetEnglishTitle(english.front());  // TODO
+
+  anime_item.SetAiringStatus(TranslateSeriesStatusFrom(StrToWstr(metadata["series_status"].asString())));
+  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(metadata["series_type"].asString())));
+  anime_item.SetDateStart(TranslateDateFrom(StrToWstr(metadata["series_start"].asString())));
+  anime_item.SetDateEnd(TranslateDateFrom(StrToWstr(metadata["series_end"].asString())));
+  anime_item.SetSynopsis(StrToWstr(metadata["plot"].asString()));
+
+  std::vector<std::wstring> genres;
+  if (JsonReadArray(metadata, "genres", genres))
+    anime_item.SetGenres(genres);
+
+  anime_item.SetEpisodeCount(metadata["episodes_total"].asInt());
+  anime_item.SetEpisodeLength(metadata["episodes_length"].asInt());
+
   // TODO: Update database
 //AnimeDatabase.UpdateItem(anime_item);
 }
@@ -233,17 +261,42 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   // - _id
   // - title
   // - slug
-  // - series_type
+  // - series_type (in string form)
   // - image_url
   // - metadata
-  //   - title_aka
-  //   - title_english
-  //   - series_status
+  //   - title_aka (array)
+  //   - title_english (array)
+  //   - series_status (in string form)
   //   - series_start
   //   - series_end
   //   - plot
+
   for (int i = 0; i < root.size(); i++) {
-    // TODO
+    auto& value = root[i];
+    ::anime::Item anime_item;
+//  anime_item.SetId(value["_id"].asString());  // TODO
+
+    anime_item.SetTitle(StrToWstr(value["title"].asString()));
+    anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(value["series_type"].asString())));
+    anime_item.SetImageUrl(StrToWstr(root["image_url"].asString()));
+
+    auto& metadata = root["metadata"];
+
+    std::vector<std::wstring> title_aka;
+    if (JsonReadArray(metadata, "title_aka", title_aka))
+      anime_item.SetSynonyms(title_aka);
+
+    std::vector<std::wstring> english;
+    if (JsonReadArray(metadata, "english", english))
+      anime_item.SetEnglishTitle(english.front());  // TODO
+
+    anime_item.SetAiringStatus(TranslateSeriesStatusFrom(StrToWstr(metadata["series_status"].asString())));
+    anime_item.SetDateStart(TranslateDateFrom(StrToWstr(metadata["series_start"].asString())));
+    anime_item.SetDateEnd(TranslateDateFrom(StrToWstr(metadata["series_end"].asString())));
+    anime_item.SetSynopsis(StrToWstr(metadata["plot"].asString()));
+
+    // TODO: Update database
+//  AnimeDatabase.UpdateItem(anime_item);
   }
 }
 

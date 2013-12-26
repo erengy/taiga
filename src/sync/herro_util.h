@@ -16,14 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_JSON_H
-#define TAIGA_BASE_JSON_H
+#ifndef TAIGA_SYNC_HERRO_UTIL_H
+#define TAIGA_SYNC_HERRO_UTIL_H
 
 #include <string>
-#include <vector>
 
-#include "third_party/jsoncpp/json/json.h"
+namespace sync {
+namespace herro {
 
-bool JsonReadArray(const Json::Value& root, const std::string& name, std::vector<std::wstring>& output);
+int TranslateSeriesStatusFrom(int value);
+int TranslateSeriesStatusFrom(const std::wstring& value);
+int TranslateSeriesTypeFrom(int value);
+int TranslateSeriesTypeFrom(const std::wstring& value);
+std::wstring TranslateDateFrom(const std::wstring& value);
+int TranslateMyStatusFrom(int value);
+int TranslateMyStatusTo(int value);
+std::wstring TranslateKeyTo(const std::wstring& key);
 
-#endif  // TAIGA_BASE_JSON_H
+}  // namespace herro
+}  // namespace sync
+
+#endif  // TAIGA_SYNC_HERRO_UTIL_H

@@ -16,14 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_JSON_H
-#define TAIGA_BASE_JSON_H
+#include "json.h"
+#include "string.h"
 
-#include <string>
-#include <vector>
+bool JsonReadArray(const Json::Value& root, const std::string& name,
+                   std::vector<std::wstring>& output) {
+  size_t previous_size = output.size();
 
-#include "third_party/jsoncpp/json/json.h"
+  for (int i = 0; i < root[name.c_str()].size(); i++)
+    output.push_back(StrToWstr(root[i].asString()));
 
-bool JsonReadArray(const Json::Value& root, const std::string& name, std::vector<std::wstring>& output);
-
-#endif  // TAIGA_BASE_JSON_H
+  return output.size() > previous_size;
+}

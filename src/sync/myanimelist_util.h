@@ -21,8 +21,6 @@
 
 #include <string>
 
-class Date;
-
 namespace sync {
 namespace myanimelist {
 

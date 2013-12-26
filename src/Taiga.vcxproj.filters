@@ -433,6 +433,12 @@
     <ClCompile Include="third_party\jsoncpp\json_writer.cpp">
       <Filter>include\jsoncpp</Filter>
     </ClCompile>
+    <ClCompile Include="sync\herro_util.cpp">
+      <Filter>sync\herro</Filter>
+    </ClCompile>
+    <ClCompile Include="base\json.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -782,6 +788,9 @@
     </ClInclude>
     <ClInclude Include="base\json.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\herro_util.h">
+      <Filter>sync\herro</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

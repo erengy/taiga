@@ -1,0 +1,140 @@
+/*
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
+** 
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+** 
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+** 
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "base/logger.h"
+#include "base/string.h"
+#include "library/anime.h"
+#include "sync/herro_util.h"
+#include "sync/herro_types.h"
+
+namespace sync {
+namespace herro {
+
+int TranslateSeriesStatusFrom(int value) {
+  switch (value) {
+    case kAiring: return anime::kAiring;
+    case kFinishedAiring: return anime::kFinishedAiring;
+    case kNotYetAired: return anime::kNotYetAired;
+  }
+
+  LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
+  return anime::kUnknownStatus;
+}
+
+int TranslateSeriesStatusFrom(const std::wstring& value) {
+  if (IsEqual(value, L"Airing")) {
+    return anime::kAiring;
+  } else if (IsEqual(value, L"Completed")) {
+    return anime::kFinishedAiring;
+  } else if (IsEqual(value, L"Not yet aired")) {
+    return anime::kNotYetAired;
+  }
+
+  LOG(LevelWarning, L"Unknown value: " + value);
+  return anime::kUnknownStatus;
+}
+
+int TranslateSeriesTypeFrom(int value) {
+  switch (value) {
+    case kTv: return anime::kTv;
+    case kOva: return anime::kOva;
+    case kMovie: return anime::kMovie;
+    case kSpecial: return anime::kSpecial;
+    case kOna: return anime::kOna;
+    case kMusic: return anime::kMusic;
+  }
+
+  LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
+  return anime::kUnknownType;
+}
+
+int TranslateSeriesTypeFrom(const std::wstring& value) {
+  if (IsEqual(value, L"TV")) {
+    return anime::kTv;
+  } else if (IsEqual(value, L"OVA")) {
+    return anime::kOva;
+  } else if (IsEqual(value, L"Movie")) {
+    return anime::kMovie;
+  } else if (IsEqual(value, L"Special")) {
+    return anime::kSpecial;
+  } else if (IsEqual(value, L"ONA")) {
+    return anime::kOna;
+  } else if (IsEqual(value, L"Music")) {
+    return anime::kMusic;
+  }
+
+  LOG(LevelWarning, L"Unknown value: " + value);
+  return anime::kUnknownType;
+}
+
+std::wstring TranslateDateFrom(const std::wstring& value) {
+  if (value.size() < 10)
+    return Date();
+
+  // Get YYYY-MM-DD from YYYY-MM-DDTHH:MM:SS.000Z
+  return value.substr(0, 10);
+}
+
+int TranslateMyStatusFrom(int value) {
+  switch (value) {
+    case kCurrent: return anime::kWatching;
+    case kCompleted: return anime::kCompleted;
+    case kOnHold: return anime::kOnHold;
+    case kDropped: return anime::kDropped;
+    case kPlanned: return anime::kPlanToWatch;
+  }
+
+  LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
+  return anime::kNotInList;
+}
+
+int TranslateMyStatusTo(int value) {
+  switch (value) {
+    case anime::kWatching: return kCurrent;
+    case anime::kCompleted: return kCompleted;
+    case anime::kOnHold: return kOnHold;
+    case anime::kDropped: return kDropped;
+    case anime::kPlanToWatch: return kPlanned;
+  }
+
+  LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
+  return kCurrent;
+}
+
+std::wstring TranslateKeyTo(const std::wstring& key) {
+  if (IsEqual(key, L"episode")) {
+    return key;
+  } else if (IsEqual(key, L"status")) {
+    return key;
+  } else if (IsEqual(key, L"score")) {
+    return key;
+  } else if (IsEqual(key, L"date_start")) {
+    return key;
+  } else if (IsEqual(key, L"date_finish")) {
+    return key;
+  } else if (IsEqual(key, L"enable_rewatching")) {
+    return key;
+  } else if (IsEqual(key, L"tags")) {
+    return key;
+  }
+
+  return std::wstring();
+}
+
+}  // namespace herro
+}  // namespace sync
