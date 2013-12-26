@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,14 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WIN_RESIZABLE_H
-#define WIN_RESIZABLE_H
+#ifndef TAIGA_WIN_RESIZABLE_H
+#define TAIGA_WIN_RESIZABLE_H
 
 #include "win_main.h"
 
 namespace win {
-
-// =============================================================================
 
 class Resizable {
 public:
@@ -34,13 +32,13 @@ public:
 
 private:
   void OnInitDialog(HWND hwnd);
-  void OnScroll(HWND hwnd, int nBar, UINT code);
-  void OnSize(HWND hwnd, UINT nType, SIZE size);
-  void ScrollClient(HWND hwnd, int nBar, int pos);
+  void OnScroll(HWND hwnd, int bar, UINT code);
+  void OnSize(HWND hwnd, UINT type, SIZE size);
+  void ScrollClient(HWND hwnd, int bar, int pos);
 
   int x_, y_;
 };
 
 }  // namespace win
 
-#endif // WIN_RESIZABLE_H
+#endif  // TAIGA_WIN_RESIZABLE_H

@@ -1,6 +1,6 @@
 /*
-** Taiga, a lightweight client for MyAnimeList
-** Copyright (C) 2010-2012, Eren Okka
+** Taiga
+** Copyright (C) 2010-2013, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,10 +24,8 @@
 
 namespace win {
 
-// =============================================================================
-
-Resizable::Resizable() :
-  x_(1), y_(1) {
+Resizable::Resizable()
+    : x_(1), y_(1) {
 }
 
 void Resizable::ResizeProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -68,28 +66,28 @@ void Resizable::OnInitDialog(HWND hwnd) {
   ::SetScrollInfo(hwnd, SB_VERT, &si, FALSE);
 }
 
-void Resizable::OnScroll(HWND hwnd, int nBar, UINT code) {
+void Resizable::OnScroll(HWND hwnd, int bar, UINT code) {
   SCROLLINFO si = {0};
   si.cbSize = sizeof(SCROLLINFO);
   si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_TRACKPOS;
-  ::GetScrollInfo(hwnd, nBar, &si);
+  ::GetScrollInfo(hwnd, bar, &si);
 
-  int nMin = si.nMin;
-  int nMax = si.nMax - (si.nPage - 1);
+  int min_pos = si.nMin;
+  int max_pos = si.nMax - (si.nPage - 1);
   int pos = -1;
 
   switch (code) {
     case SB_LINEUP:
-      pos = max(si.nPos - 1, nMin);
+      pos = max(si.nPos - 1, min_pos);
       break;
     case SB_LINEDOWN:
-      pos = min(si.nPos + 1, nMax);
+      pos = min(si.nPos + 1, max_pos);
       break;
     case SB_PAGEUP:
-      pos = max(si.nPos - (int)si.nPage, nMin);
+      pos = max(si.nPos - (int)si.nPage, min_pos);
       break;
     case SB_PAGEDOWN:
-      pos = min(si.nPos + (int)si.nPage, nMax);
+      pos = min(si.nPos + (int)si.nPage, max_pos);
       break;
     case SB_THUMBPOSITION:
       break;
@@ -97,10 +95,10 @@ void Resizable::OnScroll(HWND hwnd, int nBar, UINT code) {
       pos = si.nTrackPos;
       break;
     case SB_TOP:
-      pos = nMin;
+      pos = min_pos;
       break;
     case SB_BOTTOM:
-      pos = nMax;
+      pos = max_pos;
       break;
     case SB_ENDSCROLL:
       break;
@@ -111,12 +109,12 @@ void Resizable::OnScroll(HWND hwnd, int nBar, UINT code) {
   if (pos == -1)
     return;
 
-  ::SetScrollPos(hwnd, nBar, pos, TRUE);
-  ScrollClient(hwnd, nBar, pos);
+  ::SetScrollPos(hwnd, bar, pos, TRUE);
+  ScrollClient(hwnd, bar, pos);
 }
 
-void Resizable::OnSize(HWND hwnd, UINT nType, SIZE size) {
-  if (nType != SIZE_RESTORED && nType != SIZE_MAXIMIZED)
+void Resizable::OnSize(HWND hwnd, UINT type, SIZE size) {
+  if (type != SIZE_RESTORED && type != SIZE_MAXIMIZED)
     return;
 
   SCROLLINFO si = {0};
@@ -133,28 +131,26 @@ void Resizable::OnSize(HWND hwnd, UINT nType, SIZE size) {
     si.fMask = SIF_RANGE | SIF_POS;
     ::GetScrollInfo(hwnd, bar[i], &si);
 
-    const int maxScrollPos = si.nMax - (page[i] - 1);
+    const int max_pos = si.nMax - (page[i] - 1);
 
-    if ((si.nPos != si.nMin && si.nPos == maxScrollPos) || 
-        (nType == SIZE_MAXIMIZED)) {
+    if ((si.nPos != si.nMin && si.nPos == max_pos) ||
+        (type == SIZE_MAXIMIZED))
       ScrollClient(hwnd, bar[i], si.nPos);
-    }
   }
 }
 
-void Resizable::ScrollClient(HWND hwnd, int nBar, int pos) {
+void Resizable::ScrollClient(HWND hwnd, int bar, int pos) {
   int x = 0;
   int y = 0;
 
-  int& delta = nBar == SB_HORZ ? x : y;
-  int& prev = nBar == SB_HORZ ? x_ : y_;
+  int& delta = bar == SB_HORZ ? x : y;
+  int& prev = bar == SB_HORZ ? x_ : y_;
 
   delta = prev - pos;
   prev = pos;
 
-  if (x || y) {
+  if (x || y)
     ::ScrollWindow(hwnd, x, y, nullptr, nullptr);
-  }
 }
 
 }  // namespace win
