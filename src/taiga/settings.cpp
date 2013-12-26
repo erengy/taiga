@@ -41,16 +41,47 @@ taiga::AppSettings Settings;
 
 namespace taiga {
 
-const std::wstring kDefaultExternalLinks = L"Anime Recommendation Finder|http://www.animerecs.com\r\nMALgraph|http://mal.oko.im\r\n-\r\nAnime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\nMahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\nThe Fansub Wiki|http://www.fansubwiki.com";
-const std::wstring kDefaultFormatHttp = L"user=%user%&name=%title%&ep=%episode%&eptotal=$if(%total%,%total%,?)&score=%score%&picurl=%image%&playstatus=%playstatus%";
-const std::wstring kDefaultFormatMessenger = L"Watching: %title%$if(%episode%, #%episode%$if(%total%,/%total%)) ~ www.myanimelist.net/anime/%id%";
-const std::wstring kDefaultFormatMirc = L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 $if(%score%,\00314[Score: %score%/10]\003) \00312www.myanimelist.net/anime/%id%";
-const std::wstring kDefaultFormatSkype = L"Watching: <a href=\"http://myanimelist.net/anime/%id%\">%title%</a>$if(%episode%, #%episode%$if(%total%,/%total%))";
-const std::wstring kDefaultFormatTwitter = L"$ifequal(%episode%,%total%,Just completed: %title%$if(%score%, (Score: %score%/10)) www.myanimelist.net/anime/%id%)";
-const std::wstring kDefaultFormatBalloon = L"$if(%title%,%title%)\\n$if(%episode%,Episode %episode%$if(%total%,/%total%) )$if(%group%,by %group%)\\n$if(%name%,%name%)";
-const std::wstring kDefaultTorrentAppPath = L"C:\\Program Files\\uTorrent\\uTorrent.exe";
-const std::wstring kDefaultTorrentSearch = L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%";
-const std::wstring kDefaultTorrentSource = L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
+const std::wstring kDefaultExternalLinks =
+    L"Anime Recommendation Finder|http://www.animerecs.com\r\n"
+    L"MALgraph|http://mal.oko.im\r\n-\r\n"
+    L"Anime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\n"
+    L"Mahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\n"
+    L"The Fansub Wiki|http://www.fansubwiki.com";
+const std::wstring kDefaultFormatHttp =
+    L"user=%user%"
+    L"&name=%title%"
+    L"&ep=%episode%"
+    L"&eptotal=$if(%total%,%total%,?)"
+    L"&score=%score%"
+    L"&picurl=%image%"
+    L"&playstatus=%playstatus%";
+const std::wstring kDefaultFormatMessenger =
+    L"Watching: %title%"
+    L"$if(%episode%, #%episode%$if(%total%,/%total%)) ~ "
+    L"www.myanimelist.net/anime/%id%";
+const std::wstring kDefaultFormatMirc =
+    L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%"
+    L"$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 "
+    L"$if(%score%,\00314[Score: %score%/10]\003) "
+    L"\00312www.myanimelist.net/anime/%id%";
+const std::wstring kDefaultFormatSkype =
+    L"Watching: <a href=\"http://myanimelist.net/anime/%id%\">%title%</a>"
+    L"$if(%episode%, #%episode%$if(%total%,/%total%))";
+const std::wstring kDefaultFormatTwitter =
+    L"$ifequal(%episode%,%total%,Just completed: %title%"
+    L"$if(%score%, (Score: %score%/10)) "
+    L"www.myanimelist.net/anime/%id%)";
+const std::wstring kDefaultFormatBalloon =
+    L"$if(%title%,%title%)\\n"
+    L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )"
+    L"$if(%group%,by %group%)\\n"
+    L"$if(%name%,%name%)";
+const std::wstring kDefaultTorrentAppPath =
+    L"C:\\Program Files\\uTorrent\\uTorrent.exe";
+const std::wstring kDefaultTorrentSearch =
+    L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%";
+const std::wstring kDefaultTorrentSource =
+    L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
 
 ////////////////////////////////////////////////////////////////////////////////
 
