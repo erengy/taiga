@@ -37,6 +37,7 @@ enum AppSettingName {
   kMeta_Version_Revision,
 
   // Services
+  kSync_ActiveService,
   kSync_AutoOnStart,
   kSync_Service_Mal_Username,
   kSync_Service_Mal_Password,

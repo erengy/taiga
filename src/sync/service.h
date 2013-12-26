@@ -74,20 +74,22 @@ public:
 
 class Service {
 public:
-  Service() {}
+  Service();
   virtual ~Service() {}
 
   virtual void BuildRequest(Request& request, HttpRequest& http_request);
   virtual void HandleResponse(Response& response, HttpResponse& http_response);
   virtual bool RequestNeedsAuthentication(RequestType request_type) const;
 
+  enum_t id() const;
   string_t canonical_name() const;
   string_t name() const;
 
 protected:
   // API end-point
   string_t host_;
-  // Names that identify the service
+  // Service identifiers
+  enum_t id_;
   string_t canonical_name_;
   string_t name_;
   // User information

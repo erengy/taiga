@@ -41,6 +41,7 @@ public:
   void HandleHttpResponse(HttpResponse& http_response);
 
   Service& service(ServiceId service_id);
+  Service* service(const string_t& canonical_name);
 
 private:
   void HandleError(Response& response, HttpResponse& http_response);

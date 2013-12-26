@@ -44,6 +44,8 @@ public:
   // Metadata
 
   int GetId() const;
+  const std::wstring& GetId(enum_t service) const;
+  enum_t GetSource() const;
   int GetType() const;
   int GetEpisodeCount() const;
   int GetEpisodeLength() const;
@@ -60,7 +62,7 @@ public:
   const std::wstring& GetScore() const;
   const std::wstring& GetSynopsis() const;
 
-  void SetId(int anime_id);
+  void SetId(const std::wstring& id, enum_t service);
   void SetType(int type);
   void SetEpisodeCount(int number);
   void SetEpisodeLength(int number);

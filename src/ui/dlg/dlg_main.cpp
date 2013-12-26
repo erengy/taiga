@@ -54,6 +54,7 @@
 #include "taiga/taiga.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "sync/manager.h"
 
 #include "win/win_gdi.h"
 #include "win/win_taskbar.h"
@@ -896,8 +897,20 @@ void MainDialog::UpdateTitle() {
 #ifdef _DEBUG
   title += L" [debug]";
 #endif
-  if (!Settings[taiga::kSync_Service_Mal_Username].empty()) {
-    title += L" \u2013 " + Settings[taiga::kSync_Service_Mal_Username];
+  auto service = ServiceManager.service(Settings[taiga::kSync_ActiveService]);
+  switch (service->id()) {
+    case sync::kMyAnimeList:
+      if (!Settings[taiga::kSync_Service_Mal_Username].empty()) {
+        title += L" \u2013 " + Settings[taiga::kSync_Service_Mal_Username] +
+                 L" @ " + service->name();
+      }
+      break;
+    case sync::kHerro:
+      if (!Settings[taiga::kSync_Service_Herro_Username].empty()) {
+        title += L" \u2013 " + Settings[taiga::kSync_Service_Herro_Username] +
+                 L" @ " + service->name();
+      }
+      break;
   }
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);

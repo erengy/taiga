@@ -24,6 +24,7 @@
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
@@ -46,12 +47,24 @@ bool Database::LoadDatabase() {
     return false;
   }
 
+  xml_node meta_node = document.child(L"meta");
+  wstring meta_version = XmlReadStrValue(meta_node, L"version");
+
   xml_node animedb_node = document.child(L"animedb");
 
   foreach_xmlnode_(node, animedb_node, L"anime") {
-    int id = XmlReadIntValue(node, L"series_animedb_id");
-    Item& item = items[id];  // Creates the item if it doesn't exist
-    item.SetId(id);
+    std::vector<std::wstring> ids;
+    XmlReadChildNodes(node, ids, L"series_animedb_id");
+
+    Item& item = items[ToInt(ids.at(0))];  // Creates the item if it doesn't exist
+
+    for (size_t i = 0; i < ids.size(); i++)
+      item.SetId(ids.at(i), i);
+
+    // Compatibility with pre-1.1
+    if (meta_version.empty())
+      item.SetId(ids.at(0), sync::kMyAnimeList);
+
     item.SetTitle(XmlReadStrValue(node, L"series_title"));
     item.SetEnglishTitle(XmlReadStrValue(node, L"series_english"));
     item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
@@ -77,15 +90,23 @@ bool Database::SaveDatabase() {
     return false;
 
   xml_document document;
+
+  xml_node meta_node = document.append_child(L"meta");
+  XmlWriteStrValue(meta_node, L"version", L"1.1");
+
   xml_node animedb_node = document.append_child(L"animedb");
 
   foreach_(it, items) {
     xml_node anime_node = animedb_node.append_child(L"anime");
+
+    for (int i = 0; i <= sync::kHerro; i++) {
+      XmlWriteStrValue(anime_node, L"series_animedb_id", it->second.GetId(i).c_str());
+    }
+
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
       if (!v.empty()) XmlWriteStrValue(anime_node, n, v.c_str(), t)
-    XML_WI(L"series_animedb_id", it->second.GetId());
     XML_WS(L"series_title", it->second.GetTitle(), pugi::node_cdata);
     XML_WS(L"series_english", it->second.GetEnglishTitle(), pugi::node_cdata);
     XML_WS(L"series_synonyms", Join(it->second.GetSynonyms(), L"; "), pugi::node_cdata);
@@ -111,12 +132,20 @@ bool Database::SaveDatabase() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Item* Database::FindItem(int anime_id) {
-  if (anime_id > ID_UNKNOWN) {
-    auto it = items.find(anime_id);
+Item* Database::FindItem(int id) {
+  if (id > ID_UNKNOWN) {
+    auto it = items.find(id);
     if (it != items.end())
       return &it->second;
   }
+
+  return nullptr;
+}
+
+Item* Database::FindItem(const std::wstring& id, enum_t service) {
+  foreach_(it, items)
+    if (id == it->second.GetId(service))
+      return &it->second;
 
   return nullptr;
 }
@@ -157,18 +186,24 @@ void Database::ClearInvalidItems() {
   }
 }
 
-void Database::UpdateItem(const Item& new_item) {
+int Database::UpdateItem(const Item& new_item) {
   critical_section_.Enter();
 
-  Item* item = FindItem(new_item.GetId());
+  enum_t source = new_item.GetSource();
+  Item* item = FindItem(new_item.GetId(source), source);
   if (!item) {
+    // Generate a new ID
+    int id = 1;
+    while (FindItem(id))
+      ++id;
     // Add a new item
-    item = &items[new_item.GetId()];
+    item = &items[id];
+    item->SetId(ToWstr(id), 0);
   }
 
   // Update series information if new information is, well, new.
   if (!item->last_modified || new_item.last_modified > item->last_modified) {
-    item->SetId(new_item.GetId());
+    item->SetId(new_item.GetId(source), source);
     item->last_modified = new_item.last_modified;
 
     // Update only if a value is non-empty
@@ -205,7 +240,7 @@ void Database::UpdateItem(const Item& new_item) {
     if (!new_item.GetTitle().empty() ||
         !new_item.GetSynonyms().empty() ||
         !new_item.GetEnglishTitle(false).empty())
-      Meow.UpdateCleanTitles(new_item.GetId());
+      Meow.UpdateCleanTitles(item->GetId());
   }
 
   // Update user information
@@ -225,6 +260,8 @@ void Database::UpdateItem(const Item& new_item) {
   }
 
   critical_section_.Leave();
+
+  return item->GetId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -247,11 +284,14 @@ bool Database::LoadList() {
     return false;
   }
 
+  xml_node meta_node = document.child(L"meta");
+  wstring meta_version = XmlReadStrValue(meta_node, L"version");
+
   xml_node node_myanimelist = document.child(L"myanimelist");
 
   foreach_xmlnode_(node, node_myanimelist, L"anime") {
     Item anime_item;
-    anime_item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
+    anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), 0);
 
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
@@ -275,6 +315,10 @@ bool Database::SaveList() {
     return false;
 
   xml_document document;
+
+  xml_node meta_node = document.append_child(L"meta");
+  XmlWriteStrValue(meta_node, L"version", L"1.1");
+
   xml_node myanimelist_node = document.append_child(L"myanimelist");
 
   foreach_(it, items) {

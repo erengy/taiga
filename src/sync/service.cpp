@@ -34,6 +34,10 @@ Response::Response()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Service::Service()
+    : id_(0) {
+}
+
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
 }
 
@@ -42,6 +46,10 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {
   return false;
+}
+
+enum_t Service::id() const {
+  return id_;
 }
 
 string_t Service::canonical_name() const {

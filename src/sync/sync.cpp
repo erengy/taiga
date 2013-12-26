@@ -35,21 +35,22 @@ namespace sync {
 void AuthenticateUser() {
   Request request(kAuthenticateUser);
   AddAuthenticationToRequest(request);
+  SetActiveServiceForRequest(request);
   ServiceManager.MakeRequest(request);
 }
 
 void GetLibraryEntries() {
   Request request(kGetLibraryEntries);
   AddAuthenticationToRequest(request);
-  request.data[L"myanimelist-username"] = Settings[taiga::kSync_Service_Mal_Username];
-  request.data[L"herro-username"] = Settings[taiga::kSync_Service_Herro_Username];
+  SetActiveServiceForRequest(request);
   ServiceManager.MakeRequest(request);
 }
 
 void GetMetadataById(int id) {
   Request request(kGetMetadataById);
   AddAuthenticationToRequest(request);
-  request.data[L"myanimelist-id"] = ToWstr(id);
+  AddServiceDataToRequest(request, id);
+  SetActiveServiceForRequest(request);
   ServiceManager.MakeRequest(request);
 }
 
@@ -57,6 +58,7 @@ void SearchTitle(string_t title) {
   Request request(kSearchTitle);
   AddAuthenticationToRequest(request);
   request.data[L"title"] = title;
+  SetActiveServiceForRequest(request);
   ServiceManager.MakeRequest(request);
 }
 
@@ -99,7 +101,8 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
 
   Request request(request_type);
   AddAuthenticationToRequest(request);
-  request.data[L"myanimelist-id"] = ToWstr(id);
+  AddServiceDataToRequest(request, id);
+  SetActiveServiceForRequest(request);
 
   if (anime_values.episode)
     request.data[L"episode"] = ToWstr(*anime_values.episode);
@@ -115,7 +118,7 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
     request.data[L"enable_rewatching"] = ToWstr(*anime_values.enable_rewatching);
   if (anime_values.tags)
     request.data[L"tags"] = *anime_values.tags;
-  
+
   ServiceManager.MakeRequest(request);
 }
 
@@ -132,32 +135,61 @@ void DownloadImage(int id, const string_t& image_url) {
 
   auto& client = ConnectionManager.GetNewClient(http_request.uuid);
   client.set_download_path(::anime::GetImagePath(id));
-  ConnectionManager.MakeRequest(client, http_request, taiga::kHttpGetLibraryEntryImage);
+  ConnectionManager.MakeRequest(client, http_request,
+                                taiga::kHttpGetLibraryEntryImage);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AddAuthenticationToRequest(Request& request) {
+bool AddAuthenticationToRequest(Request& request) {
   Service& service = ServiceManager.service(kMyAnimeList);
-  if (RequestNeedsAuthentication(request.type, kMyAnimeList)) {
-    request.data[service.canonical_name() + L"-username"] =
-        Settings[taiga::kSync_Service_Mal_Username];
+  request.data[service.canonical_name() + L"-username"] =
+      Settings[taiga::kSync_Service_Mal_Username];
+  if (RequestNeedsAuthentication(request.type, kMyAnimeList))
     request.data[service.canonical_name() + L"-password"] =
         SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]);
-  }
 
   service = ServiceManager.service(kHerro);
-  if (RequestNeedsAuthentication(request.type, kHerro)) {
-    request.data[service.canonical_name() + L"-username"] =
-        Settings[taiga::kSync_Service_Herro_Username];
+  request.data[service.canonical_name() + L"-username"] =
+      Settings[taiga::kSync_Service_Herro_Username];
+  if (RequestNeedsAuthentication(request.type, kHerro))
     request.data[service.canonical_name() + L"-apitoken"] =
         Settings[taiga::kSync_Service_Herro_ApiToken];
-  }
+
+  // TODO: Return false if authentication is required but not available
+  return true;
+}
+
+bool AddServiceDataToRequest(Request& request, int id) {
+  request.data[L"taiga-id"] = id;
+
+  auto anime_item = AnimeDatabase.FindItem(id);
+
+  if (!anime_item)
+    return false;
+
+  request.data[ServiceManager.service(kMyAnimeList).canonical_name() + L"-id"] =
+      anime_item->GetId(kMyAnimeList);
+  request.data[ServiceManager.service(kHerro).canonical_name() + L"-id"] =
+      anime_item->GetId(kHerro);
+
+  return true;
 }
 
 bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id) {
   Service& service = ServiceManager.service(service_id);
   return service.RequestNeedsAuthentication(request_type);
+}
+
+void SetActiveServiceForRequest(Request& request) {
+  std::wstring active_service_name = Settings[taiga::kSync_ActiveService];
+  auto service = ServiceManager.service(active_service_name);
+
+  if (service) {
+    request.service_id = static_cast<ServiceId>(service->id());
+  } else {
+    request.service_id = kMyAnimeList;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

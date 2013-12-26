@@ -32,8 +32,7 @@ Metadata::Metadata()
     : audience(0),
       source(0),
       status(0),
-      type(0),
-      uid(0) {
+      type(0) {
 }
 
 }  // namespace library

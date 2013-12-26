@@ -33,11 +33,12 @@ public:
   bool LoadDatabase();
   bool SaveDatabase();
 
-  Item* FindItem(int anime_id);
+  Item* FindItem(int id);
+  Item* FindItem(const std::wstring& id, enum_t service);
   Item* FindSequel(int anime_id);
 
   void ClearInvalidItems();
-  void UpdateItem(const Item& item);
+  int UpdateItem(const Item& item);
 
 public:
   bool LoadList();

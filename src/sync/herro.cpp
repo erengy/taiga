@@ -31,6 +31,7 @@ namespace herro {
 Service::Service() {
   host_ = L"api.herro.co";
 
+  id_ = kHerro;
   canonical_name_ = L"herro";
   name_ = L"Herro";
 }
@@ -51,7 +52,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     // TODO: Make sure username and token are available
     http_request.header[L"Authorization"] = L"Basic " +
         Base64Encode(request.data[canonical_name_ + L"-username"] + L":" +
-                     request.data[canonical_name_ + L"-token"]);
+                     request.data[canonical_name_ + L"-apitoken"]);
   }
 
   switch (request.type) {
@@ -134,8 +135,8 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   if (request.data.count(L"status"))
     root["status"] = WstrToStr(ToWstr(TranslateMyStatusTo(
         ToInt(request.data[L"status"]))));
-  if (request.data.count(L"progress"))
-    root["progress"] = WstrToStr(request.data[L"progress"]);
+  if (request.data.count(L"episode"))
+    root["progress"] = WstrToStr(request.data[L"episode"]);
   if (request.data.count(L"score"))
     root["score"] = WstrToStr(request.data[L"score"]);
   Json::StyledWriter writer;
@@ -171,7 +172,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   for (int i = 0; i < root.size(); i++) {
     auto& value = root[i];
     ::anime::Item anime_item;
-//  anime_item.SetId(value["_id"].asString());  // TODO
+    anime_item.SetId(StrToWstr(value["_id"].asString()), this->id());
     anime_item.last_modified = time(nullptr);  // current time
 
     anime_item.SetTitle(StrToWstr(value["series_title"].asString()));
@@ -184,7 +185,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     anime_item.SetMyStatus(TranslateMyStatusFrom(value["list_status"].asInt()));
     anime_item.SetMyLastWatchedEpisode(value["list_progress"].asInt());
 
-//  AnimeDatabase.UpdateItem(anime_item);  // TODO
+    AnimeDatabase.UpdateItem(anime_item);
   }
 }
 
@@ -261,12 +262,12 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   // - _id
   // - title
   // - slug
-  // - series_type (in string form)
   // - image_url
   // - metadata
   //   - title_aka (array)
   //   - title_english (array)
   //   - series_status (in string form)
+  //   - series_type (in string form)
   //   - series_start
   //   - series_end
   //   - plot
@@ -274,13 +275,11 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   for (int i = 0; i < root.size(); i++) {
     auto& value = root[i];
     ::anime::Item anime_item;
-//  anime_item.SetId(value["_id"].asString());  // TODO
-
+    anime_item.SetId(StrToWstr(value["_id"].asString()), this->id());
     anime_item.SetTitle(StrToWstr(value["title"].asString()));
-    anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(value["series_type"].asString())));
-    anime_item.SetImageUrl(StrToWstr(root["image_url"].asString()));
+    anime_item.SetImageUrl(StrToWstr(value["image_url"].asString()));
 
-    auto& metadata = root["metadata"];
+    auto& metadata = value["metadata"];
 
     std::vector<std::wstring> title_aka;
     if (JsonReadArray(metadata, "title_aka", title_aka))
@@ -291,12 +290,15 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
       anime_item.SetEnglishTitle(english.front());  // TODO
 
     anime_item.SetAiringStatus(TranslateSeriesStatusFrom(StrToWstr(metadata["series_status"].asString())));
+    anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(metadata["series_type"].asString())));
     anime_item.SetDateStart(TranslateDateFrom(StrToWstr(metadata["series_start"].asString())));
     anime_item.SetDateEnd(TranslateDateFrom(StrToWstr(metadata["series_end"].asString())));
     anime_item.SetSynopsis(StrToWstr(metadata["plot"].asString()));
 
-    // TODO: Update database
-//  AnimeDatabase.UpdateItem(anime_item);
+    int anime_id = AnimeDatabase.UpdateItem(anime_item);
+
+    // We return a list of IDs so that we can display the results afterwards
+    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
   }
 }
 

@@ -24,6 +24,7 @@
 #include "base/logger.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/taiga.h"
 
@@ -60,7 +61,7 @@ bool SeasonDatabase::Load(wstring file) {
       continue;
 
     anime::Item item;
-    item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
+    item.SetId(XmlReadStrValue(node, L"series_animedb_id"), sync::kMyAnimeList);
     item.SetTitle(XmlReadStrValue(node, L"series_title"));
     item.SetType(XmlReadIntValue(node, L"series_type"));
     item.SetImageUrl(XmlReadStrValue(node, L"series_image"));

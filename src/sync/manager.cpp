@@ -36,7 +36,7 @@ namespace sync {
 Manager::Manager() {
   // Create services
   services_[kMyAnimeList].reset(new myanimelist::Service);
-//services_[kHerro].reset(new herro::Service);
+  services_[kHerro].reset(new herro::Service);
 }
 
 Manager::~Manager() {
@@ -45,6 +45,14 @@ Manager::~Manager() {
 
 Service& Manager::service(ServiceId service_id) {
   return *services_[service_id].get();
+}
+
+Service* Manager::service(const string_t& canonical_name) {
+  foreach_(service, services_)
+    if (canonical_name == service->second.get()->canonical_name())
+      return service->second.get();
+
+  return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,8 +113,8 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
   Request& request = requests_[http_response.uuid];
 
   int anime_id = ::anime::ID_UNKNOWN;
-  if (request.data.count(L"myanimelist-id"))
-    anime_id = ToInt(request.data[L"myanimelist-id"]);
+  if (request.data.count(L"taiga-id"))
+    anime_id = ToInt(request.data[L"taiga-id"]);
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 
   switch (response.type) {
@@ -145,13 +153,13 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
   Request& request = requests_[http_response.uuid];
                                 
   int anime_id = ::anime::ID_UNKNOWN;
-  if (request.data.count(L"myanimelist-id"))
-    anime_id = ToInt(request.data[L"myanimelist-id"]);
+  if (request.data.count(L"taiga-id"))
+    anime_id = ToInt(request.data[L"taiga-id"]);
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 
   switch (response.type) {
     case kAuthenticateUser: {
-      string_t username = response.data[L"myanimelist-username"];
+      string_t username = response.data[service.canonical_name() + L"-username"];
       if (response.service_id == kMyAnimeList && !username.empty()) {
         // Update settings with the returned value for the correct letter case
         Settings.Set(taiga::kSync_Service_Mal_Username, username);

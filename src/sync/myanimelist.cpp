@@ -33,7 +33,8 @@ namespace myanimelist {
 
 Service::Service() {
   host_ = L"myanimelist.net";
-  
+
+  id_ = kMyAnimeList;
   canonical_name_ = L"myanimelist";
   name_ = L"MyAnimeList";
 }
@@ -253,7 +254,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // - my_tags
   foreach_xmlnode_(node, node_myanimelist, L"anime") {
     ::anime::Item anime_item;
-    anime_item.SetId(XmlReadIntValue(node, L"series_animedb_id"));
+    anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), this->id());
     anime_item.last_modified = time(nullptr);  // current time
 
     anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
@@ -315,7 +316,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   StripHtmlTags(score);
 
   ::anime::Item anime_item;
-  anime_item.SetId(ToInt(id));
+  anime_item.SetId(id, this->id());
 //anime_item.SetTitle(title);  // unsafe, may be truncated
   anime_item.SetGenres(genres_vector);
   anime_item.SetPopularity(popularity);
@@ -351,9 +352,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   // - image
   foreach_xmlnode_(node, node_anime, L"entry") {
     ::anime::Item anime_item;
-    int anime_id = XmlReadIntValue(node, L"id");
-
-    anime_item.SetId(anime_id);
+    anime_item.SetId(XmlReadStrValue(node, L"id"), this->id());
     anime_item.SetTitle(DecodeText(XmlReadStrValue(node, L"title")));
     anime_item.SetEnglishTitle(DecodeText(XmlReadStrValue(node, L"english")));
     anime_item.SetSynonyms(DecodeText(XmlReadStrValue(node, L"synonyms")));
@@ -369,7 +368,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     anime_item.SetImageUrl(XmlReadStrValue(node, L"image"));
     anime_item.last_modified = time(nullptr);  // current time
 
-    AnimeDatabase.UpdateItem(anime_item);
+    int anime_id = AnimeDatabase.UpdateItem(anime_item);
 
     // We return a list of IDs so that we can display the results afterwards
     AppendString(response.data[L"ids"], ToWstr(anime_id), L",");

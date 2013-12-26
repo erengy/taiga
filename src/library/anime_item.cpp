@@ -34,6 +34,7 @@ namespace anime {
 Item::Item()
     : last_modified(0), 
       my_info_(nullptr) {
+  metadata_.uid.resize(3);  // FIXME: Magic number
 }
 
 Item::~Item() {
@@ -42,7 +43,19 @@ Item::~Item() {
 ////////////////////////////////////////////////////////////////////////////////
 
 int Item::GetId() const {
-  return metadata_.uid;
+  assert(!metadata_.uid.empty());
+
+  return ToInt(metadata_.uid.at(0));
+}
+
+const std::wstring& Item::GetId(enum_t service) const {
+  assert(metadata_.uid.size() > service);
+
+  return metadata_.uid.at(service);
+}
+
+enum_t Item::GetSource() const {
+  return metadata_.source;
 }
 
 int Item::GetType() const {
@@ -150,8 +163,12 @@ const wstring& Item::GetSynopsis() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Item::SetId(int anime_id) {
-  metadata_.uid = anime_id;
+void Item::SetId(const std::wstring& id, enum_t service) {
+  if (metadata_.uid.size() < service + 1)
+    metadata_.uid.resize(service + 1);
+
+  metadata_.uid.at(service) = id;
+  metadata_.source = service;
 }
 
 void Item::SetType(int type) {
@@ -591,7 +608,7 @@ bool Item::IsOldEnough() const {
 ////////////////////////////////////////////////////////////////////////////////
 
 HistoryItem* Item::SearchHistory(int search_mode) const {
-  return History.queue.FindItem(metadata_.uid, search_mode);
+  return History.queue.FindItem(GetId(), search_mode);
 }
 
 }  // namespace anime

@@ -44,7 +44,7 @@ struct Metadata {
   Metadata();
   ~Metadata() {}
 
-  int uid;
+  std::vector<string_t> uid;
   enum_t source;
   time_t modified;
 
