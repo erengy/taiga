@@ -23,8 +23,10 @@ bool JsonReadArray(const Json::Value& root, const std::string& name,
                    std::vector<std::wstring>& output) {
   size_t previous_size = output.size();
 
-  for (int i = 0; i < root[name.c_str()].size(); i++)
-    output.push_back(StrToWstr(root[i].asString()));
+  auto& value = root[name.c_str()];
+
+  for (int i = 0; i < value.size(); i++)
+    output.push_back(StrToWstr(value[i].asString()));
 
   return output.size() > previous_size;
 }
