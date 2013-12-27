@@ -63,6 +63,7 @@ public:
   const std::wstring& GetSynopsis() const;
 
   void SetId(const std::wstring& id, enum_t service);
+  void SetSource(enum_t source);
   void SetType(int type);
   void SetEpisodeCount(int number);
   void SetEpisodeLength(int number);

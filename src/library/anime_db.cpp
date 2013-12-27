@@ -24,6 +24,7 @@
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/manager.h"
 #include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/path.h"
@@ -61,6 +62,8 @@ bool Database::LoadDatabase() {
     for (size_t i = 0; i < ids.size(); i++)
       item.SetId(ids.at(i), i);
 
+    item.SetSource(XmlReadIntValue(node, L"source"));
+
     item.SetTitle(XmlReadStrValue(node, L"title"));
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));
     item.SetSynonyms(XmlReadStrValue(node, L"synonyms"));
@@ -96,9 +99,10 @@ bool Database::SaveDatabase() {
   foreach_(it, items) {
     xml_node anime_node = database_node.append_child(L"anime");
 
-    for (int i = 0; i <= sync::kHerro; i++) {
+    for (int i = 0; i <= sync::kHerro; i++)
       XmlWriteStrValue(anime_node, L"id", it->second.GetId(i).c_str());
-    }
+
+    XmlWriteIntValue(anime_node, L"source", it->second.GetSource());
 
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
@@ -190,6 +194,13 @@ int Database::UpdateItem(const Item& new_item) {
   enum_t source = new_item.GetSource();
   Item* item = FindItem(new_item.GetId(source), source);
   if (!item) {
+    /*
+    auto service = ServiceManager.service(Settings[taiga::kSync_ActiveService]);
+    if (new_item.GetSource() != service->id()) {
+      // TODO: Try to find the same item by similarity
+    }
+    */
+
     // Generate a new ID
     int id = 1;
     while (FindItem(id))

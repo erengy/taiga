@@ -171,6 +171,10 @@ void Item::SetId(const std::wstring& id, enum_t service) {
   metadata_.source = service;
 }
 
+void Item::SetSource(enum_t source) {
+  metadata_.source = source;
+}
+
 void Item::SetType(int type) {
   metadata_.type = type;
 }
