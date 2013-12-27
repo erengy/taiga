@@ -63,6 +63,7 @@ bool Database::LoadDatabase() {
       item.SetId(ids.at(i), i);
 
     item.SetSource(XmlReadIntValue(node, L"source"));
+    item.SetSlug(XmlReadStrValue(node, L"slug"));
 
     item.SetTitle(XmlReadStrValue(node, L"title"));
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));
@@ -102,14 +103,14 @@ bool Database::SaveDatabase() {
     for (int i = 0; i <= sync::kHerro; i++)
       XmlWriteStrValue(anime_node, L"id", it->second.GetId(i).c_str());
 
-    XmlWriteIntValue(anime_node, L"source", it->second.GetSource());
-
     #define XML_WD(n, v) \
       if (v) XmlWriteStrValue(anime_node, n, wstring(v).c_str())
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
       if (!v.empty()) XmlWriteStrValue(anime_node, n, v.c_str(), t)
+    XML_WI(L"source", it->second.GetSource());
+    XML_WS(L"slug", it->second.GetSlug(), pugi::node_pcdata);
     XML_WS(L"title", it->second.GetTitle(), pugi::node_cdata);
     XML_WS(L"english", it->second.GetEnglishTitle(), pugi::node_cdata);
     XML_WS(L"synonyms", Join(it->second.GetSynonyms(), L"; "), pugi::node_cdata);
@@ -225,6 +226,8 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetEpisodeCount(new_item.GetEpisodeCount());
     if (new_item.GetAiringStatus(false) > 0)
       item->SetAiringStatus(new_item.GetAiringStatus());
+    if (!new_item.GetSlug().empty())
+      item->SetSlug(new_item.GetSlug());
     if (!new_item.GetTitle().empty())
       item->SetTitle(new_item.GetTitle());
     if (!new_item.GetEnglishTitle(false).empty())

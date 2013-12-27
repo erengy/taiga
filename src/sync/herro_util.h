@@ -33,6 +33,10 @@ int TranslateMyStatusFrom(int value);
 int TranslateMyStatusTo(int value);
 std::wstring TranslateKeyTo(const std::wstring& key);
 
+void ViewAnimePage(int anime_id);
+void ViewDashboard();
+void ViewProfile();
+
 }  // namespace herro
 }  // namespace sync
 

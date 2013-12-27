@@ -16,11 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/file.h"
 #include "base/logger.h"
 #include "base/string.h"
 #include "library/anime.h"
+#include "library/anime_db.h"
 #include "sync/herro_util.h"
 #include "sync/herro_types.h"
+#include "taiga/settings.h"
 
 namespace sync {
 namespace herro {
@@ -134,6 +137,22 @@ std::wstring TranslateKeyTo(const std::wstring& key) {
   }
 
   return std::wstring();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ViewAnimePage(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  ExecuteLink(L"http://herro.co/anime/" + anime_item->GetSlug());
+}
+
+void ViewDashboard() {
+  ExecuteLink(L"http://herro.co/dashboard");
+}
+
+void ViewProfile() {
+  ExecuteLink(L"http://herro.co/user/" +
+              Settings[taiga::kSync_Service_Herro_Username]);
 }
 
 }  // namespace herro

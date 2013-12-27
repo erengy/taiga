@@ -168,10 +168,6 @@ void ViewHistory() {
               Settings[taiga::kSync_Service_Mal_Username]);
 }
 
-void ViewMessages() {
-  ExecuteLink(L"http://myanimelist.net/mymessages.php");
-}
-
 void ViewPanel() {
   ExecuteLink(L"http://myanimelist.net/panel.php");
 }
@@ -179,10 +175,6 @@ void ViewPanel() {
 void ViewProfile() {
   ExecuteLink(L"http://myanimelist.net/profile/" +
               Settings[taiga::kSync_Service_Mal_Username]);
-}
-
-void ViewSeasonGroup() {
-  ExecuteLink(L"http://myanimelist.net/clubs.php?cid=743");
 }
 
 void ViewUpcomingAnime() {

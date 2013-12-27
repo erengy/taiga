@@ -54,6 +54,13 @@ const std::wstring& Item::GetId(enum_t service) const {
   return metadata_.uid.at(service);
 }
 
+const std::wstring& Item::GetSlug() const {
+  if (metadata_.resource.size() > 1)
+    return metadata_.resource.at(1);
+
+  return EmptyString();
+}
+
 enum_t Item::GetSource() const {
   return metadata_.source;
 }
@@ -169,6 +176,13 @@ void Item::SetId(const std::wstring& id, enum_t service) {
 
   metadata_.uid.at(service) = id;
   metadata_.source = service;
+}
+
+void Item::SetSlug(const std::wstring& slug) {
+  if (metadata_.resource.size() < 2)
+    metadata_.resource.resize(2);
+
+  metadata_.resource.at(1) = slug;
 }
 
 void Item::SetSource(enum_t source) {

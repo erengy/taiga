@@ -224,6 +224,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   anime_item.SetId(StrToWstr(root["_id"].asString()), this->id());
   anime_item.last_modified = time(nullptr);  // current time
 
+  anime_item.SetSlug(StrToWstr(root["slug"].asString()));
   anime_item.SetTitle(StrToWstr(root["title"].asString()));
   anime_item.SetImageUrl(StrToWstr(root["image_url"].asString()));
 
@@ -282,7 +283,10 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     auto& value = root[i];
     ::anime::Item anime_item;
     anime_item.SetId(StrToWstr(value["_id"].asString()), this->id());
+    anime_item.last_modified = time(nullptr);  // current time
+
     anime_item.SetTitle(StrToWstr(value["title"].asString()));
+    anime_item.SetSlug(StrToWstr(value["slug"].asString()));
     anime_item.SetImageUrl(StrToWstr(value["image_url"].asString()));
 
     auto& metadata = value["metadata"];

@@ -30,6 +30,7 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
+#include "sync/herro_util.h"
 #include "sync/manager.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
@@ -219,20 +220,34 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     ui::OnLibraryEntryAdd(anime_id);
 
   // ViewAnimePage
-  //   Opens up anime page on MAL.
+  //   Opens up anime page on the active service.
   //   lParam is an anime ID.
   } else if (action == L"ViewAnimePage") {
     int anime_id = static_cast<int>(lParam);
-    sync::myanimelist::ViewAnimePage(anime_id);
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        sync::myanimelist::ViewAnimePage(anime_id);
+        break;
+      case sync::kHerro:
+        sync::herro::ViewAnimePage(anime_id);
+        break;
+    }
 
-  // ViewPanel(), ViewProfile(), ViewHistory()
+  // MalViewPanel(), MalViewProfile(), MalViewHistory()
   //   Opens up MyAnimeList user pages.
-  } else if (action == L"ViewPanel") {
+  } else if (action == L"MalViewPanel") {
     sync::myanimelist::ViewPanel();
-  } else if (action == L"ViewProfile") {
+  } else if (action == L"MalViewProfile") {
     sync::myanimelist::ViewProfile();
-  } else if (action == L"ViewHistory") {
+  } else if (action == L"MalViewHistory") {
     sync::myanimelist::ViewHistory();
+
+  // HerroViewProfile(), HerroViewDashboard()
+  //   Opens up Herro user pages.
+  } else if (action == L"HerroViewProfile") {
+    sync::herro::ViewProfile();
+  } else if (action == L"HerroViewDashboard") {
+    sync::herro::ViewDashboard();
 
   // ViewUpcomingAnime
   //   Opens up upcoming anime page on MAL.

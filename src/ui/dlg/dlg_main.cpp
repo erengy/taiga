@@ -189,7 +189,7 @@ void MainDialog::CreateDialogControls() {
   // Insert menu toolbar buttons
   BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
   toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  File", nullptr);
-  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  MyAnimeList", nullptr);
+  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  Services", nullptr);
   toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"  Tools", nullptr);
   toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"  View", nullptr);
   toolbar_menu.InsertButton(4, I_IMAGENONE, 104, 1, fsStyle0, 0, L"  Help", nullptr);

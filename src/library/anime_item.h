@@ -45,6 +45,7 @@ public:
 
   int GetId() const;
   const std::wstring& GetId(enum_t service) const;
+  const std::wstring& GetSlug() const;
   enum_t GetSource() const;
   int GetType() const;
   int GetEpisodeCount() const;
@@ -63,6 +64,7 @@ public:
   const std::wstring& GetSynopsis() const;
 
   void SetId(const std::wstring& id, enum_t service);
+  void SetSlug(const std::wstring& slug);
   void SetSource(enum_t source);
   void SetType(int type);
   void SetEpisodeCount(int number);

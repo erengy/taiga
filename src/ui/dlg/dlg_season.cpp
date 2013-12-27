@@ -74,8 +74,6 @@ BOOL SeasonDialog::OnInitDialog() {
   toolbar_.InsertButton(3, ui::kIcon16_Category, 103, 1, fsStyle2, 3, L"Group by", nullptr);
   toolbar_.InsertButton(4, ui::kIcon16_Sort,     104, 1, fsStyle2, 4, L"Sort by", nullptr);
   toolbar_.InsertButton(5, ui::kIcon16_Details,  105, 1, fsStyle2, 5, L"View", nullptr);
-  toolbar_.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_.InsertButton(7, ui::kIcon16_Balloon,  107, 1, fsStyle1, 7, L"Discuss", L"");
 
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_SEASON));
@@ -113,10 +111,6 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Refresh data
     case 101:
       RefreshData();
-      return TRUE;
-    // Discuss
-    case 107:
-      sync::myanimelist::ViewSeasonGroup();
       return TRUE;
   }
 

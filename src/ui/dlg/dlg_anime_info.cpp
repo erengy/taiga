@@ -196,7 +196,7 @@ BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG &&
       HIWORD(wParam) == STN_CLICKED) {
     if (anime_id_ > anime::ID_UNKNOWN) {
-      sync::myanimelist::ViewAnimePage(anime_id_);
+      ExecuteAction(L"ViewAnimePage", 0, anime_id_);
       return TRUE;
     }
   }

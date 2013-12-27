@@ -38,10 +38,8 @@ std::wstring TranslateKeyTo(const std::wstring& key);
 void ViewAnimePage(int anime_id);
 void ViewAnimeSearch(const std::wstring& title);
 void ViewHistory();
-void ViewMessages();
 void ViewPanel();
 void ViewProfile();
-void ViewSeasonGroup();
 void ViewUpcomingAnime();
 
 }  // namespace myanimelist
