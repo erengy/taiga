@@ -183,7 +183,7 @@ void FeedFilterDialog::ChoosePage(int index) {
     case 2:
       if (current_page_ == 1) {
         if (page_1_.condition_list.GetItemCount() == 0) {
-          win::TaskDialog dlg(APP_TITLE, TD_ICON_ERROR);
+          win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_ERROR);
           dlg.SetMainInstruction(
             L"There must be at least one condition in order to create a filter.");
           dlg.SetContent(

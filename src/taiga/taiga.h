@@ -19,17 +19,15 @@
 #ifndef TAIGA_TAIGA_TAIGA_H
 #define TAIGA_TAIGA_TAIGA_H
 
-#include "update.h"
+#include "taiga/update.h"
 #include "win/win_main.h"
 
-#define APP_NAME    L"Taiga"
-#define APP_TITLE   L"Taiga 1.1a"
-#define APP_VERSION L"1.1 alpha"
-#define APP_BUILD   L"2013-11-19"
+#define TAIGA_APP_NAME    L"Taiga"
+#define TAIGA_APP_TITLE   L"Taiga 1.1a"
+#define TAIGA_APP_VERSION L"1.1 alpha"
+#define TAIGA_APP_BUILD   L"2014-00-00"
 
-#ifndef PORTABLE
-#define PORTABLE
-#endif
+#define TAIGA_PORTABLE
 
 namespace taiga {
 

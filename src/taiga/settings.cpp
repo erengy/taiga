@@ -475,9 +475,9 @@ bool AppSettings::Save() {
               0, KEY_SET_VALUE);
   if (GetBool(kApp_Behavior_Autostart)) {
     wstring app_path = Taiga.GetModulePath();
-    reg.SetValue(APP_NAME, app_path.c_str());
+    reg.SetValue(TAIGA_APP_NAME, app_path.c_str());
   } else {
-    reg.DeleteValue(APP_NAME);
+    reg.DeleteValue(TAIGA_APP_NAME);
   }
   reg.CloseKey();
 
@@ -514,7 +514,7 @@ void AppSettings::ApplyChanges(const wstring& previous_user,
 void AppSettings::HandleCompatibility() {
   int version_revision = GetInt(kMeta_Version_Revision);
   
-  if (version_revision == VERSION_REVISION)
+  if (version_revision == TAIGA_VERSION_REVISION)
     return;
 
   // Convert old torrent filters to the new format
@@ -638,7 +638,7 @@ void AppSettings::HandleCompatibility() {
     LOG(LevelWarning, L"Torrent filters are converted.");
 
     // Display notice
-    win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"A friendly notice for torrent downloaders");
     wstring content =
         L"In this update, torrent filters work a bit differently. Basically, all torrents are now in a blank state by default, "

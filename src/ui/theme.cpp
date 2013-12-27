@@ -39,7 +39,7 @@ bool ThemeManager::Load() {
 
   if (parse_result.status != pugi::status_ok) {
     std::wstring message = L"Could not read theme file:\n" + path;
-    MessageBox(nullptr, message.c_str(), APP_TITLE, MB_OK | MB_ICONERROR);
+    MessageBox(nullptr, message.c_str(), TAIGA_APP_TITLE, MB_OK | MB_ICONERROR);
     return false;
   }
 

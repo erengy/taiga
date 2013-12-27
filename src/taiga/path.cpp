@@ -27,7 +27,7 @@
 namespace taiga {
 
 std::wstring GetDataPath() {
-#ifdef PORTABLE
+#ifdef TAIGA_PORTABLE
   // Return current path in portable mode
   return AddTrailingSlash(GetPathOnly(Taiga.GetModulePath())) + L"data\\";
 #else
@@ -35,7 +35,7 @@ std::wstring GetDataPath() {
   WCHAR buffer[MAX_PATH];
   if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
                                 nullptr, SHGFP_TYPE_CURRENT, buffer)))
-    return AddTrailingSlash(buffer) + APP_NAME + L"\\";
+    return AddTrailingSlash(buffer) + TAIGA_APP_NAME + L"\\";
 #endif
 }
 

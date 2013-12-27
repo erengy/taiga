@@ -43,7 +43,8 @@ HttpClient::HttpClient()
   // The default header (e.g. "User-Agent: Taiga/1.0") will be used, unless
   // another value is specified in the request header
   set_user_agent(
-      APP_NAME L"/" + ToWstr(VERSION_MAJOR) + L"." + ToWstr(VERSION_MINOR));
+      TAIGA_APP_NAME L"/" +
+      ToWstr(TAIGA_VERSION_MAJOR) + L"." + ToWstr(TAIGA_VERSION_MINOR));
 
   // Make sure all new clients use the proxy settings
   set_proxy(Settings[kApp_Connection_ProxyHost],

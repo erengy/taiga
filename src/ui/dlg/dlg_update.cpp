@@ -43,7 +43,7 @@ BOOL UpdateDialog::OnInitDialog() {
   SetIconSmall(IDI_MAIN);
 
   // Set title
-  SetText(APP_TITLE);
+  SetText(TAIGA_APP_TITLE);
 
   // Set progress text
   SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS, L"Checking updates...");

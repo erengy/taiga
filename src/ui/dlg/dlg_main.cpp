@@ -93,7 +93,7 @@ BOOL MainDialog::OnInitDialog() {
   SetTimer(g_hMain, TIMER_MAIN, 1000, nullptr);
   
   // Add icon to taskbar
-  Taskbar.Create(g_hMain, nullptr, APP_TITLE);
+  Taskbar.Create(g_hMain, nullptr, TAIGA_APP_TITLE);
 
   ChangeStatus();
   UpdateTip();
@@ -114,7 +114,7 @@ BOOL MainDialog::OnInitDialog() {
       SW_MAXIMIZE : SW_SHOWNORMAL);
   }
   if (Settings[taiga::kSync_Service_Mal_Username].empty()) {
-    win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+    win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
     dlg.SetContent(L"Username is not set. Would you like to open settings window to set it now?");
     dlg.AddButton(L"Yes", IDYES);
@@ -486,7 +486,7 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
     anime::Episode episode;
     Meow.ExamineTitle(buffer, episode); 
-    MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), APP_TITLE, MB_OK);
+    MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), TAIGA_APP_TITLE, MB_OK);
   }
 #endif
 }
@@ -744,7 +744,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   // Taskbar creation notification
   if (uMsg == WM_TASKBARCREATED) {
-    Taskbar.Create(GetWindowHandle(), nullptr, APP_TITLE);
+    Taskbar.Create(GetWindowHandle(), nullptr, TAIGA_APP_TITLE);
   
   // Windows 7 taskbar interface
   } else if (uMsg == WM_TASKBARBUTTONCREATED) {
@@ -880,7 +880,7 @@ void MainDialog::UpdateStatusTimer() {
 }
 
 void MainDialog::UpdateTip() {
-  wstring tip = APP_TITLE;
+  wstring tip = TAIGA_APP_TITLE;
 #ifdef _DEBUG
   tip += L" [debug]";
 #endif
@@ -895,7 +895,7 @@ void MainDialog::UpdateTip() {
 }
 
 void MainDialog::UpdateTitle() {
-  wstring title = APP_TITLE;
+  wstring title = TAIGA_APP_TITLE;
 #ifdef _DEBUG
   title += L" [debug]";
 #endif

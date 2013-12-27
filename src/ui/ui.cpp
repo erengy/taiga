@@ -387,7 +387,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
 
   win::TaskDialog dlg;
   wstring title = L"Anime title: " + anime_item->GetTitle();
-  dlg.SetWindowTitle(APP_TITLE);
+  dlg.SetWindowTitle(TAIGA_APP_TITLE);
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Do you want to update your anime list?");
   dlg.SetContent(title.c_str());
@@ -512,7 +512,7 @@ bool OnSeasonRefreshRequired() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnSettingsAccountEmpty() {
-  win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to set your account information?");
   dlg.SetContent(L"Anime search requires authentication, which means, you need "
                  L"to enter a valid username and password to search "
@@ -536,7 +536,7 @@ void OnSettingsRestoreDefaults() {
 }
 
 void OnSettingsRootFoldersEmpty() {
-  win::TaskDialog dlg(APP_TITLE, TD_ICON_INFORMATION);
+  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
   dlg.SetContent(L"You need to have at least one root folder set before "
                  L"scanning available episodes.");
@@ -694,7 +694,7 @@ void OnLogout() {
 
 bool OnUpdateAvailable() {
   win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-  dlg.SetFooter(L"Current version: " APP_VERSION);
+  dlg.SetFooter(L"Current version: " TAIGA_APP_VERSION);
   dlg.SetMainInstruction(L"A new version of Taiga is available!");
   dlg.AddButton(L"Download", IDYES);
   dlg.AddButton(L"Cancel", IDNO);
@@ -706,7 +706,7 @@ bool OnUpdateAvailable() {
 void OnUpdateNotAvailable() {
   if (MainDialog.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-    dlg.SetFooter(L"Current version: " APP_VERSION);
+    dlg.SetFooter(L"Current version: " TAIGA_APP_VERSION);
     dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);

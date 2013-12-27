@@ -49,7 +49,7 @@ App::App()
       ticker_memory(0),
       ticker_new_episodes(0),
       ticker_queue(0) {
-  SetVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION);
+  SetVersion(TAIGA_VERSION_MAJOR, TAIGA_VERSION_MINOR, TAIGA_VERSION_REVISION);
 }
 
 App::~App() {
@@ -69,7 +69,7 @@ BOOL App::InitInstance() {
 
   // Initialize logger
   Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) +
-                       APP_NAME L".log");
+                       TAIGA_APP_NAME L".log");
 #ifdef _DEBUG
   Logger.SetSeverityLevel(LevelDebug);
 #else

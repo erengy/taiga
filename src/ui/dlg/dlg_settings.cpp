@@ -475,7 +475,7 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Restore default settings
         case NM_CLICK: {
           win::TaskDialog dlg;
-          dlg.SetWindowTitle(APP_NAME);
+          dlg.SetWindowTitle(TAIGA_APP_NAME);
           dlg.SetMainIcon(TD_ICON_WARNING);
           dlg.SetMainInstruction(L"Are you sure you want to restore default settings?");
           dlg.SetContent(L"All your current settings will be lost.");

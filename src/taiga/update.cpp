@@ -47,7 +47,7 @@ bool UpdateHelper::Check(win::App& app) {
   http_request.host = L"taiga.erengy.com";
   http_request.path = L"/update.php";
   http_request.query[L"username"] = Settings[taiga::kSync_Service_Mal_Username];
-  http_request.query[L"version"] = APP_VERSION;
+  http_request.query[L"version"] = TAIGA_APP_VERSION;
   http_request.query[L"check"] = MainDialog.IsWindow() ? L"manual" : L"auto";
 
   client_uuid_ = http_request.uuid;
