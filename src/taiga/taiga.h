@@ -23,9 +23,8 @@
 #include "win/win_main.h"
 
 #define TAIGA_APP_NAME    L"Taiga"
-#define TAIGA_APP_TITLE   L"Taiga 1.1a"
-#define TAIGA_APP_VERSION L"1.1 alpha"
-#define TAIGA_APP_BUILD   L"2014-00-00"
+#define TAIGA_APP_TITLE   L"Taiga"
+#define TAIGA_APP_VERSION L"1.1.0-alpha"
 
 #define TAIGA_PORTABLE
 
