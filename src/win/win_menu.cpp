@@ -39,7 +39,7 @@ HMENU MenuList::CreateNewMenu(LPCWSTR name, vector<HMENU>& menu_handles) {
   menu_handles.push_back(handle);
 
   for (auto item = menu->items.begin(); item != menu->items.end(); ++item) {
-    static const UINT flags =
+    const UINT flags =
         (item->checked ? MF_CHECKED : 0) |
         (item->def ? MF_DEFAULT : 0) |
         (item->enabled ? MF_ENABLED : MF_GRAYED) |
