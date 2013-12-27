@@ -24,6 +24,7 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/history.h"
+#include "sync/manager.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
@@ -681,6 +682,35 @@ void AppSettings::RestoreDefaults() {
 
   // Reload settings dialog
   ui::OnSettingsRestoreDefaults();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+const sync::Service* GetCurrentService() {
+  std::wstring service_name = Settings[kSync_ActiveService];
+  return ServiceManager.service(service_name);
+}
+
+sync::ServiceId GetCurrentServiceId() {
+  auto service = GetCurrentService();
+  
+  if (service)
+    return static_cast<sync::ServiceId>(service->id());
+
+  return sync::kMyAnimeList;
+}
+
+const std::wstring GetCurrentUsername() {
+  std::wstring username;
+  auto service = GetCurrentService();
+
+  if (service->id() == sync::kMyAnimeList) {
+    username = Settings[kSync_Service_Mal_Username];
+  } else if (service->id() == sync::kHerro) {
+    username = Settings[kSync_Service_Herro_Username];
+  }
+
+  return username;
 }
 
 }  // namespace taiga

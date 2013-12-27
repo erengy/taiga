@@ -33,26 +33,16 @@ std::wstring GetDataPath() {
 #else
   // Return %AppData% folder
   WCHAR buffer[MAX_PATH];
-  if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                NULL, SHGFP_TYPE_CURRENT, buffer))) {
+  if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                                nullptr, SHGFP_TYPE_CURRENT, buffer)))
     return AddTrailingSlash(buffer) + APP_NAME + L"\\";
-  }
 #endif
 }
 
-std::wstring GetCurrentUsername() {
-  std::wstring service_name = Settings[kSync_ActiveService];
-  auto service = ServiceManager.service(service_name);
-
-  std::wstring username;
-
-  if (service->id() == sync::kMyAnimeList) {
-    username = Settings[kSync_Service_Mal_Username];
-  } else if (service->id() == sync::kHerro) {
-    username = Settings[kSync_Service_Herro_Username];
-  }
-
-  return username + L"@" + service_name;
+std::wstring GetUserDirectoryName() {
+  std::wstring username = GetCurrentUsername();
+  auto service = GetCurrentService();
+  return username + L"@" + service->canonical_name();
 }
 
 std::wstring GetPath(PathType type) {
@@ -89,9 +79,9 @@ std::wstring GetPath(PathType type) {
     case kPathUser:
       return data_path + L"user\\";
     case kPathUserHistory:
-      return data_path + L"user\\" + GetCurrentUsername() + L"\\history.xml";
+      return data_path + L"user\\" + GetUserDirectoryName() + L"\\history.xml";
     case kPathUserLibrary:
-      return data_path + L"user\\" + GetCurrentUsername() + L"\\anime.xml";
+      return data_path + L"user\\" + GetUserDirectoryName() + L"\\anime.xml";
   }
 }
 

@@ -25,6 +25,10 @@
 namespace pugi {
 class xml_node;
 }
+namespace sync {
+class Service;
+enum ServiceId;
+}
 
 namespace taiga {
 
@@ -176,6 +180,10 @@ private:
 
   std::map<AppSettingName, Setting> map_;
 };
+
+const sync::Service* GetCurrentService();
+sync::ServiceId GetCurrentServiceId();
+const std::wstring GetCurrentUsername();
 
 }  // namespace taiga
 

@@ -54,7 +54,7 @@
 #include "taiga/taiga.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
-#include "sync/manager.h"
+#include "sync/service.h"
 
 #include "win/win_gdi.h"
 #include "win/win_taskbar.h"
@@ -884,11 +884,13 @@ void MainDialog::UpdateTip() {
 #ifdef _DEBUG
   tip += L" [debug]";
 #endif
+
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     tip += L"\nWatching: " + anime_item->GetTitle() + 
       (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
   }
+
   Taskbar.Modify(tip.c_str());
 }
 
@@ -897,21 +899,16 @@ void MainDialog::UpdateTitle() {
 #ifdef _DEBUG
   title += L" [debug]";
 #endif
-  auto service = ServiceManager.service(Settings[taiga::kSync_ActiveService]);
-  switch (service->id()) {
-    case sync::kMyAnimeList:
-      if (!Settings[taiga::kSync_Service_Mal_Username].empty()) {
-        title += L" \u2013 " + Settings[taiga::kSync_Service_Mal_Username] +
-                 L" @ " + service->name();
-      }
-      break;
-    case sync::kHerro:
-      if (!Settings[taiga::kSync_Service_Herro_Username].empty()) {
-        title += L" \u2013 " + Settings[taiga::kSync_Service_Herro_Username] +
-                 L" @ " + service->name();
-      }
-      break;
-  }
+
+  const std::wstring username = taiga::GetCurrentUsername();
+  if (!username.empty())
+    title += L" \u2013 " + username;
+#ifdef _DEBUG
+  auto service = taiga::GetCurrentService();
+  if (service)
+    title += L" @ " + service->name();
+#endif
+
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     title += L" \u2013 " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
@@ -920,6 +917,7 @@ void MainDialog::UpdateTitle() {
       title += L" (out of range)";
     }
   }
+
   SetText(title);
 }
 
