@@ -182,8 +182,8 @@ void SettingsDialog::OnOK() {
   // Services > Main
   page = &pages[PAGE_SERVICES_MAIN];
   if (page->IsWindow()) {
-    auto service = ServiceManager.service(static_cast<sync::ServiceId>(page->GetComboSelection(IDC_COMBO_DBLCLICK) + 1));
-    Settings.Set(taiga::kSync_ActiveService, service->canonical_name());
+    //auto service = ServiceManager.service(static_cast<sync::ServiceId>(page->GetComboSelection(IDC_COMBO_DBLCLICK) + 1));
+    //Settings.Set(taiga::kSync_ActiveService, service->canonical_name());
     Settings.Set(taiga::kSync_AutoOnStart, page->IsDlgButtonChecked(IDC_CHECK_START_LOGIN));
   }
   // Services > MyAnimeList
