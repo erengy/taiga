@@ -19,24 +19,24 @@
 #ifndef TAIGA_TAIGA_SCRIPT_H
 #define TAIGA_TAIGA_SCRIPT_H
 
-#include "base/std.h"
+#include <string>
 
 namespace anime {
 class Episode;
 }
 
-wstring EvaluateFunction(const wstring& func_name, const wstring& func_body);
+std::wstring EvaluateFunction(const std::wstring& func_name, const std::wstring& func_body);
 
-bool IsScriptFunction(const wstring& str);
-bool IsScriptVariable(const wstring& str);
+bool IsScriptFunction(const std::wstring& str);
+bool IsScriptVariable(const std::wstring& str);
 
-wstring ReplaceVariables(wstring str,
-                         const anime::Episode& episode,
-                         bool url_encode = false,
-                         bool is_manual = false,
-                         bool is_preview = false);
+std::wstring ReplaceVariables(std::wstring str,
+                              const anime::Episode& episode,
+                              bool url_encode = false,
+                              bool is_manual = false,
+                              bool is_preview = false);
 
-wstring EscapeScriptEntities(const wstring& str);
-wstring UnescapeScriptEntities(const wstring& str);
+std::wstring EscapeScriptEntities(const std::wstring& str);
+std::wstring UnescapeScriptEntities(const std::wstring& str);
 
 #endif  // TAIGA_TAIGA_SCRIPT_H
