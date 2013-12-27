@@ -139,7 +139,11 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
     root["progress"] = WstrToStr(request.data[L"episode"]);
   if (request.data.count(L"score"))
     root["score"] = WstrToStr(request.data[L"score"]);
+#ifdef _DEBUG
   Json::StyledWriter writer;
+#else
+  Json::FastWriter writer;
+#endif
   http_request.body = StrToWstr(writer.write(root));
 }
 
@@ -169,7 +173,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // - series_total
   // - series_type (in string form)
   // - series_status (in string form)
-  for (int i = 0; i < root.size(); i++) {
+  for (size_t i = 0; i < root.size(); i++) {
     auto& value = root[i];
     ::anime::Item anime_item;
     anime_item.SetId(StrToWstr(value["_id"].asString()), this->id());
@@ -272,7 +276,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   //   - series_end
   //   - plot
 
-  for (int i = 0; i < root.size(); i++) {
+  for (size_t i = 0; i < root.size(); i++) {
     auto& value = root[i];
     ::anime::Item anime_item;
     anime_item.SetId(StrToWstr(value["_id"].asString()), this->id());
