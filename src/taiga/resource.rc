@@ -459,6 +459,38 @@ FONT 9, "Segoe UI", 400, 0, 0
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_SETTINGS_SERVICES_HERRO DIALOGEX 0, 0, 315, 215
+STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 9, "Segoe UI", 400, 0, 0
+{
+    GROUPBOX        "Account", IDC_STATIC, 7, 7, 301, 70
+    LTEXT           "Username:", IDC_STATIC, 12, 18, 141, 8, SS_LEFT
+    EDITTEXT        IDC_EDIT_USER_HERRO, 12, 28, 141, 12, ES_AUTOHSCROLL
+    LTEXT           "API token:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT
+    EDITTEXT        IDC_EDIT_PASS_HERRO, 160, 28, 141, 12, ES_AUTOHSCROLL
+    CONTROL         "<a href=""URL(http://herro.co/register/)"">Create a new account</a>", IDC_LINK_ACCOUNT_HERRO, "SysLink", 0x50010000, 12, 47, 140, 8
+    LTEXT           "Tip: You can find your API token at your Herro dashboard.", IDC_STATIC, 12, 62, 288, 8, SS_LEFT
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_SETTINGS_SERVICES_MAIN DIALOGEX 0, 0, 315, 215
+STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 9, "Segoe UI", 400, 0, 0
+{
+    GROUPBOX        "Synchronization", IDC_STATIC, 7, 7, 300, 73
+    AUTOCHECKBOX    "Synchronize automatically at startup", IDC_CHECK_START_LOGIN, 12, 48, 138, 10
+    COMBOBOX        IDC_COMBO_SERVICE, 12, 28, 139, 30, WS_TABSTOP | WS_DISABLED | CBS_DROPDOWNLIST | CBS_HASSTRINGS
+    LTEXT           "Active service:", IDC_STATIC, 12, 18, 138, 8, SS_LEFT
+    LTEXT           "Tip: Taiga is currently unable to synchronize multiple services at the same time.", IDC_STATIC, 12, 65, 288, 8, SS_LEFT
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDD_SETTINGS_SERVICES_MAL DIALOG 0, 0, 315, 215
 STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 EXSTYLE WS_EX_CONTROLPARENT
@@ -466,12 +498,10 @@ FONT 9, "Segoe UI"
 {
     GROUPBOX        "Account", IDC_STATIC, 7, 7, 301, 55
     LTEXT           "Username:", IDC_STATIC, 12, 18, 141, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_USER, 12, 28, 141, 12, ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_USER_MAL, 12, 28, 141, 12, ES_AUTOHSCROLL
     LTEXT           "Password:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT
-    EDITTEXT        IDC_EDIT_PASS, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD
-    CONTROL         "<a href=""URL(http://myanimelist.net/register.php)"">Create a new account</a>", IDC_LINK_MAL, "SysLink", 0x50010000, 12, 47, 140, 8
-    GROUPBOX        "Synchronization", IDC_STATIC, 7, 69, 300, 29
-    AUTOCHECKBOX    "Synchronize automatically at startup", IDC_CHECK_START_LOGIN, 12, 80, 140, 10
+    EDITTEXT        IDC_EDIT_PASS_MAL, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD
+    CONTROL         "<a href=""URL(http://myanimelist.net/register.php)"">Create a new account</a>", IDC_LINK_ACCOUNT_MAL, "SysLink", 0x50010000, 12, 47, 140, 8
 }
 
 

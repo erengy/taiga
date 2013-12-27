@@ -33,6 +33,7 @@
 #include "base/file.h"
 #include "taiga/debug.h"
 #include "library/history.h"
+#include "sync/manager.h"
 #include "taiga/http.h"
 #include "track/media.h"
 #include "track/monitor.h"
@@ -61,7 +62,7 @@ class SettingsDialog SettingsDialog;
 
 SettingsDialog::SettingsDialog()
     : current_section_(SECTION_SERVICES),
-      current_page_(PAGE_SERVICES_MAL) {
+      current_page_(PAGE_SERVICES_MAIN) {
   RegisterDlgClass(L"TaigaSettingsW");
 
   pages.resize(PAGE_COUNT);
@@ -82,7 +83,9 @@ void SettingsDialog::SetCurrentSection(int index) {
   tab_.DeleteAllItems();
   switch (index) {
     case SECTION_SERVICES:
-      tab_.InsertItem(0, L"MyAnimeList", PAGE_SERVICES_MAL);
+      tab_.InsertItem(0, L"Main", PAGE_SERVICES_MAIN);
+      tab_.InsertItem(1, L"MyAnimeList", PAGE_SERVICES_MAL);
+      tab_.InsertItem(2, L"Herro", PAGE_SERVICES_HERRO);
       break;
     case SECTION_LIBRARY:
       tab_.InsertItem(0, L"Folders", PAGE_LIBRARY_FOLDERS);
@@ -176,12 +179,24 @@ void SettingsDialog::OnOK() {
   wstring previous_user = Settings[taiga::kSync_Service_Mal_Username];
   wstring previous_theme = Settings[taiga::kApp_Interface_Theme];
 
+  // Services > Main
+  page = &pages[PAGE_SERVICES_MAIN];
+  if (page->IsWindow()) {
+    auto service = ServiceManager.service(static_cast<sync::ServiceId>(page->GetComboSelection(IDC_COMBO_DBLCLICK) + 1));
+    Settings.Set(taiga::kSync_ActiveService, service->canonical_name());
+    Settings.Set(taiga::kSync_AutoOnStart, page->IsDlgButtonChecked(IDC_CHECK_START_LOGIN));
+  }
   // Services > MyAnimeList
   page = &pages[PAGE_SERVICES_MAL];
   if (page->IsWindow()) {
-    Settings.Set(taiga::kSync_Service_Mal_Username, page->GetDlgItemText(IDC_EDIT_USER));
-    Settings.Set(taiga::kSync_Service_Mal_Password, SimpleEncrypt(page->GetDlgItemText(IDC_EDIT_PASS)));
-    Settings.Set(taiga::kSync_AutoOnStart, page->IsDlgButtonChecked(IDC_CHECK_START_LOGIN));
+    Settings.Set(taiga::kSync_Service_Mal_Username, page->GetDlgItemText(IDC_EDIT_USER_MAL));
+    Settings.Set(taiga::kSync_Service_Mal_Password, SimpleEncrypt(page->GetDlgItemText(IDC_EDIT_PASS_MAL)));
+  }
+  // Services > Herro
+  page = &pages[PAGE_SERVICES_HERRO];
+  if (page->IsWindow()) {
+    Settings.Set(taiga::kSync_Service_Herro_Username, page->GetDlgItemText(IDC_EDIT_USER_HERRO));
+    Settings.Set(taiga::kSync_Service_Herro_ApiToken, page->GetDlgItemText(IDC_EDIT_PASS_HERRO));
   }
 
   // Library > Folders

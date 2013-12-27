@@ -521,7 +521,7 @@ void OnSettingsAccountEmpty() {
   dlg.AddButton(L"No", IDNO);
   dlg.Show(g_hMain);
   if (dlg.GetSelectedButtonID() == IDYES)
-    ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAL);
+    ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAIN);
 }
 
 void OnSettingsChange() {

@@ -32,6 +32,7 @@
 #include "base/encryption.h"
 #include "base/file.h"
 #include "library/history.h"
+#include "sync/manager.h"
 #include "taiga/http.h"
 #include "track/media.h"
 #include "taiga/resource.h"
@@ -66,7 +67,9 @@ void SettingsPage::Create() {
     SETRESOURCEID(PAGE_RECOGNITION_GENERAL, IDD_SETTINGS_RECOGNITION_GENERAL);
     SETRESOURCEID(PAGE_RECOGNITION_MEDIA, IDD_SETTINGS_RECOGNITION_MEDIA);
     SETRESOURCEID(PAGE_RECOGNITION_STREAM, IDD_SETTINGS_RECOGNITION_STREAM);
+    SETRESOURCEID(PAGE_SERVICES_MAIN, IDD_SETTINGS_SERVICES_MAIN);
     SETRESOURCEID(PAGE_SERVICES_MAL, IDD_SETTINGS_SERVICES_MAL);
+    SETRESOURCEID(PAGE_SERVICES_HERRO, IDD_SETTINGS_SERVICES_HERRO);
     SETRESOURCEID(PAGE_SHARING_HTTP, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(PAGE_SHARING_MESSENGER, IDD_SETTINGS_SHARING_MESSENGER);
     SETRESOURCEID(PAGE_SHARING_MIRC, IDD_SETTINGS_SHARING_MIRC);
@@ -87,11 +90,24 @@ void SettingsPage::Create() {
 
 BOOL SettingsPage::OnInitDialog() {
   switch (index) {
+    // Services > Main
+    case PAGE_SERVICES_MAIN: {
+      AddComboString(IDC_COMBO_SERVICE, L"MyAnimeList");
+      AddComboString(IDC_COMBO_SERVICE, L"Herro");
+      SetComboSelection(IDC_COMBO_SERVICE, ServiceManager.service(Settings[taiga::kSync_ActiveService])->id() - 1);
+      CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.GetBool(taiga::kSync_AutoOnStart));
+      break;
+    }
     // Services > MyAnimeList
     case PAGE_SERVICES_MAL: {
-      SetDlgItemText(IDC_EDIT_USER, Settings[taiga::kSync_Service_Mal_Username].c_str());
-      SetDlgItemText(IDC_EDIT_PASS, SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]).c_str());
-      CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.GetBool(taiga::kSync_AutoOnStart));
+      SetDlgItemText(IDC_EDIT_USER_MAL, Settings[taiga::kSync_Service_Mal_Username].c_str());
+      SetDlgItemText(IDC_EDIT_PASS_MAL, SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]).c_str());
+      break;
+    }
+    // Services > Herro
+    case PAGE_SERVICES_HERRO: {
+      SetDlgItemText(IDC_EDIT_USER_HERRO, Settings[taiga::kSync_Service_Herro_Username].c_str());
+      SetDlgItemText(IDC_EDIT_PASS_HERRO, Settings[taiga::kSync_Service_Herro_ApiToken].c_str());
       break;
     }
 
@@ -651,7 +667,8 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case NM_CLICK: {
       switch (pnmh->idFrom) {
         // Execute link
-        case IDC_LINK_MAL:
+        case IDC_LINK_ACCOUNT_HERRO:
+        case IDC_LINK_ACCOUNT_MAL:
         case IDC_LINK_TWITTER: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
           ExecuteAction(pNMLink->item.szUrl);
