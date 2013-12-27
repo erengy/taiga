@@ -332,6 +332,10 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
   if (!anime_item && is_preview)
     anime_item = &taiga::DummyAnime;
 
+  wstring id;
+  if (anime_item)
+    id = anime_item->GetId(taiga::GetCurrentServiceId());
+
   #define VALIDATE(x, y) anime_item ? x : y
   #define ENCODE(x) url_encode ? EscapeScriptEntities(EncodeUrl(x)) : EscapeScriptEntities(x)
   #define REPLACE(x, y) \
@@ -358,7 +362,7 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
           REPLACE(L"watched", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
           REPLACE(L"total", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
           REPLACE(L"score", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyScore(), L"")), L""));
-          REPLACE(L"id", VALIDATE(ENCODE(ToWstr(anime_item->GetId())), L""));
+          REPLACE(L"id", ENCODE(id));
           REPLACE(L"image", VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
           REPLACE(L"status", VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));
           REPLACE(L"rewatching", VALIDATE(ENCODE(ToWstr(anime_item->GetMyRewatching())), L""));
@@ -373,7 +377,7 @@ wstring ReplaceVariables(wstring str, const anime::Episode& episode, bool url_en
           REPLACE(L"extra", ENCODE(episode.extras));
           REPLACE(L"file", ENCODE(episode.file));
           REPLACE(L"folder", ENCODE(episode.folder));
-          REPLACE(L"user", ENCODE(Settings[taiga::kSync_Service_Mal_Username]));
+          REPLACE(L"user", ENCODE(taiga::GetCurrentUsername()));
           REPLACE(L"manual", is_manual ? L"true" : L"");
           switch (Taiga.play_status) {
             case taiga::kPlayStatusStopped: REPLACE(L"playstatus", L"stopped"); break;

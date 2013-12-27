@@ -282,7 +282,7 @@ int Database::UpdateItem(const Item& new_item) {
 bool Database::LoadList() {
   ClearUserData();
 
-  if (Settings[taiga::kSync_Service_Mal_Username].empty())
+  if (taiga::GetCurrentUsername().empty())
     return false;
 
   xml_document document;

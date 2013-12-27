@@ -52,7 +52,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     // TODO: Make sure username and token are available
     http_request.header[L"Authorization"] = L"Basic " +
         Base64Encode(request.data[canonical_name_ + L"-username"] + L":" +
-                     request.data[canonical_name_ + L"-apitoken"]);
+                     request.data[canonical_name_ + L"-password"]);
   }
 
   switch (request.type) {
@@ -139,6 +139,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
     root["progress"] = WstrToStr(request.data[L"episode"]);
   if (request.data.count(L"score"))
     root["score"] = WstrToStr(request.data[L"score"]);
+
 #ifdef _DEBUG
   Json::StyledWriter writer;
 #else
@@ -220,7 +221,8 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   //   - episodes_length
 
   ::anime::Item anime_item;
-  // TODO: Set ID
+  anime_item.SetId(StrToWstr(root["_id"].asString()), this->id());
+  anime_item.last_modified = time(nullptr);  // current time
 
   anime_item.SetTitle(StrToWstr(root["title"].asString()));
   anime_item.SetImageUrl(StrToWstr(root["image_url"].asString()));
@@ -233,7 +235,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 
   std::vector<std::wstring> english;
   if (JsonReadArray(metadata, "english", english))
-    anime_item.SetEnglishTitle(english.front());  // TODO
+    anime_item.SetEnglishTitle(english.front());  // TODO: Is it possible that there are multiple English titles?
 
   anime_item.SetAiringStatus(TranslateSeriesStatusFrom(StrToWstr(metadata["series_status"].asString())));
   anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(metadata["series_type"].asString())));

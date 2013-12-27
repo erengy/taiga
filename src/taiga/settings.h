@@ -184,6 +184,7 @@ private:
 const sync::Service* GetCurrentService();
 sync::ServiceId GetCurrentServiceId();
 const std::wstring GetCurrentUsername();
+const std::wstring GetCurrentPassword();
 
 }  // namespace taiga
 

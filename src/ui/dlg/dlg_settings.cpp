@@ -176,7 +176,7 @@ void SettingsDialog::OnOK() {
   win::ListView list;
   SettingsPage* page = nullptr;
 
-  wstring previous_user = Settings[taiga::kSync_Service_Mal_Username];
+  wstring previous_user = taiga::GetCurrentUsername();
   wstring previous_theme = Settings[taiga::kApp_Interface_Theme];
 
   // Services > Main

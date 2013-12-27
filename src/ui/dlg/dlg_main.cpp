@@ -113,7 +113,7 @@ BOOL MainDialog::OnInitDialog() {
     Show(Settings.GetBool(taiga::kApp_Position_Remember) && Settings.GetBool(taiga::kApp_Position_Maximized) ? 
       SW_MAXIMIZE : SW_SHOWNORMAL);
   }
-  if (Settings[taiga::kSync_Service_Mal_Username].empty()) {
+  if (taiga::GetCurrentUsername().empty()) {
     win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
     dlg.SetContent(L"Username is not set. Would you like to open settings window to set it now?");

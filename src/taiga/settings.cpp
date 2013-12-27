@@ -494,7 +494,7 @@ void AppSettings::ApplyChanges(const wstring& previous_user,
     ui::OnSettingsThemeChange();
   }
 
-  if (GetWstr(kSync_Service_Mal_Username) != previous_user) {
+  if (GetCurrentUsername() != previous_user) {
     AnimeDatabase.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -645,8 +645,8 @@ void AppSettings::HandleCompatibility() {
         L"then they're selected or discarded via filters. Before this update, they were all selected by default, and filters were used to discard them.\n\n"
         L"Taiga did her best at converting your old filters to the new format, but you should still review them in case something's wrong. "
         L"If you have any questions or something else to share, let us know through our MyAnimeList club.\n\n";
-    if (!GetWstr(kSync_Service_Mal_Username).empty()) {
-      content += L"Thank you, " + GetWstr(kSync_Service_Mal_Username) + L", for participating in the beta!";
+    if (!GetCurrentUsername().empty()) {
+      content += L"Thank you, " + GetCurrentUsername() + L", for participating in the beta!";
     } else {
       content += L"Thank you all for participating in the beta!";
     }
@@ -675,7 +675,7 @@ void AppSettings::RestoreDefaults() {
   MoveFileEx(file.c_str(), backup.c_str(), flags);
   
   // Reload settings
-  wstring previous_user = GetWstr(kSync_Service_Mal_Username);
+  wstring previous_user = GetCurrentUsername();
   wstring previous_theme = GetWstr(kApp_Interface_Theme);
   Load();
   ApplyChanges(previous_user, previous_theme);
@@ -711,6 +711,19 @@ const std::wstring GetCurrentUsername() {
   }
 
   return username;
+}
+
+const std::wstring GetCurrentPassword() {
+  std::wstring password;
+  auto service = GetCurrentService();
+
+  if (service->id() == sync::kMyAnimeList) {
+    password = Settings[kSync_Service_Mal_Password];
+  } else if (service->id() == sync::kHerro) {
+    password = Settings[kSync_Service_Herro_ApiToken];
+  }
+
+  return password;
 }
 
 }  // namespace taiga

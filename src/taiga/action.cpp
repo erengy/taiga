@@ -30,6 +30,7 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
+#include "sync/manager.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
@@ -145,11 +146,15 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   
   // SearchAnime()
   } else if (action == L"SearchAnime") {
-    if (body.empty()) return;
-    if (Settings[taiga::kSync_Service_Mal_Username].empty() ||
-        Settings[taiga::kSync_Service_Mal_Password].empty()) {
-      ui::OnSettingsAccountEmpty();
+    if (body.empty())
       return;
+    auto service = taiga::GetCurrentService();
+    if (service->RequestNeedsAuthentication(sync::kSearchTitle)) {
+      if (taiga::GetCurrentUsername().empty() ||
+          taiga::GetCurrentPassword().empty()) {
+        ui::OnSettingsAccountEmpty();
+        return;
+      }
     }
     MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
     MainDialog.edit.SetText(body);

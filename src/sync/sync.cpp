@@ -34,46 +34,55 @@ namespace sync {
 
 void AuthenticateUser() {
   Request request(kAuthenticateUser);
-  AddAuthenticationToRequest(request);
   SetActiveServiceForRequest(request);
+  if (!AddAuthenticationToRequest(request))
+    return;
   ServiceManager.MakeRequest(request);
 }
 
 void GetLibraryEntries() {
   Request request(kGetLibraryEntries);
-  AddAuthenticationToRequest(request);
   SetActiveServiceForRequest(request);
+  if (!AddAuthenticationToRequest(request))
+    return;
   ServiceManager.MakeRequest(request);
 }
 
 void GetMetadataById(int id) {
   Request request(kGetMetadataById);
-  AddAuthenticationToRequest(request);
-  AddServiceDataToRequest(request, id);
   SetActiveServiceForRequest(request);
+  if (!AddAuthenticationToRequest(request))
+    return;
+  AddServiceDataToRequest(request, id);
   ServiceManager.MakeRequest(request);
 }
 
 void SearchTitle(string_t title) {
   Request request(kSearchTitle);
-  AddAuthenticationToRequest(request);
-  request.data[L"title"] = title;
   SetActiveServiceForRequest(request);
+  if (!AddAuthenticationToRequest(request))
+    return;
+  request.data[L"title"] = title;
   ServiceManager.MakeRequest(request);
 }
 
 void Synchronize() {
 #ifdef _DEBUG
   Taiga.logged_in = true;
+#else
+  // TODO: Remove after an authentication method is made available
+  if (taiga::GetCurrentServiceId() == sync::kHerro)
+    Taiga.logged_in = true;
 #endif
+
   if (!Taiga.logged_in) {
-    if (!Settings[taiga::kSync_Service_Mal_Username].empty() &&
-        !Settings[taiga::kSync_Service_Mal_Password].empty()) {
+    if (!taiga::GetCurrentUsername().empty() &&
+        !taiga::GetCurrentPassword().empty()) {
       // Log in
       ui::ChangeStatusText(L"Logging in...");
       ui::EnableDialogInput(ui::kDialogMain, false);
       AuthenticateUser();
-    } else if (!Settings[taiga::kSync_Service_Mal_Username].empty()) {
+    } else if (!taiga::GetCurrentUsername().empty()) {
       // Download list
       ui::ChangeStatusText(L"Downloading anime list...");
       ui::EnableDialogInput(ui::kDialogMain, false);
@@ -100,9 +109,10 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
   RequestType request_type = ClientModeToRequestType(http_client_mode);
 
   Request request(request_type);
-  AddAuthenticationToRequest(request);
-  AddServiceDataToRequest(request, id);
   SetActiveServiceForRequest(request);
+  if (!AddAuthenticationToRequest(request))
+    return;
+  AddServiceDataToRequest(request, id);
 
   if (anime_values.episode)
     request.data[L"episode"] = ToWstr(*anime_values.episode);
@@ -142,21 +152,17 @@ void DownloadImage(int id, const string_t& image_url) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool AddAuthenticationToRequest(Request& request) {
-  auto service = ServiceManager.service(kMyAnimeList);
-  request.data[service->canonical_name() + L"-username"] =
-      Settings[taiga::kSync_Service_Mal_Username];
-  if (RequestNeedsAuthentication(request.type, kMyAnimeList))
-    request.data[service->canonical_name() + L"-password"] =
-        SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]);
+  if (RequestNeedsAuthentication(request.type, request.service_id))
+    if (taiga::GetCurrentUsername().empty() ||
+        taiga::GetCurrentPassword().empty())
+      return false;  // Authentication is required but not available
 
-  service = ServiceManager.service(kHerro);
+  auto service = taiga::GetCurrentService();
   request.data[service->canonical_name() + L"-username"] =
-      Settings[taiga::kSync_Service_Herro_Username];
-  if (RequestNeedsAuthentication(request.type, kHerro))
-    request.data[service->canonical_name() + L"-apitoken"] =
-        Settings[taiga::kSync_Service_Herro_ApiToken];
+      taiga::GetCurrentUsername();
+  request.data[service->canonical_name() + L"-password"] =
+      taiga::GetCurrentPassword();
 
-  // TODO: Return false if authentication is required but not available
   return true;
 }
 
@@ -182,14 +188,7 @@ bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id) 
 }
 
 void SetActiveServiceForRequest(Request& request) {
-  std::wstring active_service_name = Settings[taiga::kSync_ActiveService];
-  auto service = ServiceManager.service(active_service_name);
-
-  if (service) {
-    request.service_id = static_cast<ServiceId>(service->id());
-  } else {
-    request.service_id = kMyAnimeList;
-  }
+  request.service_id = taiga::GetCurrentServiceId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
