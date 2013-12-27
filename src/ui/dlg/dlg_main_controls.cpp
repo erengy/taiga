@@ -196,7 +196,11 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     // MyAnimeList
     case TOOLBAR_BUTTON_MAL:
-      ExecuteAction(L"ViewPanel");
+      ExecuteAction(L"MalViewPanel");
+      return TRUE;
+    // Herro
+    case TOOLBAR_BUTTON_HERRO:
+      ExecuteAction(L"HerroViewProfile");
       return TRUE;
     // Settings
     case TOOLBAR_BUTTON_SETTINGS:

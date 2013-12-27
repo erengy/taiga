@@ -200,18 +200,20 @@ void MainDialog::CreateDialogControls() {
                             1, fsStyle1, 0, nullptr, L"Synchronize list");
   toolbar_main.InsertButton(1, ui::kIcon24_Mal, TOOLBAR_BUTTON_MAL, 
                             1, fsStyle1, 1, nullptr, L"Go to my panel at MyAnimeList");
-  toolbar_main.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(3, ui::kIcon24_Folders, TOOLBAR_BUTTON_FOLDERS, 
-                            1, fsStyle2, 3, nullptr, L"Root folders");
-  toolbar_main.InsertButton(4, ui::kIcon24_Tools, TOOLBAR_BUTTON_TOOLS, 
-                            1, fsStyle2, 4, nullptr, L"External links");
-  toolbar_main.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(6, ui::kIcon24_Settings, TOOLBAR_BUTTON_SETTINGS, 
-                            1, fsStyle1, 6, nullptr, L"Change program settings");
+  toolbar_main.InsertButton(2, ui::kIcon24_Herro, TOOLBAR_BUTTON_HERRO, 
+                            1, fsStyle1, 2, nullptr, L"Go to my profile at Herro");
+  toolbar_main.InsertButton(3, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(4, ui::kIcon24_Folders, TOOLBAR_BUTTON_FOLDERS, 
+                            1, fsStyle2, 4, nullptr, L"Root folders");
+  toolbar_main.InsertButton(5, ui::kIcon24_Tools, TOOLBAR_BUTTON_TOOLS, 
+                            1, fsStyle2, 5, nullptr, L"External links");
+  toolbar_main.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(7, ui::kIcon24_Settings, TOOLBAR_BUTTON_SETTINGS, 
+                            1, fsStyle1, 7, nullptr, L"Change program settings");
 #ifdef _DEBUG
-  toolbar_main.InsertButton(7, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(8, ui::kIcon24_About, TOOLBAR_BUTTON_ABOUT, 
-                            1, fsStyle1, 8, nullptr, L"Debug");
+  toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  toolbar_main.InsertButton(9, ui::kIcon24_About, TOOLBAR_BUTTON_ABOUT, 
+                            1, fsStyle1, 9, nullptr, L"Debug");
 #endif
 
   // Insert rebar bands

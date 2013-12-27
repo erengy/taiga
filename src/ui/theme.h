@@ -66,6 +66,7 @@ enum Icons16px {
 enum Icons24px {
   kIcon24_Sync,
   kIcon24_Mal,
+  kIcon24_Herro,
   kIcon24_Folders,
   kIcon24_Tools,
   kIcon24_Settings,
