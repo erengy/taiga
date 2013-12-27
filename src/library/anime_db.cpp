@@ -104,6 +104,8 @@ bool Database::SaveDatabase() {
 
     XmlWriteIntValue(anime_node, L"source", it->second.GetSource());
 
+    #define XML_WD(n, v) \
+      if (v) XmlWriteStrValue(anime_node, n, wstring(v).c_str())
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
@@ -115,8 +117,8 @@ bool Database::SaveDatabase() {
     XML_WI(L"status", it->second.GetAiringStatus());
     XML_WI(L"episode_count", it->second.GetEpisodeCount());
     XML_WI(L"episode_length", it->second.GetEpisodeLength());
-    XML_WS(L"date_start", wstring(it->second.GetDateStart()), pugi::node_pcdata);
-    XML_WS(L"date_end", wstring(it->second.GetDateEnd()), pugi::node_pcdata);
+    XML_WD(L"date_start", it->second.GetDateStart());
+    XML_WD(L"date_end", it->second.GetDateEnd());
     XML_WS(L"image", it->second.GetImageUrl(), pugi::node_pcdata);
     XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
@@ -126,6 +128,7 @@ bool Database::SaveDatabase() {
     XML_WS(L"modified", ToWstr(it->second.last_modified), pugi::node_pcdata);
     #undef XML_WS
     #undef XML_WI
+    #undef XML_WD
   }
 
   wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);

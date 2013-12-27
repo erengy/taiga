@@ -20,14 +20,13 @@
 #include "time.h"
 
 Date::Date()
-    : year(0), 
-      month(0), 
-      day(0) {
+    : year(0), month(0), day(0) {
 }
 
-Date::Date(const std::wstring& date) {
+Date::Date(const std::wstring& date)
+    : year(0), month(0), day(0) {
   // Convert from YYYY-MM-DD
-  if (date.length() == 10) {
+  if (date.length() >= 10) {
     year = ToInt(date.substr(0, 4));
     month = ToInt(date.substr(5, 2));
     day = ToInt(date.substr(8, 2));
@@ -35,9 +34,7 @@ Date::Date(const std::wstring& date) {
 }
 
 Date::Date(unsigned short year, unsigned short month, unsigned short day)
-    : year(year), 
-      month(month), 
-      day(day) {
+    : year(year), month(month), day(day) {
 }
 
 Date& Date::operator = (const Date& date) {
@@ -60,11 +57,11 @@ bool Date::operator < (const Date& date) const {
   if (year && !date.year) return true;
   if (!year && date.year) return false;
   if (year != date.year) return year < date.year;
-  
+
   if (month && !date.month) return true;
   if (!month && date.month) return false;
   if (month != date.month) return month < date.month;
-  
+
   if (day && !date.day) return true;
   if (!day && date.day) return false;
   return day < date.day;
@@ -82,19 +79,19 @@ bool Date::operator > (const Date& date) const {
   if (!year && date.year) return true;
   if (year && !date.year) return false;
   if (year != date.year) return year > date.year;
-  
+
   if (!month && date.month) return true;
   if (month && !date.month) return false;
   if (month != date.month) return month > date.month;
-  
+
   if (!day && date.day) return true;
   if (day && !date.day) return false;
   return day > date.day;
 }
 
 int Date::operator - (const Date& date) const {
-  return ((year * 365) + (month * 30) + day) - 
-    ((date.year * 365) + (date.month * 30) + date.day);
+  return ((year * 365) + (month * 30) + day) -
+         ((date.year * 365) + (date.month * 30) + date.day);
 }
 
 Date::operator bool() const {
@@ -106,13 +103,14 @@ Date::operator SYSTEMTIME() const {
   st.wYear = year;
   st.wMonth = month;
   st.wDay = day;
+
   return st;
 }
 
 Date::operator std::wstring() const {
   // Convert to YYYY-MM-DD
-  return PadChar(ToWstr(year), '0', 4) + L"-" + 
-         PadChar(ToWstr(month), '0', 2) + L"-" + 
+  return PadChar(ToWstr(year), '0', 4) + L"-" +
+         PadChar(ToWstr(month), '0', 2) + L"-" +
          PadChar(ToWstr(day), '0', 2);
 }
 
@@ -121,7 +119,8 @@ Date::operator std::wstring() const {
 void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
   // Get current time, expressed in UTC
   GetSystemTime(&st);
-  if (utc_offset == 0) return;
+  if (utc_offset == 0)
+    return;
 
   // Convert to FILETIME
   FILETIME ft;
@@ -153,16 +152,16 @@ std::wstring GetTime(LPCWSTR format) {
 }
 
 Date GetDateJapan() {
-  SYSTEMTIME stJST;
-  GetSystemTime(stJST, 9);  // JST is UTC+09
-  return Date(stJST.wYear, stJST.wMonth, stJST.wDay);
+  SYSTEMTIME st_jst;
+  GetSystemTime(st_jst, 9);  // JST is UTC+09
+  return Date(st_jst.wYear, st_jst.wMonth, st_jst.wDay);
 }
 
 std::wstring GetTimeJapan(LPCWSTR format) {
   WCHAR buff[32];
-  SYSTEMTIME stJST;
-  GetSystemTime(stJST, 9);  // JST is UTC+09
-  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &stJST, format, buff, 32);
+  SYSTEMTIME st_jst;
+  GetSystemTime(st_jst, 9);  // JST is UTC+09
+  GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, &st_jst, format, buff, 32);
   return buff;
 }
 
@@ -202,9 +201,10 @@ std::wstring ToTimeString(int seconds) {
   seconds = seconds % 3600;
   int minutes = seconds / 60;
   seconds = seconds % 60;
+
   #define TWO_DIGIT(x) (x >= 10 ? ToWstr(x) : L"0" + ToWstr(x))
-  return (hours > 0 ? TWO_DIGIT(hours) + L":" : L"") + 
-    TWO_DIGIT(minutes) + L":" + TWO_DIGIT(seconds);
+  return (hours > 0 ? TWO_DIGIT(hours) + L":" : L"") +
+         TWO_DIGIT(minutes) + L":" + TWO_DIGIT(seconds);
   #undef TWO_DIGIT
 }
 
