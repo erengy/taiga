@@ -171,7 +171,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"ShowSidebar") {
     bool hide_sidebar = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
     Settings.Set(taiga::kApp_Option_HideSidebar, hide_sidebar);
-    MainDialog.treeview.Show(hide_sidebar);
+    MainDialog.treeview.Show(!hide_sidebar);
     MainDialog.UpdateControlPositions();
     ui::Menus.UpdateView();
 
