@@ -155,5 +155,9 @@ void ViewProfile() {
               Settings[taiga::kSync_Service_Herro_Username]);
 }
 
+void ViewUpcomingAnime() {
+  ExecuteLink(L"http://herro.co/discover/anime/upcoming");
+}
+
 }  // namespace herro
 }  // namespace sync

@@ -71,7 +71,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
   if (modes & kAnnounceToMessenger) {
     if (Settings.GetBool(kShare_Messenger_Enabled) || force) {
       LOG(LevelDebug, L"Messenger");
-      ToMessenger(L"Taiga", L"MyAnimeList",
+      ToMessenger(L"Taiga", L"Taiga",
                   ReplaceVariables(Settings[kShare_Messenger_Format],
                                    *episode, false, force),
                   true);

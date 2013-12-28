@@ -252,7 +252,14 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // ViewUpcomingAnime
   //   Opens up upcoming anime page on MAL.
   } else if (action == L"ViewUpcomingAnime") {
-    sync::myanimelist::ViewUpcomingAnime();
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        sync::myanimelist::ViewUpcomingAnime();
+        break;
+      case sync::kHerro:
+        sync::herro::ViewUpcomingAnime();
+        break;
+    }
 
   // ===========================================================================
 
