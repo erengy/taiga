@@ -40,8 +40,8 @@ enum SeriesType {
 enum MyStatus {
   kCurrent = 1,
   kCompleted,
-  kOnHold,
   kPlanned,
+  kOnHold,
   kDropped
 };
 
