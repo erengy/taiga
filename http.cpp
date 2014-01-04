@@ -488,26 +488,40 @@ BOOL HttpClient::OnReadComplete() {
           }
           if (Settings.RSS.Torrent.set_folder && InStr(app_path, L"utorrent", 0, true) > -1) {
             wstring download_path;
-            if (Settings.RSS.Torrent.use_folder &&
-                FolderExists(Settings.RSS.Torrent.download_path)) {
-              download_path = Settings.RSS.Torrent.download_path;
-            }
+            // Use anime folder as the download folder
             auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
             if (anime_item) {
               wstring anime_folder = anime_item->GetFolder();
-              if (!anime_folder.empty() && FolderExists(anime_folder)) {
+              if (!anime_folder.empty() && FolderExists(anime_folder))
                 download_path = anime_folder;
-              } else if (Settings.RSS.Torrent.create_folder && !download_path.empty()) {
-                anime_folder = anime_item->GetTitle();
-                ValidateFileName(anime_folder);
-                TrimRight(anime_folder, L".");
+            }
+            // If no anime folder is set, use an alternative folder
+            if (download_path.empty()) {
+              if (Settings.RSS.Torrent.use_folder &&
+                  !Settings.RSS.Torrent.download_path.empty()) {
+                download_path = Settings.RSS.Torrent.download_path;
+              }
+              // Create a subfolder using the anime title as its name
+              if (!download_path.empty() && Settings.RSS.Torrent.create_folder) {
+                wstring anime_title;
+                if (anime_item) {
+                  anime_title = anime_item->GetTitle();
+                } else {
+                  anime_title = feed_item->episode_data.title;
+                }
+                ValidateFileName(anime_title);
+                TrimRight(anime_title, L".");
                 AddTrailingSlash(download_path);
-                download_path += anime_folder;
-                CreateDirectory(download_path.c_str(), nullptr);
-                anime_item->SetFolder(download_path);
-                Settings.Save();
+                download_path += anime_title;
+                if (!CreateFolder(download_path))
+                  LOG(LevelWarning, L"Subfolder could not be created.");
+                if (anime_item) {
+                  anime_item->SetFolder(download_path);
+                  Settings.Save();
+                }
               }
             }
+            // Set the command line parameter
             if (!download_path.empty())
               cmd = L"/directory \"" + download_path + L"\" ";
           }
