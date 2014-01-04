@@ -497,28 +497,6 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     event_item.status = ToInt(body);
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    switch (anime_item->GetAiringStatus()) {
-      case mal::STATUS_AIRING:
-        if (*event_item.status == mal::MYSTATUS_COMPLETED) {
-          MessageBox(g_hMain, 
-            L"This anime is still airing, you cannot set it as completed.", 
-            anime_item->GetTitle().c_str(), MB_ICONERROR);
-          return;
-        }
-        break;
-      case mal::STATUS_FINISHED:
-        break;
-      case mal::STATUS_NOTYETAIRED:
-        if (*event_item.status != mal::MYSTATUS_PLANTOWATCH) {
-          MessageBox(g_hMain, 
-            L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
-            anime_item->GetTitle().c_str(), MB_ICONERROR);
-          return;
-        }
-        break;
-      default:
-        return;
-    }
     switch (*event_item.status) {
       case mal::MYSTATUS_COMPLETED:
         event_item.episode = anime_item->GetEpisodeCount();
