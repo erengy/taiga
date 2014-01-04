@@ -18,6 +18,7 @@
 
 #include "../std.h"
 
+#include "dlg_anime_info.h"
 #include "dlg_anime_list.h"
 #include "dlg_history.h"
 #include "dlg_main.h"
@@ -281,6 +282,7 @@ bool HistoryDialog::RemoveItems() {
   RefreshList();
 
   MainDialog.treeview.RefreshHistoryCounter();
+  NowPlayingDialog.Refresh(false, false, false);
   AnimeListDialog.RefreshList();
   AnimeListDialog.RefreshTabs();
 

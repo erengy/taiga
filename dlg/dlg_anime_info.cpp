@@ -531,7 +531,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (anime_item->GetMyStatus() == mal::MYSTATUS_COMPLETED) {
         content += L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
         link_count++;
-      } else {
+      } else if (anime_item->GetMyStatus() != mal::MYSTATUS_DROPPED) {
         int last_watched = anime_item->GetMyLastWatchedEpisode();
         if (last_watched > 0)
           content += L" #" + ToWstr(last_watched);
