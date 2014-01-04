@@ -62,7 +62,7 @@ BOOL AnimeListDialog::OnInitDialog() {
                       UI.list_background.offset_x, UI.list_background.offset_y);
   listview.SetHoverTime(60 * 1000);
   listview.SetImageList(UI.ImgList16.GetHandle());
-  listview.Sort(0, 1, 0, ListViewCompareProc);
+  listview.Sort(Settings.Program.List.sort_column, Settings.Program.List.sort_order, LIST_SORTTYPE_DEFAULT, ListViewCompareProc);
   listview.SetTheme();
 
   // Create list tooltips
@@ -495,6 +495,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       int order = 1;
       if (lplv->iSubItem == listview.GetSortColumn()) order = listview.GetSortOrder() * -1;
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ListViewCompareProc);
+      Settings.Program.List.sort_column = lplv->iSubItem;
+      Settings.Program.List.sort_order = order;
       break;
     }
 

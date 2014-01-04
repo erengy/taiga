@@ -123,6 +123,8 @@ public:
       BOOL highlight;
       BOOL progress_show_aired;
       BOOL progress_show_available;
+      int sort_column;
+      int sort_order;
     } List;
     // Notifications
     struct Notifications {
