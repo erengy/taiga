@@ -83,15 +83,17 @@ bool Theme::Load(const wstring& name) {
     list_progress.x.value[0] = HexToARGB(progress.child(name).attribute(L"value_1").value()); \
     list_progress.x.value[1] = HexToARGB(progress.child(name).attribute(L"value_2").value()); \
     list_progress.x.value[2] = HexToARGB(progress.child(name).attribute(L"value_3").value());
-  READ_PROGRESS_DATA(aired,      L"aired");
-  READ_PROGRESS_DATA(available,  L"available");
-  READ_PROGRESS_DATA(background, L"background");
-  READ_PROGRESS_DATA(border,     L"border");
-  READ_PROGRESS_DATA(button,     L"button");
-  READ_PROGRESS_DATA(completed,  L"completed");
-  READ_PROGRESS_DATA(dropped,    L"dropped");
-  READ_PROGRESS_DATA(separator,  L"separator");
-  READ_PROGRESS_DATA(watching,   L"watching");
+  READ_PROGRESS_DATA(aired,       L"aired");
+  READ_PROGRESS_DATA(available,   L"available");
+  READ_PROGRESS_DATA(background,  L"background");
+  READ_PROGRESS_DATA(border,      L"border");
+  READ_PROGRESS_DATA(button,      L"button");
+  READ_PROGRESS_DATA(completed,   L"completed");
+  READ_PROGRESS_DATA(onhold,      L"onhold");
+  READ_PROGRESS_DATA(dropped,     L"dropped");
+  READ_PROGRESS_DATA(plantowatch, L"plantowatch");
+  READ_PROGRESS_DATA(separator,   L"separator");
+  READ_PROGRESS_DATA(watching,    L"watching");
   #undef READ_PROGRESS_DATA
 
   // Read menus

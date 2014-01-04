@@ -742,14 +742,27 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     }
 
     // Draw progress
-    if (anime_item.GetMyStatus() == mal::MYSTATUS_WATCHING || anime_item.GetMyRewatching()) {
-      UI.list_progress.watching.Draw(dc.Get(), &rcWatched);  // Watching
-    } else if (anime_item.GetMyStatus() == mal::MYSTATUS_COMPLETED) {
-      UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed
-    } else if (anime_item.GetMyStatus() == mal::MYSTATUS_DROPPED) {
-      UI.list_progress.dropped.Draw(dc.Get(), &rcWatched);   // Dropped
+    if (anime_item.GetMyRewatching()) {
+      UI.list_progress.watching.Draw(dc.Get(), &rcWatched);
     } else {
-      UI.list_progress.completed.Draw(dc.Get(), &rcWatched); // Completed / On hold / Plan to watch
+      switch (anime_item.GetMyStatus()) {
+        default:
+        case mal::MYSTATUS_WATCHING:
+          UI.list_progress.watching.Draw(dc.Get(), &rcWatched);
+          break;
+        case mal::MYSTATUS_COMPLETED:
+          UI.list_progress.completed.Draw(dc.Get(), &rcWatched);
+          break;
+        case mal::MYSTATUS_ONHOLD:
+          UI.list_progress.onhold.Draw(dc.Get(), &rcWatched);
+          break;
+        case mal::MYSTATUS_DROPPED:
+          UI.list_progress.dropped.Draw(dc.Get(), &rcWatched);
+          break;
+        case mal::MYSTATUS_PLANTOWATCH:
+          UI.list_progress.plantowatch.Draw(dc.Get(), &rcWatched);
+          break;
+      }
     }
   }
 

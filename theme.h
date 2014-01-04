@@ -161,7 +161,9 @@ public:
       border,
       button,
       completed,
+      onhold,
       dropped,
+      plantowatch,
       separator,
       watching;
   } list_progress;
