@@ -141,15 +141,18 @@ void MainDialog::CreateDialogControls() {
   toolbar_main.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Create search toolbar
   toolbar_search.Attach(GetDlgItem(IDC_TOOLBAR_SEARCH));
-  toolbar_search.SetImageList(UI.ImgList16.GetHandle(), 16, 16);
+  toolbar_search.SetImageList(UI.ImgList24.GetHandle(), 24, 24);
   toolbar_search.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Create search text
   edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   edit.SetCueBannerText(L"Search list");
-  edit.SetParent(toolbar_search.GetWindowHandle());
-  edit.SetPosition(nullptr, 0, 1, 200, 20);
   edit.SetMargins(1, 16);
+  edit.SetParent(toolbar_search.GetWindowHandle());
   win32::Rect rcEdit; edit.GetRect(&rcEdit);
+  win32::Rect rcEditWindow; edit.GetWindowRect(&rcEditWindow);
+  win32::Rect rcToolbar; toolbar_search.GetClientRect(&rcToolbar);
+  int edit_y = (30 /*rcToolbar.Height()*/ - rcEditWindow.Height()) / 2;
+  edit.SetPosition(nullptr, 0, edit_y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER);
   // Create cancel search button
   cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
   cancel_button.SetParent(edit.GetWindowHandle());
@@ -226,7 +229,7 @@ void MainDialog::CreateDialogControls() {
     HIWORD(toolbar_main.GetButtonSize()) + 2, 
     fMask, fStyle | RBBS_BREAK);
   rebar.InsertBand(toolbar_search.GetWindowHandle(), 
-    0, WIN_CONTROL_MARGIN, 0, 208, 0, 0, 0, 
+    0, WIN_CONTROL_MARGIN, 0, rcEditWindow.Width() + (WIN_CONTROL_MARGIN * 2), 0, 0, 0, 
     HIWORD(toolbar_search.GetButtonSize()), 
     fMask, fStyle);
 }
