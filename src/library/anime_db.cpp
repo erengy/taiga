@@ -390,8 +390,8 @@ int Database::GetItemCount(int status, bool check_history) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Database::ClearUserData() {
-  AnimeListDialog.SetCurrentId(ID_UNKNOWN);
-  
+  ui::DlgAnimeList.SetCurrentId(ID_UNKNOWN);
+
   foreach_(it, items)
     it->second.RemoveFromUserList();
 }

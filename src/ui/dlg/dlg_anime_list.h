@@ -16,10 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ANIME_LIST_H
-#define DLG_ANIME_LIST_H
+#ifndef TAIGA_UI_DLG_ANIME_LIST_H
+#define TAIGA_UI_DLG_ANIME_LIST_H
 
-#include "base/std.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 #include "win/win_gdi.h"
@@ -28,7 +27,7 @@ namespace anime {
 class Item;
 }
 
-// =============================================================================
+namespace ui {
 
 class AnimeListDialog : public win::Dialog {
 public:
@@ -56,7 +55,7 @@ public:
   class ListView : public win::ListView {
   public:
     ListView();
-    
+
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     void DrawProgressBar(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
@@ -64,7 +63,7 @@ public:
 
     int GetSortType(int column);
     void RefreshItem(int index);
-    
+
     win::Rect button_rect[3];
     bool button_visible[3];
     bool dragging;
@@ -82,6 +81,8 @@ private:
   int current_status_;
 };
 
-extern class AnimeListDialog AnimeListDialog;
+extern AnimeListDialog DlgAnimeList;
 
-#endif // DLG_ANIME_LIST_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_ANIME_LIST_H

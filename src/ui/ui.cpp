@@ -187,8 +187,8 @@ void OnHttpReadComplete(const taiga::HttpClient& http_client) {
 void OnLibraryChange() {
   ClearStatusText();
 
-  AnimeListDialog.RefreshList();
-  AnimeListDialog.RefreshTabs();
+  DlgAnimeList.RefreshList();
+  DlgAnimeList.RefreshTabs();
   HistoryDialog.RefreshList();
   SearchDialog.RefreshList();
 
@@ -201,8 +201,8 @@ void OnLibraryEntryAdd(int id) {
 
   auto anime_item = AnimeDatabase.FindItem(id);
   int status = anime_item->GetMyStatus();
-  AnimeListDialog.RefreshList(status);
-  AnimeListDialog.RefreshTabs(status);
+  DlgAnimeList.RefreshList(status);
+  DlgAnimeList.RefreshTabs(status);
 
   if (DlgNowPlaying.GetCurrentId() == id)
     DlgNowPlaying.Refresh();
@@ -214,8 +214,8 @@ void OnLibraryEntryChange(int id) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.Refresh(false, true, false, false);
 
-  if (AnimeListDialog.IsWindow())
-    AnimeListDialog.RefreshListItem(id);
+  if (DlgAnimeList.IsWindow())
+    DlgAnimeList.RefreshListItem(id);
 
   if (DlgNowPlaying.GetCurrentId() == id)
     DlgNowPlaying.Refresh(false, true, false, false);
@@ -228,8 +228,8 @@ void OnLibraryEntryDelete(int id) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.Destroy();
 
-  AnimeListDialog.RefreshList();
-  AnimeListDialog.RefreshTabs();
+  DlgAnimeList.RefreshList();
+  DlgAnimeList.RefreshTabs();
 
   SearchDialog.RefreshList();
 
@@ -244,8 +244,8 @@ void OnLibraryEntryImageChange(int id) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.Refresh(true, false, false, false);
 
-  if (AnimeListDialog.IsWindow())
-    AnimeListDialog.RefreshListItem(id);
+  if (DlgAnimeList.IsWindow())
+    DlgAnimeList.RefreshListItem(id);
 
   if (DlgNowPlaying.GetCurrentId() == id)
     DlgNowPlaying.Refresh(true, false, false, false);
@@ -363,10 +363,10 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
       history_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
       history_item.status ||
       history_item.enable_rewatching) {
-    AnimeListDialog.RefreshList();
-    AnimeListDialog.RefreshTabs();
+    DlgAnimeList.RefreshList();
+    DlgAnimeList.RefreshTabs();
   } else {
-    AnimeListDialog.RefreshListItem(history_item.anime_id);
+    DlgAnimeList.RefreshListItem(history_item.anime_id);
   }
 
   if (!Taiga.logged_in) {
@@ -452,14 +452,14 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
   if (anime_item.GetMyRewatching())
     list_status = anime::kWatching;
   if (list_status != anime::kNotInList) {
-    AnimeListDialog.RefreshList(list_status);
-    AnimeListDialog.RefreshTabs(list_status);
+    DlgAnimeList.RefreshList(list_status);
+    DlgAnimeList.RefreshTabs(list_status);
   }
-  int list_index = AnimeListDialog.GetListIndex(anime_item.GetId());
+  int list_index = DlgAnimeList.GetListIndex(anime_item.GetId());
   if (list_index > -1) {
-    AnimeListDialog.listview.SetItemIcon(list_index, ui::kIcon16_Play);
-    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
-    AnimeListDialog.listview.EnsureVisible(list_index);
+    DlgAnimeList.listview.SetItemIcon(list_index, ui::kIcon16_Play);
+    DlgAnimeList.listview.RedrawItems(list_index, list_index, true);
+    DlgAnimeList.listview.EnsureVisible(list_index);
   }
 
   MainDialog.UpdateTip();
@@ -483,11 +483,11 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
   MainDialog.UpdateTip();
   MainDialog.UpdateTitle();
 
-  int list_index = AnimeListDialog.GetListIndex(anime_item.GetId());
+  int list_index = DlgAnimeList.GetListIndex(anime_item.GetId());
   if (list_index > -1) {
     int icon_index = StatusToIcon(anime_item.GetAiringStatus());
-    AnimeListDialog.listview.SetItemIcon(list_index, icon_index);
-    AnimeListDialog.listview.RedrawItems(list_index, list_index, true);
+    DlgAnimeList.listview.SetItemIcon(list_index, icon_index);
+    DlgAnimeList.listview.RedrawItems(list_index, list_index, true);
   }
 }
 
@@ -525,7 +525,7 @@ void OnSettingsAccountEmpty() {
 }
 
 void OnSettingsChange() {
-  AnimeListDialog.RefreshList();
+  DlgAnimeList.RefreshList();
 }
 
 void OnSettingsRestoreDefaults() {
@@ -556,8 +556,8 @@ void OnSettingsThemeChange() {
 void OnSettingsUserChange() {
   MainDialog.treeview.RefreshHistoryCounter();
   MainDialog.UpdateTitle();
-  AnimeListDialog.RefreshList(anime::kWatching);
-  AnimeListDialog.RefreshTabs(anime::kWatching);
+  DlgAnimeList.RefreshList(anime::kWatching);
+  DlgAnimeList.RefreshTabs(anime::kWatching);
   HistoryDialog.RefreshList();
   DlgNowPlaying.Refresh();
   SearchDialog.RefreshList();
