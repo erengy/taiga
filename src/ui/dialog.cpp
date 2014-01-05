@@ -58,7 +58,7 @@ void InitializeDialogProperties() {
 
   dialog_properties.insert(std::make_pair(
       kDialogAbout,
-      DialogProperties(IDD_ABOUT, &AboutDialog, g_hMain, true)));
+      DialogProperties(IDD_ABOUT, &DlgAbout, g_hMain, true)));
   dialog_properties.insert(std::make_pair(
       kDialogAnimeInformation,
       DialogProperties(IDD_ANIME_INFO, &AnimeDialog, g_hMain, false)));

@@ -16,20 +16,19 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ABOUT_H
-#define DLG_ABOUT_H
+#ifndef TAIGA_UI_DLG_ABOUT_H
+#define TAIGA_UI_DLG_ABOUT_H
 
-#include "base/std.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class AboutDialog : public win::Dialog {
 public:
   AboutDialog();
   ~AboutDialog() {}
-  
+
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
   BOOL OnInitDialog();
@@ -38,8 +37,14 @@ public:
 
 private:
   win::RichEdit rich_edit_;
+
+  size_t note_count_;
+  int note_index_;
+  static int note_list[][2];
 };
 
-extern class AboutDialog AboutDialog;
+extern AboutDialog DlgAbout;
 
-#endif // DLG_ABOUT_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_ABOUT_H

@@ -52,6 +52,7 @@
 #include "taiga/stats.h"
 #include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "sync/service.h"
@@ -471,11 +472,11 @@ BOOL MainDialog::OnDestroy() {
     }
   }
 
-  AboutDialog.Destroy();
-  AnimeDialog.Destroy();
-  RecognitionTest.Destroy();
-  SettingsDialog.Destroy();
-  UpdateDialog.Destroy();
+  ui::DestroyDialog(ui::kDialogAbout);
+  ui::DestroyDialog(ui::kDialogAnimeInformation);
+  ui::DestroyDialog(ui::kDialogTestRecognition);
+  ui::DestroyDialog(ui::kDialogSettings);
+  ui::DestroyDialog(ui::kDialogUpdate);
 
   Taiga.Uninitialize();
 
