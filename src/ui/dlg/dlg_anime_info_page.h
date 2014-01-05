@@ -16,30 +16,27 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ANIME_INFO_PAGE_H
-#define DLG_ANIME_INFO_PAGE_H
+#ifndef TAIGA_UI_DLG_ANIME_INFO_PAGE_H
+#define TAIGA_UI_DLG_ANIME_INFO_PAGE_H
 
-#include "base/std.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
-enum AnimeInfoPageType {
-  INFOPAGE_NONE,
-  INFOPAGE_SERIESINFO,
-  INFOPAGE_MYINFO,
-  INFOPAGE_NOTRECOGNIZED
+enum AnimePageType {
+  kAnimePageNone,
+  kAnimePageSeriesInfo,
+  kAnimePageMyInfo,
+  kAnimePageNotRecognized
 };
 
-namespace ui {
 class AnimeDialog;
-}
 
 class PageBaseInfo : public win::Dialog {
- public:
+public:
   PageBaseInfo();
   virtual ~PageBaseInfo() {}
-  
+
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
@@ -47,19 +44,19 @@ class PageBaseInfo : public win::Dialog {
 
   ui::AnimeDialog* parent;
 
- protected:
+protected:
   int anime_id_;
 };
 
 class PageSeriesInfo : public PageBaseInfo {
- public:
+public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
   void Refresh(int anime_id, bool connect);
 };
 
 class PageMyInfo : public PageBaseInfo {
- public:
+public:
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   bool Save();
@@ -68,4 +65,6 @@ class PageMyInfo : public PageBaseInfo {
   void RefreshFansubPreference();
 };
 
-#endif // DLG_ANIME_INFO_PAGE_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_ANIME_INFO_PAGE_H

@@ -38,13 +38,13 @@ NowPlayingDialog DlgNowPlaying;
 
 AnimeDialog::AnimeDialog()
     : anime_id_(anime::ID_UNKNOWN),
-      current_page_(INFOPAGE_SERIESINFO),
+      current_page_(kAnimePageSeriesInfo),
       mode_(kDialogModeAnimeInformation) {
   image_label_.parent = this;
 }
 
 NowPlayingDialog::NowPlayingDialog() {
-  current_page_ = INFOPAGE_NONE;
+  current_page_ = kAnimePageNone;
   mode_ = kDialogModeNowPlaying;
 }
 
@@ -385,13 +385,13 @@ void AnimeDialog::SetCurrentId(int anime_id) {
 
   switch (anime_id_) {
     case anime::ID_NOTINLIST:
-      SetCurrentPage(INFOPAGE_NOTRECOGNIZED);
+      SetCurrentPage(kAnimePageNotRecognized);
       break;
     case anime::ID_UNKNOWN:
-      SetCurrentPage(INFOPAGE_NONE);
+      SetCurrentPage(kAnimePageNone);
       break;
     default:
-      SetCurrentPage(INFOPAGE_SERIESINFO);
+      SetCurrentPage(kAnimePageSeriesInfo);
       break;
   }
 
@@ -403,25 +403,25 @@ void AnimeDialog::SetCurrentPage(int index) {
 
   if (IsWindow()) {
     switch (index) {
-      case INFOPAGE_NONE:
+      case kAnimePageNone:
         image_label_.Hide();
         page_my_info.Hide();
         page_series_info.Hide();
         sys_link_.Show();
         break;
-      case INFOPAGE_SERIESINFO:
+      case kAnimePageSeriesInfo:
         image_label_.Show();
         page_my_info.Hide();
         page_series_info.Show();
         sys_link_.Show(mode_ == kDialogModeNowPlaying);
         break;
-      case INFOPAGE_MYINFO:
+      case kAnimePageMyInfo:
         image_label_.Show();
         page_series_info.Hide();
         page_my_info.Show();
         sys_link_.Hide();
         break;
-      case INFOPAGE_NOTRECOGNIZED:
+      case kAnimePageNotRecognized:
         image_label_.Show();
         page_my_info.Hide();
         page_series_info.Hide();
@@ -664,7 +664,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
                -ScaleY(win::kControlMargin) * 2);
 
   // Image
-  if (current_page_ != INFOPAGE_NONE) {
+  if (current_page_ != kAnimePageNone) {
     win::Rect rect_image = rect;
     rect_image.right = rect_image.left + ScaleX(150);
     auto image = ImageDatabase.GetImage(anime_id_);

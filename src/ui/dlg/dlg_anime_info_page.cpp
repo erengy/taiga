@@ -16,28 +16,22 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_anime_info.h"
-#include "dlg_anime_info_page.h"
-
-#include "dlg_input.h"
-
-#include "library/anime.h"
+#include "base/file.h"
+#include "base/foreach.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
-#include "base/common.h"
-#include "base/file.h"
 #include "library/history.h"
-#include "taiga/http.h"
 #include "sync/sync.h"
-#include "track/recognition.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "base/string.h"
+#include "track/recognition.h"
+#include "ui/dlg/dlg_anime_info.h"
+#include "ui/dlg/dlg_anime_info_page.h"
+#include "ui/dlg/dlg_input.h"
 #include "ui/theme.h"
 
-// =============================================================================
+namespace ui {
 
 PageBaseInfo::PageBaseInfo()
     : anime_id_(anime::ID_UNKNOWN), parent(nullptr) {
@@ -46,8 +40,8 @@ PageBaseInfo::PageBaseInfo()
 BOOL PageBaseInfo::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 3; i++) {
-    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-      reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), FALSE);
+    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT,
+                       reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), FALSE);
   }
 
   return TRUE;
@@ -59,7 +53,7 @@ INT_PTR PageBaseInfo::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
       if (!parent->IsTabVisible())
         return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -109,7 +103,7 @@ void PageBaseInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
   PageBaseInfo::OnSize(uMsg, nType, size);
@@ -145,14 +139,16 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
 }
 
 void PageSeriesInfo::Refresh(int anime_id, bool connect) {
-  if (anime_id <= anime::ID_UNKNOWN) return;
+  if (anime_id <= anime::ID_UNKNOWN)
+    return;
 
   anime_id_ = anime_id;
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
   // Set synonyms
-  wstring text = Join(anime_item->GetSynonyms(), L", ");
-  if (text.empty()) text = L"-";
+  std::wstring text = Join(anime_item->GetSynonyms(), L", ");
+  if (text.empty())
+    text = L"-";
   SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
 
   // Set information
@@ -181,7 +177,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
@@ -189,7 +185,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Browse anime folder
     case IDC_BUTTON_BROWSE: {
-      wstring default_path, path;
+      std::wstring default_path, path;
       if (!anime_item->GetFolder().empty()) {
         default_path = anime_item->GetFolder();
       } else if (!Settings.root_folders.empty()) {
@@ -204,24 +200,24 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
-        win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        win::Spin m_Spin = GetDlgItem(IDC_SPIN_PROGRESS);
-        int episode_value; m_Spin.GetPos32(episode_value);
+        win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        win::Spin spin = GetDlgItem(IDC_SPIN_PROGRESS);
+        int episode_value = 0;
+        spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
-          if (anime_item->GetMyStatus() == anime::kCompleted && episode_value == anime_item->GetEpisodeCount()) {
-            m_Spin.SetPos32(0);
-          }
-          m_Combo.Enable(FALSE);
-          m_Combo.SetCurSel(anime::kCompleted - 1);
+          if (anime_item->GetMyStatus() == anime::kCompleted &&
+              episode_value == anime_item->GetEpisodeCount())
+            spin.SetPos32(0);
+          combobox.Enable(FALSE);
+          combobox.SetCurSel(anime::kCompleted - 1);
         } else {
-          if (episode_value == 0) {
-            m_Spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
-          }
-          m_Combo.Enable();
-          m_Combo.SetCurSel(anime_item->GetMyStatus() - 1);
+          if (episode_value == 0)
+            spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
+          combobox.Enable();
+          combobox.SetCurSel(anime_item->GetMyStatus() - 1);
         }
-        m_Spin.SetWindowHandle(nullptr);
-        m_Combo.SetWindowHandle(nullptr);
+        spin.SetWindowHandle(nullptr);
+        combobox.SetWindowHandle(nullptr);
         return TRUE;
       }
       break;
@@ -230,18 +226,17 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     case IDC_COMBO_ANIME_STATUS:
       if (HIWORD(wParam) == CBN_SELENDOK) {
         // Selected "Completed"
-        win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-        if (m_Combo.GetItemData(m_Combo.GetCurSel()) == anime::kCompleted) {
-          if (anime_item->GetMyStatus() != anime::kCompleted && anime_item->GetEpisodeCount() > 0) {
+        win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+        if (combobox.GetItemData(combobox.GetCurSel()) == anime::kCompleted)
+          if (anime_item->GetMyStatus() != anime::kCompleted &&
+              anime_item->GetEpisodeCount() > 0)
             SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetEpisodeCount());
-          }
-        }
-        m_Combo.SetWindowHandle(nullptr);
+        combobox.SetWindowHandle(nullptr);
         return TRUE;
       }
       break;
   }
-  
+
   return FALSE;
 }
 
@@ -271,16 +266,18 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 void PageMyInfo::Refresh(int anime_id) {
-  if (anime_id <= anime::ID_UNKNOWN) return;
+  if (anime_id <= anime::ID_UNKNOWN)
+    return;
 
   anime_id_ = anime_id;
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
-  if (!anime_item->IsInList()) return;
+  if (!anime_item->IsInList())
+    return;
 
   // Episodes watched
-  SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0, 
-    anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 9999);
+  SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETRANGE32, 0,
+                     anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 9999);
   SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetMyLastWatchedEpisode());
 
   // Re-watching
@@ -288,44 +285,42 @@ void PageMyInfo::Refresh(int anime_id) {
   EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == anime::kCompleted);
 
   // Status
-  win::ComboBox m_Combo = GetDlgItem(IDC_COMBO_ANIME_STATUS);
-  if (m_Combo.GetCount() == 0) {
-    for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++) {
-      if (i != anime::kUnknownMyStatus) {
-        m_Combo.AddItem(anime::TranslateMyStatus(i, false).c_str(), i);
-      }
-    }
-  }
+  win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
+  if (combobox.GetCount() == 0)
+    for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++)
+      if (i != anime::kUnknownMyStatus)
+        combobox.AddItem(anime::TranslateMyStatus(i, false).c_str(), i);
   int status = anime_item->GetMyStatus();
-  if (status == anime::kPlanToWatch) status--;
-  m_Combo.SetCurSel(status - 1);
-  m_Combo.Enable(!anime_item->GetMyRewatching());
-  m_Combo.SetWindowHandle(nullptr);
+  if (status == anime::kPlanToWatch)
+    status--;
+  combobox.SetCurSel(status - 1);
+  combobox.Enable(!anime_item->GetMyRewatching());
+  combobox.SetWindowHandle(nullptr);
 
   // Score
-  m_Combo.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
-  if (m_Combo.GetCount() == 0) {
-    m_Combo.AddString(L"(10) Masterpiece");
-    m_Combo.AddString(L"(9) Great");
-    m_Combo.AddString(L"(8) Very Good");
-    m_Combo.AddString(L"(7) Good");
-    m_Combo.AddString(L"(6) Fine");
-    m_Combo.AddString(L"(5) Average");
-    m_Combo.AddString(L"(4) Bad");
-    m_Combo.AddString(L"(3) Very Bad");
-    m_Combo.AddString(L"(2) Horrible");
-    m_Combo.AddString(L"(1) Unwatchable");
-    m_Combo.AddString(L"(0) No Score");
+  combobox.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
+  if (combobox.GetCount() == 0) {
+    combobox.AddString(L"(10) Masterpiece");
+    combobox.AddString(L"(9) Great");
+    combobox.AddString(L"(8) Very Good");
+    combobox.AddString(L"(7) Good");
+    combobox.AddString(L"(6) Fine");
+    combobox.AddString(L"(5) Average");
+    combobox.AddString(L"(4) Bad");
+    combobox.AddString(L"(3) Very Bad");
+    combobox.AddString(L"(2) Horrible");
+    combobox.AddString(L"(1) Unwatchable");
+    combobox.AddString(L"(0) No Score");
   }
-  m_Combo.SetCurSel(10 - anime_item->GetMyScore());
-  m_Combo.SetWindowHandle(nullptr);
+  combobox.SetCurSel(10 - anime_item->GetMyScore());
+  combobox.SetWindowHandle(nullptr);
 
   // Tags
-  win::Edit m_Edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
-  m_Edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
-  m_Edit.SetText(anime_item->GetMyTags());
-  m_Edit.SetWindowHandle(nullptr);
-      
+  win::Edit edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
+  edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
+  edit.SetText(anime_item->GetMyTags());
+  edit.SetWindowHandle(nullptr);
+
   // Date limits and defaults
   if (anime::IsValidDate(anime_item->GetDateStart())) {
     SYSTEMTIME stSeriesStart = anime_item->GetDateStart();
@@ -355,30 +350,32 @@ void PageMyInfo::Refresh(int anime_id) {
   }
 
   // Alternative titles
-  m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_ALT));
-  m_Edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
-  m_Edit.SetText(Join(anime_item->GetUserSynonyms(), L"; "));
-  m_Edit.SetWindowHandle(nullptr);
+  edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_ALT));
+  edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
+  edit.SetText(Join(anime_item->GetUserSynonyms(), L"; "));
+  edit.SetWindowHandle(nullptr);
   CheckDlgButton(IDC_CHECK_ANIME_ALT, anime_item->GetUseAlternative());
 
   // Folder
-  m_Edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_FOLDER));
-  m_Edit.SetText(anime_item->GetFolder());
-  m_Edit.SetWindowHandle(nullptr);
+  edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_FOLDER));
+  edit.SetText(anime_item->GetFolder());
+  edit.SetWindowHandle(nullptr);
 
   // Fansub group
   RefreshFansubPreference();
 }
 
 void PageMyInfo::RefreshFansubPreference() {
-  if (anime_id_ <= anime::ID_UNKNOWN) return;
+  if (anime_id_ <= anime::ID_UNKNOWN)
+    return;
 
-  wstring text;
-  vector<wstring> groups;
+  std::wstring text;
+  std::vector<wstring> groups;
 
   if (anime::GetFansubFilter(anime_id_, groups)) {
-    for (auto it = groups.begin(); it != groups.end(); ++it) {
-      if (!text.empty()) text += L" or ";
+    foreach_(it, groups) {
+      if (!text.empty())
+        text += L" or ";
       text += L"\"" + *it + L"\"";
     }
   } else {
@@ -400,7 +397,7 @@ bool PageMyInfo::Save() {
   // Episodes watched
   history_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
   if (!anime::IsValidEpisode(*history_item.episode, -1, anime_item->GetEpisodeCount())) {
-    wstring msg = L"Please enter a valid episode number between 0-" + 
+    wstring msg = L"Please enter a valid episode number between 0-" +
                   ToWstr(anime_item->GetEpisodeCount()) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
     return false;
@@ -408,23 +405,21 @@ bool PageMyInfo::Save() {
 
   // Re-watching
   history_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
-  
+
   // Score
   history_item.score = 10 - GetComboSelection(IDC_COMBO_ANIME_SCORE);
-  
+
   // Status
   history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
   if (*history_item.status == anime::kUnknownMyStatus)
     history_item.status = *history_item.status + 1;
-  
+
   // Tags
-  wstring tags;
-  GetDlgItemText(IDC_EDIT_ANIME_TAGS, tags);
-  history_item.tags = tags;
+  history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
 
   // Start date
   SYSTEMTIME stMyStart;
-  if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0, 
+  if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0,
                          reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
     history_item.date_start = Date();
   } else {
@@ -432,7 +427,7 @@ bool PageMyInfo::Save() {
   }
   // Finish date
   SYSTEMTIME stMyFinish;
-  if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0, 
+  if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0,
                          reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
     history_item.date_finish = Date();
   } else {
@@ -440,16 +435,12 @@ bool PageMyInfo::Save() {
   }
 
   // Alternative titles
-  wstring titles;
-  GetDlgItemText(IDC_EDIT_ANIME_ALT, titles);
-  anime_item->SetUserSynonyms(titles);
+  anime_item->SetUserSynonyms(GetDlgItemText(IDC_EDIT_ANIME_ALT));
   anime_item->SetUseAlternative(IsDlgButtonChecked(IDC_CHECK_ANIME_ALT) == TRUE);
   Meow.UpdateCleanTitles(anime_id_);
 
   // Folder
-  wstring folder;
-  GetDlgItemText(IDC_EDIT_ANIME_FOLDER, folder);
-  anime_item->SetFolder(folder);
+  anime_item->SetFolder(GetDlgItemText(IDC_EDIT_ANIME_FOLDER));
 
   // Save settings
   Settings.Save();
@@ -458,3 +449,5 @@ bool PageMyInfo::Save() {
   History.queue.Add(history_item);
   return true;
 }
+
+}  // namespace ui

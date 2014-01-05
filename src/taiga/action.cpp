@@ -122,7 +122,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"Info") {
     int anime_id = static_cast<int>(lParam);
     ui::DlgAnime.SetCurrentId(anime_id);
-    ui::DlgAnime.SetCurrentPage(INFOPAGE_SERIESINFO);
+    ui::DlgAnime.SetCurrentPage(ui::kAnimePageSeriesInfo);
     ui::ShowDialog(ui::kDialogAnimeInformation);
 
   // MainDialog()
@@ -361,7 +361,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     if (!anime_item || !anime_item->IsInList())
       return;
     ui::DlgAnime.SetCurrentId(anime_id);
-    ui::DlgAnime.SetCurrentPage(INFOPAGE_MYINFO);
+    ui::DlgAnime.SetCurrentPage(ui::kAnimePageMyInfo);
     ui::ShowDialog(ui::kDialogAnimeInformation);
 
   // EditDelete()
