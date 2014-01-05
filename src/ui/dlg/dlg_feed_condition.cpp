@@ -16,36 +16,30 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_feed_condition.h"
-
+#include "base/foreach.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
-#include "track/feed.h"
 #include "taiga/resource.h"
-#include "base/string.h"
-
+#include "ui/dlg/dlg_feed_condition.h"
 #include "win/win_gdi.h"
 
-class FeedConditionDialog FeedConditionDialog;
+namespace ui {
 
-// =============================================================================
+FeedConditionDialog DlgFeedCondition;
 
 FeedConditionDialog::FeedConditionDialog() {
   RegisterDlgClass(L"TaigaFeedConditionW");
 }
 
-FeedConditionDialog::~FeedConditionDialog() {
-}
-
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL FeedConditionDialog::OnInitDialog() {
   // Set title
-  if (condition.element != 0 || condition.op != 0 || !condition.value.empty()) {
+  if (condition.element != 0 ||
+      condition.op != 0 ||
+      !condition.value.empty())
     SetText(L"Edit Condition");
-  }
 
   // Initialize
   element_combo_.Attach(GetDlgItem(IDC_COMBO_FEED_ELEMENT));
@@ -53,10 +47,9 @@ BOOL FeedConditionDialog::OnInitDialog() {
   value_combo_.Attach(GetDlgItem(IDC_COMBO_FEED_VALUE));
 
   // Add elements
-  for (int i = 0; i < FEED_FILTER_ELEMENT_COUNT; i++) {
+  for (int i = 0; i < FEED_FILTER_ELEMENT_COUNT; i++)
     element_combo_.AddString(Aggregator.filter_manager.TranslateElement(i).c_str());
-  }
-  
+
   // Choose
   element_combo_.SetCurSel(condition.element);
   ChooseElement(condition.element);
@@ -75,7 +68,8 @@ BOOL FeedConditionDialog::OnInitDialog() {
     }
     case FEED_FILTER_ELEMENT_USER_STATUS: {
       int value = ToInt(condition.value);
-      if (value == 6) value--;
+      if (value == 6)
+        value--;
       value_combo_.SetCurSel(value);
       break;
     }
@@ -93,7 +87,7 @@ BOOL FeedConditionDialog::OnInitDialog() {
   return TRUE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 INT_PTR FeedConditionDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
@@ -159,13 +153,13 @@ void FeedConditionDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   ::GetClientRect(GetDlgItem(IDCANCEL), &rect_button);
   rect.top = rect.bottom - (rect_button.Height() * 2);
   dc.FillRect(rect, ::GetSysColor(COLOR_BTNFACE));
-  
+
   // Paint line
   rect.bottom = rect.top + 1;
   dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void FeedConditionDialog::ChooseElement(int element_index) {
   // Operator
@@ -217,10 +211,10 @@ void FeedConditionDialog::ChooseElement(int element_index) {
 
   #undef ADD_OPERATOR
   operator_combo_.SetCurSel(op_index < 0 || op_index > operator_combo_.GetCount() - 1 ? 0 : op_index);
-  
-  // ===========================================================================
-  
+
+  //////////////////////////////////////////////////////////////////////////////
   // Value
+
   value_combo_.ResetContent();
 
   RECT rect;
@@ -231,9 +225,9 @@ void FeedConditionDialog::ChooseElement(int element_index) {
 
   #define RECREATE_COMBO(style) \
     value_combo_.Create(0, WC_COMBOBOX, nullptr, \
-      style | CBS_AUTOHSCROLL | WS_CHILD | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL, \
-      rect.left, rect.top, width, height * 2, \
-      GetWindowHandle(), nullptr, nullptr);
+        style | CBS_AUTOHSCROLL | WS_CHILD | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL, \
+        rect.left, rect.top, width, height * 2, \
+        GetWindowHandle(), nullptr, nullptr);
 
   switch (element_index) {
     case FEED_FILTER_ELEMENT_FILE_CATEGORY:
@@ -257,20 +251,19 @@ void FeedConditionDialog::ChooseElement(int element_index) {
           case anime::kDropped:
             continue;
           default:
-            title_list.push_back(std::make_pair(it->second.GetId(), 
-              AnimeDatabase.FindItem(it->second.GetId())->GetTitle()));
+            title_list.push_back(std::make_pair(
+                it->second.GetId(),
+                AnimeDatabase.FindItem(it->second.GetId())->GetTitle()));
         }
       }
-      std::sort(title_list.begin(), title_list.end(), 
+      std::sort(title_list.begin(), title_list.end(),
         [](const anime_pair& a1, const anime_pair& a2) {
           return CompareStrings(a1.second, a2.second) < 0;
         });
-      if (element_index == FEED_FILTER_ELEMENT_META_ID) {
+      if (element_index == FEED_FILTER_ELEMENT_META_ID)
         value_combo_.AddString(L"(Unknown)");
-      }
-      for (auto it = title_list.begin(); it != title_list.end(); ++it) {
+      foreach_(it, title_list)
         value_combo_.AddItem(it->second.c_str(), it->first);
-      }
       break;
     }
     case FEED_FILTER_ELEMENT_META_DATE_START:
@@ -342,3 +335,5 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   #undef RECREATE_COMBO
   value_combo_.SetCurSel(0);
 }
+
+}  // namespace ui

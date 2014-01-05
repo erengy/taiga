@@ -401,13 +401,13 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Add new condition
     case 100:
-      FeedConditionDialog.condition.Reset();
-      FeedConditionDialog.Create(IDD_FEED_CONDITION, GetWindowHandle());
-      if (FeedConditionDialog.condition.element > -1) {
+      DlgFeedCondition.condition.Reset();
+      DlgFeedCondition.Create(IDD_FEED_CONDITION, GetWindowHandle());
+      if (DlgFeedCondition.condition.element > -1) {
         parent->filter.AddCondition(
-          FeedConditionDialog.condition.element,
-          FeedConditionDialog.condition.op,
-          FeedConditionDialog.condition.value);
+            DlgFeedCondition.condition.element,
+            DlgFeedCondition.condition.op,
+            DlgFeedCondition.condition.value);
         RefreshConditionList();
         condition_list.SetSelectedItem(condition_list.GetItemCount() - 1);
       }
@@ -487,10 +487,10 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
           FeedFilterCondition* condition = reinterpret_cast<FeedFilterCondition*>(
             condition_list.GetItemParam(selected_item));
           if (condition) {
-            FeedConditionDialog.condition = *condition;
-            FeedConditionDialog.Create(IDD_FEED_CONDITION, GetWindowHandle());
-            if (FeedConditionDialog.condition.element > -1) {
-              *condition = FeedConditionDialog.condition;
+            DlgFeedCondition.condition = *condition;
+            DlgFeedCondition.Create(IDD_FEED_CONDITION, GetWindowHandle());
+            if (DlgFeedCondition.condition.element > -1) {
+              *condition = DlgFeedCondition.condition;
               RefreshConditionList();
               condition_list.SetSelectedItem(selected_item);
             }

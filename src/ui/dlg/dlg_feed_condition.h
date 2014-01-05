@@ -16,20 +16,19 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_FEED_CONDITION_H
-#define DLG_FEED_CONDITION_H
+#ifndef TAIGA_UI_DLG_FEED_CONDITION_H
+#define TAIGA_UI_DLG_FEED_CONDITION_H
 
-#include "base/std.h"
 #include "track/feed.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class FeedConditionDialog : public win::Dialog {
 public:
   FeedConditionDialog();
-  virtual ~FeedConditionDialog();
+  ~FeedConditionDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
@@ -38,16 +37,16 @@ public:
   void OnOK();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
-public:
   void ChooseElement(int index);
 
-public:
   FeedFilterCondition condition;
 
 private:
   win::ComboBox element_combo_, operator_combo_, value_combo_;
 };
 
-extern class FeedConditionDialog FeedConditionDialog;
+extern FeedConditionDialog DlgFeedCondition;
 
-#endif // DLG_FEED_CONDITION_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_FEED_CONDITION_H
