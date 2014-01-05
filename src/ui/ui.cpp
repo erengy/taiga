@@ -196,37 +196,37 @@ void OnLibraryChange() {
 }
 
 void OnLibraryEntryAdd(int id) {
-  if (AnimeDialog.GetCurrentId() == id)
-    AnimeDialog.Refresh();
+  if (DlgAnime.GetCurrentId() == id)
+    DlgAnime.Refresh();
 
   auto anime_item = AnimeDatabase.FindItem(id);
   int status = anime_item->GetMyStatus();
   AnimeListDialog.RefreshList(status);
   AnimeListDialog.RefreshTabs(status);
 
-  if (NowPlayingDialog.GetCurrentId() == id)
-    NowPlayingDialog.Refresh();
+  if (DlgNowPlaying.GetCurrentId() == id)
+    DlgNowPlaying.Refresh();
 
   SearchDialog.RefreshList();
 }
 
 void OnLibraryEntryChange(int id) {
-  if (AnimeDialog.GetCurrentId() == id)
-    AnimeDialog.Refresh(false, true, false, false);
+  if (DlgAnime.GetCurrentId() == id)
+    DlgAnime.Refresh(false, true, false, false);
 
   if (AnimeListDialog.IsWindow())
     AnimeListDialog.RefreshListItem(id);
 
-  if (NowPlayingDialog.GetCurrentId() == id)
-    NowPlayingDialog.Refresh(false, true, false, false);
+  if (DlgNowPlaying.GetCurrentId() == id)
+    DlgNowPlaying.Refresh(false, true, false, false);
 
   if (SeasonDialog.IsWindow())
     SeasonDialog.RefreshList(true);
 }
 
 void OnLibraryEntryDelete(int id) {
-  if (AnimeDialog.GetCurrentId() == id)
-    AnimeDialog.Destroy();
+  if (DlgAnime.GetCurrentId() == id)
+    DlgAnime.Destroy();
 
   AnimeListDialog.RefreshList();
   AnimeListDialog.RefreshTabs();
@@ -241,14 +241,14 @@ void OnLibraryEntryDelete(int id) {
 }
 
 void OnLibraryEntryImageChange(int id) {
-  if (AnimeDialog.GetCurrentId() == id)
-    AnimeDialog.Refresh(true, false, false, false);
+  if (DlgAnime.GetCurrentId() == id)
+    DlgAnime.Refresh(true, false, false, false);
 
   if (AnimeListDialog.IsWindow())
     AnimeListDialog.RefreshListItem(id);
 
-  if (NowPlayingDialog.GetCurrentId() == id)
-    NowPlayingDialog.Refresh(true, false, false, false);
+  if (DlgNowPlaying.GetCurrentId() == id)
+    DlgNowPlaying.Refresh(true, false, false, false);
 
   if (SeasonDialog.IsWindow())
     SeasonDialog.RefreshList(true);
@@ -379,7 +379,7 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
 void OnHistoryChange() {
   HistoryDialog.RefreshList();
   MainDialog.treeview.RefreshHistoryCounter();
-  NowPlayingDialog.Refresh(false, false, false);
+  DlgNowPlaying.Refresh(false, false, false);
 }
 
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
@@ -446,7 +446,7 @@ bool OnAnimeFolderNotFound() {
 
 void OnAnimeWatchingStart(const anime::Item& anime_item,
                           const anime::Episode& episode) {
-  NowPlayingDialog.SetCurrentId(anime_item.GetId());
+  DlgNowPlaying.SetCurrentId(anime_item.GetId());
   
   int list_status = anime_item.GetMyStatus();
   if (anime_item.GetMyRewatching())
@@ -478,7 +478,7 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
 
 void OnAnimeWatchingEnd(const anime::Item& anime_item,
                         const anime::Episode& episode) {
-  NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);
+  DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
 
   MainDialog.UpdateTip();
   MainDialog.UpdateTitle();
@@ -559,7 +559,7 @@ void OnSettingsUserChange() {
   AnimeListDialog.RefreshList(anime::kWatching);
   AnimeListDialog.RefreshTabs(anime::kWatching);
   HistoryDialog.RefreshList();
-  NowPlayingDialog.Refresh();
+  DlgNowPlaying.Refresh();
   SearchDialog.RefreshList();
   StatsDialog.Refresh();
 }

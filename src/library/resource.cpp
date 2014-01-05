@@ -76,8 +76,8 @@ void ImageDatabase::FreeMemory() {
     if (items_.find(anime_id) == items_.end())
       continue;
 
-    if (::AnimeDialog.GetCurrentId() == anime_id ||
-        ::NowPlayingDialog.GetCurrentId() == anime_id)
+    if (ui::DlgAnime.GetCurrentId() == anime_id ||
+        ui::DlgNowPlaying.GetCurrentId() == anime_id)
       erase = false;
 
     if (!SeasonDatabase.items.empty())

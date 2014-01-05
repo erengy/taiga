@@ -258,7 +258,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
           dlg.title = AnimeDatabase.FindItem(anime_id_)->GetTitle();
           dlg.info = L"Please enter your fansub group preference for this title:";
           dlg.text = text;
-          dlg.Show(AnimeDialog.GetWindowHandle());
+          dlg.Show(parent->GetWindowHandle());
           if (dlg.result == IDOK)
             if (anime::SetFansubFilter(anime_id_, dlg.text))
               RefreshFansubPreference();

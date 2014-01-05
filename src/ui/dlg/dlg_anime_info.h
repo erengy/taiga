@@ -16,22 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_ANIME_INFO_H
-#define DLG_ANIME_INFO_H
+#ifndef TAIGA_UI_DLG_ANIME_INFO_H
+#define TAIGA_UI_DLG_ANIME_INFO_H
 
-#include "base/std.h"
 #include "base/gfx.h"
+#include "ui/dlg/dlg_anime_info_page.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-#include "dlg_anime_info_page.h"
+namespace ui {
 
 enum AnimeDialogMode {
-  DIALOG_MODE_ANIME_INFORMATION,
-  DIALOG_MODE_NOW_PLAYING
+  kDialogModeAnimeInformation,
+  kDialogModeNowPlaying
 };
-
-// =============================================================================
 
 class AnimeDialog : public win::Dialog {
 public:
@@ -74,7 +72,7 @@ protected:
 
   win::Edit edit_title_;
   win::SysLink sys_link_;
-  
+
   class Tab : public win::Tab {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -85,10 +83,12 @@ protected:
 class NowPlayingDialog : public AnimeDialog {
 public:
   NowPlayingDialog();
-  virtual ~NowPlayingDialog() {}
+  ~NowPlayingDialog() {}
 };
 
-extern class AnimeDialog AnimeDialog;
-extern class NowPlayingDialog NowPlayingDialog;
+extern AnimeDialog DlgAnime;
+extern NowPlayingDialog DlgNowPlaying;
 
-#endif // DLG_ANIME_INFO_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_ANIME_INFO_H

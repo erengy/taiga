@@ -121,8 +121,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"Info") {
     int anime_id = static_cast<int>(lParam);
-    AnimeDialog.SetCurrentId(anime_id);
-    AnimeDialog.SetCurrentPage(INFOPAGE_SERIESINFO);
+    ui::DlgAnime.SetCurrentId(anime_id);
+    ui::DlgAnime.SetCurrentPage(INFOPAGE_SERIESINFO);
     ui::ShowDialog(ui::kDialogAnimeInformation);
 
   // MainDialog()
@@ -358,14 +358,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditAll") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (!anime_item || !anime_item->IsInList()) return;
-    AnimeDialog.SetCurrentId(anime_id);
-    AnimeDialog.SetCurrentPage(INFOPAGE_MYINFO);
-    if (!AnimeDialog.IsWindow()) {
-      AnimeDialog.Create(IDD_ANIME_INFO, g_hMain, false);
-    } else {
-      ActivateWindow(AnimeDialog.GetWindowHandle());
-    }
+    if (!anime_item || !anime_item->IsInList())
+      return;
+    ui::DlgAnime.SetCurrentId(anime_id);
+    ui::DlgAnime.SetCurrentPage(INFOPAGE_MYINFO);
+    ui::ShowDialog(ui::kDialogAnimeInformation);
 
   // EditDelete()
   //   Removes an anime from list.

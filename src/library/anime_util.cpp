@@ -34,6 +34,7 @@
 #include "taiga/taiga.h"
 #include "track/feed.h"
 #include "track/media.h"
+#include "track/recognition.h"
 #include "ui/ui.h"
 
 namespace anime {
@@ -194,6 +195,27 @@ bool PlayEpisode(Item& item, int number) {
   SetSharedCursor(IDC_ARROW);
 
   return !file_path.empty();
+}
+
+bool LinkEpisodeToAnime(Episode& episode, int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  episode.anime_id = anime_id;
+  anime_item->AddtoUserList();
+
+  auto synonyms = anime_item->GetUserSynonyms();
+  synonyms.push_back(CurrentEpisode.title);
+  anime_item->SetUserSynonyms(synonyms);
+  Meow.UpdateCleanTitles(anime_item->GetId());
+  Settings.Save();
+
+  StartWatching(*anime_item, episode);
+  ui::ClearStatusText();
+
+  return true;
 }
 
 void StartWatching(Item& item, Episode& episode) {
