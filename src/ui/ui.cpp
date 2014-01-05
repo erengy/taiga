@@ -189,7 +189,7 @@ void OnLibraryChange() {
 
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
-  HistoryDialog.RefreshList();
+  DlgHistory.RefreshList();
   SearchDialog.RefreshList();
 
   MainDialog.EnableInput(true);
@@ -377,9 +377,11 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
 }
 
 void OnHistoryChange() {
-  HistoryDialog.RefreshList();
+  DlgHistory.RefreshList();
   MainDialog.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
+  DlgAnimeList.RefreshList();
+  DlgAnimeList.RefreshTabs();
 }
 
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
@@ -558,7 +560,7 @@ void OnSettingsUserChange() {
   MainDialog.UpdateTitle();
   DlgAnimeList.RefreshList(anime::kWatching);
   DlgAnimeList.RefreshTabs(anime::kWatching);
-  HistoryDialog.RefreshList();
+  DlgHistory.RefreshList();
   DlgNowPlaying.Refresh();
   SearchDialog.RefreshList();
   StatsDialog.Refresh();

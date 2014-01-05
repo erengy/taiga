@@ -16,19 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_HISTORY_H
-#define DLG_HISTORY_H
+#ifndef TAIGA_UI_DLG_HISTORY_H
+#define TAIGA_UI_DLG_HISTORY_H
 
-#include "base/std.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class HistoryDialog : public win::Dialog {
 public:
   HistoryDialog() {}
-  virtual ~HistoryDialog() {}
+  ~HistoryDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
@@ -36,7 +35,6 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   BOOL PreTranslateMessage(MSG* pMsg);
 
-public:
   void RefreshList();
   bool MoveItems(int pos);
   bool RemoveItems();
@@ -45,6 +43,8 @@ private:
   win::ListView list_;
 };
 
-extern class HistoryDialog HistoryDialog;
+extern HistoryDialog DlgHistory;
 
-#endif // DLG_HISTORY_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_HISTORY_H

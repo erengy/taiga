@@ -316,6 +316,15 @@ History::History()
   queue.history = this;
 }
 
+void History::Clear(bool save) {
+  items.clear();
+
+  ui::OnHistoryChange();
+
+  if (save)
+    Save();
+}
+
 bool History::Load() {
   items.clear();
   queue.items.clear();

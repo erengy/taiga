@@ -16,28 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_anime_list.h"
-#include "dlg_history.h"
-#include "dlg_main.h"
-
-#include "library/anime_db.h"
-#include "library/anime_util.h"
 #include "base/common.h"
 #include "base/foreach.h"
 #include "base/gfx.h"
+#include "base/string.h"
+#include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "library/history.h"
 #include "taiga/resource.h"
-#include "taiga/settings.h"
-#include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/dlg/dlg_history.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
-class HistoryDialog HistoryDialog;
+namespace ui {
 
-// =============================================================================
+HistoryDialog DlgHistory;
 
 BOOL HistoryDialog::OnInitDialog() {
   // Create list
@@ -45,7 +40,7 @@ BOOL HistoryDialog::OnInitDialog() {
   list_.EnableGroupView(true);
   list_.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetTheme();
-  
+
   // Insert list columns
   list_.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 250, LVCFMT_LEFT, L"Anime title");
   list_.InsertColumn(1, 400, 400, LVCFMT_LEFT, L"Details");
@@ -55,7 +50,7 @@ BOOL HistoryDialog::OnInitDialog() {
   // Insert list groups
   list_.InsertGroup(0, L"Queued for update");
   list_.InsertGroup(1, L"Recently watched");
-  
+
   // Refresh list
   RefreshList();
   return TRUE;
@@ -68,7 +63,7 @@ INT_PTR HistoryDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
       return list_.SendMessage(uMsg, wParam, lParam);
     }
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -108,15 +103,13 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (action == L"Delete()") {
           RemoveItems();
         } else if (action == L"ClearHistory()") {
-          History.items.clear();
-          History.Save();
-          RefreshList();
+          History.Clear();
         }
         break;
       }
     }
   }
-  
+
   return 0;
 }
 
@@ -145,18 +138,15 @@ BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
           }
           // Delete selected items
           case VK_DELETE: {
-            if (RemoveItems()) {
+            if (RemoveItems())
               return TRUE;
-            }
           }
           // Move selected items
           case VK_UP:
           case VK_DOWN: {
-            if (::GetKeyState(VK_CONTROL) & 0xFF80) {
-              if (MoveItems(pMsg->wParam == VK_UP ? -1 : 1)) {
+            if (::GetKeyState(VK_CONTROL) & 0xFF80)
+              if (MoveItems(pMsg->wParam == VK_UP ? -1 : 1))
                 return TRUE;
-              }
-            }
             break;
           }
         }
@@ -168,22 +158,23 @@ BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
   return FALSE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void HistoryDialog::RefreshList() {
-  if (!IsWindow()) return;
-  
+  if (!IsWindow())
+    return;
+
   // Clear list
   list_.Hide();
   list_.DeleteAllItems();
-  
+
   // Add queued items
   foreach_cr_(it, History.queue.items) {
     int i = list_.GetItemCount();
     list_.InsertItem(i, 0, -1, 0, nullptr, 
-      AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(), 
-      static_cast<LPARAM>(it->anime_id));
-    wstring details;
+                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(), 
+                     static_cast<LPARAM>(it->anime_id));
+    std::wstring details;
     if (it->mode == taiga::kHttpServiceAddLibraryEntry)
       AppendString(details, L"Add to list");
     if (it->mode == taiga::kHttpServiceDeleteLibraryEntry)
@@ -193,8 +184,8 @@ void HistoryDialog::RefreshList() {
     if (it->score)
       AppendString(details, L"Score: " + anime::TranslateNumber(*it->score));
     if (it->status)
-      AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ? 
-        L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Re-watching");
+      AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ?
+                   L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Re-watching");
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
     if (it->date_start)
@@ -209,9 +200,9 @@ void HistoryDialog::RefreshList() {
   foreach_cr_(it, History.items) {
     int i = list_.GetItemCount();
     list_.InsertItem(i, 1, -1, 0, nullptr,
-      AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
-      static_cast<LPARAM>(it->anime_id));
-    wstring details;
+                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
+                     static_cast<LPARAM>(it->anime_id));
+    std::wstring details;
     AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
@@ -225,10 +216,11 @@ bool HistoryDialog::MoveItems(int pos) {
   return false;
 
   if (History.queue.updating) {
-    MessageBox(L"History cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
+    MessageBox(L"History cannot be modified while an update is in progress.",
+               L"Error", MB_ICONERROR);
     return false;
   }
-  
+
   int index = -1;
   vector<bool> item_selected(list_.GetItemCount());
   vector<bool> item_selected_new(list_.GetItemCount());
@@ -238,24 +230,32 @@ bool HistoryDialog::MoveItems(int pos) {
 
   for (size_t i = 0; i < item_selected.size(); i++) {
     size_t j = (pos < 0 ? i : item_selected.size() - 1 - i);
-    if (!item_selected.at(j)) continue;
-    if (j == (pos < 0 ? 0 : item_selected.size() - 1)) { item_selected_new.at(j) = true; continue; }
-    if (item_selected_new.at(j + pos)) { item_selected_new.at(j) = true; continue; }
-    std::iter_swap(History.queue.items.begin() + j, History.queue.items.begin() + j + pos);
+    if (!item_selected.at(j))
+      continue;
+    if (j == (pos < 0 ? 0 : item_selected.size() - 1)) {
+      item_selected_new.at(j) = true;
+      continue;
+    }
+    if (item_selected_new.at(j + pos)) {
+      item_selected_new.at(j) = true;
+      continue;
+    }
+    std::iter_swap(History.queue.items.begin() + j,
+                   History.queue.items.begin() + j + pos);
     item_selected_new.at(j + pos) = true;
   }
 
   RefreshList();
-  for (size_t i = 0; i < item_selected_new.size(); i++) {
+  for (size_t i = 0; i < item_selected_new.size(); i++)
     if (item_selected_new.at(i)) list_.SetSelectedItem(i);
-  }
 
   return true;
 }
 
 bool HistoryDialog::RemoveItems() {
   if (History.queue.updating) {
-    MessageBox(L"History cannot be modified while an update is in progress.", L"Error", MB_ICONERROR);
+    MessageBox(L"History cannot be modified while an update is in progress.",
+               L"Error", MB_ICONERROR);
     return false;
   }
 
@@ -276,12 +276,10 @@ bool HistoryDialog::RemoveItems() {
   } else {
     History.queue.Clear();
   }
-  
-  RefreshList();
 
-  MainDialog.treeview.RefreshHistoryCounter();
-  AnimeListDialog.RefreshList();
-  AnimeListDialog.RefreshTabs();
+  ui::OnHistoryChange();
 
   return true;
 }
+
+}  // namespace ui

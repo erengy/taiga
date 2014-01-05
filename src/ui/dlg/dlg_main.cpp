@@ -372,7 +372,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               return TRUE;
             case SIDEBAR_ITEM_HISTORY:
               // Refresh history
-              HistoryDialog.RefreshList();
+              DlgHistory.RefreshList();
               treeview.RefreshHistoryCounter();
               return TRUE;
             case SIDEBAR_ITEM_STATS:
@@ -411,7 +411,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           return AnimeListDialog.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_HISTORY:
-          return HistoryDialog.SendMessage(
+          return DlgHistory.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_STATS:
           return StatsDialog.SendMessage(
@@ -811,7 +811,7 @@ void MainDialog::EnableInput(bool enable) {
   toolbar_main.EnableButton(TOOLBAR_BUTTON_SYNCHRONIZE, enable);
   // Content
   AnimeListDialog.Enable(enable);
-  HistoryDialog.Enable(enable);
+  DlgHistory.Enable(enable);
 }
 
 void MainDialog::UpdateControlPositions(const SIZE* size) {
