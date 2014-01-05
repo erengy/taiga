@@ -439,6 +439,9 @@
     <ClCompile Include="base\json.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="base\version.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -791,6 +794,9 @@
     </ClInclude>
     <ClInclude Include="sync\herro_util.h">
       <Filter>sync\herro</Filter>
+    </ClInclude>
+    <ClInclude Include="base\version.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

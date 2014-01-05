@@ -81,10 +81,7 @@ void WindowMap::Remove(Window* window) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-App::App()
-    : version_major_(1),
-      version_minor_(0),
-      version_revision_(0) {
+App::App() {
   instance_ = ::GetModuleHandle(nullptr);
 }
 
@@ -141,24 +138,6 @@ int App::Run() {
     ::PostQuitMessage(-1);
     return -1;
   }
-}
-
-int App::GetVersionMajor() const {
-  return version_major_;
-}
-
-int App::GetVersionMinor() const {
-  return version_minor_;
-}
-
-int App::GetVersionRevision() const {
-  return version_revision_;
-}
-
-void App::SetVersion(int major, int minor, int revision) {
-  version_major_ = major;
-  version_minor_ = minor;
-  version_revision_ = revision;
 }
 
 std::wstring App::GetCurrentDirectory() const {

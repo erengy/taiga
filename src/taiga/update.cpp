@@ -32,8 +32,7 @@
 namespace taiga {
 
 UpdateHelper::UpdateHelper()
-    : app_(nullptr),
-      restart_required_(false),
+    : restart_required_(false),
       update_available_(false) {
 }
 
@@ -41,15 +40,13 @@ void UpdateHelper::Cancel() {
   ConnectionManager.CancelRequest(client_uuid_);
 }
 
-bool UpdateHelper::Check(win::App& app) {
-  app_ = &app;
-
+bool UpdateHelper::Check() {
   HttpRequest http_request;
   http_request.host = L"taiga.erengy.com";
   http_request.path = L"/update.php";
   http_request.query[L"username"] = GetCurrentUsername();
   http_request.query[L"service"] = GetCurrentService()->canonical_name();
-  http_request.query[L"version"] = TAIGA_APP_VERSION;
+  http_request.query[L"version"] = std::wstring(Taiga.version);
   http_request.query[L"check"] = MainDialog.IsWindow() ? L"manual" : L"auto";
 
   client_uuid_ = http_request.uuid;
@@ -81,16 +78,10 @@ bool UpdateHelper::ParseData(wstring data) {
     items_.back().pub_date = XmlReadStrValue(item, L"pubDate");
   }
 
-  auto current_version = GetVersionValue(app_->GetVersionMajor(),
-                                         app_->GetVersionMinor(),
-                                         app_->GetVersionRevision());
-  auto latest_version = current_version;
+  base::SemanticVersion current_version = Taiga.version;
+  base::SemanticVersion latest_version = current_version;
   foreach_(item, items_) {
-    vector<wstring> numbers;
-    Split(item->guid, L".", numbers);
-    auto item_version = GetVersionValue(ToInt(numbers.at(0)),
-                                        ToInt(numbers.at(1)),
-                                        ToInt(numbers.at(2)));
+    base::SemanticVersion item_version(item->guid);
     if (item_version > latest_version) {
       latest_guid_ = item->guid;
       latest_version = item_version;
@@ -133,7 +124,7 @@ bool UpdateHelper::Download() {
   if (!feed_item)
     return false;
 
-  download_path_ = AddTrailingSlash(GetPathOnly(app_->GetModulePath()));
+  download_path_ = AddTrailingSlash(GetPathOnly(Taiga.GetModulePath()));
   download_path_ += GetFileName(feed_item->link);
 
   win::http::Url url(feed_item->link);
@@ -159,7 +150,7 @@ bool UpdateHelper::RunInstaller() {
   // /S runs the installer silently, /D overrides the default installation
   // directory. Do not rely on the current directory here, as it isn't
   // guaranteed to be the same as the module path.
-  wstring parameters = L"/S /D=" + GetPathOnly(app_->GetModulePath());
+  wstring parameters = L"/S /D=" + GetPathOnly(Taiga.GetModulePath());
 
   restart_required_ = Execute(download_path_, parameters);
 
@@ -176,12 +167,6 @@ const GenericFeedItem* UpdateHelper::FindItem(const wstring& guid) const {
       return &(*item);
 
   return nullptr;
-}
-
-unsigned long UpdateHelper::GetVersionValue(int major, int minor, int revision) const {
-  return (major * static_cast<unsigned long>(pow(10.0, 12))) +
-         (minor * static_cast<unsigned long>(pow(10.0, 8))) +
-         revision;
 }
 
 }  // namespace taiga

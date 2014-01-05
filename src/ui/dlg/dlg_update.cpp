@@ -52,7 +52,7 @@ BOOL UpdateDialog::OnInitDialog() {
   progressbar.SetMarquee(true);
 
   // Check updates
-  Taiga.Updater.Check(Taiga);
+  Taiga.Updater.Check();
 
   return TRUE;
 }

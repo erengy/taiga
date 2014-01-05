@@ -19,12 +19,12 @@
 #ifndef TAIGA_TAIGA_TAIGA_H
 #define TAIGA_TAIGA_TAIGA_H
 
+#include "base/version.h"
 #include "taiga/update.h"
 #include "win/win_main.h"
 
 #define TAIGA_APP_NAME    L"Taiga"
 #define TAIGA_APP_TITLE   L"Taiga"
-#define TAIGA_APP_VERSION L"1.1.0-alpha"
 
 #define TAIGA_PORTABLE
 
@@ -57,6 +57,7 @@ public:
   int current_tip_type, play_status;
   bool logged_in;
   int ticker_media, ticker_memory, ticker_new_episodes, ticker_queue;
+  base::SemanticVersion version;
 
   class Updater : public UpdateHelper {
   public:

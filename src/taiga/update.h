@@ -24,10 +24,6 @@
 
 #include "track/feed.h"
 
-namespace win {
-class App;
-}
-
 namespace taiga {
 
 class UpdateHelper {
@@ -36,7 +32,7 @@ public:
   virtual ~UpdateHelper() {}
 
   void Cancel();
-  bool Check(win::App& app);
+  bool Check();
   bool Download();
   bool IsDownloadAllowed() const;
   bool IsRestartRequired() const;
@@ -47,9 +43,7 @@ public:
 
 private:
   const GenericFeedItem* FindItem(const std::wstring& guid) const;
-  unsigned long GetVersionValue(int major, int minor, int revision) const;
 
-  win::App* app_;
   std::vector<GenericFeedItem> items_;
   std::wstring download_path_;
   std::wstring latest_guid_;

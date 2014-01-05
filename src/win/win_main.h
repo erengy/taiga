@@ -62,11 +62,6 @@ public:
   virtual void PostQuitMessage(int exit_code = 0);
   virtual int Run();
 
-  int GetVersionMajor() const;
-  int GetVersionMinor() const;
-  int GetVersionRevision() const;
-  void SetVersion(int major, int minor, int revision);
-
   std::wstring GetCurrentDirectory() const;
   HINSTANCE GetInstanceHandle() const;
   std::wstring GetModulePath() const;
@@ -74,9 +69,6 @@ public:
 
 private:
   HINSTANCE instance_;
-  int version_major_;
-  int version_minor_;
-  int version_revision_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

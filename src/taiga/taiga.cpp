@@ -49,7 +49,12 @@ App::App()
       ticker_memory(0),
       ticker_new_episodes(0),
       ticker_queue(0) {
-  SetVersion(TAIGA_VERSION_MAJOR, TAIGA_VERSION_MINOR, TAIGA_VERSION_PATCH);
+  version.major = TAIGA_VERSION_MAJOR;
+  version.minor = TAIGA_VERSION_MINOR;
+  version.patch = TAIGA_VERSION_PATCH;
+  version.prerelease_identifiers = TAIGA_VERSION_PRE;
+  if (TAIGA_VERSION_BUILD > 0)
+    version.build_metadata = ToWstr(TAIGA_VERSION_BUILD);
 }
 
 App::~App() {

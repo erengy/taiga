@@ -693,7 +693,8 @@ void OnLogout() {
 
 bool OnUpdateAvailable() {
   win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-  dlg.SetFooter(L"Current version: " TAIGA_APP_VERSION);
+  std::wstring footer = L"Current version: " + std::wstring(Taiga.version);
+  dlg.SetFooter(footer.c_str());
   dlg.SetMainInstruction(L"A new version of Taiga is available!");
   dlg.AddButton(L"Download", IDYES);
   dlg.AddButton(L"Cancel", IDNO);
@@ -705,7 +706,8 @@ bool OnUpdateAvailable() {
 void OnUpdateNotAvailable() {
   if (MainDialog.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-    dlg.SetFooter(L"Current version: " TAIGA_APP_VERSION);
+    std::wstring footer = L"Current version: " + std::wstring(Taiga.version);
+    dlg.SetFooter(footer.c_str());
     dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(g_hMain);
