@@ -181,11 +181,11 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   wParam is a BOOL value that represents modal status.
   //   lParam is the handle of the parent window.
   } else if (action == L"TorrentAddFilter") {
-    if (!FeedFilterDialog.IsWindow()) {
-      FeedFilterDialog.Create(IDD_FEED_FILTER, 
-        reinterpret_cast<HWND>(lParam), wParam != FALSE);
+    if (!ui::DlgFeedFilter.IsWindow()) {
+      ui::DlgFeedFilter.Create(IDD_FEED_FILTER,
+          reinterpret_cast<HWND>(lParam), wParam != FALSE);
     } else {
-      ActivateWindow(FeedFilterDialog.GetWindowHandle());
+      ActivateWindow(ui::DlgFeedFilter.GetWindowHandle());
     }
 
   // ViewContent(page)

@@ -545,12 +545,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         // Add global filter
         case 100: {
-          FeedFilterDialog.filter.Reset();
+          DlgFeedFilter.filter.Reset();
           ExecuteAction(L"TorrentAddFilter", TRUE, reinterpret_cast<LPARAM>(parent->GetWindowHandle()));
-          if (!FeedFilterDialog.filter.conditions.empty()) {
-            if (FeedFilterDialog.filter.name.empty())
-              FeedFilterDialog.filter.name = Aggregator.filter_manager.CreateNameFromConditions(FeedFilterDialog.filter);
-            parent->feed_filters_.push_back(FeedFilterDialog.filter);
+          if (!DlgFeedFilter.filter.conditions.empty()) {
+            if (DlgFeedFilter.filter.name.empty())
+              DlgFeedFilter.filter.name = Aggregator.filter_manager.CreateNameFromConditions(DlgFeedFilter.filter);
+            parent->feed_filters_.push_back(DlgFeedFilter.filter);
             win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
             list.SetSelectedItem(list.GetItemCount() - 1);
@@ -765,10 +765,10 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         win::ListView list = lpnmitem->hdr.hwndFrom;
         FeedFilter* feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(lpnmitem->iItem));
         if (feed_filter) {
-          FeedFilterDialog.filter = *feed_filter;
-          FeedFilterDialog.Create(IDD_FEED_FILTER, parent->GetWindowHandle());
-          if (!FeedFilterDialog.filter.conditions.empty()) {
-            *feed_filter = FeedFilterDialog.filter;
+          DlgFeedFilter.filter = *feed_filter;
+          DlgFeedFilter.Create(IDD_FEED_FILTER, parent->GetWindowHandle());
+          if (!DlgFeedFilter.filter.conditions.empty()) {
+            *feed_filter = DlgFeedFilter.filter;
             parent->RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
             list.SetSelectedItem(lpnmitem->iItem);
           }

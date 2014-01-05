@@ -16,26 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_feed_condition.h"
-#include "dlg_feed_filter.h"
-
+#include "base/common.h"
+#include "base/foreach.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
-#include "base/common.h"
 #include "taiga/resource.h"
-#include "base/string.h"
 #include "taiga/taiga.h"
+#include "ui/dlg/dlg_feed_condition.h"
+#include "ui/dlg/dlg_feed_filter.h"
 #include "ui/list.h"
 #include "ui/theme.h"
-
 #include "win/win_gdi.h"
 #include "win/win_taskdialog.h"
 
-class FeedFilterDialog FeedFilterDialog;
+namespace ui {
 
-// =============================================================================
+FeedFilterDialog DlgFeedFilter;
 
 FeedFilterDialog::FeedFilterDialog()
     : current_page_(0), 
@@ -69,18 +66,18 @@ INT_PTR FeedFilterDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
       switch (current_page_) {
         case 0:
           return page_0_.SendDlgItemMessage(
-            IDC_LIST_FEED_FILTER_PRESETS, uMsg, wParam, lParam);
+              IDC_LIST_FEED_FILTER_PRESETS, uMsg, wParam, lParam);
         case 1:
           return page_1_.SendDlgItemMessage(
-            IDC_LIST_FEED_FILTER_CONDITIONS, uMsg, wParam, lParam);
+              IDC_LIST_FEED_FILTER_CONDITIONS, uMsg, wParam, lParam);
         case 2:
           return page_2_.SendDlgItemMessage(
-            IDC_LIST_FEED_FILTER_ANIME, uMsg, wParam, lParam);
+              IDC_LIST_FEED_FILTER_ANIME, uMsg, wParam, lParam);
       }
       break;
     }
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -91,16 +88,15 @@ void FeedFilterDialog::OnCancel() {
 
 BOOL FeedFilterDialog::OnInitDialog() {
   // Set icon_
-  if (!icon_) {
+  if (!icon_)
     icon_ = ui::Theme.GetImageList16().GetIcon(ui::kIcon16_Funnel);
-  }
   //SetIconSmall(icon_);
 
   // Set main instruction font
   main_instructions_label_.Attach(GetDlgItem(IDC_STATIC_HEADER));
-  main_instructions_label_.SendMessage(WM_SETFONT, 
-    reinterpret_cast<WPARAM>(ui::Theme.GetHeaderFont()), FALSE);
-  
+  main_instructions_label_.SendMessage(WM_SETFONT,
+      reinterpret_cast<WPARAM>(ui::Theme.GetHeaderFont()), FALSE);
+
   // Calculate page area
   win::Rect page_area; main_instructions_label_.GetWindowRect(&page_area);
   MapWindowPoints(nullptr, GetWindowHandle(), reinterpret_cast<LPPOINT>(&page_area), 2);
@@ -137,7 +133,7 @@ void FeedFilterDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   ::GetClientRect(GetDlgItem(IDCANCEL), &rect_button);
   rect.top = rect.bottom - (rect_button.Height() * 2);
   dc.FillRect(rect, ::GetSysColor(COLOR_BTNFACE));
-  
+
   // Paint line
   rect.bottom = rect.top + 1;
   dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
@@ -168,15 +164,14 @@ void FeedFilterDialog::ChoosePage(int index) {
 
     // Page #1
     case 1:
-      if (current_page_ == 0) {
+      if (current_page_ == 0)
         page_0_.BuildFilter(filter);
-      }
       page_1_.name_text.SetText(filter.name);
       page_1_.RefreshConditionList();
       page_1_.match_combo.SetCurSel(filter.match);
       page_1_.action_combo.SetCurSel(filter.action);
       main_instructions_label_.SetText(
-        L"Change filter options and add conditions");
+          L"Change filter options and add conditions");
       break;
 
     // Page #2
@@ -185,10 +180,10 @@ void FeedFilterDialog::ChoosePage(int index) {
         if (page_1_.condition_list.GetItemCount() == 0) {
           win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_ERROR);
           dlg.SetMainInstruction(
-            L"There must be at least one condition in order to create a filter.");
+              L"There must be at least one condition in order to create a filter.");
           dlg.SetContent(
-            L"You may add a condition using the Add New Condition button, "
-            L"or by choosing a preset from the previous page.");
+              L"You may add a condition using the Add New Condition button, "
+              L"or by choosing a preset from the previous page.");
           dlg.AddButton(L"OK", IDOK);
           dlg.Show(GetWindowHandle());
           return;
@@ -196,14 +191,14 @@ void FeedFilterDialog::ChoosePage(int index) {
         page_1_.BuildFilter(filter);
       }
       main_instructions_label_.SetText(
-        L"Limit this filter to one or more anime title, or leave it blank to apply to all items");
+          L"Limit this filter to one or more anime title, "
+          L"or leave it blank to apply to all items");
       break;
 
     // Finished
     case 3:
-      if (current_page_ == 2) {
+      if (current_page_ == 2)
         page_2_.BuildFilter(filter);
-      }
       EndDialog(IDOK);
       return;
   }
@@ -218,7 +213,7 @@ void FeedFilterDialog::ChoosePage(int index) {
   current_page_ = index;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Page */
 
@@ -234,11 +229,11 @@ INT_PTR FeedFilterDialog::DialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wP
     case WM_CTLCOLORSTATIC:
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Page 0 */
 
@@ -248,15 +243,15 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   preset_list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
   preset_list.SetImageList(ui::Theme.GetImageList16().GetHandle(), LVSIL_NORMAL);
   preset_list.SetTheme();
-  
+
   // Insert list groups
   //preset_list.EnableGroupView(true);
   preset_list.InsertGroup(0, L"Presets", true, false);
-  
+
   // Insert list columns
   preset_list.InsertColumn(0, 200, 200, 0, L"Title");
   preset_list.InsertColumn(1, 350, 350, 0, L"Details");
-  
+
   // Enable tile view
   SIZE size = {660, 40};
   RECT rect = {5, 0, 5, 0};
@@ -264,19 +259,20 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   preset_list.SetView(LV_VIEW_TILE);
 
   // Insert presets
-  for (auto it = Aggregator.filter_manager.presets.begin(); 
-       it != Aggregator.filter_manager.presets.end(); ++it) {
-    if (it->is_default) continue;
+  foreach_(it, Aggregator.filter_manager.presets) {
+    if (it->is_default)
+      continue;
     int icon_ = ui::kIcon16_Funnel;
     switch (it->filter.action) {
       case FEED_FILTER_ACTION_DISCARD: icon_ = ui::kIcon16_FunnelCross; break;
       case FEED_FILTER_ACTION_SELECT:  icon_ = ui::kIcon16_FunnelTick;  break;
       case FEED_FILTER_ACTION_PREFER:  icon_ = ui::kIcon16_FunnelPlus;  break;
     }
-    if (it->filter.conditions.empty()) icon_ = ui::kIcon16_FunnelPencil;
-    preset_list.InsertItem(it - Aggregator.filter_manager.presets.begin(), 
-      0, icon_, I_COLUMNSCALLBACK, nullptr, LPSTR_TEXTCALLBACK, 
-      reinterpret_cast<LPARAM>(&(*it)));
+    if (it->filter.conditions.empty())
+      icon_ = ui::kIcon16_FunnelPencil;
+    preset_list.InsertItem(it - Aggregator.filter_manager.presets.begin(),
+                           0, icon_, I_COLUMNSCALLBACK, nullptr, LPSTR_TEXTCALLBACK,
+                           reinterpret_cast<LPARAM>(&(*it)));
   }
   preset_list.SetSelectedItem(0);
 
@@ -311,9 +307,8 @@ LRESULT FeedFilterDialog::DialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
         // Double click
         case NM_DBLCLK: {
-          if (preset_list.GetSelectedCount() > 0) {
+          if (preset_list.GetSelectedCount() > 0)
             parent->ChoosePage(1);
-          }
           return TRUE;
         }
       }
@@ -325,11 +320,11 @@ LRESULT FeedFilterDialog::DialogPage0::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
 bool FeedFilterDialog::DialogPage0::BuildFilter(FeedFilter& filter) {
   int selected_item = preset_list.GetNextItem(-1, LVIS_SELECTED);
-  
+
   if (selected_item > -1) {
     // Build filter from preset
-    FeedFilterPreset* preset = 
-      reinterpret_cast<FeedFilterPreset*>(preset_list.GetItemParam(selected_item));
+    auto preset = reinterpret_cast<FeedFilterPreset*>(
+        preset_list.GetItemParam(selected_item));
     if (!preset || preset->filter.conditions.empty()) {
       parent->filter.Reset();
       return false;
@@ -342,17 +337,16 @@ bool FeedFilterDialog::DialogPage0::BuildFilter(FeedFilter& filter) {
   return true;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Page #1 */
 
 BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   // Set new font for headers
-  for (int i = 0; i < 3; i++) {
-    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
-      reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), FALSE);
-  }
-  
+  for (int i = 0; i < 3; i++)
+    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT,
+                       reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), FALSE);
+
   // Initialize name
   name_text.Attach(GetDlgItem(IDC_EDIT_FEED_NAME));
   name_text.SetCueBannerText(L"Type something to identify this filter");
@@ -378,7 +372,7 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   condition_toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   condition_toolbar.InsertButton(3, ui::kIcon16_ArrowUp,   103, false, 0, 3, nullptr, L"Move up");
   condition_toolbar.InsertButton(4, ui::kIcon16_ArrowDown, 104, false, 0, 4, nullptr, L"Move down");
-  
+
   // Initialize options
   match_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_MATCH));
   match_combo.AddString(Aggregator.filter_manager.TranslateMatching(FEED_FILTER_MATCH_ALL).c_str());
@@ -425,8 +419,8 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
     case 103: {
       int index = condition_list.GetNextItem(-1, LVNI_SELECTED);
       if (index > 0) {
-        iter_swap(parent->filter.conditions.begin() + index, 
-          parent->filter.conditions.begin() + index - 1);
+        iter_swap(parent->filter.conditions.begin() + index,
+                  parent->filter.conditions.begin() + index - 1);
         RefreshConditionList();
         condition_list.SetSelectedItem(index - 1);
       }
@@ -436,8 +430,8 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
     case 104:
       int index = condition_list.GetNextItem(-1, LVNI_SELECTED);
       if (index > -1 && index < condition_list.GetItemCount() - 1) {
-        iter_swap(parent->filter.conditions.begin() + index, 
-          parent->filter.conditions.begin() + index + 1);
+        iter_swap(parent->filter.conditions.begin() + index,
+                  parent->filter.conditions.begin() + index + 1);
         RefreshConditionList();
         condition_list.SetSelectedItem(index + 1);
       }
@@ -483,9 +477,10 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Double click
         case NM_DBLCLK: {
           int selected_item = condition_list.GetNextItem(-1, LVIS_SELECTED);
-          if (selected_item == -1) break;
-          FeedFilterCondition* condition = reinterpret_cast<FeedFilterCondition*>(
-            condition_list.GetItemParam(selected_item));
+          if (selected_item == -1)
+            break;
+          auto condition = reinterpret_cast<FeedFilterCondition*>(
+              condition_list.GetItemParam(selected_item));
           if (condition) {
             DlgFeedCondition.condition = *condition;
             DlgFeedCondition.Create(IDD_FEED_CONDITION, GetWindowHandle());
@@ -505,7 +500,7 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
       switch (pnmh->code) {
         // Show tooltip text
         case TBN_GETINFOTIP:
-          NMTBGETINFOTIP* git = reinterpret_cast<NMTBGETINFOTIP*>(pnmh);
+          auto git = reinterpret_cast<NMTBGETINFOTIP*>(pnmh);
           git->cchTextMax = INFOTIPSIZE;
           git->pszText = (LPWSTR)(condition_toolbar.GetButtonTooltip(git->lParam));
           break;
@@ -520,27 +515,29 @@ bool FeedFilterDialog::DialogPage1::BuildFilter(FeedFilter& filter) {
   name_text.GetText(filter.name);
   filter.match = match_combo.GetCurSel();
   filter.action = action_combo.GetCurSel();
-  
+
   return true;
 }
 
 void FeedFilterDialog::DialogPage1::AddConditionToList(const FeedFilterCondition& condition, int index) {
-  if (index == -1) index = condition_list.GetItemCount();
+  if (index == -1)
+    index = condition_list.GetItemCount();
+
   condition_list.InsertItem(index, -1, ui::kIcon16_Funnel, 0, nullptr, 
-    Aggregator.filter_manager.TranslateElement(condition.element).c_str(), 
-    reinterpret_cast<LPARAM>(&condition));
+                            Aggregator.filter_manager.TranslateElement(condition.element).c_str(), 
+                            reinterpret_cast<LPARAM>(&condition));
   condition_list.SetItem(index, 1, Aggregator.filter_manager.TranslateOperator(condition.op).c_str());
   condition_list.SetItem(index, 2, Aggregator.filter_manager.TranslateValue(condition).c_str());
 }
 
 void FeedFilterDialog::DialogPage1::RefreshConditionList() {
   condition_list.DeleteAllItems();
-  for (auto it = parent->filter.conditions.begin(); it != parent->filter.conditions.end(); ++it) {
+
+  foreach_(it, parent->filter.conditions)
     AddConditionToList(*it);
-  }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Page 2 */
 
@@ -551,25 +548,25 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   anime_list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
   anime_list.SetImageList(ui::Theme.GetImageList16().GetHandle());
   anime_list.SetTheme();
-  
+
   // Insert list columns
   anime_list.InsertColumn(0, 0, 0, 0, L"Title");
-  
+
   // Insert list groups
-  for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++) {
-    if (i != anime::kUnknownMyStatus) {
-      anime_list.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(), true, i != anime::kWatching);
-    }
-  }
-  
+  for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++)
+    if (i != anime::kUnknownMyStatus)
+      anime_list.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(),
+                             true, i != anime::kWatching);
+
   // Add anime to list
   int list_index = 0;
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (!it->second.IsInList()) continue;
-    anime_list.InsertItem(list_index, it->second.GetMyStatus(), 
-      StatusToIcon(it->second.GetAiringStatus()), 0, nullptr, 
-      LPSTR_TEXTCALLBACK, static_cast<int>(it->second.GetId()));
-    for (auto id = parent->filter.anime_ids.begin(); id != parent->filter.anime_ids.end(); ++id) {
+  foreach_(it, AnimeDatabase.items) {
+    if (!it->second.IsInList())
+      continue;
+    anime_list.InsertItem(list_index, it->second.GetMyStatus(),
+                          StatusToIcon(it->second.GetAiringStatus()), 0, nullptr,
+                          LPSTR_TEXTCALLBACK, static_cast<int>(it->second.GetId()));
+    foreach_(id, parent->filter.anime_ids) {
       if (*id == it->second.GetId()) {
         anime_list.SetCheckState(list_index, TRUE);
         break;
@@ -577,7 +574,7 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
     }
     ++list_index;
   }
-  
+
   // Sort items
   anime_list.Sort(0, 1, 0, ui::ListViewCompareProc);
 
@@ -596,7 +593,8 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case LVN_GETDISPINFO: {
           NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
           auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
-          if (!anime_item) break;
+          if (!anime_item)
+            break;
           switch (plvdi->item.iSubItem) {
             case 0: // Anime title
               plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());
@@ -608,14 +606,14 @@ LRESULT FeedFilterDialog::DialogPage2::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case LVN_ITEMCHANGED: {
           LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
           if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
-            wstring text;
+            std::wstring text;
             for (int i = 0; i < anime_list.GetItemCount(); i++) {
               auto anime_item = AnimeDatabase.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
-              if (anime_item && anime_list.GetCheckState(i)) {
+              if (anime_item && anime_list.GetCheckState(i))
                 AppendString(text, anime_item->GetTitle());
-              }
             }
-            if (text.empty()) text = L"(nothing)";
+            if (text.empty())
+              text = L"(nothing)";
             text = L"Currently limited to: " + text;
             SetDlgItemText(IDC_STATIC_FEED_FILTER_LIMIT, text.c_str());
           }
@@ -634,9 +632,12 @@ bool FeedFilterDialog::DialogPage2::BuildFilter(FeedFilter& filter) {
   for (int i = 0; i < anime_list.GetItemCount(); i++) {
     if (anime_list.GetCheckState(i)) {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(anime_list.GetItemParam(i)));
-      if (anime_item) filter.anime_ids.push_back(anime_item->GetId());
+      if (anime_item)
+        filter.anime_ids.push_back(anime_item->GetId());
     }
   }
-  
+
   return true;
 }
+
+}  // namespace ui

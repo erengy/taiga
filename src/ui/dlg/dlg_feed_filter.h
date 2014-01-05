@@ -16,20 +16,19 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_FEED_FILTER_H
-#define DLG_FEED_FILTER_H
+#ifndef TAIGA_UI_DLG_FEED_FILTER_H
+#define TAIGA_UI_DLG_FEED_FILTER_H
 
-#include "base/std.h"
 #include "track/feed.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class FeedFilterDialog : public win::Dialog {
 public:
   FeedFilterDialog();
-  virtual ~FeedFilterDialog();
+  ~FeedFilterDialog();
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
@@ -37,10 +36,8 @@ public:
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
-public:
   void ChoosePage(int index);
   
-public:
   FeedFilter filter;
 
 private:
@@ -56,7 +53,7 @@ private:
   public:
     FeedFilterDialog* parent;
   };
-  
+
   // Page #0
   class DialogPage0 : public DialogPage {
   public:
@@ -94,6 +91,8 @@ private:
   } page_2_;
 };
 
-extern class FeedFilterDialog FeedFilterDialog;
+extern FeedFilterDialog DlgFeedFilter;
 
-#endif // DLG_FEED_FILTER_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_FEED_FILTER_H
