@@ -16,23 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_input.h"
-
 #include "taiga/resource.h"
+#include "ui/dlg/dlg_input.h"
 
-// =============================================================================
+namespace ui {
 
-InputDialog::InputDialog() :
-  current_value_(0), min_value_(0), max_value_(0), 
-  numbers_only_(false), result(0)
-{
+InputDialog::InputDialog()
+    : current_value_(0), min_value_(0), max_value_(0),
+      numbers_only_(false), result(0) {
   info = L"Set new value:";
   title = L"Input";
 };
 
-void InputDialog::SetNumbers(bool enabled, int min_value, int max_value, int current_value) {
+void InputDialog::SetNumbers(bool enabled, int min_value, int max_value,
+                             int current_value) {
   numbers_only_ = enabled;
   min_value_ = min_value;
   max_value_ = max_value;
@@ -43,7 +40,7 @@ void InputDialog::Show(HWND parent) {
   result = Create(IDD_INPUT, parent, true);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL InputDialog::OnInitDialog() {
   // Set dialog title
@@ -80,3 +77,5 @@ void InputDialog::OnOK() {
   edit_.GetText(text);
   EndDialog(IDOK);
 }
+
+}  // namespace ui

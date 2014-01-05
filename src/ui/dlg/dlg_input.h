@@ -16,31 +16,30 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_INPUT_H
-#define DLG_INPUT_H
+#ifndef TAIGA_UI_DLG_INPUT_H
+#define TAIGA_UI_DLG_INPUT_H
 
-#include "base/std.h"
+#include <string>
+
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class InputDialog : public win::Dialog {
 public:
   InputDialog();
-  virtual ~InputDialog() {}
+  ~InputDialog() {}
 
   void OnCancel();
   BOOL OnInitDialog();
   void OnOK();
 
-public:
   void SetNumbers(bool enabled, int min_value, int max_value, int current_value);
   void Show(HWND parent = nullptr);
 
-public:
   INT_PTR result;
-  wstring info, title, text;
+  std::wstring info, title, text;
 
 private:
   int current_value_, min_value_, max_value_;
@@ -49,4 +48,6 @@ private:
   win::Spin spin_;
 };
 
-#endif // DLG_INPUT_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_INPUT_H
