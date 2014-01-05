@@ -33,6 +33,7 @@ enum Dialog {
   kDialogUpdate
 };
 
+void DestroyDialog(Dialog dialog);
 void EnableDialogInput(Dialog dialog, bool enable);
 void ShowDialog(Dialog dialog);
 

@@ -29,6 +29,65 @@
 
 namespace ui {
 
+class DialogProperties {
+public:
+  DialogProperties(unsigned int resource_id, win::Dialog* dialog,
+                   HWND parent, bool modal);
+
+  unsigned int resource_id;
+  win::Dialog* dialog;
+  HWND parent;
+  bool modal;
+};
+
+DialogProperties::DialogProperties(unsigned int resource_id,
+                                   win::Dialog* dialog,
+                                   HWND parent,
+                                   bool modal)
+    : resource_id(resource_id),
+      dialog(dialog),
+      parent(parent),
+      modal(modal) {
+}
+
+std::map<Dialog, DialogProperties> dialog_properties;
+
+void InitializeDialogProperties() {
+  if (!dialog_properties.empty())
+    return;
+
+  dialog_properties.insert(std::make_pair(
+      kDialogAbout,
+      DialogProperties(IDD_ABOUT, &AboutDialog, g_hMain, true)));
+  dialog_properties.insert(std::make_pair(
+      kDialogAnimeInformation,
+      DialogProperties(IDD_ANIME_INFO, &AnimeDialog, g_hMain, false)));
+  dialog_properties.insert(std::make_pair(
+      kDialogMain,
+      DialogProperties(IDD_MAIN, &MainDialog, nullptr, false)));
+  dialog_properties.insert(std::make_pair(
+      kDialogSettings,
+      DialogProperties(IDD_SETTINGS, &SettingsDialog, g_hMain, true)));
+  dialog_properties.insert(std::make_pair(
+      kDialogTestRecognition,
+      DialogProperties(IDD_TEST_RECOGNITION, &RecognitionTest, nullptr, false)));
+  dialog_properties.insert(std::make_pair(
+      kDialogUpdate,
+      DialogProperties(IDD_UPDATE, &UpdateDialog, g_hMain, true)));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void DestroyDialog(Dialog dialog) {
+  InitializeDialogProperties();
+
+  auto it = dialog_properties.find(dialog);
+
+  if (it != dialog_properties.end())
+    if (it->second.dialog)
+      it->second.dialog->Destroy();
+}
+
 void EnableDialogInput(Dialog dialog, bool enable) {
   switch (dialog) {
     case kDialogMain:
@@ -41,53 +100,18 @@ void EnableDialogInput(Dialog dialog, bool enable) {
 }
 
 void ShowDialog(Dialog dialog) {
-  win::Dialog* dlg = nullptr;
-  unsigned int resource_id = 0;
-  HWND parent = g_hMain;
-  bool modal = true;
+  InitializeDialogProperties();
 
-  switch (dialog) {
-    case kDialogAbout:
-      dlg = &AboutDialog;
-      resource_id = IDD_ABOUT;
-      break;
+  auto it = dialog_properties.find(dialog);
 
-    case kDialogAnimeInformation:
-      dlg = &AnimeDialog;
-      resource_id = IDD_ANIME_INFO;
-      modal = false;
-      break;
-
-    case kDialogMain:
-      dlg = &MainDialog;
-      resource_id = IDD_MAIN;
-      parent = nullptr;
-      modal = false;
-      break;
-
-    case kDialogSettings:
-      dlg = &SettingsDialog;
-      resource_id = IDD_SETTINGS;
-      break;
-
-    case kDialogTestRecognition:
-      dlg = &RecognitionTest;
-      resource_id = IDD_TEST_RECOGNITION;
-      parent = nullptr;
-      modal = false;
-      break;
-
-    case kDialogUpdate:
-      dlg = &UpdateDialog;
-      resource_id = IDD_UPDATE;
-      break;
-  }
-
-  if (dlg && resource_id) {
-    if (!dlg->IsWindow()) {
-      dlg->Create(resource_id, parent, modal);
-    } else {
-      ActivateWindow(dlg->GetWindowHandle());
+  if (it != dialog_properties.end()) {
+    if (it->second.dialog) {
+      if (!it->second.dialog->IsWindow()) {
+        it->second.dialog->Create(it->second.resource_id,
+                                  it->second.parent, it->second.modal);
+      } else {
+        ActivateWindow(it->second.dialog->GetWindowHandle());
+      }
     }
   }
 }
