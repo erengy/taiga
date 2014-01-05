@@ -16,30 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_format.h"
-
-#include "library/anime_db.h"
-#include "library/anime_episode.h"
-#include "base/common.h"
-#include "track/recognition.h"
+#include "base/string.h"
 #include "taiga/dummy.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
-#include "base/string.h"
+#include "ui/dlg/dlg_format.h"
 #include "ui/menu.h"
-#include "ui/theme.h"
 
-class FormatDialog FormatDialog;
-vector<wstring> functions, keywords;
+namespace ui {
 
-// =============================================================================
+FormatDialog DlgFormat;
 
-FormatDialog::FormatDialog() :
-  mode(FORMAT_MODE_HTTP)
-{
+FormatDialog::FormatDialog()
+    : mode(kFormatModeHttp) {
   RegisterDlgClass(L"TaigaFormatW");
 }
 
@@ -50,27 +40,27 @@ BOOL FormatDialog::OnInitDialog() {
 
   // Set text
   switch (mode) {
-    case FORMAT_MODE_HTTP:
+    case kFormatModeHttp:
       SetText(L"Edit format - HTTP request");
       rich_edit_.SetText(Settings[taiga::kShare_Http_Format].c_str());
       break;    
-    case FORMAT_MODE_MESSENGER:
+    case kFormatModeMessenger:
       SetText(L"Edit format - Messenger");
       rich_edit_.SetText(Settings[taiga::kShare_Messenger_Format].c_str());
       break;
-    case FORMAT_MODE_MIRC:
+    case kFormatModeMirc:
       SetText(L"Edit format - mIRC");
       rich_edit_.SetText(Settings[taiga::kShare_Mirc_Format].c_str());
       break;
-    case FORMAT_MODE_SKYPE:
+    case kFormatModeSkype:
       SetText(L"Edit format - Skype");
       rich_edit_.SetText(Settings[taiga::kShare_Skype_Format].c_str());
       break;
-    case FORMAT_MODE_TWITTER:
+    case kFormatModeTwitter:
       SetText(L"Edit format - Twitter");
       rich_edit_.SetText(Settings[taiga::kShare_Twitter_Format].c_str());
       break;
-    case FORMAT_MODE_BALLOON:
+    case kFormatModeBalloon:
       SetText(L"Edit format - Balloon tooltips");
       rich_edit_.SetText(Settings[taiga::kSync_Notify_Format].c_str());
       break;
@@ -81,26 +71,26 @@ BOOL FormatDialog::OnInitDialog() {
 
 void FormatDialog::OnOK() {
   switch (mode) {
-    case FORMAT_MODE_HTTP:
+    case kFormatModeHttp:
       Settings.Set(taiga::kShare_Http_Format, rich_edit_.GetText());
       break;
-    case FORMAT_MODE_MESSENGER:
+    case kFormatModeMessenger:
       Settings.Set(taiga::kShare_Messenger_Format, rich_edit_.GetText());
       break;
-    case FORMAT_MODE_MIRC:
+    case kFormatModeMirc:
       Settings.Set(taiga::kShare_Mirc_Format, rich_edit_.GetText());
       break;
-    case FORMAT_MODE_SKYPE:
+    case kFormatModeSkype:
       Settings.Set(taiga::kShare_Skype_Format, rich_edit_.GetText());
       break;
-    case FORMAT_MODE_TWITTER:
+    case kFormatModeTwitter:
       Settings.Set(taiga::kShare_Twitter_Format, rich_edit_.GetText());
       break;
-    case FORMAT_MODE_BALLOON:
+    case kFormatModeBalloon:
       Settings.Set(taiga::kSync_Notify_Format, rich_edit_.GetText());
       break;
   }
-  
+
   EndDialog(IDOK);
 }
 
@@ -108,8 +98,9 @@ BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Add button    
     case IDHELP: {
-      wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"ScriptAdd");
-      wstring str; rich_edit_.GetText(str);
+      std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"ScriptAdd");
+      std::wstring str;
+      rich_edit_.GetText(str);
       CHARRANGE cr = {0};
       rich_edit_.GetSel(&cr);
       str.insert(cr.cpMin, answer);
@@ -118,18 +109,20 @@ BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     }
   }
-  
-  if (LOWORD(wParam) == IDC_RICHEDIT_FORMAT && HIWORD(wParam) == EN_CHANGE) {
+
+  if (LOWORD(wParam) == IDC_RICHEDIT_FORMAT &&
+      HIWORD(wParam) == EN_CHANGE) {
     // Set preview text
     RefreshPreviewText();
     // Highlight
     ColorizeText();
     return TRUE;
   }
+
   return FALSE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void FormatDialog::ColorizeText() {
   // Save old selection
@@ -146,7 +139,8 @@ void FormatDialog::ColorizeText() {
   lstrcpy(cf.szFaceName, L"Courier New");
 
   // Get current text
-  wstring text; rich_edit_.GetText(text);
+  std::wstring text;
+  rich_edit_.GetText(text);
 
   // Reset all colors
   cf.crTextColor = ::GetSysColor(COLOR_WINDOWTEXT);
@@ -193,15 +187,15 @@ void FormatDialog::ColorizeText() {
 
 void FormatDialog::RefreshPreviewText() {
   // Replace variables
-  wstring str;
+  std::wstring str;
   GetDlgItemText(IDC_RICHEDIT_FORMAT, str);
   anime::Episode* episode = &taiga::DummyEpisode;
   if (CurrentEpisode.anime_id > 0)
     episode = &CurrentEpisode;
   str = ReplaceVariables(str, *episode, false, false, true);
-  
+
   switch (mode) {
-    case FORMAT_MODE_MIRC: {
+    case kFormatModeMirc: {
       // Strip IRC characters
       for (size_t i = 0; i < str.length(); i++) {
         if (str[i] == 0x02 || // Bold
@@ -209,25 +203,31 @@ void FormatDialog::RefreshPreviewText() {
             str[i] == 0x1D || // Italic
             str[i] == 0x1F || // Underline
             str[i] == 0x0F) { // Disable all
-              str.erase(i, 1);
-              i--; continue;
+          str.erase(i, 1);
+          i--; continue;
         }
         // Color code
         if (str[i] == 0x03) {
           str.erase(i, 1);
-          if (IsNumeric(str[i])) str.erase(i, 1);
-          if (IsNumeric(str[i])) str.erase(i, 1);
-          i--; continue;
+          if (IsNumeric(str[i]))
+            str.erase(i, 1);
+          if (IsNumeric(str[i]))
+            str.erase(i, 1);
+          i--;
+          continue;
         }
       }
       break;
     }
-    case FORMAT_MODE_SKYPE: {
+    case kFormatModeSkype: {
       // Strip HTML codes
       StripHtmlTags(str);
+      break;
     }
   }
-  
+
   // Set final text
   SetDlgItemText(IDC_EDIT_PREVIEW, str.c_str());
 }
+
+}  // namespace ui

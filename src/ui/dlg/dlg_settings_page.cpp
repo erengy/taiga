@@ -393,28 +393,28 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
       switch (LOWORD(wParam)) {
         // Edit format
         case IDC_BUTTON_FORMAT_HTTP:
-          FormatDialog.mode = FORMAT_MODE_HTTP;
-          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
+          DlgFormat.mode = kFormatModeHttp;
+          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_MSN:
-          FormatDialog.mode = FORMAT_MODE_MESSENGER;
-          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
+          DlgFormat.mode = kFormatModeMessenger;
+          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_MIRC:
-          FormatDialog.mode = FORMAT_MODE_MIRC;
-          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
+          DlgFormat.mode = kFormatModeMirc;
+          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_SKYPE:
-          FormatDialog.mode = FORMAT_MODE_SKYPE;
-          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
+          DlgFormat.mode = kFormatModeSkype;
+          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_TWITTER:
-          FormatDialog.mode = FORMAT_MODE_TWITTER;
-          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
+          DlgFormat.mode = kFormatModeTwitter;
+          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_BALLOON:
-          FormatDialog.mode = FORMAT_MODE_BALLOON;
-          FormatDialog.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
+          DlgFormat.mode = kFormatModeBalloon;
+          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
 
         // ================================================================================

@@ -16,45 +16,43 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_FORMAT_H
-#define DLG_FORMAT_H
+#ifndef TAIGA_UI_DLG_FORMAT_H
+#define TAIGA_UI_DLG_FORMAT_H
 
-#include "base/std.h"
-#include "library/anime_item.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-enum {
-  FORMAT_MODE_HTTP,
-  FORMAT_MODE_MESSENGER,
-  FORMAT_MODE_MIRC,
-  FORMAT_MODE_SKYPE,
-  FORMAT_MODE_TWITTER,
-  FORMAT_MODE_BALLOON
-};
+namespace ui {
 
-// =============================================================================
+enum FormatModes {
+  kFormatModeHttp,
+  kFormatModeMessenger,
+  kFormatModeMirc,
+  kFormatModeSkype,
+  kFormatModeTwitter,
+  kFormatModeBalloon
+};
 
 class FormatDialog : public win::Dialog {
 public:
   FormatDialog();
   ~FormatDialog() {}
-  
+
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   void OnOK();
 
-public:
   void ColorizeText();
   void RefreshPreviewText();
 
-public:
   int mode;
 
 private:
   win::RichEdit rich_edit_;
 };
 
-extern class FormatDialog FormatDialog;
+extern FormatDialog DlgFormat;
 
-#endif // DLG_FORMAT_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_FORMAT_H
