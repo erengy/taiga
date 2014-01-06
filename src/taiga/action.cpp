@@ -140,9 +140,9 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is the initial page.
   } else if (action == L"Settings") {
     if (wParam > 0)
-      SettingsDialog.SetCurrentSection(wParam);
+      ui::DlgSettings.SetCurrentSection(wParam);
     if (lParam > 0)
-      SettingsDialog.SetCurrentPage(lParam);
+      ui::DlgSettings.SetCurrentPage(lParam);
     ui::ShowDialog(ui::kDialogSettings);
   
   // SearchAnime()
@@ -157,16 +157,16 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         return;
       }
     }
-    ui::DlgMain.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
+    ui::DlgMain.navigation.SetCurrentPage(ui::kSidebarItemSearch);
     ui::DlgMain.edit.SetText(body);
-    SearchDialog.Search(body);
+    ui::DlgSearch.Search(body);
 
   // SearchTorrents(source)
   //   Searches torrents from specified source URL.
   //   lParam is an anime ID.
   } else if (action == L"SearchTorrents") {
     int anime_id = static_cast<int>(lParam);
-    TorrentDialog.Search(body, anime_id);
+    ui::DlgTorrent.Search(body, anime_id);
 
   // ShowSidebar()
   } else if (action == L"ShowSidebar") {
@@ -271,7 +271,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       Settings.root_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
         FolderMonitor.Enable();
-      ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+      ExecuteAction(L"Settings", ui::kSettingsSectionLibrary, ui::kSettingsPageLibraryFolders);
     }
 
   // ScanEpisodes(), ScanEpisodesAll()
@@ -644,39 +644,39 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"Season_Load") {
     if (SeasonDatabase.Load(body)) {
       SeasonDatabase.Review();
-      SeasonDialog.RefreshList();
-      SeasonDialog.RefreshStatus();
-      SeasonDialog.RefreshToolbar();
+      ui::DlgSeason.RefreshList();
+      ui::DlgSeason.RefreshStatus();
+      ui::DlgSeason.RefreshToolbar();
       if (SeasonDatabase.IsRefreshRequired())
         if (ui::OnSeasonRefreshRequired())
-          SeasonDialog.RefreshData();
+          ui::DlgSeason.RefreshData();
     }
 
   // Season_GroupBy(group)
   //   Groups season data.
   } else if (action == L"Season_GroupBy") {
-    SeasonDialog.group_by = ToInt(body);
-    SeasonDialog.RefreshList();
-    SeasonDialog.RefreshToolbar();
+    ui::DlgSeason.group_by = ToInt(body);
+    ui::DlgSeason.RefreshList();
+    ui::DlgSeason.RefreshToolbar();
 
   // Season_SortBy(sort)
   //   Sorts season data.
   } else if (action == L"Season_SortBy") {
-    SeasonDialog.sort_by = ToInt(body);
-    SeasonDialog.RefreshList();
-    SeasonDialog.RefreshToolbar();
+    ui::DlgSeason.sort_by = ToInt(body);
+    ui::DlgSeason.RefreshList();
+    ui::DlgSeason.RefreshToolbar();
 
   // Season_RefreshItemData()
   //   Refreshes an individual season item data.
   } else if (action == L"Season_RefreshItemData") {
-    SeasonDialog.RefreshData(static_cast<int>(lParam));
+    ui::DlgSeason.RefreshData(static_cast<int>(lParam));
 
   // Season_ViewAs(mode)
   //   Changes view mode.
   } else if (action == L"Season_ViewAs") {
-    SeasonDialog.SetViewMode(ToInt(body));
-    SeasonDialog.RefreshList();
-    SeasonDialog.RefreshToolbar();
+    ui::DlgSeason.SetViewMode(ToInt(body));
+    ui::DlgSeason.RefreshList();
+    ui::DlgSeason.RefreshToolbar();
   
   // Unknown
   } else {

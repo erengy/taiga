@@ -253,7 +253,7 @@ void MenuList::UpdateSeason() {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = SeasonDialog.group_by;
+    int item_index = DlgSeason.group_by;
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -265,7 +265,7 @@ void MenuList::UpdateSeason() {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = SeasonDialog.sort_by;
+    int item_index = DlgSeason.sort_by;
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -277,7 +277,7 @@ void MenuList::UpdateSeason() {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = SeasonDialog.view_as;
+    int item_index = DlgSeason.view_as;
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }

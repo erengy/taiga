@@ -67,13 +67,13 @@ void InitializeDialogProperties() {
       DialogProperties(IDD_MAIN, &DlgMain, nullptr, false)));
   dialog_properties.insert(std::make_pair(
       kDialogSettings,
-      DialogProperties(IDD_SETTINGS, &SettingsDialog, g_hMain, true)));
+      DialogProperties(IDD_SETTINGS, &DlgSettings, g_hMain, true)));
   dialog_properties.insert(std::make_pair(
       kDialogTestRecognition,
-      DialogProperties(IDD_TEST_RECOGNITION, &RecognitionTest, nullptr, false)));
+      DialogProperties(IDD_TEST_RECOGNITION, &DlgTestRecognition, nullptr, false)));
   dialog_properties.insert(std::make_pair(
       kDialogUpdate,
-      DialogProperties(IDD_UPDATE, &UpdateDialog, g_hMain, true)));
+      DialogProperties(IDD_UPDATE, &DlgUpdate, g_hMain, true)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ void EnableDialogInput(Dialog dialog, bool enable) {
       DlgMain.EnableInput(enable);
       break;
     case kDialogTorrents:
-      TorrentDialog.EnableInput(enable);
+      DlgTorrent.EnableInput(enable);
       break;
   }
 }

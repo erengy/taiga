@@ -78,7 +78,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
     case taiga::kHttpFeedDownload:
     case taiga::kHttpFeedDownloadAll:
       ChangeStatusText(error);
-      TorrentDialog.EnableInput();
+      DlgTorrent.EnableInput();
       break;
     case taiga::kHttpTwitterRequest:
     case taiga::kHttpTwitterAuth:
@@ -87,9 +87,9 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       break;
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
-      MessageBox(UpdateDialog.GetWindowHandle(), 
+      MessageBox(DlgUpdate.GetWindowHandle(), 
                  error.c_str(), L"Update", MB_ICONERROR | MB_OK);
-      UpdateDialog.PostMessage(WM_CLOSE);
+      DlgUpdate.PostMessage(WM_CLOSE);
       return;
   }
 
@@ -103,13 +103,13 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
       if (http_client.content_length() > 0) {
-        UpdateDialog.progressbar.SetMarquee(false);
-        UpdateDialog.progressbar.SetRange(0, http_client.content_length());
+        DlgUpdate.progressbar.SetMarquee(false);
+        DlgUpdate.progressbar.SetRange(0, http_client.content_length());
       } else {
-        UpdateDialog.progressbar.SetMarquee(true);
+        DlgUpdate.progressbar.SetMarquee(true);
       }
       if (http_client.mode() == taiga::kHttpTaigaUpdateDownload) {
-        UpdateDialog.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS,
+        DlgUpdate.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS,
                                     L"Downloading latest update...");
       }
       break;
@@ -160,7 +160,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
       if (http_client.content_length() > 0)
-        UpdateDialog.progressbar.SetPosition(http_client.current_length());
+        DlgUpdate.progressbar.SetPosition(http_client.current_length());
       return;
   }
 
@@ -190,7 +190,7 @@ void OnLibraryChange() {
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
   DlgHistory.RefreshList();
-  SearchDialog.RefreshList();
+  DlgSearch.RefreshList();
 
   DlgMain.EnableInput(true);
 }
@@ -207,7 +207,7 @@ void OnLibraryEntryAdd(int id) {
   if (DlgNowPlaying.GetCurrentId() == id)
     DlgNowPlaying.Refresh();
 
-  SearchDialog.RefreshList();
+  DlgSearch.RefreshList();
 }
 
 void OnLibraryEntryChange(int id) {
@@ -220,8 +220,8 @@ void OnLibraryEntryChange(int id) {
   if (DlgNowPlaying.GetCurrentId() == id)
     DlgNowPlaying.Refresh(false, true, false, false);
 
-  if (SeasonDialog.IsWindow())
-    SeasonDialog.RefreshList(true);
+  if (DlgSeason.IsWindow())
+    DlgSeason.RefreshList(true);
 }
 
 void OnLibraryEntryDelete(int id) {
@@ -231,10 +231,10 @@ void OnLibraryEntryDelete(int id) {
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
 
-  SearchDialog.RefreshList();
+  DlgSearch.RefreshList();
 
-  if (SeasonDialog.IsWindow())
-    SeasonDialog.RefreshList(true);
+  if (DlgSeason.IsWindow())
+    DlgSeason.RefreshList(true);
 
   if (CurrentEpisode.anime_id == id)
     CurrentEpisode.Set(anime::ID_NOTINLIST);
@@ -250,8 +250,8 @@ void OnLibraryEntryImageChange(int id) {
   if (DlgNowPlaying.GetCurrentId() == id)
     DlgNowPlaying.Refresh(true, false, false, false);
 
-  if (SeasonDialog.IsWindow())
-    SeasonDialog.RefreshList(true);
+  if (DlgSeason.IsWindow())
+    DlgSeason.RefreshList(true);
 }
 
 void OnLibrarySearchTitle(const string_t& results) {
@@ -265,7 +265,7 @@ void OnLibrarySearchTitle(const string_t& results) {
     OnLibraryEntryChange(id);
   }
 
-  SearchDialog.ParseResults(ids);
+  DlgSearch.ParseResults(ids);
 }
 
 void OnLibraryUpdateFailure(int id, const string_t& reason) {
@@ -467,7 +467,7 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
   DlgMain.UpdateTip();
   DlgMain.UpdateTitle();
   if (Settings.GetBool(taiga::kSync_Update_GoToNowPlaying))
-    DlgMain.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+    DlgMain.navigation.SetCurrentPage(kSidebarItemNowPlaying);
 
   if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
     Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
@@ -523,7 +523,7 @@ void OnSettingsAccountEmpty() {
   dlg.AddButton(L"No", IDNO);
   dlg.Show(g_hMain);
   if (dlg.GetSelectedButtonID() == IDYES)
-    ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAIN);
+    ExecuteAction(L"Settings", kSettingsSectionServices, kSettingsPageServicesMain);
 }
 
 void OnSettingsChange() {
@@ -531,8 +531,8 @@ void OnSettingsChange() {
 }
 
 void OnSettingsRestoreDefaults() {
-  if (SettingsDialog.IsWindow()) {
-    SettingsDialog.Destroy();
+  if (DlgSettings.IsWindow()) {
+    DlgSettings.Destroy();
     ExecuteAction(L"Settings");
   }
 }
@@ -546,7 +546,7 @@ void OnSettingsRootFoldersEmpty() {
   dlg.AddButton(L"No", IDNO);
   dlg.Show(g_hMain);
   if (dlg.GetSelectedButtonID() == IDYES)
-    ExecuteAction(L"Settings", SECTION_LIBRARY, PAGE_LIBRARY_FOLDERS);
+    ExecuteAction(L"Settings", kSettingsSectionLibrary, kSettingsPageLibraryFolders);
 }
 
 void OnSettingsThemeChange() {
@@ -562,8 +562,8 @@ void OnSettingsUserChange() {
   DlgAnimeList.RefreshTabs(anime::kWatching);
   DlgHistory.RefreshList();
   DlgNowPlaying.Refresh();
-  SearchDialog.RefreshList();
-  StatsDialog.Refresh();
+  DlgSearch.RefreshList();
+  DlgStats.Refresh();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -572,16 +572,16 @@ void OnFeedCheck(bool success) {
   ChangeStatusText(success ?
       L"There are new torrents available!" : L"No new torrents found.");
 
-  TorrentDialog.RefreshList();
-  TorrentDialog.EnableInput();
+  DlgTorrent.RefreshList();
+  DlgTorrent.EnableInput();
 }
 
 void OnFeedDownload(bool success) {
   if (success)
-    TorrentDialog.RefreshList();
+    DlgTorrent.RefreshList();
 
   ChangeStatusText(L"Successfully downloaded all torrents.");
-  TorrentDialog.EnableInput();
+  DlgTorrent.EnableInput();
 }
 
 bool OnFeedNotify(const Feed& feed) {
@@ -667,7 +667,7 @@ void OnTwitterAuth(bool success) {
       Settings[taiga::kShare_Twitter_Username] :
       L"Twitter authorization failed.");
 
-  SettingsDialog.RefreshTwitterLink();
+  DlgSettings.RefreshTwitterLink();
 }
 
 void OnTwitterPost(bool success, const string_t& error) {
@@ -700,7 +700,7 @@ bool OnUpdateAvailable() {
   dlg.SetMainInstruction(L"A new version of Taiga is available!");
   dlg.AddButton(L"Download", IDYES);
   dlg.AddButton(L"Cancel", IDNO);
-  dlg.Show(UpdateDialog.GetWindowHandle());
+  dlg.Show(DlgUpdate.GetWindowHandle());
 
   return dlg.GetSelectedButtonID() == IDYES;
 }
@@ -717,7 +717,7 @@ void OnUpdateNotAvailable() {
 }
 
 void OnUpdateFinished() {
-  UpdateDialog.PostMessage(WM_CLOSE);
+  DlgUpdate.PostMessage(WM_CLOSE);
 }
 
 }  // namespace ui

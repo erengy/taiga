@@ -83,7 +83,7 @@ void ImageDatabase::FreeMemory() {
     if (!SeasonDatabase.items.empty())
       if (std::find(SeasonDatabase.items.begin(), SeasonDatabase.items.end(),
                     anime_id) != SeasonDatabase.items.end())
-        if (SeasonDialog.IsVisible())
+        if (ui::DlgSeason.IsVisible())
           erase = false;
 
     if (erase)
