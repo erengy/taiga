@@ -64,7 +64,7 @@ void InitializeDialogProperties() {
       DialogProperties(IDD_ANIME_INFO, &DlgAnime, g_hMain, false)));
   dialog_properties.insert(std::make_pair(
       kDialogMain,
-      DialogProperties(IDD_MAIN, &MainDialog, nullptr, false)));
+      DialogProperties(IDD_MAIN, &DlgMain, nullptr, false)));
   dialog_properties.insert(std::make_pair(
       kDialogSettings,
       DialogProperties(IDD_SETTINGS, &SettingsDialog, g_hMain, true)));
@@ -91,7 +91,7 @@ void DestroyDialog(Dialog dialog) {
 void EnableDialogInput(Dialog dialog, bool enable) {
   switch (dialog) {
     case kDialogMain:
-      MainDialog.EnableInput(enable);
+      DlgMain.EnableInput(enable);
       break;
     case kDialogTorrents:
       TorrentDialog.EnableInput(enable);

@@ -205,7 +205,7 @@ bool SearchDialog::Search(const wstring& title) {
   //RefreshList();
   
   sync::SearchTitle(title);
-  MainDialog.ChangeStatus(L"Searching MyAnimeList for \"" + title + L"\"...");
+  DlgMain.ChangeStatus(L"Searching MyAnimeList for \"" + title + L"\"...");
   
   return true;
 }

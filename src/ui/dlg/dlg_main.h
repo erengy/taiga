@@ -16,18 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_MAIN_H
-#define DLG_MAIN_H
-
-#include "base/std.h"
+#ifndef TAIGA_UI_DLG_MAIN_H
+#define TAIGA_UI_DLG_MAIN_H
 
 #include "library/anime_filter.h"
-
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 #include "win/win_gdi.h"
 
 #define WM_TAIGA_SHOWMENU WM_USER + 1337
+
+namespace ui {
 
 enum MainToolbarButtons {
   TOOLBAR_BUTTON_SYNCHRONIZE = 200,
@@ -54,8 +53,6 @@ enum SidebarItems {
   SIDEBAR_ITEM_SEASONS = 7,
   SIDEBAR_ITEM_FEEDS = 8
 };
-
-// =============================================================================
 
 class MainDialog : public win::Dialog {
 public:
@@ -154,6 +151,8 @@ private:
   win::Rect rect_content_, rect_sidebar_;
 };
 
-extern class MainDialog MainDialog;
+extern MainDialog DlgMain;
 
-#endif // DLG_MAIN_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_MAIN_H

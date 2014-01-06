@@ -114,7 +114,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // Exit(), Quit()
   //   Exits from Taiga.
   } else if (action == L"Exit" || action == L"Quit") {
-    MainDialog.Destroy();
+    ui::DlgMain.Destroy();
 
   // Info()
   //   Shows anime information window.
@@ -157,8 +157,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         return;
       }
     }
-    MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
-    MainDialog.edit.SetText(body);
+    ui::DlgMain.navigation.SetCurrentPage(SIDEBAR_ITEM_SEARCH);
+    ui::DlgMain.edit.SetText(body);
     SearchDialog.Search(body);
 
   // SearchTorrents(source)
@@ -172,8 +172,8 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"ShowSidebar") {
     bool hide_sidebar = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
     Settings.Set(taiga::kApp_Option_HideSidebar, hide_sidebar);
-    MainDialog.treeview.Show(!hide_sidebar);
-    MainDialog.UpdateControlPositions();
+    ui::DlgMain.treeview.Show(!hide_sidebar);
+    ui::DlgMain.UpdateControlPositions();
     ui::Menus.UpdateView();
 
   // TorrentAddFilter()
@@ -192,7 +192,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Selects a page from sidebar.
   } else if (action == L"ViewContent") {
     int page = ToInt(body);
-    MainDialog.navigation.SetCurrentPage(page);
+    ui::DlgMain.navigation.SetCurrentPage(page);
 
   // ===========================================================================
   
@@ -541,7 +541,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     wstring path, title = L"Anime title: " + anime_item->GetTitle();
-    if (BrowseForFolder(MainDialog.GetWindowHandle(), title.c_str(), L"", path)) {
+    if (BrowseForFolder(ui::DlgMain.GetWindowHandle(), title.c_str(), L"", path)) {
       anime_item->SetFolder(path);
       Settings.Save();
       anime::CheckEpisodes(*anime_item);

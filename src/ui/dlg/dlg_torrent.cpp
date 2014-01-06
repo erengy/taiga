@@ -116,7 +116,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Check new torrents
     case 100: {
-      MainDialog.edit.SetText(L"");
+      DlgMain.edit.SetText(L"");
       feed->Check(Settings[taiga::kTorrent_Discovery_Source]);
       /**
       #ifdef _DEBUG
@@ -206,9 +206,9 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             if (list_.GetCheckState(i)) checked_count++;
           }
           if (checked_count == 1) {
-            MainDialog.ChangeStatus(L"Marked 1 torrent.");
+            DlgMain.ChangeStatus(L"Marked 1 torrent.");
           } else {
-            MainDialog.ChangeStatus(L"Marked " + ToWstr(checked_count) + L" torrents.");
+            DlgMain.ChangeStatus(L"Marked " + ToWstr(checked_count) + L" torrents.");
           }
           bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(pnmv->iItem));
@@ -450,9 +450,9 @@ void TorrentDialog::Search(wstring url, wstring title) {
   Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
   if (!feed) return;
 
-  MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
-  MainDialog.edit.SetText(title);
-  MainDialog.ChangeStatus(L"Searching torrents for \"" + title + L"\"...");
+  DlgMain.navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+  DlgMain.edit.SetText(title);
+  DlgMain.ChangeStatus(L"Searching torrents for \"" + title + L"\"...");
 
   Replace(url, L"%title%", title);
   feed->Check(url);

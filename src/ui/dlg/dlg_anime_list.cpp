@@ -113,16 +113,16 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           POINT pt;
           GetCursorPos(&pt);
           win::Rect rect_edit;
-          MainDialog.edit.GetWindowRect(&rect_edit);
+          DlgMain.edit.GetWindowRect(&rect_edit);
           if (rect_edit.PtIn(pt))
             allow_drop = true;
         }
 
         if (!allow_drop) {
           TVHITTESTINFO ht = {0};
-          MainDialog.treeview.HitTest(&ht, true);
+          DlgMain.treeview.HitTest(&ht, true);
           if (ht.flags & TVHT_ONITEM) {
-            int index = MainDialog.treeview.GetItemData(ht.hItem);
+            int index = DlgMain.treeview.GetItemData(ht.hItem);
             switch (index) {
               case SIDEBAR_ITEM_SEARCH:
               case SIDEBAR_ITEM_FEEDS:
@@ -134,7 +134,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         POINT pt;
         GetCursorPos(&pt);
-        ::ScreenToClient(MainDialog.GetWindowHandle(), &pt);
+        ::ScreenToClient(DlgMain.GetWindowHandle(), &pt);
         listview.drag_image.DragMove(pt.x + 16, pt.y + 32);
         SetSharedCursor(allow_drop ? IDC_ARROW : IDC_NO);
       }
@@ -144,7 +144,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     case WM_LBUTTONUP: {
       // Drop list item
       if (listview.dragging) {
-        listview.drag_image.DragLeave(MainDialog.GetWindowHandle());
+        listview.drag_image.DragLeave(DlgMain.GetWindowHandle());
         listview.drag_image.EndDrag();
         listview.drag_image.Destroy();
         listview.dragging = false;
@@ -172,16 +172,16 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         POINT pt;
         GetCursorPos(&pt);
         win::Rect rect_edit;
-        MainDialog.edit.GetWindowRect(&rect_edit);
+        DlgMain.edit.GetWindowRect(&rect_edit);
         if (rect_edit.PtIn(pt)) {
-          MainDialog.edit.SetText(text);
+          DlgMain.edit.SetText(text);
           break;
         }
 
         TVHITTESTINFO ht = {0};
-        MainDialog.treeview.HitTest(&ht, true);
+        DlgMain.treeview.HitTest(&ht, true);
         if (ht.flags & TVHT_ONITEM) {
-          int index = MainDialog.treeview.GetItemData(ht.hItem);
+          int index = DlgMain.treeview.GetItemData(ht.hItem);
           switch (index) {
             case SIDEBAR_ITEM_SEARCH:
               ExecuteAction(L"SearchAnime(" + text + L")");
@@ -481,7 +481,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (listview.drag_image.GetHandle()) {
         pt = lplv->ptAction;
         listview.drag_image.BeginDrag(0, 0, 0);
-        listview.drag_image.DragEnter(MainDialog.GetWindowHandle(), pt.x, pt.y);
+        listview.drag_image.DragEnter(DlgMain.GetWindowHandle(), pt.x, pt.y);
         listview.dragging = true;
         SetCapture();
       }
@@ -1029,7 +1029,7 @@ void AnimeListDialog::RefreshList(int index) {
   listview.RefreshItem(-1);
 
   // Enable group view
-  bool group_view = !MainDialog.search_bar.filters.text.empty() &&
+  bool group_view = !DlgMain.search_bar.filters.text.empty() &&
                     win::GetVersion() > win::kVersionXp;
   listview.EnableGroupView(group_view);
 
@@ -1047,7 +1047,7 @@ void AnimeListDialog::RefreshList(int index) {
       if (current_status_ != anime_item.GetMyStatus())
         if (current_status_ != anime::kWatching || !it->second.GetMyRewatching())
           continue;
-    if (!MainDialog.search_bar.filters.CheckItem(anime_item))
+    if (!DlgMain.search_bar.filters.CheckItem(anime_item))
       continue;
 
     group_count.at(anime_item.GetMyStatus())++;
@@ -1111,7 +1111,7 @@ void AnimeListDialog::RefreshTabs(int index) {
       tab.SetItemText(i == 6 ? 4 : i - 1, anime::TranslateMyStatus(i, true).c_str());
 
   // Select related tab
-  bool group_view = !MainDialog.search_bar.filters.text.empty();
+  bool group_view = !DlgMain.search_bar.filters.text.empty();
   int tab_index = current_status_;
   if (group_view) {
     tab_index = -1;

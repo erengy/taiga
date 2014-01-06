@@ -19,6 +19,7 @@
 #ifndef TAIGA_TAIGA_SETTINGS_H
 #define TAIGA_TAIGA_SETTINGS_H
 
+#include <map>
 #include <string>
 #include <vector>
 

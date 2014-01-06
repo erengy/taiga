@@ -16,59 +16,54 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_main.h"
-
-#include "dlg_about.h"
-#include "dlg_anime_info.h"
-#include "dlg_anime_list.h"
-#include "dlg_history.h"
-#include "dlg_search.h"
-#include "dlg_season.h"
-#include "dlg_settings.h"
-#include "dlg_stats.h"
-#include "dlg_test_recognition.h"
-#include "dlg_torrent.h"
-#include "dlg_update.h"
-
+#include "base/common.h"
+#include "base/gfx.h"
+#include "base/process.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_filter.h"
 #include "library/anime_util.h"
-#include "library/resource.h"
-#include "taiga/announce.h"
-#include "base/common.h"
-#include "taiga/debug.h"
-#include "base/gfx.h"
 #include "library/history.h"
+#include "library/resource.h"
+#include "sync/service.h"
+#include "taiga/announce.h"
+#include "taiga/debug.h"
 #include "taiga/http.h"
+#include "taiga/resource.h"
+#include "taiga/script.h"
+#include "taiga/settings.h"
+#include "taiga/stats.h"
+#include "taiga/taiga.h"
 #include "track/media.h"
 #include "track/monitor.h"
-#include "base/process.h"
 #include "track/recognition.h"
-#include "taiga/resource.h"
-#include "taiga/settings.h"
-#include "taiga/script.h"
-#include "taiga/stats.h"
-#include "base/string.h"
-#include "taiga/taiga.h"
 #include "ui/dialog.h"
+#include "ui/dlg/dlg_about.h"
+#include "ui/dlg/dlg_anime_info.h"
+#include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_history.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_search.h"
+#include "ui/dlg/dlg_season.h"
+#include "ui/dlg/dlg_settings.h"
+#include "ui/dlg/dlg_stats.h"
+#include "ui/dlg/dlg_test_recognition.h"
+#include "ui/dlg/dlg_torrent.h"
+#include "ui/dlg/dlg_update.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
-#include "sync/service.h"
-
 #include "win/win_gdi.h"
 #include "win/win_taskbar.h"
 #include "win/win_taskdialog.h"
 
-class MainDialog MainDialog;
+namespace ui {
 
-// =============================================================================
+MainDialog DlgMain;
 
 MainDialog::MainDialog() {
   navigation.parent = this;
   search_bar.parent = this;
-  
+
   RegisterDlgClass(L"TaigaMainW");
 }
 
@@ -278,7 +273,7 @@ void MainDialog::InitWindowPosition() {
   SetSnapGap(10);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
@@ -408,7 +403,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
       pMsg->wParam = MAKEWPARAM(0, HIWORD(pMsg->wParam));
       switch (navigation.GetCurrentPage()) {
         case SIDEBAR_ITEM_ANIMELIST:
-          return AnimeListDialog.SendMessage(
+          return DlgAnimeList.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
         case SIDEBAR_ITEM_HISTORY:
           return DlgHistory.SendMessage(
@@ -446,7 +441,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
   return FALSE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL MainDialog::OnClose() {
   if (Settings.GetBool(taiga::kApp_Behavior_CloseToTray)) {
@@ -555,7 +550,7 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Timer */
 
@@ -660,7 +655,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
 #endif
         } else {
           MediaPlayers.SetTitleChanged(false);
-          NowPlayingDialog.SetCurrentId(anime::ID_NOTINLIST);
+          DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
           if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
@@ -718,7 +713,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         ChangeStatus();
         CurrentEpisode.Set(anime::ID_UNKNOWN);
         MediaPlayers.index_old = 0;
-        NowPlayingDialog.SetCurrentId(anime::ID_UNKNOWN);
+        DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
       }
     
     // Was running and watching
@@ -740,7 +735,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   UpdateStatusTimer();
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Taskbar */
 
@@ -789,17 +784,17 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case WM_RBUTTONUP: {
-        ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
+        ui::Menus.UpdateAll(DlgAnimeList.GetCurrentItem());
         SetForegroundWindow();
         ExecuteAction(ui::Menus.Show(GetWindowHandle(), 0, 0, L"Tray"));
-        ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
+        ui::Menus.UpdateAll(DlgAnimeList.GetCurrentItem());
         break;
       }
     }
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void MainDialog::ChangeStatus(wstring str) {
   if (!str.empty()) str = L"  " + str;
@@ -810,7 +805,7 @@ void MainDialog::EnableInput(bool enable) {
   // Toolbar buttons
   toolbar_main.EnableButton(TOOLBAR_BUTTON_SYNCHRONIZE, enable);
   // Content
-  AnimeListDialog.Enable(enable);
+  DlgAnimeList.Enable(enable);
   DlgHistory.Enable(enable);
 }
 
@@ -851,9 +846,9 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   }
   
   // Resize content
-  AnimeListDialog.SetPosition(nullptr, rect_content_);
-  HistoryDialog.SetPosition(nullptr, rect_content_);
-  NowPlayingDialog.SetPosition(nullptr, rect_content_);
+  DlgAnimeList.SetPosition(nullptr, rect_content_);
+  DlgHistory.SetPosition(nullptr, rect_content_);
+  DlgNowPlaying.SetPosition(nullptr, rect_content_);
   SearchDialog.SetPosition(nullptr, rect_content_);
   SeasonDialog.SetPosition(nullptr, rect_content_);
   StatsDialog.SetPosition(nullptr, rect_content_);
@@ -924,7 +919,7 @@ void MainDialog::UpdateTitle() {
   SetText(title);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 int MainDialog::Navigation::GetCurrentPage() {
   return current_page_;
@@ -962,8 +957,8 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
     parent->search_bar.filters.text.clear();
     switch (previous_page) {
       case SIDEBAR_ITEM_ANIMELIST:
-        AnimeListDialog.RefreshList();
-        AnimeListDialog.RefreshTabs();
+        DlgAnimeList.RefreshList();
+        DlgAnimeList.RefreshTabs();
         break;
       case SIDEBAR_ITEM_SEASONS:
         SeasonDialog.RefreshList();
@@ -980,9 +975,9 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
       dialog.Show(); \
       break;
   switch (current_page_) {
-    DISPLAY_PAGE(SIDEBAR_ITEM_NOWPLAYING, NowPlayingDialog, IDD_ANIME_INFO);
-    DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, AnimeListDialog, IDD_ANIME_LIST);
-    DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, HistoryDialog, IDD_HISTORY);
+    DISPLAY_PAGE(SIDEBAR_ITEM_NOWPLAYING, DlgNowPlaying, IDD_ANIME_INFO);
+    DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, DlgAnimeList, IDD_ANIME_LIST);
+    DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, DlgHistory, IDD_HISTORY);
     DISPLAY_PAGE(SIDEBAR_ITEM_STATS, StatsDialog, IDD_STATS);
     DISPLAY_PAGE(SIDEBAR_ITEM_SEARCH, SearchDialog, IDD_SEARCH);
     DISPLAY_PAGE(SIDEBAR_ITEM_SEASONS, SeasonDialog, IDD_SEASON);
@@ -990,9 +985,9 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   }
   #undef DISPLAY_PAGE
   
-  if (current_page_ != SIDEBAR_ITEM_NOWPLAYING) NowPlayingDialog.Hide();
-  if (current_page_ != SIDEBAR_ITEM_ANIMELIST) AnimeListDialog.Hide();
-  if (current_page_ != SIDEBAR_ITEM_HISTORY) HistoryDialog.Hide();
+  if (current_page_ != SIDEBAR_ITEM_NOWPLAYING) DlgNowPlaying.Hide();
+  if (current_page_ != SIDEBAR_ITEM_ANIMELIST) DlgAnimeList.Hide();
+  if (current_page_ != SIDEBAR_ITEM_HISTORY) DlgHistory.Hide();
   if (current_page_ != SIDEBAR_ITEM_STATS) StatsDialog.Hide();
   if (current_page_ != SIDEBAR_ITEM_SEARCH) SearchDialog.Hide();
   if (current_page_ != SIDEBAR_ITEM_SEASONS) SeasonDialog.Hide();
@@ -1028,3 +1023,5 @@ void MainDialog::Navigation::Refresh(bool add_to_history) {
     index_ = items_.size() - 1;
   }
 }
+
+}  // namespace ui

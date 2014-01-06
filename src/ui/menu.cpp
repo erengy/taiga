@@ -320,7 +320,7 @@ void MenuList::UpdateView() {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = MainDialog.navigation.GetCurrentPage();
+    int item_index = DlgMain.navigation.GetCurrentPage();
     foreach_(it, menu->items) {
       if (it->action == L"ViewContent(" + ToWstr(item_index) + L")") {
         it->checked = true;

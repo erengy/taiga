@@ -54,7 +54,7 @@ void Tester::End(wstring str, bool display_result) {
 
   if (display_result) {
     str = ToWstr(value, 2) + L"ms | Text: [" + str + L"]";
-    MainDialog.SetText(str);
+    ui::DlgMain.SetText(str);
   }
 }
 

@@ -49,11 +49,11 @@
 namespace ui {
 
 void ChangeStatusText(const string_t& status) {
-  MainDialog.ChangeStatus(status);
+  DlgMain.ChangeStatus(status);
 }
 
 void ClearStatusText() {
-  MainDialog.ChangeStatus(L"");
+  DlgMain.ChangeStatus(L"");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
     case taiga::kHttpServiceDeleteLibraryEntry:
     case taiga::kHttpServiceUpdateLibraryEntry:
       ChangeStatusText(error);
-      MainDialog.EnableInput(true);
+      DlgMain.EnableInput(true);
       break;
     case taiga::kHttpFeedCheck:
     case taiga::kHttpFeedCheckAuto:
@@ -192,7 +192,7 @@ void OnLibraryChange() {
   DlgHistory.RefreshList();
   SearchDialog.RefreshList();
 
-  MainDialog.EnableInput(true);
+  DlgMain.EnableInput(true);
 }
 
 void OnLibraryEntryAdd(int id) {
@@ -378,7 +378,7 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
 
 void OnHistoryChange() {
   DlgHistory.RefreshList();
-  MainDialog.treeview.RefreshHistoryCounter();
+  DlgMain.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
@@ -464,10 +464,10 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
     DlgAnimeList.listview.EnsureVisible(list_index);
   }
 
-  MainDialog.UpdateTip();
-  MainDialog.UpdateTitle();
+  DlgMain.UpdateTip();
+  DlgMain.UpdateTitle();
   if (Settings.GetBool(taiga::kSync_Update_GoToNowPlaying))
-    MainDialog.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+    DlgMain.navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
 
   if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
     Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
@@ -482,8 +482,8 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
                         const anime::Episode& episode) {
   DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
 
-  MainDialog.UpdateTip();
-  MainDialog.UpdateTitle();
+  DlgMain.UpdateTip();
+  DlgMain.UpdateTitle();
 
   int list_index = DlgAnimeList.GetListIndex(anime_item.GetId());
   if (list_index > -1) {
@@ -552,12 +552,12 @@ void OnSettingsRootFoldersEmpty() {
 void OnSettingsThemeChange() {
   Menus.UpdateAll();
 
-  MainDialog.rebar.RedrawWindow();
+  DlgMain.rebar.RedrawWindow();
 }
 
 void OnSettingsUserChange() {
-  MainDialog.treeview.RefreshHistoryCounter();
-  MainDialog.UpdateTitle();
+  DlgMain.treeview.RefreshHistoryCounter();
+  DlgMain.UpdateTitle();
   DlgAnimeList.RefreshList(anime::kWatching);
   DlgAnimeList.RefreshTabs(anime::kWatching);
   DlgHistory.RefreshList();
@@ -683,9 +683,9 @@ void OnLogin() {
 
   Menus.UpdateAll();
 
-  MainDialog.UpdateTip();
-  MainDialog.UpdateTitle();
-  MainDialog.EnableInput(true);
+  DlgMain.UpdateTip();
+  DlgMain.UpdateTitle();
+  DlgMain.EnableInput(true);
 }
 
 void OnLogout() {
@@ -706,7 +706,7 @@ bool OnUpdateAvailable() {
 }
 
 void OnUpdateNotAvailable() {
-  if (MainDialog.IsWindow()) {
+  if (DlgMain.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
     std::wstring footer = L"Current version: " + std::wstring(Taiga.version);
     dlg.SetFooter(footer.c_str());

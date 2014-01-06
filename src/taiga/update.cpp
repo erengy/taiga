@@ -47,7 +47,7 @@ bool UpdateHelper::Check() {
   http_request.query[L"username"] = GetCurrentUsername();
   http_request.query[L"service"] = GetCurrentService()->canonical_name();
   http_request.query[L"version"] = std::wstring(Taiga.version);
-  http_request.query[L"check"] = MainDialog.IsWindow() ? L"manual" : L"auto";
+  http_request.query[L"check"] = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
 
   client_uuid_ = http_request.uuid;
 
