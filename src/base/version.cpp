@@ -27,7 +27,7 @@ SemanticVersion::SemanticVersion()
     : major(1), minor(0), patch(0) {
 }
 
-SemanticVersion::SemanticVersion(const std::wstring& version)
+SemanticVersion::SemanticVersion(const string_t& version)
     : major(1), minor(0), patch(0) {
   Parse(version);
 }
@@ -38,44 +38,45 @@ SemanticVersion::SemanticVersion(numeric_identifier_t major,
     : major(major), minor(minor), patch(patch) {
 }
 
-SemanticVersion& SemanticVersion::operator = (const SemanticVersion& version) {
+SemanticVersion& SemanticVersion::operator=(const SemanticVersion& version) {
   major = version.major;
   minor = version.minor;
   patch = version.patch;
+
   prerelease_identifiers = version.prerelease_identifiers;
   build_metadata = version.build_metadata;
 
   return *this;
 }
 
-bool SemanticVersion::operator == (const SemanticVersion& version) const {
+bool SemanticVersion::operator==(const SemanticVersion& version) const {
   return Compare(version) == kEqualTo;
 }
 
-bool SemanticVersion::operator != (const SemanticVersion& version) const {
-  return !operator == (version);
+bool SemanticVersion::operator!=(const SemanticVersion& version) const {
+  return !operator==(version);
 }
 
-bool SemanticVersion::operator < (const SemanticVersion& version) const {
+bool SemanticVersion::operator<(const SemanticVersion& version) const {
   return Compare(version) == kLessThan;
 }
 
-bool SemanticVersion::operator <= (const SemanticVersion& version) const {
-  return !operator > (version);
+bool SemanticVersion::operator<=(const SemanticVersion& version) const {
+  return !operator>(version);
 }
 
-bool SemanticVersion::operator > (const SemanticVersion& version) const {
+bool SemanticVersion::operator>(const SemanticVersion& version) const {
   return Compare(version) == kGreaterThan;
 }
 
-bool SemanticVersion::operator >= (const SemanticVersion& version) const {
-  return !operator < (version);
+bool SemanticVersion::operator>=(const SemanticVersion& version) const {
+  return !operator<(version);
 }
 
-SemanticVersion::operator std::wstring() const {
-  std::wstring version = ToWstr(static_cast<int>(major)) + L"." +
-                         ToWstr(static_cast<int>(minor)) + L"." +
-                         ToWstr(static_cast<int>(patch));
+SemanticVersion::operator string_t() const {
+  string_t version = ToWstr(static_cast<int>(major)) + L"." +
+                     ToWstr(static_cast<int>(minor)) + L"." +
+                     ToWstr(static_cast<int>(patch));
   if (!prerelease_identifiers.empty())
     version += L"-" + prerelease_identifiers;
   if (!build_metadata.empty())
@@ -103,7 +104,7 @@ SemanticVersion::CompareResult SemanticVersion::Compare(
         version.prerelease_identifiers.empty())
       return kLessThan;
 
-    std::vector<std::wstring> identifiers_, identifiers;
+    std::vector<string_t> identifiers_, identifiers;
     Split(prerelease_identifiers, L".", identifiers_);
     Split(version.prerelease_identifiers, L".", identifiers);
 
@@ -123,13 +124,13 @@ SemanticVersion::CompareResult SemanticVersion::Compare(
 
     if (identifiers_. size() != identifiers. size())
       return identifiers_. size() < identifiers. size() ?
-        kLessThan : kGreaterThan;
+          kLessThan : kGreaterThan;
   }
 
   return kEqualTo;
 }
 
-void SemanticVersion::Parse(const std::wstring& version) {
+void SemanticVersion::Parse(const string_t& version) {
   int identifier_index = kMajor;
   size_t current_identifier_pos = 0;
 
@@ -140,7 +141,7 @@ void SemanticVersion::Parse(const std::wstring& version) {
       case kPatch: {
         if (IsNumeric(version.at(i)))
           continue;
-        std::wstring current_identifier = version.substr(
+        string_t current_identifier = version.substr(
             current_identifier_pos, i - current_identifier_pos);
         switch (identifier_index) {
           case kMajor:

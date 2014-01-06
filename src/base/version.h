@@ -21,16 +21,17 @@
 
 #include <string>
 
+namespace base {
+
 // An implementation of Semantic Versioning 2.0.0 that provides an easy way
 // to compare version numbers.
 //
 // See http://semver.org for Semantic Versioning Specification.
 
-namespace base {
-
 class SemanticVersion {
 public:
   typedef unsigned int numeric_identifier_t;
+  typedef std::wstring string_t;
 
   enum Version {
     kMajor,
@@ -47,8 +48,10 @@ public:
   };
 
   SemanticVersion();
-  SemanticVersion(const std::wstring& version);
-  SemanticVersion(numeric_identifier_t major, numeric_identifier_t minor, numeric_identifier_t patch);
+  SemanticVersion(const string_t& version);
+  SemanticVersion(numeric_identifier_t major,
+                  numeric_identifier_t minor,
+                  numeric_identifier_t patch);
   ~SemanticVersion() {}
 
   SemanticVersion& operator = (const SemanticVersion& version);
@@ -60,17 +63,17 @@ public:
   bool operator >  (const SemanticVersion& version) const;
   bool operator >= (const SemanticVersion& version) const;
 
-  operator std::wstring() const;
+  operator string_t() const;
 
   numeric_identifier_t major;
   numeric_identifier_t minor;
   numeric_identifier_t patch;
-  std::wstring prerelease_identifiers;
-  std::wstring build_metadata;
+  string_t prerelease_identifiers;
+  string_t build_metadata;
 
 private:
   CompareResult Compare(const SemanticVersion& version) const;
-  void Parse(const std::wstring& version);
+  void Parse(const string_t& version);
 };
 
 }  // namespace base
