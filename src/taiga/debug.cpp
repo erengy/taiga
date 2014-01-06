@@ -44,7 +44,7 @@ void Tester::Start() {
   value_ = li.QuadPart;
 }
 
-void Tester::End(wstring str, bool display_result) {
+void Tester::End(std::wstring str, bool display_result) {
   LARGE_INTEGER li;
 
   ::QueryPerformanceCounter(&li);
@@ -103,7 +103,7 @@ void CheckSynonyms() {
 
 // =============================================================================
 
-void Print(wstring text) {
+void Print(std::wstring text) {
 #ifdef _DEBUG
   ::OutputDebugString(text.c_str());
 #else
@@ -113,7 +113,7 @@ void Print(wstring text) {
 
 void Test() {
   // Define variables
-  wstring str;
+  std::wstring str;
 
   // Start ticking
   Tester test;

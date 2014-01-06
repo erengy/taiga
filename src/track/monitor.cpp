@@ -62,7 +62,7 @@ FolderMonitor::~FolderMonitor() {
 
 // =============================================================================
 
-bool FolderMonitor::AddFolder(const wstring& folder) {
+bool FolderMonitor::AddFolder(const std::wstring& folder) {
   // Validate path
   if (!FolderExists(folder)) {
     return false;
@@ -251,7 +251,7 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
 
     anime::Episode episode;
     AddTrailingSlash(folder_info->path);
-    wstring path = folder_info->path + LIST[i].file_name;
+    std::wstring path = folder_info->path + LIST[i].file_name;
         
     // Is it a file or a folder?
     bool is_folder = false;

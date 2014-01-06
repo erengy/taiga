@@ -96,11 +96,11 @@ int Item::GetAiringStatus(bool check_date) const {
   return kNotYetAired;
 }
 
-const wstring& Item::GetTitle() const {
+const std::wstring& Item::GetTitle() const {
   return metadata_.title;
 }
 
-const wstring& Item::GetEnglishTitle(bool fallback) const {
+const std::wstring& Item::GetEnglishTitle(bool fallback) const {
   foreach_(it, metadata_.alternative)
     if (it->type == library::kTitleTypeLangEnglish)
       return it->value;
@@ -111,8 +111,8 @@ const wstring& Item::GetEnglishTitle(bool fallback) const {
   return EmptyString();
 }
 
-vector<wstring> Item::GetSynonyms() const {
-  vector<wstring> synonyms;
+std::vector<std::wstring> Item::GetSynonyms() const {
+  std::vector<std::wstring> synonyms;
 
   foreach_(it, metadata_.alternative)
     if (it->type == library::kTitleTypeSynonym)
@@ -135,36 +135,36 @@ const Date& Item::GetDateEnd() const {
   return EmptyDate();
 }
 
-const wstring& Item::GetImageUrl() const {
+const std::wstring& Item::GetImageUrl() const {
   if (metadata_.resource.size() > 0)
     return metadata_.resource.at(0);
 
   return EmptyString();
 }
 
-const vector<wstring>& Item::GetGenres() const {
+const std::vector<std::wstring>& Item::GetGenres() const {
   return metadata_.subject;
 }
 
-const wstring& Item::GetPopularity() const {
+const std::wstring& Item::GetPopularity() const {
   if (metadata_.community.size() > 1)
     return metadata_.community.at(1);
 
   return EmptyString();
 }
 
-const vector<wstring>& Item::GetProducers() const {
+const std::vector<std::wstring>& Item::GetProducers() const {
   return metadata_.creator;
 }
 
-const wstring& Item::GetScore() const {
+const std::wstring& Item::GetScore() const {
   if (metadata_.community.size() > 0)
     return metadata_.community.at(0);
 
   return EmptyString();
 }
 
-const wstring& Item::GetSynopsis() const {
+const std::wstring& Item::GetSynopsis() const {
   return metadata_.description;
 }
 
@@ -216,11 +216,11 @@ void Item::SetAiringStatus(int status) {
   metadata_.status = status;
 }
 
-void Item::SetTitle(const wstring& title) {
+void Item::SetTitle(const std::wstring& title) {
   metadata_.title = title;
 }
 
-void Item::SetEnglishTitle(const wstring& title) {
+void Item::SetEnglishTitle(const std::wstring& title) {
   foreach_(it, metadata_.alternative) {
     if (it->type == library::kTitleTypeLangEnglish) {
       it->value = title;
@@ -235,15 +235,15 @@ void Item::SetEnglishTitle(const wstring& title) {
   metadata_.alternative.push_back(new_title);
 }
 
-void Item::SetSynonyms(const wstring& synonyms) {
-  vector<wstring> temp;
+void Item::SetSynonyms(const std::wstring& synonyms) {
+  std::vector<std::wstring> temp;
   Split(synonyms, L"; ", temp);
   RemoveEmptyStrings(temp);
 
   SetSynonyms(temp);
 }
 
-void Item::SetSynonyms(const vector<wstring>& synonyms) {
+void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
   std::vector<library::Title> alternative;
 
   foreach_(it, metadata_.alternative)
@@ -274,52 +274,52 @@ void Item::SetDateEnd(const Date& date) {
   metadata_.date.at(1) = date;
 }
 
-void Item::SetImageUrl(const wstring& url) {
+void Item::SetImageUrl(const std::wstring& url) {
   if (metadata_.resource.size() < 1)
     metadata_.resource.resize(1);
 
   metadata_.resource.at(0) = url;
 }
 
-void Item::SetGenres(const wstring& genres) {
-  vector<wstring> temp;
+void Item::SetGenres(const std::wstring& genres) {
+  std::vector<std::wstring> temp;
   Split(genres, L", ", temp);
   RemoveEmptyStrings(temp);
 
   SetGenres(temp);
 }
 
-void Item::SetGenres(const vector<wstring>& genres) {
+void Item::SetGenres(const std::vector<std::wstring>& genres) {
   metadata_.subject = genres;
 }
 
-void Item::SetPopularity(const wstring& popularity) {
+void Item::SetPopularity(const std::wstring& popularity) {
   if (metadata_.community.size() < 2)
     metadata_.community.resize(2);
 
   metadata_.community.at(1) = popularity;
 }
 
-void Item::SetProducers(const wstring& producers) {
-  vector<wstring> temp;
+void Item::SetProducers(const std::wstring& producers) {
+  std::vector<std::wstring> temp;
   Split(producers, L", ", temp);
   RemoveEmptyStrings(temp);
 
   SetProducers(temp);
 }
 
-void Item::SetProducers(const vector<wstring>& producers) {
+void Item::SetProducers(const std::vector<std::wstring>& producers) {
   metadata_.creator = producers;
 }
 
-void Item::SetScore(const wstring& score) {
+void Item::SetScore(const std::wstring& score) {
   if (metadata_.community.size() < 1)
     metadata_.community.resize(1);
 
   metadata_.community.at(0) = score;
 }
 
-void Item::SetSynopsis(const wstring& synopsis) {
+void Item::SetSynopsis(const std::wstring& synopsis) {
   metadata_.description = synopsis;
 }
 
@@ -393,14 +393,14 @@ const Date& Item::GetMyDateEnd(bool check_queue) const {
   return history_item ? *history_item->date_finish : my_info_->date_finish;
 }
 
-const wstring& Item::GetMyLastUpdated() const {
+const std::wstring& Item::GetMyLastUpdated() const {
   if (!my_info_.get())
     return EmptyString();
 
   return my_info_->last_updated;
 }
 
-const wstring& Item::GetMyTags(bool check_queue) const {
+const std::wstring& Item::GetMyTags(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
 
@@ -454,13 +454,13 @@ void Item::SetMyDateEnd(const Date& date) {
   my_info_->date_finish = date;
 }
 
-void Item::SetMyLastUpdated(const wstring& last_updated) {
+void Item::SetMyLastUpdated(const std::wstring& last_updated) {
   assert(my_info_.get());
 
   my_info_->last_updated = last_updated;
 }
 
-void Item::SetMyTags(const wstring& tags) {
+void Item::SetMyTags(const std::wstring& tags) {
   assert(my_info_.get());
 
   my_info_->tags = tags;
@@ -473,7 +473,7 @@ int Item::GetAvailableEpisodeCount() const {
   return static_cast<int>(local_info_.available_episodes.size());
 }
 
-const wstring& Item::GetFolder() const {
+const std::wstring& Item::GetFolder() const {
   return local_info_.folder;
 }
 
@@ -497,7 +497,7 @@ int Item::GetLastAiredEpisodeNumber(bool estimate) {
   return local_info_.last_aired_episode;
 }
 
-const wstring& Item::GetNewEpisodePath() const {
+const std::wstring& Item::GetNewEpisodePath() const {
   return local_info_.new_episode_path;
 }
 
@@ -509,13 +509,14 @@ bool Item::GetUseAlternative() const {
   return local_info_.use_alternative;
 }
 
-const vector<wstring>& Item::GetUserSynonyms() const {
+const std::vector<std::wstring>& Item::GetUserSynonyms() const {
   return local_info_.synonyms;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Item::SetEpisodeAvailability(int number, bool available, const wstring& path) {
+bool Item::SetEpisodeAvailability(int number, bool available,
+                                  const std::wstring& path) {
   if (number == 0)
     number = 1;
   
@@ -536,7 +537,7 @@ bool Item::SetEpisodeAvailability(int number, bool available, const wstring& pat
   return false;
 }
 
-void Item::SetFolder(const wstring& folder) {
+void Item::SetFolder(const std::wstring& folder) {
   local_info_.folder = folder;
 }
 
@@ -545,7 +546,7 @@ void Item::SetLastAiredEpisodeNumber(int number) {
     local_info_.last_aired_episode = number;
 }
 
-void Item::SetNewEpisodePath(const wstring& path) {
+void Item::SetNewEpisodePath(const std::wstring& path) {
   local_info_.new_episode_path = path;
 }
 
@@ -557,14 +558,14 @@ void Item::SetUseAlternative(bool use_alternative) {
   local_info_.use_alternative = use_alternative;
 }
 
-void Item::SetUserSynonyms(const wstring& synonyms) {
-  vector<wstring> temp;
+void Item::SetUserSynonyms(const std::wstring& synonyms) {
+  std::vector<std::wstring> temp;
   Split(synonyms, L"; ", temp);
 
   SetUserSynonyms(temp);
 }
 
-void Item::SetUserSynonyms(const vector<wstring>& synonyms) {
+void Item::SetUserSynonyms(const std::vector<std::wstring>& synonyms) {
   local_info_.synonyms = synonyms;
   RemoveEmptyStrings(local_info_.synonyms);
 

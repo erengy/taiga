@@ -81,16 +81,16 @@ public:
   void Create();
   BOOL Discover();
   LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-  bool SendCommand(const wstring& command);
+  bool SendCommand(const std::wstring& command);
   bool GetMoodText();
-  bool SetMoodText(const wstring& mood);
+  bool SetMoodText(const std::wstring& mood);
 
   static const UINT wm_attach;
   static const UINT wm_discover;
 
 public:
   HWND hwnd, hwnd_skype;
-  wstring current_mood, previous_mood;
+  std::wstring current_mood, previous_mood;
 
 private:
   class Window : public win::Window {
@@ -117,7 +117,7 @@ public:
   OAuth oauth;
 
 private:
-  wstring status_text_;
+  std::wstring status_text_;
 };
 
 }  // namespace taiga

@@ -34,7 +34,7 @@ MenuList Menus;
 void MenuList::Load() {
   menu_list_.menus.clear();
 
-  wstring menu_resource;
+  std::wstring menu_resource;
   ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
 
   xml_document document;
@@ -183,14 +183,14 @@ void MenuList::UpdateExternalLinks() {
     // Clear menu
     menu->items.clear();
 
-    vector<wstring> lines;
+    std::vector<std::wstring> lines;
     Split(Settings[taiga::kApp_Interface_ExternalLinks], L"\r\n", lines);
     foreach_(line, lines) {
       if (IsEqual(*line, L"-")) {
         // Add separator
         menu->CreateItem();
       } else {
-        vector<wstring> content;
+        std::vector<std::wstring> content;
         Split(*line, L"|", content);
         if (content.size() > 1) {
           menu->CreateItem(L"URL(" + content.at(1) + L")", content.at(0));

@@ -121,7 +121,7 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
 }
 
 void OnHttpProgress(const taiga::HttpClient& http_client) {
-  wstring status;
+  std::wstring status;
 
   switch (http_client.mode()) {
     case taiga::kHttpSilent:
@@ -388,7 +388,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
 
   win::TaskDialog dlg;
-  wstring title = L"Anime title: " + anime_item->GetTitle();
+  std::wstring title = L"Anime title: " + anime_item->GetTitle();
   dlg.SetWindowTitle(TAIGA_APP_TITLE);
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Do you want to update your anime list?");
@@ -409,7 +409,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
     dlg.AddButton(L"Update and move\n"
                   L"Update and set as watching", IDCANCEL);
   }
-  wstring button = L"Update\n"
+  std::wstring button = L"Update\n"
                    L"Update episode number from " +
                    ToWstr(anime_item->GetMyLastWatchedEpisode()) +
                    L" to " + ToWstr(number);
@@ -497,7 +497,7 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 
 bool OnSeasonRefreshRequired() {
   win::TaskDialog dlg;
-  wstring title = L"Season - " + SeasonDatabase.name;
+  std::wstring title = L"Season - " + SeasonDatabase.name;
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");

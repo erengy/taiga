@@ -139,8 +139,8 @@ void Announcer::ToMessenger(const std::wstring& artist,
   COPYDATASTRUCT cds;
   WCHAR buffer[256];
 
-  wstring wstr = L"\\0Music\\0" + ToWstr(show) + L"\\0{1}\\0" + 
-                 artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
+  std::wstring wstr = L"\\0Music\\0" + ToWstr(show) + L"\\0{1}\\0" + 
+                      artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
   wcscpy_s(buffer, 256, wstr.c_str());
 
   cds.dwData = 0x547;
@@ -190,7 +190,7 @@ bool Announcer::ToMirc(const std::wstring& service,
     if (it->at(0) == '*') {
       *it = it->substr(1);
       if (mode == kMircChannelModeActive) {
-        wstring temp = *it;
+        std::wstring temp = *it;
         channel_list.clear();
         channel_list.push_back(temp);
         break;
@@ -209,7 +209,7 @@ bool Announcer::ToMirc(const std::wstring& service,
 
   // Send message to channels
   foreach_(it, channel_list) {
-    wstring message;
+    std::wstring message;
     message += multi_server ? L"/scon -a " : L"";
     message += use_action ? L"/describe " : L"/msg ";
     message += *it + L" " + data;
@@ -244,7 +244,7 @@ bool Announcer::TestMircConnection(const std::wstring& service) {
     return false;
   }
 
-  wstring channels;
+  std::wstring channels;
   dde.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
 
   // Success
@@ -281,8 +281,8 @@ BOOL Skype::Discover() {
                             0, SMTO_NORMAL, 1000, sendMessageResult);
 }
 
-bool Skype::SendCommand(const wstring& command) {
-  string str = WstrToStr(command);
+bool Skype::SendCommand(const std::wstring& command) {
+  std::string str = WstrToStr(command);
   const char* buffer = str.c_str();
 
   COPYDATASTRUCT cds;
@@ -303,13 +303,13 @@ bool Skype::SendCommand(const wstring& command) {
 }
 
 bool Skype::GetMoodText() {
-  wstring command = L"GET PROFILE RICH_MOOD_TEXT";
+  std::wstring command = L"GET PROFILE RICH_MOOD_TEXT";
   return SendCommand(command);
 }
 
-bool Skype::SetMoodText(const wstring& mood) {
+bool Skype::SetMoodText(const std::wstring& mood) {
   current_mood = mood;
-  wstring command = L"SET PROFILE RICH_MOOD_TEXT " + mood;
+  std::wstring command = L"SET PROFILE RICH_MOOD_TEXT " + mood;
   return SendCommand(command);
 }
 
@@ -337,12 +337,12 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
       return FALSE;
 
     auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
-    wstring command = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
+    std::wstring command = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
     LOG(LevelDebug, L"Received WM_COPYDATA: " + command);
 
-    wstring profile_command = L"PROFILE RICH_MOOD_TEXT ";
+    std::wstring profile_command = L"PROFILE RICH_MOOD_TEXT ";
     if (StartsWith(command, profile_command)) {
-      wstring mood = command.substr(profile_command.length());
+      std::wstring mood = command.substr(profile_command.length());
       if (mood != current_mood && mood != previous_mood) {
         LOG(LevelDebug, L"Saved previous mood message: " + mood);
         previous_mood = mood;
@@ -389,7 +389,7 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-void Announcer::ToSkype(const wstring& mood) {
+void Announcer::ToSkype(const std::wstring& mood) {
   ::Skype.current_mood = mood;
 
   if (::Skype.hwnd_skype == nullptr) {
@@ -420,7 +420,7 @@ bool Twitter::RequestToken() {
   return true;
 }
 
-bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstring& pin) {
+bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret, const std::wstring& pin) {
   HttpRequest http_request;
   http_request.host = L"api.twitter.com";
   http_request.path = L"oauth/access_token";
@@ -432,7 +432,7 @@ bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstri
   return true;
 }
 
-bool Twitter::SetStatusText(const wstring& status_text) {
+bool Twitter::SetStatusText(const std::wstring& status_text) {
   if (Settings[kShare_Twitter_OauthToken].empty() ||
       Settings[kShare_Twitter_OauthSecret].empty())
     return false;
@@ -459,7 +459,7 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   return true;
 }
 
-void Announcer::ToTwitter(const wstring& status_text) {
+void Announcer::ToTwitter(const std::wstring& status_text) {
   ::Twitter.SetStatusText(status_text); 
 }
 

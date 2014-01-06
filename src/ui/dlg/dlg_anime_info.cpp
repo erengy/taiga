@@ -205,7 +205,7 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Link click
         case NM_CLICK: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
-          wstring action = pNMLink->item.szUrl;
+          std::wstring action = pNMLink->item.szUrl;
           if (IsEqual(pNMLink->item.szID, L"menu")) {
             action = ui::Menus.Show(GetWindowHandle(), 0, 0, pNMLink->item.szUrl);
           } else if (IsEqual(pNMLink->item.szID, L"search")) {
@@ -465,7 +465,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
   // Set content
   if (anime_id_ == anime::ID_NOTINLIST) {
-    wstring content = L"Taiga was unable to recognize this title, and it needs your help.\n\n";
+    std::wstring content = L"Taiga was unable to recognize this title, and it needs your help.\n\n";
     auto scores = Meow.GetScores();
     if (!scores.empty()) {
       int count = 0;
@@ -487,14 +487,14 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     sys_link_.SetText(content);
 
   } else if (anime_id_ == anime::ID_UNKNOWN) {
-    wstring content;
+    std::wstring content;
     Date date_now = GetDate();
     int date_diff = 0;
     const int day_limit = 7;
     int link_count = 0;
 
     // Recently watched
-    vector<int> anime_ids;
+    std::vector<int> anime_ids;
     foreach_cr_(it, History.queue.items) {
       if (it->episode &&
           std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end()) {
@@ -561,7 +561,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"There are at least " + ToWstr(available_episodes) + L" new episodes available on your computer.\n\n";
 
     // Airing times
-    vector<int> recently_started, recently_finished, upcoming;
+    std::vector<int> recently_started, recently_finished, upcoming;
     foreach_c_(it, AnimeDatabase.items) {
       const Date& date_start = it->second.GetDateStart();
       const Date& date_end = it->second.GetDateEnd();
@@ -618,7 +618,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     int episode_number = GetEpisodeLow(CurrentEpisode.number);
     if (episode_number == 0)
       episode_number = 1;
-    wstring content = L"Now playing: Episode " + ToWstr(episode_number);
+    std::wstring content = L"Now playing: Episode " + ToWstr(episode_number);
     if (!CurrentEpisode.group.empty())
       content += L" by " + CurrentEpisode.group;
     content += L"\n";

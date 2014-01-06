@@ -127,7 +127,7 @@ BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor
 
 ////////////////////////////////////////////////////////////////////////////////
 
-COLORREF HexToARGB(const wstring& text) {
+COLORREF HexToARGB(const std::wstring& text) {
   int i = text.length() - 6;
   if (i < 0)
     return 0;

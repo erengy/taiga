@@ -153,7 +153,7 @@ void FormatDialog::ColorizeText() {
       case '$': {
         cf.crTextColor = RGB(0, 0, 160);
         size_t pos = text.find('(', i);
-        if (pos != wstring::npos) {
+        if (pos != std::wstring::npos) {
           if (IsScriptFunction(text.substr(i + 1, pos - (i + 1)))) {
             rich_edit_.SetSel(i, pos);
             rich_edit_.SetCharFormat(SCF_SELECTION, &cf);
@@ -166,7 +166,7 @@ void FormatDialog::ColorizeText() {
       case '%': {
         cf.crTextColor = RGB(0, 160, 0);
         size_t pos = text.find('%', i + 1);
-        if (pos != wstring::npos) {
+        if (pos != std::wstring::npos) {
           if (IsScriptVariable(text.substr(i + 1, pos - (i + 1)))) {
             rich_edit_.SetSel(i, pos + 1);
             rich_edit_.SetCharFormat(SCF_SELECTION, &cf);

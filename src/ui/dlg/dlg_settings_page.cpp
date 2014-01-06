@@ -147,7 +147,7 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Application > Interface
     case kSettingsPageAppInterface: {
-      vector<wstring> theme_list;
+      std::vector<std::wstring> theme_list;
       PopulateFolders(theme_list, taiga::GetPath(taiga::kPathTheme));
       if (theme_list.empty()) {
         EnableDlgItem(IDC_COMBO_THEME, FALSE);
@@ -414,7 +414,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
 
         // Add folders
         case IDC_BUTTON_ADDFOLDER: {
-          wstring path;
+          std::wstring path;
           if (BrowseForFolder(GetWindowHandle(), L"Please select a folder:", L"", path)) {
             win::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
             list.InsertItem(list.GetItemCount(), -1, ui::kIcon16_Folder, 0, nullptr, path.c_str(), 0);

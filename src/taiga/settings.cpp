@@ -315,7 +315,7 @@ void AppSettings::WriteValue(const xml_node& node_parent, AppSettingName name) {
 
 bool AppSettings::Load() {
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathSettings);
+  std::wstring path = taiga::GetPath(taiga::kPathSettings);
   xml_parse_result result = document.load_file(path.c_str());
 
   xml_node settings = document.child(L"settings");
@@ -346,7 +346,7 @@ bool AppSettings::Load() {
   // Media players
   xml_node node_players = settings.child(L"recognition").child(L"mediaplayers");
   foreach_xmlnode_(player, node_players, L"player") {
-    wstring name = player.attribute(L"name").value();
+    std::wstring name = player.attribute(L"name").value();
     bool enabled = player.attribute(L"enabled").as_bool();
     foreach_(it, MediaPlayers.items) {
       if (it->name == name) {
@@ -474,21 +474,21 @@ bool AppSettings::Save() {
               L"Software\\Microsoft\\Windows\\CurrentVersion\\Run",
               0, KEY_SET_VALUE);
   if (GetBool(kApp_Behavior_Autostart)) {
-    wstring app_path = Taiga.GetModulePath();
+    std::wstring app_path = Taiga.GetModulePath();
     reg.SetValue(TAIGA_APP_NAME, app_path.c_str());
   } else {
     reg.DeleteValue(TAIGA_APP_NAME);
   }
   reg.CloseKey();
 
-  wstring path = taiga::GetPath(taiga::kPathSettings);
+  std::wstring path = taiga::GetPath(taiga::kPathSettings);
   return XmlWriteDocumentToFile(document, path);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AppSettings::ApplyChanges(const wstring& previous_user,
-                               const wstring& previous_theme) {
+void AppSettings::ApplyChanges(const std::wstring& previous_user,
+                               const std::wstring& previous_theme) {
   if (GetWstr(kApp_Interface_Theme) != previous_theme) {
     ui::Theme.Load();
     ui::OnSettingsThemeChange();
@@ -517,14 +517,14 @@ void AppSettings::HandleCompatibility() {
 
 void AppSettings::RestoreDefaults() {
   // Take a backup
-  wstring file = taiga::GetPath(taiga::kPathSettings);
-  wstring backup = file + L".bak";
+  std::wstring file = taiga::GetPath(taiga::kPathSettings);
+  std::wstring backup = file + L".bak";
   DWORD flags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
   MoveFileEx(file.c_str(), backup.c_str(), flags);
   
   // Reload settings
-  wstring previous_user = GetCurrentUsername();
-  wstring previous_theme = GetWstr(kApp_Interface_Theme);
+  std::wstring previous_user = GetCurrentUsername();
+  std::wstring previous_theme = GetWstr(kApp_Interface_Theme);
   Load();
   ApplyChanges(previous_user, previous_theme);
 

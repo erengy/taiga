@@ -246,9 +246,9 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
       switch (pnmh->code) {
         case NM_CLICK: {
           // Set/change fansub group preference
-          vector<wstring> groups;
+          std::vector<std::wstring> groups;
           anime::GetFansubFilter(anime_id_, groups);
-          wstring text = Join(groups, L", ");
+          std::wstring text = Join(groups, L", ");
           InputDialog dlg;
           dlg.title = AnimeDatabase.FindItem(anime_id_)->GetTitle();
           dlg.info = L"Please enter your fansub group preference for this title:";
@@ -370,7 +370,7 @@ void PageMyInfo::RefreshFansubPreference() {
     return;
 
   std::wstring text;
-  std::vector<wstring> groups;
+  std::vector<std::wstring> groups;
 
   if (anime::GetFansubFilter(anime_id_, groups)) {
     foreach_(it, groups) {
@@ -397,7 +397,7 @@ bool PageMyInfo::Save() {
   // Episodes watched
   history_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
   if (!anime::IsValidEpisode(*history_item.episode, -1, anime_item->GetEpisodeCount())) {
-    wstring msg = L"Please enter a valid episode number between 0-" +
+    std::wstring msg = L"Please enter a valid episode number between 0-" +
                   ToWstr(anime_item->GetEpisodeCount()) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
     return false;

@@ -56,10 +56,10 @@
 
 // =============================================================================
 
-void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
+void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   LOG(LevelDebug, action);
   
-  wstring body;
+  std::wstring body;
   size_t pos = action.find('(');
   if (pos != action.npos) {
     body = action.substr(pos + 1, action.find_last_of(')') - (pos + 1));
@@ -90,7 +90,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
-      wstring title = anime_item->GetTitle();
+      std::wstring title = anime_item->GetTitle();
       EraseChars(title, L"_!?.,:;~+");
       Erase(title, L" -");
       Replace(body, L"%title%", title);
@@ -264,7 +264,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   // AddFolder()
   //   Opens up a dialog to add new root folder.
   } else if (action == L"AddFolder") {
-    wstring path;
+    std::wstring path;
     if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), L"Please select a folder:", L"", path)) {
       Settings.root_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
@@ -483,7 +483,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"EditTags") {
     int anime_id = static_cast<int>(lParam);
-    wstring tags;
+    std::wstring tags;
     if (ui::OnLibraryEntryEditTags(anime_id, tags)) {
       HistoryItem history_item;
       history_item.anime_id = anime_id;
@@ -499,7 +499,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"EditTitles") {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    wstring titles;
+    std::wstring titles;
     if (ui::OnLibraryEntryEditTitles(anime_id, titles)) {
       anime_item->SetUserSynonyms(titles);
       Meow.UpdateCleanTitles(anime_id);
@@ -518,7 +518,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     ui::ChangeStatusText(L"Searching for folder...");
     if (!anime::CheckFolder(*anime_item)) {
       if (ui::OnAnimeFolderNotFound()) {
-        wstring default_path, path;
+        std::wstring default_path, path;
         if (!Settings.root_folders.empty())
           default_path = Settings.root_folders.front();
         if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), L"Choose an anime folder", default_path, path)) {
@@ -538,7 +538,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"SetFolder") {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    wstring path, title = L"Anime title: " + anime_item->GetTitle();
+    std::wstring path, title = L"Anime title: " + anime_item->GetTitle();
     if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), title.c_str(), L"", path)) {
       anime_item->SetFolder(path);
       Settings.Save();
@@ -587,7 +587,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
       int total = anime_item->GetEpisodeCount();
       if (total == 0)
         total = anime_item->GetMyLastWatchedEpisode() + 1;
-      wstring path;
+      std::wstring path;
       srand(static_cast<unsigned int>(GetTickCount()));
       for (int i = 0; i < total; i++) {
         int episode_number = rand() % total + 1;

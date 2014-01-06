@@ -81,7 +81,7 @@ int Statistics::CalculateEpisodeCount() {
   return episode_count;
 }
 
-const wstring& Statistics::CalculateLifeSpentWatching() {
+const std::wstring& Statistics::CalculateLifeSpentWatching() {
   int duration = 0;
   int seconds = 0;
   
@@ -118,13 +118,13 @@ const wstring& Statistics::CalculateLifeSpentWatching() {
 }
 
 void Statistics::CalculateLocalData() {
-  vector<wstring> file_list;
+  std::vector<std::wstring> file_list;
 
   image_count = PopulateFiles(file_list, anime::GetImagePath());
   image_size = GetFolderSize(anime::GetImagePath(), false);
 
   file_list.clear();
-  wstring path = taiga::GetPath(taiga::kPathFeed);
+  std::wstring path = taiga::GetPath(taiga::kPathFeed);
   torrent_count = PopulateFiles(file_list, path, L"torrent", true);
 
   torrent_size = GetFolderSize(path, true);

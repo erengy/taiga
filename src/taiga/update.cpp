@@ -55,7 +55,7 @@ bool UpdateHelper::Check() {
   return true;
 }
 
-bool UpdateHelper::ParseData(wstring data) {
+bool UpdateHelper::ParseData(std::wstring data) {
   items_.clear();
   download_path_.clear();
   latest_guid_.clear();
@@ -150,18 +150,18 @@ bool UpdateHelper::RunInstaller() {
   // /S runs the installer silently, /D overrides the default installation
   // directory. Do not rely on the current directory here, as it isn't
   // guaranteed to be the same as the module path.
-  wstring parameters = L"/S /D=" + GetPathOnly(Taiga.GetModulePath());
+  std::wstring parameters = L"/S /D=" + GetPathOnly(Taiga.GetModulePath());
 
   restart_required_ = Execute(download_path_, parameters);
 
   return restart_required_;
 }
 
-void UpdateHelper::SetDownloadPath(const wstring& path) {
+void UpdateHelper::SetDownloadPath(const std::wstring& path) {
   download_path_ = path;
 }
 
-const GenericFeedItem* UpdateHelper::FindItem(const wstring& guid) const {
+const GenericFeedItem* UpdateHelper::FindItem(const std::wstring& guid) const {
   foreach_(item, items_)
     if (IsEqual(item->guid, latest_guid_))
       return &(*item);

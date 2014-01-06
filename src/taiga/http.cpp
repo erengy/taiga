@@ -63,8 +63,8 @@ void HttpClient::set_mode(HttpClientMode mode) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void HttpClient::OnError(DWORD error) {
-  wstring error_text = L"HTTP error #" + ToWstr(error) + L": " +
-                       FormatError(error, L"winhttp.dll");
+  std::wstring error_text = L"HTTP error #" + ToWstr(error) + L": " +
+                            FormatError(error, L"winhttp.dll");
   TrimRight(error_text, L"\r\n");
 
   LOG(LevelError, error_text);
@@ -87,7 +87,7 @@ bool HttpClient::OnRedirect(const std::wstring& address) {
 
   switch (mode()) {
     case kHttpTaigaUpdateDownload: {
-      wstring file = address.substr(address.find_last_of(L"/") + 1);
+      std::wstring file = address.substr(address.find_last_of(L"/") + 1);
       download_path_ = GetPathOnly(download_path_) + file;
       Taiga.Updater.SetDownloadPath(download_path_);
       break;
@@ -202,7 +202,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       Feed* feed = reinterpret_cast<Feed*>(response.parameter);
       if (feed) {
         FeedItem* feed_item = reinterpret_cast<FeedItem*>(&feed->items[feed->download_index]);
-        wstring app_path, cmd, file = feed_item->title;
+        std::wstring app_path, cmd, file = feed_item->title;
         ValidateFileName(file);
         file = feed->GetDataPath() + file + L".torrent";
         Aggregator.file_archive.push_back(feed_item->title);
@@ -217,14 +217,14 @@ void HttpManager::HandleResponse(HttpResponse& response) {
           }
           if (Settings.GetBool(kTorrent_Download_UseAnimeFolder) &&
               InStr(app_path, L"utorrent", 0, true) > -1) {
-            wstring download_path;
+            std::wstring download_path;
             if (Settings.GetBool(kTorrent_Download_FallbackOnFolder) &&
                 FolderExists(Settings[kTorrent_Download_Location])) {
               download_path = Settings[kTorrent_Download_Location];
             }
             auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
             if (anime_item) {
-              wstring anime_folder = anime_item->GetFolder();
+              std::wstring anime_folder = anime_item->GetFolder();
               if (!anime_folder.empty() && FolderExists(anime_folder)) {
                 download_path = anime_folder;
               } else if (Settings.GetBool(kTorrent_Download_CreateSubfolder) && !download_path.empty()) {

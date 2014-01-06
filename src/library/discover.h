@@ -38,7 +38,7 @@ public:
   void Review(bool hide_hentai = true);
 
   // Only IDs are stored here, actual info is kept in anime::Database.
-  vector<int> items;
+  std::vector<int> items;
   
   // Season name (e.g. "Spring 2012")
   std::wstring name;

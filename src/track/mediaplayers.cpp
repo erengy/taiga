@@ -48,7 +48,7 @@ BOOL MediaPlayers::Load() {
   index = -1;
   
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathMedia);
+  std::wstring path = taiga::GetPath(taiga::kPathMedia);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
@@ -126,7 +126,7 @@ int MediaPlayers::Check() {
   return -1;
 }
 
-void MediaPlayers::EditTitle(wstring& str, int player_index) {
+void MediaPlayers::EditTitle(std::wstring& str, int player_index) {
   if (str.empty() || items[player_index].edits.empty()) return;
   
   for (unsigned int i = 0; i < items[player_index].edits.size(); i++) {
@@ -148,10 +148,10 @@ void MediaPlayers::EditTitle(wstring& str, int player_index) {
   TrimRight(str, L" -");
 }
 
-wstring MediaPlayers::MediaPlayer::GetPath() {
+std::wstring MediaPlayers::MediaPlayer::GetPath() {
   for (size_t i = 0; i < folders.size(); i++) {
     for (size_t j = 0; j < files.size(); j++) {
-      wstring path = folders[i] + files[j];
+      std::wstring path = folders[i] + files[j];
       path = ExpandEnvironmentStrings(path);
       if (FileExists(path)) return path;
     }
@@ -159,7 +159,7 @@ wstring MediaPlayers::MediaPlayer::GetPath() {
   return L"";
 }
 
-wstring MediaPlayers::GetTitle(HWND hwnd, const wstring& class_name, int mode) {
+std::wstring MediaPlayers::GetTitle(HWND hwnd, const std::wstring& class_name, int mode) {
   switch (mode) {
     // File handle
     case MEDIA_MODE_FILEHANDLE:
@@ -211,8 +211,8 @@ void MediaPlayers::SetTitleChanged(bool title_changed) {
 #define IPC_GETPLAYLISTFILE  211
 #define IPC_GETPLAYLISTFILEW 214
 
-wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
-  vector<wstring> files_vector;
+std::wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
+  std::vector<std::wstring> files_vector;
   if (hwnd != NULL && process_id == 0) {
     GetWindowThreadProcessId(hwnd, &process_id);
   }
@@ -225,7 +225,7 @@ wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
         if (files_vector[i].at(1) == L':') {
           WCHAR buffer[4096] = {0};
           GetLongPathName(files_vector[i].c_str(), buffer, 4096);
-          return wstring(buffer);
+          return std::wstring(buffer);
         } else {
           return GetFileName(files_vector[i]);
         }
@@ -235,7 +235,7 @@ wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
   return L"";
 }
 
-wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
+std::wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
   if (IsWindow(hwnd)) {
     if (SendMessage(hwnd, WM_USER, 0, IPC_ISPLAYING)) {
       int list_index = SendMessage(hwnd, WM_USER, 0, IPC_GETLISTPOS);
@@ -265,7 +265,7 @@ wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
   return L"";
 }
 
-wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class_name) {
+std::wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const std::wstring& class_name) {
   // BS.Player
   if (class_name == BSP_CLASS) {
     if (IsWindow(hwnd)) {
@@ -296,10 +296,10 @@ wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class
   return L"";
 }
 
-wstring MediaPlayers::GetTitleFromMPlayer() {
+std::wstring MediaPlayers::GetTitleFromMPlayer() {
   HANDLE hProcessSnap;
   PROCESSENTRY32 pe32;
-  wstring title;
+  std::wstring title;
 
   hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
   if (hProcessSnap != INVALID_HANDLE_VALUE) {
@@ -344,8 +344,8 @@ enum WebBrowserEngines {
   WEBENGINE_PRESTO
 };
 
-base::AccessibleChild* FindAccessibleChild(vector<base::AccessibleChild>& children,
-                                           const wstring& name, const wstring& role) {
+base::AccessibleChild* FindAccessibleChild(std::vector<base::AccessibleChild>& children,
+                                           const std::wstring& name, const std::wstring& role) {
   base::AccessibleChild* child = nullptr;
   
   for (auto it = children.begin(); it != children.end(); ++it) {
@@ -366,7 +366,7 @@ base::AccessibleChild* FindAccessibleChild(vector<base::AccessibleChild>& childr
 }
 
 #ifdef _DEBUG
-void BuildTreeString(vector<base::AccessibleChild>& children, wstring& str, int indent) {
+void BuildTreeString(std::vector<base::AccessibleChild>& children, std::wstring& str, int indent) {
   for (auto it = children.begin(); it != children.end(); ++it) {
     str.append(indent * 4, L' ');
     str += L"[" + it->role + L"] " + it->name + L" = " + it->value + L"\n";
@@ -375,12 +375,12 @@ void BuildTreeString(vector<base::AccessibleChild>& children, wstring& str, int 
 }
 #endif
 
-wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
+std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   int stream_provider = STREAM_UNKNOWN;
   int web_engine = WEBENGINE_UNKNOWN;
 
   // Get window title
-  wstring title = GetWindowTitle(hwnd);
+  std::wstring title = GetWindowTitle(hwnd);
   EditTitle(title, index);
 
   // Return current title if the same web page is still open

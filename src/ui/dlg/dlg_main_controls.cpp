@@ -51,7 +51,7 @@ LRESULT MainDialog::MainTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
 }
 
 void MainDialog::MainTree::RefreshHistoryCounter() {
-  wstring text = L"History";
+  std::wstring text = L"History";
   int count = History.queue.GetItemCount();
   if (count > 0) text += L" (" + ToWstr(count) + L")";
   SetItem(hti.at(kSidebarItemHistory), text.c_str());
@@ -206,7 +206,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Search text
   if (HIWORD(wParam) == EN_CHANGE) {
     if (LOWORD(wParam) == IDC_EDIT_SEARCH) {
-      wstring text;
+      std::wstring text;
       edit.GetText(text);
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
       switch (navigation.GetCurrentPage()) {
@@ -336,7 +336,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   hook = SetWindowsHookEx(WH_MSGFILTER, &HookProc, NULL, GetCurrentThreadId());
 
   // Display menu
-  wstring action;
+  std::wstring action;
   HWND hwnd = DlgMain.GetWindowHandle();
   #define SHOWUIMENU(id, name) \
     case id: action = ui::Menus.Show(hwnd, pt.x, pt.y, name); break;

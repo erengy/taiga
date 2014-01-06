@@ -78,7 +78,7 @@ public:
   HANDLE GetCompletionPort() { return completion_port_; }
   void SetWindowHandle(HWND hwnd) { window_handle_ = hwnd; }
 
-  bool AddFolder(const wstring& folder);
+  bool AddFolder(const std::wstring& folder);
   bool ClearFolders();
   bool Start();
   bool Stop();

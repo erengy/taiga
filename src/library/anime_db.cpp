@@ -39,7 +39,7 @@ namespace anime {
 
 bool Database::LoadDatabase() {
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
   unsigned int options = pugi::parse_default & ~pugi::parse_eol;
   xml_parse_result parse_result = document.load_file(path.c_str(), options);
 
@@ -49,7 +49,7 @@ bool Database::LoadDatabase() {
   }
 
   xml_node meta_node = document.child(L"meta");
-  wstring meta_version = XmlReadStrValue(meta_node, L"version");
+  std::wstring meta_version = XmlReadStrValue(meta_node, L"version");
 
   xml_node database_node = document.child(L"database");
 
@@ -104,7 +104,7 @@ bool Database::SaveDatabase() {
       XmlWriteStrValue(anime_node, L"id", it->second.GetId(i).c_str());
 
     #define XML_WD(n, v) \
-      if (v) XmlWriteStrValue(anime_node, n, wstring(v).c_str())
+      if (v) XmlWriteStrValue(anime_node, n, std::wstring(v).c_str())
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
@@ -132,7 +132,7 @@ bool Database::SaveDatabase() {
     #undef XML_WD
   }
 
-  wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
   return XmlWriteDocumentToFile(document, path);
 }
 
@@ -289,7 +289,7 @@ bool Database::LoadList() {
     return false;
 
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathUserLibrary);
+  std::wstring path = taiga::GetPath(taiga::kPathUserLibrary);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok &&
@@ -300,7 +300,7 @@ bool Database::LoadList() {
   }
 
   xml_node meta_node = document.child(L"meta");
-  wstring meta_version = XmlReadStrValue(meta_node, L"version");
+  std::wstring meta_version = XmlReadStrValue(meta_node, L"version");
 
   xml_node node_library = document.child(L"library");
 
@@ -342,8 +342,8 @@ bool Database::SaveList() {
       xml_node node = node_library.append_child(L"anime");
       XmlWriteIntValue(node, L"id", item->GetId());
       XmlWriteIntValue(node, L"progress", item->GetMyLastWatchedEpisode(false));
-      XmlWriteStrValue(node, L"date_start", wstring(item->GetMyDateStart()).c_str());
-      XmlWriteStrValue(node, L"date_end", wstring(item->GetMyDateEnd()).c_str());
+      XmlWriteStrValue(node, L"date_start", std::wstring(item->GetMyDateStart()).c_str());
+      XmlWriteStrValue(node, L"date_end", std::wstring(item->GetMyDateEnd()).c_str());
       XmlWriteIntValue(node, L"score", item->GetMyScore(false));
       XmlWriteIntValue(node, L"status", item->GetMyStatus(false));
       XmlWriteIntValue(node, L"rewatching", item->GetMyRewatching(false));
@@ -353,7 +353,7 @@ bool Database::SaveList() {
     }
   }
 
-  wstring path = taiga::GetPath(taiga::kPathUserLibrary);
+  std::wstring path = taiga::GetPath(taiga::kPathUserLibrary);
   return XmlWriteDocumentToFile(document, path);
 }
 

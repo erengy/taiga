@@ -45,10 +45,10 @@ void Logger::Log(int severity_level, const std::wstring& file, int line,
   critical_section_.Enter();
 
   if (severity_level <= severity_level_) {
-    string output_text;
+    std::string output_text;
 
-    output_text += WstrToStr(wstring(GetDate()) + L" " + GetTime() + L" ");
-    output_text += "[" + string(SeverityLevels[severity_level]) + "] ";
+    output_text += WstrToStr(std::wstring(GetDate()) + L" " + GetTime() + L" ");
+    output_text += "[" + std::string(SeverityLevels[severity_level]) + "] ";
     output_text += WstrToStr(GetFileName(file) + L":" + ToWstr(line) + L" " + function + L" | ");
     output_text += WstrToStr(text + L"\r\n");
 

@@ -123,7 +123,7 @@ bool CheckEpisodes(Item& item, int number, bool check_folder) {
       item.SetNewEpisodePath(L"");
       number = item.GetEpisodeCount() == 1 ? 0 : item.GetMyLastWatchedEpisode() + 1;
     }
-    wstring file = SearchFileFolder(item, item.GetFolder(), number, false);
+    std::wstring file = SearchFileFolder(item, item.GetFolder(), number, false);
     return !file.empty();
   }
 }
@@ -138,7 +138,7 @@ bool CheckFolder(Item& item) {
 
   // Search root folders
   if (item.GetFolder().empty()) {
-    wstring new_folder;
+    std::wstring new_folder;
     foreach_(it, Settings.root_folders) {
       new_folder = SearchFileFolder(item, *it, 0, true);
       if (!new_folder.empty()) {
@@ -156,7 +156,7 @@ bool PlayEpisode(Item& item, int number) {
   if (number > item.GetEpisodeCount() && item.GetEpisodeCount() != 0)
     return false;
 
-  wstring file_path;
+  std::wstring file_path;
 
   SetSharedCursor(IDC_WAIT);
 
@@ -351,7 +351,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool GetFansubFilter(int anime_id, vector<wstring>& groups) {
+bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
   bool found = false;
   
   foreach_(i, Aggregator.filter_manager.filters) {
@@ -371,7 +371,7 @@ bool GetFansubFilter(int anime_id, vector<wstring>& groups) {
   return found;
 }
 
-bool SetFansubFilter(int anime_id, const wstring& group_name) {
+bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
   // Check existing filters
   foreach_(i, Aggregator.filter_manager.filters) {
     foreach_(j, i->anime_ids) {
@@ -404,13 +404,13 @@ bool SetFansubFilter(int anime_id, const wstring& group_name) {
   return true;
 }
 
-wstring GetImagePath(int anime_id) {
-  wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
+std::wstring GetImagePath(int anime_id) {
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
   if (anime_id > 0) path += ToWstr(anime_id) + L".jpg";
   return path;
 }
 
-void GetUpcomingTitles(vector<int>& anime_ids) {
+void GetUpcomingTitles(std::vector<int>& anime_ids) {
   foreach_c_(item, AnimeDatabase.items) {
     const anime::Item& anime_item = item->second;
     
@@ -427,7 +427,7 @@ void GetUpcomingTitles(vector<int>& anime_ids) {
   }
 }
 
-bool IsInsideRootFolders(const wstring& path) {
+bool IsInsideRootFolders(const std::wstring& path) {
   foreach_c_(root_folder, Settings.root_folders)
     if (StartsWith(path, *root_folder))
       return true;
@@ -501,7 +501,7 @@ int EstimateEpisodeCount(const Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-wstring TranslateMyStatus(int value, bool add_count) {
+std::wstring TranslateMyStatus(int value, bool add_count) {
   #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.GetItemCount(value)) + L")" : L"")
   switch (value) {
     case kNotInList: return L"Not in list";
@@ -515,11 +515,11 @@ wstring TranslateMyStatus(int value, bool add_count) {
   #undef ADD_COUNT
 }
 
-wstring TranslateNumber(int value, const wstring& default_char) {
+std::wstring TranslateNumber(int value, const std::wstring& default_char) {
   return value > 0 ? ToWstr(value) : default_char;
 }
 
-wstring TranslateStatus(int value) {
+std::wstring TranslateStatus(int value) {
   switch (value) {
     case kAiring: return L"Currently airing";
     case kFinishedAiring: return L"Finished airing";
@@ -528,7 +528,7 @@ wstring TranslateStatus(int value) {
   }
 }
 
-wstring TranslateType(int value) {
+std::wstring TranslateType(int value) {
   switch (value) {
     case kTv: return L"TV";
     case kOva: return L"OVA";

@@ -247,7 +247,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         // Draw second line of information
         rect.top += 20;
         COLORREF text_color = dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
-        wstring text = ToWstr(anime_item->GetMyLastWatchedEpisode()) + L"/" +
+        std::wstring text = ToWstr(anime_item->GetMyLastWatchedEpisode()) + L"/" +
                        ToWstr(anime_item->GetEpisodeCount());
         dc.DrawText(text.c_str(), -1, rect,
                     DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE);
@@ -817,7 +817,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   }
 
   // Draw text
-  wstring text;
+  std::wstring text;
   win::Rect rcText = *rc;
   COLORREF text_color = dc.GetTextColor();
   dc.SetBkMode(TRANSPARENT);
@@ -872,7 +872,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    wstring text = anime::TranslateNumber(anime_item.GetMyScore());
+    std::wstring text = anime::TranslateNumber(anime_item.GetMyScore());
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
@@ -1034,7 +1034,7 @@ void AnimeListDialog::RefreshList(int index) {
   listview.EnableGroupView(group_view);
 
   // Add items to list
-  vector<int> group_count(7);
+  std::vector<int> group_count(7);
   int group_index = -1;
   int icon_index = 0;
   int i = 0;
@@ -1067,7 +1067,7 @@ void AnimeListDialog::RefreshList(int index) {
   if (group_view) {
     for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
       if (i != anime::kUnknownMyStatus) {
-        wstring text = anime::TranslateMyStatus(i, false);
+        std::wstring text = anime::TranslateMyStatus(i, false);
         text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
         listview.SetGroupText(i, text.c_str());
       }

@@ -100,7 +100,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       }
       // Right click
       case NM_RCLICK: {
-        wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"HistoryList");
+        std::wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"HistoryList");
         if (action == L"Delete()") {
           RemoveItems();
         } else if (action == L"ClearHistory()") {
@@ -190,9 +190,9 @@ void HistoryDialog::RefreshList() {
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
     if (it->date_start)
-      AppendString(details, L"Start date: " + wstring(*it->date_start));
+      AppendString(details, L"Start date: " + std::wstring(*it->date_start));
     if (it->date_finish)
-      AppendString(details, L"Finish date: " + wstring(*it->date_finish));
+      AppendString(details, L"Finish date: " + std::wstring(*it->date_finish));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }
@@ -223,8 +223,8 @@ bool HistoryDialog::MoveItems(int pos) {
   }
 
   int index = -1;
-  vector<bool> item_selected(list_.GetItemCount());
-  vector<bool> item_selected_new(list_.GetItemCount());
+  std::vector<bool> item_selected(list_.GetItemCount());
+  std::vector<bool> item_selected_new(list_.GetItemCount());
   while ((index = list_.GetNextItem(index, LVNI_SELECTED)) > -1) {
     item_selected.at(index) = true;
   }

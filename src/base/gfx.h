@@ -31,7 +31,7 @@ public:
   Image();
   virtual ~Image() {}
 
-  bool Load(const wstring& file);
+  bool Load(const std::wstring& file);
 
   win::Dc dc;
   win::Rect rect;
@@ -45,7 +45,7 @@ int GetTextHeight(HDC hdc);
 BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, bool bVertical);
 BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, DWORD dwColor3);
 
-COLORREF HexToARGB(const wstring& text);
+COLORREF HexToARGB(const std::wstring& text);
 win::Rect ResizeRect(const win::Rect& rect_dest, int src_width, int src_height, bool stretch, bool center_x, bool center_y);
 int ScaleX(int value);
 int ScaleY(int value);

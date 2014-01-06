@@ -189,7 +189,7 @@ void SettingsDialog::OnOK() {
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_FOLDERS_ROOT));
     Settings.root_folders.clear();
     for (int i = 0; i < list.GetItemCount(); i++) {
-      wstring folder;
+      std::wstring folder;
       list.GetItemText(i, 0, folder);
       Settings.root_folders.push_back(folder);
     }

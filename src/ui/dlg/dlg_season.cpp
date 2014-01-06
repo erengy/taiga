@@ -546,8 +546,8 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   for (auto i = SeasonDatabase.items.begin(); i != SeasonDatabase.items.end(); ++i) {
     auto anime_item = AnimeDatabase.FindItem(*i);
     bool passed_filters = true;
-    wstring genres = Join(anime_item->GetGenres(), L", ");
-    wstring producers = Join(anime_item->GetProducers(), L", ");
+    std::wstring genres = Join(anime_item->GetGenres(), L", ");
+    std::wstring producers = Join(anime_item->GetProducers(), L", ");
     for (auto j = filters.begin(); passed_filters && j != filters.end(); ++j) {
       if (InStr(genres, *j, 0, true) == -1 &&
           InStr(producers, *j, 0, true) == -1 &&

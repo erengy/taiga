@@ -35,7 +35,7 @@ class Token {
 public:
   Token() : encloser('\0'), separator('\0'), virgin(true) {}
   wchar_t encloser, separator;
-  wstring content;
+  std::wstring content;
   bool virgin;
 };
 
@@ -141,7 +141,7 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   return true;
 }
 
-bool RecognitionEngine::CompareTitle(const wstring& anime_title, 
+bool RecognitionEngine::CompareTitle(const std::wstring& anime_title, 
                                      anime::Episode& episode, 
                                      const anime::Item& anime_item, 
                                      bool strict) {
@@ -176,8 +176,8 @@ std::multimap<int, int, std::greater<int>> RecognitionEngine::GetScores() {
 }
 
 bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::Item& anime_item) {
-  const wstring& episode_title = episode.clean_title;
-  const wstring& anime_title = clean_titles[anime_item.GetId()].front();
+  const std::wstring& episode_title = episode.clean_title;
+  const std::wstring& anime_title = clean_titles[anime_item.GetId()].front();
 
   const int score_bonus_small = 1;
   const int score_bonus_big = 5;
@@ -225,7 +225,7 @@ bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::I
 
 // =============================================================================
 
-bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode, 
+bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode, 
                                      bool examine_inside, bool examine_outside, bool examine_number,
                                      bool check_extras, bool check_extension) {
   // Clear previous data
@@ -249,14 +249,14 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
         return false;
 
   // Check and trim file extension
-  wstring extension = GetFileExtension(title);
+  std::wstring extension = GetFileExtension(title);
   if (!extension.empty() && extension.length() < title.length() && extension.length() <= 5) {
     if (IsAlphanumeric(extension) && CheckFileExtension(extension, valid_extensions)) {
       episode.format = ToUpper_Copy(extension);
       title.resize(title.length() - extension.length() - 1);
     } else {
       if (IsNumeric(extension)) {
-        wstring temp = title.substr(0, title.length() - extension.length());
+        std::wstring temp = title.substr(0, title.length() - extension.length());
         for (auto it = episode_keywords.begin(); it != episode_keywords.end(); ++it) {
           if (temp.length() >= it->length() && IsEqual(CharRight(temp, it->length()), *it)) {
             title.resize(title.length() - extension.length() - it->length() - 1);
@@ -281,7 +281,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
   //   keyword within is recognized and erased.
 
   // Tokenize
-  vector<Token> tokens;
+  std::vector<Token> tokens;
   tokens.reserve(4);
   TokenizeTitle(title, L"[](){}", tokens);
   if (tokens.empty()) return false;
@@ -330,7 +330,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
   // Now we apply some logic to decide on the title and the group name
 
   int group_index = -1, title_index = -1;
-  vector<int> group_vector, title_vector;
+  std::vector<int> group_vector, title_vector;
   for (unsigned int i = 0; i < tokens.size(); i++) {
     if (IsTokenEnclosed(tokens[i])) {
       group_vector.push_back(i);
@@ -417,7 +417,7 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
     // Check title
     if (episode.number.empty()) {
       // Split into words
-      vector<wstring> words;
+      std::vector<std::wstring> words;
       words.reserve(4);
       Tokenize(title, L" ", words);
       if (words.empty()) return false;
@@ -543,9 +543,9 @@ bool RecognitionEngine::ExamineTitle(wstring title, anime::Episode& episode,
 void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode, bool compare_extras) {
   // Split into words. The most common non-alphanumeric character is the 
   // separator.
-  vector<wstring> words;
+  std::vector<std::wstring> words;
   token.separator = GetMostCommonCharacter(token.content);
-  Split(token.content, wstring(1, token.separator), words);
+  Split(token.content, std::wstring(1, token.separator), words);
   
   // Revert if there are words that are too short. This prevents splitting some
   // group names (e.g. "m.3.3.w") and keywords (e.g. "H.264").
@@ -601,11 +601,11 @@ void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode, bool
 
 // Helper functions
 
-void RecognitionEngine::AppendKeyword(wstring& str, const wstring& keyword) {
+void RecognitionEngine::AppendKeyword(std::wstring& str, const std::wstring& keyword) {
   AppendString(str, keyword, L" ");
 }
 
-bool RecognitionEngine::CompareKeys(const wstring& str, const vector<wstring>& keys) {
+bool RecognitionEngine::CompareKeys(const std::wstring& str, const std::vector<std::wstring>& keys) {
   if (!str.empty())
     for (unsigned int i = 0; i < keys.size(); i++)
       if (IsEqual(str, keys[i]))
@@ -613,7 +613,7 @@ bool RecognitionEngine::CompareKeys(const wstring& str, const vector<wstring>& k
   return false;
 }
 
-void RecognitionEngine::CleanTitle(wstring& title) {
+void RecognitionEngine::CleanTitle(std::wstring& title) {
   if (title.empty()) return;
   EraseUnnecessary(title);
   TransliterateSpecial(title);
@@ -651,7 +651,7 @@ void RecognitionEngine::UpdateCleanTitles(int anime_id) {
   }
 }
 
-void RecognitionEngine::EraseUnnecessary(wstring& str) {
+void RecognitionEngine::EraseUnnecessary(std::wstring& str) {
   EraseLeft(str, L"the ", true);
   Replace(str, L" the ", L" ", false, true);
   Erase(str, L"episode ", true);
@@ -660,7 +660,7 @@ void RecognitionEngine::EraseUnnecessary(wstring& str) {
 }
 
 // TODO: make faster
-void RecognitionEngine::TransliterateSpecial(wstring& str) {
+void RecognitionEngine::TransliterateSpecial(std::wstring& str) {
   // Character equivalencies
   ReplaceChar(str, L'\u00E9', L'e'); // small e acute accent
   ReplaceChar(str, L'\uFF0F', L'/'); // unicode slash
@@ -684,7 +684,7 @@ void RecognitionEngine::TransliterateSpecial(wstring& str) {
   Replace(str, L" & ", L" and ", true, false);
 }
 
-bool RecognitionEngine::IsEpisodeFormat(const wstring& str, anime::Episode& episode, const wchar_t separator) {
+bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str, anime::Episode& episode, const wchar_t separator) {
   unsigned int numstart, i, j;
 
   // Find first number
@@ -765,11 +765,11 @@ bool RecognitionEngine::IsEpisodeFormat(const wstring& str, anime::Episode& epis
   return false;
 }
 
-bool RecognitionEngine::IsResolution(const wstring& str) {
+bool RecognitionEngine::IsResolution(const std::wstring& str) {
   return TranslateResolution(str, true) > 0;
 }
 
-bool RecognitionEngine::IsCountingWord(const wstring& str) {
+bool RecognitionEngine::IsCountingWord(const std::wstring& str) {
   if (str.length() > 2) {
     if (EndsWith(str, L"th") || EndsWith(str, L"nd") || EndsWith(str, L"rd") || EndsWith(str, L"st") ||
         EndsWith(str, L"TH") || EndsWith(str, L"ND") || EndsWith(str, L"RD") || EndsWith(str, L"ST")) {
@@ -790,24 +790,24 @@ bool RecognitionEngine::IsTokenEnclosed(const Token& token) {
   return token.encloser == '[' || token.encloser == '(' || token.encloser == '{';
 }
 
-void ReadStringTable(UINT uID, wstring& str) {
+void ReadStringTable(UINT uID, std::wstring& str) {
   wchar_t buffer[2048];
   LoadString(Taiga.GetInstanceHandle(), uID, buffer, 2048);
   str.append(buffer);
 }
 
-void RecognitionEngine::ReadKeyword(unsigned int id, vector<wstring>& str) {
-  wstring str_buff; 
+void RecognitionEngine::ReadKeyword(unsigned int id, std::vector<std::wstring>& str) {
+  std::wstring str_buff; 
   ReadStringTable(id, str_buff); 
   Split(str_buff, L", ", str);
 }
 
-size_t RecognitionEngine::TokenizeTitle(const wstring& str, const wstring& delimiters, vector<Token>& tokens) {
+size_t RecognitionEngine::TokenizeTitle(const std::wstring& str, const std::wstring& delimiters, std::vector<Token>& tokens) {
   size_t index_begin = str.find_first_not_of(delimiters);
-  while (index_begin != wstring::npos) {
+  while (index_begin != std::wstring::npos) {
     size_t index_end = str.find_first_of(delimiters, index_begin + 1);
     tokens.resize(tokens.size() + 1);
-    if (index_end == wstring::npos) {
+    if (index_end == std::wstring::npos) {
       tokens.back().content = str.substr(index_begin);
       break;
     } else {

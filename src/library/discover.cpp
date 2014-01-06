@@ -34,11 +34,11 @@ library::SeasonDatabase SeasonDatabase;
 
 namespace library {
 
-bool SeasonDatabase::Load(wstring file) {
+bool SeasonDatabase::Load(std::wstring file) {
   items.clear();
 
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + file;
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + file;
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok &&
@@ -112,13 +112,13 @@ void SeasonDatabase::Review(bool hide_hentai) {
         if (anime_start < date_start || anime_start > date_end)
           invalid = true;
       // TODO: Filter by rating instead if made possible in API
-      wstring genres = Join(anime_item->GetGenres(), L", ");
+      std::wstring genres = Join(anime_item->GetGenres(), L", ");
       if (hide_hentai && InStr(genres, L"Hentai", 0, true) > -1)
         invalid = true;
       if (invalid) {
         items.erase(items.begin() + i--);
         LOG(LevelDebug, L"Removed item: \"" + anime_item->GetTitle() +
-                        L"\" (" + wstring(anime_start) + L")");
+                        L"\" (" + std::wstring(anime_start) + L")");
       }
     }
   }
@@ -128,7 +128,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
     if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
       continue;
     // TODO: Filter by rating instead if made possible in API
-    wstring genres = Join(it->second.GetGenres(), L", ");
+    std::wstring genres = Join(it->second.GetGenres(), L", ");
     if (hide_hentai && InStr(genres, L"Hentai", 0, true) > -1)
       continue;
     // Airing date must be within the interval
@@ -137,7 +137,7 @@ void SeasonDatabase::Review(bool hide_hentai) {
         anime_start >= date_start && anime_start <= date_end) {
       items.push_back(it->second.GetId());
       LOG(LevelDebug, L"Added item: \"" + it->second.GetTitle() +
-                      L"\" (" + wstring(anime_start) + L")");
+                      L"\" (" + std::wstring(anime_start) + L")");
     }
   }
 }

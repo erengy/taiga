@@ -320,7 +320,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         // Search
         case VK_RETURN: {
           if (::GetFocus() == edit.GetWindowHandle()) {
-            wstring text;
+            std::wstring text;
             edit.GetText(text);
             if (text.empty()) break;
             switch (search_bar.mode) {
@@ -650,7 +650,7 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
           ChangeStatus(L"Watching: " + CurrentEpisode.title + 
             PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
           if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
-            wstring tip_text = ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode);
+            std::wstring tip_text = ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode);
             tip_text += L"\nClick here to view similar titles for this anime.";
             Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
             Taskbar.Tip(L"", L"", 0);
@@ -786,7 +786,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void MainDialog::ChangeStatus(wstring str) {
+void MainDialog::ChangeStatus(std::wstring str) {
   if (!str.empty()) str = L"  " + str;
   statusbar.SetText(str.c_str());
 }
@@ -854,7 +854,7 @@ void MainDialog::UpdateStatusTimer() {
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN && 
       seconds > 0 && seconds < Settings.GetInt(taiga::kSync_Update_Delay) &&
       IsUpdateAllowed(*AnimeDatabase.FindItem(CurrentEpisode.anime_id), CurrentEpisode, true)) {
-    wstring str = L"List update in " + ToTimeString(seconds);
+    std::wstring str = L"List update in " + ToTimeString(seconds);
     statusbar.SetPartText(1, str.c_str());
     statusbar.SetPartTipText(1, str.c_str());
 
@@ -868,7 +868,7 @@ void MainDialog::UpdateStatusTimer() {
 }
 
 void MainDialog::UpdateTip() {
-  wstring tip = TAIGA_APP_TITLE;
+  std::wstring tip = TAIGA_APP_TITLE;
 #ifdef _DEBUG
   tip += L" [debug]";
 #endif
@@ -883,7 +883,7 @@ void MainDialog::UpdateTip() {
 }
 
 void MainDialog::UpdateTitle() {
-  wstring title = TAIGA_APP_TITLE;
+  std::wstring title = TAIGA_APP_TITLE;
 #ifdef _DEBUG
   title += L" [debug]";
 #endif
@@ -922,7 +922,7 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   int previous_page = current_page_;
   current_page_ = page;
 
-  wstring cue_text, search_text;
+  std::wstring cue_text, search_text;
   switch (current_page_) {
     case kSidebarItemAnimeList:
     case kSidebarItemSeasons:

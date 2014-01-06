@@ -47,7 +47,7 @@ Feed::Feed()
       ticker(0) {
 }
 
-bool Feed::Check(const wstring& source, bool automatic) {
+bool Feed::Check(const std::wstring& source, bool automatic) {
   // Reset ticker before checking the source so we don't fall into a loop
   ticker = 0;
   if (source.empty()) return false;
@@ -93,7 +93,7 @@ bool Feed::Download(int index) {
   ui::ChangeStatusText(L"Downloading \"" + items[index].title + L"\"...");
   ui::EnableDialogInput(ui::kDialogTorrents, false);
   
-  wstring file = items[index].title + L".torrent";
+  std::wstring file = items[index].title + L".torrent";
   ValidateFileName(file);
   file = GetDataPath() + file;
 
@@ -146,8 +146,8 @@ bool Feed::ExamineData() {
   return Aggregator.filter_manager.IsItemDownloadAvailable(*this);
 }
 
-wstring Feed::GetDataPath() {
-  wstring path = taiga::GetPath(taiga::kPathFeed);
+std::wstring Feed::GetDataPath() {
+  std::wstring path = taiga::GetPath(taiga::kPathFeed);
 
   if (!link.empty()) {
     win::http::Url url(link);
@@ -159,7 +159,7 @@ wstring Feed::GetDataPath() {
 
 bool Feed::Load() {
   // Initialize
-  wstring file = GetDataPath() + L"feed.xml";
+  std::wstring file = GetDataPath() + L"feed.xml";
   items.clear();
 
   // Load XML file
@@ -233,7 +233,7 @@ bool Aggregator::Notify(const Feed& feed) {
   return ui::OnFeedNotify(feed);
 }
 
-bool Aggregator::SearchArchive(const wstring& file) {
+bool Aggregator::SearchArchive(const std::wstring& file) {
   for (size_t i = 0; i < file_archive.size(); i++)
     if (file_archive[i] == file)
       return true;
@@ -241,11 +241,11 @@ bool Aggregator::SearchArchive(const wstring& file) {
   return false;
 }
 
-void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
+void Aggregator::ParseDescription(FeedItem& feed_item, const std::wstring& source) {
   // AnimeSuki
   if (InStr(source, L"animesuki", 0, true) > -1) {
-    wstring size_str = L"Filesize: ";
-    vector<wstring> description_vector;
+    std::wstring size_str = L"Filesize: ";
+    std::vector<std::wstring> description_vector;
     Split(feed_item.description, L"\n", description_vector);
     if (description_vector.size() > 2) {
       feed_item.episode_data.file_size = description_vector[2].substr(size_str.length());
@@ -272,8 +272,8 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
 
   // TokyoTosho
   } else if (InStr(source, L"tokyotosho", 0, true) > -1) {
-    wstring size_str = L"Size: ", comment_str = L"Comment: ";
-    vector<wstring> description_vector;
+    std::wstring size_str = L"Size: ", comment_str = L"Comment: ";
+    std::vector<std::wstring> description_vector;
     Split(feed_item.description, L"\n", description_vector);
     feed_item.description.clear();
     for (auto it = description_vector.begin(); it != description_vector.end(); ++it) {
@@ -295,7 +295,7 @@ void Aggregator::ParseDescription(FeedItem& feed_item, const wstring& source) {
 
 bool Aggregator::LoadArchive() {
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathFeedHistory);
+  std::wstring path = taiga::GetPath(taiga::kPathFeedHistory);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok)
@@ -328,7 +328,7 @@ bool Aggregator::SaveArchive() {
     }
   }
 
-  wstring path = taiga::GetPath(taiga::kPathFeedHistory);
+  std::wstring path = taiga::GetPath(taiga::kPathFeedHistory);
   return XmlWriteDocumentToFile(document, path);
 }
 

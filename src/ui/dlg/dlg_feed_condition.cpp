@@ -244,8 +244,8 @@ void FeedConditionDialog::ChooseElement(int element_index) {
     case FEED_FILTER_ELEMENT_META_ID:
     case FEED_FILTER_ELEMENT_EPISODE_TITLE: {
       RECREATE_COMBO((element_index == FEED_FILTER_ELEMENT_META_ID ? CBS_DROPDOWNLIST : CBS_DROPDOWN));
-      typedef std::pair<int, wstring> anime_pair;
-      vector<anime_pair> title_list;
+      typedef std::pair<int, std::wstring> anime_pair;
+      std::vector<anime_pair> title_list;
       for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
         switch (it->second.GetMyStatus()) {
           case anime::kNotInList:
@@ -271,7 +271,7 @@ void FeedConditionDialog::ChooseElement(int element_index) {
     case FEED_FILTER_ELEMENT_META_DATE_START:
     case FEED_FILTER_ELEMENT_META_DATE_END:
       RECREATE_COMBO(CBS_DROPDOWN);
-      value_combo_.AddString(static_cast<wstring>(GetDate()).c_str());
+      value_combo_.AddString(static_cast<std::wstring>(GetDate()).c_str());
       value_combo_.SetCueBannerText(L"YYYY-MM-DD");
       break;
     case FEED_FILTER_ELEMENT_META_STATUS:

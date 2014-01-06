@@ -116,7 +116,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
           }
           if (!add_new_item) {
             it->mode = taiga::kHttpServiceUpdateLibraryEntry;
-            it->time = (wstring)GetDate() + L" " + GetTime();
+            it->time = (std::wstring)GetDate() + L" " + GetTime();
           }
           break;
         }
@@ -125,7 +125,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
   }
   // ...or add a new one
   if (add_new_item) {
-    if (item.time.empty()) item.time = (wstring)GetDate() + L" " + GetTime();
+    if (item.time.empty()) item.time = (std::wstring)GetDate() + L" " + GetTime();
     items.push_back(item);
   }
 
@@ -330,7 +330,7 @@ bool History::Load() {
   queue.items.clear();
 
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathUserHistory);
+  std::wstring path = taiga::GetPath(taiga::kPathUserHistory);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok)
@@ -376,7 +376,7 @@ bool History::Load() {
 
 bool History::Save() {
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathUserHistory);
+  std::wstring path = taiga::GetPath(taiga::kPathUserHistory);
   xml_node node_history = document.append_child(L"history");
 
   // Write items
@@ -396,7 +396,7 @@ bool History::Save() {
     #define APPEND_ATTRIBUTE_STR(x, y) \
         if (y) node_item.append_attribute(x) = (*y).c_str();
     #define APPEND_ATTRIBUTE_DATE(x, y) \
-        if (y) node_item.append_attribute(x) = wstring(*y).c_str();
+        if (y) node_item.append_attribute(x) = std::wstring(*y).c_str();
     node_item.append_attribute(L"anime_id") = it->anime_id;
     node_item.append_attribute(L"mode") = it->mode;
     node_item.append_attribute(L"time") = it->time.c_str();

@@ -32,19 +32,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HANDLE OpenFileForGenericRead(const wstring& path) {
+HANDLE OpenFileForGenericRead(const std::wstring& path) {
   return ::CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
                       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 }
 
-HANDLE OpenFileForGenericWrite(const wstring& path) {
+HANDLE OpenFileForGenericWrite(const std::wstring& path) {
   return ::CreateFile(path.c_str(), GENERIC_WRITE, 0, nullptr,
                       CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned long GetFileAge(const wstring& path) {
+unsigned long GetFileAge(const std::wstring& path) {
   HANDLE file_handle = OpenFileForGenericRead(path);
 
   if (file_handle == INVALID_HANDLE_VALUE)
@@ -77,7 +77,7 @@ unsigned long GetFileAge(const wstring& path) {
       (ul_now.QuadPart - ul_file.QuadPart) / 10000000);
 }
 
-QWORD GetFileSize(const wstring& path) {
+QWORD GetFileSize(const std::wstring& path) {
   QWORD file_size = 0;
 
   HANDLE file_handle = OpenFileForGenericRead(path);
@@ -93,11 +93,11 @@ QWORD GetFileSize(const wstring& path) {
   return file_size;
 }
 
-QWORD GetFolderSize(const wstring& path, bool recursive) {
+QWORD GetFolderSize(const std::wstring& path, bool recursive) {
   QWORD folder_size = 0;
   
   WIN32_FIND_DATA wfd;
-  wstring file_name = path + L"*.*";
+  std::wstring file_name = path + L"*.*";
   HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
 
   if (file_handle == INVALID_HANDLE_VALUE)
@@ -124,7 +124,7 @@ QWORD GetFolderSize(const wstring& path, bool recursive) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Execute(const wstring& path, const wstring& parameters) {
+bool Execute(const std::wstring& path, const std::wstring& parameters) {
   if (path.empty())
     return false;
 
@@ -134,7 +134,7 @@ bool Execute(const wstring& path, const wstring& parameters) {
   return reinterpret_cast<int>(value) > 32;
 }
 
-BOOL ExecuteEx(const wstring& path, const wstring& parameters) {
+BOOL ExecuteEx(const std::wstring& path, const std::wstring& parameters) {
   SHELLEXECUTEINFO si = {0};
   si.cbSize = sizeof(SHELLEXECUTEINFO);
   si.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI | SEE_MASK_UNICODE;
@@ -146,13 +146,14 @@ BOOL ExecuteEx(const wstring& path, const wstring& parameters) {
   return ShellExecuteEx(&si);
 }
 
-void ExecuteLink(const wstring& link) {
+void ExecuteLink(const std::wstring& link) {
   ShellExecute(nullptr, nullptr, link.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter) {
+std::wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle,
+                           LPCWSTR lpstrFilter) {
   if (!lpstrFilter)
     lpstrFilter = L"All files (*.*)\0*.*\0";
 
@@ -168,14 +169,16 @@ wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter) {
   ofn.Flags = OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST;
   
   if (GetOpenFileName(&ofn)) {
-    return wstring(szFile);
+    return std::wstring(szFile);
   } else {
-    return wstring();
+    return std::wstring();
   }
 }
 
-bool BrowseForFolderVista(HWND hwnd, const wstring& title,
-                          const wstring& default_folder, wstring& output) {
+bool BrowseForFolderVista(HWND hwnd,
+                          const std::wstring& title,
+                          const std::wstring& default_folder,
+                          std::wstring& output) {
   IFileDialog* pFileDialog;
   bool result = false;
 
@@ -250,8 +253,8 @@ static int CALLBACK BrowseForFolderXpProc(HWND hwnd, UINT uMsg, LPARAM lParam,
   return 0;
 }
 
-bool BrowseForFolderXp(HWND hwnd, const wstring& title,
-                       const wstring& default_path, wstring& output) {
+bool BrowseForFolderXp(HWND hwnd, const std::wstring& title,
+                       const std::wstring& default_path, std::wstring& output) {
   BROWSEINFO bi = {0};
   bi.hwndOwner = hwnd;
   bi.ulFlags = BIF_NEWDIALOGSTYLE | BIF_NONEWFOLDERBUTTON;
@@ -277,8 +280,8 @@ bool BrowseForFolderXp(HWND hwnd, const wstring& title,
   return !output.empty();
 }
 
-BOOL BrowseForFolder(HWND hwnd, const wstring& title,
-                     const wstring& default_path, wstring& output) {
+BOOL BrowseForFolder(HWND hwnd, const std::wstring& title,
+                     const std::wstring& default_path, std::wstring& output) {
   if (win::GetVersion() >= win::kVersionVista) {
     return BrowseForFolderVista(hwnd, title, default_path, output);
   } else {
@@ -288,11 +291,11 @@ BOOL BrowseForFolder(HWND hwnd, const wstring& title,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool CreateFolder(const wstring& path) {
+bool CreateFolder(const std::wstring& path) {
   return SHCreateDirectoryEx(nullptr, path.c_str(), nullptr) == ERROR_SUCCESS;
 }
 
-int DeleteFolder(wstring path) {
+int DeleteFolder(std::wstring path) {
   if (path.back() == '\\')
     path.pop_back();
 
@@ -308,7 +311,7 @@ int DeleteFolder(wstring path) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool FileExists(const wstring& file) {
+bool FileExists(const std::wstring& file) {
   if (file.empty())
     return false;
 
@@ -322,24 +325,24 @@ bool FileExists(const wstring& file) {
   return false;
 }
 
-bool FolderExists(const wstring& path) {
+bool FolderExists(const std::wstring& path) {
   DWORD file_attr = GetFileAttributes(path.c_str());
 
   return (file_attr != INVALID_FILE_ATTRIBUTES) &&
          (file_attr & FILE_ATTRIBUTE_DIRECTORY);
 }
 
-bool PathExists(const wstring& path) {
+bool PathExists(const std::wstring& path) {
   return GetFileAttributes(path.c_str()) != INVALID_FILE_ATTRIBUTES;
 }
 
-void ValidateFileName(wstring& file) {
+void ValidateFileName(std::wstring& file) {
   EraseChars(file, L"\\/:*?<>|");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-wstring ExpandEnvironmentStrings(const wstring& path) {
+std::wstring ExpandEnvironmentStrings(const std::wstring& path) {
   WCHAR buff[MAX_PATH];
 
   if (::ExpandEnvironmentStrings(path.c_str(), buff, MAX_PATH))
@@ -348,12 +351,12 @@ wstring ExpandEnvironmentStrings(const wstring& path) {
   return path;
 }
 
-wstring GetDefaultAppPath(const wstring& extension,
-                          const wstring& default_value) {
+std::wstring GetDefaultAppPath(const std::wstring& extension,
+                          const std::wstring& default_value) {
   win::Registry reg;
   reg.OpenKey(HKEY_CLASSES_ROOT, extension, 0, KEY_QUERY_VALUE);
 
-  wstring path = reg.QueryValue(L"");
+  std::wstring path = reg.QueryValue(L"");
 
   if (!path.empty()) {
     path += L"\\shell\\open\\command";
@@ -371,15 +374,15 @@ wstring GetDefaultAppPath(const wstring& extension,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned int PopulateFiles(vector<wstring>& file_list,
-                           const wstring& path,
-                           const wstring& extension,
+unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
+                           const std::wstring& path,
+                           const std::wstring& extension,
                            bool recursive, bool trim_extension) {
   if (path.empty())
     return 0;
 
   WIN32_FIND_DATA wfd;
-  wstring file_name = path + L"*.*";
+  std::wstring file_name = path + L"*.*";
   HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
 
   if (file_handle == INVALID_HANDLE_VALUE)
@@ -414,12 +417,13 @@ unsigned int PopulateFiles(vector<wstring>& file_list,
   return file_count;
 }
 
-int PopulateFolders(vector<wstring>& folder_list, const wstring& path) {
+int PopulateFolders(std::vector<std::wstring>& folder_list,
+                    const std::wstring& path) {
   if (path.empty())
     return 0;
 
   WIN32_FIND_DATA wfd;
-  wstring file_name = path + L"*.*";
+  std::wstring file_name = path + L"*.*";
   HANDLE file_handle = FindFirstFile(path.c_str(), &wfd);
 
   if (file_handle == INVALID_HANDLE_VALUE)
@@ -468,7 +472,7 @@ bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
 
   // Take a backup if needed
   if (take_backup) {
-    wstring new_path = path + L".bak";
+    std::wstring new_path = path + L".bak";
     MoveFileEx(path.c_str(), new_path.c_str(),
                MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH);
   }
@@ -488,8 +492,8 @@ bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-wstring ToSizeString(QWORD qwSize) {
-  wstring size, unit;
+std::wstring ToSizeString(QWORD qwSize) {
+  std::wstring size, unit;
 
   if (qwSize > 1073741824) {      // 2^30
     size = ToWstr(static_cast<double>(qwSize) / 1073741824, 2);

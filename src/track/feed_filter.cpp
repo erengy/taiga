@@ -31,7 +31,7 @@
 
 bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& item) {
   bool is_numeric = false;
-  wstring element, value = ReplaceVariables(condition.value, item.episode_data);
+  std::wstring element, value = ReplaceVariables(condition.value, item.episode_data);
   auto anime = AnimeDatabase.FindItem(item.episode_data.anime_id);
 
   switch (condition.element) {
@@ -210,7 +210,7 @@ FeedFilter& FeedFilter::operator=(const FeedFilter& filter) {
   return *this;
 }
 
-void FeedFilter::AddCondition(int element, int op, const wstring& value) {
+void FeedFilter::AddCondition(int element, int op, const std::wstring& value) {
   conditions.resize(conditions.size() + 1);
   conditions.back().element = element;
   conditions.back().op = op;
@@ -333,7 +333,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   }
 
 #ifdef _DEBUG
-  wstring filter_text =
+  std::wstring filter_text =
       (item.state == FEEDITEM_DISCARDED ? L"!FILTER :: " : L"FILTER :: ") +
       Aggregator.filter_manager.TranslateConditions(*this, condition_index);
   item.description = filter_text + L" -- " + item.description;
@@ -369,7 +369,7 @@ void FeedFilterManager::AddPresets() {
   }
 }
 
-void FeedFilterManager::AddFilter(int action, int match, bool enabled, const wstring& name) {
+void FeedFilterManager::AddFilter(int action, int match, bool enabled, const std::wstring& name) {
   filters.resize(filters.size() + 1);
   filters.back().action = action;
   filters.back().enabled = enabled;
@@ -413,7 +413,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       if (found) {
         item->state = FEEDITEM_DISCARDED;
 #ifdef _DEBUG
-        wstring filter_text = L"!FILTER :: Archived";
+        std::wstring filter_text = L"!FILTER :: Archived";
         item->description = filter_text + L" -- " + item->description;
 #endif
       }
@@ -555,19 +555,19 @@ void FeedFilterManager::InitializeShortcodes() {
   operator_shortcodes_[FEED_FILTER_OPERATOR_NOTCONTAINS] = L"notcontains";
 }
 
-wstring FeedFilterManager::CreateNameFromConditions(const FeedFilter& filter) {
+std::wstring FeedFilterManager::CreateNameFromConditions(const FeedFilter& filter) {
   // TODO
   return L"New Filter";
 }
 
-wstring FeedFilterManager::TranslateCondition(const FeedFilterCondition& condition) {
+std::wstring FeedFilterManager::TranslateCondition(const FeedFilterCondition& condition) {
   return TranslateElement(condition.element) + L" " + 
          TranslateOperator(condition.op) + L" \"" + 
          TranslateValue(condition) + L"\"";
 }
 
-wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, size_t index) {
-  wstring str;
+std::wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, size_t index) {
+  std::wstring str;
   
   size_t max_index = (filter.match == FEED_FILTER_MATCH_ALL) ?
       filter.conditions.size() : index + 1;
@@ -580,7 +580,7 @@ wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, size_t 
   return str;
 }
 
-wstring FeedFilterManager::TranslateElement(int element) {
+std::wstring FeedFilterManager::TranslateElement(int element) {
   switch (element) {
     case FEED_FILTER_ELEMENT_FILE_TITLE:
       return L"File name";
@@ -623,7 +623,7 @@ wstring FeedFilterManager::TranslateElement(int element) {
   }
 }
 
-wstring FeedFilterManager::TranslateOperator(int op) {
+std::wstring FeedFilterManager::TranslateOperator(int op) {
   switch (op) {
     case FEED_FILTER_OPERATOR_EQUALS:
       return L"is";
@@ -650,7 +650,7 @@ wstring FeedFilterManager::TranslateOperator(int op) {
   }
 }
 
-wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) {
+std::wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) {
   switch (condition.element) {
     case FEED_FILTER_ELEMENT_META_ID: {
       if (condition.value.empty()) {
@@ -675,7 +675,7 @@ wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) 
   }
 }
 
-wstring FeedFilterManager::TranslateMatching(int match) {
+std::wstring FeedFilterManager::TranslateMatching(int match) {
   switch (match) {
     case FEED_FILTER_MATCH_ALL:
       return L"All conditions";
@@ -686,7 +686,7 @@ wstring FeedFilterManager::TranslateMatching(int match) {
   }
 }
 
-wstring FeedFilterManager::TranslateAction(int action) {
+std::wstring FeedFilterManager::TranslateAction(int action) {
   switch (action) {
     case FEED_FILTER_ACTION_DISCARD:
       return L"Discard matched items";
@@ -699,7 +699,7 @@ wstring FeedFilterManager::TranslateAction(int action) {
   }
 }
 
-wstring FeedFilterManager::GetShortcodeFromIndex(FeedFilterShortcodeType type,
+std::wstring FeedFilterManager::GetShortcodeFromIndex(FeedFilterShortcodeType type,
                                                  int index) {
   switch (type) {
     case FEED_FILTER_SHORTCODE_ACTION:
@@ -712,12 +712,12 @@ wstring FeedFilterManager::GetShortcodeFromIndex(FeedFilterShortcodeType type,
       return operator_shortcodes_[index];
   }
 
-  return wstring();
+  return std::wstring();
 }
 
 int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
-                                             const wstring& shortcode) {
-  std::map<int, wstring>* shortcodes = nullptr;
+                                             const std::wstring& shortcode) {
+  std::map<int, std::wstring>* shortcodes = nullptr;
   switch (type) {
     case FEED_FILTER_SHORTCODE_ACTION:
       shortcodes = &action_shortcodes_;

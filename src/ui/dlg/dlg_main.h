@@ -75,7 +75,7 @@ public:
   BOOL PreTranslateMessage(MSG* pMsg);
 
 public:
-  void ChangeStatus(wstring str = L"");
+  void ChangeStatus(std::wstring str = L"");
   void EnableInput(bool enable = true);
   void UpdateControlPositions(const SIZE* size = nullptr);
   void UpdateStatusTimer();
@@ -94,7 +94,7 @@ public:
   private:
     int current_page_;
     int index_;
-    vector<int> items_;
+    std::vector<int> items_;
   } navigation;
 
 private:
@@ -118,7 +118,7 @@ public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     BOOL IsVisible();
     void RefreshHistoryCounter();
-    vector<HTREEITEM> hti;
+    std::vector<HTREEITEM> hti;
   } treeview;
 
   // Edit control

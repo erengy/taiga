@@ -23,7 +23,7 @@
 
 // =============================================================================
 
-int GetEpisodeHigh(const wstring& episode_number) {
+int GetEpisodeHigh(const std::wstring& episode_number) {
   int value = 1, pos = InStrRev(episode_number, L"-", episode_number.length());
   if (pos == episode_number.length() - 1) {
     value = ToInt(episode_number.substr(0, pos));
@@ -35,21 +35,21 @@ int GetEpisodeHigh(const wstring& episode_number) {
   return value;
 }
 
-int GetEpisodeLow(const wstring& episode_number) {
+int GetEpisodeLow(const std::wstring& episode_number) {
   return ToInt(episode_number); // ToInt() stops at -
 }
 
-void SplitEpisodeNumbers(const wstring& input, vector<int>& output) {
+void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output) {
   if (input.empty()) return;
-  vector<wstring> numbers;
+  std::vector<std::wstring> numbers;
   Split(input, L"-", numbers);
   for (auto it = numbers.begin(); it != numbers.end(); ++it) {
     output.push_back(ToInt(*it));
   }
 }
 
-wstring JoinEpisodeNumbers(const vector<int>& input) {
-  wstring output;
+std::wstring JoinEpisodeNumbers(const std::vector<int>& input) {
+  std::wstring output;
   for (auto it = input.begin(); it != input.end(); ++it) {
     if (!output.empty()) output += L"-";
     output += ToWstr(*it);
@@ -57,7 +57,7 @@ wstring JoinEpisodeNumbers(const vector<int>& input) {
   return output;
 }
 
-int TranslateResolution(const wstring& str, bool return_validity) {
+int TranslateResolution(const std::wstring& str, bool return_validity) {
   // *###x###*
   if (str.length() > 6) {
     int pos = InStr(str, L"x", 0);
@@ -100,7 +100,7 @@ int StatusToIcon(int status) {
 
 // =============================================================================
 
-wstring FormatError(DWORD dwError, LPCWSTR lpSource) {
+std::wstring FormatError(DWORD dwError, LPCWSTR lpSource) {
   DWORD dwFlags = FORMAT_MESSAGE_IGNORE_INSERTS;
   HMODULE hInstance = NULL;
   const DWORD size = 101;

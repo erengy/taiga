@@ -53,7 +53,7 @@ void Api::Announce(anime::Episode& episode) {
       continue;
     }
 
-    string str = WstrToStr(ReplaceVariables(it->second, episode));
+    std::string str = WstrToStr(ReplaceVariables(it->second, episode));
     const char* format = str.c_str();
     
     COPYDATASTRUCT cds;
@@ -118,7 +118,7 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg,
   // Set announcement format
   if (uMsg == WM_COPYDATA) {
     auto cds = reinterpret_cast<COPYDATASTRUCT*>(lParam);
-    string format = reinterpret_cast<char*>(cds->lpData);
+    std::string format = reinterpret_cast<char*>(cds->lpData);
     TaigaApi.handles[hwnd_app] = StrToWstr(format);
     LOG(LevelDebug, L"New format for " +
                     ToWstr(reinterpret_cast<int>(hwnd_app)) +

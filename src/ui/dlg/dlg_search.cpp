@@ -133,7 +133,7 @@ void SearchDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 // =============================================================================
 
-void SearchDialog::ParseResults(const vector<int>& ids) {
+void SearchDialog::ParseResults(const std::vector<int>& ids) {
   if (!IsWindow())
     return;
 
@@ -194,7 +194,7 @@ void SearchDialog::RefreshList() {
   list_.Show(SW_SHOW);
 }
 
-bool SearchDialog::Search(const wstring& title) {
+bool SearchDialog::Search(const std::wstring& title) {
   anime_ids_.clear();
   search_text = title;
   filters_.text = title;

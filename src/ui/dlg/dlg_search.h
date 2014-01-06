@@ -39,9 +39,9 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
   void AddAnimeToList(int anime_id);
-  void ParseResults(const vector<int>& ids);
+  void ParseResults(const std::vector<int>& ids);
   void RefreshList();
-  bool Search(const wstring& title);
+  bool Search(const std::wstring& title);
 
   std::wstring search_text;
 
