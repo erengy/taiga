@@ -75,11 +75,9 @@ BOOL AnimeListDialog::OnInitDialog() {
 
   // Insert tabs and list groups
   listview.InsertGroup(anime::kNotInList, anime::TranslateMyStatus(anime::kNotInList, false).c_str());
-  for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++) {
-    if (i != anime::kUnknownMyStatus) {
-      tab.InsertItem(i - 1, anime::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
-      listview.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str());
-    }
+  for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++) {
+    tab.InsertItem(i - 1, anime::TranslateMyStatus(i, true).c_str(), (LPARAM)i);
+    listview.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str());
   }
 
   // Track mouse leave event for the list view
@@ -1034,7 +1032,7 @@ void AnimeListDialog::RefreshList(int index) {
   listview.EnableGroupView(group_view);
 
   // Add items to list
-  std::vector<int> group_count(7);
+  std::vector<int> group_count(anime::kMyStatusLast);
   int group_index = -1;
   int icon_index = 0;
   int i = 0;
@@ -1065,12 +1063,10 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Set group headers
   if (group_view) {
-    for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
-      if (i != anime::kUnknownMyStatus) {
-        std::wstring text = anime::TranslateMyStatus(i, false);
-        text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
-        listview.SetGroupText(i, text.c_str());
-      }
+    for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++) {
+      std::wstring text = anime::TranslateMyStatus(i, false);
+      text += group_count.at(i) > 0 ? L" (" + ToWstr(group_count.at(i)) + L")" : L"";
+      listview.SetGroupText(i, text.c_str());
     }
   }
 
@@ -1106,17 +1102,14 @@ void AnimeListDialog::RefreshTabs(int index) {
   tab.Hide();
 
   // Refresh text
-  for (int i = 1; i <= 6; i++)
-    if (i != 5)
-      tab.SetItemText(i == 6 ? 4 : i - 1, anime::TranslateMyStatus(i, true).c_str());
+  for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
+    tab.SetItemText(i - 1, anime::TranslateMyStatus(i, true).c_str());
 
   // Select related tab
   bool group_view = !DlgMain.search_bar.filters.text.empty();
   int tab_index = current_status_;
   if (group_view) {
     tab_index = -1;
-  } else if (tab_index == 6) {
-    tab_index = 4;
   } else {
     tab_index--;
   }

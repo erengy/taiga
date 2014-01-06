@@ -90,8 +90,6 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
       it->def = false;
     }
     int item_index = anime_item->GetMyStatus();
-    if (item_index == anime::kPlanToWatch)
-      item_index--;
     if (item_index - 1 < static_cast<int>(menu->items.size())) {
       menu->items[item_index - 1].checked = true;
       menu->items[item_index - 1].def = true;

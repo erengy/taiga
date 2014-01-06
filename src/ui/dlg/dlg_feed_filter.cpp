@@ -553,10 +553,9 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
   anime_list.InsertColumn(0, 0, 0, 0, L"Title");
 
   // Insert list groups
-  for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++)
-    if (i != anime::kUnknownMyStatus)
-      anime_list.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(),
-                             true, i != anime::kWatching);
+  for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
+    anime_list.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(),
+                           true, i != anime::kWatching);
 
   // Add anime to list
   int list_index = 0;

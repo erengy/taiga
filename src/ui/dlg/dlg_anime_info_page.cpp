@@ -287,13 +287,9 @@ void PageMyInfo::Refresh(int anime_id) {
   // Status
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
   if (combobox.GetCount() == 0)
-    for (int i = anime::kWatching; i <= anime::kPlanToWatch; i++)
-      if (i != anime::kUnknownMyStatus)
-        combobox.AddItem(anime::TranslateMyStatus(i, false).c_str(), i);
-  int status = anime_item->GetMyStatus();
-  if (status == anime::kPlanToWatch)
-    status--;
-  combobox.SetCurSel(status - 1);
+    for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
+      combobox.AddItem(anime::TranslateMyStatus(i, false).c_str(), i);
+  combobox.SetCurSel(anime_item->GetMyStatus() - 1);
   combobox.Enable(!anime_item->GetMyRewatching());
   combobox.SetWindowHandle(nullptr);
 
@@ -411,8 +407,6 @@ bool PageMyInfo::Save() {
 
   // Status
   history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
-  if (*history_item.status == anime::kUnknownMyStatus)
-    history_item.status = *history_item.status + 1;
 
   // Tags
   history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);

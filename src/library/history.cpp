@@ -62,7 +62,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
       if (anime->GetMyScore() == *item.score || *item.score < 0 || *item.score > 10)
         item.score.Reset();
     if (item.status)
-      if (anime->GetMyStatus() == *item.status || *item.status < 1 || *item.status == 5 || *item.status > 6)
+      if (anime->GetMyStatus() == *item.status || *item.status < anime::kMyStatusFirst || *item.status >= anime::kMyStatusLast)
         item.status.Reset();
     if (item.enable_rewatching)
       if (anime->GetMyRewatching() == *item.enable_rewatching)

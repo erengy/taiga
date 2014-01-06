@@ -70,8 +70,6 @@ BOOL FeedConditionDialog::OnInitDialog() {
     }
     case FEED_FILTER_ELEMENT_USER_STATUS: {
       int value = ToInt(condition.value);
-      if (value == 6)
-        value--;
       value_combo_.SetCurSel(value);
       break;
     }

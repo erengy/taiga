@@ -57,13 +57,14 @@ enum SeriesType {
 };
 
 enum MyStatus {
-  kNotInList,
+  kMyStatusFirst = 1,
+  kNotInList = 0,
   kWatching,
   kCompleted,
   kOnHold,
   kDropped,
-  kUnknownMyStatus,  // TODO: Remove after translation is available
-  kPlanToWatch
+  kPlanToWatch,
+  kMyStatusLast
 };
 
 // Invalid for anime items that are not in user's list
