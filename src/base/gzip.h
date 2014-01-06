@@ -19,9 +19,9 @@
 #ifndef TAIGA_BASE_GZIP_H
 #define TAIGA_BASE_GZIP_H
 
-#include "std.h"
+#include <string>
 
-bool UncompressGzippedFile(const string& file, string& output);
-bool UncompressGzippedString(const string& input, string& output);
+bool UncompressGzippedFile(const std::string& file, std::string& output);
+bool UncompressGzippedString(const std::string& input, std::string& output);
 
 #endif  // TAIGA_BASE_GZIP_H

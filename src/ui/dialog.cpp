@@ -56,24 +56,26 @@ void InitializeDialogProperties() {
   if (!dialog_properties.empty())
     return;
 
+  HWND parent = DlgMain.GetWindowHandle();
+
   dialog_properties.insert(std::make_pair(
       kDialogAbout,
-      DialogProperties(IDD_ABOUT, &DlgAbout, g_hMain, true)));
+      DialogProperties(IDD_ABOUT, &DlgAbout, parent, true)));
   dialog_properties.insert(std::make_pair(
       kDialogAnimeInformation,
-      DialogProperties(IDD_ANIME_INFO, &DlgAnime, g_hMain, false)));
+      DialogProperties(IDD_ANIME_INFO, &DlgAnime, parent, false)));
   dialog_properties.insert(std::make_pair(
       kDialogMain,
       DialogProperties(IDD_MAIN, &DlgMain, nullptr, false)));
   dialog_properties.insert(std::make_pair(
       kDialogSettings,
-      DialogProperties(IDD_SETTINGS, &DlgSettings, g_hMain, true)));
+      DialogProperties(IDD_SETTINGS, &DlgSettings, parent, true)));
   dialog_properties.insert(std::make_pair(
       kDialogTestRecognition,
       DialogProperties(IDD_TEST_RECOGNITION, &DlgTestRecognition, nullptr, false)));
   dialog_properties.insert(std::make_pair(
       kDialogUpdate,
-      DialogProperties(IDD_UPDATE, &DlgUpdate, g_hMain, true)));
+      DialogProperties(IDD_UPDATE, &DlgUpdate, parent, true)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +99,18 @@ void EnableDialogInput(Dialog dialog, bool enable) {
       DlgTorrent.EnableInput(enable);
       break;
   }
+}
+
+HWND GetWindowHandle(Dialog dialog) {
+  InitializeDialogProperties();
+
+  auto it = dialog_properties.find(dialog);
+
+  if (it != dialog_properties.end())
+    if (it->second.dialog)
+      return it->second.dialog->GetWindowHandle();
+
+  return nullptr;
 }
 
 void ShowDialog(Dialog dialog) {

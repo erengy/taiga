@@ -37,7 +37,7 @@ public:
   bool IsDownloadAllowed() const;
   bool IsRestartRequired() const;
   bool IsUpdateAvailable() const;
-  bool ParseData(wstring data);
+  bool ParseData(std::wstring data);
   bool RunInstaller();
   void SetDownloadPath(const std::wstring& path);
 

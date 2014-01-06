@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "base/common.h"
 #include "base/encoding.h"
 #include "base/encryption.h"

@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "anime_db.h"
 #include "anime_item.h"
 #include "anime_util.h"

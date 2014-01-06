@@ -16,8 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
 #include "base/common.h"
 #include "base/file.h"
 #include "base/foreach.h"
@@ -267,7 +265,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
   //   Opens up a dialog to add new root folder.
   } else if (action == L"AddFolder") {
     wstring path;
-    if (BrowseForFolder(g_hMain, L"Please select a folder:", L"", path)) {
+    if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), L"Please select a folder:", L"", path)) {
       Settings.root_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
         FolderMonitor.Enable();
@@ -448,7 +446,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     switch (anime_item->GetAiringStatus()) {
       case anime::kAiring:
         if (*history_item.status == anime::kCompleted) {
-          MessageBox(g_hMain, 
+          MessageBox(ui::GetWindowHandle(ui::kDialogMain), 
             L"This anime is still airing, you cannot set it as completed.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
           return;
@@ -458,7 +456,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         break;
       case anime::kNotYetAired:
         if (*history_item.status != anime::kPlanToWatch) {
-          MessageBox(g_hMain, 
+          MessageBox(ui::GetWindowHandle(ui::kDialogMain), 
             L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
             anime_item->GetTitle().c_str(), MB_ICONERROR);
           return;
@@ -523,7 +521,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
         wstring default_path, path;
         if (!Settings.root_folders.empty())
           default_path = Settings.root_folders.front();
-        if (BrowseForFolder(g_hMain, L"Choose an anime folder", default_path, path)) {
+        if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), L"Choose an anime folder", default_path, path)) {
           anime_item->SetFolder(path);
           Settings.Save();
         }
@@ -541,7 +539,7 @@ void ExecuteAction(wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     wstring path, title = L"Anime title: " + anime_item->GetTitle();
-    if (BrowseForFolder(ui::DlgMain.GetWindowHandle(), title.c_str(), L"", path)) {
+    if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), title.c_str(), L"", path)) {
       anime_item->SetFolder(path);
       Settings.Save();
       anime::CheckEpisodes(*anime_item);

@@ -235,7 +235,6 @@
     <ClInclude Include="base\map.h" />
     <ClInclude Include="base\optional.h" />
     <ClInclude Include="base\process.h" />
-    <ClInclude Include="base\std.h" />
     <ClInclude Include="base\string.h" />
     <ClInclude Include="base\time.h" />
     <ClInclude Include="base\types.h" />

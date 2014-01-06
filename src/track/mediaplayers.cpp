@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
+#include <windows.h>
 #include <tlhelp32.h>
 
 #include "media.h"
@@ -31,6 +31,7 @@
 #include "taiga/path.h"
 #include "taiga/taiga.h"
 #include "base/xml.h"
+#include "ui/dialog.h"
 
 class MediaPlayers MediaPlayers;
 
@@ -86,7 +87,7 @@ int MediaPlayers::Check() {
   bool recognized = CurrentEpisode.anime_id > anime::ID_UNKNOWN;
 
   // Go through windows, starting with the highest in the Z order
-  HWND hwnd = GetWindow(g_hMain, GW_HWNDFIRST);
+  HWND hwnd = GetWindow(ui::GetWindowHandle(ui::kDialogMain), GW_HWNDFIRST);
   while (hwnd != nullptr) {
     for (auto item = items.begin(); item != items.end(); ++item) {
       if (!item->enabled)
@@ -274,7 +275,7 @@ wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class
       cds.dwData = BSP_GETFILENAME;
       cds.lpData = &data;
       cds.cbData = 4;
-      SendMessage(hwnd, WM_COPYDATA, reinterpret_cast<WPARAM>(g_hMain), 
+      SendMessage(hwnd, WM_COPYDATA, reinterpret_cast<WPARAM>(ui::GetWindowHandle(ui::kDialogMain)), 
         reinterpret_cast<LPARAM>(&cds));
       return StrToWstr(file_name);
     }
@@ -285,7 +286,7 @@ wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd, const wstring& class
     if (IsWindow(hwnd_remote))  {
       if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 0, GET_STATUS_STATUS) != MCI_MODE_STOP) {
         if (SendMessage(hwnd_remote, WM_REMOCON_GETSTATUS, 
-          reinterpret_cast<WPARAM>(g_hMain), GET_STATUS_TRACK_FILENAME)) {
+          reinterpret_cast<WPARAM>(ui::GetWindowHandle(ui::kDialogMain)), GET_STATUS_TRACK_FILENAME)) {
             return new_title;
         }
       }

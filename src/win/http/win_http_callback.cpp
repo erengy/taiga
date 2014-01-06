@@ -50,7 +50,7 @@ void Client::StatusCallback(HINTERNET hInternet,
     }
 
     case WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE: {
-      wstring buffer;
+      std::wstring buffer;
       DWORD buffer_length = 0;
       if (!::WinHttpQueryHeaders(hInternet,
                                  WINHTTP_QUERY_RAW_HEADERS_CRLF,
@@ -101,7 +101,7 @@ void Client::StatusCallback(HINTERNET hInternet,
         }
       } else if (dwSize == 0) {
         if (content_encoding_ == kContentEncodingGzip) {
-          string input, output;
+          std::string input, output;
           input.append(buffer_, current_length_);
           UncompressGzippedString(input, output);
           if (!output.empty()) {

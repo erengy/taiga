@@ -16,8 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
 #include "feed.h"
 
 #include "library/anime.h"

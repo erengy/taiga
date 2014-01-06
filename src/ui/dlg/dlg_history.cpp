@@ -26,6 +26,7 @@
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_history.h"
+#include "ui/dlg/dlg_main.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -99,7 +100,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       }
       // Right click
       case NM_RCLICK: {
-        wstring action = ui::Menus.Show(g_hMain, 0, 0, L"HistoryList");
+        wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"HistoryList");
         if (action == L"Delete()") {
           RemoveItems();
         } else if (action == L"ClearHistory()") {

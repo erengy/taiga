@@ -16,18 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef RECOGNITION_H
-#define RECOGNITION_H
+#ifndef TAIGA_TRACK_RECOGNITION_H
+#define TAIGA_TRACK_RECOGNITION_H
 
-#include "base/std.h"
+#include <map>
+#include <string>
+#include <vector>
 
 namespace anime {
 class Episode;
 class Item;
 }
 class Token;
-
-// =============================================================================
 
 class RecognitionEngine {
 public:
@@ -51,7 +51,7 @@ public:
                       bool check_date = true,
                       bool give_score = false);
   
-  bool ExamineTitle(wstring title, 
+  bool ExamineTitle(std::wstring title, 
                     anime::Episode& episode, 
                     bool examine_inside = true, 
                     bool examine_outside = true, 
@@ -61,7 +61,7 @@ public:
 
   void ExamineToken(Token& token, anime::Episode& episode, bool compare_extras);
   
-  void CleanTitle(wstring& title);
+  void CleanTitle(std::wstring& title);
   void UpdateCleanTitles(int anime_id);
 
   std::multimap<int, int, std::greater<int>> GetScores();
@@ -69,38 +69,38 @@ public:
   // Mapped as <anime_id, score>
   std::map<int, int> scores;
 
-  std::map<int, vector<wstring>> clean_titles;
+  std::map<int, std::vector<std::wstring>> clean_titles;
 
-  vector<wstring> audio_keywords;
-  vector<wstring> video_keywords;
-  vector<wstring> extra_keywords;
-  vector<wstring> extra_unsafe_keywords;
-  vector<wstring> version_keywords;
-  vector<wstring> valid_extensions;
-  vector<wstring> episode_keywords;
-  vector<wstring> episode_prefixes;
+  std::vector<std::wstring> audio_keywords;
+  std::vector<std::wstring> video_keywords;
+  std::vector<std::wstring> extra_keywords;
+  std::vector<std::wstring> extra_unsafe_keywords;
+  std::vector<std::wstring> version_keywords;
+  std::vector<std::wstring> valid_extensions;
+  std::vector<std::wstring> episode_keywords;
+  std::vector<std::wstring> episode_prefixes;
 
  private:
-  bool CompareTitle(const wstring& anime_title, 
+  bool CompareTitle(const std::wstring& anime_title, 
                     anime::Episode& episode, 
                     const anime::Item& anime_item, 
                     bool strict = true);
   bool ScoreTitle(const anime::Episode& episode, 
                   const anime::Item& anime_item);
 
-  void AppendKeyword(wstring& str, const wstring& keyword);
-  bool CompareKeys(const wstring& str, const vector<wstring>& keys);
-  void EraseUnnecessary(wstring& str);
-  void TransliterateSpecial(wstring& str);
-  bool IsEpisodeFormat(const wstring& str, anime::Episode& episode, const wchar_t separator = ' ');
-  bool IsResolution(const wstring& str);
-  bool IsCountingWord(const wstring& str);
+  void AppendKeyword(std::wstring& str, const std::wstring& keyword);
+  bool CompareKeys(const std::wstring& str, const std::vector<std::wstring>& keys);
+  void EraseUnnecessary(std::wstring& str);
+  void TransliterateSpecial(std::wstring& str);
+  bool IsEpisodeFormat(const std::wstring& str, anime::Episode& episode, const wchar_t separator = ' ');
+  bool IsResolution(const std::wstring& str);
+  bool IsCountingWord(const std::wstring& str);
   bool IsTokenEnclosed(const Token& token);
-  void ReadKeyword(unsigned int id, vector<wstring>& str);
-  size_t TokenizeTitle(const wstring& str, const wstring& delimiters, vector<Token>& tokens);
+  void ReadKeyword(unsigned int id, std::vector<std::wstring>& str);
+  size_t TokenizeTitle(const std::wstring& str, const std::wstring& delimiters, std::vector<Token>& tokens);
   bool ValidateEpisodeNumber(anime::Episode& episode);
 };
 
 extern RecognitionEngine Meow;
 
-#endif // RECOGNITION_H
+#endif  // TAIGA_TRACK_RECOGNITION_H

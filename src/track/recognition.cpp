@@ -16,8 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
 #include "recognition.h"
 
 #include "library/anime_db.h"
@@ -28,6 +26,7 @@
 #include "media.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
+#include "taiga/taiga.h"
 #include "base/string.h"
 
 RecognitionEngine Meow;
@@ -793,7 +792,7 @@ bool RecognitionEngine::IsTokenEnclosed(const Token& token) {
 
 void ReadStringTable(UINT uID, wstring& str) {
   wchar_t buffer[2048];
-  LoadString(g_hInstance, uID, buffer, 2048);
+  LoadString(Taiga.GetInstanceHandle(), uID, buffer, 2048);
   str.append(buffer);
 }
 

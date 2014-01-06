@@ -16,30 +16,28 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef TAIGA_TAIGA_DEBUG_H
+#define TAIGA_TAIGA_DEBUG_H
 
-#include "base/std.h"
+#include <string>
 
 namespace debug {
-
-// =============================================================================
 
 class Tester {
  public:
   Tester();
 
   void Start();
-  void End(wstring str, bool display_result);
+  void End(std::wstring str, bool display_result);
 
  private:
   double frequency_;
   __int64 value_;
 };
 
-void Print(wstring text);
+void Print(std::wstring text);
 void Test();
 
-} // namespace debug
+}  // namespace debug
 
-#endif // DEBUG_H
+#endif  // TAIGA_TAIGA_DEBUG_H

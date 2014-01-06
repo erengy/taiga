@@ -298,7 +298,7 @@ bool OnLibraryEntryEditDelete(int id) {
                          L"your list?");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 
   return dlg.GetSelectedButtonID() == IDYES;
 }
@@ -312,7 +312,7 @@ int OnLibraryEntryEditEpisode(int id) {
   dlg.title = anime_item->GetTitle();
   dlg.info = L"Please enter episode number for this title:";
   dlg.text = ToWstr(anime_item->GetMyLastWatchedEpisode());
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 
   if (dlg.result == IDOK)
     return ToInt(dlg.text);
@@ -327,7 +327,7 @@ bool OnLibraryEntryEditTags(int id, std::wstring& tags) {
   dlg.title = anime_item->GetTitle();
   dlg.info = L"Please enter tags for this title, separated by a comma:";
   dlg.text = anime_item->GetMyTags();
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 
   if (dlg.result == IDOK) {
     tags = dlg.text;
@@ -344,7 +344,7 @@ bool OnLibraryEntryEditTitles(int id, std::wstring& titles) {
   dlg.title = anime_item->GetTitle();
   dlg.info = L"Please enter alternative titles, separated by a semicolon:";
   dlg.text = Join(anime_item->GetUserSynonyms(), L"; ");
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 
   if (dlg.result == IDOK) {
     titles = dlg.text;
@@ -417,7 +417,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   dlg.AddButton(L"Cancel\n"
                 L"Don't update anything", IDNO);
 
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetVerificationCheck())
     Settings.Set(taiga::kSync_Update_AskToConfirm, false);
   return dlg.GetSelectedButtonID();
@@ -430,7 +430,7 @@ void OnAnimeEpisodeNotFound() {
   dlg.SetWindowTitle(L"Play Random Episode");
   dlg.SetMainIcon(TD_ICON_ERROR);
   dlg.SetMainInstruction(L"Could not find any episode to play.");
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 }
 
 bool OnAnimeFolderNotFound() {
@@ -441,7 +441,7 @@ bool OnAnimeFolderNotFound() {
                           L"Would you like to set it manually?");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 
   return dlg.GetSelectedButtonID() == IDYES;
 }
@@ -506,7 +506,7 @@ bool OnSeasonRefreshRequired() {
                  L"missing information and images.");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 
   return dlg.GetSelectedButtonID() == IDYES;
 }
@@ -521,7 +521,7 @@ void OnSettingsAccountEmpty() {
                  L"MyAnimeList.");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetSelectedButtonID() == IDYES)
     ExecuteAction(L"Settings", kSettingsSectionServices, kSettingsPageServicesMain);
 }
@@ -544,7 +544,7 @@ void OnSettingsRootFoldersEmpty() {
                  L"scanning available episodes.");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetSelectedButtonID() == IDYES)
     ExecuteAction(L"Settings", kSettingsSectionLibrary, kSettingsPageLibraryFolders);
 }
@@ -612,7 +612,7 @@ void OnMircNotRunning(bool testing) {
   win::TaskDialog dlg(title.c_str(), TD_ICON_ERROR);
   dlg.SetMainInstruction(L"mIRC is not running.");
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 }
 
 void OnMircDdeInitFail(bool testing) {
@@ -620,7 +620,7 @@ void OnMircDdeInitFail(bool testing) {
   win::TaskDialog dlg(title.c_str(), TD_ICON_ERROR);
   dlg.SetMainInstruction(L"DDE initialization failed.");
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 }
 
 void OnMircDdeConnectionFail(bool testing) {
@@ -629,7 +629,7 @@ void OnMircDdeConnectionFail(bool testing) {
   dlg.SetMainInstruction(L"DDE connection failed.");
   dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 }
 
 void OnMircDdeConnectionSuccess(const std::wstring& channels, bool testing) {
@@ -639,7 +639,7 @@ void OnMircDdeConnectionSuccess(const std::wstring& channels, bool testing) {
   std::wstring content = L"Current channels: " + channels;
   dlg.SetContent(content.c_str());
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(g_hMain);
+  dlg.Show(DlgMain.GetWindowHandle());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -712,7 +712,7 @@ void OnUpdateNotAvailable() {
     dlg.SetFooter(footer.c_str());
     dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
     dlg.AddButton(L"OK", IDOK);
-    dlg.Show(g_hMain);
+    dlg.Show(DlgMain.GetWindowHandle());
   }
 }
 

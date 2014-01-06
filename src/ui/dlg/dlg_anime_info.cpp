@@ -28,6 +28,7 @@
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_info_page.h"
+#include "ui/dlg/dlg_main.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 
@@ -54,7 +55,7 @@ BOOL AnimeDialog::OnInitDialog() {
   if (mode_ == kDialogModeNowPlaying) {
     SetStyle(DS_CONTROL | WS_CHILD | WS_CLIPCHILDREN, WS_OVERLAPPEDWINDOW);
     SetStyle(0, WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE, GWL_EXSTYLE);
-    SetParent(g_hMain);
+    SetParent(DlgMain.GetWindowHandle());
   }
 
   // Initialize image label

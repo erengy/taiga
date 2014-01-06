@@ -62,9 +62,6 @@ MainDialog::MainDialog() {
 }
 
 BOOL MainDialog::OnInitDialog() {
-  // Set global variables
-  g_hMain = GetWindowHandle();
-  
   // Initialize window properties
   InitWindowPosition();
   SetIconLarge(IDI_MAIN);
@@ -80,10 +77,10 @@ BOOL MainDialog::OnInitDialog() {
   navigation.SetCurrentPage(kSidebarItemAnimeList);
 
   // Start process timer
-  SetTimer(g_hMain, TIMER_MAIN, 1000, nullptr);
+  SetTimer(GetWindowHandle(), TIMER_MAIN, 1000, nullptr);
   
   // Add icon to taskbar
-  Taskbar.Create(g_hMain, nullptr, TAIGA_APP_TITLE);
+  Taskbar.Create(GetWindowHandle(), nullptr, TAIGA_APP_TITLE);
 
   ChangeStatus();
   UpdateTip();
@@ -109,7 +106,7 @@ BOOL MainDialog::OnInitDialog() {
     dlg.SetContent(L"Username is not set. Would you like to open settings window to set it now?");
     dlg.AddButton(L"Yes", IDYES);
     dlg.AddButton(L"No", IDNO);
-    dlg.Show(g_hMain);
+    dlg.Show(GetWindowHandle());
     if (dlg.GetSelectedButtonID() == IDYES)
       ExecuteAction(L"Settings", kSettingsSectionServices, kSettingsPageServicesMal);
   }

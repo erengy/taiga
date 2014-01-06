@@ -601,17 +601,17 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
             switch (index) {
               // Score
               case 2:
-                ExecuteAction(ui::Menus.Show(g_hMain, 0, 0, L"EditScore"), 0, anime_id);
+                ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"EditScore"), 0, anime_id);
                 break;
               // Other
               default:
-                ExecuteAction(ui::Menus.Show(g_hMain, 0, 0, L"RightClick"), 0, anime_id);
+                ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"RightClick"), 0, anime_id);
                 break;
             }
             ui::Menus.UpdateAll(anime_item);
           } else {
             ui::Menus.UpdateSearchList(true);
-            ExecuteAction(ui::Menus.Show(g_hMain, 0, 0, L"SearchList"), 0, anime_id);
+            ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"SearchList"), 0, anime_id);
           }
         }
       }

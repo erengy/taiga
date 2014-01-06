@@ -35,6 +35,7 @@ enum Dialog {
 
 void DestroyDialog(Dialog dialog);
 void EnableDialogInput(Dialog dialog, bool enable);
+HWND GetWindowHandle(Dialog dialog);
 void ShowDialog(Dialog dialog);
 
 }  // namespace ui

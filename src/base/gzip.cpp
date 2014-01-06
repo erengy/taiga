@@ -16,10 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows.h>
+
 #include "gzip.h"
 #include "third_party/zlib/zlib.h"
 
-bool UncompressGzippedFile(const string& file, string& output) {
+bool UncompressGzippedFile(const std::string& file, std::string& output) {
   gzFile gzfile = gzopen(file.c_str(), "rb");
 
   if (gzfile == nullptr)
@@ -41,7 +43,7 @@ bool UncompressGzippedFile(const string& file, string& output) {
   return true;
 }
 
-bool UncompressGzippedString(const string& input, string& output) {
+bool UncompressGzippedString(const std::string& input, std::string& output) {
   z_stream stream;
   stream.zalloc = Z_NULL;
   stream.zfree = Z_NULL;

@@ -570,9 +570,6 @@
     <ClInclude Include="base\process.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="base\std.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="base\string.h">
       <Filter>base</Filter>
     </ClInclude>

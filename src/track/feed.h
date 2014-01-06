@@ -16,14 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FEED_H
-#define FEED_H
+#ifndef TAIGA_TRACK_FEED_H
+#define TAIGA_TRACK_FEED_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
+
 #include "library/anime_episode.h"
 #include "taiga/http.h"
-
-// =============================================================================
 
 enum FeedItemState {
   FEEDITEM_DISCARDED = -1,
@@ -36,7 +36,7 @@ public:
   GenericFeedItem() : is_permalink(true) {}
   virtual ~GenericFeedItem() {}
 
-  wstring title, link, description,
+  std::wstring title, link, description,
     author, category, comments, enclosure, guid, pub_date, source;
   bool is_permalink;
 };
@@ -47,18 +47,18 @@ public:
   virtual ~FeedItem() {};
 
   int index;
-  wstring magnet_link;
+  std::wstring magnet_link;
   FeedItemState state;
 
   class EpisodeData : public anime::Episode {
   public:
     EpisodeData() : new_episode(false) {}
-    wstring file_size;
+    std::wstring file_size;
     bool new_episode;
   } episode_data;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 enum FeedCategory {
   // Broadcatching for torrent files and DDL
@@ -78,18 +78,18 @@ enum TorrentCategory {
 class GenericFeed {
 public:
   // Required channel elements
-  wstring title, link, description;
+  std::wstring title, link, description;
 
   // Optional channel elements
   // (see www.rssboard.org/rss-specification for more information)
   /*
-  wstring language, copyright, managingEditor, webMaster, pubDate, 
+  std::wstring language, copyright, managingEditor, webMaster, pubDate, 
     lastBuildDate, category, generator, docs, cloud, ttl, image, 
     rating, textInput, skipHours, skipDays;
   */
   
   // Feed items
-  vector<FeedItem> items;
+  std::vector<FeedItem> items;
 };
 
 class Feed : public GenericFeed {
@@ -97,17 +97,17 @@ public:
   Feed();
   virtual ~Feed() {}
 
-  bool Check(const wstring& source, bool automatic = false);
+  bool Check(const std::wstring& source, bool automatic = false);
   bool Download(int index);
   bool ExamineData();
-  wstring GetDataPath();
+  std::wstring GetDataPath();
   bool Load();
 
 public:
   int category, download_index, ticker;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 enum FeedFilterElement {
   FEED_FILTER_ELEMENT_META_ID,
@@ -161,7 +161,7 @@ public:
 public:
   int element;
   int op;
-  wstring value;
+  std::wstring value;
 };
 
 enum FeedFilterAction {
@@ -176,22 +176,22 @@ public:
   virtual ~FeedFilter() {}
   FeedFilter& operator=(const FeedFilter& filter);
 
-  void AddCondition(int element, int op, const wstring& value);
+  void AddCondition(int element, int op, const std::wstring& value);
   void Filter(Feed& feed, FeedItem& item, bool recursive);
   void Reset();
 
 public:
-  wstring name;
+  std::wstring name;
   bool enabled;
   int action, match;
-  vector<int> anime_ids;
-  vector<FeedFilterCondition> conditions;
+  std::vector<int> anime_ids;
+  std::vector<FeedFilterCondition> conditions;
 };
 
 class FeedFilterPreset {
 public:
   FeedFilterPreset() : is_default(false) {}
-  wstring description;
+  std::wstring description;
   FeedFilter filter;
   bool is_default;
 };
@@ -212,37 +212,37 @@ public:
 
   void AddPresets();
   void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
-    bool enabled = true, const wstring& name = L"");
+    bool enabled = true, const std::wstring& name = L"");
   void Cleanup();
   void Filter(Feed& feed, bool preferences);
   void FilterArchived(Feed& feed);
   bool IsItemDownloadAvailable(Feed& feed);
   void MarkNewEpisodes(Feed& feed);
 
-  wstring CreateNameFromConditions(const FeedFilter& filter);
-  wstring TranslateCondition(const FeedFilterCondition& condition);
-  wstring TranslateConditions(const FeedFilter& filter, size_t index);
-  wstring TranslateElement(int element);
-  wstring TranslateOperator(int op);
-  wstring TranslateValue(const FeedFilterCondition& condition);
-  wstring TranslateMatching(int match);
-  wstring TranslateAction(int action);
+  std::wstring CreateNameFromConditions(const FeedFilter& filter);
+  std::wstring TranslateCondition(const FeedFilterCondition& condition);
+  std::wstring TranslateConditions(const FeedFilter& filter, size_t index);
+  std::wstring TranslateElement(int element);
+  std::wstring TranslateOperator(int op);
+  std::wstring TranslateValue(const FeedFilterCondition& condition);
+  std::wstring TranslateMatching(int match);
+  std::wstring TranslateAction(int action);
 
-  wstring GetShortcodeFromIndex(FeedFilterShortcodeType type, int index);
-  int GetIndexFromShortcode(FeedFilterShortcodeType type, const wstring& shortcode);
+  std::wstring GetShortcodeFromIndex(FeedFilterShortcodeType type, int index);
+  int GetIndexFromShortcode(FeedFilterShortcodeType type, const std::wstring& shortcode);
 
 public:
-  vector<FeedFilter> filters;
-  vector<FeedFilterPreset> presets;
+  std::vector<FeedFilter> filters;
+  std::vector<FeedFilterPreset> presets;
 
 private:
-  std::map<int, wstring> action_shortcodes_;
-  std::map<int, wstring> element_shortcodes_;
-  std::map<int, wstring> match_shortcodes_;
-  std::map<int, wstring> operator_shortcodes_;
+  std::map<int, std::wstring> action_shortcodes_;
+  std::map<int, std::wstring> element_shortcodes_;
+  std::map<int, std::wstring> match_shortcodes_;
+  std::map<int, std::wstring> operator_shortcodes_;
 };
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 class Aggregator {
 public:
@@ -252,21 +252,21 @@ public:
   Feed* Get(int category);
 
   bool Notify(const Feed& feed);
-  void ParseDescription(FeedItem& feed_item, const wstring& source);
+  void ParseDescription(FeedItem& feed_item, const std::wstring& source);
 
   bool LoadArchive();
   bool SaveArchive();
-  bool SearchArchive(const wstring& file);
+  bool SearchArchive(const std::wstring& file);
 
 private:
   bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
 
 public:
-  vector<Feed> feeds;
-  vector<wstring> file_archive;
+  std::vector<Feed> feeds;
+  std::vector<std::wstring> file_archive;
   FeedFilterManager filter_manager;
 };
 
 extern Aggregator Aggregator;
 
-#endif // FEED_H
+#endif  // TAIGA_TRACK_FEED_H

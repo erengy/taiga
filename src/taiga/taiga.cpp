@@ -34,9 +34,6 @@
 #include "version.h"
 #include "win/win_taskbar.h"
 
-HINSTANCE g_hInstance;
-HWND g_hMain;
-
 taiga::App Taiga;
 
 namespace taiga {
@@ -66,7 +63,6 @@ BOOL App::InitInstance() {
   if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258",
                     L"TaigaMainW"))
     return FALSE;
-  g_hInstance = GetInstanceHandle();
 
   // Initialize
   InitCommonControls(ICC_STANDARD_CLASSES);

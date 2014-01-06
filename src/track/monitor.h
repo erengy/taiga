@@ -16,10 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MONITOR_H
-#define MONITOR_H
+#ifndef TAIGA_TRACK_MONITOR_H
+#define TAIGA_TRACK_MONITOR_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
 
 #include "win/win_thread.h"
 
@@ -27,8 +28,6 @@
 #define MONITOR_BUFFER_SIZE 4096
 
 class FolderMonitor;
-
-// =============================================================================
 
 enum FolderMonitorState {
   MONITOR_STATE_STOPPED,
@@ -43,7 +42,7 @@ public:
   friend class FolderMonitor;
   
 public:
-  wstring path;
+  std::wstring path;
   int state;
   
   class FolderChangeInfo {
@@ -51,9 +50,9 @@ public:
     FolderChangeInfo() : action(0), anime_id(0) {}
     DWORD action;
     int anime_id;
-    wstring file_name;
+    std::wstring file_name;
   };
-  vector<FolderChangeInfo> change_list;
+  std::vector<FolderChangeInfo> change_list;
   
 private:
   BYTE buffer_[MONITOR_BUFFER_SIZE];
@@ -63,8 +62,6 @@ private:
   OVERLAPPED overlapped_;
   BOOL watch_subtree_;
 };
-
-// =============================================================================
 
 class FolderMonitor : public win::Thread {
 public:
@@ -91,11 +88,11 @@ private:
 
 private:
   win::CriticalSection critical_section_;
-  vector<FolderInfo> folders_;
+  std::vector<FolderInfo> folders_;
   HANDLE completion_port_;
   HWND window_handle_;
 };
 
 extern FolderMonitor FolderMonitor;
 
-#endif // MONITOR_H
+#endif  // TAIGA_TRACK_MONITOR_H

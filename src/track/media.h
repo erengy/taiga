@@ -16,13 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MEDIA_H
-#define MEDIA_H
+#ifndef TAIGA_TRACK_MEDIA_H
+#define TAIGA_TRACK_MEDIA_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
+
 #include "base/accessibility.h"
-
-// =============================================================================
 
 enum MediaPlayerModes {
   MEDIA_MODE_WINDOWTITLE,
@@ -33,47 +33,45 @@ enum MediaPlayerModes {
   MEDIA_MODE_WEBBROWSER
 };
 
-/* Media players class */
-
 class MediaPlayers {
 public:
   MediaPlayers();
-  virtual ~MediaPlayers() {}
+  ~MediaPlayers() {}
 
   BOOL Load();
   int Check();
 
-  void EditTitle(wstring& str, int player_index);
-  wstring GetTitle(HWND hwnd, const wstring& class_name, int mode);
+  void EditTitle(std::wstring& str, int player_index);
+  std::wstring GetTitle(HWND hwnd, const std::wstring& class_name, int mode);
   bool TitleChanged() const;
   void SetTitleChanged(bool title_changed);
 
-  wstring GetTitleFromProcessHandle(HWND hwnd, ULONG process_id = 0);
-  wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
-  wstring GetTitleFromSpecialMessage(HWND hwnd, const wstring& class_name);
-  wstring GetTitleFromMPlayer();
-  wstring GetTitleFromBrowser(HWND hwnd);
-  
+  std::wstring GetTitleFromProcessHandle(HWND hwnd, ULONG process_id = 0);
+  std::wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
+  std::wstring GetTitleFromSpecialMessage(HWND hwnd, const std::wstring& class_name);
+  std::wstring GetTitleFromMPlayer();
+  std::wstring GetTitleFromBrowser(HWND hwnd);
+
 public:
   int index, index_old;
-  wstring current_title, new_title;
+  std::wstring current_title, new_title;
 
   class MediaPlayer {
   public:
-    wstring engine, name;
+    std::wstring engine, name;
     BOOL enabled, visible;
     int mode;
     HWND window_handle;
-    vector<wstring> classes, files, folders;
-    wstring GetPath();
+    std::vector<std::wstring> classes, files, folders;
+    std::wstring GetPath();
     class EditTitle {
     public:
       int mode;
-      wstring value;
+      std::wstring value;
     };
-    vector<EditTitle> edits;
+    std::vector<EditTitle> edits;
   };
-  vector<MediaPlayer> items;
+  std::vector<MediaPlayer> items;
 
   class BrowserAccessibleObject : public base::AccessibleObject {
   public:
@@ -86,4 +84,4 @@ private:
 
 extern MediaPlayers MediaPlayers;
 
-#endif // MEDIA_H
+#endif  // TAIGA_TRACK_MEDIA_H
