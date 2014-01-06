@@ -16,39 +16,38 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SETTINGS_PAGE_H
-#define DLG_SETTINGS_PAGE_H
+#ifndef TAIGA_UI_DLG_SETTINGS_PAGE_H
+#define TAIGA_UI_DLG_SETTINGS_PAGE_H
 
-#include "base/std.h"
 #include "win/win_dialog.h"
 
+namespace ui {
+
 enum SettingsPages {
-  PAGE_APP_BEHAVIOR = 1,
-  PAGE_APP_CONNECTION,
-  PAGE_APP_INTERFACE,
-  PAGE_APP_LIST,
-  PAGE_LIBRARY_CACHE,
-  PAGE_LIBRARY_FOLDERS,
-  PAGE_RECOGNITION_GENERAL,
-  PAGE_RECOGNITION_MEDIA,
-  PAGE_RECOGNITION_STREAM,
-  PAGE_SERVICES_HERRO,
-  PAGE_SERVICES_MAIN,
-  PAGE_SERVICES_MAL,
-  PAGE_SHARING_HTTP,
-  PAGE_SHARING_MESSENGER,
-  PAGE_SHARING_MIRC,
-  PAGE_SHARING_SKYPE,
-  PAGE_SHARING_TWITTER,
-  PAGE_TORRENTS_DISCOVERY,
-  PAGE_TORRENTS_DOWNLOADS,
-  PAGE_TORRENTS_FILTERS,
-  PAGE_COUNT
+  kSettingsPageAppBehavior = 1,
+  kSettingsPageAppConnection,
+  kSettingsPageAppInterface,
+  kSettingsPageAppList,
+  kSettingsPageLibraryCache,
+  kSettingsPageLibraryFolders,
+  kSettingsPageRecognitionGeneral,
+  kSettingsPageRecognitionMedia,
+  kSettingsPageRecognitionStream,
+  kSettingsPageServicesHerro,
+  kSettingsPageServicesMain,
+  kSettingsPageServicesMal,
+  kSettingsPageSharingHttp,
+  kSettingsPageSharingMessenger,
+  kSettingsPageSharingMirc,
+  kSettingsPageSharingSkype,
+  kSettingsPageSharingTwitter,
+  kSettingsPageTorrentsDiscovery,
+  kSettingsPageTorrentsDownloads,
+  kSettingsPageTorrentsFilters,
+  kSettingsPageCount
 };
 
 class SettingsDialog;
-
-// =============================================================================
 
 class SettingsPage : public win::Dialog {
 public:
@@ -66,4 +65,6 @@ public:
   SettingsDialog* parent;
 };
 
-#endif // DLG_SETTINGS_PAGE_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_SETTINGS_PAGE_H

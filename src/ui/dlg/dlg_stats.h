@@ -16,20 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_STATS_H
-#define DLG_STATS_H
+#ifndef TAIGA_UI_DLG_STATS_H
+#define TAIGA_UI_DLG_STATS_H
 
-#include "base/std.h"
-#include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 #include "win/win_resizable.h"
 
-// =============================================================================
+namespace ui {
 
 class StatsDialog : public win::Dialog, public win::Resizable {
 public:
   StatsDialog() {}
-  virtual ~StatsDialog() {}
+  ~StatsDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
@@ -39,6 +37,8 @@ public:
   void Refresh();
 };
 
-extern class StatsDialog StatsDialog;
+extern StatsDialog DlgStats;
 
-#endif // DLG_STATS_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_STATS_H

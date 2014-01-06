@@ -16,17 +16,16 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_TEST_RECOGNITOIN_H
-#define DLG_TEST_RECOGNITOIN_H
+#ifndef TAIGA_UI_DLG_TEST_RECOGNITOIN_H
+#define TAIGA_UI_DLG_TEST_RECOGNITOIN_H
 
-#include "base/std.h"
+#include <vector>
 
 #include "library/anime_episode.h"
-
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class RecognitionTestDialog : public win::Dialog {
 public:
@@ -43,11 +42,13 @@ private:
     EpisodeTest() : priority(0) {}
     int priority;
   };
-  vector<EpisodeTest> episodes_, test_episodes_;
+  std::vector<EpisodeTest> episodes_, test_episodes_;
 
   win::ListView list_;
 };
 
-extern RecognitionTestDialog RecognitionTest;
+extern RecognitionTestDialog DlgTestRecognition;
 
-#endif // DLG_TEST_RECOGNITOIN_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_TEST_RECOGNITOIN_H

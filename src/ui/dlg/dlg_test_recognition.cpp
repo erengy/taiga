@@ -16,22 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_test_recognition.h"
-
-#include "base/common.h"
-#include "track/recognition.h"
-#include "taiga/resource.h"
 #include "base/string.h"
-#include "taiga/path.h"
-#include "taiga/taiga.h"
 #include "base/xml.h"
+#include "taiga/path.h"
+#include "taiga/resource.h"
+#include "track/recognition.h"
+#include "ui/dlg/dlg_test_recognition.h"
 #include "ui/list.h"
 
-RecognitionTestDialog RecognitionTest;
+namespace ui {
 
-// =============================================================================
+RecognitionTestDialog DlgTestRecognition;
 
 BOOL RecognitionTestDialog::OnInitDialog() {
   episodes_.clear();
@@ -39,7 +34,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   list_.DeleteAllItems();
 
   xml_document document;
-  wstring path = taiga::GetPath(taiga::kPathTestRecognition);
+  std::wstring path = taiga::GetPath(taiga::kPathTestRecognition);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
@@ -115,12 +110,12 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   // Set title
   int success_count = 0, total_items = episodes_.size();
   for (int i = 0; i < total_items; i++) {
-    if (episodes_[i].title == test_episodes_[i].title && 
-      episodes_[i].number == test_episodes_[i].number) {
-        success_count++;
+    if (episodes_[i].title == test_episodes_[i].title &&
+        episodes_[i].number == test_episodes_[i].number) {
+      success_count++;
     }
   }
-  wstring title = L"Taiga Recognition Test";
+  std::wstring title = L"Taiga Recognition Test";
   title += L" - Success rate: " + ToWstr(success_count) + L"/" + ToWstr(total_items);
   title += L" (" + ToWstr(((float)success_count / (float)total_items) * 100.0f, 2) + L"%)";
   title += L" - Time: " + ToWstr(tick) + L" ms";
@@ -130,7 +125,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   return TRUE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 LRESULT RecognitionTestDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // ListView control
@@ -140,7 +135,8 @@ LRESULT RecognitionTestDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         int order = 1;
-        if (lplv->iSubItem == list_.GetSortColumn()) order = list_.GetSortOrder() * -1;
+        if (lplv->iSubItem == list_.GetSortColumn())
+          order = list_.GetSortOrder() * -1;
         int type = ui::kListSortDefault;
         switch (lplv->iSubItem) {
           case 3:
@@ -166,7 +162,8 @@ LRESULT RecognitionTestDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             EpisodeTest* e = reinterpret_cast<EpisodeTest*>(pCD->nmcd.lItemlParam);
-            if (!e) return CDRF_NOTIFYPOSTPAINT;
+            if (!e)
+              return CDRF_NOTIFYPOSTPAINT;
             #define CheckSubItem(e, t) \
               e->t == episodes_[e->anime_id].t ? RGB(230, 255, 230) : \
               e->t.empty() ? RGB(245, 255, 245) : RGB(255, 230, 230)
@@ -219,3 +216,5 @@ void RecognitionTestDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     }
   }
 }
+
+}  // namespace ui

@@ -16,39 +16,50 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-#include <ctime>
-
-#include "dlg_main.h"
-#include "dlg_season.h"
-
+#include "base/common.h"
+#include "base/foreach.h"
+#include "base/gfx.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/resource.h"
-#include "base/common.h"
-#include "base/foreach.h"
-#include "base/gfx.h"
-#include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
-#include "taiga/settings.h"
-#include "base/string.h"
-#include "taiga/taiga.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_season.h"
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
-#include "win/win_gdi.h"
+namespace ui {
 
-class SeasonDialog SeasonDialog;
+enum SeasonGroupBy {
+  kSeasonGroupByAiringStatus,
+  kSeasonGroupByListStatus,
+  kSeasonGroupByType
+};
 
-// =============================================================================
+enum SeasonSortBy {
+  kSeasonSortByAiringDate,
+  kSeasonSortByEpisodes,
+  kSeasonSortByPopularity,
+  kSeasonSortByScore,
+  kSeasonSortByTitle
+};
+
+enum SeasonViewAs {
+  kSeasonViewAsImages,
+  kSeasonViewAsTiles
+};
+
+SeasonDialog DlgSeason;
 
 SeasonDialog::SeasonDialog()
-    : group_by(SEASON_GROUPBY_TYPE),
-      sort_by(SEASON_SORTBY_TITLE),
-      view_as(SEASON_VIEWAS_TILES) {
+    : group_by(kSeasonGroupByType),
+      sort_by(kSeasonSortByTitle),
+      view_as(kSeasonViewAsTiles) {
 }
 
 BOOL SeasonDialog::OnInitDialog() {
@@ -58,7 +69,7 @@ BOOL SeasonDialog::OnInitDialog() {
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
   list_.SetTheme();
   list_.SetView(LV_VIEW_TILE);
-  SetViewMode(SEASON_VIEWAS_TILES);
+  SetViewMode(kSeasonViewAsTiles);
 
   // Create main toolbar
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_SEASON));
@@ -81,8 +92,8 @@ BOOL SeasonDialog::OnInitDialog() {
   UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;
   UINT fStyle = RBBS_NOGRIPPER;
   rebar_.InsertBand(nullptr, 0, 0, 0, 0, 0, 0, 0, 0, fMask, fStyle);
-  rebar_.InsertBand(toolbar_.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
-    HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), fMask, fStyle);
+  rebar_.InsertBand(toolbar_.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0,
+                    HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), fMask, fStyle);
 
   // Refresh
   RefreshList();
@@ -92,7 +103,7 @@ BOOL SeasonDialog::OnInitDialog() {
   return TRUE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 INT_PTR SeasonDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
@@ -101,7 +112,7 @@ INT_PTR SeasonDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
       return list_.SendMessage(uMsg, wParam, lParam);
     }
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -129,7 +140,7 @@ LRESULT SeasonDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   } else if (idCtrl == IDC_TOOLBAR_SEASON) {
     return OnToolbarNotify(reinterpret_cast<LPARAM>(pnmh));
   }
-  
+
   return 0;
 }
 
@@ -147,18 +158,20 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 LRESULT SeasonDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_MOUSEWHEEL: {
-      /*if (this->GetItemCount() > 0) {
+      /*
+      if (this->GetItemCount() > 0) {
         short delta = GET_WHEEL_DELTA_WPARAM(wParam);
         short value = 200;
         if (delta > 0) value = -value;
         SendMessage(LVM_SCROLL, 0, value);
         return 0;
-      }*/
+      }
+      */
       break;
     }
   }
@@ -177,21 +190,24 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
     // Double click
     case NM_DBLCLK: {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-      if (lpnmitem->iItem == -1) break;
+      if (lpnmitem->iItem == -1)
+        break;
       LPARAM param = list_.GetItemParam(lpnmitem->iItem);
-      if (param) ExecuteAction(L"Info", 0, param);
+      if (param)
+        ExecuteAction(L"Info", 0, param);
       break;
     }
 
     // Right click
     case NM_RCLICK: {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-      if (lpnmitem->iItem == -1) break;
+      if (lpnmitem->iItem == -1)
+        break;
       auto anime_item = AnimeDatabase.FindItem(
-        static_cast<int>(list_.GetItemParam(lpnmitem->iItem)));
+          static_cast<int>(list_.GetItemParam(lpnmitem->iItem)));
       if (anime_item) {
         ui::Menus.UpdateSeasonList(!anime_item->IsInList());
-        ExecuteAction(ui::Menus.Show(pnmh->hwndFrom, 0, 0, L"SeasonList"), 0, 
+        ExecuteAction(ui::Menus.Show(pnmh->hwndFrom, 0, 0, L"SeasonList"), 0,
                       static_cast<LPARAM>(anime_item->GetId()));
         list_.RedrawWindow();
       }
@@ -209,16 +225,15 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
   win::Dc hdc = pCD->nmcd.hdc;
   win::Rect rect = pCD->nmcd.rc;
 
-  if (win::GetVersion() < win::kVersionVista) {
+  if (win::GetVersion() < win::kVersionVista)
     list_.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rect);
-  }
 
   switch (pCD->nmcd.dwDrawStage) {
     case CDDS_PREPAINT: {
       // LVN_GETEMPTYMARKUP notification is sent only once, so we paint our own
       // markup text when the control has no items.
       if (list_.GetItemCount() == 0) {
-        wstring text;
+        std::wstring text;
         if (SeasonDatabase.items.empty()) {
           text = L"No season selected. Please choose one from above.";
         } else {
@@ -241,13 +256,14 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
 
     case CDDS_ITEMPOSTPAINT: {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
-      if (!anime_item) break;
+      if (!anime_item)
+        break;
       
       // Draw border
       if (win::GetVersion() > win::kVersionXp) {
         rect.Inflate(-4, -4);
       }
-      if (win::GetVersion() < win::kVersionVista && 
+      if (win::GetVersion() < win::kVersionVista &&
           pCD->nmcd.uItemState & CDIS_SELECTED) {
         hdc.FillRect(rect, GetSysColor(COLOR_HIGHLIGHT));
       } else {
@@ -263,31 +279,31 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
 
       // Calculate areas
       win::Rect rect_image(
-        rect.left + 4, rect.top + 4, 
-        rect.left + 124, rect.bottom - 4);
+          rect.left + 4, rect.top + 4, 
+          rect.left + 124, rect.bottom - 4);
       win::Rect rect_title(
-        rect_image.right + 4, rect_image.top, 
-        rect.right - 4, rect_image.top + text_height + 8);
+          rect_image.right + 4, rect_image.top, 
+          rect.right - 4, rect_image.top + text_height + 8);
       win::Rect rect_details(
-        rect_title.left + 4, rect_title.bottom + 4, 
-        rect_title.right, rect_title.bottom + 4 + (6 * (text_height + 2)));
+          rect_title.left + 4, rect_title.bottom + 4, 
+          rect_title.right, rect_title.bottom + 4 + (6 * (text_height + 2)));
       win::Rect rect_synopsis(
-        rect_details.left, rect_details.bottom + 4, 
-        rect_details.right, rect_image.bottom);
+          rect_details.left, rect_details.bottom + 4, 
+          rect_details.right, rect_image.bottom);
 
       // Draw image
       if (ImageDatabase.Load(anime_item->GetId(), false, false)) {
         auto image = ImageDatabase.GetImage(anime_item->GetId());
-        rect_image = ResizeRect(rect_image, 
+        rect_image = ResizeRect(rect_image,
                                 image->rect.Width(),
                                 image->rect.Height(),
                                 true, true, false);
         hdc.SetStretchBltMode(HALFTONE);
-        hdc.StretchBlt(rect_image.left, rect_image.top, 
-                       rect_image.Width(), rect_image.Height(), 
-                       image->dc.Get(), 0, 0, 
-                       image->rect.Width(), 
-                       image->rect.Height(), 
+        hdc.StretchBlt(rect_image.left, rect_image.top,
+                       rect_image.Width(), rect_image.Height(),
+                       image->dc.Get(), 0, 0,
+                       image->rect.Width(),
+                       image->rect.Height(),
                        SRCCOPY);
       }
       
@@ -295,13 +311,17 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       COLORREF color;
       switch (anime_item->GetAiringStatus()) {
         case anime::kAiring:
-          color = ui::kColorLightGreen; break;
-        case anime::kFinishedAiring: default:
-          color = ui::kColorLightBlue; break;
+          color = ui::kColorLightGreen;
+          break;
+        case anime::kFinishedAiring:
+        default:
+          color = ui::kColorLightBlue;
+          break;
         case anime::kNotYetAired:
-          color = ui::kColorLightRed; break;
+          color = ui::kColorLightRed;
+          break;
       }
-      if (view_as == SEASON_VIEWAS_IMAGES) {
+      if (view_as == kSeasonViewAsImages) {
         rect_title.Copy(rect);
         rect_title.top = rect_title.bottom - (text_height + 8);
       }
@@ -309,19 +329,20 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       
       // Draw anime list indicator
       if (anime_item->IsInList()) {
-        ui::Theme.GetImageList16().Draw(ui::kIcon16_DocumentA, hdc.Get(),
-                          rect_title.right - 20, rect_title.top + 4);
+        ui::Theme.GetImageList16().Draw(
+            ui::kIcon16_DocumentA, hdc.Get(),
+            rect_title.right - 20, rect_title.top + 4);
         rect_title.right -= 20;
       }
 
       // Set title
-      wstring text = anime_item->GetTitle();
-      if (view_as == SEASON_VIEWAS_IMAGES) {
+      std::wstring text = anime_item->GetTitle();
+      if (view_as == kSeasonViewAsImages) {
         switch (sort_by) {
-          case SEASON_SORTBY_AIRINGDATE:
+          case kSeasonSortByAiringDate:
             text = anime::TranslateDate(anime_item->GetDateStart());
             break;
-          case SEASON_SORTBY_EPISODES:
+          case kSeasonSortByEpisodes:
             text = anime::TranslateNumber(anime_item->GetEpisodeCount(), L"");
             if (text.empty()) {
               text = L"Unknown";
@@ -329,15 +350,17 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
               text += text == L"1" ? L" episode" : L" episodes";
             }
             break;
-          case SEASON_SORTBY_POPULARITY:
+          case kSeasonSortByPopularity:
             text = anime_item->GetPopularity();
-            if (text.empty()) text = L"#0";
+            if (text.empty())
+              text = L"#0";
             break;
-          case SEASON_SORTBY_SCORE:
+          case kSeasonSortByScore:
             text = anime_item->GetScore();
             if (InStr(text, L"scored by") > -1)
               text = text.substr(0, 4);
-            if (text.empty()) text = L"0.00";
+            if (text.empty())
+              text = L"0.00";
             break;
         }
       }
@@ -347,12 +370,13 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       hdc.EditFont(nullptr, -1, TRUE);
       hdc.SetBkMode(TRANSPARENT);
       UINT nFormat = DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER;
-      if (view_as == SEASON_VIEWAS_IMAGES)
+      if (view_as == kSeasonViewAsImages)
         nFormat |= DT_CENTER;
       hdc.DrawText(text.c_str(), text.length(), rect_title, nFormat);
 
       // Draw details
-      if (view_as == SEASON_VIEWAS_IMAGES) break;
+      if (view_as == kSeasonViewAsImages)
+        break;
       int text_top = rect_details.top;
       #define DRAWLINE(t) \
         text = t; \
@@ -368,7 +392,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(L"Popularity:");
 
       rect_details.Set(rect_details.left + 75, text_top, 
-        rect_details.right, rect_details.top + text_height);
+                       rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
       text = anime::TranslateDate(anime_item->GetDateStart());
@@ -390,7 +414,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         // DT_WORDBREAK doesn't go well with DT_*_ELLIPSIS, so we need to make
         // sure our text ends with ellipses by clipping that extra pixel.
         rect_synopsis.bottom -= (rect_synopsis.Height() % text_height) + 1;
-        hdc.DrawText(text.c_str(), text.length(), rect_synopsis, 
+        hdc.DrawText(text.c_str(), text.length(), rect_synopsis,
                      DT_END_ELLIPSIS | DT_NOPREFIX | DT_WORDBREAK);
       }
 
@@ -406,11 +430,14 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
   switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
     // Dropdown button click
     case TBN_DROPDOWN: {
-      RECT rect; LPNMTOOLBAR nmt = reinterpret_cast<LPNMTOOLBAR>(lParam);
-      ::SendMessage(nmt->hdr.hwndFrom, TB_GETRECT, static_cast<WPARAM>(nmt->iItem), reinterpret_cast<LPARAM>(&rect));          
+      RECT rect;
+      LPNMTOOLBAR nmt = reinterpret_cast<LPNMTOOLBAR>(lParam);
+      ::SendMessage(nmt->hdr.hwndFrom, TB_GETRECT,
+                    static_cast<WPARAM>(nmt->iItem),
+                    reinterpret_cast<LPARAM>(&rect));          
       MapWindowPoints(nmt->hdr.hwndFrom, HWND_DESKTOP, reinterpret_cast<LPPOINT>(&rect), 2);
       ui::Menus.UpdateSeason();
-      wstring action;
+      std::wstring action;
       switch (LOWORD(nmt->iItem)) {
         // Select season
         case 100:
@@ -449,17 +476,17 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
   return 0L;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void SeasonDialog::RefreshData(int anime_id) {
-  for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
+  foreach_(id, SeasonDatabase.items) {
     if (anime_id > 0 && anime_id != *id)
       continue;
-    
+
     auto anime_item = AnimeDatabase.FindItem(*id);
     if (!anime_item)
       continue;
-    
+
     // Download missing image
     ImageDatabase.Load(*id, true, true);
     
@@ -470,8 +497,9 @@ void SeasonDialog::RefreshData(int anime_id) {
 }
 
 void SeasonDialog::RefreshList(bool redraw_only) {
-  if (!IsWindow()) return;
-  
+  if (!IsWindow())
+    return;
+
   if (redraw_only) {
     list_.RedrawWindow();
     return;
@@ -489,19 +517,19 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 
   // Insert list groups
   list_.RemoveAllGroups();
-  list_.EnableGroupView(true); // Required for XP
+  list_.EnableGroupView(true);  // Required for XP
   switch (group_by) {
-    case SEASON_GROUPBY_AIRINGSTATUS:
+    case kSeasonGroupByAiringStatus:
       for (int i = anime::kAiring; i <= anime::kNotYetAired; i++) {
         list_.InsertGroup(i, anime::TranslateStatus(i).c_str(), true, false);
       }
       break;
-    case SEASON_GROUPBY_LISTSTATUS:
+    case kSeasonGroupByListStatus:
       for (int i = anime::kNotInList; i <= anime::kPlanToWatch; i++) {
         list_.InsertGroup(i, anime::TranslateMyStatus(i, false).c_str(), true, false);
       }
       break;
-    case SEASON_GROUPBY_TYPE:
+    case kSeasonGroupByType:
       for (int i = anime::kTv; i <= anime::kMusic; i++) {
         list_.InsertGroup(i, anime::TranslateType(i).c_str(), true, false);
       }
@@ -509,7 +537,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   }
 
   // Filter
-  vector<wstring> filters;
+  std::vector<std::wstring> filters;
   Split(DlgMain.search_bar.filters.text, L" ", filters);
   RemoveEmptyStrings(filters);
 
@@ -528,40 +556,41 @@ void SeasonDialog::RefreshList(bool redraw_only) {
         break;
       }
     }
-    if (!passed_filters) continue;
+    if (!passed_filters)
+      continue;
     int group = -1;
     switch (group_by) {
-      case SEASON_GROUPBY_AIRINGSTATUS:
+      case kSeasonGroupByAiringStatus:
         group = anime_item->GetAiringStatus();
         break;
-      case SEASON_GROUPBY_LISTSTATUS: {
+      case kSeasonGroupByListStatus: {
         group = anime_item->GetMyStatus();
         break;
       }
-      case SEASON_GROUPBY_TYPE:
+      case kSeasonGroupByType:
         group = anime_item->GetType();
         break;
     }
-    list_.InsertItem(i - SeasonDatabase.items.begin(), 
-                     group, -1, 0, nullptr, LPSTR_TEXTCALLBACK, 
+    list_.InsertItem(i - SeasonDatabase.items.begin(),
+                     group, -1, 0, nullptr, LPSTR_TEXTCALLBACK,
                      static_cast<LPARAM>(anime_item->GetId()));
   }
-  
+
   // Sort items
   switch (sort_by) {
-    case SEASON_SORTBY_AIRINGDATE:
+    case kSeasonSortByAiringDate:
       list_.Sort(0, -1, ui::kListSortDateStart, ui::ListViewCompareProc);
       break;
-    case SEASON_SORTBY_EPISODES:
+    case kSeasonSortByEpisodes:
       list_.Sort(0, -1, ui::kListSortEpisodeCount, ui::ListViewCompareProc);
       break;
-    case SEASON_SORTBY_POPULARITY:
+    case kSeasonSortByPopularity:
       list_.Sort(0, 1, ui::kListSortPopularity, ui::ListViewCompareProc);
       break;
-    case SEASON_SORTBY_SCORE:
+    case kSeasonSortByScore:
       list_.Sort(0, -1, ui::kListSortScore, ui::ListViewCompareProc);
       break;
-    case SEASON_SORTBY_TITLE:
+    case kSeasonSortByTitle:
       list_.Sort(0, 1, ui::kListSortTitle, ui::ListViewCompareProc);
       break;
   }
@@ -573,49 +602,27 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 }
 
 void SeasonDialog::RefreshStatus() {
-  if (SeasonDatabase.items.empty()) return;
+  if (SeasonDatabase.items.empty())
+    return;
 
-  wstring text = SeasonDatabase.name + L", from " + 
-                 anime::TranslateSeasonToMonths(SeasonDatabase.name);
-  
-  time_t last_modified = 0;
-  for (auto id = SeasonDatabase.items.begin(); id != SeasonDatabase.items.end(); ++id) {
-    auto anime_item = AnimeDatabase.FindItem(*id);
-    if (anime_item) {
-      if (id == SeasonDatabase.items.begin() || 
-          anime_item->last_modified < last_modified)
-        last_modified = anime_item->last_modified;
-    }
-  }
-  if (last_modified) {
-    time_t time_diff = time(nullptr) - last_modified;
-    text += L" (Last updated: ";
-    if (time_diff < 60) {
-      text += L"Now";
-    } else if (time_diff > 60 * 60 * 24) {
-      time_t days = time_diff / (60 * 60 * 24);
-      text += ToWstr(days) + (days == 1 ? L" day ago" : L" days ago");
-    } else {
-      text += L"Today";
-    }
-    text += L")";
-  }
+  std::wstring text = SeasonDatabase.name + L", from " + 
+                      anime::TranslateSeasonToMonths(SeasonDatabase.name);
 
-  DlgMain.ChangeStatus(text);
+  ui::ChangeStatusText(text);
 }
 
 void SeasonDialog::RefreshToolbar() {
   toolbar_.EnableButton(101, !SeasonDatabase.items.empty());
-  
-  wstring text = L"Group by: ";
+
+  std::wstring text = L"Group by: ";
   switch (group_by) {
-    case SEASON_GROUPBY_AIRINGSTATUS:
+    case kSeasonGroupByAiringStatus:
       text += L"Airing status";
       break;
-    case SEASON_GROUPBY_LISTSTATUS:
+    case kSeasonGroupByListStatus:
       text += L"List status";
       break;
-    case SEASON_GROUPBY_TYPE:
+    case kSeasonGroupByType:
       text += L"Type";
       break;
   }
@@ -623,19 +630,19 @@ void SeasonDialog::RefreshToolbar() {
 
   text = L"Sort by: ";
   switch (sort_by) {
-    case SEASON_SORTBY_AIRINGDATE:
+    case kSeasonSortByAiringDate:
       text += L"Airing date";
       break;
-    case SEASON_SORTBY_EPISODES:
+    case kSeasonSortByEpisodes:
       text += L"Episodes";
       break;
-    case SEASON_SORTBY_POPULARITY:
+    case kSeasonSortByPopularity:
       text += L"Popularity";
       break;
-    case SEASON_SORTBY_SCORE:
+    case kSeasonSortByScore:
       text += L"Score";
       break;
-    case SEASON_SORTBY_TITLE:
+    case kSeasonSortByTitle:
       text += L"Title";
       break;
   }
@@ -643,10 +650,10 @@ void SeasonDialog::RefreshToolbar() {
 
   text = L"View: ";
   switch (view_as) {
-    case SEASON_VIEWAS_IMAGES:
+    case kSeasonViewAsImages:
       text += L"Images";
       break;
-    case SEASON_VIEWAS_TILES:
+    case kSeasonViewAsTiles:
       text += L"Details";
       break;
   }
@@ -655,9 +662,11 @@ void SeasonDialog::RefreshToolbar() {
 
 void SeasonDialog::SetViewMode(int mode) {
   SIZE size;
-  size.cx = mode == SEASON_VIEWAS_IMAGES ? 142 : 500;
+  size.cx = mode == kSeasonViewAsImages ? 142 : 500;
   size.cy = 200;
   list_.SetTileViewInfo(0, LVTVIF_FIXEDSIZE, nullptr, &size);
 
   view_as = mode;
 }
+
+}  // namespace ui

@@ -16,31 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_main.h"
-#include "dlg_settings.h"
-#include "dlg_torrent.h"
-
+#include "base/common.h"
+#include "base/gfx.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
-#include "base/common.h"
-#include "track/feed.h"
-#include "base/gfx.h"
-#include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "base/string.h"
-#include "taiga/taiga.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_settings.h"
+#include "ui/dlg/dlg_torrent.h"
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 
-#include "win/win_gdi.h"
+namespace ui {
 
-class TorrentDialog TorrentDialog;
-
-// =============================================================================
+TorrentDialog DlgTorrent;
 
 BOOL TorrentDialog::OnInitDialog() {
   // Set properties
@@ -49,11 +41,11 @@ BOOL TorrentDialog::OnInitDialog() {
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_TORRENT));
   list_.EnableGroupView(true);
-  list_.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | 
-    LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  list_.SetExtendedStyle(
+      LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetImageList(ui::Theme.GetImageList16().GetHandle());
   list_.SetTheme();
-  
+
   // Insert list columns
   list_.InsertColumn(0, 240, 240, LVCFMT_LEFT,  L"Anime title");
   list_.InsertColumn(1,  60,  60, LVCFMT_RIGHT, L"Episode");
@@ -83,11 +75,11 @@ BOOL TorrentDialog::OnInitDialog() {
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_TORRENT));
   // Insert rebar bands
-  rebar_.InsertBand(NULL, 0, 0, 0, 0, 0, 0, 0, 0, 
-    RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE, RBBS_NOGRIPPER);
+  rebar_.InsertBand(NULL, 0, 0, 0, 0, 0, 0, 0, 0,
+      RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE, RBBS_NOGRIPPER);
   rebar_.InsertBand(toolbar_.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0, 
-    HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), 
-    RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE, RBBS_NOGRIPPER);
+      HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), 
+      RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE, RBBS_NOGRIPPER);
 
   // Refresh list
   RefreshList();
@@ -95,7 +87,7 @@ BOOL TorrentDialog::OnInitDialog() {
   return TRUE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 INT_PTR TorrentDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
@@ -104,14 +96,15 @@ INT_PTR TorrentDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
       return list_.SendMessage(uMsg, wParam, lParam);
     }
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
 BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-  if (!feed) return 0;
-  
+  if (!feed)
+    return 0;
+
   // Toolbar
   switch (LOWORD(wParam)) {
     // Check new torrents
@@ -159,7 +152,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Settings
     case 103: {
-      ExecuteAction(L"Settings", SECTION_TORRENTS, PAGE_TORRENTS_DISCOVERY);
+      ExecuteAction(L"Settings", kSettingsSectionTorrents, kSettingsPageTorrentsDiscovery);
       return TRUE;
     }
   }
@@ -169,7 +162,8 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 
 LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-  if (!feed) return 0;
+  if (!feed)
+    return 0;
 
   // ListView control
   if (idCtrl == IDC_LIST_TORRENT) {
@@ -225,9 +219,8 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
           if (lpnmitem->iItem == -1) break;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
-          if (feed_item) {
+          if (feed_item)
             feed->Download(feed_item->index);
-          }
         }
         break;
       }
@@ -238,7 +231,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (lpnmitem->iItem == -1) break;
         FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
         if (feed_item) {
-          wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"TorrentListRightClick");
+          std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
             feed->Download(feed_item->index);
           } else if (answer == L"Info") {
@@ -263,15 +256,15 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
                 }
               }
               Aggregator.filter_manager.AddFilter(
-                FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
-                L"Discard \"" + anime_item->GetTitle() + L"\"");
+                  FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
+                  L"Discard \"" + anime_item->GetTitle() + L"\"");
               Aggregator.filter_manager.filters.back().AddCondition(
-                FEED_FILTER_ELEMENT_META_ID, FEED_FILTER_OPERATOR_EQUALS, 
-                ToWstr(anime_item->GetId()));
+                  FEED_FILTER_ELEMENT_META_ID, FEED_FILTER_OPERATOR_EQUALS, 
+                  ToWstr(anime_item->GetId()));
             }
           } else if (answer == L"SelectFansub") {
             int anime_id = feed_item->episode_data.anime_id;
-            wstring group_name = feed_item->episode_data.group;
+            std::wstring group_name = feed_item->episode_data.group;
             if (anime_id > anime::ID_UNKNOWN && !group_name.empty()) {
               for (int i = 0; i < list_.GetItemCount(); i++) {
                 feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
@@ -354,7 +347,7 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void TorrentDialog::EnableInput(bool enable) {
   // Enable/disable toolbar buttons
@@ -367,16 +360,18 @@ void TorrentDialog::EnableInput(bool enable) {
 void TorrentDialog::RefreshList() {
   if (!IsWindow()) return;
   Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-  if (!feed) return;
-  
+  if (!feed)
+    return;
+
   // Hide list to avoid visual defects and gain performance
   list_.Hide();
   list_.DeleteAllItems();
 
   // Add items
   for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
-    wstring title, number, video;
-    int group = TORRENT_ANIME, icon = StatusToIcon(0);
+    std::wstring title, number, video;
+    int group = TORRENT_ANIME;
+    int icon = StatusToIcon(0);
     if (it->category == L"Batch" ||
         !IsNumeric(it->episode_data.number) ||
         InStr(it->title, L"Vol.") > -1) {
@@ -392,7 +387,7 @@ void TorrentDialog::RefreshList() {
       group = TORRENT_OTHER;
       title = it->title;
     }
-    vector<int> numbers;
+    std::vector<int> numbers;
     SplitEpisodeNumbers(it->episode_data.number, numbers);
     number = JoinEpisodeNumbers(numbers);
     if (!it->episode_data.version.empty()) {
@@ -419,7 +414,7 @@ void TorrentDialog::RefreshList() {
   list_.Show();
 
   // Set title
-  wstring title = L"Torrents";
+  std::wstring title = L"Torrents";
   if (!feed->title.empty()) {
     title = feed->title;
   } else if (!feed->link.empty()) {
@@ -432,25 +427,26 @@ void TorrentDialog::RefreshList() {
   SetText(title.c_str());
 }
 
-void TorrentDialog::Search(wstring url, int anime_id) {
+void TorrentDialog::Search(std::wstring url, int anime_id) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
-  
+
   if (!anime_item)
     return;
 
-  wstring title = anime_item->GetTitle();
+  std::wstring title = anime_item->GetTitle();
   if (anime_item->GetUseAlternative() &&
       anime_item->UserSynonymsAvailable())
     title = anime_item->GetUserSynonyms().front();
-  
+
   Search(url, title);
 }
 
-void TorrentDialog::Search(wstring url, wstring title) {
+void TorrentDialog::Search(std::wstring url, std::wstring title) {
   Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
-  if (!feed) return;
+  if (!feed)
+    return;
 
-  DlgMain.navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+  DlgMain.navigation.SetCurrentPage(kSidebarItemFeeds);
   DlgMain.edit.SetText(title);
   DlgMain.ChangeStatus(L"Searching torrents for \"" + title + L"\"...");
 
@@ -458,6 +454,8 @@ void TorrentDialog::Search(wstring url, wstring title) {
   feed->Check(url);
 }
 
-void TorrentDialog::SetTimerText(const wstring& text) {
+void TorrentDialog::SetTimerText(const std::wstring& text) {
   toolbar_.SetButtonText(0, text.c_str());
 }
+
+}  // namespace ui

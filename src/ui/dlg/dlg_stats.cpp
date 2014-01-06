@@ -16,22 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_stats.h"
-
-#include "library/anime_db.h"
-#include "base/common.h"
 #include "base/file.h"
 #include "base/gfx.h"
+#include "base/string.h"
+#include "library/anime_db.h"
 #include "taiga/resource.h"
 #include "taiga/stats.h"
-#include "base/string.h"
+#include "ui/dlg/dlg_stats.h"
 #include "ui/theme.h"
 
-class StatsDialog StatsDialog;
+namespace ui {
 
-// =============================================================================
+StatsDialog DlgStats;
 
 BOOL StatsDialog::OnInitDialog() {
   // Set new font for headers
@@ -78,7 +74,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
           }
 
           if (Stats.score_count[i] > 0.0f) {
-            wstring text = ToWstr(Stats.score_count[i]);
+            std::wstring text = ToWstr(Stats.score_count[i]);
             win::Rect rect_text = rect;
             rect_text.left = rect_text.right += 8;
             rect_text.right = dis->rcItem.right;
@@ -88,7 +84,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                         DT_SINGLELINE | DT_VCENTER);
           }
         }
-        
+
         dc.DetachDc();
         return TRUE;
       }
@@ -98,7 +94,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     case WM_ERASEBKGND:
       return TRUE;
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -147,13 +143,14 @@ void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void StatsDialog::Refresh() {
-  if (!IsWindow()) return;
-  
+  if (!IsWindow())
+    return;
+
   // Anime list
-  wstring text;
+  std::wstring text;
   text += ToWstr(Stats.anime_count) + L"\n";
   text += ToWstr(Stats.episode_count) + L"\n";
   text += Stats.life_spent_watching + L"\n";
@@ -185,3 +182,5 @@ void StatsDialog::Refresh() {
   text += ToWstr(Stats.tigers_harmed);
   SetDlgItemText(IDC_STATIC_ANIME_STAT4, text.c_str());
 }
+
+}  // namespace ui

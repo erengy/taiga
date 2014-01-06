@@ -16,19 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_TORRENT_H
-#define DLG_TORRENT_H
+#ifndef TAIGA_UI_DLG_TORRENT_H
+#define TAIGA_UI_DLG_TORRENT_H
 
-#include "base/std.h"
+#include <string>
+
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class TorrentDialog : public win::Dialog {
 public:
   TorrentDialog() {};
-  virtual ~TorrentDialog() {};
+  ~TorrentDialog() {};
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -36,12 +37,11 @@ public:
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
-public:
   void EnableInput(bool enable = true);
   void RefreshList();
-  void Search(wstring url, int anime_id);
-  void Search(wstring url, wstring title);
-  void SetTimerText(const wstring& text);
+  void Search(std::wstring url, int anime_id);
+  void Search(std::wstring url, std::wstring title);
+  void SetTimerText(const std::wstring& text);
 
 private:
   win::ListView list_;
@@ -49,6 +49,8 @@ private:
   win::Toolbar toolbar_;
 };
 
-extern class TorrentDialog TorrentDialog;
+extern TorrentDialog DlgTorrent;
 
-#endif // DLG_TORRENT_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_TORRENT_H

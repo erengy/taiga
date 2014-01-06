@@ -17,18 +17,15 @@
 */
 
 #include "base/common.h"
-#include "base/gfx.h"
 #include "base/process.h"
 #include "base/string.h"
+#include "library/anime.h"
 #include "library/anime_db.h"
-#include "library/anime_filter.h"
 #include "library/anime_util.h"
 #include "library/history.h"
 #include "library/resource.h"
 #include "sync/service.h"
 #include "taiga/announce.h"
-#include "taiga/debug.h"
-#include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -38,7 +35,6 @@
 #include "track/monitor.h"
 #include "track/recognition.h"
 #include "ui/dialog.h"
-#include "ui/dlg/dlg_about.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_history.h"
@@ -47,12 +43,10 @@
 #include "ui/dlg/dlg_season.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_stats.h"
-#include "ui/dlg/dlg_test_recognition.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
-#include "win/win_gdi.h"
 #include "win/win_taskbar.h"
 #include "win/win_taskdialog.h"
 
@@ -83,7 +77,7 @@ BOOL MainDialog::OnInitDialog() {
   CreateDialogControls();
 
   // Select default content page
-  navigation.SetCurrentPage(SIDEBAR_ITEM_ANIMELIST);
+  navigation.SetCurrentPage(kSidebarItemAnimeList);
 
   // Start process timer
   SetTimer(g_hMain, TIMER_MAIN, 1000, nullptr);
@@ -117,7 +111,7 @@ BOOL MainDialog::OnInitDialog() {
     dlg.AddButton(L"No", IDNO);
     dlg.Show(g_hMain);
     if (dlg.GetSelectedButtonID() == IDYES)
-      ExecuteAction(L"Settings", SECTION_SERVICES, PAGE_SERVICES_MAL);
+      ExecuteAction(L"Settings", kSettingsSectionServices, kSettingsPageServicesMal);
   }
   if (Settings.GetBool(taiga::kLibrary_WatchFolders)) {
     FolderMonitor.SetWindowHandle(GetWindowHandle());
@@ -169,15 +163,15 @@ void MainDialog::CreateDialogControls() {
   statusbar.InsertPart(ui::kIcon16_Clock, 0, 0,  32, nullptr, nullptr);
 
   // Insert treeview items
-  treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ui::kIcon16_Play, SIDEBAR_ITEM_NOWPLAYING, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ui::kIcon16_Play, kSidebarItemNowPlaying, nullptr));
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Anime List", ui::kIcon16_DocumentA, SIDEBAR_ITEM_ANIMELIST, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"History", ui::kIcon16_Clock, SIDEBAR_ITEM_HISTORY, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Statistics", ui::kIcon16_Chart, SIDEBAR_ITEM_STATS, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Anime List", ui::kIcon16_DocumentA, kSidebarItemAnimeList, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"History", ui::kIcon16_Clock, kSidebarItemHistory, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Statistics", ui::kIcon16_Chart, kSidebarItemStats, nullptr));
   treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Search", ui::kIcon16_Search, SIDEBAR_ITEM_SEARCH, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Seasons", ui::kIcon16_Calendar, SIDEBAR_ITEM_SEASONS, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(L"Torrents", ui::kIcon16_Feed, SIDEBAR_ITEM_FEEDS, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Search", ui::kIcon16_Search, kSidebarItemSearch, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Seasons", ui::kIcon16_Calendar, kSidebarItemSeasons, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(L"Torrents", ui::kIcon16_Feed, kSidebarItemFeeds, nullptr));
   if (History.queue.GetItemCount() > 0) {
     treeview.RefreshHistoryCounter();
   }
@@ -192,23 +186,23 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0, ui::kIcon24_Sync, TOOLBAR_BUTTON_SYNCHRONIZE, 
+  toolbar_main.InsertButton(0, ui::kIcon24_Sync, kToolbarButtonSync, 
                             1, fsStyle1, 0, nullptr, L"Synchronize list");
-  toolbar_main.InsertButton(1, ui::kIcon24_Mal, TOOLBAR_BUTTON_MAL, 
+  toolbar_main.InsertButton(1, ui::kIcon24_Mal, kToolbarButtonMal, 
                             1, fsStyle1, 1, nullptr, L"Go to my panel at MyAnimeList");
-  toolbar_main.InsertButton(2, ui::kIcon24_Herro, TOOLBAR_BUTTON_HERRO, 
+  toolbar_main.InsertButton(2, ui::kIcon24_Herro, kToolbarButtonHerro, 
                             1, fsStyle1, 2, nullptr, L"Go to my profile at Herro");
   toolbar_main.InsertButton(3, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(4, ui::kIcon24_Folders, TOOLBAR_BUTTON_FOLDERS, 
+  toolbar_main.InsertButton(4, ui::kIcon24_Folders, kToolbarButtonFolders, 
                             1, fsStyle2, 4, nullptr, L"Root folders");
-  toolbar_main.InsertButton(5, ui::kIcon24_Tools, TOOLBAR_BUTTON_TOOLS, 
+  toolbar_main.InsertButton(5, ui::kIcon24_Tools, kToolbarButtonTools, 
                             1, fsStyle2, 5, nullptr, L"External links");
   toolbar_main.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(7, ui::kIcon24_Settings, TOOLBAR_BUTTON_SETTINGS, 
+  toolbar_main.InsertButton(7, ui::kIcon24_Settings, kToolbarButtonSettings, 
                             1, fsStyle1, 7, nullptr, L"Change program settings");
 #ifdef _DEBUG
   toolbar_main.InsertButton(8, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(9, ui::kIcon24_About, TOOLBAR_BUTTON_ABOUT, 
+  toolbar_main.InsertButton(9, ui::kIcon24_About, kToolbarButtonDebug, 
                             1, fsStyle1, 9, nullptr, L"Debug");
 #endif
 
@@ -333,12 +327,12 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             edit.GetText(text);
             if (text.empty()) break;
             switch (search_bar.mode) {
-              case SEARCH_MODE_MAL: {
+              case kSearchModeService: {
                 ExecuteAction(L"SearchAnime(" + text + L")");
                 return TRUE;
               }
-              case SEARCH_MODE_FEED: {
-                TorrentDialog.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], text);
+              case kSearchModeFeed: {
+                DlgTorrent.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], text);
                 return TRUE;
               }
             }
@@ -361,25 +355,25 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         }
         case VK_F5: {
           switch (navigation.GetCurrentPage()) {
-            case SIDEBAR_ITEM_ANIMELIST:
+            case kSidebarItemAnimeList:
               // Scan available episodes
               ScanAvailableEpisodes(anime::ID_UNKNOWN, true, false);
               return TRUE;
-            case SIDEBAR_ITEM_HISTORY:
+            case kSidebarItemHistory:
               // Refresh history
               DlgHistory.RefreshList();
               treeview.RefreshHistoryCounter();
               return TRUE;
-            case SIDEBAR_ITEM_STATS:
+            case kSidebarItemStats:
               // Refresh stats
               Stats.CalculateAll();
-              StatsDialog.Refresh();
+              DlgStats.Refresh();
               return TRUE;
-            case SIDEBAR_ITEM_SEASONS:
+            case kSidebarItemSeasons:
               // Refresh season data
-              SeasonDialog.RefreshData();
+              DlgSeason.RefreshData();
               return TRUE;
-            case SIDEBAR_ITEM_FEEDS: {
+            case kSidebarItemFeeds: {
               // Check new torrents
               Feed* feed = Aggregator.Get(FEED_CATEGORY_LINK);
               if (feed) {
@@ -402,23 +396,23 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
       // message-forwarding loop
       pMsg->wParam = MAKEWPARAM(0, HIWORD(pMsg->wParam));
       switch (navigation.GetCurrentPage()) {
-        case SIDEBAR_ITEM_ANIMELIST:
+        case kSidebarItemAnimeList:
           return DlgAnimeList.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
-        case SIDEBAR_ITEM_HISTORY:
+        case kSidebarItemHistory:
           return DlgHistory.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
-        case SIDEBAR_ITEM_STATS:
-          return StatsDialog.SendMessage(
+        case kSidebarItemStats:
+          return DlgStats.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
-        case SIDEBAR_ITEM_SEARCH:
-          return SearchDialog.SendMessage(
+        case kSidebarItemSearch:
+          return DlgSearch.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
-        case SIDEBAR_ITEM_SEASONS:
-          return SeasonDialog.SendMessage(
+        case kSidebarItemSeasons:
+          return DlgSeason.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
-        case SIDEBAR_ITEM_FEEDS:
-          return TorrentDialog.SendMessage(
+        case kSidebarItemFeeds:
+          return DlgTorrent.SendMessage(
             pMsg->message, pMsg->wParam, pMsg->lParam);
       }
       break;
@@ -561,11 +555,11 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
   // Measure stability
   Stats.uptime++;
   // Refresh statistics window
-  if (StatsDialog.IsVisible()) {
+  if (DlgStats.IsVisible()) {
     if (Stats.uptime % 10 == 0) { // Recalculate every 10 seconds
       Stats.CalculateAll();
     }
-    StatsDialog.Refresh();
+    DlgStats.Refresh();
   }
 
   // ===========================================================================
@@ -610,16 +604,16 @@ void MainDialog::OnTimer(UINT_PTR nIDEvent) {
         }
         if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled) &&
             Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) > 0) {
-          if (TorrentDialog.IsWindow()) {
-            TorrentDialog.SetTimerText(L"Check new torrents [" + 
+          if (DlgTorrent.IsWindow()) {
+            DlgTorrent.SetTimerText(L"Check new torrents [" + 
               ToTimeString(Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) * 60 - Aggregator.feeds[i].ticker) + L"]");
           }
           if (Aggregator.feeds[i].ticker >= Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) * 60) {
             Aggregator.feeds[i].Check(Settings[taiga::kTorrent_Discovery_Source], true);
           }
         } else {
-          if (TorrentDialog.IsWindow()) {
-            TorrentDialog.SetTimerText(L"Check new torrents");
+          if (DlgTorrent.IsWindow()) {
+            DlgTorrent.SetTimerText(L"Check new torrents");
           }
         }
         break;
@@ -752,7 +746,6 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   } else if (uMsg == WM_TASKBARCALLBACK) {
     switch (lParam) {
       case NIN_BALLOONSHOW: {
-        debug::Print(L"Tip type: " + ToWstr(Taiga.current_tip_type) + L"\n");
         break;
       }
       case NIN_BALLOONTIMEOUT: {
@@ -762,13 +755,13 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
       case NIN_BALLOONUSERCLICK: {
         switch (Taiga.current_tip_type) {
           case taiga::kTipTypeNowPlaying:
-            navigation.SetCurrentPage(SIDEBAR_ITEM_NOWPLAYING);
+            navigation.SetCurrentPage(kSidebarItemNowPlaying);
             break;
           case taiga::kTipTypeSearch:
             ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
             break;
           case taiga::kTipTypeTorrent:
-            navigation.SetCurrentPage(SIDEBAR_ITEM_FEEDS);
+            navigation.SetCurrentPage(kSidebarItemFeeds);
             break;
           case taiga::kTipTypeUpdateFailed:
             History.queue.Check(false);
@@ -803,7 +796,7 @@ void MainDialog::ChangeStatus(wstring str) {
 
 void MainDialog::EnableInput(bool enable) {
   // Toolbar buttons
-  toolbar_main.EnableButton(TOOLBAR_BUTTON_SYNCHRONIZE, enable);
+  toolbar_main.EnableButton(kToolbarButtonSync, enable);
   // Content
   DlgAnimeList.Enable(enable);
   DlgHistory.Enable(enable);
@@ -849,10 +842,10 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   DlgAnimeList.SetPosition(nullptr, rect_content_);
   DlgHistory.SetPosition(nullptr, rect_content_);
   DlgNowPlaying.SetPosition(nullptr, rect_content_);
-  SearchDialog.SetPosition(nullptr, rect_content_);
-  SeasonDialog.SetPosition(nullptr, rect_content_);
-  StatsDialog.SetPosition(nullptr, rect_content_);
-  TorrentDialog.SetPosition(nullptr, rect_content_);
+  DlgSearch.SetPosition(nullptr, rect_content_);
+  DlgSeason.SetPosition(nullptr, rect_content_);
+  DlgStats.SetPosition(nullptr, rect_content_);
+  DlgTorrent.SetPosition(nullptr, rect_content_);
 }
 
 void MainDialog::UpdateStatusTimer() {
@@ -934,34 +927,34 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
 
   wstring cue_text, search_text;
   switch (current_page_) {
-    case SIDEBAR_ITEM_ANIMELIST:
-    case SIDEBAR_ITEM_SEASONS:
-      parent->search_bar.mode = SEARCH_MODE_MAL;
+    case kSidebarItemAnimeList:
+    case kSidebarItemSeasons:
+      parent->search_bar.mode = kSearchModeService;
       cue_text = L"Filter list or search " + taiga::GetCurrentService()->name();
       break;
-    case SIDEBAR_ITEM_NOWPLAYING:
-    case SIDEBAR_ITEM_HISTORY:
-    case SIDEBAR_ITEM_STATS:
-    case SIDEBAR_ITEM_SEARCH:
-      parent->search_bar.mode = SEARCH_MODE_MAL;
+    case kSidebarItemNowPlaying:
+    case kSidebarItemHistory:
+    case kSidebarItemStats:
+    case kSidebarItemSearch:
+      parent->search_bar.mode = kSearchModeService;
       cue_text = L"Search " + taiga::GetCurrentService()->name() + L" for anime";
-      if (current_page_ == SIDEBAR_ITEM_SEARCH)
-        search_text = SearchDialog.search_text;
+      if (current_page_ == kSidebarItemSearch)
+        search_text = DlgSearch.search_text;
       break;
-    case SIDEBAR_ITEM_FEEDS:
-      parent->search_bar.mode = SEARCH_MODE_FEED;
+    case kSidebarItemFeeds:
+      parent->search_bar.mode = kSearchModeFeed;
       cue_text = L"Search for torrents";
       break;
   }
   if (!parent->search_bar.filters.text.empty()) {
     parent->search_bar.filters.text.clear();
     switch (previous_page) {
-      case SIDEBAR_ITEM_ANIMELIST:
+      case kSidebarItemAnimeList:
         DlgAnimeList.RefreshList();
         DlgAnimeList.RefreshTabs();
         break;
-      case SIDEBAR_ITEM_SEASONS:
-        SeasonDialog.RefreshList();
+      case kSidebarItemSeasons:
+        DlgSeason.RefreshList();
         break;
     }
   }
@@ -975,23 +968,23 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
       dialog.Show(); \
       break;
   switch (current_page_) {
-    DISPLAY_PAGE(SIDEBAR_ITEM_NOWPLAYING, DlgNowPlaying, IDD_ANIME_INFO);
-    DISPLAY_PAGE(SIDEBAR_ITEM_ANIMELIST, DlgAnimeList, IDD_ANIME_LIST);
-    DISPLAY_PAGE(SIDEBAR_ITEM_HISTORY, DlgHistory, IDD_HISTORY);
-    DISPLAY_PAGE(SIDEBAR_ITEM_STATS, StatsDialog, IDD_STATS);
-    DISPLAY_PAGE(SIDEBAR_ITEM_SEARCH, SearchDialog, IDD_SEARCH);
-    DISPLAY_PAGE(SIDEBAR_ITEM_SEASONS, SeasonDialog, IDD_SEASON);
-    DISPLAY_PAGE(SIDEBAR_ITEM_FEEDS, TorrentDialog, IDD_TORRENT);
+    DISPLAY_PAGE(kSidebarItemNowPlaying, DlgNowPlaying, IDD_ANIME_INFO);
+    DISPLAY_PAGE(kSidebarItemAnimeList, DlgAnimeList, IDD_ANIME_LIST);
+    DISPLAY_PAGE(kSidebarItemHistory, DlgHistory, IDD_HISTORY);
+    DISPLAY_PAGE(kSidebarItemStats, DlgStats, IDD_STATS);
+    DISPLAY_PAGE(kSidebarItemSearch, DlgSearch, IDD_SEARCH);
+    DISPLAY_PAGE(kSidebarItemSeasons, DlgSeason, IDD_SEASON);
+    DISPLAY_PAGE(kSidebarItemFeeds, DlgTorrent, IDD_TORRENT);
   }
   #undef DISPLAY_PAGE
   
-  if (current_page_ != SIDEBAR_ITEM_NOWPLAYING) DlgNowPlaying.Hide();
-  if (current_page_ != SIDEBAR_ITEM_ANIMELIST) DlgAnimeList.Hide();
-  if (current_page_ != SIDEBAR_ITEM_HISTORY) DlgHistory.Hide();
-  if (current_page_ != SIDEBAR_ITEM_STATS) StatsDialog.Hide();
-  if (current_page_ != SIDEBAR_ITEM_SEARCH) SearchDialog.Hide();
-  if (current_page_ != SIDEBAR_ITEM_SEASONS) SeasonDialog.Hide();
-  if (current_page_ != SIDEBAR_ITEM_FEEDS) TorrentDialog.Hide();
+  if (current_page_ != kSidebarItemNowPlaying) DlgNowPlaying.Hide();
+  if (current_page_ != kSidebarItemAnimeList) DlgAnimeList.Hide();
+  if (current_page_ != kSidebarItemHistory) DlgHistory.Hide();
+  if (current_page_ != kSidebarItemStats) DlgStats.Hide();
+  if (current_page_ != kSidebarItemSearch) DlgSearch.Hide();
+  if (current_page_ != kSidebarItemSeasons) DlgSeason.Hide();
+  if (current_page_ != kSidebarItemFeeds) DlgTorrent.Hide();
 
   parent->treeview.SelectItem(parent->treeview.hti.at(current_page_));
 

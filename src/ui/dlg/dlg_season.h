@@ -16,39 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SEASON_H
-#define DLG_SEASON_H
-
-#include "base/std.h"
+#ifndef TAIGA_UI_DLG_SEASON_H
+#define TAIGA_UI_DLG_SEASON_H
 
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
-
-enum SeasonGroupBy {
-  SEASON_GROUPBY_AIRINGSTATUS,
-  SEASON_GROUPBY_LISTSTATUS,
-  SEASON_GROUPBY_TYPE
-};
-
-enum SeasonSortBy {
-  SEASON_SORTBY_AIRINGDATE,
-  SEASON_SORTBY_EPISODES,
-  SEASON_SORTBY_POPULARITY,
-  SEASON_SORTBY_SCORE,
-  SEASON_SORTBY_TITLE
-};
-
-enum SeasonViewAs {
-  SEASON_VIEWAS_IMAGES,
-  SEASON_VIEWAS_TILES
-};
+namespace ui {
 
 class SeasonDialog : public win::Dialog {
 public:
   SeasonDialog();
-  virtual ~SeasonDialog() {}
+  ~SeasonDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -60,15 +39,15 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   LRESULT OnToolbarNotify(LPARAM lParam);
 
-public:
   void RefreshData(int anime_id = 0);
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();
   void RefreshToolbar();
   void SetViewMode(int mode);
 
-public:
-  int group_by, sort_by, view_as;
+  int group_by;
+  int sort_by;
+  int view_as;
 
 private:
   win::Window cancel_button_;
@@ -80,6 +59,8 @@ private:
   win::Toolbar toolbar_;
 };
 
-extern class SeasonDialog SeasonDialog;
+extern SeasonDialog DlgSeason;
 
-#endif // DLG_SEASON_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_SEASON_H

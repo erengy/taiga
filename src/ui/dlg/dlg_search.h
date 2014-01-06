@@ -16,43 +16,43 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SEARCH_H
-#define DLG_SEARCH_H
+#ifndef TAIGA_UI_DLG_SEARCH_H
+#define TAIGA_UI_DLG_SEARCH_H
 
-#include "base/std.h"
+#include <string>
+#include <vector>
 
 #include "library/anime_filter.h"
-
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class SearchDialog : public win::Dialog {
 public:
   SearchDialog() {};
-  virtual ~SearchDialog() {};
-  
+  ~SearchDialog() {};
+
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnInitDialog();
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
 
-public:
   void AddAnimeToList(int anime_id);
   void ParseResults(const vector<int>& ids);
   void RefreshList();
   bool Search(const wstring& title);
 
-public:
-  wstring search_text;
+  std::wstring search_text;
 
 private:
-  vector<int> anime_ids_;
+  std::vector<int> anime_ids_;
   anime::Filters filters_;
   win::ListView list_;
 };
 
-extern class SearchDialog SearchDialog;
+extern SearchDialog DlgSearch;
 
-#endif // DLG_SEARCH_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_SEARCH_H

@@ -16,38 +16,24 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_anime_list.h"
-#include "dlg_history.h"
-#include "dlg_input.h"
-#include "dlg_main.h"
-#include "dlg_settings.h"
-#include "dlg_stats.h"
-
-#include "library/anime_db.h"
-#include "library/anime_filter.h"
-#include "taiga/announce.h"
-#include "base/common.h"
 #include "base/encryption.h"
 #include "base/file.h"
-#include "taiga/debug.h"
+#include "base/foreach.h"
+#include "base/string.h"
 #include "library/history.h"
-#include "sync/manager.h"
-#include "taiga/http.h"
-#include "track/media.h"
-#include "track/monitor.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
-#include "base/string.h"
 #include "taiga/taiga.h"
+#include "track/media.h"
+#include "track/monitor.h"
+#include "ui/dlg/dlg_settings.h"
 #include "ui/theme.h"
-
-#include "win/ctrl/win_ctrl.h"
 #include "win/win_taskdialog.h"
 
-const WCHAR* SECTION_TITLE[] = {
+namespace ui {
+
+const WCHAR* kSectionTitles[] = {
   L" Services",
   L" Library",
   L" Application",
@@ -56,17 +42,15 @@ const WCHAR* SECTION_TITLE[] = {
   L" Torrents"
 };
 
-class SettingsDialog SettingsDialog;
-
-// =============================================================================
+SettingsDialog DlgSettings;
 
 SettingsDialog::SettingsDialog()
-    : current_section_(SECTION_SERVICES),
-      current_page_(PAGE_SERVICES_MAIN) {
+    : current_section_(kSettingsSectionServices),
+      current_page_(kSettingsPageServicesMain) {
   RegisterDlgClass(L"TaigaSettingsW");
 
-  pages.resize(PAGE_COUNT);
-  for (size_t i = 0; i < PAGE_COUNT; i++) {
+  pages.resize(kSettingsPageCount);
+  for (size_t i = 0; i < kSettingsPageCount; i++) {
     pages[i].index = i;
     pages[i].parent = this;
   }
@@ -78,41 +62,41 @@ void SettingsDialog::SetCurrentSection(int index) {
   if (!IsWindow())
     return;
 
-  SetDlgItemText(IDC_STATIC_TITLE, SECTION_TITLE[index - 1]);
+  SetDlgItemText(IDC_STATIC_TITLE, kSectionTitles[index - 1]);
 
   tab_.DeleteAllItems();
   switch (index) {
-    case SECTION_SERVICES:
-      tab_.InsertItem(0, L"Main", PAGE_SERVICES_MAIN);
-      tab_.InsertItem(1, L"MyAnimeList", PAGE_SERVICES_MAL);
-      tab_.InsertItem(2, L"Herro", PAGE_SERVICES_HERRO);
+    case kSettingsSectionServices:
+      tab_.InsertItem(0, L"Main", kSettingsPageServicesMain);
+      tab_.InsertItem(1, L"MyAnimeList", kSettingsPageServicesMal);
+      tab_.InsertItem(2, L"Herro", kSettingsPageServicesHerro);
       break;
-    case SECTION_LIBRARY:
-      tab_.InsertItem(0, L"Folders", PAGE_LIBRARY_FOLDERS);
-      tab_.InsertItem(1, L"Cache", PAGE_LIBRARY_CACHE);
+    case kSettingsSectionLibrary:
+      tab_.InsertItem(0, L"Folders", kSettingsPageLibraryFolders);
+      tab_.InsertItem(1, L"Cache", kSettingsPageLibraryCache);
       break;
-    case SECTION_APPLICATION:
-      tab_.InsertItem(0, L"Anime list", PAGE_APP_LIST);
-      tab_.InsertItem(1, L"Behavior", PAGE_APP_BEHAVIOR);
-      tab_.InsertItem(2, L"Connection", PAGE_APP_CONNECTION);
-      tab_.InsertItem(3, L"Interface", PAGE_APP_INTERFACE);
+    case kSettingsSectionApplication:
+      tab_.InsertItem(0, L"Anime list", kSettingsPageAppList);
+      tab_.InsertItem(1, L"Behavior", kSettingsPageAppBehavior);
+      tab_.InsertItem(2, L"Connection", kSettingsPageAppConnection);
+      tab_.InsertItem(3, L"Interface", kSettingsPageAppInterface);
       break;
-    case SECTION_RECOGNITION:
-      tab_.InsertItem(0, L"General", PAGE_RECOGNITION_GENERAL);
-      tab_.InsertItem(1, L"Media players", PAGE_RECOGNITION_MEDIA);
-      tab_.InsertItem(2, L"Media providers", PAGE_RECOGNITION_STREAM);
+    case kSettingsSectionRecognition:
+      tab_.InsertItem(0, L"General", kSettingsPageRecognitionGeneral);
+      tab_.InsertItem(1, L"Media players", kSettingsPageRecognitionMedia);
+      tab_.InsertItem(2, L"Media providers", kSettingsPageRecognitionStream);
       break;
-    case SECTION_SHARING:
-      tab_.InsertItem(0, L"HTTP", PAGE_SHARING_HTTP);
-      tab_.InsertItem(1, L"Messenger", PAGE_SHARING_MESSENGER);
-      tab_.InsertItem(2, L"mIRC", PAGE_SHARING_MIRC);
-      tab_.InsertItem(3, L"Skype", PAGE_SHARING_SKYPE);
-      tab_.InsertItem(4, L"Twitter", PAGE_SHARING_TWITTER);
+    case kSettingsSectionSharing:
+      tab_.InsertItem(0, L"HTTP", kSettingsPageSharingHttp);
+      tab_.InsertItem(1, L"Messenger", kSettingsPageSharingMessenger);
+      tab_.InsertItem(2, L"mIRC", kSettingsPageSharingMirc);
+      tab_.InsertItem(3, L"Skype", kSettingsPageSharingSkype);
+      tab_.InsertItem(4, L"Twitter", kSettingsPageSharingTwitter);
       break;
-    case SECTION_TORRENTS:
-      tab_.InsertItem(0, L"Discovery", PAGE_TORRENTS_DISCOVERY);
-      tab_.InsertItem(1, L"Downloads", PAGE_TORRENTS_DOWNLOADS);
-      tab_.InsertItem(2, L"Filters", PAGE_TORRENTS_FILTERS);
+    case kSettingsSectionTorrents:
+      tab_.InsertItem(0, L"Discovery", kSettingsPageTorrentsDiscovery);
+      tab_.InsertItem(1, L"Downloads", kSettingsPageTorrentsDownloads);
+      tab_.InsertItem(2, L"Filters", kSettingsPageTorrentsFilters);
       break;
   }
 }
@@ -137,7 +121,7 @@ void SettingsDialog::SetCurrentPage(int index) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL SettingsDialog::OnInitDialog() {
   // Initialize controls
@@ -145,16 +129,16 @@ BOOL SettingsDialog::OnInitDialog() {
   tree_.SetImageList(ui::Theme.GetImageList24().GetHandle());
   tree_.SetTheme();
   tab_.Attach(GetDlgItem(IDC_TAB_PAGES));
-  
+
   // Add tree items
   #define TREE_INSERTITEM(s, t, i) \
     tree_.items[s] = tree_.InsertItem(t, i, s, nullptr);
-  TREE_INSERTITEM(SECTION_SERVICES, L"Services", ui::kIcon24_Globe);
-  TREE_INSERTITEM(SECTION_LIBRARY, L"Library", ui::kIcon24_Library);
-  TREE_INSERTITEM(SECTION_APPLICATION, L"Application", ui::kIcon24_Application);
-  TREE_INSERTITEM(SECTION_RECOGNITION, L"Recognition", ui::kIcon24_Recognition);
-  TREE_INSERTITEM(SECTION_SHARING, L"Sharing", ui::kIcon24_Sharing);
-  TREE_INSERTITEM(SECTION_TORRENTS, L"Torrents", ui::kIcon24_Feed);
+  TREE_INSERTITEM(kSettingsSectionServices, L"Services", ui::kIcon24_Globe);
+  TREE_INSERTITEM(kSettingsSectionLibrary, L"Library", ui::kIcon24_Library);
+  TREE_INSERTITEM(kSettingsSectionApplication, L"Application", ui::kIcon24_Application);
+  TREE_INSERTITEM(kSettingsSectionRecognition, L"Recognition", ui::kIcon24_Recognition);
+  TREE_INSERTITEM(kSettingsSectionSharing, L"Sharing", ui::kIcon24_Sharing);
+  TREE_INSERTITEM(kSettingsSectionTorrents, L"Torrents", ui::kIcon24_Feed);
   #undef TREE_INSERTITEM
 
   // Set title font
@@ -166,41 +150,41 @@ BOOL SettingsDialog::OnInitDialog() {
   tree_.SelectItem(tree_.items[current_section_]);
   SetCurrentSection(current_section_);
   SetCurrentPage(current_page);
-  
+
   return TRUE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void SettingsDialog::OnOK() {
   win::ListView list;
   SettingsPage* page = nullptr;
 
-  wstring previous_user = taiga::GetCurrentUsername();
-  wstring previous_theme = Settings[taiga::kApp_Interface_Theme];
+  std::wstring previous_user = taiga::GetCurrentUsername();
+  std::wstring previous_theme = Settings[taiga::kApp_Interface_Theme];
 
   // Services > Main
-  page = &pages[PAGE_SERVICES_MAIN];
+  page = &pages[kSettingsPageServicesMain];
   if (page->IsWindow()) {
     //auto service = ServiceManager.service(static_cast<sync::ServiceId>(page->GetComboSelection(IDC_COMBO_DBLCLICK) + 1));
     //Settings.Set(taiga::kSync_ActiveService, service->canonical_name());
     Settings.Set(taiga::kSync_AutoOnStart, page->IsDlgButtonChecked(IDC_CHECK_START_LOGIN));
   }
   // Services > MyAnimeList
-  page = &pages[PAGE_SERVICES_MAL];
+  page = &pages[kSettingsPageServicesMal];
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_Mal_Username, page->GetDlgItemText(IDC_EDIT_USER_MAL));
     Settings.Set(taiga::kSync_Service_Mal_Password, SimpleEncrypt(page->GetDlgItemText(IDC_EDIT_PASS_MAL)));
   }
   // Services > Herro
-  page = &pages[PAGE_SERVICES_HERRO];
+  page = &pages[kSettingsPageServicesHerro];
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_Herro_Username, page->GetDlgItemText(IDC_EDIT_USER_HERRO));
     Settings.Set(taiga::kSync_Service_Herro_ApiToken, page->GetDlgItemText(IDC_EDIT_PASS_HERRO));
   }
 
   // Library > Folders
-  page = &pages[PAGE_LIBRARY_FOLDERS];
+  page = &pages[kSettingsPageLibraryFolders];
   if (page->IsWindow()) {
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_FOLDERS_ROOT));
     Settings.root_folders.clear();
@@ -214,7 +198,7 @@ void SettingsDialog::OnOK() {
   }
 
   // Application > Behavior
-  page = &pages[PAGE_APP_BEHAVIOR];
+  page = &pages[kSettingsPageAppBehavior];
   if (page->IsWindow()) {
     Settings.Set(taiga::kApp_Behavior_Autostart, page->IsDlgButtonChecked(IDC_CHECK_AUTOSTART));
     Settings.Set(taiga::kApp_Behavior_CloseToTray, page->IsDlgButtonChecked(IDC_CHECK_GENERAL_CLOSE));
@@ -224,20 +208,20 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kApp_Behavior_StartMinimized, page->IsDlgButtonChecked(IDC_CHECK_START_MINIMIZE));
   }
   // Application > Connection
-  page = &pages[PAGE_APP_CONNECTION];
+  page = &pages[kSettingsPageAppConnection];
   if (page->IsWindow()) {
     Settings.Set(taiga::kApp_Connection_ProxyHost, page->GetDlgItemText(IDC_EDIT_PROXY_HOST));
     Settings.Set(taiga::kApp_Connection_ProxyUsername, page->GetDlgItemText(IDC_EDIT_PROXY_USER));
     Settings.Set(taiga::kApp_Connection_ProxyPassword, page->GetDlgItemText(IDC_EDIT_PROXY_PASS));
   }
   // Application > Interface
-  page = &pages[PAGE_APP_INTERFACE];
+  page = &pages[kSettingsPageAppInterface];
   if (page->IsWindow()) {
     Settings.Set(taiga::kApp_Interface_Theme, page->GetDlgItemText(IDC_COMBO_THEME));
     Settings.Set(taiga::kApp_Interface_ExternalLinks, page->GetDlgItemText(IDC_EDIT_EXTERNALLINKS));
   }
   // Application > List
-  page = &pages[PAGE_APP_LIST];
+  page = &pages[kSettingsPageAppList];
   if (page->IsWindow()) {
     Settings.Set(taiga::kApp_List_DoubleClickAction, page->GetComboSelection(IDC_COMBO_DBLCLICK));
     Settings.Set(taiga::kApp_List_MiddleClickAction, page->GetComboSelection(IDC_COMBO_MDLCLICK));
@@ -248,7 +232,7 @@ void SettingsDialog::OnOK() {
   }
   
   // Recognition > General
-  page = &pages[PAGE_RECOGNITION_GENERAL];
+  page = &pages[kSettingsPageRecognitionGeneral];
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Update_AskToConfirm, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CONFIRM));
     Settings.Set(taiga::kSync_Update_CheckPlayer, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP));
@@ -261,7 +245,7 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kSync_Notify_NotRecognized, page->IsDlgButtonChecked(IDC_CHECK_NOTIFY_NOTRECOGNIZED));
   }
   // Recognition > Media players
-  page = &pages[PAGE_RECOGNITION_MEDIA];
+  page = &pages[kSettingsPageRecognitionMedia];
   if (page->IsWindow()) {
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_MEDIA));
     for (size_t i = 0; i < MediaPlayers.items.size(); i++)
@@ -269,7 +253,7 @@ void SettingsDialog::OnOK() {
     list.SetWindowHandle(nullptr);
   }
   // Recognition > Media providers
-  page = &pages[PAGE_RECOGNITION_STREAM];
+  page = &pages[kSettingsPageRecognitionStream];
   if (page->IsWindow()) {
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_STREAM_PROVIDER));
     Settings.Set(taiga::kStream_Ann, list.GetCheckState(0) == TRUE);
@@ -281,18 +265,18 @@ void SettingsDialog::OnOK() {
   }
 
   // Sharing > HTTP
-  page = &pages[PAGE_SHARING_HTTP];
+  page = &pages[kSettingsPageSharingHttp];
   if (page->IsWindow()) {
     Settings.Set(taiga::kShare_Http_Enabled, page->IsDlgButtonChecked(IDC_CHECK_HTTP));
     Settings.Set(taiga::kShare_Http_Url, page->GetDlgItemText(IDC_EDIT_HTTP_URL));
   }
   // Sharing > Messenger
-  page = &pages[PAGE_SHARING_MESSENGER];
+  page = &pages[kSettingsPageSharingMessenger];
   if (page->IsWindow()) {
     Settings.Set(taiga::kShare_Messenger_Enabled, page->IsDlgButtonChecked(IDC_CHECK_MESSENGER));
   }
   // Sharing > mIRC
-  page = &pages[PAGE_SHARING_MIRC];
+  page = &pages[kSettingsPageSharingMirc];
   if (page->IsWindow()) {
     Settings.Set(taiga::kShare_Mirc_Enabled, page->IsDlgButtonChecked(IDC_CHECK_MIRC));
     Settings.Set(taiga::kShare_Mirc_Service, page->GetDlgItemText(IDC_EDIT_MIRC_SERVICE));
@@ -302,18 +286,18 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kShare_Mirc_Channels, page->GetDlgItemText(IDC_EDIT_MIRC_CHANNELS));
   }
   // Sharing > Skype
-  page = &pages[PAGE_SHARING_SKYPE];
+  page = &pages[kSettingsPageSharingSkype];
   if (page->IsWindow()) {
     Settings.Set(taiga::kShare_Skype_Enabled, page->IsDlgButtonChecked(IDC_CHECK_SKYPE));
   }
   // Sharing > Twitter
-  page = &pages[PAGE_SHARING_TWITTER];
+  page = &pages[kSettingsPageSharingTwitter];
   if (page->IsWindow()) {
     Settings.Set(taiga::kShare_Twitter_Enabled, page->IsDlgButtonChecked(IDC_CHECK_TWITTER));
   }
 
   // Torrents > Discovery
-  page = &pages[PAGE_TORRENTS_DISCOVERY];
+  page = &pages[kSettingsPageTorrentsDiscovery];
   if (page->IsWindow()) {
     Settings.Set(taiga::kTorrent_Discovery_Source, page->GetDlgItemText(IDC_COMBO_TORRENT_SOURCE));
     Settings.Set(taiga::kTorrent_Discovery_SearchUrl, page->GetDlgItemText(IDC_COMBO_TORRENT_SEARCH));
@@ -322,7 +306,7 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kTorrent_Discovery_NewAction, page->GetCheckedRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2) + 1);
   }
   // Torrents > Downloads
-  page = &pages[PAGE_TORRENTS_DOWNLOADS];
+  page = &pages[kSettingsPageTorrentsDownloads];
   if (page->IsWindow()) {
     Settings.Set(taiga::kTorrent_Download_AppMode, page->GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1);
     Settings.Set(taiga::kTorrent_Download_AppPath, page->GetDlgItemText(IDC_EDIT_TORRENT_APP));
@@ -332,7 +316,7 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kTorrent_Download_CreateSubfolder, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER));
   }
   // Torrents > Filters
-  page = &pages[PAGE_TORRENTS_FILTERS];
+  page = &pages[kSettingsPageTorrentsFilters];
   if (page->IsWindow()) {
     Settings.Set(taiga::kTorrent_Filter_Enabled, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_FILTER));
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_TORRENT_FILTER));
@@ -356,7 +340,7 @@ void SettingsDialog::OnOK() {
   EndDialog(IDOK);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
@@ -391,24 +375,24 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL:
       switch (current_page_) {
-        case PAGE_LIBRARY_FOLDERS:
-          return pages[PAGE_LIBRARY_FOLDERS].SendDlgItemMessage(
-            IDC_LIST_FOLDERS_ROOT, uMsg, wParam, lParam);
-        case PAGE_RECOGNITION_MEDIA:
-          return pages[PAGE_RECOGNITION_MEDIA].SendDlgItemMessage(
-            IDC_LIST_MEDIA, uMsg, wParam, lParam);
-        case PAGE_TORRENTS_FILTERS:
-          return pages[PAGE_TORRENTS_FILTERS].SendDlgItemMessage(
-            IDC_LIST_TORRENT_FILTER, uMsg, wParam, lParam);
+        case kSettingsPageLibraryFolders:
+          return pages[kSettingsPageLibraryFolders].SendDlgItemMessage(
+              IDC_LIST_FOLDERS_ROOT, uMsg, wParam, lParam);
+        case kSettingsPageRecognitionMedia:
+          return pages[kSettingsPageRecognitionMedia].SendDlgItemMessage(
+              IDC_LIST_MEDIA, uMsg, wParam, lParam);
+        case kSettingsPageTorrentsFilters:
+          return pages[kSettingsPageTorrentsFilters].SendDlgItemMessage(
+              IDC_LIST_TORRENT_FILTER, uMsg, wParam, lParam);
       }
       break;
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
 void SettingsDialog::OnHelp(LPHELPINFO lphi) {
-  wstring message, text;
+  std::wstring message, text;
   pages.at(current_page_).GetDlgItemText(lphi->iCtrlId, text);
 
   #define SET_HELP_TEXT(i, m) \
@@ -416,19 +400,19 @@ void SettingsDialog::OnHelp(LPHELPINFO lphi) {
   switch (lphi->iCtrlId) {
     // Library > Folders
     SET_HELP_TEXT(IDC_LIST_FOLDERS_ROOT,
-      L"These folders will be scanned and monitored for new episodes.\n\n"
-      L"Suppose that you have an HDD like this:\n\n"
-      L"    D:\\\n"
-      L"    \u2514 Anime\n"
-      L"        \u2514 Bleach\n"
-      L"        \u2514 Naruto\n"
-      L"        \u2514 One Piece\n"
-      L"    \u2514 Games\n"
-      L"    \u2514 Music\n\n"
-      L"In this case, \"D:\\Anime\" is the root folder you should add.");
+        L"These folders will be scanned and monitored for new episodes.\n\n"
+        L"Suppose that you have an HDD like this:\n\n"
+        L"    D:\\\n"
+        L"    \u2514 Anime\n"
+        L"        \u2514 Bleach\n"
+        L"        \u2514 Naruto\n"
+        L"        \u2514 One Piece\n"
+        L"    \u2514 Games\n"
+        L"    \u2514 Music\n\n"
+        L"In this case, \"D:\\Anime\" is the root folder you should add.");
     SET_HELP_TEXT(IDC_CHECK_FOLDERS_WATCH,
-      L"With this feature on, Taiga instantly detects when a file is added, removed, or renamed under root folders and their subfolders.\n\n"
-      L"Enabling this feature is recommended.");
+        L"With this feature on, Taiga instantly detects when a file is added, removed, or renamed under root folders and their subfolders.\n\n"
+        L"Enabling this feature is recommended.");
     // Not available
     default:
       message = L"There's no help message associated with this item.";
@@ -504,14 +488,14 @@ LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter) {
-  wstring text;
+  std::wstring text;
   win::ListView list = hwnd_list;
   int index = list.GetItemCount();
   int group = filter.anime_ids.empty() ? 0 : 1;
-  
+
   int icon = ui::kIcon16_Funnel;
   switch (filter.action) {
     case FEED_FILTER_ACTION_DISCARD: icon = ui::kIcon16_FunnelCross; break;
@@ -529,9 +513,9 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
 }
 
 void SettingsDialog::RefreshCache() {
-  wstring text;
+  std::wstring text;
   Stats.CalculateLocalData();
-  SettingsPage& page = pages[PAGE_LIBRARY_CACHE];
+  SettingsPage& page = pages[kSettingsPageLibraryCache];
 
   // History
   text = ToWstr(static_cast<int>(History.items.size())) + L" item(s)";
@@ -550,16 +534,15 @@ void SettingsDialog::RefreshTorrentFilterList(HWND hwnd_list) {
   win::ListView list = hwnd_list;
   list.DeleteAllItems();
 
-  for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it) {
+  for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it)
     AddTorrentFilterToList(hwnd_list, *it);
-  }
-  
+
   list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
   list.SetWindowHandle(nullptr);
 }
 
 void SettingsDialog::RefreshTwitterLink() {
-  wstring text;
+  std::wstring text;
 
   if (Settings[taiga::kShare_Twitter_Username].empty()) {
     text = L"Taiga is not authorized to post to your Twitter account yet.";
@@ -569,5 +552,7 @@ void SettingsDialog::RefreshTwitterLink() {
     text += L")\">" + Settings[taiga::kShare_Twitter_Username] + L"</a>";
   }
 
-  pages[PAGE_SHARING_TWITTER].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
+  pages[kSettingsPageSharingTwitter].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
 }
+
+}  // namespace ui

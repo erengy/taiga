@@ -16,22 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_main.h"
-#include "dlg_update.h"
-
 #include "base/common.h"
-#include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_update.h"
 
-#include "win/win_gdi.h"
-#include "win/win_taskdialog.h"
+namespace ui {
 
-class UpdateDialog UpdateDialog;
-
-// =============================================================================
+UpdateDialog DlgUpdate;
 
 UpdateDialog::UpdateDialog() {
   RegisterDlgClass(L"TaigaUpdateW");
@@ -90,3 +83,5 @@ void UpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   win::Dc dc = hdc;
   dc.FillRect(lpps->rcPaint, ::GetSysColor(COLOR_WINDOW));
 }
+
+}  // namespace ui

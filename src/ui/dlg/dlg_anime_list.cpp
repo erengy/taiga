@@ -124,8 +124,8 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           if (ht.flags & TVHT_ONITEM) {
             int index = DlgMain.treeview.GetItemData(ht.hItem);
             switch (index) {
-              case SIDEBAR_ITEM_SEARCH:
-              case SIDEBAR_ITEM_FEEDS:
+              case kSidebarItemSearch:
+              case kSidebarItemFeeds:
                 allow_drop = true;
                 break;
             }
@@ -183,11 +183,11 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (ht.flags & TVHT_ONITEM) {
           int index = DlgMain.treeview.GetItemData(ht.hItem);
           switch (index) {
-            case SIDEBAR_ITEM_SEARCH:
+            case kSidebarItemSearch:
               ExecuteAction(L"SearchAnime(" + text + L")");
               break;
-            case SIDEBAR_ITEM_FEEDS:
-              TorrentDialog.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], anime_id);
+            case kSidebarItemFeeds:
+              DlgTorrent.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], anime_id);
               break;
           }
         }

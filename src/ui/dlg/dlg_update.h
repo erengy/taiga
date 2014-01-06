@@ -16,29 +16,29 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_UPDATE_H
-#define DLG_UPDATE_H
+#ifndef TAIGA_UI_DLG_UPDATE_H
+#define TAIGA_UI_DLG_UPDATE_H
 
-#include "base/std.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
-// =============================================================================
+namespace ui {
 
 class UpdateDialog : public win::Dialog {
 public:
   UpdateDialog();
-  virtual ~UpdateDialog() {}
+  ~UpdateDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnDestroy();
   BOOL OnInitDialog();
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
-public:
   win::ProgressBar progressbar;
 };
 
-extern class UpdateDialog UpdateDialog;
+extern UpdateDialog DlgUpdate;
 
-#endif // DLG_UPDATE_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_UPDATE_H

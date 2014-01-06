@@ -16,35 +16,28 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_format.h"
-#include "dlg_history.h"
-#include "dlg_settings.h"
-#include "dlg_settings_page.h"
-#include "dlg_feed_filter.h"
-
-#include "library/anime_db.h"
-#include "library/anime_filter.h"
-#include "library/resource.h"
-#include "taiga/announce.h"
 #include "base/common.h"
 #include "base/encryption.h"
 #include "base/file.h"
+#include "base/string.h"
+#include "library/anime_db.h"
 #include "library/history.h"
+#include "library/resource.h"
 #include "sync/manager.h"
-#include "taiga/http.h"
-#include "track/media.h"
+#include "taiga/announce.h"
+#include "taiga/path.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "taiga/stats.h"
-#include "base/string.h"
-#include "taiga/path.h"
 #include "taiga/taiga.h"
+#include "track/media.h"
+#include "ui/dlg/dlg_feed_filter.h"
+#include "ui/dlg/dlg_format.h"
+#include "ui/dlg/dlg_settings.h"
+#include "ui/dlg/dlg_settings_page.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 
-// =============================================================================
+namespace ui {
 
 SettingsPage::SettingsPage()
     : index(-1), parent(nullptr) {
@@ -58,26 +51,26 @@ void SettingsPage::Create() {
   UINT resource_id = 0;
   switch (index) {
     #define SETRESOURCEID(page, id) case page: resource_id = id; break;
-    SETRESOURCEID(PAGE_APP_BEHAVIOR, IDD_SETTINGS_APP_BEHAVIOR);
-    SETRESOURCEID(PAGE_APP_CONNECTION, IDD_SETTINGS_APP_CONNECTION);
-    SETRESOURCEID(PAGE_APP_INTERFACE, IDD_SETTINGS_APP_INTERFACE);
-    SETRESOURCEID(PAGE_APP_LIST, IDD_SETTINGS_APP_LIST);
-    SETRESOURCEID(PAGE_LIBRARY_FOLDERS, IDD_SETTINGS_LIBRARY_FOLDERS);
-    SETRESOURCEID(PAGE_LIBRARY_CACHE, IDD_SETTINGS_LIBRARY_CACHE);
-    SETRESOURCEID(PAGE_RECOGNITION_GENERAL, IDD_SETTINGS_RECOGNITION_GENERAL);
-    SETRESOURCEID(PAGE_RECOGNITION_MEDIA, IDD_SETTINGS_RECOGNITION_MEDIA);
-    SETRESOURCEID(PAGE_RECOGNITION_STREAM, IDD_SETTINGS_RECOGNITION_STREAM);
-    SETRESOURCEID(PAGE_SERVICES_MAIN, IDD_SETTINGS_SERVICES_MAIN);
-    SETRESOURCEID(PAGE_SERVICES_MAL, IDD_SETTINGS_SERVICES_MAL);
-    SETRESOURCEID(PAGE_SERVICES_HERRO, IDD_SETTINGS_SERVICES_HERRO);
-    SETRESOURCEID(PAGE_SHARING_HTTP, IDD_SETTINGS_SHARING_HTTP);
-    SETRESOURCEID(PAGE_SHARING_MESSENGER, IDD_SETTINGS_SHARING_MESSENGER);
-    SETRESOURCEID(PAGE_SHARING_MIRC, IDD_SETTINGS_SHARING_MIRC);
-    SETRESOURCEID(PAGE_SHARING_SKYPE, IDD_SETTINGS_SHARING_SKYPE);
-    SETRESOURCEID(PAGE_SHARING_TWITTER, IDD_SETTINGS_SHARING_TWITTER);
-    SETRESOURCEID(PAGE_TORRENTS_DISCOVERY, IDD_SETTINGS_TORRENTS_DISCOVERY);
-    SETRESOURCEID(PAGE_TORRENTS_DOWNLOADS, IDD_SETTINGS_TORRENTS_DOWNLOADS);
-    SETRESOURCEID(PAGE_TORRENTS_FILTERS, IDD_SETTINGS_TORRENTS_FILTERS);
+    SETRESOURCEID(kSettingsPageAppBehavior, IDD_SETTINGS_APP_BEHAVIOR);
+    SETRESOURCEID(kSettingsPageAppConnection, IDD_SETTINGS_APP_CONNECTION);
+    SETRESOURCEID(kSettingsPageAppInterface, IDD_SETTINGS_APP_INTERFACE);
+    SETRESOURCEID(kSettingsPageAppList, IDD_SETTINGS_APP_LIST);
+    SETRESOURCEID(kSettingsPageLibraryFolders, IDD_SETTINGS_LIBRARY_FOLDERS);
+    SETRESOURCEID(kSettingsPageLibraryCache, IDD_SETTINGS_LIBRARY_CACHE);
+    SETRESOURCEID(kSettingsPageRecognitionGeneral, IDD_SETTINGS_RECOGNITION_GENERAL);
+    SETRESOURCEID(kSettingsPageRecognitionMedia, IDD_SETTINGS_RECOGNITION_MEDIA);
+    SETRESOURCEID(kSettingsPageRecognitionStream, IDD_SETTINGS_RECOGNITION_STREAM);
+    SETRESOURCEID(kSettingsPageServicesMain, IDD_SETTINGS_SERVICES_MAIN);
+    SETRESOURCEID(kSettingsPageServicesMal, IDD_SETTINGS_SERVICES_MAL);
+    SETRESOURCEID(kSettingsPageServicesHerro, IDD_SETTINGS_SERVICES_HERRO);
+    SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
+    SETRESOURCEID(kSettingsPageSharingMessenger, IDD_SETTINGS_SHARING_MESSENGER);
+    SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
+    SETRESOURCEID(kSettingsPageSharingSkype, IDD_SETTINGS_SHARING_SKYPE);
+    SETRESOURCEID(kSettingsPageSharingTwitter, IDD_SETTINGS_SHARING_TWITTER);
+    SETRESOURCEID(kSettingsPageTorrentsDiscovery, IDD_SETTINGS_TORRENTS_DISCOVERY);
+    SETRESOURCEID(kSettingsPageTorrentsDownloads, IDD_SETTINGS_TORRENTS_DOWNLOADS);
+    SETRESOURCEID(kSettingsPageTorrentsFilters, IDD_SETTINGS_TORRENTS_FILTERS);
     #undef SETRESOURCEID
   }
 
@@ -86,12 +79,12 @@ void SettingsPage::Create() {
   EnableThemeDialogTexture(GetWindowHandle(), ETDT_ENABLETAB);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL SettingsPage::OnInitDialog() {
   switch (index) {
     // Services > Main
-    case PAGE_SERVICES_MAIN: {
+    case kSettingsPageServicesMain: {
       AddComboString(IDC_COMBO_SERVICE, L"MyAnimeList");
       AddComboString(IDC_COMBO_SERVICE, L"Herro");
       SetComboSelection(IDC_COMBO_SERVICE, ServiceManager.service(Settings[taiga::kSync_ActiveService])->id() - 1);
@@ -99,22 +92,22 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Services > MyAnimeList
-    case PAGE_SERVICES_MAL: {
+    case kSettingsPageServicesMal: {
       SetDlgItemText(IDC_EDIT_USER_MAL, Settings[taiga::kSync_Service_Mal_Username].c_str());
       SetDlgItemText(IDC_EDIT_PASS_MAL, SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]).c_str());
       break;
     }
     // Services > Herro
-    case PAGE_SERVICES_HERRO: {
+    case kSettingsPageServicesHerro: {
       SetDlgItemText(IDC_EDIT_USER_HERRO, Settings[taiga::kSync_Service_Herro_Username].c_str());
       SetDlgItemText(IDC_EDIT_PASS_HERRO, Settings[taiga::kSync_Service_Herro_ApiToken].c_str());
       break;
     }
 
-    // =========================================================================
+    ////////////////////////////////////////////////////////////////////////////
 
     // Library > Folders
-    case PAGE_LIBRARY_FOLDERS: {
+    case kSettingsPageLibraryFolders: {
       win::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
       list.InsertColumn(0, 0, 0, 0, L"Folder");
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -128,15 +121,15 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Library > Cache
-    case PAGE_LIBRARY_CACHE: {
+    case kSettingsPageLibraryCache: {
       parent->RefreshCache();
       break;
     }
 
-    // =========================================================================
+    ////////////////////////////////////////////////////////////////////////////
 
     // Application > Behavior
-    case PAGE_APP_BEHAVIOR: {
+    case kSettingsPageAppBehavior: {
       CheckDlgButton(IDC_CHECK_AUTOSTART, Settings.GetBool(taiga::kApp_Behavior_Autostart));
       CheckDlgButton(IDC_CHECK_GENERAL_CLOSE, Settings.GetBool(taiga::kApp_Behavior_CloseToTray));
       CheckDlgButton(IDC_CHECK_GENERAL_MINIMIZE, Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray));
@@ -146,14 +139,14 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Application > Connection
-    case PAGE_APP_CONNECTION: {
+    case kSettingsPageAppConnection: {
       SetDlgItemText(IDC_EDIT_PROXY_HOST, Settings[taiga::kApp_Connection_ProxyHost].c_str());
       SetDlgItemText(IDC_EDIT_PROXY_USER, Settings[taiga::kApp_Connection_ProxyUsername].c_str());
       SetDlgItemText(IDC_EDIT_PROXY_PASS, Settings[taiga::kApp_Connection_ProxyPassword].c_str());
       break;
     }
     // Application > Interface
-    case PAGE_APP_INTERFACE: {
+    case kSettingsPageAppInterface: {
       vector<wstring> theme_list;
       PopulateFolders(theme_list, taiga::GetPath(taiga::kPathTheme));
       if (theme_list.empty()) {
@@ -169,7 +162,7 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Application > List
-    case PAGE_APP_LIST: {
+    case kSettingsPageAppList: {
       AddComboString(IDC_COMBO_DBLCLICK, L"Do nothing");
       AddComboString(IDC_COMBO_DBLCLICK, L"Edit details");
       AddComboString(IDC_COMBO_DBLCLICK, L"Open folder");
@@ -189,10 +182,10 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
 
-    // =========================================================================
+    ////////////////////////////////////////////////////////////////////////////
 
     // Recognition > General
-    case PAGE_RECOGNITION_GENERAL: {
+    case kSettingsPageRecognitionGeneral: {
       CheckDlgButton(IDC_CHECK_UPDATE_CONFIRM, Settings.GetBool(taiga::kSync_Update_AskToConfirm));
       CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.GetBool(taiga::kSync_Update_CheckPlayer));
       CheckDlgButton(IDC_CHECK_UPDATE_GOTO, Settings.GetBool(taiga::kSync_Update_GoToNowPlaying));
@@ -206,7 +199,7 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Recognition > Media players
-    case PAGE_RECOGNITION_MEDIA: {
+    case kSettingsPageRecognitionMedia: {
       win::ListView list = GetDlgItem(IDC_LIST_MEDIA);
       list.EnableGroupView(true);
       if (win::GetVersion() >= win::kVersionVista) {
@@ -231,8 +224,8 @@ BOOL SettingsPage::OnInitDialog() {
       }
       for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
         BOOL player_available = MediaPlayers.items[i].GetPath().empty() ? FALSE : TRUE;
-        list.InsertItem(i, MediaPlayers.items[i].mode == 5 ? 1 : 0, 
-                        ui::kIcon16_AppGray - player_available, 0, nullptr, 
+        list.InsertItem(i, MediaPlayers.items[i].mode == 5 ? 1 : 0,
+                        ui::kIcon16_AppGray - player_available, 0, nullptr,
                         MediaPlayers.items[i].name.c_str(), 0);
         if (MediaPlayers.items[i].enabled)
           list.SetCheckState(i, TRUE);
@@ -242,7 +235,7 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Recognition > Media providers
-    case PAGE_RECOGNITION_STREAM: {
+    case kSettingsPageRecognitionStream: {
       win::ListView list = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
       list.EnableGroupView(true);
       list.InsertColumn(0, 0, 0, 0, L"Media providers");
@@ -270,21 +263,21 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
 
-    // =========================================================================
+    ////////////////////////////////////////////////////////////////////////////
 
     // Sharing > HTTP
-    case PAGE_SHARING_HTTP: {
+    case kSettingsPageSharingHttp: {
       CheckDlgButton(IDC_CHECK_HTTP, Settings.GetBool(taiga::kShare_Http_Enabled));
       SetDlgItemText(IDC_EDIT_HTTP_URL, Settings[taiga::kShare_Http_Url].c_str());
       break;
     }
     // Sharing > Messenger
-    case PAGE_SHARING_MESSENGER: {
+    case kSettingsPageSharingMessenger: {
       CheckDlgButton(IDC_CHECK_MESSENGER, Settings.GetBool(taiga::kShare_Messenger_Enabled));
       break;
     }
     // Sharing > mIRC
-    case PAGE_SHARING_MIRC: {
+    case kSettingsPageSharingMirc: {
       CheckDlgButton(IDC_CHECK_MIRC, Settings.GetBool(taiga::kShare_Mirc_Enabled));
       CheckDlgButton(IDC_CHECK_MIRC_MULTISERVER, Settings.GetBool(taiga::kShare_Mirc_MultiServer));
       CheckDlgButton(IDC_CHECK_MIRC_ACTION, Settings.GetBool(taiga::kShare_Mirc_UseMeAction));
@@ -296,21 +289,21 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Sharing > Skype
-    case PAGE_SHARING_SKYPE: {
+    case kSettingsPageSharingSkype: {
       CheckDlgButton(IDC_CHECK_SKYPE, Settings.GetBool(taiga::kShare_Skype_Enabled));
       break;
     }
     // Sharing > Twitter
-    case PAGE_SHARING_TWITTER: {
+    case kSettingsPageSharingTwitter: {
       CheckDlgButton(IDC_CHECK_TWITTER, Settings.GetBool(taiga::kShare_Twitter_Enabled));
       parent->RefreshTwitterLink();
       break;
     }
 
-    // =========================================================================
+    ////////////////////////////////////////////////////////////////////////////
 
     // Torrents > Discovery
-    case PAGE_TORRENTS_DISCOVERY: {
+    case kSettingsPageTorrentsDiscovery: {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.animesuki.com/rss.php?link=enclosure");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.baka-updates.com/rss.php");
@@ -329,7 +322,7 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Torrents > Downloads
-    case PAGE_TORRENTS_DOWNLOADS: {
+    case kSettingsPageTorrentsDownloads: {
       CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2,
                        IDC_RADIO_TORRENT_APP1 + Settings.GetInt(taiga::kTorrent_Download_AppMode) - 1);
       SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings[taiga::kTorrent_Download_AppPath].c_str());
@@ -350,7 +343,7 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
     // Torrents > Filters
-    case PAGE_TORRENTS_FILTERS: {
+    case kSettingsPageTorrentsFilters: {
       CheckDlgButton(IDC_CHECK_TORRENT_FILTER, Settings.GetBool(taiga::kTorrent_Filter_Enabled));
       win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
       list.EnableGroupView(true);
@@ -381,11 +374,11 @@ BOOL SettingsPage::OnInitDialog() {
       break;
     }
   }
-  
+
   return TRUE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (HIWORD(wParam)) {
@@ -417,7 +410,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
 
-        // ================================================================================
+        ////////////////////////////////////////////////////////////////////////
 
         // Add folders
         case IDC_BUTTON_ADDFOLDER: {
@@ -440,22 +433,20 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         }
 
-        // ================================================================================
+        ////////////////////////////////////////////////////////////////////////
 
         // Clear cache
         case IDC_BUTTON_CACHE_CLEAR: {
           if (IsDlgButtonChecked(IDC_CHECK_CACHE1)) {
-            History.items.clear();
-            History.Save();
-            HistoryDialog.RefreshList();
+            History.Clear();
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE2)) {
-            wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
+            std::wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
             DeleteFolder(path);
             ImageDatabase.FreeMemory();
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE3)) {
-            wstring path = taiga::GetPath(taiga::kPathFeed);
+            std::wstring path = taiga::GetPath(taiga::kPathFeed);
             DeleteFolder(path);
           }
           parent->RefreshCache();
@@ -466,31 +457,32 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         }
 
-        // ================================================================================
+        ////////////////////////////////////////////////////////////////////////
 
         // Test DDE connection
         case IDC_BUTTON_MIRC_TEST: {
-          wstring service;
+          std::wstring service;
           GetDlgItemText(IDC_EDIT_MIRC_SERVICE, service);
           Announcer.TestMircConnection(service);
           return TRUE;
         }
 
-        // ================================================================================
-    
+        ////////////////////////////////////////////////////////////////////////
+
         // Authorize Twitter
         case IDC_BUTTON_TWITTER_AUTH: {
           Twitter.RequestToken();
           return TRUE;
         }
 
-        // ================================================================================
+        ////////////////////////////////////////////////////////////////////////
 
         // Browse for torrent application
         case IDC_BUTTON_TORRENT_BROWSE_APP: {
-          wstring current_directory = Taiga.GetCurrentDirectory();
-          wstring path = BrowseForFile(GetWindowHandle(), L"Please select a torrent application", 
-                                       L"Executable files (*.exe)\0*.exe\0\0");
+          std::wstring current_directory = Taiga.GetCurrentDirectory();
+          std::wstring path = BrowseForFile(
+              GetWindowHandle(), L"Please select a torrent application",
+              L"Executable files (*.exe)\0*.exe\0\0");
           if (current_directory != Taiga.GetCurrentDirectory())
             Taiga.SetCurrentDirectory(current_directory);
           if (!path.empty())
@@ -499,7 +491,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         // Browse for torrent download path
         case IDC_BUTTON_TORRENT_BROWSE_FOLDER: {
-          wstring path;
+          std::wstring path;
           if (BrowseForFolder(GetWindowHandle(), L"Please select a folder:", L"", path))
             SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, path.c_str());
           return TRUE;
@@ -578,7 +570,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
           int index = list.GetNextItem(-1, LVNI_SELECTED);
           if (index > 0) {
-            iter_swap(parent->feed_filters_.begin() + index, 
+            iter_swap(parent->feed_filters_.begin() + index,
                       parent->feed_filters_.begin() + index - 1);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
             list.SetSelectedItem(index - 1);
@@ -600,7 +592,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         }
 
-        // ================================================================================
+        ////////////////////////////////////////////////////////////////////////
 
         // Check radio buttons
         case IDC_RADIO_MIRC_CHANNEL1:
@@ -627,12 +619,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void SettingsPage::OnDropFiles(HDROP hDropInfo) {
-  if (index != PAGE_LIBRARY_FOLDERS)
+  if (index != kSettingsPageLibraryFolders)
     return;
-  
+
   WCHAR szFileName[MAX_PATH + 1];
   UINT nFiles = DragQueryFile(hDropInfo, static_cast<UINT>(-1), nullptr, 0);
   win::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
@@ -676,9 +668,9 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         }
         // Open themes folder
         case IDC_LINK_THEMES: {
-          wstring theme_name;
+          std::wstring theme_name;
           GetDlgItemText(IDC_COMBO_THEME, theme_name);
-          wstring path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
+          std::wstring path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
           Execute(path);
           return TRUE;
         }
@@ -730,7 +722,8 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     // Double click
     case NM_DBLCLK: {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-      if (lpnmitem->iItem == -1) break;
+      if (lpnmitem->iItem == -1)
+        break;
       // Anime folders
       if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_FOLDERS_ROOT)) {
         win::ListView list = lpnmitem->hdr.hwndFrom;
@@ -781,11 +774,12 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     // Right click
     case NM_RCLICK: {
       LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-      if (lpnmitem->iItem == -1) break;
+      if (lpnmitem->iItem == -1)
+        break;
       win::ListView list = lpnmitem->hdr.hwndFrom;
       // Media players
       if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-        wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"GenericList");
+        std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"GenericList");
         for (int i = 0; i < list.GetItemCount(); i++) {
           if (answer == L"SelectAll()") {
             list.SetCheckState(i, TRUE);
@@ -798,6 +792,8 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       return TRUE;
     }
   }
-  
+
   return 0;
 }
+
+}  // namespace ui

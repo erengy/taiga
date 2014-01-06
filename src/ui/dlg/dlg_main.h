@@ -29,29 +29,29 @@
 namespace ui {
 
 enum MainToolbarButtons {
-  TOOLBAR_BUTTON_SYNCHRONIZE = 200,
-  TOOLBAR_BUTTON_MAL = 201,
-  TOOLBAR_BUTTON_HERRO = 202,
-  TOOLBAR_BUTTON_FOLDERS = 204,
-  TOOLBAR_BUTTON_TOOLS = 205,
-  TOOLBAR_BUTTON_SETTINGS = 207,
-  TOOLBAR_BUTTON_ABOUT = 209
+  kToolbarButtonSync = 200,
+  kToolbarButtonMal = 201,
+  kToolbarButtonHerro = 202,
+  kToolbarButtonFolders = 204,
+  kToolbarButtonTools = 205,
+  kToolbarButtonSettings = 207,
+  kToolbarButtonDebug = 209
 };
 
 enum SearchMode {
-  SEARCH_MODE_NONE,
-  SEARCH_MODE_MAL,
-  SEARCH_MODE_FEED
+  kSearchModeNone,
+  kSearchModeService,
+  kSearchModeFeed
 };
 
 enum SidebarItems {
-  SIDEBAR_ITEM_NOWPLAYING = 0,
-  SIDEBAR_ITEM_ANIMELIST = 2,
-  SIDEBAR_ITEM_HISTORY = 3,
-  SIDEBAR_ITEM_STATS = 4,
-  SIDEBAR_ITEM_SEARCH = 6,
-  SIDEBAR_ITEM_SEASONS = 7,
-  SIDEBAR_ITEM_FEEDS = 8
+  kSidebarItemNowPlaying = 0,
+  kSidebarItemAnimeList = 2,
+  kSidebarItemHistory = 3,
+  kSidebarItemStats = 4,
+  kSidebarItemSearch = 6,
+  kSidebarItemSeasons = 7,
+  kSidebarItemFeeds = 8
 };
 
 class MainDialog : public win::Dialog {
@@ -141,7 +141,7 @@ public:
   // Search bar
   class SearchBar {
   public:
-    SearchBar() : mode(SEARCH_MODE_NONE), parent(nullptr) {}
+    SearchBar() : mode(kSearchModeNone), parent(nullptr) {}
     int mode;
     MainDialog* parent;
     anime::Filters filters;

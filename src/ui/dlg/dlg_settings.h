@@ -16,29 +16,32 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DLG_SETTINGS_H
-#define DLG_SETTINGS_H
+#ifndef TAIGA_UI_DLG_SETTINGS_H
+#define TAIGA_UI_DLG_SETTINGS_H
 
-#include "base/std.h"
-#include "dlg_settings_page.h"
+#include <map>
+#include <vector>
+
 #include "track/feed.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
+#include "ui/dlg/dlg_settings_page.h"
+
+namespace ui {
 
 enum SettingsSections {
-  SECTION_SERVICES = 1,
-  SECTION_LIBRARY,
-  SECTION_APPLICATION,
-  SECTION_RECOGNITION,
-  SECTION_SHARING,
-  SECTION_TORRENTS
+  kSettingsSectionServices = 1,
+  kSettingsSectionLibrary,
+  kSettingsSectionApplication,
+  kSettingsSectionRecognition,
+  kSettingsSectionSharing,
+  kSettingsSectionTorrents
 };
-// =============================================================================
 
 class SettingsDialog : public win::Dialog {
 public:
   SettingsDialog();
-  virtual ~SettingsDialog() {}
+  ~SettingsDialog() {}
 
   friend class SettingsPage;
 
@@ -67,10 +70,12 @@ private:
 private:
   int current_section_;
   int current_page_;
-  vector<FeedFilter> feed_filters_;
-  vector<SettingsPage> pages;
+  std::vector<FeedFilter> feed_filters_;
+  std::vector<SettingsPage> pages;
 };
 
-extern class SettingsDialog SettingsDialog;
+extern SettingsDialog DlgSettings;
 
-#endif // DLG_SETTINGS_H
+}  // namespace ui
+
+#endif  // TAIGA_UI_DLG_SETTINGS_H

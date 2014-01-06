@@ -16,31 +16,20 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/std.h"
-
-#include "dlg_main.h"
-
-#include "dlg_anime_list.h"
-#include "dlg_history.h"
-#include "dlg_season.h"
-#include "dlg_stats.h"
-
-#include "library/anime_db.h"
-#include "library/anime_filter.h"
 #include "base/common.h"
-#include "taiga/debug.h"
-#include "base/gfx.h"
-#include "library/history.h"
-#include "taiga/resource.h"
-#include "taiga/settings.h"
 #include "base/string.h"
-#include "taiga/taiga.h"
+#include "library/history.h"
+#include "taiga/debug.h"
+#include "taiga/resource.h"
+#include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_main.h"
+#include "ui/dlg/dlg_season.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 
-#include "win/win_gdi.h"
+namespace ui {
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* TreeView control */
 
@@ -65,12 +54,14 @@ void MainDialog::MainTree::RefreshHistoryCounter() {
   wstring text = L"History";
   int count = History.queue.GetItemCount();
   if (count > 0) text += L" (" + ToWstr(count) + L")";
-  SetItem(hti.at(SIDEBAR_ITEM_HISTORY), text.c_str());
+  SetItem(hti.at(kSidebarItemHistory), text.c_str());
 }
 
 BOOL MainDialog::MainTree::IsVisible() {
   // This hack ensures that the sidebar is considered visible on startup
-  if (!::MainDialog.IsVisible()) return TRUE;
+  if (!DlgMain.IsVisible())
+    return TRUE;
+
   return TreeView::IsVisible();
 }
 
@@ -133,7 +124,7 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
   return 0;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Button control */
 
@@ -183,7 +174,7 @@ LRESULT MainDialog::EditSearch::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 /* Toolbar */
 
@@ -191,23 +182,23 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Toolbar
   switch (LOWORD(wParam)) {
     // Synchronize
-    case TOOLBAR_BUTTON_SYNCHRONIZE:
+    case kToolbarButtonSync:
       ExecuteAction(L"Synchronize");
       return TRUE;
     // MyAnimeList
-    case TOOLBAR_BUTTON_MAL:
+    case kToolbarButtonMal:
       ExecuteAction(L"MalViewPanel");
       return TRUE;
     // Herro
-    case TOOLBAR_BUTTON_HERRO:
+    case kToolbarButtonHerro:
       ExecuteAction(L"HerroViewProfile");
       return TRUE;
     // Settings
-    case TOOLBAR_BUTTON_SETTINGS:
+    case kToolbarButtonSettings:
       ExecuteAction(L"Settings");
       return TRUE;
     // Debug
-    case TOOLBAR_BUTTON_ABOUT:
+    case kToolbarButtonDebug:
       debug::Test();
       return TRUE;
   }
@@ -219,18 +210,18 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       edit.GetText(text);
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
       switch (navigation.GetCurrentPage()) {
-        case SIDEBAR_ITEM_ANIMELIST:
+        case kSidebarItemAnimeList:
           if (search_bar.filters.text != text) {
             search_bar.filters.text = text;
-            AnimeListDialog.RefreshList();
-            AnimeListDialog.RefreshTabs();
+            DlgAnimeList.RefreshList();
+            DlgAnimeList.RefreshTabs();
             return TRUE;
           }
           break;
-        case SIDEBAR_ITEM_SEASONS:
+        case kSidebarItemSeasons:
           if (search_bar.filters.text != text) {
             search_bar.filters.text = text;
-            SeasonDialog.RefreshList();
+            DlgSeason.RefreshList();
             return TRUE;
           }
           break;
@@ -253,17 +244,17 @@ LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, 
 
       case WM_MOUSEMOVE: {
         POINT pt = {LOWORD(msg->lParam), HIWORD(msg->lParam)};
-        ScreenToClient(::MainDialog.toolbar_wm.toolbar->GetWindowHandle(), &pt);
+        ScreenToClient(DlgMain.toolbar_wm.toolbar->GetWindowHandle(), &pt);
 
-        int button_index = ::MainDialog.toolbar_wm.toolbar->HitTest(pt);
-        int button_count = ::MainDialog.toolbar_wm.toolbar->GetButtonCount();
-        DWORD button_style = ::MainDialog.toolbar_wm.toolbar->GetButtonStyle(button_index);
+        int button_index = DlgMain.toolbar_wm.toolbar->HitTest(pt);
+        int button_count = DlgMain.toolbar_wm.toolbar->GetButtonCount();
+        DWORD button_style = DlgMain.toolbar_wm.toolbar->GetButtonStyle(button_index);
         
         if (button_index > -1 && 
             button_index < button_count && 
-            button_index != ::MainDialog.toolbar_wm.button_index) {
+            button_index != DlgMain.toolbar_wm.button_index) {
           if (button_style & BTNS_DROPDOWN || button_style & BTNS_WHOLEDROPDOWN) {
-            ::MainDialog.toolbar_wm.toolbar->SendMessage(TB_SETHOTITEM, button_index, 0);
+            DlgMain.toolbar_wm.toolbar->SendMessage(TB_SETHOTITEM, button_index, 0);
             return 0L;
           }
         }
@@ -273,7 +264,7 @@ LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, 
     }
   }
   
-  return CallNextHookEx(::MainDialog.toolbar_wm.hook, code, wParam, lParam);
+  return CallNextHookEx(DlgMain.toolbar_wm.hook, code, wParam, lParam);
 }
 
 LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
@@ -315,7 +306,6 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
     case TBN_HOTITEMCHANGE: {
       LPNMTBHOTITEM lpnmhi = reinterpret_cast<LPNMTBHOTITEM>(lParam);
       if (toolbar_wm.hook && lpnmhi->idNew > 0) {
-        debug::Print(L"Old: " + ToWstr(lpnmhi->idOld) + L" | New: " + ToWstr(lpnmhi->idNew) + L"\n");
         toolbar_wm.toolbar->PressButton(lpnmhi->idOld, FALSE);
         toolbar_wm.toolbar->SendMessage(lpnmhi->idNew, TRUE);
         SendMessage(WM_CANCELMODE);
@@ -347,7 +337,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
 
   // Display menu
   wstring action;
-  HWND hwnd = ::MainDialog.GetWindowHandle();
+  HWND hwnd = DlgMain.GetWindowHandle();
   #define SHOWUIMENU(id, name) \
     case id: action = ui::Menus.Show(hwnd, pt.x, pt.y, name); break;
   switch (tbb.idCommand) {
@@ -356,8 +346,8 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
     SHOWUIMENU(102, L"Tools");
     SHOWUIMENU(103, L"View");
     SHOWUIMENU(104, L"Help");
-    SHOWUIMENU(TOOLBAR_BUTTON_FOLDERS, L"Folders");
-    SHOWUIMENU(TOOLBAR_BUTTON_TOOLS, L"ExternalLinks");
+    SHOWUIMENU(kToolbarButtonFolders, L"Folders");
+    SHOWUIMENU(kToolbarButtonTools, L"ExternalLinks");
   }
   #undef SHOWUIMENU
 
@@ -371,6 +361,8 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
 
   if (!action.empty()) {
     ExecuteAction(action);
-    ui::Menus.UpdateAll(AnimeListDialog.GetCurrentItem());
+    ui::Menus.UpdateAll(DlgAnimeList.GetCurrentItem());
   }
 }
+
+}  // namespace ui
