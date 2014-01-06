@@ -20,7 +20,7 @@
 
 namespace win {
 
-HMENU MenuList::CreateNewMenu(LPCWSTR name, vector<HMENU>& menu_handles) {
+HMENU MenuList::CreateNewMenu(LPCWSTR name, std::vector<HMENU>& menu_handles) {
   auto menu = FindMenu(name);
 
   if (!menu)
@@ -75,8 +75,8 @@ HMENU MenuList::CreateNewMenu(LPCWSTR name, vector<HMENU>& menu_handles) {
   return handle;
 }
 
-wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR name) {
-  vector<HMENU> menu_handles;
+std::wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR name) {
+  std::vector<HMENU> menu_handles;
   CreateNewMenu(name, menu_handles);
 
   if (menu_handles.empty())
@@ -97,7 +97,7 @@ wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR name) {
     ::DestroyMenu(*it);
 
   if (index > 0) {
-    auto str = reinterpret_cast<wstring*>(index);
+    auto str = reinterpret_cast<std::wstring*>(index);
     return *str;
   } else {
     return std::wstring();

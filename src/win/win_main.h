@@ -27,10 +27,6 @@
 #include <string>
 #include <vector>
 
-using std::string;
-using std::vector;
-using std::wstring;
-
 namespace win {
 
 class Window;

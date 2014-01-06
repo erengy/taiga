@@ -44,8 +44,8 @@ public:
   virtual HWND GetDlgItem(int id_item);
   virtual UINT GetDlgItemInt(int id_item);
   virtual void GetDlgItemText(int id_item, LPWSTR output, int max_length = MAX_PATH);
-  virtual void GetDlgItemText(int id_item, wstring& output);
-  virtual wstring GetDlgItemText(int id_item);
+  virtual void GetDlgItemText(int id_item, std::wstring& output);
+  virtual std::wstring GetDlgItemText(int id_item);
   virtual BOOL HideDlgItem(int id_item);
   virtual BOOL IsDlgButtonChecked(int id_button);
   virtual BOOL SendDlgItemMessage(int id_item, UINT uMsg, WPARAM wParam, LPARAM lParam);

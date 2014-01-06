@@ -360,18 +360,18 @@ void Window::GetText(LPWSTR output, int max_count) const {
   ::GetWindowText(window_, output, max_count);
 }
 
-void Window::GetText(wstring& output) const {
+void Window::GetText(std::wstring& output) const {
   int len = ::GetWindowTextLength(window_) + 1;
-  vector<wchar_t> buffer(len);
+  std::vector<wchar_t> buffer(len);
   ::GetWindowText(window_, &buffer[0], len);
   output.assign(&buffer[0]);
 }
 
-wstring Window::GetText() const {
+std::wstring Window::GetText() const {
   int len = ::GetWindowTextLength(window_) + 1;
-  vector<wchar_t> buffer(len);
+  std::vector<wchar_t> buffer(len);
   ::GetWindowText(window_, &buffer[0], len);
-  return wstring(&buffer[0]);
+  return std::wstring(&buffer[0]);
 }
 
 INT Window::GetTextLength() const {

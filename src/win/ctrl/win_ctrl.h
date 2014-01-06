@@ -126,7 +126,7 @@ public:
   int        GetItemCount();
   LPARAM     GetItemParam(int i);
   void       GetItemText(int item, int subitem, LPWSTR output, int max_length = MAX_PATH);
-  void       GetItemText(int item, int subitem, wstring& output, int max_length = MAX_PATH);
+  void       GetItemText(int item, int subitem, std::wstring& output, int max_length = MAX_PATH);
   INT        GetNextItem(int start, UINT flags);
   INT        GetNextItemIndex(int item, int group, LPARAM flags);
   UINT       GetSelectedCount();
@@ -222,13 +222,13 @@ public:
   virtual ~RichEdit();
 
   void    GetSel(CHARRANGE* cr);
-  wstring GetTextRange(CHARRANGE* cr);
+  std::wstring GetTextRange(CHARRANGE* cr);
   void    HideSelection(BOOL hide);
   BOOL    SetCharFormat(DWORD format, CHARFORMAT* cf);
   DWORD   SetEventMask(DWORD flags);
   void    SetSel(int start, int end);
   void    SetSel(CHARRANGE* cr);
-  UINT    SetTextEx(const string& text);
+  UINT    SetTextEx(const std::string& text);
 
 protected:
   virtual void PreCreate(CREATESTRUCT &cs);
@@ -274,7 +274,7 @@ protected:
 
 private:
   HIMAGELIST image_list_;
-  vector<int> widths_;
+  std::vector<int> widths_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -346,7 +346,7 @@ protected:
   virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  vector<LPCWSTR> tooltip_text_;
+  std::vector<LPCWSTR> tooltip_text_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

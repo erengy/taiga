@@ -166,7 +166,7 @@ HRESULT TaskDialog::Show(HWND parent) {
     // Set message
     #define ADD_MSG(x) \
         if (x) { msg += L"\n\n"; msg += x; }
-    wstring msg = config_.pszMainInstruction;
+    std::wstring msg = config_.pszMainInstruction;
     ADD_MSG(config_.pszContent);
     ADD_MSG(config_.pszExpandedInformation);
     ADD_MSG(config_.pszFooter);
@@ -178,7 +178,7 @@ HRESULT TaskDialog::Show(HWND parent) {
     for (unsigned int i = 0; i < button_text.size(); i++) {
       button_text[i] = buttons_[i].pszButtonText;
       unsigned int pos = button_text[i].find(L"\n");
-      if (pos != wstring::npos)
+      if (pos != std::wstring::npos)
         button_text[i].resize(pos);
     }
     switch (config_.cButtons) {

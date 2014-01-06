@@ -47,7 +47,7 @@ public:
                   bool newcolumn = false,
                   bool radio = false);
 
-  vector<MenuItem> items;
+  std::vector<MenuItem> items;
   std::wstring name;
   std::wstring type;
 };
@@ -55,7 +55,7 @@ public:
 class MenuList {
 public:
   void Create(LPCWSTR name, LPCWSTR type);
-  HMENU CreateNewMenu(LPCWSTR name, vector<HMENU>& menu_handles);
+  HMENU CreateNewMenu(LPCWSTR name, std::vector<HMENU>& menu_handles);
   Menu* FindMenu(LPCWSTR name);
   std::wstring Show(HWND hwnd, int x, int y, LPCWSTR name);
 

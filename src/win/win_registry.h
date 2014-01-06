@@ -39,7 +39,7 @@ public:
       LPDWORD disposition = nullptr);
   LONG DeleteKey(const std::wstring& subkey);
   LSTATUS DeleteValue(const std::wstring& value_name);
-  void EnumKeys(vector<std::wstring>& output);
+  void EnumKeys(std::vector<std::wstring>& output);
   LSTATUS OpenKey(
       HKEY key,
       const std::wstring& subkey,

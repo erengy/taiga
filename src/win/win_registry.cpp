@@ -97,7 +97,7 @@ LSTATUS Registry::DeleteValue(const std::wstring& value_name) {
   return ::RegDeleteValue(key_, value_name.c_str());
 }
 
-void Registry::EnumKeys(vector<std::wstring>& output) {
+void Registry::EnumKeys(std::vector<std::wstring>& output) {
   // sam_desired must be: KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS
 
   WCHAR name[MAX_PATH] = {0};

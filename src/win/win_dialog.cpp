@@ -209,18 +209,18 @@ void Dialog::GetDlgItemText(int id_item, LPWSTR output, int max_length) {
   ::GetDlgItemText(window_, id_item, output, max_length);
 }
 
-void Dialog::GetDlgItemText(int id_item, wstring& output) {
+void Dialog::GetDlgItemText(int id_item, std::wstring& output) {
   int len = ::GetWindowTextLength(GetDlgItem(id_item)) + 1;
-  vector<wchar_t> buffer(len);
+  std::vector<wchar_t> buffer(len);
   ::GetDlgItemText(window_, id_item, &buffer[0], len);
   output.assign(&buffer[0]);
 }
 
-wstring Dialog::GetDlgItemText(int id_item) {
+std::wstring Dialog::GetDlgItemText(int id_item) {
   int len = ::GetWindowTextLength(GetDlgItem(id_item)) + 1;
-  vector<wchar_t> buffer(len);
+  std::vector<wchar_t> buffer(len);
   ::GetDlgItemText(window_, id_item, &buffer[0], len);
-  return wstring(&buffer[0]);
+  return std::wstring(&buffer[0]);
 }
 
 BOOL Dialog::HideDlgItem(int id_item) {

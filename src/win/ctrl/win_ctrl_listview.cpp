@@ -152,7 +152,7 @@ void ListView::GetItemText(int item, int subitem,
 
 void ListView::GetItemText(int item, int subitem,
                            std::wstring& output, int max_length) {
-  vector<wchar_t> buffer(max_length);
+  std::vector<wchar_t> buffer(max_length);
   ListView_GetItemText(window_, item, subitem, &buffer[0], max_length);
   output.assign(&buffer[0]);
 }
