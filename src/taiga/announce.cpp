@@ -404,8 +404,8 @@ void Announcer::ToSkype(const wstring& mood) {
 
 Twitter::Twitter() {
   // These are unique values that identify Taiga
-  oauth.ConsumerKey = L"9GZsCbqzjOrsPWlIlysvg";
-  oauth.ConsumerSecret = L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw";
+  oauth.consumer_key = L"9GZsCbqzjOrsPWlIlysvg";
+  oauth.consumer_secret = L"ebjXyymbuLtjDvoxle9Ldj8YYIMoleORapIOoqBrjRw";
 }
 
 bool Twitter::RequestToken() {

@@ -20,51 +20,47 @@
 ** THE SOFTWARE.
 */
 
-#ifndef OAUTH_H
-#define OAUTH_H
+#ifndef TAIGA_THIRD_PARTY_OAUTH_H
+#define TAIGA_THIRD_PARTY_OAUTH_H
 
 #include <map>
 #include <string>
 
-using std::string;
-using std::wstring;
+typedef std::map<std::wstring, std::wstring> OAuthParameters;
 
-typedef std::map<wstring, wstring> OAuthParameters;
-
-// =============================================================================
-
-class COAuth {
+class OAuth {
 public:
-  COAuth() {}
-  virtual ~COAuth() {}
+  OAuth() {}
+  ~OAuth() {}
 
-  wstring ConsumerKey, ConsumerSecret;
+  std::wstring BuildAuthorizationHeader(
+      const std::wstring& url,
+      const std::wstring& http_method,
+      const OAuthParameters* post_parameters = nullptr, 
+      const std::wstring& oauth_token = L"",
+      const std::wstring& oauth_token_secret = L"",
+      const std::wstring& pin = L"");
+  OAuthParameters ParseQueryString(const std::wstring& url);
 
-  wstring BuildAuthorizationHeader(
-    const wstring& url, 
-    const wstring& http_method, 
-    const OAuthParameters* post_parameters = NULL, 
-    const wstring& oauth_token = L"", 
-    const wstring& oauth_token_secret = L"", 
-    const wstring& pin = L"");
-  OAuthParameters ParseQueryString(const wstring& url);
+  std::wstring consumer_key;
+  std::wstring consumer_secret;
 
 private:
   OAuthParameters BuildSignedParameters(
-    const OAuthParameters& get_parameters, 
-    const wstring& url, 
-    const wstring& http_method, 
-    const OAuthParameters* post_parameters, 
-    const wstring& oauth_token, 
-    const wstring& oauth_token_secret, 
-    const wstring& pin);
-  wstring CreateNonce();
-  wstring CreateSignature(const wstring& signature_base, const wstring& oauth_token_secret);
-  wstring CreateTimestamp();
-  string Crypt_HMACSHA1(const string& key_bytes, const string& data);
-  wstring NormalizeURL(const wstring& url);
-  wstring SortParameters(const OAuthParameters& parameters);
-  wstring UrlGetQuery(const wstring& url);
+      const OAuthParameters& get_parameters,
+      const std::wstring& url,
+      const std::wstring& http_method,
+      const OAuthParameters* post_parameters,
+      const std::wstring& oauth_token,
+      const std::wstring& oauth_token_secret,
+      const std::wstring& pin);
+  std::wstring CreateNonce();
+  std::wstring CreateSignature(const std::wstring& signature_base, const std::wstring& oauth_token_secret);
+  std::wstring CreateTimestamp();
+  std::string Crypt_HMACSHA1(const std::string& key_bytes, const std::string& data);
+  std::wstring NormalizeURL(const std::wstring& url);
+  std::wstring SortParameters(const OAuthParameters& parameters);
+  std::wstring UrlGetQuery(const std::wstring& url);
 };
 
-#endif // OAUTH_H
+#endif  // TAIGA_THIRD_PARTY_OAUTH_H

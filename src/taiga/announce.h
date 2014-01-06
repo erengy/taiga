@@ -114,7 +114,7 @@ public:
   bool SetStatusText(const std::wstring& status_text);
 
 public:
-  COAuth oauth;
+  OAuth oauth;
 
 private:
   wstring status_text_;
