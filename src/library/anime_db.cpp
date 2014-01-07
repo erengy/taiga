@@ -389,6 +389,28 @@ int Database::GetItemCount(int status, bool check_history) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Database::AddToList(int anime_id, int status) {
+  auto anime_item = FindItem(anime_id);
+
+  if (!anime_item)
+    return;
+
+  anime_item->AddtoUserList();
+  SaveList();
+
+  HistoryItem history_item;
+  history_item.anime_id = anime_id;
+  history_item.status = status;
+  if (status == anime::kCompleted) {
+    history_item.episode = anime_item->GetEpisodeCount();
+    history_item.date_finish = GetDate();
+  }
+  history_item.mode = taiga::kHttpServiceAddLibraryEntry;
+  History.queue.Add(history_item);
+
+  ui::OnLibraryEntryAdd(anime_id);
+}
+
 void Database::ClearUserData() {
   ui::DlgAnimeList.SetCurrentId(ID_UNKNOWN);
 

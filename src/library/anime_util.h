@@ -58,6 +58,9 @@ bool IsInsideRootFolders(const std::wstring& path);
 
 bool IsValidEpisode(int episode, int watched, int total);
 int EstimateEpisodeCount(const Item& item);
+void ChangeEpisode(int anime_id, int value);
+void DecrementEpisode(int anime_id);
+void IncrementEpisode(int anime_id);
 
 std::wstring TranslateMyStatus(int value, bool add_count);
 std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");

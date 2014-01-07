@@ -130,4 +130,29 @@ void ShowDialog(Dialog dialog) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void ShowDlgAnimeEdit(int anime_id) {
+  DlgAnime.SetCurrentId(anime_id);
+  DlgAnime.SetCurrentPage(kAnimePageMyInfo);
+
+  ShowDialog(kDialogAnimeInformation);
+}
+
+void ShowDlgAnimeInfo(int anime_id) {
+  DlgAnime.SetCurrentId(anime_id);
+  DlgAnime.SetCurrentPage(kAnimePageSeriesInfo);
+
+  ShowDialog(kDialogAnimeInformation);
+}
+
+void ShowDlgSettings(int section, int page) {
+  if (section > 0)
+    DlgSettings.SetCurrentSection(static_cast<SettingsSections>(section));
+  if (page > 0)
+    DlgSettings.SetCurrentPage(static_cast<SettingsPages>(page));
+
+  ShowDialog(kDialogSettings);
+}
+
 }  // namespace ui

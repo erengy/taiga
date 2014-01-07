@@ -51,8 +51,8 @@ public:
   LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
   void OnOK();
 
-  void SetCurrentSection(int index);
-  void SetCurrentPage(int index);
+  void SetCurrentSection(SettingsSections section);
+  void SetCurrentPage(SettingsPages page);
 
   int AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter);
   void RefreshCache();
@@ -68,8 +68,8 @@ private:
   win::Tab tab_;
 
 private:
-  int current_section_;
-  int current_page_;
+  SettingsSections current_section_;
+  SettingsPages current_page_;
   std::vector<FeedFilter> feed_filters_;
   std::vector<SettingsPage> pages;
 };

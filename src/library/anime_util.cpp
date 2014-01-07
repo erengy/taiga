@@ -573,6 +573,57 @@ int EstimateEpisodeCount(const Item& item) {
   return 0;
 }
 
+void ChangeEpisode(int anime_id, int value) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return;
+
+  if (IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
+    Episode episode;
+    episode.number = ToWstr(value);
+    AddToQueue(*anime_item, episode, true);
+  }
+}
+
+void DecrementEpisode(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return;
+
+  int watched = anime_item->GetMyLastWatchedEpisode();
+  auto history_item = History.queue.FindItem(anime_item->GetId(),
+                                             kQueueSearchEpisode);
+
+  if (history_item && *history_item->episode == watched &&
+      watched > anime_item->GetMyLastWatchedEpisode(false)) {
+    history_item->enabled = false;
+    History.queue.RemoveDisabled();
+  } else {
+    if (IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
+      Episode episode;
+      episode.number = ToWstr(watched - 1);
+      AddToQueue(*anime_item, episode, true);
+    }
+  }
+}
+
+void IncrementEpisode(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return;
+
+  int watched = anime_item->GetMyLastWatchedEpisode();
+
+  if (IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
+    Episode episode;
+    episode.number = ToWstr(watched + 1);
+    AddToQueue(*anime_item, episode, true);
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring TranslateMyStatus(int value, bool add_count) {

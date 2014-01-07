@@ -46,6 +46,7 @@ public:
 
   int GetItemCount(int status, bool check_history = true);
 
+  void AddToList(int anime_id, int status);
   void ClearUserData();
   bool DeleteListItem(int anime_id);
   void UpdateItem(const HistoryItem& history_item);

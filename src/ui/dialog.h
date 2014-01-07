@@ -38,6 +38,10 @@ void EnableDialogInput(Dialog dialog, bool enable);
 HWND GetWindowHandle(Dialog dialog);
 void ShowDialog(Dialog dialog);
 
+void ShowDlgAnimeEdit(int anime_id);
+void ShowDlgAnimeInfo(int anime_id);
+void ShowDlgSettings(int section, int page);
+
 }  // namespace ui
 
 #endif  // TAIGA_UI_DIALOG_H

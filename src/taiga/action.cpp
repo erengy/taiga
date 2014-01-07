@@ -18,41 +18,30 @@
 
 #include "base/common.h"
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/logger.h"
 #include "base/process.h"
 #include "base/string.h"
-#include "library/anime.h"
 #include "library/anime_db.h"
-#include "library/anime_filter.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
 #include "sync/herro_util.h"
-#include "sync/manager.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
-#include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
-#include "taiga/stats.h"
-#include "taiga/taiga.h"
-#include "track/feed.h"
 #include "track/monitor.h"
 #include "track/recognition.h"
-#include "ui/dialog.h"
-#include "ui/menu.h"
-#include "ui/theme.h"
-#include "ui/ui.h"
-
-#include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dlg/dlg_season.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_feed_filter.h"
+#include "ui/dialog.h"
+#include "ui/menu.h"
+#include "ui/ui.h"
 
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   LOG(LevelDebug, action);
@@ -69,12 +58,83 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     return;
 
   //////////////////////////////////////////////////////////////////////////////
+  // Taiga
+
+  // CheckUpdates()
+  //   Checks for a new version of the program.
+  if (action == L"CheckUpdates") {
+    ui::ShowDialog(ui::kDialogUpdate);
+
+  // Exit(), Quit()
+  //   Exits from Taiga.
+  } else if (action == L"Exit" || action == L"Quit") {
+    ui::DlgMain.Destroy();
+
+  //////////////////////////////////////////////////////////////////////////////
   // Services
 
   // Synchronize()
   //   Synchronizes local and remote lists.
-  if (action == L"Synchronize") {
+  } else if (action == L"Synchronize") {
     sync::Synchronize();
+
+  // SearchAnime()
+  } else if (action == L"SearchAnime") {
+    if (body.empty())
+      return;
+    auto service = taiga::GetCurrentService();
+    if (service->RequestNeedsAuthentication(sync::kSearchTitle)) {
+      if (taiga::GetCurrentUsername().empty() ||
+          taiga::GetCurrentPassword().empty()) {
+        ui::OnSettingsAccountEmpty();
+        return;
+      }
+    }
+    ui::DlgMain.navigation.SetCurrentPage(ui::kSidebarItemSearch);
+    ui::DlgMain.edit.SetText(body);
+    ui::DlgSearch.Search(body);
+
+  // ViewAnimePage
+  //   Opens up anime page on the active service.
+  //   lParam is an anime ID.
+  } else if (action == L"ViewAnimePage") {
+    int anime_id = static_cast<int>(lParam);
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        sync::myanimelist::ViewAnimePage(anime_id);
+        break;
+      case sync::kHerro:
+        sync::herro::ViewAnimePage(anime_id);
+        break;
+    }
+
+  // ViewUpcomingAnime
+  //   Opens up upcoming anime page on MAL.
+  } else if (action == L"ViewUpcomingAnime") {
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        sync::myanimelist::ViewUpcomingAnime();
+        break;
+      case sync::kHerro:
+        sync::herro::ViewUpcomingAnime();
+        break;
+    }
+
+  // MalViewPanel(), MalViewProfile(), MalViewHistory()
+  //   Opens up MyAnimeList user pages.
+  } else if (action == L"MalViewPanel") {
+    sync::myanimelist::ViewPanel();
+  } else if (action == L"MalViewProfile") {
+    sync::myanimelist::ViewProfile();
+  } else if (action == L"MalViewHistory") {
+    sync::myanimelist::ViewHistory();
+
+  // HerroViewProfile(), HerroViewDashboard()
+  //   Opens up Herro user pages.
+  } else if (action == L"HerroViewProfile") {
+    sync::herro::ViewProfile();
+  } else if (action == L"HerroViewDashboard") {
+    sync::herro::ViewDashboard();
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -98,31 +158,19 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     ExecuteLink(body);
 
   //////////////////////////////////////////////////////////////////////////////
-  // Dialogs
+  // UI
 
   // About()
   //   Shows about window.
   } else if (action == L"About") {
     ui::ShowDialog(ui::kDialogAbout);
 
-  // CheckUpdates()
-  //   Checks for a new version of the program.
-  } else if (action == L"CheckUpdates") {
-    ui::ShowDialog(ui::kDialogUpdate);
-
-  // Exit(), Quit()
-  //   Exits from Taiga.
-  } else if (action == L"Exit" || action == L"Quit") {
-    ui::DlgMain.Destroy();
-
   // Info()
   //   Shows anime information window.
   //   lParam is an anime ID.
   } else if (action == L"Info") {
     int anime_id = static_cast<int>(lParam);
-    ui::DlgAnime.SetCurrentId(anime_id);
-    ui::DlgAnime.SetCurrentPage(ui::kAnimePageSeriesInfo);
-    ui::ShowDialog(ui::kDialogAnimeInformation);
+    ui::ShowDlgAnimeInfo(anime_id);
 
   // MainDialog()
   } else if (action == L"MainDialog") {
@@ -138,27 +186,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   wParam is the initial section.
   //   lParam is the initial page.
   } else if (action == L"Settings") {
-    if (wParam > 0)
-      ui::DlgSettings.SetCurrentSection(wParam);
-    if (lParam > 0)
-      ui::DlgSettings.SetCurrentPage(lParam);
-    ui::ShowDialog(ui::kDialogSettings);
-  
-  // SearchAnime()
-  } else if (action == L"SearchAnime") {
-    if (body.empty())
-      return;
-    auto service = taiga::GetCurrentService();
-    if (service->RequestNeedsAuthentication(sync::kSearchTitle)) {
-      if (taiga::GetCurrentUsername().empty() ||
-          taiga::GetCurrentPassword().empty()) {
-        ui::OnSettingsAccountEmpty();
-        return;
-      }
-    }
-    ui::DlgMain.navigation.SetCurrentPage(ui::kSidebarItemSearch);
-    ui::DlgMain.edit.SetText(body);
-    ui::DlgSearch.Search(body);
+    ui::ShowDlgSettings(wParam, lParam);
 
   // SearchTorrents(source)
   //   Searches torrents from specified source URL.
@@ -194,6 +222,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     ui::DlgMain.navigation.SetCurrentPage(page);
 
   //////////////////////////////////////////////////////////////////////////////
+  // Library
   
   // AddToListAs(status)
   //   Adds new anime to list with given status.
@@ -201,66 +230,10 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"AddToListAs") {
     int status = ToInt(body);
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    // Add item to list
-    anime_item->AddtoUserList();
-    AnimeDatabase.SaveList();
-    // Add item to queue
-    HistoryItem history_item;
-    history_item.anime_id = anime_id;
-    history_item.status = status;
-    if (status == anime::kCompleted) {
-      history_item.episode = anime_item->GetEpisodeCount();
-      history_item.date_finish = GetDate();
-    }
-    history_item.mode = taiga::kHttpServiceAddLibraryEntry;
-    History.queue.Add(history_item);
-    // Refresh
-    ui::OnLibraryEntryAdd(anime_id);
-
-  // ViewAnimePage
-  //   Opens up anime page on the active service.
-  //   lParam is an anime ID.
-  } else if (action == L"ViewAnimePage") {
-    int anime_id = static_cast<int>(lParam);
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        sync::myanimelist::ViewAnimePage(anime_id);
-        break;
-      case sync::kHerro:
-        sync::herro::ViewAnimePage(anime_id);
-        break;
-    }
-
-  // MalViewPanel(), MalViewProfile(), MalViewHistory()
-  //   Opens up MyAnimeList user pages.
-  } else if (action == L"MalViewPanel") {
-    sync::myanimelist::ViewPanel();
-  } else if (action == L"MalViewProfile") {
-    sync::myanimelist::ViewProfile();
-  } else if (action == L"MalViewHistory") {
-    sync::myanimelist::ViewHistory();
-
-  // HerroViewProfile(), HerroViewDashboard()
-  //   Opens up Herro user pages.
-  } else if (action == L"HerroViewProfile") {
-    sync::herro::ViewProfile();
-  } else if (action == L"HerroViewDashboard") {
-    sync::herro::ViewDashboard();
-
-  // ViewUpcomingAnime
-  //   Opens up upcoming anime page on MAL.
-  } else if (action == L"ViewUpcomingAnime") {
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        sync::myanimelist::ViewUpcomingAnime();
-        break;
-      case sync::kHerro:
-        sync::herro::ViewUpcomingAnime();
-        break;
-    }
+    AnimeDatabase.AddToList(anime_id, status);
 
   //////////////////////////////////////////////////////////////////////////////
+  // Tracker
 
   // AddFolder()
   //   Opens up a dialog to add new root folder.
@@ -280,6 +253,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     ScanAvailableEpisodes(anime_id, true, false);
   } else if (action == L"ScanEpisodesAll") {
     ScanAvailableEpisodes(anime::ID_UNKNOWN, true, false);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Settings
 
   // ToggleRecognition()
   //   Enables or disables anime recognition.
@@ -322,6 +298,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     }
 
   //////////////////////////////////////////////////////////////////////////////
+  // Sharing
 
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
@@ -356,12 +333,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"EditAll") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (!anime_item || !anime_item->IsInList())
-      return;
-    ui::DlgAnime.SetCurrentId(anime_id);
-    ui::DlgAnime.SetCurrentPage(ui::kAnimePageMyInfo);
-    ui::ShowDialog(ui::kDialogAnimeInformation);
+    ui::ShowDlgAnimeEdit(anime_id);
 
   // EditDelete()
   //   Removes an anime from list.
@@ -381,47 +353,19 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"EditEpisode") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    int value = -1;
-    if (body.empty()) {
-      value = ui::OnLibraryEntryEditEpisode(anime_id);
-    } else {
-      value = ToInt(body);
-    }
-    if (anime::IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
-      anime::Episode episode;
-      episode.number = ToWstr(value);
-      AddToQueue(*anime_item, episode, true);
-    }
+    int value = body.empty() ?
+        ui::OnLibraryEntryEditEpisode(anime_id) : ToInt(body);
+    anime::ChangeEpisode(anime_id, value);
   // DecrementEpisode()
   //   lParam is an anime ID.
   } else if (action == L"DecrementEpisode") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    int watched = anime_item->GetMyLastWatchedEpisode();
-    auto history_item = History.queue.FindItem(anime_item->GetId(), kQueueSearchEpisode);
-    if (history_item && *history_item->episode == watched &&
-        watched > anime_item->GetMyLastWatchedEpisode(false)) {
-      history_item->enabled = false;
-      History.queue.RemoveDisabled();
-    } else {
-      if (anime::IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
-        anime::Episode episode;
-        episode.number = ToWstr(watched - 1);
-        AddToQueue(*anime_item, episode, true);
-      }
-    }
+    anime::DecrementEpisode(anime_id);
   // IncrementEpisode()
   //   lParam is an anime ID.
   } else if (action == L"IncrementEpisode") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    int watched = anime_item->GetMyLastWatchedEpisode();
-    if (anime::IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
-      anime::Episode episode;
-      episode.number = ToWstr(watched + 1);
-      AddToQueue(*anime_item, episode, true);
-    }
+    anime::IncrementEpisode(anime_id);
 
   // EditScore(value)
   //   Changes anime score.
@@ -444,32 +388,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     history_item.status = ToInt(body);
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    switch (anime_item->GetAiringStatus()) {
-      case anime::kAiring:
-        if (*history_item.status == anime::kCompleted) {
-          MessageBox(ui::GetWindowHandle(ui::kDialogMain), 
-            L"This anime is still airing, you cannot set it as completed.", 
-            anime_item->GetTitle().c_str(), MB_ICONERROR);
-          return;
-        }
-        break;
-      case anime::kFinishedAiring:
-        break;
-      case anime::kNotYetAired:
-        if (*history_item.status != anime::kPlanToWatch) {
-          MessageBox(ui::GetWindowHandle(ui::kDialogMain), 
-            L"This anime has not aired yet, you cannot set it as anything but Plan to Watch.", 
-            anime_item->GetTitle().c_str(), MB_ICONERROR);
-          return;
-        }
-        break;
-      default:
-        return;
-    }
     switch (*history_item.status) {
       case anime::kCompleted:
         history_item.episode = anime_item->GetEpisodeCount();
-        if (*history_item.episode == 0) history_item.episode.Reset();
+        if (*history_item.episode == 0)
+          history_item.episode.Reset();
         if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
           history_item.date_finish = GetDate();
         break;

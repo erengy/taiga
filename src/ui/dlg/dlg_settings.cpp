@@ -56,16 +56,16 @@ SettingsDialog::SettingsDialog()
   }
 }
 
-void SettingsDialog::SetCurrentSection(int index) {
-  current_section_ = index;
+void SettingsDialog::SetCurrentSection(SettingsSections section) {
+  current_section_ = section;
   
   if (!IsWindow())
     return;
 
-  SetDlgItemText(IDC_STATIC_TITLE, kSectionTitles[index - 1]);
+  SetDlgItemText(IDC_STATIC_TITLE, kSectionTitles[current_section_ - 1]);
 
   tab_.DeleteAllItems();
-  switch (index) {
+  switch (current_section_) {
     case kSettingsSectionServices:
       tab_.InsertItem(0, L"Main", kSettingsPageServicesMain);
       tab_.InsertItem(1, L"MyAnimeList", kSettingsPageServicesMal);
@@ -101,20 +101,20 @@ void SettingsDialog::SetCurrentSection(int index) {
   }
 }
 
-void SettingsDialog::SetCurrentPage(int index) {
+void SettingsDialog::SetCurrentPage(SettingsPages page) {
   pages.at(current_page_).Hide();
 
-  current_page_ = index;
+  current_page_ = page;
 
   if (!IsWindow())
     return;
 
-  if (!pages.at(index).IsWindow())
-    pages.at(index).Create();
-  pages.at(index).Show();
+  if (!pages.at(current_page_).IsWindow())
+    pages.at(current_page_).Create();
+  pages.at(current_page_).Show();
 
   for (int i = 0; i < tab_.GetItemCount(); i++) {
-    if (tab_.GetItemParam(i) == index) {
+    if (tab_.GetItemParam(i) == current_page_) {
       tab_.SetCurrentlySelected(i);
       break;
     }
@@ -146,7 +146,7 @@ BOOL SettingsDialog::OnInitDialog() {
                      reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), TRUE);
 
   // Select current section and page
-  int current_page = current_page_;
+  SettingsPages current_page = current_page_;
   tree_.SelectItem(tree_.items[current_section_]);
   SetCurrentSection(current_section_);
   SetCurrentPage(current_page);
@@ -430,11 +430,11 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         // Select section
         case TVN_SELCHANGED: {
           LPNMTREEVIEW pnmtv = reinterpret_cast<LPNMTREEVIEW>(pnmh);
-          int section_new = pnmtv->itemNew.lParam;
-          int section_old = pnmtv->itemOld.lParam;
+          auto section_new = static_cast<SettingsSections>(pnmtv->itemNew.lParam);
+          auto section_old = static_cast<SettingsSections>(pnmtv->itemOld.lParam);
           if (section_new != section_old) {
             SetCurrentSection(section_new);
-            SetCurrentPage(tab_.GetItemParam(0));
+            SetCurrentPage(static_cast<SettingsPages>(tab_.GetItemParam(0)));
           }
           break;
         }
@@ -446,8 +446,8 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       switch (pnmh->code) {
         // Select tab
         case TCN_SELCHANGE: {
-          int index = static_cast<int>(tab_.GetItemParam(tab_.GetCurrentlySelected()));
-          SetCurrentPage(index);
+          auto page = static_cast<SettingsPages>(tab_.GetItemParam(tab_.GetCurrentlySelected()));
+          SetCurrentPage(page);
           break;
         }
       }
