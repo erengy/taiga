@@ -197,6 +197,80 @@ bool PlayEpisode(Item& item, int number) {
   return !file_path.empty();
 }
 
+bool PlayLastEpisode(Item& item) {
+  return PlayEpisode(item, item.GetMyLastWatchedEpisode());
+}
+
+bool PlayNextEpisode(Item& item) {
+  if (item.GetEpisodeCount() != 1) {
+    return PlayEpisode(item, item.GetMyLastWatchedEpisode() + 1);
+  } else {
+    return PlayEpisode(item, 1);
+  }
+}
+
+bool PlayRandomAnime() {
+  static time_t time_last_checked = 0;
+  time_t time_now = time(nullptr);
+  if (time_now > time_last_checked + (60 * 2)) {  // 2 minutes
+    ScanAvailableEpisodes(ID_UNKNOWN, false, false);
+    time_last_checked = time_now;
+  }
+
+  std::vector<int> valid_ids;
+
+  foreach_(it, AnimeDatabase.items) {
+    anime::Item& anime_item = it->second;
+    if (!anime_item.IsInList())
+      continue;
+    if (!anime_item.IsNewEpisodeAvailable())
+      continue;
+    switch (anime_item.GetMyStatus()) {
+      case anime::kNotInList:
+      case anime::kCompleted:
+      case anime::kDropped:
+        continue;
+    }
+    valid_ids.push_back(anime_item.GetId());
+  }
+
+  foreach_ (id, valid_ids) {
+    srand(static_cast<unsigned int>(GetTickCount()));
+    size_t max_value = valid_ids.size();
+    size_t index = rand() % max_value + 1;
+    int anime_id = valid_ids.at(index);
+    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    if (PlayEpisode(*anime_item, anime_item->GetMyLastWatchedEpisode() + 1))
+      return true;
+  }
+
+  ui::OnAnimeEpisodeNotFound();
+  return false;
+}
+
+bool PlayRandomEpisode(Item& item) {
+  if (CheckFolder(item)) {
+    int total = item.GetEpisodeCount();
+    if (total == 0)
+      total = item.GetMyLastWatchedEpisode() + 1;
+
+    srand(static_cast<unsigned int>(GetTickCount()));
+
+    for (int i = 0; i < total; i++) {
+      int episode_number = rand() % total + 1;
+      std::wstring path =
+          SearchFileFolder(item, item.GetFolder(), episode_number, false);
+      if (!path.empty()) {
+        Execute(path);
+        return true;
+      }
+    }
+  }
+
+  ui::OnAnimeEpisodeNotFound();
+  return false;
+}
+
 bool LinkEpisodeToAnime(Episode& episode, int anime_id) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 

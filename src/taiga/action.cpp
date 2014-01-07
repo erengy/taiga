@@ -54,8 +54,6 @@
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_feed_filter.h"
 
-// =============================================================================
-
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   LOG(LevelDebug, action);
   
@@ -67,16 +65,18 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   }
   Trim(body);
   Trim(action);
-  if (action.empty()) return;
+  if (action.empty())
+    return;
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
+  // Services
 
   // Synchronize()
   //   Synchronizes local and remote lists.
   if (action == L"Synchronize") {
     sync::Synchronize();
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
 
   // Execute(path)
   //   Executes a file or folder.
@@ -97,7 +97,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     }
     ExecuteLink(body);
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
+  // Dialogs
 
   // About()
   //   Shows about window.
@@ -192,7 +193,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     int page = ToInt(body);
     ui::DlgMain.navigation.SetCurrentPage(page);
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
   
   // AddToListAs(status)
   //   Adds new anime to list with given status.
@@ -259,7 +260,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         break;
     }
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
 
   // AddFolder()
   //   Opens up a dialog to add new root folder.
@@ -320,7 +321,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       ui::ChangeStatusText(L"Automatic synchronization is now disabled.");
     }
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
 
   // AnnounceToHTTP(force)
   //   Sends an HTTP request.
@@ -348,7 +349,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"AnnounceToTwitter") {
     Announcer.Do(taiga::kAnnounceToTwitter, nullptr, body == L"true");
   
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
 
   // EditAll([anime_id])
   //   Shows a dialog to edit details of an anime.
@@ -506,7 +507,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       Settings.Save();
     }
   
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
   
   // OpenFolder()
   //   Searches for anime folder and opens it.
@@ -545,7 +546,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       anime::CheckEpisodes(*anime_item);
     }
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
 
   // PlayEpisode(value)
   //   Searches for an episode of an anime and plays it.
@@ -554,88 +555,42 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     int number = ToInt(body);
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    anime::PlayEpisode(*anime_item, number);
-  
+    if (anime_item)
+      anime::PlayEpisode(*anime_item, number);
+
   // PlayLast()
   //   Searches for the last watched episode of an anime and plays it.
   //   lParam is an anime ID.
   } else if (action == L"PlayLast") {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    int number = anime_item->GetMyLastWatchedEpisode();
-    anime::PlayEpisode(*anime_item, number);
-  
+    if (anime_item)
+      anime::PlayLastEpisode(*anime_item);
+
   // PlayNext([anime_id])
   //   Searches for the next episode of an anime and plays it.
   //   lParam is an anime ID.
   } else if (action == L"PlayNext") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item->GetEpisodeCount() != 1) {
-      anime::PlayEpisode(*anime_item, anime_item->GetMyLastWatchedEpisode() + 1);
-    } else {
-      anime::PlayEpisode(*anime_item, 1);
-    }
-  
+    if (anime_item)
+      anime::PlayNextEpisode(*anime_item);
+
   // PlayRandom()
   //   Searches for a random episode of an anime and plays it.
   //   lParam is an anime ID.
   } else if (action == L"PlayRandom") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item && anime::CheckFolder(*anime_item)) {
-      int total = anime_item->GetEpisodeCount();
-      if (total == 0)
-        total = anime_item->GetMyLastWatchedEpisode() + 1;
-      std::wstring path;
-      srand(static_cast<unsigned int>(GetTickCount()));
-      for (int i = 0; i < total; i++) {
-        int episode_number = rand() % total + 1;
-        path = SearchFileFolder(*anime_item, anime_item->GetFolder(), episode_number, false);
-        if (!path.empty()) {
-          Execute(path);
-          return;
-        }
-      }
-    }
-    ui::OnAnimeEpisodeNotFound();
-  
+    if (anime_item)
+      anime::PlayRandomEpisode(*anime_item);
+
   // PlayRandomAnime()
   //   Searches for a random episode of a random anime and plays it.
   } else if (action == L"PlayRandomAnime") {
-    static time_t time_last_checked = 0;
-    time_t time_now = time(nullptr);
-    if (time_now > time_last_checked + (60 * 2)) { // 2 minutes
-      ScanAvailableEpisodes(anime::ID_UNKNOWN, false, false);
-      time_last_checked = time_now;
-    }
-    std::vector<int> valid_ids;
-    foreach_(it, AnimeDatabase.items) {
-      anime::Item& anime_item = it->second;
-      if (!anime_item.IsInList())
-        continue;
-      if (!anime_item.IsNewEpisodeAvailable())
-        continue;
-      switch (anime_item.GetMyStatus()) {
-        case anime::kNotInList:
-        case anime::kCompleted:
-        case anime::kDropped:
-          continue;
-      }
-      valid_ids.push_back(anime_item.GetId());
-    }
-    foreach_ (id, valid_ids) {
-      srand(static_cast<unsigned int>(GetTickCount()));
-      size_t max_value = valid_ids.size();
-      size_t index = rand() % max_value + 1;
-      int anime_id = valid_ids.at(index);
-      auto anime_item = AnimeDatabase.FindItem(anime_id);
-      if (anime::PlayEpisode(*anime_item, anime_item->GetMyLastWatchedEpisode() + 1))
-        return;
-    }
-    ui::OnAnimeEpisodeNotFound();
+    anime::PlayRandomAnime();
 
-  // ===========================================================================
+  //////////////////////////////////////////////////////////////////////////////
 
   // Season_Load(file)
   //   Loads season data.
@@ -675,7 +630,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     ui::DlgSeason.SetViewMode(ToInt(body));
     ui::DlgSeason.RefreshList();
     ui::DlgSeason.RefreshToolbar();
-  
+
   // Unknown
   } else {
     LOG(LevelWarning, L"Unknown action: " + action);
