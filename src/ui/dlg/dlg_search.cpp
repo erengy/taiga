@@ -23,6 +23,7 @@
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "ui/dlg/dlg_search.h"
+#include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -98,7 +99,7 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             break;
           LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
           if (lParam)
-            ExecuteAction(L"Info", 0, lParam);
+            ShowDlgAnimeInfo(lParam);
         }
         break;
       }

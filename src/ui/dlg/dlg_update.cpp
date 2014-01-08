@@ -21,6 +21,7 @@
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_update.h"
+#include "ui/dialog.h"
 
 namespace ui {
 
@@ -72,7 +73,7 @@ BOOL UpdateDialog::OnDestroy() {
     }
   } else {
     // Create/activate main window
-    ExecuteAction(L"MainDialog");
+    ShowDialog(kDialogMain);
   }
 
   return TRUE;

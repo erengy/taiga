@@ -35,9 +35,9 @@ int EstimateLastAiredEpisodeNumber(const Item& item);
 
 bool CheckEpisodes(Item& item, int number = -1, bool check_folder = false);
 bool CheckFolder(Item& item);
-bool PlayEpisode(Item& item, int number);
-bool PlayLastEpisode(Item& item);
-bool PlayNextEpisode(Item& item);
+bool PlayEpisode(int anime_id, int number);
+bool PlayLastEpisode(int anime_id);
+bool PlayNextEpisode(int anime_id);
 bool PlayRandomAnime();
 bool PlayRandomEpisode(Item& item);
 bool LinkEpisodeToAnime(Episode& episode, int anime_id);

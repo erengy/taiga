@@ -243,7 +243,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       Settings.root_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
         FolderMonitor.Enable();
-      ExecuteAction(L"Settings", ui::kSettingsSectionLibrary, ui::kSettingsPageLibraryFolders);
+      ui::ShowDlgSettings(ui::kSettingsSectionLibrary, ui::kSettingsPageLibraryFolders);
     }
 
   // ScanEpisodes(), ScanEpisodesAll()
@@ -477,27 +477,21 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"PlayEpisode") {
     int number = ToInt(body);
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item)
-      anime::PlayEpisode(*anime_item, number);
+    anime::PlayEpisode(anime_id, number);
 
   // PlayLast()
   //   Searches for the last watched episode of an anime and plays it.
   //   lParam is an anime ID.
   } else if (action == L"PlayLast") {
     int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item)
-      anime::PlayLastEpisode(*anime_item);
+    anime::PlayLastEpisode(anime_id);
 
   // PlayNext([anime_id])
   //   Searches for the next episode of an anime and plays it.
   //   lParam is an anime ID.
   } else if (action == L"PlayNext") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item)
-      anime::PlayNextEpisode(*anime_item);
+    anime::PlayNextEpisode(anime_id);
 
   // PlayRandom()
   //   Searches for a random episode of an anime and plays it.

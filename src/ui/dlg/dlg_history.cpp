@@ -27,6 +27,7 @@
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_history.h"
 #include "ui/dlg/dlg_main.h"
+#include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -94,7 +95,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
           int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
           int anime_id = list_.GetItemParam(item_index);
-          ExecuteAction(L"Info", 0, anime_id);
+          ShowDlgAnimeInfo(anime_id);
         }
         break;
       }

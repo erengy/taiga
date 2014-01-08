@@ -26,6 +26,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_torrent.h"
+#include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -152,7 +153,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Settings
     case 103: {
-      ExecuteAction(L"Settings", kSettingsSectionTorrents, kSettingsPageTorrentsDiscovery);
+      ShowDlgSettings(kSettingsSectionTorrents, kSettingsPageTorrentsDiscovery);
       return TRUE;
     }
   }
@@ -237,7 +238,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else if (answer == L"Info") {
             auto anime_id = feed_item->episode_data.anime_id;
             if (anime_id) {
-              ExecuteAction(L"Info", 0, anime_id);
+              ShowDlgAnimeInfo(anime_id);
             } else {
               ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
             }

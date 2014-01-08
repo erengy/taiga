@@ -25,6 +25,7 @@
 #include "library/history.h"
 #include "library/resource.h"
 #include "sync/service.h"
+#include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -90,8 +91,8 @@ BOOL MainDialog::OnInitDialog() {
   ui::Menus.UpdateAll();
 
   // Apply start-up settings
-  if (Settings.GetBool(taiga::kSync_AutoOnStart)) { 		
-    ExecuteAction(L"Synchronize"); 		
+  if (Settings.GetBool(taiga::kSync_AutoOnStart)) {
+    sync::Synchronize();
   }
   if (Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes)) {
     ScanAvailableEpisodes(anime::ID_UNKNOWN, false, true);
@@ -108,7 +109,7 @@ BOOL MainDialog::OnInitDialog() {
     dlg.AddButton(L"No", IDNO);
     dlg.Show(GetWindowHandle());
     if (dlg.GetSelectedButtonID() == IDYES)
-      ExecuteAction(L"Settings", kSettingsSectionServices, kSettingsPageServicesMal);
+      ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMal);
   }
   if (Settings.GetBool(taiga::kLibrary_WatchFolders)) {
     FolderMonitor.SetWindowHandle(GetWindowHandle());

@@ -16,22 +16,23 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "api.h"
-#include "dummy.h"
 #include "base/common.h"
 #include "base/logger.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/history.h"
-#include "resource.h"
-#include "settings.h"
-#include "taiga.h"
 #include "taiga/announce.h"
+#include "taiga/api.h"
+#include "taiga/dummy.h"
+#include "taiga/resource.h"
+#include "taiga/settings.h"
+#include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "track/media.h"
+#include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
-#include "version.h"
 #include "win/win_taskbar.h"
 
 taiga::App Taiga;
@@ -88,11 +89,9 @@ BOOL App::InitInstance() {
   TaigaApi.Create();
 
   if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
-    // Create update dialog
-    ExecuteAction(L"CheckUpdates");
+    ui::ShowDialog(ui::kDialogUpdate);
   } else {
-    // Create main dialog
-    ExecuteAction(L"MainDialog");
+    ui::ShowDialog(ui::kDialogMain);
   }
 
   return TRUE;

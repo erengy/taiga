@@ -16,17 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "debug.h"
-
-#include "library/anime_db.h"
 #include "base/common.h"
 #include "base/string.h"
-
+#include "library/anime_db.h"
+#include "taiga/debug.h"
 #include "ui/dlg/dlg_main.h"
+#include "ui/dialog.h"
 
 namespace debug {
-
-// =============================================================================
 
 Tester::Tester()
     : frequency_(0.0), value_(0) {
@@ -56,52 +53,7 @@ void Tester::End(std::wstring str, bool display_result) {
   }
 }
 
-// =============================================================================
-
-void PrintBbcodeUrl(const anime::Item& anime_item) {
-  Print(L"[url=http://myanimelist.net/anime/" + ToWstr(anime_item.GetId()) + L"/]" + 
-    anime_item.GetTitle() + L"[/url]\n");
-}
-
-void CheckDoubleSpace() {
-  for (auto item = AnimeDatabase.items.begin(); item != AnimeDatabase.items.end(); ++item) {
-    if (InStr(item->second.GetTitle(), L"  ") > -1 ||
-        InStr(Join(item->second.GetSynonyms(), L"; "), L"  ") > -1) {
-      PrintBbcodeUrl(item->second);
-    }
-  }
-}
-
-void CheckInvalidDates() {
-  for (auto item = AnimeDatabase.items.begin(); item != AnimeDatabase.items.end(); ++item) {
-    if (item->second.GetAiringStatus(true) != item->second.GetAiringStatus(false)) {
-      PrintBbcodeUrl(item->second);
-    }
-  }
-}
-
-void CheckInvalidEpisodes() {
-  for (auto item = AnimeDatabase.items.begin(); item != AnimeDatabase.items.end(); ++item) {
-    if (item->second.GetEpisodeCount() < 0 ||
-        item->second.GetEpisodeCount() > 500 ||
-        (item->second.IsInList() && item->second.GetMyLastWatchedEpisode() > item->second.GetEpisodeCount())) {
-      PrintBbcodeUrl(item->second);
-    }
-  }
-}
-
-void CheckSynonyms() {
-  for (auto item = AnimeDatabase.items.begin(); item != AnimeDatabase.items.end(); ++item) {
-    for (auto synonym = item->second.GetSynonyms().begin(); synonym != item->second.GetSynonyms().end(); ++synonym) {
-      if (InStr(*synonym, L";", 0, true) > -1) {
-        PrintBbcodeUrl(item->second);
-        break;
-      }
-    }
-  }
-}
-
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void Print(std::wstring text) {
 #ifdef _DEBUG
@@ -128,14 +80,8 @@ void Test() {
     //      O RLY?
   }
 
-  // Debugging MAL database
-  //CheckDoubleSpace();
-  //CheckInvalidDates();
-  //CheckInvalidEpisodes();
-  //CheckSynonyms();
-
-  // Debugging recognition engine
-  //ExecuteAction(L"RecognitionTest");
+  // Debug recognition engine
+  ui::ShowDialog(ui::kDialogTestRecognition);
 
   // Show result
   test.End(str, 0);

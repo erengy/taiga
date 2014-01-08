@@ -30,6 +30,7 @@
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_torrent.h"
+#include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -159,7 +160,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           if (anime_item->IsInList()) {
             ExecuteAction(L"EditStatus(" + ToWstr(status) + L")", 0, anime_id);
           } else {
-            ExecuteAction(L"AddToListAs(" + ToWstr(status) + L")", 0, anime_id);
+            AnimeDatabase.AddToList(anime_id, status);
           }
           break;
         }
@@ -425,16 +426,16 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
         int anime_id = parent->GetCurrentId();
         switch (Settings.GetInt(taiga::kApp_List_MiddleClickAction)) {
           case 1:
-            ExecuteAction(L"EditAll", 0, anime_id);
+            ShowDlgAnimeEdit(anime_id);
             break;
           case 2:
             ExecuteAction(L"OpenFolder", 0, anime_id);
             break;
           case 3:
-            ExecuteAction(L"PlayNext", 0, anime_id);
+            anime::PlayNextEpisode(anime_id);
             break;
           case 4:
-            ExecuteAction(L"Info", 0, anime_id);
+            ShowDlgAnimeInfo(anime_id);
             break;
         }
       }
@@ -529,11 +530,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
         if (listview.button_visible[0] &&
             listview.button_rect[0].PtIn(lpnmitem->ptAction)) {
-          ExecuteAction(L"DecrementEpisode", 0, anime_id);
+          anime::DecrementEpisode(anime_id);
           on_button = true;
         } else if (listview.button_visible[1] &&
                    listview.button_rect[1].PtIn(lpnmitem->ptAction)) {
-          ExecuteAction(L"IncrementEpisode", 0, anime_id);
+          anime::IncrementEpisode(anime_id);
           on_button = true;
         }
         if (on_button) {
@@ -543,16 +544,16 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         } else {
           switch (Settings.GetInt(taiga::kApp_List_DoubleClickAction)) {
             case 1:
-              ExecuteAction(L"EditAll", 0, anime_id);
+              ShowDlgAnimeEdit(anime_id);
               break;
             case 2:
               ExecuteAction(L"OpenFolder", 0, anime_id);
               break;
             case 3:
-              ExecuteAction(L"PlayNext", 0, anime_id);
+              anime::PlayNextEpisode(anime_id);
               break;
             case 4:
-              ExecuteAction(L"Info", 0, anime_id);
+              ShowDlgAnimeInfo(anime_id);
               break;
           }
         }
@@ -568,10 +569,10 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
           if (listview.button_visible[0] &&
               listview.button_rect[0].PtIn(lpnmitem->ptAction)) {
-            ExecuteAction(L"DecrementEpisode", 0, anime_id);
+            anime::DecrementEpisode(anime_id);
           } else if (listview.button_visible[1] &&
                      listview.button_rect[1].PtIn(lpnmitem->ptAction)) {
-            ExecuteAction(L"IncrementEpisode", 0, anime_id);
+            anime::IncrementEpisode(anime_id);
           } else if (listview.button_visible[2] &&
                      listview.button_rect[2].PtIn(lpnmitem->ptAction)) {
             POINT pt = {listview.button_rect[2].left, listview.button_rect[2].bottom};

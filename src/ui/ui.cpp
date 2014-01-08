@@ -41,6 +41,7 @@
 #include "ui/dlg/dlg_stats.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
+#include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -523,7 +524,7 @@ void OnSettingsAccountEmpty() {
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetSelectedButtonID() == IDYES)
-    ExecuteAction(L"Settings", kSettingsSectionServices, kSettingsPageServicesMain);
+    ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMain);
 }
 
 void OnSettingsChange() {
@@ -532,8 +533,8 @@ void OnSettingsChange() {
 
 void OnSettingsRestoreDefaults() {
   if (DlgSettings.IsWindow()) {
-    DlgSettings.Destroy();
-    ExecuteAction(L"Settings");
+    DestroyDialog(kDialogSettings);
+    ShowDialog(kDialogSettings);
   }
 }
 
@@ -546,7 +547,7 @@ void OnSettingsRootFoldersEmpty() {
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetSelectedButtonID() == IDYES)
-    ExecuteAction(L"Settings", kSettingsSectionLibrary, kSettingsPageLibraryFolders);
+    ShowDlgSettings(kSettingsSectionLibrary, kSettingsPageLibraryFolders);
 }
 
 void OnSettingsThemeChange() {

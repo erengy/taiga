@@ -28,6 +28,7 @@
 #include "taiga/resource.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_season.h"
+#include "ui/dialog.h"
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -194,7 +195,7 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         break;
       LPARAM param = list_.GetItemParam(lpnmitem->iItem);
       if (param)
-        ExecuteAction(L"Info", 0, param);
+        ShowDlgAnimeInfo(param);
       break;
     }
 

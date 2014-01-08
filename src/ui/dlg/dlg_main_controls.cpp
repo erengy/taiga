@@ -19,11 +19,13 @@
 #include "base/common.h"
 #include "base/string.h"
 #include "library/history.h"
+#include "sync/sync.h"
 #include "taiga/debug.h"
 #include "taiga/resource.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_season.h"
+#include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 
@@ -183,7 +185,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Synchronize
     case kToolbarButtonSync:
-      ExecuteAction(L"Synchronize");
+      sync::Synchronize();
       return TRUE;
     // MyAnimeList
     case kToolbarButtonMal:
@@ -195,7 +197,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     // Settings
     case kToolbarButtonSettings:
-      ExecuteAction(L"Settings");
+      ShowDialog(ui::kDialogSettings);
       return TRUE;
     // Debug
     case kToolbarButtonDebug:

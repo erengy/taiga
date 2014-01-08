@@ -152,8 +152,14 @@ bool CheckFolder(Item& item) {
   return !item.GetFolder().empty();
 }
 
-bool PlayEpisode(Item& item, int number) {
-  if (number > item.GetEpisodeCount() && item.GetEpisodeCount() != 0)
+bool PlayEpisode(int anime_id, int number) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  if (number > anime_item->GetEpisodeCount() &&
+      anime_item->GetEpisodeCount() != 0)
     return false;
 
   std::wstring file_path;
@@ -161,23 +167,24 @@ bool PlayEpisode(Item& item, int number) {
   SetSharedCursor(IDC_WAIT);
 
   // Check saved episode path
-  if (number == item.GetMyLastWatchedEpisode() + 1)
-    if (!item.GetNewEpisodePath().empty())
-      if (FileExists(item.GetNewEpisodePath()))
-        file_path = item.GetNewEpisodePath();
+  if (number == anime_item->GetMyLastWatchedEpisode() + 1)
+    if (!anime_item->GetNewEpisodePath().empty())
+      if (FileExists(anime_item->GetNewEpisodePath()))
+        file_path = anime_item->GetNewEpisodePath();
   
   // Check anime folder
   if (file_path.empty()) {
-    CheckFolder(item);
-    if (!item.GetFolder().empty()) {
-      file_path = SearchFileFolder(item, item.GetFolder(), number, false);
+    CheckFolder(*anime_item);
+    if (!anime_item->GetFolder().empty()) {
+      file_path = SearchFileFolder(*anime_item, anime_item->GetFolder(),
+                                   number, false);
     }
   }
 
   // Check other folders
   if (file_path.empty()) {
     foreach_(it, Settings.root_folders) {
-      file_path = SearchFileFolder(item, *it, number, false);
+      file_path = SearchFileFolder(*anime_item, *it, number, false);
       if (!file_path.empty())
         break;
     }
@@ -187,7 +194,7 @@ bool PlayEpisode(Item& item, int number) {
     if (number == 0)
       number = 1;
     ui::ChangeStatusText(L"Could not find episode #" + ToWstr(number) +
-                         L" (" + item.GetTitle() + L").");
+                         L" (" + anime_item->GetTitle() + L").");
   } else {
     Execute(file_path);
   }
@@ -197,15 +204,25 @@ bool PlayEpisode(Item& item, int number) {
   return !file_path.empty();
 }
 
-bool PlayLastEpisode(Item& item) {
-  return PlayEpisode(item, item.GetMyLastWatchedEpisode());
+bool PlayLastEpisode(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  return PlayEpisode(anime_id, anime_item->GetMyLastWatchedEpisode());
 }
 
-bool PlayNextEpisode(Item& item) {
-  if (item.GetEpisodeCount() != 1) {
-    return PlayEpisode(item, item.GetMyLastWatchedEpisode() + 1);
+bool PlayNextEpisode(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  if (anime_item->GetEpisodeCount() != 1) {
+    return PlayEpisode(anime_id, anime_item->GetMyLastWatchedEpisode() + 1);
   } else {
-    return PlayEpisode(item, 1);
+    return PlayEpisode(anime_id, 1);
   }
 }
 
@@ -239,8 +256,7 @@ bool PlayRandomAnime() {
     size_t max_value = valid_ids.size();
     size_t index = rand() % max_value + 1;
     int anime_id = valid_ids.at(index);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (PlayEpisode(*anime_item, anime_item->GetMyLastWatchedEpisode() + 1))
+    if (PlayNextEpisode(anime_id))
       return true;
   }
 
