@@ -16,65 +16,81 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "recognition.h"
-
+#include "base/common.h"
+#include "base/foreach.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
-#include "base/common.h"
-#include "base/foreach.h"
-#include "media.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
-#include "base/string.h"
+#include "track/media.h"
+#include "track/recognition.h"
 
 RecognitionEngine Meow;
 
 class Token {
 public:
-  Token() : encloser('\0'), separator('\0'), virgin(true) {}
-  wchar_t encloser, separator;
+  Token() : encloser('\0'), separator('\0'), untouched(true) {}
+
   std::wstring content;
-  bool virgin;
+  wchar_t encloser;
+  wchar_t separator;
+  bool untouched;
 };
 
-// =============================================================================
-
 RecognitionEngine::RecognitionEngine() {
-  // Load keywords into memory
-  ReadKeyword(IDS_KEYWORD_AUDIO, audio_keywords);
-  ReadKeyword(IDS_KEYWORD_VIDEO, video_keywords);
-  ReadKeyword(IDS_KEYWORD_EXTRA, extra_keywords);
-  ReadKeyword(IDS_KEYWORD_EXTRA_UNSAFE, extra_unsafe_keywords);
-  ReadKeyword(IDS_KEYWORD_VERSION, version_keywords);
-  ReadKeyword(IDS_KEYWORD_EXTENSION, valid_extensions);
-  ReadKeyword(IDS_KEYWORD_EPISODE, episode_keywords);
-  ReadKeyword(IDS_KEYWORD_EPISODE_PREFIX, episode_prefixes);
+  ReadKeyword(audio_keywords,
+      L"2CH, 5.1CH, 5.1, AAC, AC3, DTS, DTS5.1, DTS-ES, DUALAUDIO, DUAL AUDIO, "
+      L"FLAC, MP3, OGG, TRUEHD5.1, VORBIS");
+  ReadKeyword(video_keywords,
+      L"MKV, AVI, MP4, OGM, RM, RMVB, WMV, DIVX, MOV, FLV, MPG, 3GP");
+  ReadKeyword(extra_keywords,
+      L"ASS, BATCH, BD, BLURAY, BLU-RAY, COMPLETE, DIRECTOR'S CUT, DVD, DVD5, "
+      L"DVD9, DVD-R2J, DVDRIP, ENG, ENGLISH, HARDSUB, PS3, R2DVD, R2J, R2JDVD, "
+      L"RAW, REMASTERED, SOFTSUB, SUBBED, SUB, UNCENSORED, UNCUT, VOSTFR, "
+      L"WEBCAST, WIDESCREEN, WS");
+  ReadKeyword(extra_unsafe_keywords,
+      L"END, FINAL, OAV, ONA, OVA");
+  ReadKeyword(version_keywords,
+      L"V0, V2, V3, V4");
+  ReadKeyword(valid_extensions,
+      L"8BIT, 10BIT, AVI, DIVX, H264, H.264, HD, HDTV, HI10P, HQ, LQ, RMVB, "
+      L"SD, TS, VFR, WMV, X264, X.264, XVID");
+  ReadKeyword(episode_keywords,
+      L"EPISODE, EP., EP, VOLUME, VOL., VOL, EPS., EPS");
+  ReadKeyword(episode_prefixes,
+      L"EP., EP, E, VOL., VOL, EPS., \x7B2C");
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
-                                              bool in_list, bool reverse,
-                                              bool strict, bool check_episode,
-                                              bool check_date, bool give_score) {
-  for (auto it = scores.begin(); it != scores.end(); ++it) {
+                                              bool in_list,
+                                              bool reverse,
+                                              bool strict,
+                                              bool check_episode,
+                                              bool check_date,
+                                              bool give_score) {
+  // Reset scores
+  foreach_(it, scores)
     it->second = 0;
-  }
 
   if (reverse) {
-    for (auto it = AnimeDatabase.items.rbegin(); it != AnimeDatabase.items.rend(); ++it) {
+    foreach_r_(it, AnimeDatabase.items) {
       if (in_list && !it->second.IsInList())
         continue;
-      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date, give_score))
+      if (Meow.CompareEpisode(episode, it->second, strict, check_episode,
+                              check_date, give_score))
         return AnimeDatabase.FindItem(episode.anime_id);
     }
   } else {
-    for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
+    foreach_(it, AnimeDatabase.items) {
       if (in_list && !it->second.IsInList())
         continue;
-      if (Meow.CompareEpisode(episode, it->second, strict, check_episode, check_date, give_score))
+      if (Meow.CompareEpisode(episode, it->second, strict, check_episode,
+                              check_date, give_score))
         return AnimeDatabase.FindItem(episode.anime_id);
     }
   }
@@ -82,7 +98,7 @@ anime::Item* RecognitionEngine::MatchDatabase(anime::Episode& episode,
   return nullptr;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
                                        const anime::Item& anime_item,
@@ -91,20 +107,20 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
                                        bool check_date,
                                        bool give_score) {
   // Leave if title is empty
-  if (episode.clean_title.empty()) return false;
+  if (episode.clean_title.empty())
+    return false;
 
   // Leave if not yet aired
-  if (check_date && !anime::IsAiredYet(anime_item)) return false;
+  if (check_date && !anime::IsAiredYet(anime_item))
+    return false;
 
-  // Compare with titles
   bool found = false;
 
+  // Compare with titles
   if (clean_titles[anime_item.GetId()].empty())
     UpdateCleanTitles(anime_item.GetId());
-  for (auto it = clean_titles[anime_item.GetId()].begin();
-       !found && it != clean_titles[anime_item.GetId()].end(); ++it) {
+  foreach_(it, clean_titles[anime_item.GetId()])
     found = CompareTitle(*it, episode, anime_item, strict);
-  }
 
   if (!found) {
     // Score title in case we need it later on
@@ -138,12 +154,13 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
     episode.number = L"1";
 
   episode.anime_id = anime_item.GetId();
+
   return true;
 }
 
-bool RecognitionEngine::CompareTitle(const std::wstring& anime_title, 
-                                     anime::Episode& episode, 
-                                     const anime::Item& anime_item, 
+bool RecognitionEngine::CompareTitle(const std::wstring& anime_title,
+                                     anime::Episode& episode,
+                                     const anime::Item& anime_item,
                                      bool strict) {
   // Compare with title + number
   if (strict && anime_item.GetEpisodeCount() == 1 && !episode.number.empty()) {
@@ -155,27 +172,30 @@ bool RecognitionEngine::CompareTitle(const std::wstring& anime_title,
   }
   // Compare with title
   if (strict) {
-    if (IsEqual(anime_title, episode.clean_title)) return true;
+    if (IsEqual(anime_title, episode.clean_title))
+      return true;
   } else {
-    if (InStr(anime_title, episode.clean_title, 0, true) > -1) return true;
+    if (InStr(anime_title, episode.clean_title, 0, true) > -1)
+      return true;
   }
 
-  // Failed
   return false;
 }
 
 std::multimap<int, int, std::greater<int>> RecognitionEngine::GetScores() {
   std::multimap<int, int, std::greater<int>> reverse_map;
 
-  for (auto it = scores.begin(); it != scores.end(); ++it) {
-    if (it->second == 0) continue;
+  foreach_(it, scores) {
+    if (it->second == 0)
+      continue;
     reverse_map.insert(std::pair<int, int>(it->second, it->first));
   }
 
   return reverse_map;
 }
 
-bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::Item& anime_item) {
+bool RecognitionEngine::ScoreTitle(const anime::Episode& episode,
+                                   const anime::Item& anime_item) {
   const std::wstring& episode_title = episode.clean_title;
   const std::wstring& anime_title = clean_titles[anime_item.GetId()].front();
 
@@ -223,17 +243,23 @@ bool RecognitionEngine::ScoreTitle(const anime::Episode& episode, const anime::I
   return false;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode, 
-                                     bool examine_inside, bool examine_outside, bool examine_number,
-                                     bool check_extras, bool check_extension) {
+bool RecognitionEngine::ExamineTitle(std::wstring title,
+                                     anime::Episode& episode,
+                                     bool examine_inside,
+                                     bool examine_outside,
+                                     bool examine_number,
+                                     bool check_extras,
+                                     bool check_extension) {
   // Clear previous data
   episode.Clear();
-  if (title.empty()) return false;
+
+  if (title.empty())
+    return false;
 
   // Remove zero width space character
-  EraseChars(title, L"\u200B");
+  EraseChars(title, L"\u200B");  // TEMP
 
   // Retrieve file name from full path
   if (title.length() > 2 && title.at(1) == ':' && title.at(2) == '\\') {
@@ -250,24 +276,27 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
 
   // Check and trim file extension
   std::wstring extension = GetFileExtension(title);
-  if (!extension.empty() && extension.length() < title.length() && extension.length() <= 5) {
-    if (IsAlphanumeric(extension) && CheckFileExtension(extension, valid_extensions)) {
+  if (!extension.empty() &&
+      extension.length() < title.length() &&
+      extension.length() <= 5) {
+    if (IsAlphanumeric(extension) &&
+        CheckFileExtension(extension, valid_extensions)) {
       episode.format = ToUpper_Copy(extension);
       title.resize(title.length() - extension.length() - 1);
     } else {
       if (IsNumeric(extension)) {
         std::wstring temp = title.substr(0, title.length() - extension.length());
-        for (auto it = episode_keywords.begin(); it != episode_keywords.end(); ++it) {
-          if (temp.length() >= it->length() && IsEqual(CharRight(temp, it->length()), *it)) {
+        foreach_(it, episode_keywords) {
+          if (temp.length() >= it->length() &&
+              IsEqual(CharRight(temp, it->length()), *it)) {
             title.resize(title.length() - extension.length() - it->length() - 1);
             episode.number = extension;
             break;
           }
         }
       }
-      if (check_extension && episode.number.empty()) {
+      if (check_extension && episode.number.empty())
         return false;
-      }
     }
   }
 
@@ -275,35 +304,40 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
   // Here we are, entering the world of tokens. Each token has four properties:
   // * content: Self-explanatory
   // * encloser: Can be empty or one of these characters: [](){}
-  // * separator: The most common non-alphanumeric character - usually a space 
+  // * separator: The most common non-alphanumeric character - usually a space
   //   or an underscore
-  // * virgin: All tokens start out as virgins but lose this property when some
-  //   keyword within is recognized and erased.
+  // * untouched: All tokens start out as untouched but lose this property when
+  //   some keyword within is recognized and erased.
 
   // Tokenize
   std::vector<Token> tokens;
   tokens.reserve(4);
   TokenizeTitle(title, L"[](){}", tokens);
-  if (tokens.empty()) return false;
+  if (tokens.empty())
+    return false;
   title.clear();
 
   // Examine tokens
-  for (unsigned int i = 0; i < tokens.size(); i++) {
-    if (IsTokenEnclosed(tokens[i])) {
-      if (examine_inside) ExamineToken(tokens[i], episode, check_extras);
+  foreach_(token, tokens) {
+    if (IsTokenEnclosed(*token)) {
+      if (examine_inside)
+        ExamineToken(*token, episode, check_extras);
     } else {
-      if (examine_outside) ExamineToken(tokens[i], episode, check_extras);
+      if (examine_outside)
+        ExamineToken(*token, episode, check_extras);
     }
   }
 
   // Tidy up tokens
-  for (unsigned int i = 1; i < tokens.size() - 1; i++) {
+  for (size_t i = 1; i < tokens.size() - 1; i++) {
     // Combine remaining tokens that are enclosed with parentheses - this is
     // especially useful for titles that include a year value and some other cases
-    if (tokens[i - 1].virgin == false || tokens[i].virgin == false || 
-      IsTokenEnclosed(tokens[i - 1]) == true || tokens[i].encloser != '(' || 
-      tokens[i - 1].content.length() < 2) {
-        continue;
+    if (tokens[i - 1].untouched == false ||
+        tokens[i].untouched == false ||
+        IsTokenEnclosed(tokens[i - 1]) == true ||
+        tokens[i].encloser != '(' ||
+        tokens[i - 1].content.length() < 2) {
+      continue;
     }
     tokens[i - 1].content += L"(" + tokens[i].content + L")";
     if (IsTokenEnclosed(tokens[i + 1]) == false) {
@@ -315,7 +349,7 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
     tokens.erase(tokens.begin() + i);
     i = 0;
   }
-  for (unsigned int i = 0; i < tokens.size(); i++) {
+  for (size_t i = 0; i < tokens.size(); i++) {
     // Trim separator character from each side of the token
     wchar_t trim_char[] = {tokens[i].separator, '\0'};
     Trim(tokens[i].content, trim_char);
@@ -329,9 +363,11 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
   //////////////////////////////////////////////////////////////////////////////
   // Now we apply some logic to decide on the title and the group name
 
-  int group_index = -1, title_index = -1;
-  std::vector<int> group_vector, title_vector;
-  for (unsigned int i = 0; i < tokens.size(); i++) {
+  int group_index = -1;
+  int title_index = -1;
+  std::vector<int> group_vector;
+  std::vector<int> title_vector;
+  for (size_t i = 0; i < tokens.size(); i++) {
     if (IsTokenEnclosed(tokens[i])) {
       group_vector.push_back(i);
     } else {
@@ -357,10 +393,10 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
     }
   }
 
-  // Choose the first enclosed virgin token as the group name
-  for (unsigned int i = 0; i < group_vector.size(); i++) {
+  // Choose the first enclosed untouched token as the group name
+  for (size_t i = 0; i < group_vector.size(); i++) {
     // Here we assume that group names are never enclosed with other keywords
-    if (tokens[group_vector[i]].virgin) {
+    if (tokens[group_vector[i]].untouched) {
       group_index = group_vector[i];
       group_vector.erase(group_vector.begin() + i);
       break;
@@ -407,9 +443,9 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
   
   if (examine_number) {
     // Check remaining tokens first
-    for (unsigned int i = 0; i < tokens.size(); i++) {
-      if (IsEpisodeFormat(tokens[i].content, episode, tokens[i].separator)) {
-        tokens[i].virgin = false;
+    foreach_(token, tokens) {
+      if (IsEpisodeFormat(token->content, episode, token->separator)) {
+        token->untouched = false;
         break;
       }
     }
@@ -420,25 +456,26 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
       std::vector<std::wstring> words;
       words.reserve(4);
       Tokenize(title, L" ", words);
-      if (words.empty()) return false;
+      if (words.empty())
+        return false;
       title.clear();
       int number_index = -1;
 
       // Check for episode number format, starting with the second word
-      for (unsigned int i = 1; i < words.size(); i++) {
+      for (size_t i = 1; i < words.size(); i++) {
         if (IsEpisodeFormat(words[i], episode)) {
-          number_index = i;
+          number_index = static_cast<int>(i);
           break;
         }
       }
 
       // Set the first valid numeric token as episode number
       if (episode.number.empty()) {
-        for (unsigned int i = 0; i < tokens.size(); i++) {
-          if (IsNumeric(tokens[i].content)) {
-            episode.number = tokens[i].content;
+        foreach_(token, tokens) {
+          if (IsNumeric(token->content)) {
+            episode.number = token->content;
             if (ValidateEpisodeNumber(episode)) {
-              tokens[i].virgin = false;
+              token->untouched = false;
               break;
             }
           }
@@ -447,11 +484,11 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
 
       // Set the lastmost number that follows a '-'
       if (episode.number.empty() && words.size() > 2) {
-        for (unsigned int i = words.size() - 2; i > 0; i--) {
+        for (size_t i = words.size() - 2; i > 0; i--) {
           if (words[i] == L"-" && IsNumeric(words[i + 1])) {
             episode.number = words[i + 1];
             if (ValidateEpisodeNumber(episode)) {
-              number_index = i + 1;
+              number_index = static_cast<int>(i) + 1;
               break;
             }
           }
@@ -460,19 +497,22 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
 
       // Set the lastmost number as a last resort
       if (episode.number.empty()) {
-        for (unsigned int i = words.size() - 1; i > 0; i--) {
+        for (size_t i = words.size() - 1; i > 0; i--) {
           if (IsNumeric(words[i])) {
             episode.number = words[i];
             if (ValidateEpisodeNumber(episode)) {
-              // Discard and give up if movie or season number (episode numbers cannot precede them)
-              if (i > 1 && (IsEqual(words[i - 1], L"Season") || IsEqual(words[i - 1], L"Movie")) &&
+              // Discard and give up if movie or season number (episode numbers
+              // cannot precede them)
+              if (i > 1 &&
+                  (IsEqual(words[i - 1], L"Season") ||
+                   IsEqual(words[i - 1], L"Movie")) &&
                   !IsCountingWord(words[i - 2])) {
                 episode.number.clear();
                 number_index = -1;
                 break;
               }
 
-              number_index = i;
+              number_index = static_cast<int>(i);
               break;
             }
           }
@@ -480,10 +520,11 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
       }
   
       // Build title and name
-      for (unsigned int i = 0; i < words.size(); i++) {
+      for (int i = 0; i < static_cast<int>(words.size()); i++) {
         if (i < number_index) {
           // Ignore episode keywords
-          if (i == number_index - 1 && CompareKeys(words[i], episode_keywords)) continue;
+          if (i == number_index - 1 && CompareKeys(words[i], episode_keywords))
+            continue;
           AppendKeyword(title, words[i]);
         } else if (i > number_index) {
           AppendKeyword(episode.name, words[i]);
@@ -495,20 +536,20 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
       TrimLeft(episode.name, L" -");
       if (StartsWith(episode.name, L"'") && EndsWith(episode.name, L"'"))
         Trim(episode.name, L"'");
-      TrimLeft(episode.name, L"\u300C"); // Japanese left quotation mark
-      TrimRight(episode.name, L"\u300D"); // Japanese right quotation mark
+      TrimLeft(episode.name, L"\u300C");  // Japanese left quotation mark
+      TrimRight(episode.name, L"\u300D");  // Japanese right quotation mark
     }
   }
 
   //////////////////////////////////////////////////////////////////////////////
 
-  // Check if the group token is still a virgin
-  if (group_index > -1 && !tokens[group_index].virgin) {
+  // Check if the group token is still untouched
+  if (group_index > -1 && !tokens[group_index].untouched) {
     episode.group.clear();
-    for (unsigned int i = 0; i < tokens.size(); i++) {
-      // Set the first available virgin token as group name
-      if (!tokens[i].content.empty() && tokens[i].virgin) {
-        episode.group = tokens[i].content;
+    foreach_(token, tokens) {
+      // Set the first available untouched token as group name
+      if (!token->content.empty() && token->untouched) {
+        episode.group = token->content;
         break;
       }
     }
@@ -522,11 +563,9 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
   }
 
   // Examine remaining tokens once more
-  for (unsigned int i = 0; i < tokens.size(); i++) {
-    if (!tokens[i].content.empty()) {
-      ExamineToken(tokens[i], episode, true);
-    }
-  }
+  foreach_(token, tokens)
+    if (!token->content.empty())
+      ExamineToken(*token, episode, true);
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -538,83 +577,92 @@ bool RecognitionEngine::ExamineTitle(std::wstring title, anime::Episode& episode
   return !title.empty();
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
-void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode, bool compare_extras) {
+void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode,
+                                     bool compare_extras) {
   // Split into words. The most common non-alphanumeric character is the 
   // separator.
   std::vector<std::wstring> words;
   token.separator = GetMostCommonCharacter(token.content);
   Split(token.content, std::wstring(1, token.separator), words);
-  
+
   // Revert if there are words that are too short. This prevents splitting some
   // group names (e.g. "m.3.3.w") and keywords (e.g. "H.264").
   if (IsTokenEnclosed(token)) {
-    for (unsigned int i = 0; i < words.size(); i++) {
-      if (words[i].length() == 1) {
-        words.clear(); words.push_back(token.content); break;
+    foreach_(word, words) {
+      if (word->length() == 1) {
+        words.clear();
+        words.push_back(token.content);
+        break;
       }
     }
   }
 
   // Compare with keywords
-  for (unsigned int i = 0; i < words.size(); i++) {
-    Trim(words[i]);
-    if (words[i].empty()) continue;
+  foreach_(word, words) {
+    Trim(*word);
+    if (word->empty()) continue;
     #define RemoveWordFromToken(b) { \
-      Erase(token.content, words[i], b); token.virgin = false; }
+      Erase(token.content, *word, b); token.untouched = false; }
     
     // Checksum
-    if (episode.checksum.empty() && words[i].length() == 8 && IsHex(words[i])) {
-      episode.checksum = words[i];
+    if (episode.checksum.empty() && word->length() == 8 && IsHex(*word)) {
+      episode.checksum = *word;
       RemoveWordFromToken(false);
     // Video resolution
-    } else if (episode.resolution.empty() && IsResolution(words[i])) {
-      episode.resolution = words[i];
+    } else if (episode.resolution.empty() && IsResolution(*word)) {
+      episode.resolution = *word;
       RemoveWordFromToken(false);
     // Video info
-    } else if (CompareKeys(words[i], video_keywords)) {
-      AppendKeyword(episode.video_type, words[i]);
+    } else if (CompareKeys(*word, video_keywords)) {
+      AppendKeyword(episode.video_type, *word);
       RemoveWordFromToken(true);
     // Audio info
-    } else if (CompareKeys(words[i], audio_keywords)) {
-      AppendKeyword(episode.audio_type, words[i]);
+    } else if (CompareKeys(*word, audio_keywords)) {
+      AppendKeyword(episode.audio_type, *word);
       RemoveWordFromToken(true);
     // Version
-    } else if (episode.version.empty() && CompareKeys(words[i], version_keywords)) {
-      episode.version.push_back(words[i].at(words[i].length() - 1));
+    } else if (episode.version.empty() && CompareKeys(*word, version_keywords)) {
+      episode.version.push_back(word->at(word->length() - 1));
       RemoveWordFromToken(true);
     // Extras
-    } else if (compare_extras && CompareKeys(words[i], extra_keywords)) {
-      AppendKeyword(episode.extras, words[i]);
+    } else if (compare_extras && CompareKeys(*word, extra_keywords)) {
+      AppendKeyword(episode.extras, *word);
       RemoveWordFromToken(true);
-    } else if (compare_extras && CompareKeys(words[i], extra_unsafe_keywords)) {
-      AppendKeyword(episode.extras, words[i]);
-      if (IsTokenEnclosed(token)) RemoveWordFromToken(true);
+    } else if (compare_extras && CompareKeys(*word, extra_unsafe_keywords)) {
+      AppendKeyword(episode.extras, *word);
+      if (IsTokenEnclosed(token))
+        RemoveWordFromToken(true);
     }
 
     #undef RemoveWordFromToken
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 // Helper functions
 
-void RecognitionEngine::AppendKeyword(std::wstring& str, const std::wstring& keyword) {
+void RecognitionEngine::AppendKeyword(std::wstring& str,
+                                      const std::wstring& keyword) {
   AppendString(str, keyword, L" ");
 }
 
-bool RecognitionEngine::CompareKeys(const std::wstring& str, const std::vector<std::wstring>& keys) {
+bool RecognitionEngine::CompareKeys(const std::wstring& str,
+                                    const std::vector<std::wstring>& keys) {
   if (!str.empty())
-    for (unsigned int i = 0; i < keys.size(); i++)
-      if (IsEqual(str, keys[i]))
+    foreach_(key, keys)
+      if (IsEqual(str, *key))
         return true;
+
   return false;
 }
 
 void RecognitionEngine::CleanTitle(std::wstring& title) {
-  if (title.empty()) return;
+  if (title.empty())
+    return;
+
   EraseUnnecessary(title);
   TransliterateSpecial(title);
   ErasePunctuation(title, true);
@@ -622,7 +670,7 @@ void RecognitionEngine::CleanTitle(std::wstring& title) {
 
 void RecognitionEngine::UpdateCleanTitles(int anime_id) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
-  
+
   clean_titles[anime_id].clear();
 
   // Main title
@@ -662,45 +710,49 @@ void RecognitionEngine::EraseUnnecessary(std::wstring& str) {
 // TODO: make faster
 void RecognitionEngine::TransliterateSpecial(std::wstring& str) {
   // Character equivalencies
-  ReplaceChar(str, L'\u00E9', L'e'); // small e acute accent
-  ReplaceChar(str, L'\uFF0F', L'/'); // unicode slash
-  ReplaceChar(str, L'\uFF5E', L'~'); // unicode tilde
-  ReplaceChar(str, L'\u223C', L'~'); // unicode tilde 2
-  ReplaceChar(str, L'\u301C', L'~'); // unicode tilde 3
-  ReplaceChar(str, L'\uFF1F', L'?'); // unicode question mark
-  ReplaceChar(str, L'\uFF01', L'!'); // unicode exclamation point
-  ReplaceChar(str, L'\u00D7', L'x'); // multiplication symbol
-  ReplaceChar(str, L'\u2715', L'x'); // multiplication symbol 2
+  ReplaceChar(str, L'\u00E9', L'e');  // small e acute accent
+  ReplaceChar(str, L'\uFF0F', L'/');  // unicode slash
+  ReplaceChar(str, L'\uFF5E', L'~');  // unicode tilde
+  ReplaceChar(str, L'\u223C', L'~');  // unicode tilde 2
+  ReplaceChar(str, L'\u301C', L'~');  // unicode tilde 3
+  ReplaceChar(str, L'\uFF1F', L'?');  // unicode question mark
+  ReplaceChar(str, L'\uFF01', L'!');  // unicode exclamation point
+  ReplaceChar(str, L'\u00D7', L'x');  // multiplication symbol
+  ReplaceChar(str, L'\u2715', L'x');  // multiplication symbol 2
 
   // A few common always-equivalent romanizations
-  Replace(str, L"\u014C", L"Ou"); // O macron
-  Replace(str, L"\u014D", L"ou"); // o macron
-  Replace(str, L"\u016B", L"uu"); // u macron
-  Replace(str, L" wa ", L" ha "); // hepburn to wapuro
-  Replace(str, L" e ", L" he "); // hepburn to wapuro
-  Replace(str, L" o ", L" wo "); // hepburn to wapuro
+  Replace(str, L"\u014C", L"Ou");  // O macron
+  Replace(str, L"\u014D", L"ou");  // o macron
+  Replace(str, L"\u016B", L"uu");  // u macron
+  Replace(str, L" wa ", L" ha ");  // hepburn to wapuro
+  Replace(str, L" e ", L" he ");  // hepburn to wapuro
+  Replace(str, L" o ", L" wo ");  // hepburn to wapuro
 
   // Abbreviations
   Replace(str, L" & ", L" and ", true, false);
 }
 
-bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str, anime::Episode& episode, const wchar_t separator) {
+bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str,
+                                        anime::Episode& episode,
+                                        const wchar_t separator) {
   unsigned int numstart, i, j;
 
   // Find first number
   for (numstart = 0; numstart < str.length() && !IsNumeric(str.at(numstart)); numstart++);
-  if (numstart == str.length()) return false;
+  if (numstart == str.length())
+    return false;
 
   // Check for episode prefix
-  if (numstart > 0) {
-    if (!CompareKeys(str.substr(0, numstart), episode_prefixes)) return false;
-  }
+  if (numstart > 0)
+    if (!CompareKeys(str.substr(0, numstart), episode_prefixes))
+      return false;
 
   for (i = numstart + 1; i < str.length(); i++) {
     if (!IsNumeric(str.at(i))) {
       // *#-#*
       if (str.at(i) == '-' || str.at(i) == '&') {
-        if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
+        if (i == str.length() - 1 || !IsNumeric(str.at(i + 1)))
+          return false;
         for (j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
         episode.number = str.substr(numstart, j - numstart);
         // *#-#*v#
@@ -710,7 +762,7 @@ bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str, anime::Episode&
         } else {
           return true;
         }
-      
+
       // v#
       } else if (str.at(i) == 'v' || str.at(i) == 'V') {
         if (episode.number.empty()) {
@@ -722,17 +774,19 @@ bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str, anime::Episode&
       
       // *# of #*
       } else if (str.at(i) == separator) {
-        if (str.length() < i + 5) return false;
-        if (str.at(i + 1) == 'o' && 
-            str.at(i + 2) == 'f' && 
+        if (str.length() < i + 5)
+          return false;
+        if (str.at(i + 1) == 'o' &&
+            str.at(i + 2) == 'f' &&
             str.at(i + 3) == separator) {
-              episode.number = str.substr(numstart, i - numstart);
-              return true;
+          episode.number = str.substr(numstart, i - numstart);
+          return true;
         }
 
       // *#x#*
       } else if (str.at(i) == 'x') {
-        if (i == str.length() - 1 || !IsNumeric(str.at(i + 1))) return false;
+        if (i == str.length() - 1 || !IsNumeric(str.at(i + 1)))
+          return false;
         for (j = i + 1; j < str.length() && IsNumeric(str.at(j)); j++);
         episode.number = str.substr(i + 1, j - i - 1);
         if (ToInt(episode.number) < 100) {
@@ -757,7 +811,8 @@ bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str, anime::Episode&
   // [prefix]#*
   if (numstart > 0 && episode.number.empty()) {
     episode.number = str.substr(numstart, str.length() - numstart);
-    if (!ValidateEpisodeNumber(episode)) return false;
+    if (!ValidateEpisodeNumber(episode))
+      return false;
     return true;
   }
 
@@ -779,31 +834,30 @@ bool RecognitionEngine::IsCountingWord(const std::wstring& str) {
           IsEqual(str, L"THIRD") ||
           IsEqual(str, L"FOURTH") ||
           IsEqual(str, L"FIFTH")) {
-            return true;
+        return true;
       }
     }
   }
+
   return false;
 }
 
 bool RecognitionEngine::IsTokenEnclosed(const Token& token) {
-  return token.encloser == '[' || token.encloser == '(' || token.encloser == '{';
+  return token.encloser == '[' ||
+         token.encloser == '(' ||
+         token.encloser == '{';
 }
 
-void ReadStringTable(UINT uID, std::wstring& str) {
-  wchar_t buffer[2048];
-  LoadString(Taiga.GetInstanceHandle(), uID, buffer, 2048);
-  str.append(buffer);
+void RecognitionEngine::ReadKeyword(std::vector<std::wstring>& output,
+                                    const std::wstring& input) {
+  Split(input, L", ", output);
 }
 
-void RecognitionEngine::ReadKeyword(unsigned int id, std::vector<std::wstring>& str) {
-  std::wstring str_buff; 
-  ReadStringTable(id, str_buff); 
-  Split(str_buff, L", ", str);
-}
-
-size_t RecognitionEngine::TokenizeTitle(const std::wstring& str, const std::wstring& delimiters, std::vector<Token>& tokens) {
+size_t RecognitionEngine::TokenizeTitle(const std::wstring& str,
+                                        const std::wstring& delimiters,
+                                        std::vector<Token>& tokens) {
   size_t index_begin = str.find_first_not_of(delimiters);
+
   while (index_begin != std::wstring::npos) {
     size_t index_end = str.find_first_of(delimiters, index_begin + 1);
     tokens.resize(tokens.size() + 1);
@@ -812,21 +866,24 @@ size_t RecognitionEngine::TokenizeTitle(const std::wstring& str, const std::wstr
       break;
     } else {
       tokens.back().content = str.substr(index_begin, index_end - index_begin);
-      if (index_begin > 0) tokens.back().encloser = str.at(index_begin - 1);
+      if (index_begin > 0)
+        tokens.back().encloser = str.at(index_begin - 1);
       index_begin = str.find_first_not_of(delimiters, index_end + 1);
     }
   }
+
   return tokens.size();
 }
 
 bool RecognitionEngine::ValidateEpisodeNumber(anime::Episode& episode) {
   int number = ToInt(episode.number);
+
   if (number <= 0 || number > 1000) {
-    if (number > 1950 && number < 2050) {
+    if (number > 1950 && number < 2050)
       episode.year = episode.number;
-    }
     episode.number.clear();
     return false;
   }
+
   return true;
 }

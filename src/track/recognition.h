@@ -32,35 +32,35 @@ class Token;
 class RecognitionEngine {
 public:
   RecognitionEngine();
-  virtual ~RecognitionEngine() {};
-  
+  ~RecognitionEngine() {};
+
   void Initialize();
 
-  anime::Item* MatchDatabase(anime::Episode& episode, 
-                             bool in_list = true, 
-                             bool reverse = true, 
-                             bool strict = true, 
-                             bool check_episode = true, 
+  anime::Item* MatchDatabase(anime::Episode& episode,
+                             bool in_list = true,
+                             bool reverse = true,
+                             bool strict = true,
+                             bool check_episode = true,
                              bool check_date = true,
                              bool give_score = false);
-  
-  bool CompareEpisode(anime::Episode& episode, 
-                      const anime::Item& anime_item, 
-                      bool strict = true, 
-                      bool check_episode = true, 
+
+  bool CompareEpisode(anime::Episode& episode,
+                      const anime::Item& anime_item,
+                      bool strict = true,
+                      bool check_episode = true,
                       bool check_date = true,
                       bool give_score = false);
-  
-  bool ExamineTitle(std::wstring title, 
-                    anime::Episode& episode, 
-                    bool examine_inside = true, 
-                    bool examine_outside = true, 
-                    bool examine_number = true, 
-                    bool check_extras = true, 
+
+  bool ExamineTitle(std::wstring title,
+                    anime::Episode& episode,
+                    bool examine_inside = true,
+                    bool examine_outside = true,
+                    bool examine_number = true,
+                    bool check_extras = true,
                     bool check_extension = true);
 
   void ExamineToken(Token& token, anime::Episode& episode, bool compare_extras);
-  
+
   void CleanTitle(std::wstring& title);
   void UpdateCleanTitles(int anime_id);
 
@@ -80,12 +80,12 @@ public:
   std::vector<std::wstring> episode_keywords;
   std::vector<std::wstring> episode_prefixes;
 
- private:
-  bool CompareTitle(const std::wstring& anime_title, 
-                    anime::Episode& episode, 
-                    const anime::Item& anime_item, 
+private:
+  bool CompareTitle(const std::wstring& anime_title,
+                    anime::Episode& episode,
+                    const anime::Item& anime_item,
                     bool strict = true);
-  bool ScoreTitle(const anime::Episode& episode, 
+  bool ScoreTitle(const anime::Episode& episode,
                   const anime::Item& anime_item);
 
   void AppendKeyword(std::wstring& str, const std::wstring& keyword);
@@ -96,7 +96,7 @@ public:
   bool IsResolution(const std::wstring& str);
   bool IsCountingWord(const std::wstring& str);
   bool IsTokenEnclosed(const Token& token);
-  void ReadKeyword(unsigned int id, std::vector<std::wstring>& str);
+  void ReadKeyword(std::vector<std::wstring>& output, const std::wstring& input);
   size_t TokenizeTitle(const std::wstring& str, const std::wstring& delimiters, std::vector<Token>& tokens);
   bool ValidateEpisodeNumber(anime::Episode& episode);
 };
