@@ -66,6 +66,7 @@ public:
   LPARAM  GetParam();
   int     GetResponseStatusCode();
   void    SetAutoRedirect(BOOL enabled);
+  void    SetHttpsEnabled(BOOL enabled);
   void    SetProxy(const wstring& proxy, const wstring& user, const wstring& pass);
   void    SetUserAgent(const wstring& user_agent);
 
@@ -109,6 +110,7 @@ protected:
   INT     m_ContentEncoding;
   wstring m_Cookie;
   wstring m_File;
+  BOOL    m_HttpsEnabled;
   string  m_OptionalData;
   wstring m_Proxy, m_ProxyUser, m_ProxyPass;
   wstring m_Referer;

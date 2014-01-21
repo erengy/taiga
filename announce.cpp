@@ -429,8 +429,10 @@ bool Twitter::RequestToken() {
   wstring header = 
     Clients.sharing.twitter.GetDefaultHeader() + 
     oauth.BuildHeader(
-      L"http://api.twitter.com/oauth/request_token", 
+      L"https://api.twitter.com/oauth/request_token", 
       L"GET", NULL);
+
+  Clients.sharing.twitter.SetHttpsEnabled(TRUE);
 
   return Clients.sharing.twitter.Connect(
     L"api.twitter.com", L"oauth/request_token",
@@ -442,9 +444,11 @@ bool Twitter::AccessToken(const wstring& key, const wstring& secret, const wstri
   wstring header = 
     Clients.sharing.twitter.GetDefaultHeader() + 
     oauth.BuildHeader(
-      L"http://api.twitter.com/oauth/access_token", 
+      L"https://api.twitter.com/oauth/access_token", 
       L"POST", NULL, 
       key, secret, pin);
+
+  Clients.sharing.twitter.SetHttpsEnabled(TRUE);
 
   return Clients.sharing.twitter.Connect(
     L"api.twitter.com", L"oauth/access_token",
@@ -467,10 +471,12 @@ bool Twitter::SetStatusText(const wstring& status_text) {
   wstring header = 
     Clients.sharing.twitter.GetDefaultHeader() + 
     oauth.BuildHeader(
-      L"http://api.twitter.com/1.1/statuses/update.json", 
+      L"https://api.twitter.com/1.1/statuses/update.json", 
       L"POST", &post_parameters, 
       Settings.Announce.Twitter.oauth_key, 
       Settings.Announce.Twitter.oauth_secret);
+
+  Clients.sharing.twitter.SetHttpsEnabled(TRUE);
 
   return Clients.sharing.twitter.Connect(
     L"api.twitter.com", L"1.1/statuses/update.json", 

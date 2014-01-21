@@ -558,8 +558,10 @@ BOOL HttpClient::OnReadComplete() {
           Twitter.AccessToken(response[L"oauth_token"], response[L"oauth_token_secret"], dlg.text);
           return TRUE;
         }
+      } else {
+        status = L"Twitter token request failed.";
       }
-      MainDialog.ChangeStatus();
+      MainDialog.ChangeStatus(status);
       break;
     }
 	case HTTP_Twitter_Auth: {

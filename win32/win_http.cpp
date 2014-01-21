@@ -95,7 +95,7 @@ bool Http::Connect(wstring szServer, wstring szObject, wstring szData, wstring s
   // Open an HTTP session
   m_hConnect = ::WinHttpConnect(m_hSession, 
     szServer.c_str(), 
-    INTERNET_DEFAULT_HTTP_PORT, 
+    m_HttpsEnabled ? INTERNET_DEFAULT_HTTPS_PORT : INTERNET_DEFAULT_HTTP_PORT,
     0);
   if (!m_hConnect) {
     Cleanup();
@@ -110,7 +110,7 @@ bool Http::Connect(wstring szServer, wstring szObject, wstring szData, wstring s
     NULL, 
     szReferer.c_str(), 
     WINHTTP_DEFAULT_ACCEPT_TYPES, 
-    0);
+    m_HttpsEnabled ? WINHTTP_FLAG_SECURE : 0);
   if (!m_hRequest) {
     Cleanup();
     OnError(::GetLastError());
@@ -137,6 +137,15 @@ bool Http::Connect(wstring szServer, wstring szObject, wstring szData, wstring s
   if (m_AutoRedirect == FALSE) {
     DWORD dwDisable = WINHTTP_DISABLE_REDIRECTS;
     ::WinHttpSetOption(m_hRequest, WINHTTP_OPTION_DISABLE_FEATURE, &dwDisable, sizeof(dwDisable));
+  }
+
+  // Set security options
+  if (m_HttpsEnabled) {
+    DWORD dwOptions = SECURITY_FLAG_IGNORE_CERT_CN_INVALID |
+                      SECURITY_FLAG_IGNORE_CERT_DATE_INVALID |
+                      SECURITY_FLAG_IGNORE_UNKNOWN_CA;
+    ::WinHttpSetOption(m_hRequest, WINHTTP_OPTION_SECURITY_FLAGS,
+                       &dwOptions, sizeof(DWORD));
   }
   
   // Install the status callback function
@@ -328,7 +337,7 @@ void Http::StatusCallback(HINTERNET hInternet, DWORD dwInternetStatus,
 // =============================================================================
 
 Http::Http() : 
-  m_AutoRedirect(TRUE), m_Buffer(NULL), m_ContentEncoding(HTTP_Encoding_None), 
+  m_AutoRedirect(TRUE), m_Buffer(NULL), m_ContentEncoding(HTTP_Encoding_None), m_HttpsEnabled(FALSE),
   m_ResponseStatusCode(0), m_dwDownloaded(0), m_dwTotal(0), m_dwClientMode(0), m_lParam(0), 
   m_hConnect(NULL), m_hRequest(NULL), m_hSession(NULL)
 {
@@ -407,6 +416,10 @@ int Http::GetResponseStatusCode() {
 
 void Http::SetAutoRedirect(BOOL enabled) {
   m_AutoRedirect = enabled;
+}
+
+void Http::SetHttpsEnabled(BOOL enabled) {
+  m_HttpsEnabled = enabled;
 }
 
 void Http::SetProxy(const wstring& proxy, const wstring& user, const wstring& pass) {
