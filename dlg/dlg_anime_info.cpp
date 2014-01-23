@@ -525,6 +525,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
           anime_ids.push_back(it->anime_id);
       }
     }
+    int recently_watched = 0;
     foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
       content += L"  \u2022 " + anime_item->GetTitle();
@@ -539,6 +540,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         link_count++;
       }
       content += L"\n";
+      recently_watched++;
+      if (recently_watched >= 20)
+        break;
     }
     if (content.empty()) {
       content = L"You haven't watched anything recently. "
@@ -546,21 +550,21 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       link_count++;
     } else {
       content = L"Recently watched:\n" + content + L"\n";
-      int recently_watched = 0;
+      int watched_last_week = 0;
       foreach_c_(it, History.queue.items) {
         if (!it->episode) continue;
         date_diff = date_now - (Date)(it->time.substr(0, 10));
         if (date_diff <= day_limit)
-          recently_watched++;
+          watched_last_week++;
       }
       foreach_c_(it, History.items) {
         if (!it->episode) continue;
         date_diff = date_now - (Date)(it->time.substr(0, 10));
         if (date_diff <= day_limit)
-          recently_watched++;
+          watched_last_week++;
       }
-      if (recently_watched > 0)
-        content += L"You've watched " + ToWstr(recently_watched) + L" episodes in the last week.\n\n";
+      if (watched_last_week > 0)
+        content += L"You've watched " + ToWstr(watched_last_week) + L" episodes in the last week.\n\n";
     }
 
     // Available episodes
