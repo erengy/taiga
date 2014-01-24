@@ -92,6 +92,10 @@ wstring CalculateCRC(const wstring& file) {
 
 // =============================================================================
 
+bool IsEpisodeRange(const wstring& episode_number) {
+  return GetEpisodeLow(episode_number) != GetEpisodeHigh(episode_number);
+}
+
 int GetEpisodeHigh(const wstring& episode_number) {
   int value = 1, pos = InStrRev(episode_number, L"-", episode_number.length());
   if (pos == episode_number.length() - 1) {

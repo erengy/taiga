@@ -51,6 +51,7 @@ void ExecuteAction(wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 wstring Base64Decode(const wstring& str, bool for_filename = false);
 wstring Base64Encode(const wstring& str, bool for_filename = false);
 wstring CalculateCRC(const wstring& file);
+bool IsEpisodeRange(const wstring& episode_number);
 int GetEpisodeHigh(const wstring& episode_number);
 int GetEpisodeLow(const wstring& episode_number);
 void SplitEpisodeNumbers(const wstring& input, vector<int>& output);

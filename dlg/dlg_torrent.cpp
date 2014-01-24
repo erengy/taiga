@@ -375,7 +375,8 @@ void TorrentDialog::RefreshList() {
       group = TORRENT_BATCH;
     }
     if (!IsNumeric(it->episode_data.number)) {
-      if (it->episode_data.format.empty()) {
+      if (it->episode_data.format.empty() ||
+          IsEpisodeRange(it->episode_data.number)) {
         group = TORRENT_BATCH;
       } else {
         group = TORRENT_OTHER;
