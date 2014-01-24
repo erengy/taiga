@@ -53,9 +53,18 @@ BOOL PageBaseInfo::OnInitDialog() {
 
 INT_PTR PageBaseInfo::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
-    case WM_CTLCOLORSTATIC:
-      if (!parent->IsTabVisible())
+    case WM_CTLCOLORSTATIC: {
+      if (!parent->IsTabVisible()) {
+        win32::Dc dc = reinterpret_cast<HDC>(wParam);
+        HWND hwnd_control = reinterpret_cast<HWND>(lParam);
+        dc.SetBkMode(TRANSPARENT);
+        dc.DetachDC();
+        if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_ALT))
+          return reinterpret_cast<INT_PTR>(UI.brush_background.Get());
         return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+      }
+      break;
+    }
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
