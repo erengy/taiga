@@ -442,6 +442,9 @@
     <ClCompile Include="base\version.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="base\timer.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -793,6 +796,9 @@
       <Filter>sync\herro</Filter>
     </ClInclude>
     <ClInclude Include="base\version.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\timer.h">
       <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>

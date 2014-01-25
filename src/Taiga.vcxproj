@@ -104,6 +104,7 @@
     <ClCompile Include="base\process.cpp" />
     <ClCompile Include="base\string.cpp" />
     <ClCompile Include="base\time.cpp" />
+    <ClCompile Include="base\timer.cpp" />
     <ClCompile Include="base\version.cpp" />
     <ClCompile Include="base\xml.cpp" />
     <ClCompile Include="library\anime.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="base\process.h" />
     <ClInclude Include="base\string.h" />
     <ClInclude Include="base\time.h" />
+    <ClInclude Include="base\timer.h" />
     <ClInclude Include="base\types.h" />
     <ClInclude Include="base\version.h" />
     <ClInclude Include="base\xml.h" />
