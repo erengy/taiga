@@ -506,13 +506,6 @@ void SeasonDialog::RefreshList(bool redraw_only) {
     return;
   }
 
-  // Set title
-  if (SeasonDatabase.name.empty()) {
-    SetText(L"Season Browser");
-  } else {
-    SetText(L"Season Browser - " + SeasonDatabase.name);
-  }
-
   // Disable drawing
   list_.SetRedraw(FALSE);
 

@@ -18,14 +18,14 @@
 
 #include <algorithm>
 
-#include "anime_db.h"
-#include "anime_item.h"
-#include "anime_util.h"
-#include "discover.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "library/anime_db.h"
+#include "library/anime_item.h"
+#include "library/anime_util.h"
+#include "library/discover.h"
 #include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/taiga.h"
@@ -51,25 +51,37 @@ bool SeasonDatabase::Load(std::wstring file) {
   xml_node season_node = document.child(L"season");
 
   name = XmlReadStrValue(season_node.child(L"info"), L"name");
-  time_t last_modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
-                                                 L"last_modified").c_str());
+  time_t modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
+                                            L"modified").c_str());
 
   foreach_xmlnode_(node, season_node, L"anime") {
-    int anime_id = XmlReadIntValue(node, L"series_animedb_id");
+    std::vector<std::wstring> ids;
+    XmlReadChildNodes(node, ids, L"id");
+
+    int anime_id = anime::ID_UNKNOWN;
+    anime::Item* anime_item = nullptr;
+
+    for (int i = 0; i < ids.size(); ++i) {
+      anime_item = AnimeDatabase.FindItem(ids.at(i), i + 1);
+      if (anime_item)
+        break;
+    }
+
+    if (anime_item && anime_item->last_modified >= modified) {
+      anime_id = anime_item->GetId();
+    } else {
+      anime::Item item;
+      for (size_t i = 0; i < ids.size(); i++)
+        item.SetId(ids.at(i), i + 1);
+      item.last_modified = modified;
+      item.SetTitle(XmlReadStrValue(node, L"title"));
+      item.SetType(XmlReadIntValue(node, L"type"));
+      item.SetImageUrl(XmlReadStrValue(node, L"image"));
+      item.SetProducers(XmlReadStrValue(node, L"producers"));
+      anime_id = AnimeDatabase.UpdateItem(item);
+    }
+
     items.push_back(anime_id);
-    
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item && anime_item->last_modified >= last_modified)
-      continue;
-
-    anime::Item item;
-    item.SetId(XmlReadStrValue(node, L"series_animedb_id"), sync::kMyAnimeList);
-    item.SetTitle(XmlReadStrValue(node, L"series_title"));
-    item.SetType(XmlReadIntValue(node, L"series_type"));
-    item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
-    item.SetProducers(XmlReadStrValue(node, L"producers"));
-
-    AnimeDatabase.UpdateItem(item);
   }
 
   return true;

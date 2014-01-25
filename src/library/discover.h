@@ -39,7 +39,7 @@ public:
 
   // Only IDs are stored here, actual info is kept in anime::Database.
   std::vector<int> items;
-  
+
   // Season name (e.g. "Spring 2012")
   std::wstring name;
 };
