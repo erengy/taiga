@@ -167,7 +167,7 @@ bool AddAuthenticationToRequest(Request& request) {
 }
 
 bool AddServiceDataToRequest(Request& request, int id) {
-  request.data[L"taiga-id"] = id;
+  request.data[L"taiga-id"] = ToWstr(id);
 
   auto anime_item = AnimeDatabase.FindItem(id);
 
