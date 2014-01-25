@@ -455,7 +455,17 @@ void TorrentDialog::Search(std::wstring url, std::wstring title) {
   feed->Check(url);
 }
 
-void TorrentDialog::SetTimerText(const std::wstring& text) {
+void TorrentDialog::SetTimer(int ticks) {
+  if (!IsWindow())
+    return;
+
+  std::wstring text = L"Check new torrents";
+
+  if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled) &&
+      Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) > 0) {
+    text += L" [" + ToTimeString(ticks) + L"]";
+  }
+
   toolbar_.SetButtonText(0, text.c_str());
 }
 

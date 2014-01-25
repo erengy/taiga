@@ -43,10 +43,7 @@ App::App()
     : logged_in(false),
       current_tip_type(kTipTypeDefault),
       play_status(kPlayStatusStopped),
-      ticker_media(0),
-      ticker_memory(0),
-      ticker_new_episodes(0),
-      ticker_queue(0) {
+      ticker_media(0) {
   version.major = TAIGA_VERSION_MAJOR;
   version.minor = TAIGA_VERSION_MINOR;
   version.patch = TAIGA_VERSION_PATCH;

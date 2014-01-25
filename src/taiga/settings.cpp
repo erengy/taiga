@@ -29,6 +29,7 @@
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "taiga/taiga.h"
+#include "taiga/timer.h"
 #include "taiga/version.h"
 #include "track/media.h"
 #include "track/monitor.h"
@@ -509,6 +510,8 @@ void AppSettings::ApplyChanges(const std::wstring& previous_user,
   FolderMonitor.Enable(enable_monitor);
 
   ui::Menus.UpdateExternalLinks();
+
+  timers.UpdateIntervalsFromSettings();
 }
 
 void AppSettings::HandleCompatibility() {

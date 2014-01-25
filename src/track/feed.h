@@ -104,7 +104,7 @@ public:
   bool Load();
 
 public:
-  int category, download_index, ticker;
+  int category, download_index;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

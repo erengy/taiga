@@ -445,6 +445,9 @@
     <ClCompile Include="base\timer.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="taiga\timer.cpp">
+      <Filter>taiga</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -800,6 +803,9 @@
     </ClInclude>
     <ClInclude Include="base\timer.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="taiga\timer.h">
+      <Filter>taiga</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

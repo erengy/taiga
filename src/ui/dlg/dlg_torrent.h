@@ -41,7 +41,7 @@ public:
   void RefreshList();
   void Search(std::wstring url, int anime_id);
   void Search(std::wstring url, std::wstring title);
-  void SetTimerText(const std::wstring& text);
+  void SetTimer(int ticks);
 
 private:
   win::ListView list_;

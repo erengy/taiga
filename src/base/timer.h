@@ -66,12 +66,12 @@ public:
 
   Timer* timer(unsigned int id);
 
-  bool Initialize(HWND hwnd, TIMERPROC proc);
-  void InsertTimer(const Timer* timer);
+  virtual bool Initialize(HWND hwnd, TIMERPROC proc);
+  virtual void InsertTimer(const Timer* timer);
 
   virtual void OnTick() = 0;
 
-private:
+protected:
   HWND hwnd_;
   UINT_PTR id_;
   std::map<unsigned int, Timer*> timers_;

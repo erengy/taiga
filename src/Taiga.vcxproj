@@ -137,6 +137,7 @@
     <ClCompile Include="taiga\settings.cpp" />
     <ClCompile Include="taiga\stats.cpp" />
     <ClCompile Include="taiga\taiga.cpp" />
+    <ClCompile Include="taiga\timer.cpp" />
     <ClCompile Include="taiga\update.cpp" />
     <ClCompile Include="third_party\base64\base64.cpp" />
     <ClCompile Include="third_party\jsoncpp\json_reader.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="taiga\settings.h" />
     <ClInclude Include="taiga\stats.h" />
     <ClInclude Include="taiga\taiga.h" />
+    <ClInclude Include="taiga\timer.h" />
     <ClInclude Include="taiga\update.h" />
     <ClInclude Include="taiga\version.h" />
     <ClInclude Include="third_party\base64\base64.h" />

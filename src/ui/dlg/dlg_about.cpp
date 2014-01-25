@@ -31,6 +31,8 @@ namespace ui {
 
 class AboutDialog DlgAbout;
 
+const UINT_PTR kTimerTaiga = 74164;
+
 int AboutDialog::note_list[][2] = {
   {84, 1},  // 1/2
   {84, 2},  // 1/4
@@ -81,7 +83,7 @@ AboutDialog::AboutDialog()
 }
 
 BOOL AboutDialog::OnDestroy() {
-  KillTimer(GetWindowHandle(), TIMER_TAIGA);
+  KillTimer(GetWindowHandle(), kTimerTaiga);
 
   return TRUE;
 }
@@ -126,7 +128,7 @@ BOOL AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       // Icon click
       if (HIWORD(wParam) == STN_DBLCLK) {
         Stats.tigers_harmed++;
-        SetTimer(hwnd, TIMER_TAIGA, 100, nullptr);
+        SetTimer(hwnd, kTimerTaiga, 100, nullptr);
         note_index_ = 0;
         return TRUE;
       }
@@ -164,7 +166,7 @@ void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
 void AboutDialog::OnTimer(UINT_PTR nIDEvent) {
   if (note_index_ == note_count_) {
-    KillTimer(GetWindowHandle(), TIMER_TAIGA);
+    KillTimer(GetWindowHandle(), kTimerTaiga);
     SetText(L"About");
     note_index_ = 0;
   } else {

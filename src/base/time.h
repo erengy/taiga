@@ -23,11 +23,6 @@
 #include <string>
 #include <windows.h>
 
-enum TimerId {
-  TIMER_MAIN = 1337,
-  TIMER_TAIGA = 74164
-};
-
 class Date {
  public:
   Date();

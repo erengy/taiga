@@ -42,14 +42,11 @@ class Aggregator Aggregator;
 // =============================================================================
 
 Feed::Feed()
-    : category(0), 
-      download_index(-1), 
-      ticker(0) {
+    : category(0),
+      download_index(-1) {
 }
 
 bool Feed::Check(const std::wstring& source, bool automatic) {
-  // Reset ticker before checking the source so we don't fall into a loop
-  ticker = 0;
   if (source.empty()) return false;
   link = source;
   

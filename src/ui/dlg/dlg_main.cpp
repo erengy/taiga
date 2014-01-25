@@ -32,6 +32,7 @@
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "taiga/taiga.h"
+#include "taiga/timer.h"
 #include "track/media.h"
 #include "track/monitor.h"
 #include "track/recognition.h"
@@ -78,7 +79,7 @@ BOOL MainDialog::OnInitDialog() {
   navigation.SetCurrentPage(kSidebarItemAnimeList);
 
   // Start process timer
-  SetTimer(GetWindowHandle(), TIMER_MAIN, 1000, nullptr);
+  taiga::timers.Initialize();
   
   // Add icon to taskbar
   Taskbar.Create(GetWindowHandle(), nullptr, TAIGA_APP_TITLE);
@@ -550,76 +551,6 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 // Please be careful with what you change.
 
 void MainDialog::OnTimer(UINT_PTR nIDEvent) {
-  // Measure stability
-  Stats.uptime++;
-  // Refresh statistics window
-  if (DlgStats.IsVisible()) {
-    if (Stats.uptime % 10 == 0) { // Recalculate every 10 seconds
-      Stats.CalculateAll();
-    }
-    DlgStats.Refresh();
-  }
-
-  // ===========================================================================
-
-  // Free memory
-  Taiga.ticker_memory++;
-  if (Taiga.ticker_memory >= 10 * 60) { // 10 minutes
-    Taiga.ticker_memory = 0;
-    ImageDatabase.FreeMemory();
-  }
-
-  // ===========================================================================
-
-  // Check queue
-  Taiga.ticker_queue++;
-  if (Taiga.ticker_queue >= 5 * 60) { // 5 minutes
-    Taiga.ticker_queue = 0;
-    if (History.queue.updating == false) {
-      History.queue.Check(true);
-    }
-  }
-
-  // ===========================================================================
-  
-  // Check new episodes (if folder monitor is disabled)
-  if (!Settings.GetBool(taiga::kLibrary_WatchFolders)) {
-    Taiga.ticker_new_episodes++;
-    if (Taiga.ticker_new_episodes >= 30 * 60) { // 30 minutes
-      Taiga.ticker_new_episodes = 0;
-      ScanAvailableEpisodes(anime::ID_UNKNOWN, false, true);
-    }
-  }
-
-  // ===========================================================================
-
-  // Check feeds
-  for (unsigned int i = 0; i < Aggregator.feeds.size(); i++) {
-    switch (Aggregator.feeds[i].category) {
-      case FEED_CATEGORY_LINK:
-        if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled)) {
-          Aggregator.feeds[i].ticker++;
-        }
-        if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled) &&
-            Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) > 0) {
-          if (DlgTorrent.IsWindow()) {
-            DlgTorrent.SetTimerText(L"Check new torrents [" + 
-              ToTimeString(Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) * 60 - Aggregator.feeds[i].ticker) + L"]");
-          }
-          if (Aggregator.feeds[i].ticker >= Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) * 60) {
-            Aggregator.feeds[i].Check(Settings[taiga::kTorrent_Discovery_Source], true);
-          }
-        } else {
-          if (DlgTorrent.IsWindow()) {
-            DlgTorrent.SetTimerText(L"Check new torrents");
-          }
-        }
-        break;
-    }
-  }
-
-  // ===========================================================================
-  
   // Check process list for media players
   auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
   int media_index = MediaPlayers.Check();
