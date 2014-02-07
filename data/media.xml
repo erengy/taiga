@@ -61,17 +61,6 @@
 		<edit mode="1">GOM Player</edit>
 		<edit mode="1">[Built-in subtitle]</edit>
 	</player>
-	<!-- JetAudio -->
-	<player>
-		<name>JetAudio</name>
-		<enabled>1</enabled>
-		<visible>1</visible>
-		<mode>3</mode>
-		<class>COWON Jet-Audio MainWnd Class</class>
-		<file>JetAudio.exe</file>
-		<folder>%ProgramFiles%\JetAudio\</folder>
-		<folder>%ProgramW6432%\JetAudio\</folder>
-	</player>
 	<!-- Kantaris Media Player -->
 	<player>
 		<name>Kantaris Media Player</name>

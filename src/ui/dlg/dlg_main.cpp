@@ -287,21 +287,6 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       toolbar_wm.ShowMenu();
       return TRUE;
     }
-
-    // External programs
-    case WM_COPYDATA: {
-      auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
-      // JetAudio
-      if (pCDS->dwData == 0x3000 /* JRC_COPYDATA_ID_TRACK_FILENAME */) {
-        MediaPlayers.new_title = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
-        return TRUE;
-      // Media Portal
-      } else if (pCDS->dwData == 0x1337) {
-        MediaPlayers.new_title = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
-        return TRUE;
-      }
-      break;
-    }
   }
   
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
