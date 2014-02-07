@@ -32,6 +32,7 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "taiga/timer.h"
 #include "track/feed.h"
 #include "track/media.h"
 #include "track/recognition.h"
@@ -322,9 +323,8 @@ void StartWatching(Item& item, Episode& episode) {
   // Check folder
   if (item.GetFolder().empty()) {
     if (episode.folder.empty()) {
-      HWND hwnd = MediaPlayers.items[MediaPlayers.index].window_handle;
-      episode.folder = MediaPlayers.GetTitleFromProcessHandle(hwnd);
-      episode.folder = GetPathOnly(episode.folder);
+      HWND hwnd = MediaPlayers.GetCurrentWindowHandle();
+      episode.folder = GetPathOnly(MediaPlayers.GetTitleFromProcessHandle(hwnd));
     }
     if (IsInsideRootFolders(episode.folder)) {
       // Set the folder if only it is under a root folder
@@ -362,10 +362,11 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
   if (episode.processed)
     return false;
 
-  if (!ignore_update_time)
-    if (Settings.GetInt(taiga::kSync_Update_Delay) > Taiga.ticker_media)
-      if (Taiga.ticker_media > -1)
-        return false;
+  if (!ignore_update_time) {
+    auto ticks = taiga::timers.timer(taiga::kTimerMedia)->ticks();
+    if (Settings.GetInt(taiga::kSync_Update_Delay) > ticks)
+      return false;
+  }
 
   if (item.GetMyStatus() == kCompleted && item.GetMyRewatching() == 0)
     return false;

@@ -25,12 +25,35 @@
 #include "base/accessibility.h"
 
 enum MediaPlayerModes {
-  MEDIA_MODE_WINDOWTITLE,
-  MEDIA_MODE_FILEHANDLE,
-  MEDIA_MODE_WINAMPAPI,
-  MEDIA_MODE_SPECIALMESSAGE,
-  MEDIA_MODE_MPLAYER,
-  MEDIA_MODE_WEBBROWSER
+  kMediaModeWindowTitle,
+  kMediaModeFileHandle,
+  kMediaModeWinampApi,
+  kMediaModeSpecialMessage,
+  kMediaModeMplayer,
+  kMediaModeWebBrowser
+};
+
+class MediaPlayer {
+public:
+  std::wstring GetPath() const;
+  bool IsActive() const;
+
+  std::wstring name;
+  BOOL enabled;
+  BOOL visible;
+  int mode;
+  std::vector<std::wstring> classes;
+  std::vector<std::wstring> files;
+  std::vector<std::wstring> folders;
+  std::wstring engine;
+
+  struct EditTitle {
+    int mode;
+    std::wstring value;
+  };
+  std::vector<EditTitle> edits;
+
+  HWND window_handle;
 };
 
 class MediaPlayers {
@@ -38,13 +61,23 @@ public:
   MediaPlayers();
   ~MediaPlayers() {}
 
-  BOOL Load();
-  int Check();
+  bool Load();
 
-  void EditTitle(std::wstring& str, int player_index);
+  MediaPlayer* FindPlayer(const std::wstring& name);
+  HWND GetCurrentWindowHandle();
+
+  std::wstring current_player() const;
+  bool player_running() const;
+  void set_player_running(bool player_running);
+  std::wstring current_title() const;
+  void set_current_title(const std::wstring& title);
+  bool title_changed() const;
+  void set_title_changed(bool title_changed);
+
+  MediaPlayer* CheckRunningPlayers();
+
+  void EditTitle(std::wstring& str, const MediaPlayer* media_player);
   std::wstring GetTitle(HWND hwnd, const std::wstring& class_name, int mode);
-  bool TitleChanged() const;
-  void SetTitleChanged(bool title_changed);
 
   std::wstring GetTitleFromProcessHandle(HWND hwnd, ULONG process_id = 0);
   std::wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
@@ -53,24 +86,6 @@ public:
   std::wstring GetTitleFromBrowser(HWND hwnd);
 
 public:
-  int index, index_old;
-  std::wstring current_title, new_title;
-
-  class MediaPlayer {
-  public:
-    std::wstring engine, name;
-    BOOL enabled, visible;
-    int mode;
-    HWND window_handle;
-    std::vector<std::wstring> classes, files, folders;
-    std::wstring GetPath();
-    class EditTitle {
-    public:
-      int mode;
-      std::wstring value;
-    };
-    std::vector<EditTitle> edits;
-  };
   std::vector<MediaPlayer> items;
 
   class BrowserAccessibleObject : public base::AccessibleObject {
@@ -79,9 +94,16 @@ public:
   } acc_obj;
 
 private:
+  std::wstring current_player_;
+  bool player_running_;
+
+  std::wstring current_title_;
   bool title_changed_;
 };
 
 extern MediaPlayers MediaPlayers;
+
+void ProcessMediaPlayerStatus(const MediaPlayer* media_player);
+void ProcessMediaPlayerTitle(const MediaPlayer& media_player);
 
 #endif  // TAIGA_TRACK_MEDIA_H

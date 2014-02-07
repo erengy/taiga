@@ -530,121 +530,6 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Timer */
-
-// This function is very delicate, even order of things are important.
-// Please be careful with what you change.
-
-void MainDialog::OnTimer(UINT_PTR nIDEvent) {
-  // Check process list for media players
-  auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
-  int media_index = MediaPlayers.Check();
-
-  // Media player is running
-  if (media_index > -1) {
-    // Started to watch?
-    if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
-      // Recognized?
-      if (Settings.GetBool(taiga::kApp_Option_EnableRecognition)) {
-        if (Meow.ExamineTitle(MediaPlayers.current_title, CurrentEpisode)) {
-          anime_item = Meow.MatchDatabase(CurrentEpisode, false, true, true, true, true, true);
-          if (anime_item) {
-            MediaPlayers.SetTitleChanged(false);
-            CurrentEpisode.Set(anime_item->GetId());
-            StartWatching(*anime_item, CurrentEpisode);
-            return;
-          }
-        }
-        // Not recognized
-        CurrentEpisode.Set(anime::ID_NOTINLIST);
-        if (CurrentEpisode.title.empty()) {
-#ifdef _DEBUG
-          ChangeStatus(MediaPlayers.items[MediaPlayers.index].name + L" is running.");
-#endif
-        } else {
-          MediaPlayers.SetTitleChanged(false);
-          DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
-          ChangeStatus(L"Watching: " + CurrentEpisode.title + 
-            PushString(L" #", CurrentEpisode.number) + L" (Not recognized)");
-          if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
-            std::wstring tip_text = ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode);
-            tip_text += L"\nClick here to view similar titles for this anime.";
-            Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
-            Taskbar.Tip(L"", L"", 0);
-            Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
-          }
-        }
-      }
-
-    // Already watching or not recognized before
-    } else {
-      // Tick and compare with delay time
-      if (Taiga.ticker_media > -1 && Taiga.ticker_media <= Settings.GetInt(taiga::kSync_Update_Delay)) {
-        if (Taiga.ticker_media == Settings.GetInt(taiga::kSync_Update_Delay)) {
-          // Disable ticker
-          Taiga.ticker_media = -1;
-          // Announce current episode
-          Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToMessenger |
-                       taiga::kAnnounceToMirc | taiga::kAnnounceToSkype);
-          // Update
-          if (!Settings.GetBool(taiga::kSync_Update_WaitPlayer))
-            if (anime_item)
-              UpdateList(*anime_item, CurrentEpisode);
-          return;
-        }
-        if (!Settings.GetBool(taiga::kSync_Update_CheckPlayer) ||
-            MediaPlayers.items[media_index].window_handle == GetForegroundWindow())
-          Taiga.ticker_media++;
-      }
-      // Caption changed?
-      if (MediaPlayers.TitleChanged()) {
-        MediaPlayers.SetTitleChanged(false);
-        ChangeStatus();
-        bool processed = CurrentEpisode.processed; // TODO: not a good solution...
-        CurrentEpisode.Set(anime::ID_UNKNOWN);
-        if (anime_item) {
-          EndWatching(*anime_item, CurrentEpisode);
-          CurrentEpisode.anime_id = anime_item->GetId();
-          CurrentEpisode.processed = processed;
-          UpdateList(*anime_item, CurrentEpisode);
-          CurrentEpisode.anime_id = anime::ID_UNKNOWN;
-        }
-        Taiga.ticker_media = 0;
-      }
-    }
-  
-  // Media player is NOT running
-  } else {
-    // Was running, but not watching
-    if (!anime_item) {
-      if (MediaPlayers.index_old > 0){
-        ChangeStatus();
-        CurrentEpisode.Set(anime::ID_UNKNOWN);
-        MediaPlayers.index_old = 0;
-        DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
-      }
-    
-    // Was running and watching
-    } else {
-      bool processed = CurrentEpisode.processed; // TODO: temporary solution...
-      CurrentEpisode.Set(anime::ID_UNKNOWN);
-      EndWatching(*anime_item, CurrentEpisode);
-      if (Settings.GetBool(taiga::kSync_Update_WaitPlayer)) {
-        CurrentEpisode.anime_id = anime_item->GetId();
-        CurrentEpisode.processed = processed;
-        UpdateList(*anime_item, CurrentEpisode);
-        CurrentEpisode.anime_id = anime::ID_UNKNOWN;
-      }
-      Taiga.ticker_media = 0;
-    }
-  }
-
-  // Update status timer
-  UpdateStatusTimer();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 /* Taskbar */
 
 void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
@@ -766,7 +651,10 @@ void MainDialog::UpdateStatusTimer() {
   win::Rect rect;
   GetClientRect(&rect);
 
-  int seconds = Settings.GetInt(taiga::kSync_Update_Delay) - Taiga.ticker_media;
+  int seconds = 0;
+  auto timer = taiga::timers.timer(taiga::kTimerMedia);
+  if (timer)
+    seconds = taiga::timers.timer(taiga::kTimerMedia)->ticks();
 
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN && 
       seconds > 0 && seconds < Settings.GetInt(taiga::kSync_Update_Delay) &&

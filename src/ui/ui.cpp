@@ -29,6 +29,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/media.h"
 #include "win/win_taskbar.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -491,6 +492,31 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
     int icon_index = StatusToIcon(anime_item.GetAiringStatus());
     DlgAnimeList.listview.SetItemIcon(list_index, icon_index);
     DlgAnimeList.listview.RedrawItems(list_index, list_index, true);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void OnRecognitionFail() {
+  if (!CurrentEpisode.title.empty()) {
+    MediaPlayers.set_title_changed(false);
+    DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
+    ChangeStatusText(L"Watching: " + CurrentEpisode.title +
+                     PushString(L" #", CurrentEpisode.number) +
+                     L" (Not recognized)");
+    if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
+      std::wstring tip_text =
+          ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode) +
+          L"\nClick here to view similar titles for this anime.";
+      Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
+      Taskbar.Tip(L"", L"", 0);
+      Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
+    }
+
+  } else {
+#ifdef _DEBUG
+    ChangeStatusText(MediaPlayers.current_player() + L" is running.");
+#endif
   }
 }
 

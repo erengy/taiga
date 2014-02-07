@@ -56,7 +56,6 @@ public:
 
   int current_tip_type, play_status;
   bool logged_in;
-  int ticker_media;
   base::SemanticVersion version;
 
   class Updater : public UpdateHelper {

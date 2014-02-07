@@ -42,8 +42,7 @@ namespace taiga {
 App::App()
     : logged_in(false),
       current_tip_type(kTipTypeDefault),
-      play_status(kPlayStatusStopped),
-      ticker_media(0) {
+      play_status(kPlayStatusStopped) {
   version.major = TAIGA_VERSION_MAJOR;
   version.minor = TAIGA_VERSION_MINOR;
   version.patch = TAIGA_VERSION_PATCH;

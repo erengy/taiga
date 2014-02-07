@@ -19,12 +19,17 @@
 #include "base/common.h"
 #include "base/foreach.h"
 #include "library/anime.h"
+#include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "library/history.h"
 #include "library/resource.h"
+#include "taiga/announce.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "taiga/timer.h"
 #include "track/feed.h"
+#include "track/media.h"
+#include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_stats.h"
 #include "ui/dlg/dlg_torrent.h"
 
@@ -57,7 +62,13 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerMedia:
-      // TODO
+      ::Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToMessenger |
+                     taiga::kAnnounceToMirc | taiga::kAnnounceToSkype);
+      if (!Settings.GetBool(taiga::kSync_Update_WaitPlayer)) {
+        auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+        if (anime_item)
+          anime::UpdateList(*anime_item, CurrentEpisode);
+      }
       break;
 
     case kTimerMemory:
@@ -106,7 +117,12 @@ void TimerManager::OnTick() {
   timer_library.set_enabled(!Settings.GetBool(taiga::kLibrary_WatchFolders));
 
   // Media
-  // TODO
+  auto media_player = MediaPlayers.CheckRunningPlayers();
+  bool media_player_is_running = media_player != nullptr;
+  bool media_player_is_active = media_player && media_player->IsActive();
+  timer_media.set_enabled(media_player_is_running && media_player_is_active);
+  ProcessMediaPlayerStatus(media_player);
+  ui::DlgMain.UpdateStatusTimer();
 
   // Statistics
   Stats.uptime++;

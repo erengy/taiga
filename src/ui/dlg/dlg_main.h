@@ -69,7 +69,6 @@ public:
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   void OnTaskbarCallback(UINT uMsg, LPARAM lParam);
-  void OnTimer(UINT_PTR nIDEvent);
   LRESULT OnToolbarNotify(LPARAM lParam);
   LRESULT OnTreeNotify(LPARAM lParam);
   BOOL PreTranslateMessage(MSG* pMsg);

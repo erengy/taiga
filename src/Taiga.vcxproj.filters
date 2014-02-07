@@ -243,9 +243,6 @@
     <ClCompile Include="track\monitor.cpp">
       <Filter>track</Filter>
     </ClCompile>
-    <ClCompile Include="track\mediaplayers.cpp">
-      <Filter>track</Filter>
-    </ClCompile>
     <ClCompile Include="track\feed_filter.cpp">
       <Filter>track</Filter>
     </ClCompile>
@@ -447,6 +444,12 @@
     </ClCompile>
     <ClCompile Include="taiga\timer.cpp">
       <Filter>taiga</Filter>
+    </ClCompile>
+    <ClCompile Include="track\media_stream.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
+    <ClCompile Include="track\media.cpp">
+      <Filter>track</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

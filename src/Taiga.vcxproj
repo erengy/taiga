@@ -164,7 +164,8 @@
     <ClCompile Include="third_party\zlib\zutil.c" />
     <ClCompile Include="track\feed.cpp" />
     <ClCompile Include="track\feed_filter.cpp" />
-    <ClCompile Include="track\mediaplayers.cpp" />
+    <ClCompile Include="track\media.cpp" />
+    <ClCompile Include="track\media_stream.cpp" />
     <ClCompile Include="track\monitor.cpp" />
     <ClCompile Include="track\recognition.cpp" />
     <ClCompile Include="track\search.cpp" />
