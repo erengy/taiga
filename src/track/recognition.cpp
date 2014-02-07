@@ -45,7 +45,8 @@ RecognitionEngine::RecognitionEngine() {
       L"2CH, 5.1CH, 5.1, AAC, AC3, DTS, DTS5.1, DTS-ES, DUALAUDIO, DUAL AUDIO, "
       L"FLAC, MP3, OGG, TRUEHD5.1, VORBIS");
   ReadKeyword(video_keywords,
-      L"MKV, AVI, MP4, OGM, RM, RMVB, WMV, DIVX, MOV, FLV, MPG, 3GP");
+      L"8BIT, 10BIT, AVI, DIVX, H264, H.264, HD, HDTV, HI10P, HQ, LQ, RMVB, "
+      L"SD, TS, VFR, WMV, X264, X.264, XVID");
   ReadKeyword(extra_keywords,
       L"ASS, BATCH, BD, BLURAY, BLU-RAY, COMPLETE, DIRECTOR'S CUT, DVD, DVD5, "
       L"DVD9, DVD-R2J, DVDRIP, ENG, ENGLISH, HARDSUB, PS3, R2DVD, R2J, R2JDVD, "
@@ -56,8 +57,7 @@ RecognitionEngine::RecognitionEngine() {
   ReadKeyword(version_keywords,
       L"V0, V2, V3, V4");
   ReadKeyword(valid_extensions,
-      L"8BIT, 10BIT, AVI, DIVX, H264, H.264, HD, HDTV, HI10P, HQ, LQ, RMVB, "
-      L"SD, TS, VFR, WMV, X264, X.264, XVID");
+      L"MKV, AVI, MP4, OGM, RM, RMVB, WMV, DIVX, MOV, FLV, MPG, 3GP");
   ReadKeyword(episode_keywords,
       L"EPISODE, EP., EP, VOLUME, VOL., VOL, EPS., EPS");
   ReadKeyword(episode_prefixes,
