@@ -37,6 +37,11 @@ enum ContentEncoding {
   kContentEncodingGzip
 };
 
+enum Protocol {
+  kHttp,
+  kHttps
+};
+
 class Request {
 public:
   Request();
@@ -44,6 +49,7 @@ public:
 
   void Clear();
 
+  Protocol protocol;
   std::wstring method;
   std::wstring host;
   std::wstring path;
@@ -115,6 +121,7 @@ protected:
   std::wstring proxy_password_;
   std::wstring proxy_username_;
   std::wstring referer_;
+  bool secure_transaction_;
   std::wstring user_agent_;
 
 private:

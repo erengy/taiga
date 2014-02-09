@@ -25,10 +25,14 @@ namespace win {
 namespace http {
 
 bool Client::MakeRequest(Request request) {
-  Cleanup();  // Close any previous connection
+  // Close any previous connection
+  Cleanup();
 
   // Set the new request
   request_ = request;
+
+  // Set secure transaction state
+  secure_transaction_ = request.protocol == kHttps;
 
   // Ensure that the response has the same parameter and UUID as the request
   response_.parameter = request.parameter;
@@ -57,10 +61,14 @@ HINTERNET Client::OpenSession() {
 }
 
 HINTERNET Client::ConnectToSession() {
+  // Use port 80 for HTTP, port 443 for HTTPS
+  INTERNET_PORT port = secure_transaction_ ? INTERNET_DEFAULT_HTTPS_PORT :
+                                             INTERNET_DEFAULT_HTTP_PORT;
+
   // Specify the initial target server of an HTTP request
   connection_handle_ = ::WinHttpConnect(session_handle_,
                                         request_.host.c_str(),
-                                        INTERNET_DEFAULT_HTTP_PORT,  // port 80
+                                        port,
                                         0);  // reserved, must be 0
   return connection_handle_;
 }
@@ -77,6 +85,9 @@ HINTERNET Client::OpenRequest() {
     path += query_string;
   }
 
+  // Enable SSL/TLS if required
+  DWORD flags = secure_transaction_ ? WINHTTP_FLAG_SECURE : 0;
+
   // Create an HTTP request handle
   request_handle_ = ::WinHttpOpenRequest(connection_handle_,
                                          request_.method.c_str(),
@@ -84,7 +95,7 @@ HINTERNET Client::OpenRequest() {
                                          nullptr,  // use HTTP/1.1
                                          referer_.c_str(),
                                          WINHTTP_DEFAULT_ACCEPT_TYPES,
-                                         0);  // no flags set
+                                         flags);
   return request_handle_;
 }
 
@@ -115,6 +126,15 @@ BOOL Client::SetRequestOptions() {
     DWORD option = WINHTTP_DISABLE_REDIRECTS;
     ::WinHttpSetOption(request_handle_, WINHTTP_OPTION_DISABLE_FEATURE,
                        &option, sizeof(option));
+  }
+
+  // Set security options
+  if (secure_transaction_) {
+    DWORD options = SECURITY_FLAG_IGNORE_CERT_CN_INVALID |
+                    SECURITY_FLAG_IGNORE_CERT_DATE_INVALID |
+                    SECURITY_FLAG_IGNORE_UNKNOWN_CA;
+    ::WinHttpSetOption(request_handle_, WINHTTP_OPTION_SECURITY_FLAGS,
+                       &options, sizeof(DWORD));
   }
 
   // Set callback function

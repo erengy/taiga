@@ -26,7 +26,7 @@ namespace win {
 namespace http {
 
 Request::Request()
-    : method(L"GET"), parameter(0) {
+    : method(L"GET"), parameter(0), protocol(kHttp) {
   // Each HTTP request must have a unique ID, as there are many parts of the
   // application that rely on this assumption.
   // TODO: Generate a real UUID
@@ -40,6 +40,7 @@ Response::Response()
 }
 
 void Request::Clear() {
+  protocol = kHttp;
   method = L"GET";
   host.clear();
   path.clear();
@@ -62,6 +63,7 @@ Client::Client()
       current_length_(0),
       connection_handle_(nullptr),
       request_handle_(nullptr),
+      secure_transaction_(false),
       session_handle_(nullptr) {
   user_agent_ = L"Mozilla/5.0";
 }
