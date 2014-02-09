@@ -122,8 +122,8 @@ SemanticVersion::CompareResult SemanticVersion::Compare(
       }
     }
 
-    if (identifiers_. size() != identifiers. size())
-      return identifiers_. size() < identifiers. size() ?
+    if (identifiers_.size() != identifiers.size())
+      return identifiers_.size() < identifiers.size() ?
           kLessThan : kGreaterThan;
   }
 
