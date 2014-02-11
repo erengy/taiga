@@ -204,11 +204,3 @@
 #define IDC_TOOLBAR_TORRENT                     1157
 #define IDC_TREE_MAIN                           1158
 #define IDC_TREE_SECTIONS                       1159
-#define IDS_KEYWORD_AUDIO                       40000
-#define IDS_KEYWORD_EXTENSION                   40001
-#define IDS_KEYWORD_EXTRA                       40002
-#define IDS_KEYWORD_EXTRA_UNSAFE                40003
-#define IDS_KEYWORD_VERSION                     40004
-#define IDS_KEYWORD_VIDEO                       40005
-#define IDS_KEYWORD_EPISODE                     40006
-#define IDS_KEYWORD_EPISODE_PREFIX              40007
