@@ -26,6 +26,7 @@
 #include "library/anime_item.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
+#include "sync/manager.h"
 #include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/taiga.h"
@@ -55,14 +56,20 @@ bool SeasonDatabase::Load(std::wstring file) {
                                             L"modified").c_str());
 
   foreach_xmlnode_(node, season_node, L"anime") {
-    std::vector<std::wstring> ids;
-    XmlReadChildNodes(node, ids, L"id");
+    std::map<enum_t, std::wstring> id_map;
+
+    foreach_xmlnode_(id_node, node, L"id") {
+      std::wstring id = id_node.child_value();
+      std::wstring name = id_node.attribute(L"name").as_string();
+      enum_t service_id = ServiceManager.GetServiceIdByName(name);
+      id_map[service_id] = id;
+    }
 
     int anime_id = anime::ID_UNKNOWN;
     anime::Item* anime_item = nullptr;
 
-    for (int i = 0; i < ids.size(); ++i) {
-      anime_item = AnimeDatabase.FindItem(ids.at(i), i + 1);
+    foreach_(it, id_map) {
+      anime_item = AnimeDatabase.FindItem(it->second, it->first);
       if (anime_item)
         break;
     }
@@ -71,8 +78,8 @@ bool SeasonDatabase::Load(std::wstring file) {
       anime_id = anime_item->GetId();
     } else {
       anime::Item item;
-      for (size_t i = 0; i < ids.size(); i++)
-        item.SetId(ids.at(i), i + 1);
+      foreach_(it, id_map)
+        item.SetId(it->second, it->first);
       item.last_modified = modified;
       item.SetTitle(XmlReadStrValue(node, L"title"));
       item.SetType(XmlReadIntValue(node, L"type"));

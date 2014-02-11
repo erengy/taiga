@@ -54,15 +54,26 @@ bool Database::LoadDatabase() {
   xml_node database_node = document.child(L"database");
 
   foreach_xmlnode_(node, database_node, L"anime") {
-    std::vector<std::wstring> ids;
-    XmlReadChildNodes(node, ids, L"id");
+    std::map<enum_t, std::wstring> id_map;
 
-    Item& item = items[ToInt(ids.at(0))];  // Creates the item if it doesn't exist
+    foreach_xmlnode_(id_node, node, L"id") {
+      std::wstring id = id_node.child_value();
+      std::wstring name = id_node.attribute(L"name").as_string();
+      enum_t service_id = ServiceManager.GetServiceIdByName(name);
+      id_map[service_id] = id;
+    }
 
-    for (size_t i = 0; i < ids.size(); i++)
-      item.SetId(ids.at(i), i);
+    Item& item = items[ToInt(id_map[sync::kTaiga])];  // Creates the item if it doesn't exist
 
-    item.SetSource(XmlReadIntValue(node, L"source"));
+    foreach_(it, id_map)
+      item.SetId(it->second, it->first);
+
+    enum_t source = sync::kTaiga;
+    auto service = ServiceManager.service(XmlReadStrValue(node, L"source"));
+    if (service)
+      source = service->id();
+
+    item.SetSource(source);
     item.SetSlug(XmlReadStrValue(node, L"slug"));
 
     item.SetTitle(XmlReadStrValue(node, L"title"));
@@ -100,8 +111,18 @@ bool Database::SaveDatabase() {
   foreach_(it, items) {
     xml_node anime_node = database_node.append_child(L"anime");
 
-    for (int i = 0; i <= sync::kLastService; i++)
-      XmlWriteStrValue(anime_node, L"id", it->second.GetId(i).c_str());
+    for (int i = 0; i <= sync::kLastService; i++) {
+      std::wstring id = it->second.GetId(i);
+      if (!id.empty()) {
+        xml_node child = anime_node.append_child(L"id");
+        std::wstring name = ServiceManager.GetServiceNameById(static_cast<sync::ServiceId>(i));
+        child.append_attribute(L"name") = name.c_str();
+        child.append_child(pugi::node_pcdata).set_value(id.c_str());
+      }
+    }
+
+    std::wstring source = ServiceManager.GetServiceNameById(
+        static_cast<sync::ServiceId>(it->second.GetSource()));
 
     #define XML_WD(n, v) \
       if (v) XmlWriteStrValue(anime_node, n, std::wstring(v).c_str())
@@ -109,7 +130,7 @@ bool Database::SaveDatabase() {
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
       if (!v.empty()) XmlWriteStrValue(anime_node, n, v.c_str(), t)
-    XML_WI(L"source", it->second.GetSource());
+    XML_WS(L"source", source, pugi::node_pcdata);
     XML_WS(L"slug", it->second.GetSlug(), pugi::node_pcdata);
     XML_WS(L"title", it->second.GetTitle(), pugi::node_cdata);
     XML_WS(L"english", it->second.GetEnglishTitle(), pugi::node_cdata);

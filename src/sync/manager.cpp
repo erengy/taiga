@@ -58,6 +58,24 @@ const Service* Manager::service(const string_t& canonical_name) {
   return nullptr;
 }
 
+ServiceId Manager::GetServiceIdByName(const string_t& canonical_name) {
+  auto found_service = service(canonical_name);
+
+  if (found_service)
+    return static_cast<ServiceId>(found_service->id());
+
+  return kTaiga;
+}
+
+string_t Manager::GetServiceNameById(ServiceId service_id) {
+  auto found_service = service(service_id);
+
+  if (found_service)
+    return found_service->canonical_name();
+
+  return L"taiga";
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Manager::MakeRequest(Request& request) {

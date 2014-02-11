@@ -43,6 +43,9 @@ public:
   const Service* service(ServiceId service_id);
   const Service* service(const string_t& canonical_name);
 
+  ServiceId GetServiceIdByName(const string_t& canonical_name);
+  string_t GetServiceNameById(ServiceId service_id);
+
 private:
   void HandleError(Response& response, HttpResponse& http_response);
   void HandleResponse(Response& response, HttpResponse& http_response);
