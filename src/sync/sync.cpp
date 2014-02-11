@@ -68,7 +68,8 @@ void SearchTitle(string_t title) {
 
 void Synchronize() {
 #ifdef _DEBUG
-  Taiga.logged_in = true;
+  if (taiga::GetCurrentServiceId() != sync::kHummingbird)
+    Taiga.logged_in = true;
 #else
   // TODO: Remove after an authentication method is made available
   if (taiga::GetCurrentServiceId() == sync::kHerro)
@@ -178,6 +179,8 @@ bool AddServiceDataToRequest(Request& request, int id) {
       anime_item->GetId(kMyAnimeList);
   request.data[ServiceManager.service(kHerro)->canonical_name() + L"-id"] =
       anime_item->GetId(kHerro);
+  request.data[ServiceManager.service(kHummingbird)->canonical_name() + L"-id"] =
+      anime_item->GetId(kHummingbird);
 
   return true;
 }

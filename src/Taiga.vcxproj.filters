@@ -58,6 +58,9 @@
     <Filter Include="include\jsoncpp">
       <UniqueIdentifier>{6efb0ffb-ce73-47bd-bfbc-3480db16ac1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sync\hummingbird">
+      <UniqueIdentifier>{fc17319d-c4b2-43e2-a077-c3c74eeb7139}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
@@ -451,6 +454,12 @@
     <ClCompile Include="track\media.cpp">
       <Filter>track</Filter>
     </ClCompile>
+    <ClCompile Include="sync\hummingbird.cpp">
+      <Filter>sync\hummingbird</Filter>
+    </ClCompile>
+    <ClCompile Include="sync\hummingbird_util.cpp">
+      <Filter>sync\hummingbird</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -809,6 +818,15 @@
     </ClInclude>
     <ClInclude Include="taiga\timer.h">
       <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\hummingbird.h">
+      <Filter>sync\hummingbird</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\hummingbird_types.h">
+      <Filter>sync\hummingbird</Filter>
+    </ClInclude>
+    <ClInclude Include="sync\hummingbird_util.h">
+      <Filter>sync\hummingbird</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

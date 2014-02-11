@@ -123,6 +123,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sync\herro.cpp" />
     <ClCompile Include="sync\herro_util.cpp" />
+    <ClCompile Include="sync\hummingbird.cpp" />
+    <ClCompile Include="sync\hummingbird_util.cpp" />
     <ClCompile Include="sync\manager.cpp" />
     <ClCompile Include="sync\myanimelist.cpp" />
     <ClCompile Include="sync\myanimelist_util.cpp" />
@@ -259,6 +261,9 @@
     <ClInclude Include="sync\herro.h" />
     <ClInclude Include="sync\herro_types.h" />
     <ClInclude Include="sync\herro_util.h" />
+    <ClInclude Include="sync\hummingbird.h" />
+    <ClInclude Include="sync\hummingbird_types.h" />
+    <ClInclude Include="sync\hummingbird_util.h" />
     <ClInclude Include="sync\manager.h" />
     <ClInclude Include="sync\myanimelist.h" />
     <ClInclude Include="sync\myanimelist_types.h" />

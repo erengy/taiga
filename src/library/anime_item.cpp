@@ -25,6 +25,7 @@
 #include "library/anime_item.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/sync.h"
 #include "ui/ui.h"
 
 anime::Database* anime::Item::database_ = &AnimeDatabase;
@@ -34,7 +35,7 @@ namespace anime {
 Item::Item()
     : last_modified(0), 
       my_info_(nullptr) {
-  metadata_.uid.resize(3);  // FIXME: Magic number
+  metadata_.uid.resize(sync::kLastService + 1);
 }
 
 Item::~Item() {

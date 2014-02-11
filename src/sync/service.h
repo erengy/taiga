@@ -29,9 +29,12 @@
 namespace sync {
 
 enum ServiceId {
-  kAllServices,
-  kMyAnimeList,
-  kHerro
+  kAllServices = 0,
+  kTaiga = 0,
+  kMyAnimeList = 1,
+  kHerro = 2,
+  kHummingbird = 3,
+  kLastService = 3
 };
 
 enum RequestType {

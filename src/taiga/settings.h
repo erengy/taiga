@@ -48,6 +48,8 @@ enum AppSettingName {
   kSync_Service_Mal_Password,
   kSync_Service_Herro_Username,
   kSync_Service_Herro_ApiToken,
+  kSync_Service_Hummingbird_Username,
+  kSync_Service_Hummingbird_Password,
 
   // Library
   kLibrary_WatchFolders,

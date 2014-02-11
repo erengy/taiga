@@ -26,6 +26,7 @@
 #include "library/discover.h"
 #include "library/history.h"
 #include "sync/herro_util.h"
+#include "sync/hummingbird_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
@@ -106,6 +107,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kHerro:
         sync::herro::ViewAnimePage(anime_id);
         break;
+      case sync::kHummingbird:
+        sync::hummingbird::ViewAnimePage(anime_id);
+        break;
     }
 
   // ViewUpcomingAnime
@@ -117,6 +121,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         break;
       case sync::kHerro:
         sync::herro::ViewUpcomingAnime();
+        break;
+      case sync::kHummingbird:
+        sync::hummingbird::ViewUpcomingAnime();
         break;
     }
 
@@ -135,6 +142,13 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     sync::herro::ViewProfile();
   } else if (action == L"HerroViewDashboard") {
     sync::herro::ViewDashboard();
+
+  // HummingbirdViewProfile(), HummingbirdViewDashboard()
+  //   Opens up Hummingbird user pages.
+  } else if (action == L"HummingbirdViewProfile") {
+    sync::hummingbird::ViewProfile();
+  } else if (action == L"HummingbirdViewDashboard") {
+    sync::hummingbird::ViewDashboard();
 
   //////////////////////////////////////////////////////////////////////////////
 

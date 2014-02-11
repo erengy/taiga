@@ -100,7 +100,7 @@ bool Database::SaveDatabase() {
   foreach_(it, items) {
     xml_node anime_node = database_node.append_child(L"anime");
 
-    for (int i = 0; i <= sync::kHerro; i++)
+    for (int i = 0; i <= sync::kLastService; i++)
       XmlWriteStrValue(anime_node, L"id", it->second.GetId(i).c_str());
 
     #define XML_WD(n, v) \
