@@ -30,12 +30,10 @@ namespace ui {
 
 enum MainToolbarButtons {
   kToolbarButtonSync = 200,
-  kToolbarButtonMal = 201,
-  kToolbarButtonHerro = 202,
-  kToolbarButtonFolders = 204,
-  kToolbarButtonTools = 205,
-  kToolbarButtonSettings = 207,
-  kToolbarButtonDebug = 209
+  kToolbarButtonFolders = 202,
+  kToolbarButtonTools = 203,
+  kToolbarButtonSettings = 205,
+  kToolbarButtonDebug = 207
 };
 
 enum SearchMode {
