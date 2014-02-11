@@ -41,6 +41,8 @@ enum WebBrowserEngines {
   kWebEnginePresto    // Opera (older versions)
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
 base::AccessibleChild* FindAccessibleChild(
     std::vector<base::AccessibleChild>& children,
     const std::wstring& name,
@@ -60,8 +62,32 @@ base::AccessibleChild* FindAccessibleChild(
   return child;
 }
 
+bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
+    base::AccessibleChild& child,
+    LPARAM param) {
+  switch (param) {
+    case kWebEngineUnknown:
+      return false;
+    case kWebEngineGecko:
+      if (IsEqual(child.role, L"document"))
+        return false;
+      break;
+    case kWebEngineTrident:
+      if (IsEqual(child.role, L"pane") || IsEqual(child.role, L"scroll bar"))
+        return false;
+      break;
+    case kWebEnginePresto:
+      if (IsEqual(child.role, L"document") || IsEqual(child.role, L"pane"))
+        return false;
+      break;
+  }
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
-  int stream_provider = kStreamUnknown;
   int web_engine = kWebEngineUnknown;
 
   auto media_player = FindPlayer(current_player());
@@ -191,32 +217,46 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
       break;
   }
 
-  // Check URL for known streaming video providers
   if (child) {
+    title = GetTitleFromStreamingMediaProvider(child->value, title);
+  } else {
+    title.clear();
+  }
+
+  return title;
+}
+
+std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
+    const std::wstring& url,
+    std::wstring& title) {
+  int stream_provider = kStreamUnknown;
+
+  // Check URL for known streaming video providers
+  if (!url.empty()) {
     // Anime News Network
     if (Settings.GetBool(taiga::kStream_Ann) &&
-        InStr(child->value, L"animenewsnetwork.com/video") > -1) {
+        InStr(url, L"animenewsnetwork.com/video") > -1) {
       stream_provider = kStreamAnn;
     // Crunchyroll
     } else if (Settings.GetBool(taiga::kStream_Crunchyroll) &&
-               InStr(child->value, L"crunchyroll.com/") > -1) {
+               InStr(url, L"crunchyroll.com/") > -1) {
        stream_provider = kStreamCrunchyroll;
     // Hulu
     /*
-    } else if (InStr(child->value, L"hulu.com/watch") > -1) {
+    } else if (InStr(url, L"hulu.com/watch") > -1) {
       stream_provider = kStreamHulu;
     */
     // Veoh
     } else if (Settings.GetBool(taiga::kStream_Veoh) &&
-               InStr(child->value, L"veoh.com/watch") > -1) {
+               InStr(url, L"veoh.com/watch") > -1) {
       stream_provider = kStreamVeoh;
     // Viz Anime
     } else if (Settings.GetBool(taiga::kStream_Viz) &&
-               InStr(child->value, L"vizanime.com/ep") > -1) {
+               InStr(url, L"vizanime.com/ep") > -1) {
       stream_provider = kStreamVizanime;
     // YouTube
     } else if (Settings.GetBool(taiga::kStream_Youtube) &&
-               InStr(child->value, L"youtube.com/watch") > -1) {
+               InStr(url, L"youtube.com/watch") > -1) {
       stream_provider = kStreamYoutube;
     }
   }
@@ -253,33 +293,11 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
       EraseRight(title, L" - YouTube");
       break;
     // Some other website, or URL is not found
+    default:
     case kStreamUnknown:
       title.clear();
       break;
   }
 
   return title;
-}
-
-bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
-    base::AccessibleChild& child,
-    LPARAM param) {
-  switch (param) {
-    case kWebEngineUnknown:
-      return false;
-    case kWebEngineGecko:
-      if (IsEqual(child.role, L"document"))
-        return false;
-      break;
-    case kWebEngineTrident:
-      if (IsEqual(child.role, L"pane") || IsEqual(child.role, L"scroll bar"))
-        return false;
-      break;
-    case kWebEnginePresto:
-      if (IsEqual(child.role, L"document") || IsEqual(child.role, L"pane"))
-        return false;
-      break;
-  }
-
-  return true;
 }

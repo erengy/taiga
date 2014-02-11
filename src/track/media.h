@@ -84,6 +84,7 @@ public:
   std::wstring GetTitleFromSpecialMessage(HWND hwnd, const std::wstring& class_name);
   std::wstring GetTitleFromMPlayer();
   std::wstring GetTitleFromBrowser(HWND hwnd);
+  std::wstring GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 
 public:
   std::vector<MediaPlayer> items;
