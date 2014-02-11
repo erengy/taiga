@@ -49,9 +49,6 @@
     <Filter Include="sync\myanimelist">
       <UniqueIdentifier>{496cb38d-e9ef-4695-845c-2264442a9835}</UniqueIdentifier>
     </Filter>
-    <Filter Include="sync\herro">
-      <UniqueIdentifier>{a6128b60-172a-4c28-89ce-4d6a193462c4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="library\anime">
       <UniqueIdentifier>{34871dd8-76ae-4f8d-96d7-75b13d067a56}</UniqueIdentifier>
     </Filter>
@@ -370,9 +367,6 @@
     <ClCompile Include="sync\myanimelist_util.cpp">
       <Filter>sync\myanimelist</Filter>
     </ClCompile>
-    <ClCompile Include="sync\herro.cpp">
-      <Filter>sync\herro</Filter>
-    </ClCompile>
     <ClCompile Include="library\metadata.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -432,9 +426,6 @@
     </ClCompile>
     <ClCompile Include="third_party\jsoncpp\json_writer.cpp">
       <Filter>include\jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="sync\herro_util.cpp">
-      <Filter>sync\herro</Filter>
     </ClCompile>
     <ClCompile Include="base\json.cpp">
       <Filter>base</Filter>
@@ -717,12 +708,6 @@
     <ClInclude Include="sync\myanimelist_types.h">
       <Filter>sync\myanimelist</Filter>
     </ClInclude>
-    <ClInclude Include="sync\herro.h">
-      <Filter>sync\herro</Filter>
-    </ClInclude>
-    <ClInclude Include="sync\herro_types.h">
-      <Filter>sync\herro</Filter>
-    </ClInclude>
     <ClInclude Include="library\metadata.h">
       <Filter>library</Filter>
     </ClInclude>
@@ -806,9 +791,6 @@
     </ClInclude>
     <ClInclude Include="base\json.h">
       <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="sync\herro_util.h">
-      <Filter>sync\herro</Filter>
     </ClInclude>
     <ClInclude Include="base\version.h">
       <Filter>base</Filter>

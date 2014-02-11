@@ -175,8 +175,6 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_AutoOnStart, nullptr, L"account/myanimelist/login");
   INITKEY(kSync_Service_Mal_Username, nullptr, L"account/myanimelist/username");
   INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
-  INITKEY(kSync_Service_Herro_Username, nullptr, L"account/herro/username");
-  INITKEY(kSync_Service_Herro_ApiToken, nullptr, L"account/herro/apitoken");
   INITKEY(kSync_Service_Hummingbird_Username, nullptr, L"account/hummingbird/username");
   INITKEY(kSync_Service_Hummingbird_Password, nullptr, L"account/hummingbird/password");
 
@@ -560,8 +558,6 @@ const std::wstring GetCurrentUsername() {
 
   if (service->id() == sync::kMyAnimeList) {
     username = Settings[kSync_Service_Mal_Username];
-  } else if (service->id() == sync::kHerro) {
-    username = Settings[kSync_Service_Herro_Username];
   } else if (service->id() == sync::kHummingbird) {
     username = Settings[kSync_Service_Hummingbird_Username];
   }
@@ -575,8 +571,6 @@ const std::wstring GetCurrentPassword() {
 
   if (service->id() == sync::kMyAnimeList) {
     password = SimpleDecrypt(Settings[kSync_Service_Mal_Password]);
-  } else if (service->id() == sync::kHerro) {
-    password = Settings[kSync_Service_Herro_ApiToken];
   } else if (service->id() == sync::kHummingbird) {
     password = SimpleDecrypt(Settings[kSync_Service_Hummingbird_Password]);
   }

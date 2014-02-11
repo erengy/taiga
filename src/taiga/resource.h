@@ -31,7 +31,7 @@
 #define IDD_SETTINGS_RECOGNITION_STREAM         135
 #define IDD_SETTINGS_SERVICES_MAIN              136
 #define IDD_SETTINGS_SERVICES_MAL               137
-#define IDD_SETTINGS_SERVICES_HERRO             138
+#define IDD_SETTINGS_SERVICES_HUMMINGBIRD       138
 #define IDD_SETTINGS_SHARING_HTTP               139
 #define IDD_SETTINGS_SHARING_MESSENGER          140
 #define IDD_SETTINGS_SHARING_MIRC               141
@@ -126,7 +126,7 @@
 #define IDC_EDIT_INPUT                          1079
 #define IDC_EDIT_MIRC_CHANNELS                  1080
 #define IDC_EDIT_MIRC_SERVICE                   1081
-#define IDC_EDIT_PASS_HERRO                     1082
+#define IDC_EDIT_PASS_HUMMINGBIRD               1082
 #define IDC_EDIT_PASS_MAL                       1083
 #define IDC_EDIT_PREVIEW                        1084
 #define IDC_EDIT_PROXY_HOST                     1085
@@ -135,9 +135,9 @@
 #define IDC_EDIT_SEARCH                         1088
 #define IDC_EDIT_TORRENT_APP                    1089
 #define IDC_EDIT_TORRENT_INTERVAL               1090
-#define IDC_EDIT_USER_HERRO                     1091
+#define IDC_EDIT_USER_HUMMINGBIRD               1091
 #define IDC_EDIT_USER_MAL                       1092
-#define IDC_LINK_ACCOUNT_HERRO                  1093
+#define IDC_LINK_ACCOUNT_HUMMINGBIRD            1093
 #define IDC_LINK_ACCOUNT_MAL                    1094
 #define IDC_LINK_ANIME_FANSUB                   1095
 #define IDC_LINK_DEFAULTS                       1096

@@ -70,10 +70,6 @@ void Synchronize() {
 #ifdef _DEBUG
   if (taiga::GetCurrentServiceId() != sync::kHummingbird)
     Taiga.logged_in = true;
-#else
-  // TODO: Remove after an authentication method is made available
-  if (taiga::GetCurrentServiceId() == sync::kHerro)
-    Taiga.logged_in = true;
 #endif
 
   if (!Taiga.logged_in) {
@@ -177,8 +173,6 @@ bool AddServiceDataToRequest(Request& request, int id) {
 
   request.data[ServiceManager.service(kMyAnimeList)->canonical_name() + L"-id"] =
       anime_item->GetId(kMyAnimeList);
-  request.data[ServiceManager.service(kHerro)->canonical_name() + L"-id"] =
-      anime_item->GetId(kHerro);
   request.data[ServiceManager.service(kHummingbird)->canonical_name() + L"-id"] =
       anime_item->GetId(kHummingbird);
 

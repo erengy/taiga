@@ -22,25 +22,19 @@
 	<menu name="Services">
 		<item name="Synchronize list" action="Synchronize()"/>
 		<item type="separator"/>
-		<item name="MyAnimeList" sub="MyAnimeList"/>
-		<item name="Herro" sub="Herro"/>
 		<item name="Hummingbird" sub="Hummingbird"/>
+		<item name="MyAnimeList" sub="MyAnimeList"/>
+	</menu>
+	<!-- Hummingbird -->
+	<menu name="Hummingbird">
+		<item name="Go to my profile"   action="HummingbirdViewProfile()"/>
+		<item name="Go to my dashboard" action="HummingbirdViewDashboard()"/>
 	</menu>
 	<!-- MyAnimeList -->
 	<menu name="MyAnimeList">
 		<item name="Go to my panel" 	action="MalViewPanel()"/>
 		<item name="Go to my profile" action="MalViewProfile()"/>
 		<item name="Go to my history" action="MalViewHistory()"/>
-	</menu>
-	<!-- Herro -->
-	<menu name="Herro">
-		<item name="Go to my profile"   action="HerroViewProfile()"/>
-		<item name="Go to my dashboard" action="HerroViewDashboard()"/>
-	</menu>
-	<!-- Hummingbird -->
-	<menu name="Hummingbird">
-		<item name="Go to my profile"   action="HummingbirdViewProfile()"/>
-		<item name="Go to my dashboard" action="HummingbirdViewDashboard()"/>
 	</menu>
 	<!-- Share -->
 	<menu name="Announce">

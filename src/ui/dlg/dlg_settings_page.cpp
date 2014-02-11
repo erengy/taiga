@@ -62,7 +62,7 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageRecognitionStream, IDD_SETTINGS_RECOGNITION_STREAM);
     SETRESOURCEID(kSettingsPageServicesMain, IDD_SETTINGS_SERVICES_MAIN);
     SETRESOURCEID(kSettingsPageServicesMal, IDD_SETTINGS_SERVICES_MAL);
-    SETRESOURCEID(kSettingsPageServicesHerro, IDD_SETTINGS_SERVICES_HERRO);
+    SETRESOURCEID(kSettingsPageServicesHummingbird, IDD_SETTINGS_SERVICES_HUMMINGBIRD);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(kSettingsPageSharingMessenger, IDD_SETTINGS_SHARING_MESSENGER);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
@@ -86,7 +86,7 @@ BOOL SettingsPage::OnInitDialog() {
     // Services > Main
     case kSettingsPageServicesMain: {
       AddComboString(IDC_COMBO_SERVICE, L"MyAnimeList");
-      AddComboString(IDC_COMBO_SERVICE, L"Herro");
+      AddComboString(IDC_COMBO_SERVICE, L"Hummingbird");
       SetComboSelection(IDC_COMBO_SERVICE, ServiceManager.service(Settings[taiga::kSync_ActiveService])->id() - 1);
       CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.GetBool(taiga::kSync_AutoOnStart));
       break;
@@ -97,10 +97,10 @@ BOOL SettingsPage::OnInitDialog() {
       SetDlgItemText(IDC_EDIT_PASS_MAL, SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]).c_str());
       break;
     }
-    // Services > Herro
-    case kSettingsPageServicesHerro: {
-      SetDlgItemText(IDC_EDIT_USER_HERRO, Settings[taiga::kSync_Service_Herro_Username].c_str());
-      SetDlgItemText(IDC_EDIT_PASS_HERRO, Settings[taiga::kSync_Service_Herro_ApiToken].c_str());
+    // Services > Hummingbird
+    case kSettingsPageServicesHummingbird: {
+      SetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD, Settings[taiga::kSync_Service_Hummingbird_Username].c_str());
+      SetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD, SimpleDecrypt(Settings[taiga::kSync_Service_Hummingbird_Password]).c_str());
       break;
     }
 
@@ -659,7 +659,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case NM_CLICK: {
       switch (pnmh->idFrom) {
         // Execute link
-        case IDC_LINK_ACCOUNT_HERRO:
+        case IDC_LINK_ACCOUNT_HUMMINGBIRD:
         case IDC_LINK_ACCOUNT_MAL:
         case IDC_LINK_TWITTER: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);

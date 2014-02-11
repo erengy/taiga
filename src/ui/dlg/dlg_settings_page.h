@@ -33,7 +33,7 @@ enum SettingsPages {
   kSettingsPageRecognitionGeneral,
   kSettingsPageRecognitionMedia,
   kSettingsPageRecognitionStream,
-  kSettingsPageServicesHerro,
+  kSettingsPageServicesHummingbird,
   kSettingsPageServicesMain,
   kSettingsPageServicesMal,
   kSettingsPageSharingHttp,

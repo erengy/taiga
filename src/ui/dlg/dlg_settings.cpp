@@ -69,7 +69,7 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
     case kSettingsSectionServices:
       tab_.InsertItem(0, L"Main", kSettingsPageServicesMain);
       tab_.InsertItem(1, L"MyAnimeList", kSettingsPageServicesMal);
-      tab_.InsertItem(2, L"Herro", kSettingsPageServicesHerro);
+      tab_.InsertItem(2, L"Hummingbird", kSettingsPageServicesHummingbird);
       break;
     case kSettingsSectionLibrary:
       tab_.InsertItem(0, L"Folders", kSettingsPageLibraryFolders);
@@ -176,11 +176,11 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kSync_Service_Mal_Username, page->GetDlgItemText(IDC_EDIT_USER_MAL));
     Settings.Set(taiga::kSync_Service_Mal_Password, SimpleEncrypt(page->GetDlgItemText(IDC_EDIT_PASS_MAL)));
   }
-  // Services > Herro
-  page = &pages[kSettingsPageServicesHerro];
+  // Services > Hummingbird
+  page = &pages[kSettingsPageServicesHummingbird];
   if (page->IsWindow()) {
-    Settings.Set(taiga::kSync_Service_Herro_Username, page->GetDlgItemText(IDC_EDIT_USER_HERRO));
-    Settings.Set(taiga::kSync_Service_Herro_ApiToken, page->GetDlgItemText(IDC_EDIT_PASS_HERRO));
+    Settings.Set(taiga::kSync_Service_Hummingbird_Username, page->GetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD));
+    Settings.Set(taiga::kSync_Service_Hummingbird_Password, SimpleEncrypt(page->GetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD)));
   }
 
   // Library > Folders

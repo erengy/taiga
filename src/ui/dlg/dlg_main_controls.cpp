@@ -187,14 +187,6 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     case kToolbarButtonSync:
       sync::Synchronize();
       return TRUE;
-    // MyAnimeList
-    case kToolbarButtonMal:
-      ExecuteAction(L"MalViewPanel");
-      return TRUE;
-    // Herro
-    case kToolbarButtonHerro:
-      ExecuteAction(L"HerroViewProfile");
-      return TRUE;
     // Settings
     case kToolbarButtonSettings:
       ShowDialog(ui::kDialogSettings);
