@@ -119,8 +119,11 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
   // Compare with titles
   if (clean_titles[anime_item.GetId()].empty())
     UpdateCleanTitles(anime_item.GetId());
-  foreach_(it, clean_titles[anime_item.GetId()])
+  foreach_(it, clean_titles[anime_item.GetId()]) {
     found = CompareTitle(*it, episode, anime_item, strict);
+    if (found)
+      break;
+  }
 
   if (!found) {
     // Score title in case we need it later on
@@ -420,6 +423,7 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
     // Set the title
     title = tokens[title_index].content;
     tokens[title_index].content.clear();
+    tokens[title_index].untouched = false;
   }
 
   // Do we have a group name?
@@ -521,7 +525,7 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
   
       // Build title and name
       for (int i = 0; i < static_cast<int>(words.size()); i++) {
-        if (i < number_index) {
+        if (number_index == -1 || i < number_index) {
           // Ignore episode keywords
           if (i == number_index - 1 && CompareKeys(words[i], episode_keywords))
             continue;
@@ -602,7 +606,8 @@ void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode,
   // Compare with keywords
   foreach_(word, words) {
     Trim(*word);
-    if (word->empty()) continue;
+    if (word->empty())
+      continue;
     #define RemoveWordFromToken(b) { \
       Erase(token.content, *word, b); token.untouched = false; }
     
