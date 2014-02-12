@@ -167,6 +167,10 @@ void ViewProfile() {
               Settings[taiga::kSync_Service_Hummingbird_Username]);
 }
 
+void ViewRecommendations() {
+  ExecuteLink(L"http://hummingbird.me/recommendations");
+}
+
 void ViewUpcomingAnime() {
   ExecuteLink(L"http://hummingbird.me/anime/upcoming");
 }

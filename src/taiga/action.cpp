@@ -120,7 +120,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         break;
     }
 
-  // MalViewPanel(), MalViewProfile(), MalViewHistory()
+  // MalViewPanel()
+  // MalViewProfile()
+  // MalViewHistory()
   //   Opens up MyAnimeList user pages.
   } else if (action == L"MalViewPanel") {
     sync::myanimelist::ViewPanel();
@@ -129,12 +131,16 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"MalViewHistory") {
     sync::myanimelist::ViewHistory();
 
-  // HummingbirdViewProfile(), HummingbirdViewDashboard()
+  // HummingbirdViewProfile()
+  // HummingbirdViewDashboard()
+  // HummingbirdViewRecommendations()
   //   Opens up Hummingbird user pages.
   } else if (action == L"HummingbirdViewProfile") {
     sync::hummingbird::ViewProfile();
   } else if (action == L"HummingbirdViewDashboard") {
     sync::hummingbird::ViewDashboard();
+  } else if (action == L"HummingbirdViewRecommendations") {
+    sync::hummingbird::ViewRecommendations();
 
   //////////////////////////////////////////////////////////////////////////////
 

@@ -27,8 +27,9 @@
 	</menu>
 	<!-- Hummingbird -->
 	<menu name="Hummingbird">
-		<item name="Go to my profile"   action="HummingbirdViewProfile()"/>
-		<item name="Go to my dashboard" action="HummingbirdViewDashboard()"/>
+		<item name="Go to my dashboard"       action="HummingbirdViewDashboard()"/>
+		<item name="Go to my profile"         action="HummingbirdViewProfile()"/>
+		<item name="Go to my recommendations" action="HummingbirdViewRecommendations()"/>
 	</menu>
 	<!-- MyAnimeList -->
 	<menu name="MyAnimeList">

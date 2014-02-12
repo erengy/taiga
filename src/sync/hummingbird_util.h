@@ -38,6 +38,7 @@ std::wstring TranslateKeyTo(const std::wstring& key);
 void ViewAnimePage(int anime_id);
 void ViewDashboard();
 void ViewProfile();
+void ViewRecommendations();
 void ViewUpcomingAnime();
 
 }  // namespace hummingbird
