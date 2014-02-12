@@ -658,4 +658,17 @@
 		<number>01</number>
 		<title>Ro-Kyu-Bu! SS</title>
 	</file>
+	<file>
+		<file>[Raizel] Persona 4 The Animation Episode 13 - A Stormy Summer Vacation Part 1  [BD_1080p_Dual_Audio_FLAC_Hi10p][8A45634B].mkv</file>
+		<audio>FLAC</audio>
+		<checksum>8A45634B</checksum>
+		<extra>BD</extra>
+		<format>MKV</format>
+		<group>Raizel</group>
+		<name>A Stormy Summer Vacation Part 1</name>
+		<number>13</number>
+		<resolution>1080p</resolution>
+		<title>Persona 4 The Animation</title>
+		<video>Hi10p</video>
+	</file>
 </recognition>
