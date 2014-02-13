@@ -25,7 +25,7 @@ Timer::Timer(unsigned int id, int interval, bool repeat)
       id_(id),
       interval_(interval),
       repeat_(repeat),
-      ticks_(0) {
+      ticks_(interval) {
 }
 
 bool Timer::enabled() const {
