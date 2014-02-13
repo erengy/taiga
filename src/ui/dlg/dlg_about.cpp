@@ -113,7 +113,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"- zlib version 1.2.8, Copyright (c) 1995-2013, Jean-loup Gailly and Mark Adler\\line\\line "
       L"\\b Links:\\b0\\line "
       L"- Home page {\\field{\\*\\fldinst HYPERLINK \"http://taiga.erengy.com\"}{\\fldrslt http://taiga.erengy.com}}\\line "
-      L"- Google Code {\\field{\\*\\fldinst HYPERLINK \"http://code.google.com/p/taiga/\"}{\\fldrslt http://code.google.com/p/taiga/}}\\line "
+      L"- GitHub repository {\\field{\\*\\fldinst HYPERLINK \"https://github.com/erengy/taiga\"}{\\fldrslt https://github.com/erengy/taiga}}\\line "
       L"- MyAnimeList club {\\field{\\*\\fldinst HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}{\\fldrslt http://myanimelist.net/clubs.php?cid=21400}}\\line "
       L"- IRC channel {\\field{\\*\\fldinst HYPERLINK \"irc://irc.rizon.net/taiga\"}{\\fldrslt irc://irc.rizon.net/taiga}}"
       L"}";
