@@ -45,9 +45,9 @@ taiga::AppSettings Settings;
 namespace taiga {
 
 const std::wstring kDefaultExternalLinks =
-    L"Anime Recommendation Finder|http://www.animerecs.com\r\n"
-    L"MALgraph|http://mal.oko.im\r\n-\r\n"
-    L"Anime Season Discussion Group|http://myanimelist.net/clubs.php?cid=743\r\n"
+    L"Hummingboard|http://hummingboard.me\r\n"
+    L"MALgraph|http://mal.oko.im\r\n"
+    L"-\r\n"
     L"Mahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\n"
     L"The Fansub Wiki|http://www.fansubwiki.com";
 const std::wstring kDefaultFormatHttp =
