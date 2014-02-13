@@ -18,6 +18,8 @@
 
 #include "base/common.h"
 #include "base/foreach.h"
+#include "base/logger.h"
+#include "base/string.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -51,6 +53,9 @@ Timer::Timer(unsigned int id, int interval, bool repeat)
 }
 
 void Timer::OnTimeout() {
+  LOG(LevelDebug, L"ID: " + ToWstr(static_cast<int>(id())) + L", "
+                  L"Interval: " + ToWstr(static_cast<int>(this->interval())));
+
   switch (id()) {
     case kTimerHistory:
       if (!History.queue.updating)
