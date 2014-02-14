@@ -189,6 +189,7 @@
     <ClCompile Include="ui\dlg\dlg_test_recognition.cpp" />
     <ClCompile Include="ui\dlg\dlg_torrent.cpp" />
     <ClCompile Include="ui\dlg\dlg_update.cpp" />
+    <ClCompile Include="ui\dlg\dlg_update_new.cpp" />
     <ClCompile Include="ui\list.cpp" />
     <ClCompile Include="ui\menu.cpp" />
     <ClCompile Include="ui\theme.cpp" />
@@ -327,6 +328,7 @@
     <ClInclude Include="ui\dlg\dlg_test_recognition.h" />
     <ClInclude Include="ui\dlg\dlg_torrent.h" />
     <ClInclude Include="ui\dlg\dlg_update.h" />
+    <ClInclude Include="ui\dlg\dlg_update_new.h" />
     <ClInclude Include="ui\list.h" />
     <ClInclude Include="ui\menu.h" />
     <ClInclude Include="ui\theme.h" />

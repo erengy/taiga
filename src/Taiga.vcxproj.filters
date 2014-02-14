@@ -451,6 +451,9 @@
     <ClCompile Include="sync\hummingbird_util.cpp">
       <Filter>sync\hummingbird</Filter>
     </ClCompile>
+    <ClCompile Include="ui\dlg\dlg_update_new.cpp">
+      <Filter>ui\dlg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third_party\pugixml\pugixml.hpp">
@@ -809,6 +812,9 @@
     </ClInclude>
     <ClInclude Include="sync\hummingbird_util.h">
       <Filter>sync\hummingbird</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\dlg\dlg_update_new.h">
+      <Filter>ui\dlg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

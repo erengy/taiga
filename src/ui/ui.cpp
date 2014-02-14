@@ -42,6 +42,7 @@
 #include "ui/dlg/dlg_stats.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
+#include "ui/dlg/dlg_update_new.h"
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
@@ -726,16 +727,8 @@ void OnLogout() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool OnUpdateAvailable() {
-  win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-  std::wstring footer = L"Current version: " + std::wstring(Taiga.version);
-  dlg.SetFooter(footer.c_str());
-  dlg.SetMainInstruction(L"A new version of Taiga is available!");
-  dlg.AddButton(L"Download", IDYES);
-  dlg.AddButton(L"Cancel", IDNO);
-  dlg.Show(DlgUpdate.GetWindowHandle());
-
-  return dlg.GetSelectedButtonID() == IDYES;
+void OnUpdateAvailable() {
+  DlgUpdateNew.Create(IDD_UPDATE_NEW, DlgUpdate.GetWindowHandle(), true);
 }
 
 void OnUpdateNotAvailable() {
@@ -745,7 +738,7 @@ void OnUpdateNotAvailable() {
     dlg.SetFooter(footer.c_str());
     dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
     dlg.AddButton(L"OK", IDOK);
-    dlg.Show(DlgMain.GetWindowHandle());
+    dlg.Show(DlgUpdate.GetWindowHandle());
   }
 }
 

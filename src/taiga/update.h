@@ -41,10 +41,11 @@ public:
   bool RunInstaller();
   void SetDownloadPath(const std::wstring& path);
 
+  std::vector<GenericFeedItem> items;
+
 private:
   const GenericFeedItem* FindItem(const std::wstring& guid) const;
 
-  std::vector<GenericFeedItem> items_;
   std::wstring download_path_;
   std::wstring latest_guid_;
   bool restart_required_;

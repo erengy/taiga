@@ -56,7 +56,7 @@ bool UpdateHelper::Check() {
 }
 
 bool UpdateHelper::ParseData(std::wstring data) {
-  items_.clear();
+  items.clear();
   download_path_.clear();
   latest_guid_.clear();
   restart_required_ = false;
@@ -70,17 +70,17 @@ bool UpdateHelper::ParseData(std::wstring data) {
 
   xml_node channel = document.child(L"rss").child(L"channel");
   foreach_xmlnode_(item, channel, L"item") {
-    items_.resize(items_.size() + 1);
-    items_.back().guid = XmlReadStrValue(item, L"guid");
-    items_.back().category = XmlReadStrValue(item, L"category");
-    items_.back().link = XmlReadStrValue(item, L"link");
-    items_.back().description = XmlReadStrValue(item, L"description");
-    items_.back().pub_date = XmlReadStrValue(item, L"pubDate");
+    items.resize(items.size() + 1);
+    items.back().guid = XmlReadStrValue(item, L"guid");
+    items.back().category = XmlReadStrValue(item, L"category");
+    items.back().link = XmlReadStrValue(item, L"link");
+    items.back().description = XmlReadStrValue(item, L"description");
+    items.back().pub_date = XmlReadStrValue(item, L"pubDate");
   }
 
-  base::SemanticVersion current_version = Taiga.version;
-  base::SemanticVersion latest_version = current_version;
-  foreach_(item, items_) {
+  auto current_version = Taiga.version;
+  auto latest_version = current_version;
+  foreach_(item, items) {
     base::SemanticVersion item_version(item->guid);
     if (item_version > latest_version) {
       latest_guid_ = item->guid;
@@ -88,7 +88,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
     }
   }
 
-  if (latest_version > current_version)
+  //if (latest_version > current_version)
     update_available_ = true;
 
   return true;
@@ -104,19 +104,12 @@ bool UpdateHelper::IsUpdateAvailable() const {
 
 bool UpdateHelper::IsDownloadAllowed() const {
   if (IsUpdateAvailable()) {
-    auto feed_item = FindItem(latest_guid_);
-    if (!feed_item)
-      return false;
-
-    if (!ui::OnUpdateAvailable())
-      return false;
-
+    ui::OnUpdateAvailable();
+    return true;
   } else {
     ui::OnUpdateNotAvailable();
     return false;
   }
-
-  return true;
 }
 
 bool UpdateHelper::Download() {
@@ -162,7 +155,7 @@ void UpdateHelper::SetDownloadPath(const std::wstring& path) {
 }
 
 const GenericFeedItem* UpdateHelper::FindItem(const std::wstring& guid) const {
-  foreach_(item, items_)
+  foreach_(item, items)
     if (IsEqual(item->guid, latest_guid_))
       return &(*item);
 

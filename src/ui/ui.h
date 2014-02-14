@@ -91,7 +91,7 @@ void OnTwitterPost(bool success, const string_t& error);
 void OnLogin();
 void OnLogout();
 
-bool OnUpdateAvailable();
+void OnUpdateAvailable();
 void OnUpdateNotAvailable();
 void OnUpdateFinished();
 

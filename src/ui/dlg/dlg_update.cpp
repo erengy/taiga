@@ -22,6 +22,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_update.h"
 #include "ui/dialog.h"
+#include "ui/theme.h"
 
 namespace ui {
 
@@ -35,6 +36,9 @@ BOOL UpdateDialog::OnInitDialog() {
   // Set icon
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
+
+  // Create default fonts
+  Theme.CreateFonts(GetDC());
 
   // Set title
   SetText(TAIGA_APP_TITLE);

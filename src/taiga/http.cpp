@@ -299,8 +299,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     case kHttpTaigaUpdateCheck:
       if (Taiga.Updater.ParseData(response.body))
         if (Taiga.Updater.IsDownloadAllowed())
-          if (Taiga.Updater.Download())
-            break;
+          break;
       ui::OnUpdateFinished();
       break;
     case kHttpTaigaUpdateDownload:
