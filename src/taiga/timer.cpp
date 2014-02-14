@@ -77,6 +77,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerMemory:
+      ConnectionManager.FreeMemory();
       ImageDatabase.FreeMemory();
       break;
 

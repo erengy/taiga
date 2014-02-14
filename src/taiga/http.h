@@ -82,6 +82,8 @@ public:
   void HandleError(HttpResponse& response, const string_t& error);
   void HandleResponse(HttpResponse& response);
 
+  void FreeMemory();
+
 private:
   std::map<std::wstring, HttpClient> clients_;
 };

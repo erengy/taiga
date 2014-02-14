@@ -310,4 +310,16 @@ void HttpManager::HandleResponse(HttpResponse& response) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void HttpManager::FreeMemory() {
+  for (auto it = clients_.cbegin(); it != clients_.cend(); ) {
+    if (it->second.response().code > 0) {
+      clients_.erase(it++);
+    } else {
+      ++it;
+    }
+  }
+}
+
 }  // namespace taiga
