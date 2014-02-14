@@ -310,7 +310,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     AUTOCHECKBOX    "Start automatically with Windows", IDC_CHECK_AUTOSTART, 12, 18, 118, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Start minimized", IDC_CHECK_START_MINIMIZE, 12, 30, 85, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Check for updates for Taiga", IDC_CHECK_START_VERSION, 12, 42, 110, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Scan available episodes", IDC_CHECK_START_CHECKEPS, 12, 54, 95, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Scan available episodes on my computer", IDC_CHECK_START_CHECKEPS, 12, 54, 155, 10, 0, WS_EX_LEFT
     GROUPBOX        "System tray use", IDC_STATIC, 7, 78, 301, 40, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Close to tray", IDC_CHECK_GENERAL_CLOSE, 12, 89, 70, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Minimize to tray", IDC_CHECK_GENERAL_MINIMIZE, 12, 101, 85, 10, 0, WS_EX_LEFT
