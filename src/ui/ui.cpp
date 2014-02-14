@@ -270,6 +270,11 @@ void OnLibrarySearchTitle(const string_t& results) {
   DlgSearch.ParseResults(ids);
 }
 
+void OnLibraryEntryChangeFailure(int id, const string_t& reason) {
+  if (DlgAnime.GetCurrentId() == id)
+    DlgAnime.UpdateTitle(false);
+}
+
 void OnLibraryUpdateFailure(int id, const string_t& reason) {
   auto anime_item = AnimeDatabase.FindItem(id);
 

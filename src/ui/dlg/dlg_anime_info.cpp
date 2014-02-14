@@ -722,4 +722,12 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   page_my_info.SetPosition(nullptr, rect_page);
 }
 
+void AnimeDialog::UpdateTitle(bool refreshing) {
+  if (refreshing) {
+    SetText(L"Anime Information (Refreshing...)");
+  } else {
+    SetText(L"Anime Information");
+  }
+}
+
 }  // namespace ui

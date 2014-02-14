@@ -145,6 +145,9 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   anime_id_ = anime_id;
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
+  // Update window title
+  parent->UpdateTitle(false);
+
   // Set synonyms
   std::wstring text = Join(anime_item->GetSynonyms(), L", ");
   if (text.empty())
@@ -169,8 +172,10 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, text.c_str());
 
   // Get new data if necessary
-  if (connect && anime::MetadataNeedsRefresh(*anime_item))
+  if (connect && anime::MetadataNeedsRefresh(*anime_item)) {
+    parent->UpdateTitle(true);
     sync::GetMetadataById(anime_id_);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
