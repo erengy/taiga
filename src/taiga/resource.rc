@@ -42,7 +42,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     CONTROL         "", IDC_STATIC_ANIME_IMG, WC_STATIC, SS_OWNERDRAW | SS_NOTIFY, 7, 7, 95, 120, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_ANIME_TITLE, 105, 4, 360, 15, NOT WS_BORDER | NOT WS_TABSTOP | ES_AUTOHSCROLL | ES_READONLY, WS_EX_LEFT
     CONTROL         "", IDC_TAB_ANIME, WC_TABCONTROL, 0, 106, 26, 360, 250, WS_EX_LEFT
-    CONTROL         "", IDC_LINK_NOWPLAYING, "SysLink", 0x50010000, 7, 163, 95, 140, 0x00000000
+    CONTROL         "", IDC_LINK_NOWPLAYING, "SysLink", 0x50010004, 7, 163, 95, 140, 0x00000000
     DEFPUSHBUTTON   "OK", IDOK, 369, 289, 50, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "Cancel", IDCANCEL, 423, 289, 50, 14, 0, WS_EX_LEFT
 }
@@ -94,7 +94,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     LTEXT           "Folder:", IDC_STATIC, 7, 194, 85, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_ANIME_FOLDER, 7, 204, 322, 14, ES_AUTOHSCROLL, WS_EX_LEFT
     PUSHBUTTON      "...", IDC_BUTTON_BROWSE, 333, 204, 15, 14, 0, WS_EX_LEFT
-    CONTROL         "Fansub group preference: None <a href=""URL()"">(Change)</a>", IDC_LINK_ANIME_FANSUB, "SysLink", 0x50010000, 7, 224, 335, 10, 0x00000000
+    CONTROL         "Fansub group preference: None <a href=""URL()"">(Change)</a>", IDC_LINK_ANIME_FANSUB, "SysLink", 0x50010004, 7, 224, 335, 10, 0x00000000
 }
 
 
@@ -293,7 +293,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     CONTROL         "", IDC_TREE_SECTIONS, WC_TREEVIEW, WS_TABSTOP | WS_BORDER | TVS_HASBUTTONS | TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | TVS_TRACKSELECT | TVS_INFOTIP | TVS_FULLROWSELECT | TVS_NOSCROLL | TVS_NONEVENHEIGHT, 7, 7, 90, 250, WS_EX_LEFT
     LTEXT           "", IDC_STATIC_TITLE, 104, 7, 319, 12, SS_LEFT | SS_CENTERIMAGE | SS_NOPREFIX, WS_EX_STATICEDGE
     CONTROL         "", IDC_TAB_PAGES, WC_TABCONTROL, 0, 104, 26, 319, 231, WS_EX_LEFT
-    CONTROL         "<a id=""Defaults"">Restore default settings</a>", IDC_LINK_DEFAULTS, "SysLink", 0x50010000, 7, 270, 90, 8, 0x00000000
+    CONTROL         "<a id=""Defaults"">Restore default settings</a>", IDC_LINK_DEFAULTS, "SysLink", 0x50010004, 7, 270, 90, 8, 0x00000000
     DEFPUSHBUTTON   "OK", IDOK, 319, 264, 50, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "Cancel", IDCANCEL, 373, 264, 50, 14, 0, WS_EX_LEFT
 }
@@ -344,7 +344,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     GROUPBOX        "Theme", IDC_STATIC, 7, 7, 301, 56, 0, WS_EX_LEFT
     LTEXT           "Current theme:", IDC_STATIC, 12, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_COMBO_THEME, 12, 28, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
-    CONTROL         "<a id=""Themes"">Open theme folder</a>", IDC_LINK_THEMES, "SysLink", 0x50010000, 160, 30, 90, 8, 0x00000000
+    CONTROL         "<a id=""Themes"">Open theme folder</a>", IDC_LINK_THEMES, "SysLink", 0x50010004, 160, 30, 90, 8, 0x00000000
     LTEXT           "Tip: With themes, you can change icons and progress bar colors.", IDC_STATIC, 12, 48, 289, 8, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
     GROUPBOX        "External links", IDC_STATIC, 7, 70, 301, 82, 0, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_EXTERNALLINKS, 12, 81, 289, 64, WS_VSCROLL | ES_AUTOVSCROLL | ES_MULTILINE | ES_WANTRETURN, WS_EX_LEFT
@@ -470,7 +470,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     EDITTEXT        IDC_EDIT_USER_HUMMINGBIRD, 12, 28, 141, 12, ES_AUTOHSCROLL, WS_EX_LEFT
     LTEXT           "Password:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_PASS_HUMMINGBIRD, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD, WS_EX_LEFT
-    CONTROL         "<a href=""URL(http://hummingbird.me/users/sign_up)"">Create a new account</a>", IDC_LINK_ACCOUNT_HUMMINGBIRD, "SysLink", 0x50010000, 12, 47, 140, 8, 0x00000000
+    CONTROL         "<a href=""URL(http://hummingbird.me/users/sign_up)"">Create a new account</a>", IDC_LINK_ACCOUNT_HUMMINGBIRD, "SysLink", 0x50010004, 12, 47, 140, 8, 0x00000000
 }
 
 
@@ -501,7 +501,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     EDITTEXT        IDC_EDIT_USER_MAL, 12, 28, 141, 12, ES_AUTOHSCROLL, WS_EX_LEFT
     LTEXT           "Password:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_PASS_MAL, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD, WS_EX_LEFT
-    CONTROL         "<a href=""URL(http://myanimelist.net/register.php)"">Create a new account</a>", IDC_LINK_ACCOUNT_MAL, "SysLink", 0x50010000, 12, 47, 140, 8, 0x00000000
+    CONTROL         "<a href=""URL(http://myanimelist.net/register.php)"">Create a new account</a>", IDC_LINK_ACCOUNT_MAL, "SysLink", 0x50010004, 12, 47, 140, 8, 0x00000000
 }
 
 
@@ -583,7 +583,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     GROUPBOX        "Options", IDC_STATIC, 7, 24, 301, 32, 0, WS_EX_LEFT
     PUSHBUTTON      "Edit format string...", IDC_BUTTON_FORMAT_TWITTER, 12, 35, 85, 14, 0, WS_EX_LEFT
     GROUPBOX        "Authorization", IDC_STATIC, 7, 63, 301, 46, 0, WS_EX_LEFT
-    CONTROL         "Taiga is not authorized to post to your Twitter account yet.", IDC_LINK_TWITTER, "SysLink", 0x50010000, 12, 74, 275, 10, 0x00000000
+    CONTROL         "Taiga is not authorized to post to your Twitter account yet.", IDC_LINK_TWITTER, "SysLink", 0x50010004, 12, 74, 275, 10, 0x00000000
     PUSHBUTTON      "Authorize...", IDC_BUTTON_TWITTER_AUTH, 12, 88, 85, 14, 0, WS_EX_LEFT
 }
 
