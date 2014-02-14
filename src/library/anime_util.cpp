@@ -101,6 +101,36 @@ int EstimateLastAiredEpisodeNumber(const Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool IsItemOldEnough(const Item& item) {
+  if (!item.last_modified)
+    return true;
+
+  time_t time_diff = time(nullptr) - item.last_modified;
+
+  if (item.GetAiringStatus() == kFinishedAiring) {
+    return time_diff >= 60 * 60 * 24 * 7;  // 1 week
+  } else {
+    return time_diff >= 60 * 60;  // 1 hour
+  }
+}
+
+bool MetadataNeedsRefresh(const Item& item) {
+  if (IsItemOldEnough(item))
+    return true;
+
+  if (item.GetSynopsis().empty())
+    return true;
+  if (item.GetGenres().empty())
+    return true;
+  if (item.GetScore().empty() &&
+      taiga::GetCurrentServiceId() == sync::kMyAnimeList)
+    return true;
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool CheckEpisodes(Item& item, int number, bool check_folder) {
   // Check folder
   if (check_folder)

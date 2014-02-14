@@ -490,9 +490,9 @@ void SeasonDialog::RefreshData(int anime_id) {
 
     // Download missing image
     ImageDatabase.Load(*id, true, true);
-    
+
     // Get details
-    if (anime_item->IsOldEnough() || anime_item->GetSynopsis().empty())
+    if (anime::MetadataNeedsRefresh(*anime_item))
       sync::GetMetadataById(*id);
   }
 }

@@ -613,18 +613,6 @@ void Item::RemoveFromUserList() {
   assert(my_info_.use_count() == 0);
 }
 
-bool Item::IsOldEnough() const {
-  if (!last_modified) return true;
-
-  time_t time_diff = time(nullptr) - last_modified;
-
-  if (GetAiringStatus() == kFinishedAiring) {
-    return time_diff >= 60 * 60 * 24 * 7; // 1 week
-  } else {
-    return time_diff >= 60 * 60; // 1 hour
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 HistoryItem* Item::SearchHistory(int search_mode) const {

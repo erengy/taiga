@@ -167,14 +167,10 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   // Set synopsis
   text = anime_item->GetSynopsis();
   SetDlgItemText(IDC_EDIT_ANIME_SYNOPSIS, text.c_str());
-  if (connect) {
-    if (anime_item->IsOldEnough() ||
-        anime_item->GetSynopsis().empty() ||
-        anime_item->GetGenres().empty() ||
-        anime_item->GetScore().empty()) {
-      sync::GetMetadataById(anime_id_);
-    }
-  }
+
+  // Get new data if necessary
+  if (connect && anime::MetadataNeedsRefresh(*anime_item))
+    sync::GetMetadataById(anime_id_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

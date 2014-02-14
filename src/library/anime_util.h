@@ -33,6 +33,9 @@ bool IsAiredYet(const Item& item);
 bool IsFinishedAiring(const Item& item);
 int EstimateLastAiredEpisodeNumber(const Item& item);
 
+bool IsItemOldEnough(const Item& item);
+bool MetadataNeedsRefresh(const Item& item);
+
 bool CheckEpisodes(Item& item, int number = -1, bool check_folder = false);
 bool CheckFolder(Item& item);
 bool PlayEpisode(int anime_id, int number);

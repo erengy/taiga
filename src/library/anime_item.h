@@ -139,10 +139,6 @@ public:
   bool IsInList() const;
   void RemoveFromUserList();
 
-  // Is this item old enough to be updated? See last_modified for more
-  // information.
-  bool IsOldEnough() const;
-
   // An item's series information will only be updated only if last_modified
   // value is significantly older than the new one's. This helps us lower
   // the number of requests we send to a service.
