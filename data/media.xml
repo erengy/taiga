@@ -225,9 +225,9 @@
 		<folder>%ProgramFiles%\Mirillis\Splash Lite\</folder>
 		<folder>%ProgramW6432%\Mirillis\Splash Lite\</folder>
 	</player>
-	<!-- Shooter Player -->
+	<!-- SPlayer -->
 	<player>
-		<name>Shooter Player</name>
+		<name>SPlayer</name>
 		<enabled>1</enabled>
 		<visible>1</visible>
 		<mode>0</mode>
