@@ -375,7 +375,7 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
   BYTE fsState2 = TBSTATE_INDETERMINATE | TBSTATE_WRAP;
   condition_toolbar.InsertButton(0, ui::kIcon16_Plus,      100, fsState1, 0, 0, nullptr, L"Add new condition...");
   condition_toolbar.InsertButton(1, ui::kIcon16_Minus,     101, fsState2, 0, 1, nullptr, L"Delete condition");
-  condition_toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+  condition_toolbar.InsertButton(2, 0, 0, TBSTATE_WRAP, BTNS_SEP, 0, nullptr, nullptr);
   condition_toolbar.InsertButton(3, ui::kIcon16_ArrowUp,   103, fsState2, 0, 3, nullptr, L"Move up");
   condition_toolbar.InsertButton(4, ui::kIcon16_ArrowDown, 104, fsState2, 0, 4, nullptr, L"Move down");
 
