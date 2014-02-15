@@ -761,6 +761,29 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     } else {
       ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressCompleted); // Completed / On hold / Plan to watch
     }
+    // Draw progress
+    if (anime_item.GetMyRewatching()) {
+      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressWatching);
+    } else {
+      switch (anime_item.GetMyStatus()) {
+        default:
+        case anime::kWatching:
+          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressWatching);
+          break;
+        case anime::kCompleted:
+          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressCompleted);
+          break;
+        case anime::kOnHold:
+          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressOnHold);
+          break;
+        case anime::kDropped:
+          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressDropped);
+          break;
+        case anime::kPlanToWatch:
+          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressPlanToWatch);
+          break;
+      }
+    }
   }
 
   // Draw episode availability

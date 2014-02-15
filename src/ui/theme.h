@@ -86,6 +86,8 @@ enum ListProgressType {
   kListProgressButton,
   kListProgressCompleted,
   kListProgressDropped,
+  kListProgressOnHold,
+  kListProgressPlanToWatch,
   kListProgressSeparator,
   kListProgressWatching
 };
