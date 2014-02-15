@@ -552,9 +552,12 @@ bool OnSeasonRefreshRequired() {
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
-  dlg.SetContent(L"It seems that we don't know much about some anime titles in "
-                 L"this season. Taiga will connect to MyAnimeList to retrieve "
-                 L"missing information and images.");
+  auto service = taiga::GetCurrentService();
+  std::wstring content =
+      L"It seems that we don't know much about some anime titles in this "
+      L"season. Taiga will connect to " + service->name() + L"to retrieve "
+      L"missing information and images.";
+  dlg.SetContent(content.c_str());
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());

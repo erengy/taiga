@@ -228,7 +228,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kShare_Mirc_MultiServer, nullptr, L"announce/mirc/multiserver");
   INITKEY(kShare_Mirc_UseMeAction, L"true", L"announce/mirc/useaction");
   INITKEY(kShare_Mirc_Mode, L"1", L"announce/mirc/mode");
-  INITKEY(kShare_Mirc_Channels, L"#myanimelist, #taiga", L"announce/mirc/channels");
+  INITKEY(kShare_Mirc_Channels, L"#hummingbird, #myanimelist, #taiga", L"announce/mirc/channels");
   INITKEY(kShare_Mirc_Format, kDefaultFormatMirc.c_str(), L"announce/mirc/format");
   INITKEY(kShare_Mirc_Service, nullptr, L"announce/mirc/service");
   INITKEY(kShare_Skype_Enabled, nullptr, L"announce/skype/enabled");

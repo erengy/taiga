@@ -27,7 +27,6 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
     {
         BLOCK "0409FDE9"
         {
-            VALUE "Comments", "MyAnimeList client"
             VALUE "CompanyName", "erengy"
             VALUE "FileDescription", "Taiga"
             VALUE "FileVersion", VERSION_VALUE_STRING
