@@ -170,9 +170,6 @@ public:
   std::wstring path;
 };
 
-std::wstring GetUrlEncodedString(const std::wstring& str,
-                                 bool encode_unreserved);
-
 }  // namespace http
 }  // namespace win
 

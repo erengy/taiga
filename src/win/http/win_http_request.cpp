@@ -18,6 +18,7 @@
 
 #include "win_http.h"
 
+#include "base/encoding.h"
 #include "base/foreach.h"
 #include "base/string.h"
 
@@ -80,7 +81,7 @@ HINTERNET Client::OpenRequest() {
     std::wstring query_string;
     foreach_(it, request_.query) {
       query_string += query_string.empty() ? L"?" : L"&";
-      query_string += it->first + L"=" + GetUrlEncodedString(it->second, false);
+      query_string += it->first + L"=" + EncodeUrl(it->second, false);
     }
     path += query_string;
   }

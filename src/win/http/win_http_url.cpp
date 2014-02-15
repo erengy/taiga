@@ -57,43 +57,5 @@ void Url::Crack(std::wstring url) {
   path = url.substr(i);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring GetUrlEncodedString(const std::wstring& str,
-                                 bool encode_unreserved) {
-  std::wstring output;
-  output.reserve(str.size());
-
-  static const wchar_t* digits = L"0123456789ABCDEF";
-  #define PercentEncode(x) \
-      output.append(L"%"); \
-      output.append(&digits[(x >> 4) & 0x0F], 1); \
-      output.append(&digits[x & 0x0F], 1);
-
-  for (size_t i = 0; i < str.length(); i++) {
-    if ((str[i] >= '0' && str[i] <= '9') ||
-        (str[i] >= 'A' && str[i] <= 'Z') ||
-        (str[i] >= 'a' && str[i] <= 'z') ||
-        (!encode_unreserved &&
-         (str[i] == '-' || str[i] == '.' ||
-          str[i] == '_' || str[i] == '~'))) {
-      output.push_back(str[i]);
-    } else {
-      if (str[i] > 255) {
-        std::string buffer = WstrToStr(std::wstring(&str[i], 1));
-        for (unsigned int j = 0; j < buffer.length(); j++) {
-          PercentEncode(buffer[j]);
-        }
-      } else {
-        PercentEncode(str[i]);
-      }
-    }
-  }
-
-  #undef PercentEncode
-
-  return output;
-}
-
 }  // namespace http
 }  // namespace win

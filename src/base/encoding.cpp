@@ -65,15 +65,11 @@ std::wstring Base64Encode(const std::wstring& str, bool for_filename) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::wstring EncodeUrl(const std::wstring& str, bool encode_unreserved) {
-  std::wstring output;
-  output.reserve(str.size());
+std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved) {
+  std::string str = WstrToStr(input);
 
-  static const wchar_t* digits = L"0123456789ABCDEF";
-  #define PercentEncode(x) \
-      output.append(L"%"); \
-      output.append(&digits[(x >> 4) & 0x0F], 1); \
-      output.append(&digits[x & 0x0F], 1);
+  std::wstring output;
+  output.reserve(input.size() * 2);
 
   for (size_t i = 0; i < str.length(); i++) {
     if ((str[i] >= '0' && str[i] <= '9') ||
@@ -82,20 +78,14 @@ std::wstring EncodeUrl(const std::wstring& str, bool encode_unreserved) {
         (!encode_unreserved &&
          (str[i] == '-' || str[i] == '.' ||
           str[i] == '_' || str[i] == '~'))) {
-      output.push_back(str[i]);
+      output.append(1, static_cast<wchar_t>(str[i]));
     } else {
-      if (str[i] > 255) {
-        std::string buffer = WstrToStr(std::wstring(&str[i], 1));
-        for (unsigned int j = 0; j < buffer.length(); j++) {
-          PercentEncode(buffer[j]);
-        }
-      } else {
-        PercentEncode(str[i]);
-      }
+      static const wchar_t* digits = L"0123456789ABCDEF";
+      output.append(L"%");
+      output.append(&digits[(str[i] >> 4) & 0x0F], 1);
+      output.append(&digits[str[i] & 0x0F], 1);
     }
   }
-
-  #undef PercentEncode
 
   return output;
 }
