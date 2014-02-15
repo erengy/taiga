@@ -188,6 +188,8 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_List_HighlightNewEpisodes, L"true", L"program/list/filter/episodes/highlight");
   INITKEY(kApp_List_ProgressDisplayAired, L"true", L"program/list/progress/showaired");
   INITKEY(kApp_List_ProgressDisplayAvailable, L"true", L"program/list/progress/showavailable");
+  INITKEY(kApp_List_SortColumn, L"0", L"program/list/sort/column");
+  INITKEY(kApp_List_SortOrder, L"1", L"program/list/sort/order");
   INITKEY(kApp_Behavior_Autostart, nullptr, L"program/general/autostart");
   INITKEY(kApp_Behavior_StartMinimized, nullptr, L"program/startup/minimize");
   INITKEY(kApp_Behavior_CheckForUpdates, L"true", L"program/startup/checkversion");

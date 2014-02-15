@@ -59,6 +59,8 @@ enum AppSettingName {
   kApp_List_HighlightNewEpisodes,
   kApp_List_ProgressDisplayAired,
   kApp_List_ProgressDisplayAvailable,
+  kApp_List_SortColumn,
+  kApp_List_SortOrder,
   kApp_Behavior_Autostart,
   kApp_Behavior_StartMinimized,
   kApp_Behavior_CheckForUpdates,

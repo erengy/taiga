@@ -60,7 +60,10 @@ BOOL AnimeListDialog::OnInitDialog() {
                             LVS_EX_TRACKSELECT);
   listview.SetHoverTime(60 * 1000);
   listview.SetImageList(ui::Theme.GetImageList16().GetHandle());
-  listview.Sort(0, 1, 0, ui::ListViewCompareProc);
+  listview.Sort(Settings.GetInt(taiga::kApp_List_SortColumn),
+                Settings.GetInt(taiga::kApp_List_SortOrder),
+                ui::kListSortDefault,
+                ui::ListViewCompareProc);
   listview.SetTheme();
 
   // Create list tooltips
@@ -494,6 +497,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (lplv->iSubItem == listview.GetSortColumn())
         order = listview.GetSortOrder() * -1;
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ui::ListViewCompareProc);
+      Settings.Set(taiga::kApp_List_SortColumn, lplv->iSubItem);
+      Settings.Set(taiga::kApp_List_SortOrder, order);
       break;
     }
 
