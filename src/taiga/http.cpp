@@ -199,7 +199,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     }
     case kHttpFeedDownload:
     case kHttpFeedDownloadAll: {
-      Feed* feed = reinterpret_cast<Feed*>(response.parameter);
+      auto feed = reinterpret_cast<Feed*>(response.parameter);
       if (feed) {
         FeedItem* feed_item = reinterpret_cast<FeedItem*>(&feed->items[feed->download_index]);
         std::wstring app_path, cmd, file = feed_item->title;
@@ -218,26 +218,41 @@ void HttpManager::HandleResponse(HttpResponse& response) {
           if (Settings.GetBool(kTorrent_Download_UseAnimeFolder) &&
               InStr(app_path, L"utorrent", 0, true) > -1) {
             std::wstring download_path;
-            if (Settings.GetBool(kTorrent_Download_FallbackOnFolder) &&
-                FolderExists(Settings[kTorrent_Download_Location])) {
-              download_path = Settings[kTorrent_Download_Location];
-            }
+            // Use anime folder as the download folder
             auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
             if (anime_item) {
               std::wstring anime_folder = anime_item->GetFolder();
-              if (!anime_folder.empty() && FolderExists(anime_folder)) {
+              if (!anime_folder.empty() && FolderExists(anime_folder))
                 download_path = anime_folder;
-              } else if (Settings.GetBool(kTorrent_Download_CreateSubfolder) && !download_path.empty()) {
-                anime_folder = anime_item->GetTitle();
-                ValidateFileName(anime_folder);
-                TrimRight(anime_folder, L".");
+            }
+            // If no anime folder is set, use an alternative folder
+            if (download_path.empty()) {
+              if (Settings.GetBool(kTorrent_Download_FallbackOnFolder) &&
+                  !Settings[kTorrent_Download_Location].empty()) {
+                download_path = Settings[kTorrent_Download_Location];
+              }
+              // Create a subfolder using the anime title as its name
+              if (!download_path.empty() &&
+                  Settings.GetBool(kTorrent_Download_CreateSubfolder)) {
+                std::wstring anime_title;
+                if (anime_item) {
+                  anime_title = anime_item->GetTitle();
+                } else {
+                  anime_title = feed_item->episode_data.title;
+                }
+                ValidateFileName(anime_title);
+                TrimRight(anime_title, L".");
                 AddTrailingSlash(download_path);
-                download_path += anime_folder;
-                CreateDirectory(download_path.c_str(), nullptr);
-                anime_item->SetFolder(download_path);
-                Settings.Save();
+                download_path += anime_title;
+                if (!CreateFolder(download_path))
+                  LOG(LevelWarning, L"Subfolder could not be created.");
+                if (anime_item) {
+                  anime_item->SetFolder(download_path);
+                  Settings.Save();
+                }
               }
             }
+            // Set the command line parameter
             if (!download_path.empty())
               cmd = L"/directory \"" + download_path + L"\" ";
           }
