@@ -52,7 +52,7 @@ BOOL NewUpdateDialog::OnInitDialog() {
       L"\\deflang1024\\fs18";
   foreach_(item, Taiga.Updater.items) {
     base::SemanticVersion item_version(item->guid);
-    /*if (item_version > Taiga.version)*/ {
+    if (item_version > Taiga.version) {
       changelog += L"\\b Version " + item->guid + L"\\b0\\line ";
       std::wstring description = item->description;
       Replace(description, L"\n", L"\\line ", true);

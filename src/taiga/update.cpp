@@ -88,7 +88,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
     }
   }
 
-  //if (latest_version > current_version)
+  if (latest_version > current_version)
     update_available_ = true;
 
   return true;
