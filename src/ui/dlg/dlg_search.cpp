@@ -22,6 +22,7 @@
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
+#include "taiga/settings.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dialog.h"
 #include "ui/list.h"
@@ -132,7 +133,7 @@ void SearchDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void SearchDialog::ParseResults(const std::vector<int>& ids) {
   if (!IsWindow())
@@ -147,10 +148,7 @@ void SearchDialog::ParseResults(const std::vector<int>& ids) {
     return;
   }
 
-  anime_ids_.clear();
-  foreach_(id, ids)
-    anime_ids_.push_back(*id);
-
+  anime_ids_ = ids;
   RefreshList();
 }
 
@@ -179,32 +177,20 @@ void SearchDialog::RefreshList() {
   list_.DeleteAllItems();
 
   // Add anime items to list
-  for (size_t i = 0; i < anime_ids_.size(); i++) {
-    AddAnimeToList(anime_ids_.at(i));
-  }
-  /*
-  for (auto it = AnimeDatabase.items.begin(); it != AnimeDatabase.items.end(); ++it) {
-    if (std::find(anime_ids_.begin(), anime_ids_.end(), it->second.GetId()) == anime_ids_.end())
-      if (filters_.CheckItem(it->second))
-        AddAnimeToList(it->second.GetId());
-  }
-  */
+  foreach_(it, anime_ids_)
+    AddAnimeToList(*it);
 
-  // Sort and show the list again
-  //list_.Sort(0, 1, LIST_SORTTYPE_DEFAULT, ui::ListViewCompareProc);
+  // Show the list again
   list_.Show(SW_SHOW);
 }
 
-bool SearchDialog::Search(const std::wstring& title) {
+void SearchDialog::Search(const std::wstring& title) {
   anime_ids_.clear();
   search_text = title;
-  filters_.text = title;
-  //RefreshList();
 
+  ui::ChangeStatusText(L"Searching " + taiga::GetCurrentService()->name() +
+                       L" for \"" + title + L"\"...");
   sync::SearchTitle(title);
-  ui::ChangeStatusText(L"Searching MyAnimeList for \"" + title + L"\"...");
-
-  return true;
 }
 
 }  // namespace ui

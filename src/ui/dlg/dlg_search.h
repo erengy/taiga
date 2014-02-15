@@ -22,7 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "library/anime_filter.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
 
@@ -41,13 +40,12 @@ public:
   void AddAnimeToList(int anime_id);
   void ParseResults(const std::vector<int>& ids);
   void RefreshList();
-  bool Search(const std::wstring& title);
+  void Search(const std::wstring& title);
 
   std::wstring search_text;
 
 private:
   std::vector<int> anime_ids_;
-  anime::Filters filters_;
   win::ListView list_;
 };
 

@@ -24,6 +24,7 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
+#include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -278,6 +279,7 @@ void OnLibraryEntryImageChange(int id) {
 void OnLibrarySearchTitle(const string_t& results) {
   std::vector<string_t> split_vector;
   Split(results, L",", split_vector);
+  RemoveEmptyStrings(split_vector);
 
   std::vector<int> ids;
   foreach_(it, split_vector) {
