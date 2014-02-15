@@ -372,6 +372,8 @@ bool AppSettings::Load() {
             FEED_FILTER_SHORTCODE_ACTION, item.attribute(L"action").value()),
         Aggregator.filter_manager.GetIndexFromShortcode(
             FEED_FILTER_SHORTCODE_MATCH, item.attribute(L"match").value()),
+        Aggregator.filter_manager.GetIndexFromShortcode(
+            FEED_FILTER_SHORTCODE_OPTION, item.attribute(L"option").value()),
         item.attribute(L"enabled").as_bool(),
         item.attribute(L"name").value());
     foreach_xmlnode_(anime, item, L"anime") {
@@ -452,6 +454,9 @@ bool AppSettings::Save() {
     item.append_attribute(L"match") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
             FEED_FILTER_SHORTCODE_MATCH, it->match).c_str();
+    item.append_attribute(L"option") =
+        Aggregator.filter_manager.GetShortcodeFromIndex(
+            FEED_FILTER_SHORTCODE_OPTION, it->option).c_str();
     item.append_attribute(L"enabled") = it->enabled;
     item.append_attribute(L"name") = it->name.c_str();
     foreach_(ita, it->anime_ids) {

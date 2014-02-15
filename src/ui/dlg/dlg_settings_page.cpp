@@ -365,11 +365,13 @@ BOOL SettingsPage::OnInitDialog() {
       toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
       toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
       // Add toolbar items
-      toolbar.InsertButton(0, ui::kIcon16_Plus,      100, true,  0, 0, nullptr, L"Add new filter...");
-      toolbar.InsertButton(1, ui::kIcon16_Minus,     101, false, 0, 1, nullptr, L"Delete filter");
+      BYTE fsState1 = TBSTATE_ENABLED;
+      BYTE fsState2 = TBSTATE_INDETERMINATE;
+      toolbar.InsertButton(0, ui::kIcon16_Plus,      100, fsState1, 0, 0, nullptr, L"Add new filter...");
+      toolbar.InsertButton(1, ui::kIcon16_Minus,     101, fsState2, 0, 1, nullptr, L"Delete filter");
       toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-      toolbar.InsertButton(3, ui::kIcon16_ArrowUp,   103, false, 0, 3, nullptr, L"Move up");
-      toolbar.InsertButton(4, ui::kIcon16_ArrowDown, 104, false, 0, 4, nullptr, L"Move down");
+      toolbar.InsertButton(3, ui::kIcon16_ArrowUp,   103, fsState2, 0, 3, nullptr, L"Move up");
+      toolbar.InsertButton(4, ui::kIcon16_ArrowDown, 104, fsState2, 0, 4, nullptr, L"Move down");
       toolbar.SetWindowHandle(nullptr);
       break;
     }

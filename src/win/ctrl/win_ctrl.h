@@ -40,6 +40,7 @@ public:
   int     AddItem(LPCWSTR text, LPARAM data);
   int     AddString(LPCWSTR text);
   int     DeleteString(int index);
+  int     FindItemData(LPARAM data);
   int     GetCount();
   LRESULT GetItemData(int index);
   int     GetCurSel();
@@ -332,8 +333,8 @@ public:
   LPCWSTR GetButtonTooltip(int index);
   DWORD   GetPadding();
   int     HitTest(POINT& point);
-  BOOL    InsertButton(int index, int bitmap, int command_id, 
-                       bool enabled, BYTE style, DWORD_PTR data, 
+  BOOL    InsertButton(int index, int bitmap, int command_id,
+                       BYTE state, BYTE style, DWORD_PTR data,
                        LPCWSTR text, LPCWSTR tooltip);
   BOOL    PressButton(int command_id, BOOL press);
   BOOL    SetButtonImage(int index, int image);

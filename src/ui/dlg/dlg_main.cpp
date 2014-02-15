@@ -176,29 +176,30 @@ void MainDialog::CreateDialogControls() {
   }
 
   // Insert menu toolbar buttons
+  BYTE fsState = TBSTATE_ENABLED;
   BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
-  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, 1, fsStyle0, 0, L"  File", nullptr);
-  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, 1, fsStyle0, 0, L"  Services", nullptr);
-  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, 1, fsStyle0, 0, L"  Tools", nullptr);
-  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, 1, fsStyle0, 0, L"  View", nullptr);
-  toolbar_menu.InsertButton(4, I_IMAGENONE, 104, 1, fsStyle0, 0, L"  Help", nullptr);
+  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, fsState, fsStyle0, 0, L"  File", nullptr);
+  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, fsState, fsStyle0, 0, L"  Services", nullptr);
+  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, fsState, fsStyle0, 0, L"  Tools", nullptr);
+  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, fsState, fsStyle0, 0, L"  View", nullptr);
+  toolbar_menu.InsertButton(4, I_IMAGENONE, 104, fsState, fsStyle0, 0, L"  Help", nullptr);
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
   toolbar_main.InsertButton(0, ui::kIcon24_Sync, kToolbarButtonSync, 
-                            1, fsStyle1, 0, nullptr, L"Synchronize list");
+                            fsState, fsStyle1, 0, nullptr, L"Synchronize list");
   toolbar_main.InsertButton(1, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(2, ui::kIcon24_Folders, kToolbarButtonFolders, 
-                            1, fsStyle2, 2, nullptr, L"Root folders");
+                            fsState, fsStyle2, 2, nullptr, L"Root folders");
   toolbar_main.InsertButton(3, ui::kIcon24_Tools, kToolbarButtonTools, 
-                            1, fsStyle2, 3, nullptr, L"External links");
+                            fsState, fsStyle2, 3, nullptr, L"External links");
   toolbar_main.InsertButton(4, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(5, ui::kIcon24_Settings, kToolbarButtonSettings, 
-                            1, fsStyle1, 5, nullptr, L"Change program settings");
+                            fsState, fsStyle1, 5, nullptr, L"Change program settings");
 #ifdef _DEBUG
   toolbar_main.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(7, ui::kIcon24_About, kToolbarButtonDebug, 
-                            1, fsStyle1, 7, nullptr, L"Debug");
+                            fsState, fsStyle1, 7, nullptr, L"Debug");
 #endif
 
   // Insert rebar bands

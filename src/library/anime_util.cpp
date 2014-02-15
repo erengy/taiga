@@ -516,11 +516,11 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
   // Create new filter
   auto anime_item = AnimeDatabase.FindItem(anime_id);
   Aggregator.filter_manager.AddFilter(
-    FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ALL, true,
-    L"[Fansub] " + anime_item->GetTitle());
+      FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ALL, FEED_FILTER_OPTION_DEFAULT,
+      true, L"[Fansub] " + anime_item->GetTitle());
   Aggregator.filter_manager.filters.back().AddCondition(
-    FEED_FILTER_ELEMENT_EPISODE_GROUP, FEED_FILTER_OPERATOR_EQUALS,
-    group_name);
+      FEED_FILTER_ELEMENT_EPISODE_GROUP, FEED_FILTER_OPERATOR_EQUALS,
+      group_name);
   Aggregator.filter_manager.filters.back().anime_ids.push_back(anime_id);
   return true;
 }

@@ -26,9 +26,11 @@
 #include "taiga/http.h"
 
 enum FeedItemState {
-  FEEDITEM_DISCARDED = -1,
-  FEEDITEM_BLANK = 0,
-  FEEDITEM_SELECTED = 1
+  FEEDITEM_BLANK,
+  FEEDITEM_DISCARDED_NORMAL,
+  FEEDITEM_DISCARDED_INACTIVE,
+  FEEDITEM_DISCARDED_HIDDEN,
+  FEEDITEM_SELECTED
 };
 
 class GenericFeedItem {
@@ -45,6 +47,11 @@ class FeedItem : public GenericFeedItem {
 public:
   FeedItem() : index(-1), state(FEEDITEM_BLANK) {}
   virtual ~FeedItem() {};
+
+  void Discard(int option);
+  bool IsDiscarded() const;
+
+  bool operator<(const FeedItem& item) const;
 
   int index;
   std::wstring magnet_link;
@@ -170,9 +177,15 @@ enum FeedFilterAction {
   FEED_FILTER_ACTION_PREFER
 };
 
+enum FeedFilterOption {
+  FEED_FILTER_OPTION_DEFAULT,
+  FEED_FILTER_OPTION_DEACTIVATE,
+  FEED_FILTER_OPTION_HIDE
+};
+
 class FeedFilter {
 public:
-  FeedFilter() : action(0), enabled(true), match(FEED_FILTER_MATCH_ALL) {}
+  FeedFilter() : action(0), enabled(true), match(FEED_FILTER_MATCH_ALL), option(FEED_FILTER_OPTION_DEFAULT) {}
   virtual ~FeedFilter() {}
   FeedFilter& operator=(const FeedFilter& filter);
 
@@ -183,7 +196,7 @@ public:
 public:
   std::wstring name;
   bool enabled;
-  int action, match;
+  int action, match, option;
   std::vector<int> anime_ids;
   std::vector<FeedFilterCondition> conditions;
 };
@@ -201,6 +214,7 @@ enum FeedFilterShortcodeType {
   FEED_FILTER_SHORTCODE_ELEMENT,
   FEED_FILTER_SHORTCODE_MATCH,
   FEED_FILTER_SHORTCODE_OPERATOR,
+  FEED_FILTER_SHORTCODE_OPTION
 };
 
 class FeedFilterManager {
@@ -211,8 +225,7 @@ public:
   void InitializeShortcodes();
 
   void AddPresets();
-  void AddFilter(int action, int match = FEED_FILTER_MATCH_ALL, 
-    bool enabled = true, const std::wstring& name = L"");
+  void AddFilter(int action, int match, int option, bool enabled, const std::wstring& name);
   void Cleanup();
   void Filter(Feed& feed, bool preferences);
   void FilterArchived(Feed& feed);
@@ -227,6 +240,7 @@ public:
   std::wstring TranslateValue(const FeedFilterCondition& condition);
   std::wstring TranslateMatching(int match);
   std::wstring TranslateAction(int action);
+  std::wstring TranslateOption(int option);
 
   std::wstring GetShortcodeFromIndex(FeedFilterShortcodeType type, int index);
   int GetIndexFromShortcode(FeedFilterShortcodeType type, const std::wstring& shortcode);
@@ -240,6 +254,7 @@ private:
   std::map<int, std::wstring> element_shortcodes_;
   std::map<int, std::wstring> match_shortcodes_;
   std::map<int, std::wstring> operator_shortcodes_;
+  std::map<int, std::wstring> option_shortcodes_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

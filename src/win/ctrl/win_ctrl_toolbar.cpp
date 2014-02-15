@@ -47,7 +47,16 @@ BOOL Toolbar::EnableButton(int command_id, bool enabled) {
   TBBUTTONINFO tbbi = {0};
   tbbi.cbSize = sizeof(TBBUTTONINFO);
   tbbi.dwMask = TBIF_STATE;
-  tbbi.fsState = enabled ? TBSTATE_ENABLED : TBSTATE_INDETERMINATE;
+
+  SendMessage(TB_GETBUTTONINFO, command_id, reinterpret_cast<LPARAM>(&tbbi));
+
+  if (enabled) {
+    tbbi.fsState |= TBSTATE_ENABLED;
+    tbbi.fsState &= ~TBSTATE_INDETERMINATE;
+  } else {
+    tbbi.fsState |= TBSTATE_INDETERMINATE;
+    tbbi.fsState &= ~TBSTATE_ENABLED;
+  }
 
   return SendMessage(TB_SETBUTTONINFO, command_id,
                      reinterpret_cast<LPARAM>(&tbbi));
@@ -90,14 +99,14 @@ int Toolbar::HitTest(POINT& point) {
   return SendMessage(TB_HITTEST, 0, reinterpret_cast<LPARAM>(&point));
 }
 
-BOOL Toolbar::InsertButton(int index, int bitmap, int command_id, bool enabled,
-                           BYTE style, DWORD_PTR data,
+BOOL Toolbar::InsertButton(int index, int bitmap, int command_id,
+                           BYTE state, BYTE style, DWORD_PTR data,
                            LPCWSTR text, LPCWSTR tooltip) {
   TBBUTTON tbb = {0};
   tbb.iBitmap = bitmap;
   tbb.idCommand = command_id;
   tbb.iString = reinterpret_cast<INT_PTR>(text);
-  tbb.fsState = enabled ? TBSTATE_ENABLED : TBSTATE_INDETERMINATE;
+  tbb.fsState = state;
   tbb.fsStyle = style;
   tbb.dwData = data;
 

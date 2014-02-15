@@ -41,6 +41,42 @@ class Aggregator Aggregator;
 
 // =============================================================================
 
+void FeedItem::Discard(int option) {
+  switch (option) {
+    default:
+    case FEED_FILTER_OPTION_DEFAULT:
+      state = FEEDITEM_DISCARDED_NORMAL;
+      break;
+    case FEED_FILTER_OPTION_DEACTIVATE:
+      state = FEEDITEM_DISCARDED_INACTIVE;
+      break;
+    case FEED_FILTER_OPTION_HIDE:
+      state = FEEDITEM_DISCARDED_HIDDEN;
+      break;
+  }
+}
+
+bool FeedItem::IsDiscarded() const {
+  switch (state) {
+    case FEEDITEM_DISCARDED_NORMAL:
+    case FEEDITEM_DISCARDED_INACTIVE:
+    case FEEDITEM_DISCARDED_HIDDEN:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool FeedItem::operator<(const FeedItem& item) const {
+  // Initialize priority list
+  static const int state_priorities[] = {1, 2, 3, 4, 0};
+
+  // Sort items by the priority of their state
+  return state_priorities[this->state] < state_priorities[item.state];
+}
+
+// =============================================================================
+
 Feed::Feed()
     : category(0),
       download_index(-1) {
@@ -121,16 +157,6 @@ bool Feed::ExamineData() {
     }
   }
 
-  // Sort items by their anime ID, giving priority to identified items, while
-  // preserving the order for unidentified ones.
-  std::stable_sort(items.begin(), items.end(),
-    [](const FeedItem& a, const FeedItem& b) {
-      return a.episode_data.anime_id > b.episode_data.anime_id;
-    });
-  // Re-assign item indexes
-  for (size_t i = 0; i < items.size(); i++)
-    items.at(i).index = i;
-
   // Filter
   Aggregator.filter_manager.MarkNewEpisodes(*this);
   // Preferences have lower priority, so we need to handle other filters
@@ -139,7 +165,14 @@ bool Feed::ExamineData() {
   Aggregator.filter_manager.Filter(*this, true);
   // Archived items must be discarded after other filters are processed.
   Aggregator.filter_manager.FilterArchived(*this);
-  
+
+  // Sort items
+  std::stable_sort(items.begin(), items.end());
+
+  // Re-assign item indexes
+  for (size_t i = 0; i < items.size(); i++)
+    items.at(i).index = i;
+
   return Aggregator.filter_manager.IsItemDownloadAvailable(*this);
 }
 

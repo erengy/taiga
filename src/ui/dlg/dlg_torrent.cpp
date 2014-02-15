@@ -65,13 +65,14 @@ BOOL TorrentDialog::OnInitDialog() {
   toolbar_.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
   toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Insert toolbar buttons
+  BYTE fsState = TBSTATE_ENABLED;
   BYTE fsStyle = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
-  toolbar_.InsertButton(0, ui::kIcon16_Refresh,  100, 1, fsStyle, 0, L"Check new torrents", NULL);
+  toolbar_.InsertButton(0, ui::kIcon16_Refresh,  100, fsState, fsStyle, 0, L"Check new torrents", NULL);
   toolbar_.InsertButton(1, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  toolbar_.InsertButton(2, ui::kIcon16_Download, 101, 1, fsStyle, 0, L"Download marked torrents", NULL);
-  toolbar_.InsertButton(3, ui::kIcon16_Cross,    102, 1, fsStyle, 0, L"Discard all", NULL);
+  toolbar_.InsertButton(2, ui::kIcon16_Download, 101, fsState, fsStyle, 0, L"Download marked torrents", NULL);
+  toolbar_.InsertButton(3, ui::kIcon16_Cross,    102, fsState, fsStyle, 0, L"Discard all", NULL);
   toolbar_.InsertButton(4, 0, 0, 0, BTNS_SEP, NULL, NULL, NULL);
-  toolbar_.InsertButton(5, ui::kIcon16_Settings, 103, 1, fsStyle, 0, L"Settings", NULL);
+  toolbar_.InsertButton(5, ui::kIcon16_Settings, 103, fsState, fsStyle, 0, L"Settings", NULL);
 
   // Create rebar
   rebar_.Attach(GetDlgItem(IDC_REBAR_TORRENT));
@@ -123,17 +124,6 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Download marked torrents
     case 101: {
-      for (int i = 0; i < list_.GetItemCount(); i++) {
-        FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-        if (feed_item) {
-          bool check_state = list_.GetCheckState(i) == TRUE;
-          if (feed_item->state == FEEDITEM_SELECTED && !check_state) {
-            // Discard items that have passed all filters but are unchecked by the user
-            Aggregator.file_archive.push_back(feed_item->title);
-          }
-          feed_item->state = check_state ? FEEDITEM_SELECTED : FEEDITEM_DISCARDED;
-        }
-      }
       feed->Download(-1);
       return TRUE;
     }
@@ -143,7 +133,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
         if (list_.GetCheckState(i) == TRUE) {
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
           if (feed_item) {
-            feed_item->state = FEEDITEM_DISCARDED;
+            feed_item->state = FEEDITEM_DISCARDED_NORMAL;
             list_.SetCheckState(i, FALSE);
             Aggregator.file_archive.push_back(feed_item->title);
           }
@@ -205,10 +195,10 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else {
             DlgMain.ChangeStatus(L"Marked " + ToWstr(checked_count) + L" torrents.");
           }
-          bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(pnmv->iItem));
           if (feed_item) {
-            feed_item->state = checked ? FEEDITEM_SELECTED : FEEDITEM_DISCARDED;
+            bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
+            feed_item->state = checked ? FEEDITEM_SELECTED : FEEDITEM_DISCARDED_NORMAL;
           }
         }
         break;
@@ -243,7 +233,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
             }
           } else if (answer == L"DiscardTorrent") {
-            feed_item->state = FEEDITEM_DISCARDED;
+            feed_item->state = FEEDITEM_DISCARDED_NORMAL;
             list_.SetCheckState(lpnmitem->iItem, FALSE);
             Aggregator.file_archive.push_back(feed_item->title);
           } else if (answer == L"DiscardTorrents") {
@@ -252,15 +242,15 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               for (int i = 0; i < list_.GetItemCount(); i++) {
                 feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
                 if (feed_item && feed_item->episode_data.anime_id == anime_item->GetId()) {
-                  feed_item->state = FEEDITEM_DISCARDED;
+                  feed_item->state = FEEDITEM_DISCARDED_NORMAL;
                   list_.SetCheckState(i, FALSE);
                 }
               }
               Aggregator.filter_manager.AddFilter(
-                  FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, true, 
-                  L"Discard \"" + anime_item->GetTitle() + L"\"");
+                  FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, FEED_FILTER_OPTION_DEFAULT,
+                  true, L"Discard \"" + anime_item->GetTitle() + L"\"");
               Aggregator.filter_manager.filters.back().AddCondition(
-                  FEED_FILTER_ELEMENT_META_ID, FEED_FILTER_OPERATOR_EQUALS, 
+                  FEED_FILTER_ELEMENT_META_ID, FEED_FILTER_OPERATOR_EQUALS,
                   ToWstr(anime_item->GetId()));
             }
           } else if (answer == L"SelectFansub") {
@@ -270,7 +260,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               for (int i = 0; i < list_.GetItemCount(); i++) {
                 feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
                 if (feed_item && !IsEqual(feed_item->episode_data.group, group_name)) {
-                  feed_item->state = FEEDITEM_DISCARDED;
+                  feed_item->state = FEEDITEM_DISCARDED_NORMAL;
                   list_.SetCheckState(i, FALSE);
                 }
               }
@@ -306,7 +296,9 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 #ifdef _DEBUG
               // Change background color
               switch (feed_item->state) {
-                case FEEDITEM_DISCARDED:
+                case FEEDITEM_DISCARDED_NORMAL:
+                case FEEDITEM_DISCARDED_INACTIVE:
+                case FEEDITEM_DISCARDED_HIDDEN:
                   pCD->clrTextBk = ui::kColorLightRed;
                   break;
                 case FEEDITEM_SELECTED:
@@ -318,7 +310,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               }
 #endif
               // Change text color
-              if (feed_item->episode_data.anime_id < 1) {
+              if (feed_item->state == FEEDITEM_DISCARDED_INACTIVE) {
                 pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
               } else if (feed_item->episode_data.new_episode) {
                 pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
@@ -370,6 +362,10 @@ void TorrentDialog::RefreshList() {
 
   // Add items
   for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
+    // Skip item if it was discarded and hidden
+    if (it->state == FEEDITEM_DISCARDED_HIDDEN)
+      continue;
+
     std::wstring title, number, video;
     int group = TORRENT_ANIME;
     int icon = StatusToIcon(0);
