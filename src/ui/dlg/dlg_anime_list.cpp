@@ -374,12 +374,12 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
       win::Rect rect_item;
       GetSubItemRect(index, 1, &rect_item);
-      rect_item.right -= 50;
+      rect_item.right -= ScaleX(50);
       rect_item.Inflate(-5, -5);
       button_rect[0].Copy(rect_item);
-      button_rect[0].right = button_rect[0].left + 9;
+      button_rect[0].right = button_rect[0].left + rect_item.Height();
       button_rect[1].Copy(rect_item);
-      button_rect[1].left = button_rect[1].right - 9;
+      button_rect[1].left = button_rect[1].right - rect_item.Height();
 
       POINT pt;
       ::GetCursorPos(&pt);
@@ -705,7 +705,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (eps_watched == 0)
     eps_watched = -1;
 
-  rcBar.right -= 50;
+  rcBar.right -= ScaleX(50);
 
   // Draw border
   rcBar.Inflate(-4, -4);
@@ -801,21 +801,19 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (index > -1 && index == hot_item) {
     // Draw decrement button
     if (button_visible[0]) {
-      rcButton = rcBar;
-      rcButton.right = rcButton.left + 9;
+      rcButton = button_rect[0];
       dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressButton));
-      rcButton.Inflate(-1, -4);
+      rcButton.Inflate(-1, -((button_rect[0].Height() - 1) / 2));
       dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
     }
     // Draw increment button
     if (button_visible[1]) {
-      rcButton = rcBar;
-      rcButton.right = rcBar.right;
-      rcButton.left = rcButton.right - 9;
+      rcButton = button_rect[1];
       dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressButton));
-      rcButton.Inflate(-1, -4);
+      rcButton.Inflate(-1, -((button_rect[1].Height() - 1) / 2));
       dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
-      rcButton.Inflate(-3, 3);
+      rcButton = button_rect[1];
+      rcButton.Inflate(-((button_rect[1].Width() - 1) / 2), -1);
       dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
     }
   }
@@ -864,10 +862,10 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
                                              UINT uItemState, anime::Item& anime_item) {
   win::Dc dc = hdc;
-  win::Rect rcBox = *rc;
+  win::Rect rcBox = button_rect[2];
 
   if (index > -1 && index == hot_item) {
-    rcBox.Inflate(-8, -2);
+    rcBox.right -= 2;
     ui::Theme.DrawListProgress(dc.Get(), &rcBox, ui::kListProgressBorder);
     rcBox.Inflate(-1, -1);
     ui::Theme.DrawListProgress(dc.Get(), &rcBox, ui::kListProgressBackground);
@@ -938,11 +936,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         return CDRF_DODEFAULT;
       if (pCD->iSubItem == 1 || pCD->iSubItem == 2) {
         win::Rect rcItem;
-        if (win::GetVersion() < win::kVersionVista) {
-          listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
-        } else {
-          rcItem = pCD->nmcd.rc;
-        }
+        listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
         if (!rcItem.IsEmpty()) {
           if (pCD->iSubItem == 1) {
             listview.DrawProgressBar(pCD->nmcd.hdc, &rcItem, pCD->nmcd.dwItemSpec,
