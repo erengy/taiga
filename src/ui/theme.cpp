@@ -100,6 +100,13 @@ bool ThemeManager::Load() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void ThemeManager::CreateBrushes() {
+  if (brush_background_.Get())
+    return;
+
+  brush_background_.Set(CreateSolidBrush(GetSysColor(COLOR_WINDOW)));
+}
+
 void ThemeManager::CreateFonts(HDC hdc) {
   if (font_bold_.Get() && font_header_.Get())
     return;
@@ -122,6 +129,10 @@ void ThemeManager::CreateFonts(HDC hdc) {
   lFont.lfWeight = FW_NORMAL;
   lstrcpy(lFont.lfFaceName, L"Segoe UI");
   font_header_.Set(::CreateFontIndirect(&lFont));
+}
+
+HBRUSH ThemeManager::GetBackgroundBrush() const {
+  return brush_background_.Get();
 }
 
 HFONT ThemeManager::GetBoldFont() const {

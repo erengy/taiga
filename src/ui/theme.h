@@ -105,7 +105,9 @@ public:
 
   bool Load();
 
+  void CreateBrushes();
   void CreateFonts(HDC hdc);
+  HBRUSH GetBackgroundBrush() const;
   HFONT GetBoldFont() const;
   HFONT GetHeaderFont() const;
 
@@ -116,6 +118,8 @@ public:
   COLORREF GetListProgressColor(ListProgressType type);
 
 private:
+  win::Brush brush_background_;
+
   win::Font font_bold_;
   win::Font font_header_;
 

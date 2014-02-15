@@ -127,12 +127,14 @@ void AnimeDialog::OnOK() {
 BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC: {
-      HDC hdc = reinterpret_cast<HDC>(wParam);
+      win::Dc dc = reinterpret_cast<HDC>(wParam);
       HWND hwnd_control = reinterpret_cast<HWND>(lParam);
-      if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
-        SetBkMode(hdc, TRANSPARENT);
-        SetTextColor(hdc, ui::kColorMainInstruction);
-      }
+      dc.SetBkMode(TRANSPARENT);
+      if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE))
+        dc.SetTextColor(ui::kColorMainInstruction);
+      dc.DetachDc();
+      if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE))
+        return reinterpret_cast<INT_PTR>(Theme.GetBackgroundBrush());
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }
 

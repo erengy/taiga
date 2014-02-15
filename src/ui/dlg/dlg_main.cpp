@@ -69,9 +69,10 @@ BOOL MainDialog::OnInitDialog() {
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
 
-  // Create default fonts
+  // Create default brushes and fonts
+  ui::Theme.CreateBrushes();
   ui::Theme.CreateFonts(GetDC());
-  
+
   // Create controls
   CreateDialogControls();
 

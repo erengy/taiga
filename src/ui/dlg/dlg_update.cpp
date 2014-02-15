@@ -58,7 +58,10 @@ BOOL UpdateDialog::OnInitDialog() {
 INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORSTATIC: {
-      return ::GetSysColor(COLOR_WINDOW);
+      win::Dc dc = reinterpret_cast<HDC>(wParam);
+      dc.SetBkMode(TRANSPARENT);
+      dc.DetachDc();
+      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }
   }
 

@@ -226,8 +226,12 @@ void FeedFilterDialog::DialogPage::Create(UINT uResourceID, FeedFilterDialog* pa
 INT_PTR FeedFilterDialog::DialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_CTLCOLORDLG:
-    case WM_CTLCOLORSTATIC:
+    case WM_CTLCOLORSTATIC: {
+      win::Dc dc = reinterpret_cast<HDC>(wParam);
+      dc.SetBkMode(TRANSPARENT);
+      dc.DetachDc();
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+    }
   }
 
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
