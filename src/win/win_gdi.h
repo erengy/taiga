@@ -72,6 +72,23 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+class Brush {
+public:
+  Brush();
+  Brush(HBRUSH brush);
+  ~Brush();
+
+  HBRUSH Get() const;
+  void Set(HBRUSH brush);
+
+  operator HBRUSH() const;
+
+private:
+  HBRUSH brush_;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 class Font {
 public:
   Font();

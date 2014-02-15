@@ -229,6 +229,34 @@ COLORREF Dc::SetTextColor(COLORREF color) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Brush::Brush()
+    : brush_(nullptr) {
+}
+
+Brush::Brush(HBRUSH brush)
+    : brush_(brush) {
+}
+
+Brush::~Brush() {
+  Set(nullptr);
+}
+
+HBRUSH Brush::Get() const {
+  return brush_;
+}
+
+void Brush::Set(HBRUSH brush) {
+  if (brush_)
+    ::DeleteObject(brush_);
+  brush_ = brush;
+}
+
+Brush::operator HBRUSH() const {
+  return brush_;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 Font::Font()
     : font_(nullptr) {
 }
