@@ -202,7 +202,7 @@ void Item::SetEpisodeCount(int number) {
 
   // TODO: Call it separately
   if (number >= 0)
-    if (static_cast<size_t>(number) != local_info_.available_episodes.size())
+    if (static_cast<size_t>(number) > local_info_.available_episodes.size())
       local_info_.available_episodes.resize(number);
 }
 
