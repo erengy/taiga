@@ -410,10 +410,11 @@ Twitter::Twitter() {
 
 bool Twitter::RequestToken() {
   HttpRequest http_request;
+  http_request.protocol = win::http::kHttps;
   http_request.host = L"api.twitter.com";
   http_request.path = L"oauth/request_token";
   http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/request_token",
+      oauth.BuildAuthorizationHeader(L"https://api.twitter.com/oauth/request_token",
                                      L"GET");
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterRequest);
@@ -422,10 +423,11 @@ bool Twitter::RequestToken() {
 
 bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret, const std::wstring& pin) {
   HttpRequest http_request;
+  http_request.protocol = win::http::kHttps;
   http_request.host = L"api.twitter.com";
   http_request.path = L"oauth/access_token";
   http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(L"http://api.twitter.com/oauth/access_token",
+      oauth.BuildAuthorizationHeader(L"https://api.twitter.com/oauth/access_token",
                                      L"POST", nullptr, key, secret, pin);
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterAuth);
@@ -445,12 +447,13 @@ bool Twitter::SetStatusText(const std::wstring& status_text) {
   post_parameters[L"status"] = EncodeUrl(status_text_);
 
   HttpRequest http_request;
+  http_request.protocol = win::http::kHttps;
   http_request.method = L"POST";
   http_request.host = L"api.twitter.com";
   http_request.path = L"1.1/statuses/update.json";
   http_request.body = L"status=" + post_parameters[L"status"];
   http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(L"http://api.twitter.com/1.1/statuses/update.json",
+      oauth.BuildAuthorizationHeader(L"https://api.twitter.com/1.1/statuses/update.json",
                                      L"POST", &post_parameters,
                                      Settings[kShare_Twitter_OauthToken],
                                      Settings[kShare_Twitter_OauthSecret]);

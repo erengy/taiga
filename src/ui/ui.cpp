@@ -677,7 +677,15 @@ void OnMircDdeConnectionSuccess(const std::wstring& channels, bool testing) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool OnTwitterRequest(string_t& auth_pin) {
+void OnTwitterTokenRequest(bool success) {
+  if (success) {
+    ClearStatusText();
+  } else {
+    ChangeStatusText(L"Twitter token request failed.");
+  }
+}
+
+bool OnTwitterTokenEntry(string_t& auth_pin) {
   ClearStatusText();
 
   InputDialog dlg;

@@ -84,7 +84,8 @@ void OnMircDdeInitFail(bool testing = false);
 void OnMircDdeConnectionFail(bool testing = false);
 void OnMircDdeConnectionSuccess(const std::wstring& channels, bool testing = false);
 
-bool OnTwitterRequest(string_t& auth_pin);
+void OnTwitterTokenRequest(bool success);
+bool OnTwitterTokenEntry(string_t& auth_pin);
 void OnTwitterAuth(bool success);
 void OnTwitterPost(bool success, const string_t& error);
 
