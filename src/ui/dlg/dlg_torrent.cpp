@@ -370,9 +370,16 @@ void TorrentDialog::RefreshList() {
     int group = TORRENT_ANIME;
     int icon = StatusToIcon(0);
     if (it->category == L"Batch" ||
-        !IsNumeric(it->episode_data.number) ||
         InStr(it->title, L"Vol.") > -1) {
       group = TORRENT_BATCH;
+    }
+    if (!IsNumeric(it->episode_data.number)) {
+      if (it->episode_data.format.empty() ||
+          IsEpisodeRange(it->episode_data.number)) {
+        group = TORRENT_BATCH;
+      } else {
+        group = TORRENT_OTHER;
+      }
     }
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
     if (anime_item) {

@@ -31,6 +31,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
 
 std::wstring FormatError(DWORD dwError, LPCWSTR lpSource = NULL);
 
+bool IsEpisodeRange(const std::wstring& episode_number);
 int GetEpisodeHigh(const std::wstring& episode_number);
 int GetEpisodeLow(const std::wstring& episode_number);
 void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output);

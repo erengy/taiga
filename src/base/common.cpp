@@ -23,6 +23,10 @@
 
 // =============================================================================
 
+bool IsEpisodeRange(const std::wstring& episode_number) {
+  return GetEpisodeLow(episode_number) != GetEpisodeHigh(episode_number);
+}
+
 int GetEpisodeHigh(const std::wstring& episode_number) {
   int value = 1, pos = InStrRev(episode_number, L"-", episode_number.length());
   if (pos == episode_number.length() - 1) {
