@@ -399,6 +399,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         history_item.episode = anime_item->GetEpisodeCount();
         if (*history_item.episode == 0)
           history_item.episode.Reset();
+        if (!anime::IsValidDate(anime_item->GetMyDateStart()) &&
+            anime_item->GetEpisodeCount() == 1)
+          history_item.date_start = GetDate();
         if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
           history_item.date_finish = GetDate();
         break;
