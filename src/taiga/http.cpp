@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/file.h"
 #include "base/logger.h"
 #include "base/string.h"
@@ -64,7 +63,7 @@ void HttpClient::set_mode(HttpClientMode mode) {
 
 void HttpClient::OnError(DWORD error) {
   std::wstring error_text = L"HTTP error #" + ToWstr(error) + L": " +
-                            FormatError(error, L"winhttp.dll");
+                            Logger::FormatError(error, L"winhttp.dll");
   TrimRight(error_text, L"\r\n");
 
   LOG(LevelError, error_text);

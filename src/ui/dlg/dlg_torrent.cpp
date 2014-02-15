@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
@@ -30,6 +30,7 @@
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -368,14 +369,14 @@ void TorrentDialog::RefreshList() {
 
     std::wstring title, number, video;
     int group = TORRENT_ANIME;
-    int icon = StatusToIcon(0);
+    int icon = StatusToIcon(anime::kUnknownStatus);
     if (it->category == L"Batch" ||
         InStr(it->title, L"Vol.") > -1) {
       group = TORRENT_BATCH;
     }
     if (!IsNumeric(it->episode_data.number)) {
       if (it->episode_data.format.empty() ||
-          IsEpisodeRange(it->episode_data.number)) {
+          anime::IsEpisodeRange(it->episode_data.number)) {
         group = TORRENT_BATCH;
       } else {
         group = TORRENT_OTHER;
@@ -392,8 +393,8 @@ void TorrentDialog::RefreshList() {
       title = it->title;
     }
     std::vector<int> numbers;
-    SplitEpisodeNumbers(it->episode_data.number, numbers);
-    number = JoinEpisodeNumbers(numbers);
+    anime::SplitEpisodeNumbers(it->episode_data.number, numbers);
+    number = anime::JoinEpisodeNumbers(numbers);
     if (!it->episode_data.version.empty()) {
       number += L"v" + it->episode_data.version;
     }

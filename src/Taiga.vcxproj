@@ -93,7 +93,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="base\accessibility.cpp" />
-    <ClCompile Include="base\common.cpp" />
     <ClCompile Include="base\crc.cpp" />
     <ClCompile Include="base\dde.cpp" />
     <ClCompile Include="base\encoding.cpp" />
@@ -227,7 +226,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\accessibility.h" />
-    <ClInclude Include="base\common.h" />
     <ClInclude Include="base\crc.h" />
     <ClInclude Include="base\dde.h" />
     <ClInclude Include="base\encoding.h" />
@@ -309,6 +307,7 @@
     <ClInclude Include="track\media.h" />
     <ClInclude Include="track\monitor.h" />
     <ClInclude Include="track\recognition.h" />
+    <ClInclude Include="track\search.h" />
     <ClInclude Include="ui\dialog.h" />
     <ClInclude Include="ui\dlg\dlg_about.h" />
     <ClInclude Include="ui\dlg\dlg_anime_info.h" />

@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -135,7 +134,7 @@ bool RecognitionEngine::CompareEpisode(anime::Episode& episode,
 
   // Validate episode number
   if (check_episode && anime_item.GetEpisodeCount() > 0) {
-    int number = GetEpisodeHigh(episode.number);
+    int number = anime::GetEpisodeHigh(episode.number);
     if (number > anime_item.GetEpisodeCount()) {
       // Check sequels
       auto sequel = &anime_item;
@@ -826,7 +825,7 @@ bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str,
 }
 
 bool RecognitionEngine::IsResolution(const std::wstring& str) {
-  return TranslateResolution(str, true) > 0;
+  return anime::TranslateResolution(str, true) > 0;
 }
 
 bool RecognitionEngine::IsCountingWord(const std::wstring& str) {

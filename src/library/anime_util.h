@@ -59,7 +59,12 @@ void GetUpcomingTitles(std::vector<int>& anime_ids);
 
 bool IsInsideRootFolders(const std::wstring& path);
 
+int GetEpisodeHigh(const std::wstring& episode_number);
+int GetEpisodeLow(const std::wstring& episode_number);
+bool IsEpisodeRange(const std::wstring& episode_number);
 bool IsValidEpisode(int episode, int watched, int total);
+std::wstring JoinEpisodeNumbers(const std::vector<int>& input);
+void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output);
 int EstimateEpisodeCount(const Item& item);
 void ChangeEpisode(int anime_id, int value);
 void DecrementEpisode(int anime_id);
@@ -69,6 +74,8 @@ std::wstring TranslateMyStatus(int value, bool add_count);
 std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");
 std::wstring TranslateStatus(int value);
 std::wstring TranslateType(int value);
+
+int TranslateResolution(const std::wstring& str, bool return_validity = false);
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -21,7 +21,6 @@
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
-#include "base/common.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "taiga/script.h"
@@ -78,7 +77,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_EPISODE_NUMBER:
-      element = ToWstr(GetEpisodeHigh(item.episode_data.number));
+      element = ToWstr(anime::GetEpisodeHigh(item.episode_data.number));
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_EPISODE_VERSION:
@@ -88,7 +87,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
       break;
     case FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE:
       if (anime) element = ToWstr(anime->IsEpisodeAvailable(
-        GetEpisodeHigh(item.episode_data.number)));
+        anime::GetEpisodeHigh(item.episode_data.number)));
       is_numeric = true;
       break;
     case FEED_FILTER_ELEMENT_EPISODE_GROUP:
@@ -109,7 +108,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
         return ToInt(element) == ToInt(value);
       } else {
         if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
-          return TranslateResolution(element) == TranslateResolution(condition.value);
+          return anime::TranslateResolution(element) == anime::TranslateResolution(condition.value);
         } else {
           return IsEqual(element, value);
         }
@@ -120,7 +119,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
         return ToInt(element) != ToInt(value);
       } else {
         if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
-          return TranslateResolution(element) != TranslateResolution(condition.value);
+          return anime::TranslateResolution(element) != anime::TranslateResolution(condition.value);
         } else {
           return !IsEqual(element, value);
         }
@@ -130,7 +129,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
         return ToInt(element) > ToInt(value);
       } else {
         if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
-          return TranslateResolution(element) > TranslateResolution(condition.value);
+          return anime::TranslateResolution(element) > anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) > 0;
         }
@@ -140,7 +139,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
         return ToInt(element) >= ToInt(value);
       } else {
         if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
-          return TranslateResolution(element) >= TranslateResolution(condition.value);
+          return anime::TranslateResolution(element) >= anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) >= 0;
         }
@@ -150,7 +149,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
         return ToInt(element) < ToInt(value);
       } else {
         if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
-          return TranslateResolution(element) < TranslateResolution(condition.value);
+          return anime::TranslateResolution(element) < anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) < 0;
         }
@@ -160,7 +159,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& ite
         return ToInt(element) <= ToInt(value);
       } else {
         if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
-          return TranslateResolution(element) <= TranslateResolution(condition.value);
+          return anime::TranslateResolution(element) <= anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) <= 0;
         }
@@ -436,7 +435,7 @@ void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
   foreach_(item, feed.items) {
     auto anime_item = AnimeDatabase.FindItem(item->episode_data.anime_id);
     if (anime_item) {
-      int number = GetEpisodeHigh(item->episode_data.number);
+      int number = anime::GetEpisodeHigh(item->episode_data.number);
       if (number > anime_item->GetMyLastWatchedEpisode())
         item->episode_data.new_episode = true;
     }

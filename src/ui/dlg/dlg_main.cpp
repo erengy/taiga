@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime.h"
@@ -36,6 +35,7 @@
 #include "track/media.h"
 #include "track/monitor.h"
 #include "track/recognition.h"
+#include "track/search.h"
 #include "ui/dialog.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -707,7 +707,7 @@ void MainDialog::UpdateTitle() {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     title += L" \u2013 " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
     if (Settings.GetBool(taiga::kSync_Update_OutOfRange) &&
-        GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
+        anime::GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
       title += L" (out of range)";
     }
   }

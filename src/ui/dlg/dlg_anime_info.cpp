@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -24,6 +23,7 @@
 #include "library/history.h"
 #include "library/resource.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
@@ -31,6 +31,7 @@
 #include "ui/dlg/dlg_main.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -621,7 +622,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     */
 
   } else {
-    int episode_number = GetEpisodeLow(CurrentEpisode.number);
+    int episode_number = anime::GetEpisodeLow(CurrentEpisode.number);
     if (episode_number == 0)
       episode_number = 1;
     std::wstring content = L"Now playing: Episode " + ToWstr(episode_number);

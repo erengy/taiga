@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/foreach.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dialog.h"
 #include "ui/list.h"

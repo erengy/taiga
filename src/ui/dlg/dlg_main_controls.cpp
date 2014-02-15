@@ -16,18 +16,19 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/string.h"
 #include "library/history.h"
 #include "sync/sync.h"
 #include "taiga/debug.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_season.h"
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
 namespace ui {
 

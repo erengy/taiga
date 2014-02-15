@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/file.h"
 #include "base/logger.h"
 #include "base/process.h"
@@ -33,6 +32,7 @@
 #include "taiga/settings.h"
 #include "track/monitor.h"
 #include "track/recognition.h"
+#include "track/search.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dlg/dlg_season.h"

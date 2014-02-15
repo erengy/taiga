@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/encryption.h"
 #include "base/file.h"
 #include "base/string.h"
@@ -27,6 +26,7 @@
 #include "taiga/announce.h"
 #include "taiga/path.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/media.h"

@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
@@ -25,6 +24,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/recognition.h"
+#include "track/search.h"
 #include "ui/ui.h"
 #include "win/win_taskbar.h"
 
@@ -66,7 +66,7 @@ std::wstring SearchFileFolder(anime::Item& anime_item, const std::wstring& root,
           LOG(LevelError, L"No matching files were found.");
           break;
         default:
-          LOG(LevelError, FormatError(error_code));
+          LOG(LevelError, Logger::FormatError(error_code));
           break;
       }
       LOG(LevelError, L"Path: " + path);
@@ -107,8 +107,8 @@ std::wstring SearchFileFolder(anime::Item& anime_item, const std::wstring& root,
                                 true, true, true, true, true)) {
             // Compare episode data with anime title
             if (Meow.CompareEpisode(episode, anime_item)) {
-              int number = GetEpisodeHigh(episode.number);
-              int numberlow = GetEpisodeLow(episode.number);
+              int number = anime::GetEpisodeHigh(episode.number);
+              int numberlow = anime::GetEpisodeLow(episode.number);
               for (int i = numberlow; i <= number; i++) {
                 anime_item.SetEpisodeAvailability(
                     i, true, root + win32_find_data.cFileName);
@@ -153,7 +153,7 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
     // probably more interested in them than the older titles.
     if (!silent) {
       TaskbarList.SetProgressState(TBPF_NORMAL);
-      SetSharedCursor(IDC_WAIT);
+      ui::SetSharedCursor(IDC_WAIT);
     }
     foreach_r_(it, AnimeDatabase.items) {
       if (!silent)
@@ -181,16 +181,16 @@ void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent) {
     }
     if (!silent) {
       TaskbarList.SetProgressState(TBPF_NOPROGRESS);
-      SetSharedCursor(IDC_ARROW);
+      ui::SetSharedCursor(IDC_ARROW);
     }
 
   // Search for a single item
   } else {
-    SetSharedCursor(IDC_WAIT);
+    ui::SetSharedCursor(IDC_WAIT);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item)
       anime::CheckEpisodes(*anime_item, episode_number, true);
-    SetSharedCursor(IDC_ARROW);
+    ui::SetSharedCursor(IDC_ARROW);
   }
 
   // We're done

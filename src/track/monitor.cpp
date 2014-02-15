@@ -21,7 +21,6 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
-#include "base/common.h"
 #include "base/file.h"
 #include "base/logger.h"
 #include "recognition.h"
@@ -339,8 +338,8 @@ void FolderMonitor::OnChange(FolderInfo* folder_info) {
 
         // Set episode availability
         if (!is_folder) {
-          int number = GetEpisodeHigh(episode.number);
-          int numberlow = GetEpisodeLow(episode.number);
+          int number = anime::GetEpisodeHigh(episode.number);
+          int numberlow = anime::GetEpisodeLow(episode.number);
           for (int j = numberlow; j <= number; j++) {
             if (anime_item->SetEpisodeAvailability(number, path_available, path)) {
               LOG(LevelDebug, anime_item->GetTitle() + L" #" + ToWstr(j) + L" is " +

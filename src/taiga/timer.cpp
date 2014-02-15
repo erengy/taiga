@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
@@ -31,6 +30,7 @@
 #include "taiga/timer.h"
 #include "track/feed.h"
 #include "track/media.h"
+#include "track/search.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_stats.h"
 #include "ui/dlg/dlg_torrent.h"

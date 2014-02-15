@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/encoding.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -359,7 +358,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
       }
 
   // Prepare episode value
-  std::wstring episode_number = ToWstr(GetEpisodeHigh(episode.number));
+  std::wstring episode_number = ToWstr(anime::GetEpisodeHigh(episode.number));
   TrimLeft(episode_number, L"0");
 
   // Replace variables

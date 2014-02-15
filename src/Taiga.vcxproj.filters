@@ -180,9 +180,6 @@
     <ClCompile Include="base\accessibility.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="base\common.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="base\dde.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -561,9 +558,6 @@
     <ClInclude Include="base\accessibility.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="base\common.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="base\dde.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -815,6 +809,9 @@
     </ClInclude>
     <ClInclude Include="ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
+    </ClInclude>
+    <ClInclude Include="track\search.h">
+      <Filter>track</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

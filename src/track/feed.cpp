@@ -18,7 +18,6 @@
 
 #include <algorithm>
 
-#include "base/common.h"
 #include "base/encoding.h"
 #include "base/encryption.h"
 #include "base/file.h"
@@ -27,6 +26,7 @@
 #include "base/types.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "taiga/path.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -152,7 +152,7 @@ bool Feed::ExamineData() {
     // Update last aired episode number
     if (items[i].episode_data.anime_id > anime::ID_UNKNOWN) {
       auto anime_item = AnimeDatabase.FindItem(items[i].episode_data.anime_id);
-      int episode_number = GetEpisodeHigh(items[i].episode_data.number);
+      int episode_number = anime::GetEpisodeHigh(items[i].episode_data.number);
       anime_item->SetLastAiredEpisodeNumber(episode_number);
     }
   }

@@ -35,6 +35,8 @@ namespace ui {
 
 void ChangeStatusText(const string_t& status);
 void ClearStatusText();
+void SetSharedCursor(LPCWSTR name);
+int StatusToIcon(int status);
 
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error);
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client);

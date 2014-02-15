@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/logger.h"
@@ -36,6 +35,7 @@
 #include "track/feed.h"
 #include "track/media.h"
 #include "track/recognition.h"
+#include "track/search.h"
 #include "ui/ui.h"
 
 namespace anime {
@@ -195,7 +195,7 @@ bool PlayEpisode(int anime_id, int number) {
 
   std::wstring file_path;
 
-  SetSharedCursor(IDC_WAIT);
+  ui::SetSharedCursor(IDC_WAIT);
 
   // Check saved episode path
   if (number == anime_item->GetMyLastWatchedEpisode() + 1)
@@ -230,7 +230,7 @@ bool PlayEpisode(int anime_id, int number) {
     Execute(file_path);
   }
 
-  SetSharedCursor(IDC_ARROW);
+  ui::SetSharedCursor(IDC_ARROW);
 
   return !file_path.empty();
 }
@@ -387,6 +387,8 @@ void EndWatching(Item& item, Episode episode) {
 
   ui::OnAnimeWatchingEnd(item, episode);
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time) {
   if (episode.processed)
@@ -558,6 +560,29 @@ bool IsInsideRootFolders(const std::wstring& path) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int GetEpisodeHigh(const std::wstring& episode_number) {
+  int value = 1;
+  int pos = InStrRev(episode_number, L"-", episode_number.length());
+
+  if (pos == episode_number.length() - 1) {
+    value = ToInt(episode_number.substr(0, pos));
+  } else if (pos > -1) {
+    value = ToInt(episode_number.substr(pos + 1));
+  } else {
+    value = ToInt(episode_number);
+  }
+
+  return value;
+}
+
+int GetEpisodeLow(const std::wstring& episode_number) {
+  return ToInt(episode_number);  // ToInt() stops at "-"
+}
+
+bool IsEpisodeRange(const std::wstring& episode_number) {
+  return GetEpisodeLow(episode_number) != GetEpisodeHigh(episode_number);
+}
+
 bool IsValidEpisode(int episode, int watched, int total) {
   if ((episode < 0) ||
       (episode < watched) ||
@@ -566,6 +591,29 @@ bool IsValidEpisode(int episode, int watched, int total) {
     return false;
 
   return true;
+}
+
+std::wstring JoinEpisodeNumbers(const std::vector<int>& input) {
+  std::wstring output;
+
+  foreach_(it, input) {
+    if (!output.empty())
+      output += L"-";
+    output += ToWstr(*it);
+  }
+
+  return output;
+}
+
+void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output) {
+  if (input.empty())
+    return;
+
+  std::vector<std::wstring> numbers;
+  Split(input, L"-", numbers);
+
+  foreach_(it, numbers)
+    output.push_back(ToInt(*it));
 }
 
 int EstimateEpisodeCount(const Item& item) {
@@ -710,6 +758,30 @@ std::wstring TranslateType(int value) {
     case kMusic: return L"Music";
     default: return L"";
   }
+}
+
+int TranslateResolution(const std::wstring& str, bool return_validity) {
+  // *###x###*
+  if (str.length() > 6) {
+    int pos = InStr(str, L"x", 0);
+    if (pos > -1) {
+      for (unsigned int i = 0; i < str.length(); i++)
+        if (i != pos && !IsNumeric(str.at(i)))
+          return 0;
+      return return_validity ? TRUE : ToInt(str.substr(pos + 1));
+    }
+
+  // *###p
+  } else if (str.length() > 3) {
+    if (str.at(str.length() - 1) == 'p') {
+      for (unsigned int i = 0; i < str.length() - 1; i++)
+        if (!IsNumeric(str.at(i)))
+          return 0;
+      return return_validity ? TRUE : ToInt(str.substr(0, str.length() - 1));
+    }
+  }
+
+  return 0;
 }
 
 }  // namespace anime

@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -25,6 +24,7 @@
 #include "library/anime_util.h"
 #include "library/resource.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -34,6 +34,7 @@
 #include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 #include "win/win_gdi.h"
 
 namespace ui {

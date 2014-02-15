@@ -25,6 +25,8 @@ namespace anime {
 class Episode;
 }
 
+void ExecuteAction(std::wstring action, WPARAM wParam = 0, LPARAM lParam = 0);
+
 std::wstring EvaluateFunction(const std::wstring& func_name, const std::wstring& func_body);
 
 bool IsScriptFunction(const std::wstring& str);

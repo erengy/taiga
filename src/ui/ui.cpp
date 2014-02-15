@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/common.h"
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
+#include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
 #include "taiga/http.h"
@@ -57,6 +57,24 @@ void ChangeStatusText(const string_t& status) {
 
 void ClearStatusText() {
   DlgMain.ChangeStatus(L"");
+}
+
+void SetSharedCursor(LPCWSTR name) {
+  SetCursor(reinterpret_cast<HCURSOR>(LoadImage(nullptr, name, IMAGE_CURSOR,
+                                                0, 0, LR_SHARED)));
+}
+
+int StatusToIcon(int status) {  
+  switch (status) {
+    case anime::kAiring:
+      return kIcon16_Green;
+    case anime::kFinishedAiring:
+      return kIcon16_Blue;
+    case anime::kNotYetAired:
+      return kIcon16_Red;
+    default:
+      return kIcon16_Gray;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -404,7 +422,7 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   dlg.SetVerificationText(L"Don't ask again, update automatically");
   dlg.UseCommandLinks(true);
 
-  int number = GetEpisodeHigh(episode.number);
+  int number = anime::GetEpisodeHigh(episode.number);
   if (number == 0)
     number = 1;
   if (anime_item->GetEpisodeCount() == 1)
