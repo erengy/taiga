@@ -803,7 +803,7 @@ void MainDialog::Navigation::GoBack() {
 }
 
 void MainDialog::Navigation::GoForward() {
-  if (index_ < items_.size() - 1) {
+  if (index_ < static_cast<int>(items_.size()) - 1) {
     index_++;
     SetCurrentPage(items_.at(index_), false);
   }

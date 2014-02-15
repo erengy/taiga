@@ -172,7 +172,7 @@ const std::wstring& Item::GetSynopsis() const {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Item::SetId(const std::wstring& id, enum_t service) {
-  if (metadata_.uid.size() < service + 1)
+  if (metadata_.uid.size() < static_cast<size_t>(service) + 1)
     metadata_.uid.resize(service + 1);
 
   metadata_.uid.at(service) = id;

@@ -345,7 +345,7 @@ bool Aggregator::SaveArchive() {
   xml_document document;
   xml_node archive_node = document.append_child(L"archive");
 
-  int max_count = Settings.GetInt(taiga::kTorrent_Filter_ArchiveMaxCount);
+  size_t max_count = Settings.GetInt(taiga::kTorrent_Filter_ArchiveMaxCount);
 
   if (max_count > 0) {
     size_t length = file_archive.size();

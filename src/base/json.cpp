@@ -25,7 +25,7 @@ bool JsonReadArray(const Json::Value& root, const std::string& name,
 
   auto& value = root[name.c_str()];
 
-  for (int i = 0; i < value.size(); i++)
+  for (size_t i = 0; i < value.size(); i++)
     output.push_back(StrToWstr(value[i].asString()));
 
   return output.size() > previous_size;
