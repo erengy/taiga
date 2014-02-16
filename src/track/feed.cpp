@@ -21,6 +21,7 @@
 #include "base/encoding.h"
 #include "base/file.h"
 #include "base/foreach.h"
+#include "base/logger.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
@@ -271,6 +272,106 @@ bool Aggregator::SearchArchive(const std::wstring& file) {
       return true;
 
   return false;
+}
+
+void Aggregator::HandleFeedCheck(Feed& feed, bool automatic) {
+  feed.Load();
+
+  bool success = feed.ExamineData();
+  ui::OnFeedCheck(success);
+
+  if (automatic) {
+    switch (Settings.GetInt(taiga::kTorrent_Discovery_NewAction)) {
+      case 1:  // Notify
+        Notify(feed);
+        break;
+      case 2:  // Download
+        feed.Download(-1);
+        break;
+    }
+  }
+}
+
+void Aggregator::HandleFeedDownload(Feed& feed, bool download_all) {
+  auto feed_item = reinterpret_cast<FeedItem*>(&feed.items.at(feed.download_index));
+
+  file_archive.push_back(feed_item->title);
+
+  std::wstring file = feed_item->title;
+  ValidateFileName(file);
+  file = feed.GetDataPath() + file + L".torrent";
+
+  if (FileExists(file)) {
+    std::wstring app_path;
+    std::wstring parameters;
+
+    switch (Settings.GetInt(taiga::kTorrent_Download_AppMode)) {
+      case 1:  // Default application
+        app_path = GetDefaultAppPath(L".torrent", L"");
+        break;
+      case 2:  // Custom application
+        app_path = Settings[taiga::kTorrent_Download_AppPath];
+        break;
+    }
+
+    if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder) &&
+        InStr(app_path, L"utorrent", 0, true) > -1) {
+      std::wstring download_path;
+      // Use anime folder as the download folder
+      auto anime_id = feed_item->episode_data.anime_id;
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (anime_item) {
+        std::wstring anime_folder = anime_item->GetFolder();
+        if (!anime_folder.empty() && FolderExists(anime_folder))
+          download_path = anime_folder;
+      }
+      // If no anime folder is set, use an alternative folder
+      if (download_path.empty()) {
+        if (Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder) &&
+            !Settings[taiga::kTorrent_Download_Location].empty()) {
+          download_path = Settings[taiga::kTorrent_Download_Location];
+        }
+        // Create a subfolder using the anime title as its name
+        if (!download_path.empty() &&
+            Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder)) {
+          std::wstring anime_title;
+          if (anime_item) {
+            anime_title = anime_item->GetTitle();
+          } else {
+            anime_title = feed_item->episode_data.title;
+          }
+          ValidateFileName(anime_title);
+          TrimRight(anime_title, L".");
+          AddTrailingSlash(download_path);
+          download_path += anime_title;
+          if (!CreateFolder(download_path))
+            LOG(LevelWarning, L"Subfolder could not be created.");
+          if (anime_item) {
+            anime_item->SetFolder(download_path);
+            Settings.Save();
+          }
+        }
+      }
+
+      // Set the command line parameter
+      if (!download_path.empty())
+        parameters = L"/directory \"" + download_path + L"\" ";
+    }
+
+    parameters += L"\"" + file + L"\"";
+    Execute(app_path, parameters);
+
+    feed_item->state = kFeedItemDiscardedNormal;
+    ui::OnFeedDownload(true);
+  }
+
+  feed.download_index = -1;
+
+  if (download_all)
+    if (feed.Download(-1))
+      return;
+
+  ui::OnFeedDownload(false);
 }
 
 void Aggregator::ParseDescription(FeedItem& feed_item,
