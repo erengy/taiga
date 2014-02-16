@@ -481,6 +481,8 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void SeasonDialog::RefreshData(int anime_id) {
+  ui::SetSharedCursor(IDC_WAIT);
+
   foreach_(id, SeasonDatabase.items) {
     if (anime_id > 0 && anime_id != *id)
       continue;
@@ -495,7 +497,11 @@ void SeasonDialog::RefreshData(int anime_id) {
     // Get details
     if (anime::MetadataNeedsRefresh(*anime_item))
       sync::GetMetadataById(*id);
+
+    Sleep(100);
   }
+
+  ui::SetSharedCursor(IDC_ARROW);
 }
 
 void SeasonDialog::RefreshList(bool redraw_only) {
