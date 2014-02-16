@@ -187,7 +187,7 @@ void HistoryQueue::Check(bool automatic) {
 
   // Update
   History.queue.updating = true;
-  ui::ChangeStatusText(L"Updating list...");
+  ui::ChangeStatusText(L"Updating list... (" + anime_item->GetTitle() + L")");
   AnimeValues* anime_values = static_cast<AnimeValues*>(&items[index]);
   sync::UpdateLibraryEntry(*anime_values, items[index].anime_id,
       static_cast<taiga::HttpClientMode>(items[index].mode));
