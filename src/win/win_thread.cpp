@@ -116,6 +116,17 @@ HANDLE Event::Create(LPSECURITY_ATTRIBUTES event_attributes, BOOL manual_reset,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Lock::Lock(CriticalSection& critical_section)
+    : critical_section_(critical_section) {
+  critical_section_.Enter();
+}
+
+Lock::~Lock() {
+  critical_section_.Leave();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 Mutex::Mutex()
     : mutex_(nullptr) {
 }

@@ -62,8 +62,6 @@ private:
   CRITICAL_SECTION critical_section_;
 };
 
-////////////////////////////////////////////////////////////////////////////////
-
 class Event {
 public:
   Event();
@@ -79,7 +77,14 @@ private:
   HANDLE event_;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+class Lock {
+public:
+  Lock(CriticalSection& critical_section);
+  virtual ~Lock();
+
+private:
+  CriticalSection& critical_section_;
+};
 
 class Mutex {
 public:
