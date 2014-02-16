@@ -19,16 +19,16 @@
 #include "base/file.h"
 #include "base/logger.h"
 #include "base/string.h"
-#include "http.h"
 #include "library/anime_db.h"
 #include "library/resource.h"
-#include "settings.h"
-#include "stats.h"
 #include "sync/manager.h"
-#include "taiga.h"
 #include "taiga/announce.h"
+#include "taiga/http.h"
+#include "taiga/settings.h"
+#include "taiga/stats.h"
+#include "taiga/taiga.h"
+#include "taiga/version.h"
 #include "ui/ui.h"
-#include "version.h"
 
 taiga::HttpManager ConnectionManager;
 
@@ -269,49 +269,11 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
     }
 
-    case kHttpTwitterRequest: {
-      bool success = false;
-      OAuthParameters parameters = ::Twitter.oauth.ParseQueryString(response.body);
-      if (!parameters[L"oauth_token"].empty()) {
-        ExecuteLink(L"http://api.twitter.com/oauth/authorize?oauth_token=" +
-                    parameters[L"oauth_token"]);
-        string_t auth_pin;
-        if (ui::OnTwitterTokenEntry(auth_pin))
-          ::Twitter.AccessToken(parameters[L"oauth_token"],
-                                parameters[L"oauth_token_secret"],
-                                auth_pin);
-        success = true;
-      }
-      ui::OnTwitterTokenRequest(success);
+    case kHttpTwitterRequest:
+    case kHttpTwitterAuth:
+    case kHttpTwitterPost:
+      ::Twitter.HandleHttpResponse(client.mode(), response);
       break;
-    }
-    case kHttpTwitterAuth: {
-      bool success = false;
-      OAuthParameters parameters = ::Twitter.oauth.ParseQueryString(response.body);
-      if (!parameters[L"oauth_token"].empty() && !parameters[L"oauth_token_secret"].empty()) {
-        Settings.Set(kShare_Twitter_OauthToken, parameters[L"oauth_token"]);
-        Settings.Set(kShare_Twitter_OauthSecret, parameters[L"oauth_token_secret"]);
-        Settings.Set(kShare_Twitter_Username, parameters[L"screen_name"]);
-        success = true;
-      }
-      ui::OnTwitterAuth(success);
-      break;
-    }
-    case kHttpTwitterPost: {
-      if (InStr(response.body, L"\"errors\"", 0) == -1) {
-        ui::OnTwitterPost(true, L"");
-      } else {
-        string_t error;
-        int index_begin = InStr(response.body, L"\"message\":\"", 0);
-        int index_end = InStr(response.body, L"\",\"", index_begin);
-        if (index_begin > -1 && index_end > -1) {
-          index_begin += 11;
-          error = response.body.substr(index_begin, index_end - index_begin);
-        }
-        ui::OnTwitterPost(false, error);
-      }
-      break;
-    }
 
     case kHttpTaigaUpdateCheck:
       if (Taiga.Updater.ParseData(response.body))

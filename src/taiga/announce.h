@@ -21,6 +21,8 @@
 
 #include <string>
 
+#include "base/types.h"
+#include "taiga/http.h"
 #include "third_party/oauth/oauth.h"
 #include "win/win_window.h"
 
@@ -112,6 +114,8 @@ public:
   bool RequestToken();
   bool AccessToken(const std::wstring& key, const std::wstring& secret, const std::wstring& pin);
   bool SetStatusText(const std::wstring& status_text);
+
+  void HandleHttpResponse(HttpClientMode mode, const HttpResponse& response);
 
 public:
   OAuth oauth;

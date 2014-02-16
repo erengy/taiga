@@ -18,6 +18,7 @@
 
 #include "base/dde.h"
 #include "base/encoding.h"
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
@@ -421,7 +422,8 @@ bool Twitter::RequestToken() {
   return true;
 }
 
-bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret, const std::wstring& pin) {
+bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret,
+                          const std::wstring& pin) {
   HttpRequest http_request;
   http_request.protocol = win::http::kHttps;
   http_request.host = L"api.twitter.com";
@@ -460,6 +462,58 @@ bool Twitter::SetStatusText(const std::wstring& status_text) {
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterPost);
   return true;
+}
+
+void Twitter::HandleHttpResponse(HttpClientMode mode,
+                                 const HttpResponse& response) {
+  switch (mode) {
+    case kHttpTwitterRequest: {
+      bool success = false;
+      OAuthParameters parameters = oauth.ParseQueryString(response.body);
+      if (!parameters[L"oauth_token"].empty()) {
+        ExecuteLink(L"http://api.twitter.com/oauth/authorize?oauth_token=" +
+                    parameters[L"oauth_token"]);
+        string_t auth_pin;
+        if (ui::OnTwitterTokenEntry(auth_pin))
+          AccessToken(parameters[L"oauth_token"],
+                      parameters[L"oauth_token_secret"],
+                      auth_pin);
+        success = true;
+      }
+      ui::OnTwitterTokenRequest(success);
+      break;
+    }
+
+    case kHttpTwitterAuth: {
+      bool success = false;
+      OAuthParameters parameters = oauth.ParseQueryString(response.body);
+      if (!parameters[L"oauth_token"].empty() &&
+          !parameters[L"oauth_token_secret"].empty()) {
+        Settings.Set(kShare_Twitter_OauthToken, parameters[L"oauth_token"]);
+        Settings.Set(kShare_Twitter_OauthSecret, parameters[L"oauth_token_secret"]);
+        Settings.Set(kShare_Twitter_Username, parameters[L"screen_name"]);
+        success = true;
+      }
+      ui::OnTwitterAuth(success);
+      break;
+    }
+
+    case kHttpTwitterPost: {
+      if (InStr(response.body, L"\"errors\"", 0) == -1) {
+        ui::OnTwitterPost(true, L"");
+      } else {
+        string_t error;
+        int index_begin = InStr(response.body, L"\"message\":\"", 0);
+        int index_end = InStr(response.body, L"\",\"", index_begin);
+        if (index_begin > -1 && index_end > -1) {
+          index_begin += 11;
+          error = response.body.substr(index_begin, index_end - index_begin);
+        }
+        ui::OnTwitterPost(false, error);
+      }
+      break;
+    }
+  }
 }
 
 void Announcer::ToTwitter(const std::wstring& status_text) {
