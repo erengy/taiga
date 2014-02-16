@@ -162,7 +162,7 @@ void HistoryQueue::Check(bool automatic) {
   }
   if (!items[index].enabled) {
     LOG(LevelDebug, L"Item is disabled, removing...");
-    Remove(index);
+    Remove(index, true, true, false);
     Check();
     return;
   }
@@ -180,7 +180,7 @@ void HistoryQueue::Check(bool automatic) {
   if (!anime_item) {
     LOG(LevelWarning, L"Item not found in list, removing... ID: " +
                       ToWstr(items[index].anime_id));
-    Remove(index);
+    Remove(index, true, true, false);
     Check();
     return;
   }
@@ -288,7 +288,8 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
       ui::OnHistoryChange();
   }
 
-  if (save) history->Save();
+  if (save)
+    history->Save();
 }
 
 void HistoryQueue::RemoveDisabled(bool save, bool refresh) {
