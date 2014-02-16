@@ -646,7 +646,7 @@ bool OnFeedNotify(const Feed& feed) {
   std::wstring tip_format = L"%title%$if(%episode%, #%episode%)\n";
 
   foreach_(it, feed.items)
-    if (it->state == FEEDITEM_SELECTED)
+    if (it->state == kFeedItemSelected)
       tip_text += L"\u00BB " + ReplaceVariables(tip_format, it->episode_data);
 
   if (tip_text.empty())

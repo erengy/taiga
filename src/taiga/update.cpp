@@ -23,6 +23,7 @@
 #include "base/string.h"
 #include "base/xml.h"
 #include "sync/service.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "taiga/update.h"

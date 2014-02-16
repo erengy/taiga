@@ -268,9 +268,9 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
       continue;
     int icon_ = ui::kIcon16_Funnel;
     switch (it->filter.action) {
-      case FEED_FILTER_ACTION_DISCARD: icon_ = ui::kIcon16_FunnelCross; break;
-      case FEED_FILTER_ACTION_SELECT:  icon_ = ui::kIcon16_FunnelTick;  break;
-      case FEED_FILTER_ACTION_PREFER:  icon_ = ui::kIcon16_FunnelPlus;  break;
+      case kFeedFilterActionDiscard: icon_ = ui::kIcon16_FunnelCross; break;
+      case kFeedFilterActionSelect:  icon_ = ui::kIcon16_FunnelTick;  break;
+      case kFeedFilterActionPrefer:  icon_ = ui::kIcon16_FunnelPlus;  break;
     }
     if (it->filter.conditions.empty())
       icon_ = ui::kIcon16_FunnelPencil;
@@ -381,16 +381,16 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
 
   // Initialize options
   match_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_MATCH));
-  match_combo.AddString(Aggregator.filter_manager.TranslateMatching(FEED_FILTER_MATCH_ALL).c_str());
-  match_combo.AddString(Aggregator.filter_manager.TranslateMatching(FEED_FILTER_MATCH_ANY).c_str());
+  match_combo.AddString(Aggregator.filter_manager.TranslateMatching(kFeedFilterMatchAll).c_str());
+  match_combo.AddString(Aggregator.filter_manager.TranslateMatching(kFeedFilterMatchAny).c_str());
   action_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_ACTION));
-  action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_DISCARD).c_str());
-  action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_SELECT).c_str());
-  action_combo.AddString(Aggregator.filter_manager.TranslateAction(FEED_FILTER_ACTION_PREFER).c_str());
+  action_combo.AddString(Aggregator.filter_manager.TranslateAction(kFeedFilterActionDiscard).c_str());
+  action_combo.AddString(Aggregator.filter_manager.TranslateAction(kFeedFilterActionSelect).c_str());
+  action_combo.AddString(Aggregator.filter_manager.TranslateAction(kFeedFilterActionPrefer).c_str());
   option_combo.Attach(GetDlgItem(IDC_COMBO_FEED_FILTER_OPTION));
-  option_combo.AddString(Aggregator.filter_manager.TranslateOption(FEED_FILTER_OPTION_DEFAULT).c_str());
-  option_combo.AddString(Aggregator.filter_manager.TranslateOption(FEED_FILTER_OPTION_DEACTIVATE).c_str());
-  option_combo.AddString(Aggregator.filter_manager.TranslateOption(FEED_FILTER_OPTION_HIDE).c_str());
+  option_combo.AddString(Aggregator.filter_manager.TranslateOption(kFeedFilterOptionDefault).c_str());
+  option_combo.AddString(Aggregator.filter_manager.TranslateOption(kFeedFilterOptionDeactivate).c_str());
+  option_combo.AddString(Aggregator.filter_manager.TranslateOption(kFeedFilterOptionHide).c_str());
 
   // Display current filter
   name_text.SetText(parent->filter.name);
@@ -409,7 +409,7 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
     case 100: {
       DlgFeedCondition.condition.Reset();
       DlgFeedCondition.Create(IDD_FEED_CONDITION, GetWindowHandle());
-      if (DlgFeedCondition.condition.element > -1) {
+      if (DlgFeedCondition.condition.element != kFeedFilterElement_None) {
         parent->filter.AddCondition(
             DlgFeedCondition.condition.element,
             DlgFeedCondition.condition.op,
@@ -507,7 +507,7 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (condition) {
             DlgFeedCondition.condition = *condition;
             DlgFeedCondition.Create(IDD_FEED_CONDITION, GetWindowHandle());
-            if (DlgFeedCondition.condition.element > -1) {
+            if (DlgFeedCondition.condition.element != kFeedFilterElement_None) {
               *condition = DlgFeedCondition.condition;
               RefreshConditionList();
               condition_list.SetSelectedItem(selected_item);
@@ -536,9 +536,9 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
 bool FeedFilterDialog::DialogPage1::BuildFilter(FeedFilter& filter) {
   name_text.GetText(filter.name);
-  filter.match = match_combo.GetCurSel();
-  filter.action = action_combo.GetCurSel();
-  filter.option = option_combo.GetCurSel();
+  filter.match = static_cast<FeedFilterMatch>(match_combo.GetCurSel());
+  filter.action = static_cast<FeedFilterAction>(action_combo.GetCurSel());
+  filter.option = static_cast<FeedFilterOption>(option_combo.GetCurSel());
 
   return true;
 }
@@ -562,10 +562,10 @@ void FeedFilterDialog::DialogPage1::RefreshConditionList() {
 }
 
 void FeedFilterDialog::DialogPage1::ChangeAction() {
-  bool enabled = action_combo.GetCurSel() == FEED_FILTER_ACTION_DISCARD;
+  bool enabled = action_combo.GetCurSel() == kFeedFilterActionDiscard;
 
   if (!enabled)
-    option_combo.SetCurSel(FEED_FILTER_OPTION_DEFAULT);
+    option_combo.SetCurSel(kFeedFilterOptionDefault);
   option_combo.Enable(enabled);
   option_combo.Show(enabled);
 

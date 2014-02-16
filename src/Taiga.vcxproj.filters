@@ -813,6 +813,9 @@
     <ClInclude Include="track\search.h">
       <Filter>track</Filter>
     </ClInclude>
+    <ClInclude Include="track\feed_filter.h">
+      <Filter>track</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="taiga\version.rc">

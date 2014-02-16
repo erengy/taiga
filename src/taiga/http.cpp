@@ -257,7 +257,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
           }
           cmd += L"\"" + file + L"\"";
           Execute(app_path, cmd);
-          feed_item->state = FEEDITEM_DISCARDED_NORMAL;
+          feed_item->state = kFeedItemDiscardedNormal;
           ui::OnFeedDownload(true);
         }
         feed->download_index = -1;

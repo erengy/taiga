@@ -19,19 +19,15 @@
 #include <algorithm>
 
 #include "base/encoding.h"
-#include "base/encryption.h"
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
-#include "base/types.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
+#include "taiga/http.h"
 #include "taiga/path.h"
-#include "taiga/resource.h"
-#include "taiga/script.h"
 #include "taiga/settings.h"
-#include "taiga/taiga.h"
 #include "track/feed.h"
 #include "track/recognition.h"
 #include "ui/dialog.h"
@@ -39,28 +35,35 @@
 
 class Aggregator Aggregator;
 
-// =============================================================================
+GenericFeedItem::GenericFeedItem()
+    : permalink(true) {
+}
+
+FeedItem::FeedItem()
+    : index(-1),
+      state(kFeedItemBlank) {
+}
 
 void FeedItem::Discard(int option) {
   switch (option) {
     default:
-    case FEED_FILTER_OPTION_DEFAULT:
-      state = FEEDITEM_DISCARDED_NORMAL;
+    case kFeedFilterOptionDefault:
+      state = kFeedItemDiscardedNormal;
       break;
-    case FEED_FILTER_OPTION_DEACTIVATE:
-      state = FEEDITEM_DISCARDED_INACTIVE;
+    case kFeedFilterOptionDeactivate:
+      state = kFeedItemDiscardedInactive;
       break;
-    case FEED_FILTER_OPTION_HIDE:
-      state = FEEDITEM_DISCARDED_HIDDEN;
+    case kFeedFilterOptionHide:
+      state = kFeedItemDiscardedHidden;
       break;
   }
 }
 
 bool FeedItem::IsDiscarded() const {
   switch (state) {
-    case FEEDITEM_DISCARDED_NORMAL:
-    case FEEDITEM_DISCARDED_INACTIVE:
-    case FEEDITEM_DISCARDED_HIDDEN:
+    case kFeedItemDiscardedNormal:
+    case kFeedItemDiscardedInactive:
+    case kFeedItemDiscardedHidden:
       return true;
     default:
       return false;
@@ -75,63 +78,68 @@ bool FeedItem::operator<(const FeedItem& item) const {
   return state_priorities[this->state] < state_priorities[item.state];
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 Feed::Feed()
-    : category(0),
+    : category(kFeedCategoryLink),
       download_index(-1) {
 }
 
 bool Feed::Check(const std::wstring& source, bool automatic) {
-  if (source.empty()) return false;
+  if (source.empty())
+    return false;
+
   link = source;
-  
+
   switch (category) {
-    case FEED_CATEGORY_LINK:
+    case kFeedCategoryLink:
       ui::EnableDialogInput(ui::kDialogTorrents, false);
       break;
   }
 
   win::http::Url url(link);
-  
+
   HttpRequest http_request;
   http_request.host = url.host;
   http_request.path = url.path;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
-  
-  auto client_mode = automatic ? taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
+
+  auto client_mode = automatic ?
+      taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
   auto& client = ConnectionManager.GetNewClient(http_request.uuid);
   client.set_download_path(GetDataPath() + L"feed.xml");
   ConnectionManager.MakeRequest(client, http_request, client_mode);
+
   return true;
 }
 
 bool Feed::Download(int index) {
-  if (category != FEED_CATEGORY_LINK)
+  if (category != kFeedCategoryLink)
     return false;
-  
+
   auto client_mode = taiga::kHttpFeedDownload;
   if (index == -1) {
     for (size_t i = 0; i < items.size(); i++) {
-      if (items[i].state == FEEDITEM_SELECTED) {
+      if (items.at(i).state == kFeedItemSelected) {
         client_mode = taiga::kHttpFeedDownloadAll;
         index = i;
         break;
       }
     }
   }
-  if (index < 0 || index > static_cast<int>(items.size())) return false;
+  if (index < 0 || index > static_cast<int>(items.size()))
+    return false;
   download_index = index;
 
   ui::ChangeStatusText(L"Downloading \"" + items[index].title + L"\"...");
   ui::EnableDialogInput(ui::kDialogTorrents, false);
-  
+
   std::wstring file = items[index].title + L".torrent";
   ValidateFileName(file);
   file = GetDataPath() + file;
 
   win::http::Url url(items[index].link);
-  
+
   HttpRequest http_request;
   http_request.host = url.host;
   http_request.path = url.path;
@@ -140,24 +148,25 @@ bool Feed::Download(int index) {
   auto& client = ConnectionManager.GetNewClient(http_request.uuid);
   client.set_download_path(file);
   ConnectionManager.MakeRequest(client, http_request, client_mode);
+
   return true;
 }
 
 bool Feed::ExamineData() {
-  for (size_t i = 0; i < items.size(); i++) {
+  foreach_(it, items) {
     // Examine title and compare with anime list items
-    Meow.ExamineTitle(items[i].title, items[i].episode_data, true, true, true, true, false);
-    Meow.MatchDatabase(items[i].episode_data, true, true);
-    
+    Meow.ExamineTitle(it->title, it->episode_data,
+                      true, true, true, true, false);
+    Meow.MatchDatabase(it->episode_data, true, true);
+
     // Update last aired episode number
-    if (items[i].episode_data.anime_id > anime::ID_UNKNOWN) {
-      auto anime_item = AnimeDatabase.FindItem(items[i].episode_data.anime_id);
-      int episode_number = anime::GetEpisodeHigh(items[i].episode_data.number);
+    if (it->episode_data.anime_id > anime::ID_UNKNOWN) {
+      auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
+      int episode_number = anime::GetEpisodeHigh(it->episode_data.number);
       anime_item->SetLastAiredEpisodeNumber(episode_number);
     }
   }
 
-  // Filter
   Aggregator.filter_manager.MarkNewEpisodes(*this);
   // Preferences have lower priority, so we need to handle other filters
   // first in order to avoid discarding items that we actually want.
@@ -168,7 +177,6 @@ bool Feed::ExamineData() {
 
   // Sort items
   std::stable_sort(items.begin(), items.end());
-
   // Re-assign item indexes
   for (size_t i = 0; i < items.size(); i++)
     items.at(i).index = i;
@@ -188,25 +196,23 @@ std::wstring Feed::GetDataPath() {
 }
 
 bool Feed::Load() {
-  // Initialize
   std::wstring file = GetDataPath() + L"feed.xml";
   items.clear();
 
-  // Load XML file
-  xml_document doc;
-  xml_parse_result result = doc.load_file(file.c_str());
-  if (result.status != pugi::status_ok) {
+  xml_document document;
+  xml_parse_result parse_result = document.load_file(file.c_str());
+
+  if (parse_result.status != pugi::status_ok)
     return false;
-  }
 
   // Read channel information
-  xml_node channel = doc.child(L"rss").child(L"channel");
+  xml_node channel = document.child(L"rss").child(L"channel");
   title = XmlReadStrValue(channel, L"title");
   link = XmlReadStrValue(channel, L"link");
   description = XmlReadStrValue(channel, L"description");
 
   // Read items
-  for (xml_node item = channel.child(L"item"); item; item = item.next_sibling(L"item")) {
+  foreach_xmlnode_(item, channel, L"item") {
     // Read data
     items.resize(items.size() + 1);
     items.back().index = items.size() - 1;
@@ -216,13 +222,13 @@ bool Feed::Load() {
     items.back().description = XmlReadStrValue(item, L"description");
     
     // Remove if title or link is empty
-    if (category == FEED_CATEGORY_LINK) {
+    if (category == kFeedCategoryLink) {
       if (items.back().title.empty() || items.back().link.empty()) {
         items.pop_back();
         continue;
       }
     }
-    
+
     // Clean up title
     DecodeHtmlEntities(items.back().title);
     Replace(items.back().title, L"\\'", L"'");
@@ -234,24 +240,20 @@ bool Feed::Load() {
     Trim(items.back().description, L" \n");
     Aggregator.ParseDescription(items.back(), link);
     Replace(items.back().description, L"\n", L" | ");
-    // Get download link
-    if (InStr(items.back().link, L"nyaatorrents", 0, true) > -1) {
-      Replace(items.back().link, L"torrentinfo", L"download");
-    }
   }
 
   return true;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 Aggregator::Aggregator() {
   // Add torrent feed
   feeds.resize(feeds.size() + 1);
-  feeds.back().category = FEED_CATEGORY_LINK;
+  feeds.back().category = kFeedCategoryLink;
 }
 
-Feed* Aggregator::Get(int category) {
+Feed* Aggregator::Get(FeedCategory category) {
   foreach_(it, feeds)
     if (it->category == category)
       return &(*it);
@@ -264,56 +266,64 @@ bool Aggregator::Notify(const Feed& feed) {
 }
 
 bool Aggregator::SearchArchive(const std::wstring& file) {
-  for (size_t i = 0; i < file_archive.size(); i++)
-    if (file_archive[i] == file)
+  foreach_(it, file_archive)
+    if (*it == file)
       return true;
 
   return false;
 }
 
-void Aggregator::ParseDescription(FeedItem& feed_item, const std::wstring& source) {
+void Aggregator::ParseDescription(FeedItem& feed_item,
+                                  const std::wstring& source) {
   // AnimeSuki
   if (InStr(source, L"animesuki", 0, true) > -1) {
     std::wstring size_str = L"Filesize: ";
     std::vector<std::wstring> description_vector;
     Split(feed_item.description, L"\n", description_vector);
     if (description_vector.size() > 2) {
-      feed_item.episode_data.file_size = description_vector[2].substr(size_str.length());
+      feed_item.episode_data.file_size =
+          description_vector[2].substr(size_str.length());
     }
     if (description_vector.size() > 1) {
-      feed_item.description = description_vector[0] + L" " + description_vector[1];
+      feed_item.description =
+          description_vector[0] + L" " + description_vector[1];
       return;
     }
     feed_item.description.clear();
 
   // Baka-Updates
   } else if (InStr(source, L"baka-updates", 0, true) > -1) {
-    int index_begin = 0, index_end = feed_item.description.length();
-    index_begin = InStr(feed_item.description, L"Released on");
-    if (index_begin > -1) index_end -= index_begin;
-    if (index_begin == -1) index_begin = 0;
-    feed_item.description = feed_item.description.substr(index_begin, index_end);
+    int index_begin = InStr(feed_item.description, L"Released on");
+    int index_end = feed_item.description.length();
+    if (index_begin > -1)
+      index_end -= index_begin;
+    if (index_begin == -1)
+      index_begin = 0;
+    feed_item.description =
+        feed_item.description.substr(index_begin, index_end);
 
   // NyaaTorrents
   } else if (InStr(source, L"nyaa", 0, true) > -1) {
-    feed_item.episode_data.file_size = InStr(feed_item.description, L" - ", L" - ");
+    feed_item.episode_data.file_size =
+        InStr(feed_item.description, L" - ", L" - ");
     Erase(feed_item.description, feed_item.episode_data.file_size);
     Replace(feed_item.description, L"-  -", L"-");
 
   // TokyoTosho
   } else if (InStr(source, L"tokyotosho", 0, true) > -1) {
-    std::wstring size_str = L"Size: ", comment_str = L"Comment: ";
+    std::wstring size_str = L"Size: ";
+    std::wstring comment_str = L"Comment: ";
     std::vector<std::wstring> description_vector;
     Split(feed_item.description, L"\n", description_vector);
     feed_item.description.clear();
-    for (auto it = description_vector.begin(); it != description_vector.end(); ++it) {
+    foreach_(it, description_vector) {
       if (StartsWith(*it, size_str)) {
         feed_item.episode_data.file_size = it->substr(size_str.length());
       } else if (StartsWith(*it, comment_str)) {
         feed_item.description = it->substr(comment_str.length());
       } else if (InStr(*it, L"magnet:?") > -1) {
         feed_item.magnet_link = L"magnet:?" + 
-          InStr(*it, L"<a href=\"magnet:?", L"\">Magnet Link</a>");
+            InStr(*it, L"<a href=\"magnet:?", L"\">Magnet Link</a>");
       }
     }
 
@@ -362,26 +372,24 @@ bool Aggregator::SaveArchive() {
   return XmlWriteDocumentToFile(document, path);
 }
 
-// =============================================================================
-
-bool Aggregator::CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2) {
+bool Aggregator::CompareFeedItems(const GenericFeedItem& item1,
+                                  const GenericFeedItem& item2) {
   // Check for guid element first
-  if (item1.is_permalink && item2.is_permalink) {
-    if (!item1.guid.empty() || !item2.guid.empty()) {
-      if (item1.guid == item2.guid) return true;
-    }
-  }
+  if (item1.permalink && item2.permalink)
+    if (!item1.guid.empty() || !item2.guid.empty())
+      if (item1.guid == item2.guid)
+        return true;
 
   // Fallback to link element
-  if (!item1.link.empty() || !item2.link.empty()) {
-    if (item1.link == item2.link) return true;
-  }
+  if (!item1.link.empty() || !item2.link.empty())
+    if (item1.link == item2.link)
+      return true;
 
   // Fallback to title element
-  if (!item1.title.empty() || !item2.title.empty()) {
-    if (item1.title == item2.title) return true;
-  }
+  if (!item1.title.empty() || !item2.title.empty())
+    if (item1.title == item2.title)
+      return true;
 
-  // items are different
+  // Items are different
   return false;
 }

@@ -304,6 +304,7 @@
     <ClInclude Include="third_party\zlib\zlib.h" />
     <ClInclude Include="third_party\zlib\zutil.h" />
     <ClInclude Include="track\feed.h" />
+    <ClInclude Include="track\feed_filter.h" />
     <ClInclude Include="track\media.h" />
     <ClInclude Include="track\monitor.h" />
     <ClInclude Include="track\recognition.h" />

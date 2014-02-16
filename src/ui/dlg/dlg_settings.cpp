@@ -498,9 +498,9 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
 
   int icon = ui::kIcon16_Funnel;
   switch (filter.action) {
-    case FEED_FILTER_ACTION_DISCARD: icon = ui::kIcon16_FunnelCross; break;
-    case FEED_FILTER_ACTION_SELECT:  icon = ui::kIcon16_FunnelTick;  break;
-    case FEED_FILTER_ACTION_PREFER:  icon = ui::kIcon16_FunnelPlus;  break;
+    case kFeedFilterActionDiscard: icon = ui::kIcon16_FunnelCross; break;
+    case kFeedFilterActionSelect:  icon = ui::kIcon16_FunnelTick;  break;
+    case kFeedFilterActionPrefer:  icon = ui::kIcon16_FunnelPlus;  break;
   }
 
   // Insert item

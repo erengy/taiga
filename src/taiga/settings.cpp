@@ -369,12 +369,15 @@ bool AppSettings::Load() {
   Aggregator.filter_manager.filters.clear();
   foreach_xmlnode_(item, node_filter, L"item") {
     Aggregator.filter_manager.AddFilter(
-        Aggregator.filter_manager.GetIndexFromShortcode(
-            FEED_FILTER_SHORTCODE_ACTION, item.attribute(L"action").value()),
-        Aggregator.filter_manager.GetIndexFromShortcode(
-            FEED_FILTER_SHORTCODE_MATCH, item.attribute(L"match").value()),
-        Aggregator.filter_manager.GetIndexFromShortcode(
-            FEED_FILTER_SHORTCODE_OPTION, item.attribute(L"option").value()),
+        static_cast<FeedFilterAction>(
+            Aggregator.filter_manager.GetIndexFromShortcode(
+                kFeedFilterShortcodeAction, item.attribute(L"action").value())),
+        static_cast<FeedFilterMatch>(
+            Aggregator.filter_manager.GetIndexFromShortcode(
+                kFeedFilterShortcodeMatch, item.attribute(L"match").value())),
+        static_cast<FeedFilterOption>(
+            Aggregator.filter_manager.GetIndexFromShortcode(
+                kFeedFilterShortcodeOption, item.attribute(L"option").value())),
         item.attribute(L"enabled").as_bool(),
         item.attribute(L"name").value());
     foreach_xmlnode_(anime, item, L"anime") {
@@ -383,19 +386,21 @@ bool AppSettings::Load() {
     }
     foreach_xmlnode_(condition, item, L"condition") {
       Aggregator.filter_manager.filters.back().AddCondition(
-          Aggregator.filter_manager.GetIndexFromShortcode(
-              FEED_FILTER_SHORTCODE_ELEMENT,
-              condition.attribute(L"element").value()),
-          Aggregator.filter_manager.GetIndexFromShortcode(
-              FEED_FILTER_SHORTCODE_OPERATOR,
-              condition.attribute(L"operator").value()),
+          static_cast<FeedFilterElement>(
+              Aggregator.filter_manager.GetIndexFromShortcode(
+                  kFeedFilterShortcodeElement,
+                  condition.attribute(L"element").value())),
+          static_cast<FeedFilterOperator>(
+              Aggregator.filter_manager.GetIndexFromShortcode(
+                  kFeedFilterShortcodeOperator,
+                  condition.attribute(L"operator").value())),
           condition.attribute(L"value").value());
     }
   }
 
   if (Aggregator.filter_manager.filters.empty())
     Aggregator.filter_manager.AddPresets();
-  auto feed = Aggregator.Get(FEED_CATEGORY_LINK);
+  auto feed = Aggregator.Get(kFeedCategoryLink);
   if (feed)
     feed->link = GetWstr(kTorrent_Discovery_Source);
   Aggregator.LoadArchive();
@@ -451,13 +456,13 @@ bool AppSettings::Save() {
     xml_node item = torrent_filter.append_child(L"item");
     item.append_attribute(L"action") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
-            FEED_FILTER_SHORTCODE_ACTION, it->action).c_str();
+            kFeedFilterShortcodeAction, it->action).c_str();
     item.append_attribute(L"match") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
-            FEED_FILTER_SHORTCODE_MATCH, it->match).c_str();
+            kFeedFilterShortcodeMatch, it->match).c_str();
     item.append_attribute(L"option") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
-            FEED_FILTER_SHORTCODE_OPTION, it->option).c_str();
+            kFeedFilterShortcodeOption, it->option).c_str();
     item.append_attribute(L"enabled") = it->enabled;
     item.append_attribute(L"name") = it->name.c_str();
     foreach_(ita, it->anime_ids) {
@@ -468,10 +473,10 @@ bool AppSettings::Save() {
       xml_node condition = item.append_child(L"condition");
       condition.append_attribute(L"element") =
           Aggregator.filter_manager.GetShortcodeFromIndex(
-              FEED_FILTER_SHORTCODE_ELEMENT, itc->element).c_str();
+              kFeedFilterShortcodeElement, itc->element).c_str();
       condition.append_attribute(L"operator") =
           Aggregator.filter_manager.GetShortcodeFromIndex(
-              FEED_FILTER_SHORTCODE_OPERATOR, itc->op).c_str();
+              kFeedFilterShortcodeOperator, itc->op).c_str();
       condition.append_attribute(L"value") = itc->value.c_str();
     }
   }

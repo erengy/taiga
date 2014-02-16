@@ -16,168 +16,184 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "feed.h"
-
+#include "base/foreach.h"
+#include "base/logger.h"
+#include "base/string.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
-#include "base/foreach.h"
-#include "base/logger.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
-#include "base/string.h"
+#include "track/feed.h"
+#include "track/feed_filter.h"
 
-// =============================================================================
-
-bool EvaluateCondition(const FeedFilterCondition& condition, const FeedItem& item) {
+bool EvaluateCondition(const FeedFilterCondition& condition,
+                       const FeedItem& item) {
   bool is_numeric = false;
-  std::wstring element, value = ReplaceVariables(condition.value, item.episode_data);
+  std::wstring element;
+  std::wstring value = ReplaceVariables(condition.value, item.episode_data);
   auto anime = AnimeDatabase.FindItem(item.episode_data.anime_id);
 
   switch (condition.element) {
-    case FEED_FILTER_ELEMENT_FILE_TITLE:
+    case kFeedFilterElement_File_Title:
       element = item.title;
       break;
-    case FEED_FILTER_ELEMENT_FILE_CATEGORY:
+    case kFeedFilterElement_File_Category:
       element = item.category;
       break;
-    case FEED_FILTER_ELEMENT_FILE_DESCRIPTION:
+    case kFeedFilterElement_File_Description:
       element = item.description;
       break;
-    case FEED_FILTER_ELEMENT_FILE_LINK:
+    case kFeedFilterElement_File_Link:
       element = item.link;
       break;
-    case FEED_FILTER_ELEMENT_META_ID:
-      if (anime) element = ToWstr(anime->GetId());
+    case kFeedFilterElement_Meta_Id:
+      if (anime)
+        element = ToWstr(anime->GetId());
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_EPISODE_TITLE:
+    case kFeedFilterElement_Episode_Title:
       element = item.episode_data.title;
       break;
-    case FEED_FILTER_ELEMENT_META_DATE_START:
-      if (anime) element = anime->GetDateStart();
+    case kFeedFilterElement_Meta_DateStart:
+      if (anime)
+        element = anime->GetDateStart();
       break;
-    case FEED_FILTER_ELEMENT_META_DATE_END:
-      if (anime) element = anime->GetDateEnd();
+    case kFeedFilterElement_Meta_DateEnd:
+      if (anime)
+        element = anime->GetDateEnd();
       break;
-    case FEED_FILTER_ELEMENT_META_EPISODES:
-      if (anime) element = ToWstr(anime->GetEpisodeCount());
+    case kFeedFilterElement_Meta_Episodes:
+      if (anime)
+        element = ToWstr(anime->GetEpisodeCount());
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_META_STATUS:
-      if (anime) element = ToWstr(anime->GetAiringStatus());
+    case kFeedFilterElement_Meta_Status:
+      if (anime)
+        element = ToWstr(anime->GetAiringStatus());
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_META_TYPE:
-      if (anime) element = ToWstr(anime->GetType());
+    case kFeedFilterElement_Meta_Type:
+      if (anime)
+        element = ToWstr(anime->GetType());
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_USER_STATUS:
-      if (anime) element = ToWstr(anime->GetMyStatus());
+    case kFeedFilterElement_User_Status:
+      if (anime)
+        element = ToWstr(anime->GetMyStatus());
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_EPISODE_NUMBER:
+    case kFeedFilterElement_Episode_Number:
       element = ToWstr(anime::GetEpisodeHigh(item.episode_data.number));
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_EPISODE_VERSION:
+    case kFeedFilterElement_Episode_Version:
       element = item.episode_data.version;
-      if (element.empty()) element = L"1";
+      if (element.empty())
+        element = L"1";
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE:
-      if (anime) element = ToWstr(anime->IsEpisodeAvailable(
-        anime::GetEpisodeHigh(item.episode_data.number)));
+    case kFeedFilterElement_Local_EpisodeAvailable:
+      if (anime)
+        element = ToWstr(anime->IsEpisodeAvailable(
+            anime::GetEpisodeHigh(item.episode_data.number)));
       is_numeric = true;
       break;
-    case FEED_FILTER_ELEMENT_EPISODE_GROUP:
+    case kFeedFilterElement_Episode_Group:
       element = item.episode_data.group;
       break;
-    case FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION:
+    case kFeedFilterElement_Episode_VideoResolution:
       element = item.episode_data.resolution;
       break;
-    case FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE:
+    case kFeedFilterElement_Episode_VideoType:
       element = item.episode_data.video_type;
       break;
   }
 
   switch (condition.op) {
-    case FEED_FILTER_OPERATOR_EQUALS:
+    case kFeedFilterOperator_Equals:
       if (is_numeric) {
-        if (IsEqual(value, L"True")) return ToInt(element) == TRUE;
+        if (IsEqual(value, L"True"))
+          return ToInt(element) == TRUE;
         return ToInt(element) == ToInt(value);
       } else {
-        if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
+        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
           return anime::TranslateResolution(element) == anime::TranslateResolution(condition.value);
         } else {
           return IsEqual(element, value);
         }
       }
-    case FEED_FILTER_OPERATOR_NOTEQUALS:
+    case kFeedFilterOperator_NotEquals:
       if (is_numeric) {
-        if (IsEqual(value, L"True")) return ToInt(element) == TRUE;
+        if (IsEqual(value, L"True"))
+          return ToInt(element) == TRUE;
         return ToInt(element) != ToInt(value);
       } else {
-        if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
+        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
           return anime::TranslateResolution(element) != anime::TranslateResolution(condition.value);
         } else {
           return !IsEqual(element, value);
         }
       }
-    case FEED_FILTER_OPERATOR_ISGREATERTHAN:
+    case kFeedFilterOperator_IsGreaterThan:
       if (is_numeric) {
         return ToInt(element) > ToInt(value);
       } else {
-        if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
+        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
           return anime::TranslateResolution(element) > anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) > 0;
         }
       }
-    case FEED_FILTER_OPERATOR_ISGREATERTHANOREQUALTO:
+    case kFeedFilterOperator_IsGreaterThanOrEqualTo:
       if (is_numeric) {
         return ToInt(element) >= ToInt(value);
       } else {
-        if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
+        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
           return anime::TranslateResolution(element) >= anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) >= 0;
         }
       }
-    case FEED_FILTER_OPERATOR_ISLESSTHAN:
+    case kFeedFilterOperator_IsLessThan:
       if (is_numeric) {
         return ToInt(element) < ToInt(value);
       } else {
-        if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
+        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
           return anime::TranslateResolution(element) < anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) < 0;
         }
       }
-    case FEED_FILTER_OPERATOR_ISLESSTHANOREQUALTO:
+    case kFeedFilterOperator_IsLessThanOrEqualTo:
       if (is_numeric) {
         return ToInt(element) <= ToInt(value);
       } else {
-        if (condition.element == FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION) {
+        if (condition.element == kFeedFilterElement_Episode_VideoResolution) {
           return anime::TranslateResolution(element) <= anime::TranslateResolution(condition.value);
         } else {
           return CompareStrings(element, condition.value) <= 0;
         }
       }
-    case FEED_FILTER_OPERATOR_BEGINSWITH:
+    case kFeedFilterOperator_BeginsWith:
       return StartsWith(element, value);
-    case FEED_FILTER_OPERATOR_ENDSWITH:
+    case kFeedFilterOperator_EndsWith:
       return EndsWith(element, value);
-    case FEED_FILTER_OPERATOR_CONTAINS:
+    case kFeedFilterOperator_Contains:
       return InStr(element, value, 0, true) > -1;
-    case FEED_FILTER_OPERATOR_NOTCONTAINS:
+    case kFeedFilterOperator_NotContains:
       return InStr(element, value, 0, true) == -1;
   }
 
   return false;
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+
+FeedFilterCondition::FeedFilterCondition()
+    : element(kFeedFilterElement_Meta_Id),
+      op(kFeedFilterOperator_Equals) {
+}
 
 FeedFilterCondition& FeedFilterCondition::operator=(const FeedFilterCondition& condition) {
   element = condition.element;
@@ -188,12 +204,19 @@ FeedFilterCondition& FeedFilterCondition::operator=(const FeedFilterCondition& c
 }
 
 void FeedFilterCondition::Reset() {
-  element = FEED_FILTER_ELEMENT_FILE_TITLE;
-  op = FEED_FILTER_OPERATOR_EQUALS;
+  element = kFeedFilterElement_File_Title;
+  op = kFeedFilterOperator_Equals;
   value.clear();
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+
+FeedFilter::FeedFilter()
+    : action(kFeedFilterActionDiscard),
+      enabled(true),
+      match(kFeedFilterMatchAll),
+      option(kFeedFilterOptionDefault) {
+}
 
 FeedFilter& FeedFilter::operator=(const FeedFilter& filter) {
   action = filter.action;
@@ -203,15 +226,19 @@ FeedFilter& FeedFilter::operator=(const FeedFilter& filter) {
   option = filter.option;
 
   conditions.resize(filter.conditions.size());
-  std::copy(filter.conditions.begin(), filter.conditions.end(), conditions.begin());
+  std::copy(filter.conditions.begin(), filter.conditions.end(),
+            conditions.begin());
 
   anime_ids.resize(filter.anime_ids.size());
-  std::copy(filter.anime_ids.begin(), filter.anime_ids.end(), anime_ids.begin());
+  std::copy(filter.anime_ids.begin(), filter.anime_ids.end(),
+            anime_ids.begin());
 
   return *this;
 }
 
-void FeedFilter::AddCondition(int element, int op, const std::wstring& value) {
+void FeedFilter::AddCondition(FeedFilterElement element,
+                              FeedFilterOperator op,
+                              const std::wstring& value) {
   conditions.resize(conditions.size() + 1);
   conditions.back().element = element;
   conditions.back().op = op;
@@ -235,27 +262,27 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
       }
     }
     if (!apply_filter)
-      return; // Filter doesn't apply to this item
+      return;  // Filter doesn't apply to this item
   }
 
   bool matched = false;
   size_t condition_index = 0;
 
   switch (match) {
-    case FEED_FILTER_MATCH_ALL:
+    case kFeedFilterMatchAll:
       matched = true;
       for (size_t i = 0; i < conditions.size(); i++) {
-        if (!EvaluateCondition(conditions[i], item)) {
+        if (!EvaluateCondition(conditions.at(i), item)) {
           matched = false;
           condition_index = i;
           break;
         }
       }
       break;
-    case FEED_FILTER_MATCH_ANY:
+    case kFeedFilterMatchAny:
       matched = false;
       for (size_t i = 0; i < conditions.size(); i++) {
-        if (EvaluateCondition(conditions[i], item)) {
+        if (EvaluateCondition(conditions.at(i), item)) {
           matched = true;
           condition_index = i;
           break;
@@ -265,42 +292,48 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   }
 
   switch (action) {
-    case FEED_FILTER_ACTION_DISCARD:
+    case kFeedFilterActionDiscard:
       if (matched) {
         // Discard matched items, regardless of their previous state
         item.Discard(option);
       } else {
-        return; // Filter doesn't apply to this item
+        return;  // Filter doesn't apply to this item
       }
       break;
 
-    case FEED_FILTER_ACTION_SELECT:
+    case kFeedFilterActionSelect:
       if (matched) {
         // Select matched items, if they were not discarded before
-        item.state = FEEDITEM_SELECTED;
+        item.state = kFeedItemSelected;
       } else {
-        return; // Filter doesn't apply to this item
+        return;  // Filter doesn't apply to this item
       }
       break;
 
-    case FEED_FILTER_ACTION_PREFER: {
+    case kFeedFilterActionPrefer: {
       if (recursive) {
         if (matched) {
           foreach_(it, feed.items) {
             // Do not bother if the item was discarded before
-            if (it->IsDiscarded()) continue;
+            if (it->IsDiscarded())
+              continue;
             // Do not filter the same item again
-            if (it->index == item.index) continue;
+            if (it->index == item.index)
+              continue;
             // Is it the same title?
             if (it->episode_data.anime_id == anime::ID_NOTINLIST) {
-              if (!IsEqual(it->episode_data.title, item.episode_data.title)) continue;
+              if (!IsEqual(it->episode_data.title, item.episode_data.title))
+                continue;
             } else {
-              if (it->episode_data.anime_id != item.episode_data.anime_id) continue;
+              if (it->episode_data.anime_id != item.episode_data.anime_id)
+                continue;
             }
             // Is it the same episode?
-            if (it->episode_data.number != item.episode_data.number) continue;
+            if (it->episode_data.number != item.episode_data.number)
+              continue;
             // Is it the same group?
-            if (!IsEqual(it->episode_data.group, item.episode_data.group)) continue;
+            if (!IsEqual(it->episode_data.group, item.episode_data.group))
+              continue;
             // Try applying the same filter
             Filter(feed, *it, false);
           }
@@ -310,7 +343,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         if (strong_preference) {
           if (matched) {
             // Select matched items, if they were not discarded before
-            item.state = FEEDITEM_SELECTED;
+            item.state = kFeedItemSelected;
           } else {
             // Discard mismatched items, regardless of their previous state
             item.Discard(option);
@@ -326,7 +359,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
           // Discard mismatched items, regardless of their previous state
           item.Discard(option);
         } else {
-          return; // Filter doesn't apply to this item
+          return;  // Filter doesn't apply to this item
         }
       }
       break;
@@ -343,14 +376,18 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
 
 void FeedFilter::Reset() {
   enabled = true;
-  action = FEED_FILTER_ACTION_DISCARD;
-  match = FEED_FILTER_MATCH_ALL;
+  action = kFeedFilterActionDiscard;
+  match = kFeedFilterMatchAll;
   anime_ids.clear();
   conditions.clear();
   name.clear();
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
+
+FeedFilterPreset::FeedFilterPreset()
+    : is_default(false) {
+}
 
 FeedFilterManager::FeedFilterManager() {
   InitializePresets();
@@ -359,9 +396,13 @@ FeedFilterManager::FeedFilterManager() {
 
 void FeedFilterManager::AddPresets() {
   foreach_(preset, presets) {
-    if (!preset->is_default) continue;
-    AddFilter(preset->filter.action, preset->filter.match, preset->filter.option,
-              preset->filter.enabled, preset->filter.name);
+    if (!preset->is_default)
+      continue;
+
+    AddFilter(preset->filter.action, preset->filter.match,
+              preset->filter.option, preset->filter.enabled,
+              preset->filter.name);
+
     foreach_(condition, preset->filter.conditions) {
       filters.back().AddCondition(condition->element,
                                   condition->op,
@@ -370,7 +411,11 @@ void FeedFilterManager::AddPresets() {
   }
 }
 
-void FeedFilterManager::AddFilter(int action, int match, int option, bool enabled, const std::wstring& name) {
+void FeedFilterManager::AddFilter(FeedFilterAction action,
+                                  FeedFilterMatch match,
+                                  FeedFilterOption option,
+                                  bool enabled,
+                                  const std::wstring& name) {
   filters.resize(filters.size() + 1);
   filters.back().action = action;
   filters.back().enabled = enabled;
@@ -401,7 +446,7 @@ void FeedFilterManager::Filter(Feed& feed, bool preferences) {
 
   foreach_(item, feed.items) {
     foreach_(filter, filters) {
-      if (preferences != (filter->action == FEED_FILTER_ACTION_PREFER))
+      if (preferences != (filter->action == kFeedFilterActionPrefer))
         continue;
       filter->Filter(feed, *item, true);
     }
@@ -413,7 +458,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
     if (!item->IsDiscarded()) {
       bool found = Aggregator.SearchArchive(item->title);
       if (found) {
-        item->state = FEEDITEM_DISCARDED_NORMAL;
+        item->state = kFeedItemDiscardedNormal;
 #ifdef _DEBUG
         std::wstring filter_text = L"!FILTER :: Archived";
         item->description = filter_text + L" -- " + item->description;
@@ -425,7 +470,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
 
 bool FeedFilterManager::IsItemDownloadAvailable(Feed& feed) {
   foreach_c_(item, feed.items)
-    if (item->state == FEEDITEM_SELECTED)
+    if (item->state == kFeedItemSelected)
       return true;
 
   return false;
@@ -442,7 +487,7 @@ void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
   }
 }
 
-// =============================================================================
+////////////////////////////////////////////////////////////////////////////////
 
 void FeedFilterManager::InitializePresets() {
   #define ADD_PRESET(action_, match_, is_default_, option_, name_, description_) \
@@ -460,127 +505,131 @@ void FeedFilterManager::InitializePresets() {
   /* Preset filters */
 
   // Custom
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ALL, false, FEED_FILTER_OPTION_DEFAULT,
+  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
       L"(Custom)", 
       L"Lets you create a custom filter from scratch");
 
   // Fansub group
-  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ALL, false, FEED_FILTER_OPTION_DEFAULT,
+  ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
       L"[Fansub] Anime", 
       L"Lets you choose a fansub group for one or more anime");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_GROUP, FEED_FILTER_OPERATOR_EQUALS, L"TaigaSubs (change this)");
+  ADD_CONDITION(kFeedFilterElement_Episode_Group, kFeedFilterOperator_Equals, L"TaigaSubs (change this)");
 
   // Discard bad video keywords
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, false, FEED_FILTER_OPTION_DEFAULT,
+  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
       L"Discard bad video keywords", 
       L"Discards everything that is AVI, DIVX, LQ, RMVB, SD, WMV or XVID");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"AVI");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"DIVX");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"LQ");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"RMVB");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"SD");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"WMV");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE, FEED_FILTER_OPERATOR_CONTAINS, L"XVID");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"AVI");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"DIVX");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"LQ");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"RMVB");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"SD");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"WMV");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"XVID");
 
   // Prefer new versions
-  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, false, FEED_FILTER_OPTION_DEFAULT,
+  ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
       L"Prefer new versions", 
       L"Prefers v2 files and above when there are earlier releases of the same episode as well");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VERSION, FEED_FILTER_OPERATOR_ISGREATERTHAN, L"1");
+  ADD_CONDITION(kFeedFilterElement_Episode_Version, kFeedFilterOperator_IsGreaterThan, L"1");
 
   /* Default filters */
 
   // Select currently watching
-  ADD_PRESET(FEED_FILTER_ACTION_SELECT, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEFAULT,
+  ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Select currently watching", 
       L"Selects files that belong to anime that you're currently watching");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_USER_STATUS, FEED_FILTER_OPERATOR_EQUALS, ToWstr(anime::kWatching));
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kWatching));
 
   // Discard unknown titles
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEACTIVATE,
+  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
       L"Discard unknown titles", 
       L"Discards files that do not belong to any anime in your list");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_META_ID, FEED_FILTER_OPERATOR_EQUALS, L"");
+  ADD_CONDITION(kFeedFilterElement_Meta_Id, kFeedFilterOperator_Equals, L"");
 
   // Discard watched and available episodes
-  ADD_PRESET(FEED_FILTER_ACTION_DISCARD, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEFAULT,
+  ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Discard watched and available episodes", 
       L"Discards episodes you've already watched or downloaded");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_NUMBER, FEED_FILTER_OPERATOR_ISLESSTHANOREQUALTO, L"%watched%");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE, FEED_FILTER_OPERATOR_EQUALS, L"True");
+  ADD_CONDITION(kFeedFilterElement_Episode_Number, kFeedFilterOperator_IsLessThanOrEqualTo, L"%watched%");
+  ADD_CONDITION(kFeedFilterElement_Local_EpisodeAvailable, kFeedFilterOperator_Equals, L"True");
 
   // Prefer high-resolution files
-  ADD_PRESET(FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ANY, true, FEED_FILTER_OPTION_DEFAULT,
+  ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
       L"Prefer high-resolution files", 
       L"Prefers 720p files when there are other files of the same episode as well");
-  ADD_CONDITION(FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION, FEED_FILTER_OPERATOR_EQUALS, L"720p");
+  ADD_CONDITION(kFeedFilterElement_Episode_VideoResolution, kFeedFilterOperator_Equals, L"720p");
 
   #undef ADD_CONDITION
   #undef ADD_PRESET
 }
 
 void FeedFilterManager::InitializeShortcodes() {
-  action_shortcodes_[FEED_FILTER_ACTION_DISCARD] = L"discard";
-  action_shortcodes_[FEED_FILTER_ACTION_SELECT] = L"select";
-  action_shortcodes_[FEED_FILTER_ACTION_PREFER] = L"prefer";
+  action_shortcodes_[kFeedFilterActionDiscard] = L"discard";
+  action_shortcodes_[kFeedFilterActionSelect] = L"select";
+  action_shortcodes_[kFeedFilterActionPrefer] = L"prefer";
 
-  element_shortcodes_[FEED_FILTER_ELEMENT_META_ID] = L"meta_id";
-  element_shortcodes_[FEED_FILTER_ELEMENT_META_STATUS] = L"meta_status";
-  element_shortcodes_[FEED_FILTER_ELEMENT_META_TYPE] = L"meta_type";
-  element_shortcodes_[FEED_FILTER_ELEMENT_META_EPISODES] = L"meta_episodes";
-  element_shortcodes_[FEED_FILTER_ELEMENT_META_DATE_START] = L"meta_date_start";
-  element_shortcodes_[FEED_FILTER_ELEMENT_META_DATE_END] = L"meta_date_end";
-  element_shortcodes_[FEED_FILTER_ELEMENT_USER_STATUS] = L"user_status";
-  element_shortcodes_[FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE] = L"local_episode_available";
-  element_shortcodes_[FEED_FILTER_ELEMENT_EPISODE_TITLE] = L"episode_title";
-  element_shortcodes_[FEED_FILTER_ELEMENT_EPISODE_NUMBER] = L"episode_number";
-  element_shortcodes_[FEED_FILTER_ELEMENT_EPISODE_VERSION] = L"episode_version";
-  element_shortcodes_[FEED_FILTER_ELEMENT_EPISODE_GROUP] = L"episode_group";
-  element_shortcodes_[FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION] = L"episode_video_resolution";
-  element_shortcodes_[FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE] = L"episode_video_type";
-  element_shortcodes_[FEED_FILTER_ELEMENT_FILE_TITLE] = L"file_title";
-  element_shortcodes_[FEED_FILTER_ELEMENT_FILE_CATEGORY] = L"file_category";
-  element_shortcodes_[FEED_FILTER_ELEMENT_FILE_DESCRIPTION] = L"file_description";
-  element_shortcodes_[FEED_FILTER_ELEMENT_FILE_LINK] = L"file_link";
+  element_shortcodes_[kFeedFilterElement_Meta_Id] = L"meta_id";
+  element_shortcodes_[kFeedFilterElement_Meta_Status] = L"meta_status";
+  element_shortcodes_[kFeedFilterElement_Meta_Type] = L"meta_type";
+  element_shortcodes_[kFeedFilterElement_Meta_Episodes] = L"meta_episodes";
+  element_shortcodes_[kFeedFilterElement_Meta_DateStart] = L"meta_date_start";
+  element_shortcodes_[kFeedFilterElement_Meta_DateEnd] = L"meta_date_end";
+  element_shortcodes_[kFeedFilterElement_User_Status] = L"user_status";
+  element_shortcodes_[kFeedFilterElement_Local_EpisodeAvailable] = L"local_episode_available";
+  element_shortcodes_[kFeedFilterElement_Episode_Title] = L"episode_title";
+  element_shortcodes_[kFeedFilterElement_Episode_Number] = L"episode_number";
+  element_shortcodes_[kFeedFilterElement_Episode_Version] = L"episode_version";
+  element_shortcodes_[kFeedFilterElement_Episode_Group] = L"episode_group";
+  element_shortcodes_[kFeedFilterElement_Episode_VideoResolution] = L"episode_video_resolution";
+  element_shortcodes_[kFeedFilterElement_Episode_VideoType] = L"episode_video_type";
+  element_shortcodes_[kFeedFilterElement_File_Title] = L"file_title";
+  element_shortcodes_[kFeedFilterElement_File_Category] = L"file_category";
+  element_shortcodes_[kFeedFilterElement_File_Description] = L"file_description";
+  element_shortcodes_[kFeedFilterElement_File_Link] = L"file_link";
 
-  match_shortcodes_[FEED_FILTER_MATCH_ALL] = L"all";
-  match_shortcodes_[FEED_FILTER_MATCH_ANY] = L"any";
+  match_shortcodes_[kFeedFilterMatchAll] = L"all";
+  match_shortcodes_[kFeedFilterMatchAny] = L"any";
 
-  operator_shortcodes_[FEED_FILTER_OPERATOR_EQUALS] = L"equals";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_NOTEQUALS] = L"notequals";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_ISGREATERTHAN] = L"gt";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_ISGREATERTHANOREQUALTO] = L"ge";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_ISLESSTHAN] = L"lt";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_ISLESSTHANOREQUALTO] = L"le";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_BEGINSWITH] = L"beginswith";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_ENDSWITH] = L"endswith";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_CONTAINS] = L"contains";
-  operator_shortcodes_[FEED_FILTER_OPERATOR_NOTCONTAINS] = L"notcontains";
+  operator_shortcodes_[kFeedFilterOperator_Equals] = L"equals";
+  operator_shortcodes_[kFeedFilterOperator_NotEquals] = L"notequals";
+  operator_shortcodes_[kFeedFilterOperator_IsGreaterThan] = L"gt";
+  operator_shortcodes_[kFeedFilterOperator_IsGreaterThanOrEqualTo] = L"ge";
+  operator_shortcodes_[kFeedFilterOperator_IsLessThan] = L"lt";
+  operator_shortcodes_[kFeedFilterOperator_IsLessThanOrEqualTo] = L"le";
+  operator_shortcodes_[kFeedFilterOperator_BeginsWith] = L"beginswith";
+  operator_shortcodes_[kFeedFilterOperator_EndsWith] = L"endswith";
+  operator_shortcodes_[kFeedFilterOperator_Contains] = L"contains";
+  operator_shortcodes_[kFeedFilterOperator_NotContains] = L"notcontains";
 
-  option_shortcodes_[FEED_FILTER_OPTION_DEFAULT] = L"default";
-  option_shortcodes_[FEED_FILTER_OPTION_DEACTIVATE] = L"deactivate";
-  option_shortcodes_[FEED_FILTER_OPTION_HIDE] = L"hide";
+  option_shortcodes_[kFeedFilterOptionDefault] = L"default";
+  option_shortcodes_[kFeedFilterOptionDeactivate] = L"deactivate";
+  option_shortcodes_[kFeedFilterOptionHide] = L"hide";
 }
 
-std::wstring FeedFilterManager::CreateNameFromConditions(const FeedFilter& filter) {
+std::wstring FeedFilterManager::CreateNameFromConditions(
+    const FeedFilter& filter) {
   // TODO
   return L"New Filter";
 }
 
-std::wstring FeedFilterManager::TranslateCondition(const FeedFilterCondition& condition) {
-  return TranslateElement(condition.element) + L" " + 
-         TranslateOperator(condition.op) + L" \"" + 
+std::wstring FeedFilterManager::TranslateCondition(
+    const FeedFilterCondition& condition) {
+  return TranslateElement(condition.element) + L" " +
+         TranslateOperator(condition.op) + L" \"" +
          TranslateValue(condition) + L"\"";
 }
 
-std::wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, size_t index) {
+std::wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter,
+                                                    size_t index) {
   std::wstring str;
-  
-  size_t max_index = (filter.match == FEED_FILTER_MATCH_ALL) ?
+
+  size_t max_index = (filter.match == kFeedFilterMatchAll) ?
       filter.conditions.size() : index + 1;
-  
+
   for (size_t i = index; i < max_index; i++) {
-    if (i > index) str += L" & ";
+    if (i > index)
+      str += L" & ";
     str += TranslateCondition(filter.conditions[i]);
   }
 
@@ -589,41 +638,41 @@ std::wstring FeedFilterManager::TranslateConditions(const FeedFilter& filter, si
 
 std::wstring FeedFilterManager::TranslateElement(int element) {
   switch (element) {
-    case FEED_FILTER_ELEMENT_FILE_TITLE:
+    case kFeedFilterElement_File_Title:
       return L"File name";
-    case FEED_FILTER_ELEMENT_FILE_CATEGORY:
+    case kFeedFilterElement_File_Category:
       return L"File category";
-    case FEED_FILTER_ELEMENT_FILE_DESCRIPTION:
+    case kFeedFilterElement_File_Description:
       return L"File description";
-    case FEED_FILTER_ELEMENT_FILE_LINK:
+    case kFeedFilterElement_File_Link:
       return L"File link";
-    case FEED_FILTER_ELEMENT_META_ID:
+    case kFeedFilterElement_Meta_Id:
       return L"Anime ID";
-    case FEED_FILTER_ELEMENT_EPISODE_TITLE:
+    case kFeedFilterElement_Episode_Title:
       return L"Episode title";
-    case FEED_FILTER_ELEMENT_META_DATE_START:
+    case kFeedFilterElement_Meta_DateStart:
       return L"Anime date started";
-    case FEED_FILTER_ELEMENT_META_DATE_END:
+    case kFeedFilterElement_Meta_DateEnd:
       return L"Anime date ended";
-    case FEED_FILTER_ELEMENT_META_EPISODES:
+    case kFeedFilterElement_Meta_Episodes:
       return L"Anime episode count";
-    case FEED_FILTER_ELEMENT_META_STATUS:
+    case kFeedFilterElement_Meta_Status:
       return L"Anime airing status";
-    case FEED_FILTER_ELEMENT_META_TYPE:
+    case kFeedFilterElement_Meta_Type:
       return L"Anime type";
-    case FEED_FILTER_ELEMENT_USER_STATUS:
+    case kFeedFilterElement_User_Status:
       return L"Anime watching status";
-    case FEED_FILTER_ELEMENT_EPISODE_NUMBER:
+    case kFeedFilterElement_Episode_Number:
       return L"Episode number";
-    case FEED_FILTER_ELEMENT_EPISODE_VERSION:
+    case kFeedFilterElement_Episode_Version:
       return L"Episode version";
-    case FEED_FILTER_ELEMENT_LOCAL_EPISODE_AVAILABLE:
+    case kFeedFilterElement_Local_EpisodeAvailable:
       return L"Episode availability";
-    case FEED_FILTER_ELEMENT_EPISODE_GROUP:
+    case kFeedFilterElement_Episode_Group:
       return L"Episode fansub group";
-    case FEED_FILTER_ELEMENT_EPISODE_VIDEO_RESOLUTION:
+    case kFeedFilterElement_Episode_VideoResolution:
       return L"Episode video resolution";
-    case FEED_FILTER_ELEMENT_EPISODE_VIDEO_TYPE:
+    case kFeedFilterElement_Episode_VideoType:
       return L"Episode video type";
     default:
       return L"?";
@@ -632,34 +681,35 @@ std::wstring FeedFilterManager::TranslateElement(int element) {
 
 std::wstring FeedFilterManager::TranslateOperator(int op) {
   switch (op) {
-    case FEED_FILTER_OPERATOR_EQUALS:
+    case kFeedFilterOperator_Equals:
       return L"is";
-    case FEED_FILTER_OPERATOR_NOTEQUALS:
+    case kFeedFilterOperator_NotEquals:
       return L"is not";
-    case FEED_FILTER_OPERATOR_ISGREATERTHAN:
+    case kFeedFilterOperator_IsGreaterThan:
       return L"is greater than";
-    case FEED_FILTER_OPERATOR_ISGREATERTHANOREQUALTO:
+    case kFeedFilterOperator_IsGreaterThanOrEqualTo:
       return L"is greater than or equal to";
-    case FEED_FILTER_OPERATOR_ISLESSTHAN:
+    case kFeedFilterOperator_IsLessThan:
       return L"is less than";
-    case FEED_FILTER_OPERATOR_ISLESSTHANOREQUALTO:
+    case kFeedFilterOperator_IsLessThanOrEqualTo:
       return L"is less than or equal to";
-    case FEED_FILTER_OPERATOR_BEGINSWITH:
+    case kFeedFilterOperator_BeginsWith:
       return L"begins with";
-    case FEED_FILTER_OPERATOR_ENDSWITH:
+    case kFeedFilterOperator_EndsWith:
       return L"ends with";
-    case FEED_FILTER_OPERATOR_CONTAINS:
+    case kFeedFilterOperator_Contains:
       return L"contains";
-    case FEED_FILTER_OPERATOR_NOTCONTAINS:
+    case kFeedFilterOperator_NotContains:
       return L"does not contain";
     default:
       return L"?";
   }
 }
 
-std::wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condition) {
+std::wstring FeedFilterManager::TranslateValue(
+    const FeedFilterCondition& condition) {
   switch (condition.element) {
-    case FEED_FILTER_ELEMENT_META_ID: {
+    case kFeedFilterElement_Meta_Id: {
       if (condition.value.empty()) {
         return L"(?)";
       } else {
@@ -671,11 +721,11 @@ std::wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condit
         }
       }
     }
-    case FEED_FILTER_ELEMENT_USER_STATUS:
+    case kFeedFilterElement_User_Status:
       return anime::TranslateMyStatus(ToInt(condition.value), false);
-    case FEED_FILTER_ELEMENT_META_STATUS:
+    case kFeedFilterElement_Meta_Status:
       return anime::TranslateStatus(ToInt(condition.value));
-    case FEED_FILTER_ELEMENT_META_TYPE:
+    case kFeedFilterElement_Meta_Type:
       return anime::TranslateType(ToInt(condition.value));
     default:
       return condition.value;
@@ -684,9 +734,9 @@ std::wstring FeedFilterManager::TranslateValue(const FeedFilterCondition& condit
 
 std::wstring FeedFilterManager::TranslateMatching(int match) {
   switch (match) {
-    case FEED_FILTER_MATCH_ALL:
+    case kFeedFilterMatchAll:
       return L"All conditions";
-    case FEED_FILTER_MATCH_ANY:
+    case kFeedFilterMatchAny:
       return L"Any condition";
     default:
       return L"?";
@@ -695,11 +745,11 @@ std::wstring FeedFilterManager::TranslateMatching(int match) {
 
 std::wstring FeedFilterManager::TranslateAction(int action) {
   switch (action) {
-    case FEED_FILTER_ACTION_DISCARD:
+    case kFeedFilterActionDiscard:
       return L"Discard matched items";
-    case FEED_FILTER_ACTION_SELECT:
+    case kFeedFilterActionSelect:
       return L"Select matched items";
-    case FEED_FILTER_ACTION_PREFER:
+    case kFeedFilterActionPrefer:
       return L"Prefer matched items to similar ones";
     default:
       return L"?";
@@ -708,29 +758,29 @@ std::wstring FeedFilterManager::TranslateAction(int action) {
 
 std::wstring FeedFilterManager::TranslateOption(int option) {
   switch (option) {
-    case FEED_FILTER_OPTION_DEFAULT:
+    case kFeedFilterOptionDefault:
       return L"Default";
-    case FEED_FILTER_OPTION_DEACTIVATE:
+    case kFeedFilterOptionDeactivate:
       return L"Deactivate discarded items";
-    case FEED_FILTER_OPTION_HIDE:
+    case kFeedFilterOptionHide:
       return L"Hide discarded items";
     default:
       return L"?";
   }
 }
 
-std::wstring FeedFilterManager::GetShortcodeFromIndex(FeedFilterShortcodeType type,
-                                                 int index) {
+std::wstring FeedFilterManager::GetShortcodeFromIndex(
+    FeedFilterShortcodeType type, int index) {
   switch (type) {
-    case FEED_FILTER_SHORTCODE_ACTION:
+    case kFeedFilterShortcodeAction:
       return action_shortcodes_[index];
-    case FEED_FILTER_SHORTCODE_ELEMENT:
+    case kFeedFilterShortcodeElement:
       return element_shortcodes_[index];
-    case FEED_FILTER_SHORTCODE_MATCH:
+    case kFeedFilterShortcodeMatch:
       return match_shortcodes_[index];
-    case FEED_FILTER_SHORTCODE_OPERATOR:
+    case kFeedFilterShortcodeOperator:
       return operator_shortcodes_[index];
-    case FEED_FILTER_SHORTCODE_OPTION:
+    case kFeedFilterShortcodeOption:
       return option_shortcodes_[index];
   }
 
@@ -741,19 +791,19 @@ int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
                                              const std::wstring& shortcode) {
   std::map<int, std::wstring>* shortcodes = nullptr;
   switch (type) {
-    case FEED_FILTER_SHORTCODE_ACTION:
+    case kFeedFilterShortcodeAction:
       shortcodes = &action_shortcodes_;
       break;
-    case FEED_FILTER_SHORTCODE_ELEMENT:
+    case kFeedFilterShortcodeElement:
       shortcodes = &element_shortcodes_;
       break;
-    case FEED_FILTER_SHORTCODE_MATCH:
+    case kFeedFilterShortcodeMatch:
       shortcodes = &match_shortcodes_;
       break;
-    case FEED_FILTER_SHORTCODE_OPERATOR:
+    case kFeedFilterShortcodeOperator:
       shortcodes = &operator_shortcodes_;
       break;
-    case FEED_FILTER_SHORTCODE_OPTION:
+    case kFeedFilterShortcodeOption:
       shortcodes = &option_shortcodes_;
       break;
   }

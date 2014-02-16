@@ -483,7 +483,7 @@ bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
       if (*j != anime_id) continue;
       if (found) break;
       foreach_(k, i->conditions) {
-        if (k->element == FEED_FILTER_ELEMENT_EPISODE_GROUP) {
+        if (k->element == kFeedFilterElement_Episode_Group) {
           groups.push_back(k->value);
           found = true;
         }
@@ -500,7 +500,7 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
     foreach_(j, i->anime_ids) {
       if (*j != anime_id) continue;
       foreach_(k, i->conditions) {
-        if (k->element == FEED_FILTER_ELEMENT_EPISODE_GROUP) {
+        if (k->element == kFeedFilterElement_Episode_Group) {
           if (group_name.empty()) {
             Aggregator.filter_manager.filters.erase(i);
           } else {
@@ -518,10 +518,10 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
   // Create new filter
   auto anime_item = AnimeDatabase.FindItem(anime_id);
   Aggregator.filter_manager.AddFilter(
-      FEED_FILTER_ACTION_PREFER, FEED_FILTER_MATCH_ALL, FEED_FILTER_OPTION_DEFAULT,
+      kFeedFilterActionPrefer, kFeedFilterMatchAll, kFeedFilterOptionDefault,
       true, L"[Fansub] " + anime_item->GetTitle());
   Aggregator.filter_manager.filters.back().AddCondition(
-      FEED_FILTER_ELEMENT_EPISODE_GROUP, FEED_FILTER_OPERATOR_EQUALS,
+      kFeedFilterElement_Episode_Group, kFeedFilterOperator_Equals,
       group_name);
   Aggregator.filter_manager.filters.back().anime_ids.push_back(anime_id);
   return true;

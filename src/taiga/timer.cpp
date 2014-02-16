@@ -25,6 +25,7 @@
 #include "library/history.h"
 #include "library/resource.h"
 #include "taiga/announce.h"
+#include "taiga/http.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "taiga/timer.h"
