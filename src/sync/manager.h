@@ -25,6 +25,7 @@
 #include "service.h"
 #include "base/types.h"
 #include "taiga/http.h"
+#include "win/win_thread.h"
 
 namespace sync {
 
@@ -50,6 +51,7 @@ private:
   void HandleError(Response& response, HttpResponse& http_response);
   void HandleResponse(Response& response, HttpResponse& http_response);
 
+  win::CriticalSection critical_section_;
   std::map<std::wstring, Request> requests_;
   std::map<ServiceId, std::unique_ptr<Service>> services_;
 };

@@ -102,6 +102,8 @@ void Manager::MakeRequest(Request& request) {
 }
 
 void Manager::HandleHttpError(HttpResponse& http_response, string_t error) {
+  win::Lock lock(critical_section_);
+
   const Request& request = requests_[http_response.uuid];
 
   Response response;
@@ -116,6 +118,8 @@ void Manager::HandleHttpError(HttpResponse& http_response, string_t error) {
 }
 
 void Manager::HandleHttpResponse(HttpResponse& http_response) {
+  win::Lock lock(critical_section_);
+
   const Request& request = requests_[http_response.uuid];
 
   Response response;

@@ -22,7 +22,6 @@
 #include <map>
 
 #include "library/anime_item.h"
-#include "win/win_thread.h"
 
 class HistoryItem;
 
@@ -53,9 +52,6 @@ public:
 
 public:
   std::map<int, Item> items;
-
-private:
-  win::CriticalSection critical_section_;
 };
 
 }  // namespace anime

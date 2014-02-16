@@ -214,8 +214,6 @@ void Database::ClearInvalidItems() {
 }
 
 int Database::UpdateItem(const Item& new_item) {
-  critical_section_.Enter();
-
   enum_t source = new_item.GetSource();
   Item* item = FindItem(new_item.GetId(source), source);
   if (!item) {
@@ -294,8 +292,6 @@ int Database::UpdateItem(const Item& new_item) {
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
   }
-
-  critical_section_.Leave();
 
   return item->GetId();
 }
@@ -461,8 +457,6 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   if (!anime_item)
     return;
 
-  critical_section_.Enter();
-
   // Edit episode
   if (history_item.episode) {
     anime_item->SetMyLastWatchedEpisode(*history_item.episode);
@@ -501,8 +495,6 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   History.queue.Check(false);
 
   ui::OnLibraryEntryChange(history_item.anime_id);
-
-  critical_section_.Leave();
 }
 
 }  // namespace anime
