@@ -265,12 +265,19 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 
 BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
   if (pMsg->message == WM_KEYDOWN) {
-    // Close window
-    if (pMsg->wParam == VK_ESCAPE) {
-      if (mode_ == kDialogModeAnimeInformation) {
-        Destroy();
+    switch (pMsg->wParam) {
+      // Refresh
+      case VK_F5:
+        page_series_info.Refresh(anime_id_, true);
+        page_my_info.Refresh(anime_id_);
         return TRUE;
-      }
+      // Close window
+      case VK_ESCAPE:
+        if (mode_ == kDialogModeAnimeInformation) {
+          Destroy();
+          return TRUE;
+        }
+        break;
     }
   }
 
