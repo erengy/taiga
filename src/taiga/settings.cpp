@@ -328,6 +328,14 @@ bool AppSettings::Load() {
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
     ReadValue(settings, static_cast<AppSettingName>(i));
 
+  // Meta
+  if (GetWstr(kMeta_Version_Major).empty())
+    Set(kMeta_Version_Major, ToWstr(static_cast<int>(Taiga.version.major)));
+  if (GetWstr(kMeta_Version_Minor).empty())
+    Set(kMeta_Version_Minor, ToWstr(static_cast<int>(Taiga.version.minor)));
+  if (GetWstr(kMeta_Version_Revision).empty())
+    Set(kMeta_Version_Revision, ToWstr(static_cast<int>(Taiga.version.patch)));
+
   // Folders
   root_folders.clear();
   xml_node node_folders = settings.child(L"anime").child(L"folders");
@@ -418,14 +426,14 @@ bool AppSettings::Save() {
     WriteValue(settings, static_cast<AppSettingName>(i));
 
   // Root folders
-  xml_node folders = settings.append_child(L"anime").append_child(L"folders");  
+  xml_node folders = settings.child(L"anime").append_child(L"folders");  
   foreach_(it, root_folders) {
     xml_node root = folders.append_child(L"root");
     root.append_attribute(L"folder") = it->c_str();
   }
 
   // Anime items
-  xml_node items = settings.append_child(L"anime").append_child(L"items");
+  xml_node items = settings.child(L"anime").append_child(L"items");
   foreach_(it, AnimeDatabase.items) {
     anime::Item& anime_item = it->second;
     if (anime_item.GetFolder().empty() &&
@@ -443,7 +451,7 @@ bool AppSettings::Save() {
   }
 
   // Media players
-  xml_node mediaplayers = settings.append_child(L"recognition").append_child(L"mediaplayers");
+  xml_node mediaplayers = settings.child(L"recognition").append_child(L"mediaplayers");
   foreach_(it, MediaPlayers.items) {
     xml_node player = mediaplayers.append_child(L"player");
     player.append_attribute(L"name") = it->name.c_str();
@@ -451,7 +459,7 @@ bool AppSettings::Save() {
   }
 
   // Torrent filters
-  xml_node torrent_filter = settings.append_child(L"rss").append_child(L"torrent").append_child(L"filter");
+  xml_node torrent_filter = settings.child(L"rss").child(L"torrent").append_child(L"filter");
   foreach_(it, Aggregator.filter_manager.filters) {
     xml_node item = torrent_filter.append_child(L"item");
     item.append_attribute(L"action") =
