@@ -19,7 +19,6 @@
 #include "win_http.h"
 
 #include "base/file.h"
-#include "base/logger.h"
 #include "base/string.h"
 
 namespace win {
@@ -32,7 +31,6 @@ Request::Request()
   // TODO: Generate a real UUID
   static unsigned int counter = 0;
   uuid = L"win-http-" + PadChar(ToWstr(static_cast<ULONG>(counter++)), L'0', 10);
-  LOG(LevelDebug, L"UUID: " + uuid);
 }
 
 Response::Response()

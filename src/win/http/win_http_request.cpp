@@ -20,6 +20,7 @@
 
 #include "base/encoding.h"
 #include "base/foreach.h"
+#include "base/logger.h"
 #include "base/string.h"
 
 namespace win {
@@ -31,6 +32,7 @@ bool Client::MakeRequest(Request request) {
 
   // Set the new request
   request_ = request;
+  LOG(LevelDebug, L"ID: " + request.uuid);
 
   // Set secure transaction state
   secure_transaction_ = request.protocol == kHttps;
@@ -85,6 +87,8 @@ HINTERNET Client::OpenRequest() {
     }
     path += query_string;
   }
+  LOG(LevelDebug, L"Host: " + request_.host);
+  LOG(LevelDebug, L"Path: " + path);
 
   // Enable SSL/TLS if required
   DWORD flags = secure_transaction_ ? WINHTTP_FLAG_SECURE : 0;
