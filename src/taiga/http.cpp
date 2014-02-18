@@ -16,10 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/file.h"
 #include "base/logger.h"
 #include "base/string.h"
-#include "library/anime_db.h"
 #include "library/resource.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"

@@ -16,11 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "api.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
 #include "library/anime_episode.h"
+#include "taiga/api.h"
 #include "taiga/script.h"
 
 taiga::Api TaigaApi;

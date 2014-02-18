@@ -20,8 +20,8 @@
 #include "base/foreach.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
-#include "path.h"
-#include "stats.h"
+#include "taiga/path.h"
+#include "taiga/stats.h"
 
 taiga::Statistics Stats;
 
