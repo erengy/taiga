@@ -20,6 +20,10 @@
 
 namespace base {
 
+AccessibleChild::AccessibleChild()
+    : role(0) {
+}
+
 AccessibleObject::AccessibleObject()
     : acc_(nullptr), 
       win_event_hook_(nullptr) {
@@ -77,7 +81,7 @@ HRESULT AccessibleObject::GetName(std::wstring& name, long child_id,
   return hr;
 }
 
-HRESULT AccessibleObject::GetRole(std::wstring& role, long child_id,
+HRESULT AccessibleObject::GetRole(DWORD& role, long child_id,
                                   IAccessible* acc) {
   if (acc == nullptr)
     acc = acc_;
@@ -90,23 +94,37 @@ HRESULT AccessibleObject::GetRole(std::wstring& role, long child_id,
 
   VARIANT var_result;
   HRESULT hr = acc->get_accRole(var_child, &var_result);
-  
+
   if (hr == S_OK && var_result.vt == VT_I4) {
-    DWORD role_id = var_result.lVal;
-    UINT role_length = GetRoleText(role_id, NULL, 0);
-    LPTSTR buffer = (LPTSTR)malloc((role_length + 1) * sizeof(TCHAR));
-    
-    if (buffer != nullptr) {
-      GetRoleText(role_id, buffer, role_length + 1);
-      if (buffer) {
-        role = buffer;
-      } else {
-        role.clear();
-      }
-      free(buffer);
+    role = var_result.lVal;
+    return S_OK;
+  }
+
+  return E_FAIL;
+}
+
+HRESULT AccessibleObject::GetRole(std::wstring& role, long child_id,
+                                  IAccessible* acc) {
+  DWORD role_id = 0;
+
+  HRESULT hr = GetRole(role_id, child_id, acc);
+
+  if (hr != S_OK)
+    return hr;
+
+  UINT role_length = GetRoleText(role_id, nullptr, 0);
+  LPTSTR buffer = (LPTSTR)malloc((role_length + 1) * sizeof(TCHAR));
+
+  if (buffer != nullptr) {
+    GetRoleText(role_id, buffer, role_length + 1);
+    if (buffer) {
+      role = buffer;
     } else {
-      return E_OUTOFMEMORY;
+      role.clear();
     }
+    free(buffer);
+  } else {
+    return E_OUTOFMEMORY;
   }
 
   return S_OK;

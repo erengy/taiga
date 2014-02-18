@@ -26,8 +26,10 @@
 namespace base {
 
 struct AccessibleChild {
+  AccessibleChild();
+
   std::wstring name;
-  std::wstring role;
+  DWORD role;
   std::wstring value;
   std::vector<AccessibleChild> children;
 };
@@ -41,6 +43,8 @@ public:
   void Release();
 
   HRESULT GetName(std::wstring& name, long child_id = CHILDID_SELF,
+                  IAccessible* acc = nullptr);
+  HRESULT GetRole(DWORD& role, long child_id = CHILDID_SELF,
                   IAccessible* acc = nullptr);
   HRESULT GetRole(std::wstring& role, long child_id = CHILDID_SELF,
                   IAccessible* acc = nullptr);

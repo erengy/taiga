@@ -46,12 +46,12 @@ enum WebBrowserEngines {
 base::AccessibleChild* FindAccessibleChild(
     std::vector<base::AccessibleChild>& children,
     const std::wstring& name,
-    const std::wstring& role) {
+    DWORD role) {
   base::AccessibleChild* child = nullptr;
 
   foreach_(it, children) {
     if (name.empty() || IsEqual(name, it->name))
-      if (role.empty() || IsEqual(role, it->role))
+      if (!role || role == it->role)
         child = &(*it);
     if (child == nullptr && !it->children.empty())
       child = FindAccessibleChild(it->children, name, role);
@@ -68,17 +68,48 @@ bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
   switch (param) {
     case kWebEngineUnknown:
       return false;
+
+    case kWebEngineWebkit:
+      switch (child.role) {
+        case ROLE_SYSTEM_CLIENT:
+        case ROLE_SYSTEM_GROUPING:
+        case ROLE_SYSTEM_PAGETABLIST:
+        case ROLE_SYSTEM_TEXT:
+        case ROLE_SYSTEM_TOOLBAR:
+        case ROLE_SYSTEM_WINDOW:
+          return true;
+        default:
+          return false;
+      }
+      break;
+
     case kWebEngineGecko:
-      if (IsEqual(child.role, L"document"))
-        return false;
+      switch (child.role) {
+        case ROLE_SYSTEM_APPLICATION:
+        case ROLE_SYSTEM_COMBOBOX:
+        case ROLE_SYSTEM_PAGETABLIST:
+        case ROLE_SYSTEM_TOOLBAR:
+          return true;
+        case ROLE_SYSTEM_DOCUMENT:
+        default:
+          return false;
+      }
       break;
+
     case kWebEngineTrident:
-      if (IsEqual(child.role, L"pane") || IsEqual(child.role, L"scroll bar"))
-        return false;
+      switch (child.role) {
+        case ROLE_SYSTEM_PANE:
+        case ROLE_SYSTEM_SCROLLBAR:
+          return false;
+      }
       break;
+
     case kWebEnginePresto:
-      if (IsEqual(child.role, L"document") || IsEqual(child.role, L"pane"))
-        return false;
+      switch (child.role) {
+        case ROLE_SYSTEM_DOCUMENT:
+        case ROLE_SYSTEM_PANE:
+          return false;
+      }
       break;
   }
 
@@ -136,13 +167,16 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     switch (web_engine) {
       case kWebEngineWebkit:
       case kWebEngineGecko:
-        child = FindAccessibleChild(acc_obj.children, L"", L"page tab list");
+        child = FindAccessibleChild(acc_obj.children,
+                                    L"", ROLE_SYSTEM_PAGETABLIST);
         break;
       case kWebEngineTrident:
-        child = FindAccessibleChild(acc_obj.children, L"Tab Row", L"");
+        child = FindAccessibleChild(acc_obj.children,
+                                    L"Tab Row", 0);
         break;
       case kWebEnginePresto:
-        child = FindAccessibleChild(acc_obj.children, L"", L"client");
+        child = FindAccessibleChild(acc_obj.children,
+                                    L"", ROLE_SYSTEM_CLIENT);
         break;
     }
     if (child) {
@@ -163,54 +197,54 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     case kWebEngineWebkit:
       child = FindAccessibleChild(acc_obj.children,
                                   L"Address and search bar",
-                                  L"grouping");
+                                  ROLE_SYSTEM_GROUPING);
       if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children,
                                     L"Address",
-                                    L"grouping");
+                                    ROLE_SYSTEM_GROUPING);
       if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children,
                                     L"Location",
-                                    L"grouping");
+                                    ROLE_SYSTEM_GROUPING);
       if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children,
                                     L"Address field",
-                                    L"editable text");
+                                    ROLE_SYSTEM_TEXT);
       break;
     case kWebEngineGecko:
       child = FindAccessibleChild(acc_obj.children,
                                   L"Search or enter address",
-                                  L"editable text");
+                                  ROLE_SYSTEM_TEXT);
       if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children,
                                     L"Go to a Website",
-                                    L"editable text");
+                                    ROLE_SYSTEM_TEXT);
       if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children,
                                     L"Go to a Web Site",
-                                    L"editable text");
+                                    ROLE_SYSTEM_TEXT);
       break;
     case kWebEngineTrident:
       child = FindAccessibleChild(acc_obj.children,
                                   L"Address and search using Bing",
-                                  L"editable text");
+                                  ROLE_SYSTEM_TEXT);
       if (child == nullptr)
         child = FindAccessibleChild(acc_obj.children,
                                     L"Address and search using Google",
-                                    L"editable text");
+                                    ROLE_SYSTEM_TEXT);
       break;
     case kWebEnginePresto:
       child = FindAccessibleChild(acc_obj.children,
-                                  L"", L"client");
+                                  L"", ROLE_SYSTEM_CLIENT);
       if (child && !child->children.empty()) {
         child = FindAccessibleChild(child->children.at(0).children,
-                                    L"", L"tool bar");
+                                    L"", ROLE_SYSTEM_TOOLBAR);
         if (child && !child->children.empty()) {
           child = FindAccessibleChild(child->children,
-                                      L"", L"combo box");
+                                      L"", ROLE_SYSTEM_COMBOBOX);
           if (child && !child->children.empty()) {
             child = FindAccessibleChild(child->children,
-                                        L"", L"editable text");
+                                        L"", ROLE_SYSTEM_TEXT);
           }
         }
       }
