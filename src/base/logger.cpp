@@ -42,7 +42,7 @@ Logger::Logger()
 
 void Logger::Log(int severity_level, const std::wstring& file, int line,
                  const std::wstring& function, const std::wstring& text) {
-  critical_section_.Enter();
+  win::Lock lock(critical_section_);
 
   if (severity_level <= severity_level_) {
     std::string output_text;
@@ -67,8 +67,6 @@ void Logger::Log(int severity_level, const std::wstring& file, int line,
       }
     }
   }
-
-  critical_section_.Leave();
 }
 
 void Logger::SetOutputPath(const std::wstring& path) {
