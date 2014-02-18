@@ -30,30 +30,35 @@
 class FolderMonitor;
 
 enum FolderMonitorState {
-  MONITOR_STATE_STOPPED,
-  MONITOR_STATE_ACTIVE
+  kFolderMonitorStateStopped,
+  kFolderMonitorStateActive
+};
+
+enum PathType {
+  kPathTypeFile,
+  kPathTypeDirectory
 };
 
 class FolderInfo {
 public:
   FolderInfo();
-  virtual ~FolderInfo();
+  ~FolderInfo() {}
 
   friend class FolderMonitor;
-  
-public:
+
   std::wstring path;
   int state;
-  
+
   class FolderChangeInfo {
   public:
-    FolderChangeInfo() : action(0), anime_id(0) {}
+    FolderChangeInfo();
     DWORD action;
-    int anime_id;
     std::wstring file_name;
+    LPARAM parameter;
+    PathType type;
   };
   std::vector<FolderChangeInfo> change_list;
-  
+
 private:
   BYTE buffer_[MONITOR_BUFFER_SIZE];
   DWORD bytes_returned_;
@@ -73,20 +78,21 @@ public:
 
   // Main thread
   void Enable(bool enabled = true);
-  virtual void OnChange(FolderInfo* folder_info);
+  virtual void OnChange(FolderInfo& folder_info);
 
-  HANDLE GetCompletionPort() { return completion_port_; }
-  void SetWindowHandle(HWND hwnd) { window_handle_ = hwnd; }
+  HANDLE GetCompletionPort() const;
+  void SetWindowHandle(HWND hwnd);
 
   bool AddFolder(const std::wstring& folder);
   bool ClearFolders();
   bool Start();
-  bool Stop();
+  void Stop();
 
 private:
-  BOOL ReadDirectoryChanges(FolderInfo* folder_info);
+  void HandleAnime(const std::wstring& path, FolderInfo& folder_info, size_t change_index);
+  bool IsPathAvailable(DWORD action) const;
+  BOOL ReadDirectoryChanges(FolderInfo& folder_info) const;
 
-private:
   win::CriticalSection critical_section_;
   std::vector<FolderInfo> folders_;
   HANDLE completion_port_;
