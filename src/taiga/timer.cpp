@@ -127,24 +127,32 @@ void TimerManager::OnTick() {
   auto media_player = MediaPlayers.CheckRunningPlayers();
   bool media_player_is_running = media_player != nullptr;
   bool media_player_is_active = media_player && media_player->IsActive();
-  timer_media.set_enabled(media_player_is_running && media_player_is_active);
-  ProcessMediaPlayerStatus(media_player);
-  ui::DlgMain.UpdateStatusTimer();
+  bool episode_processed = CurrentEpisode.processed;
+  timer_media.set_enabled(media_player_is_running && media_player_is_active &&
+                          !episode_processed);
 
   // Statistics
   Stats.uptime++;
-  if (ui::DlgStats.IsVisible())
-    ui::DlgStats.Refresh();
   timer_stats.set_enabled(ui::DlgStats.IsVisible() != FALSE);
 
   // Torrents
   timer_torrents.set_enabled(
       Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
-  ui::DlgTorrent.SetTimer(timer_torrents.ticks());
 
   // Tick
   foreach_(it, timers_)
     it->second->Tick();
+
+  // Media
+  ui::DlgMain.UpdateStatusTimer();
+  ProcessMediaPlayerStatus(media_player);
+
+  // Statistics
+  if (ui::DlgStats.IsVisible())
+    ui::DlgStats.Refresh();
+
+  // Torrents
+  ui::DlgTorrent.SetTimer(timer_torrents.ticks());
 }
 
 void CALLBACK TimerManager::TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent,

@@ -395,8 +395,9 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
     return false;
 
   if (!ignore_update_time) {
+    auto delay = Settings.GetInt(taiga::kSync_Update_Delay);
     auto ticks = taiga::timers.timer(taiga::kTimerMedia)->ticks();
-    if (Settings.GetInt(taiga::kSync_Update_Delay) > ticks)
+    if (delay > 0 && ticks > 0)
       return false;
   }
 
