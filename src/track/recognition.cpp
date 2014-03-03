@@ -44,8 +44,8 @@ RecognitionEngine::RecognitionEngine() {
       L"2CH, 5.1CH, 5.1, AAC, AC3, DTS, DTS5.1, DTS-ES, DUALAUDIO, DUAL AUDIO, "
       L"FLAC, MP3, OGG, TRUEHD5.1, VORBIS");
   ReadKeyword(video_keywords,
-      L"8BIT, 10BIT, AVI, DIVX, H264, H.264, HD, HDTV, HI10P, HQ, LQ, RMVB, "
-      L"SD, TS, VFR, WMV, X264, X.264, XVID");
+      L"8BIT, 8-BIT, 10BIT, 10-BIT, AVI, DIVX, H264, H.264, HD, HDTV, HI10P, "
+      L"HQ, LQ, RMVB, SD, TS, VFR, WMV, X264, X.264, XVID");
   ReadKeyword(extra_keywords,
       L"ASS, BATCH, BD, BLURAY, BLU-RAY, COMPLETE, DIRECTOR'S CUT, DVD, DVD5, "
       L"DVD9, DVD-R2J, DVDRIP, ENG, ENGLISH, HARDSUB, PS3, R2DVD, R2J, R2JDVD, "
