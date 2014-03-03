@@ -230,11 +230,11 @@ int Database::UpdateItem(const Item& new_item) {
       ++id;
     // Add a new item
     item = &items[id];
-    item->SetId(ToWstr(id), 0);
+    item->SetId(ToWstr(id), sync::kTaiga);
   }
 
   // Update series information if new information is, well, new.
-  if (!item->last_modified || new_item.last_modified > item->last_modified) {
+  if (!item->last_modified || new_item.last_modified >= item->last_modified) {
     item->SetId(new_item.GetId(source), source);
     item->last_modified = new_item.last_modified;
 
