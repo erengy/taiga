@@ -57,13 +57,7 @@
 	</menu>
 	<!-- External links -->
 	<menu name="ExternalLinks">
-		<!-- Note: Overwritten -->
-		<item name="Anime Recommendation Finder" action="URL(http://www.animerecs.com/)"/>
-		<item name="MALgraph" action="URL(http://mal.oko.im/)"/>
-		<item type="separator"/>
-		<item name="Anime Season Discussion Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
-		<item name="Mahou Showtime Schedule" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
-		<item name="The Fansub Wiki" action="URL(http://www.fansubwiki.com/)"/>
+		<!-- Note: Overwritten -->-
 	</menu>
 	<!-- View -->
 	<menu name="View">
@@ -245,7 +239,7 @@
 	<!-- Season list -->
 	<menu name="SeasonList">
 		<item name="Information" action="Info()" default="1"/>
-		<item name="View on MAL" action="ViewAnimePage()"/>
+		<item name="Go to the web page" action="ViewAnimePage()"/>
 		<item type="separator"/>
 		<item name="Refresh data" action="Season_RefreshItemData()"/>
 		<item type="separator"/>
@@ -261,7 +255,7 @@
 		<item name="Quick filters" sub="QuickFilters"/>
 		<item type="separator"/>
 		<item name="Search more torrents for this title" action="MoreTorrents"/>
-		<item name="Search MyAnimeList for this title" action="SearchMAL"/>
+		<item name="Search for anime with this title" action="SearchService"/>
 	</menu>
 	<menu name="QuickFilters">
 		<item name="Discard all torrents for this title" action="DiscardTorrents"/>

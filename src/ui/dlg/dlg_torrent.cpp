@@ -269,7 +269,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             }
           } else if (answer == L"MoreTorrents") {
             Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.title);
-          } else if (answer == L"SearchMAL") {
+          } else if (answer == L"SearchService") {
             ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
           }
         }
