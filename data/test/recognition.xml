@@ -671,4 +671,16 @@
 		<title>Persona 4 The Animation</title>
 		<video>Hi10p</video>
 	</file>
+	<file>
+		<file>[Hien] Kotoura-san - Special Short Anime 'Haruka's Room' - 01 [BD 1080p H.264 10-bit AAC][6B6BE015].mkv</file>
+		<audio>AAC</audio>
+		<checksum>6B6BE015</checksum>
+		<extra>BD</extra>
+		<format>MKV</format>
+		<group>Hien</group>
+		<number>01</number>
+		<resolution>1080p</resolution>
+		<title>Kotoura-san - Special Short Anime 'Haruka's Room'</title>
+		<video>H.264 10-bit</video>
+	</file>
 </recognition>
