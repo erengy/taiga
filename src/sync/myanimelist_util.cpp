@@ -22,8 +22,10 @@
 #include "base/string.h"
 #include "base/time.h"
 #include "library/anime.h"
+#include "library/anime_db.h"
 #include "sync/myanimelist_util.h"
 #include "sync/myanimelist_types.h"
+#include "sync/service.h"
 #include "taiga/settings.h"
 
 namespace sync {
@@ -156,7 +158,9 @@ std::wstring TranslateKeyTo(const std::wstring& key) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ViewAnimePage(int anime_id) {
-  ExecuteLink(L"http://myanimelist.net/anime/" + ToWstr(anime_id) + L"/");
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  ExecuteLink(L"http://myanimelist.net/anime/" +
+              anime_item->GetId(sync::kMyAnimeList) + L"/");
 }
 
 void ViewAnimeSearch(const std::wstring& title) {
