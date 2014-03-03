@@ -111,7 +111,7 @@ BOOL MainDialog::OnInitDialog() {
     dlg.AddButton(L"No", IDNO);
     dlg.Show(GetWindowHandle());
     if (dlg.GetSelectedButtonID() == IDYES)
-      ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMal);
+      ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMain);
   }
   if (Settings.GetBool(taiga::kLibrary_WatchFolders)) {
     FolderMonitor.SetWindowHandle(GetWindowHandle());
