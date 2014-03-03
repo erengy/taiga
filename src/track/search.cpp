@@ -100,7 +100,7 @@ std::wstring SearchFileFolder(anime::Item& anime_item, const std::wstring& root,
     // Files
     } else {
       if (search_folder == false) {
-        // Check file size -- anything less than 10 MB can't be a new episode
+        // Check file size -- anything less than 10 MiB can't be a new episode
         if (win32_find_data.nFileSizeLow > 1024 * 1024 * 10) {
           // Examine file name and extract episode data
           if (Meow.ExamineTitle(win32_find_data.cFileName, episode,
