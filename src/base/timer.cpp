@@ -87,11 +87,15 @@ void Timer::Tick() {
   if (interval_ > 0 && ticks_ > 0)
     ticks_ -= 1;
 
-  if (ticks_ == 0)
+  if (ticks_ == 0) {
     OnTimeout();
 
-  if (ticks_ == 0 && repeat_)
-    Reset();
+    if (repeat_) {
+      Reset();
+    } else {
+      enabled_ = false;
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
