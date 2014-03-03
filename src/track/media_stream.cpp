@@ -23,7 +23,7 @@
 #include "taiga/settings.h"
 #include "track/media.h"
 
-enum StreamingVideoProviders {
+enum StreamingVideoProvider {
   kStreamUnknown = -1,
   kStreamAnn,
   kStreamCrunchyroll,
@@ -33,13 +33,61 @@ enum StreamingVideoProviders {
   kStreamYoutube
 };
 
-enum WebBrowserEngines {
+enum WebBrowserEngine {
   kWebEngineUnknown = -1,
   kWebEngineWebkit,   // Google Chrome (and other browsers based on Chromium)
   kWebEngineGecko,    // Mozilla Firefox
   kWebEngineTrident,  // Internet Explorer
   kWebEnginePresto    // Opera (older versions)
 };
+
+class BrowserAccessibilityData {
+public:
+  BrowserAccessibilityData(const std::wstring& name, DWORD role);
+
+  std::wstring name;
+  DWORD role;
+};
+
+std::map<WebBrowserEngine, std::vector<BrowserAccessibilityData>> browser_data;
+
+////////////////////////////////////////////////////////////////////////////////
+
+BrowserAccessibilityData::BrowserAccessibilityData(const std::wstring& name,
+                                                   DWORD role)
+    : name(name), role(role) {
+}
+
+void AddBrowserData(WebBrowserEngine browser,
+                    const std::wstring& name, DWORD role) {
+  browser_data[browser].push_back(BrowserAccessibilityData(name, role));
+}
+
+void InitializeBrowserData() {
+  if (!browser_data.empty())
+    return;
+
+  AddBrowserData(kWebEngineWebkit,
+      L"Address and search bar", ROLE_SYSTEM_GROUPING);
+  AddBrowserData(kWebEngineWebkit,
+      L"Address", ROLE_SYSTEM_GROUPING);
+  AddBrowserData(kWebEngineWebkit,
+      L"Location", ROLE_SYSTEM_GROUPING);
+  AddBrowserData(kWebEngineWebkit,
+      L"Address field", ROLE_SYSTEM_TEXT);
+
+  AddBrowserData(kWebEngineGecko,
+      L"Search or enter address", ROLE_SYSTEM_TEXT);
+  AddBrowserData(kWebEngineGecko,
+      L"Go to a Website", ROLE_SYSTEM_TEXT);
+  AddBrowserData(kWebEngineGecko,
+      L"Go to a Web Site", ROLE_SYSTEM_TEXT);
+
+  AddBrowserData(kWebEngineTrident,
+      L"Address and search using Bing", ROLE_SYSTEM_TEXT);
+  AddBrowserData(kWebEngineTrident,
+      L"Address and search using Google", ROLE_SYSTEM_TEXT);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -119,7 +167,7 @@ bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
-  int web_engine = kWebEngineUnknown;
+  WebBrowserEngine web_engine = kWebEngineUnknown;
 
   auto media_player = FindPlayer(current_player());
 
@@ -181,6 +229,7 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     }
     if (child) {
       foreach_(it, child->children) {
+        // FIXME: Doesn't work with ANN because of "(s)" or "(d)"
         if (InStr(it->name, current_title()) > -1) {
           // Tab is still open, just not active
           return current_title();
@@ -195,44 +244,17 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   base::AccessibleChild* child = nullptr;
   switch (web_engine) {
     case kWebEngineWebkit:
-      child = FindAccessibleChild(acc_obj.children,
-                                  L"Address and search bar",
-                                  ROLE_SYSTEM_GROUPING);
-      if (child == nullptr)
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Address",
-                                    ROLE_SYSTEM_GROUPING);
-      if (child == nullptr)
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Location",
-                                    ROLE_SYSTEM_GROUPING);
-      if (child == nullptr)
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Address field",
-                                    ROLE_SYSTEM_TEXT);
-      break;
     case kWebEngineGecko:
-      child = FindAccessibleChild(acc_obj.children,
-                                  L"Search or enter address",
-                                  ROLE_SYSTEM_TEXT);
-      if (child == nullptr)
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Go to a Website",
-                                    ROLE_SYSTEM_TEXT);
-      if (child == nullptr)
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Go to a Web Site",
-                                    ROLE_SYSTEM_TEXT);
+    case kWebEngineTrident: {
+      InitializeBrowserData();
+      auto& child_data = browser_data[web_engine];
+      foreach_(it, child_data) {
+        child = FindAccessibleChild(acc_obj.children, it->name, it->role);
+        if (child)
+          break;
+      }
       break;
-    case kWebEngineTrident:
-      child = FindAccessibleChild(acc_obj.children,
-                                  L"Address and search using Bing",
-                                  ROLE_SYSTEM_TEXT);
-      if (child == nullptr)
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Address and search using Google",
-                                    ROLE_SYSTEM_TEXT);
-      break;
+    }
     case kWebEnginePresto:
       child = FindAccessibleChild(acc_obj.children,
                                   L"", ROLE_SYSTEM_CLIENT);
@@ -263,7 +285,7 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
     const std::wstring& url,
     std::wstring& title) {
-  int stream_provider = kStreamUnknown;
+  StreamingVideoProvider stream_provider = kStreamUnknown;
 
   // Check URL for known streaming video providers
   if (!url.empty()) {
