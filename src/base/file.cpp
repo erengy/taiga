@@ -424,7 +424,7 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
 
   WIN32_FIND_DATA wfd;
   std::wstring file_name = path + L"*.*";
-  HANDLE file_handle = FindFirstFile(path.c_str(), &wfd);
+  HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
 
   if (file_handle == INVALID_HANDLE_VALUE)
     return 0;
