@@ -1,7 +1,7 @@
 /**
- * pugixml parser - version 1.2
+ * pugixml parser - version 1.4
  * --------------------------------------------------------
- * Copyright (C) 2006-2012, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+ * Copyright (C) 2006-2014, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
  * Report bugs and download new versions at http://pugixml.org/
  *
  * This library is distributed under the MIT License. See notice at the end
@@ -32,19 +32,22 @@
 // #define PUGIXML_FUNCTION __fastcall // to set calling conventions to all public functions to fastcall
 // In absence of PUGIXML_CLASS/PUGIXML_FUNCTION definitions PUGIXML_API is used instead
 
-// Uncomment this to switch to header-only version
-// #define PUGIXML_HEADER_ONLY
-// #include "pugixml.cpp"
-
 // Tune these constants to adjust memory-related behavior
 // #define PUGIXML_MEMORY_PAGE_SIZE 32768
 // #define PUGIXML_MEMORY_OUTPUT_STACK 10240
 // #define PUGIXML_MEMORY_XPATH_PAGE_SIZE 4096
 
+// Uncomment this to switch to header-only version
+// #define PUGIXML_HEADER_ONLY
+// #include "pugixml.cpp"
+
+// Uncomment this to enable long long support
+// #define PUGIXML_HAS_LONG_LONG
+
 #endif
 
 /**
- * Copyright (c) 2006-2012 Arseny Kapoulkine
+ * Copyright (c) 2006-2014 Arseny Kapoulkine
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation

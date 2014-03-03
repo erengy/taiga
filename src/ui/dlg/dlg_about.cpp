@@ -109,7 +109,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
       L"- JsonCpp 0.6.0, Copyright (c) 2007-2010, Baptiste Lepilleur\\line "
       L"- OAuth class is based on codebrook-twitter-oauth example code, Copyright (c) 2010, Brook Miles\\line "
-      L"- pugixml parser version 1.2, Copyright (c) 2006-2012, Arseny Kapoulkine\\line "
+      L"- pugixml version 1.4, Copyright (c) 2006-2014, Arseny Kapoulkine\\line "
       L"- zlib version 1.2.8, Copyright (c) 1995-2013, Jean-loup Gailly and Mark Adler\\line\\line "
       L"\\b Links:\\b0\\line "
       L"- Home page {\\field{\\*\\fldinst HYPERLINK \"http://taiga.erengy.com\"}{\\fldrslt http://taiga.erengy.com}}\\line "
