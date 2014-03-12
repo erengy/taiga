@@ -79,6 +79,7 @@
 	<!-- Help -->
 	<menu name="Help">
 		<item name="About Taiga" action="About()"/>
+		<item name="Support" action="URL(http://taiga.erengy.com/#support)"/>
 		<item type="separator"/>
 		<item name="Check for updates" action="CheckUpdates()"/>
 	</menu>
