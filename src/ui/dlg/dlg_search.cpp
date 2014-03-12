@@ -190,7 +190,7 @@ void SearchDialog::Search(const std::wstring& title) {
 
   ui::ChangeStatusText(L"Searching " + taiga::GetCurrentService()->name() +
                        L" for \"" + title + L"\"...");
-  sync::SearchTitle(title);
+  sync::SearchTitle(title, anime::ID_UNKNOWN);
 }
 
 }  // namespace ui

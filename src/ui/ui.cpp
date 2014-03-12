@@ -277,7 +277,7 @@ void OnLibraryEntryImageChange(int id) {
     DlgSeason.RefreshList(true);
 }
 
-void OnLibrarySearchTitle(const string_t& results) {
+void OnLibrarySearchTitle(int id, const string_t& results) {
   std::vector<string_t> split_vector;
   Split(results, L",", split_vector);
   RemoveEmptyStrings(split_vector);
@@ -289,7 +289,8 @@ void OnLibrarySearchTitle(const string_t& results) {
     OnLibraryEntryChange(id);
   }
 
-  DlgSearch.ParseResults(ids);
+  if (id == anime::ID_UNKNOWN)
+    DlgSearch.ParseResults(ids);
 }
 
 void OnLibraryEntryChangeFailure(int id, const string_t& reason) {

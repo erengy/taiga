@@ -151,7 +151,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
       ui::OnLibraryEntryChangeFailure(anime_id, response.data[L"error"]);
       // Try making the other request, even though this one failed
       if (response.service_id == kMyAnimeList && anime_item)
-        SearchTitle(anime_item->GetTitle());
+        SearchTitle(anime_item->GetTitle(), anime_id);
       break;
     case kAddLibraryEntry:
     case kDeleteLibraryEntry:
@@ -202,13 +202,14 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       // a proper method in its API for metadata retrieval, and the one we use
       // doesn't provide us enough information.
       if (response.service_id == kMyAnimeList && anime_item)
-        SearchTitle(anime_item->GetTitle());
+        SearchTitle(anime_item->GetTitle(), anime_id);
       break;
     }
 
     case kSearchTitle: {
-      ui::ClearStatusText();
-      ui::OnLibrarySearchTitle(response.data[L"ids"]);
+      if (!anime_item)
+        ui::ClearStatusText();
+      ui::OnLibrarySearchTitle(anime_id, response.data[L"ids"]);
       break;
     }
 

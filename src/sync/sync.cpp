@@ -57,11 +57,13 @@ void GetMetadataById(int id) {
   ServiceManager.MakeRequest(request);
 }
 
-void SearchTitle(string_t title) {
+void SearchTitle(string_t title, int id) {
   Request request(kSearchTitle);
   SetActiveServiceForRequest(request);
   if (!AddAuthenticationToRequest(request))
     return;
+  if (id != anime::ID_UNKNOWN)
+    AddServiceDataToRequest(request, id);
   request.data[L"title"] = title;
   ServiceManager.MakeRequest(request);
 }

@@ -29,7 +29,7 @@ namespace sync {
 void AuthenticateUser();
 void GetLibraryEntries();
 void GetMetadataById(int id);
-void SearchTitle(string_t title);
+void SearchTitle(string_t title, int id);
 void Synchronize();
 void UpdateLibraryEntry(AnimeValues& anime_values, int id,
                         taiga::HttpClientMode http_client_mode);
