@@ -224,10 +224,15 @@ int Database::UpdateItem(const Item& new_item) {
     }
     */
 
-    // Generate a new ID
     int id = 1;
-    while (FindItem(id))
-      ++id;
+    if (source == sync::kMyAnimeList) {
+      // Use MyAnimeList ID
+      id = ToInt(new_item.GetId(source));
+    } else {
+      // Generate a new ID
+      while (FindItem(id))
+        ++id;
+    }
     // Add a new item
     item = &items[id];
     item->SetId(ToWstr(id), sync::kTaiga);
