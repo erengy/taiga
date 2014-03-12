@@ -24,6 +24,7 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/history.h"
+#include "library/resource.h"
 #include "sync/manager.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
@@ -508,14 +509,34 @@ bool AppSettings::Save() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void AppSettings::ApplyChanges(const std::wstring& previous_user,
+void AppSettings::ApplyChanges(const std::wstring& previous_service,
+                               const std::wstring& previous_user,
                                const std::wstring& previous_theme) {
+  if (GetWstr(kSync_ActiveService) != previous_service) {
+    if (History.queue.GetItemCount() > 0) {
+      ui::OnSettingsServiceChangeFailed();
+      Set(kSync_ActiveService, previous_service);
+    } else {
+      if (ui::OnSettingsServiceChange(previous_service,
+                                      GetWstr(kSync_ActiveService))) {
+        AnimeDatabase.items.clear();
+        ImageDatabase.Clear();
+        // TODO: Delete previous user list: data/user/username@service/anime.xml
+        // Actually, history.xml has anime_id, so we've got to delete that too
+      } else {
+        Set(kSync_ActiveService, previous_service);
+      }
+    }
+    Set(kSync_ActiveService, previous_service);  // TEMP
+  }
+
   if (GetWstr(kApp_Interface_Theme) != previous_theme) {
     ui::Theme.Load();
     ui::OnSettingsThemeChange();
   }
 
-  if (GetCurrentUsername() != previous_user) {
+  if (GetWstr(kSync_ActiveService) != previous_service ||
+      GetCurrentUsername() != previous_user) {
     AnimeDatabase.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -544,12 +565,13 @@ void AppSettings::RestoreDefaults() {
   std::wstring backup = file + L".bak";
   DWORD flags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
   MoveFileEx(file.c_str(), backup.c_str(), flags);
-  
+
   // Reload settings
+  std::wstring previous_service = GetCurrentService()->canonical_name();
   std::wstring previous_user = GetCurrentUsername();
   std::wstring previous_theme = GetWstr(kApp_Interface_Theme);
   Load();
-  ApplyChanges(previous_user, previous_theme);
+  ApplyChanges(previous_service, previous_user, previous_theme);
 
   // Reload settings dialog
   ui::OnSettingsRestoreDefaults();

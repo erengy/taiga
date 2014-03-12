@@ -169,7 +169,7 @@ public:
   void Set(AppSettingName name, int value);
   void Set(AppSettingName name, const std::wstring& value);
 
-  void ApplyChanges(const std::wstring& previous_user, const std::wstring& previous_theme);
+  void ApplyChanges(const std::wstring& previous_service, const std::wstring& previous_user, const std::wstring& previous_theme);
   void HandleCompatibility();
   void RestoreDefaults();
 

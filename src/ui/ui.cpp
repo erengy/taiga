@@ -24,6 +24,7 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
+#include "sync/manager.h"
 #include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
@@ -603,6 +604,35 @@ void OnSettingsRootFoldersEmpty() {
   dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetSelectedButtonID() == IDYES)
     ShowDlgSettings(kSettingsSectionLibrary, kSettingsPageLibraryFolders);
+}
+
+bool OnSettingsServiceChange(const string_t& current_service, const string_t& new_service) {
+  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
+  std::wstring instruction =
+      L"Are you sure you want to change the active service from " +
+      ServiceManager.service(current_service)->name() + L" to " +
+      ServiceManager.service(new_service)->name() + L"?";
+  dlg.SetMainInstruction(instruction.c_str());
+  dlg.SetContent(L"Note that:\n"
+                 L"- Your list will not be moved from one service to another. "
+                 L"Taiga can't do that.\n"
+                 L"- Local history will be reset, and local settings associated "
+                 L"with an anime (folders, alternative titles, torrent filters) "
+                 L"will be lost or broken.");
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(DlgMain.GetWindowHandle());
+
+  return dlg.GetSelectedButtonID() == IDYES;
+}
+
+void OnSettingsServiceChangeFailed() {
+  win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_ERROR);
+  dlg.SetMainInstruction(L"You cannot change the active service while there "
+                         L"are queued items in your History.");
+  dlg.SetContent(L"Synchronize your list or clear the queue, and try again.");
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(DlgMain.GetWindowHandle());
 }
 
 void OnSettingsThemeChange() {

@@ -74,6 +74,8 @@ void OnSettingsAccountEmpty();
 void OnSettingsChange();
 void OnSettingsRestoreDefaults();
 void OnSettingsRootFoldersEmpty();
+bool OnSettingsServiceChange(const string_t& current_service, const string_t& new_service);
+void OnSettingsServiceChangeFailed();
 void OnSettingsThemeChange();
 void OnSettingsUserChange();
 

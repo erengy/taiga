@@ -35,6 +35,7 @@ public:
 
   // Releases image data from memory if an image is not in sight.
   void FreeMemory();
+  void Clear();
 
   // Returns a pointer to requested image if available.
   base::Image* GetImage(int anime_id);

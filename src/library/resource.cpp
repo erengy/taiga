@@ -24,6 +24,7 @@
 #include "library/discover.h"
 #include "library/resource.h"
 #include "sync/sync.h"
+#include "taiga/path.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_season.h"
 
@@ -89,6 +90,13 @@ void ImageDatabase::FreeMemory() {
     if (erase)
       items_.erase(anime_id);
   }
+}
+
+void ImageDatabase::Clear() {
+  items_.clear();
+
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
+  DeleteFolder(path);
 }
 
 base::Image* ImageDatabase::GetImage(int anime_id) {

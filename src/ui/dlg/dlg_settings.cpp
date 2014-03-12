@@ -21,6 +21,7 @@
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/history.h"
+#include "sync/manager.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
@@ -160,15 +161,19 @@ void SettingsDialog::OnOK() {
   win::ListView list;
   SettingsPage* page = nullptr;
 
+  std::wstring previous_service = taiga::GetCurrentService()->canonical_name();
   std::wstring previous_user = taiga::GetCurrentUsername();
   std::wstring previous_theme = Settings[taiga::kApp_Interface_Theme];
 
   // Services > Main
   page = &pages[kSettingsPageServicesMain];
   if (page->IsWindow()) {
-    //auto service = ServiceManager.service(static_cast<sync::ServiceId>(page->GetComboSelection(IDC_COMBO_DBLCLICK) + 1));
-    //Settings.Set(taiga::kSync_ActiveService, service->canonical_name());
+    win::ComboBox combo(page->GetDlgItem(IDC_COMBO_SERVICE));
+    auto service_id = static_cast<sync::ServiceId>(combo.GetItemData(combo.GetCurSel()));
+    auto service = ServiceManager.service(service_id);
+    Settings.Set(taiga::kSync_ActiveService, service->canonical_name());
     Settings.Set(taiga::kSync_AutoOnStart, page->IsDlgButtonChecked(IDC_CHECK_START_LOGIN));
+    combo.SetWindowHandle(nullptr);
   }
   // Services > MyAnimeList
   page = &pages[kSettingsPageServicesMal];
@@ -334,7 +339,7 @@ void SettingsDialog::OnOK() {
   Settings.Save();
 
   // Apply changes
-  Settings.ApplyChanges(previous_user, previous_theme);
+  Settings.ApplyChanges(previous_service, previous_user, previous_theme);
 
   // End dialog
   EndDialog(IDOK);

@@ -85,9 +85,15 @@ BOOL SettingsPage::OnInitDialog() {
   switch (index) {
     // Services > Main
     case kSettingsPageServicesMain: {
-      AddComboString(IDC_COMBO_SERVICE, L"MyAnimeList");
-      AddComboString(IDC_COMBO_SERVICE, L"Hummingbird");
-      SetComboSelection(IDC_COMBO_SERVICE, ServiceManager.service(Settings[taiga::kSync_ActiveService])->id() - 1);
+      win::ComboBox combo(GetDlgItem(IDC_COMBO_SERVICE));
+      for (int i = sync::kFirstService; i <= sync::kLastService; i++) {
+        auto service = ServiceManager.service(static_cast<sync::ServiceId>(i));
+        combo.AddItem(service->name().c_str(), service->id());
+        auto active_service = ServiceManager.service(Settings[taiga::kSync_ActiveService]);
+        if (service->id() == active_service->id())
+          combo.SetCurSel(combo.GetCount() - 1);
+      }
+      combo.SetWindowHandle(nullptr);
       CheckDlgButton(IDC_CHECK_START_LOGIN, Settings.GetBool(taiga::kSync_AutoOnStart));
       break;
     }
@@ -443,9 +449,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             History.Clear();
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE2)) {
-            std::wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
-            DeleteFolder(path);
-            ImageDatabase.FreeMemory();
+            ImageDatabase.Clear();
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE3)) {
             std::wstring path = taiga::GetPath(taiga::kPathFeed);
