@@ -29,6 +29,7 @@
 #include "sync/manager.h"
 #include "sync/service.h"
 #include "taiga/path.h"
+#include "taiga/settings.h"
 #include "taiga/taiga.h"
 
 library::SeasonDatabase SeasonDatabase;
@@ -77,6 +78,13 @@ bool SeasonDatabase::Load(std::wstring file) {
     if (anime_item && anime_item->last_modified >= modified) {
       anime_id = anime_item->GetId();
     } else {
+      auto current_service_id = taiga::GetCurrentServiceId();
+      if (id_map[current_service_id].empty()) {
+        LOG(LevelDebug, name + L" - No ID for current service: " +
+                        XmlReadStrValue(node, L"title"));
+        continue;
+      }
+
       anime::Item item;
       foreach_(it, id_map)
         item.SetId(it->second, it->first);
