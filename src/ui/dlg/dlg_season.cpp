@@ -497,8 +497,6 @@ void SeasonDialog::RefreshData(int anime_id) {
     // Get details
     if (anime::MetadataNeedsRefresh(*anime_item))
       sync::GetMetadataById(*id);
-
-    Sleep(100);
   }
 
   ui::SetSharedCursor(IDC_ARROW);

@@ -32,6 +32,11 @@ taiga::HttpManager ConnectionManager;
 
 namespace taiga {
 
+// This is the commonly used value for today's web browsers.
+// See: http://www.browserscope.org/?category=network
+// We currently don't need to apply this limit on a per-hostname basis.
+const unsigned int kMaxSimultaneousConnections = 6;
+
 HttpClient::HttpClient()
     : mode_(kHttpSilent) {
   // We will handle redirections ourselves
@@ -111,6 +116,10 @@ bool HttpClient::OnReadComplete() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+HttpManager::HttpManager()
+    : connections_(0) {
+}
+
 HttpClient& HttpManager::GetNewClient(const base::uuid_t& uuid) {
   return clients_[uuid];
 }
@@ -128,13 +137,17 @@ void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
 
   HttpClient& client = clients_[request.uuid];
   client.set_mode(mode);
-  client.MakeRequest(request);
+
+  AddToQueue(request);
+  ProcessQueue();
 }
 
 void HttpManager::MakeRequest(HttpClient& client, HttpRequest& request,
                               HttpClientMode mode) {
   client.set_mode(mode);
-  client.MakeRequest(request);
+
+  AddToQueue(request);
+  ProcessQueue();
 }
 
 void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
@@ -151,6 +164,9 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
       ServiceManager.HandleHttpError(client.response_, error);
       break;
   }
+
+  FreeConnection();
+  ProcessQueue();
 }
 
 void HttpManager::HandleResponse(HttpResponse& response) {
@@ -210,6 +226,9 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       ui::OnUpdateFinished();
       break;
   }
+
+  FreeConnection();
+  ProcessQueue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,6 +240,41 @@ void HttpManager::FreeMemory() {
     } else {
       ++it;
     }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void HttpManager::AddToQueue(HttpRequest& request) {
+  win::Lock lock(critical_section_);
+
+  requests_.push(request);
+
+  LOG(LevelDebug, L"ID: " + request.uuid);
+}
+
+void HttpManager::ProcessQueue() {
+  win::Lock lock(critical_section_);
+
+  while (connections_ < kMaxSimultaneousConnections && !requests_.empty()) {
+    HttpRequest& request = requests_.front();
+    HttpClient& client = clients_[request.uuid];
+    client.MakeRequest(request);
+    requests_.pop();
+    connections_++;
+  }
+
+  if (connections_ == kMaxSimultaneousConnections)
+    LOG(LevelDebug, L"Reached max connections");
+}
+
+void HttpManager::FreeConnection() {
+  win::Lock lock(critical_section_);
+
+  if (connections_ > 0) {
+    connections_--;
+  } else {
+    LOG(LevelError, L"connections was already zero");
   }
 }
 

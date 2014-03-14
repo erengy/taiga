@@ -19,8 +19,12 @@
 #ifndef TAIGA_TAIGA_HTTP_H
 #define TAIGA_TAIGA_HTTP_H
 
+#include <map>
+#include <queue>
+
 #include "base/types.h"
 #include "win/http/win_http.h"
+#include "win/win_thread.h"
 
 namespace taiga {
 
@@ -73,6 +77,9 @@ private:
 
 class HttpManager {
 public:
+  HttpManager();
+  ~HttpManager() {}
+
   HttpClient& GetNewClient(const base::uuid_t& uuid);
 
   void CancelRequest(base::uuid_t uuid);
@@ -85,7 +92,14 @@ public:
   void FreeMemory();
 
 private:
+  void AddToQueue(HttpRequest& request);
+  void ProcessQueue();
+  void FreeConnection();
+
   std::map<std::wstring, HttpClient> clients_;
+  unsigned int connections_;
+  win::CriticalSection critical_section_;
+  std::queue<HttpRequest> requests_;
 };
 
 }  // namespace taiga
