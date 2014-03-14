@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
 #include "library/resource.h"
@@ -32,10 +33,10 @@ taiga::HttpManager ConnectionManager;
 
 namespace taiga {
 
-// This is the commonly used value for today's web browsers.
+// These are the values commonly used by today's web browsers.
 // See: http://www.browserscope.org/?category=network
-// We currently don't need to apply this limit on a per-hostname basis.
-const unsigned int kMaxSimultaneousConnections = 6;
+const unsigned int kMaxSimultaneousConnections = 10;
+const unsigned int kMaxSimultaneousConnectionsPerHostname = 6;
 
 HttpClient::HttpClient()
     : mode_(kHttpSilent) {
@@ -116,10 +117,6 @@ bool HttpClient::OnReadComplete() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpManager::HttpManager()
-    : connections_(0) {
-}
-
 HttpClient& HttpManager::GetNewClient(const base::uuid_t& uuid) {
   return clients_[uuid];
 }
@@ -165,7 +162,7 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
       break;
   }
 
-  FreeConnection();
+  FreeConnection(client.request_.host);
   ProcessQueue();
 }
 
@@ -227,7 +224,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
   }
 
-  FreeConnection();
+  FreeConnection(client.request_.host);
   ProcessQueue();
 }
 
@@ -248,7 +245,7 @@ void HttpManager::FreeMemory() {
 void HttpManager::AddToQueue(HttpRequest& request) {
   win::Lock lock(critical_section_);
 
-  requests_.push(request);
+  requests_.push_back(request);
 
   LOG(LevelDebug, L"ID: " + request.uuid);
 }
@@ -256,25 +253,40 @@ void HttpManager::AddToQueue(HttpRequest& request) {
 void HttpManager::ProcessQueue() {
   win::Lock lock(critical_section_);
 
-  while (connections_ < kMaxSimultaneousConnections && !requests_.empty()) {
-    HttpRequest& request = requests_.front();
-    HttpClient& client = clients_[request.uuid];
-    client.MakeRequest(request);
-    requests_.pop();
-    connections_++;
-  }
+  unsigned int connections = 0;
+  foreach_(it, connections_)
+    connections += it->second;
 
-  if (connections_ == kMaxSimultaneousConnections)
-    LOG(LevelDebug, L"Reached max connections");
+  for (size_t i = 0; i < requests_.size(); i++) {
+    if (connections == kMaxSimultaneousConnections) {
+      LOG(LevelDebug, L"Reached max connections");
+      break;
+    }
+
+    HttpRequest& request = requests_.at(i);
+    if (connections_[request.host] == kMaxSimultaneousConnectionsPerHostname) {
+      LOG(LevelDebug, L"Reached max connections for hostname: " + request.host);
+      continue;
+    } else {
+      HttpClient& client = clients_[request.uuid];
+      client.MakeRequest(request);
+
+      connections++;
+      connections_[request.host]++;
+
+      requests_.erase(requests_.begin() + i);
+      i--;
+    }
+  }
 }
 
-void HttpManager::FreeConnection() {
+void HttpManager::FreeConnection(const string_t& hostname) {
   win::Lock lock(critical_section_);
 
-  if (connections_ > 0) {
-    connections_--;
+  if (connections_[hostname] > 0) {
+    connections_[hostname]--;
   } else {
-    LOG(LevelError, L"connections was already zero");
+    LOG(LevelError, L"Connections for hostname was already zero: " + hostname);
   }
 }
 

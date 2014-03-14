@@ -558,9 +558,9 @@ bool OnSeasonRefreshRequired() {
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
   auto service = taiga::GetCurrentService();
   std::wstring content =
-      L"It seems that we don't know much about some anime titles in this "
-      L"season. Taiga will connect to " + service->name() + L"to retrieve "
-      L"missing information and images.";
+      L"Taiga will connect to " + service->name() + L" to retrieve missing "
+      L"information and images. Note that it may take about a minute until "
+      L"Taiga gets all the data.";
   dlg.SetContent(content.c_str());
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);

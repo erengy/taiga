@@ -20,7 +20,6 @@
 #define TAIGA_TAIGA_HTTP_H
 
 #include <map>
-#include <queue>
 
 #include "base/types.h"
 #include "win/http/win_http.h"
@@ -77,9 +76,6 @@ private:
 
 class HttpManager {
 public:
-  HttpManager();
-  ~HttpManager() {}
-
   HttpClient& GetNewClient(const base::uuid_t& uuid);
 
   void CancelRequest(base::uuid_t uuid);
@@ -94,12 +90,12 @@ public:
 private:
   void AddToQueue(HttpRequest& request);
   void ProcessQueue();
-  void FreeConnection();
+  void FreeConnection(const string_t& hostname);
 
   std::map<std::wstring, HttpClient> clients_;
-  unsigned int connections_;
+  std::map<std::wstring, unsigned int> connections_;
   win::CriticalSection critical_section_;
-  std::queue<HttpRequest> requests_;
+  std::vector<HttpRequest> requests_;
 };
 
 }  // namespace taiga
