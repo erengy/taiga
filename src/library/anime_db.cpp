@@ -73,12 +73,15 @@ bool Database::LoadDatabase() {
     if (service)
       source = service->id();
 
+    std::vector<std::wstring> synonyms;
+    XmlReadChildNodes(node, synonyms, L"synonym");
+
     item.SetSource(source);
     item.SetSlug(XmlReadStrValue(node, L"slug"));
 
     item.SetTitle(XmlReadStrValue(node, L"title"));
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));
-    item.SetSynonyms(XmlReadStrValue(node, L"synonyms"));
+    item.SetSynonyms(synonyms);
     item.SetType(XmlReadIntValue(node, L"type"));
     item.SetAiringStatus(XmlReadIntValue(node, L"status"));
     item.SetEpisodeCount(XmlReadIntValue(node, L"episode_count"));
@@ -124,6 +127,8 @@ bool Database::SaveDatabase() {
     std::wstring source = ServiceManager.GetServiceNameById(
         static_cast<sync::ServiceId>(it->second.GetSource()));
 
+    #define XML_WC(n, v, t) \
+      if (!v.empty()) XmlWriteChildNodes(anime_node, v, n, t)
     #define XML_WD(n, v) \
       if (v) XmlWriteStrValue(anime_node, n, std::wstring(v).c_str())
     #define XML_WI(n, v) \
@@ -134,7 +139,7 @@ bool Database::SaveDatabase() {
     XML_WS(L"slug", it->second.GetSlug(), pugi::node_pcdata);
     XML_WS(L"title", it->second.GetTitle(), pugi::node_cdata);
     XML_WS(L"english", it->second.GetEnglishTitle(), pugi::node_cdata);
-    XML_WS(L"synonyms", Join(it->second.GetSynonyms(), L"; "), pugi::node_cdata);
+    XML_WC(L"synonym", it->second.GetSynonyms(), pugi::node_cdata);
     XML_WI(L"type", it->second.GetType());
     XML_WI(L"status", it->second.GetAiringStatus());
     XML_WI(L"episode_count", it->second.GetEpisodeCount());
@@ -151,6 +156,7 @@ bool Database::SaveDatabase() {
     #undef XML_WS
     #undef XML_WI
     #undef XML_WD
+    #undef XML_WC
   }
 
   std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
