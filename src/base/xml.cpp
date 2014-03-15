@@ -53,11 +53,12 @@ void XmlReadChildNodes(pugi::xml_node& parent_node,
 }
 
 void XmlWriteChildNodes(pugi::xml_node& parent_node,
-                        std::vector<std::wstring>& output,
-                        const wchar_t* name) {
-  foreach_(it, output) {
+                        const std::vector<std::wstring>& input,
+                        const wchar_t* name,
+                        pugi::xml_node_type node_type) {
+  foreach_(it, input) {
     xml_node child_node = parent_node.append_child(name);
-    child_node.append_child(pugi::node_pcdata).set_value(it->c_str());
+    child_node.append_child(node_type).set_value(it->c_str());
   }
 }
 

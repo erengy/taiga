@@ -41,8 +41,9 @@ void XmlReadChildNodes(pugi::xml_node& parent_node,
                        std::vector<std::wstring>& output,
                        const wchar_t* name);
 void XmlWriteChildNodes(pugi::xml_node& parent_node,
-                        std::vector<std::wstring>& output,
-                        const wchar_t* name);
+                        const std::vector<std::wstring>& input,
+                        const wchar_t* name,
+                        pugi::xml_node_type node_type = pugi::node_pcdata);
 
 void XmlWriteIntValue(pugi::xml_node& node, const wchar_t* name, int value);
 void XmlWriteStrValue(pugi::xml_node& node, const wchar_t* name,
