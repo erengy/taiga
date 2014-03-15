@@ -26,7 +26,8 @@ class DummyAnime DummyAnime;
 class DummyEpisode DummyEpisode;
 
 void DummyAnime::Initialize() {
-  SetId(L"74164", 0);
+  SetSource(sync::kMyAnimeList);
+  SetId(L"4224", sync::kTaiga);
   SetId(L"4224", sync::kMyAnimeList);
   SetId(L"toradora", sync::kHummingbird);
   SetTitle(L"Toradora!");

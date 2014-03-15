@@ -176,7 +176,6 @@ void Item::SetId(const std::wstring& id, enum_t service) {
     metadata_.uid.resize(service + 1);
 
   metadata_.uid.at(service) = id;
-  metadata_.source = service;
 }
 
 void Item::SetSlug(const std::wstring& slug) {

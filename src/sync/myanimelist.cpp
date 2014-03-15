@@ -254,6 +254,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // - my_tags
   foreach_xmlnode_(node, node_myanimelist, L"anime") {
     ::anime::Item anime_item;
+    anime_item.SetSource(this->id());
     anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), this->id());
     anime_item.last_modified = time(nullptr);  // current time
 
@@ -316,6 +317,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   StripHtmlTags(score);
 
   ::anime::Item anime_item;
+  anime_item.SetSource(this->id());
   anime_item.SetId(id, this->id());
 //anime_item.SetTitle(title);  // unsafe, may be truncated
   anime_item.SetGenres(genres_vector);
@@ -352,6 +354,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   // - image
   foreach_xmlnode_(node, node_anime, L"entry") {
     ::anime::Item anime_item;
+    anime_item.SetSource(this->id());
     anime_item.SetId(XmlReadStrValue(node, L"id"), this->id());
     anime_item.SetTitle(DecodeText(XmlReadStrValue(node, L"title")));
     anime_item.SetEnglishTitle(DecodeText(XmlReadStrValue(node, L"english")));

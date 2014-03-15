@@ -176,9 +176,10 @@ Item* Database::FindItem(int id) {
 }
 
 Item* Database::FindItem(const std::wstring& id, enum_t service) {
-  foreach_(it, items)
-    if (id == it->second.GetId(service))
-      return &it->second;
+  if (!id.empty())
+    foreach_(it, items)
+      if (id == it->second.GetId(service))
+        return &it->second;
 
   return nullptr;
 }
@@ -220,8 +221,14 @@ void Database::ClearInvalidItems() {
 }
 
 int Database::UpdateItem(const Item& new_item) {
-  enum_t source = new_item.GetSource();
-  Item* item = FindItem(new_item.GetId(source), source);
+  Item* item = nullptr;
+
+  for (enum_t i = sync::kTaiga; i <= sync::kLastService; i++) {
+    item = FindItem(new_item.GetId(i), i);
+    if (item)
+      break;
+  }
+
   if (!item) {
     /*
     auto service = ServiceManager.service(Settings[taiga::kSync_ActiveService]);
@@ -231,9 +238,9 @@ int Database::UpdateItem(const Item& new_item) {
     */
 
     int id = 1;
-    if (source == sync::kMyAnimeList) {
-      // Use MyAnimeList ID
-      id = ToInt(new_item.GetId(source));
+    if (!new_item.GetId(sync::kMyAnimeList).empty()) {
+      // Use MyAnimeList ID, if available
+      id = ToInt(new_item.GetId(sync::kMyAnimeList));
     } else {
       // Generate a new ID
       while (FindItem(id))
@@ -246,10 +253,15 @@ int Database::UpdateItem(const Item& new_item) {
 
   // Update series information if new information is, well, new.
   if (!item->last_modified || new_item.last_modified >= item->last_modified) {
-    item->SetId(new_item.GetId(source), source);
     item->last_modified = new_item.last_modified;
 
-    // Update only if a value is non-empty
+    for (enum_t i = sync::kFirstService; i <= sync::kLastService; i++)
+      if (!new_item.GetId(i).empty())
+        item->SetId(new_item.GetId(i), i);
+
+    if (new_item.GetSource() != sync::kTaiga)
+      item->SetSource(new_item.GetSource());
+
     if (new_item.GetType() > 0)
       item->SetType(new_item.GetType());
     if (new_item.GetEpisodeCount() > -1)
@@ -334,7 +346,7 @@ bool Database::LoadList() {
 
   foreach_xmlnode_(node, node_library, L"anime") {
     Item anime_item;
-    anime_item.SetId(XmlReadStrValue(node, L"id"), 0);
+    anime_item.SetId(XmlReadStrValue(node, L"id"), sync::kTaiga);
 
     anime_item.AddtoUserList();
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"progress"));

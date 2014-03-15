@@ -86,6 +86,7 @@ bool SeasonDatabase::Load(std::wstring file) {
       }
 
       anime::Item item;
+      item.SetSource(sync::kMyAnimeList);
       foreach_(it, id_map)
         item.SetId(it->second, it->first);
       item.last_modified = modified;

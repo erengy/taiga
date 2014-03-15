@@ -30,6 +30,7 @@ Title::Title(TitleType type, const string_t& value)
 
 Metadata::Metadata()
     : audience(0),
+      modified(0),
       source(0),
       status(0),
       type(0) {
