@@ -94,7 +94,7 @@ bool Database::LoadDatabase() {
     item.SetScore(XmlReadStrValue(node, L"score"));
     item.SetPopularity(XmlReadStrValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
-    item.last_modified = _wtoi64(XmlReadStrValue(node, L"modified").c_str());
+    item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
   }
 
   return true;
@@ -152,7 +152,7 @@ bool Database::SaveDatabase() {
     XML_WS(L"score", it->second.GetScore(), pugi::node_pcdata);
     XML_WS(L"popularity", it->second.GetPopularity(), pugi::node_pcdata);
     XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
-    XML_WS(L"modified", ToWstr(it->second.last_modified), pugi::node_pcdata);
+    XML_WS(L"modified", ToWstr(it->second.GetLastModified()), pugi::node_pcdata);
     #undef XML_WS
     #undef XML_WI
     #undef XML_WD
@@ -252,8 +252,9 @@ int Database::UpdateItem(const Item& new_item) {
   }
 
   // Update series information if new information is, well, new.
-  if (!item->last_modified || new_item.last_modified >= item->last_modified) {
-    item->last_modified = new_item.last_modified;
+  if (!item->GetLastModified() ||
+      new_item.GetLastModified() >= item->GetLastModified()) {
+    item->SetLastModified(new_item.GetLastModified());
 
     for (enum_t i = sync::kFirstService; i <= sync::kLastService; i++)
       if (!new_item.GetId(i).empty())

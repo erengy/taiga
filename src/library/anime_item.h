@@ -62,6 +62,7 @@ public:
   const std::vector<std::wstring>& GetProducers() const;
   const std::wstring& GetScore() const;
   const std::wstring& GetSynopsis() const;
+  const time_t GetLastModified() const;
 
   void SetId(const std::wstring& id, enum_t service);
   void SetSlug(const std::wstring& slug);
@@ -84,6 +85,7 @@ public:
   void SetProducers(const std::vector<std::wstring>& producers);
   void SetScore(const std::wstring& score);
   void SetSynopsis(const std::wstring& synopsis);
+  void SetLastModified(time_t modified);
 
   //////////////////////////////////////////////////////////////////////////////
   // Library data
@@ -138,11 +140,6 @@ public:
   void AddtoUserList();
   bool IsInList() const;
   void RemoveFromUserList();
-
-  // An item's series information will only be updated only if last_modified
-  // value is significantly older than the new one's. This helps us lower
-  // the number of requests we send to a service.
-  time_t last_modified;
 
 private:
   // Helper function

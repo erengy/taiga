@@ -32,9 +32,7 @@ anime::Database* anime::Item::database_ = &AnimeDatabase;
 
 namespace anime {
 
-Item::Item()
-    : last_modified(0), 
-      my_info_(nullptr) {
+Item::Item() {
   metadata_.uid.resize(sync::kLastService + 1);
 }
 
@@ -167,6 +165,10 @@ const std::wstring& Item::GetScore() const {
 
 const std::wstring& Item::GetSynopsis() const {
   return metadata_.description;
+}
+
+const time_t Item::GetLastModified() const {
+  return metadata_.modified;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -321,6 +323,10 @@ void Item::SetScore(const std::wstring& score) {
 
 void Item::SetSynopsis(const std::wstring& synopsis) {
   metadata_.description = synopsis;
+}
+
+void Item::SetLastModified(time_t modified) {
+  metadata_.modified = modified;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

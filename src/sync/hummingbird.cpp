@@ -176,7 +176,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
     anime_item.SetId(StrToWstr(anime_value["slug"].asString()), this->id());
-    anime_item.last_modified = time(nullptr);  // current time
+    anime_item.SetLastModified(time(nullptr));  // current time
 
     ParseAnimeObject(anime_value, anime_item);
 
@@ -204,7 +204,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
   anime_item.SetId(StrToWstr(root["slug"].asString()), this->id());
-  anime_item.last_modified = time(nullptr);  // current time
+  anime_item.SetLastModified(time(nullptr));  // current time
 
   ParseAnimeObject(root, anime_item);
 
@@ -225,7 +225,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
     anime_item.SetId(StrToWstr(root[i]["slug"].asString()), this->id());
-    anime_item.last_modified = time(nullptr);  // current time
+    anime_item.SetLastModified(time(nullptr));  // current time
 
     ParseAnimeObject(root[i], anime_item);
 

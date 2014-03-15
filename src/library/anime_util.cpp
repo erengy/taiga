@@ -101,11 +101,15 @@ int EstimateLastAiredEpisodeNumber(const Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// An item's series information will only be updated only if its last modified
+// value is significantly older than the new one's. This helps us lower
+// the number of requests we send to a service.
+
 bool IsItemOldEnough(const Item& item) {
-  if (!item.last_modified)
+  if (!item.GetLastModified())
     return true;
 
-  time_t time_diff = time(nullptr) - item.last_modified;
+  time_t time_diff = time(nullptr) - item.GetLastModified();
 
   if (item.GetAiringStatus() == kFinishedAiring) {
     return time_diff >= 60 * 60 * 24 * 7;  // 1 week

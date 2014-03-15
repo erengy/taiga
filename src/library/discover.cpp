@@ -75,7 +75,7 @@ bool SeasonDatabase::Load(std::wstring file) {
         break;
     }
 
-    if (anime_item && anime_item->last_modified >= modified) {
+    if (anime_item && anime_item->GetLastModified() >= modified) {
       anime_id = anime_item->GetId();
     } else {
       auto current_service_id = taiga::GetCurrentServiceId();
@@ -89,7 +89,7 @@ bool SeasonDatabase::Load(std::wstring file) {
       item.SetSource(sync::kMyAnimeList);
       foreach_(it, id_map)
         item.SetId(it->second, it->first);
-      item.last_modified = modified;
+      item.SetLastModified(modified);
       item.SetTitle(XmlReadStrValue(node, L"title"));
       item.SetType(XmlReadIntValue(node, L"type"));
       item.SetImageUrl(XmlReadStrValue(node, L"image"));

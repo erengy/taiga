@@ -256,7 +256,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
     anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), this->id());
-    anime_item.last_modified = time(nullptr);  // current time
+    anime_item.SetLastModified(time(nullptr));  // current time
 
     anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
     anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
@@ -323,7 +323,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   anime_item.SetGenres(genres_vector);
   anime_item.SetPopularity(popularity);
   anime_item.SetScore(score);
-  anime_item.last_modified = time(nullptr);  // current time
+  anime_item.SetLastModified(time(nullptr));  // current time
 
   AnimeDatabase.UpdateItem(anime_item);
 }
@@ -369,7 +369,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     if (!StartsWith(synopsis, L"No synopsis has been added for this series yet"))
       anime_item.SetSynopsis(synopsis);
     anime_item.SetImageUrl(XmlReadStrValue(node, L"image"));
-    anime_item.last_modified = time(nullptr);  // current time
+    anime_item.SetLastModified(time(nullptr));  // current time
 
     int anime_id = AnimeDatabase.UpdateItem(anime_item);
 
