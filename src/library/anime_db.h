@@ -24,6 +24,9 @@
 #include "library/anime_item.h"
 
 class HistoryItem;
+namespace pugi {
+class xml_node;
+}
 
 namespace anime {
 
@@ -41,7 +44,7 @@ public:
 
 public:
   bool LoadList();
-  bool SaveList();
+  bool SaveList(bool include_database = false);
 
   int GetItemCount(int status, bool check_history = true);
 
@@ -52,6 +55,10 @@ public:
 
 public:
   std::map<int, Item> items;
+
+private:
+  void ReadDatabaseNode(pugi::xml_node& database_node);
+  void WriteDatabaseNode(pugi::xml_node& database_node);
 };
 
 }  // namespace anime

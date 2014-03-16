@@ -512,31 +512,36 @@ bool AppSettings::Save() {
 void AppSettings::ApplyChanges(const std::wstring& previous_service,
                                const std::wstring& previous_user,
                                const std::wstring& previous_theme) {
-  if (GetWstr(kSync_ActiveService) != previous_service) {
+  bool changed_service = GetWstr(kSync_ActiveService) != previous_service;
+  if (changed_service) {
     if (History.queue.GetItemCount() > 0) {
       ui::OnSettingsServiceChangeFailed();
       Set(kSync_ActiveService, previous_service);
+      changed_service = false;
     } else {
       if (ui::OnSettingsServiceChange(previous_service,
                                       GetWstr(kSync_ActiveService))) {
+        std::wstring current_service = GetWstr(kSync_ActiveService);
+        Set(kSync_ActiveService, previous_service);
+        AnimeDatabase.SaveList(true);
+        Set(kSync_ActiveService, current_service);
         AnimeDatabase.items.clear();
         ImageDatabase.Clear();
-        // TODO: Delete previous user list: data/user/username@service/anime.xml
-        // Actually, history.xml has anime_id, so we've got to delete that too
       } else {
         Set(kSync_ActiveService, previous_service);
+        changed_service = false;
       }
     }
-    Set(kSync_ActiveService, previous_service);  // TEMP
   }
 
-  if (GetWstr(kApp_Interface_Theme) != previous_theme) {
+  bool changed_theme = GetWstr(kApp_Interface_Theme) != previous_theme;
+  if (changed_theme) {
     ui::Theme.Load();
     ui::OnSettingsThemeChange();
   }
 
-  if (GetWstr(kSync_ActiveService) != previous_service ||
-      GetCurrentUsername() != previous_user) {
+  bool changed_username = GetCurrentUsername() != previous_user;
+  if (changed_username || changed_service) {
     AnimeDatabase.LoadList();
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);

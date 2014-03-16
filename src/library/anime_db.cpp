@@ -52,7 +52,12 @@ bool Database::LoadDatabase() {
   std::wstring meta_version = XmlReadStrValue(meta_node, L"version");
 
   xml_node database_node = document.child(L"database");
+  ReadDatabaseNode(database_node);
 
+  return true;
+}
+
+void Database::ReadDatabaseNode(xml_node& database_node) {
   foreach_xmlnode_(node, database_node, L"anime") {
     std::map<enum_t, std::wstring> id_map;
 
@@ -96,8 +101,6 @@ bool Database::LoadDatabase() {
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
   }
-
-  return true;
 }
 
 bool Database::SaveDatabase() {
@@ -110,7 +113,13 @@ bool Database::SaveDatabase() {
   XmlWriteStrValue(meta_node, L"version", L"1.1");
 
   xml_node database_node = document.append_child(L"database");
+  WriteDatabaseNode(database_node);
 
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
+  return XmlWriteDocumentToFile(document, path);
+}
+
+void Database::WriteDatabaseNode(xml_node& database_node) {
   foreach_(it, items) {
     xml_node anime_node = database_node.append_child(L"anime");
 
@@ -158,9 +167,6 @@ bool Database::SaveDatabase() {
     #undef XML_WD
     #undef XML_WC
   }
-
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
-  return XmlWriteDocumentToFile(document, path);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -343,6 +349,9 @@ bool Database::LoadList() {
   xml_node meta_node = document.child(L"meta");
   std::wstring meta_version = XmlReadStrValue(meta_node, L"version");
 
+  xml_node node_database = document.child(L"database");
+  ReadDatabaseNode(node_database);
+
   xml_node node_library = document.child(L"library");
 
   foreach_xmlnode_(node, node_library, L"anime") {
@@ -366,7 +375,7 @@ bool Database::LoadList() {
   return true;
 }
 
-bool Database::SaveList() {
+bool Database::SaveList(bool include_database) {
   if (items.empty())
     return false;
 
@@ -374,6 +383,11 @@ bool Database::SaveList() {
 
   xml_node meta_node = document.append_child(L"meta");
   XmlWriteStrValue(meta_node, L"version", L"1.1");
+
+  if (include_database) {
+    xml_node node_database = document.append_child(L"database");
+    WriteDatabaseNode(node_database);
+  }
 
   xml_node node_library = document.append_child(L"library");
 

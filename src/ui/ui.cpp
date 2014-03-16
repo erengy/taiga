@@ -607,7 +607,8 @@ void OnSettingsRootFoldersEmpty() {
     ShowDlgSettings(kSettingsSectionLibrary, kSettingsPageLibraryFolders);
 }
 
-bool OnSettingsServiceChange(const string_t& current_service, const string_t& new_service) {
+bool OnSettingsServiceChange(const string_t& current_service,
+                             const string_t& new_service) {
   win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
   std::wstring instruction =
       L"Are you sure you want to change the active service from " +
@@ -617,9 +618,8 @@ bool OnSettingsServiceChange(const string_t& current_service, const string_t& ne
   dlg.SetContent(L"Note that:\n"
                  L"- Your list will not be moved from one service to another. "
                  L"Taiga can't do that.\n"
-                 L"- Local history will be reset, and local settings associated "
-                 L"with an anime (folders, alternative titles, torrent filters) "
-                 L"will be lost or broken.");
+                 L"- Local settings associated with an anime will be lost or "
+                 L"broken.");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());
