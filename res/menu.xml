@@ -95,7 +95,7 @@
 		<item name="Completed"          action="AddToListAs(2)"/>
 		<item name="On hold"            action="AddToListAs(3)"/>
 		<item name="Dropped"            action="AddToListAs(4)"/>
-		<item name="Plan to watch"      action="AddToListAs(6)"/>
+		<item name="Plan to watch"      action="AddToListAs(5)"/>
 	</menu>
 	
 	<!-- Right click -->
