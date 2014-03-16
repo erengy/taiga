@@ -112,7 +112,7 @@
 		<type>5</type>
 		<id name="myanimelist">21335</id>
 		<id name="hummingbird">double-circle</id>
-		<producers />
+		<producers>Toshiba Entertainment</producers>
 		<image>http://cdn.myanimelist.net/images/anime/6/56319.jpg</image>
 		<title>Double Circle</title>
 	</anime>
@@ -152,17 +152,9 @@
 		<type>4</type>
 		<id name="myanimelist">21465</id>
 		<id name="hummingbird">kakashi-anbu-hen-yami-wo-ikiru-shinobu</id>
-		<producers />
+		<producers>Studio Pierrot</producers>
 		<image>http://cdn.myanimelist.net/images/anime/9/56757.jpg</image>
 		<title>Kakashi Anbu Hen: Yami wo Ikiru Shinobu</title>
-	</anime>
-	<anime>
-		<type>5</type>
-		<id name="myanimelist">21641</id>
-		<id name="hummingbird">planet-valkyrie</id>
-		<producers>P.A. Works</producers>
-		<image>http://cdn.myanimelist.net/images/anime/13/57001.jpg</image>
-		<title>Planet:Valkyrie</title>
 	</anime>
 	<anime>
 		<type>4</type>
@@ -280,7 +272,7 @@
 		<type>5</type>
 		<id name="myanimelist">14751</id>
 		<id name="hummingbird">bishoujo-senshi-sailor-moon-2014</id>
-		<producers />
+		<producers>Toei Animation, Starchild Records</producers>
 		<image>http://cdn.myanimelist.net/images/anime/9/40091.jpg</image>
 		<title>Bishoujo Senshi Sailor Moon (2014)</title>
 	</anime>
@@ -350,14 +342,6 @@
 	</anime>
 	<anime>
 		<type>1</type>
-		<id name="myanimelist">21507</id>
-		<id name="hummingbird">soul-eater-not</id>
-		<producers>Bones</producers>
-		<image>http://cdn.myanimelist.net/images/anime/10/56815.jpg</image>
-		<title>Soul Eater Not!</title>
-	</anime>
-	<anime>
-		<type>1</type>
 		<id name="myanimelist">20555</id>
 		<id name="hummingbird">super-sonico-the-animation</id>
 		<producers>Genco, Pony Canyon, Half H.P Studio, White Fox, Nitroplus</producers>
@@ -402,7 +386,7 @@
 		<id name="hummingbird">wooser-no-sono-higurashi-2</id>
 		<producers>TV Tokyo, SANZIGEN</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/56609.jpg</image>
-		<title>Wooser no Sono Higurashi 2 Kakusei-hen</title>
+		<title>Wooser no Sono Higurashi: Kakusei-hen</title>
 	</anime>
 	<anime>
 		<type>4</type>
@@ -688,7 +672,7 @@
 		<type>4</type>
 		<id name="myanimelist">21075</id>
 		<id name="hummingbird">hetalia-the-beautiful-world-extra-disc</id>
-		<producers />
+		<producers>Studio Deen</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/55751.jpg</image>
 		<title>Hetalia: The Beautiful World Extra Disc</title>
 	</anime>

@@ -176,7 +176,7 @@
 		<type>4</type>
 		<id name="myanimelist">18849</id>
 		<id name="hummingbird">natsume-yuujinchou-lala-special</id>
-		<producers />
+		<producers>Brains Base</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/51431.jpg</image>
 		<title>Natsume Yuujinchou LaLa Special</title>
 	</anime>
@@ -320,7 +320,7 @@
 		<type>2</type>
 		<id name="myanimelist">15963</id>
 		<id name="hummingbird">seitokai-no-shukujitsu</id>
-		<producers />
+		<producers>AIC</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/43525.jpg</image>
 		<title>Seitokai no Shukujitsu</title>
 	</anime>
@@ -672,7 +672,7 @@
 		<type>3</type>
 		<id name="myanimelist">17677</id>
 		<id name="hummingbird">buki-yo-saraba</id>
-		<producers />
+		<producers>Sentai Filmworks</producers>
 		<image>http://cdn.myanimelist.net/images/anime/4/53169.jpg</image>
 		<title>Buki yo Saraba</title>
 	</anime>
@@ -680,7 +680,7 @@
 		<type>3</type>
 		<id name="myanimelist">17679</id>
 		<id name="hummingbird">gambo</id>
-		<producers />
+		<producers>Sentai Filmworks</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/53167.jpg</image>
 		<title>Gambo</title>
 	</anime>
@@ -816,7 +816,7 @@
 		<type>2</type>
 		<id name="myanimelist">18177</id>
 		<id name="hummingbird">yowamushi-pedal-special-ride</id>
-		<producers />
+		<producers>TMS Entertainment</producers>
 		<image>http://cdn.myanimelist.net/images/anime/13/53213.jpg</image>
 		<title>Yowamushi Pedal: Special Ride</title>
 	</anime>
