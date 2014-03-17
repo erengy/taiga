@@ -16,15 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/logger.h"
 #include "base/string.h"
+#include "base/version.h"
 #include "base/xml.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
 #include "sync/manager.h"
+#include "sync/myanimelist_util.h"
 #include "sync/service.h"
 #include "taiga/http.h"
 #include "taiga/path.h"
@@ -51,8 +54,13 @@ bool Database::LoadDatabase() {
   xml_node meta_node = document.child(L"meta");
   std::wstring meta_version = XmlReadStrValue(meta_node, L"version");
 
-  xml_node database_node = document.child(L"database");
-  ReadDatabaseNode(database_node);
+  if (!meta_version.empty()) {
+    xml_node database_node = document.child(L"database");
+    ReadDatabaseNode(database_node);
+  } else {
+    LOG(LevelWarning, L"Reading database in compatibility mode");
+    ReadDatabaseInCompatibilityMode(document);
+  }
 
   return true;
 }
@@ -339,37 +347,45 @@ bool Database::LoadList() {
   std::wstring path = taiga::GetPath(taiga::kPathUserLibrary);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
-  if (parse_result.status != pugi::status_ok &&
-      parse_result.status != pugi::status_file_not_found) {
-    MessageBox(nullptr, L"Could not read anime list.", path.c_str(),
-               MB_OK | MB_ICONERROR);
-    return false;
+  if (parse_result.status != pugi::status_ok) {
+    if (parse_result.status == pugi::status_file_not_found) {
+      return CheckOldUserDirectory();
+    } else {
+      MessageBox(nullptr, L"Could not read anime list.", path.c_str(),
+                 MB_OK | MB_ICONERROR);
+      return false;
+    }
   }
 
   xml_node meta_node = document.child(L"meta");
   std::wstring meta_version = XmlReadStrValue(meta_node, L"version");
 
-  xml_node node_database = document.child(L"database");
-  ReadDatabaseNode(node_database);
+  if (!meta_version.empty()) {
+    xml_node node_database = document.child(L"database");
+    ReadDatabaseNode(node_database);
 
-  xml_node node_library = document.child(L"library");
+    xml_node node_library = document.child(L"library");
+    foreach_xmlnode_(node, node_library, L"anime") {
+      Item anime_item;
+      anime_item.SetId(XmlReadStrValue(node, L"id"), sync::kTaiga);
 
-  foreach_xmlnode_(node, node_library, L"anime") {
-    Item anime_item;
-    anime_item.SetId(XmlReadStrValue(node, L"id"), sync::kTaiga);
+      anime_item.AddtoUserList();
+      anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"progress"));
+      anime_item.SetMyDateStart(XmlReadStrValue(node, L"date_start"));
+      anime_item.SetMyDateEnd(XmlReadStrValue(node, L"date_end"));
+      anime_item.SetMyScore(XmlReadIntValue(node, L"score"));
+      anime_item.SetMyStatus(XmlReadIntValue(node, L"status"));
+      anime_item.SetMyRewatching(XmlReadIntValue(node, L"rewatching"));
+      anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"rewatching_ep"));
+      anime_item.SetMyTags(XmlReadStrValue(node, L"tags"));
+      anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"last_updated"));
 
-    anime_item.AddtoUserList();
-    anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"progress"));
-    anime_item.SetMyDateStart(XmlReadStrValue(node, L"date_start"));
-    anime_item.SetMyDateEnd(XmlReadStrValue(node, L"date_end"));
-    anime_item.SetMyScore(XmlReadIntValue(node, L"score"));
-    anime_item.SetMyStatus(XmlReadIntValue(node, L"status"));
-    anime_item.SetMyRewatching(XmlReadIntValue(node, L"rewatching"));
-    anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"rewatching_ep"));
-    anime_item.SetMyTags(XmlReadStrValue(node, L"tags"));
-    anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"last_updated"));
+      UpdateItem(anime_item);
+    }
 
-    UpdateItem(anime_item);
+  } else {
+    LOG(LevelWarning, L"Reading list in compatibility mode");
+    ReadListInCompatibilityMode(document);
   }
 
   return true;
@@ -533,6 +549,82 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   History.queue.Check(false);
 
   ui::OnLibraryEntryChange(history_item.anime_id);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+bool Database::CheckOldUserDirectory() {
+  std::wstring path = taiga::GetPath(taiga::kPathUser) +
+                      taiga::GetCurrentUsername();
+
+  if (FolderExists(path)) {
+    LOG(LevelWarning, L"Moving old user directory to its new place");
+    auto service_name = ServiceManager.GetServiceNameById(sync::kMyAnimeList);
+    std::wstring new_path = path + L"@" + service_name;
+    if (MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0) {
+      return LoadList();
+    }
+  }
+
+  return true;
+}
+
+void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
+  xml_node animedb_node = document.child(L"animedb");
+
+  foreach_xmlnode_(node, animedb_node, L"anime") {
+    std::wstring id = XmlReadStrValue(node, L"series_animedb_id");
+    Item& item = items[ToInt(id)];  // Creates the item if it doesn't exist
+    item.SetId(id, sync::kMyAnimeList);
+    item.SetTitle(XmlReadStrValue(node, L"series_title"));
+    item.SetEnglishTitle(XmlReadStrValue(node, L"series_english"));
+    item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
+    item.SetType(sync::myanimelist::TranslateSeriesTypeFrom(XmlReadIntValue(node, L"series_type")));
+    item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
+    item.SetAiringStatus(sync::myanimelist::TranslateSeriesStatusFrom(XmlReadIntValue(node, L"series_status")));
+    item.SetDateStart(Date(XmlReadStrValue(node, L"series_start")));
+    item.SetDateEnd(Date(XmlReadStrValue(node, L"series_end")));
+    item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    item.SetGenres(XmlReadStrValue(node, L"genres"));
+    item.SetProducers(XmlReadStrValue(node, L"producers"));
+    item.SetScore(XmlReadStrValue(node, L"score"));
+    item.SetPopularity(XmlReadStrValue(node, L"popularity"));
+    item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
+    item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"last_modified").c_str()));
+  }
+}
+
+void Database::ReadListInCompatibilityMode(xml_document& document) {
+  xml_node myanimelist = document.child(L"myanimelist");
+
+  foreach_xmlnode_(node, myanimelist, L"anime") {
+    Item anime_item;
+    anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), sync::kMyAnimeList);
+
+    anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
+    anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));
+    anime_item.SetType(sync::myanimelist::TranslateSeriesTypeFrom(XmlReadIntValue(node, L"series_type")));
+    anime_item.SetEpisodeCount(XmlReadIntValue(node, L"series_episodes"));
+    anime_item.SetAiringStatus(sync::myanimelist::TranslateSeriesStatusFrom(XmlReadIntValue(node, L"series_status")));
+    anime_item.SetDateStart(XmlReadStrValue(node, L"series_start"));
+    anime_item.SetDateEnd(XmlReadStrValue(node, L"series_end"));
+    anime_item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
+    anime_item.SetLastModified(0);
+
+    anime_item.AddtoUserList();
+    anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
+    anime_item.SetMyDateStart(XmlReadStrValue(node, L"my_start_date"));
+    anime_item.SetMyDateEnd(XmlReadStrValue(node, L"my_finish_date"));
+    anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
+    anime_item.SetMyStatus(sync::myanimelist::TranslateMyStatusFrom(XmlReadIntValue(node, L"my_status")));
+    anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
+    anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));
+    anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"my_last_updated"));
+    anime_item.SetMyTags(XmlReadStrValue(node, L"my_tags"));
+
+    UpdateItem(anime_item);
+  }
 }
 
 }  // namespace anime

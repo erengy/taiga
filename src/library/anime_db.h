@@ -25,6 +25,7 @@
 
 class HistoryItem;
 namespace pugi {
+class xml_document;
 class xml_node;
 }
 
@@ -59,6 +60,10 @@ public:
 private:
   void ReadDatabaseNode(pugi::xml_node& database_node);
   void WriteDatabaseNode(pugi::xml_node& database_node);
+
+  bool CheckOldUserDirectory();
+  void ReadDatabaseInCompatibilityMode(pugi::xml_document& document);
+  void ReadListInCompatibilityMode(pugi::xml_document& document);
 };
 
 }  // namespace anime
