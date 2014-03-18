@@ -199,6 +199,9 @@ Item* Database::FindItem(const std::wstring& id, enum_t service) {
 }
 
 Item* Database::FindSequel(int anime_id) {
+  if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)
+    return nullptr;
+
   int sequel_id = ID_UNKNOWN;
 
   switch (anime_id) {
