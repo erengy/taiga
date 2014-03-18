@@ -24,6 +24,7 @@
 namespace ui {
 
 enum Dialog {
+  kDialogNone,
   kDialogAbout,
   kDialogAnimeInformation,
   kDialogMain,

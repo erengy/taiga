@@ -32,17 +32,17 @@ namespace ui {
 class DialogProperties {
 public:
   DialogProperties(unsigned int resource_id, win::Dialog* dialog,
-                   HWND parent, bool modal);
+                   Dialog parent = kDialogNone, bool modal = false);
 
   unsigned int resource_id;
   win::Dialog* dialog;
-  HWND parent;
+  Dialog parent;
   bool modal;
 };
 
 DialogProperties::DialogProperties(unsigned int resource_id,
                                    win::Dialog* dialog,
-                                   HWND parent,
+                                   Dialog parent,
                                    bool modal)
     : resource_id(resource_id),
       dialog(dialog),
@@ -56,26 +56,24 @@ void InitializeDialogProperties() {
   if (!dialog_properties.empty())
     return;
 
-  HWND parent = DlgMain.GetWindowHandle();
-
   dialog_properties.insert(std::make_pair(
       kDialogAbout,
-      DialogProperties(IDD_ABOUT, &DlgAbout, parent, true)));
+      DialogProperties(IDD_ABOUT, &DlgAbout, kDialogMain, true)));
   dialog_properties.insert(std::make_pair(
       kDialogAnimeInformation,
-      DialogProperties(IDD_ANIME_INFO, &DlgAnime, parent, false)));
+      DialogProperties(IDD_ANIME_INFO, &DlgAnime, kDialogMain, false)));
   dialog_properties.insert(std::make_pair(
       kDialogMain,
-      DialogProperties(IDD_MAIN, &DlgMain, nullptr, false)));
+      DialogProperties(IDD_MAIN, &DlgMain)));
   dialog_properties.insert(std::make_pair(
       kDialogSettings,
-      DialogProperties(IDD_SETTINGS, &DlgSettings, parent, true)));
+      DialogProperties(IDD_SETTINGS, &DlgSettings, kDialogMain, true)));
   dialog_properties.insert(std::make_pair(
       kDialogTestRecognition,
-      DialogProperties(IDD_TEST_RECOGNITION, &DlgTestRecognition, nullptr, false)));
+      DialogProperties(IDD_TEST_RECOGNITION, &DlgTestRecognition)));
   dialog_properties.insert(std::make_pair(
       kDialogUpdate,
-      DialogProperties(IDD_UPDATE, &DlgUpdate, parent, true)));
+      DialogProperties(IDD_UPDATE, &DlgUpdate, kDialogMain, true)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +120,8 @@ void ShowDialog(Dialog dialog) {
     if (it->second.dialog) {
       if (!it->second.dialog->IsWindow()) {
         it->second.dialog->Create(it->second.resource_id,
-                                  it->second.parent, it->second.modal);
+                                  GetWindowHandle(it->second.parent),
+                                  it->second.modal);
       } else {
         ActivateWindow(it->second.dialog->GetWindowHandle());
       }
