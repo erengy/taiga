@@ -684,4 +684,52 @@
 		<image>http://cdn.myanimelist.net/images/anime/13/55745.jpg</image>
 		<title>Utopia</title>
 	</anime>
+	<anime>
+		<type>1</type>
+		<id name="myanimelist">21851</id>
+		<id name="hummingbird">tesagure-bukatsumono-encore</id>
+		<producers>Tesagure! Production Committee</producers>
+		<image>http://cdn.myanimelist.net/images/anime/7/58483.jpg</image>
+		<title>Tesagure! Bukatsumono Encore</title>
+	</anime>
+	<anime>
+		<type>x</type>
+		<id name="myanimelist">21703</id>
+		<id name="hummingbird" />
+		<producers>TV Tokyo, Oriental Light and Magic</producers>
+		<image>http://cdn.myanimelist.net/images/anime/13/57141.jpg</image>
+		<title>Pokemon XY: New Year Special</title>
+	</anime>
+	<anime>
+		<type>4</type>
+		<id name="myanimelist">22335</id>
+		<id name="hummingbird">teekyuu-3-specials</id>
+		<producers>MAPPA, Earth Star Entertainment</producers>
+		<image>http://cdn.myanimelist.net/images/anime/7/58477.jpg</image>
+		<title>Teekyuu 3 Specials</title>
+	</anime>
+	<anime>
+		<type>4</type>
+		<id name="myanimelist">22673</id>
+		<id name="hummingbird" />
+		<producers>Production I.G</producers>
+		<image>http://cdn.myanimelist.net/images/anime/13/59027.jpg</image>
+		<title>Kuroko no Basket 2nd Season NG-shuu</title>
+	</anime>
+	<anime>
+		<type>4</type>
+		<id name="myanimelist">22745</id>
+		<id name="hummingbird" />
+		<producers />
+		<image>http://cdn.myanimelist.net/images/anime/3/59141.jpg</image>
+		<title>Brothers Conflict Special</title>
+	</anime>
+	<anime>
+		<type>4</type>
+		<id name="myanimelist">22859</id>
+		<id name="hummingbird" />
+		<producers>Kyoto Animation</producers>
+		<image>http://cdn.myanimelist.net/images/anime/8/59343.jpg</image>
+		<title>Takanashi Rikka Kai: Chuunibyou demo Koi ga Shitai! Movie Lite</title>
+	</anime>
 </season>
