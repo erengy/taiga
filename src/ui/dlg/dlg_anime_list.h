@@ -50,6 +50,9 @@ public:
   void RefreshListItem(int anime_id);
   void RefreshTabs(int index = -1);
 
+  void GoToPreviousTab();
+  void GoToNextTab();
+
 public:
   // List-view control
   class ListView : public win::ListView {

@@ -1143,4 +1143,36 @@ void AnimeListDialog::RefreshTabs(int index) {
   tab.Show(SW_SHOW);
 }
 
+void AnimeListDialog::GoToPreviousTab() {
+  int tab_index = tab.GetCurrentlySelected();
+  int tab_count = tab.GetItemCount();
+
+  if (tab_index > 0) {
+    --tab_index;
+  } else {
+    tab_index = tab_count - 1;
+  }
+
+  tab.SetCurrentlySelected(tab_index);
+
+  int status = static_cast<int>(tab.GetItemParam(tab_index));
+  RefreshList(status);
+}
+
+void AnimeListDialog::GoToNextTab() {
+  int tab_index = tab.GetCurrentlySelected();
+  int tab_count = tab.GetItemCount();
+
+  if (tab_index < tab_count - 1) {
+    ++tab_index;
+  } else {
+    tab_index = 0;
+  }
+
+  tab.SetCurrentlySelected(tab_index);
+
+  int status = static_cast<int>(tab.GetItemParam(tab_index));
+  RefreshList(status);
+}
+
 }  // namespace ui

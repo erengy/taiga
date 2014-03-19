@@ -305,6 +305,22 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           }
           break;
         }
+        // Switch tabs
+        case VK_TAB: {
+          switch (navigation.GetCurrentPage()) {
+            case kSidebarItemAnimeList:
+              if (GetKeyState(VK_CONTROL) & 0x8000) {
+                if (GetKeyState(VK_SHIFT) & 0x8000) {
+                  DlgAnimeList.GoToPreviousTab();
+                } else {
+                  DlgAnimeList.GoToNextTab();
+                }
+                return TRUE;
+              }
+              break;
+          }
+          break;
+        }
         // Search
         case VK_RETURN: {
           if (::GetFocus() == edit.GetWindowHandle()) {
