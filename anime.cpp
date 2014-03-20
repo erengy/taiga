@@ -211,6 +211,7 @@ void Item::AddToQueue(const Episode& episode, bool change_status) {
   // Set update mode
   if (GetMyStatus() == mal::MYSTATUS_NOTINLIST) {
     event_item.mode = HTTP_MAL_AnimeAdd;
+    change_status = true;
   } else {
     event_item.mode = HTTP_MAL_AnimeUpdate;
   }

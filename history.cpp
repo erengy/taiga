@@ -444,12 +444,14 @@ int AskForConfirmation(anime::Episode& episode) {
   if (anime_item->GetEpisodeCount() == 1) episode.number = L"1";
 
   // Add buttons
-  if (anime_item->GetEpisodeCount() == number) { // Completed
-    dlg.AddButton(L"Update and move\n"
-                  L"Update and set as completed", IDCANCEL);
-  } else if (anime_item->GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
-    dlg.AddButton(L"Update and move\n"
-                  L"Update and set as watching", IDCANCEL);
+  if (anime_item->GetMyStatus() != mal::MYSTATUS_NOTINLIST) {
+    if (anime_item->GetEpisodeCount() == number) { // Completed
+      dlg.AddButton(L"Update and move\n"
+                    L"Update and set as completed", IDCANCEL);
+    } else if (anime_item->GetMyStatus() != mal::MYSTATUS_WATCHING) { // Watching
+      dlg.AddButton(L"Update and move\n"
+                    L"Update and set as watching", IDCANCEL);
+    }
   }
   wstring button = L"Update\n"
                    L"Update episode number from " +
