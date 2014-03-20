@@ -432,17 +432,19 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   if (anime_item->GetEpisodeCount() == 1)
     episode.number = L"1";
 
-  if (anime_item->GetEpisodeCount() == number) {  // Completed
-    dlg.AddButton(L"Update and move\n"
-                  L"Update and set as completed", IDCANCEL);
-  } else if (anime_item->GetMyStatus() != anime::kWatching) {  // Watching
-    dlg.AddButton(L"Update and move\n"
-                  L"Update and set as watching", IDCANCEL);
+  if (anime_item->GetMyStatus() != anime::kNotInList) {
+    if (anime_item->GetEpisodeCount() == number) {  // Completed
+      dlg.AddButton(L"Update and move\n"
+                    L"Update and set as completed", IDCANCEL);
+    } else if (anime_item->GetMyStatus() != anime::kWatching) {  // Watching
+      dlg.AddButton(L"Update and move\n"
+                    L"Update and set as watching", IDCANCEL);
+    }
   }
   std::wstring button = L"Update\n"
-                   L"Update episode number from " +
-                   ToWstr(anime_item->GetMyLastWatchedEpisode()) +
-                   L" to " + ToWstr(number);
+                        L"Update episode number from " +
+                        ToWstr(anime_item->GetMyLastWatchedEpisode()) +
+                        L" to " + ToWstr(number);
   dlg.AddButton(button.c_str(), IDYES);
   dlg.AddButton(L"Cancel\n"
                 L"Don't update anything", IDNO);

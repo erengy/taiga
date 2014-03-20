@@ -453,6 +453,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
   // Set update mode
   if (item.GetMyStatus() == kNotInList) {
     history_item.mode = taiga::kHttpServiceAddLibraryEntry;
+    change_status = true;
   } else {
     history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
   }
