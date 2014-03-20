@@ -709,6 +709,14 @@
 		<title>Teekyuu 3 Specials</title>
 	</anime>
 	<anime>
+		<type>5</type>
+		<id name="myanimelist">22377</id>
+		<id name="hummingbird">wonder-momo</id>
+		<producers>Graphinica, Namco Bandai Games</producers>
+		<image>http://cdn.myanimelist.net/images/anime/8/58783.jpg</image>
+		<title>Wonder Momo</title>
+	</anime>
+	<anime>
 		<type>4</type>
 		<id name="myanimelist">22673</id>
 		<id name="hummingbird" />
