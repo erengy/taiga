@@ -89,7 +89,7 @@
 		<name>KMPlayer</name>
 		<enabled>1</enabled>
 		<visible>1</visible>
-		<mode>2</mode>
+		<mode>1</mode>
 		<class>Winamp v1.x</class>
 		<file>KMPlayer.exe</file>
 		<folder>%ProgramFiles%\The KMPlayer\</folder>
