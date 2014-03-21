@@ -45,10 +45,11 @@ bool UpdateHelper::Check() {
   HttpRequest http_request;
   http_request.host = L"taiga.erengy.com";
   http_request.path = L"/update.php";
-  http_request.query[L"username"] = GetCurrentUsername();
-  http_request.query[L"service"] = GetCurrentService()->canonical_name();
-  http_request.query[L"version"] = std::wstring(Taiga.version);
+  http_request.query[L"channel"] = L"beta";
   http_request.query[L"check"] = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
+  http_request.query[L"version"] = std::wstring(Taiga.version);
+  http_request.query[L"service"] = GetCurrentService()->canonical_name();
+  http_request.query[L"username"] = GetCurrentUsername();
 
   client_uuid_ = http_request.uuid;
 
