@@ -40,7 +40,7 @@ public:
   void SetDownloadPath(const wstring& path);
 
   const GenericFeedItem* FindItem(const wstring& guid) const;
-  unsigned long GetVersionValue(int major, int minor, int revision) const;
+  unsigned long long GetVersionValue(int major, int minor, int revision) const;
 
   HttpClient client;
   vector<GenericFeedItem> items;

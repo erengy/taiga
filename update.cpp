@@ -50,6 +50,7 @@ bool UpdateHelper::Check(win32::App& app) {
 
   wstring address = L"taiga.erengy.com/update.php?";
   std::map<wstring, wstring> parameters;
+  parameters[L"channel"] = L"stable";
   parameters[L"username"] = Settings.Account.MAL.user;
   parameters[L"version"] = APP_VERSION;
   parameters[L"check"] = MainDialog.IsWindow() ? L"manual" : L"auto";
@@ -176,8 +177,8 @@ const GenericFeedItem* UpdateHelper::FindItem(const wstring& guid) const {
   return nullptr;
 }
 
-unsigned long UpdateHelper::GetVersionValue(int major, int minor, int revision) const {
-  return (major * static_cast<unsigned long>(pow(10.0, 12))) +
-         (minor * static_cast<unsigned long>(pow(10.0, 8))) +
+unsigned long long UpdateHelper::GetVersionValue(int major, int minor, int revision) const {
+  return (major * static_cast<unsigned long long>(pow(10.0, 12))) +
+         (minor * static_cast<unsigned long long>(pow(10.0, 8))) +
          revision;
 }

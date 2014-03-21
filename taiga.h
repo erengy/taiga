@@ -26,9 +26,9 @@
 #include "win32/win_main.h"
 
 #define APP_NAME    L"Taiga"
-#define APP_TITLE   L"Taiga 1.0b"
-#define APP_VERSION L"1.0.278 beta"
-#define APP_BUILD   L"2014-01-24"
+#define APP_TITLE   L"Taiga 1.0"
+#define APP_VERSION L"1.0.282"
+#define APP_BUILD   L"2014-03-21"
 
 #ifndef PORTABLE
 #define PORTABLE
