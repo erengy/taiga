@@ -40,7 +40,7 @@ public:
   virtual ~Logger() {}
 
   void Log(int severity_level, const std::wstring& file, int line,
-           const std::wstring& function, const std::wstring& text);
+           const std::wstring& function, std::wstring text);
   void SetOutputPath(const std::wstring& path);
   void SetSeverityLevel(int severity_level);
 
