@@ -470,7 +470,7 @@ bool OnAnimeFolderNotFound() {
   dlg.SetWindowTitle(L"Folder Not Found");
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Taiga couldn't find the folder of this anime. "
-                          L"Would you like to set it manually?");
+                         L"Would you like to set it manually?");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());
@@ -624,7 +624,7 @@ bool OnSettingsServiceChange(const string_t& current_service,
                  L"broken.");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
-  dlg.Show(DlgMain.GetWindowHandle());
+  dlg.Show(DlgSettings.GetWindowHandle());
 
   return dlg.GetSelectedButtonID() == IDYES;
 }
