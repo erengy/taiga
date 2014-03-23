@@ -19,12 +19,22 @@
 #ifndef TAIGA_WIN_HTTP_H
 #define TAIGA_WIN_HTTP_H
 
+#define TAIGA_WIN_HTTP_MULTITHREADED
+
+#ifndef CURL_STATICLIB
+#define CURL_STATICLIB
+#endif
+#ifndef HTTP_ONLY
+#define HTTP_ONLY
+#endif
+
 #include <windows.h>
-#include <winhttp.h>
 #include <string>
 #include <vector>
 
 #include "base/map.h"
+#include "third_party/curl/curl.h"
+#include "win/win_thread.h"
 
 namespace win {
 namespace http {
@@ -76,7 +86,18 @@ public:
   LPARAM parameter;
 };
 
-class Client {
+class CurlGlobal {
+public:
+  CurlGlobal();
+  ~CurlGlobal();
+
+  bool initialized() const;
+
+private:
+  bool initialized_;
+};
+
+class Client : public win::Thread {
 public:
   Client();
   virtual ~Client();
@@ -86,8 +107,8 @@ public:
 
   const Request& request() const;
   const Response& response() const;
-  DWORD content_length() const;
-  DWORD current_length() const;
+  curl_off_t content_length() const;
+  curl_off_t current_length() const;
 
   void set_auto_redirect(bool enabled);
   void set_download_path(const std::wstring& download_path);
@@ -98,22 +119,22 @@ public:
   void set_referer(const std::wstring& referer);
   void set_user_agent(const std::wstring& user_agent);
 
-  virtual void OnError(DWORD error) {}
-  virtual bool OnSendRequestComplete() { return false; }
+  virtual void OnError(CURLcode error_code) {}
   virtual bool OnHeadersAvailable() { return false; }
-  virtual bool OnDataAvailable() { return false; }
-  virtual bool OnReadData() { return false; }
+  virtual bool OnProgress() { return false; }
   virtual bool OnReadComplete() { return true; }  // TODO: Why "true"?
   virtual bool OnRedirect(const std::wstring& address) { return false; }
+
+  DWORD ThreadProc();
 
 protected:
   Request request_;
   Response response_;
 
-  LPSTR buffer_;
   ContentEncoding content_encoding_;
-  DWORD content_length_;
-  DWORD current_length_;
+  curl_off_t content_length_;
+  curl_off_t current_length_;
+  std::string write_buffer_;
 
   bool auto_redirect_;
   std::wstring download_path_;
@@ -125,32 +146,25 @@ protected:
   std::wstring user_agent_;
 
 private:
-  static void CALLBACK Callback(
-      HINTERNET hInternet,
-      DWORD_PTR dwContext,
-      DWORD dwInternetStatus,
-      LPVOID lpvStatusInformation,
-      DWORD dwStatusInformationLength);
-  void StatusCallback(
-      HINTERNET hInternet,
-      DWORD dwInternetStatus,
-      LPVOID lpvStatusInformation,
-      DWORD dwStatusInformationLength);
+  static size_t HeaderFunction(void*, size_t, size_t, void*);
+  static size_t WriteFunction(char*, size_t, size_t, void*);
+  static int DebugCallback(CURL*, curl_infotype, char*, size_t, void*);
+  static int XferInfoFunction(void*, curl_off_t, curl_off_t, curl_off_t, curl_off_t);
+  int ProgressFunction(curl_off_t, curl_off_t);
 
-  HINTERNET OpenSession();
-  HINTERNET ConnectToSession();
-  HINTERNET OpenRequest();
-  BOOL SetRequestOptions();
-  BOOL SendRequest();
+  bool Initialize();
+  bool SetRequestOptions();
+  bool SendRequest();
+  bool Perform();
 
-  std::wstring BuildRequestHeader();
+  void BuildRequestHeader();
   bool GetResponseHeader(const std::wstring& header);
   bool ParseResponseHeader();
 
-  HINTERNET connection_handle_;
-  HINTERNET request_handle_;
-  HINTERNET session_handle_;
+  static CurlGlobal curl_global_;
+  CURL* curl_handle_;
 
+  curl_slist* header_list_;
   std::string optional_data_;
 };
 

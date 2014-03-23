@@ -18,158 +18,107 @@
 
 #include "win_http.h"
 
-#include "base/gzip.h"
+#include "base/file.h"
+#include "base/logger.h"
 #include "base/string.h"
 
 namespace win {
 namespace http {
 
-void CALLBACK Client::Callback(HINTERNET hInternet,
-                               DWORD_PTR dwContext,
-                               DWORD dwInternetStatus,
-                               LPVOID lpvStatusInformation,
-                               DWORD dwStatusInformationLength) {
-  auto object = reinterpret_cast<Client*>(dwContext);
-  if (object) {
-    object->StatusCallback(hInternet,
-                           dwInternetStatus,
-                           lpvStatusInformation,
-                           dwStatusInformationLength);
+size_t Client::HeaderFunction(void* ptr, size_t size, size_t nmemb,
+                              void* userdata) {
+  if (!userdata)
+    return 0;
+
+  size_t data_size = size * nmemb;
+  std::string header(static_cast<char*>(ptr), data_size);
+
+  auto client = reinterpret_cast<Client*>(userdata);
+
+  if (header != "\r\n") {
+    client->GetResponseHeader(StrToWstr(header));
+  } else {
+    if (!client->ParseResponseHeader() || client->OnHeadersAvailable())
+      return 0;
   }
+
+  return data_size;
 }
 
-void Client::StatusCallback(HINTERNET hInternet,
-                            DWORD dwInternetStatus,
-                            LPVOID lpvStatusInformation,
-                            DWORD dwStatusInformationLength) {
-  switch (dwInternetStatus) {
-    case WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE: {
-      if (::WinHttpReceiveResponse(hInternet, nullptr))
-        OnSendRequestComplete();
-      break;
-    }
+size_t Client::WriteFunction(char* ptr, size_t size, size_t nmemb,
+                             void* userdata) {
+  if (!userdata)
+    return 0;
 
-    case WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE: {
-      std::wstring buffer;
-      DWORD buffer_length = 0;
-      if (!::WinHttpQueryHeaders(hInternet,
-                                 WINHTTP_QUERY_RAW_HEADERS_CRLF,
-                                 WINHTTP_HEADER_NAME_BY_INDEX,
-                                 WINHTTP_NO_OUTPUT_BUFFER,
-                                 &buffer_length,
-                                 WINHTTP_NO_HEADER_INDEX)) {
-        DWORD error = GetLastError();
-        if (error != ERROR_INSUFFICIENT_BUFFER) {
-          OnError(error);
-          break;
-        }
-      }
-      buffer.resize(buffer_length, L'\0');
-      if (::WinHttpQueryHeaders(hInternet,
-                                WINHTTP_QUERY_RAW_HEADERS_CRLF,
-                                WINHTTP_HEADER_NAME_BY_INDEX,
-                                (LPVOID)buffer.data(),
-                                &buffer_length,
-                                WINHTTP_NO_HEADER_INDEX)) {
-        if (!GetResponseHeader(buffer) ||
-            !ParseResponseHeader() ||
-            OnHeadersAvailable()) {
-          break;
-        }
-      }
-      ::WinHttpQueryDataAvailable(hInternet, nullptr);
-      break;
-    }
+  size_t data_size = size * nmemb;
 
-    case WINHTTP_CALLBACK_STATUS_REDIRECT: {
-      StatusCallback(hInternet, WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE,
-                     lpvStatusInformation, dwStatusInformationLength);
-      break;
-    }
+  reinterpret_cast<std::string*>(userdata)->append(ptr, data_size);
 
-    case WINHTTP_CALLBACK_STATUS_DATA_AVAILABLE: {
-      DWORD dwSize = *reinterpret_cast<LPDWORD>(lpvStatusInformation);
-      if (dwSize > 0) {
-        LPSTR lpOutBuffer = new char[dwSize + 1];
-        ::ZeroMemory(lpOutBuffer, dwSize + 1);
-        if (!::WinHttpReadData(hInternet, (LPVOID)lpOutBuffer, dwSize, nullptr)) {
-          delete [] lpOutBuffer;
-          break;
-        }
-        if (OnDataAvailable()) {
-          Cleanup();
-        }
-      } else if (dwSize == 0) {
-        if (content_encoding_ == kContentEncodingGzip) {
-          std::string input, output;
-          input.append(buffer_, current_length_);
-          UncompressGzippedString(input, output);
-          if (!output.empty()) {
-            delete [] buffer_;
-            current_length_ = output.length();
-            buffer_ = new char[current_length_];
-            memcpy(buffer_, &output[0], current_length_);
-          }
-        }
-        if (!download_path_.empty()) {
-          HANDLE hFile = ::CreateFile(download_path_.c_str(), GENERIC_WRITE,
-                                      0, nullptr, CREATE_ALWAYS,
-                                      FILE_ATTRIBUTE_NORMAL, nullptr);
-          if (hFile != INVALID_HANDLE_VALUE) {
-            DWORD bytes_to_write = current_length_;
-            DWORD bytes_written = 0;
-            ::WriteFile(hFile, (LPCVOID)buffer_, bytes_to_write,
-                        &bytes_written, nullptr);
-            ::CloseHandle(hFile);
-          }
-        }
-        if (buffer_)
-          response_.body = StrToWstr(buffer_);
-        if (!OnReadComplete()) {
-          Cleanup();
-        }
-      }
-      break;
-    }
+  return data_size;
+}
 
-    case WINHTTP_CALLBACK_STATUS_READ_COMPLETE: {
-      if (dwStatusInformationLength > 0) {
-        LPSTR lpReadBuffer = (LPSTR)lpvStatusInformation;
-        DWORD dwBytesRead = dwStatusInformationLength;
-        if (!buffer_) {
-          buffer_ = lpReadBuffer;
-        } else {
-          LPSTR lpOldBuffer = buffer_;
-          buffer_ = new char[current_length_ + dwBytesRead];
-          memcpy(buffer_, lpOldBuffer, current_length_);
-          memcpy(buffer_ + current_length_, lpReadBuffer, dwBytesRead);
-          delete [] lpOldBuffer;
-          delete [] lpReadBuffer;
-        }
-        current_length_ += dwBytesRead;
-        if (OnReadData()) {
-          Cleanup();
-        } else {
-          ::WinHttpQueryDataAvailable(hInternet, nullptr);
-        }
-      }
-      break;
-    }
+int Client::ProgressFunction(curl_off_t dltotal, curl_off_t dlnow) {
+  if (response_.header.empty())
+    return 0;
+  if (!dlnow && !dltotal)
+    return 0;
+  if (dlnow == current_length_)
+    return 0;
 
-    case WINHTTP_CALLBACK_STATUS_REQUEST_ERROR: {
-      auto result = reinterpret_cast<WINHTTP_ASYNC_RESULT*>(lpvStatusInformation);
-      switch (result->dwResult) {
-        case API_RECEIVE_RESPONSE:
-        case API_QUERY_DATA_AVAILABLE:
-        case API_READ_DATA:
-        case API_WRITE_DATA:
-        case API_SEND_REQUEST:
-          OnError(result->dwError);
-          break;
-      }
+  current_length_ = dlnow;
+
+  if (OnProgress())
+   return 1;  // Abort
+
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int Client::DebugCallback(CURL* curl, curl_infotype infotype, char* data,
+                          size_t size, void* client) {
+  std::wstring text;
+
+  switch (infotype) {
+    case CURLINFO_TEXT:
       break;
-    }
+    case CURLINFO_HEADER_IN:
+      text = L"<= Response header";
+      break;
+    case CURLINFO_HEADER_OUT:
+      text = L"=> Request header";
+      break;
+    case CURLINFO_DATA_IN:
+      text = L"<= Recv data";
+      break;
+    case CURLINFO_DATA_OUT:
+      text = L"=> Send data";
+      break;
+    case CURLINFO_SSL_DATA_IN:
+      text = L"<= Recv SSL data";
+      break;
+    case CURLINFO_SSL_DATA_OUT:
+      text = L"=> Send SSL data";
+      break;
+    default:
+      return 0;
   }
+
+  if (!text.empty())
+    text += L" | ";
+
+  LOG(LevelDebug, text + StrToWstr(std::string(data, size)));
+
+  return 0;
+}
+
+int Client::XferInfoFunction(void* clientp,
+                             curl_off_t dltotal, curl_off_t dlnow,
+                             curl_off_t ultotal, curl_off_t ulnow) {
+  if (!clientp)
+    return 0;
+
+  return reinterpret_cast<Client*>(clientp)->ProgressFunction(dltotal, dlnow);
 }
 
 }  // namespace http

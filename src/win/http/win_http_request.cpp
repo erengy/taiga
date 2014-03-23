@@ -19,7 +19,9 @@
 #include "win_http.h"
 
 #include "base/encoding.h"
+#include "base/file.h"
 #include "base/foreach.h"
+#include "base/gzip.h"
 #include "base/logger.h"
 #include "base/string.h"
 
@@ -41,138 +43,195 @@ bool Client::MakeRequest(Request request) {
   response_.parameter = request.parameter;
   response_.uuid = request.uuid;
 
-  if (OpenSession() && ConnectToSession())
-    if (OpenRequest() && SetRequestOptions())
+  if (Initialize())
+    if (SetRequestOptions())
       if (SendRequest())
         return true;
 
   Cleanup();
-  OnError(::GetLastError());
   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HINTERNET Client::OpenSession() {
-  // Initialize the use of WinHTTP functions for the application
-  session_handle_ = ::WinHttpOpen(user_agent_.c_str(),
-                                  WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
-                                  WINHTTP_NO_PROXY_NAME,
-                                  WINHTTP_NO_PROXY_BYPASS,
-                                  WINHTTP_FLAG_ASYNC);
-  return session_handle_;
+bool Client::Initialize() {
+  if (!curl_global_.initialized())
+    return false;
+
+  curl_handle_ = curl_easy_init();
+
+  return curl_handle_ != nullptr;
 }
 
-HINTERNET Client::ConnectToSession() {
-  // Use port 80 for HTTP, port 443 for HTTPS
-  INTERNET_PORT port = secure_transaction_ ? INTERNET_DEFAULT_HTTPS_PORT :
-                                             INTERNET_DEFAULT_HTTP_PORT;
+bool Client::SetRequestOptions() {
+  CURLcode code = CURLE_OK;
 
-  // Specify the initial target server of an HTTP request
-  connection_handle_ = ::WinHttpConnect(session_handle_,
-                                        request_.host.c_str(),
-                                        port,
-                                        0);  // reserved, must be 0
-  return connection_handle_;
-}
+  #define TAIGA_CURL_SET_OPTION(option, value) \
+    if ((code = curl_easy_setopt(curl_handle_, option, value)) != CURLE_OK) { \
+      OnError(code); \
+      return false; \
+    }
 
-HINTERNET Client::OpenRequest() {
-  // Append the query component to the path
+  //////////////////////////////////////////////////////////////////////////////
+  // Callback options
+
+#ifdef _DEBUG
+  TAIGA_CURL_SET_OPTION(CURLOPT_VERBOSE, TRUE);
+  TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGFUNCTION, DebugCallback);
+  TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGDATA, this);
+#endif
+
+  TAIGA_CURL_SET_OPTION(CURLOPT_HEADERFUNCTION, HeaderFunction);
+  TAIGA_CURL_SET_OPTION(CURLOPT_HEADERDATA, this);
+
+  TAIGA_CURL_SET_OPTION(CURLOPT_WRITEFUNCTION, WriteFunction);
+  TAIGA_CURL_SET_OPTION(CURLOPT_WRITEDATA, &write_buffer_);
+
+  TAIGA_CURL_SET_OPTION(CURLOPT_NOPROGRESS, FALSE);
+  TAIGA_CURL_SET_OPTION(CURLOPT_XFERINFOFUNCTION, XferInfoFunction);
+  TAIGA_CURL_SET_OPTION(CURLOPT_XFERINFODATA, this);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Network options
+
+  // Set URL
+  std::string url;
+  switch (request_.protocol) {
+    case kHttp:
+    default:
+      url += "http://";
+      break;
+    case kHttps:
+      url += "https://";
+      break;
+  }
+  url += WstrToStr(request_.host);
   std::wstring path = request_.path;
   if (!request_.query.empty()) {
     std::wstring query_string;
-    foreach_(it, request_.query) {
+    foreach_(it, request_.query) {  // Append the query component to the path
       query_string += query_string.empty() ? L"?" : L"&";
       query_string += it->first + L"=" + EncodeUrl(it->second, false);
     }
     path += query_string;
   }
+  url += WstrToStr(path);
+  TAIGA_CURL_SET_OPTION(CURLOPT_URL, url.c_str());
   LOG(LevelDebug, L"Host: " + request_.host);
   LOG(LevelDebug, L"Path: " + path);
 
-  // Enable SSL/TLS if required
-  DWORD flags = secure_transaction_ ? WINHTTP_FLAG_SECURE : 0;
+  // Set protocol
+  int protocol = secure_transaction_ ? CURLPROTO_HTTPS : CURLPROTO_HTTP;
+  TAIGA_CURL_SET_OPTION(CURLOPT_PROTOCOLS, protocol);
+  TAIGA_CURL_SET_OPTION(CURLOPT_REDIR_PROTOCOLS, protocol);
 
-  // Create an HTTP request handle
-  request_handle_ = ::WinHttpOpenRequest(connection_handle_,
-                                         request_.method.c_str(),
-                                         path.c_str(),
-                                         nullptr,  // use HTTP/1.1
-                                         referer_.c_str(),
-                                         WINHTTP_DEFAULT_ACCEPT_TYPES,
-                                         flags);
-  return request_handle_;
-}
-
-BOOL Client::SetRequestOptions() {
-  // Set proxy information
+  // Set proxy
   if (!proxy_host_.empty()) {
-    WINHTTP_PROXY_INFO pi = {0};
-    pi.dwAccessType = WINHTTP_ACCESS_TYPE_NAMED_PROXY;
-    pi.lpszProxy = const_cast<LPWSTR>(proxy_host_.c_str());
-    ::WinHttpSetOption(request_handle_, WINHTTP_OPTION_PROXY,
-                       &pi, sizeof(pi));
+    std::string proxy_host = WstrToStr(proxy_host_);
+    TAIGA_CURL_SET_OPTION(CURLOPT_PROXY, proxy_host.c_str());
     if (!proxy_username_.empty()) {
-      ::WinHttpSetOption(request_handle_,
-                         WINHTTP_OPTION_PROXY_USERNAME,
-                         (LPVOID)proxy_username_.c_str(),
-                         proxy_username_.size() * sizeof(wchar_t));
-      if (!proxy_password_.empty()) {
-        ::WinHttpSetOption(request_handle_,
-                           WINHTTP_OPTION_PROXY_PASSWORD,
-                           (LPVOID)proxy_password_.c_str(),
-                           proxy_password_.size() * sizeof(wchar_t));
-      }
+      std::string proxy_username = WstrToStr(proxy_username_);
+      TAIGA_CURL_SET_OPTION(CURLOPT_PROXYUSERNAME,
+                            proxy_username.c_str());
+    }
+    if (!proxy_password_.empty()) {
+      std::string proxy_password = WstrToStr(proxy_password_);
+      TAIGA_CURL_SET_OPTION(CURLOPT_PROXYPASSWORD,
+                            proxy_password.c_str());
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  // HTTP options
+
   // Set auto-redirect
-  if (!auto_redirect_) {
-    DWORD option = WINHTTP_DISABLE_REDIRECTS;
-    ::WinHttpSetOption(request_handle_, WINHTTP_OPTION_DISABLE_FEATURE,
-                       &option, sizeof(option));
+  if (auto_redirect_) {
+    TAIGA_CURL_SET_OPTION(CURLOPT_FOLLOWLOCATION, TRUE);
   }
 
-  // Set security options
-  if (secure_transaction_) {
-    DWORD options = SECURITY_FLAG_IGNORE_CERT_CN_INVALID |
-                    SECURITY_FLAG_IGNORE_CERT_DATE_INVALID |
-                    SECURITY_FLAG_IGNORE_UNKNOWN_CA;
-    ::WinHttpSetOption(request_handle_, WINHTTP_OPTION_SECURITY_FLAGS,
-                       &options, sizeof(DWORD));
+  // Set method
+  if (request_.method == L"POST") {
+    optional_data_ = WstrToStr(request_.body);
+    TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDS, optional_data_.c_str());
+    TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDSIZE, optional_data_.size());
+    TAIGA_CURL_SET_OPTION(CURLOPT_POST, TRUE);
   }
 
-  // Set callback function
-  WINHTTP_STATUS_CALLBACK callback = ::WinHttpSetStatusCallback(
-      request_handle_,
-      reinterpret_cast<WINHTTP_STATUS_CALLBACK>(&Callback),
-      WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS,
-      NULL);  // reserved, must be null
-  return callback != WINHTTP_INVALID_STATUS_CALLBACK;
+  // Set referrer
+  if (!referer_.empty()) {
+    std::string referer = WstrToStr(referer_);
+    TAIGA_CURL_SET_OPTION(CURLOPT_REFERER, referer.c_str());
+  }
+
+  // Set user agent
+  if (!user_agent_.empty()) {
+    std::string user_agent = WstrToStr(user_agent_);
+    TAIGA_CURL_SET_OPTION(CURLOPT_USERAGENT, user_agent.c_str());
+  }
+
+  // Set custom headers
+  BuildRequestHeader();
+  TAIGA_CURL_SET_OPTION(CURLOPT_HTTPHEADER, header_list_);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Security options
+
+#ifdef TAIGA_WIN_HTTP_SSL_UNSECURE
+  TAIGA_CURL_SET_OPTION(CURLOPT_SSL_VERIFYPEER, 0L);
+  TAIGA_CURL_SET_OPTION(CURLOPT_SSL_VERIFYHOST, 0L);
+#endif
+
+  #undef TAIGA_CURL_SET_OPTION
+
+  return true;
 }
 
-BOOL Client::SendRequest() {
-  std::wstring header = BuildRequestHeader();
+bool Client::SendRequest() {
+#ifdef TAIGA_WIN_HTTP_MULTITHREADED
+  return CreateThread(nullptr, 0, 0);
+#else
+  return Perform();
+#endif
+}
 
-  // This buffer must remain available until the request handle is closed or the
-  // call to WinHttpReceiveResponse has completed
-  optional_data_ = WstrToStr(request_.body);
-  LPVOID optional_data = optional_data_.empty() ?
-      WINHTTP_NO_REQUEST_DATA : (LPVOID)optional_data_.c_str();
 
-  // Send the request to the HTTP server
-  return ::WinHttpSendRequest(request_handle_,
-                              header.c_str(),
-                              header.length(),
-                              optional_data,
-                              optional_data_.length(),
-                              optional_data_.length(),
-                              reinterpret_cast<DWORD_PTR>(this));
+
+bool Client::Perform() {
+  CURLcode code = curl_easy_perform(curl_handle_);
+
+  if (code == CURLE_OK) {
+    if (!write_buffer_.empty()) {
+      if (content_encoding_ == kContentEncodingGzip) {
+        std::string compressed;
+        std::swap(write_buffer_, compressed);
+        UncompressGzippedString(compressed, write_buffer_);
+      }
+      response_.body = StrToWstr(write_buffer_);
+    }
+
+    if (!download_path_.empty())
+      SaveToFile((LPCVOID)&write_buffer_.front(), write_buffer_.size(),
+                 download_path_);
+
+    if (!OnReadComplete())
+      return true;
+
+  } else {
+    OnError(code);
+  }
+
+  Cleanup();
+
+  return code == CURLE_OK;
+}
+
+DWORD Client::ThreadProc() {
+  return Perform();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::wstring Client::BuildRequestHeader() {
+void Client::BuildRequestHeader() {
   // Set acceptable types for the response
   if (!request_.header.count(L"Accept"))
     request_.header[L"Accept"] = L"*/*";
@@ -182,13 +241,16 @@ std::wstring Client::BuildRequestHeader() {
     if (!request_.header.count(L"Content-Type"))
       request_.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
 
-  std::wstring header;
-
   // Append available header fields
-  foreach_(it, request_.header)
-    header += it->first + L": " + it->second + L"\r\n";
-
-  return header;
+  foreach_(it, request_.header) {
+    std::string header = WstrToStr(it->first);
+    if (!it->second.empty()) {
+      header += ": " + WstrToStr(it->second);
+    } else {
+      header += ";";
+    }
+    header_list_ = curl_slist_append(header_list_, header.c_str());
+  }
 }
 
 }  // namespace http

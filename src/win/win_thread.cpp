@@ -56,7 +56,7 @@ HANDLE Thread::GetThreadHandle() const {
   return thread_;
 }
 
-int Thread::GetThreadId() const {
+DWORD Thread::GetThreadId() const {
   return thread_id_;
 }
 

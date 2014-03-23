@@ -55,14 +55,12 @@ void Response::Clear() {
 
 Client::Client()
     : auto_redirect_(true),
-      buffer_(nullptr),
       content_encoding_(kContentEncodingNone),
       content_length_(0),
       current_length_(0),
-      connection_handle_(nullptr),
-      request_handle_(nullptr),
-      secure_transaction_(false),
-      session_handle_(nullptr) {
+      curl_handle_(nullptr),
+      header_list_(nullptr),
+      secure_transaction_(false) {
   user_agent_ = L"Mozilla/5.0";
 }
 
@@ -74,29 +72,26 @@ Client::~Client() {
 
 void Client::Cleanup() {
   // Close handles
-  if (request_handle_) {
-    ::WinHttpSetStatusCallback(request_handle_, nullptr, 0, NULL);
-    ::WinHttpCloseHandle(request_handle_);
-    request_handle_ = nullptr;
+  if (curl_handle_) {
+    curl_easy_cleanup(curl_handle_);
+    curl_handle_ = nullptr;
   }
-  if (connection_handle_) {
-    ::WinHttpCloseHandle(connection_handle_);
-    connection_handle_ = nullptr;
+  if (header_list_) {
+    curl_slist_free_all(header_list_);
+    header_list_ = nullptr;
   }
-  if (session_handle_) {
-    ::WinHttpCloseHandle(session_handle_);
-    session_handle_ = nullptr;
+  if (GetThreadHandle() &&
+      GetThreadId() != GetCurrentThreadId()) {
+    CloseThreadHandle();
   }
 
   // Clear request and response
   request_.Clear();
   response_.Clear();
 
-  // Clear buffer
-  if (buffer_) {
-    delete [] buffer_;
-    buffer_ = nullptr;
-  }
+  // Clear buffers
+  optional_data_.clear();
+  write_buffer_.clear();
 
   // Reset variables
   content_encoding_ = kContentEncodingNone;
@@ -114,11 +109,11 @@ const Response& Client::response() const {
   return response_;
 }
 
-DWORD Client::content_length() const {
+curl_off_t Client::content_length() const {
   return content_length_;
 }
 
-DWORD Client::current_length() const {
+curl_off_t Client::current_length() const {
   return current_length_;
 }
 
@@ -148,6 +143,27 @@ void Client::set_referer(const std::wstring& referer) {
 
 void Client::set_user_agent(const std::wstring& user_agent) {
   user_agent_ = user_agent;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+CurlGlobal Client::curl_global_;
+
+CurlGlobal::CurlGlobal()
+    : initialized_(false) {
+  if (curl_global_init(CURL_GLOBAL_ALL) == 0)
+    initialized_ = true;
+}
+
+CurlGlobal::~CurlGlobal() {
+  if (initialized_) {
+    curl_global_cleanup();
+    initialized_ = false;
+  }
+}
+
+bool CurlGlobal::initialized() const {
+  return initialized_;
 }
 
 }  // namespace http
