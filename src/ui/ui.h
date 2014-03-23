@@ -44,6 +44,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client);
 void OnHttpReadComplete(const taiga::HttpClient& http_client);
 
 void OnLibraryChange();
+void OnLibraryChangeFailure();
 void OnLibraryEntryAdd(int id);
 void OnLibraryEntryChange(int id);
 void OnLibraryEntryDelete(int id);

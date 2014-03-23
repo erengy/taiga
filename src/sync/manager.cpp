@@ -153,6 +153,10 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
       if (response.service_id == kMyAnimeList && anime_item)
         SearchTitle(anime_item->GetTitle(), anime_id);
       break;
+    case kGetLibraryEntries:
+      ui::OnLibraryChangeFailure();
+      ui::ChangeStatusText(response.data[L"error"]);
+      break;
     case kAddLibraryEntry:
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry:
