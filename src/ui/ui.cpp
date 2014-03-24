@@ -322,10 +322,11 @@ bool OnLibraryEntryEditDelete(int id) {
   auto anime_item = AnimeDatabase.FindItem(id);
 
   win::TaskDialog dlg;
-  dlg.SetWindowTitle(anime_item->GetTitle().c_str());
+  dlg.SetWindowTitle(L"Delete List Entry");
   dlg.SetMainIcon(TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Are you sure you want to delete this title from "
+  dlg.SetMainInstruction(L"Are you sure you want to delete this entry from "
                          L"your list?");
+  dlg.SetContent(anime_item->GetTitle().c_str());
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());
