@@ -89,15 +89,18 @@ const std::wstring& Statistics::CalculateLifeSpentWatching() {
     if (!it->second.IsInList())
       continue;
 
-    // Approximate duration in minutes
-    switch (it->second.GetType()) {
-      default:
-      case anime::kTv:      duration = 24; break;
-      case anime::kOva:     duration = 24; break;
-      case anime::kMovie:   duration = 90; break;
-      case anime::kSpecial: duration = 12; break;
-      case anime::kOna:     duration = 24; break;
-      case anime::kMusic:   duration =  5; break;
+    duration = it->second.GetEpisodeLength();
+    if (duration <= 0) {
+      // Approximate duration in minutes
+      switch (it->second.GetType()) {
+        default:
+        case anime::kTv:      duration = 24; break;
+        case anime::kOva:     duration = 24; break;
+        case anime::kMovie:   duration = 90; break;
+        case anime::kSpecial: duration = 12; break;
+        case anime::kOna:     duration = 24; break;
+        case anime::kMusic:   duration =  5; break;
+      }
     }
 
     int episodes_watched = it->second.GetMyLastWatchedEpisode();
