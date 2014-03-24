@@ -45,7 +45,7 @@ bool Client::GetResponseHeader(const std::wstring& header) {
     }
   }
 
-  if (!response_.code /*&& response_.header.empty()*/)
+  if (!response_.code)
     return false;
 
   return true;
@@ -67,24 +67,22 @@ bool Client::ParseResponseHeader() {
     } else if (IsEqual(name, L"Content-Length")) {
       content_length_ = ToInt(value);
     } else if (IsEqual(name, L"Location")) {
-      if (!OnRedirect(value))
+      if (!OnRedirect(value)) {
         location.Crack(value);
+      } else {
+        return false;
+      }
     }
   }
 
   // Redirection
-  if (!location.host.empty()) {
-    if (!auto_redirect_) {
-      request_.host = location.host;
-      request_.path = location.path;
-      MakeRequest(request_);
-      return false;
-    } else {
-      content_encoding_ = kContentEncodingNone;
-      content_length_ = 0;
-      current_length_ = 0;
-      response_.Clear();
-    }
+  if (!location.host.empty() && auto_redirect_) {
+    content_encoding_ = kContentEncodingNone;
+    content_length_ = 0;
+    current_length_ = 0;
+    request_.host = location.host;
+    request_.path = location.path;
+    response_.Clear();
   }
 
   return true;

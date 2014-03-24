@@ -102,6 +102,7 @@ void App::Uninitialize() {
   ::Announcer.Clear(kAnnounceToMessenger | kAnnounceToSkype);
 
   // Cleanup
+  ConnectionManager.Shutdown();
   Taskbar.Destroy();
   TaskbarList.Release();
 

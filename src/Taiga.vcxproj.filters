@@ -58,6 +58,9 @@
     <Filter Include="sync\hummingbird">
       <UniqueIdentifier>{fc17319d-c4b2-43e2-a077-c3c74eeb7139}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\curl">
+      <UniqueIdentifier>{78f57ef1-5ab8-4cd6-b950-ce0eda201281}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="third_party\pugixml\pugixml.cpp">
@@ -815,6 +818,33 @@
     </ClInclude>
     <ClInclude Include="track\feed_filter.h">
       <Filter>track</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\curl.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\curlbuild.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\curlrules.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\curlver.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\easy.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\mprintf.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\multi.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\stdcheaders.h">
+      <Filter>include\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\curl\typecheck-gcc.h">
+      <Filter>include\curl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -37,7 +37,7 @@ public:
       DWORD creation_flags);
 
   HANDLE GetThreadHandle() const;
-  int GetThreadId() const;
+  DWORD GetThreadId() const;
 
 private:
   static DWORD WINAPI ThreadProcStatic(LPVOID thread);

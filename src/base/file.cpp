@@ -482,8 +482,7 @@ bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
   HANDLE file_handle = OpenFileForGenericWrite(path);
   if (file_handle != INVALID_HANDLE_VALUE) {
     DWORD bytes_written = 0;
-    result = ::WriteFile(file_handle, (LPCVOID)data, length, &bytes_written,
-                         nullptr);
+    result = ::WriteFile(file_handle, data, length, &bytes_written, nullptr);
     ::CloseHandle(file_handle);
   }
 

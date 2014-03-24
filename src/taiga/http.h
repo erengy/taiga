@@ -64,9 +64,9 @@ public:
   void set_mode(HttpClientMode mode);
 
 protected:
-  void OnError(DWORD error);
+  void OnError(CURLcode error_code);
   bool OnHeadersAvailable();
-  bool OnReadData();
+  bool OnProgress();
   bool OnReadComplete();
   bool OnRedirect(const std::wstring& address);
 
@@ -83,13 +83,16 @@ public:
   void MakeRequest(HttpClient& client, HttpRequest& request, HttpClientMode mode);
 
   void HandleError(HttpResponse& response, const string_t& error);
+  void HandleRedirect(const std::wstring& current_host, const std::wstring& next_host);
   void HandleResponse(HttpResponse& response);
 
   void FreeMemory();
+  void Shutdown();
 
 private:
   void AddToQueue(HttpRequest& request);
   void ProcessQueue();
+  void AddConnection(const string_t& hostname);
   void FreeConnection(const string_t& hostname);
 
   std::map<std::wstring, HttpClient> clients_;

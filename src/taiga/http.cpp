@@ -40,9 +40,6 @@ const unsigned int kMaxSimultaneousConnectionsPerHostname = 6;
 
 HttpClient::HttpClient()
     : mode_(kHttpSilent) {
-  // We will handle redirections ourselves
-  set_auto_redirect(false);
-
   // The default header (e.g. "User-Agent: Taiga/1.0") will be used, unless
   // another value is specified in the request header
   set_user_agent(
@@ -65,9 +62,9 @@ void HttpClient::set_mode(HttpClientMode mode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpClient::OnError(DWORD error) {
-  std::wstring error_text = L"HTTP error #" + ToWstr(error) + L": " +
-                            Logger::FormatError(error, L"winhttp.dll");
+void HttpClient::OnError(CURLcode error_code) {
+  std::wstring error_text = L"HTTP error #" + ToWstr(error_code) + L": " +
+                            StrToWstr(curl_easy_strerror(error_code));
   TrimRight(error_text, L"\r\n");
 
   LOG(LevelError, error_text);
@@ -97,10 +94,13 @@ bool HttpClient::OnRedirect(const std::wstring& address) {
     }
   }
 
+  win::http::Url url(address);
+  ConnectionManager.HandleRedirect(request_.host, url.host);
+
   return false;
 }
 
-bool HttpClient::OnReadData() {
+bool HttpClient::OnProgress() {
   ui::OnHttpProgress(*this);
   return false;
 }
@@ -164,6 +164,12 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
 
   FreeConnection(client.request_.host);
   ProcessQueue();
+}
+
+void HttpManager::HandleRedirect(const std::wstring& current_host,
+                                 const std::wstring& next_host) {
+  FreeConnection(current_host);
+  AddConnection(next_host);
 }
 
 void HttpManager::HandleResponse(HttpResponse& response) {
@@ -240,17 +246,27 @@ void HttpManager::FreeMemory() {
   }
 }
 
+void HttpManager::Shutdown() {
+  clients_.clear();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void HttpManager::AddToQueue(HttpRequest& request) {
+#ifdef TAIGA_WIN_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
-  requests_.push_back(request);
-
   LOG(LevelDebug, L"ID: " + request.uuid);
+
+  requests_.push_back(request);
+#else
+  HttpClient& client = clients_[request.uuid];
+  client.MakeRequest(request);
+#endif
 }
 
 void HttpManager::ProcessQueue() {
+#ifdef TAIGA_WIN_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   unsigned int connections = 0;
@@ -268,19 +284,29 @@ void HttpManager::ProcessQueue() {
       LOG(LevelDebug, L"Reached max connections for hostname: " + request.host);
       continue;
     } else {
-      HttpClient& client = clients_[request.uuid];
-      client.MakeRequest(request);
-
       connections++;
       connections_[request.host]++;
+
+      HttpClient& client = clients_[request.uuid];
+      client.MakeRequest(request);
 
       requests_.erase(requests_.begin() + i);
       i--;
     }
   }
+#endif
+}
+
+void HttpManager::AddConnection(const string_t& hostname) {
+#ifdef TAIGA_WIN_HTTP_MULTITHREADED
+  win::Lock lock(critical_section_);
+
+  connections_[hostname]++;
+#endif
 }
 
 void HttpManager::FreeConnection(const string_t& hostname) {
+#ifdef TAIGA_WIN_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   if (connections_[hostname] > 0) {
@@ -288,6 +314,7 @@ void HttpManager::FreeConnection(const string_t& hostname) {
   } else {
     LOG(LevelError, L"Connections for hostname was already zero: " + hostname);
   }
+#endif
 }
 
 }  // namespace taiga

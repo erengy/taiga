@@ -218,6 +218,10 @@ void OnLibraryChange() {
   DlgMain.EnableInput(true);
 }
 
+void OnLibraryChangeFailure() {
+  DlgMain.EnableInput(true);
+}
+
 void OnLibraryEntryAdd(int id) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.Refresh();
