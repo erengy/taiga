@@ -72,6 +72,7 @@ BOOL App::InitInstance() {
 #else
   Logger.SetSeverityLevel(LevelWarning);
 #endif
+  LOG(LevelInformational, L"Version " + std::wstring(version));
 
   // Load data
   LoadData();
