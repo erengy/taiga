@@ -16,9 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/encryption.h"
+#include "base/crypto.h"
 #include "base/foreach.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
@@ -135,7 +136,7 @@ void DownloadImage(int id, const string_t& image_url) {
   if (image_url.empty())
     return;
   
-  win::http::Url url(image_url);
+  Url url(image_url);
   
   HttpRequest http_request;
   http_request.host = url.host;

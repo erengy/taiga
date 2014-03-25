@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/html.h"
 #include "base/string.h"
 #include "taiga/dummy.h"
 #include "taiga/resource.h"

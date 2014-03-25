@@ -18,6 +18,7 @@
 
 #include "base/gfx.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "taiga/resource.h"
@@ -423,7 +424,7 @@ void TorrentDialog::RefreshList() {
   if (!feed->title.empty()) {
     title = feed->title;
   } else if (!feed->link.empty()) {
-    win::http::Url url(feed->link);
+    Url url(feed->link);
     title += L" (" + url.host + L")";
   }
   if (!feed->description.empty()) {

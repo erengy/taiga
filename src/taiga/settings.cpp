@@ -16,10 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/encryption.h"
+#include "base/crypto.h"
 #include "base/file.h"
 #include "base/foreach.h"
-#include "base/logger.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"

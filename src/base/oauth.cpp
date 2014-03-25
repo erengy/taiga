@@ -1,49 +1,49 @@
 /*
-** Copyright (c) 2010 Brook Miles
+** Taiga
+** Copyright (C) 2010-2014, Eren Okka
 ** 
-** Permission is hereby granted, free of charge, to any person obtaining a copy
-** of this software and associated documentation files (the "Software"), to deal
-** in the Software without restriction, including without limitation the rights
-** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-** copies of the Software, and to permit persons to whom the Software is
-** furnished to do so, subject to the following conditions:
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
 ** 
-** The above copyright notice and this permission notice shall be included in
-** all copies or substantial portions of the Software.
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
 ** 
-** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-** LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-** OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-** THE SOFTWARE.
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <windows.h>
 #include <winhttp.h>
-#include <time.h>
 #include <list>
+#include <time.h>
 #include <vector>
 
+#include "base64.h"
+#include "crypto.h"
+#include "string.h"
 #include "oauth.h"
-
-#include "base/encoding.h"
-#include "base/string.h"
-#include "third_party/base64/base64.h"
+#include "url.h"
 
 #ifndef SIZEOF
-#define SIZEOF(x) (sizeof(x)/sizeof(*x))
+#define SIZEOF(x) (sizeof(x) / sizeof(*x))
 #endif
 
+////////////////////////////////////////////////////////////////////////////////
+// OAuth implementation is based on codebrook-twitter-oauth example code
+// Copyright (c) 2010 Brook Miles
+// https://code.google.com/p/codebrook-twitter-oauth/
+
 std::wstring OAuth::BuildAuthorizationHeader(
-  const std::wstring& url,
-  const std::wstring& http_method,
-  const OAuthParameters* post_parameters,
-  const std::wstring& oauth_token,
-  const std::wstring& oauth_token_secret,
-  const std::wstring& pin)
-{
+    const std::wstring& url,
+    const std::wstring& http_method,
+    const OAuthParameters* post_parameters,
+    const std::wstring& oauth_token,
+    const std::wstring& oauth_token_secret,
+    const std::wstring& pin) {
   // Build request parameters
   OAuthParameters get_parameters = ParseQueryString(UrlGetQuery(url));
 
@@ -84,14 +84,13 @@ OAuthParameters OAuth::ParseQueryString(const std::wstring& url) {
 ////////////////////////////////////////////////////////////////////////////////
 
 OAuthParameters OAuth::BuildSignedParameters(
-  const OAuthParameters& get_parameters,
-  const std::wstring& url,
-  const std::wstring& http_method,
-  const OAuthParameters* post_parameters,
-  const std::wstring& oauth_token,
-  const std::wstring& oauth_token_secret,
-  const std::wstring& pin)
-{
+    const OAuthParameters& get_parameters,
+    const std::wstring& url,
+    const std::wstring& http_method,
+    const OAuthParameters* post_parameters,
+    const std::wstring& oauth_token,
+    const std::wstring& oauth_token_secret,
+    const std::wstring& pin) {
   // Create OAuth parameters
   OAuthParameters oauth_parameters;
   oauth_parameters[L"oauth_callback"] = L"oob";
@@ -115,7 +114,7 @@ OAuthParameters OAuth::BuildSignedParameters(
   all_parameters.insert(oauth_parameters.begin(), oauth_parameters.end());
 
   // Prepare the signature base
-  std::wstring normal_url = NormalizeURL(url);
+  std::wstring normal_url = NormalizeUrl(url);
   std::wstring sorted_parameters = SortParameters(all_parameters);
   std::wstring signature_base = http_method +
                                 L"&" + EncodeUrl(normal_url) +
@@ -146,12 +145,10 @@ std::wstring OAuth::CreateSignature(const std::wstring& signature_base,
   // Create a SHA-1 hash of signature
   std::wstring key = EncodeUrl(consumer_secret) +
                      L"&" + EncodeUrl(oauth_token_secret);
-  std::string hash = Crypt_HMACSHA1(WstrToStr(key), WstrToStr(signature_base));
+  std::string hash = HmacSha1(WstrToStr(key), WstrToStr(signature_base));
 
   // Encode signature in Base64
-  Base64Coder coder;
-  coder.Encode((BYTE*)hash.c_str(), hash.size());
-  std::wstring signature = StrToWstr(coder.EncodedMessage());
+  std::wstring signature = Base64Encode(StrToWstr(hash));
 
   // Return URL-encoded signature
   return EncodeUrl(signature);
@@ -165,7 +162,7 @@ std::wstring OAuth::CreateTimestamp() {
   return buf;
 }
 
-std::wstring OAuth::NormalizeURL(const std::wstring& url) {
+std::wstring OAuth::NormalizeUrl(const std::wstring& url) {
   wchar_t scheme[1024 * 4] = {'\0'};
   wchar_t host[1024 * 4] = {'\0'};
   wchar_t path[1024 * 4] = {'\0'};
@@ -219,7 +216,7 @@ std::wstring OAuth::SortParameters(const OAuthParameters& parameters) {
 std::wstring OAuth::UrlGetQuery(const std::wstring& url) {
   std::wstring query;
   wchar_t buf[1024 * 4] = {'\0'};
-  
+
   URL_COMPONENTS components = {sizeof(URL_COMPONENTS)};
   components.dwExtraInfoLength = SIZEOF(buf);
   components.lpszExtraInfo = buf;
@@ -235,60 +232,4 @@ std::wstring OAuth::UrlGetQuery(const std::wstring& url) {
   }
 
   return query;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// HMAC (Hashed Message Authentication Checksum) code is based on:
-// http://msdn.microsoft.com/en-us/library/aa382379%28v=VS.85%29.aspx
-
-// Key creation is based on:
-// http://mirror.leaseweb.com/NetBSD/NetBSD-release-5-0/src/dist/wpa/src/crypto/crypto_cryptoapi.c
-
-std::string OAuth::Crypt_HMACSHA1(const std::string& key_bytes,
-                                  const std::string& data) {
-  std::string hash;
-  HCRYPTPROV hProv = NULL;
-  HCRYPTHASH hHash = NULL;
-  HCRYPTKEY hKey = NULL;
-  HCRYPTHASH hHmacHash = NULL;
-  PBYTE pbHash = NULL;
-  DWORD dwDataLen = 0;
-  HMAC_INFO HmacInfo;
-  ZeroMemory(&HmacInfo, sizeof(HmacInfo));
-  HmacInfo.HashAlgid = CALG_SHA1;
-
-  if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
-    if (CryptCreateHash(hProv, CALG_SHA1, 0, 0, &hHash)) {
-      if (CryptHashData(hHash, (BYTE*)key_bytes.c_str(), key_bytes.size(), 0)) {
-        struct {
-          BLOBHEADER hdr;
-          DWORD len;
-          BYTE key[1024];
-        } key_blob;
-        key_blob.hdr.bType = PLAINTEXTKEYBLOB;
-        key_blob.hdr.bVersion = CUR_BLOB_VERSION;
-        key_blob.hdr.reserved = 0;
-        key_blob.hdr.aiKeyAlg = CALG_RC2;
-        key_blob.len = key_bytes.size();
-        ZeroMemory(key_blob.key, sizeof(key_blob.key));
-        CopyMemory(key_blob.key, key_bytes.c_str(), min(key_bytes.size(), SIZEOF(key_blob.key)));
-        if (CryptImportKey(hProv, (BYTE*)&key_blob, sizeof(key_blob), 0, CRYPT_IPSEC_HMAC_KEY, &hKey)) {
-          if (CryptCreateHash(hProv, CALG_HMAC, hKey, 0, &hHmacHash)) {
-            if (CryptSetHashParam(hHmacHash, HP_HMAC_INFO, (BYTE*)&HmacInfo, 0)) {
-              if (CryptHashData(hHmacHash, (BYTE*)data.c_str(), data.size(), 0)) {
-                if (CryptGetHashParam(hHmacHash, HP_HASHVAL, NULL, &dwDataLen, 0)) {
-                  pbHash = (BYTE*)malloc(dwDataLen);
-                  if (pbHash != NULL) {
-                    if (CryptGetHashParam(hHmacHash, HP_HASHVAL, pbHash, &dwDataLen, 0)) {
-                      for (DWORD i = 0 ; i < dwDataLen ; i++) {
-                        hash.push_back((char)pbHash[i]);
-  } } } } } } } } } } }
-
-  if (hHmacHash) CryptDestroyHash(hHmacHash);
-  if (hKey) CryptDestroyKey(hKey);
-  if (hHash) CryptDestroyHash(hHash);    
-  if (hProv) CryptReleaseContext(hProv, 0);
-  if (pbHash) free(pbHash);
-
-  return hash;
 }

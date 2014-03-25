@@ -29,7 +29,6 @@ void ErasePunctuation(std::wstring& str, bool keep_trailing = false);
 void EraseLeft(std::wstring& str1, const std::wstring str2, bool case_insensitive = false);
 void EraseRight(std::wstring& str1, const std::wstring str2, bool case_insensitive = false);
 void RemoveEmptyStrings(std::vector<std::wstring>& input);
-void StripHtmlTags(std::wstring& str);
 
 std::wstring CharLeft(const std::wstring& str, int length);
 std::wstring CharRight(const std::wstring& str, int length);

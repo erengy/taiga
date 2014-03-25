@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/encoding.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"

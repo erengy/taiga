@@ -18,8 +18,9 @@
 
 #include <windows.h>
 
+#include <zlib/zlib.h>
+
 #include "gzip.h"
-#include "third_party/zlib/zlib.h"
 
 bool UncompressGzippedFile(const std::string& file, std::string& output) {
   gzFile gzfile = gzopen(file.c_str(), "rb");

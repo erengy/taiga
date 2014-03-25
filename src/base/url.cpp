@@ -16,12 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "win_http.h"
-
-#include "base/string.h"
-
-namespace win {
-namespace http {
+#include "string.h"
+#include "url.h"
 
 Url::Url(const std::wstring& url) {
   Crack(url);
@@ -57,5 +53,29 @@ void Url::Crack(std::wstring url) {
   path = url.substr(i);
 }
 
-}  // namespace http
-}  // namespace win
+////////////////////////////////////////////////////////////////////////////////
+
+std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved) {
+  std::string str = WstrToStr(input);
+
+  std::wstring output;
+  output.reserve(input.size() * 2);
+
+  for (size_t i = 0; i < str.length(); i++) {
+    if ((str[i] >= '0' && str[i] <= '9') ||
+        (str[i] >= 'A' && str[i] <= 'Z') ||
+        (str[i] >= 'a' && str[i] <= 'z') ||
+        (!encode_unreserved &&
+         (str[i] == '-' || str[i] == '.' ||
+          str[i] == '_' || str[i] == '~'))) {
+      output.append(1, static_cast<wchar_t>(str[i]));
+    } else {
+      static const wchar_t* digits = L"0123456789ABCDEF";
+      output.append(L"%");
+      output.append(&digits[(str[i] >> 4) & 0x0F], 1);
+      output.append(&digits[str[i] & 0x0F], 1);
+    }
+  }
+
+  return output;
+}

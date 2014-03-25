@@ -16,16 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "win_http.h"
+#include "file.h"
+#include "foreach.h"
+#include "http.h"
+#include "gzip.h"
+#include "log.h"
+#include "string.h"
+#include "url.h"
 
-#include "base/encoding.h"
-#include "base/file.h"
-#include "base/foreach.h"
-#include "base/gzip.h"
-#include "base/logger.h"
-#include "base/string.h"
-
-namespace win {
+namespace base {
 namespace http {
 
 bool Client::MakeRequest(Request request) {
@@ -187,7 +186,7 @@ bool Client::SetRequestOptions() {
 }
 
 bool Client::SendRequest() {
-#ifdef TAIGA_WIN_HTTP_MULTITHREADED
+#ifdef TAIGA_HTTP_MULTITHREADED
   return CreateThread(nullptr, 0, 0);
 #else
   return Perform();
@@ -254,4 +253,4 @@ void Client::BuildRequestHeader() {
 }
 
 }  // namespace http
-}  // namespace win
+}  // namespace base

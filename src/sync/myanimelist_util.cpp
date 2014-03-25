@@ -16,9 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/encoding.h"
 #include "base/file.h"
-#include "base/logger.h"
+#include "base/html.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "library/anime.h"

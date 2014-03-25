@@ -19,7 +19,7 @@
 #include <windows.h>
 #include <psapi.h>
 
-#include "logger.h"
+#include "log.h"
 #include "process.h"
 #include "string.h"
 

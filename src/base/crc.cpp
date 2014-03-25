@@ -18,9 +18,10 @@
 
 #include <windows.h>
 
+#include <zlib/zlib.h>
+
 #include "crc.h"
 #include "string.h"
-#include "third_party/zlib/zlib.h"
 
 std::wstring CalculateCrcFromFile(const std::wstring& file) {
   BYTE buffer[0x10000];

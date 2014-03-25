@@ -21,6 +21,7 @@
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "base/xml.h"
 #include "sync/service.h"
 #include "taiga/http.h"
@@ -122,7 +123,7 @@ bool UpdateHelper::Download() {
   download_path_ = AddTrailingSlash(GetPathOnly(Taiga.GetModulePath()));
   download_path_ += GetFileName(feed_item->link);
 
-  win::http::Url url(feed_item->link);
+  Url url(feed_item->link);
 
   HttpRequest http_request;
   http_request.host = url.host;

@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/logger.h"
+#include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime_db.h"

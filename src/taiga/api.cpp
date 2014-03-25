@@ -17,7 +17,7 @@
 */
 
 #include "base/foreach.h"
-#include "base/logger.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "library/anime_episode.h"
 #include "taiga/api.h"

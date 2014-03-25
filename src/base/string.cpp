@@ -131,23 +131,6 @@ void RemoveEmptyStrings(vector<wstring>& input) {
       input.end());
 }
 
-void StripHtmlTags(wstring& str) {
-  int index_begin = -1;
-  int index_end = -1;
-
-  do {
-    index_begin = InStr(str, L"<", 0);
-    if (index_begin > -1) {
-      index_end = InStr(str, L">", index_begin);
-      if (index_end > -1) {
-        str.erase(index_begin, index_end - index_begin + 1);
-      } else {
-        break;
-      }
-    }
-  } while (index_begin > -1);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Searching and comparison
 

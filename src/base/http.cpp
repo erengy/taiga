@@ -16,12 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "win_http.h"
+#include "file.h"
+#include "http.h"
+#include "string.h"
 
-#include "base/file.h"
-#include "base/string.h"
-
-namespace win {
+namespace base {
 namespace http {
 
 Request::Request()
@@ -167,4 +166,4 @@ bool CurlGlobal::initialized() const {
 }
 
 }  // namespace http
-}  // namespace win
+}  // namespace base

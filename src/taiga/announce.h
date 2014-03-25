@@ -21,9 +21,9 @@
 
 #include <string>
 
+#include "base/oauth.h"
 #include "base/types.h"
 #include "taiga/http.h"
-#include "third_party/oauth/oauth.h"
 #include "win/win_window.h"
 
 namespace anime {

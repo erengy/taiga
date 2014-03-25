@@ -16,15 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_ENCODING_H
-#define TAIGA_BASE_ENCODING_H
+#ifndef TAIGA_BASE_HTML_H
+#define TAIGA_BASE_HTML_H
 
 #include <string>
 
-std::wstring Base64Decode(const std::wstring& str, bool for_filename = false);
-std::wstring Base64Encode(const std::wstring& str, bool for_filename = false);
-
 void DecodeHtmlEntities(std::wstring& str);
-std::wstring EncodeUrl(const std::wstring& str, bool encode_unreserved = false);
+void StripHtmlTags(std::wstring& str);
 
-#endif  // TAIGA_BASE_ENCODING_H
+#endif  // TAIGA_BASE_HTML_H

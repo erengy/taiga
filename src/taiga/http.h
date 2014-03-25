@@ -21,8 +21,8 @@
 
 #include <map>
 
+#include "base/http.h"
 #include "base/types.h"
-#include "win/http/win_http.h"
 #include "win/win_thread.h"
 
 namespace taiga {
@@ -53,7 +53,7 @@ enum HttpClientMode {
   kHttpTaigaUpdateDownload
 };
 
-class HttpClient : public win::http::Client {
+class HttpClient : public base::http::Client {
 public:
   friend class HttpManager;
 

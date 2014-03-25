@@ -24,7 +24,12 @@
 #include <string>
 #include <vector>
 
-#include "win/http/win_http.h"
+namespace base {
+namespace http {
+class Request;
+class Response;
+}
+}
 
 namespace base {
 
@@ -44,10 +49,10 @@ typedef std::map<string_t, string_t> dictionary_t;
 typedef std::map<string_t, std::vector<string_t>> multidictionary_t;
 
 // HTTP request and response
-typedef win::http::Request HttpRequest;
-typedef win::http::Response HttpResponse;
+typedef base::http::Request HttpRequest;
+typedef base::http::Response HttpResponse;
 
-// 64-bit value
+// 64-bit integral data type (quadword)
 typedef unsigned __int64 QWORD, *LPQWORD;
 
 #endif  // TAIGA_BASE_TYPES_H

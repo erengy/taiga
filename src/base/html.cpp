@@ -19,76 +19,10 @@
 #include <map>
 #include <string>
 
-#include "encoding.h"
+#include "html.h"
 #include "string.h"
-#include "third_party/base64/base64.h"
 
 std::map<std::wstring, wchar_t> html_entities;
-
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring Base64Decode(const std::wstring& str, bool for_filename) {
-  if (str.empty())
-    return str;
-
-  std::string buff = WstrToStr(str);
-
-  Base64Coder coder;
-  coder.Decode((BYTE*)buff.c_str(), buff.length());
-
-  if (for_filename) {
-    std::wstring msg = StrToWstr(coder.DecodedMessage());
-    ReplaceChar(msg, '-', '/');
-    return msg;
-  } else {
-    return StrToWstr(coder.DecodedMessage());
-  }
-}
-
-std::wstring Base64Encode(const std::wstring& str, bool for_filename) {
-  if (str.empty())
-    return str;
-
-  std::string buff = WstrToStr(str);
-
-  Base64Coder coder;
-  coder.Encode((BYTE*)buff.c_str(), buff.length());
-
-  if (for_filename) {
-    std::wstring msg = StrToWstr(coder.EncodedMessage());
-    ReplaceChar(msg, '/', '-');
-    return msg;
-  } else {
-    return StrToWstr(coder.EncodedMessage());
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved) {
-  std::string str = WstrToStr(input);
-
-  std::wstring output;
-  output.reserve(input.size() * 2);
-
-  for (size_t i = 0; i < str.length(); i++) {
-    if ((str[i] >= '0' && str[i] <= '9') ||
-        (str[i] >= 'A' && str[i] <= 'Z') ||
-        (str[i] >= 'a' && str[i] <= 'z') ||
-        (!encode_unreserved &&
-         (str[i] == '-' || str[i] == '.' ||
-          str[i] == '_' || str[i] == '~'))) {
-      output.append(1, static_cast<wchar_t>(str[i]));
-    } else {
-      static const wchar_t* digits = L"0123456789ABCDEF";
-      output.append(L"%");
-      output.append(&digits[(str[i] >> 4) & 0x0F], 1);
-      output.append(&digits[str[i] & 0x0F], 1);
-    }
-  }
-
-  return output;
-}
 
 void DecodeHtmlEntities(std::wstring& str) {
   // Build entity map
@@ -422,4 +356,21 @@ void DecodeHtmlEntities(std::wstring& str) {
       }
     }
   }
+}
+
+void StripHtmlTags(std::wstring& str) {
+  int index_begin = -1;
+  int index_end = -1;
+
+  do {
+    index_begin = InStr(str, L"<", 0);
+    if (index_begin > -1) {
+      index_end = InStr(str, L">", index_begin);
+      if (index_end > -1) {
+        str.erase(index_begin, index_end - index_begin + 1);
+      } else {
+        break;
+      }
+    }
+  } while (index_begin > -1);
 }

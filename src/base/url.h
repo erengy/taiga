@@ -16,14 +16,27 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_JSON_H
-#define TAIGA_BASE_JSON_H
+#ifndef TAIGA_BASE_URL_H
+#define TAIGA_BASE_URL_H
 
 #include <string>
-#include <vector>
 
-#include <jsoncpp/json/json.h>
+class Url {
+public:
+  Url() {}
+  Url(const std::wstring& url);
+  ~Url() {}
 
-bool JsonReadArray(const Json::Value& root, const std::string& name, std::vector<std::wstring>& output);
+  void Crack(std::wstring url);
 
-#endif  // TAIGA_BASE_JSON_H
+  Url& operator=(const Url& url);
+  void operator=(const std::wstring& url);
+
+  std::wstring scheme;
+  std::wstring host;
+  std::wstring path;
+};
+
+std::wstring EncodeUrl(const std::wstring& str, bool encode_unreserved = false);
+
+#endif  // TAIGA_BASE_URL_H

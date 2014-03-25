@@ -17,8 +17,9 @@
 */
 
 #include "base/foreach.h"
-#include "base/logger.h"
+#include "base/log.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "library/resource.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
@@ -94,7 +95,7 @@ bool HttpClient::OnRedirect(const std::wstring& address) {
     }
   }
 
-  win::http::Url url(address);
+  Url url(address);
   ConnectionManager.HandleRedirect(request_.host, url.host);
 
   return false;
@@ -253,7 +254,7 @@ void HttpManager::Shutdown() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void HttpManager::AddToQueue(HttpRequest& request) {
-#ifdef TAIGA_WIN_HTTP_MULTITHREADED
+#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   LOG(LevelDebug, L"ID: " + request.uuid);
@@ -266,7 +267,7 @@ void HttpManager::AddToQueue(HttpRequest& request) {
 }
 
 void HttpManager::ProcessQueue() {
-#ifdef TAIGA_WIN_HTTP_MULTITHREADED
+#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   unsigned int connections = 0;
@@ -298,7 +299,7 @@ void HttpManager::ProcessQueue() {
 }
 
 void HttpManager::AddConnection(const string_t& hostname) {
-#ifdef TAIGA_WIN_HTTP_MULTITHREADED
+#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   connections_[hostname]++;
@@ -306,7 +307,7 @@ void HttpManager::AddConnection(const string_t& hostname) {
 }
 
 void HttpManager::FreeConnection(const string_t& hostname) {
-#ifdef TAIGA_WIN_HTTP_MULTITHREADED
+#ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   if (connections_[hostname] > 0) {

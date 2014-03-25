@@ -17,11 +17,11 @@
 */
 
 #include "base/dde.h"
-#include "base/encoding.h"
 #include "base/file.h"
 #include "base/foreach.h"
-#include "base/logger.h"
+#include "base/log.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "library/anime.h"
 #include "library/anime_episode.h"
 #include "taiga/announce.h"
@@ -116,7 +116,7 @@ void Announcer::ToHttp(const std::wstring& address, const std::wstring& data) {
   if (address.empty() || data.empty())
     return;
 
-  win::http::Url url(address);
+  Url url(address);
 
   HttpRequest http_request;
   http_request.method = L"POST";
@@ -411,7 +411,7 @@ Twitter::Twitter() {
 
 bool Twitter::RequestToken() {
   HttpRequest http_request;
-  http_request.protocol = win::http::kHttps;
+  http_request.protocol = base::http::kHttps;
   http_request.host = L"api.twitter.com";
   http_request.path = L"oauth/request_token";
   http_request.header[L"Authorization"] =
@@ -425,7 +425,7 @@ bool Twitter::RequestToken() {
 bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret,
                           const std::wstring& pin) {
   HttpRequest http_request;
-  http_request.protocol = win::http::kHttps;
+  http_request.protocol = base::http::kHttps;
   http_request.host = L"api.twitter.com";
   http_request.path = L"oauth/access_token";
   http_request.header[L"Authorization"] =
@@ -449,7 +449,7 @@ bool Twitter::SetStatusText(const std::wstring& status_text) {
   post_parameters[L"status"] = EncodeUrl(status_text_);
 
   HttpRequest http_request;
-  http_request.protocol = win::http::kHttps;
+  http_request.protocol = base::http::kHttps;
   http_request.method = L"POST";
   http_request.host = L"api.twitter.com";
   http_request.path = L"1.1/statuses/update.json";

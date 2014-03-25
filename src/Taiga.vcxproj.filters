@@ -13,9 +13,6 @@
     <Filter Include="taiga">
       <UniqueIdentifier>{a1203609-2ae6-4ecf-b0d9-68210e43f27f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{de9b6faa-fd42-41ff-a14c-74f061854127}</UniqueIdentifier>
-    </Filter>
     <Filter Include="track">
       <UniqueIdentifier>{7fb09042-cbff-4d45-9475-3ab8ce9feba3}</UniqueIdentifier>
     </Filter>
@@ -25,23 +22,8 @@
     <Filter Include="ui\dlg">
       <UniqueIdentifier>{d1bdf49c-0a57-4644-b3d9-c38735eae84d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\zlib">
-      <UniqueIdentifier>{c8d3c2ca-aff5-47eb-a494-791f8c819306}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\base64">
-      <UniqueIdentifier>{632c9571-5b54-4fc7-b4cb-25cb4abc7b96}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\oauth">
-      <UniqueIdentifier>{1c1c56f5-5f1c-4db5-88f0-ed1f7286f97d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="include\pugixml">
-      <UniqueIdentifier>{69e5923a-3694-4a7d-834b-59c61bb1fa00}</UniqueIdentifier>
-    </Filter>
     <Filter Include="win">
       <UniqueIdentifier>{5a049f3c-a24c-4b07-9a18-368feca131b4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="win\http">
-      <UniqueIdentifier>{58c20329-c357-4173-bd3b-a89d0287f9a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="win\ctrl">
       <UniqueIdentifier>{c5f2befa-8552-490e-bddd-e1a6eea6d47a}</UniqueIdentifier>
@@ -52,71 +34,29 @@
     <Filter Include="library\anime">
       <UniqueIdentifier>{34871dd8-76ae-4f8d-96d7-75b13d067a56}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\jsoncpp">
-      <UniqueIdentifier>{6efb0ffb-ce73-47bd-bfbc-3480db16ac1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sync\hummingbird">
       <UniqueIdentifier>{fc17319d-c4b2-43e2-a077-c3c74eeb7139}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\curl">
-      <UniqueIdentifier>{78f57ef1-5ab8-4cd6-b950-ce0eda201281}</UniqueIdentifier>
+    <Filter Include="deps">
+      <UniqueIdentifier>{1318eae4-cff8-43bd-b775-6ccfa45f8821}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\base64">
+      <UniqueIdentifier>{58efac92-5057-4eff-b018-4b06c91d1691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\curl">
+      <UniqueIdentifier>{44149ec4-dc2c-4653-bc93-65aaf42da816}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\jsoncpp">
+      <UniqueIdentifier>{2029a66a-f7da-4bcb-8b36-5dec03dc5dc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\pugixml">
+      <UniqueIdentifier>{3410a331-b145-40db-bad0-955258c6e7ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\zlib">
+      <UniqueIdentifier>{afa94179-8774-49e2-a1c3-41cb563e2428}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="third_party\pugixml\pugixml.cpp">
-      <Filter>include\pugixml</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\oauth\oauth.cpp">
-      <Filter>include\oauth</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\base64\base64.cpp">
-      <Filter>include\base64</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\adler32.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\compress.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\crc32.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\deflate.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\gzclose.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\gzlib.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\gzread.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\gzwrite.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\infback.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\inffast.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\inflate.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\inftrees.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\trees.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\uncompr.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\zlib\zutil.c">
-      <Filter>include\zlib</Filter>
-    </ClCompile>
     <ClCompile Include="ui\dlg\dlg_about.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
@@ -183,28 +123,16 @@
     <ClCompile Include="base\accessibility.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="base\dde.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="base\encryption.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="base\gfx.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="base\gzip.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="base\logger.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="base\process.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="base\time.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="base\xml.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="taiga\action.cpp">
@@ -289,21 +217,6 @@
     <ClCompile Include="win\win_window.cpp">
       <Filter>win</Filter>
     </ClCompile>
-    <ClCompile Include="win\http\win_http.cpp">
-      <Filter>win\http</Filter>
-    </ClCompile>
-    <ClCompile Include="win\http\win_http_url.cpp">
-      <Filter>win\http</Filter>
-    </ClCompile>
-    <ClCompile Include="win\http\win_http_callback.cpp">
-      <Filter>win\http</Filter>
-    </ClCompile>
-    <ClCompile Include="win\http\win_http_request.cpp">
-      <Filter>win\http</Filter>
-    </ClCompile>
-    <ClCompile Include="win\http\win_http_response.cpp">
-      <Filter>win\http</Filter>
-    </ClCompile>
     <ClCompile Include="win\ctrl\win_ctrl_combobox.cpp">
       <Filter>win\ctrl</Filter>
     </ClCompile>
@@ -379,9 +292,6 @@
     <ClCompile Include="base\crc.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="base\encoding.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="library\discover.cpp">
       <Filter>library</Filter>
     </ClCompile>
@@ -418,18 +328,6 @@
     <ClCompile Include="ui\dialog.cpp">
       <Filter>ui</Filter>
     </ClCompile>
-    <ClCompile Include="third_party\jsoncpp\json_reader.cpp">
-      <Filter>include\jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\jsoncpp\json_value.cpp">
-      <Filter>include\jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\jsoncpp\json_writer.cpp">
-      <Filter>include\jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="base\json.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="base\version.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -454,53 +352,107 @@
     <ClCompile Include="ui\dlg\dlg_update_new.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\deps\src\base64\base64.cpp">
+      <Filter>deps\base64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\jsoncpp\json_reader.cpp">
+      <Filter>deps\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\jsoncpp\json_value.cpp">
+      <Filter>deps\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\jsoncpp\json_writer.cpp">
+      <Filter>deps\jsoncpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\pugixml\pugixml.cpp">
+      <Filter>deps\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\adler32.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\compress.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\crc32.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\deflate.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\gzclose.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\gzlib.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\gzread.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\gzwrite.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\infback.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\inffast.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\inflate.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\inftrees.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\trees.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\uncompr.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\deps\src\zlib\zutil.c">
+      <Filter>deps\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="base\html.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\crypto.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\oauth.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\url.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\dde.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\log.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\http_response.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\http.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\http_callback.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\http_request.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\base64.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\json.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="base\xml.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="third_party\pugixml\pugixml.hpp">
-      <Filter>include\pugixml</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\pugixml\pugiconfig.hpp">
-      <Filter>include\pugixml</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\oauth\oauth.h">
-      <Filter>include\oauth</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\base64\base64.h">
-      <Filter>include\base64</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\crc32.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\deflate.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\gzguts.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\inffast.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\inffixed.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\inflate.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\inftrees.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\trees.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\zconf.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\zlib.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\zlib\zutil.h">
-      <Filter>include\zlib</Filter>
-    </ClInclude>
     <ClInclude Include="ui\dlg\dlg_update.h">
       <Filter>ui\dlg</Filter>
     </ClInclude>
@@ -561,16 +513,10 @@
     <ClInclude Include="base\accessibility.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="base\dde.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="base\foreach.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\gfx.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="base\logger.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\optional.h">
@@ -583,9 +529,6 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\time.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="base\xml.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="taiga\api.h">
@@ -663,9 +606,6 @@
     <ClInclude Include="win\win_window.h">
       <Filter>win</Filter>
     </ClInclude>
-    <ClInclude Include="win\http\win_http.h">
-      <Filter>win\http</Filter>
-    </ClInclude>
     <ClInclude Include="win\ctrl\win_ctrl.h">
       <Filter>win\ctrl</Filter>
     </ClInclude>
@@ -676,9 +616,6 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="base\map.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="base\encryption.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="sync\service.h">
@@ -723,9 +660,6 @@
     <ClInclude Include="base\crc.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="base\encoding.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="library\discover.h">
       <Filter>library</Filter>
     </ClInclude>
@@ -759,39 +693,6 @@
     <ClInclude Include="ui\dialog.h">
       <Filter>ui</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\autolink.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\config.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\features.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\forwards.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\json.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\reader.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\value.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json\writer.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json_batchallocator.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\jsoncpp\json_tool.h">
-      <Filter>include\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="base\json.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="base\version.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -819,32 +720,134 @@
     <ClInclude Include="track\feed_filter.h">
       <Filter>track</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\curl.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\base64\base64.h">
+      <Filter>deps\base64</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\curlbuild.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\curl.h">
+      <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\curlrules.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\curlbuild.h">
+      <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\curlver.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\curlrules.h">
+      <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\easy.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\curlver.h">
+      <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\mprintf.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\easy.h">
+      <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\multi.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\mprintf.h">
+      <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\stdcheaders.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\multi.h">
+      <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\curl\typecheck-gcc.h">
-      <Filter>include\curl</Filter>
+    <ClInclude Include="..\deps\src\curl\stdcheaders.h">
+      <Filter>deps\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\curl\typecheck-gcc.h">
+      <Filter>deps\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\autolink.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\config.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\features.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\forwards.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\json.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\reader.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\value.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json\writer.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json_batchallocator.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\jsoncpp\json_tool.h">
+      <Filter>deps\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\pugixml\pugiconfig.hpp">
+      <Filter>deps\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\pugixml\pugixml.hpp">
+      <Filter>deps\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\crc32.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\deflate.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\gzguts.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\inffast.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\inffixed.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\inflate.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\inftrees.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\trees.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\zconf.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\zlib.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\deps\src\zlib\zutil.h">
+      <Filter>deps\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="base\html.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\crypto.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\oauth.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\url.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\dde.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\log.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\http.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\xml.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\base64.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\json.h">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -856,14 +859,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="third_party\jsoncpp\json_internalarray.inl">
-      <Filter>include\jsoncpp</Filter>
+    <None Include="..\deps\src\jsoncpp\json_internalarray.inl">
+      <Filter>deps\jsoncpp</Filter>
     </None>
-    <None Include="third_party\jsoncpp\json_internalmap.inl">
-      <Filter>include\jsoncpp</Filter>
+    <None Include="..\deps\src\jsoncpp\json_internalmap.inl">
+      <Filter>deps\jsoncpp</Filter>
     </None>
-    <None Include="third_party\jsoncpp\json_valueiterator.inl">
-      <Filter>include\jsoncpp</Filter>
+    <None Include="..\deps\src\jsoncpp\json_valueiterator.inl">
+      <Filter>deps\jsoncpp</Filter>
     </None>
   </ItemGroup>
 </Project>

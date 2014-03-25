@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_ENCRYPTION_H
-#define TAIGA_BASE_ENCRYPTION_H
+#ifndef TAIGA_BASE_BASE64_H
+#define TAIGA_BASE_BASE64_H
 
 #include <string>
 
-std::wstring SimpleEncrypt(std::wstring str);
-std::wstring SimpleDecrypt(std::wstring str);
+std::wstring Base64Decode(const std::wstring& str, bool for_filename = false);
+std::wstring Base64Encode(const std::wstring& str, bool for_filename = false);
 
-#endif  // TAIGA_BASE_ENCRYPTION_H
+#endif  // TAIGA_BASE_BASE64_H

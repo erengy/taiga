@@ -57,6 +57,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <AdditionalIncludeDirectories>..\deps\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -64,7 +65,7 @@
       <AdditionalDependencies>comctl32.lib;libcurl_debug.lib;Oleacc.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winhttp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type=%27win32%27 name=%27Microsoft.Windows.Common-Controls%27 version=%276.0.0.0%27 processorArchitecture=%27x86%27 publicKeyToken=%276595b64144ccf1df%27 language=%27*%27;%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
-      <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\deps\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -80,6 +81,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <AdditionalIncludeDirectories>..\deps\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,25 +92,52 @@
       <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type=%27win32%27 name=%27Microsoft.Windows.Common-Controls%27 version=%276.0.0.0%27 processorArchitecture=%27x86%27 publicKeyToken=%276595b64144ccf1df%27 language=%27*%27;%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
-      <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\deps\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\deps\src\base64\base64.cpp" />
+    <ClCompile Include="..\deps\src\jsoncpp\json_reader.cpp" />
+    <ClCompile Include="..\deps\src\jsoncpp\json_value.cpp" />
+    <ClCompile Include="..\deps\src\jsoncpp\json_writer.cpp" />
+    <ClCompile Include="..\deps\src\pugixml\pugixml.cpp" />
+    <ClCompile Include="..\deps\src\zlib\adler32.c" />
+    <ClCompile Include="..\deps\src\zlib\compress.c" />
+    <ClCompile Include="..\deps\src\zlib\crc32.c" />
+    <ClCompile Include="..\deps\src\zlib\deflate.c" />
+    <ClCompile Include="..\deps\src\zlib\gzclose.c" />
+    <ClCompile Include="..\deps\src\zlib\gzlib.c" />
+    <ClCompile Include="..\deps\src\zlib\gzread.c" />
+    <ClCompile Include="..\deps\src\zlib\gzwrite.c" />
+    <ClCompile Include="..\deps\src\zlib\infback.c" />
+    <ClCompile Include="..\deps\src\zlib\inffast.c" />
+    <ClCompile Include="..\deps\src\zlib\inflate.c" />
+    <ClCompile Include="..\deps\src\zlib\inftrees.c" />
+    <ClCompile Include="..\deps\src\zlib\trees.c" />
+    <ClCompile Include="..\deps\src\zlib\uncompr.c" />
+    <ClCompile Include="..\deps\src\zlib\zutil.c" />
     <ClCompile Include="base\accessibility.cpp" />
+    <ClCompile Include="base\base64.cpp" />
     <ClCompile Include="base\crc.cpp" />
+    <ClCompile Include="base\crypto.cpp" />
     <ClCompile Include="base\dde.cpp" />
-    <ClCompile Include="base\encoding.cpp" />
-    <ClCompile Include="base\encryption.cpp" />
     <ClCompile Include="base\file.cpp" />
     <ClCompile Include="base\gfx.cpp" />
     <ClCompile Include="base\gzip.cpp" />
+    <ClCompile Include="base\html.cpp" />
+    <ClCompile Include="base\http.cpp" />
+    <ClCompile Include="base\http_callback.cpp" />
+    <ClCompile Include="base\http_request.cpp" />
+    <ClCompile Include="base\http_response.cpp" />
     <ClCompile Include="base\json.cpp" />
-    <ClCompile Include="base\logger.cpp" />
+    <ClCompile Include="base\log.cpp" />
+    <ClCompile Include="base\oauth.cpp" />
     <ClCompile Include="base\process.cpp" />
     <ClCompile Include="base\string.cpp" />
     <ClCompile Include="base\time.cpp" />
     <ClCompile Include="base\timer.cpp" />
+    <ClCompile Include="base\url.cpp" />
     <ClCompile Include="base\version.cpp" />
     <ClCompile Include="base\xml.cpp" />
     <ClCompile Include="library\anime.cpp" />
@@ -143,27 +172,6 @@
     <ClCompile Include="taiga\taiga.cpp" />
     <ClCompile Include="taiga\timer.cpp" />
     <ClCompile Include="taiga\update.cpp" />
-    <ClCompile Include="third_party\base64\base64.cpp" />
-    <ClCompile Include="third_party\jsoncpp\json_reader.cpp" />
-    <ClCompile Include="third_party\jsoncpp\json_value.cpp" />
-    <ClCompile Include="third_party\jsoncpp\json_writer.cpp" />
-    <ClCompile Include="third_party\oauth\oauth.cpp" />
-    <ClCompile Include="third_party\pugixml\pugixml.cpp" />
-    <ClCompile Include="third_party\zlib\adler32.c" />
-    <ClCompile Include="third_party\zlib\compress.c" />
-    <ClCompile Include="third_party\zlib\crc32.c" />
-    <ClCompile Include="third_party\zlib\deflate.c" />
-    <ClCompile Include="third_party\zlib\gzclose.c" />
-    <ClCompile Include="third_party\zlib\gzlib.c" />
-    <ClCompile Include="third_party\zlib\gzread.c" />
-    <ClCompile Include="third_party\zlib\gzwrite.c" />
-    <ClCompile Include="third_party\zlib\infback.c" />
-    <ClCompile Include="third_party\zlib\inffast.c" />
-    <ClCompile Include="third_party\zlib\inflate.c" />
-    <ClCompile Include="third_party\zlib\inftrees.c" />
-    <ClCompile Include="third_party\zlib\trees.c" />
-    <ClCompile Include="third_party\zlib\uncompr.c" />
-    <ClCompile Include="third_party\zlib\zutil.c" />
     <ClCompile Include="track\feed.cpp" />
     <ClCompile Include="track\feed_filter.cpp" />
     <ClCompile Include="track\media.cpp" />
@@ -210,11 +218,6 @@
     <ClCompile Include="win\ctrl\win_ctrl_toolbar.cpp" />
     <ClCompile Include="win\ctrl\win_ctrl_tooltip.cpp" />
     <ClCompile Include="win\ctrl\win_ctrl_treeview.cpp" />
-    <ClCompile Include="win\http\win_http.cpp" />
-    <ClCompile Include="win\http\win_http_callback.cpp" />
-    <ClCompile Include="win\http\win_http_request.cpp" />
-    <ClCompile Include="win\http\win_http_response.cpp" />
-    <ClCompile Include="win\http\win_http_url.cpp" />
     <ClCompile Include="win\win_dialog.cpp" />
     <ClCompile Include="win\win_gdi.cpp" />
     <ClCompile Include="win\win_gdiplus.cpp" />
@@ -228,24 +231,61 @@
     <ClCompile Include="win\win_window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\deps\src\base64\base64.h" />
+    <ClInclude Include="..\deps\src\curl\curl.h" />
+    <ClInclude Include="..\deps\src\curl\curlbuild.h" />
+    <ClInclude Include="..\deps\src\curl\curlrules.h" />
+    <ClInclude Include="..\deps\src\curl\curlver.h" />
+    <ClInclude Include="..\deps\src\curl\easy.h" />
+    <ClInclude Include="..\deps\src\curl\mprintf.h" />
+    <ClInclude Include="..\deps\src\curl\multi.h" />
+    <ClInclude Include="..\deps\src\curl\stdcheaders.h" />
+    <ClInclude Include="..\deps\src\curl\typecheck-gcc.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\autolink.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\config.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\features.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\forwards.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\json.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\reader.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\value.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json\writer.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json_batchallocator.h" />
+    <ClInclude Include="..\deps\src\jsoncpp\json_tool.h" />
+    <ClInclude Include="..\deps\src\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="..\deps\src\pugixml\pugixml.hpp" />
+    <ClInclude Include="..\deps\src\zlib\crc32.h" />
+    <ClInclude Include="..\deps\src\zlib\deflate.h" />
+    <ClInclude Include="..\deps\src\zlib\gzguts.h" />
+    <ClInclude Include="..\deps\src\zlib\inffast.h" />
+    <ClInclude Include="..\deps\src\zlib\inffixed.h" />
+    <ClInclude Include="..\deps\src\zlib\inflate.h" />
+    <ClInclude Include="..\deps\src\zlib\inftrees.h" />
+    <ClInclude Include="..\deps\src\zlib\trees.h" />
+    <ClInclude Include="..\deps\src\zlib\zconf.h" />
+    <ClInclude Include="..\deps\src\zlib\zlib.h" />
+    <ClInclude Include="..\deps\src\zlib\zutil.h" />
     <ClInclude Include="base\accessibility.h" />
+    <ClInclude Include="base\base64.h" />
     <ClInclude Include="base\crc.h" />
+    <ClInclude Include="base\crypto.h" />
     <ClInclude Include="base\dde.h" />
-    <ClInclude Include="base\encoding.h" />
-    <ClInclude Include="base\encryption.h" />
     <ClInclude Include="base\file.h" />
     <ClInclude Include="base\foreach.h" />
     <ClInclude Include="base\gfx.h" />
     <ClInclude Include="base\gzip.h" />
+    <ClInclude Include="base\html.h" />
+    <ClInclude Include="base\http.h" />
     <ClInclude Include="base\json.h" />
-    <ClInclude Include="base\logger.h" />
+    <ClInclude Include="base\log.h" />
     <ClInclude Include="base\map.h" />
+    <ClInclude Include="base\oauth.h" />
     <ClInclude Include="base\optional.h" />
     <ClInclude Include="base\process.h" />
     <ClInclude Include="base\string.h" />
     <ClInclude Include="base\time.h" />
     <ClInclude Include="base\timer.h" />
     <ClInclude Include="base\types.h" />
+    <ClInclude Include="base\url.h" />
     <ClInclude Include="base\version.h" />
     <ClInclude Include="base\xml.h" />
     <ClInclude Include="library\anime.h" />
@@ -281,40 +321,6 @@
     <ClInclude Include="taiga\timer.h" />
     <ClInclude Include="taiga\update.h" />
     <ClInclude Include="taiga\version.h" />
-    <ClInclude Include="third_party\base64\base64.h" />
-    <ClInclude Include="third_party\curl\curl.h" />
-    <ClInclude Include="third_party\curl\curlbuild.h" />
-    <ClInclude Include="third_party\curl\curlrules.h" />
-    <ClInclude Include="third_party\curl\curlver.h" />
-    <ClInclude Include="third_party\curl\easy.h" />
-    <ClInclude Include="third_party\curl\mprintf.h" />
-    <ClInclude Include="third_party\curl\multi.h" />
-    <ClInclude Include="third_party\curl\stdcheaders.h" />
-    <ClInclude Include="third_party\curl\typecheck-gcc.h" />
-    <ClInclude Include="third_party\jsoncpp\json\autolink.h" />
-    <ClInclude Include="third_party\jsoncpp\json\config.h" />
-    <ClInclude Include="third_party\jsoncpp\json\features.h" />
-    <ClInclude Include="third_party\jsoncpp\json\forwards.h" />
-    <ClInclude Include="third_party\jsoncpp\json\json.h" />
-    <ClInclude Include="third_party\jsoncpp\json\reader.h" />
-    <ClInclude Include="third_party\jsoncpp\json\value.h" />
-    <ClInclude Include="third_party\jsoncpp\json\writer.h" />
-    <ClInclude Include="third_party\jsoncpp\json_batchallocator.h" />
-    <ClInclude Include="third_party\jsoncpp\json_tool.h" />
-    <ClInclude Include="third_party\oauth\oauth.h" />
-    <ClInclude Include="third_party\pugixml\pugiconfig.hpp" />
-    <ClInclude Include="third_party\pugixml\pugixml.hpp" />
-    <ClInclude Include="third_party\zlib\crc32.h" />
-    <ClInclude Include="third_party\zlib\deflate.h" />
-    <ClInclude Include="third_party\zlib\gzguts.h" />
-    <ClInclude Include="third_party\zlib\inffast.h" />
-    <ClInclude Include="third_party\zlib\inffixed.h" />
-    <ClInclude Include="third_party\zlib\inflate.h" />
-    <ClInclude Include="third_party\zlib\inftrees.h" />
-    <ClInclude Include="third_party\zlib\trees.h" />
-    <ClInclude Include="third_party\zlib\zconf.h" />
-    <ClInclude Include="third_party\zlib\zlib.h" />
-    <ClInclude Include="third_party\zlib\zutil.h" />
     <ClInclude Include="track\feed.h" />
     <ClInclude Include="track\feed_filter.h" />
     <ClInclude Include="track\media.h" />
@@ -346,7 +352,6 @@
     <ClInclude Include="ui\theme.h" />
     <ClInclude Include="ui\ui.h" />
     <ClInclude Include="win\ctrl\win_ctrl.h" />
-    <ClInclude Include="win\http\win_http.h" />
     <ClInclude Include="win\win_dialog.h" />
     <ClInclude Include="win\win_gdi.h" />
     <ClInclude Include="win\win_gdiplus.h" />
@@ -364,9 +369,9 @@
     <ResourceCompile Include="taiga\version.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="third_party\jsoncpp\json_internalarray.inl" />
-    <None Include="third_party\jsoncpp\json_internalmap.inl" />
-    <None Include="third_party\jsoncpp\json_valueiterator.inl" />
+    <None Include="..\deps\src\jsoncpp\json_internalarray.inl" />
+    <None Include="..\deps\src\jsoncpp\json_internalmap.inl" />
+    <None Include="..\deps\src\jsoncpp\json_valueiterator.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

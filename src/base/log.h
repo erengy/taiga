@@ -16,8 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_LOGGER_H
-#define TAIGA_BASE_LOGGER_H
+#ifndef TAIGA_BASE_LOG_H
+#define TAIGA_BASE_LOG_H
 
 #include <string>
 
@@ -59,4 +59,4 @@ extern class Logger Logger;
   Logger.Log(level, __FILEW__, __LINE__, __FUNCTIONW__, text)
 #endif
 
-#endif  // TAIGA_BASE_LOGGER_H
+#endif  // TAIGA_BASE_LOG_H

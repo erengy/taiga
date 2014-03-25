@@ -18,8 +18,10 @@
 
 #include <set>
 
-#include "base/encoding.h"
+#include "base/base64.h"
 #include "base/foreach.h"
+#include "base/html.h"
+#include "base/http.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"

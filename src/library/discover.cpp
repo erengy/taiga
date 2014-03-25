@@ -19,7 +19,7 @@
 #include <algorithm>
 
 #include "base/foreach.h"
-#include "base/logger.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"

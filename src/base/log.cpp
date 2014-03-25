@@ -20,7 +20,7 @@
 #include <fstream>
 
 #include "foreach.h"
-#include "logger.h"
+#include "log.h"
 #include "string.h"
 #include "time.h"
 

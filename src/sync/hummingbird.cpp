@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/http.h"
 #include "base/json.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -42,7 +43,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.host = host_;
 
   // Mashape requires HTTPS connections
-  http_request.protocol = win::http::kHttps;
+  http_request.protocol = base::http::kHttps;
 
   // Hummingbird is supposed to return a JSON response for each and every
   // request, so that's what we expect from it

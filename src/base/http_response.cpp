@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "win_http.h"
+#include "foreach.h"
+#include "http.h"
+#include "string.h"
+#include "url.h"
 
-#include "base/foreach.h"
-#include "base/string.h"
-
-namespace win {
+namespace base {
 namespace http {
 
 bool Client::GetResponseHeader(const std::wstring& header) {
@@ -89,4 +89,4 @@ bool Client::ParseResponseHeader() {
 }
 
 }  // namespace http
-}  // namespace win
+}  // namespace base

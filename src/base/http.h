@@ -16,11 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_WIN_HTTP_H
-#define TAIGA_WIN_HTTP_H
+#ifndef TAIGA_BASE_HTTP_H
+#define TAIGA_BASE_HTTP_H
 
-#define TAIGA_WIN_HTTP_MULTITHREADED
+// Each client will have its own thread
+#define TAIGA_HTTP_MULTITHREADED
 
+// CURL definitions
 #ifndef CURL_STATICLIB
 #define CURL_STATICLIB
 #endif
@@ -32,11 +34,12 @@
 #include <string>
 #include <vector>
 
-#include "base/map.h"
-#include "third_party/curl/curl.h"
+#include <curl/curl.h>
+
+#include "map.h"
 #include "win/win_thread.h"
 
-namespace win {
+namespace base {
 namespace http {
 
 typedef base::multimap<std::wstring, std::wstring> header_t;
@@ -51,6 +54,8 @@ enum Protocol {
   kHttp,
   kHttps
 };
+
+////////////////////////////////////////////////////////////////////////////////
 
 class Request {
 public:
@@ -85,6 +90,8 @@ public:
   std::wstring uuid;
   LPARAM parameter;
 };
+
+////////////////////////////////////////////////////////////////////////////////
 
 class CurlGlobal {
 public:
@@ -168,23 +175,7 @@ private:
   std::string optional_data_;
 };
 
-class Url {
-public:
-  Url() {}
-  Url(const std::wstring& url);
-  virtual ~Url() {}
-
-  void Crack(std::wstring url);
-
-  Url& operator=(const Url& url);
-  void operator=(const std::wstring& url);
-
-  std::wstring scheme;
-  std::wstring host;
-  std::wstring path;
-};
-
 }  // namespace http
-}  // namespace win
+}  // namespace base
 
-#endif  // TAIGA_WIN_HTTP_H
+#endif  // TAIGA_BASE_HTTP_H

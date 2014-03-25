@@ -16,14 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_JSON_H
-#define TAIGA_BASE_JSON_H
+#ifndef TAIGA_BASE_CRYPTO_H
+#define TAIGA_BASE_CRYPTO_H
 
 #include <string>
-#include <vector>
 
-#include <jsoncpp/json/json.h>
+std::wstring SimpleEncrypt(std::wstring str);
+std::wstring SimpleDecrypt(std::wstring str);
 
-bool JsonReadArray(const Json::Value& root, const std::string& name, std::vector<std::wstring>& output);
+std::string HmacSha1(const std::string& key_bytes, const std::string& data);
 
-#endif  // TAIGA_BASE_JSON_H
+#endif  // TAIGA_BASE_CRYPTO_H

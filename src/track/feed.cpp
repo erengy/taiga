@@ -18,11 +18,13 @@
 
 #include <algorithm>
 
-#include "base/encoding.h"
+#include "base/base64.h"
 #include "base/file.h"
 #include "base/foreach.h"
-#include "base/logger.h"
+#include "base/html.h"
+#include "base/log.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -98,7 +100,7 @@ bool Feed::Check(const std::wstring& source, bool automatic) {
       break;
   }
 
-  win::http::Url url(link);
+  Url url(link);
 
   HttpRequest http_request;
   http_request.host = url.host;
@@ -139,7 +141,7 @@ bool Feed::Download(int index) {
   ValidateFileName(file);
   file = GetDataPath() + file;
 
-  win::http::Url url(items[index].link);
+  Url url(items[index].link);
 
   HttpRequest http_request;
   http_request.host = url.host;
@@ -189,7 +191,7 @@ std::wstring Feed::GetDataPath() {
   std::wstring path = taiga::GetPath(taiga::kPathFeed);
 
   if (!link.empty()) {
-    win::http::Url url(link);
+    Url url(link);
     path += Base64Encode(url.host, true) + L"\\";
   }
 
