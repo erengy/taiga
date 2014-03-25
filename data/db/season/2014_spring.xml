@@ -34,7 +34,7 @@
 		<id name="hummingbird">fate-kaleid-liner-prisma-illya-2014</id>
 		<producers>Silver Link</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/50659.jpg</image>
-		<title>Fate/kaleid liner Prisma&#9734;Illya (2014)</title>
+		<title>Fate/kaleid liner Prisma&#9734;Illya OVA</title>
 	</anime>
 	<anime>
 		<type>1</type>
@@ -589,14 +589,6 @@
 		<title>Break Blade (TV)</title>
 	</anime>
 	<anime>
-		<type>2</type>
-		<id name="myanimelist">22463</id>
-		<id name="hummingbird" />
-		<producers>Production I.G</producers>
-		<image>http://cdn.myanimelist.net/images/anime/8/58681.jpg</image>
-		<title>xxxHOLiC: Rei</title>
-	</anime>
-	<anime>
 		<type>1</type>
 		<id name="myanimelist">22465</id>
 		<id name="hummingbird" />
@@ -739,5 +731,13 @@
 		<producers>Kadokawa Shoten</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/60097.jpg</image>
 		<title>Meshimase Lodoss-tou Senki: Sorette Oishii no?</title>
+	</anime>
+	<anime>
+		<type>4</type>
+		<id name="myanimelist">23237</id>
+		<id name="hummingbird" />
+		<producers />
+		<image>http://cdn.myanimelist.net/images/anime/13/60351.jpg</image>
+		<title>Chuunibyou demo Koi ga Shitai! Ren Specials</title>
 	</anime>
 </season>
