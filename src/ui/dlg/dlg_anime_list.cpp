@@ -1109,6 +1109,9 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
 
   if (index > -1) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
+    int icon_index = anime_item->GetPlaying() ?
+        ui::kIcon16_Play : StatusToIcon(anime_item->GetAiringStatus());
+    listview.SetItemIcon(index, icon_index);
     listview.SetItem(index, 2, anime::TranslateNumber(anime_item->GetMyScore()).c_str());
     listview.RedrawItems(index, index, true);
   }
