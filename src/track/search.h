@@ -21,15 +21,35 @@
 
 #include <string>
 
-namespace anime {
-class Item;
-}
+#include "base/file.h"
+#include "library/anime_episode.h"
 
-std::wstring SearchFileFolder(anime::Item& anime_item,
-                              const std::wstring& root,
-                              int episode_number,
-                              bool search_folder);
+class TaigaFileSearchHelper : public FileSearchHelper {
+public:
+  TaigaFileSearchHelper();
+  ~TaigaFileSearchHelper() {}
 
-void ScanAvailableEpisodes(int anime_id, bool check_folder, bool silent);
+  bool OnDirectory(const std::wstring& root, const std::wstring& name);
+  bool OnFile(const std::wstring& root, const std::wstring& name);
+
+  const std::wstring& path_found() const;
+
+  void set_anime_id(int anime_id);
+  void set_episode_number(int episode_number);
+  void set_path_found(const std::wstring& path_found);
+
+private:
+  int anime_id_;
+  anime::Episode episode_;
+  int episode_number_;
+  std::wstring path_found_;
+};
+
+extern TaigaFileSearchHelper file_search_helper;
+
+void ScanAvailableEpisodes(bool silent);
+void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number);
+void ScanAvailableEpisodesQuick();
+void ScanAvailableEpisodesQuick(int anime_id);
 
 #endif  // TAIGA_TRACK_SEARCH_H

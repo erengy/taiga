@@ -39,6 +39,10 @@ BOOL BrowseForFolder(HWND hwnd, const std::wstring& title, const std::wstring& d
 bool CreateFolder(const std::wstring& path);
 int DeleteFolder(std::wstring path);
 
+std::wstring GetExtendedLengthPath(const std::wstring& path);
+bool IsDirectory(const WIN32_FIND_DATA& find_data);
+bool IsValidDirectory(const WIN32_FIND_DATA& find_data);
+
 bool FileExists(const std::wstring& file);
 bool FolderExists(const std::wstring& folder);
 bool PathExists(const std::wstring& path);
@@ -54,5 +58,26 @@ bool ReadFromFile(const std::wstring& path, std::string& output);
 bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path, bool take_backup = false);
 
 std::wstring ToSizeString(QWORD qwSize);
+
+class FileSearchHelper {
+public:
+  FileSearchHelper();
+  virtual ~FileSearchHelper() {}
+
+  bool Search(const std::wstring& root);
+
+  virtual bool OnDirectory(const std::wstring& root, const std::wstring& name) = 0;
+  virtual bool OnFile(const std::wstring& root, const std::wstring& name) = 0;
+
+  void set_skip_directories(bool skip_directories);
+  void set_skip_files(bool skip_files);
+  void set_skip_subdirectories(bool skip_subdirectories);
+
+protected:
+  ULONGLONG minimum_file_size_;
+  bool skip_directories_;
+  bool skip_files_;
+  bool skip_subdirectories_;
+};
 
 #endif  // TAIGA_BASE_FILE_H

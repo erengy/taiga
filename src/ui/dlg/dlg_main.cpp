@@ -97,7 +97,7 @@ BOOL MainDialog::OnInitDialog() {
     sync::Synchronize();
   }
   if (Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes)) {
-    ScanAvailableEpisodes(anime::ID_UNKNOWN, false, true);
+    ScanAvailableEpisodesQuick();
   }
   if (!Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
     Show(Settings.GetBool(taiga::kApp_Position_Remember) && Settings.GetBool(taiga::kApp_Position_Maximized) ? 
@@ -358,7 +358,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           switch (navigation.GetCurrentPage()) {
             case kSidebarItemAnimeList:
               // Scan available episodes
-              ScanAvailableEpisodes(anime::ID_UNKNOWN, true, false);
+              ScanAvailableEpisodes(false);
               return TRUE;
             case kSidebarItemHistory:
               // Refresh history

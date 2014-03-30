@@ -256,9 +256,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Checks episode availability.
   } else if (action == L"ScanEpisodes") {
     int anime_id = static_cast<int>(lParam);
-    ScanAvailableEpisodes(anime_id, true, false);
+    ScanAvailableEpisodes(false, anime_id, 0);
   } else if (action == L"ScanEpisodesAll") {
-    ScanAvailableEpisodes(anime::ID_UNKNOWN, true, false);
+    ScanAvailableEpisodes(false);
 
   //////////////////////////////////////////////////////////////////////////////
   // Settings
@@ -447,14 +447,18 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"OpenFolder") {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (!anime_item || !anime_item->IsInList()) return;
-    ui::ChangeStatusText(L"Searching for folder...");
-    if (!anime::CheckFolder(*anime_item)) {
+    if (!anime_item || !anime_item->IsInList())
+      return;
+    if (anime_item->GetFolder().empty()) {
+      ScanAvailableEpisodes(false, anime_item->GetId(), 0);
+    }
+    if (anime_item->GetFolder().empty()) {
       if (ui::OnAnimeFolderNotFound()) {
         std::wstring default_path, path;
         if (!Settings.root_folders.empty())
           default_path = Settings.root_folders.front();
-        if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), L"Choose an anime folder", default_path, path)) {
+        if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
+                            L"Choose an anime folder", default_path, path)) {
           anime_item->SetFolder(path);
           Settings.Save();
         }
@@ -475,7 +479,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), title.c_str(), L"", path)) {
       anime_item->SetFolder(path);
       Settings.Save();
-      anime::CheckEpisodes(*anime_item);
+      ScanAvailableEpisodesQuick(anime_item->GetId());
     }
 
   //////////////////////////////////////////////////////////////////////////////

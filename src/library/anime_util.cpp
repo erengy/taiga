@@ -135,58 +135,6 @@ bool MetadataNeedsRefresh(const Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool CheckEpisodes(Item& item, int number, bool check_folder) {
-  // Check folder
-  if (check_folder)
-    CheckFolder(item);
-  if (item.GetFolder().empty()) {
-    for (int i = 1; i <= item.GetAvailableEpisodeCount(); i++)
-      item.SetEpisodeAvailability(i, false, L"");
-    return false;
-  }
-  
-  // Check all episodes
-  if (number == -1) {
-    SearchFileFolder(item, item.GetFolder(), -1, false);
-    return true;
-
-  // Check single episode
-  } else {
-    if (number == 0) {
-      if (item.IsNewEpisodeAvailable())
-        return true;
-      item.SetNewEpisodePath(L"");
-      number = item.GetEpisodeCount() == 1 ? 0 : item.GetMyLastWatchedEpisode() + 1;
-    }
-    std::wstring file = SearchFileFolder(item, item.GetFolder(), number, false);
-    return !file.empty();
-  }
-}
-
-bool CheckFolder(Item& item) {
-  // Check if current folder still exists
-  if (!item.GetFolder().empty() && !FolderExists(item.GetFolder())) {
-    LOG(LevelWarning, L"Folder doesn't exist anymore.");
-    LOG(LevelWarning, L"Path: " + item.GetFolder());
-    item.SetFolder(L"");
-  }
-
-  // Search root folders
-  if (item.GetFolder().empty()) {
-    std::wstring new_folder;
-    foreach_(it, Settings.root_folders) {
-      new_folder = SearchFileFolder(item, *it, 0, true);
-      if (!new_folder.empty()) {
-        item.SetFolder(new_folder);
-        Settings.Save();
-        break;
-      }
-    }
-  }
-
-  return !item.GetFolder().empty();
-}
-
 bool PlayEpisode(int anime_id, int number) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 
@@ -197,44 +145,31 @@ bool PlayEpisode(int anime_id, int number) {
       anime_item->GetEpisodeCount() != 0)
     return false;
 
-  std::wstring file_path;
+  if (number == 0)
+    number = 1;
 
-  ui::SetSharedCursor(IDC_WAIT);
+  std::wstring file_path;
 
   // Check saved episode path
   if (number == anime_item->GetMyLastWatchedEpisode() + 1)
     if (!anime_item->GetNewEpisodePath().empty())
       if (FileExists(anime_item->GetNewEpisodePath()))
         file_path = anime_item->GetNewEpisodePath();
-  
-  // Check anime folder
-  if (file_path.empty()) {
-    CheckFolder(*anime_item);
-    if (!anime_item->GetFolder().empty()) {
-      file_path = SearchFileFolder(*anime_item, anime_item->GetFolder(),
-                                   number, false);
-    }
-  }
 
-  // Check other folders
+  // Scan available episodes
   if (file_path.empty()) {
-    foreach_(it, Settings.root_folders) {
-      file_path = SearchFileFolder(*anime_item, *it, number, false);
-      if (!file_path.empty())
-        break;
+    ScanAvailableEpisodes(false, anime_item->GetId(), number);
+    if (anime_item->IsEpisodeAvailable(number)) {
+      file_path = file_search_helper.path_found();
     }
   }
 
   if (file_path.empty()) {
-    if (number == 0)
-      number = 1;
     ui::ChangeStatusText(L"Could not find episode #" + ToWstr(number) +
                          L" (" + anime_item->GetTitle() + L").");
   } else {
     Execute(file_path);
   }
-
-  ui::SetSharedCursor(IDC_ARROW);
 
   return !file_path.empty();
 }
@@ -265,7 +200,7 @@ bool PlayRandomAnime() {
   static time_t time_last_checked = 0;
   time_t time_now = time(nullptr);
   if (time_now > time_last_checked + (60 * 2)) {  // 2 minutes
-    ScanAvailableEpisodes(ID_UNKNOWN, false, false);
+    ScanAvailableEpisodesQuick();
     time_last_checked = time_now;
   }
 
@@ -300,22 +235,16 @@ bool PlayRandomAnime() {
 }
 
 bool PlayRandomEpisode(Item& item) {
-  if (CheckFolder(item)) {
-    int total = item.GetEpisodeCount();
-    if (total == 0)
-      total = item.GetMyLastWatchedEpisode() + 1;
+  const int total = item.GetMyStatus() == kCompleted ?
+      item.GetEpisodeCount() : item.GetMyLastWatchedEpisode() + 1;
+  const int max_tries = item.GetFolder().empty() ? 3 : 10;
 
-    srand(static_cast<unsigned int>(GetTickCount()));
+  srand(static_cast<unsigned int>(GetTickCount()));
 
-    for (int i = 0; i < total; i++) {
-      int episode_number = rand() % total + 1;
-      std::wstring path =
-          SearchFileFolder(item, item.GetFolder(), episode_number, false);
-      if (!path.empty()) {
-        Execute(path);
-        return true;
-      }
-    }
+  for (int i = 0; i < min(total, max_tries); i++) {
+    int episode_number = rand() % total + 1;
+    if (PlayEpisode(item.GetId(), episode_number))
+      return true;
   }
 
   ui::OnAnimeEpisodeNotFound();
@@ -589,11 +518,18 @@ bool IsEpisodeRange(const std::wstring& episode_number) {
   return GetEpisodeLow(episode_number) != GetEpisodeHigh(episode_number);
 }
 
-bool IsValidEpisode(int episode, int watched, int total) {
+bool IsValidEpisode(int episode, int total) {
   if ((episode < 0) ||
-      (episode < watched) ||
-      (episode == watched && total != 1) ||
       (episode > total && total != 0))
+    return false;
+
+  return true;
+}
+
+bool IsValidEpisode(int episode, int watched, int total) {
+  if (!IsValidEpisode(episode, total) ||
+      (episode < watched) ||
+      (episode == watched && total != 1))
     return false;
 
   return true;

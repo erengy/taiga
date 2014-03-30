@@ -28,6 +28,7 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/search.h"
 #include "ui/ui.h"
 
 class ConfirmationQueue ConfirmationQueue;
@@ -125,7 +126,8 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
   }
   // ...or add a new one
   if (add_new_item) {
-    if (item.time.empty()) item.time = (std::wstring)GetDate() + L" " + GetTime();
+    if (item.time.empty())
+      item.time = (std::wstring)GetDate() + L" " + GetTime();
     items.push_back(item);
   }
 
@@ -145,7 +147,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
     // Check new episode
     if (item.episode) {
       anime->SetNewEpisodePath(L"");
-      anime::CheckEpisodes(*anime, 0);
+      ScanAvailableEpisodesQuick(anime->GetId());
     }
 
     ui::OnHistoryAddItem(item);

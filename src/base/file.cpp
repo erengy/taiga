@@ -20,6 +20,7 @@
 #include <shlobj.h>
 
 #include "file.h"
+#include "log.h"
 #include "string.h"
 #include "win/win_main.h"
 #include "win/win_registry.h"
@@ -95,10 +96,10 @@ QWORD GetFileSize(const std::wstring& path) {
 
 QWORD GetFolderSize(const std::wstring& path, bool recursive) {
   QWORD folder_size = 0;
-  
-  WIN32_FIND_DATA wfd;
+
+  WIN32_FIND_DATA find_data;
   std::wstring file_name = path + L"*.*";
-  HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
+  HANDLE file_handle = FindFirstFile(file_name.c_str(), &find_data);
 
   if (file_handle == INVALID_HANDLE_VALUE)
     return 0;
@@ -106,17 +107,17 @@ QWORD GetFolderSize(const std::wstring& path, bool recursive) {
   QWORD max_dword = static_cast<QWORD>(MAXDWORD) + 1;
 
   do {
-    if (recursive && wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-      if (wcscmp(wfd.cFileName, L".") != 0 &&
-          wcscmp(wfd.cFileName, L"..") != 0) {
-        file_name = path + wfd.cFileName + L"\\";
+    if (IsDirectory(find_data)) {
+      if (recursive && IsValidDirectory(find_data)) {
+        file_name = path + find_data.cFileName + L"\\";
         folder_size += GetFolderSize(file_name, recursive);
       }
+    } else {
+      folder_size += static_cast<QWORD>(find_data.nFileSizeHigh) * max_dword +
+                     static_cast<QWORD>(find_data.nFileSizeLow);
     }
-    folder_size += static_cast<QWORD>(wfd.nFileSizeHigh) * max_dword +
-                   static_cast<QWORD>(wfd.nFileSizeLow);
-  } while (FindNextFile(file_handle, &wfd));
-	
+  } while (FindNextFile(file_handle, &find_data));
+
   FindClose(file_handle);
 
   return folder_size;
@@ -309,6 +310,22 @@ int DeleteFolder(std::wstring path) {
   return SHFileOperation(&fos);
 }
 
+// Extends the length limit from 260 to 32767 characters
+std::wstring GetExtendedLengthPath(const std::wstring& path) {
+  if (!StartsWith(path, L"\\\\?\\"))
+    return L"\\\\?\\" + path;
+  return path;
+}
+
+bool IsDirectory(const WIN32_FIND_DATA& find_data) {
+  return (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+}
+
+bool IsValidDirectory(const WIN32_FIND_DATA& find_data) {
+  return wcscmp(find_data.cFileName, L".") != 0 &&
+         wcscmp(find_data.cFileName, L"..") != 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 bool FileExists(const std::wstring& file) {
@@ -381,9 +398,9 @@ unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
   if (path.empty())
     return 0;
 
-  WIN32_FIND_DATA wfd;
+  WIN32_FIND_DATA find_data;
   std::wstring file_name = path + L"*.*";
-  HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
+  HANDLE file_handle = FindFirstFile(file_name.c_str(), &find_data);
 
   if (file_handle == INVALID_HANDLE_VALUE)
     return 0;
@@ -391,26 +408,24 @@ unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
   unsigned int file_count = 0;
 
   do {
-    if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-      if (recursive &&
-          wcscmp(wfd.cFileName, L".") != 0 &&
-          wcscmp(wfd.cFileName, L"..") != 0) {
-        file_name = path + wfd.cFileName + L"\\";
+    if (IsDirectory(find_data)) {
+      if (recursive && IsValidDirectory(find_data)) {
+        file_name = path + find_data.cFileName + L"\\";
         file_count += PopulateFiles(file_list, file_name, extension, recursive,
                                     trim_extension);
       }
-    } else if (wfd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY) {
+    } else {
       if (extension.empty() ||
-          IsEqual(GetFileExtension(wfd.cFileName), extension)) {
+          IsEqual(GetFileExtension(find_data.cFileName), extension)) {
         if (trim_extension) {
-          file_list.push_back(GetFileWithoutExtension(wfd.cFileName));
+          file_list.push_back(GetFileWithoutExtension(find_data.cFileName));
         } else {
-          file_list.push_back(wfd.cFileName);
+          file_list.push_back(find_data.cFileName);
         }
         file_count++;
       }
     }
-  } while (FindNextFile(file_handle, &wfd));
+  } while (FindNextFile(file_handle, &find_data));
 
   FindClose(file_handle);
 
@@ -422,9 +437,9 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
   if (path.empty())
     return 0;
 
-  WIN32_FIND_DATA wfd;
+  WIN32_FIND_DATA find_data;
   std::wstring file_name = path + L"*.*";
-  HANDLE file_handle = FindFirstFile(file_name.c_str(), &wfd);
+  HANDLE file_handle = FindFirstFile(file_name.c_str(), &find_data);
 
   if (file_handle == INVALID_HANDLE_VALUE)
     return 0;
@@ -432,14 +447,11 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
   int folder_count = 0;
 
   do {
-    if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-      if (wcscmp(wfd.cFileName, L".") != 0 &&
-          wcscmp(wfd.cFileName, L"..") != 0) {
-        folder_count++;
-        folder_list.push_back(wfd.cFileName);
-      }
+    if (IsDirectory(find_data) && IsValidDirectory(find_data)) {
+      folder_count++;
+      folder_list.push_back(find_data.cFileName);
     }
-  } while (FindNextFile(file_handle, &wfd));
+  } while (FindNextFile(file_handle, &find_data));
 
   FindClose(file_handle);
 
@@ -509,4 +521,82 @@ std::wstring ToSizeString(QWORD qwSize) {
   }
 
   return size + unit;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+FileSearchHelper::FileSearchHelper()
+    : minimum_file_size_(0),
+      skip_directories_(false),
+      skip_files_(false),
+      skip_subdirectories_(false) {
+}
+
+bool FileSearchHelper::Search(const std::wstring& root) {
+  if (root.empty())
+    return false;
+  if (skip_directories_ && skip_files_)
+    return false;
+
+  std::wstring path = AddTrailingSlash(GetExtendedLengthPath(root)) + L"*";
+  bool result = false;
+
+  WIN32_FIND_DATA find_data;
+  HANDLE handle = FindFirstFile(path.c_str(), &find_data);
+
+  do {
+    if (handle == INVALID_HANDLE_VALUE) {
+      LOG(LevelError, Logger::FormatError(GetLastError()));
+      LOG(LevelError, L"Path: " + path);
+      SetLastError(ERROR_SUCCESS);
+      return false;
+    }
+
+    // Directory
+    if (IsDirectory(find_data)) {
+      if (IsValidDirectory(find_data)) {
+        if (!skip_directories_)
+          result = OnDirectory(root, find_data.cFileName);
+        if (!skip_subdirectories_ && !result)
+          result = Search(AddTrailingSlash(root) + find_data.cFileName);
+      }
+
+    // File
+    } else if (!skip_files_) {
+      if (find_data.nFileSizeLow < minimum_file_size_) {
+        LOG(LevelDebug,
+            L"File is ignored because its size does not meet the threshold.");
+        LOG(LevelDebug,
+            L"Path: " + AddTrailingSlash(root) + find_data.cFileName);
+        continue;
+      }
+      result = OnFile(root, find_data.cFileName);
+    }
+
+  } while (!result && FindNextFile(handle, &find_data));
+
+  FindClose(handle);
+  return result;
+}
+
+bool FileSearchHelper::OnDirectory(const std::wstring& root,
+                                   const std::wstring& name) {
+  return false;
+}
+
+bool FileSearchHelper::OnFile(const std::wstring& root,
+                              const std::wstring& name) {
+  return false;
+}
+
+void FileSearchHelper::set_skip_directories(bool skip_directories) {
+  skip_directories_ = skip_directories;
+}
+
+void FileSearchHelper::set_skip_files(bool skip_files) {
+  skip_files_ = skip_files;
+}
+
+void FileSearchHelper::set_skip_subdirectories(bool skip_subdirectories) {
+  skip_subdirectories_ = skip_subdirectories;
 }

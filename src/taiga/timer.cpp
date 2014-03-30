@@ -64,7 +64,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerLibrary:
-      ScanAvailableEpisodes(anime::ID_UNKNOWN, false, true);
+      ScanAvailableEpisodesQuick();
       break;
 
     case kTimerMedia:

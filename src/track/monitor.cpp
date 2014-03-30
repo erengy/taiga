@@ -23,9 +23,10 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
+#include "taiga/settings.h"
 #include "track/monitor.h"
 #include "track/recognition.h"
-#include "taiga/settings.h"
+#include "track/search.h"
 
 class FolderMonitor FolderMonitor;
 
@@ -305,10 +306,11 @@ void FolderMonitor::OnChange(FolderInfo& folder_info) {
 void ChangeAnimeFolder(anime::Item& anime_item, const std::wstring& path) {
   anime_item.SetFolder(path);
   Settings.Save();
-  anime::CheckEpisodes(anime_item);
 
   LOG(LevelDebug, L"Anime folder changed: " + anime_item.GetTitle());
   LOG(LevelDebug, L"Path: " + anime_item.GetFolder());
+
+  ScanAvailableEpisodesQuick(anime_item.GetId());
 }
 
 void FolderMonitor::HandleAnime(const std::wstring& path,
