@@ -86,11 +86,11 @@ BOOL DynamicDataExchange::ClientTransaction(const std::wstring& item,
                                             UINT wType) {
   DWORD dwResult = 0;
   HSZ hszItem = wType != XTYP_EXECUTE ? CreateStringHandle(item) : nullptr;
-  
+
   HDDEDATA hData = ::DdeClientTransaction(
       is_unicode_ ? (LPBYTE)data.data() : (LPBYTE)WstrToStr(data).data(),
       is_unicode_ ? (data.size() + 1) * sizeof(WCHAR) : data.size() + 1,
-      conversation_, 
+      conversation_,
       hszItem,
       is_unicode_ ? CF_UNICODETEXT : CF_TEXT,
       wType,
@@ -146,7 +146,7 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt,
   //DdeQueryStringA(instance_, hsz1, sz1, 256, CP_WINANSI);
   //DdeQueryStringA(instance_, hsz2, sz2, 256, CP_WINANSI);
 
-  switch (uType) { 
+  switch (uType) {
     case XTYP_CONNECT: {
       OutputDebugStringA("[CONNECT]\n");
       //BOOL result = OnConnect();
@@ -185,7 +185,7 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt,
       break;
   }
 
-  return reinterpret_cast<HDDEDATA>(0); 
+  return reinterpret_cast<HDDEDATA>(0);
 }
 
 }  // namespace base

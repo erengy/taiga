@@ -66,7 +66,7 @@ int Statistics::CalculateAnimeCount() {
 
 int Statistics::CalculateEpisodeCount() {
   episode_count = 0;
-  
+
   foreach_(it, AnimeDatabase.items) {
     if (!it->second.IsInList())
       continue;
@@ -84,7 +84,7 @@ int Statistics::CalculateEpisodeCount() {
 const std::wstring& Statistics::CalculateLifeSpentWatching() {
   int duration = 0;
   int seconds = 0;
-  
+
   foreach_(it, AnimeDatabase.items) {
     if (!it->second.IsInList())
       continue;
@@ -110,7 +110,7 @@ const std::wstring& Statistics::CalculateLifeSpentWatching() {
 
     seconds += (duration * 60) * episodes_watched;
   }
-  
+
   if (seconds > 0) {
     life_spent_watching = ToDateString(seconds);
   } else {
@@ -136,7 +136,7 @@ void Statistics::CalculateLocalData() {
 float Statistics::CalculateMeanScore() {
   float items_scored = 0.0f;
   float sum_scores = 0.0f;
-  
+
   foreach_(it, AnimeDatabase.items) {
     if (!it->second.IsInList())
       continue;
@@ -146,16 +146,16 @@ float Statistics::CalculateMeanScore() {
       items_scored++;
     }
   }
-  
+
   score_mean = items_scored > 0 ? (sum_scores / items_scored) : 0.0f;
-  
+
   return score_mean;
 }
 
 float Statistics::CalculateScoreDeviation() {
   float items_scored = 0.0f;
   float sum_squares = 0.0f;
-  
+
   foreach_(it, AnimeDatabase.items) {
     if (!it->second.IsInList())
       continue;
@@ -166,7 +166,7 @@ float Statistics::CalculateScoreDeviation() {
       items_scored++;
     }
   }
-  
+
   score_deviation = items_scored > 0 ? sqrt(sum_squares / items_scored) : 0.0f;
 
   return score_deviation;

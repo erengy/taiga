@@ -29,11 +29,11 @@ public:
   // file exists.
   bool Load(std::wstring file);
 
-  // Checkes if a significant portion of season data is empty and requires 
+  // Checkes if a significant portion of season data is empty and requires
   // refreshing.
   bool IsRefreshRequired();
 
-  // Improves season data by excluding invalid items (i.e. postpones series) and 
+  // Improves season data by excluding invalid items (i.e. postpones series) and
   // adding missing ones from the anime database.
   void Review(bool hide_hentai = true);
 

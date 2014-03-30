@@ -25,7 +25,7 @@ AccessibleChild::AccessibleChild()
 }
 
 AccessibleObject::AccessibleObject()
-    : acc_(nullptr), 
+    : acc_(nullptr),
       win_event_hook_(nullptr) {
 }
 
@@ -224,7 +224,7 @@ bool AccessibleObject::AllowChildTraverse(AccessibleChild& child,
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef _DEBUG
-HWINEVENTHOOK AccessibleObject::Hook(DWORD eventMin, DWORD eventMax, 
+HWINEVENTHOOK AccessibleObject::Hook(DWORD eventMin, DWORD eventMax,
                                      HMODULE hmodWinEventProc,
                                      WINEVENTPROC pfnWinEventProc,
                                      DWORD idProcess, DWORD idThread,
@@ -232,7 +232,7 @@ HWINEVENTHOOK AccessibleObject::Hook(DWORD eventMin, DWORD eventMax,
   Unhook();
 
   win_event_hook_ = SetWinEventHook(eventMin, eventMax,
-                                    hmodWinEventProc, 
+                                    hmodWinEventProc,
                                     pfnWinEventProc,
                                     idProcess, idThread,
                                     dwFlags);
@@ -251,14 +251,14 @@ void AccessibleObject::Unhook() {
   }
 }
 
-void CALLBACK WinEventFunc(HWINEVENTHOOK hook, DWORD dwEvent, HWND hwnd, 
-                           LONG idObject, LONG idChild, 
+void CALLBACK WinEventFunc(HWINEVENTHOOK hook, DWORD dwEvent, HWND hwnd,
+                           LONG idObject, LONG idChild,
                            DWORD dwEventThread, DWORD dwmsEventTime) {
   IAccessible* acc = nullptr;
   VARIANT var_child;
   HRESULT hr = AccessibleObjectFromEvent(hwnd, idObject, idChild, &acc,
                                          &var_child);
-  
+
   if (hr == S_OK && acc != nullptr) {
     BSTR name;
     acc->get_accName(var_child, &name);

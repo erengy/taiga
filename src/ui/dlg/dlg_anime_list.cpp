@@ -290,7 +290,7 @@ LRESULT AnimeListDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   } else if (idCtrl == IDC_TAB_MAIN) {
     return OnTabNotify(reinterpret_cast<LPARAM>(pnmh));
   }
-  
+
   return 0;
 }
 

@@ -135,9 +135,9 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
 void DownloadImage(int id, const string_t& image_url) {
   if (image_url.empty())
     return;
-  
+
   Url url(image_url);
-  
+
   HttpRequest http_request;
   http_request.host = url.host;
   http_request.path = url.path;

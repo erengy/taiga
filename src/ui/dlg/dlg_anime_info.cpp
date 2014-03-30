@@ -642,7 +642,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"<a href=\"AddToListAs(1)\">Add to list</a>";
     }
     content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
-    if (anime_item->GetEpisodeCount() == 0 || 
+    if (anime_item->GetEpisodeCount() == 0 ||
         anime_item->GetEpisodeCount() > episode_number) {
       content += L" \u2022 <a href=\"PlayEpisode(" + ToWstr(episode_number + 1) + L"\">Watch next episode</a>";
     }

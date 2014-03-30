@@ -140,7 +140,7 @@ void Announcer::ToMessenger(const std::wstring& artist,
   COPYDATASTRUCT cds;
   WCHAR buffer[256];
 
-  std::wstring wstr = L"\\0Music\\0" + ToWstr(show) + L"\\0{1}\\0" + 
+  std::wstring wstr = L"\\0Music\\0" + ToWstr(show) + L"\\0{1}\\0" +
                       artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
   wcscpy_s(buffer, 256, wstr.c_str());
 
@@ -292,7 +292,7 @@ bool Skype::SendCommand(const std::wstring& command) {
   cds.cbData = strlen(buffer) + 1;
 
   if (SendMessage(hwnd_skype, WM_COPYDATA,
-                  reinterpret_cast<WPARAM>(hwnd), 
+                  reinterpret_cast<WPARAM>(hwnd),
                   reinterpret_cast<LPARAM>(&cds)) == FALSE) {
     LOG(LevelError, L"WM_COPYDATA failed.");
     hwnd_skype = nullptr;
@@ -517,7 +517,7 @@ void Twitter::HandleHttpResponse(HttpClientMode mode,
 }
 
 void Announcer::ToTwitter(const std::wstring& status_text) {
-  ::Twitter.SetStatusText(status_text); 
+  ::Twitter.SetStatusText(status_text);
 }
 
 }  // namespace taiga

@@ -93,7 +93,7 @@ std::wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR name) {
   UINT_PTR index = ::TrackPopupMenuEx(menu_handles.front(),
                                       flags, x, y, hwnd, nullptr);
 
-  for (auto it = menu_handles.begin(); it != menu_handles.end(); ++it) 
+  for (auto it = menu_handles.begin(); it != menu_handles.end(); ++it)
     ::DestroyMenu(*it);
 
   if (index > 0) {

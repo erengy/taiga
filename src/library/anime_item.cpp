@@ -116,7 +116,7 @@ std::vector<std::wstring> Item::GetSynonyms() const {
   foreach_(it, metadata_.alternative)
     if (it->type == library::kTitleTypeSynonym)
       synonyms.push_back(it->value);
-  
+
   return synonyms;
 }
 
@@ -336,7 +336,7 @@ int Item::GetMyLastWatchedEpisode(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ? 
+  HistoryItem* history_item = check_queue ?
       SearchHistory(kQueueSearchEpisode) : nullptr;
 
   return history_item ? *history_item->episode : my_info_->watched_episodes;
@@ -346,7 +346,7 @@ int Item::GetMyScore(bool check_queue) const {
   if (!my_info_.get())
     return 0;
 
-  HistoryItem* history_item = check_queue ? 
+  HistoryItem* history_item = check_queue ?
       SearchHistory(kQueueSearchScore) : nullptr;
 
   return history_item ? *history_item->score : my_info_->score;
@@ -356,7 +356,7 @@ int Item::GetMyStatus(bool check_queue) const {
   if (!my_info_.get())
     return kNotInList;
 
-  HistoryItem* history_item = check_queue ? 
+  HistoryItem* history_item = check_queue ?
       SearchHistory(kQueueSearchStatus) : nullptr;
 
   return history_item ? *history_item->status : my_info_->status;
@@ -366,7 +366,7 @@ int Item::GetMyRewatching(bool check_queue) const {
   if (!my_info_.get())
     return FALSE;
 
-  HistoryItem* history_item = check_queue ? 
+  HistoryItem* history_item = check_queue ?
     SearchHistory(kQueueSearchRewatching) : nullptr;
 
   return history_item ? *history_item->enable_rewatching : my_info_->rewatching;
@@ -383,7 +383,7 @@ const Date& Item::GetMyDateStart(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  HistoryItem* history_item = check_queue ? 
+  HistoryItem* history_item = check_queue ?
       SearchHistory(kQueueSearchDateStart) : nullptr;
 
   return history_item ? *history_item->date_start : my_info_->date_start;
@@ -393,7 +393,7 @@ const Date& Item::GetMyDateEnd(bool check_queue) const {
   if (!my_info_.get())
     return EmptyDate();
 
-  HistoryItem* history_item = check_queue ? 
+  HistoryItem* history_item = check_queue ?
       SearchHistory(kQueueSearchDateEnd) : nullptr;
 
   return history_item ? *history_item->date_finish : my_info_->date_finish;
@@ -410,7 +410,7 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
   if (!my_info_.get())
     return EmptyString();
 
-  HistoryItem* history_item = check_queue ? 
+  HistoryItem* history_item = check_queue ?
     SearchHistory(kQueueSearchTags) : nullptr;
 
   return history_item ? *history_item->tags : my_info_->tags;
@@ -525,7 +525,7 @@ bool Item::SetEpisodeAvailability(int number, bool available,
                                   const std::wstring& path) {
   if (number == 0)
     number = 1;
-  
+
   if (number <= GetEpisodeCount() || GetEpisodeCount() == 0) {
     if (static_cast<size_t>(number) > local_info_.available_episodes.size()) {
       local_info_.available_episodes.resize(number);
@@ -539,7 +539,7 @@ bool Item::SetEpisodeAvailability(int number, bool available,
 
     return true;
   }
-  
+
   return false;
 }
 

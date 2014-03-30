@@ -218,7 +218,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   }
 
   xml_node node_myanimelist = document.child(L"myanimelist");
-  
+
   // Available tags:
   // - user_id
   // - user_name

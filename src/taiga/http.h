@@ -59,7 +59,7 @@ public:
 
   HttpClient();
   virtual ~HttpClient() {}
-  
+
   HttpClientMode mode() const;
   void set_mode(HttpClientMode mode);
 

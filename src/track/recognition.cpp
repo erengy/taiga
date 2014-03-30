@@ -443,7 +443,7 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
 
   //////////////////////////////////////////////////////////////////////////////
   // Get episode number and version, if available
-  
+
   if (examine_number) {
     // Check remaining tokens first
     foreach_(token, tokens) {
@@ -521,7 +521,7 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
           }
         }
       }
-  
+
       // Build title and name
       for (int i = 0; i < static_cast<int>(words.size()); i++) {
         if (number_index == -1 || i < number_index) {
@@ -584,7 +584,7 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
 
 void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode,
                                      bool compare_extras) {
-  // Split into words. The most common non-alphanumeric character is the 
+  // Split into words. The most common non-alphanumeric character is the
   // separator.
   std::vector<std::wstring> words;
   token.separator = GetMostCommonCharacter(token.content);
@@ -609,7 +609,7 @@ void RecognitionEngine::ExamineToken(Token& token, anime::Episode& episode,
       continue;
     #define RemoveWordFromToken(b) { \
       Erase(token.content, *word, b); token.untouched = false; }
-    
+
     // Checksum
     if (episode.checksum.empty() && word->length() == 8 && IsHex(*word)) {
       episode.checksum = *word;
@@ -775,7 +775,7 @@ bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str,
         }
         episode.version = str.substr(i + 1);
         return true;
-      
+
       // *# of #*
       } else if (str.at(i) == separator) {
         if (str.length() < i + 5)

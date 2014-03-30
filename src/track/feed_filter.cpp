@@ -506,18 +506,18 @@ void FeedFilterManager::InitializePresets() {
 
   // Custom
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
-      L"(Custom)", 
+      L"(Custom)",
       L"Lets you create a custom filter from scratch");
 
   // Fansub group
   ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAll, false, kFeedFilterOptionDefault,
-      L"[Fansub] Anime", 
+      L"[Fansub] Anime",
       L"Lets you choose a fansub group for one or more anime");
   ADD_CONDITION(kFeedFilterElement_Episode_Group, kFeedFilterOperator_Equals, L"TaigaSubs (change this)");
 
   // Discard bad video keywords
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
-      L"Discard bad video keywords", 
+      L"Discard bad video keywords",
       L"Discards everything that is AVI, DIVX, LQ, RMVB, SD, WMV or XVID");
   ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"AVI");
   ADD_CONDITION(kFeedFilterElement_Episode_VideoType, kFeedFilterOperator_Contains, L"DIVX");
@@ -529,7 +529,7 @@ void FeedFilterManager::InitializePresets() {
 
   // Prefer new versions
   ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAny, false, kFeedFilterOptionDefault,
-      L"Prefer new versions", 
+      L"Prefer new versions",
       L"Prefers v2 files and above when there are earlier releases of the same episode as well");
   ADD_CONDITION(kFeedFilterElement_Episode_Version, kFeedFilterOperator_IsGreaterThan, L"1");
 
@@ -537,26 +537,26 @@ void FeedFilterManager::InitializePresets() {
 
   // Select currently watching
   ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
-      L"Select currently watching", 
+      L"Select currently watching",
       L"Selects files that belong to anime that you're currently watching");
   ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kWatching));
 
   // Discard unknown titles
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
-      L"Discard unknown titles", 
+      L"Discard unknown titles",
       L"Discards files that do not belong to any anime in your list");
   ADD_CONDITION(kFeedFilterElement_Meta_Id, kFeedFilterOperator_Equals, L"");
 
   // Discard watched and available episodes
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
-      L"Discard watched and available episodes", 
+      L"Discard watched and available episodes",
       L"Discards episodes you've already watched or downloaded");
   ADD_CONDITION(kFeedFilterElement_Episode_Number, kFeedFilterOperator_IsLessThanOrEqualTo, L"%watched%");
   ADD_CONDITION(kFeedFilterElement_Local_EpisodeAvailable, kFeedFilterOperator_Equals, L"True");
 
   // Prefer high-resolution files
   ADD_PRESET(kFeedFilterActionPrefer, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,
-      L"Prefer high-resolution files", 
+      L"Prefer high-resolution files",
       L"Prefers 720p files when there are other files of the same episode as well");
   ADD_CONDITION(kFeedFilterElement_Episode_VideoResolution, kFeedFilterOperator_Equals, L"720p");
 

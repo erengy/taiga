@@ -86,8 +86,8 @@ void RichEdit::SetSel(CHARRANGE* cr) {
 
 UINT RichEdit::SetTextEx(const std::string& text) {
   SETTEXTEX ste;
-  return SendMessage(EM_SETTEXTEX, 
-                     reinterpret_cast<WPARAM>(&ste), 
+  return SendMessage(EM_SETTEXTEX,
+                     reinterpret_cast<WPARAM>(&ste),
                      reinterpret_cast<LPARAM>(text.data()));
 }
 

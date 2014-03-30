@@ -44,7 +44,7 @@ BOOL FormatDialog::OnInitDialog() {
     case kFormatModeHttp:
       SetText(L"Edit format - HTTP request");
       rich_edit_.SetText(Settings[taiga::kShare_Http_Format].c_str());
-      break;    
+      break;
     case kFormatModeMessenger:
       SetText(L"Edit format - Messenger");
       rich_edit_.SetText(Settings[taiga::kShare_Messenger_Format].c_str());
@@ -97,7 +97,7 @@ void FormatDialog::OnOK() {
 
 BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
-    // Add button    
+    // Add button
     case IDHELP: {
       std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"ScriptAdd");
       std::wstring str;

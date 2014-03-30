@@ -31,7 +31,7 @@ Image::Image()
 
 bool Image::Load(const std::wstring& path) {
   ::DeleteObject(dc.DetachBitmap());
-  
+
   if (dc.Get() == nullptr) {
     HDC hScreen = ::GetDC(nullptr);
     dc = ::CreateCompatibleDC(hScreen);
@@ -64,7 +64,7 @@ HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize,
   LOGFONT lFont;
   HFONT hFont = reinterpret_cast<HFONT>(GetCurrentObject(hdc, OBJ_FONT));
   GetObject(hFont, sizeof(LOGFONT), &lFont);
-  
+
   if (lpFaceName)
     lstrcpy(lFont.lfFaceName, lpFaceName);
   if (iSize > -1) {
@@ -89,7 +89,7 @@ int GetTextHeight(HDC hdc) {
 }
 
 BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2,
-                  bool bVertical) { 
+                  bool bVertical) {
   TRIVERTEX vertex[2];
   vertex[0].x     = lpRect->left;
   vertex[0].y     = lpRect->top;
@@ -150,7 +150,7 @@ win::Rect ResizeRect(const win::Rect& rect_dest,
   float dest_height = static_cast<float>(rect_dest.Height());
   float image_width = static_cast<float>(src_width);
   float image_Height = static_cast<float>(src_height);
-  
+
   // Source < Destination (no need to resize)
   if ((image_width < dest_width) && (image_Height < dest_height) && !stretch) {
     rect.right = rect.left + src_width;
@@ -165,7 +165,7 @@ win::Rect ResizeRect(const win::Rect& rect_dest,
     // Calculate aspect ratios
     float dest_ratio = dest_width / dest_height;
     float image_ratio = image_width / image_Height;
-    
+
     // Width > Height
     if (image_ratio > dest_ratio) {
       rect.bottom = rect.top +
@@ -179,7 +179,7 @@ win::Rect ResizeRect(const win::Rect& rect_dest,
         rect.Offset(static_cast<int>((dest_width - rect.Width()) / 2.0f), 0);
     }
   }
-  
+
   return rect;
 }
 

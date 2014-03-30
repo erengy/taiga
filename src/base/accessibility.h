@@ -58,7 +58,7 @@ public:
   virtual bool AllowChildTraverse(AccessibleChild& child, LPARAM param = 0L);
 
 #ifdef _DEBUG
-  HWINEVENTHOOK Hook(DWORD eventMin, DWORD eventMax, 
+  HWINEVENTHOOK Hook(DWORD eventMin, DWORD eventMax,
                      HMODULE hmodWinEventProc, WINEVENTPROC pfnWinEventProc,
                      DWORD idProcess, DWORD idThread, DWORD dwFlags);
   bool IsHooked();

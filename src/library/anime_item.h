@@ -135,7 +135,7 @@ public:
   bool UserSynonymsAvailable() const;
 
   //////////////////////////////////////////////////////////////////////////////
-  
+
   // A database item may not be in user's list.
   void AddtoUserList();
   bool IsInList() const;

@@ -223,7 +223,7 @@ bool Feed::Load() {
     items.back().title = XmlReadStrValue(item, L"title");
     items.back().link = XmlReadStrValue(item, L"link");
     items.back().description = XmlReadStrValue(item, L"description");
-    
+
     // Remove if title or link is empty
     if (category == kFeedCategoryLink) {
       if (items.back().title.empty() || items.back().link.empty()) {
@@ -425,7 +425,7 @@ void Aggregator::ParseDescription(FeedItem& feed_item,
       } else if (StartsWith(*it, comment_str)) {
         feed_item.description = it->substr(comment_str.length());
       } else if (InStr(*it, L"magnet:?") > -1) {
-        feed_item.magnet_link = L"magnet:?" + 
+        feed_item.magnet_link = L"magnet:?" +
             InStr(*it, L"<a href=\"magnet:?", L"\">Magnet Link</a>");
       }
     }

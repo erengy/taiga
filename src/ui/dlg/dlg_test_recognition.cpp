@@ -91,7 +91,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
 
   // Fill list
   for (UINT i = 0; i < episodes_.size(); i++) {
-    list_.InsertItem(i, -1, -1, 0, NULL, test_episodes_[i].file.c_str(), 
+    list_.InsertItem(i, -1, -1, 0, NULL, test_episodes_[i].file.c_str(),
       reinterpret_cast<LPARAM>(&test_episodes_[i]));
     list_.SetItem(i, 1, test_episodes_[i].title.c_str());
     list_.SetItem(i, 2, test_episodes_[i].group.c_str());
@@ -120,7 +120,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   title += L" (" + ToWstr(((float)success_count / (float)total_items) * 100.0f, 2) + L"%)";
   title += L" - Time: " + ToWstr(tick) + L" ms";
   SetText(title.c_str());
-  
+
   // Success
   return TRUE;
 }

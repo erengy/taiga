@@ -31,7 +31,7 @@ void SysLink::SetItemState(int item, UINT states) {
   li.mask = LIF_ITEMINDEX | LIF_STATE;
   li.state = states;
   li.stateMask = states;
-  
+
   SendMessage(LM_SETITEM, 0, reinterpret_cast<LPARAM>(&li));
 }
 

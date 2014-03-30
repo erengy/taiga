@@ -49,7 +49,7 @@ LRESULT MainDialog::MainTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
       break;
     }
   }
-  
+
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -111,7 +111,7 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
           if (pnmtv->itemNew.lParam == -1) {
             if (pnmtv->action == TVC_BYKEYBOARD) {
               // TODO: Should work upwards too
-              HTREEITEM hti = TreeView_GetNextItem(treeview.GetWindowHandle(), 
+              HTREEITEM hti = TreeView_GetNextItem(treeview.GetWindowHandle(),
                                                    pnmtv->itemNew.hItem, TVGN_NEXT);
               navigation.SetCurrentPage(treeview.GetItemData(hti));
             }
@@ -138,7 +138,7 @@ LRESULT MainDialog::CancelButton::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
       return TRUE;
     }
   }
-  
+
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -173,7 +173,7 @@ LRESULT MainDialog::EditSearch::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
       break;
     }
   }
-  
+
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -197,7 +197,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       debug::Test();
       return TRUE;
   }
-  
+
   // Search text
   if (HIWORD(wParam) == EN_CHANGE) {
     if (LOWORD(wParam) == IDC_EDIT_SEARCH) {
@@ -244,9 +244,9 @@ LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, 
         int button_index = DlgMain.toolbar_wm.toolbar->HitTest(pt);
         int button_count = DlgMain.toolbar_wm.toolbar->GetButtonCount();
         DWORD button_style = DlgMain.toolbar_wm.toolbar->GetButtonStyle(button_index);
-        
-        if (button_index > -1 && 
-            button_index < button_count && 
+
+        if (button_index > -1 &&
+            button_index < button_count &&
             button_index != DlgMain.toolbar_wm.button_index) {
           if (button_style & BTNS_DROPDOWN || button_style & BTNS_WHOLEDROPDOWN) {
             DlgMain.toolbar_wm.toolbar->SendMessage(TB_SETHOTITEM, button_index, 0);
@@ -258,7 +258,7 @@ LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, 
       }
     }
   }
-  
+
   return CallNextHookEx(DlgMain.toolbar_wm.hook, code, wParam, lParam);
 }
 
@@ -319,7 +319,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   TBBUTTON tbb;
   toolbar->GetButton(button_index, tbb);
   toolbar->PressButton(tbb.idCommand, TRUE);
-  
+
   // Calculate point
   RECT rect;
   toolbar->SendMessage(TB_GETITEMRECT, button_index, reinterpret_cast<LPARAM>(&rect));

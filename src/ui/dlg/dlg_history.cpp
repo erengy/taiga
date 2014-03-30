@@ -173,8 +173,8 @@ void HistoryDialog::RefreshList() {
   // Add queued items
   foreach_cr_(it, History.queue.items) {
     int i = list_.GetItemCount();
-    list_.InsertItem(i, 0, -1, 0, nullptr, 
-                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(), 
+    list_.InsertItem(i, 0, -1, 0, nullptr,
+                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
                      static_cast<LPARAM>(it->anime_id));
     std::wstring details;
     if (it->mode == taiga::kHttpServiceAddLibraryEntry)

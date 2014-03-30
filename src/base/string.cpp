@@ -84,7 +84,7 @@ void ErasePunctuation(wstring& str, bool keep_trailing) {
         // Valid character
         return false;
       });
-  
+
   if (keep_trailing)
     std::copy(rlast.base(), str.end(), it);
 
@@ -544,7 +544,7 @@ wstring ToLower_Copy(wstring str, bool use_locale) {
 
 void ToUpper(wstring& str, bool use_locale) {
   if (use_locale) {
-    std::transform(str.begin(), str.end(), str.begin(), 
+    std::transform(str.begin(), str.end(), str.begin(),
                    std::bind2nd(std::ptr_fun(&std::toupper<wchar_t>),
                                 current_locale));
   } else {
@@ -795,7 +795,7 @@ wchar_t GetMostCommonCharacter(const wstring& str) {
       }
     }
   }
-  
+
   char_index = 0;
   for (auto it = char_map.begin(); it != char_map.end(); ++it) {
     if (it->second * 1.8f >= char_map.at(char_index).second &&

@@ -37,7 +37,7 @@ public:
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 
   void ChoosePage(int index);
-  
+
   FeedFilter filter;
 
 private:

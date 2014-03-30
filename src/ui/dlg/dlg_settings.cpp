@@ -59,7 +59,7 @@ SettingsDialog::SettingsDialog()
 
 void SettingsDialog::SetCurrentSection(SettingsSections section) {
   current_section_ = section;
-  
+
   if (!IsWindow())
     return;
 
@@ -143,7 +143,7 @@ BOOL SettingsDialog::OnInitDialog() {
   #undef TREE_INSERTITEM
 
   // Set title font
-  SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT, 
+  SendDlgItemMessage(IDC_STATIC_TITLE, WM_SETFONT,
                      reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), TRUE);
 
   // Select current section and page
@@ -235,7 +235,7 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kApp_List_ProgressDisplayAired, page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AIRED));
     Settings.Set(taiga::kApp_List_ProgressDisplayAvailable, page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AVAILABLE));
   }
-  
+
   // Recognition > General
   page = &pages[kSettingsPageRecognitionGeneral];
   if (page->IsWindow()) {
@@ -484,7 +484,7 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uMsg) {  
+  switch (uMsg) {
     // Forward mouse wheel messages to parent
     case WM_MOUSEWHEEL:
       return ::SendMessage(GetParent(), uMsg, wParam, lParam);
@@ -509,7 +509,7 @@ int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& fil
   }
 
   // Insert item
-  index = list.InsertItem(index, group, icon, 0, nullptr, filter.name.c_str(), 
+  index = list.InsertItem(index, group, icon, 0, nullptr, filter.name.c_str(),
                           reinterpret_cast<LPARAM>(&filter));
   list.SetCheckState(index, filter.enabled);
   list.SetWindowHandle(nullptr);

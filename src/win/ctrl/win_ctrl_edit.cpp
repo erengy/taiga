@@ -52,7 +52,7 @@ BOOL Edit::SetCueBannerText(LPCWSTR text, BOOL draw_focused) {
 void Edit::SetMargins(int left, int right) {
   DWORD flags = 0;
 
-  if (left > -1) 
+  if (left > -1)
     flags |= EC_LEFTMARGIN;
   if (right > -1)
     flags |= EC_RIGHTMARGIN;

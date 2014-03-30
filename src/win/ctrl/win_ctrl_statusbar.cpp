@@ -83,7 +83,7 @@ void StatusBar::SetPartWidth(int part, int width) {
   } else {
     widths_.at(part) = widths_.at(part - 1) + width;
   }
-  
+
   SendMessage(SB_SETPARTS, widths_.size(),
               reinterpret_cast<LPARAM>(&widths_[0]));
 }

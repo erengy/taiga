@@ -178,7 +178,7 @@ DWORD FolderMonitor::ThreadProc() {
           break;
         }
 
-        // Change detected 
+        // Change detected
         case kFolderMonitorStateActive: {
           DWORD dwNextEntryOffset = 0;
           PFILE_NOTIFY_INFORMATION pfni = nullptr;

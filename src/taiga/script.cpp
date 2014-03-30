@@ -128,7 +128,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
     for (size_t i = 0; i < body_parts.size(); i++)
       if (!body_parts[i].empty())
         return L"true";
-  
+
   // $cut(string,len)
   //   Returns first len characters of string.
   } else if (func_name == L"cut") {
@@ -203,7 +203,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
   // $if()
   } else if (func_name == L"if") {
     switch (body_parts.size()) {
-      // $if(cond)      
+      // $if(cond)
       case 1:
         str = body_parts[0];
         break;

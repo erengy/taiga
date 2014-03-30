@@ -133,7 +133,7 @@ std::string HmacSha1(const std::string& key_bytes, const std::string& data) {
   if (hKey)
     CryptDestroyKey(hKey);
   if (hHash)
-    CryptDestroyHash(hHash);    
+    CryptDestroyHash(hHash);
   if (hProv)
     CryptReleaseContext(hProv, 0);
   if (pbHash)

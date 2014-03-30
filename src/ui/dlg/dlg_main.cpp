@@ -81,14 +81,14 @@ BOOL MainDialog::OnInitDialog() {
 
   // Start process timer
   taiga::timers.Initialize();
-  
+
   // Add icon to taskbar
   Taskbar.Create(GetWindowHandle(), nullptr, TAIGA_APP_TITLE);
 
   ChangeStatus();
   UpdateTip();
   UpdateTitle();
-  
+
   // Refresh menus
   ui::Menus.UpdateAll();
 
@@ -100,7 +100,7 @@ BOOL MainDialog::OnInitDialog() {
     ScanAvailableEpisodesQuick();
   }
   if (!Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
-    Show(Settings.GetBool(taiga::kApp_Position_Remember) && Settings.GetBool(taiga::kApp_Position_Maximized) ? 
+    Show(Settings.GetBool(taiga::kApp_Position_Remember) && Settings.GetBool(taiga::kApp_Position_Maximized) ?
       SW_MAXIMIZE : SW_SHOWNORMAL);
   }
   if (taiga::GetCurrentUsername().empty()) {
@@ -190,38 +190,38 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
-  toolbar_main.InsertButton(0, ui::kIcon24_Sync, kToolbarButtonSync, 
+  toolbar_main.InsertButton(0, ui::kIcon24_Sync, kToolbarButtonSync,
                             fsState, fsStyle1, 0, nullptr, L"Synchronize list");
   toolbar_main.InsertButton(1, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(2, ui::kIcon24_Folders, kToolbarButtonFolders, 
+  toolbar_main.InsertButton(2, ui::kIcon24_Folders, kToolbarButtonFolders,
                             fsState, fsStyle2, 2, nullptr, L"Root folders");
-  toolbar_main.InsertButton(3, ui::kIcon24_Tools, kToolbarButtonTools, 
+  toolbar_main.InsertButton(3, ui::kIcon24_Tools, kToolbarButtonTools,
                             fsState, fsStyle2, 3, nullptr, L"External links");
   toolbar_main.InsertButton(4, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(5, ui::kIcon24_Settings, kToolbarButtonSettings, 
+  toolbar_main.InsertButton(5, ui::kIcon24_Settings, kToolbarButtonSettings,
                             fsState, fsStyle1, 5, nullptr, L"Change program settings");
 #ifdef _DEBUG
   toolbar_main.InsertButton(6, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
-  toolbar_main.InsertButton(7, ui::kIcon24_About, kToolbarButtonDebug, 
+  toolbar_main.InsertButton(7, ui::kIcon24_About, kToolbarButtonDebug,
                             fsState, fsStyle1, 7, nullptr, L"Debug");
 #endif
 
   // Insert rebar bands
   UINT fMask = RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_HEADERSIZE | RBBIM_SIZE | RBBIM_STYLE;
   UINT fStyle = RBBS_NOGRIPPER;
-  rebar.InsertBand(toolbar_menu.GetWindowHandle(), 
-    GetSystemMetrics(SM_CXSCREEN), 
+  rebar.InsertBand(toolbar_menu.GetWindowHandle(),
+    GetSystemMetrics(SM_CXSCREEN),
     0, 0, 0, 0, 0, 0,
-    HIWORD(toolbar_menu.GetButtonSize()), 
+    HIWORD(toolbar_menu.GetButtonSize()),
     fMask, fStyle);
-  rebar.InsertBand(toolbar_main.GetWindowHandle(), 
-    GetSystemMetrics(SM_CXSCREEN), 
-    win::kControlMargin, 0, 0, 0, 0, 0, 
-    HIWORD(toolbar_main.GetButtonSize()) + 2, 
+  rebar.InsertBand(toolbar_main.GetWindowHandle(),
+    GetSystemMetrics(SM_CXSCREEN),
+    win::kControlMargin, 0, 0, 0, 0, 0,
+    HIWORD(toolbar_main.GetButtonSize()) + 2,
     fMask, fStyle | RBBS_BREAK);
-  rebar.InsertBand(toolbar_search.GetWindowHandle(), 
-    0, win::kControlMargin, 0, rcEditWindow.Width() + (win::kControlMargin * 2), 0, 0, 0, 
-    HIWORD(toolbar_search.GetButtonSize()), 
+  rebar.InsertBand(toolbar_search.GetWindowHandle(),
+    0, win::kControlMargin, 0, rcEditWindow.Width() + (win::kControlMargin * 2), 0, 0, 0,
+    HIWORD(toolbar_search.GetButtonSize()),
     fMask, fStyle);
 }
 
@@ -229,7 +229,7 @@ void MainDialog::InitWindowPosition() {
   UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
   const LONG min_w = ScaleX(710);
   const LONG min_h = ScaleX(480);
-  
+
   win::Rect rcParent, rcWindow;
   ::GetWindowRect(GetParent(), &rcParent);
   rcWindow.Set(
@@ -238,7 +238,7 @@ void MainDialog::InitWindowPosition() {
     Settings.GetInt(taiga::kApp_Position_X) + Settings.GetInt(taiga::kApp_Position_W),
     Settings.GetInt(taiga::kApp_Position_Y) + Settings.GetInt(taiga::kApp_Position_H));
 
-  if (rcWindow.left < 0 || rcWindow.left >= rcParent.right || 
+  if (rcWindow.left < 0 || rcWindow.left >= rcParent.right ||
       rcWindow.top < 0 || rcWindow.top >= rcParent.bottom) {
     flags |= SWP_NOMOVE;
   }
@@ -254,7 +254,7 @@ void MainDialog::InitWindowPosition() {
   if (rcWindow.Height() > rcParent.Height()) {
     rcWindow.bottom = rcParent.top + rcParent.Height();
   }
-  if (rcWindow.Width() > 0 && rcWindow.Height() > 0 && 
+  if (rcWindow.Width() > 0 && rcWindow.Height() > 0 &&
       !Settings.GetBool(taiga::kApp_Position_Maximized) &&
       Settings.GetBool(taiga::kApp_Position_Remember)) {
     SetPosition(nullptr, rcWindow, flags);
@@ -289,7 +289,7 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
       return TRUE;
     }
   }
-  
+
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
@@ -478,7 +478,7 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
   WCHAR buffer[MAX_PATH];
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
     anime::Episode episode;
-    Meow.ExamineTitle(buffer, episode); 
+    Meow.ExamineTitle(buffer, episode);
     MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), TAIGA_APP_TITLE, MB_OK);
   }
 #endif
@@ -501,7 +501,7 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       return cancel_button.OnCustomDraw(reinterpret_cast<LPARAM>(pnmh));
     }
   }
-  
+
   return 0;
 }
 
@@ -553,7 +553,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   // Taskbar creation notification
   if (uMsg == WM_TASKBARCREATED) {
     Taskbar.Create(GetWindowHandle(), nullptr, TAIGA_APP_TITLE);
-  
+
   // Windows 7 taskbar interface
   } else if (uMsg == WM_TASKBARBUTTONCREATED) {
     TaskbarList.Initialize(GetWindowHandle());
@@ -630,14 +630,14 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   // Resize rebar
   rebar.SendMessage(WM_SIZE, 0, 0);
   rect_client.top += rebar.GetBarHeight();
-  
+
   // Resize status bar
   win::Rect rcStatus;
   statusbar.GetClientRect(&rcStatus);
   statusbar.SendMessage(WM_SIZE, 0, 0);
   UpdateStatusTimer();
   rect_client.bottom -= rcStatus.Height();
-  
+
   // Set sidebar
   rect_sidebar_.Set(0, rect_client.top, 140, rect_client.bottom);
   // Resize treeview
@@ -653,7 +653,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   } else {
     rect_content_ = rect_client;
   }
-  
+
   // Resize content
   DlgAnimeList.SetPosition(nullptr, rect_content_);
   DlgHistory.SetPosition(nullptr, rect_content_);
@@ -697,7 +697,7 @@ void MainDialog::UpdateTip() {
 
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
-    tip += L"\nWatching: " + anime_item->GetTitle() + 
+    tip += L"\nWatching: " + anime_item->GetTitle() +
       (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
   }
 
@@ -740,7 +740,7 @@ int MainDialog::Navigation::GetCurrentPage() {
 void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   if (page == current_page_)
     return;
-  
+
   int previous_page = current_page_;
   current_page_ = page;
 
@@ -796,7 +796,7 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
     DISPLAY_PAGE(kSidebarItemFeeds, DlgTorrent, IDD_TORRENT);
   }
   #undef DISPLAY_PAGE
-  
+
   if (current_page_ != kSidebarItemNowPlaying) DlgNowPlaying.Hide();
   if (current_page_ != kSidebarItemAnimeList) DlgAnimeList.Hide();
   if (current_page_ != kSidebarItemHistory) DlgHistory.Hide();

@@ -66,7 +66,7 @@ void SetSharedCursor(LPCWSTR name) {
                                                 0, 0, LR_SHARED)));
 }
 
-int StatusToIcon(int status) {  
+int StatusToIcon(int status) {
   switch (status) {
     case anime::kAiring:
       return kIcon16_Green;
@@ -110,7 +110,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       break;
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
-      MessageBox(DlgUpdate.GetWindowHandle(), 
+      MessageBox(DlgUpdate.GetWindowHandle(),
                  error.c_str(), L"Update", MB_ICONERROR | MB_OK);
       DlgUpdate.PostMessage(WM_CLOSE);
       return;
@@ -486,7 +486,7 @@ bool OnAnimeFolderNotFound() {
 void OnAnimeWatchingStart(const anime::Item& anime_item,
                           const anime::Episode& episode) {
   DlgNowPlaying.SetCurrentId(anime_item.GetId());
-  
+
   int list_status = anime_item.GetMyStatus();
   if (anime_item.GetMyRewatching())
     list_status = anime::kWatching;

@@ -244,7 +244,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         hdc.EditFont(L"Segoe UI", 9, -1, TRUE);
         hdc.SetBkMode(TRANSPARENT);
         hdc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
-        hdc.DrawText(text.c_str(), text.length(), rect, 
+        hdc.DrawText(text.c_str(), text.length(), rect,
                      DT_CENTER | DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
       }
       result = CDRF_NOTIFYITEMDRAW;
@@ -260,7 +260,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
         break;
-      
+
       // Draw border
       if (win::GetVersion() > win::kVersionXp) {
         rect.Inflate(-4, -4);
@@ -281,16 +281,16 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
 
       // Calculate areas
       win::Rect rect_image(
-          rect.left + 4, rect.top + 4, 
+          rect.left + 4, rect.top + 4,
           rect.left + 124, rect.bottom - 4);
       win::Rect rect_title(
-          rect_image.right + 4, rect_image.top, 
+          rect_image.right + 4, rect_image.top,
           rect.right - 4, rect_image.top + text_height + 8);
       win::Rect rect_details(
-          rect_title.left + 4, rect_title.bottom + 4, 
+          rect_title.left + 4, rect_title.bottom + 4,
           rect_title.right, rect_title.bottom + 4 + (6 * (text_height + 2)));
       win::Rect rect_synopsis(
-          rect_details.left, rect_details.bottom + 4, 
+          rect_details.left, rect_details.bottom + 4,
           rect_details.right, rect_image.bottom);
 
       // Draw image
@@ -308,7 +308,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
                        image->rect.Height(),
                        SRCCOPY);
       }
-      
+
       // Draw title background
       COLORREF color;
       switch (anime_item->GetAiringStatus()) {
@@ -328,7 +328,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         rect_title.top = rect_title.bottom - (text_height + 8);
       }
       hdc.FillRect(rect_title, color);
-      
+
       // Draw anime list indicator
       if (anime_item->IsInList()) {
         ui::Theme.GetImageList16().Draw(
@@ -393,12 +393,12 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(L"Score:");
       DRAWLINE(L"Popularity:");
 
-      rect_details.Set(rect_details.left + 75, text_top, 
+      rect_details.Set(rect_details.left + 75, text_top,
                        rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
       text = anime::TranslateDate(anime_item->GetDateStart());
-      text += anime_item->GetDateEnd() != anime_item->GetDateStart() ? 
+      text += anime_item->GetDateEnd() != anime_item->GetDateStart() ?
               L" to " + anime::TranslateDate(anime_item->GetDateEnd()) : L"";
       text += L" (" + anime::TranslateStatus(anime_item->GetAiringStatus()) + L")";
       DRAWLINE(text);
@@ -409,7 +409,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(anime_item->GetPopularity().empty() ? L"#0" : anime_item->GetPopularity());
 
       #undef DRAWLINE
-      
+
       // Draw synopsis
       if (!anime_item->GetSynopsis().empty()) {
         text = anime_item->GetSynopsis();
@@ -436,7 +436,7 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
       LPNMTOOLBAR nmt = reinterpret_cast<LPNMTOOLBAR>(lParam);
       ::SendMessage(nmt->hdr.hwndFrom, TB_GETRECT,
                     static_cast<WPARAM>(nmt->iItem),
-                    reinterpret_cast<LPARAM>(&rect));          
+                    reinterpret_cast<LPARAM>(&rect));
       MapWindowPoints(nmt->hdr.hwndFrom, HWND_DESKTOP, reinterpret_cast<LPPOINT>(&rect), 2);
       ui::Menus.UpdateSeason();
       std::wstring action;
@@ -596,7 +596,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 
   // Redraw
   list_.SetRedraw(TRUE);
-  list_.RedrawWindow(nullptr, nullptr, 
+  list_.RedrawWindow(nullptr, nullptr,
                      RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
@@ -604,7 +604,7 @@ void SeasonDialog::RefreshStatus() {
   if (SeasonDatabase.items.empty())
     return;
 
-  std::wstring text = SeasonDatabase.name + L", from " + 
+  std::wstring text = SeasonDatabase.name + L", from " +
                       anime::TranslateSeasonToMonths(SeasonDatabase.name);
 
   ui::ChangeStatusText(text);

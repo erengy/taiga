@@ -116,7 +116,7 @@ public:
   ListView();
   ListView(HWND hwnd);
   virtual ~ListView() {}
-  
+
   HIMAGELIST CreateDragImage(int item, LPPOINT pt_up_left);
   BOOL       DeleteAllItems();
   BOOL       DeleteItem(int item);
@@ -358,7 +358,7 @@ public:
   Tooltip() {}
   Tooltip(HWND hwnd);
   virtual ~Tooltip() {}
-  
+
   BOOL AddTip(UINT id, LPCWSTR text, LPCWSTR title, LPRECT rect, bool window_id);
   BOOL DeleteTip(UINT id);
   void SetDelayTime(long autopop, long initial, long reshow);

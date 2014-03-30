@@ -427,7 +427,7 @@ bool AppSettings::Save() {
     WriteValue(settings, static_cast<AppSettingName>(i));
 
   // Root folders
-  xml_node folders = settings.child(L"anime").child(L"folders");  
+  xml_node folders = settings.child(L"anime").child(L"folders");
   foreach_(it, root_folders) {
     xml_node root = folders.append_child(L"root");
     root.append_attribute(L"folder") = it->c_str();
@@ -489,7 +489,7 @@ bool AppSettings::Save() {
       condition.append_attribute(L"value") = itc->value.c_str();
     }
   }
-  
+
   // Write to registry
   win::Registry reg;
   reg.OpenKey(HKEY_CURRENT_USER,
@@ -591,7 +591,7 @@ const sync::Service* GetCurrentService() {
 
 sync::ServiceId GetCurrentServiceId() {
   auto service = GetCurrentService();
-  
+
   if (service)
     return static_cast<sync::ServiceId>(service->id());
 

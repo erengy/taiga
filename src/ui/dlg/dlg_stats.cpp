@@ -32,7 +32,7 @@ StatsDialog DlgStats;
 BOOL StatsDialog::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 4; i++) {
-    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT, 
+    SendDlgItemMessage(IDC_STATIC_HEADER1 + i, WM_SETFONT,
                        reinterpret_cast<WPARAM>(ui::Theme.GetBoldFont()), FALSE);
   }
 
@@ -62,10 +62,10 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         win::Dc dc = dis->hDC;
 
         dc.FillRect(dis->rcItem, ::GetSysColor(COLOR_WINDOW));
-        
+
         int bar_height = GetTextHeight(dc.Get());
         int bar_max = rect.Width() * 3 / 4;
-        
+
         for (int i = 10; i > 0; i--) {
           if (i < 10)
             rect.top += bar_height;

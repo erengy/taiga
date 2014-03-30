@@ -55,14 +55,14 @@ void Api::Announce(anime::Episode& episode) {
 
     std::string str = WstrToStr(ReplaceVariables(it->second, episode));
     const char* format = str.c_str();
-    
+
     COPYDATASTRUCT cds;
     cds.dwData = 0;
     cds.lpData = (void*)format;
     cds.cbData = strlen(format) + 1;
 
-    SendMessage(it->first, WM_COPYDATA, 
-                reinterpret_cast<WPARAM>(window.GetWindowHandle()), 
+    SendMessage(it->first, WM_COPYDATA,
+                reinterpret_cast<WPARAM>(window.GetWindowHandle()),
                 reinterpret_cast<LPARAM>(&cds));
   }
 }

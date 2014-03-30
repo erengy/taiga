@@ -58,7 +58,7 @@ unsigned long GetFileAge(const std::wstring& path) {
 
   if (!result)
     return 0;
-  
+
   // Get current time
   SYSTEMTIME st_now;
   GetSystemTime(&st_now);
@@ -168,7 +168,7 @@ std::wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle,
   ofn.lpstrTitle = lpstrTitle;
   ofn.nMaxFile = sizeof(szFile);
   ofn.Flags = OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST;
-  
+
   if (GetOpenFileName(&ofn)) {
     return std::wstring(szFile);
   } else {

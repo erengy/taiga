@@ -187,7 +187,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     anime_item.SetMyRewatching(value["rewatching"].asBool());
     anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(rating_value["value"].asString()),
                                                 StrToWstr(rating_value["type"].asString())));
-    
+
     AnimeDatabase.UpdateItem(anime_item);
   }
 }

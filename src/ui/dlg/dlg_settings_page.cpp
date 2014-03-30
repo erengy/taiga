@@ -361,8 +361,8 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertGroup(0, L"General filters", true, false);
       list.InsertGroup(1, L"Limited filters", true, false);
       parent->feed_filters_.resize(Aggregator.filter_manager.filters.size());
-      std::copy(Aggregator.filter_manager.filters.begin(), 
-                Aggregator.filter_manager.filters.end(), 
+      std::copy(Aggregator.filter_manager.filters.begin(),
+                Aggregator.filter_manager.filters.end(),
                 parent->feed_filters_.begin());
       parent->RefreshTorrentFilterList(list.GetWindowHandle());
       list.SetWindowHandle(nullptr);
@@ -589,7 +589,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
           int index = list.GetNextItem(-1, LVNI_SELECTED);
           if (index > -1 && index < list.GetItemCount() - 1) {
-            iter_swap(parent->feed_filters_.begin() + index, 
+            iter_swap(parent->feed_filters_.begin() + index,
                       parent->feed_filters_.begin() + index + 1);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
             list.SetSelectedItem(index + 1);

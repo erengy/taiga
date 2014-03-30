@@ -69,7 +69,7 @@ int Toolbar::GetHeight() {
 }
 
 BOOL Toolbar::GetButton(int index, TBBUTTON& tbb) {
-  return SendMessage(TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbb)); 
+  return SendMessage(TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbb));
 }
 
 int Toolbar::GetButtonCount() {

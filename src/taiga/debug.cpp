@@ -30,12 +30,12 @@ Tester::Tester()
 
 void Tester::Start() {
   LARGE_INTEGER li;
-  
+
   if (frequency_ == 0.0) {
     ::QueryPerformanceFrequency(&li);
     frequency_ = double(li.QuadPart) / 1000.0;
   }
-  
+
   ::QueryPerformanceCounter(&li);
   value_ = li.QuadPart;
 }

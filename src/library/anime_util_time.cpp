@@ -36,7 +36,7 @@ void GetSeasonInterval(const std::wstring& season, Date& date_start,
   interval[L"Fall"] = std::make_pair<int, int>(9, 11);
   interval[L"Winter"] = std::make_pair<int, int>(12, 2);
 
-  const int days_in_months[] = 
+  const int days_in_months[] =
     {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
   std::vector<std::wstring> season_year;
@@ -62,7 +62,7 @@ std::wstring TranslateDate(const Date& date) {
 
   if (date.month > 0 && date.month <= 12) {
     const wchar_t* months[] = {
-      L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
+      L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
       L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
     };
     result += months[date.month - 1];
@@ -102,7 +102,7 @@ std::wstring TranslateDateToSeason(const Date& date) {
 
 std::wstring TranslateSeasonToMonths(const std::wstring& season) {
   const wchar_t* months[] = {
-    L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
+    L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
     L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
   };
 

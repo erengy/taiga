@@ -386,7 +386,7 @@ std::wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
           } else {
             char file_name[MAX_PATH];
             ReadProcessMemory(hwnd_winamp,
-                              reinterpret_cast<LPCVOID>(base_address), 
+                              reinterpret_cast<LPCVOID>(base_address),
                               file_name, MAX_PATH, NULL);
             CloseHandle(hwnd_winamp);
             return StrToWstr(file_name);

@@ -30,10 +30,10 @@ class Filters {
  public:
   Filters();
   virtual ~Filters() {}
-  
+
   bool CheckItem(Item& item);
   void Reset();
-  
+
   std::vector<bool> my_status;
   std::vector<bool> status;
   std::vector<bool> type;

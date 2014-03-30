@@ -35,7 +35,7 @@ namespace ui {
 FeedFilterDialog DlgFeedFilter;
 
 FeedFilterDialog::FeedFilterDialog()
-    : current_page_(0), 
+    : current_page_(0),
       icon_(nullptr) {
   RegisterDlgClass(L"TaigaFeedFilterW");
 }
@@ -158,8 +158,8 @@ void FeedFilterDialog::ChoosePage(int index) {
   switch (index) {
     // Page #0
     case 0:
-      main_instructions_label_.SetText( 
-        L"Choose one of the preset filters, or create a custom one");
+      main_instructions_label_.SetText(
+          L"Choose one of the preset filters, or create a custom one");
       break;
 
     // Page #1
@@ -547,8 +547,8 @@ void FeedFilterDialog::DialogPage1::AddConditionToList(const FeedFilterCondition
   if (index == -1)
     index = condition_list.GetItemCount();
 
-  condition_list.InsertItem(index, -1, ui::kIcon16_Funnel, 0, nullptr, 
-                            Aggregator.filter_manager.TranslateElement(condition.element).c_str(), 
+  condition_list.InsertItem(index, -1, ui::kIcon16_Funnel, 0, nullptr,
+                            Aggregator.filter_manager.TranslateElement(condition.element).c_str(),
                             reinterpret_cast<LPARAM>(&condition));
   condition_list.SetItem(index, 1, Aggregator.filter_manager.TranslateOperator(condition.op).c_str());
   condition_list.SetItem(index, 2, Aggregator.filter_manager.TranslateValue(condition).c_str());

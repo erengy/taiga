@@ -45,7 +45,7 @@
 
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   LOG(LevelDebug, action);
-  
+
   std::wstring body;
   size_t pos = action.find('(');
   if (pos != action.npos) {
@@ -229,7 +229,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Library
-  
+
   // AddToListAs(status)
   //   Adds new anime to list with given status.
   //   lParam is an anime ID.
@@ -310,17 +310,17 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Sends an HTTP request.
   } else if (action == L"AnnounceToHTTP") {
     Announcer.Do(taiga::kAnnounceToHttp, nullptr, body == L"true");
-  
+
   // AnnounceToMessenger(force)
   //   Changes MSN Messenger status text.
   } else if (action == L"AnnounceToMessenger") {
     Announcer.Do(taiga::kAnnounceToMessenger, nullptr, body == L"true");
-  
+
   // AnnounceToMIRC(force)
   //   Sends message to specified channels in mIRC.
   } else if (action == L"AnnounceToMIRC") {
     Announcer.Do(taiga::kAnnounceToMirc, nullptr, body == L"true");
-  
+
   // AnnounceToSkype(force)
   //   Changes Skype mood text.
   //   Requires authorization.
@@ -331,7 +331,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Changes Twitter status.
   } else if (action == L"AnnounceToTwitter") {
     Announcer.Do(taiga::kAnnounceToTwitter, nullptr, body == L"true");
-  
+
   //////////////////////////////////////////////////////////////////////////////
 
   // EditAll([anime_id])
@@ -438,9 +438,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       Meow.UpdateCleanTitles(anime_id);
       Settings.Save();
     }
-  
+
   //////////////////////////////////////////////////////////////////////////////
-  
+
   // OpenFolder()
   //   Searches for anime folder and opens it.
   //   lParam is an anime ID.

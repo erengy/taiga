@@ -92,11 +92,11 @@ public:
   virtual ~Mutex();
 
   HANDLE Create(
-      LPSECURITY_ATTRIBUTES mutex_attributes, 
+      LPSECURITY_ATTRIBUTES mutex_attributes,
       BOOL initial_owner,
       LPCTSTR name);
   HANDLE Open(
-      DWORD desired_access, 
+      DWORD desired_access,
       BOOL inherit_handle,
       LPCTSTR name);
   bool Release();

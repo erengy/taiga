@@ -313,7 +313,7 @@ std::wstring GetWindowTitle(HWND hwnd) {
   WCHAR buff[MAX_PATH];
   GetWindowText(hwnd, buff, MAX_PATH);
   return buff;
-} 
+}
 
 std::wstring GetWindowPath(HWND hwnd) {
   DWORD dwProcessId;
@@ -386,7 +386,7 @@ bool TranslateDeviceName(std::wstring& path) {
   bool bFound = false;
   WCHAR szName[MAX_PATH];
   WCHAR szDrive[3] = L" :";
-  
+
   do {
     *szDrive = *p;
     if (QueryDosDevice(szDrive, szName, MAX_PATH)) {

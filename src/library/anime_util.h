@@ -25,7 +25,7 @@
 class Date;
 
 namespace anime {
-  
+
 class Episode;
 class Item;
 

@@ -26,7 +26,7 @@ ListView::ListView()
       sort_type_(0) {
 }
 
-ListView::ListView(HWND hwnd) 
+ListView::ListView(HWND hwnd)
     : sort_column_(-1),
       sort_order_(1),
       sort_type_(0) {
@@ -79,14 +79,14 @@ int ListView::InsertGroup(int index, LPCWSTR text,
   lvg.iGroupId = index;
   lvg.mask = LVGF_HEADER | LVGF_GROUPID;
   lvg.pszHeader = const_cast<LPWSTR>(text);
-  
+
   if (collapsable && GetVersion() >= kVersionVista) {
     lvg.mask |= LVGF_STATE;
     lvg.state = LVGS_COLLAPSIBLE;
     if (collapsed)
       lvg.state |= LVGS_COLLAPSED;
   }
-  
+
   return ListView_InsertGroup(window_, index, &lvg);
 }
 
@@ -133,7 +133,7 @@ int ListView::GetItemCount() {
   return ListView_GetItemCount(window_);
 }
 
-LPARAM ListView::GetItemParam(int i) {  
+LPARAM ListView::GetItemParam(int i) {
   LVITEM lvi = {0};
   lvi.iItem  = i;
   lvi.mask   = LVIF_PARAM;
@@ -312,7 +312,7 @@ BOOL ListView::SetTileViewInfo(int line_count, DWORD flags,
                                RECT* rc_label_margin, SIZE* size_tile) {
   LVTILEVIEWINFO tvi = {0};
   tvi.cbSize = sizeof(LVTILEVIEWINFO);
-  
+
   tvi.dwFlags = flags;
 
   if (line_count) {

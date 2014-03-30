@@ -300,7 +300,7 @@ void DecodeHtmlEntities(std::wstring& str) {
 
   if (InStr(str, L"&") == -1)
     return;
-  
+
   size_t pos = 0;
   size_t reference_pos = 0;
   unsigned int character_value = -1;
@@ -310,7 +310,7 @@ void DecodeHtmlEntities(std::wstring& str) {
       reference_pos = i;
       character_value = -1;
       if (++i == str.size()) return;
-      
+
       // Numeric character references
       if (str.at(i) == L'#') {
         if (++i == str.size()) return;
@@ -348,7 +348,7 @@ void DecodeHtmlEntities(std::wstring& str) {
       }
 
       if (character_value <= 0xFFFD) {
-        str.replace(reference_pos, i - reference_pos + 1, 
+        str.replace(reference_pos, i - reference_pos + 1,
                     std::wstring(1, static_cast<wchar_t>(character_value)));
         i = reference_pos - 1;
       } else {

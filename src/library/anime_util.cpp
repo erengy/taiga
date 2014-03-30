@@ -46,16 +46,16 @@ bool IsAiredYet(const Item& item) {
 
   if (!IsValidDate(item.GetDateStart()))
     return false;
-  
+
   Date date_japan = GetDateJapan();
   Date date_start = item.GetDateStart();
-  
+
   // Assume the worst case
   if (!date_start.month)
     date_start.month = 12;
   if (!date_start.day)
     date_start.day = 31;
-  
+
   return date_japan >= date_start;
 }
 
@@ -82,7 +82,7 @@ int EstimateLastAiredEpisodeNumber(const Item& item) {
   // irregularities such as broadcasts being postponed due to sports events make
   // this method unreliable.
   const Date& date_start = item.GetDateStart();
-  if (date_start.year && date_start.month && date_start.day) { 
+  if (date_start.year && date_start.month && date_start.day) {
     // To compensate for the fact that we don't know the airing hour,
     // we substract one more day.
     int date_diff = GetDateJapan() - date_start - 1;
@@ -310,7 +310,7 @@ void EndWatching(Item& item, Episode episode) {
   // Change status
   Taiga.play_status = taiga::kPlayStatusStopped;
   item.SetPlaying(false);
-  
+
   // Announce
   episode.anime_id = item.GetId();
   Announcer.Do(taiga::kAnnounceToHttp, &episode);
@@ -411,7 +411,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
 
 bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
   bool found = false;
-  
+
   foreach_(i, Aggregator.filter_manager.filters) {
     if (found) break;
     foreach_(j, i->anime_ids) {
@@ -471,7 +471,7 @@ std::wstring GetImagePath(int anime_id) {
 void GetUpcomingTitles(std::vector<int>& anime_ids) {
   foreach_c_(item, AnimeDatabase.items) {
     const anime::Item& anime_item = item->second;
-    
+
     const Date& date_start = anime_item.GetDateStart();
     const Date& date_now = GetDateJapan();
 
