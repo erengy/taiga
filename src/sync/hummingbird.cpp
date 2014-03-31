@@ -170,25 +170,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   }
 
   for (size_t i = 0; i < root.size(); i++) {
-    auto& value = root[i];
-    auto& anime_value = value["anime"];
-    auto& rating_value = value["rating"];
-
-    ::anime::Item anime_item;
-    anime_item.SetSource(this->id());
-    anime_item.SetId(StrToWstr(anime_value["slug"].asString()), this->id());
-    anime_item.SetLastModified(time(nullptr));  // current time
-
-    ParseAnimeObject(anime_value, anime_item);
-
-    anime_item.AddtoUserList();
-    anime_item.SetMyLastWatchedEpisode(value["episodes_watched"].asInt());
-    anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(value["status"].asString())));
-    anime_item.SetMyRewatching(value["rewatching"].asBool());
-    anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(rating_value["value"].asString()),
-                                                StrToWstr(rating_value["type"].asString())));
-
-    AnimeDatabase.UpdateItem(anime_item);
+    ParseLibraryObject(root[i]);
   }
 }
 
@@ -238,15 +220,24 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
 }
 
 void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Nothing to do here
+  UpdateLibraryEntry(response, http_response);
 }
 
 void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Nothing to do here
+  // Returns "true"
 }
 
 void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Nothing to do here
+  Json::Value root;
+  Json::Reader reader;
+  bool parsed = reader.parse(WstrToStr(http_response.body), root);
+
+  if (!parsed) {
+    response.data[L"error"] = L"Could not parse library entry";
+    return;
+  }
+
+  ParseLibraryObject(root);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,6 +298,27 @@ void Service::ParseAnimeObject(Json::Value& value, anime::Item& anime_item) {
 
   if (!genres.empty())
     anime_item.SetGenres(genres);
+}
+
+void Service::ParseLibraryObject(Json::Value& value) {
+  auto& anime_value = value["anime"];
+  auto& rating_value = value["rating"];
+
+  ::anime::Item anime_item;
+  anime_item.SetSource(this->id());
+  anime_item.SetId(StrToWstr(anime_value["slug"].asString()), this->id());
+  anime_item.SetLastModified(time(nullptr));  // current time
+
+  ParseAnimeObject(anime_value, anime_item);
+
+  anime_item.AddtoUserList();
+  anime_item.SetMyLastWatchedEpisode(value["episodes_watched"].asInt());
+  anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(value["status"].asString())));
+  anime_item.SetMyRewatching(value["rewatching"].asBool());
+  anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(rating_value["value"].asString()),
+                                              StrToWstr(rating_value["type"].asString())));
+
+  AnimeDatabase.UpdateItem(anime_item);
 }
 
 }  // namespace hummingbird

@@ -54,6 +54,7 @@ private:
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
   void ParseAnimeObject(Json::Value& value, anime::Item& anime_item);
+  void ParseLibraryObject(Json::Value& value);
 
   string_t auth_token_;
 };
