@@ -56,7 +56,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <ObjectFileName>$(IntDir)\src\%(RelativeDir)</ObjectFileName>
       <AdditionalIncludeDirectories>..\deps\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -80,7 +80,7 @@
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
+      <ObjectFileName>$(IntDir)\src\%(RelativeDir)</ObjectFileName>
       <AdditionalIncludeDirectories>..\deps\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
