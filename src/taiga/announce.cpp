@@ -116,12 +116,9 @@ void Announcer::ToHttp(const std::wstring& address, const std::wstring& data) {
   if (address.empty() || data.empty())
     return;
 
-  Url url(address);
-
   HttpRequest http_request;
   http_request.method = L"POST";
-  http_request.host = url.host;
-  http_request.path = url.path;
+  http_request.url = address;
   http_request.body = data;
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpSilent);
@@ -411,9 +408,9 @@ Twitter::Twitter() {
 
 bool Twitter::RequestToken() {
   HttpRequest http_request;
-  http_request.protocol = base::http::kHttps;
-  http_request.host = L"api.twitter.com";
-  http_request.path = L"oauth/request_token";
+  http_request.url.protocol = base::http::kHttps;
+  http_request.url.host = L"api.twitter.com";
+  http_request.url.path = L"oauth/request_token";
   http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"https://api.twitter.com/oauth/request_token",
                                      L"GET");
@@ -425,9 +422,9 @@ bool Twitter::RequestToken() {
 bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret,
                           const std::wstring& pin) {
   HttpRequest http_request;
-  http_request.protocol = base::http::kHttps;
-  http_request.host = L"api.twitter.com";
-  http_request.path = L"oauth/access_token";
+  http_request.url.protocol = base::http::kHttps;
+  http_request.url.host = L"api.twitter.com";
+  http_request.url.path = L"oauth/access_token";
   http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"https://api.twitter.com/oauth/access_token",
                                      L"POST", nullptr, key, secret, pin);
@@ -449,10 +446,10 @@ bool Twitter::SetStatusText(const std::wstring& status_text) {
   post_parameters[L"status"] = EncodeUrl(status_text_);
 
   HttpRequest http_request;
-  http_request.protocol = base::http::kHttps;
   http_request.method = L"POST";
-  http_request.host = L"api.twitter.com";
-  http_request.path = L"1.1/statuses/update.json";
+  http_request.url.protocol = base::http::kHttps;
+  http_request.url.host = L"api.twitter.com";
+  http_request.url.path = L"1.1/statuses/update.json";
   http_request.body = L"status=" + post_parameters[L"status"];
   http_request.header[L"Authorization"] =
       oauth.BuildAuthorizationHeader(L"https://api.twitter.com/1.1/statuses/update.json",

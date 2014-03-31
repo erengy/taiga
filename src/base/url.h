@@ -21,22 +21,41 @@
 
 #include <string>
 
+#include "map.h"
+
+typedef base::multimap<std::wstring, std::wstring> query_t;
+
+namespace base {
+namespace http {
+enum Protocol {
+  kHttp,
+  kHttps
+};
+}
+}
+
 class Url {
 public:
-  Url() {}
+  Url();
   Url(const std::wstring& url);
   ~Url() {}
 
+  void Clear();
+  std::wstring Build() const;
   void Crack(std::wstring url);
 
   Url& operator=(const Url& url);
   void operator=(const std::wstring& url);
 
-  std::wstring scheme;
+  base::http::Protocol protocol;
   std::wstring host;
+  unsigned short port;
   std::wstring path;
+  query_t query;
+  std::wstring fragment;
 };
 
-std::wstring EncodeUrl(const std::wstring& str, bool encode_unreserved = false);
+std::wstring DecodeUrl(const std::wstring& input);
+std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved = false);
 
 #endif  // TAIGA_BASE_URL_H

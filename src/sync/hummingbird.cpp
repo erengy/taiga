@@ -40,10 +40,10 @@ Service::Service() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
-  http_request.host = host_;
+  http_request.url.host = host_;
 
   // Mashape requires HTTPS connections
-  http_request.protocol = base::http::kHttps;
+  http_request.url.protocol = base::http::kHttps;
 
   // Hummingbird is supposed to return a JSON response for each and every
   // request, so that's what we expect from it
@@ -58,14 +58,14 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   // kAuthenticateUser method returns the user's authentication token, which
   // is to be used on all methods that require authentication.
   if (RequestNeedsAuthentication(request.type))
-    http_request.query[L"auth_token"] = auth_token_;
+    http_request.url.query[L"auth_token"] = auth_token_;
 
   switch (request.type) {
     case kAuthenticateUser:
       // TODO: Make sure username and password are available
-      http_request.query[L"username"] =
+      http_request.url.query[L"username"] =
           request.data[canonical_name_ + L"-username"];
-      http_request.query[L"password"] =
+      http_request.url.query[L"password"] =
           request.data[canonical_name_ + L"-password"];
       break;
     case kGetLibraryEntries:
@@ -104,27 +104,27 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
-  http_request.path = L"/users/authenticate";
+  http_request.url.path = L"/users/authenticate";
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  http_request.path =
+  http_request.url.path =
       L"/users/" + request.data[canonical_name_ + L"-username"] + L"/library";
 
   if (request.data.count(L"status"))
-    http_request.query[L"status"] =
+    http_request.url.query[L"status"] =
         TranslateMyStatusTo(ToInt(request.data[L"status"]));
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  http_request.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
+  http_request.url.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
   // This method is not documented, but otherwise works fine. Note that it will
   // return only 5 results at a time.
-  http_request.path = L"/search/anime";
-  http_request.query[L"query"] = request.data[L"title"];
+  http_request.url.path = L"/search/anime";
+  http_request.url.query[L"query"] = request.data[L"title"];
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -133,27 +133,28 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
 
 void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
-  http_request.path =
+  http_request.url.path =
       L"/libraries/" + request.data[canonical_name_ + L"-id"] + L"/remove";
 }
 
 void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
-  http_request.path = L"/libraries/" + request.data[canonical_name_ + L"-id"];
+  http_request.url.path =
+      L"/libraries/" + request.data[canonical_name_ + L"-id"];
 
   // When this undocumented parameter is included, Hummingbird will return a
   // "mal_id" value that identifies the corresponding entry in MyAnimeList, if
   // available.
-  http_request.query[L"include_mal_id"] = L"true";
+  http_request.url.query[L"include_mal_id"] = L"true";
 
   if (request.data.count(L"status"))
-    http_request.query[L"status"] =
+    http_request.url.query[L"status"] =
         TranslateMyStatusTo(ToInt(request.data[L"status"]));
   if (request.data.count(L"score"))
-    http_request.query[L"rating"] =
+    http_request.url.query[L"rating"] =
         TranslateMyRatingTo(ToInt(request.data[L"score"]));
   if (request.data.count(L"episode"))
-    http_request.query[L"episodes_watched"] = request.data[L"episode"];
+    http_request.url.query[L"episodes_watched"] = request.data[L"episode"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -225,7 +226,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
 }
 
 void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
-  UpdateLibraryEntry(response, http_response);
+  // Returns "false"
 }
 
 void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response) {

@@ -37,22 +37,17 @@
 #include <curl/curl.h>
 
 #include "map.h"
+#include "url.h"
 #include "win/win_thread.h"
 
 namespace base {
 namespace http {
 
 typedef base::multimap<std::wstring, std::wstring> header_t;
-typedef base::multimap<std::wstring, std::wstring> query_t;
 
 enum ContentEncoding {
   kContentEncodingNone,
   kContentEncodingGzip
-};
-
-enum Protocol {
-  kHttp,
-  kHttps
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,11 +59,9 @@ public:
 
   void Clear();
 
-  Protocol protocol;
   std::wstring method;
-  std::wstring host;
-  std::wstring path;
-  query_t query;
+  Url url;
+
   header_t header;
   std::wstring body;
 
@@ -84,6 +77,7 @@ public:
   void Clear();
 
   unsigned int code;
+
   header_t header;
   std::wstring body;
 

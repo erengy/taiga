@@ -136,11 +136,8 @@ void DownloadImage(int id, const string_t& image_url) {
   if (image_url.empty())
     return;
 
-  Url url(image_url);
-
   HttpRequest http_request;
-  http_request.host = url.host;
-  http_request.path = url.path;
+  http_request.url = image_url;
   http_request.parameter = id;
 
   auto& client = ConnectionManager.GetNewClient(http_request.uuid);

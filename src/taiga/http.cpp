@@ -96,7 +96,7 @@ bool HttpClient::OnRedirect(const std::wstring& address) {
   }
 
   Url url(address);
-  ConnectionManager.HandleRedirect(request_.host, url.host);
+  ConnectionManager.HandleRedirect(request_.url.host, url.host);
 
   return false;
 }
@@ -163,7 +163,7 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
       break;
   }
 
-  FreeConnection(client.request_.host);
+  FreeConnection(client.request_.url.host);
   ProcessQueue();
 }
 
@@ -231,7 +231,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
   }
 
-  FreeConnection(client.request_.host);
+  FreeConnection(client.request_.url.host);
   ProcessQueue();
 }
 
@@ -281,12 +281,12 @@ void HttpManager::ProcessQueue() {
     }
 
     HttpRequest& request = requests_.at(i);
-    if (connections_[request.host] == kMaxSimultaneousConnectionsPerHostname) {
-      LOG(LevelDebug, L"Reached max connections for hostname: " + request.host);
+    if (connections_[request.url.host] == kMaxSimultaneousConnectionsPerHostname) {
+      LOG(LevelDebug, L"Reached max connections for hostname: " + request.url.host);
       continue;
     } else {
       connections++;
-      connections_[request.host]++;
+      connections_[request.url.host]++;
 
       HttpClient& client = clients_[request.uuid];
       client.MakeRequest(request);

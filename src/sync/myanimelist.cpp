@@ -44,7 +44,7 @@ Service::Service() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
-  http_request.host = host_;
+  http_request.url.host = host_;
 
   // This doesn't quite help; MAL returns whatever it pleases
   http_request.header[L"Accept"] = L"text/xml, text/*";
@@ -101,17 +101,17 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 // Request builders
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
-  http_request.path = L"/api/account/verify_credentials.xml";
+  http_request.url.path = L"/api/account/verify_credentials.xml";
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   // malappinfo.php is an undocumented feature of MAL. While it's not a part
   // of their official API, it's the easiest way to get user lists.
-  http_request.path = L"/malappinfo.php";
-  http_request.query[L"u"] = request.data[canonical_name_ + L"-username"];
+  http_request.url.path = L"/malappinfo.php";
+  http_request.url.query[L"u"] = request.data[canonical_name_ + L"-username"];
   // Changing the status parameter to some other value such as "1" or "watching"
   // doesn't seem to make any difference.
-  http_request.query[L"status"] = L"all";
+  http_request.url.query[L"status"] = L"all";
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
@@ -119,18 +119,18 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
   // undocumented call that is normally used to display information bubbles
   // when hovering over anime/manga titles at the website. The downside is,
   // it doesn't provide all the information we need.
-  http_request.path = L"/includes/ajax.inc.php";
-  http_request.query[L"t"] = L"64";
-  http_request.query[L"id"] = request.data[canonical_name_ + L"-id"];
+  http_request.url.path = L"/includes/ajax.inc.php";
+  http_request.url.query[L"t"] = L"64";
+  http_request.url.query[L"id"] = request.data[canonical_name_ + L"-id"];
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
   // MAL's search method is far from perfect. Missing a punctuation mark
   // (e.g. "A B" instead of "A: B") or searching for a title that is too short
   // (e.g. "C", "K") can return irrelevant or no results.
-  http_request.path = L"/api/anime/search.xml";
+  http_request.url.path = L"/api/anime/search.xml";
   // TODO: We might have to do some encoding on the title here
-  http_request.query[L"q"] = request.data[L"title"];
+  http_request.url.query[L"q"] = request.data[L"title"];
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -150,8 +150,8 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   if (!request.data.count(L"action"))
     request.data[L"action"] = L"update";
 
-  http_request.path = L"/api/animelist/" + request.data[L"action"] + L"/" +
-                      request.data[canonical_name_ + L"-id"] + L".xml";
+  http_request.url.path = L"/api/animelist/" + request.data[L"action"] + L"/" +
+                          request.data[canonical_name_ + L"-id"] + L".xml";
 
   // Delete method doesn't require us to provide additional data
   if (request.data[L"action"] == L"delete")

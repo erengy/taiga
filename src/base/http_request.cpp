@@ -36,7 +36,7 @@ bool Client::MakeRequest(Request request) {
   LOG(LevelDebug, L"ID: " + request.uuid);
 
   // Set secure transaction state
-  secure_transaction_ = request.protocol == kHttps;
+  secure_transaction_ = request.url.protocol == kHttps;
 
   // Ensure that the response has the same parameter and UUID as the request
   response_.parameter = request.parameter;
@@ -94,30 +94,9 @@ bool Client::SetRequestOptions() {
   // Network options
 
   // Set URL
-  std::string url;
-  switch (request_.protocol) {
-    case kHttp:
-    default:
-      url += "http://";
-      break;
-    case kHttps:
-      url += "https://";
-      break;
-  }
-  url += WstrToStr(request_.host);
-  std::wstring path = request_.path;
-  if (!request_.query.empty()) {
-    std::wstring query_string;
-    foreach_(it, request_.query) {  // Append the query component to the path
-      query_string += query_string.empty() ? L"?" : L"&";
-      query_string += it->first + L"=" + EncodeUrl(it->second, false);
-    }
-    path += query_string;
-  }
-  url += WstrToStr(path);
-  TAIGA_CURL_SET_OPTION(CURLOPT_URL, url.c_str());
-  LOG(LevelDebug, L"Host: " + request_.host);
-  LOG(LevelDebug, L"Path: " + path);
+  std::wstring url = request_.url.Build();
+  TAIGA_CURL_SET_OPTION(CURLOPT_URL, WstrToStr(url).c_str());
+  LOG(LevelDebug, L"URL: " + url);
 
   // Set protocol
   int protocol = secure_transaction_ ? CURLPROTO_HTTPS : CURLPROTO_HTTP;
@@ -192,8 +171,6 @@ bool Client::SendRequest() {
   return Perform();
 #endif
 }
-
-
 
 bool Client::Perform() {
   CURLcode code = curl_easy_perform(curl_handle_);

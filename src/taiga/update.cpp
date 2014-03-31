@@ -44,13 +44,13 @@ void UpdateHelper::Cancel() {
 
 bool UpdateHelper::Check() {
   HttpRequest http_request;
-  http_request.host = L"taiga.erengy.com";
-  http_request.path = L"/update.php";
-  http_request.query[L"channel"] = L"beta";
-  http_request.query[L"check"] = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
-  http_request.query[L"version"] = std::wstring(Taiga.version);
-  http_request.query[L"service"] = GetCurrentService()->canonical_name();
-  http_request.query[L"username"] = GetCurrentUsername();
+  http_request.url.host = L"taiga.erengy.com";
+  http_request.url.path = L"/update.php";
+  http_request.url.query[L"channel"] = L"beta";
+  http_request.url.query[L"check"] = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
+  http_request.url.query[L"version"] = std::wstring(Taiga.version);
+  http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
+  http_request.url.query[L"username"] = GetCurrentUsername();
 
   client_uuid_ = http_request.uuid;
 
@@ -123,11 +123,8 @@ bool UpdateHelper::Download() {
   download_path_ = AddTrailingSlash(GetPathOnly(Taiga.GetModulePath()));
   download_path_ += GetFileName(feed_item->link);
 
-  Url url(feed_item->link);
-
   HttpRequest http_request;
-  http_request.host = url.host;
-  http_request.path = url.path;
+  http_request.url = feed_item->link;
 
   client_uuid_ = http_request.uuid;
 

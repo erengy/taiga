@@ -80,8 +80,8 @@ bool Client::ParseResponseHeader() {
     content_encoding_ = kContentEncodingNone;
     content_length_ = 0;
     current_length_ = 0;
-    request_.host = location.host;
-    request_.path = location.path;
+    request_.url.host = location.host;
+    request_.url.path = location.path;
     response_.Clear();
   }
 

@@ -100,11 +100,8 @@ bool Feed::Check(const std::wstring& source, bool automatic) {
       break;
   }
 
-  Url url(link);
-
   HttpRequest http_request;
-  http_request.host = url.host;
-  http_request.path = url.path;
+  http_request.url = link;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
 
   auto client_mode = automatic ?
@@ -141,11 +138,8 @@ bool Feed::Download(int index) {
   ValidateFileName(file);
   file = GetDataPath() + file;
 
-  Url url(items[index].link);
-
   HttpRequest http_request;
-  http_request.host = url.host;
-  http_request.path = url.path;
+  http_request.url = items[index].link;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
 
   auto& client = ConnectionManager.GetNewClient(http_request.uuid);

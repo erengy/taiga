@@ -418,19 +418,6 @@ void TorrentDialog::RefreshList() {
 
   // Show again
   list_.Show();
-
-  // Set title
-  std::wstring title = L"Torrents";
-  if (!feed->title.empty()) {
-    title = feed->title;
-  } else if (!feed->link.empty()) {
-    Url url(feed->link);
-    title += L" (" + url.host + L")";
-  }
-  if (!feed->description.empty()) {
-    title += L" - " + feed->description;
-  }
-  SetText(title.c_str());
 }
 
 void TorrentDialog::Search(std::wstring url, int anime_id) {

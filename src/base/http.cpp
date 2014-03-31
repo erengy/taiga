@@ -24,7 +24,7 @@ namespace base {
 namespace http {
 
 Request::Request()
-    : method(L"GET"), parameter(0), protocol(kHttp) {
+    : method(L"GET"), parameter(0) {
   // Each HTTP request must have a unique ID, as there are many parts of the
   // application that rely on this assumption.
   // TODO: Generate a real UUID
@@ -37,11 +37,8 @@ Response::Response()
 }
 
 void Request::Clear() {
-  protocol = kHttp;
   method = L"GET";
-  host.clear();
-  path.clear();
-  query.clear();
+  url.Clear();
   header.clear();
   body.clear();
 }
