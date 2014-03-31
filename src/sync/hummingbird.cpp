@@ -141,6 +141,11 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
   http_request.path = L"/libraries/" + request.data[canonical_name_ + L"-id"];
 
+  // When this undocumented parameter is included, Hummingbird will return a
+  // "mal_id" value that identifies the corresponding entry in MyAnimeList, if
+  // available.
+  http_request.query[L"include_mal_id"] = L"true";
+
   if (request.data.count(L"status"))
     http_request.query[L"status"] =
         TranslateMyStatusTo(ToInt(request.data[L"status"]));
@@ -306,6 +311,7 @@ void Service::ParseLibraryObject(Json::Value& value) {
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
+  anime_item.SetId(ToWstr(value["mal_id"].asInt()), sync::kMyAnimeList);
   anime_item.SetId(StrToWstr(anime_value["slug"].asString()), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
