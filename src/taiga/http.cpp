@@ -124,7 +124,7 @@ HttpClient& HttpManager::GetNewClient(const base::uuid_t& uuid) {
 
 void HttpManager::CancelRequest(base::uuid_t uuid) {
   if (clients_.count(uuid))
-    clients_[uuid].Cleanup();
+    clients_[uuid].Cancel();
 }
 
 void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {

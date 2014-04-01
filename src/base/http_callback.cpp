@@ -57,6 +57,9 @@ size_t Client::WriteFunction(char* ptr, size_t size, size_t nmemb,
 }
 
 int Client::ProgressFunction(curl_off_t dltotal, curl_off_t dlnow) {
+  if (cancel_)
+    return 1;  // Abort
+
   if (response_.header.empty())
     return 0;
   if (!dlnow && !dltotal)

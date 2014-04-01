@@ -192,7 +192,7 @@ bool Client::Perform() {
     if (!OnReadComplete())
       return true;
 
-  } else {
+  } else if (code != CURLE_ABORTED_BY_CALLBACK) {
     OnError(code);
   }
 

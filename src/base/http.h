@@ -103,6 +103,7 @@ public:
   Client();
   virtual ~Client();
 
+  void Cancel();
   void Cleanup();
   bool MakeRequest(Request request);
 
@@ -165,6 +166,7 @@ private:
   static CurlGlobal curl_global_;
   CURL* curl_handle_;
 
+  bool cancel_;
   curl_slist* header_list_;
   std::string optional_data_;
 };

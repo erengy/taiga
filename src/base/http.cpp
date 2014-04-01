@@ -51,6 +51,7 @@ void Response::Clear() {
 
 Client::Client()
     : auto_redirect_(true),
+      cancel_(false),
       content_encoding_(kContentEncodingNone),
       content_length_(0),
       current_length_(0),
@@ -65,6 +66,10 @@ Client::~Client() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void Client::Cancel() {
+  cancel_ = true;
+}
 
 void Client::Cleanup() {
   // Close handles
@@ -90,6 +95,7 @@ void Client::Cleanup() {
   write_buffer_.clear();
 
   // Reset variables
+  cancel_ = false;
   content_encoding_ = kContentEncodingNone;
   content_length_ = 0;
   current_length_ = 0;
