@@ -24,6 +24,7 @@
 #include "library/anime_util.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
+#include "taiga/taiga.h"
 #include "track/feed.h"
 #include "track/feed_filter.h"
 
@@ -366,12 +367,12 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     }
   }
 
-#ifdef _DEBUG
-  std::wstring filter_text =
-      (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
-      Aggregator.filter_manager.TranslateConditions(*this, condition_index);
-  item.description = filter_text + L" -- " + item.description;
-#endif
+  if (Taiga.debug_mode) {
+    std::wstring filter_text =
+        (item.IsDiscarded() ? L"!FILTER :: " : L"FILTER :: ") +
+        Aggregator.filter_manager.TranslateConditions(*this, condition_index);
+    item.description = filter_text + L" -- " + item.description;
+  }
 }
 
 void FeedFilter::Reset() {
@@ -459,10 +460,10 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       bool found = Aggregator.SearchArchive(item->title);
       if (found) {
         item->state = kFeedItemDiscardedNormal;
-#ifdef _DEBUG
-        std::wstring filter_text = L"!FILTER :: Archived";
-        item->description = filter_text + L" -- " + item->description;
-#endif
+        if (Taiga.debug_mode) {
+          std::wstring filter_text = L"!FILTER :: Archived";
+          item->description = filter_text + L" -- " + item->description;
+        }
       }
     }
   }

@@ -55,6 +55,7 @@ public:
   void LoadData();
 
   int current_tip_type, play_status;
+  bool debug_mode;
   bool logged_in;
   base::SemanticVersion version;
 
@@ -67,6 +68,9 @@ public:
     bool OnRestartApp();
     void OnRunActions();
   } Updater;
+
+private:
+  void ParseCommandLineArguments();
 };
 
 }  // namespace taiga

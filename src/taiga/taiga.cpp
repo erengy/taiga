@@ -39,9 +39,14 @@ taiga::App Taiga;
 namespace taiga {
 
 App::App()
-    : logged_in(false),
+    : debug_mode(false),
+      logged_in(false),
       current_tip_type(kTipTypeDefault),
       play_status(kPlayStatusStopped) {
+#ifdef _DEBUG
+  debug_mode = true;
+#endif
+
   version.major = TAIGA_VERSION_MAJOR;
   version.minor = TAIGA_VERSION_MINOR;
   version.patch = TAIGA_VERSION_PATCH;
@@ -73,6 +78,9 @@ BOOL App::InitInstance() {
   Logger.SetSeverityLevel(LevelWarning);
 #endif
   LOG(LevelInformational, L"Version " + std::wstring(version));
+
+  // Parse command line
+  ParseCommandLineArguments();
 
   // Load data
   LoadData();
@@ -113,6 +121,26 @@ void App::Uninitialize() {
 
   // Exit
   PostQuitMessage();
+}
+
+void App::ParseCommandLineArguments() {
+  int argument_count = 0;
+  LPWSTR* argument_list = CommandLineToArgvW(GetCommandLine(), &argument_count);
+
+  if (!argument_count || !argument_list)
+    return;
+
+  for (int i = 1; i < argument_count; i++) {
+    std::wstring argument = argument_list[i];
+
+    if (argument == L"-debug" && !debug_mode) {
+      debug_mode = true;
+      Logger.SetSeverityLevel(LevelDebug);
+      LOG(LevelDebug, argument);
+    }
+  }
+
+  LocalFree(argument_list);
 }
 
 void App::LoadData() {

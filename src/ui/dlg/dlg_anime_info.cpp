@@ -25,6 +25,7 @@
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
+#include "taiga/taiga.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_info_page.h"
@@ -482,11 +483,10 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"Please choose the correct one from the list below:\n\n";
       foreach_c_(it, scores) {
         content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->second) + L"\">" +
-                   AnimeDatabase.items[it->second].GetTitle() + L"</a>"
-#ifdef _DEBUG
-                   L" [Score: " + ToWstr(it->first) + L"]"
-#endif
-                   L"\n";
+                   AnimeDatabase.items[it->second].GetTitle() + L"</a>";
+        if (Taiga.debug_mode)
+          content += L" [Score: " + ToWstr(it->first) + L"]";
+        content += L"\n";
         if (++count >= 10)
           break;
       }

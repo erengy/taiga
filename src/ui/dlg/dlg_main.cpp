@@ -691,9 +691,8 @@ void MainDialog::UpdateStatusTimer() {
 
 void MainDialog::UpdateTip() {
   std::wstring tip = TAIGA_APP_TITLE;
-#ifdef _DEBUG
-  tip += L" [debug]";
-#endif
+  if (Taiga.debug_mode)
+    tip += L" [debug]";
 
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
@@ -706,18 +705,17 @@ void MainDialog::UpdateTip() {
 
 void MainDialog::UpdateTitle() {
   std::wstring title = TAIGA_APP_TITLE;
-#ifdef _DEBUG
-  title += L" [debug]";
-#endif
+  if (Taiga.debug_mode)
+    title += L" [debug]";
 
   const std::wstring username = taiga::GetCurrentUsername();
   if (!username.empty())
     title += L" \u2013 " + username;
-#ifdef _DEBUG
-  auto service = taiga::GetCurrentService();
-  if (service)
-    title += L" @ " + service->name();
-#endif
+  if (Taiga.debug_mode) {
+    auto service = taiga::GetCurrentService();
+    if (service)
+      title += L" @ " + service->name();
+  }
 
   if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);

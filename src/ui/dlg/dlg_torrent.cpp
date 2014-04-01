@@ -24,6 +24,7 @@
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
+#include "taiga/taiga.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_torrent.h"
@@ -295,22 +296,22 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);
             FeedItem* feed_item = reinterpret_cast<FeedItem*>(pCD->nmcd.lItemlParam);
             if (feed_item) {
-#ifdef _DEBUG
-              // Change background color
-              switch (feed_item->state) {
-                case kFeedItemDiscardedNormal:
-                case kFeedItemDiscardedInactive:
-                case kFeedItemDiscardedHidden:
-                  pCD->clrTextBk = ui::kColorLightRed;
-                  break;
-                case kFeedItemSelected:
-                  pCD->clrTextBk = ui::kColorLightGreen;
-                  break;
-                default:
-                  pCD->clrTextBk = GetSysColor(COLOR_WINDOW);
-                  break;
+              if (Taiga.debug_mode) {
+                // Change background color
+                switch (feed_item->state) {
+                  case kFeedItemDiscardedNormal:
+                  case kFeedItemDiscardedInactive:
+                  case kFeedItemDiscardedHidden:
+                    pCD->clrTextBk = ui::kColorLightRed;
+                    break;
+                  case kFeedItemSelected:
+                    pCD->clrTextBk = ui::kColorLightGreen;
+                    break;
+                  default:
+                    pCD->clrTextBk = GetSysColor(COLOR_WINDOW);
+                    break;
+                }
               }
-#endif
               // Change text color
               if (feed_item->state == kFeedItemDiscardedInactive) {
                 pCD->clrText = GetSysColor(COLOR_GRAYTEXT);

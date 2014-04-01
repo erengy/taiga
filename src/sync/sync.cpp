@@ -70,11 +70,6 @@ void SearchTitle(string_t title, int id) {
 }
 
 void Synchronize() {
-#ifdef _DEBUG
-  if (taiga::GetCurrentServiceId() != sync::kHummingbird)
-    Taiga.logged_in = true;
-#endif
-
   if (!Taiga.logged_in) {
     if (!taiga::GetCurrentUsername().empty() &&
         !taiga::GetCurrentPassword().empty()) {
