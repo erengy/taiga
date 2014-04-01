@@ -312,9 +312,12 @@ void Service::ParseLibraryObject(Json::Value& value) {
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
-  anime_item.SetId(ToWstr(value["mal_id"].asInt()), sync::kMyAnimeList);
   anime_item.SetId(StrToWstr(anime_value["slug"].asString()), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
+
+  int mal_id = value["mal_id"].asInt();
+  if (mal_id > 0)
+    anime_item.SetId(ToWstr(mal_id), sync::kMyAnimeList);
 
   ParseAnimeObject(anime_value, anime_item);
 
