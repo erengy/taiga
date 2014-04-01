@@ -83,10 +83,11 @@ public:
   public:
     Navigation() : current_page_(-1), index_(-1), parent(nullptr) {}
     int GetCurrentPage();
-    void SetCurrentPage(int page, bool reorder = true);
+    void SetCurrentPage(int page, bool add_to_history = true);
     void GoBack();
     void GoForward();
     void Refresh(bool add_to_history);
+    void RefreshSearchText(int previous_page);
     MainDialog* parent;
   private:
     int current_page_;

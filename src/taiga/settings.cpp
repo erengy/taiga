@@ -518,9 +518,9 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
       ui::OnSettingsServiceChangeFailed();
       Set(kSync_ActiveService, previous_service);
       changed_service = false;
-    } else {
-      if (ui::OnSettingsServiceChange(previous_service,
-                                      GetWstr(kSync_ActiveService))) {
+    } else if (!previous_user.empty()) {
+      if (ui::OnSettingsServiceChangeConfirm(previous_service,
+                                             GetWstr(kSync_ActiveService))) {
         std::wstring current_service = GetWstr(kSync_ActiveService);
         Set(kSync_ActiveService, previous_service);
         AnimeDatabase.SaveList(true);
@@ -548,6 +548,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
     Stats.CalculateAll();
     Taiga.logged_in = false;
     ui::OnSettingsUserChange();
+    ui::OnSettingsServiceChange();
   } else {
     ui::OnSettingsChange();
   }

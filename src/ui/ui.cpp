@@ -614,8 +614,13 @@ void OnSettingsRootFoldersEmpty() {
     ShowDlgSettings(kSettingsSectionLibrary, kSettingsPageLibraryFolders);
 }
 
-bool OnSettingsServiceChange(const string_t& current_service,
-                             const string_t& new_service) {
+void OnSettingsServiceChange() {
+  int current_page = DlgMain.navigation.GetCurrentPage();
+  DlgMain.navigation.RefreshSearchText(current_page);
+}
+
+bool OnSettingsServiceChangeConfirm(const string_t& current_service,
+                                    const string_t& new_service) {
   win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
   std::wstring instruction =
       L"Are you sure you want to change the active service from " +

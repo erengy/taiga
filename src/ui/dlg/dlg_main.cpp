@@ -744,41 +744,7 @@ void MainDialog::Navigation::SetCurrentPage(int page, bool add_to_history) {
   int previous_page = current_page_;
   current_page_ = page;
 
-  std::wstring cue_text, search_text;
-  switch (current_page_) {
-    case kSidebarItemAnimeList:
-    case kSidebarItemSeasons:
-      parent->search_bar.mode = kSearchModeService;
-      cue_text = L"Filter list or search " + taiga::GetCurrentService()->name();
-      break;
-    case kSidebarItemNowPlaying:
-    case kSidebarItemHistory:
-    case kSidebarItemStats:
-    case kSidebarItemSearch:
-      parent->search_bar.mode = kSearchModeService;
-      cue_text = L"Search " + taiga::GetCurrentService()->name() + L" for anime";
-      if (current_page_ == kSidebarItemSearch)
-        search_text = DlgSearch.search_text;
-      break;
-    case kSidebarItemFeeds:
-      parent->search_bar.mode = kSearchModeFeed;
-      cue_text = L"Search for torrents";
-      break;
-  }
-  if (!parent->search_bar.filters.text.empty()) {
-    parent->search_bar.filters.text.clear();
-    switch (previous_page) {
-      case kSidebarItemAnimeList:
-        DlgAnimeList.RefreshList();
-        DlgAnimeList.RefreshTabs();
-        break;
-      case kSidebarItemSeasons:
-        DlgSeason.RefreshList();
-        break;
-    }
-  }
-  parent->edit.SetCueBannerText(cue_text.c_str());
-  parent->edit.SetText(search_text);
+  RefreshSearchText(previous_page);
 
   #define DISPLAY_PAGE(item, dialog, resource_id) \
     case item: \
@@ -834,6 +800,48 @@ void MainDialog::Navigation::Refresh(bool add_to_history) {
     items_.push_back(current_page_);
     index_ = items_.size() - 1;
   }
+}
+
+void MainDialog::Navigation::RefreshSearchText(int previous_page) {
+  std::wstring cue_text;
+  std::wstring search_text;
+
+  switch (current_page_) {
+    case kSidebarItemAnimeList:
+    case kSidebarItemSeasons:
+      parent->search_bar.mode = kSearchModeService;
+      cue_text = L"Filter list or search " + taiga::GetCurrentService()->name();
+      break;
+    case kSidebarItemNowPlaying:
+    case kSidebarItemHistory:
+    case kSidebarItemStats:
+    case kSidebarItemSearch:
+      parent->search_bar.mode = kSearchModeService;
+      cue_text = L"Search " + taiga::GetCurrentService()->name() + L" for anime";
+      if (current_page_ == kSidebarItemSearch)
+        search_text = DlgSearch.search_text;
+      break;
+    case kSidebarItemFeeds:
+      parent->search_bar.mode = kSearchModeFeed;
+      cue_text = L"Search for torrents";
+      break;
+  }
+
+  if (!parent->search_bar.filters.text.empty()) {
+    parent->search_bar.filters.text.clear();
+    switch (previous_page) {
+      case kSidebarItemAnimeList:
+        DlgAnimeList.RefreshList();
+        DlgAnimeList.RefreshTabs();
+        break;
+      case kSidebarItemSeasons:
+        DlgSeason.RefreshList();
+        break;
+    }
+  }
+
+  parent->edit.SetCueBannerText(cue_text.c_str());
+  parent->edit.SetText(search_text);
 }
 
 }  // namespace ui
