@@ -317,6 +317,9 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   Split(genres, L", ", genres_vector);
 
   StripHtmlTags(score);
+  int pos = InStr(score, L" (", 0);
+  if (pos > -1)
+    score.resize(pos);
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
