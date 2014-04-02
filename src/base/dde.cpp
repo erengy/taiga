@@ -154,7 +154,8 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt,
     }
 
     case XTYP_POKE: {
-      if (hdata) lpData = DdeAccessData(hdata, &cb);
+      if (hdata)
+        lpData = DdeAccessData(hdata, &cb);
 #ifdef _DEBUG
       std::string str = "[POKE]";
       str += "Topic: " + *sz1;
@@ -164,7 +165,8 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt,
       OutputDebugStringA(str.c_str());
 #endif
       //OnPoke();
-      if (hdata) DdeUnaccessData(hdata);
+      if (hdata)
+        DdeUnaccessData(hdata);
       return reinterpret_cast<HDDEDATA>(DDE_FACK);
     }
 

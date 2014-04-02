@@ -91,7 +91,7 @@ void ErasePunctuation(wstring& str, bool keep_trailing) {
   str.resize(str.size() - (rlast.base() - it));
 }
 
-void EraseLeft(wstring& str1, const wstring str2, bool case_insensitive) {
+void EraseLeft(wstring& str1, const wstring& str2, bool case_insensitive) {
   if (str1.length() < str2.length())
     return;
 
@@ -106,7 +106,7 @@ void EraseLeft(wstring& str1, const wstring str2, bool case_insensitive) {
   str1.erase(str1.begin(), str1.begin() + str2.length());
 }
 
-void EraseRight(wstring& str1, const wstring str2, bool case_insensitive) {
+void EraseRight(wstring& str1, const wstring& str2, bool case_insensitive) {
   if (str1.length() < str2.length())
     return;
 
@@ -155,7 +155,7 @@ int CompareStrings(const wstring& str1, const wstring& str2,
   }
 }
 
-int InStr(const wstring& str1, const wstring str2, int pos,
+int InStr(const wstring& str1, const wstring& str2, int pos,
           bool case_insensitive) {
   if (str1.empty())
     return -1;
@@ -191,17 +191,17 @@ wstring InStr(const wstring& str1, const wstring& str2_left,
   return output;
 }
 
-int InStrRev(const wstring& str1, const wstring str2, int pos) {
+int InStrRev(const wstring& str1, const wstring& str2, int pos) {
   size_t i = str1.rfind(str2, pos);
   return (i != wstring::npos) ? i : -1;
 }
 
-int InStrChars(const wstring& str1, const wstring str2, int pos) {
+int InStrChars(const wstring& str1, const wstring& str2, int pos) {
   size_t i = str1.find_first_of(str2, pos);
   return (i != wstring::npos) ? i : -1;
 }
 
-int InStrCharsRev(const wstring& str1, const wstring str2, int pos) {
+int InStrCharsRev(const wstring& str1, const wstring& str2, int pos) {
   size_t i = str1.find_last_of(str2, pos);
   return (i != wstring::npos) ? i : -1;
 }

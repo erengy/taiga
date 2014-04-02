@@ -29,7 +29,7 @@
 #pragma warning (disable: 4996)
 #endif
 
-#define MAKEQWORD(a, b)	((QWORD)(((QWORD)((DWORD)(a))) << 32 | ((DWORD)(b))))
+#define MAKEQWORD(a, b) ((QWORD)(((QWORD)((DWORD)(a))) << 32 | ((DWORD)(b))))
 
 ////////////////////////////////////////////////////////////////////////////////
 

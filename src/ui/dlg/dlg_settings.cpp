@@ -496,7 +496,6 @@ LRESULT SettingsDialog::TreeView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam
 ////////////////////////////////////////////////////////////////////////////////
 
 int SettingsDialog::AddTorrentFilterToList(HWND hwnd_list, const FeedFilter& filter) {
-  std::wstring text;
   win::ListView list = hwnd_list;
   int index = list.GetItemCount();
   int group = filter.anime_ids.empty() ? 0 : 1;

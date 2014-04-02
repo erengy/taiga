@@ -26,8 +26,8 @@
 void Erase(std::wstring& str1, const std::wstring& str2, bool case_insensitive = false);
 void EraseChars(std::wstring& str, const wchar_t chars[]);
 void ErasePunctuation(std::wstring& str, bool keep_trailing = false);
-void EraseLeft(std::wstring& str1, const std::wstring str2, bool case_insensitive = false);
-void EraseRight(std::wstring& str1, const std::wstring str2, bool case_insensitive = false);
+void EraseLeft(std::wstring& str1, const std::wstring& str2, bool case_insensitive = false);
+void EraseRight(std::wstring& str1, const std::wstring& str2, bool case_insensitive = false);
 void RemoveEmptyStrings(std::vector<std::wstring>& input);
 
 std::wstring CharLeft(const std::wstring& str, int length);
@@ -37,11 +37,11 @@ int CompareStrings(const std::wstring& str1, const std::wstring& str2, bool case
 inline bool IsCharsEqual(const wchar_t c1, const wchar_t c2);
 bool IsEqual(const std::wstring& str1, const std::wstring& str2);
 
-int InStr(const std::wstring& str1, const std::wstring str2, int pos = 0, bool case_insensitive = false);
+int InStr(const std::wstring& str1, const std::wstring& str2, int pos = 0, bool case_insensitive = false);
 std::wstring InStr(const std::wstring& str1, const std::wstring& str2_left, const std::wstring& str2_right);
-int InStrRev(const std::wstring& str1, const std::wstring str2, int pos);
-int InStrChars(const std::wstring& str1, const std::wstring str2, int pos);
-int InStrCharsRev(const std::wstring& str1, const std::wstring str2, int pos);
+int InStrRev(const std::wstring& str1, const std::wstring& str2, int pos);
+int InStrChars(const std::wstring& str1, const std::wstring& str2, int pos);
+int InStrCharsRev(const std::wstring& str1, const std::wstring& str2, int pos);
 
 bool IsAlphanumeric(const wchar_t c);
 bool IsAlphanumeric(const std::wstring& str);
