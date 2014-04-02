@@ -79,6 +79,14 @@ int Client::ProgressFunction(curl_off_t dltotal, curl_off_t dlnow) {
 
 int Client::DebugCallback(CURL* curl, curl_infotype infotype, char* data,
                           size_t size, void* client) {
+  if (infotype == CURLINFO_DATA_IN || infotype == CURLINFO_DATA_OUT) {
+    if (client) {
+      auto client_ = reinterpret_cast<Client*>(client);
+      if (client_->content_encoding_ == kContentEncodingGzip)
+        return 0;
+    }
+  }
+
   std::wstring text;
 
   switch (infotype) {
