@@ -80,6 +80,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     BUILD_HTTP_REQUEST(kDeleteLibraryEntry, DeleteLibraryEntry);
     BUILD_HTTP_REQUEST(kGetLibraryEntries, GetLibraryEntries);
     BUILD_HTTP_REQUEST(kGetMetadataById, GetMetadataById);
+    BUILD_HTTP_REQUEST(kGetMetadataByIdV2, GetMetadataByIdV2);
     BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
     BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
   }
@@ -93,6 +94,7 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
       HANDLE_HTTP_RESPONSE(kDeleteLibraryEntry, DeleteLibraryEntry);
       HANDLE_HTTP_RESPONSE(kGetLibraryEntries, GetLibraryEntries);
       HANDLE_HTTP_RESPONSE(kGetMetadataById, GetMetadataById);
+      HANDLE_HTTP_RESPONSE(kGetMetadataByIdV2, GetMetadataByIdV2);
       HANDLE_HTTP_RESPONSE(kSearchTitle, SearchTitle);
       HANDLE_HTTP_RESPONSE(kUpdateLibraryEntry, UpdateLibraryEntry);
     }
@@ -117,6 +119,13 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
+  http_request.url.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
+}
+
+void Service::GetMetadataByIdV2(Request& request, HttpRequest& http_request) {
+  // Hummingbird APIv2 is not yet ready, but this method can be called for
+  // additional data that APIv1 doesn't provide.
+  http_request.url.host = L"vikhyat-hummingbird-v2.p.mashape.com";
   http_request.url.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
 }
 
@@ -196,6 +205,26 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   anime_item.SetLastModified(time(nullptr));  // current time
 
   ParseAnimeObject(root, anime_item);
+
+  AnimeDatabase.UpdateItem(anime_item);
+}
+
+void Service::GetMetadataByIdV2(Response& response, HttpResponse& http_response) {
+  Json::Value root;
+  Json::Reader reader;
+  bool parsed = reader.parse(WstrToStr(http_response.body), root);
+
+  if (!parsed) {
+    response.data[L"error"] = L"Could not parse the anime object";
+    return;
+  }
+
+  ::anime::Item anime_item;
+  anime_item.SetSource(this->id());
+  anime_item.SetId(StrToWstr(root["id"].asString()), this->id());
+  anime_item.SetLastModified(time(nullptr));  // current time
+
+  ParseAnimeObjectV2(root, anime_item);
 
   AnimeDatabase.UpdateItem(anime_item);
 }
@@ -301,6 +330,26 @@ void Service::ParseAnimeObject(Json::Value& value, anime::Item& anime_item) {
   auto& genres_value = value["genres"];
   for (size_t i = 0; i < genres_value.size(); i++)
     genres.push_back(StrToWstr(genres_value[i]["name"].asString()));
+
+  if (!genres.empty())
+    anime_item.SetGenres(genres);
+}
+
+void Service::ParseAnimeObjectV2(Json::Value& value, anime::Item& anime_item) {
+  anime_item.SetTitle(StrToWstr(value["canonical_title"].asString()));
+  anime_item.SetEnglishTitle(StrToWstr(value["english_title"].asString()));
+  anime_item.SetSynonyms(StrToWstr(value["romaji_title"].asString()));
+  anime_item.SetSynopsis(StrToWstr(value["synopsis"].asString()));
+  anime_item.SetImageUrl(StrToWstr(value["poster_image"].asString()));
+  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(value["type"].asString())));
+  anime_item.SetDateStart(StrToWstr(value["started_airing"].asString()));
+  anime_item.SetDateEnd(StrToWstr(value["finished_airing"].asString()));
+  anime_item.SetScore(TranslateSeriesRatingFrom(value["community_rating"].asFloat()));
+
+  std::vector<std::wstring> genres;
+  auto& genres_value = value["genres"];
+  for (size_t i = 0; i < genres_value.size(); i++)
+    genres.push_back(StrToWstr(genres_value[i].asString()));
 
   if (!genres.empty())
     anime_item.SetGenres(genres);

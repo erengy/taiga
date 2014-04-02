@@ -23,7 +23,8 @@
 
 namespace sync {
 namespace hummingbird {
-
+  
+std::wstring TranslateSeriesRatingFrom(float value);
 int TranslateSeriesStatusFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);
 int TranslateSeriesTypeFrom(int value);

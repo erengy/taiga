@@ -28,6 +28,10 @@
 namespace sync {
 namespace hummingbird {
 
+std::wstring TranslateSeriesRatingFrom(float value) {
+  return ToWstr(static_cast<double>(value) * 2.0, 2);
+}
+
 int TranslateSeriesStatusFrom(int value) {
   switch (value) {
     case kCurrentlyAiring: return anime::kAiring;

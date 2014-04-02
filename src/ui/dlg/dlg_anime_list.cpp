@@ -1113,6 +1113,8 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
         ui::kIcon16_Play : StatusToIcon(anime_item->GetAiringStatus());
     listview.SetItemIcon(index, icon_index);
     listview.SetItem(index, 2, anime::TranslateNumber(anime_item->GetMyScore()).c_str());
+    listview.SetItem(index, 3, anime::TranslateType(anime_item->GetType()).c_str());
+    listview.SetItem(index, 4, anime::TranslateDateToSeason(anime_item->GetDateStart()).c_str());
     listview.RedrawItems(index, index, true);
   }
 }

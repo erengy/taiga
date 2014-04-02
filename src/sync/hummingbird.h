@@ -48,12 +48,14 @@ private:
   REQUEST_AND_RESPONSE(DeleteLibraryEntry);
   REQUEST_AND_RESPONSE(GetLibraryEntries);
   REQUEST_AND_RESPONSE(GetMetadataById);
+  REQUEST_AND_RESPONSE(GetMetadataByIdV2);
   REQUEST_AND_RESPONSE(SearchTitle);
   REQUEST_AND_RESPONSE(UpdateLibraryEntry);
 
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
   void ParseAnimeObject(Json::Value& value, anime::Item& anime_item);
+  void ParseAnimeObjectV2(Json::Value& value, anime::Item& anime_item);
   void ParseLibraryObject(Json::Value& value);
 
   string_t auth_token_;
