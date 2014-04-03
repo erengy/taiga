@@ -72,14 +72,14 @@ int Item::GetEpisodeCount() const {
   if (metadata_.extent.size() > 0)
     return metadata_.extent.at(0);
 
-  return -1;
+  return kUnknownEpisodeCount;
 }
 
 int Item::GetEpisodeLength() const {
   if (metadata_.extent.size() > 1)
     return metadata_.extent.at(1);
 
-  return -1;
+  return kUnknownEpisodeLength;
 }
 
 int Item::GetAiringStatus(bool check_date) const {

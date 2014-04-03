@@ -278,11 +278,13 @@ int Database::UpdateItem(const Item& new_item) {
     if (new_item.GetSource() != sync::kTaiga)
       item->SetSource(new_item.GetSource());
 
-    if (new_item.GetType() > 0)
+    if (new_item.GetType() != kUnknownType)
       item->SetType(new_item.GetType());
-    if (new_item.GetEpisodeCount() > -1)
+    if (new_item.GetEpisodeCount() != kUnknownEpisodeCount)
       item->SetEpisodeCount(new_item.GetEpisodeCount());
-    if (new_item.GetAiringStatus(false) > 0)
+    if (new_item.GetEpisodeLength() != kUnknownEpisodeLength)
+      item->SetEpisodeLength(new_item.GetEpisodeLength());
+    if (new_item.GetAiringStatus(false) != kUnknownStatus)
       item->SetAiringStatus(new_item.GetAiringStatus());
     if (!new_item.GetSlug().empty())
       item->SetSlug(new_item.GetSlug());

@@ -56,6 +56,11 @@ enum SeriesType {
   kMusic
 };
 
+enum SeriesEpisodeInfo {
+  kUnknownEpisodeCount = -1,
+  kUnknownEpisodeLength = -1
+};
+
 enum MyStatus {
   kMyStatusFirst = 1,
   kNotInList = 0,
