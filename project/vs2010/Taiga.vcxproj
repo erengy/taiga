@@ -1,0 +1,378 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{50BAD968-CEBF-46CA-A18A-FE3E8D625F94}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Taiga</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+    <IntDir>..\..\build\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+    <IntDir>..\..\build\$(Configuration)\</IntDir>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>comctl32.lib;libcurl_debug.lib;Oleacc.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winhttp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
+      <AdditionalManifestDependencies>type=%27win32%27 name=%27Microsoft.Windows.Common-Controls%27 version=%276.0.0.0%27 processorArchitecture=%27x86%27 publicKeyToken=%276595b64144ccf1df%27 language=%27*%27;%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <AdditionalLibraryDirectories>..\..\deps\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MinSpace</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
+      <AdditionalIncludeDirectories>..\..\deps\src;..\..\src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>comctl32.lib;libcurl.lib;Oleacc.lib;psapi.lib;shlwapi.lib;uxtheme.lib;Winhttp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>comctl32.dll</DelayLoadDLLs>
+      <AdditionalManifestDependencies>type=%27win32%27 name=%27Microsoft.Windows.Common-Controls%27 version=%276.0.0.0%27 processorArchitecture=%27x86%27 publicKeyToken=%276595b64144ccf1df%27 language=%27*%27;%(AdditionalManifestDependencies)</AdditionalManifestDependencies>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <AdditionalLibraryDirectories>..\..\deps\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
+    <ClCompile Include="..\..\deps\src\jsoncpp\json_reader.cpp" />
+    <ClCompile Include="..\..\deps\src\jsoncpp\json_value.cpp" />
+    <ClCompile Include="..\..\deps\src\jsoncpp\json_writer.cpp" />
+    <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp" />
+    <ClCompile Include="..\..\deps\src\zlib\adler32.c" />
+    <ClCompile Include="..\..\deps\src\zlib\compress.c" />
+    <ClCompile Include="..\..\deps\src\zlib\crc32.c" />
+    <ClCompile Include="..\..\deps\src\zlib\deflate.c" />
+    <ClCompile Include="..\..\deps\src\zlib\gzclose.c" />
+    <ClCompile Include="..\..\deps\src\zlib\gzlib.c" />
+    <ClCompile Include="..\..\deps\src\zlib\gzread.c" />
+    <ClCompile Include="..\..\deps\src\zlib\gzwrite.c" />
+    <ClCompile Include="..\..\deps\src\zlib\infback.c" />
+    <ClCompile Include="..\..\deps\src\zlib\inffast.c" />
+    <ClCompile Include="..\..\deps\src\zlib\inflate.c" />
+    <ClCompile Include="..\..\deps\src\zlib\inftrees.c" />
+    <ClCompile Include="..\..\deps\src\zlib\trees.c" />
+    <ClCompile Include="..\..\deps\src\zlib\uncompr.c" />
+    <ClCompile Include="..\..\deps\src\zlib\zutil.c" />
+    <ClCompile Include="..\..\src\base\accessibility.cpp" />
+    <ClCompile Include="..\..\src\base\base64.cpp" />
+    <ClCompile Include="..\..\src\base\crc.cpp" />
+    <ClCompile Include="..\..\src\base\crypto.cpp" />
+    <ClCompile Include="..\..\src\base\dde.cpp" />
+    <ClCompile Include="..\..\src\base\file.cpp" />
+    <ClCompile Include="..\..\src\base\gfx.cpp" />
+    <ClCompile Include="..\..\src\base\gzip.cpp" />
+    <ClCompile Include="..\..\src\base\html.cpp" />
+    <ClCompile Include="..\..\src\base\http.cpp" />
+    <ClCompile Include="..\..\src\base\http_callback.cpp" />
+    <ClCompile Include="..\..\src\base\http_request.cpp" />
+    <ClCompile Include="..\..\src\base\http_response.cpp" />
+    <ClCompile Include="..\..\src\base\json.cpp" />
+    <ClCompile Include="..\..\src\base\log.cpp" />
+    <ClCompile Include="..\..\src\base\oauth.cpp" />
+    <ClCompile Include="..\..\src\base\process.cpp" />
+    <ClCompile Include="..\..\src\base\string.cpp" />
+    <ClCompile Include="..\..\src\base\time.cpp" />
+    <ClCompile Include="..\..\src\base\timer.cpp" />
+    <ClCompile Include="..\..\src\base\url.cpp" />
+    <ClCompile Include="..\..\src\base\version.cpp" />
+    <ClCompile Include="..\..\src\base\xml.cpp" />
+    <ClCompile Include="..\..\src\library\anime.cpp" />
+    <ClCompile Include="..\..\src\library\anime_db.cpp" />
+    <ClCompile Include="..\..\src\library\anime_episode.cpp" />
+    <ClCompile Include="..\..\src\library\anime_filter.cpp" />
+    <ClCompile Include="..\..\src\library\anime_item.cpp" />
+    <ClCompile Include="..\..\src\library\anime_util.cpp" />
+    <ClCompile Include="..\..\src\library\anime_util_time.cpp" />
+    <ClCompile Include="..\..\src\library\discover.cpp" />
+    <ClCompile Include="..\..\src\library\history.cpp" />
+    <ClCompile Include="..\..\src\library\metadata.cpp" />
+    <ClCompile Include="..\..\src\library\resource.cpp" />
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\sync\hummingbird.cpp" />
+    <ClCompile Include="..\..\src\sync\hummingbird_util.cpp" />
+    <ClCompile Include="..\..\src\sync\manager.cpp" />
+    <ClCompile Include="..\..\src\sync\myanimelist.cpp" />
+    <ClCompile Include="..\..\src\sync\myanimelist_util.cpp" />
+    <ClCompile Include="..\..\src\sync\service.cpp" />
+    <ClCompile Include="..\..\src\sync\sync.cpp" />
+    <ClCompile Include="..\..\src\taiga\action.cpp" />
+    <ClCompile Include="..\..\src\taiga\announce.cpp" />
+    <ClCompile Include="..\..\src\taiga\api.cpp" />
+    <ClCompile Include="..\..\src\taiga\debug.cpp" />
+    <ClCompile Include="..\..\src\taiga\dummy.cpp" />
+    <ClCompile Include="..\..\src\taiga\http.cpp" />
+    <ClCompile Include="..\..\src\taiga\path.cpp" />
+    <ClCompile Include="..\..\src\taiga\script.cpp" />
+    <ClCompile Include="..\..\src\taiga\settings.cpp" />
+    <ClCompile Include="..\..\src\taiga\stats.cpp" />
+    <ClCompile Include="..\..\src\taiga\taiga.cpp" />
+    <ClCompile Include="..\..\src\taiga\timer.cpp" />
+    <ClCompile Include="..\..\src\taiga\update.cpp" />
+    <ClCompile Include="..\..\src\track\feed.cpp" />
+    <ClCompile Include="..\..\src\track\feed_filter.cpp" />
+    <ClCompile Include="..\..\src\track\media.cpp" />
+    <ClCompile Include="..\..\src\track\media_stream.cpp" />
+    <ClCompile Include="..\..\src\track\monitor.cpp" />
+    <ClCompile Include="..\..\src\track\recognition.cpp" />
+    <ClCompile Include="..\..\src\track\search.cpp" />
+    <ClCompile Include="..\..\src\ui\dialog.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_about.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_anime_info.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_anime_info_page.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_anime_list.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_feed_condition.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_feed_filter.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_format.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_history.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_input.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_main.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_main_controls.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_search.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_season.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_settings.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_settings_page.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_stats.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_test_recognition.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_torrent.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_update.cpp" />
+    <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp" />
+    <ClCompile Include="..\..\src\ui\list.cpp" />
+    <ClCompile Include="..\..\src\ui\menu.cpp" />
+    <ClCompile Include="..\..\src\ui\theme.cpp" />
+    <ClCompile Include="..\..\src\ui\ui.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_combobox.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_edit.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_imagelist.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_listview.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_progressbar.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_rebar.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_richedit.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_spin.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_statusbar.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_syslink.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tab.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_toolbar.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tooltip.cpp" />
+    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_treeview.cpp" />
+    <ClCompile Include="..\..\src\win\win_dialog.cpp" />
+    <ClCompile Include="..\..\src\win\win_gdi.cpp" />
+    <ClCompile Include="..\..\src\win\win_gdiplus.cpp" />
+    <ClCompile Include="..\..\src\win\win_main.cpp" />
+    <ClCompile Include="..\..\src\win\win_menu.cpp" />
+    <ClCompile Include="..\..\src\win\win_registry.cpp" />
+    <ClCompile Include="..\..\src\win\win_resizable.cpp" />
+    <ClCompile Include="..\..\src\win\win_taskbar.cpp" />
+    <ClCompile Include="..\..\src\win\win_taskdialog.cpp" />
+    <ClCompile Include="..\..\src\win\win_thread.cpp" />
+    <ClCompile Include="..\..\src\win\win_window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\deps\src\base64\base64.h" />
+    <ClInclude Include="..\..\deps\src\curl\curl.h" />
+    <ClInclude Include="..\..\deps\src\curl\curlbuild.h" />
+    <ClInclude Include="..\..\deps\src\curl\curlrules.h" />
+    <ClInclude Include="..\..\deps\src\curl\curlver.h" />
+    <ClInclude Include="..\..\deps\src\curl\easy.h" />
+    <ClInclude Include="..\..\deps\src\curl\mprintf.h" />
+    <ClInclude Include="..\..\deps\src\curl\multi.h" />
+    <ClInclude Include="..\..\deps\src\curl\stdcheaders.h" />
+    <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\autolink.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\config.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\features.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\forwards.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\reader.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\value.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\writer.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json_batchallocator.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json_tool.h" />
+    <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp" />
+    <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp" />
+    <ClInclude Include="..\..\deps\src\zlib\crc32.h" />
+    <ClInclude Include="..\..\deps\src\zlib\deflate.h" />
+    <ClInclude Include="..\..\deps\src\zlib\gzguts.h" />
+    <ClInclude Include="..\..\deps\src\zlib\inffast.h" />
+    <ClInclude Include="..\..\deps\src\zlib\inffixed.h" />
+    <ClInclude Include="..\..\deps\src\zlib\inflate.h" />
+    <ClInclude Include="..\..\deps\src\zlib\inftrees.h" />
+    <ClInclude Include="..\..\deps\src\zlib\trees.h" />
+    <ClInclude Include="..\..\deps\src\zlib\zconf.h" />
+    <ClInclude Include="..\..\deps\src\zlib\zlib.h" />
+    <ClInclude Include="..\..\deps\src\zlib\zutil.h" />
+    <ClInclude Include="..\..\src\base\accessibility.h" />
+    <ClInclude Include="..\..\src\base\base64.h" />
+    <ClInclude Include="..\..\src\base\crc.h" />
+    <ClInclude Include="..\..\src\base\crypto.h" />
+    <ClInclude Include="..\..\src\base\dde.h" />
+    <ClInclude Include="..\..\src\base\file.h" />
+    <ClInclude Include="..\..\src\base\foreach.h" />
+    <ClInclude Include="..\..\src\base\gfx.h" />
+    <ClInclude Include="..\..\src\base\gzip.h" />
+    <ClInclude Include="..\..\src\base\html.h" />
+    <ClInclude Include="..\..\src\base\http.h" />
+    <ClInclude Include="..\..\src\base\json.h" />
+    <ClInclude Include="..\..\src\base\log.h" />
+    <ClInclude Include="..\..\src\base\map.h" />
+    <ClInclude Include="..\..\src\base\oauth.h" />
+    <ClInclude Include="..\..\src\base\optional.h" />
+    <ClInclude Include="..\..\src\base\process.h" />
+    <ClInclude Include="..\..\src\base\string.h" />
+    <ClInclude Include="..\..\src\base\time.h" />
+    <ClInclude Include="..\..\src\base\timer.h" />
+    <ClInclude Include="..\..\src\base\types.h" />
+    <ClInclude Include="..\..\src\base\url.h" />
+    <ClInclude Include="..\..\src\base\version.h" />
+    <ClInclude Include="..\..\src\base\xml.h" />
+    <ClInclude Include="..\..\src\library\anime.h" />
+    <ClInclude Include="..\..\src\library\anime_db.h" />
+    <ClInclude Include="..\..\src\library\anime_episode.h" />
+    <ClInclude Include="..\..\src\library\anime_filter.h" />
+    <ClInclude Include="..\..\src\library\anime_item.h" />
+    <ClInclude Include="..\..\src\library\anime_util.h" />
+    <ClInclude Include="..\..\src\library\discover.h" />
+    <ClInclude Include="..\..\src\library\history.h" />
+    <ClInclude Include="..\..\src\library\metadata.h" />
+    <ClInclude Include="..\..\src\library\resource.h" />
+    <ClInclude Include="..\..\src\sync\hummingbird.h" />
+    <ClInclude Include="..\..\src\sync\hummingbird_types.h" />
+    <ClInclude Include="..\..\src\sync\hummingbird_util.h" />
+    <ClInclude Include="..\..\src\sync\manager.h" />
+    <ClInclude Include="..\..\src\sync\myanimelist.h" />
+    <ClInclude Include="..\..\src\sync\myanimelist_types.h" />
+    <ClInclude Include="..\..\src\sync\myanimelist_util.h" />
+    <ClInclude Include="..\..\src\sync\service.h" />
+    <ClInclude Include="..\..\src\sync\sync.h" />
+    <ClInclude Include="..\..\src\taiga\announce.h" />
+    <ClInclude Include="..\..\src\taiga\api.h" />
+    <ClInclude Include="..\..\src\taiga\debug.h" />
+    <ClInclude Include="..\..\src\taiga\dummy.h" />
+    <ClInclude Include="..\..\src\taiga\http.h" />
+    <ClInclude Include="..\..\src\taiga\path.h" />
+    <ClInclude Include="..\..\src\taiga\resource.h" />
+    <ClInclude Include="..\..\src\taiga\script.h" />
+    <ClInclude Include="..\..\src\taiga\settings.h" />
+    <ClInclude Include="..\..\src\taiga\stats.h" />
+    <ClInclude Include="..\..\src\taiga\taiga.h" />
+    <ClInclude Include="..\..\src\taiga\timer.h" />
+    <ClInclude Include="..\..\src\taiga\update.h" />
+    <ClInclude Include="..\..\src\taiga\version.h" />
+    <ClInclude Include="..\..\src\track\feed.h" />
+    <ClInclude Include="..\..\src\track\feed_filter.h" />
+    <ClInclude Include="..\..\src\track\media.h" />
+    <ClInclude Include="..\..\src\track\monitor.h" />
+    <ClInclude Include="..\..\src\track\recognition.h" />
+    <ClInclude Include="..\..\src\track\search.h" />
+    <ClInclude Include="..\..\src\ui\dialog.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_about.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_anime_info.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_anime_info_page.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_anime_list.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_feed_condition.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_feed_filter.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_format.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_history.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_input.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_main.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_search.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_season.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_settings.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_settings_page.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_stats.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_test_recognition.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_torrent.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_update.h" />
+    <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h" />
+    <ClInclude Include="..\..\src\ui\list.h" />
+    <ClInclude Include="..\..\src\ui\menu.h" />
+    <ClInclude Include="..\..\src\ui\theme.h" />
+    <ClInclude Include="..\..\src\ui\ui.h" />
+    <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h" />
+    <ClInclude Include="..\..\src\win\win_dialog.h" />
+    <ClInclude Include="..\..\src\win\win_gdi.h" />
+    <ClInclude Include="..\..\src\win\win_gdiplus.h" />
+    <ClInclude Include="..\..\src\win\win_main.h" />
+    <ClInclude Include="..\..\src\win\win_menu.h" />
+    <ClInclude Include="..\..\src\win\win_registry.h" />
+    <ClInclude Include="..\..\src\win\win_resizable.h" />
+    <ClInclude Include="..\..\src\win\win_taskbar.h" />
+    <ClInclude Include="..\..\src\win\win_taskdialog.h" />
+    <ClInclude Include="..\..\src\win\win_thread.h" />
+    <ClInclude Include="..\..\src\win\win_window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\deps\src\jsoncpp\json_internalarray.inl" />
+    <None Include="..\..\deps\src\jsoncpp\json_internalmap.inl" />
+    <None Include="..\..\deps\src\jsoncpp\json_valueiterator.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\src\taiga\resource.rc" />
+    <ResourceCompile Include="..\..\src\taiga\version.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

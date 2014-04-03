@@ -1,8 +1,8 @@
 bin/*
 build/*
 
-src/ipch
-src/*.opensdf
-src/*.sdf
-src/*.suo
-src/*.user
+project/vs*/ipch
+project/vs*/*.opensdf
+project/vs*/*.sdf
+project/vs*/*.suo
+project/vs*/*.user
