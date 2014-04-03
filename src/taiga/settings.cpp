@@ -423,6 +423,11 @@ bool AppSettings::Save() {
   xml_document document;
   xml_node settings = document.append_child(L"settings");
 
+  // Meta
+  Set(kMeta_Version_Major, ToWstr(static_cast<int>(Taiga.version.major)));
+  Set(kMeta_Version_Minor, ToWstr(static_cast<int>(Taiga.version.minor)));
+  Set(kMeta_Version_Revision, ToWstr(static_cast<int>(Taiga.version.patch)));
+
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
     WriteValue(settings, static_cast<AppSettingName>(i));
 
@@ -460,7 +465,7 @@ bool AppSettings::Save() {
   }
 
   // Torrent filters
-  xml_node torrent_filter = settings.child(L"rss").child(L"torrent").append_child(L"filter");
+  xml_node torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
   foreach_(it, Aggregator.filter_manager.filters) {
     xml_node item = torrent_filter.append_child(L"item");
     item.append_attribute(L"action") =

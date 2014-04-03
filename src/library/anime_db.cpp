@@ -46,10 +46,8 @@ bool Database::LoadDatabase() {
   unsigned int options = pugi::parse_default & ~pugi::parse_eol;
   xml_parse_result parse_result = document.load_file(path.c_str(), options);
 
-  if (parse_result.status != pugi::status_ok &&
-      parse_result.status != pugi::status_file_not_found) {
+  if (parse_result.status != pugi::status_ok)
     return false;
-  }
 
   xml_node meta_node = document.child(L"meta");
   std::wstring meta_version = XmlReadStrValue(meta_node, L"version");
@@ -579,6 +577,7 @@ void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
   foreach_xmlnode_(node, animedb_node, L"anime") {
     std::wstring id = XmlReadStrValue(node, L"series_animedb_id");
     Item& item = items[ToInt(id)];  // Creates the item if it doesn't exist
+    item.SetId(id, sync::kTaiga);
     item.SetId(id, sync::kMyAnimeList);
     item.SetTitle(XmlReadStrValue(node, L"series_title"));
     item.SetEnglishTitle(XmlReadStrValue(node, L"series_english"));

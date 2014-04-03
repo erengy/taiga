@@ -85,6 +85,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
   switch (http_client.mode()) {
     case taiga::kHttpSilent:
     case taiga::kHttpServiceGetMetadataById:
+    case taiga::kHttpServiceGetMetadataByIdV2:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpGetLibraryEntryImage:
       return;
@@ -149,6 +150,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
   switch (http_client.mode()) {
     case taiga::kHttpSilent:
     case taiga::kHttpServiceGetMetadataById:
+    case taiga::kHttpServiceGetMetadataByIdV2:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpGetLibraryEntryImage:
       return;
