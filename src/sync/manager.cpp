@@ -82,14 +82,14 @@ void Manager::MakeRequest(Request& request) {
   foreach_(service, services_) {
     if (request.service_id == kAllServices ||
         request.service_id == service->first) {
-      // Create a new HTTP request, and store its UUID alongside the service
+      // Create a new HTTP request, and store its UID alongside the service
       // request until we receive a response
       HttpRequest http_request;
-      requests_.insert(std::make_pair(http_request.uuid, request));
+      requests_.insert(std::make_pair(http_request.uid, request));
 
       // Make sure we store the actual service ID
       if (request.service_id == kAllServices)
-        requests_[http_request.uuid].service_id = service->first;
+        requests_[http_request.uid].service_id = service->first;
 
       // Let the service build the HTTP request
       service->second->BuildRequest(request, http_request);
@@ -104,7 +104,7 @@ void Manager::MakeRequest(Request& request) {
 void Manager::HandleHttpError(HttpResponse& http_response, string_t error) {
   win::Lock lock(critical_section_);
 
-  const Request& request = requests_[http_response.uuid];
+  const Request& request = requests_[http_response.uid];
 
   Response response;
   response.service_id = request.service_id;
@@ -114,13 +114,13 @@ void Manager::HandleHttpError(HttpResponse& http_response, string_t error) {
   HandleError(response, http_response);
 
   // FIXME: Not thread-safe. Invalidates iterators on other threads.
-//requests_.erase(http_response.uuid);
+//requests_.erase(http_response.uid);
 }
 
 void Manager::HandleHttpResponse(HttpResponse& http_response) {
   win::Lock lock(critical_section_);
 
-  const Request& request = requests_[http_response.uuid];
+  const Request& request = requests_[http_response.uid];
 
   Response response;
   response.service_id = request.service_id;
@@ -129,13 +129,13 @@ void Manager::HandleHttpResponse(HttpResponse& http_response) {
   HandleResponse(response, http_response);
 
   // FIXME: Not thread-safe. Invalidates iterators on other threads.
-//requests_.erase(http_response.uuid);
+//requests_.erase(http_response.uid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void Manager::HandleError(Response& response, HttpResponse& http_response) {
-  Request& request = requests_[http_response.uuid];
+  Request& request = requests_[http_response.uid];
 
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))
@@ -186,7 +186,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     return;
   }
 
-  Request& request = requests_[http_response.uuid];
+  Request& request = requests_[http_response.uid];
 
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))

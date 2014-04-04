@@ -118,22 +118,22 @@ bool HttpClient::OnReadComplete() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpClient& HttpManager::GetNewClient(const base::uuid_t& uuid) {
-  return clients_[uuid];
+HttpClient& HttpManager::GetNewClient(const base::uid_t& uid) {
+  return clients_[uid];
 }
 
-void HttpManager::CancelRequest(base::uuid_t uuid) {
-  if (clients_.count(uuid))
-    clients_[uuid].Cancel();
+void HttpManager::CancelRequest(base::uid_t uid) {
+  if (clients_.count(uid))
+    clients_[uid].Cancel();
 }
 
 void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
-  if (clients_.count(request.uuid)) {
-    LOG(LevelWarning, L"HttpClient already exists. ID: " + request.uuid);
-    clients_[request.uuid].Cleanup();
+  if (clients_.count(request.uid)) {
+    LOG(LevelWarning, L"HttpClient already exists. ID: " + request.uid);
+    clients_[request.uid].Cleanup();
   }
 
-  HttpClient& client = clients_[request.uuid];
+  HttpClient& client = clients_[request.uid];
   client.set_mode(mode);
 
   AddToQueue(request);
@@ -149,7 +149,7 @@ void HttpManager::MakeRequest(HttpClient& client, HttpRequest& request,
 }
 
 void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
-  HttpClient& client = clients_[response.uuid];
+  HttpClient& client = clients_[response.uid];
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
@@ -175,7 +175,7 @@ void HttpManager::HandleRedirect(const std::wstring& current_host,
 }
 
 void HttpManager::HandleResponse(HttpResponse& response) {
-  HttpClient& client = clients_[response.uuid];
+  HttpClient& client = clients_[response.uid];
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
@@ -259,11 +259,11 @@ void HttpManager::AddToQueue(HttpRequest& request) {
 #ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
-  LOG(LevelDebug, L"ID: " + request.uuid);
+  LOG(LevelDebug, L"ID: " + request.uid);
 
   requests_.push_back(request);
 #else
-  HttpClient& client = clients_[request.uuid];
+  HttpClient& client = clients_[request.uid];
   client.MakeRequest(request);
 #endif
 }
@@ -290,7 +290,7 @@ void HttpManager::ProcessQueue() {
       connections++;
       connections_[request.url.host]++;
 
-      HttpClient& client = clients_[request.uuid];
+      HttpClient& client = clients_[request.uid];
       client.MakeRequest(request);
 
       requests_.erase(requests_.begin() + i);

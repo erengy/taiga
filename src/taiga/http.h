@@ -77,9 +77,9 @@ private:
 
 class HttpManager {
 public:
-  HttpClient& GetNewClient(const base::uuid_t& uuid);
+  HttpClient& GetNewClient(const base::uid_t& uid);
 
-  void CancelRequest(base::uuid_t uuid);
+  void CancelRequest(base::uid_t uid);
   void MakeRequest(HttpRequest& request, HttpClientMode mode);
   void MakeRequest(HttpClient& client, HttpRequest& request, HttpClientMode mode);
 

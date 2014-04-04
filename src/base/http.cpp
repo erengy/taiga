@@ -27,9 +27,9 @@ Request::Request()
     : method(L"GET"), parameter(0) {
   // Each HTTP request must have a unique ID, as there are many parts of the
   // application that rely on this assumption.
-  // TODO: Generate a real UUID
   static unsigned int counter = 0;
-  uuid = L"win-http-" + PadChar(ToWstr(static_cast<ULONG>(counter++)), L'0', 10);
+  uid = L"taiga-http-" +
+        PadChar(ToWstr(static_cast<ULONG>(counter++)), L'0', 10);
 }
 
 Response::Response()

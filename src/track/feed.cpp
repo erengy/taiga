@@ -106,7 +106,7 @@ bool Feed::Check(const std::wstring& source, bool automatic) {
 
   auto client_mode = automatic ?
       taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
-  auto& client = ConnectionManager.GetNewClient(http_request.uuid);
+  auto& client = ConnectionManager.GetNewClient(http_request.uid);
   client.set_download_path(GetDataPath() + L"feed.xml");
   ConnectionManager.MakeRequest(client, http_request, client_mode);
 
@@ -142,7 +142,7 @@ bool Feed::Download(int index) {
   http_request.url = items[index].link;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
 
-  auto& client = ConnectionManager.GetNewClient(http_request.uuid);
+  auto& client = ConnectionManager.GetNewClient(http_request.uid);
   client.set_download_path(file);
   ConnectionManager.MakeRequest(client, http_request, client_mode);
 

@@ -33,14 +33,14 @@ bool Client::MakeRequest(Request request) {
 
   // Set the new request
   request_ = request;
-  LOG(LevelDebug, L"ID: " + request.uuid);
+  LOG(LevelDebug, L"ID: " + request.uid);
 
   // Set secure transaction state
   secure_transaction_ = request.url.protocol == kHttps;
 
-  // Ensure that the response has the same parameter and UUID as the request
+  // Ensure that the response has the same parameter and UID as the request
   response_.parameter = request.parameter;
-  response_.uuid = request.uuid;
+  response_.uid = request.uid;
 
   if (Initialize())
     if (SetRequestOptions())
@@ -154,7 +154,7 @@ bool Client::SetRequestOptions() {
   //////////////////////////////////////////////////////////////////////////////
   // Security options
 
-#ifdef TAIGA_WIN_HTTP_SSL_UNSECURE
+#ifdef TAIGA_HTTP_SSL_UNSECURE
   TAIGA_CURL_SET_OPTION(CURLOPT_SSL_VERIFYPEER, 0L);
   TAIGA_CURL_SET_OPTION(CURLOPT_SSL_VERIFYHOST, 0L);
 #endif

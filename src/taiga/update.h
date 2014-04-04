@@ -50,7 +50,7 @@ private:
   std::wstring latest_guid_;
   bool restart_required_;
   bool update_available_;
-  std::wstring client_uuid_;
+  std::wstring client_uid_;
 };
 
 }  // namespace taiga

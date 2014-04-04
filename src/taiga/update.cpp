@@ -39,7 +39,7 @@ UpdateHelper::UpdateHelper()
 }
 
 void UpdateHelper::Cancel() {
-  ConnectionManager.CancelRequest(client_uuid_);
+  ConnectionManager.CancelRequest(client_uid_);
 }
 
 bool UpdateHelper::Check() {
@@ -52,7 +52,7 @@ bool UpdateHelper::Check() {
   http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
   http_request.url.query[L"username"] = GetCurrentUsername();
 
-  client_uuid_ = http_request.uuid;
+  client_uid_ = http_request.uid;
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTaigaUpdateCheck);
   return true;
@@ -126,9 +126,9 @@ bool UpdateHelper::Download() {
   HttpRequest http_request;
   http_request.url = feed_item->link;
 
-  client_uuid_ = http_request.uuid;
+  client_uid_ = http_request.uid;
 
-  auto& client = ConnectionManager.GetNewClient(http_request.uuid);
+  auto& client = ConnectionManager.GetNewClient(http_request.uid);
   client.set_download_path(download_path_);
   ConnectionManager.MakeRequest(client, http_request,
                                 taiga::kHttpTaigaUpdateDownload);

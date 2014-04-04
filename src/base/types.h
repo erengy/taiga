@@ -33,8 +33,8 @@ class Response;
 
 namespace base {
 
-// UUID type
-typedef std::wstring uuid_t;
+// Unique ID type
+typedef std::wstring uid_t;
 
 }  // namespace base
 

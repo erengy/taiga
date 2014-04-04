@@ -146,7 +146,7 @@ void DownloadImage(int id, const string_t& image_url) {
   http_request.url = image_url;
   http_request.parameter = id;
 
-  auto& client = ConnectionManager.GetNewClient(http_request.uuid);
+  auto& client = ConnectionManager.GetNewClient(http_request.uid);
   client.set_download_path(::anime::GetImagePath(id));
   ConnectionManager.MakeRequest(client, http_request,
                                 taiga::kHttpGetLibraryEntryImage);
