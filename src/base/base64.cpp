@@ -23,14 +23,12 @@
 #include "base64.h"
 #include "string.h"
 
-std::wstring Base64Decode(const std::wstring& str, bool for_filename) {
+std::wstring Base64Decode(const std::string& str, bool for_filename) {
   if (str.empty())
-    return str;
-
-  std::string buff = WstrToStr(str);
+    return EmptyString();
 
   Base64Coder coder;
-  coder.Decode((BYTE*)buff.c_str(), buff.length());
+  coder.Decode((BYTE*)str.c_str(), str.size());
 
   if (for_filename) {
     std::wstring msg = StrToWstr(coder.DecodedMessage());
@@ -41,14 +39,16 @@ std::wstring Base64Decode(const std::wstring& str, bool for_filename) {
   }
 }
 
-std::wstring Base64Encode(const std::wstring& str, bool for_filename) {
-  if (str.empty())
-    return str;
+std::wstring Base64Decode(const std::wstring& str, bool for_filename) {
+  return Base64Decode(WstrToStr(str), for_filename);
+}
 
-  std::string buff = WstrToStr(str);
+std::wstring Base64Encode(const std::string& str, bool for_filename) {
+  if (str.empty())
+    return EmptyString();
 
   Base64Coder coder;
-  coder.Encode((BYTE*)buff.c_str(), buff.length());
+  coder.Encode((BYTE*)str.c_str(), str.size());
 
   if (for_filename) {
     std::wstring msg = StrToWstr(coder.EncodedMessage());
@@ -57,4 +57,8 @@ std::wstring Base64Encode(const std::wstring& str, bool for_filename) {
   } else {
     return StrToWstr(coder.EncodedMessage());
   }
+}
+
+std::wstring Base64Encode(const std::wstring& str, bool for_filename) {
+  return Base64Encode(WstrToStr(str), for_filename);
 }
