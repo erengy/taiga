@@ -22,7 +22,9 @@
 #include <map>
 #include <string>
 
-typedef std::map<std::wstring, std::wstring> OAuthParameters;
+#include "url.h"
+
+typedef std::map<std::wstring, std::wstring> oauth_parameter_t;
 
 class OAuth {
 public:
@@ -32,21 +34,21 @@ public:
   std::wstring BuildAuthorizationHeader(
       const std::wstring& url,
       const std::wstring& http_method,
-      const OAuthParameters* post_parameters = nullptr,
+      const oauth_parameter_t* post_parameters = nullptr,
       const std::wstring& oauth_token = L"",
       const std::wstring& oauth_token_secret = L"",
       const std::wstring& pin = L"");
-  OAuthParameters ParseQueryString(const std::wstring& url);
+  oauth_parameter_t ParseQueryString(const std::wstring& url);
 
   std::wstring consumer_key;
   std::wstring consumer_secret;
 
 private:
-  OAuthParameters BuildSignedParameters(
-      const OAuthParameters& get_parameters,
+  oauth_parameter_t BuildSignedParameters(
+      const oauth_parameter_t& get_parameters,
       const std::wstring& url,
       const std::wstring& http_method,
-      const OAuthParameters* post_parameters,
+      const oauth_parameter_t* post_parameters,
       const std::wstring& oauth_token,
       const std::wstring& oauth_token_secret,
       const std::wstring& pin);
@@ -56,8 +58,8 @@ private:
   std::wstring CreateTimestamp();
 
   std::wstring NormalizeUrl(const std::wstring& url);
-  std::wstring SortParameters(const OAuthParameters& parameters);
-  std::wstring UrlGetQuery(const std::wstring& url);
+  oauth_parameter_t ParseQuery(const query_t& query);
+  std::wstring SortParameters(const oauth_parameter_t& parameters);
 };
 
 #endif  // TAIGA_THIRD_PARTY_OAUTH_H

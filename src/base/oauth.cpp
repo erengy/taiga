@@ -16,13 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <windows.h>
-#include <winhttp.h>
 #include <list>
 #include <time.h>
 #include <vector>
 
 #include "base64.h"
+#include "foreach.h"
 #include "crypto.h"
 #include "string.h"
 #include "oauth.h"
@@ -40,39 +39,37 @@
 std::wstring OAuth::BuildAuthorizationHeader(
     const std::wstring& url,
     const std::wstring& http_method,
-    const OAuthParameters* post_parameters,
+    const oauth_parameter_t* post_parameters,
     const std::wstring& oauth_token,
     const std::wstring& oauth_token_secret,
     const std::wstring& pin) {
   // Build request parameters
-  OAuthParameters get_parameters = ParseQueryString(UrlGetQuery(url));
+  oauth_parameter_t get_parameters = ParseQuery(Url(url).query);
 
   // Build signed OAuth parameters
-  OAuthParameters signed_parameters =
+  oauth_parameter_t signed_parameters =
       BuildSignedParameters(get_parameters, url, http_method, post_parameters,
                             oauth_token, oauth_token_secret, pin);
 
   // Build and return OAuth header
   std::wstring oauth_header = L"OAuth ";
-  for (OAuthParameters::const_iterator it = signed_parameters.begin();
-       it != signed_parameters.end(); ++it) {
+  foreach_c_(it, signed_parameters) {
     if (it != signed_parameters.begin())
       oauth_header += L", ";
     oauth_header += it->first + L"=\"" + it->second + L"\"";
   }
-  oauth_header += L"\r\n";
   return oauth_header;
 }
 
-OAuthParameters OAuth::ParseQueryString(const std::wstring& url) {
-  OAuthParameters parsed_parameters;
+oauth_parameter_t OAuth::ParseQueryString(const std::wstring& url) {
+  oauth_parameter_t parsed_parameters;
 
   std::vector<std::wstring> parameters;
   Split(url, L"&", parameters);
 
-  for (size_t i = 0; i < parameters.size(); ++i) {
+  foreach_(parameter, parameters) {
     std::vector<std::wstring> elements;
-    Split(parameters[i], L"=", elements);
+    Split(*parameter, L"=", elements);
     if (elements.size() == 2) {
       parsed_parameters[elements[0]] = elements[1];
     }
@@ -83,16 +80,16 @@ OAuthParameters OAuth::ParseQueryString(const std::wstring& url) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-OAuthParameters OAuth::BuildSignedParameters(
-    const OAuthParameters& get_parameters,
+oauth_parameter_t OAuth::BuildSignedParameters(
+    const oauth_parameter_t& get_parameters,
     const std::wstring& url,
     const std::wstring& http_method,
-    const OAuthParameters* post_parameters,
+    const oauth_parameter_t* post_parameters,
     const std::wstring& oauth_token,
     const std::wstring& oauth_token_secret,
     const std::wstring& pin) {
   // Create OAuth parameters
-  OAuthParameters oauth_parameters;
+  oauth_parameter_t oauth_parameters;
   oauth_parameters[L"oauth_callback"] = L"oob";
   oauth_parameters[L"oauth_consumer_key"] = consumer_key;
   oauth_parameters[L"oauth_nonce"] = CreateNonce();
@@ -108,8 +105,8 @@ OAuthParameters OAuth::BuildSignedParameters(
     oauth_parameters[L"oauth_verifier"] = pin;
 
   // Create a parameter list containing both OAuth and original parameters
-  OAuthParameters all_parameters = get_parameters;
-  if (CompareStrings(http_method, L"POST") == 0 && post_parameters)
+  oauth_parameter_t all_parameters = get_parameters;
+  if (IsEqual(http_method, L"POST") && post_parameters)
     all_parameters.insert(post_parameters->begin(), post_parameters->end());
   all_parameters.insert(oauth_parameters.begin(), oauth_parameters.end());
 
@@ -148,7 +145,7 @@ std::wstring OAuth::CreateSignature(const std::wstring& signature_base,
   std::string hash = HmacSha1(WstrToStr(key), WstrToStr(signature_base));
 
   // Encode signature in Base64
-  std::wstring signature = Base64Encode(StrToWstr(hash));
+  std::wstring signature = Base64Encode(hash);
 
   // Return URL-encoded signature
   return EncodeUrl(signature);
@@ -163,73 +160,40 @@ std::wstring OAuth::CreateTimestamp() {
 }
 
 std::wstring OAuth::NormalizeUrl(const std::wstring& url) {
-  wchar_t scheme[1024 * 4] = {'\0'};
-  wchar_t host[1024 * 4] = {'\0'};
-  wchar_t path[1024 * 4] = {'\0'};
+  Url url_components = url;
 
-  URL_COMPONENTS components = {sizeof(URL_COMPONENTS)};
-  components.lpszScheme = scheme;
-  components.dwSchemeLength = SIZEOF(scheme);
-  components.lpszHostName = host;
-  components.dwHostNameLength = SIZEOF(host);
-  components.lpszUrlPath = path;
-  components.dwUrlPathLength = SIZEOF(path);
+  // Strip off ? and # elements in the path
+  url_components.query.clear();
+  url_components.fragment.clear();
 
-  std::wstring normal_url = url;
-  if (::WinHttpCrackUrl(url.c_str(), url.size(), 0, &components)) {
-    // Include port number if it is non-standard
-    wchar_t port[10] = {};
-    if ((CompareStrings(scheme, L"http") == 0 && components.nPort != 80) ||
-        (CompareStrings(scheme, L"https") == 0 && components.nPort != 443)) {
-      swprintf_s(port, SIZEOF(port), L":%u", components.nPort);
-    }
-    // Strip off ? and # elements in the path
-    std::wstring path_only = path;
-    std::wstring::size_type pos = path_only.find_first_of(L"#?");
-    if (pos != std::wstring::npos)
-      path_only = path_only.substr(0, pos);
-    // Build normal URL
-    normal_url = std::wstring(scheme) + L"://" + host + port + path_only;
-  }
+  // Build normal URL
+  std::wstring normal_url = url_components.Build();
+
   return normal_url;
 }
 
-std::wstring OAuth::SortParameters(const OAuthParameters& parameters) {
+oauth_parameter_t OAuth::ParseQuery(const query_t& query) {
+  oauth_parameter_t parameters;
+
+  foreach_(it, query)
+    parameters[it->first] = it->second;
+
+  return parameters;
+}
+
+std::wstring OAuth::SortParameters(const oauth_parameter_t& parameters) {
   std::list<std::wstring> sorted;
-  for (OAuthParameters::const_iterator it = parameters.begin();
-       it != parameters.end(); ++it) {
+  foreach_c_(it, parameters) {
     std::wstring param = it->first + L"=" + it->second;
     sorted.push_back(param);
   }
   sorted.sort();
 
   std::wstring params;
-  for (std::list<std::wstring>::iterator it = sorted.begin();
-       it != sorted.end(); ++it) {
+  foreach_(it, sorted) {
     if (params.size() > 0)
       params += L"&";
     params += *it;
   }
   return params;
-}
-
-std::wstring OAuth::UrlGetQuery(const std::wstring& url) {
-  std::wstring query;
-  wchar_t buf[1024 * 4] = {'\0'};
-
-  URL_COMPONENTS components = {sizeof(URL_COMPONENTS)};
-  components.dwExtraInfoLength = SIZEOF(buf);
-  components.lpszExtraInfo = buf;
-
-  if (::WinHttpCrackUrl(url.c_str(), url.size(), 0, &components)) {
-    query = components.lpszExtraInfo;
-    std::wstring::size_type q = query.find_first_of(L'?');
-    if (q != std::wstring::npos)
-      query = query.substr(q + 1);
-    std::wstring::size_type h = query.find_first_of(L'#');
-    if (h != std::wstring::npos)
-      query = query.substr(0, h);
-  }
-
-  return query;
 }

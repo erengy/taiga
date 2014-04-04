@@ -410,10 +410,9 @@ bool Twitter::RequestToken() {
   HttpRequest http_request;
   http_request.url.protocol = base::http::kHttps;
   http_request.url.host = L"api.twitter.com";
-  http_request.url.path = L"oauth/request_token";
+  http_request.url.path = L"/oauth/request_token";
   http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(L"https://api.twitter.com/oauth/request_token",
-                                     L"GET");
+      oauth.BuildAuthorizationHeader(http_request.url.Build(), L"GET");
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterRequest);
   return true;
@@ -424,9 +423,9 @@ bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret,
   HttpRequest http_request;
   http_request.url.protocol = base::http::kHttps;
   http_request.url.host = L"api.twitter.com";
-  http_request.url.path = L"oauth/access_token";
+  http_request.url.path = L"/oauth/access_token";
   http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(L"https://api.twitter.com/oauth/access_token",
+      oauth.BuildAuthorizationHeader(http_request.url.Build(),
                                      L"POST", nullptr, key, secret, pin);
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTwitterAuth);
@@ -442,17 +441,17 @@ bool Twitter::SetStatusText(const std::wstring& status_text) {
 
   status_text_ = status_text;
 
-  OAuthParameters post_parameters;
+  oauth_parameter_t post_parameters;
   post_parameters[L"status"] = EncodeUrl(status_text_);
 
   HttpRequest http_request;
   http_request.method = L"POST";
   http_request.url.protocol = base::http::kHttps;
   http_request.url.host = L"api.twitter.com";
-  http_request.url.path = L"1.1/statuses/update.json";
+  http_request.url.path = L"/1.1/statuses/update.json";
   http_request.body = L"status=" + post_parameters[L"status"];
   http_request.header[L"Authorization"] =
-      oauth.BuildAuthorizationHeader(L"https://api.twitter.com/1.1/statuses/update.json",
+      oauth.BuildAuthorizationHeader(http_request.url.Build(),
                                      L"POST", &post_parameters,
                                      Settings[kShare_Twitter_OauthToken],
                                      Settings[kShare_Twitter_OauthSecret]);
@@ -466,7 +465,7 @@ void Twitter::HandleHttpResponse(HttpClientMode mode,
   switch (mode) {
     case kHttpTwitterRequest: {
       bool success = false;
-      OAuthParameters parameters = oauth.ParseQueryString(response.body);
+      oauth_parameter_t parameters = oauth.ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty()) {
         ExecuteLink(L"http://api.twitter.com/oauth/authorize?oauth_token=" +
                     parameters[L"oauth_token"]);
@@ -483,7 +482,7 @@ void Twitter::HandleHttpResponse(HttpClientMode mode,
 
     case kHttpTwitterAuth: {
       bool success = false;
-      OAuthParameters parameters = oauth.ParseQueryString(response.body);
+      oauth_parameter_t parameters = oauth.ParseQueryString(response.body);
       if (!parameters[L"oauth_token"].empty() &&
           !parameters[L"oauth_token_secret"].empty()) {
         Settings.Set(kShare_Twitter_OauthToken, parameters[L"oauth_token"]);
