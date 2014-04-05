@@ -151,10 +151,18 @@ bool PlayEpisode(int anime_id, int number) {
   std::wstring file_path;
 
   // Check saved episode path
-  if (number == anime_item->GetMyLastWatchedEpisode() + 1)
-    if (!anime_item->GetNewEpisodePath().empty())
-      if (FileExists(anime_item->GetNewEpisodePath()))
-        file_path = anime_item->GetNewEpisodePath();
+  if (number == anime_item->GetMyLastWatchedEpisode() + 1) {
+    const std::wstring& next_episode_path = anime_item->GetNextEpisodePath();
+    if (!next_episode_path.empty()) {
+      if (FileExists(next_episode_path)) {
+        file_path = next_episode_path;
+      } else {
+        LOG(LevelWarning, L"File doesn't exist anymore.");
+        LOG(LevelWarning, L"Path: " + next_episode_path);
+        anime_item->SetEpisodeAvailability(number, false, L"");
+      }
+    }
+  }
 
   // Scan available episodes
   if (file_path.empty()) {

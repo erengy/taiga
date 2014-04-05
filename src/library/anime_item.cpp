@@ -503,8 +503,8 @@ int Item::GetLastAiredEpisodeNumber(bool estimate) {
   return local_info_.last_aired_episode;
 }
 
-const std::wstring& Item::GetNewEpisodePath() const {
-  return local_info_.new_episode_path;
+const std::wstring& Item::GetNextEpisodePath() const {
+  return local_info_.next_episode_path;
 }
 
 bool Item::GetPlaying() const {
@@ -532,7 +532,7 @@ bool Item::SetEpisodeAvailability(int number, bool available,
     }
     local_info_.available_episodes.at(number - 1) = available;
     if (number == GetMyLastWatchedEpisode() + 1) {
-      SetNewEpisodePath(path);
+      SetNextEpisodePath(path);
     }
 
     ui::OnLibraryEntryChange(GetId());
@@ -552,8 +552,8 @@ void Item::SetLastAiredEpisodeNumber(int number) {
     local_info_.last_aired_episode = number;
 }
 
-void Item::SetNewEpisodePath(const std::wstring& path) {
-  local_info_.new_episode_path = path;
+void Item::SetNextEpisodePath(const std::wstring& path) {
+  local_info_.next_episode_path = path;
 }
 
 void Item::SetPlaying(bool playing) {

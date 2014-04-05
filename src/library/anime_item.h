@@ -116,7 +116,7 @@ public:
   int GetAvailableEpisodeCount() const;
   const std::wstring& GetFolder() const;
   int GetLastAiredEpisodeNumber(bool estimate = false);
-  const std::wstring& GetNewEpisodePath() const;
+  const std::wstring& GetNextEpisodePath() const;
   bool GetPlaying() const;
   bool GetUseAlternative() const;
   const std::vector<std::wstring>& GetUserSynonyms() const;
@@ -124,7 +124,7 @@ public:
   bool SetEpisodeAvailability(int number, bool available, const std::wstring& path);
   void SetFolder(const std::wstring& folder);
   void SetLastAiredEpisodeNumber(int number);
-  void SetNewEpisodePath(const std::wstring& path);
+  void SetNextEpisodePath(const std::wstring& path);
   void SetPlaying(bool playing);
   void SetUseAlternative(bool use_alternative);
   void SetUserSynonyms(const std::wstring& synonyms);

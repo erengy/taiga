@@ -146,7 +146,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
 
     // Check new episode
     if (item.episode) {
-      anime->SetNewEpisodePath(L"");
+      anime->SetNextEpisodePath(L"");
       ScanAvailableEpisodesQuick(anime->GetId());
     }
 
