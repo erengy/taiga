@@ -108,14 +108,17 @@ public:
   virtual ~Client();
 
   void Cancel();
-  void Cleanup();
+  void Cleanup(bool reuse);
   bool MakeRequest(Request request);
 
+  bool allow_reuse() const;
+  bool busy() const;
   const Request& request() const;
   const Response& response() const;
   curl_off_t content_length() const;
   curl_off_t current_length() const;
 
+  void set_allow_reuse(bool allow);
   void set_auto_redirect(bool enabled);
   void set_download_path(const std::wstring& download_path);
   void set_proxy(
@@ -128,7 +131,7 @@ public:
   virtual void OnError(CURLcode error_code) {}
   virtual bool OnHeadersAvailable() { return false; }
   virtual bool OnProgress() { return false; }
-  virtual bool OnReadComplete() { return true; }  // TODO: Why "true"?
+  virtual void OnReadComplete() {}
   virtual bool OnRedirect(const std::wstring& address) { return false; }
 
   DWORD ThreadProc();
@@ -142,6 +145,7 @@ protected:
   curl_off_t current_length_;
   std::string write_buffer_;
 
+  bool allow_reuse_;
   bool auto_redirect_;
   std::wstring download_path_;
   std::wstring proxy_host_;
@@ -170,6 +174,7 @@ private:
   static CurlGlobal curl_global_;
   CURL* curl_handle_;
 
+  bool busy_;
   bool cancel_;
   curl_slist* header_list_;
   std::string optional_data_;

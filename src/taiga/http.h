@@ -68,7 +68,7 @@ protected:
   void OnError(CURLcode error_code);
   bool OnHeadersAvailable();
   bool OnProgress();
-  bool OnReadComplete();
+  void OnReadComplete();
   bool OnRedirect(const std::wstring& address);
 
 private:
@@ -77,7 +77,7 @@ private:
 
 class HttpManager {
 public:
-  HttpClient& GetNewClient(const base::uid_t& uid);
+  HttpClient& GetClient(HttpRequest& request);
 
   void CancelRequest(base::uid_t uid);
   void MakeRequest(HttpRequest& request, HttpClientMode mode);

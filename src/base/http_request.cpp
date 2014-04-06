@@ -28,8 +28,13 @@ namespace base {
 namespace http {
 
 bool Client::MakeRequest(Request request) {
-  // Close any previous connection
-  Cleanup();
+  // Check if the client is busy
+  if (busy_) {
+    LOG(LevelWarning, L"Client is busy. ID: " + request_.uid);
+    return false;
+  } else {
+    busy_ = true;
+  }
 
   // Set the new request
   request_ = request;
@@ -47,7 +52,7 @@ bool Client::MakeRequest(Request request) {
       if (SendRequest())
         return true;
 
-  Cleanup();
+  Cleanup(false);
   return false;
 }
 
@@ -57,7 +62,8 @@ bool Client::Initialize() {
   if (!curl_global_.initialized())
     return false;
 
-  curl_handle_ = curl_easy_init();
+  if (!curl_handle_)
+    curl_handle_ = curl_easy_init();
 
   return curl_handle_ != nullptr;
 }
@@ -189,14 +195,13 @@ bool Client::Perform() {
       SaveToFile((LPCVOID)&write_buffer_.front(), write_buffer_.size(),
                  download_path_);
 
-    if (!OnReadComplete())
-      return true;
+    OnReadComplete();
 
   } else if (code != CURLE_ABORTED_BY_CALLBACK) {
     OnError(code);
   }
 
-  Cleanup();
+  Cleanup(allow_reuse_);
 
   return code == CURLE_OK;
 }

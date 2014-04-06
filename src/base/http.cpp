@@ -50,7 +50,9 @@ void Response::Clear() {
 }
 
 Client::Client()
-    : auto_redirect_(true),
+    : allow_reuse_(false),
+      auto_redirect_(true),
+      busy_(false),
       cancel_(false),
       content_encoding_(kContentEncodingNone),
       content_length_(0),
@@ -62,7 +64,7 @@ Client::Client()
 }
 
 Client::~Client() {
-  Cleanup();
+  Cleanup(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,11 +73,15 @@ void Client::Cancel() {
   cancel_ = true;
 }
 
-void Client::Cleanup() {
+void Client::Cleanup(bool reuse) {
   // Close handles
   if (curl_handle_) {
-    curl_easy_cleanup(curl_handle_);
-    curl_handle_ = nullptr;
+    if (reuse) {
+      curl_easy_reset(curl_handle_);
+    } else {
+      curl_easy_cleanup(curl_handle_);
+      curl_handle_ = nullptr;
+    }
   }
   if (header_list_) {
     curl_slist_free_all(header_list_);
@@ -87,7 +93,8 @@ void Client::Cleanup() {
   }
 
   // Clear request and response
-  request_.Clear();
+  if (!reuse)
+    request_.Clear();
   response_.Clear();
 
   // Clear buffers
@@ -95,6 +102,7 @@ void Client::Cleanup() {
   write_buffer_.clear();
 
   // Reset variables
+  busy_ = false;
   cancel_ = false;
   content_encoding_ = kContentEncodingNone;
   content_length_ = 0;
@@ -102,6 +110,14 @@ void Client::Cleanup() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+bool Client::allow_reuse() const {
+  return allow_reuse_;
+}
+
+bool Client::busy() const {
+  return busy_;
+}
 
 const Request& Client::request() const {
   return request_;
@@ -117,6 +133,10 @@ curl_off_t Client::content_length() const {
 
 curl_off_t Client::current_length() const {
   return current_length_;
+}
+
+void Client::set_allow_reuse(bool allow) {
+  allow_reuse_ = allow;
 }
 
 void Client::set_auto_redirect(bool enabled) {

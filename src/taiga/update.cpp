@@ -128,7 +128,7 @@ bool UpdateHelper::Download() {
 
   client_uid_ = http_request.uid;
 
-  auto& client = ConnectionManager.GetNewClient(http_request.uid);
+  auto& client = ConnectionManager.GetClient(http_request);
   client.set_download_path(download_path_);
   ConnectionManager.MakeRequest(client, http_request,
                                 taiga::kHttpTaigaUpdateDownload);

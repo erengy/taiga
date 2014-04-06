@@ -106,34 +106,51 @@ bool HttpClient::OnProgress() {
   return false;
 }
 
-bool HttpClient::OnReadComplete() {
+void HttpClient::OnReadComplete() {
   ui::OnHttpReadComplete(*this);
 
   Stats.connections_succeeded++;
 
   ConnectionManager.HandleResponse(response_);
-
-  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpClient& HttpManager::GetNewClient(const base::uid_t& uid) {
-  return clients_[uid];
+HttpClient& HttpManager::GetClient(HttpRequest& request) {
+  HttpClient* client = nullptr;
+
+  foreach_(it, clients_) {
+    if (it->second.allow_reuse() && !it->second.busy()) {
+      if (IsEqual(it->second.request().url.host, request.url.host)) {
+        LOG(LevelDebug, L"Will reuse client with the ID: " + it->first);
+        const_cast<std::wstring&>(it->first) = request.uid;
+        LOG(LevelDebug, L"Client's new ID: " + it->first);
+        client = &it->second;
+        break;
+      }
+    }
+  }
+
+  if (!client)
+    client = &clients_[request.uid];
+
+  return *client;
 }
 
 void HttpManager::CancelRequest(base::uid_t uid) {
-  if (clients_.count(uid))
-    clients_[uid].Cancel();
+  if (clients_.count(uid)) {
+    auto& client = clients_[uid];
+    if (client.busy())
+      client.Cancel();
+  }
 }
 
 void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
   if (clients_.count(request.uid)) {
     LOG(LevelWarning, L"HttpClient already exists. ID: " + request.uid);
-    clients_[request.uid].Cleanup();
   }
 
-  HttpClient& client = clients_[request.uid];
+  HttpClient& client = GetClient(request);
   client.set_mode(mode);
 
   AddToQueue(request);
@@ -241,7 +258,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
 
 void HttpManager::FreeMemory() {
   for (auto it = clients_.cbegin(); it != clients_.cend(); ) {
-    if (it->second.response().code > 0) {
+    if (!it->second.busy()) {
       clients_.erase(it++);
     } else {
       ++it;
