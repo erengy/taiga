@@ -64,7 +64,6 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageServicesMal, IDD_SETTINGS_SERVICES_MAL);
     SETRESOURCEID(kSettingsPageServicesHummingbird, IDD_SETTINGS_SERVICES_HUMMINGBIRD);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
-    SETRESOURCEID(kSettingsPageSharingMessenger, IDD_SETTINGS_SHARING_MESSENGER);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
     SETRESOURCEID(kSettingsPageSharingSkype, IDD_SETTINGS_SHARING_SKYPE);
     SETRESOURCEID(kSettingsPageSharingTwitter, IDD_SETTINGS_SHARING_TWITTER);
@@ -277,11 +276,6 @@ BOOL SettingsPage::OnInitDialog() {
       SetDlgItemText(IDC_EDIT_HTTP_URL, Settings[taiga::kShare_Http_Url].c_str());
       break;
     }
-    // Sharing > Messenger
-    case kSettingsPageSharingMessenger: {
-      CheckDlgButton(IDC_CHECK_MESSENGER, Settings.GetBool(taiga::kShare_Messenger_Enabled));
-      break;
-    }
     // Sharing > mIRC
     case kSettingsPageSharingMirc: {
       CheckDlgButton(IDC_CHECK_MIRC, Settings.GetBool(taiga::kShare_Mirc_Enabled));
@@ -395,10 +389,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Edit format
         case IDC_BUTTON_FORMAT_HTTP:
           DlgFormat.mode = kFormatModeHttp;
-          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
-          return TRUE;
-        case IDC_BUTTON_FORMAT_MSN:
-          DlgFormat.mode = kFormatModeMessenger;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_MIRC:

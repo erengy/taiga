@@ -45,10 +45,6 @@ BOOL FormatDialog::OnInitDialog() {
       SetText(L"Edit format - HTTP request");
       rich_edit_.SetText(Settings[taiga::kShare_Http_Format].c_str());
       break;
-    case kFormatModeMessenger:
-      SetText(L"Edit format - Messenger");
-      rich_edit_.SetText(Settings[taiga::kShare_Messenger_Format].c_str());
-      break;
     case kFormatModeMirc:
       SetText(L"Edit format - mIRC");
       rich_edit_.SetText(Settings[taiga::kShare_Mirc_Format].c_str());
@@ -74,9 +70,6 @@ void FormatDialog::OnOK() {
   switch (mode) {
     case kFormatModeHttp:
       Settings.Set(taiga::kShare_Http_Format, rich_edit_.GetText());
-      break;
-    case kFormatModeMessenger:
-      Settings.Set(taiga::kShare_Messenger_Format, rich_edit_.GetText());
       break;
     case kFormatModeMirc:
       Settings.Set(taiga::kShare_Mirc_Format, rich_edit_.GetText());

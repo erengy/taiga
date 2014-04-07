@@ -311,11 +311,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"AnnounceToHTTP") {
     Announcer.Do(taiga::kAnnounceToHttp, nullptr, body == L"true");
 
-  // AnnounceToMessenger(force)
-  //   Changes MSN Messenger status text.
-  } else if (action == L"AnnounceToMessenger") {
-    Announcer.Do(taiga::kAnnounceToMessenger, nullptr, body == L"true");
-
   // AnnounceToMIRC(force)
   //   Sends message to specified channels in mIRC.
   } else if (action == L"AnnounceToMIRC") {

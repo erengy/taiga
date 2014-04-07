@@ -33,7 +33,6 @@
 #define IDD_SETTINGS_SERVICES_MAL               137
 #define IDD_SETTINGS_SERVICES_HUMMINGBIRD       138
 #define IDD_SETTINGS_SHARING_HTTP               139
-#define IDD_SETTINGS_SHARING_MESSENGER          140
 #define IDD_SETTINGS_SHARING_MIRC               141
 #define IDD_SETTINGS_SHARING_SKYPE              142
 #define IDD_SETTINGS_SHARING_TWITTER            143
@@ -52,7 +51,6 @@
 #define IDC_BUTTON_FORMAT_BALLOON               1004
 #define IDC_BUTTON_FORMAT_HTTP                  1005
 #define IDC_BUTTON_FORMAT_MIRC                  1006
-#define IDC_BUTTON_FORMAT_MSN                   1007
 #define IDC_BUTTON_FORMAT_SKYPE                 1008
 #define IDC_BUTTON_FORMAT_TWITTER               1009
 #define IDC_BUTTON_MIRC_TEST                    1010
@@ -74,7 +72,6 @@
 #define IDC_CHECK_LIST_ENGLISH                  1026
 #define IDC_CHECK_LIST_PROGRESS_AIRED           1027
 #define IDC_CHECK_LIST_PROGRESS_AVAILABLE       1028
-#define IDC_CHECK_MESSENGER                     1029
 #define IDC_CHECK_MIRC                          1030
 #define IDC_CHECK_MIRC_ACTION                   1031
 #define IDC_CHECK_MIRC_MULTISERVER              1032

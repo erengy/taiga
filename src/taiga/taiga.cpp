@@ -107,7 +107,7 @@ void App::Uninitialize() {
     play_status = kPlayStatusStopped;
     ::Announcer.Do(kAnnounceToHttp);
   }
-  ::Announcer.Clear(kAnnounceToMessenger | kAnnounceToSkype);
+  ::Announcer.Clear(kAnnounceToSkype);
 
   // Cleanup
   ConnectionManager.Shutdown();

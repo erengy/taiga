@@ -26,7 +26,6 @@ namespace ui {
 
 enum FormatModes {
   kFormatModeHttp,
-  kFormatModeMessenger,
   kFormatModeMirc,
   kFormatModeSkype,
   kFormatModeTwitter,

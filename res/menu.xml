@@ -40,7 +40,6 @@
 	<!-- Share -->
 	<menu name="Announce">
 		<item name="HTTP"      action="AnnounceToHTTP(true)"/>
-		<item name="Messenger" action="AnnounceToMessenger(true)"/>
 		<item name="mIRC"      action="AnnounceToMIRC(true)"/>
 		<item name="Skype"     action="AnnounceToSkype(true)"/>
 		<item name="Twitter"   action="AnnounceToTwitter(true)"/>

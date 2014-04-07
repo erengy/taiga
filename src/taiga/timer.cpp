@@ -68,8 +68,8 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerMedia:
-      ::Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToMessenger |
-                     taiga::kAnnounceToMirc | taiga::kAnnounceToSkype);
+      ::Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToMirc |
+                     taiga::kAnnounceToSkype);
       if (!Settings.GetBool(taiga::kSync_Update_WaitPlayer)) {
         auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
         if (anime_item)

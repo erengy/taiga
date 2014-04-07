@@ -34,10 +34,9 @@ namespace taiga {
 
 enum AnnouncerModes {
   kAnnounceToHttp      = 0x01,
-  kAnnounceToMessenger = 0x02,
-  kAnnounceToMirc      = 0x04,
-  kAnnounceToSkype     = 0x08,
-  kAnnounceToTwitter   = 0x10
+  kAnnounceToMirc      = 0x02,
+  kAnnounceToSkype     = 0x04,
+  kAnnounceToTwitter   = 0x08
 };
 
 class Announcer {
@@ -49,7 +48,6 @@ public:
 
 private:
   void ToHttp(const std::wstring& address, const std::wstring& data);
-  void ToMessenger(const std::wstring& artist, const std::wstring& album, const std::wstring& title, BOOL show);
   bool ToMirc(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, BOOL use_action, BOOL multi_server);
   void ToSkype(const std::wstring& mood);
   void ToTwitter(const std::wstring& status_text);

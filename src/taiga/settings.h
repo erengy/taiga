@@ -94,8 +94,6 @@ enum AppSettingName {
   kShare_Http_Enabled,
   kShare_Http_Format,
   kShare_Http_Url,
-  kShare_Messenger_Enabled,
-  kShare_Messenger_Format,
   kShare_Mirc_Enabled,
   kShare_Mirc_MultiServer,
   kShare_Mirc_UseMeAction,

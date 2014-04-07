@@ -41,10 +41,6 @@ void Announcer::Clear(int modes, bool force) {
     if (Settings.GetBool(kShare_Http_Enabled) || force)
       ToHttp(Settings[kShare_Http_Url], L"");
 
-  if (modes & kAnnounceToMessenger)
-    if (Settings.GetBool(kShare_Messenger_Enabled) || force)
-      ToMessenger(L"", L"", L"", false);
-
   if (modes & kAnnounceToSkype)
     if (Settings.GetBool(kShare_Skype_Enabled) || force)
       ToSkype(::Skype.previous_mood);
@@ -68,16 +64,6 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 
   if (episode->anime_id <= anime::ID_UNKNOWN)
     return;
-
-  if (modes & kAnnounceToMessenger) {
-    if (Settings.GetBool(kShare_Messenger_Enabled) || force) {
-      LOG(LevelDebug, L"Messenger");
-      ToMessenger(L"Taiga", L"Taiga",
-                  ReplaceVariables(Settings[kShare_Messenger_Format],
-                                   *episode, false, force),
-                  true);
-    }
-  }
 
   if (modes & kAnnounceToMirc) {
     if (Settings.GetBool(kShare_Mirc_Enabled) || force) {
@@ -122,33 +108,6 @@ void Announcer::ToHttp(const std::wstring& address, const std::wstring& data) {
   http_request.body = data;
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpSilent);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Messenger
-
-void Announcer::ToMessenger(const std::wstring& artist,
-                            const std::wstring& album,
-                            const std::wstring& title,
-                            BOOL show) {
-  if (title.empty() && show)
-    return;
-
-  COPYDATASTRUCT cds;
-  WCHAR buffer[256];
-
-  std::wstring wstr = L"\\0Music\\0" + ToWstr(show) + L"\\0{1}\\0" +
-                      artist + L"\\0" + title + L"\\0" + album + L"\\0\\0";
-  wcscpy_s(buffer, 256, wstr.c_str());
-
-  cds.dwData = 0x547;
-  cds.lpData = &buffer;
-  cds.cbData = (lstrlenW(buffer) * 2) + 2;
-
-  HWND hwnd = nullptr;
-  while (hwnd = FindWindowEx(nullptr, hwnd, L"MsnMsgrUIManager", nullptr))
-    if (hwnd > 0)
-      SendMessage(hwnd, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&cds));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

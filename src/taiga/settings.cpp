@@ -58,10 +58,6 @@ const std::wstring kDefaultFormatHttp =
     L"&score=%score%"
     L"&picurl=%image%"
     L"&playstatus=%playstatus%";
-const std::wstring kDefaultFormatMessenger =
-    L"Watching: %title%"
-    L"$if(%episode%, #%episode%$if(%total%,/%total%)) ~ "
-    L"www.myanimelist.net/anime/%id%";
 const std::wstring kDefaultFormatMirc =
     L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%"
     L"$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 "
@@ -223,8 +219,6 @@ void AppSettings::InitializeMap() {
   INITKEY(kShare_Http_Enabled, nullptr, L"announce/http/enabled");
   INITKEY(kShare_Http_Format, kDefaultFormatHttp.c_str(), L"announce/http/format");
   INITKEY(kShare_Http_Url, nullptr, L"announce/http/url");
-  INITKEY(kShare_Messenger_Enabled, nullptr, L"announce/messenger/enabled");
-  INITKEY(kShare_Messenger_Format, kDefaultFormatMessenger.c_str(), L"announce/messenger/format");
   INITKEY(kShare_Mirc_Enabled, nullptr, L"announce/mirc/enabled");
   INITKEY(kShare_Mirc_MultiServer, nullptr, L"announce/mirc/multiserver");
   INITKEY(kShare_Mirc_UseMeAction, L"true", L"announce/mirc/useaction");
