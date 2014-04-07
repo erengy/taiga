@@ -61,13 +61,6 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     http_request.url.query[L"auth_token"] = auth_token_;
 
   switch (request.type) {
-    case kAuthenticateUser:
-      // TODO: Make sure username and password are available
-      http_request.url.query[L"username"] =
-          request.data[canonical_name_ + L"-username"];
-      http_request.url.query[L"password"] =
-          request.data[canonical_name_ + L"-password"];
-      break;
     case kGetLibraryEntries:
       // TODO: Make sure username is available
       http_request.header[L"Accept-Encoding"] = L"gzip";
@@ -107,6 +100,12 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
   http_request.url.path = L"/users/authenticate";
+
+  // TODO: Make sure username and password are available
+  http_request.url.query[L"username"] =
+      request.data[canonical_name_ + L"-username"];
+  http_request.url.query[L"password"] =
+      request.data[canonical_name_ + L"-password"];
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
@@ -176,28 +175,19 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
   Json::Value root;
-  Json::Reader reader;
-  bool parsed = reader.parse(WstrToStr(http_response.body), root);
 
-  if (!parsed) {
-    response.data[L"error"] = L"Could not parse the list";
+  if (!ParseResponseBody(response, http_response, root))
     return;
-  }
 
-  for (size_t i = 0; i < root.size(); i++) {
+  for (size_t i = 0; i < root.size(); i++)
     ParseLibraryObject(root[i]);
-  }
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   Json::Value root;
-  Json::Reader reader;
-  bool parsed = reader.parse(WstrToStr(http_response.body), root);
 
-  if (!parsed) {
-    response.data[L"error"] = L"Could not parse the anime object";
+  if (!ParseResponseBody(response, http_response, root))
     return;
-  }
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
@@ -211,13 +201,9 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 
 void Service::GetMetadataByIdV2(Response& response, HttpResponse& http_response) {
   Json::Value root;
-  Json::Reader reader;
-  bool parsed = reader.parse(WstrToStr(http_response.body), root);
 
-  if (!parsed) {
-    response.data[L"error"] = L"Could not parse the anime object";
+  if (!ParseResponseBody(response, http_response, root))
     return;
-  }
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
@@ -231,13 +217,9 @@ void Service::GetMetadataByIdV2(Response& response, HttpResponse& http_response)
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   Json::Value root;
-  Json::Reader reader;
-  bool parsed = reader.parse(WstrToStr(http_response.body), root);
 
-  if (!parsed) {
-    response.data[L"error"] = L"Could not parse search results";
+  if (!ParseResponseBody(response, http_response, root))
     return;
-  }
 
   for (size_t i = 0; i < root.size(); i++) {
     ::anime::Item anime_item;
@@ -264,13 +246,9 @@ void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response
 
 void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
   Json::Value root;
-  Json::Reader reader;
-  bool parsed = reader.parse(WstrToStr(http_response.body), root);
 
-  if (!parsed) {
-    response.data[L"error"] = L"Could not parse library entry";
+  if (!ParseResponseBody(response, http_response, root))
     return;
-  }
 
   ParseLibraryObject(root);
 }
@@ -378,6 +356,32 @@ void Service::ParseLibraryObject(Json::Value& value) {
                                               StrToWstr(rating_value["type"].asString())));
 
   AnimeDatabase.UpdateItem(anime_item);
+}
+
+bool Service::ParseResponseBody(Response& response, HttpResponse& http_response,
+                                Json::Value& root) {
+  Json::Reader reader;
+
+  if (reader.parse(WstrToStr(http_response.body), root))
+    return true;
+
+  switch (response.type) {
+    case kGetLibraryEntries:
+      response.data[L"error"] = L"Could not parse the list";
+      break;
+    case kGetMetadataById:
+    case kGetMetadataByIdV2:
+      response.data[L"error"] = L"Could not parse the anime object";
+      break;
+    case kSearchTitle:
+      response.data[L"error"] = L"Could not parse search results";
+      break;
+    case kUpdateLibraryEntry:
+      response.data[L"error"] = L"Could not parse library entry";
+      break;
+  }
+
+  return false;
 }
 
 }  // namespace hummingbird
