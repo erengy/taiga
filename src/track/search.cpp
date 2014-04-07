@@ -67,7 +67,8 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
 
     if (anime_id_ != anime::ID_UNKNOWN) {
       path_found_ = AddTrailingSlash(root) + name;
-      return true;
+      if (skip_files_)
+        return true;
     } else {
       return false;
     }
@@ -113,14 +114,21 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
       anime_item.SetEpisodeAvailability(
           i, true, AddTrailingSlash(root) + name);
 
+    // Check if we've found the episode we were looking for
     if (episode_number_ > 0 &&
         episode_number_ >= lower_bound &&
         episode_number_ <= upper_bound) {
       path_found_ = AddTrailingSlash(root) + name;
       return true;
-    } else {
-      return false;
     }
+    // Check if all episodes are available
+    if (episode_number_ == 0 &&
+        anime_id_ != anime::ID_UNKNOWN &&
+        IsAllEpisodesAvailable(anime_item)) {
+      return true;
+    }
+
+    return false;
   }
 
   return false;
@@ -198,20 +206,6 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
         file_search_helper.set_skip_subdirectories(true);
         found = file_search_helper.Search(next_episode_path);
       }
-    }
-
-    // Check if all episodes are available
-    if (episode_number == 0 && anime_item->GetEpisodeCount() > 0) {
-      int available_episode_count = anime_item->GetAvailableEpisodeCount();
-      bool all_episodes_available = available_episode_count > 0;
-      for (int i = 1; i <= available_episode_count; i++) {
-        if (!anime_item->IsEpisodeAvailable(i)) {
-          all_episodes_available = false;
-          break;
-        }
-      }
-      if (all_episodes_available)
-        found = true;
     }
   }
 

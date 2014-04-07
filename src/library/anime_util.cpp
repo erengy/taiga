@@ -522,6 +522,23 @@ int GetEpisodeLow(const std::wstring& episode_number) {
   return ToInt(episode_number);  // ToInt() stops at "-"
 }
 
+bool IsAllEpisodesAvailable(const Item& item) {
+  if (item.GetEpisodeCount() == 0)
+    return false;
+
+  int available_episode_count = item.GetAvailableEpisodeCount();
+  bool all_episodes_available = available_episode_count > 0;
+
+  for (int i = 1; i <= available_episode_count; i++) {
+    if (!item.IsEpisodeAvailable(i)) {
+      all_episodes_available = false;
+      break;
+    }
+  }
+
+  return all_episodes_available;
+}
+
 bool IsEpisodeRange(const std::wstring& episode_number) {
   return GetEpisodeLow(episode_number) != GetEpisodeHigh(episode_number);
 }

@@ -59,6 +59,7 @@ bool IsInsideRootFolders(const std::wstring& path);
 
 int GetEpisodeHigh(const std::wstring& episode_number);
 int GetEpisodeLow(const std::wstring& episode_number);
+bool IsAllEpisodesAvailable(const Item& item);
 bool IsEpisodeRange(const std::wstring& episode_number);
 bool IsValidEpisode(int episode, int total);
 bool IsValidEpisode(int episode, int watched, int total);
