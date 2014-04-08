@@ -82,78 +82,8 @@ const std::wstring kDefaultTorrentSearch =
 const std::wstring kDefaultTorrentSource =
     L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
 
-////////////////////////////////////////////////////////////////////////////////
-
-Setting::Setting(bool attribute,
-                 const std::wstring& path)
-    : attribute(attribute),
-      path(path) {
-}
-
-Setting::Setting(bool attribute,
-                 const std::wstring& default_value,
-                 const std::wstring& path)
-    : attribute(attribute),
-      default_value(default_value),
-      path(path) {
-}
 
 ////////////////////////////////////////////////////////////////////////////////
-
-const std::wstring& AppSettings::operator[](AppSettingName name) const {
-  return GetWstr(name);
-}
-
-bool AppSettings::GetBool(AppSettingName name) const {
-  auto it = map_.find(name);
-
-  if (it != map_.end())
-    return ToBool(it->second.value);
-
-  return false;
-}
-
-int AppSettings::GetInt(AppSettingName name) const {
-  auto it = map_.find(name);
-
-  if (it != map_.end())
-    return ToInt(it->second.value);
-
-  return 0;
-}
-
-const std::wstring& AppSettings::GetWstr(AppSettingName name) const {
-  auto it = map_.find(name);
-
-  if (it != map_.end())
-    return it->second.value;
-
-  return EmptyString();
-}
-
-void AppSettings::Set(AppSettingName name, bool value) {
-  map_[name].value = value ? L"true" : L"false";
-}
-
-void AppSettings::Set(AppSettingName name, int value) {
-  map_[name].value = ToWstr(value);
-}
-
-void AppSettings::Set(AppSettingName name, const std::wstring& value) {
-  map_[name].value = value;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void AppSettings::InitializeKey(AppSettingName name,
-                                const wchar_t* default_value,
-                                const std::wstring& path) {
-  if (default_value) {
-    map_.insert(std::pair<AppSettingName, Setting>(name, Setting(true, default_value, path)));
-  } else {
-    map_.insert(std::pair<AppSettingName, Setting>(name, Setting(true, path)));
-  }
-}
 
 void AppSettings::InitializeMap() {
   if (!map_.empty())
@@ -264,51 +194,6 @@ void AppSettings::InitializeMap() {
   #undef INITKEY
 }
 
-void AppSettings::ReadValue(const xml_node& node_parent, AppSettingName name) {
-  Setting& item = map_[name];
-
-  std::vector<std::wstring> node_names;
-  Split(item.path, L"/", node_names);
-
-  const wchar_t* node_name = node_names.back().c_str();
-
-  xml_node current_node = node_parent;
-  for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++)
-    current_node = current_node.child(node_names.at(i).c_str());
-
-  if (item.attribute) {
-    const wchar_t* default_value = item.default_value.c_str();
-    item.value = current_node.attribute(node_name).as_string(default_value);
-  } else {
-    item.value = XmlReadStrValue(current_node, node_name);
-  }
-}
-
-void AppSettings::WriteValue(const xml_node& node_parent, AppSettingName name) {
-  Setting& item = map_[name];
-
-  std::vector<std::wstring> node_names;
-  Split(item.path, L"/", node_names);
-
-  const wchar_t* node_name = node_names.back().c_str();
-
-  xml_node current_node = node_parent;
-  for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++) {
-    std::wstring child_name = node_names.at(i);
-    if (!current_node.child(child_name.c_str())) {
-      current_node = current_node.append_child(child_name.c_str());
-    } else {
-      current_node = current_node.child(child_name.c_str());
-    }
-  }
-
-  if (item.attribute) {
-    current_node.append_attribute(node_name) = item.value.c_str();
-  } else {
-    XmlWriteStrValue(current_node, node_name, item.value.c_str());
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 bool AppSettings::Load() {
@@ -321,7 +206,7 @@ bool AppSettings::Load() {
   InitializeMap();
 
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
-    ReadValue(settings, static_cast<AppSettingName>(i));
+    ReadValue(settings, i);
 
   // Meta
   if (GetWstr(kMeta_Version_Major).empty())
@@ -423,7 +308,7 @@ bool AppSettings::Save() {
   Set(kMeta_Version_Revision, ToWstr(static_cast<int>(Taiga.version.patch)));
 
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
-    WriteValue(settings, static_cast<AppSettingName>(i));
+    WriteValue(settings, i);
 
   // Root folders
   xml_node folders = settings.child(L"anime").child(L"folders");

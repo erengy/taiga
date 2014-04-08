@@ -109,6 +109,9 @@
     <ClCompile Include="..\..\src\base\process.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\settings.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\base\string.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -502,6 +505,9 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\process.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\settings.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\string.h">

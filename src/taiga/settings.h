@@ -23,9 +23,8 @@
 #include <string>
 #include <vector>
 
-namespace pugi {
-class xml_node;
-}
+#include "base/settings.h"
+
 namespace sync {
 class Service;
 enum ServiceId;
@@ -139,47 +138,21 @@ enum AppSettingName {
   kAppSettingNameLast  // used for iteration
 };
 
-class Setting {
+class AppSettings : public base::Settings {
 public:
-  Setting() {}
-  Setting(bool attribute, const std::wstring& path);
-  Setting(bool attribute, const std::wstring& default_value, const std::wstring& path);
-  ~Setting() {}
-
-  bool attribute;
-  std::wstring default_value;
-  std::wstring path;
-  std::wstring value;
-};
-
-class AppSettings {
-public:
-  const std::wstring& operator[](AppSettingName name) const;
-
   bool Load();
   bool Save();
 
-  bool GetBool(AppSettingName name) const;
-  int GetInt(AppSettingName name) const;
-  const std::wstring& GetWstr(AppSettingName name) const;
-
-  void Set(AppSettingName name, bool value);
-  void Set(AppSettingName name, int value);
-  void Set(AppSettingName name, const std::wstring& value);
-
-  void ApplyChanges(const std::wstring& previous_service, const std::wstring& previous_user, const std::wstring& previous_theme);
+  void ApplyChanges(const std::wstring& previous_service,
+                    const std::wstring& previous_user,
+                    const std::wstring& previous_theme);
   void HandleCompatibility();
   void RestoreDefaults();
 
   std::vector<std::wstring> root_folders;
 
 private:
-  void InitializeKey(AppSettingName name, const wchar_t* default_value, const std::wstring& path);
   void InitializeMap();
-  void ReadValue(const pugi::xml_node& node_parent, AppSettingName name);
-  void WriteValue(const pugi::xml_node& node_parent, AppSettingName name);
-
-  std::map<AppSettingName, Setting> map_;
 };
 
 const sync::Service* GetCurrentService();
