@@ -50,10 +50,13 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.header[L"Accept"] = L"text/xml, text/*";
   http_request.header[L"Accept-Charset"] = L"utf-8";
 
-  // Taiga has a unique user-agent string that is whitelisted by MAL. This will
-  // overwrite the default value (e.g. "Taiga/1.0") for all requests.
-  // If you want your own user-agent whitelisted by MAL, refer to the official
-  // MAL API club page for the registration link.
+  // Since October 2013, third-party applications need to identify themselves
+  // with a unique user-agent string that is whitelisted by MAL. Using a generic
+  // value (e.g. "Mozilla/5.0") or an arbitrary one (e.g. "Taiga/1.0") will
+  // result in invalid text/html responses, courtesy of Incapsula.
+  // To get your own whitelisted user-agent string, follow the registration link
+  // at the official MAL API club page. If, for any reason, you'd like to use
+  // Taiga's instead, I will appreciate it if you ask beforehand.
   http_request.header[L"User-Agent"] =
       L"api-taiga-32864c09ef538453b4d8110734ee355b";
 
