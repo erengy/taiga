@@ -33,6 +33,7 @@ enum ListSortType {
   kListSortPopularity,
   kListSortProgress,
   kListSortScore,
+  kListSortSeason,
   kListSortTitle
 };
 

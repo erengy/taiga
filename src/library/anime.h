@@ -41,8 +41,8 @@ enum AnimeId {
 
 enum SeriesStatus {
   kUnknownStatus,
-  kAiring,
   kFinishedAiring,
+  kAiring,
   kNotYetAired
 };
 

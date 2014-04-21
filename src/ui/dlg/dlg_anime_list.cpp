@@ -336,7 +336,7 @@ int AnimeListDialog::ListView::GetSortType(int column) {
       return ui::kListSortNumber;
     // Season
     case 4:
-      return ui::kListSortDateStart;
+      return ui::kListSortSeason;
     // Other columns
     default:
       return ui::kListSortDefault;
@@ -1082,7 +1082,7 @@ void AnimeListDialog::RefreshList(int index) {
                         static_cast<LPARAM>(anime_item.GetId()));
     listview.SetItem(i, 2, anime::TranslateNumber(anime_item.GetMyScore()).c_str());
     listview.SetItem(i, 3, anime::TranslateType(anime_item.GetType()).c_str());
-    listview.SetItem(i, 4, anime::TranslateDateToSeason(anime_item.GetDateStart()).c_str());
+    listview.SetItem(i, 4, anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str());
   }
 
   // Set group headers
@@ -1114,7 +1114,7 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
     listview.SetItemIcon(index, icon_index);
     listview.SetItem(index, 2, anime::TranslateNumber(anime_item->GetMyScore()).c_str());
     listview.SetItem(index, 3, anime::TranslateType(anime_item->GetType()).c_str());
-    listview.SetItem(index, 4, anime::TranslateDateToSeason(anime_item->GetDateStart()).c_str());
+    listview.SetItem(index, 4, anime::TranslateDateToSeasonString(anime_item->GetDateStart()).c_str());
     listview.RedrawItems(index, index, true);
   }
 }

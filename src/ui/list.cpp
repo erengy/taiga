@@ -18,9 +18,11 @@
 
 #include "list.h"
 
+#include "base/compare.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "library/anime_db.h"
+#include "library/anime_util.h"
 #include "taiga/settings.h"
 
 #include "win/ctrl/win_ctrl.h"
@@ -75,12 +77,12 @@ int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
   }
 
   if (size[0] > size[1]) {
-    return 1;
+    return base::kGreaterThan;
   } else if (size[0] < size[1]) {
-    return -1;
+    return base::kLessThan;
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
@@ -88,12 +90,12 @@ int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
   int num2 = _wtoi(str2);
 
   if (num1 > num2) {
-    return 1;
+    return base::kGreaterThan;
   } else if (num1 < num2) {
-    return -1;
+    return base::kLessThan;
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 int SortAsText(LPCWSTR str1, LPCWSTR str2) {
@@ -101,6 +103,16 @@ int SortAsText(LPCWSTR str1, LPCWSTR str2) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+int SortListByAiringStatus(const anime::Item& item1, const anime::Item& item2) {
+  int status1 = item1.GetAiringStatus();
+  int status2 = item2.GetAiringStatus();
+
+  if (status1 != status2)
+    return status2 > status1 ? base::kGreaterThan : base::kLessThan;
+
+  return base::kEqualTo;
+}
 
 int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
   Date date1 = item1.GetDateStart();
@@ -120,20 +132,20 @@ int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
     if (!date2.day)
       date2.day = 31;
 
-    return date2 > date1 ? 1 : -1;
+    return date2 > date1 ? base::kGreaterThan : base::kLessThan;
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 int SortListByEpisodeCount(const anime::Item& item1, const anime::Item& item2) {
   if (item1.GetEpisodeCount() > item2.GetEpisodeCount()) {
-    return 1;
+    return base::kGreaterThan;
   } else if (item1.GetEpisodeCount() < item2.GetEpisodeCount()) {
-    return -1;
+    return base::kLessThan;
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
@@ -141,12 +153,12 @@ int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
   time_t time2 = _wtoi64(item2.GetMyLastUpdated().c_str());
 
   if (time1 > time2) {
-    return 1;
+    return base::kGreaterThan;
   } else if (time1 < time2) {
-    return -1;
+    return base::kLessThan;
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
@@ -159,16 +171,16 @@ int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
     val2 = _wtoi(item2.GetPopularity().substr(1).c_str());
 
   if (val2 == 0) {
-    return -1;
+    return base::kLessThan;
   } else if (val1 == 0) {
-    return 1;
+    return base::kGreaterThan;
   } else if (val1 > val2) {
-    return 1;
+    return base::kGreaterThan;
   } else if (val1 < val2) {
-    return -1;
+    return base::kLessThan;
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
@@ -180,38 +192,38 @@ int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
   bool available2 = item2.IsNewEpisodeAvailable();
 
   if (available1 && !available2) {
-    return -1;
+    return base::kLessThan;
   } else if (!available1 && available2) {
-    return 1;
+    return base::kGreaterThan;
   } else if (total1 && total2) {
     float ratio1 = static_cast<float>(watched1) / static_cast<float>(total1);
     float ratio2 = static_cast<float>(watched2) / static_cast<float>(total2);
     if (ratio1 > ratio2) {
-      return -1;
+      return base::kLessThan;
     } else if (ratio1 < ratio2) {
-      return 1;
+      return base::kGreaterThan;
     } else {
       if (total1 > total2) {
-        return -1;
+        return base::kLessThan;
       } else if (total1 < total2) {
-        return 1;
+        return base::kGreaterThan;
       }
     }
   } else {
     if (watched1 > watched2) {
-      return -1;
+      return base::kLessThan;
     } else if (watched1 < watched2) {
-      return 1;
+      return base::kGreaterThan;
     } else {
       if (total1 > total2) {
-        return -1;
+        return base::kLessThan;
       } else if (total1 < total2) {
-        return 1;
+        return base::kGreaterThan;
       }
     }
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
@@ -227,6 +239,20 @@ int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
   }
 }
 
+int SortListBySeason(const anime::Item& item1, const anime::Item& item2,
+                     int order) {
+  auto season1 = anime::TranslateDateToSeason(item1.GetDateStart());
+  auto season2 = anime::TranslateDateToSeason(item2.GetDateStart());
+
+  if (season1 != season2)
+    return season2 > season1 ? base::kGreaterThan : base::kLessThan;
+
+  if (item1.GetAiringStatus() != item2.GetAiringStatus())
+    return SortListByAiringStatus(item1, item2);
+
+  return SortListByTitle(item1, item2) * order;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
@@ -240,10 +266,10 @@ int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
       return SortAsNumber(str1, str2);
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
-int SortList(int type, int id1, int id2) {
+int SortList(int type, int order, int id1, int id2) {
   auto item1 = AnimeDatabase.FindItem(id1);
   auto item2 = AnimeDatabase.FindItem(id2);
 
@@ -261,12 +287,14 @@ int SortList(int type, int id1, int id2) {
         return SortListByProgress(*item1, *item2);
       case kListSortScore:
         return SortListByScore(*item1, *item2);
+      case kListSortSeason:
+        return SortListBySeason(*item1, *item2, order);
       case kListSortTitle:
         return SortListByTitle(*item1, *item2);
     }
   }
 
-  return 0;
+  return base::kEqualTo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -274,10 +302,10 @@ int SortList(int type, int id1, int id2) {
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
                                  LPARAM lParamSort) {
   if (!lParamSort)
-    return 0;
+    return base::kEqualTo;
 
   win::ListView* list = reinterpret_cast<win::ListView*>(lParamSort);
-  int return_value = 0;
+  int return_value = base::kEqualTo;
 
   switch (list->GetSortType()) {
     case kListSortDefault:
@@ -298,8 +326,9 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
     case kListSortPopularity:
     case kListSortProgress:
     case kListSortScore:
+    case kListSortSeason:
     case kListSortTitle: {
-      return_value = SortList(list->GetSortType(),
+      return_value = SortList(list->GetSortType(), list->GetSortOrder(),
                               static_cast<int>(list->GetItemParam(lParam1)),
                               static_cast<int>(list->GetItemParam(lParam2)));
       break;

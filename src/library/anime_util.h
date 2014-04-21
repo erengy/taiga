@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+#include "base/compare.h"
+
 class Date;
 
 namespace anime {
@@ -79,10 +81,33 @@ int TranslateResolution(const std::wstring& str, bool return_validity = false);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+class Season : public base::Comparable<Season> {
+public:
+  Season();
+  ~Season() {}
+
+  Season& operator = (const Season& season);
+
+  enum Name {
+    kUnknown,
+    kWinter,
+    kSpring,
+    kSummer,
+    kFall
+  };
+
+  Name name;
+  unsigned short year;
+
+private:
+  base::CompareResult Compare(const Season& season) const;
+};
+
 bool IsValidDate(const Date& date);
 void GetSeasonInterval(const std::wstring& season, Date& date_start, Date& date_end);
 std::wstring TranslateDate(const Date& date);
-std::wstring TranslateDateToSeason(const Date& date);
+Season TranslateDateToSeason(const Date& date);
+std::wstring TranslateDateToSeasonString(const Date& date);
 std::wstring TranslateSeasonToMonths(const std::wstring& season);
 
 }  // namespace anime

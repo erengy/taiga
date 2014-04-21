@@ -24,6 +24,39 @@
 
 namespace anime {
 
+Season::Season()
+    : name(kUnknown), year(0) {
+}
+
+Season& Season::operator=(const Season& season) {
+  name = season.name;
+  year = season.year;
+
+  return *this;
+}
+
+base::CompareResult Season::Compare(const Season& season) const {
+  if (year != season.year) {
+    if (year == 0)
+      return base::kGreaterThan;
+    if (season.year == 0)
+      return base::kLessThan;
+    return year < season.year ? base::kLessThan : base::kGreaterThan;
+  }
+
+  if (name != season.name) {
+    if (name == Season::kUnknown)
+      return base::kGreaterThan;
+    if (season.name == Season::kUnknown)
+      return base::kLessThan;
+    return name < season.name ? base::kLessThan : base::kGreaterThan;
+  }
+
+  return base::kEqualTo;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool IsValidDate(const Date& date) {
   return date.year > 0;
 }
@@ -75,29 +108,55 @@ std::wstring TranslateDate(const Date& date) {
   return result;
 }
 
-std::wstring TranslateDateToSeason(const Date& date) {
+Season TranslateDateToSeason(const Date& date) {
+  Season season;
+
+  season.year = date.year;
+
+  if (date.month == 0) {
+    season.name = Season::kUnknown;
+  } else if (date.month < 3) {  // Jan-Feb
+    season.name = Season::kWinter;
+  } else if (date.month < 6) {  // Mar-May
+    season.name = Season::kSpring;
+  } else if (date.month < 9) {  // Jun-Aug
+    season.name = Season::kSummer;
+  } else if (date.month < 12) { // Sep-Nov
+    season.name = Season::kFall;
+  } else {                      // Dec
+    season.name = Season::kWinter;
+    season.year++;
+  }
+
+  return season;
+}
+
+std::wstring TranslateDateToSeasonString(const Date& date) {
   if (!IsValidDate(date))
     return L"Unknown";
 
-  std::wstring season;
-  unsigned short year = date.year;
+  Season season = TranslateDateToSeason(date);
+  std::wstring name;
 
-  if (date.month == 0) {
-    season = L"Unknown";
-  } else if (date.month < 3) {  // Jan-Feb
-    season = L"Winter";
-  } else if (date.month < 6) {  // Mar-May
-    season = L"Spring";
-  } else if (date.month < 9) {  // Jun-Aug
-    season = L"Summer";
-  } else if (date.month < 12) { // Sep-Nov
-    season = L"Fall";
-  } else {                      // Dec
-    season = L"Winter";
-    year++;
+  switch (season.name) {
+    case Season::kUnknown:
+      name = L"Unknown";
+      break;
+    case Season::kWinter:
+      name = L"Winter";
+      break;
+    case Season::kSpring:
+      name = L"Spring";
+      break;
+    case Season::kSummer:
+      name = L"Summer";
+      break;
+    case Season::kFall:
+      name = L"Fall";
+      break;
   }
 
-  return season + L" " + ToWstr(year);
+  return name + L" " + ToWstr(season.year);
 }
 
 std::wstring TranslateSeasonToMonths(const std::wstring& season) {

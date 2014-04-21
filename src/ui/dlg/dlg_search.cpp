@@ -164,7 +164,7 @@ void SearchDialog::AddAnimeToList(int anime_id) {
     list_.SetItem(i, 1, anime::TranslateType(anime_item->GetType()).c_str());
     list_.SetItem(i, 2, anime::TranslateNumber(anime_item->GetEpisodeCount()).c_str());
     list_.SetItem(i, 3, anime_item->GetScore().c_str());
-    list_.SetItem(i, 4, anime::TranslateDateToSeason(anime_item->GetDateStart()).c_str());
+    list_.SetItem(i, 4, anime::TranslateDateToSeasonString(anime_item->GetDateStart()).c_str());
   }
 }
 
