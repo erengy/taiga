@@ -198,8 +198,10 @@
 		<file>PotPlayer64.exe</file>
 		<file>PotPlayerMini.exe</file>
 		<file>PotPlayerMini64.exe</file>
+		<file>sumire.exe</file>
 		<folder>%ProgramFiles%\Daum\PotPlayer\</folder>
 		<folder>%ProgramW6432%\Daum\PotPlayer\</folder>
+		<folder>%ProgramFiles%\LAV Filters\x86\PotPlayer\</folder>
 	</player>
 	<!-- SMPlayer -->
 	<player>
