@@ -44,7 +44,10 @@ protected:
 class TimerManager : public base::TimerManager {
 public:
   void Initialize();
+
+  void UpdateEnabledState();
   void UpdateIntervalsFromSettings();
+  void UpdateUi();
 
 protected:
   void OnTick();

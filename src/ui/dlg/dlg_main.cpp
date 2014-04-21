@@ -669,13 +669,12 @@ void MainDialog::UpdateStatusTimer() {
   GetClientRect(&rect);
 
   auto timer = taiga::timers.timer(taiga::kTimerMedia);
-  bool timer_enabled = timer && timer->enabled();
+  int seconds = timer ? timer->ticks() : 0;
 
-  if (timer_enabled &&
+  if (seconds > 0 &&
       CurrentEpisode.anime_id > anime::ID_UNKNOWN &&
-      IsUpdateAllowed(*AnimeDatabase.FindItem(CurrentEpisode.anime_id), CurrentEpisode, true)) {
-    int seconds = taiga::timers.timer(taiga::kTimerMedia)->ticks();
-
+      IsUpdateAllowed(*AnimeDatabase.FindItem(CurrentEpisode.anime_id),
+                      CurrentEpisode, true)) {
     std::wstring str = L"List update in " + ToTimeString(seconds);
     statusbar.SetPartText(1, str.c_str());
     statusbar.SetPartTipText(1, str.c_str());

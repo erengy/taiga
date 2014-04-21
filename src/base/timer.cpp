@@ -78,6 +78,7 @@ void Timer::set_ticks(int ticks) {
 
 void Timer::Reset() {
   ticks_ = interval_;
+  enabled_ = true;
 }
 
 void Timer::Tick() {

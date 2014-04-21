@@ -181,6 +181,10 @@ MediaPlayer* MediaPlayers::CheckRunningPlayers() {
   return nullptr;
 }
 
+MediaPlayer* MediaPlayers::GetRunningPlayer() {
+  return FindPlayer(current_player_);
+}
+
 void MediaPlayers::EditTitle(std::wstring& str,
                              const MediaPlayer* media_player) {
   if (str.empty() || !media_player || media_player->edits.empty())

@@ -75,6 +75,7 @@ public:
   void set_title_changed(bool title_changed);
 
   MediaPlayer* CheckRunningPlayers();
+  MediaPlayer* GetRunningPlayer();
 
   void EditTitle(std::wstring& str, const MediaPlayer* media_player);
   std::wstring GetTitle(HWND hwnd, const std::wstring& class_name, int mode);
