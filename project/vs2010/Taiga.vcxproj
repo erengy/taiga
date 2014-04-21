@@ -266,6 +266,7 @@
     <ClInclude Include="..\..\deps\src\zlib\zutil.h" />
     <ClInclude Include="..\..\src\base\accessibility.h" />
     <ClInclude Include="..\..\src\base\base64.h" />
+    <ClInclude Include="..\..\src\base\compare.h" />
     <ClInclude Include="..\..\src\base\crc.h" />
     <ClInclude Include="..\..\src\base\crypto.h" />
     <ClInclude Include="..\..\src\base\dde.h" />
