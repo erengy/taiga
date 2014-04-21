@@ -23,21 +23,16 @@
 #include <string>
 #include <windows.h>
 
-class Date {
- public:
+#include "compare.h"
+
+class Date : public base::Comparable<Date> {
+public:
   Date();
   Date(const std::wstring& date);
   Date(unsigned short year, unsigned short month, unsigned short day);
   virtual ~Date() {}
 
   Date& operator = (const Date& date);
-
-  bool operator == (const Date& date) const;
-  bool operator != (const Date& date) const;
-  bool operator <  (const Date& date) const;
-  bool operator <= (const Date& date) const;
-  bool operator >= (const Date& date) const;
-  bool operator >  (const Date& date) const;
 
   int operator - (const Date& date) const;
 
@@ -48,6 +43,9 @@ class Date {
   unsigned short year;
   unsigned short month;
   unsigned short day;
+
+private:
+  base::CompareResult Compare(const Date& date) const;
 };
 
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);

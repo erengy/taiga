@@ -45,50 +45,6 @@ Date& Date::operator = (const Date& date) {
   return *this;
 }
 
-bool Date::operator == (const Date& date) const {
-  return year == date.year && month == date.month && day == date.day;
-}
-
-bool Date::operator != (const Date& date) const {
-  return !operator == (date);
-}
-
-bool Date::operator < (const Date& date) const {
-  if (year && !date.year) return true;
-  if (!year && date.year) return false;
-  if (year != date.year) return year < date.year;
-
-  if (month && !date.month) return true;
-  if (!month && date.month) return false;
-  if (month != date.month) return month < date.month;
-
-  if (day && !date.day) return true;
-  if (!day && date.day) return false;
-  return day < date.day;
-}
-
-bool Date::operator <= (const Date& date) const {
-  return !operator > (date);
-}
-
-bool Date::operator >= (const Date& date) const {
-  return !operator < (date);
-}
-
-bool Date::operator > (const Date& date) const {
-  if (!year && date.year) return true;
-  if (year && !date.year) return false;
-  if (year != date.year) return year > date.year;
-
-  if (!month && date.month) return true;
-  if (month && !date.month) return false;
-  if (month != date.month) return month > date.month;
-
-  if (!day && date.day) return true;
-  if (day && !date.day) return false;
-  return day > date.day;
-}
-
 int Date::operator - (const Date& date) const {
   return ((year * 365) + (month * 30) + day) -
          ((date.year * 365) + (date.month * 30) + date.day);
@@ -112,6 +68,34 @@ Date::operator std::wstring() const {
   return PadChar(ToWstr(year), '0', 4) + L"-" +
          PadChar(ToWstr(month), '0', 2) + L"-" +
          PadChar(ToWstr(day), '0', 2);
+}
+
+base::CompareResult Date::Compare(const Date& date) const {
+  if (year != date.year) {
+    if (year == 0)
+      return base::kGreaterThan;
+    if (date.year == 0)
+      return base::kLessThan;
+    return year < date.year ? base::kLessThan : base::kGreaterThan;
+  }
+
+  if (month != date.month) {
+    if (month == 0)
+      return base::kGreaterThan;
+    if (date.month == 0)
+      return base::kLessThan;
+    return month < date.month ? base::kLessThan : base::kGreaterThan;
+  }
+
+  if (day != date.day) {
+    if (day == 0)
+      return base::kGreaterThan;
+    if (date.day == 0)
+      return base::kLessThan;
+    return day < date.day ? base::kLessThan : base::kGreaterThan;
+  }
+
+  return base::kEqualTo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

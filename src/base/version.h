@@ -21,6 +21,8 @@
 
 #include <string>
 
+#include "compare.h"
+
 namespace base {
 
 // An implementation of Semantic Versioning 2.0.0 that provides an easy way
@@ -28,7 +30,7 @@ namespace base {
 //
 // See http://semver.org for Semantic Versioning Specification.
 
-class SemanticVersion {
+class SemanticVersion : public Comparable<SemanticVersion> {
 public:
   typedef unsigned int numeric_identifier_t;
   typedef std::wstring string_t;
@@ -41,12 +43,6 @@ public:
     kBuildMetadata
   };
 
-  enum CompareResult {
-    kLessThan = -1,
-    kEqualTo = 0,
-    kGreaterThan = 1,
-  };
-
   SemanticVersion();
   SemanticVersion(const string_t& version);
   SemanticVersion(numeric_identifier_t major,
@@ -55,13 +51,6 @@ public:
   ~SemanticVersion() {}
 
   SemanticVersion& operator = (const SemanticVersion& version);
-
-  bool operator == (const SemanticVersion& version) const;
-  bool operator != (const SemanticVersion& version) const;
-  bool operator <  (const SemanticVersion& version) const;
-  bool operator <= (const SemanticVersion& version) const;
-  bool operator >  (const SemanticVersion& version) const;
-  bool operator >= (const SemanticVersion& version) const;
 
   operator string_t() const;
 

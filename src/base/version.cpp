@@ -49,30 +49,6 @@ SemanticVersion& SemanticVersion::operator=(const SemanticVersion& version) {
   return *this;
 }
 
-bool SemanticVersion::operator==(const SemanticVersion& version) const {
-  return Compare(version) == kEqualTo;
-}
-
-bool SemanticVersion::operator!=(const SemanticVersion& version) const {
-  return !operator==(version);
-}
-
-bool SemanticVersion::operator<(const SemanticVersion& version) const {
-  return Compare(version) == kLessThan;
-}
-
-bool SemanticVersion::operator<=(const SemanticVersion& version) const {
-  return !operator>(version);
-}
-
-bool SemanticVersion::operator>(const SemanticVersion& version) const {
-  return Compare(version) == kGreaterThan;
-}
-
-bool SemanticVersion::operator>=(const SemanticVersion& version) const {
-  return !operator<(version);
-}
-
 SemanticVersion::operator string_t() const {
   string_t version = ToWstr(static_cast<int>(major)) + L"." +
                      ToWstr(static_cast<int>(minor)) + L"." +
@@ -87,8 +63,7 @@ SemanticVersion::operator string_t() const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SemanticVersion::CompareResult SemanticVersion::Compare(
-    const SemanticVersion& version) const {
+CompareResult SemanticVersion::Compare(const SemanticVersion& version) const {
   if (major != version.major)
     return major < version.major ? kLessThan : kGreaterThan;
   if (minor != version.minor)
