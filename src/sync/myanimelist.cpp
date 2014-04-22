@@ -301,20 +301,30 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   // - Popularity
   // - Members
   string_t id = InStr(http_response.body,
-      L"myanimelist.net/anime/", L"/");
+      L"/anime/", L"/");
   string_t title = InStr(http_response.body,
       L"class=\"hovertitle\">", L"</a>");
   string_t genres = InStr(http_response.body,
       L"Genres:</span> ", L"<br />");
+  string_t status = InStr(http_response.body,
+      L"Status:</span> ", L"<br />");
+  string_t type = InStr(http_response.body,
+      L"Type:</span> ", L"<br />");
+  string_t episodes = InStr(http_response.body,
+      L"Episodes:</span> ", L"<br />");
   string_t score = InStr(http_response.body,
       L"Score:</span> ", L"<br />");
   string_t popularity = InStr(http_response.body,
       L"Popularity:</span> ", L"<br />");
 
+  bool title_is_truncated = false;
+
   if (EndsWith(title, L")") && title.length() > 7)
     title = title.substr(0, title.length() - 7);
-  if (EndsWith(title, L"...") && title.length() > 3)
+  if (EndsWith(title, L"...") && title.length() > 3) {
     title = title.substr(0, title.length() - 3);
+    title_is_truncated = true;
+  }
 
   std::vector<std::wstring> genres_vector;
   Split(genres, L", ", genres_vector);
@@ -327,7 +337,11 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
   anime_item.SetId(id, this->id());
-//anime_item.SetTitle(title);  // unsafe, may be truncated
+  if (!title_is_truncated)
+    anime_item.SetTitle(title);
+  anime_item.SetAiringStatus(TranslateSeriesStatusFrom(status));
+  anime_item.SetType(TranslateSeriesTypeFrom(type));
+  anime_item.SetEpisodeCount(ToInt(episodes));
   anime_item.SetGenres(genres_vector);
   anime_item.SetPopularity(popularity);
   anime_item.SetScore(score);
@@ -454,7 +468,7 @@ bool Service::RequestSucceeded(Response& response,
         return true;
       break;
     case kGetMetadataById:
-      if (!InStr(http_response.body, L"myanimelist.net/anime/", L"/").empty())
+      if (!InStr(http_response.body, L"/anime/", L"/").empty())
         return true;
       break;
     case kSearchTitle:
