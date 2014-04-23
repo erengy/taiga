@@ -319,6 +319,8 @@ BOOL SettingsPage::OnInitDialog() {
       EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
       CheckRadioButton(IDC_RADIO_TORRENT_NEW1, IDC_RADIO_TORRENT_NEW2,
                        IDC_RADIO_TORRENT_NEW1 + Settings.GetInt(taiga::kTorrent_Discovery_NewAction) - 1);
+      EnableDlgItem(IDC_RADIO_TORRENT_NEW1, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
+      EnableDlgItem(IDC_RADIO_TORRENT_NEW2, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
       break;
     }
     // Torrents > Downloads
@@ -506,6 +508,8 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
           EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, enable);
           EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, enable);
+          EnableDlgItem(IDC_RADIO_TORRENT_NEW1, enable);
+          EnableDlgItem(IDC_RADIO_TORRENT_NEW2, enable);
           return TRUE;
         }
         case IDC_CHECK_TORRENT_AUTOSETFOLDER: {
