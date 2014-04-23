@@ -495,6 +495,10 @@ LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   } else if (idCtrl == IDC_TREE_MAIN) {
     return OnTreeNotify(reinterpret_cast<LPARAM>(pnmh));
 
+  // Statusbar control
+  } else if (idCtrl == IDC_STATUSBAR_MAIN) {
+    return OnStatusbarNotify(reinterpret_cast<LPARAM>(pnmh));
+
   // Button control
   } else if (idCtrl == IDC_BUTTON_CANCELSEARCH) {
     if (pnmh->code == NM_CUSTOMDRAW) {

@@ -360,4 +360,47 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+/* Statusbar */
+
+LRESULT MainDialog::StatusBar::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_SETCURSOR: {
+      POINT pt;
+      GetCursorPos(&pt);
+      ScreenToClient(GetWindowHandle(), &pt);
+      win::Rect rect;
+      GetRect(1, &rect);
+      if (rect.PtIn(pt)) {
+        SetSharedCursor(IDC_HAND);
+        return TRUE;
+      }
+      break;
+    }
+  }
+
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT MainDialog::OnStatusbarNotify(LPARAM lParam) {
+  auto pnmh = reinterpret_cast<LPNMHDR>(lParam);
+
+  switch (pnmh->code) {
+    case NM_CLICK: {
+      auto pnm = reinterpret_cast<LPNMMOUSE>(lParam);
+      // Handle click on timer
+      if (pnm->dwItemSpec == 1) {
+        if (ui::OnRecognitionCancelConfirm()) {
+          CurrentEpisode.processed = true;
+        }
+        return TRUE;
+      }
+      break;
+    }
+  }
+
+  return 0L;
+}
+
 }  // namespace ui

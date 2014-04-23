@@ -67,6 +67,7 @@ public:
   void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   void OnTaskbarCallback(UINT uMsg, LPARAM lParam);
+  LRESULT OnStatusbarNotify(LPARAM lParam);
   LRESULT OnToolbarNotify(LPARAM lParam);
   LRESULT OnTreeNotify(LPARAM lParam);
   BOOL PreTranslateMessage(MSG* pMsg);
@@ -131,9 +132,14 @@ public:
     LRESULT OnCustomDraw(LPARAM lParam);
   } cancel_button;
 
+  // Statusbar
+  class StatusBar : public win::StatusBar {
+  public:
+    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  } statusbar;
+
   // Other controls
   win::Rebar rebar;
-  win::StatusBar statusbar;
   win::Toolbar toolbar_menu, toolbar_main, toolbar_search;
 
   // Search bar

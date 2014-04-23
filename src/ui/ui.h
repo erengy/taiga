@@ -67,6 +67,7 @@ bool OnAnimeFolderNotFound();
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);
 void OnAnimeWatchingEnd(const anime::Item& anime_item, const anime::Episode& episode);
 
+bool OnRecognitionCancelConfirm();
 void OnRecognitionFail();
 
 bool OnSeasonRefreshRequired();

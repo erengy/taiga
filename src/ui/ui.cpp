@@ -534,6 +534,24 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool OnRecognitionCancelConfirm() {
+  win::TaskDialog dlg;
+  std::wstring title = L"List Update";
+  dlg.SetWindowTitle(title.c_str());
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Would you like to cancel this list update?");
+  auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+  std::wstring content = anime_item->GetTitle();
+  if (!CurrentEpisode.number.empty())
+    content += L" #" + CurrentEpisode.number;
+  dlg.SetContent(content.c_str());
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(DlgMain.GetWindowHandle());
+
+  return dlg.GetSelectedButtonID() == IDYES;
+}
+
 void OnRecognitionFail() {
   if (!CurrentEpisode.title.empty()) {
     MediaPlayers.set_title_changed(false);
