@@ -445,8 +445,6 @@ int Database::GetItemCount(int status, bool check_history) {
   if (check_history) {
     foreach_(it, History.queue.items) {
       if (it->status) {
-        if (it->mode == taiga::kHttpServiceAddLibraryEntry)
-          continue;  // counted already
         if (status == *it->status) {
           count++;
         } else {
@@ -470,7 +468,6 @@ void Database::AddToList(int anime_id, int status) {
     return;
 
   anime_item->AddtoUserList();
-  SaveList();
 
   HistoryItem history_item;
   history_item.anime_id = anime_id;
@@ -481,6 +478,8 @@ void Database::AddToList(int anime_id, int status) {
   }
   history_item.mode = taiga::kHttpServiceAddLibraryEntry;
   History.queue.Add(history_item);
+
+  SaveList();
 
   ui::OnLibraryEntryAdd(anime_id);
 }
