@@ -263,6 +263,7 @@ public:
   StatusBar(HWND hwnd);
   virtual ~StatusBar() {}
 
+  void GetRect(int part, LPRECT rect);
   int  InsertPart(int image, int style, int autosize, int width, LPCWSTR text, LPCWSTR tooltip);
   void SetImageList(HIMAGELIST image_list);
   void SetPartText(int part, LPCWSTR text);

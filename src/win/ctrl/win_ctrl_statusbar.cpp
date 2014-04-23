@@ -37,6 +37,10 @@ void StatusBar::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void StatusBar::GetRect(int part, LPRECT rect) {
+  SendMessage(SB_GETRECT, part, reinterpret_cast<LPARAM>(rect));
+}
+
 int StatusBar::InsertPart(int image, int style, int autosize, int width,
                           LPCWSTR text, LPCWSTR tooltip) {
   if (widths_.empty()) {
