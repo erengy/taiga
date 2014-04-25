@@ -41,6 +41,7 @@ BOOL HistoryDialog::OnInitDialog() {
   list_.Attach(GetDlgItem(IDC_LIST_EVENT));
   list_.EnableGroupView(true);
   list_.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  list_.SetImageList(ui::Theme.GetImageList16().GetHandle());
   list_.SetTheme();
 
   // Insert list columns
@@ -173,9 +174,17 @@ void HistoryDialog::RefreshList() {
   // Add queued items
   foreach_cr_(it, History.queue.items) {
     int i = list_.GetItemCount();
-    list_.InsertItem(i, 0, -1, 0, nullptr,
-                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
-                     static_cast<LPARAM>(it->anime_id));
+
+    int icon = ui::kIcon16_ArrowUp;
+    switch (it->mode) {
+      case taiga::kHttpServiceAddLibraryEntry:
+        icon = ui::kIcon16_Plus;
+        break;
+      case taiga::kHttpServiceDeleteLibraryEntry:
+        icon = ui::kIcon16_Cross;
+        break;
+    }
+
     std::wstring details;
     if (it->mode == taiga::kHttpServiceAddLibraryEntry)
       AppendString(details, L"Add to list");
@@ -194,6 +203,10 @@ void HistoryDialog::RefreshList() {
       AppendString(details, L"Start date: " + std::wstring(*it->date_start));
     if (it->date_finish)
       AppendString(details, L"Finish date: " + std::wstring(*it->date_finish));
+
+    list_.InsertItem(i, 0, icon, 0, nullptr,
+                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
+                     static_cast<LPARAM>(it->anime_id));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }
@@ -201,11 +214,14 @@ void HistoryDialog::RefreshList() {
   // Add recently watched
   foreach_cr_(it, History.items) {
     int i = list_.GetItemCount();
-    list_.InsertItem(i, 1, -1, 0, nullptr,
-                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
-                     static_cast<LPARAM>(it->anime_id));
+    auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+    int icon = StatusToIcon(anime_item->GetAiringStatus());
     std::wstring details;
     AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
+
+    list_.InsertItem(i, 1, icon, 0, nullptr,
+                     anime_item->GetTitle().c_str(),
+                     static_cast<LPARAM>(it->anime_id));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }
