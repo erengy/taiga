@@ -21,6 +21,10 @@
 
 #include <string>
 
+namespace anime {
+class Item;
+}
+
 namespace sync {
 namespace myanimelist {
 
@@ -35,6 +39,7 @@ int TranslateMyStatusFrom(int value);
 int TranslateMyStatusTo(int value);
 std::wstring TranslateKeyTo(const std::wstring& key);
 
+std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);
 void ViewAnimeSearch(const std::wstring& title);
 void ViewHistory();

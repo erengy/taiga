@@ -21,6 +21,9 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
+#include "sync/hummingbird_util.h"
+#include "sync/myanimelist_util.h"
+#include "sync/sync.h"
 #include "taiga/dummy.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -57,8 +60,9 @@ const wchar_t* script_functions[] = {
   L"upper"
 };
 
-#define SCRIPT_VARIABLE_COUNT 22
+#define SCRIPT_VARIABLE_COUNT 23
 const wchar_t* script_variables[] = {
+  L"animeurl",
   L"audio",
   L"checksum",
   L"episode",
@@ -395,6 +399,14 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
             case taiga::kPlayStatusStopped: REPLACE(L"playstatus", L"stopped"); break;
             case taiga::kPlayStatusPlaying: REPLACE(L"playstatus", L"playing"); break;
             case taiga::kPlayStatusUpdated: REPLACE(L"playstatus", L"updated"); break;
+          }
+          switch (taiga::GetCurrentServiceId()) {
+            case sync::kMyAnimeList:
+              REPLACE(L"animeurl", ENCODE(sync::myanimelist::GetAnimePage(*anime_item)));
+              break;
+            case sync::kHummingbird:
+              REPLACE(L"animeurl", ENCODE(sync::hummingbird::GetAnimePage(*anime_item)));
+              break;
           }
         } else {
           pos_var = pos_end + 1;

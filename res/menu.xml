@@ -325,6 +325,7 @@
 		<item name="upper()"   action="$upper(string)"/>
 	</menu>
 	<menu name="ScriptAddVariable">
+		<item name="animeurl"   action="%animeurl%"/>
 		<item name="audio"      action="%audio%"/>
 		<item name="checksum"   action="%checksum%"/>
 		<item name="episode"    action="%episode%"/>

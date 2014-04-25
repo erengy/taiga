@@ -21,6 +21,10 @@
 
 #include <string>
 
+namespace anime {
+class Item;
+}
+
 namespace sync {
 namespace hummingbird {
   
@@ -36,6 +40,7 @@ int TranslateMyStatusFrom(const std::wstring& value);
 std::wstring TranslateMyStatusTo(int value);
 std::wstring TranslateKeyTo(const std::wstring& key);
 
+std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);
 void ViewDashboard();
 void ViewProfile();

@@ -157,9 +157,14 @@ std::wstring TranslateKeyTo(const std::wstring& key) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+std::wstring GetAnimePage(const anime::Item& anime_item) {
+  return L"http://hummingbird.me/anime/" + anime_item.GetSlug();
+}
+
 void ViewAnimePage(int anime_id) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
-  ExecuteLink(L"http://hummingbird.me/anime/" + anime_item->GetSlug());
+
+  ExecuteLink(GetAnimePage(*anime_item));
 }
 
 void ViewDashboard() {

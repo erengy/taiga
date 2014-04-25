@@ -157,10 +157,15 @@ std::wstring TranslateKeyTo(const std::wstring& key) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+std::wstring GetAnimePage(const anime::Item& anime_item) {
+  return L"http://myanimelist.net/anime/" +
+         anime_item.GetId(sync::kMyAnimeList) + L"/";
+}
+
 void ViewAnimePage(int anime_id) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
-  ExecuteLink(L"http://myanimelist.net/anime/" +
-              anime_item->GetId(sync::kMyAnimeList) + L"/");
+
+  ExecuteLink(GetAnimePage(*anime_item));
 }
 
 void ViewAnimeSearch(const std::wstring& title) {

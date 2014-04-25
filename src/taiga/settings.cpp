@@ -62,14 +62,14 @@ const std::wstring kDefaultFormatMirc =
     L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%"
     L"$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 "
     L"$if(%score%,\00314[Score: %score%/10]\003) "
-    L"\00312www.myanimelist.net/anime/%id%";
+    L"\00312%animeurl%";
 const std::wstring kDefaultFormatSkype =
-    L"Watching: <a href=\"http://myanimelist.net/anime/%id%\">%title%</a>"
+    L"Watching: <a href=\"%animeurl%\">%title%</a>"
     L"$if(%episode%, #%episode%$if(%total%,/%total%))";
 const std::wstring kDefaultFormatTwitter =
     L"$ifequal(%episode%,%total%,Just completed: %title%"
     L"$if(%score%, (Score: %score%/10)) "
-    L"www.myanimelist.net/anime/%id%)";
+    L"%animeurl%)";
 const std::wstring kDefaultFormatBalloon =
     L"$if(%title%,%title%)\\n"
     L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )"
