@@ -357,7 +357,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
   #define REPLACE(x, y) \
       if (var == x) { \
         str.replace(pos_var, var.length() + 2, y); \
-        pos_var += int(std::wstring(y).length()) - int(std::wstring(x).length()) + 1; \
+        pos_var += static_cast<int>(std::wstring(y).length()); \
         continue; \
       }
 
