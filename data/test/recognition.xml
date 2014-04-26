@@ -683,4 +683,15 @@
 		<title>Kotoura-san - Special Short Anime 'Haruka's Room'</title>
 		<video>H.264 10-bit</video>
 	</file>
+	<file>
+		<file>[R-R] Diebuster.EP1 (720p.Hi10p.AC3) [82E36A36].mkv</file>
+		<audio>AC3</audio>
+		<checksum>82E36A36</checksum>
+		<format>MKV</format>
+		<group>R-R</group>
+		<number>1</number>
+		<resolution>720p</resolution>
+		<title>Diebuster</title>
+		<video>Hi10p</video>
+	</file>
 </recognition>
