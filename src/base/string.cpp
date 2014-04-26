@@ -20,6 +20,7 @@
 #include <functional>
 #include <iomanip>
 #include <locale>
+#include <map>
 #include <sstream>
 
 #include "string.h"
@@ -762,47 +763,51 @@ void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output) {
 // included in the table. Note that characters in the table are listed by their
 // precedence.
 
-const wchar_t* common_char_table = L",_ -+;.&|~";
+const wstring kCommonCharTable = L",_ .-+;&|~";
 
 int GetCommonCharIndex(wchar_t c) {
-  for (int i = 0; i < 10; i++)
-    if (common_char_table[i] == c)
+  for (size_t i = 0; i < kCommonCharTable.size(); i++)
+    if (kCommonCharTable.at(i) == c)
       return i;
 
   return -1;
 }
 
-wchar_t GetMostCommonCharacter(const wstring& str) {
-  vector<std::pair<wchar_t, int>> char_map;
-  int char_index = -1;
+wchar_t GetMostCommonCharacter(wstring str) {
+  Trim(str);
 
-  for (size_t i = 0; i < str.length(); i++) {
-    if (!IsAlphanumeric(str[i])) {
-      char_index = GetCommonCharIndex(str[i]);
-      if (char_index == -1)
-        continue;
+  std::map<wchar_t, int> frequency;
 
-      for (auto it = char_map.begin(); it != char_map.end(); ++it) {
-        if (it->first == str[i]) {
-          it->second++;
-          char_index = -1;
-          break;
-        }
-      }
+  for (auto it = str.begin(); it != str.end(); ++it) {
+    if (IsAlphanumeric(*it))
+      continue;
+    if (GetCommonCharIndex(*it) == -1)
+      continue;
 
-      if (char_index > -1) {
-        char_map.push_back(std::make_pair(str[i], 1));
-      }
+    frequency[*it] += 1;
+  }
+
+  wchar_t most_common_char = L'\0';
+
+  for (auto it = frequency.begin(); it != frequency.end(); ++it) {
+    if (most_common_char == L'\0') {
+      most_common_char = it->first;
+      continue;
+    }
+
+    int character_distance = GetCommonCharIndex(it->first) -
+                             GetCommonCharIndex(most_common_char);
+    if (character_distance < 0) {
+      most_common_char = it->first;
+      continue;
+    }
+
+    float frequency_ratio = static_cast<float>(it->second) /
+                            static_cast<float>(frequency[most_common_char]);
+    if (frequency_ratio / character_distance > 0.8f) {
+      most_common_char = it->first;
     }
   }
 
-  char_index = 0;
-  for (auto it = char_map.begin(); it != char_map.end(); ++it) {
-    if (it->second * 1.8f >= char_map.at(char_index).second &&
-        GetCommonCharIndex(it->first) < GetCommonCharIndex(char_map.at(char_index).first)) {
-      char_index = it - char_map.begin();
-    }
-  }
-
-  return char_map.empty() ? '\0' : char_map.at(char_index).first;
+  return most_common_char;
 }
