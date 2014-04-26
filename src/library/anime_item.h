@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "anime.h"
 #include "metadata.h"
