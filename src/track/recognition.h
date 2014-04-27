@@ -22,6 +22,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace anime {
 class Episode;
