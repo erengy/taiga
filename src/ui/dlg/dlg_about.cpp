@@ -104,7 +104,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"\\b Author:\\b0\\line "
       L"Eren 'erengy' Okka\\line\\line "
       L"\\b Committers and other contributors:\\b0\\line "
-      L"saka, Diablofan, slevir, LordGravewish, cassist\\line\\line "
+      L"saka, Diablofan, slevir, LordGravewish, cassist, rr-\\line\\line "
       L"\\b Third party stuff that is used by Taiga:\\b0\\line "
       L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
       L"- JsonCpp 0.6.0, Copyright (c) 2007-2010, Baptiste Lepilleur\\line "
