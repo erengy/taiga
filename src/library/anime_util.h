@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "base/compare.h"
+#include "base/comparable.h"
 
 class Date;
 

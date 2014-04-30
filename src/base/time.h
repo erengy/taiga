@@ -23,7 +23,7 @@
 #include <string>
 #include <windows.h>
 
-#include "compare.h"
+#include "comparable.h"
 
 class Date : public base::Comparable<Date> {
 public:

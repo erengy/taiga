@@ -18,7 +18,7 @@
 
 #include "list.h"
 
-#include "base/compare.h"
+#include "base/comparable.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "library/anime_db.h"
