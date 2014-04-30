@@ -20,7 +20,6 @@
 #include <shlobj.h>
 
 #include "file.h"
-#include "log.h"
 #include "string.h"
 #include "win/win_main.h"
 #include "win/win_registry.h"
@@ -521,82 +520,4 @@ std::wstring ToSizeString(QWORD qwSize) {
   }
 
   return size + unit;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-FileSearchHelper::FileSearchHelper()
-    : minimum_file_size_(0),
-      skip_directories_(false),
-      skip_files_(false),
-      skip_subdirectories_(false) {
-}
-
-bool FileSearchHelper::Search(const std::wstring& root) {
-  if (root.empty())
-    return false;
-  if (skip_directories_ && skip_files_)
-    return false;
-
-  std::wstring path = AddTrailingSlash(GetExtendedLengthPath(root)) + L"*";
-  bool result = false;
-
-  WIN32_FIND_DATA find_data;
-  HANDLE handle = FindFirstFile(path.c_str(), &find_data);
-
-  do {
-    if (handle == INVALID_HANDLE_VALUE) {
-      LOG(LevelError, Logger::FormatError(GetLastError()));
-      LOG(LevelError, L"Path: " + path);
-      SetLastError(ERROR_SUCCESS);
-      return false;
-    }
-
-    // Directory
-    if (IsDirectory(find_data)) {
-      if (IsValidDirectory(find_data)) {
-        if (!skip_directories_)
-          result = OnDirectory(root, find_data.cFileName);
-        if (!skip_subdirectories_ && !result)
-          result = Search(AddTrailingSlash(root) + find_data.cFileName);
-      }
-
-    // File
-    } else if (!skip_files_) {
-      if (find_data.nFileSizeLow < minimum_file_size_) {
-        LOG(LevelDebug,
-            L"File is ignored because its size does not meet the threshold.");
-        LOG(LevelDebug,
-            L"Path: " + AddTrailingSlash(root) + find_data.cFileName);
-        continue;
-      }
-      result = OnFile(root, find_data.cFileName);
-    }
-
-  } while (!result && FindNextFile(handle, &find_data));
-
-  FindClose(handle);
-  return result;
-}
-
-bool FileSearchHelper::OnDirectory(const std::wstring& root,
-                                   const std::wstring& name) {
-  return false;
-}
-
-bool FileSearchHelper::OnFile(const std::wstring& root,
-                              const std::wstring& name) {
-  return false;
-}
-
-void FileSearchHelper::set_skip_directories(bool skip_directories) {
-  skip_directories_ = skip_directories;
-}
-
-void FileSearchHelper::set_skip_files(bool skip_files) {
-  skip_files_ = skip_files;
-}
-
-void FileSearchHelper::set_skip_subdirectories(bool skip_subdirectories) {
-  skip_subdirectories_ = skip_subdirectories;
 }

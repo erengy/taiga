@@ -121,6 +121,7 @@
     <ClCompile Include="..\..\src\base\crc.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
     <ClCompile Include="..\..\src\base\file.cpp" />
+    <ClCompile Include="..\..\src\base\file_search.cpp" />
     <ClCompile Include="..\..\src\base\gfx.cpp" />
     <ClCompile Include="..\..\src\base\gzip.cpp" />
     <ClCompile Include="..\..\src\base\html.cpp" />

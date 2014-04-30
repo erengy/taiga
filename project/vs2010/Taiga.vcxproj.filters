@@ -70,9 +70,10 @@
     <ClCompile Include="..\..\src\base\crypto.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\file.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\file.cpp">
+    <ClCompile Include="..\..\src\base\file_search.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\gfx.cpp">
