@@ -694,4 +694,15 @@
 		<title>Diebuster</title>
 		<video>Hi10p</video>
 	</file>
+	<file>
+		<file>Aim_For_The_Top!_Gunbuster-ep1.BD(H264.FLAC.10bit)[KAA][69ECCDCF].mkv</file>
+		<audio>FLAC</audio>
+		<checksum>69ECCDCF</checksum>
+		<extra>BD</extra>
+		<format>MKV</format>
+		<group>KAA</group>
+		<number>1</number>
+		<title>Aim For The Top! Gunbuster</title>
+		<video>H264 10bit</video>
+	</file>
 </recognition>
