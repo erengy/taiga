@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/file.h"
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
@@ -42,6 +41,7 @@
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/ui.h"
+#include "win/win_commondialog.h"
 
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   LOG(LevelDebug, action);
@@ -245,7 +245,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Opens up a dialog to add new root folder.
   } else if (action == L"AddFolder") {
     std::wstring path;
-    if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), L"Please select a folder:", L"", path)) {
+    if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
+                             L"Please select a folder:", L"", path)) {
       Settings.root_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
         FolderMonitor.Enable();
@@ -452,8 +453,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         std::wstring default_path, path;
         if (!Settings.root_folders.empty())
           default_path = Settings.root_folders.front();
-        if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
-                            L"Choose an anime folder", default_path, path)) {
+        if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
+                                 L"Choose an anime folder",
+                                 default_path, path)) {
           anime_item->SetFolder(path);
           Settings.Save();
         }
@@ -471,7 +473,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = static_cast<int>(lParam);
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     std::wstring path, title = L"Anime title: " + anime_item->GetTitle();
-    if (BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain), title.c_str(), L"", path)) {
+    if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
+                             title.c_str(), L"", path)) {
       anime_item->SetFolder(path);
       Settings.Save();
       ScanAvailableEpisodesQuick(anime_item->GetId());

@@ -33,9 +33,6 @@ bool Execute(const std::wstring& path, const std::wstring& parameters = L"");
 BOOL ExecuteEx(const std::wstring& path, const std::wstring& parameters = L"");
 void ExecuteLink(const std::wstring& link);
 
-std::wstring BrowseForFile(HWND hwndOwner, LPCWSTR lpstrTitle, LPCWSTR lpstrFilter = nullptr);
-BOOL BrowseForFolder(HWND hwnd, const std::wstring& title, const std::wstring& default_path, std::wstring& output);
-
 bool CreateFolder(const std::wstring& path);
 int DeleteFolder(std::wstring path);
 

@@ -379,6 +379,9 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\win\win_commondialog.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\win\win_dde.cpp">
       <Filter>win</Filter>
     </ClCompile>
@@ -821,6 +824,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win\win_commondialog.h">
+      <Filter>win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\win\win_dde.h">
       <Filter>win</Filter>

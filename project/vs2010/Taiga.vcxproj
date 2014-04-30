@@ -218,6 +218,7 @@
     <ClCompile Include="..\..\src\win\ctrl\win_ctrl_toolbar.cpp" />
     <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tooltip.cpp" />
     <ClCompile Include="..\..\src\win\ctrl\win_ctrl_treeview.cpp" />
+    <ClCompile Include="..\..\src\win\win_commondialog.cpp" />
     <ClCompile Include="..\..\src\win\win_dde.cpp" />
     <ClCompile Include="..\..\src\win\win_dialog.cpp" />
     <ClCompile Include="..\..\src\win\win_gdi.cpp" />
@@ -354,6 +355,7 @@
     <ClInclude Include="..\..\src\ui\theme.h" />
     <ClInclude Include="..\..\src\ui\ui.h" />
     <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h" />
+    <ClInclude Include="..\..\src\win\win_commondialog.h" />
     <ClInclude Include="..\..\src\win\win_dde.h" />
     <ClInclude Include="..\..\src\win\win_dialog.h" />
     <ClInclude Include="..\..\src\win\win_gdi.h" />

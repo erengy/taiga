@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -30,6 +29,7 @@
 #include "ui/dlg/dlg_anime_info_page.h"
 #include "ui/dlg/dlg_input.h"
 #include "ui/theme.h"
+#include "win/win_commondialog.h"
 
 namespace ui {
 
@@ -201,7 +201,7 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       } else if (!Settings.root_folders.empty()) {
         default_path = Settings.root_folders.front();
       }
-      if (BrowseForFolder(GetWindowHandle(), L"Choose an anime folder", default_path, path)) {
+      if (win::BrowseForFolder(GetWindowHandle(), L"Choose an anime folder", default_path, path)) {
         SetDlgItemText(IDC_EDIT_ANIME_FOLDER, path.c_str());
       }
       return TRUE;
