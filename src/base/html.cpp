@@ -19,12 +19,16 @@
 #include <map>
 #include <string>
 
+#include "foreach.h"
 #include "html.h"
 #include "string.h"
 
 std::map<std::wstring, wchar_t> html_entities;
 
 void DecodeHtmlEntities(std::wstring& str) {
+  static size_t min_html_entity_length = 0;
+  static size_t max_html_entity_length = 0;
+
   // Build entity map
   // Source: http://www.w3.org/TR/html4/sgml/entities.html
   if (html_entities.empty()) {
@@ -296,6 +300,14 @@ void DecodeHtmlEntities(std::wstring& str) {
     html_entities[L"lsaquo"] =   L'\u2039';
     html_entities[L"rsaquo"] =   L'\u203A';
     html_entities[L"euro"] =     L'\u20AC';
+
+    foreach_(entity, html_entities) {
+      if (!min_html_entity_length ||
+          entity->first.length() < min_html_entity_length)
+        min_html_entity_length = entity->first.length();
+      if (entity->first.length() > max_html_entity_length)
+        max_html_entity_length = entity->first.length();
+    }
   }
 
   if (InStr(str, L"&") == -1)
@@ -338,7 +350,8 @@ void DecodeHtmlEntities(std::wstring& str) {
         while (i < str.size() && IsAlphanumeric(str.at(i))) i++;
         if (i > pos && i < str.size() && str.at(i) == L';') {
           size_t length = i - pos;
-          if (length > 1 && length < 10) {
+          if (length >= min_html_entity_length &&
+              length <= max_html_entity_length) {
             std::wstring entity_name = str.substr(pos, length);
             if (html_entities.find(entity_name) != html_entities.end()) {
               character_value = html_entities[entity_name];
