@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/dde.h"
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
@@ -29,6 +28,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "ui/ui.h"
+#include "win/win_dde.h"
 
 taiga::Announcer Announcer;
 taiga::Skype Skype;
@@ -125,7 +125,7 @@ bool Announcer::ToMirc(const std::wstring& service,
     return false;
 
   // Initialize
-  base::DynamicDataExchange dde;
+  win::DynamicDataExchange dde;
   if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     ui::OnMircDdeInitFail();
     return false;
@@ -188,7 +188,7 @@ bool Announcer::TestMircConnection(const std::wstring& service) {
   }
 
   // Initialize
-  base::DynamicDataExchange dde;
+  win::DynamicDataExchange dde;
   if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
     ui::OnMircDdeInitFail(true);
     return false;

@@ -120,7 +120,6 @@
     <ClCompile Include="..\..\src\base\base64.cpp" />
     <ClCompile Include="..\..\src\base\crc.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
-    <ClCompile Include="..\..\src\base\dde.cpp" />
     <ClCompile Include="..\..\src\base\file.cpp" />
     <ClCompile Include="..\..\src\base\gfx.cpp" />
     <ClCompile Include="..\..\src\base\gzip.cpp" />
@@ -218,6 +217,7 @@
     <ClCompile Include="..\..\src\win\ctrl\win_ctrl_toolbar.cpp" />
     <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tooltip.cpp" />
     <ClCompile Include="..\..\src\win\ctrl\win_ctrl_treeview.cpp" />
+    <ClCompile Include="..\..\src\win\win_dde.cpp" />
     <ClCompile Include="..\..\src\win\win_dialog.cpp" />
     <ClCompile Include="..\..\src\win\win_gdi.cpp" />
     <ClCompile Include="..\..\src\win\win_gdiplus.cpp" />
@@ -269,7 +269,6 @@
     <ClInclude Include="..\..\src\base\comparable.h" />
     <ClInclude Include="..\..\src\base\crc.h" />
     <ClInclude Include="..\..\src\base\crypto.h" />
-    <ClInclude Include="..\..\src\base\dde.h" />
     <ClInclude Include="..\..\src\base\file.h" />
     <ClInclude Include="..\..\src\base\foreach.h" />
     <ClInclude Include="..\..\src\base\gfx.h" />
@@ -354,6 +353,7 @@
     <ClInclude Include="..\..\src\ui\theme.h" />
     <ClInclude Include="..\..\src\ui\ui.h" />
     <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h" />
+    <ClInclude Include="..\..\src\win\win_dde.h" />
     <ClInclude Include="..\..\src\win\win_dialog.h" />
     <ClInclude Include="..\..\src\win\win_gdi.h" />
     <ClInclude Include="..\..\src\win\win_gdiplus.h" />

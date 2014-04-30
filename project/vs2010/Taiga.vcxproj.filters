@@ -70,7 +70,6 @@
     <ClCompile Include="..\..\src\base\crypto.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\dde.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\file.cpp">
@@ -379,6 +378,9 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\win\win_dde.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\win\win_dialog.cpp">
       <Filter>win</Filter>
     </ClCompile>
@@ -469,9 +471,6 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\crypto.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\base\dde.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\file.h">
@@ -821,6 +820,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win\win_dde.h">
+      <Filter>win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\win\win_dialog.h">
       <Filter>win</Filter>

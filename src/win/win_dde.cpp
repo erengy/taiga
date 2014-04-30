@@ -16,10 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "dde.h"
-#include "string.h"
+#include "win_dde.h"
 
-namespace base {
+#include "base/string.h"
+
+namespace win {
 
 DynamicDataExchange::DynamicDataExchange()
     : conversation_(nullptr),
@@ -190,4 +191,4 @@ HDDEDATA CALLBACK DynamicDataExchange::DdeCallback(UINT uType, UINT uFmt,
   return reinterpret_cast<HDDEDATA>(0);
 }
 
-}  // namespace base
+}  // namespace win

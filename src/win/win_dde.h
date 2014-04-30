@@ -16,13 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_DDE_H
-#define TAIGA_BASE_DDE_H
+#ifndef TAIGA_WIN_DDE_H
+#define TAIGA_WIN_DDE_H
 
-#include <string>
-#include <windows.h>
+#include "win_main.h"
 
-namespace base {
+namespace win {
 
 // A helper class to use Dynamic Data Exchange (DDE) protocol
 
@@ -60,6 +59,6 @@ private:
   bool is_unicode_;
 };
 
-}  // namespace base
+}  // namespace win
 
-#endif  // TAIGA_BASE_DDE_H
+#endif  // TAIGA_WIN_DDE_H
