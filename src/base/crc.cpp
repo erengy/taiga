@@ -23,48 +23,51 @@
 #include "crc.h"
 #include "string.h"
 
-std::wstring CalculateCrcFromFile(const std::wstring& file) {
-  BYTE buffer[0x10000];
-  DWORD dwBytesRead = 0;
+std::wstring ConvertCrcValueToString(ULONG crc) {
+  wchar_t crc_val[16] = {0};
+  _ultow_s(crc, crc_val, 16, 16);
 
-  HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
-                            OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
-  if (hFile == INVALID_HANDLE_VALUE)
-    return L"";
+  std::wstring value = crc_val;
 
-  ULONG crc = crc32(0L, Z_NULL, 0);
-  BOOL bSuccess = ReadFile(hFile, buffer, sizeof(buffer), &dwBytesRead, NULL);
-  while (bSuccess && dwBytesRead) {
-    crc = crc32(crc, buffer, dwBytesRead);
-    bSuccess = ReadFile(hFile, buffer, sizeof(buffer), &dwBytesRead, NULL);
-  }
-
-  if (hFile != NULL)
-    CloseHandle(hFile);
-
-  wchar_t val[16] = {0};
-  _ultow_s(crc, val, 16, 16);
-  std::wstring value = val;
-  if (value.length() < 8) {
+  if (value.length() < 8)
     value.insert(0, 8 - value.length(), '0');
-  }
+
+  ToUpper(value);
 
   return value;
+}
+
+std::wstring CalculateCrcFromFile(const std::wstring& file) {
+  BYTE buffer[0x10000];
+  DWORD bytes_read = 0;
+
+  HANDLE file_handle = CreateFile(
+      file.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
+      OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+
+  if (file_handle == INVALID_HANDLE_VALUE)
+    return std::wstring();
+
+  ULONG crc = crc32(0L, Z_NULL, 0);
+  BOOL success = ReadFile(file_handle, buffer, sizeof(buffer),
+                          &bytes_read, nullptr);
+  while (success && bytes_read) {
+    crc = crc32(crc, buffer, bytes_read);
+    success = ReadFile(file_handle, buffer, sizeof(buffer),
+                       &bytes_read, nullptr);
+  }
+
+  if (file_handle != nullptr)
+    CloseHandle(file_handle);
+
+  return ConvertCrcValueToString(crc);
 }
 
 std::wstring CalculateCrcFromString(const std::wstring& str) {
   std::string text = WstrToStr(str);
 
   ULONG crc = crc32(0L, Z_NULL, 0);
-  crc = crc32(crc, (BYTE*)text.data(), text.size());
+  crc = crc32(crc, reinterpret_cast<const Bytef*>(text.data()), text.size());
 
-  wchar_t crc_val[16] = {0};
-  _ultow_s(crc, crc_val, 16, 16);
-  std::wstring value = crc_val;
-  if (value.length() < 8) {
-    value.insert(0, 8 - value.length(), '0');
-  }
-  ToUpper(value);
-
-  return value;
+  return ConvertCrcValueToString(crc);
 }
