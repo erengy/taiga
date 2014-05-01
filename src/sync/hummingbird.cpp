@@ -30,7 +30,7 @@ namespace hummingbird {
 
 Service::Service() {
   // Hummingbird's APIv1 is consumed through Mashape
-  host_ = L"hummingbirdv1.p.mashape.com";
+  host_ = L"hbrd-v1.p.mashape.com";
 
   id_ = kHummingbird;
   canonical_name_ = L"hummingbird";
@@ -257,7 +257,6 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
 
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {
   switch (request_type) {
-    case kGetLibraryEntries:
     case kAddLibraryEntry:
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry:
