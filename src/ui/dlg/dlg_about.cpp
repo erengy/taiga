@@ -115,6 +115,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"- Home page {\\field{\\*\\fldinst HYPERLINK \"http://taiga.erengy.com\"}{\\fldrslt http://taiga.erengy.com}}\\line "
       L"- GitHub repository {\\field{\\*\\fldinst HYPERLINK \"https://github.com/erengy/taiga\"}{\\fldrslt https://github.com/erengy/taiga}}\\line "
       L"- MyAnimeList club {\\field{\\*\\fldinst HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}{\\fldrslt http://myanimelist.net/clubs.php?cid=21400}}\\line "
+      L"- Twitter account {\\field{\\*\\fldinst HYPERLINK \"https://twitter.com/taigaapp\"}{\\fldrslt https://twitter.com/taigaapp}}\\line "
       L"- IRC channel {\\field{\\*\\fldinst HYPERLINK \"irc://irc.rizon.net/taiga\"}{\\fldrslt irc://irc.rizon.net/taiga}}"
       L"}";
   rich_edit_.SetTextEx(WstrToStr(text));
