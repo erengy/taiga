@@ -47,7 +47,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19163</id>
-		<id name="hummingbird">date-a-live-2nd-season</id>
+		<id name="hummingbird">date-a-live-ii</id>
 		<producers>AIC Plus+, Nippon Columbia</producers>
 		<image>http://cdn.myanimelist.net/images/anime/6/59227.jpg</image>
 		<title>Date A Live II</title>
@@ -167,7 +167,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">20899</id>
-		<id name="hummingbird">jojo-s-bizarre-adventure-part-3-stardust-crusaders</id>
+		<id name="hummingbird">jojo-s-bizarre-adventure-stardust-crusaders</id>
 		<producers>David Production, Warner Bros.</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/55267.jpg</image>
 		<title>JoJo's Bizarre Adventure: Stardust Crusaders</title>
@@ -215,7 +215,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">20971</id>
-		<id name="hummingbird">kiniro-no-corda-3</id>
+		<id name="hummingbird">kiniro-no-corda-blue-sky</id>
 		<producers>Koei, TYO Animations</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/58933.jpg</image>
 		<title>Kiniro no Corda: Blue&#9834;Sky</title>
@@ -239,7 +239,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">21033</id>
-		<id name="hummingbird">dragonar-academy</id>
+		<id name="hummingbird">seikoku-no-dragonar</id>
 		<producers>Media Factory, Kadokawa Shoten, C-Station</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/58237.jpg</image>
 		<title>Seikoku no Dragonar</title>
@@ -247,7 +247,7 @@
 	<anime>
 		<type>5</type>
 		<id name="myanimelist">21073</id>
-		<id name="hummingbird">puchimas-petit-idolm-ster--2</id>
+		<id name="hummingbird">puchimas-petit-petit-idolm-ster</id>
 		<producers>Gathering</producers>
 		<image>http://cdn.myanimelist.net/images/anime/6/55661.jpg</image>
 		<title>Puchimas!!: Petit Petit iDOLM@STER</title>
@@ -311,7 +311,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">21421</id>
-		<id name="hummingbird">maho-shojo-taisen</id>
+		<id name="hummingbird">mahou-shoujo-taisen</id>
 		<producers>Gainax</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/56835.jpg</image>
 		<title>Mahou Shoujo Taisen</title>
@@ -343,7 +343,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">21561</id>
-		<id name="hummingbird">ryuugajou-nanana-no-maizoukin--2</id>
+		<id name="hummingbird">ryuugajou-nanana-no-maizoukin-b6a5f293-3c57-400a-ba19-4d76d259a797</id>
 		<producers>A-1 Pictures</producers>
 		<image>http://cdn.myanimelist.net/images/anime/9/58787.jpg</image>
 		<title>Ryuugajou Nanana no Maizoukin</title>
@@ -367,7 +367,7 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">21635</id>
-		<id name="hummingbird">gj-bu-ba2bfeb9-40f1-4d35-af72-c07b9ca31a40</id>
+		<id name="hummingbird">gj-bu-2da50c52-49e6-4cd7-8ada-d5809a85b343</id>
 		<producers>Doga Kobo</producers>
 		<image>http://cdn.myanimelist.net/images/anime/6/56997.jpg</image>
 		<title>GJ-bu@</title>
@@ -463,7 +463,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">21863</id>
-		<id name="hummingbird">mangaka-san-to-assistant-san</id>
+		<id name="hummingbird">mangaka-san-to-assistant-san-to</id>
 		<producers>Zexcs</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/57517.jpg</image>
 		<title>Mangaka-san to Assistant-san to</title>
@@ -583,7 +583,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">22433</id>
-		<id name="hummingbird">break-blade</id>
+		<id name="hummingbird">break-blade-tv</id>
 		<producers>Production I.G, Bandai Visual, Xebec, Lantis</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/58635.jpg</image>
 		<title>Break Blade (TV)</title>
@@ -655,7 +655,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">22817</id>
-		<id name="hummingbird">kindaichi-shounen-no-jikenbo-ritanzu</id>
+		<id name="hummingbird">kindaichi-shounen-no-jikenbo-returns</id>
 		<producers />
 		<image>http://cdn.myanimelist.net/images/anime/10/59495.jpg</image>
 		<title>Kindaichi Shounen no Jikenbo Returns</title>
