@@ -425,15 +425,36 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Changes alternative titles of an anime.
   //   Titles must be separated by "; ".
   //   lParam is an anime ID.
-  } else if (action == L"EditTitles") {
-    int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    std::wstring titles;
-    if (ui::OnLibraryEntryEditTitles(anime_id, titles)) {
-      anime_item->SetUserSynonyms(titles);
-      Meow.UpdateCleanTitles(anime_id);
-      Settings.Save();
-    }
+  }
+  else if (action == L"EditTitles") {
+	  int anime_id = static_cast<int>(lParam);
+	  auto anime_item = AnimeDatabase.FindItem(anime_id);
+	  std::wstring titles;
+	  if (ui::OnLibraryEntryEditTitles(anime_id, titles)) {
+		  anime_item->SetUserSynonyms(titles);
+		  Meow.UpdateCleanTitles(anime_id);
+		  Settings.Save();
+	  }
+
+	  //////////////////////////////////////////////////////////////////////////////
+
+	  // AddCurrentTitle()
+	  //   Adds current playing file title as alternative title for the anime.
+	  //   lParam is an anime ID.
+  }
+  else if (action == L"AddCurrentTitle") {
+	  
+	  int anime_id = static_cast<int>(lParam);
+	  auto anime_item = AnimeDatabase.FindItem(anime_id);
+	  auto AlternativeTitles = anime_item->GetUserSynonyms();
+	  if (CurrentEpisode.anime_id != anime::ID_UNKNOWN &&  std::find(AlternativeTitles.begin(), AlternativeTitles.end(), CurrentEpisode.title) == AlternativeTitles.end()) {
+		  
+		  AlternativeTitles.push_back(CurrentEpisode.title);
+		  std::wstring titles = Join(AlternativeTitles, L"; ");
+		  anime_item->SetUserSynonyms(titles);
+		  Meow.UpdateCleanTitles(anime_id);
+		  Settings.Save();
+	  }
 
   //////////////////////////////////////////////////////////////////////////////
 

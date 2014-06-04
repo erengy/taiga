@@ -206,3 +206,4 @@
 #define IDC_TOOLBAR_TORRENT                     1161
 #define IDC_TREE_MAIN                           1162
 #define IDC_TREE_SECTIONS                       1163
+#define IDC_BUTTON_ANIME_ALT                    1164
