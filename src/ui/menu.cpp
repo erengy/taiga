@@ -96,6 +96,29 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
     }
   }
 
+  // Edit 
+  menu = menu_list_.FindMenu(L"Edit");
+  if (menu)
+  {
+	  foreach_(it, menu->items) {
+		  if (it->name.compare(L"Add Current As Alternate Title") == 0)
+		  {
+			  auto AlternativeTitles = anime_item->GetUserSynonyms();
+			  if (CurrentEpisode.anime_id != anime::ID_UNKNOWN &&  std::find(AlternativeTitles.begin(), AlternativeTitles.end(), CurrentEpisode.title) == AlternativeTitles.end()) {
+				  it->enabled = true;
+			  }
+			  else
+			  {
+				  it->enabled = false;
+			  }
+
+			  
+
+			  break;
+		  }
+	  }
+
+  }
   // Play
   menu = menu_list_.FindMenu(L"RightClick");
   if (menu) {

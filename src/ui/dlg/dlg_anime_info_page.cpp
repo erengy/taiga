@@ -206,7 +206,11 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       }
       return TRUE;
     }
-
+	  // Browse anime folder
+	case IDC_BUTTON_ANIME_ALT: {
+	  
+	  return TRUE;
+	}
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
