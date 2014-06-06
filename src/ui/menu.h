@@ -40,7 +40,7 @@ public:
   void UpdateAnnounce();
   void UpdateExternalLinks();
   void UpdateFolders();
-  void UpdateSearchList(bool enabled = false);
+  void UpdateSearchList(bool enabled = false, const anime::Item* anime_item = nullptr);
   void UpdateSeasonList(bool enabled = false);
   void UpdateSeason();
   void UpdateTools();

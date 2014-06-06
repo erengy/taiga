@@ -88,6 +88,8 @@
 		<item name="Information" action="Info()" default="1"/>
 		<item type="separator"/>
 		<item name="Add to list" sub="AddToList" disabled="1"/>
+		<item type="separator"/>
+		<item name="Add Current As Alternate Title"   action="AddCurrentTitle()"/>
 	</menu>
 	<menu name="AddToList">
 		<item name="Currently watching" action="AddToListAs(1)"/>
@@ -122,6 +124,7 @@
 		<item name="Status"         sub="EditStatus"/>
 		<item name="Tags..."     action="EditTags()"/>
 		<item name="Titles..."   action="EditTitles()"/>
+		<item name="Add Current As Alternate Title"   action="AddCurrentTitle()"/>
 		<item type="separator"/>
 		<item name="Delete"      action="EditDelete()"/>
 	</menu>

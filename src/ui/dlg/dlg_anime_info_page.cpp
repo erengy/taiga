@@ -206,7 +206,22 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       }
       return TRUE;
     }
-
+	  // Browse anime folder
+	case IDC_BUTTON_ANIME_ALT: {
+		 win::Edit txtBox = GetDlgItem(IDC_EDIT_ANIME_ALT);
+		 std::vector<std::wstring> synonyms;
+		 Split(txtBox.GetText(), L";", synonyms);
+		 for (size_t i = 0; i < synonyms.size(); i++)
+		 {
+			 Trim(synonyms[i]);
+		 }
+		 if (CurrentEpisode.anime_id != anime::ID_UNKNOWN &&  std::find(synonyms.begin(), synonyms.end(), CurrentEpisode.title) == synonyms.end()) {
+			 synonyms.push_back(CurrentEpisode.title);
+			 txtBox.SetText(Join(synonyms, L"; "));
+		 }
+		 txtBox.SetWindowHandle(nullptr);
+	  return TRUE;
+	}
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
@@ -360,7 +375,15 @@ void PageMyInfo::Refresh(int anime_id) {
   edit.SetCueBannerText(L"Enter alternative titles here, separated by a semicolon (e.g. Title 1; Title 2)");
   edit.SetText(Join(anime_item->GetUserSynonyms(), L"; "));
   edit.SetWindowHandle(nullptr);
+
+  edit.SetWindowHandle(GetDlgItem(IDC_BUTTON_ANIME_ALT));
+  if (CurrentEpisode.anime_id != anime::ID_UNKNOWN)
+	  edit.Enable(true);
+  else
+	  edit.Enable(false);
+
   CheckDlgButton(IDC_CHECK_ANIME_ALT, anime_item->GetUseAlternative());
+
 
   // Folder
   edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_FOLDER));
