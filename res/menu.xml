@@ -88,6 +88,8 @@
 		<item name="Information" action="Info()" default="1"/>
 		<item type="separator"/>
 		<item name="Add to list" sub="AddToList" disabled="1"/>
+		<item type="separator"/>
+		<item name="Add Current As Alternate Title"   action="AddCurrentTitle()"/>
 	</menu>
 	<menu name="AddToList">
 		<item name="Currently watching" action="AddToListAs(1)"/>

@@ -241,7 +241,7 @@ void MenuList::UpdateFolders() {
   }
 }
 
-void MenuList::UpdateSearchList(bool enabled) {
+void MenuList::UpdateSearchList(bool enabled, const anime::Item* anime_item) {
   auto menu = menu_list_.FindMenu(L"SearchList");
   if (menu) {
     // Add to list
@@ -251,6 +251,22 @@ void MenuList::UpdateSearchList(bool enabled) {
         break;
       }
     }
+	
+	foreach_(it, menu->items) {
+		if (it->name.compare(L"Add Current As Alternate Title") == 0)
+		{
+			if (anime_item && anime_item->IsInList())
+			{
+				auto AlternativeTitles = anime_item->GetUserSynonyms();
+				if (CurrentEpisode.anime_id != anime::ID_UNKNOWN &&  std::find(AlternativeTitles.begin(), AlternativeTitles.end(), CurrentEpisode.title) == AlternativeTitles.end()){
+					it->enabled = true;
+					break;
+				}
+			}
+			it->enabled = false;
+			break;
+		}
+	}
   }
 }
 
