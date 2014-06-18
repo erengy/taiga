@@ -141,6 +141,10 @@ const std::wstring& Item::GetImageUrl() const {
   return EmptyString();
 }
 
+enum_t Item::GetAgeRating() const {
+  return metadata_.audience;
+}
+
 const std::vector<std::wstring>& Item::GetGenres() const {
   return metadata_.subject;
 }
@@ -281,6 +285,10 @@ void Item::SetImageUrl(const std::wstring& url) {
     metadata_.resource.resize(1);
 
   metadata_.resource.at(0) = url;
+}
+
+void Item::SetAgeRating(enum_t rating) {
+  metadata_.audience = rating;
 }
 
 void Item::SetGenres(const std::wstring& genres) {

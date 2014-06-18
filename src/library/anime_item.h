@@ -58,6 +58,7 @@ public:
   const Date& GetDateStart() const;
   const Date& GetDateEnd() const;
   const std::wstring& GetImageUrl() const;
+  enum_t GetAgeRating() const;
   const std::vector<std::wstring>& GetGenres() const;
   const std::wstring& GetPopularity() const;
   const std::vector<std::wstring>& GetProducers() const;
@@ -79,6 +80,7 @@ public:
   void SetDateStart(const Date& date);
   void SetDateEnd(const Date& date);
   void SetImageUrl(const std::wstring& url);
+  void SetAgeRating(enum_t rating);
   void SetGenres(const std::wstring& genres);
   void SetGenres(const std::vector<std::wstring>& genres);
   void SetPopularity(const std::wstring& popularity);

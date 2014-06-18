@@ -100,6 +100,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetDateStart(Date(XmlReadStrValue(node, L"date_start")));
     item.SetDateEnd(Date(XmlReadStrValue(node, L"date_end")));
     item.SetImageUrl(XmlReadStrValue(node, L"image"));
+    item.SetAgeRating(XmlReadIntValue(node, L"age_rating"));
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetScore(XmlReadStrValue(node, L"score"));
@@ -162,6 +163,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     XML_WD(L"date_start", it->second.GetDateStart());
     XML_WD(L"date_end", it->second.GetDateEnd());
     XML_WS(L"image", it->second.GetImageUrl(), pugi::node_pcdata);
+    XML_WI(L"age_rating", it->second.GetAgeRating());
     XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
     XML_WS(L"score", it->second.GetScore(), pugi::node_pcdata);
@@ -300,6 +302,8 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetDateEnd(new_item.GetDateEnd());
     if (!new_item.GetImageUrl().empty())
       item->SetImageUrl(new_item.GetImageUrl());
+    if (new_item.GetAgeRating() != kUnknownAgeRating)
+      item->SetAgeRating(new_item.GetAgeRating());
     if (!new_item.GetGenres().empty())
       item->SetGenres(new_item.GetGenres());
     if (!new_item.GetPopularity().empty())

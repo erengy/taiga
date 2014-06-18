@@ -72,6 +72,15 @@ enum MyStatus {
   kMyStatusLast
 };
 
+enum AgeRating {
+  kUnknownAgeRating,
+  kAgeRatingG,
+  kAgeRatingPG,
+  kAgeRatingPG13,
+  kAgeRatingR17,
+  kAgeRatingR18
+};
+
 // Invalid for anime items that are not in user's list
 class MyInformation {
  public:
