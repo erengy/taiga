@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf8'?>
 <season>
 	<info>
 		<name>Fall 2013</name>
@@ -7,7 +7,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">17549</id>
-		<id name="hummingbird">non-non-biyori</id>
+		<id name="hummingbird">7711</id>
 		<producers>Lantis, Media Factory, Silver Link</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/51581.jpg</image>
 		<title>Non Non Biyori</title>
@@ -15,7 +15,7 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">19889</id>
-		<id name="hummingbird">genshiken-nidaime-specials</id>
+		<id name="hummingbird">8004</id>
 		<producers>Production I.G, Starchild Records</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/54119.jpg</image>
 		<title>Genshiken Nidaime Specials</title>
@@ -23,7 +23,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19843</id>
-		<id name="hummingbird">tamagotchi-miracle-friends</id>
+		<id name="hummingbird">7990</id>
 		<producers>Oriental Light and Magic</producers>
 		<image>http://cdn.myanimelist.net/images/anime/12/52925.jpg</image>
 		<title>Tamagotchi! Miracle Friends</title>
@@ -31,7 +31,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">17269</id>
-		<id name="hummingbird">captain-harlock</id>
+		<id name="hummingbird">7624</id>
 		<producers>Toei Animation</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/52045.jpg</image>
 		<title>Captain Harlock</title>
@@ -39,7 +39,7 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">19671</id>
-		<id name="hummingbird">free-specials</id>
+		<id name="hummingbird">7913</id>
 		<producers>Kyoto Animation, Lantis, Animation Do</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/53643.jpg</image>
 		<title>Free! Specials</title>
@@ -47,7 +47,7 @@
 	<anime>
 		<type>2</type>
 		<id name="myanimelist">18745</id>
-		<id name="hummingbird">chihayafuru-ova</id>
+		<id name="hummingbird">7814</id>
 		<producers>VAP</producers>
 		<image>http://cdn.myanimelist.net/images/anime/13/54451.jpg</image>
 		<title>Chihayafuru 2 OVA</title>
@@ -63,7 +63,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">19021</id>
-		<id name="hummingbird">takanashi-rikka-kai-chuunibyou-demo-koi-ga-shitai-movie</id>
+		<id name="hummingbird">7773</id>
 		<producers>Kyoto Animation</producers>
 		<image>http://cdn.myanimelist.net/images/anime/8/58069.jpg</image>
 		<title>Takanashi Rikka Kai: Chuunibyou demo Koi ga Shitai! Movie</title>
@@ -71,7 +71,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">15197</id>
-		<id name="hummingbird">code-geass-akito-the-exiled-2-the-torn-up-wyvern</id>
+		<id name="hummingbird">7227</id>
 		<producers>Sunrise, FUNimation Entertainment</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/46265.jpg</image>
 		<title>Code Geass: Boukoku no Akito 2 - Hikisakareshi Yokuryuu</title>
@@ -79,7 +79,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19841</id>
-		<id name="hummingbird">super-seisyun-brothers</id>
+		<id name="hummingbird">7893</id>
 		<producers>AIC, AIC Plus+</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/53807.jpg</image>
 		<title>Super Seisyun Brothers</title>
@@ -87,7 +87,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">17247</id>
-		<id name="hummingbird">unbreakable-machine-doll</id>
+		<id name="hummingbird">7617</id>
 		<producers>Genco, Media Factory, Lerche</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/52801.jpg</image>
 		<title>Machine-Doll wa Kizutsukanai</title>
@@ -103,7 +103,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">17513</id>
-		<id name="hummingbird">diabolik-lovers</id>
+		<id name="hummingbird">7707</id>
 		<producers>Frontier Works, Idea Factory, Zexcs, Showgate</producers>
 		<image>http://cdn.myanimelist.net/images/anime/9/51989.jpg</image>
 		<title>Diabolik Lovers</title>
@@ -111,7 +111,7 @@
 	<anime>
 		<type>2</type>
 		<id name="myanimelist">18753</id>
-		<id name="hummingbird">yahari-ore-no-seishun-love-comedy-wa-machigatteiru-ova</id>
+		<id name="hummingbird">7748</id>
 		<producers>Brains Base</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/50107.jpg</image>
 		<title>Yahari Ore no Seishun Love Comedy wa Machigatteiru. OVA</title>
@@ -119,7 +119,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19825</id>
-		<id name="hummingbird">saikyou-ginga-ultimate-zero-battle-spirits</id>
+		<id name="hummingbird">7977</id>
 		<producers>Sunrise, Asatsu DK</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/52895.jpg</image>
 		<title>Saikyou Ginga Ultimate Zero: Battle Spirits</title>
@@ -135,7 +135,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18115</id>
-		<id name="hummingbird">magi-the-kingdom-of-magic</id>
+		<id name="hummingbird">7696</id>
 		<producers>Aniplex, A-1 Pictures, Aniplex of America</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/54533.jpg</image>
 		<title>Magi: The Kingdom of Magic</title>
@@ -143,7 +143,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">17895</id>
-		<id name="hummingbird">golden-time</id>
+		<id name="hummingbird">7708</id>
 		<producers>J.C. Staff, Genco, Starchild Records</producers>
 		<image>http://cdn.myanimelist.net/images/anime/12/52091.jpg</image>
 		<title>Golden Time</title>
@@ -151,15 +151,15 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">19109</id>
-		<id name="hummingbird">fate-kaleid-liner-prisma-illya-specials</id>
+		<id name="hummingbird">7858</id>
 		<producers>Silver Link</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/51235.jpg</image>
-		<title>Fate/kaleid liner Prisma&#9734;Illya Specials</title>
+		<title>Fate/kaleid liner Prisma☆Illya Specials</title>
 	</anime>
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">16067</id>
-		<id name="hummingbird">nagi-no-asukara</id>
+		<id name="hummingbird">7370</id>
 		<producers>Geneon Universal Entertainment, P.A. Works, Rondo Robe</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/53549.jpg</image>
 		<title>Nagi no Asukara</title>
@@ -167,7 +167,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19257</id>
-		<id name="hummingbird">meganebu</id>
+		<id name="hummingbird">7851</id>
 		<producers>Studio Deen</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/52073.jpg</image>
 		<title>Meganebu!</title>
@@ -175,7 +175,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18497</id>
-		<id name="hummingbird">yozakura-quartet-hana-no-uta</id>
+		<id name="hummingbird">7843</id>
 		<producers>Tatsunoko Productions</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/52563.jpg</image>
 		<title>Yozakura Quartet: Hana no Uta</title>
@@ -183,7 +183,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">14807</id>
-		<id name="hummingbird">kara-no-kyoukai-mirai-fukuin</id>
+		<id name="hummingbird">7167</id>
 		<producers>ufotable, Notes</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/52559.jpg</image>
 		<title>Kara no Kyoukai: Mirai Fukuin</title>
@@ -191,7 +191,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18679</id>
-		<id name="hummingbird">kill-la-kill</id>
+		<id name="hummingbird">7712</id>
 		<producers>Aniplex, Aniplex of America, Trigger</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/54379.jpg</image>
 		<title>Kill la Kill</title>
@@ -199,7 +199,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18001</id>
-		<id name="hummingbird">freezing-vibration</id>
+		<id name="hummingbird">7710</id>
 		<producers>Media Factory, A.C.G.T.</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/52089.jpg</image>
 		<title>Freezing Vibration</title>
@@ -207,7 +207,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18411</id>
-		<id name="hummingbird">gingitsune</id>
+		<id name="hummingbird">7703</id>
 		<producers>Diomedea, Pony Canyon</producers>
 		<image>http://cdn.myanimelist.net/images/anime/8/49313.jpg</image>
 		<title>Gingitsune</title>
@@ -215,7 +215,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19755</id>
-		<id name="hummingbird">oshiri-kajiri-mushi-2</id>
+		<id name="hummingbird">7976</id>
 		<producers>Kinema Citrus</producers>
 		<image>http://cdn.myanimelist.net/images/anime/9/52771.jpg</image>
 		<title>Oshiri Kajiri Mushi 2</title>
@@ -223,7 +223,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19315</id>
-		<id name="hummingbird">pupa</id>
+		<id name="hummingbird">7845</id>
 		<producers>Studio Deen, Earth Star Entertainment, Pupa Production Committee</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/54395.jpg</image>
 		<title>Pupa</title>
@@ -231,7 +231,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">9479</id>
-		<id name="hummingbird">coppelion</id>
+		<id name="hummingbird">5746</id>
 		<producers>Starchild Records, GoHands</producers>
 		<image>http://cdn.myanimelist.net/images/anime/6/51997.jpg</image>
 		<title>Coppelion</title>
@@ -239,7 +239,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">20033</id>
-		<id name="hummingbird">miss-monochrome</id>
+		<id name="hummingbird">7911</id>
 		<producers>TV Tokyo, Starchild Records, SANZIGEN, LIDEN FILMS</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/53559.jpg</image>
 		<title>Miss Monochrome</title>
@@ -247,7 +247,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19871</id>
-		<id name="hummingbird">gaist-crusher</id>
+		<id name="hummingbird">7974</id>
 		<producers>Studio Pierrot</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/53241.jpg</image>
 		<title>Gaist Crusher</title>
@@ -255,7 +255,7 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">20159</id>
-		<id name="hummingbird">pokemon-the-origin</id>
+		<id name="hummingbird">7922</id>
 		<producers>Production I.G, Xebec, Oriental Light and Magic</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/53701.jpg</image>
 		<title>Pokemon: The Origin</title>
@@ -263,7 +263,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">20181</id>
-		<id name="hummingbird">aikatsu-2</id>
+		<id name="hummingbird">7972</id>
 		<producers>Sunrise, TV Tokyo, Bandai Visual, Dentsu</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/53737.jpg</image>
 		<title>Aikatsu! 2</title>
@@ -271,7 +271,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18153</id>
-		<id name="hummingbird">kyoukai-no-kanata</id>
+		<id name="hummingbird">7714</id>
 		<producers>Kyoto Animation</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/53111.jpg</image>
 		<title>Kyoukai no Kanata</title>
@@ -279,7 +279,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19703</id>
-		<id name="hummingbird">kyousougiga-tv</id>
+		<id name="hummingbird">7870</id>
 		<producers>Toei Animation</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/53417.jpg</image>
 		<title>Kyousou Giga (TV)</title>
@@ -287,7 +287,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18247</id>
-		<id name="hummingbird">is-infinite-stratos-2</id>
+		<id name="hummingbird">7733</id>
 		<producers>Lantis, TBS, 8bit, Sony Music Communications, Project IS</producers>
 		<image>http://cdn.myanimelist.net/images/anime/12/49359.jpg</image>
 		<title>IS: Infinite Stratos 2</title>
@@ -295,7 +295,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18277</id>
-		<id name="hummingbird">strike-the-blood</id>
+		<id name="hummingbird">7715</id>
 		<producers>Silver Link, Connect</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/54273.jpg</image>
 		<title>Strike the Blood</title>
@@ -303,7 +303,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19369</id>
-		<id name="hummingbird">outbreak-company</id>
+		<id name="hummingbird">7837</id>
 		<producers>Feel, Pony Canyon</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/54343.jpg</image>
 		<title>Outbreak Company</title>
@@ -311,7 +311,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18195</id>
-		<id name="hummingbird">little-busters-refrain</id>
+		<id name="hummingbird">7704</id>
 		<producers>J.C. Staff, Warner Bros.</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/48895.jpg</image>
 		<title>Little Busters!: Refrain</title>
@@ -319,7 +319,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">17265</id>
-		<id name="hummingbird">log-horizon</id>
+		<id name="hummingbird">7622</id>
 		<producers>Satelight, NHK, NHK Enterprises</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/54267.jpg</image>
 		<title>Log Horizon</title>
@@ -327,7 +327,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18677</id>
-		<id name="hummingbird">yuusha-ni-narenakatta-ore-wa-shibushibu-shuushoku-wo-ketsui-shimashita</id>
+		<id name="hummingbird">7725</id>
 		<producers>Asread</producers>
 		<image>http://cdn.myanimelist.net/images/anime/13/54389.jpg</image>
 		<title>Yuusha ni Narenakatta Ore wa Shibushibu Shuushoku wo Ketsui Shimashita.</title>
@@ -335,7 +335,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18689</id>
-		<id name="hummingbird">diamond-no-ace</id>
+		<id name="hummingbird">7699</id>
 		<producers>Production I.G, Madhouse Studios, TV Tokyo</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/54235.jpg</image>
 		<title>Diamond no Ace</title>
@@ -343,7 +343,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">15651</id>
-		<id name="hummingbird">phi-brain-kami-no-puzzle-shukuteki-ratsel-hen</id>
+		<id name="hummingbird">7288</id>
 		<producers>Sunrise, NHK, NHK Enterprises</producers>
 		<image>http://cdn.myanimelist.net/images/anime/12/54099.jpg</image>
 		<title>Phi Brain: Kami no Puzzle 3rd Season</title>
@@ -351,7 +351,7 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">19759</id>
-		<id name="hummingbird">ansatsu-kyoushitsu</id>
+		<id name="hummingbird">7973</id>
 		<producers>Brains Base</producers>
 		<image>http://cdn.myanimelist.net/images/anime/8/52773.jpg</image>
 		<title>Ansatsu Kyoushitsu</title>
@@ -359,7 +359,7 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">19511</id>
-		<id name="hummingbird">naruto-shippuuden-jump-super-anime-tour-2013-special</id>
+		<id name="hummingbird">7975</id>
 		<producers>Studio Pierrot</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/52343.jpg</image>
 		<title>Naruto: Shippuuden - Jump Super Anime Tour 2013 Special</title>
@@ -367,7 +367,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18245</id>
-		<id name="hummingbird">white-album-2</id>
+		<id name="hummingbird">7697</id>
 		<producers>Satelight, Starchild Records</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/53561.jpg</image>
 		<title>White Album 2</title>
@@ -375,7 +375,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19647</id>
-		<id name="hummingbird">hajime-no-ippo-rising</id>
+		<id name="hummingbird">7855</id>
 		<producers>Madhouse Studios, VAP, MAPPA</producers>
 		<image>http://cdn.myanimelist.net/images/anime/12/52629.jpg</image>
 		<title>Hajime no Ippo: Rising</title>
@@ -383,7 +383,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19919</id>
-		<id name="hummingbird">tesagure-bukatsumono</id>
+		<id name="hummingbird">7912</id>
 		<producers>Tesagure! Production Committee</producers>
 		<image>http://cdn.myanimelist.net/images/anime/8/56211.jpg</image>
 		<title>Tesagure! Bukatsumono</title>
@@ -391,7 +391,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">11763</id>
-		<id name="hummingbird">sekai-de-ichiban-tsuyoku-naritai</id>
+		<id name="hummingbird">6592</id>
 		<producers>Arms, Movic, Earth Star Entertainment</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/52633.jpg</image>
 		<title>Sekai de Ichiban Tsuyoku Naritai!</title>
@@ -399,7 +399,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">20473</id>
-		<id name="hummingbird">teekyuu-3</id>
+		<id name="hummingbird">7980</id>
 		<producers>MAPPA, Earth Star Entertainment</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/54455.jpg</image>
 		<title>Teekyuu 3</title>
@@ -407,7 +407,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">16894</id>
-		<id name="hummingbird">kuroko-no-basket-2</id>
+		<id name="hummingbird">7545</id>
 		<producers>Production I.G</producers>
 		<image>http://cdn.myanimelist.net/images/anime/13/52265.jpg</image>
 		<title>Kuroko no Basket 2</title>
@@ -415,7 +415,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19319</id>
-		<id name="hummingbird">gundam-build-fighters</id>
+		<id name="hummingbird">7852</id>
 		<producers>Sunrise, TV Tokyo, Sotsu Agency</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/51815.jpg</image>
 		<title>Gundam Build Fighters</title>
@@ -423,7 +423,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19151</id>
-		<id name="hummingbird">walkure-romanze</id>
+		<id name="hummingbird">7849</id>
 		<producers>Lantis, Pony Canyon, 8bit</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/54377.jpg</image>
 		<title>Walkure Romanze</title>
@@ -431,7 +431,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18179</id>
-		<id name="hummingbird">yowamushi-pedal</id>
+		<id name="hummingbird">7700</id>
 		<producers>TMS Entertainment, Toho Company</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/53211.jpg</image>
 		<title>Yowamushi Pedal</title>
@@ -439,7 +439,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18893</id>
-		<id name="hummingbird">aoki-hagane-no-arpeggio-ars-nova</id>
+		<id name="hummingbird">7769</id>
 		<producers>SANZIGEN</producers>
 		<image>http://cdn.myanimelist.net/images/anime/13/50625.jpg</image>
 		<title>Aoki Hagane no Arpeggio: Ars Nova</title>
@@ -447,7 +447,7 @@
 	<anime>
 		<type>2</type>
 		<id name="myanimelist">18499</id>
-		<id name="hummingbird">yozakura-quartet-tsuki-ni-naku</id>
+		<id name="hummingbird">7702</id>
 		<producers>Tatsunoko Productions</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/49489.jpg</image>
 		<title>Yozakura Quartet: Tsuki ni Naku</title>
@@ -455,7 +455,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18767</id>
-		<id name="hummingbird">blazblue-alter-memory</id>
+		<id name="hummingbird">7722</id>
 		<producers>Lantis, Hoods Entertainment, Studio Mausu, teamKG</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/50159.jpg</image>
 		<title>BlazBlue: Alter Memory</title>
@@ -463,7 +463,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">16011</id>
-		<id name="hummingbird">tokyo-ravens</id>
+		<id name="hummingbird">7359</id>
 		<producers>8bit</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/53229.jpg</image>
 		<title>Tokyo Ravens</title>
@@ -471,7 +471,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19221</id>
-		<id name="hummingbird">noucome-my-mental-choices-are-completely-interfering-with-my-school-romantic-comedy</id>
+		<id name="hummingbird">7846</id>
 		<producers>Diomedea, DAX Production, Studio Jack, Mages</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/53235.jpg</image>
 		<title>Ore no Nounai Sentakushi ga, Gakuen Love Comedy wo Zenryoku de Jama Shiteiru</title>
@@ -479,7 +479,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">20329</id>
-		<id name="hummingbird">koroshiya-san-the-hired-gun</id>
+		<id name="hummingbird">8025</id>
 		<producers>The Klock Worx, Studio Mausu, Opera House</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/54067.jpg</image>
 		<title>Koroshiya-san: The Hired Gun</title>
@@ -487,7 +487,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">18295</id>
-		<id name="hummingbird">kakumeiki-valvrave-2nd-season</id>
+		<id name="hummingbird">7698</id>
 		<producers>Sunrise, Aniplex, Aniplex of America</producers>
 		<image>http://cdn.myanimelist.net/images/anime/8/54439.jpg</image>
 		<title>Kakumeiki Valvrave 2nd Season</title>
@@ -495,7 +495,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19365</id>
-		<id name="hummingbird">samurai-flamenco</id>
+		<id name="hummingbird">7835</id>
 		<producers>Aniplex, Manglobe, Fuji TV, Aniplex of America</producers>
 		<image>http://cdn.myanimelist.net/images/anime/9/53817.jpg</image>
 		<title>Samurai Flamenco</title>
@@ -503,7 +503,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19367</id>
-		<id name="hummingbird">galilei-donna</id>
+		<id name="hummingbird">7836</id>
 		<producers>Aniplex, A-1 Pictures, Fuji TV</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/53239.jpg</image>
 		<title>Galilei Donna</title>
@@ -511,7 +511,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">20671</id>
-		<id name="hummingbird">shashinkan</id>
+		<id name="hummingbird">8085</id>
 		<producers>Studio Colorido</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/54725.jpg</image>
 		<title>Shashinkan</title>
@@ -519,7 +519,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">20673</id>
-		<id name="hummingbird">hinata-no-aoshigure</id>
+		<id name="hummingbird">8080</id>
 		<producers>Studio Colorido</producers>
 		<image>http://cdn.myanimelist.net/images/anime/4/54727.jpg</image>
 		<title>Hinata no Aoshigure</title>
@@ -527,7 +527,7 @@
 	<anime>
 		<type>2</type>
 		<id name="myanimelist">20039</id>
-		<id name="hummingbird">kill-me-baby-ova</id>
+		<id name="hummingbird">7900</id>
 		<producers>J.C. Staff, Pony Canyon</producers>
 		<image>http://cdn.myanimelist.net/images/anime/10/53427.jpg</image>
 		<title>Kill Me Baby OVA</title>
@@ -535,7 +535,7 @@
 	<anime>
 		<type>1</type>
 		<id name="myanimelist">19291</id>
-		<id name="hummingbird">pokemon-xy</id>
+		<id name="hummingbird">7850</id>
 		<producers>TV Tokyo, Oriental Light and Magic</producers>
 		<image>http://cdn.myanimelist.net/images/anime/12/54549.jpg</image>
 		<title>Pokemon XY</title>
@@ -543,7 +543,7 @@
 	<anime>
 		<type>2</type>
 		<id name="myanimelist">18359</id>
-		<id name="hummingbird">miyakawa-ke-no-kuufuku-ova</id>
+		<id name="hummingbird">7701</id>
 		<producers>Ordet</producers>
 		<image>http://cdn.myanimelist.net/images/anime/6/49149.jpg</image>
 		<title>Miyakawa-ke no Kuufuku OVA</title>
@@ -551,15 +551,15 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">11981</id>
-		<id name="hummingbird">mahou-shoujo-madoka-magica-movie-3-hangyaku-no-monogatari</id>
+		<id name="hummingbird">6638</id>
 		<producers>Aniplex, Shaft, Mainichi Broadcasting, Movic, Nitroplus, Aniplex of America, Madoka Partners, Hobunsha</producers>
 		<image>http://cdn.myanimelist.net/images/anime/3/52585.jpg</image>
-		<title>Mahou Shoujo Madoka&#9733;Magica Movie 3: Hangyaku no Monogatari</title>
+		<title>Mahou Shoujo Madoka★Magica Movie 3: Hangyaku no Monogatari</title>
 	</anime>
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">17357</id>
-		<id name="hummingbird">dokidoki-precure-movie-mana-kekkon-mirai-ni-tsunagu-kibou-no-dress</id>
+		<id name="hummingbird">7857</id>
 		<producers>Toei Animation</producers>
 		<image>http://cdn.myanimelist.net/images/anime/7/51775.jpg</image>
 		<title>DokiDoki! Precure Movie: Mana Kekkon!!? Mirai ni Tsunagu Kibou no Dress</title>
@@ -567,7 +567,7 @@
 	<anime>
 		<type>2</type>
 		<id name="myanimelist">20045</id>
-		<id name="hummingbird">is-infinite-stratos-2-hitonatsu-no-omoide</id>
+		<id name="hummingbird">7909</id>
 		<producers>Lantis, 8bit</producers>
 		<image>http://cdn.myanimelist.net/images/anime/2/54323.jpg</image>
 		<title>IS: Infinite Stratos 2 - Hitonatsu no Omoide</title>
@@ -575,7 +575,7 @@
 	<anime>
 		<type>4</type>
 		<id name="myanimelist">20141</id>
-		<id name="hummingbird">lupin-iii-princess-of-the-breeze-kakusareta-kuuchuu-toshi</id>
+		<id name="hummingbird">7923</id>
 		<producers>TMS Entertainment</producers>
 		<image>http://cdn.myanimelist.net/images/anime/4/53665.jpg</image>
 		<title>Lupin III: Princess of the Breeze - Kakusareta Kuuchuu Toshi</title>
@@ -583,7 +583,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">16664</id>
-		<id name="hummingbird">kaguya-hime-no-monogatari</id>
+		<id name="hummingbird">7486</id>
 		<producers>Studio Ghibli</producers>
 		<image>http://cdn.myanimelist.net/images/anime/4/46511.jpg</image>
 		<title>Kaguya-hime no Monogatari</title>
@@ -591,7 +591,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">20543</id>
-		<id name="hummingbird">bayonetta-bloody-fate</id>
+		<id name="hummingbird">8024</id>
 		<producers>Gonzo, Pony Canyon</producers>
 		<image>http://cdn.myanimelist.net/images/anime/5/54567.jpg</image>
 		<title>Bayonetta: Bloody Fate</title>
@@ -599,7 +599,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">14407</id>
-		<id name="hummingbird">persona-3-the-movie-1-spring-of-birth</id>
+		<id name="hummingbird">7124</id>
 		<producers>AIC A.S.T.A.</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/47949.jpg</image>
 		<title>Persona 3 the Movie</title>
@@ -607,7 +607,7 @@
 	<anime>
 		<type>2</type>
 		<id name="myanimelist">17739</id>
-		<id name="hummingbird">hidamari-sketch-sae-hiro-sotsugyou-hen</id>
+		<id name="hummingbird">8021</id>
 		<producers>Shaft</producers>
 		<image>http://cdn.myanimelist.net/images/anime/6/47273.jpg</image>
 		<title>Hidamari Sketch: Sae Hiro Sotsugyou-hen</title>
@@ -615,7 +615,7 @@
 	<anime>
 		<type>3</type>
 		<id name="myanimelist">19191</id>
-		<id name="hummingbird">ghost-in-the-shell-arise-border-2-ghost-whispers</id>
+		<id name="hummingbird">7856</id>
 		<producers>Production I.G, FUNimation Entertainment</producers>
 		<image>http://cdn.myanimelist.net/images/anime/8/52135.jpg</image>
 		<title>Ghost in the Shell: Arise - Border:2 Ghost Whispers</title>
