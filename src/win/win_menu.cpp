@@ -39,6 +39,8 @@ HMENU MenuList::CreateNewMenu(LPCWSTR name, std::vector<HMENU>& menu_handles) {
   menu_handles.push_back(handle);
 
   for (auto item = menu->items.begin(); item != menu->items.end(); ++item) {
+    if (!item->visible)
+      continue;
     const UINT flags =
         (item->checked ? MF_CHECKED : 0) |
         (item->def ? MF_DEFAULT : 0) |
@@ -135,6 +137,7 @@ void Menu::CreateItem(std::wstring action, std::wstring name,
   item.new_column = newcolumn;
   item.radio = radio;
   item.submenu = submenu;
+  item.visible = true;
 
   if (!submenu.empty()) {
     item.type = kMenuItemSubmenu;

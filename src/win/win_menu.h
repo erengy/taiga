@@ -31,7 +31,7 @@ enum MenuItemType {
 
 class MenuItem {
 public:
-  bool checked, def, enabled, new_column, radio;
+  bool checked, def, enabled, new_column, radio, visible;
   std::wstring action, name, submenu;
   int type;
 };
