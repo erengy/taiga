@@ -43,10 +43,12 @@ void UpdateHelper::Cancel() {
 }
 
 bool UpdateHelper::Check() {
+  bool is_prerelease = !Taiga.version.prerelease_identifiers.empty();
+
   HttpRequest http_request;
   http_request.url.host = L"taiga.erengy.com";
   http_request.url.path = L"/update.php";
-  http_request.url.query[L"channel"] = L"beta";
+  http_request.url.query[L"channel"] = is_prerelease ? L"beta" : L"stable";
   http_request.url.query[L"check"] = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
   http_request.url.query[L"version"] = std::wstring(Taiga.version);
   http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
