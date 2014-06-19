@@ -29,8 +29,7 @@ namespace sync {
 namespace hummingbird {
 
 Service::Service() {
-  // Hummingbird's APIv1 is consumed through Mashape
-  host_ = L"hbrd-v1.p.mashape.com";
+  host_ = L"hummingbird.me/api/v1";
 
   id_ = kHummingbird;
   canonical_name_ = L"hummingbird";
@@ -42,18 +41,10 @@ Service::Service() {
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
 
-  // Mashape requires HTTPS connections
-  http_request.url.protocol = base::http::kHttps;
-
   // Hummingbird is supposed to return a JSON response for each and every
   // request, so that's what we expect from it
   http_request.header[L"Accept"] = L"application/json";
   http_request.header[L"Accept-Charset"] = L"utf-8";
-
-  // All API methods require authorization. You can get your own API key from
-  // mashape.com; the one provided below is registered to Taiga.
-  http_request.header[L"X-Mashape-Authorization"] =
-      L"ejWhZL1cNqFjrhsZc85F5p2dkOvLY5B1";
 
   // kAuthenticateUser method returns the user's authentication token, which
   // is to be used on all methods that require authentication.
@@ -124,7 +115,7 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
 void Service::GetMetadataByIdV2(Request& request, HttpRequest& http_request) {
   // Hummingbird APIv2 is not yet ready, but this method can be called for
   // additional data that APIv1 doesn't provide.
-  http_request.url.host = L"vikhyat-hummingbird-v2.p.mashape.com";
+  http_request.url.host = L"hummingbird.me/api/v2";
   http_request.url.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
 }
 
