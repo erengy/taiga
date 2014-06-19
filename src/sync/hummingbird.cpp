@@ -191,7 +191,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
-  anime_item.SetId(StrToWstr(root["slug"].asString()), this->id());
+  anime_item.SetId(ToWstr(root["id"].asInt()), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
   ParseAnimeObject(root, anime_item);
@@ -207,7 +207,7 @@ void Service::GetMetadataByIdV2(Response& response, HttpResponse& http_response)
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
-  anime_item.SetId(StrToWstr(root["id"].asString()), this->id());
+  anime_item.SetId(ToWstr(root["id"].asInt()), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
   ParseAnimeObjectV2(root, anime_item);
@@ -224,7 +224,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   for (size_t i = 0; i < root.size(); i++) {
     ::anime::Item anime_item;
     anime_item.SetSource(this->id());
-    anime_item.SetId(StrToWstr(root[i]["slug"].asString()), this->id());
+    anime_item.SetId(ToWstr(root[i]["id"].asInt()), this->id());
     anime_item.SetLastModified(time(nullptr));  // current time
 
     ParseAnimeObject(root[i], anime_item);
@@ -313,6 +313,7 @@ void Service::ParseAnimeObject(Json::Value& value, anime::Item& anime_item) {
 }
 
 void Service::ParseAnimeObjectV2(Json::Value& value, anime::Item& anime_item) {
+  anime_item.SetSlug(StrToWstr(value["slug"].asString()));
   anime_item.SetTitle(StrToWstr(value["canonical_title"].asString()));
   anime_item.SetEnglishTitle(StrToWstr(value["english_title"].asString()));
   anime_item.SetSynonyms(StrToWstr(value["romaji_title"].asString()));
@@ -322,6 +323,9 @@ void Service::ParseAnimeObjectV2(Json::Value& value, anime::Item& anime_item) {
   anime_item.SetDateStart(StrToWstr(value["started_airing"].asString()));
   anime_item.SetDateEnd(StrToWstr(value["finished_airing"].asString()));
   anime_item.SetScore(TranslateSeriesRatingFrom(value["community_rating"].asFloat()));
+  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(value["age_rating"].asString())));
+  anime_item.SetEpisodeCount(value["episode_count"].asInt());
+  anime_item.SetEpisodeLength(value["episode_length"].asInt());
 
   std::vector<std::wstring> genres;
   auto& genres_value = value["genres"];
@@ -338,7 +342,7 @@ void Service::ParseLibraryObject(Json::Value& value) {
 
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
-  anime_item.SetId(StrToWstr(anime_value["slug"].asString()), this->id());
+  anime_item.SetId(ToWstr(anime_value["id"].asInt()), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
   int mal_id = value["mal_id"].asInt();

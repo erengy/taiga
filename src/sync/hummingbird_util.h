@@ -28,6 +28,7 @@ class Item;
 namespace sync {
 namespace hummingbird {
   
+int TranslateAgeRatingFrom(const std::wstring& value);
 std::wstring TranslateSeriesRatingFrom(float value);
 int TranslateSeriesStatusFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);

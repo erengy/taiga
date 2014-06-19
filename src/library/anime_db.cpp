@@ -254,15 +254,26 @@ int Database::UpdateItem(const Item& new_item) {
     }
     */
 
+    auto source = new_item.GetSource();
+
+    bool id_is_numeric = false;
+    switch (source) {
+      case sync::kMyAnimeList:
+      case sync::kHummingbird:
+        id_is_numeric = true;
+        break;
+    }
+
     int id = 1;
-    if (!new_item.GetId(sync::kMyAnimeList).empty()) {
-      // Use MyAnimeList ID, if available
-      id = ToInt(new_item.GetId(sync::kMyAnimeList));
+
+    if (id_is_numeric) {
+      id = ToInt(new_item.GetId(source));
     } else {
       // Generate a new ID
       while (FindItem(id))
         ++id;
     }
+
     // Add a new item
     item = &items[id];
     item->SetId(ToWstr(id), sync::kTaiga);

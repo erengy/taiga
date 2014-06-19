@@ -28,6 +28,23 @@
 namespace sync {
 namespace hummingbird {
 
+int TranslateAgeRatingFrom(const std::wstring& value) {
+  if (IsEqual(value, L"G")) {
+    return anime::kAgeRatingG;
+  } else if (IsEqual(value, L"PG")) {
+    return anime::kAgeRatingPG;
+  } else if (IsEqual(value, L"PG13")) {
+    return anime::kAgeRatingPG13;
+  } else if (IsEqual(value, L"R17+")) {
+    return anime::kAgeRatingR17;
+  } else if (IsEqual(value, L"R18+")) {
+    return anime::kAgeRatingR18;
+  }
+
+  LOG(LevelDebug, L"Unknown value: " + value);
+  return anime::kUnknownAgeRating;
+}
+
 std::wstring TranslateSeriesRatingFrom(float value) {
   return ToWstr(static_cast<double>(value) * 2.0, 2);
 }
