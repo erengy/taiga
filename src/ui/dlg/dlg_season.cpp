@@ -26,6 +26,7 @@
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
+#include "taiga/settings.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_season.h"
 #include "ui/dialog.h"
@@ -279,6 +280,18 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Calculate text height
       int text_height = GetTextHeight(hdc.Get());
 
+      // Calculate line count
+      int line_count = 6;
+      auto current_service = taiga::GetCurrentServiceId();
+      switch (current_service) {
+        case sync::kMyAnimeList:
+          line_count = 6;
+          break;
+        case sync::kHummingbird:
+          line_count = 5;
+          break;
+      }
+
       // Calculate areas
       win::Rect rect_image(
           rect.left + 4, rect.top + 4,
@@ -288,7 +301,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           rect.right - 4, rect_image.top + text_height + 8);
       win::Rect rect_details(
           rect_title.left + 4, rect_title.bottom + 4,
-          rect_title.right, rect_title.bottom + 4 + (6 * (text_height + 2)));
+          rect_title.right, rect_title.bottom + 4 + (line_count * (text_height + 2)));
       win::Rect rect_synopsis(
           rect_details.left, rect_details.bottom + 4,
           rect_details.right, rect_image.bottom);
@@ -391,7 +404,9 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(L"Genres:");
       DRAWLINE(L"Producers:");
       DRAWLINE(L"Score:");
-      DRAWLINE(L"Popularity:");
+      if (current_service == sync::kMyAnimeList) {
+        DRAWLINE(L"Popularity:");
+      }
 
       rect_details.Set(rect_details.left + 75, text_top,
                        rect_details.right, rect_details.top + text_height);
@@ -406,7 +421,9 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
       DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
       DRAWLINE(anime_item->GetScore().empty() ? L"0.00" : anime_item->GetScore());
-      DRAWLINE(anime_item->GetPopularity().empty() ? L"#0" : anime_item->GetPopularity());
+      if (current_service == sync::kMyAnimeList) {
+        DRAWLINE(anime_item->GetPopularity().empty() ? L"#0" : anime_item->GetPopularity());
+      }
 
       #undef DRAWLINE
 

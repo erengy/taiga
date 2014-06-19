@@ -171,8 +171,7 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
          anime::TranslateDateToSeasonString(anime_item->GetDateStart()) + L"\n" +
          (anime_item->GetGenres().empty() ? L"Unknown" : Join(anime_item->GetGenres(), L", ")) + L"\n" +
          (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
-         ADD_INFOLINE(anime_item->GetScore(), L"0.00") + L"\n" +
-         ADD_INFOLINE(anime_item->GetPopularity(), L"#0");
+         ADD_INFOLINE(anime_item->GetScore(), L"0.00");
   #undef ADD_INFOLINE
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
 

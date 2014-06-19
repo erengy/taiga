@@ -21,6 +21,7 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
+#include "sync/sync.h"
 #include "taiga/settings.h"
 #include "ui/menu.h"
 
@@ -262,6 +263,9 @@ void MenuList::UpdateSeason() {
   if (menu) {
     foreach_(it, menu->items) {
       it->checked = false;
+      if (it->action == L"Season_SortBy(2)")  // Popularity
+        if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)
+          it->visible = false;
     }
     int item_index = DlgSeason.sort_by;
     if (item_index < static_cast<int>(menu->items.size())) {
