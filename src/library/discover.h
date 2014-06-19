@@ -35,7 +35,7 @@ public:
 
   // Improves season data by excluding invalid items (i.e. postpones series) and
   // adding missing ones from the anime database.
-  void Review(bool hide_hentai = true);
+  void Review(bool hide_nsfw = true);
 
   // Only IDs are stored here, actual info is kept in anime::Database.
   std::vector<int> items;

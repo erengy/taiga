@@ -38,6 +38,8 @@ int EstimateLastAiredEpisodeNumber(const Item& item);
 bool IsItemOldEnough(const Item& item);
 bool MetadataNeedsRefresh(const Item& item);
 
+bool IsNsfw(const Item& item);
+
 bool PlayEpisode(int anime_id, int number);
 bool PlayLastEpisode(int anime_id);
 bool PlayNextEpisode(int anime_id);

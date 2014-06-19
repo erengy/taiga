@@ -135,6 +135,21 @@ bool MetadataNeedsRefresh(const Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool IsNsfw(const Item& item) {
+  if (item.GetAgeRating() == anime::kAgeRatingR18)
+    return true;
+
+  if (item.GetAgeRating() == anime::kUnknownAgeRating) {
+    auto& genres = item.GetGenres();
+    if (std::find(genres.begin(), genres.end(), L"Hentai") != genres.end())
+      return true;
+  }
+
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool PlayEpisode(int anime_id, int number) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 

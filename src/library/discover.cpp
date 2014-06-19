@@ -124,7 +124,7 @@ bool SeasonDatabase::IsRefreshRequired() {
   return required;
 }
 
-void SeasonDatabase::Review(bool hide_hentai) {
+void SeasonDatabase::Review(bool hide_nsfw) {
   Date date_start, date_end;
   anime::GetSeasonInterval(name, date_start, date_end);
 
@@ -139,9 +139,8 @@ void SeasonDatabase::Review(bool hide_hentai) {
       if (anime::IsValidDate(anime_start))
         if (anime_start < date_start || anime_start > date_end)
           invalid = true;
-      // TODO: Filter by rating instead if made possible in API
-      std::wstring genres = Join(anime_item->GetGenres(), L", ");
-      if (hide_hentai && InStr(genres, L"Hentai", 0, true) > -1)
+      // Filter by age rating
+      if (hide_nsfw && IsNsfw(*anime_item))
         invalid = true;
       if (invalid) {
         items.erase(items.begin() + i--);
@@ -155,9 +154,8 @@ void SeasonDatabase::Review(bool hide_hentai) {
   foreach_(it, AnimeDatabase.items) {
     if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
       continue;
-    // TODO: Filter by rating instead if made possible in API
-    std::wstring genres = Join(it->second.GetGenres(), L", ");
-    if (hide_hentai && InStr(genres, L"Hentai", 0, true) > -1)
+    // Filter by age rating
+    if (hide_nsfw && IsNsfw(it->second))
       continue;
     // Airing date must be within the interval
     const Date& anime_start = it->second.GetDateStart();
