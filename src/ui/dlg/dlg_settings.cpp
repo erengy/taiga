@@ -355,16 +355,6 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
       break;
     }
 
-    // Drag window
-    case WM_ENTERSIZEMOVE:
-      if (::IsAppThemed() && win::GetVersion() >= win::kVersionVista)
-        SetTransparency(200);
-      break;
-    case WM_EXITSIZEMOVE:
-      if (::IsAppThemed() && win::GetVersion() >= win::kVersionVista)
-        SetTransparency(255);
-      break;
-
     // Taiga, help! Only you can save us!
     case WM_HELP: {
       OnHelp(reinterpret_cast<LPHELPINFO>(lParam));

@@ -525,18 +525,6 @@ void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
 void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
-    case WM_ENTERSIZEMOVE: {
-      if (::IsAppThemed() && win::GetVersion() >= win::kVersionVista) {
-        SetTransparency(200);
-      }
-      break;
-    }
-    case WM_EXITSIZEMOVE: {
-      if (::IsAppThemed() && win::GetVersion() >= win::kVersionVista) {
-        SetTransparency(255);
-      }
-      break;
-    }
     case WM_SIZE: {
       if (IsIconic()) {
         if (Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray))
