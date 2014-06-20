@@ -441,6 +441,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
   FolderMonitor.Enable(enable_monitor);
 
   ui::Menus.UpdateExternalLinks();
+  ui::Menus.UpdateFolders();
 
   timers.UpdateIntervalsFromSettings();
 }
