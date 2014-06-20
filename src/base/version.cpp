@@ -106,63 +106,32 @@ CompareResult SemanticVersion::Compare(const SemanticVersion& version) const {
 }
 
 void SemanticVersion::Parse(const string_t& version) {
-  int identifier_index = kMajor;
-  size_t current_identifier_pos = 0;
+  std::vector<string_t> identifiers;
+  std::wstring last_one;
 
-  for (size_t i = 0; i < version.size(); ++i) {
-    switch (identifier_index) {
-      case kMajor:
-      case kMinor:
-      case kPatch: {
-        if (IsNumeric(version.at(i)))
-          continue;
-        string_t current_identifier = version.substr(
-            current_identifier_pos, i - current_identifier_pos);
-        switch (identifier_index) {
-          case kMajor:
-            major = ToInt(current_identifier);
-            break;
-          case kMinor:
-            minor = ToInt(current_identifier);
-            break;
-          case kPatch:
-            patch = ToInt(current_identifier);
-            break;
-        }
-        switch (version.at(i)) {
-          case L'.':
-            ++identifier_index;
-            break;
-          case L'-':
-            identifier_index = kPreRelease;
-            break;
-          case L'+':
-            identifier_index = kBuildMetadata;
-            break;
-        }
-        current_identifier_pos = i + 1;
-        break;
-      }
+  Split(version, L".", identifiers);
 
-      case kPreRelease: {
-        if (version.at(i) != L'+' && i < version.size() - 1)
-          continue;
-        prerelease_identifiers = version.substr(
-            current_identifier_pos, i - current_identifier_pos);
-        identifier_index = kBuildMetadata;
-        current_identifier_pos = i + 1;
-        break;
-      }
+  if (identifiers.empty())
+    return;
 
-      case kBuildMetadata: {
-        if (i < version.size() - 1)
-          continue;
-        build_metadata = version.substr(
-            current_identifier_pos, i - current_identifier_pos);
-        break;
-      }
-    }
-  }
+  last_one = identifiers.back();
+  identifiers.pop_back();
+  Split(last_one, L"-", identifiers);
+
+  last_one = identifiers.back();
+  identifiers.pop_back();
+  Split(last_one, L"+", identifiers);
+
+  if (identifiers.size() > 0)
+    major = ToInt(identifiers.at(0));
+  if (identifiers.size() > 1)
+    minor = ToInt(identifiers.at(1));
+  if (identifiers.size() > 2)
+    patch = ToInt(identifiers.at(2));
+  if (identifiers.size() > 3)
+    prerelease_identifiers = identifiers.at(3);
+  if (identifiers.size() > 4)
+    build_metadata = identifiers.at(4);
 }
 
 }  // namespace base
