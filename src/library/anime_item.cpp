@@ -102,7 +102,8 @@ const std::wstring& Item::GetTitle() const {
 const std::wstring& Item::GetEnglishTitle(bool fallback) const {
   foreach_(it, metadata_.alternative)
     if (it->type == library::kTitleTypeLangEnglish)
-      return it->value;
+      if (!it->value.empty())
+        return it->value;
 
   if (fallback)
     return metadata_.title;
@@ -233,6 +234,9 @@ void Item::SetEnglishTitle(const std::wstring& title) {
       return;
     }
   }
+
+  if (title.empty())
+    return;
 
   library::Title new_title;
   new_title.type = library::kTitleTypeLangEnglish;
