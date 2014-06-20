@@ -26,6 +26,7 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/hummingbird_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -719,6 +720,57 @@ std::wstring TranslateMyStatus(int value, bool add_count) {
 
 std::wstring TranslateNumber(int value, const std::wstring& default_char) {
   return value > 0 ? ToWstr(value) : default_char;
+}
+
+std::wstring TranslateScore(int value, const std::wstring& default_char) {
+  switch (taiga::GetCurrentServiceId()) {
+    default:
+    case sync::kMyAnimeList:
+      return value > 0 ? ToWstr(value) : default_char;
+
+    case sync::kHummingbird:
+      return value > 0 ? 
+          sync::hummingbird::TranslateMyRatingTo(value) : default_char;
+  }
+}
+
+std::wstring TranslateScoreFull(int value) {
+  switch (taiga::GetCurrentServiceId()) {
+    default:
+    case sync::kMyAnimeList:
+      switch (value) {
+        default:
+        case 0: return L"(0) No Score";
+        case 1: return L"(1) Unwatchable";
+        case 2: return L"(2) Horrible";
+        case 3: return L"(3) Very Bad";
+        case 4: return L"(4) Bad";
+        case 5: return L"(5) Average";
+        case 6: return L"(6) Fine";
+        case 7: return L"(7) Good";
+        case 8: return L"(8) Very Good";
+        case 9: return L"(9) Great";
+        case 10: return L"(10) Masterpiece";
+      }
+      break;
+
+    case sync::kHummingbird:
+      switch (value) {
+        default:
+        case 0: return L"\u2605 0.0";
+        case 1: return L"\u2605 0.5";
+        case 2: return L"\u2605 1.0";
+        case 3: return L"\u2605 1.5";
+        case 4: return L"\u2605 2.0";
+        case 5: return L"\u2605 2.5";
+        case 6: return L"\u2605 3.0";
+        case 7: return L"\u2605 3.5";
+        case 8: return L"\u2605 4.0";
+        case 9: return L"\u2605 4.5";
+        case 10: return L"\u2605 5.0";
+      }
+      break;
+  }
 }
 
 std::wstring TranslateStatus(int value) {

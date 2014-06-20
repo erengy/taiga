@@ -21,6 +21,7 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
+#include "library/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/settings.h"
 #include "ui/menu.h"
@@ -71,20 +72,10 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
     return;
 
   // Edit > Score
-  auto menu = menu_list_.FindMenu(L"EditScore");
-  if (menu) {
-    foreach_(it, menu->items) {
-      it->checked = false;
-      it->def = false;
-    }
-    int item_index = anime_item->GetMyScore();
-    if (item_index < static_cast<int>(menu->items.size())) {
-      menu->items[item_index].checked = true;
-      menu->items[item_index].def = true;
-    }
-  }
+  UpdateScore(anime_item);
+
   // Edit > Status
-  menu = menu_list_.FindMenu(L"EditStatus");
+  auto menu = menu_list_.FindMenu(L"EditStatus");
   if (menu) {
     foreach_(it, menu->items) {
       it->checked = false;
@@ -216,6 +207,25 @@ void MenuList::UpdateFolders() {
 
     // Add default item
     menu->CreateItem(L"AddFolder()", L"Add new folder...");
+  }
+}
+
+void MenuList::UpdateScore(const anime::Item* anime_item) {
+  auto menu = menu_list_.FindMenu(L"EditScore");
+  if (menu) {
+    for (size_t i = 0; i < menu->items.size(); i++) {
+      auto& item = menu->items.at(i);
+      item.checked = false;
+      item.def = false;
+      item.name = anime::TranslateScoreFull(i);
+    }
+    if (anime_item) {
+      int item_index = anime_item->GetMyScore();
+      if (item_index < static_cast<int>(menu->items.size())) {
+        menu->items[item_index].checked = true;
+        menu->items[item_index].def = true;
+      }
+    }
   }
 }
 

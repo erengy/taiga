@@ -305,17 +305,9 @@ void PageMyInfo::Refresh(int anime_id) {
   // Score
   combobox.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
   if (combobox.GetCount() == 0) {
-    combobox.AddString(L"(10) Masterpiece");
-    combobox.AddString(L"(9) Great");
-    combobox.AddString(L"(8) Very Good");
-    combobox.AddString(L"(7) Good");
-    combobox.AddString(L"(6) Fine");
-    combobox.AddString(L"(5) Average");
-    combobox.AddString(L"(4) Bad");
-    combobox.AddString(L"(3) Very Bad");
-    combobox.AddString(L"(2) Horrible");
-    combobox.AddString(L"(1) Unwatchable");
-    combobox.AddString(L"(0) No Score");
+    for (int i = 10; i >= 0; i--) {
+      combobox.AddString(anime::TranslateScoreFull(i).c_str());
+    }
   }
   combobox.SetCurSel(10 - anime_item->GetMyScore());
   combobox.SetWindowHandle(nullptr);

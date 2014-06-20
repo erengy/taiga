@@ -377,7 +377,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"title", VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.title)));
           REPLACE(L"watched", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
           REPLACE(L"total", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
-          REPLACE(L"score", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyScore(), L"")), L""));
+          REPLACE(L"score", VALIDATE(ENCODE(anime::TranslateScore(anime_item->GetMyScore(), L"")), L""));
           REPLACE(L"id", ENCODE(id));
           REPLACE(L"image", VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
           REPLACE(L"status", VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));

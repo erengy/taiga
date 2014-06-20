@@ -127,6 +127,7 @@
 	</menu>
 	<!-- Score -->
 	<menu name="EditScore">
+		<!-- Note: Overwritten -->
 		<item name="(0) No Score"     action="EditScore(0)"  radio="1"/>
 		<item name="(1) Unwatchable"  action="EditScore(1)"  radio="1"/>
 		<item name="(2) Horrible"     action="EditScore(2)"  radio="1"/>

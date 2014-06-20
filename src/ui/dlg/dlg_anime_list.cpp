@@ -898,7 +898,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    std::wstring text = anime::TranslateNumber(anime_item.GetMyScore());
+    std::wstring text = anime::TranslateScore(anime_item.GetMyScore());
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
@@ -1080,7 +1080,7 @@ void AnimeListDialog::RefreshList(int index) {
     listview.InsertItem(i, group_index, icon_index,
                         0, nullptr, LPSTR_TEXTCALLBACK,
                         static_cast<LPARAM>(anime_item.GetId()));
-    listview.SetItem(i, 2, anime::TranslateNumber(anime_item.GetMyScore()).c_str());
+    listview.SetItem(i, 2, anime::TranslateScore(anime_item.GetMyScore()).c_str());
     listview.SetItem(i, 3, anime::TranslateType(anime_item.GetType()).c_str());
     listview.SetItem(i, 4, anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str());
   }
@@ -1112,7 +1112,7 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
     int icon_index = anime_item->GetPlaying() ?
         ui::kIcon16_Play : StatusToIcon(anime_item->GetAiringStatus());
     listview.SetItemIcon(index, icon_index);
-    listview.SetItem(index, 2, anime::TranslateNumber(anime_item->GetMyScore()).c_str());
+    listview.SetItem(index, 2, anime::TranslateScore(anime_item->GetMyScore()).c_str());
     listview.SetItem(index, 3, anime::TranslateType(anime_item->GetType()).c_str());
     listview.SetItem(index, 4, anime::TranslateDateToSeasonString(anime_item->GetDateStart()).c_str());
     listview.RedrawItems(index, index, true);

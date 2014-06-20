@@ -76,6 +76,8 @@ void IncrementEpisode(int anime_id);
 
 std::wstring TranslateMyStatus(int value, bool add_count);
 std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");
+std::wstring TranslateScore(int value, const std::wstring& default_char = L"-");
+std::wstring TranslateScoreFull(int value);
 std::wstring TranslateStatus(int value);
 std::wstring TranslateType(int value);
 
