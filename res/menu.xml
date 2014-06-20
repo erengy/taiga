@@ -3,7 +3,7 @@
 	<!-- Main -->
 	<menu name="Main" type="menubar">
 		<item name="File" sub="File"/>
-		<item name="MyAnimeList" sub="MyAnimeList"/>
+		<item name="Services" sub="Services"/>
 		<item name="Tools" sub="Tools"/>
 		<item name="View" sub="View"/>
 		<item name="Help" sub="Help"/>
@@ -18,18 +18,28 @@
 		<item type="separator"/>
 		<item name="Exit" action="Exit()"/>
 	</menu>
-	<!-- MyAnimeList -->
-	<menu name="MyAnimeList">
+	<!-- Services -->
+	<menu name="Services">
 		<item name="Synchronize list" action="Synchronize()"/>
 		<item type="separator"/>
-		<item name="Go to my panel" 	action="ViewPanel()"/>
-		<item name="Go to my profile" action="ViewProfile()"/>
-		<item name="Go to my history" action="ViewHistory()"/>
+		<item name="Hummingbird" sub="Hummingbird"/>
+		<item name="MyAnimeList" sub="MyAnimeList"/>
+	</menu>
+	<!-- Hummingbird -->
+	<menu name="Hummingbird">
+		<item name="Go to my dashboard"       action="HummingbirdViewDashboard()"/>
+		<item name="Go to my profile"         action="HummingbirdViewProfile()"/>
+		<item name="Go to my recommendations" action="HummingbirdViewRecommendations()"/>
+	</menu>
+	<!-- MyAnimeList -->
+	<menu name="MyAnimeList">
+		<item name="Go to my panel" 	action="MalViewPanel()"/>
+		<item name="Go to my profile" action="MalViewProfile()"/>
+		<item name="Go to my history" action="MalViewHistory()"/>
 	</menu>
 	<!-- Share -->
 	<menu name="Announce">
 		<item name="HTTP"      action="AnnounceToHTTP(true)"/>
-		<item name="Messenger" action="AnnounceToMessenger(true)"/>
 		<item name="mIRC"      action="AnnounceToMIRC(true)"/>
 		<item name="Skype"     action="AnnounceToSkype(true)"/>
 		<item name="Twitter"   action="AnnounceToTwitter(true)"/>
@@ -46,13 +56,7 @@
 	</menu>
 	<!-- External links -->
 	<menu name="ExternalLinks">
-		<!-- Note: Overwritten -->
-		<item name="Anime Recommendation Finder" action="URL(http://www.animerecs.com/)"/>
-		<item name="MALgraph" action="URL(http://mal.oko.im/)"/>
-		<item type="separator"/>
-		<item name="Anime Season Discussion Group" action="URL(http://myanimelist.net/clubs.php?cid=743)"/>
-		<item name="Mahou Showtime Schedule" action="URL(http://www.mahou.org/Showtime/?o=ET#Current)"/>
-		<item name="The Fansub Wiki" action="URL(http://www.fansubwiki.com/)"/>
+		<!-- Note: Overwritten -->-
 	</menu>
 	<!-- View -->
 	<menu name="View">
@@ -74,6 +78,7 @@
 	<!-- Help -->
 	<menu name="Help">
 		<item name="About Taiga" action="About()"/>
+		<item name="Support" action="URL(http://taiga.erengy.com/#support)"/>
 		<item type="separator"/>
 		<item name="Check for updates" action="CheckUpdates()"/>
 	</menu>
@@ -89,7 +94,7 @@
 		<item name="Completed"          action="AddToListAs(2)"/>
 		<item name="On hold"            action="AddToListAs(3)"/>
 		<item name="Dropped"            action="AddToListAs(4)"/>
-		<item name="Plan to watch"      action="AddToListAs(6)"/>
+		<item name="Plan to watch"      action="AddToListAs(5)"/>
 	</menu>
 	
 	<!-- Right click -->
@@ -165,8 +170,8 @@
 		<item name="Open Taiga" action="MainDialog()" default="1"/>
 		<item type="separator"/>
 		<item name="Folders" sub="Folders"/>
-		<item name="MyAnimeList" sub="MyAnimeList"/>
-		<item name="External services" sub="Services"/>
+		<item name="Services" sub="Services"/>
+		<item name="External links" sub="ExternalLinks"/>
 		<item type="separator"/>
 		<item name="Settings" action="Settings()"/>
 		<item type="separator"/>
@@ -235,7 +240,7 @@
 	<!-- Season list -->
 	<menu name="SeasonList">
 		<item name="Information" action="Info()" default="1"/>
-		<item name="View on MAL" action="ViewAnimePage()"/>
+		<item name="Go to the web page" action="ViewAnimePage()"/>
 		<item type="separator"/>
 		<item name="Refresh data" action="Season_RefreshItemData()"/>
 		<item type="separator"/>
@@ -251,7 +256,7 @@
 		<item name="Quick filters" sub="QuickFilters"/>
 		<item type="separator"/>
 		<item name="Search more torrents for this title" action="MoreTorrents"/>
-		<item name="Search MyAnimeList for this title" action="SearchMAL"/>
+		<item name="Search for anime with this title" action="SearchService"/>
 	</menu>
 	<menu name="QuickFilters">
 		<item name="Discard all torrents for this title" action="DiscardTorrents"/>
@@ -320,6 +325,7 @@
 		<item name="upper()"   action="$upper(string)"/>
 	</menu>
 	<menu name="ScriptAddVariable">
+		<item name="animeurl"   action="%animeurl%"/>
 		<item name="audio"      action="%audio%"/>
 		<item name="checksum"   action="%checksum%"/>
 		<item name="episode"    action="%episode%"/>

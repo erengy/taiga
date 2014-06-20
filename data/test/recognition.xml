@@ -658,4 +658,51 @@
 		<number>01</number>
 		<title>Ro-Kyu-Bu! SS</title>
 	</file>
+	<file>
+		<file>[Raizel] Persona 4 The Animation Episode 13 - A Stormy Summer Vacation Part 1  [BD_1080p_Dual_Audio_FLAC_Hi10p][8A45634B].mkv</file>
+		<audio>FLAC</audio>
+		<checksum>8A45634B</checksum>
+		<extra>BD</extra>
+		<format>MKV</format>
+		<group>Raizel</group>
+		<name>A Stormy Summer Vacation Part 1</name>
+		<number>13</number>
+		<resolution>1080p</resolution>
+		<title>Persona 4 The Animation</title>
+		<video>Hi10p</video>
+	</file>
+	<file>
+		<file>[Hien] Kotoura-san - Special Short Anime 'Haruka's Room' - 01 [BD 1080p H.264 10-bit AAC][6B6BE015].mkv</file>
+		<audio>AAC</audio>
+		<checksum>6B6BE015</checksum>
+		<extra>BD</extra>
+		<format>MKV</format>
+		<group>Hien</group>
+		<number>01</number>
+		<resolution>1080p</resolution>
+		<title>Kotoura-san - Special Short Anime 'Haruka's Room'</title>
+		<video>H.264 10-bit</video>
+	</file>
+	<file>
+		<file>[R-R] Diebuster.EP1 (720p.Hi10p.AC3) [82E36A36].mkv</file>
+		<audio>AC3</audio>
+		<checksum>82E36A36</checksum>
+		<format>MKV</format>
+		<group>R-R</group>
+		<number>1</number>
+		<resolution>720p</resolution>
+		<title>Diebuster</title>
+		<video>Hi10p</video>
+	</file>
+	<file>
+		<file>Aim_For_The_Top!_Gunbuster-ep1.BD(H264.FLAC.10bit)[KAA][69ECCDCF].mkv</file>
+		<audio>FLAC</audio>
+		<checksum>69ECCDCF</checksum>
+		<extra>BD</extra>
+		<format>MKV</format>
+		<group>KAA</group>
+		<number>1</number>
+		<title>Aim For The Top! Gunbuster</title>
+		<video>H264 10bit</video>
+	</file>
 </recognition>

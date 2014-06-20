@@ -1,0 +1,9 @@
+bin/*
+build/*
+deps/lib/*
+
+project/vs*/ipch
+project/vs*/*.opensdf
+project/vs*/*.sdf
+project/vs*/*.suo
+project/vs*/*.user

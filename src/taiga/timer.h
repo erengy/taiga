@@ -1,0 +1,63 @@
+/*
+** Taiga
+** Copyright (C) 2010-2014, Eren Okka
+** 
+** This program is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 3 of the License, or
+** (at your option) any later version.
+** 
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+** 
+** You should have received a copy of the GNU General Public License
+** along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef TAIGA_TAIGA_TIMER_H
+#define TAIGA_TAIGA_TIMER_H
+
+#include "base/timer.h"
+
+namespace taiga {
+
+enum TimerIds {
+  kTimerHistory = 1,
+  kTimerLibrary,
+  kTimerMedia,
+  kTimerMemory,
+  kTimerStats,
+  kTimerTorrents
+};
+
+class Timer : public base::Timer {
+public:
+  Timer(unsigned int id, int interval = 1 /*second*/, bool repeat = true);
+  ~Timer() {}
+
+protected:
+  void OnTimeout();
+};
+
+class TimerManager : public base::TimerManager {
+public:
+  void Initialize();
+
+  void UpdateEnabledState();
+  void UpdateIntervalsFromSettings();
+  void UpdateUi();
+
+protected:
+  void OnTick();
+
+private:
+  static void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
+};
+
+extern TimerManager timers;
+
+}  // namespace taiga
+
+#endif  // TAIGA_TAIGA_TIMER_H

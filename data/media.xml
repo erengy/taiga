@@ -61,17 +61,6 @@
 		<edit mode="1">GOM Player</edit>
 		<edit mode="1">[Built-in subtitle]</edit>
 	</player>
-	<!-- JetAudio -->
-	<player>
-		<name>JetAudio</name>
-		<enabled>1</enabled>
-		<visible>1</visible>
-		<mode>3</mode>
-		<class>COWON Jet-Audio MainWnd Class</class>
-		<file>JetAudio.exe</file>
-		<folder>%ProgramFiles%\JetAudio\</folder>
-		<folder>%ProgramW6432%\JetAudio\</folder>
-	</player>
 	<!-- Kantaris Media Player -->
 	<player>
 		<name>Kantaris Media Player</name>
@@ -209,8 +198,10 @@
 		<file>PotPlayer64.exe</file>
 		<file>PotPlayerMini.exe</file>
 		<file>PotPlayerMini64.exe</file>
+		<file>sumire.exe</file>
 		<folder>%ProgramFiles%\Daum\PotPlayer\</folder>
 		<folder>%ProgramW6432%\Daum\PotPlayer\</folder>
+		<folder>%ProgramFiles%\LAV Filters\x86\PotPlayer\</folder>
 	</player>
 	<!-- SMPlayer -->
 	<player>
@@ -236,9 +227,9 @@
 		<folder>%ProgramFiles%\Mirillis\Splash Lite\</folder>
 		<folder>%ProgramW6432%\Mirillis\Splash Lite\</folder>
 	</player>
-	<!-- Shooter Player -->
+	<!-- SPlayer -->
 	<player>
-		<name>Shooter Player</name>
+		<name>SPlayer</name>
 		<enabled>1</enabled>
 		<visible>1</visible>
 		<mode>0</mode>
