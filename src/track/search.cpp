@@ -155,6 +155,10 @@ void TaigaFileSearchHelper::set_path_found(const std::wstring& path_found) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ScanAvailableEpisodes(bool silent) {
+  foreach_(it, AnimeDatabase.items) {
+    anime::ValidateFolder(it->second);
+  }
+
   ScanAvailableEpisodes(silent, anime::ID_UNKNOWN, 0);
 }
 
@@ -180,14 +184,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
   if (anime_item) {
     // Check if the anime folder still exists
-    if (!anime_item->GetFolder().empty() &&
-        !FolderExists(anime_item->GetFolder())) {
-      LOG(LevelWarning, L"Folder doesn't exist anymore.");
-      LOG(LevelWarning, L"Path: " + anime_item->GetFolder());
-      anime_item->SetFolder(L"");
-      for (int i = 1; i <= anime_item->GetAvailableEpisodeCount(); i++)
-        anime_item->SetEpisodeAvailability(i, false, EmptyString());
-    }
+    anime::ValidateFolder(*anime_item);
 
     // Search the anime folder for available episodes
     if (!anime_item->GetFolder().empty()) {

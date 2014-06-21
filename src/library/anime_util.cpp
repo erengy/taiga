@@ -509,12 +509,31 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 bool IsInsideRootFolders(const std::wstring& path) {
   foreach_c_(root_folder, Settings.root_folders)
     if (StartsWith(path, *root_folder))
       return true;
 
   return false;
+}
+
+bool ValidateFolder(Item& item) {
+  if (!item.GetFolder().empty() &&
+      !FolderExists(item.GetFolder())) {
+    LOG(LevelWarning, L"Folder doesn't exist anymore.");
+    LOG(LevelWarning, L"Path: " + item.GetFolder());
+
+    item.SetFolder(L"");
+
+    for (int i = 1; i <= item.GetAvailableEpisodeCount(); i++)
+      item.SetEpisodeAvailability(i, false, L"");
+
+    return false;
+  }
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

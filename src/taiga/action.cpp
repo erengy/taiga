@@ -445,9 +445,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (!anime_item || !anime_item->IsInList())
       return;
-    if (anime_item->GetFolder().empty()) {
+    if (!anime::ValidateFolder(*anime_item))
       ScanAvailableEpisodes(false, anime_item->GetId(), 0);
-    }
     if (anime_item->GetFolder().empty()) {
       if (ui::OnAnimeFolderNotFound()) {
         std::wstring default_path, path;

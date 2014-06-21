@@ -60,6 +60,7 @@ std::wstring GetImagePath(int anime_id = -1);
 void GetUpcomingTitles(std::vector<int>& anime_ids);
 
 bool IsInsideRootFolders(const std::wstring& path);
+bool ValidateFolder(Item& item);
 
 int GetEpisodeHigh(const std::wstring& episode_number);
 int GetEpisodeLow(const std::wstring& episode_number);
