@@ -354,6 +354,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           edit.SetSel(0, -1);
           return TRUE;
         }
+        // Various
         case VK_F5: {
           switch (navigation.GetCurrentPage()) {
             case kSidebarItemAnimeList:

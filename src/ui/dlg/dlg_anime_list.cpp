@@ -649,12 +649,42 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       int anime_id = GetCurrentId();
       auto anime_item = GetCurrentItem();
       switch (pnkd->wVKey) {
+        case VK_RETURN: {
+          switch (Settings.GetInt(taiga::kApp_List_DoubleClickAction)) {
+            case 1:
+              ShowDlgAnimeEdit(anime_id);
+              break;
+            case 2:
+              ExecuteAction(L"OpenFolder", 0, anime_id);
+              break;
+            case 3:
+              anime::PlayNextEpisode(anime_id);
+              break;
+            case 4:
+              ShowDlgAnimeInfo(anime_id);
+              break;
+          }
+          break;
+        }
         // Delete item
         case VK_DELETE: {
           if (listview.GetSelectedCount() > 0)
             ExecuteAction(L"EditDelete()", 0, anime_id);
           break;
         }
+        // Context menu
+        case VK_APPS: {
+          if (listview.GetSelectedCount() > 0) {
+            int item_index = listview.GetNextItem(-1, LVIS_SELECTED);
+            win::Rect rect;
+            listview.GetSubItemRect(item_index, 0, &rect);
+            POINT pt = {rect.left, rect.bottom};
+            ::ClientToScreen(listview.GetWindowHandle(), &pt);
+            ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"RightClick"), 0, anime_id);
+          }
+          break;
+        }
+        // Various
         default: {
           if (listview.GetSelectedCount() > 0 &&
               GetKeyState(VK_CONTROL) & 0x8000) {
@@ -674,6 +704,9 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - '0') + L")", 0, anime_id);
             } else if (pnkd->wVKey >= VK_NUMPAD0 && pnkd->wVKey <= VK_NUMPAD9) {
               ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - VK_NUMPAD0) + L")", 0, anime_id);
+            // Play next episode
+            } else if (pnkd->wVKey == 'P') {
+              anime::PlayNextEpisode(anime_id);
             }
           }
           break;
