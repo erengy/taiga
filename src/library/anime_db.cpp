@@ -369,8 +369,7 @@ bool Database::LoadList() {
     if (parse_result.status == pugi::status_file_not_found) {
       return CheckOldUserDirectory();
     } else {
-      MessageBox(nullptr, L"Could not read anime list.", path.c_str(),
-                 MB_OK | MB_ICONERROR);
+      ui::DisplayErrorMessage(L"Could not read anime list.", path.c_str());
       return false;
     }
   }

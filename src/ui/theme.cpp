@@ -22,6 +22,7 @@
 #include "taiga/path.h"
 #include "taiga/taiga.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -39,7 +40,7 @@ bool ThemeManager::Load() {
 
   if (parse_result.status != pugi::status_ok) {
     std::wstring message = L"Could not read theme file:\n" + path;
-    MessageBox(nullptr, message.c_str(), TAIGA_APP_TITLE, MB_OK | MB_ICONERROR);
+    ui::DisplayErrorMessage(message.c_str(), TAIGA_APP_TITLE);
     return false;
   }
 

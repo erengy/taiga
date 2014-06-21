@@ -52,8 +52,7 @@ bool MediaPlayers::Load() {
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
-    MessageBox(nullptr, L"Could not read media list.",
-               path.c_str(), MB_OK | MB_ICONERROR);
+    ui::DisplayErrorMessage(L"Could not read media list.", path.c_str());
     return false;
   }
 

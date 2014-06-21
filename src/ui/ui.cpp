@@ -79,6 +79,11 @@ int StatusToIcon(int status) {
   }
 }
 
+void DisplayErrorMessage(const std::wstring& text,
+                         const std::wstring& caption) {
+  MessageBox(nullptr, text.c_str(), caption.c_str(), MB_OK | MB_ICONERROR);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {

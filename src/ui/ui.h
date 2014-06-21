@@ -38,6 +38,8 @@ void ClearStatusText();
 void SetSharedCursor(LPCWSTR name);
 int StatusToIcon(int status);
 
+void DisplayErrorMessage(const std::wstring& text, const std::wstring& caption);
+
 void OnHttpError(const taiga::HttpClient& http_client, const string_t& error);
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client);
 void OnHttpProgress(const taiga::HttpClient& http_client);

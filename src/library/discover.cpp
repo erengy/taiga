@@ -31,6 +31,7 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "ui/ui.h"
 
 library::SeasonDatabase SeasonDatabase;
 
@@ -45,8 +46,7 @@ bool SeasonDatabase::Load(std::wstring file) {
 
   if (parse_result.status != pugi::status_ok &&
       parse_result.status != pugi::status_file_not_found) {
-    MessageBox(nullptr, L"Could not read season data.", path.c_str(),
-               MB_OK | MB_ICONERROR);
+    ui::DisplayErrorMessage(L"Could not read season data.", path.c_str());
     return false;
   }
 
