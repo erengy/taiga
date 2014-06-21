@@ -149,7 +149,13 @@ void MainDialog::CreateDialogControls() {
   // Create cancel search button
   cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
   cancel_button.SetParent(edit.GetWindowHandle());
-  cancel_button.SetPosition(nullptr, rcEdit.right + 1, 0, 16, 16);
+  win::Rect rcButton;
+  rcButton.left = rcEdit.right;
+  edit.GetWindowRect(&rcEdit);
+  rcButton.top = static_cast<LONG>(std::floor((rcEdit.Height() - 2 - 16) / 2));
+  rcButton.right = rcButton.left + 16;
+  rcButton.bottom = rcButton.top + 16;
+  cancel_button.SetPosition(nullptr, rcButton);
   // Create treeview control
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
   treeview.SendMessage(TVM_SETBKCOLOR, 0, ::GetSysColor(COLOR_3DFACE));
