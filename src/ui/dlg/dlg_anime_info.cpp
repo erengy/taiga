@@ -22,6 +22,7 @@
 #include "library/anime_util.h"
 #include "library/history.h"
 #include "library/resource.h"
+#include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -269,8 +270,10 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
     switch (pMsg->wParam) {
       // Refresh
       case VK_F5:
-        page_series_info.Refresh(anime_id_, true);
         page_my_info.Refresh(anime_id_);
+        page_series_info.Refresh(anime_id_, false);
+        UpdateTitle(true);
+        sync::GetMetadataById(anime_id_);
         return TRUE;
       // Close window
       case VK_ESCAPE:
