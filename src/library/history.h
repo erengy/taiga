@@ -25,6 +25,7 @@
 
 #include "base/optional.h"
 #include "base/time.h"
+#include "base/xml.h"
 #include "library/anime_episode.h"
 
 enum QueueSearchMode {
@@ -94,6 +95,13 @@ public:
   std::vector<HistoryItem> items;
   HistoryQueue queue;
   int limit;
+
+private:
+  void ReadQueue(const pugi::xml_document& document);
+  void ReadQueueInCompatibilityMode(const pugi::xml_document& document);
+
+  int TranslateModeFromString(const std::wstring& mode);
+  std::wstring TranslateModeToString(int mode);
 };
 
 class ConfirmationQueue {

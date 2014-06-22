@@ -339,6 +339,10 @@ bool History::Load() {
   if (parse_result.status != pugi::status_ok)
     return false;
 
+  // Meta
+  xml_node node_meta = document.child(L"meta");
+  base::SemanticVersion version(XmlReadStrValue(node_meta, L"version"));
+
   // Items
   xml_node node_items = document.child(L"history").child(L"items");
   foreach_xmlnode_(item, node_items, L"item") {
@@ -349,18 +353,32 @@ bool History::Load() {
     items.push_back(history_item);
   }
   // Queue events
+  if (version < base::SemanticVersion(1, 1, 4)) {
+    ReadQueueInCompatibilityMode(document);
+  } else {
+    ReadQueue(document);
+  }
+
+  return true;
+}
+
+void History::ReadQueue(const pugi::xml_document& document) {
   xml_node node_queue = document.child(L"history").child(L"queue");
+
   foreach_xmlnode_(item, node_queue, L"item") {
     HistoryItem history_item;
+
     history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
-    history_item.mode = item.attribute(L"mode").as_int();
+    history_item.mode = TranslateModeFromString(item.attribute(L"mode").value());
     history_item.time = item.attribute(L"time").value();
+
     #define READ_ATTRIBUTE_INT(x, y) \
         if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
     #define READ_ATTRIBUTE_STR(x, y) \
         if (!item.attribute(y).empty()) x = item.attribute(y).as_string();
     #define READ_ATTRIBUTE_DATE(x, y) \
         if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
+
     READ_ATTRIBUTE_INT(history_item.episode, L"episode");
     READ_ATTRIBUTE_INT(history_item.score, L"score");
     READ_ATTRIBUTE_INT(history_item.status, L"status");
@@ -368,18 +386,69 @@ bool History::Load() {
     READ_ATTRIBUTE_STR(history_item.tags, L"tags");
     READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
     READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
+
     #undef READ_ATTRIBUTE_DATE
     #undef READ_ATTRIBUTE_STR
     #undef READ_ATTRIBUTE_INT
+
     queue.Add(history_item, false);
   }
+}
 
-  return true;
+void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
+  xml_node node_queue = document.child(L"history").child(L"queue");
+
+  foreach_xmlnode_(item, node_queue, L"item") {
+    HistoryItem history_item;
+
+    history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
+    history_item.mode = item.attribute(L"mode").as_int();
+    history_item.time = item.attribute(L"time").value();
+
+    #define READ_ATTRIBUTE_INT(x, y) \
+        if (!item.attribute(y).empty()) x = item.attribute(y).as_int();
+    #define READ_ATTRIBUTE_STR(x, y) \
+        if (!item.attribute(y).empty()) x = item.attribute(y).as_string();
+    #define READ_ATTRIBUTE_DATE(x, y) \
+        if (!item.attribute(y).empty()) x = (Date)item.attribute(y).as_string();
+
+    READ_ATTRIBUTE_INT(history_item.episode, L"episode");
+    READ_ATTRIBUTE_INT(history_item.score, L"score");
+    READ_ATTRIBUTE_INT(history_item.status, L"status");
+    READ_ATTRIBUTE_INT(history_item.enable_rewatching, L"enable_rewatching");
+    READ_ATTRIBUTE_STR(history_item.tags, L"tags");
+    READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
+    READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
+
+    #undef READ_ATTRIBUTE_DATE
+    #undef READ_ATTRIBUTE_STR
+    #undef READ_ATTRIBUTE_INT
+
+    Date date_item(history_item.time);
+    Date date_limit(L"2014-06-20");  // Release date of v1.1.0
+    if (date_item < date_limit) {
+      if (history_item.mode == 3) {         // HTTP_MAL_AnimeAdd
+        history_item.mode = taiga::kHttpServiceAddLibraryEntry;
+      } else if (history_item.mode == 5) {  // HTTP_MAL_AnimeDelete
+        history_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
+      } else if (history_item.mode == 7) {  // HTTP_MAL_AnimeUpdate
+        history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      }
+    }
+
+    queue.Add(history_item, false);
+  }
 }
 
 bool History::Save() {
   xml_document document;
   std::wstring path = taiga::GetPath(taiga::kPathUserHistory);
+
+  // Write meta
+  xml_node node_meta = document.append_child(L"meta");
+  XmlWriteStrValue(node_meta, L"version",
+                   static_cast<std::wstring>(Taiga.version).c_str());
+
   xml_node node_history = document.append_child(L"history");
 
   // Write items
@@ -401,7 +470,7 @@ bool History::Save() {
     #define APPEND_ATTRIBUTE_DATE(x, y) \
         if (y) node_item.append_attribute(x) = std::wstring(*y).c_str();
     node_item.append_attribute(L"anime_id") = it->anime_id;
-    node_item.append_attribute(L"mode") = it->mode;
+    node_item.append_attribute(L"mode") = TranslateModeToString(it->mode).c_str();
     node_item.append_attribute(L"time") = it->time.c_str();
     APPEND_ATTRIBUTE_INT(L"episode", it->episode);
     APPEND_ATTRIBUTE_INT(L"score", it->score);
@@ -416,6 +485,28 @@ bool History::Save() {
   }
 
   return XmlWriteDocumentToFile(document, path);
+}
+
+int History::TranslateModeFromString(const std::wstring& mode) {
+  if (mode == L"add") {
+    return taiga::kHttpServiceAddLibraryEntry;
+  } else if (mode == L"delete") {
+    return taiga::kHttpServiceDeleteLibraryEntry;
+  } else {
+    return taiga::kHttpServiceUpdateLibraryEntry;
+  }
+}
+
+std::wstring History::TranslateModeToString(int mode) {
+  switch (mode) {
+    case taiga::kHttpServiceAddLibraryEntry:
+      return L"add";
+    case taiga::kHttpServiceDeleteLibraryEntry:
+      return L"delete";
+    default:
+    case taiga::kHttpServiceUpdateLibraryEntry:
+      return L"update";
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
