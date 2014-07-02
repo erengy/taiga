@@ -104,10 +104,10 @@ bool Client::SetRequestOptions() {
   TAIGA_CURL_SET_OPTION(CURLOPT_URL, WstrToStr(url).c_str());
   LOG(LevelDebug, L"URL: " + url);
 
-  // Set protocol
-  int protocol = secure_transaction_ ? CURLPROTO_HTTPS : CURLPROTO_HTTP;
-  TAIGA_CURL_SET_OPTION(CURLOPT_PROTOCOLS, protocol);
-  TAIGA_CURL_SET_OPTION(CURLOPT_REDIR_PROTOCOLS, protocol);
+  // Set allowed protocols
+  int protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
+  TAIGA_CURL_SET_OPTION(CURLOPT_PROTOCOLS, protocols);
+  TAIGA_CURL_SET_OPTION(CURLOPT_REDIR_PROTOCOLS, protocols);
 
   // Set proxy
   if (!proxy_host_.empty()) {
