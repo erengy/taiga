@@ -73,7 +73,7 @@ BOOL UpdateDialog::OnDestroy() {
 
   if (Taiga.Updater.IsRestartRequired()) {
     if (DlgMain.IsWindow()) {
-      DlgMain.PostMessage(WM_CLOSE);
+      DlgMain.Destroy();
     } else {
       Taiga.Uninitialize();
     }

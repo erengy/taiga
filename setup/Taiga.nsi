@@ -138,7 +138,7 @@ Function CheckInstance
     
     IntOp $secondsWaited $secondsWaited + 1
     IntCmp $secondsWaited 3 0 skipMessageBox 0 ; Display the message box after 3 seconds
-      MessageBox MB_OKCANCEL "${PRODUCT_NAME} is still running. Close it first, then click OK to continue setup." /SD IDOK IDOK skipMessageBox
+      MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is still running. Close it first, then click OK to continue setup." IDOK skipMessageBox
       Quit
     skipMessageBox:
     
