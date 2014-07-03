@@ -56,9 +56,9 @@ void Logger::Log(int severity_level, const std::wstring& file, int line,
 
     std::string padding(output_text.length(), ' ');
     std::vector<std::wstring> lines;
-    Split(text, L"\r\n", lines);
+    Split(text, L"\n", lines);
     foreach_(it, lines) {
-      Trim(*it);
+      Trim(*it, L" \r");
       if (!it->empty()) {
         if (it != lines.begin())
           output_text += padding;
