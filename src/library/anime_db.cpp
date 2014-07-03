@@ -338,6 +338,12 @@ int Database::UpdateItem(const Item& new_item) {
     // Make sure our pointer to MyInformation class is valid
     item->AddtoUserList();
 
+    if (!item->GetNextEpisodePath().empty() && 
+        item->GetMyLastWatchedEpisode() != new_item.GetMyLastWatchedEpisode()) {
+      // Next episode path is no longer valid
+      item->SetNextEpisodePath(L"");
+    }
+
     item->SetMyLastWatchedEpisode(new_item.GetMyLastWatchedEpisode(false));
     item->SetMyScore(new_item.GetMyScore(false));
     item->SetMyStatus(new_item.GetMyStatus(false));
