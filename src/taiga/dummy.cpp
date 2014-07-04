@@ -30,6 +30,7 @@ void DummyAnime::Initialize() {
   SetId(L"4224", sync::kTaiga);
   SetId(L"4224", sync::kMyAnimeList);
   SetId(L"3532", sync::kHummingbird);
+  SetSlug(L"toradora");
   SetTitle(L"Toradora!");
   SetSynonyms(L"Tiger X Dragon");
   SetType(anime::kTv);
