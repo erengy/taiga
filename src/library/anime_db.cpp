@@ -74,15 +74,26 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
       id_map[service_id] = id;
     }
 
-    Item& item = items[ToInt(id_map[sync::kTaiga])];  // Creates the item if it doesn't exist
-
-    foreach_(it, id_map)
-      item.SetId(it->second, it->first);
-
     enum_t source = sync::kTaiga;
     auto service = ServiceManager.service(XmlReadStrValue(node, L"source"));
     if (service)
       source = service->id();
+
+    if (source == sync::kTaiga) {
+      auto current_service_id = taiga::GetCurrentServiceId();
+      if (id_map.find(current_service_id) != id_map.end()) {
+        source = current_service_id;
+        LOG(LevelWarning, L"Fixed source for ID: " + id_map[source]);
+      } else {
+        LOG(LevelError, L"Invalid source for ID: " + id_map[sync::kTaiga]);
+        continue;
+      }
+    }
+
+    Item& item = items[ToInt(id_map[sync::kTaiga])];  // Creates the item if it doesn't exist
+
+    foreach_(it, id_map)
+      item.SetId(it->second, it->first);
 
     std::vector<std::wstring> synonyms;
     XmlReadChildNodes(node, synonyms, L"synonym");
@@ -247,32 +258,14 @@ int Database::UpdateItem(const Item& new_item) {
   }
 
   if (!item) {
-    /*
-    auto service = ServiceManager.service(Settings[taiga::kSync_ActiveService]);
-    if (new_item.GetSource() != service->id()) {
-      // TODO: Try to find the same item by similarity
-    }
-    */
-
     auto source = new_item.GetSource();
 
-    bool id_is_numeric = false;
-    switch (source) {
-      case sync::kMyAnimeList:
-      case sync::kHummingbird:
-        id_is_numeric = true;
-        break;
+    if (source == sync::kTaiga) {
+      LOG(LevelError, L"Invalid source for ID: " + new_item.GetId(source));
+      return ID_UNKNOWN;
     }
 
-    int id = 1;
-
-    if (id_is_numeric) {
-      id = ToInt(new_item.GetId(source));
-    } else {
-      // Generate a new ID
-      while (FindItem(id))
-        ++id;
-    }
+    int id = ToInt(new_item.GetId(source));
 
     // Add a new item
     item = &items[id];
@@ -391,6 +384,7 @@ bool Database::LoadList() {
     foreach_xmlnode_(node, node_library, L"anime") {
       Item anime_item;
       anime_item.SetId(XmlReadStrValue(node, L"id"), sync::kTaiga);
+      anime_item.SetSource(sync::kTaiga);
 
       anime_item.AddtoUserList();
       anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"progress"));
@@ -624,6 +618,7 @@ void Database::ReadListInCompatibilityMode(xml_document& document) {
   foreach_xmlnode_(node, myanimelist, L"anime") {
     Item anime_item;
     anime_item.SetId(XmlReadStrValue(node, L"series_animedb_id"), sync::kMyAnimeList);
+    anime_item.SetSource(sync::kMyAnimeList);
 
     anime_item.SetTitle(XmlReadStrValue(node, L"series_title"));
     anime_item.SetSynonyms(XmlReadStrValue(node, L"series_synonyms"));

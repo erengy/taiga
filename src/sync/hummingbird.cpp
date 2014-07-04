@@ -170,6 +170,8 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   if (!ParseResponseBody(response, http_response, root))
     return;
 
+  AnimeDatabase.ClearUserData();
+
   for (size_t i = 0; i < root.size(); i++)
     ParseLibraryObject(root[i]);
 }

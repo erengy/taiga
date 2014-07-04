@@ -237,6 +237,8 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   // We ignore the remaining tags, because MAL can be very slow at updating
   // their values, and we can easily calculate them ourselves anyway.
 
+  AnimeDatabase.ClearUserData();
+
   // Available tags:
   // - series_animedb_id
   // - series_title
