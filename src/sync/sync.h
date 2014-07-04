@@ -26,7 +26,7 @@
 
 namespace sync {
 
-void AuthenticateUser();
+void AuthenticateUser(bool download);
 void GetLibraryEntries();
 void GetMetadataById(int id);
 void GetMetadataByIdV2(int id);

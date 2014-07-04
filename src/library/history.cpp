@@ -136,7 +136,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
     history->Save();
 
     // Announce
-    if (Taiga.logged_in && item.episode) {
+    if (item.episode) {
       anime::Episode episode;
       episode.anime_id = anime->GetId();
       episode.number = ToWstr(*item.episode);
@@ -153,43 +153,44 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
     ui::OnHistoryAddItem(item);
 
     // Update
-    Check();
+    Check(true);
   }
 }
 
 void HistoryQueue::Check(bool automatic) {
-  // Check
-  if (items.empty()) {
+  if (items.empty())
     return;
-  }
+
   if (!items[index].enabled) {
     LOG(LevelDebug, L"Item is disabled, removing...");
     Remove(index, true, true, false);
-    Check();
-    return;
-  }
-  if (!Taiga.logged_in) {
-    items[index].reason = L"Not logged in";
-    return;
-  }
-  if (automatic && !Settings.GetBool(taiga::kApp_Option_EnableSync)) {
-    items[index].reason = L"Synchronization is disabled";
+    Check(automatic);
     return;
   }
 
-  // Compare ID with anime list
   auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);
   if (!anime_item) {
     LOG(LevelWarning, L"Item not found in list, removing... ID: " +
                       ToWstr(items[index].anime_id));
     Remove(index, true, true, false);
-    Check();
+    Check(automatic);
     return;
   }
 
-  // Update
+  if (automatic && !Settings.GetBool(taiga::kApp_Option_EnableSync)) {
+    items[index].reason = L"Automatic synchronization is disabled";
+    LOG(LevelDebug, items[index].reason);
+    return;
+  }
+
+  if (!Taiga.logged_in) {
+    sync::AuthenticateUser(false);
+    return;
+  }
+
   History.queue.updating = true;
   ui::ChangeStatusText(L"Updating list... (" + anime_item->GetTitle() + L")");
+
   AnimeValues* anime_values = static_cast<AnimeValues*>(&items[index]);
   sync::UpdateLibraryEntry(*anime_values, items[index].anime_id,
       static_cast<taiga::HttpClientMode>(items[index].mode));

@@ -33,15 +33,31 @@
 
 namespace sync {
 
-void AuthenticateUser() {
-  Request request(kAuthenticateUser);
-  SetActiveServiceForRequest(request);
-  if (!AddAuthenticationToRequest(request))
-    return;
-  ServiceManager.MakeRequest(request);
+void AuthenticateUser(bool download) {
+  if (!taiga::GetCurrentUsername().empty() &&
+      !taiga::GetCurrentPassword().empty()) {
+    ui::ChangeStatusText(L"Logging in...");
+    ui::EnableDialogInput(ui::kDialogMain, false);
+
+    Request request(kAuthenticateUser);
+    SetActiveServiceForRequest(request);
+    if (!AddAuthenticationToRequest(request))
+      return;
+    ServiceManager.MakeRequest(request);
+
+  } else if (!taiga::GetCurrentUsername().empty() && download) {
+    GetLibraryEntries();
+
+  } else {
+    ui::ChangeStatusText(
+        L"Cannot authenticate. Username or password not available.");
+  }
 }
 
 void GetLibraryEntries() {
+  ui::ChangeStatusText(L"Downloading anime list...");
+  ui::EnableDialogInput(ui::kDialogMain, false);
+
   Request request(kGetLibraryEntries);
   SetActiveServiceForRequest(request);
   if (!AddAuthenticationToRequest(request))
@@ -82,31 +98,11 @@ void SearchTitle(string_t title, int id) {
 
 void Synchronize() {
   if (!Taiga.logged_in) {
-    if (!taiga::GetCurrentUsername().empty() &&
-        !taiga::GetCurrentPassword().empty()) {
-      // Log in
-      ui::ChangeStatusText(L"Logging in...");
-      ui::EnableDialogInput(ui::kDialogMain, false);
-      AuthenticateUser();
-    } else if (!taiga::GetCurrentUsername().empty()) {
-      // Download list
-      ui::ChangeStatusText(L"Downloading anime list...");
-      ui::EnableDialogInput(ui::kDialogMain, false);
-      GetLibraryEntries();
-    } else {
-      ui::ChangeStatusText(
-          L"Cannot synchronize, username and password not available");
-    }
+    AuthenticateUser(true);
+  } else if (History.queue.GetItemCount() == 0) {
+    GetLibraryEntries();
   } else {
-    if (History.queue.GetItemCount() > 0) {
-      // Update items in queue
-      History.queue.Check(false);
-    } else {
-      // Retrieve list
-      ui::ChangeStatusText(L"Synchronizing anime list...");
-      ui::EnableDialogInput(ui::kDialogMain, false);
-      GetLibraryEntries();
-    }
+    History.queue.Check(false);
   }
 }
 
