@@ -350,7 +350,15 @@ bool History::Load() {
     history_item.anime_id = item.attribute(L"anime_id").as_int(anime::ID_NOTINLIST);
     history_item.episode = item.attribute(L"episode").as_int();
     history_item.time = item.attribute(L"time").value();
-    items.push_back(history_item);
+
+    if (AnimeDatabase.FindItem(history_item.anime_id)) {
+      items.push_back(history_item);
+    } else {
+      LOG(LevelWarning, L"Item does not exist in the database.\n"
+                        L"ID: " + ToWstr(history_item.anime_id) + L"\n"
+                        L"Episode: " + ToWstr(*history_item.episode) + L"\n"
+                        L"Time: " + history_item.time);
+    }
   }
   // Queue events
   if (version < base::SemanticVersion(1, 1, 4)) {
@@ -391,7 +399,12 @@ void History::ReadQueue(const pugi::xml_document& document) {
     #undef READ_ATTRIBUTE_STR
     #undef READ_ATTRIBUTE_INT
 
-    queue.Add(history_item, false);
+    if (AnimeDatabase.FindItem(history_item.anime_id)) {
+      queue.Add(history_item, false);
+    } else {
+      LOG(LevelWarning, L"Item does not exist in the database.\n"
+                        L"ID: " + ToWstr(history_item.anime_id));
+    }
   }
 }
 
@@ -436,7 +449,12 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
       }
     }
 
-    queue.Add(history_item, false);
+    if (AnimeDatabase.FindItem(history_item.anime_id)) {
+      queue.Add(history_item, false);
+    } else {
+      LOG(LevelWarning, L"Item does not exist in the database.\n"
+                        L"ID: " + ToWstr(history_item.anime_id));
+    }
   }
 }
 
