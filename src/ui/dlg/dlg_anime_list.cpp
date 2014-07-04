@@ -765,8 +765,10 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
         ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
       }
     } else {
-      ratio_aired = eps_aired > -1 ? 0.85f : 0.0f;
-      ratio_watched = eps_watched > 0 ? 0.8f : 0.0f;
+      if (eps_aired > -1)
+        ratio_aired = 0.85f;
+      if (eps_watched > 0)
+        ratio_watched = eps_aired > -1 ? eps_watched / (eps_aired / ratio_aired) : 0.8f;
     }
     if (ratio_watched > 1.0f) {
       // The number of watched episodes is greater than the number of total episodes

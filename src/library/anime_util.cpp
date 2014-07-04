@@ -630,6 +630,9 @@ int EstimateEpisodeCount(const Item& item) {
     number = max(item.GetMyLastWatchedEpisode(),
                  item.GetAvailableEpisodeCount());
 
+  // Estimate using local information
+  number = max(number, const_cast<Item&>(item).GetLastAiredEpisodeNumber());
+
   // Estimate using airing dates of TV series
   if (item.GetType() == kTv) {
     Date date_start = item.GetDateStart();
