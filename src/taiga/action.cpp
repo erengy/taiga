@@ -383,7 +383,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditStatus(value)
   //   Changes anime status of user.
-  //   Value must be 1, 2, 3, 4 or 6, and different from current status.
+  //   Value must be 1, 2, 3, 4 or 5, and different from current status.
   //   lParam is an anime ID.
   } else if (action == L"EditStatus") {
     HistoryItem history_item;

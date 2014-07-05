@@ -146,7 +146,7 @@
 		<item name="Completed"          action="EditStatus(2)" radio="1"/>
 		<item name="On hold"            action="EditStatus(3)" radio="1"/>
 		<item name="Dropped"            action="EditStatus(4)" radio="1"/>
-		<item name="Plan to watch"      action="EditStatus(6)" radio="1"/>
+		<item name="Plan to watch"      action="EditStatus(5)" radio="1"/>
 	</menu>
 	<!-- Search -->
 	<menu name="Search">
