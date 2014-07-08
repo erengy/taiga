@@ -59,7 +59,6 @@ Client::Client()
       current_length_(0),
       curl_handle_(nullptr),
       header_list_(nullptr),
-      secure_transaction_(false),
       user_agent_(L"Mozilla/5.0") {
 }
 

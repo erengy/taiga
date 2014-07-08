@@ -40,9 +40,6 @@ bool Client::MakeRequest(Request request) {
   request_ = request;
   LOG(LevelDebug, L"ID: " + request.uid);
 
-  // Set secure transaction state
-  secure_transaction_ = request.url.protocol == kHttps;
-
   // Ensure that the response has the same parameter and UID as the request
   response_.parameter = request.parameter;
   response_.uid = request.uid;

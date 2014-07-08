@@ -152,7 +152,6 @@ protected:
   std::wstring proxy_password_;
   std::wstring proxy_username_;
   std::wstring referer_;
-  bool secure_transaction_;
   std::wstring user_agent_;
 
 private:
