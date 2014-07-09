@@ -53,6 +53,7 @@ int PopulateFolders(std::vector<std::wstring>& folder_list, const std::wstring& 
 
 bool ReadFromFile(const std::wstring& path, std::string& output);
 bool SaveToFile(LPCVOID data, DWORD length, const std::wstring& path, bool take_backup = false);
+bool SaveToFile(const std::string data, const std::wstring& path, bool take_backup = false);
 
 std::wstring ToSizeString(QWORD qwSize);
 
