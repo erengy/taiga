@@ -130,10 +130,8 @@ bool UpdateHelper::Download() {
 
   client_uid_ = http_request.uid;
 
-  auto& client = ConnectionManager.GetClient(http_request);
-  client.set_download_path(download_path_);
-  ConnectionManager.MakeRequest(client, http_request,
-                                taiga::kHttpTaigaUpdateDownload);
+  ConnectionManager.MakeRequest(http_request, taiga::kHttpTaigaUpdateDownload);
+
   return true;
 }
 
@@ -150,6 +148,10 @@ bool UpdateHelper::RunInstaller() {
   restart_required_ = Execute(download_path_, parameters);
 
   return restart_required_;
+}
+
+std::wstring UpdateHelper::GetDownloadPath() const {
+  return download_path_;
 }
 
 void UpdateHelper::SetDownloadPath(const std::wstring& path) {

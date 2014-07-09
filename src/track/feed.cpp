@@ -106,9 +106,8 @@ bool Feed::Check(const std::wstring& source, bool automatic) {
 
   auto client_mode = automatic ?
       taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
-  auto& client = ConnectionManager.GetClient(http_request);
-  client.set_download_path(GetDataPath() + L"feed.xml");
-  ConnectionManager.MakeRequest(client, http_request, client_mode);
+
+  ConnectionManager.MakeRequest(http_request, client_mode);
 
   return true;
 }
@@ -134,17 +133,11 @@ bool Feed::Download(int index) {
   ui::ChangeStatusText(L"Downloading \"" + items[index].title + L"\"...");
   ui::EnableDialogInput(ui::kDialogTorrents, false);
 
-  std::wstring file = items[index].title + L".torrent";
-  ValidateFileName(file);
-  file = GetDataPath() + file;
-
   HttpRequest http_request;
   http_request.url = items[index].link;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
 
-  auto& client = ConnectionManager.GetClient(http_request);
-  client.set_download_path(file);
-  ConnectionManager.MakeRequest(client, http_request, client_mode);
+  ConnectionManager.MakeRequest(http_request, client_mode);
 
   return true;
 }
@@ -270,7 +263,12 @@ bool Aggregator::SearchArchive(const std::wstring& file) {
   return false;
 }
 
-void Aggregator::HandleFeedCheck(Feed& feed, bool automatic) {
+void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
+                                 bool automatic) {
+  std::wstring file = feed.GetDataPath() + L"feed.xml";
+
+  SaveToFile(data, file);
+
   feed.Load();
 
   bool success = feed.ExamineData();
@@ -288,7 +286,8 @@ void Aggregator::HandleFeedCheck(Feed& feed, bool automatic) {
   }
 }
 
-void Aggregator::HandleFeedDownload(Feed& feed, bool download_all) {
+void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
+                                    bool download_all) {
   auto feed_item = reinterpret_cast<FeedItem*>(&feed.items.at(feed.download_index));
 
   file_archive.push_back(feed_item->title);
@@ -296,6 +295,8 @@ void Aggregator::HandleFeedDownload(Feed& feed, bool download_all) {
   std::wstring file = feed_item->title;
   ValidateFileName(file);
   file = feed.GetDataPath() + file + L".torrent";
+
+  SaveToFile(data, file);
 
   if (FileExists(file)) {
     std::wstring app_path;

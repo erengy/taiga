@@ -131,8 +131,8 @@ public:
 
   Feed* Get(FeedCategory category);
 
-  void HandleFeedCheck(Feed& feed, bool automatic);
-  void HandleFeedDownload(Feed& feed, bool download_all);
+  void HandleFeedCheck(Feed& feed, const std::string& data, bool automatic);
+  void HandleFeedDownload(Feed& feed, const std::string& data, bool download_all);
 
   bool Notify(const Feed& feed);
   void ParseDescription(FeedItem& feed_item, const std::wstring& source);

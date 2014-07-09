@@ -16,10 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/url.h"
+#include "library/anime_util.h"
 #include "library/resource.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
@@ -88,9 +90,9 @@ bool HttpClient::OnRedirect(const std::wstring& address) {
 
   switch (mode()) {
     case kHttpTaigaUpdateDownload: {
-      std::wstring file = address.substr(address.find_last_of(L"/") + 1);
-      download_path_ = GetPathOnly(download_path_) + file;
-      Taiga.Updater.SetDownloadPath(download_path_);
+      std::wstring path = GetPathOnly(Taiga.Updater.GetDownloadPath());
+      std::wstring file = GetFileName(address);
+      Taiga.Updater.SetDownloadPath(path + file);
       break;
     }
   }
@@ -157,14 +159,6 @@ void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
   ProcessQueue();
 }
 
-void HttpManager::MakeRequest(HttpClient& client, HttpRequest& request,
-                              HttpClientMode mode) {
-  client.set_mode(mode);
-
-  AddToQueue(request);
-  ProcessQueue();
-}
-
 void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
   HttpClient& client = clients_[response.uid];
 
@@ -208,6 +202,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
 
     case kHttpGetLibraryEntryImage: {
       int anime_id = static_cast<int>(response.parameter);
+      SaveToFile(client.write_buffer_, anime::GetImagePath(anime_id));
       if (ImageDatabase.Load(anime_id, true, false))
         ui::OnLibraryEntryImageChange(anime_id);
       break;
@@ -218,7 +213,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       Feed* feed = reinterpret_cast<Feed*>(response.parameter);
       if (feed) {
         bool automatic = client.mode() == kHttpFeedCheckAuto;
-        Aggregator.HandleFeedCheck(*feed, automatic);
+        Aggregator.HandleFeedCheck(*feed, client.write_buffer_, automatic);
       }
       break;
     }
@@ -227,7 +222,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       auto feed = reinterpret_cast<Feed*>(response.parameter);
       if (feed) {
         bool download_all = client.mode() == kHttpFeedDownloadAll;
-        Aggregator.HandleFeedDownload(*feed, download_all);
+        Aggregator.HandleFeedDownload(*feed, client.write_buffer_, download_all);
       }
       break;
     }
@@ -245,6 +240,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       ui::OnUpdateFinished();
       break;
     case kHttpTaigaUpdateDownload:
+      SaveToFile(client.write_buffer_, Taiga.Updater.GetDownloadPath());
       Taiga.Updater.RunInstaller();
       ui::OnUpdateFinished();
       break;

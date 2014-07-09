@@ -142,14 +142,6 @@ void Client::set_auto_redirect(bool enabled) {
   auto_redirect_ = enabled;
 }
 
-void Client::set_download_path(const std::wstring& download_path) {
-  download_path_ = download_path;
-
-  // Make sure the path is available
-  if (!download_path.empty())
-    CreateFolder(GetPathOnly(download_path));
-}
-
 void Client::set_proxy(const std::wstring& host,
                        const std::wstring& username,
                        const std::wstring& password) {

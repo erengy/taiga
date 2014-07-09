@@ -81,7 +81,6 @@ public:
 
   void CancelRequest(base::uid_t uid);
   void MakeRequest(HttpRequest& request, HttpClientMode mode);
-  void MakeRequest(HttpClient& client, HttpRequest& request, HttpClientMode mode);
 
   void HandleError(HttpResponse& response, const string_t& error);
   void HandleRedirect(const std::wstring& current_host, const std::wstring& next_host);

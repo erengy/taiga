@@ -120,7 +120,6 @@ public:
 
   void set_allow_reuse(bool allow);
   void set_auto_redirect(bool enabled);
-  void set_download_path(const std::wstring& download_path);
   void set_proxy(
       const std::wstring& host,
       const std::wstring& username,
@@ -147,7 +146,6 @@ protected:
 
   bool allow_reuse_;
   bool auto_redirect_;
-  std::wstring download_path_;
   std::wstring proxy_host_;
   std::wstring proxy_password_;
   std::wstring proxy_username_;

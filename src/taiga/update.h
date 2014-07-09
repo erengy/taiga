@@ -39,6 +39,8 @@ public:
   bool IsUpdateAvailable() const;
   bool ParseData(std::wstring data);
   bool RunInstaller();
+
+  std::wstring GetDownloadPath() const;
   void SetDownloadPath(const std::wstring& path);
 
   std::vector<GenericFeedItem> items;

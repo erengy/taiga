@@ -188,10 +188,6 @@ bool Client::Perform() {
       response_.body = StrToWstr(write_buffer_);
     }
 
-    if (!download_path_.empty())
-      SaveToFile((LPCVOID)&write_buffer_.front(), write_buffer_.size(),
-                 download_path_);
-
     OnReadComplete();
 
   } else if (code != CURLE_ABORTED_BY_CALLBACK) {
