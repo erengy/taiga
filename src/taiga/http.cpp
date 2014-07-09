@@ -43,6 +43,9 @@ const unsigned int kMaxSimultaneousConnectionsPerHostname = 6;
 
 HttpClient::HttpClient()
     : mode_(kHttpSilent) {
+  // Reuse existing connections
+  set_allow_reuse(true);
+
   // The default header (e.g. "User-Agent: Taiga/1.0") will be used, unless
   // another value is specified in the request header
   set_user_agent(
@@ -70,8 +73,7 @@ void HttpClient::OnError(CURLcode error_code) {
                             StrToWstr(curl_easy_strerror(error_code));
   TrimRight(error_text, L"\r\n");
 
-  LOG(LevelError, error_text);
-  LOG(LevelError, L"Connection mode: " + ToWstr(mode_));
+  LOG(LevelError, error_text + L"\nConnection mode: " + ToWstr(mode_));
 
   ui::OnHttpError(*this, error_text);
 
@@ -118,49 +120,20 @@ void HttpClient::OnReadComplete() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpClient& HttpManager::GetClient(HttpRequest& request) {
-  HttpClient* client = nullptr;
-
-  foreach_(it, clients_) {
-    if (it->second.allow_reuse() && !it->second.busy()) {
-      if (IsEqual(it->second.request().url.host, request.url.host)) {
-        LOG(LevelDebug, L"Will reuse client with the ID: " + it->first);
-        const_cast<std::wstring&>(it->first) = request.uid;
-        LOG(LevelDebug, L"Client's new ID: " + it->first);
-        client = &it->second;
-        break;
-      }
-    }
-  }
-
-  if (!client)
-    client = &clients_[request.uid];
-
-  return *client;
-}
-
 void HttpManager::CancelRequest(base::uid_t uid) {
-  if (clients_.count(uid)) {
-    auto& client = clients_[uid];
-    if (client.busy())
-      client.Cancel();
-  }
+  auto client = FindClient(uid);
+
+  if (client && client->busy())
+    client->Cancel();
 }
 
 void HttpManager::MakeRequest(HttpRequest& request, HttpClientMode mode) {
-  if (clients_.count(request.uid)) {
-    LOG(LevelWarning, L"HttpClient already exists. ID: " + request.uid);
-  }
-
-  HttpClient& client = GetClient(request);
-  client.set_mode(mode);
-
-  AddToQueue(request);
+  AddToQueue(request, mode);
   ProcessQueue();
 }
 
 void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
-  HttpClient& client = clients_[response.uid];
+  HttpClient& client = *FindClient(response.uid);
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
@@ -186,7 +159,7 @@ void HttpManager::HandleRedirect(const std::wstring& current_host,
 }
 
 void HttpManager::HandleResponse(HttpResponse& response) {
-  HttpClient& client = clients_[response.uid];
+  HttpClient& client = *FindClient(response.uid);
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
@@ -254,7 +227,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
 
 void HttpManager::FreeMemory() {
   for (auto it = clients_.cbegin(); it != clients_.cend(); ) {
-    if (!it->second.busy()) {
+    if (!it->busy()) {
       clients_.erase(it++);
     } else {
       ++it;
@@ -268,15 +241,48 @@ void HttpManager::Shutdown() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpManager::AddToQueue(HttpRequest& request) {
+HttpClient* HttpManager::FindClient(base::uid_t uid) {
+  foreach_(it, clients_)
+    if (it->request().uid == uid)
+      return &(*it);
+
+  return nullptr;
+}
+
+HttpClient& HttpManager::GetClient(const HttpRequest& request) {
+  HttpClient* client = nullptr;
+
+  foreach_(it, clients_) {
+    if (it->allow_reuse() && !it->busy()) {
+      if (IsEqual(it->request().url.host, request.url.host)) {
+        LOG(LevelDebug, L"Reusing client with the ID: " + it->request().uid +
+                        L"\nClient's new ID: " + request.uid);
+        client = &(*it);
+        break;
+      }
+    }
+  }
+
+  if (!client) {
+    clients_.push_back(HttpClient());
+    client = &clients_.back();
+    LOG(LevelDebug, L"Created a new client. Total number of clients is now " +
+                    ToWstr(static_cast<int>(clients_.size())));
+  }
+
+  return *client;
+}
+
+void HttpManager::AddToQueue(HttpRequest& request, HttpClientMode mode) {
 #ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
   LOG(LevelDebug, L"ID: " + request.uid);
 
-  requests_.push_back(request);
+  requests_.push_back(std::make_pair(request, mode));
 #else
-  HttpClient& client = clients_[request.uid];
+  HttpClient& client = GetClient(request);
+  client.set_mode(mode);
   client.MakeRequest(request);
 #endif
 }
@@ -292,18 +298,24 @@ void HttpManager::ProcessQueue() {
   for (size_t i = 0; i < requests_.size(); i++) {
     if (connections == kMaxSimultaneousConnections) {
       LOG(LevelDebug, L"Reached max connections");
-      break;
+      return;
     }
 
-    HttpRequest& request = requests_.at(i);
+    const HttpRequest& request = requests_.at(i).first;
+    HttpClientMode mode = requests_.at(i).second;
+
     if (connections_[request.url.host] == kMaxSimultaneousConnectionsPerHostname) {
       LOG(LevelDebug, L"Reached max connections for hostname: " + request.url.host);
       continue;
     } else {
       connections++;
       connections_[request.url.host]++;
+      LOG(LevelDebug, L"Connections for hostname is now " +
+                      ToWstr(static_cast<int>(connections_[request.url.host])) +
+                      L": " + request.url.host);
 
-      HttpClient& client = clients_[request.uid];
+      HttpClient& client = GetClient(request);
+      client.set_mode(mode);
       client.MakeRequest(request);
 
       requests_.erase(requests_.begin() + i);
@@ -318,6 +330,9 @@ void HttpManager::AddConnection(const string_t& hostname) {
   win::Lock lock(critical_section_);
 
   connections_[hostname]++;
+  LOG(LevelDebug, L"Connections for hostname is now " +
+                  ToWstr(static_cast<int>(connections_[hostname])) + 
+                  L": " + hostname);
 #endif
 }
 
@@ -327,6 +342,9 @@ void HttpManager::FreeConnection(const string_t& hostname) {
 
   if (connections_[hostname] > 0) {
     connections_[hostname]--;
+    LOG(LevelDebug, L"Connections for hostname is now " +
+                    ToWstr(static_cast<int>(connections_[hostname])) +
+                    L": " + hostname);
   } else {
     LOG(LevelError, L"Connections for hostname was already zero: " + hostname);
   }
