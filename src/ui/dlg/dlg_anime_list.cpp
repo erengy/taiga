@@ -1076,6 +1076,17 @@ void AnimeListDialog::RefreshList(int index) {
   if (!IsWindow())
     return;
 
+  bool group_view = !DlgMain.search_bar.filters.text.empty() &&
+                    win::GetVersion() > win::kVersionXp;
+
+  // Remember current position
+  int current_position = -1;
+  if (index == -1 && !group_view) {
+    current_position = listview.GetTopIndex() + listview.GetCountPerPage() - 1;
+    if (current_position > listview.GetItemCount() - 1)
+      current_position = listview.GetItemCount() - 1;
+  }
+
   // Remember current status
   if (index > anime::kNotInList)
     current_status_ = index;
@@ -1086,8 +1097,6 @@ void AnimeListDialog::RefreshList(int index) {
   listview.RefreshItem(-1);
 
   // Enable group view
-  bool group_view = !DlgMain.search_bar.filters.text.empty() &&
-                    win::GetVersion() > win::kVersionXp;
   listview.EnableGroupView(group_view);
 
   // Add items to list
@@ -1134,6 +1143,9 @@ void AnimeListDialog::RefreshList(int index) {
                 listview.GetSortOrder(),
                 listview.GetSortType(listview.GetSortColumn()),
                 ui::ListViewCompareProc);
+
+  if (current_position > -1)
+    listview.EnsureVisible(current_position);
 
   // Show again
   listview.Show(SW_SHOW);

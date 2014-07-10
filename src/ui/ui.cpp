@@ -399,7 +399,9 @@ bool OnLibraryEntryEditTitles(int id, std::wstring& titles) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void OnHistoryAddItem(const HistoryItem& history_item) {
-  OnHistoryChange();
+  DlgHistory.RefreshList();
+  DlgMain.treeview.RefreshHistoryCounter();
+  DlgNowPlaying.Refresh(false, false, false);
 
   if (history_item.mode == taiga::kHttpServiceAddLibraryEntry ||
       history_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
