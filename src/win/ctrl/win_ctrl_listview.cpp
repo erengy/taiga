@@ -125,6 +125,10 @@ BOOL ListView::GetCheckState(UINT index) {
   return ListView_GetCheckState(window_, index);
 }
 
+int ListView::GetCountPerPage() {
+  return ListView_GetCountPerPage(window_);
+}
+
 HWND ListView::GetHeader() {
   return ListView_GetHeader(window_);
 }
@@ -183,6 +187,10 @@ INT ListView::GetSelectionMark() {
 
 BOOL ListView::GetSubItemRect(int item, int subitem, LPRECT rect) {
   return ListView_GetSubItemRect(window_, item, subitem, LVIR_BOUNDS, rect);
+}
+
+int ListView::GetTopIndex() {
+  return ListView_GetTopIndex(window_);
 }
 
 DWORD ListView::GetView() {

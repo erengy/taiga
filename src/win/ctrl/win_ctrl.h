@@ -123,6 +123,7 @@ public:
   int        EnableGroupView(bool enable);
   BOOL       EnsureVisible(int item);
   BOOL       GetCheckState(UINT index);
+  int        GetCountPerPage();
   HWND       GetHeader();
   int        GetItemCount();
   LPARAM     GetItemParam(int i);
@@ -136,6 +137,7 @@ public:
   int        GetSortOrder();
   int        GetSortType();
   BOOL       GetSubItemRect(int item, int subitem, LPRECT rect);
+  int        GetTopIndex();
   DWORD      GetView();
   int        HitTest(bool return_subitem = false);
   int        HitTestEx(LPLVHITTESTINFO lplvhi);
