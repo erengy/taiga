@@ -400,6 +400,7 @@ bool OnLibraryEntryEditTitles(int id, std::wstring& titles) {
 
 void OnHistoryAddItem(const HistoryItem& history_item) {
   DlgHistory.RefreshList();
+  DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
 
@@ -422,6 +423,7 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
 
 void OnHistoryChange() {
   DlgHistory.RefreshList();
+  DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
   DlgAnimeList.RefreshList();

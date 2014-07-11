@@ -377,6 +377,10 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               Stats.CalculateAll();
               DlgStats.Refresh();
               return TRUE;
+            case kSidebarItemSearch:
+              // Refresh search results
+              DlgSearch.RefreshList();
+              return TRUE;
             case kSidebarItemSeasons:
               // Refresh season data
               DlgSeason.RefreshData();

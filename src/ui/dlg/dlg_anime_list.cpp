@@ -1081,18 +1081,17 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Remember current position
   int current_position = -1;
-  if (index == -1 && !group_view) {
+  if (index == -1 && !group_view)
     current_position = listview.GetTopIndex() + listview.GetCountPerPage() - 1;
-    if (current_position > listview.GetItemCount() - 1)
-      current_position = listview.GetItemCount() - 1;
-  }
 
   // Remember current status
   if (index > anime::kNotInList)
     current_status_ = index;
 
-  // Hide list to avoid visual defects and gain performance
-  listview.Hide();
+  // Disable drawing
+  listview.SetRedraw(FALSE);
+
+  // Clear list
   listview.DeleteAllItems();
   listview.RefreshItem(-1);
 
@@ -1144,11 +1143,16 @@ void AnimeListDialog::RefreshList(int index) {
                 listview.GetSortType(listview.GetSortColumn()),
                 ui::ListViewCompareProc);
 
-  if (current_position > -1)
+  if (current_position > -1) {
+    if (current_position > listview.GetItemCount() - 1)
+      current_position = listview.GetItemCount() - 1;
     listview.EnsureVisible(current_position);
+  }
 
-  // Show again
-  listview.Show(SW_SHOW);
+  // Redraw
+  listview.SetRedraw(TRUE);
+  listview.RedrawWindow(nullptr, nullptr,
+                        RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void AnimeListDialog::RefreshListItem(int anime_id) {
@@ -1174,8 +1178,8 @@ void AnimeListDialog::RefreshTabs(int index) {
   if (index > anime::kNotInList)
     current_status_ = index;
 
-  // Hide
-  tab.Hide();
+  // Disable drawing
+  tab.SetRedraw(FALSE);
 
   // Refresh text
   for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
@@ -1191,8 +1195,10 @@ void AnimeListDialog::RefreshTabs(int index) {
   }
   tab.SetCurrentlySelected(tab_index);
 
-  // Show again
-  tab.Show(SW_SHOW);
+  // Redraw
+  tab.SetRedraw(TRUE);
+  tab.RedrawWindow(nullptr, nullptr,
+                   RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void AnimeListDialog::GoToPreviousTab() {

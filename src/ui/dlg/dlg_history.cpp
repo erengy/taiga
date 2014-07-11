@@ -167,8 +167,10 @@ void HistoryDialog::RefreshList() {
   if (!IsWindow())
     return;
 
+  // Disable drawing
+  list_.SetRedraw(FALSE);
+
   // Clear list
-  list_.Hide();
   list_.DeleteAllItems();
 
   // Add queued items
@@ -226,7 +228,10 @@ void HistoryDialog::RefreshList() {
     list_.SetItem(i, 2, it->time.c_str());
   }
 
-  list_.Show();
+  // Redraw
+  list_.SetRedraw(TRUE);
+  list_.RedrawWindow(nullptr, nullptr,
+                     RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 bool HistoryDialog::MoveItems(int pos) {

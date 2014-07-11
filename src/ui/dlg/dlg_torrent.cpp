@@ -359,8 +359,10 @@ void TorrentDialog::RefreshList() {
   if (!feed)
     return;
 
-  // Hide list to avoid visual defects and gain performance
-  list_.Hide();
+  // Disable drawing
+  list_.SetRedraw(FALSE);
+
+  // Clear list
   list_.DeleteAllItems();
 
   // Add items
@@ -417,8 +419,10 @@ void TorrentDialog::RefreshList() {
     list_.SetCheckState(index, it->state == kFeedItemSelected);
   }
 
-  // Show again
-  list_.Show();
+  // Redraw
+  list_.SetRedraw(TRUE);
+  list_.RedrawWindow(nullptr, nullptr,
+                     RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void TorrentDialog::Search(std::wstring url, int anime_id) {

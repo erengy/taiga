@@ -172,16 +172,20 @@ void SearchDialog::RefreshList() {
   if (!IsWindow())
     return;
 
-  // Hide and clear the list
-  list_.Hide();
+  // Disable drawing
+  list_.SetRedraw(FALSE);
+
+  // Clear list
   list_.DeleteAllItems();
 
   // Add anime items to list
   foreach_(it, anime_ids_)
     AddAnimeToList(*it);
 
-  // Show the list again
-  list_.Show(SW_SHOW);
+  // Redraw
+  list_.SetRedraw(TRUE);
+  list_.RedrawWindow(nullptr, nullptr,
+                     RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
 void SearchDialog::Search(const std::wstring& title) {
