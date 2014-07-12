@@ -512,7 +512,7 @@ void SeasonDialog::RefreshData(int anime_id) {
     ImageDatabase.Load(*id, true, true);
 
     // Get details
-    if (anime::MetadataNeedsRefresh(*anime_item))
+    if (anime_id > 0 || anime::MetadataNeedsRefresh(*anime_item))
       sync::GetMetadataById(*id);
   }
 
