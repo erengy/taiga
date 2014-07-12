@@ -520,20 +520,21 @@ bool IsInsideRootFolders(const std::wstring& path) {
 }
 
 bool ValidateFolder(Item& item) {
-  if (!item.GetFolder().empty() &&
-      !FolderExists(item.GetFolder())) {
-    LOG(LevelWarning, L"Folder doesn't exist anymore.");
-    LOG(LevelWarning, L"Path: " + item.GetFolder());
-
-    item.SetFolder(L"");
-
-    for (int i = 1; i <= item.GetAvailableEpisodeCount(); i++)
-      item.SetEpisodeAvailability(i, false, L"");
-
+  if (item.GetFolder().empty())
     return false;
-  }
 
-  return true;
+  if (FolderExists(item.GetFolder()))
+    return true;
+
+  LOG(LevelWarning, L"Folder doesn't exist anymore.\n"
+                    L"Path: " + item.GetFolder());
+
+  item.SetFolder(L"");
+
+  for (int i = 1; i <= item.GetAvailableEpisodeCount(); i++)
+    item.SetEpisodeAvailability(i, false, L"");
+
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
