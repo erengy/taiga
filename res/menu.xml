@@ -151,11 +151,11 @@
 	<!-- Search -->
 	<menu name="Search">
 		<!-- Note: Use %title% as the search string -->
-		<item name="AniDB"        action="URL(http://anidb.net/perl-bin/animedb.pl?show=animelist&amp;adb.search=%title%&amp;noalias=1&amp;do.update=update)"/>
-		<item name="AnimeNfo"     action="URL(http://www.animenfo.com/search.php?query=%title%&amp;queryin=anime_titles&amp;action=Go&amp;option=keywords)"/>
-		<item name="ANN"          action="URL(http://www.animenewsnetwork.com/search?cx=016604166282602569737%3Aznd1ysjewre&amp;cof=FORID%3A11&amp;q=%title%)"/>
-		<item name="MyAnimeList"  action="URL(http://myanimelist.net/anime.php?q=%title%)"/>
-		<item name="Wikipedia"    action="URL(http://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
+		<item name="AniDB"              action="URL(http://anidb.net/perl-bin/animedb.pl?show=animelist&amp;adb.search=%title%&amp;noalias=1&amp;do.update=update)"/>
+		<item name="Anime News Network" action="URL(http://www.animenewsnetwork.com/search?q=%title%)"/>
+		<item name="Hummingbird"        action="URL(http://hummingbird.me/search?query=%title%)"/>
+		<item name="MyAnimeList"        action="URL(http://myanimelist.net/anime.php?q=%title%)"/>
+		<item name="Wikipedia"          action="URL(http://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
 		<item type="separator"/>
 		<item name="NyaaTorrents" action="SearchTorrents(http://www.nyaa.se/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%title%)"/>
 		<item name="TokyoTosho"   action="SearchTorrents(http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&amp;_id=7b99f981c5b1f02354642f4e271cca43&amp;_render=rss)"/>
