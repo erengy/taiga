@@ -104,12 +104,12 @@ private:
 
 class Client : public win::Thread {
 public:
-  Client();
+  Client(const Request& request);
   virtual ~Client();
 
   void Cancel();
   void Cleanup(bool reuse);
-  bool MakeRequest(Request request);
+  bool MakeRequest(const Request& request);
 
   bool allow_reuse() const;
   bool busy() const;

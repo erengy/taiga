@@ -27,7 +27,7 @@
 namespace base {
 namespace http {
 
-bool Client::MakeRequest(Request request) {
+bool Client::MakeRequest(const Request& request) {
   // Check if the client is busy
   if (busy_) {
     LOG(LevelWarning, L"Client is busy. ID: " + request_.uid);
@@ -38,11 +38,11 @@ bool Client::MakeRequest(Request request) {
 
   // Set the new request
   request_ = request;
-  LOG(LevelDebug, L"ID: " + request.uid);
+  LOG(LevelDebug, L"ID: " + request_.uid);
 
   // Ensure that the response has the same parameter and UID as the request
-  response_.parameter = request.parameter;
-  response_.uid = request.uid;
+  response_.parameter = request_.parameter;
+  response_.uid = request_.uid;
 
   if (Initialize())
     if (SetRequestOptions())

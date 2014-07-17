@@ -41,8 +41,9 @@ namespace taiga {
 const unsigned int kMaxSimultaneousConnections = 10;
 const unsigned int kMaxSimultaneousConnectionsPerHostname = 6;
 
-HttpClient::HttpClient()
-    : mode_(kHttpSilent) {
+HttpClient::HttpClient(const HttpRequest& request)
+    : base::http::Client(request),
+      mode_(kHttpSilent) {
   // Reuse existing connections
   set_allow_reuse(true);
 
@@ -268,7 +269,7 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
   }
 
   if (!client) {
-    clients_.push_back(HttpClient());
+    clients_.push_back(HttpClient(request));
     client = &clients_.back();
     LOG(LevelDebug, L"Created a new client. Total number of clients is now " +
                     ToWstr(static_cast<int>(clients_.size())));

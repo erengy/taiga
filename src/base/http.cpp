@@ -49,7 +49,7 @@ void Response::Clear() {
   body.clear();
 }
 
-Client::Client()
+Client::Client(const Request& request)
     : allow_reuse_(false),
       auto_redirect_(true),
       busy_(false),
@@ -59,6 +59,7 @@ Client::Client()
       current_length_(0),
       curl_handle_(nullptr),
       header_list_(nullptr),
+      request_(request),
       user_agent_(L"Mozilla/5.0") {
 }
 

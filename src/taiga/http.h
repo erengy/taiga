@@ -59,7 +59,7 @@ class HttpClient : public base::http::Client {
 public:
   friend class HttpManager;
 
-  HttpClient();
+  HttpClient(const HttpRequest& request);
   virtual ~HttpClient() {}
 
   HttpClientMode mode() const;
