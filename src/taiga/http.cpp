@@ -258,6 +258,10 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
         LOG(LevelDebug, L"Reusing client with the ID: " + it->request().uid +
                         L"\nClient's new ID: " + request.uid);
         client = &(*it);
+        // Proxy settings might have changed since then
+        client->set_proxy(Settings[kApp_Connection_ProxyHost],
+                          Settings[kApp_Connection_ProxyUsername],
+                          Settings[kApp_Connection_ProxyPassword]);
         break;
       }
     }
