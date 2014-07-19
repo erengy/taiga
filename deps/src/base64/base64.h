@@ -6,6 +6,7 @@
 #ifndef BASE64_H
 #define BASE64_H
 
+#include <string>
 #include <windows.h>
 
 // =============================================================================
@@ -34,8 +35,8 @@ public:
   virtual void Encode(LPCSTR sMessage);
   virtual void Decode(LPCSTR sMessage);
 
-  virtual LPCSTR DecodedMessage() const;
-  virtual LPCSTR EncodedMessage() const;
+  virtual std::string DecodedMessage() const;
+  virtual std::string EncodedMessage() const;
 
   virtual void AllocEncode(DWORD);
   virtual void AllocDecode(DWORD);

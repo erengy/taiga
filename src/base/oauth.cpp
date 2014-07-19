@@ -145,7 +145,7 @@ std::wstring OAuth::CreateSignature(const std::wstring& signature_base,
   std::string hash = HmacSha1(WstrToStr(key), WstrToStr(signature_base));
 
   // Encode signature in Base64
-  std::wstring signature = Base64Encode(hash);
+  std::wstring signature = StrToWstr(Base64Encode(hash));
 
   // Return URL-encoded signature
   return EncodeUrl(signature);

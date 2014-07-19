@@ -21,9 +21,10 @@
 
 #include <string>
 
-std::wstring Base64Decode(const std::string& str, bool for_filename = false);
+std::string Base64Decode(const std::string& str);
+std::string Base64Encode(const std::string& str);
+
 std::wstring Base64Decode(const std::wstring& str, bool for_filename = false);
-std::wstring Base64Encode(const std::string& str, bool for_filename = false);
 std::wstring Base64Encode(const std::wstring& str, bool for_filename = false);
 
 #endif  // TAIGA_BASE_BASE64_H

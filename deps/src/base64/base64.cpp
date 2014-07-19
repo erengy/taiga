@@ -34,12 +34,12 @@ Base64Coder::~Base64Coder() {
 
 // =============================================================================
 
-LPCSTR Base64Coder::DecodedMessage() const {
-  return (LPCSTR)m_pDBuffer;
+std::string Base64Coder::DecodedMessage() const {
+  return std::string((LPCSTR)m_pDBuffer, m_nDDataLen);
 }
 
-LPCSTR Base64Coder::EncodedMessage() const {
-  return (LPCSTR)m_pEBuffer;
+std::string Base64Coder::EncodedMessage() const {
+  return std::string((LPCSTR)m_pEBuffer, m_nEDataLen);
 }
 
 void Base64Coder::AllocEncode(DWORD nSize) {

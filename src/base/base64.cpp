@@ -23,42 +23,42 @@
 #include "base64.h"
 #include "string.h"
 
-std::wstring Base64Decode(const std::string& str, bool for_filename) {
+std::string Base64Decode(const std::string& str) {
   if (str.empty())
-    return EmptyString();
+    return str;
 
   Base64Coder coder;
   coder.Decode((BYTE*)str.c_str(), str.size());
 
-  if (for_filename) {
-    std::wstring msg = StrToWstr(coder.DecodedMessage());
-    ReplaceChar(msg, '-', '/');
-    return msg;
-  } else {
-    return StrToWstr(coder.DecodedMessage());
-  }
+  return coder.DecodedMessage();
 }
 
-std::wstring Base64Decode(const std::wstring& str, bool for_filename) {
-  return Base64Decode(WstrToStr(str), for_filename);
-}
-
-std::wstring Base64Encode(const std::string& str, bool for_filename) {
+std::string Base64Encode(const std::string& str) {
   if (str.empty())
-    return EmptyString();
+    return str;
 
   Base64Coder coder;
   coder.Encode((BYTE*)str.c_str(), str.size());
 
-  if (for_filename) {
-    std::wstring msg = StrToWstr(coder.EncodedMessage());
-    ReplaceChar(msg, '/', '-');
-    return msg;
-  } else {
-    return StrToWstr(coder.EncodedMessage());
-  }
+  return coder.EncodedMessage();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::wstring Base64Decode(const std::wstring& str, bool for_filename) {
+  std::wstring output = StrToWstr(Base64Decode(WstrToStr(str)));
+
+  if (for_filename)
+    ReplaceChar(output, '-', '/');
+
+  return output;
 }
 
 std::wstring Base64Encode(const std::wstring& str, bool for_filename) {
-  return Base64Encode(WstrToStr(str), for_filename);
+  std::wstring output = StrToWstr(Base64Encode(WstrToStr(str)));
+
+  if (for_filename)
+    ReplaceChar(output, '/', '-');
+
+  return output;
 }
