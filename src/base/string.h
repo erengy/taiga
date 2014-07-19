@@ -77,7 +77,9 @@ std::wstring ToUpper_Copy(std::wstring str, bool use_locale = false);
 
 bool ToBool(const std::wstring& str);
 double ToDouble(const std::wstring& str);
+int ToInt(const std::string& str);
 int ToInt(const std::wstring& str);
+std::string ToStr(const INT& value);
 std::wstring ToWstr(const INT& value);
 std::wstring ToWstr(const ULONG& value);
 std::wstring ToWstr(const INT64& value);

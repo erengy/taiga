@@ -574,8 +574,18 @@ double ToDouble(const wstring& str) {
   return _wtof(str.c_str());
 }
 
+int ToInt(const string& str) {
+  return atoi(str.c_str());
+}
+
 int ToInt(const wstring& str) {
   return _wtoi(str.c_str());
+}
+
+string ToStr(const INT& value) {
+  char buffer[65];
+  _ltoa_s(value, buffer, 65, 10);
+  return string(buffer);
 }
 
 wstring ToWstr(const INT& value) {
