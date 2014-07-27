@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0"?>
 <media_players>
+	<!-- ACE Player HD (VLC) -->
+	<player>
+		<name>ACE Player HD (VLC)</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>0</mode>
+		<class>QWidget</class>
+		<file>ace_player.exe</file>
+		<folder>%AppData%\ACEStream\player\</folder>
+		<edit mode="2">Ace Player HD</edit>
+	</player>
 	<!-- ALLPlayer -->
 	<player>
 		<name>ALLPlayer</name>
