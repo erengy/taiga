@@ -44,8 +44,7 @@ bool SeasonDatabase::Load(std::wstring file) {
   std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + file;
   xml_parse_result parse_result = document.load_file(path.c_str());
 
-  if (parse_result.status != pugi::status_ok &&
-      parse_result.status != pugi::status_file_not_found) {
+  if (parse_result.status != pugi::status_ok) {
     ui::DisplayErrorMessage(L"Could not read season data.", path.c_str());
     return false;
   }
