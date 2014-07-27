@@ -388,10 +388,14 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       if (rect_item.PtIn(pt)) {
         if (anime_item->IsInList()) {
           std::wstring text;
-          if (anime_item->IsNewEpisodeAvailable())
-            AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L" is on computer");
-          if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
-            AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) + L" is available for download");
+          if (IsAllEpisodesAvailable(*anime_item)) {
+            AppendString(text, L"All episodes are on computer");
+          } else {
+            if (anime_item->IsNewEpisodeAvailable())
+              AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L" is on computer");
+            if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
+              AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) + L" is available for download");
+          }
           if (!text.empty()) {
             tooltips.AddTip(2, text.c_str(), nullptr, &rect_item, false);
           } else {
