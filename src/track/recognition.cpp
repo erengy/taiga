@@ -263,6 +263,10 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
   // Remove zero width space character
   EraseChars(title, L"\u200B");  // TEMP
 
+  // TEMP: Fix "Futsuu no Joshikousei ga [Locodol] Yatte Mita."
+  // We're not going to need this once we upgrade to Anitomy.
+  Replace(title, L"[Locodol]", L"Locodol");
+
   // Retrieve file name from full path
   if (title.length() > 2 && title.at(1) == ':' && title.at(2) == '\\') {
     episode.folder = GetPathOnly(title);
