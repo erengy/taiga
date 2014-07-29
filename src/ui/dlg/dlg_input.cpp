@@ -52,7 +52,6 @@ BOOL InputDialog::OnInitDialog() {
   // Set text style and properties
   edit_.Attach(GetDlgItem(IDC_EDIT_INPUT));
   spin_.Attach(GetDlgItem(IDC_SPIN_INPUT));
-  edit_.LimitText(256);
   if (numbers_only_) {
     edit_.SetStyle(ES_NUMBER, 0);
     spin_.SetBuddy(edit_.GetWindowHandle());
