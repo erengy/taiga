@@ -77,3 +77,36 @@ bool UncompressGzippedString(const std::string& input, std::string& output) {
 
   return status == Z_STREAM_END;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool DeflateString(const std::string& input, std::string& output) {
+  uLong source_length = input.length();
+  uLong destination_length = compressBound(source_length);
+
+  output.resize(destination_length);
+
+  int result = compress((Bytef*)output.data(), &destination_length,
+                        (Bytef*)input.data(), source_length);
+
+  if (output.length() != destination_length)
+    output.resize(destination_length);
+
+  return result == Z_OK;
+}
+
+bool InflateString(const std::string& input, std::string& output,
+                   size_t output_length) {
+  uLong source_length = input.length();
+  uLong destination_length = output_length;
+
+  output.resize(destination_length);
+
+  int result = uncompress((Bytef*)output.data(), &destination_length,
+                          (Bytef*)input.data(), source_length);
+
+  if (output.length() != destination_length)
+    output.resize(destination_length);
+
+  return result == Z_OK;
+}

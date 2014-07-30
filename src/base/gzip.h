@@ -24,4 +24,7 @@
 bool UncompressGzippedFile(const std::string& file, std::string& output);
 bool UncompressGzippedString(const std::string& input, std::string& output);
 
+bool DeflateString(const std::string& input, std::string& output);
+bool InflateString(const std::string& input, std::string& output, size_t output_length);
+
 #endif  // TAIGA_BASE_GZIP_H
