@@ -60,6 +60,8 @@ enum Icons16px {
   kIcon16_Chart,
   kIcon16_Feed,
   kIcon16_Details,
+  kIcon16_Import,
+  kIcon16_Export,
   kIconCount16px
 };
 

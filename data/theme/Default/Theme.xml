@@ -36,6 +36,8 @@
 			<icon name="chart"/>
 			<icon name="feed"/>
 			<icon name="ui-scroll-pane-detail"/>
+			<icon name="document-import"/>
+			<icon name="document-export"/>
 		</set_16px>
 		<set_24px>
 			<icon name="arrow-circle-double-135"/>

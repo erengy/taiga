@@ -18,6 +18,7 @@
 
 #include "base/crypto.h"
 #include "base/file.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/history.h"
@@ -32,10 +33,12 @@
 #include "track/media.h"
 #include "ui/dlg/dlg_feed_filter.h"
 #include "ui/dlg/dlg_format.h"
+#include "ui/dlg/dlg_input.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_settings_page.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 #include "win/win_commondialog.h"
 
 namespace ui {
@@ -376,6 +379,9 @@ BOOL SettingsPage::OnInitDialog() {
       toolbar.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
       toolbar.InsertButton(3, ui::kIcon16_ArrowUp,   103, fsState2, 0, 3, nullptr, L"Move up");
       toolbar.InsertButton(4, ui::kIcon16_ArrowDown, 104, fsState2, 0, 4, nullptr, L"Move down");
+      toolbar.InsertButton(5, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
+      toolbar.InsertButton(6, ui::kIcon16_Import,    106, fsState1, 0, 6, nullptr, L"Import filters...");
+      toolbar.InsertButton(7, ui::kIcon16_Export,    107, fsState1, 0, 7, nullptr, L"Export filters...");
       toolbar.SetWindowHandle(nullptr);
       break;
     }
@@ -591,6 +597,44 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             list.SetSelectedItem(index + 1);
           }
           list.SetWindowHandle(nullptr);
+          return TRUE;
+        }
+        // Import filters
+        case 106: {
+          InputDialog dlg;
+          dlg.title = L"Import Filters";
+          dlg.info = L"Please enter encoded text below:";
+          dlg.Show(parent->GetWindowHandle());
+          if (dlg.result == IDOK) {
+            std::wstring data, metadata;
+            StringCoder coder;
+            bool parsed = coder.Decode(dlg.text, data, metadata);
+            if (parsed) {
+              parsed = Aggregator.filter_manager.Import(data, parent->feed_filters_);
+              if (parsed) {
+                parent->RefreshTorrentFilterList(GetDlgItem(IDC_LIST_TORRENT_FILTER));
+              }
+            }
+            if (!parsed) {
+              LOG(LevelError, metadata);
+              LOG(LevelError, data);
+              ui::DisplayErrorMessage(L"Could not parse filter string.", L"Import Filters");
+            }
+          }
+          return TRUE;
+        }
+        // Export filters
+        case 107: {
+          std::wstring data;
+          Aggregator.filter_manager.Export(data, parent->feed_filters_);
+          std::wstring metadata = Taiga.version;
+          InputDialog dlg;
+          StringCoder coder;
+          if (coder.Encode(data, dlg.text, metadata)) {
+            dlg.title = L"Export Filters";
+            dlg.info = L"Please copy the text below to share it with other people:";
+            dlg.Show(parent->GetWindowHandle());
+          }
           return TRUE;
         }
 
