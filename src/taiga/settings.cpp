@@ -254,38 +254,7 @@ bool AppSettings::Load() {
 
   // Torrent filters
   xml_node node_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
-  Aggregator.filter_manager.filters.clear();
-  foreach_xmlnode_(item, node_filter, L"item") {
-    Aggregator.filter_manager.AddFilter(
-        static_cast<FeedFilterAction>(
-            Aggregator.filter_manager.GetIndexFromShortcode(
-                kFeedFilterShortcodeAction, item.attribute(L"action").value())),
-        static_cast<FeedFilterMatch>(
-            Aggregator.filter_manager.GetIndexFromShortcode(
-                kFeedFilterShortcodeMatch, item.attribute(L"match").value())),
-        static_cast<FeedFilterOption>(
-            Aggregator.filter_manager.GetIndexFromShortcode(
-                kFeedFilterShortcodeOption, item.attribute(L"option").value())),
-        item.attribute(L"enabled").as_bool(),
-        item.attribute(L"name").value());
-    foreach_xmlnode_(anime, item, L"anime") {
-      auto& filter = Aggregator.filter_manager.filters.back();
-      filter.anime_ids.push_back(anime.attribute(L"id").as_int());
-    }
-    foreach_xmlnode_(condition, item, L"condition") {
-      Aggregator.filter_manager.filters.back().AddCondition(
-          static_cast<FeedFilterElement>(
-              Aggregator.filter_manager.GetIndexFromShortcode(
-                  kFeedFilterShortcodeElement,
-                  condition.attribute(L"element").value())),
-          static_cast<FeedFilterOperator>(
-              Aggregator.filter_manager.GetIndexFromShortcode(
-                  kFeedFilterShortcodeOperator,
-                  condition.attribute(L"operator").value())),
-          condition.attribute(L"value").value());
-    }
-  }
-
+  Aggregator.filter_manager.Import(node_filter, Aggregator.filter_manager.filters);
   if (Aggregator.filter_manager.filters.empty())
     Aggregator.filter_manager.AddPresets();
   auto feed = Aggregator.Get(kFeedCategoryLink);
@@ -345,34 +314,7 @@ bool AppSettings::Save() {
 
   // Torrent filters
   xml_node torrent_filter = settings.child(L"rss").child(L"torrent").child(L"filter");
-  foreach_(it, Aggregator.filter_manager.filters) {
-    xml_node item = torrent_filter.append_child(L"item");
-    item.append_attribute(L"action") =
-        Aggregator.filter_manager.GetShortcodeFromIndex(
-            kFeedFilterShortcodeAction, it->action).c_str();
-    item.append_attribute(L"match") =
-        Aggregator.filter_manager.GetShortcodeFromIndex(
-            kFeedFilterShortcodeMatch, it->match).c_str();
-    item.append_attribute(L"option") =
-        Aggregator.filter_manager.GetShortcodeFromIndex(
-            kFeedFilterShortcodeOption, it->option).c_str();
-    item.append_attribute(L"enabled") = it->enabled;
-    item.append_attribute(L"name") = it->name.c_str();
-    foreach_(ita, it->anime_ids) {
-      xml_node anime = item.append_child(L"anime");
-      anime.append_attribute(L"id") = *ita;
-    }
-    foreach_(itc, it->conditions) {
-      xml_node condition = item.append_child(L"condition");
-      condition.append_attribute(L"element") =
-          Aggregator.filter_manager.GetShortcodeFromIndex(
-              kFeedFilterShortcodeElement, itc->element).c_str();
-      condition.append_attribute(L"operator") =
-          Aggregator.filter_manager.GetShortcodeFromIndex(
-              kFeedFilterShortcodeOperator, itc->op).c_str();
-      condition.append_attribute(L"value") = itc->value.c_str();
-    }
-  }
+  Aggregator.filter_manager.Export(torrent_filter, Aggregator.filter_manager.filters);
 
   // Write to registry
   win::Registry reg;

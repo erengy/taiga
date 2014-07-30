@@ -19,6 +19,7 @@
 #include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
+#include "base/xml.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -606,6 +607,92 @@ void FeedFilterManager::InitializeShortcodes() {
   option_shortcodes_[kFeedFilterOptionDefault] = L"default";
   option_shortcodes_[kFeedFilterOptionDeactivate] = L"deactivate";
   option_shortcodes_[kFeedFilterOptionHide] = L"hide";
+}
+
+bool FeedFilterManager::Import(const std::wstring& input,
+                               std::vector<FeedFilter>& filters) {
+  xml_document document;
+  xml_parse_result result = document.load(input.c_str());
+
+  if (result.status != pugi::status_ok)
+    return false;
+
+  Import(document, filters);
+  return true;
+}
+
+void FeedFilterManager::Import(const xml_node& node_filter,
+                               std::vector<FeedFilter>& filters) {
+  filters.clear();
+
+  foreach_xmlnode_(item, node_filter, L"item") {
+    FeedFilter filter;
+
+    filter.action = static_cast<FeedFilterAction>(GetIndexFromShortcode(
+        kFeedFilterShortcodeAction, item.attribute(L"action").value()));
+    filter.enabled = item.attribute(L"enabled").as_bool();
+    filter.match = static_cast<FeedFilterMatch>(GetIndexFromShortcode(
+        kFeedFilterShortcodeMatch, item.attribute(L"match").value()));
+    filter.name = item.attribute(L"name").value();
+    filter.option = static_cast<FeedFilterOption>(GetIndexFromShortcode(
+        kFeedFilterShortcodeOption, item.attribute(L"option").value()));
+
+    foreach_xmlnode_(anime, item, L"anime") {
+      filter.anime_ids.push_back(anime.attribute(L"id").as_int());
+    }
+
+    foreach_xmlnode_(condition, item, L"condition") {
+      filter.AddCondition(
+          static_cast<FeedFilterElement>(GetIndexFromShortcode(
+              kFeedFilterShortcodeElement, condition.attribute(L"element").value())),
+          static_cast<FeedFilterOperator>(GetIndexFromShortcode(
+              kFeedFilterShortcodeOperator, condition.attribute(L"operator").value())),
+          condition.attribute(L"value").value());
+    }
+
+    filters.push_back(filter);
+  }
+}
+
+void FeedFilterManager::Export(std::wstring& output,
+                               const std::vector<FeedFilter>& filters) {
+  xml_document node_filter;
+  Export(node_filter, filters);
+  output = XmlGetNodeAsString(node_filter);
+}
+
+void FeedFilterManager::Export(pugi::xml_node& node_filter,
+                               const std::vector<FeedFilter>& filters) {
+  foreach_(it, filters) {
+    xml_node item = node_filter.append_child(L"item");
+    item.append_attribute(L"action") =
+        Aggregator.filter_manager.GetShortcodeFromIndex(
+            kFeedFilterShortcodeAction, it->action).c_str();
+    item.append_attribute(L"match") =
+        Aggregator.filter_manager.GetShortcodeFromIndex(
+            kFeedFilterShortcodeMatch, it->match).c_str();
+    item.append_attribute(L"option") =
+        Aggregator.filter_manager.GetShortcodeFromIndex(
+            kFeedFilterShortcodeOption, it->option).c_str();
+    item.append_attribute(L"enabled") = it->enabled;
+    item.append_attribute(L"name") = it->name.c_str();
+
+    foreach_(ita, it->anime_ids) {
+      xml_node anime = item.append_child(L"anime");
+      anime.append_attribute(L"id") = *ita;
+    }
+
+    foreach_(itc, it->conditions) {
+      xml_node condition = item.append_child(L"condition");
+      condition.append_attribute(L"element") =
+          Aggregator.filter_manager.GetShortcodeFromIndex(
+              kFeedFilterShortcodeElement, itc->element).c_str();
+      condition.append_attribute(L"operator") =
+          Aggregator.filter_manager.GetShortcodeFromIndex(
+              kFeedFilterShortcodeOperator, itc->op).c_str();
+      condition.append_attribute(L"value") = itc->value.c_str();
+    }
+  }
 }
 
 std::wstring FeedFilterManager::CreateNameFromConditions(

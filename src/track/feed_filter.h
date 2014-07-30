@@ -23,6 +23,10 @@
 #include <string>
 #include <vector>
 
+namespace pugi {
+class xml_node;
+}
+
 enum FeedFilterElement {
   kFeedFilterElement_None = -1,
   kFeedFilterElement_Meta_Id,
@@ -151,6 +155,11 @@ public:
   void FilterArchived(Feed& feed);
   bool IsItemDownloadAvailable(Feed& feed);
   void MarkNewEpisodes(Feed& feed);
+
+  bool Import(const std::wstring& input, std::vector<FeedFilter>& filters);
+  void Import(const pugi::xml_node& node_filter, std::vector<FeedFilter>& filters);
+  void Export(std::wstring& output, const std::vector<FeedFilter>& filters);
+  void Export(pugi::xml_node& node_filter, const std::vector<FeedFilter>& filters);
 
   std::wstring CreateNameFromConditions(const FeedFilter& filter);
   std::wstring TranslateCondition(const FeedFilterCondition& condition);
