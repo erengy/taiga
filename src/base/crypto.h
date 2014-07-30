@@ -24,6 +24,22 @@
 std::wstring SimpleEncrypt(std::wstring str);
 std::wstring SimpleDecrypt(std::wstring str);
 
+class StringCoder {
+public:
+  StringCoder();
+
+  bool Encode(const std::wstring& input, std::wstring& output, const std::wstring& metadata);
+  bool Decode(const std::wstring& input, std::wstring& output, std::wstring& metadata);
+
+private:
+  std::string ConvertSizeToString(unsigned short value);
+  unsigned short ReadSize(const std::string& str, unsigned short pos);
+
+  const std::string magic_string_;
+  const size_t min_length_;
+  const unsigned char version_;
+};
+
 std::string HmacSha1(const std::string& key_bytes, const std::string& data);
 
 #endif  // TAIGA_BASE_CRYPTO_H

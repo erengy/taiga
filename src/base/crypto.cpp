@@ -19,7 +19,9 @@
 #include <string>
 #include <windows.h>
 
+#include "base64.h"
 #include "crypto.h"
+#include "gzip.h"
 #include "string.h"
 
 namespace base {
@@ -76,6 +78,103 @@ std::wstring SimpleDecrypt(std::wstring str) {
     TrimRight(buffer, std::wstring(1, base::encryption_char).c_str());
 
   return buffer;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+StringCoder::StringCoder()
+    : magic_string_("TAI"),
+      min_length_(3 + 1 + 2 + 2),
+      version_(0x00) {
+}
+
+bool StringCoder::Encode(const std::wstring& input, std::wstring& output,
+                         const std::wstring& metadata) {
+  if (input.empty())
+    return false;
+
+  std::string data;
+  if (!DeflateString(WstrToStr(input), data))
+    return false;
+
+  std::string buffer;
+  buffer.append(magic_string_);
+  buffer.push_back(version_);
+  buffer.append(ConvertSizeToString(metadata.size()));
+  buffer.append(WstrToStr(metadata));
+  buffer.append(ConvertSizeToString(input.size()));
+  buffer.append(data);
+
+  output = StrToWstr(Base64Encode(buffer));
+
+  return true;
+}
+
+bool StringCoder::Decode(const std::wstring& input, std::wstring& output,
+                         std::wstring& metadata) {
+  if (input.empty())
+    return false;
+
+  std::string decoded = Base64Decode(WstrToStr(input));
+
+  if (decoded.size() < min_length_)
+    return false;
+
+  size_t pos = magic_string_.size();
+  
+  if (decoded.substr(0, pos) != magic_string_)
+    return false;
+
+  if (decoded.at(pos++) != version_)
+    return false;
+
+  unsigned short metadata_size = ReadSize(decoded, pos);
+  pos += sizeof(metadata_size);
+  if (metadata_size > 0) {
+    metadata = StrToWstr(decoded.substr(pos, metadata_size));
+    pos += metadata_size;
+  }
+
+  unsigned short data_size = ReadSize(decoded, pos);
+  pos += sizeof(data_size);
+  if (data_size > 0) {
+    decoded = decoded.substr(pos, data_size);
+  } else {
+    return false;
+  }
+
+  std::string inflated;
+  if (!InflateString(decoded, inflated, data_size))
+    return false;
+
+  output = StrToWstr(inflated);
+
+  return true;
+}
+
+std::string StringCoder::ConvertSizeToString(unsigned short value) {
+  std::string output;
+
+  for (size_t i = 0; i < sizeof(value); i++) {
+    output.push_back(static_cast<char>((value >> (i * 8)) & 0xFF));
+  }
+
+  return output;
+}
+
+unsigned short StringCoder::ReadSize(const std::string& str,
+                                     unsigned short pos) {
+  unsigned short result = 0;
+  size_t len = sizeof(result);
+
+  if (pos + len > str.size())
+    return 0;
+
+  for (size_t n = pos + len; n > pos; n--) {
+    result = (result << 8) + static_cast<unsigned char>(str.at(n - 1));
+  }
+
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
