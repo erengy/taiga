@@ -347,6 +347,15 @@ void EndWatching(Item& item, Episode episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool IsDeletedFromList(Item& item) {
+  foreach_(it, History.queue.items)
+    if (it->anime_id == item.GetId())
+      if (it->mode == taiga::kHttpServiceDeleteLibraryEntry)
+        return true;
+
+  return false;
+}
+
 bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time) {
   if (episode.processed)
     return false;

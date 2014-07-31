@@ -458,7 +458,7 @@ int Database::GetItemCount(int status, bool check_history) {
   // Search queued items for status changes
   if (check_history) {
     foreach_(it, History.queue.items) {
-      if (it->status) {
+      if (it->status || it->mode == taiga::kHttpServiceDeleteLibraryEntry) {
         if (status == *it->status) {
           count++;
         } else {
