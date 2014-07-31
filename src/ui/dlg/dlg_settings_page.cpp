@@ -731,6 +731,11 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       } else if (lplv->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
         win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
         win::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
+        LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
+        if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
+          auto feed_filter = reinterpret_cast<FeedFilter*>(list.GetItemParam(pnmv->iItem));
+          feed_filter->enabled = list.GetCheckState(pnmv->iItem) == TRUE;
+        }
         int index = list.GetNextItem(-1, LVNI_SELECTED);
         int count = list.GetItemCount();
         toolbar.EnableButton(101, index > -1);
