@@ -176,6 +176,14 @@ bool IsDirectory(const WIN32_FIND_DATA& find_data) {
   return (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
+bool IsHiddenFile(const WIN32_FIND_DATA& find_data) {
+  return (find_data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) != 0;
+}
+
+bool IsSystemFile(const WIN32_FIND_DATA& find_data) {
+  return (find_data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) != 0;
+}
+
 bool IsValidDirectory(const WIN32_FIND_DATA& find_data) {
   return wcscmp(find_data.cFileName, L".") != 0 &&
          wcscmp(find_data.cFileName, L"..") != 0;

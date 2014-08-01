@@ -38,6 +38,8 @@ int DeleteFolder(std::wstring path);
 
 std::wstring GetExtendedLengthPath(const std::wstring& path);
 bool IsDirectory(const WIN32_FIND_DATA& find_data);
+bool IsHiddenFile(const WIN32_FIND_DATA& find_data);
+bool IsSystemFile(const WIN32_FIND_DATA& find_data);
 bool IsValidDirectory(const WIN32_FIND_DATA& find_data);
 
 bool FileExists(const std::wstring& file);
