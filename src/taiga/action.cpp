@@ -199,6 +199,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"SearchTorrents") {
     int anime_id = static_cast<int>(lParam);
+    if (body.empty())
+      body = Settings[taiga::kTorrent_Discovery_SearchUrl];
     ui::DlgTorrent.Search(body, anime_id);
 
   // ShowSidebar()
