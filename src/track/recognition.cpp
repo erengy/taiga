@@ -576,6 +576,8 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
 
   //////////////////////////////////////////////////////////////////////////////
 
+  EraseRight(title, L" S01");
+
   // Set the final title, hopefully name of the anime
   episode.title = title;
   episode.clean_title = title;
