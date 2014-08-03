@@ -203,10 +203,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       body = Settings[taiga::kTorrent_Discovery_SearchUrl];
     ui::DlgTorrent.Search(body, anime_id);
 
-  // ShowSidebar()
-  } else if (action == L"ShowSidebar") {
-    bool hide_sidebar = !Settings.GetBool(taiga::kApp_Option_HideSidebar);
-    Settings.Set(taiga::kApp_Option_HideSidebar, hide_sidebar);
+  // ToggleSidebar()
+  } else if (action == L"ToggleSidebar") {
+    bool hide_sidebar = Settings.Toggle(taiga::kApp_Option_HideSidebar);
     ui::DlgMain.treeview.Show(!hide_sidebar);
     ui::DlgMain.UpdateControlPositions();
     ui::Menus.UpdateView();
@@ -269,8 +268,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleRecognition()
   //   Enables or disables anime recognition.
   } else if (action == L"ToggleRecognition") {
-    bool enable_recognition = !Settings.GetBool(taiga::kApp_Option_EnableRecognition);
-    Settings.Set(taiga::kApp_Option_EnableRecognition, enable_recognition);
+    bool enable_recognition = Settings.Toggle(taiga::kApp_Option_EnableRecognition);
     if (enable_recognition) {
       ui::ChangeStatusText(L"Automatic anime recognition is now enabled.");
       CurrentEpisode.Set(anime::ID_UNKNOWN);
@@ -285,8 +283,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleSharing()
   //   Enables or disables automatic sharing.
   } else if (action == L"ToggleSharing") {
-    bool enable_sharing = !Settings.GetBool(taiga::kApp_Option_EnableSharing);
-    Settings.Set(taiga::kApp_Option_EnableSharing, enable_sharing);
+    bool enable_sharing = Settings.Toggle(taiga::kApp_Option_EnableSharing);
     ui::Menus.UpdateTools();
     if (enable_sharing) {
       ui::ChangeStatusText(L"Automatic sharing is now enabled.");
@@ -297,8 +294,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // ToggleSynchronization()
   //   Enables or disables automatic list synchronization.
   } else if (action == L"ToggleSynchronization") {
-    bool enable_sync = !Settings.GetBool(taiga::kApp_Option_EnableSync);
-    Settings.Set(taiga::kApp_Option_EnableSync, enable_sync);
+    bool enable_sync = Settings.Toggle(taiga::kApp_Option_EnableSync);
     ui::Menus.UpdateTools();
     if (enable_sync) {
       ui::ChangeStatusText(L"Automatic synchronization is now enabled.");

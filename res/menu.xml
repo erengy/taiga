@@ -68,7 +68,7 @@
 		<item name="Seasons"     action="ViewContent(7)" radio="1"/>
 		<item name="Torrents"    action="ViewContent(8)" radio="1"/>
 		<item type="separator"/>
-		<item name="Show sidebar" action="ShowSidebar()" checked="1"/>
+		<item name="Show sidebar" action="ToggleSidebar()" checked="1"/>
 	</menu>
 	<!-- Folders -->
 	<menu name="Folders">

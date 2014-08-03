@@ -54,6 +54,7 @@ public:
   void Set(enum_t name, bool value);
   void Set(enum_t name, int value);
   void Set(enum_t name, const std::wstring& value);
+  bool Toggle(enum_t name);
 
 protected:
   void InitializeKey(enum_t name, const wchar_t* default_value, const std::wstring& path);

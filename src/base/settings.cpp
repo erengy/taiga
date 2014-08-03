@@ -81,6 +81,12 @@ void Settings::Set(enum_t name, const std::wstring& value) {
   map_[name].value = value;
 }
 
+bool Settings::Toggle(enum_t name) {
+  bool value = !GetBool(name);
+  Set(name, value);
+  return value;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Settings::InitializeKey(enum_t name, const wchar_t* default_value,
