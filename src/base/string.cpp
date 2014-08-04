@@ -410,7 +410,7 @@ void ReplaceChar(wstring& str, const wchar_t c, const wchar_t replace_with) {
 }
 
 void ReplaceChars(wstring& str, const wchar_t chars[],
-                  const wstring replace_with) {
+                  const wstring& replace_with) {
   if (chars == replace_with)
     return;
 

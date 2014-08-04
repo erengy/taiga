@@ -60,7 +60,7 @@ size_t LevenshteinDistance(const std::wstring& str1, const std::wstring& str2);
 
 void Replace(std::wstring& str1, std::wstring str2, std::wstring replace_with, bool replace_all = false, bool case_insensitive = false);
 void ReplaceChar(std::wstring& str, const wchar_t c, const wchar_t replace_with);
-void ReplaceChars(std::wstring& str, const wchar_t chars[], const std::wstring replace_with);
+void ReplaceChars(std::wstring& str, const wchar_t chars[], const std::wstring& replace_with);
 
 std::wstring Join(const std::vector<std::wstring>& join_vector, const std::wstring& separator);
 void Split(const std::wstring& str, const std::wstring& separator, std::vector<std::wstring>& split_vector);
