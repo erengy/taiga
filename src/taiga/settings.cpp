@@ -344,7 +344,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
       ui::OnSettingsServiceChangeFailed();
       Set(kSync_ActiveService, previous_service);
       changed_service = false;
-    } else if (!previous_user.empty()) {
+    } else if (!AnimeDatabase.items.empty()) {
       if (ui::OnSettingsServiceChangeConfirm(previous_service,
                                              GetWstr(kSync_ActiveService))) {
         std::wstring current_service = GetWstr(kSync_ActiveService);
