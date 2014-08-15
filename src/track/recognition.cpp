@@ -294,6 +294,7 @@ bool RecognitionEngine::ExamineTitle(std::wstring title,
         std::wstring temp = title.substr(0, title.length() - extension.length());
         foreach_(it, episode_keywords) {
           if (temp.length() >= it->length() &&
+              title.length() > extension.length() + it->length() &&
               IsEqual(CharRight(temp, it->length()), *it)) {
             title.resize(title.length() - extension.length() - it->length() - 1);
             episode.number = extension;
