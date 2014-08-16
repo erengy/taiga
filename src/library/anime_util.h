@@ -68,7 +68,7 @@ int GetEpisodeLow(const std::wstring& episode_number);
 bool IsAllEpisodesAvailable(const Item& item);
 bool IsEpisodeRange(const std::wstring& episode_number);
 bool IsValidEpisode(int episode, int total);
-bool IsValidEpisode(int episode, int watched, int total);
+bool IsValidEpisode(int episode, int total, int watched);
 std::wstring JoinEpisodeNumbers(const std::vector<int>& input);
 void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output);
 int EstimateEpisodeCount(const Item& item);

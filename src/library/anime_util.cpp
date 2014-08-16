@@ -213,11 +213,11 @@ bool PlayNextEpisode(int anime_id) {
   if (!anime_item)
     return false;
 
-  if (anime_item->GetEpisodeCount() != 1) {
-    return PlayEpisode(anime_id, anime_item->GetMyLastWatchedEpisode() + 1);
-  } else {
-    return PlayEpisode(anime_id, 1);
-  }
+  int number = 1;
+  if (anime_item->GetEpisodeCount() != 1)
+    number = anime_item->GetMyLastWatchedEpisode() + 1;
+
+  return PlayEpisode(anime_id, number);
 }
 
 bool PlayRandomAnime() {
@@ -378,7 +378,7 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
     if (number_low > last_watched + 1 || number < last_watched + 1)
       return false;
 
-  if (!IsValidEpisode(number, last_watched, item.GetEpisodeCount()))
+  if (!IsValidEpisode(number, item.GetEpisodeCount(), last_watched))
     return false;
 
   return true;
@@ -596,7 +596,7 @@ bool IsValidEpisode(int episode, int total) {
   return true;
 }
 
-bool IsValidEpisode(int episode, int watched, int total) {
+bool IsValidEpisode(int episode, int total, int watched) {
   if (!IsValidEpisode(episode, total) ||
       (episode < watched) ||
       (episode == watched && total != 1))
@@ -689,7 +689,7 @@ void ChangeEpisode(int anime_id, int value) {
   if (!anime_item)
     return;
 
-  if (IsValidEpisode(value, -1, anime_item->GetEpisodeCount())) {
+  if (IsValidEpisode(value, anime_item->GetEpisodeCount())) {
     Episode episode;
     episode.number = ToWstr(value);
     AddToQueue(*anime_item, episode, true);
@@ -711,11 +711,7 @@ void DecrementEpisode(int anime_id) {
     history_item->enabled = false;
     History.queue.RemoveDisabled();
   } else {
-    if (IsValidEpisode(watched - 1, -1, anime_item->GetEpisodeCount())) {
-      Episode episode;
-      episode.number = ToWstr(watched - 1);
-      AddToQueue(*anime_item, episode, true);
-    }
+    ChangeEpisode(anime_id, watched - 1);
   }
 }
 
@@ -727,11 +723,7 @@ void IncrementEpisode(int anime_id) {
 
   int watched = anime_item->GetMyLastWatchedEpisode();
 
-  if (IsValidEpisode(watched + 1, watched, anime_item->GetEpisodeCount())) {
-    Episode episode;
-    episode.number = ToWstr(watched + 1);
-    AddToQueue(*anime_item, episode, true);
-  }
+  ChangeEpisode(anime_id, watched + 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

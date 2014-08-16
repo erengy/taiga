@@ -694,15 +694,9 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               GetKeyState(VK_CONTROL) & 0x8000) {
             // Edit episode
             if (pnkd->wVKey == VK_ADD) {
-              if (anime_item) {
-                int value = anime_item->GetMyLastWatchedEpisode();
-                ExecuteAction(L"EditEpisode(" + ToWstr(value + 1) + L")", 0, anime_id);
-              }
+              anime::IncrementEpisode(anime_id);
             } else if (pnkd->wVKey == VK_SUBTRACT) {
-              if (anime_item) {
-                int value = anime_item->GetMyLastWatchedEpisode();
-                ExecuteAction(L"EditEpisode(" + ToWstr(value - 1) + L")", 0, anime_id);
-              }
+              anime::DecrementEpisode(anime_id);
             // Edit score
             } else if (pnkd->wVKey >= '0' && pnkd->wVKey <= '9') {
               ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - '0') + L")", 0, anime_id);

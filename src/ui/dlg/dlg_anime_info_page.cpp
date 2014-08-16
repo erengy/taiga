@@ -393,7 +393,7 @@ bool PageMyInfo::Save() {
 
   // Episodes watched
   history_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
-  if (!anime::IsValidEpisode(*history_item.episode, -1, anime_item->GetEpisodeCount())) {
+  if (!anime::IsValidEpisode(*history_item.episode, anime_item->GetEpisodeCount())) {
     std::wstring msg = L"Please enter a valid episode number between 0-" +
                   ToWstr(anime_item->GetEpisodeCount()) + L".";
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
