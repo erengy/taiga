@@ -45,18 +45,12 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   // request, so that's what we expect from it
   http_request.header[L"Accept"] = L"application/json";
   http_request.header[L"Accept-Charset"] = L"utf-8";
+  http_request.header[L"Accept-Encoding"] = L"gzip";
 
   // kAuthenticateUser method returns the user's authentication token, which
   // is to be used on all methods that require authentication.
   if (RequestNeedsAuthentication(request.type))
     http_request.url.query[L"auth_token"] = auth_token_;
-
-  switch (request.type) {
-    case kGetLibraryEntries:
-      // TODO: Make sure username is available
-      http_request.header[L"Accept-Encoding"] = L"gzip";
-      break;
-  }
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);

@@ -49,6 +49,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   // This doesn't quite help; MAL returns whatever it pleases
   http_request.header[L"Accept"] = L"text/xml, text/*";
   http_request.header[L"Accept-Charset"] = L"utf-8";
+  http_request.header[L"Accept-Encoding"] = L"gzip";
 
   // Since October 2013, third-party applications need to identify themselves
   // with a unique user-agent string that is whitelisted by MAL. Using a generic
@@ -65,14 +66,6 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     http_request.header[L"Authorization"] = L"Basic " +
         Base64Encode(request.data[canonical_name_ + L"-username"] + L":" +
                      request.data[canonical_name_ + L"-password"]);
-  }
-
-  switch (request.type) {
-    case kGetLibraryEntries:
-      // Compressed lists save us a lot of bandwidth and time
-      // TODO: Make sure username is available
-      http_request.header[L"Accept-Encoding"] = L"gzip";
-      break;
   }
 
   switch (request.type) {
