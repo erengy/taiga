@@ -169,7 +169,8 @@ void MainDialog::CreateDialogControls() {
   statusbar.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
   statusbar.SetImageList(ui::Theme.GetImageList16().GetHandle());
   statusbar.InsertPart(-1, 0, 0, 900, nullptr, nullptr);
-  statusbar.InsertPart(ui::kIcon16_Clock, 0, 0,  32, nullptr, nullptr);
+  statusbar.InsertPart(ui::kIcon16_Clock, 0, 0, 32, nullptr, nullptr);
+  statusbar.InsertPart(ui::kIcon16_Cross, 0, 0, 32, nullptr, nullptr);
 
   // Insert treeview items
   treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ui::kIcon16_Play, kSidebarItemNowPlaying, nullptr));
@@ -671,23 +672,36 @@ void MainDialog::UpdateStatusTimer() {
   win::Rect rect;
   GetClientRect(&rect);
 
-  auto timer = taiga::timers.timer(taiga::kTimerMedia);
-  int seconds = timer ? timer->ticks() : 0;
-
-  if (seconds > 0 &&
-      CurrentEpisode.anime_id > anime::ID_UNKNOWN &&
+  if (CurrentEpisode.anime_id > anime::ID_UNKNOWN &&
       IsUpdateAllowed(*AnimeDatabase.FindItem(CurrentEpisode.anime_id),
                       CurrentEpisode, true)) {
+    auto timer = taiga::timers.timer(taiga::kTimerMedia);
+    int seconds = timer ? timer->ticks() : 0;
+    bool waiting_for_media_player = seconds == 0 &&
+        Settings.GetBool(taiga::kSync_Update_WaitPlayer);
+
     std::wstring str = L"List update in " + ToTimeString(seconds);
+    if (waiting_for_media_player)
+      str += L" (waiting for media player to close)";
+
     statusbar.SetPartText(1, str.c_str());
     statusbar.SetPartTipText(1, str.c_str());
+    statusbar.SetPartTipText(2, L"Cancel update");
 
-    statusbar.SetPartWidth(0, rect.Width() - ScaleX(160));
-    statusbar.SetPartWidth(1, ScaleX(160));
+    const int icon_width = 32;
+    win::Dc hdc = statusbar.GetDC();
+    hdc.AttachFont(statusbar.GetFont());
+    int timer_width = icon_width + GetTextWidth(hdc.Get(), str);
+    hdc.DetachFont();
+
+    statusbar.SetPartWidth(0, rect.Width() - timer_width - (icon_width + 4));
+    statusbar.SetPartWidth(1, timer_width);
+    statusbar.SetPartWidth(2, icon_width + 4);
 
   } else {
     statusbar.SetPartWidth(0, rect.Width());
     statusbar.SetPartWidth(1, 0);
+    statusbar.SetPartWidth(2, 0);
   }
 }
 

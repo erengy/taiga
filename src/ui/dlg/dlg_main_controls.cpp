@@ -371,7 +371,7 @@ LRESULT MainDialog::StatusBar::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, L
       GetCursorPos(&pt);
       ScreenToClient(GetWindowHandle(), &pt);
       win::Rect rect;
-      GetRect(1, &rect);
+      GetRect(2, &rect);
       if (rect.PtIn(pt)) {
         SetSharedCursor(IDC_HAND);
         return TRUE;
@@ -390,7 +390,7 @@ LRESULT MainDialog::OnStatusbarNotify(LPARAM lParam) {
     case NM_CLICK: {
       auto pnm = reinterpret_cast<LPNMMOUSE>(lParam);
       // Handle click on timer
-      if (pnm->dwItemSpec == 1) {
+      if (pnm->dwItemSpec == 2) {
         if (ui::OnRecognitionCancelConfirm()) {
           CurrentEpisode.processed = true;
         }

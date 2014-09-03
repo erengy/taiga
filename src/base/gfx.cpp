@@ -88,6 +88,12 @@ int GetTextHeight(HDC hdc) {
   return size.cy;
 }
 
+int GetTextWidth(HDC hdc, const std::wstring& text) {
+  SIZE size = {0};
+  GetTextExtentPoint32(hdc, text.c_str(), text.size(), &size);
+  return size.cx;
+}
+
 BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2,
                   bool bVertical) {
   TRIVERTEX vertex[2];
