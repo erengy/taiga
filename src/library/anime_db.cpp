@@ -32,6 +32,7 @@
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
+#include "taiga/taiga.h"
 #include "track/recognition.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/ui.h"
@@ -55,6 +56,7 @@ bool Database::LoadDatabase() {
   if (!meta_version.empty()) {
     xml_node database_node = document.child(L"database");
     ReadDatabaseNode(database_node);
+    HandleCompatibility(meta_version);
   } else {
     LOG(LevelWarning, L"Reading database in compatibility mode");
     ReadDatabaseInCompatibilityMode(document);
@@ -128,7 +130,7 @@ bool Database::SaveDatabase() {
   xml_document document;
 
   xml_node meta_node = document.append_child(L"meta");
-  XmlWriteStrValue(meta_node, L"version", L"1.1");
+  XmlWriteStrValue(meta_node, L"version", std::wstring(Taiga.version).c_str());
 
   xml_node database_node = document.append_child(L"database");
   WriteDatabaseNode(database_node);
@@ -584,6 +586,39 @@ bool Database::CheckOldUserDirectory() {
   }
 
   return true;
+}
+
+void Database::ClearInvalidValues(Item& item) {
+  const std::wstring invalid_title = L"S"L"S"L"J"L"Master";
+  const std::wstring invalid_description =
+      L"Prepare yourself for another 9001 action-packed episodes";
+
+  if (item.GetEnglishTitle() == invalid_title)
+    item.SetEnglishTitle(L"");
+
+  auto synonyms = item.GetSynonyms();
+  if (!synonyms.empty()) {
+    foreach_(synonym, synonyms) {
+      if (*synonym == invalid_title)
+        *synonym = L"";
+    }
+    RemoveEmptyStrings(synonyms);
+    item.SetSynonyms(synonyms);
+  }
+
+  if (StartsWith(item.GetSynopsis(), invalid_description))
+    item.SetSynopsis(L"");
+}
+
+void Database::HandleCompatibility(const std::wstring& meta_version) {
+  base::SemanticVersion version = meta_version;
+
+  if (version <= base::SemanticVersion(L"1.1.7")) {
+    LOG(LevelWarning, L"Clearing invalid values");
+    foreach_(item, items) {
+      ClearInvalidValues(item->second);
+    }
+  }
 }
 
 void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
