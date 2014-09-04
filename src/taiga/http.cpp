@@ -72,7 +72,12 @@ void HttpClient::set_mode(HttpClientMode mode) {
 void HttpClient::OnError(CURLcode error_code) {
   std::wstring error_text = L"HTTP error #" + ToWstr(error_code) + L": " +
                             StrToWstr(curl_easy_strerror(error_code));
-  TrimRight(error_text, L"\r\n");
+  TrimRight(error_text, L"\r\n ");
+  switch (error_code) {
+    case CURLE_COULDNT_CONNECT:
+      error_text += L" (" + request_.url.host + L")";
+      break;
+  }
 
   LOG(LevelError, error_text + L"\nConnection mode: " + ToWstr(mode_));
 
