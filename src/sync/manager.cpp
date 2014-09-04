@@ -146,6 +146,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
     case kAuthenticateUser:
       Taiga.logged_in = false;
       ui::OnLogout();
+      ui::ChangeStatusText(response.data[L"error"]);
       break;
     case kGetMetadataById:
       ui::OnLibraryEntryChangeFailure(anime_id, response.data[L"error"]);
