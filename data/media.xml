@@ -342,6 +342,8 @@
 		<class>Chrome_WidgetWin_1</class>
 		<file>chrome.exe</file>
 		<folder>%LocalAppData%\Google\Chrome\Application\</folder>
+		<folder>%ProgramFiles%\Google\Chrome\Application\</folder>
+		<folder>%ProgramW6432%\Google\Chrome\Application\</folder>
 		<edit mode="2">Google Chrome</edit>
 		<engine>WebKit</engine>
 	</player>
