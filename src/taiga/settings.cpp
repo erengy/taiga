@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/base64.h"
 #include "base/crypto.h"
 #include "base/file.h"
 #include "base/foreach.h"
@@ -389,7 +390,15 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
 }
 
 void AppSettings::HandleCompatibility() {
-  // Nothing to do here, for now
+  if (GetInt(kMeta_Version_Major) == 1 &&
+      GetInt(kMeta_Version_Minor) == 1 &&
+      GetInt(kMeta_Version_Revision) == 7) {
+    // Convert old password encoding to base64
+    std::wstring password = SimpleDecrypt(GetWstr(kSync_Service_Mal_Password));
+    Set(kSync_Service_Mal_Password, Base64Encode(password));
+    password = SimpleDecrypt(GetWstr(kSync_Service_Hummingbird_Password));
+    Set(kSync_Service_Hummingbird_Password, Base64Encode(password));
+  }
 }
 
 void AppSettings::RestoreDefaults() {
@@ -444,9 +453,9 @@ const std::wstring GetCurrentPassword() {
   auto service = GetCurrentService();
 
   if (service->id() == sync::kMyAnimeList) {
-    password = SimpleDecrypt(Settings[kSync_Service_Mal_Password]);
+    password = Base64Decode(Settings[kSync_Service_Mal_Password]);
   } else if (service->id() == sync::kHummingbird) {
-    password = SimpleDecrypt(Settings[kSync_Service_Hummingbird_Password]);
+    password = Base64Decode(Settings[kSync_Service_Hummingbird_Password]);
   }
 
   return password;

@@ -21,6 +21,7 @@
 
 #include <string>
 
+// Deprecated
 std::wstring SimpleEncrypt(std::wstring str);
 std::wstring SimpleDecrypt(std::wstring str);
 

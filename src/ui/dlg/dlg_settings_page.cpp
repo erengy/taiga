@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/base64.h"
 #include "base/crypto.h"
 #include "base/file.h"
 #include "base/log.h"
@@ -103,13 +104,13 @@ BOOL SettingsPage::OnInitDialog() {
     // Services > MyAnimeList
     case kSettingsPageServicesMal: {
       SetDlgItemText(IDC_EDIT_USER_MAL, Settings[taiga::kSync_Service_Mal_Username].c_str());
-      SetDlgItemText(IDC_EDIT_PASS_MAL, SimpleDecrypt(Settings[taiga::kSync_Service_Mal_Password]).c_str());
+      SetDlgItemText(IDC_EDIT_PASS_MAL, Base64Decode(Settings[taiga::kSync_Service_Mal_Password]).c_str());
       break;
     }
     // Services > Hummingbird
     case kSettingsPageServicesHummingbird: {
       SetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD, Settings[taiga::kSync_Service_Hummingbird_Username].c_str());
-      SetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD, SimpleDecrypt(Settings[taiga::kSync_Service_Hummingbird_Password]).c_str());
+      SetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD, Base64Decode(Settings[taiga::kSync_Service_Hummingbird_Password]).c_str());
       break;
     }
 

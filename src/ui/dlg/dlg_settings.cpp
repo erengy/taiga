@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/crypto.h"
+#include "base/base64.h"
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
@@ -178,13 +178,13 @@ void SettingsDialog::OnOK() {
   page = &pages[kSettingsPageServicesMal];
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_Mal_Username, page->GetDlgItemText(IDC_EDIT_USER_MAL));
-    Settings.Set(taiga::kSync_Service_Mal_Password, SimpleEncrypt(page->GetDlgItemText(IDC_EDIT_PASS_MAL)));
+    Settings.Set(taiga::kSync_Service_Mal_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_MAL)));
   }
   // Services > Hummingbird
   page = &pages[kSettingsPageServicesHummingbird];
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_Hummingbird_Username, page->GetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD));
-    Settings.Set(taiga::kSync_Service_Hummingbird_Password, SimpleEncrypt(page->GetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD)));
+    Settings.Set(taiga::kSync_Service_Hummingbird_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD)));
   }
 
   // Library > Folders
