@@ -54,6 +54,9 @@ bool IsWhitespace(const wchar_t c);
 bool StartsWith(const std::wstring& str, const std::wstring& search);
 bool EndsWith(const std::wstring& str, const std::wstring& search);
 
+bool MatchRegex(const std::wstring& str, const std::wstring& pattern);
+bool SearchRegex(const std::wstring& str, const std::wstring& pattern);
+
 size_t LongestCommonSubsequenceLength(const std::wstring& str1, const std::wstring& str2);
 size_t LongestCommonSubstringLength(const std::wstring& str1, const std::wstring& str2);
 size_t LevenshteinDistance(const std::wstring& str1, const std::wstring& str2);

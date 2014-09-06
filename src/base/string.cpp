@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <locale>
 #include <map>
+#include <regex>
 #include <sstream>
 
 #include "string.h"
@@ -277,6 +278,14 @@ bool EndsWith(const wstring& str1, const wstring& str2) {
     return false;
 
   return str1.compare(str1.length() - str2.length(), str2.length(), str2) == 0;
+}
+
+bool MatchRegex(const wstring& str, const wstring& pattern) {
+  return std::regex_match(str, std::wregex(pattern));
+}
+
+bool SearchRegex(const wstring& str, const wstring& pattern) {
+  return std::regex_search(str, std::wregex(pattern));
 }
 
 size_t LongestCommonSubsequenceLength(const wstring& str1,

@@ -295,7 +295,7 @@ std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
       stream_provider = kStreamAnn;
     // Crunchyroll
     } else if (Settings.GetBool(taiga::kStream_Crunchyroll) &&
-               InStr(url, L"crunchyroll.com/") > -1) {
+               SearchRegex(url, L"crunchyroll\\.[a-z.]+/")) {
        stream_provider = kStreamCrunchyroll;
     // Hulu
     /*
