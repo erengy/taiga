@@ -147,7 +147,7 @@ bool Feed::ExamineData() {
     // Examine title and compare with anime list items
     Meow.ExamineTitle(it->title, it->episode_data,
                       true, true, true, true, false);
-    Meow.MatchDatabase(it->episode_data, true, true);
+    Meow.MatchDatabase(it->episode_data, false, true);
 
     // Update last aired episode number
     if (it->episode_data.anime_id > anime::ID_UNKNOWN) {

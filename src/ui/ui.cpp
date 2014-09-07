@@ -16,6 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <map>
+#include <set>
+
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
@@ -712,16 +715,31 @@ void OnFeedDownload(bool success) {
 }
 
 bool OnFeedNotify(const Feed& feed) {
+  std::map<std::wstring, std::set<std::wstring>> found_episodes;
+
+  foreach_(it, feed.items) {
+    if (it->state == kFeedItemSelected) {
+      const auto& episode = it->episode_data;
+      auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+      auto anime_title = anime_item ? anime_item->GetTitle() : episode.title;
+      found_episodes[anime_title].insert(episode.number);
+    }
+  }
+
+  if (found_episodes.empty())
+    return false;
+
   std::wstring tip_text;
   std::wstring tip_title = L"New torrents available";
-  std::wstring tip_format = L"%title%$if(%episode%, #%episode%)\n";
 
-  foreach_(it, feed.items)
-    if (it->state == kFeedItemSelected)
-      tip_text += L"\u00BB " + ReplaceVariables(tip_format, it->episode_data);
-
-  if (tip_text.empty())
-    return false;
+  foreach_(it, found_episodes) {
+    tip_text += L"\u00BB " + LimitText(it->first, 32);
+    std::wstring episodes;
+    foreach_(episode, it->second)
+      if (!episode->empty())
+        AppendString(episodes, L" #" + *episode);
+    tip_text += episodes + L"\n";
+  }
 
   tip_text += L"Click to see all.";
   tip_text = LimitText(tip_text, 255);
