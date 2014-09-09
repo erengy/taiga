@@ -39,13 +39,15 @@ taiga::App Taiga;
 namespace taiga {
 
 App::App()
-    : debug_mode(false),
+    : allow_multiple_instances(false),
+#ifdef _DEBUG
+    debug_mode(true),
+#else
+    debug_mode(false),
+#endif
       logged_in(false),
       current_tip_type(kTipTypeDefault),
       play_status(kPlayStatusStopped) {
-#ifdef _DEBUG
-  debug_mode = true;
-#endif
 
   version.major = TAIGA_VERSION_MAJOR;
   version.minor = TAIGA_VERSION_MINOR;
@@ -60,27 +62,27 @@ App::~App() {
 }
 
 BOOL App::InitInstance() {
-  // Check another instance
-  if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258",
-                    L"TaigaMainW"))
-    return FALSE;
-
-  // Initialize
-  InitCommonControls(ICC_STANDARD_CLASSES);
-  OleInitialize(nullptr);
+  // Parse command line
+  ParseCommandLineArguments();
 
   // Initialize logger
   Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) +
                        TAIGA_APP_NAME L".log");
-#ifdef _DEBUG
-  Logger.SetSeverityLevel(LevelDebug);
-#else
-  Logger.SetSeverityLevel(LevelWarning);
-#endif
+  Logger.SetSeverityLevel(debug_mode ? LevelDebug : LevelWarning);
   LOG(LevelInformational, L"Version " + std::wstring(version));
 
-  // Parse command line
-  ParseCommandLineArguments();
+  // Check another instance
+  if (!allow_multiple_instances) {
+    if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258",
+                      L"TaigaMainW")) {
+      LOG(LevelDebug, L"Another instance of Taiga is running.");
+      return FALSE;
+    }
+  }
+
+  // Initialize
+  InitCommonControls(ICC_STANDARD_CLASSES);
+  OleInitialize(nullptr);
 
   // Load data
   LoadData();
@@ -133,10 +135,14 @@ void App::ParseCommandLineArguments() {
   for (int i = 1; i < argument_count; i++) {
     std::wstring argument = argument_list[i];
 
-    if (argument == L"-debug" && !debug_mode) {
+    if (argument == L"-debug") {
       debug_mode = true;
-      Logger.SetSeverityLevel(LevelDebug);
       LOG(LevelDebug, argument);
+    } else if (argument == L"-allowmultipleinstances") {
+      allow_multiple_instances = true;
+      LOG(LevelDebug, argument);
+    } else {
+      LOG(LevelWarning, L"Invalid argument: " + argument);
     }
   }
 

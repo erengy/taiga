@@ -54,6 +54,7 @@ public:
 
   void LoadData();
 
+  bool allow_multiple_instances;
   int current_tip_type, play_status;
   bool debug_mode;
   bool logged_in;
