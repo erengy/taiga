@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include "base/types.h"
 #include "library/anime_episode.h"
 #include "track/feed_filter.h"
 
@@ -133,6 +134,7 @@ public:
 
   void HandleFeedCheck(Feed& feed, const std::string& data, bool automatic);
   void HandleFeedDownload(Feed& feed, const std::string& data, bool download_all);
+  bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
 
   bool Notify(const Feed& feed);
   void ParseDescription(FeedItem& feed_item, const std::wstring& source);

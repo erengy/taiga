@@ -706,11 +706,14 @@ void OnFeedCheck(bool success) {
   DlgTorrent.EnableInput();
 }
 
-void OnFeedDownload(bool success) {
+void OnFeedDownload(bool success, const string_t& error) {
+  ChangeStatusText(success ?
+      L"Successfully downloaded the torrent file." :
+      L"Torrent download error: " + error);
+
   if (success)
     DlgTorrent.RefreshList();
 
-  ChangeStatusText(L"Successfully downloaded all torrents.");
   DlgTorrent.EnableInput();
 }
 

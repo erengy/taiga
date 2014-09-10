@@ -85,7 +85,7 @@ void OnSettingsThemeChange();
 void OnSettingsUserChange();
 
 void OnFeedCheck(bool success);
-void OnFeedDownload(bool success);
+void OnFeedDownload(bool success, const string_t& error);
 bool OnFeedNotify(const Feed& feed);
 
 void OnMircNotRunning(bool testing = false);
