@@ -423,7 +423,9 @@ typedef enum {
   CURLE_FTP_WEIRD_PASV_REPLY,    /* 13 */
   CURLE_FTP_WEIRD_227_FORMAT,    /* 14 */
   CURLE_FTP_CANT_GET_HOST,       /* 15 */
-  CURLE_OBSOLETE16,              /* 16 - NOT USED */
+  CURLE_HTTP2,                   /* 16 - A problem in the http2 framing layer.
+                                    [was obsoleted in August 2007 for 7.17.0,
+                                    reused in July 2014 for 7.38.0] */
   CURLE_FTP_COULDNT_SET_TYPE,    /* 17 */
   CURLE_PARTIAL_FILE,            /* 18 */
   CURLE_FTP_COULDNT_RETR_FILE,   /* 19 */
@@ -525,7 +527,10 @@ typedef enum {
 #ifndef CURL_NO_OLDIES /* define this to test if your app builds with all
                           the obsolete stuff removed! */
 
-/* Previously obsoletes error codes re-used in 7.24.0 */
+/* Previously obsolete error code re-used in 7.38.0 */
+#define CURLE_OBSOLETE16 CURLE_HTTP2
+
+/* Previously obsolete error codes re-used in 7.24.0 */
 #define CURLE_OBSOLETE10 CURLE_FTP_ACCEPT_FAILED
 #define CURLE_OBSOLETE12 CURLE_FTP_ACCEPT_TIMEOUT
 
@@ -619,7 +624,8 @@ typedef enum {
  * CURLAUTH_NONE         - No HTTP authentication
  * CURLAUTH_BASIC        - HTTP Basic authentication (default)
  * CURLAUTH_DIGEST       - HTTP Digest authentication
- * CURLAUTH_GSSNEGOTIATE - HTTP GSS-Negotiate authentication
+ * CURLAUTH_NEGOTIATE    - HTTP Negotiate (SPNEGO) authentication
+ * CURLAUTH_GSSNEGOTIATE - Alias for CURLAUTH_NEGOTIATE (deprecated)
  * CURLAUTH_NTLM         - HTTP NTLM authentication
  * CURLAUTH_DIGEST_IE    - HTTP Digest authentication with IE flavour
  * CURLAUTH_NTLM_WB      - HTTP NTLM authentication delegated to winbind helper
@@ -632,7 +638,9 @@ typedef enum {
 #define CURLAUTH_NONE         ((unsigned long)0)
 #define CURLAUTH_BASIC        (((unsigned long)1)<<0)
 #define CURLAUTH_DIGEST       (((unsigned long)1)<<1)
-#define CURLAUTH_GSSNEGOTIATE (((unsigned long)1)<<2)
+#define CURLAUTH_NEGOTIATE    (((unsigned long)1)<<2)
+/* Deprecated since the advent of CURLAUTH_NEGOTIATE */
+#define CURLAUTH_GSSNEGOTIATE CURLAUTH_NEGOTIATE
 #define CURLAUTH_NTLM         (((unsigned long)1)<<3)
 #define CURLAUTH_DIGEST_IE    (((unsigned long)1)<<4)
 #define CURLAUTH_NTLM_WB      (((unsigned long)1)<<5)
@@ -2025,7 +2033,8 @@ typedef enum {
   CURLSSLBACKEND_POLARSSL = 6,
   CURLSSLBACKEND_CYASSL = 7,
   CURLSSLBACKEND_SCHANNEL = 8,
-  CURLSSLBACKEND_DARWINSSL = 9
+  CURLSSLBACKEND_DARWINSSL = 9,
+  CURLSSLBACKEND_AXTLS = 10
 } curl_sslbackend;
 
 /* Information about the SSL library used and the respective internal SSL
@@ -2231,10 +2240,11 @@ typedef struct {
 #define CURL_VERSION_SSL       (1<<2)  /* SSL options are present */
 #define CURL_VERSION_LIBZ      (1<<3)  /* libz features are present */
 #define CURL_VERSION_NTLM      (1<<4)  /* NTLM auth is supported */
-#define CURL_VERSION_GSSNEGOTIATE (1<<5) /* Negotiate auth support */
+#define CURL_VERSION_GSSNEGOTIATE (1<<5) /* Negotiate auth support
+                                            (deprecated) */
 #define CURL_VERSION_DEBUG     (1<<6)  /* built with debug capabilities */
 #define CURL_VERSION_ASYNCHDNS (1<<7)  /* asynchronous dns resolves */
-#define CURL_VERSION_SPNEGO    (1<<8)  /* SPNEGO auth */
+#define CURL_VERSION_SPNEGO    (1<<8)  /* SPNEGO auth is supported */
 #define CURL_VERSION_LARGEFILE (1<<9)  /* supports files bigger than 2GB */
 #define CURL_VERSION_IDN       (1<<10) /* International Domain Names support */
 #define CURL_VERSION_SSPI      (1<<11) /* SSPI is supported */
@@ -2243,6 +2253,7 @@ typedef struct {
 #define CURL_VERSION_TLSAUTH_SRP (1<<14) /* TLS-SRP auth is supported */
 #define CURL_VERSION_NTLM_WB   (1<<15) /* NTLM delegating to winbind helper */
 #define CURL_VERSION_HTTP2     (1<<16) /* HTTP2 support built-in */
+#define CURL_VERSION_GSSAPI    (1<<17) /* GSS-API is supported */
 
  /*
  * NAME curl_version_info()
