@@ -74,6 +74,7 @@ void HttpClient::OnError(CURLcode error_code) {
                             StrToWstr(curl_easy_strerror(error_code));
   TrimRight(error_text, L"\r\n ");
   switch (error_code) {
+    case CURLE_COULDNT_RESOLVE_HOST:
     case CURLE_COULDNT_CONNECT:
       error_text += L" (" + request_.url.host + L")";
       break;
