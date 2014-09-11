@@ -81,8 +81,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_User_Status:
-      if (anime)
-        element = ToWstr(anime->GetMyStatus());
+      element = ToWstr(anime ? anime->GetMyStatus() : anime::kNotInList);
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Number:
@@ -543,11 +542,11 @@ void FeedFilterManager::InitializePresets() {
       L"Selects files that belong to anime that you're currently watching");
   ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kWatching));
 
-  // Discard unknown titles
+  // Discard and deactivate not-in-list anime
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
-      L"Discard unknown titles",
+      L"Discard and deactivate not-in-list anime",
       L"Discards files that do not belong to any anime in your list");
-  ADD_CONDITION(kFeedFilterElement_Meta_Id, kFeedFilterOperator_Equals, L"");
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kNotInList));
 
   // Discard watched and available episodes
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDefault,

@@ -398,6 +398,21 @@ void AppSettings::HandleCompatibility() {
     Set(kSync_Service_Mal_Password, Base64Encode(password));
     password = SimpleDecrypt(GetWstr(kSync_Service_Hummingbird_Password));
     Set(kSync_Service_Hummingbird_Password, Base64Encode(password));
+
+    // Update torrent filters
+    foreach_(filter, Aggregator.filter_manager.filters) {
+      if (filter->name == L"Discard unknown titles") {
+        if (filter->conditions.size() == 1) {
+          auto condition = filter->conditions.begin();
+          if (condition->element == kFeedFilterElement_Meta_Id) {
+            filter->name = L"Discard and deactivate not-in-list anime";
+            condition->element = kFeedFilterElement_User_Status;
+            condition->value = ToWstr(anime::kNotInList);
+          }
+        }
+        break;
+      }
+    }
   }
 }
 
