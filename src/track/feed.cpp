@@ -105,6 +105,7 @@ bool Feed::Check(const std::wstring& source, bool automatic) {
   HttpRequest http_request;
   http_request.url = link;
   http_request.parameter = reinterpret_cast<LPARAM>(this);
+  http_request.header[L"Accept-Encoding"] = L"gzip";
 
   auto client_mode = automatic ?
       taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
