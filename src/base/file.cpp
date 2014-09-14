@@ -92,29 +92,18 @@ QWORD GetFileSize(const std::wstring& path) {
 
 QWORD GetFolderSize(const std::wstring& path, bool recursive) {
   QWORD folder_size = 0;
+  const QWORD max_dword = static_cast<QWORD>(MAXDWORD) + 1;
 
-  WIN32_FIND_DATA find_data;
-  std::wstring file_name = path + L"*.*";
-  HANDLE file_handle = FindFirstFile(file_name.c_str(), &find_data);
+  auto OnFile = [&](const std::wstring& root, const std::wstring& name,
+                    const WIN32_FIND_DATA& data) {
+    folder_size += static_cast<QWORD>(data.nFileSizeHigh) * max_dword +
+                   static_cast<QWORD>(data.nFileSizeLow);
+    return false;
+  };
 
-  if (file_handle == INVALID_HANDLE_VALUE)
-    return 0;
-
-  QWORD max_dword = static_cast<QWORD>(MAXDWORD) + 1;
-
-  do {
-    if (IsDirectory(find_data)) {
-      if (recursive && IsValidDirectory(find_data)) {
-        file_name = path + find_data.cFileName + L"\\";
-        folder_size += GetFolderSize(file_name, recursive);
-      }
-    } else {
-      folder_size += static_cast<QWORD>(find_data.nFileSizeHigh) * max_dword +
-                     static_cast<QWORD>(find_data.nFileSizeLow);
-    }
-  } while (FindNextFile(file_handle, &find_data));
-
-  FindClose(file_handle);
+  FileSearchHelper helper;
+  helper.set_skip_subdirectories(!recursive);
+  helper.Search(path, nullptr, OnFile);
 
   return folder_size;
 }
@@ -285,66 +274,39 @@ std::wstring GetDefaultAppPath(const std::wstring& extension,
 unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
                            const std::wstring& path,
                            const std::wstring& extension,
-                           bool recursive, bool trim_extension) {
-  if (path.empty())
-    return 0;
-
-  WIN32_FIND_DATA find_data;
-  std::wstring file_name = path + L"*.*";
-  HANDLE file_handle = FindFirstFile(file_name.c_str(), &find_data);
-
-  if (file_handle == INVALID_HANDLE_VALUE)
-    return 0;
-
+                           bool recursive,
+                           bool trim_extension) {
   unsigned int file_count = 0;
 
-  do {
-    if (IsDirectory(find_data)) {
-      if (recursive && IsValidDirectory(find_data)) {
-        file_name = path + find_data.cFileName + L"\\";
-        file_count += PopulateFiles(file_list, file_name, extension, recursive,
-                                    trim_extension);
-      }
-    } else {
-      if (extension.empty() ||
-          IsEqual(GetFileExtension(find_data.cFileName), extension)) {
-        if (trim_extension) {
-          file_list.push_back(GetFileWithoutExtension(find_data.cFileName));
-        } else {
-          file_list.push_back(find_data.cFileName);
-        }
-        file_count++;
-      }
+  auto OnFile = [&](const std::wstring& root, const std::wstring& name,
+                    const WIN32_FIND_DATA& data) {
+    if (extension.empty() || IsEqual(GetFileExtension(name), extension)) {
+      file_list.push_back(trim_extension ? GetFileWithoutExtension(name) : name);
+      file_count++;
     }
-  } while (FindNextFile(file_handle, &find_data));
+    return false;
+  };
 
-  FindClose(file_handle);
+  FileSearchHelper helper;
+  helper.set_skip_subdirectories(!recursive);
+  helper.Search(path, nullptr, OnFile);
 
   return file_count;
 }
 
 int PopulateFolders(std::vector<std::wstring>& folder_list,
                     const std::wstring& path) {
-  if (path.empty())
-    return 0;
+  unsigned int folder_count = 0;
 
-  WIN32_FIND_DATA find_data;
-  std::wstring file_name = path + L"*.*";
-  HANDLE file_handle = FindFirstFile(file_name.c_str(), &find_data);
+  auto OnDirectory = [&](const std::wstring& root, const std::wstring& name,
+                         const WIN32_FIND_DATA& data) {
+    folder_list.push_back(name);
+    folder_count++;
+    return false;
+  };
 
-  if (file_handle == INVALID_HANDLE_VALUE)
-    return 0;
-
-  int folder_count = 0;
-
-  do {
-    if (IsDirectory(find_data) && IsValidDirectory(find_data)) {
-      folder_count++;
-      folder_list.push_back(find_data.cFileName);
-    }
-  } while (FindNextFile(file_handle, &find_data));
-
-  FindClose(file_handle);
+  FileSearchHelper helper;
+  helper.Search(path, OnDirectory, nullptr);
 
   return folder_count;
 }

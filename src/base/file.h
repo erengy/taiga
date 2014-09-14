@@ -19,6 +19,7 @@
 #ifndef TAIGA_BASE_FILE_H
 #define TAIGA_BASE_FILE_H
 
+#include <functional>
 #include <string>
 #include <vector>
 #include <windows.h>
@@ -61,13 +62,16 @@ std::wstring ToSizeString(QWORD qwSize);
 
 class FileSearchHelper {
 public:
+  typedef std::function<bool(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data)> callback_function_t;
+
   FileSearchHelper();
   virtual ~FileSearchHelper() {}
 
   bool Search(const std::wstring& root);
+  bool Search(const std::wstring& root, callback_function_t OnDirectoryFunc, callback_function_t OnFileFunc);
 
-  virtual bool OnDirectory(const std::wstring& root, const std::wstring& name) = 0;
-  virtual bool OnFile(const std::wstring& root, const std::wstring& name) = 0;
+  virtual bool OnDirectory(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
+  virtual bool OnFile(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
 
   void set_skip_directories(bool skip_directories);
   void set_skip_files(bool skip_files);

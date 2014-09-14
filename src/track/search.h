@@ -29,8 +29,8 @@ public:
   TaigaFileSearchHelper();
   ~TaigaFileSearchHelper() {}
 
-  bool OnDirectory(const std::wstring& root, const std::wstring& name);
-  bool OnFile(const std::wstring& root, const std::wstring& name);
+  bool OnDirectory(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
+  bool OnFile(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
 
   const std::wstring& path_found() const;
 

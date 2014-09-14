@@ -28,6 +28,16 @@ FileSearchHelper::FileSearchHelper()
 }
 
 bool FileSearchHelper::Search(const std::wstring& root) {
+  using namespace std::placeholders;
+
+  return Search(root,
+      std::bind(&FileSearchHelper::OnDirectory, this, _1, _2, _3),
+      std::bind(&FileSearchHelper::OnFile, this, _1, _2, _3));
+}
+
+bool FileSearchHelper::Search(const std::wstring& root,
+                              callback_function_t OnDirectoryFunc,
+                              callback_function_t OnFileFunc) {
   if (root.empty())
     return false;
   if (skip_directories_ && skip_files_)
@@ -36,8 +46,8 @@ bool FileSearchHelper::Search(const std::wstring& root) {
   std::wstring path = AddTrailingSlash(GetExtendedLengthPath(root)) + L"*";
   bool result = false;
 
-  WIN32_FIND_DATA find_data;
-  HANDLE handle = FindFirstFile(path.c_str(), &find_data);
+  WIN32_FIND_DATA data;
+  HANDLE handle = FindFirstFile(path.c_str(), &data);
 
   do {
     if (handle == INVALID_HANDLE_VALUE) {
@@ -46,41 +56,45 @@ bool FileSearchHelper::Search(const std::wstring& root) {
       continue;
     }
 
-    if (IsSystemFile(find_data) || IsHiddenFile(find_data))
+    if (IsSystemFile(data) || IsHiddenFile(data))
       continue;
 
     // Directory
-    if (IsDirectory(find_data)) {
+    if (IsDirectory(data)) {
       if (skip_directories_)
         continue;
-      if (!IsValidDirectory(find_data))
+      if (!IsValidDirectory(data))
         continue;
-      result = OnDirectory(root, find_data.cFileName);
-      if (!result)
-        result = Search(AddTrailingSlash(root) + find_data.cFileName);
+      if (OnDirectoryFunc)
+        result = OnDirectoryFunc(root, data.cFileName, data);
+      if (!skip_subdirectories_ & !result)
+        result = Search(AddTrailingSlash(root) + data.cFileName);
 
     // File
     } else {
       if (skip_files_)
         continue;
-      if (find_data.nFileSizeLow < minimum_file_size_)
+      if (data.nFileSizeLow < minimum_file_size_)
         continue;
-      result = OnFile(root, find_data.cFileName);
+      if (OnFileFunc)
+        result = OnFileFunc(root, std::wstring(data.cFileName), data);
     }
 
-  } while (!result && FindNextFile(handle, &find_data));
+  } while (!result && FindNextFile(handle, &data));
 
   FindClose(handle);
   return result;
 }
 
 bool FileSearchHelper::OnDirectory(const std::wstring& root,
-                                   const std::wstring& name) {
+                                   const std::wstring& name,
+                                   const WIN32_FIND_DATA& data) {
   return false;
 }
 
 bool FileSearchHelper::OnFile(const std::wstring& root,
-                              const std::wstring& name) {
+                              const std::wstring& name,
+                              const WIN32_FIND_DATA& data) {
   return false;
 }
 
