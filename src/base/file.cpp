@@ -28,12 +28,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 HANDLE OpenFileForGenericRead(const std::wstring& path) {
-  return ::CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
+  return ::CreateFile(GetExtendedLengthPath(path).c_str(),
+                      GENERIC_READ, FILE_SHARE_READ, nullptr,
                       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 }
 
 HANDLE OpenFileForGenericWrite(const std::wstring& path) {
-  return ::CreateFile(path.c_str(), GENERIC_WRITE, 0, nullptr,
+  return ::CreateFile(GetExtendedLengthPath(path).c_str(),
+                      GENERIC_WRITE, 0, nullptr,
                       CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 }
 
@@ -123,22 +125,37 @@ bool Execute(const std::wstring& path, const std::wstring& parameters) {
   if (path.empty())
     return false;
 
-  HINSTANCE value = ShellExecute(nullptr, L"open", path.c_str(),
-                                 parameters.c_str(), nullptr, SW_SHOWNORMAL);
+  if (path.length() > MAX_PATH)
+    return ExecuteFile(path, parameters);
 
+  auto value = ShellExecute(nullptr, L"open", path.c_str(), parameters.c_str(),
+                            nullptr, SW_SHOWNORMAL);
   return reinterpret_cast<int>(value) > 32;
 }
 
-BOOL ExecuteEx(const std::wstring& path, const std::wstring& parameters) {
-  SHELLEXECUTEINFO si = {0};
-  si.cbSize = sizeof(SHELLEXECUTEINFO);
-  si.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI | SEE_MASK_UNICODE;
-  si.lpVerb = L"open";
-  si.lpFile = path.c_str();
-  si.lpParameters = parameters.c_str();
-  si.nShow = SW_SHOWNORMAL;
+bool ExecuteFile(const std::wstring& path, std::wstring parameters) {
+  std::wstring exe_path = GetDefaultAppPath(L"." + GetFileExtension(path), L"");
 
-  return ShellExecuteEx(&si);
+  if (exe_path.empty())
+    return false;
+
+  parameters = L"\"" + exe_path + L"\" " +
+               L"\"" + GetExtendedLengthPath(path) + L"\"" +
+               parameters;
+
+  PROCESS_INFORMATION process_information = {0};
+  STARTUPINFO startup_info = {sizeof(STARTUPINFO)};
+
+  if (!CreateProcess(nullptr, const_cast<wchar_t*>(parameters.c_str()),
+                     nullptr, nullptr, FALSE, 0, nullptr, nullptr,
+                     &startup_info, &process_information)) {
+    return false;
+  }
+
+  CloseHandle(process_information.hProcess);
+  CloseHandle(process_information.hThread);
+
+  return true;
 }
 
 void ExecuteLink(const std::wstring& link) {
@@ -215,14 +232,16 @@ bool FileExists(const std::wstring& file) {
 }
 
 bool FolderExists(const std::wstring& path) {
-  DWORD file_attr = GetFileAttributes(path.c_str());
+  auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
 
   return (file_attr != INVALID_FILE_ATTRIBUTES) &&
          (file_attr & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 bool PathExists(const std::wstring& path) {
-  return GetFileAttributes(path.c_str()) != INVALID_FILE_ATTRIBUTES;
+  auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
+
+  return file_attr != INVALID_FILE_ATTRIBUTES;
 }
 
 void ValidateFileName(std::wstring& file) {

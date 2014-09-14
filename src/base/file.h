@@ -30,7 +30,7 @@ QWORD GetFileSize(const std::wstring& path);
 QWORD GetFolderSize(const std::wstring& path, bool recursive);
 
 bool Execute(const std::wstring& path, const std::wstring& parameters = L"");
-BOOL ExecuteEx(const std::wstring& path, const std::wstring& parameters = L"");
+bool ExecuteFile(const std::wstring& path, std::wstring parameters = L"");
 void ExecuteLink(const std::wstring& link);
 
 bool CreateFolder(const std::wstring& path);
