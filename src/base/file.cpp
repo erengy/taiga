@@ -166,10 +166,19 @@ int DeleteFolder(std::wstring path) {
 }
 
 // Extends the length limit from 260 to 32767 characters
+// See: http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#maxpath
 std::wstring GetExtendedLengthPath(const std::wstring& path) {
-  if (!StartsWith(path, L"\\\\?\\"))
-    return L"\\\\?\\" + path;
-  return path;
+  const std::wstring prefix = L"\\\\?\\";
+
+  if (StartsWith(path, prefix))
+    return path;
+
+  // "\\computer\path" -> "\\?\UNC\computer\path"
+  if (StartsWith(path, L"\\\\"))
+    return prefix + L"UNC\\" + path.substr(2);
+
+  // "C:\path" -> "\\?\C:\path"
+  return prefix + path;
 }
 
 bool IsDirectory(const WIN32_FIND_DATA& find_data) {
