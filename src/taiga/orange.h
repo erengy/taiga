@@ -16,30 +16,32 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_ABOUT_H
-#define TAIGA_UI_DLG_ABOUT_H
+#ifndef TAIGA_TAIGA_ORANGE_H
+#define TAIGA_TAIGA_ORANGE_H
 
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_dialog.h"
+#include "win/win_thread.h"
 
-namespace ui {
+namespace taiga {
 
-class AboutDialog : public win::Dialog {
+class Orange : public win::Thread {
 public:
-  AboutDialog();
-  ~AboutDialog() {}
+  Orange();
+  ~Orange();
 
-  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  BOOL OnDestroy();
-  BOOL OnInitDialog();
-  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
+  void Start();
+  void Stop();
+
+  DWORD ThreadProc();
 
 private:
-  win::RichEdit rich_edit_;
+  float NoteToFrequency(int n);
+
+  static int note_list_[][2];
+  bool play_;
 };
 
-extern AboutDialog DlgAbout;
+extern Orange orange;
 
-}  // namespace ui
+}  // namespace taiga
 
-#endif  // TAIGA_UI_DLG_ABOUT_H
+#endif  // TAIGA_TAIGA_ORANGE_H

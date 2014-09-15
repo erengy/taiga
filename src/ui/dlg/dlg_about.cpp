@@ -21,7 +21,7 @@
 #include "base/file.h"
 #include "base/gfx.h"
 #include "base/string.h"
-#include "base/time.h"
+#include "taiga/orange.h"
 #include "taiga/resource.h"
 #include "taiga/stats.h"
 #include "taiga/taiga.h"
@@ -31,59 +31,12 @@ namespace ui {
 
 class AboutDialog DlgAbout;
 
-const UINT_PTR kTimerTaiga = 74164;
-
-int AboutDialog::note_list[][2] = {
-  {84, 1},  // 1/2
-  {84, 2},  // 1/4
-  {86, 4},  // 1/8
-  {84, 2},  // 1/4
-  {82, 2},  // 1/4
-  {81, 2},  // 1/4
-  {77, 4},  // 1/8
-  {79, 4},  // 1/8
-  {72, 4},  // 1/8
-  {77, 1},  // 1/2
-  {76, 4},  // 1/8
-  {77, 4},  // 1/8
-  {79, 4},  // 1/8
-  {81, 2},  // 1/4
-  {79, 2},  // 1/4
-  {77, 2},  // 1/4
-  {79, 2},  // 1/4
-  {81, 4},  // 1/8
-  {84, 1},  // 1/2
-  {84, 2},  // 1/2
-  {86, 4},  // 1/8
-  {84, 2},  // 1/4
-  {82, 2},  // 1/4
-  {81, 2},  // 1/4
-  {77, 4},  // 1/8
-  {79, 4},  // 1/8
-  {72, 4},  // 1/8
-  {77, 1},  // 1/2
-  {76, 4},  // 1/8
-  {77, 4},  // 1/8
-  {76, 4},  // 1/8
-  {74, 1}   // 1/1
-};
-
-float NoteToFrequency(int n) {
-  if (n < 0 || n > 119)
-    return -1.0f;
-
-  return 440.0f * pow(2.0f, static_cast<float>(n - 57) / 12.0f);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-AboutDialog::AboutDialog()
-    : note_count_(32), note_index_(0) {
+AboutDialog::AboutDialog() {
   RegisterDlgClass(L"TaigaAboutW");
 }
 
 BOOL AboutDialog::OnDestroy() {
-  KillTimer(GetWindowHandle(), kTimerTaiga);
+  taiga::orange.Stop();
 
   return TRUE;
 }
@@ -129,9 +82,9 @@ BOOL AboutDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND: {
       // Icon click
       if (HIWORD(wParam) == STN_DBLCLK) {
+        SetText(L"Orange");
         Stats.tigers_harmed++;
-        SetTimer(hwnd, kTimerTaiga, 100, nullptr);
-        note_index_ = 0;
+        taiga::orange.Start();
         return TRUE;
       }
       break;
@@ -164,21 +117,6 @@ void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   GetClientRect(&rect);
   rect.left = ScaleX(static_cast<int>(48 * 1.5f));
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
-}
-
-void AboutDialog::OnTimer(UINT_PTR nIDEvent) {
-  if (note_index_ == note_count_) {
-    KillTimer(GetWindowHandle(), kTimerTaiga);
-    SetText(L"About");
-    note_index_ = 0;
-  } else {
-    if (note_index_ == 0)
-      SetText(L"Orange");
-    DWORD frequency = static_cast<DWORD>(NoteToFrequency(note_list[note_index_][0]));
-    DWORD duration = 800 / note_list[note_index_][1];
-    Beep(frequency, duration);
-    note_index_++;
-  }
 }
 
 }  // namespace ui

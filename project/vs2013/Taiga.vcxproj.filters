@@ -262,6 +262,9 @@
     <ClCompile Include="..\..\src\taiga\http.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\taiga\orange.cpp">
+      <Filter>taiga</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\taiga\path.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
@@ -706,6 +709,9 @@
       <Filter>taiga</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\http.h">
+      <Filter>taiga</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\taiga\orange.h">
       <Filter>taiga</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\path.h">
