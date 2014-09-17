@@ -346,6 +346,7 @@ std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
       break;
     // YouTube
     case kStreamYoutube:
+      EraseLeft(title, L"\u25B6 ");  // black right pointing triangle
       EraseRight(title, L" - YouTube");
       break;
     // Some other website, or URL is not found
