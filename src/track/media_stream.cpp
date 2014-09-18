@@ -25,12 +25,13 @@
 
 enum StreamingVideoProvider {
   kStreamUnknown = -1,
-  kStreamAnn,
+  kStreamFirst,
+  kStreamAnn = kStreamFirst,
   kStreamCrunchyroll,
-  kStreamHulu,
   kStreamVeoh,
-  kStreamVizanime,
-  kStreamYoutube
+  kStreamViz,
+  kStreamYoutube,
+  kStreamLast
 };
 
 enum WebBrowserEngine {
@@ -229,7 +230,6 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     }
     if (child) {
       foreach_(it, child->children) {
-        // FIXME: Doesn't work with ANN because of "(s)" or "(d)"
         if (InStr(it->name, current_title()) > -1) {
           // Tab is still open, just not active
           return current_title();
@@ -282,58 +282,58 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   return title;
 }
 
-std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
-    const std::wstring& url,
-    std::wstring& title) {
-  StreamingVideoProvider stream_provider = kStreamUnknown;
-
-  // Check URL for known streaming video providers
-  if (!url.empty()) {
-    // Anime News Network
-    if (Settings.GetBool(taiga::kStream_Ann) &&
-        InStr(url, L"animenewsnetwork.com/video") > -1) {
-      stream_provider = kStreamAnn;
-    // Crunchyroll
-    } else if (Settings.GetBool(taiga::kStream_Crunchyroll) &&
-               SearchRegex(url, L"crunchyroll\\.[a-z.]+/")) {
-       stream_provider = kStreamCrunchyroll;
-    // Hulu
-    /*
-    } else if (InStr(url, L"hulu.com/watch") > -1) {
-      stream_provider = kStreamHulu;
-    */
-    // Veoh
-    } else if (Settings.GetBool(taiga::kStream_Veoh) &&
-               InStr(url, L"veoh.com/watch") > -1) {
-      stream_provider = kStreamVeoh;
-    // Viz Anime
-    } else if (Settings.GetBool(taiga::kStream_Viz) &&
-               InStr(url, L"vizanime.com/ep") > -1) {
-      stream_provider = kStreamVizanime;
-    // YouTube
-    } else if (Settings.GetBool(taiga::kStream_Youtube) &&
-               InStr(url, L"youtube.com/watch") > -1) {
-      stream_provider = kStreamYoutube;
-    }
+bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
+  switch (stream_provider) {
+    case kStreamAnn:
+      return Settings.GetBool(taiga::kStream_Ann);
+    case kStreamCrunchyroll:
+      return Settings.GetBool(taiga::kStream_Crunchyroll);
+    case kStreamVeoh:
+      return Settings.GetBool(taiga::kStream_Veoh);
+    case kStreamViz:
+      return Settings.GetBool(taiga::kStream_Viz);
+    case kStreamYoutube:
+      return Settings.GetBool(taiga::kStream_Youtube);
   }
 
-  // Clean-up title
+  return false;
+}
+
+bool MatchStreamUrl(StreamingVideoProvider stream_provider,
+                    const std::wstring& url) {
+  switch (stream_provider) {
+    case kStreamAnn:
+      return SearchRegex(url, L"animenewsnetwork.com/video/[0-9]+");
+    case kStreamCrunchyroll:
+      return SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/episode-[0-9]+.*-[0-9]+") ||
+             SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/.*-movie-[0-9]+");
+    case kStreamVeoh:
+      return InStr(url, L"veoh.com/watch/") > -1;
+    case kStreamViz:
+      return SearchRegex(url, L"viz.com/anime/streaming/[^/]+-episode-[0-9]+/") ||
+             SearchRegex(url, L"viz.com/anime/streaming/[^/]+-movie/");
+    case kStreamYoutube:
+      return InStr(url, L"youtube.com/watch") > -1;
+  }
+
+  return false;
+}
+
+void CleanStreamTitle(StreamingVideoProvider stream_provider,
+                      std::wstring& title) {
   switch (stream_provider) {
     // Anime News Network
     case kStreamAnn:
       EraseRight(title, L" - Anime News Network");
+      /*
       Erase(title, L" (s)");
       Erase(title, L" (d)");
+      */
       break;
     // Crunchyroll
     case kStreamCrunchyroll:
       EraseLeft(title, L"Crunchyroll - Watch ");
-      break;
-    // Hulu
-    case kStreamHulu:
-      EraseLeft(title, L"Watch ");
-      EraseRight(title, L" online | Free | Hulu");
-      EraseRight(title, L" online | Plus | Hulu");
+      EraseRight(title, L" - Movie - Movie");
       break;
     // Veoh
     case kStreamVeoh:
@@ -341,8 +341,10 @@ std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
       EraseRight(title, L" | Veoh.com");
       break;
     // Viz Anime
-    case kStreamVizanime:
-      EraseRight(title, L" - VIZ ANIME: Free Online Anime - All The Time");
+    case kStreamViz:
+      EraseLeft(title, L"VIZ.com - NEON ALLEY - ");
+      EraseRight(title, L" (DUB)");
+      EraseRight(title, L" (SUB)");
       break;
     // YouTube
     case kStreamYoutube:
@@ -355,6 +357,28 @@ std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
       title.clear();
       break;
   }
+}
+
+std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
+    const std::wstring& url,
+    std::wstring& title) {
+  StreamingVideoProvider stream_provider = kStreamUnknown;
+
+  // Check URL for known streaming video providers
+  if (!url.empty()) {
+    for (int i = kStreamFirst; i < kStreamLast; i++) {
+      auto stream = static_cast<StreamingVideoProvider>(i);
+      if (IsStreamSettingEnabled(stream)) {
+        if (MatchStreamUrl(stream, url)) {
+          stream_provider = stream;
+          break;
+        }
+      }
+    }
+  }
+
+  // Clean-up title
+  CleanStreamTitle(stream_provider, title);
 
   return title;
 }
