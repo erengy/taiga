@@ -26,8 +26,10 @@
 enum StreamingVideoProvider {
   kStreamUnknown = -1,
   kStreamFirst,
-  kStreamAnn = kStreamFirst,
+  kStreamAnimelab = kStreamFirst,
+  kStreamAnn,
   kStreamCrunchyroll,
+  kStreamDaisuki,
   kStreamVeoh,
   kStreamViz,
   kStreamYoutube,
@@ -284,10 +286,14 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 
 bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
   switch (stream_provider) {
+    case kStreamAnimelab:
+      return Settings.GetBool(taiga::kStream_Animelab);
     case kStreamAnn:
       return Settings.GetBool(taiga::kStream_Ann);
     case kStreamCrunchyroll:
       return Settings.GetBool(taiga::kStream_Crunchyroll);
+    case kStreamDaisuki:
+      return Settings.GetBool(taiga::kStream_Daisuki);
     case kStreamVeoh:
       return Settings.GetBool(taiga::kStream_Veoh);
     case kStreamViz:
@@ -302,11 +308,15 @@ bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
 bool MatchStreamUrl(StreamingVideoProvider stream_provider,
                     const std::wstring& url) {
   switch (stream_provider) {
+    case kStreamAnimelab:
+      return InStr(url, L"animelab.com/player/") > -1;
     case kStreamAnn:
       return SearchRegex(url, L"animenewsnetwork.com/video/[0-9]+");
     case kStreamCrunchyroll:
       return SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/episode-[0-9]+.*-[0-9]+") ||
              SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/.*-movie-[0-9]+");
+    case kStreamDaisuki:
+      return InStr(url, L"daisuki.net/anime/watch/") > -1;
     case kStreamVeoh:
       return InStr(url, L"veoh.com/watch/") > -1;
     case kStreamViz:
@@ -322,6 +332,10 @@ bool MatchStreamUrl(StreamingVideoProvider stream_provider,
 void CleanStreamTitle(StreamingVideoProvider stream_provider,
                       std::wstring& title) {
   switch (stream_provider) {
+    // AnimeLab
+    case kStreamAnimelab:
+      EraseLeft(title, L"AnimeLab - ");
+      break;
     // Anime News Network
     case kStreamAnn:
       EraseRight(title, L" - Anime News Network");
@@ -335,6 +349,17 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
       EraseLeft(title, L"Crunchyroll - Watch ");
       EraseRight(title, L" - Movie - Movie");
       break;
+    // DAISUKI
+    case kStreamDaisuki: {
+      EraseRight(title, L" - DAISUKI");
+      auto pos = title.rfind(L" - ");
+      if (pos != title.npos) {
+        title = title.substr(pos + 3) + L" - " + title.substr(1, pos);
+      } else {
+        title.clear();
+      }
+      break;
+    }
     // Veoh
     case kStreamVeoh:
       EraseLeft(title, L"Watch Videos Online | ");

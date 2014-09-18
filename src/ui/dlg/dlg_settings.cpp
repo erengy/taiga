@@ -260,11 +260,13 @@ void SettingsDialog::OnOK() {
   page = &pages[kSettingsPageRecognitionStream];
   if (page->IsWindow()) {
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_STREAM_PROVIDER));
-    Settings.Set(taiga::kStream_Ann, list.GetCheckState(0) == TRUE);
-    Settings.Set(taiga::kStream_Crunchyroll, list.GetCheckState(1) == TRUE);
-    Settings.Set(taiga::kStream_Veoh, list.GetCheckState(2) == TRUE);
-    Settings.Set(taiga::kStream_Viz, list.GetCheckState(3) == TRUE);
-    Settings.Set(taiga::kStream_Youtube, list.GetCheckState(4) == TRUE);
+    Settings.Set(taiga::kStream_Animelab, list.GetCheckState(0) == TRUE);
+    Settings.Set(taiga::kStream_Ann, list.GetCheckState(1) == TRUE);
+    Settings.Set(taiga::kStream_Crunchyroll, list.GetCheckState(2) == TRUE);
+    Settings.Set(taiga::kStream_Daisuki, list.GetCheckState(3) == TRUE);
+    Settings.Set(taiga::kStream_Veoh, list.GetCheckState(4) == TRUE);
+    Settings.Set(taiga::kStream_Viz, list.GetCheckState(5) == TRUE);
+    Settings.Set(taiga::kStream_Youtube, list.GetCheckState(6) == TRUE);
     list.SetWindowHandle(nullptr);
   }
 

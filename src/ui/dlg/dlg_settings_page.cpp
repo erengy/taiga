@@ -253,21 +253,27 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      list.InsertItem(0, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", 0);
-      list.InsertItem(1, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", 1);
-      list.InsertItem(2, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", 3);
-      list.InsertItem(3, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", 4);
-      list.InsertItem(4, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", 5);
-      if (Settings.GetBool(taiga::kStream_Ann))
+      list.InsertItem(0, 0, ui::kIcon16_AppBlue, 0, nullptr, L"AnimeLab", 0);
+      list.InsertItem(1, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", 1);
+      list.InsertItem(2, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", 2);
+      list.InsertItem(3, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", 3);
+      list.InsertItem(4, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", 4);
+      list.InsertItem(5, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", 5);
+      list.InsertItem(6, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", 6);
+      if (Settings.GetBool(taiga::kStream_Animelab))
         list.SetCheckState(0, TRUE);
-      if (Settings.GetBool(taiga::kStream_Crunchyroll))
+      if (Settings.GetBool(taiga::kStream_Ann))
         list.SetCheckState(1, TRUE);
-      if (Settings.GetBool(taiga::kStream_Veoh))
+      if (Settings.GetBool(taiga::kStream_Crunchyroll))
         list.SetCheckState(2, TRUE);
-      if (Settings.GetBool(taiga::kStream_Viz))
+      if (Settings.GetBool(taiga::kStream_Daisuki))
         list.SetCheckState(3, TRUE);
-      if (Settings.GetBool(taiga::kStream_Youtube))
+      if (Settings.GetBool(taiga::kStream_Veoh))
         list.SetCheckState(4, TRUE);
+      if (Settings.GetBool(taiga::kStream_Viz))
+        list.SetCheckState(5, TRUE);
+      if (Settings.GetBool(taiga::kStream_Youtube))
+        list.SetCheckState(6, TRUE);
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.SetWindowHandle(nullptr);
       break;
