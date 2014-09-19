@@ -277,7 +277,7 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
   if (index < static_cast<int>(items.size())) {
     auto history_item = items.begin() + index;
 
-    if (to_history && history_item->episode) {
+    if (to_history && history_item->episode && *history_item->episode > 0) {
       history->items.push_back(*history_item);
       if (history->limit > 0 &&
           static_cast<int>(history->items.size()) > history->limit) {

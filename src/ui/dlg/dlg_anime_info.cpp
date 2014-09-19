@@ -553,13 +553,15 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content = L"Recently watched:\n" + content + L"\n";
       int watched_last_week = 0;
       foreach_c_(it, History.queue.items) {
-        if (!it->episode) continue;
+        if (!it->episode || *it->episode == 0)
+          continue;
         date_diff = date_now - (Date)(it->time.substr(0, 10));
         if (date_diff <= day_limit)
           watched_last_week++;
       }
       foreach_c_(it, History.items) {
-        if (!it->episode) continue;
+        if (!it->episode || *it->episode == 0)
+          continue;
         date_diff = date_now - (Date)(it->time.substr(0, 10));
         if (date_diff <= day_limit)
           watched_last_week++;
