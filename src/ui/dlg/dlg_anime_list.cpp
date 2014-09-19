@@ -912,6 +912,19 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
               DT_LEFT | DT_VCENTER | DT_SINGLELINE);
   dc.SetTextColor(text_color);
 
+  // Rewatching
+  if (index > -1 && index == hot_item) {
+    if (anime_item.GetMyRewatching()) {
+      rcText.Copy(rcBar);
+      rcText.Inflate(0, 4);
+      dc.EditFont(nullptr, 7, -1, TRUE);
+      dc.SetTextColor(ui::Theme.GetListProgressColor(ui::kListProgressButton));
+      dc.DrawText(L"Rewatching", -1, rcText,
+                  DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+      dc.SetTextColor(text_color);
+    }
+  }
+
   // Don't destroy the DC
   dc.DetachDc();
 }
