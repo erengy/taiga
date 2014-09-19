@@ -289,7 +289,7 @@ void PageMyInfo::Refresh(int anime_id) {
                      anime_item->GetEpisodeCount() > 0 ? anime_item->GetEpisodeCount() : 9999);
   SendDlgItemMessage(IDC_SPIN_PROGRESS, UDM_SETPOS32, 0, anime_item->GetMyLastWatchedEpisode());
 
-  // Re-watching
+  // Rewatching
   CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
   EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == anime::kCompleted);
 
@@ -400,7 +400,7 @@ bool PageMyInfo::Save() {
     return false;
   }
 
-  // Re-watching
+  // Rewatching
   history_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
 
   // Score

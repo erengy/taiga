@@ -541,7 +541,7 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   if (history_item.status) {
     anime_item->SetMyStatus(*history_item.status);
   }
-  // Edit re-watching status
+  // Edit rewatching status
   if (history_item.enable_rewatching) {
     anime_item->SetMyRewatching(*history_item.enable_rewatching);
   }

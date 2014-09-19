@@ -198,7 +198,7 @@ void HistoryDialog::RefreshList() {
       AppendString(details, L"Score: " + anime::TranslateScore(*it->score));
     if (it->status)
       AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ?
-                   L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Re-watching");
+                   L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Rewatching");
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
     if (it->date_start)

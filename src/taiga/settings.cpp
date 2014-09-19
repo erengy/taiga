@@ -60,7 +60,7 @@ const std::wstring kDefaultFormatHttp =
     L"&picurl=%image%"
     L"&playstatus=%playstatus%";
 const std::wstring kDefaultFormatMirc =
-    L"\00304$if($greater(%episode%,%watched%),Watching,Re-watching):\003 %title%"
+    L"\00304$if($greater(%episode%,%watched%),Watching,Rewatching):\003 %title%"
     L"$if(%episode%, \00303%episode%$if(%total%,/%total%))\003 "
     L"$if(%score%,\00314[Score: %score%]\003) "
     L"\00312%animeurl%";

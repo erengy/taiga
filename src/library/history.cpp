@@ -224,7 +224,7 @@ HistoryItem* HistoryQueue::FindItem(int anime_id, int search_mode) {
           if (it->episode)
             return &(*it);
           break;
-        // Re-watching
+        // Rewatching
         case kQueueSearchRewatching:
           if (it->enable_rewatching)
             return &(*it);
