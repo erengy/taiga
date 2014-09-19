@@ -450,12 +450,13 @@ bool Database::SaveList(bool include_database) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int Database::GetItemCount(int status, bool check_history) {
-  int count = 0;
-
   // Get current count
-  foreach_(it, items)
-    if (it->second.GetMyStatus(false) == status)
-      count++;
+  int count = std::count_if(items.begin(), items.end(),
+      [&](const std::pair<int, Item>& it) {
+        if (it.second.GetMyRewatching())
+          return status == kWatching;
+        return it.second.GetMyStatus(false) == status;
+      });
 
   // Search queued items for status changes
   if (check_history) {

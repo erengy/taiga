@@ -1109,10 +1109,14 @@ void AnimeListDialog::RefreshList(int index) {
       continue;
     if (IsDeletedFromList(anime_item))
       continue;
-    if (!group_view)
-      if (current_status_ != anime_item.GetMyStatus())
-        if (current_status_ != anime::kWatching || !it->second.GetMyRewatching())
+    if (!group_view) {
+      if (it->second.GetMyRewatching()) {
+        if (current_status_ != anime::kWatching)
           continue;
+      } else if (current_status_ != anime_item.GetMyStatus()) {
+        continue;
+      }
+    }
     if (!DlgMain.search_bar.filters.CheckItem(anime_item))
       continue;
 
