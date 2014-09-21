@@ -209,7 +209,6 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
-        win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
         win::Spin spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value = 0;
         spin.GetPos32(episode_value);
@@ -217,16 +216,11 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (anime_item->GetMyStatus() == anime::kCompleted &&
               episode_value == anime_item->GetEpisodeCount())
             spin.SetPos32(0);
-          combobox.Enable(FALSE);
-          combobox.SetCurSel(anime::kCompleted - 1);
         } else {
           if (episode_value == 0)
             spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
-          combobox.Enable();
-          combobox.SetCurSel(anime_item->GetMyStatus() - 1);
         }
         spin.SetWindowHandle(nullptr);
-        combobox.SetWindowHandle(nullptr);
         return TRUE;
       }
       break;
@@ -291,7 +285,6 @@ void PageMyInfo::Refresh(int anime_id) {
 
   // Rewatching
   CheckDlgButton(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyRewatching());
-  EnableDlgItem(IDC_CHECK_ANIME_REWATCH, anime_item->GetMyStatus() == anime::kCompleted);
 
   // Status
   win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
@@ -299,7 +292,6 @@ void PageMyInfo::Refresh(int anime_id) {
     for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++)
       combobox.AddItem(anime::TranslateMyStatus(i, false).c_str(), i);
   combobox.SetCurSel(anime_item->GetMyStatus() - 1);
-  combobox.Enable(!anime_item->GetMyRewatching());
   combobox.SetWindowHandle(nullptr);
 
   // Score
