@@ -988,6 +988,10 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
           if (!anime_item->GetMyScore())
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
+        case 4:
+          if (!anime::IsValidDate(anime_item->GetDateStart()))
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
       }
       // Indicate currently playing
       if (anime_item->GetPlaying()) {
