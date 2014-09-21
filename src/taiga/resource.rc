@@ -519,7 +519,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     LTEXT           "URL:", IDC_STATIC, 12, 35, 30, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_HTTP_URL, 12, 45, 289, 12, ES_AUTOHSCROLL, WS_EX_LEFT
     PUSHBUTTON      "Edit format string...", IDC_BUTTON_FORMAT_HTTP, 12, 64, 85, 14, 0, WS_EX_LEFT
-    LTEXT           "Tip: You can use this feature to update scripted forum signatures.", IDC_STATIC, 7, 92, 301, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Tip: Formatted string will be sent as the body data of a POST request.", IDC_STATIC, 7, 92, 301, 8, SS_LEFT, WS_EX_LEFT
 }
 
 
