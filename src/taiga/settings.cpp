@@ -392,9 +392,9 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
 }
 
 void AppSettings::HandleCompatibility() {
-  if (GetInt(kMeta_Version_Major) == 1 &&
-      GetInt(kMeta_Version_Minor) == 1 &&
-      GetInt(kMeta_Version_Revision) == 7) {
+  if (GetInt(kMeta_Version_Major) <= 1 &&
+      GetInt(kMeta_Version_Minor) <= 1 &&
+      GetInt(kMeta_Version_Revision) <= 7) {
     // Convert old password encoding to base64
     std::wstring password = SimpleDecrypt(GetWstr(kSync_Service_Mal_Password));
     Set(kSync_Service_Mal_Password, Base64Encode(password));
