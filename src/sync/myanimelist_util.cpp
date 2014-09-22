@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <regex>
+
 #include "base/file.h"
 #include "base/html.h"
 #include "base/log.h"
@@ -39,6 +41,13 @@ std::wstring DecodeText(std::wstring text) {
   DecodeHtmlEntities(text);
 
   return text;
+}
+
+std::wstring EraseBbcode(std::wstring& str) {
+  using namespace std::regex_constants;
+  const std::wregex pattern(L"\\[/?(b|i|u|(size(=[0-9]+)?))\\]",
+                            nosubs | optimize);
+  return std::regex_replace(str, pattern, L"");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

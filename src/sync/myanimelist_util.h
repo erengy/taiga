@@ -29,6 +29,7 @@ namespace sync {
 namespace myanimelist {
 
 std::wstring DecodeText(std::wstring text);
+std::wstring EraseBbcode(std::wstring& str);
 
 int TranslateSeriesStatusFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);

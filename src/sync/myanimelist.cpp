@@ -382,7 +382,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadStrValue(node, L"status")));
     anime_item.SetDateStart(XmlReadStrValue(node, L"start_date"));
     anime_item.SetDateEnd(XmlReadStrValue(node, L"end_date"));
-    std::wstring synopsis = DecodeText(XmlReadStrValue(node, L"synopsis"));
+    std::wstring synopsis = EraseBbcode(DecodeText(XmlReadStrValue(node, L"synopsis")));
     if (!StartsWith(synopsis, L"No synopsis has been added for this series yet"))
       anime_item.SetSynopsis(synopsis);
     anime_item.SetImageUrl(XmlReadStrValue(node, L"image"));
