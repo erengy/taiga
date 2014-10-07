@@ -709,7 +709,8 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       break;
     }
 
-    case NM_CLICK: {
+    case NM_CLICK:
+    case NM_RETURN: {
       switch (pnmh->idFrom) {
         // Execute link
         case IDC_LINK_ACCOUNT_HUMMINGBIRD:

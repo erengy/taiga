@@ -247,7 +247,8 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
   switch (pnmh->idFrom) {
     case IDC_LINK_ANIME_FANSUB:
       switch (pnmh->code) {
-        case NM_CLICK: {
+        case NM_CLICK:
+        case NM_RETURN: {
           // Set/change fansub group preference
           std::vector<std::wstring> groups;
           anime::GetFansubFilter(anime_id_, groups);

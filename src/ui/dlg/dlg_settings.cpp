@@ -448,7 +448,8 @@ LRESULT SettingsDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case IDC_LINK_DEFAULTS: {
       switch (pnmh->code) {
         // Restore default settings
-        case NM_CLICK: {
+        case NM_CLICK:
+        case NM_RETURN: {
           win::TaskDialog dlg;
           dlg.SetWindowTitle(TAIGA_APP_NAME);
           dlg.SetMainIcon(TD_ICON_WARNING);

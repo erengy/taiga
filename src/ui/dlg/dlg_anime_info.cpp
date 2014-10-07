@@ -208,7 +208,8 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case IDC_LINK_NOWPLAYING: {
       switch (pnmh->code) {
         // Link click
-        case NM_CLICK: {
+        case NM_CLICK:
+        case NM_RETURN: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
           std::wstring action = pNMLink->item.szUrl;
           if (IsEqual(pNMLink->item.szID, L"menu")) {
