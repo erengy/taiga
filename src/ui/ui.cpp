@@ -272,9 +272,6 @@ void OnLibraryEntryDelete(int id) {
 
   if (DlgSeason.IsWindow())
     DlgSeason.RefreshList(true);
-
-  if (CurrentEpisode.anime_id == id)
-    CurrentEpisode.Set(anime::ID_NOTINLIST);
 }
 
 void OnLibraryEntryImageChange(int id) {

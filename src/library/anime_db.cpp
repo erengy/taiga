@@ -499,6 +499,9 @@ void Database::AddToList(int anime_id, int status) {
   SaveList();
 
   ui::OnLibraryEntryAdd(anime_id);
+
+  if (CurrentEpisode.anime_id == anime::ID_NOTINLIST)
+    CurrentEpisode.Set(anime::ID_UNKNOWN);
 }
 
 void Database::ClearUserData() {
@@ -520,6 +523,9 @@ bool Database::DeleteListItem(int anime_id) {
 
   ui::ChangeStatusText(L"Item deleted. (" + anime_item->GetTitle() + L")");
   ui::OnLibraryEntryDelete(anime_item->GetId());
+
+  if (CurrentEpisode.anime_id == anime_id)
+    CurrentEpisode.Set(anime::ID_NOTINLIST);
 
   return true;
 }
