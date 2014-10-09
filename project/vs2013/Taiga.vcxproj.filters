@@ -73,6 +73,9 @@
     <ClCompile Include="..\..\src\base\file.cpp">
       <Filter>base</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\base\file_monitor.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\base\file_search.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -481,6 +484,9 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\file.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\base\file_monitor.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\foreach.h">

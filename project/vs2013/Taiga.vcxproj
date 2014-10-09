@@ -123,6 +123,7 @@
     <ClCompile Include="..\..\src\base\crc.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
     <ClCompile Include="..\..\src\base\file.cpp" />
+    <ClCompile Include="..\..\src\base\file_monitor.cpp" />
     <ClCompile Include="..\..\src\base\file_search.cpp" />
     <ClCompile Include="..\..\src\base\gfx.cpp" />
     <ClCompile Include="..\..\src\base\gzip.cpp" />
@@ -275,6 +276,7 @@
     <ClInclude Include="..\..\src\base\crc.h" />
     <ClInclude Include="..\..\src\base\crypto.h" />
     <ClInclude Include="..\..\src\base\file.h" />
+    <ClInclude Include="..\..\src\base\file_monitor.h" />
     <ClInclude Include="..\..\src\base\foreach.h" />
     <ClInclude Include="..\..\src\base\gfx.h" />
     <ClInclude Include="..\..\src\base\gzip.h" />
