@@ -246,13 +246,13 @@ void FeedFilter::AddCondition(FeedFilterElement element,
   conditions.back().value = value;
 }
 
-void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
+bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
   if (!enabled)
-    return;
+    return false;
 
   // No need to filter if the item was discarded before
   if (item.IsDiscarded())
-    return;
+    return false;
 
   if (!anime_ids.empty()) {
     bool apply_filter = false;
@@ -263,11 +263,11 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
       }
     }
     if (!apply_filter)
-      return;  // Filter doesn't apply to this item
+      return false;  // Filter doesn't apply to this item
   }
 
   bool matched = false;
-  size_t condition_index = 0;
+  size_t condition_index = 0;  // Used only for debugging purposes
 
   switch (match) {
     case kFeedFilterMatchAll:
@@ -298,7 +298,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         // Discard matched items, regardless of their previous state
         item.Discard(option);
       } else {
-        return;  // Filter doesn't apply to this item
+        return false;  // Filter doesn't apply to this item
       }
       break;
 
@@ -307,38 +307,12 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         // Select matched items, if they were not discarded before
         item.state = kFeedItemSelected;
       } else {
-        return;  // Filter doesn't apply to this item
+        return false;  // Filter doesn't apply to this item
       }
       break;
 
     case kFeedFilterActionPrefer: {
       if (recursive) {
-        if (matched) {
-          foreach_(it, feed.items) {
-            // Do not bother if the item was discarded before
-            if (it->IsDiscarded())
-              continue;
-            // Do not filter the same item again
-            if (it->index == item.index)
-              continue;
-            // Is it the same title?
-            if (it->episode_data.anime_id == anime::ID_NOTINLIST) {
-              if (!IsEqual(it->episode_data.title, item.episode_data.title))
-                continue;
-            } else {
-              if (it->episode_data.anime_id != item.episode_data.anime_id)
-                continue;
-            }
-            // Is it the same episode?
-            if (it->episode_data.number != item.episode_data.number)
-              continue;
-            // Is it the same group?
-            if (!IsEqual(it->episode_data.group, item.episode_data.group))
-              continue;
-            // Try applying the same filter
-            Filter(feed, *it, false);
-          }
-        }
         // Filters are strong if they're limited, weak otherwise
         bool strong_preference = !anime_ids.empty();
         if (strong_preference) {
@@ -350,7 +324,12 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
             item.Discard(option);
           }
         } else {
-          return; // Filter doesn't apply to this item
+          if (matched) {  
+            if (!ApplyPreferenceFilter(feed, item))
+              return false;  // Filter didn't have any effect
+          } else {
+            return false;  // Filter doesn't apply to this item
+          }
         }
       } else {
         // The fact that we're here means that the preference filter matched an
@@ -360,7 +339,7 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
           // Discard mismatched items, regardless of their previous state
           item.Discard(option);
         } else {
-          return;  // Filter doesn't apply to this item
+          return false;  // Filter doesn't apply to this item
         }
       }
       break;
@@ -373,6 +352,60 @@ void FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         Aggregator.filter_manager.TranslateConditions(*this, condition_index);
     item.description = filter_text + L" -- " + item.description;
   }
+
+  return true;
+}
+
+bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
+  std::map<FeedFilterElement, bool> element_found;
+
+  foreach_(condition, conditions) {
+    switch (condition->element) {
+      case kFeedFilterElement_Meta_Id:
+      case kFeedFilterElement_Episode_Title:
+      case kFeedFilterElement_Episode_Number:
+      case kFeedFilterElement_Episode_Group:
+        element_found[condition->element] = true;
+        break;
+    }
+  }
+
+  bool filter_applied = false;
+
+  foreach_(it, feed.items) {
+    // Do not bother if the item was discarded before
+    if (it->IsDiscarded())
+      continue;
+    // Do not filter the same item again
+    if (it->index == item.index)
+      continue;
+
+    // Is it the same title/anime?
+    if (!anime::IsValidId(it->episode_data.anime_id) &&
+        !anime::IsValidId(item.episode_data.anime_id)) {
+      if (!element_found[kFeedFilterElement_Episode_Title])
+        if (!IsEqual(it->episode_data.clean_title, item.episode_data.clean_title))
+          continue;
+    } else {
+      if (!element_found[kFeedFilterElement_Meta_Id])
+        if (it->episode_data.anime_id != item.episode_data.anime_id)
+          continue;
+    }
+    // Is it the same episode?
+    if (!element_found[kFeedFilterElement_Episode_Number])
+      if (it->episode_data.number != item.episode_data.number)
+        continue;
+    // Is it from the same fansub group?
+    if (!element_found[kFeedFilterElement_Episode_Group])
+      if (!IsEqual(it->episode_data.group, item.episode_data.group))
+        continue;
+
+    // Try applying the same filter
+    bool result = Filter(feed, *it, false);
+    filter_applied = filter_applied || result;
+  }
+
+  return filter_applied;
 }
 
 void FeedFilter::Reset() {

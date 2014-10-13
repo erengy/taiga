@@ -115,10 +115,12 @@ public:
   FeedFilter& operator=(const FeedFilter& filter);
 
   void AddCondition(FeedFilterElement element, FeedFilterOperator op, const std::wstring& value);
-  void Filter(Feed& feed, FeedItem& item, bool recursive);
+  bool Filter(Feed& feed, FeedItem& item, bool recursive);
   void Reset();
 
 public:
+  bool ApplyPreferenceFilter(Feed& feed, FeedItem& item);
+
   std::wstring name;
   bool enabled;
 
