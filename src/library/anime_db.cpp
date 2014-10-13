@@ -491,6 +491,8 @@ void Database::AddToList(int anime_id, int status) {
   history_item.status = status;
   if (status == anime::kCompleted) {
     history_item.episode = anime_item->GetEpisodeCount();
+    if (anime_item->GetEpisodeCount() == 1)
+      history_item.date_start = GetDate();
     history_item.date_finish = GetDate();
   }
   history_item.mode = taiga::kHttpServiceAddLibraryEntry;
