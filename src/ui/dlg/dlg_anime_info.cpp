@@ -154,7 +154,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         rect.Inflate(-1, -1);
         // Paint image
         auto image = ImageDatabase.GetImage(anime_id_);
-        if (anime_id_ > anime::ID_UNKNOWN && image) {
+        if (anime::IsValidId(anime_id_) && image) {
           dc.SetStretchBltMode(HALFTONE);
           dc.StretchBlt(rect.left, rect.top, rect.Width(), rect.Height(),
                         image->dc.Get(),
@@ -180,7 +180,7 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 LRESULT AnimeDialog::ImageLabel::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
     case WM_SETCURSOR: {
-      if (parent->anime_id_ > anime::ID_UNKNOWN) {
+      if (anime::IsValidId(parent->anime_id_)) {
         SetSharedCursor(IDC_HAND);
         return TRUE;
       }
@@ -194,7 +194,7 @@ LRESULT AnimeDialog::ImageLabel::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG &&
       HIWORD(wParam) == STN_CLICKED) {
-    if (anime_id_ > anime::ID_UNKNOWN) {
+    if (anime::IsValidId(anime_id_)) {
       ExecuteAction(L"ViewAnimePage", 0, anime_id_);
       return TRUE;
     }
@@ -717,7 +717,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
 
   // Content
   if (mode_ == kDialogModeNowPlaying) {
-    if (anime_id_ <= anime::ID_UNKNOWN) {
+    if (!anime::IsValidId(anime_id_)) {
       rect.left += ScaleX(win::kControlMargin);
       sys_link_.SetPosition(nullptr, rect);
     } else {

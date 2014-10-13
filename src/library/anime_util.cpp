@@ -41,6 +41,12 @@
 
 namespace anime {
 
+bool IsValidId(int anime_id) {
+  return anime_id > ID_UNKNOWN;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 bool IsAiredYet(const Item& item) {
   if (item.GetAiringStatus(false) != kNotYetAired)
     return true;

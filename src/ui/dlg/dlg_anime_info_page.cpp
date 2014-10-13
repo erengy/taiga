@@ -148,7 +148,7 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
 }
 
 void PageSeriesInfo::Refresh(int anime_id, bool connect) {
-  if (anime_id <= anime::ID_UNKNOWN)
+  if (!anime::IsValidId(anime_id))
     return;
 
   anime_id_ = anime_id;
@@ -270,7 +270,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
 }
 
 void PageMyInfo::Refresh(int anime_id) {
-  if (anime_id <= anime::ID_UNKNOWN)
+  if (!anime::IsValidId(anime_id))
     return;
 
   anime_id_ = anime_id;
@@ -356,7 +356,7 @@ void PageMyInfo::Refresh(int anime_id) {
 }
 
 void PageMyInfo::RefreshFansubPreference() {
-  if (anime_id_ <= anime::ID_UNKNOWN)
+  if (!anime::IsValidId(anime_id_))
     return;
 
   std::wstring text;

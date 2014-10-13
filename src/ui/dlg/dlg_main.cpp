@@ -672,7 +672,7 @@ void MainDialog::UpdateStatusTimer() {
   win::Rect rect;
   GetClientRect(&rect);
 
-  if (CurrentEpisode.anime_id > anime::ID_UNKNOWN &&
+  if (anime::IsValidId(CurrentEpisode.anime_id) &&
       IsUpdateAllowed(*AnimeDatabase.FindItem(CurrentEpisode.anime_id),
                       CurrentEpisode, true)) {
     auto timer = taiga::timers.timer(taiga::kTimerMedia);
@@ -710,7 +710,7 @@ void MainDialog::UpdateTip() {
   if (Taiga.debug_mode)
     tip += L" [debug]";
 
-  if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
+  if (anime::IsValidId(CurrentEpisode.anime_id)) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     tip += L"\nWatching: " + anime_item->GetTitle() +
       (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
@@ -733,7 +733,7 @@ void MainDialog::UpdateTitle() {
       title += L" @ " + service->name();
   }
 
-  if (CurrentEpisode.anime_id > anime::ID_UNKNOWN) {
+  if (anime::IsValidId(CurrentEpisode.anime_id)) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     title += L" \u2013 " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
     if (Settings.GetBool(taiga::kSync_Update_OutOfRange) &&

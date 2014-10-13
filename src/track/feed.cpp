@@ -153,7 +153,7 @@ bool Feed::ExamineData() {
     Meow.MatchDatabase(it->episode_data, false, true);
 
     // Update last aired episode number
-    if (it->episode_data.anime_id > anime::ID_UNKNOWN) {
+    if (anime::IsValidId(it->episode_data.anime_id)) {
       auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
       int episode_number = anime::GetEpisodeHigh(it->episode_data.number);
       anime_item->SetLastAiredEpisodeNumber(episode_number);

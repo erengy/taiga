@@ -23,6 +23,7 @@
 #include "base/url.h"
 #include "library/anime.h"
 #include "library/anime_episode.h"
+#include "library/anime_util.h"
 #include "taiga/announce.h"
 #include "taiga/http.h"
 #include "taiga/script.h"
@@ -62,7 +63,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
     }
   }
 
-  if (episode->anime_id <= anime::ID_UNKNOWN)
+  if (!anime::IsValidId(episode->anime_id))
     return;
 
   if (modes & kAnnounceToMirc) {

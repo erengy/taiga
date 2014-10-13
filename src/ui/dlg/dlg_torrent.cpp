@@ -259,7 +259,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else if (answer == L"SelectFansub") {
             int anime_id = feed_item->episode_data.anime_id;
             std::wstring group_name = feed_item->episode_data.group;
-            if (anime_id > anime::ID_UNKNOWN && !group_name.empty()) {
+            if (anime::IsValidId(anime_id) && !group_name.empty()) {
               for (int i = 0; i < list_.GetItemCount(); i++) {
                 feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
                 if (feed_item && !IsEqual(feed_item->episode_data.group, group_name)) {

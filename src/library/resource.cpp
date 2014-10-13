@@ -33,11 +33,11 @@ anime::ImageDatabase ImageDatabase;
 namespace anime {
 
 bool ImageDatabase::Load(int anime_id, bool load, bool download) {
-  if (anime_id <= anime::ID_UNKNOWN)
+  if (!IsValidId(anime_id))
     return false;
 
   if (items_.find(anime_id) != items_.end()) {
-    if (items_[anime_id].data > anime::ID_UNKNOWN) {
+    if (IsValidId(items_[anime_id].data)) {
       return true;
     } else if (!load) {
       return false;

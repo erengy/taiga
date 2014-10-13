@@ -193,7 +193,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
 ////////////////////////////////////////////////////////////////////////////////
 
 Item* Database::FindItem(int id) {
-  if (id > ID_UNKNOWN) {
+  if (IsValidId(id)) {
     auto it = items.find(id);
     if (it != items.end())
       return &it->second;

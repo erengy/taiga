@@ -31,6 +31,8 @@ namespace anime {
 class Episode;
 class Item;
 
+bool IsValidId(int anime_id);
+
 bool IsAiredYet(const Item& item);
 bool IsFinishedAiring(const Item& item);
 int EstimateLastAiredEpisodeNumber(const Item& item);

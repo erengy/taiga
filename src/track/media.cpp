@@ -135,7 +135,7 @@ void MediaPlayers::set_title_changed(bool title_changed) {
 MediaPlayer* MediaPlayers::CheckRunningPlayers() {
   current_player_.clear();
 
-  bool recognized = CurrentEpisode.anime_id > anime::ID_UNKNOWN;
+  bool recognized = anime::IsValidId(CurrentEpisode.anime_id);
 
   // Go through windows, starting with the highest in the Z-order
   HWND hwnd = GetWindow(ui::GetWindowHandle(ui::kDialogMain), GW_HWNDFIRST);

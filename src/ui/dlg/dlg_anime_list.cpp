@@ -1051,7 +1051,7 @@ LRESULT AnimeListDialog::OnTabNotify(LPARAM lParam) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int AnimeListDialog::GetCurrentId() {
-  if (current_id_ > anime::ID_UNKNOWN)
+  if (anime::IsValidId(current_id_))
     if (!AnimeDatabase.FindItem(current_id_))
       current_id_ = anime::ID_UNKNOWN;
 
@@ -1061,7 +1061,7 @@ int AnimeListDialog::GetCurrentId() {
 anime::Item* AnimeListDialog::GetCurrentItem() {
   anime::Item* item = nullptr;
 
-  if (current_id_ > anime::ID_UNKNOWN) {
+  if (anime::IsValidId(current_id_)) {
     item = AnimeDatabase.FindItem(current_id_);
     if (!item)
       current_id_ = anime::ID_UNKNOWN;
@@ -1071,7 +1071,7 @@ anime::Item* AnimeListDialog::GetCurrentItem() {
 }
 
 void AnimeListDialog::SetCurrentId(int anime_id) {
-  if (anime_id > anime::ID_UNKNOWN)
+  if (anime::IsValidId(anime_id))
     if (!AnimeDatabase.FindItem(anime_id))
       anime_id = anime::ID_UNKNOWN;
 
