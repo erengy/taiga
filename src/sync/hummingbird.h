@@ -48,7 +48,6 @@ private:
   REQUEST_AND_RESPONSE(DeleteLibraryEntry);
   REQUEST_AND_RESPONSE(GetLibraryEntries);
   REQUEST_AND_RESPONSE(GetMetadataById);
-  REQUEST_AND_RESPONSE(GetMetadataByIdV2);
   REQUEST_AND_RESPONSE(SearchTitle);
   REQUEST_AND_RESPONSE(UpdateLibraryEntry);
 

@@ -58,7 +58,6 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     BUILD_HTTP_REQUEST(kDeleteLibraryEntry, DeleteLibraryEntry);
     BUILD_HTTP_REQUEST(kGetLibraryEntries, GetLibraryEntries);
     BUILD_HTTP_REQUEST(kGetMetadataById, GetMetadataById);
-    BUILD_HTTP_REQUEST(kGetMetadataByIdV2, GetMetadataByIdV2);
     BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
     BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
   }
@@ -72,7 +71,6 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
       HANDLE_HTTP_RESPONSE(kDeleteLibraryEntry, DeleteLibraryEntry);
       HANDLE_HTTP_RESPONSE(kGetLibraryEntries, GetLibraryEntries);
       HANDLE_HTTP_RESPONSE(kGetMetadataById, GetMetadataById);
-      HANDLE_HTTP_RESPONSE(kGetMetadataByIdV2, GetMetadataByIdV2);
       HANDLE_HTTP_RESPONSE(kSearchTitle, SearchTitle);
       HANDLE_HTTP_RESPONSE(kUpdateLibraryEntry, UpdateLibraryEntry);
     }
@@ -103,10 +101,6 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
-}
-
-void Service::GetMetadataByIdV2(Request& request, HttpRequest& http_request) {
   // Hummingbird APIv2 is not yet ready, but this method can be called for
   // additional data that APIv1 doesn't provide.
   http_request.url.host = L"hummingbird.me/api/v2";
@@ -171,22 +165,6 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
-  Json::Value root;
-
-  if (!ParseResponseBody(response, http_response, root))
-    return;
-
-  ::anime::Item anime_item;
-  anime_item.SetSource(this->id());
-  anime_item.SetId(ToWstr(root["id"].asInt()), this->id());
-  anime_item.SetLastModified(time(nullptr));  // current time
-
-  ParseAnimeObject(root, anime_item);
-
-  AnimeDatabase.UpdateItem(anime_item);
-}
-
-void Service::GetMetadataByIdV2(Response& response, HttpResponse& http_response) {
   Json::Value root;
 
   if (!ParseResponseBody(response, http_response, root))
@@ -360,7 +338,6 @@ bool Service::ParseResponseBody(Response& response, HttpResponse& http_response,
       response.data[L"error"] = L"Could not parse the list";
       break;
     case kGetMetadataById:
-    case kGetMetadataByIdV2:
       response.data[L"error"] = L"Could not parse the anime object";
       break;
     case kSearchTitle:

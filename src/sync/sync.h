@@ -29,7 +29,6 @@ namespace sync {
 void AuthenticateUser(bool download);
 void GetLibraryEntries();
 void GetMetadataById(int id);
-void GetMetadataByIdV2(int id);
 void SearchTitle(string_t title, int id);
 void Synchronize();
 void UpdateLibraryEntry(AnimeValues& anime_values, int id,

@@ -153,12 +153,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
       // Try making the other request, even though this one failed
       if (response.service_id == kMyAnimeList && anime_item) {
         SearchTitle(anime_item->GetTitle(), anime_id);
-      } else if (response.service_id == kHummingbird && anime_item) {
-        GetMetadataByIdV2(anime_id);
       }
-      break;
-    case kGetMetadataByIdV2:
-      ui::OnLibraryEntryChangeFailure(anime_id, response.data[L"error"]);
       break;
     case kGetLibraryEntries:
       ui::OnLibraryChangeFailure();
@@ -214,15 +209,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       // doesn't provide us enough information.
       if (response.service_id == kMyAnimeList && anime_item) {
         SearchTitle(anime_item->GetTitle(), anime_id);
-      // Hummingbird APIv1 doesn't provide all the information we need, so we
-      // make an additional call to APIv2.
-      } else if (response.service_id == kHummingbird && anime_item) {
-        GetMetadataByIdV2(anime_id);
       }
-      break;
-    }
-    case kGetMetadataByIdV2: {
-      ui::OnLibraryEntryChange(anime_id);
       break;
     }
 

@@ -33,7 +33,6 @@ enum HttpClientMode {
   // Service
   kHttpServiceAuthenticateUser,
   kHttpServiceGetMetadataById,
-  kHttpServiceGetMetadataByIdV2,
   kHttpServiceSearchTitle,
   kHttpServiceAddLibraryEntry,
   kHttpServiceDeleteLibraryEntry,

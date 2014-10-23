@@ -74,17 +74,6 @@ void GetMetadataById(int id) {
   ServiceManager.MakeRequest(request);
 }
 
-// This is just a temporary method we use until Hummingbird improves their API,
-// and it is only called after we receive a kGetMetadataById response.
-void GetMetadataByIdV2(int id) {
-  Request request(kGetMetadataByIdV2);
-  SetActiveServiceForRequest(request);
-  if (!AddAuthenticationToRequest(request))
-    return;
-  AddServiceDataToRequest(request, id);
-  ServiceManager.MakeRequest(request);
-}
-
 void SearchTitle(string_t title, int id) {
   Request request(kSearchTitle);
   SetActiveServiceForRequest(request);
@@ -195,8 +184,6 @@ RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode) {
       return kAuthenticateUser;
     case taiga::kHttpServiceGetMetadataById:
       return kGetMetadataById;
-    case taiga::kHttpServiceGetMetadataByIdV2:
-      return kGetMetadataByIdV2;
     case taiga::kHttpServiceSearchTitle:
       return kSearchTitle;
     case taiga::kHttpServiceAddLibraryEntry:
@@ -218,8 +205,6 @@ taiga::HttpClientMode RequestTypeToClientMode(RequestType request_type) {
       return taiga::kHttpServiceAuthenticateUser;
     case kGetMetadataById:
       return taiga::kHttpServiceGetMetadataById;
-    case kGetMetadataByIdV2:
-      return taiga::kHttpServiceGetMetadataByIdV2;
     case kSearchTitle:
       return taiga::kHttpServiceSearchTitle;
     case kAddLibraryEntry:
