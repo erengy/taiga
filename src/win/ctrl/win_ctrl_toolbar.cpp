@@ -87,8 +87,11 @@ DWORD Toolbar::GetButtonStyle(int index) {
 }
 
 LPCWSTR Toolbar::GetButtonTooltip(int index) {
-  bool valid = index < static_cast<int>(tooltip_text_.size());
-  return valid ? tooltip_text_[index] : L"";
+  if (index < static_cast<int>(tooltip_text_.size()))
+    if (!tooltip_text_[index].empty())
+      return tooltip_text_[index].c_str();
+
+  return nullptr;
 }
 
 DWORD Toolbar::GetPadding() {
@@ -110,7 +113,7 @@ BOOL Toolbar::InsertButton(int index, int bitmap, int command_id,
   tbb.fsStyle = style;
   tbb.dwData = data;
 
-  tooltip_text_.push_back(tooltip);
+  tooltip_text_.push_back(tooltip ? tooltip : L"");
   return SendMessage(TB_INSERTBUTTON, index, reinterpret_cast<LPARAM>(&tbb));
 }
 

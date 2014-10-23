@@ -645,6 +645,10 @@ void OnSettingsRootFoldersEmpty() {
 void OnSettingsServiceChange() {
   int current_page = DlgMain.navigation.GetCurrentPage();
   DlgMain.navigation.RefreshSearchText(current_page);
+
+  string_t tooltip = L"Synchronize list with " +
+                     taiga::GetCurrentService()->name();
+  DlgMain.toolbar_main.SetButtonTooltip(0, tooltip.c_str());
 }
 
 bool OnSettingsServiceChangeConfirm(const string_t& current_service,

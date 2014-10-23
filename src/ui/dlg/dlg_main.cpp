@@ -197,8 +197,9 @@ void MainDialog::CreateDialogControls() {
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
+  std::wstring tooltip = L"Synchronize list with " + taiga::GetCurrentService()->name();
   toolbar_main.InsertButton(0, ui::kIcon24_Sync, kToolbarButtonSync,
-                            fsState, fsStyle1, 0, nullptr, L"Synchronize list");
+                            fsState, fsStyle1, 0, nullptr, tooltip.c_str());
   toolbar_main.InsertButton(1, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(2, ui::kIcon24_Folders, kToolbarButtonFolders,
                             fsState, fsStyle2, 2, nullptr, L"Root folders");

@@ -350,7 +350,7 @@ protected:
   virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  std::vector<LPCWSTR> tooltip_text_;
+  std::vector<std::wstring> tooltip_text_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
