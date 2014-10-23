@@ -71,6 +71,8 @@ void InitializeBrowserData() {
     return;
 
   AddBrowserData(kWebEngineWebkit,
+      L"Address and search bar", ROLE_SYSTEM_TEXT);
+  AddBrowserData(kWebEngineWebkit,
       L"Address and search bar", ROLE_SYSTEM_GROUPING);
   AddBrowserData(kWebEngineWebkit,
       L"Address", ROLE_SYSTEM_GROUPING);
