@@ -46,7 +46,7 @@ taiga::AppSettings Settings;
 namespace taiga {
 
 const std::wstring kDefaultExternalLinks =
-    L"Hummingboard|http://hummingboard.me\r\n"
+    L"Hummingboard|http://hb.cybrox.eu\r\n"
     L"MALgraph|http://mal.oko.im\r\n"
     L"-\r\n"
     L"Mahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\n"
@@ -415,6 +415,14 @@ void AppSettings::HandleCompatibility() {
         break;
       }
     }
+  }
+
+  if (GetInt(kMeta_Version_Major) <= 1 &&
+      GetInt(kMeta_Version_Minor) <= 1 &&
+      GetInt(kMeta_Version_Revision) <= 8) {
+    auto external_links = GetWstr(kApp_Interface_ExternalLinks);
+    Replace(external_links, L"http://hummingboard.me", L"http://hb.cybrox.eu");
+    Set(kApp_Interface_ExternalLinks, external_links);
   }
 }
 
