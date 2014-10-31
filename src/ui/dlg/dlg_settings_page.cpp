@@ -797,18 +797,24 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
         switch (lpnmitem->iItem) {
           case 0:
-            ExecuteLink(L"http://www.animenewsnetwork.com/video/");
+            ExecuteLink(L"http://www.animelab.com");
             break;
           case 1:
-            ExecuteLink(L"http://www.crunchyroll.com");
+            ExecuteLink(L"http://www.animenewsnetwork.com/video/");
             break;
           case 2:
-            ExecuteLink(L"http://www.veoh.com");
+            ExecuteLink(L"http://www.crunchyroll.com");
             break;
           case 3:
-            ExecuteLink(L"http://www.vizanime.com");
+            ExecuteLink(L"http://www.daisuki.net");
             break;
           case 4:
+            ExecuteLink(L"http://www.veoh.com");
+            break;
+          case 5:
+            ExecuteLink(L"http://www.viz.com/anime/streaming");
+            break;
+          case 6:
             ExecuteLink(L"http://www.youtube.com");
             break;
         }
