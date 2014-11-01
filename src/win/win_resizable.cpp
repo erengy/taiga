@@ -25,7 +25,13 @@
 namespace win {
 
 Resizable::Resizable()
-    : x_(1), y_(1) {
+    : horizontal_(true), vertical_(true),
+      x_(1), y_(1) {
+}
+
+Resizable::Resizable(bool horizontal, bool vertical)
+    : horizontal_(horizontal), vertical_(vertical),
+      x_(1), y_(1) {
 }
 
 void Resizable::ResizeProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -57,13 +63,16 @@ void Resizable::OnInitDialog(HWND hwnd) {
   si.nMin = 1;
   si.nPos = 1;
 
-  si.nMax = rect.Width();
-  si.nPage = rect.Width();
-  ::SetScrollInfo(hwnd, SB_HORZ, &si, FALSE);
-
-  si.nMax = rect.Height();
-  si.nPage = rect.Height();
-  ::SetScrollInfo(hwnd, SB_VERT, &si, FALSE);
+  if (horizontal_) {
+    si.nMax = rect.Width();
+    si.nPage = rect.Width();
+    ::SetScrollInfo(hwnd, SB_HORZ, &si, FALSE);
+  }
+  if (vertical_) {
+    si.nMax = rect.Height();
+    si.nPage = rect.Height();
+    ::SetScrollInfo(hwnd, SB_VERT, &si, FALSE);
+  }
 }
 
 void Resizable::OnScroll(HWND hwnd, int bar, UINT code) {

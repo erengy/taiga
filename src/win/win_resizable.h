@@ -26,6 +26,7 @@ namespace win {
 class Resizable {
 public:
   Resizable();
+  Resizable(bool horizontal, bool vertical);
   virtual ~Resizable() {}
 
   void ResizeProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -36,6 +37,7 @@ private:
   void OnSize(HWND hwnd, UINT type, SIZE size);
   void ScrollClient(HWND hwnd, int bar, int pos);
 
+  bool horizontal_, vertical_;
   int x_, y_;
 };
 
