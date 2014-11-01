@@ -72,11 +72,11 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.tooltips.SetDelayTime(30000, -1, 0);
 
   // Insert list columns
-  listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 340, LVCFMT_LEFT, L"Anime title");
+  listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 200, LVCFMT_LEFT, L"Anime title");
   listview.InsertColumn(1, 200, 200, LVCFMT_CENTER, L"Progress");
-  listview.InsertColumn(2,  62,  62, LVCFMT_CENTER, L"Score");
-  listview.InsertColumn(3,  62,  62, LVCFMT_CENTER, L"Type");
-  listview.InsertColumn(4, 105, 105, LVCFMT_RIGHT,  L"Season");
+  listview.InsertColumn(2, 60, 60, LVCFMT_CENTER, L"Score");
+  listview.InsertColumn(3, 60, 60, LVCFMT_CENTER, L"Type");
+  listview.InsertColumn(4, 90, 90, LVCFMT_RIGHT,  L"Season");
 
   // Insert tabs and list groups
   listview.InsertGroup(anime::kNotInList, anime::TranslateMyStatus(anime::kNotInList, false).c_str());

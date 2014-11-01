@@ -235,7 +235,7 @@ void MainDialog::CreateDialogControls() {
 
 void MainDialog::InitWindowPosition() {
   UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
-  const LONG min_w = ScaleX(710);
+  const LONG min_w = ScaleX(683);  // 1366/2, for 1366x768
   const LONG min_h = ScaleX(480);
 
   win::Rect rcParent, rcWindow;
