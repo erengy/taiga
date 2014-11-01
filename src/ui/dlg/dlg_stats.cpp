@@ -29,6 +29,10 @@ namespace ui {
 
 StatsDialog DlgStats;
 
+StatsDialog::StatsDialog()
+    : win::Resizable(false, true) {
+}
+
 BOOL StatsDialog::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 4; i++) {

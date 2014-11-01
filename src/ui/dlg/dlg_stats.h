@@ -26,7 +26,7 @@ namespace ui {
 
 class StatsDialog : public win::Dialog, public win::Resizable {
 public:
-  StatsDialog() {}
+  StatsDialog();
   ~StatsDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
