@@ -724,7 +724,16 @@ bool OnFeedNotify(const Feed& feed) {
       const auto& episode = it->episode_data;
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
       auto anime_title = anime_item ? anime_item->GetTitle() : episode.title;
-      found_episodes[anime_title].insert(episode.number);
+
+      auto episode_l = anime::GetEpisodeLow(episode.number);
+      auto episode_h = anime::GetEpisodeHigh(episode.number);
+      if (anime_item)
+        episode_l = max(episode_l, anime_item->GetMyLastWatchedEpisode() + 1);
+      std::wstring episode_number = ToWstr(episode_h);
+      if (episode_l < episode_h)
+        episode_number = ToWstr(episode_l) + L"-" + episode_number;
+
+      found_episodes[anime_title].insert(episode_number);
     }
   }
 
