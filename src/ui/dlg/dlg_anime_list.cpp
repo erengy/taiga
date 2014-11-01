@@ -728,6 +728,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   win::Rect rcBar = *rc;
 
   int eps_aired = anime_item.GetLastAiredEpisodeNumber(true);
+  int eps_available = anime_item.GetAvailableEpisodeCount();
   int eps_watched = anime_item.GetMyLastWatchedEpisode(true);
   int eps_estimate = anime::EstimateEpisodeCount(anime_item);
   int eps_total = anime_item.GetEpisodeCount();
@@ -824,8 +825,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable)) {
     if (eps_estimate > 0) {
       float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
-      int available_episode_count = static_cast<int>(anime_item.GetAvailableEpisodeCount());
-      for (int i = eps_watched + 1; i <= available_episode_count; i++) {
+      for (int i = eps_watched + 1; i <= eps_available; i++) {
         if (i > 0 && anime_item.IsEpisodeAvailable(i)) {
           rcAvail.left = static_cast<int>(rcBar.left + (width * (i - 1)));
           rcAvail.right = static_cast<int>(rcAvail.left + width + 1);
@@ -848,7 +848,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     rcSeparator.right = rcWatched.right + 1;
     ui::Theme.DrawListProgress(dc.Get(), &rcSeparator, ui::kListProgressSeparator);
   }
-  if (eps_aired > 0 && (eps_aired < eps_total || eps_total == 0)) {
+  if (eps_aired > 0 && (eps_aired < eps_total || eps_total == 0) && eps_aired > eps_available) {
     rcSeparator.left = rcAired.right;
     rcSeparator.right = rcAired.right + 1;
     ui::Theme.DrawListProgress(dc.Get(), &rcSeparator, ui::kListProgressSeparator);
