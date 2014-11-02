@@ -45,7 +45,7 @@ std::wstring DecodeText(std::wstring text) {
 
 std::wstring EraseBbcode(std::wstring& str) {
   using namespace std::regex_constants;
-  const std::wregex pattern(L"\\[/?(b|i|u|(size(=[0-9]+)?))\\]",
+  const std::wregex pattern(L"\\[/?(b|i|u|(size(=[0-9]+)?)|(url(=[^\\]]*)?))\\]",
                             nosubs | optimize);
   return std::regex_replace(str, pattern, L"");
 }
