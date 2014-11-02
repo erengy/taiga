@@ -179,8 +179,8 @@ bool PlayEpisode(int anime_id, int number) {
       if (FileExists(next_episode_path)) {
         file_path = next_episode_path;
       } else {
-        LOG(LevelWarning, L"File doesn't exist anymore.");
-        LOG(LevelWarning, L"Path: " + next_episode_path);
+        LOG(LevelWarning, L"File doesn't exist anymore.\n"
+                          L"Path: " + next_episode_path);
         anime_item->SetEpisodeAvailability(number, false, L"");
       }
     }

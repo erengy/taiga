@@ -107,8 +107,8 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
 
     if (!anime::IsValidEpisode(upper_bound, anime_item.GetEpisodeCount()) ||
         !anime::IsValidEpisode(lower_bound, anime_item.GetEpisodeCount())) {
-      LOG(LevelWarning, L"Invalid episode number: " + episode_.number);
-      LOG(LevelWarning, L"File: " + AddTrailingSlash(root) + name);
+      LOG(LevelWarning, L"Invalid episode number: " + episode_.number + L"\n"
+                        L"File: " + AddTrailingSlash(root) + name);
       continue;
     }
 
