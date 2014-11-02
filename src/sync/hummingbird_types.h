@@ -23,13 +23,15 @@ namespace sync {
 namespace hummingbird {
 
 enum SeriesStatus {
-  kCurrentlyAiring = 1,
+  kUnknownStatus,
+  kCurrentlyAiring,
   kFinishedAiring,
   kNotYetAired
 };
 
 enum SeriesType {
-  kTv = 1,
+  kUnknownType,
+  kTv,
   kMovie,
   kOva,
   kOna,

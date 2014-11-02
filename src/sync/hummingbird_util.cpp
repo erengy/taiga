@@ -51,6 +51,7 @@ std::wstring TranslateSeriesRatingFrom(float value) {
 
 int TranslateSeriesStatusFrom(int value) {
   switch (value) {
+    case kUnknownStatus: return anime::kUnknownStatus;
     case kCurrentlyAiring: return anime::kAiring;
     case kFinishedAiring: return anime::kFinishedAiring;
     case kNotYetAired: return anime::kNotYetAired;
@@ -75,6 +76,7 @@ int TranslateSeriesStatusFrom(const std::wstring& value) {
 
 int TranslateSeriesTypeFrom(int value) {
   switch (value) {
+    case kUnknownType: return anime::kUnknownType;
     case kTv: return anime::kTv;
     case kOva: return anime::kOva;
     case kMovie: return anime::kMovie;

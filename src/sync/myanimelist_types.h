@@ -23,13 +23,15 @@ namespace sync {
 namespace myanimelist {
 
 enum SeriesStatus {
-  kAiring = 1,
+  kUnknownStatus,
+  kAiring,
   kFinishedAiring,
   kNotYetAired
 };
 
 enum SeriesType {
-  kTv = 1,
+  kUnknownType,
+  kTv,
   kOva,
   kMovie,
   kSpecial,
