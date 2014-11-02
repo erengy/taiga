@@ -140,23 +140,22 @@ std::wstring TranslateDateToSeasonString(const Date& date) {
 
   switch (season.name) {
     case Season::kUnknown:
-      name = L"Unknown";
       break;
     case Season::kWinter:
-      name = L"Winter";
+      name = L"Winter ";
       break;
     case Season::kSpring:
-      name = L"Spring";
+      name = L"Spring ";
       break;
     case Season::kSummer:
-      name = L"Summer";
+      name = L"Summer ";
       break;
     case Season::kFall:
-      name = L"Fall";
+      name = L"Fall ";
       break;
   }
 
-  return name + L" " + ToWstr(season.year);
+  return name + ToWstr(season.year);
 }
 
 std::wstring TranslateSeasonToMonths(const std::wstring& season) {
