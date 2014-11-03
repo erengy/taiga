@@ -374,12 +374,22 @@ int Item::GetMyStatus(bool check_queue) const {
   return history_item ? *history_item->status : my_info_->status;
 }
 
+int Item::GetMyRewatchedTimes(bool check_queue) const {
+  if (!my_info_.get())
+    return 0;
+
+  HistoryItem* history_item = check_queue ?
+      SearchHistory(kQueueSearchRewatchedTimes) : nullptr;
+
+  return history_item ? *history_item->rewatched_times : my_info_->rewatched_times;
+}
+
 int Item::GetMyRewatching(bool check_queue) const {
   if (!my_info_.get())
     return FALSE;
 
   HistoryItem* history_item = check_queue ?
-    SearchHistory(kQueueSearchRewatching) : nullptr;
+      SearchHistory(kQueueSearchRewatching) : nullptr;
 
   return history_item ? *history_item->enable_rewatching : my_info_->rewatching;
 }
@@ -446,6 +456,12 @@ void Item::SetMyStatus(int status) {
   assert(my_info_.get());
 
   my_info_->status = status;
+}
+
+void Item::SetMyRewatchedTimes(int rewatched_times) {
+  assert(my_info_.get());
+
+  my_info_->rewatched_times = rewatched_times;
 }
 
 void Item::SetMyRewatching(int rewatching) {

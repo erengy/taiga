@@ -24,6 +24,7 @@ MyInformation::MyInformation()
     : watched_episodes(0),
       score(0),
       status(kNotInList),
+      rewatched_times(0),
       rewatching(FALSE),
       rewatching_ep(0) {
 }

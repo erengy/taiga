@@ -90,6 +90,7 @@ class MyInformation {
   int watched_episodes;
   int score;
   int status;
+  int rewatched_times;
   int rewatching;
   int rewatching_ep;
   Date date_start;

@@ -432,7 +432,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
       history_item.status = kCompleted;
       if (item.GetMyRewatching()) {
         history_item.enable_rewatching = FALSE;
-        //history_item.times_rewatched++; // TODO: Enable when MAL adds to API
+        history_item.rewatched_times = item.GetMyRewatchedTimes() + 1;
       }
     // Move to watching
     } else if (item.GetMyStatus() != kWatching || *history_item.episode == 1) {

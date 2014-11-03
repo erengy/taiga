@@ -72,10 +72,7 @@ int Statistics::CalculateEpisodeCount() {
       continue;
 
     episode_count += it->second.GetMyLastWatchedEpisode();
-
-    // TODO: Implement times_rewatched when MAL adds to API
-    if (it->second.GetMyRewatching() == TRUE)
-      episode_count += it->second.GetEpisodeCount();
+    episode_count += it->second.GetMyRewatchedTimes() * it->second.GetEpisodeCount();
   }
 
   return episode_count;
@@ -104,9 +101,7 @@ const std::wstring& Statistics::CalculateLifeSpentWatching() {
     }
 
     int episodes_watched = it->second.GetMyLastWatchedEpisode();
-
-    if (it->second.GetMyRewatching() == TRUE)
-      episodes_watched += it->second.GetEpisodeCount();
+    episodes_watched += it->second.GetMyRewatchedTimes() * it->second.GetEpisodeCount();
 
     seconds += (duration * 60) * episodes_watched;
   }

@@ -342,6 +342,7 @@ int Database::UpdateItem(const Item& new_item) {
     item->SetMyLastWatchedEpisode(new_item.GetMyLastWatchedEpisode(false));
     item->SetMyScore(new_item.GetMyScore(false));
     item->SetMyStatus(new_item.GetMyStatus(false));
+    item->SetMyRewatchedTimes(new_item.GetMyRewatchedTimes());
     item->SetMyRewatching(new_item.GetMyRewatching(false));
     item->SetMyRewatchingEp(new_item.GetMyRewatchingEp());
     item->SetMyDateStart(new_item.GetMyDateStart());
@@ -394,6 +395,7 @@ bool Database::LoadList() {
       anime_item.SetMyDateEnd(XmlReadStrValue(node, L"date_end"));
       anime_item.SetMyScore(XmlReadIntValue(node, L"score"));
       anime_item.SetMyStatus(XmlReadIntValue(node, L"status"));
+      anime_item.SetMyRewatchedTimes(XmlReadIntValue(node, L"rewatched_times"));
       anime_item.SetMyRewatching(XmlReadIntValue(node, L"rewatching"));
       anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"rewatching_ep"));
       anime_item.SetMyTags(XmlReadStrValue(node, L"tags"));
@@ -436,6 +438,7 @@ bool Database::SaveList(bool include_database) {
       XmlWriteStrValue(node, L"date_end", std::wstring(item->GetMyDateEnd()).c_str());
       XmlWriteIntValue(node, L"score", item->GetMyScore(false));
       XmlWriteIntValue(node, L"status", item->GetMyStatus(false));
+      XmlWriteIntValue(node, L"rewatched_times", item->GetMyRewatchedTimes());
       XmlWriteIntValue(node, L"rewatching", item->GetMyRewatching(false));
       XmlWriteIntValue(node, L"rewatching_ep", item->GetMyRewatchingEp());
       XmlWriteStrValue(node, L"tags", item->GetMyTags(false).c_str());
@@ -553,6 +556,9 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   // Edit rewatching status
   if (history_item.enable_rewatching) {
     anime_item->SetMyRewatching(*history_item.enable_rewatching);
+  }
+  if (history_item.rewatched_times) {
+    anime_item->SetMyRewatchedTimes(*history_item.rewatched_times);
   }
   // Edit tags
   if (history_item.tags) {

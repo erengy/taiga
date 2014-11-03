@@ -32,6 +32,7 @@ enum QueueSearchMode {
   kQueueSearchDateStart = 1,
   kQueueSearchDateEnd,
   kQueueSearchEpisode,
+  kQueueSearchRewatchedTimes,
   kQueueSearchRewatching,
   kQueueSearchScore,
   kQueueSearchStatus,
@@ -46,6 +47,7 @@ public:
   Optional<Date> date_start;
   Optional<Date> date_finish;
   Optional<int> enable_rewatching;
+  Optional<int> rewatched_times;
   Optional<std::wstring> tags;
 };
 

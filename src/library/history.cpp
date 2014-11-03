@@ -68,6 +68,9 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
     if (item.enable_rewatching)
       if (anime->GetMyRewatching() == *item.enable_rewatching)
         item.enable_rewatching.Reset();
+    if (item.rewatched_times)
+      if (anime->GetMyRewatchedTimes() == *item.rewatched_times)
+        item.rewatched_times.Reset();
     if (item.tags)
       if (anime->GetMyTags() == *item.tags)
         item.tags.Reset();
@@ -84,6 +87,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
           !item.score &&
           !item.status &&
           !item.enable_rewatching &&
+          !item.rewatched_times &&
           !item.tags &&
           !item.date_start &&
           !item.date_finish)
@@ -107,6 +111,8 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
               it->status = *item.status;
             if (item.enable_rewatching)
               it->enable_rewatching = *item.enable_rewatching;
+            if (item.rewatched_times)
+              it->rewatched_times = *item.rewatched_times;
             if (item.tags)
               it->tags = *item.tags;
             if (item.date_start)
@@ -222,6 +228,11 @@ HistoryItem* HistoryQueue::FindItem(int anime_id, int search_mode) {
         // Episode
         case kQueueSearchEpisode:
           if (it->episode)
+            return &(*it);
+          break;
+        // Rewatched times
+        case kQueueSearchRewatchedTimes:
+          if (it->rewatched_times)
             return &(*it);
           break;
         // Rewatching
@@ -392,6 +403,7 @@ void History::ReadQueue(const pugi::xml_document& document) {
     READ_ATTRIBUTE_INT(history_item.score, L"score");
     READ_ATTRIBUTE_INT(history_item.status, L"status");
     READ_ATTRIBUTE_INT(history_item.enable_rewatching, L"enable_rewatching");
+    READ_ATTRIBUTE_INT(history_item.rewatched_times, L"rewatched_times");
     READ_ATTRIBUTE_STR(history_item.tags, L"tags");
     READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
     READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
@@ -495,6 +507,7 @@ bool History::Save() {
     APPEND_ATTRIBUTE_INT(L"score", it->score);
     APPEND_ATTRIBUTE_INT(L"status", it->status);
     APPEND_ATTRIBUTE_INT(L"enable_rewatching", it->enable_rewatching);
+    APPEND_ATTRIBUTE_INT(L"rewatched_times", it->rewatched_times);
     APPEND_ATTRIBUTE_STR(L"tags", it->tags);
     APPEND_ATTRIBUTE_DATE(L"date_start", it->date_start);
     APPEND_ATTRIBUTE_DATE(L"date_finish", it->date_finish);

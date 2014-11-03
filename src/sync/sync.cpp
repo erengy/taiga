@@ -117,6 +117,8 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
     request.data[L"date_finish"] = *anime_values.date_finish;
   if (anime_values.enable_rewatching)
     request.data[L"enable_rewatching"] = ToWstr(*anime_values.enable_rewatching);
+  if (anime_values.rewatched_times)
+    request.data[L"rewatched_times"] = ToWstr(*anime_values.rewatched_times);
   if (anime_values.tags)
     request.data[L"tags"] = *anime_values.tags;
 

@@ -96,6 +96,7 @@ public:
   int GetMyLastWatchedEpisode(bool check_queue = true) const;
   int GetMyScore(bool check_queue = true) const;
   int GetMyStatus(bool check_queue = true) const;
+  int GetMyRewatchedTimes(bool check_queue = true) const;
   int GetMyRewatching(bool check_queue = true) const;
   int GetMyRewatchingEp() const;
   const Date& GetMyDateStart(bool check_queue = true) const;
@@ -106,6 +107,7 @@ public:
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
   void SetMyStatus(int status);
+  void SetMyRewatchedTimes(int rewatched_times);
   void SetMyRewatching(int rewatching);
   void SetMyRewatchingEp(int rewatching_ep);
   void SetMyDateStart(const Date& date);
