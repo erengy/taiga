@@ -140,6 +140,11 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   if (request.data.count(L"score"))
     http_request.url.query[L"rating"] =
         TranslateMyRatingTo(ToInt(request.data[L"score"]));
+  if (request.data.count(L"enable_rewatching"))
+    http_request.url.query[L"rewatching"] =
+        request.data[L"enable_rewatching"] == L"0" ? L"false" : L"true";
+  if (request.data.count(L"rewatched_times"))
+    http_request.url.query[L"rewatched_times"] = request.data[L"rewatched_times"];
   if (request.data.count(L"episode"))
     http_request.url.query[L"episodes_watched"] = request.data[L"episode"];
 }
@@ -318,6 +323,7 @@ void Service::ParseLibraryObject(Json::Value& value) {
 
   anime_item.AddtoUserList();
   anime_item.SetMyLastWatchedEpisode(value["episodes_watched"].asInt());
+  anime_item.SetMyRewatchedTimes(value["rewatched_times"].asInt());
   anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(value["status"].asString())));
   anime_item.SetMyRewatching(value["rewatching"].asBool());
   anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(rating_value["value"].asString()),
