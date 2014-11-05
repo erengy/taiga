@@ -101,9 +101,6 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  // Hummingbird APIv2 is not yet ready, but this method can be called for
-  // additional data that APIv1 doesn't provide.
-  http_request.url.host = L"hummingbird.me/api/v2";
   http_request.url.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
 }
 
@@ -180,7 +177,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   anime_item.SetId(ToWstr(root["id"].asInt()), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
-  ParseAnimeObjectV2(root, anime_item);
+  ParseAnimeObject(root, anime_item);
 
   AnimeDatabase.UpdateItem(anime_item);
 }
@@ -282,30 +279,6 @@ void Service::ParseAnimeObject(Json::Value& value, anime::Item& anime_item) {
   auto& genres_value = value["genres"];
   for (size_t i = 0; i < genres_value.size(); i++)
     genres.push_back(StrToWstr(genres_value[i]["name"].asString()));
-
-  if (!genres.empty())
-    anime_item.SetGenres(genres);
-}
-
-void Service::ParseAnimeObjectV2(Json::Value& value, anime::Item& anime_item) {
-  anime_item.SetSlug(StrToWstr(value["slug"].asString()));
-  anime_item.SetTitle(StrToWstr(value["canonical_title"].asString()));
-  anime_item.SetEnglishTitle(StrToWstr(value["english_title"].asString()));
-  anime_item.SetSynonyms(StrToWstr(value["romaji_title"].asString()));
-  anime_item.SetSynopsis(StrToWstr(value["synopsis"].asString()));
-  anime_item.SetImageUrl(StrToWstr(value["poster_image"].asString()));
-  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(value["type"].asString())));
-  anime_item.SetDateStart(StrToWstr(value["started_airing"].asString()));
-  anime_item.SetDateEnd(StrToWstr(value["finished_airing"].asString()));
-  anime_item.SetScore(TranslateSeriesRatingFrom(value["community_rating"].asFloat()));
-  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(value["age_rating"].asString())));
-  anime_item.SetEpisodeCount(value["episode_count"].asInt());
-  anime_item.SetEpisodeLength(value["episode_length"].asInt());
-
-  std::vector<std::wstring> genres;
-  auto& genres_value = value["genres"];
-  for (size_t i = 0; i < genres_value.size(); i++)
-    genres.push_back(StrToWstr(genres_value[i].asString()));
 
   if (!genres.empty())
     anime_item.SetGenres(genres);
