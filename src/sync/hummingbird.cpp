@@ -135,7 +135,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
     http_request.url.query[L"status"] =
         TranslateMyStatusTo(ToInt(request.data[L"status"]));
   if (request.data.count(L"score"))
-    http_request.url.query[L"rating"] =
+    http_request.url.query[L"sane_rating_update"] =
         TranslateMyRatingTo(ToInt(request.data[L"score"]));
   if (request.data.count(L"enable_rewatching"))
     http_request.url.query[L"rewatching"] =
