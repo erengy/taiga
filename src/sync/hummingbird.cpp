@@ -269,9 +269,14 @@ void Service::ParseAnimeObject(Json::Value& value, anime::Item& anime_item) {
   anime_item.SetTitle(StrToWstr(value["title"].asString()));
   anime_item.SetSynonyms(StrToWstr(value["alternate_title"].asString()));
   anime_item.SetEpisodeCount(value["episode_count"].asInt());
+  anime_item.SetEpisodeLength(value["episode_length"].asInt());
   anime_item.SetImageUrl(StrToWstr(value["cover_image"].asString()));
   anime_item.SetSynopsis(StrToWstr(value["synopsis"].asString()));
   anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(value["show_type"].asString())));
+  anime_item.SetDateStart(StrToWstr(value["started_airing"].asString()));
+  anime_item.SetDateEnd(StrToWstr(value["finished_airing"].asString()));
+  anime_item.SetScore(TranslateSeriesRatingFrom(value["community_rating"].asFloat()));
+  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(value["age_rating"].asString())));
 
   std::vector<std::wstring> genres;
   auto& genres_value = value["genres"];
