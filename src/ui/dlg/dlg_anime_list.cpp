@@ -23,6 +23,7 @@
 #include "library/anime_filter.h"
 #include "library/anime_util.h"
 #include "library/resource.h"
+#include "sync/service.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
@@ -1117,7 +1118,6 @@ void AnimeListDialog::RefreshList(int index) {
   // Add items to list
   std::vector<int> group_count(anime::kMyStatusLast);
   int group_index = -1;
-  int icon_index = 0;
   int i = 0;
   foreach_(it, AnimeDatabase.items) {
     anime::Item& anime_item = it->second;
@@ -1139,15 +1139,12 @@ void AnimeListDialog::RefreshList(int index) {
 
     group_count.at(anime_item.GetMyStatus())++;
     group_index = group_view ? anime_item.GetMyStatus() : -1;
-    icon_index = anime_item.GetPlaying() ? ui::kIcon16_Play : StatusToIcon(anime_item.GetAiringStatus());
     i = listview.GetItemCount();
 
-    listview.InsertItem(i, group_index, icon_index,
+    listview.InsertItem(i, group_index, 0,
                         0, nullptr, LPSTR_TEXTCALLBACK,
                         static_cast<LPARAM>(anime_item.GetId()));
-    listview.SetItem(i, 2, anime::TranslateScore(anime_item.GetMyScore()).c_str());
-    listview.SetItem(i, 3, anime::TranslateType(anime_item.GetType()).c_str());
-    listview.SetItem(i, 4, anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str());
+    RefreshListItemColumns(i, anime_item);
   }
 
   // Set group headers
@@ -1183,14 +1180,27 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
 
   if (index > -1) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
-    int icon_index = anime_item->GetPlaying() ?
-        ui::kIcon16_Play : StatusToIcon(anime_item->GetAiringStatus());
-    listview.SetItemIcon(index, icon_index);
-    listview.SetItem(index, 2, anime::TranslateScore(anime_item->GetMyScore()).c_str());
-    listview.SetItem(index, 3, anime::TranslateType(anime_item->GetType()).c_str());
-    listview.SetItem(index, 4, anime::TranslateDateToSeasonString(anime_item->GetDateStart()).c_str());
+    if (anime_item)
+      RefreshListItemColumns(index, *anime_item);
     listview.RedrawItems(index, index, true);
   }
+}
+
+void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime_item) {
+  int icon_index = anime_item.GetPlaying() ?
+      ui::kIcon16_Play : StatusToIcon(anime_item.GetAiringStatus());
+
+  std::wstring score = anime::TranslateMyScore(anime_item.GetMyScore());
+  if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
+    auto community_rating = anime_item.GetScore();
+    if (anime_item.GetMyScore() == 0 && community_rating > 0.0)
+      score = ToWstr(community_rating / 2.0, 1);
+  }
+
+  listview.SetItemIcon(index, icon_index);
+  listview.SetItem(index, 2, score.c_str());
+  listview.SetItem(index, 3, anime::TranslateType(anime_item.GetType()).c_str());
+  listview.SetItem(index, 4, anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str());
 }
 
 void AnimeListDialog::RefreshTabs(int index) {

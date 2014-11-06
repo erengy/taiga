@@ -48,6 +48,7 @@ public:
   int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
   void RefreshListItem(int anime_id);
+  void RefreshListItemColumns(int index, const anime::Item& anime_item);
   void RefreshTabs(int index = -1);
 
   void GoToPreviousTab();
