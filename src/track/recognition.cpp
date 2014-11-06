@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <regex>
+
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -753,10 +755,22 @@ bool RecognitionEngine::IsEpisodeFormat(const std::wstring& str,
   if (numstart == str.length())
     return false;
 
-  // Check for episode prefix
-  if (numstart > 0)
+  if (numstart > 0) {
+    // S##E##
+    if (str.front() == 'S' && IsNumeric(str.back())) {
+      static const std::wregex pattern(L"S\\d{1,2}x?E(\\d{1,3})",
+                                       std::regex_constants::icase);
+      std::match_results<std::wstring::const_iterator> match_results;
+      if (std::regex_match(str, match_results, pattern)) {
+        episode.number = match_results[1];
+        return true;
+      }
+    }
+
+    // Check for episode prefix
     if (!CompareKeys(str.substr(0, numstart), episode_prefixes))
       return false;
+  }
 
   for (i = numstart + 1; i < str.length(); i++) {
     if (!IsNumeric(str.at(i))) {
