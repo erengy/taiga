@@ -217,7 +217,7 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
       auto& item = menu->items.at(i);
       item.checked = false;
       item.def = false;
-      item.name = anime::TranslateScoreFull(i);
+      item.name = anime::TranslateMyScoreFull(i);
     }
     if (anime_item) {
       int item_index = anime_item->GetMyScore();

@@ -45,8 +45,12 @@ int TranslateAgeRatingFrom(const std::wstring& value) {
   return anime::kUnknownAgeRating;
 }
 
-std::wstring TranslateSeriesRatingFrom(float value) {
-  return ToWstr(static_cast<double>(value) * 2.0, 2);
+double TranslateSeriesRatingFrom(float value) {
+  return static_cast<double>(value) * 2.0;
+}
+
+double TranslateSeriesRatingTo(double value) {
+  return value / 2.0;
 }
 
 int TranslateSeriesStatusFrom(int value) {
@@ -152,26 +156,6 @@ std::wstring TranslateMyStatusTo(int value) {
 
   LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
   return L"";
-}
-
-std::wstring TranslateKeyTo(const std::wstring& key) {
-  if (IsEqual(key, L"episode")) {
-    return key;
-  } else if (IsEqual(key, L"status")) {
-    return key;
-  } else if (IsEqual(key, L"score")) {
-    return key;
-  } else if (IsEqual(key, L"date_start")) {
-    return key;
-  } else if (IsEqual(key, L"date_finish")) {
-    return key;
-  } else if (IsEqual(key, L"enable_rewatching")) {
-    return key;
-  } else if (IsEqual(key, L"tags")) {
-    return key;
-  }
-
-  return std::wstring();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

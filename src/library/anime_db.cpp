@@ -116,7 +116,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetAgeRating(XmlReadIntValue(node, L"age_rating"));
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
-    item.SetScore(XmlReadStrValue(node, L"score"));
+    item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
     item.SetPopularity(XmlReadStrValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
@@ -179,7 +179,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     XML_WI(L"age_rating", it->second.GetAgeRating());
     XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
-    XML_WS(L"score", it->second.GetScore(), pugi::node_pcdata);
+    XML_WS(L"score", ToWstr(it->second.GetScore()), pugi::node_pcdata);
     XML_WS(L"popularity", it->second.GetPopularity(), pugi::node_pcdata);
     XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
     XML_WS(L"modified", ToWstr(it->second.GetLastModified()), pugi::node_pcdata);
@@ -316,7 +316,7 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetPopularity(new_item.GetPopularity());
     if (!new_item.GetProducers().empty())
       item->SetProducers(new_item.GetProducers());
-    if (!new_item.GetScore().empty())
+    if (new_item.GetScore() != kUnknownScore)
       item->SetScore(new_item.GetScore());
     if (!new_item.GetSynopsis().empty())
       item->SetSynopsis(new_item.GetSynopsis());
@@ -655,7 +655,7 @@ void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
     item.SetImageUrl(XmlReadStrValue(node, L"series_image"));
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
-    item.SetScore(XmlReadStrValue(node, L"score"));
+    item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
     item.SetPopularity(XmlReadStrValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"last_modified").c_str()));

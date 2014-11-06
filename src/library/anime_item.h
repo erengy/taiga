@@ -62,7 +62,7 @@ public:
   const std::vector<std::wstring>& GetGenres() const;
   const std::wstring& GetPopularity() const;
   const std::vector<std::wstring>& GetProducers() const;
-  const std::wstring& GetScore() const;
+  double GetScore() const;
   const std::wstring& GetSynopsis() const;
   const time_t GetLastModified() const;
 
@@ -86,7 +86,7 @@ public:
   void SetPopularity(const std::wstring& popularity);
   void SetProducers(const std::wstring& producers);
   void SetProducers(const std::vector<std::wstring>& producers);
-  void SetScore(const std::wstring& score);
+  void SetScore(double score);
   void SetSynopsis(const std::wstring& synopsis);
   void SetLastModified(time_t modified);
 

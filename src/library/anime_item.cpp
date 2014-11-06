@@ -161,11 +161,11 @@ const std::vector<std::wstring>& Item::GetProducers() const {
   return metadata_.creator;
 }
 
-const std::wstring& Item::GetScore() const {
+double Item::GetScore() const {
   if (metadata_.community.size() > 0)
-    return metadata_.community.at(0);
+    return ToDouble(metadata_.community.at(0));
 
-  return EmptyString();
+  return 0.0;
 }
 
 const std::wstring& Item::GetSynopsis() const {
@@ -326,11 +326,11 @@ void Item::SetProducers(const std::vector<std::wstring>& producers) {
   metadata_.creator = producers;
 }
 
-void Item::SetScore(const std::wstring& score) {
+void Item::SetScore(double score) {
   if (metadata_.community.size() < 1)
     metadata_.community.resize(1);
 
-  metadata_.community.at(0) = score;
+  metadata_.community.at(0) = ToWstr(score);
 }
 
 void Item::SetSynopsis(const std::wstring& synopsis) {

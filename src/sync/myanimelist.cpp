@@ -339,7 +339,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   anime_item.SetEpisodeCount(ToInt(episodes));
   anime_item.SetGenres(genres_vector);
   anime_item.SetPopularity(popularity);
-  anime_item.SetScore(score);
+  anime_item.SetScore(ToDouble(score));
   anime_item.SetLastModified(time(nullptr));  // current time
 
   AnimeDatabase.UpdateItem(anime_item);
@@ -377,7 +377,7 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
     anime_item.SetEnglishTitle(DecodeText(XmlReadStrValue(node, L"english")));
     anime_item.SetSynonyms(DecodeText(XmlReadStrValue(node, L"synonyms")));
     anime_item.SetEpisodeCount(XmlReadIntValue(node, L"episodes"));
-    anime_item.SetScore(XmlReadStrValue(node, L"score"));
+    anime_item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
     anime_item.SetType(TranslateSeriesTypeFrom(XmlReadStrValue(node, L"type")));
     anime_item.SetAiringStatus(TranslateSeriesStatusFrom(XmlReadStrValue(node, L"status")));
     anime_item.SetDateStart(XmlReadStrValue(node, L"start_date"));

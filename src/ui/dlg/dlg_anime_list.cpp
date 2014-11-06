@@ -944,7 +944,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    std::wstring text = anime::TranslateScore(anime_item.GetMyScore());
+    std::wstring text = anime::TranslateMyScore(anime_item.GetMyScore());
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 

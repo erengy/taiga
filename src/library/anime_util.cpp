@@ -133,7 +133,7 @@ bool MetadataNeedsRefresh(const Item& item) {
     return true;
   if (item.GetGenres().empty())
     return true;
-  if (item.GetScore().empty() &&
+  if (item.GetScore() == kUnknownScore &&
       taiga::GetCurrentServiceId() == sync::kMyAnimeList)
     return true;
 
@@ -327,7 +327,7 @@ void StartWatching(Item& item, Episode& episode) {
   }
 
   // Get additional information
-  if (item.GetScore().empty() || item.GetSynopsis().empty())
+  if (item.GetScore() == kUnknownScore || item.GetSynopsis().empty())
     sync::GetMetadataById(item.GetId());
 
   // Update list
@@ -752,7 +752,7 @@ std::wstring TranslateNumber(int value, const std::wstring& default_char) {
   return value > 0 ? ToWstr(value) : default_char;
 }
 
-std::wstring TranslateScore(int value, const std::wstring& default_char) {
+std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
   switch (taiga::GetCurrentServiceId()) {
     default:
     case sync::kMyAnimeList:
@@ -764,7 +764,7 @@ std::wstring TranslateScore(int value, const std::wstring& default_char) {
   }
 }
 
-std::wstring TranslateScoreFull(int value) {
+std::wstring TranslateMyScoreFull(int value) {
   switch (taiga::GetCurrentServiceId()) {
     default:
     case sync::kMyAnimeList:
@@ -800,6 +800,17 @@ std::wstring TranslateScoreFull(int value) {
         case 10: return L"\u2605 5.0";
       }
       break;
+  }
+}
+
+std::wstring TranslateScore(double value) {
+  switch (taiga::GetCurrentServiceId()) {
+    default:
+    case sync::kMyAnimeList:
+      return ToWstr(value, 2);
+
+    case sync::kHummingbird:
+      return ToWstr(sync::hummingbird::TranslateSeriesRatingTo(value), 2);
   }
 }
 

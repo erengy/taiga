@@ -29,7 +29,8 @@ namespace sync {
 namespace hummingbird {
   
 int TranslateAgeRatingFrom(const std::wstring& value);
-std::wstring TranslateSeriesRatingFrom(float value);
+double TranslateSeriesRatingFrom(float value);
+double TranslateSeriesRatingTo(double value);
 int TranslateSeriesStatusFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);
 int TranslateSeriesTypeFrom(int value);
@@ -39,7 +40,6 @@ int TranslateMyRatingFrom(const std::wstring& value, const std::wstring& type);
 std::wstring TranslateMyRatingTo(int value);
 int TranslateMyStatusFrom(const std::wstring& value);
 std::wstring TranslateMyStatusTo(int value);
-std::wstring TranslateKeyTo(const std::wstring& key);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);

@@ -164,15 +164,13 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
 
   // Set information
-  #define ADD_INFOLINE(x, y) (x.empty() ? y : x)
   text = anime::TranslateType(anime_item->GetType()) + L"\n" +
          anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown") + L"\n" +
          anime::TranslateStatus(anime_item->GetAiringStatus()) + L"\n" +
          anime::TranslateDateToSeasonString(anime_item->GetDateStart()) + L"\n" +
          (anime_item->GetGenres().empty() ? L"Unknown" : Join(anime_item->GetGenres(), L", ")) + L"\n" +
          (anime_item->GetProducers().empty() ? L"Unknown" : Join(anime_item->GetProducers(), L", ")) + L"\n" +
-         ADD_INFOLINE(anime_item->GetScore(), L"0.00");
-  #undef ADD_INFOLINE
+         anime::TranslateScore(anime_item->GetScore());
   SetDlgItemText(IDC_STATIC_ANIME_DETAILS, text.c_str());
 
   // Set synopsis
@@ -299,7 +297,7 @@ void PageMyInfo::Refresh(int anime_id) {
   combobox.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
   if (combobox.GetCount() == 0) {
     for (int i = 10; i >= 0; i--) {
-      combobox.AddString(anime::TranslateScoreFull(i).c_str());
+      combobox.AddString(anime::TranslateMyScoreFull(i).c_str());
     }
   }
   combobox.SetCurSel(10 - anime_item->GetMyScore());
