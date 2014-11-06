@@ -23,6 +23,7 @@
 #include "base/time.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
+#include "sync/service.h"
 #include "taiga/settings.h"
 
 #include "win/ctrl/win_ctrl.h"
@@ -227,7 +228,23 @@ int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
-  return lstrcmpi(item1.GetScore().c_str(), item2.GetScore().c_str());
+  double score1 = item1.GetMyScore();
+  double score2 = item2.GetMyScore();
+
+  if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
+    if (!score1)
+      score1 = item1.GetScore();
+    if (!score2)
+      score2 = item2.GetScore();
+  }
+
+  if (score1 > score2) {
+    return base::kGreaterThan;
+  } else if (score1 < score2) {
+    return base::kLessThan;
+  }
+
+  return base::kEqualTo;
 }
 
 int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
