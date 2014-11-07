@@ -635,10 +635,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     */
 
   } else {
-    int episode_number = anime::GetEpisodeLow(CurrentEpisode.number);
-    if (episode_number == 0)
-      episode_number = 1;
-    std::wstring content = L"Now playing: Episode " + ToWstr(episode_number);
+    std::wstring content = L"Now playing: Episode " + CurrentEpisode.number;
     if (!CurrentEpisode.group.empty())
       content += L" by " + CurrentEpisode.group;
     content += L"\n";
@@ -648,6 +645,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"<a href=\"AddToListAs(1)\">Add to list</a>";
     }
     content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
+    int episode_number = anime::GetEpisodeHigh(CurrentEpisode.number);
+    if (episode_number == 0)
+      episode_number = 1;
     if (anime_item->GetEpisodeCount() == 0 ||
         anime_item->GetEpisodeCount() > episode_number) {
       content += L" \u2022 <a href=\"PlayEpisode(" + ToWstr(episode_number + 1) + L"\">Watch next episode</a>";
