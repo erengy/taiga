@@ -222,7 +222,7 @@ int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
   return base::kEqualTo;
 }
 
-int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
+int SortListByMyScore(const anime::Item& item1, const anime::Item& item2) {
   double score1 = item1.GetMyScore();
   double score2 = item2.GetMyScore();
 
@@ -233,11 +233,18 @@ int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
       score2 = item2.GetScore();
   }
 
-  if (score1 > score2) {
-    return base::kGreaterThan;
-  } else if (score1 < score2) {
-    return base::kLessThan;
-  }
+  if (score1 != score2)
+    return score2 > score1 ? base::kGreaterThan : base::kLessThan;
+
+  return base::kEqualTo;
+}
+
+int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
+  double score1 = item1.GetScore();
+  double score2 = item2.GetScore();
+
+  if (score1 != score2)
+    return score1 > score2 ? base::kGreaterThan : base::kLessThan;
 
   return base::kEqualTo;
 }
@@ -297,6 +304,8 @@ int SortList(int type, int order, int id1, int id2) {
         return SortListByPopularity(*item1, *item2);
       case kListSortProgress:
         return SortListByProgress(*item1, *item2);
+      case kListSortMyScore:
+        return SortListByMyScore(*item1, *item2);
       case kListSortScore:
         return SortListByScore(*item1, *item2);
       case kListSortSeason:
@@ -337,6 +346,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
     case kListSortLastUpdated:
     case kListSortPopularity:
     case kListSortProgress:
+    case kListSortMyScore:
     case kListSortScore:
     case kListSortSeason:
     case kListSortTitle: {

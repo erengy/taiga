@@ -71,22 +71,23 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
     switch (pnmh->code) {
       // Column click
       case LVN_COLUMNCLICK: {
-        LPNMLISTVIEW lplv = (LPNMLISTVIEW)pnmh;
-        int order = 1;
-        if (lplv->iSubItem == list_.GetSortColumn())
-          order = list_.GetSortOrder() * -1;
+        auto lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         switch (lplv->iSubItem) {
-          // Episode
+          // Episodes
           case 2:
-            list_.Sort(lplv->iSubItem, order, ui::kListSortNumber, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, -1, ui::kListSortNumber, ui::ListViewCompareProc);
+            break;
+          // Score
+          case 3:
+            list_.Sort(lplv->iSubItem, -1, ui::kListSortScore, ui::ListViewCompareProc);
             break;
           // Season
           case 4:
-            list_.Sort(lplv->iSubItem, order, ui::kListSortDateStart, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, 1, ui::kListSortDateStart, ui::ListViewCompareProc);
             break;
           // Other columns
           default:
-            list_.Sort(lplv->iSubItem, order, ui::kListSortDefault, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, 1, ui::kListSortDefault, ui::ListViewCompareProc);
             break;
         }
         break;

@@ -334,7 +334,7 @@ int AnimeListDialog::ListView::GetSortType(int column) {
       return ui::kListSortProgress;
     // Score
     case 2:
-      return ui::kListSortScore;
+      return ui::kListSortMyScore;
     // Season
     case 4:
       return ui::kListSortSeason;
