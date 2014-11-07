@@ -150,11 +150,11 @@ const std::vector<std::wstring>& Item::GetGenres() const {
   return metadata_.subject;
 }
 
-const std::wstring& Item::GetPopularity() const {
+int Item::GetPopularity() const {
   if (metadata_.community.size() > 1)
-    return metadata_.community.at(1);
+    return ToInt(metadata_.community.at(1));
 
-  return EmptyString();
+  return 0;
 }
 
 const std::vector<std::wstring>& Item::GetProducers() const {
@@ -307,11 +307,11 @@ void Item::SetGenres(const std::vector<std::wstring>& genres) {
   metadata_.subject = genres;
 }
 
-void Item::SetPopularity(const std::wstring& popularity) {
+void Item::SetPopularity(int popularity) {
   if (metadata_.community.size() < 2)
     metadata_.community.resize(2);
 
-  metadata_.community.at(1) = popularity;
+  metadata_.community.at(1) = ToWstr(popularity);
 }
 
 void Item::SetProducers(const std::wstring& producers) {
@@ -330,7 +330,7 @@ void Item::SetScore(double score) {
   if (metadata_.community.size() < 1)
     metadata_.community.resize(1);
 
-  metadata_.community.at(0) = ToWstr(score);
+  metadata_.community.at(0) = score > 0.0 ? ToWstr(score) : L"";
 }
 
 void Item::SetSynopsis(const std::wstring& synopsis) {

@@ -60,7 +60,7 @@ public:
   const std::wstring& GetImageUrl() const;
   enum_t GetAgeRating() const;
   const std::vector<std::wstring>& GetGenres() const;
-  const std::wstring& GetPopularity() const;
+  int GetPopularity() const;
   const std::vector<std::wstring>& GetProducers() const;
   double GetScore() const;
   const std::wstring& GetSynopsis() const;
@@ -83,7 +83,7 @@ public:
   void SetAgeRating(enum_t rating);
   void SetGenres(const std::wstring& genres);
   void SetGenres(const std::vector<std::wstring>& genres);
-  void SetPopularity(const std::wstring& popularity);
+  void SetPopularity(int popularity);
   void SetProducers(const std::wstring& producers);
   void SetProducers(const std::vector<std::wstring>& producers);
   void SetScore(double score);

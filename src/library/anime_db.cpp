@@ -117,7 +117,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
-    item.SetPopularity(XmlReadStrValue(node, L"popularity"));
+    item.SetPopularity(XmlReadIntValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
   }
@@ -164,6 +164,8 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
       if (!v.empty()) XmlWriteStrValue(anime_node, n, v.c_str(), t)
+    #define XML_WF(n, v, t) \
+      if (v > 0.0) XmlWriteStrValue(anime_node, n, ToWstr(v).c_str(), t)
     XML_WS(L"source", source, pugi::node_pcdata);
     XML_WS(L"slug", it->second.GetSlug(), pugi::node_pcdata);
     XML_WS(L"title", it->second.GetTitle(), pugi::node_cdata);
@@ -179,10 +181,11 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     XML_WI(L"age_rating", it->second.GetAgeRating());
     XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
     XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
-    XML_WS(L"score", ToWstr(it->second.GetScore()), pugi::node_pcdata);
-    XML_WS(L"popularity", it->second.GetPopularity(), pugi::node_pcdata);
+    XML_WF(L"score", it->second.GetScore(), pugi::node_pcdata);
+    XML_WI(L"popularity", it->second.GetPopularity());
     XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
     XML_WS(L"modified", ToWstr(it->second.GetLastModified()), pugi::node_pcdata);
+    #undef XML_WF
     #undef XML_WS
     #undef XML_WI
     #undef XML_WD
@@ -312,7 +315,7 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetAgeRating(new_item.GetAgeRating());
     if (!new_item.GetGenres().empty())
       item->SetGenres(new_item.GetGenres());
-    if (!new_item.GetPopularity().empty())
+    if (new_item.GetPopularity() > 0)
       item->SetPopularity(new_item.GetPopularity());
     if (!new_item.GetProducers().empty())
       item->SetProducers(new_item.GetProducers());
@@ -656,7 +659,7 @@ void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
-    item.SetPopularity(XmlReadStrValue(node, L"popularity"));
+    item.SetPopularity(XmlReadIntValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"last_modified").c_str()));
   }

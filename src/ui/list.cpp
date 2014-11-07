@@ -163,13 +163,8 @@ int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
-  int val1 = 0;
-  int val2 = 0;
-
-  if (!item1.GetPopularity().empty())
-    val1 = _wtoi(item1.GetPopularity().substr(1).c_str());
-  if (!item2.GetPopularity().empty())
-    val2 = _wtoi(item2.GetPopularity().substr(1).c_str());
+  int val1 = item1.GetPopularity();
+  int val2 = item2.GetPopularity();
 
   if (val2 == 0) {
     return base::kLessThan;

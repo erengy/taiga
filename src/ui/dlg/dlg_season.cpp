@@ -366,9 +366,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
             }
             break;
           case kSeasonSortByPopularity:
-            text = anime_item->GetPopularity();
-            if (text.empty())
-              text = L"#0";
+            text = L"#" + ToWstr(anime_item->GetPopularity());
             break;
           case kSeasonSortByScore:
             text = anime::TranslateScore(anime_item->GetScore());
@@ -418,7 +416,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
       DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
       if (current_service == sync::kMyAnimeList) {
-        DRAWLINE(anime_item->GetPopularity().empty() ? L"#0" : anime_item->GetPopularity());
+        DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
       }
 
       #undef DRAWLINE

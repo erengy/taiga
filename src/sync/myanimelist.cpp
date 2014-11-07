@@ -329,6 +329,8 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   if (pos > -1)
     score.resize(pos);
 
+  TrimLeft(popularity, L"#");
+
   ::anime::Item anime_item;
   anime_item.SetSource(this->id());
   anime_item.SetId(id, this->id());
@@ -338,7 +340,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   anime_item.SetType(TranslateSeriesTypeFrom(type));
   anime_item.SetEpisodeCount(ToInt(episodes));
   anime_item.SetGenres(genres_vector);
-  anime_item.SetPopularity(popularity);
+  anime_item.SetPopularity(ToInt(popularity));
   anime_item.SetScore(ToDouble(score));
   anime_item.SetLastModified(time(nullptr));  // current time
 
