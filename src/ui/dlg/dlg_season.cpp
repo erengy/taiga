@@ -503,7 +503,11 @@ void SeasonDialog::RefreshData(int anime_id) {
       continue;
 
     // Download missing image
-    ImageDatabase.Load(*id, true, true);
+    if (anime_id > 0) {
+      sync::DownloadImage(anime_id, anime_item->GetImageUrl());
+    } else {
+      ImageDatabase.Load(*id, true, true);
+    }
 
     // Get details
     if (anime_id > 0 || anime::MetadataNeedsRefresh(*anime_item))

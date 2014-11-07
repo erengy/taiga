@@ -273,8 +273,12 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
       case VK_F5:
         page_my_info.Refresh(anime_id_);
         page_series_info.Refresh(anime_id_, false);
-        UpdateTitle(true);
-        sync::GetMetadataById(anime_id_);
+        if (anime::IsValidId(anime_id_)) {
+          UpdateTitle(true);
+          auto anime_item = AnimeDatabase.FindItem(anime_id_);
+          sync::GetMetadataById(anime_id_);
+          sync::DownloadImage(anime_id_, anime_item->GetImageUrl());
+        }
         return TRUE;
       // Close window
       case VK_ESCAPE:
