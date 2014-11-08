@@ -788,38 +788,30 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     }
 
     // Draw progress
-    if (anime_item.GetMyStatus() == anime::kWatching || anime_item.GetMyRewatching()) {
-      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressWatching);  // Watching
-    } else if (anime_item.GetMyStatus() == anime::kCompleted) {
-      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressCompleted); // Completed
-    } else if (anime_item.GetMyStatus() == anime::kDropped) {
-      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressDropped);   // Dropped
-    } else {
-      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressCompleted); // Completed / On hold / Plan to watch
-    }
-    // Draw progress
+    auto list_progress_type = ui::kListProgressWatching;
     if (anime_item.GetMyRewatching()) {
-      ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressWatching);
+      list_progress_type = ui::kListProgressWatching;
     } else {
       switch (anime_item.GetMyStatus()) {
         default:
         case anime::kWatching:
-          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressWatching);
+          list_progress_type = ui::kListProgressWatching;
           break;
         case anime::kCompleted:
-          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressCompleted);
+          list_progress_type = ui::kListProgressCompleted;
           break;
         case anime::kOnHold:
-          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressOnHold);
+          list_progress_type = ui::kListProgressOnHold;
           break;
         case anime::kDropped:
-          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressDropped);
+          list_progress_type = ui::kListProgressDropped;
           break;
         case anime::kPlanToWatch:
-          ui::Theme.DrawListProgress(dc.Get(), &rcWatched, ui::kListProgressPlanToWatch);
+          list_progress_type = ui::kListProgressPlanToWatch;
           break;
       }
     }
+    ui::Theme.DrawListProgress(dc.Get(), &rcWatched, list_progress_type);
   }
 
   // Draw episode availability
