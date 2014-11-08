@@ -154,7 +154,8 @@ void ExecuteLink(const std::wstring& link) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool CreateFolder(const std::wstring& path) {
-  return SHCreateDirectoryEx(nullptr, path.c_str(), nullptr) == ERROR_SUCCESS;
+  auto result = SHCreateDirectoryEx(nullptr, path.c_str(), nullptr);
+  return result == ERROR_SUCCESS || result == ERROR_ALREADY_EXISTS;
 }
 
 int DeleteFolder(std::wstring path) {
