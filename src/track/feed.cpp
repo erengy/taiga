@@ -338,6 +338,11 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
           !Settings[taiga::kTorrent_Download_Location].empty()) {
         download_path = Settings[taiga::kTorrent_Download_Location];
       }
+      if (!FolderExists(download_path)) {
+        LOG(LevelWarning, L"Folder doesn't exist.\n"
+                          L"Path: " + download_path);
+        download_path.clear();
+      }
       // Create a subfolder using the anime title as its name
       if (!download_path.empty() &&
           Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder)) {
@@ -351,11 +356,15 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
         TrimRight(anime_title, L".");
         AddTrailingSlash(download_path);
         download_path += anime_title;
-        if (!CreateFolder(download_path))
-          LOG(LevelWarning, L"Subfolder could not be created.");
-        if (anime_item) {
-          anime_item->SetFolder(download_path);
-          Settings.Save();
+        if (!CreateFolder(download_path)) {
+          LOG(LevelError, L"Subfolder could not be created.\n"
+                          L"Path: " + download_path);
+          download_path.clear();
+        } else {
+          if (anime_item) {
+            anime_item->SetFolder(download_path);
+            Settings.Save();
+          }
         }
       }
     }
