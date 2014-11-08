@@ -77,8 +77,7 @@ BOOL AnimeDialog::OnInitDialog() {
   switch (mode_) {
     case kDialogModeAnimeInformation:
       tab_.InsertItem(0, L"Main information", 0);
-      if (AnimeDatabase.FindItem(anime_id_)->IsInList())
-        tab_.InsertItem(1, L"My list and settings", 0);
+      tab_.InsertItem(1, L"My list and settings", 0);
       break;
     case kDialogModeNowPlaying:
       tab_.Hide();
@@ -98,15 +97,6 @@ BOOL AnimeDialog::OnInitDialog() {
     case kDialogModeNowPlaying:
       break;
   }
-
-  // Initialize buttons
-  int show = SW_SHOW;
-  if (mode_ == kDialogModeNowPlaying ||
-      !AnimeDatabase.FindItem(anime_id_)->IsInList()) {
-    show = SW_HIDE;
-  }
-  ShowDlgItem(IDOK, show);
-  ShowDlgItem(IDCANCEL, show);
 
   // Refresh
   SetCurrentPage(current_page_);
@@ -433,7 +423,8 @@ void AnimeDialog::SetCurrentPage(int index) {
         image_label_.Show();
         page_my_info.Hide();
         page_series_info.Show();
-        sys_link_.Show(mode_ == kDialogModeNowPlaying);
+        sys_link_.Show(mode_ == kDialogModeNowPlaying ||
+                       !AnimeDatabase.FindItem(anime_id_)->IsInList());
         break;
       case kAnimePageMyInfo:
         image_label_.Show();
@@ -450,6 +441,14 @@ void AnimeDialog::SetCurrentPage(int index) {
     }
 
     tab_.SetCurrentlySelected(index - 1);
+
+    int show = SW_SHOW;
+    if (mode_ == kDialogModeNowPlaying ||
+        !AnimeDatabase.FindItem(anime_id_)->IsInList()) {
+      show = SW_HIDE;
+    }
+    ShowDlgItem(IDOK, show);
+    ShowDlgItem(IDCANCEL, show);
   }
 }
 
@@ -639,22 +638,27 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     */
 
   } else {
-    std::wstring content = L"Now playing: Episode " + CurrentEpisode.number;
-    if (!CurrentEpisode.group.empty())
-      content += L" by " + CurrentEpisode.group;
-    content += L"\n";
+    std::wstring content;
+    if (mode_ == kDialogModeNowPlaying) {
+      content += L"Now playing: Episode " + CurrentEpisode.number;
+      if (!CurrentEpisode.group.empty())
+        content += L" by " + CurrentEpisode.group;
+      content += L"\n";
+    }
     if (anime_item->IsInList()) {
       content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
     } else {
       content += L"<a href=\"AddToListAs(1)\">Add to list</a>";
     }
-    content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
-    int episode_number = anime::GetEpisodeHigh(CurrentEpisode.number);
-    if (episode_number == 0)
-      episode_number = 1;
-    if (anime_item->GetEpisodeCount() == 0 ||
-        anime_item->GetEpisodeCount() > episode_number) {
-      content += L" \u2022 <a href=\"PlayEpisode(" + ToWstr(episode_number + 1) + L"\">Watch next episode</a>";
+    if (mode_ == kDialogModeNowPlaying) {
+      content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
+      int episode_number = anime::GetEpisodeHigh(CurrentEpisode.number);
+      if (episode_number == 0)
+        episode_number = 1;
+      if (anime_item->GetEpisodeCount() == 0 ||
+          anime_item->GetEpisodeCount() > episode_number) {
+        content += L" \u2022 <a href=\"PlayEpisode(" + ToWstr(episode_number + 1) + L"\">Watch next episode</a>";
+      }
     }
     sys_link_.SetText(content);
   }
@@ -672,6 +676,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     page_series_info.Refresh(anime_id_, connect);
   if (my_info)
     page_my_info.Refresh(anime_id_);
+  SetCurrentPage(current_page_);
 
   // Update controls
   UpdateControlPositions();
@@ -720,19 +725,19 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   }
 
   // Content
-  if (mode_ == kDialogModeNowPlaying) {
-    if (!anime::IsValidId(anime_id_)) {
-      rect.left += ScaleX(win::kControlMargin);
-      sys_link_.SetPosition(nullptr, rect);
-    } else {
-      win::Dc dc = sys_link_.GetDC();
-      int text_height = GetTextHeight(dc.Get());
-      win::Rect rect_content = rect;
-      rect_content.Inflate(-ScaleX(win::kControlMargin * 2), 0);
-      rect_content.bottom = rect_content.top + text_height * 2;
-      sys_link_.SetPosition(nullptr, rect_content);
-      rect.top = rect_content.bottom + ScaleY(win::kControlMargin) * 3;
-    }
+  if (mode_ == kDialogModeNowPlaying && !anime::IsValidId(anime_id_)) {
+    rect.left += ScaleX(win::kControlMargin);
+    sys_link_.SetPosition(nullptr, rect);
+  } else if (mode_ == kDialogModeNowPlaying ||
+             !AnimeDatabase.FindItem(anime_id_)->IsInList()) {
+    win::Dc dc = sys_link_.GetDC();
+    int text_height = GetTextHeight(dc.Get());
+    int line_count = mode_ == kDialogModeNowPlaying ? 2 : 1;
+    win::Rect rect_content = rect;
+    rect_content.Inflate(-ScaleX(win::kControlMargin * 2), 0);
+    rect_content.bottom = rect_content.top + text_height * line_count;
+    sys_link_.SetPosition(nullptr, rect_content);
+    rect.top = rect_content.bottom + ScaleY(win::kControlMargin) * 3;
   }
 
   // Pages

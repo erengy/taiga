@@ -232,7 +232,7 @@ void OnLibraryChangeFailure() {
 
 void OnLibraryEntryAdd(int id) {
   if (DlgAnime.GetCurrentId() == id)
-    DlgAnime.Refresh();
+    DlgAnime.Refresh(false, false, true, false);
 
   auto anime_item = AnimeDatabase.FindItem(id);
   int status = anime_item->GetMyStatus();
@@ -261,7 +261,7 @@ void OnLibraryEntryChange(int id) {
 
 void OnLibraryEntryDelete(int id) {
   if (DlgAnime.GetCurrentId() == id)
-    DlgAnime.Destroy();
+    DlgAnime.Refresh(false, false, true, false);
 
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
