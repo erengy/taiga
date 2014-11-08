@@ -211,6 +211,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   if (!found) {
     // Search root folders for available episodes
     foreach_(it, Settings.root_folders) {
+      if (!FolderExists(*it))
+        continue;  // Might be a disconnected external drive
       bool skip_directories = false;
       if (anime_item && !anime_item->GetFolder().empty())
         skip_directories = true;
@@ -242,6 +244,8 @@ void ScanAvailableEpisodesQuick(int anime_id) {
     if (anime_id != anime::ID_UNKNOWN && anime_item.GetId() != anime_id)
       continue;
     if (anime_item.GetFolder().empty())
+      continue;
+    if (!FolderExists(anime_item.GetFolder()))
       continue;
 
     file_search_helper.set_anime_id(anime_item.GetId());
