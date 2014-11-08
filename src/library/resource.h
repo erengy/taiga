@@ -33,6 +33,8 @@ public:
   // Loads a picture into memory, downloads a new file if requested.
   bool Load(int anime_id, bool load, bool download);
 
+  bool Reload(int anime_id);
+
   // Releases image data from memory if an image is not in sight.
   void FreeMemory();
   void Clear();

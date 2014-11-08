@@ -181,7 +181,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     case kHttpGetLibraryEntryImage: {
       int anime_id = static_cast<int>(response.parameter);
       SaveToFile(client.write_buffer_, anime::GetImagePath(anime_id));
-      if (ImageDatabase.Load(anime_id, true, false))
+      if (ImageDatabase.Reload(anime_id))
         ui::OnLibraryEntryImageChange(anime_id);
       break;
     }

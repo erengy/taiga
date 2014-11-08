@@ -69,6 +69,20 @@ bool ImageDatabase::Load(int anime_id, bool load, bool download) {
   return false;
 }
 
+bool ImageDatabase::Reload(int anime_id) {
+  if (!IsValidId(anime_id))
+    return false;
+
+  if (items_[anime_id].Load(anime::GetImagePath(anime_id))) {
+    items_[anime_id].data = anime_id;
+    return true;
+  } else {
+    items_[anime_id].data = -1;
+  }
+
+  return false;
+}
+
 void ImageDatabase::FreeMemory() {
   foreach_(it, ::AnimeDatabase.items) {
     bool erase = true;
