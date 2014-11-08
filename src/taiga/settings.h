@@ -117,6 +117,7 @@ enum AppSettingName {
   kTorrent_Discovery_AutoCheckInterval,
   kTorrent_Discovery_NewAction,
   kTorrent_Download_AppMode,
+  kTorrent_Download_AppOpen,
   kTorrent_Download_AppPath,
   kTorrent_Download_Location,
   kTorrent_Download_UseAnimeFolder,

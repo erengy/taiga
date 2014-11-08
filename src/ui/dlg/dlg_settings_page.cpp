@@ -337,11 +337,16 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Torrents > Downloads
     case kSettingsPageTorrentsDownloads: {
+      CheckDlgButton(IDC_CHECK_TORRENT_APP_OPEN, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
       CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2,
                        IDC_RADIO_TORRENT_APP1 + Settings.GetInt(taiga::kTorrent_Download_AppMode) - 1);
+      EnableDlgItem(IDC_RADIO_TORRENT_APP1, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
+      EnableDlgItem(IDC_RADIO_TORRENT_APP2, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
       SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings[taiga::kTorrent_Download_AppPath].c_str());
-      EnableDlgItem(IDC_EDIT_TORRENT_APP, Settings.GetInt(taiga::kTorrent_Download_AppMode) > 1);
-      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, Settings.GetInt(taiga::kTorrent_Download_AppMode) > 1);
+      bool enabled = Settings.GetBool(taiga::kTorrent_Download_AppOpen) &&
+                     Settings.GetInt(taiga::kTorrent_Download_AppMode) > 1;
+      EnableDlgItem(IDC_EDIT_TORRENT_APP, enabled);
+      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, enabled);
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder));
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOUSEFOLDER, Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder));
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder));
@@ -349,8 +354,8 @@ BOOL SettingsPage::OnInitDialog() {
         AddComboString(IDC_COMBO_TORRENT_FOLDER, Settings.root_folders[i].c_str());
       SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, Settings[taiga::kTorrent_Download_Location].c_str());
       EnableDlgItem(IDC_CHECK_TORRENT_AUTOUSEFOLDER, Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder));
-      bool enabled = Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder) &&
-                     Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder);
+      enabled = Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder) &&
+                Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder);
       EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, enabled);
       EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enabled);
       EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enabled);
@@ -525,6 +530,15 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           EnableDlgItem(IDC_SPIN_TORRENT_INTERVAL, enable);
           EnableDlgItem(IDC_RADIO_TORRENT_NEW1, enable);
           EnableDlgItem(IDC_RADIO_TORRENT_NEW2, enable);
+          return TRUE;
+        }
+        case IDC_CHECK_TORRENT_APP_OPEN: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_RADIO_TORRENT_APP1, enable);
+          EnableDlgItem(IDC_RADIO_TORRENT_APP2, enable);
+          enable = enable && IsDlgButtonChecked(IDC_RADIO_TORRENT_APP2);
+          EnableDlgItem(IDC_EDIT_TORRENT_APP, enable);
+          EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, enable);
           return TRUE;
         }
         case IDC_CHECK_TORRENT_AUTOSETFOLDER: {

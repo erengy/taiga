@@ -149,6 +149,7 @@ public:
 
 private:
   bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
+  void HandleFeedDownloadOpen(FeedItem& feed_item, const std::wstring& file);
 };
 
 extern Aggregator Aggregator;

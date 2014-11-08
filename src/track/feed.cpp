@@ -291,12 +291,12 @@ void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
 
 void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
                                     bool download_all) {
-  auto feed_item = reinterpret_cast<FeedItem*>(&feed.items.at(feed.download_index));
+  auto& feed_item = feed.items.at(feed.download_index);
 
-  feed_item->state = kFeedItemDiscardedNormal;
+  feed_item.state = kFeedItemDiscardedNormal;
   feed.download_index = -1;
 
-  std::wstring file = feed_item->title;
+  std::wstring file = feed_item.title;
   ValidateFileName(file);
   file = feed.GetDataPath() + file + L".torrent";
   SaveToFile(data, file);
@@ -305,9 +305,20 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
     ui::OnFeedDownload(false, L"Torrent file doesn't exist");
     return;
   } else {
-    file_archive.push_back(feed_item->title);
+    file_archive.push_back(feed_item.title);
     ui::OnFeedDownload(true, L"");
   }
+
+  HandleFeedDownloadOpen(feed_item, file);
+
+  if (download_all)
+    feed.Download(-1);
+}
+
+void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
+                                        const std::wstring& file) {
+  if (!Settings.GetBool(taiga::kTorrent_Download_AppOpen))
+    return;
 
   std::wstring app_path;
   std::wstring parameters;
@@ -325,7 +336,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
       InStr(app_path, L"utorrent", 0, true) > -1) {
     std::wstring download_path;
     // Use anime folder as the download folder
-    auto anime_id = feed_item->episode_data.anime_id;
+    auto anime_id = feed_item.episode_data.anime_id;
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       std::wstring anime_folder = anime_item->GetFolder();
@@ -340,7 +351,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
       }
       if (!FolderExists(download_path)) {
         LOG(LevelWarning, L"Folder doesn't exist.\n"
-                          L"Path: " + download_path);
+            L"Path: " + download_path);
         download_path.clear();
       }
       // Create a subfolder using the anime title as its name
@@ -350,7 +361,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
         if (anime_item) {
           anime_title = anime_item->GetTitle();
         } else {
-          anime_title = feed_item->episode_data.title;
+          anime_title = feed_item.episode_data.title;
         }
         ValidateFileName(anime_title);
         TrimRight(anime_title, L".");
@@ -358,7 +369,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
         download_path += anime_title;
         if (!CreateFolder(download_path)) {
           LOG(LevelError, L"Subfolder could not be created.\n"
-                          L"Path: " + download_path);
+              L"Path: " + download_path);
           download_path.clear();
         } else {
           if (anime_item) {
@@ -376,9 +387,6 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data,
 
   parameters += L"\"" + file + L"\"";
   Execute(app_path, parameters);
-
-  if (download_all)
-    feed.Download(-1);
 }
 
 bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,

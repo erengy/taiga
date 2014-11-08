@@ -174,6 +174,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kTorrent_Discovery_AutoCheckInterval, L"60", L"rss/torrent/options/checkinterval");
   INITKEY(kTorrent_Discovery_NewAction, L"1", L"rss/torrent/options/newaction");
   INITKEY(kTorrent_Download_AppMode, L"1", L"rss/torrent/application/mode");
+  INITKEY(kTorrent_Download_AppOpen, L"true", L"rss/torrent/application/open");
   INITKEY(kTorrent_Download_AppPath, nullptr, L"rss/torrent/application/path");
   INITKEY(kTorrent_Download_Location, nullptr, L"rss/torrent/options/downloadpath");
   INITKEY(kTorrent_Download_UseAnimeFolder, L"true", L"rss/torrent/options/autosetfolder");

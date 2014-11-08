@@ -309,6 +309,7 @@ void SettingsDialog::OnOK() {
   // Torrents > Downloads
   page = &pages[kSettingsPageTorrentsDownloads];
   if (page->IsWindow()) {
+    Settings.Set(taiga::kTorrent_Download_AppOpen, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_APP_OPEN));
     Settings.Set(taiga::kTorrent_Download_AppMode, page->GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1);
     Settings.Set(taiga::kTorrent_Download_AppPath, page->GetDlgItemText(IDC_EDIT_TORRENT_APP));
     Settings.Set(taiga::kTorrent_Download_UseAnimeFolder, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER));
