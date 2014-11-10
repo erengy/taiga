@@ -133,8 +133,7 @@ bool MetadataNeedsRefresh(const Item& item) {
     return true;
   if (item.GetGenres().empty())
     return true;
-  if (item.GetScore() == kUnknownScore &&
-      taiga::GetCurrentServiceId() == sync::kMyAnimeList)
+  if (item.GetScore() == kUnknownScore && IsAiredYet(item))
     return true;
 
   return false;
