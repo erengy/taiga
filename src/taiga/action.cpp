@@ -231,12 +231,12 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //////////////////////////////////////////////////////////////////////////////
   // Library
 
-  // AddToListAs(status)
-  //   Adds new anime to list with given status.
+  // AddToList(status)
+  //   Adds an anime to list with given status.
   //   lParam is an anime ID.
-  } else if (action == L"AddToListAs") {
-    int status = ToInt(body);
+  } else if (action == L"AddToList") {
     int anime_id = static_cast<int>(lParam);
+    int status = ToInt(body);
     AnimeDatabase.AddToList(anime_id, status);
 
   //////////////////////////////////////////////////////////////////////////////

@@ -648,7 +648,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     if (anime_item->IsInList()) {
       content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
     } else {
-      content += L"<a href=\"AddToListAs(1)\">Add to list</a>";
+      content += L"<a href=\"AddToList()\">Add to list</a>";
     }
     if (mode_ == kDialogModeNowPlaying) {
       content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";

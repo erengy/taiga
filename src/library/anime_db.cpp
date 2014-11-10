@@ -490,6 +490,10 @@ void Database::AddToList(int anime_id, int status) {
   if (!anime_item)
     return;
 
+  if (status == anime::kUnknownStatus)
+    status = anime::IsAiredYet(*anime_item) ? anime::kWatching :
+                                              anime::kPlanToWatch;
+
   anime_item->AddtoUserList();
 
   HistoryItem history_item;

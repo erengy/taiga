@@ -90,11 +90,11 @@
 		<item name="Add to list" sub="AddToList" disabled="1"/>
 	</menu>
 	<menu name="AddToList">
-		<item name="Currently watching" action="AddToListAs(1)"/>
-		<item name="Completed"          action="AddToListAs(2)"/>
-		<item name="On hold"            action="AddToListAs(3)"/>
-		<item name="Dropped"            action="AddToListAs(4)"/>
-		<item name="Plan to watch"      action="AddToListAs(5)"/>
+		<item name="Currently watching" action="AddToList(1)"/>
+		<item name="Completed"          action="AddToList(2)"/>
+		<item name="On hold"            action="AddToList(3)"/>
+		<item name="Dropped"            action="AddToList(4)"/>
+		<item name="Plan to watch"      action="AddToList(5)"/>
 	</menu>
 	
 	<!-- Right click -->
