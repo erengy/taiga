@@ -29,7 +29,9 @@ namespace sync {
 namespace hummingbird {
 
 int TranslateAgeRatingFrom(const std::wstring& value) {
-  if (IsEqual(value, L"G")) {
+  if (value.empty()) {
+    return anime::kUnknownAgeRating;
+  } else if (IsEqual(value, L"G")) {
     return anime::kAgeRatingG;
   } else if (IsEqual(value, L"PG")) {
     return anime::kAgeRatingPG;
@@ -41,7 +43,7 @@ int TranslateAgeRatingFrom(const std::wstring& value) {
     return anime::kAgeRatingR18;
   }
 
-  LOG(LevelDebug, L"Unknown value: " + value);
+  LOG(LevelWarning, L"Unknown value: " + value);
   return anime::kUnknownAgeRating;
 }
 
