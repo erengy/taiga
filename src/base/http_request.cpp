@@ -78,7 +78,7 @@ bool Client::SetRequestOptions() {
   // Callback options
 
   if (debug_mode_) {
-    TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGFUNCTION, DebugCallback);
+    TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGFUNCTION, DebugFunction);
     TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGDATA, this);
     TAIGA_CURL_SET_OPTION(CURLOPT_VERBOSE, TRUE);
   }
@@ -184,6 +184,8 @@ bool Client::Perform() {
         std::string compressed;
         std::swap(write_buffer_, compressed);
         UncompressGzippedString(compressed, write_buffer_);
+        if (debug_mode_)
+          DebugHandler(CURLINFO_DATA_IN, write_buffer_, true);
       }
       response_.body = StrToWstr(write_buffer_);
     }

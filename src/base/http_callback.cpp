@@ -77,16 +77,8 @@ int Client::ProgressFunction(curl_off_t dltotal, curl_off_t dlnow) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int Client::DebugCallback(CURL* curl, curl_infotype infotype, char* data,
-                          size_t size, void* client) {
-  if (infotype == CURLINFO_DATA_IN || infotype == CURLINFO_DATA_OUT) {
-    if (client) {
-      auto client_ = reinterpret_cast<Client*>(client);
-      if (client_->content_encoding_ == kContentEncodingGzip)
-        return 0;
-    }
-  }
-
+int Client::DebugHandler(curl_infotype infotype, std::string data,
+                         bool simulated_callback) {
   std::wstring text;
 
   switch (infotype) {
@@ -99,6 +91,8 @@ int Client::DebugCallback(CURL* curl, curl_infotype infotype, char* data,
       text = L"=> Request header";
       break;
     case CURLINFO_DATA_IN:
+      if (content_encoding_ == kContentEncodingGzip && !simulated_callback)
+        return 0;  // Don't output garbage
       text = L"<= Recv data";
       break;
     case CURLINFO_DATA_OUT:
@@ -113,13 +107,25 @@ int Client::DebugCallback(CURL* curl, curl_infotype infotype, char* data,
     default:
       return 0;
   }
-
   if (!text.empty())
     text += L" | ";
+  if (simulated_callback)
+    text += L"<simulated> | ";
 
-  LOG(LevelDebug, text + StrToWstr(std::string(data, size)));
+  LOG(LevelDebug, text + StrToWstr(data));
 
   return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int Client::DebugFunction(CURL* curl, curl_infotype infotype, char* data,
+                          size_t size, void* client) {
+  if (!client)
+    return 0;
+
+  return reinterpret_cast<Client*>(client)->DebugHandler(
+      infotype, std::string(data, size), false);
 }
 
 int Client::XferInfoFunction(void* clientp,

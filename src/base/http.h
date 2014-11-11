@@ -156,8 +156,9 @@ protected:
 private:
   static size_t HeaderFunction(void*, size_t, size_t, void*);
   static size_t WriteFunction(char*, size_t, size_t, void*);
-  static int DebugCallback(CURL*, curl_infotype, char*, size_t, void*);
+  static int DebugFunction(CURL*, curl_infotype, char*, size_t, void*);
   static int XferInfoFunction(void*, curl_off_t, curl_off_t, curl_off_t, curl_off_t);
+  int DebugHandler(curl_infotype, std::string, bool);
   int ProgressFunction(curl_off_t, curl_off_t);
 
   bool Initialize();
