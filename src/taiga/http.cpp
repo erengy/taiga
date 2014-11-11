@@ -47,6 +47,9 @@ HttpClient::HttpClient(const HttpRequest& request)
   // Reuse existing connections
   set_allow_reuse(true);
 
+  // Enable debug mode to log requests and responses
+  set_debug_mode(Taiga.debug_mode);
+
   // The default header (e.g. "User-Agent: Taiga/1.0") will be used, unless
   // another value is specified in the request header
   set_user_agent(

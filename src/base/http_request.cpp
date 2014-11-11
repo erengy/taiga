@@ -77,11 +77,11 @@ bool Client::SetRequestOptions() {
   //////////////////////////////////////////////////////////////////////////////
   // Callback options
 
-#ifdef _DEBUG
-  TAIGA_CURL_SET_OPTION(CURLOPT_VERBOSE, TRUE);
-  TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGFUNCTION, DebugCallback);
-  TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGDATA, this);
-#endif
+  if (debug_mode_) {
+    TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGFUNCTION, DebugCallback);
+    TAIGA_CURL_SET_OPTION(CURLOPT_DEBUGDATA, this);
+    TAIGA_CURL_SET_OPTION(CURLOPT_VERBOSE, TRUE);
+  }
 
   TAIGA_CURL_SET_OPTION(CURLOPT_HEADERFUNCTION, HeaderFunction);
   TAIGA_CURL_SET_OPTION(CURLOPT_HEADERDATA, this);

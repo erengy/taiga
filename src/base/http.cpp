@@ -58,6 +58,7 @@ Client::Client(const Request& request)
       content_length_(0),
       current_length_(0),
       curl_handle_(nullptr),
+      debug_mode_(false),
       header_list_(nullptr),
       request_(request),
       user_agent_(L"Mozilla/5.0") {
@@ -141,6 +142,10 @@ void Client::set_allow_reuse(bool allow) {
 
 void Client::set_auto_redirect(bool enabled) {
   auto_redirect_ = enabled;
+}
+
+void Client::set_debug_mode(bool enabled) {
+  debug_mode_ = enabled;
 }
 
 void Client::set_proxy(const std::wstring& host,

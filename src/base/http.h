@@ -120,6 +120,7 @@ public:
 
   void set_allow_reuse(bool allow);
   void set_auto_redirect(bool enabled);
+  void set_debug_mode(bool enabled);
   void set_proxy(
       const std::wstring& host,
       const std::wstring& username,
@@ -173,6 +174,7 @@ private:
 
   bool busy_;
   bool cancel_;
+  bool debug_mode_;
   curl_slist* header_list_;
   std::string optional_data_;
 };
