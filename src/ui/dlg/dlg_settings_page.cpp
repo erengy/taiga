@@ -111,6 +111,7 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageServicesHummingbird: {
       SetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD, Settings[taiga::kSync_Service_Hummingbird_Username].c_str());
       SetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD, Base64Decode(Settings[taiga::kSync_Service_Hummingbird_Password]).c_str());
+      CheckDlgButton(IDC_CHECK_HUMMINGBIRD_HTTPS, Settings.GetBool(taiga::kSync_Service_Hummingbird_UseHttps));
       break;
     }
 

@@ -104,6 +104,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
   INITKEY(kSync_Service_Hummingbird_Username, nullptr, L"account/hummingbird/username");
   INITKEY(kSync_Service_Hummingbird_Password, nullptr, L"account/hummingbird/password");
+  INITKEY(kSync_Service_Hummingbird_UseHttps, L"true", L"account/hummingbird/https");
 
   // Library
   INITKEY(kLibrary_WatchFolders, L"true", L"anime/folders/watch/enabled");

@@ -473,6 +473,8 @@ FONT 9, "Segoe UI", 400, 0, 0
     LTEXT           "Password:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_PASS_HUMMINGBIRD, 160, 28, 141, 12, ES_AUTOHSCROLL | ES_PASSWORD, WS_EX_LEFT
     CONTROL         "<a href=""URL(http://hummingbird.me/users/sign_up)"">Create a new account</a>", IDC_LINK_ACCOUNT_HUMMINGBIRD, "SysLink", 0x50010004, 12, 47, 140, 8, 0x00000000
+    GROUPBOX        "Options", IDC_STATIC, 7, 69, 301, 28, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Use HTTPS connections", IDC_CHECK_HUMMINGBIRD_HTTPS, 12, 80, 138, 10, 0, WS_EX_LEFT
 }
 
 

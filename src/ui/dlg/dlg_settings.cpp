@@ -185,6 +185,7 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_Hummingbird_Username, page->GetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD));
     Settings.Set(taiga::kSync_Service_Hummingbird_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD)));
+    Settings.Set(taiga::kSync_Service_Hummingbird_UseHttps, page->IsDlgButtonChecked(IDC_CHECK_HUMMINGBIRD_HTTPS));
   }
 
   // Library > Folders

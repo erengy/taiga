@@ -24,6 +24,7 @@
 #include "sync/hummingbird.h"
 #include "sync/hummingbird_types.h"
 #include "sync/hummingbird_util.h"
+#include "taiga/settings.h"
 
 namespace sync {
 namespace hummingbird {
@@ -40,6 +41,9 @@ Service::Service() {
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
+
+  if (Settings.GetBool(taiga::kSync_Service_Hummingbird_UseHttps))
+    http_request.url.protocol = base::http::kHttps;
 
   // Hummingbird is supposed to return a JSON response for each and every
   // request, so that's what we expect from it
