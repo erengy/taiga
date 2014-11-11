@@ -43,7 +43,7 @@ int TranslateAgeRatingFrom(const std::wstring& value) {
     return anime::kAgeRatingR18;
   }
 
-  LOG(LevelWarning, L"Unknown value: " + value);
+  LOG(LevelWarning, L"Invalid value: " + value);
   return anime::kUnknownAgeRating;
 }
 
@@ -63,7 +63,7 @@ int TranslateSeriesStatusFrom(int value) {
     case kNotYetAired: return anime::kNotYetAired;
   }
 
-  LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
+  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
   return anime::kUnknownStatus;
 }
 
@@ -76,7 +76,7 @@ int TranslateSeriesStatusFrom(const std::wstring& value) {
     return anime::kNotYetAired;
   }
 
-  LOG(LevelWarning, L"Unknown value: " + value);
+  LOG(LevelWarning, L"Invalid value: " + value);
   return anime::kUnknownStatus;
 }
 
@@ -91,7 +91,7 @@ int TranslateSeriesTypeFrom(int value) {
     case kMusic: return anime::kMusic;
   }
 
-  LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
+  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
   return anime::kUnknownType;
 }
 
@@ -110,7 +110,7 @@ int TranslateSeriesTypeFrom(const std::wstring& value) {
     return anime::kMusic;
   }
 
-  LOG(LevelWarning, L"Unknown value: " + value);
+  LOG(LevelWarning, L"Invalid value: " + value);
   return anime::kUnknownType;
 }
 
@@ -135,7 +135,7 @@ int TranslateMyStatusFrom(const std::wstring& value) {
     return anime::kDropped;
   }
 
-  LOG(LevelWarning, L"Unknown value: " + value);
+  LOG(LevelWarning, L"Invalid value: " + value);
   return anime::kNotInList;
 }
 
@@ -156,7 +156,7 @@ std::wstring TranslateMyStatusTo(int value) {
     case anime::kPlanToWatch: return L"plan-to-watch";
   }
 
-  LOG(LevelWarning, L"Unknown value: " + ToWstr(value));
+  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
   return L"";
 }
 
