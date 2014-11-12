@@ -937,7 +937,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    std::wstring text = anime::TranslateMyScore(anime_item.GetMyScore());
+    std::wstring text = anime::GetMyScore(anime_item);
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
@@ -1182,15 +1182,8 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
   int icon_index = anime_item.GetPlaying() ?
       ui::kIcon16_Play : StatusToIcon(anime_item.GetAiringStatus());
 
-  std::wstring score = anime::TranslateMyScore(anime_item.GetMyScore());
-  if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
-    auto community_rating = anime_item.GetScore();
-    if (anime_item.GetMyScore() == 0 && community_rating > 0.0)
-      score = ToWstr(community_rating / 2.0, 1);
-  }
-
   listview.SetItemIcon(index, icon_index);
-  listview.SetItem(index, 2, score.c_str());
+  listview.SetItem(index, 2, anime::GetMyScore(anime_item).c_str());
   listview.SetItem(index, 3, anime::TranslateType(anime_item.GetType()).c_str());
   listview.SetItem(index, 4, anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str());
 }

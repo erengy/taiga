@@ -55,6 +55,7 @@ enum AppSettingName {
   // Application
   kApp_List_DoubleClickAction,
   kApp_List_MiddleClickAction,
+  kApp_List_DisplayCommunityRatings,
   kApp_List_DisplayEnglishTitles,
   kApp_List_HighlightNewEpisodes,
   kApp_List_ProgressDisplayAired,

@@ -733,6 +733,22 @@ void IncrementEpisode(int anime_id) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+std::wstring GetMyScore(const Item& item) {
+  std::wstring score = anime::TranslateMyScore(item.GetMyScore());
+
+  if (Settings.GetBool(taiga::kApp_List_DisplayCommunityRatings)) {
+    if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
+      auto community_rating = item.GetScore();
+      if (item.GetMyScore() == 0 && community_rating > 0.0)
+        score = anime::TranslateScore(community_rating);
+    }
+  }
+
+  return score;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 std::wstring TranslateMyStatus(int value, bool add_count) {
   #define ADD_COUNT() (add_count ? L" (" + ToWstr(AnimeDatabase.GetItemCount(value)) + L")" : L"")
   switch (value) {

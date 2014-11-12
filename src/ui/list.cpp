@@ -226,11 +226,13 @@ int SortListByMyScore(const anime::Item& item1, const anime::Item& item2) {
   double score1 = item1.GetMyScore();
   double score2 = item2.GetMyScore();
 
-  if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
-    if (!score1)
-      score1 = item1.GetScore();
-    if (!score2)
-      score2 = item2.GetScore();
+  if (Settings.GetBool(taiga::kApp_List_DisplayCommunityRatings)) {
+    if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
+      if (!score1)
+        score1 = item1.GetScore();
+      if (!score2)
+        score2 = item2.GetScore();
+    }
   }
 
   if (score1 != score2)

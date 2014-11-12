@@ -112,6 +112,7 @@ void AppSettings::InitializeMap() {
   // Application
   INITKEY(kApp_List_DoubleClickAction, L"4", L"program/list/action/doubleclick");
   INITKEY(kApp_List_MiddleClickAction, L"3", L"program/list/action/middleclick");
+  INITKEY(kApp_List_DisplayCommunityRatings, L"true", L"program/list/action/communityratings");
   INITKEY(kApp_List_DisplayEnglishTitles, nullptr, L"program/list/action/englishtitles");
   INITKEY(kApp_List_HighlightNewEpisodes, L"true", L"program/list/filter/episodes/highlight");
   INITKEY(kApp_List_ProgressDisplayAired, L"true", L"program/list/progress/showaired");

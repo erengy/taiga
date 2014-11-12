@@ -186,6 +186,8 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_MDLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.GetInt(taiga::kApp_List_MiddleClickAction));
+      CheckDlgButton(IDC_CHECK_LIST_COMMUNITY_RATINGS, Settings.GetBool(taiga::kApp_List_DisplayCommunityRatings));
+      EnableDlgItem(IDC_CHECK_LIST_COMMUNITY_RATINGS, taiga::GetCurrentServiceId() == sync::kHummingbird);
       CheckDlgButton(IDC_CHECK_LIST_ENGLISH, Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles));
       CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes));
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AIRED, Settings.GetBool(taiga::kApp_List_ProgressDisplayAired));

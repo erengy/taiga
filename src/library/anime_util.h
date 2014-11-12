@@ -78,6 +78,8 @@ void ChangeEpisode(int anime_id, int value);
 void DecrementEpisode(int anime_id);
 void IncrementEpisode(int anime_id);
 
+std::wstring GetMyScore(const Item& item);
+
 std::wstring TranslateMyStatus(int value, bool add_count);
 std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");
 std::wstring TranslateMyScore(int value, const std::wstring& default_char = L"-");
