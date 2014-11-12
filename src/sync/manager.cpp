@@ -93,6 +93,7 @@ void Manager::MakeRequest(Request& request) {
 
       // Let the service build the HTTP request
       service->second->BuildRequest(request, http_request);
+      http_request.url.Crack(http_request.url.Build());
 
       // Make the request
       ConnectionManager.MakeRequest(http_request,
