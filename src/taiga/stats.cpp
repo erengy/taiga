@@ -123,8 +123,8 @@ void Statistics::CalculateLocalData() {
 
   file_list.clear();
   std::wstring path = taiga::GetPath(taiga::kPathFeed);
-  torrent_count = PopulateFiles(file_list, path, L"torrent", true);
 
+  torrent_count = PopulateFiles(file_list, path, L"torrent", true);
   torrent_size = GetFolderSize(path, true);
 }
 

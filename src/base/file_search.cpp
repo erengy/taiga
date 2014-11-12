@@ -68,7 +68,8 @@ bool FileSearchHelper::Search(const std::wstring& root,
       if (OnDirectoryFunc)
         result = OnDirectoryFunc(root, data.cFileName, data);
       if (!skip_subdirectories_ && !result)
-        result = Search(AddTrailingSlash(root) + data.cFileName);
+        result = Search(AddTrailingSlash(root) + data.cFileName,
+                        OnDirectoryFunc, OnFileFunc);
 
     // File
     } else {
