@@ -487,11 +487,9 @@ bool Service::RequestSucceeded(Response& response,
       response.data[L"error"] = error_message;
       break;
     }
-    case kGetLibraryEntries:
-      response.data[L"error"] = name() + L" returned an invalid response";
-      break;
     default:
-      response.data[L"error"] = L"Request failed for an unknown reason";
+      response.data[L"error"] += L"Unknown error (" +
+            ToWstr(static_cast<int>(http_response.code)) + L")";
       break;
   }
 
