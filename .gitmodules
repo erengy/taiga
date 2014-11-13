@@ -1,0 +1,3 @@
+[submodule "anitomy"]
+	path = deps/src/anitomy
+	url = https://github.com/erengy/anitomy.git
