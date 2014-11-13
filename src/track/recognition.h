@@ -28,7 +28,6 @@ namespace anime {
 class Episode;
 class Item;
 }
-class Token;
 
 class RecognitionEngine {
 public:
@@ -60,8 +59,6 @@ public:
                     bool check_extras = true,
                     bool check_extension = true);
 
-  void ExamineToken(Token& token, anime::Episode& episode, bool compare_extras);
-
   void CleanTitle(std::wstring& title);
   void UpdateCleanTitles(int anime_id);
 
@@ -72,15 +69,6 @@ public:
 
   std::map<int, std::vector<std::wstring>> clean_titles;
 
-  std::vector<std::wstring> audio_keywords;
-  std::vector<std::wstring> video_keywords;
-  std::vector<std::wstring> extra_keywords;
-  std::vector<std::wstring> extra_unsafe_keywords;
-  std::vector<std::wstring> version_keywords;
-  std::vector<std::wstring> valid_extensions;
-  std::vector<std::wstring> episode_keywords;
-  std::vector<std::wstring> episode_prefixes;
-
 private:
   bool CompareTitle(const std::wstring& anime_title,
                     anime::Episode& episode,
@@ -89,17 +77,8 @@ private:
   bool ScoreTitle(const anime::Episode& episode,
                   const anime::Item& anime_item);
 
-  void AppendKeyword(std::wstring& str, const std::wstring& keyword);
-  bool CompareKeys(const std::wstring& str, const std::vector<std::wstring>& keys);
   void EraseUnnecessary(std::wstring& str);
   void TransliterateSpecial(std::wstring& str);
-  bool IsEpisodeFormat(const std::wstring& str, anime::Episode& episode, const wchar_t separator = ' ');
-  bool IsResolution(const std::wstring& str);
-  bool IsCountingWord(const std::wstring& str);
-  bool IsTokenEnclosed(const Token& token);
-  void ReadKeyword(std::vector<std::wstring>& output, const std::wstring& input);
-  size_t TokenizeTitle(const std::wstring& str, const std::wstring& delimiters, std::vector<Token>& tokens);
-  bool ValidateEpisodeNumber(anime::Episode& episode);
 };
 
 extern RecognitionEngine Meow;
