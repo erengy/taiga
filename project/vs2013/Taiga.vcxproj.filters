@@ -25,6 +25,9 @@
     <Filter Include="win">
       <UniqueIdentifier>{5802bd8b-5cfa-4945-b7eb-c52aa2fbef32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\anitomy">
+      <UniqueIdentifier>{09fde2fa-d11a-4179-b5ef-8f3924a3ab25}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\base64">
       <UniqueIdentifier>{e10ab21b-a2bf-4ffc-9e68-a2bfb8ab3ee4}</UniqueIdentifier>
     </Filter>
@@ -132,6 +135,33 @@
     </ClCompile>
     <ClCompile Include="..\..\src\base\xml.cpp">
       <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\element.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\keyword.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\parser.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\parser_helper.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\parser_number.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\string.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\token.cpp">
+      <Filter>deps\anitomy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\tokenizer.cpp">
+      <Filter>deps\anitomy</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
@@ -545,6 +575,27 @@
     </ClInclude>
     <ClInclude Include="..\..\src\base\xml.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h">
+      <Filter>deps\anitomy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\element.h">
+      <Filter>deps\anitomy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\keyword.h">
+      <Filter>deps\anitomy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\parser.h">
+      <Filter>deps\anitomy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\string.h">
+      <Filter>deps\anitomy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\token.h">
+      <Filter>deps\anitomy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\tokenizer.h">
+      <Filter>deps\anitomy</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\base64\base64.h">
       <Filter>deps\base64</Filter>

@@ -98,6 +98,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\element.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\keyword.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\parser.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\parser_helper.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\parser_number.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\string.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\token.cpp" />
+    <ClCompile Include="..\..\deps\src\anitomy\anitomy\tokenizer.cpp" />
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
     <ClCompile Include="..\..\deps\src\jsoncpp\json_reader.cpp" />
     <ClCompile Include="..\..\deps\src\jsoncpp\json_value.cpp" />
@@ -237,6 +246,13 @@
     <ClCompile Include="..\..\src\win\win_window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h" />
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\element.h" />
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\keyword.h" />
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\parser.h" />
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\string.h" />
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\token.h" />
+    <ClInclude Include="..\..\deps\src\anitomy\anitomy\tokenizer.h" />
     <ClInclude Include="..\..\deps\src\base64\base64.h" />
     <ClInclude Include="..\..\deps\src\curl\curl.h" />
     <ClInclude Include="..\..\deps\src\curl\curlbuild.h" />
