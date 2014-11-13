@@ -41,7 +41,7 @@ TaigaFileSearchHelper::TaigaFileSearchHelper()
 bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
                                         const std::wstring& name,
                                         const WIN32_FIND_DATA& data) {
-  if (!Meow.ExamineTitle(name, episode_, false, false, false, false, false))
+  if (!Meow.ExamineTitle(name, episode_))
     return false;
 
   foreach_r_(it, AnimeDatabase.items) {
@@ -81,7 +81,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
 bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
                                    const std::wstring& name,
                                    const WIN32_FIND_DATA& data) {
-  if (!Meow.ExamineTitle(name, episode_, true, true, true, true, true))
+  if (!Meow.ExamineTitle(name, episode_))
     return false;
 
   foreach_r_(it, AnimeDatabase.items) {

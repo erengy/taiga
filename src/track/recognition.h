@@ -52,12 +52,7 @@ public:
                       bool give_score = false);
 
   bool ExamineTitle(std::wstring title,
-                    anime::Episode& episode,
-                    bool examine_inside = true,
-                    bool examine_outside = true,
-                    bool examine_number = true,
-                    bool check_extras = true,
-                    bool check_extension = true);
+                    anime::Episode& episode);
 
   void CleanTitle(std::wstring& title);
   void UpdateCleanTitles(int anime_id);

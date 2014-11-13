@@ -216,12 +216,7 @@ bool RecognitionEngine::ScoreTitle(const anime::Episode& episode,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool RecognitionEngine::ExamineTitle(std::wstring title,
-                                     anime::Episode& episode,
-                                     bool examine_inside,
-                                     bool examine_outside,
-                                     bool examine_number,
-                                     bool check_extras,
-                                     bool check_extension) {
+                                     anime::Episode& episode) {
   // Clear previous data
   episode.Clear();
 
