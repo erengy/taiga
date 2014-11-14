@@ -36,7 +36,7 @@ class Episode {
   std::wstring folder;
   std::wstring format;
   std::wstring title;
-  std::wstring clean_title;
+  std::wstring normal_title;
   std::wstring name;
   std::wstring group;
   std::wstring number;

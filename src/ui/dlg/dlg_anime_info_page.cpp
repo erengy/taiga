@@ -423,7 +423,7 @@ bool PageMyInfo::Save() {
   // Alternative titles
   anime_item->SetUserSynonyms(GetDlgItemText(IDC_EDIT_ANIME_ALT));
   anime_item->SetUseAlternative(IsDlgButtonChecked(IDC_CHECK_ANIME_ALT) == TRUE);
-  Meow.UpdateCleanTitles(anime_id_);
+  Meow.UpdateNormalTitles(anime_id_);
 
   // Folder
   anime_item->SetFolder(GetDlgItemText(IDC_EDIT_ANIME_FOLDER));

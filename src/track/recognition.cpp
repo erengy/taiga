@@ -107,14 +107,14 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) {
     }
   }
 
-  episode.clean_title = episode.title;
-  CleanTitle(episode.clean_title);
+  episode.normal_title = episode.title;
+  Normalize(episode.normal_title);
 
-  if (episode.clean_title.empty()) {
+  if (episode.normal_title.empty()) {
     LOG(LevelWarning, L"episode.clean_title is empty for file: " + episode.file);
   }
 
-  return !episode.clean_title.empty();
+  return !episode.normal_title.empty();
 }
 
 int Engine::Identify(anime::Episode& episode, bool give_score,
@@ -139,19 +139,19 @@ bool Engine::Match(anime::Episode& episode, const anime::Item& anime_item,
 ////////////////////////////////////////////////////////////////////////////////
 
 int Engine::Find(anime::Episode& episode, const MatchOptions& match_options) {
-  InitializeCleanTitles();
+  InitializeNormalTitles();
 
   auto find_clean_title = [&](std::wstring title) {
     ToLower(title);
-    auto it = clean_titles_.find(title);
-    if (it != clean_titles_.end()) {
-      episode.anime_id = *it->second.begin();  // TODO: Handle multiple IDs
+    auto it = normal_titles_.find(title);
+    if (it != normal_titles_.end()) {
+      episode.anime_id = *it->second.rbegin();  // TODO: Handle multiple IDs
       return true;
     }
     return false;
   };
 
-  if (find_clean_title(episode.clean_title + episode.number)) {
+  if (find_clean_title(episode.normal_title + episode.number)) {
     const anime::Item& anime_item = *AnimeDatabase.FindItem(episode.anime_id);
     if (anime_item.GetEpisodeCount() == 1) {
       episode.title += episode.number;
@@ -162,7 +162,7 @@ int Engine::Find(anime::Episode& episode, const MatchOptions& match_options) {
   }
 
   if (!anime::IsValidId(episode.anime_id)) {
-    find_clean_title(episode.clean_title);
+    find_clean_title(episode.normal_title);
   }
 
   if (anime::IsValidId(episode.anime_id)) {
@@ -226,72 +226,44 @@ bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Engine::CleanTitle(std::wstring& title) {
-  if (title.empty())
-    return;
-
-  EraseUnnecessary(title);
-  TransliterateSpecial(title);
-  ErasePunctuation(title);
-
+void Engine::Normalize(std::wstring& title) {
   ToLower(title);
-
-  // TODO: `2nd Season` = `Season 2` = `S2`, `II` = `2`
+  EraseUnnecessary(title);
+  // TODO: `2nd Season` = `Season 2` = `S2`, `II` -> `2`
+  Transliterate(title);
+  ErasePunctuation(title);
 }
 
-// TODO: Too damn slow.
-void Engine::InitializeCleanTitles() {
-  if (!clean_titles_.empty())
-    return;
-
-  for (const auto& it : AnimeDatabase.items) {
-    //if (it.second.IsInList())
-      UpdateCleanTitles(it.first);
+void Engine::InitializeNormalTitles() {
+  if (normal_titles_.empty()) {
+    for (const auto& it : AnimeDatabase.items) {
+      UpdateNormalTitles(it.first);
+    }
   }
 }
 
-void Engine::UpdateCleanTitles(int anime_id) {
-  for (auto& clean_title : clean_titles_) {
-    clean_title.second.erase(anime_id);
-  }
-
+void Engine::UpdateNormalTitles(int anime_id) {
   auto insert_title = [&](std::wstring title) {
-    CleanTitle(title);
-    clean_titles_[title].insert(anime_id);
+    if (!title.empty()) {
+      Normalize(title);
+      normal_titles_[title].insert(anime_id);
+    }
   };
 
-  auto anime_item = AnimeDatabase.FindItem(anime_id);
+  const auto& anime_item = *AnimeDatabase.FindItem(anime_id);
 
-  // Main title
-  insert_title(anime_item->GetTitle());
+  insert_title(anime_item.GetTitle());
+  insert_title(anime_item.GetEnglishTitle());
 
-  // English title
-  if (!anime_item->GetEnglishTitle().empty())
-    insert_title(anime_item->GetEnglishTitle());
-
-  // Synonyms
-  if (!anime_item->GetUserSynonyms().empty()) {
-    for (const auto& synonym : anime_item->GetUserSynonyms()) {
-      insert_title(synonym);
-    }
-  }
-  if (!anime_item->GetSynonyms().empty()) {
-    for (const auto& synonym : anime_item->GetSynonyms()) {
-      insert_title(synonym);
-    }
-  }
+  for (const auto& synonym : anime_item.GetUserSynonyms())
+    insert_title(synonym);
+  for (const auto& synonym : anime_item.GetSynonyms())
+    insert_title(synonym);
 }
 
 void Engine::ErasePunctuation(std::wstring& str) {
-  auto rlast = std::find_if(str.rbegin(), str.rend(),
+  auto it = std::remove_if(str.begin(), str.end(),
       [](wchar_t c) -> bool {
-        return !(c == L'!' ||  // "Hayate no Gotoku!", "K-ON!"...
-                 c == L'+' ||  // "Needless+"
-                 c == L'\'');  // "Gintama'"
-      });
-
-  auto it = std::remove_if(str.begin(), rlast.base(),
-      [](int c) -> bool {
         // Control codes, white-space and punctuation characters
         if (c <= 255 && !isalnum(c))
           return true;
@@ -302,42 +274,46 @@ void Engine::ErasePunctuation(std::wstring& str) {
         return false;
       });
 
-  std::copy(rlast.base(), str.end(), it);
-
-  str.resize(str.size() - (rlast.base() - it));
+  if (it != str.end())
+    str.resize(std::distance(str.begin(), it));
 }
 
+// TODO: Rename
 void Engine::EraseUnnecessary(std::wstring& str) {
-  EraseLeft(str, L"the ", true);
-  Replace(str, L" the ", L" ", false, true);
-  Erase(str, L"episode ", true);
-  Erase(str, L" ep.", true);
-  Replace(str, L" specials", L" special", false, true);
+  Replace(str, L" & ", L" and ", true);
+
+  EraseLeft(str, L"the ");
+  Replace(str, L" the ", L" ", true);
+
+  Erase(str, L"episode ");
+  Replace(str, L" specials", L" special", true);
 }
 
-// TODO: make faster
-void Engine::TransliterateSpecial(std::wstring& str) {
-  // Character equivalencies
-  ReplaceChar(str, L'\u00E9', L'e');  // small e acute accent
-  ReplaceChar(str, L'\uFF0F', L'/');  // unicode slash
-  ReplaceChar(str, L'\uFF5E', L'~');  // unicode tilde
-  ReplaceChar(str, L'\u223C', L'~');  // unicode tilde 2
-  ReplaceChar(str, L'\u301C', L'~');  // unicode tilde 3
-  ReplaceChar(str, L'\uFF1F', L'?');  // unicode question mark
-  ReplaceChar(str, L'\uFF01', L'!');  // unicode exclamation point
-  ReplaceChar(str, L'\u00D7', L'x');  // multiplication symbol
-  ReplaceChar(str, L'\u2715', L'x');  // multiplication symbol 2
+void Engine::Transliterate(std::wstring& str) {
+  for (size_t i = 0; i < str.size(); ++i) {
+    auto& c = str[i];
+    switch (c) {
+      // Character equivalencies
+      case L'\u00D7': c = L'x'; break;  // multiplication sign
+      case L'\u00E9': c = L'e'; break;  // latin small letter e with acute
+      case L'\u223C': c = L'~'; break;  // tilde operator
+      case L'\u2715': c = L'x'; break;  // multiplication x
+      case L'\u301C': c = L'~'; break;  // wave dash
+      case L'\uFF01': c = L'!'; break;  // fullwidth exclamation mark
+      case L'\uFF0F': c = L'/'; break;  // fullwidth solidus
+      case L'\uFF1F': c = L'?'; break;  // fullwidth question mark
+      case L'\uFF5E': c = L'~'; break;  // fullwidth tilde
+      // A few common always-equivalent romanizations
+      case L'\u014C': str.replace(i, 1, L"ou"); break;  // latin capital letter o with macron
+      case L'\u014D': str.replace(i, 1, L"ou"); break;  // latin small letter o with macron
+      case L'\u016B': str.replace(i, 1, L"uu"); break;  // latin small letter u with macron
+    }
+  }
 
-  // A few common always-equivalent romanizations
-  Replace(str, L"\u014C", L"Ou");  // O macron
-  Replace(str, L"\u014D", L"ou");  // o macron
-  Replace(str, L"\u016B", L"uu");  // u macron
-  Replace(str, L" wa ", L" ha ");  // hepburn to wapuro
-  Replace(str, L" e ", L" he ");  // hepburn to wapuro
-  Replace(str, L" o ", L" wo ");  // hepburn to wapuro
-
-  // Abbreviations
-  Replace(str, L" & ", L" and ", true, false);
+  // Romanizations (Hepburn to Wapuro)
+  Replace(str, L" wa ", L" ha ", true);
+  Replace(str, L" e ", L" he ", true);
+  Replace(str, L" o ", L" wo ", true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -361,9 +337,9 @@ void Engine::ResetScores() {
 }
 
 void Engine::ScoreTitle(const anime::Episode& episode) {
-  const std::wstring& title = episode.clean_title;
+  const std::wstring& title = episode.normal_title;
 
-  for (auto& it : clean_titles_) {
+  for (auto& it : normal_titles_) {
     int anime_id = *it.second.begin();
     const auto& anime_item = *AnimeDatabase.FindItem(anime_id);
     const std::wstring& anime_title = it.first;

@@ -48,7 +48,7 @@ public:
   int Identify(anime::Episode& episode, bool give_score, const MatchOptions& match_options);
   bool Match(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options);
 
-  void UpdateCleanTitles(int anime_id);
+  void UpdateNormalTitles(int anime_id);
 
   typedef std::multimap<int, int, std::greater<int>> score_result_t;
   score_result_t GetScores();
@@ -60,13 +60,13 @@ public:
   bool Engine::ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options);
   bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item);
 
-  void InitializeCleanTitles();
-  void CleanTitle(std::wstring& title);
+  void InitializeNormalTitles();
+  void Normalize(std::wstring& title);
   void ErasePunctuation(std::wstring& str);
   void EraseUnnecessary(std::wstring& str);
-  void TransliterateSpecial(std::wstring& str);
+  void Transliterate(std::wstring& str);
 
-  std::map<std::wstring, std::set<int, std::greater<int>>> clean_titles_;
+  std::map<std::wstring, std::set<int>> normal_titles_;
   std::map<int, int> scores_;
 };
 

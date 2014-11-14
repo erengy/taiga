@@ -328,7 +328,7 @@ int Database::UpdateItem(const Item& new_item) {
     if (!new_item.GetTitle().empty() ||
         !new_item.GetSynonyms().empty() ||
         !new_item.GetEnglishTitle(false).empty())
-      Meow.UpdateCleanTitles(item->GetId());
+      Meow.UpdateNormalTitles(item->GetId());
   }
 
   // Update user information
