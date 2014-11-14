@@ -41,7 +41,7 @@ TaigaFileSearchHelper::TaigaFileSearchHelper()
 bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
                                         const std::wstring& name,
                                         const WIN32_FIND_DATA& data) {
-  if (!Meow.ExamineTitle(name, episode_))
+  if (!Meow.Parse(name, episode_))
     return false;
 
   foreach_r_(it, AnimeDatabase.items) {
@@ -61,7 +61,11 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
         continue;
     }
 
-    if (!Meow.CompareEpisode(episode_, anime_item, true, false, false, false))
+    static track::recognition::MatchOptions match_options;
+    match_options.check_airing_date = false;
+    match_options.check_anime_type = false;
+    match_options.validate_episode_number = false;
+    if (!Meow.Match(episode_, anime_item, match_options))
       continue;
 
     anime_item.SetFolder(AddTrailingSlash(root) + name);
@@ -81,7 +85,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
 bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
                                    const std::wstring& name,
                                    const WIN32_FIND_DATA& data) {
-  if (!Meow.ExamineTitle(name, episode_))
+  if (!Meow.Parse(name, episode_))
     return false;
 
   foreach_r_(it, AnimeDatabase.items) {
@@ -99,7 +103,11 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
       }
     }
 
-    if (!Meow.CompareEpisode(episode_, anime_item))
+    static track::recognition::MatchOptions match_options;
+    match_options.check_airing_date = true;
+    match_options.check_anime_type = true;
+    match_options.validate_episode_number = true;
+    if (!Meow.Match(episode_, anime_item, match_options))
       continue;
 
     int upper_bound = anime::GetEpisodeHigh(episode_.number);
@@ -107,8 +115,8 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
 
     if (!anime::IsValidEpisode(upper_bound, anime_item.GetEpisodeCount()) ||
         !anime::IsValidEpisode(lower_bound, anime_item.GetEpisodeCount())) {
-      LOG(LevelWarning, L"Invalid episode number: " + episode_.number + L"\n"
-                        L"File: " + AddTrailingSlash(root) + name);
+      LOG(LevelDebug, L"Invalid episode number: " + episode_.number + L"\n"
+                      L"File: " + AddTrailingSlash(root) + name);
       continue;
     }
 

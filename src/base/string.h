@@ -25,7 +25,6 @@
 
 void Erase(std::wstring& str1, const std::wstring& str2, bool case_insensitive = false);
 void EraseChars(std::wstring& str, const wchar_t chars[]);
-void ErasePunctuation(std::wstring& str, bool keep_trailing = false);
 void EraseLeft(std::wstring& str1, const std::wstring& str2, bool case_insensitive = false);
 void EraseRight(std::wstring& str1, const std::wstring& str2, bool case_insensitive = false);
 void RemoveEmptyStrings(std::vector<std::wstring>& input);

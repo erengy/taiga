@@ -148,8 +148,12 @@ bool Feed::Download(int index) {
 bool Feed::ExamineData() {
   foreach_(it, items) {
     // Examine title and compare with anime list items
-    Meow.ExamineTitle(it->title, it->episode_data);
-    Meow.MatchDatabase(it->episode_data, false, true);
+    Meow.Parse(it->title, it->episode_data);
+    static track::recognition::MatchOptions match_options;
+    match_options.check_airing_date = true;
+    match_options.check_anime_type = true;
+    match_options.validate_episode_number = true;
+    Meow.Identify(it->episode_data, false, match_options);
 
     // Update last aired episode number
     if (anime::IsValidId(it->episode_data.anime_id)) {

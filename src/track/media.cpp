@@ -295,16 +295,27 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
   if (CurrentEpisode.anime_id == anime::ID_UNKNOWN) {
     if (!Settings.GetBool(taiga::kApp_Option_EnableRecognition))
       return;
+
     // Examine title and compare it with list items
-    if (Meow.ExamineTitle(MediaPlayers.current_title(), CurrentEpisode)) {
-      anime_item = Meow.MatchDatabase(CurrentEpisode,
-                                      false, true, true, true, true, true);
-      if (anime_item) {
-        // Recognized
-        MediaPlayers.set_title_changed(false);
-        CurrentEpisode.Set(anime_item->GetId());
-        StartWatching(*anime_item, CurrentEpisode);
-        return;
+    if (Meow.Parse(MediaPlayers.current_title(), CurrentEpisode)) {
+      bool is_inside_root_folders = true;
+      if (Settings.GetBool(taiga::kSync_Update_OutOfRoot))
+        if (!CurrentEpisode.folder.empty() && !Settings.root_folders.empty())
+          is_inside_root_folders = anime::IsInsideRootFolders(CurrentEpisode.folder);
+      if (is_inside_root_folders) {
+        static track::recognition::MatchOptions match_options;
+        match_options.check_airing_date = true;
+        match_options.check_anime_type = true;
+        match_options.validate_episode_number = true;
+        auto anime_id = Meow.Identify(CurrentEpisode, true, match_options);
+        if (anime::IsValidId(anime_id)) {
+          // Recognized
+          anime_item = AnimeDatabase.FindItem(anime_id);
+          MediaPlayers.set_title_changed(false);
+          CurrentEpisode.Set(anime_item->GetId());
+          StartWatching(*anime_item, CurrentEpisode);
+          return;
+        }
       }
     }
     // Not recognized

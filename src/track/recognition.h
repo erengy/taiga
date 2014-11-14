@@ -20,6 +20,7 @@
 #define TAIGA_TRACK_RECOGNITION_H
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include <functional>
@@ -29,53 +30,49 @@ class Episode;
 class Item;
 }
 
-class RecognitionEngine {
+namespace track {
+namespace recognition {
+
+class MatchOptions {
 public:
-  RecognitionEngine();
-  ~RecognitionEngine() {};
+  MatchOptions();
 
-  void Initialize();
-
-  anime::Item* MatchDatabase(anime::Episode& episode,
-                             bool in_list = true,
-                             bool reverse = true,
-                             bool strict = true,
-                             bool check_episode = true,
-                             bool check_date = true,
-                             bool give_score = false);
-
-  bool CompareEpisode(anime::Episode& episode,
-                      const anime::Item& anime_item,
-                      bool strict = true,
-                      bool check_episode = true,
-                      bool check_date = true,
-                      bool give_score = false);
-
-  bool ExamineTitle(std::wstring title,
-                    anime::Episode& episode);
-
-  void CleanTitle(std::wstring& title);
-  void UpdateCleanTitles(int anime_id);
-
-  std::multimap<int, int, std::greater<int>> GetScores();
-
-  // Mapped as <anime_id, score>
-  std::map<int, int> scores;
-
-  std::map<int, std::vector<std::wstring>> clean_titles;
-
-private:
-  bool CompareTitle(const std::wstring& anime_title,
-                    anime::Episode& episode,
-                    const anime::Item& anime_item,
-                    bool strict = true);
-  bool ScoreTitle(const anime::Episode& episode,
-                  const anime::Item& anime_item);
-
-  void EraseUnnecessary(std::wstring& str);
-  void TransliterateSpecial(std::wstring& str);
+  bool check_airing_date;
+  bool check_anime_type;
+  bool validate_episode_number;
 };
 
-extern RecognitionEngine Meow;
+class Engine {
+public:
+  bool Parse(std::wstring title, anime::Episode& episode);
+  int Identify(anime::Episode& episode, bool give_score, const MatchOptions& match_options);
+  bool Match(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options);
+
+  void UpdateCleanTitles(int anime_id);
+
+  typedef std::multimap<int, int, std::greater<int>> score_result_t;
+  score_result_t GetScores();
+  void ResetScores();
+  void ScoreTitle(const anime::Episode& episode);
+
+//private:
+  int Find(anime::Episode& episode, const MatchOptions& match_options);
+  bool Engine::ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options);
+  bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item);
+
+  void InitializeCleanTitles();
+  void CleanTitle(std::wstring& title);
+  void ErasePunctuation(std::wstring& str);
+  void EraseUnnecessary(std::wstring& str);
+  void TransliterateSpecial(std::wstring& str);
+
+  std::map<std::wstring, std::set<int, std::greater<int>>> clean_titles_;
+  std::map<int, int> scores_;
+};
+
+}  // namespace recognition
+}  // namespace track
+
+extern track::recognition::Engine Meow;
 
 #endif  // TAIGA_TRACK_RECOGNITION_H

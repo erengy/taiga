@@ -69,10 +69,17 @@ void FolderMonitor::HandleChangeNotification(
 
 static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notification,
                                   anime::Episode& episode) {
-  if (!Meow.ExamineTitle(notification.path + notification.filename.first, episode))
+  if (!Meow.Parse(notification.path + notification.filename.first, episode))
     return nullptr;
 
-  return Meow.MatchDatabase(episode, true, true, true, false, false);
+  static track::recognition::MatchOptions match_options;
+  match_options.check_airing_date = false;
+  match_options.check_anime_type = false;
+  match_options.validate_episode_number = false;
+
+  auto anime_id = Meow.Identify(episode, false, match_options);
+
+  return AnimeDatabase.FindItem(anime_id);
 }
 
 void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification) const {

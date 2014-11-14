@@ -67,7 +67,7 @@ BOOL RecognitionTestDialog::OnInitDialog() {
   DWORD tick = GetTickCount();
   for (UINT i = 0; i < episodes_.size(); i++) {
     EpisodeTest episode;
-    Meow.ExamineTitle(episodes_[i].file, episode);
+    Meow.Parse(episodes_[i].file, episode);
     episode.anime_id = i;
     episode.priority = episodes_[i].priority;
     test_episodes_.push_back(episode);

@@ -64,35 +64,6 @@ void EraseChars(wstring& str, const wchar_t chars[]) {
   } while (pos != wstring::npos);
 }
 
-void ErasePunctuation(wstring& str, bool keep_trailing) {
-  auto rlast = str.rbegin();
-
-  if (keep_trailing)
-    rlast = std::find_if(str.rbegin(), str.rend(),
-        [](wchar_t c) -> bool {
-          return !(c == L'!' || // "Hayate no Gotoku!", "K-ON!"...
-                   c == L'+' || // "Needless+"
-                   c == L'\''); // "Gintama'"
-        });
-
-  auto it = std::remove_if(str.begin(), rlast.base(),
-      [](int c) -> bool {
-        // Control codes, white-space and punctuation characters
-        if (c <= 255 && !isalnum(c))
-          return true;
-        // Unicode stars, hearts, notes, etc. (0x2000-0x2767)
-        if (c > 8192 && c < 10087)
-          return true;
-        // Valid character
-        return false;
-      });
-
-  if (keep_trailing)
-    std::copy(rlast.base(), str.end(), it);
-
-  str.resize(str.size() - (rlast.base() - it));
-}
-
 void EraseLeft(wstring& str1, const wstring& str2, bool case_insensitive) {
   if (str1.length() < str2.length())
     return;
