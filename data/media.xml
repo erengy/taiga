@@ -359,6 +359,7 @@
 		<folder>%ProgramFiles%\Mozilla Firefox\</folder>
 		<folder>%ProgramW6432%\Mozilla Firefox\</folder>
 		<edit mode="2">Mozilla Firefox</edit>
+		<edit mode="2">Firefox Developer Edition</edit>
 		<engine>Gecko</engine>
 	</player>
 	<!-- Opera -->
