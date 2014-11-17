@@ -307,6 +307,7 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
   };
 
   FileSearchHelper helper;
+  helper.set_skip_subdirectories(true);
   helper.Search(path, OnDirectory, nullptr);
 
   return folder_count;

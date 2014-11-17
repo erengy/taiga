@@ -368,8 +368,11 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
 
   bool changed_theme = GetWstr(kApp_Interface_Theme) != previous_theme;
   if (changed_theme) {
-    ui::Theme.Load();
-    ui::OnSettingsThemeChange();
+    if (ui::Theme.Load()) {
+      ui::OnSettingsThemeChange();
+    } else {
+      Set(kApp_Interface_Theme, previous_theme);
+    }
   }
 
   bool changed_username = GetCurrentUsername() != previous_user;
