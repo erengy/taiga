@@ -54,7 +54,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   // kAuthenticateUser method returns the user's authentication token, which
   // is to be used on all methods that require authentication.
   if (RequestNeedsAuthentication(request.type))
-    http_request.url.query[L"auth_token"] = auth_token_;
+    http_request.data[L"auth_token"] = auth_token_;
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
@@ -86,13 +86,11 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
+  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
   http_request.url.path = L"/users/authenticate";
 
-  // TODO: Make sure username and password are available
-  http_request.url.query[L"username"] =
-      request.data[canonical_name_ + L"-username"];
-  http_request.url.query[L"password"] =
-      request.data[canonical_name_ + L"-password"];
+  http_request.data[L"username"] = request.data[canonical_name_ + L"-username"];
+  http_request.data[L"password"] = request.data[canonical_name_ + L"-password"];
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
@@ -127,27 +125,28 @@ void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
 
 void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
+  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
   http_request.url.path =
       L"/libraries/" + request.data[canonical_name_ + L"-id"];
 
   // When this undocumented parameter is included, Hummingbird will return a
   // "mal_id" value that identifies the corresponding entry in MyAnimeList, if
   // available.
-  http_request.url.query[L"include_mal_id"] = L"true";
+  http_request.data[L"include_mal_id"] = L"true";
 
   if (request.data.count(L"status"))
-    http_request.url.query[L"status"] =
+    http_request.data[L"status"] =
         TranslateMyStatusTo(ToInt(request.data[L"status"]));
   if (request.data.count(L"score"))
-    http_request.url.query[L"sane_rating_update"] =
+    http_request.data[L"sane_rating_update"] =
         TranslateMyRatingTo(ToInt(request.data[L"score"]));
   if (request.data.count(L"enable_rewatching"))
-    http_request.url.query[L"rewatching"] =
+    http_request.data[L"rewatching"] =
         request.data[L"enable_rewatching"] == L"0" ? L"false" : L"true";
   if (request.data.count(L"rewatched_times"))
-    http_request.url.query[L"rewatched_times"] = request.data[L"rewatched_times"];
+    http_request.data[L"rewatched_times"] = request.data[L"rewatched_times"];
   if (request.data.count(L"episode"))
-    http_request.url.query[L"episodes_watched"] = request.data[L"episode"];
+    http_request.data[L"episodes_watched"] = request.data[L"episode"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
