@@ -132,7 +132,14 @@ bool Client::SetRequestOptions() {
 
   // Set method
   if (request_.method == L"POST") {
-    optional_data_ = WstrToStr(request_.body);
+    if (!request_.data.empty() && !request_.body.empty()) {
+      OnError(CURLE_HTTP_POST_ERROR);
+      return false;
+    } else if (!request_.data.empty()) {
+      optional_data_ = WstrToStr(BuildUrlParameters(request_.data));
+    } else {
+      optional_data_ = WstrToStr(request_.body);
+    }
     TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDS, optional_data_.c_str());
     TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDSIZE, optional_data_.size());
     TAIGA_CURL_SET_OPTION(CURLOPT_POST, TRUE);

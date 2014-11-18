@@ -68,6 +68,7 @@ public:
 
   header_t header;
   std::wstring body;
+  query_t data;
 
   std::wstring uid;
   LPARAM parameter;

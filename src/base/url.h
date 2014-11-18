@@ -55,6 +55,7 @@ public:
   std::wstring fragment;
 };
 
+std::wstring BuildUrlParameters(const query_t& parameters);
 std::wstring DecodeUrl(const std::wstring& input);
 std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved = false);
 
