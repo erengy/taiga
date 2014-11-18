@@ -193,7 +193,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
     }
   }
 
-  http_request.body = L"data=" + XmlGetNodeAsString(document);
+  http_request.data[L"data"] = XmlGetNodeAsString(document);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
