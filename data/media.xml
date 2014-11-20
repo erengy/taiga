@@ -95,6 +95,21 @@
 		<folder>%ProgramFiles%\The KMPlayer\</folder>
 		<folder>%ProgramW6432%\The KMPlayer\</folder>
 	</player>
+	<!-- Kodi (XBMC) -->
+	<player>
+		<name>Kodi (XBMC)</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>1</mode>
+		<class>Kodi</class>
+		<class>XBMC</class>
+		<file>Kodi.exe</file>
+		<file>XBMC.exe</file>
+		<folder>%ProgramFiles%\Kodi\</folder>
+		<folder>%ProgramW6432%\Kodi\</folder>
+		<folder>%ProgramFiles%\XBMC\</folder>
+		<folder>%ProgramW6432%\XBMC\</folder>
+	</player>
 	<!-- Light Alloy -->
 	<player>
 		<name>Light Alloy</name>
@@ -306,17 +321,6 @@
 		<file>wmplayer.exe</file>
 		<folder>%ProgramFiles%\Windows Media Player\</folder>
 		<folder>%ProgramW6432%\Windows Media Player\</folder>
-	</player>
-	<!-- XBMC -->
-	<player>
-		<name>XBMC</name>
-		<enabled>1</enabled>
-		<visible>1</visible>
-		<mode>1</mode>
-		<class>XBMC</class>
-		<file>XBMC.exe</file>
-		<folder>%ProgramFiles%\XBMC\</folder>
-		<folder>%ProgramW6432%\XBMC\</folder>
 	</player>
 	<!-- Zoom Player -->
 	<player>
