@@ -250,10 +250,12 @@ bool PlayRandomAnime() {
     valid_ids.push_back(anime_item.GetId());
   }
 
-  foreach_ (id, valid_ids) {
-    srand(static_cast<unsigned int>(GetTickCount()));
-    size_t max_value = valid_ids.size();
-    size_t index = rand() % max_value + 1;
+  size_t max_value = valid_ids.size();
+
+  srand(static_cast<unsigned int>(GetTickCount()));
+
+  foreach_(id, valid_ids) {
+    size_t index = rand() % max_value;
     int anime_id = valid_ids.at(index);
     if (PlayNextEpisode(anime_id))
       return true;
