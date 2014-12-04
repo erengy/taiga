@@ -238,9 +238,7 @@ void Item::SetEnglishTitle(const std::wstring& title) {
   if (title.empty())
     return;
 
-  library::Title new_title;
-  new_title.type = library::kTitleTypeLangEnglish;
-  new_title.value = title;
+  library::Title new_title(library::kTitleTypeLangEnglish, title);
 
   metadata_.alternative.push_back(new_title);
 }
@@ -261,9 +259,10 @@ void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
       alternative.push_back(*it);
 
   foreach_(it, synonyms) {
-    library::Title new_title;
-    new_title.type = library::kTitleTypeSynonym;
-    new_title.value = *it;
+    if (*it == GetTitle())
+      continue;
+
+    library::Title new_title(library::kTitleTypeSynonym, *it);
     alternative.push_back(new_title);
   }
 
