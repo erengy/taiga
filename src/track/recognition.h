@@ -23,7 +23,8 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <functional>
+
+#include "base/string.h"
 
 namespace anime {
 class Episode;
@@ -33,41 +34,55 @@ class Item;
 namespace track {
 namespace recognition {
 
+typedef std::map<int, double> scores_t;
+typedef std::vector<std::pair<int, double>> sorted_scores_t;
+typedef std::map<std::wstring, std::set<int>> title_container_t;
+
 class MatchOptions {
 public:
   MatchOptions();
 
+  bool allow_sequels;
   bool check_airing_date;
   bool check_anime_type;
   bool validate_episode_number;
 };
 
+class Titles {
+public:
+  title_container_t alternative;
+  title_container_t main;
+  title_container_t user;
+};
+
 class Engine {
 public:
-  bool Parse(std::wstring title, anime::Episode& episode);
+  bool Parse(std::wstring title, anime::Episode& episode) const;
   int Identify(anime::Episode& episode, bool give_score, const MatchOptions& match_options);
-  bool Match(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options);
 
-  void UpdateNormalTitles(int anime_id);
+  void UpdateTitles(const anime::Item& anime_item);
 
-  typedef std::multimap<int, int, std::greater<int>> score_result_t;
-  score_result_t GetScores();
-  void ResetScores();
-  void ScoreTitle(const anime::Episode& episode);
+  sorted_scores_t GetScores() const;
 
-//private:
-  int Find(anime::Episode& episode, const MatchOptions& match_options);
-  bool Engine::ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options);
-  bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item);
+private:
+  bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options) const;
+  int ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item) const;
 
-  void InitializeNormalTitles();
-  void Normalize(std::wstring& title);
-  void ErasePunctuation(std::wstring& str);
-  void EraseUnnecessary(std::wstring& str);
-  void Transliterate(std::wstring& str);
+  void InitializeTitles();
+  int LookUpTitle(const std::wstring& title, const std::wstring& normal_title, std::set<int>& anime_ids) const;
 
-  std::map<std::wstring, std::set<int>> normal_titles_;
-  std::map<int, int> scores_;
+  int ScoreTitle(const anime::Episode& episode, const std::set<int>& anime_ids);
+  int ScoreTitle(const std::wstring& str, const anime::Episode& episode, const scores_t& trigram_results);
+
+  void Normalize(std::wstring& title) const;
+  void ErasePunctuation(std::wstring& str) const;
+  void EraseUnnecessary(std::wstring& str) const;
+  void Transliterate(std::wstring& str) const;
+
+  Titles titles_;
+  Titles normal_titles_;
+  sorted_scores_t scores_;
+  std::map<int, std::vector<trigram_container_t>> trigrams_;
 };
 
 }  // namespace recognition

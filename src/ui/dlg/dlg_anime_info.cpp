@@ -489,10 +489,10 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       int count = 0;
       content += L"Please choose the correct one from the list below:\n\n";
       foreach_c_(it, scores) {
-        content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->second) + L"\">" +
-                   AnimeDatabase.items[it->second].GetTitle() + L"</a>";
+        content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->first) + L"\">" +
+                   AnimeDatabase.items[it->first].GetTitle() + L"</a>";
         if (Taiga.debug_mode)
-          content += L" [Score: " + ToWstr(it->first) + L"]";
+          content += L" [Score: " + ToWstr(it->second) + L"]";
         content += L"\n";
         if (++count >= 10)
           break;

@@ -41,41 +41,28 @@ TaigaFileSearchHelper::TaigaFileSearchHelper()
 bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
                                         const std::wstring& name,
                                         const WIN32_FIND_DATA& data) {
-  if (!Meow.Parse(name, episode_))
+  if (!Meow.Parse(name, episode_)) {
+    LOG(LevelDebug, L"Could not parse directory: " + name);
     return false;
+  }
 
-  foreach_r_(it, AnimeDatabase.items) {
-    anime::Item& anime_item = it->second;
+  static track::recognition::MatchOptions match_options;
+  match_options.check_airing_date = false;
+  match_options.check_anime_type = false;
+  match_options.validate_episode_number = false;
 
-    if (anime_id_ != anime::ID_UNKNOWN) {
-      if (anime_item.GetId() != anime_id_)
-        continue;
-    } else {
-      switch (anime_item.GetMyStatus()) {
-        case anime::kNotInList:
-        case anime::kCompleted:
-        case anime::kDropped:
-          continue;
-      }
-      if (!anime_item.GetFolder().empty())
-        continue;
-    }
+  Meow.Identify(episode_, false, match_options);
 
-    static track::recognition::MatchOptions match_options;
-    match_options.check_airing_date = false;
-    match_options.check_anime_type = false;
-    match_options.validate_episode_number = false;
-    if (!Meow.Match(episode_, anime_item, match_options))
-      continue;
+  anime::Item* anime_item = AnimeDatabase.FindItem(episode_.anime_id);
 
-    anime_item.SetFolder(AddTrailingSlash(root) + name);
+  if (anime_item) {
+    if (anime_item->GetFolder().empty())
+      anime_item->SetFolder(AddTrailingSlash(root) + name);
 
-    if (anime_id_ != anime::ID_UNKNOWN) {
+    if (anime::IsValidId(anime_id_) && anime_id_ == anime_item->GetId()) {
       path_found_ = AddTrailingSlash(root) + name;
       if (skip_files_)
         return true;
-    } else {
-      return false;
     }
   }
 
@@ -85,60 +72,47 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
 bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
                                    const std::wstring& name,
                                    const WIN32_FIND_DATA& data) {
-  if (!Meow.Parse(name, episode_))
+  if (!Meow.Parse(name, episode_)) {
+    LOG(LevelDebug, L"Could not parse filename: " + name);
     return false;
+  }
 
-  foreach_r_(it, AnimeDatabase.items) {
-    anime::Item& anime_item = it->second;
+  static track::recognition::MatchOptions match_options;
+  match_options.check_airing_date = true;
+  match_options.check_anime_type = true;
+  match_options.validate_episode_number = true;
 
-    if (anime_id_ != anime::ID_UNKNOWN) {
-      if (anime_item.GetId() != anime_id_)
-        continue;
-    } else {
-      switch (anime_item.GetMyStatus()) {
-        case anime::kNotInList:
-        case anime::kCompleted:
-        case anime::kDropped:
-          continue;
-      }
-    }
+  Meow.Identify(episode_, false, match_options);
 
-    static track::recognition::MatchOptions match_options;
-    match_options.check_airing_date = true;
-    match_options.check_anime_type = true;
-    match_options.validate_episode_number = true;
-    if (!Meow.Match(episode_, anime_item, match_options))
-      continue;
+  anime::Item* anime_item = AnimeDatabase.FindItem(episode_.anime_id);
 
+  if (anime_item) {
     int upper_bound = anime::GetEpisodeHigh(episode_.number);
     int lower_bound = anime::GetEpisodeLow(episode_.number);
 
-    if (!anime::IsValidEpisode(upper_bound, anime_item.GetEpisodeCount()) ||
-        !anime::IsValidEpisode(lower_bound, anime_item.GetEpisodeCount())) {
+    if (!anime::IsValidEpisode(upper_bound, anime_item->GetEpisodeCount()) ||
+        !anime::IsValidEpisode(lower_bound, anime_item->GetEpisodeCount())) {
       LOG(LevelDebug, L"Invalid episode number: " + episode_.number + L"\n"
-                      L"File: " + AddTrailingSlash(root) + name);
-      continue;
+          L"File: " + AddTrailingSlash(root) + name);
+      return false;
     }
 
-    for (int i = lower_bound; i <= upper_bound; i++)
-      anime_item.SetEpisodeAvailability(
-          i, true, AddTrailingSlash(root) + name);
+    for (int i = lower_bound; i <= upper_bound; ++i)
+      anime_item->SetEpisodeAvailability(i, true, AddTrailingSlash(root) + name);
 
-    // Check if we've found the episode we were looking for
-    if (episode_number_ > 0 &&
-        episode_number_ >= lower_bound &&
-        episode_number_ <= upper_bound) {
-      path_found_ = AddTrailingSlash(root) + name;
-      return true;
+    if (anime::IsValidId(anime_id_) && anime_id_ == anime_item->GetId()) {
+      // Check if we've found the episode we were looking for
+      if (episode_number_ > 0 &&
+          episode_number_ >= lower_bound && episode_number_ <= upper_bound) {
+        path_found_ = AddTrailingSlash(root) + name;
+        return true;
+      }
+      // Check if all episodes are available
+      if (episode_number_ == 0 &&
+          IsAllEpisodesAvailable(*anime_item)) {
+        return true;
+      }
     }
-    // Check if all episodes are available
-    if (episode_number_ == 0 &&
-        anime_id_ != anime::ID_UNKNOWN &&
-        IsAllEpisodesAvailable(anime_item)) {
-      return true;
-    }
-
-    return false;
   }
 
   return false;

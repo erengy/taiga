@@ -429,7 +429,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     std::wstring titles;
     if (ui::OnLibraryEntryEditTitles(anime_id, titles)) {
       anime_item->SetUserSynonyms(titles);
-      Meow.UpdateNormalTitles(anime_id);
+      Meow.UpdateTitles(*anime_item);
       Settings.Save();
     }
 

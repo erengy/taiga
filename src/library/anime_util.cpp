@@ -292,7 +292,7 @@ bool LinkEpisodeToAnime(Episode& episode, int anime_id) {
   auto synonyms = anime_item->GetUserSynonyms();
   synonyms.push_back(CurrentEpisode.title);
   anime_item->SetUserSynonyms(synonyms);
-  Meow.UpdateNormalTitles(anime_item->GetId());
+  Meow.UpdateTitles(*anime_item);
   Settings.Save();
 
   StartWatching(*anime_item, episode);
