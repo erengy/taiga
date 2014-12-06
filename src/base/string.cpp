@@ -259,6 +259,8 @@ bool SearchRegex(const wstring& str, const wstring& pattern) {
   return std::regex_search(str, std::wregex(pattern));
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 size_t LongestCommonSubsequenceLength(const wstring& str1,
                                       const wstring& str2) {
   if (str1.empty() || str2.empty())
@@ -317,7 +319,71 @@ size_t LongestCommonSubstringLength(const wstring& str1, const wstring& str2) {
   return longest_length;
 }
 
-size_t LevenshteinDistance(const wstring& str1, const wstring& str2) {
+////////////////////////////////////////////////////////////////////////////////
+
+// Based on Miguel Serrano's Jaro-Winkler distance implementation
+// Licensed under GNU GPLv3 - Copyright (C) 2011 Miguel Serrano
+double JaroWinklerDistance(const wstring& str1, const wstring& str2) {
+  const int len1 = str1.size();
+  const int len2 = str2.size();
+
+  if (!len1 || !len2)
+    return 0.0;
+
+  int i, j, l;
+  int m = 0, t = 0;
+  vector<int> sflags(len1), aflags(len2);
+
+  // Calculate matching characters
+  int range = max(0, (max(len1, len2) / 2) - 1);
+  for (i = 0; i < len2; i++) {
+    for (j = max(i - range, 0), l = min(i + range + 1, len1); j < l; j++) {
+      if (str2[i] == str1[j] && !sflags[j]) {
+        sflags[j] = 1;
+        aflags[i] = 1;
+        m++;
+        break;
+      }
+    }
+  }
+  if (!m)
+    return 0.0;
+
+  // Calculate character transpositions
+  l = 0;
+  for (i = 0; i < len2; i++) {
+    if (aflags[i] == 1) {
+      for (j = l; j < len1; j++) {
+        if (sflags[j] == 1) {
+          l = j + 1;
+          break;
+        }
+      }
+      if (str2[i] != str1[j])
+        t++;
+    }
+  }
+  t /= 2;
+
+  // Jaro distance
+  double dw = ((static_cast<double>(m) / len1) +
+               (static_cast<double>(m) / len2) +
+               (static_cast<double>(m - t) / m)) / 3.0;
+
+  // Calculate common string prefix up to 4 chars
+  l = 0;
+  for (i = 0; i < min(min(len1, len2), 4); i++)
+    if (str1[i] == str2[i])
+        l++;
+
+  // Jaro-Winkler distance
+  const double scaling_factor = 0.1;
+  dw = dw + (l * scaling_factor * (1.0 - dw));
+
+  return dw;
+}
+
+double LevenshteinDistance(const wstring& str1, const wstring& str2) {
   const size_t len1 = str1.size();
   const size_t len2 = str2.size();
 
@@ -337,7 +403,45 @@ size_t LevenshteinDistance(const wstring& str1, const wstring& str2) {
     col.swap(prev_col);
   }
 
-  return prev_col[len2];
+  const double len = static_cast<double>(max(str1.size(), str2.size()));
+  return 1.0 - (prev_col[len2] / len);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void GetTrigrams(const wstring& str, trigram_container_t& output) {
+  const size_t n = 3;
+
+  if (n < 1)
+    return;
+
+  output.clear();
+
+  if (n >= str.size()) {
+    trigram_t buffer = {'\0'};
+    std::copy(str.begin(), str.end(), buffer.begin());
+    output.push_back(buffer);
+    return;
+  }
+
+  for (size_t i = 0; i <= str.size() - n; ++i) {
+    trigram_t buffer = {'\0'};
+    std::copy(str.begin() + i, str.begin() + (i + n), buffer.begin());
+    output.push_back(buffer);
+  }
+
+  std::sort(output.begin(), output.end());
+}
+
+double CompareTrigrams(const trigram_container_t& t1,
+                       const trigram_container_t& t2) {
+  trigram_container_t intersection;
+
+  std::set_intersection(t1.begin(), t1.end(), t2.begin(), t2.end(),
+                        std::back_inserter(intersection));
+
+  return static_cast<double>(intersection.size()) /
+         static_cast<double>(max(t1.size(), t2.size()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -419,7 +523,7 @@ wstring Join(const vector<wstring>& join_vector, const wstring& separator) {
 }
 
 void Split(const wstring& str, const wstring& separator,
-           std::vector<wstring>& split_vector) {
+           vector<wstring>& split_vector) {
   if (separator.empty()) {
     split_vector.push_back(str);
     return;

@@ -19,6 +19,7 @@
 #ifndef TAIGA_BASE_STRING_H
 #define TAIGA_BASE_STRING_H
 
+#include <array>
 #include <string>
 #include <vector>
 #include <windows.h>
@@ -58,7 +59,13 @@ bool SearchRegex(const std::wstring& str, const std::wstring& pattern);
 
 size_t LongestCommonSubsequenceLength(const std::wstring& str1, const std::wstring& str2);
 size_t LongestCommonSubstringLength(const std::wstring& str1, const std::wstring& str2);
-size_t LevenshteinDistance(const std::wstring& str1, const std::wstring& str2);
+double JaroWinklerDistance(const std::wstring& str1, const std::wstring& str2);
+double LevenshteinDistance(const std::wstring& str1, const std::wstring& str2);
+
+typedef std::array<wchar_t, 3> trigram_t;
+typedef std::vector<trigram_t> trigram_container_t;
+void GetTrigrams(const std::wstring& str, trigram_container_t& output);
+double CompareTrigrams(const trigram_container_t& t1, const trigram_container_t& t2);
 
 void Replace(std::wstring& str1, std::wstring str2, std::wstring replace_with, bool replace_all = false, bool case_insensitive = false);
 void ReplaceChar(std::wstring& str, const wchar_t c, const wchar_t replace_with);
