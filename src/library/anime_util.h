@@ -78,6 +78,7 @@ void ChangeEpisode(int anime_id, int value);
 void DecrementEpisode(int anime_id);
 void IncrementEpisode(int anime_id);
 
+void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
 std::wstring GetMyScore(const Item& item);
 
 std::wstring TranslateMyStatus(int value, bool add_count);

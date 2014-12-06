@@ -733,6 +733,23 @@ void IncrementEpisode(int anime_id) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
+  const auto& anime_item = *AnimeDatabase.FindItem(anime_id);
+
+  auto insert_title = [&titles](const std::wstring& title) {
+    if (!title.empty())
+      titles.push_back(title);
+  };
+
+  insert_title(anime_item.GetTitle());
+  insert_title(anime_item.GetEnglishTitle());
+
+  for (const auto& synonym : anime_item.GetSynonyms())
+    insert_title(synonym);
+  for (const auto& synonym : anime_item.GetUserSynonyms())
+    insert_title(synonym);
+}
+
 std::wstring GetMyScore(const Item& item) {
   std::wstring score = anime::TranslateMyScore(item.GetMyScore());
 
