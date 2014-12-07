@@ -109,6 +109,7 @@
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\tokenizer.cpp" />
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
     <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp" />
+    <ClCompile Include="..\..\deps\src\libmojibake\utf8proc.c" />
     <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp" />
     <ClCompile Include="..\..\deps\src\zlib\adler32.c" />
     <ClCompile Include="..\..\deps\src\zlib\compress.c" />
@@ -263,6 +264,8 @@
     <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h" />
     <ClInclude Include="..\..\deps\src\jsoncpp\json\json-forwards.h" />
     <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h" />
+    <ClInclude Include="..\..\deps\src\libmojibake\mojibake.h" />
+    <ClInclude Include="..\..\deps\src\libmojibake\utf8proc_data.h" />
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp" />
     <ClInclude Include="..\..\deps\src\zlib\crc32.h" />
