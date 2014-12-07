@@ -74,18 +74,7 @@ enum {false, true};
 #  include <inttypes.h>
 #endif
 #include <limits.h>
-
-#ifdef _WIN32
-#  ifdef MOJIBAKE_EXPORTS
-#    define DLLEXPORT __declspec(dllexport)
-#  else
-#    define DLLEXPORT __declspec(dllimport)
-#  endif
-#elif __GNUC__ >= 4
-#  define DLLEXPORT __attribute__ ((visibility("default")))
-#else
-#  define DLLEXPORT
-#endif
+#define DLLEXPORT
 
 #ifdef __cplusplus
 extern "C" {
