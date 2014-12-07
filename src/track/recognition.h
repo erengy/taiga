@@ -75,6 +75,7 @@ private:
   int ScoreTitle(const std::wstring& str, const anime::Episode& episode, const scores_t& trigram_results);
 
   void Normalize(std::wstring& title) const;
+  void NormalizeUnicode(std::wstring& str) const;
   void ErasePunctuation(std::wstring& str) const;
   void EraseUnnecessary(std::wstring& str) const;
   void Transliterate(std::wstring& str) const;

@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include <anitomy/anitomy/anitomy.h>
+#include <libmojibake/mojibake.h>
 
 #include "base/log.h"
 #include "base/string.h"
@@ -231,8 +232,6 @@ void Engine::UpdateTitles(const anime::Item& anime_item) {
                           title_container_t& titles,
                           title_container_t& normal_titles) {
     if (!title.empty()) {
-
-
       titles[title.c_str()].insert(anime_item.GetId());
 
       ToLower(title);
@@ -291,10 +290,36 @@ int Engine::LookUpTitle(const std::wstring& title,
 
 void Engine::Normalize(std::wstring& title) const {
   ToLower(title);
-  EraseUnnecessary(title);
-  // TODO: `2nd Season` = `Season 2` = `S2`, `II` -> `2`
   Transliterate(title);
+  NormalizeUnicode(title);
+  EraseUnnecessary(title);
   ErasePunctuation(title);
+}
+
+void Engine::NormalizeUnicode(std::wstring& str) const {
+  static const int options =
+      // NFKC normalization according to Unicode Standard Annex #15
+      UTF8PROC_COMPAT | UTF8PROC_COMPOSE | UTF8PROC_STABLE |
+      // Strip "default ignorable" characters, control characters, character
+      // marks (accents, diaeresis)
+      UTF8PROC_IGNORE | UTF8PROC_STRIPCC | UTF8PROC_STRIPMARK |
+      // Map certain characters (e.g. hyphen and minus) for easier comparison
+      UTF8PROC_LUMP;
+
+  char* buffer = nullptr;
+  std::string temp = WstrToStr(str);
+
+  int length = utf8proc_map(
+      reinterpret_cast<const uint8_t*>(temp.data()), temp.length(),
+      reinterpret_cast<uint8_t**>(&buffer), options);
+
+  if (length >= 0) {
+    temp.assign(buffer, length);
+    str = StrToWstr(temp);
+  }
+
+  if (buffer)
+    free(buffer);
 }
 
 void Engine::ErasePunctuation(std::wstring& str) const {
