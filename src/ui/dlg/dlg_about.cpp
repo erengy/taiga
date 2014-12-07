@@ -62,7 +62,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
       L"- JsonCpp 1.0.0, Copyright (c) 2007-2010, Baptiste Lepilleur\\line "
       L"- libcurl 7.39.0, Copyright (c) 1996-2014, Daniel Stenberg\\line "
-      L"- pugixml 1.4, Copyright (c) 2006-2014, Arseny Kapoulkine\\line "
+      L"- pugixml 1.5, Copyright (c) 2006-2014, Arseny Kapoulkine\\line "
       L"- zlib 1.2.8, Copyright (c) 1995-2013, Jean-loup Gailly and Mark Adler\\line\\line "
       L"\\b Links:\\b0\\line "
       L"- Home page {\\field{\\*\\fldinst HYPERLINK \"http://taiga.erengy.com\"}{\\fldrslt http://taiga.erengy.com}}\\line "
