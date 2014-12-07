@@ -166,13 +166,7 @@
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\jsoncpp\json_reader.cpp">
-      <Filter>deps\jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\jsoncpp\json_value.cpp">
-      <Filter>deps\jsoncpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\jsoncpp\json_writer.cpp">
+    <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp">
       <Filter>deps\jsoncpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp">
@@ -627,34 +621,10 @@
     <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\autolink.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\config.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\features.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\forwards.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h">
       <Filter>deps\jsoncpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\reader.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\value.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\writer.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json_batchallocator.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json_tool.h">
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\json-forwards.h">
       <Filter>deps\jsoncpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp">
@@ -930,17 +900,6 @@
     <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h">
       <Filter>win\ctrl</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\deps\src\jsoncpp\json_internalarray.inl">
-      <Filter>deps\jsoncpp</Filter>
-    </None>
-    <None Include="..\..\deps\src\jsoncpp\json_internalmap.inl">
-      <Filter>deps\jsoncpp</Filter>
-    </None>
-    <None Include="..\..\deps\src\jsoncpp\json_valueiterator.inl">
-      <Filter>deps\jsoncpp</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc">

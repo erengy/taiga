@@ -108,9 +108,7 @@
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\token.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\tokenizer.cpp" />
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
-    <ClCompile Include="..\..\deps\src\jsoncpp\json_reader.cpp" />
-    <ClCompile Include="..\..\deps\src\jsoncpp\json_value.cpp" />
-    <ClCompile Include="..\..\deps\src\jsoncpp\json_writer.cpp" />
+    <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp" />
     <ClCompile Include="..\..\deps\src\zlib\adler32.c" />
     <ClCompile Include="..\..\deps\src\zlib\compress.c" />
@@ -263,16 +261,8 @@
     <ClInclude Include="..\..\deps\src\curl\multi.h" />
     <ClInclude Include="..\..\deps\src\curl\stdcheaders.h" />
     <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\autolink.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\config.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\features.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\forwards.h" />
+    <ClInclude Include="..\..\deps\src\jsoncpp\json\json-forwards.h" />
     <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\reader.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\value.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\writer.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json_batchallocator.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json_tool.h" />
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp" />
     <ClInclude Include="..\..\deps\src\zlib\crc32.h" />
@@ -390,11 +380,6 @@
     <ClInclude Include="..\..\src\win\win_taskdialog.h" />
     <ClInclude Include="..\..\src\win\win_thread.h" />
     <ClInclude Include="..\..\src\win\win_window.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\deps\src\jsoncpp\json_internalarray.inl" />
-    <None Include="..\..\deps\src\jsoncpp\json_internalmap.inl" />
-    <None Include="..\..\deps\src\jsoncpp\json_valueiterator.inl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc" />
