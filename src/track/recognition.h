@@ -78,6 +78,9 @@ private:
   void NormalizeUnicode(std::wstring& str) const;
   void ErasePunctuation(std::wstring& str) const;
   void EraseUnnecessary(std::wstring& str) const;
+  void ConvertOrdinalNumbers(std::wstring& str) const;
+  void ConvertRomanNumbers(std::wstring& str) const;
+  void ConvertSeasonNumbers(std::wstring& str) const;
   void Transliterate(std::wstring& str) const;
 
   Titles titles_;

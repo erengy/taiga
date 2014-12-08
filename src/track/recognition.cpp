@@ -234,9 +234,8 @@ void Engine::UpdateTitles(const anime::Item& anime_item) {
     if (!title.empty()) {
       titles[title.c_str()].insert(anime_item.GetId());
 
-      ToLower(title);
       trigram_container_t trigrams;
-      GetTrigrams(title, trigrams);
+      GetTrigrams(ToLower_Copy(title), trigrams);
       trigrams_[anime_item.GetId()].push_back(trigrams);
 
       Normalize(title);
@@ -289,11 +288,75 @@ int Engine::LookUpTitle(const std::wstring& title,
 ////////////////////////////////////////////////////////////////////////////////
 
 void Engine::Normalize(std::wstring& title) const {
-  ToLower(title);
+  ConvertRomanNumbers(title);
   Transliterate(title);
-  NormalizeUnicode(title);
+  NormalizeUnicode(title);  // Title is lower case after this point, due to UTF8PROC_CASEFOLD
+  ConvertOrdinalNumbers(title);
+  ConvertSeasonNumbers(title);
   EraseUnnecessary(title);
   ErasePunctuation(title);
+}
+
+void Engine::ConvertOrdinalNumbers(std::wstring& str) const {
+  static const std::vector<std::pair<std::wstring, std::wstring>> ordinals{
+    {L"1st", L"first"}, {L"2nd", L"second"}, {L"3rd", L"third"},
+    {L"4th", L"fourth"}, {L"5th", L"fifth"}, {L"6th", L"sixth"},
+    {L"7th", L"seventh"}, {L"8th", L"eighth"}, {L"9th", L"ninth"},
+  };
+
+  for (const auto& ordinal : ordinals)
+    ReplaceString(str, 0, ordinal.second, ordinal.first, true, true);
+}
+
+void Engine::ConvertRomanNumbers(std::wstring& str) const {
+  // We skip 1 and 10 to avoid matching "I" and "X", as they're unlikely to be
+  // used as Roman numerals. Any number above "XIII" is rarely used in anime
+  // titles, which is why we don't need an actual Roman-to-Arabic number
+  // conversion algorithm.
+  static const std::vector<std::pair<std::wstring, std::wstring>> numerals{
+    {L"2", L"II"}, {L"3", L"III"}, {L"4", L"IV"}, {L"5", L"V"},
+    {L"6", L"VI"}, {L"7", L"VII"}, {L"8", L"VIII"}, {L"9", L"IX"},
+    {L"11", L"XI"}, {L"12", L"XII"}, {L"13", L"XIII"},
+  };
+
+  for (const auto& numeral : numerals)
+    ReplaceString(str, 0, numeral.second, numeral.first, true, true);
+}
+
+void Engine::ConvertSeasonNumbers(std::wstring& str) const {
+  // This works considerably faster than regular expressions.
+  typedef std::vector<std::wstring> season_t;
+  static const std::vector<std::pair<std::wstring, season_t>> values{
+    {L"1", {L"1st season", L"season 1", L"s1"}},
+    {L"2", {L"2nd season", L"season 2", L"s2"}},
+    {L"3", {L"3rd season", L"season 3", L"s3"}},
+    {L"4", {L"4th season", L"season 4", L"s4"}},
+    {L"5", {L"5th season", L"season 5", L"s5"}},
+    {L"6", {L"6th season", L"season 6", L"s6"}},
+  };
+
+  for (const auto& value : values)
+    for (const auto& season : value.second)
+      ReplaceString(str, 0, season, value.first, true, true);
+}
+
+void Engine::Transliterate(std::wstring& str) const {
+  for (size_t i = 0; i < str.size(); ++i) {
+    auto& c = str[i];
+    switch (c) {
+      // Character equivalencies
+      case L'\u00D7': c = L'x'; break;  // multiplication sign (e.g. "Tasogare Otome x Amnesia")
+      // A few common always-equivalent romanizations
+      case L'\u014C': str.replace(i, 1, L"ou"); break;  // latin capital letter o with macron
+      case L'\u014D': str.replace(i, 1, L"ou"); break;  // latin small letter o with macron
+      case L'\u016B': str.replace(i, 1, L"uu"); break;  // latin small letter u with macron
+    }
+  }
+
+  // Romanizations (Hepburn to Wapuro)
+  ReplaceString(str, 0, L"wa", L"ha", true, true);
+  ReplaceString(str, 0, L"e", L"he", true, true);
+  ReplaceString(str, 0, L"o", L"wo", true, true);
 }
 
 void Engine::NormalizeUnicode(std::wstring& str) const {
@@ -304,7 +367,9 @@ void Engine::NormalizeUnicode(std::wstring& str) const {
       // marks (accents, diaeresis)
       UTF8PROC_IGNORE | UTF8PROC_STRIPCC | UTF8PROC_STRIPMARK |
       // Map certain characters (e.g. hyphen and minus) for easier comparison
-      UTF8PROC_LUMP;
+      UTF8PROC_LUMP |
+      // Perform unicode case folding for case-insensitive comparison
+      UTF8PROC_CASEFOLD;
 
   char* buffer = nullptr;
   std::string temp = WstrToStr(str);
@@ -322,6 +387,14 @@ void Engine::NormalizeUnicode(std::wstring& str) const {
     free(buffer);
 }
 
+// TODO: Rename
+void Engine::EraseUnnecessary(std::wstring& str) const {
+  ReplaceString(str, 0, L"&", L"and", true, true);
+  ReplaceString(str, 0, L"the", L"", true, true);
+  ReplaceString(str, 0, L"episode", L"", true, true);
+  ReplaceString(str, 0, L"specials", L"special", true, true);
+}
+
 void Engine::ErasePunctuation(std::wstring& str) const {
   auto it = std::remove_if(str.begin(), str.end(),
       [](wchar_t c) -> bool {
@@ -337,44 +410,6 @@ void Engine::ErasePunctuation(std::wstring& str) const {
 
   if (it != str.end())
     str.resize(std::distance(str.begin(), it));
-}
-
-// TODO: Rename
-void Engine::EraseUnnecessary(std::wstring& str) const {
-  Replace(str, L" & ", L" and ", true);
-
-  EraseLeft(str, L"the ");
-  Replace(str, L" the ", L" ", true);
-
-  Erase(str, L"episode ");
-  Replace(str, L" specials", L" special", true);
-}
-
-void Engine::Transliterate(std::wstring& str) const {
-  for (size_t i = 0; i < str.size(); ++i) {
-    auto& c = str[i];
-    switch (c) {
-      // Character equivalencies
-      case L'\u00D7': c = L'x'; break;  // multiplication sign
-      case L'\u00E9': c = L'e'; break;  // latin small letter e with acute
-      case L'\u223C': c = L'~'; break;  // tilde operator
-      case L'\u2715': c = L'x'; break;  // multiplication x
-      case L'\u301C': c = L'~'; break;  // wave dash
-      case L'\uFF01': c = L'!'; break;  // fullwidth exclamation mark
-      case L'\uFF0F': c = L'/'; break;  // fullwidth solidus
-      case L'\uFF1F': c = L'?'; break;  // fullwidth question mark
-      case L'\uFF5E': c = L'~'; break;  // fullwidth tilde
-      // A few common always-equivalent romanizations
-      case L'\u014C': str.replace(i, 1, L"ou"); break;  // latin capital letter o with macron
-      case L'\u014D': str.replace(i, 1, L"ou"); break;  // latin small letter o with macron
-      case L'\u016B': str.replace(i, 1, L"uu"); break;  // latin small letter u with macron
-    }
-  }
-
-  // Romanizations (Hepburn to Wapuro)
-  Replace(str, L" wa ", L" ha ", true);
-  Replace(str, L" e ", L" he ", true);
-  Replace(str, L" o ", L" wo ", true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
