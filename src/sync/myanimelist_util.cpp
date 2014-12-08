@@ -34,8 +34,8 @@ namespace sync {
 namespace myanimelist {
 
 std::wstring DecodeText(std::wstring text) {
-  Replace(text, L"<br />", L"\r", true);
-  Replace(text, L"\n\n", L"\r\n\r\n", true);
+  ReplaceString(text, L"<br />", L"\r");
+  ReplaceString(text, L"\n\n", L"\r\n\r\n");
 
   StripHtmlTags(text);
   DecodeHtmlEntities(text);

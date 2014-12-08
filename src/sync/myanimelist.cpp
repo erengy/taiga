@@ -482,7 +482,7 @@ bool Service::RequestSucceeded(Response& response,
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry: {
       std::wstring error_message = http_response.body;
-      Replace(error_message, L"</div><div>", L"\r\n");
+      ReplaceString(error_message, L"</div><div>", L"\r\n");
       StripHtmlTags(error_message);
       response.data[L"error"] = error_message;
       break;

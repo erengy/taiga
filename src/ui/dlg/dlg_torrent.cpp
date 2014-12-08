@@ -448,7 +448,7 @@ void TorrentDialog::Search(std::wstring url, std::wstring title) {
   DlgMain.edit.SetText(title);
   DlgMain.ChangeStatus(L"Searching torrents for \"" + title + L"\"...");
 
-  Replace(url, L"%title%", title);
+  ReplaceString(url, L"%title%", title);
   feed->Check(url);
 }
 

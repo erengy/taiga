@@ -285,7 +285,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
     if (body_parts.size() == 2) body_parts.push_back(L"");
     if (body_parts.size() > 2) {
       str = body_parts[0];
-      Replace(str, body_parts[1], body_parts[2], true);
+      while (ReplaceString(str, body_parts[1], body_parts[2]));
     }
 
   // $substr(s,pos,n)
@@ -422,8 +422,8 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
   #undef VALIDATE
 
   // Replace special characters
-  Replace(str, L"\\n", L"\n", true);
-  Replace(str, L"\\t", L"\t", true);
+  ReplaceString(str, L"\\n", L"\n");
+  ReplaceString(str, L"\\t", L"\t");
 
   // Scripting
   int pos_func = 0, pos_left = 0, pos_right = 0;
@@ -482,8 +482,8 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
   str = UnescapeScriptEntities(str);
 
   // Clean-up
-  Replace(str, L"\n\n", L"\n", true);
-  Replace(str, L"  ", L" ", true);
+  while (ReplaceString(str, L"\n\n", L"\n"));
+  while (ReplaceString(str, L"  ", L" "));
 
   // Return
   return str;

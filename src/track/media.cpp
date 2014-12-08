@@ -193,7 +193,7 @@ void MediaPlayers::EditTitle(std::wstring& str,
     switch (it->mode) {
       // Erase
       case 1: {
-        Replace(str, it->value, L"", false, true);
+        ReplaceString(str, it->value, L"");
         break;
       }
       // Cut right side

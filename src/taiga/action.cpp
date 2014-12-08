@@ -159,7 +159,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       std::wstring title = anime_item->GetTitle();
       EraseChars(title, L"_!?.,:;~+");
       Erase(title, L" -");
-      Replace(body, L"%title%", title);
+      ReplaceString(body, L"%title%", title);
     }
     ExecuteLink(body);
 

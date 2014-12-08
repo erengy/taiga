@@ -424,7 +424,7 @@ void AppSettings::HandleCompatibility() {
       GetInt(kMeta_Version_Minor) <= 1 &&
       GetInt(kMeta_Version_Revision) <= 8) {
     auto external_links = GetWstr(kApp_Interface_ExternalLinks);
-    Replace(external_links, L"http://hummingboard.me", L"http://hb.cybrox.eu");
+    ReplaceString(external_links, L"http://hummingboard.me", L"http://hb.cybrox.eu");
     Set(kApp_Interface_ExternalLinks, external_links);
   }
 }

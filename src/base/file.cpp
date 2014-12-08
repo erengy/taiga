@@ -261,7 +261,7 @@ std::wstring GetDefaultAppPath(const std::wstring& extension,
     reg.OpenKey(HKEY_CLASSES_ROOT, path, 0, KEY_QUERY_VALUE);
 
     path = reg.QueryValue(L"");
-    Replace(path, L"\"", L"");
+    ReplaceString(path, L"\"", L"");
     Trim(path, L" %1");
   }
 

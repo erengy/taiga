@@ -227,15 +227,15 @@ bool Feed::Load() {
 
     // Clean up title
     DecodeHtmlEntities(items.back().title);
-    Replace(items.back().title, L"\\'", L"'");
+    ReplaceString(items.back().title, L"\\'", L"'");
     // Clean up description
-    Replace(items.back().description, L"<br/>", L"\n");
-    Replace(items.back().description, L"<br />", L"\n");
+    ReplaceString(items.back().description, L"<br/>", L"\n");
+    ReplaceString(items.back().description, L"<br />", L"\n");
     StripHtmlTags(items.back().description);
     DecodeHtmlEntities(items.back().description);
     Trim(items.back().description, L" \n");
     Aggregator.ParseDescription(items.back(), link);
-    Replace(items.back().description, L"\n", L" | ");
+    ReplaceString(items.back().description, L"\n", L" | ");
   }
 
   return true;
@@ -456,7 +456,7 @@ void Aggregator::ParseDescription(FeedItem& feed_item,
     feed_item.episode_data.file_size =
         InStr(feed_item.description, L" - ", L" - ");
     Erase(feed_item.description, feed_item.episode_data.file_size);
-    Replace(feed_item.description, L"-  -", L"-");
+    ReplaceString(feed_item.description, L"-  -", L"-");
 
   // TokyoTosho
   } else if (InStr(source, L"tokyotosho", 0, true) > -1) {

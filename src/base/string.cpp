@@ -447,39 +447,6 @@ double CompareTrigrams(const trigram_container_t& t1,
 ////////////////////////////////////////////////////////////////////////////////
 // Replace
 
-void Replace(wstring& input, wstring find, wstring replace_with,
-             bool replace_all, bool case_insensitive) {
-  if (find.empty() || find == replace_with || input.length() < find.length())
-    return;
-
-  if (!case_insensitive) {
-    for (size_t pos = input.find(find); pos != wstring::npos;
-         pos = input.find(find, pos)) {
-      input.replace(pos, find.length(), replace_with);
-      if (!replace_all)
-        pos += replace_with.length();
-    }
-  } else {
-    for (size_t i = 0; i < input.length() - find.length() + 1; i++) {
-      for (size_t j = 0; j < find.length(); j++) {
-        if (input.length() < find.length())
-          return;
-        if (tolower(input[i + j]) == tolower(find[j])) {
-          if (j == find.length() - 1) {
-            input.replace(i--, find.length(), replace_with);
-            if (!replace_all)
-              i += replace_with.length();
-            break;
-          }
-        } else {
-          i += j;
-          break;
-        }
-      }
-    }
-  }
-}
-
 void ReplaceChar(wstring& str, const wchar_t c, const wchar_t replace_with) {
   if (c == replace_with)
     return;
@@ -505,6 +472,51 @@ void ReplaceChars(wstring& str, const wchar_t chars[],
     if (pos != wstring::npos)
       str.replace(pos, 1, replace_with);
   } while (pos != wstring::npos);
+}
+
+
+bool ReplaceString(wstring& str,
+                   size_t offset,
+                   const wstring& find_this,
+                   const wstring& replace_with,
+                   bool whole_word_only,
+                   bool replace_all_instances) {
+  if (find_this.empty() || find_this == replace_with ||
+      str.length() < find_this.length() || offset >= str.length())
+    return false;
+
+  bool found_and_replaced = false;
+
+  for (size_t pos = str.find(find_this, offset);
+       pos != wstring::npos; pos = str.find(find_this, pos)) {
+
+    auto is_whole_word = [&]() {
+      if (pos == 0 || str.at(pos - 1) == L' ') {
+        size_t pos_end = pos + find_this.length();
+        if (pos_end >= str.length() || str.at(pos_end) == L' ')
+          return true;
+      }
+      return false;
+    };
+
+    if (whole_word_only && !is_whole_word()) {
+      pos += find_this.length();
+    } else {
+      str.replace(pos, find_this.length(), replace_with);
+      pos += replace_with.length();
+      found_and_replaced = true;
+      if (!replace_all_instances)
+        break;
+    }
+  }
+
+  return found_and_replaced;
+}
+
+bool ReplaceString(wstring& str,
+                   const wstring& find_this,
+                   const wstring& replace_with) {
+  return ReplaceString(str, 0, find_this, replace_with, false, true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

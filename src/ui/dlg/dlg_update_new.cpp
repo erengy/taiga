@@ -55,7 +55,7 @@ BOOL NewUpdateDialog::OnInitDialog() {
     if (item_version > Taiga.version) {
       changelog += L"\\b Version " + item->guid + L"\\b0\\line ";
       std::wstring description = item->description;
-      Replace(description, L"\n", L"\\line ", true);
+      ReplaceString(description, L"\n", L"\\line ");
       changelog += description + L"\\line\\line ";
     }
   }
