@@ -234,41 +234,34 @@ void MainDialog::CreateDialogControls() {
 }
 
 void MainDialog::InitWindowPosition() {
-  UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
   const LONG min_w = ScaleX(683);  // 1366/2, for 1366x768
   const LONG min_h = ScaleX(480);
 
-  win::Rect rcParent, rcWindow;
-  ::GetWindowRect(GetParent(), &rcParent);
-  rcWindow.Set(
-    Settings.GetInt(taiga::kApp_Position_X),
-    Settings.GetInt(taiga::kApp_Position_Y),
-    Settings.GetInt(taiga::kApp_Position_X) + Settings.GetInt(taiga::kApp_Position_W),
-    Settings.GetInt(taiga::kApp_Position_Y) + Settings.GetInt(taiga::kApp_Position_H));
+  win::Rect rcWindow(
+      Settings.GetInt(taiga::kApp_Position_X),
+      Settings.GetInt(taiga::kApp_Position_Y),
+      Settings.GetInt(taiga::kApp_Position_X) + Settings.GetInt(taiga::kApp_Position_W),
+      Settings.GetInt(taiga::kApp_Position_Y) + Settings.GetInt(taiga::kApp_Position_H));
 
-  if (rcWindow.left < 0 || rcWindow.left >= rcParent.right ||
-      rcWindow.top < 0 || rcWindow.top >= rcParent.bottom) {
-    flags |= SWP_NOMOVE;
-  }
-  if (rcWindow.Width() < min_w) {
-    rcWindow.right = rcWindow.left + min_w;
-  }
-  if (rcWindow.Height() < min_h) {
-    rcWindow.bottom = rcWindow.top + min_h;
-  }
-  if (rcWindow.Width() > rcParent.Width()) {
-    rcWindow.right = rcParent.left + rcParent.Width();
-  }
-  if (rcWindow.Height() > rcParent.Height()) {
-    rcWindow.bottom = rcParent.top + rcParent.Height();
-  }
-  if (rcWindow.Width() > 0 && rcWindow.Height() > 0 &&
-      !Settings.GetBool(taiga::kApp_Position_Maximized) &&
-      Settings.GetBool(taiga::kApp_Position_Remember)) {
+  bool first_time = rcWindow.left == -1 && rcWindow.top == -1;
+
+  HMONITOR hMonitor = MonitorFromRect(&rcWindow, MONITOR_DEFAULTTONEAREST);
+  MONITORINFO mi;
+  mi.cbSize = sizeof(mi);
+  GetMonitorInfo(hMonitor, &mi);
+  win::Rect rcWork = mi.rcWork;
+  auto w = rcWindow.Width();
+  auto h = rcWindow.Height();
+  rcWindow.left = max(rcWork.left, min(rcWork.right - w, rcWindow.left));
+  rcWindow.top = max(rcWork.top, min(rcWork.bottom - h, rcWindow.top));
+  rcWindow.right = rcWindow.left + w;
+  rcWindow.bottom = rcWindow.top + h;
+
+  if (first_time || Settings.GetBool(taiga::kApp_Position_Remember)) {
+    UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
     SetPosition(nullptr, rcWindow, flags);
-    if (flags & SWP_NOMOVE) {
+    if (first_time)
       CenterOwner();
-    }
   }
 
   SetSizeMin(min_w, min_h);
@@ -462,12 +455,16 @@ BOOL MainDialog::OnClose() {
 
 BOOL MainDialog::OnDestroy() {
   if (Settings.GetBool(taiga::kApp_Position_Remember)) {
-    Settings.Set(taiga::kApp_Position_Maximized, (GetWindowLong() & WS_MAXIMIZE) ? true : false);
-    if (!Settings.GetBool(taiga::kApp_Position_Maximized)) {
+    bool maximized = (GetWindowLong() & WS_MAXIMIZE) ? true : false;
+    Settings.Set(taiga::kApp_Position_Maximized, maximized);
+    if (!maximized) {
       bool invisible = !IsVisible();
-      if (invisible) ActivateWindow(GetWindowHandle());
-      win::Rect rcWindow; GetWindowRect(&rcWindow);
-      if (invisible) Hide();
+      if (invisible)
+        ActivateWindow(GetWindowHandle());
+      win::Rect rcWindow;
+      GetWindowRect(&rcWindow);
+      if (invisible)
+        Hide();
       Settings.Set(taiga::kApp_Position_X, rcWindow.left);
       Settings.Set(taiga::kApp_Position_Y, rcWindow.top);
       Settings.Set(taiga::kApp_Position_W, rcWindow.Width());
