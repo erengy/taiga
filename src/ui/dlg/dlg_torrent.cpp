@@ -45,8 +45,8 @@ BOOL TorrentDialog::OnInitDialog() {
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_TORRENT));
   list_.EnableGroupView(true);
-  list_.SetExtendedStyle(
-      LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+  list_.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS | LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER |
+                         LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetImageList(ui::Theme.GetImageList16().GetHandle());
   list_.SetTheme();
 
@@ -418,6 +418,14 @@ void TorrentDialog::RefreshList() {
     list_.SetItem(index, 6, it->episode_data.file.c_str());
     list_.SetCheckState(index, it->state == kFeedItemSelected);
   }
+
+  // Resize columns
+  list_.SetColumnWidth(0, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(1, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(2, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(3, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(4, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(6, LVSCW_AUTOSIZE_USEHEADER);
 
   // Redraw
   list_.SetRedraw(TRUE);

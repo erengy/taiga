@@ -45,10 +45,9 @@ BOOL HistoryDialog::OnInitDialog() {
   list_.SetTheme();
 
   // Insert list columns
-  list_.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 250, LVCFMT_LEFT, L"Anime title");
-  list_.InsertColumn(1, 400, 400, LVCFMT_LEFT, L"Details");
+  list_.InsertColumn(0, 250, 250, LVCFMT_LEFT, L"Anime title");
+  list_.InsertColumn(1, 100, 100, LVCFMT_LEFT, L"Details");
   list_.InsertColumn(2, 120, 120, LVCFMT_LEFT, L"Last modified");
-  list_.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
 
   // Insert list groups
   list_.InsertGroup(0, L"Queued for update");
@@ -227,6 +226,11 @@ void HistoryDialog::RefreshList() {
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
   }
+
+  // Resize columns
+  list_.SetColumnWidth(0, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(1, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(2, LVSCW_AUTOSIZE_USEHEADER);
 
   // Redraw
   list_.SetRedraw(TRUE);
