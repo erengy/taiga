@@ -234,9 +234,6 @@ void MainDialog::CreateDialogControls() {
 }
 
 void MainDialog::InitWindowPosition() {
-  const LONG min_w = ScaleX(683);  // 1366/2, for 1366x768
-  const LONG min_h = ScaleX(480);
-
   win::Rect rcWindow(
       Settings.GetInt(taiga::kApp_Position_X),
       Settings.GetInt(taiga::kApp_Position_Y),
@@ -264,7 +261,7 @@ void MainDialog::InitWindowPosition() {
       CenterOwner();
   }
 
-  SetSizeMin(min_w, min_h);
+  SetSizeMin(320, 240);
   SetSnapGap(10);
 }
 
