@@ -55,7 +55,7 @@ Date::operator bool() const {
 }
 
 Date::operator SYSTEMTIME() const {
-  SYSTEMTIME st;
+  SYSTEMTIME st = {0};
   st.wYear = year;
   st.wMonth = month;
   st.wDay = day;
