@@ -317,7 +317,7 @@ void StartWatching(Item& item, Episode& episode) {
   // Check folder
   if (item.GetFolder().empty()) {
     if (episode.folder.empty()) {
-      HWND hwnd = MediaPlayers.GetCurrentWindowHandle();
+      HWND hwnd = MediaPlayers.current_window_handle();
       episode.folder = GetPathOnly(MediaPlayers.GetTitleFromProcessHandle(hwnd));
     }
     if (IsInsideRootFolders(episode.folder)) {
