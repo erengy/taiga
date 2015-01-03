@@ -48,6 +48,7 @@ public:
   virtual std::wstring GetDlgItemText(int id_item);
   virtual BOOL HideDlgItem(int id_item);
   virtual BOOL IsDlgButtonChecked(int id_button);
+  virtual bool IsModal();
   virtual BOOL SendDlgItemMessage(int id_item, UINT uMsg, WPARAM wParam, LPARAM lParam);
   virtual BOOL SetComboSelection(int id_item, int index);
   virtual BOOL SetDlgItemText(int id_item, LPCWSTR text);

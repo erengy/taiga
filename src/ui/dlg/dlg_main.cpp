@@ -436,6 +436,18 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
     }
   }
 
+  if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
+    switch (pMsg->wParam) {
+      case VK_ESCAPE:
+      case VK_RETURN:
+        break;  // We don't want to close the dialogs
+      default:
+        if (!IsModal() && IsDialogMessage(GetWindowHandle(), pMsg)) {
+          return TRUE;
+        }
+    }
+  }
+
   return FALSE;
 }
 
