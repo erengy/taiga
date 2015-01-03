@@ -749,6 +749,36 @@ std::wstring GetMyScore(const Item& item) {
   return score;
 }
 
+void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched) {
+  ratio_aired = 0.0f;
+  ratio_watched = 0.0f;
+
+  int eps_aired = item.GetLastAiredEpisodeNumber(true);
+  int eps_watched = item.GetMyLastWatchedEpisode(true);
+
+  if (eps_watched > eps_aired)
+    eps_aired = -1;
+  if (eps_watched == 0)
+    eps_watched = -1;
+
+  int eps_total = EstimateEpisodeCount(item);
+
+  if (eps_total) {  // Episode count is known or estimated
+    if (eps_aired > 0)
+      ratio_aired = eps_aired / static_cast<float>(eps_total);
+    if (eps_watched > 0)
+      ratio_watched = eps_watched / static_cast<float>(eps_total);
+  } else {  // Episode count is unknown
+    if (eps_aired > -1)
+      ratio_aired = 0.85f;
+    if (eps_watched > 0)
+      ratio_watched = eps_aired == -1 ? 0.8f : eps_watched / (eps_aired / ratio_aired);
+  }
+
+  if (ratio_watched > 1.0f)  // Watched episodes is greater than total episodes
+    ratio_watched = 1.0f;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring TranslateMyStatus(int value, bool add_count) {
