@@ -57,7 +57,7 @@ private:
 // mIRC
 
 enum MircChannelMode {
-  kMircChannelModeActive,
+  kMircChannelModeActive = 1,
   kMircChannelModeAll,
   kMircChannelModeCustom
 };
