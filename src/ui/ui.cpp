@@ -768,7 +768,7 @@ void OnMircNotRunning(bool testing) {
   win::TaskDialog dlg(title.c_str(), TD_ICON_ERROR);
   dlg.SetMainInstruction(L"mIRC is not running.");
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(DlgMain.GetWindowHandle());
+  dlg.Show(testing ? DlgSettings.GetWindowHandle() : DlgMain.GetWindowHandle());
 }
 
 void OnMircDdeInitFail(bool testing) {
@@ -776,7 +776,7 @@ void OnMircDdeInitFail(bool testing) {
   win::TaskDialog dlg(title.c_str(), TD_ICON_ERROR);
   dlg.SetMainInstruction(L"DDE initialization failed.");
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(DlgMain.GetWindowHandle());
+  dlg.Show(testing ? DlgSettings.GetWindowHandle() : DlgMain.GetWindowHandle());
 }
 
 void OnMircDdeConnectionFail(bool testing) {
@@ -785,17 +785,18 @@ void OnMircDdeConnectionFail(bool testing) {
   dlg.SetMainInstruction(L"DDE connection failed.");
   dlg.SetContent(L"Please enable DDE server from mIRC Options > Other > DDE.");
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(DlgMain.GetWindowHandle());
+  dlg.Show(testing ? DlgSettings.GetWindowHandle() : DlgMain.GetWindowHandle());
 }
 
-void OnMircDdeConnectionSuccess(const std::wstring& channels, bool testing) {
+void OnMircDdeConnectionSuccess(const std::vector<std::wstring> channels,
+                                bool testing) {
   std::wstring title = testing ? L"Test DDE connection" : L"Announce to mIRC";
   win::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Successfuly connected to DDE server!");
-  std::wstring content = L"Current channels: " + channels;
+  std::wstring content = L"Current channels: " + Join(channels, L", ");
   dlg.SetContent(content.c_str());
   dlg.AddButton(L"OK", IDOK);
-  dlg.Show(DlgMain.GetWindowHandle());
+  dlg.Show(testing ? DlgSettings.GetWindowHandle() : DlgMain.GetWindowHandle());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
