@@ -799,7 +799,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable)) {
     if (eps_estimate > 0) {
       float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
-      for (int i = eps_watched + 1; i <= eps_available; i++) {
+      for (int i = eps_watched + 1; i <= min(eps_available, eps_estimate); i++) {
         if (i > 0 && anime_item.IsEpisodeAvailable(i)) {
           rcAvail.left = static_cast<int>(rcBar.left + (width * (i - 1)));
           rcAvail.right = static_cast<int>(rcAvail.left + width + 1);
