@@ -46,7 +46,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     http_request.url.protocol = base::http::kHttps;
 
   // Hummingbird is supposed to return a JSON response for each and every
-  // request, so that's what we expect from it
+  // request, so that's what we expect from it.
   http_request.header[L"Accept"] = L"application/json";
   http_request.header[L"Accept-Charset"] = L"utf-8";
   http_request.header[L"Accept-Encoding"] = L"gzip";
@@ -65,6 +65,12 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
     BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
   }
+
+  // APIv1 provides different title and alternate_title values depending on the
+  // title_language_preference parameter.
+  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles))
+    if (RequestSupportsTitleLanguagePreference(request.type))
+      AppendTitleLanguagePreference(http_request);
 }
 
 void Service::HandleResponse(Response& response, HttpResponse& http_response) {
@@ -107,8 +113,7 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  // This method is not documented, but otherwise works fine. Note that it will
-  // return only 5 results at a time.
+  // Note that this method will return only 5 results at a time.
   http_request.url.path = L"/search/anime";
   http_request.url.query[L"query"] = request.data[L"title"];
 }
@@ -221,6 +226,28 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
     return;
 
   ParseLibraryObject(root);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Service::AppendTitleLanguagePreference(HttpRequest& http_request) const {
+  if (http_request.method == L"POST") {
+    http_request.data[L"title_language_preference"] = L"english";
+  } else {
+    http_request.url.query[L"title_language_preference"] = L"english";
+  }
+}
+
+bool Service::RequestSupportsTitleLanguagePreference(RequestType request_type) const {
+  switch (request_type) {
+    case kGetLibraryEntries:
+    case kGetMetadataById:
+    case kSearchTitle:
+    case kUpdateLibraryEntry:
+      return true;
+  }
+
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
