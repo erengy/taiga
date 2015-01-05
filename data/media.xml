@@ -146,6 +146,10 @@
 		<file>mpc-hc64.exe</file>
 		<folder>%ProgramFiles%\K-Lite Codec Pack\Media Player Classic\</folder>
 		<folder>%ProgramW6432%\K-Lite Codec Pack\Media Player Classic\</folder>
+		<folder>%ProgramFiles%\K-Lite Codec Pack\MPC-HC\</folder>
+		<folder>%ProgramW6432%\K-Lite Codec Pack\MPC-HC\</folder>
+		<folder>%ProgramFiles%\K-Lite Codec Pack\MPC-HC64\</folder>
+		<folder>%ProgramW6432%\K-Lite Codec Pack\MPC-HC64\</folder>
 		<folder>%ProgramFiles%\Media Player Classic - Home Cinema\</folder>
 		<folder>%ProgramW6432%\Media Player Classic - Home Cinema\</folder>
 		<edit mode="2">Media Player Classic</edit>
