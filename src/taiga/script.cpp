@@ -60,13 +60,12 @@ const wchar_t* script_functions[] = {
   L"upper"
 };
 
-#define SCRIPT_VARIABLE_COUNT 23
+#define SCRIPT_VARIABLE_COUNT 22
 const wchar_t* script_variables[] = {
   L"animeurl",
   L"audio",
   L"checksum",
   L"episode",
-  L"extra",
   L"file",
   L"folder",
   L"group",
@@ -390,7 +389,6 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"video", ENCODE(episode.video_type));
           REPLACE(L"audio", ENCODE(episode.audio_type));
           REPLACE(L"checksum", ENCODE(episode.checksum));
-          REPLACE(L"extra", ENCODE(episode.extras));
           REPLACE(L"file", ENCODE(episode.file));
           REPLACE(L"folder", ENCODE(episode.folder));
           REPLACE(L"user", ENCODE(taiga::GetCurrentUsername()));

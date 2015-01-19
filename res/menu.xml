@@ -333,7 +333,6 @@
 		<item name="audio"      action="%audio%"/>
 		<item name="checksum"   action="%checksum%"/>
 		<item name="episode"    action="%episode%"/>
-		<item name="extra"      action="%extra%"/>
 		<item name="file"       action="%file%"/>
 		<item name="folder"     action="%folder%"/>
 		<item name="group"      action="%group%"/>
