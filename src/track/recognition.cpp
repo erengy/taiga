@@ -345,6 +345,7 @@ void Engine::Transliterate(std::wstring& str) const {
     auto& c = str[i];
     switch (c) {
       // Character equivalencies
+      case L'@': c = L'a'; break;  // e.g. "iDOLM@STER" (doesn't make a difference for "GJ-bu@" or "Sasami-san@Ganbaranai")
       case L'\u00D7': c = L'x'; break;  // multiplication sign (e.g. "Tasogare Otome x Amnesia")
       // A few common always-equivalent romanizations
       case L'\u014C': str.replace(i, 1, L"ou"); break;  // latin capital letter o with macron
