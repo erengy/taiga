@@ -22,7 +22,6 @@
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
-#include "ui/dlg/dlg_test_recognition.h"
 #include "ui/dlg/dlg_torrent.h"
 #include "ui/dlg/dlg_update.h"
 #include "ui/dialog.h"
@@ -68,9 +67,6 @@ void InitializeDialogProperties() {
   dialog_properties.insert(std::make_pair(
       kDialogSettings,
       DialogProperties(IDD_SETTINGS, &DlgSettings, kDialogMain, true)));
-  dialog_properties.insert(std::make_pair(
-      kDialogTestRecognition,
-      DialogProperties(IDD_TEST_RECOGNITION, &DlgTestRecognition)));
   dialog_properties.insert(std::make_pair(
       kDialogUpdate,
       DialogProperties(IDD_UPDATE, &DlgUpdate, kDialogMain, true)));

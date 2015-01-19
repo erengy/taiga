@@ -182,11 +182,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"MainDialog") {
     ui::ShowDialog(ui::kDialogMain);
 
-  // RecognitionTest()
-  //   Shows recognition test window.
-  } else if (action == L"RecognitionTest") {
-    ui::ShowDialog(ui::kDialogTestRecognition);
-
   // Settings()
   //   Shows settings window.
   //   wParam is the initial section.

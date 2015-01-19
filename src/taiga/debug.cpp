@@ -79,11 +79,8 @@ void Test() {
     //      O RLY?
   }
 
-  // Debug recognition engine
-  ui::ShowDialog(ui::kDialogTestRecognition);
-
   // Show result
-  test.End(str, 0);
+  test.End(str, true);
 }
 
 } // namespace debug

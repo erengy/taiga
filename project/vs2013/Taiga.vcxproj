@@ -208,7 +208,6 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_settings.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_settings_page.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_stats.cpp" />
-    <ClCompile Include="..\..\src\ui\dlg\dlg_test_recognition.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_torrent.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_update.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp" />
@@ -361,7 +360,6 @@
     <ClInclude Include="..\..\src\ui\dlg\dlg_settings.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_settings_page.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_stats.h" />
-    <ClInclude Include="..\..\src\ui\dlg\dlg_test_recognition.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_torrent.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_update.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h" />

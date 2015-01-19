@@ -40,10 +40,9 @@
 #define IDD_SETTINGS_TORRENTS_DOWNLOADS         145
 #define IDD_SETTINGS_TORRENTS_FILTERS           146
 #define IDD_STATS                               147
-#define IDD_TEST_RECOGNITION                    148
-#define IDD_TORRENT                             149
-#define IDD_UPDATE                              150
-#define IDD_UPDATE_NEW                          151
+#define IDD_TORRENT                             148
+#define IDD_UPDATE                              149
+#define IDD_UPDATE_NEW                          150
 #define IDC_BUTTON_ADDFOLDER                    1000
 #define IDC_BUTTON_BROWSE                       1001
 #define IDC_BUTTON_CACHE_CLEAR                  1002
@@ -155,7 +154,6 @@
 #define IDC_LIST_SEARCH                         1108
 #define IDC_LIST_SEASON                         1109
 #define IDC_LIST_STREAM_PROVIDER                1110
-#define IDC_LIST_TEST_RECOGNITION               1111
 #define IDC_LIST_TORRENT                        1112
 #define IDC_LIST_TORRENT_FILTER                 1113
 #define IDC_PROGRESS_UPDATE                     1114

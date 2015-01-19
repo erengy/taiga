@@ -477,7 +477,6 @@ BOOL MainDialog::OnDestroy() {
 
   ui::DestroyDialog(ui::kDialogAbout);
   ui::DestroyDialog(ui::kDialogAnimeInformation);
-  ui::DestroyDialog(ui::kDialogTestRecognition);
   ui::DestroyDialog(ui::kDialogSettings);
   ui::DestroyDialog(ui::kDialogUpdate);
 

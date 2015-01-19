@@ -403,9 +403,6 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_stats.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\ui\dlg\dlg_test_recognition.cpp">
-      <Filter>ui\dlg</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ui\dlg\dlg_torrent.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
@@ -856,9 +853,6 @@
       <Filter>ui\dlg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_stats.h">
-      <Filter>ui\dlg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ui\dlg\dlg_test_recognition.h">
       <Filter>ui\dlg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_torrent.h">

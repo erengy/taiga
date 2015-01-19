@@ -29,7 +29,6 @@ enum Dialog {
   kDialogAnimeInformation,
   kDialogMain,
   kDialogSettings,
-  kDialogTestRecognition,
   kDialogTorrents,
   kDialogUpdate
 };
