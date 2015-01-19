@@ -61,7 +61,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"\\b Third-party stuff that is used by Taiga:\\b0\\line "
       L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
       L"- JsonCpp 1.1.0, Copyright (c) 2007-2010, Baptiste Lepilleur\\line "
-      L"- libcurl 7.39.0, Copyright (c) 1996-2014, Daniel Stenberg\\line "
+      L"- libcurl 7.40.0, Copyright (c) 1996-2015, Daniel Stenberg\\line "
       L"- libmojibake 1.1.6, Copyright (c) 2009 Public Software Group e. V.\\line "
       L"- pugixml 1.5, Copyright (c) 2006-2014, Arseny Kapoulkine\\line "
       L"- zlib 1.2.8, Copyright (c) 1995-2013, Jean-loup Gailly and Mark Adler\\line\\line "
