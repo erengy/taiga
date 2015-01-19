@@ -180,43 +180,18 @@ int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
-  int total1 = item1.GetEpisodeCount();
-  int total2 = item2.GetEpisodeCount();
-  int watched1 = item1.GetMyLastWatchedEpisode();
-  int watched2 = item2.GetMyLastWatchedEpisode();
-  bool available1 = item1.IsNewEpisodeAvailable();
-  bool available2 = item2.IsNewEpisodeAvailable();
+  float ratio1, unused1;
+  float ratio2, unused2;
+  anime::GetProgressRatios(item1, unused1, ratio1);
+  anime::GetProgressRatios(item2, unused2, ratio2);
 
-  if (available1 && !available2) {
-    return base::kLessThan;
-  } else if (!available1 && available2) {
-    return base::kGreaterThan;
-  } else if (total1 && total2) {
-    float ratio1 = static_cast<float>(watched1) / static_cast<float>(total1);
-    float ratio2 = static_cast<float>(watched2) / static_cast<float>(total2);
-    if (ratio1 > ratio2) {
-      return base::kLessThan;
-    } else if (ratio1 < ratio2) {
-      return base::kGreaterThan;
-    } else {
-      if (total1 > total2) {
-        return base::kLessThan;
-      } else if (total1 < total2) {
-        return base::kGreaterThan;
-      }
-    }
+  if (ratio1 != ratio2) {
+    return ratio1 > ratio2 ? base::kLessThan : base::kGreaterThan;
   } else {
-    if (watched1 > watched2) {
-      return base::kLessThan;
-    } else if (watched1 < watched2) {
-      return base::kGreaterThan;
-    } else {
-      if (total1 > total2) {
-        return base::kLessThan;
-      } else if (total1 < total2) {
-        return base::kGreaterThan;
-      }
-    }
+    int total1 = anime::EstimateEpisodeCount(item1);
+    int total2 = anime::EstimateEpisodeCount(item2);
+    if (total1 != total2)
+      return total1 > total2 ? base::kLessThan : base::kGreaterThan;
   }
 
   return base::kEqualTo;

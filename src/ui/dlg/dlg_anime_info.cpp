@@ -259,6 +259,19 @@ void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
   if (pMsg->message == WM_KEYDOWN) {
     switch (pMsg->wParam) {
+      // Switch tabs
+      case VK_TAB:
+        if (IsTabVisible()) {
+          if (GetKeyState(VK_CONTROL) & 0x8000) {
+            if (GetKeyState(VK_SHIFT) & 0x8000) {
+              GoToPreviousTab();
+            } else {
+              GoToNextTab();
+            }
+            return TRUE;
+          }
+        }
+        break;
       // Refresh
       case VK_F5:
         page_my_info.Refresh(anime_id_);
@@ -270,13 +283,14 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
           sync::DownloadImage(anime_id_, anime_item->GetImageUrl());
         }
         return TRUE;
-      // Close window
-      case VK_ESCAPE:
-        if (mode_ == kDialogModeAnimeInformation) {
-          Destroy();
-          return TRUE;
-        }
-        break;
+    }
+  }
+
+  if (mode_ == kDialogModeAnimeInformation) {
+    if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
+      if (!IsModal() && IsDialogMessage(GetWindowHandle(), pMsg)) {
+        return TRUE;
+      }
     }
   }
 
@@ -384,6 +398,15 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
 bool AnimeDialog::IsTabVisible() const {
   return tab_.IsVisible() != FALSE;
+}
+
+void AnimeDialog::GoToPreviousTab() {
+  SetCurrentPage(current_page_ == kAnimePageSeriesInfo ?
+      kAnimePageMyInfo : kAnimePageSeriesInfo);
+}
+
+void AnimeDialog::GoToNextTab() {
+  GoToPreviousTab();
 }
 
 int AnimeDialog::GetCurrentId() const {

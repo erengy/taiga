@@ -757,35 +757,16 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (eps_watched > -1 || eps_aired > -1) {
     float ratio_aired = 0.0f;
     float ratio_watched = 0.0f;
-    if (eps_estimate) {
-      if (eps_aired > 0) {
-        ratio_aired = static_cast<float>(eps_aired) / static_cast<float>(eps_estimate);
-      }
-      if (eps_watched > 0) {
-        ratio_watched = static_cast<float>(eps_watched) / static_cast<float>(eps_estimate);
-      }
-    } else {
-      if (eps_aired > -1)
-        ratio_aired = 0.85f;
-      if (eps_watched > 0)
-        ratio_watched = eps_aired > -1 ? eps_watched / (eps_aired / ratio_aired) : 0.8f;
-    }
-    if (ratio_watched > 1.0f) {
-      // The number of watched episodes is greater than the number of total episodes
-      ratio_watched = 1.0f;
-    }
+    anime::GetProgressRatios(anime_item, ratio_aired, ratio_watched);
 
-    if (eps_aired > -1) {
+    if (eps_aired > -1)
       rcAired.right = static_cast<int>((rcAired.Width()) * ratio_aired) + rcAired.left;
-    }
-    if (ratio_watched > -1) {
+    if (ratio_watched > -1)
       rcWatched.right = static_cast<int>((rcWatched.Width()) * ratio_watched) + rcWatched.left;
-    }
 
     // Draw aired episodes
-    if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAired) && eps_aired > 0) {
+    if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAired) && eps_aired > 0)
       ui::Theme.DrawListProgress(dc.Get(), &rcAired, ui::kListProgressAired);
-    }
 
     // Draw progress
     auto list_progress_type = ui::kListProgressWatching;
@@ -818,7 +799,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable)) {
     if (eps_estimate > 0) {
       float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
-      for (int i = eps_watched + 1; i <= eps_available; i++) {
+      for (int i = eps_watched + 1; i <= min(eps_available, eps_estimate); i++) {
         if (i > 0 && anime_item.IsEpisodeAvailable(i)) {
           rcAvail.left = static_cast<int>(rcBar.left + (width * (i - 1)));
           rcAvail.right = static_cast<int>(rcAvail.left + width + 1);

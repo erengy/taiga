@@ -80,6 +80,7 @@ void IncrementEpisode(int anime_id);
 
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
 std::wstring GetMyScore(const Item& item);
+void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched);
 
 std::wstring TranslateMyStatus(int value, bool add_count);
 std::wstring TranslateNumber(int value, const std::wstring& default_char = L"-");

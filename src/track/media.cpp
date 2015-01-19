@@ -40,7 +40,8 @@
 class MediaPlayers MediaPlayers;
 
 MediaPlayers::MediaPlayers()
-    : player_running_(false),
+    : current_window_handle_(nullptr),
+      player_running_(false),
       title_changed_(false) {
 }
 
@@ -91,12 +92,16 @@ MediaPlayer* MediaPlayers::FindPlayer(const std::wstring& name) {
   return nullptr;
 }
 
-HWND MediaPlayers::GetCurrentWindowHandle() {
-  auto media_player = FindPlayer(current_player_);
-  if (media_player)
-    return media_player->window_handle;
+bool MediaPlayers::IsPlayerActive() const {
+  if (!Settings.GetBool(taiga::kSync_Update_CheckPlayer))
+    return true;
 
-  return nullptr;
+  return current_window_handle_ &&
+         current_window_handle_ == GetForegroundWindow();
+}
+
+HWND MediaPlayers::current_window_handle() const {
+  return current_window_handle_;
 }
 
 std::wstring MediaPlayers::current_player() const {
@@ -115,13 +120,6 @@ std::wstring MediaPlayers::current_title() const {
   return current_title_;
 }
 
-void MediaPlayers::set_current_title(const std::wstring& title) {
-  if (current_title_ != title) {
-    current_title_ = title;
-    set_title_changed(true);
-  }
-}
-
 bool MediaPlayers::title_changed() const {
   return title_changed_;
 }
@@ -133,10 +131,6 @@ void MediaPlayers::set_title_changed(bool title_changed) {
 ////////////////////////////////////////////////////////////////////////////////
 
 MediaPlayer* MediaPlayers::CheckRunningPlayers() {
-  current_player_.clear();
-
-  bool recognized = anime::IsValidId(CurrentEpisode.anime_id);
-
   // Go through windows, starting with the highest in the Z-order
   HWND hwnd = GetWindow(ui::GetWindowHandle(ui::kDialogMain), GW_HWNDFIRST);
   while (hwnd != nullptr) {
@@ -155,14 +149,18 @@ MediaPlayer* MediaPlayers::CheckRunningPlayers() {
               if (item->mode != kMediaModeWebBrowser ||
                   !GetWindowTitle(hwnd).empty()) {
                 // Stick with the previously recognized window, if there is one
-                if (!recognized || item->window_handle == hwnd) {
+                bool recognized = anime::IsValidId(CurrentEpisode.anime_id);
+                if (!recognized || current_window_handle_ == hwnd) {
                   // We have a match!
                   player_running_ = true;
                   current_player_ = item->name;
                   std::wstring title = GetTitle(hwnd, *window_class, item->mode);
                   EditTitle(title, &(*item));
-                  set_current_title(title);
-                  item->window_handle = hwnd;
+                  if (current_title_ != title) {
+                    current_title_ = title;
+                    set_title_changed(true);
+                  }
+                  current_window_handle_ = hwnd;
                   return &(*item);
                 }
               }
@@ -177,6 +175,12 @@ MediaPlayer* MediaPlayers::CheckRunningPlayers() {
   }
 
   // Not found
+  current_player_.clear();
+  if (!current_title_.empty()) {
+    current_title_.clear();
+    set_title_changed(true);
+  }
+  current_window_handle_ = nullptr;
   return nullptr;
 }
 
@@ -220,13 +224,6 @@ std::wstring MediaPlayer::GetPath() const {
   }
 
   return std::wstring();
-}
-
-bool MediaPlayer::IsActive() const {
-  if (!Settings.GetBool(taiga::kSync_Update_CheckPlayer))
-    return true;
-
-  return window_handle == GetForegroundWindow();
 }
 
 std::wstring MediaPlayers::GetTitle(HWND hwnd,

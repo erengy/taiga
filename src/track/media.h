@@ -36,7 +36,6 @@ enum MediaPlayerModes {
 class MediaPlayer {
 public:
   std::wstring GetPath() const;
-  bool IsActive() const;
 
   std::wstring name;
   BOOL enabled;
@@ -52,8 +51,6 @@ public:
     std::wstring value;
   };
   std::vector<EditTitle> edits;
-
-  HWND window_handle;
 };
 
 class MediaPlayers {
@@ -64,13 +61,13 @@ public:
   bool Load();
 
   MediaPlayer* FindPlayer(const std::wstring& name);
-  HWND GetCurrentWindowHandle();
+  bool IsPlayerActive() const;
 
+  HWND current_window_handle() const;
   std::wstring current_player() const;
   bool player_running() const;
   void set_player_running(bool player_running);
   std::wstring current_title() const;
-  void set_current_title(const std::wstring& title);
   bool title_changed() const;
   void set_title_changed(bool title_changed);
 
@@ -96,6 +93,7 @@ public:
   } acc_obj;
 
 private:
+  HWND current_window_handle_;
   std::wstring current_player_;
   bool player_running_;
 

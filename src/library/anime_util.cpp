@@ -250,10 +250,12 @@ bool PlayRandomAnime() {
     valid_ids.push_back(anime_item.GetId());
   }
 
-  foreach_ (id, valid_ids) {
-    srand(static_cast<unsigned int>(GetTickCount()));
-    size_t max_value = valid_ids.size();
-    size_t index = rand() % max_value + 1;
+  size_t max_value = valid_ids.size();
+
+  srand(static_cast<unsigned int>(GetTickCount()));
+
+  foreach_(id, valid_ids) {
+    size_t index = rand() % max_value;
     int anime_id = valid_ids.at(index);
     if (PlayNextEpisode(anime_id))
       return true;
@@ -315,7 +317,7 @@ void StartWatching(Item& item, Episode& episode) {
   // Check folder
   if (item.GetFolder().empty()) {
     if (episode.folder.empty()) {
-      HWND hwnd = MediaPlayers.GetCurrentWindowHandle();
+      HWND hwnd = MediaPlayers.current_window_handle();
       episode.folder = GetPathOnly(MediaPlayers.GetTitleFromProcessHandle(hwnd));
     }
     if (IsInsideRootFolders(episode.folder)) {
@@ -762,6 +764,36 @@ std::wstring GetMyScore(const Item& item) {
   }
 
   return score;
+}
+
+void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched) {
+  ratio_aired = 0.0f;
+  ratio_watched = 0.0f;
+
+  int eps_aired = item.GetLastAiredEpisodeNumber(true);
+  int eps_watched = item.GetMyLastWatchedEpisode(true);
+
+  if (eps_watched > eps_aired)
+    eps_aired = -1;
+  if (eps_watched == 0)
+    eps_watched = -1;
+
+  int eps_total = EstimateEpisodeCount(item);
+
+  if (eps_total) {  // Episode count is known or estimated
+    if (eps_aired > 0)
+      ratio_aired = eps_aired / static_cast<float>(eps_total);
+    if (eps_watched > 0)
+      ratio_watched = eps_watched / static_cast<float>(eps_total);
+  } else {  // Episode count is unknown
+    if (eps_aired > -1)
+      ratio_aired = 0.85f;
+    if (eps_watched > 0)
+      ratio_watched = eps_aired == -1 ? 0.8f : eps_watched / (eps_aired / ratio_aired);
+  }
+
+  if (ratio_watched > 1.0f)  // Watched episodes is greater than total episodes
+    ratio_watched = 1.0f;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -484,7 +484,18 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_BUTTON_MIRC_TEST: {
           std::wstring service;
           GetDlgItemText(IDC_EDIT_MIRC_SERVICE, service);
-          Announcer.TestMircConnection(service);
+
+          if (!Mirc.IsRunning()) {
+            ui::OnMircNotRunning(true);
+          } else {
+            std::vector<std::wstring> channels;
+            if (!Mirc.GetChannels(service, channels)) {
+              ui::OnMircDdeConnectionFail(true);
+            } else {
+              ui::OnMircDdeConnectionSuccess(channels, true);
+            }
+          }
+
           return TRUE;
         }
 

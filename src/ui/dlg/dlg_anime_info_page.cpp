@@ -223,6 +223,22 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       }
       break;
 
+    // User changed date checkbox
+    case IDC_CHECK_ANIME_DATE_START: {
+      auto enabled = IsDlgButtonChecked(IDC_CHECK_ANIME_DATE_START);
+      EnableDlgItem(IDC_COMBO_ANIME_DATE_START_YEAR, enabled);
+      EnableDlgItem(IDC_COMBO_ANIME_DATE_START_MONTH, enabled);
+      EnableDlgItem(IDC_COMBO_ANIME_DATE_START_DAY, enabled);
+      break;
+    }
+    case IDC_CHECK_ANIME_DATE_FINISH: {
+      auto enabled = IsDlgButtonChecked(IDC_CHECK_ANIME_DATE_FINISH);
+      EnableDlgItem(IDC_COMBO_ANIME_DATE_FINISH_YEAR, enabled);
+      EnableDlgItem(IDC_COMBO_ANIME_DATE_FINISH_MONTH, enabled);
+      EnableDlgItem(IDC_COMBO_ANIME_DATE_FINISH_DAY, enabled);
+      break;
+    }
+
     // User changed status dropdown
     case IDC_COMBO_ANIME_STATUS:
       if (HIWORD(wParam) == CBN_SELENDOK) {
@@ -309,33 +325,70 @@ void PageMyInfo::Refresh(int anime_id) {
   edit.SetText(anime_item->GetMyTags());
   edit.SetWindowHandle(nullptr);
 
-  // Date limits and defaults
-  if (anime::IsValidDate(anime_item->GetDateStart())) {
-    SYSTEMTIME stSeriesStart = anime_item->GetDateStart();
-    SendDlgItemMessage(IDC_DATETIME_START, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
-    SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
-    SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesStart);
-    SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesStart);
+  // Dates
+  bool date_start_enabled = anime::IsValidDate(anime_item->GetMyDateStart());
+  bool date_finish_enabled = anime::IsValidDate(anime_item->GetMyDateEnd());
+  CheckDlgButton(IDC_CHECK_ANIME_DATE_START, date_start_enabled);
+  CheckDlgButton(IDC_CHECK_ANIME_DATE_FINISH, date_finish_enabled);
+  EnableDlgItem(IDC_COMBO_ANIME_DATE_START_YEAR, date_start_enabled);
+  EnableDlgItem(IDC_COMBO_ANIME_DATE_START_MONTH, date_start_enabled);
+  EnableDlgItem(IDC_COMBO_ANIME_DATE_START_DAY, date_start_enabled);
+  EnableDlgItem(IDC_COMBO_ANIME_DATE_FINISH_YEAR, date_finish_enabled);
+  EnableDlgItem(IDC_COMBO_ANIME_DATE_FINISH_MONTH, date_finish_enabled);
+  EnableDlgItem(IDC_COMBO_ANIME_DATE_FINISH_DAY, date_finish_enabled);
+
+  win::ComboBox combo_start_year = GetDlgItem(IDC_COMBO_ANIME_DATE_START_YEAR);
+  win::ComboBox combo_start_month = GetDlgItem(IDC_COMBO_ANIME_DATE_START_MONTH);
+  win::ComboBox combo_start_day = GetDlgItem(IDC_COMBO_ANIME_DATE_START_DAY);
+  win::ComboBox combo_finish_year = GetDlgItem(IDC_COMBO_ANIME_DATE_FINISH_YEAR);
+  win::ComboBox combo_finish_month = GetDlgItem(IDC_COMBO_ANIME_DATE_FINISH_MONTH);
+  win::ComboBox combo_finish_day = GetDlgItem(IDC_COMBO_ANIME_DATE_FINISH_DAY);
+
+  Date date_now = GetDate();
+  Date date_start = anime_item->GetDateStart();
+  Date date_finish = anime_item->GetDateEnd();
+
+  combo_start_year.ResetContent();
+  combo_finish_year.ResetContent();
+  combo_start_year.AddItem(L"(yyyy)", 0);
+  combo_finish_year.AddItem(L"(yyyy)", 0);
+  for (int i = date_now.year; i >= max(date_start.year, 1985); --i)
+    combo_start_year.AddItem(ToWstr(i).c_str(), i);
+  for (int i = date_now.year; i >= max(date_finish.year, 1985); --i)
+    combo_finish_year.AddItem(ToWstr(i).c_str(), i);
+  combo_start_year.SetCurSel(anime_item->GetMyDateStart().year == 0 ? 0 :
+                             1 + date_now.year - anime_item->GetMyDateStart().year);
+  combo_finish_year.SetCurSel(anime_item->GetMyDateEnd().year == 0 ? 0 :
+                              1 + date_now.year - anime_item->GetMyDateEnd().year);
+
+  combo_start_month.ResetContent();
+  combo_finish_month.ResetContent();
+  combo_start_month.AddItem(L"(mm)", 0);
+  combo_finish_month.AddItem(L"(mm)", 0);
+  for (int i = 1; i <= 12; ++i) {
+    combo_start_month.AddItem(ToWstr(i).c_str(), i);
+    combo_finish_month.AddItem(ToWstr(i).c_str(), i);
   }
-  if (anime::IsValidDate(anime_item->GetDateEnd())) {
-    SYSTEMTIME stSeriesEnd = anime_item->GetDateEnd();
-    SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETRANGE, GDTR_MIN, (LPARAM)&stSeriesEnd);
-    SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stSeriesEnd);
+  combo_start_month.SetCurSel(anime_item->GetMyDateStart().month);
+  combo_finish_month.SetCurSel(anime_item->GetMyDateEnd().month);
+
+  combo_start_day.ResetContent();
+  combo_finish_day.ResetContent();
+  combo_start_day.AddItem(L"(dd)", 0);
+  combo_finish_day.AddItem(L"(dd)", 0);
+  for (int i = 1; i <= 31; ++i) {
+    combo_start_day.AddItem(ToWstr(i).c_str(), i);
+    combo_finish_day.AddItem(ToWstr(i).c_str(), i);
   }
-  // Start date
-  if (anime::IsValidDate(anime_item->GetMyDateStart())) {
-    SYSTEMTIME stMyStart = anime_item->GetMyDateStart();
-    SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyStart);
-  } else {
-    SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, 0);
-  }
-  // Finish date
-  if (anime::IsValidDate(anime_item->GetMyDateEnd())) {
-    SYSTEMTIME stMyFinish = anime_item->GetMyDateEnd();
-    SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyFinish);
-  } else {
-    SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_NONE, 0);
-  }
+  combo_start_day.SetCurSel(anime_item->GetMyDateStart().day);
+  combo_finish_day.SetCurSel(anime_item->GetMyDateEnd().day);
+
+  combo_finish_day.SetWindowHandle(nullptr);
+  combo_finish_month.SetWindowHandle(nullptr);
+  combo_finish_year.SetWindowHandle(nullptr);
+  combo_start_day.SetWindowHandle(nullptr);
+  combo_start_month.SetWindowHandle(nullptr);
+  combo_start_year.SetWindowHandle(nullptr);
 
   // Alternative titles
   edit.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_ALT));
@@ -404,20 +457,34 @@ bool PageMyInfo::Save() {
   history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
 
   // Start date
-  SYSTEMTIME stMyStart;
-  if (SendDlgItemMessage(IDC_DATETIME_START, DTM_GETSYSTEMTIME, 0,
-                         reinterpret_cast<LPARAM>(&stMyStart)) == GDT_NONE) {
+  if (!IsDlgButtonChecked(IDC_CHECK_ANIME_DATE_START)) {
     history_item.date_start = Date();
   } else {
-    history_item.date_start = Date(stMyStart.wYear, stMyStart.wMonth, stMyStart.wDay);
+    win::ComboBox combo_year = GetDlgItem(IDC_COMBO_ANIME_DATE_START_YEAR);
+    win::ComboBox combo_month = GetDlgItem(IDC_COMBO_ANIME_DATE_START_MONTH);
+    win::ComboBox combo_day = GetDlgItem(IDC_COMBO_ANIME_DATE_START_DAY);
+    history_item.date_start = Date(
+        combo_year.GetItemData(combo_year.GetCurSel()),
+        combo_month.GetItemData(combo_month.GetCurSel()),
+        combo_day.GetItemData(combo_day.GetCurSel()));
+    combo_day.SetWindowHandle(nullptr);
+    combo_month.SetWindowHandle(nullptr);
+    combo_year.SetWindowHandle(nullptr);
   }
   // Finish date
-  SYSTEMTIME stMyFinish;
-  if (SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_GETSYSTEMTIME, 0,
-                         reinterpret_cast<LPARAM>(&stMyFinish)) == GDT_NONE) {
+  if (!IsDlgButtonChecked(IDC_CHECK_ANIME_DATE_FINISH)) {
     history_item.date_finish = Date();
   } else {
-    history_item.date_finish = Date(stMyFinish.wYear, stMyFinish.wMonth, stMyFinish.wDay);
+    win::ComboBox combo_year = GetDlgItem(IDC_COMBO_ANIME_DATE_FINISH_YEAR);
+    win::ComboBox combo_month = GetDlgItem(IDC_COMBO_ANIME_DATE_FINISH_MONTH);
+    win::ComboBox combo_day = GetDlgItem(IDC_COMBO_ANIME_DATE_FINISH_DAY);
+    history_item.date_finish = Date(
+        combo_year.GetItemData(combo_year.GetCurSel()),
+        combo_month.GetItemData(combo_month.GetCurSel()),
+        combo_day.GetItemData(combo_day.GetCurSel()));
+    combo_day.SetWindowHandle(nullptr);
+    combo_month.SetWindowHandle(nullptr);
+    combo_year.SetWindowHandle(nullptr);
   }
 
   // Alternative titles

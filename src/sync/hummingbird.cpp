@@ -46,7 +46,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     http_request.url.protocol = base::http::kHttps;
 
   // Hummingbird is supposed to return a JSON response for each and every
-  // request, so that's what we expect from it
+  // request, so that's what we expect from it.
   http_request.header[L"Accept"] = L"application/json";
   http_request.header[L"Accept-Charset"] = L"utf-8";
   http_request.header[L"Accept-Encoding"] = L"gzip";
@@ -54,7 +54,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   // kAuthenticateUser method returns the user's authentication token, which
   // is to be used on all methods that require authentication.
   if (RequestNeedsAuthentication(request.type))
-    http_request.url.query[L"auth_token"] = auth_token_;
+    http_request.data[L"auth_token"] = auth_token_;
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
@@ -65,6 +65,12 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
     BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
   }
+
+  // APIv1 provides different title and alternate_title values depending on the
+  // title_language_preference parameter.
+  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles))
+    if (RequestSupportsTitleLanguagePreference(request.type))
+      AppendTitleLanguagePreference(http_request);
 }
 
 void Service::HandleResponse(Response& response, HttpResponse& http_response) {
@@ -86,13 +92,11 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
+  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
   http_request.url.path = L"/users/authenticate";
 
-  // TODO: Make sure username and password are available
-  http_request.url.query[L"username"] =
-      request.data[canonical_name_ + L"-username"];
-  http_request.url.query[L"password"] =
-      request.data[canonical_name_ + L"-password"];
+  http_request.data[L"username"] = request.data[canonical_name_ + L"-username"];
+  http_request.data[L"password"] = request.data[canonical_name_ + L"-password"];
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
@@ -109,8 +113,7 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  // This method is not documented, but otherwise works fine. Note that it will
-  // return only 5 results at a time.
+  // Note that this method will return only 5 results at a time.
   http_request.url.path = L"/search/anime";
   http_request.url.query[L"query"] = request.data[L"title"];
 }
@@ -127,27 +130,28 @@ void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
 
 void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
+  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
   http_request.url.path =
       L"/libraries/" + request.data[canonical_name_ + L"-id"];
 
   // When this undocumented parameter is included, Hummingbird will return a
   // "mal_id" value that identifies the corresponding entry in MyAnimeList, if
   // available.
-  http_request.url.query[L"include_mal_id"] = L"true";
+  http_request.data[L"include_mal_id"] = L"true";
 
   if (request.data.count(L"status"))
-    http_request.url.query[L"status"] =
+    http_request.data[L"status"] =
         TranslateMyStatusTo(ToInt(request.data[L"status"]));
   if (request.data.count(L"score"))
-    http_request.url.query[L"sane_rating_update"] =
+    http_request.data[L"sane_rating_update"] =
         TranslateMyRatingTo(ToInt(request.data[L"score"]));
   if (request.data.count(L"enable_rewatching"))
-    http_request.url.query[L"rewatching"] =
+    http_request.data[L"rewatching"] =
         request.data[L"enable_rewatching"] == L"0" ? L"false" : L"true";
   if (request.data.count(L"rewatched_times"))
-    http_request.url.query[L"rewatched_times"] = request.data[L"rewatched_times"];
+    http_request.data[L"rewatched_times"] = request.data[L"rewatched_times"];
   if (request.data.count(L"episode"))
-    http_request.url.query[L"episodes_watched"] = request.data[L"episode"];
+    http_request.data[L"episodes_watched"] = request.data[L"episode"];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +226,28 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
     return;
 
   ParseLibraryObject(root);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Service::AppendTitleLanguagePreference(HttpRequest& http_request) const {
+  if (http_request.method == L"POST") {
+    http_request.data[L"title_language_preference"] = L"english";
+  } else {
+    http_request.url.query[L"title_language_preference"] = L"english";
+  }
+}
+
+bool Service::RequestSupportsTitleLanguagePreference(RequestType request_type) const {
+  switch (request_type) {
+    case kGetLibraryEntries:
+    case kGetMetadataById:
+    case kSearchTitle:
+    case kUpdateLibraryEntry:
+      return true;
+  }
+
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

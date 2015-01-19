@@ -44,11 +44,9 @@ public:
   void Clear(int modes, bool force = false);
   void Do(int modes, anime::Episode* episode = nullptr, bool force = false);
 
-  bool TestMircConnection(const std::wstring& service);
-
 private:
   void ToHttp(const std::wstring& address, const std::wstring& data);
-  bool ToMirc(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, BOOL use_action, BOOL multi_server);
+  bool ToMirc(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, bool use_action, bool multi_server);
   void ToSkype(const std::wstring& mood);
   void ToTwitter(const std::wstring& status_text);
 };
@@ -57,9 +55,19 @@ private:
 // mIRC
 
 enum MircChannelMode {
-  kMircChannelModeActive,
+  kMircChannelModeActive = 1,
   kMircChannelModeAll,
   kMircChannelModeCustom
+};
+
+class Mirc {
+public:
+  bool GetChannels(const std::wstring& service, std::vector<std::wstring>& channels);
+  bool IsRunning();
+  bool Send(const std::wstring& service, std::wstring channels, const std::wstring& data, int mode, bool use_action, bool multi_server);
+
+private:
+  bool SendCommands(const std::wstring& service, const std::vector<std::wstring>& commands);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +135,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 extern taiga::Announcer Announcer;
+extern taiga::Mirc Mirc;
 extern taiga::Skype Skype;
 extern taiga::Twitter Twitter;
 

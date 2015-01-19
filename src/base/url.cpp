@@ -80,14 +80,8 @@ std::wstring Url::Build() const {
 
   url += path;
 
-  if (!query.empty()) {
-    std::wstring query_string;
-    foreach_(it, query) {
-      query_string += query_string.empty() ? L"?" : L"&";
-      query_string += it->first + L"=" + EncodeUrl(it->second, false);
-    }
-    url += query_string;
-  }
+  if (!query.empty())
+    url += L"?" + BuildUrlParameters(query);
 
   if (!fragment.empty())
     url += L"#" + fragment;
@@ -147,6 +141,18 @@ void Url::Crack(std::wstring url) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+std::wstring BuildUrlParameters(const query_t& parameters) {
+  std::wstring output;
+
+  for (const auto& parameter : parameters) {
+    if (!output.empty())
+      output += L"&";
+    output += parameter.first + L"=" + EncodeUrl(parameter.second, false);
+  }
+
+  return output;
+}
 
 std::wstring DecodeUrl(const std::wstring& input) {
   std::string output;

@@ -116,9 +116,8 @@ void TimerManager::UpdateEnabledState() {
   timer_library.set_enabled(!Settings.GetBool(taiga::kLibrary_WatchFolders));
 
   // Media
-  auto media_player = MediaPlayers.GetRunningPlayer();
-  bool media_player_is_running = media_player != nullptr;
-  bool media_player_is_active = media_player && media_player->IsActive();
+  bool media_player_is_running = MediaPlayers.GetRunningPlayer() != nullptr;
+  bool media_player_is_active = MediaPlayers.IsPlayerActive();
   bool episode_processed = CurrentEpisode.processed || timer_media.ticks() == 0;
   timer_media.set_enabled(media_player_is_running && media_player_is_active &&
                           !episode_processed);

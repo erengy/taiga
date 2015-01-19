@@ -85,7 +85,11 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Number:
-      element = ToWstr(anime::GetEpisodeHigh(item.episode_data.number));
+      if (item.episode_data.number.empty()) {
+        element = ToWstr(anime ? anime->GetEpisodeCount() : 1);
+      } else {
+        element = ToWstr(anime::GetEpisodeHigh(item.episode_data.number));
+      }
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Version:

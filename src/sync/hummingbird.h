@@ -31,7 +31,7 @@ namespace sync {
 namespace hummingbird {
 
 // API documentation:
-// http://www.mashape.com/vikhyat/hummingbird-v1
+// https://github.com/hummingbird-me/hummingbird/wiki/API-Reference
 
 class Service : public sync::Service {
 public:
@@ -50,6 +50,9 @@ private:
   REQUEST_AND_RESPONSE(GetMetadataById);
   REQUEST_AND_RESPONSE(SearchTitle);
   REQUEST_AND_RESPONSE(UpdateLibraryEntry);
+
+  void AppendTitleLanguagePreference(HttpRequest& http_request) const;
+  bool RequestSupportsTitleLanguagePreference(RequestType request_type) const;
 
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 

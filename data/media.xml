@@ -95,6 +95,21 @@
 		<folder>%ProgramFiles%\The KMPlayer\</folder>
 		<folder>%ProgramW6432%\The KMPlayer\</folder>
 	</player>
+	<!-- Kodi (XBMC) -->
+	<player>
+		<name>Kodi (XBMC)</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>1</mode>
+		<class>Kodi</class>
+		<class>XBMC</class>
+		<file>Kodi.exe</file>
+		<file>XBMC.exe</file>
+		<folder>%ProgramFiles%\Kodi\</folder>
+		<folder>%ProgramW6432%\Kodi\</folder>
+		<folder>%ProgramFiles%\XBMC\</folder>
+		<folder>%ProgramW6432%\XBMC\</folder>
+	</player>
 	<!-- Light Alloy -->
 	<player>
 		<name>Light Alloy</name>
@@ -131,6 +146,10 @@
 		<file>mpc-hc64.exe</file>
 		<folder>%ProgramFiles%\K-Lite Codec Pack\Media Player Classic\</folder>
 		<folder>%ProgramW6432%\K-Lite Codec Pack\Media Player Classic\</folder>
+		<folder>%ProgramFiles%\K-Lite Codec Pack\MPC-HC\</folder>
+		<folder>%ProgramW6432%\K-Lite Codec Pack\MPC-HC\</folder>
+		<folder>%ProgramFiles%\K-Lite Codec Pack\MPC-HC64\</folder>
+		<folder>%ProgramW6432%\K-Lite Codec Pack\MPC-HC64\</folder>
 		<folder>%ProgramFiles%\Media Player Classic - Home Cinema\</folder>
 		<folder>%ProgramW6432%\Media Player Classic - Home Cinema\</folder>
 		<edit mode="2">Media Player Classic</edit>
@@ -307,17 +326,6 @@
 		<folder>%ProgramFiles%\Windows Media Player\</folder>
 		<folder>%ProgramW6432%\Windows Media Player\</folder>
 	</player>
-	<!-- XBMC -->
-	<player>
-		<name>XBMC</name>
-		<enabled>1</enabled>
-		<visible>1</visible>
-		<mode>1</mode>
-		<class>XBMC</class>
-		<file>XBMC.exe</file>
-		<folder>%ProgramFiles%\XBMC\</folder>
-		<folder>%ProgramW6432%\XBMC\</folder>
-	</player>
 	<!-- Zoom Player -->
 	<player>
 		<name>Zoom Player</name>
@@ -359,6 +367,7 @@
 		<folder>%ProgramFiles%\Mozilla Firefox\</folder>
 		<folder>%ProgramW6432%\Mozilla Firefox\</folder>
 		<edit mode="2">Mozilla Firefox</edit>
+		<edit mode="2">Firefox Developer Edition</edit>
 		<engine>Gecko</engine>
 	</player>
 	<!-- Opera -->

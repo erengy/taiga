@@ -41,6 +41,7 @@ void Request::Clear() {
   url.Clear();
   header.clear();
   body.clear();
+  data.clear();
 }
 
 void Response::Clear() {

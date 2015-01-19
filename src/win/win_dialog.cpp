@@ -231,6 +231,10 @@ BOOL Dialog::IsDlgButtonChecked(int id_button) {
   return ::IsDlgButtonChecked(window_, id_button);
 }
 
+bool Dialog::IsModal() {
+  return modal_;
+}
+
 BOOL Dialog::SendDlgItemMessage(int id_item, UINT uMsg,
                                 WPARAM wParam, LPARAM lParam) {
   return ::SendDlgItemMessage(window_, id_item, uMsg, wParam, lParam);

@@ -32,6 +32,7 @@
 #include "win/win_dde.h"
 
 taiga::Announcer Announcer;
+taiga::Mirc Mirc;
 taiga::Skype Skype;
 taiga::Twitter Twitter;
 
@@ -114,103 +115,114 @@ void Announcer::ToHttp(const std::wstring& address, const std::wstring& data) {
 ////////////////////////////////////////////////////////////////////////////////
 // mIRC
 
-bool Announcer::ToMirc(const std::wstring& service,
-                       std::wstring channels,
-                       const std::wstring& data,
-                       int mode,
-                       BOOL use_action,
-                       BOOL multi_server) {
-  if (!FindWindow(L"mIRC", nullptr))
+bool Mirc::GetChannels(const std::wstring& service,
+                       std::vector<std::wstring>& channels) {
+  win::DynamicDataExchange dde;
+
+  if (!dde.Initialize())
+    return false;
+  if (!dde.Connect(service, L"CHANNELS"))
+    return false;
+
+  std::wstring data;
+  bool success = dde.ClientTransaction(L" ", L"", &data, XTYP_REQUEST) != FALSE;
+  Split(data, L" ", channels);
+
+  return success;
+}
+
+bool Mirc::IsRunning() {
+  return FindWindow(L"mIRC", nullptr) != nullptr;
+}
+
+bool Mirc::SendCommands(const std::wstring& service,
+                        const std::vector<std::wstring>& commands) {
+  win::DynamicDataExchange dde;
+
+  if (!dde.Initialize())
+    return false;
+  if (!dde.Connect(service, L"COMMAND"))
+    return false;
+
+  bool success = true;
+  for (const auto& command : commands)
+    if (success)
+      success = dde.ClientTransaction(L" ", command, nullptr, XTYP_POKE) != FALSE;
+
+  return success;
+}
+
+bool Mirc::Send(const std::wstring& service,
+                std::wstring channels,
+                const std::wstring& data,
+                int mode,
+                bool use_action,
+                bool multi_server) {
+  if (!IsRunning())
     return false;
   if (service.empty() || channels.empty() || data.empty())
     return false;
 
   // Initialize
   win::DynamicDataExchange dde;
-  if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
+  if (!dde.Initialize()) {
     ui::OnMircDdeInitFail();
     return false;
   }
 
   // List channels
-  if (mode != kMircChannelModeCustom) {
-    if (dde.Connect(service, L"CHANNELS")) {
-      dde.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
-      dde.Disconnect();
-    }
-  }
   std::vector<std::wstring> channel_list;
-  Tokenize(channels, L" ,;", channel_list);
-  foreach_(it, channel_list) {
-    Trim(*it);
-    if (it->empty())
-      continue;
-    if (it->at(0) == '*') {
-      *it = it->substr(1);
-      if (mode == kMircChannelModeActive) {
-        std::wstring temp = *it;
-        channel_list.clear();
-        channel_list.push_back(temp);
-        break;
-      }
-    }
-    if (it->at(0) != '#')
-      it->insert(it->begin(), '#');
+  std::wstring active_channel;
+  
+  switch (mode) {
+    case kMircChannelModeActive:
+    case kMircChannelModeAll:
+      GetChannels(service, channel_list);
+      break;
+    case kMircChannelModeCustom:
+      Tokenize(channels, L" ,;", channel_list);
+      break;
   }
 
-  // Connect
-  if (!dde.Connect(service, L"COMMAND")) {
-    dde.UnInitialize();
-    ui::OnMircDdeConnectionFail();
-    return false;
+  for (auto& channel : channel_list) {
+    Trim(channel);
+    if (channel.empty())  // ?
+      continue;
+    if (channel.front() == '*') {
+      channel = channel.substr(1);
+      active_channel = channel;
+    } else if (channel.front() != '#') {
+      channel.insert(channel.begin(), '#');
+    }
   }
 
   // Send message to channels
-  foreach_(it, channel_list) {
-    std::wstring message;
-    message += multi_server ? L"/scon -a " : L"";
-    message += use_action ? L"/describe " : L"/msg ";
-    message += *it + L" " + data;
-    dde.ClientTransaction(L" ", message, NULL, XTYP_POKE);
+  std::vector<std::wstring> commands;
+  for (const auto& channel : channel_list) {
+    if (mode == kMircChannelModeActive && channel != active_channel)
+      continue;
+    std::wstring command;
+    if (multi_server)
+      command += L"/scon -a ";
+    command += use_action ? L"/describe " : L"/msg ";
+    command += channel + L" " + data;
+    commands.push_back(command);
   }
-
-  // Clean up
-  dde.Disconnect();
-  dde.UnInitialize();
-
-  return true;
+  return SendCommands(service, commands);
 }
 
-bool Announcer::TestMircConnection(const std::wstring& service) {
-  // Search for mIRC window
-  if (!FindWindow(L"mIRC", nullptr)) {
-    ui::OnMircNotRunning(true);
+bool Announcer::ToMirc(const std::wstring& service,
+                       std::wstring channels,
+                       const std::wstring& data,
+                       int mode,
+                       bool use_action,
+                       bool multi_server) {
+  if (::Mirc.Send(service, channels, data, mode, use_action, multi_server)) {
+    return true;
+  } else {
+    ui::OnMircDdeConnectionFail();
     return false;
   }
-
-  // Initialize
-  win::DynamicDataExchange dde;
-  if (!dde.Initialize(/*APPCLASS_STANDARD | APPCMD_CLIENTONLY, TRUE*/)) {
-    ui::OnMircDdeInitFail(true);
-    return false;
-  }
-
-  // Try to connect
-  if (!dde.Connect(service, L"CHANNELS")) {
-    dde.UnInitialize();
-    ui::OnMircDdeConnectionFail(true);
-    return false;
-  }
-
-  std::wstring channels;
-  dde.ClientTransaction(L" ", L"", &channels, XTYP_REQUEST);
-
-  // Success
-  dde.Disconnect();
-  dde.UnInitialize();
-  ui::OnMircDdeConnectionSuccess(channels, true);
-
-  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
