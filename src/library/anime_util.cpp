@@ -383,7 +383,7 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
     if (number_low > last_watched + 1 || number < last_watched + 1)
       return false;
 
-  if (!IsValidEpisode(number, item.GetEpisodeCount(), last_watched))
+  if (!IsValidEpisodeNumber(number, item.GetEpisodeCount(), last_watched))
     return false;
 
   return true;
@@ -593,18 +593,18 @@ bool IsEpisodeRange(const std::wstring& episode_number) {
   return GetEpisodeLow(episode_number) != GetEpisodeHigh(episode_number);
 }
 
-bool IsValidEpisode(int episode, int total) {
-  if ((episode < 0) ||
-      (episode > total && total != 0))
+bool IsValidEpisodeNumber(int number, int total) {
+  if ((number < 0) ||
+      (number > total && total != 0))
     return false;
 
   return true;
 }
 
-bool IsValidEpisode(int episode, int total, int watched) {
-  if (!IsValidEpisode(episode, total) ||
-      (episode < watched) ||
-      (episode == watched && total != 1))
+bool IsValidEpisodeNumber(int number, int total, int watched) {
+  if (!IsValidEpisodeNumber(number, total) ||
+      (number < watched) ||
+      (number == watched && total != 1))
     return false;
 
   return true;
@@ -694,7 +694,7 @@ void ChangeEpisode(int anime_id, int value) {
   if (!anime_item)
     return;
 
-  if (IsValidEpisode(value, anime_item->GetEpisodeCount())) {
+  if (IsValidEpisodeNumber(value, anime_item->GetEpisodeCount())) {
     Episode episode;
     episode.number = ToWstr(value);
     AddToQueue(*anime_item, episode, true);
