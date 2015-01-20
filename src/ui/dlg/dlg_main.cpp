@@ -584,7 +584,7 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
             navigation.SetCurrentPage(kSidebarItemNowPlaying);
             break;
           case taiga::kTipTypeSearch:
-            ExecuteAction(L"SearchAnime(" + CurrentEpisode.title + L")");
+            ExecuteAction(L"SearchAnime(" + CurrentEpisode.anime_title() + L")");
             break;
           case taiga::kTipTypeTorrent:
             navigation.SetCurrentPage(kSidebarItemFeeds);

@@ -55,7 +55,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Title:
-      element = item.episode_data.title;
+      element = item.episode_data.anime_title();
       break;
     case kFeedFilterElement_Meta_DateStart:
       if (anime)
@@ -93,9 +93,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Version:
-      element = item.episode_data.version;
-      if (element.empty())
-        element = L"1";
+      element = ToWstr(item.episode_data.release_version());  // defaults to 1
       is_numeric = true;
       break;
     case kFeedFilterElement_Local_EpisodeAvailable:
@@ -105,13 +103,13 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Group:
-      element = item.episode_data.group;
+      element = item.episode_data.release_group();
       break;
     case kFeedFilterElement_Episode_VideoResolution:
-      element = item.episode_data.resolution;
+      element = item.episode_data.video_resolution();
       break;
     case kFeedFilterElement_Episode_VideoType:
-      element = item.episode_data.video_type;
+      element = item.episode_data.video_terms();
       break;
   }
 
@@ -401,7 +399,7 @@ bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
         continue;
     // Is it from the same fansub group?
     if (!element_found[kFeedFilterElement_Episode_Group])
-      if (!IsEqual(it->episode_data.group, item.episode_data.group))
+      if (!IsEqual(it->episode_data.release_group(), item.episode_data.release_group()))
         continue;
 
     // Try applying the same filter

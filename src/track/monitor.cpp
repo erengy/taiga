@@ -109,7 +109,7 @@ void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification)
     anime::Episode episode;
     anime_item = FindAnimeItem(notification, episode);
     if (anime_item)
-      ChangeAnimeFolder(*anime_item, episode.folder + episode.file);
+      ChangeAnimeFolder(*anime_item, episode.folder + episode.file_name());
   }
 }
 

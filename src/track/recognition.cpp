@@ -62,60 +62,21 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
   if (!anitomy_instance.Parse(title))
     return false;
 
+  episode.set_elements(anitomy_instance.elements());
+
   for (const auto& element : anitomy_instance.elements()) {
     switch (element.first) {
-      case anitomy::kElementFileName:
-        episode.file = element.second;
-        break;
-      case anitomy::kElementFileExtension:
-        episode.format = element.second;
-        break;
-      case anitomy::kElementAnimeTitle:
-        episode.title = element.second;
-        break;
-      case anitomy::kElementEpisodeTitle:
-        episode.name = element.second;
-        break;
-      case anitomy::kElementReleaseGroup:
-        episode.group = element.second;
-        break;
       case anitomy::kElementEpisodeNumber:
         AppendString(episode.number, element.second, L"-");
-        break;
-      case anitomy::kElementReleaseVersion:
-        episode.version = element.second;
-        break;
-      case anitomy::kElementVideoResolution:
-        episode.resolution = element.second;
-        break;
-      case anitomy::kElementAudioTerm:
-        AppendString(episode.audio_type, element.second, L" ");
-        break;
-      case anitomy::kElementVideoTerm:
-        AppendString(episode.video_type, element.second, L" ");
-        break;
-      case anitomy::kElementFileChecksum:
-        episode.checksum = element.second;
-        break;
-      case anitomy::kElementAnimeYear:
-        episode.year = element.second;
-        break;
-      case anitomy::kElementAnimeType:
-      case anitomy::kElementDeviceCompatibility:
-      case anitomy::kElementLanguage:
-      case anitomy::kElementOther:
-      case anitomy::kElementSource:
-      case anitomy::kElementSubtitles:
-        AppendString(episode.extras, element.second, L" ");
         break;
     }
   }
 
-  episode.normal_title = episode.title;
+  episode.normal_title = episode.anime_title();
   Normalize(episode.normal_title);
 
   if (episode.normal_title.empty()) {
-    LOG(LevelWarning, L"episode.clean_title is empty for file: " + episode.file);
+    LOG(LevelWarning, L"episode.clean_title is empty for file: " + episode.file_name());
   }
 
   return !episode.normal_title.empty();
@@ -127,7 +88,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Look up the title in our database
   InitializeTitles();
-  LookUpTitle(episode.title, episode.normal_title, anime_ids);
+  LookUpTitle(episode.anime_title(), episode.normal_title, anime_ids);
 
   // Validate IDs
   for (auto it = anime_ids.begin(); it != anime_ids.end(); ) {
@@ -423,7 +384,7 @@ int Engine::ScoreTitle(const anime::Episode& episode,
                        const std::set<int>& anime_ids) {
   scores_t trigram_results;
 
-  auto title = episode.title;
+  auto title = episode.anime_title();
   ToLower(title);
 
   trigram_container_t t1;

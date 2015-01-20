@@ -21,6 +21,8 @@
 
 #include <string>
 
+#include <anitomy/anitomy/element.h>
+
 namespace anime {
 
 class Episode {
@@ -31,23 +33,49 @@ class Episode {
   void Clear();
   void Set(int anime_id);
 
+  const std::wstring& anime_title() const;
+  const std::wstring& anime_type() const;
+  int anime_year() const;
+  std::wstring audio_terms() const;
+  const anitomy::Elements& elements() const;
+  const std::wstring& episode_title() const;
+  const std::wstring& file_checksum() const;
+  const std::wstring& file_extension() const;
+  const std::wstring& file_name() const;
+  const std::wstring& release_group() const;
+  int release_version() const;
+  const std::wstring& video_resolution() const;
+  std::wstring video_terms() const;
+
+  void set_anime_title(const std::wstring& str);
+  void set_anime_type(const std::wstring& str);
+  void set_anime_year(int value);
+  void set_audio_terms(const std::wstring& str);
+  void set_elements(const anitomy::Elements& elements);
+  void set_episode_title(const std::wstring& str);
+  void set_file_checksum(const std::wstring& str);
+  void set_file_extension(const std::wstring& str);
+  void set_file_name(const std::wstring& str);
+  void set_release_group(const std::wstring& str);
+  void set_release_version(int value);
+  void set_video_resolution(const std::wstring& str);
+  void set_video_terms(const std::wstring& str);
+
   int anime_id;
-  std::wstring file;
   std::wstring folder;
-  std::wstring format;
-  std::wstring title;
-  std::wstring normal_title;
-  std::wstring name;
-  std::wstring group;
-  std::wstring number;
-  std::wstring version;
-  std::wstring resolution;
-  std::wstring audio_type;
-  std::wstring video_type;
-  std::wstring checksum;
-  std::wstring extras;
-  std::wstring year;
+  std::wstring number;  // TODO: kElementEpisodeNumber
   bool processed;
+  std::wstring normal_title;
+
+private:
+  int GetElementAsInt(anitomy::ElementCategory category, int default_value = 0) const;
+  const std::wstring& GetElementAsString(anitomy::ElementCategory category) const;
+  std::wstring GetElementsAsString(anitomy::ElementCategory category) const;
+
+  void SetElementValue(anitomy::ElementCategory category, int value);
+  void SetElementValue(anitomy::ElementCategory category, const std::wstring& str);
+
+  anitomy::Elements elements_;
 };
 
 }  // namespace anime

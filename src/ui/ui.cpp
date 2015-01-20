@@ -561,10 +561,10 @@ bool OnRecognitionCancelConfirm() {
 }
 
 void OnRecognitionFail() {
-  if (!CurrentEpisode.title.empty()) {
+  if (!CurrentEpisode.anime_title().empty()) {
     MediaPlayers.set_title_changed(false);
     DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
-    ChangeStatusText(L"Watching: " + CurrentEpisode.title +
+    ChangeStatusText(L"Watching: " + CurrentEpisode.anime_title() +
                      PushString(L" #", CurrentEpisode.number) +
                      L" (Not recognized)");
     if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
@@ -724,7 +724,7 @@ bool OnFeedNotify(const Feed& feed) {
     if (it->state == kFeedItemSelected) {
       const auto& episode = it->episode_data;
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
-      auto anime_title = anime_item ? anime_item->GetTitle() : episode.title;
+      auto anime_title = anime_item ? anime_item->GetTitle() : episode.anime_title();
 
       auto episode_l = anime::GetEpisodeLow(episode.number);
       auto episode_h = anime::GetEpisodeHigh(episode.number);

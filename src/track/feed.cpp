@@ -364,7 +364,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         if (anime_item) {
           anime_title = anime_item->GetTitle();
         } else {
-          anime_title = feed_item.episode_data.title;
+          anime_title = feed_item.episode_data.anime_title();
         }
         ValidateFileName(anime_title);
         TrimRight(anime_title, L".");

@@ -205,7 +205,7 @@ LRESULT AnimeDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (IsEqual(pNMLink->item.szID, L"menu")) {
             action = ui::Menus.Show(GetWindowHandle(), 0, 0, pNMLink->item.szUrl);
           } else if (IsEqual(pNMLink->item.szID, L"search")) {
-            action = L"SearchAnime(" + CurrentEpisode.title + L")";
+            action = L"SearchAnime(" + CurrentEpisode.anime_title() + L")";
           } else if (IsEqual(pNMLink->item.szUrl, L"score")) {
             action = L"";
             anime::LinkEpisodeToAnime(CurrentEpisode, ToInt(pNMLink->item.szID));
@@ -499,7 +499,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
     }
   } else if (anime_id_ == anime::ID_NOTINLIST) {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.title.c_str());
+    SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.anime_title().c_str());
   } else {
     SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Now Playing");
   }
@@ -664,8 +664,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     std::wstring content;
     if (mode_ == kDialogModeNowPlaying) {
       content += L"Now playing: Episode " + CurrentEpisode.number;
-      if (!CurrentEpisode.group.empty())
-        content += L" by " + CurrentEpisode.group;
+      if (!CurrentEpisode.release_group().empty())
+        content += L" by " + CurrentEpisode.release_group();
       content += L"\n";
     }
     if (anime_item->IsInList()) {

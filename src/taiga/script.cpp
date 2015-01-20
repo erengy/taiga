@@ -373,7 +373,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
       if (pos_end > -1) {
         std::wstring var = str.substr(pos_var + 1, pos_end - pos_var - 1);
         if (IsScriptVariable(var)) {
-          REPLACE(L"title", VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.title)));
+          REPLACE(L"title", VALIDATE(ENCODE(anime_item->GetTitle()), ENCODE(episode.anime_title())));
           REPLACE(L"watched", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetMyLastWatchedEpisode(), L"")), L""));
           REPLACE(L"total", VALIDATE(ENCODE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"")), L""));
           REPLACE(L"score", VALIDATE(ENCODE(anime::TranslateMyScore(anime_item->GetMyScore(), L"")), L""));
@@ -381,15 +381,15 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"image", VALIDATE(ENCODE(anime_item->GetImageUrl()), L""));
           REPLACE(L"status", VALIDATE(ENCODE(ToWstr(anime_item->GetMyStatus())), L""));
           REPLACE(L"rewatching", VALIDATE(ENCODE(ToWstr(anime_item->GetMyRewatching())), L""));
-          REPLACE(L"name", ENCODE(episode.name));
+          REPLACE(L"name", ENCODE(episode.episode_title()));
           REPLACE(L"episode", ENCODE(episode_number));
-          REPLACE(L"version", ENCODE(episode.version));
-          REPLACE(L"group", ENCODE(episode.group));
-          REPLACE(L"resolution", ENCODE(episode.resolution));
-          REPLACE(L"video", ENCODE(episode.video_type));
-          REPLACE(L"audio", ENCODE(episode.audio_type));
-          REPLACE(L"checksum", ENCODE(episode.checksum));
-          REPLACE(L"file", ENCODE(episode.file));
+          REPLACE(L"version", ENCODE(ToWstr(episode.release_version())));
+          REPLACE(L"group", ENCODE(episode.release_group()));
+          REPLACE(L"resolution", ENCODE(episode.video_resolution()));
+          REPLACE(L"video", ENCODE(episode.video_terms()));
+          REPLACE(L"audio", ENCODE(episode.audio_terms()));
+          REPLACE(L"checksum", ENCODE(episode.file_checksum()));
+          REPLACE(L"file", ENCODE(episode.file_name()));
           REPLACE(L"folder", ENCODE(episode.folder));
           REPLACE(L"user", ENCODE(taiga::GetCurrentUsername()));
           REPLACE(L"manual", is_manual ? L"true" : L"");

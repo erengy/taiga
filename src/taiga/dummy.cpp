@@ -50,8 +50,7 @@ void DummyAnime::Initialize() {
 void DummyEpisode::Initialize() {
   anime_id = 74164;
   folder = L"D:\\Anime\\";
-  file = L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv";
-  Meow.Parse(file, *this);
+  Meow.Parse(L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv", *this);
 }
 
 }  // namespace taiga

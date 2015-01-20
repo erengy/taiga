@@ -233,7 +233,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             if (anime_id) {
               ShowDlgAnimeInfo(anime_id);
             } else {
-              ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
+              ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
             }
           } else if (answer == L"DiscardTorrent") {
             feed_item->state = kFeedItemDiscardedNormal;
@@ -258,11 +258,11 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             }
           } else if (answer == L"SelectFansub") {
             int anime_id = feed_item->episode_data.anime_id;
-            std::wstring group_name = feed_item->episode_data.group;
+            std::wstring group_name = feed_item->episode_data.release_group();
             if (anime::IsValidId(anime_id) && !group_name.empty()) {
               for (int i = 0; i < list_.GetItemCount(); i++) {
                 feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-                if (feed_item && !IsEqual(feed_item->episode_data.group, group_name)) {
+                if (feed_item && !IsEqual(feed_item->episode_data.release_group(), group_name)) {
                   feed_item->state = kFeedItemDiscardedNormal;
                   list_.SetCheckState(i, FALSE);
                 }
@@ -270,9 +270,9 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
               anime::SetFansubFilter(anime_id, group_name);
             }
           } else if (answer == L"MoreTorrents") {
-            Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.title);
+            Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.anime_title());
           } else if (answer == L"SearchService") {
-            ExecuteAction(L"SearchAnime(" + feed_item->episode_data.title + L")");
+            ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
           }
         }
         break;
@@ -379,7 +379,7 @@ void TorrentDialog::RefreshList() {
       group = kTorrentCategoryBatch;
     }
     if (!IsNumeric(it->episode_data.number)) {
-      if (it->episode_data.format.empty() ||
+      if (it->episode_data.file_extension().empty() ||
           anime::IsEpisodeRange(it->episode_data.number)) {
         group = kTorrentCategoryBatch;
       } else {
@@ -390,8 +390,8 @@ void TorrentDialog::RefreshList() {
     if (anime_item) {
       icon = StatusToIcon(anime_item->GetAiringStatus());
       title = anime_item->GetTitle();
-    } else if (!it->episode_data.title.empty()) {
-      title = it->episode_data.title;
+    } else if (!it->episode_data.anime_title().empty()) {
+      title = it->episode_data.anime_title();
     } else {
       group = kTorrentCategoryOther;
       title = it->title;
@@ -399,23 +399,23 @@ void TorrentDialog::RefreshList() {
     std::vector<int> numbers;
     anime::SplitEpisodeNumbers(it->episode_data.number, numbers);
     number = anime::JoinEpisodeNumbers(numbers);
-    if (!it->episode_data.version.empty()) {
-      number += L"v" + it->episode_data.version;
+    if (it->episode_data.release_version() != 1) {
+      number += L"v" + ToWstr(it->episode_data.release_version());
     }
-    video = it->episode_data.video_type;
-    if (!it->episode_data.resolution.empty()) {
+    video = it->episode_data.video_terms();
+    if (!it->episode_data.video_resolution().empty()) {
       if (!video.empty()) video += L" ";
-      video += it->episode_data.resolution;
+      video += it->episode_data.video_resolution();
     }
     int index = list_.InsertItem(it - feed->items.begin(),
                                  group, icon, 0, NULL, title.c_str(),
                                  reinterpret_cast<LPARAM>(&(*it)));
     list_.SetItem(index, 1, number.c_str());
-    list_.SetItem(index, 2, it->episode_data.group.c_str());
+    list_.SetItem(index, 2, it->episode_data.release_group().c_str());
     list_.SetItem(index, 3, it->episode_data.file_size.c_str());
     list_.SetItem(index, 4, video.c_str());
     list_.SetItem(index, 5, it->description.c_str());
-    list_.SetItem(index, 6, it->episode_data.file.c_str());
+    list_.SetItem(index, 6, it->episode_data.file_name().c_str());
     list_.SetCheckState(index, it->state == kFeedItemSelected);
   }
 
