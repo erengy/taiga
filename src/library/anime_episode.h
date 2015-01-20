@@ -25,6 +25,8 @@
 
 namespace anime {
 
+typedef std::pair<int, int> episode_number_range_t;
+
 class Episode {
  public:
   Episode();
@@ -38,6 +40,8 @@ class Episode {
   int anime_year() const;
   std::wstring audio_terms() const;
   const anitomy::Elements& elements() const;
+  int episode_number() const;
+  episode_number_range_t episode_number_range() const;
   const std::wstring& episode_title() const;
   const std::wstring& file_checksum() const;
   const std::wstring& file_extension() const;
@@ -52,6 +56,7 @@ class Episode {
   void set_anime_year(int value);
   void set_audio_terms(const std::wstring& str);
   void set_elements(const anitomy::Elements& elements);
+  void set_episode_number(int value);
   void set_episode_title(const std::wstring& str);
   void set_file_checksum(const std::wstring& str);
   void set_file_extension(const std::wstring& str);
@@ -63,9 +68,8 @@ class Episode {
 
   int anime_id;
   std::wstring folder;
-  std::wstring number;  // TODO: kElementEpisodeNumber
-  bool processed;
   std::wstring normal_title;
+  bool processed;
 
 private:
   int GetElementAsInt(anitomy::ElementCategory category, int default_value = 0) const;

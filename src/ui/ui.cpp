@@ -440,11 +440,11 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   dlg.SetVerificationText(L"Don't ask again, update automatically");
   dlg.UseCommandLinks(true);
 
-  int number = anime::GetEpisodeHigh(episode.number);
+  int number = anime::GetEpisodeHigh(episode);
   if (number == 0)
     number = 1;
   if (anime_item->GetEpisodeCount() == 1)
-    episode.number = L"1";
+    episode.set_episode_number(1);
 
   if (anime_item->GetMyStatus() != anime::kNotInList &&
       anime_item->GetMyRewatching() == FALSE) {
@@ -549,9 +549,8 @@ bool OnRecognitionCancelConfirm() {
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to cancel this list update?");
   auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
-  std::wstring content = anime_item->GetTitle();
-  if (!CurrentEpisode.number.empty())
-    content += L" #" + CurrentEpisode.number;
+  std::wstring content = anime_item->GetTitle() +
+      PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
   dlg.SetContent(content.c_str());
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
@@ -565,7 +564,7 @@ void OnRecognitionFail() {
     MediaPlayers.set_title_changed(false);
     DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
     ChangeStatusText(L"Watching: " + CurrentEpisode.anime_title() +
-                     PushString(L" #", CurrentEpisode.number) +
+                     PushString(L" #", anime::GetEpisodeRange(CurrentEpisode)) +
                      L" (Not recognized)");
     if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
       std::wstring tip_text =
@@ -726,8 +725,8 @@ bool OnFeedNotify(const Feed& feed) {
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
       auto anime_title = anime_item ? anime_item->GetTitle() : episode.anime_title();
 
-      auto episode_l = anime::GetEpisodeLow(episode.number);
-      auto episode_h = anime::GetEpisodeHigh(episode.number);
+      auto episode_l = anime::GetEpisodeLow(episode);
+      auto episode_h = anime::GetEpisodeHigh(episode);
       if (anime_item)
         episode_l = max(episode_l, anime_item->GetMyLastWatchedEpisode() + 1);
       std::wstring episode_number = ToWstr(episode_h);

@@ -719,7 +719,7 @@ void MainDialog::UpdateTip() {
   if (anime::IsValidId(CurrentEpisode.anime_id)) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
     tip += L"\nWatching: " + anime_item->GetTitle() +
-      (!CurrentEpisode.number.empty() ? L" #" + CurrentEpisode.number : L"");
+        PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
   }
 
   Taskbar.Modify(tip.c_str());
@@ -741,9 +741,10 @@ void MainDialog::UpdateTitle() {
 
   if (anime::IsValidId(CurrentEpisode.anime_id)) {
     auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
-    title += L" \u2013 " + anime_item->GetTitle() + PushString(L" #", CurrentEpisode.number);
+    title += L" \u2013 " + anime_item->GetTitle() +
+        PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
     if (Settings.GetBool(taiga::kSync_Update_OutOfRange) &&
-        anime::GetEpisodeLow(CurrentEpisode.number) > anime_item->GetMyLastWatchedEpisode() + 1) {
+        anime::GetEpisodeLow(CurrentEpisode) > anime_item->GetMyLastWatchedEpisode() + 1) {
       title += L" (out of range)";
     }
   }

@@ -34,7 +34,6 @@ void Episode::Clear() {
   anime_id = ID_UNKNOWN;
   elements_.clear();
   folder.clear();
-  number.clear();
   normal_title.clear();
   processed = false;
 }
@@ -65,6 +64,19 @@ std::wstring Episode::audio_terms() const {
 
 const anitomy::Elements& Episode::elements() const {
   return elements_;
+}
+
+int Episode::episode_number() const {
+  return GetElementAsInt(anitomy::kElementEpisodeNumber);
+}
+
+episode_number_range_t Episode::episode_number_range() const {
+  auto numbers = elements_.get_all(anitomy::kElementEpisodeNumber);
+  episode_number_range_t range{
+    numbers.empty() ? 0 : ToInt(numbers.front()),
+    numbers.empty() ? 0 : ToInt(numbers.back())
+  };
+  return range;
 }
 
 const std::wstring& Episode::episode_title() const {
@@ -119,6 +131,10 @@ void Episode::set_audio_terms(const std::wstring& str) {
 
 void Episode::set_elements(const anitomy::Elements& elements) {
   elements_ = elements;
+}
+
+void Episode::set_episode_number(int value) {
+  SetElementValue(anitomy::kElementEpisodeNumber, value);
 }
 
 void Episode::set_episode_title(const std::wstring& str) {

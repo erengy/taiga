@@ -85,10 +85,10 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Number:
-      if (item.episode_data.number.empty()) {
+      if (!item.episode_data.episode_number()) {
         element = ToWstr(anime ? anime->GetEpisodeCount() : 1);
       } else {
-        element = ToWstr(anime::GetEpisodeHigh(item.episode_data.number));
+        element = ToWstr(anime::GetEpisodeHigh(item.episode_data));
       }
       is_numeric = true;
       break;
@@ -99,7 +99,7 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
     case kFeedFilterElement_Local_EpisodeAvailable:
       if (anime)
         element = ToWstr(anime->IsEpisodeAvailable(
-            anime::GetEpisodeHigh(item.episode_data.number)));
+            anime::GetEpisodeHigh(item.episode_data)));
       is_numeric = true;
       break;
     case kFeedFilterElement_Episode_Group:
@@ -395,7 +395,7 @@ bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
     }
     // Is it the same episode?
     if (!element_found[kFeedFilterElement_Episode_Number])
-      if (it->episode_data.number != item.episode_data.number)
+      if (it->episode_data.episode_number_range() != item.episode_data.episode_number_range())
         continue;
     // Is it from the same fansub group?
     if (!element_found[kFeedFilterElement_Episode_Group])
@@ -516,7 +516,7 @@ void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
   foreach_(item, feed.items) {
     auto anime_item = AnimeDatabase.FindItem(item->episode_data.anime_id);
     if (anime_item) {
-      int number = anime::GetEpisodeHigh(item->episode_data.number);
+      int number = anime::GetEpisodeHigh(item->episode_data);
       if (number > anime_item->GetMyLastWatchedEpisode())
         item->episode_data.new_episode = true;
     }

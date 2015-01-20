@@ -377,8 +377,8 @@ bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time
   if (item.GetMyStatus() == kCompleted && item.GetMyRewatching() == 0)
     return false;
 
-  int number = GetEpisodeHigh(episode.number);
-  int number_low = GetEpisodeLow(episode.number);
+  int number = GetEpisodeHigh(episode);
+  int number_low = GetEpisodeLow(episode);
   int last_watched = item.GetMyLastWatchedEpisode();
 
   if (Settings.GetBool(taiga::kSync_Update_OutOfRange))
@@ -411,7 +411,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
   history_item.anime_id = item.GetId();
 
   // Set episode number
-  history_item.episode = GetEpisodeHigh(episode.number);
+  history_item.episode = GetEpisodeHigh(episode);
 
   // Set start/finish date
   if (*history_item.episode == 1 && !IsValidDate(item.GetMyDateStart()))
@@ -555,23 +555,23 @@ bool ValidateFolder(Item& item) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-int GetEpisodeHigh(const std::wstring& episode_number) {
-  int value = 1;
-  int pos = InStrRev(episode_number, L"-", episode_number.length());
-
-  if (pos == episode_number.length() - 1) {
-    value = ToInt(episode_number.substr(0, pos));
-  } else if (pos > -1) {
-    value = ToInt(episode_number.substr(pos + 1));
-  } else {
-    value = ToInt(episode_number);
-  }
-
-  return value;
+int GetEpisodeHigh(const Episode& episode) {
+  return episode.episode_number_range().second;
 }
 
-int GetEpisodeLow(const std::wstring& episode_number) {
-  return ToInt(episode_number);  // ToInt() stops at "-"
+int GetEpisodeLow(const Episode& episode) {
+  return episode.episode_number_range().first;
+}
+
+std::wstring GetEpisodeRange(const Episode& episode) {
+  if (IsEpisodeRange(episode))
+    return ToWstr(GetEpisodeLow(episode)) + L"-" +
+           ToWstr(GetEpisodeHigh(episode));
+
+  if (episode.episode_number())
+    return ToWstr(episode.episode_number());
+
+  return std::wstring();
 }
 
 bool IsAllEpisodesAvailable(const Item& item) {
@@ -591,8 +591,8 @@ bool IsAllEpisodesAvailable(const Item& item) {
   return all_episodes_available;
 }
 
-bool IsEpisodeRange(const std::wstring& episode_number) {
-  return GetEpisodeLow(episode_number) != GetEpisodeHigh(episode_number);
+bool IsEpisodeRange(const Episode& episode) {
+  return GetEpisodeLow(episode) != GetEpisodeHigh(episode);
 }
 
 bool IsValidEpisodeNumber(int number, int total) {
@@ -698,7 +698,7 @@ void ChangeEpisode(int anime_id, int value) {
 
   if (IsValidEpisodeNumber(value, anime_item->GetEpisodeCount())) {
     Episode episode;
-    episode.number = ToWstr(value);
+    episode.set_episode_number(value);
     AddToQueue(*anime_item, episode, true);
   }
 }

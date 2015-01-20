@@ -65,10 +65,11 @@ void GetUpcomingTitles(std::vector<int>& anime_ids);
 bool IsInsideRootFolders(const std::wstring& path);
 bool ValidateFolder(Item& item);
 
-int GetEpisodeHigh(const std::wstring& episode_number);
-int GetEpisodeLow(const std::wstring& episode_number);
+int GetEpisodeHigh(const Episode& episode);
+int GetEpisodeLow(const Episode& episode);
+std::wstring GetEpisodeRange(const Episode& episode);
 bool IsAllEpisodesAvailable(const Item& item);
-bool IsEpisodeRange(const std::wstring& episode_number);
+bool IsEpisodeRange(const Episode& episode);
 bool IsValidEpisodeNumber(int number, int total);
 bool IsValidEpisodeNumber(int number, int total, int watched);
 std::wstring JoinEpisodeNumbers(const std::vector<int>& input);

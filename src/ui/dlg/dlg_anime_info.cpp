@@ -663,7 +663,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   } else {
     std::wstring content;
     if (mode_ == kDialogModeNowPlaying) {
-      content += L"Now playing: Episode " + CurrentEpisode.number;
+      content += L"Now playing: Episode " + anime::GetEpisodeRange(CurrentEpisode);
       if (!CurrentEpisode.release_group().empty())
         content += L" by " + CurrentEpisode.release_group();
       content += L"\n";
@@ -675,7 +675,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     }
     if (mode_ == kDialogModeNowPlaying) {
       content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
-      int episode_number = anime::GetEpisodeHigh(CurrentEpisode.number);
+      int episode_number = anime::GetEpisodeHigh(CurrentEpisode);
       if (episode_number == 0)
         episode_number = 1;
       if (anime_item->GetEpisodeCount() == 0 ||

@@ -145,7 +145,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
     if (item.episode) {
       anime::Episode episode;
       episode.anime_id = anime->GetId();
-      episode.number = ToWstr(*item.episode);
+      episode.set_episode_number(*item.episode);
       Taiga.play_status = taiga::kPlayStatusUpdated;
       Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToTwitter, &episode);
     }

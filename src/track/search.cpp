@@ -87,13 +87,14 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
   anime::Item* anime_item = AnimeDatabase.FindItem(episode_.anime_id);
 
   if (anime_item) {
-    int upper_bound = anime::GetEpisodeHigh(episode_.number);
-    int lower_bound = anime::GetEpisodeLow(episode_.number);
+    int upper_bound = anime::GetEpisodeHigh(episode_);
+    int lower_bound = anime::GetEpisodeLow(episode_);
 
     if (!anime::IsValidEpisodeNumber(upper_bound, anime_item->GetEpisodeCount()) ||
         !anime::IsValidEpisodeNumber(lower_bound, anime_item->GetEpisodeCount())) {
-      LOG(LevelDebug, L"Invalid episode number: " + episode_.number + L"\n"
-          L"File: " + AddTrailingSlash(root) + name);
+      std::wstring episode_number = anime::GetEpisodeRange(episode_);
+      LOG(LevelDebug, L"Invalid episode number: " + episode_number + L"\n"
+                      L"File: " + AddTrailingSlash(root) + name);
       return false;
     }
 

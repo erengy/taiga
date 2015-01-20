@@ -158,7 +158,7 @@ bool Feed::ExamineData() {
     // Update last aired episode number
     if (anime::IsValidId(it->episode_data.anime_id)) {
       auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
-      int episode_number = anime::GetEpisodeHigh(it->episode_data.number);
+      int episode_number = anime::GetEpisodeHigh(it->episode_data);
       anime_item->SetLastAiredEpisodeNumber(episode_number);
     }
   }

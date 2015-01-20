@@ -361,7 +361,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
       }
 
   // Prepare episode value
-  std::wstring episode_number = ToWstr(anime::GetEpisodeHigh(episode.number));
+  std::wstring episode_number = ToWstr(anime::GetEpisodeHigh(episode));
   TrimLeft(episode_number, L"0");
 
   // Replace variables

@@ -375,16 +375,12 @@ void TorrentDialog::RefreshList() {
     int group = kTorrentCategoryAnime;
     int icon = StatusToIcon(anime::kUnknownStatus);
     if (it->category == L"Batch" ||
-        InStr(it->title, L"Vol.") > -1) {
+        InStr(it->title, L"Vol.") > -1 ||
+        it->episode_data.file_extension().empty() ||
+        anime::IsEpisodeRange(it->episode_data)) {
       group = kTorrentCategoryBatch;
-    }
-    if (!IsNumeric(it->episode_data.number)) {
-      if (it->episode_data.file_extension().empty() ||
-          anime::IsEpisodeRange(it->episode_data.number)) {
-        group = kTorrentCategoryBatch;
-      } else {
-        group = kTorrentCategoryOther;
-      }
+    } else if (!it->episode_data.episode_number()) {
+      group = kTorrentCategoryOther;
     }
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
     if (anime_item) {
@@ -396,9 +392,7 @@ void TorrentDialog::RefreshList() {
       group = kTorrentCategoryOther;
       title = it->title;
     }
-    std::vector<int> numbers;
-    anime::SplitEpisodeNumbers(it->episode_data.number, numbers);
-    number = anime::JoinEpisodeNumbers(numbers);
+    number = anime::GetEpisodeRange(it->episode_data);
     if (it->episode_data.release_version() != 1) {
       number += L"v" + ToWstr(it->episode_data.release_version());
     }

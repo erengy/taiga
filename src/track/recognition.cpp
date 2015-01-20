@@ -45,8 +45,7 @@ MatchOptions::MatchOptions()
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
-  // Clear previous data
-  episode.Clear();
+  episode.Clear();  // Clear previous data
 
   if (title.empty())
     return false;
@@ -64,20 +63,12 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
 
   episode.set_elements(anitomy_instance.elements());
 
-  for (const auto& element : anitomy_instance.elements()) {
-    switch (element.first) {
-      case anitomy::kElementEpisodeNumber:
-        AppendString(episode.number, element.second, L"-");
-        break;
-    }
-  }
-
   episode.normal_title = episode.anime_title();
   Normalize(episode.normal_title);
 
-  if (episode.normal_title.empty()) {
-    LOG(LevelWarning, L"episode.clean_title is empty for file: " + episode.file_name());
-  }
+  if (episode.normal_title.empty())
+    LOG(LevelWarning, L"episode.clean_title is empty for file: " +
+                      episode.file_name());
 
   return !episode.normal_title.empty();
 }
@@ -112,8 +103,8 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   if (anime::IsValidId(episode.anime_id)) {
     const anime::Item& anime_item = *AnimeDatabase.FindItem(episode.anime_id);
     // Assume episode 1, if matched a single-episode anime
-    if (episode.number.empty() && anime_item.GetEpisodeCount() == 1)
-      episode.number = L"1";
+    if (!episode.episode_number() && anime_item.GetEpisodeCount() == 1)
+      episode.set_episode_number(1);
     // TODO: check for sequels
   }
 
@@ -153,7 +144,7 @@ int Engine::ValidateEpisodeNumber(anime::Episode& episode,
   if (!anime_item.GetEpisodeCount())
     return 1;
 
-  int number = anime::GetEpisodeHigh(episode.number);
+  int number = anime::GetEpisodeHigh(episode);
 
   if (number > anime_item.GetEpisodeCount()) {
     // Check sequels

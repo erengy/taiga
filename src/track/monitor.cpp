@@ -128,8 +128,8 @@ void FolderMonitor::OnFile(const DirectoryChangeNotification& notification) cons
   }
 
   // Set episode availability
-  int lower_bound = anime::GetEpisodeHigh(episode.number);
-  int upper_bound = anime::GetEpisodeLow(episode.number);
+  int lower_bound = anime::GetEpisodeLow(episode);
+  int upper_bound = anime::GetEpisodeHigh(episode);
   std::wstring path = notification.path + notification.filename.first;
   for (int number = lower_bound; number <= upper_bound; ++number) {
     if (anime_item->SetEpisodeAvailability(number, path_available, path)) {
