@@ -25,6 +25,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/recognition.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_torrent.h"
@@ -379,7 +380,8 @@ void TorrentDialog::RefreshList() {
         it->episode_data.file_extension().empty() ||
         anime::IsEpisodeRange(it->episode_data)) {
       group = kTorrentCategoryBatch;
-    } else if (!it->episode_data.episode_number()) {
+    } else if (!it->episode_data.episode_number() ||
+               !Meow.IsValidAnimeType(it->episode_data)) {
       group = kTorrentCategoryOther;
     }
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);

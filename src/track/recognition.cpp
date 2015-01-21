@@ -17,6 +17,7 @@
 */
 
 #include <algorithm>
+#include <set>
 
 #include <anitomy/anitomy/anitomy.h>
 #include <anitomy/anitomy/keyword.h>
@@ -125,9 +126,9 @@ bool Engine::ValidateOptions(anime::Episode& episode, int anime_id,
     if (!anime::IsAiredYet(*anime_item))
       return false;
 
-  if (match_options.check_anime_type) {
-    // TODO: Check anime type, ignore if "ED", "OP", "PV"
-  }
+  if (match_options.check_anime_type)
+    if (!IsValidAnimeType(episode))
+      return false;
 
   if (match_options.validate_episode_number) {
     int result = ValidateEpisodeNumber(episode, *anime_item);
@@ -459,7 +460,20 @@ int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Engine::IsValidFileExtension(std::wstring extension) {
+bool Engine::IsValidAnimeType(const anime::Episode& episode) const {
+  static const std::set<std::wstring> invalid_anime_types{
+    L"ED", L"ENDING", L"NCED", L"NCOP", L"OP", L"OPENING", L"PV"
+  };
+
+  auto anime_type = episode.anime_type();
+  if (!anime_type.empty())
+    if (invalid_anime_types.count(anime_type))
+      return false;
+
+  return true;
+}
+
+bool Engine::IsValidFileExtension(std::wstring extension) const {
   if (extension.empty())
     return false;
 
