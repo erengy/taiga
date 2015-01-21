@@ -788,7 +788,7 @@ void OnMircDdeConnectionFail(bool testing) {
   dlg.Show(testing ? DlgSettings.GetWindowHandle() : DlgMain.GetWindowHandle());
 }
 
-void OnMircDdeConnectionSuccess(const std::vector<std::wstring> channels,
+void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels,
                                 bool testing) {
   std::wstring title = testing ? L"Test DDE connection" : L"Announce to mIRC";
   win::TaskDialog dlg(title.c_str(), TD_ICON_INFORMATION);

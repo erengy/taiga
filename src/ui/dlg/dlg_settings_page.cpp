@@ -728,7 +728,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       if (pnmh->hwndFrom == list.GetHeader()) {
         auto nmh = reinterpret_cast<LPNMHEADER>(pnmh);
         if (nmh->pitem->mask & HDI_FORMAT) {
-          BOOL checked = nmh->pitem->fmt & HDF_CHECKED ? TRUE : FALSE;
+          BOOL checked = (nmh->pitem->fmt & HDF_CHECKED) ? TRUE : FALSE;
           for (size_t i = 0; i < MediaPlayers.items.size(); i++)
             list.SetCheckState(i, checked);
         }

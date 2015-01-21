@@ -91,7 +91,7 @@ bool OnFeedNotify(const Feed& feed);
 void OnMircNotRunning(bool testing = false);
 void OnMircDdeInitFail(bool testing = false);
 void OnMircDdeConnectionFail(bool testing = false);
-void OnMircDdeConnectionSuccess(const std::vector<std::wstring> channels, bool testing = false);
+void OnMircDdeConnectionSuccess(const std::vector<std::wstring>& channels, bool testing = false);
 
 void OnTwitterTokenRequest(bool success);
 bool OnTwitterTokenEntry(string_t& auth_pin);
