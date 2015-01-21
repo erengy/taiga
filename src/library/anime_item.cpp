@@ -186,8 +186,11 @@ void Item::SetId(const std::wstring& id, enum_t service) {
 }
 
 void Item::SetSlug(const std::wstring& slug) {
-  if (metadata_.resource.size() < 2)
+  if (metadata_.resource.size() < 2) {
+    if (slug.empty())
+      return;
     metadata_.resource.resize(2);
+  }
 
   metadata_.resource.at(1) = slug;
 }
@@ -201,8 +204,11 @@ void Item::SetType(int type) {
 }
 
 void Item::SetEpisodeCount(int number) {
-  if (metadata_.extent.size() < 1)
+  if (metadata_.extent.size() < 1) {
+    if (number <= 0)
+      return;
     metadata_.extent.resize(1);
+  }
 
   metadata_.extent.at(0) = number;
 
@@ -213,8 +219,11 @@ void Item::SetEpisodeCount(int number) {
 }
 
 void Item::SetEpisodeLength(int number) {
-  if (metadata_.extent.size() < 2)
+  if (metadata_.extent.size() < 2) {
+    if (number <= 0)
+      return;
     metadata_.extent.resize(2);
+  }
 
   metadata_.extent.at(1) = number;
 }
@@ -243,6 +252,13 @@ void Item::SetEnglishTitle(const std::wstring& title) {
   metadata_.alternative.push_back(new_title);
 }
 
+void Item::InsertSynonym(const std::wstring& synonym) {
+  if (synonym == GetTitle())
+    return;
+  metadata_.alternative.push_back(
+      library::Title(library::kTitleTypeSynonym, synonym));
+}
+
 void Item::SetSynonyms(const std::wstring& synonyms) {
   std::vector<std::wstring> temp;
   Split(synonyms, L"; ", temp);
@@ -252,40 +268,47 @@ void Item::SetSynonyms(const std::wstring& synonyms) {
 }
 
 void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
+  if (synonyms.empty() && metadata_.alternative.empty())
+    return;
+
   std::vector<library::Title> alternative;
 
   foreach_(it, metadata_.alternative)
     if (it->type != library::kTitleTypeSynonym)
       alternative.push_back(*it);
 
-  foreach_(it, synonyms) {
-    if (*it == GetTitle())
-      continue;
-
-    library::Title new_title(library::kTitleTypeSynonym, *it);
-    alternative.push_back(new_title);
-  }
+  foreach_(it, synonyms)
+    InsertSynonym(*it);
 
   metadata_.alternative = alternative;
 }
 
 void Item::SetDateStart(const Date& date) {
-  if (metadata_.date.size() < 1)
+  if (metadata_.date.size() < 1) {
+    if (!IsValidDate(date))
+      return;
     metadata_.date.resize(1);
+  }
 
   metadata_.date.at(0) = date;
 }
 
 void Item::SetDateEnd(const Date& date) {
-  if (metadata_.date.size() < 2)
+  if (metadata_.date.size() < 2) {
+    if (!IsValidDate(date))
+      return;
     metadata_.date.resize(2);
+  }
 
   metadata_.date.at(1) = date;
 }
 
 void Item::SetImageUrl(const std::wstring& url) {
-  if (metadata_.resource.size() < 1)
+  if (metadata_.resource.size() < 1) {
+    if (url.empty())
+      return;
     metadata_.resource.resize(1);
+  }
 
   metadata_.resource.at(0) = url;
 }
@@ -307,8 +330,11 @@ void Item::SetGenres(const std::vector<std::wstring>& genres) {
 }
 
 void Item::SetPopularity(int popularity) {
-  if (metadata_.community.size() < 2)
+  if (metadata_.community.size() < 2) {
+    if (popularity <= 0)
+      return;
     metadata_.community.resize(2);
+  }
 
   metadata_.community.at(1) = ToWstr(popularity);
 }
@@ -326,8 +352,11 @@ void Item::SetProducers(const std::vector<std::wstring>& producers) {
 }
 
 void Item::SetScore(double score) {
-  if (metadata_.community.size() < 1)
+  if (metadata_.community.size() < 1) {
+    if (score <= 0.0)
+      return;
     metadata_.community.resize(1);
+  }
 
   metadata_.community.at(0) = score > 0.0 ? ToWstr(score) : L"";
 }

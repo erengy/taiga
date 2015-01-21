@@ -75,6 +75,7 @@ public:
   void SetAiringStatus(int status);
   void SetTitle(const std::wstring& title);
   void SetEnglishTitle(const std::wstring& title);
+  void InsertSynonym(const std::wstring& synonym);
   void SetSynonyms(const std::wstring& synonyms);
   void SetSynonyms(const std::vector<std::wstring>& synonyms);
   void SetDateStart(const Date& date);

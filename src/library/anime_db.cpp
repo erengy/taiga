@@ -70,10 +70,9 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     std::map<enum_t, std::wstring> id_map;
 
     foreach_xmlnode_(id_node, node, L"id") {
-      std::wstring id = id_node.child_value();
-      std::wstring name = id_node.attribute(L"name").as_string();
+      auto name = id_node.attribute(L"name").as_string();
       enum_t service_id = ServiceManager.GetServiceIdByName(name);
-      id_map[service_id] = id;
+      id_map[service_id] = id_node.child_value();
     }
 
     enum_t source = sync::kTaiga;
@@ -92,34 +91,34 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
       }
     }
 
-    Item& item = items[ToInt(id_map[sync::kTaiga])];  // Creates the item if it doesn't exist
+    int id = ToInt(id_map[sync::kTaiga]);
+    Item& item = items[id];  // Creates the item if it doesn't exist
 
     foreach_(it, id_map)
       item.SetId(it->second, it->first);
 
-    std::vector<std::wstring> synonyms;
-    XmlReadChildNodes(node, synonyms, L"synonym");
-
     item.SetSource(source);
-    item.SetSlug(XmlReadStrValue(node, L"slug"));
-
     item.SetTitle(XmlReadStrValue(node, L"title"));
-    item.SetEnglishTitle(XmlReadStrValue(node, L"english"));
-    item.SetSynonyms(synonyms);
     item.SetType(XmlReadIntValue(node, L"type"));
     item.SetAiringStatus(XmlReadIntValue(node, L"status"));
-    item.SetEpisodeCount(XmlReadIntValue(node, L"episode_count"));
-    item.SetEpisodeLength(XmlReadIntValue(node, L"episode_length"));
-    item.SetDateStart(Date(XmlReadStrValue(node, L"date_start")));
-    item.SetDateEnd(Date(XmlReadStrValue(node, L"date_end")));
-    item.SetImageUrl(XmlReadStrValue(node, L"image"));
     item.SetAgeRating(XmlReadIntValue(node, L"age_rating"));
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
-    item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
-    item.SetPopularity(XmlReadIntValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
+
+    // This ordering results in less reallocations
+    item.SetEnglishTitle(XmlReadStrValue(node, L"english"));  // alternative
+    foreach_xmlnode_(child_node, node, L"synonym")
+      item.InsertSynonym(child_node.child_value());  // alternative
+    item.SetPopularity(XmlReadIntValue(node, L"popularity"));  // community(1)
+    item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));  // community(0)
+    item.SetDateEnd(Date(XmlReadStrValue(node, L"date_end")));      // date(1)
+    item.SetDateStart(Date(XmlReadStrValue(node, L"date_start")));  // date(0)
+    item.SetEpisodeLength(XmlReadIntValue(node, L"episode_length"));  // extent(1)
+    item.SetEpisodeCount(XmlReadIntValue(node, L"episode_count"));    // extent(0)
+    item.SetSlug(XmlReadStrValue(node, L"slug"));       // resource(1)
+    item.SetImageUrl(XmlReadStrValue(node, L"image"));  // resource(0)
   }
 }
 
