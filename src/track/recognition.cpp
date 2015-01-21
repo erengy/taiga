@@ -142,7 +142,7 @@ bool Engine::ValidateOptions(anime::Episode& episode, int anime_id,
 
 int Engine::ValidateEpisodeNumber(anime::Episode& episode,
                                   const anime::Item& anime_item) const {
-  if (!anime_item.GetEpisodeCount())
+  if (!anime::IsValidEpisodeCount(anime_item.GetEpisodeCount()))
     return 1;
 
   int number = anime::GetEpisodeHigh(episode);

@@ -70,6 +70,7 @@ int GetEpisodeLow(const Episode& episode);
 std::wstring GetEpisodeRange(const Episode& episode);
 bool IsAllEpisodesAvailable(const Item& item);
 bool IsEpisodeRange(const Episode& episode);
+bool IsValidEpisodeCount(int number);
 bool IsValidEpisodeNumber(int number, int total);
 bool IsValidEpisodeNumber(int number, int total, int watched);
 std::wstring JoinEpisodeNumbers(const std::vector<int>& input);

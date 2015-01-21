@@ -371,7 +371,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       if (anime_item->GetMyLastWatchedEpisode() > 0)
         button_visible[0] = true;
       if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
-          anime_item->GetEpisodeCount() == 0)
+          !anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
         button_visible[1] = true;
 
       win::Rect rect_item;

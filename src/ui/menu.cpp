@@ -106,7 +106,7 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
                            ToWstr(anime_item->GetMyLastWatchedEpisode()) + L")");
         }
         // Play next episode
-        if (anime_item->GetEpisodeCount() == 0 ||
+        if (!anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()) ||
             anime_item->GetMyLastWatchedEpisode() < anime_item->GetEpisodeCount()) {
           menu->CreateItem(L"PlayNext()",
                            L"Play next episode (#" +

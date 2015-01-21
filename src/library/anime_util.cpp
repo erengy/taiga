@@ -163,7 +163,7 @@ bool PlayEpisode(int anime_id, int number) {
     return false;
 
   if (number > anime_item->GetEpisodeCount() &&
-      anime_item->GetEpisodeCount() != 0)
+      IsValidEpisodeCount(anime_item->GetEpisodeCount()))
     return false;
 
   if (number == 0)
@@ -575,7 +575,7 @@ std::wstring GetEpisodeRange(const Episode& episode) {
 }
 
 bool IsAllEpisodesAvailable(const Item& item) {
-  if (item.GetEpisodeCount() == 0)
+  if (!IsValidEpisodeCount(item.GetEpisodeCount()))
     return false;
 
   int available_episode_count = item.GetAvailableEpisodeCount();
@@ -593,6 +593,10 @@ bool IsAllEpisodesAvailable(const Item& item) {
 
 bool IsEpisodeRange(const Episode& episode) {
   return GetEpisodeLow(episode) != GetEpisodeHigh(episode);
+}
+
+bool IsValidEpisodeCount(int number) {
+  return number > 0 && number < 1900;
 }
 
 bool IsValidEpisodeNumber(int number, int total) {

@@ -678,7 +678,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       int episode_number = anime::GetEpisodeHigh(CurrentEpisode);
       if (episode_number == 0)
         episode_number = 1;
-      if (anime_item->GetEpisodeCount() == 0 ||
+      if (!anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()) ||
           anime_item->GetEpisodeCount() > episode_number) {
         content += L" \u2022 <a href=\"PlayEpisode(" + ToWstr(episode_number + 1) + L"\">Watch next episode</a>";
       }

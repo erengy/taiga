@@ -581,7 +581,7 @@ bool Item::SetEpisodeAvailability(int number, bool available,
   if (number == 0)
     number = 1;
 
-  if (number <= GetEpisodeCount() || GetEpisodeCount() == 0) {
+  if (number <= GetEpisodeCount() || !IsValidEpisodeCount(GetEpisodeCount())) {
     if (static_cast<size_t>(number) > local_info_.available_episodes.size()) {
       local_info_.available_episodes.resize(number);
     }
