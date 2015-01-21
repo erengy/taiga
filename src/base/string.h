@@ -103,7 +103,6 @@ void TrimRight(std::wstring& str, const wchar_t trim_chars[] = L" ");
 
 void AddTrailingSlash(std::wstring& str);
 std::wstring AddTrailingSlash(const std::wstring& str);
-bool CheckFileExtension(std::wstring extension, const std::vector<std::wstring>& extension_list);
 std::wstring GetFileExtension(const std::wstring& str);
 std::wstring GetFileName(const std::wstring& str);
 std::wstring GetFileWithoutExtension(std::wstring str);

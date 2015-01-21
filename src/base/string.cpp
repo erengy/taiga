@@ -774,20 +774,6 @@ wstring AddTrailingSlash(const wstring& str) {
   }
 }
 
-bool CheckFileExtension(wstring extension, const vector<wstring>& extension_list) {
-  if (extension.empty() || extension_list.empty())
-    return false;
-
-  for (size_t i = 0; i < extension.length(); i++)
-    extension[i] = toupper(extension[i]);
-
-  for (size_t i = 0; i < extension_list.size(); i++)
-    if (extension == extension_list[i])
-      return true;
-
-  return false;
-}
-
 wstring GetFileExtension(const wstring& str) {
   return str.substr(str.find_last_of(L".") + 1);
 }

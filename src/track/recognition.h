@@ -64,6 +64,8 @@ public:
 
   sorted_scores_t GetScores() const;
 
+  bool IsValidFileExtension(std::wstring extension);
+
 private:
   bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options) const;
   int ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item) const;

@@ -358,7 +358,7 @@ std::wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id
 
   if (GetProcessFiles(process_id, files_vector)) {
     foreach_(it, files_vector) {
-      if (CheckFileExtension(GetFileExtension(*it), Meow.valid_extensions)) {
+      if (Meow.IsValidFileExtension(GetFileExtension(*it))) {
         if (it->at(1) != L':') {
           TranslateDeviceName(*it);
         }

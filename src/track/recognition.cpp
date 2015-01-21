@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include <anitomy/anitomy/anitomy.h>
+#include <anitomy/anitomy/keyword.h>
 #include <libmojibake/mojibake.h>
 
 #include "base/log.h"
@@ -454,6 +455,17 @@ int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
     return scores_.front().first;
 
   return anime::ID_UNKNOWN;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool Engine::IsValidFileExtension(std::wstring extension) {
+  if (extension.empty())
+    return false;
+
+  extension = anitomy::keyword_manager.Normalize(extension);
+  return anitomy::keyword_manager.Find(anitomy::kElementFileExtension,
+                                       extension);
 }
 
 }  // namespace recognition
