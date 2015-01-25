@@ -60,6 +60,9 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
 
   anitomy::Anitomy anitomy_instance;
 
+  if (episode.streaming_media)
+    anitomy_instance.options().allowed_delimiters = L" ";
+
   if (!anitomy_instance.Parse(title))
     return false;
 

@@ -293,6 +293,8 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     if (!Settings.GetBool(taiga::kApp_Option_EnableRecognition))
       return;
 
+    CurrentEpisode.streaming_media = !media_player.engine.empty();
+
     // Examine title and compare it with list items
     if (Meow.Parse(MediaPlayers.current_title(), CurrentEpisode)) {
       bool is_inside_root_folders = true;

@@ -70,6 +70,7 @@ class Episode {
   std::wstring folder;
   std::wstring normal_title;
   bool processed;
+  bool streaming_media;
 
 private:
   int GetElementAsInt(anitomy::ElementCategory category, int default_value = 0) const;
