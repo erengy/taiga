@@ -302,7 +302,8 @@ void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       win::Rect rcWindow(0, 0, size.cx, size.cy);
       // Resize tab
       rcWindow.left -= 1;
-      rcWindow.top -= 1;
+      if (win::GetVersion() < win::kVersion8)
+        rcWindow.top -= 1;
       rcWindow.right += 3;
       rcWindow.bottom += 2;
       tab.SetPosition(nullptr, rcWindow);
