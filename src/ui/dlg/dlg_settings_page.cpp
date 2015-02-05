@@ -262,7 +262,8 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertItem(3, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", 3);
       list.InsertItem(4, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", 4);
       list.InsertItem(5, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", 5);
-      list.InsertItem(6, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", 6);
+      list.InsertItem(6, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", 6);
+      list.InsertItem(7, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", 7);
       if (Settings.GetBool(taiga::kStream_Animelab))
         list.SetCheckState(0, TRUE);
       if (Settings.GetBool(taiga::kStream_Ann))
@@ -275,8 +276,10 @@ BOOL SettingsPage::OnInitDialog() {
         list.SetCheckState(4, TRUE);
       if (Settings.GetBool(taiga::kStream_Viz))
         list.SetCheckState(5, TRUE);
-      if (Settings.GetBool(taiga::kStream_Youtube))
+      if (Settings.GetBool(taiga::kStream_Wakanim))
         list.SetCheckState(6, TRUE);
+      if (Settings.GetBool(taiga::kStream_Youtube))
+        list.SetCheckState(7, TRUE);
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.SetWindowHandle(nullptr);
       break;

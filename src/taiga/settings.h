@@ -91,6 +91,7 @@ enum AppSettingName {
   kStream_Daisuki,
   kStream_Veoh,
   kStream_Viz,
+  kStream_Wakanim,
   kStream_Youtube,
 
   // Sharing

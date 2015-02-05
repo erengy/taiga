@@ -251,6 +251,11 @@ bool EndsWith(const wstring& str1, const wstring& str2) {
   return str1.compare(str1.length() - str2.length(), str2.length(), str2) == 0;
 }
 
+bool IntersectsWith(const std::wstring& str1, const std::wstring& str2) {
+  return min(str1.size(), str2.size()) ==
+         LongestCommonSubsequenceLength(str1, str2);
+}
+
 bool MatchRegex(const wstring& str, const wstring& pattern) {
   return std::regex_match(str, std::wregex(pattern));
 }

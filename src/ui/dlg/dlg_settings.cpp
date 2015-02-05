@@ -268,7 +268,8 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kStream_Daisuki, list.GetCheckState(3) == TRUE);
     Settings.Set(taiga::kStream_Veoh, list.GetCheckState(4) == TRUE);
     Settings.Set(taiga::kStream_Viz, list.GetCheckState(5) == TRUE);
-    Settings.Set(taiga::kStream_Youtube, list.GetCheckState(6) == TRUE);
+    Settings.Set(taiga::kStream_Wakanim, list.GetCheckState(6) == TRUE);
+    Settings.Set(taiga::kStream_Youtube, list.GetCheckState(7) == TRUE);
     list.SetWindowHandle(nullptr);
   }
 

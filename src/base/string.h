@@ -53,6 +53,7 @@ bool IsWhitespace(const wchar_t c);
 
 bool StartsWith(const std::wstring& str, const std::wstring& search);
 bool EndsWith(const std::wstring& str, const std::wstring& search);
+bool IntersectsWith(const std::wstring& str1, const std::wstring& str2);
 
 bool MatchRegex(const std::wstring& str, const std::wstring& pattern);
 bool SearchRegex(const std::wstring& str, const std::wstring& pattern);

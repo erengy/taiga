@@ -32,6 +32,7 @@ enum StreamingVideoProvider {
   kStreamDaisuki,
   kStreamVeoh,
   kStreamViz,
+  kStreamWakanim,
   kStreamYoutube,
   kStreamLast
 };
@@ -182,7 +183,7 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 
   // Return current title if the same web page is still open
   if (CurrentEpisode.anime_id > 0)
-    if (InStr(title, current_title()) > -1)
+    if (IntersectsWith(title, current_title()))
       return current_title();
 
   // Delay operation to save some CPU
@@ -234,7 +235,7 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     }
     if (child) {
       foreach_(it, child->children) {
-        if (InStr(it->name, current_title()) > -1) {
+        if (IntersectsWith(it->name, current_title())) {
           // Tab is still open, just not active
           return current_title();
         }
@@ -300,6 +301,8 @@ bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
       return Settings.GetBool(taiga::kStream_Veoh);
     case kStreamViz:
       return Settings.GetBool(taiga::kStream_Viz);
+    case kStreamWakanim:
+      return Settings.GetBool(taiga::kStream_Wakanim);
     case kStreamYoutube:
       return Settings.GetBool(taiga::kStream_Youtube);
   }
@@ -324,6 +327,8 @@ bool MatchStreamUrl(StreamingVideoProvider stream_provider,
     case kStreamViz:
       return SearchRegex(url, L"viz.com/anime/streaming/[^/]+-episode-[0-9]+/") ||
              SearchRegex(url, L"viz.com/anime/streaming/[^/]+-movie/");
+    case kStreamWakanim:
+      return SearchRegex(url, L"wakanim\\.tv/video(-premium)?/[^/]+/");
     case kStreamYoutube:
       return InStr(url, L"youtube.com/watch") > -1;
   }
@@ -341,10 +346,8 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
     // Anime News Network
     case kStreamAnn:
       EraseRight(title, L" - Anime News Network");
-      /*
       Erase(title, L" (s)");
       Erase(title, L" (d)");
-      */
       break;
     // Crunchyroll
     case kStreamCrunchyroll:
@@ -370,8 +373,13 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
     // Viz Anime
     case kStreamViz:
       EraseLeft(title, L"VIZ.com - NEON ALLEY - ");
-      EraseRight(title, L" (DUB)");
-      EraseRight(title, L" (SUB)");
+      break;
+    // Wakanim
+    case kStreamWakanim:
+      EraseRight(title, L" - Wakanim.TV");
+      EraseRight(title, L" / Streaming");
+      ReplaceString(title, 0, L" de ", L" ", false, false);
+      ReplaceString(title, 0, L" en VOSTFR", L" VOSTFR", false, false);
       break;
     // YouTube
     case kStreamYoutube:
