@@ -359,6 +359,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
         AnimeDatabase.SaveList(true);
         Set(kSync_ActiveService, current_service);
         AnimeDatabase.items.clear();
+        AnimeDatabase.SaveDatabase();
         ImageDatabase.Clear();
       } else {
         Set(kSync_ActiveService, previous_service);

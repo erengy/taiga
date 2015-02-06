@@ -123,9 +123,6 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
 }
 
 bool Database::SaveDatabase() {
-  if (items.empty())
-    return false;
-
   xml_document document;
 
   xml_node meta_node = document.append_child(L"meta");
