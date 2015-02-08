@@ -17,6 +17,7 @@
 */
 
 #include <algorithm>
+#include <cmath>
 #include <set>
 
 #include <anitomy/anitomy/anitomy.h>
@@ -29,22 +30,12 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
-#include "taiga/settings.h"
 #include "track/recognition.h"
 
 track::recognition::Engine Meow;
 
 namespace track {
 namespace recognition {
-
-MatchOptions::MatchOptions()
-    : allow_sequels(false),
-      check_airing_date(false),
-      check_anime_type(false),
-      validate_episode_number(false) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
 
 bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
   episode.Clear();  // Clear previous data
@@ -63,28 +54,36 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
   if (episode.streaming_media)
     anitomy_instance.options().allowed_delimiters = L" ";
 
-  if (!anitomy_instance.Parse(title))
+  if (!anitomy_instance.Parse(title)) {
+    LOG(LevelDebug, L"Could not parse filename: " + title);
     return false;
+  }
 
   episode.set_elements(anitomy_instance.elements());
 
-  episode.normal_title = episode.anime_title();
-  Normalize(episode.normal_title);
+  // Append season number and year to title
+  auto anime_season = episode.anime_season();
+  if (anime_season > 1)
+    episode.set_anime_title(episode.anime_title() + L" " +
+                            ToWstr(anime_season));
+  auto anime_year = episode.anime_year();
+  if (anime_year > 0)
+    episode.set_anime_title(episode.anime_title() + L" (" +
+                            ToWstr(anime_year) + L")");
 
-  if (episode.normal_title.empty())
-    LOG(LevelWarning, L"episode.clean_title is empty for file: " +
-                      episode.file_name());
-
-  return !episode.normal_title.empty();
+  return true;
 }
 
 int Engine::Identify(anime::Episode& episode, bool give_score,
                      const MatchOptions& match_options) {
   std::set<int> anime_ids;
 
+  if (give_score)
+    scores_.clear();
+
   // Look up the title in our database
   InitializeTitles();
-  LookUpTitle(episode.anime_title(), episode.normal_title, anime_ids);
+  LookUpTitle(episode.anime_title(), anime_ids);
 
   // Validate IDs
   for (auto it = anime_ids.begin(); it != anime_ids.end(); ) {
@@ -99,9 +98,9 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   if (anime_ids.size() == 1) {
     episode.anime_id = *anime_ids.begin();
   } else if (anime_ids.size() > 1) {
-    episode.anime_id = ScoreTitle(episode, anime_ids);
+    episode.anime_id = ScoreTitle(episode, anime_ids, match_options);
   } else if (anime_ids.empty() && give_score) {
-    episode.anime_id = ScoreTitle(episode, anime_ids);
+    ScoreTitle(episode, anime_ids, match_options);
   }
 
   // Post-processing
@@ -110,7 +109,6 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
     // Assume episode 1, if matched a single-episode anime
     if (!episode.episode_number() && anime_item.GetEpisodeCount() == 1)
       episode.set_episode_number(1);
-    // TODO: check for sequels
   }
 
   return episode.anime_id;
@@ -125,50 +123,39 @@ bool Engine::ValidateOptions(anime::Episode& episode, int anime_id,
   if (!anime_item)
     return false;
 
+  return ValidateOptions(episode, *anime_item, match_options);
+}
+
+bool Engine::ValidateOptions(anime::Episode& episode,
+                             const anime::Item& anime_item,
+                             const MatchOptions& match_options) const {
   if (match_options.check_airing_date)
-    if (!anime::IsAiredYet(*anime_item))
+    if (!anime::IsAiredYet(anime_item))
       return false;
 
   if (match_options.check_anime_type)
     if (!IsValidAnimeType(episode))
       return false;
 
-  if (match_options.validate_episode_number) {
-    int result = ValidateEpisodeNumber(episode, *anime_item);
-    if (result == 0)
+  if (match_options.check_episode_number)
+    if (!ValidateEpisodeNumber(episode, anime_item))
       return false;
-    if (result == -1 && !match_options.allow_sequels)
-      return false;
-  }
 
   return true;
 }
 
-int Engine::ValidateEpisodeNumber(anime::Episode& episode,
-                                  const anime::Item& anime_item) const {
+bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
+                                   const anime::Item& anime_item) const {
   if (!anime::IsValidEpisodeCount(anime_item.GetEpisodeCount()))
-    return 1;
+    return true;  // Episode count is unknown, so anything goes
 
   int number = anime::GetEpisodeHigh(episode);
-
   if (number > anime_item.GetEpisodeCount()) {
-    // Check sequels
-    auto sequel = &anime_item;
-    do {
-      number -= sequel->GetEpisodeCount();
-      sequel = AnimeDatabase.FindSequel(sequel->GetId());
-    } while (sequel && number > sequel->GetEpisodeCount());
-    if (sequel) {
-      //episode.anime_id = sequel->GetId();
-      //episode.number = ToWstr(number);
-      return -1;
-    }
-
-    return 0;  // Episode number is out of range
+    // TODO: Check sequels if match_options.allow_sequels
+    return false;  // Episode number is out of range
   }
 
-  // TODO: Clarify return values
-  return 1;
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,27 +163,34 @@ int Engine::ValidateEpisodeNumber(anime::Episode& episode,
 void Engine::InitializeTitles() {
   static bool initialized = false;
 
-  if (initialized)
-    return;
-  initialized = true;
-
-  for (const auto& it : AnimeDatabase.items)
-    UpdateTitles(it.second);
+  if (!initialized) {
+    initialized = true;
+    for (const auto& it : AnimeDatabase.items) {
+      UpdateTitles(it.second);
+    }
+  }
 }
 
 void Engine::UpdateTitles(const anime::Item& anime_item) {
+  int anime_id = anime_item.GetId();
+
+  db_[anime_id].normal_titles.clear();
+  db_[anime_id].trigrams.clear();
+
   auto update_title = [&](std::wstring title,
-                          title_container_t& titles,
-                          title_container_t& normal_titles) {
+                          Titles::container_t& titles,
+                          Titles::container_t& normal_titles) {
     if (!title.empty()) {
-      titles[title.c_str()].insert(anime_item.GetId());
+      titles[title].insert(anime_id);
 
+      Normalize(title, true);
       trigram_container_t trigrams;
-      GetTrigrams(ToLower_Copy(title), trigrams);
-      trigrams_[anime_item.GetId()].push_back(trigrams);
+      GetTrigrams(title, trigrams);
+      db_[anime_id].trigrams.push_back(trigrams);
+      db_[anime_id].normal_titles.push_back(title);
 
-      Normalize(title);
-      normal_titles[title.c_str()].insert(anime_item.GetId());
+      ErasePunctuation(title);
+      normal_titles[title].insert(anime_id);
     }
   };
 
@@ -212,12 +206,11 @@ void Engine::UpdateTitles(const anime::Item& anime_item) {
 }
 
 int Engine::LookUpTitle(const std::wstring& title,
-                        const std::wstring& normal_title,
                         std::set<int>& anime_ids) const {
   int anime_id = anime::ID_UNKNOWN;
 
   auto find_title = [&](const std::wstring& title,
-                        const title_container_t& container) {
+                        const Titles::container_t& container) {
     if (!anime::IsValidId(anime_id)) {
       auto it = container.find(title.c_str());
       if (it != container.end()) {
@@ -235,6 +228,9 @@ int Engine::LookUpTitle(const std::wstring& title,
   if (anime_ids.size() == 1)
     return anime_id;
 
+  auto normal_title = title;
+  Normalize(normal_title);
+
   find_title(normal_title, normal_titles_.user);
   find_title(normal_title, normal_titles_.main);
   find_title(normal_title, normal_titles_.alternative);
@@ -244,14 +240,20 @@ int Engine::LookUpTitle(const std::wstring& title,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Engine::Normalize(std::wstring& title) const {
+void Engine::Normalize(std::wstring& title, bool for_trigrams) const {
   ConvertRomanNumbers(title);
   Transliterate(title);
   NormalizeUnicode(title);  // Title is lower case after this point, due to UTF8PROC_CASEFOLD
   ConvertOrdinalNumbers(title);
   ConvertSeasonNumbers(title);
   EraseUnnecessary(title);
-  ErasePunctuation(title);
+
+  if (for_trigrams) {
+    ErasePunctuation(title, true);
+    while (ReplaceString(title, 0, L"  ", L" ", false, true));
+  } else {
+    ErasePunctuation(title);
+  }
 }
 
 void Engine::ConvertOrdinalNumbers(std::wstring& str) const {
@@ -353,21 +355,33 @@ void Engine::EraseUnnecessary(std::wstring& str) const {
   ReplaceString(str, 0, L"specials", L"special", true, true);
 }
 
-void Engine::ErasePunctuation(std::wstring& str) const {
-  auto it = std::remove_if(str.begin(), str.end(),
-      [](wchar_t c) -> bool {
-        // Control codes, white-space and punctuation characters
-        if (c <= 255 && !isalnum(c))
-          return true;
-        // Unicode stars, hearts, notes, etc. (0x2000-0x2767)
-        if (c > 8192 && c < 10087)
-          return true;
-        // Valid character
-        return false;
-      });
+void Engine::ErasePunctuation(std::wstring& str, bool for_trigrams) const {
+  bool is_trailing = for_trigrams;
+
+  auto is_removable = [&](const wchar_t c) {
+    // Control codes, white-space and punctuation characters
+    if (c <= 0xFF && !IsAlphanumeric(c))
+      if (!for_trigrams ||
+          (c != L' ' && (!is_trailing || (c != L')' && c != L']'))))
+        return true;
+    // Unicode stars, hearts, notes, etc.
+    if (c > 0x2000 && c < 0x2767)
+      return true;
+    // Valid character
+    return false;
+  };
+
+  auto it_end = !for_trigrams ? str.end() :
+      std::find_if_not(str.rbegin(), str.rend(), is_removable).base();
+  is_trailing = false;
+
+  auto it = std::remove_if(str.begin(), it_end, is_removable);
+
+  if (for_trigrams)
+    it = std::copy(it_end, str.end(), it);
 
   if (it != str.end())
-    str.resize(std::distance(str.begin(), it));
+    str.erase(it, str.end());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -376,86 +390,122 @@ sorted_scores_t Engine::GetScores() const {
   return scores_;
 }
 
-int Engine::ScoreTitle(const anime::Episode& episode,
-                       const std::set<int>& anime_ids) {
+int Engine::ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids,
+                       const MatchOptions& match_options) {
   scores_t trigram_results;
 
-  auto title = episode.anime_title();
-  ToLower(title);
+  auto normal_title = episode.anime_title();
+  Normalize(normal_title, true);
 
   trigram_container_t t1;
-  GetTrigrams(title, t1);
+  GetTrigrams(normal_title, t1);
 
-  for (const auto& it : AnimeDatabase.items) {
-    const int anime_id = it.first;
-
-    if (!anime_ids.empty() && anime_ids.find(anime_id) == anime_ids.end())
-      continue;
-
-    for (const auto& t2 : trigrams_[anime_id]) {
+  auto calculate_trigram_results = [&](int anime_id) {
+    for (const auto& t2 : db_[anime_id].trigrams) {
       double result = CompareTrigrams(t1, t2);
-      if (result > 0.1)
-        trigram_results[anime_id] = max(trigram_results[anime_id], result);
+      if (result > 0.1) {
+        auto& target = trigram_results[anime_id];
+        target = max(target, result);
+      }
+    }
+  };
+
+  if (!anime_ids.empty()) {
+    for (const auto& id : anime_ids) {
+      calculate_trigram_results(id);
+    }
+  } else {
+    for (const auto& it : AnimeDatabase.items) {
+      if (ValidateOptions(episode, it.second, match_options))
+        calculate_trigram_results(it.first);
     }
   }
 
-  return ScoreTitle(title, episode, trigram_results);
+  return ScoreTitle(normal_title, episode, trigram_results);
 }
+
+static double CustomScore(const std::wstring& title, const std::wstring& str) {
+  double length_min = min(title.size(), str.size());
+  double length_max = max(title.size(), str.size());
+  double length_ratio = length_min / length_max;
+
+  double score = 0.0;
+
+  if (StartsWith(title, str) || StartsWith(str, title)) {
+    score = length_ratio;
+  } else if (InStr(title, str) > -1 || InStr(str, title) > -1) {
+    score = length_ratio * 0.9;
+  } else {
+    auto length_lcs = LongestCommonSubsequenceLength(title, str);
+    auto lcs_score = length_lcs / length_max;
+    score = lcs_score * 0.8;
+
+    auto mismatch = std::mismatch(title.begin(), title.end(), str.begin());
+    auto distance = std::distance(title.begin(), mismatch.first);
+    if (distance > 0) {
+      auto distance_score = distance / length_min;
+      score = max(score, distance_score * 0.7);
+    }
+  }
+
+  return score;
+};
+
+static double BonusScore(const anime::Episode& episode, int id) {
+  double score = 0.0;
+  auto anime_item = AnimeDatabase.FindItem(id);
+
+  auto anime_year = episode.anime_year();
+  if (anime_year)
+    if (anime_year == anime_item->GetDateStart().year)
+      score += 0.1;
+
+  auto anime_type = anime::TranslateType(episode.anime_type());
+  if (anime_type != anime::kUnknownType)
+    if (anime_type == anime_item->GetType())
+      score += 0.1;
+
+  return score;
+};
 
 int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
                        const scores_t& trigram_results) {
-  scores_t levenshtein;
-  scores_t jaro_winkler;
-  scores_t subsequence;
-  scores_t substring;
-  scores_t custom;
+  scores_t jaro_winkler, levenshtein, custom, bonus;
 
-  for (const auto& it : trigram_results) {
-    int id = it.first;
+  for (const auto& trigram_result : trigram_results) {
+    int id = trigram_result.first;
 
-    std::vector<std::wstring> titles;
-    anime::GetAllTitles(id, titles);
-
-    for (auto& title : titles) {
-      ToLower(title);
-
-      auto len = static_cast<double>(max(title.size(), str.size()));
-
-      levenshtein[id] = max(levenshtein[id], LevenshteinDistance(title, str));
+    // Calculate individual scores for all titles
+    for (auto& title : db_[id].normal_titles) {
       jaro_winkler[id] = max(jaro_winkler[id], JaroWinklerDistance(title, str));
-      subsequence[id] = max(subsequence[id], LongestCommonSubsequenceLength(title, str) / len);
-      substring[id] = max(substring[id], LongestCommonSubstringLength(title, str) / len);
-
-      auto val_temp = (title.length() - str.length()) / len;
-      if (StartsWith(title, str)) {
-        custom[id] = max(custom[id], 1.0 - val_temp);
-      } else if (InStr(title, str) > -1) {
-        custom[id] = max(custom[id], 1.0 - (val_temp * 0.75));
-      }
+      levenshtein[id] = max(levenshtein[id], LevenshteinDistance(title, str));
+      custom[id] = max(custom[id], CustomScore(title, str));
     }
+    bonus[id] = BonusScore(episode, id);
+
+    // Calculate the average score for the ID
+    double score =
+        (((1.0 * jaro_winkler[id]) +
+          (0.5 * std::pow(custom[id], 0.66)) +
+          (0.3 * std::pow(levenshtein[id], 0.8)) +
+          (0.2 * std::pow(trigram_result.second, 0.8))) / 2.0) + bonus[id];
+    if (score >= 0.3)
+      scores_.push_back(std::make_pair(id, score));
   }
 
-  scores_.clear();
-  for (const auto& it : trigram_results) {
-    int id = it.first;
-    double value = ((1.0 * it.second +
-                     0.4 * levenshtein[id] +
-                     0.5 * subsequence[id] +
-                     0.6 * substring[id] +
-                     2.0 * jaro_winkler[id]) / 4.5) + custom[id];
-    if (value >= 0.5)
-      scores_.push_back(std::make_pair(id, value));
-  }
+  // Sort scores in descending order, then limit the results
   std::stable_sort(scores_.begin(), scores_.end(),
       [&](const std::pair<int, double>& a,
-          const std::pair<int, double>& b) -> bool {
+          const std::pair<int, double>& b) {
         return a.second > b.second;
       });
+  if (scores_.size() > 20)
+    scores_.resize(20);
 
   double score_1st = scores_.size() > 0 ? scores_.at(0).second : 0.0;
   double score_2nd = scores_.size() > 1 ? scores_.at(1).second : 0.0;
 
-  if (score_1st > 1.0 && score_1st != score_2nd)
+  if (score_1st >= 1.0 && score_1st != score_2nd)
     return scores_.front().first;
 
   return anime::ID_UNKNOWN;

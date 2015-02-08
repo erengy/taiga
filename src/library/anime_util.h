@@ -91,6 +91,7 @@ std::wstring TranslateMyScoreFull(int value);
 std::wstring TranslateScore(double value);
 std::wstring TranslateStatus(int value);
 std::wstring TranslateType(int value);
+int TranslateType(const std::wstring& value);
 
 int TranslateResolution(const std::wstring& str, bool return_validity = false);
 

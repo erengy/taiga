@@ -386,7 +386,7 @@ bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
     if (!anime::IsValidId(it->episode_data.anime_id) &&
         !anime::IsValidId(item.episode_data.anime_id)) {
       if (!element_found[kFeedFilterElement_Episode_Title])
-        if (!IsEqual(it->episode_data.normal_title, item.episode_data.normal_title))
+        if (!IsEqual(it->episode_data.anime_title(), item.episode_data.anime_title()))
           continue;
     } else {
       if (!element_found[kFeedFilterElement_Meta_Id])

@@ -903,6 +903,20 @@ std::wstring TranslateType(int value) {
   }
 }
 
+int TranslateType(const std::wstring& value) {
+  static const std::map<std::wstring, anime::SeriesType> types{
+    {L"tv", kTv},
+    {L"ova", kOva}, {L"oav", kOva},
+    {L"movie", kMovie}, {L"gekijouban", kMovie},
+    {L"special", kSpecial},
+    {L"ona", kOna},
+    {L"music", kMusic},
+  };
+
+  auto it = types.find(ToLower_Copy(value));
+  return it != types.end() ? it->second : anime::kUnknownType;
+}
+
 int TranslateResolution(const std::wstring& str, bool return_validity) {
   // *###x###*
   if (str.length() > 6) {

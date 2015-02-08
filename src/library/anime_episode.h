@@ -35,6 +35,7 @@ class Episode {
   void Clear();
   void Set(int anime_id);
 
+  int anime_season() const;
   const std::wstring& anime_title() const;
   const std::wstring& anime_type() const;
   int anime_year() const;
@@ -51,6 +52,7 @@ class Episode {
   const std::wstring& video_resolution() const;
   std::wstring video_terms() const;
 
+  void set_anime_season(int value);
   void set_anime_title(const std::wstring& str);
   void set_anime_type(const std::wstring& str);
   void set_anime_year(int value);
@@ -68,7 +70,6 @@ class Episode {
 
   int anime_id;
   std::wstring folder;
-  std::wstring normal_title;
   bool processed;
   bool streaming_media;
 

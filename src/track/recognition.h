@@ -36,23 +36,12 @@ namespace recognition {
 
 typedef std::map<int, double> scores_t;
 typedef std::vector<std::pair<int, double>> sorted_scores_t;
-typedef std::map<std::wstring, std::set<int>> title_container_t;
 
-class MatchOptions {
-public:
-  MatchOptions();
-
-  bool allow_sequels;
-  bool check_airing_date;
-  bool check_anime_type;
-  bool validate_episode_number;
-};
-
-class Titles {
-public:
-  title_container_t alternative;
-  title_container_t main;
-  title_container_t user;
+struct MatchOptions {
+  bool allow_sequels = false;
+  bool check_airing_date = false;
+  bool check_anime_type = false;
+  bool check_episode_number = false;
 };
 
 class Engine {
@@ -60,6 +49,7 @@ public:
   bool Parse(std::wstring title, anime::Episode& episode) const;
   int Identify(anime::Episode& episode, bool give_score, const MatchOptions& match_options);
 
+  void InitializeTitles();
   void UpdateTitles(const anime::Item& anime_item);
 
   sorted_scores_t GetScores() const;
@@ -69,27 +59,36 @@ public:
 
 private:
   bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options) const;
-  int ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item) const;
+  bool ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options) const;
+  bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item) const;
 
-  void InitializeTitles();
-  int LookUpTitle(const std::wstring& title, const std::wstring& normal_title, std::set<int>& anime_ids) const;
+  int LookUpTitle(const std::wstring& title, std::set<int>& anime_ids) const;
 
-  int ScoreTitle(const anime::Episode& episode, const std::set<int>& anime_ids);
+  int ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids, const MatchOptions& match_options);
   int ScoreTitle(const std::wstring& str, const anime::Episode& episode, const scores_t& trigram_results);
 
-  void Normalize(std::wstring& title) const;
+  void Normalize(std::wstring& title, bool for_trigrams = false) const;
   void NormalizeUnicode(std::wstring& str) const;
-  void ErasePunctuation(std::wstring& str) const;
+  void ErasePunctuation(std::wstring& str, bool for_trigrams = false) const;
   void EraseUnnecessary(std::wstring& str) const;
   void ConvertOrdinalNumbers(std::wstring& str) const;
   void ConvertRomanNumbers(std::wstring& str) const;
   void ConvertSeasonNumbers(std::wstring& str) const;
   void Transliterate(std::wstring& str) const;
 
-  Titles titles_;
-  Titles normal_titles_;
+  struct Titles {
+    typedef std::map<std::wstring, std::set<int>> container_t;
+    container_t alternative;
+    container_t main;
+    container_t user;
+  } normal_titles_, titles_;
+
+  struct ScoreStore {
+    std::vector<std::wstring> normal_titles;
+    std::vector<trigram_container_t> trigrams;
+  };
+  std::map<int, ScoreStore> db_;
   sorted_scores_t scores_;
-  std::map<int, std::vector<trigram_container_t>> trigrams_;
 };
 
 }  // namespace recognition

@@ -75,7 +75,7 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
   static track::recognition::MatchOptions match_options;
   match_options.check_airing_date = false;
   match_options.check_anime_type = false;
-  match_options.validate_episode_number = false;
+  match_options.check_episode_number = false;
 
   auto anime_id = Meow.Identify(episode, false, match_options);
 

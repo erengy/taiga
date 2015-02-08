@@ -34,7 +34,6 @@ void Episode::Clear() {
   anime_id = ID_UNKNOWN;
   elements_.clear();
   folder.clear();
-  normal_title.clear();
   processed = false;
   streaming_media = false;
 }
@@ -46,6 +45,10 @@ void Episode::Set(int anime_id) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+int Episode::anime_season() const {
+  return GetElementAsInt(anitomy::kElementAnimeSeason);
+}
 
 const std::wstring& Episode::anime_title() const {
   return GetElementAsString(anitomy::kElementAnimeTitle);
@@ -113,6 +116,10 @@ std::wstring Episode::video_terms() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void Episode::set_anime_season(int value) {
+  SetElementValue(anitomy::kElementAnimeSeason, value);
+}
 
 void Episode::set_anime_title(const std::wstring& str) {
   SetElementValue(anitomy::kElementAnimeTitle, str);

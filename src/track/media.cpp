@@ -305,7 +305,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
         static track::recognition::MatchOptions match_options;
         match_options.check_airing_date = true;
         match_options.check_anime_type = true;
-        match_options.validate_episode_number = true;
+        match_options.check_episode_number = true;
         auto anime_id = Meow.Identify(CurrentEpisode, true, match_options);
         if (anime::IsValidId(anime_id)) {
           // Recognized
