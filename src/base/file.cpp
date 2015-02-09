@@ -23,10 +23,6 @@
 #include "string.h"
 #include "win/win_registry.h"
 
-#define MAKEQWORD(a, b) ((QWORD)(((QWORD)((DWORD)(a))) << 32 | ((DWORD)(b))))
-
-////////////////////////////////////////////////////////////////////////////////
-
 HANDLE OpenFileForGenericRead(const std::wstring& path) {
   return ::CreateFile(GetExtendedLengthPath(path).c_str(),
                       GENERIC_READ, FILE_SHARE_READ, nullptr,
@@ -80,10 +76,9 @@ QWORD GetFileSize(const std::wstring& path) {
   HANDLE file_handle = OpenFileForGenericRead(path);
 
   if (file_handle != INVALID_HANDLE_VALUE) {
-    DWORD size_high = 0;
-    DWORD size_low = ::GetFileSize(file_handle, &size_high);
-    if (size_low != INVALID_FILE_SIZE)
-      file_size = MAKEQWORD(size_high, size_low);
+    LARGE_INTEGER size;
+    if (::GetFileSizeEx(file_handle, &size))
+      file_size = size.QuadPart;
     CloseHandle(file_handle);
   }
 
