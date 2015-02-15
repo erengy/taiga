@@ -54,18 +54,15 @@ BOOL AnimeListDialog::OnInitDialog() {
   // Create main list
   listview.parent = this;
   listview.Attach(GetDlgItem(IDC_LIST_MAIN));
-  listview.SetExtendedStyle(LVS_EX_AUTOSIZECOLUMNS |
+  listview.SetExtendedStyle(LVS_EX_COLUMNSNAPPOINTS |
                             LVS_EX_DOUBLEBUFFER |
                             LVS_EX_FULLROWSELECT |
+                            LVS_EX_HEADERDRAGDROP |
                             LVS_EX_INFOTIP |
                             LVS_EX_LABELTIP |
                             LVS_EX_TRACKSELECT);
   listview.SetHoverTime(60 * 1000);
   listview.SetImageList(ui::Theme.GetImageList16().GetHandle());
-  listview.Sort(Settings.GetInt(taiga::kApp_List_SortColumn),
-                Settings.GetInt(taiga::kApp_List_SortOrder),
-                ui::kListSortDefault,
-                ui::ListViewCompareProc);
   listview.SetTheme();
 
   // Create list tooltips
@@ -73,11 +70,7 @@ BOOL AnimeListDialog::OnInitDialog() {
   listview.tooltips.SetDelayTime(30000, -1, 0);
 
   // Insert list columns
-  listview.InsertColumn(0, GetSystemMetrics(SM_CXSCREEN), 200, LVCFMT_LEFT, L"Anime title");
-  listview.InsertColumn(1, 200, 200, LVCFMT_CENTER, L"Progress");
-  listview.InsertColumn(2, 60, 60, LVCFMT_CENTER, L"Score");
-  listview.InsertColumn(3, 60, 60, LVCFMT_CENTER, L"Type");
-  listview.InsertColumn(4, 90, 90, LVCFMT_RIGHT,  L"Season");
+  listview.InsertColumns();
 
   // Insert tabs and list groups
   listview.InsertGroup(anime::kNotInList, anime::TranslateMyStatus(anime::kNotInList, false).c_str());
@@ -329,17 +322,16 @@ AnimeListDialog::ListView::ListView()
 }
 
 int AnimeListDialog::ListView::GetSortType(int column) {
-  switch (column) {
-    // Progress
-    case 1:
+  auto column_type = FindColumnAtSubItemIndex(column);
+  switch (column_type) {
+    case kColumnUserProgress:
       return ui::kListSortProgress;
-    // Score
-    case 2:
+    case kColumnUserRating:
       return ui::kListSortMyScore;
-    // Season
-    case 4:
+    case kColumnAnimeSeason:
       return ui::kListSortSeason;
-    // Other columns
+    case kColumnAnimeStatus:
+      return ui::kListSortStatus;
     default:
       return ui::kListSortDefault;
   }
@@ -376,7 +368,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
         button_visible[1] = true;
 
       win::Rect rect_item;
-      GetSubItemRect(index, 1, &rect_item);
+      GetSubItemRect(index, columns[kColumnUserProgress].index, &rect_item);
       rect_item.right -= ScaleX(50);
       rect_item.Inflate(-5, -5);
       button_rect[0].Copy(rect_item);
@@ -421,8 +413,8 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   button_visible[2] = true;
 
   win::Rect rect_item;
-  GetSubItemRect(index, 2, &rect_item);
-  rect_item.Inflate(-8, -2);
+  GetSubItemRect(index, columns[kColumnUserRating].index, &rect_item);
+  rect_item.Inflate(-4, -2);
   button_rect[2].Copy(rect_item);
 }
 
@@ -504,7 +496,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (lplv->iSubItem == listview.GetSortColumn())
         order = listview.GetSortOrder() * -1;
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ui::ListViewCompareProc);
-      Settings.Set(taiga::kApp_List_SortColumn, lplv->iSubItem);
+      auto column_type = listview.FindColumnAtSubItemIndex(lplv->iSubItem);
+      Settings.Set(taiga::kApp_List_SortColumn, listview.columns[column_type].key);
       Settings.Set(taiga::kApp_List_SortOrder, order);
       break;
     }
@@ -625,6 +618,20 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
             ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"SearchList"), 0, anime_id);
           }
         }
+      } else if (pnmh->hwndFrom == listview.GetHeader()) {
+        ui::Menus.UpdateAnimeListHeaders();
+        auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"AnimeListHeaders");
+        if (!action.empty()) {
+          bool reset = false;
+          if (action == L"ResetAnimeListHeaders()") {
+            reset = true;
+          } else {
+            auto column_type = listview.TranslateColumnName(action);
+            auto& column = listview.columns[column_type];
+            column.visible = !column.visible;
+          }
+          listview.RefreshColumns(reset);
+        }
       }
       break;
     }
@@ -635,14 +642,17 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
       if (!anime_item)
         break;
-      switch (plvdi->item.iSubItem) {
-        case 0:  // Anime title
-          if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
-            plvdi->item.pszText = const_cast<LPWSTR>(
+      auto column_type = listview.FindColumnAtSubItemIndex(plvdi->item.iSubItem);
+      switch (column_type) {
+        case kColumnAnimeTitle:
+          if (plvdi->item.mask & LVIF_TEXT) {
+            if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
+              plvdi->item.pszText = const_cast<LPWSTR>(
                 anime_item->GetEnglishTitle(true).data());
-          } else {
-            plvdi->item.pszText = const_cast<LPWSTR>(
+            } else {
+              plvdi->item.pszText = const_cast<LPWSTR>(
                 anime_item->GetTitle().data());
+            }
           }
           break;
       }
@@ -712,6 +722,37 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           break;
         }
       }
+      break;
+    }
+
+    // Header drag & drop
+    case HDN_BEGINDRAG: {
+      auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
+      auto column_type = listview.FindColumnAtSubItemIndex(nmh->iItem);
+      if (column_type == kColumnAnimeStatus)
+        return TRUE;
+      break;
+    }
+    case HDN_ENDDRAG: {
+      auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
+      auto column_type = listview.FindColumnAtSubItemIndex(nmh->iItem);
+      if (column_type == kColumnAnimeStatus ||
+          nmh->pitem->iOrder == 0)
+        return TRUE;
+      listview.MoveColumn(nmh->iItem, nmh->pitem->iOrder);
+      break;
+    }
+    // Header resize
+    case HDN_ITEMCHANGING: {
+      auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
+      auto column_type = listview.FindColumnAtSubItemIndex(nmh->iItem);
+      if (column_type == kColumnAnimeStatus)
+        return TRUE;
+      break;
+    }
+    case HDN_ITEMCHANGED: {
+      auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
+      listview.SetColumnSize(nmh->iItem, nmh->pitem->cxy);
       break;
     }
 
@@ -953,17 +994,18 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       if (!anime_item)
         return CDRF_NOTIFYPOSTPAINT;
       pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
-      switch (pCD->iSubItem) {
-        case 0:
+      auto column_type = listview.FindColumnAtSubItemIndex(pCD->iSubItem);
+      switch (column_type) {
+        case kColumnAnimeTitle:
           if (anime_item->IsNewEpisodeAvailable() &&
               Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes))
             pCD->clrText = GetSysColor(COLOR_HIGHLIGHT);
           break;
-        case 2:
+        case kColumnUserRating:
           if (!anime_item->GetMyScore())
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
-        case 4:
+        case kColumnAnimeSeason:
           if (!anime::IsValidDate(anime_item->GetDateStart()))
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
@@ -973,7 +1015,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         pCD->clrTextBk = ui::kColorLightGreen;
         static HFONT hFontDefault = ChangeDCFont(pCD->nmcd.hdc, nullptr, -1, true, -1, -1);
         static HFONT hFontBold = reinterpret_cast<HFONT>(GetCurrentObject(pCD->nmcd.hdc, OBJ_FONT));
-        SelectObject(pCD->nmcd.hdc, pCD->iSubItem == 0 ? hFontBold : hFontDefault);
+        SelectObject(pCD->nmcd.hdc, column_type == kColumnAnimeTitle ? hFontBold : hFontDefault);
         return CDRF_NEWFONT | CDRF_NOTIFYPOSTPAINT;
       }
       return CDRF_NOTIFYPOSTPAINT;
@@ -983,14 +1025,15 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
         return CDRF_DODEFAULT;
-      if (pCD->iSubItem == 1 || pCD->iSubItem == 2) {
+      auto column_type = listview.FindColumnAtSubItemIndex(pCD->iSubItem);
+      if (column_type == kColumnUserProgress || column_type == kColumnUserRating) {
         win::Rect rcItem;
         listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
-        if (!rcItem.IsEmpty()) {
-          if (pCD->iSubItem == 1) {
+        if (!rcItem.IsEmpty() && listview.columns[column_type].visible) {
+          if (column_type == kColumnUserProgress) {
             listview.DrawProgressBar(pCD->nmcd.hdc, &rcItem, pCD->nmcd.dwItemSpec,
                                      pCD->nmcd.uItemState, *anime_item);
-          } else if (pCD->iSubItem == 2) {
+          } else if (column_type == kColumnUserRating) {
             listview.DrawScoreBox(pCD->nmcd.hdc, &rcItem, pCD->nmcd.dwItemSpec,
                                   pCD->nmcd.uItemState, *anime_item);
           }
@@ -1115,7 +1158,7 @@ void AnimeListDialog::RefreshList(int index) {
     group_index = group_view ? anime_item.GetMyStatus() : -1;
     i = listview.GetItemCount();
 
-    listview.InsertItem(i, group_index, 0,
+    listview.InsertItem(i, group_index, -1,
                         0, nullptr, LPSTR_TEXTCALLBACK,
                         static_cast<LPARAM>(anime_item.GetId()));
     RefreshListItemColumns(i, anime_item);
@@ -1131,9 +1174,12 @@ void AnimeListDialog::RefreshList(int index) {
   }
 
   // Sort items
-  listview.Sort(listview.GetSortColumn(),
-                listview.GetSortOrder(),
-                listview.GetSortType(listview.GetSortColumn()),
+  auto sort_column = listview.TranslateColumnName(Settings[taiga::kApp_List_SortColumn]);
+  if (sort_column == kColumnUnknown)
+    sort_column = kColumnAnimeTitle;
+  listview.Sort(listview.columns[sort_column].index,
+                Settings.GetInt(taiga::kApp_List_SortOrder),
+                listview.GetSortType(listview.columns[sort_column].index),
                 ui::ListViewCompareProc);
 
   if (current_position > -1) {
@@ -1164,10 +1210,31 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
   int icon_index = anime_item.GetPlaying() ?
       ui::kIcon16_Play : StatusToIcon(anime_item.GetAiringStatus());
 
-  listview.SetItemIcon(index, icon_index);
-  listview.SetItem(index, 2, anime::GetMyScore(anime_item).c_str());
-  listview.SetItem(index, 3, anime::TranslateType(anime_item.GetType()).c_str());
-  listview.SetItem(index, 4, anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str());
+  for (const auto& it : listview.columns) {
+    const auto& column = it.second;
+    if (!column.visible)
+      continue;
+    std::wstring text;
+    switch (column.column) {
+      case kColumnAnimeSeason:
+        text = anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str();
+        break;
+      case kColumnAnimeStatus:
+        listview.SetItemIcon(index, column.index, icon_index);
+        break;
+      case kColumnAnimeType:
+        text = anime::TranslateType(anime_item.GetType()).c_str();
+        break;
+      case kColumnUserLastWatched:
+        text = anime_item.GetMyLastUpdated().c_str();
+        break;
+      case kColumnUserRating:
+        text = anime::GetMyScore(anime_item).c_str();
+        break;
+    }
+    if (!text.empty())
+      listview.SetItem(index, column.index, text.c_str());
+  }
 }
 
 void AnimeListDialog::RefreshTabs(int index) {
@@ -1231,6 +1298,137 @@ void AnimeListDialog::GoToNextTab() {
 
   int status = static_cast<int>(tab.GetItemParam(tab_index));
   RefreshList(status);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void AnimeListDialog::ListView::InitializeColumns() {
+  columns.clear();
+
+  int i = 0;
+
+  columns.insert(std::make_pair(kColumnAnimeStatus, ColumnData(
+      {kColumnAnimeStatus, true, i, i++, 0, 22, 22, LVCFMT_LEFT,
+       L"", L"anime_status"})));
+  columns.insert(std::make_pair(kColumnAnimeTitle, ColumnData(
+      {kColumnAnimeTitle, true, i, i++, 0, 350, 100, LVCFMT_LEFT,
+       L"Anime title", L"anime_title"})));
+  columns.insert(std::make_pair(kColumnUserProgress, ColumnData(
+      {kColumnUserProgress, true, i, i++, 0, 200, 100, LVCFMT_CENTER,
+       L"Progress", L"user_progress"})));
+  columns.insert(std::make_pair(kColumnUserRating, ColumnData(
+      {kColumnUserRating, true, i, i++, 0, 50, 50, LVCFMT_CENTER,
+       L"Score", L"user_rating"})));
+  columns.insert(std::make_pair(kColumnAnimeType, ColumnData(
+      {kColumnAnimeType, true, i, i++, 0, 60, 60, LVCFMT_CENTER,
+       L"Type", L"anime_type"})));
+  columns.insert(std::make_pair(kColumnAnimeSeason, ColumnData(
+      {kColumnAnimeSeason, true, i, i++, 0, 90, 90, LVCFMT_RIGHT,
+       L"Season", L"anime_season"})));
+  columns.insert(std::make_pair(kColumnUserLastWatched, ColumnData(
+      {kColumnUserLastWatched, false, i, i++, 0, 100, 100, LVCFMT_LEFT,
+       L"Last watched", L"user_last_watched"})));
+}
+
+void AnimeListDialog::ListView::InsertColumns() {
+  // Calculate the index and width of each column
+  size_t current_index = 0;
+  for (int order = 0; order < columns.size(); ++order) {
+    for (auto& it : columns) {
+      auto& column = it.second;
+      if (column.width < column.width_min)
+        column.width = column.width_default;
+      if (column.order == order) {
+        if (column.visible)
+          column.index = current_index++;
+        break;
+      }
+    }
+  }
+
+  // Insert columns
+  DeleteAllColumns();
+  InsertColumn(0, 0, 0, 0, L"Dummy");
+  for (int i = 0; i < columns.size(); ++i) {
+    for (auto& it : columns) {
+      auto& column = it.second;
+      if (!column.visible || column.index != i)
+        continue;
+      InsertColumn(column.index + 1, column.width, column.width_min,
+                   column.alignment, column.name.c_str());
+      break;
+    }
+  }
+  // The first column is always LVCFMT_LEFT. In order to support other
+  // alignments, we use a dummy column as per LVCOLUMN's documentation.
+  DeleteColumn(0);
+}
+
+void AnimeListDialog::ListView::MoveColumn(int index, int new_order) {
+  int old_order = 0;
+
+  for (auto& it : columns) {
+    auto& column = it.second;
+    if (column.index == index) {
+      old_order = column.order;
+      column.order = new_order;
+      break;
+    }
+  }
+
+  if (new_order == old_order)
+    return;
+
+  for (auto& it : columns) {
+    auto& column = it.second;
+    if (column.index == index)
+      continue;
+    if (column.order >= min(old_order, new_order) &&
+        column.order <= max(old_order, new_order)) {
+      column.order += new_order > old_order ? -1 : 1;
+    }
+  }
+}
+
+AnimeListColumn AnimeListDialog::ListView::FindColumnAtSubItemIndex(int index) {
+  for (auto& it : columns) {
+    auto& column = it.second;
+    if (column.index == index)
+      return column.column;
+  }
+  return kColumnUnknown;
+}
+
+void AnimeListDialog::ListView::RefreshColumns(bool reset) {
+  if (reset)
+    InitializeColumns();
+  InsertColumns();
+  parent->RefreshList();
+}
+
+void AnimeListDialog::ListView::SetColumnSize(int index, unsigned short width) {
+  for (auto& it : columns) {
+    auto& column = it.second;
+    if (column.index == index) {
+      column.width = width;
+      break;
+    }
+  }
+}
+
+AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstring& name) {
+  static const std::map<std::wstring, AnimeListColumn> names{
+    {L"anime_season", kColumnAnimeSeason},
+    {L"anime_status", kColumnAnimeStatus},
+    {L"anime_title", kColumnAnimeTitle},
+    {L"anime_type", kColumnAnimeType},
+    {L"user_last_watched", kColumnUserLastWatched},
+    {L"user_progress", kColumnUserProgress},
+    {L"user_rating", kColumnUserRating},
+  };
+
+  auto it = names.find(name);
+  return it != names.end() ? it->second : kColumnUnknown;
 }
 
 }  // namespace ui

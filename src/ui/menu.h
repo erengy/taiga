@@ -37,6 +37,7 @@ public:
 
   void UpdateAll(const anime::Item* anime_item = nullptr);
   void UpdateAnime(const anime::Item* anime_item);
+  void UpdateAnimeListHeaders();
   void UpdateAnnounce();
   void UpdateExternalLinks();
   void UpdateFolders();

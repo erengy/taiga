@@ -29,6 +29,17 @@ class Item;
 
 namespace ui {
 
+enum AnimeListColumn {
+  kColumnUnknown,
+  kColumnAnimeSeason,
+  kColumnAnimeStatus,
+  kColumnAnimeTitle,
+  kColumnAnimeType,
+  kColumnUserLastWatched,
+  kColumnUserProgress,
+  kColumnUserRating,
+};
+
 class AnimeListDialog : public win::Dialog {
 public:
   AnimeListDialog();
@@ -67,6 +78,28 @@ public:
 
     int GetSortType(int column);
     void RefreshItem(int index);
+
+    class ColumnData {
+    public:
+      AnimeListColumn column;
+      bool visible;
+      int index;
+      int order;
+      unsigned short width;
+      unsigned short width_default;
+      unsigned short width_min;
+      int alignment;
+      std::wstring name;
+      std::wstring key;
+    };
+    std::map<AnimeListColumn, ColumnData> columns;
+    void InitializeColumns();
+    void InsertColumns();
+    void MoveColumn(int index, int new_order);
+    void SetColumnSize(int index, unsigned short width);
+    AnimeListColumn FindColumnAtSubItemIndex(int index);
+    void RefreshColumns(bool reset = false);
+    static AnimeListColumn TranslateColumnName(const std::wstring& name);
 
     win::Rect button_rect[3];
     bool button_visible[3];

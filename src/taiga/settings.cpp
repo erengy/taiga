@@ -35,6 +35,7 @@
 #include "taiga/version.h"
 #include "track/media.h"
 #include "track/monitor.h"
+#include "ui/dlg/dlg_anime_list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -117,7 +118,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_List_HighlightNewEpisodes, L"true", L"program/list/filter/episodes/highlight");
   INITKEY(kApp_List_ProgressDisplayAired, L"true", L"program/list/progress/showaired");
   INITKEY(kApp_List_ProgressDisplayAvailable, L"true", L"program/list/progress/showavailable");
-  INITKEY(kApp_List_SortColumn, L"0", L"program/list/sort/column");
+  INITKEY(kApp_List_SortColumn, L"anime_title", L"program/list/sort/column");
   INITKEY(kApp_List_SortOrder, L"1", L"program/list/sort/order");
   INITKEY(kApp_Behavior_Autostart, nullptr, L"program/general/autostart");
   INITKEY(kApp_Behavior_StartMinimized, nullptr, L"program/startup/minimize");
@@ -254,6 +255,18 @@ bool AppSettings::Load() {
     }
   }
 
+  // Anime list columns
+  ui::DlgAnimeList.listview.InitializeColumns();
+  xml_node node_list_columns = settings.child(L"program").child(L"list").child(L"columns");
+  foreach_xmlnode_(column, node_list_columns, L"column") {
+    std::wstring name = column.attribute(L"name").value();
+    auto column_type = ui::AnimeListDialog::ListView::TranslateColumnName(name);
+    auto& data = ui::DlgAnimeList.listview.columns[column_type];
+    data.order = column.attribute(L"order").as_int();
+    data.visible = column.attribute(L"visible").as_bool();
+    data.width = column.attribute(L"width").as_int();
+  }
+
   // Torrent application path
   if (GetWstr(kTorrent_Download_AppPath).empty()) {
     Set(kTorrent_Download_AppPath, GetDefaultAppPath(L".torrent", kDefaultTorrentAppPath));
@@ -317,6 +330,17 @@ bool AppSettings::Save() {
     xml_node player = mediaplayers.append_child(L"player");
     player.append_attribute(L"name") = it->name.c_str();
     player.append_attribute(L"enabled") = it->enabled;
+  }
+
+  // Anime list columns
+  xml_node list_columns = settings.child(L"program").child(L"list").append_child(L"columns");
+  for (const auto& it : ui::DlgAnimeList.listview.columns) {
+    const auto& column = it.second;
+    xml_node node = list_columns.append_child(L"column");
+    node.append_attribute(L"name") = column.key.c_str();
+    node.append_attribute(L"order") = column.order;
+    node.append_attribute(L"visible") = column.visible;
+    node.append_attribute(L"width") = column.width;
   }
 
   // Torrent filters

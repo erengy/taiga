@@ -26,6 +26,7 @@
 #include "taiga/settings.h"
 #include "ui/menu.h"
 
+#include "dlg/dlg_anime_list.h"
 #include "dlg/dlg_main.h"
 #include "dlg/dlg_season.h"
 
@@ -150,6 +151,17 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
                        true,
                        (i > 1) && (i % count_column == 1),
                        false);
+    }
+  }
+}
+
+void MenuList::UpdateAnimeListHeaders() {
+  auto menu = menu_list_.FindMenu(L"AnimeListHeaders");
+  if (menu) {
+    foreach_(it, menu->items) {
+      auto column_type = AnimeListDialog::ListView::TranslateColumnName(it->action);
+      if (column_type != kColumnUnknown)
+        it->checked = ui::DlgAnimeList.listview.columns[column_type].visible;
     }
   }
 }

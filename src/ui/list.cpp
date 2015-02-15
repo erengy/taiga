@@ -287,6 +287,8 @@ int SortList(int type, int order, int id1, int id2) {
         return SortListByScore(*item1, *item2);
       case kListSortSeason:
         return SortListBySeason(*item1, *item2, order);
+      case kListSortStatus:
+        return SortListByAiringStatus(*item1, *item2);
       case kListSortTitle:
         return SortListByTitle(*item1, *item2);
     }
@@ -326,6 +328,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
     case kListSortMyScore:
     case kListSortScore:
     case kListSortSeason:
+    case kListSortStatus:
     case kListSortTitle: {
       return_value = SortList(list->GetSortType(), list->GetSortOrder(),
                               static_cast<int>(list->GetItemParam(lParam1)),

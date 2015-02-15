@@ -118,11 +118,14 @@ public:
   virtual ~ListView() {}
 
   HIMAGELIST CreateDragImage(int item, LPPOINT pt_up_left);
+  void       DeleteAllColumns();
   BOOL       DeleteAllItems();
+  BOOL       DeleteColumn(int index);
   BOOL       DeleteItem(int item);
   int        EnableGroupView(bool enable);
   BOOL       EnsureVisible(int item);
   BOOL       GetCheckState(UINT index);
+  BOOL       GetColumnOrderArray(int count, int* array);
   int        GetCountPerPage();
   HWND       GetHeader();
   int        GetItemCount();
@@ -157,6 +160,7 @@ public:
   void       SetImageList(HIMAGELIST image_list, int type = LVSIL_SMALL);
   BOOL       SetItem(int index, int subitem, LPCWSTR text);
   BOOL       SetItemIcon(int index, int icon);
+  BOOL       SetItemIcon(int index, int subitem, int icon);
   void       SetSelectedItem(int index);
   BOOL       SetTileViewInfo(PLVTILEVIEWINFO tvi);
   BOOL       SetTileViewInfo(int line_count, DWORD flags, RECT* rc_label_margin = nullptr, SIZE* size_tile = nullptr);

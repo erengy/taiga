@@ -166,6 +166,16 @@
 		<!-- Note: Overwritten -->
 		<item name="#1" action="PlayEpisode(1)"/>
 	</menu>
+	<!-- Anime list headers -->
+	<menu name="AnimeListHeaders">
+		<item name="Progress" action="user_progress" checked="1"/>
+		<item name="Score" action="user_rating" checked="1"/>
+		<item name="Type" action="anime_type" checked="1"/>
+		<item name="Season" action="anime_season" checked="1"/>
+		<item name="Last watched" action="user_last_watched" checked="1"/>
+		<item type="separator"/>
+		<item name="Reset to defaults" action="ResetAnimeListHeaders()"/>
+	</menu>
 	
 	<!-- Tray -->
 	<menu name="Tray">

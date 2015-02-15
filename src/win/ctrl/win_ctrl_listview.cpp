@@ -109,8 +109,16 @@ HIMAGELIST ListView::CreateDragImage(int item, LPPOINT pt_up_left) {
   return ListView_CreateDragImage(window_, item, pt_up_left);
 }
 
+void ListView::DeleteAllColumns() {
+  while (DeleteColumn(0) == TRUE);
+}
+
 BOOL ListView::DeleteAllItems() {
   return ListView_DeleteAllItems(window_);
+}
+
+BOOL ListView::DeleteColumn(int index) {
+  return ListView_DeleteColumn(window_, index);
 }
 
 BOOL ListView::DeleteItem(int item) {
@@ -123,6 +131,10 @@ BOOL ListView::EnsureVisible(int item) {
 
 BOOL ListView::GetCheckState(UINT index) {
   return ListView_GetCheckState(window_, index);
+}
+
+BOOL ListView::GetColumnOrderArray(int count, int* array) {
+  return ListView_GetColumnOrderArray(window_, count, array);
 }
 
 int ListView::GetCountPerPage() {
@@ -303,6 +315,16 @@ BOOL ListView::SetItemIcon(int index, int icon) {
   LVITEM lvi = {0};
   lvi.iImage = icon;
   lvi.iItem = index;
+  lvi.mask = LVIF_IMAGE;
+
+  return ListView_SetItem(window_, &lvi);
+}
+
+BOOL ListView::SetItemIcon(int index, int subitem, int icon) {
+  LVITEM lvi = {0};
+  lvi.iImage = icon;
+  lvi.iItem = index;
+  lvi.iSubItem = subitem;
   lvi.mask = LVIF_IMAGE;
 
   return ListView_SetItem(window_, &lvi);
