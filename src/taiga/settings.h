@@ -86,6 +86,7 @@ enum AppSettingName {
   kSync_Notify_NotRecognized,
   kSync_Notify_Format,
   kStream_Animelab,
+  kStream_Animesols,
   kStream_Ann,
   kStream_Crunchyroll,
   kStream_Daisuki,

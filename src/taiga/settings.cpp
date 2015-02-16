@@ -144,6 +144,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Notify_NotRecognized, L"true", L"program/notifications/balloon/notrecognized");
   INITKEY(kSync_Notify_Format, kDefaultFormatBalloon.c_str(), L"program/notifications/balloon/format");
   INITKEY(kStream_Animelab, nullptr, L"recognition/streaming/providers/animelab");
+  INITKEY(kStream_Animesols, nullptr, L"recognition/streaming/providers/animesols");
   INITKEY(kStream_Ann, nullptr, L"recognition/streaming/providers/ann");
   INITKEY(kStream_Crunchyroll, nullptr, L"recognition/streaming/providers/crunchyroll");
   INITKEY(kStream_Daisuki, nullptr, L"recognition/streaming/providers/daisuki");
