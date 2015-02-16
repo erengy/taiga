@@ -600,14 +600,12 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           int anime_id = GetCurrentId();
           auto anime_item = GetCurrentItem();
           ui::Menus.UpdateAll(anime_item);
-          int index = listview.HitTest(true);
           if (anime_item->IsInList()) {
-            switch (index) {
-              // Score
-              case 2:
+            int index = listview.HitTest(true);
+            switch (listview.FindColumnAtSubItemIndex(index)) {
+              case kColumnUserRating:
                 ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"EditScore"), 0, anime_id);
                 break;
-              // Other
               default:
                 ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"RightClick"), 0, anime_id);
                 break;
