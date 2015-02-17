@@ -652,21 +652,12 @@ int EstimateEpisodeCount(const Item& item) {
                  item.GetAvailableEpisodeCount());
 
   // Estimate using local information
-  number = max(number, const_cast<Item&>(item).GetLastAiredEpisodeNumber());
+  number = max(number, item.GetLastAiredEpisodeNumber());
 
   // Estimate using airing dates of TV series
-  if (item.GetType() == kTv) {
-    Date date_start = item.GetDateStart();
-    if (IsValidDate(date_start)) {
-      Date date_end = item.GetDateEnd();
-      // Use current date in Japan if ending date is unknown
-      if (!IsValidDate(date_end)) date_end = GetDateJapan();
-      // Assuming the series is aired weekly
-      number = max(number, (date_end - date_start) / 7);
-    }
-  }
+  number = max(number, EstimateLastAiredEpisodeNumber(item));
 
-  // Given all TV series aired since 2000, most them have their episodes
+  // Given all TV series aired since 2000, most of them have their episodes
   // spanning one or two seasons. Following is a table of top ten values:
   //
   //   Episodes    Seasons    Percent
