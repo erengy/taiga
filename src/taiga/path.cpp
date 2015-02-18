@@ -56,6 +56,8 @@ std::wstring GetPath(PathType type) {
       return data_path + L"db\\";
     case kPathDatabaseAnime:
       return data_path + L"db\\anime.xml";
+    case kPathDatabaseAnimeRelations:
+      return data_path + L"db\\anime_relations.json";
     case kPathDatabaseImage:
       return data_path + L"db\\image\\";
     case kPathDatabaseSeason:

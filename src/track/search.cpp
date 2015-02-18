@@ -47,6 +47,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
   }
 
   static track::recognition::MatchOptions match_options;
+  match_options.allow_sequels = false;
   match_options.check_airing_date = false;
   match_options.check_anime_type = false;
   match_options.check_episode_number = false;
@@ -78,6 +79,7 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
   }
 
   static track::recognition::MatchOptions match_options;
+  match_options.allow_sequels = true;
   match_options.check_airing_date = true;
   match_options.check_anime_type = true;
   match_options.check_episode_number = true;

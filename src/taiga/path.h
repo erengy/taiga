@@ -27,6 +27,7 @@ enum PathType {
   kPathData,
   kPathDatabase,
   kPathDatabaseAnime,
+  kPathDatabaseAnimeRelations,
   kPathDatabaseImage,
   kPathDatabaseSeason,
   kPathFeed,

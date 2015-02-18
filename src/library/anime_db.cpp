@@ -210,32 +210,6 @@ Item* Database::FindItem(const std::wstring& id, enum_t service) {
   return nullptr;
 }
 
-Item* Database::FindSequel(int anime_id) {
-  if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)
-    return nullptr;
-
-  int sequel_id = ID_UNKNOWN;
-
-  switch (anime_id) {
-    #define SEQUEL_ID(p, s) case p: sequel_id = s; break;
-    // Gintama -> Gintama'
-    SEQUEL_ID(918, 9969);
-    // Tegami Bachi -> Tegami Bachi Reverse
-    SEQUEL_ID(6444, 8311);
-    // Fate/Zero -> Fate/Zero 2nd Season
-    SEQUEL_ID(10087, 11741);
-    // Towa no Qwon
-    SEQUEL_ID(10294, 10713);
-    SEQUEL_ID(10713, 10714);
-    SEQUEL_ID(10714, 10715);
-    SEQUEL_ID(10715, 10716);
-    SEQUEL_ID(10716, 10717);
-    #undef SEQUEL_ID
-  }
-
-  return FindItem(sequel_id);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void Database::ClearInvalidItems() {

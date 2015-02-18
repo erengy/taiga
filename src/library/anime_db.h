@@ -38,7 +38,6 @@ public:
 
   Item* FindItem(int id);
   Item* FindItem(const std::wstring& id, enum_t service);
-  Item* FindSequel(int anime_id);
 
   void ClearInvalidItems();
   int UpdateItem(const Item& item);

@@ -73,6 +73,7 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
     return nullptr;
 
   static track::recognition::MatchOptions match_options;
+  match_options.allow_sequels = false;
   match_options.check_airing_date = false;
   match_options.check_anime_type = false;
   match_options.check_episode_number = false;

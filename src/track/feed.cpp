@@ -150,6 +150,7 @@ bool Feed::ExamineData() {
     // Examine title and compare with anime list items
     Meow.Parse(it->title, it->episode_data);
     static track::recognition::MatchOptions match_options;
+    match_options.allow_sequels = true;
     match_options.check_airing_date = true;
     match_options.check_anime_type = true;
     match_options.check_episode_number = true;

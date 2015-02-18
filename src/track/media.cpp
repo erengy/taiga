@@ -303,6 +303,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
           is_inside_root_folders = anime::IsInsideRootFolders(CurrentEpisode.folder);
       if (is_inside_root_folders) {
         static track::recognition::MatchOptions match_options;
+        match_options.allow_sequels = true;
         match_options.check_airing_date = true;
         match_options.check_anime_type = true;
         match_options.check_episode_number = true;

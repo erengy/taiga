@@ -95,7 +95,9 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   }
 
   // Figure out which ID is the one we're looking for
-  if (anime_ids.size() == 1) {
+  if (anime::IsValidId(episode.anime_id)) {
+    // We had a redirection while validating IDs
+  } else if (anime_ids.size() == 1) {
     episode.anime_id = *anime_ids.begin();
   } else if (anime_ids.size() > 1) {
     episode.anime_id = ScoreTitle(episode, anime_ids, match_options);
@@ -138,20 +140,32 @@ bool Engine::ValidateOptions(anime::Episode& episode,
       return false;
 
   if (match_options.check_episode_number)
-    if (!ValidateEpisodeNumber(episode, anime_item))
+    if (!ValidateEpisodeNumber(episode, anime_item, match_options))
       return false;
 
   return true;
 }
 
 bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
-                                   const anime::Item& anime_item) const {
+                                   const anime::Item& anime_item,
+                                   const MatchOptions& match_options) const {
   if (!anime::IsValidEpisodeCount(anime_item.GetEpisodeCount()))
     return true;  // Episode count is unknown, so anything goes
 
   int number = anime::GetEpisodeHigh(episode);
   if (number > anime_item.GetEpisodeCount()) {
-    // TODO: Check sequels if match_options.allow_sequels
+    if (match_options.allow_sequels) {
+      std::pair<int, int> result;
+      if (SearchEpisodeRedirection(anime_item.GetId(), number, result)) {
+        LOG(LevelDebug, L"Redirection: " +
+                        ToWstr(anime_item.GetId()) + L":" + ToWstr(number) +
+                        L" -> " +
+                        ToWstr(result.first) + L":" + ToWstr(result.second));
+        episode.anime_id = result.first;
+        episode.set_episode_number(result.second);
+        return true;
+      }
+    }
     return false;  // Episode number is out of range
   }
 
@@ -168,6 +182,8 @@ void Engine::InitializeTitles() {
     for (const auto& it : AnimeDatabase.items) {
       UpdateTitles(it.second);
     }
+
+    ReadRelations();
   }
 }
 

@@ -337,6 +337,9 @@
     <ClCompile Include="..\..\src\track\recognition.cpp">
       <Filter>track</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_relations.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\track\search.cpp">
       <Filter>track</Filter>
     </ClCompile>

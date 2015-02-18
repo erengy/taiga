@@ -190,6 +190,7 @@
     <ClCompile Include="..\..\src\track\media_stream.cpp" />
     <ClCompile Include="..\..\src\track\monitor.cpp" />
     <ClCompile Include="..\..\src\track\recognition.cpp" />
+    <ClCompile Include="..\..\src\track\recognition_relations.cpp" />
     <ClCompile Include="..\..\src\track\search.cpp" />
     <ClCompile Include="..\..\src\ui\dialog.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_about.cpp" />
