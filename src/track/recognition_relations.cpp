@@ -39,8 +39,8 @@ public:
 private:
   struct Range {
     int id;
+    int_pair_t r0;
     int_pair_t r1;
-    int_pair_t r2;
   };
 
   std::vector<Range> ranges_;
@@ -56,11 +56,11 @@ void Relation::AddRange(int id, int_pair_t r1, int_pair_t r2) {
 
 bool Relation::FindRange(int episode_number, int_pair_t& result) const {
   for (const auto& it : ranges_) {
-    int distance = episode_number - it.r1.first;
+    int distance = episode_number - it.r0.first;
     if (distance >= 0) {
-      if (!it.r1.second || it.r1.second - episode_number > 0) {
-        int destination = it.r2.first + distance;
-        if (!it.r2.second || destination <= it.r2.second) {
+      if (!it.r0.second || it.r0.second - episode_number >= 0) {
+        int destination = it.r1.first + distance;
+        if (!it.r1.second || destination <= it.r1.second) {
           result.first = it.id;
           result.second = destination;
           return true;
@@ -74,32 +74,52 @@ bool Relation::FindRange(int episode_number, int_pair_t& result) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool ParseRule(const std::wstring& entry) {
-  static std::wstring episode_range_pattern = L"(\\d+)(?:-(\\d+|\\?))?";
-  static const std::wregex pattern(L"(\\d+):" + episode_range_pattern +
-                                   L" -\\> (\\d+|~):" + episode_range_pattern);
+static bool ParseRule(const std::wstring& rule) {
+  static std::wstring id_pattern = L"(\\d+|[?~])";
+  static std::wstring episode_pattern = L"(\\d+)(?:-(\\d+|\\?))?";
+  static const std::wregex pattern(
+      id_pattern + L"\\|" + id_pattern + L":" + episode_pattern + L" -> " +
+      id_pattern + L"\\|" + id_pattern + L":" + episode_pattern);
 
   std::match_results<std::wstring::const_iterator> match_results;
 
-  if (std::regex_match(entry, match_results, pattern)) {
-    int id1 = ToInt(match_results[1].str());
+  if (std::regex_match(rule, match_results, pattern)) {
+    int id0 = 0;
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        id0 = ToInt(match_results[1].str());
+        break;
+      case sync::kHummingbird:
+        id0 = ToInt(match_results[2].str());
+        break;
+    }
+    if (!id0)
+      return false;
+
+    std::pair<int, int> r0;
+    r0.first = ToInt(match_results[3].str());
+    if (match_results[4].matched)
+      r0.second = ToInt(match_results[4].str());
+
+    int id1 = 0;
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        id1 = ToInt(match_results[5].str());
+        break;
+      case sync::kHummingbird:
+        id1 = ToInt(match_results[6].str());
+        break;
+    }
+    if (!id1)
+      id1 = id0;
 
     std::pair<int, int> r1;
-    r1.first = ToInt(match_results[2].str());
-    if (match_results[3].matched)
-      r1.second = ToInt(match_results[3].str());
+    r1.first = ToInt(match_results[7].str());
+    if (match_results[8].matched)
+      r1.second = ToInt(match_results[8].str());
 
-    int id2 = ToInt(match_results[4].str());
-    if (!id2)
-      id2 = id1;
-
-    std::pair<int, int> r2;
-    r2.first = ToInt(match_results[5].str());
-    if (match_results[6].matched)
-      r2.second = ToInt(match_results[6].str());
-
-    auto& relation = relations[id1];
-    relation.AddRange(id2, r1, r2);
+    auto& relation = relations[id0];
+    relation.AddRange(id1, r0, r1);
     return true;
   }
 
@@ -126,8 +146,11 @@ bool Engine::ReadRelations() {
     Json::Reader reader;
     Json::Value root;
     if (reader.parse(document, root)) {
-      for (const auto& rule : root["rules"]) {
-        ParseRule(StrToWstr(rule.asString()));
+      for (const auto& item : root["rules"]) {
+        auto rule = StrToWstr(item.asString());
+        if (!ParseRule(rule)) {
+          LOG(LevelWarning, L"Could not parse rule: " + rule);
+        }
       }
       return true;
     }
@@ -141,9 +164,6 @@ bool Engine::ReadRelations() {
 
 bool Engine::SearchEpisodeRedirection(int id, int episode_number,
                                       std::pair<int, int>& result) const {
-  if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)  // TEMP
-    return false;
-
   auto it = relations.find(id);
   if (it != relations.end()) {
     const auto& relation = it->second;

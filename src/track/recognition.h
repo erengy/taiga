@@ -61,9 +61,9 @@ public:
   bool SearchEpisodeRedirection(int id, int episode_number, std::pair<int, int>& result) const;
 
 private:
-  bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options) const;
-  bool ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options) const;
-  bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options) const;
+  bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options, bool redirect) const;
+  bool ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
+  bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
 
   int LookUpTitle(const std::wstring& title, std::set<int>& anime_ids) const;
 

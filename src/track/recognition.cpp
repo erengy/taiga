@@ -87,7 +87,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Validate IDs
   for (auto it = anime_ids.begin(); it != anime_ids.end(); ) {
-    if (!ValidateOptions(episode, *it, match_options)) {
+    if (!ValidateOptions(episode, *it, match_options, true)) {
       it = anime_ids.erase(it);
     } else {
       ++it;
@@ -119,18 +119,20 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Engine::ValidateOptions(anime::Episode& episode, int anime_id,
-                             const MatchOptions& match_options) const {
+                             const MatchOptions& match_options,
+                             bool redirect) const {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 
   if (!anime_item)
     return false;
 
-  return ValidateOptions(episode, *anime_item, match_options);
+  return ValidateOptions(episode, *anime_item, match_options, redirect);
 }
 
 bool Engine::ValidateOptions(anime::Episode& episode,
                              const anime::Item& anime_item,
-                             const MatchOptions& match_options) const {
+                             const MatchOptions& match_options,
+                             bool redirect) const {
   if (match_options.check_airing_date)
     if (!anime::IsAiredYet(anime_item))
       return false;
@@ -140,7 +142,7 @@ bool Engine::ValidateOptions(anime::Episode& episode,
       return false;
 
   if (match_options.check_episode_number)
-    if (!ValidateEpisodeNumber(episode, anime_item, match_options))
+    if (!ValidateEpisodeNumber(episode, anime_item, match_options, redirect))
       return false;
 
   return true;
@@ -148,7 +150,8 @@ bool Engine::ValidateOptions(anime::Episode& episode,
 
 bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
                                    const anime::Item& anime_item,
-                                   const MatchOptions& match_options) const {
+                                   const MatchOptions& match_options,
+                                   bool redirect) const {
   if (!anime::IsValidEpisodeCount(anime_item.GetEpisodeCount()))
     return true;  // Episode count is unknown, so anything goes
 
@@ -157,12 +160,14 @@ bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
     if (match_options.allow_sequels) {
       std::pair<int, int> result;
       if (SearchEpisodeRedirection(anime_item.GetId(), number, result)) {
-        LOG(LevelDebug, L"Redirection: " +
-                        ToWstr(anime_item.GetId()) + L":" + ToWstr(number) +
-                        L" -> " +
-                        ToWstr(result.first) + L":" + ToWstr(result.second));
-        episode.anime_id = result.first;
-        episode.set_episode_number(result.second);
+        if (redirect) {
+          LOG(LevelDebug, L"Redirection: " +
+                          ToWstr(anime_item.GetId()) + L":" + ToWstr(number) +
+                          L" -> " +
+                          ToWstr(result.first) + L":" + ToWstr(result.second));
+          episode.anime_id = result.first;
+          episode.set_episode_number(result.second);
+        }
         return true;
       }
     }
