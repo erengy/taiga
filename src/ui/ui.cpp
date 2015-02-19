@@ -130,6 +130,9 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
   switch (http_client.mode()) {
     case taiga::kHttpSilent:
+    case taiga::kHttpServiceGetMetadataById:
+    case taiga::kHttpServiceSearchTitle:
+    case taiga::kHttpGetLibraryEntryImage:
       return;
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
