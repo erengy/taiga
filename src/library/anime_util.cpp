@@ -219,7 +219,8 @@ bool PlayNextEpisode(int anime_id) {
     return false;
 
   int number = 1;
-  if (anime_item->GetEpisodeCount() != 1)
+  if (anime_item->GetEpisodeCount() != 1 &&
+      anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode())
     number = anime_item->GetMyLastWatchedEpisode() + 1;
 
   return PlayEpisode(anime_id, number);
