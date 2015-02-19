@@ -59,6 +59,7 @@ class Episode {
   void set_audio_terms(const std::wstring& str);
   void set_elements(const anitomy::Elements& elements);
   void set_episode_number(int value);
+  void set_episode_number_range(std::pair<int, int> range);
   void set_episode_title(const std::wstring& str);
   void set_file_checksum(const std::wstring& str);
   void set_file_extension(const std::wstring& str);

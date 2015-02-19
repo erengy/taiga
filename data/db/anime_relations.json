@@ -2,69 +2,133 @@
 	"meta": {
 		"version": "1.2.0"
 	},
+
+
 	"rules": [
-		// Black Lagoon -> ~: The Second Barrage
-		"889|789:13-24 -> 1519|1363:1-12",
+		{
+			"name": "Black Lagoon -> ~: The Second Barrage",
+			"rule": "889|789:13-24 -> 1519|1363:1-12"
+		},
 
-		// Gintama -> ~'
-		"918|818:202-252 -> 9969|5971:1-51",
-		// Gintama -> ~': Enchousen
-		"918|818:253-265 -> 15417|7253:1-13",
-		// Gintama -> ~' (2015)
-		"918|818:266-? -> 28977|10083:1-?",
 
-		// Tegami Bachi -> ~ Reverse
-		"6444|4564:26-50 -> 8311|5288:1-25",
-		// Tegami Bachi Reverse -> ~
-		"8311|5288:26-50 -> ~|~:1-25",
+		{
+			"name": "Gintama -> ~'",
+			"rule": "918|818:202-252 -> 9969|5971:1-51"
+		},
+		{
+			"name": "Gintama -> ~': Enchousen",
+			"rule": "918|818:253-265 -> 15417|7253:1-13"
+		},
+		{
+			"name": "Gintama -> ~' (2015)",
+			"rule": "918|818:266-? -> 28977|10083:1-?"
+		},
 
-		// Fate/Zero -> ~ 2nd Season
-		"10087|6028:14-25 -> 11741|7658:1-12",
-		// Fate/Zero 2nd Season -> ~
-		"11741|7658:14-25 -> ~|~:1-12",
 
-		// Towa no Quon 1 -> ~ 2
-		"10294|6116:2 -> 10713|6310:1",
-		// Towa no Quon 1 -> ~ 3
-		"10294|6116:3 -> 10714|6311:1",
-		// Towa no Quon 1 -> ~ 4
-		"10294|6116:4 -> 10715|6312:1",
-		// Towa no Quon 1 -> ~ 5
-		"10294|6116:5 -> 10716|6313:1",
-		// Towa no Quon 1 -> ~ 6
-		"10294|6116:6 -> 10717|6314:1",
+		{
+			"name": "Tegami Bachi -> ~ Reverse",
+			"rule": "6444|4564:26-50 -> 8311|5288:1-25"
+		},
+		{
+			"name": "Tegami Bachi Reverse -> ~",
+			"rule": "8311|5288:26-50 -> ~|~:1-25"
+		},
 
-		// Kuroko no Basket -> ~ 2nd Season
-		"11771|6595:26-50 -> 16894|7545:1-25",
-		// Kuroko no Basket 2nd Season -> ~
-		"16894|7545:26-50 -> ~|~:1-25",
-		// Kuroko no Basket -> ~ 3rd Season
-		"11771|6595:51-? -> 24415|8524:1-?",
-		// Kuroko no Basket 3rd Season -> ~
-		"24415|8524:51-? -> ~|~:1-?",
 
-		// Kokoro Connect -> ~ Michi Random
-		"11887|6626:14-17 -> 16001|7355:1-4",
+		{
+			"name": "Fate/Zero -> ~ 2nd Season",
+			"rule": "10087|6028:14-25 -> 11741|7658:1-12"
+		},
+		{
+			"name": "Fate/Zero 2nd Season -> ~",
+			"rule": "11741|7658:14-25 -> ~|~:1-12"
+		},
 
-		// Kakumeiki Valvrave -> ~ 2nd Season
-		"16668|7487:13-24 -> 18295|7698:1-12",
-		// Kakumeiki Valvrave 2nd Season -> ~
-		"18295|7698:13-24 -> ~|~:1-12",
 
-		// Date A Live II -> Date A Live: Encore OVA
-		"19163|7864:11 -> 22961|8511:1",
+		{
+			"name": "Towa no Quon 1 -> ~ 2",
+			"rule": "10294|6116:2 -> 10713|6310:1"
+		},
+		{
+			"name": "Towa no Quon 1 -> ~ 3",
+			"rule": "10294|6116:3 -> 10714|6311:1"
+		},
+		{
+			"name": "Towa no Quon 1 -> ~ 4",
+			"rule": "10294|6116:4 -> 10715|6312:1"
+		},
+		{
+			"name": "Towa no Quon 1 -> ~ 5",
+			"rule": "10294|6116:5 -> 10716|6313:1"
+		},
+		{
+			"name": "Towa no Quon 1 -> ~ 6",
+			"rule": "10294|6116:6 -> 10717|6314:1"
+		},
 
-		// Mushishi Zoku Shou -> ~ Special
-		"21939|8204:11-12 -> 24687|8519:1",
-		// Mushishi Zoku Shou -> ~ 2nd Season
-		"21939|8204:13-22 -> 24701|8581:1-10",
 
-		// JoJo's Bizarre Adventure: Stardust Crusaders -> ~ 2nd Season
-		"20899|8063:25-? -> 26055|8739:1-?",
-		// JoJo's Bizarre Adventure: Stardust Crusaders 2nd Season -> ~
-		"26055|8739:25-? -> ~|~:1-?",
+		{
+			"name": "Kuroko no Basket -> ~ 2nd Season",
+			"rule": "11771|6595:26-50 -> 16894|7545:1-25"
+		},
+		{
+			"name": "Kuroko no Basket 2nd Season -> ~",
+			"rule": "16894|7545:26-50 -> ~|~:1-25"
+		},
+		{
+			"name": "Kuroko no Basket -> ~ 3rd Season",
+			"rule": "11771|6595:51-? -> 24415|8524:1-?"
+		},
+		{
+			"name": "Kuroko no Basket 3rd Season -> ~",
+			"rule": "24415|8524:51-? -> ~|~:1-?"
+		},
 
-		// Aldnoah.Zero -> ~ 2nd Season
-		"22729|8297:13-? -> 27655|9136:1-?"
+
+		{
+			"name": "Kokoro Connect -> ~ Michi Random",
+			"rule": "11887|6626:14-17 -> 16001|7355:1-4"
+		},
+
+
+		{
+			"name": "Kakumeiki Valvrave -> ~ 2nd Season",
+			"rule": "16668|7487:13-24 -> 18295|7698:1-12"
+		},
+		{
+			"name": "Kakumeiki Valvrave 2nd Season -> ~",
+			"rule": "18295|7698:13-24 -> ~|~:1-12"
+		},
+
+		{
+			"name": "Date A Live II -> Date A Live: Encore OVA",
+			"rule": "19163|7864:11 -> 22961|8511:1"
+		},
+
+
+		{
+			"name": "Mushishi Zoku Shou -> ~ Special",
+			"rule": "21939|8204:11-12 -> 24687|8519:1"
+		},
+		{
+			"name": "Mushishi Zoku Shou -> ~ 2nd Season",
+			"rule": "21939|8204:13-22 -> 24701|8581:1-10"
+		},
+
+
+		{
+			"name": "JoJo's Bizarre Adventure: Stardust Crusaders -> ~ 2nd Season",
+			"rule": "20899|8063:25-? -> 26055|8739:1-?"
+		},
+		{
+			"name": "JoJo's Bizarre Adventure: Stardust Crusaders 2nd Season -> ~",
+			"rule": "26055|8739:25-? -> ~|~:1-?"
+		},
+
+
+		{
+			"name": "Aldnoah.Zero -> ~ 2nd Season",
+			"rule": "22729|8297:13-? -> 27655|9136:1-?"
+		}
 	]
 }

@@ -21,9 +21,11 @@
 #include "base/file.h"
 #include "base/json.h"
 #include "base/log.h"
+#include "base/version.h"
 #include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
+#include "taiga/taiga.h"
 #include "track/recognition.h"
 
 namespace track {
@@ -59,7 +61,9 @@ bool Relation::FindRange(int episode_number, int_pair_t& result) const {
     int distance = episode_number - it.r0.first;
     if (distance >= 0) {
       if (!it.r0.second || it.r0.second - episode_number >= 0) {
-        int destination = it.r1.first + distance;
+        int destination = it.r1.first;
+        if (it.r1.first != it.r1.second)
+          destination += distance;
         if (!it.r1.second || destination <= it.r1.second) {
           result.first = it.id;
           result.second = destination;
@@ -98,8 +102,11 @@ static bool ParseRule(const std::wstring& rule) {
 
     std::pair<int, int> r0;
     r0.first = ToInt(match_results[3].str());
-    if (match_results[4].matched)
+    if (match_results[4].matched) {
       r0.second = ToInt(match_results[4].str());
+    } else {
+      r0.second = r0.first;
+    }
 
     int id1 = 0;
     switch (taiga::GetCurrentServiceId()) {
@@ -115,8 +122,11 @@ static bool ParseRule(const std::wstring& rule) {
 
     std::pair<int, int> r1;
     r1.first = ToInt(match_results[7].str());
-    if (match_results[8].matched)
+    if (match_results[8].matched) {
       r1.second = ToInt(match_results[8].str());
+    } else {
+      r1.second = r1.first;
+    }
 
     auto& relation = relations[id0];
     relation.AddRange(id1, r0, r1);
@@ -133,21 +143,14 @@ bool Engine::ReadRelations() {
   std::string document;
 
   if (ReadFromFile(path, document)) {
-    // Erase comments
-    size_t pos = 0;
-    do {
-      pos = document.find("//");
-      if (pos != document.npos) {
-        size_t pos_end = document.find('\n', pos);
-        document.erase(pos, (pos_end - pos) + 1);
-      }
-    } while (pos != document.npos);
-
     Json::Reader reader;
     Json::Value root;
     if (reader.parse(document, root)) {
+      base::SemanticVersion version = StrToWstr(root["meta"]["version"].asString());
+      if (version > Taiga.version)
+        LOG(LevelDebug, L"Anime relations version is larger than application version.");
       for (const auto& item : root["rules"]) {
-        auto rule = StrToWstr(item.asString());
+        auto rule = StrToWstr(item["rule"].asString());
         if (!ParseRule(rule)) {
           LOG(LevelWarning, L"Could not parse rule: " + rule);
         }
@@ -162,16 +165,34 @@ bool Engine::ReadRelations() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Engine::SearchEpisodeRedirection(int id, int episode_number,
-                                      std::pair<int, int>& result) const {
+bool Engine::SearchEpisodeRedirection(
+    int id, const std::pair<int, int>& range,
+    int& destination_id, std::pair<int, int>& destination_range) const {
+
   auto it = relations.find(id);
-  if (it != relations.end()) {
-    const auto& relation = it->second;
-    if (relation.FindRange(episode_number, result))
-      return true;
+
+  if (it == relations.end())
+    return false;
+
+  const auto& relation = it->second;
+
+  std::pair<std::pair<int, int>, std::pair<int, int>> results;
+
+  if (!relation.FindRange(range.first, results.first))
+    return false;
+
+  if (range.first != range.second) {
+    if (!relation.FindRange(range.second, results.second))
+      return false;
+    if (results.first.first != results.second.first)
+      return false;
   }
 
-  return false;
+  destination_id = results.first.first;
+  destination_range.first = results.first.second;
+  destination_range.second = results.second.second;
+
+  return true;
 }
 
 }  // namespace recognition

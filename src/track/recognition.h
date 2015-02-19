@@ -58,7 +58,7 @@ public:
   bool IsValidFileExtension(std::wstring extension) const;
 
   bool ReadRelations();
-  bool SearchEpisodeRedirection(int id, int episode_number, std::pair<int, int>& result) const;
+  bool SearchEpisodeRedirection(int id, const std::pair<int, int>& range, int& destination_id, std::pair<int, int>& destination_range) const;
 
 private:
   bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options, bool redirect) const;

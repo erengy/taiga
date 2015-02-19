@@ -145,6 +145,13 @@ void Episode::set_episode_number(int value) {
   SetElementValue(anitomy::kElementEpisodeNumber, value);
 }
 
+void Episode::set_episode_number_range(std::pair<int, int> range) {
+  elements_.erase(anitomy::kElementEpisodeNumber);
+  elements_.insert(anitomy::kElementEpisodeNumber, ToWstr(range.first));
+  if (range.second > range.first)
+    elements_.insert(anitomy::kElementEpisodeNumber, ToWstr(range.second));
+}
+
 void Episode::set_episode_title(const std::wstring& str) {
   SetElementValue(anitomy::kElementEpisodeTitle, str);
 }
