@@ -62,6 +62,7 @@ bool OnLibraryEntryEditTitles(int id, std::wstring& titles);
 
 void OnHistoryAddItem(const HistoryItem& history_item);
 void OnHistoryChange();
+bool OnHistoryClear();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 
 void OnAnimeEpisodeNotFound();

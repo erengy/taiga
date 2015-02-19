@@ -234,6 +234,12 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     int status = ToInt(body);
     AnimeDatabase.AddToList(anime_id, status);
 
+  // ClearHistory()
+  //   Deletes all history items.
+  } else if (action == L"ClearHistory") {
+    if (ui::OnHistoryClear())
+      History.Clear();
+
   //////////////////////////////////////////////////////////////////////////////
   // Tracker
 

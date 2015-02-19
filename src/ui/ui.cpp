@@ -428,6 +428,18 @@ void OnHistoryChange() {
   DlgAnimeList.RefreshTabs();
 }
 
+bool OnHistoryClear() {
+  win::TaskDialog dlg;
+  dlg.SetWindowTitle(L"Clear History");
+  dlg.SetMainIcon(TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Are you sure you want to delete your entire history?");
+  dlg.AddButton(L"Yes", IDYES);
+  dlg.AddButton(L"No", IDNO);
+  dlg.Show(DlgMain.GetWindowHandle());
+
+  return dlg.GetSelectedButtonID() == IDYES;
+}
+
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
 

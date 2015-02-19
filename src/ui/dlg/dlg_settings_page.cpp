@@ -467,19 +467,20 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Clear cache
         case IDC_BUTTON_CACHE_CLEAR: {
           if (IsDlgButtonChecked(IDC_CHECK_CACHE1)) {
-            History.Clear();
+            if (ui::OnHistoryClear())
+              History.Clear();
+            CheckDlgButton(IDC_CHECK_CACHE1, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE2)) {
             ImageDatabase.Clear();
+            CheckDlgButton(IDC_CHECK_CACHE2, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE3)) {
             std::wstring path = taiga::GetPath(taiga::kPathFeed);
             DeleteFolder(path);
+            CheckDlgButton(IDC_CHECK_CACHE3, FALSE);
           }
           parent->RefreshCache();
-          CheckDlgButton(IDC_CHECK_CACHE1, FALSE);
-          CheckDlgButton(IDC_CHECK_CACHE2, FALSE);
-          CheckDlgButton(IDC_CHECK_CACHE3, FALSE);
           EnableDlgItem(IDC_BUTTON_CACHE_CLEAR, FALSE);
           return TRUE;
         }

@@ -24,6 +24,7 @@
 #include "library/history.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
+#include "taiga/script.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_history.h"
 #include "ui/dlg/dlg_main.h"
@@ -104,8 +105,8 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         std::wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"HistoryList");
         if (action == L"Delete()") {
           RemoveItems();
-        } else if (action == L"ClearHistory()") {
-          History.Clear();
+        } else {
+          ExecuteAction(action);
         }
         break;
       }
