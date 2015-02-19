@@ -1205,9 +1205,6 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
 }
 
 void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime_item) {
-  int icon_index = anime_item.GetPlaying() ?
-      ui::kIcon16_Play : StatusToIcon(anime_item.GetAiringStatus());
-
   for (const auto& it : listview.columns) {
     const auto& column = it.second;
     if (!column.visible)
@@ -1217,9 +1214,14 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnAnimeSeason:
         text = anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str();
         break;
-      case kColumnAnimeStatus:
+      case kColumnAnimeStatus: {
+        bool playing = anime_item.GetPlaying();
+        int status = anime_item.GetAiringStatus();
+        int icon_index = playing ? ui::kIcon16_Play : StatusToIcon(status);
         listview.SetItemIcon(index, column.index, icon_index);
+        text = playing ? L"Now playing" : anime::TranslateStatus(status);
         break;
+      }
       case kColumnAnimeType:
         text = anime::TranslateType(anime_item.GetType()).c_str();
         break;
