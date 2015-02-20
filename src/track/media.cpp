@@ -296,6 +296,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     CurrentEpisode.streaming_media = !media_player.engine.empty();
 
     // Examine title and compare it with list items
+    bool ignore_file = false;
     if (Meow.Parse(MediaPlayers.current_title(), CurrentEpisode)) {
       bool is_inside_root_folders = true;
       if (Settings.GetBool(taiga::kSync_Update_OutOfRoot))
@@ -315,12 +316,17 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
           CurrentEpisode.Set(anime_item->GetId());
           StartWatching(*anime_item, CurrentEpisode);
           return;
+        } else if (!Meow.IsValidAnimeType(CurrentEpisode)) {
+          ignore_file = true;
         }
+      } else {
+        ignore_file = true;
       }
     }
     // Not recognized
     CurrentEpisode.Set(anime::ID_NOTINLIST);
-    ui::OnRecognitionFail();
+    if (!ignore_file)
+      ui::OnRecognitionFail();
 
   } else {
     if (MediaPlayers.title_changed()) {
