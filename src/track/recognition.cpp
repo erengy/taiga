@@ -557,8 +557,11 @@ bool Engine::IsValidFileExtension(std::wstring extension) const {
     return false;
 
   extension = anitomy::keyword_manager.Normalize(extension);
-  return anitomy::keyword_manager.Find(anitomy::kElementFileExtension,
-                                       extension);
+  auto category = anitomy::kElementFileExtension;
+  anitomy::KeywordOptions options;
+
+  bool found = anitomy::keyword_manager.Find(extension, category, options);
+  return found && options.valid;
 }
 
 }  // namespace recognition

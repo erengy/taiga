@@ -99,6 +99,14 @@ const std::wstring& Episode::file_name() const {
   return GetElementAsString(anitomy::kElementFileName);
 }
 
+std::wstring Episode::file_name_with_extension() const {
+  auto filename = GetElementAsString(anitomy::kElementFileName);
+  auto extension = file_extension();
+  if (!extension.empty())
+    filename += L"." + extension;
+  return filename;
+}
+
 const std::wstring& Episode::release_group() const {
   return GetElementAsString(anitomy::kElementReleaseGroup);
 }

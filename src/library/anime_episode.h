@@ -47,6 +47,7 @@ class Episode {
   const std::wstring& file_checksum() const;
   const std::wstring& file_extension() const;
   const std::wstring& file_name() const;
+  std::wstring file_name_with_extension() const;
   const std::wstring& release_group() const;
   int release_version() const;
   const std::wstring& video_resolution() const;

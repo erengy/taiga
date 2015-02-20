@@ -375,13 +375,15 @@ void TorrentDialog::RefreshList() {
     std::wstring title, number, video;
     int group = kTorrentCategoryAnime;
     int icon = StatusToIcon(anime::kUnknownStatus);
+    const auto& file_extension = it->episode_data.file_extension();
     if (it->category == L"Batch" ||
         InStr(it->title, L"Vol.") > -1 ||
-        it->episode_data.file_extension().empty() ||
+        file_extension.empty() ||
         anime::IsEpisodeRange(it->episode_data)) {
       group = kTorrentCategoryBatch;
     } else if (!it->episode_data.episode_number() ||
-               !Meow.IsValidAnimeType(it->episode_data)) {
+               !Meow.IsValidAnimeType(it->episode_data) ||
+               !Meow.IsValidFileExtension(file_extension)) {
       group = kTorrentCategoryOther;
     }
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
@@ -411,7 +413,7 @@ void TorrentDialog::RefreshList() {
     list_.SetItem(index, 3, it->episode_data.file_size.c_str());
     list_.SetItem(index, 4, video.c_str());
     list_.SetItem(index, 5, it->description.c_str());
-    list_.SetItem(index, 6, it->episode_data.file_name().c_str());
+    list_.SetItem(index, 6, it->episode_data.file_name_with_extension().c_str());
     list_.SetCheckState(index, it->state == kFeedItemSelected);
   }
 

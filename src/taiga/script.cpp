@@ -389,7 +389,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"video", ENCODE(episode.video_terms()));
           REPLACE(L"audio", ENCODE(episode.audio_terms()));
           REPLACE(L"checksum", ENCODE(episode.file_checksum()));
-          REPLACE(L"file", ENCODE(episode.file_name()));
+          REPLACE(L"file", ENCODE(episode.file_name_with_extension()));
           REPLACE(L"folder", ENCODE(episode.folder));
           REPLACE(L"user", ENCODE(taiga::GetCurrentUsername()));
           REPLACE(L"manual", is_manual ? L"true" : L"");
