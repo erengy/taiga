@@ -442,7 +442,7 @@ int Engine::ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids,
     }
   } else {
     for (const auto& it : AnimeDatabase.items) {
-      if (ValidateOptions(episode, it.second, match_options))
+      if (ValidateOptions(episode, it.second, match_options, false))
         calculate_trigram_results(it.first);
     }
   }
