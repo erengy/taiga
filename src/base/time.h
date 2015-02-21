@@ -48,6 +48,8 @@ private:
   base::CompareResult Compare(const Date& date) const;
 };
 
+std::wstring GetRelativeTimeString(time_t unix_time);
+
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 
 Date GetDate();

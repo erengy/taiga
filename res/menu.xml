@@ -172,7 +172,7 @@
 		<item name="Score" action="user_rating" checked="1"/>
 		<item name="Type" action="anime_type" checked="1"/>
 		<item name="Season" action="anime_season" checked="1"/>
-		<item name="Last watched" action="user_last_watched" checked="1"/>
+		<item name="Last updated" action="user_last_updated" checked="1"/>
 		<item type="separator"/>
 		<item name="Reset to defaults" action="ResetAnimeListHeaders()"/>
 	</menu>

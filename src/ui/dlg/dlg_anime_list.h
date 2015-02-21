@@ -35,7 +35,7 @@ enum AnimeListColumn {
   kColumnAnimeStatus,
   kColumnAnimeTitle,
   kColumnAnimeType,
-  kColumnUserLastWatched,
+  kColumnUserLastUpdated,
   kColumnUserProgress,
   kColumnUserRating,
 };

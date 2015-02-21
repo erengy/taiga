@@ -1035,6 +1035,11 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
           if (!anime::IsValidDate(anime_item->GetDateStart()))
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
+        case kColumnUserLastUpdated:
+          if (anime_item->GetMyLastUpdated().empty() ||
+              anime_item->GetMyLastUpdated() == L"0")
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
       }
       // Indicate currently playing
       if (anime_item->GetPlaying()) {
@@ -1248,9 +1253,11 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnAnimeType:
         text = anime::TranslateType(anime_item.GetType()).c_str();
         break;
-      case kColumnUserLastWatched:
-        text = anime_item.GetMyLastUpdated().c_str();
+      case kColumnUserLastUpdated: {
+        time_t time_last_updated = _wtoi64(anime_item.GetMyLastUpdated().c_str());
+        text = GetRelativeTimeString(time_last_updated);
         break;
+      }
       case kColumnUserRating:
         text = anime::GetMyScore(anime_item).c_str();
         break;
@@ -1348,9 +1355,9 @@ void AnimeListDialog::ListView::InitializeColumns() {
   columns.insert(std::make_pair(kColumnAnimeSeason, ColumnData(
       {kColumnAnimeSeason, true, i, i++, 0, 90, 90, LVCFMT_RIGHT,
        L"Season", L"anime_season"})));
-  columns.insert(std::make_pair(kColumnUserLastWatched, ColumnData(
-      {kColumnUserLastWatched, false, i, i++, 0, 100, 100, LVCFMT_LEFT,
-       L"Last watched", L"user_last_watched"})));
+  columns.insert(std::make_pair(kColumnUserLastUpdated, ColumnData(
+      {kColumnUserLastUpdated, false, i, i++, 0, 100, 85, LVCFMT_CENTER,
+       L"Last updated", L"user_last_updated"})));
 }
 
 void AnimeListDialog::ListView::InsertColumns() {
@@ -1445,7 +1452,7 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"anime_status", kColumnAnimeStatus},
     {L"anime_title", kColumnAnimeTitle},
     {L"anime_type", kColumnAnimeType},
-    {L"user_last_watched", kColumnUserLastWatched},
+    {L"user_last_updated", kColumnUserLastUpdated},
     {L"user_progress", kColumnUserProgress},
     {L"user_rating", kColumnUserRating},
   };

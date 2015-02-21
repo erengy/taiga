@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cmath>
+
 #include "string.h"
 #include "time.h"
 
@@ -99,6 +101,48 @@ base::CompareResult Date::Compare(const Date& date) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+std::wstring GetRelativeTimeString(time_t unix_time) {
+  if (!unix_time)
+    return L"Unknown";
+
+  std::tm tm;
+  if (localtime_s(&tm, &unix_time)) {
+    return L"Unknown";
+  }
+
+  std::wstring str;
+  auto date_now = GetDate();
+
+  auto str_time = [](std::tm& tm, const char* format) {
+    std::string result(100, '\0');
+    std::strftime(&result.at(0), result.size(), format, &tm);
+    return StrToWstr(result);
+  };
+
+  if (1900 + tm.tm_year < date_now.year) {
+    str = Date(1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday);  // YYYY-MM-DD
+  } else if (tm.tm_mon + 1 < date_now.month) {
+    str = str_time(tm, "%B %d");  // January 1
+  } else {
+    time_t seconds = time(nullptr) - unix_time;
+    if (seconds >= 60 * 60 * 24) {
+      auto value = std::lround(static_cast<float>(seconds) / (60 * 60 * 24));
+      str = ToWstr(value) + (value == 1 ? L" day" : L" days");
+    } else if (seconds >= 60 * 60) {
+      auto value = std::lround(static_cast<float>(seconds) / (60 * 60));
+      str = ToWstr(value) + (value == 1 ? L" hour" : L" hours");
+    } else if (seconds >= 60) {
+      auto value = std::lround(static_cast<float>(seconds) / 60);
+      str = ToWstr(value) + (value == 1 ? L" minute" : L" minutes");
+    } else {
+      str = L"a moment";
+    }
+    str += L" ago";
+  }
+
+  return str;
+}
 
 void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
   // Get current time, expressed in UTC
