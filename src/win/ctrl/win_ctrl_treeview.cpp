@@ -71,6 +71,10 @@ LPARAM TreeView::GetItemData(HTREEITEM item) {
   return tvi.lParam;
 }
 
+HTREEITEM TreeView::GetNextItem(HTREEITEM item, UINT flag) {
+  return TreeView_GetNextItem(window_, item, flag);
+}
+
 HTREEITEM TreeView::GetSelection() {
   return TreeView_GetSelection(window_);
 }

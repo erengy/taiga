@@ -394,6 +394,7 @@ public:
   UINT       GetCount();
   BOOL       GetItem(LPTVITEM item);
   LPARAM     GetItemData(HTREEITEM item);
+  HTREEITEM  GetNextItem(HTREEITEM item, UINT flag);
   HTREEITEM  GetSelection();
   HTREEITEM  HitTest(LPTVHITTESTINFO hti, bool get_cursor_pos = false);
   HTREEITEM  InsertItem(LPCWSTR text, int image, LPARAM param,

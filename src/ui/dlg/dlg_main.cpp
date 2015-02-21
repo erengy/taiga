@@ -174,11 +174,11 @@ void MainDialog::CreateDialogControls() {
 
   // Insert treeview items
   treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ui::kIcon16_Play, kSidebarItemNowPlaying, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(nullptr, -1, kSidebarItemSeparator1, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Anime List", ui::kIcon16_DocumentA, kSidebarItemAnimeList, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"History", ui::kIcon16_Clock, kSidebarItemHistory, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Statistics", ui::kIcon16_Chart, kSidebarItemStats, nullptr));
-  treeview.hti.push_back(treeview.InsertItem(nullptr, -1, -1, nullptr));
+  treeview.hti.push_back(treeview.InsertItem(nullptr, -1, kSidebarItemSeparator2, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Search", ui::kIcon16_Search, kSidebarItemSearch, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Seasons", ui::kIcon16_Calendar, kSidebarItemSeasons, nullptr));
   treeview.hti.push_back(treeview.InsertItem(L"Torrents", ui::kIcon16_Feed, kSidebarItemFeeds, nullptr));

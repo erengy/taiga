@@ -43,13 +43,15 @@ enum SearchMode {
 };
 
 enum SidebarItems {
-  kSidebarItemNowPlaying = 0,
-  kSidebarItemAnimeList = 2,
-  kSidebarItemHistory = 3,
-  kSidebarItemStats = 4,
-  kSidebarItemSearch = 6,
-  kSidebarItemSeasons = 7,
-  kSidebarItemFeeds = 8
+  kSidebarItemNowPlaying,
+  kSidebarItemSeparator1,
+  kSidebarItemAnimeList,
+  kSidebarItemHistory,
+  kSidebarItemStats,
+  kSidebarItemSeparator2,
+  kSidebarItemSearch,
+  kSidebarItemSeasons,
+  kSidebarItemFeeds
 };
 
 class MainDialog : public win::Dialog {
@@ -115,6 +117,7 @@ public:
   class MainTree : public win::TreeView {
   public:
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    bool IsSeparator(int page);
     BOOL IsVisible();
     void RefreshHistoryCounter();
     std::vector<HTREEITEM> hti;

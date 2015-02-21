@@ -41,8 +41,7 @@ LRESULT MainDialog::MainTree::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
     case WM_SETCURSOR: {
       TVHITTESTINFO ht = {0};
       HitTest(&ht, true);
-      int index = GetItemData(ht.hItem);
-      if (index == -1) {
+      if (IsSeparator(GetItemData(ht.hItem))) {
         SetSharedCursor(IDC_ARROW);
         return TRUE;
       }
@@ -58,6 +57,16 @@ void MainDialog::MainTree::RefreshHistoryCounter() {
   int count = History.queue.GetItemCount();
   if (count > 0) text += L" (" + ToWstr(count) + L")";
   SetItem(hti.at(kSidebarItemHistory), text.c_str());
+}
+
+bool MainDialog::MainTree::IsSeparator(int page) {
+  switch (page) {
+    case kSidebarItemSeparator1:
+    case kSidebarItemSeparator2:
+      return true;
+    default:
+      return false;
+  }
 }
 
 BOOL MainDialog::MainTree::IsVisible() {
@@ -82,7 +91,7 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
           return CDRF_NOTIFYPOSTPAINT;
         case CDDS_ITEMPOSTPAINT: {
           // Draw separator
-          if (pCD->nmcd.lItemlParam == -1) {
+          if (treeview.IsSeparator(pCD->nmcd.lItemlParam)) {
             win::Rect rcItem = pCD->nmcd.rc;
             win::Dc hdc = pCD->nmcd.hdc;
             hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DFACE));
@@ -106,19 +115,21 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
         case TVC_UNKNOWN:
           break;
         case TVC_BYMOUSE:
-        case TVC_BYKEYBOARD:
+        case TVC_BYKEYBOARD: {
+          int old_page = pnmtv->itemOld.lParam;
+          int new_page = pnmtv->itemNew.lParam;
           // Prevent selection of separators
-          if (pnmtv->itemNew.lParam == -1) {
-            if (pnmtv->action == TVC_BYKEYBOARD) {
-              // TODO: Should work upwards too
-              HTREEITEM hti = TreeView_GetNextItem(treeview.GetWindowHandle(),
-                                                   pnmtv->itemNew.hItem, TVGN_NEXT);
-              navigation.SetCurrentPage(treeview.GetItemData(hti));
-            }
-            return TRUE;
+          if (treeview.IsSeparator(new_page) &&
+              pnmtv->action == TVC_BYKEYBOARD) {
+            UINT flag = new_page > old_page ? TVGN_NEXT : TVGN_PREVIOUS;
+            HTREEITEM hti = treeview.GetNextItem(pnmtv->itemNew.hItem, flag);
+            if (hti)
+              new_page = treeview.GetItemData(hti);
           }
-          navigation.SetCurrentPage(pnmtv->itemNew.lParam);
-          break;
+          if (!treeview.IsSeparator(new_page))
+            navigation.SetCurrentPage(new_page);
+          return TRUE;
+        }
       }
       break;
     }
