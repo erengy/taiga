@@ -1161,7 +1161,6 @@ void AnimeListDialog::RefreshList(int index) {
 
   // Disable drawing
   listview.SetRedraw(FALSE);
-  listview.Hide();
 
   // Clear list
   listview.DeleteAllItems();
@@ -1228,7 +1227,6 @@ void AnimeListDialog::RefreshList(int index) {
   listview.SetRedraw(TRUE);
   listview.RedrawWindow(nullptr, nullptr,
                         RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
-  listview.Show(SW_SHOW);
 }
 
 void AnimeListDialog::RefreshListItem(int anime_id) {
