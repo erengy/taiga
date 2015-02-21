@@ -207,10 +207,12 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       switch (navigation.GetCurrentPage()) {
         case kSidebarItemAnimeList:
           if (search_bar.filters.text != text) {
-            search_bar.filters.text = text;
-            DlgAnimeList.RefreshList();
-            DlgAnimeList.RefreshTabs();
-            return TRUE;
+            if (text.empty() || text.size() > 1) {
+              search_bar.filters.text = text;
+              DlgAnimeList.RefreshList();
+              DlgAnimeList.RefreshTabs();
+              return TRUE;
+            }
           }
           break;
         case kSidebarItemSeasons:
