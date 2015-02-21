@@ -262,10 +262,12 @@ bool AppSettings::Load() {
   foreach_xmlnode_(column, node_list_columns, L"column") {
     std::wstring name = column.attribute(L"name").value();
     auto column_type = ui::AnimeListDialog::ListView::TranslateColumnName(name);
-    auto& data = ui::DlgAnimeList.listview.columns[column_type];
-    data.order = column.attribute(L"order").as_int();
-    data.visible = column.attribute(L"visible").as_bool();
-    data.width = column.attribute(L"width").as_int();
+    if (column_type != ui::kColumnUnknown) {
+      auto& data = ui::DlgAnimeList.listview.columns[column_type];
+      data.order = column.attribute(L"order").as_int();
+      data.visible = column.attribute(L"visible").as_bool();
+      data.width = column.attribute(L"width").as_int();
+    }
   }
 
   // Torrent application path

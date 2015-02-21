@@ -292,20 +292,14 @@ LRESULT AnimeListDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      // Set client area
-      win::Rect rcWindow(0, 0, size.cx, size.cy);
       // Resize tab
-      rcWindow.left -= 1;
+      win::Rect rcWindow(-1, 0, size.cx + 3, size.cy + 2);
       if (win::GetVersion() < win::kVersion8)
         rcWindow.top -= 1;
-      rcWindow.right += 3;
-      rcWindow.bottom += 2;
       tab.SetPosition(nullptr, rcWindow);
       // Resize list
       tab.AdjustRect(nullptr, FALSE, &rcWindow);
-      rcWindow.left -= 3;
-      rcWindow.top -= 1;
-      rcWindow.bottom += 2;
+      rcWindow.Set(0, rcWindow.top - 1, size.cx, size.cy);
       listview.SetPosition(nullptr, rcWindow, 0);
     }
   }
@@ -390,11 +384,13 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   if (anime_item->GetMyStatus() != anime::kDropped) {
     if (anime_item->GetMyStatus() != anime::kCompleted ||
         anime_item->GetMyRewatching()) {
-      if (anime_item->GetMyLastWatchedEpisode() > 0)
-        button_visible[0] = true;
-      if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
-          !anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-        button_visible[1] = true;
+      if (columns[kColumnUserProgress].visible) {
+        if (anime_item->GetMyLastWatchedEpisode() > 0)
+          button_visible[0] = true;
+        if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
+            !anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
+            button_visible[1] = true;
+      }
 
       win::Rect rect_item;
       GetSubItemRect(index, columns[kColumnUserProgress].index, &rect_item);
@@ -439,12 +435,13 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     }
   }
 
-  button_visible[2] = true;
-
-  win::Rect rect_item;
-  GetSubItemRect(index, columns[kColumnUserRating].index, &rect_item);
-  rect_item.Inflate(-4, -2);
-  button_rect[2].Copy(rect_item);
+  if (columns[kColumnUserRating].visible) {
+    win::Rect rect_item;
+    GetSubItemRect(index, columns[kColumnUserRating].index, &rect_item);
+    rect_item.Inflate(-4, -2);
+    button_rect[2].Copy(rect_item);
+    button_visible[2] = true;
+  }
 }
 
 LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -1343,10 +1340,10 @@ void AnimeListDialog::ListView::InitializeColumns() {
   int i = 0;
 
   columns.insert(std::make_pair(kColumnAnimeStatus, ColumnData(
-      {kColumnAnimeStatus, true, i, i++, 0, 22, 22, LVCFMT_LEFT,
+      {kColumnAnimeStatus, true, i, i++, 0, 22, 22, LVCFMT_CENTER,
        L"", L"anime_status"})));
   columns.insert(std::make_pair(kColumnAnimeTitle, ColumnData(
-      {kColumnAnimeTitle, true, i, i++, 0, 350, 100, LVCFMT_LEFT,
+      {kColumnAnimeTitle, true, i, i++, 0, 300, 100, LVCFMT_LEFT,
        L"Anime title", L"anime_title"})));
   columns.insert(std::make_pair(kColumnUserProgress, ColumnData(
       {kColumnUserProgress, true, i, i++, 0, 200, 100, LVCFMT_CENTER,
@@ -1374,8 +1371,7 @@ void AnimeListDialog::ListView::InsertColumns() {
       if (column.width < column.width_min)
         column.width = column.width_default;
       if (column.order == order) {
-        if (column.visible)
-          column.index = current_index++;
+        column.index = column.visible ? current_index++ : -1;
         break;
       }
     }

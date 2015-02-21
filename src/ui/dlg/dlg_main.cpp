@@ -324,7 +324,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           if (::GetFocus() == edit.GetWindowHandle()) {
             std::wstring text;
             edit.GetText(text);
-            if (text.empty()) break;
+            if (text.empty())
+              break;
             switch (search_bar.mode) {
               case kSearchModeService: {
                 ExecuteAction(L"SearchAnime(" + text + L")");
