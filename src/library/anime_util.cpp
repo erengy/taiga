@@ -448,6 +448,10 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
   History.queue.Add(history_item);
 }
 
+void SetMyLastUpdateToNow(Item& item) {
+  item.SetMyLastUpdated(ToWstr(time(nullptr)));
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {

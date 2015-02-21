@@ -54,6 +54,7 @@ bool IsDeletedFromList(Item& item);
 bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time);
 void UpdateList(Item& item, Episode& episode);
 void AddToQueue(Item& item, const Episode& episode, bool change_status);
+void SetMyLastUpdateToNow(Item& item);
 
 bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups);
 bool SetFansubFilter(int anime_id, const std::wstring& group_name);

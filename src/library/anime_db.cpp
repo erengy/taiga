@@ -558,6 +558,8 @@ void Database::UpdateItem(const HistoryItem& history_item) {
     DeleteListItem(anime_item->GetId());
   }
 
+  anime::SetMyLastUpdateToNow(*anime_item);
+
   SaveList();
 
   History.queue.Remove();
