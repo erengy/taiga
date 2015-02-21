@@ -742,6 +742,15 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
             } else if (pnkd->wVKey == 'P') {
               anime::PlayNextEpisode(anime_id);
             }
+          } else {
+            wchar_t c = MapVirtualKey(pnkd->wVKey, MAPVK_VK_TO_CHAR);
+            if (c > ' ') {
+              auto text = ToLower_Copy(std::wstring(1, c));
+              DlgMain.edit.SetText(text);
+              DlgMain.edit.SetSel(1, -1);
+              DlgMain.edit.SetFocus();
+              return TRUE;
+            }
           }
           break;
         }
