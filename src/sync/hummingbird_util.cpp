@@ -19,6 +19,7 @@
 #include "base/file.h"
 #include "base/log.h"
 #include "base/string.h"
+#include "base/time.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "sync/hummingbird_util.h"
@@ -118,8 +119,14 @@ std::wstring TranslateDateFrom(const std::wstring& value) {
   if (value.size() < 10)
     return Date();
 
-  // Get YYYY-MM-DD from YYYY-MM-DDTHH:MM:SS.000Z
+  // Get YYYY-MM-DD from YYYY-MM-DDTHH:MM:SS.000Z (ISO 8601)
   return value.substr(0, 10);
+}
+
+std::wstring TranslateMyLastUpdatedFrom(const std::wstring& value) {
+  // Get Unix time from ISO 8601
+  auto result = ConvertIso8601(value);
+  return result != -1 ? ToWstr(result) : std::wstring();
 }
 
 int TranslateMyStatusFrom(const std::wstring& value) {

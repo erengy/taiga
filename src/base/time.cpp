@@ -17,6 +17,7 @@
 */
 
 #include <cmath>
+#include <regex>
 
 #include "string.h"
 #include "time.h"
@@ -101,6 +102,45 @@ base::CompareResult Date::Compare(const Date& date) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+time_t ConvertIso8601(const std::wstring& datetime) {
+  // e.g.
+  // "2015-02-20T04:43:50"
+  // "2015-02-20T04:43:50.016Z"
+  // "2015-02-20T06:43:50.016+02:00"
+  static const std::wregex pattern(
+      L"(\\d{4})-(\\d{2})-(\\d{2})"
+      L"T(\\d{2}):(\\d{2}):(\\d{2})(?:[.,]\\d+)?"
+      L"(?:(?:([+-])(\\d{2}):(\\d{2}))|Z)?");
+
+  std::match_results<std::wstring::const_iterator> m;
+  time_t result = -1;
+
+  if (std::regex_match(datetime, m, pattern)) {
+    tm t = {0};
+    t.tm_year = ToInt(m[1].str()) - 1900;
+    t.tm_mon = ToInt(m[2].str()) - 1;
+    t.tm_mday = ToInt(m[3].str());
+    t.tm_hour = ToInt(m[4].str());
+    t.tm_min = ToInt(m[5].str());
+    t.tm_sec = ToInt(m[6].str());
+
+    if (m[7].matched) {
+      int sign = m[7].str() == L"+" ? 1 : -1;
+      t.tm_hour += sign * ToInt(m[8].str());
+      t.tm_min += sign * ToInt(m[9].str());
+    }
+
+    long timezone_difference = 0;
+    if (_get_timezone(&timezone_difference) == 0) {
+      t.tm_sec -= timezone_difference;  // mktime uses the current time zone
+    }
+
+    result = mktime(&t);
+  }
+
+  return result;
+}
 
 std::wstring GetRelativeTimeString(time_t unix_time) {
   if (!unix_time)

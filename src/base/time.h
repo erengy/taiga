@@ -50,6 +50,8 @@ private:
 
 std::wstring GetRelativeTimeString(time_t unix_time);
 
+time_t ConvertIso8601(const std::wstring& datetime);
+
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 
 Date GetDate();
