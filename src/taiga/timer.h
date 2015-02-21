@@ -24,7 +24,8 @@
 namespace taiga {
 
 enum TimerIds {
-  kTimerHistory = 1,
+  kTimerAnimeList = 1,
+  kTimerHistory,
   kTimerLibrary,
   kTimerMedia,
   kTimerMemory,

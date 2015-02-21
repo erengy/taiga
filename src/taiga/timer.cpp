@@ -32,12 +32,14 @@
 #include "track/feed.h"
 #include "track/media.h"
 #include "track/search.h"
+#include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_stats.h"
 #include "ui/dlg/dlg_torrent.h"
 
 namespace taiga {
 
+Timer timer_anime_list(kTimerAnimeList, 60);    //  1 minute
 Timer timer_history(kTimerHistory, 5 * 60);     //  5 minutes
 Timer timer_library(kTimerLibrary, 30 * 60);    // 30 minutes
 Timer timer_media(kTimerMedia, 2 * 60, false);  //  2 minutes
@@ -58,6 +60,10 @@ void Timer::OnTimeout() {
                   L"Interval: " + ToWstr(static_cast<int>(this->interval())));
 
   switch (id()) {
+    case kTimerAnimeList:
+      ui::DlgAnimeList.listview.RefreshLastUpdateColumn();
+      break;
+
     case kTimerHistory:
       if (!History.queue.updating)
         History.queue.Check(true);
@@ -103,6 +109,7 @@ void TimerManager::Initialize() {
   base::TimerManager::Initialize(nullptr, TimerProc);
 
   // Attach timers to the manager
+  InsertTimer(&timer_anime_list);
   InsertTimer(&timer_history);
   InsertTimer(&timer_library);
   InsertTimer(&timer_media);

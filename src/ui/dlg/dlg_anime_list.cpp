@@ -28,6 +28,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "taiga/timer.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_torrent.h"
@@ -1195,6 +1196,10 @@ void AnimeListDialog::RefreshList(int index) {
     RefreshListItemColumns(i, anime_item);
   }
 
+  auto timer = taiga::timers.timer(taiga::kTimerAnimeList);
+  if (timer)
+    timer->Reset();
+
   // Set group headers
   if (group_view) {
     for (int i = anime::kMyStatusFirst; i < anime::kMyStatusLast; i++) {
@@ -1434,6 +1439,27 @@ void AnimeListDialog::ListView::RefreshColumns(bool reset) {
     InitializeColumns();
   InsertColumns();
   parent->RefreshList();
+}
+
+void AnimeListDialog::ListView::RefreshLastUpdateColumn() {
+  const auto& column = columns[kColumnUserLastUpdated];
+
+  if (!column.visible)
+    return;
+
+  int item_count = GetItemCount();
+  time_t time_now = time(nullptr);
+
+  for (int i = 0; i < item_count; ++i) {
+    auto anime_item = AnimeDatabase.FindItem(GetItemParam(i));
+    if (!anime_item)
+      continue;
+    time_t time_last_updated = _wtoi64(anime_item->GetMyLastUpdated().c_str());
+    if ((time_now - time_last_updated) < 60 * 60 * 24) {
+      std::wstring text = GetRelativeTimeString(time_last_updated);
+      SetItem(i, column.index, text.c_str());
+    }
+  }
 }
 
 void AnimeListDialog::ListView::SetColumnSize(int index, unsigned short width) {

@@ -101,6 +101,7 @@ public:
     void SetColumnSize(int index, unsigned short width);
     AnimeListColumn FindColumnAtSubItemIndex(int index);
     void RefreshColumns(bool reset = false);
+    void RefreshLastUpdateColumn();
     static AnimeListColumn TranslateColumnName(const std::wstring& name);
 
     win::Rect button_rect[3];
