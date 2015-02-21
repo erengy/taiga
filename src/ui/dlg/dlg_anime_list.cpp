@@ -321,9 +321,25 @@ AnimeListDialog::ListView::ListView()
   button_visible[2] = false;
 }
 
-int AnimeListDialog::ListView::GetSortType(int column) {
-  auto column_type = FindColumnAtSubItemIndex(column);
-  switch (column_type) {
+int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
+  switch (column) {
+    case kColumnAnimeSeason:
+    case kColumnAnimeStatus:
+    case kColumnAnimeType:
+    case kColumnUserLastUpdated:
+    case kColumnUserProgress:
+    case kColumnUserRating:
+      return -1;
+    case kColumnAnimeTitle:
+    default:
+      return 1;
+  }
+}
+
+int AnimeListDialog::ListView::GetSortType(AnimeListColumn column) {
+  switch (column) {
+    case kColumnUserLastUpdated:
+      return ui::kListSortLastUpdated;
     case kColumnUserProgress:
       return ui::kListSortProgress;
     case kColumnUserRating:
@@ -335,6 +351,18 @@ int AnimeListDialog::ListView::GetSortType(int column) {
     default:
       return ui::kListSortDefault;
   }
+}
+
+void AnimeListDialog::ListView::SortFromSettings() {
+  auto sort_column = TranslateColumnName(Settings[taiga::kApp_List_SortColumn]);
+
+  if (sort_column == kColumnUnknown)
+    sort_column = kColumnAnimeTitle;
+
+  win::ListView::Sort(columns[sort_column].index,
+                      Settings.GetInt(taiga::kApp_List_SortOrder),
+                      GetSortType(sort_column),
+                      ui::ListViewCompareProc);
 }
 
 void AnimeListDialog::ListView::RefreshItem(int index) {
@@ -492,11 +520,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     // Column click
     case LVN_COLUMNCLICK: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      int order = 1;
+      auto column_type = listview.FindColumnAtSubItemIndex(lplv->iSubItem);
+      int order = listview.GetDefaultSortOrder(column_type);
       if (lplv->iSubItem == listview.GetSortColumn())
         order = listview.GetSortOrder() * -1;
-      listview.Sort(lplv->iSubItem, order, listview.GetSortType(lplv->iSubItem), ui::ListViewCompareProc);
-      auto column_type = listview.FindColumnAtSubItemIndex(lplv->iSubItem);
+      listview.Sort(lplv->iSubItem, order, listview.GetSortType(column_type), ui::ListViewCompareProc);
       Settings.Set(taiga::kApp_List_SortColumn, listview.columns[column_type].key);
       Settings.Set(taiga::kApp_List_SortOrder, order);
       break;
@@ -1172,13 +1200,7 @@ void AnimeListDialog::RefreshList(int index) {
   }
 
   // Sort items
-  auto sort_column = listview.TranslateColumnName(Settings[taiga::kApp_List_SortColumn]);
-  if (sort_column == kColumnUnknown)
-    sort_column = kColumnAnimeTitle;
-  listview.Sort(listview.columns[sort_column].index,
-                Settings.GetInt(taiga::kApp_List_SortOrder),
-                listview.GetSortType(listview.columns[sort_column].index),
-                ui::ListViewCompareProc);
+  listview.SortFromSettings();
 
   if (current_position > -1) {
     if (current_position > listview.GetItemCount() - 1)
@@ -1201,6 +1223,7 @@ void AnimeListDialog::RefreshListItem(int anime_id) {
     if (anime_item)
       RefreshListItemColumns(index, *anime_item);
     listview.RedrawItems(index, index, true);
+    listview.SortFromSettings();
   }
 }
 

@@ -30,6 +30,15 @@
 
 namespace ui {
 
+template<class T>
+static int CompareValues(const T& first, const T& second) {
+  if (first != second)
+    return first < second ? base::kLessThan : base::kGreaterThan;
+  return base::kEqualTo;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
   UINT64 size[2] = {1, 1};
 
@@ -77,26 +86,11 @@ int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
     size[i] *= _wtoi(value.c_str());
   }
 
-  if (size[0] > size[1]) {
-    return base::kGreaterThan;
-  } else if (size[0] < size[1]) {
-    return base::kLessThan;
-  }
-
-  return base::kEqualTo;
+  return CompareValues<UINT64>(size[0], size[1]);
 }
 
 int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
-  int num1 = _wtoi(str1);
-  int num2 = _wtoi(str2);
-
-  if (num1 > num2) {
-    return base::kGreaterThan;
-  } else if (num1 < num2) {
-    return base::kLessThan;
-  }
-
-  return base::kEqualTo;
+  return CompareValues<int>(_wtoi(str1), _wtoi(str2));
 }
 
 int SortAsText(LPCWSTR str1, LPCWSTR str2) {
@@ -106,13 +100,7 @@ int SortAsText(LPCWSTR str1, LPCWSTR str2) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int SortListByAiringStatus(const anime::Item& item1, const anime::Item& item2) {
-  int status1 = item1.GetAiringStatus();
-  int status2 = item2.GetAiringStatus();
-
-  if (status1 != status2)
-    return status2 > status1 ? base::kGreaterThan : base::kLessThan;
-
-  return base::kEqualTo;
+  return CompareValues<int>(item1.GetAiringStatus(), item2.GetAiringStatus());
 }
 
 int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
@@ -132,51 +120,29 @@ int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
       date1.day = 31;
     if (!date2.day)
       date2.day = 31;
-
-    return date2 > date1 ? base::kGreaterThan : base::kLessThan;
   }
 
-  return base::kEqualTo;
+  return CompareValues<Date>(date1, date2);
 }
 
 int SortListByEpisodeCount(const anime::Item& item1, const anime::Item& item2) {
-  if (item1.GetEpisodeCount() > item2.GetEpisodeCount()) {
-    return base::kGreaterThan;
-  } else if (item1.GetEpisodeCount() < item2.GetEpisodeCount()) {
-    return base::kLessThan;
-  }
-
-  return base::kEqualTo;
+  return CompareValues<int>(item1.GetEpisodeCount(), item2.GetEpisodeCount());
 }
 
 int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
-  time_t time1 = _wtoi64(item1.GetMyLastUpdated().c_str());
-  time_t time2 = _wtoi64(item2.GetMyLastUpdated().c_str());
-
-  if (time1 > time2) {
-    return base::kGreaterThan;
-  } else if (time1 < time2) {
-    return base::kLessThan;
-  }
-
-  return base::kEqualTo;
+  return CompareValues<time_t>(_wtoi64(item1.GetMyLastUpdated().c_str()),
+                               _wtoi64(item2.GetMyLastUpdated().c_str()));
 }
 
 int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
   int val1 = item1.GetPopularity();
   int val2 = item2.GetPopularity();
 
-  if (val2 == 0) {
-    return base::kLessThan;
-  } else if (val1 == 0) {
-    return base::kGreaterThan;
-  } else if (val1 > val2) {
-    return base::kGreaterThan;
-  } else if (val1 < val2) {
-    return base::kLessThan;
-  }
+  if (val1 != val2)
+    if (val1 == 0 || val2 == 0)
+      return val2 == 0 ? base::kLessThan : base::kGreaterThan;
 
-  return base::kEqualTo;
+  return CompareValues<int>(val1, val2);
 }
 
 int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
@@ -186,15 +152,11 @@ int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
   anime::GetProgressRatios(item2, unused2, ratio2);
 
   if (ratio1 != ratio2) {
-    return ratio1 > ratio2 ? base::kLessThan : base::kGreaterThan;
+    return CompareValues<float>(ratio1, ratio2);
   } else {
-    int total1 = anime::EstimateEpisodeCount(item1);
-    int total2 = anime::EstimateEpisodeCount(item2);
-    if (total1 != total2)
-      return total1 > total2 ? base::kLessThan : base::kGreaterThan;
+    return CompareValues<int>(anime::EstimateEpisodeCount(item1),
+                              anime::EstimateEpisodeCount(item2));
   }
-
-  return base::kEqualTo;
 }
 
 int SortListByMyScore(const anime::Item& item1, const anime::Item& item2) {
@@ -210,20 +172,11 @@ int SortListByMyScore(const anime::Item& item1, const anime::Item& item2) {
     }
   }
 
-  if (score1 != score2)
-    return score2 > score1 ? base::kGreaterThan : base::kLessThan;
-
-  return base::kEqualTo;
+  return CompareValues<double>(score1, score2);
 }
 
 int SortListByScore(const anime::Item& item1, const anime::Item& item2) {
-  double score1 = item1.GetScore();
-  double score2 = item2.GetScore();
-
-  if (score1 != score2)
-    return score1 > score2 ? base::kGreaterThan : base::kLessThan;
-
-  return base::kEqualTo;
+  return CompareValues<double>(item1.GetScore(), item2.GetScore());
 }
 
 int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
@@ -241,7 +194,7 @@ int SortListBySeason(const anime::Item& item1, const anime::Item& item2,
   auto season2 = anime::TranslateDateToSeason(item2.GetDateStart());
 
   if (season1 != season2)
-    return season2 > season1 ? base::kGreaterThan : base::kLessThan;
+    return CompareValues<anime::Season>(season1, season2);
 
   if (item1.GetAiringStatus() != item2.GetAiringStatus())
     return SortListByAiringStatus(item1, item2);

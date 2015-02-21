@@ -76,8 +76,10 @@ public:
     void DrawProgressBar(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
     void DrawScoreBox(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
 
-    int GetSortType(int column);
+    int GetDefaultSortOrder(AnimeListColumn column);
+    int GetSortType(AnimeListColumn column);
     void RefreshItem(int index);
+    void SortFromSettings();
 
     class ColumnData {
     public:
