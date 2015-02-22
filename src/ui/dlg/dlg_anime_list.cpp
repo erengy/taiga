@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <WindowsX.h>
+
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -261,6 +263,51 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         dc.DetachDc();
         return TRUE;
+      }
+      break;
+    }
+
+    // Context menu
+    case WM_CONTEXTMENU: {
+      auto hwnd_from = reinterpret_cast<HWND>(wParam);
+      POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+      HDHITTESTINFO hti = {0};
+      hti.pt = pt;
+      ::ScreenToClient(listview.GetHeader(), &hti.pt);
+      ::SendMessage(listview.GetHeader(), HDM_HITTEST, 0, reinterpret_cast<LPARAM>(&hti));
+      if ((hti.flags & HHT_ONHEADER) || (hti.flags & HHT_NOWHERE))
+        hwnd_from = listview.GetHeader();
+      if (hwnd_from == listview.GetWindowHandle()) {
+        if (listview.GetSelectedCount() > 0) {
+          if (pt.x == -1 || pt.y == -1) {
+            win::Rect rect;
+            int item_index = listview.GetNextItem(-1, LVIS_SELECTED);
+            listview.GetSubItemRect(item_index, 0, &rect);
+            pt = {rect.left, rect.bottom};
+            ::ClientToScreen(listview.GetWindowHandle(), &pt);
+          }
+          std::wstring menu_name = L"RightClick";
+          int index = listview.HitTest(true);
+          if (kColumnUserRating == listview.FindColumnAtSubItemIndex(index))
+            menu_name = L"EditScore";
+          ui::Menus.UpdateAll(GetCurrentItem());
+          ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y,
+                        menu_name.c_str()), 0, GetCurrentId());
+        }
+      } else if (hwnd_from == listview.GetHeader()) {
+        ui::Menus.UpdateAnimeListHeaders();
+        auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"AnimeListHeaders");
+        if (!action.empty()) {
+          bool reset = false;
+          if (action == L"ResetAnimeListHeaders()") {
+            reset = true;
+          } else {
+            auto column_type = listview.TranslateColumnName(action);
+            auto& column = listview.columns[column_type];
+            column.visible = !column.visible;
+          }
+          listview.RefreshColumns(reset);
+        }
       }
       break;
     }
@@ -619,47 +666,6 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       break;
     }
 
-    // Right click
-    case NM_RCLICK: {
-      if (pnmh->hwndFrom == listview.GetWindowHandle()) {
-        if (listview.GetSelectedCount() > 0) {
-          int anime_id = GetCurrentId();
-          auto anime_item = GetCurrentItem();
-          ui::Menus.UpdateAll(anime_item);
-          if (anime_item->IsInList()) {
-            int index = listview.HitTest(true);
-            switch (listview.FindColumnAtSubItemIndex(index)) {
-              case kColumnUserRating:
-                ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"EditScore"), 0, anime_id);
-                break;
-              default:
-                ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"RightClick"), 0, anime_id);
-                break;
-            }
-            ui::Menus.UpdateAll(anime_item);
-          } else {
-            ui::Menus.UpdateSearchList(true);
-            ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"SearchList"), 0, anime_id);
-          }
-        }
-      } else if (pnmh->hwndFrom == listview.GetHeader()) {
-        ui::Menus.UpdateAnimeListHeaders();
-        auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"AnimeListHeaders");
-        if (!action.empty()) {
-          bool reset = false;
-          if (action == L"ResetAnimeListHeaders()") {
-            reset = true;
-          } else {
-            auto column_type = listview.TranslateColumnName(action);
-            auto& column = listview.columns[column_type];
-            column.visible = !column.visible;
-          }
-          listview.RefreshColumns(reset);
-        }
-      }
-      break;
-    }
-
     // Text callback
     case LVN_GETDISPINFO: {
       NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(lParam);
@@ -710,18 +716,6 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         case VK_DELETE: {
           if (listview.GetSelectedCount() > 0)
             ExecuteAction(L"EditDelete()", 0, anime_id);
-          break;
-        }
-        // Context menu
-        case VK_APPS: {
-          if (listview.GetSelectedCount() > 0) {
-            int item_index = listview.GetNextItem(-1, LVIS_SELECTED);
-            win::Rect rect;
-            listview.GetSubItemRect(item_index, 0, &rect);
-            POINT pt = {rect.left, rect.bottom};
-            ::ClientToScreen(listview.GetWindowHandle(), &pt);
-            ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"RightClick"), 0, anime_id);
-          }
           break;
         }
         // Various
