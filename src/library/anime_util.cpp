@@ -606,7 +606,7 @@ bool IsValidEpisodeCount(int number) {
 
 bool IsValidEpisodeNumber(int number, int total) {
   if ((number < 0) ||
-      (number > total && total != 0))
+      (number > total && IsValidEpisodeCount(total)))
     return false;
 
   return true;
