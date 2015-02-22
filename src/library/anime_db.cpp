@@ -492,8 +492,6 @@ void Database::AddToList(int anime_id, int status) {
 }
 
 void Database::ClearUserData() {
-  ui::DlgAnimeList.SetCurrentId(ID_UNKNOWN);
-
   foreach_(it, items)
     it->second.RemoveFromUserList();
 }

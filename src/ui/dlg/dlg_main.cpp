@@ -604,10 +604,9 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case WM_RBUTTONUP: {
-        ui::Menus.UpdateAll(DlgAnimeList.GetCurrentItem());
         SetForegroundWindow();
+        ui::Menus.UpdateAll();
         ExecuteAction(ui::Menus.Show(GetWindowHandle(), 0, 0, L"Tray"));
-        ui::Menus.UpdateAll(DlgAnimeList.GetCurrentItem());
         break;
       }
     }

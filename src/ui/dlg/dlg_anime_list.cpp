@@ -46,8 +46,7 @@ namespace ui {
 AnimeListDialog DlgAnimeList;
 
 AnimeListDialog::AnimeListDialog()
-    : current_id_(anime::ID_UNKNOWN),
-      current_status_(anime::kWatching) {
+    : current_status_(anime::kWatching) {
 }
 
 BOOL AnimeListDialog::OnInitDialog() {
@@ -151,6 +150,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         ReleaseCapture();
 
         int anime_id = GetCurrentId();
+        auto anime_ids = GetCurrentIds();
         auto anime_item = GetCurrentItem();
         if (!anime_item)
           break;
@@ -159,9 +159,12 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (tab_index > -1) {
           int status = tab.GetItemParam(tab_index);
           if (anime_item->IsInList()) {
-            ExecuteAction(L"EditStatus(" + ToWstr(status) + L")", 0, anime_id);
+            ExecuteAction(L"EditStatus(" + ToWstr(status) + L")", 0,
+                          reinterpret_cast<LPARAM>(&anime_ids));
           } else {
-            AnimeDatabase.AddToList(anime_id, status);
+            for (const auto& id : anime_ids) {
+              AnimeDatabase.AddToList(id, status);
+            }
           }
           break;
         }
@@ -287,12 +290,18 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
             ::ClientToScreen(listview.GetWindowHandle(), &pt);
           }
           std::wstring menu_name = L"RightClick";
-          int index = listview.HitTest(true);
-          if (kColumnUserRating == listview.FindColumnAtSubItemIndex(index))
+          LPARAM parameter = GetCurrentId();
+          auto anime_ids = GetCurrentIds();
+          if (kColumnUserRating == listview.FindColumnAtSubItemIndex(listview.HitTest(true))) {
             menu_name = L"EditScore";
+            parameter = reinterpret_cast<LPARAM>(&anime_ids);
+          } else if (listview.GetSelectedCount() > 1) {
+            menu_name = L"Edit";
+            parameter = reinterpret_cast<LPARAM>(&anime_ids);
+          }
           ui::Menus.UpdateAll(GetCurrentItem());
           ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y,
-                        menu_name.c_str()), 0, GetCurrentId());
+                        menu_name.c_str()), 0, parameter);
         }
       } else if (hwnd_from == listview.GetHeader()) {
         ui::Menus.UpdateAnimeListHeaders();
@@ -412,6 +421,9 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     button_rect[i].SetEmpty();
     button_visible[i] = false;
   }
+
+  if (GetSelectedCount() > 1)
+    index = -1;
 
   hot_item = index;
 
@@ -575,19 +587,10 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       break;
     }
 
-    // Delete all items
-    case LVN_DELETEALLITEMS: {
-      SetCurrentId(anime::ID_UNKNOWN);
-      listview.button_visible[0] = false;
-      listview.button_visible[1] = false;
-      break;
-    }
-
     // Item select
     case LVN_ITEMCHANGED: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
       auto anime_id = static_cast<int>(lplv->lParam);
-      SetCurrentId(anime_id);
       if (lplv->uNewState)
         listview.RefreshItem(lplv->iItem);
       break;
@@ -644,6 +647,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (pnmh->hwndFrom == listview.GetWindowHandle()) {
         if (listview.GetSelectedCount() > 0) {
           int anime_id = GetCurrentId();
+          auto anime_ids = GetCurrentIds();
           auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(lParam);
           if (listview.button_visible[0] &&
               listview.button_rect[0].PtIn(lpnmitem->ptAction)) {
@@ -656,7 +660,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
             POINT pt = {listview.button_rect[2].left, listview.button_rect[2].bottom};
             ClientToScreen(listview.GetWindowHandle(), &pt);
             ui::Menus.UpdateAnime(GetCurrentItem());
-            ExecuteAction(ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"EditScore"), 0, anime_id);
+            ExecuteAction(ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"EditScore"), 0,
+                          reinterpret_cast<LPARAM>(&anime_ids));
           }
           int list_index = GetListIndex(GetCurrentId());
           listview.RefreshItem(list_index);
@@ -693,9 +698,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case LVN_KEYDOWN: {
       LPNMLVKEYDOWN pnkd = reinterpret_cast<LPNMLVKEYDOWN>(lParam);
       int anime_id = GetCurrentId();
-      auto anime_item = GetCurrentItem();
+      auto anime_ids = GetCurrentIds();
       switch (pnkd->wVKey) {
         case VK_RETURN: {
+          if (!anime::IsValidId(anime_id))
+            break;
           switch (Settings.GetInt(taiga::kApp_List_DoubleClickAction)) {
             case 1:
               ShowDlgAnimeEdit(anime_id);
@@ -714,27 +721,36 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         }
         // Delete item
         case VK_DELETE: {
-          if (listview.GetSelectedCount() > 0)
-            ExecuteAction(L"EditDelete()", 0, anime_id);
-          break;
+          if (!anime::IsValidId(anime_id))
+            break;
+          ExecuteAction(L"EditDelete()", 0, reinterpret_cast<LPARAM>(&anime_ids));
+          return TRUE;
         }
         // Various
         default: {
-          if (listview.GetSelectedCount() > 0 &&
-              GetKeyState(VK_CONTROL) & 0x8000) {
+          if (GetKeyState(VK_CONTROL) & 0x8000) {
+            if (!anime::IsValidId(anime_id))
+              break;
             // Edit episode
             if (pnkd->wVKey == VK_ADD) {
               anime::IncrementEpisode(anime_id);
+              return TRUE;
             } else if (pnkd->wVKey == VK_SUBTRACT) {
               anime::DecrementEpisode(anime_id);
+              return TRUE;
             // Edit score
             } else if (pnkd->wVKey >= '0' && pnkd->wVKey <= '9') {
-              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - '0') + L")", 0, anime_id);
+              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - '0') + L")", 0,
+                            reinterpret_cast<LPARAM>(&anime_ids));
+              return TRUE;
             } else if (pnkd->wVKey >= VK_NUMPAD0 && pnkd->wVKey <= VK_NUMPAD9) {
-              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - VK_NUMPAD0) + L")", 0, anime_id);
+              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - VK_NUMPAD0) + L")", 0,
+                            reinterpret_cast<LPARAM>(&anime_ids));
+              return TRUE;
             // Play next episode
             } else if (pnkd->wVKey == 'P') {
               anime::PlayNextEpisode(anime_id);
+              return TRUE;
             }
           } else {
             wchar_t c = MapVirtualKey(pnkd->wVKey, MAPVK_VK_TO_CHAR);
@@ -1101,31 +1117,35 @@ LRESULT AnimeListDialog::OnTabNotify(LPARAM lParam) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int AnimeListDialog::GetCurrentId() {
-  if (anime::IsValidId(current_id_))
-    if (!AnimeDatabase.FindItem(current_id_))
-      current_id_ = anime::ID_UNKNOWN;
+  int index = listview.GetNextItem(-1, LVIS_SELECTED);
 
-  return current_id_;
+  if (index > -1) {
+    if (listview.GetSelectedCount() > 1) {
+      int focused_index = listview.GetNextItem(-1, LVIS_FOCUSED);
+      if (focused_index > -1)
+        index = focused_index;
+    }
+    int anime_id = listview.GetItemParam(index);
+    if (anime::IsValidId(anime_id))
+      return anime_id;
+  }
+
+  return anime::ID_UNKNOWN;
+}
+
+std::vector<int> AnimeListDialog::GetCurrentIds() {
+  std::vector<int> ids;
+
+  int index = -1;
+  while ((index = listview.GetNextItem(index, LVIS_SELECTED)) > -1) {
+    ids.push_back(listview.GetItemParam(index));
+  };
+
+  return ids;
 }
 
 anime::Item* AnimeListDialog::GetCurrentItem() {
-  anime::Item* item = nullptr;
-
-  if (anime::IsValidId(current_id_)) {
-    item = AnimeDatabase.FindItem(current_id_);
-    if (!item)
-      current_id_ = anime::ID_UNKNOWN;
-  }
-
-  return item;
-}
-
-void AnimeListDialog::SetCurrentId(int anime_id) {
-  if (anime::IsValidId(anime_id))
-    if (!AnimeDatabase.FindItem(anime_id))
-      anime_id = anime::ID_UNKNOWN;
-
-  current_id_ = anime_id;
+  return AnimeDatabase.FindItem(GetCurrentId());
 }
 
 int AnimeListDialog::GetListIndex(int anime_id) {

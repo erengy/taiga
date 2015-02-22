@@ -101,7 +101,7 @@
 	<menu name="RightClick">
 		<item name="Information" action="Info()"/>
 		<item type="separator"/>
-		<item name="Edit" sub="Edit"/>
+		<item name="Edit" action="EditAll()"/>
 		<item name="Search" sub="Search"/>
 		<item type="separator"/>
 		<item name="Open folder" action="OpenFolder()"/>
@@ -115,15 +115,12 @@
 	</menu>
 	<!-- Edit -->
 	<menu name="Edit">
-		<item name="Edit all..." action="EditAll()"/>
+		<item name="Set episode..." action="EditEpisode()"/>
+		<item name="Set score"         sub="EditScore"/>
+		<item name="Set status"        sub="EditStatus"/>
+		<item name="Set tags..."    action="EditTags()"/>
 		<item type="separator"/>
-		<item name="Episode..."  action="EditEpisode()"/>
-		<item name="Score"          sub="EditScore"/>
-		<item name="Status"         sub="EditStatus"/>
-		<item name="Tags..."     action="EditTags()"/>
-		<item name="Titles..."   action="EditTitles()"/>
-		<item type="separator"/>
-		<item name="Delete"      action="EditDelete()"/>
+		<item name="Delete from list..." action="EditDelete()"/>
 	</menu>
 	<!-- Score -->
 	<menu name="EditScore">

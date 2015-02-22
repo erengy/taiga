@@ -330,15 +330,19 @@ void OnLibraryUpdateFailure(int id, const string_t& reason) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool OnLibraryEntryEditDelete(int id) {
-  auto anime_item = AnimeDatabase.FindItem(id);
+bool OnLibraryEntriesEditDelete(const std::vector<int> ids) {
+  std::wstring content;
+  for (const auto& id : ids) {
+    auto anime_item = AnimeDatabase.FindItem(id);
+    AppendString(content, anime_item->GetTitle(), L"\n");
+  }
 
   win::TaskDialog dlg;
-  dlg.SetWindowTitle(L"Delete List Entry");
+  dlg.SetWindowTitle(L"Delete List Entries");
   dlg.SetMainIcon(TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Are you sure you want to delete this entry from "
+  dlg.SetMainInstruction(L"Are you sure you want to delete these anime from "
                          L"your list?");
-  dlg.SetContent(anime_item->GetTitle().c_str());
+  dlg.SetContent(content.c_str());
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());
@@ -346,15 +350,22 @@ bool OnLibraryEntryEditDelete(int id) {
   return dlg.GetSelectedButtonID() == IDYES;
 }
 
-int OnLibraryEntryEditEpisode(int id) {
-  auto anime_item = AnimeDatabase.FindItem(id);
+int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
+  std::set<int> current;
+  int number_max = 1900;
+  for (const auto& id : ids) {
+    auto anime_item = AnimeDatabase.FindItem(id);
+    current.insert(anime_item->GetMyLastWatchedEpisode());
+    if (anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
+      number_max = min(number_max, anime_item->GetEpisodeCount());
+  }
+  int value = current.size() == 1 ? *current.begin() : 0;
 
   InputDialog dlg;
-  dlg.SetNumbers(true, 0, anime_item->GetEpisodeCount(),
-                 anime_item->GetMyLastWatchedEpisode());
-  dlg.title = anime_item->GetTitle();
-  dlg.info = L"Please enter episode number for this title:";
-  dlg.text = ToWstr(anime_item->GetMyLastWatchedEpisode());
+  dlg.SetNumbers(true, 0, number_max, value);
+  dlg.title = L"Set Last Watched Episode Number";
+  dlg.info = L"Enter an episode number for the selected anime:";
+  dlg.text = ToWstr(value);
   dlg.Show(DlgMain.GetWindowHandle());
 
   if (dlg.result == IDOK)
@@ -363,34 +374,22 @@ int OnLibraryEntryEditEpisode(int id) {
   return -1;
 }
 
-bool OnLibraryEntryEditTags(int id, std::wstring& tags) {
-  auto anime_item = AnimeDatabase.FindItem(id);
+bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
+  std::set<std::wstring> current;
+  for (const auto& id : ids) {
+    auto anime_item = AnimeDatabase.FindItem(id);
+    current.insert(anime_item->GetMyTags());
+  }
+  std::wstring value = current.size() == 1 ? *current.begin() : L"";
 
   InputDialog dlg;
-  dlg.title = anime_item->GetTitle();
-  dlg.info = L"Please enter tags for this title, separated by a comma:";
-  dlg.text = anime_item->GetMyTags();
+  dlg.title = L"Set Tags";
+  dlg.info = L"Enter tags for the selected anime, separated by a comma:";
+  dlg.text = value;
   dlg.Show(DlgMain.GetWindowHandle());
 
   if (dlg.result == IDOK) {
     tags = dlg.text;
-    return true;
-  }
-
-  return false;
-}
-
-bool OnLibraryEntryEditTitles(int id, std::wstring& titles) {
-  auto anime_item = AnimeDatabase.FindItem(id);
-
-  InputDialog dlg;
-  dlg.title = anime_item->GetTitle();
-  dlg.info = L"Please enter alternative titles, separated by a semicolon:";
-  dlg.text = Join(anime_item->GetUserSynonyms(), L"; ");
-  dlg.Show(DlgMain.GetWindowHandle());
-
-  if (dlg.result == IDOK) {
-    titles = dlg.text;
     return true;
   }
 

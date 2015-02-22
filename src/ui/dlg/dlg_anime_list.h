@@ -54,8 +54,9 @@ public:
   LRESULT OnTabNotify(LPARAM lParam);
 
   int GetCurrentId();
+  std::vector<int> GetCurrentIds();
   anime::Item* GetCurrentItem();
-  void SetCurrentId(int anime_id);
+
   int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
   void RefreshListItem(int anime_id);
@@ -117,7 +118,6 @@ public:
   win::Tab tab;
 
 private:
-  int current_id_;
   int current_status_;
 };
 

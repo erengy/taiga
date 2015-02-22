@@ -55,10 +55,9 @@ void OnLibrarySearchTitle(int id, const string_t& results);
 void OnLibraryEntryChangeFailure(int id, const string_t& reason);
 void OnLibraryUpdateFailure(int id, const string_t& reason);
 
-bool OnLibraryEntryEditDelete(int id);
-int OnLibraryEntryEditEpisode(int id);
-bool OnLibraryEntryEditTags(int id, std::wstring& tags);
-bool OnLibraryEntryEditTitles(int id, std::wstring& titles);
+bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
+int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
+bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags);
 
 void OnHistoryAddItem(const HistoryItem& history_item);
 void OnHistoryChange();

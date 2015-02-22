@@ -338,25 +338,30 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditDelete()
   //   Removes an anime from list.
-  //   lParam is an anime ID.
+  //   lParam is a pointer to a vector of anime IDs.
   } else if (action == L"EditDelete") {
-    int anime_id = static_cast<int>(lParam);
-    if (ui::OnLibraryEntryEditDelete(anime_id)) {
-      HistoryItem history_item;
-      history_item.anime_id = anime_id;
-      history_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
-      History.queue.Add(history_item);
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    if (ui::OnLibraryEntriesEditDelete(anime_ids)) {
+      for (const auto& anime_id : anime_ids) {
+        HistoryItem history_item;
+        history_item.anime_id = anime_id;
+        history_item.mode = taiga::kHttpServiceDeleteLibraryEntry;
+        History.queue.Add(history_item);
+      }
     }
 
-  // EditEpisode(value)
+  // EditEpisode()
   //   Changes watched episode value of an anime.
-  //   Value is optional.
-  //   lParam is an anime ID.
+  //   lParam is a pointer to a vector of anime IDs.
   } else if (action == L"EditEpisode") {
-    int anime_id = static_cast<int>(lParam);
-    int value = body.empty() ?
-        ui::OnLibraryEntryEditEpisode(anime_id) : ToInt(body);
-    anime::ChangeEpisode(anime_id, value);
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    int value = ui::OnLibraryEntriesEditEpisode(anime_ids);
+    if (value > -1) {
+      for (const auto& anime_id : anime_ids) {
+        anime::ChangeEpisode(anime_id, value);
+      }
+    }
+
   // DecrementEpisode()
   //   lParam is an anime ID.
   } else if (action == L"DecrementEpisode") {
@@ -371,67 +376,59 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // EditScore(value)
   //   Changes anime score.
   //   Value must be between 0-10 and different from current score.
-  //   lParam is an anime ID.
+  //   lParam is a pointer to a vector of anime IDs.
   } else if (action == L"EditScore") {
-    int anime_id = static_cast<int>(lParam);
-    HistoryItem history_item;
-    history_item.anime_id = anime_id;
-    history_item.score = ToInt(body);
-    history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-    History.queue.Add(history_item);
-
-  // EditStatus(value)
-  //   Changes anime status of user.
-  //   Value must be 1, 2, 3, 4 or 5, and different from current status.
-  //   lParam is an anime ID.
-  } else if (action == L"EditStatus") {
-    HistoryItem history_item;
-    history_item.status = ToInt(body);
-    int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    switch (*history_item.status) {
-      case anime::kCompleted:
-        history_item.episode = anime_item->GetEpisodeCount();
-        if (*history_item.episode == 0)
-          history_item.episode.Reset();
-        if (!anime::IsValidDate(anime_item->GetMyDateStart()) &&
-            anime_item->GetEpisodeCount() == 1)
-          history_item.date_start = GetDate();
-        if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
-          history_item.date_finish = GetDate();
-        break;
-    }
-    history_item.anime_id = anime_id;
-    history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
-    History.queue.Add(history_item);
-
-  // EditTags(tags)
-  //   Changes anime tags.
-  //   Tags must be separated by a comma.
-  //   lParam is an anime ID.
-  } else if (action == L"EditTags") {
-    int anime_id = static_cast<int>(lParam);
-    std::wstring tags;
-    if (ui::OnLibraryEntryEditTags(anime_id, tags)) {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (const auto& anime_id : anime_ids) {
       HistoryItem history_item;
       history_item.anime_id = anime_id;
-      history_item.tags = tags;
+      history_item.score = ToInt(body);
       history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
       History.queue.Add(history_item);
     }
 
-  // EditTitles(titles)
-  //   Changes alternative titles of an anime.
-  //   Titles must be separated by "; ".
-  //   lParam is an anime ID.
-  } else if (action == L"EditTitles") {
-    int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    std::wstring titles;
-    if (ui::OnLibraryEntryEditTitles(anime_id, titles)) {
-      anime_item->SetUserSynonyms(titles);
-      Meow.UpdateTitles(*anime_item);
-      Settings.Save();
+  // EditStatus(value)
+  //   Changes anime status of user.
+  //   Value must be 1, 2, 3, 4 or 5, and different from current status.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (action == L"EditStatus") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (const auto& anime_id : anime_ids) {
+      HistoryItem history_item;
+      history_item.status = ToInt(body);
+      auto anime_item = AnimeDatabase.FindItem(anime_id);
+      switch (*history_item.status) {
+        case anime::kCompleted:
+          history_item.episode = anime_item->GetEpisodeCount();
+          if (*history_item.episode == 0)
+            history_item.episode.Reset();
+          if (!anime::IsValidDate(anime_item->GetMyDateStart()) &&
+              anime_item->GetEpisodeCount() == 1)
+              history_item.date_start = GetDate();
+          if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
+            history_item.date_finish = GetDate();
+          break;
+      }
+      history_item.anime_id = anime_id;
+      history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      History.queue.Add(history_item);
+    }
+
+  // EditTags(tags)
+  //   Changes anime tags.
+  //   Tags must be separated by a comma.
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (action == L"EditTags") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    std::wstring tags;
+    if (ui::OnLibraryEntriesEditTags(anime_ids, tags)) {
+      for (const auto& anime_id : anime_ids) {
+        HistoryItem history_item;
+        history_item.anime_id = anime_id;
+        history_item.tags = tags;
+        history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+        History.queue.Add(history_item);
+      }
     }
 
   //////////////////////////////////////////////////////////////////////////////

@@ -344,6 +344,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   hook = SetWindowsHookEx(WH_MSGFILTER, &HookProc, NULL, GetCurrentThreadId());
 
   // Display menu
+  ui::Menus.UpdateAll();
   std::wstring action;
   HWND hwnd = DlgMain.GetWindowHandle();
   #define SHOWUIMENU(id, name) \
@@ -367,10 +368,8 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
 
   toolbar->PressButton(tbb.idCommand, FALSE);
 
-  if (!action.empty()) {
+  if (!action.empty())
     ExecuteAction(action);
-    ui::Menus.UpdateAll(DlgAnimeList.GetCurrentItem());
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
