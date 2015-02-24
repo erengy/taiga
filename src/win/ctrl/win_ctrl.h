@@ -149,6 +149,7 @@ public:
   int        InsertItem(const LVITEM& lvi);
   int        InsertItem(int index, int nGroup, int icon, UINT column_count, PUINT columns, LPCWSTR text, LPARAM lParam);
   BOOL       IsGroupViewEnabled();
+  UINT       IsItemVisible(UINT index);
   BOOL       RedrawItems(int first, int last, bool repaint);
   void       RemoveAllGroups();
   BOOL       SetBkImage(HBITMAP bitmap, ULONG flags = LVBKIF_TYPE_WATERMARK, int offset_x = 100, int offset_y = 100);

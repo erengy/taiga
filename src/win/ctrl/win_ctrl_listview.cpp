@@ -255,6 +255,10 @@ int ListView::InsertItem(int item, int group, int image, UINT column_count,
   return ListView_InsertItem(window_, &lvi);
 }
 
+UINT ListView::IsItemVisible(UINT index) {
+  return ListView_IsItemVisible(window_, index);
+}
+
 BOOL ListView::RedrawItems(int first, int last, bool repaint) {
   BOOL return_value = ListView_RedrawItems(window_, first, last);
 

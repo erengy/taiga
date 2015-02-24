@@ -414,6 +414,8 @@ void AnimeListDialog::ListView::SortFromSettings() {
                       Settings.GetInt(taiga::kApp_List_SortOrder),
                       GetSortType(sort_column),
                       ui::ListViewCompareProc);
+
+  parent->RebuildIdCache();
 }
 
 void AnimeListDialog::ListView::RefreshItem(int index) {
@@ -582,6 +584,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       if (lplv->iSubItem == listview.GetSortColumn())
         order = listview.GetSortOrder() * -1;
       listview.Sort(lplv->iSubItem, order, listview.GetSortType(column_type), ui::ListViewCompareProc);
+      RebuildIdCache();
       Settings.Set(taiga::kApp_List_SortColumn, listview.columns[column_type].key);
       Settings.Set(taiga::kApp_List_SortOrder, order);
       break;
@@ -1149,12 +1152,14 @@ anime::Item* AnimeListDialog::GetCurrentItem() {
 }
 
 int AnimeListDialog::GetListIndex(int anime_id) {
-  if (IsWindow())
-    for (int i = 0; i < listview.GetItemCount(); i++)
-      if (static_cast<int>(listview.GetItemParam(i)) == anime_id)
-        return i;
+  auto it = listview.id_cache.find(anime_id);
+  return it != listview.id_cache.end() ? it->second : -1;
+}
 
-  return -1;
+void AnimeListDialog::RebuildIdCache() {
+  listview.id_cache.clear();
+  for (int i = 0; i < listview.GetItemCount(); i++)
+    listview.id_cache[listview.GetItemParam(i)] = i;
 }
 
 void AnimeListDialog::RefreshList(int index) {
@@ -1246,12 +1251,11 @@ void AnimeListDialog::RefreshList(int index) {
 void AnimeListDialog::RefreshListItem(int anime_id) {
   int index = GetListIndex(anime_id);
 
-  if (index > -1) {
+  if (index > -1 && listview.IsItemVisible(index)) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item)
       RefreshListItemColumns(index, *anime_item);
     listview.RedrawItems(index, index, true);
-    listview.SortFromSettings();
   }
 }
 
@@ -1263,7 +1267,7 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
     std::wstring text;
     switch (column.column) {
       case kColumnAnimeSeason:
-        text = anime::TranslateDateToSeasonString(anime_item.GetDateStart()).c_str();
+        text = anime::TranslateDateToSeasonString(anime_item.GetDateStart());
         break;
       case kColumnAnimeStatus: {
         bool playing = anime_item.GetPlaying();
@@ -1274,7 +1278,7 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
         break;
       }
       case kColumnAnimeType:
-        text = anime::TranslateType(anime_item.GetType()).c_str();
+        text = anime::TranslateType(anime_item.GetType());
         break;
       case kColumnUserLastUpdated: {
         time_t time_last_updated = _wtoi64(anime_item.GetMyLastUpdated().c_str());
@@ -1282,7 +1286,7 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
         break;
       }
       case kColumnUserRating:
-        text = anime::GetMyScore(anime_item).c_str();
+        text = anime::GetMyScore(anime_item);
         break;
     }
     if (!text.empty())

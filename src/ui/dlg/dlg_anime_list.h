@@ -56,6 +56,7 @@ public:
   int GetCurrentId();
   std::vector<int> GetCurrentIds();
   anime::Item* GetCurrentItem();
+  void RebuildIdCache();
 
   int GetListIndex(int anime_id);
   void RefreshList(int index = -1);
@@ -110,6 +111,7 @@ public:
     bool dragging;
     win::ImageList drag_image;
     int hot_item;
+    std::map<int, int> id_cache;
     win::Tooltip tooltips;
     AnimeListDialog* parent;
   } listview;
