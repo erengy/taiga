@@ -556,7 +556,8 @@ void Database::UpdateItem(const HistoryItem& history_item) {
     DeleteListItem(anime_item->GetId());
   }
 
-  anime::SetMyLastUpdateToNow(*anime_item);
+  if (history_item.mode != taiga::kHttpServiceDeleteLibraryEntry)
+    anime::SetMyLastUpdateToNow(*anime_item);
 
   SaveList();
 
