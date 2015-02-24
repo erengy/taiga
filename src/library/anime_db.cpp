@@ -462,7 +462,7 @@ int Database::GetItemCount(int status, bool check_history) {
 void Database::AddToList(int anime_id, int status) {
   auto anime_item = FindItem(anime_id);
 
-  if (!anime_item)
+  if (!anime_item || anime_item->IsInList())
     return;
 
   if (status == anime::kUnknownStatus)

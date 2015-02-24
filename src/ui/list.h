@@ -19,7 +19,12 @@
 #ifndef TAIGA_UI_LIST_H
 #define TAIGA_UI_LIST_H
 
+#include <vector>
 #include <windows.h>
+
+namespace win {
+class ListView;
+}
 
 namespace ui {
 
@@ -41,6 +46,9 @@ enum ListSortType {
 
 int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
                                  LPARAM lParamSort);
+
+int GetAnimeIdFromSelectedListItem(win::ListView& listview);
+std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview);
 
 }  // namespace ui
 

@@ -293,4 +293,34 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
   return return_value * list->GetSortOrder();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+int GetAnimeIdFromSelectedListItem(win::ListView& listview) {
+  int index = listview.GetNextItem(-1, LVIS_SELECTED);
+
+  if (index > -1) {
+    if (listview.GetSelectedCount() > 1) {
+      int focused_index = listview.GetNextItem(-1, LVIS_FOCUSED);
+      if (focused_index > -1)
+        index = focused_index;
+    }
+    int anime_id = listview.GetItemParam(index);
+    if (anime::IsValidId(anime_id))
+      return anime_id;
+  }
+
+  return anime::ID_UNKNOWN;
+}
+
+std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview) {
+  std::vector<int> anime_ids;
+
+  int index = -1;
+  while ((index = listview.GetNextItem(index, LVIS_SELECTED)) > -1) {
+    anime_ids.push_back(listview.GetItemParam(index));
+  };
+
+  return anime_ids;
+}
+
 }  // namespace ui

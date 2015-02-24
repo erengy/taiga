@@ -1120,31 +1120,11 @@ LRESULT AnimeListDialog::OnTabNotify(LPARAM lParam) {
 ////////////////////////////////////////////////////////////////////////////////
 
 int AnimeListDialog::GetCurrentId() {
-  int index = listview.GetNextItem(-1, LVIS_SELECTED);
-
-  if (index > -1) {
-    if (listview.GetSelectedCount() > 1) {
-      int focused_index = listview.GetNextItem(-1, LVIS_FOCUSED);
-      if (focused_index > -1)
-        index = focused_index;
-    }
-    int anime_id = listview.GetItemParam(index);
-    if (anime::IsValidId(anime_id))
-      return anime_id;
-  }
-
-  return anime::ID_UNKNOWN;
+  return GetAnimeIdFromSelectedListItem(listview);
 }
 
 std::vector<int> AnimeListDialog::GetCurrentIds() {
-  std::vector<int> ids;
-
-  int index = -1;
-  while ((index = listview.GetNextItem(index, LVIS_SELECTED)) > -1) {
-    ids.push_back(listview.GetItemParam(index));
-  };
-
-  return ids;
+  return GetAnimeIdsFromSelectedListItems(listview);
 }
 
 anime::Item* AnimeListDialog::GetCurrentItem() {

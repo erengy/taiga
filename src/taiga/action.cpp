@@ -228,11 +228,19 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // AddToList(status)
   //   Adds an anime to list with given status.
-  //   lParam is an anime ID.
+  //   wParam is a BOOL value that defines lParam.
+  //   lParam is an anime ID, or a pointer to a vector of anime IDs.
   } else if (action == L"AddToList") {
-    int anime_id = static_cast<int>(lParam);
     int status = ToInt(body);
-    AnimeDatabase.AddToList(anime_id, status);
+    if (!wParam) {
+      int anime_id = static_cast<int>(lParam);
+      AnimeDatabase.AddToList(anime_id, status);
+    } else {
+      const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+      for (const auto& anime_id : anime_ids) {
+        AnimeDatabase.AddToList(anime_id, status);
+      }
+    }
 
   // ClearHistory()
   //   Deletes all history items.
@@ -544,8 +552,12 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // Season_RefreshItemData()
   //   Refreshes an individual season item data.
+  //   lParam is a pointer to a vector of anime IDs.
   } else if (action == L"Season_RefreshItemData") {
-    ui::DlgSeason.RefreshData(static_cast<int>(lParam));
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (const auto& anime_id : anime_ids) {
+      ui::DlgSeason.RefreshData(anime_id);
+    }
 
   // Season_ViewAs(mode)
   //   Changes view mode.

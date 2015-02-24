@@ -16,13 +16,17 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <WindowsX.h>
+
 #include "base/foreach.h"
+#include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
+#include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dialog.h"
 #include "ui/list.h"
@@ -56,6 +60,37 @@ BOOL SearchDialog::OnInitDialog() {
 
 INT_PTR SearchDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
+    case WM_CONTEXTMENU: {
+      auto hwnd_from = reinterpret_cast<HWND>(wParam);
+      POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+      if (hwnd_from == list_.GetWindowHandle()) {
+        if (list_.GetSelectedCount() > 0) {
+          if (pt.x == -1 || pt.y == -1) {
+            win::Rect rect;
+            int item_index = list_.GetNextItem(-1, LVIS_SELECTED);
+            list_.GetSubItemRect(item_index, 0, &rect);
+            pt = {rect.left, rect.bottom};
+            ::ClientToScreen(list_.GetWindowHandle(), &pt);
+          }
+          auto anime_id = GetAnimeIdFromSelectedListItem(list_);
+          auto anime_ids = GetAnimeIdsFromSelectedListItems(list_);
+          bool is_in_list = true;
+          for (const auto& anime_id : anime_ids) {
+            auto anime_item = AnimeDatabase.FindItem(anime_id);
+            if (anime_item && !anime_item->IsInList()) {
+              is_in_list = false;
+              break;
+            }
+          }
+          ui::Menus.UpdateSearchList(!is_in_list);
+          auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SearchList");
+          ExecuteAction(action, TRUE, StartsWith(action, L"AddToList") ?
+                        reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
+        }
+      }
+      break;
+    }
+
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL: {
       return list_.SendMessage(uMsg, wParam, lParam);
@@ -95,26 +130,12 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
       // Double click
       case NM_DBLCLK: {
-        if (list_.GetSelectedCount() > 0) {
-          LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-          if (lpnmitem->iItem == -1)
-            break;
-          LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
-          if (lParam)
-            ShowDlgAnimeInfo(lParam);
-        }
-        break;
-      }
-
-      // Right click
-      case NM_RCLICK: {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-        if (lpnmitem->iItem == -1)
-          break;
-        LPARAM lParam = list_.GetItemParam(lpnmitem->iItem);
-        auto anime_item = AnimeDatabase.FindItem(static_cast<int>(lParam));
-        ui::Menus.UpdateSearchList(!anime_item->IsInList());
-        ExecuteAction(ui::Menus.Show(pnmh->hwndFrom, 0, 0, L"SearchList"), 0, lParam);
+        if (lpnmitem->iItem > -1) {
+          int anime_id = list_.GetItemParam(lpnmitem->iItem);
+          if (anime::IsValidId(anime_id))
+            ShowDlgAnimeInfo(anime_id);
+        }
         break;
       }
     }
