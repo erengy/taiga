@@ -107,9 +107,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Post-processing
   if (anime::IsValidId(episode.anime_id)) {
-    const anime::Item& anime_item = *AnimeDatabase.FindItem(episode.anime_id);
-    // Assume episode 1, if matched a single-episode anime
-    if (!episode.episode_number() && anime_item.GetEpisodeCount() == 1)
+    if (!episode.episode_number())
       episode.set_episode_number(1);
   }
 
