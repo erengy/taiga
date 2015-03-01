@@ -78,6 +78,7 @@ enum Version {
   kVersion7,
   kVersion8,
   kVersion8_1,
+  kVersion10,
   kVersionUnknown
 };
 

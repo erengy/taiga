@@ -164,7 +164,9 @@ BOOL GetProcessFiles(ULONG process_id,
     case win::kVersionVista:
       objectTypeFile = 25;
       break;
-    case win::VERSION_WIN8:
+    case win::kVersion8:
+    case win::kVersion8_1:
+    case win::kVersion10:
       objectTypeFile = 31;
       break;
     default:

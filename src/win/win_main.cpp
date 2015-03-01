@@ -186,7 +186,7 @@ Version GetVersion() {
         default:
           version = kVersionServer2003;
           break;
-        }
+      }
     } else if (version_info.dwMajorVersion == 6) {
       if (version_info.wProductType != VER_NT_WORKSTATION) {
         version = kVersionServer2008;
@@ -201,12 +201,20 @@ Version GetVersion() {
           case 2:
             version = kVersion8;
             break;
+          case 3:
           default:
             version = kVersion8_1;
             break;
         }
       }
-    } else if (version_info.dwMajorVersion > 6) {
+    } else if (version_info.dwMajorVersion == 10) {
+      switch (version_info.dwMinorVersion) {
+        case 0:
+        default:
+          version = kVersion10;
+          break;
+      }
+    } else if (version_info.dwMajorVersion > 10) {
       version = kVersionUnknown;
     }
 
