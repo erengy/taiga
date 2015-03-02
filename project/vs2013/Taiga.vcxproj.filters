@@ -64,9 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\base\accessibility.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\base64.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -415,6 +412,9 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\win\win_accessibility.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\win\win_commondialog.cpp">
       <Filter>win</Filter>
     </ClCompile>
@@ -498,9 +498,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\base\accessibility.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\base64.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -866,6 +863,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win\win_accessibility.h">
+      <Filter>win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\win\win_commondialog.h">
       <Filter>win</Filter>

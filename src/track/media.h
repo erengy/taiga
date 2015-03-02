@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "base/accessibility.h"
+#include "win/win_accessibility.h"
 
 enum MediaPlayerModes {
   kMediaModeWindowTitle,
@@ -87,9 +87,9 @@ public:
 public:
   std::vector<MediaPlayer> items;
 
-  class BrowserAccessibleObject : public base::AccessibleObject {
+  class BrowserAccessibleObject : public win::AccessibleObject {
   public:
-    bool AllowChildTraverse(base::AccessibleChild& child, LPARAM param = 0L);
+    bool AllowChildTraverse(win::AccessibleChild& child, LPARAM param = 0L);
   } acc_obj;
 
 private:

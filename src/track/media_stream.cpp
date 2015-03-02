@@ -98,11 +98,11 @@ void InitializeBrowserData() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-base::AccessibleChild* FindAccessibleChild(
-    std::vector<base::AccessibleChild>& children,
+win::AccessibleChild* FindAccessibleChild(
+    std::vector<win::AccessibleChild>& children,
     const std::wstring& name,
     DWORD role) {
-  base::AccessibleChild* child = nullptr;
+  win::AccessibleChild* child = nullptr;
 
   foreach_(it, children) {
     if (name.empty() || IsEqual(name, it->name))
@@ -118,7 +118,7 @@ base::AccessibleChild* FindAccessibleChild(
 }
 
 bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
-    base::AccessibleChild& child,
+    win::AccessibleChild& child,
     LPARAM param) {
   switch (param) {
     case kWebEngineUnknown:
@@ -218,7 +218,7 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
 
   // Check other tabs
   if (CurrentEpisode.anime_id > 0) {
-    base::AccessibleChild* child = nullptr;
+    win::AccessibleChild* child = nullptr;
     switch (web_engine) {
       case kWebEngineWebkit:
       case kWebEngineGecko:
@@ -247,7 +247,7 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   }
 
   // Find URL
-  base::AccessibleChild* child = nullptr;
+  win::AccessibleChild* child = nullptr;
   switch (web_engine) {
     case kWebEngineWebkit:
     case kWebEngineGecko:

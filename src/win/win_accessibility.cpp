@@ -16,9 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "accessibility.h"
+#include "win_accessibility.h"
 
-namespace base {
+namespace win {
 
 AccessibleChild::AccessibleChild()
     : role(0) {
@@ -278,4 +278,4 @@ void CALLBACK WinEventFunc(HWINEVENTHOOK hook, DWORD dwEvent, HWND hwnd,
 }
 #endif
 
-}  // namespace base
+}  // namespace win

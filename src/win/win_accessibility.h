@@ -16,14 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_ACCESSIBILITY_H
-#define TAIGA_BASE_ACCESSIBILITY_H
+#ifndef TAIGA_WIN_ACCESSIBILITY_H
+#define TAIGA_WIN_ACCESSIBILITY_H
 
 #include <string>
 #include <OleAcc.h>
 #include <vector>
 
-namespace base {
+namespace win {
 
 struct AccessibleChild {
   AccessibleChild();
@@ -72,6 +72,6 @@ private:
   HWINEVENTHOOK win_event_hook_;
 };
 
-}  // namespace base
+}  // namespace win
 
-#endif  // TAIGA_BASE_ACCESSIBILITY_H
+#endif  // TAIGA_WIN_ACCESSIBILITY_H
