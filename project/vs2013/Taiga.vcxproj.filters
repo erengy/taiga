@@ -415,6 +415,9 @@
     <ClCompile Include="..\..\src\win\win_accessibility.cpp">
       <Filter>win</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\win\win_automation.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\win\win_commondialog.cpp">
       <Filter>win</Filter>
     </ClCompile>
@@ -865,6 +868,9 @@
       <Filter>ui\dlg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\win\win_accessibility.h">
+      <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\win\win_automation.h">
       <Filter>win</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\win\win_commondialog.h">
