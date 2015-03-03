@@ -158,17 +158,6 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Application > Interface
     case kSettingsPageAppInterface: {
-      std::vector<std::wstring> theme_list;
-      PopulateFolders(theme_list, taiga::GetPath(taiga::kPathTheme));
-      if (theme_list.empty()) {
-        EnableDlgItem(IDC_COMBO_THEME, FALSE);
-      } else {
-        for (size_t i = 0; i < theme_list.size(); i++) {
-          AddComboString(IDC_COMBO_THEME, theme_list[i].c_str());
-          if (IsEqual(theme_list[i], Settings[taiga::kApp_Interface_Theme]))
-            SetComboSelection(IDC_COMBO_THEME, i);
-        }
-      }
       SetDlgItemText(IDC_EDIT_EXTERNALLINKS, Settings[taiga::kApp_Interface_ExternalLinks].c_str());
       break;
     }
@@ -753,14 +742,6 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         case IDC_LINK_TWITTER: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);
           ExecuteAction(pNMLink->item.szUrl);
-          return TRUE;
-        }
-        // Open themes folder
-        case IDC_LINK_THEMES: {
-          std::wstring theme_name;
-          GetDlgItemText(IDC_COMBO_THEME, theme_name);
-          std::wstring path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
-          Execute(path);
           return TRUE;
         }
       }

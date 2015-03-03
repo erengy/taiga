@@ -222,7 +222,6 @@ void SettingsDialog::OnOK() {
   // Application > Interface
   page = &pages[kSettingsPageAppInterface];
   if (page->IsWindow()) {
-    Settings.Set(taiga::kApp_Interface_Theme, page->GetDlgItemText(IDC_COMBO_THEME));
     Settings.Set(taiga::kApp_Interface_ExternalLinks, page->GetDlgItemText(IDC_EDIT_EXTERNALLINKS));
   }
   // Application > List

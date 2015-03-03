@@ -115,7 +115,6 @@
 #define IDC_COMBO_FEED_VALUE                    1069
 #define IDC_COMBO_MDLCLICK                      1070
 #define IDC_COMBO_SERVICE                       1071
-#define IDC_COMBO_THEME                         1072
 #define IDC_COMBO_TORRENT_FOLDER                1073
 #define IDC_COMBO_TORRENT_SEARCH                1074
 #define IDC_COMBO_TORRENT_SOURCE                1075
@@ -148,7 +147,6 @@
 #define IDC_LINK_ANIME_FANSUB                   1102
 #define IDC_LINK_DEFAULTS                       1103
 #define IDC_LINK_NOWPLAYING                     1104
-#define IDC_LINK_THEMES                         1105
 #define IDC_LINK_TWITTER                        1106
 #define IDC_LIST_EVENT                          1107
 #define IDC_LIST_FEED_FILTER_ANIME              1108
