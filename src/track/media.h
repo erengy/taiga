@@ -93,6 +93,9 @@ public:
   } acc_obj;
 
 private:
+  std::wstring FromActiveAccessibility(HWND hwnd, int web_engine, std::wstring& title);
+  std::wstring FromAutomationApi(HWND hwnd, int web_engine, std::wstring& title);
+
   HWND current_window_handle_;
   std::wstring current_player_;
   bool player_running_;

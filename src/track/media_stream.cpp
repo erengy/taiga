@@ -22,6 +22,7 @@
 #include "library/anime_episode.h"
 #include "taiga/settings.h"
 #include "track/media.h"
+#include "win/win_automation.h"
 
 enum StreamingVideoProvider {
   kStreamUnknown = -1,
@@ -173,6 +174,152 @@ bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
 
 ////////////////////////////////////////////////////////////////////////////////
 
+std::wstring MediaPlayers::FromActiveAccessibility(HWND hwnd, int web_engine,
+                                                   std::wstring& title) {
+  // Build accessibility data
+  acc_obj.children.clear();
+  if (acc_obj.FromWindow(hwnd) == S_OK) {
+    acc_obj.BuildChildren(acc_obj.children, nullptr, web_engine);
+    acc_obj.Release();
+  }
+
+  // Check other tabs
+  if (CurrentEpisode.anime_id > 0) {
+    win::AccessibleChild* child = nullptr;
+    switch (web_engine) {
+      case kWebEngineWebkit:
+      case kWebEngineGecko:
+        child = FindAccessibleChild(acc_obj.children,
+                                    L"", ROLE_SYSTEM_PAGETABLIST);
+        break;
+      case kWebEngineTrident:
+        child = FindAccessibleChild(acc_obj.children,
+                                    L"Tab Row", 0);
+        break;
+      case kWebEnginePresto:
+        child = FindAccessibleChild(acc_obj.children,
+                                    L"", ROLE_SYSTEM_CLIENT);
+        break;
+    }
+    if (child) {
+      foreach_(it, child->children) {
+        if (IntersectsWith(it->name, current_title())) {
+          // Tab is still open, just not active
+          return current_title();
+        }
+      }
+    }
+    // Tab is closed
+    return std::wstring();
+
+  // Find URL
+  } else {
+    win::AccessibleChild* child = nullptr;
+    switch (web_engine) {
+      case kWebEngineWebkit:
+      case kWebEngineGecko:
+      case kWebEngineTrident: {
+        InitializeBrowserData();
+        auto& child_data = browser_data[static_cast<WebBrowserEngine>(web_engine)];
+        foreach_(it, child_data) {
+          child = FindAccessibleChild(acc_obj.children, it->name, it->role);
+          if (child)
+            break;
+        }
+        break;
+      }
+      case kWebEnginePresto:
+        child = FindAccessibleChild(acc_obj.children,
+                                    L"", ROLE_SYSTEM_CLIENT);
+        if (child && !child->children.empty()) {
+          child = FindAccessibleChild(child->children.at(0).children,
+                                      L"", ROLE_SYSTEM_TOOLBAR);
+          if (child && !child->children.empty()) {
+            child = FindAccessibleChild(child->children,
+                                        L"", ROLE_SYSTEM_COMBOBOX);
+            if (child && !child->children.empty()) {
+              child = FindAccessibleChild(child->children,
+                                          L"", ROLE_SYSTEM_TEXT);
+            }
+          }
+        }
+        break;
+    }
+    if (child) {
+      title = GetTitleFromStreamingMediaProvider(child->value, title);
+    } else {
+      title.clear();
+    }
+  }
+
+  return title;
+}
+
+std::wstring MediaPlayers::FromAutomationApi(HWND hwnd, int web_engine,
+                                             std::wstring& title) {
+  win::UIAutomation ui_automation;
+  if (!ui_automation.Initialize())
+    return std::wstring();
+
+  // Find browser
+  auto element_browser = ui_automation.ElementFromHandle(hwnd);
+  if (!element_browser)
+    return std::wstring();
+
+  // Find tabs
+  if (CurrentEpisode.anime_id > 0) {
+    bool found_tab = false;
+    auto element_tab = ui_automation.FindFirstControl(
+        element_browser, UIA_TabControlTypeId, true);
+    if (element_tab) {
+      auto element_array_tab_items = ui_automation.FindAllControls(
+          element_tab, UIA_TabItemControlTypeId, true);
+      if (element_array_tab_items) {
+        int tab_count = ui_automation.GetElementArrayLength(element_array_tab_items);
+        for (int tab_index = 0; tab_index < tab_count; ++tab_index) {
+          auto element_tab_item = ui_automation.GetElementFromArrayIndex(
+              element_array_tab_items, tab_index);
+          auto name = ui_automation.GetElementName(element_tab_item);
+          if (name.empty()) {
+            auto element_text = ui_automation.FindFirstControl(
+                element_tab_item, UIA_TextControlTypeId, true);
+            if (element_text) {
+              name = ui_automation.GetElementName(element_text);
+              element_text->Release();
+            }
+          }
+          if (!name.empty() && IntersectsWith(name, current_title())) {
+            // Tab is still open, just not active
+            title = current_title();
+            found_tab = true;
+            break;
+          }
+        }
+        element_array_tab_items->Release();
+      }
+      element_tab->Release();
+    }
+    if (!found_tab)
+      title.clear();
+  
+  // Find URL
+  } else {
+    auto element_url = ui_automation.FindFirstControl(
+        element_browser, UIA_EditControlTypeId, false);
+    if (element_url) {
+      title = GetTitleFromStreamingMediaProvider(
+          ui_automation.GetElementValue(element_url), title);
+      element_url->Release();
+    } else {
+      title.clear();
+    }
+  }
+
+  element_browser->Release();
+
+  return title;
+}
+
 std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
   WebBrowserEngine web_engine = kWebEngineUnknown;
 
@@ -209,83 +356,11 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     return std::wstring();
   }
 
-  // Build accessibility data
-  acc_obj.children.clear();
-  if (acc_obj.FromWindow(hwnd) == S_OK) {
-    acc_obj.BuildChildren(acc_obj.children, nullptr, web_engine);
-    acc_obj.Release();
-  }
-
-  // Check other tabs
-  if (CurrentEpisode.anime_id > 0) {
-    win::AccessibleChild* child = nullptr;
-    switch (web_engine) {
-      case kWebEngineWebkit:
-      case kWebEngineGecko:
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"", ROLE_SYSTEM_PAGETABLIST);
-        break;
-      case kWebEngineTrident:
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Tab Row", 0);
-        break;
-      case kWebEnginePresto:
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"", ROLE_SYSTEM_CLIENT);
-        break;
-    }
-    if (child) {
-      foreach_(it, child->children) {
-        if (IntersectsWith(it->name, current_title())) {
-          // Tab is still open, just not active
-          return current_title();
-        }
-      }
-    }
-    // Tab is closed
-    return std::wstring();
-  }
-
-  // Find URL
-  win::AccessibleChild* child = nullptr;
-  switch (web_engine) {
-    case kWebEngineWebkit:
-    case kWebEngineGecko:
-    case kWebEngineTrident: {
-      InitializeBrowserData();
-      auto& child_data = browser_data[web_engine];
-      foreach_(it, child_data) {
-        child = FindAccessibleChild(acc_obj.children, it->name, it->role);
-        if (child)
-          break;
-      }
-      break;
-    }
-    case kWebEnginePresto:
-      child = FindAccessibleChild(acc_obj.children,
-                                  L"", ROLE_SYSTEM_CLIENT);
-      if (child && !child->children.empty()) {
-        child = FindAccessibleChild(child->children.at(0).children,
-                                    L"", ROLE_SYSTEM_TOOLBAR);
-        if (child && !child->children.empty()) {
-          child = FindAccessibleChild(child->children,
-                                      L"", ROLE_SYSTEM_COMBOBOX);
-          if (child && !child->children.empty()) {
-            child = FindAccessibleChild(child->children,
-                                        L"", ROLE_SYSTEM_TEXT);
-          }
-        }
-      }
-      break;
-  }
-
-  if (child) {
-    title = GetTitleFromStreamingMediaProvider(child->value, title);
-  } else {
-    title.clear();
-  }
-
-  return title;
+#ifdef TAIGA_USE_ACTIVE_ACCESSIBILITY
+  return FromActiveAccessibility(hwnd, web_engine, title);
+#else
+  return FromAutomationApi(hwnd, web_engine, title);
+#endif
 }
 
 bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
