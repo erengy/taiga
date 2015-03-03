@@ -635,23 +635,23 @@ void OnSettingsChange() {
   DlgAnimeList.RefreshList();
 }
 
-void OnSettingsRestoreDefaults() {
-  if (DlgSettings.IsWindow()) {
-    DestroyDialog(kDialogSettings);
-    ShowDialog(kDialogSettings);
-  }
-}
-
-void OnSettingsRootFoldersEmpty() {
+void OnSettingsLibraryFoldersEmpty() {
   win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
-  dlg.SetMainInstruction(L"Would you like to set root anime folders first?");
-  dlg.SetContent(L"You need to have at least one root folder set before "
+  dlg.SetMainInstruction(L"Would you like to set library folders first?");
+  dlg.SetContent(L"You need to have at least one library folder set before "
                  L"scanning available episodes.");
   dlg.AddButton(L"Yes", IDYES);
   dlg.AddButton(L"No", IDNO);
   dlg.Show(DlgMain.GetWindowHandle());
   if (dlg.GetSelectedButtonID() == IDYES)
     ShowDlgSettings(kSettingsSectionLibrary, kSettingsPageLibraryFolders);
+}
+
+void OnSettingsRestoreDefaults() {
+  if (DlgSettings.IsWindow()) {
+    DestroyDialog(kDialogSettings);
+    ShowDialog(kDialogSettings);
+  }
 }
 
 void OnSettingsServiceChange() {

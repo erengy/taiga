@@ -298,11 +298,11 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     // Examine title and compare it with list items
     bool ignore_file = false;
     if (Meow.Parse(MediaPlayers.current_title(), CurrentEpisode)) {
-      bool is_inside_root_folders = true;
+      bool is_inside_library_folders = true;
       if (Settings.GetBool(taiga::kSync_Update_OutOfRoot))
-        if (!CurrentEpisode.folder.empty() && !Settings.root_folders.empty())
-          is_inside_root_folders = anime::IsInsideRootFolders(CurrentEpisode.folder);
-      if (is_inside_root_folders) {
+        if (!CurrentEpisode.folder.empty() && !Settings.library_folders.empty())
+          is_inside_library_folders = anime::IsInsideLibraryFolders(CurrentEpisode.folder);
+      if (is_inside_library_folders) {
         static track::recognition::MatchOptions match_options;
         match_options.allow_sequels = true;
         match_options.check_airing_date = true;

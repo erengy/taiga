@@ -156,7 +156,7 @@ public:
   void HandleCompatibility();
   void RestoreDefaults();
 
-  std::vector<std::wstring> root_folders;
+  std::vector<std::wstring> library_folders;
 
 private:
   void InitializeMap();

@@ -404,13 +404,13 @@ STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW
 EXSTYLE WS_EX_ACCEPTFILES | WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
-    GROUPBOX        "Root folders", IDC_STATIC, 7, 7, 301, 101, 0, WS_EX_LEFT
+    GROUPBOX        "Library folders", IDC_STATIC, 7, 7, 301, 101, 0, WS_EX_LEFT
     CONTROL         "", IDC_LIST_FOLDERS_ROOT, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_SHAREIMAGELISTS | LVS_REPORT, 12, 18, 289, 65, WS_EX_LEFT
     LTEXT           "Tip: You can drag and drop folders here.", IDC_STATIC, 13, 90, 180, 8, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
     PUSHBUTTON      "Add new...", IDC_BUTTON_ADDFOLDER, 197, 87, 50, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "Remove", IDC_BUTTON_REMOVEFOLDER, 251, 87, 50, 14, WS_DISABLED, WS_EX_LEFT
-    GROUPBOX        "Monitor", IDC_STATIC, 7, 115, 301, 28, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Watch folders for new files", IDC_CHECK_FOLDERS_WATCH, 12, 126, 130, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Real-time monitor", IDC_STATIC, 7, 115, 301, 28, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Detect new files and folders under library folders", IDC_CHECK_FOLDERS_WATCH, 12, 126, 180, 10, 0, WS_EX_LEFT
 }
 
 
@@ -422,7 +422,7 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     GROUPBOX        "Validation", IDC_STATIC, 7, 7, 301, 28, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Ignore files outside of root folders", IDC_CHECK_UPDATE_ROOT, 12, 18, 130, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Ignore files outside of library folders", IDC_CHECK_UPDATE_ROOT, 12, 18, 130, 10, 0, WS_EX_LEFT
     GROUPBOX        "List updates and automatic sharing", IDC_STATIC, 7, 42, 147, 54, 0, WS_EX_LEFT
     LTEXT           "Delay time:", IDC_STATIC, 12, 53, 116, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_DELAY, 12, 63, 40, 14, ES_AUTOHSCROLL | ES_NUMBER, WS_EX_LEFT

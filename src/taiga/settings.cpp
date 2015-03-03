@@ -226,10 +226,10 @@ bool AppSettings::Load() {
     Set(kMeta_Version_Revision, ToWstr(static_cast<int>(Taiga.version.patch)));
 
   // Folders
-  root_folders.clear();
+  library_folders.clear();
   xml_node node_folders = settings.child(L"anime").child(L"folders");
   foreach_xmlnode_(folder, node_folders, L"root")
-    root_folders.push_back(folder.attribute(L"folder").value());
+    library_folders.push_back(folder.attribute(L"folder").value());
 
   // Anime items
   xml_node node_items = settings.child(L"anime").child(L"items");
@@ -302,9 +302,9 @@ bool AppSettings::Save() {
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
     WriteValue(settings, i);
 
-  // Root folders
+  // Library folders
   xml_node folders = settings.child(L"anime").child(L"folders");
-  foreach_(it, root_folders) {
+  foreach_(it, library_folders) {
     xml_node root = folders.append_child(L"root");
     root.append_attribute(L"folder") = it->c_str();
   }

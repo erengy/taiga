@@ -11,7 +11,7 @@
 	
 	<!-- File -->
 	<menu name="File">
-		<item name="Root folders" sub="Folders"/>
+		<item name="Library folders" sub="Folders"/>
 		<item type="separator"/>
 		<item name="Play random anime" action="PlayRandomAnime()"/>
 		<item name="Scan available episodes" action="ScanEpisodesAll()"/>

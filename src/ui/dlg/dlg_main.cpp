@@ -202,7 +202,7 @@ void MainDialog::CreateDialogControls() {
                             fsState, fsStyle1, 0, nullptr, tooltip.c_str());
   toolbar_main.InsertButton(1, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_main.InsertButton(2, ui::kIcon24_Folders, kToolbarButtonFolders,
-                            fsState, fsStyle2, 2, nullptr, L"Root folders");
+                            fsState, fsStyle2, 2, nullptr, L"Library folders");
   toolbar_main.InsertButton(3, ui::kIcon24_Tools, kToolbarButtonTools,
                             fsState, fsStyle2, 3, nullptr, L"External links");
   toolbar_main.InsertButton(4, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);

@@ -208,9 +208,9 @@ void MenuList::UpdateFolders() {
     // Clear menu
     menu->items.clear();
 
-    if (!Settings.root_folders.empty()) {
+    if (!Settings.library_folders.empty()) {
       // Add folders
-      foreach_(it, Settings.root_folders) {
+      foreach_(it, Settings.library_folders) {
         menu->CreateItem(L"Execute(" + *it + L")", *it);
       }
       // Add separator

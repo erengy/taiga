@@ -195,8 +195,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       std::wstring default_path, path;
       if (!anime_item->GetFolder().empty()) {
         default_path = anime_item->GetFolder();
-      } else if (!Settings.root_folders.empty()) {
-        default_path = Settings.root_folders.front();
+      } else if (!Settings.library_folders.empty()) {
+        default_path = Settings.library_folders.front();
       }
       if (win::BrowseForFolder(GetWindowHandle(), L"Choose an anime folder", default_path, path)) {
         SetDlgItemText(IDC_EDIT_ANIME_FOLDER, path.c_str());

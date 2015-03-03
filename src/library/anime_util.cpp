@@ -321,8 +321,8 @@ void StartWatching(Item& item, Episode& episode) {
       HWND hwnd = MediaPlayers.current_window_handle();
       episode.folder = GetPathOnly(MediaPlayers.GetTitleFromProcessHandle(hwnd));
     }
-    if (IsInsideRootFolders(episode.folder)) {
-      // Set the folder if only it is under a root folder
+    if (IsInsideLibraryFolders(episode.folder)) {
+      // Set the folder if only it is under a library folder
       item.SetFolder(episode.folder);
       Settings.Save();
     }
@@ -532,9 +532,9 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool IsInsideRootFolders(const std::wstring& path) {
-  foreach_c_(root_folder, Settings.root_folders)
-    if (StartsWith(path, *root_folder))
+bool IsInsideLibraryFolders(const std::wstring& path) {
+  foreach_c_(library_folder, Settings.library_folders)
+    if (StartsWith(path, *library_folder))
       return true;
 
   return false;

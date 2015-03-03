@@ -150,9 +150,9 @@ void ScanAvailableEpisodes(bool silent) {
 }
 
 void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
-  // Check if any root folder is available
-  if (!silent && Settings.root_folders.empty()) {
-    ui::OnSettingsRootFoldersEmpty();
+  // Check if any library folder is available
+  if (!silent && Settings.library_folders.empty()) {
+    ui::OnSettingsLibraryFoldersEmpty();
     return;
   }
 
@@ -194,8 +194,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   }
 
   if (!found) {
-    // Search root folders for available episodes
-    foreach_(it, Settings.root_folders) {
+    // Search library folders for available episodes
+    foreach_(it, Settings.library_folders) {
       if (!FolderExists(*it))
         continue;  // Might be a disconnected external drive
       bool skip_directories = false;

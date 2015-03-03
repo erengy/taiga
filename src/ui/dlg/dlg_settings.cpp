@@ -192,11 +192,11 @@ void SettingsDialog::OnOK() {
   page = &pages[kSettingsPageLibraryFolders];
   if (page->IsWindow()) {
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_FOLDERS_ROOT));
-    Settings.root_folders.clear();
+    Settings.library_folders.clear();
     for (int i = 0; i < list.GetItemCount(); i++) {
       std::wstring folder;
       list.GetItemText(i, 0, folder);
-      Settings.root_folders.push_back(folder);
+      Settings.library_folders.push_back(folder);
     }
     Settings.Set(taiga::kLibrary_WatchFolders, page->IsDlgButtonChecked(IDC_CHECK_FOLDERS_WATCH));
     list.SetWindowHandle(nullptr);
@@ -405,9 +405,9 @@ void SettingsDialog::OnHelp(LPHELPINFO lphi) {
         L"        \u2514 One Piece\n"
         L"    \u2514 Games\n"
         L"    \u2514 Music\n\n"
-        L"In this case, \"D:\\Anime\" is the root folder you should add.");
+        L"In this case, \"D:\\Anime\" is the folder you should add.");
     SET_HELP_TEXT(IDC_CHECK_FOLDERS_WATCH,
-        L"With this feature on, Taiga instantly detects when a file is added, removed, or renamed under root folders and their subfolders.\n\n"
+        L"With this feature on, Taiga instantly detects when a file is added, removed, or renamed under library folders and their subfolders.\n\n"
         L"Enabling this feature is recommended.");
     // Not available
     default:

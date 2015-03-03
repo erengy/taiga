@@ -76,8 +76,8 @@ bool OnSeasonRefreshRequired();
 
 void OnSettingsAccountEmpty();
 void OnSettingsChange();
+void OnSettingsLibraryFoldersEmpty();
 void OnSettingsRestoreDefaults();
-void OnSettingsRootFoldersEmpty();
 void OnSettingsServiceChange();
 bool OnSettingsServiceChangeConfirm(const string_t& current_service, const string_t& new_service);
 void OnSettingsServiceChangeFailed();

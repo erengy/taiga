@@ -33,7 +33,7 @@ void FolderMonitor::Enable(bool enabled) {
   Clear();
 
   if (enabled) {
-    for (const auto& folder : Settings.root_folders)
+    for (const auto& folder : Settings.library_folders)
       Add(folder);
     Start();
   }
