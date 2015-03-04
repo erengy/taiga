@@ -469,20 +469,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       Execute(anime_item->GetFolder());
     }
 
-  // SetFolder()
-  //   Lets user set an anime folder.
-  //   lParam is an anime ID.
-  } else if (action == L"SetFolder") {
-    int anime_id = static_cast<int>(lParam);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    std::wstring path, title = L"Anime title: " + anime_item->GetTitle();
-    if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
-                             title.c_str(), L"", path)) {
-      anime_item->SetFolder(path);
-      Settings.Save();
-      ScanAvailableEpisodesQuick(anime_item->GetId());
-    }
-
   //////////////////////////////////////////////////////////////////////////////
 
   // PlayEpisode(value)
