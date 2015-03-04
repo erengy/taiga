@@ -256,7 +256,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"AddFolder") {
     std::wstring path;
     if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
-                             L"Please select a folder:", L"", path)) {
+                             L"Add a Library Folder", L"", path)) {
       Settings.library_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
         FolderMonitor.Enable();
@@ -457,7 +457,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         if (!Settings.library_folders.empty())
           default_path = Settings.library_folders.front();
         if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
-                                 L"Choose an anime folder",
+                                 L"Select Anime Folder",
                                  default_path, path)) {
           anime_item->SetFolder(path);
           Settings.Save();

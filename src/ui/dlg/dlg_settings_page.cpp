@@ -433,7 +433,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Add folders
         case IDC_BUTTON_ADDFOLDER: {
           std::wstring path;
-          if (win::BrowseForFolder(GetWindowHandle(), L"Please select a folder:", L"", path)) {
+          if (win::BrowseForFolder(GetWindowHandle(), L"Add a Library Folder", L"", path)) {
             win::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
             list.InsertItem(list.GetItemCount(), -1, ui::kIcon16_Folder, 0, nullptr, path.c_str(), 0);
             list.SetSelectedItem(list.GetItemCount() - 1);
@@ -509,7 +509,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_BUTTON_TORRENT_BROWSE_APP: {
           std::wstring current_directory = Taiga.GetCurrentDirectory();
           std::wstring path = win::BrowseForFile(
-              GetWindowHandle(), L"Please select a torrent application",
+              GetWindowHandle(), L"Select Torrent Application",
               L"Executable files (*.exe)\0*.exe\0\0");
           if (current_directory != Taiga.GetCurrentDirectory())
             Taiga.SetCurrentDirectory(current_directory);
@@ -520,7 +520,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Browse for torrent download path
         case IDC_BUTTON_TORRENT_BROWSE_FOLDER: {
           std::wstring path;
-          if (win::BrowseForFolder(GetWindowHandle(), L"Please select a folder:", L"", path))
+          if (win::BrowseForFolder(GetWindowHandle(), L"Select Download Folder", L"", path))
             SetDlgItemText(IDC_COMBO_TORRENT_FOLDER, path.c_str());
           return TRUE;
         }
