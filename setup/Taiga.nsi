@@ -22,7 +22,8 @@ OutFile "..\bin\${PRODUCT_NAME}Setup.exe"
 SetCompressor lzma
 
 ; Default installation folder
-InstallDir "$APPDATA\${PRODUCT_NAME}"
+!define DEFAULT_INSTALL_DIR "$APPDATA\${PRODUCT_NAME}"
+InstallDir "${DEFAULT_INSTALL_DIR}"
 ; Get installation folder from registry, if available
 InstallDirRegKey HKCU "Software\${PRODUCT_NAME}" ""
 
@@ -48,6 +49,11 @@ RequestExecutionLevel user
 ; Abort warning
 !define MUI_ABORTWARNING
 !define MUI_UNABORTWARNING
+
+; Directory page
+!define MUI_DIRECTORYPAGE_TEXT_TOP "\
+    Please note that installing under Program Files may cause issues if you have User Account Control enabled.$\r$\n$\r$\n\
+    The default installation folder is:$\r$\n${DEFAULT_INSTALL_DIR}"
 
 ; ------------------------------------------------------------------------------
 ; Pages
