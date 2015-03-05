@@ -84,6 +84,8 @@ const std::wstring kDefaultTorrentSearch =
 const std::wstring kDefaultTorrentSource =
     L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
 
+// Here we assume that anything less than 10 MiB can't be a valid episode.
+const ULONGLONG kDefaultFileSizeThreshold = 1024 * 1024 * 10;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -108,6 +110,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Service_Hummingbird_UseHttps, L"true", L"account/hummingbird/https");
 
   // Library
+  INITKEY(kLibrary_FileSizeThreshold, ToWstr(kDefaultFileSizeThreshold).c_str(), L"anime/folders/scan/minfilesize");
   INITKEY(kLibrary_WatchFolders, L"true", L"anime/folders/watch/enabled");
 
   // Application

@@ -50,6 +50,7 @@ enum AppSettingName {
   kSync_Service_Hummingbird_UseHttps,
 
   // Library
+  kLibrary_FileSizeThreshold,
   kLibrary_WatchFolders,
 
   // Application

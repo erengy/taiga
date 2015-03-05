@@ -34,8 +34,6 @@ TaigaFileSearchHelper file_search_helper;
 TaigaFileSearchHelper::TaigaFileSearchHelper()
     : anime_id_(anime::ID_UNKNOWN),
       episode_number_(0) {
-  // Here we assume that anything less than 10 MiB can't be a valid episode.
-  minimum_file_size_ = 1024 * 1024 * 10;
 }
 
 bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
@@ -164,6 +162,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
   file_search_helper.set_anime_id(anime_id);
   file_search_helper.set_episode_number(episode_number);
+  file_search_helper.set_minimum_file_size(
+      Settings.GetInt(taiga::kLibrary_FileSizeThreshold));
   file_search_helper.set_path_found(L"");
 
   auto anime_item = AnimeDatabase.FindItem(anime_id);
@@ -235,6 +235,8 @@ void ScanAvailableEpisodesQuick(int anime_id) {
 
     file_search_helper.set_anime_id(anime_item.GetId());
     file_search_helper.set_episode_number(0);
+    file_search_helper.set_minimum_file_size(
+        Settings.GetInt(taiga::kLibrary_FileSizeThreshold));
     file_search_helper.set_skip_directories(true);
     file_search_helper.set_skip_files(false);
     file_search_helper.set_skip_subdirectories(false);

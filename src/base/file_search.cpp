@@ -97,6 +97,10 @@ bool FileSearchHelper::OnFile(const std::wstring& root,
   return false;
 }
 
+void FileSearchHelper::set_minimum_file_size(ULONGLONG minimum_file_size) {
+  minimum_file_size_ = minimum_file_size;
+}
+
 void FileSearchHelper::set_skip_directories(bool skip_directories) {
   skip_directories_ = skip_directories;
 }
