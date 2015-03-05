@@ -23,7 +23,7 @@ namespace ui {
 
 InputDialog::InputDialog()
     : current_value_(0), min_value_(0), max_value_(0),
-      numbers_only_(false), result(0) {
+      numbers_only_(false), password_(false), result(0) {
   info = L"Set new value:";
   title = L"Input";
 };
@@ -34,6 +34,10 @@ void InputDialog::SetNumbers(bool enabled, int min_value, int max_value,
   min_value_ = min_value;
   max_value_ = max_value;
   current_value_ = current_value;
+}
+
+void InputDialog::SetPassword(bool enabled) {
+  password_ = enabled;
 }
 
 void InputDialog::Show(HWND parent) {
@@ -63,6 +67,7 @@ BOOL InputDialog::OnInitDialog() {
     spin_.Enable(FALSE);
     spin_.Hide();
   }
+  edit_.SetPasswordChar(password_ ? L'\u25cf' : 0);  // black circle
   edit_.SetSel(0, -1);
 
   return TRUE;

@@ -20,9 +20,6 @@
 #define IDD_SEARCH                              124
 #define IDD_SEASON                              125
 #define IDD_SETTINGS                            126
-#define IDD_SETTINGS_APP_BEHAVIOR               127
-#define IDD_SETTINGS_APP_CONNECTION             128
-#define IDD_SETTINGS_APP_INTERFACE              129
 #define IDD_SETTINGS_APP_LIST                   130
 #define IDD_SETTINGS_LIBRARY_CACHE              131
 #define IDD_SETTINGS_LIBRARY_FOLDERS            132
@@ -43,11 +40,12 @@
 #define IDD_TORRENT                             148
 #define IDD_UPDATE                              149
 #define IDD_UPDATE_NEW                          150
+#define IDD_SETTINGS_ADVANCED                   151
+#define IDD_SETTINGS_APP_GENERAL                152
 #define IDC_BUTTON_ADDFOLDER                    1000
 #define IDC_BUTTON_BROWSE                       1001
 #define IDC_BUTTON_CACHE_CLEAR                  1002
 #define IDC_BUTTON_CANCELSEARCH                 1003
-#define IDC_BUTTON_FORMAT_BALLOON               1004
 #define IDC_BUTTON_FORMAT_HTTP                  1005
 #define IDC_BUTTON_FORMAT_MIRC                  1006
 #define IDC_BUTTON_FORMAT_SKYPE                 1007
@@ -70,7 +68,6 @@
 #define IDC_CHECK_GENERAL_MINIMIZE              1024
 #define IDC_CHECK_HIGHLIGHT                     1025
 #define IDC_CHECK_HTTP                          1026
-#define IDC_CHECK_HUMMINGBIRD_HTTPS             1027
 #define IDC_CHECK_LIST_COMMUNITY_RATINGS        1028
 #define IDC_CHECK_LIST_ENGLISH                  1029
 #define IDC_CHECK_LIST_PROGRESS_AIRED           1030
@@ -134,9 +131,6 @@
 #define IDC_EDIT_PASS_HUMMINGBIRD               1089
 #define IDC_EDIT_PASS_MAL                       1090
 #define IDC_EDIT_PREVIEW                        1091
-#define IDC_EDIT_PROXY_HOST                     1092
-#define IDC_EDIT_PROXY_PASS                     1093
-#define IDC_EDIT_PROXY_USER                     1094
 #define IDC_EDIT_SEARCH                         1095
 #define IDC_EDIT_TORRENT_APP                    1096
 #define IDC_EDIT_TORRENT_INTERVAL               1097
@@ -211,3 +205,4 @@
 #define IDC_TOOLBAR_TORRENT                     1168
 #define IDC_TREE_MAIN                           1169
 #define IDC_TREE_SECTIONS                       1170
+#define IDC_LIST_ADVANCED_SETTINGS              40000

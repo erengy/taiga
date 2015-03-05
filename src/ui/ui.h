@@ -75,6 +75,7 @@ void OnRecognitionFail();
 bool OnSeasonRefreshRequired();
 
 void OnSettingsAccountEmpty();
+bool OnSettingsEditAdvanced(const std::wstring& description, bool is_password, std::wstring& value);
 void OnSettingsChange();
 void OnSettingsLibraryFoldersEmpty();
 void OnSettingsRestoreDefaults();

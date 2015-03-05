@@ -36,6 +36,7 @@ public:
   void OnOK();
 
   void SetNumbers(bool enabled, int min_value, int max_value, int current_value);
+  void SetPassword(bool enabled);
   void Show(HWND parent = nullptr);
 
   INT_PTR result;
@@ -43,7 +44,7 @@ public:
 
 private:
   int current_value_, min_value_, max_value_;
-  bool numbers_only_;
+  bool numbers_only_, password_;
   win::Edit edit_;
   win::Spin spin_;
 };

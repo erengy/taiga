@@ -35,7 +35,8 @@ enum SettingsSections {
   kSettingsSectionApplication,
   kSettingsSectionRecognition,
   kSettingsSectionSharing,
-  kSettingsSectionTorrents
+  kSettingsSectionTorrents,
+  kSettingsSectionAdvanced,
 };
 
 class SettingsDialog : public win::Dialog {
@@ -67,6 +68,7 @@ private:
   win::Tab tab_;
 
 private:
+  std::map<int, std::pair<std::wstring, std::wstring>> advanced_settings_;
   SettingsSections current_section_;
   SettingsPages current_page_;
   std::vector<FeedFilter> feed_filters_;

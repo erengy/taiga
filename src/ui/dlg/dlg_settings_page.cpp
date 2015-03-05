@@ -37,6 +37,7 @@
 #include "ui/dlg/dlg_input.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/dlg/dlg_settings_page.h"
+#include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -56,9 +57,8 @@ void SettingsPage::Create() {
   UINT resource_id = 0;
   switch (index) {
     #define SETRESOURCEID(page, id) case page: resource_id = id; break;
-    SETRESOURCEID(kSettingsPageAppBehavior, IDD_SETTINGS_APP_BEHAVIOR);
-    SETRESOURCEID(kSettingsPageAppConnection, IDD_SETTINGS_APP_CONNECTION);
-    SETRESOURCEID(kSettingsPageAppInterface, IDD_SETTINGS_APP_INTERFACE);
+    SETRESOURCEID(kSettingsPageAdvanced, IDD_SETTINGS_ADVANCED);
+    SETRESOURCEID(kSettingsPageAppGeneral, IDD_SETTINGS_APP_GENERAL);
     SETRESOURCEID(kSettingsPageAppList, IDD_SETTINGS_APP_LIST);
     SETRESOURCEID(kSettingsPageLibraryFolders, IDD_SETTINGS_LIBRARY_FOLDERS);
     SETRESOURCEID(kSettingsPageLibraryCache, IDD_SETTINGS_LIBRARY_CACHE);
@@ -111,7 +111,6 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageServicesHummingbird: {
       SetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD, Settings[taiga::kSync_Service_Hummingbird_Username].c_str());
       SetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD, Base64Decode(Settings[taiga::kSync_Service_Hummingbird_Password]).c_str());
-      CheckDlgButton(IDC_CHECK_HUMMINGBIRD_HTTPS, Settings.GetBool(taiga::kSync_Service_Hummingbird_UseHttps));
       break;
     }
 
@@ -139,25 +138,14 @@ BOOL SettingsPage::OnInitDialog() {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    // Application > Behavior
-    case kSettingsPageAppBehavior: {
+    // Application > General
+    case kSettingsPageAppGeneral: {
       CheckDlgButton(IDC_CHECK_AUTOSTART, Settings.GetBool(taiga::kApp_Behavior_Autostart));
       CheckDlgButton(IDC_CHECK_GENERAL_CLOSE, Settings.GetBool(taiga::kApp_Behavior_CloseToTray));
       CheckDlgButton(IDC_CHECK_GENERAL_MINIMIZE, Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray));
       CheckDlgButton(IDC_CHECK_START_VERSION, Settings.GetBool(taiga::kApp_Behavior_CheckForUpdates));
       CheckDlgButton(IDC_CHECK_START_CHECKEPS, Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes));
       CheckDlgButton(IDC_CHECK_START_MINIMIZE, Settings.GetBool(taiga::kApp_Behavior_StartMinimized));
-      break;
-    }
-    // Application > Connection
-    case kSettingsPageAppConnection: {
-      SetDlgItemText(IDC_EDIT_PROXY_HOST, Settings[taiga::kApp_Connection_ProxyHost].c_str());
-      SetDlgItemText(IDC_EDIT_PROXY_USER, Settings[taiga::kApp_Connection_ProxyUsername].c_str());
-      SetDlgItemText(IDC_EDIT_PROXY_PASS, Settings[taiga::kApp_Connection_ProxyPassword].c_str());
-      break;
-    }
-    // Application > Interface
-    case kSettingsPageAppInterface: {
       SetDlgItemText(IDC_EDIT_EXTERNALLINKS, Settings[taiga::kApp_Interface_ExternalLinks].c_str());
       break;
     }
@@ -395,6 +383,40 @@ BOOL SettingsPage::OnInitDialog() {
       toolbar.SetWindowHandle(nullptr);
       break;
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    // Advanced
+    case kSettingsPageAdvanced: {
+      parent->advanced_settings_.clear();
+      parent->advanced_settings_.insert({
+        {taiga::kSync_Notify_Format, {L"", L"Episode notification format"}},
+        {taiga::kApp_Connection_ProxyHost, {L"", L"Proxy host"}},
+        {taiga::kApp_Connection_ProxyPassword, {L"", L"Proxy password"}},
+        {taiga::kApp_Connection_ProxyUsername, {L"", L"Proxy username"}},
+        {taiga::kApp_Position_Remember, {L"", L"Remember main window position and size"}},
+        {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrent archive limit"}},
+        {taiga::kApp_Interface_Theme, {L"", L"UI theme"}},
+        {taiga::kSync_Service_Hummingbird_UseHttps, {L"", L"Use HTTPS connections for Hummingbird"}},
+      });
+      win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
+      list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
+      list.SetTheme();
+      list.InsertColumn(0, 250, 0, LVS_ALIGNLEFT, L"Name");
+      list.InsertColumn(1, 100, 0, LVS_ALIGNTOP, L"Value");
+      int list_index = 0;
+      for (auto& it : parent->advanced_settings_) {
+        list.InsertItem(list_index, -1, -1, 0, nullptr, it.second.second.c_str(), it.first);
+        it.second.first = Settings.GetWstr(it.first);
+        bool is_password = it.first == taiga::kApp_Connection_ProxyPassword;
+        auto value = is_password ? std::wstring(it.second.first.size(), L'\u25cf') : it.second.first;
+        list.SetItem(list_index, 1, value.c_str());
+        ++list_index;
+      }
+      list.Sort(0, 1, 0, ui::ListViewCompareProc);
+      list.SetWindowHandle(nullptr);
+      break;
+    }
   }
 
   return TRUE;
@@ -439,10 +461,6 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           return TRUE;
         case IDC_BUTTON_FORMAT_TWITTER:
           DlgFormat.mode = kFormatModeTwitter;
-          DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
-          return TRUE;
-        case IDC_BUTTON_FORMAT_BALLOON:
-          DlgFormat.mode = kFormatModeBalloon;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
 
@@ -863,6 +881,25 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
             *feed_filter = DlgFeedFilter.filter;
             parent->RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
             list.SetSelectedItem(lpnmitem->iItem);
+          }
+        }
+        list.SetWindowHandle(nullptr);
+      // Advanced settings
+      } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_ADVANCED_SETTINGS)) {
+        win::ListView list = lpnmitem->hdr.hwndFrom;
+        auto param = list.GetItemParam(lpnmitem->iItem);
+        auto& it = parent->advanced_settings_[param];
+        if (param == taiga::kSync_Notify_Format) {
+          DlgFormat.mode = kFormatModeBalloon;
+          if (DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true) == IDOK) {
+            it.first = Settings.GetWstr(taiga::kSync_Notify_Format);
+            list.SetItem(lpnmitem->iItem, 1, it.first.c_str());
+          }
+        } else {
+          bool is_password = param == taiga::kApp_Connection_ProxyPassword;
+          if (OnSettingsEditAdvanced(it.second, is_password, it.first)) {
+            auto value = is_password ? std::wstring(it.first.size(), L'\u25cf') : it.first;
+            list.SetItem(lpnmitem->iItem, 1, value.c_str());
           }
         }
         list.SetWindowHandle(nullptr);

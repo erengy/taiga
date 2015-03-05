@@ -40,7 +40,8 @@ const WCHAR* kSectionTitles[] = {
   L" Application",
   L" Recognition",
   L" Sharing",
-  L" Torrents"
+  L" Torrents",
+  L" Advanced",
 };
 
 SettingsDialog DlgSettings;
@@ -78,9 +79,7 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       break;
     case kSettingsSectionApplication:
       tab_.InsertItem(0, L"Anime list", kSettingsPageAppList);
-      tab_.InsertItem(1, L"Behavior", kSettingsPageAppBehavior);
-      tab_.InsertItem(2, L"Connection", kSettingsPageAppConnection);
-      tab_.InsertItem(3, L"Interface", kSettingsPageAppInterface);
+      tab_.InsertItem(1, L"General", kSettingsPageAppGeneral);
       break;
     case kSettingsSectionRecognition:
       tab_.InsertItem(0, L"General", kSettingsPageRecognitionGeneral);
@@ -97,6 +96,9 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
       tab_.InsertItem(0, L"Discovery", kSettingsPageTorrentsDiscovery);
       tab_.InsertItem(1, L"Downloads", kSettingsPageTorrentsDownloads);
       tab_.InsertItem(2, L"Filters", kSettingsPageTorrentsFilters);
+      break;
+    case kSettingsSectionAdvanced:
+      tab_.InsertItem(0, L"Advanced settings", kSettingsPageAdvanced);
       break;
   }
 }
@@ -139,6 +141,7 @@ BOOL SettingsDialog::OnInitDialog() {
   TREE_INSERTITEM(kSettingsSectionRecognition, L"Recognition", ui::kIcon24_Recognition);
   TREE_INSERTITEM(kSettingsSectionSharing, L"Sharing", ui::kIcon24_Sharing);
   TREE_INSERTITEM(kSettingsSectionTorrents, L"Torrents", ui::kIcon24_Feed);
+  TREE_INSERTITEM(kSettingsSectionAdvanced, L"Advanced", ui::kIcon24_Settings);
   #undef TREE_INSERTITEM
 
   // Set title font
@@ -185,7 +188,6 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Service_Hummingbird_Username, page->GetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD));
     Settings.Set(taiga::kSync_Service_Hummingbird_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD)));
-    Settings.Set(taiga::kSync_Service_Hummingbird_UseHttps, page->IsDlgButtonChecked(IDC_CHECK_HUMMINGBIRD_HTTPS));
   }
 
   // Library > Folders
@@ -202,8 +204,8 @@ void SettingsDialog::OnOK() {
     list.SetWindowHandle(nullptr);
   }
 
-  // Application > Behavior
-  page = &pages[kSettingsPageAppBehavior];
+  // Application > General
+  page = &pages[kSettingsPageAppGeneral];
   if (page->IsWindow()) {
     Settings.Set(taiga::kApp_Behavior_Autostart, page->IsDlgButtonChecked(IDC_CHECK_AUTOSTART));
     Settings.Set(taiga::kApp_Behavior_CloseToTray, page->IsDlgButtonChecked(IDC_CHECK_GENERAL_CLOSE));
@@ -211,17 +213,6 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kApp_Behavior_CheckForUpdates, page->IsDlgButtonChecked(IDC_CHECK_START_VERSION));
     Settings.Set(taiga::kApp_Behavior_ScanAvailableEpisodes, page->IsDlgButtonChecked(IDC_CHECK_START_CHECKEPS));
     Settings.Set(taiga::kApp_Behavior_StartMinimized, page->IsDlgButtonChecked(IDC_CHECK_START_MINIMIZE));
-  }
-  // Application > Connection
-  page = &pages[kSettingsPageAppConnection];
-  if (page->IsWindow()) {
-    Settings.Set(taiga::kApp_Connection_ProxyHost, page->GetDlgItemText(IDC_EDIT_PROXY_HOST));
-    Settings.Set(taiga::kApp_Connection_ProxyUsername, page->GetDlgItemText(IDC_EDIT_PROXY_USER));
-    Settings.Set(taiga::kApp_Connection_ProxyPassword, page->GetDlgItemText(IDC_EDIT_PROXY_PASS));
-  }
-  // Application > Interface
-  page = &pages[kSettingsPageAppInterface];
-  if (page->IsWindow()) {
     Settings.Set(taiga::kApp_Interface_ExternalLinks, page->GetDlgItemText(IDC_EDIT_EXTERNALLINKS));
   }
   // Application > List
@@ -333,6 +324,14 @@ void SettingsDialog::OnOK() {
     Aggregator.filter_manager.filters.clear();
     for (auto it = feed_filters_.begin(); it != feed_filters_.end(); ++it)
       Aggregator.filter_manager.filters.push_back(*it);
+  }
+
+  // Advanced
+  page = &pages[kSettingsPageAdvanced];
+  if (page->IsWindow()) {
+    for (const auto& it : advanced_settings_) {
+      Settings.Set(it.first, it.second.first);
+    }
   }
 
   // Save settings

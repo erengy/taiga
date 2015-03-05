@@ -24,9 +24,8 @@
 namespace ui {
 
 enum SettingsPages {
-  kSettingsPageAppBehavior = 1,
-  kSettingsPageAppConnection,
-  kSettingsPageAppInterface,
+  kSettingsPageAdvanced = 1,
+  kSettingsPageAppGeneral,
   kSettingsPageAppList,
   kSettingsPageLibraryCache,
   kSettingsPageLibraryFolders,

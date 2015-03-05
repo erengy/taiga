@@ -631,6 +631,23 @@ void OnSettingsAccountEmpty() {
     ShowDlgSettings(kSettingsSectionServices, kSettingsPageServicesMain);
 }
 
+bool OnSettingsEditAdvanced(const std::wstring& description,
+                            bool is_password, std::wstring& value) {
+  InputDialog dlg;
+  dlg.title = L"Advanced Setting";
+  dlg.info = description + L":";
+  dlg.text = value;
+  dlg.SetPassword(is_password);
+  dlg.Show(DlgSettings.GetWindowHandle());
+
+  if (dlg.result == IDOK) {
+    value = dlg.text;
+    return true;
+  }
+
+  return false;
+}
+
 void OnSettingsChange() {
   DlgAnimeList.RefreshList();
 }
