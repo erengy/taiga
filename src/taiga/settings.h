@@ -76,6 +76,7 @@ enum AppSettingName {
   kApp_Interface_ExternalLinks,
 
   // Recognition
+  kRecognition_IgnoredStrings,
   kSync_Update_Delay,
   kSync_Update_AskToConfirm,
   kSync_Update_CheckPlayer,

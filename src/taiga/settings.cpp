@@ -136,6 +136,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_Interface_ExternalLinks, kDefaultExternalLinks.c_str(), L"program/general/externallinks");
 
   // Recognition
+  INITKEY(kRecognition_IgnoredStrings, nullptr, L"recognition/anitomy/ignored_strings");
   INITKEY(kSync_Update_Delay, L"120", L"account/update/delay");
   INITKEY(kSync_Update_AskToConfirm, L"true", L"account/update/asktoconfirm");
   INITKEY(kSync_Update_CheckPlayer, nullptr, L"account/update/checkplayer");

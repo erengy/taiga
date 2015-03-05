@@ -30,6 +30,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
+#include "taiga/settings.h"
 #include "track/recognition.h"
 
 track::recognition::Engine Meow;
@@ -53,6 +54,10 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
 
   if (episode.streaming_media)
     anitomy_instance.options().allowed_delimiters = L" ";
+
+  const auto& ignored_strings = Settings[taiga::kRecognition_IgnoredStrings];
+  if (!ignored_strings.empty())
+    Split(ignored_strings, L"|", anitomy_instance.options().ignored_strings);
 
   if (!anitomy_instance.Parse(title)) {
     LOG(LevelDebug, L"Could not parse filename: " + title);

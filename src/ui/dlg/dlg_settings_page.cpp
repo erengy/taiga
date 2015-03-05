@@ -392,6 +392,7 @@ BOOL SettingsPage::OnInitDialog() {
       parent->advanced_settings_.insert({
         {taiga::kSync_Notify_Format, {L"", L"Episode notification format"}},
         {taiga::kLibrary_FileSizeThreshold, {L"", L"File size threshold"}},
+        {taiga::kRecognition_IgnoredStrings, {L"", L"Ignored strings"}},
         {taiga::kApp_Connection_ProxyHost, {L"", L"Proxy host"}},
         {taiga::kApp_Connection_ProxyPassword, {L"", L"Proxy password"}},
         {taiga::kApp_Connection_ProxyUsername, {L"", L"Proxy username"}},
