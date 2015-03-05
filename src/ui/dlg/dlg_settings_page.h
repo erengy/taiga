@@ -53,6 +53,7 @@ public:
   SettingsPage();
   virtual ~SettingsPage() {}
 
+  INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
   void OnDropFiles(HDROP hDropInfo);
   BOOL OnInitDialog();

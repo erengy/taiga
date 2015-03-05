@@ -367,7 +367,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      list.InsertColumn(0, 0, 0, 0, L"Name");
+      list.InsertColumn(0, 0, 0, LVS_ALIGNLEFT, L"Name");
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.InsertGroup(0, L"General filters", true, false);
       list.InsertGroup(1, L"Limited filters", true, false);
@@ -401,6 +401,24 @@ BOOL SettingsPage::OnInitDialog() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_CTLCOLORSTATIC: {
+      HDC hdc = reinterpret_cast<HDC>(wParam);
+      HWND hwnd_static = reinterpret_cast<HWND>(lParam);
+      // We use WS_EX_TRANSPARENT to identify secondary static controls
+      if (::GetWindowLong(hwnd_static, GWL_EXSTYLE) & WS_EX_TRANSPARENT) {
+        ::SetBkMode(hdc, TRANSPARENT);
+        ::SetTextColor(hdc, ::GetSysColor(COLOR_GRAYTEXT));
+        return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+      }
+      break;
+    }
+  }
+
+  return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
 
 BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (HIWORD(wParam)) {
