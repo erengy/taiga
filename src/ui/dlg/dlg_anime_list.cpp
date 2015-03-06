@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <set>
 #include <WindowsX.h>
 
 #include "base/foreach.h"
@@ -262,7 +263,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         rect.top += 12;
         rect.bottom = rect.top + 12;
         rect.right -= 8;
-        listview.DrawProgressBar(dc.Get(), &rect, dis->itemID, 0, *anime_item);
+        listview.DrawProgressBar(dc.Get(), &rect, dis->itemID, *anime_item);
 
         dc.DetachDc();
         return TRUE;
@@ -366,7 +367,7 @@ void AnimeListDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 /* ListView control */
 
 AnimeListDialog::ListView::ListView()
-    : dragging(false), hot_item(-1), parent(nullptr) {
+    : dragging(false), hot_item(-1), parent(nullptr), progress_bars_visible(false) {
   button_visible[0] = false;
   button_visible[1] = false;
   button_visible[2] = false;
@@ -429,7 +430,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
   hot_item = index;
 
-  if (index < 0) {
+  if (index < 0 || !progress_bars_visible) {
     tooltips.DeleteTip(0);
     tooltips.DeleteTip(1);
     tooltips.DeleteTip(2);
@@ -812,7 +813,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
 }
 
 void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
-                                                UINT uItemState, anime::Item& anime_item) {
+                                                anime::Item& anime_item) {
   win::Dc dc = hdc;
   win::Rect rcBar = *rc;
 
@@ -827,10 +828,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   if (eps_watched == 0)
     eps_watched = -1;
 
-  rcBar.right -= ScaleX(50);
-
   // Draw border
-  rcBar.Inflate(-4, -4);
   ui::Theme.DrawListProgress(dc.Get(), &rcBar, ui::kListProgressBorder);
   // Draw background
   rcBar.Inflate(-1, -1);
@@ -937,6 +935,32 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     }
   }
 
+  // Rewatching
+  if (index > -1 && index == hot_item) {
+    if (anime_item.GetMyRewatching()) {
+      win::Rect rcText = rcBar;
+      rcText.Inflate(-button_rect[0].Width(), 4);
+      COLORREF text_color = dc.GetTextColor();
+      dc.SetBkMode(TRANSPARENT);
+      dc.EditFont(nullptr, 7, -1, TRUE);
+      dc.SetTextColor(ui::Theme.GetListProgressColor(ui::kListProgressButton));
+      dc.DrawText(L"Rewatching", -1, rcText,
+                  DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+      dc.SetTextColor(text_color);
+    }
+  }
+
+  // Don't destroy the DC
+  dc.DetachDc();
+}
+
+void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
+                                                 anime::Item& anime_item) {
+  win::Dc dc = hdc;
+
+  int eps_watched = anime_item.GetMyLastWatchedEpisode(true);
+  int eps_total = anime_item.GetEpisodeCount();
+
   // Draw text
   std::wstring text;
   win::Rect rcText = *rc;
@@ -944,7 +968,6 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   dc.SetBkMode(TRANSPARENT);
 
   // Separator
-  rcText.left = rcBar.right;
   dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
   dc.DrawText(L"/", 1, rcText,
               DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -953,9 +976,9 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   // Episodes watched
   text = anime::TranslateNumber(eps_watched, L"0");
   rcText.right -= (rcText.Width() / 2) + 4;
-  if (eps_watched < 1) {
+  if (!eps_watched) {
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
-  } else if (eps_watched > eps_total && eps_total) {
+  } else if (!anime::IsValidEpisodeNumber(eps_watched, eps_total)) {
     dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
   } else if (eps_watched < eps_total && anime_item.GetMyStatus() == anime::kCompleted) {
     dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
@@ -968,24 +991,11 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   text = anime::TranslateNumber(eps_total, L"?");
   rcText.left = rcText.right + 8;
   rcText.right = rc->right;
-  if (eps_total < 1)
+  if (!eps_total)
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
   dc.DrawText(text.c_str(), text.length(), rcText,
               DT_LEFT | DT_VCENTER | DT_SINGLELINE);
   dc.SetTextColor(text_color);
-
-  // Rewatching
-  if (index > -1 && index == hot_item) {
-    if (anime_item.GetMyRewatching()) {
-      rcText.Copy(rcBar);
-      rcText.Inflate(0, 4);
-      dc.EditFont(nullptr, 7, -1, TRUE);
-      dc.SetTextColor(ui::Theme.GetListProgressColor(ui::kListProgressButton));
-      dc.DrawText(L"Rewatching", -1, rcText,
-                  DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-      dc.SetTextColor(text_color);
-    }
-  }
 
   // Don't destroy the DC
   dc.DetachDc();
@@ -1026,19 +1036,17 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
     case CDDS_PREPAINT:
       return CDRF_NOTIFYITEMDRAW;
     case CDDS_ITEMPREPAINT:
-      return CDRF_NOTIFYSUBITEMDRAW;
-    case CDDS_PREERASE:
-    case CDDS_ITEMPREERASE:
-      return CDRF_NOTIFYPOSTERASE;
-
-    case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
-      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       // Alternate background color
       if ((pCD->nmcd.dwItemSpec % 2) && !listview.IsGroupViewEnabled())
         pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);
-      // Change text color
+      return CDRF_NOTIFYSUBITEMDRAW;
+
+    case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
+      auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
-        return CDRF_NOTIFYPOSTPAINT;
+        break;
+
+      // Change text color
       pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
       auto column_type = listview.FindColumnAtSubItemIndex(pCD->iSubItem);
       switch (column_type) {
@@ -1061,6 +1069,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
       }
+
       // Indicate currently playing
       if (anime_item->GetPlaying()) {
         pCD->clrTextBk = ui::kColorLightGreen;
@@ -1069,34 +1078,48 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         SelectObject(pCD->nmcd.hdc, column_type == kColumnAnimeTitle ? hFontBold : hFontDefault);
         return CDRF_NEWFONT | CDRF_NOTIFYPOSTPAINT;
       }
+
       return CDRF_NOTIFYPOSTPAINT;
     }
 
     case CDDS_ITEMPOSTPAINT | CDDS_SUBITEM: {
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(pCD->nmcd.lItemlParam));
       if (!anime_item)
-        return CDRF_DODEFAULT;
+        break;
+
       auto column_type = listview.FindColumnAtSubItemIndex(pCD->iSubItem);
       if (column_type == kColumnUserProgress || column_type == kColumnUserRating) {
         win::Rect rcItem;
         listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
         if (!rcItem.IsEmpty() && listview.columns[column_type].visible) {
+
+          // Draw progress bar and text
           if (column_type == kColumnUserProgress) {
-            listview.DrawProgressBar(pCD->nmcd.hdc, &rcItem, pCD->nmcd.dwItemSpec,
-                                     pCD->nmcd.uItemState, *anime_item);
+            listview.progress_bars_visible = rcItem.Width() > 100;
+            rcItem.Inflate(-4, 0);
+            if (listview.progress_bars_visible) {
+              win::Rect rcBar = rcItem;
+              rcBar.right -= ScaleX(50);
+              rcBar.Inflate(0, -4);
+              listview.DrawProgressBar(pCD->nmcd.hdc, &rcBar, pCD->nmcd.dwItemSpec,
+                                       *anime_item);
+              rcItem.left = rcBar.right;
+            }
+            listview.DrawProgressText(pCD->nmcd.hdc, &rcItem, *anime_item);
+
+          // Draw score box
           } else if (column_type == kColumnUserRating) {
             listview.DrawScoreBox(pCD->nmcd.hdc, &rcItem, pCD->nmcd.dwItemSpec,
                                   pCD->nmcd.uItemState, *anime_item);
           }
         }
       }
-      return CDRF_DODEFAULT;
-    }
 
-    default: {
-      return CDRF_DODEFAULT;
+      break;
     }
   }
+
+  return CDRF_DODEFAULT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1351,7 +1374,7 @@ void AnimeListDialog::ListView::InitializeColumns() {
       {kColumnAnimeTitle, true, i, i++, 0, 300, 100, LVCFMT_LEFT,
        L"Anime title", L"anime_title"})));
   columns.insert(std::make_pair(kColumnUserProgress, ColumnData(
-      {kColumnUserProgress, true, i, i++, 0, 200, 100, LVCFMT_CENTER,
+      {kColumnUserProgress, true, i, i++, 0, 200, 60, LVCFMT_CENTER,
        L"Progress", L"user_progress"})));
   columns.insert(std::make_pair(kColumnUserRating, ColumnData(
       {kColumnUserRating, true, i, i++, 0, 50, 50, LVCFMT_CENTER,

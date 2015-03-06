@@ -75,7 +75,8 @@ public:
 
     LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-    void DrawProgressBar(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
+    void DrawProgressBar(HDC hdc, RECT* rc, int index, anime::Item& anime_item);
+    void DrawProgressText(HDC hdc, RECT* rc, anime::Item& anime_item);
     void DrawScoreBox(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
 
     int GetDefaultSortOrder(AnimeListColumn column);
@@ -108,6 +109,7 @@ public:
 
     win::Rect button_rect[3];
     bool button_visible[3];
+    bool progress_bars_visible;
     bool dragging;
     win::ImageList drag_image;
     int hot_item;
