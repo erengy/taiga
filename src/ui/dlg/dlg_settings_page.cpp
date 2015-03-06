@@ -347,7 +347,10 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Torrents > Filters
     case kSettingsPageTorrentsFilters: {
-      CheckDlgButton(IDC_CHECK_TORRENT_FILTER, Settings.GetBool(taiga::kTorrent_Filter_Enabled));
+      BOOL enable = Settings.GetBool(taiga::kTorrent_Filter_Enabled);
+      CheckDlgButton(IDC_CHECK_TORRENT_FILTER, enable);
+      EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
+      EnableDlgItem(IDC_TOOLBAR_FEED_FILTER, enable);
       win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
       list.EnableGroupView(true);
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
