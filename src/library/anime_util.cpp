@@ -752,20 +752,6 @@ void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
     insert_title(synonym);
 }
 
-std::wstring GetMyScore(const Item& item) {
-  std::wstring score = anime::TranslateMyScore(item.GetMyScore());
-
-  if (Settings.GetBool(taiga::kApp_List_DisplayCommunityRatings)) {
-    if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
-      auto community_rating = item.GetScore();
-      if (item.GetMyScore() == 0 && community_rating > 0.0)
-        score = anime::TranslateScore(community_rating);
-    }
-  }
-
-  return score;
-}
-
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched) {
   ratio_aired = 0.0f;
   ratio_watched = 0.0f;

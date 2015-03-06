@@ -68,7 +68,6 @@
 #define IDC_CHECK_GENERAL_MINIMIZE              1024
 #define IDC_CHECK_HIGHLIGHT                     1025
 #define IDC_CHECK_HTTP                          1026
-#define IDC_CHECK_LIST_COMMUNITY_RATINGS        1028
 #define IDC_CHECK_LIST_ENGLISH                  1029
 #define IDC_CHECK_LIST_PROGRESS_AIRED           1030
 #define IDC_CHECK_LIST_PROGRESS_AVAILABLE       1031

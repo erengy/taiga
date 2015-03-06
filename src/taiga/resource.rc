@@ -349,13 +349,12 @@ FONT 9, "Segoe UI", 400, 0, 0
     COMBOBOX        IDC_COMBO_DBLCLICK, 12, 28, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
     LTEXT           "Middle click:", IDC_STATIC, 160, 18, 141, 8, SS_LEFT, WS_EX_LEFT
     COMBOBOX        IDC_COMBO_MDLCLICK, 160, 28, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
-    GROUPBOX        "Appearance", IDC_STATIC, 7, 55, 301, 91, 0, WS_EX_LEFT
+    GROUPBOX        "Appearance", IDC_STATIC, 7, 55, 301, 40, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Highlight new episodes", IDC_CHECK_HIGHLIGHT, 12, 66, 90, 10, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Display English titles, if available", IDC_CHECK_LIST_ENGLISH, 12, 78, 125, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Display community ratings (Hummingbird only)", IDC_CHECK_LIST_COMMUNITY_RATINGS, 12, 90, 170, 10, 0, WS_EX_LEFT
-    LTEXT           "Progress bars:", IDC_STATIC, 12, 107, 141, 8, SS_LEFT, WS_EX_LEFT
-    AUTOCHECKBOX    "Display aired episodes (estimated)", IDC_CHECK_LIST_PROGRESS_AIRED, 12, 117, 141, 10, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Display available episodes on my computer", IDC_CHECK_LIST_PROGRESS_AVAILABLE, 12, 129, 170, 10, 0, WS_EX_LEFT
+    GROUPBOX        "Progress", IDC_STATIC, 7, 102, 301, 40, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Display aired episodes (estimated)", IDC_CHECK_LIST_PROGRESS_AIRED, 12, 113, 141, 10, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Display available episodes on my computer", IDC_CHECK_LIST_PROGRESS_AVAILABLE, 12, 125, 170, 10, 0, WS_EX_LEFT
 }
 
 

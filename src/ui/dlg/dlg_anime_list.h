@@ -31,6 +31,7 @@ namespace ui {
 
 enum AnimeListColumn {
   kColumnUnknown,
+  kColumnAnimeRating,
   kColumnAnimeSeason,
   kColumnAnimeStatus,
   kColumnAnimeTitle,

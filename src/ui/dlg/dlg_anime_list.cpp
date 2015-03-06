@@ -314,6 +314,10 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           } else {
             auto column_type = listview.TranslateColumnName(action);
             auto& column = listview.columns[column_type];
+            if (column_type == kColumnAnimeRating && !column.visible &&
+                taiga::GetCurrentServiceId() == sync::kMyAnimeList) {
+              OnAnimeListHeaderRatingWarning();
+            }
             column.visible = !column.visible;
           }
           listview.RefreshColumns(reset);
@@ -375,6 +379,7 @@ AnimeListDialog::ListView::ListView()
 
 int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
   switch (column) {
+    case kColumnAnimeRating:
     case kColumnAnimeSeason:
     case kColumnAnimeStatus:
     case kColumnAnimeType:
@@ -396,6 +401,8 @@ int AnimeListDialog::ListView::GetSortType(AnimeListColumn column) {
       return ui::kListSortProgress;
     case kColumnUserRating:
       return ui::kListSortMyScore;
+    case kColumnAnimeRating:
+      return ui::kListSortScore;
     case kColumnAnimeSeason:
       return ui::kListSortSeason;
     case kColumnAnimeStatus:
@@ -1016,7 +1023,7 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     COLORREF text_color = dc.GetTextColor();
     dc.SetBkMode(TRANSPARENT);
 
-    std::wstring text = anime::GetMyScore(anime_item);
+    std::wstring text = anime::TranslateMyScore(anime_item.GetMyScore());
     dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
@@ -1050,6 +1057,10 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
       pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
       auto column_type = listview.FindColumnAtSubItemIndex(pCD->iSubItem);
       switch (column_type) {
+        case kColumnAnimeRating:
+          if (!anime_item->GetScore())
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
         case kColumnAnimeTitle:
           if (anime_item->IsNewEpisodeAvailable() &&
               Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes))
@@ -1269,6 +1280,9 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       continue;
     std::wstring text;
     switch (column.column) {
+      case kColumnAnimeRating:
+        text = anime::TranslateScore(anime_item.GetScore());
+        break;
       case kColumnAnimeSeason:
         text = anime::TranslateDateToSeasonString(anime_item.GetDateStart());
         break;
@@ -1289,7 +1303,7 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
         break;
       }
       case kColumnUserRating:
-        text = anime::GetMyScore(anime_item);
+        text = anime::TranslateMyScore(anime_item.GetMyScore());
         break;
     }
     if (!text.empty())
@@ -1379,6 +1393,9 @@ void AnimeListDialog::ListView::InitializeColumns() {
   columns.insert(std::make_pair(kColumnUserRating, ColumnData(
       {kColumnUserRating, true, i, i++, 0, 50, 50, LVCFMT_CENTER,
        L"Score", L"user_rating"})));
+  columns.insert(std::make_pair(kColumnAnimeRating, ColumnData(
+      {kColumnAnimeRating, false, i, i++, 0, 55, 55, LVCFMT_CENTER,
+       L"Average", L"anime_average_rating"})));
   columns.insert(std::make_pair(kColumnAnimeType, ColumnData(
       {kColumnAnimeType, true, i, i++, 0, 60, 60, LVCFMT_CENTER,
        L"Type", L"anime_type"})));
@@ -1498,6 +1515,7 @@ void AnimeListDialog::ListView::SetColumnSize(int index, unsigned short width) {
 
 AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstring& name) {
   static const std::map<std::wstring, AnimeListColumn> names{
+    {L"anime_average_rating", kColumnAnimeRating},
     {L"anime_season", kColumnAnimeSeason},
     {L"anime_status", kColumnAnimeStatus},
     {L"anime_title", kColumnAnimeTitle},

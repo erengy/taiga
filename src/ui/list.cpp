@@ -160,19 +160,7 @@ int SortListByProgress(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByMyScore(const anime::Item& item1, const anime::Item& item2) {
-  double score1 = item1.GetMyScore();
-  double score2 = item2.GetMyScore();
-
-  if (Settings.GetBool(taiga::kApp_List_DisplayCommunityRatings)) {
-    if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
-      if (!score1)
-        score1 = item1.GetScore();
-      if (!score2)
-        score2 = item2.GetScore();
-    }
-  }
-
-  return CompareValues<double>(score1, score2);
+  return CompareValues<double>(item1.GetMyScore(), item2.GetMyScore());
 }
 
 int SortListByScore(const anime::Item& item1, const anime::Item& item2) {

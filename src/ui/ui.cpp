@@ -597,6 +597,15 @@ void OnRecognitionFail() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void OnAnimeListHeaderRatingWarning() {
+  win::TaskDialog dlg(L"Average Score", TD_ICON_INFORMATION);
+  dlg.SetMainInstruction(L"Technical limitation");
+  dlg.SetContent(L"Please note that Taiga may display outdated average values "
+                 L"for MyAnimeList.");
+  dlg.AddButton(L"OK", IDOK);
+  dlg.Show(DlgMain.GetWindowHandle());
+}
+
 bool OnSeasonRefreshRequired() {
   win::TaskDialog dlg;
   std::wstring title = L"Season - " + SeasonDatabase.name;
