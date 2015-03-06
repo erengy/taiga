@@ -279,7 +279,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
       hti.pt = pt;
       ::ScreenToClient(listview.GetHeader(), &hti.pt);
       ::SendMessage(listview.GetHeader(), HDM_HITTEST, 0, reinterpret_cast<LPARAM>(&hti));
-      if ((hti.flags & HHT_ONHEADER) || (hti.flags & HHT_NOWHERE))
+      if (hti.flags & (HHT_NOWHERE | HHT_ONHEADER | HHT_ONDIVIDER))
         hwnd_from = listview.GetHeader();
       if (hwnd_from == listview.GetWindowHandle()) {
         if (listview.GetSelectedCount() > 0) {
