@@ -99,9 +99,13 @@ BOOL MainDialog::OnInitDialog() {
   if (Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes)) {
     ScanAvailableEpisodesQuick();
   }
-  if (!Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
-    Show(Settings.GetBool(taiga::kApp_Position_Remember) && Settings.GetBool(taiga::kApp_Position_Maximized) ?
-      SW_MAXIMIZE : SW_SHOWNORMAL);
+  if (Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
+    if (!Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray))
+      Show(SW_SHOWMINIMIZED);
+  } else {
+    bool maximized = Settings.GetBool(taiga::kApp_Position_Remember) &&
+                     Settings.GetBool(taiga::kApp_Position_Maximized);
+    Show(maximized ? SW_MAXIMIZE : SW_SHOWNORMAL);
   }
   if (taiga::GetCurrentUsername().empty()) {
     win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
