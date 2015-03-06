@@ -1408,13 +1408,66 @@ void AnimeListDialog::ListView::InitializeColumns() {
 }
 
 void AnimeListDialog::ListView::InsertColumns() {
-  // Calculate the index and width of each column
-  size_t current_index = 0;
-  for (int order = 0; order < columns.size(); ++order) {
+  // Resolve width issues
+  for (auto& it : columns) {
+    auto& column = it.second;
+    if (column.width < column.width_min)
+      column.width = column.width_default;
+  }
+
+  // Resolve order issues
+  for (int order = 0; order < static_cast<int>(columns.size()); ++order) {
+    bool found = false;
     for (auto& it : columns) {
       auto& column = it.second;
-      if (column.width < column.width_min)
-        column.width = column.width_default;
+      if (column.order == order) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      int minimum_order = INT_MAX;
+      for (auto& it : columns) {
+        auto& column = it.second;
+        if (column.order > order) {
+          minimum_order = min(minimum_order, column.order);
+        }
+      }
+      int order_difference = minimum_order - order;
+      for (auto& it : columns) {
+        auto& column = it.second;
+        if (column.order > order)
+          column.order -= order_difference;
+      }
+    }
+  }
+  for (int order = 0; order < static_cast<int>(columns.size()); ++order) {
+    std::set<int> found;
+    for (auto& it : columns) {
+      auto& column = it.second;
+      if (column.order == order)
+        found.insert(column.column);
+    }
+    if (found.size() > 1) {
+      int maximum_order = 0;
+      for (auto& it : columns) {
+        auto& column = it.second;
+        maximum_order = max(maximum_order, column.order);
+      }
+      int current_order = maximum_order + 1;
+      found.erase(found.begin());
+      for (const auto& it : found) {
+        auto& column = columns[static_cast<AnimeListColumn>(it)];
+        column.order = current_order++;
+      }
+    }
+  }
+
+  // Calculate the index of each column
+  size_t current_index = 0;
+  for (int order = 0; order < static_cast<int>(columns.size()); ++order) {
+    for (auto& it : columns) {
+      auto& column = it.second;
       if (column.order == order) {
         column.index = column.visible ? current_index++ : -1;
         break;
@@ -1425,7 +1478,7 @@ void AnimeListDialog::ListView::InsertColumns() {
   // Insert columns
   DeleteAllColumns();
   InsertColumn(0, 0, 0, 0, L"Dummy");
-  for (int i = 0; i < columns.size(); ++i) {
+  for (int i = 0; i < static_cast<int>(columns.size()); ++i) {
     for (auto& it : columns) {
       auto& column = it.second;
       if (!column.visible || column.index != i)
