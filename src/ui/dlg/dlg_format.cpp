@@ -42,23 +42,23 @@ BOOL FormatDialog::OnInitDialog() {
   // Set text
   switch (mode) {
     case kFormatModeHttp:
-      SetText(L"Edit format - HTTP request");
+      SetText(L"Edit Format - HTTP Request");
       rich_edit_.SetText(Settings[taiga::kShare_Http_Format].c_str());
       break;
     case kFormatModeMirc:
-      SetText(L"Edit format - mIRC");
+      SetText(L"Edit Format - mIRC");
       rich_edit_.SetText(Settings[taiga::kShare_Mirc_Format].c_str());
       break;
     case kFormatModeSkype:
-      SetText(L"Edit format - Skype");
+      SetText(L"Edit Format - Skype");
       rich_edit_.SetText(Settings[taiga::kShare_Skype_Format].c_str());
       break;
     case kFormatModeTwitter:
-      SetText(L"Edit format - Twitter");
+      SetText(L"Edit Format - Twitter");
       rich_edit_.SetText(Settings[taiga::kShare_Twitter_Format].c_str());
       break;
     case kFormatModeBalloon:
-      SetText(L"Edit format - Balloon tooltips");
+      SetText(L"Edit Format - Episode Notifications");
       rich_edit_.SetText(Settings[taiga::kSync_Notify_Format].c_str());
       break;
   }
