@@ -379,7 +379,7 @@ bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
     if (it->IsDiscarded())
       continue;
     // Do not filter the same item again
-    if (it->index == item.index)
+    if (*it == item)
       continue;
 
     // Is it the same title/anime?
@@ -502,14 +502,6 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
       }
     }
   }
-}
-
-bool FeedFilterManager::IsItemDownloadAvailable(Feed& feed) {
-  foreach_c_(item, feed.items)
-    if (item->state == kFeedItemSelected)
-      return true;
-
-  return false;
 }
 
 void FeedFilterManager::MarkNewEpisodes(Feed& feed) {

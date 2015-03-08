@@ -384,13 +384,10 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               return TRUE;
             case kSidebarItemFeeds: {
               // Check new torrents
-              Feed* feed = Aggregator.Get(kFeedCategoryLink);
-              if (feed) {
-                edit.SetText(L"");
-                feed->Check(Settings[taiga::kTorrent_Discovery_Source]);
-                return TRUE;
-              }
-              break;
+              edit.SetText(L"");
+              Aggregator.CheckFeed(kFeedCategoryLink,
+                                   Settings[taiga::kTorrent_Discovery_Source]);
+              return TRUE;
             }
           }
           break;

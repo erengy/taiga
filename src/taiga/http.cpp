@@ -198,14 +198,11 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       }
       break;
     }
-    case kHttpFeedDownload:
-    case kHttpFeedDownloadAll: {
+    case kHttpFeedDownload: {
       if (Aggregator.ValidateFeedDownload(client.request(), response)) {
         auto feed = reinterpret_cast<Feed*>(response.parameter);
-        if (feed) {
-          bool download_all = client.mode() == kHttpFeedDownloadAll;
-          Aggregator.HandleFeedDownload(*feed, client.write_buffer_, download_all);
-        }
+        if (feed)
+          Aggregator.HandleFeedDownload(*feed, client.write_buffer_);
       }
       break;
     }

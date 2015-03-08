@@ -107,7 +107,6 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
     case taiga::kHttpFeedCheck:
     case taiga::kHttpFeedCheckAuto:
     case taiga::kHttpFeedDownload:
-    case taiga::kHttpFeedDownloadAll:
       ChangeStatusText(error);
       DlgTorrent.EnableInput();
       break;
@@ -179,7 +178,6 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
       status = L"Checking new torrents...";
       break;
     case taiga::kHttpFeedDownload:
-    case taiga::kHttpFeedDownloadAll:
       status = L"Downloading torrent file...";
       break;
     case taiga::kHttpTwitterRequest:

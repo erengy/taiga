@@ -319,6 +319,9 @@
     <ClCompile Include="..\..\src\track\feed.cpp">
       <Filter>track</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\feed_aggregator.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\track\feed_filter.cpp">
       <Filter>track</Filter>
     </ClCompile>

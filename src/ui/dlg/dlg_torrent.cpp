@@ -107,16 +107,11 @@ INT_PTR TorrentDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 }
 
 BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
-  Feed* feed = Aggregator.Get(kFeedCategoryLink);
-  if (!feed)
-    return 0;
-
-  // Toolbar
   switch (LOWORD(wParam)) {
     // Check new torrents
     case 100: {
       DlgMain.edit.SetText(L"");
-      feed->Check(Settings[taiga::kTorrent_Discovery_Source]);
+      Aggregator.CheckFeed(kFeedCategoryLink, Settings[taiga::kTorrent_Discovery_Source]);
       /**
       #ifdef _DEBUG
       feed->Load();
@@ -128,7 +123,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Download marked torrents
     case 101: {
-      feed->Download(-1);
+      Aggregator.Download(kFeedCategoryLink, nullptr);
       return TRUE;
     }
     // Discard marked torrents
@@ -139,7 +134,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (feed_item) {
             feed_item->state = kFeedItemDiscardedNormal;
             list_.SetCheckState(i, FALSE);
-            Aggregator.file_archive.push_back(feed_item->title);
+            Aggregator.AddToArchive(feed_item->title);
           }
         }
       }
@@ -156,10 +151,6 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
-  Feed* feed = Aggregator.Get(kFeedCategoryLink);
-  if (!feed)
-    return 0;
-
   // ListView control
   if (idCtrl == IDC_LIST_TORRENT) {
     switch (pnmh->code) {
@@ -212,10 +203,10 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case NM_DBLCLK: {
         if (list_.GetSelectedCount() > 0) {
           LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-          if (lpnmitem->iItem == -1) break;
+          if (lpnmitem->iItem == -1)
+            break;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
-          if (feed_item)
-            feed->Download(feed_item->index);
+          Aggregator.Download(kFeedCategoryLink, feed_item);
         }
         break;
       }
@@ -223,12 +214,13 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Right click
       case NM_RCLICK: {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-        if (lpnmitem->iItem == -1) break;
+        if (lpnmitem->iItem == -1)
+          break;
         FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
         if (feed_item) {
           std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"TorrentListRightClick");
           if (answer == L"DownloadTorrent") {
-            feed->Download(feed_item->index);
+            Aggregator.Download(kFeedCategoryLink, feed_item);
           } else if (answer == L"Info") {
             auto anime_id = feed_item->episode_data.anime_id;
             if (anime_id) {
@@ -239,7 +231,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           } else if (answer == L"DiscardTorrent") {
             feed_item->state = kFeedItemDiscardedNormal;
             list_.SetCheckState(lpnmitem->iItem, FALSE);
-            Aggregator.file_archive.push_back(feed_item->title);
+            Aggregator.AddToArchive(feed_item->title);
           } else if (answer == L"DiscardTorrents") {
             auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
             if (anime_item) {
@@ -355,8 +347,10 @@ void TorrentDialog::EnableInput(bool enable) {
 }
 
 void TorrentDialog::RefreshList() {
-  if (!IsWindow()) return;
-  Feed* feed = Aggregator.Get(kFeedCategoryLink);
+  if (!IsWindow())
+    return;
+
+  Feed* feed = Aggregator.GetFeed(kFeedCategoryLink);
   if (!feed)
     return;
 
@@ -446,16 +440,12 @@ void TorrentDialog::Search(std::wstring url, int anime_id) {
 }
 
 void TorrentDialog::Search(std::wstring url, std::wstring title) {
-  Feed* feed = Aggregator.Get(kFeedCategoryLink);
-  if (!feed)
-    return;
-
   DlgMain.navigation.SetCurrentPage(kSidebarItemFeeds);
   DlgMain.edit.SetText(title);
   DlgMain.ChangeStatus(L"Searching torrents for \"" + title + L"\"...");
 
   ReplaceString(url, L"%title%", title);
-  feed->Check(url);
+  Aggregator.CheckFeed(kFeedCategoryLink, url);
 }
 
 void TorrentDialog::SetTimer(int ticks) {

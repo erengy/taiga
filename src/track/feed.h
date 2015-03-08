@@ -79,8 +79,8 @@ public:
   bool IsDiscarded() const;
 
   bool operator<(const FeedItem& item) const;
+  bool operator==(const FeedItem& item) const;
 
-  int index;
   std::wstring magnet_link;
   FeedItemState state;
 
@@ -113,14 +113,10 @@ public:
   Feed();
   ~Feed() {}
 
-  bool Check(const std::wstring& source, bool automatic = false);
-  bool Download(int index);
-  bool ExamineData();
   std::wstring GetDataPath();
   bool Load();
 
   FeedCategory category;
-  int download_index;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -130,28 +126,36 @@ public:
   Aggregator();
   ~Aggregator() {}
 
-  Feed* Get(FeedCategory category);
+  Feed* GetFeed(FeedCategory category);
+
+  bool CheckFeed(FeedCategory category, const std::wstring& source, bool automatic = false);
+  bool Download(FeedCategory category, const FeedItem* feed_item);
 
   void HandleFeedCheck(Feed& feed, const std::string& data, bool automatic);
-  void HandleFeedDownload(Feed& feed, const std::string& data, bool download_all);
+  void HandleFeedDownload(Feed& feed, const std::string& data);
   bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
 
-  bool Notify(const Feed& feed);
+  bool Notify(const Feed& feed) const;
   void ParseDescription(FeedItem& feed_item, const std::wstring& source);
 
   bool LoadArchive();
-  bool SaveArchive();
-  bool SearchArchive(const std::wstring& file);
+  bool SaveArchive() const;
+  void AddToArchive(const std::wstring& file);
+  bool SearchArchive(const std::wstring& file) const;
 
-  std::vector<Feed> feeds;
-  std::vector<std::wstring> file_archive;
   FeedFilterManager filter_manager;
 
 private:
   bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
+  void ExamineData(Feed& feed);
+  FeedItem* FindFeedItemByLink(Feed& feed, const std::wstring& link);
   void HandleFeedDownloadOpen(FeedItem& feed_item, const std::wstring& file);
+
+  std::vector<std::wstring> download_queue_;
+  std::vector<Feed> feeds_;
+  std::vector<std::wstring> file_archive_;
 };
 
-extern Aggregator Aggregator;
+extern class Aggregator Aggregator;
 
 #endif  // TAIGA_TRACK_FEED_H

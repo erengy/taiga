@@ -283,7 +283,7 @@ bool AppSettings::Load() {
   Aggregator.filter_manager.Import(node_filter, Aggregator.filter_manager.filters);
   if (Aggregator.filter_manager.filters.empty())
     Aggregator.filter_manager.AddPresets();
-  auto feed = Aggregator.Get(kFeedCategoryLink);
+  auto feed = Aggregator.GetFeed(kFeedCategoryLink);
   if (feed)
     feed->link = GetWstr(kTorrent_Discovery_Source);
   Aggregator.LoadArchive();

@@ -155,7 +155,6 @@ public:
   void Cleanup();
   void Filter(Feed& feed, bool preferences);
   void FilterArchived(Feed& feed);
-  bool IsItemDownloadAvailable(Feed& feed);
   void MarkNewEpisodes(Feed& feed);
 
   bool Import(const std::wstring& input, std::vector<FeedFilter>& filters);
