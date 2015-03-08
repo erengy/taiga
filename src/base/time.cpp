@@ -103,6 +103,12 @@ base::CompareResult Date::Compare(const Date& date) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void NeutralizeTimezone(tm& t) {
+  long timezone_difference = 0;
+  if (_get_timezone(&timezone_difference) == 0)
+    t.tm_sec -= timezone_difference;  // mktime uses the current time zone
+}
+
 time_t ConvertIso8601(const std::wstring& datetime) {
   // e.g.
   // "2015-02-20T04:43:50"
@@ -130,11 +136,47 @@ time_t ConvertIso8601(const std::wstring& datetime) {
       t.tm_hour += sign * ToInt(m[8].str());
       t.tm_min += sign * ToInt(m[9].str());
     }
+    NeutralizeTimezone(t);
 
-    long timezone_difference = 0;
-    if (_get_timezone(&timezone_difference) == 0) {
-      t.tm_sec -= timezone_difference;  // mktime uses the current time zone
-    }
+    result = mktime(&t);
+  }
+
+  return result;
+}
+
+time_t ConvertRfc822(const std::wstring& datetime) {
+  // See: https://tools.ietf.org/html/rfc822#section-5
+  static const std::wregex pattern(
+      L"(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun), )?"
+      L"(\\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\\d{2,4}) "
+      L"(\\d{2}):(\\d{2})(?::(\\d{2}))? "
+      L"(UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[ZAMNY]|[+-]\\d{4})");
+
+  static const std::vector<std::wstring> months{
+    L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun", 
+    L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
+  };
+
+  std::match_results<std::wstring::const_iterator> m;
+  time_t result = -1;
+
+  if (std::regex_match(datetime, m, pattern)) {
+    tm t = {0};
+
+    t.tm_mday = ToInt(m[2].str());
+    t.tm_mon = std::distance(months.begin(),
+        std::find(months.begin(), months.end(), m[3].str()));
+    t.tm_year = ToInt(m[4].str());
+    if (t.tm_year > 1900)
+      t.tm_year -= 1900;
+
+    t.tm_hour = ToInt(m[5].str());
+    t.tm_min = ToInt(m[6].str());
+    if (m[7].matched)
+      t.tm_sec = ToInt(m[7].str());
+
+    // TODO: Get time zone from m[8]
+    NeutralizeTimezone(t);
 
     result = mktime(&t);
   }
