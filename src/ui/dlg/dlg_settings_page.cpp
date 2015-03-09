@@ -403,22 +403,22 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageAdvanced: {
       parent->advanced_settings_.clear();
       parent->advanced_settings_.insert({
-        {taiga::kSync_Notify_Format, {L"", L"Episode notification format"}},
-        {taiga::kLibrary_FileSizeThreshold, {L"", L"File size threshold"}},
-        {taiga::kRecognition_IgnoredStrings, {L"", L"Ignored strings"}},
-        {taiga::kApp_Connection_ProxyHost, {L"", L"Proxy host"}},
-        {taiga::kApp_Connection_ProxyPassword, {L"", L"Proxy password"}},
-        {taiga::kApp_Connection_ProxyUsername, {L"", L"Proxy username"}},
-        {taiga::kApp_Position_Remember, {L"", L"Remember main window position and size"}},
-        {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrent archive limit"}},
-        {taiga::kApp_Interface_Theme, {L"", L"UI theme"}},
-        {taiga::kSync_Service_Hummingbird_UseHttps, {L"", L"Use HTTPS connections for Hummingbird"}},
+        {taiga::kSync_Notify_Format, {L"", L"Application / Episode notification format"}},
+        {taiga::kApp_Connection_ProxyHost, {L"", L"Application / Proxy host"}},
+        {taiga::kApp_Connection_ProxyPassword, {L"", L"Application / Proxy password"}},
+        {taiga::kApp_Connection_ProxyUsername, {L"", L"Application / Proxy username"}},
+        {taiga::kApp_Position_Remember, {L"", L"Application / Remember main window position and size"}},
+        {taiga::kApp_Interface_Theme, {L"", L"Application / UI theme"}},
+        {taiga::kLibrary_FileSizeThreshold, {L"", L"Library / File size threshold"}},
+        {taiga::kRecognition_IgnoredStrings, {L"", L"Recognition / Ignored strings"}},
+        {taiga::kSync_Service_Hummingbird_UseHttps, {L"", L"Services / Use HTTPS connections for Hummingbird"}},
+        {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrents / Archive limit"}},
       });
       win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       list.SetTheme();
-      list.InsertColumn(0, 250, 0, LVS_ALIGNLEFT, L"Name");
-      list.InsertColumn(1, 100, 0, LVS_ALIGNTOP, L"Value");
+      list.InsertColumn(0, 350, 0, LVS_ALIGNLEFT, L"Name");
+      list.InsertColumn(1, 100, 0, LVS_ALIGNLEFT, L"Value");
       int list_index = 0;
       for (auto& it : parent->advanced_settings_) {
         list.InsertItem(list_index, -1, -1, 0, nullptr, it.second.second.c_str(), it.first);
