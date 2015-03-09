@@ -569,6 +569,13 @@ void FeedFilterManager::InitializePresets() {
       L"Selects files that belong to anime that you're currently watching");
   ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kWatching));
 
+  // Select airing anime in plan to watch
+  ADD_PRESET(kFeedFilterActionSelect, kFeedFilterMatchAll, true, kFeedFilterOptionDefault,
+      L"Select airing anime in plan to watch",
+      L"Selects files that belong to an airing anime that you're planning to watch");
+  ADD_CONDITION(kFeedFilterElement_Meta_Status, kFeedFilterOperator_Equals, ToWstr(anime::kAiring));
+  ADD_CONDITION(kFeedFilterElement_User_Status, kFeedFilterOperator_Equals, ToWstr(anime::kPlanToWatch));
+
   // Discard and deactivate not-in-list anime
   ADD_PRESET(kFeedFilterActionDiscard, kFeedFilterMatchAny, true, kFeedFilterOptionDeactivate,
       L"Discard and deactivate not-in-list anime",
