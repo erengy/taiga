@@ -150,7 +150,7 @@
 		<!-- Note: Use %title% as the search string -->
 		<item name="AniDB"              action="URL(http://anidb.net/perl-bin/animedb.pl?show=animelist&amp;adb.search=%title%&amp;noalias=1&amp;do.update=update)"/>
 		<item name="Anime News Network" action="URL(http://www.animenewsnetwork.com/search?q=%title%)"/>
-		<item name="Hummingbird"        action="URL(http://hummingbird.me/search?query=%title%)"/>
+		<item name="Hummingbird"        action="URL(http://hummingbird.me/search?query=%title%&scope=anime)"/>
 		<item name="MyAnimeList"        action="URL(http://myanimelist.net/anime.php?q=%title%)"/>
 		<item name="Wikipedia"          action="URL(http://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
 		<item type="separator"/>
