@@ -93,13 +93,17 @@ BOOL FormatDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Add button
     case IDHELP: {
       std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"ScriptAdd");
-      std::wstring str;
-      rich_edit_.GetText(str);
-      CHARRANGE cr = {0};
-      rich_edit_.GetSel(&cr);
-      str.insert(cr.cpMin, answer);
-      rich_edit_.SetText(str.c_str());
-      rich_edit_.SetFocus();
+      if (!answer.empty()) {
+        std::wstring str;
+        rich_edit_.GetText(str);
+        CHARRANGE cr = {0};
+        rich_edit_.GetSel(&cr);
+        str.replace(cr.cpMin, cr.cpMax - cr.cpMin, answer);
+        rich_edit_.SetText(str.c_str());
+        int pos = cr.cpMin + answer.size();
+        rich_edit_.SetSel(pos, pos);
+        rich_edit_.SetFocus();
+      }
       return TRUE;
     }
   }
