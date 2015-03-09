@@ -124,6 +124,32 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
       if (item.state == kFeedItemSelected)
         selected_feed_items.push_back(&item);
     }
+    std::sort(selected_feed_items.begin(), selected_feed_items.end(),
+        [&](const FeedItem* item1, const FeedItem* item2) {
+          if (item1->episode_data.anime_id != item2->episode_data.anime_id)
+            return item1->episode_data.anime_id < item2->episode_data.anime_id;
+          auto sort_by = Settings[taiga::kTorrent_Download_SortBy];
+          auto sort_order = Settings[taiga::kTorrent_Download_SortOrder];
+          if (sort_by == L"episode_number") {
+            if (sort_order == L"descending") {
+              return item2->episode_data.episode_number() <
+                     item1->episode_data.episode_number();
+            } else {
+              return item1->episode_data.episode_number() <
+                     item2->episode_data.episode_number();
+            }
+          } else if (sort_by == L"release_date") {
+            if (sort_order == L"descending") {
+              return ConvertRfc822(item2->pub_date) <
+                     ConvertRfc822(item1->pub_date);
+            } else {
+              return ConvertRfc822(item1->pub_date) <
+                     ConvertRfc822(item2->pub_date);
+            }
+          } else {
+            return false;
+          }
+        });
     for (const auto& item : selected_feed_items) {
       download_queue_.push_back(item->link);
     }

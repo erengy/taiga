@@ -302,13 +302,19 @@ void SettingsDialog::OnOK() {
   // Torrents > Downloads
   page = &pages[kSettingsPageTorrentsDownloads];
   if (page->IsWindow()) {
-    Settings.Set(taiga::kTorrent_Download_AppOpen, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_APP_OPEN));
-    Settings.Set(taiga::kTorrent_Download_AppMode, page->GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1);
-    Settings.Set(taiga::kTorrent_Download_AppPath, page->GetDlgItemText(IDC_EDIT_TORRENT_APP));
+    Settings.Set(taiga::kTorrent_Download_SortBy,
+        page->GetComboSelection(IDC_COMBO_TORRENTS_QUEUE_SORTBY) == 0 ?
+        std::wstring(L"episode_number") : std::wstring(L"release_date"));
+    Settings.Set(taiga::kTorrent_Download_SortOrder,
+        page->GetComboSelection(IDC_COMBO_TORRENTS_QUEUE_SORTORDER) == 0 ?
+        std::wstring(L"ascending") : std::wstring(L"descending"));
     Settings.Set(taiga::kTorrent_Download_UseAnimeFolder, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOSETFOLDER));
     Settings.Set(taiga::kTorrent_Download_FallbackOnFolder, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOUSEFOLDER));
     Settings.Set(taiga::kTorrent_Download_Location, page->GetDlgItemText(IDC_COMBO_TORRENT_FOLDER));
     Settings.Set(taiga::kTorrent_Download_CreateSubfolder, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_AUTOCREATEFOLDER));
+    Settings.Set(taiga::kTorrent_Download_AppOpen, page->IsDlgButtonChecked(IDC_CHECK_TORRENT_APP_OPEN));
+    Settings.Set(taiga::kTorrent_Download_AppMode, page->GetCheckedRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2) + 1);
+    Settings.Set(taiga::kTorrent_Download_AppPath, page->GetDlgItemText(IDC_EDIT_TORRENT_APP));
   }
   // Torrents > Filters
   page = &pages[kSettingsPageTorrentsFilters];

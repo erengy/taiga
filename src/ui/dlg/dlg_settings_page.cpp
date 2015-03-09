@@ -321,16 +321,17 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Torrents > Downloads
     case kSettingsPageTorrentsDownloads: {
-      CheckDlgButton(IDC_CHECK_TORRENT_APP_OPEN, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
-      CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2,
-                       IDC_RADIO_TORRENT_APP1 + Settings.GetInt(taiga::kTorrent_Download_AppMode) - 1);
-      EnableDlgItem(IDC_RADIO_TORRENT_APP1, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
-      EnableDlgItem(IDC_RADIO_TORRENT_APP2, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
-      SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings[taiga::kTorrent_Download_AppPath].c_str());
-      bool enabled = Settings.GetBool(taiga::kTorrent_Download_AppOpen) &&
-                     Settings.GetInt(taiga::kTorrent_Download_AppMode) > 1;
-      EnableDlgItem(IDC_EDIT_TORRENT_APP, enabled);
-      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, enabled);
+      bool enabled = true;
+      // Queue
+      AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTBY, L"Sort by episode number");
+      AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTBY, L"Sort by release date");
+      SetComboSelection(IDC_COMBO_TORRENTS_QUEUE_SORTBY,
+                        Settings[taiga::kTorrent_Download_SortBy] == L"episode_number" ? 0 : 1);
+      AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTORDER, L"In ascending order");
+      AddComboString(IDC_COMBO_TORRENTS_QUEUE_SORTORDER, L"In descending order");
+      SetComboSelection(IDC_COMBO_TORRENTS_QUEUE_SORTORDER,
+                        Settings[taiga::kTorrent_Download_SortOrder] == L"ascending" ? 0 : 1);
+      // Location
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOSETFOLDER, Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder));
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOUSEFOLDER, Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder));
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder));
@@ -343,6 +344,17 @@ BOOL SettingsPage::OnInitDialog() {
       EnableDlgItem(IDC_COMBO_TORRENT_FOLDER, enabled);
       EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_FOLDER, enabled);
       EnableDlgItem(IDC_CHECK_TORRENT_AUTOCREATEFOLDER, enabled);
+      // Application
+      CheckDlgButton(IDC_CHECK_TORRENT_APP_OPEN, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
+      CheckRadioButton(IDC_RADIO_TORRENT_APP1, IDC_RADIO_TORRENT_APP2,
+                       IDC_RADIO_TORRENT_APP1 + Settings.GetInt(taiga::kTorrent_Download_AppMode) - 1);
+      EnableDlgItem(IDC_RADIO_TORRENT_APP1, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
+      EnableDlgItem(IDC_RADIO_TORRENT_APP2, Settings.GetBool(taiga::kTorrent_Download_AppOpen));
+      SetDlgItemText(IDC_EDIT_TORRENT_APP, Settings[taiga::kTorrent_Download_AppPath].c_str());
+      enabled = Settings.GetBool(taiga::kTorrent_Download_AppOpen) &&
+                Settings.GetInt(taiga::kTorrent_Download_AppMode) > 1;
+      EnableDlgItem(IDC_EDIT_TORRENT_APP, enabled);
+      EnableDlgItem(IDC_BUTTON_TORRENT_BROWSE_APP, enabled);
       break;
     }
     // Torrents > Filters

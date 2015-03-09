@@ -204,4 +204,6 @@
 #define IDC_TOOLBAR_TORRENT                     1168
 #define IDC_TREE_MAIN                           1169
 #define IDC_TREE_SECTIONS                       1170
+#define IDC_COMBO_TORRENTS_QUEUE_SORTBY         40000
 #define IDC_LIST_ADVANCED_SETTINGS              40000
+#define IDC_COMBO_TORRENTS_QUEUE_SORTORDER      40001

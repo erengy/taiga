@@ -128,6 +128,8 @@ enum AppSettingName {
   kTorrent_Download_UseAnimeFolder,
   kTorrent_Download_FallbackOnFolder,
   kTorrent_Download_CreateSubfolder,
+  kTorrent_Download_SortBy,
+  kTorrent_Download_SortOrder,
   kTorrent_Filter_Enabled,
   kTorrent_Filter_ArchiveMaxCount,
 
