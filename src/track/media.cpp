@@ -139,6 +139,16 @@ MediaPlayer* MediaPlayers::CheckRunningPlayers() {
         continue;
       if (item->visible && !IsWindowVisible(hwnd))
         continue;
+      switch (item->mode) {
+        default:
+          if (!Settings.GetBool(taiga::kRecognition_DetectMediaPlayers))
+            continue;
+          break;
+        case kMediaModeWebBrowser:
+          if (!Settings.GetBool(taiga::kRecognition_DetectStreamingMedia))
+            continue;
+          break;
+      }
 
       // Compare window classes
       foreach_(window_class, item->classes) {

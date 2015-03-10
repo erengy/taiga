@@ -135,6 +135,8 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_Interface_ExternalLinks, kDefaultExternalLinks.c_str(), L"program/general/externallinks");
 
   // Recognition
+  INITKEY(kRecognition_DetectMediaPlayers, L"true", L"recognition/mediaplayers/enabled");
+  INITKEY(kRecognition_DetectStreamingMedia, nullptr, L"recognition/streaming/enabled");
   INITKEY(kRecognition_IgnoredStrings, nullptr, L"recognition/anitomy/ignored_strings");
   INITKEY(kSync_Update_Delay, L"120", L"account/update/delay");
   INITKEY(kSync_Update_AskToConfirm, L"true", L"account/update/asktoconfirm");
@@ -333,7 +335,7 @@ bool AppSettings::Save() {
   }
 
   // Media players
-  xml_node mediaplayers = settings.child(L"recognition").append_child(L"mediaplayers");
+  xml_node mediaplayers = settings.child(L"recognition").child(L"mediaplayers");
   foreach_(it, MediaPlayers.items) {
     xml_node player = mediaplayers.append_child(L"player");
     player.append_attribute(L"name") = it->name.c_str();
@@ -463,6 +465,20 @@ void AppSettings::HandleCompatibility() {
     auto external_links = GetWstr(kApp_Interface_ExternalLinks);
     ReplaceString(external_links, L"http://hummingboard.me", L"http://hb.cybrox.eu");
     Set(kApp_Interface_ExternalLinks, external_links);
+  }
+
+  if (GetInt(kMeta_Version_Major) <= 1 &&
+      GetInt(kMeta_Version_Minor) <= 1 &&
+      GetInt(kMeta_Version_Revision) <= 11) {
+    bool detect_streaming_media = false;
+    for (auto& media_player : MediaPlayers.items) {
+      if (media_player.mode == kMediaModeWebBrowser) {
+        if (media_player.enabled)
+          detect_streaming_media = true;
+        media_player.enabled = true;
+      }
+    }
+    Set(kRecognition_DetectStreamingMedia, detect_streaming_media);
   }
 }
 

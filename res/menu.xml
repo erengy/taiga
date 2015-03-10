@@ -188,12 +188,6 @@
 		<item name="Exit" action="Exit()"/>
 	</menu>
 	
-	<!-- Generic list menu -->
-	<menu name="GenericList">
-		<item name="Select all"   action="SelectAll()"/>
-		<item name="Deselect all" action="DeselectAll()"/>
-	</menu>
-	
 	<!-- History list menu -->
 	<menu name="HistoryList">
 		<item name="Delete" action="Delete()"/>

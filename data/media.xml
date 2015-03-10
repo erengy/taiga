@@ -344,7 +344,7 @@
 	<!-- Google Chrome -->
 	<player>
 		<name>Google Chrome</name>
-		<enabled>0</enabled>
+		<enabled>1</enabled>
 		<visible>1</visible>
 		<mode>5</mode>
 		<class>Chrome_WidgetWin_1</class>
@@ -358,7 +358,7 @@
 	<!-- Mozilla Firefox -->
 	<player>
 		<name>Mozilla Firefox</name>
-		<enabled>0</enabled>
+		<enabled>1</enabled>
 		<visible>1</visible>
 		<mode>5</mode>
 		<class>MozillaUIWindowClass</class>
@@ -373,7 +373,7 @@
 	<!-- Opera -->
 	<player>
 		<name>Opera</name>
-		<enabled>0</enabled>
+		<enabled>1</enabled>
 		<visible>1</visible>
 		<mode>5</mode>
 		<class>Chrome_WidgetWin_0</class>

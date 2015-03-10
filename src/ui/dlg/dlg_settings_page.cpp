@@ -188,19 +188,18 @@ BOOL SettingsPage::OnInitDialog() {
     }
     // Recognition > Media players
     case kSettingsPageRecognitionMedia: {
+      bool enabled = Settings.GetBool(taiga::kRecognition_DetectMediaPlayers);
+      CheckDlgButton(IDC_CHECK_DETECT_MEDIA_PLAYER, enabled);
+      bool header_support = win::GetVersion() >= win::kVersionVista;
       win::ListView list = GetDlgItem(IDC_LIST_MEDIA);
+      list.Enable(enabled);
       list.EnableGroupView(true);
-      if (win::GetVersion() >= win::kVersionVista) {
-        list.InsertColumn(0, 0, 0, 0, L"Select/deselect all");
-      } else {
-        list.InsertColumn(0, 0, 0, 0, L"Supported players");
-      }
-      list.InsertGroup(0, L"Media players");
-      list.InsertGroup(1, L"Web browsers");
+      list.InsertColumn(0, 0, 0, 0, header_support ? L"Select/deselect all" : L"Media player");
+      list.InsertGroup(0, L"Supported media players");
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      if (win::GetVersion() >= win::kVersionVista) {
+      if (header_support) {
         win::Window header = list.GetHeader();
         HDITEM hdi = {0};
         header.SetStyle(HDS_CHECKBOXES, 0);
@@ -211,53 +210,53 @@ BOOL SettingsPage::OnInitDialog() {
         header.SetWindowHandle(nullptr);
       }
       for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
+        if (MediaPlayers.items[i].mode == kMediaModeWebBrowser)
+          continue;
         BOOL player_available = MediaPlayers.items[i].GetPath().empty() ? FALSE : TRUE;
-        list.InsertItem(i, MediaPlayers.items[i].mode == 5 ? 1 : 0,
-                        ui::kIcon16_AppGray - player_available, 0, nullptr,
-                        MediaPlayers.items[i].name.c_str(), 0);
-        if (MediaPlayers.items[i].enabled)
-          list.SetCheckState(i, TRUE);
+        list.InsertItem(i, 0, ui::kIcon16_AppGray - player_available, 0, nullptr,
+                        MediaPlayers.items[i].name.c_str(), i);
+        list.SetCheckState(i, MediaPlayers.items[i].enabled);
       }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.SetWindowHandle(nullptr);
       break;
     }
-    // Recognition > Media providers
+    // Recognition > Streaming media
     case kSettingsPageRecognitionStream: {
+      bool enabled = Settings.GetBool(taiga::kRecognition_DetectStreamingMedia);
+      CheckDlgButton(IDC_CHECK_DETECT_STREAMING_MEDIA, enabled);
+      bool header_support = win::GetVersion() >= win::kVersionVista;
       win::ListView list = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
+      list.Enable(enabled);
       list.EnableGroupView(true);
-      list.InsertColumn(0, 0, 0, 0, L"Media providers");
-      list.InsertGroup(0, L"Media providers");
+      list.InsertColumn(0, 0, 0, 0, header_support ? L"Select/deselect all" : L"Media provider");
+      list.InsertGroup(0, L"Supported media providers");
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER);
       list.SetImageList(ui::Theme.GetImageList16().GetHandle());
       list.SetTheme();
-      list.InsertItem(0, 0, ui::kIcon16_AppBlue, 0, nullptr, L"AnimeLab", 0);
-      list.InsertItem(1, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime Sols", 0);
-      list.InsertItem(2, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", 1);
-      list.InsertItem(3, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", 2);
-      list.InsertItem(4, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", 3);
-      list.InsertItem(5, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", 4);
-      list.InsertItem(6, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", 5);
-      list.InsertItem(7, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", 6);
-      list.InsertItem(8, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", 7);
-      if (Settings.GetBool(taiga::kStream_Animelab))
-        list.SetCheckState(0, TRUE);
-      if (Settings.GetBool(taiga::kStream_Animesols))
-        list.SetCheckState(1, TRUE);
-      if (Settings.GetBool(taiga::kStream_Ann))
-        list.SetCheckState(2, TRUE);
-      if (Settings.GetBool(taiga::kStream_Crunchyroll))
-        list.SetCheckState(3, TRUE);
-      if (Settings.GetBool(taiga::kStream_Daisuki))
-        list.SetCheckState(4, TRUE);
-      if (Settings.GetBool(taiga::kStream_Veoh))
-        list.SetCheckState(5, TRUE);
-      if (Settings.GetBool(taiga::kStream_Viz))
-        list.SetCheckState(6, TRUE);
-      if (Settings.GetBool(taiga::kStream_Wakanim))
-        list.SetCheckState(7, TRUE);
-      if (Settings.GetBool(taiga::kStream_Youtube))
-        list.SetCheckState(8, TRUE);
+      if (header_support) {
+        win::Window header = list.GetHeader();
+        HDITEM hdi = {0};
+        header.SetStyle(HDS_CHECKBOXES, 0);
+        hdi.mask = HDI_FORMAT;
+        Header_GetItem(header.GetWindowHandle(), 0, &hdi);
+        hdi.fmt |= HDF_CHECKBOX;
+        Header_SetItem(header.GetWindowHandle(), 0, &hdi);
+        header.SetWindowHandle(nullptr);
+      }
+      list.InsertItem(0, 0, ui::kIcon16_AppBlue, 0, nullptr, L"AnimeLab", taiga::kStream_Animelab);
+      list.InsertItem(1, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime Sols", taiga::kStream_Animesols);
+      list.InsertItem(2, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", taiga::kStream_Ann);
+      list.InsertItem(3, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", taiga::kStream_Crunchyroll);
+      list.InsertItem(4, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", taiga::kStream_Daisuki);
+      list.InsertItem(5, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", taiga::kStream_Veoh);
+      list.InsertItem(6, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", taiga::kStream_Viz);
+      list.InsertItem(7, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", taiga::kStream_Wakanim);
+      list.InsertItem(8, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", taiga::kStream_Youtube);
+      for (int i = 0; i < list.GetItemCount(); ++i) {
+        if (Settings.GetBool(list.GetItemParam(i)))
+          list.SetCheckState(i, TRUE);
+      }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
       list.SetWindowHandle(nullptr);
       break;
@@ -585,6 +584,16 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           EnableDlgItem(IDC_BUTTON_CACHE_CLEAR, enable);
           return TRUE;
         }
+        case IDC_CHECK_DETECT_MEDIA_PLAYER: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_LIST_MEDIA, enable);
+          return TRUE;
+        }
+        case IDC_CHECK_DETECT_STREAMING_MEDIA: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_LIST_STREAM_PROVIDER, enable);
+          return TRUE;
+        }
         case IDC_CHECK_TORRENT_AUTOCHECK: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
           EnableDlgItem(IDC_EDIT_TORRENT_INTERVAL, enable);
@@ -771,13 +780,12 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
   switch (pnmh->code) {
     // Header checkbox click
     case HDN_ITEMCHANGED: {
-      win::ListView list = GetDlgItem(IDC_LIST_MEDIA);
-      if (pnmh->hwndFrom == list.GetHeader()) {
-        auto nmh = reinterpret_cast<LPNMHEADER>(pnmh);
-        if (nmh->pitem->mask & HDI_FORMAT) {
-          BOOL checked = (nmh->pitem->fmt & HDF_CHECKED) ? TRUE : FALSE;
-          for (size_t i = 0; i < MediaPlayers.items.size(); i++)
-            list.SetCheckState(i, checked);
+      win::ListView list = ::GetParent(pnmh->hwndFrom);
+      auto nmh = reinterpret_cast<LPNMHEADER>(pnmh);
+      if (nmh->pitem->mask & HDI_FORMAT) {
+        BOOL checked = (nmh->pitem->fmt & HDF_CHECKED) ? TRUE : FALSE;
+        for (size_t i = 0; i < list.GetItemCount(); i++) {
+          list.SetCheckState(i, checked);
         }
       }
       list.SetWindowHandle(nullptr);
@@ -867,21 +875,27 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
             ExecuteLink(L"http://www.animelab.com");
             break;
           case 1:
-            ExecuteLink(L"http://www.animenewsnetwork.com/video/");
+            ExecuteLink(L"http://www.animesols.com");
             break;
           case 2:
-            ExecuteLink(L"http://www.crunchyroll.com");
+            ExecuteLink(L"http://www.animenewsnetwork.com/video/");
             break;
           case 3:
-            ExecuteLink(L"http://www.daisuki.net");
+            ExecuteLink(L"http://www.crunchyroll.com");
             break;
           case 4:
-            ExecuteLink(L"http://www.veoh.com");
+            ExecuteLink(L"http://www.daisuki.net");
             break;
           case 5:
-            ExecuteLink(L"http://www.viz.com/anime/streaming");
+            ExecuteLink(L"http://www.veoh.com");
             break;
           case 6:
+            ExecuteLink(L"http://www.viz.com/anime/streaming");
+            break;
+          case 7:
+            ExecuteLink(L"http://www.wakanim.tv");
+            break;
+          case 8:
             ExecuteLink(L"http://www.youtube.com");
             break;
         }
@@ -919,27 +933,6 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         }
         list.SetWindowHandle(nullptr);
       }
-      return TRUE;
-    }
-
-    // Right click
-    case NM_RCLICK: {
-      LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-      if (lpnmitem->iItem == -1)
-        break;
-      win::ListView list = lpnmitem->hdr.hwndFrom;
-      // Media players
-      if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-        std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"GenericList");
-        for (int i = 0; i < list.GetItemCount(); i++) {
-          if (answer == L"SelectAll()") {
-            list.SetCheckState(i, TRUE);
-          } else if (answer == L"DeselectAll()") {
-            list.SetCheckState(i, FALSE);
-          }
-        }
-      }
-      list.SetWindowHandle(nullptr);
       return TRUE;
     }
   }

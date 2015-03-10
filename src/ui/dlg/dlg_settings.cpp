@@ -84,7 +84,7 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
     case kSettingsSectionRecognition:
       tab_.InsertItem(0, L"General", kSettingsPageRecognitionGeneral);
       tab_.InsertItem(1, L"Media players", kSettingsPageRecognitionMedia);
-      tab_.InsertItem(2, L"Media providers", kSettingsPageRecognitionStream);
+      tab_.InsertItem(2, L"Streaming media", kSettingsPageRecognitionStream);
       break;
     case kSettingsSectionSharing:
       tab_.InsertItem(0, L"HTTP", kSettingsPageSharingHttp);
@@ -242,24 +242,21 @@ void SettingsDialog::OnOK() {
   // Recognition > Media players
   page = &pages[kSettingsPageRecognitionMedia];
   if (page->IsWindow()) {
+    Settings.Set(taiga::kRecognition_DetectMediaPlayers, page->IsDlgButtonChecked(IDC_CHECK_DETECT_MEDIA_PLAYER) == TRUE);
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_MEDIA));
-    for (size_t i = 0; i < MediaPlayers.items.size(); i++)
-      MediaPlayers.items[i].enabled = list.GetCheckState(i);
+    for (int i = 0; i < list.GetItemCount(); ++i) {
+      MediaPlayers.items[list.GetItemParam(i)].enabled = list.GetCheckState(i);
+    }
     list.SetWindowHandle(nullptr);
   }
   // Recognition > Media providers
   page = &pages[kSettingsPageRecognitionStream];
   if (page->IsWindow()) {
+    Settings.Set(taiga::kRecognition_DetectStreamingMedia, page->IsDlgButtonChecked(IDC_CHECK_DETECT_STREAMING_MEDIA) == TRUE);
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_STREAM_PROVIDER));
-    Settings.Set(taiga::kStream_Animelab, list.GetCheckState(0) == TRUE);
-    Settings.Set(taiga::kStream_Animesols, list.GetCheckState(1) == TRUE);
-    Settings.Set(taiga::kStream_Ann, list.GetCheckState(2) == TRUE);
-    Settings.Set(taiga::kStream_Crunchyroll, list.GetCheckState(3) == TRUE);
-    Settings.Set(taiga::kStream_Daisuki, list.GetCheckState(4) == TRUE);
-    Settings.Set(taiga::kStream_Veoh, list.GetCheckState(5) == TRUE);
-    Settings.Set(taiga::kStream_Viz, list.GetCheckState(6) == TRUE);
-    Settings.Set(taiga::kStream_Wakanim, list.GetCheckState(7) == TRUE);
-    Settings.Set(taiga::kStream_Youtube, list.GetCheckState(8) == TRUE);
+    for (int i = 0; i < list.GetItemCount(); ++i) {
+      Settings.Set(list.GetItemParam(i), list.GetCheckState(i) == TRUE);
+    }
     list.SetWindowHandle(nullptr);
   }
 
