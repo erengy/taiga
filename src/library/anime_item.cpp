@@ -646,7 +646,7 @@ bool Item::IsEpisodeAvailable(int number) const {
   return local_info_.available_episodes.at(number - 1);
 }
 
-bool Item::IsNewEpisodeAvailable() const {
+bool Item::IsNextEpisodeAvailable() const {
   return IsEpisodeAvailable(GetMyLastWatchedEpisode() + 1);
 }
 

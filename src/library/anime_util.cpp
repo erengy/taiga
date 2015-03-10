@@ -240,7 +240,7 @@ bool PlayRandomAnime() {
     anime::Item& anime_item = it->second;
     if (!anime_item.IsInList())
       continue;
-    if (!anime_item.IsNewEpisodeAvailable())
+    if (!anime_item.IsNextEpisodeAvailable())
       continue;
     switch (anime_item.GetMyStatus()) {
       case anime::kNotInList:

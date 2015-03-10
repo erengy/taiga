@@ -164,7 +164,10 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.GetInt(taiga::kApp_List_MiddleClickAction));
       CheckDlgButton(IDC_CHECK_LIST_ENGLISH, Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles));
-      CheckDlgButton(IDC_CHECK_HIGHLIGHT, Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes));
+      bool enabled = Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes);
+      CheckDlgButton(IDC_CHECK_HIGHLIGHT, enabled);
+      CheckDlgButton(IDC_CHECK_HIGHLIGHT_ONTOP, Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop));
+      EnableDlgItem(IDC_CHECK_HIGHLIGHT_ONTOP, enabled);
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AIRED, Settings.GetBool(taiga::kApp_List_ProgressDisplayAired));
       CheckDlgButton(IDC_CHECK_LIST_PROGRESS_AVAILABLE, Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable));
       break;
@@ -593,6 +596,11 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case IDC_CHECK_DETECT_STREAMING_MEDIA: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
           EnableDlgItem(IDC_LIST_STREAM_PROVIDER, enable);
+          return TRUE;
+        }
+        case IDC_CHECK_HIGHLIGHT: {
+          BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
+          EnableDlgItem(IDC_CHECK_HIGHLIGHT_ONTOP, enable);
           return TRUE;
         }
         case IDC_CHECK_TORRENT_AUTOCHECK: {

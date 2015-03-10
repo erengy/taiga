@@ -281,6 +281,25 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
   return return_value * list->GetSortOrder();
 }
 
+
+int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
+                                  LPARAM lParamSort) {
+  if (Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes) &&
+      Settings.GetBool(taiga::kApp_List_DisplayHighlightedOnTop)) {
+    win::ListView* list = reinterpret_cast<win::ListView*>(lParamSort);
+    auto item1 = AnimeDatabase.FindItem(list->GetItemParam(lParam1));
+    auto item2 = AnimeDatabase.FindItem(list->GetItemParam(lParam2));
+    if (item1 && item2) {
+      bool available1 = item1->IsNextEpisodeAvailable();
+      bool available2 = item2->IsNextEpisodeAvailable();
+      if (available1 != available2)
+        return CompareValues<bool>(!available1, !available2);
+    }
+  }
+
+  return ListViewCompareProc(lParam1, lParam2, lParamSort);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 int GetAnimeIdFromSelectedListItem(win::ListView& listview) {

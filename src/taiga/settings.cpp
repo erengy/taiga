@@ -118,6 +118,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_List_MiddleClickAction, L"3", L"program/list/action/middleclick");
   INITKEY(kApp_List_DisplayEnglishTitles, nullptr, L"program/list/action/englishtitles");
   INITKEY(kApp_List_HighlightNewEpisodes, L"true", L"program/list/filter/episodes/highlight");
+  INITKEY(kApp_List_DisplayHighlightedOnTop, nullptr, L"program/list/filter/episodes/highlightedontop");
   INITKEY(kApp_List_ProgressDisplayAired, L"true", L"program/list/progress/showaired");
   INITKEY(kApp_List_ProgressDisplayAvailable, L"true", L"program/list/progress/showavailable");
   INITKEY(kApp_List_SortColumn, L"anime_title", L"program/list/sort/column");

@@ -421,7 +421,7 @@ void AnimeListDialog::ListView::SortFromSettings() {
   win::ListView::Sort(columns[sort_column].index,
                       Settings.GetInt(taiga::kApp_List_SortOrder),
                       GetSortType(sort_column),
-                      ui::ListViewCompareProc);
+                      ui::AnimeListCompareProc);
 
   parent->RebuildIdCache();
 }
@@ -479,7 +479,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
           if (IsAllEpisodesAvailable(*anime_item)) {
             AppendString(text, L"All episodes are on computer");
           } else {
-            if (anime_item->IsNewEpisodeAvailable())
+            if (anime_item->IsNextEpisodeAvailable())
               AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L" is on computer");
             if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
               AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) + L" is available for download");
@@ -591,7 +591,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       int order = listview.GetDefaultSortOrder(column_type);
       if (lplv->iSubItem == listview.GetSortColumn())
         order = listview.GetSortOrder() * -1;
-      listview.Sort(lplv->iSubItem, order, listview.GetSortType(column_type), ui::ListViewCompareProc);
+      listview.Sort(lplv->iSubItem, order, listview.GetSortType(column_type), ui::AnimeListCompareProc);
       RebuildIdCache();
       Settings.Set(taiga::kApp_List_SortColumn, listview.columns[column_type].key);
       Settings.Set(taiga::kApp_List_SortOrder, order);
@@ -900,7 +900,7 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
         }
       }
     } else {
-      if (anime_item.IsNewEpisodeAvailable()) {
+      if (anime_item.IsNextEpisodeAvailable()) {
         float ratio_avail = anime_item.IsEpisodeAvailable(eps_aired) ? 0.85f : 0.83f;
         rcAvail.right = rcAvail.left + static_cast<int>((rcAvail.Width()) * ratio_avail);
         rcAvail.left = rcWatched.right;
@@ -1062,7 +1062,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
         case kColumnAnimeTitle:
-          if (anime_item->IsNewEpisodeAvailable() &&
+          if (anime_item->IsNextEpisodeAvailable() &&
               Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes))
             pCD->clrText = GetSysColor(COLOR_HIGHLIGHT);
           break;

@@ -600,8 +600,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     // Available episodes
     int available_episodes = 0;
     foreach_c_(it, AnimeDatabase.items) {
-      if (it->second.IsInList() && it->second.IsNewEpisodeAvailable())
-        available_episodes ++;
+      if (it->second.IsInList() && it->second.IsNextEpisodeAvailable())
+        available_episodes++;
     }
     if (available_episodes > 0)
       content += L"There are at least " + ToWstr(available_episodes) + L" new episodes available on your computer.\n\n";

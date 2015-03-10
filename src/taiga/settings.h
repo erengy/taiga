@@ -58,6 +58,7 @@ enum AppSettingName {
   kApp_List_MiddleClickAction,
   kApp_List_DisplayEnglishTitles,
   kApp_List_HighlightNewEpisodes,
+  kApp_List_DisplayHighlightedOnTop,
   kApp_List_ProgressDisplayAired,
   kApp_List_ProgressDisplayAvailable,
   kApp_List_SortColumn,

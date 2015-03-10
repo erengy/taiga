@@ -222,6 +222,7 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kApp_List_MiddleClickAction, page->GetComboSelection(IDC_COMBO_MDLCLICK));
     Settings.Set(taiga::kApp_List_DisplayEnglishTitles, page->IsDlgButtonChecked(IDC_CHECK_LIST_ENGLISH));
     Settings.Set(taiga::kApp_List_HighlightNewEpisodes, page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT));
+    Settings.Set(taiga::kApp_List_DisplayHighlightedOnTop, page->IsDlgButtonChecked(IDC_CHECK_HIGHLIGHT_ONTOP));
     Settings.Set(taiga::kApp_List_ProgressDisplayAired, page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AIRED));
     Settings.Set(taiga::kApp_List_ProgressDisplayAvailable, page->IsDlgButtonChecked(IDC_CHECK_LIST_PROGRESS_AVAILABLE));
   }
