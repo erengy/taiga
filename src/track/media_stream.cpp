@@ -356,11 +356,11 @@ std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
     return std::wstring();
   }
 
-#ifdef TAIGA_USE_ACTIVE_ACCESSIBILITY
-  return FromActiveAccessibility(hwnd, web_engine, title);
-#else
-  return FromAutomationApi(hwnd, web_engine, title);
-#endif
+  if (Settings[taiga::kRecognition_BrowserDetectionMethod] == L"ui_automation") {
+    return FromAutomationApi(hwnd, web_engine, title);
+  } else {
+    return FromActiveAccessibility(hwnd, web_engine, title);
+  }
 }
 
 bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
