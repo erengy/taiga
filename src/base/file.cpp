@@ -21,6 +21,7 @@
 
 #include "file.h"
 #include "string.h"
+#include "time.h"
 #include "win/win_registry.h"
 
 HANDLE OpenFileForGenericRead(const std::wstring& path) {
@@ -68,6 +69,23 @@ unsigned long GetFileAge(const std::wstring& path) {
   // Return difference in seconds
   return static_cast<unsigned long>(
       (ul_now.QuadPart - ul_file.QuadPart) / 10000000);
+}
+
+std::wstring GetFileLastModifiedDate(const std::wstring& path) {
+  HANDLE file_handle = OpenFileForGenericRead(path);
+  if (file_handle != INVALID_HANDLE_VALUE) {
+    FILETIME ft_file = {0};
+    BOOL result = GetFileTime(file_handle, nullptr, nullptr, &ft_file);
+    CloseHandle(file_handle);
+    if (result) {
+      SYSTEMTIME st_file = {0};
+      result = FileTimeToSystemTime(&ft_file, &st_file);
+      if (result)
+        return Date(st_file.wYear, st_file.wMonth, st_file.wDay);
+    }
+  }
+
+  return std::wstring();
 }
 
 QWORD GetFileSize(const std::wstring& path) {

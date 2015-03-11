@@ -27,6 +27,7 @@
 #include "types.h"
 
 unsigned long GetFileAge(const std::wstring& path);
+std::wstring GetFileLastModifiedDate(const std::wstring& path);
 QWORD GetFileSize(const std::wstring& path);
 QWORD GetFolderSize(const std::wstring& path, bool recursive);
 

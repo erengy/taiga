@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/file.h"
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
@@ -41,9 +42,9 @@ namespace taiga {
 App::App()
     : allow_multiple_instances(false),
 #ifdef _DEBUG
-    debug_mode(true),
+      debug_mode(true),
 #else
-    debug_mode(false),
+      debug_mode(false),
 #endif
       logged_in(false),
       current_tip_type(kTipTypeDefault),
@@ -66,10 +67,12 @@ BOOL App::InitInstance() {
   ParseCommandLineArguments();
 
   // Initialize logger
-  Logger.SetOutputPath(AddTrailingSlash(GetPathOnly(GetModulePath())) +
-                       TAIGA_APP_NAME L".log");
+  auto module_path = GetModulePath();
+  auto path = AddTrailingSlash(GetPathOnly(module_path));
+  Logger.SetOutputPath(path + TAIGA_APP_NAME L".log");
   Logger.SetSeverityLevel(debug_mode ? LevelDebug : LevelWarning);
-  LOG(LevelInformational, L"Version " + std::wstring(version));
+  LOG(LevelInformational, L"Version " + std::wstring(version) +
+                          L" (" + GetFileLastModifiedDate(module_path) + L")");
 
   // Check another instance
   if (!allow_multiple_instances) {
