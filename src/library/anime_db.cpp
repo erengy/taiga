@@ -617,6 +617,15 @@ void Database::HandleCompatibility(const std::wstring& meta_version) {
       ClearInvalidValues(item->second);
     }
   }
+
+  if (version <= base::SemanticVersion(L"1.1.11")) {
+    if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
+      LOG(LevelWarning, L"Clearing English titles");
+      for (auto& item : items) {
+        item.second.SetEnglishTitle(EmptyString());
+      }
+    }
+  }
 }
 
 void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
