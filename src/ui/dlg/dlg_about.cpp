@@ -43,35 +43,35 @@ BOOL AboutDialog::OnDestroy() {
 
 BOOL AboutDialog::OnInitDialog() {
   rich_edit_.Attach(GetDlgItem(IDC_RICHEDIT_ABOUT));
-  rich_edit_.SendMessage(EM_AUTOURLDETECT, TRUE /* AURL_ENABLEURL */);
+  auto schemes = L"http:https:irc:";
+  rich_edit_.SendMessage(EM_AUTOURLDETECT, TRUE /*= AURL_ENABLEURL*/,
+                         reinterpret_cast<LPARAM>(schemes));
   rich_edit_.SetEventMask(ENM_LINK);
 
   std::wstring text =
-      L"{\\rtf1\\ansi\\deff0"
+      L"{\\rtf1\\ansi\\deff0\\deflang1024"
       L"{\\fonttbl"
-      L"{\\f0 Segoe UI;}"
+      L"{\\f0\\fnil\\fcharset0 Segoe UI;}"
       L"}"
-      L"\\deflang1024\\fs18"
-      L"\\b " TAIGA_APP_NAME L"\\b0\\line "
-      L"version " + std::wstring(Taiga.version) + L"\\line\\line "
+      L"\\fs24\\b " TAIGA_APP_NAME L"\\b0  " + std::wstring(Taiga.version) + L"\\line\\fs18\\par "
       L"\\b Author:\\b0\\line "
-      L"Eren 'erengy' Okka\\line\\line "
+      L"Eren 'erengy' Okka\\line\\par "
       L"\\b Contributors:\\b0\\line "
-      L"saka, Diablofan, slevir, LordGravewish, cassist, rr-, sunjayc\\line\\line "
+      L"saka, Diablofan, slevir, LordGravewish, cassist, rr-, sunjayc\\line\\par "
       L"\\b Third-party components:\\b0\\line "
-      L"- Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
-      L"- JsonCpp 1.1.0, Copyright (c) 2007-2010, Baptiste Lepilleur\\line "
-      L"- libcurl 7.40.0, Copyright (c) 1996-2015, Daniel Stenberg\\line "
-      L"- libmojibake 1.1.6, Copyright (c) 2009 Public Software Group e. V.\\line "
-      L"- pugixml 1.5, Copyright (c) 2006-2014, Arseny Kapoulkine\\line "
-      L"- zlib 1.2.8, Copyright (c) 1995-2013, Jean-loup Gailly and Mark Adler\\line\\line "
+      L"\u2022 Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
+      L"\u2022 JsonCpp 1.1.0, Copyright (c) 2007-2010, Baptiste Lepilleur\\line "
+      L"\u2022 libcurl 7.40.0, Copyright (c) 1996-2015, Daniel Stenberg\\line "
+      L"\u2022 libmojibake 1.1.6, Copyright (c) 2009 Public Software Group e. V.\\line "
+      L"\u2022 pugixml 1.5, Copyright (c) 2006-2014, Arseny Kapoulkine\\line "
+      L"\u2022 zlib 1.2.8, Copyright (c) 1995-2013, Jean-loup Gailly and Mark Adler\\line\\par "
       L"\\b Links:\\b0\\line "
-      L"- Home page {\\field{\\*\\fldinst HYPERLINK \"http://taiga.erengy.com\"}{\\fldrslt http://taiga.erengy.com}}\\line "
-      L"- GitHub repository {\\field{\\*\\fldinst HYPERLINK \"https://github.com/erengy/taiga\"}{\\fldrslt https://github.com/erengy/taiga}}\\line "
-      L"- Hummingbird thread {\\field{\\*\\fldinst HYPERLINK \"https://forums.hummingbird.me/t/taiga/10565\"}{\\fldrslt https://forums.hummingbird.me/t/taiga/10565}}\\line "
-      L"- MyAnimeList club {\\field{\\*\\fldinst HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}{\\fldrslt http://myanimelist.net/clubs.php?cid=21400}}\\line "
-      L"- Twitter account {\\field{\\*\\fldinst HYPERLINK \"https://twitter.com/taigaapp\"}{\\fldrslt https://twitter.com/taigaapp}}\\line "
-      L"- IRC channel {\\field{\\*\\fldinst HYPERLINK \"irc://irc.rizon.net/taiga\"}{\\fldrslt irc://irc.rizon.net/taiga}}"
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"http://taiga.erengy.com\"}}{\\fldrslt{Home page}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://github.com/erengy/taiga\"}}{\\fldrslt{GitHub repository}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://forums.hummingbird.me/t/taiga/10565\"}}{\\fldrslt{Hummingbird thread}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}}{\\fldrslt{MyAnimeList club}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://twitter.com/taigaapp\"}}{\\fldrslt{Twitter account}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"irc://irc.rizon.net/taiga\"}}{\\fldrslt{IRC channel}}}"
       L"}";
   rich_edit_.SetTextEx(WstrToStr(text));
 

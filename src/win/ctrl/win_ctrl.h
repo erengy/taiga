@@ -243,7 +243,8 @@ protected:
   virtual void OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
 
 private:
-  HMODULE module_;
+  HMODULE module_msftedit_;
+  HMODULE module_riched20_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

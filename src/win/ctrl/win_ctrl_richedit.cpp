@@ -21,17 +21,21 @@
 namespace win {
 
 RichEdit::RichEdit() {
-  module_ = ::LoadLibrary(L"riched20.dll");
+  module_msftedit_ = ::LoadLibrary(L"msftedit.dll");
+  module_riched20_ = ::LoadLibrary(L"riched20.dll");
 }
 
 RichEdit::RichEdit(HWND hwnd) {
-  module_ = ::LoadLibrary(L"riched20.dll");
+  module_msftedit_ = ::LoadLibrary(L"msftedit.dll");
+  module_riched20_ = ::LoadLibrary(L"riched20.dll");
   SetWindowHandle(hwnd);
 }
 
 RichEdit::~RichEdit() {
-  if (module_)
-    ::FreeLibrary(module_);
+  if (module_msftedit_)
+    ::FreeLibrary(module_msftedit_);
+  if (module_riched20_)
+    ::FreeLibrary(module_riched20_);
 }
 
 void RichEdit::PreCreate(CREATESTRUCT &cs) {
@@ -86,6 +90,9 @@ void RichEdit::SetSel(CHARRANGE* cr) {
 
 UINT RichEdit::SetTextEx(const std::string& text) {
   SETTEXTEX ste;
+  ste.codepage = CP_UTF8;
+  ste.flags = ST_DEFAULT;
+
   return SendMessage(EM_SETTEXTEX,
                      reinterpret_cast<WPARAM>(&ste),
                      reinterpret_cast<LPARAM>(text.data()));
