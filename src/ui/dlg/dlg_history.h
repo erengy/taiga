@@ -36,7 +36,7 @@ public:
   BOOL PreTranslateMessage(MSG* pMsg);
 
   void RefreshList();
-  bool RemoveItems();
+  bool RemoveSelectedItems();
 
 private:
   win::ListView list_;

@@ -41,6 +41,7 @@ public:
   void UpdateAnnounce();
   void UpdateExternalLinks();
   void UpdateFolders();
+  void UpdateHistoryList(bool enabled = false);
   void UpdateScore(const anime::Item* anime_item);
   void UpdateSearchList(bool enabled = false);
   void UpdateSeasonList(bool enabled = false);

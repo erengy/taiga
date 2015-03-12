@@ -102,9 +102,10 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       }
       // Right click
       case NM_RCLICK: {
+        Menus.UpdateHistoryList(list_.GetSelectedCount() > 0);
         std::wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"HistoryList");
         if (action == L"Delete()") {
-          RemoveItems();
+          RemoveSelectedItems();
         } else {
           ExecuteAction(action);
         }
@@ -141,7 +142,7 @@ BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
           }
           // Delete selected items
           case VK_DELETE: {
-            if (RemoveItems())
+            if (RemoveSelectedItems())
               return TRUE;
           }
         }
@@ -229,30 +230,30 @@ void HistoryDialog::RefreshList() {
                      RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-bool HistoryDialog::RemoveItems() {
+bool HistoryDialog::RemoveSelectedItems() {
   if (History.queue.updating) {
     MessageBox(L"History cannot be modified while an update is in progress.",
                L"Error", MB_ICONERROR);
     return false;
   }
 
-  if (list_.GetSelectedCount() > 0) {
-    while (list_.GetSelectedCount() > 0) {
-      int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
-      list_.DeleteItem(item_index);
-      if (item_index < static_cast<int>(History.queue.items.size())) {
-        item_index = History.queue.items.size() - item_index - 1;
-        History.queue.Remove(item_index, false, false, false);
-      } else {
-        item_index -= History.queue.items.size();
-        item_index = History.items.size() - item_index - 1;
-        History.items.erase(History.items.begin() + item_index);
-      }
+  if (!list_.GetSelectedCount())
+    return false;
+
+  while (list_.GetSelectedCount() > 0) {
+    int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
+    list_.DeleteItem(item_index);
+    if (item_index < static_cast<int>(History.queue.items.size())) {
+      item_index = History.queue.items.size() - item_index - 1;
+      History.queue.Remove(item_index, false, false, false);
+    } else {
+      item_index -= History.queue.items.size();
+      item_index = History.items.size() - item_index - 1;
+      History.items.erase(History.items.begin() + item_index);
     }
-    History.Save();
-  } else {
-    History.queue.Clear();
   }
+
+  History.Save();
 
   ui::OnHistoryChange();
 

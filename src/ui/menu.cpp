@@ -222,6 +222,19 @@ void MenuList::UpdateFolders() {
   }
 }
 
+void MenuList::UpdateHistoryList(bool enabled) {
+  auto menu = menu_list_.FindMenu(L"HistoryList");
+  if (menu) {
+    // Add to list
+    foreach_(it, menu->items) {
+      if (it->action == L"Delete()") {
+        it->enabled = enabled;
+        break;
+      }
+    }
+  }
+}
+
 void MenuList::UpdateScore(const anime::Item* anime_item) {
   auto menu = menu_list_.FindMenu(L"EditScore");
   if (menu) {
