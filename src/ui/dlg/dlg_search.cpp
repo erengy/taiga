@@ -107,22 +107,37 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Column click
       case LVN_COLUMNCLICK: {
         auto lplv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
+        int order = 1;
         switch (lplv->iSubItem) {
+          case 1:  // Type
+          case 2:  // Episodes
+          case 3:  // Score
+          case 4:  // Season
+            order = -1;
+            break;
+        }
+        if (lplv->iSubItem == list_.GetSortColumn())
+          order = list_.GetSortOrder() * -1;
+        switch (lplv->iSubItem) {
+          // Type
+          case 1:
+            list_.Sort(lplv->iSubItem, order, ui::kListSortDefault, ui::ListViewCompareProc);
+            break;
           // Episodes
           case 2:
-            list_.Sort(lplv->iSubItem, -1, ui::kListSortNumber, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortNumber, ui::ListViewCompareProc);
             break;
           // Score
           case 3:
-            list_.Sort(lplv->iSubItem, -1, ui::kListSortScore, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortScore, ui::ListViewCompareProc);
             break;
           // Season
           case 4:
-            list_.Sort(lplv->iSubItem, 1, ui::kListSortDateStart, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortDateStart, ui::ListViewCompareProc);
             break;
           // Other columns
           default:
-            list_.Sort(lplv->iSubItem, 1, ui::kListSortDefault, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortDefault, ui::ListViewCompareProc);
             break;
         }
         break;

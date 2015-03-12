@@ -159,7 +159,15 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lplv = (LPNMLISTVIEW)pnmh;
         int order = 1;
-        if (lplv->iSubItem == list_.GetSortColumn()) order = list_.GetSortOrder() * -1;
+        switch (lplv->iSubItem) {
+          case 1:  // Episode
+          case 3:  // Size
+          case 7:  // Release date
+            order = -1;
+            break;
+        }
+        if (lplv->iSubItem == list_.GetSortColumn())
+          order = list_.GetSortOrder() * -1;
         switch (lplv->iSubItem) {
           // Episode
           case 1:
