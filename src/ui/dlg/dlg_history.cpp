@@ -81,8 +81,6 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           case CDDS_PREPAINT:
             return CDRF_NOTIFYITEMDRAW;
           case CDDS_ITEMPREPAINT:
-            return CDRF_NOTIFYSUBITEMDRAW;
-          case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
             // Alternate background color
             if (pCD->nmcd.dwItemSpec % 2)
               pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);

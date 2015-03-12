@@ -278,15 +278,12 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           case CDDS_PREPAINT:
             return CDRF_NOTIFYITEMDRAW;
           case CDDS_ITEMPREPAINT:
-            return CDRF_NOTIFYSUBITEMDRAW;
-          case CDDS_PREERASE:
-          case CDDS_ITEMPREERASE:
-            return CDRF_NOTIFYPOSTERASE;
-
-          case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             // Alternate background color
             if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled())
               pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);
+            return CDRF_NOTIFYSUBITEMDRAW;
+
+          case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
             FeedItem* feed_item = reinterpret_cast<FeedItem*>(pCD->nmcd.lItemlParam);
             if (feed_item) {
               if (Taiga.debug_mode) {
