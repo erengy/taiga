@@ -144,14 +144,6 @@ BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
             if (RemoveItems())
               return TRUE;
           }
-          // Move selected items
-          case VK_UP:
-          case VK_DOWN: {
-            if (::GetKeyState(VK_CONTROL) & 0xFF80)
-              if (MoveItems(pMsg->wParam == VK_UP ? -1 : 1))
-                return TRUE;
-            break;
-          }
         }
       }
       break;
@@ -235,47 +227,6 @@ void HistoryDialog::RefreshList() {
   list_.SetRedraw(TRUE);
   list_.RedrawWindow(nullptr, nullptr,
                      RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
-}
-
-bool HistoryDialog::MoveItems(int pos) {
-  // TODO: Re-enable
-  return false;
-
-  if (History.queue.updating) {
-    MessageBox(L"History cannot be modified while an update is in progress.",
-               L"Error", MB_ICONERROR);
-    return false;
-  }
-
-  int index = -1;
-  std::vector<bool> item_selected(list_.GetItemCount());
-  std::vector<bool> item_selected_new(list_.GetItemCount());
-  while ((index = list_.GetNextItem(index, LVNI_SELECTED)) > -1) {
-    item_selected.at(index) = true;
-  }
-
-  for (size_t i = 0; i < item_selected.size(); i++) {
-    size_t j = (pos < 0 ? i : item_selected.size() - 1 - i);
-    if (!item_selected.at(j))
-      continue;
-    if (j == (pos < 0 ? 0 : item_selected.size() - 1)) {
-      item_selected_new.at(j) = true;
-      continue;
-    }
-    if (item_selected_new.at(j + pos)) {
-      item_selected_new.at(j) = true;
-      continue;
-    }
-    std::iter_swap(History.queue.items.begin() + j,
-                   History.queue.items.begin() + j + pos);
-    item_selected_new.at(j + pos) = true;
-  }
-
-  RefreshList();
-  for (size_t i = 0; i < item_selected_new.size(); i++)
-    if (item_selected_new.at(i)) list_.SetSelectedItem(i);
-
-  return true;
 }
 
 bool HistoryDialog::RemoveItems() {

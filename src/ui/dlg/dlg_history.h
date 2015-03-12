@@ -36,7 +36,6 @@ public:
   BOOL PreTranslateMessage(MSG* pMsg);
 
   void RefreshList();
-  bool MoveItems(int pos);
   bool RemoveItems();
 
 private:
