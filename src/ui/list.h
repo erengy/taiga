@@ -37,6 +37,7 @@ enum ListSortType {
   kListSortLastUpdated,
   kListSortPopularity,
   kListSortProgress,
+  kListSortRfc822DateTime,
   kListSortMyScore,
   kListSortScore,
   kListSortSeason,

@@ -54,11 +54,12 @@ BOOL TorrentDialog::OnInitDialog() {
   // Insert list columns
   list_.InsertColumn(0, 240, 240, LVCFMT_LEFT,  L"Anime title");
   list_.InsertColumn(1,  60,  60, LVCFMT_RIGHT, L"Episode");
-  list_.InsertColumn(2, 120, 120, LVCFMT_LEFT,  L"Group");
+  list_.InsertColumn(2, 100, 100, LVCFMT_LEFT,  L"Group");
   list_.InsertColumn(3,  70,  70, LVCFMT_RIGHT, L"Size");
   list_.InsertColumn(4, 100, 100, LVCFMT_LEFT,  L"Video");
-  list_.InsertColumn(5, 250, 250, LVCFMT_LEFT,  L"Description");
-  list_.InsertColumn(6, 250, 250, LVCFMT_LEFT,  L"File name");
+  list_.InsertColumn(5, 200, 200, LVCFMT_LEFT,  L"Description");
+  list_.InsertColumn(6, 200, 200, LVCFMT_LEFT,  L"File name");
+  list_.InsertColumn(7, 190, 190, LVCFMT_RIGHT, L"Release date");
   // Insert list groups
   list_.InsertGroup(0, L"Anime");
   list_.InsertGroup(1, L"Batch");
@@ -167,6 +168,10 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           // File size
           case 3:
             list_.Sort(lplv->iSubItem, order, ui::kListSortFileSize, ui::ListViewCompareProc);
+            break;
+          // Release date
+          case 7:
+            list_.Sort(lplv->iSubItem, order, ui::kListSortRfc822DateTime, ui::ListViewCompareProc);
             break;
           // Other columns
           default:
@@ -405,6 +410,7 @@ void TorrentDialog::RefreshList() {
     list_.SetItem(index, 4, video.c_str());
     list_.SetItem(index, 5, it->description.c_str());
     list_.SetItem(index, 6, it->episode_data.file_name_with_extension().c_str());
+    list_.SetItem(index, 7, it->pub_date.c_str());
     list_.SetCheckState(index, it->state == kFeedItemSelected);
   }
 
@@ -414,7 +420,8 @@ void TorrentDialog::RefreshList() {
   list_.SetColumnWidth(2, LVSCW_AUTOSIZE);
   list_.SetColumnWidth(3, LVSCW_AUTOSIZE);
   list_.SetColumnWidth(4, LVSCW_AUTOSIZE);
-  list_.SetColumnWidth(6, LVSCW_AUTOSIZE_USEHEADER);
+  list_.SetColumnWidth(6, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(7, LVSCW_AUTOSIZE_USEHEADER);
 
   // Redraw
   list_.SetRedraw(TRUE);

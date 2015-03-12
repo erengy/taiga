@@ -93,6 +93,10 @@ int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
   return CompareValues<int>(_wtoi(str1), _wtoi(str2));
 }
 
+int SortListAsRfc822DateTime(LPCWSTR str1, LPCWSTR str2) {
+  return CompareValues<time_t>(ConvertRfc822(str1), ConvertRfc822(str2));
+}
+
 int SortAsText(LPCWSTR str1, LPCWSTR str2) {
   return lstrcmpi(str1, str2);
 }
@@ -201,6 +205,8 @@ int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
       return SortAsFileSize(str1, str2);
     case kListSortNumber:
       return SortAsNumber(str1, str2);
+    case kListSortRfc822DateTime:
+      return SortListAsRfc822DateTime(str1, str2);
   }
 
   return base::kEqualTo;
@@ -252,6 +258,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
     case kListSortDefault:
     case kListSortFileSize:
     case kListSortNumber:
+    case kListSortRfc822DateTime:
     default: {
       WCHAR str1[MAX_PATH];
       WCHAR str2[MAX_PATH];

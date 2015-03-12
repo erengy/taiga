@@ -129,6 +129,13 @@ bool Feed::Load() {
     item.title = XmlReadStrValue(node, L"title");
     item.link = XmlReadStrValue(node, L"link");
     item.description = XmlReadStrValue(node, L"description");
+    item.category = XmlReadStrValue(node, L"category");
+    item.guid = XmlReadStrValue(node, L"guid");
+    item.pub_date = XmlReadStrValue(node, L"pubDate");
+
+    auto permalink = XmlReadStrValue(node, L"isPermaLink");
+    if (!permalink.empty())
+      item.permalink = ToBool(permalink);
 
     // Skip if title or link is empty
     if (category == kFeedCategoryLink)
