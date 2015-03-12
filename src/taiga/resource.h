@@ -56,8 +56,6 @@
 #define IDC_BUTTON_TORRENT_BROWSE_FOLDER        1011
 #define IDC_BUTTON_TWITTER_AUTH                 1012
 #define IDC_CHECK_ANIME_ALT                     1013
-#define IDC_CHECK_ANIME_DATE_FINISH             1014
-#define IDC_CHECK_ANIME_DATE_START              1015
 #define IDC_CHECK_ANIME_REWATCH                 1016
 #define IDC_CHECK_AUTOSTART                     1017
 #define IDC_CHECK_CACHE1                        1018
@@ -97,12 +95,6 @@
 #define IDC_CHECK_UPDATE_RANGE                  1052
 #define IDC_CHECK_UPDATE_ROOT                   1053
 #define IDC_CHECK_UPDATE_WAITMP                 1054
-#define IDC_COMBO_ANIME_DATE_FINISH_DAY         1055
-#define IDC_COMBO_ANIME_DATE_FINISH_MONTH       1056
-#define IDC_COMBO_ANIME_DATE_FINISH_YEAR        1057
-#define IDC_COMBO_ANIME_DATE_START_DAY          1058
-#define IDC_COMBO_ANIME_DATE_START_MONTH        1059
-#define IDC_COMBO_ANIME_DATE_START_YEAR         1060
 #define IDC_COMBO_ANIME_SCORE                   1061
 #define IDC_COMBO_ANIME_STATUS                  1062
 #define IDC_COMBO_DBLCLICK                      1063
@@ -210,3 +202,5 @@
 #define IDC_TOOLBAR_TORRENT                     1165
 #define IDC_TREE_MAIN                           1166
 #define IDC_TREE_SECTIONS                       1167
+#define IDC_DATETIME_FINISH                     1168
+#define IDC_DATETIME_START                      1169

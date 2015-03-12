@@ -63,6 +63,10 @@ public:
 
   void Refresh(int anime_id);
   void RefreshFansubPreference();
+
+private:
+  bool start_date_changed_;
+  bool finish_date_changed_;
 };
 
 }  // namespace ui
