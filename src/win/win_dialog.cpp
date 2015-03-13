@@ -296,6 +296,11 @@ INT_PTR Dialog::DialogProcDefault(HWND hwnd, UINT uMsg,
       }
       break;
     }
+    case WM_CONTEXTMENU: {
+      POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+      OnContextMenu(reinterpret_cast<HWND>(wParam), pt);
+      break;
+    }
     case WM_DESTROY: {
       OnDestroy();
       break;

@@ -31,6 +31,7 @@ public:
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
+  void OnContextMenu(HWND hwnd, POINT pt);
   BOOL OnDestroy();
   BOOL OnInitDialog();
   LRESULT OnListCustomDraw(LPARAM lParam);
@@ -51,10 +52,7 @@ public:
 
 private:
   win::Window cancel_button_;
-  class ListView : public win::ListView {
-  public:
-    LRESULT WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-  } list_;
+  win::ListView list_;
   win::Rebar rebar_;
   win::Toolbar toolbar_;
 };

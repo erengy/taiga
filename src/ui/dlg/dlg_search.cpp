@@ -16,8 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <WindowsX.h>
-
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -61,37 +59,6 @@ BOOL SearchDialog::OnInitDialog() {
 
 INT_PTR SearchDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
-    case WM_CONTEXTMENU: {
-      auto hwnd_from = reinterpret_cast<HWND>(wParam);
-      POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-      if (hwnd_from == list_.GetWindowHandle()) {
-        if (list_.GetSelectedCount() > 0) {
-          if (pt.x == -1 || pt.y == -1) {
-            win::Rect rect;
-            int item_index = list_.GetNextItem(-1, LVIS_SELECTED);
-            list_.GetSubItemRect(item_index, 0, &rect);
-            pt = {rect.left, rect.bottom};
-            ::ClientToScreen(list_.GetWindowHandle(), &pt);
-          }
-          auto anime_id = GetAnimeIdFromSelectedListItem(list_);
-          auto anime_ids = GetAnimeIdsFromSelectedListItems(list_);
-          bool is_in_list = true;
-          for (const auto& anime_id : anime_ids) {
-            auto anime_item = AnimeDatabase.FindItem(anime_id);
-            if (anime_item && !anime_item->IsInList()) {
-              is_in_list = false;
-              break;
-            }
-          }
-          ui::Menus.UpdateSearchList(!is_in_list);
-          auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SearchList");
-          ExecuteAction(action, TRUE, StartsWith(action, L"AddToList") ?
-                        reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
-        }
-      }
-      break;
-    }
-
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL: {
       return list_.SendMessage(uMsg, wParam, lParam);
@@ -99,6 +66,29 @@ INT_PTR SearchDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
   }
 
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
+void SearchDialog::OnContextMenu(HWND hwnd, POINT pt) {
+  if (hwnd == list_.GetWindowHandle()) {
+    if (list_.GetSelectedCount() > 0) {
+      if (pt.x == -1 || pt.y == -1)
+        GetPopupMenuPositionForSelectedListItem(list_, pt);
+      auto anime_id = GetAnimeIdFromSelectedListItem(list_);
+      auto anime_ids = GetAnimeIdsFromSelectedListItems(list_);
+      bool is_in_list = true;
+      for (const auto& anime_id : anime_ids) {
+        auto anime_item = AnimeDatabase.FindItem(anime_id);
+        if (anime_item && !anime_item->IsInList()) {
+          is_in_list = false;
+          break;
+        }
+      }
+      ui::Menus.UpdateSearchList(!is_in_list);
+      auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SearchList");
+      ExecuteAction(action, TRUE, StartsWith(action, L"AddToList") ?
+                    reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
+    }
+  }
 }
 
 LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {

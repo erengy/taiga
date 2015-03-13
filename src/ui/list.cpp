@@ -27,6 +27,7 @@
 #include "taiga/settings.h"
 
 #include "win/ctrl/win_ctrl.h"
+#include "win/win_gdi.h"
 
 namespace ui {
 
@@ -335,6 +336,30 @@ std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview) {
   };
 
   return anime_ids;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void GetPopupMenuPositionForSelectedListItem(win::ListView& listview,
+                                             POINT& pt) {
+  int item_index = listview.GetNextItem(-1, LVIS_SELECTED);
+
+  win::Rect rect;
+  listview.GetSubItemRect(item_index, 0, &rect);
+
+  pt = {rect.left, rect.bottom};
+  ClientToScreen(listview.GetWindowHandle(), &pt);
+}
+
+bool HitTestListHeader(win::ListView& listview, POINT pt) {
+  HDHITTESTINFO hti = {0};
+  hti.pt = pt;
+  ScreenToClient(listview.GetHeader(), &hti.pt);
+
+  SendMessage(listview.GetHeader(), HDM_HITTEST, 0,
+              reinterpret_cast<LPARAM>(&hti));
+
+  return hti.flags & (HHT_NOWHERE | HHT_ONHEADER | HHT_ONDIVIDER);
 }
 
 }  // namespace ui

@@ -47,6 +47,7 @@ public:
   virtual ~AnimeListDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  void OnContextMenu(HWND hwnd, POINT pt);
   BOOL OnInitDialog();
   LRESULT OnListNotify(LPARAM lParam);
   LRESULT OnListCustomDraw(LPARAM lParam);

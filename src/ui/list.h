@@ -54,6 +54,9 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
 int GetAnimeIdFromSelectedListItem(win::ListView& listview);
 std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview);
 
+void GetPopupMenuPositionForSelectedListItem(win::ListView& listview, POINT& pt);
+bool HitTestListHeader(win::ListView& listview, POINT pt);
+
 }  // namespace ui
 
 #endif  // TAIGA_UI_LIST_H

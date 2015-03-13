@@ -16,8 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <WindowsX.h>
-
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -112,39 +110,6 @@ BOOL SeasonDialog::OnInitDialog() {
 
 INT_PTR SeasonDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
-    case WM_CONTEXTMENU: {
-      auto hwnd_from = reinterpret_cast<HWND>(wParam);
-      POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-      if (hwnd_from == list_.GetWindowHandle()) {
-        if (list_.GetSelectedCount() > 0) {
-          if (pt.x == -1 || pt.y == -1) {
-            win::Rect rect;
-            int item_index = list_.GetNextItem(-1, LVIS_SELECTED);
-            list_.GetSubItemRect(item_index, 0, &rect);
-            pt = {rect.left, rect.bottom};
-            ::ClientToScreen(list_.GetWindowHandle(), &pt);
-          }
-          auto anime_id = GetAnimeIdFromSelectedListItem(list_);
-          auto anime_ids = GetAnimeIdsFromSelectedListItems(list_);
-          bool is_in_list = true;
-          for (const auto& anime_id : anime_ids) {
-            auto anime_item = AnimeDatabase.FindItem(anime_id);
-            if (anime_item && !anime_item->IsInList()) {
-              is_in_list = false;
-              break;
-            }
-          }
-          ui::Menus.UpdateSeasonList(!is_in_list);
-          auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SeasonList");
-          bool multi_id = StartsWith(action, L"AddToList") ||
-                          StartsWith(action, L"Season_RefreshItemData");
-          ExecuteAction(action, TRUE, multi_id ? reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
-          list_.RedrawWindow();
-        }
-      }
-      break;
-    }
-
     // Forward mouse wheel messages to the list
     case WM_MOUSEWHEEL: {
       return list_.SendMessage(uMsg, wParam, lParam);
@@ -164,6 +129,31 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   }
 
   return FALSE;
+}
+
+void SeasonDialog::OnContextMenu(HWND hwnd, POINT pt) {
+  if (hwnd == list_.GetWindowHandle()) {
+    if (list_.GetSelectedCount() > 0) {
+      if (pt.x == -1 || pt.y == -1)
+        GetPopupMenuPositionForSelectedListItem(list_, pt);
+      auto anime_id = GetAnimeIdFromSelectedListItem(list_);
+      auto anime_ids = GetAnimeIdsFromSelectedListItems(list_);
+      bool is_in_list = true;
+      for (const auto& anime_id : anime_ids) {
+        auto anime_item = AnimeDatabase.FindItem(anime_id);
+        if (anime_item && !anime_item->IsInList()) {
+          is_in_list = false;
+          break;
+        }
+      }
+      ui::Menus.UpdateSeasonList(!is_in_list);
+      auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"SeasonList");
+      bool multi_id = StartsWith(action, L"AddToList") ||
+                      StartsWith(action, L"Season_RefreshItemData");
+      ExecuteAction(action, TRUE, multi_id ? reinterpret_cast<LPARAM>(&anime_ids) : anime_id);
+      list_.RedrawWindow();
+    }
+  }
 }
 
 BOOL SeasonDialog::OnDestroy() {
@@ -197,25 +187,6 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-LRESULT SeasonDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uMsg) {
-    case WM_MOUSEWHEEL: {
-      /*
-      if (this->GetItemCount() > 0) {
-        short delta = GET_WHEEL_DELTA_WPARAM(wParam);
-        short value = 200;
-        if (delta > 0) value = -value;
-        SendMessage(LVM_SCROLL, 0, value);
-        return 0;
-      }
-      */
-      break;
-    }
-  }
-
-  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
-}
 
 LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);

@@ -106,6 +106,7 @@ public:
 protected:
   // Message handlers
   virtual BOOL    OnCommand(WPARAM wParam, LPARAM lParam) { return FALSE; }
+  virtual void    OnContextMenu(HWND hwnd, POINT pt) {}
   virtual void    OnCreate(HWND hwnd, LPCREATESTRUCT create_struct);
   virtual BOOL    OnDestroy() { return FALSE; }
   virtual void    OnDropFiles(HDROP drop_info) {}

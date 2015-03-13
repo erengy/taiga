@@ -153,6 +153,76 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   return FALSE;
 }
 
+void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
+  int item_index = list_.GetNextItem(-1, LVIS_SELECTED);
+  if (item_index == -1)
+    return;
+
+  auto feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(item_index));
+  if (!feed_item)
+    return;
+
+  if (pt.x == -1 || pt.y == -1)
+    GetPopupMenuPositionForSelectedListItem(list_, pt);
+
+  std::wstring answer = ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"TorrentListRightClick");
+
+  if (answer == L"DownloadTorrent") {
+    Aggregator.Download(kFeedCategoryLink, feed_item);
+
+  } else if (answer == L"Info") {
+    auto anime_id = feed_item->episode_data.anime_id;
+    if (anime_id) {
+      ShowDlgAnimeInfo(anime_id);
+    } else {
+      ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
+    }
+
+  } else if (answer == L"DiscardTorrent") {
+    feed_item->state = kFeedItemDiscardedNormal;
+    list_.SetCheckState(item_index, FALSE);
+    Aggregator.AddToArchive(feed_item->title);
+
+  } else if (answer == L"DiscardTorrents") {
+    auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
+    if (anime_item) {
+      for (int i = 0; i < list_.GetItemCount(); i++) {
+        feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
+        if (feed_item && feed_item->episode_data.anime_id == anime_item->GetId()) {
+          feed_item->state = kFeedItemDiscardedNormal;
+          list_.SetCheckState(i, FALSE);
+        }
+      }
+      Aggregator.filter_manager.AddFilter(
+          kFeedFilterActionDiscard, kFeedFilterMatchAll, kFeedFilterOptionDefault,
+          true, L"Discard \"" + anime_item->GetTitle() + L"\"");
+      Aggregator.filter_manager.filters.back().AddCondition(
+          kFeedFilterElement_Meta_Id, kFeedFilterOperator_Equals,
+          ToWstr(anime_item->GetId()));
+    }
+
+  } else if (answer == L"SelectFansub") {
+    int anime_id = feed_item->episode_data.anime_id;
+    std::wstring group_name = feed_item->episode_data.release_group();
+    if (anime::IsValidId(anime_id) && !group_name.empty()) {
+      for (int i = 0; i < list_.GetItemCount(); i++) {
+        feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
+        if (feed_item && !IsEqual(feed_item->episode_data.release_group(), group_name)) {
+          feed_item->state = kFeedItemDiscardedNormal;
+          list_.SetCheckState(i, FALSE);
+        }
+      }
+      anime::SetFansubFilter(anime_id, group_name);
+    }
+
+  } else if (answer == L"MoreTorrents") {
+    Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.anime_title());
+
+  } else if (answer == L"SearchService") {
+    ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
+  }
+}
+
 LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   // ListView control
   if (idCtrl == IDC_LIST_TORRENT) {
@@ -222,66 +292,6 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
             break;
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
           Aggregator.Download(kFeedCategoryLink, feed_item);
-        }
-        break;
-      }
-
-      // Right click
-      case NM_RCLICK: {
-        LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-        if (lpnmitem->iItem == -1)
-          break;
-        FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(lpnmitem->iItem));
-        if (feed_item) {
-          std::wstring answer = ui::Menus.Show(GetWindowHandle(), 0, 0, L"TorrentListRightClick");
-          if (answer == L"DownloadTorrent") {
-            Aggregator.Download(kFeedCategoryLink, feed_item);
-          } else if (answer == L"Info") {
-            auto anime_id = feed_item->episode_data.anime_id;
-            if (anime_id) {
-              ShowDlgAnimeInfo(anime_id);
-            } else {
-              ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
-            }
-          } else if (answer == L"DiscardTorrent") {
-            feed_item->state = kFeedItemDiscardedNormal;
-            list_.SetCheckState(lpnmitem->iItem, FALSE);
-            Aggregator.AddToArchive(feed_item->title);
-          } else if (answer == L"DiscardTorrents") {
-            auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);
-            if (anime_item) {
-              for (int i = 0; i < list_.GetItemCount(); i++) {
-                feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-                if (feed_item && feed_item->episode_data.anime_id == anime_item->GetId()) {
-                  feed_item->state = kFeedItemDiscardedNormal;
-                  list_.SetCheckState(i, FALSE);
-                }
-              }
-              Aggregator.filter_manager.AddFilter(
-                  kFeedFilterActionDiscard, kFeedFilterMatchAll, kFeedFilterOptionDefault,
-                  true, L"Discard \"" + anime_item->GetTitle() + L"\"");
-              Aggregator.filter_manager.filters.back().AddCondition(
-                  kFeedFilterElement_Meta_Id, kFeedFilterOperator_Equals,
-                  ToWstr(anime_item->GetId()));
-            }
-          } else if (answer == L"SelectFansub") {
-            int anime_id = feed_item->episode_data.anime_id;
-            std::wstring group_name = feed_item->episode_data.release_group();
-            if (anime::IsValidId(anime_id) && !group_name.empty()) {
-              for (int i = 0; i < list_.GetItemCount(); i++) {
-                feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
-                if (feed_item && !IsEqual(feed_item->episode_data.release_group(), group_name)) {
-                  feed_item->state = kFeedItemDiscardedNormal;
-                  list_.SetCheckState(i, FALSE);
-                }
-              }
-              anime::SetFansubFilter(anime_id, group_name);
-            }
-          } else if (answer == L"MoreTorrents") {
-            Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.anime_title());
-          } else if (answer == L"SearchService") {
-            ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
-          }
         }
         break;
       }

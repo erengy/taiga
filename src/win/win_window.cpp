@@ -641,6 +641,11 @@ LRESULT Window::WindowProcDefault(HWND hwnd, UINT uMsg,
         return 0;
       break;
     }
+    case WM_CONTEXTMENU: {
+      POINT pt = {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+      OnContextMenu(reinterpret_cast<HWND>(wParam), pt);
+      break;
+    }
     case WM_CREATE: {
       OnCreate(hwnd, reinterpret_cast<LPCREATESTRUCT>(lParam));
       break;

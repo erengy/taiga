@@ -29,6 +29,7 @@
 #include "ui/dlg/dlg_history.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dialog.h"
+#include "ui/list.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -70,6 +71,21 @@ INT_PTR HistoryDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
   return DialogProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
+void HistoryDialog::OnContextMenu(HWND hwnd, POINT pt) {
+  if (hwnd == list_.GetWindowHandle()) {
+    if (pt.x == -1 || pt.y == -1)
+      GetPopupMenuPositionForSelectedListItem(list_, pt);
+
+    Menus.UpdateHistoryList(list_.GetSelectedCount() > 0);
+    std::wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, L"HistoryList");
+
+    if (action == L"Delete()") {
+      RemoveSelectedItems();
+    } else {
+      ExecuteAction(action);
+    }
+  }
+}
 
 LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
   if (pnmh->hwndFrom == list_.GetWindowHandle()) {
@@ -95,17 +111,6 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
           int anime_id = list_.GetItemParam(item_index);
           ShowDlgAnimeInfo(anime_id);
-        }
-        break;
-      }
-      // Right click
-      case NM_RCLICK: {
-        Menus.UpdateHistoryList(list_.GetSelectedCount() > 0);
-        std::wstring action = ui::Menus.Show(DlgMain.GetWindowHandle(), 0, 0, L"HistoryList");
-        if (action == L"Delete()") {
-          RemoveSelectedItems();
-        } else {
-          ExecuteAction(action);
         }
         break;
       }
