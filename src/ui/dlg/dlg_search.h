@@ -40,7 +40,7 @@ public:
   void AddAnimeToList(int anime_id);
   void ParseResults(const std::vector<int>& ids);
   void RefreshList();
-  void Search(const std::wstring& title);
+  void Search(const std::wstring& title, bool local = false);
 
   std::wstring search_text;
 

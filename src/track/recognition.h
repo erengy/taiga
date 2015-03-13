@@ -48,6 +48,7 @@ class Engine {
 public:
   bool Parse(std::wstring title, anime::Episode& episode) const;
   int Identify(anime::Episode& episode, bool give_score, const MatchOptions& match_options);
+  bool Search(const std::wstring& title, std::vector<int>& anime_ids);
 
   void InitializeTitles();
   void UpdateTitles(const anime::Item& anime_item);

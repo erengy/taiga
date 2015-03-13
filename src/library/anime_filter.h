@@ -31,7 +31,7 @@ class Filters {
   Filters();
   virtual ~Filters() {}
 
-  bool CheckItem(Item& item);
+  bool CheckItem(const Item& item);
   void Reset();
 
   std::vector<bool> my_status;

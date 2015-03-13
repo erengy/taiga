@@ -26,7 +26,7 @@ Filters::Filters() {
   Reset();
 }
 
-bool Filters::CheckItem(Item& item) {
+bool Filters::CheckItem(const Item& item) {
   // Filter my status
   for (size_t i = 0; i < my_status.size(); i++)
     if (!my_status.at(i) && item.GetMyStatus() == i)

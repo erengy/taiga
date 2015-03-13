@@ -332,7 +332,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
               break;
             switch (search_bar.mode) {
               case kSearchModeService: {
-                ExecuteAction(L"SearchAnime(" + text + L")");
+                BOOL local_search = GetKeyState(VK_CONTROL) & 0x8000;
+                ExecuteAction(L"SearchAnime(" + text + L")", local_search);
                 return TRUE;
               }
               case kSearchModeFeed: {

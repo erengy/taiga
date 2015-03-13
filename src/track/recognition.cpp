@@ -119,6 +119,25 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   return episode.anime_id;
 }
 
+bool Engine::Search(const std::wstring& title, std::vector<int>& anime_ids) {
+  anime::Episode episode;
+  episode.set_anime_title(title);
+
+  std::set<int> empty_set;
+  track::recognition::MatchOptions default_options;
+
+  InitializeTitles();
+  scores_.clear();
+
+  ScoreTitle(episode, empty_set, default_options);
+
+  for (const auto& score : scores_) {
+    anime_ids.push_back(score.first);
+  }
+
+  return !anime_ids.empty();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Engine::ValidateOptions(anime::Episode& episode, int anime_id,

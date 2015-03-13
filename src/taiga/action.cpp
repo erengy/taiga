@@ -79,20 +79,24 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     sync::Synchronize();
 
   // SearchAnime()
+  //   wParam is a BOOL value that defines local search.
   } else if (action == L"SearchAnime") {
     if (body.empty())
       return;
-    auto service = taiga::GetCurrentService();
-    if (service->RequestNeedsAuthentication(sync::kSearchTitle)) {
-      if (taiga::GetCurrentUsername().empty() ||
-          taiga::GetCurrentPassword().empty()) {
-        ui::OnSettingsAccountEmpty();
-        return;
+    bool local_search = wParam != FALSE;
+    if (!local_search) {
+      auto service = taiga::GetCurrentService();
+      if (service->RequestNeedsAuthentication(sync::kSearchTitle)) {
+        if (taiga::GetCurrentUsername().empty() ||
+            taiga::GetCurrentPassword().empty()) {
+          ui::OnSettingsAccountEmpty();
+          return;
+        }
       }
     }
     ui::DlgMain.navigation.SetCurrentPage(ui::kSidebarItemSearch);
     ui::DlgMain.edit.SetText(body);
-    ui::DlgSearch.Search(body);
+    ui::DlgSearch.Search(body, local_search);
 
   // ViewAnimePage
   //   Opens up anime page on the active service.

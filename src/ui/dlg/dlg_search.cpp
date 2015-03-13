@@ -26,6 +26,7 @@
 #include "taiga/resource.h"
 #include "taiga/script.h"
 #include "taiga/settings.h"
+#include "track/recognition.h"
 #include "ui/dlg/dlg_main.h"
 #include "ui/dlg/dlg_search.h"
 #include "ui/dialog.h"
@@ -225,13 +226,18 @@ void SearchDialog::RefreshList() {
                      RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
 
-void SearchDialog::Search(const std::wstring& title) {
+void SearchDialog::Search(const std::wstring& title, bool local) {
   anime_ids_.clear();
   search_text = title;
 
-  ui::ChangeStatusText(L"Searching " + taiga::GetCurrentService()->name() +
-                       L" for \"" + title + L"\"...");
-  sync::SearchTitle(title, anime::ID_UNKNOWN);
+  if (local) {
+    Meow.Search(title, anime_ids_);
+    RefreshList();
+  } else {
+    ui::ChangeStatusText(L"Searching " + taiga::GetCurrentService()->name() +
+                         L" for \"" + title + L"\"...");
+    sync::SearchTitle(title, anime::ID_UNKNOWN);
+  }
 }
 
 }  // namespace ui
