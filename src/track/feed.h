@@ -135,7 +135,7 @@ public:
   void HandleFeedDownload(Feed& feed, const std::string& data);
   bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
 
-  bool Notify(const Feed& feed) const;
+  void ExamineData(Feed& feed);
   void ParseDescription(FeedItem& feed_item, const std::wstring& source);
 
   bool LoadArchive();
@@ -147,7 +147,6 @@ public:
 
 private:
   bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
-  void ExamineData(Feed& feed);
   FeedItem* FindFeedItemByLink(Feed& feed, const std::wstring& link);
   void HandleFeedDownloadOpen(FeedItem& feed_item, const std::wstring& file);
 

@@ -112,14 +112,16 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     // Check new torrents
     case 100: {
       DlgMain.edit.SetText(L"");
-      Aggregator.CheckFeed(kFeedCategoryLink, Settings[taiga::kTorrent_Discovery_Source]);
-      /**
-      #ifdef _DEBUG
-      feed->Load();
-      feed->ExamineData();
-      RefreshList();
-      #endif
-      /**/
+      if (GetKeyState(VK_CONTROL) & 0x8000) {
+        auto feed = Aggregator.GetFeed(kFeedCategoryLink);
+        if (feed) {
+          feed->Load();
+          Aggregator.ExamineData(*feed);
+        }
+        RefreshList();
+      } else {
+        Aggregator.CheckFeed(kFeedCategoryLink, Settings[taiga::kTorrent_Discovery_Source]);
+      }
       return TRUE;
     }
     // Download marked torrents

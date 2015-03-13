@@ -176,10 +176,6 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
   return true;
 }
 
-bool Aggregator::Notify(const Feed& feed) const {
-  return ui::OnFeedNotify(feed);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 FeedItem* Aggregator::FindFeedItemByLink(Feed& feed, const std::wstring& link) {
@@ -213,7 +209,7 @@ void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
   if (automatic) {
     switch (Settings.GetInt(taiga::kTorrent_Discovery_NewAction)) {
       case 1:  // Notify
-        Notify(feed);
+        ui::OnFeedNotify(feed);
         break;
       case 2:  // Download
         Download(feed.category, nullptr);
