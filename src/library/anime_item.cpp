@@ -603,8 +603,13 @@ void Item::SetFolder(const std::wstring& folder) {
 }
 
 void Item::SetLastAiredEpisodeNumber(int number) {
-  if (number > local_info_.last_aired_episode)
-    local_info_.last_aired_episode = number;
+  if (number > local_info_.last_aired_episode) {
+    if (GetAiringStatus() == kFinishedAiring) {
+      local_info_.last_aired_episode = GetEpisodeCount();
+    } else {
+      local_info_.last_aired_episode = number;
+    }
+  }
 }
 
 void Item::SetNextEpisodePath(const std::wstring& path) {
