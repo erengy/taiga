@@ -116,9 +116,14 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       ChangeStatusText(error);
       break;
     case taiga::kHttpTaigaUpdateCheck:
+      if (!DlgMain.IsWindow())  // Don't display error message on automatic checks
+        MessageBox(DlgUpdate.GetWindowHandle(), error.c_str(), L"Update Error",
+                   MB_ICONERROR | MB_OK);
+      DlgUpdate.PostMessage(WM_CLOSE);
+      return;
     case taiga::kHttpTaigaUpdateDownload:
-      MessageBox(DlgUpdate.GetWindowHandle(),
-                 error.c_str(), L"Update", MB_ICONERROR | MB_OK);
+      MessageBox(DlgUpdate.GetWindowHandle(), error.c_str(), L"Download Error",
+                 MB_ICONERROR | MB_OK);
       DlgUpdate.PostMessage(WM_CLOSE);
       return;
   }
