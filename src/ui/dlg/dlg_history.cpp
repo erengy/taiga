@@ -53,7 +53,7 @@ BOOL HistoryDialog::OnInitDialog() {
 
   // Insert list groups
   list_.InsertGroup(0, L"Queued for update");
-  list_.InsertGroup(1, L"Recently watched");
+  list_.InsertGroup(1, L"History");
 
   // Refresh list
   RefreshList();

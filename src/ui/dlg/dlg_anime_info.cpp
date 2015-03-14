@@ -556,15 +556,13 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     int recently_watched = 0;
     foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
-      content += L"  \u2022 " + anime_item->GetTitle();
+      content += L"  \u2022 ";
       if (anime_item->GetMyStatus() == anime::kCompleted) {
-        content += L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
+        content += anime_item->GetTitle() + L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
         link_count++;
       } else if (anime_item->GetMyStatus() != anime::kDropped) {
-        int last_watched = anime_item->GetMyLastWatchedEpisode();
-        if (last_watched > 0)
-          content += L" #" + ToWstr(last_watched);
-        content += L" \u2014 <a href=\"PlayNext(" + ToWstr(*it) + L")\">Watch next episode</a>";
+        std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
+        content += L"<a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>";
         link_count++;
       }
       content += L"\n";
@@ -577,7 +575,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
                 L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?\n\n";
       link_count++;
     } else {
-      content = L"Recently watched:\n" + content + L"\n";
+      content = L"Continue watching:\n" + content + L"\n";
       int watched_last_week = 0;
       foreach_c_(it, History.queue.items) {
         if (!it->episode || *it->episode == 0)
