@@ -312,11 +312,10 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
 
     // Hot-tracking
     case TBN_HOTITEMCHANGE: {
-      LPNMTBHOTITEM lpnmhi = reinterpret_cast<LPNMTBHOTITEM>(lParam);
+      auto lpnmhi = reinterpret_cast<LPNMTBHOTITEM>(lParam);
       if (toolbar_wm.hook && lpnmhi->idNew > 0) {
-        toolbar_wm.toolbar->PressButton(lpnmhi->idOld, FALSE);
-        toolbar_wm.toolbar->SendMessage(lpnmhi->idNew, TRUE);
-        SendMessage(WM_CANCELMODE);
+        toolbar_wm.button_index = -1;
+        PostMessage(WM_CANCELMODE);
         PostMessage(WM_TAIGA_SHOWMENU);
       }
       break;
@@ -340,7 +339,8 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   ClientToScreen(toolbar->GetWindowHandle(), &pt);
 
   // Hook
-  if (hook) UnhookWindowsHookEx(hook);
+  if (hook)
+    UnhookWindowsHookEx(hook);
   hook = SetWindowsHookEx(WH_MSGFILTER, &HookProc, NULL, GetCurrentThreadId());
 
   // Display menu
@@ -367,6 +367,8 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
   }
 
   toolbar->PressButton(tbb.idCommand, FALSE);
+  if (button_index > -1)
+    toolbar->SendMessage(TB_SETHOTITEM, -1, 0);
 
   if (!action.empty())
     ExecuteAction(action);
