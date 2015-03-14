@@ -162,6 +162,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
   file_search_helper.set_anime_id(anime_id);
   file_search_helper.set_episode_number(episode_number);
+  // Casting file size threshold to int shouldn't be a problem, as the value
+  // is never supposed to exceed INT_MAX (i.e. ~2GB).
   file_search_helper.set_minimum_file_size(
       Settings.GetInt(taiga::kLibrary_FileSizeThreshold));
   file_search_helper.set_path_found(L"");
