@@ -583,7 +583,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   // Sort items
   switch (sort_by) {
     case kSeasonSortByAiringDate:
-      list_.Sort(0, -1, ui::kListSortDateStart, ui::ListViewCompareProc);
+      list_.Sort(0, 1, ui::kListSortDateStart, ui::ListViewCompareProc);
       break;
     case kSeasonSortByEpisodes:
       list_.Sort(0, -1, ui::kListSortEpisodeCount, ui::ListViewCompareProc);
