@@ -351,6 +351,8 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
         CurrentEpisode.processed = processed;
         UpdateList(*anime_item, CurrentEpisode);
         CurrentEpisode.anime_id = anime::ID_UNKNOWN;
+      } else {
+        ui::DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
       }
       taiga::timers.timer(taiga::kTimerMedia)->Reset();
     }
