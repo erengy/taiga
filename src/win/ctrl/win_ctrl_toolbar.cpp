@@ -76,6 +76,16 @@ int Toolbar::GetButtonCount() {
   return SendMessage(TB_BUTTONCOUNT, 0, 0);
 }
 
+int Toolbar::GetButtonIndex(int command_id) {
+  TBBUTTONINFO tbbi = {0};
+  tbbi.cbSize = sizeof(tbbi);
+  tbbi.dwMask = TBIF_COMMAND;
+  tbbi.idCommand = command_id;
+
+  return SendMessage(TB_GETBUTTONINFO, command_id,
+                     reinterpret_cast<LPARAM>(&tbbi));
+}
+
 DWORD Toolbar::GetButtonSize() {
   return SendMessage(TB_GETBUTTONSIZE, 0, 0);
 }
@@ -92,6 +102,10 @@ LPCWSTR Toolbar::GetButtonTooltip(int index) {
       return tooltip_text_[index].c_str();
 
   return nullptr;
+}
+
+int Toolbar::GetHotItem() {
+  return SendMessage(TB_GETHOTITEM, 0, 0);
 }
 
 DWORD Toolbar::GetPadding() {
@@ -115,6 +129,11 @@ BOOL Toolbar::InsertButton(int index, int bitmap, int command_id,
 
   tooltip_text_.push_back(tooltip ? tooltip : L"");
   return SendMessage(TB_INSERTBUTTON, index, reinterpret_cast<LPARAM>(&tbb));
+}
+
+BOOL Toolbar::MapAcelerator(UINT character, UINT& command_id) {
+  return SendMessage(TB_MAPACCELERATOR, character,
+                     reinterpret_cast<LPARAM>(&command_id));
 }
 
 BOOL Toolbar::PressButton(int command_id, BOOL press) {
@@ -146,6 +165,14 @@ BOOL Toolbar::SetButtonTooltip(int index, LPCWSTR tooltip) {
     tooltip_text_[index] = tooltip;
     return TRUE;
   }
+}
+
+int Toolbar::SetHotItem(int index) {
+  return SendMessage(TB_SETHOTITEM, index, 0);
+}
+
+int Toolbar::SetHotItem(int index, DWORD flags) {
+  return SendMessage(TB_SETHOTITEM2, index, flags);
 }
 
 void Toolbar::SetImageList(HIMAGELIST image_list, int dx, int dy) {

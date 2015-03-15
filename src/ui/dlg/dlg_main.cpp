@@ -193,11 +193,11 @@ void MainDialog::CreateDialogControls() {
   // Insert menu toolbar buttons
   BYTE fsState = TBSTATE_ENABLED;
   BYTE fsStyle0 = BTNS_AUTOSIZE | BTNS_DROPDOWN | BTNS_SHOWTEXT;
-  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, fsState, fsStyle0, 0, L"  File", nullptr);
-  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, fsState, fsStyle0, 0, L"  Services", nullptr);
-  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, fsState, fsStyle0, 0, L"  Tools", nullptr);
-  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, fsState, fsStyle0, 0, L"  View", nullptr);
-  toolbar_menu.InsertButton(4, I_IMAGENONE, 104, fsState, fsStyle0, 0, L"  Help", nullptr);
+  toolbar_menu.InsertButton(0, I_IMAGENONE, 100, fsState, fsStyle0, 0, L"  &File", nullptr);
+  toolbar_menu.InsertButton(1, I_IMAGENONE, 101, fsState, fsStyle0, 0, L"  &Services", nullptr);
+  toolbar_menu.InsertButton(2, I_IMAGENONE, 102, fsState, fsStyle0, 0, L"  &Tools", nullptr);
+  toolbar_menu.InsertButton(3, I_IMAGENONE, 103, fsState, fsStyle0, 0, L"  &View", nullptr);
+  toolbar_menu.InsertButton(4, I_IMAGENONE, 104, fsState, fsStyle0, 0, L"  &Help", nullptr);
   // Insert main toolbar buttons
   BYTE fsStyle1 = BTNS_AUTOSIZE;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_WHOLEDROPDOWN;
@@ -296,8 +296,58 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 }
 
 BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
+  auto handle_menu_accelerator = [&]() {
+    UINT command_id = 0;
+    if (toolbar_menu.MapAcelerator(pMsg->wParam, command_id)) {
+      int button_index = toolbar_menu.GetButtonIndex(command_id);
+      toolbar_menu.SetHotItem(button_index, HICF_ACCELERATOR);
+      toolbar_wm.toolbar = &toolbar_menu;
+      toolbar_wm.ShowMenu();
+      return true;
+    }
+    return false;
+  };
+
   switch (pMsg->message) {
     case WM_KEYDOWN: {
+      // Menubar
+      auto hot_item = toolbar_menu.GetHotItem();
+      if (hot_item > -1) {
+        switch (pMsg->wParam) {
+          case VK_ESCAPE: {
+            toolbar_menu.SetHotItem(-1);
+            return TRUE;
+          }
+          case VK_RETURN:
+          case VK_UP:
+          case VK_DOWN: {
+            toolbar_wm.toolbar = &toolbar_menu;
+            toolbar_wm.ShowMenu();
+            return TRUE;
+          }
+          case VK_LEFT:
+          case VK_RIGHT: {
+            switch (pMsg->wParam) {
+              case VK_LEFT:
+                if (--hot_item < 0)
+                  hot_item = toolbar_menu.GetButtonCount() - 1;
+                break;
+              case VK_RIGHT:
+                if (++hot_item == toolbar_menu.GetButtonCount())
+                  hot_item = 0;
+                break;
+            }
+            toolbar_menu.SetHotItem(hot_item, HICF_ARROWKEYS);
+            return TRUE;
+          }
+          default: {
+            if (handle_menu_accelerator())
+              return TRUE;
+            break;
+          }
+        }
+      }
+
       switch (pMsg->wParam) {
         // Clear search text
         case VK_ESCAPE: {
@@ -392,6 +442,26 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             }
           }
           break;
+        }
+      }
+      break;
+    }
+
+    case WM_SYSKEYDOWN: {
+      if (handle_menu_accelerator())
+        return TRUE;
+      break;
+    }
+    case WM_SYSKEYUP: {
+      switch (pMsg->wParam) {
+        case VK_MENU:
+        case VK_F10: {
+          if (!(GetKeyState(VK_SHIFT) & 0x8000)) {
+            auto hot_item = toolbar_menu.GetHotItem();
+            hot_item = hot_item == -1 ? 0 : -1;
+            toolbar_menu.SetHotItem(hot_item, HICF_ACCELERATOR);
+          }
+          return TRUE;
         }
       }
       break;

@@ -337,18 +337,23 @@ public:
   int     GetHeight();
   BOOL    GetButton(int index, TBBUTTON& tbb);
   int     GetButtonCount();
+  int     GetButtonIndex(int command_id);
   DWORD   GetButtonSize();
   DWORD   GetButtonStyle(int index);
   LPCWSTR GetButtonTooltip(int index);
+  int     GetHotItem();
   DWORD   GetPadding();
   int     HitTest(POINT& point);
   BOOL    InsertButton(int index, int bitmap, int command_id,
                        BYTE state, BYTE style, DWORD_PTR data,
                        LPCWSTR text, LPCWSTR tooltip);
+  BOOL    MapAcelerator(UINT character, UINT& command_id);
   BOOL    PressButton(int command_id, BOOL press);
   BOOL    SetButtonImage(int index, int image);
   BOOL    SetButtonText(int index, LPCWSTR text);
   BOOL    SetButtonTooltip(int index, LPCWSTR tooltip);
+  int     SetHotItem(int index);
+  int     SetHotItem(int index, DWORD flags);
   void    SetImageList(HIMAGELIST image_list, int dx, int dy);
 
 protected:

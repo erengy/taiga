@@ -2,6 +2,7 @@
 <menus>
 	<!-- Main -->
 	<menu name="Main" type="menubar">
+		<!-- Note: Ignored -->
 		<item name="File" sub="File"/>
 		<item name="Services" sub="Services"/>
 		<item name="Tools" sub="Tools"/>

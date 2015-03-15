@@ -242,14 +242,9 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
 
 LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, LPARAM lParam) {
   if (code == MSGF_MENU) {
-    MSG* msg = reinterpret_cast<MSG*>(lParam);
+    auto msg = reinterpret_cast<MSG*>(lParam);
 
     switch (msg->message) {
-      case WM_LBUTTONDOWN:
-      case WM_RBUTTONDOWN: {
-        break;
-      }
-
       case WM_MOUSEMOVE: {
         POINT pt = {LOWORD(msg->lParam), HIWORD(msg->lParam)};
         ScreenToClient(DlgMain.toolbar_wm.toolbar->GetWindowHandle(), &pt);
@@ -262,7 +257,7 @@ LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, 
             button_index < button_count &&
             button_index != DlgMain.toolbar_wm.button_index) {
           if (button_style & BTNS_DROPDOWN || button_style & BTNS_WHOLEDROPDOWN) {
-            DlgMain.toolbar_wm.toolbar->SendMessage(TB_SETHOTITEM, button_index, 0);
+            DlgMain.toolbar_wm.toolbar->SetHotItem(button_index, HICF_MOUSE);
             return 0L;
           }
         }
@@ -326,7 +321,7 @@ LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
 }
 
 void MainDialog::ToolbarWithMenu::ShowMenu() {
-  button_index = toolbar->SendMessage(TB_GETHOTITEM);
+  button_index = toolbar->GetHotItem();
 
   TBBUTTON tbb;
   toolbar->GetButton(button_index, tbb);
@@ -368,7 +363,7 @@ void MainDialog::ToolbarWithMenu::ShowMenu() {
 
   toolbar->PressButton(tbb.idCommand, FALSE);
   if (button_index > -1)
-    toolbar->SendMessage(TB_SETHOTITEM, -1, 0);
+    toolbar->SetHotItem(-1);
 
   if (!action.empty())
     ExecuteAction(action);
