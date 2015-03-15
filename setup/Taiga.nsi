@@ -92,7 +92,7 @@ Section "!${PRODUCT_NAME}" SEC01
   
   ; Add files
   SetOutPath "$INSTDIR\data\"
-  File /r /x "test" "..\data\"
+  File /r "..\data\"
   SetOutPath "$INSTDIR"
   File "..\bin\Release\Taiga.exe"
   
