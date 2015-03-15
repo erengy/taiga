@@ -40,6 +40,18 @@ static int CompareValues(const T& first, const T& second) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+int SortAsEpisodeRange(const std::wstring& str1, const std::wstring& str2) {
+  auto get_last_episode = [](const std::wstring& str) {
+    auto pos = InStr(str, L"-");
+    return pos > -1 ? ToInt(str.substr(pos + 1)) : ToInt(str);
+  };
+
+  int number1 = get_last_episode(str1);
+  int number2 = get_last_episode(str2);
+
+  return CompareValues<int>(number1, number2);
+}
+
 int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
   UINT64 size[2] = {1, 1};
 
@@ -91,7 +103,7 @@ int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
 }
 
 int SortAsNumber(LPCWSTR str1, LPCWSTR str2) {
-  return CompareValues<int>(_wtoi(str1), _wtoi(str2));
+  return CompareValues<int>(ToInt(str1), ToInt(str2));
 }
 
 int SortListAsRfc822DateTime(LPCWSTR str1, LPCWSTR str2) {
@@ -202,6 +214,8 @@ int SortList(int type, LPCWSTR str1, LPCWSTR str2) {
     case kListSortDefault:
     default:
       return SortAsText(str1, str2);
+    case kListSortEpisodeRange:
+      return SortAsEpisodeRange(str1, str2);
     case kListSortFileSize:
       return SortAsFileSize(str1, str2);
     case kListSortNumber:
@@ -257,6 +271,7 @@ int CALLBACK ListViewCompareProc(LPARAM lParam1, LPARAM lParam2,
 
   switch (list->GetSortType()) {
     case kListSortDefault:
+    case kListSortEpisodeRange:
     case kListSortFileSize:
     case kListSortNumber:
     case kListSortRfc822DateTime:

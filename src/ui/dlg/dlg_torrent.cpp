@@ -243,7 +243,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         switch (lplv->iSubItem) {
           // Episode
           case 1:
-            list_.Sort(lplv->iSubItem, order, ui::kListSortNumber, ui::ListViewCompareProc);
+            list_.Sort(lplv->iSubItem, order, ui::kListSortEpisodeRange, ui::ListViewCompareProc);
             break;
           // File size
           case 3:
