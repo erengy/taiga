@@ -32,6 +32,7 @@ enum StreamingVideoProvider {
   kStreamAnn,
   kStreamCrunchyroll,
   kStreamDaisuki,
+  kStreamPlex,
   kStreamVeoh,
   kStreamViz,
   kStreamWakanim,
@@ -375,6 +376,8 @@ bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
       return Settings.GetBool(taiga::kStream_Crunchyroll);
     case kStreamDaisuki:
       return Settings.GetBool(taiga::kStream_Daisuki);
+    case kStreamPlex:
+      return Settings.GetBool(taiga::kStream_Plex);
     case kStreamVeoh:
       return Settings.GetBool(taiga::kStream_Veoh);
     case kStreamViz:
@@ -402,6 +405,9 @@ bool MatchStreamUrl(StreamingVideoProvider stream_provider,
              SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/.*-movie-[0-9]+");
     case kStreamDaisuki:
       return InStr(url, L"daisuki.net/anime/watch/") > -1;
+    case kStreamPlex:
+      return SearchRegex(url,
+          L"(?:(?:localhost|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):32400|plex.tv)/web/");
     case kStreamVeoh:
       return InStr(url, L"veoh.com/watch/") > -1;
     case kStreamViz:
@@ -447,6 +453,13 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
       } else {
         title.clear();
       }
+      break;
+    }
+    // Plex
+    case kStreamPlex: {
+      EraseLeft(title, L"Plex");
+      EraseLeft(title, L"\u25B6 ");  // black right pointing triangle
+      ReplaceString(title, L" \u00B7 ", L"");
       break;
     }
     // Veoh

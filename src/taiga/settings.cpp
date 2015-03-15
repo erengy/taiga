@@ -155,6 +155,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kStream_Ann, nullptr, L"recognition/streaming/providers/ann");
   INITKEY(kStream_Crunchyroll, nullptr, L"recognition/streaming/providers/crunchyroll");
   INITKEY(kStream_Daisuki, nullptr, L"recognition/streaming/providers/daisuki");
+  INITKEY(kStream_Plex, nullptr, L"recognition/streaming/providers/plex");
   INITKEY(kStream_Veoh, nullptr, L"recognition/streaming/providers/veoh");
   INITKEY(kStream_Viz, nullptr, L"recognition/streaming/providers/viz");
   INITKEY(kStream_Wakanim, nullptr, L"recognition/streaming/providers/wakanim");

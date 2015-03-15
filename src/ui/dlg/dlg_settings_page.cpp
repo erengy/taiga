@@ -247,15 +247,17 @@ BOOL SettingsPage::OnInitDialog() {
         Header_SetItem(header.GetWindowHandle(), 0, &hdi);
         header.SetWindowHandle(nullptr);
       }
-      list.InsertItem(0, 0, ui::kIcon16_AppBlue, 0, nullptr, L"AnimeLab", taiga::kStream_Animelab);
-      list.InsertItem(1, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime Sols", taiga::kStream_Animesols);
-      list.InsertItem(2, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", taiga::kStream_Ann);
-      list.InsertItem(3, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", taiga::kStream_Crunchyroll);
-      list.InsertItem(4, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", taiga::kStream_Daisuki);
-      list.InsertItem(5, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", taiga::kStream_Veoh);
-      list.InsertItem(6, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", taiga::kStream_Viz);
-      list.InsertItem(7, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", taiga::kStream_Wakanim);
-      list.InsertItem(8, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", taiga::kStream_Youtube);
+      int i = 0;
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"AnimeLab", taiga::kStream_Animelab);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime Sols", taiga::kStream_Animesols);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", taiga::kStream_Ann);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", taiga::kStream_Crunchyroll);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", taiga::kStream_Daisuki);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Plex Web App", taiga::kStream_Plex);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", taiga::kStream_Veoh);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", taiga::kStream_Viz);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", taiga::kStream_Wakanim);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", taiga::kStream_Youtube);
       for (int i = 0; i < list.GetItemCount(); ++i) {
         if (Settings.GetBool(list.GetItemParam(i)))
           list.SetCheckState(i, TRUE);
@@ -895,15 +897,18 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
             ExecuteLink(L"http://www.daisuki.net");
             break;
           case 5:
-            ExecuteLink(L"http://www.veoh.com");
+            ExecuteLink(L"http://www.daisuki.net");
             break;
           case 6:
-            ExecuteLink(L"http://www.viz.com/anime/streaming");
+            ExecuteLink(L"http://plex.tv");
             break;
           case 7:
-            ExecuteLink(L"http://www.wakanim.tv");
+            ExecuteLink(L"http://www.viz.com/anime/streaming");
             break;
           case 8:
+            ExecuteLink(L"http://www.wakanim.tv");
+            break;
+          case 9:
             ExecuteLink(L"http://www.youtube.com");
             break;
         }
