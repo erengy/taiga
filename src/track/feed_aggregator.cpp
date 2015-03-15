@@ -356,24 +356,8 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
 
 void Aggregator::ParseDescription(FeedItem& feed_item,
                                   const std::wstring& source) {
-  // AnimeSuki
-  if (InStr(source, L"animesuki", 0, true) > -1) {
-    std::wstring size_str = L"Filesize: ";
-    std::vector<std::wstring> description_vector;
-    Split(feed_item.description, L"\n", description_vector);
-    if (description_vector.size() > 2) {
-      feed_item.episode_data.file_size =
-          description_vector[2].substr(size_str.length());
-    }
-    if (description_vector.size() > 1) {
-      feed_item.description =
-          description_vector[0] + L" " + description_vector[1];
-      return;
-    }
-    feed_item.description.clear();
-
   // Baka-Updates
-  } else if (InStr(source, L"baka-updates", 0, true) > -1) {
+  if (InStr(source, L"baka-updates", 0, true) > -1) {
     int index_begin = InStr(feed_item.description, L"Released on");
     int index_end = feed_item.description.length();
     if (index_begin > -1)
