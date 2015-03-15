@@ -45,7 +45,10 @@ public:
   void SetTimer(int ticks);
 
 private:
-  win::ListView list_;
+  class ListView : public win::ListView {
+  public:
+    int last_checked_item;
+  } list_;
   win::Rebar rebar_;
   win::Toolbar toolbar_;
 };

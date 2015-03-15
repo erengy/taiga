@@ -266,9 +266,19 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         if (!list_.IsVisible()) break;
         LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
+          bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
+          if (list_.last_checked_item > -1 && (GetKeyState(VK_SHIFT) & 0x8000)) {
+            for (int i = min(pnmv->iItem, list_.last_checked_item);
+                 i <= max(pnmv->iItem, list_.last_checked_item); ++i) {
+              list_.SetCheckState(i, checked);
+            }
+          }
+          if (checked)
+            list_.last_checked_item = pnmv->iItem;
           int checked_count = 0;
           for (int i = 0; i < list_.GetItemCount(); i++) {
-            if (list_.GetCheckState(i)) checked_count++;
+            if (list_.GetCheckState(i))
+              checked_count++;
           }
           if (checked_count == 1) {
             DlgMain.ChangeStatus(L"Marked 1 torrent.");
@@ -277,7 +287,6 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           }
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(pnmv->iItem));
           if (feed_item) {
-            bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
             feed_item->state = checked ? kFeedItemSelected : kFeedItemDiscardedNormal;
           }
         }
@@ -381,6 +390,7 @@ void TorrentDialog::RefreshList() {
 
   // Clear list
   list_.DeleteAllItems();
+  list_.last_checked_item = -1;
 
   // Add items
   for (auto it = feed->items.begin(); it != feed->items.end(); ++it) {
