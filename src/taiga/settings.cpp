@@ -150,16 +150,16 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Notify_Recognized, L"true", L"program/notifications/balloon/recognized");
   INITKEY(kSync_Notify_NotRecognized, L"true", L"program/notifications/balloon/notrecognized");
   INITKEY(kSync_Notify_Format, kDefaultFormatBalloon.c_str(), L"program/notifications/balloon/format");
-  INITKEY(kStream_Animelab, nullptr, L"recognition/streaming/providers/animelab");
-  INITKEY(kStream_Animesols, nullptr, L"recognition/streaming/providers/animesols");
-  INITKEY(kStream_Ann, nullptr, L"recognition/streaming/providers/ann");
-  INITKEY(kStream_Crunchyroll, nullptr, L"recognition/streaming/providers/crunchyroll");
-  INITKEY(kStream_Daisuki, nullptr, L"recognition/streaming/providers/daisuki");
-  INITKEY(kStream_Plex, nullptr, L"recognition/streaming/providers/plex");
-  INITKEY(kStream_Veoh, nullptr, L"recognition/streaming/providers/veoh");
-  INITKEY(kStream_Viz, nullptr, L"recognition/streaming/providers/viz");
-  INITKEY(kStream_Wakanim, nullptr, L"recognition/streaming/providers/wakanim");
-  INITKEY(kStream_Youtube, nullptr, L"recognition/streaming/providers/youtube");
+  INITKEY(kStream_Animelab, L"true", L"recognition/streaming/providers/animelab");
+  INITKEY(kStream_Animesols, L"true", L"recognition/streaming/providers/animesols");
+  INITKEY(kStream_Ann, L"true", L"recognition/streaming/providers/ann");
+  INITKEY(kStream_Crunchyroll, L"true", L"recognition/streaming/providers/crunchyroll");
+  INITKEY(kStream_Daisuki, L"true", L"recognition/streaming/providers/daisuki");
+  INITKEY(kStream_Plex, L"true", L"recognition/streaming/providers/plex");
+  INITKEY(kStream_Veoh, L"true", L"recognition/streaming/providers/veoh");
+  INITKEY(kStream_Viz, L"true", L"recognition/streaming/providers/viz");
+  INITKEY(kStream_Wakanim, L"true", L"recognition/streaming/providers/wakanim");
+  INITKEY(kStream_Youtube, L"true", L"recognition/streaming/providers/youtube");
 
   // Sharing
   INITKEY(kShare_Http_Enabled, nullptr, L"announce/http/enabled");
