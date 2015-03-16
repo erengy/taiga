@@ -149,6 +149,18 @@ int ListView::GetItemCount() {
   return ListView_GetItemCount(window_);
 }
 
+int ListView::GetItemGroup(int i) {
+  LVITEM lvi = {0};
+  lvi.iItem = i;
+  lvi.mask = LVIF_GROUPID;
+
+  if (ListView_GetItem(window_, &lvi)) {
+    return lvi.iGroupId;
+  } else {
+    return -1;
+  }
+}
+
 LPARAM ListView::GetItemParam(int i) {
   LVITEM lvi = {0};
   lvi.iItem  = i;

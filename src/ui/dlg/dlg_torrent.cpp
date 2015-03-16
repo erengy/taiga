@@ -263,14 +263,17 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
 
       // Check/uncheck
       case LVN_ITEMCHANGED: {
-        if (!list_.IsVisible()) break;
+        if (!list_.IsVisible())
+          break;
         LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
           bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
+          int group = list_.GetItemGroup(list_.last_checked_item);
           if (list_.last_checked_item > -1 && (GetKeyState(VK_SHIFT) & 0x8000)) {
             for (int i = min(pnmv->iItem, list_.last_checked_item);
                  i <= max(pnmv->iItem, list_.last_checked_item); ++i) {
-              list_.SetCheckState(i, checked);
+              if (i != pnmv->iItem && list_.GetItemGroup(i) == group)
+                list_.SetCheckState(i, checked);
             }
           }
           if (checked)

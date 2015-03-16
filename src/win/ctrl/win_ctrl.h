@@ -129,6 +129,7 @@ public:
   int        GetCountPerPage();
   HWND       GetHeader();
   int        GetItemCount();
+  int        GetItemGroup(int i);
   LPARAM     GetItemParam(int i);
   void       GetItemText(int item, int subitem, LPWSTR output, int max_length = MAX_PATH);
   void       GetItemText(int item, int subitem, std::wstring& output, int max_length = MAX_PATH);
