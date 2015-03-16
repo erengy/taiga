@@ -43,12 +43,12 @@ int InStrRev(const std::wstring& str1, const std::wstring& str2, int pos);
 int InStrChars(const std::wstring& str1, const std::wstring& str2, int pos);
 int InStrCharsRev(const std::wstring& str1, const std::wstring& str2, int pos);
 
-bool IsAlphanumeric(const wchar_t c);
-bool IsAlphanumeric(const std::wstring& str);
-bool IsHex(const wchar_t c);
-bool IsHex(const std::wstring& str);
-bool IsNumeric(const wchar_t c);
-bool IsNumeric(const std::wstring& str);
+bool IsAlphanumericChar(const wchar_t c);
+bool IsAlphanumericString(const std::wstring& str);
+bool IsHexadecimalChar(const wchar_t c);
+bool IsHexadecimalString(const std::wstring& str);
+bool IsNumericChar(const wchar_t c);
+bool IsNumericString(const std::wstring& str);
 bool IsWhitespace(const wchar_t c);
 
 bool StartsWith(const std::wstring& str, const std::wstring& search);

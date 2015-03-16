@@ -146,7 +146,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
   //   Returns true, if x is equal to y.
   } else if (func_name == L"equal") {
     if (body_parts.size() > 1) {
-      if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
+      if (IsNumericString(body_parts[0]) && IsNumericString(body_parts[1])) {
         if (ToInt(body_parts[0]) == ToInt(body_parts[1]))
           return L"true";
       } else {
@@ -158,7 +158,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
   //   Returns true, if x is greater as or equal to y.
   } else if (func_name == L"gequal") {
     if (body_parts.size() > 1) {
-      if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
+      if (IsNumericString(body_parts[0]) && IsNumericString(body_parts[1])) {
         if (ToInt(body_parts[0]) >= ToInt(body_parts[1]))
           return L"true";
       } else {
@@ -170,7 +170,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
   //   Returns true, if x is greater than y.
   } else if (func_name == L"greater") {
     if (body_parts.size() > 1) {
-      if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
+      if (IsNumericString(body_parts[0]) && IsNumericString(body_parts[1])) {
         if (ToInt(body_parts[0]) > ToInt(body_parts[1]))
           return L"true";
       } else {
@@ -182,7 +182,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
   //   Returns true, if x is less than or equal to y.
   } else if (func_name == L"lequal") {
     if (body_parts.size() > 1) {
-      if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
+      if (IsNumericString(body_parts[0]) && IsNumericString(body_parts[1])) {
         if (ToInt(body_parts[0]) <= ToInt(body_parts[1]))
           return L"true";
       } else {
@@ -194,7 +194,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
   //   Returns true, if x is less than y.
   } else if (func_name == L"less") {
     if (body_parts.size() > 1) {
-      if (IsNumeric(body_parts[0]) && IsNumeric(body_parts[1])) {
+      if (IsNumericString(body_parts[0]) && IsNumericString(body_parts[1])) {
         if (ToInt(body_parts[0]) < ToInt(body_parts[1]))
           return L"true";
       } else {

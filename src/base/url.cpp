@@ -161,7 +161,7 @@ std::wstring DecodeUrl(const std::wstring& input) {
   for (size_t i = 0; i < input.length(); i++) {
     if (input[i] == L'%' &&
         i + 2 < input.length() &&
-        IsHex(input[i + 1]) && IsHex(input[i + 2])) {
+        IsHexadecimalChar(input[i + 1]) && IsHexadecimalChar(input[i + 2])) {
       char c = 0;
       static const wchar_t* digits = L"0123456789ABCDEF";
       for (size_t j = 0; j < 16; j++) {

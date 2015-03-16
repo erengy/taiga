@@ -85,7 +85,8 @@ CompareResult SemanticVersion::Compare(const SemanticVersion& version) const {
 
     size_t min_size = min(identifiers_.size(), identifiers.size());
     for (size_t i = 0; i < min_size; ++i) {
-      if (IsNumeric(identifiers_.at(i)) && IsNumeric(identifiers.at(i))) {
+      if (IsNumericString(identifiers_.at(i)) &&
+          IsNumericString(identifiers.at(i))) {
         int lhs = ToInt(identifiers_.at(i));
         int rhs = ToInt(identifiers.at(i));
         if (lhs != rhs)

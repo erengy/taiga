@@ -179,20 +179,14 @@ int InStrCharsRev(const wstring& str1, const wstring& str2, int pos) {
   return (i != wstring::npos) ? i : -1;
 }
 
-bool IsAlphanumeric(const wchar_t c) {
-  return (c >= '0' && c <= '9') ||
-         (c >= 'A' && c <= 'Z') ||
-         (c >= 'a' && c <= 'z');
+bool IsAlphanumericChar(const wchar_t c) {
+  return (c >= L'0' && c <= L'9') ||
+         (c >= L'A' && c <= L'Z') ||
+         (c >= L'a' && c <= L'z');
 }
-bool IsAlphanumeric(const wstring& str) {
-  if (str.empty())
-    return false;
-
-  for (size_t i = 0; i < str.length(); i++)
-    if (!IsAlphanumeric(str[i]))
-      return false;
-
-  return true;
+bool IsAlphanumericString(const wstring& str) {
+  return !str.empty() &&
+         std::all_of(str.begin(), str.end(), IsAlphanumericChar);
 }
 
 inline bool IsCharsEqual(const wchar_t c1, const wchar_t c2) {
@@ -206,34 +200,22 @@ bool IsEqual(const wstring& str1, const wstring& str2) {
   return std::equal(str1.begin(), str1.end(), str2.begin(), &IsCharsEqual);
 }
 
-bool IsHex(const wchar_t c) {
-  return (c >= '0' && c <= '9') ||
-         (c >= 'A' && c <= 'F') ||
-         (c >= 'a' && c <= 'f');
+bool IsHexadecimalChar(const wchar_t c) {
+  return (c >= L'0' && c <= L'9') ||
+         (c >= L'A' && c <= L'F') ||
+         (c >= L'a' && c <= L'f');
 }
-bool IsHex(const wstring& str) {
-  if (str.empty())
-    return false;
-
-  for (size_t i = 0; i < str.length(); i++)
-    if (!IsHex(str[i]))
-      return false;
-
-  return true;
+bool IsHexadecimalString(const wstring& str) {
+  return !str.empty() &&
+         std::all_of(str.begin(), str.end(), IsHexadecimalChar);
 }
 
-bool IsNumeric(const wchar_t c) {
-  return c >= '0' && c <= '9';
+bool IsNumericChar(const wchar_t c) {
+  return c >= L'0' && c <= L'9';
 }
-bool IsNumeric(const wstring& str) {
-  if (str.empty())
-    return false;
-
-  for (size_t i = 0; i < str.length(); i++)
-    if (!IsNumeric(str[i]))
-      return false;
-
-  return true;
+bool IsNumericString(const wstring& str) {
+  return !str.empty() &&
+         std::all_of(str.begin(), str.end(), IsNumericChar);
 }
 
 bool IsWhitespace(const wchar_t c) {
@@ -804,7 +786,7 @@ bool ValidateFileExtension(const wstring& extension, unsigned int max_length) {
   if (max_length > 0 && extension.length() > max_length)
     return false;
 
-  if (!IsAlphanumeric(extension))
+  if (!IsAlphanumericString(extension))
     return false;
 
   return true;

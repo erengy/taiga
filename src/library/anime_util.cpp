@@ -900,7 +900,7 @@ int TranslateResolution(const std::wstring& str, bool return_validity) {
     int pos = InStr(str, L"x", 0);
     if (pos > -1) {
       for (unsigned int i = 0; i < str.length(); i++)
-        if (i != pos && !IsNumeric(str.at(i)))
+        if (i != pos && !IsNumericChar(str.at(i)))
           return 0;
       return return_validity ? TRUE : ToInt(str.substr(pos + 1));
     }
@@ -909,7 +909,7 @@ int TranslateResolution(const std::wstring& str, bool return_validity) {
   } else if (str.length() > 3) {
     if (str.at(str.length() - 1) == 'p') {
       for (unsigned int i = 0; i < str.length() - 1; i++)
-        if (!IsNumeric(str.at(i)))
+        if (!IsNumericChar(str.at(i)))
           return 0;
       return return_validity ? TRUE : ToInt(str.substr(0, str.length() - 1));
     }

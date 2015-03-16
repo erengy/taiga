@@ -64,7 +64,7 @@ int SortAsFileSize(LPCWSTR str1, LPCWSTR str2) {
 
     if (value.length() >= 2) {
       for (auto it = value.rbegin(); it != value.rend(); ++it) {
-        if (IsNumeric(*it))
+        if (IsNumericChar(*it))
           break;
         unit.insert(unit.begin(), *it);
       }

@@ -411,7 +411,7 @@ void Engine::ErasePunctuation(std::wstring& str, bool for_trigrams) const {
 
   auto is_removable = [&](const wchar_t c) {
     // Control codes, white-space and punctuation characters
-    if (c <= 0xFF && !IsAlphanumeric(c))
+    if (c <= 0xFF && !IsAlphanumericChar(c))
       if (!for_trigrams ||
           (c != L' ' && (!is_trailing || (c != L')' && c != L']'))))
         return true;

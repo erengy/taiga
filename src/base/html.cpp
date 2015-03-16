@@ -330,7 +330,7 @@ void DecodeHtmlEntities(std::wstring& str) {
         if (str.at(i) == L'x') {
           if (++i == str.size()) return;
           pos = i;
-          while (i < str.size() && IsHex(str.at(i))) i++;
+          while (i < str.size() && IsHexadecimalChar(str.at(i))) i++;
           if (i > pos && i < str.size() && str.at(i) == L';') {
             character_value = wcstoul(str.substr(pos, i - pos).c_str(),
                                       nullptr, 16);
@@ -338,7 +338,7 @@ void DecodeHtmlEntities(std::wstring& str) {
         // Decimal (&#nnnn;)
         } else {
           pos = i;
-          while (i < str.size() && IsNumeric(str.at(i))) i++;
+          while (i < str.size() && IsNumericChar(str.at(i))) i++;
           if (i > pos && i < str.size() && str.at(i) == L';') {
             character_value = ToInt(str.substr(pos, i - pos));
           }
@@ -347,7 +347,7 @@ void DecodeHtmlEntities(std::wstring& str) {
       // Character entity references
       } else {
         pos = i;
-        while (i < str.size() && IsAlphanumeric(str.at(i))) i++;
+        while (i < str.size() && IsAlphanumericChar(str.at(i))) i++;
         if (i > pos && i < str.size() && str.at(i) == L';') {
           size_t length = i - pos;
           if (length >= min_html_entity_length &&

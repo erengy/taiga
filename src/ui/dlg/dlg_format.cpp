@@ -207,9 +207,9 @@ void FormatDialog::RefreshPreviewText() {
         // Color code
         if (str[i] == 0x03) {
           str.erase(i, 1);
-          if (IsNumeric(str[i]))
+          if (IsNumericChar(str[i]))
             str.erase(i, 1);
-          if (IsNumeric(str[i]))
+          if (IsNumericChar(str[i]))
             str.erase(i, 1);
           i--;
           continue;

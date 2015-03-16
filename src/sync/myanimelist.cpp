@@ -443,7 +443,7 @@ bool Service::RequestSucceeded(Response& response,
 
   switch (response.type) {
     case kAddLibraryEntry:
-      if (IsNumeric(http_response.body))
+      if (IsNumericString(http_response.body))
         return true;
       if (InStr(http_response.body, L"This anime is already on your list") > -1)
         return true;
