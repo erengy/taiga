@@ -61,18 +61,19 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
 
   if (!anitomy_instance.Parse(title)) {
     LOG(LevelDebug, L"Could not parse filename: " + title);
-    return false;
+    if (episode.folder.empty())  // If not, perhaps we can parse the path later on
+      return false;
   }
 
   episode.set_elements(anitomy_instance.elements());
 
   // Append season number and year to title
   auto anime_season = episode.anime_season();
-  if (anime_season > 1)
+  if (anime_season > 1 && !episode.anime_title().empty())
     episode.set_anime_title(episode.anime_title() + L" " +
                             ToWstr(anime_season));
   auto anime_year = episode.anime_year();
-  if (anime_year > 0)
+  if (anime_year > 0 && !episode.anime_title().empty())
     episode.set_anime_title(episode.anime_title() + L" (" +
                             ToWstr(anime_year) + L")");
 
@@ -86,16 +87,28 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   if (give_score)
     scores_.clear();
 
-  // Look up the title in our database
-  InitializeTitles();
-  LookUpTitle(episode.anime_title(), anime_ids);
+  auto valide_ids = [&]() {
+    for (auto it = anime_ids.begin(); it != anime_ids.end(); ) {
+      if (!ValidateOptions(episode, *it, match_options, true)) {
+        it = anime_ids.erase(it);
+      } else {
+        ++it;
+      }
+    }
+  };
 
-  // Validate IDs
-  for (auto it = anime_ids.begin(); it != anime_ids.end(); ) {
-    if (!ValidateOptions(episode, *it, match_options, true)) {
-      it = anime_ids.erase(it);
-    } else {
-      ++it;
+  InitializeTitles();
+
+  // Look up the title in our database
+  LookUpTitle(episode.anime_title(), anime_ids);
+  valide_ids();
+
+  // Look up parent directories
+  if (anime_ids.empty() && !episode.folder.empty()) {
+    auto title = GetTitleFromPath(episode);
+    if (!title.empty()) {
+      LookUpTitle(title, anime_ids);
+      valide_ids();
     }
   }
 
@@ -287,6 +300,81 @@ int Engine::LookUpTitle(const std::wstring& title,
   find_title(normal_title, normal_titles_.alternative);
 
   return anime_id;
+}
+
+std::wstring Engine::GetTitleFromPath(anime::Episode& episode) {
+  std::wstring path = episode.folder;
+
+  for (const auto& library_folder : Settings.library_folders) {
+    if (StartsWith(path, library_folder)) {
+      path.erase(0, library_folder.size());
+      break;
+    }
+  }
+
+  Trim(path, L"\\/");
+  std::vector<std::wstring> directories;
+  Tokenize(path, L"\\/", directories);
+
+  auto is_invalid_string = [](const std::wstring& str) {
+    if (str.find(L':') != str.npos)  // drive letter
+      return true;
+    static std::set<std::wstring> invalid_strings{
+      L"Anime", L"Download", L"Downloads",
+    };
+    return invalid_strings.count(str) > 0;
+  };
+
+  auto get_season_number = [](const std::wstring& str) {
+    anitomy::Anitomy anitomy_instance;
+    anitomy_instance.options().parse_episode_number = false;
+    anitomy_instance.options().parse_episode_title = false;
+    anitomy_instance.options().parse_file_extension = false;
+    anitomy_instance.options().parse_release_group = false;
+    anitomy_instance.Parse(str);
+    auto it = anitomy_instance.elements().find(anitomy::kElementAnimeSeason);
+    if (it != anitomy_instance.elements().end())
+      return ToInt(it->second);
+    return 0;
+  };
+
+  std::wstring title;
+
+  int current_depth = 0;
+  const int max_allowed_depth = 1;
+
+  for (auto it = directories.rbegin(); it != directories.rend(); ++it) {
+    if (current_depth++ > max_allowed_depth)
+      break;
+    const auto& directory = *it;
+    if (directory.empty() || is_invalid_string(directory))
+      break;
+    int season_number = get_season_number(directory);
+    if (season_number) {
+      if (!episode.anime_season())
+        episode.set_anime_season(season_number);
+      continue;
+    } else {
+      title = directory;
+      break;
+    }
+  }
+
+  auto find_number_in_string = [](const std::wstring& str) {
+    auto it = std::find_if(str.begin(), str.end(), IsNumericChar);
+    return it == str.end() ? str.npos : (it - str.begin());
+  };
+
+  if (!title.empty() && !episode.episode_number()) {
+    const auto& filename = episode.file_name();
+    auto pos = find_number_in_string(filename);
+    if (pos != filename.npos) {
+      int number = ToInt(filename.substr(pos));
+      episode.set_episode_number(number);
+    }
+  }
+
+  return title;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

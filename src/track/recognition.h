@@ -67,6 +67,7 @@ private:
   bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
 
   int LookUpTitle(const std::wstring& title, std::set<int>& anime_ids) const;
+  std::wstring GetTitleFromPath(anime::Episode& episode);
 
   int ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids, const MatchOptions& match_options);
   int ScoreTitle(const std::wstring& str, const anime::Episode& episode, const scores_t& trigram_results);
