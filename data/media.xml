@@ -366,6 +366,8 @@
 		<file>firefox.exe</file>
 		<folder>%ProgramFiles%\Mozilla Firefox\</folder>
 		<folder>%ProgramW6432%\Mozilla Firefox\</folder>
+		<folder>%ProgramFiles%\Firefox Developer Edition\</folder>
+		<folder>%ProgramW6432%\Firefox Developer Edition\</folder>
 		<edit mode="2">Mozilla Firefox</edit>
 		<edit mode="2">Firefox Developer Edition</edit>
 		<engine>Gecko</engine>
