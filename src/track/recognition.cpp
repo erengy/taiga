@@ -44,16 +44,16 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
   if (title.empty())
     return false;
 
-  // Retrieve filename from full path
-  if (title.length() > 2 && title.at(1) == ':' && title.at(2) == '\\') {
-    episode.folder = GetPathOnly(title);
-    title = GetFileName(title);
-  }
-
   anitomy::Anitomy anitomy_instance;
 
-  if (episode.streaming_media)
+  if (episode.streaming_media) {
     anitomy_instance.options().allowed_delimiters = L" ";
+  } else {
+    if (title.find_first_of(L"\\/") != title.npos) {
+      episode.folder = GetPathOnly(title);
+      title = GetFileName(title);
+    }
+  }
 
   const auto& ignored_strings = Settings[taiga::kRecognition_IgnoredStrings];
   if (!ignored_strings.empty())
