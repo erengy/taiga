@@ -180,7 +180,8 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
       break;
     case taiga::kHttpFeedCheck:
     case taiga::kHttpFeedCheckAuto:
-      status = L"Checking new torrents...";
+      status = L"Checking new torrents via " +
+               http_client.request().url.host + L"...";
       break;
     case taiga::kHttpFeedDownload:
       status = L"Downloading torrent file...";

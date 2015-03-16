@@ -58,18 +58,20 @@ bool Aggregator::CheckFeed(FeedCategory category, const std::wstring& source,
 
   feed.link = source;
 
-  switch (feed.category) {
-    case kFeedCategoryLink:
-      if (!automatic)
-        ui::ChangeStatusText(L"Checking new torrents...");
-      ui::EnableDialogInput(ui::kDialogTorrents, false);
-      break;
-  }
-
   HttpRequest http_request;
   http_request.url = feed.link;
   http_request.parameter = reinterpret_cast<LPARAM>(&feed);
   http_request.header[L"Accept-Encoding"] = L"gzip";
+
+  switch (feed.category) {
+    case kFeedCategoryLink:
+      if (!automatic) {
+        ui::ChangeStatusText(L"Checking new torrents via " +
+                             http_request.url.host + L"...");
+      }
+      ui::EnableDialogInput(ui::kDialogTorrents, false);
+      break;
+  }
 
   auto client_mode = automatic ?
       taiga::kHttpFeedCheckAuto : taiga::kHttpFeedCheck;
