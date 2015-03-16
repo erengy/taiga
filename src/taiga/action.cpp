@@ -495,16 +495,18 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   lParam is an anime ID.
   } else if (action == L"PlayNext") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
-    anime::PlayNextEpisode(anime_id);
+    if (anime::IsValidId(anime_id)) {
+      anime::PlayNextEpisode(anime_id);
+    } else {
+      anime::PlayNextEpisodeOfLastWatchedAnime();
+    }
 
   // PlayRandom()
   //   Searches for a random episode of an anime and plays it.
   //   lParam is an anime ID.
   } else if (action == L"PlayRandom") {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
-    if (anime_item)
-      anime::PlayRandomEpisode(*anime_item);
+    anime::PlayRandomEpisode(anime_id);
 
   // PlayRandomAnime()
   //   Searches for a random episode of a random anime and plays it.

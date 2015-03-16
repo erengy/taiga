@@ -225,6 +225,29 @@ bool PlayNextEpisode(int anime_id) {
   return PlayEpisode(anime_id, number);
 }
 
+bool PlayNextEpisodeOfLastWatchedAnime() {
+  int anime_id = ID_UNKNOWN;
+
+  auto get_id_from_history_items = [](const std::vector<HistoryItem>& items) {
+    for (auto it = items.rbegin(); it != items.rend(); ++it) {
+      const auto& item = *it;
+      if (item.episode) {
+        auto anime_item = AnimeDatabase.FindItem(item.anime_id);
+        if (anime_item && anime_item->GetMyStatus() != anime::kCompleted)
+          return item.anime_id;
+      }
+    }
+    return static_cast<int>(anime::ID_UNKNOWN);
+  };
+
+  if (!anime::IsValidId(anime_id))
+    anime_id = get_id_from_history_items(History.queue.items);
+  if (!anime::IsValidId(anime_id))
+    anime_id = get_id_from_history_items(History.items);
+
+  return PlayNextEpisode(anime_id);
+}
+
 bool PlayRandomAnime() {
   static time_t time_last_checked = 0;
   time_t time_now = time(nullptr);
@@ -265,16 +288,21 @@ bool PlayRandomAnime() {
   return false;
 }
 
-bool PlayRandomEpisode(Item& item) {
-  const int total = item.GetMyStatus() == kCompleted ?
-      item.GetEpisodeCount() : item.GetMyLastWatchedEpisode() + 1;
-  const int max_tries = item.GetFolder().empty() ? 3 : 10;
+bool PlayRandomEpisode(int anime_id) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  const int total = anime_item->GetMyStatus() == kCompleted ?
+      anime_item->GetEpisodeCount() : anime_item->GetMyLastWatchedEpisode() + 1;
+  const int max_tries = anime_item->GetFolder().empty() ? 3 : 10;
 
   srand(static_cast<unsigned int>(GetTickCount()));
 
   for (int i = 0; i < min(total, max_tries); i++) {
     int episode_number = rand() % total + 1;
-    if (PlayEpisode(item.GetId(), episode_number))
+    if (PlayEpisode(anime_item->GetId(), episode_number))
       return true;
   }
 
