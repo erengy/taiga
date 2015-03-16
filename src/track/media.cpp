@@ -236,8 +236,7 @@ std::wstring MediaPlayer::GetPath() const {
   return std::wstring();
 }
 
-std::wstring MediaPlayers::GetTitle(HWND hwnd,
-                                    const std::wstring& class_name,
+std::wstring MediaPlayers::GetTitle(HWND hwnd, const std::wstring& class_name,
                                     int mode) {
   switch (mode) {
     // File handle
@@ -255,10 +254,18 @@ std::wstring MediaPlayers::GetTitle(HWND hwnd,
     // Browser
     case kMediaModeWebBrowser:
       return GetTitleFromBrowser(hwnd);
+
     // Window title
     case kMediaModeWindowTitle:
-    default:
-      return GetWindowTitle(hwnd);
+    default: {
+      std::wstring title;
+      auto method = Settings[taiga::kRecognition_MediaPlayerDetectionMethod];
+      if (method == L"prioritize_file_handle")
+        title = GetTitleFromProcessHandle(hwnd);
+      if (title.empty())
+        title = GetWindowTitle(hwnd);
+      return title;
+    }
   }
 }
 

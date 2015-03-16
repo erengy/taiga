@@ -137,6 +137,7 @@ void AppSettings::InitializeMap() {
 
   // Recognition
   INITKEY(kRecognition_BrowserDetectionMethod, L"ui_automation", L"recognition/streaming/browserdetectionmethod");
+  INITKEY(kRecognition_MediaPlayerDetectionMethod, L"prioritize_file_handle", L"recognition/mediaplayers/detectionmethod");
   INITKEY(kRecognition_DetectMediaPlayers, L"true", L"recognition/mediaplayers/enabled");
   INITKEY(kRecognition_DetectStreamingMedia, nullptr, L"recognition/streaming/enabled");
   INITKEY(kRecognition_IgnoredStrings, nullptr, L"recognition/anitomy/ignored_strings");

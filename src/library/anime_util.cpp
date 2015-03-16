@@ -34,7 +34,6 @@
 #include "taiga/taiga.h"
 #include "taiga/timer.h"
 #include "track/feed.h"
-#include "track/media.h"
 #include "track/recognition.h"
 #include "track/search.h"
 #include "ui/ui.h"
@@ -317,10 +316,6 @@ void StartWatching(Item& item, Episode& episode) {
 
   // Check folder
   if (item.GetFolder().empty()) {
-    if (episode.folder.empty()) {
-      HWND hwnd = MediaPlayers.current_window_handle();
-      episode.folder = GetPathOnly(MediaPlayers.GetTitleFromProcessHandle(hwnd));
-    }
     if (IsInsideLibraryFolders(episode.folder)) {
       // Set the folder if only it is under a library folder
       item.SetFolder(episode.folder);

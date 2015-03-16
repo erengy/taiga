@@ -77,6 +77,7 @@ enum AppSettingName {
 
   // Recognition
   kRecognition_BrowserDetectionMethod,
+  kRecognition_MediaPlayerDetectionMethod,
   kRecognition_DetectMediaPlayers,
   kRecognition_DetectStreamingMedia,
   kRecognition_IgnoredStrings,
