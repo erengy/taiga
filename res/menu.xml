@@ -13,16 +13,16 @@
 	<!-- File -->
 	<menu name="File">
 		<item name="Library folders" sub="Folders"/>
-		<item type="separator"/>
-		<item name="Play next episode" action="PlayNext()"/>
-		<item name="Play random anime" action="PlayRandomAnime()"/>
 		<item name="Scan available episodes" action="ScanEpisodesAll()"/>
 		<item type="separator"/>
-		<item name="Exit" action="Exit()"/>
+		<item name="Play next episode&#9;Ctrl+N" action="PlayNext()"/>
+		<item name="Play random anime&#9;Ctrl+R" action="PlayRandomAnime()"/>
+		<item type="separator"/>
+		<item name="Exit&#9;Alt+F4" action="Exit()"/>
 	</menu>
 	<!-- Services -->
 	<menu name="Services">
-		<item name="Synchronize list" action="Synchronize()"/>
+		<item name="Synchronize list&#9;Ctrl+S" action="Synchronize()"/>
 		<item type="separator"/>
 		<item name="Hummingbird" sub="Hummingbird"/>
 		<item name="MyAnimeList" sub="MyAnimeList"/>
@@ -80,7 +80,7 @@
 	<!-- Help -->
 	<menu name="Help">
 		<item name="About Taiga" action="About()"/>
-		<item name="Support" action="URL(http://taiga.erengy.com/#support)"/>
+		<item name="Support&#9;F1" action="URL(http://taiga.erengy.com/#support)"/>
 		<item type="separator"/>
 		<item name="Check for updates" action="CheckUpdates()"/>
 	</menu>
@@ -107,7 +107,7 @@
 		<item name="Search" sub="Search"/>
 		<item type="separator"/>
 		<item name="Open folder" action="OpenFolder()"/>
-		<item name="Scan available episodes" action="ScanEpisodes()"/>
+		<item name="Scan available episodes&#9;F5" action="ScanEpisodes()"/>
 		<item type="separator"/>
 		<!-- Note: Overwritten -->
 		<item name="Play episode"           sub="PlayEpisode"/>

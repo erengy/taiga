@@ -728,6 +728,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
         // Various
         default: {
           if (GetKeyState(VK_CONTROL) & 0x8000) {
+            // Select all items
+            if (pnkd->wVKey == 'A') {
+              listview.SetSelectedItem(-1);
+              return TRUE;
+            }
             if (!anime::IsValidId(anime_id))
               break;
             // Edit episode
@@ -747,8 +752,12 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
                             reinterpret_cast<LPARAM>(&anime_ids));
               return TRUE;
             // Play next episode
-            } else if (pnkd->wVKey == 'P') {
+            } else if (pnkd->wVKey == 'N') {
               anime::PlayNextEpisode(anime_id);
+              return TRUE;
+            // Play random episode 
+            } else if (pnkd->wVKey == 'R') {
+              anime::PlayRandomEpisode(anime_id);
               return TRUE;
             }
           } else {

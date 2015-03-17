@@ -298,7 +298,8 @@ INT_PTR MainDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
   auto handle_menu_accelerator = [&]() {
     UINT command_id = 0;
-    if (toolbar_menu.MapAcelerator(pMsg->wParam, command_id)) {
+    if ((pMsg->wParam >= 'A' && pMsg->wParam <= 'Z') &&
+        toolbar_menu.MapAcelerator(pMsg->wParam, command_id)) {
       int button_index = toolbar_menu.GetButtonIndex(command_id);
       toolbar_menu.SetHotItem(button_index, HICF_ACCELERATOR);
       toolbar_wm.toolbar = &toolbar_menu;
@@ -408,6 +409,35 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           edit.SetSel(0, -1);
           return TRUE;
         }
+        // Play next episode
+        case 'N': {
+          if (GetKeyState(VK_CONTROL) & 0x8000) {
+            anime::PlayNextEpisodeOfLastWatchedAnime();
+            return TRUE;
+          }
+          break;
+        }
+        // Play random anime
+        case 'R': {
+          if (GetKeyState(VK_CONTROL) & 0x8000) {
+            anime::PlayRandomAnime();
+            return TRUE;
+          }
+          break;
+        }
+        // Synchronize list
+        case 'S': {
+          if (GetKeyState(VK_CONTROL) & 0x8000) {
+            sync::Synchronize();
+            return TRUE;
+          }
+          break;
+        }
+        // Help
+        case VK_F1: {
+          ExecuteLink(L"http://taiga.erengy.com/#support");
+          return TRUE;
+        }
         // Various
         case VK_F5: {
           switch (navigation.GetCurrentPage()) {
@@ -448,8 +478,18 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
     }
 
     case WM_SYSKEYDOWN: {
-      if (handle_menu_accelerator())
+      if (IsNumericChar(pMsg->wParam)) {
+        int index = (pMsg->wParam - '0') - 1;
+        if (index >= 0 && index < Settings.library_folders.size()) {
+          Execute(Settings.library_folders.at(index));
+          return TRUE;
+        }
+      } else if (pMsg->wParam == VK_F4) {
+        Destroy();
         return TRUE;
+      } else if (handle_menu_accelerator()) {
+        return TRUE;
+      }
       break;
     }
     case WM_SYSKEYUP: {

@@ -111,11 +111,12 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
             anime_item->GetMyLastWatchedEpisode() < anime_item->GetEpisodeCount()) {
           menu->CreateItem(L"PlayNext()",
                            L"Play next episode (#" +
-                           ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")");
+                           ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")"
+                           L"\tCtrl+N");
         }
         // Play random episode
         if (anime_item->GetEpisodeCount() != 1) {
-          menu->CreateItem(L"PlayRandom()", L"Play random episode");
+          menu->CreateItem(L"PlayRandom()", L"Play random episode\tCtrl+R");
         }
         break;
       }
@@ -210,8 +211,12 @@ void MenuList::UpdateFolders() {
 
     if (!Settings.library_folders.empty()) {
       // Add folders
-      foreach_(it, Settings.library_folders) {
-        menu->CreateItem(L"Execute(" + *it + L")", *it);
+      for (size_t i = 0; i < Settings.library_folders.size(); ++i) {
+        const auto& library_folder = Settings.library_folders.at(i);
+        auto name = library_folder;
+        if (i <= 9)
+          name += L"\tAlt+" + ToWstr(static_cast<int>(i + 1));
+        menu->CreateItem(L"Execute(" + library_folder + L")", name);
       }
       // Add separator
       menu->CreateItem();
