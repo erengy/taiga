@@ -22,7 +22,7 @@
 
 #include <anitomy/anitomy/anitomy.h>
 #include <anitomy/anitomy/keyword.h>
-#include <libmojibake/mojibake.h>
+#include <utf8proc/utf8proc.h>
 
 #include "base/log.h"
 #include "base/string.h"

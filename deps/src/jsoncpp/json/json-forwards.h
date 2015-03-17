@@ -1,5 +1,5 @@
 /// Json-cpp amalgated forward header (http://jsoncpp.sourceforge.net/).
-/// It is intented to be used with #include <json/json-forwards.h>
+/// It is intended to be used with #include "json/json-forwards.h"
 /// This header provides forward declaration for all JsonCpp types.
 
 // //////////////////////////////////////////////////////////////////////
@@ -100,17 +100,6 @@ license you like.
 /// std::map
 /// as Value container.
 //#  define JSON_USE_CPPTL_SMALLMAP 1
-/// If defined, indicates that Json specific container should be used
-/// (hash table & simple deque container with customizable allocator).
-/// THIS FEATURE IS STILL EXPERIMENTAL! There is know bugs: See #3177332
-//#  define JSON_VALUE_USE_INTERNAL_MAP 1
-/// Force usage of standard new/malloc based allocator instead of memory pool
-/// based allocator.
-/// The memory pools allocator used optimization (initializing Value and
-/// ValueInternalLink
-/// as if it was a POD) that may cause some validation tool to report errors.
-/// Only has effects if JSON_VALUE_USE_INTERNAL_MAP is defined.
-//#  define JSON_USE_SIMPLE_INTERNAL_ALLOCATOR 1
 
 // If non-zero, the library uses exceptions to report bad input instead of C
 // assertion macros. The default is to use exceptions.
@@ -166,6 +155,14 @@ license you like.
 #if defined(_MSC_VER) && _MSC_VER >= 1500 // MSVC 2008
 /// Indicates that the following function is deprecated.
 #define JSONCPP_DEPRECATED(message) __declspec(deprecated(message))
+#elif defined(__clang__) && defined(__has_feature)
+#if __has_feature(attribute_deprecated_with_message)
+#define JSONCPP_DEPRECATED(message)  __attribute__ ((deprecated(message)))
+#endif
+#elif defined(__GNUC__) &&  (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+#define JSONCPP_DEPRECATED(message)  __attribute__ ((deprecated(message)))
+#elif defined(__GNUC__) &&  (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
+#define JSONCPP_DEPRECATED(message)  __attribute__((__deprecated__))
 #endif
 
 #if !defined(JSONCPP_DEPRECATED)
@@ -242,12 +239,6 @@ class Value;
 class ValueIteratorBase;
 class ValueIterator;
 class ValueConstIterator;
-#ifdef JSON_VALUE_USE_INTERNAL_MAP
-class ValueMapAllocator;
-class ValueInternalLink;
-class ValueInternalArray;
-class ValueInternalMap;
-#endif // #ifdef JSON_VALUE_USE_INTERNAL_MAP
 
 } // namespace Json
 

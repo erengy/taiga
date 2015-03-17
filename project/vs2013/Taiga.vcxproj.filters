@@ -37,11 +37,11 @@
     <Filter Include="deps\jsoncpp">
       <UniqueIdentifier>{dd9648e9-7e26-4239-a931-8fee59d183e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="deps\libmojibake">
-      <UniqueIdentifier>{6eac59ce-21be-42c4-89c1-95423ddc00b0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="deps\pugixml">
       <UniqueIdentifier>{0f915cf6-1a44-47c9-8c1f-3a640aa5fb67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\utf8proc">
+      <UniqueIdentifier>{810fd707-5236-421d-83d6-eb9251e1254d}</UniqueIdentifier>
     </Filter>
     <Filter Include="deps\zlib">
       <UniqueIdentifier>{1dd6ca23-29e1-4a1b-b1fb-a3b4988da7b0}</UniqueIdentifier>
@@ -169,11 +169,11 @@
     <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp">
       <Filter>deps\jsoncpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\libmojibake\utf8proc.c">
-      <Filter>deps\libmojibake</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp">
       <Filter>deps\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c">
+      <Filter>deps\utf8proc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\zlib\adler32.c">
       <Filter>deps\zlib</Filter>
@@ -636,17 +636,17 @@
     <ClInclude Include="..\..\deps\src\jsoncpp\json\json-forwards.h">
       <Filter>deps\jsoncpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\libmojibake\mojibake.h">
-      <Filter>deps\libmojibake</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\libmojibake\utf8proc_data.h">
-      <Filter>deps\libmojibake</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp">
       <Filter>deps\pugixml</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp">
       <Filter>deps\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h">
+      <Filter>deps\utf8proc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.h">
+      <Filter>deps\utf8proc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\zlib\crc32.h">
       <Filter>deps\zlib</Filter>
