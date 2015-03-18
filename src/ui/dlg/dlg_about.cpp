@@ -16,7 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cmath>
+#include <curl/curlver.h>
+#include <jsoncpp/json/json.h>
+#include <pugixml/pugixml.hpp>
+#include <utf8proc/utf8proc.h>
+#include <zlib/zlib.h>
 
 #include "base/file.h"
 #include "base/gfx.h"
@@ -28,6 +32,38 @@
 #include "ui/dlg/dlg_about.h"
 
 namespace ui {
+
+static enum ThirdPartyLibrary {
+  kJsoncpp,
+  kLibcurl,
+  kPugixml,
+  kUtf8proc,
+  kZlib,
+};
+
+static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
+  switch (library) {
+    case kJsoncpp:
+      return StrToWstr(JSONCPP_VERSION_STRING);
+    case kLibcurl:
+      return StrToWstr(LIBCURL_VERSION);
+    case kPugixml: {
+      base::SemanticVersion version((PUGIXML_VERSION / 100),
+                                    (PUGIXML_VERSION % 100) / 10,
+                                    (PUGIXML_VERSION % 100) % 10);
+      return version;
+    }
+    case kUtf8proc:
+      return StrToWstr(utf8proc_version());
+    case kZlib:
+      return StrToWstr(ZLIB_VERSION);
+      break;
+  }
+
+  return std::wstring();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 class AboutDialog DlgAbout;
 
@@ -59,16 +95,16 @@ BOOL AboutDialog::OnInitDialog() {
       L"\\b Contributors:\\b0\\line "
       L"saka, Diablofan, slevir, LordGravewish, cassist, rr-, sunjayc\\line\\par "
       L"\\b Third-party components:\\b0\\line "
-      L"\u2022 Fugue Icons 3.4.5, Copyright (c) 2012, Yusuke Kamiyamane\\line "
-      L"\u2022 JsonCpp 1.1.0, Copyright (c) 2007-2010, Baptiste Lepilleur\\line "
-      L"\u2022 libcurl 7.40.0, Copyright (c) 1996-2015, Daniel Stenberg\\line "
-      L"\u2022 libmojibake 1.1.6, Copyright (c) 2009 Public Software Group e. V.\\line "
-      L"\u2022 pugixml 1.5, Copyright (c) 2006-2014, Arseny Kapoulkine\\line "
-      L"\u2022 zlib 1.2.8, Copyright (c) 1995-2013, Jean-loup Gailly and Mark Adler\\line\\par "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/yusukekamiyamane/fugue-icons\"}}{\\fldrslt{Fugue Icons 3.4.5}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/open-source-parsers/jsoncpp\"}}{\\fldrslt{JsonCpp " + GetLibraryVersion(kJsoncpp) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/bagder/curl\"}}{\\fldrslt{libcurl " + GetLibraryVersion(kLibcurl) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/zeux/pugixml\"}}{\\fldrslt{pugixml " + GetLibraryVersion(kPugixml) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/JuliaLang/utf8proc\"}}{\\fldrslt{utf8proc " + GetLibraryVersion(kUtf8proc) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/madler/zlib\"}}{\\fldrslt{zlib " + GetLibraryVersion(kZlib) + L"}}}\\line\\par "
       L"\\b Links:\\b0\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"http://taiga.erengy.com\"}}{\\fldrslt{Home page}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://github.com/erengy/taiga\"}}{\\fldrslt{GitHub repository}}}\\line "
-      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://forums.hummingbird.me/t/taiga/10565\"}}{\\fldrslt{Hummingbird thread}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://hummingbird.me/groups/taiga\"}}{\\fldrslt{Hummingbird group}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}}{\\fldrslt{MyAnimeList club}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://twitter.com/taigaapp\"}}{\\fldrslt{Twitter account}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"irc://irc.rizon.net/taiga\"}}{\\fldrslt{IRC channel}}}"
