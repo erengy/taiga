@@ -309,6 +309,12 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
     return false;
   };
 
+  auto is_anime_list_focused = [&]() {
+    return navigation.GetCurrentPage() == kSidebarItemAnimeList &&
+        ::GetFocus() == DlgAnimeList.listview.GetWindowHandle() &&
+        DlgAnimeList.listview.GetSelectedCount() > 0;
+  };
+
   switch (pMsg->message) {
     case WM_KEYDOWN: {
       // Menubar
@@ -411,7 +417,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         }
         // Play next episode
         case 'N': {
-          if (GetKeyState(VK_CONTROL) & 0x8000) {
+          if ((GetKeyState(VK_CONTROL) & 0x8000) && !is_anime_list_focused()) {
             anime::PlayNextEpisodeOfLastWatchedAnime();
             return TRUE;
           }
@@ -419,7 +425,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         }
         // Play random anime
         case 'R': {
-          if (GetKeyState(VK_CONTROL) & 0x8000) {
+          if ((GetKeyState(VK_CONTROL) & 0x8000) && !is_anime_list_focused()) {
             anime::PlayRandomAnime();
             return TRUE;
           }
