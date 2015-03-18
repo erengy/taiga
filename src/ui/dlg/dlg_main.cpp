@@ -143,7 +143,7 @@ void MainDialog::CreateDialogControls() {
   // Create search text
   edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   edit.SetCueBannerText(L"Search list");
-  edit.SetMargins(1, 16);
+  edit.SetMargins(2, 16);
   edit.SetParent(toolbar_search.GetWindowHandle());
   win::Rect rcEdit; edit.GetRect(&rcEdit);
   win::Rect rcEditWindow; edit.GetWindowRect(&rcEditWindow);
@@ -223,16 +223,16 @@ void MainDialog::CreateDialogControls() {
   UINT fStyle = RBBS_NOGRIPPER;
   rebar.InsertBand(toolbar_menu.GetWindowHandle(),
     GetSystemMetrics(SM_CXSCREEN),
-    0, 0, 0, 0, 0, 0,
+    -2, 0, 0, 0, 0, 0,
     HIWORD(toolbar_menu.GetButtonSize()),
     fMask, fStyle);
   rebar.InsertBand(toolbar_main.GetWindowHandle(),
     GetSystemMetrics(SM_CXSCREEN),
-    win::kControlMargin, 0, 0, 0, 0, 0,
+    win::kControlMargin - 2, 0, 0, 0, 0, 0,
     HIWORD(toolbar_main.GetButtonSize()) + 2,
     fMask, fStyle | RBBS_BREAK);
   rebar.InsertBand(toolbar_search.GetWindowHandle(),
-    0, win::kControlMargin, 0, rcEditWindow.Width() + (win::kControlMargin * 2), 0, 0, 0,
+    0, win::kControlMargin, 0, rcEditWindow.Width() + win::kControlMargin, 0, 0, 0,
     HIWORD(toolbar_search.GetButtonSize()),
     fMask, fStyle);
 }
