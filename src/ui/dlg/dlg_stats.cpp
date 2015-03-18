@@ -176,7 +176,7 @@ void StatsDialog::Refresh() {
 
   // Database
   text.clear();
-  text += ToWstr(static_cast<int>(AnimeDatabase.items.size())) + L"\n";
+  text += ToWstr(AnimeDatabase.items.size()) + L"\n";
   text += ToWstr(Stats.image_count) + L" (" + ToSizeString(Stats.image_size) + L")\n";
   text += ToWstr(Stats.torrent_count) + L" (" + ToSizeString(Stats.torrent_size) + L")";
   SetDlgItemText(IDC_STATIC_ANIME_STAT3, text.c_str());

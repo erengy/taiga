@@ -119,6 +119,6 @@ std::wstring Logger::FormatError(DWORD error, LPCWSTR source) {
   } else {
     if (module_handle)
       FreeLibrary(module_handle);
-    return ToWstr(error);
+    return ToWstr(static_cast<UINT>(error));
   }
 }

@@ -480,7 +480,8 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
     case WM_SYSKEYDOWN: {
       if (IsNumericChar(pMsg->wParam)) {
         int index = (pMsg->wParam - '0') - 1;
-        if (index >= 0 && index < Settings.library_folders.size()) {
+        if (index >= 0 &&
+            index < static_cast<int>(Settings.library_folders.size())) {
           Execute(Settings.library_folders.at(index));
           return TRUE;
         }

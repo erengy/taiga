@@ -215,7 +215,7 @@ void MenuList::UpdateFolders() {
         const auto& library_folder = Settings.library_folders.at(i);
         auto name = library_folder;
         if (i <= 9)
-          name += L"\tAlt+" + ToWstr(static_cast<int>(i + 1));
+          name += L"\tAlt+" + ToWstr(i + 1);
         menu->CreateItem(L"Execute(" + library_folder + L")", name);
       }
       // Add separator

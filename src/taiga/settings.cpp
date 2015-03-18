@@ -230,11 +230,11 @@ bool AppSettings::Load() {
 
   // Meta
   if (GetWstr(kMeta_Version_Major).empty())
-    Set(kMeta_Version_Major, ToWstr(static_cast<int>(Taiga.version.major)));
+    Set(kMeta_Version_Major, ToWstr(Taiga.version.major));
   if (GetWstr(kMeta_Version_Minor).empty())
-    Set(kMeta_Version_Minor, ToWstr(static_cast<int>(Taiga.version.minor)));
+    Set(kMeta_Version_Minor, ToWstr(Taiga.version.minor));
   if (GetWstr(kMeta_Version_Revision).empty())
-    Set(kMeta_Version_Revision, ToWstr(static_cast<int>(Taiga.version.patch)));
+    Set(kMeta_Version_Revision, ToWstr(Taiga.version.patch));
 
   // Folders
   library_folders.clear();
@@ -306,9 +306,9 @@ bool AppSettings::Save() {
   xml_node settings = document.append_child(L"settings");
 
   // Meta
-  Set(kMeta_Version_Major, ToWstr(static_cast<int>(Taiga.version.major)));
-  Set(kMeta_Version_Minor, ToWstr(static_cast<int>(Taiga.version.minor)));
-  Set(kMeta_Version_Revision, ToWstr(static_cast<int>(Taiga.version.patch)));
+  Set(kMeta_Version_Major, ToWstr(Taiga.version.major));
+  Set(kMeta_Version_Minor, ToWstr(Taiga.version.minor));
+  Set(kMeta_Version_Revision, ToWstr(Taiga.version.patch));
 
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
     WriteValue(settings, i);

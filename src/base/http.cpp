@@ -28,8 +28,7 @@ Request::Request()
   // Each HTTP request must have a unique ID, as there are many parts of the
   // application that rely on this assumption.
   static unsigned int counter = 0;
-  uid = L"taiga-http-" +
-        PadChar(ToWstr(static_cast<ULONG>(counter++)), L'0', 10);
+  uid = L"taiga-http-" + PadChar(ToWstr(counter++), L'0', 10);
 }
 
 Response::Response()

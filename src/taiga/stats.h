@@ -43,16 +43,16 @@ public:
   int connections_failed;
   int connections_succeeded;
   int episode_count;
-  int image_count;
-  int image_size;
+  unsigned int image_count;
+  unsigned long long image_size;
   std::wstring life_spent_watching;
   float score_mean;
   float score_deviation;
   std::vector<int> score_count;
   std::vector<float> score_distribution;
   int tigers_harmed;
-  int torrent_count;
-  int torrent_size;
+  unsigned int torrent_count;
+  unsigned long long torrent_size;
   int uptime;
 };
 

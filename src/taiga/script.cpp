@@ -241,7 +241,7 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
   // $len(string)
   //   Returns length of string in characters.
   } else if (func_name == L"len") {
-    str = ToWstr(static_cast<int>(body_parts[0].length()));
+    str = ToWstr(body_parts[0].length());
 
   // $lower(string)
   //   Converts string to lowercase.

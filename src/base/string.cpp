@@ -677,7 +677,7 @@ wstring ToWstr(const INT& value) {
   return wstring(buffer);
 }
 
-wstring ToWstr(const ULONG& value) {
+wstring ToWstr(const UINT& value) {
   wchar_t buffer[65];
   _ultow_s(value, buffer, 65, 10);
   return wstring(buffer);

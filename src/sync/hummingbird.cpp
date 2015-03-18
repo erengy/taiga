@@ -281,7 +281,7 @@ bool Service::RequestSucceeded(Response& response,
         response.data[L"error"] += StrToWstr(root["error"].asString());
       } else {
         response.data[L"error"] += L"Unknown error (" +
-            ToWstr(static_cast<int>(http_response.code)) + L")";
+            ToWstr(http_response.code) + L")";
       }
       return false;
     }

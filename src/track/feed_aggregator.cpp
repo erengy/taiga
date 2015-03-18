@@ -333,7 +333,7 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
       auto location = http_request.url.Build();
       ui::OnFeedDownload(false, L"File not found at " + location);
     } else {
-      auto code = ToWstr(static_cast<int>(http_response.code));
+      auto code = ToWstr(http_response.code);
       ui::OnFeedDownload(false, L"Invalid HTTP response (" + code + L")");
     }
     return false;

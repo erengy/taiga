@@ -50,9 +50,9 @@ SemanticVersion& SemanticVersion::operator=(const SemanticVersion& version) {
 }
 
 SemanticVersion::operator string_t() const {
-  string_t version = ToWstr(static_cast<int>(major)) + L"." +
-                     ToWstr(static_cast<int>(minor)) + L"." +
-                     ToWstr(static_cast<int>(patch));
+  string_t version = ToWstr(major) + L"." +
+                     ToWstr(minor) + L"." +
+                     ToWstr(patch);
   if (!prerelease_identifiers.empty())
     version += L"-" + prerelease_identifiers;
   if (!build_metadata.empty())

@@ -142,7 +142,8 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
     case taiga::kHttpTaigaUpdateDownload:
       if (http_client.content_length() > 0) {
         DlgUpdate.progressbar.SetMarquee(false);
-        DlgUpdate.progressbar.SetRange(0, http_client.content_length());
+        DlgUpdate.progressbar.SetRange(0,
+            static_cast<UINT>(http_client.content_length()));
       } else {
         DlgUpdate.progressbar.SetMarquee(true);
       }
@@ -198,7 +199,8 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
       if (http_client.content_length() > 0)
-        DlgUpdate.progressbar.SetPosition(http_client.current_length());
+        DlgUpdate.progressbar.SetPosition(
+            static_cast<UINT>(http_client.current_length()));
       return;
   }
 

@@ -256,7 +256,7 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kRecognition_DetectStreamingMedia, page->IsDlgButtonChecked(IDC_CHECK_DETECT_STREAMING_MEDIA) == TRUE);
     list.SetWindowHandle(page->GetDlgItem(IDC_LIST_STREAM_PROVIDER));
     for (int i = 0; i < list.GetItemCount(); ++i) {
-      Settings.Set(list.GetItemParam(i), list.GetCheckState(i) == TRUE);
+      Settings.Set(static_cast<int>(list.GetItemParam(i)), list.GetCheckState(i) == TRUE);
     }
     list.SetWindowHandle(nullptr);
   }
@@ -477,7 +477,7 @@ void SettingsDialog::RefreshCache() {
   SettingsPage& page = pages[kSettingsPageLibraryCache];
 
   // History
-  text = ToWstr(static_cast<int>(History.items.size())) + L" item(s)";
+  text = ToWstr(History.items.size()) + L" item(s)";
   page.SetDlgItemText(IDC_STATIC_CACHE1, text.c_str());
 
   // Image files

@@ -278,7 +278,7 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
     clients_.push_back(HttpClient(request));
     client = &clients_.back();
     LOG(LevelDebug, L"Created a new client. Total number of clients is now " +
-                    ToWstr(static_cast<int>(clients_.size())));
+                    ToWstr(clients_.size()));
   }
 
   return *client;
@@ -322,7 +322,7 @@ void HttpManager::ProcessQueue() {
       connections++;
       connections_[request.url.host]++;
       LOG(LevelDebug, L"Connections for hostname is now " +
-                      ToWstr(static_cast<int>(connections_[request.url.host])) +
+                      ToWstr(connections_[request.url.host]) +
                       L": " + request.url.host);
 
       HttpClient& client = GetClient(request);
@@ -342,8 +342,7 @@ void HttpManager::AddConnection(const string_t& hostname) {
 
   connections_[hostname]++;
   LOG(LevelDebug, L"Connections for hostname is now " +
-                  ToWstr(static_cast<int>(connections_[hostname])) + 
-                  L": " + hostname);
+                  ToWstr(connections_[hostname]) + L": " + hostname);
 #endif
 }
 
@@ -354,8 +353,7 @@ void HttpManager::FreeConnection(const string_t& hostname) {
   if (connections_[hostname] > 0) {
     connections_[hostname]--;
     LOG(LevelDebug, L"Connections for hostname is now " +
-                    ToWstr(static_cast<int>(connections_[hostname])) +
-                    L": " + hostname);
+                    ToWstr(connections_[hostname]) + L": " + hostname);
   } else {
     LOG(LevelError, L"Connections for hostname was already zero: " + hostname);
   }

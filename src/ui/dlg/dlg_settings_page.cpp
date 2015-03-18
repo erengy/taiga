@@ -259,7 +259,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", taiga::kStream_Wakanim);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", taiga::kStream_Youtube);
       for (int i = 0; i < list.GetItemCount(); ++i) {
-        if (Settings.GetBool(list.GetItemParam(i)))
+        if (Settings.GetBool(static_cast<int>(list.GetItemParam(i))))
           list.SetCheckState(i, TRUE);
       }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -795,7 +795,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       auto nmh = reinterpret_cast<LPNMHEADER>(pnmh);
       if (nmh->pitem->mask & HDI_FORMAT) {
         BOOL checked = (nmh->pitem->fmt & HDF_CHECKED) ? TRUE : FALSE;
-        for (size_t i = 0; i < list.GetItemCount(); i++) {
+        for (int i = 0; i < list.GetItemCount(); i++) {
           list.SetCheckState(i, checked);
         }
       }

@@ -374,7 +374,7 @@ bool HitTestListHeader(win::ListView& listview, POINT pt) {
   SendMessage(listview.GetHeader(), HDM_HITTEST, 0,
               reinterpret_cast<LPARAM>(&hti));
 
-  return hti.flags & (HHT_NOWHERE | HHT_ONHEADER | HHT_ONDIVIDER);
+  return (hti.flags & (HHT_NOWHERE | HHT_ONHEADER | HHT_ONDIVIDER)) > 0;
 }
 
 }  // namespace ui
