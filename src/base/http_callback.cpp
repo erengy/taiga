@@ -34,6 +34,9 @@ size_t Client::HeaderFunction(void* ptr, size_t size, size_t nmemb,
 
   auto client = reinterpret_cast<Client*>(userdata);
 
+  if (client->cancel_)
+    return 0;
+
   if (header != "\r\n") {
     client->GetResponseHeader(StrToWstr(header));
   } else {
@@ -51,7 +54,12 @@ size_t Client::WriteFunction(char* ptr, size_t size, size_t nmemb,
 
   size_t data_size = size * nmemb;
 
-  reinterpret_cast<std::string*>(userdata)->append(ptr, data_size);
+  auto client = reinterpret_cast<Client*>(userdata);
+
+  if (client->cancel_)
+    return 0;
+
+  client->write_buffer_.append(ptr, data_size);
 
   return data_size;
 }

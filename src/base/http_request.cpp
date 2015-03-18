@@ -87,7 +87,7 @@ bool Client::SetRequestOptions() {
   TAIGA_CURL_SET_OPTION(CURLOPT_HEADERDATA, this);
 
   TAIGA_CURL_SET_OPTION(CURLOPT_WRITEFUNCTION, WriteFunction);
-  TAIGA_CURL_SET_OPTION(CURLOPT_WRITEDATA, &write_buffer_);
+  TAIGA_CURL_SET_OPTION(CURLOPT_WRITEDATA, this);
 
   TAIGA_CURL_SET_OPTION(CURLOPT_NOPROGRESS, FALSE);
   TAIGA_CURL_SET_OPTION(CURLOPT_XFERINFOFUNCTION, XferInfoFunction);
@@ -199,11 +199,11 @@ bool Client::Perform() {
 
     OnReadComplete();
 
-  } else if (code != CURLE_ABORTED_BY_CALLBACK) {
+  } else if (!cancel_ && code != CURLE_ABORTED_BY_CALLBACK) {
     OnError(code);
   }
 
-  Cleanup(allow_reuse_);
+  Cleanup(allow_reuse_ && !cancel_);
 
   return code == CURLE_OK;
 }

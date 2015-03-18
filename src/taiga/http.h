@@ -76,6 +76,8 @@ private:
 
 class HttpManager {
 public:
+  HttpManager();
+
   void CancelRequest(base::uid_t uid);
   void MakeRequest(HttpRequest& request, HttpClientMode mode);
 
@@ -99,6 +101,7 @@ private:
   std::map<std::wstring, unsigned int> connections_;
   win::CriticalSection critical_section_;
   std::vector<std::pair<HttpRequest, HttpClientMode>> requests_;
+  bool shutdown_;
 };
 
 }  // namespace taiga

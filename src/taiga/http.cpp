@@ -130,6 +130,10 @@ void HttpClient::OnReadComplete() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+HttpManager::HttpManager()
+    : shutdown_(false) {
+}
+
 void HttpManager::CancelRequest(base::uid_t uid) {
   auto client = FindClient(uid);
 
@@ -243,7 +247,12 @@ void HttpManager::FreeMemory() {
 }
 
 void HttpManager::Shutdown() {
-  clients_.clear();
+  shutdown_ = true;
+
+  for (auto& client : clients_) {
+    if (client.busy())
+      client.Cancel();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -307,6 +316,11 @@ void HttpManager::ProcessQueue() {
     connections += it->second;
 
   for (size_t i = 0; i < requests_.size(); i++) {
+    if (shutdown_) {
+      LOG(LevelDebug, L"Shutting down");
+      return;
+    }
+
     if (connections == kMaxSimultaneousConnections) {
       LOG(LevelDebug, L"Reached max connections");
       return;
