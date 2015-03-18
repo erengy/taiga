@@ -64,6 +64,7 @@ void OnHistoryChange();
 bool OnHistoryClear();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 
+void OnAnimeDelete(int id);
 void OnAnimeEpisodeNotFound();
 bool OnAnimeFolderNotFound();
 void OnAnimeWatchingStart(const anime::Item& anime_item, const anime::Episode& episode);

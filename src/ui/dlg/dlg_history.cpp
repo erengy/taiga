@@ -18,6 +18,7 @@
 
 #include "base/foreach.h"
 #include "base/gfx.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -171,6 +172,12 @@ void HistoryDialog::RefreshList() {
 
   // Add queued items
   foreach_cr_(it, History.queue.items) {
+    auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+    if (!anime_item) {
+      LOG(LevelError, L"Item does not exist in the database: " + ToWstr(it->anime_id));
+      continue;
+    }
+
     int i = list_.GetItemCount();
 
     int icon = ui::kIcon16_ArrowUp;
@@ -202,8 +209,7 @@ void HistoryDialog::RefreshList() {
     if (it->date_finish)
       AppendString(details, L"Finish date: " + std::wstring(*it->date_finish));
 
-    list_.InsertItem(i, 0, icon, 0, nullptr,
-                     AnimeDatabase.FindItem(it->anime_id)->GetTitle().c_str(),
+    list_.InsertItem(i, 0, icon, 0, nullptr, anime_item->GetTitle().c_str(),
                      static_cast<LPARAM>(it->anime_id));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());
@@ -211,14 +217,18 @@ void HistoryDialog::RefreshList() {
 
   // Add recently watched
   foreach_cr_(it, History.items) {
-    int i = list_.GetItemCount();
     auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+    if (!anime_item) {
+      LOG(LevelError, L"Item does not exist in the database: " + ToWstr(it->anime_id));
+      continue;
+    }
+
+    int i = list_.GetItemCount();
     int icon = StatusToIcon(anime_item->GetAiringStatus());
     std::wstring details;
     AppendString(details, L"Episode: " + anime::TranslateNumber(*it->episode));
 
-    list_.InsertItem(i, 1, icon, 0, nullptr,
-                     anime_item->GetTitle().c_str(),
+    list_.InsertItem(i, 1, icon, 0, nullptr, anime_item->GetTitle().c_str(),
                      static_cast<LPARAM>(it->anime_id));
     list_.SetItem(i, 1, details.c_str());
     list_.SetItem(i, 2, it->time.c_str());

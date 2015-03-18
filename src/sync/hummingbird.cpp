@@ -278,7 +278,12 @@ bool Service::RequestSucceeded(Response& response,
       bool parsed = reader.parse(WstrToStr(http_response.body), root);
       response.data[L"error"] = name() + L" returned an error: ";
       if (parsed) {
-        response.data[L"error"] += StrToWstr(root["error"].asString());
+        auto error = StrToWstr(root["error"].asString());
+        response.data[L"error"] += error;
+        if (response.type == kGetMetadataById) {
+          if (InStr(error, L"Couldn't find Anime with 'id'=") > -1)
+            response.data[L"invalid_id"] = L"true";
+        }
       } else {
         response.data[L"error"] += L"Unknown error (" +
             ToWstr(http_response.code) + L")";

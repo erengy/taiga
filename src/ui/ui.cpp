@@ -492,6 +492,19 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void OnAnimeDelete(int id) {
+  ChangeStatusText(L"Anime is removed from the database: " + ToWstr(id));
+
+  if (DlgAnime.GetCurrentId() == id)
+    DlgAnime.Destroy();
+
+  DlgAnimeList.RefreshList();
+  DlgAnimeList.RefreshTabs();
+
+  DlgSearch.RefreshList();
+  DlgSeason.RefreshList();
+}
+
 void OnAnimeEpisodeNotFound() {
   win::TaskDialog dlg;
   dlg.SetWindowTitle(L"Play Random Episode");

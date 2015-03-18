@@ -40,6 +40,7 @@ public:
   Item* FindItem(const std::wstring& id, enum_t service);
 
   void ClearInvalidItems();
+  bool DeleteItem(int id);
   int UpdateItem(const Item& item);
 
 public:

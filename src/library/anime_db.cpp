@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
@@ -25,6 +27,7 @@
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
+#include "library/discover.h"
 #include "library/history.h"
 #include "sync/manager.h"
 #include "sync/myanimelist_util.h"
@@ -214,13 +217,41 @@ Item* Database::FindItem(const std::wstring& id, enum_t service) {
 
 void Database::ClearInvalidItems() {
   for (auto it = items.begin(); it != items.end(); ) {
-    if (!it->second.GetId() || it->first != it->second.GetId()) {
+    if (!anime::IsValidId(it->second.GetId()) ||
+        it->first != it->second.GetId()) {
       LOG(LevelDebug, L"ID: " + ToWstr(it->first));
       items.erase(it++);
     } else {
       ++it;
     }
   }
+}
+
+bool Database::DeleteItem(int id) {
+  if (items.erase(id) > 0) {
+    LOG(LevelWarning, L"ID: " + ToWstr(id));
+
+    auto delete_history_items = [](int id, std::vector<HistoryItem>& items) {
+      for (auto it = items.begin(); it != items.end(); ) {
+        if (it->anime_id == id) {
+          items.erase(it++);
+        } else {
+          ++it;
+        }
+      }
+    };
+
+    delete_history_items(id, History.items);
+    delete_history_items(id, History.queue.items);
+
+    auto& items = SeasonDatabase.items;
+    items.erase(std::remove(items.begin(), items.end(), id), items.end());
+
+    ui::OnAnimeDelete(id);
+    return true;
+  }
+
+  return false;
 }
 
 int Database::UpdateItem(const Item& new_item) {

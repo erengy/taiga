@@ -467,6 +467,11 @@ bool Service::RequestSucceeded(Response& response,
     case kGetMetadataById:
       if (!InStr(http_response.body, L"/anime/", L"/").empty())
         return true;
+      if (InStr(http_response.body, L"/anime//") > -1) {
+        response.data[L"error"] = L"Invalid anime ID";
+        response.data[L"invalid_id"] = L"true";
+        return false;
+      }
       break;
     case kSearchTitle:
       return true;
