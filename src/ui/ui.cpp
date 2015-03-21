@@ -619,8 +619,8 @@ void OnRecognitionFail() {
 void OnAnimeListHeaderRatingWarning() {
   win::TaskDialog dlg(L"Average Score", TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Technical limitation");
-  dlg.SetContent(L"Please note that Taiga may display outdated average values "
-                 L"for MyAnimeList.");
+  dlg.SetContent(L"Please note that some average values may be outdated, as "
+                 L"MyAnimeList doesn't provide a way to get them in batch.");
   dlg.AddButton(L"OK", IDOK);
   dlg.Show(DlgMain.GetWindowHandle());
 }
