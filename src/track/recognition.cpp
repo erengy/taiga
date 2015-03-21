@@ -126,9 +126,13 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   // Post-processing
   if (anime::IsValidId(episode.anime_id)) {
     if (!episode.episode_number()) {
-      const auto& anime_item = *AnimeDatabase.FindItem(episode.anime_id);
-      int episode_count = anime_item.GetEpisodeCount();
-      episode.set_episode_number_range(std::make_pair(1, episode_count));
+      if (!episode.file_extension().empty()) {
+        episode.set_episode_number(1);
+      } else {
+        const auto& anime_item = *AnimeDatabase.FindItem(episode.anime_id);
+        int episode_count = anime_item.GetEpisodeCount();
+        episode.set_episode_number_range(std::make_pair(1, episode_count));
+      }
     }
   }
 
