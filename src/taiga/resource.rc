@@ -324,7 +324,7 @@ FONT 9, "Segoe UI", 400, 0, 0
     AUTOCHECKBOX    "Start automatically with Windows", IDC_CHECK_AUTOSTART, 12, 18, 118, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Start minimized", IDC_CHECK_START_MINIMIZE, 12, 29, 85, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Check for application updates", IDC_CHECK_START_VERSION, 12, 40, 110, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Scan my computer for available episodes", IDC_CHECK_START_CHECKEPS, 12, 51, 155, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Scan library folders for available episodes", IDC_CHECK_START_CHECKEPS, 12, 51, 155, 8, 0, WS_EX_LEFT
     GROUPBOX        "System tray use", IDC_STATIC, 7, 73, 301, 37, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Close to tray", IDC_CHECK_GENERAL_CLOSE, 12, 84, 70, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Minimize to tray", IDC_CHECK_GENERAL_MINIMIZE, 12, 95, 85, 8, 0, WS_EX_LEFT
@@ -347,11 +347,11 @@ FONT 9, "Segoe UI", 400, 0, 0
     COMBOBOX        IDC_COMBO_MDLCLICK, 160, 28, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
     GROUPBOX        "Appearance", IDC_STATIC, 7, 55, 301, 48, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Display English titles when possible", IDC_CHECK_LIST_ENGLISH, 12, 66, 141, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Highlight anime if next episode is available on my computer", IDC_CHECK_HIGHLIGHT, 12, 77, 200, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Highlight anime if next episode is available in library folders", IDC_CHECK_HIGHLIGHT, 12, 77, 200, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Display highlighted anime above others", IDC_CHECK_HIGHLIGHT_ONTOP, 21, 88, 161, 8, 0, WS_EX_LEFT
     GROUPBOX        "Progress", IDC_STATIC, 7, 110, 301, 37, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Display aired episodes (estimated)", IDC_CHECK_LIST_PROGRESS_AIRED, 12, 121, 141, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Display available episodes on my computer", IDC_CHECK_LIST_PROGRESS_AVAILABLE, 12, 132, 170, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Display available episodes in library folders", IDC_CHECK_LIST_PROGRESS_AVAILABLE, 12, 132, 170, 8, 0, WS_EX_LEFT
 }
 
 

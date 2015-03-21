@@ -465,10 +465,10 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
         if (anime_item->IsInList()) {
           std::wstring text;
           if (IsAllEpisodesAvailable(*anime_item)) {
-            AppendString(text, L"All episodes are on computer");
+            AppendString(text, L"All episodes are in library folders");
           } else {
             if (anime_item->IsNextEpisodeAvailable())
-              AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L" is on computer");
+              AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L" is in library folders");
             if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
               AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) + L" is available for download");
           }
