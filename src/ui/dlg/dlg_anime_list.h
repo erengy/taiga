@@ -102,7 +102,7 @@ public:
     std::map<AnimeListColumn, ColumnData> columns;
     void InitializeColumns();
     void InsertColumns();
-    void MoveColumn(int index, int new_order);
+    void MoveColumn(int index, int new_visible_order);
     void SetColumnSize(int index, unsigned short width);
     AnimeListColumn FindColumnAtSubItemIndex(int index);
     void RefreshColumns(bool reset = false);

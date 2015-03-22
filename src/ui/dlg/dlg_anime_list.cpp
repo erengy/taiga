@@ -787,8 +787,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case HDN_ENDDRAG: {
       auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
       auto column_type = listview.FindColumnAtSubItemIndex(nmh->iItem);
-      if (column_type == kColumnAnimeStatus ||
-          nmh->pitem->iOrder == 0)
+      if (column_type == kColumnAnimeStatus || nmh->pitem->iOrder == 0)
         return TRUE;
       listview.MoveColumn(nmh->iItem, nmh->pitem->iOrder);
       break;
@@ -1490,28 +1489,35 @@ void AnimeListDialog::ListView::InsertColumns() {
   DeleteColumn(0);
 }
 
-void AnimeListDialog::ListView::MoveColumn(int index, int new_order) {
-  int old_order = 0;
+void AnimeListDialog::ListView::MoveColumn(int index, int new_visible_order) {
+  int order = 0;
 
-  for (auto& it : columns) {
+  for (const auto& it : columns) {
     auto& column = it.second;
     if (column.index == index) {
-      old_order = column.order;
-      column.order = new_order;
+      order = column.order;
       break;
     }
   }
 
-  if (new_order == old_order)
+  int new_order = new_visible_order;
+
+  for (const auto& it : columns) {
+    auto& column = it.second;
+    if (column.order <= new_visible_order && !column.visible)
+      ++new_order;
+  }
+
+  if (new_order == order)
     return;
 
   for (auto& it : columns) {
     auto& column = it.second;
-    if (column.index == index)
-      continue;
-    if (column.order >= min(old_order, new_order) &&
-        column.order <= max(old_order, new_order)) {
-      column.order += new_order > old_order ? -1 : 1;
+    if (column.index == index) {
+      column.order = new_order;
+    } else if (column.order >= min(order, new_order) &&
+               column.order <= max(order, new_order)) {
+      column.order += new_order > order ? -1 : 1;
     }
   }
 }
