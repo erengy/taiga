@@ -535,24 +535,24 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Recently watched
     std::vector<int> anime_ids;
-    foreach_cr_(it, History.queue.items) {
-      if (it->episode &&
-          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end()) {
-        auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-        if (anime_item->GetMyStatus() != anime::kCompleted ||
-            anime_item->GetMyScore() == 0)
-          anime_ids.push_back(it->anime_id);
+    auto list_anime_ids = [&anime_ids](const std::vector<HistoryItem>& items) {
+      foreach_cr_(it, items) {
+        if (it->episode) {
+          if (std::find(anime_ids.begin(), anime_ids.end(),
+                        it->anime_id) == anime_ids.end()) {
+            auto anime_item = AnimeDatabase.FindItem(it->anime_id);
+            if (anime_item->GetMyStatus() == anime::kDropped)
+              continue;
+            if (anime_item->GetMyStatus() == anime::kCompleted &&
+                anime_item->GetMyScore() > 0)
+              continue;
+            anime_ids.push_back(it->anime_id);
+          }
+        }
       }
-    }
-    foreach_cr_(it, History.items) {
-      if (it->episode &&
-          std::find(anime_ids.begin(), anime_ids.end(), it->anime_id) == anime_ids.end()) {
-        auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-        if (anime_item->GetMyStatus() != anime::kCompleted ||
-            anime_item->GetMyScore() == 0)
-          anime_ids.push_back(it->anime_id);
-      }
-    }
+    };
+    list_anime_ids(History.queue.items);
+    list_anime_ids(History.items);
     int recently_watched = 0;
     foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
@@ -560,7 +560,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (anime_item->GetMyStatus() == anime::kCompleted) {
         content += anime_item->GetTitle() + L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
         link_count++;
-      } else if (anime_item->GetMyStatus() != anime::kDropped) {
+      } else {
         std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
         content += L"<a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>";
         link_count++;
