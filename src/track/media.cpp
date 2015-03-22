@@ -335,6 +335,9 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
           return;
         } else if (!Meow.IsValidAnimeType(CurrentEpisode)) {
           ignore_file = true;
+        } else if (!CurrentEpisode.file_extension().empty() &&
+                   !Meow.IsValidFileExtension(CurrentEpisode.file_extension())) {
+          ignore_file = true;
         }
       } else {
         ignore_file = true;
