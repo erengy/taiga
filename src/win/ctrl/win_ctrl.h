@@ -153,6 +153,8 @@ public:
   UINT       IsItemVisible(UINT index);
   BOOL       RedrawItems(int first, int last, bool repaint);
   void       RemoveAllGroups();
+  void       SelectAllItems(bool selected = true);
+  void       SelectItem(int index, bool selected = true);
   BOOL       SetBkImage(HBITMAP bitmap, ULONG flags = LVBKIF_TYPE_WATERMARK, int offset_x = 100, int offset_y = 100);
   void       SetCheckState(int index, BOOL check);
   BOOL       SetColumnWidth(int column, int cx);
@@ -163,7 +165,7 @@ public:
   BOOL       SetItem(int index, int subitem, LPCWSTR text);
   BOOL       SetItemIcon(int index, int icon);
   BOOL       SetItemIcon(int index, int subitem, int icon);
-  void       SetSelectedItem(int index);
+  void       SetItemState(int index, UINT state, UINT mask);
   BOOL       SetTileViewInfo(PLVTILEVIEWINFO tvi);
   BOOL       SetTileViewInfo(int line_count, DWORD flags, RECT* rc_label_margin = nullptr, SIZE* size_tile = nullptr);
   int        SetView(DWORD view);

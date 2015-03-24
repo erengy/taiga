@@ -507,7 +507,7 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
     case WM_MBUTTONDOWN: {
       int item_index = HitTest();
       if (item_index > -1) {
-        SetSelectedItem(item_index);
+        SelectItem(item_index);
         int anime_id = parent->GetCurrentId();
         switch (Settings.GetInt(taiga::kApp_List_MiddleClickAction)) {
           case 1:
@@ -730,7 +730,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           if (GetKeyState(VK_CONTROL) & 0x8000) {
             // Select all items
             if (pnkd->wVKey == 'A') {
-              listview.SetSelectedItem(-1);
+              listview.SelectAllItems();
               return TRUE;
             }
             if (!anime::IsValidId(anime_id))

@@ -492,7 +492,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           if (win::BrowseForFolder(GetWindowHandle(), L"Add a Library Folder", L"", path)) {
             win::ListView list = GetDlgItem(IDC_LIST_FOLDERS_ROOT);
             list.InsertItem(list.GetItemCount(), -1, ui::kIcon16_Folder, 0, nullptr, path.c_str(), 0);
-            list.SetSelectedItem(list.GetItemCount() - 1);
+            list.SelectItem(list.GetItemCount() - 1);
             list.SetWindowHandle(nullptr);
           }
           return TRUE;
@@ -655,7 +655,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             parent->feed_filters_.push_back(DlgFeedFilter.filter);
             win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
-            list.SetSelectedItem(list.GetItemCount() - 1);
+            list.SelectItem(list.GetItemCount() - 1);
             list.SetWindowHandle(nullptr);
           }
           return TRUE;
@@ -683,7 +683,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             iter_swap(parent->feed_filters_.begin() + index,
                       parent->feed_filters_.begin() + index - 1);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
-            list.SetSelectedItem(index - 1);
+            list.SelectItem(index - 1);
           }
           list.SetWindowHandle(nullptr);
           return TRUE;
@@ -696,7 +696,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             iter_swap(parent->feed_filters_.begin() + index,
                       parent->feed_filters_.begin() + index + 1);
             parent->RefreshTorrentFilterList(list.GetWindowHandle());
-            list.SetSelectedItem(index + 1);
+            list.SelectItem(index + 1);
           }
           list.SetWindowHandle(nullptr);
           return TRUE;
@@ -923,7 +923,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (!DlgFeedFilter.filter.conditions.empty()) {
             *feed_filter = DlgFeedFilter.filter;
             parent->RefreshTorrentFilterList(lpnmitem->hdr.hwndFrom);
-            list.SetSelectedItem(lpnmitem->iItem);
+            list.SelectItem(lpnmitem->iItem);
           }
         }
         list.SetWindowHandle(nullptr);

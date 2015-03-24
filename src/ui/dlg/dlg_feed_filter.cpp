@@ -278,7 +278,7 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
                            0, icon_, I_COLUMNSCALLBACK, nullptr, LPSTR_TEXTCALLBACK,
                            reinterpret_cast<LPARAM>(&(*it)));
   }
-  preset_list.SetSelectedItem(0);
+  preset_list.SelectItem(0);
 
   return TRUE;
 }
@@ -415,7 +415,7 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
             DlgFeedCondition.condition.op,
             DlgFeedCondition.condition.value);
         RefreshConditionList();
-        condition_list.SetSelectedItem(condition_list.GetItemCount() - 1);
+        condition_list.SelectItem(condition_list.GetItemCount() - 1);
       }
       return TRUE;
     }
@@ -435,7 +435,7 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
         iter_swap(parent->filter.conditions.begin() + index,
                   parent->filter.conditions.begin() + index - 1);
         RefreshConditionList();
-        condition_list.SetSelectedItem(index - 1);
+        condition_list.SelectItem(index - 1);
       }
       return TRUE;
     }
@@ -446,7 +446,7 @@ BOOL FeedFilterDialog::DialogPage1::OnCommand(WPARAM wParam, LPARAM lParam) {
         iter_swap(parent->filter.conditions.begin() + index,
                   parent->filter.conditions.begin() + index + 1);
         RefreshConditionList();
-        condition_list.SetSelectedItem(index + 1);
+        condition_list.SelectItem(index + 1);
       }
       return TRUE;
     }
@@ -510,7 +510,7 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
             if (DlgFeedCondition.condition.element != kFeedFilterElement_None) {
               *condition = DlgFeedCondition.condition;
               RefreshConditionList();
-              condition_list.SetSelectedItem(selected_item);
+              condition_list.SelectItem(selected_item);
             }
           }
           break;

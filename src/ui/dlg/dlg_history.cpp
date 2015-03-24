@@ -139,7 +139,7 @@ BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
           // Select all items
           case 'A': {
             if (::GetKeyState(VK_CONTROL) & 0xFF80) {
-              list_.SetSelectedItem(-1);
+              list_.SelectAllItems();
               return TRUE;
             }
             break;

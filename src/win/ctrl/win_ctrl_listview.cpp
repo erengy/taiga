@@ -284,6 +284,14 @@ void ListView::RemoveAllGroups() {
   ListView_RemoveAllGroups(window_);
 }
 
+void ListView::SelectAllItems(bool selected) {
+  SelectItem(-1, selected);
+}
+
+void ListView::SelectItem(int index, bool selected) {
+  SetItemState(index, selected ? LVIS_SELECTED : 0, LVIS_SELECTED);
+}
+
 BOOL ListView::SetBkImage(HBITMAP bitmap, ULONG flags,
                           int offset_x, int offset_y) {
   LVBKIMAGE bki= {0};
@@ -346,8 +354,8 @@ BOOL ListView::SetItemIcon(int index, int subitem, int icon) {
   return ListView_SetItem(window_, &lvi);
 }
 
-void ListView::SetSelectedItem(int index) {
-  ListView_SetItemState(window_, index, LVIS_SELECTED, LVIS_SELECTED);
+void ListView::SetItemState(int index, UINT state, UINT mask) {
+  ListView_SetItemState(window_, index, state, mask);
 }
 
 BOOL ListView::SetTileViewInfo(PLVTILEVIEWINFO tvi) {
