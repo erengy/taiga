@@ -88,7 +88,7 @@
 	<player>
 		<name>KMPlayer</name>
 		<enabled>1</enabled>
-		<visible>1</visible>
+		<visible>0</visible>
 		<mode>1</mode>
 		<class>KMPlayer v3.x</class>
 		<class>Winamp v1.x</class>
