@@ -365,6 +365,26 @@ AnimeListDialog::ListView::ListView()
   button_visible[2] = false;
 }
 
+void AnimeListDialog::ListView::ExecuteAction(AnimeListAction action,
+                                              int anime_id) {
+  switch (action) {
+    case kAnimeListActionNothing:
+      break;
+    case kAnimeListActionEdit:
+      ShowDlgAnimeEdit(anime_id);
+      break;
+    case kAnimeListActionOpenFolder:
+      ::ExecuteAction(L"OpenFolder", 0, anime_id);
+      break;
+    case kAnimeListActionPlayNext:
+      anime::PlayNextEpisode(anime_id);
+      break;
+    case kAnimeListActionInfo:
+      ShowDlgAnimeInfo(anime_id);
+      break;
+  }
+}
+
 int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
   switch (column) {
     case kColumnAnimeRating:
@@ -509,21 +529,9 @@ LRESULT AnimeListDialog::ListView::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
       if (item_index > -1) {
         SelectAllItems(false);
         SelectItem(item_index);
+        auto action = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_MiddleClickAction));
         int anime_id = parent->GetCurrentId();
-        switch (Settings.GetInt(taiga::kApp_List_MiddleClickAction)) {
-          case 1:
-            ShowDlgAnimeEdit(anime_id);
-            break;
-          case 2:
-            ExecuteAction(L"OpenFolder", 0, anime_id);
-            break;
-          case 3:
-            anime::PlayNextEpisode(anime_id);
-            break;
-          case 4:
-            ShowDlgAnimeInfo(anime_id);
-            break;
-        }
+        ExecuteAction(action, anime_id);
       }
       break;
     }
@@ -623,20 +631,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
           listview.RefreshItem(list_index);
           listview.RedrawItems(list_index, list_index, true);
         } else {
-          switch (Settings.GetInt(taiga::kApp_List_DoubleClickAction)) {
-            case 1:
-              ShowDlgAnimeEdit(anime_id);
-              break;
-            case 2:
-              ExecuteAction(L"OpenFolder", 0, anime_id);
-              break;
-            case 3:
-              anime::PlayNextEpisode(anime_id);
-              break;
-            case 4:
-              ShowDlgAnimeInfo(anime_id);
-              break;
-          }
+          auto action = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
+          listview.ExecuteAction(action, anime_id);
         }
       }
       break;

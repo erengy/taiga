@@ -29,6 +29,14 @@ class Item;
 
 namespace ui {
 
+enum AnimeListAction {
+  kAnimeListActionNothing,
+  kAnimeListActionEdit,
+  kAnimeListActionOpenFolder,
+  kAnimeListActionPlayNext,
+  kAnimeListActionInfo,
+};
+
 enum AnimeListColumn {
   kColumnUnknown,
   kColumnAnimeRating,
@@ -80,6 +88,8 @@ public:
     void DrawProgressBar(HDC hdc, RECT* rc, int index, anime::Item& anime_item);
     void DrawProgressText(HDC hdc, RECT* rc, anime::Item& anime_item);
     void DrawScoreBox(HDC hdc, RECT* rc, int index, UINT uItemState, anime::Item& anime_item);
+
+    void ExecuteAction(AnimeListAction action, int anime_id);
 
     int GetDefaultSortOrder(AnimeListColumn column);
     int GetSortType(AnimeListColumn column);
