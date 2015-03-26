@@ -65,9 +65,10 @@ MainDialog::MainDialog() {
 
 BOOL MainDialog::OnInitDialog() {
   // Initialize window properties
-  InitWindowPosition();
   SetIconLarge(IDI_MAIN);
   SetIconSmall(IDI_MAIN);
+  SetSizeMin(320, 240);
+  SetSnapGap(10);
 
   // Create default brushes and fonts
   ui::Theme.CreateBrushes();
@@ -99,14 +100,10 @@ BOOL MainDialog::OnInitDialog() {
   if (Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes)) {
     ScanAvailableEpisodesQuick();
   }
-  if (Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
-    if (!Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray))
-      Show(SW_SHOWMINIMIZED);
-  } else {
-    bool maximized = Settings.GetBool(taiga::kApp_Position_Remember) &&
-                     Settings.GetBool(taiga::kApp_Position_Maximized);
-    Show(maximized ? SW_MAXIMIZE : SW_SHOWNORMAL);
-  }
+
+  // Display window
+  InitWindowPosition();
+
   if (taiga::GetCurrentUsername().empty()) {
     win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Welcome to Taiga!");
@@ -122,7 +119,6 @@ BOOL MainDialog::OnInitDialog() {
     FolderMonitor.Enable();
   }
 
-  // Success
   return TRUE;
 }
 
@@ -245,28 +241,36 @@ void MainDialog::InitWindowPosition() {
       Settings.GetInt(taiga::kApp_Position_Y) + Settings.GetInt(taiga::kApp_Position_H));
 
   bool first_time = rcWindow.left == -1 && rcWindow.top == -1;
+  bool center_owner = first_time;
 
-  HMONITOR hMonitor = MonitorFromRect(&rcWindow, MONITOR_DEFAULTTONEAREST);
-  MONITORINFO mi;
-  mi.cbSize = sizeof(mi);
-  GetMonitorInfo(hMonitor, &mi);
-  win::Rect rcWork = mi.rcWork;
-  auto w = rcWindow.Width();
-  auto h = rcWindow.Height();
-  rcWindow.left = max(rcWork.left, min(rcWork.right - w, rcWindow.left));
-  rcWindow.top = max(rcWork.top, min(rcWork.bottom - h, rcWindow.top));
-  rcWindow.right = rcWindow.left + w;
-  rcWindow.bottom = rcWindow.top + h;
+  WINDOWPLACEMENT wp = {0};
+  wp.length = sizeof(WINDOWPLACEMENT);
+  wp.showCmd = SW_SHOWNORMAL;
 
-  if (first_time || Settings.GetBool(taiga::kApp_Position_Remember)) {
-    UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER;
-    SetPosition(nullptr, rcWindow, flags);
-    if (first_time)
-      CenterOwner();
+  if (Settings.GetBool(taiga::kApp_Position_Remember)) {
+    CopyRect(&wp.rcNormalPosition, &rcWindow);
+    if (Settings.GetBool(taiga::kApp_Position_Maximized)) {
+      wp.flags = WPF_RESTORETOMAXIMIZED;
+      wp.showCmd = SW_SHOWMAXIMIZED;
+    }
+  } else {
+    wp.rcNormalPosition = {0, 0, 960, 640};
+    center_owner = true;
   }
 
-  SetSizeMin(320, 240);
-  SetSnapGap(10);
+  if (Settings.GetBool(taiga::kApp_Behavior_StartMinimized)) {
+    wp.showCmd = SW_SHOWMINIMIZED;
+  }
+
+  SetPlacement(wp);
+
+  if (center_owner)
+    CenterOwner();
+
+  if (Settings.GetBool(taiga::kApp_Behavior_StartMinimized) &&
+      Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray)) {
+    Show(SW_HIDE);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -584,16 +588,14 @@ BOOL MainDialog::OnClose() {
 
 BOOL MainDialog::OnDestroy() {
   if (Settings.GetBool(taiga::kApp_Position_Remember)) {
-    bool maximized = (GetWindowLong() & WS_MAXIMIZE) ? true : false;
-    Settings.Set(taiga::kApp_Position_Maximized, maximized);
-    if (!maximized) {
-      bool invisible = !IsVisible();
-      if (invisible)
-        ActivateWindow(GetWindowHandle());
-      win::Rect rcWindow;
-      GetWindowRect(&rcWindow);
-      if (invisible)
-        Hide();
+    WINDOWPLACEMENT wp = {0};
+    wp.length = sizeof(WINDOWPLACEMENT);
+    if (GetPlacement(wp)) {
+      bool maximized = wp.showCmd == SW_SHOWMAXIMIZED;
+      bool restore_to_maximized = (wp.showCmd == SW_SHOWMINIMIZED) &&
+                                  (wp.flags & WPF_RESTORETOMAXIMIZED);
+      Settings.Set(taiga::kApp_Position_Maximized, maximized || restore_to_maximized);
+      win::Rect rcWindow(wp.rcNormalPosition);
       Settings.Set(taiga::kApp_Position_X, rcWindow.left);
       Settings.Set(taiga::kApp_Position_Y, rcWindow.top);
       Settings.Set(taiga::kApp_Position_W, rcWindow.Width());
@@ -664,7 +666,7 @@ void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
   switch (uMsg) {
     case WM_SIZE: {
-      if (IsIconic()) {
+      if (nType == SIZE_MINIMIZED) {
         if (Settings.GetBool(taiga::kApp_Behavior_MinimizeToTray))
           Hide();
         return;

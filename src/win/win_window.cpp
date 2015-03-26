@@ -356,6 +356,10 @@ HWND Window::GetParent() {
   return parent_;
 }
 
+BOOL Window::GetPlacement(WINDOWPLACEMENT& wp) const {
+  return ::GetWindowPlacement(window_, &wp);
+}
+
 void Window::GetText(LPWSTR output, int max_count) const {
   ::GetWindowText(window_, output, max_count);
 }
@@ -518,6 +522,10 @@ void Window::SetParent(HWND parent) const {
     SetStyle(WS_CHILD, WS_POPUP);
     ::SetParent(window_, parent);
   }
+}
+
+BOOL Window::SetPlacement(const WINDOWPLACEMENT& wp) const {
+  return ::SetWindowPlacement(window_, &wp);
 }
 
 BOOL Window::SetPosition(HWND hwnd_insert_after, int x, int y, int w, int h,

@@ -66,6 +66,7 @@ public:
   HFONT   GetFont() const;
   HMENU   GetMenu() const;
   HWND    GetParent();
+  BOOL    GetPlacement(WINDOWPLACEMENT& wp) const;
   void    GetText(LPWSTR output, int max_count = MAX_PATH) const;
   void    GetText(std::wstring& output) const;
   std::wstring GetText() const;
@@ -92,6 +93,7 @@ public:
   BOOL    SetForegroundWindow() const;
   BOOL    SetMenu(HMENU menu) const;
   void    SetParent(HWND parent) const;
+  BOOL    SetPlacement(const WINDOWPLACEMENT& wp) const;
   BOOL    SetPosition(HWND hwnd_insert_after, int x, int y, int w, int h, UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER) const;
   BOOL    SetPosition(HWND hwnd_insert_after, const RECT& rc, UINT flags = SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER) const;
   BOOL    SetRedraw(BOOL redraw) const;
