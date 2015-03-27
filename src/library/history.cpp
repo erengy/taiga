@@ -296,6 +296,15 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
       }
     }
 
+    if (history_item->episode) {
+      auto anime_item = AnimeDatabase.FindItem(history_item->anime_id);
+      if (anime_item &&
+          anime_item->GetMyLastWatchedEpisode() == *history_item->episode) {
+        // Next episode path is no longer valid
+        anime_item->SetNextEpisodePath(L"");
+      }
+    }
+
     items.erase(history_item);
 
     if (refresh)
