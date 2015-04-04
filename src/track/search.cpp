@@ -218,6 +218,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
     ui::SetSharedCursor(IDC_ARROW);
     ui::ClearStatusText();
   }
+
+  ui::OnScanAvailableEpisodesFinished();
 }
 
 void ScanAvailableEpisodesQuick() {
@@ -245,4 +247,6 @@ void ScanAvailableEpisodesQuick(int anime_id) {
 
     file_search_helper.Search(anime_item.GetFolder());
   }
+
+  ui::OnScanAvailableEpisodesFinished();
 }

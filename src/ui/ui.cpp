@@ -756,6 +756,12 @@ void OnSettingsUserChange() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void OnScanAvailableEpisodesFinished() {
+  DlgNowPlaying.Refresh(false, false, false);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void OnFeedCheck(bool success) {
   ChangeStatusText(success ?
       L"There are new torrents available!" : L"No new torrents found.");

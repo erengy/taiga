@@ -541,10 +541,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
           if (std::find(anime_ids.begin(), anime_ids.end(),
                         it->anime_id) == anime_ids.end()) {
             auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-            if (anime_item->GetMyStatus() == anime::kDropped)
-              continue;
-            if (anime_item->GetMyStatus() == anime::kCompleted &&
-                anime_item->GetMyScore() > 0)
+            if (anime_item->GetMyStatus() == anime::kCompleted ||
+                anime_item->GetMyStatus() == anime::kDropped)
               continue;
             anime_ids.push_back(it->anime_id);
           }
@@ -556,24 +554,20 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     int recently_watched = 0;
     foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
-      content += L"  \u2022 ";
-      if (anime_item->GetMyStatus() == anime::kCompleted) {
-        content += anime_item->GetTitle() + L" \u2014 <a href=\"EditAll(" + ToWstr(*it) + L")\">Give a score</a>";
-        link_count++;
-      } else {
-        std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
-        content += L"<a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>";
-        link_count++;
-      }
-      content += L"\n";
+      if (!anime_item->IsNextEpisodeAvailable())
+        continue;
+      std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
+      content += L"  \u2022 <a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>\n";
+      link_count++;
       recently_watched++;
       if (recently_watched >= 20)
         break;
     }
     if (content.empty()) {
-      content = L"You haven't watched anything recently. "
-                L"How about <a href=\"PlayRandomAnime()\">trying a random one</a>?\n\n";
-      link_count++;
+      content = L"Continue watching:\n  "
+                L"<a href=\"ScanEpisodesAll()\">Scan available episodes</a> to see recently watched anime. "
+                L"Or how about you <a href=\"PlayRandomAnime()\">try a random one</a>?\n\n";
+      link_count += 2;
     } else {
       content = L"Continue watching:\n" + content + L"\n";
       int watched_last_week = 0;
@@ -630,22 +624,27 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         }
       }
     }
+    
+    auto add_info_lines = [&](const std::vector<int>& ids) {
+      for (const auto& id : ids) {
+        auto title = AnimeDatabase.FindItem(id)->GetTitle();
+        content += L"  \u2022 <a href=\"Info(" + ToWstr(id) + L")\">" + title + L"</a>\n";
+        link_count++;
+      }
+    };
     if (!recently_started.empty()) {
       content += L"Recently started airing:\n";
-      foreach_c_(it, recently_started)
-        content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
+      add_info_lines(recently_started);
       content += L"\n";
     }
     if (!recently_finished.empty()) {
       content += L"Recently finished airing:\n";
-      foreach_c_(it, recently_finished)
-        content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
+      add_info_lines(recently_finished);
       content += L"\n";
     }
     if (!upcoming.empty()) {
       content += L"Upcoming:\n";
-      foreach_c_(it, upcoming)
-        content += L"  \u2022 " + AnimeDatabase.FindItem(*it)->GetTitle() + L"\n";
+      add_info_lines(upcoming);
       content += L"\n";
     } else {
       content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";

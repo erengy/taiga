@@ -175,11 +175,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"About") {
     ui::ShowDialog(ui::kDialogAbout);
 
-  // Info()
+  // Info([anime_id])
   //   Shows anime information window.
   //   lParam is an anime ID.
   } else if (action == L"Info") {
-    int anime_id = static_cast<int>(lParam);
+    int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     ui::ShowDlgAnimeInfo(anime_id);
 
   // MainDialog()

@@ -87,6 +87,8 @@ void OnSettingsServiceChangeFailed();
 void OnSettingsThemeChange();
 void OnSettingsUserChange();
 
+void OnScanAvailableEpisodesFinished();
+
 void OnFeedCheck(bool success);
 void OnFeedDownload(bool success, const string_t& error);
 bool OnFeedNotify(const Feed& feed);
