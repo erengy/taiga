@@ -35,7 +35,6 @@ void Episode::Clear() {
   elements_.clear();
   folder.clear();
   processed = false;
-  streaming_media = false;
 }
 
 void Episode::Set(int anime_id) {

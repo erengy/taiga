@@ -310,7 +310,7 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     if (!Settings.GetBool(taiga::kApp_Option_EnableRecognition))
       return;
 
-    CurrentEpisode.streaming_media = !media_player.engine.empty();
+    CurrentEpisode.streaming_media = media_player.mode == kMediaModeWebBrowser;
 
     // Examine title and compare it with list items
     bool ignore_file = false;
