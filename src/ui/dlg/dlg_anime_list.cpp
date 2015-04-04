@@ -784,7 +784,8 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     case HDN_ENDDRAG: {
       auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
       auto column_type = listview.FindColumnAtSubItemIndex(nmh->iItem);
-      if (column_type == kColumnAnimeStatus || nmh->pitem->iOrder == 0)
+      if (column_type == kColumnAnimeStatus || nmh->pitem->iOrder == 0 ||
+          nmh->pitem->iOrder == -1)
         return TRUE;
       listview.MoveColumn(nmh->iItem, nmh->pitem->iOrder);
       break;
