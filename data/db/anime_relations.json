@@ -53,6 +53,20 @@
 			"name": "Fate/Zero 2nd Season -> ~",
 			"rule": "11741|7658:14-25 -> ~|~:1-12"
 		},
+		
+
+		{
+			"name": "Fate/stay night: Unlimited Blade Works (TV) -> ~ Episode 0",
+			"rule": "22297|7882:0 -> 27821|9718:1"
+		},
+		{
+			"name": "Fate/stay night: Unlimited Blade Works (TV) -> ~ 2nd Season",
+			"rule": "22297|7882:12-24 -> 28701|10052:1-12"
+		},
+		{
+			"name": "Fate/stay night: Unlimited Blade Works (TV) 2nd Season -> ~",
+			"rule": "28701|10052:14-24 -> ~|~:1-12"
+		},
 
 
 		{
@@ -138,7 +152,7 @@
 
 		{
 			"name": "Aldnoah.Zero -> ~ 2nd Season",
-			"rule": "22729|8297:13-? -> 27655|9136:1-?"
+			"rule": "22729|8297:13-24 -> 27655|9136:1-12"
 		}
 	]
 }
