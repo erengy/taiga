@@ -380,7 +380,8 @@ std::wstring Engine::GetTitleFromPath(anime::Episode& episode) {
     return it == str.end() ? str.npos : (it - str.begin());
   };
 
-  if (!title.empty() && !episode.episode_number()) {
+  if (!title.empty() &&
+      episode.elements().empty(anitomy::kElementEpisodeNumber)) {
     const auto& filename = episode.file_name();
     auto pos = find_number_in_string(filename);
     if (pos != filename.npos) {
