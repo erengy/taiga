@@ -557,14 +557,14 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (!anime_item->IsNextEpisodeAvailable())
         continue;
       std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
-      content += L"  \u2022 <a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>\n";
+      content += L"\u2022 <a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>\n";
       link_count++;
       recently_watched++;
       if (recently_watched >= 20)
         break;
     }
     if (content.empty()) {
-      content = L"Continue watching:\n  "
+      content = L"Continue watching:\n"
                 L"<a href=\"ScanEpisodesAll()\">Scan available episodes</a> to see recently watched anime. "
                 L"Or how about you <a href=\"PlayRandomAnime()\">try a random one</a>?\n\n";
       link_count += 2;
@@ -626,26 +626,28 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     }
     
     auto add_info_lines = [&](const std::vector<int>& ids) {
+      std::wstring text;
       for (const auto& id : ids) {
         auto title = AnimeDatabase.FindItem(id)->GetTitle();
-        content += L"  \u2022 <a href=\"Info(" + ToWstr(id) + L")\">" + title + L"</a>\n";
+        AppendString(text, L"<a href=\"Info(" + ToWstr(id) + L")\">" + title + L"</a>", L"  \u2022  ");
         link_count++;
       }
+      content += text;
     };
     if (!recently_started.empty()) {
       content += L"Recently started airing:\n";
       add_info_lines(recently_started);
-      content += L"\n";
+      content += L"\n\n";
     }
     if (!recently_finished.empty()) {
       content += L"Recently finished airing:\n";
       add_info_lines(recently_finished);
-      content += L"\n";
+      content += L"\n\n";
     }
     if (!upcoming.empty()) {
       content += L"Upcoming:\n";
       add_info_lines(upcoming);
-      content += L"\n";
+      content += L"\n\n";
     } else {
       content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
       link_count++;
