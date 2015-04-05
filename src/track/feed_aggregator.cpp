@@ -166,14 +166,20 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
   if (!feed_item)
     return false;
 
-  ui::ChangeStatusText(L"Downloading \"" + feed_item->title + L"\"...");
-  ui::EnableDialogInput(ui::kDialogTorrents, false);
+  if (StartsWith(feed_item->link, L"magnet")) {
+    ui::OnFeedDownload(false, L"Magnet links are currently not supported");
+    return false;
 
-  HttpRequest http_request;
-  http_request.url = feed_item->link;
-  http_request.parameter = reinterpret_cast<LPARAM>(&feed);
+  } else {
+    ui::ChangeStatusText(L"Downloading \"" + feed_item->title + L"\"...");
+    ui::EnableDialogInput(ui::kDialogTorrents, false);
 
-  ConnectionManager.MakeRequest(http_request, taiga::kHttpFeedDownload);
+    HttpRequest http_request;
+    http_request.url = feed_item->link;
+    http_request.parameter = reinterpret_cast<LPARAM>(&feed);
+
+    ConnectionManager.MakeRequest(http_request, taiga::kHttpFeedDownload);
+  }
 
   return true;
 }
