@@ -73,10 +73,21 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
     return nullptr;
 
   static track::recognition::MatchOptions match_options;
-  match_options.allow_sequels = false;
-  match_options.check_airing_date = false;
-  match_options.check_anime_type = false;
-  match_options.check_episode_number = false;
+  switch (notification.type) {
+    case DirectoryChangeNotification::kTypeDirectory:
+      match_options.allow_sequels = false;
+      match_options.check_airing_date = false;
+      match_options.check_anime_type = false;
+      match_options.check_episode_number = false;
+      break;
+    default:
+    case DirectoryChangeNotification::kTypeFile:
+      match_options.allow_sequels = true;
+      match_options.check_airing_date = true;
+      match_options.check_anime_type = true;
+      match_options.check_episode_number = true;
+      break;
+  }
 
   auto anime_id = Meow.Identify(episode, false, match_options);
 
@@ -109,7 +120,7 @@ void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification)
   if (new_path_available) {
     anime::Episode episode;
     anime_item = FindAnimeItem(notification, episode);
-    if (anime_item)
+    if (anime_item && Meow.IsValidAnimeType(episode))
       ChangeAnimeFolder(*anime_item, episode.folder + episode.file_name());
   }
 }
@@ -119,6 +130,8 @@ void FolderMonitor::OnFile(const DirectoryChangeNotification& notification) cons
   auto anime_item = FindAnimeItem(notification, episode);
 
   if (!anime_item)
+    return;
+  if (!Meow.IsValidAnimeType(episode) || !Meow.IsValidFileExtension(episode))
     return;
 
   bool path_available = notification.action != FILE_ACTION_REMOVED;

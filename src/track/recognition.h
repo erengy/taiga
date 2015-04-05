@@ -56,7 +56,8 @@ public:
   sorted_scores_t GetScores() const;
 
   bool IsValidAnimeType(const anime::Episode& episode) const;
-  bool IsValidFileExtension(std::wstring extension) const;
+  bool IsValidFileExtension(const anime::Episode& episode) const;
+  bool IsValidFileExtension(const std::wstring& extension) const;
 
   bool ReadRelations();
   bool SearchEpisodeRedirection(int id, const std::pair<int, int>& range, int& destination_id, std::pair<int, int>& destination_range) const;

@@ -656,29 +656,43 @@ int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Engine::IsValidAnimeType(const anime::Episode& episode) const {
-  static const std::set<std::wstring> invalid_anime_types{
-    L"ED", L"ENDING", L"NCED", L"NCOP", L"OP", L"OPENING", L"PV"
-  };
+static bool ValidateAnitomyElement(std::wstring str,
+                                   anitomy::ElementCategory category) {
+  str = anitomy::keyword_manager.Normalize(str);
+  anitomy::KeywordOptions options;
 
+  bool found = anitomy::keyword_manager.Find(str, category, options);
+  return found && options.valid;
+}
+
+bool Engine::IsValidAnimeType(const anime::Episode& episode) const {
   auto anime_type = episode.anime_type();
-  if (!anime_type.empty())
-    if (invalid_anime_types.count(anime_type))
-      return false;
+
+  if (anime_type.empty())
+    return true;
+
+  if (!ValidateAnitomyElement(anime_type, anitomy::kElementAnimeType)) {
+    LOG(LevelDebug, episode.file_name_with_extension());
+    return false;
+  }
 
   return true;
 }
 
-bool Engine::IsValidFileExtension(std::wstring extension) const {
+bool Engine::IsValidFileExtension(const anime::Episode& episode) const {
+  if (!IsValidFileExtension(episode.file_extension())) {
+    LOG(LevelDebug, episode.file_name_with_extension());
+    return false;
+  }
+
+  return true;
+}
+
+bool Engine::IsValidFileExtension(const std::wstring& extension) const {
   if (extension.empty())
     return false;
 
-  extension = anitomy::keyword_manager.Normalize(extension);
-  auto category = anitomy::kElementFileExtension;
-  anitomy::KeywordOptions options;
-
-  bool found = anitomy::keyword_manager.Find(extension, category, options);
-  return found && options.valid;
+  return ValidateAnitomyElement(extension, anitomy::kElementFileExtension);
 }
 
 }  // namespace recognition

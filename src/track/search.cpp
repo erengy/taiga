@@ -54,7 +54,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
 
   anime::Item* anime_item = AnimeDatabase.FindItem(episode_.anime_id);
 
-  if (anime_item) {
+  if (anime_item && Meow.IsValidAnimeType(episode_)) {
     if (anime_item->GetFolder().empty())
       anime_item->SetFolder(AddTrailingSlash(root) + name);
 
@@ -86,7 +86,8 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
 
   anime::Item* anime_item = AnimeDatabase.FindItem(episode_.anime_id);
 
-  if (anime_item) {
+  if (anime_item && Meow.IsValidAnimeType(episode_) &&
+                    Meow.IsValidFileExtension(episode_)) {
     int upper_bound = anime::GetEpisodeHigh(episode_);
     int lower_bound = anime::GetEpisodeLow(episode_);
 
