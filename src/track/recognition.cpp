@@ -33,6 +33,12 @@
 #include "taiga/settings.h"
 #include "track/recognition.h"
 
+static enum NormalizationType {
+  kNormalizeMinimal,
+  kNormalizeForTrigrams,
+  kNormalizeFull,
+};
+
 track::recognition::Engine Meow;
 
 namespace track {
@@ -249,15 +255,16 @@ void Engine::UpdateTitles(const anime::Item& anime_item) {
                           Titles::container_t& titles,
                           Titles::container_t& normal_titles) {
     if (!title.empty()) {
+      Normalize(title, kNormalizeMinimal, false);
       titles[title].insert(anime_id);
 
-      Normalize(title, true);
+      Normalize(title, kNormalizeForTrigrams, true);
       trigram_container_t trigrams;
       GetTrigrams(title, trigrams);
       db_[anime_id].trigrams.push_back(trigrams);
       db_[anime_id].normal_titles.push_back(title);
 
-      ErasePunctuation(title);
+      Normalize(title, kNormalizeFull, true);
       normal_titles[title].insert(anime_id);
     }
   };
@@ -273,8 +280,7 @@ void Engine::UpdateTitles(const anime::Item& anime_item) {
   }
 }
 
-int Engine::LookUpTitle(const std::wstring& title,
-                        std::set<int>& anime_ids) const {
+int Engine::LookUpTitle(std::wstring title, std::set<int>& anime_ids) const {
   int anime_id = anime::ID_UNKNOWN;
 
   auto find_title = [&](const std::wstring& title,
@@ -289,6 +295,7 @@ int Engine::LookUpTitle(const std::wstring& title,
     }
   };
 
+  Normalize(title, kNormalizeMinimal, false);
   find_title(title, titles_.user);
   find_title(title, titles_.main);
   find_title(title, titles_.alternative);
@@ -296,12 +303,10 @@ int Engine::LookUpTitle(const std::wstring& title,
   if (anime_ids.size() == 1)
     return anime_id;
 
-  auto normal_title = title;
-  Normalize(normal_title);
-
-  find_title(normal_title, normal_titles_.user);
-  find_title(normal_title, normal_titles_.main);
-  find_title(normal_title, normal_titles_.alternative);
+  Normalize(title, kNormalizeFull, true);
+  find_title(title, normal_titles_.user);
+  find_title(title, normal_titles_.main);
+  find_title(title, normal_titles_.alternative);
 
   return anime_id;
 }
@@ -383,19 +388,30 @@ std::wstring Engine::GetTitleFromPath(anime::Episode& episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Engine::Normalize(std::wstring& title, bool for_trigrams) const {
-  ConvertRomanNumbers(title);
-  Transliterate(title);
-  NormalizeUnicode(title);  // Title is lower case after this point, due to UTF8PROC_CASEFOLD
-  ConvertOrdinalNumbers(title);
-  ConvertSeasonNumbers(title);
-  EraseUnnecessary(title);
+void Engine::Normalize(std::wstring& title, int type,
+                       bool normalized_before) const {
+  if (!normalized_before) {
+    ConvertRomanNumbers(title);
+    Transliterate(title);
+    NormalizeUnicode(title);  // Title is lower case after this point, due to UTF8PROC_CASEFOLD
+    ConvertOrdinalNumbers(title);
+    ConvertSeasonNumbers(title);
+    EraseUnnecessary(title);
+  }
 
-  if (for_trigrams) {
-    ErasePunctuation(title, true);
-    while (ReplaceString(title, 0, L"  ", L" ", false, true));
-  } else {
-    ErasePunctuation(title);
+  switch (type) {
+    case kNormalizeMinimal:
+      Trim(title);
+      while (ReplaceString(title, 0, L"  ", L" ", false, true));
+      break;
+    case kNormalizeForTrigrams:
+      ErasePunctuation(title, true);
+      while (ReplaceString(title, 0, L"  ", L" ", false, true));
+      break;
+    default:
+    case kNormalizeFull:
+      ErasePunctuation(title);
+      break;
   }
 }
 
@@ -496,6 +512,7 @@ void Engine::EraseUnnecessary(std::wstring& str) const {
   ReplaceString(str, 0, L"the", L"", true, true);
   ReplaceString(str, 0, L"episode", L"", true, true);
   ReplaceString(str, 0, L"specials", L"special", true, true);
+  ReplaceString(str, 0, L"(tv)", L"", true, true);
 }
 
 void Engine::ErasePunctuation(std::wstring& str, bool for_trigrams) const {
@@ -538,7 +555,7 @@ int Engine::ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids,
   scores_t trigram_results;
 
   auto normal_title = episode.anime_title();
-  Normalize(normal_title, true);
+  Normalize(normal_title, kNormalizeForTrigrams, false);
 
   trigram_container_t t1;
   GetTrigrams(normal_title, t1);

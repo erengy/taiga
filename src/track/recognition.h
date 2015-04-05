@@ -67,13 +67,13 @@ private:
   bool ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
   bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
 
-  int LookUpTitle(const std::wstring& title, std::set<int>& anime_ids) const;
+  int LookUpTitle(std::wstring title, std::set<int>& anime_ids) const;
   std::wstring GetTitleFromPath(anime::Episode& episode);
 
   int ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids, const MatchOptions& match_options);
   int ScoreTitle(const std::wstring& str, const anime::Episode& episode, const scores_t& trigram_results);
 
-  void Normalize(std::wstring& title, bool for_trigrams = false) const;
+  void Normalize(std::wstring& title, int type, bool normalized_before) const;
   void NormalizeUnicode(std::wstring& str) const;
   void ErasePunctuation(std::wstring& str, bool for_trigrams = false) const;
   void EraseUnnecessary(std::wstring& str) const;
