@@ -131,7 +131,9 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Post-processing
   if (anime::IsValidId(episode.anime_id)) {
-    if (!episode.episode_number()) {
+    // Here we check the element rather than episode_number(), in order to
+    // prevent overwriting episode 0.
+    if (episode.elements().empty(anitomy::kElementEpisodeNumber)) {
       if (!episode.file_extension().empty()) {
         episode.set_episode_number(1);
       } else {
@@ -203,9 +205,13 @@ bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
   if (!anime::IsValidEpisodeCount(anime_item.GetEpisodeCount()))
     return true;  // Episode count is unknown, so anything goes
 
+  if (episode.elements().empty(anitomy::kElementEpisodeNumber))
+    if (anime_item.GetEpisodeCount() > 1)
+      return false;
+
   auto range = episode.episode_number_range();
 
-  if (range.second <= anime_item.GetEpisodeCount())
+  if (range.second > 0 && range.second <= anime_item.GetEpisodeCount())
     return true;
 
   if (!match_options.allow_sequels)

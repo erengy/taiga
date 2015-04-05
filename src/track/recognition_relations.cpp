@@ -60,11 +60,11 @@ bool Relation::FindRange(int episode_number, int_pair_t& result) const {
   for (const auto& it : ranges_) {
     int distance = episode_number - it.r0.first;
     if (distance >= 0) {
-      if (!it.r0.second || it.r0.second - episode_number >= 0) {
+      if (it.r0.second - episode_number >= 0) {
         int destination = it.r1.first;
         if (it.r1.first != it.r1.second)
           destination += distance;
-        if (!it.r1.second || destination <= it.r1.second) {
+        if (destination <= it.r1.second) {
           result.first = it.id;
           result.second = destination;
           return true;
@@ -88,45 +88,41 @@ static bool ParseRule(const std::wstring& rule) {
   std::match_results<std::wstring::const_iterator> match_results;
 
   if (std::regex_match(rule, match_results, pattern)) {
-    int id0 = 0;
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        id0 = ToInt(match_results[1].str());
-        break;
-      case sync::kHummingbird:
-        id0 = ToInt(match_results[2].str());
-        break;
-    }
+    auto get_id = [&](size_t first, size_t second) {
+      switch (taiga::GetCurrentServiceId()) {
+        case sync::kMyAnimeList:
+          return ToInt(match_results[first].str());
+        case sync::kHummingbird:
+          return ToInt(match_results[second].str());
+        default:
+          return 0;
+      }
+    };
+
+    auto get_range = [&](size_t first, size_t second) {
+      std::pair<int, int> range;
+      range.first = ToInt(match_results[first].str());
+      if (match_results[second].matched) {
+        if (IsNumericString(match_results[second].str())) {
+          range.second = ToInt(match_results[second].str());
+        } else {
+          range.second = INT_MAX;
+        }
+      } else {
+        range.second = range.first;
+      }
+      return range;
+    };
+
+    int id0 = get_id(1, 2);
     if (!id0)
       return false;
+    auto r0 = get_range(3, 4);
 
-    std::pair<int, int> r0;
-    r0.first = ToInt(match_results[3].str());
-    if (match_results[4].matched) {
-      r0.second = ToInt(match_results[4].str());
-    } else {
-      r0.second = r0.first;
-    }
-
-    int id1 = 0;
-    switch (taiga::GetCurrentServiceId()) {
-      case sync::kMyAnimeList:
-        id1 = ToInt(match_results[5].str());
-        break;
-      case sync::kHummingbird:
-        id1 = ToInt(match_results[6].str());
-        break;
-    }
+    int id1 = get_id(5, 6);
     if (!id1)
       id1 = id0;
-
-    std::pair<int, int> r1;
-    r1.first = ToInt(match_results[7].str());
-    if (match_results[8].matched) {
-      r1.second = ToInt(match_results[8].str());
-    } else {
-      r1.second = r1.first;
-    }
+    auto r1 = get_range(7, 8);
 
     auto& relation = relations[id0];
     relation.AddRange(id1, r0, r1);
