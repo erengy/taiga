@@ -93,7 +93,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"\\b Author:\\b0\\line "
       L"Eren 'erengy' Okka\\line\\par "
       L"\\b Contributors:\\b0\\line "
-      L"saka, Diablofan, slevir, LordGravewish, cassist, rr-, sunjayc\\line\\par "
+      L"saka, Diablofan, slevir, LordGravewish, cassist, rr-, sunjayc, LordHaruto\\line\\par "
       L"\\b Third-party components:\\b0\\line "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/yusukekamiyamane/fugue-icons\"}}{\\fldrslt{Fugue Icons 3.4.5}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/open-source-parsers/jsoncpp\"}}{\\fldrslt{JsonCpp " + GetLibraryVersion(kJsoncpp) + L"}}}, "
