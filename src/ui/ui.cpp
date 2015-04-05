@@ -338,9 +338,13 @@ void OnLibraryUpdateFailure(int id, const string_t& reason) {
 
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids) {
   std::wstring content;
-  for (const auto& id : ids) {
-    auto anime_item = AnimeDatabase.FindItem(id);
-    AppendString(content, anime_item->GetTitle(), L"\n");
+  if (ids.size() < 20) {
+    for (const auto& id : ids) {
+      auto anime_item = AnimeDatabase.FindItem(id);
+      AppendString(content, anime_item->GetTitle(), L"\n");
+    }
+  } else {
+    content = L"Selected " + ToWstr(ids.size()) + L" entries";
   }
 
   win::TaskDialog dlg;
