@@ -143,7 +143,8 @@ void SeasonDatabase::Review(bool hide_nsfw) {
         invalid = true;
       if (invalid) {
         items.erase(items.begin() + i--);
-        LOG(LevelDebug, L"Removed item: \"" + anime_item->GetTitle() +
+        LOG(LevelDebug, L"Removed item: #" + ToWstr(anime_id) +
+                        L" \"" + anime_item->GetTitle() +
                         L"\" (" + std::wstring(anime_start) + L")");
       }
     }
@@ -161,8 +162,15 @@ void SeasonDatabase::Review(bool hide_nsfw) {
     if (anime_start.year && anime_start.month &&
         anime_start >= date_start && anime_start <= date_end) {
       items.push_back(it->second.GetId());
-      LOG(LevelDebug, L"Added item: \"" + it->second.GetTitle() +
-                      L"\" (" + std::wstring(anime_start) + L")");
+      LOGR(LevelDebug,
+          L"\t<anime>\n"
+          L"\t\t<type>" + ToWstr(it->second.GetType()) + L"</type>\n"
+          L"\t\t<id name=\"myanimelist\">" + ToWstr(it->second.GetId()) + L"</id>\n"
+          L"\t\t<id name=\"hummingbird\"></id>\n"
+          L"\t\t<producers>" + Join(it->second.GetProducers(), L", ") + L"</producers>\n"
+          L"\t\t<image>" + it->second.GetImageUrl() + L"</image>\n"
+          L"\t\t<title>" + it->second.GetTitle() + L"</title>\n"
+          L"\t</anime>\n");
     }
   }
 }

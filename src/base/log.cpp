@@ -42,27 +42,33 @@ Logger::Logger()
 }
 
 void Logger::Log(int severity_level, const std::wstring& file, int line,
-                 const std::wstring& function, std::wstring text) {
+                 const std::wstring& function, std::wstring text, bool raw) {
   win::Lock lock(critical_section_);
 
   if (severity_level <= severity_level_) {
-    Trim(text, L" \r\n");
-
     std::string output_text;
 
-    output_text += WstrToStr(std::wstring(GetDate()) + L" " + GetTime() + L" ");
-    output_text += "[" + std::string(SeverityLevels[severity_level]) + "] ";
-    output_text += WstrToStr(GetFileName(file) + L":" + ToWstr(line) + L" " + function + L" | ");
+    if (raw) {
+      output_text += WstrToStr(text);
 
-    std::string padding(output_text.length(), ' ');
-    std::vector<std::wstring> lines;
-    Split(text, L"\n", lines);
-    foreach_(it, lines) {
-      Trim(*it, L" \r");
-      if (!it->empty()) {
-        if (it != lines.begin())
-          output_text += padding;
-        output_text += WstrToStr(*it + L"\r\n");
+    } else {
+      Trim(text, L" \r\n");
+
+      output_text +=
+          WstrToStr(std::wstring(GetDate()) + L" " + GetTime() + L" ") +
+          "[" + std::string(SeverityLevels[severity_level]) + "] " +
+          WstrToStr(GetFileName(file) + L":" + ToWstr(line) + L" " + function + L" | ");
+
+      std::string padding(output_text.length(), ' ');
+      std::vector<std::wstring> lines;
+      Split(text, L"\n", lines);
+      foreach_(it, lines) {
+        Trim(*it, L" \r");
+        if (!it->empty()) {
+          if (it != lines.begin())
+            output_text += padding;
+          output_text += WstrToStr(*it + L"\r\n");
+        }
       }
     }
 
