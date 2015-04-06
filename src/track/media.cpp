@@ -240,8 +240,11 @@ std::wstring MediaPlayers::GetTitle(HWND hwnd, const std::wstring& class_name,
                                     int mode) {
   switch (mode) {
     // File handle
-    case kMediaModeFileHandle:
-      return GetTitleFromProcessHandle(hwnd);
+    case kMediaModeFileHandle: {
+      std::wstring title;
+      GetTitleFromProcessHandle(hwnd, 0, title);
+      return title;
+    }
     // Winamp API
     case kMediaModeWinampApi:
       return GetTitleFromWinampAPI(hwnd, false);
@@ -258,13 +261,13 @@ std::wstring MediaPlayers::GetTitle(HWND hwnd, const std::wstring& class_name,
     // Window title
     case kMediaModeWindowTitle:
     default: {
-      std::wstring title;
       auto method = Settings[taiga::kRecognition_MediaPlayerDetectionMethod];
-      if (method == L"prioritize_file_handle")
-        title = GetTitleFromProcessHandle(hwnd);
-      if (title.empty())
-        title = GetWindowTitle(hwnd);
-      return title;
+      if (method == L"prioritize_file_handle") {
+        std::wstring title;
+        if (GetTitleFromProcessHandle(hwnd, 0, title))
+          return title;
+      }
+      return GetWindowTitle(hwnd);
     }
   }
 }
@@ -381,30 +384,33 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
 #define IPC_GETPLAYLISTFILE  211
 #define IPC_GETPLAYLISTFILEW 214
 
-std::wstring MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id) {
-  if (hwnd != NULL && process_id == 0)
+bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
+                                             std::wstring& title) {
+  if (hwnd != nullptr && process_id == 0)
     GetWindowThreadProcessId(hwnd, &process_id);
 
   std::vector<std::wstring> files_vector;
 
-  if (GetProcessFiles(process_id, files_vector)) {
-    foreach_(it, files_vector) {
-      if (Meow.IsValidFileExtension(GetFileExtension(*it))) {
-        if (it->at(1) != L':') {
-          TranslateDeviceName(*it);
-        }
-        if (it->at(1) == L':') {
-          WCHAR buffer[4096] = {0};
-          GetLongPathName(it->c_str(), buffer, 4096);
-          return std::wstring(buffer);
-        } else {
-          return GetFileName(*it);
-        }
+  if (!GetProcessFiles(process_id, files_vector))
+    return false;
+
+  for (auto path : files_vector) {
+    if (Meow.IsValidFileExtension(GetFileExtension(path))) {
+      if (path.at(1) != L':') {
+        TranslateDeviceName(path);
       }
+      if (path.at(1) == L':') {
+        WCHAR buffer[4096] = {0};
+        GetLongPathName(path.c_str(), buffer, 4096);
+        title = std::wstring(buffer);
+      } else {
+        title = GetFileName(path);
+      }
+      break;
     }
   }
 
-  return std::wstring();
+  return true;
 }
 
 std::wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
@@ -473,8 +479,8 @@ std::wstring MediaPlayers::GetTitleFromMPlayer() {
     if (Process32First(hProcessSnap, &pe32)) {
       do {
         if (IsEqual(pe32.szExeFile, L"mplayer.exe")) {
-          title = GetTitleFromProcessHandle(NULL, pe32.th32ProcessID);
-          break;
+          if (GetTitleFromProcessHandle(NULL, pe32.th32ProcessID, title))
+            break;
         }
       } while (Process32Next(hProcessSnap, &pe32));
     }

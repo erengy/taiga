@@ -77,7 +77,7 @@ public:
   void EditTitle(std::wstring& str, const MediaPlayer* media_player);
   std::wstring GetTitle(HWND hwnd, const std::wstring& class_name, int mode);
 
-  std::wstring GetTitleFromProcessHandle(HWND hwnd, ULONG process_id = 0);
+  bool GetTitleFromProcessHandle(HWND hwnd, ULONG process_id, std::wstring& title);
   std::wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
   std::wstring GetTitleFromSpecialMessage(HWND hwnd, const std::wstring& class_name);
   std::wstring GetTitleFromMPlayer();
