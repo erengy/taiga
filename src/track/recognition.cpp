@@ -713,7 +713,7 @@ bool Engine::IsValidFileExtension(const anime::Episode& episode) const {
 }
 
 bool Engine::IsValidFileExtension(const std::wstring& extension) const {
-  if (extension.empty())
+  if (extension.empty() || extension.size() > 4)
     return false;
 
   return ValidateAnitomyElement(extension, anitomy::kElementFileExtension);
