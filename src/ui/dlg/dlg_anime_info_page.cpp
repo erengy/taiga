@@ -198,7 +198,8 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
       } else if (!Settings.library_folders.empty()) {
         default_path = Settings.library_folders.front();
       }
-      if (win::BrowseForFolder(GetWindowHandle(), L"Select Anime Folder", default_path, path)) {
+      if (win::BrowseForFolder(parent->GetWindowHandle(), L"Select Anime Folder",
+                               default_path, path)) {
         SetDlgItemText(IDC_EDIT_ANIME_FOLDER, path.c_str());
       }
       return TRUE;

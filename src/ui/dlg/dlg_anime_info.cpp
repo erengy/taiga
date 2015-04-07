@@ -105,6 +105,12 @@ BOOL AnimeDialog::OnInitDialog() {
   return TRUE;
 }
 
+
+void AnimeDialog::OnCancel() {
+  EndDialog(IDCANCEL);
+  DlgMain.SetFocus();
+}
+
 void AnimeDialog::OnOK() {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
@@ -113,6 +119,7 @@ void AnimeDialog::OnOK() {
       return;
 
   EndDialog(IDOK);
+  DlgMain.SetFocus();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
