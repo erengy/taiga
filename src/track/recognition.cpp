@@ -202,38 +202,41 @@ bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
                                    const anime::Item& anime_item,
                                    const MatchOptions& match_options,
                                    bool redirect) const {
-  if (!anime::IsValidEpisodeCount(anime_item.GetEpisodeCount()))
-    return true;  // Episode count is unknown, so anything goes
-
-  if (episode.elements().empty(anitomy::kElementEpisodeNumber))
-    if (anime_item.GetEpisodeCount() > 1)
-      return false;
+  if (episode.elements().empty(anitomy::kElementEpisodeNumber)) {
+    if (anime_item.GetEpisodeCount() == 1)
+      return true;  // Single-episode anime can do without an episode number
+    if (episode.file_extension().empty())
+      return true;  // It's a batch release
+  }
 
   auto range = episode.episode_number_range();
 
-  if (range.second > 0 && range.second <= anime_item.GetEpisodeCount())
-    return true;
-
-  if (!match_options.allow_sequels)
-    return false;  // Episode number is out of range
-
-  int destination_id = anime::ID_UNKNOWN;
-  std::pair<int, int> destination_range;
-
-  if (SearchEpisodeRedirection(anime_item.GetId(), range,
-                               destination_id, destination_range)) {
-    if (redirect) {
-      std::wstring text = L"Redirection: " +  ToWstr(anime_item.GetId()) +
-                          L":" + anime::GetEpisodeRange(episode) + L" -> ";
-      episode.anime_id = destination_id;
-      episode.set_episode_number_range(destination_range);
-      text += ToWstr(destination_id) + L":" + anime::GetEpisodeRange(episode);
-      LOG(LevelDebug, text);
-    }
-    return true;
+  if (range.second > 0 &&  // We need this to be able to redirect episode 0
+      range.second <= anime_item.GetEpisodeCount()) {
+    return true;  // Episode number is within range
   }
 
-  return false;
+  if (match_options.allow_sequels) {
+    int destination_id = anime::ID_UNKNOWN;
+    std::pair<int, int> destination_range;
+    if (SearchEpisodeRedirection(anime_item.GetId(), range,
+                                 destination_id, destination_range)) {
+      if (redirect) {
+        std::wstring text = L"Redirection: " + ToWstr(anime_item.GetId()) +
+                            L":" + anime::GetEpisodeRange(episode) + L" -> ";
+        episode.anime_id = destination_id;
+        episode.set_episode_number_range(destination_range);
+        text += ToWstr(destination_id) + L":" + anime::GetEpisodeRange(episode);
+        LOG(LevelDebug, text);
+      }
+      return true;  // Redirection available
+    }
+  }
+
+  if (!anime::IsValidEpisodeCount(anime_item.GetEpisodeCount()))
+    return true;  // Episode count is unknown, so anything goes
+
+  return false;  // Episode number is out of range
 }
 
 ////////////////////////////////////////////////////////////////////////////////
