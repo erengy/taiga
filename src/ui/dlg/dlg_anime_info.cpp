@@ -513,7 +513,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
   // Set content
   if (anime_id_ == anime::ID_NOTINLIST) {
-    std::wstring content = L"Taiga was unable to recognize this title, and it needs your help.\n\n";
+    std::wstring content = L"Taiga was unable to identify this title, and it needs your help.\n\n";
     auto scores = Meow.GetScores();
     if (!scores.empty()) {
       int count = 0;
@@ -548,10 +548,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
           if (std::find(anime_ids.begin(), anime_ids.end(),
                         it->anime_id) == anime_ids.end()) {
             auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-            if (anime_item->GetMyStatus() == anime::kCompleted ||
-                anime_item->GetMyStatus() == anime::kDropped)
-              continue;
-            anime_ids.push_back(it->anime_id);
+            if (anime_item->GetMyStatus() == anime::kWatching)
+              anime_ids.push_back(it->anime_id);
           }
         }
       }
@@ -571,7 +569,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         break;
     }
     if (content.empty()) {
-      content = L"Continue watching:\n"
+      content = L"Continue Watching:\n"
                 L"<a href=\"ScanEpisodesAll()\">Scan available episodes</a> to see recently watched anime. "
                 L"Or how about you <a href=\"PlayRandomAnime()\">try a random one</a>?\n\n";
       link_count += 2;
@@ -592,8 +590,11 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         if (date_diff <= day_limit)
           watched_last_week++;
       }
-      if (watched_last_week > 0)
-        content += L"You've watched " + ToWstr(watched_last_week) + L" episodes in the last week.\n\n";
+      if (watched_last_week > 0) {
+        content += L"You've watched " + ToWstr(watched_last_week) + L" ";
+        content += watched_last_week == 1 ? L"episode" : L"episodes";
+        content += L" in the last week.\n\n";
+      }
     }
 
     // Available episodes
@@ -602,13 +603,17 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       if (it->second.IsInList() && it->second.IsNextEpisodeAvailable())
         available_episodes++;
     }
-    if (available_episodes > 0)
-      content += L"There are at least " + ToWstr(available_episodes) +
-                 L" new episodes available in library folders.\n\n";
+    if (available_episodes > 0) {
+      content += L"There are at least " + ToWstr(available_episodes) + L" new ";
+      content += available_episodes == 1 ? L"episode" : L"episodes";
+      content += L" available in library folders.\n\n";
+    }
 
     // Airing times
     std::vector<int> recently_started, recently_finished, upcoming;
     foreach_c_(it, AnimeDatabase.items) {
+      if (it->second.GetMyStatus() != anime::kPlanToWatch)
+        continue;
       const Date& date_start = it->second.GetDateStart();
       const Date& date_end = it->second.GetDateEnd();
       if (date_start.year && date_start.month && date_start.day) {
@@ -642,12 +647,12 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += text;
     };
     if (!recently_started.empty()) {
-      content += L"Recently started airing:\n";
+      content += L"Recently Started Airing:\n";
       add_info_lines(recently_started);
       content += L"\n\n";
     }
     if (!recently_finished.empty()) {
-      content += L"Recently finished airing:\n";
+      content += L"Recently Finished Airing:\n";
       add_info_lines(recently_finished);
       content += L"\n\n";
     }
