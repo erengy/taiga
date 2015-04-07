@@ -247,6 +247,9 @@ bool Database::DeleteItem(int id) {
     auto& items = SeasonDatabase.items;
     items.erase(std::remove(items.begin(), items.end(), id), items.end());
 
+    if (CurrentEpisode.anime_id == id)
+      CurrentEpisode.Set(anime::ID_UNKNOWN);
+
     ui::OnAnimeDelete(id);
     return true;
   }

@@ -275,6 +275,8 @@ void OnLibraryEntryDelete(int id) {
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
 
+  DlgNowPlaying.Refresh(false, false, false, false);
+
   DlgSearch.RefreshList();
 
   if (DlgSeason.IsWindow())
@@ -504,6 +506,12 @@ void OnAnimeDelete(int id) {
 
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
+
+  if (DlgNowPlaying.GetCurrentId() == id) {
+    DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
+  } else {
+    DlgNowPlaying.Refresh(false, false, false, false);
+  }
 
   DlgSearch.RefreshList();
   DlgSeason.RefreshList();
