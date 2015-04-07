@@ -246,7 +246,7 @@ LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, 
 
     switch (msg->message) {
       case WM_MOUSEMOVE: {
-        POINT pt = {LOWORD(msg->lParam), HIWORD(msg->lParam)};
+        POINT pt = {GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam)};
         ScreenToClient(DlgMain.toolbar_wm.toolbar->GetWindowHandle(), &pt);
 
         int button_index = DlgMain.toolbar_wm.toolbar->HitTest(pt);
