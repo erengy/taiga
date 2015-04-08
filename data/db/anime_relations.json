@@ -162,6 +162,20 @@
 
 
 		{
+			"name": "Teekyuu -> ~ 2",
+			"rule": "15125|7217:13-24 -> 18121|7718:1-12"
+		},
+		{
+			"name": "Teekyuu -> ~ 3",
+			"rule": "15125|7217:25-36 -> 20473|7980:1-12"
+		},
+		{
+			"name": "Teekyuu -> ~ 4",
+			"rule": "15125|7217:37-? -> 26395|8906:1-?"
+		},
+
+
+		{
 			"name": "Kakumeiki Valvrave -> ~ 2nd Season",
 			"rule": "16668|7487:13-24 -> 18295|7698:1-12"
 		},
@@ -169,7 +183,6 @@
 			"name": "Kakumeiki Valvrave 2nd Season -> ~",
 			"rule": "18295|7698:13-24 -> ~|~:1-12"
 		},
-
 
 		{
 			"name": "Date A Live II -> Date A Live: Encore OVA",
