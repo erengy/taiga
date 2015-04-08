@@ -285,6 +285,21 @@ void MenuList::UpdateSeasonList(bool enabled) {
   }
 }
 
+void MenuList::UpdateTorrentsList(bool enabled) {
+  auto menu = menu_list_.FindMenu(L"TorrentListRightClick");
+  if (menu) {
+    foreach_(it, menu->items) {
+      // Info
+      if (it->action == L"Info") {
+        it->enabled = enabled;
+      // Quick filters
+      } else if (it->submenu == L"QuickFilters") {
+        it->enabled = enabled;
+      }
+    }
+  }
+}
+
 void MenuList::UpdateSeason() {
   // Group by
   auto menu = menu_list_.FindMenu(L"SeasonGroup");

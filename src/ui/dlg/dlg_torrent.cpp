@@ -165,18 +165,14 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
   if (pt.x == -1 || pt.y == -1)
     GetPopupMenuPositionForSelectedListItem(list_, pt);
 
+  ui::Menus.UpdateTorrentsList(anime::IsValidId(feed_item->episode_data.anime_id));
   std::wstring answer = ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"TorrentListRightClick");
 
   if (answer == L"DownloadTorrent") {
     Aggregator.Download(kFeedCategoryLink, feed_item);
 
   } else if (answer == L"Info") {
-    auto anime_id = feed_item->episode_data.anime_id;
-    if (anime_id) {
-      ShowDlgAnimeInfo(anime_id);
-    } else {
-      ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
-    }
+    ShowDlgAnimeInfo(feed_item->episode_data.anime_id);
 
   } else if (answer == L"DiscardTorrent") {
     feed_item->state = kFeedItemDiscardedNormal;

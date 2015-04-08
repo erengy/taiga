@@ -45,6 +45,7 @@ public:
   void UpdateScore(const anime::Item* anime_item);
   void UpdateSearchList(bool enabled = false);
   void UpdateSeasonList(bool enabled = false);
+  void UpdateTorrentsList(bool enabled = false);
   void UpdateSeason();
   void UpdateTools();
   void UpdateTray();
