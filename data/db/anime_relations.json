@@ -6,6 +6,12 @@
 
 	"rules": [
 		{
+			"name": "Kamichu! -> ~ Specials",
+			"rule": "489|7763:13-16 -> 3449|450:1-4"
+		},
+
+
+		{
 			"name": "Black Lagoon -> ~: The Second Barrage",
 			"rule": "889|789:13-24 -> 1519|1363:1-12"
 		},
@@ -163,6 +169,7 @@
 			"name": "Kakumeiki Valvrave 2nd Season -> ~",
 			"rule": "18295|7698:13-24 -> ~|~:1-12"
 		},
+
 
 		{
 			"name": "Date A Live II -> Date A Live: Encore OVA",
