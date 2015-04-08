@@ -217,10 +217,11 @@ bool PlayNextEpisode(int anime_id) {
   if (!anime_item)
     return false;
 
-  int number = 1;
-  if (anime_item->GetEpisodeCount() != 1 &&
-      anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode())
-    number = anime_item->GetMyLastWatchedEpisode() + 1;
+  int number = anime_item->GetMyLastWatchedEpisode() + 1;
+
+  if (IsValidEpisodeCount(anime_item->GetEpisodeCount()))
+    if (number > anime_item->GetEpisodeCount())
+      number = 1;  // Play the first episode of completed series
 
   return PlayEpisode(anime_id, number);
 }
