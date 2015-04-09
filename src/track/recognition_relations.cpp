@@ -19,7 +19,6 @@
 #include <regex>
 
 #include "base/file.h"
-#include "base/json.h"
 #include "base/log.h"
 #include "base/version.h"
 #include "sync/service.h"
@@ -138,25 +137,68 @@ bool Engine::ReadRelations() {
   std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnimeRelations);
   std::string document;
 
-  if (ReadFromFile(path, document)) {
-    Json::Reader reader;
-    Json::Value root;
-    if (reader.parse(document, root)) {
-      base::SemanticVersion version = StrToWstr(root["meta"]["version"].asString());
-      if (version > Taiga.version)
-        LOG(LevelDebug, L"Anime relations version is larger than application version.");
-      for (const auto& item : root["rules"]) {
-        auto rule = StrToWstr(item["rule"].asString());
-        if (!ParseRule(rule)) {
-          LOG(LevelWarning, L"Could not parse rule: " + rule);
-        }
+  if (!ReadFromFile(path, document)) {
+    LOG(LevelWarning, L"Could not read anime relations data.");
+    return false;
+  }
+
+  std::vector<std::wstring> lines;
+  Split(StrToWstr(document), L"\n", lines);
+
+  enum FileSections {
+    kUnknownSection,
+    kMetaSection,
+    kRulesSection,
+  };
+  auto current_section = kUnknownSection;
+
+  for (auto& line : lines) {
+    Trim(line, L"\r ");
+
+    if (line.empty())
+      continue;
+    if (line.front() == L'#')  // comment
+      continue;
+
+    if (StartsWith(line, L"::")) {
+      auto section = line.substr(2);
+      if (section == L"meta") {
+        current_section = kMetaSection;
+      } else if (section == L"rules") {
+        current_section = kRulesSection;
+      } else {
+        current_section = kUnknownSection;
       }
-      return true;
+      continue;
+    }
+
+    switch (current_section) {
+      case kMetaSection: {
+        TrimLeft(line, L"- ");
+        static const std::wregex pattern(L"([a-z_]+): (.+)");
+        std::match_results<std::wstring::const_iterator> match_results;
+        if (std::regex_match(line, match_results, pattern)) {
+          auto name = match_results[1].str();
+          auto value = match_results[2].str();
+          if (name == L"version") {
+            base::SemanticVersion version(value);
+            if (version > Taiga.version)
+              LOG(LevelDebug, L"Anime relations version is larger than "
+                              L"application version.");
+          }
+        }
+        break;
+      }
+      case kRulesSection: {
+        TrimLeft(line, L"- ");
+        if (!ParseRule(line))
+          LOG(LevelWarning, L"Could not parse rule: " + line);
+        break;
+      }
     }
   }
 
-  LOG(LevelWarning, L"Could not read anime relations data.");
-  return false;
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

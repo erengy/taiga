@@ -1,0 +1,132 @@
+# This file includes anime relation data for Taiga. It is used to redirect an
+# episode to another, which is required to handle special episodes and the case
+# where fansub groups use continuous numbering scheme in their releases.
+#
+# Rule format must be:
+#   {pattern} -> {pattern}
+#
+# Pattern must be:
+#   {myanimelist-id}|{hummingbird-id}:{episode}
+#
+# Episode format can be one of the following:
+#   {number}
+#   {number}-{number}
+#   {number}-?
+#
+# Rules are sorted alphabetically by anime title.
+#
+# If you are editing this file in the installation directory of Taiga, be aware
+# that it may be overwritten next time you update the application.
+#
+# The latest version of this file can be found at:
+#   <https://github.com/erengy/taiga>
+#
+# This file is in the public domain.
+
+::meta
+
+# Do not change these lines.
+- version: 1.2.0
+- last_modified: 2015-04-08
+
+::rules
+
+# Aldnoah.Zero -> ~ 2nd Season
+- 22729|8297:13-24 -> 27655|9136:1-12
+
+# Black Lagoon -> ~: The Second Barrage
+- 889|789:13-24 -> 1519|1363:1-12
+
+# Break Blade 1 -> ~ 2,3,4,5,6
+- 6772|4708:2 -> 8514|5366:1
+- 6772|4708:3 -> 9252|5645:1
+- 6772|4708:4 -> 9465|5743:1
+- 6772|4708:5 -> 9724|5837:1
+- 6772|4708:6 -> 10092|6031:1
+
+# Date A Live II -> Date A Live: Encore OVA
+- 19163|7864:11 -> 22961|8511:1
+
+# Fate/stay night: Unlimited Blade Works (TV) -> ~ Episode 0
+- 22297|7882:0 -> 27821|9718:1
+# Fate/stay night: Unlimited Blade Works (TV) -> ~ 2nd Season
+- 22297|7882:13-? -> 28701|10052:1-?
+# Fate/stay night: Unlimited Blade Works (TV) 2nd Season -> ~
+- 28701|10052:13-? -> ~|~:1-?
+
+# Fate/Zero -> ~ 2nd Season
+- 10087|6028:14-25 -> 11741|7658:1-12
+# Fate/Zero 2nd Season -> ~
+- 11741|7658:14-25 -> ~|~:1-12
+
+# Gintama -> ~'
+- 918|818:202-252 -> 9969|5971:1-51
+# Gintama -> ~': Enchousen
+- 918|818:253-265 -> 15417|7253:1-13
+# Gintama -> ~' (2015)
+- 918|818:266-? -> 28977|10083:1-?
+
+# JoJo's Bizarre Adventure: Stardust Crusaders -> ~ 2nd Season
+- 20899|8063:25-? -> 26055|8739:1-?
+# JoJo's Bizarre Adventure: Stardust Crusaders 2nd Season -> ~
+- 26055|8739:25-? -> ~|~:1-?
+
+# Kakumeiki Valvrave -> ~ 2nd Season
+- 16668|7487:13-24 -> 18295|7698:1-12
+# Kakumeiki Valvrave 2nd Season -> ~
+- 18295|7698:13-24 -> ~|~:1-12
+
+# Kamichu! -> ~ Specials
+- 489|7763:13-16 -> 3449|450:1-4
+
+# Kara no Kyoukai 1 -> ~ 2,3,4,5,6,7
+- 2593|2357:2 -> 3782|3248:1
+- 2593|2357:3 -> 3783|3249:1
+- 2593|2357:4 -> 4280|3545:1
+- 2593|2357:5 -> 4282|3546:1
+- 2593|2357:6 -> 5204|3983:1
+- 2593|2357:7 -> 5205|3984:1
+
+# Kokoro Connect -> ~ Michi Random
+- 11887|6626:14-17 -> 16001|7355:1-4
+
+# Kuroko no Basket -> ~ 2nd Season
+- 11771|6595:26-50 -> 16894|7545:1-25
+# Kuroko no Basket 2nd Season -> ~
+- 16894|7545:26-50 -> ~|~:1-25
+# Kuroko no Basket -> ~ 3rd Season
+- 11771|6595:51-? -> 24415|8524:1-?
+# Kuroko no Basket 3rd Season -> ~
+- 24415|8524:51-? -> ~|~:1-?
+
+# Mushishi Zoku Shou -> ~ Special
+- 21939|8204:11-12 -> 24687|8519:1
+# Mushishi Zoku Shou -> ~ 2nd Season
+- 21939|8204:13-22 -> 24701|8581:1-10
+
+# Ore no Imouto ga Konnani Kawaii Wake ga Nai -> ~ Specials
+- 8769|5487:13-15 -> 10020|5998:2-4
+# Ore no Imouto ga Konnani Kawaii Wake ga Nai. -> ~ Specials
+- 13659|7006:14-16 -> 18857|7822:1-3
+
+# Tegami Bachi -> ~ Reverse
+- 6444|4564:26-50 -> 8311|5288:1-25
+# Tegami Bachi Reverse -> ~
+- 8311|5288:26-50 -> ~|~:1-25
+
+# The iDOLM@STER -> ~: 765 Pro to Iu Monogatari
+- 10278|6111:765 -> 11889|6627:1
+
+# Towa no Quon 1 -> ~ 2,3,4,5,6
+- 10294|6116:2 -> 10713|6310:1
+- 10294|6116:3 -> 10714|6311:1
+- 10294|6116:4 -> 10715|6312:1
+- 10294|6116:5 -> 10716|6313:1
+- 10294|6116:6 -> 10717|6314:1
+
+# Teekyuu -> ~ 2
+- 15125|7217:13-24 -> 18121|7718:1-12
+# Teekyuu -> ~ 3
+- 15125|7217:25-36 -> 20473|7980:1-12
+# Teekyuu -> ~ 4
+- 15125|7217:37-? -> 26395|8906:1-?
