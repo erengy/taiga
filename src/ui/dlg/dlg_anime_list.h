@@ -66,6 +66,7 @@ public:
   int GetCurrentId();
   std::vector<int> GetCurrentIds();
   anime::Item* GetCurrentItem();
+  int GetCurrentStatus();
   void RebuildIdCache();
 
   int GetListIndex(int anime_id);

@@ -243,10 +243,8 @@ void OnLibraryEntryAdd(int id) {
   if (DlgAnime.GetCurrentId() == id)
     DlgAnime.Refresh(false, false, true, false);
 
-  auto anime_item = AnimeDatabase.FindItem(id);
-  int status = anime_item->GetMyStatus();
-  DlgAnimeList.RefreshList(status);
-  DlgAnimeList.RefreshTabs(status);
+  DlgAnimeList.RefreshList();
+  DlgAnimeList.RefreshTabs();
 
   if (DlgNowPlaying.GetCurrentId() == id)
     DlgNowPlaying.Refresh();
@@ -545,7 +543,8 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
   int list_status = anime_item.GetMyStatus();
   if (anime_item.GetMyRewatching())
     list_status = anime::kWatching;
-  if (list_status != anime::kNotInList) {
+  if (list_status != anime::kNotInList &&
+      list_status != DlgAnimeList.GetCurrentStatus()) {
     DlgAnimeList.RefreshList(list_status);
     DlgAnimeList.RefreshTabs(list_status);
   }

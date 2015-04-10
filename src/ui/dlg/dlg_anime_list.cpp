@@ -1159,6 +1159,10 @@ anime::Item* AnimeListDialog::GetCurrentItem() {
   return AnimeDatabase.FindItem(GetCurrentId());
 }
 
+int AnimeListDialog::GetCurrentStatus() {
+  return current_status_;
+}
+
 int AnimeListDialog::GetListIndex(int anime_id) {
   auto it = listview.id_cache.find(anime_id);
   return it != listview.id_cache.end() ? it->second : -1;
