@@ -93,7 +93,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   if (give_score)
     scores_.clear();
 
-  auto valide_ids = [&]() {
+  auto valide_ids = [&](anime::Episode& episode) {
     for (auto it = anime_ids.begin(); it != anime_ids.end(); ) {
       if (!ValidateOptions(episode, *it, match_options, true)) {
         it = anime_ids.erase(it);
@@ -107,14 +107,22 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Look up the title in our database
   LookUpTitle(episode.anime_title(), anime_ids);
-  valide_ids();
+  valide_ids(episode);
 
   // Look up parent directories
   if (anime_ids.empty() && !episode.folder.empty()) {
-    auto title = GetTitleFromPath(episode);
-    if (!title.empty()) {
-      LookUpTitle(title, anime_ids);
-      valide_ids();
+    anime::Episode episode_from_directory;
+    if (GetTitleFromPath(episode, episode_from_directory)) {
+      LookUpTitle(episode_from_directory.anime_title(), anime_ids);
+      valide_ids(episode_from_directory);
+      if (!anime_ids.empty()) {
+        if (episode_from_directory.anime_season())
+          episode.set_anime_season(episode_from_directory.anime_season());
+        if (episode_from_directory.episode_number())
+          episode.set_episode_number(episode_from_directory.episode_number());
+        LOG(LevelDebug, L"Parent directory lookup succeeded: " +
+                        episode_from_directory.anime_title());
+      }
     }
   }
 
@@ -320,7 +328,11 @@ int Engine::LookUpTitle(std::wstring title, std::set<int>& anime_ids) const {
   return anime_id;
 }
 
-std::wstring Engine::GetTitleFromPath(anime::Episode& episode) {
+bool Engine::GetTitleFromPath(const anime::Episode& episode,
+                              anime::Episode& output) {
+  if (episode.folder.empty())
+    return false;
+
   std::wstring path = episode.folder;
 
   for (const auto& library_folder : Settings.library_folders) {
@@ -334,12 +346,13 @@ std::wstring Engine::GetTitleFromPath(anime::Episode& episode) {
   std::vector<std::wstring> directories;
   Tokenize(path, L"\\/", directories);
 
-  auto is_invalid_string = [](const std::wstring& str) {
+  auto is_invalid_string = [](std::wstring str) {
     if (str.find(L':') != str.npos)  // drive letter
       return true;
     static std::set<std::wstring> invalid_strings{
-      L"Anime", L"Download", L"Downloads",
+      L"anime", L"download", L"downloads", L"extra", L"extras",
     };
+    ToLower(str);
     return invalid_strings.count(str) > 0;
   };
 
@@ -356,8 +369,6 @@ std::wstring Engine::GetTitleFromPath(anime::Episode& episode) {
     return 0;
   };
 
-  std::wstring title;
-
   int current_depth = 0;
   const int max_allowed_depth = 1;
 
@@ -367,33 +378,32 @@ std::wstring Engine::GetTitleFromPath(anime::Episode& episode) {
     const auto& directory = *it;
     if (directory.empty() || is_invalid_string(directory))
       break;
-    int season_number = get_season_number(directory);
-    if (season_number) {
-      if (!episode.anime_season())
-        episode.set_anime_season(season_number);
-      continue;
+    int number = get_season_number(directory);
+    if (number) {
+      if (!output.anime_season())
+        output.set_anime_season(number);
     } else {
-      title = directory;
+      output.set_anime_title(directory);
       break;
     }
   }
+
+  if (output.anime_title().empty())
+    return false;
 
   auto find_number_in_string = [](const std::wstring& str) {
     auto it = std::find_if(str.begin(), str.end(), IsNumericChar);
     return it == str.end() ? str.npos : (it - str.begin());
   };
 
-  if (!title.empty() &&
-      episode.elements().empty(anitomy::kElementEpisodeNumber)) {
+  if (episode.elements().empty(anitomy::kElementEpisodeNumber)) {
     const auto& filename = episode.file_name();
     auto pos = find_number_in_string(filename);
-    if (pos != filename.npos) {
-      int number = ToInt(filename.substr(pos));
-      episode.set_episode_number(number);
-    }
+    if (pos == 0)  // begins with a number (e.g. "01.mkv", "02 - Title.mkv")
+      output.set_episode_number(ToInt(filename.substr(pos)));
   }
 
-  return title;
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
