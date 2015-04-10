@@ -82,7 +82,7 @@ static bool ParseRule(const std::wstring& rule) {
   static std::wstring episode_pattern = L"(\\d+)(?:-(\\d+|\\?))?";
   static const std::wregex pattern(
       id_pattern + L"\\|" + id_pattern + L":" + episode_pattern + L" -> " +
-      id_pattern + L"\\|" + id_pattern + L":" + episode_pattern);
+      id_pattern + L"\\|" + id_pattern + L":" + episode_pattern + L"(!)?");
 
   std::match_results<std::wstring::const_iterator> match_results;
 
@@ -123,8 +123,11 @@ static bool ParseRule(const std::wstring& rule) {
       id1 = id0;
     auto r1 = get_range(7, 8);
 
-    auto& relation = relations[id0];
-    relation.AddRange(id1, r0, r1);
+    relations[id0].AddRange(id1, r0, r1);
+
+    if (match_results[9].matched)
+      relations[id1].AddRange(id1, r0, r1);
+
     return true;
   }
 
