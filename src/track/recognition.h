@@ -75,7 +75,7 @@ private:
 
   void Normalize(std::wstring& title, int type, bool normalized_before) const;
   void NormalizeUnicode(std::wstring& str) const;
-  void ErasePunctuation(std::wstring& str, bool for_trigrams = false) const;
+  void ErasePunctuation(std::wstring& str, int type) const;
   void EraseUnnecessary(std::wstring& str) const;
   void ConvertOrdinalNumbers(std::wstring& str) const;
   void ConvertRomanNumbers(std::wstring& str) const;

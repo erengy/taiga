@@ -36,6 +36,7 @@
 static enum NormalizationType {
   kNormalizeMinimal,
   kNormalizeForTrigrams,
+  kNormalizeForLookup,
   kNormalizeFull,
 };
 
@@ -270,14 +271,14 @@ void Engine::UpdateTitles(const anime::Item& anime_item) {
                           Titles::container_t& titles,
                           Titles::container_t& normal_titles) {
     if (!title.empty()) {
-      Normalize(title, kNormalizeMinimal, false);
-      titles[title].insert(anime_id);
-
-      Normalize(title, kNormalizeForTrigrams, true);
+      Normalize(title, kNormalizeForTrigrams, false);
       trigram_container_t trigrams;
       GetTrigrams(title, trigrams);
       db_[anime_id].trigrams.push_back(trigrams);
       db_[anime_id].normal_titles.push_back(title);
+
+      Normalize(title, kNormalizeForLookup, true);
+      titles[title].insert(anime_id);
 
       Normalize(title, kNormalizeFull, true);
       normal_titles[title].insert(anime_id);
@@ -310,7 +311,7 @@ int Engine::LookUpTitle(std::wstring title, std::set<int>& anime_ids) const {
     }
   };
 
-  Normalize(title, kNormalizeMinimal, false);
+  Normalize(title, kNormalizeForLookup, false);
   find_title(title, titles_.user);
   find_title(title, titles_.main);
   find_title(title, titles_.alternative);
@@ -414,22 +415,21 @@ void Engine::Normalize(std::wstring& title, int type,
     ConvertOrdinalNumbers(title);
     ConvertSeasonNumbers(title);
     EraseUnnecessary(title);
+    Trim(title);
   }
 
   switch (type) {
     case kNormalizeMinimal:
-      Trim(title);
-      while (ReplaceString(title, 0, L"  ", L" ", false, true));
       break;
     case kNormalizeForTrigrams:
-      ErasePunctuation(title, true);
-      while (ReplaceString(title, 0, L"  ", L" ", false, true));
-      break;
-    default:
+    case kNormalizeForLookup:
     case kNormalizeFull:
-      ErasePunctuation(title);
+      ErasePunctuation(title, type);
       break;
   }
+
+  if (type < kNormalizeFull)
+    while (ReplaceString(title, 0, L"  ", L" ", false, true));
 }
 
 void Engine::ConvertOrdinalNumbers(std::wstring& str) const {
@@ -532,29 +532,38 @@ void Engine::EraseUnnecessary(std::wstring& str) const {
   ReplaceString(str, 0, L"(tv)", L"", true, true);
 }
 
-void Engine::ErasePunctuation(std::wstring& str, bool for_trigrams) const {
-  bool is_trailing = for_trigrams;
+void Engine::ErasePunctuation(std::wstring& str, int type) const {
+  bool erase_trailing = type == kNormalizeFull;
+  bool erase_whitespace = type >= kNormalizeForLookup;
+  bool is_trailing = true;
 
   auto is_removable = [&](const wchar_t c) {
     // Control codes, white-space and punctuation characters
-    if (c <= 0xFF && !IsAlphanumericChar(c))
-      if (!for_trigrams ||
-          (c != L' ' && (!is_trailing || (c != L')' && c != L']'))))
-        return true;
+    if (c <= 0xFF && !IsAlphanumericChar(c)) {
+      switch (c) {
+        case L' ':
+          return erase_whitespace;
+        case L')':
+        case L']':
+          return !is_trailing;
+        default:
+          return true;
+      }
     // Unicode stars, hearts, notes, etc.
-    if (c > 0x2000 && c < 0x2767)
+    } else if (c > 0x2000 && c < 0x2767) {
       return true;
+    }
     // Valid character
     return false;
   };
 
-  auto it_end = !for_trigrams ? str.end() :
+  auto it_end = erase_trailing ? str.end() :
       std::find_if_not(str.rbegin(), str.rend(), is_removable).base();
   is_trailing = false;
 
   auto it = std::remove_if(str.begin(), it_end, is_removable);
 
-  if (for_trigrams)
+  if (!erase_trailing)
     it = std::copy(it_end, str.end(), it);
 
   if (it != str.end())
