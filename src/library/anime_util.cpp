@@ -320,6 +320,9 @@ bool LinkEpisodeToAnime(Episode& episode, int anime_id) {
   episode.anime_id = anime_id;
   anime_item->AddtoUserList();
 
+  if (episode.elements().empty(anitomy::kElementEpisodeNumber))
+    episode.set_episode_number(1);
+
   auto synonyms = anime_item->GetUserSynonyms();
   synonyms.push_back(CurrentEpisode.anime_title());
   anime_item->SetUserSynonyms(synonyms);
