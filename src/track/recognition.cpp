@@ -111,17 +111,15 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Look up parent directories
   if (anime_ids.empty() && !episode.folder.empty()) {
-    anime::Episode episode_from_directory;
-    if (GetTitleFromPath(episode, episode_from_directory)) {
+    anime::Episode episode_from_directory(episode);
+    episode_from_directory.elements().erase(anitomy::kElementAnimeTitle);
+    if (GetTitleFromPath(episode_from_directory)) {
       LookUpTitle(episode_from_directory.anime_title(), anime_ids);
       valide_ids(episode_from_directory);
       if (!anime_ids.empty()) {
-        if (episode_from_directory.anime_season())
-          episode.set_anime_season(episode_from_directory.anime_season());
-        if (episode_from_directory.episode_number())
-          episode.set_episode_number(episode_from_directory.episode_number());
+        std::swap(episode_from_directory, episode);
         LOG(LevelDebug, L"Parent directory lookup succeeded: " +
-                        episode_from_directory.anime_title());
+                        episode.anime_title());
       }
     }
   }
@@ -328,8 +326,7 @@ int Engine::LookUpTitle(std::wstring title, std::set<int>& anime_ids) const {
   return anime_id;
 }
 
-bool Engine::GetTitleFromPath(const anime::Episode& episode,
-                              anime::Episode& output) {
+bool Engine::GetTitleFromPath(anime::Episode& episode) {
   if (episode.folder.empty())
     return false;
 
@@ -380,15 +377,15 @@ bool Engine::GetTitleFromPath(const anime::Episode& episode,
       break;
     int number = get_season_number(directory);
     if (number) {
-      if (!output.anime_season())
-        output.set_anime_season(number);
+      if (!episode.anime_season())
+        episode.set_anime_season(number);
     } else {
-      output.set_anime_title(directory);
+      episode.set_anime_title(directory);
       break;
     }
   }
 
-  if (output.anime_title().empty())
+  if (episode.anime_title().empty())
     return false;
 
   auto find_number_in_string = [](const std::wstring& str) {
@@ -400,7 +397,7 @@ bool Engine::GetTitleFromPath(const anime::Episode& episode,
     const auto& filename = episode.file_name();
     auto pos = find_number_in_string(filename);
     if (pos == 0)  // begins with a number (e.g. "01.mkv", "02 - Title.mkv")
-      output.set_episode_number(ToInt(filename.substr(pos)));
+      episode.set_episode_number(ToInt(filename.substr(pos)));
   }
 
   return true;

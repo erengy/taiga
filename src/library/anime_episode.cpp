@@ -65,7 +65,7 @@ std::wstring Episode::audio_terms() const {
   return GetElementsAsString(anitomy::kElementAudioTerm);
 }
 
-const anitomy::Elements& Episode::elements() const {
+anitomy::Elements& Episode::elements() {
   return elements_;
 }
 
