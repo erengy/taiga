@@ -14,6 +14,9 @@
 #   (4) Appending "!" to a rule is a shorthand for creating a new rule where
 #       destination ID is redirected to itself
 #
+# Get Hummingbird IDs using the api search function
+# e.g. http://hummingbird.me/api/v1/search/anime?query=Kamichu
+#
 # If you are editing this file in the installation directory of Taiga, be aware
 # that it may be overwritten next time you update the application.
 #
@@ -26,7 +29,7 @@
 
 # Do not change these lines.
 - version: 1.2.0
-- last_modified: 2015-04-10
+- last_modified: 2015-04-12
 
 ::rules
 
