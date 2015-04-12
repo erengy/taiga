@@ -9,8 +9,11 @@
 #     1     2            3               1     2            3          4
 #
 #   (1) MyAnimeList ID
+#       <http://myanimelist.net/anime/{id}/{title}>
 #   (2) Hummingbird ID
-#   (3) Episode number or range ("?" is used for unknown episode count)
+#       <http://hummingbird.me/api/v1/search/anime?query={title}>
+#   (3) Episode number or range
+#       ("?" is used for unknown episode count)
 #   (4) Appending "!" to a rule is a shorthand for creating a new rule where
 #       destination ID is redirected to itself
 #
@@ -24,14 +27,19 @@
 
 ::meta
 
-# Do not change these lines.
+# Do not change this line.
 - version: 1.2.0
-- last_modified: 2015-04-10
+
+# Update this date when you add, remove or modify a rule.
+- last_modified: 2015-04-12
 
 ::rules
 
 # Aldnoah.Zero -> ~ 2nd Season
 - 22729|8297:13-24 -> 27655|9136:1-12
+
+# Amagami SS -> ~: Imouto
+- 8676|5435:26 -> 9925|5943:1
 
 # Another -> ~: The Other - Inga
 - 11111|6462:0 -> 11701|6569:1
