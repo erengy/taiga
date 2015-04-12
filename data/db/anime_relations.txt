@@ -33,6 +33,9 @@
 # Aldnoah.Zero -> ~ 2nd Season
 - 22729|8297:13-24 -> 27655|9136:1-12
 
+# Amagami SS -> ~: Imouto
+- 8676|5435:26 -> 9925|5943:1
+
 # Black Lagoon -> ~: The Second Barrage
 - 889|789:13-24 -> 1519|1363:1-12
 
