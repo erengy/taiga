@@ -529,7 +529,10 @@ void Engine::EraseUnnecessary(std::wstring& str) const {
   ReplaceString(str, 0, L"&", L"and", true, true);
   ReplaceString(str, 0, L"the", L"", true, true);
   ReplaceString(str, 0, L"episode", L"", true, true);
-  ReplaceString(str, 0, L"specials", L"special", true, true);
+  ReplaceString(str, 0, L"oad", L"ova", true, true);
+  ReplaceString(str, 0, L"oav", L"ova", true, true);
+  ReplaceString(str, 0, L"specials", L"sp", true, true);
+  ReplaceString(str, 0, L"special", L"sp", true, true);
   ReplaceString(str, 0, L"(tv)", L"", true, true);
 }
 
