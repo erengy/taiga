@@ -33,8 +33,14 @@
 # Aldnoah.Zero -> ~ 2nd Season
 - 22729|8297:13-24 -> 27655|9136:1-12
 
+# Another -> ~: The Other - Inga
+- 11111|6462:0 -> 11701|6569:1
+
 # Black Lagoon -> ~: The Second Barrage
 - 889|789:13-24 -> 1519|1363:1-12
+
+# Boku wa Tomodachi ga Sukunai -> ~ Episode 0
+- 10719|6316:0 -> 10897|6397:1
 
 # Break Blade 1 -> ~ 2,3,4,5,6
 - 6772|4708:2 -> 8514|5366:1
@@ -42,6 +48,9 @@
 - 6772|4708:4 -> 9465|5743:1
 - 6772|4708:5 -> 9724|5837:1
 - 6772|4708:6 -> 10092|6031:1
+
+# Candy Boy -> Candy☆Boy
+- 4535|3668:0 -> 3456|3022:1
 
 # Date A Live II -> Date A Live: Encore OVA
 - 19163|7864:11 -> 22961|8511:1
@@ -61,8 +70,19 @@
 # Gintama -> ~' (2015)
 - 918|818:266-? -> 28977|10083:1-?
 
+# Guilty Crown -> ~: Lost Christmas
+- 10793|6349:0 -> 13411|6958:1
+
+# Hayate no Gotoku!! -> ~: Atsu ga Natsuize - Mizugihen!
+- 4192|3514:0 -> 5521|4133:1
+
 # JoJo's Bizarre Adventure: Stardust Crusaders -> ~ 2nd Season
 - 20899|8063:25-? -> 26055|8739:1-?!
+
+# K-On! -> ~: Live House!
+- 5680|4240:14 -> 6862|4758:1
+# K-On!! -> ~: Keikaku!
+- 7791|5124:27 -> 9734|5841:1
 
 # Kakumeiki Valvrave -> ~ 2nd Season
 - 16668|7487:13-24 -> 18295|7698:1-12!
@@ -78,23 +98,60 @@
 - 2593|2357:6 -> 5204|3983:1
 - 2593|2357:7 -> 5205|3984:1
 
+# Kimi ni Todoke 2nd Season -> ~: Kataomoi
+- 9656|5820:0 -> 10152|6055:1
+
 # Kokoro Connect -> ~ Michi Random
 - 11887|6626:14-17 -> 16001|7355:1-4
+
+# Kore wa Zombie Desu ka? -> ~ OVA
+- 8841|5507:13 -> 10209|6079:1
+# Kore wa Zombie Desu ka? of the Dead -> Kore wa Zombie Desu ka? OVA
+- 10790|6347:0 -> 10209|6079:2
+# Kore wa Zombie Desu ka? of the Dead -> ~ OVA
+- 10790|6347:11 -> 15437|7256:1
 
 # Kuroko no Basket -> ~ 2nd Season
 - 11771|6595:26-50 -> 16894|7545:1-25!
 # Kuroko no Basket -> ~ 3rd Season
 - 11771|6595:51-? -> 24415|8524:1-?!
 
+# Kyoukai no Kanata -> ~: Shinonome
+- 18153|7714:0 -> 23385|8379:1
+
+# Kyousou Giga -> ~ (TV) Recaps
+- 10893|6396:0 -> 20723|8050:1
+# Kyousou Giga (TV) -> ~ Recaps
+- 19703|7870:0 -> 20723|8050:1
+
 # Mushishi Zoku Shou -> ~ Special
 - 21939|8204:11-12 -> 24687|8519:1
 # Mushishi Zoku Shou -> ~ 2nd Season
 - 21939|8204:13-22 -> 24701|8581:1-10
 
+# Nichijou -> ~: Nichijou no 0-wa
+- 10165|6062:0 -> 8857|5512:1
+
+# Nodame Cantabile Finale -> ~ Special
+- 5690|4248:0 -> 8038|5177:1
+
 # Ore no Imouto ga Konnani Kawaii Wake ga Nai -> ~ Specials
 - 8769|5487:13-15 -> 10020|5998:2-4
 # Ore no Imouto ga Konnani Kawaii Wake ga Nai. -> ~ Specials
 - 13659|7006:14-16 -> 18857|7822:1-3
+
+# Saenai Heroine no Sodatekata -> ~: Ai to Seishun no Service Kai
+- 23277|8406:0 -> 29317|10225:1
+
+# Sankarea -> ~ OVA
+- 11499|6521:0 -> 13055|6873:1
+# Sankarea -> ~: Wagahai mo... Zombie de Aru...
+- 11499|6521:13 -> 16694|7492:1
+# Sankarea -> ~ OVA
+- 11499|6521:14 -> 13055|6873:2
+
+# Sekirei: Pure Engagement -> ~ Special
+- 5277|4029:0 -> 9355|5700:1
 
 # Teekyuu -> ~ 2
 - 15125|7217:13-24 -> 18121|7718:1-12
@@ -115,3 +172,9 @@
 - 10294|6116:4 -> 10715|6312:1
 - 10294|6116:5 -> 10716|6313:1
 - 10294|6116:6 -> 10717|6314:1
+
+# UN-GO -> ~: Inga-ron
+- 10798|6353:0 -> 11531|6529:1
+
+# Winter Sonata -> ~ Episode 0
+- 4189|3511:0 -> 7377|4957:1
