@@ -31,9 +31,18 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-04-12
+- last_modified: 2015-04-14
 
 ::rules
+
+# 11eyes -> ~: Momoiro Genmutan
+- 6682|4662:13 -> 7739|5102:1
+
+# Acchi Kocchi (TV) -> ~: Place=Princess
+- 12291|6701:13 -> 16273|7401:1
+
+# Akuma no Riddle -> ~: Shousha wa Dare? Nukiuchi Test
+- 19429|7844:13 -> 24751|8724:1
 
 # Aldnoah.Zero -> ~ 2nd Season
 - 22729|8297:13-24 -> 27655|9136:1-12
@@ -43,6 +52,10 @@
 
 # Another -> ~: The Other - Inga
 - 11111|6462:0 -> 11701|6569:1
+
+# Ao Haru Ride -> ~ OVA
+- 21995|8246:0 -> 24151|8488:1
+- 21995|8246:13 -> 24151|8488:2
 
 # Black Lagoon -> ~: The Second Barrage
 - 889|789:13-24 -> 1519|1363:1-12
@@ -57,11 +70,45 @@
 - 6772|4708:5 -> 9724|5837:1
 - 6772|4708:6 -> 10092|6031:1
 
+# C³ -> ~ Special
+- 10578|6249:13 -> 12505|6751:1
+
 # Candy Boy -> Candy☆Boy
 - 4535|3668:0 -> 3456|3022:1
 
+# Chobits -> ~ Recap
+- 59|40:27 -> 1311|1176:1
+
+# Choujigen Game Neptune: The Animation -> ~ OVA
+- 16157|7379:13 -> 20479|8071:1
+
+# Chuunibyou demo Koi ga Shitai! -> ~: Kirameki no... Slapstick Noel
+- 14741|7160:13 -> 16934|7556:1
+# Chuunibyou demo Koi ga Shitai! Ren -> ~: The Rikka Wars
+- 18671|7705:13 -> 27601|9132:1
+
+# Dakara Boku wa, H ga Dekinai. -> ~ OVA
+- 12549|7656:13 -> 14893|7180:1
+
+# Darker than Black: Kuro no Keiyakusha -> ~ Special
+- 2025|1824:26 -> 4182|3506:1
+
+# Date A Live -> ~: Date to Date
+- 15583|7278:13 -> 17641|7839:1
 # Date A Live II -> Date A Live: Encore OVA
 - 19163|7864:11 -> 22961|8511:1
+
+# Denpa Onna to Seishun Otoko -> ~ Special
+- 9379|5710:13 -> 10638|6276:1
+
+# Dokkiri Doctor -> ~ Special
+- 4554|3680:27 -> 13781|7027:1
+
+# Dragon Ball Kai -> ~: Mirai ni Heiwa wo! Goku no Tamashii yo Eien ni
+- 6033|4394:98 -> 11359|6500:1
+
+# Durarara!! -> ~ Specials
+- 6746|4696:25 -> 8408|5324:2
 
 # Fate/stay night: Unlimited Blade Works (TV) -> ~ Episode 0
 - 22297|7882:0 -> 27821|9718:1
@@ -70,6 +117,9 @@
 
 # Fate/Zero -> ~ 2nd Season
 - 10087|6028:14-25 -> 11741|7658:1-12!
+
+# Futsuu no Joshikousei ga [Locodol] Yatte Mita. -> ~: Nagarekawa, Annai Shite Mita.
+- 22189|8267:13 -> 25719|8659:1
 
 # Gintama -> ~'
 - 918|818:202-252 -> 9969|5971:1-51
@@ -81,11 +131,35 @@
 # Guilty Crown -> ~: Lost Christmas
 - 10793|6349:0 -> 13411|6958:1
 
+# Haiyoru! Nyaruani: Remember My Love(craft-sensei) -> ~ Special
+- 9598|7808:12 -> 10477|5803:1
+
+# Hajime no Ippo -> ~ Special
+- 263|238:76 -> 12069|6660:1
+
 # Hayate no Gotoku!! -> ~: Atsu ga Natsuize - Mizugihen!
 - 4192|3514:0 -> 5521|4133:1
 
+# Hipira-kun -> ~ ONA
+- 7723|5097:11-12 -> 22983|8585:1
+
+# Hourou Musuko -> ~
+- 8426|5331:12 -> ~|~:11
+
+# Inari, Konkon, Koi Iroha. -> ~: Inari, Konkon, Semishigure.
+- 20457|7988:11 -> 22057|8251:1
+
+# Itsuka Tenma no Kuro Usagi -> ~ OVA
+- 9750|5850:13 -> 10934|6412:1
+
 # JoJo's Bizarre Adventure: Stardust Crusaders -> ~ 2nd Season
 - 20899|8063:25-? -> 26055|8739:1-?!
+
+# Kämpfer -> ~ für die Liebe
+- 6205|4474:13-14 -> 10076|6023:1-2
+
+# Kannagi -> ~: Moshimo Kannagi ga Attara...
+- 3958|3378:14 -> 5978|4369:1
 
 # K-On! -> ~: Live House!
 - 5680|4240:14 -> 6862|4758:1
@@ -98,6 +172,9 @@
 # Kamichu! -> ~ Specials
 - 489|7763:13-16 -> 3449|450:1-4
 
+# Kamisama no Inai Nichiyoubi -> ~ Special
+- 16009|7358:13 -> 20423|7989:1
+
 # Kara no Kyoukai 1 -> ~ 2,3,4,5,6,7
 - 2593|2357:2 -> 3782|3248:1
 - 2593|2357:3 -> 3783|3249:1
@@ -109,8 +186,14 @@
 # Kimi ni Todoke 2nd Season -> ~: Kataomoi
 - 9656|5820:0 -> 10152|6055:1
 
+# Kino no Tabi: The Beautiful World -> ~ - Tou no Kuni
+- 486|447:0 -> 3466|3031:1
+
 # Kokoro Connect -> ~ Michi Random
 - 11887|6626:14-17 -> 16001|7355:1-4
+
+# Kono Naka ni Hitori, Imouto ga Iru! -> ~: Ani, Imouto, Koibito
+- 13367|6947:13 -> 15609|7282:1
 
 # Kore wa Zombie Desu ka? -> ~ OVA
 - 8841|5507:13 -> 10209|6079:1
@@ -132,6 +215,21 @@
 # Kyousou Giga (TV) -> ~ Recaps
 - 19703|7870:0 -> 20723|8050:1
 
+# Love Hina -> ~: Motoko's Choice, Love or the Sword - Don't Cry
+- 189|166:25 -> 963|853:1
+
+# Lovedol: Lovely Idol -> ~ OVA
+- 1561|1401:13 -> 6227|4484:1
+
+# Mangirl! -> ~: Asobu Henshuu Girl
+- 14045|7071:14 -> 17351|7886:1
+
+# MapleStory -> ~ Special
+- 2719|2480:26 -> 28237|9993:1
+
+# Marie & Gali -> ~ Episode Zero
+- 6130|4440:0 -> 6355|4530:1
+
 # Mushishi Zoku Shou -> ~ Special
 - 21939|8204:11-12 -> 24687|8519:1
 # Mushishi Zoku Shou -> ~ 2nd Season
@@ -143,10 +241,25 @@
 # Nodame Cantabile Finale -> ~ Special
 - 5690|4248:0 -> 8038|5177:1
 
+# One Piece: Strong World -> ~ Episode 0
+- 4155|3492:0 -> 8740|5469:1
+
+# Onee-chan ga Kita -> ~ Special
+- 20931|8083:13 -> 23427|8343:1
+
+# Ookami to Koushinryou II -> ~: Ookami to Kohakuiro no Yuuutsu
+- 5341|4063:0 -> 6007|4382:1
+
 # Ore no Imouto ga Konnani Kawaii Wake ga Nai -> ~ Specials
 - 8769|5487:13-15 -> 10020|5998:2-4
 # Ore no Imouto ga Konnani Kawaii Wake ga Nai. -> ~ Specials
 - 13659|7006:14-16 -> 18857|7822:1-3
+
+# Recorder to Randoseru Mi☆ -> ~ Special
+- 18099|7695:13 -> 24935|8569:1
+
+# Rurouni Kenshin: Meiji Kenkaku Romantan -> ~ Special
+- 45|27:95 -> 12067|6659:1
 
 # Saenai Heroine no Sodatekata -> ~: Ai to Seishun no Service Kai
 - 23277|8406:0 -> 29317|10225:1
@@ -158,8 +271,22 @@
 # Sankarea -> ~ OVA
 - 11499|6521:14 -> 13055|6873:2
 
+# Sekai Seifuku: Bouryaku no Zvezda -> ~ - Shin Zvezda Daisakusen
+- 20973|8082:13 -> 23459|8381:1
+
 # Sekirei: Pure Engagement -> ~ Special
 - 5277|4029:0 -> 9355|5700:1
+
+# So Ra No Wo To -> ~ Specials
+- 6802|7668:13 -> 8197|4724:2
+
+# Suisei no Gargantia -> ~ Specials
+- 16524|7449:14-15 -> 19211|7872:1-2
+# Puchitto Gargantia -> ~ Special
+- 18413|7751:14 -> 23099|8592:1
+
+# Tasogare Otome x Amnesia -> ~: Taima Otome
+- 12445|6734:13 -> 14189|7093:1
 
 # Teekyuu -> ~ 2
 - 15125|7217:13-24 -> 18121|7718:1-12
@@ -184,5 +311,19 @@
 # UN-GO -> ~: Inga-ron
 - 10798|6353:0 -> 11531|6529:1
 
+# Watashi ga Motenai no wa Dou Kangaetemo Omaera ga Warui! -> ~ OVA
+- 16742|7504:13 -> 20449|7991:1
+
 # Winter Sonata -> ~ Episode 0
 - 4189|3511:0 -> 7377|4957:1
+
+# Wooser no Sono Higurashi -> ~: Ken to Pantsu to Wooser to
+- 15313|7238:13 -> 16738|7502:1
+
+# Yama no Susume -> ~: Kabette Kowakunai no?
+- 14355|7117:13 -> 17341|7766:1
+# Yama no Susume 2nd Season -> ~ Specials
+- 21435|8201:25 -> 27887|9783:2
+
+# Yomigaeru Sora: Rescue Wings -> ~ Special
+- 798|712:13 -> 1843|1660:1
