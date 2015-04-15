@@ -118,9 +118,47 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   InitializeTitles();
 
-  // Look up the title in our database
-  LookUpTitle(episode.anime_title(), anime_ids);
-  valide_ids(episode);
+  // Look up anime title + episode number + episode title
+  if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
+      !episode.elements().empty(anitomy::kElementEpisodeTitle)) {
+    anime::Episode episode_merged_title(episode);
+    episode_merged_title.set_anime_title(
+        episode.anime_title() + L" " +
+        episode.elements().get(anitomy::kElementEpisodeNumber) + L" " +
+        episode.elements().get(anitomy::kElementEpisodeTitle));
+    episode_merged_title.elements().erase(anitomy::kElementEpisodeNumber);
+    episode_merged_title.elements().erase(anitomy::kElementEpisodeTitle);
+    LookUpTitle(episode_merged_title.anime_title(), anime_ids);
+    valide_ids(episode_merged_title);
+    if (!anime_ids.empty()) {
+      std::swap(episode_merged_title, episode);
+      LOG(LevelDebug, L"Merged title lookup succeeded: " +
+                      episode.anime_title());
+    }
+  }
+
+  // Look up anime title + episode number
+  if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
+      episode.elements().empty(anitomy::kElementFileExtension)) {
+    anime::Episode episode_merged_title(episode);
+    episode_merged_title.set_anime_title(
+      episode.anime_title() + L" " +
+      episode.elements().get(anitomy::kElementEpisodeNumber));
+    episode_merged_title.elements().erase(anitomy::kElementEpisodeNumber);
+    LookUpTitle(episode_merged_title.anime_title(), anime_ids);
+    valide_ids(episode_merged_title);
+    if (!anime_ids.empty()) {
+      std::swap(episode_merged_title, episode);
+      LOG(LevelDebug, L"Merged title lookup succeeded: " +
+                      episode.anime_title());
+    }
+  }
+
+  // Look up anime title
+  if (anime_ids.empty()) {
+    LookUpTitle(episode.anime_title(), anime_ids);
+    valide_ids(episode);
+  }
 
   // Look up parent directories
   if (anime_ids.empty() && !episode.folder.empty()) {
