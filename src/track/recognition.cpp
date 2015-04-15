@@ -74,15 +74,27 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
 
   episode.set_elements(anitomy_instance.elements());
 
-  // Append season number and year to title
-  auto anime_season = episode.anime_season();
+  // Append season number to title
+  const auto anime_season = episode.anime_season();
   if (anime_season > 1 && !episode.anime_title().empty())
-    episode.set_anime_title(episode.anime_title() + L" " +
-                            ToWstr(anime_season));
-  auto anime_year = episode.anime_year();
+    episode.set_anime_title(
+        episode.anime_title() + L" " + ToWstr(anime_season));
+  // Append year to title
+  const auto anime_year = episode.anime_year();
   if (anime_year > 0 && !episode.anime_title().empty())
-    episode.set_anime_title(episode.anime_title() + L" (" +
-                            ToWstr(anime_year) + L")");
+    episode.set_anime_title(
+        episode.anime_title() + L" (" + ToWstr(anime_year) + L")");
+  // TEMP: Append episode number to title
+  // We're going to get rid of this once we're able to redirect fractional
+  // episode numbers.
+  if (!episode.elements().empty(anitomy::kElementEpisodeNumber)) {
+    const auto& episode_number = episode.elements().get(anitomy::kElementEpisodeNumber);
+    if (episode_number.find(L'.') != episode_number.npos) {
+      episode.set_anime_title(
+          episode.anime_title() + L" Episode " + episode_number);
+      episode.set_episode_number(1);
+    }
+  }
 
   return true;
 }
