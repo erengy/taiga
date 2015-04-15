@@ -76,6 +76,13 @@
 # Candy Boy -> Candy☆Boy
 - 4535|3668:0 -> 3456|3022:1
 
+# Cardfight!! Vanguard -> ~: Asia Circuit-hen
+- 9539|5781:66-104 -> 13145|6893:1-39!
+# Cardfight!! Vanguard -> ~: Link Joker-hen
+- 9539|5781:105-163 -> 15611|7283:1-59!
+# Cardfight!! Vanguard -> ~: Legion Mate-hen
+- 9539|5781:164-196 -> 21729|8264:1-33!
+
 # Chobits -> ~ Recap
 - 59|40:27 -> 1311|1176:1
 
@@ -155,16 +162,16 @@
 # JoJo's Bizarre Adventure: Stardust Crusaders -> ~ 2nd Season
 - 20899|8063:25-? -> 26055|8739:1-?!
 
-# Kämpfer -> ~ für die Liebe
-- 6205|4474:13-14 -> 10076|6023:1-2!
-
-# Kannagi -> ~: Moshimo Kannagi ga Attara...
-- 3958|3378:14 -> 5978|4369:1
+# Jormungand -> ~: Perfect Order
+- 12413|6726:13-24 -> 13331|6940:1-12!
 
 # K-On! -> ~: Live House!
 - 5680|4240:14 -> 6862|4758:1
 # K-On!! -> ~: Keikaku!
 - 7791|5124:27 -> 9734|5841:1
+
+# Kaitou Joker -> ~ 2nd Season
+- 24909|8664:14-? -> 28869|10070:1-?!
 
 # Kakumeiki Valvrave -> ~ 2nd Season
 - 16668|7487:13-24 -> 18295|7698:1-12!
@@ -174,6 +181,12 @@
 
 # Kamisama no Inai Nichiyoubi -> ~ Special
 - 16009|7358:13 -> 20423|7989:1
+
+# Kämpfer -> ~ für die Liebe
+- 6205|4474:13-14 -> 10076|6023:1-2!
+
+# Kannagi -> ~: Moshimo Kannagi ga Attara...
+- 3958|3378:14 -> 5978|4369:1
 
 # Kara no Kyoukai 1 -> ~ 2,3,4,5,6,7
 - 2593|2357:2 -> 3782|3248:1
@@ -209,6 +222,9 @@
 
 # Kyoukai no Kanata -> ~: Shinonome
 - 18153|7714:0 -> 23385|8379:1
+
+# Kyoukaisenjou no Horizon -> ~ II
+- 10456|6187:14-26 -> 12487|6746:1-13!
 
 # Kyousou Giga -> ~ (TV) Recaps
 - 10893|6396:0 -> 20723|8050:1
@@ -255,6 +271,11 @@
 # Ore no Imouto ga Konnani Kawaii Wake ga Nai. -> ~ Specials
 - 13659|7006:14-16 -> 18857|7822:1-3
 
+# Phi Brain: Kami no Puzzle -> ~ - Orpheus Order-hen
+- 9981|5978:26-50 -> 12753|6803:1-25!
+
+# Recorder to Randoseru Do♪ -> Recorder to Randoseru Re♪
+- 11491|6519:14-26 -> 13377|6951:1-13!
 # Recorder to Randoseru Mi☆ -> ~ Special
 - 18099|7695:13 -> 24935|8569:1
 
@@ -274,8 +295,14 @@
 # Sekai Seifuku: Bouryaku no Zvezda -> ~ - Shin Zvezda Daisakusen
 - 20973|8082:13 -> 23459|8381:1
 
+# Sekaiichi Hatsukoi -> ~ 2
+- 9926|5944:13-24 -> 11123|6464:1-12!
+
 # Sekirei: Pure Engagement -> ~ Special
 - 5277|4029:0 -> 9355|5700:1
+
+# Senyuu. -> ~ 2
+- 15751|7303:14-26 -> 18523|7719:1-13!
 
 # So Ra No Wo To -> ~ Specials
 - 6802|7668:13 -> 8197|4724:2
@@ -313,6 +340,9 @@
 
 # Watashi ga Motenai no wa Dou Kangaetemo Omaera ga Warui! -> ~ OVA
 - 16742|7504:13 -> 20449|7991:1
+
+# White Album -> ~ 2nd Season
+- 4720|3760:14-26 -> 6165|4455:1-13!
 
 # Winter Sonata -> ~ Episode 0
 - 4189|3511:0 -> 7377|4957:1
