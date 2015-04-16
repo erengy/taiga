@@ -277,28 +277,12 @@
 		<title>Omakase! Miracle Cat-dan</title>
 	</anime>
 	<anime>
-		<type>1</type>
-		<id name="myanimelist">27947</id>
-		<id name="hummingbird">9958</id>
-		<producers>TMS Entertainment, Telecom Animation Film</producers>
-		<image>http://cdn.myanimelist.net/images/anime/12/67767.jpg</image>
-		<title>Lupin III (2015)</title>
-	</anime>
-	<anime>
 		<type>5</type>
 		<id name="myanimelist">30013</id>
 		<id name="hummingbird">10588</id>
 		<producers>Steve N' Steven</producers>
 		<image>http://cdn.myanimelist.net/images/anime/4/71928.jpg</image>
 		<title>Super Short Comics</title>
-	</anime>
-	<anime>
-		<type>1</type>
-		<id name="myanimelist">25687</id>
-		<id name="hummingbird">8684</id>
-		<producers>Toei Animation, Bandai</producers>
-		<image>http://cdn.myanimelist.net/images/anime/7/72691.jpg</image>
-		<title>Digimon Adventure Tri.</title>
 	</anime>
 	<anime>
 		<type>0</type>
@@ -867,5 +851,21 @@
 		<producers>Studio A-CAT</producers>
 		<image>http://cdn.myanimelist.net/images/anime/11/71921.jpg</image>
 		<title>Frame Arms: A Violent Struggle</title>
+	</anime>
+	<anime>
+		<type>1</type>
+		<id name="myanimelist">24893</id>
+		<id name="hummingbird">8670</id>
+		<producers>Starchild Records, Studio Mausu, Polygon Pictures</producers>
+		<image>http://cdn.myanimelist.net/images/anime/12/68913.jpg</image>
+		<title>Sidonia no Kishi: Daikyuu Wakusei Seneki</title>
+	</anime>
+	<anime>
+		<type>4</type>
+		<id name="myanimelist">30552</id>
+		<id name="hummingbird" />
+		<producers />
+		<image>http://cdn.myanimelist.net/images/anime/11/73340.jpg</image>
+		<title>Ore, Twin tails ni Narimasu. Special</title>
 	</anime>
 </season>

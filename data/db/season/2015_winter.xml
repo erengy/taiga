@@ -798,10 +798,34 @@
 	</anime>
 	<anime>
 		<type>4</type>
-		<id name="myanimelist">30525</id>
+		<id name="myanimelist">30289</id>
+		<id name="hummingbird">10808</id>
+		<producers>TMS Entertainment</producers>
+		<image>http://cdn.myanimelist.net/images/anime/8/72492.jpg</image>
+		<title>Dededen</title>
+	</anime>
+	<anime>
+		<type>5</type>
+		<id name="myanimelist">30443</id>
+		<id name="hummingbird">10794</id>
+		<producers>DLE</producers>
+		<image>http://cdn.myanimelist.net/images/anime/2/72841.jpg</image>
+		<title>Kana Kana Kazoku: Shinnen no Goaisatsu</title>
+	</anime>
+	<anime>
+		<type>5</type>
+		<id name="myanimelist">30444</id>
 		<id name="hummingbird" />
-		<producers />
-		<image>http://cdn.myanimelist.net/images/anime/2/73241.jpg</image>
-		<title>Dog Days'' Specials</title>
+		<producers>DLE</producers>
+		<image>http://cdn.myanimelist.net/images/anime/11/72842.jpg</image>
+		<title>Kana Kana Kazoku: Stop Rubella</title>
+	</anime>
+	<anime>
+		<type>6</type>
+		<id name="myanimelist">30534</id>
+		<id name="hummingbird" />
+		<producers>Hang Zhou StarQ</producers>
+		<image>http://cdn.myanimelist.net/images/anime/5/73399.jpg</image>
+		<title>Fen Qing</title>
 	</anime>
 </season>
