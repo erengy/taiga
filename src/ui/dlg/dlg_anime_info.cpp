@@ -18,6 +18,7 @@
 
 #include "base/foreach.h"
 #include "base/string.h"
+#include "base/process.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
@@ -108,7 +109,7 @@ BOOL AnimeDialog::OnInitDialog() {
 
 void AnimeDialog::OnCancel() {
   EndDialog(IDCANCEL);
-  DlgMain.SetFocus();
+  ActivateWindow(DlgMain.GetWindowHandle());
 }
 
 void AnimeDialog::OnOK() {
@@ -119,7 +120,7 @@ void AnimeDialog::OnOK() {
       return;
 
   EndDialog(IDOK);
-  DlgMain.SetFocus();
+  ActivateWindow(DlgMain.GetWindowHandle());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
