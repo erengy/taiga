@@ -58,7 +58,7 @@ BOOL TorrentDialog::OnInitDialog() {
   list_.InsertColumn(3,  70,  70, LVCFMT_RIGHT, L"Size");
   list_.InsertColumn(4, 100, 100, LVCFMT_LEFT,  L"Video");
   list_.InsertColumn(5, 200, 200, LVCFMT_LEFT,  L"Description");
-  list_.InsertColumn(6, 200, 200, LVCFMT_LEFT,  L"File name");
+  list_.InsertColumn(6, 200, 200, LVCFMT_LEFT,  L"Filename");
   list_.InsertColumn(7, 190, 190, LVCFMT_RIGHT, L"Release date");
   // Insert list groups
   list_.InsertGroup(0, L"Anime");
@@ -447,12 +447,10 @@ void TorrentDialog::RefreshList() {
   }
 
   // Resize columns
-  list_.SetColumnWidth(0, LVSCW_AUTOSIZE);
   list_.SetColumnWidth(1, LVSCW_AUTOSIZE);
   list_.SetColumnWidth(2, LVSCW_AUTOSIZE);
   list_.SetColumnWidth(3, LVSCW_AUTOSIZE);
   list_.SetColumnWidth(4, LVSCW_AUTOSIZE);
-  list_.SetColumnWidth(6, LVSCW_AUTOSIZE);
   list_.SetColumnWidth(7, LVSCW_AUTOSIZE_USEHEADER);
 
   // Redraw
