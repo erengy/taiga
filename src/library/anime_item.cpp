@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <assert.h>
 
 #include "base/foreach.h"
@@ -271,16 +272,16 @@ void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
   if (synonyms.empty() && metadata_.alternative.empty())
     return;
 
-  std::vector<library::Title> alternative;
+  auto iterator = std::remove_if(
+      metadata_.alternative.begin(), metadata_.alternative.end(),
+      [](const library::Title& title) {
+        return title.type == library::kTitleTypeSynonym;
+      });
+  metadata_.alternative.erase(iterator, metadata_.alternative.end());
 
-  foreach_(it, metadata_.alternative)
-    if (it->type != library::kTitleTypeSynonym)
-      alternative.push_back(*it);
-
-  foreach_(it, synonyms)
-    InsertSynonym(*it);
-
-  metadata_.alternative = alternative;
+  for (const auto& synonym : synonyms) {
+    InsertSynonym(synonym);
+  }
 }
 
 void Item::SetDateStart(const Date& date) {
