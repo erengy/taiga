@@ -71,7 +71,9 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
 bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
                                    const std::wstring& name,
                                    const WIN32_FIND_DATA& data) {
-  if (!Meow.Parse(name, episode_)) {
+  auto path = AddTrailingSlash(root) + name;
+
+  if (!Meow.Parse(path, episode_)) {
     LOG(LevelDebug, L"Could not parse filename: " + name);
     return false;
   }
@@ -95,18 +97,18 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
         !anime::IsValidEpisodeNumber(lower_bound, anime_item->GetEpisodeCount())) {
       std::wstring episode_number = anime::GetEpisodeRange(episode_);
       LOG(LevelDebug, L"Invalid episode number: " + episode_number + L"\n"
-                      L"File: " + AddTrailingSlash(root) + name);
+                      L"File: " + path);
       return false;
     }
 
     for (int i = lower_bound; i <= upper_bound; ++i)
-      anime_item->SetEpisodeAvailability(i, true, AddTrailingSlash(root) + name);
+      anime_item->SetEpisodeAvailability(i, true, path);
 
     if (anime::IsValidId(anime_id_) && anime_id_ == anime_item->GetId()) {
       // Check if we've found the episode we were looking for
       if (episode_number_ > 0 &&
           episode_number_ >= lower_bound && episode_number_ <= upper_bound) {
-        path_found_ = AddTrailingSlash(root) + name;
+        path_found_ = path;
         return true;
       }
       // Check if all episodes are available
