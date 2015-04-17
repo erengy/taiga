@@ -26,10 +26,12 @@
 #include "sync/manager.h"
 #include "taiga/announce.h"
 #include "taiga/http.h"
+#include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "taiga/taiga.h"
 #include "taiga/version.h"
+#include "track/recognition.h"
 #include "ui/ui.h"
 
 taiga::HttpManager ConnectionManager;
@@ -217,16 +219,30 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       ::Twitter.HandleHttpResponse(client.mode(), response);
       break;
 
-    case kHttpTaigaUpdateCheck:
+    case kHttpTaigaUpdateCheck: {
       if (Taiga.Updater.ParseData(response.body))
         if (Taiga.Updater.IsDownloadAllowed())
           break;
       ui::OnUpdateFinished();
+      auto it = client.request().url.query.find(L"check");
+      if (it != client.request().url.query.end())
+        if (it->second == L"manual")
+          Taiga.Updater.CheckAnimeRelations();
       break;
+    }
     case kHttpTaigaUpdateDownload:
       SaveToFile(client.write_buffer_, Taiga.Updater.GetDownloadPath());
       Taiga.Updater.RunInstaller();
       ui::OnUpdateFinished();
+      break;
+    case kHttpTaigaUpdateRelations:
+      if (Meow.ReadRelations(client.write_buffer_) &&
+          SaveToFile(client.write_buffer_, GetPath(kPathDatabaseAnimeRelations))) {
+        LOG(LevelDebug, L"Updated anime relation data.");
+      } else {
+        Meow.ReadRelations();
+        LOG(LevelDebug, L"Anime relation data update failed.");
+      }
       break;
   }
 

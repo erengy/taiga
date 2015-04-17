@@ -50,7 +50,8 @@ enum HttpClientMode {
   kHttpTwitterPost,
   // Taiga
   kHttpTaigaUpdateCheck,
-  kHttpTaigaUpdateDownload
+  kHttpTaigaUpdateDownload,
+  kHttpTaigaUpdateRelations,
 };
 
 class HttpClient : public base::http::Client {

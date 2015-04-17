@@ -135,8 +135,6 @@ static bool ParseRule(const std::wstring& rule) {
 }
 
 bool Engine::ReadRelations() {
-  relations.clear();
-
   std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnimeRelations);
   std::string document;
 
@@ -144,6 +142,12 @@ bool Engine::ReadRelations() {
     LOG(LevelWarning, L"Could not read anime relations data.");
     return false;
   }
+
+  return ReadRelations(document);
+}
+
+bool Engine::ReadRelations(const std::string& document) {
+  relations.clear();
 
   std::vector<std::wstring> lines;
   Split(StrToWstr(document), L"\n", lines);
@@ -201,7 +205,7 @@ bool Engine::ReadRelations() {
     }
   }
 
-  return true;
+  return !relations.empty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -42,7 +42,7 @@ void UpdateHelper::Cancel() {
   ConnectionManager.CancelRequest(client_uid_);
 }
 
-bool UpdateHelper::Check() {
+void UpdateHelper::Check() {
   bool is_automatic = !ui::DlgMain.IsWindow();
   bool is_stable = Taiga.version.prerelease_identifiers.empty();
 
@@ -58,12 +58,23 @@ bool UpdateHelper::Check() {
   client_uid_ = http_request.uid;
 
   ConnectionManager.MakeRequest(http_request, taiga::kHttpTaigaUpdateCheck);
-  return true;
+}
+
+void UpdateHelper::CheckAnimeRelations() {
+  if (latest_anime_relations_.empty())
+    return;
+
+  HttpRequest http_request;
+  http_request.url = latest_anime_relations_;
+
+  ConnectionManager.MakeRequest(http_request,
+                                taiga::kHttpTaigaUpdateRelations);
 }
 
 bool UpdateHelper::ParseData(std::wstring data) {
   items.clear();
   download_path_.clear();
+  latest_anime_relations_.clear();
   latest_guid_.clear();
   restart_required_ = false;
   update_available_ = false;
@@ -82,6 +93,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
     items.back().link = XmlReadStrValue(item, L"link");
     items.back().description = XmlReadStrValue(item, L"description");
     items.back().pub_date = XmlReadStrValue(item, L"pubDate");
+    items.back().taiga_anime_relations = XmlReadStrValue(item, L"taiga:animeRelations");
   }
 
   auto current_version = Taiga.version;
@@ -91,6 +103,8 @@ bool UpdateHelper::ParseData(std::wstring data) {
     if (item_version > latest_version) {
       latest_guid_ = item->guid;
       latest_version = item_version;
+    } else if (item_version == current_version) {
+      latest_anime_relations_ = item->taiga_anime_relations;
     }
   }
 

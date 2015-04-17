@@ -95,6 +95,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpGetLibraryEntryImage:
+    case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
     case taiga::kHttpServiceGetLibraryEntries:
@@ -137,6 +138,7 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpGetLibraryEntryImage:
+    case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpTaigaUpdateCheck:
     case taiga::kHttpTaigaUpdateDownload:
@@ -167,6 +169,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpServiceGetMetadataById:
     case taiga::kHttpServiceSearchTitle:
     case taiga::kHttpGetLibraryEntryImage:
+    case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
       status = L"Reading account information...";

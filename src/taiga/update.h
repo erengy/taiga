@@ -32,7 +32,8 @@ public:
   virtual ~UpdateHelper() {}
 
   void Cancel();
-  bool Check();
+  void Check();
+  void CheckAnimeRelations();
   bool Download();
   bool IsDownloadAllowed() const;
   bool IsRestartRequired() const;
@@ -43,12 +44,17 @@ public:
   std::wstring GetDownloadPath() const;
   void SetDownloadPath(const std::wstring& path);
 
-  std::vector<GenericFeedItem> items;
+  class Item : public GenericFeedItem {
+  public:
+    std::wstring taiga_anime_relations;
+  };
+  std::vector<Item> items;
 
 private:
   const GenericFeedItem* FindItem(const std::wstring& guid) const;
 
   std::wstring download_path_;
+  std::wstring latest_anime_relations_;
   std::wstring latest_guid_;
   bool restart_required_;
   bool update_available_;

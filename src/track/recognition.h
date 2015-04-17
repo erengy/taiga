@@ -60,6 +60,7 @@ public:
   bool IsValidFileExtension(const std::wstring& extension) const;
 
   bool ReadRelations();
+  bool ReadRelations(const std::string& document);
   bool SearchEpisodeRedirection(int id, const std::pair<int, int>& range, int& destination_id, std::pair<int, int>& destination_range) const;
 
 private:
