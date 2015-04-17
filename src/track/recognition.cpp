@@ -45,7 +45,8 @@ track::recognition::Engine Meow;
 namespace track {
 namespace recognition {
 
-bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
+bool Engine::Parse(std::wstring title, anime::Episode& episode,
+                   const ParseOptions& parse_options) const {
   episode.Clear();  // Clear previous data
 
   if (title.empty())
@@ -53,9 +54,9 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode) const {
 
   anitomy::Anitomy anitomy_instance;
 
-  if (episode.streaming_media) {
+  if (parse_options.streaming_media) {
     anitomy_instance.options().allowed_delimiters = L" ";
-  } else {
+  } else if (parse_options.parse_path) {
     if (title.find_first_of(L"\\/") != title.npos) {
       episode.folder = GetPathOnly(title);
       title = GetFileName(title);

@@ -37,6 +37,11 @@ namespace recognition {
 typedef std::map<int, double> scores_t;
 typedef std::vector<std::pair<int, double>> sorted_scores_t;
 
+struct ParseOptions {
+  bool parse_path = false;
+  bool streaming_media = false;
+};
+
 struct MatchOptions {
   bool allow_sequels = false;
   bool check_airing_date = false;
@@ -46,7 +51,7 @@ struct MatchOptions {
 
 class Engine {
 public:
-  bool Parse(std::wstring title, anime::Episode& episode) const;
+  bool Parse(std::wstring title, anime::Episode& episode, const ParseOptions& parse_options) const;
   int Identify(anime::Episode& episode, bool give_score, const MatchOptions& match_options);
   bool Search(const std::wstring& title, std::vector<int>& anime_ids);
 

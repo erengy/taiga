@@ -27,7 +27,7 @@ anime::Episode CurrentEpisode;
 namespace anime {
 
 Episode::Episode()
-    : anime_id(ID_UNKNOWN), processed(false), streaming_media(false) {
+    : anime_id(ID_UNKNOWN), processed(false) {
 }
 
 void Episode::Clear() {

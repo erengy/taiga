@@ -86,7 +86,10 @@ void Aggregator::ExamineData(Feed& feed) {
     auto& episode_data = feed_item.episode_data;
 
     // Examine title and compare with anime list items
-    Meow.Parse(feed_item.title, episode_data);
+    static track::recognition::ParseOptions parse_options;
+    parse_options.parse_path = false;
+    parse_options.streaming_media = false;
+    Meow.Parse(feed_item.title, episode_data, parse_options);
     static track::recognition::MatchOptions match_options;
     match_options.allow_sequels = true;
     match_options.check_airing_date = true;

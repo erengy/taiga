@@ -39,7 +39,11 @@ TaigaFileSearchHelper::TaigaFileSearchHelper()
 bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
                                         const std::wstring& name,
                                         const WIN32_FIND_DATA& data) {
-  if (!Meow.Parse(name, episode_)) {
+  static track::recognition::ParseOptions parse_options;
+  parse_options.parse_path = false;
+  parse_options.streaming_media = false;
+
+  if (!Meow.Parse(name, episode_, parse_options)) {
     LOG(LevelDebug, L"Could not parse directory: " + name);
     return false;
   }
@@ -73,7 +77,11 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
                                    const WIN32_FIND_DATA& data) {
   auto path = AddTrailingSlash(root) + name;
 
-  if (!Meow.Parse(path, episode_)) {
+  static track::recognition::ParseOptions parse_options;
+  parse_options.parse_path = true;
+  parse_options.streaming_media = false;
+
+  if (!Meow.Parse(path, episode_, parse_options)) {
     LOG(LevelDebug, L"Could not parse filename: " + name);
     return false;
   }

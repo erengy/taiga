@@ -69,7 +69,23 @@ void FolderMonitor::HandleChangeNotification(
 
 static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notification,
                                   anime::Episode& episode) {
-  if (!Meow.Parse(notification.path + notification.filename.first, episode))
+  std::wstring path;
+  static track::recognition::ParseOptions parse_options;
+  switch (notification.type) {
+    case DirectoryChangeNotification::kTypeDirectory:
+      path = GetFileName(notification.filename.first);
+      parse_options.parse_path = false;
+      parse_options.streaming_media = false;
+      break;
+    default:
+    case DirectoryChangeNotification::kTypeFile:
+      path = notification.path + notification.filename.first;
+      parse_options.parse_path = true;
+      parse_options.streaming_media = false;
+      break;
+  }
+
+  if (!Meow.Parse(path, episode, parse_options))
     return nullptr;
 
   static track::recognition::MatchOptions match_options;

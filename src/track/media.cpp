@@ -313,11 +313,12 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
     if (!Settings.GetBool(taiga::kApp_Option_EnableRecognition))
       return;
 
-    CurrentEpisode.streaming_media = media_player.mode == kMediaModeWebBrowser;
-
     // Examine title and compare it with list items
     bool ignore_file = false;
-    if (Meow.Parse(MediaPlayers.current_title(), CurrentEpisode)) {
+    static track::recognition::ParseOptions parse_options;
+    parse_options.parse_path = true;
+    parse_options.streaming_media = media_player.mode == kMediaModeWebBrowser;
+    if (Meow.Parse(MediaPlayers.current_title(), CurrentEpisode, parse_options)) {
       bool is_inside_library_folders = true;
       if (Settings.GetBool(taiga::kSync_Update_OutOfRoot))
         if (!CurrentEpisode.folder.empty() && !Settings.library_folders.empty())

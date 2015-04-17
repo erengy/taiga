@@ -73,7 +73,6 @@ class Episode {
   int anime_id;
   std::wstring folder;
   bool processed;
-  bool streaming_media;
 
 private:
   int GetElementAsInt(anitomy::ElementCategory category, int default_value = 0) const;
