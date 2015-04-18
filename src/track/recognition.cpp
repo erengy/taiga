@@ -79,7 +79,7 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode,
   const auto anime_season = episode.anime_season();
   if (anime_season > 1 && !episode.anime_title().empty())
     episode.set_anime_title(
-        episode.anime_title() + L" " + ToWstr(anime_season));
+        episode.anime_title() + L" Season " + ToWstr(anime_season));
   // Append year to title
   const auto anime_year = episode.anime_year();
   if (anime_year > 0 && !episode.anime_title().empty())
