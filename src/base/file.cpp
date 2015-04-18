@@ -19,6 +19,7 @@
 #include <fstream>
 #include <shlobj.h>
 
+#include "error.h"
 #include "file.h"
 #include "string.h"
 #include "time.h"
@@ -235,6 +236,8 @@ bool FileExists(const std::wstring& file) {
 }
 
 bool FolderExists(const std::wstring& path) {
+  base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+
   auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
 
   return (file_attr != INVALID_FILE_ATTRIBUTES) &&
@@ -242,6 +245,8 @@ bool FolderExists(const std::wstring& path) {
 }
 
 bool PathExists(const std::wstring& path) {
+  base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+
   auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
 
   return file_attr != INVALID_FILE_ATTRIBUTES;
