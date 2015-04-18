@@ -93,7 +93,7 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode,
     if (episode_number.find(L'.') != episode_number.npos) {
       episode.set_anime_title(
           episode.anime_title() + L" Episode " + episode_number);
-      episode.set_episode_number(1);
+      episode.elements().erase(anitomy::kElementEpisodeNumber);
     }
   }
 
@@ -163,7 +163,8 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
 
   // Look up parent directories
   if (anime_ids.empty() && !episode.folder.empty() &&
-      Settings.GetBool(taiga::kRecognition_LookupParentDirectories)) {
+      Settings.GetBool(taiga::kRecognition_LookupParentDirectories) &&
+      episode.anime_type().empty()) {
     anime::Episode episode_from_directory(episode);
     episode_from_directory.elements().erase(anitomy::kElementAnimeTitle);
     if (GetTitleFromPath(episode_from_directory)) {
@@ -172,6 +173,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
       if (!anime_ids.empty()) {
         std::swap(episode_from_directory, episode);
         LOG(LevelDebug, L"Parent directory lookup succeeded: " +
+                        episode_from_directory.anime_title() + L" -> " +
                         episode.anime_title());
       }
     }
@@ -408,10 +410,15 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
     if (str.find(L':') != str.npos)  // drive letter
       return true;
     static std::set<std::wstring> invalid_strings{
-      L"anime", L"download", L"downloads", L"extra", L"extras",
+      L"ANIME", L"DOWNLOAD", L"DOWNLOADS", L"EXTRA", L"EXTRAS",
     };
-    ToLower(str);
-    return invalid_strings.count(str) > 0;
+    ToUpper(str);
+    if (invalid_strings.count(str) > 0)
+      return true;
+    anitomy::keyword_manager.Normalize(str);
+    anitomy::ElementCategory category = anitomy::kElementUnknown;
+    anitomy::KeywordOptions options;
+    return anitomy::keyword_manager.Find(str, category, options);
   };
 
   auto get_season_number = [](const std::wstring& str) {
