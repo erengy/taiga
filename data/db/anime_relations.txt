@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-04-14
+- last_modified: 2015-04-19
 
 ::rules
 
@@ -137,6 +137,9 @@
 
 # Guilty Crown -> ~: Lost Christmas
 - 10793|6349:0 -> 13411|6958:1
+
+# Hagure Yuusha no Aesthetica: Hajirai Ippai -> Queen's Blade Rebellion vs. Hagure Yuusha no Aesthetica
+- 15729|7298:0 -> 14663|7152:1
 
 # Haiyoru! Nyaruani: Remember My Love(craft-sensei) -> ~ Special
 - 9598|7808:12 -> 10477|5803:1
@@ -357,3 +360,6 @@
 
 # Yomigaeru Sora: Rescue Wings -> ~ Special
 - 798|712:13 -> 1843|1660:1
+
+# Yuusha ni Narenakatta Ore wa Shibushibu Shuushoku wo Ketsui Shimashita. -> ~ OVA
+- 18677|7725:13 -> 20545|8029:1
