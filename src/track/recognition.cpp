@@ -179,6 +179,11 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   // Figure out which ID is the one we're looking for
   if (anime::IsValidId(episode.anime_id)) {
     // We had a redirection while validating IDs
+    if (!AnimeDatabase.FindItem(episode.anime_id, false)) {
+      episode.anime_id = anime::ID_UNKNOWN;
+      LOG(LevelDebug, L"Redirection failed, because destination ID is not "
+                      L"available in the database.");
+    }
   } else if (anime_ids.size() == 1) {
     episode.anime_id = *anime_ids.begin();
   } else if (anime_ids.size() > 1) {
@@ -282,12 +287,13 @@ bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
     if (SearchEpisodeRedirection(anime_item.GetId(), range,
                                  destination_id, destination_range)) {
       if (redirect) {
-        std::wstring text = L"Redirection: " + ToWstr(anime_item.GetId()) +
-                            L":" + anime::GetEpisodeRange(episode) + L" -> ";
+        LOG(LevelDebug, L"Redirection: " +
+                        ToWstr(anime_item.GetId()) + L":" +
+                        anime::GetEpisodeRange(episode) + L" -> " +
+                        ToWstr(destination_id) + L":" +
+                        anime::GetEpisodeRange(destination_range));
         episode.anime_id = destination_id;
         episode.set_episode_number_range(destination_range);
-        text += ToWstr(destination_id) + L":" + anime::GetEpisodeRange(episode);
-        LOG(LevelDebug, text);
       }
       return true;  // Redirection available
     }

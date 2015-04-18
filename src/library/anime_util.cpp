@@ -610,6 +610,13 @@ std::wstring GetEpisodeRange(const Episode& episode) {
   return std::wstring();
 }
 
+std::wstring GetEpisodeRange(const episode_number_range_t& range) {
+  if (range.second > range.first)
+    return ToWstr(range.first) + L"-" + ToWstr(range.second);
+
+  return ToWstr(range.first);
+}
+
 bool IsAllEpisodesAvailable(const Item& item) {
   if (!IsValidEpisodeCount(item.GetEpisodeCount()))
     return false;
@@ -628,7 +635,7 @@ bool IsAllEpisodesAvailable(const Item& item) {
 }
 
 bool IsEpisodeRange(const Episode& episode) {
-  return GetEpisodeLow(episode) != GetEpisodeHigh(episode);
+  return GetEpisodeHigh(episode) > GetEpisodeLow(episode);
 }
 
 bool IsValidEpisodeCount(int number) {

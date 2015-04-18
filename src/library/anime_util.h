@@ -23,12 +23,12 @@
 #include <vector>
 
 #include "base/comparable.h"
+#include "library/anime_episode.h"
 
 class Date;
 
 namespace anime {
 
-class Episode;
 class Item;
 
 bool IsValidId(int anime_id);
@@ -70,6 +70,7 @@ bool ValidateFolder(Item& item);
 int GetEpisodeHigh(const Episode& episode);
 int GetEpisodeLow(const Episode& episode);
 std::wstring GetEpisodeRange(const Episode& episode);
+std::wstring GetEpisodeRange(const episode_number_range_t& range);
 bool IsAllEpisodesAvailable(const Item& item);
 bool IsEpisodeRange(const Episode& episode);
 bool IsValidEpisodeCount(int number);
