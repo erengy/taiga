@@ -414,6 +414,7 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kApp_Interface_Theme, {L"", L"Application / UI theme"}},
         {taiga::kLibrary_FileSizeThreshold, {L"", L"Library / File size threshold"}},
         {taiga::kRecognition_IgnoredStrings, {L"", L"Recognition / Ignored strings"}},
+        {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
         {taiga::kRecognition_MediaPlayerDetectionMethod, {L"", L"Recognition / Media player detection method"}},
         {taiga::kRecognition_BrowserDetectionMethod, {L"", L"Recognition / Web browser detection method"}},
         {taiga::kSync_Service_Hummingbird_UseHttps, {L"", L"Services / Use HTTPS connections for Hummingbird"}},

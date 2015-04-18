@@ -162,7 +162,8 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   }
 
   // Look up parent directories
-  if (anime_ids.empty() && !episode.folder.empty()) {
+  if (anime_ids.empty() && !episode.folder.empty() &&
+      Settings.GetBool(taiga::kRecognition_LookupParentDirectories)) {
     anime::Episode episode_from_directory(episode);
     episode_from_directory.elements().erase(anitomy::kElementAnimeTitle);
     if (GetTitleFromPath(episode_from_directory)) {
