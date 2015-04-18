@@ -336,7 +336,7 @@ void Service::ParseLibraryObject(Json::Value& value) {
 
   anime_item.AddtoUserList();
   anime_item.SetMyLastWatchedEpisode(value["episodes_watched"].asInt());
-  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(StrToWstr(rating_value["updated_at"].asString())));
+  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(StrToWstr(value["updated_at"].asString())));
   anime_item.SetMyRewatchedTimes(value["rewatched_times"].asInt());
   anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(value["status"].asString())));
   anime_item.SetMyRewatching(value["rewatching"].asBool());
