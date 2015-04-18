@@ -69,6 +69,10 @@ anitomy::Elements& Episode::elements() {
   return elements_;
 }
 
+const anitomy::Elements& Episode::elements() const {
+  return elements_;
+}
+
 int Episode::episode_number() const {
   return GetElementAsInt(anitomy::kElementEpisodeNumber);
 }

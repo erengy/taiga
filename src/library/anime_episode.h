@@ -41,6 +41,7 @@ class Episode {
   int anime_year() const;
   std::wstring audio_terms() const;
   anitomy::Elements& elements();
+  const anitomy::Elements& elements() const;
   int episode_number() const;
   episode_number_range_t episode_number_range() const;
   const std::wstring& episode_title() const;

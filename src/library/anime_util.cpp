@@ -604,7 +604,7 @@ std::wstring GetEpisodeRange(const Episode& episode) {
     return ToWstr(GetEpisodeLow(episode)) + L"-" +
            ToWstr(GetEpisodeHigh(episode));
 
-  if (episode.episode_number())
+  if (!episode.elements().empty(anitomy::kElementEpisodeNumber))
     return ToWstr(episode.episode_number());
 
   return std::wstring();
