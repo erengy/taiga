@@ -194,21 +194,27 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Item* Database::FindItem(int id) {
+Item* Database::FindItem(int id, bool log_error) {
   if (IsValidId(id)) {
     auto it = items.find(id);
     if (it != items.end())
       return &it->second;
+    if (log_error)
+      LOG(LevelError, L"Could not find ID: " + ToWstr(id));
   }
 
   return nullptr;
 }
 
-Item* Database::FindItem(const std::wstring& id, enum_t service) {
-  if (!id.empty())
+Item* Database::FindItem(const std::wstring& id, enum_t service,
+                         bool log_error) {
+  if (!id.empty()) {
     foreach_(it, items)
       if (id == it->second.GetId(service))
         return &it->second;
+    if (log_error)
+      LOG(LevelError, L"Could not find ID: " + id);
+  }
 
   return nullptr;
 }

@@ -409,6 +409,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       HistoryItem history_item;
       history_item.status = ToInt(body);
       auto anime_item = AnimeDatabase.FindItem(anime_id);
+      if (!anime_item)
+        continue;
       switch (*history_item.status) {
         case anime::kCompleted:
           history_item.episode = anime_item->GetEpisodeCount();

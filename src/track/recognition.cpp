@@ -195,9 +195,11 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
       if (!episode.file_extension().empty()) {
         episode.set_episode_number(1);
       } else {
-        const auto& anime_item = *AnimeDatabase.FindItem(episode.anime_id);
-        int episode_count = anime_item.GetEpisodeCount();
-        episode.set_episode_number_range(std::make_pair(1, episode_count));
+        auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+        if (anime_item) {
+          int episode_count = anime_item->GetEpisodeCount();
+          episode.set_episode_number_range(std::make_pair(1, episode_count));
+        }
       }
     }
   }
@@ -696,15 +698,17 @@ static double BonusScore(const anime::Episode& episode, int id) {
   double score = 0.0;
   auto anime_item = AnimeDatabase.FindItem(id);
 
-  auto anime_year = episode.anime_year();
-  if (anime_year)
-    if (anime_year == anime_item->GetDateStart().year)
-      score += 0.1;
+  if (anime_item) {
+    auto anime_year = episode.anime_year();
+    if (anime_year)
+      if (anime_year == anime_item->GetDateStart().year)
+        score += 0.1;
 
-  auto anime_type = anime::TranslateType(episode.anime_type());
-  if (anime_type != anime::kUnknownType)
-    if (anime_type == anime_item->GetType())
-      score += 0.1;
+    auto anime_type = anime::TranslateType(episode.anime_type());
+    if (anime_type != anime::kUnknownType)
+      if (anime_type == anime_item->GetType())
+        score += 0.1;
+  }
 
   return score;
 };

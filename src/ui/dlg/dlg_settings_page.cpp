@@ -845,7 +845,8 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case LVN_GETDISPINFO: {
       NMLVDISPINFO* plvdi = reinterpret_cast<NMLVDISPINFO*>(pnmh);
       auto anime_item = AnimeDatabase.FindItem(static_cast<int>(plvdi->item.lParam));
-      if (!anime_item) break;
+      if (!anime_item)
+        break;
       switch (plvdi->item.iSubItem) {
         case 0: // Anime title
           plvdi->item.pszText = const_cast<LPWSTR>(anime_item->GetTitle().data());

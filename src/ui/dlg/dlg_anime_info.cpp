@@ -115,7 +115,7 @@ void AnimeDialog::OnCancel() {
 void AnimeDialog::OnOK() {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
-  if (anime_item->IsInList())
+  if (anime_item && anime_item->IsInList())
     if (!page_my_info.Save())
       return;
 
@@ -287,8 +287,10 @@ BOOL AnimeDialog::PreTranslateMessage(MSG* pMsg) {
         if (anime::IsValidId(anime_id_)) {
           UpdateTitle(true);
           auto anime_item = AnimeDatabase.FindItem(anime_id_);
-          sync::GetMetadataById(anime_id_);
-          sync::DownloadImage(anime_id_, anime_item->GetImageUrl());
+          if (anime_item) {
+            sync::GetMetadataById(anime_id_);
+            sync::DownloadImage(anime_id_, anime_item->GetImageUrl());
+          }
         }
         return TRUE;
     }
@@ -442,6 +444,9 @@ void AnimeDialog::SetCurrentId(int anime_id) {
 void AnimeDialog::SetCurrentPage(int index) {
   current_page_ = index;
 
+  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+  bool anime_in_list = anime_item && anime_item->IsInList();
+
   if (IsWindow()) {
     switch (index) {
       case kAnimePageNone:
@@ -454,8 +459,7 @@ void AnimeDialog::SetCurrentPage(int index) {
         image_label_.Show();
         page_my_info.Hide();
         page_series_info.Show();
-        sys_link_.Show(mode_ == kDialogModeNowPlaying ||
-                       !AnimeDatabase.FindItem(anime_id_)->IsInList());
+        sys_link_.Show(mode_ == kDialogModeNowPlaying || !anime_in_list);
         break;
       case kAnimePageMyInfo:
         image_label_.Show();
@@ -474,8 +478,7 @@ void AnimeDialog::SetCurrentPage(int index) {
     tab_.SetCurrentlySelected(index - 1);
 
     int show = SW_SHOW;
-    if (mode_ == kDialogModeNowPlaying ||
-        !AnimeDatabase.FindItem(anime_id_)->IsInList()) {
+    if (mode_ == kDialogModeNowPlaying || !anime_in_list) {
       show = SW_HIDE;
     }
     ShowDlgItem(IDOK, show);
@@ -549,7 +552,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
           if (std::find(anime_ids.begin(), anime_ids.end(),
                         it->anime_id) == anime_ids.end()) {
             auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-            if (anime_item->GetMyStatus() == anime::kWatching)
+            if (anime_item && anime_item->GetMyStatus() == anime::kWatching)
               anime_ids.push_back(it->anime_id);
           }
         }
@@ -560,7 +563,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     int recently_watched = 0;
     foreach_c_(it, anime_ids) {
       auto anime_item = AnimeDatabase.FindItem(*it);
-      if (!anime_item->IsNextEpisodeAvailable())
+      if (!anime_item || !anime_item->IsNextEpisodeAvailable())
         continue;
       std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
       content += L"\u2022 <a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>\n";
@@ -681,12 +684,12 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         content += L" by " + CurrentEpisode.release_group();
       content += L"\n";
     }
-    if (anime_item->IsInList()) {
+    if (anime_item && anime_item->IsInList()) {
       content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
     } else {
       content += L"<a href=\"AddToList()\">Add to list</a>";
     }
-    if (mode_ == kDialogModeNowPlaying) {
+    if (anime_item && mode_ == kDialogModeNowPlaying) {
       content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
       int episode_number = anime::GetEpisodeHigh(CurrentEpisode);
       if (episode_number == 0)
@@ -761,11 +764,12 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   }
 
   // Content
+  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+  bool anime_in_list = anime_item && anime_item->IsInList();
   if (mode_ == kDialogModeNowPlaying && !anime::IsValidId(anime_id_)) {
     rect.left += ScaleX(win::kControlMargin);
     sys_link_.SetPosition(nullptr, rect);
-  } else if (mode_ == kDialogModeNowPlaying ||
-             !AnimeDatabase.FindItem(anime_id_)->IsInList()) {
+  } else if (mode_ == kDialogModeNowPlaying || !anime_in_list) {
     win::Dc dc = sys_link_.GetDC();
     int text_height = GetTextHeight(dc.Get());
     int line_count = mode_ == kDialogModeNowPlaying ? 2 : 1;

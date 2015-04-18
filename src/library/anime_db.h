@@ -36,8 +36,8 @@ public:
   bool LoadDatabase();
   bool SaveDatabase();
 
-  Item* FindItem(int id);
-  Item* FindItem(const std::wstring& id, enum_t service);
+  Item* FindItem(int id, bool log_error = true);
+  Item* FindItem(const std::wstring& id, enum_t service, bool log_error = true);
 
   void ClearInvalidItems();
   bool DeleteItem(int id);

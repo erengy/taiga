@@ -522,8 +522,12 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
   if (group_name.empty())
     return false;
 
-  // Create new filter
   auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return false;
+
+  // Create new filter
   Aggregator.filter_manager.AddFilter(
       kFeedFilterActionPrefer, kFeedFilterMatchAll, kFeedFilterOptionDefault,
       true, L"[Fansub] " + anime_item->GetTitle());

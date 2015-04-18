@@ -176,7 +176,8 @@ std::wstring GetAnimePage(const anime::Item& anime_item) {
 void ViewAnimePage(int anime_id) {
   auto anime_item = AnimeDatabase.FindItem(anime_id);
 
-  ExecuteLink(GetAnimePage(*anime_item));
+  if (anime_item)
+    ExecuteLink(GetAnimePage(*anime_item));
 }
 
 void ViewDashboard() {

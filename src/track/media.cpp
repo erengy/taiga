@@ -281,7 +281,7 @@ void ProcessMediaPlayerStatus(const MediaPlayer* media_player) {
 
   // Media player is not running
   } else {
-    auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+    auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id, false);
 
     // Media player was running, and the media was recognized
     if (anime_item) {

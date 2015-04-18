@@ -157,6 +157,9 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   // Update window title
   parent->UpdateTitle(false);
 
+  if (!anime_item)
+    return;
+
   // Set synonyms
   std::wstring text = Join(anime_item->GetSynonyms(), L", ");
   if (text.empty())
@@ -188,6 +191,9 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
 
 BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
+
+  if (!anime_item)
+    return FALSE;
 
   switch (LOWORD(wParam)) {
     // Browse anime folder
@@ -243,6 +249,11 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  auto anime_item = AnimeDatabase.FindItem(anime_id_);
+
+  if (!anime_item)
+    return 0;
+
   switch (pnmh->idFrom) {
     case IDC_DATETIME_START:
       if (pnmh->code == DTN_DATETIMECHANGE)
@@ -262,7 +273,7 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
           anime::GetFansubFilter(anime_id_, groups);
           std::wstring text = Join(groups, L", ");
           InputDialog dlg;
-          dlg.title = AnimeDatabase.FindItem(anime_id_)->GetTitle();
+          dlg.title = anime_item->GetTitle();
           dlg.info = L"Please enter your fansub group preference for this title:";
           dlg.text = text;
           dlg.Show(parent->GetWindowHandle());
@@ -285,7 +296,7 @@ void PageMyInfo::Refresh(int anime_id) {
   anime_id_ = anime_id;
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
 
-  if (!anime_item->IsInList())
+  if (!anime_item || !anime_item->IsInList())
     return;
 
   // Episodes watched
@@ -397,6 +408,9 @@ void PageMyInfo::RefreshFansubPreference() {
 
 bool PageMyInfo::Save() {
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
+
+  if (!anime_item)
+    return false;
 
   // Create item
   HistoryItem history_item;

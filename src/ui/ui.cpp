@@ -344,7 +344,8 @@ bool OnLibraryEntriesEditDelete(const std::vector<int> ids) {
   if (ids.size() < 20) {
     for (const auto& id : ids) {
       auto anime_item = AnimeDatabase.FindItem(id);
-      AppendString(content, anime_item->GetTitle(), L"\n");
+      if (anime_item)
+        AppendString(content, anime_item->GetTitle(), L"\n");
     }
   } else {
     content = L"Selected " + ToWstr(ids.size()) + L" entries";
@@ -368,6 +369,8 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
   int number_max = 1900;
   for (const auto& id : ids) {
     auto anime_item = AnimeDatabase.FindItem(id);
+    if (!anime_item)
+      continue;
     current.insert(anime_item->GetMyLastWatchedEpisode());
     if (anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
       number_max = min(number_max, anime_item->GetEpisodeCount());
@@ -391,7 +394,8 @@ bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
   std::set<std::wstring> current;
   for (const auto& id : ids) {
     auto anime_item = AnimeDatabase.FindItem(id);
-    current.insert(anime_item->GetMyTags());
+    if (anime_item)
+      current.insert(anime_item->GetMyTags());
   }
   std::wstring value = current.size() == 1 ? *current.begin() : L"";
 
@@ -429,8 +433,10 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
 
   if (!Taiga.logged_in) {
     auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
-    ChangeStatusText(L"\"" + anime_item->GetTitle() +
-                     L"\" is queued for update.");
+    if (anime_item) {
+      ChangeStatusText(L"\"" + anime_item->GetTitle() +
+                       L"\" is queued for update.");
+    }
   }
 }
 
@@ -457,6 +463,9 @@ bool OnHistoryClear() {
 
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
   auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
+
+  if (!anime_item)
+    return IDNO;
 
   win::TaskDialog dlg;
   std::wstring title = L"Anime title: " + anime_item->GetTitle();
@@ -590,12 +599,16 @@ void OnAnimeWatchingEnd(const anime::Item& anime_item,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool OnRecognitionCancelConfirm() {
+  auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
+
+  if (!anime_item)
+    return false;
+
   win::TaskDialog dlg;
   std::wstring title = L"List Update";
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to cancel this list update?");
-  auto anime_item = AnimeDatabase.FindItem(CurrentEpisode.anime_id);
   std::wstring content = anime_item->GetTitle() +
       PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
   dlg.SetContent(content.c_str());

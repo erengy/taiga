@@ -246,7 +246,7 @@ bool AppSettings::Load() {
   xml_node node_items = settings.child(L"anime").child(L"items");
   foreach_xmlnode_(item, node_items, L"item") {
     int anime_id = item.attribute(L"id").as_int();
-    auto anime_item = AnimeDatabase.FindItem(anime_id);
+    auto anime_item = AnimeDatabase.FindItem(anime_id, false);
     if (!anime_item)
       anime_item = &AnimeDatabase.items[anime_id];
     anime_item->SetFolder(item.attribute(L"folder").value());
