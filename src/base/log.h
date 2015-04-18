@@ -44,8 +44,6 @@ public:
   void SetOutputPath(const std::wstring& path);
   void SetSeverityLevel(int severity_level);
 
-  static std::wstring FormatError(DWORD error, LPCWSTR source = nullptr);
-
 private:
   win::CriticalSection critical_section_;
   std::wstring output_path_;

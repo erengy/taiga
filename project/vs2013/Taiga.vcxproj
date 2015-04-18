@@ -133,6 +133,7 @@
     <ClCompile Include="..\..\src\base\base64.cpp" />
     <ClCompile Include="..\..\src\base\crc.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
+    <ClCompile Include="..\..\src\base\error.cpp" />
     <ClCompile Include="..\..\src\base\file.cpp" />
     <ClCompile Include="..\..\src\base\file_monitor.cpp" />
     <ClCompile Include="..\..\src\base\file_search.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="..\..\src\base\comparable.h" />
     <ClInclude Include="..\..\src\base\crc.h" />
     <ClInclude Include="..\..\src\base\crypto.h" />
+    <ClInclude Include="..\..\src\base\error.h" />
     <ClInclude Include="..\..\src\base\file.h" />
     <ClInclude Include="..\..\src\base\file_monitor.h" />
     <ClInclude Include="..\..\src\base\foreach.h" />

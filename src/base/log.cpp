@@ -96,35 +96,3 @@ void Logger::SetOutputPath(const std::wstring& path) {
 void Logger::SetSeverityLevel(int severity_level) {
   severity_level_ = severity_level;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring Logger::FormatError(DWORD error, LPCWSTR source) {
-  DWORD flags = FORMAT_MESSAGE_IGNORE_INSERTS;
-  HMODULE module_handle = nullptr;
-
-  const DWORD size = 101;
-  WCHAR buffer[size];
-
-  if (source) {
-    flags |= FORMAT_MESSAGE_FROM_HMODULE;
-    module_handle = LoadLibrary(source);
-    if (!module_handle)
-      return std::wstring();
-  } else {
-    flags |= FORMAT_MESSAGE_FROM_SYSTEM;
-  }
-
-  DWORD language_id = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-
-  if (FormatMessage(flags, module_handle, error, language_id,
-                    buffer, size, nullptr)) {
-      if (module_handle)
-        FreeLibrary(module_handle);
-      return buffer;
-  } else {
-    if (module_handle)
-      FreeLibrary(module_handle);
-    return ToWstr(static_cast<UINT>(error));
-  }
-}

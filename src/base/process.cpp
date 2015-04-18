@@ -19,6 +19,7 @@
 #include <windows.h>
 #include <psapi.h>
 
+#include "error.h"
 #include "log.h"
 #include "process.h"
 #include "string.h"
@@ -225,8 +226,7 @@ BOOL GetProcessFiles(ULONG process_id,
 
     objectNameInfo = malloc(0x1000);
 
-    UINT errorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
-    SetErrorMode(errorMode | SEM_FAILCRITICALERRORS);
+    base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
 
     if (!NT_SUCCESS(NtQueryObject(dupHandle, ObjectNameInformation,
                                   objectNameInfo, 0x1000, &returnLength))) {
@@ -234,7 +234,6 @@ BOOL GetProcessFiles(ULONG process_id,
         free(objectTypeInfo);
         free(objectNameInfo);
         CloseHandle(dupHandle);
-        SetErrorMode(errorMode);
         continue;
       }
       // Reallocate the buffer and try again
@@ -244,7 +243,6 @@ BOOL GetProcessFiles(ULONG process_id,
         free(objectTypeInfo);
         free(objectNameInfo);
         CloseHandle(dupHandle);
-        SetErrorMode(errorMode);
         continue;
       }
     }
@@ -253,7 +251,6 @@ BOOL GetProcessFiles(ULONG process_id,
     if (errorCode != ERROR_SUCCESS) {
       SetLastError(ERROR_SUCCESS);
     }
-    SetErrorMode(errorMode);
 
     // Cast our buffer into a UNICODE_STRING
     objectName = *reinterpret_cast<PUNICODE_STRING>(objectNameInfo);
