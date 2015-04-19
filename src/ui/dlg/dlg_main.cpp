@@ -495,9 +495,6 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
           Execute(Settings.library_folders.at(index));
           return TRUE;
         }
-      } else if (pMsg->wParam == VK_F4) {
-        Destroy();
-        return TRUE;
       } else if (handle_menu_accelerator()) {
         return TRUE;
       }

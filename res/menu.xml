@@ -18,7 +18,7 @@
 		<item name="Play next episode&#9;Ctrl+N" action="PlayNext()"/>
 		<item name="Play random anime&#9;Ctrl+R" action="PlayRandomAnime()"/>
 		<item type="separator"/>
-		<item name="Exit&#9;Alt+F4" action="Exit()"/>
+		<item name="E&xit" action="Exit()"/>
 	</menu>
 	<!-- Services -->
 	<menu name="Services">
