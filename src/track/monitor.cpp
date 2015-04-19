@@ -136,8 +136,10 @@ void FolderMonitor::OnDirectory(const DirectoryChangeNotification& notification)
   if (new_path_available) {
     anime::Episode episode;
     anime_item = FindAnimeItem(notification, episode);
-    if (anime_item && Meow.IsValidAnimeType(episode))
-      ChangeAnimeFolder(*anime_item, episode.folder + episode.file_name());
+    if (anime_item && Meow.IsValidAnimeType(episode)) {
+      std::wstring new_path = notification.path + notification.filename.first;
+      ChangeAnimeFolder(*anime_item, new_path);
+    }
   }
 }
 
