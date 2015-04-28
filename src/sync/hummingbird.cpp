@@ -134,11 +134,6 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.url.path =
       L"/libraries/" + request.data[canonical_name_ + L"-id"];
 
-  // When this undocumented parameter is included, Hummingbird will return a
-  // "mal_id" value that identifies the corresponding entry in MyAnimeList, if
-  // available.
-  http_request.data[L"include_mal_id"] = L"true";
-
   if (request.data.count(L"status"))
     http_request.data[L"status"] =
         TranslateMyStatusTo(ToInt(request.data[L"status"]));
@@ -310,6 +305,10 @@ void Service::ParseAnimeObject(Json::Value& value, anime::Item& anime_item) {
   anime_item.SetScore(TranslateSeriesRatingFrom(value["community_rating"].asFloat()));
   anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(value["age_rating"].asString())));
 
+  int mal_id = value["mal_id"].asInt();
+  if (mal_id > 0)
+    anime_item.SetId(ToWstr(mal_id), sync::kMyAnimeList);
+
   std::vector<std::wstring> genres;
   auto& genres_value = value["genres"];
   for (size_t i = 0; i < genres_value.size(); i++)
@@ -327,10 +326,6 @@ void Service::ParseLibraryObject(Json::Value& value) {
   anime_item.SetSource(this->id());
   anime_item.SetId(ToWstr(anime_value["id"].asInt()), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
-
-  int mal_id = value["mal_id"].asInt();
-  if (mal_id > 0)
-    anime_item.SetId(ToWstr(mal_id), sync::kMyAnimeList);
 
   ParseAnimeObject(anime_value, anime_item);
 
