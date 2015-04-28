@@ -345,8 +345,9 @@ bool Service::ParseResponseBody(Response& response, HttpResponse& http_response,
                                 Json::Value& root) {
   Json::Reader reader;
 
-  if (reader.parse(WstrToStr(http_response.body), root))
-    return true;
+  if (http_response.body != L"false")
+    if (reader.parse(WstrToStr(http_response.body), root))
+      return true;
 
   switch (response.type) {
     case kGetLibraryEntries:
