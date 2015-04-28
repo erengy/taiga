@@ -205,11 +205,8 @@ void Item::SetType(int type) {
 }
 
 void Item::SetEpisodeCount(int number) {
-  if (metadata_.extent.size() < 1) {
-    if (number <= 0)
-      return;
+  if (metadata_.extent.size() < 1)
     metadata_.extent.resize(1);
-  }
 
   metadata_.extent.at(0) = number;
 
