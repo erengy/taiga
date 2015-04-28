@@ -21,9 +21,11 @@
 #include "base/html.h"
 #include "base/string.h"
 #include "base/xml.h"
+#include "library/anime_util.h"
 #include "taiga/http.h"
 #include "taiga/path.h"
 #include "track/feed.h"
+#include "track/recognition.h"
 
 GenericFeedItem::GenericFeedItem()
     : permalink(true) {
@@ -86,6 +88,26 @@ bool FeedItem::operator==(const FeedItem& item) const {
 
   // Items are different
   return false;
+}
+
+TorrentCategory FeedItem::GetTorrentCategory() const {
+  if (InStr(category, L"Batch") > -1)  // Respect feed's own categorization
+    return kTorrentCategoryBatch;
+
+  if (InStr(title, L"Vol.") > -1)  // A volume is always a batch release
+    return kTorrentCategoryBatch;
+
+  if (!Meow.IsValidAnimeType(episode_data))
+    return kTorrentCategoryOther;
+
+  if (anime::IsEpisodeRange(episode_data))
+    return kTorrentCategoryBatch;
+
+  if (!episode_data.file_extension().empty())
+    if (!Meow.IsValidFileExtension(episode_data.file_extension()))
+      return kTorrentCategoryOther;
+
+  return kTorrentCategoryAnime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

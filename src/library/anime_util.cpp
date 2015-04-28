@@ -635,6 +635,8 @@ bool IsAllEpisodesAvailable(const Item& item) {
 }
 
 bool IsEpisodeRange(const Episode& episode) {
+  if (episode.elements().count(anitomy::kElementEpisodeNumber) < 2)
+    return false;
   return GetEpisodeHigh(episode) > GetEpisodeLow(episode);
 }
 

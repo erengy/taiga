@@ -78,6 +78,8 @@ public:
   void Discard(int option);
   bool IsDiscarded() const;
 
+  TorrentCategory GetTorrentCategory() const;
+
   bool operator<(const FeedItem& item) const;
   bool operator==(const FeedItem& item) const;
 

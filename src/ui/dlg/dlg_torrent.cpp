@@ -401,19 +401,8 @@ void TorrentDialog::RefreshList() {
       continue;
 
     std::wstring title, number, video;
-    int group = kTorrentCategoryAnime;
+    int group = it->GetTorrentCategory();
     int icon = StatusToIcon(anime::kUnknownStatus);
-    const auto& file_extension = it->episode_data.file_extension();
-    if (it->category == L"Batch" ||
-        InStr(it->title, L"Vol.") > -1 ||
-        file_extension.empty() ||
-        anime::IsEpisodeRange(it->episode_data)) {
-      group = kTorrentCategoryBatch;
-    } else if (!it->episode_data.episode_number() ||
-               !Meow.IsValidAnimeType(it->episode_data) ||
-               !Meow.IsValidFileExtension(file_extension)) {
-      group = kTorrentCategoryOther;
-    }
     auto anime_item = AnimeDatabase.FindItem(it->episode_data.anime_id);
     if (anime_item) {
       icon = StatusToIcon(anime_item->GetAiringStatus());
