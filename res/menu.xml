@@ -102,9 +102,10 @@
 	<!-- Right click -->
 	<menu name="RightClick">
 		<item name="Information" action="Info()"/>
+		<item name="Search" sub="Search"/>
 		<item type="separator"/>
 		<item name="Edit" action="EditAll()"/>
-		<item name="Search" sub="Search"/>
+		<item name="Delete from list...&#9;Del" action="EditDelete()"/>
 		<item type="separator"/>
 		<item name="Open folder" action="OpenFolder()"/>
 		<item name="Scan available episodes&#9;F5" action="ScanEpisodes()"/>

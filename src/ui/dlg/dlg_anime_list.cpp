@@ -300,8 +300,10 @@ void AnimeListDialog::OnContextMenu(HWND hwnd, POINT pt) {
         parameter = reinterpret_cast<LPARAM>(&anime_ids);
       }
       ui::Menus.UpdateAll(GetCurrentItem());
-      ExecuteAction(ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y,
-                                   menu_name.c_str()), 0, parameter);
+      auto action = ui::Menus.Show(DlgMain.GetWindowHandle(), pt.x, pt.y, menu_name.c_str());
+      if (action == L"EditDelete()")
+        parameter = reinterpret_cast<LPARAM>(&anime_ids);
+      ExecuteAction(action, 0, parameter);
     }
 
   } else if (hwnd == listview.GetHeader()) {
