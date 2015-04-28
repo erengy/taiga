@@ -578,7 +578,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
                 L"Or how about you <a href=\"PlayRandomAnime()\">try a random one</a>?\n\n";
       link_count += 2;
     } else {
-      content = L"Continue watching:\n" + content + L"\n";
+      content = L"Continue Watching:\n" + content + L"\n";
       int watched_last_week = 0;
       foreach_c_(it, History.queue.items) {
         if (!it->episode || *it->episode == 0)
