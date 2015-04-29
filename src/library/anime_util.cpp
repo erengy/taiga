@@ -739,7 +739,7 @@ void ChangeEpisode(int anime_id, int value) {
   if (IsValidEpisodeNumber(value, anime_item->GetEpisodeCount())) {
     Episode episode;
     episode.set_episode_number(value);
-    AddToQueue(*anime_item, episode, true);
+    AddToQueue(*anime_item, episode, false);
   }
 }
 
