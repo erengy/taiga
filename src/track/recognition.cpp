@@ -107,6 +107,8 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
   if (give_score)
     scores_.clear();
 
+  InitializeTitles();
+
   auto valide_ids = [&](anime::Episode& episode) {
     for (auto it = anime_ids.begin(); it != anime_ids.end(); ) {
       if (!ValidateOptions(episode, *it, match_options, true)) {
@@ -117,42 +119,37 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
     }
   };
 
-  InitializeTitles();
+  auto look_up_merged_title = [&](
+      const std::initializer_list<anitomy::ElementCategory>& elements) {
+    anime::Episode episode_merged_title(episode);
+    auto merged_title = episode.anime_title();
+    for (const auto& element : elements) {
+      merged_title += L" " + episode.elements().get(element);
+      episode_merged_title.elements().erase(element);
+    }
+    episode_merged_title.set_anime_title(merged_title);
+    LookUpTitle(episode_merged_title.anime_title(), anime_ids);
+    valide_ids(episode_merged_title);
+    if (!anime_ids.empty()) {
+      std::swap(episode_merged_title, episode);
+      LOG(LevelDebug, L"Merged title lookup succeeded: " +
+                      episode.anime_title());
+    }
+  };
 
   // Look up anime title + episode number + episode title
   if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
       !episode.elements().empty(anitomy::kElementEpisodeTitle)) {
-    anime::Episode episode_merged_title(episode);
-    episode_merged_title.set_anime_title(
-        episode.anime_title() + L" " +
-        episode.elements().get(anitomy::kElementEpisodeNumber) + L" " +
-        episode.elements().get(anitomy::kElementEpisodeTitle));
-    episode_merged_title.elements().erase(anitomy::kElementEpisodeNumber);
-    episode_merged_title.elements().erase(anitomy::kElementEpisodeTitle);
-    LookUpTitle(episode_merged_title.anime_title(), anime_ids);
-    valide_ids(episode_merged_title);
-    if (!anime_ids.empty()) {
-      std::swap(episode_merged_title, episode);
-      LOG(LevelDebug, L"Merged title lookup succeeded: " +
-                      episode.anime_title());
-    }
+    static const auto elements =
+        {anitomy::kElementEpisodeNumber, anitomy::kElementEpisodeTitle};
+    look_up_merged_title(elements);
   }
-
   // Look up anime title + episode number
   if (!episode.elements().empty(anitomy::kElementEpisodeNumber) &&
-      episode.elements().empty(anitomy::kElementFileExtension)) {
-    anime::Episode episode_merged_title(episode);
-    episode_merged_title.set_anime_title(
-      episode.anime_title() + L" " +
-      episode.elements().get(anitomy::kElementEpisodeNumber));
-    episode_merged_title.elements().erase(anitomy::kElementEpisodeNumber);
-    LookUpTitle(episode_merged_title.anime_title(), anime_ids);
-    valide_ids(episode_merged_title);
-    if (!anime_ids.empty()) {
-      std::swap(episode_merged_title, episode);
-      LOG(LevelDebug, L"Merged title lookup succeeded: " +
-                      episode.anime_title());
-    }
+      (episode.elements().empty(anitomy::kElementFileExtension) ||
+       !episode.elements().empty(anitomy::kElementAnimeType))) {
+    static const auto elements = {anitomy::kElementEpisodeNumber};
+    look_up_merged_title(elements);
   }
 
   // Look up anime title
