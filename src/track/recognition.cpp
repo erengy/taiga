@@ -779,14 +779,17 @@ static bool ValidateAnitomyElement(std::wstring str,
 }
 
 bool Engine::IsValidAnimeType(const anime::Episode& episode) const {
-  auto anime_type = episode.anime_type();
+  const auto category = anitomy::kElementAnimeType;
 
-  if (anime_type.empty())
+  if (episode.elements().empty(category))
     return true;
 
-  if (!ValidateAnitomyElement(anime_type, anitomy::kElementAnimeType)) {
-    LOG(LevelDebug, episode.file_name_with_extension());
-    return false;
+  auto anime_types = episode.elements().get_all(category);
+  for (const auto& anime_type : anime_types) {
+    if (!ValidateAnitomyElement(anime_type, category)) {
+      LOG(LevelDebug, episode.file_name_with_extension());
+      return false;
+    }
   }
 
   return true;
