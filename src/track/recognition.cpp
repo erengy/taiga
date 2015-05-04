@@ -526,12 +526,12 @@ void Engine::ConvertSeasonNumbers(std::wstring& str) const {
   // This works considerably faster than regular expressions.
   typedef std::vector<std::wstring> season_t;
   static const std::vector<std::pair<std::wstring, season_t>> values{
-    {L"1", {L"1st season", L"season 1", L"s1"}},
-    {L"2", {L"2nd season", L"season 2", L"s2"}},
-    {L"3", {L"3rd season", L"season 3", L"s3"}},
-    {L"4", {L"4th season", L"season 4", L"s4"}},
-    {L"5", {L"5th season", L"season 5", L"s5"}},
-    {L"6", {L"6th season", L"season 6", L"s6"}},
+    {L"1", {L"1st season", L"season 1", L"series 1", L"s1"}},
+    {L"2", {L"2nd season", L"season 2", L"series 2", L"s2"}},
+    {L"3", {L"3rd season", L"season 3", L"series 3", L"s3"}},
+    {L"4", {L"4th season", L"season 4", L"series 4", L"s4"}},
+    {L"5", {L"5th season", L"season 5", L"series 5", L"s5"}},
+    {L"6", {L"6th season", L"season 6", L"series 6", L"s6"}},
   };
 
   for (const auto& value : values)
