@@ -60,6 +60,7 @@ public:
 
   sorted_scores_t GetScores() const;
 
+  bool IsBatchRelease(const anime::Episode& episode) const;
   bool IsValidAnimeType(const anime::Episode& episode) const;
   bool IsValidFileExtension(const anime::Episode& episode) const;
   bool IsValidFileExtension(const std::wstring& extension) const;

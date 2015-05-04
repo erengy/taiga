@@ -778,6 +778,21 @@ static bool ValidateAnitomyElement(std::wstring str,
   return found && options.valid;
 }
 
+bool Engine::IsBatchRelease(const anime::Episode& episode) const {
+  const auto category = anitomy::kElementReleaseInformation;
+
+  if (episode.elements().empty(category))
+    return false;
+
+  auto keywords = episode.elements().get_all(category);
+  for (const auto& keyword : keywords) {
+    if (IsEqual(keyword, L"Batch"))
+      return true;
+  }
+
+  return false;
+}
+
 bool Engine::IsValidAnimeType(const anime::Episode& episode) const {
   const auto category = anitomy::kElementAnimeType;
 
