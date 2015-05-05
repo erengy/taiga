@@ -17,6 +17,7 @@
 */
 
 #include "base/foreach.h"
+#include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -44,11 +45,11 @@ BOOL SearchDialog::OnInitDialog() {
   list_.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
   list_.SetImageList(ui::Theme.GetImageList16().GetHandle());
   list_.SetTheme();
-  list_.InsertColumn(0, 400, 400, LVCFMT_LEFT,   L"Anime title");
-  list_.InsertColumn(1,  60,  60, LVCFMT_CENTER, L"Type");
-  list_.InsertColumn(2,  60,  60, LVCFMT_RIGHT,  L"Episodes");
-  list_.InsertColumn(3,  60,  60, LVCFMT_RIGHT,  L"Score");
-  list_.InsertColumn(4, 100, 100, LVCFMT_RIGHT,  L"Season");
+  list_.InsertColumn(0, ScaleX(400), ScaleX(400), LVCFMT_LEFT,   L"Anime title");
+  list_.InsertColumn(1,  ScaleX(60),  ScaleX(60), LVCFMT_CENTER, L"Type");
+  list_.InsertColumn(2,  ScaleX(60),  ScaleX(60), LVCFMT_RIGHT,  L"Episodes");
+  list_.InsertColumn(3,  ScaleX(60),  ScaleX(60), LVCFMT_RIGHT,  L"Score");
+  list_.InsertColumn(4, ScaleX(100), ScaleX(100), LVCFMT_RIGHT,  L"Season");
   list_.EnableGroupView(true);
   list_.InsertGroup(0, L"Not in list");
   list_.InsertGroup(1, L"In list");

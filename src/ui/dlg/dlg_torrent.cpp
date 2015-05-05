@@ -40,9 +40,6 @@ namespace ui {
 TorrentDialog DlgTorrent;
 
 BOOL TorrentDialog::OnInitDialog() {
-  // Set properties
-  SetSizeMin(470, 260);
-
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_TORRENT));
   list_.EnableGroupView(true);
@@ -52,14 +49,14 @@ BOOL TorrentDialog::OnInitDialog() {
   list_.SetTheme();
 
   // Insert list columns
-  list_.InsertColumn(0, 240, 240, LVCFMT_LEFT,  L"Anime title");
-  list_.InsertColumn(1,  60,  60, LVCFMT_RIGHT, L"Episode");
-  list_.InsertColumn(2, 100, 100, LVCFMT_LEFT,  L"Group");
-  list_.InsertColumn(3,  70,  70, LVCFMT_RIGHT, L"Size");
-  list_.InsertColumn(4, 100, 100, LVCFMT_LEFT,  L"Video");
-  list_.InsertColumn(5, 200, 200, LVCFMT_LEFT,  L"Description");
-  list_.InsertColumn(6, 200, 200, LVCFMT_LEFT,  L"Filename");
-  list_.InsertColumn(7, 190, 190, LVCFMT_RIGHT, L"Release date");
+  list_.InsertColumn(0, ScaleX(240), ScaleX(240), LVCFMT_LEFT,  L"Anime title");
+  list_.InsertColumn(1,  ScaleX(60),  ScaleX(60), LVCFMT_RIGHT, L"Episode");
+  list_.InsertColumn(2, ScaleX(100), ScaleX(100), LVCFMT_LEFT,  L"Group");
+  list_.InsertColumn(3,  ScaleX(70),  ScaleX(70), LVCFMT_RIGHT, L"Size");
+  list_.InsertColumn(4, ScaleX(100), ScaleX(100), LVCFMT_LEFT,  L"Video");
+  list_.InsertColumn(5, ScaleX(200), ScaleX(200), LVCFMT_LEFT,  L"Description");
+  list_.InsertColumn(6, ScaleX(200), ScaleX(200), LVCFMT_LEFT,  L"Filename");
+  list_.InsertColumn(7, ScaleX(190), ScaleX(190), LVCFMT_RIGHT, L"Release date");
   // Insert list groups
   list_.InsertGroup(0, L"Anime");
   list_.InsertGroup(1, L"Batch");

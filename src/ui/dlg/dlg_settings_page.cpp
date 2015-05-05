@@ -423,8 +423,8 @@ BOOL SettingsPage::OnInitDialog() {
       win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
       list.SetTheme();
-      list.InsertColumn(0, 350, 0, LVS_ALIGNLEFT, L"Name");
-      list.InsertColumn(1, 100, 0, LVS_ALIGNLEFT, L"Value");
+      list.InsertColumn(0, ScaleX(350), 0, LVS_ALIGNLEFT, L"Name");
+      list.InsertColumn(1, ScaleX(100), 0, LVS_ALIGNLEFT, L"Value");
       int list_index = 0;
       for (auto& it : parent->advanced_settings_) {
         list.InsertItem(list_index, -1, -1, 0, nullptr, it.second.second.c_str(), it.first);

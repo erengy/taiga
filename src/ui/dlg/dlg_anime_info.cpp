@@ -742,7 +742,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
                               image->rect.Width(), image->rect.Height(),
                               true, true, false);
     } else {
-      rect_image.bottom = rect_image.top + ScaleY(230);
+      rect_image.bottom = rect_image.top + static_cast<int>(rect_image.Width() * 1.4);
     }
     image_label_.SetPosition(nullptr, rect_image);
     rect.left = rect_image.right + ScaleX(win::kControlMargin) * 2;
@@ -771,7 +771,10 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
     sys_link_.SetPosition(nullptr, rect);
   } else if (mode_ == kDialogModeNowPlaying || !anime_in_list) {
     win::Dc dc = sys_link_.GetDC();
-    int text_height = GetTextHeight(dc.Get());
+    dc.AttachFont(sys_link_.GetFont());
+    const int text_height = GetTextHeight(dc.Get());
+    dc.DetachFont();
+    dc.DetachDc();
     int line_count = mode_ == kDialogModeNowPlaying ? 2 : 1;
     win::Rect rect_content = rect;
     rect_content.Inflate(-ScaleX(win::kControlMargin * 2), 0);

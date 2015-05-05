@@ -48,9 +48,9 @@ BOOL HistoryDialog::OnInitDialog() {
   list_.SetTheme();
 
   // Insert list columns
-  list_.InsertColumn(0, 250, 100, LVCFMT_LEFT, L"Anime title");
-  list_.InsertColumn(1, 100, 100, LVCFMT_LEFT, L"Details");
-  list_.InsertColumn(2, 120, 120, LVCFMT_LEFT, L"Last modified");
+  list_.InsertColumn(0, ScaleX(250), ScaleX(100), LVCFMT_LEFT, L"Anime title");
+  list_.InsertColumn(1, ScaleX(100), ScaleX(100), LVCFMT_LEFT, L"Details");
+  list_.InsertColumn(2, ScaleX(120), ScaleX(120), LVCFMT_LEFT, L"Last modified");
 
   // Insert list groups
   list_.InsertGroup(0, L"Queued for update");

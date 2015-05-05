@@ -132,10 +132,12 @@ void MainDialog::CreateDialogControls() {
   toolbar_main.Attach(GetDlgItem(IDC_TOOLBAR_MAIN));
   toolbar_main.SetImageList(ui::Theme.GetImageList24().GetHandle(), 24, 24);
   toolbar_main.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
+  toolbar_main.SendMessage(TB_SETBUTTONSIZE, 0, MAKELPARAM(ScaleX(24), ScaleY(24)));
   // Create search toolbar
   toolbar_search.Attach(GetDlgItem(IDC_TOOLBAR_SEARCH));
-  toolbar_search.SetImageList(ui::Theme.GetImageList24().GetHandle(), 24, 24);
+  toolbar_search.SetImageList(nullptr, 0, 0);
   toolbar_search.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
+  toolbar_search.SendMessage(TB_SETBUTTONSIZE, 0, MAKELPARAM(ScaleX(24), ScaleY(24)));
   // Create search text
   edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   edit.SetCueBannerText(L"Search list");
@@ -144,8 +146,10 @@ void MainDialog::CreateDialogControls() {
   win::Rect rcEdit; edit.GetRect(&rcEdit);
   win::Rect rcEditWindow; edit.GetWindowRect(&rcEditWindow);
   win::Rect rcToolbar; toolbar_search.GetClientRect(&rcToolbar);
-  int edit_y = (30 /*rcToolbar.Height()*/ - rcEditWindow.Height()) / 2;
-  edit.SetPosition(nullptr, 0, edit_y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+  rcEditWindow.bottom = rcEditWindow.top + ScaleY(20);
+  int edit_y = (ScaleY(24) - rcEditWindow.Height()) / 2;
+  edit.SetPosition(nullptr, 0, edit_y, rcEditWindow.Width(), rcEditWindow.Height(),
+                   SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER);
   // Create cancel search button
   cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
   cancel_button.SetParent(edit.GetWindowHandle());
@@ -160,7 +164,7 @@ void MainDialog::CreateDialogControls() {
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
   treeview.SendMessage(TVM_SETBKCOLOR, 0, ::GetSysColor(COLOR_3DFACE));
   treeview.SetImageList(ui::Theme.GetImageList16().GetHandle());
-  treeview.SetItemHeight(20);
+  treeview.SetItemHeight(ScaleY(20));
   treeview.SetTheme();
   if (Settings.GetBool(taiga::kApp_Option_HideSidebar)) {
     treeview.Hide();
@@ -768,7 +772,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   rect_client.bottom -= rcStatus.Height();
 
   // Set sidebar
-  rect_sidebar_.Set(0, rect_client.top, 140, rect_client.bottom);
+  rect_sidebar_.Set(0, rect_client.top, ScaleX(140), rect_client.bottom);
   // Resize treeview
   if (treeview.IsVisible()) {
     win::Rect rect_tree(rect_sidebar_);

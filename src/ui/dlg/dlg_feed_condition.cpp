@@ -222,18 +222,14 @@ void FeedConditionDialog::ChooseElement(int element_index) {
   //////////////////////////////////////////////////////////////////////////////
   // Value
 
+  win::Rect rect;
+  value_combo_.GetWindowRect(GetWindowHandle(), &rect);
   value_combo_.ResetContent();
-
-  RECT rect;
-  value_combo_.GetWindowRect(&rect);
-  int width = rect.right - rect.left;
-  int height = rect.bottom - rect.top;
-  ::ScreenToClient(GetWindowHandle(), reinterpret_cast<LPPOINT>(&rect));
 
   #define RECREATE_COMBO(style) \
     value_combo_.Create(0, WC_COMBOBOX, nullptr, \
         style | CBS_AUTOHSCROLL | WS_CHILD | WS_TABSTOP | WS_VISIBLE | WS_VSCROLL, \
-        rect.left, rect.top, width, height * 2, \
+        rect.left, rect.top, rect.Width(), rect.Height() * 2, \
         GetWindowHandle(), nullptr, nullptr);
 
   switch (element_index) {

@@ -978,7 +978,7 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
 
   // Episodes watched
   text = anime::TranslateNumber(eps_watched, L"0");
-  rcText.right -= (rcText.Width() / 2) + 4;
+  rcText.right -= (rcText.Width() / 2) + ScaleX(4);
   if (!eps_watched) {
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
   } else if (!anime::IsValidEpisodeNumber(eps_watched, eps_total)) {
@@ -992,7 +992,7 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
 
   // Total episodes
   text = anime::TranslateNumber(eps_total, L"?");
-  rcText.left = rcText.right + 8;
+  rcText.left = rcText.right + ScaleX(8);
   rcText.right = rc->right;
   if (!eps_total)
     dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
@@ -1102,7 +1102,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
 
           // Draw progress bar and text
           if (column_type == kColumnUserProgress) {
-            listview.progress_bars_visible = rcItem.Width() > 100;
+            listview.progress_bars_visible = rcItem.Width() > ScaleX(100);
             rcItem.Inflate(-4, 0);
             if (listview.progress_bars_visible) {
               win::Rect rcBar = rcItem;
@@ -1385,25 +1385,25 @@ void AnimeListDialog::ListView::InitializeColumns() {
       {kColumnAnimeStatus, true, i, i++, 0, 22, 22, LVCFMT_CENTER,
        L"", L"anime_status"})));
   columns.insert(std::make_pair(kColumnAnimeTitle, ColumnData(
-      {kColumnAnimeTitle, true, i, i++, 0, 300, 100, LVCFMT_LEFT,
+      {kColumnAnimeTitle, true, i, i++, 0, ScaleX(300), ScaleX(100), LVCFMT_LEFT,
        L"Anime title", L"anime_title"})));
   columns.insert(std::make_pair(kColumnUserProgress, ColumnData(
-      {kColumnUserProgress, true, i, i++, 0, 200, 60, LVCFMT_CENTER,
+      {kColumnUserProgress, true, i, i++, 0, ScaleX(200), ScaleX(60), LVCFMT_CENTER,
        L"Progress", L"user_progress"})));
   columns.insert(std::make_pair(kColumnUserRating, ColumnData(
-      {kColumnUserRating, true, i, i++, 0, 50, 50, LVCFMT_CENTER,
+      {kColumnUserRating, true, i, i++, 0, ScaleX(50), ScaleX(50), LVCFMT_CENTER,
        L"Score", L"user_rating"})));
   columns.insert(std::make_pair(kColumnAnimeRating, ColumnData(
-      {kColumnAnimeRating, false, i, i++, 0, 55, 55, LVCFMT_CENTER,
+      {kColumnAnimeRating, false, i, i++, 0, ScaleX(55), ScaleX(55), LVCFMT_CENTER,
        L"Average", L"anime_average_rating"})));
   columns.insert(std::make_pair(kColumnAnimeType, ColumnData(
-      {kColumnAnimeType, true, i, i++, 0, 60, 60, LVCFMT_CENTER,
+      {kColumnAnimeType, true, i, i++, 0, ScaleX(60), ScaleX(60), LVCFMT_CENTER,
        L"Type", L"anime_type"})));
   columns.insert(std::make_pair(kColumnAnimeSeason, ColumnData(
-      {kColumnAnimeSeason, true, i, i++, 0, 90, 90, LVCFMT_RIGHT,
+      {kColumnAnimeSeason, true, i, i++, 0, ScaleX(90), ScaleX(90), LVCFMT_RIGHT,
        L"Season", L"anime_season"})));
   columns.insert(std::make_pair(kColumnUserLastUpdated, ColumnData(
-      {kColumnUserLastUpdated, false, i, i++, 0, 100, 85, LVCFMT_CENTER,
+      {kColumnUserLastUpdated, false, i, i++, 0, ScaleX(100), ScaleX(85), LVCFMT_CENTER,
        L"Last updated", L"user_last_updated"})));
 }
 

@@ -285,7 +285,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Calculate areas
       win::Rect rect_image(
           rect.left + 4, rect.top + 4,
-          rect.left + 124, rect.bottom - 4);
+          rect.left + ScaleX(124), rect.bottom - 4);
       win::Rect rect_title(
           rect_image.right + 4, rect_image.top,
           rect.right - 4, rect_image.top + text_height + 8);
@@ -336,7 +336,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (anime_item->IsInList()) {
         ui::Theme.GetImageList16().Draw(
             ui::kIcon16_DocumentA, hdc.Get(),
-            rect_title.right - 20, rect_title.top + 4);
+            rect_title.right - 20,
+            rect_title.top + ((rect_title.Height() - 16) / 2));
         rect_title.right -= 20;
       }
 
@@ -392,7 +393,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         DRAWLINE(L"Popularity:");
       }
 
-      rect_details.Set(rect_details.left + 75, text_top,
+      rect_details.Set(rect_details.left + ScaleX(75), text_top,
                        rect_details.right, rect_details.top + text_height);
       DeleteObject(hdc.DetachFont());
 
@@ -667,9 +668,39 @@ void SeasonDialog::RefreshToolbar() {
 }
 
 void SeasonDialog::SetViewMode(int mode) {
+  int line_count = 6;
+  auto current_service = taiga::GetCurrentServiceId();
+  switch (current_service) {
+    case sync::kMyAnimeList:
+      line_count = 6;
+      break;
+    case sync::kHummingbird:
+      line_count = 5;
+      break;
+  }
+  const int synopsis_line_count = 9 - line_count;
+
+  win::Dc hdc = list_.GetDC();
+  hdc.AttachFont(list_.GetFont());
+  const int text_height = GetTextHeight(hdc.Get());
+  hdc.DetachFont();
+  hdc.DetachDc();
+
   SIZE size;
-  size.cx = mode == kSeasonViewAsImages ? 142 : 500;
-  size.cy = 200;
+  size.cy =
+      4 +  // margin
+      1 +  // border
+      4 +  // padding
+      4 + text_height + 4 +  // title
+      4 + (line_count * (text_height + 2)) +  // details
+      4 + (synopsis_line_count * text_height) +  // synopsis
+      4 +  // ?
+      4 +  // padding
+      1 +  // border
+      4;   // margin
+  size.cx = mode == kSeasonViewAsImages ?
+      (4 + 1 + 4 + ScaleX(124) + 4 + 1 + 4) :
+      static_cast<int>(size.cy * 2.5);
   list_.SetTileViewInfo(0, LVTVIF_FIXEDSIZE, nullptr, &size);
 
   view_as = mode;
