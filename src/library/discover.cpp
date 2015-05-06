@@ -69,7 +69,7 @@ bool SeasonDatabase::Load(std::wstring file) {
     anime::Item* anime_item = nullptr;
 
     foreach_(it, id_map) {
-      anime_item = AnimeDatabase.FindItem(it->second, it->first);
+      anime_item = AnimeDatabase.FindItem(it->second, it->first, false);
       if (anime_item)
         break;
     }

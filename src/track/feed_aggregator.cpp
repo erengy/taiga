@@ -297,9 +297,9 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
           !Settings[taiga::kTorrent_Download_Location].empty()) {
         download_path = Settings[taiga::kTorrent_Download_Location];
       }
-      if (!FolderExists(download_path)) {
+      if (!download_path.empty() && !FolderExists(download_path)) {
         LOG(LevelWarning, L"Folder doesn't exist.\n"
-            L"Path: " + download_path);
+                          L"Path: " + download_path);
         download_path.clear();
       }
       // Create a subfolder using the anime title as its name

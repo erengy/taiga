@@ -267,7 +267,7 @@ int Database::UpdateItem(const Item& new_item) {
   Item* item = nullptr;
 
   for (enum_t i = sync::kTaiga; i <= sync::kLastService; i++) {
-    item = FindItem(new_item.GetId(i), i);
+    item = FindItem(new_item.GetId(i), i, false);
     if (item)
       break;
   }
