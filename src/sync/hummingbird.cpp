@@ -281,6 +281,8 @@ bool Service::RequestSucceeded(Response& response,
         }
       } else {
         response.data[L"error"] += L"Unknown error (" +
+            canonical_name() + L"|" +
+            ToWstr(response.type) + L"|" +
             ToWstr(http_response.code) + L")";
       }
       return false;

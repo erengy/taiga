@@ -494,7 +494,9 @@ bool Service::RequestSucceeded(Response& response,
     }
     default:
       response.data[L"error"] += L"Unknown error (" +
-            ToWstr(http_response.code) + L")";
+          canonical_name() + L"|" +
+          ToWstr(response.type) + L"|" +
+          ToWstr(http_response.code) + L")";
       break;
   }
 
