@@ -1382,7 +1382,7 @@ void AnimeListDialog::ListView::InitializeColumns() {
   int i = 0;
 
   columns.insert(std::make_pair(kColumnAnimeStatus, ColumnData(
-      {kColumnAnimeStatus, true, i, i++, 0, 22, 22, LVCFMT_CENTER,
+      {kColumnAnimeStatus, true, i, i++, 0, ScaleX(16) + 6, ScaleX(16) + 6, LVCFMT_CENTER,
        L"", L"anime_status"})));
   columns.insert(std::make_pair(kColumnAnimeTitle, ColumnData(
       {kColumnAnimeTitle, true, i, i++, 0, ScaleX(300), ScaleX(100), LVCFMT_LEFT,

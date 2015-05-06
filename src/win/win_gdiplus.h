@@ -30,7 +30,7 @@ public:
 
   void DrawRectangle(const HDC hdc, const RECT& rect, DWORD color);
   HICON LoadIcon(const std::wstring& file);
-  HBITMAP LoadImage(const std::wstring& file);
+  HBITMAP LoadImage(const std::wstring& file, UINT width, UINT height);
 
 private:
   ULONG_PTR token_;

@@ -64,7 +64,7 @@ BOOL TorrentDialog::OnInitDialog() {
 
   // Create main toolbar
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_TORRENT));
-  toolbar_.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
+  toolbar_.SetImageList(ui::Theme.GetImageList16().GetHandle(), ScaleX(16), ScaleY(16));
   toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   // Insert toolbar buttons
   BYTE fsState = TBSTATE_ENABLED;

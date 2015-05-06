@@ -383,7 +383,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.SetWindowHandle(nullptr);
       // Initialize toolbar
       win::Toolbar toolbar = GetDlgItem(IDC_TOOLBAR_FEED_FILTER);
-      toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
+      toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), ScaleX(16), ScaleY(16));
       toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
       // Add toolbar items
       BYTE fsState1 = TBSTATE_ENABLED;

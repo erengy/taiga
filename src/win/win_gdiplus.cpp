@@ -18,6 +18,7 @@
 
 #include "win_gdiplus.h"
 #include <gdiplus.h>
+#include <memory>
 
 #pragma comment(lib, "gdiplus.lib")
 
@@ -43,30 +44,45 @@ void GdiPlus::DrawRectangle(const HDC hdc, const RECT& rect,
 }
 
 HICON GdiPlus::LoadIcon(const std::wstring& file) {
-  HICON icon = nullptr;
+  HICON icon_handle = nullptr;
 
-  Gdiplus::Bitmap* gp_bitmap = Gdiplus::Bitmap::FromFile(file.c_str());
-  if (gp_bitmap) {
-    gp_bitmap->GetHICON(&icon);
-    delete gp_bitmap;
-    gp_bitmap = nullptr;
-  }
+  std::unique_ptr<Gdiplus::Bitmap> bitmap(
+      Gdiplus::Bitmap::FromFile(file.c_str()));
 
-  return icon;
+  if (bitmap)
+    bitmap->GetHICON(&icon_handle);
+
+  return icon_handle;
 }
 
-HBITMAP GdiPlus::LoadImage(const std::wstring& file) {
-  HBITMAP bitmap = nullptr;
+HBITMAP GdiPlus::LoadImage(const std::wstring& file, UINT width, UINT height) {
+  HBITMAP bitmap_handle = nullptr;
 
-  Gdiplus::Bitmap* gp_bitmap = Gdiplus::Bitmap::FromFile(file.c_str());
-  if (gp_bitmap) {
-    Gdiplus::Color color(Gdiplus::Color::AlphaMask);
-    gp_bitmap->GetHBITMAP(color, &bitmap);
-    delete gp_bitmap;
-    gp_bitmap = nullptr;
+  std::unique_ptr<Gdiplus::Bitmap> bitmap(
+      Gdiplus::Bitmap::FromFile(file.c_str()));
+
+  if (bitmap) {
+    const Gdiplus::Color color(Gdiplus::Color::AlphaMask);
+
+    if ((width > 0 && width != bitmap->GetWidth()) ||
+        (height > 0 && height != bitmap->GetHeight())) {
+      std::unique_ptr<Gdiplus::Bitmap> resized_bitmap(
+          new Gdiplus::Bitmap(width, height));
+
+      Gdiplus::Graphics graphics(resized_bitmap.get());
+      graphics.ScaleTransform(
+          width / static_cast<Gdiplus::REAL>(bitmap->GetWidth()),
+          height / static_cast<Gdiplus::REAL>(bitmap->GetHeight()));
+      graphics.DrawImage(bitmap.get(), 0, 0);
+
+      resized_bitmap->GetHBITMAP(color, &bitmap_handle);
+
+    } else {
+      bitmap->GetHBITMAP(color, &bitmap_handle);
+    }
   }
 
-  return bitmap;
+  return bitmap_handle;
 }
 
 }  // namespace win

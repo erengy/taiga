@@ -369,7 +369,7 @@ BOOL FeedFilterDialog::DialogPage1::OnInitDialog() {
 
   // Initialize toolbar
   condition_toolbar.Attach(GetDlgItem(IDC_TOOLBAR_FEED_FILTER));
-  condition_toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
+  condition_toolbar.SetImageList(ui::Theme.GetImageList16().GetHandle(), ScaleX(16), ScaleY(16));
   condition_toolbar.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_MIXEDBUTTONS);
   // Add toolbar items
   BYTE fsState1 = TBSTATE_ENABLED | TBSTATE_WRAP;

@@ -29,8 +29,8 @@ namespace ui {
 ThemeManager Theme;
 
 ThemeManager::ThemeManager() {
-  icons16_.Create(16, 16);  // 16px
-  icons24_.Create(24, 24);  // 24px
+  icons16_.Create(ScaleX(16), ScaleY(16));  // 16px
+  icons24_.Create(ScaleX(24), ScaleY(24));  // 24px
 }
 
 bool ThemeManager::Load() {
@@ -87,13 +87,15 @@ bool ThemeManager::Load() {
   HBITMAP bitmap_handle;
   for (size_t i = 0; i < kIconCount16px && i < icons16.size(); i++) {
     bitmap_handle = GdiPlus.LoadImage(path + L"16px\\" +
-                                      icons16.at(i) + L".png");
+                                      icons16.at(i) + L".png",
+                                      ScaleX(16), ScaleY(16));
     icons16_.AddBitmap(bitmap_handle, CLR_NONE);
     DeleteObject(bitmap_handle);
   }
   for (size_t i = 0; i < kIconCount24px && i < icons24.size(); i++) {
     bitmap_handle = GdiPlus.LoadImage(path + L"24px\\" +
-                                      icons24.at(i) + L".png");
+                                      icons24.at(i) + L".png",
+                                      ScaleX(24), ScaleY(24));
     icons24_.AddBitmap(bitmap_handle, CLR_NONE);
     DeleteObject(bitmap_handle);
   }

@@ -130,7 +130,7 @@ void MainDialog::CreateDialogControls() {
   toolbar_menu.SetImageList(nullptr, 0, 0);
   // Create main toolbar
   toolbar_main.Attach(GetDlgItem(IDC_TOOLBAR_MAIN));
-  toolbar_main.SetImageList(ui::Theme.GetImageList24().GetHandle(), 24, 24);
+  toolbar_main.SetImageList(ui::Theme.GetImageList24().GetHandle(), ScaleX(24), ScaleY(24));
   toolbar_main.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
   toolbar_main.SendMessage(TB_SETBUTTONSIZE, 0, MAKELPARAM(ScaleX(24), ScaleY(24)));
   // Create search toolbar
@@ -141,24 +141,24 @@ void MainDialog::CreateDialogControls() {
   // Create search text
   edit.Attach(GetDlgItem(IDC_EDIT_SEARCH));
   edit.SetCueBannerText(L"Search list");
-  edit.SetMargins(2, 16);
+  edit.SetMargins(ScaleX(2), ScaleX(16));
   edit.SetParent(toolbar_search.GetWindowHandle());
-  win::Rect rcEdit; edit.GetRect(&rcEdit);
   win::Rect rcEditWindow; edit.GetWindowRect(&rcEditWindow);
   win::Rect rcToolbar; toolbar_search.GetClientRect(&rcToolbar);
-  rcEditWindow.bottom = rcEditWindow.top + ScaleY(20);
+  rcEditWindow.bottom = rcEditWindow.top + ScaleY(22);
   int edit_y = (ScaleY(24) - rcEditWindow.Height()) / 2;
   edit.SetPosition(nullptr, 0, edit_y, rcEditWindow.Width(), rcEditWindow.Height(),
                    SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER);
   // Create cancel search button
   cancel_button.Attach(GetDlgItem(IDC_BUTTON_CANCELSEARCH));
   cancel_button.SetParent(edit.GetWindowHandle());
+  win::Rect rcEdit;
+  edit.GetClientRect(&rcEdit);
   win::Rect rcButton;
-  rcButton.left = rcEdit.right;
-  edit.GetWindowRect(&rcEdit);
-  rcButton.top = static_cast<LONG>(std::floor((rcEdit.Height() - 2 - 16) / 2));
-  rcButton.right = rcButton.left + 16;
-  rcButton.bottom = rcButton.top + 16;
+  rcButton.left = rcEdit.right - ScaleX(16);
+  rcButton.top = static_cast<LONG>(std::floor((rcEdit.Height() - ScaleY(16)) / 2.0));
+  rcButton.right = rcButton.left + ScaleX(16);
+  rcButton.bottom = rcButton.top + ScaleY(16);
   cancel_button.SetPosition(nullptr, rcButton);
   // Create treeview control
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
@@ -172,9 +172,9 @@ void MainDialog::CreateDialogControls() {
   // Create status bar
   statusbar.Attach(GetDlgItem(IDC_STATUSBAR_MAIN));
   statusbar.SetImageList(ui::Theme.GetImageList16().GetHandle());
-  statusbar.InsertPart(-1, 0, 0, 900, nullptr, nullptr);
-  statusbar.InsertPart(ui::kIcon16_Clock, 0, 0, 32, nullptr, nullptr);
-  statusbar.InsertPart(ui::kIcon16_Cross, 0, 0, 32, nullptr, nullptr);
+  statusbar.InsertPart(-1, 0, 0, ScaleX(900), nullptr, nullptr);
+  statusbar.InsertPart(ui::kIcon16_Clock, 0, 0, ScaleX(32), nullptr, nullptr);
+  statusbar.InsertPart(ui::kIcon16_Cross, 0, 0, ScaleX(32), nullptr, nullptr);
 
   // Insert treeview items
   treeview.hti.push_back(treeview.InsertItem(L"Now Playing", ui::kIcon16_Play, kSidebarItemNowPlaying, nullptr));
@@ -817,15 +817,16 @@ void MainDialog::UpdateStatusTimer() {
     statusbar.SetPartTipText(1, str.c_str());
     statusbar.SetPartTipText(2, L"Cancel update");
 
-    const int icon_width = 32;
+    const int icon_width = ScaleX(16);
     win::Dc hdc = statusbar.GetDC();
     hdc.AttachFont(statusbar.GetFont());
-    int timer_width = icon_width + GetTextWidth(hdc.Get(), str);
+    const int timer_width = ScaleX(5) + icon_width + ScaleX(5) + GetTextWidth(hdc.Get(), str) + ScaleX(4);
     hdc.DetachFont();
+    const int cancel_width = ScaleX(5) + icon_width + ScaleX(16);
 
-    statusbar.SetPartWidth(0, rect.Width() - timer_width - (icon_width + 4));
+    statusbar.SetPartWidth(0, rect.Width() - timer_width - cancel_width);
     statusbar.SetPartWidth(1, timer_width);
-    statusbar.SetPartWidth(2, icon_width + 4);
+    statusbar.SetPartWidth(2, cancel_width);
 
   } else {
     statusbar.SetPartWidth(0, rect.Width());

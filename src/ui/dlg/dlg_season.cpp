@@ -75,7 +75,7 @@ BOOL SeasonDialog::OnInitDialog() {
 
   // Create main toolbar
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_SEASON));
-  toolbar_.SetImageList(ui::Theme.GetImageList16().GetHandle(), 16, 16);
+  toolbar_.SetImageList(ui::Theme.GetImageList16().GetHandle(), ScaleX(16), ScaleY(16));
   toolbar_.SendMessage(TB_SETEXTENDEDSTYLE, 0, TBSTYLE_EX_DRAWDDARROWS | TBSTYLE_EX_MIXEDBUTTONS);
 
   // Insert toolbar buttons
@@ -336,9 +336,9 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       if (anime_item->IsInList()) {
         ui::Theme.GetImageList16().Draw(
             ui::kIcon16_DocumentA, hdc.Get(),
-            rect_title.right - 20,
-            rect_title.top + ((rect_title.Height() - 16) / 2));
-        rect_title.right -= 20;
+            rect_title.right - ScaleX(16) - 4,
+            rect_title.top + ((rect_title.Height() - ScaleY(16)) / 2));
+        rect_title.right -= ScaleX(16) - 4;
       }
 
       // Set title
