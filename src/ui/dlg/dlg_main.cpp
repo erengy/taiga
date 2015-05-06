@@ -739,7 +739,8 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void MainDialog::ChangeStatus(std::wstring str) {
-  if (!str.empty()) str = L"  " + str;
+  if (!str.empty())
+    str = L" " + str;  // padding
   statusbar.SetText(str.c_str());
 }
 
