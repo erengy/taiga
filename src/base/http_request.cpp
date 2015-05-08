@@ -112,13 +112,11 @@ bool Client::SetRequestOptions() {
     TAIGA_CURL_SET_OPTION(CURLOPT_PROXY, proxy_host.c_str());
     if (!proxy_username_.empty()) {
       std::string proxy_username = WstrToStr(proxy_username_);
-      TAIGA_CURL_SET_OPTION(CURLOPT_PROXYUSERNAME,
-                            proxy_username.c_str());
+      TAIGA_CURL_SET_OPTION(CURLOPT_PROXYUSERNAME, proxy_username.c_str());
     }
     if (!proxy_password_.empty()) {
       std::string proxy_password = WstrToStr(proxy_password_);
-      TAIGA_CURL_SET_OPTION(CURLOPT_PROXYPASSWORD,
-                            proxy_password.c_str());
+      TAIGA_CURL_SET_OPTION(CURLOPT_PROXYPASSWORD, proxy_password.c_str());
     }
   }
 
@@ -131,7 +129,7 @@ bool Client::SetRequestOptions() {
   }
 
   // Set method
-  if (request_.method == L"POST") {
+  if (!request_.data.empty() || !request_.body.empty()) {
     if (!request_.data.empty() && !request_.body.empty()) {
       OnError(CURLE_HTTP_POST_ERROR);
       return false;
@@ -140,9 +138,15 @@ bool Client::SetRequestOptions() {
     } else {
       optional_data_ = WstrToStr(request_.body);
     }
+  }
+  if (request_.method == L"POST" || !optional_data_.empty()) {
     TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDS, optional_data_.c_str());
     TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDSIZE, optional_data_.size());
     TAIGA_CURL_SET_OPTION(CURLOPT_POST, TRUE);
+    if (request_.method != L"POST") {
+      std::string custom_method = WstrToStr(request_.method);
+      TAIGA_CURL_SET_OPTION(CURLOPT_CUSTOMREQUEST, custom_method.c_str());
+    }
   }
 
   // Set referrer
