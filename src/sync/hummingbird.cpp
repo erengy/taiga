@@ -52,7 +52,8 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.header[L"Accept-Encoding"] = L"gzip";
 
   // kAuthenticateUser method returns the user's authentication token, which
-  // is to be used on all methods that require authentication.
+  // is to be used on all methods that require authentication. Some methods
+  // don't require the token, but behave differently when it's provided.
   if (RequestNeedsAuthentication(request.type))
     http_request.data[L"auth_token"] = auth_token_;
 
@@ -113,7 +114,7 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  // Note that this method will return only 5 results at a time.
+  // Note that this method will return only 7 results at a time.
   http_request.url.path = L"/search/anime";
   http_request.url.query[L"query"] = request.data[L"title"];
 }
@@ -253,6 +254,10 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry:
       return true;
+    case kGetLibraryEntries:
+    case kGetMetadataById:
+    case kSearchTitle:
+      return !auth_token_.empty();
   }
 
   return false;
