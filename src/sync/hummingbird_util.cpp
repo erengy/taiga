@@ -44,7 +44,7 @@ int TranslateAgeRatingFrom(const std::wstring& value) {
     return anime::kAgeRatingR18;
   }
 
-  LOG(LevelWarning, L"Invalid value: " + value);
+  LOG(LevelDebug, L"Invalid value: " + value);
   return anime::kUnknownAgeRating;
 }
 
