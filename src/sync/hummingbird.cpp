@@ -69,9 +69,8 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
 
   // APIv1 provides different title and alternate_title values depending on the
   // title_language_preference parameter.
-  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles))
-    if (RequestSupportsTitleLanguagePreference(request.type))
-      AppendTitleLanguagePreference(http_request);
+  if (RequestSupportsTitleLanguagePreference(request.type))
+    AppendTitleLanguagePreference(http_request);
 }
 
 void Service::HandleResponse(Response& response, HttpResponse& http_response) {
@@ -227,10 +226,16 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::AppendTitleLanguagePreference(HttpRequest& http_request) const {
+  // Can be "canonical", "english" or "romanized"
+  std::wstring language = L"romanized";
+
+  if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles))
+    language = L"english";
+
   if (http_request.method == L"POST") {
-    http_request.data[L"title_language_preference"] = L"english";
+    http_request.data[L"title_language_preference"] = language;
   } else {
-    http_request.url.query[L"title_language_preference"] = L"english";
+    http_request.url.query[L"title_language_preference"] = language;
   }
 }
 
