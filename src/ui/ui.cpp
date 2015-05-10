@@ -508,11 +508,15 @@ int OnHistoryProcessConfirmationQueue(anime::Episode& episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void OnAnimeDelete(int id) {
-  ChangeStatusText(L"Anime is removed from the database: " + ToWstr(id));
+void OnAnimeDelete(int id, const string_t& title) {
+  ChangeStatusText(L"Anime is removed from the database: " + title);
 
-  if (DlgAnime.GetCurrentId() == id)
-    DlgAnime.Destroy();
+  if (DlgAnime.GetCurrentId() == id) {
+    // We're posting a message rather than directly terminating the dialog,
+    // because this function can be called from another thread, and it is not
+    // possible to destroy a window created by a different thread.
+    DlgAnime.PostMessage(WM_CLOSE);
+  }
 
   DlgAnimeList.RefreshList();
   DlgAnimeList.RefreshTabs();
@@ -522,6 +526,9 @@ void OnAnimeDelete(int id) {
   } else {
     DlgNowPlaying.Refresh(false, false, false, false);
   }
+
+  DlgHistory.RefreshList();
+  DlgMain.treeview.RefreshHistoryCounter();
 
   DlgSearch.RefreshList();
   DlgSeason.RefreshList();

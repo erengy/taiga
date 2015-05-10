@@ -234,17 +234,20 @@ void Database::ClearInvalidItems() {
 }
 
 bool Database::DeleteItem(int id) {
+  std::wstring title;
+
+  auto anime_item = FindItem(id, false);
+  if (anime_item)
+    title = anime_item->GetTitle();
+
   if (items.erase(id) > 0) {
-    LOG(LevelWarning, L"ID: " + ToWstr(id));
+    LOG(LevelWarning, L"ID: " + ToWstr(id) + L" | Title: " + title);
 
     auto delete_history_items = [](int id, std::vector<HistoryItem>& items) {
-      for (auto it = items.begin(); it != items.end(); ) {
-        if (it->anime_id == id) {
-          items.erase(it++);
-        } else {
-          ++it;
-        }
-      }
+      items.erase(std::remove_if(items.begin(), items.end(),
+          [&id](const HistoryItem& item) {
+            return item.anime_id == id;
+          }), items.end());
     };
 
     delete_history_items(id, History.items);
@@ -256,7 +259,7 @@ bool Database::DeleteItem(int id) {
     if (CurrentEpisode.anime_id == id)
       CurrentEpisode.Set(anime::ID_UNKNOWN);
 
-    ui::OnAnimeDelete(id);
+    ui::OnAnimeDelete(id, title);
     return true;
   }
 
