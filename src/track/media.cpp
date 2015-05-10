@@ -415,6 +415,8 @@ bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
 }
 
 std::wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
+  std::wstring title;
+
   if (IsWindow(hwnd)) {
     if (SendMessage(hwnd, WM_USER, 0, IPC_ISPLAYING)) {
       int list_index = SendMessage(hwnd, WM_USER, 0, IPC_GETLISTPOS);
@@ -430,27 +432,31 @@ std::wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
             ReadProcessMemory(hwnd_winamp,
                               reinterpret_cast<LPCVOID>(base_address),
                               file_name, MAX_PATH, NULL);
-            CloseHandle(hwnd_winamp);
-            return file_name;
+            title = file_name;
           } else {
             char file_name[MAX_PATH];
             ReadProcessMemory(hwnd_winamp,
                               reinterpret_cast<LPCVOID>(base_address),
                               file_name, MAX_PATH, NULL);
-            CloseHandle(hwnd_winamp);
-            return StrToWstr(file_name);
+            title = StrToWstr(file_name);
           }
+          CloseHandle(hwnd_winamp);
         }
       }
     }
   }
 
-  return std::wstring();
+  if (!Meow.IsValidFileExtension(GetFileExtension(title)))
+    title.clear();
+
+  return title;
 }
 
 std::wstring MediaPlayers::GetTitleFromSpecialMessage(
     HWND hwnd,
     const std::wstring& class_name) {
+  std::wstring title;
+
   // BS.Player
   if (class_name == BSP_CLASS) {
     if (IsWindow(hwnd)) {
@@ -463,11 +469,14 @@ std::wstring MediaPlayers::GetTitleFromSpecialMessage(
       SendMessage(hwnd, WM_COPYDATA,
                   reinterpret_cast<WPARAM>(ui::GetWindowHandle(ui::kDialogMain)),
                   reinterpret_cast<LPARAM>(&cds));
-      return StrToWstr(file_name);
+      title = StrToWstr(file_name);
     }
   }
 
-  return std::wstring();
+  if (!Meow.IsValidFileExtension(GetFileExtension(title)))
+    title.clear();
+
+  return title;
 }
 
 std::wstring MediaPlayers::GetTitleFromMPlayer() {
