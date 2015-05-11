@@ -28,6 +28,9 @@
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_info_page.h"
 #include "ui/dlg/dlg_input.h"
+#include "ui/dlg/dlg_settings.h"
+#include "ui/dlg/dlg_settings_page.h"
+#include "ui/dialog.h"
 #include "ui/theme.h"
 #include "win/win_commondialog.h"
 
@@ -271,15 +274,20 @@ LRESULT PageMyInfo::OnNotify(int idCtrl, LPNMHDR pnmh) {
           // Set/change fansub group preference
           std::vector<std::wstring> groups;
           anime::GetFansubFilter(anime_id_, groups);
-          std::wstring text = Join(groups, L", ");
-          InputDialog dlg;
-          dlg.title = anime_item->GetTitle();
-          dlg.info = L"Please enter your fansub group preference for this title:";
-          dlg.text = text;
-          dlg.Show(parent->GetWindowHandle());
-          if (dlg.result == IDOK)
-            if (anime::SetFansubFilter(anime_id_, dlg.text))
-              RefreshFansubPreference();
+          if (groups.size() > 1) {
+            ShowDlgSettings(kSettingsSectionTorrents, kSettingsPageTorrentsFilters);
+            RefreshFansubPreference();
+          } else {
+            std::wstring text = Join(groups, L", ");
+            InputDialog dlg;
+            dlg.title = anime_item->GetTitle();
+            dlg.info = L"Please enter your fansub group preference for this title:";
+            dlg.text = text;
+            dlg.Show(parent->GetWindowHandle());
+            if (dlg.result == IDOK && dlg.text != text)
+              if (anime::SetFansubFilter(anime_id_, dlg.text))
+                RefreshFansubPreference();
+          }
           return TRUE;
         }
       }

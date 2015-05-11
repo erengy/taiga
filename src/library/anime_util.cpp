@@ -484,14 +484,12 @@ void SetMyLastUpdateToNow(Item& item) {
 bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
   bool found = false;
 
-  foreach_(i, Aggregator.filter_manager.filters) {
-    if (found) break;
-    foreach_(j, i->anime_ids) {
-      if (*j != anime_id) continue;
-      if (found) break;
-      foreach_(k, i->conditions) {
-        if (k->element == kFeedFilterElement_Episode_Group) {
-          groups.push_back(k->value);
+  for (const auto& filter : Aggregator.filter_manager.filters) {
+    if (std::find(filter.anime_ids.begin(), filter.anime_ids.end(),
+                  anime_id) != filter.anime_ids.end()) {
+      for (const auto& condition : filter.conditions) {
+        if (condition.element == kFeedFilterElement_Episode_Group) {
+          groups.push_back(condition.value);
           found = true;
         }
       }
@@ -503,19 +501,34 @@ bool GetFansubFilter(int anime_id, std::vector<std::wstring>& groups) {
 
 bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
   // Check existing filters
-  foreach_(i, Aggregator.filter_manager.filters) {
-    foreach_(j, i->anime_ids) {
-      if (*j != anime_id) continue;
-      foreach_(k, i->conditions) {
-        if (k->element == kFeedFilterElement_Episode_Group) {
-          if (group_name.empty()) {
-            Aggregator.filter_manager.filters.erase(i);
-          } else {
-            k->value = group_name;
-          }
-          return true;
-        }
+  foreach_(filter, Aggregator.filter_manager.filters) {
+    auto id = std::find(
+        filter->anime_ids.begin(), filter->anime_ids.end(), anime_id);
+    if (id == filter->anime_ids.end())
+      continue;
+
+    auto condition = std::find_if(
+        filter->conditions.begin(), filter->conditions.end(),
+        [](const FeedFilterCondition& condition) {
+          return condition.element == kFeedFilterElement_Episode_Group;
+        });
+    if (condition == filter->conditions.end())
+      continue;
+
+    if (filter->anime_ids.size() > 1) {
+      filter->anime_ids.erase(id);
+      if (group_name.empty()) {
+        return true;
+      } else {
+        break;
       }
+    } else {
+      if (group_name.empty()) {
+        Aggregator.filter_manager.filters.erase(filter);
+      } else {
+        condition->value = group_name;
+      }
+      return true;
     }
   }
 
