@@ -29,8 +29,8 @@ class StringCoder {
 public:
   StringCoder();
 
-  bool Encode(const std::wstring& input, std::wstring& output, const std::wstring& metadata);
-  bool Decode(const std::wstring& input, std::wstring& output, std::wstring& metadata);
+  bool Encode(const std::wstring& metadata, const std::wstring& data, std::wstring& output);
+  bool Decode(const std::wstring& input, std::wstring& metadata, std::wstring& data);
 
 private:
   std::string ConvertSizeToString(unsigned short value);

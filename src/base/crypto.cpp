@@ -84,34 +84,38 @@ std::wstring SimpleDecrypt(std::wstring str) {
 
 StringCoder::StringCoder()
     : magic_string_("TAI"),
-      min_length_(3 + 1 + 2 + 2),
-      version_(0x00) {
+      min_length_(3 + 1 + 2 + 2 + 2),
+      version_(0x01) {
 }
 
-bool StringCoder::Encode(const std::wstring& input, std::wstring& output,
-                         const std::wstring& metadata) {
-  if (input.empty())
+bool StringCoder::Encode(const std::wstring& metadata, const std::wstring& data,
+                         std::wstring& output) {
+  if (data.empty())
     return false;
 
-  std::string data;
-  if (!DeflateString(WstrToStr(input), data))
+  std::string converted_metadata = WstrToStr(metadata);
+  std::string converted_data = WstrToStr(data);
+
+  std::string compressed_data;
+  if (!DeflateString(converted_data, compressed_data))
     return false;
 
   std::string buffer;
   buffer.append(magic_string_);
   buffer.push_back(version_);
-  buffer.append(ConvertSizeToString(metadata.size()));
-  buffer.append(WstrToStr(metadata));
-  buffer.append(ConvertSizeToString(input.size()));
-  buffer.append(data);
+  buffer.append(ConvertSizeToString(converted_metadata.size()));
+  buffer.append(converted_metadata);
+  buffer.append(ConvertSizeToString(compressed_data.size()));
+  buffer.append(ConvertSizeToString(converted_data.size()));
+  buffer.append(compressed_data);
 
   output = StrToWstr(Base64Encode(buffer));
 
   return true;
 }
 
-bool StringCoder::Decode(const std::wstring& input, std::wstring& output,
-                         std::wstring& metadata) {
+bool StringCoder::Decode(const std::wstring& input,
+                         std::wstring& metadata, std::wstring& data) {
   if (input.empty())
     return false;
 
@@ -137,17 +141,19 @@ bool StringCoder::Decode(const std::wstring& input, std::wstring& output,
 
   unsigned short data_size = ReadSize(decoded, pos);
   pos += sizeof(data_size);
-  if (data_size > 0) {
+  unsigned short inflated_data_size = ReadSize(decoded, pos);
+  pos += sizeof(inflated_data_size);
+  if (data_size > 0 && inflated_data_size > 0) {
     decoded = decoded.substr(pos, data_size);
   } else {
     return false;
   }
 
   std::string inflated;
-  if (!InflateString(decoded, inflated, data_size))
+  if (!InflateString(decoded, inflated, inflated_data_size))
     return false;
 
-  output = StrToWstr(inflated);
+  data = StrToWstr(inflated);
 
   return true;
 }

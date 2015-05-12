@@ -706,12 +706,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case 106: {
           InputDialog dlg;
           dlg.title = L"Import Filters";
-          dlg.info = L"Please enter encoded text below:";
+          dlg.info = L"Enter encoded text below:";
           dlg.Show(parent->GetWindowHandle());
           if (dlg.result == IDOK) {
             std::wstring data, metadata;
             StringCoder coder;
-            bool parsed = coder.Decode(dlg.text, data, metadata);
+            bool parsed = coder.Decode(dlg.text, metadata, data);
             if (parsed) {
               parsed = Aggregator.filter_manager.Import(data, parent->feed_filters_);
               if (parsed) {
@@ -721,7 +721,10 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             if (!parsed) {
               LOG(LevelError, metadata);
               LOG(LevelError, data);
-              ui::DisplayErrorMessage(L"Could not parse filter string.", L"Import Filters");
+              ui::DisplayErrorMessage(
+                  L"Could not parse the filter string. It may be missing characters, "
+                  L"or encoded with an incompatible version of the application.",
+                  L"Import Filters");
             }
           }
           return TRUE;
@@ -733,9 +736,9 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
           std::wstring metadata = Taiga.version;
           InputDialog dlg;
           StringCoder coder;
-          if (coder.Encode(data, dlg.text, metadata)) {
+          if (coder.Encode(metadata, data, dlg.text)) {
             dlg.title = L"Export Filters";
-            dlg.info = L"Please copy the text below to share it with other people:";
+            dlg.info = L"Copy the text below and share it with other people:";
             dlg.Show(parent->GetWindowHandle());
           }
           return TRUE;
