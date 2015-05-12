@@ -508,6 +508,12 @@ void Database::AddToList(int anime_id, int status) {
   if (!anime_item || anime_item->IsInList())
     return;
 
+  if (taiga::GetCurrentUsername().empty()) {
+    ui::ChangeStatusText(
+        L"Please set up your account before adding anime to your list.");
+    return;
+  }
+
   if (status == anime::kUnknownStatus)
     status = anime::IsAiredYet(*anime_item) ? anime::kWatching :
                                               anime::kPlanToWatch;
