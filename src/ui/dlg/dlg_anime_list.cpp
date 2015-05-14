@@ -446,14 +446,21 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
   hot_item = index;
 
+  enum {
+    kTooltipAnimeStatus,
+    kTooltipEpisodeAvailable,
+    kTooltipEpisodeMinus,
+    kTooltipEpisodePlus,
+  };
+
   if (index < 0 || !progress_bars_visible) {
-    tooltips.DeleteTip(0);
-    tooltips.DeleteTip(1);
-    tooltips.DeleteTip(2);
-    if (index < 0) {
-      tooltips.DeleteTip(3);
-      return;
-    }
+    tooltips.DeleteTip(kTooltipEpisodeAvailable);
+    tooltips.DeleteTip(kTooltipEpisodeMinus);
+    tooltips.DeleteTip(kTooltipEpisodePlus);
+  }
+  if (index < 0) {
+    tooltips.DeleteTip(kTooltipAnimeStatus);
+    return;
   }
 
   int anime_id = GetItemParam(index);
@@ -462,21 +469,18 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   if (!anime_item || !anime_item->IsInList())
     return;
 
+  POINT pt;
+  ::GetCursorPos(&pt);
+  ::ScreenToClient(GetWindowHandle(), &pt);
+
   if (columns[kColumnAnimeStatus].visible) {
     win::Rect rect_item;
     GetSubItemRect(index, columns[kColumnAnimeStatus].index, &rect_item);
-    POINT pt;
-    ::GetCursorPos(&pt);
-    ::ScreenToClient(GetWindowHandle(), &pt);
     if (rect_item.PtIn(pt)) {
       const std::wstring text = anime_item->GetPlaying() ? L"Now playing" :
           anime::TranslateStatus(anime_item->GetAiringStatus());
-      tooltips.AddTip(3, text.c_str(), nullptr, &rect_item, false);
-    } else {
-      tooltips.DeleteTip(3);
+      tooltips.AddTip(kTooltipAnimeStatus, text.c_str(), nullptr, &rect_item, false);
     }
-  } else {
-    tooltips.DeleteTip(3);
   }
 
   if (progress_bars_visible &&
@@ -500,9 +504,6 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       button_rect[1].Copy(rect_item);
       button_rect[1].left = button_rect[1].right - rect_item.Height();
 
-      POINT pt;
-      ::GetCursorPos(&pt);
-      ::ScreenToClient(GetWindowHandle(), &pt);
       if (rect_item.PtIn(pt)) {
         if (anime_item->IsInList()) {
           std::wstring text;
@@ -510,26 +511,21 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
             AppendString(text, L"All episodes are in library folders");
           } else {
             if (anime_item->IsNextEpisodeAvailable())
-              AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L" is in library folders");
+              AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) +
+                                 L" is in library folders");
             if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
-              AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) + L" is available for download");
+              AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) +
+                                 L" is available for download");
           }
           if (!text.empty()) {
-            tooltips.AddTip(2, text.c_str(), nullptr, &rect_item, false);
-          } else {
-            tooltips.DeleteTip(2);
+            tooltips.AddTip(kTooltipEpisodeAvailable, text.c_str(), nullptr, &rect_item, false);
           }
         }
-      } else {
-        tooltips.DeleteTip(2);
       }
       if ((button_visible[0] && button_rect[0].PtIn(pt)) ||
           (button_visible[1] && button_rect[1].PtIn(pt))) {
-        tooltips.AddTip(0, L"-1 episode", nullptr, &button_rect[0], false);
-        tooltips.AddTip(1, L"+1 episode", nullptr, &button_rect[1], false);
-      } else {
-        tooltips.DeleteTip(0);
-        tooltips.DeleteTip(1);
+        tooltips.AddTip(kTooltipEpisodeMinus, L"-1 episode", nullptr, &button_rect[0], false);
+        tooltips.AddTip(kTooltipEpisodePlus, L"+1 episode", nullptr, &button_rect[1], false);
       }
     }
   }
