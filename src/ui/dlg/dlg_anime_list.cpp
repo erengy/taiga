@@ -450,6 +450,10 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     tooltips.DeleteTip(0);
     tooltips.DeleteTip(1);
     tooltips.DeleteTip(2);
+    if (index < 0) {
+      tooltips.DeleteTip(3);
+      return;
+    }
   }
 
   int anime_id = GetItemParam(index);
@@ -457,6 +461,23 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
   if (!anime_item || !anime_item->IsInList())
     return;
+
+  if (columns[kColumnAnimeStatus].visible) {
+    win::Rect rect_item;
+    GetSubItemRect(index, columns[kColumnAnimeStatus].index, &rect_item);
+    POINT pt;
+    ::GetCursorPos(&pt);
+    ::ScreenToClient(GetWindowHandle(), &pt);
+    if (rect_item.PtIn(pt)) {
+      const std::wstring text = anime_item->GetPlaying() ? L"Now playing" :
+          anime::TranslateStatus(anime_item->GetAiringStatus());
+      tooltips.AddTip(3, text.c_str(), nullptr, &rect_item, false);
+    } else {
+      tooltips.DeleteTip(3);
+    }
+  } else {
+    tooltips.DeleteTip(3);
+  }
 
   if (progress_bars_visible &&
       anime_item->GetMyStatus() != anime::kDropped) {
