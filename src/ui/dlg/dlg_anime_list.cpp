@@ -64,7 +64,6 @@ BOOL AnimeListDialog::OnInitDialog() {
                             LVS_EX_LABELTIP |
                             LVS_EX_TRACKSELECT);
   listview.SetHoverTime(60 * 1000);
-  listview.SetImageList(ui::Theme.GetImageList16().GetHandle());
   listview.SetTheme();
 
   // Create list tooltips
@@ -759,15 +758,6 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               anime::PlayRandomEpisode(anime_id);
               return TRUE;
             }
-          } else {
-            wchar_t c = MapVirtualKey(pnkd->wVKey, MAPVK_VK_TO_CHAR);
-            if (c > ' ') {
-              auto text = ToLower_Copy(std::wstring(1, c));
-              DlgMain.edit.SetText(text);
-              DlgMain.edit.SetSel(1, -1);
-              DlgMain.edit.SetFocus();
-              return TRUE;
-            }
           }
           break;
         }
@@ -776,18 +766,9 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
     }
 
     // Header drag & drop
-    case HDN_BEGINDRAG: {
-      auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
-      auto column_type = listview.FindColumnAtSubItemIndex(nmh->iItem);
-      if (column_type == kColumnAnimeStatus)
-        return TRUE;
-      break;
-    }
     case HDN_ENDDRAG: {
       auto nmh = reinterpret_cast<LPNMHEADER>(lParam);
-      auto column_type = listview.FindColumnAtSubItemIndex(nmh->iItem);
-      if (column_type == kColumnAnimeStatus || nmh->pitem->iOrder == 0 ||
-          nmh->pitem->iOrder == -1)
+      if (nmh->pitem->iOrder == -1)
         return TRUE;
       listview.MoveColumn(nmh->iItem, nmh->pitem->iOrder);
       break;
@@ -813,6 +794,27 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
   }
 
   return 0;
+}
+
+void AnimeListDialog::ListView::DrawAiringStatus(HDC hdc, RECT* rc,
+                                                 anime::Item& anime_item) {
+  win::Dc dc = hdc;
+  win::Rect rect = *rc;
+
+  int icon_index = anime_item.GetPlaying() ? ui::kIcon16_Play :
+      StatusToIcon(anime_item.GetAiringStatus());
+
+  int cx = ScaleX(16);
+  int cy = ScaleY(16);
+  ui::Theme.GetImageList16().GetIconSize(cx, cy);
+
+  int x = (rect.Width() - cx) / 2;
+  int y = (rect.Height() - cy) / 2;
+
+  ui::Theme.GetImageList16().Draw(icon_index, dc.Get(),
+                                  rect.left + x, rect.top + y);
+
+  dc.DetachDc();
 }
 
 void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
@@ -1095,13 +1097,18 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         break;
 
       auto column_type = listview.FindColumnAtSubItemIndex(pCD->iSubItem);
-      if (column_type == kColumnUserProgress || column_type == kColumnUserRating) {
+      if (column_type == kColumnAnimeStatus ||
+          column_type == kColumnUserProgress ||
+          column_type == kColumnUserRating) {
         win::Rect rcItem;
         listview.GetSubItemRect(pCD->nmcd.dwItemSpec, pCD->iSubItem, &rcItem);
         if (!rcItem.IsEmpty() && listview.columns[column_type].visible) {
+          // Draw airing status
+          if (column_type == kColumnAnimeStatus) {
+            listview.DrawAiringStatus(pCD->nmcd.hdc, &rcItem, *anime_item);
 
           // Draw progress bar and text
-          if (column_type == kColumnUserProgress) {
+          } else if (column_type == kColumnUserProgress) {
             listview.progress_bars_visible = rcItem.Width() > ScaleX(100);
             rcItem.Inflate(-4, 0);
             if (listview.progress_bars_visible) {
@@ -1286,14 +1293,9 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnAnimeSeason:
         text = anime::TranslateDateToSeasonString(anime_item.GetDateStart());
         break;
-      case kColumnAnimeStatus: {
-        bool playing = anime_item.GetPlaying();
-        int status = anime_item.GetAiringStatus();
-        int icon_index = playing ? ui::kIcon16_Play : StatusToIcon(status);
-        listview.SetItemIcon(index, column.index, icon_index);
-        text = playing ? L"Now playing" : anime::TranslateStatus(status);
+      case kColumnAnimeStatus:
+        listview.RedrawItems(index, index, true);
         break;
-      }
       case kColumnAnimeType:
         text = anime::TranslateType(anime_item.GetType());
         break;
@@ -1475,22 +1477,46 @@ void AnimeListDialog::ListView::InsertColumns() {
     }
   }
 
-  // Insert columns
   DeleteAllColumns();
-  InsertColumn(0, 0, 0, 0, L"Dummy");
+
+  // Make sure the anime title column is inserted first, so that quick key
+  // access feature works. This also handles the issue where the alignment of
+  // the first column has to be LVCFMT_LEFT.
+  int title_index = columns[kColumnAnimeTitle].index;
+  if (title_index > 0) {
+    for (auto& it : columns) {
+      auto& column = it.second;
+      if (column.index == 0) {
+        column.index = title_index;
+        break;
+      }
+    }
+    columns[kColumnAnimeTitle].index = 0;
+  }
+
+  // Insert columns
   for (int i = 0; i < static_cast<int>(columns.size()); ++i) {
     for (auto& it : columns) {
       auto& column = it.second;
       if (!column.visible || column.index != i)
         continue;
-      InsertColumn(column.index + 1, column.width, column.width_min,
+      InsertColumn(column.index, column.width, column.width_min,
                    column.alignment, column.name.c_str());
       break;
     }
   }
-  // The first column is always LVCFMT_LEFT. In order to support other
-  // alignments, we use a dummy column as per LVCOLUMN's documentation.
-  DeleteColumn(0);
+
+  // Reposition the anime title column if needed
+  if (title_index > 0) {
+    std::vector<int> order_array;
+    for (auto& it : columns) {
+      auto& column = it.second;
+      if (column.visible)
+        order_array.push_back(order_array.size());
+    }
+    std::swap(order_array.at(0), order_array.at(title_index));
+    SetColumnOrderArray(order_array.size(), order_array.data());
+  }
 }
 
 void AnimeListDialog::ListView::MoveColumn(int index, int new_visible_order) {

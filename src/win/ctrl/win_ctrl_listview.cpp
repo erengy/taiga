@@ -308,6 +308,10 @@ void ListView::SetCheckState(int index, BOOL check) {
   ListView_SetItemState(window_, index, state, LVIS_STATEIMAGEMASK);
 }
 
+BOOL ListView::SetColumnOrderArray(int count, int* order_array) {
+  return ListView_SetColumnOrderArray(window_, count, order_array);
+}
+
 BOOL ListView::SetColumnWidth(int column, int cx) {
   // LVSCW_AUTOSIZE or LVSCW_AUTOSIZE_USEHEADER can be used as cx
   return ListView_SetColumnWidth(window_, column, cx);

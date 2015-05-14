@@ -89,6 +89,10 @@ HICON ImageList::GetIcon(int index) {
   return ::ImageList_GetIcon(image_list_, index, ILD_NORMAL);
 }
 
+BOOL ImageList::GetIconSize(int& cx, int& cy) {
+  return ImageList_GetIconSize(image_list_, &cx, &cy);
+}
+
 BOOL ImageList::Remove(int index) {
   return ::ImageList_Remove(image_list_, index);
 }
