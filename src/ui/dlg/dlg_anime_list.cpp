@@ -450,7 +450,6 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     tooltips.DeleteTip(0);
     tooltips.DeleteTip(1);
     tooltips.DeleteTip(2);
-    return;
   }
 
   int anime_id = GetItemParam(index);
@@ -459,7 +458,8 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   if (!anime_item || !anime_item->IsInList())
     return;
 
-  if (anime_item->GetMyStatus() != anime::kDropped) {
+  if (progress_bars_visible &&
+      anime_item->GetMyStatus() != anime::kDropped) {
     if (anime_item->GetMyStatus() != anime::kCompleted ||
         anime_item->GetMyRewatching()) {
       if (columns[kColumnUserProgress].visible) {
