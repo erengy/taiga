@@ -77,8 +77,14 @@ BOOL ImageList::Draw(int index, HDC hdc, int x, int y) {
   return ::ImageList_Draw(image_list_, index, hdc, x, y, ILD_NORMAL);
 }
 
+void ImageList::Duplicate(HIMAGELIST image_list) {
+  Destroy();
+
+  image_list_ = ::ImageList_Duplicate(image_list);
+}
+
 VOID ImageList::EndDrag() {
-  ImageList_EndDrag();
+  ::ImageList_EndDrag();
 }
 
 HIMAGELIST ImageList::GetHandle() {
@@ -90,7 +96,7 @@ HICON ImageList::GetIcon(int index) {
 }
 
 BOOL ImageList::GetIconSize(int& cx, int& cy) {
-  return ImageList_GetIconSize(image_list_, &cx, &cy);
+  return ::ImageList_GetIconSize(image_list_, &cx, &cy);
 }
 
 BOOL ImageList::Remove(int index) {

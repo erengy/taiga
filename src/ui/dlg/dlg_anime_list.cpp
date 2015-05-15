@@ -133,7 +133,10 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         POINT pt;
         GetCursorPos(&pt);
         ::ScreenToClient(DlgMain.GetWindowHandle(), &pt);
-        listview.drag_image.DragMove(pt.x + 16, pt.y + 32);
+        win::Rect rect_header;
+        ::GetClientRect(listview.GetHeader(), &rect_header);
+        listview.drag_image.DragMove(pt.x + (GetSystemMetrics(SM_CXCURSOR) / 2),
+                                     pt.y + rect_header.Height());
         SetSharedCursor(allow_drop ? IDC_ARROW : IDC_NO);
       }
       break;
@@ -586,13 +589,17 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
   switch (pnmh->code) {
     // Item drag
     case LVN_BEGINDRAG: {
-      POINT pt = {};
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
-      listview.drag_image = listview.CreateDragImage(lplv->iItem, &pt);
+      listview.drag_image.Duplicate(ui::Theme.GetImageList16().GetHandle());
       if (listview.drag_image.GetHandle()) {
-        pt = lplv->ptAction;
-        listview.drag_image.BeginDrag(0, 0, 0);
-        listview.drag_image.DragEnter(DlgMain.GetWindowHandle(), pt.x, pt.y);
+        int icon_index = ui::kIcon16_DocumentA;
+        int anime_id = listview.GetItemParam(lplv->iItem);
+        auto anime_item = AnimeDatabase.FindItem(anime_id);
+        if (anime_item)
+          icon_index = ui::StatusToIcon(anime_item->GetAiringStatus());
+        listview.drag_image.BeginDrag(icon_index, 0, 0);
+        listview.drag_image.DragEnter(DlgMain.GetWindowHandle(),
+                                      lplv->ptAction.x, lplv->ptAction.y);
         listview.dragging = true;
         SetCapture();
       }

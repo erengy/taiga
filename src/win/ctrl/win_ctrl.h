@@ -98,6 +98,7 @@ public:
   BOOL       DragLeave(HWND hwnd_lock);
   BOOL       DragMove(int x, int y);
   BOOL       Draw(int index, HDC hdc, int x, int y);
+  void       Duplicate(HIMAGELIST image_list);
   VOID       EndDrag();
   HIMAGELIST GetHandle();
   HICON      GetIcon(int index);
