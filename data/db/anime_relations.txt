@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-05-04
+- last_modified: 2015-06-05
 
 ::rules
 
@@ -281,6 +281,11 @@
 - 8769|5487:13-15 -> 10020|5998:2-4
 # Ore no Imouto ga Konnani Kawaii Wake ga Nai. -> ~ Specials
 - 13659|7006:14-16 -> 18857|7822:1-3
+
+# Papa no Iukoto wo Kikinasai! -> ~ Pokkapoka
+- 11179|6469:13 -> 12673|6787:1
+# Papa no Iukoto wo Kikinasai! -> ~ OVA
+- 11179|6469:14-15 -> 17875|7685:1-2
 
 # Persona 4 The Animation -> ~: No One is Alone
 - 10588|6255:26 -> 13587|6997:1
