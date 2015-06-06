@@ -532,6 +532,7 @@ void Database::AddToList(int anime_id, int status) {
   history_item.mode = taiga::kHttpServiceAddLibraryEntry;
   History.queue.Add(history_item);
 
+  SaveDatabase();
   SaveList();
 
   ui::OnLibraryEntryAdd(anime_id);

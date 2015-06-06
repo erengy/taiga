@@ -99,6 +99,9 @@ bool SeasonDatabase::Load(std::wstring file) {
     items.push_back(anime_id);
   }
 
+  if (!items.empty())
+    AnimeDatabase.SaveDatabase();
+
   return true;
 }
 
