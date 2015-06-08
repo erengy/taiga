@@ -591,6 +591,7 @@ void Engine::NormalizeUnicode(std::wstring& str) const {
 // TODO: Rename
 void Engine::EraseUnnecessary(std::wstring& str) const {
   ReplaceString(str, 0, L"&", L"and", true, true);
+  ReplaceString(str, 0, L"the animation", L"", true, true);
   ReplaceString(str, 0, L"the", L"", true, true);
   ReplaceString(str, 0, L"episode", L"", true, true);
   ReplaceString(str, 0, L"oad", L"ova", true, true);
