@@ -472,7 +472,11 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
 
 void Engine::Normalize(std::wstring& title, int type,
                        bool normalized_before) const {
+  bool modified_tail = false;
+
   if (!normalized_before) {
+    const auto unmodified_title = title;
+
     ConvertRomanNumbers(title);
     Transliterate(title);
     NormalizeUnicode(title);  // Title is lower case after this point, due to UTF8PROC_CASEFOLD
@@ -480,6 +484,11 @@ void Engine::Normalize(std::wstring& title, int type,
     ConvertSeasonNumbers(title);
     EraseUnnecessary(title);
     Trim(title);
+
+    if (title.size() != unmodified_title.size() &&
+        title.back() != unmodified_title.back()) {
+      modified_tail = true;
+    }
   }
 
   switch (type) {
@@ -488,7 +497,7 @@ void Engine::Normalize(std::wstring& title, int type,
     case kNormalizeForTrigrams:
     case kNormalizeForLookup:
     case kNormalizeFull:
-      ErasePunctuation(title, type);
+      ErasePunctuation(title, type, modified_tail);
       break;
   }
 
@@ -601,10 +610,11 @@ void Engine::EraseUnnecessary(std::wstring& str) const {
   ReplaceString(str, 0, L"(tv)", L"", true, true);
 }
 
-void Engine::ErasePunctuation(std::wstring& str, int type) const {
-  bool erase_trailing = type == kNormalizeFull;
+void Engine::ErasePunctuation(std::wstring& str, int type,
+                              bool modified_tail) const {
+  bool erase_tail = modified_tail || type == kNormalizeFull;
   bool erase_whitespace = type >= kNormalizeForLookup;
-  bool is_trailing = true;
+  bool is_tail = true;
 
   auto is_removable = [&](const wchar_t c) {
     // Control codes, white-space and punctuation characters
@@ -614,7 +624,7 @@ void Engine::ErasePunctuation(std::wstring& str, int type) const {
           return erase_whitespace;
         case L')':
         case L']':
-          return !is_trailing;
+          return !is_tail;
         default:
           return true;
       }
@@ -626,13 +636,13 @@ void Engine::ErasePunctuation(std::wstring& str, int type) const {
     return false;
   };
 
-  auto it_end = erase_trailing ? str.end() :
+  auto it_end = erase_tail ? str.end() :
       std::find_if_not(str.rbegin(), str.rend(), is_removable).base();
-  is_trailing = false;
+  is_tail = false;
 
   auto it = std::remove_if(str.begin(), it_end, is_removable);
 
-  if (!erase_trailing)
+  if (!erase_tail)
     it = std::copy(it_end, str.end(), it);
 
   if (it != str.end())
