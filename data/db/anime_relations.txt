@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-06-05
+- last_modified: 2015-06-11
 
 ::rules
 
@@ -198,6 +198,9 @@
 
 # Kannagi -> ~: Moshimo Kannagi ga Attara...
 - 3958|3378:14 -> 5978|4369:1
+
+# Kanojo ga Flag wo Oraretara -> ~ OVA
+- 19685|8011:14 -> 24451|8705:1
 
 # Kara no Kyoukai 1 -> ~ 2,3,4,5,6,7
 - 2593|2357:2 -> 3782|3248:1
