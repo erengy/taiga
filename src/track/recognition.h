@@ -70,6 +70,13 @@ public:
   bool SearchEpisodeRedirection(int id, const std::pair<int, int>& range, int& destination_id, std::pair<int, int>& destination_range) const;
 
 private:
+  enum NormalizationType {
+    kNormalizeMinimal,
+    kNormalizeForTrigrams,
+    kNormalizeForLookup,
+    kNormalizeFull,
+  };
+
   bool ValidateOptions(anime::Episode& episode, int anime_id, const MatchOptions& match_options, bool redirect) const;
   bool ValidateOptions(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;
   bool ValidateEpisodeNumber(anime::Episode& episode, const anime::Item& anime_item, const MatchOptions& match_options, bool redirect) const;

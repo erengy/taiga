@@ -340,7 +340,16 @@
     <ClCompile Include="..\..\src\track\recognition.cpp">
       <Filter>track</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_normalize.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\track\recognition_relations.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_score.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\track\recognition_validate.cpp">
       <Filter>track</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\track\search.cpp">
