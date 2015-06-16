@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-06-11
+- last_modified: 2015-06-16
 
 ::rules
 
@@ -154,6 +154,9 @@
 
 # Hajime no Ippo -> ~ Special
 - 263|238:76 -> 12069|6660:1
+
+# Hakkenden: Touhou Hakken Ibun -> ~ 2nd Season
+- 15613|7284:14-26 -> 18055|7679:1-13!
 
 # Hayate no Gotoku!! -> ~: Atsu ga Natsuize - Mizugihen!
 - 4192|3514:0 -> 5521|4133:1
