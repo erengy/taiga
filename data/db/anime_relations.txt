@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-06-16
+- last_modified: 2015-06-20
 
 ::rules
 
@@ -376,6 +376,9 @@
 
 # Winter Sonata -> ~ Episode 0
 - 4189|3511:0 -> 7377|4957:1
+
+# Wolf's Rain -> ~ OVA
+- 202|7716:27-30 -> 1023|913:1-4
 
 # Wooser no Sono Higurashi -> ~: Ken to Pantsu to Wooser to
 - 15313|7238:13 -> 16738|7502:1
