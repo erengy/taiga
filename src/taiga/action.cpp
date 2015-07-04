@@ -161,9 +161,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       std::wstring title = anime_item->GetTitle();
-      EraseChars(title, L"_!?.,:;~+");
-      Erase(title, L" -");
-      ReplaceString(body, L"%title%", title);
+      ReplaceString(body, L"%title%", EncodeUrl(title));
     }
     ExecuteLink(body);
 
