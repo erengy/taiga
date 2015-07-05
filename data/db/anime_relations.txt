@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-06-20
+- last_modified: 2015-07-05
 
 ::rules
 
@@ -117,10 +117,14 @@
 # Dragon Ball Kai -> ~: Mirai ni Heiwa wo! Goku no Tamashii yo Eien ni
 - 6033|4394:98 -> 11359|6500:1
 # Dragon Ball Kai -> ~ (2014)
-- 6033|4394:99-? -> 22777|8351:1-?!
+- 6033|4394:99-159 -> 22777|8351:1-61!
 
 # Durarara!! -> ~ Specials
 - 6746|4696:25 -> 8408|5324:2
+# Durarara!!x2 Shou -> Durarara!!x2 Ten
+- 23199|8314:13-24 -> 27831|9726:1-12!
+# Durarara!!x2 Shou -> Durarara!!x2 Ketsu
+- 23199|8314:25-36 -> 27833|9725:1-12!
 
 # Fairy Tail -> ~ (2014)
 - 6702|4676:176-? -> 22043|8203:1-?!
@@ -128,13 +132,16 @@
 # Fate/stay night: Unlimited Blade Works (TV) -> ~ Episode 0
 - 22297|7882:0 -> 27821|9718:1
 # Fate/stay night: Unlimited Blade Works (TV) -> ~ 2nd Season
-- 22297|7882:13-? -> 28701|10052:1-?!
+- 22297|7882:13-25 -> 28701|10052:1-13!
 
 # Fate/Zero -> ~ 2nd Season
 - 10087|6028:14-25 -> 11741|7658:1-12!
 
 # Futsuu no Joshikousei ga [Locodol] Yatte Mita. -> ~: Nagarekawa, Annai Shite Mita.
 - 22189|8267:13 -> 25719|8659:1
+
+# Gatchaman Crowds Insight -> ~: Inbound
+- 21039|8180:0 -> 30925|11033:1
 
 # Gintama -> ~'
 - 918|818:202-252 -> 9969|5971:1-51!
@@ -174,7 +181,7 @@
 - 9750|5850:13 -> 10934|6412:1
 
 # JoJo's Bizarre Adventure: Stardust Crusaders -> ~ 2nd Season
-- 20899|8063:25-? -> 26055|8739:1-?!
+- 20899|8063:25-48 -> 26055|8739:1-24!
 
 # Jormungand -> ~: Perfect Order
 - 12413|6726:13-24 -> 13331|6940:1-12!
@@ -185,7 +192,7 @@
 - 7791|5124:27 -> 9734|5841:1
 
 # Kaitou Joker -> ~ 2nd Season
-- 24909|8664:14-? -> 28869|10070:1-?!
+- 24909|8664:14-26 -> 28869|10070:1-13!
 
 # Kakumeiki Valvrave -> ~ 2nd Season
 - 16668|7487:13-24 -> 18295|7698:1-12!
@@ -235,7 +242,7 @@
 # Kuroko no Basket -> ~ 2nd Season
 - 11771|6595:26-50 -> 16894|7545:1-25!
 # Kuroko no Basket -> ~ 3rd Season
-- 11771|6595:51-? -> 24415|8524:1-?!
+- 11771|6595:51-75 -> 24415|8524:1-25!
 
 # Kyoukai no Kanata -> ~: Shinonome
 - 18153|7714:0 -> 23385|8379:1
@@ -350,7 +357,9 @@
 # Teekyuu -> ~ 3
 - 15125|7217:25-36 -> 20473|7980:1-12!
 # Teekyuu -> ~ 4
-- 15125|7217:37-? -> 26395|8906:1-?!
+- 15125|7217:37-48 -> 26395|8906:1-12!
+# Teekyuu -> ~ 5
+- 15125|7217:49-? -> 30567|10858:1-?!
 
 # Tegami Bachi -> ~ Reverse
 - 6444|4564:26-50 -> 8311|5288:1-25!
