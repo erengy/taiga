@@ -180,6 +180,7 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
     ui::EnableDialogInput(ui::kDialogTorrents, false);
 
     HttpRequest http_request;
+    http_request.header[L"Accept"] = L"application/x-bittorrent, */*";
     http_request.url = feed_item->link;
     http_request.parameter = reinterpret_cast<LPARAM>(&feed);
 
@@ -352,7 +353,15 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
 
   auto it = http_response.header.find(L"Content-Type");
   if (it != http_response.header.end()) {
-    if (InStr(it->second, L"application/x-bittorrent", 0, true) == -1) {
+    static const std::vector<std::wstring> allowed_types{
+      L"application/x-bittorrent",
+      // The following MIME types are invalid for .torrent files, but we allow
+      // them to handle misconfigured servers.
+      L"application/force-download",
+      L"application/octet-stream",
+    };
+    if (std::find(allowed_types.begin(), allowed_types.end(),
+                  ToLower_Copy(it->second)) == allowed_types.end()) {
       ui::OnFeedDownload(false, L"Invalid content type: " + it->second);
       return false;
     }
