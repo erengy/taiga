@@ -83,6 +83,7 @@ private:
 
   int LookUpTitle(std::wstring title, std::set<int>& anime_ids) const;
   bool GetTitleFromPath(anime::Episode& episode);
+  void ExtendAnimeTitle(anime::Episode& episode) const;
 
   int ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids, const MatchOptions& match_options);
   int ScoreTitle(const std::wstring& str, const anime::Episode& episode, const scores_t& trigram_results);

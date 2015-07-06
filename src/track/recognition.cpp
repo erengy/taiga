@@ -63,27 +63,7 @@ bool Engine::Parse(std::wstring title, anime::Episode& episode,
 
   episode.set_elements(anitomy_instance.elements());
 
-  // Append season number to title
-  const auto anime_season = episode.anime_season();
-  if (anime_season > 1 && !episode.anime_title().empty())
-    episode.set_anime_title(
-        episode.anime_title() + L" Season " + ToWstr(anime_season));
-  // Append year to title
-  const auto anime_year = episode.anime_year();
-  if (anime_year > 0 && !episode.anime_title().empty())
-    episode.set_anime_title(
-        episode.anime_title() + L" (" + ToWstr(anime_year) + L")");
-  // TEMP: Append episode number to title
-  // We're going to get rid of this once we're able to redirect fractional
-  // episode numbers.
-  if (!episode.elements().empty(anitomy::kElementEpisodeNumber)) {
-    const auto& episode_number = episode.elements().get(anitomy::kElementEpisodeNumber);
-    if (episode_number.find(L'.') != episode_number.npos) {
-      episode.set_anime_title(
-          episode.anime_title() + L" Episode " + episode_number);
-      episode.elements().erase(anitomy::kElementEpisodeNumber);
-    }
-  }
+  ExtendAnimeTitle(episode);
 
   return true;
 }
@@ -298,6 +278,46 @@ int Engine::LookUpTitle(std::wstring title, std::set<int>& anime_ids) const {
   find_title(title, normal_titles_.alternative);
 
   return anime_id;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Engine::ExtendAnimeTitle(anime::Episode& episode) const {
+  if (episode.anime_title().empty())
+    return;
+
+  // We need this because we don't have anime relation data. Otherwise we could
+  // jump to a sequel after matching the first season of a series.
+  const auto anime_season = episode.anime_season();
+  if (anime_season > 1) {  // No need to append for the first season
+    // The word "Season" is added for clarity; it's going to be erased in the
+    // normalization process.
+    episode.set_anime_title(episode.anime_title() +
+                            L" Season " + ToWstr(anime_season));
+  }
+
+  // Some anime share the same title, and they're differentiated by their airing
+  // date. We also come across year values in batch releases, where they appear
+  // as additional metadata.
+  // As it turns out, these numbers aren't always reliable as a means to discard
+  // anime entries. So we make do with appending the value to the title, which
+  // handles the first use case at the expense of complicating the second one.
+  const auto anime_year = episode.anime_year();
+  if (anime_year > 0) {
+    episode.set_anime_title(episode.anime_title() +
+                            L" (" + ToWstr(anime_year) + L")");
+  }
+
+  // TEMP: We're going to get rid of this once we're able to redirect fractional
+  // episode numbers.
+  if (!episode.elements().empty(anitomy::kElementEpisodeNumber)) {
+    const auto& episode_number = episode.elements().get(anitomy::kElementEpisodeNumber);
+    if (episode_number.find(L'.') != episode_number.npos) {
+      episode.set_anime_title(episode.anime_title() +
+                              L" Episode " + episode_number);
+      episode.elements().erase(anitomy::kElementEpisodeNumber);
+    }
+  }
 }
 
 bool Engine::GetTitleFromPath(anime::Episode& episode) {
