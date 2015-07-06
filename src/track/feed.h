@@ -26,6 +26,10 @@
 #include "library/anime_episode.h"
 #include "track/feed_filter.h"
 
+namespace pugi {
+class xml_document;
+}
+
 enum FeedItemState {
   kFeedItemBlank,
   kFeedItemDiscardedNormal,
@@ -117,8 +121,12 @@ public:
 
   std::wstring GetDataPath();
   bool Load();
+  bool Load(const std::wstring& data);
 
   FeedCategory category;
+
+private:
+  void Load(const pugi::xml_document& document);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

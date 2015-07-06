@@ -131,15 +131,33 @@ std::wstring Feed::GetDataPath() {
 }
 
 bool Feed::Load() {
-  std::wstring file = GetDataPath() + L"feed.xml";
   items.clear();
 
   xml_document document;
+  std::wstring file = GetDataPath() + L"feed.xml";
   xml_parse_result parse_result = document.load_file(file.c_str());
 
   if (parse_result.status != pugi::status_ok)
     return false;
 
+  Load(document);
+  return true;
+}
+
+bool Feed::Load(const std::wstring& data) {
+  items.clear();
+
+  xml_document document;
+  xml_parse_result parse_result = document.load(data.c_str());
+
+  if (parse_result.status != pugi::status_ok)
+    return false;
+
+  Load(document);
+  return true;
+}
+
+void Feed::Load(const xml_document& document) {
   // Read channel information
   xml_node channel = document.child(L"rss").child(L"channel");
   title = XmlReadStrValue(channel, L"title");
@@ -181,6 +199,4 @@ bool Feed::Load() {
 
     items.push_back(item);
   }
-
-  return true;
 }

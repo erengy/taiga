@@ -206,7 +206,7 @@ void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
   std::wstring file = feed.GetDataPath() + L"feed.xml";
   SaveToFile(data, file);
 
-  feed.Load();
+  feed.Load(StrToWstr(data));
   ExamineData(feed);
   download_queue_.clear();
 
