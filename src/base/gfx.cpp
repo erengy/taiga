@@ -116,6 +116,38 @@ BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2,
                          static_cast<ULONG>(bVertical));
 }
 
+BOOL DrawIconResource(int icon_id, HDC hdc, win::Rect& rect,
+                      bool center_x, bool center_y) {
+  const auto avialable_icons = {128, 64, 48, 32, 16};
+  const int available_width = rect.Width();
+  const int available_height = rect.Height();
+
+  int icon_size = 0;
+  for (const auto icon_width : avialable_icons) {
+    if (available_width >= icon_width) {
+      icon_size = icon_width;
+      break;
+    }
+  }
+
+  HICON icon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
+      MAKEINTRESOURCE(icon_id), IMAGE_ICON, icon_size, icon_size, LR_SHARED));
+
+  if (icon && icon_size) {
+    if (center_x)
+      rect.left += (available_width - icon_size) / 2;
+    if (center_y)
+      rect.top += (available_height - icon_size) / 2;
+    rect.right = rect.left + icon_size;
+    rect.bottom = rect.top + icon_size;
+
+    return DrawIconEx(hdc, rect.left, rect.top, icon, icon_size, icon_size,
+                      0, nullptr, DI_NORMAL);
+  }
+
+  return FALSE;
+}
+
 BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2,
                      DWORD dwColor3) {
   // Draw bottom rect

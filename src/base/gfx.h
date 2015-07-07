@@ -44,6 +44,7 @@ HFONT ChangeDCFont(HDC hdc, LPCWSTR lpFaceName, INT iSize, BOOL bBold, BOOL bIta
 int GetTextHeight(HDC hdc);
 int GetTextWidth(HDC hdc, const std::wstring& text);
 BOOL GradientRect(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, bool bVertical);
+BOOL DrawIconResource(int icon_id, HDC hdc, win::Rect& rect, bool center_x, bool center_y);
 BOOL DrawProgressBar(HDC hdc, const LPRECT lpRect, DWORD dwColor1, DWORD dwColor2, DWORD dwColor3);
 
 COLORREF HexToARGB(const std::wstring& text);

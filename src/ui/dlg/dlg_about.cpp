@@ -162,27 +162,12 @@ void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
 
   // Paint application icon
-  const int available_width = sidebar_width - margin;
-  const auto avialable_icons = {128, 64, 48, 32, 16};
-  int icon_size = 0;
-  for (const auto icon_width : avialable_icons) {
-    if (available_width >= icon_width) {
-      icon_size = icon_width;
-      break;
-    }
-  }
-  HICON icon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(nullptr),
-      MAKEINTRESOURCE(IDI_MAIN), IMAGE_ICON, icon_size, icon_size, LR_SHARED));
-  if (icon && icon_size) {
-    rect.Set((margin / 2) + ((available_width - icon_size) / 2), margin, 0, 0);
-    rect.right = rect.left + icon_size;
-    rect.bottom = rect.top + icon_size;
-    win::Window label = GetDlgItem(IDC_STATIC_APP_ICON);
-    label.SetPosition(nullptr, rect);
-    label.SetWindowHandle(nullptr);
-    DrawIconEx(dc.Get(), rect.left, rect.top, icon, icon_size, icon_size,
-               0, nullptr, DI_NORMAL);
-  }
+  rect.Set(margin / 2, margin, sidebar_width - (margin / 2), rect.bottom);
+  DrawIconResource(IDI_MAIN, dc.Get(), rect, true, false);
+  win::Window label = GetDlgItem(IDC_STATIC_APP_ICON);
+  label.SetPosition(nullptr, rect,
+      SWP_NOACTIVATE | SWP_NOREDRAW | SWP_NOOWNERZORDER | SWP_NOZORDER);
+  label.SetWindowHandle(nullptr);
 }
 
 }  // namespace ui
