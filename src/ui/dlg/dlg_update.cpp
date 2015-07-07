@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/gfx.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
 #include "ui/dlg/dlg_main.h"
@@ -89,6 +90,13 @@ void UpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   win::Dc dc = hdc;
   dc.FillRect(lpps->rcPaint, ::GetSysColor(COLOR_WINDOW));
+
+  // Paint application icon
+  win::Rect rect;
+  win::Window label = GetDlgItem(IDC_STATIC_APP_ICON);
+  label.GetWindowRect(GetWindowHandle(), &rect);
+  label.SetWindowHandle(nullptr);
+  DrawIconResource(IDI_MAIN, dc.Get(), rect, true, true);
 }
 
 }  // namespace ui
