@@ -89,7 +89,7 @@ void Aggregator::ExamineData(Feed& feed) {
     static track::recognition::ParseOptions parse_options;
     parse_options.parse_path = false;
     parse_options.streaming_media = false;
-    Meow.Parse(feed_item.title, episode_data, parse_options);
+    Meow.Parse(feed_item.title, parse_options, episode_data);
     static track::recognition::MatchOptions match_options;
     match_options.allow_sequels = true;
     match_options.check_airing_date = true;

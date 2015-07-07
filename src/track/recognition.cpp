@@ -33,30 +33,32 @@ track::recognition::Engine Meow;
 namespace track {
 namespace recognition {
 
-bool Engine::Parse(std::wstring title, anime::Episode& episode,
-                   const ParseOptions& parse_options) const {
-  episode.Clear();  // Clear previous data
+bool Engine::Parse(std::wstring filename, const ParseOptions& parse_options,
+                   anime::Episode& episode) const {
+  // Clear previous data
+  episode.Clear();
 
-  if (title.empty())
+  // Separate filename from path
+  if (parse_options.parse_path && !parse_options.streaming_media) {
+    if (filename.find_first_of(L"\\/") != filename.npos) {
+      episode.folder = GetPathOnly(filename);
+      filename = GetFileName(filename);
+    }
+  }
+
+  if (filename.empty())
     return false;
 
   anitomy::Anitomy anitomy_instance;
 
-  if (parse_options.streaming_media) {
+  // Set Anitomy options
+  if (parse_options.streaming_media)
     anitomy_instance.options().allowed_delimiters = L" ";
-  } else if (parse_options.parse_path) {
-    if (title.find_first_of(L"\\/") != title.npos) {
-      episode.folder = GetPathOnly(title);
-      title = GetFileName(title);
-    }
-  }
+  Split(Settings[taiga::kRecognition_IgnoredStrings], L"|",
+        anitomy_instance.options().ignored_strings);
 
-  const auto& ignored_strings = Settings[taiga::kRecognition_IgnoredStrings];
-  if (!ignored_strings.empty())
-    Split(ignored_strings, L"|", anitomy_instance.options().ignored_strings);
-
-  if (!anitomy_instance.Parse(title)) {
-    LOG(LevelDebug, L"Could not parse filename: " + title);
+  if (!anitomy_instance.Parse(filename)) {
+    LOG(LevelDebug, L"Could not parse filename: " + filename);
     if (episode.folder.empty())  // If not, perhaps we can parse the path later on
       return false;
   }

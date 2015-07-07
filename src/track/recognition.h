@@ -51,7 +51,7 @@ struct MatchOptions {
 
 class Engine {
 public:
-  bool Parse(std::wstring title, anime::Episode& episode, const ParseOptions& parse_options) const;
+  bool Parse(std::wstring filename, const ParseOptions& parse_options, anime::Episode& episode) const;
   int Identify(anime::Episode& episode, bool give_score, const MatchOptions& match_options);
   bool Search(const std::wstring& title, std::vector<int>& anime_ids);
 

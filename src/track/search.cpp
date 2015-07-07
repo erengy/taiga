@@ -43,7 +43,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
   parse_options.parse_path = false;
   parse_options.streaming_media = false;
 
-  if (!Meow.Parse(name, episode_, parse_options)) {
+  if (!Meow.Parse(name, parse_options, episode_)) {
     LOG(LevelDebug, L"Could not parse directory: " + name);
     return false;
   }
@@ -81,7 +81,7 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
   parse_options.parse_path = true;
   parse_options.streaming_media = false;
 
-  if (!Meow.Parse(path, episode_, parse_options)) {
+  if (!Meow.Parse(path, parse_options, episode_)) {
     LOG(LevelDebug, L"Could not parse filename: " + name);
     return false;
   }

@@ -620,7 +620,7 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
   if (DragQueryFile(hDropInfo, 0, buffer, MAX_PATH) > 0) {
     anime::Episode episode;
     track::recognition::ParseOptions parse_options;
-    Meow.Parse(buffer, episode, parse_options);
+    Meow.Parse(buffer, parse_options, episode);
     MessageBox(ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode).c_str(), TAIGA_APP_TITLE, MB_OK);
   }
 #endif

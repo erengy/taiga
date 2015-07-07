@@ -56,7 +56,7 @@ void DummyEpisode::Initialize() {
 
   Meow.Parse(L"D:\\Anime\\Toradora!\\"
              L"[TaigaSubs]_Toradora!_-_01v2_-_Tiger_and_Dragon_[DVD][1280x720_H264_AAC][ABCD1234].mkv",
-             *this, parse_options);
+             parse_options, *this);
 }
 
 }  // namespace taiga

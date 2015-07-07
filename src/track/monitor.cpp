@@ -85,7 +85,7 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
       break;
   }
 
-  if (!Meow.Parse(path, episode, parse_options))
+  if (!Meow.Parse(path, parse_options, episode))
     return nullptr;
 
   static track::recognition::MatchOptions match_options;
