@@ -48,7 +48,7 @@ namespace taiga {
 
 const std::wstring kDefaultExternalLinks =
     L"Hummingboard|http://hb.cybrox.eu\r\n"
-    L"MALgraph|http://mal.oko.im\r\n"
+    L"MALgraph|http://graph.anime.sc\r\n"
     L"-\r\n"
     L"Mahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\n"
     L"The Fansub Wiki|http://www.fansubwiki.com";
