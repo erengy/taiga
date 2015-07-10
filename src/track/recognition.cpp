@@ -243,6 +243,15 @@ void Engine::UpdateTitles(const anime::Item& anime_item) {
   update_title(anime_item.GetTitle(), titles_.main, normal_titles_.main);
   update_title(anime_item.GetEnglishTitle(), titles_.main, normal_titles_.main);
 
+  const auto& date = anime_item.GetDateStart();
+  if (anime::IsValidDate(date)) {
+    std::wstring year = ToWstr(date.year);
+    if (anime_item.GetTitle().find(year) == std::wstring::npos) {
+      update_title(anime_item.GetTitle() + L" (" + year + L")",
+                   titles_.alternative, normal_titles_.alternative);
+    }
+  }
+
   for (const auto& synonym : anime_item.GetSynonyms()) {
     update_title(synonym, titles_.alternative, normal_titles_.alternative);
   }
