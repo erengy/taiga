@@ -404,9 +404,10 @@ FONT 9, "Segoe UI", 400, 0, 0
     GROUPBOX        "Behavior", IDC_STATIC, 7, 51, 301, 47, 0, WS_EX_LEFT
     LTEXT           "When an episode is recognized:", IDC_STATIC, 12, 62, 130, 8, SS_LEFT, WS_EX_LEFT
     AUTOCHECKBOX    "Notify me", IDC_CHECK_NOTIFY_RECOGNIZED, 12, 72, 75, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Go to Now Playing", IDC_CHECK_UPDATE_GOTO, 12, 83, 100, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Go to Now Playing", IDC_CHECK_GOTO_RECOGNIZED, 12, 83, 100, 8, 0, WS_EX_LEFT
     LTEXT           "When an episode is not recognized:", IDC_STATIC, 167, 62, 130, 8, SS_LEFT, WS_EX_LEFT
     AUTOCHECKBOX    "Notify me", IDC_CHECK_NOTIFY_NOTRECOGNIZED, 167, 72, 75, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Go to Now Playing", IDC_CHECK_GOTO_NOTRECOGNIZED, 167, 83, 100, 8, 0, WS_EX_LEFT
     GROUPBOX        "List updates and automatic sharing", IDC_STATIC, 7, 105, 301, 51, 0, WS_EX_LEFT
     LTEXT           "Delay:", IDC_STATIC, 12, 116, 32, 8, SS_LEFT, WS_EX_LEFT
     EDITTEXT        IDC_EDIT_DELAY, 12, 126, 30, 12, ES_AUTOHSCROLL | ES_NUMBER, WS_EX_LEFT

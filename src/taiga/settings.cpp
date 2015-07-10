@@ -145,10 +145,11 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Update_Delay, L"120", L"account/update/delay");
   INITKEY(kSync_Update_AskToConfirm, L"true", L"account/update/asktoconfirm");
   INITKEY(kSync_Update_CheckPlayer, nullptr, L"account/update/checkplayer");
-  INITKEY(kSync_Update_GoToNowPlaying, L"true", L"account/update/gotonowplaying");
   INITKEY(kSync_Update_OutOfRange, nullptr, L"account/update/outofrange");
   INITKEY(kSync_Update_OutOfRoot, nullptr, L"account/update/outofroot");
   INITKEY(kSync_Update_WaitPlayer, nullptr, L"account/update/waitplayer");
+  INITKEY(kSync_GoToNowPlaying_Recognized, L"true", L"account/update/gotonowplaying");
+  INITKEY(kSync_GoToNowPlaying_NotRecognized, nullptr, L"account/update/gotonowplayingnot");
   INITKEY(kSync_Notify_Recognized, L"true", L"program/notifications/balloon/recognized");
   INITKEY(kSync_Notify_NotRecognized, L"true", L"program/notifications/balloon/notrecognized");
   INITKEY(kSync_Notify_Format, kDefaultFormatBalloon.c_str(), L"program/notifications/balloon/format");

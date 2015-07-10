@@ -576,7 +576,7 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
 
   DlgMain.UpdateTip();
   DlgMain.UpdateTitle();
-  if (Settings.GetBool(taiga::kSync_Update_GoToNowPlaying))
+  if (Settings.GetBool(taiga::kSync_GoToNowPlaying_Recognized))
     DlgMain.navigation.SetCurrentPage(kSidebarItemNowPlaying);
 
   if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
@@ -633,6 +633,8 @@ void OnRecognitionFail() {
     ChangeStatusText(L"Watching: " + CurrentEpisode.anime_title() +
                      PushString(L" #", anime::GetEpisodeRange(CurrentEpisode)) +
                      L" (Not recognized)");
+    if (Settings.GetBool(taiga::kSync_GoToNowPlaying_NotRecognized))
+      DlgMain.navigation.SetCurrentPage(kSidebarItemNowPlaying);
     if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
       std::wstring tip_text =
           ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode) +

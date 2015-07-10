@@ -232,11 +232,12 @@ void SettingsDialog::OnOK() {
   if (page->IsWindow()) {
     Settings.Set(taiga::kSync_Update_AskToConfirm, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CONFIRM));
     Settings.Set(taiga::kSync_Update_CheckPlayer, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_CHECKMP));
-    Settings.Set(taiga::kSync_Update_GoToNowPlaying, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_GOTO));
     Settings.Set(taiga::kSync_Update_OutOfRange, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_RANGE));
     Settings.Set(taiga::kSync_Update_OutOfRoot, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_ROOT));
     Settings.Set(taiga::kSync_Update_WaitPlayer, page->IsDlgButtonChecked(IDC_CHECK_UPDATE_WAITMP));
     Settings.Set(taiga::kSync_Update_Delay, static_cast<int>(page->GetDlgItemInt(IDC_EDIT_DELAY)));
+    Settings.Set(taiga::kSync_GoToNowPlaying_Recognized, page->IsDlgButtonChecked(IDC_CHECK_GOTO_RECOGNIZED));
+    Settings.Set(taiga::kSync_GoToNowPlaying_NotRecognized, page->IsDlgButtonChecked(IDC_CHECK_GOTO_NOTRECOGNIZED));
     Settings.Set(taiga::kSync_Notify_Recognized, page->IsDlgButtonChecked(IDC_CHECK_NOTIFY_RECOGNIZED));
     Settings.Set(taiga::kSync_Notify_NotRecognized, page->IsDlgButtonChecked(IDC_CHECK_NOTIFY_NOTRECOGNIZED));
   }

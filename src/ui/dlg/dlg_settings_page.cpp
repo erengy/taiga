@@ -179,7 +179,6 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageRecognitionGeneral: {
       CheckDlgButton(IDC_CHECK_UPDATE_CONFIRM, Settings.GetBool(taiga::kSync_Update_AskToConfirm));
       CheckDlgButton(IDC_CHECK_UPDATE_CHECKMP, Settings.GetBool(taiga::kSync_Update_CheckPlayer));
-      CheckDlgButton(IDC_CHECK_UPDATE_GOTO, Settings.GetBool(taiga::kSync_Update_GoToNowPlaying));
       CheckDlgButton(IDC_CHECK_UPDATE_RANGE, Settings.GetBool(taiga::kSync_Update_OutOfRange));
       CheckDlgButton(IDC_CHECK_UPDATE_ROOT, Settings.GetBool(taiga::kSync_Update_OutOfRoot));
       CheckDlgButton(IDC_CHECK_UPDATE_WAITMP, Settings.GetBool(taiga::kSync_Update_WaitPlayer));
@@ -187,6 +186,8 @@ BOOL SettingsPage::OnInitDialog() {
       SendDlgItemMessage(IDC_SPIN_DELAY, UDM_SETPOS32, 0, Settings.GetInt(taiga::kSync_Update_Delay));
       CheckDlgButton(IDC_CHECK_NOTIFY_RECOGNIZED, Settings.GetBool(taiga::kSync_Notify_Recognized));
       CheckDlgButton(IDC_CHECK_NOTIFY_NOTRECOGNIZED, Settings.GetBool(taiga::kSync_Notify_NotRecognized));
+      CheckDlgButton(IDC_CHECK_GOTO_RECOGNIZED, Settings.GetBool(taiga::kSync_GoToNowPlaying_Recognized));
+      CheckDlgButton(IDC_CHECK_GOTO_NOTRECOGNIZED, Settings.GetBool(taiga::kSync_GoToNowPlaying_NotRecognized));
       break;
     }
     // Recognition > Media players
