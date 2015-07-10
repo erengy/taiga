@@ -141,8 +141,8 @@ void Engine::NormalizeUnicode(std::wstring& str) const {
   std::string temp = WstrToStr(str);
 
   int length = utf8proc_map(
-      reinterpret_cast<const uint8_t*>(temp.data()), temp.length(),
-      reinterpret_cast<uint8_t**>(&buffer),
+      reinterpret_cast<const utf8proc_uint8_t*>(temp.data()), temp.length(),
+      reinterpret_cast<utf8proc_uint8_t**>(&buffer),
       static_cast<utf8proc_option_t>(options));
 
   if (length >= 0) {
