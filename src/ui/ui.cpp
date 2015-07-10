@@ -644,7 +644,7 @@ void OnRecognitionFail() {
 
   } else {
     if (Taiga.debug_mode)
-      ChangeStatusText(MediaPlayers.current_player() + L" is running.");
+      ChangeStatusText(MediaPlayers.current_player_name() + L" is running.");
   }
 }
 

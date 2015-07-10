@@ -64,7 +64,7 @@ public:
   bool IsPlayerActive() const;
 
   HWND current_window_handle() const;
-  std::wstring current_player() const;
+  std::wstring current_player_name() const;
   bool player_running() const;
   void set_player_running(bool player_running);
   std::wstring current_title() const;
@@ -74,14 +74,14 @@ public:
   MediaPlayer* CheckRunningPlayers();
   MediaPlayer* GetRunningPlayer();
 
-  void EditTitle(std::wstring& str, const MediaPlayer* media_player);
-  std::wstring GetTitle(HWND hwnd, const std::wstring& class_name, int mode);
+  void EditTitle(std::wstring& str, const MediaPlayer& media_player);
+  std::wstring GetTitle(HWND hwnd, const MediaPlayer& media_player);
 
   bool GetTitleFromProcessHandle(HWND hwnd, ULONG process_id, std::wstring& title);
   std::wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
-  std::wstring GetTitleFromSpecialMessage(HWND hwnd, const std::wstring& class_name);
+  std::wstring GetTitleFromSpecialMessage(HWND hwnd);
   std::wstring GetTitleFromMPlayer();
-  std::wstring GetTitleFromBrowser(HWND hwnd);
+  std::wstring GetTitleFromBrowser(HWND hwnd, const MediaPlayer& media_player);
   std::wstring GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 
 public:
@@ -97,7 +97,7 @@ private:
   std::wstring FromAutomationApi(HWND hwnd, int web_engine, std::wstring& title);
 
   HWND current_window_handle_;
-  std::wstring current_player_;
+  std::wstring current_player_name_;
   bool player_running_;
 
   std::wstring current_title_;

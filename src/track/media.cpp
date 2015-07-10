@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <windows.h>
 #include <tlhelp32.h>
 
@@ -104,8 +105,8 @@ HWND MediaPlayers::current_window_handle() const {
   return current_window_handle_;
 }
 
-std::wstring MediaPlayers::current_player() const {
-  return current_player_;
+std::wstring MediaPlayers::current_player_name() const {
+  return current_player_name_;
 }
 
 bool MediaPlayers::player_running() const {
@@ -131,15 +132,21 @@ void MediaPlayers::set_title_changed(bool title_changed) {
 ////////////////////////////////////////////////////////////////////////////////
 
 MediaPlayer* MediaPlayers::CheckRunningPlayers() {
+  typedef std::pair<HWND, const MediaPlayer*> running_player_t;
+  std::vector<running_player_t> running_players;
+
   // Go through windows, starting with the highest in the Z-order
   HWND hwnd = GetWindow(ui::GetWindowHandle(ui::kDialogMain), GW_HWNDFIRST);
   while (hwnd != nullptr) {
-    foreach_(item, items) {
-      if (!item->enabled)
+    std::wstring class_from_window;
+    std::wstring filename_from_window;
+
+    for (const auto& item : items) {
+      if (!item.enabled)
         continue;
-      if (item->visible && !IsWindowVisible(hwnd))
+      if (item.visible && !IsWindowVisible(hwnd))
         continue;
-      switch (item->mode) {
+      switch (item.mode) {
         default:
           if (!Settings.GetBool(taiga::kRecognition_DetectMediaPlayers))
             continue;
@@ -150,60 +157,89 @@ MediaPlayer* MediaPlayers::CheckRunningPlayers() {
           break;
       }
 
-      // Compare window classes
-      foreach_(window_class, item->classes) {
-        if (*window_class == GetWindowClass(hwnd)) {
-          // Compare file names
-          foreach_(file, item->files) {
-            if (IsEqual(*file, GetFileName(GetWindowPath(hwnd)))) {
-              if (item->mode != kMediaModeWebBrowser ||
-                  !GetWindowTitle(hwnd).empty()) {
-                // Stick with the previously recognized window, if there is one
-                bool recognized = anime::IsValidId(CurrentEpisode.anime_id);
-                if (!recognized || current_window_handle_ == hwnd) {
-                  // We have a match!
-                  player_running_ = true;
-                  current_player_ = item->name;
-                  std::wstring title = GetTitle(hwnd, *window_class, item->mode);
-                  EditTitle(title, &(*item));
-                  if (current_title_ != title) {
-                    current_title_ = title;
-                    set_title_changed(true);
-                  }
-                  current_window_handle_ = hwnd;
-                  return &(*item);
-                }
-              }
-            }
-          }
-        }
-      }
+      if (class_from_window.empty())
+        class_from_window = GetWindowClass(hwnd);
+      auto class_from_item = std::find(
+          item.classes.begin(), item.classes.end(), class_from_window);
+      if (class_from_item == item.classes.end())
+        continue;
+
+      if (filename_from_window.empty())
+        filename_from_window = GetFileName(GetWindowPath(hwnd));
+      auto filename_from_item = std::find_if(
+          item.files.begin(), item.files.end(),
+          [&filename_from_window](const std::wstring& filename) {
+            return IsEqual(filename, filename_from_window);
+          });
+      if (filename_from_item == item.files.end())
+        continue;
+
+      running_players.push_back(std::make_pair(hwnd, &item));
     }
 
-    // Check next window
     hwnd = GetWindow(hwnd, GW_HWNDNEXT);
   }
 
-  // Not found
-  current_player_.clear();
-  if (!current_title_.empty()) {
-    current_title_.clear();
+  const MediaPlayer* current_player = nullptr;
+  std::wstring current_player_name;
+  std::wstring current_title;
+  HWND current_window_handle = nullptr;
+
+  if (!running_players.empty()) {
+    auto set_running_player = [&](running_player_t& running_player) {
+      if (!running_player.first || !running_player.second)
+        return false;
+      current_title = GetTitle(running_player.first, *running_player.second);
+      if (!current_title.empty()) {
+        current_player = running_player.second;
+        current_player_name = running_player.second->name;
+        current_window_handle = running_player.first;
+        return true;
+      } else {
+        running_player.second = nullptr;
+        return false;
+      }
+    };
+
+    // Stick with the previously detected window if possible
+    bool anime_identified = anime::IsValidId(CurrentEpisode.anime_id);
+    if (current_window_handle_ && anime_identified) {
+      for (auto& running_player : running_players) {
+        if (running_player.first == current_window_handle_)
+          if (set_running_player(running_player))
+            break;
+      }
+    }
+    // Otherwise, get the first one with a valid title
+    if (!current_player) {
+      for (auto& running_player : running_players) {
+        if (set_running_player(running_player))
+          break;
+      }
+    }
+  }
+
+  if (current_player)
+    player_running_ = true;
+  current_player_name_ = current_player_name;
+  if (current_title_ != current_title) {
+    current_title_ = current_title;
     set_title_changed(true);
   }
-  current_window_handle_ = nullptr;
-  return nullptr;
+  current_window_handle_ = current_window_handle;
+
+  return const_cast<MediaPlayer*>(current_player);
 }
 
 MediaPlayer* MediaPlayers::GetRunningPlayer() {
-  return FindPlayer(current_player_);
+  return FindPlayer(current_player_name_);
 }
 
-void MediaPlayers::EditTitle(std::wstring& str,
-                             const MediaPlayer* media_player) {
-  if (str.empty() || !media_player || media_player->edits.empty())
+void MediaPlayers::EditTitle(std::wstring& str, const MediaPlayer& media_player) {
+  if (str.empty() || media_player.edits.empty())
     return;
 
-  foreach_(it, media_player->edits) {
+  foreach_(it, media_player.edits) {
     switch (it->mode) {
       // Erase
       case 1: {
@@ -236,9 +272,8 @@ std::wstring MediaPlayer::GetPath() const {
   return std::wstring();
 }
 
-std::wstring MediaPlayers::GetTitle(HWND hwnd, const std::wstring& class_name,
-                                    int mode) {
-  switch (mode) {
+std::wstring MediaPlayers::GetTitle(HWND hwnd, const MediaPlayer& media_player) {
+  switch (media_player.mode) {
     // File handle
     case kMediaModeFileHandle: {
       std::wstring title;
@@ -250,24 +285,25 @@ std::wstring MediaPlayers::GetTitle(HWND hwnd, const std::wstring& class_name,
       return GetTitleFromWinampAPI(hwnd, false);
     // Special message
     case kMediaModeSpecialMessage:
-      return GetTitleFromSpecialMessage(hwnd, class_name);
+      return GetTitleFromSpecialMessage(hwnd);
     // MPlayer
     case kMediaModeMplayer:
       return GetTitleFromMPlayer();
     // Browser
     case kMediaModeWebBrowser:
-      return GetTitleFromBrowser(hwnd);
+      return GetTitleFromBrowser(hwnd, media_player);
 
     // Window title
     case kMediaModeWindowTitle:
     default: {
+      std::wstring title;
       auto method = Settings[taiga::kRecognition_MediaPlayerDetectionMethod];
-      if (method == L"prioritize_file_handle") {
-        std::wstring title;
+      if (method == L"prioritize_file_handle")
         if (GetTitleFromProcessHandle(hwnd, 0, title))
           return title;
-      }
-      return GetWindowTitle(hwnd);
+      title = GetWindowTitle(hwnd);
+      EditTitle(title, media_player);
+      return title;
     }
   }
 }
@@ -452,10 +488,10 @@ std::wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
   return title;
 }
 
-std::wstring MediaPlayers::GetTitleFromSpecialMessage(
-    HWND hwnd,
-    const std::wstring& class_name) {
+std::wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd) {
   std::wstring title;
+
+  const std::wstring class_name = GetWindowClass(hwnd);
 
   // BS.Player
   if (class_name == BSP_CLASS) {

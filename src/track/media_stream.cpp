@@ -321,37 +321,38 @@ std::wstring MediaPlayers::FromAutomationApi(HWND hwnd, int web_engine,
   return title;
 }
 
-std::wstring MediaPlayers::GetTitleFromBrowser(HWND hwnd) {
+std::wstring MediaPlayers::GetTitleFromBrowser(
+    HWND hwnd, const MediaPlayer& media_player) {
   WebBrowserEngine web_engine = kWebEngineUnknown;
-
-  auto media_player = FindPlayer(current_player());
 
   // Get window title
   std::wstring title = GetWindowTitle(hwnd);
   EditTitle(title, media_player);
 
-  // Return current title if the same web page is still open
-  if (CurrentEpisode.anime_id > 0)
-    if (IntersectsWith(title, current_title()))
-      return current_title();
+  if (media_player.name == current_player_name()) {
+    // Return current title if the same web page is still open
+    if (CurrentEpisode.anime_id > 0)
+      if (IntersectsWith(title, current_title()))
+        return current_title();
 
-  // Delay operation to save some CPU
-  static int counter = 0;
-  if (counter < 5) {
-    counter++;
-    return current_title();
-  } else {
-    counter = 0;
+    // Delay operation to save some CPU
+    static int counter = 0;
+    if (counter < 5) {
+      counter++;
+      return current_title();
+    } else {
+      counter = 0;
+    }
   }
 
   // Select web browser engine
-  if (media_player->engine == L"WebKit") {
+  if (media_player.engine == L"WebKit") {
     web_engine = kWebEngineWebkit;
-  } else if (media_player->engine == L"Gecko") {
+  } else if (media_player.engine == L"Gecko") {
     web_engine = kWebEngineGecko;
-  } else if (media_player->engine == L"Trident") {
+  } else if (media_player.engine == L"Trident") {
     web_engine = kWebEngineTrident;
-  } else if (media_player->engine == L"Presto") {
+  } else if (media_player.engine == L"Presto") {
     web_engine = kWebEnginePresto;
   } else {
     return std::wstring();
@@ -510,6 +511,7 @@ std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
   }
 
   // Clean-up title
+  EraseLeft(title, L"New Tab");
   CleanStreamTitle(stream_provider, title);
 
   return title;
