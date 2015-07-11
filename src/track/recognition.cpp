@@ -74,9 +74,6 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
                      const MatchOptions& match_options) {
   std::set<int> anime_ids;
 
-  if (give_score)
-    scores_.clear();
-
   InitializeTitles();
 
   auto valide_ids = [&](anime::Episode& episode) {
@@ -190,7 +187,6 @@ bool Engine::Search(const std::wstring& title, std::vector<int>& anime_ids) {
   track::recognition::MatchOptions default_options;
 
   InitializeTitles();
-  scores_.clear();
 
   ScoreTitle(episode, empty_set, default_options);
 

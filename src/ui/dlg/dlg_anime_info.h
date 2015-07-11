@@ -36,6 +36,8 @@ public:
   AnimeDialog();
   virtual ~AnimeDialog() {}
 
+  typedef std::vector<std::pair<int, double>> sorted_scores_t;
+
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
   void OnCancel();
   BOOL OnCommand(WPARAM wParam, LPARAM lParam);
@@ -52,6 +54,7 @@ public:
   int GetCurrentId() const;
   void SetCurrentId(int anime_id);
   void SetCurrentPage(int index);
+  void SetScores(const sorted_scores_t& scores);
   void Refresh(bool image = true,
                bool series_info = true,
                bool my_info = true,
@@ -67,6 +70,7 @@ protected:
   int anime_id_;
   int current_page_;
   int mode_;
+  sorted_scores_t scores_;
 
   class ImageLabel : public win::Window {
   public:

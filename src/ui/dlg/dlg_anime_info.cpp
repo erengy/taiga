@@ -486,6 +486,10 @@ void AnimeDialog::SetCurrentPage(int index) {
   }
 }
 
+void AnimeDialog::SetScores(const sorted_scores_t& scores) {
+  scores_ = scores;
+}
+
 void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool connect) {
   if (!IsWindow())
     return;
@@ -518,11 +522,10 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   // Set content
   if (anime_id_ == anime::ID_NOTINLIST) {
     std::wstring content = L"Taiga was unable to identify this title, and it needs your help.\n\n";
-    auto scores = Meow.GetScores();
-    if (!scores.empty()) {
+    if (!scores_.empty()) {
       int count = 0;
       content += L"Please choose the correct one from the list below:\n\n";
-      foreach_c_(it, scores) {
+      foreach_c_(it, scores_) {
         content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->first) + L"\">" +
                    AnimeDatabase.items[it->first].GetTitle() + L"</a>";
         if (Taiga.debug_mode)

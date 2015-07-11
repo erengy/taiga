@@ -35,6 +35,7 @@
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
 #include "track/media.h"
+#include "track/recognition.h"
 #include "win/win_taskbar.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
@@ -629,6 +630,7 @@ bool OnRecognitionCancelConfirm() {
 void OnRecognitionFail() {
   if (!CurrentEpisode.anime_title().empty()) {
     MediaPlayers.set_title_changed(false);
+    DlgNowPlaying.SetScores(Meow.GetScores());
     DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
     ChangeStatusText(L"Watching: " + CurrentEpisode.anime_title() +
                      PushString(L" #", anime::GetEpisodeRange(CurrentEpisode)) +

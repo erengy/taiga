@@ -115,6 +115,8 @@ int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
                        const scores_t& trigram_results) {
   scores_t jaro_winkler, levenshtein, custom, bonus;
 
+  scores_.clear();
+
   for (const auto& trigram_result : trigram_results) {
     int id = trigram_result.first;
 
