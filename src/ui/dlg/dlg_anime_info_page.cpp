@@ -217,17 +217,23 @@ BOOL PageMyInfo::OnCommand(WPARAM wParam, LPARAM lParam) {
     // User changed rewatching checkbox
     case IDC_CHECK_ANIME_REWATCH:
       if (HIWORD(wParam) == BN_CLICKED) {
+        win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_STATUS);
         win::Spin spin = GetDlgItem(IDC_SPIN_PROGRESS);
         int episode_value = 0;
         spin.GetPos32(episode_value);
         if (IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH)) {
+          if (taiga::GetCurrentServiceId() == sync::kHummingbird)
+            combobox.SetCurSel(anime::kWatching - 1);
           if (anime_item->GetMyStatus() == anime::kCompleted &&
               episode_value == anime_item->GetEpisodeCount())
             spin.SetPos32(0);
         } else {
+          if (taiga::GetCurrentServiceId() == sync::kHummingbird)
+            combobox.SetCurSel(anime_item->GetMyStatus() - 1);
           if (episode_value == 0)
             spin.SetPos32(anime_item->GetMyLastWatchedEpisode());
         }
+        combobox.SetWindowHandle(nullptr);
         spin.SetWindowHandle(nullptr);
         return TRUE;
       }
