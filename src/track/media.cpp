@@ -431,18 +431,11 @@ bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
   if (!GetProcessFiles(process_id, files_vector))
     return false;
 
-  for (auto path : files_vector) {
+  for (const auto& path : files_vector) {
     if (Meow.IsValidFileExtension(GetFileExtension(path))) {
-      if (path.at(1) != L':') {
-        TranslateDeviceName(path);
-      }
-      if (path.at(1) == L':') {
-        WCHAR buffer[4096] = {0};
-        GetLongPathName(path.c_str(), buffer, 4096);
-        title = std::wstring(buffer);
-      } else {
-        title = GetFileName(path);
-      }
+      title = path;
+      TranslateDeviceName(title);
+      ConvertToLongPath(title);
       break;
     }
   }

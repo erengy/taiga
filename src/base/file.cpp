@@ -186,6 +186,13 @@ int DeleteFolder(std::wstring path) {
   return SHFileOperation(&fos);
 }
 
+void ConvertToLongPath(std::wstring& path) {
+  const DWORD buffer_size = 4096;
+  WCHAR buffer[buffer_size] = {0};
+  if (GetLongPathName(path.c_str(), buffer, buffer_size) > 0)
+    path = std::wstring(buffer);
+}
+
 // Extends the length limit from 260 to 32767 characters
 // See: http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#maxpath
 std::wstring GetExtendedLengthPath(const std::wstring& path) {
@@ -217,6 +224,42 @@ bool IsSystemFile(const WIN32_FIND_DATA& find_data) {
 bool IsValidDirectory(const WIN32_FIND_DATA& find_data) {
   return wcscmp(find_data.cFileName, L".") != 0 &&
          wcscmp(find_data.cFileName, L"..") != 0;
+}
+
+bool TranslateDeviceName(std::wstring& path) {
+  if (!StartsWith(path, L"\\Device\\"))
+    return false;
+
+  size_t pos = path.find('\\', 8);
+  if (pos == std::wstring::npos)
+    return false;
+  std::wstring device_name = path.substr(0, pos);
+  path = path.substr(pos);
+
+  const int drive_letters_size = 1024;
+  WCHAR drive_letters[drive_letters_size] = {'\0'};
+  if (!GetLogicalDriveStrings(drive_letters_size - 1, drive_letters))
+    return false;
+
+  WCHAR* p = drive_letters;
+  WCHAR device[MAX_PATH];
+  WCHAR logical_drive[3] = L" :";
+  std::wstring drive_letter;
+
+  do {
+    *logical_drive = *p;
+    if (QueryDosDevice(logical_drive, device, MAX_PATH))
+      if (device_name == device)
+        drive_letter = logical_drive;
+    while (*p++);
+  } while (drive_letter.empty() && *p);
+
+  if (drive_letter.empty())
+    drive_letter = L"\\";  // assuming that it's a remote drive
+
+  path = drive_letter + path;
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -34,6 +34,5 @@ std::wstring GetWindowTitle(HWND hwnd);
 bool IsFullscreen(HWND hwnd);
 
 PVOID GetLibraryProcAddress(PSTR dll_module, PSTR proc_name);
-bool TranslateDeviceName(std::wstring& path);
 
 #endif  // TAIGA_BASE_PROCESS_H

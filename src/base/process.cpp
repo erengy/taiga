@@ -389,35 +389,3 @@ bool IsFullscreen(HWND hwnd) {
 PVOID GetLibraryProcAddress(PSTR dll_module, PSTR proc_name) {
   return GetProcAddress(GetModuleHandleA(dll_module), proc_name);
 }
-
-bool TranslateDeviceName(std::wstring& path) {
-  size_t pos = path.find('\\', 8);
-  if (pos == std::wstring::npos)
-    return false;
-  std::wstring device_name = path.substr(0, pos);
-  path = path.substr(pos);
-
-  const int size = 1024;
-  WCHAR szTemp[size] = {'\0'};
-  if (!GetLogicalDriveStrings(size - 1, szTemp))
-    return false;
-
-  WCHAR* p = szTemp;
-  bool bFound = false;
-  WCHAR szName[MAX_PATH];
-  WCHAR szDrive[3] = L" :";
-
-  do {
-    *szDrive = *p;
-    if (QueryDosDevice(szDrive, szName, MAX_PATH)) {
-      if (device_name == szName) {
-        device_name = szDrive;
-        bFound = true;
-      }
-    }
-    while (*p++);
-  } while (!bFound && *p);
-
-  path = device_name + path;
-  return bFound;
-}
