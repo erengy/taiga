@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-07-05
+- last_modified: 2015-07-12
 
 ::rules
 
@@ -149,6 +149,9 @@
 - 918|818:253-265 -> 15417|7253:1-13!
 # Gintama -> ~' (2015)
 - 918|818:266-? -> 28977|10083:1-?!
+
+# God Eater -> ~ Prologue
+- 27631|9130:0 -> 10470|6197:1
 
 # Guilty Crown -> ~: Lost Christmas
 - 10793|6349:0 -> 13411|6958:1
