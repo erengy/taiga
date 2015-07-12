@@ -15,8 +15,8 @@
 		<item name="Library folders" sub="Folders"/>
 		<item name="Scan available episodes" action="ScanEpisodesAll()"/>
 		<item type="separator"/>
-		<item name="Play next episode&#9;Ctrl+N" action="PlayNext()"/>
-		<item name="Play random anime&#9;Ctrl+R" action="PlayRandomAnime()"/>
+		<item name="Play &next episode&#9;Ctrl+N" action="PlayNext()"/>
+		<item name="Play &random anime&#9;Ctrl+R" action="PlayRandomAnime()"/>
 		<item type="separator"/>
 		<item name="E&xit" action="Exit()"/>
 	</menu>
@@ -105,25 +105,25 @@
 		<item name="Search" sub="Search"/>
 		<item type="separator"/>
 		<item name="Edit" action="EditAll()"/>
-		<item name="Delete from list...&#9;Del" action="EditDelete()"/>
+		<item name="&Delete from list...&#9;Del" action="EditDelete()"/>
 		<item type="separator"/>
 		<item name="Open folder" action="OpenFolder()"/>
 		<item name="Scan available episodes&#9;F5" action="ScanEpisodes()"/>
 		<item type="separator"/>
 		<!-- Note: Overwritten -->
 		<item name="Play episode"           sub="PlayEpisode"/>
-		<item name="Play last episode"   action="PlayLast()"/>
-		<item name="Play next episode"   action="PlayNext()"/>
-		<item name="Play random episode" action="PlayRandom()"/>
+		<item name="Play &last episode"   action="PlayLast()"/>
+		<item name="Play &next episode"   action="PlayNext()"/>
+		<item name="Play &random episode" action="PlayRandom()"/>
 	</menu>
 	<!-- Edit -->
 	<menu name="Edit">
-		<item name="Set episode..." action="EditEpisode()"/>
-		<item name="Set score"         sub="EditScore"/>
-		<item name="Set status"        sub="EditStatus"/>
-		<item name="Set tags..."    action="EditTags()"/>
+		<item name="Set &episode..." action="EditEpisode()"/>
+		<item name="Set sco&re"         sub="EditScore"/>
+		<item name="Set &status"        sub="EditStatus"/>
+		<item name="Set &tags..."    action="EditTags()"/>
 		<item type="separator"/>
-		<item name="Delete from list..." action="EditDelete()"/>
+		<item name="&Delete from list...&#9;Del" action="EditDelete()"/>
 	</menu>
 	<!-- Score -->
 	<menu name="EditScore">
