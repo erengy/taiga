@@ -109,9 +109,10 @@ void Engine::Transliterate(std::wstring& str) const {
   for (size_t i = 0; i < str.size(); ++i) {
     auto& c = str[i];
     switch (c) {
-      // Character equivalencies
+      // Character equivalencies that are not included in UTF8PROC_LUMP
       case L'@': c = L'a'; break;  // e.g. "iDOLM@STER" (doesn't make a difference for "GJ-bu@" or "Sasami-san@Ganbaranai")
       case L'\u00D7': c = L'x'; break;  // multiplication sign (e.g. "Tasogare Otome x Amnesia")
+      case L'\uA789': c = L':'; break;  // modifier letter colon (e.g. "Nisekoi:")
       // A few common always-equivalent romanizations
       case L'\u014C': str.replace(i, 1, L"ou"); break;  // latin capital letter o with macron
       case L'\u014D': str.replace(i, 1, L"ou"); break;  // latin small letter o with macron
