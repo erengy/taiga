@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-07-12
+- last_modified: 2015-07-18
 
 ::rules
 
@@ -369,6 +369,8 @@
 
 # The iDOLM@STER -> ~: 765 Pro to Iu Monogatari
 - 10278|6111:765 -> 11889|6627:1
+# The iDOLM@STER Cinderella Girls -> ~ 2nd Season
+- 23587|8777:14-25 -> 30344|10760:1-12!
 
 # Towa no Quon 1 -> ~ 2,3,4,5,6
 - 10294|6116:2 -> 10713|6310:1
@@ -376,6 +378,9 @@
 - 10294|6116:4 -> 10715|6312:1
 - 10294|6116:5 -> 10716|6313:1
 - 10294|6116:6 -> 10717|6314:1
+
+# Trinity Seven -> ~ OVA
+- 25157|8607:13 -> 28285|10014:1
 
 # UN-GO -> ~: Inga-ron
 - 10798|6353:0 -> 11531|6529:1
