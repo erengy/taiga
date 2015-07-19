@@ -457,7 +457,7 @@ void AddToQueue(Item& item, const Episode& episode, bool change_status) {
 
   if (change_status) {
     // Move to completed
-    if (item.GetEpisodeCount() == *history_item.episode) {
+    if (item.GetEpisodeCount() == *history_item.episode && *history_item.episode > 0) {
       history_item.status = kCompleted;
       if (item.GetMyRewatching()) {
         history_item.enable_rewatching = FALSE;
