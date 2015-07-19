@@ -749,11 +749,16 @@ void ChangeEpisode(int anime_id, int value) {
   if (!anime_item)
     return;
 
-  if (IsValidEpisodeNumber(value, anime_item->GetEpisodeCount())) {
-    Episode episode;
-    episode.set_episode_number(value);
-    AddToQueue(*anime_item, episode, false);
-  }
+  if (!IsValidEpisodeNumber(value, anime_item->GetEpisodeCount()))
+    return;
+
+  Episode episode;
+  episode.set_episode_number(value);
+
+  // Allow changing the status to Completed
+  bool change_status = value == anime_item->GetEpisodeCount() && value > 0;
+
+  AddToQueue(*anime_item, episode, change_status);
 }
 
 void DecrementEpisode(int anime_id) {
