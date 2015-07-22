@@ -250,7 +250,6 @@ BOOL SettingsPage::OnInitDialog() {
       }
       int i = 0;
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"AnimeLab", taiga::kStream_Animelab);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime Sols", taiga::kStream_Animesols);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", taiga::kStream_Ann);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", taiga::kStream_Crunchyroll);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", taiga::kStream_Daisuki);
@@ -887,38 +886,19 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         Execute(MediaPlayers.items[lpnmitem->iItem].GetPath());
       // Streaming media providers
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
-        switch (lpnmitem->iItem) {
-          case 0:
-            ExecuteLink(L"http://www.animelab.com");
-            break;
-          case 1:
-            ExecuteLink(L"http://www.animesols.com");
-            break;
-          case 2:
-            ExecuteLink(L"http://www.animenewsnetwork.com/video/");
-            break;
-          case 3:
-            ExecuteLink(L"http://www.crunchyroll.com");
-            break;
-          case 4:
-            ExecuteLink(L"http://www.daisuki.net");
-            break;
-          case 5:
-            ExecuteLink(L"http://www.daisuki.net");
-            break;
-          case 6:
-            ExecuteLink(L"http://plex.tv");
-            break;
-          case 7:
-            ExecuteLink(L"http://www.viz.com/anime/streaming");
-            break;
-          case 8:
-            ExecuteLink(L"http://www.wakanim.tv");
-            break;
-          case 9:
-            ExecuteLink(L"http://www.youtube.com");
-            break;
-        }
+        const std::vector<std::wstring> links = {
+          L"http://www.animelab.com",
+          L"http://www.animenewsnetwork.com/video/",
+          L"http://www.crunchyroll.com",
+          L"http://www.daisuki.net",
+          L"http://plex.tv",
+          L"http://www.veoh.com",
+          L"http://www.viz.com/anime/streaming",
+          L"http://www.wakanim.tv",
+          L"http://www.youtube.com",
+        };
+        if (lpnmitem->iItem > -1 && lpnmitem->iItem < static_cast<int>(links.size()))
+          ExecuteLink(links.at(lpnmitem->iItem));
       // Torrent filters
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
         win::ListView list = lpnmitem->hdr.hwndFrom;

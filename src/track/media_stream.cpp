@@ -28,7 +28,6 @@ enum StreamingVideoProvider {
   kStreamUnknown = -1,
   kStreamFirst,
   kStreamAnimelab = kStreamFirst,
-  kStreamAnimesols,
   kStreamAnn,
   kStreamCrunchyroll,
   kStreamDaisuki,
@@ -369,8 +368,6 @@ bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
   switch (stream_provider) {
     case kStreamAnimelab:
       return Settings.GetBool(taiga::kStream_Animelab);
-    case kStreamAnimesols:
-      return Settings.GetBool(taiga::kStream_Animesols);
     case kStreamAnn:
       return Settings.GetBool(taiga::kStream_Ann);
     case kStreamCrunchyroll:
@@ -397,8 +394,6 @@ bool MatchStreamUrl(StreamingVideoProvider stream_provider,
   switch (stream_provider) {
     case kStreamAnimelab:
       return InStr(url, L"animelab.com/player/") > -1;
-    case kStreamAnimesols:
-      return SearchRegex(url, L"animesols.com/videos/[0-9]+");
     case kStreamAnn:
       return SearchRegex(url, L"animenewsnetwork.com/video/[0-9]+");
     case kStreamCrunchyroll:
@@ -429,10 +424,6 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
     // AnimeLab
     case kStreamAnimelab:
       EraseLeft(title, L"AnimeLab - ");
-      break;
-    // Anime Sols
-    case kStreamAnimesols:
-      EraseLeft(title, L"Anime Sols ");
       break;
     // Anime News Network
     case kStreamAnn:
