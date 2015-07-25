@@ -355,6 +355,12 @@ void StartWatching(Item& item, Episode& episode) {
     }
   }
 
+  // Update last watched fansub group
+  if (!episode.release_group().empty()) {
+    item.SetLastWatchedGroup(episode.release_group());
+    ui::OnLibraryEntryChange(item.GetId());
+  }
+
   // Get additional information
   if (item.GetScore() == kUnknownScore || item.GetSynopsis().empty())
     sync::GetMetadataById(item.GetId());
