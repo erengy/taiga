@@ -649,6 +649,18 @@ bool Item::IsEpisodeAvailable(int number) const {
   return local_info_.available_episodes.at(number - 1);
 }
 
+int Item::LatestEpisodeAvailable() const {
+  int latest_ep = GetMyLastWatchedEpisode();
+  auto& iter = local_info_.available_episodes.begin() + latest_ep;
+  while (iter < local_info_.available_episodes.end()) {
+    if (!*iter)
+      return latest_ep;
+    iter++;
+    latest_ep++;
+  }
+  return local_info_.available_episodes.size();
+}
+
 bool Item::IsNextEpisodeAvailable() const {
   return IsEpisodeAvailable(GetMyLastWatchedEpisode() + 1);
 }
