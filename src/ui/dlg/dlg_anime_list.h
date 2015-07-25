@@ -47,6 +47,7 @@ enum AnimeListColumn {
   kColumnUserLastUpdated,
   kColumnUserProgress,
   kColumnUserRating,
+  kColumnGroup,
 };
 
 class AnimeListDialog : public win::Dialog {
