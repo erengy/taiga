@@ -137,6 +137,7 @@ public:
   void SetUserSynonyms(const std::vector<std::wstring>& synonyms);
 
   bool IsEpisodeAvailable(int number) const;
+  int LatestEpisodeAvailable() const;
   bool IsNextEpisodeAvailable() const;
   bool UserSynonymsAvailable() const;
 

@@ -513,9 +513,15 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
           if (IsAllEpisodesAvailable(*anime_item)) {
             AppendString(text, L"All episodes are in library folders");
           } else {
-            if (anime_item->IsNextEpisodeAvailable())
-              AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) +
-                                 L" is in library folders");
+            if (anime_item->IsNextEpisodeAvailable()) {
+              int first_available = anime_item->GetMyLastWatchedEpisode() + 1;
+              int last_available = anime_item->LatestEpisodeAvailable();
+              bool more_than_one = (last_available > first_available);
+              AppendString(text, L"#" + ToWstr(first_available)
+                  + (more_than_one ? L"-" + ToWstr(last_available) + L" are "
+                                   : L" is ")
+                  + L"in library folders");
+            }
             if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
               AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) +
                                  L" is available for download");
