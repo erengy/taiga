@@ -407,6 +407,8 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
       episode.set_episode_number(ToInt(filename.substr(pos)));
   }
 
+  ExtendAnimeTitle(episode);
+
   return true;
 }
 
