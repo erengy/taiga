@@ -368,7 +368,8 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
     anitomy_instance.Parse(str);
     auto it = anitomy_instance.elements().find(anitomy::kElementAnimeSeason);
     if (it != anitomy_instance.elements().end())
-      return ToInt(it->second);
+      if (anitomy_instance.elements().empty(anitomy::kElementAnimeTitle))
+        return ToInt(it->second);
     return 0;
   };
 
