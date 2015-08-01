@@ -193,8 +193,8 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       ADD_OPERATOR(kFeedFilterOperator_NotEquals);
       break;
     case kFeedFilterElement_Episode_Title:
-	case kFeedFilterElement_Episode_Group:
-	case kFeedFilterElement_Meta_Groups:
+    case kFeedFilterElement_Episode_Group:
+    case kFeedFilterElement_Meta_Groups:
     case kFeedFilterElement_Episode_VideoType:
     case kFeedFilterElement_File_Title:
     case kFeedFilterElement_File_Category:
@@ -306,11 +306,11 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       value_combo_.AddString(L"%watched%");
       value_combo_.AddString(L"%total%");
       break;
-	case kFeedFilterElement_Meta_Groups:
+    case kFeedFilterElement_Meta_Groups:
       RECREATE_COMBO(CBS_DROPDOWN);
-	  value_combo_.AddString(L"%group%");
-	  value_combo_.AddString(L"None");
-	  break;
+      value_combo_.AddString(L"%group%");
+      value_combo_.AddString(L"None");
+      break;
     case kFeedFilterElement_Episode_Version:
       RECREATE_COMBO(CBS_DROPDOWN);
       value_combo_.AddString(L"2");

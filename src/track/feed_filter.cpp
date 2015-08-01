@@ -80,24 +80,24 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
         element = ToWstr(anime->GetType());
       is_numeric = true;
       break;
-	case kFeedFilterElement_Meta_Groups:
-		element = L"None";
-		if (anime) {
-			int intid = anime->GetId();
+    case kFeedFilterElement_Meta_Groups:
+      element = L"None";
+      if (anime) {
+        int intid = anime->GetId();
 
-			std::vector<std::wstring> groups;
-			if (anime::GetFansubFilter(intid, groups)) {
-				std::wstring assignedgroups = L"";
-				foreach_(it, groups) {
-					if (!assignedgroups.empty())
-						assignedgroups += L" or ";
-					assignedgroups += L"\"" + *it + L"\"";
-				}
-				element = assignedgroups;
-			}
-		}
+        std::vector<std::wstring> groups;
+        if (anime::GetFansubFilter(intid, groups)) {
+          std::wstring assignedgroups = L"";
+          foreach_(it, groups) {
+            if (!assignedgroups.empty())
+              assignedgroups += L" or ";
+            assignedgroups += L"\"" + *it + L"\"";
+          }
+          element = assignedgroups;
+        }
+      }
 
-		break;
+      break;
     case kFeedFilterElement_User_Status:
       element = ToWstr(anime ? anime->GetMyStatus() : anime::kNotInList);
       is_numeric = true;
@@ -800,7 +800,7 @@ std::wstring FeedFilterManager::TranslateElement(int element) {
       return L"Anime airing status";
     case kFeedFilterElement_Meta_Type:
       return L"Anime type";
-	case kFeedFilterElement_Meta_Groups:
+    case kFeedFilterElement_Meta_Groups:
       return L"Anime preferred groups";
     case kFeedFilterElement_User_Status:
       return L"Anime watching status";
