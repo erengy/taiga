@@ -311,22 +311,33 @@ std::wstring ExpandEnvironmentStrings(const std::wstring& path) {
 }
 
 std::wstring GetDefaultAppPath(const std::wstring& extension,
-                          const std::wstring& default_value) {
-  win::Registry reg;
-  reg.OpenKey(HKEY_CLASSES_ROOT, extension, 0, KEY_QUERY_VALUE);
+                               const std::wstring& default_value) {
+  auto query_root_value = [](const std::wstring& subkey) {
+    win::Registry reg;
+    reg.OpenKey(HKEY_CLASSES_ROOT, subkey, 0, KEY_QUERY_VALUE);
+    return reg.QueryValue(L"");
+  };
 
-  std::wstring path = reg.QueryValue(L"");
+  std::wstring path = query_root_value(extension);
+
+  if (!path.empty())
+    path = query_root_value(path + L"\\shell\\open\\command");
 
   if (!path.empty()) {
-    path += L"\\shell\\open\\command";
-    reg.OpenKey(HKEY_CLASSES_ROOT, path, 0, KEY_QUERY_VALUE);
-
-    path = reg.QueryValue(L"");
-    ReplaceString(path, L"\"", L"");
-    Trim(path, L" %1");
+    size_t position = 0;
+    bool inside_quotes = false;
+    for ( ; position < path.size(); ++position) {
+      if (path.at(position) == ' ') {
+        if (!inside_quotes)
+          break;
+      } else if (path.at(position) == '"') {
+        inside_quotes = !inside_quotes;
+      }
+    }
+    if (position != path.size())
+      path.resize(position);
+    Trim(path, L"\" ");
   }
-
-  reg.CloseKey();
 
   return path.empty() ? default_value : path;
 }
