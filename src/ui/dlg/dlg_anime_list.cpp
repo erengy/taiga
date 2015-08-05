@@ -398,6 +398,7 @@ int AnimeListDialog::ListView::GetDefaultSortOrder(AnimeListColumn column) {
     case kColumnUserLastUpdated:
     case kColumnUserProgress:
     case kColumnUserRating:
+    case kColumnGroup:
       return -1;
     case kColumnAnimeTitle:
     default:
@@ -1101,6 +1102,10 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
               anime_item->GetMyLastUpdated() == L"0")
             pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
           break;
+        case kColumnGroup:
+          if (anime_item->GetLastWatchedGroup().empty())
+            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+          break;
       }
 
       // Indicate currently playing
@@ -1331,6 +1336,10 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
       case kColumnUserRating:
         text = anime::TranslateMyScore(anime_item.GetMyScore());
         break;
+      case kColumnGroup:
+        if (!anime_item.GetLastWatchedGroup().empty())
+          text = (std::wstring(L"[").append(anime_item.GetLastWatchedGroup()).append(L"]")).c_str();
+        break;
     }
     if (!text.empty())
       listview.SetItem(index, column.index, text.c_str());
@@ -1413,6 +1422,9 @@ void AnimeListDialog::ListView::InitializeColumns() {
   columns.insert(std::make_pair(kColumnAnimeTitle, ColumnData(
       {kColumnAnimeTitle, true, i, i++, 0, ScaleX(300), ScaleX(100), LVCFMT_LEFT,
        L"Anime title", L"anime_title"})));
+  columns.insert(std::make_pair(kColumnGroup, ColumnData(
+      {kColumnGroup, true, i, i++, 0, 120, 60, LVCFMT_CENTER,
+       L"Group", L"anime_subgroup"})));
   columns.insert(std::make_pair(kColumnUserProgress, ColumnData(
       {kColumnUserProgress, true, i, i++, 0, ScaleX(200), ScaleX(60), LVCFMT_CENTER,
        L"Progress", L"user_progress"})));
@@ -1633,6 +1645,7 @@ AnimeListColumn AnimeListDialog::ListView::TranslateColumnName(const std::wstrin
     {L"user_last_updated", kColumnUserLastUpdated},
     {L"user_progress", kColumnUserProgress},
     {L"user_rating", kColumnUserRating},
+    {L"anime_subgroup", kColumnGroup},
   };
 
   auto it = names.find(name);

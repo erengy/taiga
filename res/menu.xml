@@ -175,6 +175,8 @@
 		<item name="Season" action="anime_season" checked="1"/>
 		<item name="Type" action="anime_type" checked="1"/>
 		<item type="separator"/>
+		<item name="Group" action="anime_subgroup" checked="1"/>
+		<item type="separator"/>
 		<item name="Reset to defaults" action="ResetAnimeListHeaders()"/>
 	</menu>
 	

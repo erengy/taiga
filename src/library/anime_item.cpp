@@ -533,6 +533,10 @@ int Item::GetAvailableEpisodeCount() const {
   return static_cast<int>(local_info_.available_episodes.size());
 }
 
+const std::wstring& Item::GetLastWatchedGroup() const {
+  return local_info_.last_watched_group;
+}
+
 const std::wstring& Item::GetFolder() const {
   return local_info_.folder;
 }
@@ -594,6 +598,10 @@ bool Item::SetEpisodeAvailability(int number, bool available,
   }
 
   return false;
+}
+
+void Item::SetLastWatchedGroup(const std::wstring& group) {
+  local_info_.last_watched_group = group;
 }
 
 void Item::SetFolder(const std::wstring& folder) {

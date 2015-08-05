@@ -109,6 +109,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
     item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
+    item.SetLastWatchedGroup(XmlReadStrValue(node, L"last_watched_group"));
 
     // This ordering results in less reallocations
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));  // alternative
@@ -184,6 +185,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     XML_WI(L"popularity", it->second.GetPopularity());
     XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
     XML_WS(L"modified", ToWstr(it->second.GetLastModified()), pugi::node_pcdata);
+    XML_WS(L"last_watched_group", it->second.GetLastWatchedGroup(), pugi::node_cdata);
     #undef XML_WF
     #undef XML_WS
     #undef XML_WI

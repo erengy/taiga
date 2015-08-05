@@ -120,6 +120,7 @@ public:
   // Local data
 
   int GetAvailableEpisodeCount() const;
+  const std::wstring& GetLastWatchedGroup() const;
   const std::wstring& GetFolder() const;
   int GetLastAiredEpisodeNumber(bool estimate = false) const;
   const std::wstring& GetNextEpisodePath() const;
@@ -128,6 +129,7 @@ public:
   const std::vector<std::wstring>& GetUserSynonyms() const;
 
   bool SetEpisodeAvailability(int number, bool available, const std::wstring& path);
+  void SetLastWatchedGroup(const std::wstring& group);
   void SetFolder(const std::wstring& folder);
   void SetLastAiredEpisodeNumber(int number);
   void SetNextEpisodePath(const std::wstring& path);
