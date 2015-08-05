@@ -248,9 +248,26 @@ bool TranslateDeviceName(std::wstring& path) {
 
   do {
     *logical_drive = *p;
-    if (QueryDosDevice(logical_drive, device, MAX_PATH))
-      if (device_name == device)
+    if (QueryDosDevice(logical_drive, device, MAX_PATH)) {
+      if (device_name == device) {
         drive_letter = logical_drive;
+      } else {
+        const std::wstring network_prefix = L"\\Device\\LanmanRedirector";
+        std::wstring location = device;
+        if (StartsWith(location, network_prefix)) {
+          location.erase(0, network_prefix.size());
+          if (StartsWith(location, L"\\;")) {
+            pos = location.find('\\', 1);
+            if (pos != std::wstring::npos)
+              location.erase(0, pos);
+          }
+          if (StartsWith(path, location)) {
+            drive_letter = logical_drive;
+            path.erase(0, location.size());
+          }
+        }
+      }
+    }
     while (*p++);
   } while (drive_letter.empty() && *p);
 
