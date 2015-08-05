@@ -40,31 +40,44 @@ void Tooltip::OnCreate(HWND hwnd, LPCREATESTRUCT create_struct) {
 
 BOOL Tooltip::AddTip(UINT id, LPCWSTR text, LPCWSTR title, LPRECT rect,
                      bool window_id) {
-  TOOLINFO ti;
+  TOOLINFO ti = {0};
   ti.cbSize = sizeof(TOOLINFO);
   ti.hwnd = parent_;
   ti.hinst = instance_;
   ti.lpszText = const_cast<LPWSTR>(text);
   ti.uFlags = TTF_SUBCLASS | (window_id ? TTF_IDISHWND : 0);
-  ti.uId = (UINT_PTR)id;
+  ti.uId = static_cast<UINT_PTR>(id);
 
   if (rect)
     ti.rect = *rect;
 
   BOOL result = SendMessage(TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&ti));
   if (result && title)
-    result = SendMessage(TTM_SETTITLE, 1, reinterpret_cast<LPARAM>(title));
+    result = SendMessage(TTM_SETTITLE, TTI_INFO,
+                         reinterpret_cast<LPARAM>(title));
 
   return result;
 }
 
-BOOL Tooltip::DeleteTip(UINT id) {
-  TOOLINFO ti;
+void Tooltip::DeleteTip(UINT id) {
+  TOOLINFO ti = {0};
   ti.cbSize = sizeof(TOOLINFO);
   ti.hwnd = parent_;
   ti.uId = static_cast<UINT_PTR>(id);
 
-  return SendMessage(TTM_DELTOOL, 0, reinterpret_cast<LPARAM>(&ti));
+  SendMessage(TTM_DELTOOL, 0, reinterpret_cast<LPARAM>(&ti));
+}
+
+void Tooltip::NewToolRect(UINT id, LPRECT rect) {
+  TOOLINFO ti = {0};
+  ti.cbSize = sizeof(TOOLINFO);
+  ti.hwnd = parent_;
+  ti.uId = static_cast<UINT_PTR>(id);
+
+  if (rect)
+    ti.rect = *rect;
+
+  SendMessage(TTM_NEWTOOLRECT, 0, reinterpret_cast<LPARAM>(&ti));
 }
 
 void Tooltip::SetDelayTime(long autopop, long initial, long reshow) {
@@ -78,7 +91,7 @@ void Tooltip::SetMaxWidth(long width) {
 }
 
 void Tooltip::UpdateText(UINT id, LPCWSTR text) {
-  TOOLINFO ti;
+  TOOLINFO ti = {0};
   ti.cbSize = sizeof(TOOLINFO);
   ti.hinst = instance_;
   ti.hwnd = parent_;

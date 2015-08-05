@@ -380,7 +380,8 @@ public:
   virtual ~Tooltip() {}
 
   BOOL AddTip(UINT id, LPCWSTR text, LPCWSTR title, LPRECT rect, bool window_id);
-  BOOL DeleteTip(UINT id);
+  void DeleteTip(UINT id);
+  void NewToolRect(UINT id, LPRECT rect);
   void SetDelayTime(long autopop, long initial, long reshow);
   void SetMaxWidth(long width);
   void UpdateText(UINT id, LPCWSTR text);

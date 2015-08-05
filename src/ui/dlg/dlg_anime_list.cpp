@@ -43,6 +43,17 @@
 
 namespace ui {
 
+enum kAnimeListTooltips {
+  kTooltipFirst,
+  kTooltipAnimeSeason = kTooltipFirst,
+  kTooltipAnimeStatus,
+  kTooltipEpisodeAvailable,
+  kTooltipEpisodeMinus,
+  kTooltipEpisodePlus,
+  kTooltipUserLastUpdated,
+  kTooltipLast,
+};
+
 AnimeListDialog DlgAnimeList;
 
 AnimeListDialog::AnimeListDialog()
@@ -69,6 +80,9 @@ BOOL AnimeListDialog::OnInitDialog() {
   // Create list tooltips
   listview.tooltips.Create(listview.GetWindowHandle());
   listview.tooltips.SetDelayTime(30000, -1, 0);
+  for (int id = kTooltipFirst; id < kTooltipLast; ++id) {
+    listview.tooltips.AddTip(id, nullptr, nullptr, nullptr, false);
+  }
 
   // Insert list columns
   listview.InsertColumns();
@@ -449,20 +463,15 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
   hot_item = index;
 
-  enum {
-    kTooltipAnimeStatus,
-    kTooltipEpisodeAvailable,
-    kTooltipEpisodeMinus,
-    kTooltipEpisodePlus,
-  };
-
   if (index < 0 || !progress_bars_visible) {
-    tooltips.DeleteTip(kTooltipEpisodeAvailable);
-    tooltips.DeleteTip(kTooltipEpisodeMinus);
-    tooltips.DeleteTip(kTooltipEpisodePlus);
+    tooltips.NewToolRect(kTooltipEpisodeAvailable, nullptr);
+    tooltips.NewToolRect(kTooltipEpisodeMinus, nullptr);
+    tooltips.NewToolRect(kTooltipEpisodePlus, nullptr);
   }
   if (index < 0) {
-    tooltips.DeleteTip(kTooltipAnimeStatus);
+    tooltips.NewToolRect(kTooltipAnimeSeason, nullptr);
+    tooltips.NewToolRect(kTooltipAnimeStatus, nullptr);
+    tooltips.NewToolRect(kTooltipUserLastUpdated, nullptr);
     return;
   }
 
@@ -476,13 +485,47 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   ::GetCursorPos(&pt);
   ::ScreenToClient(GetWindowHandle(), &pt);
 
+  auto get_subitem_rect = [this, &index](AnimeListColumn column, win::Rect& rect_item) {
+    GetSubItemRect(index, columns[column].index, &rect_item);
+    rect_item.Inflate(0, 2);
+  };
+
+  auto update_tooltip = [this](UINT id, LPCWSTR text, LPRECT rect) {
+    tooltips.NewToolRect(id, rect);
+    tooltips.UpdateText(id, text);
+  };
+
+  if (columns[kColumnAnimeSeason].visible) {
+    win::Rect rect_item;
+    get_subitem_rect(kColumnAnimeSeason, rect_item);
+    if (rect_item.PtIn(pt)) {
+      auto date_start = anime_item->GetDateStart();
+      if (date_start.year && date_start.month && date_start.day) {
+        const std::wstring text = date_start;
+        update_tooltip(kTooltipAnimeSeason, text.c_str(), &rect_item);
+      }
+    }
+  }
+
   if (columns[kColumnAnimeStatus].visible) {
     win::Rect rect_item;
-    GetSubItemRect(index, columns[kColumnAnimeStatus].index, &rect_item);
+    get_subitem_rect(kColumnAnimeStatus, rect_item);
     if (rect_item.PtIn(pt)) {
       const std::wstring text = anime_item->GetPlaying() ? L"Now playing" :
           anime::TranslateStatus(anime_item->GetAiringStatus());
-      tooltips.AddTip(kTooltipAnimeStatus, text.c_str(), nullptr, &rect_item, false);
+      update_tooltip(kTooltipAnimeStatus, text.c_str(), &rect_item);
+    }
+  }
+
+  if (columns[kColumnUserLastUpdated].visible) {
+    win::Rect rect_item;
+    get_subitem_rect(kColumnUserLastUpdated, rect_item);
+    if (rect_item.PtIn(pt)) {
+      time_t time_last_updated = _wtoi64(anime_item->GetMyLastUpdated().c_str());
+      if (time_last_updated > 0) {
+        const std::wstring text = GetAbsoluteTimeString(time_last_updated);
+        update_tooltip(kTooltipUserLastUpdated, text.c_str(), &rect_item);
+      }
     }
   }
 
@@ -495,7 +538,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
           button_visible[0] = true;
         if (anime_item->GetEpisodeCount() > anime_item->GetMyLastWatchedEpisode() ||
             !anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-            button_visible[1] = true;
+          button_visible[1] = true;
       }
 
       win::Rect rect_item;
@@ -506,8 +549,12 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       button_rect[0].right = button_rect[0].left + rect_item.Height();
       button_rect[1].Copy(rect_item);
       button_rect[1].left = button_rect[1].right - rect_item.Height();
+      if (button_visible[0])
+        rect_item.left += button_rect[0].Width();
+      if (button_visible[1])
+        rect_item.right -= button_rect[1].Width();
 
-      if (rect_item.PtIn(pt)) {
+      if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt)) {
         if (anime_item->IsInList()) {
           std::wstring text;
           if (IsAllEpisodesAvailable(*anime_item)) {
@@ -520,16 +567,14 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
               AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) +
                                  L" is available for download");
           }
-          if (!text.empty()) {
-            tooltips.AddTip(kTooltipEpisodeAvailable, text.c_str(), nullptr, &rect_item, false);
-          }
+          if (!text.empty())
+            update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
         }
       }
-      if ((button_visible[0] && button_rect[0].PtIn(pt)) ||
-          (button_visible[1] && button_rect[1].PtIn(pt))) {
-        tooltips.AddTip(kTooltipEpisodeMinus, L"-1 episode", nullptr, &button_rect[0], false);
-        tooltips.AddTip(kTooltipEpisodePlus, L"+1 episode", nullptr, &button_rect[1], false);
-      }
+      if (button_visible[0] && button_rect[0].PtIn(pt))
+        update_tooltip(kTooltipEpisodeMinus, L"-1 episode", &button_rect[0]);
+      if (button_visible[1] && button_rect[1].PtIn(pt))
+        update_tooltip(kTooltipEpisodePlus, L"+1 episode", &button_rect[1]);
     }
   }
 
