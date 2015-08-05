@@ -1325,7 +1325,7 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
         break;
       case kColumnUserLastUpdated: {
         time_t time_last_updated = _wtoi64(anime_item.GetMyLastUpdated().c_str());
-        text = GetRelativeTimeString(time_last_updated);
+        text = GetRelativeTimeString(time_last_updated, true);
         break;
       }
       case kColumnUserRating:
@@ -1606,8 +1606,8 @@ void AnimeListDialog::ListView::RefreshLastUpdateColumn() {
     if (!anime_item)
       continue;
     time_t time_last_updated = _wtoi64(anime_item->GetMyLastUpdated().c_str());
-    if ((time_now - time_last_updated) < 60 * 60 * 24) {
-      std::wstring text = GetRelativeTimeString(time_last_updated);
+    if (Duration(time_now - time_last_updated).hours() < 22) {
+      std::wstring text = GetRelativeTimeString(time_last_updated, true);
       SetItem(i, column.index, text.c_str());
     }
   }

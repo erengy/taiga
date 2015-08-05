@@ -103,6 +103,36 @@ base::CompareResult Date::Compare(const Date& date) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+Duration::Duration(time_t time)
+    : time_(time) {
+}
+
+float Duration::seconds() const {
+  return static_cast<float>(time_);
+}
+
+float Duration::minutes() const {
+  return static_cast<float>(time_) / kToMinutes;
+}
+
+float Duration::hours() const {
+  return static_cast<float>(time_) / kToHours;
+}
+
+float Duration::days() const {
+  return static_cast<float>(time_) / kToDays;
+}
+
+float Duration::months() const {
+  return static_cast<float>(time_) / kToMonths;
+}
+
+float Duration::years() const {
+  return static_cast<float>(time_) / kToYears;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 static void NeutralizeTimezone(tm& t) {
   long timezone_difference = 0;
   if (_get_timezone(&timezone_difference) == 0)
@@ -184,43 +214,58 @@ time_t ConvertRfc822(const std::wstring& datetime) {
   return result;
 }
 
-std::wstring GetRelativeTimeString(time_t unix_time) {
+std::wstring GetAbsoluteTimeString(time_t unix_time) {
+  std::tm tm;
+
+  if (!unix_time || localtime_s(&tm, &unix_time))
+    return L"Unknown";
+
+  if (1900 + tm.tm_year < GetDate().year) {
+    return Date(1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday);  // YYYY-MM-DD
+  } else {
+    std::string result(100, '\0');
+    std::strftime(&result.at(0), result.size(), "%B %d", &tm);  // January 1
+    return StrToWstr(result);
+  }
+}
+
+std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix) {
   if (!unix_time)
     return L"Unknown";
 
-  std::tm tm;
-  if (localtime_s(&tm, &unix_time)) {
-    return L"Unknown";
-  }
+  time_t time_diff = time(nullptr) - unix_time;
+  Duration duration(std::abs(time_diff));
+  bool future = time_diff < 0;
 
   std::wstring str;
-  auto date_now = GetDate();
 
-  auto str_time = [](std::tm& tm, const char* format) {
-    std::string result(100, '\0');
-    std::strftime(&result.at(0), result.size(), format, &tm);
-    return StrToWstr(result);
+  auto str_value = [](const float value,
+                      const std::wstring& singular,
+                      const std::wstring& plural) {
+    long result = std::lround(value);
+    return ToWstr(result) + L" " + (result == 1 ? singular : plural);
   };
 
-  if (1900 + tm.tm_year < date_now.year) {
-    str = Date(1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday);  // YYYY-MM-DD
-  } else if (tm.tm_mon + 1 < date_now.month) {
-    str = str_time(tm, "%B %d");  // January 1
+  if (duration.seconds() < 90) {
+    str = L"a moment";
+  } else if (duration.minutes() < 45) {
+    str = str_value(duration.minutes(), L"minute", L"minutes");
+  } else if (duration.hours() < 22) {
+    str = str_value(duration.hours(), L"hour", L"hours");
+  } else if (duration.days() < 25) {
+    str = str_value(duration.days(), L"day", L"days");
+  } else if (duration.days() < 345) {
+    str = str_value(duration.months(), L"month", L"months");
   } else {
-    time_t seconds = time(nullptr) - unix_time;
-    if (seconds >= 60 * 60 * 24) {
-      auto value = std::lround(static_cast<float>(seconds) / (60 * 60 * 24));
-      str = ToWstr(value) + (value == 1 ? L" day" : L" days");
-    } else if (seconds >= 60 * 60) {
-      auto value = std::lround(static_cast<float>(seconds) / (60 * 60));
-      str = ToWstr(value) + (value == 1 ? L" hour" : L" hours");
-    } else if (seconds >= 60) {
-      auto value = std::lround(static_cast<float>(seconds) / 60);
-      str = ToWstr(value) + (value == 1 ? L" minute" : L" minutes");
+    str = str_value(duration.years(), L"year", L"years");
+  }
+
+  if (append_suffix) {
+    if (future) {
+      str = L"in " + str;
     } else {
-      str = L"a moment";
+      str += L" ago";
     }
-    str += L" ago";
   }
 
   return str;

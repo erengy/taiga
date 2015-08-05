@@ -48,7 +48,31 @@ private:
   base::CompareResult Compare(const Date& date) const;
 };
 
-std::wstring GetRelativeTimeString(time_t unix_time);
+class Duration {
+public:
+  Duration(time_t time);
+
+  enum {
+    kToMinutes = 60,
+    kToHours   = 60 * 60,
+    kToDays    = 60 * 60 * 24,
+    kToMonths  = 60 * 60 * 24 * 30,
+    kToYears   = 60 * 60 * 24 * 365,
+  };
+
+  float seconds() const;
+  float minutes() const;
+  float hours() const;
+  float days() const;
+  float months() const;
+  float years() const;
+
+private:
+  time_t time_;
+};
+
+std::wstring GetAbsoluteTimeString(time_t unix_time);
+std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix);
 
 time_t ConvertIso8601(const std::wstring& datetime);
 time_t ConvertRfc822(const std::wstring& datetime);
