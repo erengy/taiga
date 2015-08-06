@@ -270,12 +270,12 @@
 		<item name="Discard" action="DiscardTorrent"/>
 		<item name="Quick filters" sub="QuickFilters"/>
 		<item type="separator"/>
-		<item name="Search more torrents for this title" action="MoreTorrents"/>
+		<item name="Search for more torrents with this title" action="MoreTorrents"/>
 		<item name="Search for anime with this title" action="SearchService"/>
 	</menu>
 	<menu name="QuickFilters">
-		<item name="Discard all torrents for this title" action="DiscardTorrents"/>
-		<item name="Select this fansub group for this title" action="SelectFansub"/>
+		<item name="Discard all torrents for this anime" action="DiscardTorrents"/>
+		<item name="Select this fansub group for this anime" action="SelectFansub"/>
 	</menu>
 	
 	<!-- Script functions and variables -->
