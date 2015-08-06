@@ -33,7 +33,7 @@
 
 namespace ui {
 
-static enum ThirdPartyLibrary {
+enum ThirdPartyLibrary {
   kJsoncpp,
   kLibcurl,
   kPugixml,

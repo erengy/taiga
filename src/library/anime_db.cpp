@@ -636,37 +636,8 @@ bool Database::CheckOldUserDirectory() {
   return true;
 }
 
-void Database::ClearInvalidValues(Item& item) {
-  const std::wstring invalid_title = L"S"L"S"L"J"L"Master";
-  const std::wstring invalid_description =
-      L"Prepare yourself for another 9001 action-packed episodes";
-
-  if (item.GetEnglishTitle() == invalid_title)
-    item.SetEnglishTitle(L"");
-
-  auto synonyms = item.GetSynonyms();
-  if (!synonyms.empty()) {
-    foreach_(synonym, synonyms) {
-      if (*synonym == invalid_title)
-        *synonym = L"";
-    }
-    RemoveEmptyStrings(synonyms);
-    item.SetSynonyms(synonyms);
-  }
-
-  if (StartsWith(item.GetSynopsis(), invalid_description))
-    item.SetSynopsis(L"");
-}
-
 void Database::HandleCompatibility(const std::wstring& meta_version) {
   base::SemanticVersion version = meta_version;
-
-  if (version <= base::SemanticVersion(L"1.1.7")) {
-    LOG(LevelWarning, L"Clearing invalid values");
-    foreach_(item, items) {
-      ClearInvalidValues(item->second);
-    }
-  }
 
   if (version <= base::SemanticVersion(L"1.1.11")) {
     if (taiga::GetCurrentServiceId() == sync::kHummingbird) {

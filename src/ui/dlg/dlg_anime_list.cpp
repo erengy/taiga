@@ -1453,29 +1453,37 @@ void AnimeListDialog::ListView::InitializeColumns() {
   int i = 0;
 
   columns.insert(std::make_pair(kColumnAnimeStatus, ColumnData(
-      {kColumnAnimeStatus, true, i, i++, 0, ScaleX(16) + 6, ScaleX(16) + 6, LVCFMT_CENTER,
-       L"", L"anime_status"})));
+      {kColumnAnimeStatus, true, i, i++,
+       0, static_cast<unsigned short>(ScaleX(16) + 6), static_cast<unsigned short>(ScaleX(16) + 6),
+       LVCFMT_CENTER, L"", L"anime_status"})));
   columns.insert(std::make_pair(kColumnAnimeTitle, ColumnData(
-      {kColumnAnimeTitle, true, i, i++, 0, ScaleX(300), ScaleX(100), LVCFMT_LEFT,
-       L"Anime title", L"anime_title"})));
+      {kColumnAnimeTitle, true, i, i++,
+       0, static_cast<unsigned short>(ScaleX(300)), static_cast<unsigned short>(ScaleX(100)),
+       LVCFMT_LEFT, L"Anime title", L"anime_title"})));
   columns.insert(std::make_pair(kColumnUserProgress, ColumnData(
-      {kColumnUserProgress, true, i, i++, 0, ScaleX(200), ScaleX(60), LVCFMT_CENTER,
-       L"Progress", L"user_progress"})));
+      {kColumnUserProgress, true, i, i++,
+       0, static_cast<unsigned short>(ScaleX(200)), static_cast<unsigned short>(ScaleX(60)),
+       LVCFMT_CENTER, L"Progress", L"user_progress"})));
   columns.insert(std::make_pair(kColumnUserRating, ColumnData(
-      {kColumnUserRating, true, i, i++, 0, ScaleX(50), ScaleX(50), LVCFMT_CENTER,
-       L"Score", L"user_rating"})));
+      {kColumnUserRating, true, i, i++,
+       0, static_cast<unsigned short>(ScaleX(50)), static_cast<unsigned short>(ScaleX(50)),
+       LVCFMT_CENTER, L"Score", L"user_rating"})));
   columns.insert(std::make_pair(kColumnAnimeRating, ColumnData(
-      {kColumnAnimeRating, false, i, i++, 0, ScaleX(55), ScaleX(55), LVCFMT_CENTER,
-       L"Average", L"anime_average_rating"})));
+      {kColumnAnimeRating, false, i, i++,
+       0, static_cast<unsigned short>(ScaleX(55)), static_cast<unsigned short>(ScaleX(55)),
+       LVCFMT_CENTER, L"Average", L"anime_average_rating"})));
   columns.insert(std::make_pair(kColumnAnimeType, ColumnData(
-      {kColumnAnimeType, true, i, i++, 0, ScaleX(60), ScaleX(60), LVCFMT_CENTER,
-       L"Type", L"anime_type"})));
+      {kColumnAnimeType, true, i, i++,
+       0, static_cast<unsigned short>(ScaleX(60)), static_cast<unsigned short>(ScaleX(60)),
+       LVCFMT_CENTER, L"Type", L"anime_type"})));
   columns.insert(std::make_pair(kColumnAnimeSeason, ColumnData(
-      {kColumnAnimeSeason, true, i, i++, 0, ScaleX(90), ScaleX(90), LVCFMT_RIGHT,
-       L"Season", L"anime_season"})));
+      {kColumnAnimeSeason, true, i, i++,
+       0, static_cast<unsigned short>(ScaleX(90)), static_cast<unsigned short>(ScaleX(90)),
+       LVCFMT_RIGHT, L"Season", L"anime_season"})));
   columns.insert(std::make_pair(kColumnUserLastUpdated, ColumnData(
-      {kColumnUserLastUpdated, false, i, i++, 0, ScaleX(100), ScaleX(85), LVCFMT_CENTER,
-       L"Last updated", L"user_last_updated"})));
+      {kColumnUserLastUpdated, false, i, i++,
+       0, static_cast<unsigned short>(ScaleX(100)), static_cast<unsigned short>(ScaleX(85)),
+       LVCFMT_CENTER, L"Last updated", L"user_last_updated"})));
 }
 
 void AnimeListDialog::ListView::InsertColumns() {
