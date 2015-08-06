@@ -205,9 +205,9 @@ void HistoryDialog::RefreshList() {
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
     if (it->date_start)
-      AppendString(details, L"Start date: " + std::wstring(*it->date_start));
+      AppendString(details, L"Date started: " + std::wstring(*it->date_start));
     if (it->date_finish)
-      AppendString(details, L"Finish date: " + std::wstring(*it->date_finish));
+      AppendString(details, L"Date completed: " + std::wstring(*it->date_finish));
 
     list_.InsertItem(i, 0, icon, 0, nullptr, anime_item->GetTitle().c_str(),
                      static_cast<LPARAM>(it->anime_id));
