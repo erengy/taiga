@@ -338,7 +338,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
             ui::kIcon16_DocumentA, hdc.Get(),
             rect_title.right - ScaleX(16) - 4,
             rect_title.top + ((rect_title.Height() - ScaleY(16)) / 2));
-        rect_title.right -= ScaleX(16) - 4;
+        rect_title.right -= ScaleX(16) + 4;
       }
 
       // Set title
