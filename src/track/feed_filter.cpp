@@ -849,7 +849,11 @@ std::wstring FeedFilterManager::TranslateValue(
     case kFeedFilterElement_Meta_Type:
       return anime::TranslateType(ToInt(condition.value));
     default:
-      return condition.value;
+      if (condition.value.empty()) {
+        return L"(empty)";
+      } else {
+        return condition.value;
+      }
   }
 }
 
