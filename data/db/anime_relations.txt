@@ -277,6 +277,8 @@
 - 21939|8204:11-12 -> 24687|8519:1
 # Mushishi Zoku Shou -> ~ 2nd Season
 - 21939|8204:13-22 -> 24701|8581:1-10
+# Mushishi Zoku Shou -> ~: Suzu no Shizuku
+- 21939|8204:23-24 -> 28957|10084:1
 
 # Nichijou -> ~: Nichijou no 0-wa
 - 10165|6062:0 -> 8857|5512:1
