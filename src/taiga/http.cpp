@@ -47,7 +47,7 @@ HttpClient::HttpClient(const HttpRequest& request)
     : base::http::Client(request),
       mode_(kHttpSilent) {
   // Reuse existing connections
-  set_allow_reuse(true);
+  set_allow_reuse(Settings.GetBool(kApp_Connection_ReuseActive));
 
   // Enable debug mode to log requests and responses
   set_debug_mode(Taiga.debug_mode);

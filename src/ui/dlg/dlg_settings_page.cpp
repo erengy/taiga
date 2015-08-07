@@ -411,6 +411,7 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kApp_Connection_ProxyPassword, {L"", L"Application / Proxy password"}},
         {taiga::kApp_Connection_ProxyUsername, {L"", L"Application / Proxy username"}},
         {taiga::kApp_Position_Remember, {L"", L"Application / Remember main window position and size"}},
+        {taiga::kApp_Connection_ReuseActive, {L"", L"Application / Reuse active connections"}},
         {taiga::kApp_Interface_Theme, {L"", L"Application / UI theme"}},
         {taiga::kLibrary_FileSizeThreshold, {L"", L"Library / File size threshold"}},
         {taiga::kRecognition_IgnoredStrings, {L"", L"Recognition / Ignored strings"}},
