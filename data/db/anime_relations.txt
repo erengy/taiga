@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-07-18
+- last_modified: 2015-08-07
 
 ::rules
 
@@ -338,6 +338,9 @@
 
 # Senyuu. -> ~ 2
 - 15751|7303:14-26 -> 18523|7719:1-13!
+
+# Shugo Chara! -> ~! Doki
+- 2923|2648:52-102 -> 5262|4019:1-51!
 
 # So Ra No Wo To -> ~ Specials
 - 6802|7668:13 -> 8197|4724:2
