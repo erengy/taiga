@@ -220,12 +220,23 @@ std::wstring GetAbsoluteTimeString(time_t unix_time) {
   if (!unix_time || localtime_s(&tm, &unix_time))
     return L"Unknown";
 
-  if (1900 + tm.tm_year < GetDate().year) {
-    return Date(1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday);  // YYYY-MM-DD
-  } else {
+  Duration duration(std::abs(time(nullptr) - unix_time));
+  Date today = GetDate();
+
+  auto strftime = [&tm](const char* format) {
     std::string result(100, '\0');
-    std::strftime(&result.at(0), result.size(), "%B %d", &tm);  // January 1
+    std::strftime(&result.at(0), result.size(), format, &tm);
     return StrToWstr(result);
+  };
+
+  if (1900 + tm.tm_year < today.year) {
+    return strftime("%d %B %Y");  // 01 January 2014
+  } else if (std::lround(duration.days()) <= 1 && tm.tm_mday == today.day) {
+    return strftime("%H:%M");  // 13:37
+  } else if (std::lround(duration.days()) <= 7) {
+    return strftime("%A, %d %B");  // Thursday, 01 January
+  } else {
+    return strftime("%d %B");  // 01 January
   }
 }
 
