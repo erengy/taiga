@@ -24,11 +24,7 @@ namespace base {
 namespace http {
 
 Request::Request()
-    : method(L"GET"), parameter(0) {
-  // Each HTTP request must have a unique ID, as there are many parts of the
-  // application that rely on this assumption.
-  static unsigned int counter = 0;
-  uid = L"taiga-http-" + PadChar(ToWstr(counter++), L'0', 10);
+    : method(L"GET"), parameter(0), uid(GenerateRequestId()) {
 }
 
 Response::Response()
@@ -47,6 +43,13 @@ void Response::Clear() {
   code = 0;
   header.clear();
   body.clear();
+}
+
+std::wstring GenerateRequestId() {
+  // Each HTTP request must have a unique ID, as there are many parts of the
+  // application that rely on this assumption.
+  static unsigned int counter = 0;
+  return L"taiga-http-" + PadChar(ToWstr(counter++), L'0', 10);
 }
 
 Client::Client(const Request& request)
