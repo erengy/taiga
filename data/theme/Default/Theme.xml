@@ -58,7 +58,7 @@
 	<list>
 		<progress>
 			<border      type="solid" value_1="E0E0E0"/>
-			<background  type="solid" value_1="FFFFFF"/>
+			<background  type="solid" value_1="F0F0F0"/>
 			<button      type="solid" value_1="646464"/>
 			<separator   type="solid" value_1="E0E0E0"/>
 			<watching    type="solid" value_1="60C653"/>
@@ -66,8 +66,8 @@
 			<onhold      type="solid" value_1="60C653"/>
 			<dropped     type="solid" value_1="60C653"/>
 			<plantowatch type="solid" value_1="60C653"/>
-			<available   type="solid" value_1="CBCBCB"/>
-			<aired       type="solid" value_1="EBEBEB"/>
+			<available   type="solid" value_1="4B9940"/>
+			<aired       type="solid" value_1="D8D8D8"/>
 		</progress>
 	</list>
 </theme>

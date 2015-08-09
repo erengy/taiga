@@ -544,7 +544,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       win::Rect rect_item;
       GetSubItemRect(index, columns[kColumnUserProgress].index, &rect_item);
       rect_item.right -= ScaleX(50);
-      rect_item.Inflate(-5, -5);
+      rect_item.Inflate(ScaleX(-4), ScaleY(-4));
       button_rect[0].Copy(rect_item);
       button_rect[0].right = button_rect[0].left + rect_item.Height();
       button_rect[1].Copy(rect_item);
@@ -898,37 +898,35 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
   int eps_total = anime_item.GetEpisodeCount();
 
   if (eps_watched > eps_aired)
-    eps_aired = -1;
+    eps_aired = eps_watched;
   if (eps_watched == 0)
     eps_watched = -1;
 
-  // Draw border
-  ui::Theme.DrawListProgress(dc.Get(), &rcBar, ui::kListProgressBorder);
   // Draw background
-  rcBar.Inflate(-1, -1);
   ui::Theme.DrawListProgress(dc.Get(), &rcBar, ui::kListProgressBackground);
 
   win::Rect rcAired = rcBar;
   win::Rect rcAvail = rcBar;
-  win::Rect rcButton = rcBar;
-  win::Rect rcSeparator = rcBar;
   win::Rect rcWatched = rcBar;
 
   if (eps_watched > -1 || eps_aired > -1) {
     float ratio_aired = 0.0f;
     float ratio_watched = 0.0f;
     anime::GetProgressRatios(anime_item, ratio_aired, ratio_watched);
-
     if (eps_aired > -1)
       rcAired.right = static_cast<int>((rcAired.Width()) * ratio_aired) + rcAired.left;
     if (ratio_watched > -1)
       rcWatched.right = static_cast<int>((rcWatched.Width()) * ratio_watched) + rcWatched.left;
+  }
 
-    // Draw aired episodes
-    if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAired) && eps_aired > 0)
-      ui::Theme.DrawListProgress(dc.Get(), &rcAired, ui::kListProgressAired);
+  // Draw aired episodes
+  if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAired) && eps_aired > 0) {
+    rcAired.top = rcAired.bottom - ScaleY(3);
+    ui::Theme.DrawListProgress(dc.Get(), &rcAired, ui::kListProgressAired);
+  }
 
-    // Draw progress
+  // Draw progress
+  if (eps_watched > 0) {
     auto list_progress_type = ui::kListProgressWatching;
     if (anime_item.GetMyRewatching()) {
       list_progress_type = ui::kListProgressWatching;
@@ -957,12 +955,13 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
 
   // Draw episode availability
   if (Settings.GetBool(taiga::kApp_List_ProgressDisplayAvailable)) {
+    rcAvail.top = rcAvail.bottom - ScaleY(3);
     if (eps_estimate > 0) {
       float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
-      for (int i = eps_watched + 1; i <= min(eps_available, eps_estimate); i++) {
-        if (i > 0 && anime_item.IsEpisodeAvailable(i)) {
+      for (int i = 1; i <= min(eps_available, eps_estimate); i++) {
+        if (anime_item.IsEpisodeAvailable(i)) {
           rcAvail.left = static_cast<int>(rcBar.left + (width * (i - 1)));
-          rcAvail.right = static_cast<int>(rcAvail.left + width + 1);
+          rcAvail.right = min(static_cast<int>(rcAvail.left + width + 1), rcBar.right);
           ui::Theme.DrawListProgress(dc.Get(), &rcAvail, ui::kListProgressAvailable);
         }
       }
@@ -976,36 +975,37 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     }
   }
 
-  // Draw separators
-  if (eps_watched > 0 && (eps_watched < eps_total || eps_total == 0)) {
-    rcSeparator.left = rcWatched.right;
-    rcSeparator.right = rcWatched.right + 1;
-    ui::Theme.DrawListProgress(dc.Get(), &rcSeparator, ui::kListProgressSeparator);
-  }
-  if (eps_aired > 0 && (eps_aired < eps_total || eps_total == 0) && eps_aired > eps_available) {
-    rcSeparator.left = rcAired.right;
-    rcSeparator.right = rcAired.right + 1;
-    ui::Theme.DrawListProgress(dc.Get(), &rcSeparator, ui::kListProgressSeparator);
-  }
-
   // Draw buttons
   if (index > -1 && index == hot_item) {
+    auto draw_button_background = [&dc](win::Rect& rect) {
+      ui::Theme.DrawListProgress(dc.Get(), &rect, ui::kListProgressBackground);
+      rect.Inflate(-1, -1);
+      dc.FillRect(rect, ui::Theme.GetListProgressColor(ui::kListProgressButton));
+      rect.Inflate(-1, -1);
+    };
+    auto get_inflation = [](int value) {
+      return -((value - 1) / 2);
+    };
+    auto draw_line_h = [&dc, &get_inflation](win::Rect rect) {
+      rect.Inflate(0, get_inflation(rect.Height()));
+      dc.FillRect(rect, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
+    };
+    auto draw_line_v = [&dc, &get_inflation](win::Rect rect) {
+      rect.Inflate(get_inflation(rect.Width()), 0);
+      dc.FillRect(rect, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
+    };
     // Draw decrement button
     if (button_visible[0]) {
-      rcButton = button_rect[0];
-      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressButton));
-      rcButton.Inflate(-1, -((button_rect[0].Height() - 1) / 2));
-      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
+      win::Rect rcButton = button_rect[0];
+      draw_button_background(rcButton);
+      draw_line_h(rcButton);
     }
     // Draw increment button
     if (button_visible[1]) {
-      rcButton = button_rect[1];
-      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressButton));
-      rcButton.Inflate(-1, -((button_rect[1].Height() - 1) / 2));
-      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
-      rcButton = button_rect[1];
-      rcButton.Inflate(-((button_rect[1].Width() - 1) / 2), -1);
-      dc.FillRect(rcButton, ui::Theme.GetListProgressColor(ui::kListProgressBackground));
+      win::Rect rcButton = button_rect[1];
+      draw_button_background(rcButton);
+      draw_line_h(rcButton);
+      draw_line_v(rcButton);
     }
   }
 
@@ -1179,11 +1179,11 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
           // Draw progress bar and text
           } else if (column_type == kColumnUserProgress) {
             listview.progress_bars_visible = rcItem.Width() > ScaleX(100);
-            rcItem.Inflate(-4, 0);
+            rcItem.Inflate(ScaleX(-4), 0);
             if (listview.progress_bars_visible) {
               win::Rect rcBar = rcItem;
               rcBar.right -= ScaleX(50);
-              rcBar.Inflate(0, -4);
+              rcBar.Inflate(0, ScaleY(-4));
               listview.DrawProgressBar(pCD->nmcd.hdc, &rcBar, pCD->nmcd.dwItemSpec,
                                        *anime_item);
               rcItem.left = rcBar.right;

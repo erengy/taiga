@@ -818,7 +818,7 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
   int eps_watched = item.GetMyLastWatchedEpisode(true);
 
   if (eps_watched > eps_aired)
-    eps_aired = -1;
+    eps_aired = eps_watched;
   if (eps_watched == 0)
     eps_watched = -1;
 
@@ -836,8 +836,9 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
       ratio_watched = eps_aired == -1 ? 0.8f : eps_watched / (eps_aired / ratio_aired);
   }
 
-  if (ratio_watched > 1.0f)  // Watched episodes is greater than total episodes
-    ratio_watched = 1.0f;
+  // Limit values so that they don't exceed total episodes
+  ratio_aired = min(ratio_aired, 1.0f);
+  ratio_watched = min(ratio_watched, 1.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
