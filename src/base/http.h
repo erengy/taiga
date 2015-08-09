@@ -135,7 +135,7 @@ public:
   virtual bool OnHeadersAvailable() { return false; }
   virtual bool OnProgress() { return false; }
   virtual void OnReadComplete() {}
-  virtual bool OnRedirect(const std::wstring& address) { return false; }
+  virtual bool OnRedirect(const std::wstring& address, bool refresh) { return false; }
 
   DWORD ThreadProc();
 

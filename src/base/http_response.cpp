@@ -53,6 +53,7 @@ bool Client::GetResponseHeader(const std::wstring& header) {
 
 bool Client::ParseResponseHeader() {
   Url location;
+  bool refresh = false;
 
   foreach_(it, response_.header) {
     std::wstring name = it->first;
@@ -64,25 +65,35 @@ bool Client::ParseResponseHeader() {
       } else {
         content_encoding_ = kContentEncodingNone;
       }
+
     } else if (IsEqual(name, L"Content-Length")) {
       content_length_ = ToInt(value);
-    } else if (IsEqual(name, L"Location")) {
-      if (!OnRedirect(value)) {
-        location.Crack(value);
-      } else {
-        return false;
+
+    } else if (IsEqual(name, L"Location") || IsEqual(name, L"Refresh")) {
+      refresh = IsEqual(name, L"Refresh");
+      if (refresh) {
+        const std::wstring url_field = L"url=";
+        size_t pos = value.find(url_field);
+        if (pos != value.npos)
+          value = value.substr(pos + url_field.size());
       }
+      location.Crack(value);
+      if (location.host.empty())  // relative URL
+        location.host = request_.url.host;
+      if (OnRedirect(location.Build(), refresh))
+        return false;
     }
   }
 
   // Redirection
-  if (!location.host.empty() && auto_redirect_) {
+  if (!location.host.empty() && auto_redirect_ && !refresh) {
     content_encoding_ = kContentEncodingNone;
     content_length_ = 0;
     current_length_ = 0;
     request_.url.host = location.host;
     request_.url.path = location.path;
     response_.Clear();
+    // cURL will automatically follow due to CURLOPT_FOLLOWLOCATION
   }
 
   return true;

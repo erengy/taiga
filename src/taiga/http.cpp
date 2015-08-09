@@ -99,7 +99,7 @@ bool HttpClient::OnHeadersAvailable() {
   return false;
 }
 
-bool HttpClient::OnRedirect(const std::wstring& address) {
+bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
   LOG(LevelDebug, L"Redirecting... (" + address + L")");
 
   switch (mode()) {
@@ -111,10 +111,18 @@ bool HttpClient::OnRedirect(const std::wstring& address) {
     }
   }
 
-  Url url(address);
-  ConnectionManager.HandleRedirect(request_.url.host, url.host);
-
-  return false;
+  if (refresh) {
+    HttpRequest http_request = request_;
+    http_request.uid = base::http::GenerateRequestId();
+    http_request.url = address;
+    ConnectionManager.MakeRequest(http_request, mode());
+    Cancel();
+    return true;
+  } else {
+    Url url(address);
+    ConnectionManager.HandleRedirect(request_.url.host, url.host);
+    return false;
+  }
 }
 
 bool HttpClient::OnProgress() {

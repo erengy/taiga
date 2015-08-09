@@ -69,7 +69,7 @@ protected:
   bool OnHeadersAvailable();
   bool OnProgress();
   void OnReadComplete();
-  bool OnRedirect(const std::wstring& address);
+  bool OnRedirect(const std::wstring& address, bool refresh);
 
 private:
   HttpClientMode mode_;
