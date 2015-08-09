@@ -172,8 +172,9 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
     return false;
 
   if (StartsWith(feed_item->link, L"magnet")) {
-    ui::OnFeedDownload(false, L"Magnet links are currently not supported");
-    return false;
+    ui::ChangeStatusText(L"Opening magnet link for \"" + feed_item->title + L"\"...");
+    const std::string empty_data;
+    HandleFeedDownload(feed, empty_data);
 
   } else {
     ui::ChangeStatusText(L"Downloading \"" + feed_item->title + L"\"...");
@@ -243,22 +244,30 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
   if (!feed_item)
     return;
 
-  feed_item->state = kFeedItemDiscardedNormal;
+  std::wstring file;
 
-  std::wstring file = feed_item->title;
-  ValidateFileName(file);
-  file = feed.GetDataPath() + file + L".torrent";
-  SaveToFile(data, file);
+  if (!data.empty()) {
+    file = feed_item->title;
+    ValidateFileName(file);
+    file = feed.GetDataPath() + file + L".torrent";
 
-  if (!FileExists(file)) {
-    ui::OnFeedDownload(false, L"Torrent file doesn't exist");
-    return;
-  } else {
-    AddToArchive(feed_item->title);
-    ui::OnFeedDownload(true, L"");
+    SaveToFile(data, file);
+
+    if (!FileExists(file)) {
+      ui::OnFeedDownload(false, L"Torrent file doesn't exist");
+      return;
+    }
   }
 
-  HandleFeedDownloadOpen(*feed_item, file);
+  feed_item->state = kFeedItemDiscardedNormal;
+  AddToArchive(feed_item->title);
+  ui::OnFeedDownload(true, L"");
+
+  if (!file.empty()) {
+    HandleFeedDownloadOpen(*feed_item, file);
+  } else {
+    ExecuteLink(feed_item->link);  // magnet link
+  }
 
   if (!download_queue_.empty())
     Download(feed.category, nullptr);
@@ -409,6 +418,7 @@ void Aggregator::ParseDescription(FeedItem& feed_item,
       } else if (StartsWith(it, comment_str)) {
         feed_item.description = it.substr(comment_str.length());
       } else if (InStr(it, L"magnet:?") > -1) {
+        // TODO: This doesn't work because we've used StripHtmlTags beforehand.
         feed_item.magnet_link = L"magnet:?" +
             InStr(it, L"<a href=\"magnet:?", L"\">Magnet Link</a>");
       }
