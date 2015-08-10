@@ -447,6 +447,9 @@ bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
 
 bool SaveToFile(const std::string& data, const std::wstring& path,
                 bool take_backup) {
+  if (data.empty())
+    return false;
+
   return SaveToFile((LPCVOID)&data.front(), data.size(), path, take_backup);
 }
 
