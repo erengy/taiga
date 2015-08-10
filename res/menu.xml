@@ -169,11 +169,12 @@
 	<!-- Anime list headers -->
 	<menu name="AnimeListHeaders">
 		<item name="Average score" action="anime_average_rating" checked="1"/>
+		<item name="Season" action="anime_season" checked="1"/>
+		<item name="Type" action="anime_type" checked="1"/>
+		<item type="separator"/>
 		<item name="Last updated" action="user_last_updated" checked="1"/>
 		<item name="Progress" action="user_progress" checked="1"/>
 		<item name="Score" action="user_rating" checked="1"/>
-		<item name="Season" action="anime_season" checked="1"/>
-		<item name="Type" action="anime_type" checked="1"/>
 		<item type="separator"/>
 		<item name="Reset to defaults" action="ResetAnimeListHeaders()"/>
 	</menu>
