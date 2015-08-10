@@ -456,7 +456,7 @@ bool Service::RequestSucceeded(Response& response,
         return true;
       break;
     case kDeleteLibraryEntry:
-      if (IsEqual(http_response.body, L"Deleted"))
+      if (StartsWith(http_response.body, L"Deleted"))
         return true;
       break;
     case kGetLibraryEntries:
@@ -476,7 +476,7 @@ bool Service::RequestSucceeded(Response& response,
     case kSearchTitle:
       return true;
     case kUpdateLibraryEntry:
-      if (IsEqual(http_response.body, L"Updated"))
+      if (StartsWith(http_response.body, L"Updated"))
         return true;
       break;
   }
