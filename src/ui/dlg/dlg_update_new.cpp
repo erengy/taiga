@@ -17,6 +17,7 @@
 */
 
 #include "base/foreach.h"
+#include "base/gfx.h"
 #include "base/string.h"
 #include "taiga/resource.h"
 #include "taiga/taiga.h"
@@ -78,6 +79,17 @@ void NewUpdateDialog::OnCancel() {
   EndDialog(IDCANCEL);
 
   DlgUpdate.PostMessage(WM_CLOSE);
+}
+
+void NewUpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
+  win::Dc dc = hdc;
+
+  // Paint application icon
+  win::Rect rect;
+  win::Window label = GetDlgItem(IDC_STATIC_APP_ICON);
+  label.GetWindowRect(GetWindowHandle(), &rect);
+  label.SetWindowHandle(nullptr);
+  DrawIconResource(IDI_MAIN, dc.Get(), rect, true, false);
 }
 
 }  // namespace ui

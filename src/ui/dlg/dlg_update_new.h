@@ -31,6 +31,7 @@ public:
   BOOL OnInitDialog();
   void OnOK();
   void OnCancel();
+  void OnPaint(HDC hdc, LPPAINTSTRUCT lpps);
 };
 
 extern NewUpdateDialog DlgUpdateNew;
