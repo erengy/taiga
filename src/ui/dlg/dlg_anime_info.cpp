@@ -555,8 +555,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
           if (std::find(anime_ids.begin(), anime_ids.end(),
                         it->anime_id) == anime_ids.end()) {
             auto anime_item = AnimeDatabase.FindItem(it->anime_id);
-            if (anime_item && anime_item->GetMyStatus() == anime::kWatching)
-              anime_ids.push_back(it->anime_id);
+            if (anime_item)
+              if (anime_item->GetMyStatus() == anime::kWatching || anime_item->GetMyRewatching())
+                anime_ids.push_back(it->anime_id);
           }
         }
       }
