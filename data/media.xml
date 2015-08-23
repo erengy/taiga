@@ -194,6 +194,18 @@
 		<folder>%ProgramW6432%\MpcStar\</folder>
 		<edit mode="2">MPCSTAR</edit>
 	</player>
+	<!-- MPDN -->
+	<player>
+		<name>MPDN</name>
+		<enabled>1</enabled>
+		<visible>0</visible>
+		<mode>1</mode>
+		<class>FilterGraphWindow</class>
+		<class>VsyncWindowClass</class>
+		<file>MediaPlayerDotNet.exe</file>
+		<folder>%ProgramFiles%\MPDN\</folder>
+		<folder>%ProgramW6432%\MPDN\</folder>
+	</player>
 	<!-- mpv -->
 	<player>
 		<name>mpv</name>
