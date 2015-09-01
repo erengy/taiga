@@ -52,7 +52,7 @@ RequestExecutionLevel user
 
 ; Directory page
 !define MUI_DIRECTORYPAGE_TEXT_TOP "\
-    Please note that installing under Program Files may cause issues if you have User Account Control enabled.$\r$\n$\r$\n\
+    WARNING: Installing under Program Files may cause issues if you have User Account Control enabled on your system.$\r$\n$\r$\n\
     The default installation folder is:$\r$\n${DEFAULT_INSTALL_DIR}"
 
 ; ------------------------------------------------------------------------------
