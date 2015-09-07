@@ -555,59 +555,59 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       if (button_visible[1])
         rect_item.right -= button_rect[1].Width();
 
-	  if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt) && anime_item->IsInList()) {
-		  std::wstring text;
-		  std::vector<int> missing;
+      if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt) && anime_item->IsInList()) {
+        std::wstring text;
+        std::vector<int> missing;
 
-		  for (int i = 0; i < anime_item->GetLastAiredEpisodeNumber(true); i++)
-			  if (!anime_item->IsEpisodeAvailable(i + 1))
-				  missing.push_back(i + 1);
+        for (int i = 0; i < anime_item->GetLastAiredEpisodeNumber(true); i++)
+          if (!anime_item->IsEpisodeAvailable(i + 1))
+            missing.push_back(i + 1);
 
-		  // No episodes are missing
-		  if (missing.empty())
-			  // That's alright
-			  AppendString(text, L"All episodes are in library folders");
-		  // If more than episodes we can display are missing
-		  else if (missing.size() > 10)
-			  // Print at least something for the user
-			  AppendString(text, L"More than 10 episodes are missing");
-		  // We are missing at least one episode
-		  else {
-			  // String stream to format missing episodes output
-			  std::wostringstream stream;
+        // No episodes are missing
+        if (missing.empty())
+          // That's alright
+          AppendString(text, L"All episodes are in library folders");
+        // If more than episodes we can display are missing
+        else if (missing.size() > 10)
+          // Print at least something for the user
+          AppendString(text, L"More than 10 episodes are missing");
+        // We are missing at least one episode
+        else {
+          // String stream to format missing episodes output
+          std::wostringstream stream;
 
-			  for (auto& i = missing.begin(); i != missing.end(); i++) {
-				  // First item: add "##"
-				  if (i == missing.begin())
-					  stream << L"#" << (*i);
-				  // Last item: add " and ##"
-				  else if (i + 1 == missing.end())
-					  stream << L" and #" << (*i);
-				  // Intermediate items: add ", ##"
-				  else
-					  stream << L", #" << (*i);
-			  }
+          for (auto& i = missing.begin(); i != missing.end(); i++) {
+            // First item: add "##"
+            if (i == missing.begin())
+              stream << L"#" << (*i);
+            // Last item: add " and ##"
+            else if (i + 1 == missing.end())
+              stream << L" and #" << (*i);
+            // Intermediate items: add ", ##"
+            else
+              stream << L", #" << (*i);
+          }
 
-			  // Add is/are missing at the end
-			  stream << (missing.size() == 1 ? L" is missing" : L" are missing");
+          // Add is/are missing at the end
+          stream << (missing.size() == 1 ? L" is missing" : L" are missing");
 
-			  // Append built string
-			  AppendString(text, stream.str());
+          // Append built string
+          AppendString(text, stream.str());
 
-			  // If the next episode is available
-			  if (anime_item->IsNextEpisodeAvailable())
-				  AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) +
-					  L" is in library folders");
-		  }
+          // If the next episode is available
+          if (anime_item->IsNextEpisodeAvailable())
+            AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) +
+              L" is in library folders");
+        }
 
-		  // If there is a new episode aired and downloadable
-		  if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
-			  AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) +
-				  L" is available for download");
+        // If there is a new episode aired and downloadable
+        if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
+          AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) +
+            L" is available for download");
 
-		  if (!text.empty())
-			  update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
-	  }
+        if (!text.empty())
+          update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
+      }
       if (button_visible[0] && button_rect[0].PtIn(pt))
         update_tooltip(kTooltipEpisodeMinus, L"-1 episode", &button_rect[0]);
       if (button_visible[1] && button_rect[1].PtIn(pt))
