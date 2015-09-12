@@ -80,6 +80,7 @@ BOOL AnimeListDialog::OnInitDialog() {
   // Create list tooltips
   listview.tooltips.Create(listview.GetWindowHandle());
   listview.tooltips.SetDelayTime(30000, -1, 0);
+  listview.tooltips.SetMaxWidth(::GetSystemMetrics(SM_CXSCREEN));  // Required for line breaks
   for (int id = kTooltipFirst; id < kTooltipLast; ++id) {
     listview.tooltips.AddTip(id, nullptr, nullptr, nullptr, false);
   }
@@ -556,43 +557,54 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
       if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt)) {
         std::wstring text;
-        std::vector<int> missing;
 
-        for (int i = 1; i <= anime_item->GetLastAiredEpisodeNumber(true); i++) {
+        // Find missing episodes
+        std::vector<int> missing_episodes;
+        const int last_aired_episode_number = anime_item->GetLastAiredEpisodeNumber(true);
+        for (int i = 1; i <= last_aired_episode_number; ++i) {
           if (!anime_item->IsEpisodeAvailable(i))
-            missing.push_back(i);
+            missing_episodes.push_back(i);
         }
-
-        if (missing.empty()) {
-          AppendString(text, L"All episodes are in library folders");
-        } else if (missing.size() > 10) {
-          AppendString(text, L"More than 10 episodes are missing");
-        } else {
-          std::wstring missing_text;
-          for (const auto i : missing) {
-            if (i == missing.front()) {
-              missing_text += L"#" + ToWstr(i);
-            } else if (i + 1 == missing.back()) {
-              missing_text += L" and #" + ToWstr(i);
+        // Collapse episode ranges (e.g. "1|3|4|5" -> "1|3-5")
+        std::vector<std::pair<int, int>> missing_episode_ranges;
+        if (!missing_episodes.empty()) {
+          missing_episode_ranges.push_back({0, 0});
+          for (const auto i : missing_episodes) {
+            auto& current_pair = missing_episode_ranges.back();
+            if (current_pair.first == 0) {
+              current_pair = {i, i};
+            } else if (current_pair.second == i - 1) {
+              current_pair.second = i;
             } else {
-              missing_text += L", #" + ToWstr(i);
+              missing_episode_ranges.push_back({i, i});
             }
           }
-          missing_text += (missing.size() == 1 ? L" is missing" : L" are missing");
-          AppendString(text, missing_text);
-
-          if (anime_item->IsNextEpisodeAvailable())
-            AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) +
-                               L" is in library folders");
         }
 
-        if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
-          AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) +
-                             L" is available for download");
+        if (missing_episodes.size() == last_aired_episode_number) {
+          AppendString(text, L"All episodes are missing");
+        } else if (missing_episodes.empty()) {
+          AppendString(text, L"All episodes are in library folders");
+        } else {
+          std::wstring missing_text;
+          for (const auto& range : missing_episode_ranges)  {
+            AppendString(missing_text, L"#" + ToWstr(range.first) + (range.second > range.first ?
+                                       L"-" + ToWstr(range.second) : L""));
+          }
+          AppendString(text, L"Missing: " + missing_text);
+        }
+
+        if (!anime::IsFinishedAiring(*anime_item) &&
+            last_aired_episode_number > anime_item->GetMyLastWatchedEpisode()) {
+          bool estimate = last_aired_episode_number != anime_item->GetLastAiredEpisodeNumber();
+          AppendString(text, L"Aired: #" + ToWstr(last_aired_episode_number) +
+                             (estimate ? L" (estimated)" : L""), L"\r\n");
+        }
 
         if (!text.empty())
           update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
       }
+
       if (button_visible[0] && button_rect[0].PtIn(pt))
         update_tooltip(kTooltipEpisodeMinus, L"-1 episode", &button_rect[0]);
       if (button_visible[1] && button_rect[1].PtIn(pt))
