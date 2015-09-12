@@ -17,7 +17,6 @@
 */
 
 #include <set>
-#include <sstream>
 
 #include "base/foreach.h"
 #include "base/gfx.h"
@@ -555,55 +554,41 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       if (button_visible[1])
         rect_item.right -= button_rect[1].Width();
 
-      if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt) && anime_item->IsInList()) {
+      if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt)) {
         std::wstring text;
         std::vector<int> missing;
 
-        for (int i = 0; i < anime_item->GetLastAiredEpisodeNumber(true); i++)
-          if (!anime_item->IsEpisodeAvailable(i + 1))
-            missing.push_back(i + 1);
-
-        // No episodes are missing
-        if (missing.empty())
-          // That's alright
-          AppendString(text, L"All episodes are in library folders");
-        // If more than episodes we can display are missing
-        else if (missing.size() > 10)
-          // Print at least something for the user
-          AppendString(text, L"More than 10 episodes are missing");
-        // We are missing at least one episode
-        else {
-          // String stream to format missing episodes output
-          std::wostringstream stream;
-
-          for (auto& i = missing.begin(); i != missing.end(); i++) {
-            // First item: add "##"
-            if (i == missing.begin())
-              stream << L"#" << (*i);
-            // Last item: add " and ##"
-            else if (i + 1 == missing.end())
-              stream << L" and #" << (*i);
-            // Intermediate items: add ", ##"
-            else
-              stream << L", #" << (*i);
-          }
-
-          // Add is/are missing at the end
-          stream << (missing.size() == 1 ? L" is missing" : L" are missing");
-
-          // Append built string
-          AppendString(text, stream.str());
-
-          // If the next episode is available
-          if (anime_item->IsNextEpisodeAvailable())
-            AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) +
-              L" is in library folders");
+        for (int i = 1; i <= anime_item->GetLastAiredEpisodeNumber(true); i++) {
+          if (!anime_item->IsEpisodeAvailable(i))
+            missing.push_back(i);
         }
 
-        // If there is a new episode aired and downloadable
+        if (missing.empty()) {
+          AppendString(text, L"All episodes are in library folders");
+        } else if (missing.size() > 10) {
+          AppendString(text, L"More than 10 episodes are missing");
+        } else {
+          std::wstring missing_text;
+          for (const auto i : missing) {
+            if (i == missing.front()) {
+              missing_text += L"#" + ToWstr(i);
+            } else if (i + 1 == missing.back()) {
+              missing_text += L" and #" + ToWstr(i);
+            } else {
+              missing_text += L", #" + ToWstr(i);
+            }
+          }
+          missing_text += (missing.size() == 1 ? L" is missing" : L" are missing");
+          AppendString(text, missing_text);
+
+          if (anime_item->IsNextEpisodeAvailable())
+            AppendString(text, L"#" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) +
+                               L" is in library folders");
+        }
+
         if (anime_item->GetLastAiredEpisodeNumber() > anime_item->GetMyLastWatchedEpisode())
           AppendString(text, L"#" + ToWstr(anime_item->GetLastAiredEpisodeNumber()) +
-            L" is available for download");
+                             L" is available for download");
 
         if (!text.empty())
           update_tooltip(kTooltipEpisodeAvailable, text.c_str(), &rect_item);
