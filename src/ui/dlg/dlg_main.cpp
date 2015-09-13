@@ -77,9 +77,6 @@ BOOL MainDialog::OnInitDialog() {
   // Create controls
   CreateDialogControls();
 
-  // Select default content page
-  navigation.SetCurrentPage(kSidebarItemAnimeList);
-
   // Start process timer
   taiga::timers.Initialize();
 
@@ -93,13 +90,16 @@ BOOL MainDialog::OnInitDialog() {
   // Refresh menus
   ui::Menus.UpdateAll();
 
-  // Apply start-up settings
+  // Apply startup settings
   if (Settings.GetBool(taiga::kSync_AutoOnStart)) {
     sync::Synchronize();
   }
   if (Settings.GetBool(taiga::kApp_Behavior_ScanAvailableEpisodes)) {
     ScanAvailableEpisodesQuick();
   }
+
+  // Select default content page
+  navigation.SetCurrentPage(kSidebarItemAnimeList);
 
   // Display window
   InitWindowPosition();
