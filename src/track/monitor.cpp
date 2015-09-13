@@ -47,6 +47,12 @@ static void ChangeAnimeFolder(anime::Item& anime_item,
   LOG(LevelDebug, L"Anime folder changed: " + anime_item.GetTitle() + L"\n"
                   L"Path: " + anime_item.GetFolder());
 
+  if (path.empty()) {
+    for (int i = 1; i <= anime_item.GetAvailableEpisodeCount(); ++i) {
+      anime_item.SetEpisodeAvailability(i, false, path);
+    }
+  }
+
   ScanAvailableEpisodesQuick(anime_item.GetId());
 }
 
