@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-08-31
+- last_modified: 2015-09-23
 
 ::rules
 
@@ -282,6 +282,9 @@
 - 21939|8204:13-22 -> 24701|8581:1-10
 # Mushishi Zoku Shou -> ~: Suzu no Shizuku
 - 21939|8204:23-24 -> 28957|10084:1
+
+# Nazo no Kanojo X -> ~: Nazo no Natsu Matsuri
+- 12467|6740:14 -> 13093|6882:1
 
 # Nichijou -> ~: Nichijou no 0-wa
 - 10165|6062:0 -> 8857|5512:1
