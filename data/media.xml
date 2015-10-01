@@ -145,6 +145,8 @@
 		<class>MediaPlayerClassicW</class>
 		<file>mpc-hc.exe</file>
 		<file>mpc-hc64.exe</file>
+		<file>mpc-hc_nvo.exe</file>
+		<file>mpc-hc64_nvo.exe</file>
 		<folder>%ProgramFiles%\K-Lite Codec Pack\Media Player Classic\</folder>
 		<folder>%ProgramW6432%\K-Lite Codec Pack\Media Player Classic\</folder>
 		<folder>%ProgramFiles%\K-Lite Codec Pack\MPC-HC\</folder>
