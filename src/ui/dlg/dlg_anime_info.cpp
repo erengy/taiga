@@ -442,48 +442,70 @@ void AnimeDialog::SetCurrentId(int anime_id) {
 }
 
 void AnimeDialog::SetCurrentPage(int index) {
+  const auto previous_page = current_page_;
   current_page_ = index;
+
+  if (!IsWindow())
+    return;
 
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
   bool anime_in_list = anime_item && anime_item->IsInList();
 
-  if (IsWindow()) {
-    switch (index) {
-      case kAnimePageNone:
-        image_label_.Hide();
-        page_my_info.Hide();
-        page_series_info.Hide();
-        sys_link_.Show();
-        break;
-      case kAnimePageSeriesInfo:
-        image_label_.Show();
-        page_my_info.Hide();
-        page_series_info.Show();
-        sys_link_.Show(mode_ == kDialogModeNowPlaying || !anime_in_list);
-        break;
-      case kAnimePageMyInfo:
-        image_label_.Show();
-        page_series_info.Hide();
-        page_my_info.Show();
-        sys_link_.Hide();
-        break;
-      case kAnimePageNotRecognized:
-        image_label_.Show();
-        page_my_info.Hide();
-        page_series_info.Hide();
-        sys_link_.Show();
-        break;
-    }
-
-    tab_.SetCurrentlySelected(index - 1);
-
-    int show = SW_SHOW;
-    if (mode_ == kDialogModeNowPlaying || !anime_in_list) {
-      show = SW_HIDE;
-    }
-    ShowDlgItem(IDOK, show);
-    ShowDlgItem(IDCANCEL, show);
+  switch (index) {
+    case kAnimePageNone:
+      image_label_.Hide();
+      page_my_info.Hide();
+      page_series_info.Hide();
+      sys_link_.Show();
+      break;
+    case kAnimePageSeriesInfo:
+      image_label_.Show();
+      page_my_info.Hide();
+      page_series_info.Show();
+      sys_link_.Show(mode_ == kDialogModeNowPlaying || !anime_in_list);
+      break;
+    case kAnimePageMyInfo:
+      image_label_.Show();
+      page_series_info.Hide();
+      page_my_info.Show();
+      sys_link_.Hide();
+      break;
+    case kAnimePageNotRecognized:
+      image_label_.Show();
+      page_my_info.Hide();
+      page_series_info.Hide();
+      sys_link_.Show();
+      break;
   }
+
+  if (previous_page != current_page_) {
+    const HWND hwnd = GetFocus();
+    if (::IsWindow(hwnd) && !::IsWindowVisible(hwnd)) {
+      switch (current_page_) {
+        case kAnimePageNone:
+          sys_link_.SetFocus();
+          break;
+        case kAnimePageSeriesInfo:
+          page_series_info.SetFocus();
+          break;
+        case kAnimePageMyInfo:
+          page_my_info.SetFocus();
+          break;
+        case kAnimePageNotRecognized:
+          sys_link_.SetFocus();
+          break;
+      }
+    }
+  }
+
+  tab_.SetCurrentlySelected(index - 1);
+
+  int show = SW_SHOW;
+  if (mode_ == kDialogModeNowPlaying || !anime_in_list) {
+    show = SW_HIDE;
+  }
+  ShowDlgItem(IDOK, show);
+  ShowDlgItem(IDCANCEL, show);
 }
 
 void AnimeDialog::SetScores(const sorted_scores_t& scores) {

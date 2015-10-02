@@ -104,9 +104,10 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
 }
 
 void SettingsDialog::SetCurrentPage(SettingsPages page) {
-  pages.at(current_page_).Hide();
-
+  const auto previous_page = current_page_;
   current_page_ = page;
+
+  pages.at(previous_page).Hide();
 
   if (!IsWindow())
     return;
@@ -114,6 +115,12 @@ void SettingsDialog::SetCurrentPage(SettingsPages page) {
   if (!pages.at(current_page_).IsWindow())
     pages.at(current_page_).Create();
   pages.at(current_page_).Show();
+
+  if (previous_page != current_page_) {
+    const HWND hwnd = GetFocus();
+    if (::IsWindow(hwnd) && !::IsWindowVisible(hwnd))
+      pages.at(current_page_).SetFocus();
+  }
 
   for (int i = 0; i < tab_.GetItemCount(); i++) {
     if (tab_.GetItemParam(i) == current_page_) {
