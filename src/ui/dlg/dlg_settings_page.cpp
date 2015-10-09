@@ -309,7 +309,6 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings[taiga::kTorrent_Discovery_Source].c_str());
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%");
-      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://pipes.yahoo.com/pipes/pipe.run?SearchQuery=%title%&_id=7b99f981c5b1f02354642f4e271cca43&_render=rss");
       SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings[taiga::kTorrent_Discovery_SearchUrl].c_str());
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETRANGE32, 10, 3600);
