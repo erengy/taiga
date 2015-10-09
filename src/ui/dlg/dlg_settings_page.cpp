@@ -156,12 +156,14 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_DBLCLICK, L"Open folder");
       AddComboString(IDC_COMBO_DBLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_DBLCLICK, L"View anime info");
+      AddComboString(IDC_COMBO_DBLCLICK, L"View anime page");
       SetComboSelection(IDC_COMBO_DBLCLICK, Settings.GetInt(taiga::kApp_List_DoubleClickAction));
       AddComboString(IDC_COMBO_MDLCLICK, L"Do nothing");
       AddComboString(IDC_COMBO_MDLCLICK, L"Edit details");
       AddComboString(IDC_COMBO_MDLCLICK, L"Open folder");
       AddComboString(IDC_COMBO_MDLCLICK, L"Play next episode");
       AddComboString(IDC_COMBO_MDLCLICK, L"View anime info");
+      AddComboString(IDC_COMBO_MDLCLICK, L"View anime page");
       SetComboSelection(IDC_COMBO_MDLCLICK, Settings.GetInt(taiga::kApp_List_MiddleClickAction));
       CheckDlgButton(IDC_CHECK_LIST_ENGLISH, Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles));
       bool enabled = Settings.GetBool(taiga::kApp_List_HighlightNewEpisodes);

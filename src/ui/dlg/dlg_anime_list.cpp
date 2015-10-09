@@ -401,6 +401,9 @@ void AnimeListDialog::ListView::ExecuteAction(AnimeListAction action,
     case kAnimeListActionInfo:
       ShowDlgAnimeInfo(anime_id);
       break;
+    case kAnimeListActionPage:
+      ::ExecuteAction(L"ViewAnimePage", 0, anime_id);
+      break;
   }
 }
 

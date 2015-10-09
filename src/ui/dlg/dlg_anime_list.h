@@ -35,6 +35,7 @@ enum AnimeListAction {
   kAnimeListActionOpenFolder,
   kAnimeListActionPlayNext,
   kAnimeListActionInfo,
+  kAnimeListActionPage,
 };
 
 enum AnimeListColumn {
