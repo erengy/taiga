@@ -40,6 +40,13 @@ PageBaseInfo::PageBaseInfo()
     : anime_id_(anime::ID_UNKNOWN), parent(nullptr) {
 }
 
+BOOL PageBaseInfo::OnClose() {
+  if (parent && parent->GetMode() == kDialogModeAnimeInformation)
+    parent->OnCancel();
+
+  return TRUE;  // Disables closing via Escape key
+}
+
 BOOL PageBaseInfo::OnInitDialog() {
   // Set new font for headers
   for (int i = 0; i < 3; i++) {

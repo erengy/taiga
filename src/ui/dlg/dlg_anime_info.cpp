@@ -419,6 +419,10 @@ void AnimeDialog::GoToNextTab() {
   GoToPreviousTab();
 }
 
+int AnimeDialog::GetMode() const {
+  return mode_;
+}
+
 int AnimeDialog::GetCurrentId() const {
   return anime_id_;
 }

@@ -51,6 +51,7 @@ public:
   bool IsTabVisible() const;
   void GoToPreviousTab();
   void GoToNextTab();
+  int GetMode() const;
   int GetCurrentId() const;
   void SetCurrentId(int anime_id);
   void SetCurrentPage(int index);
