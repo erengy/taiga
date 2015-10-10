@@ -609,26 +609,26 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       link_count += 2;
     } else {
       content = L"Continue Watching:\n" + content + L"\n";
-      int watched_last_week = 0;
-      foreach_c_(it, History.queue.items) {
-        if (!it->episode || *it->episode == 0)
-          continue;
-        date_diff = date_now - (Date)(it->time.substr(0, 10));
-        if (date_diff <= day_limit)
-          watched_last_week++;
-      }
-      foreach_c_(it, History.items) {
-        if (!it->episode || *it->episode == 0)
-          continue;
-        date_diff = date_now - (Date)(it->time.substr(0, 10));
-        if (date_diff <= day_limit)
-          watched_last_week++;
-      }
-      if (watched_last_week > 0) {
-        content += L"You've watched " + ToWstr(watched_last_week) + L" ";
-        content += watched_last_week == 1 ? L"episode" : L"episodes";
-        content += L" in the last week.\n\n";
-      }
+    }
+    int watched_last_week = 0;
+    foreach_c_(it, History.queue.items) {
+      if (!it->episode || *it->episode == 0)
+        continue;
+      date_diff = date_now - (Date)(it->time.substr(0, 10));
+      if (date_diff <= day_limit)
+        watched_last_week++;
+    }
+    foreach_c_(it, History.items) {
+      if (!it->episode || *it->episode == 0)
+        continue;
+      date_diff = date_now - (Date)(it->time.substr(0, 10));
+      if (date_diff <= day_limit)
+        watched_last_week++;
+    }
+    if (watched_last_week > 0) {
+      content += L"You've watched " + ToWstr(watched_last_week) + L" ";
+      content += watched_last_week == 1 ? L"episode" : L"episodes";
+      content += L" in the last week.\n\n";
     }
 
     // Available episodes
