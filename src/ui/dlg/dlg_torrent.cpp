@@ -260,13 +260,15 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           break;
         LPNMLISTVIEW pnmv = reinterpret_cast<LPNMLISTVIEW>(pnmh);
         if (pnmv->uOldState != 0 && (pnmv->uNewState == 0x1000 || pnmv->uNewState == 0x2000)) {
-          bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
+          const bool checked = list_.GetCheckState(pnmv->iItem) == TRUE;
+          const int group = list_.GetItemGroup(list_.last_checked_item);
           if (list_.last_checked_item > -1 && (GetKeyState(VK_SHIFT) & 0x8000) &&
-              list_.GetItemGroup(pnmv->iItem) == list_.GetItemGroup(list_.last_checked_item)) {
+              list_.GetItemGroup(pnmv->iItem) == group) {
             int item_index = min(pnmv->iItem, list_.last_checked_item);
-            int last_index = max(pnmv->iItem, list_.last_checked_item);
+            const int last_index = max(pnmv->iItem, list_.last_checked_item);
             do {
-              list_.SetCheckState(item_index, checked);
+              if (list_.GetItemGroup(item_index) == group)
+                list_.SetCheckState(item_index, checked);
               if (item_index == last_index)
                 break;
               item_index = list_.GetNextItem(item_index, LVNI_ALL);
