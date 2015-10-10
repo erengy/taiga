@@ -229,6 +229,9 @@
 # Kimi ni Todoke 2nd Season -> ~: Kataomoi
 - 9656|5820:0 -> 10152|6055:1
 
+# Kindaichi Shounen no Jikenbo Returns -> ~ 2nd Season
+- 22817|8310:26-? -> 31227|11211:1-?!
+
 # Kino no Tabi: The Beautiful World -> ~ - Tou no Kuni
 - 486|447:0 -> 3466|3031:1
 
@@ -353,6 +356,9 @@
 # So Ra No Wo To -> ~ Specials
 - 6802|7668:13 -> 8197|4724:2
 
+# Soukyuu no Fafner: Dead Aggressor - Exodus -> ~ 2nd Season
+- 17080|7575:14-26 -> 30549|10854:1-13!
+
 # Suisei no Gargantia -> ~ Specials
 - 16524|7449:14-15 -> 19211|7872:1-2
 # Puchitto Gargantia -> ~ Special
@@ -373,7 +379,9 @@
 # Teekyuu -> ~ 4
 - 15125|7217:37-48 -> 26395|8906:1-12!
 # Teekyuu -> ~ 5
-- 15125|7217:49-? -> 30567|10858:1-?!
+- 15125|7217:49-60 -> 30567|10858:1-12!
+# Teekyuu -> ~ 6
+- 15125|7217:61-? -> 31440|11334:1-?!
 
 # Tegami Bachi -> ~ Reverse
 - 6444|4564:26-50 -> 8311|5288:1-25!
