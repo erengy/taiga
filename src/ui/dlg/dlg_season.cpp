@@ -82,7 +82,7 @@ BOOL SeasonDialog::OnInitDialog() {
   BYTE fsState = TBSTATE_ENABLED;
   BYTE fsStyle1 = BTNS_AUTOSIZE | BTNS_SHOWTEXT;
   BYTE fsStyle2 = BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_WHOLEDROPDOWN;
-  toolbar_.InsertButton(0, ui::kIcon16_Calendar, 100, fsState, fsStyle2, 0, L"Select season", nullptr);
+  toolbar_.InsertButton(0, ui::kIcon16_Calendar, 100, fsState, fsStyle2, 0, L"Select season", L"Select season");
   toolbar_.InsertButton(1, ui::kIcon16_Refresh,  101, fsState, fsStyle1, 1, L"Refresh data", L"Download anime details and missing images");
   toolbar_.InsertButton(2, 0, 0, 0, BTNS_SEP, 0, nullptr, nullptr);
   toolbar_.InsertButton(3, ui::kIcon16_Category, 103, fsState, fsStyle2, 3, L"Group by", nullptr);
@@ -619,6 +619,9 @@ void SeasonDialog::RefreshStatus() {
 }
 
 void SeasonDialog::RefreshToolbar() {
+  if (!SeasonDatabase.name.empty())
+    toolbar_.SetButtonText(0, SeasonDatabase.name.c_str());
+
   toolbar_.EnableButton(101, !SeasonDatabase.items.empty());
 
   std::wstring text = L"Group by: ";
