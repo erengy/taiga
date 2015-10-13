@@ -309,8 +309,8 @@
 # Ore no Imouto ga Konnani Kawaii Wake ga Nai. -> ~ Specials
 - 13659|7006:14-16 -> 18857|7822:1-3
 
-# Owari no Seraph -> ~: Nagoya Kessen
-- 26243|8736:13-24 -> 28927|10082:1
+# Owari no Seraph -> ~: Nagoya Kessen-hen
+- 26243|8736:13-24 -> 28927|10082:1-12!
 
 # Papa no Iukoto wo Kikinasai! -> ~ Pokkapoka
 - 11179|6469:13 -> 12673|6787:1
