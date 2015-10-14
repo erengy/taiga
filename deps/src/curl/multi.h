@@ -370,6 +370,12 @@ typedef enum {
   /* maximum number of open connections in total */
   CINIT(MAX_TOTAL_CONNECTIONS, LONG, 13),
 
+   /* This is the server push callback function pointer */
+  CINIT(PUSHFUNCTION, FUNCTIONPOINT, 14),
+
+  /* This is the argument passed to the server push callback */
+  CINIT(PUSHDATA, OBJECTPOINT, 15),
+
   CURLMOPT_LASTENTRY /* the last unused */
 } CURLMoption;
 
@@ -396,6 +402,31 @@ CURL_EXTERN CURLMcode curl_multi_setopt(CURLM *multi_handle,
  */
 CURL_EXTERN CURLMcode curl_multi_assign(CURLM *multi_handle,
                                         curl_socket_t sockfd, void *sockp);
+
+
+/*
+ * Name: curl_push_callback
+ *
+ * Desc: This callback gets called when a new stream is being pushed by the
+ *       server. It approves or denies the new stream.
+ *
+ * Returns: CURL_PUSH_OK or CURL_PUSH_DENY.
+ */
+#define CURL_PUSH_OK   0
+#define CURL_PUSH_DENY 1
+
+struct curl_pushheaders;  /* forward declaration only */
+
+CURL_EXTERN char *curl_pushheader_bynum(struct curl_pushheaders *h,
+                                        size_t num);
+CURL_EXTERN char *curl_pushheader_byname(struct curl_pushheaders *h,
+                                         const char *name);
+
+typedef int (*curl_push_callback)(CURL *parent,
+                                  CURL *easy,
+                                  size_t num_headers,
+                                  struct curl_pushheaders *headers,
+                                  void *userp);
 
 #ifdef __cplusplus
 } /* end of extern "C" */
