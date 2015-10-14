@@ -953,9 +953,9 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     float ratio_watched = 0.0f;
     anime::GetProgressRatios(anime_item, ratio_aired, ratio_watched);
     if (eps_aired > -1)
-      rcAired.right = static_cast<int>((rcAired.Width()) * ratio_aired) + rcAired.left;
+      rcAired.right = rcAired.left + std::lround(rcAired.Width() * ratio_aired);
     if (ratio_watched > -1)
-      rcWatched.right = static_cast<int>((rcWatched.Width()) * ratio_watched) + rcWatched.left;
+      rcWatched.right = rcWatched.left + std::lround(rcWatched.Width() * ratio_watched);
   }
 
   // Draw aired episodes
@@ -999,8 +999,9 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
       float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
       for (int i = 1; i <= min(eps_available, eps_estimate); i++) {
         if (anime_item.IsEpisodeAvailable(i)) {
-          rcAvail.left = static_cast<int>(rcBar.left + (width * (i - 1)));
-          rcAvail.right = min(static_cast<int>(rcAvail.left + width + 1), rcBar.right);
+          rcAvail.left = rcBar.left + static_cast<int>(std::floor(width * (i - 1)));
+          rcAvail.right = rcAvail.left + static_cast<int>(std::ceil(width));
+          rcAvail.right = min(rcAvail.right, rcBar.right);
           ui::Theme.DrawListProgress(dc.Get(), &rcAvail, ui::kListProgressAvailable);
         }
       }
