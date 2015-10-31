@@ -286,29 +286,30 @@ void HistoryQueue::Remove(int index, bool save, bool refresh, bool to_history) {
     index = this->index;
 
   if (index < static_cast<int>(items.size())) {
-    auto history_item = items.begin() + index;
+    auto it = items.begin() + index;
+    const HistoryItem history_item = *it;
 
-    if (to_history && history_item->episode && *history_item->episode > 0) {
-      history->items.push_back(*history_item);
+    if (to_history && history_item.episode && *history_item.episode > 0) {
+      history->items.push_back(history_item);
       if (history->limit > 0 &&
           static_cast<int>(history->items.size()) > history->limit) {
         history->items.erase(history->items.begin());
       }
     }
 
-    if (history_item->episode) {
-      auto anime_item = AnimeDatabase.FindItem(history_item->anime_id);
+    if (history_item.episode) {
+      auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
       if (anime_item &&
-          anime_item->GetMyLastWatchedEpisode() == *history_item->episode) {
+          anime_item->GetMyLastWatchedEpisode() == *history_item.episode) {
         // Next episode path is no longer valid
         anime_item->SetNextEpisodePath(L"");
       }
     }
 
-    items.erase(history_item);
+    items.erase(it);
 
     if (refresh)
-      ui::OnHistoryChange();
+      ui::OnHistoryChange(&history_item);
   }
 
   if (save)

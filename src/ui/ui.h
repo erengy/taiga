@@ -60,7 +60,7 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids);
 bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags);
 
 void OnHistoryAddItem(const HistoryItem& history_item);
-void OnHistoryChange();
+void OnHistoryChange(const HistoryItem* history_item = nullptr);
 bool OnHistoryClear();
 int OnHistoryProcessConfirmationQueue(anime::Episode& episode);
 

@@ -416,16 +416,20 @@ bool OnLibraryEntriesEditTags(const std::vector<int> ids, std::wstring& tags) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static bool AnimeListNeedsRefresh(const HistoryItem& history_item) {
+  return history_item.mode == taiga::kHttpServiceAddLibraryEntry ||
+         history_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
+         history_item.status ||
+         history_item.enable_rewatching;
+}
+
 void OnHistoryAddItem(const HistoryItem& history_item) {
   DlgHistory.RefreshList();
   DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
 
-  if (history_item.mode == taiga::kHttpServiceAddLibraryEntry ||
-      history_item.mode == taiga::kHttpServiceDeleteLibraryEntry ||
-      history_item.status ||
-      history_item.enable_rewatching) {
+  if (AnimeListNeedsRefresh(history_item)) {
     DlgAnimeList.RefreshList();
     DlgAnimeList.RefreshTabs();
   } else {
@@ -441,13 +445,18 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
   }
 }
 
-void OnHistoryChange() {
+void OnHistoryChange(const HistoryItem* history_item) {
   DlgHistory.RefreshList();
   DlgSearch.RefreshList();
   DlgMain.treeview.RefreshHistoryCounter();
   DlgNowPlaying.Refresh(false, false, false);
-  DlgAnimeList.RefreshList();
-  DlgAnimeList.RefreshTabs();
+
+  if (!history_item || AnimeListNeedsRefresh(*history_item)) {
+    DlgAnimeList.RefreshList();
+    DlgAnimeList.RefreshTabs();
+  } else {
+    DlgAnimeList.RefreshListItem(history_item->anime_id);
+  }
 }
 
 bool OnHistoryClear() {
