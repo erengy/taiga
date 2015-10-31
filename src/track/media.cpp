@@ -332,12 +332,13 @@ void ProcessMediaPlayerStatus(const MediaPlayer* media_player) {
       }
       taiga::timers.timer(taiga::kTimerMedia)->Reset();
 
-    // Media player was running, but not watching
+    // Media player was running, but the media was not recognized
     } else if (MediaPlayers.player_running()) {
       ui::ClearStatusText();
       CurrentEpisode.Set(anime::ID_UNKNOWN);
       MediaPlayers.set_player_running(false);
       ui::DlgNowPlaying.SetCurrentId(anime::ID_UNKNOWN);
+      taiga::timers.timer(taiga::kTimerMedia)->Reset();
     }
   }
 }
