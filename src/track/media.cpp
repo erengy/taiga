@@ -427,17 +427,19 @@ bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
   if (hwnd != nullptr && process_id == 0)
     GetWindowThreadProcessId(hwnd, &process_id);
 
-  std::vector<std::wstring> files_vector;
+  std::vector<std::wstring> process_files;
 
-  if (!GetProcessFiles(process_id, files_vector))
+  if (!GetProcessFiles(process_id, process_files))
     return false;
 
-  for (const auto& path : files_vector) {
+  for (auto path : process_files) {
     if (Meow.IsValidFileExtension(GetFileExtension(path))) {
-      title = path;
-      TranslateDeviceName(title);
-      ConvertToLongPath(title);
-      break;
+      TranslateDeviceName(path);
+      ConvertToLongPath(path);
+      if (Meow.IsValidAnimeType(path)) {
+        title = path;
+        break;
+      }
     }
   }
 
