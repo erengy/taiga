@@ -392,8 +392,21 @@ bool Engine::GetTitleFromPath(anime::Episode& episode) {
     }
   }
 
-  if (episode.anime_title().empty())
+  if (episode.anime_title().empty()) {
     return false;
+  } else {
+    // We're parsing the directory name in case it looks like
+    // "[Fansub] Anime Title [Stuff]" rather than just "Anime Title".
+    anitomy::Anitomy anitomy_instance;
+    anitomy_instance.options().parse_episode_number = false;
+    anitomy_instance.options().parse_episode_title = false;
+    anitomy_instance.options().parse_file_extension = false;
+    anitomy_instance.options().parse_release_group = true;
+    if (anitomy_instance.Parse(episode.anime_title())) {
+      auto elements = anitomy_instance.elements();
+      episode.set_anime_title(elements.get(anitomy::kElementAnimeTitle));
+    }
+  }
 
   auto find_number_in_string = [](const std::wstring& str) {
     auto it = std::find_if(str.begin(), str.end(), IsNumericChar);
