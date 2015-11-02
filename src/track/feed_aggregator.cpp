@@ -368,6 +368,8 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
       // them to handle misconfigured servers.
       L"application/force-download",
       L"application/octet-stream",
+      L"application/torrent",
+      L"application/x-torrent",
     };
     if (std::find(allowed_types.begin(), allowed_types.end(),
                   ToLower_Copy(it->second)) == allowed_types.end()) {
