@@ -449,7 +449,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
         }
         // Help
         case VK_F1: {
-          ExecuteLink(L"http://taiga.erengy.com/#support");
+          ExecuteLink(L"http://taiga.moe/#support");
           return TRUE;
         }
         // Various

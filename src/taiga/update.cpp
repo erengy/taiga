@@ -47,7 +47,7 @@ void UpdateHelper::Check() {
   bool is_stable = Taiga.version.prerelease_identifiers.empty();
 
   HttpRequest http_request;
-  http_request.url.host = L"taiga.erengy.com";
+  http_request.url.host = L"taiga.moe";
   http_request.url.path = L"/update.php";
   http_request.url.query[L"channel"] = is_stable ? L"stable" : L"beta";
   http_request.url.query[L"check"] = is_automatic ? L"auto" : L"manual";
