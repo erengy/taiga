@@ -34,6 +34,15 @@
 		<folder>%ProgramW6432%\BESTplayer\</folder>
 		<edit mode="2">BESTplayer</edit>
 	</player>
+	<!-- Bomi Player -->
+	<player>
+		<name>Bomi Player</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>0</mode>
+		<class>Qt5QWindowGLOwnDCIcon</class>
+		<file>bomi.exe</file>
+	</player>
 	<!-- BSPlayer -->
 	<player>
 		<name>BSPlayer</name>
