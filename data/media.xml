@@ -48,6 +48,7 @@
 		<folder>%ProgramW6432%\bomi-32bit\bomi\</folder>
 		<folder>%ProgramFiles%\bomi-64bit\bomi\</folder>
 		<folder>%ProgramW6432%\bomi-64bit\bomi\</folder>
+		<edit mode="2">bomi</edit>
 	</player>
 	<!-- BSPlayer -->
 	<player>
