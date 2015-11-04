@@ -56,7 +56,7 @@ public:
   bool Search(const std::wstring& title, std::vector<int>& anime_ids);
 
   void InitializeTitles();
-  void UpdateTitles(const anime::Item& anime_item);
+  void UpdateTitles(const anime::Item& anime_item, bool erase_ids = false);
 
   sorted_scores_t GetScores() const;
 

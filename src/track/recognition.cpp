@@ -212,11 +212,25 @@ void Engine::InitializeTitles() {
   }
 }
 
-void Engine::UpdateTitles(const anime::Item& anime_item) {
-  int anime_id = anime_item.GetId();
+void Engine::UpdateTitles(const anime::Item& anime_item, bool erase_ids) {
+  const int anime_id = anime_item.GetId();
 
   db_[anime_id].normal_titles.clear();
   db_[anime_id].trigrams.clear();
+
+  if (erase_ids) {
+    auto erase_id = [&anime_id](Titles::container_t& titles) {
+      for (auto& title : titles) {
+        title.second.erase(anime_id);
+      }
+    };
+    erase_id(titles_.alternative);
+    erase_id(titles_.main);
+    erase_id(titles_.user);
+    erase_id(normal_titles_.alternative);
+    erase_id(normal_titles_.main);
+    erase_id(normal_titles_.user);
+  }
 
   auto update_title = [&](std::wstring title,
                           Titles::container_t& titles,
