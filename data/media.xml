@@ -22,6 +22,19 @@
 		<folder>%ProgramFiles%\ALLPlayer\</folder>
 		<folder>%ProgramW6432%\ALLPlayer\</folder>
 	</player>
+	<!-- Baka MPlayer -->
+	<player>
+		<name>Baka MPlayer</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>0</mode>
+		<class>Qt5QWindowIcon</class>
+		<file>Baka MPlayer.exe</file>
+		<folder>%ProgramFiles%\Baka-MPlayer.i686\</folder>
+		<folder>%ProgramW6432%\Baka-MPlayer.i686\</folder>
+		<folder>%ProgramFiles%\Baka-MPlayer.x86_64\</folder>
+		<folder>%ProgramW6432%\Baka-MPlayer.x86_64\</folder>
+	</player>
 	<!-- BESTplayer -->
 	<player>
 		<name>BESTplayer</name>
