@@ -42,6 +42,12 @@
 		<mode>0</mode>
 		<class>Qt5QWindowGLOwnDCIcon</class>
 		<file>bomi.exe</file>
+		<folder>%ProgramFiles%\bomi\</folder>
+		<folder>%ProgramW6432%\bomi\</folder>
+		<folder>%ProgramFiles%\bomi-32bit\bomi\</folder>
+		<folder>%ProgramW6432%\bomi-32bit\bomi\</folder>
+		<folder>%ProgramFiles%\bomi-64bit\bomi\</folder>
+		<folder>%ProgramW6432%\bomi-64bit\bomi\</folder>
 	</player>
 	<!-- BSPlayer -->
 	<player>
