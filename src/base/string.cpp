@@ -234,6 +234,9 @@ bool EndsWith(const wstring& str1, const wstring& str2) {
 }
 
 bool IntersectsWith(const std::wstring& str1, const std::wstring& str2) {
+  if (str1.empty() || str2.empty())
+    return false;
+
   return min(str1.size(), str2.size()) ==
          LongestCommonSubsequenceLength(str1, str2);
 }

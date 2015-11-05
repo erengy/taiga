@@ -288,7 +288,7 @@ std::wstring MediaPlayers::FromAutomationApi(HWND hwnd, int web_engine,
               element_text->Release();
             }
           }
-          if (!name.empty() && IntersectsWith(name, current_title())) {
+          if (IntersectsWith(name, current_title())) {
             // Tab is still open, just not active
             title = current_title();
             found_tab = true;
