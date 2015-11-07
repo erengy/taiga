@@ -50,6 +50,7 @@ bool Filters::CheckItem(const Item& item) {
   auto synonyms = item.GetSynonyms();
   for (auto it = words.begin(); it != words.end(); ++it) {
     if (InStr(item.GetTitle(), *it, 0, true) == -1 &&
+        InStr(item.GetEnglishTitle(), *it, 0, true) == -1 &&
         InStr(genres, *it, 0, true) == -1 &&
         InStr(item.GetMyTags(), *it, 0, true) == -1) {
       bool found = false;
