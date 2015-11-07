@@ -858,6 +858,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
             // Open folder
             } else if (pnkd->wVKey == 'K') {
               ExecuteAction(L"OpenFolder", 0, anime_id);
+              return TRUE;
             // Play next episode
             } else if (pnkd->wVKey == 'N') {
               anime::PlayNextEpisode(anime_id);
