@@ -107,7 +107,7 @@
 		<item name="Edit" action="EditAll()"/>
 		<item name="&Delete from list...&#9;Del" action="EditDelete()"/>
 		<item type="separator"/>
-		<item name="Open folder" action="OpenFolder()"/>
+		<item name="Open folder&#9;Ctrl+K" action="OpenFolder()"/>
 		<item name="Scan available episodes&#9;F5" action="ScanEpisodes()"/>
 		<item type="separator"/>
 		<!-- Note: Overwritten -->
