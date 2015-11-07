@@ -27,17 +27,20 @@ namespace anime {
 class Item;
 
 class Filters {
- public:
+public:
   Filters();
   virtual ~Filters() {}
 
-  bool CheckItem(const Item& item);
+  bool CheckItem(const Item& item) const;
   void Reset();
 
   std::vector<bool> my_status;
   std::vector<bool> status;
   std::vector<bool> type;
   std::wstring text;
+
+private:
+  bool FilterText(const Item& item) const;
 };
 
 }  // namespace anime
