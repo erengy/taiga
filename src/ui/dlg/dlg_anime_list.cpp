@@ -803,23 +803,12 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       int anime_id = GetCurrentId();
       auto anime_ids = GetCurrentIds();
       switch (pnkd->wVKey) {
+        // Simulate double-click
         case VK_RETURN: {
           if (!anime::IsValidId(anime_id))
             break;
-          switch (Settings.GetInt(taiga::kApp_List_DoubleClickAction)) {
-            case 1:
-              ShowDlgAnimeEdit(anime_id);
-              break;
-            case 2:
-              ExecuteAction(L"OpenFolder", 0, anime_id);
-              break;
-            case 3:
-              anime::PlayNextEpisode(anime_id);
-              break;
-            case 4:
-              ShowDlgAnimeInfo(anime_id);
-              break;
-          }
+          auto action = static_cast<AnimeListAction>(Settings.GetInt(taiga::kApp_List_DoubleClickAction));
+          listview.ExecuteAction(action, anime_id);
           break;
         }
         // Delete item
