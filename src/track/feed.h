@@ -25,6 +25,7 @@
 #include "base/types.h"
 #include "library/anime_episode.h"
 #include "track/feed_filter.h"
+#include "torrent_client.h"
 
 namespace pugi {
 class xml_document;
@@ -163,6 +164,8 @@ private:
   std::vector<std::wstring> download_queue_;
   std::vector<Feed> feeds_;
   std::vector<std::wstring> file_archive_;
+
+  TorrentClients clients_;
 };
 
 extern class Aggregator Aggregator;

@@ -279,7 +279,6 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     return;
 
   std::wstring app_path;
-  std::wstring parameters;
 
   switch (Settings.GetInt(taiga::kTorrent_Download_AppMode)) {
     case 1:  // Default application
@@ -290,9 +289,8 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
       break;
   }
 
-  if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder) &&
-      InStr(app_path, L"utorrent", 0, true) > -1) {
-    std::wstring download_path;
+  std::wstring download_path;
+  if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder)) {
     // Use anime folder as the download folder
     auto anime_id = feed_item.episode_data.anime_id;
     auto anime_item = AnimeDatabase.FindItem(anime_id);
@@ -304,21 +302,22 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     // If no anime folder is set, use an alternative folder
     if (download_path.empty()) {
       if (Settings.GetBool(taiga::kTorrent_Download_FallbackOnFolder) &&
-          !Settings[taiga::kTorrent_Download_Location].empty()) {
+        !Settings[taiga::kTorrent_Download_Location].empty()) {
         download_path = Settings[taiga::kTorrent_Download_Location];
       }
       if (!download_path.empty() && !FolderExists(download_path)) {
         LOG(LevelWarning, L"Folder doesn't exist.\n"
-                          L"Path: " + download_path);
+          L"Path: " + download_path);
         download_path.clear();
       }
       // Create a subfolder using the anime title as its name
       if (!download_path.empty() &&
-          Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder)) {
+        Settings.GetBool(taiga::kTorrent_Download_CreateSubfolder)) {
         std::wstring anime_title;
         if (anime_item) {
           anime_title = anime_item->GetTitle();
-        } else {
+        }
+        else {
           anime_title = feed_item.episode_data.anime_title();
         }
         ValidateFileName(anime_title);
@@ -327,9 +326,10 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         download_path += anime_title;
         if (!CreateFolder(download_path)) {
           LOG(LevelError, L"Subfolder could not be created.\n"
-              L"Path: " + download_path);
+            L"Path: " + download_path);
           download_path.clear();
-        } else {
+        }
+        else {
           if (anime_item) {
             anime_item->SetFolder(download_path);
             Settings.Save();
@@ -337,14 +337,16 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         }
       }
     }
-
-    // Set the command line parameter
-    if (!download_path.empty())
-      parameters = L"/directory \"" + download_path + L"\" ";
   }
 
-  parameters += L"\"" + file + L"\"";
-  Execute(app_path, parameters);
+  auto client = clients_.GetClientByPath(app_path);
+  if (client) {
+    client->DownloadTorrent(app_path, download_path, file);
+  }
+  else {
+    // Default behavior if no application was found
+    Execute(app_path, L"\"" + file + L"\"");
+  }
 }
 
 bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
