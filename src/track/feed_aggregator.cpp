@@ -345,7 +345,14 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
   }
   else {
     // Default behavior if no application was found
-    Execute(app_path, L"\"" + file + L"\"");
+    std::wstring parameters;
+
+    if (!download_path.empty())
+      parameters = L"\"" + download_path + L"\" ";
+
+    parameters += L"\"" + file + L"\"";
+
+    Execute(app_path, parameters);
   }
 }
 
