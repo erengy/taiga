@@ -29,7 +29,8 @@ class TorrentClients {
 public:
   TorrentClients();
 
-  std::shared_ptr<TorrentClient> GetClientByPath(const std::wstring& path);
+  std::shared_ptr<TorrentClient> GetClientByPath(const std::wstring& path) const;
+  void AddClient(const std::wstring& name, const std::shared_ptr<TorrentClient> client);
 private:
   std::map<std::wstring, std::shared_ptr<TorrentClient>> clients_;
 };
@@ -39,22 +40,25 @@ public:
   virtual ~TorrentClient() {}
 
   void DownloadTorrent(const std::wstring& app_path, const std::wstring& download_path, const std::wstring& file);
+  virtual void RegisterClient(TorrentClients& clients) = 0;
 protected:
-  virtual std::wstring GenerateParameters(const std::wstring& download_path, const std::wstring& file) = 0;
+  virtual std::wstring GenerateParameters(const std::wstring& download_path, const std::wstring& file) const = 0;
+  virtual std::wstring GetAppPath(const std::wstring& app_path) const;
 };
 
-class Deluge : public TorrentClient {
+class Deluge : public TorrentClient, public std::enable_shared_from_this<Deluge> {
 public:
-  static std::wstring& kBinaryName();
+  void RegisterClient(TorrentClients& clients) override;
 private:
-  std::wstring GenerateParameters(const std::wstring& download_path, const std::wstring& file);
+  std::wstring GenerateParameters(const std::wstring& download_path, const std::wstring& file) const override;
+  std::wstring GetAppPath(const std::wstring& app_path) const override;
 };
 
-class UTorrent : public TorrentClient {
+class UTorrent : public TorrentClient, public std::enable_shared_from_this<UTorrent> {
 public:
-  static std::wstring& kBinaryName();
+  void RegisterClient(TorrentClients& clients) override;
 private:
-  std::wstring GenerateParameters(const std::wstring& download_path, const std::wstring& file);
+  std::wstring GenerateParameters(const std::wstring& download_path, const std::wstring& file) const override;
 };
 
 #endif  // TAIGA_TRACK_TORRENT_CLIENT_H

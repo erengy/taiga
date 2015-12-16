@@ -21,21 +21,36 @@
 #include "base/string.h"
 #include "track/torrent_client.h"
 
-void TorrentClient::DownloadTorrent(const std::wstring& app_path, const std::wstring& download_path, const std::wstring& file) {
+void TorrentClient::DownloadTorrent(const std::wstring& app_path,
+                                    const std::wstring& download_path,
+                                    const std::wstring& file) {
   std::wstring parameters = GenerateParameters(download_path, file);
-  Execute(app_path, parameters);
+  Execute(GetAppPath(app_path), parameters);
 }
 
-std::wstring Deluge::GenerateParameters(const std::wstring& download_path, const std::wstring& file) {
+std::wstring Deluge::GenerateParameters(const std::wstring& download_path,
+                                        const std::wstring& file) const {
   return L"add -p \\\"" + download_path + L"\\\" \\\"" + file + L"\\\"";
 }
 
-std::wstring& Deluge::kBinaryName() {
-  static std::wstring *x = new std::wstring(L"deluge-console.exe");
-  return *x;
+std::wstring TorrentClient::GetAppPath(const std::wstring& app_path) const {
+  return app_path;
 }
 
-std::wstring UTorrent::GenerateParameters(const std::wstring& download_path, const std::wstring& file) {
+void Deluge::RegisterClient(TorrentClients& clients) {
+  clients.AddClient(L"deluge.exe", shared_from_this());
+  clients.AddClient(L"deluge-console.exe", shared_from_this());
+}
+
+std::wstring Deluge::GetAppPath(const std::wstring& app_path) const {
+  if (GetFileName(app_path) == L"deluge.exe") {
+    return GetPathOnly(app_path) + L"deluge-console.exe";
+  }
+  return app_path;
+}
+
+std::wstring UTorrent::GenerateParameters(const std::wstring& download_path,
+                                          const std::wstring& file) const {
   std::wstring parameters;
   if (!download_path.empty()) {
     parameters = L"/directory \"" + download_path + L"\" ";
@@ -44,17 +59,16 @@ std::wstring UTorrent::GenerateParameters(const std::wstring& download_path, con
   return parameters + L"\"" + file + L"\"";
 }
 
-std::wstring& UTorrent::kBinaryName() {
-  static std::wstring *x = new std::wstring(L"uTorrent.exe");
-  return *x;
+void UTorrent::RegisterClient(TorrentClients& clients) {
+  clients.AddClient(L"uTorrent.exe", shared_from_this());
 }
 
 TorrentClients::TorrentClients() {
-  clients_[Deluge::kBinaryName()]   = std::make_shared<Deluge>();
-  clients_[UTorrent::kBinaryName()] = std::make_shared<UTorrent>();
+  std::make_shared<Deluge>()->RegisterClient(*this);
+  std::make_shared<UTorrent>()->RegisterClient(*this);
 }
 
-std::shared_ptr<TorrentClient> TorrentClients::GetClientByPath(const std::wstring& path) {
+std::shared_ptr<TorrentClient> TorrentClients::GetClientByPath(const std::wstring& path) const {
   std::wstring app = GetFileName(path);
 
   auto item = clients_.find(app);
@@ -65,4 +79,9 @@ std::shared_ptr<TorrentClient> TorrentClients::GetClientByPath(const std::wstrin
   LOG(LevelNotice, L"Application is not a supported torrent client:\n"
                    L"Path: " + app);
   return nullptr;
+}
+
+void TorrentClients::AddClient(const std::wstring& name,
+                               const std::shared_ptr<TorrentClient> client) {
+  clients_[name] = client;
 }
