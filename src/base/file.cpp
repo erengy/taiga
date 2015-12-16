@@ -132,7 +132,7 @@ bool Execute(const std::wstring& path, const std::wstring& parameters) {
     return ExecuteFile(path, parameters);
 
   auto value = ShellExecute(nullptr, L"open", path.c_str(), parameters.c_str(),
-                            nullptr, SW_SHOWNORMAL);
+                            nullptr, SW_HIDE);
   return reinterpret_cast<int>(value) > 32;
 }
 

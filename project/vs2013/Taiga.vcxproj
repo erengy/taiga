@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\src\track\recognition_score.cpp" />
     <ClCompile Include="..\..\src\track\recognition_validate.cpp" />
     <ClCompile Include="..\..\src\track\search.cpp" />
+    <ClCompile Include="..\..\src\track\torrent_client.cpp" />
     <ClCompile Include="..\..\src\ui\dialog.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_about.cpp" />
     <ClCompile Include="..\..\src\ui\dlg\dlg_anime_info.cpp" />
@@ -355,6 +356,7 @@
     <ClInclude Include="..\..\src\track\monitor.h" />
     <ClInclude Include="..\..\src\track\recognition.h" />
     <ClInclude Include="..\..\src\track\search.h" />
+    <ClInclude Include="..\..\src\track\torrent_client.h" />
     <ClInclude Include="..\..\src\ui\dialog.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_about.h" />
     <ClInclude Include="..\..\src\ui\dlg\dlg_anime_info.h" />

@@ -355,6 +355,9 @@
     <ClCompile Include="..\..\src\track\search.cpp">
       <Filter>track</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\track\torrent_client.cpp">
+      <Filter>track</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\ui\dialog.cpp">
       <Filter>ui</Filter>
     </ClCompile>
@@ -932,6 +935,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h">
       <Filter>win\ctrl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\track\torrent_client.h">
+      <Filter>track</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
