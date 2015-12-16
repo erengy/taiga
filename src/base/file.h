@@ -31,7 +31,7 @@ std::wstring GetFileLastModifiedDate(const std::wstring& path);
 QWORD GetFileSize(const std::wstring& path);
 QWORD GetFolderSize(const std::wstring& path, bool recursive);
 
-bool Execute(const std::wstring& path, const std::wstring& parameters = L"");
+bool Execute(const std::wstring& path, const std::wstring& parameters = L"", int show_command = SW_SHOWNORMAL);
 bool ExecuteFile(const std::wstring& path, std::wstring parameters = L"");
 void ExecuteLink(const std::wstring& link);
 

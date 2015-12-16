@@ -124,7 +124,8 @@ QWORD GetFolderSize(const std::wstring& path, bool recursive) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Execute(const std::wstring& path, const std::wstring& parameters) {
+bool Execute(const std::wstring& path, const std::wstring& parameters,
+             int show_command) {
   if (path.empty())
     return false;
 
@@ -132,7 +133,7 @@ bool Execute(const std::wstring& path, const std::wstring& parameters) {
     return ExecuteFile(path, parameters);
 
   auto value = ShellExecute(nullptr, L"open", path.c_str(), parameters.c_str(),
-                            nullptr, SW_SHOWNORMAL);
+                            nullptr, show_command);
   return reinterpret_cast<int>(value) > 32;
 }
 
