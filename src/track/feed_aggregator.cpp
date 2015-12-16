@@ -279,8 +279,6 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     return;
 
   std::wstring app_path;
-  std::wstring parameters;
-
   switch (Settings.GetInt(taiga::kTorrent_Download_AppMode)) {
     case 1:  // Default application
       app_path = GetDefaultAppPath(L".torrent", L"");
@@ -290,9 +288,8 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
       break;
   }
 
-  if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder) &&
-      InStr(app_path, L"utorrent", 0, true) > -1) {
-    std::wstring download_path;
+  std::wstring download_path;
+  if (Settings.GetBool(taiga::kTorrent_Download_UseAnimeFolder)) {
     // Use anime folder as the download folder
     auto anime_id = feed_item.episode_data.anime_id;
     auto anime_item = AnimeDatabase.FindItem(anime_id);
@@ -327,7 +324,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         download_path += anime_title;
         if (!CreateFolder(download_path)) {
           LOG(LevelError, L"Subfolder could not be created.\n"
-              L"Path: " + download_path);
+                          L"Path: " + download_path);
           download_path.clear();
         } else {
           if (anime_item) {
@@ -337,14 +334,27 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         }
       }
     }
-
-    // Set the command line parameter
-    if (!download_path.empty())
-      parameters = L"/directory \"" + download_path + L"\" ";
   }
 
-  parameters += L"\"" + file + L"\"";
-  Execute(app_path, parameters);
+  std::wstring parameters = L"\"" + file + L"\"";
+  int show_command = SW_SHOWNORMAL;
+
+  if (!download_path.empty()) {
+    // uTorrent
+    if (InStr(GetFileName(app_path), L"utorrent", 0, true) > -1) {
+      parameters = L"/directory \"" + download_path + L"\" " + parameters;
+    // Deluge
+    } else if (InStr(GetFileName(app_path), L"deluge", 0, true) > -1) {
+      app_path = GetPathOnly(app_path) + L"deluge-console.exe";
+      parameters = L"add -p \\\"" + download_path + L"\\\" \\\"" + file + L"\\\"";
+      show_command = SW_HIDE;
+    } else {
+      LOG(LevelDebug, L"Application is not a supported torrent client.\n"
+                      L"Path: " + app_path);
+    }
+  }
+
+  Execute(app_path, parameters, show_command);
 }
 
 bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
