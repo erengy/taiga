@@ -191,6 +191,22 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
   LPNMHDR pnmh = reinterpret_cast<LPNMHDR>(lParam);
   switch (pnmh->code) {
+    // Key press
+    case LVN_KEYDOWN: {
+      auto pnkd = reinterpret_cast<LPNMLVKEYDOWN>(pnmh);
+      switch (pnkd->wVKey) {
+        case VK_RETURN: {
+          int anime_id = GetAnimeIdFromSelectedListItem(list_);
+          if (anime::IsValidId(anime_id)) {
+            ShowDlgAnimeInfo(anime_id);
+            return TRUE;
+          }
+          break;
+        }
+      }
+      break;
+    }
+
     // Custom draw
     case NM_CUSTOMDRAW: {
       return OnListCustomDraw(lParam);

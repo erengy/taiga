@@ -294,6 +294,23 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         break;
       }
 
+      // Key press
+      case LVN_KEYDOWN: {
+        auto pnkd = reinterpret_cast<LPNMLVKEYDOWN>(pnmh);
+        switch (pnkd->wVKey) {
+          case VK_RETURN: {
+            auto param = GetParamFromSelectedListItem(list_);
+            if (param) {
+              auto feed_item = reinterpret_cast<FeedItem*>(param);
+              Aggregator.Download(kFeedCategoryLink, feed_item);
+              return TRUE;
+            }
+            break;
+          }
+        }
+        break;
+      }
+
       // Double click
       case NM_DBLCLK: {
         if (list_.GetSelectedCount() > 0) {

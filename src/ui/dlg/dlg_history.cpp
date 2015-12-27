@@ -83,7 +83,8 @@ void HistoryDialog::OnContextMenu(HWND hwnd, POINT pt) {
     if (action == L"Delete()") {
       RemoveSelectedItems();
     } else {
-      ExecuteAction(action);
+      int anime_id = GetAnimeIdFromSelectedListItem(list_);
+      ExecuteAction(action, 0, anime_id);
     }
   }
 }
@@ -108,9 +109,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Double click
       case NM_DBLCLK: {
         if (list_.GetSelectedCount() > 0) {
-          auto lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);
-          int item_index = list_.GetNextItem(-1, LVNI_SELECTED);
-          int anime_id = list_.GetItemParam(item_index);
+          int anime_id = GetAnimeIdFromSelectedListItem(list_);
           ShowDlgAnimeInfo(anime_id);
         }
         break;
@@ -144,10 +143,20 @@ BOOL HistoryDialog::PreTranslateMessage(MSG* pMsg) {
             }
             break;
           }
+          // Display anime information
+          case VK_RETURN: {
+            int anime_id = GetAnimeIdFromSelectedListItem(list_);
+            if (anime::IsValidId(anime_id)) {
+              ShowDlgAnimeInfo(anime_id);
+              return TRUE;
+            }
+            break;
+          }
           // Delete selected items
           case VK_DELETE: {
             if (RemoveSelectedItems())
               return TRUE;
+            break;
           }
         }
       }

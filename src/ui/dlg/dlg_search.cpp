@@ -135,6 +135,22 @@ LRESULT SearchDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         break;
       }
 
+      // Key press
+      case LVN_KEYDOWN: {
+        auto pnkd = reinterpret_cast<LPNMLVKEYDOWN>(pnmh);
+        switch (pnkd->wVKey) {
+          case VK_RETURN: {
+            int anime_id = GetAnimeIdFromSelectedListItem(list_);
+            if (anime::IsValidId(anime_id)) {
+              ShowDlgAnimeInfo(anime_id);
+              return TRUE;
+            }
+            break;
+          }
+        }
+        break;
+      }
+
       // Double click
       case NM_DBLCLK: {
         LPNMITEMACTIVATE lpnmitem = reinterpret_cast<LPNMITEMACTIVATE>(pnmh);

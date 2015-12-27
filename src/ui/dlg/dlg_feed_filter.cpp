@@ -481,7 +481,7 @@ LRESULT FeedFilterDialog::DialogPage1::OnNotify(int idCtrl, LPNMHDR pnmh) {
         }
         // Key press
         case LVN_KEYDOWN: {
-          LPNMLVKEYDOWN pnkd = reinterpret_cast<LPNMLVKEYDOWN>(pnmh);
+          auto pnkd = reinterpret_cast<LPNMLVKEYDOWN>(pnmh);
           switch (pnkd->wVKey) {
             // Delete condition
             case VK_DELETE:

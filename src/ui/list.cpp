@@ -326,6 +326,22 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
 ////////////////////////////////////////////////////////////////////////////////
 
 int GetAnimeIdFromSelectedListItem(win::ListView& listview) {
+  int anime_id = static_cast<int>(GetParamFromSelectedListItem(listview));
+  return anime::IsValidId(anime_id) ? anime_id : anime::ID_UNKNOWN;
+}
+
+std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview) {
+  std::vector<int> anime_ids;
+
+  auto params = GetParamsFromSelectedListItems(listview);
+  for (const auto& param : params) {
+    anime_ids.push_back(static_cast<int>(param));
+  }
+
+  return anime_ids;
+}
+
+LPARAM GetParamFromSelectedListItem(win::ListView& listview) {
   int index = listview.GetNextItem(-1, LVIS_SELECTED);
 
   if (index > -1) {
@@ -334,23 +350,21 @@ int GetAnimeIdFromSelectedListItem(win::ListView& listview) {
       if (focused_index > -1)
         index = focused_index;
     }
-    int anime_id = listview.GetItemParam(index);
-    if (anime::IsValidId(anime_id))
-      return anime_id;
+    return listview.GetItemParam(index);
   }
 
-  return anime::ID_UNKNOWN;
+  return 0;
 }
 
-std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview) {
-  std::vector<int> anime_ids;
+std::vector<LPARAM> GetParamsFromSelectedListItems(win::ListView& listview) {
+  std::vector<LPARAM> params;
 
   int index = -1;
   while ((index = listview.GetNextItem(index, LVIS_SELECTED)) > -1) {
-    anime_ids.push_back(listview.GetItemParam(index));
+    params.push_back(listview.GetItemParam(index));
   };
 
-  return anime_ids;
+  return params;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

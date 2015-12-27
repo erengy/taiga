@@ -232,9 +232,9 @@ void MenuList::UpdateHistoryList(bool enabled) {
   if (menu) {
     // Add to list
     foreach_(it, menu->items) {
-      if (it->action == L"Delete()") {
+      if (it->action == L"Info()" ||
+          it->action == L"Delete()") {
         it->enabled = enabled;
-        break;
       }
     }
   }

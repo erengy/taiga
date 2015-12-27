@@ -54,6 +54,8 @@ int CALLBACK AnimeListCompareProc(LPARAM lParam1, LPARAM lParam2,
 
 int GetAnimeIdFromSelectedListItem(win::ListView& listview);
 std::vector<int> GetAnimeIdsFromSelectedListItems(win::ListView& listview);
+LPARAM GetParamFromSelectedListItem(win::ListView& listview);
+std::vector<LPARAM> GetParamsFromSelectedListItems(win::ListView& listview);
 
 void GetPopupMenuPositionForSelectedListItem(win::ListView& listview, POINT& pt);
 bool HitTestListHeader(win::ListView& listview, POINT pt);

@@ -799,7 +799,7 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
 
     // Key press
     case LVN_KEYDOWN: {
-      LPNMLVKEYDOWN pnkd = reinterpret_cast<LPNMLVKEYDOWN>(lParam);
+      auto pnkd = reinterpret_cast<LPNMLVKEYDOWN>(lParam);
       int anime_id = GetCurrentId();
       auto anime_ids = GetCurrentIds();
       switch (pnkd->wVKey) {

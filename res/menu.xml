@@ -193,7 +193,8 @@
 	
 	<!-- History list menu -->
 	<menu name="HistoryList">
-		<item name="Delete" action="Delete()"/>
+		<item name="Information" action="Info()" default="1"/>
+		<item name="Delete&#9;Del" action="Delete()"/>
 		<item type="separator"/>
 		<item name="Clear history..." action="ClearHistory()"/>
 	</menu>
