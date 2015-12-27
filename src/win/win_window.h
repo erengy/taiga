@@ -75,6 +75,7 @@ public:
   BOOL    GetWindowRect(LPRECT rect) const;
   void    GetWindowRect(HWND hwnd_to, LPRECT rect) const;
   BOOL    Hide() const;
+  BOOL    HideCaret() const;
   BOOL    InvalidateRect(LPCRECT rect = nullptr, BOOL erase = TRUE) const;
   BOOL    IsEnabled() const;
   BOOL    IsIconic() const;

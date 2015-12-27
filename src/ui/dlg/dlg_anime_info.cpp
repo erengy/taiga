@@ -189,6 +189,19 @@ LRESULT AnimeDialog::ImageLabel::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam,
   return WindowProcDefault(hwnd, uMsg, wParam, lParam);
 }
 
+LRESULT AnimeDialog::EditTitle::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  switch (uMsg) {
+    case WM_SETFOCUS: {
+      WindowProcDefault(hwnd, uMsg, wParam, lParam);
+      SetSel(0, 0);
+      HideCaret();
+      return 0;
+    }
+  }
+
+  return WindowProcDefault(hwnd, uMsg, wParam, lParam);
+}
+
 BOOL AnimeDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   if (LOWORD(wParam) == IDC_STATIC_ANIME_IMG &&
       HIWORD(wParam) == STN_CLICKED) {
@@ -535,14 +548,14 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
   // Set title
   if (anime_item) {
     if (Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles)) {
-      SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetEnglishTitle(true).c_str());
+      edit_title_.SetText(anime_item->GetEnglishTitle(true));
     } else {
-      SetDlgItemText(IDC_EDIT_ANIME_TITLE, anime_item->GetTitle().c_str());
+      edit_title_.SetText(anime_item->GetTitle());
     }
   } else if (anime_id_ == anime::ID_NOTINLIST) {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, CurrentEpisode.anime_title().c_str());
+    edit_title_.SetText(CurrentEpisode.anime_title());
   } else {
-    SetDlgItemText(IDC_EDIT_ANIME_TITLE, L"Now Playing");
+    edit_title_.SetText(L"Now Playing");
   }
 
   // Set content

@@ -406,6 +406,10 @@ BOOL Window::Hide() const {
   return ::ShowWindow(window_, SW_HIDE);
 }
 
+BOOL Window::HideCaret() const {
+  return ::HideCaret(window_);
+}
+
 BOOL Window::InvalidateRect(LPCRECT rect, BOOL erase) const {
   return ::InvalidateRect(window_, rect, erase);
 }
