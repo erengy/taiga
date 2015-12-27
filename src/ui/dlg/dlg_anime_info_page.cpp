@@ -170,8 +170,13 @@ void PageSeriesInfo::Refresh(int anime_id, bool connect) {
   if (!anime_item)
     return;
 
-  // Set synonyms
-  std::wstring text = Join(anime_item->GetSynonyms(), L", ");
+  // Set alternative titles
+  std::wstring main_title = Settings.GetBool(taiga::kApp_List_DisplayEnglishTitles) ?
+      anime_item->GetEnglishTitle(true) : anime_item->GetTitle();
+  std::vector<std::wstring> titles;
+  anime::GetAllTitles(anime_id_, titles);
+  titles.erase(std::remove(titles.begin(), titles.end(), main_title), titles.end());
+  std::wstring text = Join(titles, L", ");
   if (text.empty())
     text = L"-";
   SetDlgItemText(IDC_EDIT_ANIME_ALT, text.c_str());
