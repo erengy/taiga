@@ -334,6 +334,9 @@
 # Saenai Heroine no Sodatekata -> ~: Ai to Seishun no Service Kai
 - 23277|8406:0 -> 29317|10225:1
 
+# Saki Achiga-hen: Episode of Side-A -> ~: Specials
+- 10884|6392:13-16 -> 15989|7353:1-4
+
 # Sankarea -> ~ OVA
 - 11499|6521:0 -> 13055|6873:1
 # Sankarea -> ~: Wagahai mo... Zombie de Aru...
