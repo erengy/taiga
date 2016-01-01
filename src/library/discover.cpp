@@ -51,7 +51,7 @@ bool SeasonDatabase::Load(std::wstring file) {
 
   xml_node season_node = document.child(L"season");
 
-  name = XmlReadStrValue(season_node.child(L"info"), L"name");
+  current_season = XmlReadStrValue(season_node.child(L"info"), L"name");
   time_t modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
                                             L"modified").c_str());
 
@@ -79,7 +79,8 @@ bool SeasonDatabase::Load(std::wstring file) {
     } else {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map[current_service_id].empty()) {
-        LOG(LevelDebug, name + L" - No ID for current service: " +
+        LOG(LevelDebug, current_season.GetString() +
+                        L" - No ID for current service: " +
                         XmlReadStrValue(node, L"title"));
         continue;
       }
@@ -128,7 +129,7 @@ bool SeasonDatabase::IsRefreshRequired() {
 
 void SeasonDatabase::Review(bool hide_nsfw) {
   Date date_start, date_end;
-  anime::GetSeasonInterval(name, date_start, date_end);
+  current_season.GetInterval(date_start, date_end);
 
   // Check for invalid items
   for (size_t i = 0; i < items.size(); i++) {

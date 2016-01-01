@@ -628,15 +628,16 @@ void SeasonDialog::RefreshStatus() {
   if (SeasonDatabase.items.empty())
     return;
 
-  std::wstring text = SeasonDatabase.name + L", from " +
-                      anime::TranslateSeasonToMonths(SeasonDatabase.name);
+  std::wstring text = SeasonDatabase.current_season.GetString() + L", from " +
+                      anime::TranslateSeasonToMonths(SeasonDatabase.current_season);
 
   ui::ChangeStatusText(text);
 }
 
 void SeasonDialog::RefreshToolbar() {
-  if (!SeasonDatabase.name.empty())
-    toolbar_.SetButtonText(0, SeasonDatabase.name.c_str());
+  toolbar_.SetButtonText(0, SeasonDatabase.current_season ?
+      SeasonDatabase.current_season.GetString().c_str() :
+      L"Select season");
 
   toolbar_.EnableButton(101, !SeasonDatabase.items.empty());
 

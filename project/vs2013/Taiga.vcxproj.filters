@@ -253,6 +253,9 @@
     <ClCompile Include="..\..\src\library\anime_item.cpp">
       <Filter>library\anime</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\library\anime_season.cpp">
+      <Filter>library\anime</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\library\anime_util.cpp">
       <Filter>library\anime</Filter>
     </ClCompile>
@@ -721,6 +724,9 @@
       <Filter>library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_item.h">
+      <Filter>library\anime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\library\anime_season.h">
       <Filter>library\anime</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\library\anime_util.h">

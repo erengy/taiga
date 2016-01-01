@@ -160,6 +160,7 @@
     <ClCompile Include="..\..\src\library\anime_episode.cpp" />
     <ClCompile Include="..\..\src\library\anime_filter.cpp" />
     <ClCompile Include="..\..\src\library\anime_item.cpp" />
+    <ClCompile Include="..\..\src\library\anime_season.cpp" />
     <ClCompile Include="..\..\src\library\anime_util.cpp" />
     <ClCompile Include="..\..\src\library\anime_util_time.cpp" />
     <ClCompile Include="..\..\src\library\discover.cpp" />
@@ -320,6 +321,7 @@
     <ClInclude Include="..\..\src\library\anime_episode.h" />
     <ClInclude Include="..\..\src\library\anime_filter.h" />
     <ClInclude Include="..\..\src\library\anime_item.h" />
+    <ClInclude Include="..\..\src\library\anime_season.h" />
     <ClInclude Include="..\..\src\library\anime_util.h" />
     <ClInclude Include="..\..\src\library\discover.h" />
     <ClInclude Include="..\..\src\library\history.h" />

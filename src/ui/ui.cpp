@@ -674,7 +674,7 @@ void OnAnimeListHeaderRatingWarning() {
 
 bool OnSeasonRefreshRequired() {
   win::TaskDialog dlg;
-  std::wstring title = L"Season - " + SeasonDatabase.name;
+  std::wstring title = L"Season - " + SeasonDatabase.current_season.GetString();
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
