@@ -24,6 +24,7 @@
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
+#include "library/anime_season.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "sync/manager.h"
@@ -37,10 +38,17 @@ library::SeasonDatabase SeasonDatabase;
 
 namespace library {
 
-bool SeasonDatabase::Load(std::wstring file) {
+SeasonDatabase::SeasonDatabase()
+    : available_seasons({anime::Season::kWinter, 2011},
+                        {anime::Season::kFall, 2015}) {
+}
+
+bool SeasonDatabase::Load(const anime::Season& season) {
   items.clear();
 
   xml_document document;
+  std::wstring file = ToWstr(season.year) + L"_" +
+                      ToLower_Copy(season.GetName()) + L".xml";
   std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + file;
   xml_parse_result parse_result = document.load_file(path.c_str());
 

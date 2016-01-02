@@ -30,6 +30,10 @@ Season::Season()
     : name(kUnknown), year(0) {
 }
 
+Season::Season(Name name, unsigned short year)
+    : name(name), year(year) {
+}
+
 Season::Season(const Date& date) {
   year = date.year;
 
@@ -75,8 +79,28 @@ Season& Season::operator=(const Season& season) {
   return *this;
 }
 
+Season& Season::operator++() {
+  switch (name) {
+    case kWinter:
+      name = kSpring;
+      break;
+    case kSpring:
+      name = kSummer;
+      break;
+    case kSummer:
+      name = kFall;
+      break;
+    case kFall:
+      name = kWinter;
+      ++year;
+      break;
+  }
+
+  return *this;
+}
+
 Season::operator bool() const {
-  return name != kUnknown;
+  return name != kUnknown && year > 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +124,18 @@ void Season::GetInterval(Date& date_start, Date& date_end) const {
   date_end.year = year;
   date_end.month = interval[name].second;
   date_end.day = days_in_months[date_end.month - 1];
+}
+
+std::wstring Season::GetName() const {
+  static std::map<Season::Name, std::wstring> seasons{
+    {kUnknown, L"Unknown"},
+    {kWinter, L"Winter"},
+    {kSpring, L"Spring"},
+    {kSummer, L"Summer"},
+    {kFall, L"Fall"},
+  };
+
+  return seasons[name];
 }
 
 std::wstring Season::GetString() const {

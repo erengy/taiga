@@ -22,6 +22,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
+#include "library/discover.h"
 #include "sync/sync.h"
 #include "taiga/settings.h"
 #include "ui/menu.h"
@@ -301,8 +302,33 @@ void MenuList::UpdateTorrentsList(bool enabled) {
 }
 
 void MenuList::UpdateSeason() {
+  // Select season
+  auto menu = menu_list_.FindMenu(L"SeasonSelect");
+  if (menu) {
+    menu->items.clear();
+    const auto& season_min = SeasonDatabase.available_seasons.first;
+    const auto& season_max = SeasonDatabase.available_seasons.second;
+    int current_year = 0;
+    for (auto season = season_min; season <= season_max; ++season) {
+      win::Menu* submenu = nullptr;
+      std::wstring submenu_name = L"Season" + ToWstr(season.year);
+      submenu = menu_list_.FindMenu(submenu_name.c_str());
+      if (!submenu) {
+        menu_list_.Create(submenu_name.c_str(), L"");
+        submenu = menu_list_.FindMenu(submenu_name.c_str());
+      }
+      if (current_year == 0 || current_year != season.year) {
+        menu->CreateItem(L"", ToWstr(season.year), submenu_name);
+        submenu->items.clear();
+        current_year = season.year;
+      }
+      submenu->CreateItem(L"Season_Load(" + season.GetString() + L")",
+                          season.GetString());
+    }
+  }
+
   // Group by
-  auto menu = menu_list_.FindMenu(L"SeasonGroup");
+  menu = menu_list_.FindMenu(L"SeasonGroup");
   if (menu) {
     foreach_(it, menu->items) {
       it->checked = false;

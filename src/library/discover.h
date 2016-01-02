@@ -27,9 +27,11 @@ namespace library {
 
 class SeasonDatabase {
 public:
+  SeasonDatabase();
+
   // Loads season data from db\season\<seasonname>.xml, returns false if no such
   // file exists.
-  bool Load(std::wstring file);
+  bool Load(const anime::Season& season);
 
   // Checkes if a significant portion of season data is empty and requires
   // refreshing.
@@ -44,6 +46,9 @@ public:
 
   // Current season (e.g. "Spring 2012")
   anime::Season current_season;
+
+  // Available seasons
+  std::pair<anime::Season, anime::Season> available_seasons;
 };
 
 }  // namespace library

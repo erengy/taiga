@@ -201,41 +201,7 @@
 	
 	<!-- Season browser -->
 	<menu name="SeasonSelect">
-		<item name="2015" sub="Season2015"/>
-		<item name="2014" sub="Season2014"/>
-		<item name="2013" sub="Season2013"/>
-		<item name="2012" sub="Season2012"/>
-		<item name="2011" sub="Season2011"/>
-	</menu>
-	<menu name="Season2015">
-		<item name="Fall 2015"   action="Season_Load(2015_fall.xml)"/>
-		<item name="Summer 2015" action="Season_Load(2015_summer.xml)"/>
-		<item name="Spring 2015" action="Season_Load(2015_spring.xml)"/>
-		<item name="Winter 2015" action="Season_Load(2015_winter.xml)"/>
-	</menu>
-	<menu name="Season2014">
-		<item name="Fall 2014"   action="Season_Load(2014_fall.xml)"/>
-		<item name="Summer 2014" action="Season_Load(2014_summer.xml)"/>
-		<item name="Spring 2014" action="Season_Load(2014_spring.xml)"/>
-		<item name="Winter 2014" action="Season_Load(2014_winter.xml)"/>
-	</menu>
-	<menu name="Season2013">
-		<item name="Fall 2013"   action="Season_Load(2013_fall.xml)"/>
-		<item name="Summer 2013" action="Season_Load(2013_summer.xml)"/>
-		<item name="Spring 2013" action="Season_Load(2013_spring.xml)"/>
-		<item name="Winter 2013" action="Season_Load(2013_winter.xml)"/>
-	</menu>
-	<menu name="Season2012">
-		<item name="Fall 2012"   action="Season_Load(2012_fall.xml)"/>
-		<item name="Summer 2012" action="Season_Load(2012_summer.xml)"/>
-		<item name="Spring 2012" action="Season_Load(2012_spring.xml)"/>
-		<item name="Winter 2012" action="Season_Load(2012_winter.xml)"/>
-	</menu>
-	<menu name="Season2011">
-		<item name="Fall 2011"   action="Season_Load(2011_fall.xml)"/>
-		<item name="Summer 2011" action="Season_Load(2011_summer.xml)"/>
-		<item name="Spring 2011" action="Season_Load(2011_spring.xml)"/>
-		<item name="Winter 2011" action="Season_Load(2011_winter.xml)"/>
+		<!-- Note: Overwritten -->
 	</menu>
 	<menu name="SeasonGroup">
 		<item name="Airing status" action="Season_GroupBy(0)" radio="1"/>

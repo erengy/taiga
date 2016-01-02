@@ -29,15 +29,6 @@ namespace anime {
 
 class Season : public base::Comparable<Season> {
 public:
-  Season();
-  Season(const Date& date);
-  Season(const std::wstring& str);
-  ~Season() {}
-
-  Season& operator = (const Season& season);
-
-  operator bool() const;
-
   enum Name {
     kUnknown,
     kWinter,
@@ -46,7 +37,19 @@ public:
     kFall
   };
 
+  Season();
+  Season(Name name, unsigned short year);
+  Season(const Date& date);
+  Season(const std::wstring& str);
+  ~Season() {}
+
+  Season& operator = (const Season& season);
+  Season& operator ++ ();
+
+  operator bool() const;
+
   void GetInterval(Date& date_start, Date& date_end) const;
+  std::wstring GetName() const;
   std::wstring GetString() const;
 
   Name name;
