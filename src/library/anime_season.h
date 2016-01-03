@@ -45,6 +45,7 @@ public:
 
   Season& operator = (const Season& season);
   Season& operator ++ ();
+  Season& operator -- ();
 
   operator bool() const;
 

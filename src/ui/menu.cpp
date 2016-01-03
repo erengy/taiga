@@ -309,7 +309,7 @@ void MenuList::UpdateSeason() {
     const auto& season_min = SeasonDatabase.available_seasons.first;
     const auto& season_max = SeasonDatabase.available_seasons.second;
     int current_year = 0;
-    for (auto season = season_min; season <= season_max; ++season) {
+    for (auto season = season_max; season >= season_min; --season) {
       win::Menu* submenu = nullptr;
       std::wstring submenu_name = L"Season" + ToWstr(season.year);
       submenu = menu_list_.FindMenu(submenu_name.c_str());

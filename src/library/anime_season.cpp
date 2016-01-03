@@ -99,6 +99,26 @@ Season& Season::operator++() {
   return *this;
 }
 
+Season& Season::operator--() {
+  switch (name) {
+    case kWinter:
+      name = kFall;
+      --year;
+      break;
+    case kSpring:
+      name = kWinter;
+      break;
+    case kSummer:
+      name = kSpring;
+      break;
+    case kFall:
+      name = kSummer;
+      break;
+  }
+
+  return *this;
+}
+
 Season::operator bool() const {
   return name != kUnknown && year > 0;
 }
