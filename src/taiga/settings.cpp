@@ -212,6 +212,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_Option_EnableRecognition, L"true", L"program/general/enablerecognition");
   INITKEY(kApp_Option_EnableSharing, L"true", L"program/general/enablesharing");
   INITKEY(kApp_Option_EnableSync, L"true", L"program/general/enablesync");
+  INITKEY(kApp_Seasons_LastSeason, nullptr, L"program/seasons/lastseason");
 
   #undef INITKEY
 }

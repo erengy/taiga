@@ -98,6 +98,12 @@ BOOL SeasonDialog::OnInitDialog() {
   rebar_.InsertBand(toolbar_.GetWindowHandle(), GetSystemMetrics(SM_CXSCREEN), 0, 0, 0, 0, 0, 0,
                     HIWORD(toolbar_.GetButtonSize()) + (HIWORD(toolbar_.GetPadding()) / 2), fMask, fStyle);
 
+  // Load the last selected season
+  const auto last_season = Settings[taiga::kApp_Seasons_LastSeason];
+  if (!last_season.empty())
+    if (SeasonDatabase.Load(last_season))
+      SeasonDatabase.Review();
+
   // Refresh
   RefreshList();
   RefreshStatus();

@@ -519,6 +519,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Loads season data.
   } else if (action == L"Season_Load") {
     if (SeasonDatabase.Load(body)) {
+      Settings.Set(taiga::kApp_Seasons_LastSeason, body);
       SeasonDatabase.Review();
       ui::DlgSeason.RefreshList();
       ui::DlgSeason.RefreshStatus();
@@ -526,6 +527,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       if (SeasonDatabase.IsRefreshRequired())
         if (ui::OnSeasonRefreshRequired())
           ui::DlgSeason.RefreshData();
+    } else {
+      Settings.Set(taiga::kApp_Seasons_LastSeason, L"");
     }
 
   // Season_GroupBy(group)

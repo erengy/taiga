@@ -152,6 +152,7 @@ enum AppSettingName {
   kApp_Option_EnableRecognition,
   kApp_Option_EnableSharing,
   kApp_Option_EnableSync,
+  kApp_Seasons_LastSeason,
 
   kAppSettingNameLast  // used for iteration
 };
