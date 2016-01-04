@@ -518,15 +518,11 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // Season_Load(file)
   //   Loads season data.
   } else if (action == L"Season_Load") {
-    if (SeasonDatabase.Load(body)) {
-      Settings.Set(taiga::kApp_Seasons_LastSeason, body);
+    if (SeasonDatabase.LoadSeason(body)) {
+      Settings.Set(taiga::kApp_Seasons_LastSeason,
+                   SeasonDatabase.current_season.GetString());
       SeasonDatabase.Review();
-      ui::DlgSeason.RefreshList();
-      ui::DlgSeason.RefreshStatus();
-      ui::DlgSeason.RefreshToolbar();
-      if (SeasonDatabase.IsRefreshRequired())
-        if (ui::OnSeasonRefreshRequired())
-          ui::DlgSeason.RefreshData();
+      ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
     }
 
   // Season_GroupBy(group)

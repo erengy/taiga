@@ -22,6 +22,7 @@
 #include "base/string.h"
 #include "base/url.h"
 #include "library/anime_util.h"
+#include "library/discover.h"
 #include "library/resource.h"
 #include "sync/manager.h"
 #include "taiga/announce.h"
@@ -217,6 +218,21 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         auto feed = reinterpret_cast<Feed*>(response.parameter);
         if (feed)
           Aggregator.HandleFeedDownload(*feed, client.write_buffer_);
+      }
+      break;
+    }
+
+    case kHttpSeasonsGet: {
+      auto filename = GetFileName(client.request().url.path);
+      auto path = GetPath(kPathDatabaseSeason) + filename;
+      if (SaveToFile(client.write_buffer_, path) &&
+          SeasonDatabase.LoadFile(filename)) {
+        Settings.Set(taiga::kApp_Seasons_LastSeason,
+                     SeasonDatabase.current_season.GetString());
+        SeasonDatabase.Review();
+        ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
+      } else {
+        ui::OnSeasonLoadFail();
       }
       break;
     }

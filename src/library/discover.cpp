@@ -18,6 +18,7 @@
 
 #include <algorithm>
 
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -29,9 +30,11 @@
 #include "library/discover.h"
 #include "sync/manager.h"
 #include "sync/service.h"
+#include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "ui/dlg/dlg_season.h"
 #include "ui/ui.h"
 
 library::SeasonDatabase SeasonDatabase;
@@ -45,25 +48,56 @@ SeasonDatabase::SeasonDatabase()
                       L"/erengy/taiga/master/data/db/season/") {
 }
 
-bool SeasonDatabase::Load(const anime::Season& season) {
-  items.clear();
+bool SeasonDatabase::LoadSeason(const anime::Season& season) {
+  std::wstring filename =
+      ToWstr(season.year) + L"_" + ToLower_Copy(season.GetName()) + L".xml";
 
-  xml_document document;
-  std::wstring file = ToWstr(season.year) + L"_" +
-                      ToLower_Copy(season.GetName()) + L".xml";
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + file;
-  xml_parse_result parse_result = document.load_file(path.c_str());
+  return LoadFile(filename);
+}
 
-  if (parse_result.status != pugi::status_ok) {
-    ui::DisplayErrorMessage(L"Could not read season data.", path.c_str());
+bool SeasonDatabase::LoadFile(const std::wstring& filename) {
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + filename;
+
+  std::string document;
+
+  if (!ReadFromFile(path, document)) {
+    LOG(LevelWarning, L"Could not find anime season file.\n"
+                      L"Path: " + path);
+
+    // Try to download from remote location
+    if (!remote_location.empty()) {
+      ui::ChangeStatusText(L"Downloading anime season data...");
+      ui::DlgSeason.EnableInput(false);
+      HttpRequest http_request;
+      http_request.url = remote_location + filename;
+      ConnectionManager.MakeRequest(http_request, taiga::kHttpSeasonsGet);
+    }
+
     return false;
   }
+
+  if (!LoadString(StrToWstr(document))) {
+    ui::DisplayErrorMessage(L"Could not read anime season file.", path.c_str());
+    return false;
+  }
+
+  return true;
+}
+
+bool SeasonDatabase::LoadString(const std::wstring& data) {
+  xml_document document;
+  xml_parse_result parse_result = document.load_string(data.c_str());
+
+  if (parse_result.status != pugi::status_ok)
+    return false;
 
   xml_node season_node = document.child(L"season");
 
   current_season = XmlReadStrValue(season_node.child(L"info"), L"name");
   time_t modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
                                             L"modified").c_str());
+
+  items.clear();
 
   foreach_xmlnode_(node, season_node, L"anime") {
     std::map<enum_t, std::wstring> id_map;
@@ -97,8 +131,9 @@ bool SeasonDatabase::Load(const anime::Season& season) {
 
       anime::Item item;
       item.SetSource(current_service_id);
-      foreach_(it, id_map)
+      foreach_(it, id_map) {
         item.SetId(it->second, it->first);
+      }
       item.SetLastModified(modified);
       item.SetTitle(XmlReadStrValue(node, L"title"));
       item.SetType(XmlReadIntValue(node, L"type"));

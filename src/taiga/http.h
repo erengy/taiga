@@ -44,6 +44,8 @@ enum HttpClientMode {
   kHttpFeedCheck,
   kHttpFeedCheckAuto,
   kHttpFeedDownload,
+  // Seasons
+  kHttpSeasonsGet,
   // Twitter
   kHttpTwitterRequest,
   kHttpTwitterAuth,

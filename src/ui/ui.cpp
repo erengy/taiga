@@ -112,6 +112,10 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       ChangeStatusText(error);
       DlgTorrent.EnableInput();
       break;
+    case taiga::kHttpSeasonsGet:
+      ChangeStatusText(error);
+      DlgSeason.EnableInput();
+      break;
     case taiga::kHttpTwitterRequest:
     case taiga::kHttpTwitterAuth:
     case taiga::kHttpTwitterPost:
@@ -190,6 +194,9 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
       break;
     case taiga::kHttpFeedDownload:
       status = L"Downloading torrent file...";
+      break;
+    case taiga::kHttpSeasonsGet:
+      status = L"Downloading anime season data...";
       break;
     case taiga::kHttpTwitterRequest:
       status = L"Connecting to Twitter...";
@@ -670,6 +677,23 @@ void OnAnimeListHeaderRatingWarning() {
                  L"MyAnimeList doesn't provide a way to get them in batch.");
   dlg.AddButton(L"OK", IDOK);
   dlg.Show(DlgMain.GetWindowHandle());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void OnSeasonLoad(bool refresh) {
+  DlgSeason.RefreshList();
+  DlgSeason.RefreshStatus();
+  DlgSeason.RefreshToolbar();
+  DlgSeason.EnableInput();
+
+  if (refresh && OnSeasonRefreshRequired())
+    DlgSeason.RefreshData();
+}
+
+void OnSeasonLoadFail() {
+  ChangeStatusText(L"Could not load anime season data.");
+  DlgSeason.EnableInput();
 }
 
 bool OnSeasonRefreshRequired() {

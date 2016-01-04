@@ -40,6 +40,7 @@ public:
   void OnSize(UINT uMsg, UINT nType, SIZE size);
   LRESULT OnToolbarNotify(LPARAM lParam);
 
+  void EnableInput(bool enable = true);
   void RefreshData(int anime_id = 0);
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();

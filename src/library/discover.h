@@ -31,7 +31,9 @@ public:
 
   // Loads season data from db\season\<seasonname>.xml, returns false if no such
   // file exists.
-  bool Load(const anime::Season& season);
+  bool LoadSeason(const anime::Season& season);
+  bool LoadFile(const std::wstring& filename);
+  bool LoadString(const std::wstring& data);
 
   // Checkes if a significant portion of season data is empty and requires
   // refreshing.

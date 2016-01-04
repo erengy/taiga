@@ -101,7 +101,7 @@ BOOL SeasonDialog::OnInitDialog() {
   // Load the last selected season
   const auto last_season = Settings[taiga::kApp_Seasons_LastSeason];
   if (!last_season.empty()) {
-    if (SeasonDatabase.Load(last_season)) {
+    if (SeasonDatabase.LoadSeason(last_season)) {
       SeasonDatabase.Review();
     } else {
       Settings.Set(taiga::kApp_Seasons_LastSeason, std::wstring());
@@ -507,6 +507,11 @@ LRESULT SeasonDialog::OnToolbarNotify(LPARAM lParam) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void SeasonDialog::EnableInput(bool enable) {
+  toolbar_.Enable(enable);
+  list_.Enable(enable);
+}
 
 void SeasonDialog::RefreshData(int anime_id) {
   ui::SetSharedCursor(IDC_WAIT);
