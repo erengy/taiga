@@ -527,8 +527,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       if (SeasonDatabase.IsRefreshRequired())
         if (ui::OnSeasonRefreshRequired())
           ui::DlgSeason.RefreshData();
-    } else {
-      Settings.Set(taiga::kApp_Seasons_LastSeason, L"");
     }
 
   // Season_GroupBy(group)

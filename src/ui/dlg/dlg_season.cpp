@@ -100,9 +100,13 @@ BOOL SeasonDialog::OnInitDialog() {
 
   // Load the last selected season
   const auto last_season = Settings[taiga::kApp_Seasons_LastSeason];
-  if (!last_season.empty())
-    if (SeasonDatabase.Load(last_season))
+  if (!last_season.empty()) {
+    if (SeasonDatabase.Load(last_season)) {
       SeasonDatabase.Review();
+    } else {
+      Settings.Set(taiga::kApp_Seasons_LastSeason, std::wstring());
+    }
+  }
 
   // Refresh
   RefreshList();
