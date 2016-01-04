@@ -49,6 +49,7 @@ public:
 
   // Available seasons
   std::pair<anime::Season, anime::Season> available_seasons;
+  std::wstring remote_location;
 };
 
 }  // namespace library
