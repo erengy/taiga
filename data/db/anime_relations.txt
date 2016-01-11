@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-12-29
+- last_modified: 2016-01-11
 
 ::rules
 
@@ -142,6 +142,9 @@
 
 # Gatchaman Crowds Insight -> ~: Inbound
 - 21039|8180:0 -> 30925|11033:1
+
+# Gate: Jieitai Kanochi nite, Kaku Tatakaeri -> ~ 2nd Season
+- 28907|10085:13-24 -> 31637|11376:1-12!
 
 # Gintama -> ~'
 - 918|818:202-252 -> 9969|5971:1-51!
