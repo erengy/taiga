@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2015-12-29
+- last_modified: 2016-11-11
 
 ::rules
 
@@ -40,6 +40,9 @@
 
 # Acchi Kocchi (TV) -> ~: Place=Princess
 - 12291|6701:13 -> 16273|7401:1
+
+# Akagami no Shirayuki-hime -> ~ 2nd Season
+- 30123|10621:13-24 -> 31173:11179:1-12!
 
 # Akuma no Riddle -> ~: Shousha wa Dare? Nukiuchi Test
 - 19429|7844:13 -> 24751|8724:1
