@@ -118,12 +118,19 @@
 	</menu>
 	<!-- Edit -->
 	<menu name="Edit">
+		<item name="Set &date"          sub="EditDate"/>
 		<item name="Set &episode..." action="EditEpisode()"/>
 		<item name="Set sco&re"         sub="EditScore"/>
 		<item name="Set &status"        sub="EditStatus"/>
 		<item name="Set &tags..."    action="EditTags()"/>
 		<item type="separator"/>
-		<item name="&Delete from list...&#9;Del" action="EditDelete()"/>
+		<item name="Delete from &list...&#9;Del" action="EditDelete()"/>
+	</menu>
+	<!-- Date -->
+	<menu name="EditDate">
+		<item name="Clear date started"   action="EditDateClear(0)"/>
+		<item name="Clear date completed" action="EditDateClear(1)"/>
+		<item name="Clear both dates"     action="EditDateClear(2)"/>
 	</menu>
 	<!-- Score -->
 	<menu name="EditScore">

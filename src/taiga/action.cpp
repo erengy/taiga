@@ -346,6 +346,23 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     int anime_id = body.empty() ? static_cast<int>(lParam) : ToInt(body);
     ui::ShowDlgAnimeEdit(anime_id);
 
+  // EditDateClear(value)
+  //   Clears date started (0), date completed (1), or both (2).
+  //   lParam is a pointer to a vector of anime IDs.
+  } else if (action == L"EditDateClear") {
+    const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);
+    for (const auto& anime_id : anime_ids) {
+      HistoryItem history_item;
+      history_item.anime_id = anime_id;
+      int value = ToInt(body);
+      if (value == 0 || value == 2)
+        history_item.date_start = Date();
+      if (value == 1 || value == 2)
+        history_item.date_finish = Date();
+      history_item.mode = taiga::kHttpServiceUpdateLibraryEntry;
+      History.queue.Add(history_item);
+    }
+
   // EditDelete()
   //   Removes an anime from list.
   //   lParam is a pointer to a vector of anime IDs.
