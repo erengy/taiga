@@ -311,7 +311,8 @@ void MenuList::UpdateSeason() {
     auto create_item = [](win::Menu& menu, const anime::Season& season) {
       menu.CreateItem(L"Season_Load(" + season.GetString() + L")",
                       season.GetString(), L"",
-                      season == SeasonDatabase.current_season);
+                      season == SeasonDatabase.current_season,
+                      false, true, false, true);
     };
     // Add latest seasons
     for (auto season = season_max; season >= season_min; --season) {
