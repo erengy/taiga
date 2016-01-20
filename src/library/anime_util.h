@@ -84,6 +84,7 @@ void DecrementEpisode(int anime_id);
 void IncrementEpisode(int anime_id);
 
 void GetAllTitles(int anime_id, std::vector<std::wstring>& titles);
+int GetMyRewatchedTimes(const Item& item);
 void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watched);
 
 std::wstring TranslateMyStatus(int value, bool add_count);

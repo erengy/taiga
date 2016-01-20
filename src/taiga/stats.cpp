@@ -72,7 +72,8 @@ int Statistics::CalculateEpisodeCount() {
       continue;
 
     episode_count += it->second.GetMyLastWatchedEpisode();
-    episode_count += it->second.GetMyRewatchedTimes() * it->second.GetEpisodeCount();
+    episode_count += anime::GetMyRewatchedTimes(it->second) *
+                     it->second.GetEpisodeCount();
   }
 
   return episode_count;
@@ -101,7 +102,8 @@ const std::wstring& Statistics::CalculateLifeSpentWatching() {
     }
 
     int episodes_watched = it->second.GetMyLastWatchedEpisode();
-    episodes_watched += it->second.GetMyRewatchedTimes() * it->second.GetEpisodeCount();
+    episodes_watched += anime::GetMyRewatchedTimes(it->second) *
+                        it->second.GetEpisodeCount();
 
     seconds += (duration * 60) * episodes_watched;
   }
