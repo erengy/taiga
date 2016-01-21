@@ -113,15 +113,17 @@ static bool ValidateAnitomyElement(std::wstring str,
 }
 
 bool Engine::IsBatchRelease(const anime::Episode& episode) const {
-  const auto category = anitomy::kElementReleaseInformation;
+  const auto& elements = episode.elements();
 
-  if (episode.elements().empty(category))
-    return false;
+  if (!elements.empty(anitomy::kElementVolumeNumber))
+    return true;  // A volume is always a batch release
 
-  auto keywords = episode.elements().get_all(category);
-  for (const auto& keyword : keywords) {
-    if (IsEqual(keyword, L"Batch"))
-      return true;
+  if (!elements.empty(anitomy::kElementReleaseInformation)) {
+    auto keywords = elements.get_all(anitomy::kElementReleaseInformation);
+    for (const auto& keyword : keywords) {
+      if (IsEqual(keyword, L"Batch"))
+        return true;
+    }
   }
 
   return false;

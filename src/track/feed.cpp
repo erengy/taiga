@@ -94,9 +94,6 @@ TorrentCategory FeedItem::GetTorrentCategory() const {
   if (InStr(category, L"Batch") > -1)  // Respect feed's own categorization
     return kTorrentCategoryBatch;
 
-  if (InStr(title, L"Vol.") > -1)  // A volume is always a batch release
-    return kTorrentCategoryBatch;
-
   if (Meow.IsBatchRelease(episode_data))
     return kTorrentCategoryBatch;
 
