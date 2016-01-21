@@ -25,7 +25,7 @@
 
 namespace anime {
 
-typedef std::pair<int, int> episode_number_range_t;
+typedef std::pair<int, int> number_range_t;
 
 class Episode {
  public:
@@ -35,15 +35,16 @@ class Episode {
   void Clear();
   void Set(int anime_id);
 
+  anitomy::Elements& elements();
+  const anitomy::Elements& elements() const;
+
   int anime_season() const;
   const std::wstring& anime_title() const;
   const std::wstring& anime_type() const;
   int anime_year() const;
   std::wstring audio_terms() const;
-  anitomy::Elements& elements();
-  const anitomy::Elements& elements() const;
   int episode_number() const;
-  episode_number_range_t episode_number_range() const;
+  number_range_t episode_number_range() const;
   const std::wstring& episode_title() const;
   const std::wstring& file_checksum() const;
   const std::wstring& file_extension() const;
@@ -53,6 +54,8 @@ class Episode {
   int release_version() const;
   const std::wstring& video_resolution() const;
   std::wstring video_terms() const;
+  int volume_number() const;
+  number_range_t volume_number_range() const;
 
   void set_anime_season(int value);
   void set_anime_title(const std::wstring& str);
@@ -70,19 +73,21 @@ class Episode {
   void set_release_version(int value);
   void set_video_resolution(const std::wstring& str);
   void set_video_terms(const std::wstring& str);
+  void set_volume_number(int value);
+
+  int GetElementAsInt(anitomy::ElementCategory category, int default_value = 0) const;
+  const std::wstring& GetElementAsString(anitomy::ElementCategory category) const;
+  number_range_t GetElementAsRange(anitomy::ElementCategory category) const;
+  std::wstring GetElementsAsString(anitomy::ElementCategory category) const;
+
+  void SetElementValue(anitomy::ElementCategory category, int value);
+  void SetElementValue(anitomy::ElementCategory category, const std::wstring& str);
 
   int anime_id;
   std::wstring folder;
   bool processed;
 
 private:
-  int GetElementAsInt(anitomy::ElementCategory category, int default_value = 0) const;
-  const std::wstring& GetElementAsString(anitomy::ElementCategory category) const;
-  std::wstring GetElementsAsString(anitomy::ElementCategory category) const;
-
-  void SetElementValue(anitomy::ElementCategory category, int value);
-  void SetElementValue(anitomy::ElementCategory category, const std::wstring& str);
-
   anitomy::Elements elements_;
 };
 

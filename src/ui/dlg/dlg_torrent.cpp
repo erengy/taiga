@@ -429,7 +429,11 @@ void TorrentDialog::RefreshList() {
       group = kTorrentCategoryOther;
       title = it->title;
     }
-    number = anime::GetEpisodeRange(it->episode_data);
+    if (!it->episode_data.elements().empty(anitomy::kElementEpisodeNumber)) {
+      number = anime::GetEpisodeRange(it->episode_data);
+    } else if (!it->episode_data.elements().empty(anitomy::kElementVolumeNumber)) {
+      number = L"Vol. " + GetVolumeRange(it->episode_data);
+    }
     if (it->episode_data.release_version() != 1) {
       number += L"v" + ToWstr(it->episode_data.release_version());
     }

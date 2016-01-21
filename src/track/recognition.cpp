@@ -166,7 +166,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
     if (episode.elements().empty(anitomy::kElementEpisodeNumber)) {
       if (!episode.file_extension().empty()) {
         episode.set_episode_number(1);
-      } else {
+      } else if (episode.elements().empty(anitomy::kElementVolumeNumber)) {
         auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
         if (anime_item) {
           int episode_count = anime_item->GetEpisodeCount();

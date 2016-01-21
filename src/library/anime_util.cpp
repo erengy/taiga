@@ -612,6 +612,22 @@ int GetEpisodeLow(const Episode& episode) {
   return episode.episode_number_range().first;
 }
 
+static std::wstring GetElementRange(anitomy::ElementCategory category,
+                                    const Episode& episode) {
+  const auto element_count = episode.elements().count(category);
+
+  if (element_count > 1) {
+    const auto range = episode.GetElementAsRange(category);
+    if (range.second > range.first)
+      return ToWstr(range.first) + L"-" + ToWstr(range.second);
+  }
+
+  if (element_count > 0)
+    return ToWstr(episode.GetElementAsInt(category));
+
+  return std::wstring();
+}
+
 std::wstring GetEpisodeRange(const Episode& episode) {
   if (IsEpisodeRange(episode))
     return ToWstr(GetEpisodeLow(episode)) + L"-" +
@@ -623,7 +639,11 @@ std::wstring GetEpisodeRange(const Episode& episode) {
   return std::wstring();
 }
 
-std::wstring GetEpisodeRange(const episode_number_range_t& range) {
+std::wstring GetVolumeRange(const Episode& episode) {
+  return GetElementRange(anitomy::kElementVolumeNumber, episode);
+}
+
+std::wstring GetEpisodeRange(const number_range_t& range) {
   if (range.second > range.first)
     return ToWstr(range.first) + L"-" + ToWstr(range.second);
 
