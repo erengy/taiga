@@ -26,6 +26,7 @@
 namespace anime {
 class Item;
 }
+class FeedItem;
 
 namespace ui {
 
@@ -45,7 +46,7 @@ public:
   void UpdateScore(const anime::Item* anime_item);
   void UpdateSearchList(bool enabled = false);
   void UpdateSeasonList(bool enabled = false);
-  void UpdateTorrentsList(bool enabled = false);
+  void UpdateTorrentsList(const FeedItem& feed_item);
   void UpdateSeason();
   void UpdateTools();
   void UpdateTray();

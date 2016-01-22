@@ -87,6 +87,7 @@ public:
   bool operator<(const FeedItem& item) const;
   bool operator==(const FeedItem& item) const;
 
+  std::wstring info_link;
   std::wstring magnet_link;
   FeedItemState state;
 

@@ -24,6 +24,7 @@
 #include "library/anime_util.h"
 #include "sync/sync.h"
 #include "taiga/settings.h"
+#include "track/feed.h"
 #include "ui/menu.h"
 
 #include "dlg/dlg_anime_list.h"
@@ -285,16 +286,20 @@ void MenuList::UpdateSeasonList(bool enabled) {
   }
 }
 
-void MenuList::UpdateTorrentsList(bool enabled) {
+void MenuList::UpdateTorrentsList(const FeedItem& feed_item) {
   auto menu = menu_list_.FindMenu(L"TorrentListRightClick");
   if (menu) {
+    bool anime_identified = anime::IsValidId(feed_item.episode_data.anime_id);
     foreach_(it, menu->items) {
       // Info
       if (it->action == L"Info") {
-        it->enabled = enabled;
+        it->enabled = anime_identified;
+      // Torrent info
+      } else if (it->action == L"TorrentInfo") {
+        it->enabled = !feed_item.info_link.empty();
       // Quick filters
       } else if (it->submenu == L"QuickFilters") {
-        it->enabled = enabled;
+        it->enabled = anime_identified;
       }
     }
   }

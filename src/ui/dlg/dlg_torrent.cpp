@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/file.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "base/url.h"
@@ -162,7 +163,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
   if (pt.x == -1 || pt.y == -1)
     GetPopupMenuPositionForSelectedListItem(list_, pt);
 
-  ui::Menus.UpdateTorrentsList(anime::IsValidId(feed_item->episode_data.anime_id));
+  ui::Menus.UpdateTorrentsList(*feed_item);
   std::wstring answer = ui::Menus.Show(GetWindowHandle(), pt.x, pt.y, L"TorrentListRightClick");
 
   if (answer == L"DownloadTorrent") {
@@ -170,6 +171,9 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
 
   } else if (answer == L"Info") {
     ShowDlgAnimeInfo(feed_item->episode_data.anime_id);
+
+  } else if (answer == L"TorrentInfo") {
+    ExecuteLink(feed_item->info_link);
 
   } else if (answer == L"DiscardTorrent") {
     feed_item->state = kFeedItemDiscardedNormal;

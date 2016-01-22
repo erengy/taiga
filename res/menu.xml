@@ -273,8 +273,9 @@
 	
 	<!-- Torrent list right click -->
 	<menu name="TorrentListRightClick">
-		<item name="Download" action="DownloadTorrent" default="1"/>
-		<item name="Information" action="Info"/>
+		<item name="Download torrent" action="DownloadTorrent" default="1"/>
+		<item name="View anime information" action="Info"/>
+		<item name="View torrent information" action="TorrentInfo"/>
 		<item type="separator"/>
 		<item name="Discard" action="DiscardTorrent"/>
 		<item name="Quick filters" sub="QuickFilters"/>
