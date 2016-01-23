@@ -528,14 +528,14 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // Season_GroupBy(group)
   //   Groups season data.
   } else if (action == L"Season_GroupBy") {
-    ui::DlgSeason.group_by = ToInt(body);
+    Settings.Set(taiga::kApp_Seasons_GroupBy, ToInt(body));
     ui::DlgSeason.RefreshList();
     ui::DlgSeason.RefreshToolbar();
 
   // Season_SortBy(sort)
   //   Sorts season data.
   } else if (action == L"Season_SortBy") {
-    ui::DlgSeason.sort_by = ToInt(body);
+    Settings.Set(taiga::kApp_Seasons_SortBy, ToInt(body));
     ui::DlgSeason.RefreshList();
     ui::DlgSeason.RefreshToolbar();
 

@@ -347,7 +347,7 @@ void MenuList::UpdateSeason() {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = DlgSeason.group_by;
+    int item_index = Settings.GetInt(taiga::kApp_Seasons_GroupBy);
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -362,7 +362,7 @@ void MenuList::UpdateSeason() {
         if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)
           it->visible = false;
     }
-    int item_index = DlgSeason.sort_by;
+    int item_index = Settings.GetInt(taiga::kApp_Seasons_SortBy);
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -374,7 +374,7 @@ void MenuList::UpdateSeason() {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = DlgSeason.view_as;
+    int item_index = Settings.GetInt(taiga::kApp_Seasons_ViewAs);
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
