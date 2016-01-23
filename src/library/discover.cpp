@@ -172,6 +172,13 @@ bool SeasonDatabase::IsRefreshRequired() {
   return required;
 }
 
+void SeasonDatabase::Reset() {
+  items.clear();
+
+  current_season.name = anime::Season::kUnknown;
+  current_season.year = 0;
+}
+
 void SeasonDatabase::Review(bool hide_nsfw) {
   Date date_start, date_end;
   current_season.GetInterval(date_start, date_end);

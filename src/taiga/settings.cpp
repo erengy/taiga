@@ -414,6 +414,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
         AnimeDatabase.items.clear();
         AnimeDatabase.SaveDatabase();
         ImageDatabase.Clear();
+        SeasonDatabase.Reset();
       } else {
         Set(kSync_ActiveService, previous_service);
         changed_service = false;

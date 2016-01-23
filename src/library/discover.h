@@ -39,6 +39,8 @@ public:
   // refreshing.
   bool IsRefreshRequired();
 
+  void Reset();
+
   // Improves season data by excluding invalid items (i.e. postpones series) and
   // adding missing ones from the anime database.
   void Review(bool hide_nsfw = true);

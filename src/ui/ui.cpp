@@ -822,6 +822,8 @@ void OnSettingsUserChange() {
   DlgHistory.RefreshList();
   DlgNowPlaying.Refresh();
   DlgSearch.RefreshList();
+  DlgSeason.RefreshList();
+  DlgSeason.RefreshToolbar();
   DlgStats.Refresh();
 }
 
