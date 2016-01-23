@@ -212,10 +212,11 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   // Search text
   if (HIWORD(wParam) == EN_CHANGE) {
     if (LOWORD(wParam) == IDC_EDIT_SEARCH) {
-      std::wstring text;
+      int current_page = navigation.GetCurrentPage();
+      auto& text = search_bar.text[current_page];
       edit.GetText(text);
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
-      switch (navigation.GetCurrentPage()) {
+      switch (current_page) {
         case kSidebarItemAnimeList:
           if (search_bar.filters.text != text) {
             if (text.empty() || text.size() > 1) {

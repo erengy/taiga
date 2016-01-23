@@ -19,6 +19,9 @@
 #ifndef TAIGA_UI_DLG_MAIN_H
 #define TAIGA_UI_DLG_MAIN_H
 
+#include <map>
+#include <vector>
+
 #include "library/anime_filter.h"
 #include "win/ctrl/win_ctrl.h"
 #include "win/win_dialog.h"
@@ -152,6 +155,7 @@ public:
     int mode;
     MainDialog* parent;
     anime::Filters filters;
+    std::map<int, std::wstring> text;
   } search_bar;
 
 private:
