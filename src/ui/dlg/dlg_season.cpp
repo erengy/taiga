@@ -534,7 +534,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
   list_.EnableGroupView(true);  // Required for XP
   switch (Settings.GetInt(taiga::kApp_Seasons_GroupBy)) {
     case kSeasonGroupByAiringStatus:
-      for (int i = anime::kAiring; i <= anime::kNotYetAired; i++) {
+      for (int i = anime::kFinishedAiring; i <= anime::kNotYetAired; i++) {
         list_.InsertGroup(i, anime::TranslateStatus(i).c_str(), true, false);
       }
       break;
