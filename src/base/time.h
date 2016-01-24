@@ -76,6 +76,7 @@ std::wstring GetRelativeTimeString(time_t unix_time, bool append_suffix);
 
 time_t ConvertIso8601(const std::wstring& datetime);
 time_t ConvertRfc822(const std::wstring& datetime);
+std::wstring ConvertRfc822ToLocal(const std::wstring& datetime);
 
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 

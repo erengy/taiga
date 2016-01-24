@@ -213,7 +213,12 @@ time_t ConvertRfc822(const std::wstring& datetime) {
     if (m[7].matched)
       t.tm_sec = ToInt(m[7].str());
 
-    // TODO: Get time zone from m[8]
+    // TODO: Handle other time zones
+    if (StartsWith(m[8].str(), L"+") || StartsWith(m[8].str(), L"-")) {
+      int sign = StartsWith(m[8].str(), L"+") ? 1 : -1;
+      t.tm_hour += sign * ToInt(m[8].str().substr(1, 3));
+      t.tm_min += sign * ToInt(m[8].str().substr(3, 5));
+    }
     NeutralizeTimezone(t);
     t.tm_isdst = -1;
 
@@ -221,6 +226,31 @@ time_t ConvertRfc822(const std::wstring& datetime) {
   }
 
   return result;
+}
+
+std::wstring ConvertRfc822ToLocal(const std::wstring& datetime) {
+  auto time = ConvertRfc822(datetime);
+
+  std::tm local_tm = {0};
+  if (localtime_s(&local_tm, &time) != 0)
+    return datetime;
+
+  std::string result(100, '\0');
+  std::strftime(&result.at(0), result.size(),
+                "%a, %d %b %Y %H:%M:%S", &local_tm);
+
+  TIME_ZONE_INFORMATION time_zone_info = {0};
+  auto time_zone_id = GetTimeZoneInformation(&time_zone_info);
+
+  std::wstring sign = time_zone_info.Bias <= 0 ? L"+" : L"-";
+  int hh = std::abs(time_zone_info.Bias) / 60;
+  int mm = std::abs(time_zone_info.Bias) % 60;
+
+  std::wstring result_with_tz = StrToWstr(result) + L" " + sign +
+      PadChar(ToWstr(hh), L'0', 2) +
+      PadChar(ToWstr(mm), L'0', 2);
+
+  return result_with_tz;
 }
 
 std::wstring GetAbsoluteTimeString(time_t unix_time) {

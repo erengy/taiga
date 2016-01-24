@@ -455,7 +455,7 @@ void TorrentDialog::RefreshList() {
     list_.SetItem(index, 4, video.c_str());
     list_.SetItem(index, 5, it->description.c_str());
     list_.SetItem(index, 6, it->episode_data.file_name_with_extension().c_str());
-    list_.SetItem(index, 7, it->pub_date.c_str());
+    list_.SetItem(index, 7, ConvertRfc822ToLocal(it->pub_date).c_str());
     list_.SetCheckState(index, it->state == kFeedItemSelected);
   }
 
