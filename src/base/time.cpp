@@ -134,9 +134,16 @@ float Duration::years() const {
 ////////////////////////////////////////////////////////////////////////////////
 
 static void NeutralizeTimezone(tm& t) {
-  long timezone_difference = 0;
-  if (_get_timezone(&timezone_difference) == 0)
-    t.tm_sec -= timezone_difference;  // mktime uses the current time zone
+  static bool initialized = false;
+  static long timezone_difference = 0;
+
+  if (!initialized) {
+    _tzset();
+    _get_timezone(&timezone_difference);
+    initialized = true;
+  }
+
+  t.tm_sec -= timezone_difference;  // mktime uses the current time zone
 }
 
 time_t ConvertIso8601(const std::wstring& datetime) {
@@ -167,8 +174,9 @@ time_t ConvertIso8601(const std::wstring& datetime) {
       t.tm_min += sign * ToInt(m[9].str());
     }
     NeutralizeTimezone(t);
+    t.tm_isdst = -1;
 
-    result = mktime(&t);
+    result = std::mktime(&t);
   }
 
   return result;
@@ -207,8 +215,9 @@ time_t ConvertRfc822(const std::wstring& datetime) {
 
     // TODO: Get time zone from m[8]
     NeutralizeTimezone(t);
+    t.tm_isdst = -1;
 
-    result = mktime(&t);
+    result = std::mktime(&t);
   }
 
   return result;
