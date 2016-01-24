@@ -84,6 +84,10 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       element = ToWstr(anime ? anime->GetMyStatus() : anime::kNotInList);
       is_numeric = true;
       break;
+    case kFeedFilterElement_User_Tags:
+      if (anime)
+        element = anime->GetMyTags();
+      break;
     case kFeedFilterElement_Episode_Number:
       if (!item.episode_data.episode_number()) {
         element = ToWstr(anime ? anime->GetEpisodeCount() : 1);
@@ -611,6 +615,7 @@ void FeedFilterManager::InitializeShortcodes() {
   element_shortcodes_[kFeedFilterElement_Meta_DateStart] = L"meta_date_start";
   element_shortcodes_[kFeedFilterElement_Meta_DateEnd] = L"meta_date_end";
   element_shortcodes_[kFeedFilterElement_User_Status] = L"user_status";
+  element_shortcodes_[kFeedFilterElement_User_Tags] = L"user_tags";
   element_shortcodes_[kFeedFilterElement_Local_EpisodeAvailable] = L"local_episode_available";
   element_shortcodes_[kFeedFilterElement_Episode_Title] = L"episode_title";
   element_shortcodes_[kFeedFilterElement_Episode_Number] = L"episode_number";
@@ -783,6 +788,8 @@ std::wstring FeedFilterManager::TranslateElement(int element) {
       return L"Anime type";
     case kFeedFilterElement_User_Status:
       return L"Anime watching status";
+    case kFeedFilterElement_User_Tags:
+      return L"Anime tags";
     case kFeedFilterElement_Episode_Number:
       return L"Episode number";
     case kFeedFilterElement_Episode_Version:
