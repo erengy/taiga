@@ -47,6 +47,8 @@ public:
   class Item : public GenericFeedItem {
   public:
     std::wstring taiga_anime_relations;
+    std::wstring taiga_anime_season_location;
+    std::wstring taiga_anime_season_max;
   };
   std::vector<Item> items;
 

@@ -24,6 +24,8 @@
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
+#include "library/anime_season.h"
+#include "library/discover.h"
 #include "library/history.h"
 #include "library/resource.h"
 #include "sync/manager.h"
@@ -36,6 +38,7 @@
 #include "track/media.h"
 #include "track/monitor.h"
 #include "ui/dlg/dlg_anime_list.h"
+#include "ui/dlg/dlg_season.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
@@ -212,6 +215,11 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_Option_EnableRecognition, L"true", L"program/general/enablerecognition");
   INITKEY(kApp_Option_EnableSharing, L"true", L"program/general/enablesharing");
   INITKEY(kApp_Option_EnableSync, L"true", L"program/general/enablesync");
+  INITKEY(kApp_Seasons_LastSeason, nullptr, L"program/seasons/lastseason");
+  INITKEY(kApp_Seasons_MaxSeason, nullptr, L"program/seasons/maxseason");
+  INITKEY(kApp_Seasons_GroupBy, ToWstr(ui::kSeasonGroupByType).c_str(), L"program/seasons/groupby");
+  INITKEY(kApp_Seasons_SortBy, ToWstr(ui::kSeasonSortByTitle).c_str(), L"program/seasons/sortby");
+  INITKEY(kApp_Seasons_ViewAs, ToWstr(ui::kSeasonViewAsTiles).c_str(), L"program/seasons/viewas");
 
   #undef INITKEY
 }
@@ -282,6 +290,11 @@ bool AppSettings::Load() {
       data.width = column.attribute(L"width").as_int();
     }
   }
+
+  // Seasons
+  anime::Season season_max(GetWstr(kApp_Seasons_MaxSeason));
+  if (season_max && season_max > SeasonDatabase.available_seasons.second)
+    SeasonDatabase.available_seasons.second = season_max;
 
   // Torrent application path
   if (GetWstr(kTorrent_Download_AppPath).empty()) {
@@ -401,6 +414,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
         AnimeDatabase.items.clear();
         AnimeDatabase.SaveDatabase();
         ImageDatabase.Clear();
+        SeasonDatabase.Reset();
       } else {
         Set(kSync_ActiveService, previous_service);
         changed_service = false;

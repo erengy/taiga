@@ -112,6 +112,10 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       ChangeStatusText(error);
       DlgTorrent.EnableInput();
       break;
+    case taiga::kHttpSeasonsGet:
+      ChangeStatusText(error);
+      DlgSeason.EnableInput();
+      break;
     case taiga::kHttpTwitterRequest:
     case taiga::kHttpTwitterAuth:
     case taiga::kHttpTwitterPost:
@@ -190,6 +194,9 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
       break;
     case taiga::kHttpFeedDownload:
       status = L"Downloading torrent file...";
+      break;
+    case taiga::kHttpSeasonsGet:
+      status = L"Downloading anime season data...";
       break;
     case taiga::kHttpTwitterRequest:
       status = L"Connecting to Twitter...";
@@ -672,9 +679,26 @@ void OnAnimeListHeaderRatingWarning() {
   dlg.Show(DlgMain.GetWindowHandle());
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void OnSeasonLoad(bool refresh) {
+  DlgSeason.RefreshList();
+  DlgSeason.RefreshStatus();
+  DlgSeason.RefreshToolbar();
+  DlgSeason.EnableInput();
+
+  if (refresh && OnSeasonRefreshRequired())
+    DlgSeason.RefreshData();
+}
+
+void OnSeasonLoadFail() {
+  ChangeStatusText(L"Could not load anime season data.");
+  DlgSeason.EnableInput();
+}
+
 bool OnSeasonRefreshRequired() {
   win::TaskDialog dlg;
-  std::wstring title = L"Season - " + SeasonDatabase.name;
+  std::wstring title = L"Season - " + SeasonDatabase.current_season.GetString();
   dlg.SetWindowTitle(title.c_str());
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"Would you like to refresh this season's data?");
@@ -798,6 +822,8 @@ void OnSettingsUserChange() {
   DlgHistory.RefreshList();
   DlgNowPlaying.Refresh();
   DlgSearch.RefreshList();
+  DlgSeason.RefreshList();
+  DlgSeason.RefreshToolbar();
   DlgStats.Refresh();
 }
 

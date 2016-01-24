@@ -22,6 +22,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
+#include "library/discover.h"
 #include "sync/sync.h"
 #include "taiga/settings.h"
 #include "track/feed.h"
@@ -47,10 +48,10 @@ void MenuList::Load() {
   xml_node menus = document.child(L"menus");
 
   foreach_xmlnode_(menu, menus, L"menu") {
-    menu_list_.Create(menu.attribute(L"name").value(),
-                      menu.attribute(L"type").value());
+    const std::wstring name = menu.attribute(L"name").value();
+    menu_list_.Create(name, menu.attribute(L"type").value());
     foreach_xmlnode_(item, menu, L"item") {
-      menu_list_.menus.back().CreateItem(
+      menu_list_.menus[name].CreateItem(
           item.attribute(L"action").value(),
           item.attribute(L"name").value(),
           item.attribute(L"sub").value(),
@@ -306,13 +307,52 @@ void MenuList::UpdateTorrentsList(const FeedItem& feed_item) {
 }
 
 void MenuList::UpdateSeason() {
+  // Select season
+  auto menu = menu_list_.FindMenu(L"SeasonSelect");
+  if (menu) {
+    menu->items.clear();
+    const auto& season_min = SeasonDatabase.available_seasons.first;
+    const auto& season_max = SeasonDatabase.available_seasons.second;
+    auto create_item = [](win::Menu& menu, const anime::Season& season) {
+      menu.CreateItem(L"Season_Load(" + season.GetString() + L")",
+                      season.GetString(), L"",
+                      season == SeasonDatabase.current_season,
+                      false, true, false, true);
+    };
+    // Add latest seasons
+    for (auto season = season_max; season >= season_min; --season) {
+      create_item(*menu, season);
+      if (menu->items.size() == 2)
+        break;
+    }
+    if (!menu->items.empty())
+      menu->CreateItem();  // separator
+    // Add available seasons
+    int current_year = 0;
+    for (auto season = season_max; season >= season_min; --season) {
+      win::Menu* submenu = nullptr;
+      std::wstring submenu_name = L"Season" + ToWstr(season.year);
+      submenu = menu_list_.FindMenu(submenu_name.c_str());
+      if (!submenu) {
+        menu_list_.Create(submenu_name.c_str(), L"");
+        submenu = menu_list_.FindMenu(submenu_name.c_str());
+      }
+      if (current_year == 0 || current_year != season.year) {
+        menu->CreateItem(L"", ToWstr(season.year), submenu_name);
+        submenu->items.clear();
+        current_year = season.year;
+      }
+      create_item(*submenu, season);
+    }
+  }
+
   // Group by
-  auto menu = menu_list_.FindMenu(L"SeasonGroup");
+  menu = menu_list_.FindMenu(L"SeasonGroup");
   if (menu) {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = DlgSeason.group_by;
+    int item_index = Settings.GetInt(taiga::kApp_Seasons_GroupBy);
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -327,7 +367,7 @@ void MenuList::UpdateSeason() {
         if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)
           it->visible = false;
     }
-    int item_index = DlgSeason.sort_by;
+    int item_index = Settings.GetInt(taiga::kApp_Seasons_SortBy);
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }
@@ -339,7 +379,7 @@ void MenuList::UpdateSeason() {
     foreach_(it, menu->items) {
       it->checked = false;
     }
-    int item_index = DlgSeason.view_as;
+    int item_index = Settings.GetInt(taiga::kApp_Seasons_ViewAs);
     if (item_index < static_cast<int>(menu->items.size())) {
       menu->items[item_index].checked = true;
     }

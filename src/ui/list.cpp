@@ -22,6 +22,7 @@
 #include "base/string.h"
 #include "base/time.h"
 #include "library/anime_db.h"
+#include "library/anime_season.h"
 #include "library/anime_util.h"
 #include "sync/service.h"
 #include "taiga/settings.h"
@@ -209,8 +210,8 @@ int SortListByTitle(const anime::Item& item1, const anime::Item& item2) {
 
 int SortListBySeason(const anime::Item& item1, const anime::Item& item2,
                      int order) {
-  auto season1 = anime::TranslateDateToSeason(item1.GetDateStart());
-  auto season2 = anime::TranslateDateToSeason(item2.GetDateStart());
+  anime::Season season1(item1.GetDateStart());
+  anime::Season season2(item2.GetDateStart());
 
   if (season1 != season2)
     return CompareValues<anime::Season>(season1, season2);

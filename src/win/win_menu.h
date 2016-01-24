@@ -38,9 +38,9 @@ public:
 
 class Menu {
 public:
-  void CreateItem(std::wstring action = L"",
-                  std::wstring name = L"",
-                  std::wstring submenu = L"",
+  void CreateItem(const std::wstring& action = L"",
+                  const std::wstring& name = L"",
+                  const std::wstring& submenu = L"",
                   bool checked = false,
                   bool def = false,
                   bool enabled = true,
@@ -54,12 +54,12 @@ public:
 
 class MenuList {
 public:
-  void Create(LPCWSTR name, LPCWSTR type);
-  HMENU CreateNewMenu(LPCWSTR name, std::vector<HMENU>& menu_handles);
-  Menu* FindMenu(LPCWSTR name);
-  std::wstring Show(HWND hwnd, int x, int y, LPCWSTR name);
+  void Create(const std::wstring& name, const std::wstring& type);
+  HMENU CreateNewMenu(const std::wstring& name, std::vector<HMENU>& menu_handles);
+  Menu* FindMenu(const std::wstring& name);
+  std::wstring Show(HWND hwnd, int x, int y, const std::wstring& name);
 
-  std::vector<Menu> menus;
+  std::map<std::wstring, Menu> menus;
 };
 
 }  // namespace win

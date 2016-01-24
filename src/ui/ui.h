@@ -74,6 +74,9 @@ bool OnRecognitionCancelConfirm();
 void OnRecognitionFail();
 
 void OnAnimeListHeaderRatingWarning();
+
+void OnSeasonLoad(bool refresh);
+void OnSeasonLoadFail();
 bool OnSeasonRefreshRequired();
 
 void OnSettingsAccountEmpty();

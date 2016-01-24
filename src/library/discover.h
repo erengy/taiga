@@ -21,17 +21,25 @@
 
 #include <string>
 
+#include "library/anime_season.h"
+
 namespace library {
 
 class SeasonDatabase {
 public:
+  SeasonDatabase();
+
   // Loads season data from db\season\<seasonname>.xml, returns false if no such
   // file exists.
-  bool Load(std::wstring file);
+  bool LoadSeason(const anime::Season& season);
+  bool LoadFile(const std::wstring& filename);
+  bool LoadString(const std::wstring& data);
 
   // Checkes if a significant portion of season data is empty and requires
   // refreshing.
   bool IsRefreshRequired();
+
+  void Reset();
 
   // Improves season data by excluding invalid items (i.e. postpones series) and
   // adding missing ones from the anime database.
@@ -40,8 +48,12 @@ public:
   // Only IDs are stored here, actual info is kept in anime::Database.
   std::vector<int> items;
 
-  // Season name (e.g. "Spring 2012")
-  std::wstring name;
+  // Current season (e.g. "Spring 2012")
+  anime::Season current_season;
+
+  // Available seasons
+  std::pair<anime::Season, anime::Season> available_seasons;
+  std::wstring remote_location;
 };
 
 }  // namespace library

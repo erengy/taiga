@@ -20,7 +20,8 @@
 
 namespace win {
 
-HMENU MenuList::CreateNewMenu(LPCWSTR name, std::vector<HMENU>& menu_handles) {
+HMENU MenuList::CreateNewMenu(const std::wstring& name,
+                              std::vector<HMENU>& menu_handles) {
   auto menu = FindMenu(name);
 
   if (!menu)
@@ -77,7 +78,7 @@ HMENU MenuList::CreateNewMenu(LPCWSTR name, std::vector<HMENU>& menu_handles) {
   return handle;
 }
 
-std::wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR name) {
+std::wstring MenuList::Show(HWND hwnd, int x, int y, const std::wstring& name) {
   std::vector<HMENU> menu_handles;
   CreateNewMenu(name, menu_handles);
 
@@ -106,25 +107,21 @@ std::wstring MenuList::Show(HWND hwnd, int x, int y, LPCWSTR name) {
   }
 }
 
-void MenuList::Create(LPCWSTR name, LPCWSTR type) {
-  Menu menu;
-
-  menu.name = name;
-  menu.type = type;
-
-  menus.push_back(menu);
+void MenuList::Create(const std::wstring& name, const std::wstring& type) {
+  menus[name].name = name;
+  menus[name].type = type;
 }
 
-Menu* MenuList::FindMenu(LPCWSTR name) {
-  for (auto it = menus.begin(); it != menus.end(); ++it)
-    if (it->name == name)
-      return &(*it);
+Menu* MenuList::FindMenu(const std::wstring& name) {
+  auto it = menus.find(name);
+  if (it != menus.end())
+    return &it->second;
 
   return nullptr;
 }
 
-void Menu::CreateItem(std::wstring action, std::wstring name,
-                      std::wstring submenu,
+void Menu::CreateItem(const std::wstring& action, const std::wstring& name,
+                      const std::wstring& submenu,
                       bool checked, bool def, bool enabled,
                       bool newcolumn, bool radio) {
   MenuItem item;

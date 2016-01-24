@@ -18,42 +18,86 @@
 
 #include <algorithm>
 
+#include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
+#include "library/anime_season.h"
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "sync/manager.h"
 #include "sync/service.h"
+#include "taiga/http.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "ui/dlg/dlg_season.h"
 #include "ui/ui.h"
 
 library::SeasonDatabase SeasonDatabase;
 
 namespace library {
 
-bool SeasonDatabase::Load(std::wstring file) {
-  items.clear();
+SeasonDatabase::SeasonDatabase()
+    : available_seasons({anime::Season::kWinter, 2011},
+                        {anime::Season::kWinter, 2016}),
+      remote_location(L"https://raw.githubusercontent.com"
+                      L"/erengy/taiga/master/data/db/season/") {
+}
 
-  xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + file;
-  xml_parse_result parse_result = document.load_file(path.c_str());
+bool SeasonDatabase::LoadSeason(const anime::Season& season) {
+  std::wstring filename =
+      ToWstr(season.year) + L"_" + ToLower_Copy(season.GetName()) + L".xml";
 
-  if (parse_result.status != pugi::status_ok) {
-    ui::DisplayErrorMessage(L"Could not read season data.", path.c_str());
+  return LoadFile(filename);
+}
+
+bool SeasonDatabase::LoadFile(const std::wstring& filename) {
+  std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + filename;
+
+  std::string document;
+
+  if (!ReadFromFile(path, document)) {
+    LOG(LevelWarning, L"Could not find anime season file.\n"
+                      L"Path: " + path);
+
+    // Try to download from remote location
+    if (!remote_location.empty()) {
+      ui::ChangeStatusText(L"Downloading anime season data...");
+      ui::DlgSeason.EnableInput(false);
+      HttpRequest http_request;
+      http_request.url = remote_location + filename;
+      ConnectionManager.MakeRequest(http_request, taiga::kHttpSeasonsGet);
+    }
+
     return false;
   }
 
+  if (!LoadString(StrToWstr(document))) {
+    ui::DisplayErrorMessage(L"Could not read anime season file.", path.c_str());
+    return false;
+  }
+
+  return true;
+}
+
+bool SeasonDatabase::LoadString(const std::wstring& data) {
+  xml_document document;
+  xml_parse_result parse_result = document.load_string(data.c_str());
+
+  if (parse_result.status != pugi::status_ok)
+    return false;
+
   xml_node season_node = document.child(L"season");
 
-  name = XmlReadStrValue(season_node.child(L"info"), L"name");
+  current_season = XmlReadStrValue(season_node.child(L"info"), L"name");
   time_t modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
                                             L"modified").c_str());
+
+  items.clear();
 
   foreach_xmlnode_(node, season_node, L"anime") {
     std::map<enum_t, std::wstring> id_map;
@@ -79,15 +123,17 @@ bool SeasonDatabase::Load(std::wstring file) {
     } else {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map[current_service_id].empty()) {
-        LOG(LevelDebug, name + L" - No ID for current service: " +
+        LOG(LevelDebug, current_season.GetString() +
+                        L" - No ID for current service: " +
                         XmlReadStrValue(node, L"title"));
         continue;
       }
 
       anime::Item item;
       item.SetSource(current_service_id);
-      foreach_(it, id_map)
+      foreach_(it, id_map) {
         item.SetId(it->second, it->first);
+      }
       item.SetLastModified(modified);
       item.SetTitle(XmlReadStrValue(node, L"title"));
       item.SetType(XmlReadIntValue(node, L"type"));
@@ -126,9 +172,16 @@ bool SeasonDatabase::IsRefreshRequired() {
   return required;
 }
 
+void SeasonDatabase::Reset() {
+  items.clear();
+
+  current_season.name = anime::Season::kUnknown;
+  current_season.year = 0;
+}
+
 void SeasonDatabase::Review(bool hide_nsfw) {
   Date date_start, date_end;
-  anime::GetSeasonInterval(name, date_start, date_end);
+  current_season.GetInterval(date_start, date_end);
 
   // Check for invalid items
   for (size_t i = 0; i < items.size(); i++) {
