@@ -19,6 +19,7 @@
 #ifndef TAIGA_TAIGA_UPDATE_H
 #define TAIGA_TAIGA_UPDATE_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -46,18 +47,17 @@ public:
 
   class Item : public GenericFeedItem {
   public:
-    std::wstring taiga_anime_relations;
+    std::wstring taiga_anime_relations_location;
+    std::wstring taiga_anime_relations_modified;
     std::wstring taiga_anime_season_location;
     std::wstring taiga_anime_season_max;
   };
   std::vector<Item> items;
 
 private:
-  const GenericFeedItem* FindItem(const std::wstring& guid) const;
-
   std::wstring download_path_;
-  std::wstring latest_anime_relations_;
-  std::wstring latest_guid_;
+  std::unique_ptr<Item> current_item_;
+  std::unique_ptr<Item> latest_item_;
   bool restart_required_;
   bool update_available_;
   std::wstring client_uid_;

@@ -248,10 +248,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
         if (Taiga.Updater.IsDownloadAllowed())
           break;
       ui::OnUpdateFinished();
-      auto it = client.request().url.query.find(L"check");
-      if (it != client.request().url.query.end())
-        if (it->second == L"manual")
-          Taiga.Updater.CheckAnimeRelations();
+      Taiga.Updater.CheckAnimeRelations();
       break;
     }
     case kHttpTaigaUpdateDownload:

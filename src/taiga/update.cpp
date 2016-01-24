@@ -21,6 +21,7 @@
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/string.h"
+#include "base/time.h"
 #include "base/url.h"
 #include "base/xml.h"
 #include "library/discover.h"
@@ -62,11 +63,21 @@ void UpdateHelper::Check() {
 }
 
 void UpdateHelper::CheckAnimeRelations() {
-  if (latest_anime_relations_.empty())
+  if (!current_item_)
     return;
 
+  if (current_item_->taiga_anime_relations_location.empty())
+    return;
+
+  Date local_modified(Settings[kRecognition_RelationsLastModified]);
+  if (local_modified) {
+    Date current_modified(current_item_->taiga_anime_relations_modified);
+    if (!current_modified || current_modified <= local_modified)
+      return;
+  }
+
   HttpRequest http_request;
-  http_request.url = latest_anime_relations_;
+  http_request.url = current_item_->taiga_anime_relations_location;
 
   ConnectionManager.MakeRequest(http_request,
                                 taiga::kHttpTaigaUpdateRelations);
@@ -75,8 +86,8 @@ void UpdateHelper::CheckAnimeRelations() {
 bool UpdateHelper::ParseData(std::wstring data) {
   items.clear();
   download_path_.clear();
-  latest_anime_relations_.clear();
-  latest_guid_.clear();
+  current_item_.reset();
+  latest_item_.reset();
   restart_required_ = false;
   update_available_ = false;
 
@@ -94,7 +105,8 @@ bool UpdateHelper::ParseData(std::wstring data) {
     items.back().link = XmlReadStrValue(item, L"link");
     items.back().description = XmlReadStrValue(item, L"description");
     items.back().pub_date = XmlReadStrValue(item, L"pubDate");
-    items.back().taiga_anime_relations = XmlReadStrValue(item, L"taiga:animeRelations");
+    items.back().taiga_anime_relations_location = XmlReadStrValue(item, L"taiga:animeRelationsLocation");
+    items.back().taiga_anime_relations_modified = XmlReadStrValue(item, L"taiga:animeRelationsModified");
     items.back().taiga_anime_season_location = XmlReadStrValue(item, L"taiga:animeSeasonLocation");
     items.back().taiga_anime_season_max = XmlReadStrValue(item, L"taiga:animeSeasonMax");
   }
@@ -104,10 +116,10 @@ bool UpdateHelper::ParseData(std::wstring data) {
   foreach_(item, items) {
     base::SemanticVersion item_version(item->guid);
     if (item_version > latest_version) {
-      latest_guid_ = item->guid;
+      latest_item_.reset(new Item(*item));
       latest_version = item_version;
     } else if (item_version == current_version) {
-      latest_anime_relations_ = item->taiga_anime_relations;
+      current_item_.reset(new Item(*item));
       anime::Season season_max(item->taiga_anime_season_max);
       if (season_max && season_max > SeasonDatabase.available_seasons.second) {
         SeasonDatabase.available_seasons.second = season_max;
@@ -143,15 +155,14 @@ bool UpdateHelper::IsDownloadAllowed() const {
 }
 
 bool UpdateHelper::Download() {
-  auto feed_item = FindItem(latest_guid_);
-  if (!feed_item)
+  if (!latest_item_)
     return false;
 
   download_path_ = AddTrailingSlash(GetPathOnly(Taiga.GetModulePath()));
-  download_path_ += GetFileName(feed_item->link);
+  download_path_ += GetFileName(latest_item_->link);
 
   HttpRequest http_request;
-  http_request.url = feed_item->link;
+  http_request.url = latest_item_->link;
 
   client_uid_ = http_request.uid;
 
@@ -161,8 +172,7 @@ bool UpdateHelper::Download() {
 }
 
 bool UpdateHelper::RunInstaller() {
-  auto feed_item = FindItem(latest_guid_);
-  if (!feed_item)
+  if (!latest_item_)
     return false;
 
   // /S runs the installer silently, /D overrides the default installation
@@ -181,14 +191,6 @@ std::wstring UpdateHelper::GetDownloadPath() const {
 
 void UpdateHelper::SetDownloadPath(const std::wstring& path) {
   download_path_ = path;
-}
-
-const GenericFeedItem* UpdateHelper::FindItem(const std::wstring& guid) const {
-  foreach_(item, items)
-    if (IsEqual(item->guid, latest_guid_))
-      return &(*item);
-
-  return nullptr;
 }
 
 }  // namespace taiga

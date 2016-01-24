@@ -83,6 +83,7 @@ enum AppSettingName {
   kRecognition_DetectStreamingMedia,
   kRecognition_IgnoredStrings,
   kRecognition_LookupParentDirectories,
+  kRecognition_RelationsLastModified,
   kSync_Update_Delay,
   kSync_Update_AskToConfirm,
   kSync_Update_CheckPlayer,

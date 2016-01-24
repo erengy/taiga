@@ -146,6 +146,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kRecognition_DetectStreamingMedia, nullptr, L"recognition/streaming/enabled");
   INITKEY(kRecognition_IgnoredStrings, nullptr, L"recognition/anitomy/ignored_strings");
   INITKEY(kRecognition_LookupParentDirectories, L"true", L"recognition/general/lookup_parent_directories");
+  INITKEY(kRecognition_RelationsLastModified, nullptr, L"recognition/general/relations_last_modified");
   INITKEY(kSync_Update_Delay, L"120", L"account/update/delay");
   INITKEY(kSync_Update_AskToConfirm, L"true", L"account/update/asktoconfirm");
   INITKEY(kSync_Update_CheckPlayer, nullptr, L"account/update/checkplayer");

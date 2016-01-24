@@ -140,6 +140,7 @@ bool Engine::ReadRelations() {
 
   if (!ReadFromFile(path, document)) {
     LOG(LevelWarning, L"Could not read anime relations data.");
+    Settings.Set(taiga::kRecognition_RelationsLastModified, std::wstring());
     return false;
   }
 
@@ -192,6 +193,8 @@ bool Engine::ReadRelations(const std::string& document) {
             if (version > Taiga.version)
               LOG(LevelDebug, L"Anime relations version is larger than "
                               L"application version.");
+          } else if (name == L"last_modified") {
+            Settings.Set(taiga::kRecognition_RelationsLastModified, value);
           }
         }
         break;
