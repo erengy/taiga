@@ -716,6 +716,9 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
           case taiga::kTipTypeUpdateFailed:
             History.queue.Check(false);
             break;
+          case taiga::kTipTypeNotApproved:
+            navigation.SetCurrentPage(kSidebarItemHistory);
+            break;
         }
         ActivateWindow(GetWindowHandle());
         Taiga.current_tip_type = taiga::kTipTypeDefault;

@@ -327,17 +327,24 @@ void OnLibraryEntryChangeFailure(int id, const string_t& reason) {
     DlgAnime.UpdateTitle(false);
 }
 
-void OnLibraryUpdateFailure(int id, const string_t& reason) {
+void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved) {
   auto anime_item = AnimeDatabase.FindItem(id);
 
   std::wstring text;
   if (anime_item)
     text += L"Title: " + anime_item->GetTitle() + L"\n";
-  if (!reason.empty())
-    text += L"Reason: " + reason + L"\n";
-  text += L"Click to try again.";
 
-  Taiga.current_tip_type = taiga::kTipTypeUpdateFailed;
+  if (not_approved) {
+    text += L"Reason: Taiga won't be able to synchronize your list until MAL "
+            L"approves the anime, or you remove it from the update queue.\n"
+            L"Click to go to History page.";
+    Taiga.current_tip_type = taiga::kTipTypeNotApproved;
+  } else {
+    if (!reason.empty())
+      text += L"Reason: " + reason + L"\n";
+    text += L"Click to try again.";
+    Taiga.current_tip_type = taiga::kTipTypeUpdateFailed;
+  }
 
   Taskbar.Tip(L"", L"", 0);  // clear previous tips
   Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);

@@ -169,7 +169,8 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
     case kDeleteLibraryEntry:
     case kUpdateLibraryEntry:
       History.queue.updating = false;
-      ui::OnLibraryUpdateFailure(anime_id, response.data[L"error"]);
+      ui::OnLibraryUpdateFailure(anime_id, response.data[L"error"],
+                                 response.data.count(L"not_approved"));
       break;
     default:
       ui::ChangeStatusText(response.data[L"error"]);

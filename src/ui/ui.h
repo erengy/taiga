@@ -53,7 +53,7 @@ void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
 void OnLibrarySearchTitle(int id, const string_t& results);
 void OnLibraryEntryChangeFailure(int id, const string_t& reason);
-void OnLibraryUpdateFailure(int id, const string_t& reason);
+void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved);
 
 bool OnLibraryEntriesEditDelete(const std::vector<int> ids);
 int OnLibraryEntriesEditEpisode(const std::vector<int> ids);

@@ -441,6 +441,16 @@ bool Service::RequestSucceeded(Response& response,
     return false;
   }
 
+  // Not approved
+  // TODO: Remove when MAL fixes its API
+  if (http_response.code == 400) {
+    if (InStr(http_response.body, L"This anime has not been approved yet") > -1) {
+      response.data[L"error"] = http_response.body;
+      response.data[L"not_approved"] = L"true";
+      return false;
+    }
+  }
+
   switch (response.type) {
     case kAddLibraryEntry:
       if (IsNumericString(http_response.body))

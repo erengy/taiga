@@ -41,7 +41,8 @@ enum TipType {
   kTipTypeNowPlaying,
   kTipTypeSearch,
   kTipTypeTorrent,
-  kTipTypeUpdateFailed
+  kTipTypeUpdateFailed,
+  kTipTypeNotApproved,
 };
 
 class App : public win::App {
