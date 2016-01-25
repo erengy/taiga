@@ -39,6 +39,10 @@ namespace ui {
 
 SeasonDialog DlgSeason;
 
+SeasonDialog::SeasonDialog()
+    : hot_item_(-1) {
+}
+
 BOOL SeasonDialog::OnInitDialog() {
   // Create list
   list_.Attach(GetDlgItem(IDC_LIST_SEASON));
@@ -47,6 +51,12 @@ BOOL SeasonDialog::OnInitDialog() {
   list_.SetTheme();
   list_.SetView(LV_VIEW_TILE);
   SetViewMode(Settings.GetInt(taiga::kApp_Seasons_ViewAs));
+
+  // Create list tooltips
+  tooltips_.Create(list_.GetWindowHandle());
+  tooltips_.SetDelayTime(30000, -1, 0);
+  tooltips_.SetMaxWidth(::GetSystemMetrics(SM_CXSCREEN));  // Required for line breaks
+  tooltips_.AddTip(0, nullptr, nullptr, nullptr, false);
 
   // Create main toolbar
   toolbar_.Attach(GetDlgItem(IDC_TOOLBAR_SEASON));
@@ -188,6 +198,38 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
           }
           break;
         }
+      }
+      break;
+    }
+                            
+    // Item hover
+    case LVN_HOTTRACK: {
+      auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
+      if (Settings.GetInt(taiga::kApp_Seasons_ViewAs) != kSeasonViewAsImages) {
+        tooltips_.NewToolRect(0, nullptr);
+        break;
+      }
+      if (hot_item_ != lplv->iItem) {
+        hot_item_ = lplv->iItem;
+        win::Rect rect_item;
+        list_.GetSubItemRect(lplv->iItem, 0, &rect_item);
+        tooltips_.NewToolRect(0, &rect_item);
+      }
+      auto anime_item = AnimeDatabase.FindItem(list_.GetItemParam(lplv->iItem));
+      if (anime_item) {
+        tooltips_.UpdateTitle(anime_item->GetTitle().c_str());
+        std::wstring text;
+        const std::wstring separator = L" \u2022 ";
+        text += anime::TranslateType(anime_item->GetType()) + separator +
+                anime::TranslateNumber(anime_item->GetEpisodeCount(), L"?") + L" eps." + separator +
+                anime::TranslateScore(anime_item->GetScore());
+        if (taiga::GetCurrentServiceId() == sync::kMyAnimeList)
+          text += separator + L"#" + ToWstr(anime_item->GetPopularity());
+        if (!anime_item->GetGenres().empty())
+          text += L"\n" + Join(anime_item->GetGenres(), L", ");
+        if (!anime_item->GetProducers().empty())
+          text += L"\n" + Join(anime_item->GetProducers(), L", ");
+        tooltips_.UpdateText(0, text.c_str());
       }
       break;
     }

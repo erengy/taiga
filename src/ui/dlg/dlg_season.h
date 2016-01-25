@@ -45,7 +45,7 @@ enum SeasonViewAs {
 
 class SeasonDialog : public win::Dialog {
 public:
-  SeasonDialog() {}
+  SeasonDialog();
   ~SeasonDialog() {}
 
   INT_PTR DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -71,6 +71,9 @@ private:
   win::ListView list_;
   win::Rebar rebar_;
   win::Toolbar toolbar_;
+  win::Tooltip tooltips_;
+
+  int hot_item_;
 };
 
 extern SeasonDialog DlgSeason;
