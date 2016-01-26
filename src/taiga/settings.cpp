@@ -50,11 +50,15 @@ taiga::AppSettings Settings;
 namespace taiga {
 
 const std::wstring kDefaultExternalLinks =
-    L"Hummingboard|http://hb.cybrox.eu\r\n"
+    L"Hummingbird Tools|https://hb.wopian.me\r\n"
     L"MALgraph|http://graph.anime.plus\r\n"
     L"-\r\n"
-    L"Mahou Showtime Schedule|http://www.mahou.org/Showtime/?o=ET#Current\r\n"
-    L"The Fansub Wiki|http://www.fansubwiki.com";
+    L"AniChart|http://anichart.net/airing\r\n"
+    L"Monthly.moe|http://www.monthly.moe/weekly\r\n"
+    L"Senpai Anime Charts|http://www.senpai.moe/?mode=calendar\r\n"
+    L"-\r\n"
+    L"Anime Streaming Search Engine|http://because.moe\r\n"
+    L"The Fansub Database|http://fansubdb.com";
 const std::wstring kDefaultFormatHttp =
     L"user=%user%"
     L"&name=%title%"
@@ -500,6 +504,30 @@ void AppSettings::HandleCompatibility() {
       }
     }
     Set(kRecognition_DetectStreamingMedia, detect_streaming_media);
+  }
+
+  if (GetInt(kMeta_Version_Major) <= 1 &&
+      GetInt(kMeta_Version_Minor) <= 2 &&
+      GetInt(kMeta_Version_Revision) <= 2) {
+    auto external_links = GetWstr(kApp_Interface_ExternalLinks);
+    ReplaceString(external_links, L"http://mal.oko.im", L"http://graph.anime.plus");
+    std::vector<std::wstring> link_vector;
+    Split(external_links, L"\r\n", link_vector);
+    for (auto it = link_vector.begin(); it != link_vector.end(); ++it) {
+      if (StartsWith(*it, L"Hummingboard")) {
+        *it = L"Hummingbird Tools|https://hb.wopian.me";
+      } else if (StartsWith(*it, L"Mahou Showtime Schedule")) {
+        *it = L"Senpai Anime Charts|http://www.senpai.moe/?mode=calendar";
+        it = link_vector.insert(it, L"Monthly.moe|http://www.monthly.moe/weekly");
+        it = link_vector.insert(it, L"AniChart|http://anichart.net/airing");
+      } else if (StartsWith(*it, L"The Fansub Wiki")) {
+        *it = L"The Fansub Database|http://fansubdb.com";
+        it = link_vector.insert(it, L"Anime Streaming Search Engine|http://because.moe");
+        it = link_vector.insert(it, L"-");
+      }
+    }
+    external_links = Join(link_vector, L"\r\n");
+    Set(kApp_Interface_ExternalLinks, external_links);
   }
 }
 
