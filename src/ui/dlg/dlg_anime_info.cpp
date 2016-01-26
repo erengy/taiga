@@ -730,7 +730,10 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     if (anime_item && anime_item->IsInList()) {
       content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
     } else {
-      content += L"<a href=\"AddToList()\">Add to list</a>";
+      int status = anime::kPlanToWatch;
+      if (mode_ == kDialogModeNowPlaying || CurrentEpisode.anime_id == anime_id_)
+        status = anime::kWatching;
+      content += L"<a href=\"AddToList(" + ToWstr(status) + L")\">Add to list</a>";
     }
     if (anime_item && mode_ == kDialogModeNowPlaying) {
       content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
