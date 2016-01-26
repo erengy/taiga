@@ -20,7 +20,9 @@
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
+#include "sync/service.h"
 #include "taiga/resource.h"
+#include "taiga/settings.h"
 #include "taiga/stats.h"
 #include "ui/dlg/dlg_stats.h"
 #include "ui/theme.h"
@@ -168,6 +170,17 @@ void StatsDialog::Refresh() {
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());
 
   // Score distribution
+  text.clear();
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+    default:
+      text = L"10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n";
+      break;
+    case sync::kHummingbird:
+      text = L"5.0\n4.5\n4.0\n3.5\n3.0\n2.5\n2.0\n1.5\n1.0\n0.5";
+      break;
+  }
+  SetDlgItemText(IDC_STATIC_ANIME_STAT2_LABEL, text.c_str());
   win::Window window = GetDlgItem(IDC_STATIC_ANIME_STAT2);
   win::Rect rect;
   window.GetWindowRect(GetWindowHandle(), &rect);
