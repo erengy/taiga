@@ -63,17 +63,14 @@
 - 21995|8246:0 -> 24151|8488:1
 - 21995|8246:13 -> 24151|8488:2
 
-# Bishoujo Senshi Sailor Moon -> ~: Bishoujo Senshi Sailor Moon R
-- 530|489:46 -> 740|664:43
-
-# Bishoujo Senshi Sailor Moon R -> ~: Bishoujo Senshi Sailor Moon S
-- 740|664:43 -> 532|491:38
-
-# Bishoujo Senshi Sailor Moon S -> ~: Bishoujo Senshi Sailor Moon SuperS
-- 532|491:38 -> 1239|1115:39
-
-# Bishoujo Senshi Sailor Moon SuperS -> ~: Bishoujo Senshi Sailor Moon Sailor Stars
-- 1239|1115:39 -> 996|886:34
+# Bishoujo Senshi Sailor Moon -> ~ R
+- 530|489:47-89 -> 740|664:1-43!
+# Bishoujo Senshi Sailor Moon -> ~ S
+- 530|489:90-127 -> 532|491:1-38!
+# Bishoujo Senshi Sailor Moon -> ~ SuperS
+- 530|489:128-166 -> 1239|1115:1-39!
+# Bishoujo Senshi Sailor Moon -> ~: Sailor Stars
+- 530|489:167-200 -> 996|886:1-34!
 
 # Black Lagoon -> ~: The Second Barrage
 - 889|789:13-24 -> 1519|1363:1-12!
