@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2016-01-12
+- last_modified: 2016-02-18
 
 ::rules
 
@@ -62,6 +62,18 @@
 # Ao Haru Ride -> ~ OVA
 - 21995|8246:0 -> 24151|8488:1
 - 21995|8246:13 -> 24151|8488:2
+
+# Bishoujo Senshi Sailor Moon -> ~: Bishoujo Senshi Sailor Moon R
+- 530|489:46 -> 740|664:43
+
+# Bishoujo Senshi Sailor Moon R -> ~: Bishoujo Senshi Sailor Moon S
+- 740|664:43 -> 532|491:38
+
+# Bishoujo Senshi Sailor Moon S -> ~: Bishoujo Senshi Sailor Moon SuperS
+- 532|491:38 -> 1239|1115:39
+
+# Bishoujo Senshi Sailor Moon SuperS -> ~: Bishoujo Senshi Sailor Moon Sailor Stars
+- 1239|1115:39 -> 996|886:34
 
 # Black Lagoon -> ~: The Second Barrage
 - 889|789:13-24 -> 1519|1363:1-12!
