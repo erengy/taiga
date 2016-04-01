@@ -488,6 +488,9 @@
 # UN-GO -> ~: Inga-ron
 - 10798|6353:0 -> 11531|6529:1
 
+# Ushio to Tora (TV) -> ~ 2nd Season
+- 29854|10359:27-39 -> 31098|11126:1-13!
+
 # Watashi ga Motenai no wa Dou Kangaetemo Omaera ga Warui! -> ~ OVA
 - 16742|7504:13 -> 20449|7991:1
 
