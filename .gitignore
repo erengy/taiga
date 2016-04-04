@@ -3,6 +3,8 @@ build/*
 deps/lib/*
 
 project/vs*/ipch
+project/vs*/*.db
+project/vs*/*.opendb
 project/vs*/*.opensdf
 project/vs*/*.sdf
 project/vs*/*.suo
