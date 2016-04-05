@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2016-03-09
+- last_modified: 2016-04-02
 
 ::rules
 
@@ -173,6 +173,9 @@
 
 # Futsuu no Joshikousei ga [Locodol] Yatte Mita. -> ~: Nagarekawa, Annai Shite Mita.
 - 22189|8267:13 -> 25719|8659:1
+
+# Gakusen Toshi Asterisk -> ~ 2nd Season
+- 30544|10857:13-24 -> 31737|11421:1-12!
 
 # Gantz -> ~ 2nd Stage
 - 384|351:14-26 -> 395|362:1-13!
