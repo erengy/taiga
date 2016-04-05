@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2016-03-09
+- last_modified: 2016-04-05
 
 ::rules
 
@@ -74,6 +74,8 @@
 - 530|489:128-166 -> 1239|1115:1-39!
 # Bishoujo Senshi Sailor Moon -> ~: Sailor Stars
 - 530|489:167-200 -> 996|886:1-34!
+# Bishoujo Senshi Sailor Moon Crystal -> ~ Season III
+- 14751|7163:27-? -> 31733|11415:1-?!
 
 # Black Lagoon -> ~: The Second Barrage
 - 889|789:13-24 -> 1519|1363:1-12!
@@ -126,6 +128,9 @@
 - 8888|5518:4 -> 15201|7229:1
 - 8888|5518:5 -> 30711|10904:1
 
+# Concrete Revolutio: Choujin Gensou -> ~ - The Last Song
+- 31147|11165:14-? -> 32313|11620:1-?!
+
 # Dakara Boku wa, H ga Dekinai. -> ~ OVA
 - 12549|7656:13 -> 14893|7180:1
 
@@ -161,7 +166,7 @@
 - 23199|8314:25-36 -> 27833|9725:1-12!
 
 # Fairy Tail -> ~ (2014)
-- 6702|4676:176-? -> 22043|8203:1-?!
+- 6702|4676:176-277 -> 22043|8203:1-102!
 
 # Fate/stay night: Unlimited Blade Works (TV) -> ~ Episode 0
 - 22297|7882:0 -> 27821|9718:1
@@ -171,8 +176,13 @@
 # Fate/Zero -> ~ 2nd Season
 - 10087|6028:14-25 -> 11741|7658:1-12!
 
-# Futsuu no Joshikousei ga [Locodol] Yatte Mita. -> ~: Nagarekawa, Annai Shite Mita.
+# Futsuu no Joshikousei ga [Locodol] Yattemita. -> ~: Nagarekawa, Annai Shitemita.
 - 22189|8267:13 -> 25719|8659:1
+# Futsuu no Joshikousei ga [Locodol] Yattemita. -> ~ OVA
+- 22189|8267:14-15 -> 30988|11077:1-2
+
+# Gakusen Toshi Asterisk -> ~ 2nd Season
+- 30544|10857:13-24 -> 31737|11421:1-12!
 
 # Gantz -> ~ 2nd Stage
 - 384|351:14-26 -> 395|362:1-13!
@@ -188,7 +198,7 @@
 # Gintama -> ~': Enchousen
 - 918|818:253-265 -> 15417|7253:1-13!
 # Gintama -> ~°
-- 918|818:266-? -> 28977|10083:1-?!
+- 918|818:266-316 -> 28977|10083:1-51!
 
 # God Eater -> ~ Prologue
 - 27631|9130:0 -> 10470|6197:1
@@ -246,6 +256,8 @@
 
 # Kaitou Joker -> ~ 2nd Season
 - 24909|8664:14-26 -> 28869|10070:1-13!
+# Kaitou Joker -> ~ 3rd Season
+- 24909|8664:27-? -> 31670|11393:1-?!
 
 # Kakumeiki Valvrave -> ~ 2nd Season
 - 16668|7487:13-24 -> 18295|7698:1-12!
@@ -277,7 +289,7 @@
 - 9656|5820:0 -> 10152|6055:1
 
 # Kindaichi Shounen no Jikenbo Returns -> ~ 2nd Season
-- 22817|8310:26-? -> 31227|11211:1-?!
+- 22817|8310:26-47 -> 31227|11211:1-22!
 
 # Kino no Tabi: The Beautiful World -> ~ - Tou no Kuni
 - 486|447:0 -> 3466|3031:1
@@ -302,6 +314,9 @@
 
 # Kyoukai no Kanata -> ~: Shinonome
 - 18153|7714:0 -> 23385|8379:1
+
+# Kyoukai no Rinne (TV) -> ~ 2nd Season
+- 28423|10018:26-50 -> 31610|11366:1-25!
 
 # Kyoukaisenjou no Horizon -> ~ II
 - 10456|6187:14-26 -> 12487|6746:1-13!
@@ -487,6 +502,9 @@
 
 # UN-GO -> ~: Inga-ron
 - 10798|6353:0 -> 11531|6529:1
+
+# Ushio to Tora (TV) -> ~ 2nd Season
+- 29854|10359:27-39 -> 31098|11126:1-13!
 
 # Watashi ga Motenai no wa Dou Kangaetemo Omaera ga Warui! -> ~ OVA
 - 16742|7504:13 -> 20449|7991:1
