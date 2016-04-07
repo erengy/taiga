@@ -333,6 +333,7 @@
 		<mode>1</mode>
 		<class>QWidget</class>
 		<class>Qt5QWindowIcon</class>
+		<class>SkinWindowClass</class>
 		<class>VLC DirectX</class>
 		<file>vlc.exe</file>
 		<folder>%ProgramFiles%\VideoLAN\VLC\</folder>
