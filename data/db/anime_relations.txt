@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2016-04-05
+- last_modified: 2016-05-03
 
 ::rules
 
@@ -334,6 +334,9 @@
 
 # Lovedol: Lovely Idol -> ~ OVA
 - 1561|1401:13 -> 6227|4484:1
+
+# Lupin III (2015) -> ~ Specials
+- 27947|9958:25-26 -> 33074|12018:1-2!
 
 # Major S1 -> ~ S2,S3,S4,S5,S6
 - 627|582:27-52 -> 558|515:1-26!
