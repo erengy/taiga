@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** Taiga
 ** Copyright (C) 2010-2014, Eren Okka
 ** 
@@ -567,6 +567,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       foreach_c_(it, scores_) {
         content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->first) + L"\">" +
                    AnimeDatabase.items[it->first].GetTitle() + L"</a>";
+
+		content += L" <a href=\"Info(" + ToWstr(it->first) + L")\">❔‍</a>";
+
         if (Taiga.debug_mode)
           content += L" [Score: " + ToWstr(it->second) + L"]";
         content += L"\n";
