@@ -560,13 +560,16 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
   // Set content
   if (anime_id_ == anime::ID_NOTINLIST) {
+    std::vector<int> passive_links;
     std::wstring content = L"Taiga was unable to identify this title, and it needs your help.\n\n";
     if (!scores_.empty()) {
       int count = 0;
       content += L"Please choose the correct one from the list below:\n\n";
       foreach_c_(it, scores_) {
+        passive_links.push_back(passive_links.empty() ? 1 : passive_links.back() + 2);
         content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->first) + L"\">" +
-                   AnimeDatabase.items[it->first].GetTitle() + L"</a>";
+                   AnimeDatabase.items[it->first].GetTitle() + L"</a>" +
+                   L" <a href=\"Info(" + ToWstr(it->first) + L")\">[?]</a>";
         if (Taiga.debug_mode)
           content += L" [Score: " + ToWstr(it->second) + L"]";
         content += L"\n";
@@ -578,13 +581,15 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"<a id=\"search\">Search</a> for this title.";
     }
     sys_link_.SetText(content);
+    for (const auto i : passive_links) {
+      sys_link_.SetItemState(i, LIS_ENABLED | LIS_DEFAULTCOLORS);
+    }
 
   } else if (anime_id_ == anime::ID_UNKNOWN) {
     std::wstring content;
     Date date_now = GetDate();
     int date_diff = 0;
     const int day_limit = 7;
-    int link_count = 0;
 
     // Recently watched
     std::vector<int> anime_ids;
@@ -610,7 +615,6 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         continue;
       std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
       content += L"\u2022 <a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>\n";
-      link_count++;
       recently_watched++;
       if (recently_watched >= 20)
         break;
@@ -619,7 +623,6 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content = L"Continue Watching:\n"
                 L"<a href=\"ScanEpisodesAll()\">Scan available episodes</a> to see recently watched anime. "
                 L"Or how about you <a href=\"PlayRandomAnime()\">try a random one</a>?\n\n";
-      link_count += 2;
     } else {
       content = L"Continue Watching:\n" + content + L"\n";
     }
@@ -689,7 +692,6 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       for (const auto& id : ids) {
         auto title = AnimeDatabase.FindItem(id)->GetTitle();
         AppendString(text, L"<a href=\"Info(" + ToWstr(id) + L")\">" + title + L"</a>", L"  \u2022  ");
-        link_count++;
       }
       content += text;
     };
@@ -709,15 +711,9 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"\n\n";
     } else {
       content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
-      link_count++;
     }
 
     sys_link_.SetText(content);
-
-    /*
-    for (int i = 0; i < link_count; i++)
-      sys_link_.SetItemState(i, LIS_ENABLED | LIS_HOTTRACK | LIS_DEFAULTCOLORS);
-    */
 
   } else {
     std::wstring content;
