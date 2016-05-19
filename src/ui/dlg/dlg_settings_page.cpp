@@ -255,6 +255,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", taiga::kStream_Ann);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", taiga::kStream_Crunchyroll);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", taiga::kStream_Daisuki);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"KissAnime", taiga::kStream_Kissanime);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Plex Web App", taiga::kStream_Plex);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", taiga::kStream_Veoh);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Viz Anime", taiga::kStream_Viz);
