@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2016-04-05
+- last_modified: 2016-05-20
 
 ::rules
 
@@ -65,6 +65,9 @@
 # Ao Haru Ride -> ~ OVA
 - 21995|8246:0 -> 24151|8488:1
 - 21995|8246:13 -> 24151|8488:2
+
+# Baccano! -> ~ Specials
+- 2251|2039:14-16 -> 3901|3334:1-3
 
 # Bishoujo Senshi Sailor Moon -> ~ R
 - 530|489:47-89 -> 740|664:1-43!
@@ -335,6 +338,9 @@
 # Lovedol: Lovely Idol -> ~ OVA
 - 1561|1401:13 -> 6227|4484:1
 
+# Lupin III (2015) -> ~ Specials
+- 27947|9958:25-26 -> 33074|12018:1-2
+
 # Major S1 -> ~ S2,S3,S4,S5,S6
 - 627|582:27-52 -> 558|515:1-26!
 - 627|582:53-78 -> 1842|1659:1-26!
@@ -371,6 +377,9 @@
 
 # Nodame Cantabile Finale -> ~ Special
 - 5690|4248:0 -> 8038|5177:1
+
+# Ojisan to Marshmallow -> ~ Special
+- 31848|11261:13 -> 33201|12057:1
 
 # One Piece: Strong World -> ~ Episode 0
 - 4155|3492:0 -> 8740|5469:1
@@ -486,6 +495,11 @@
 - 10278|6111:765 -> 11889|6627:1
 # The iDOLM@STER Cinderella Girls -> ~ 2nd Season
 - 23587|8777:14-25 -> 30344|10760:1-12!
+
+# To LOVE-Ru Darkness OVA -> To LOVE-Ru Darkness 2nd OVA
+- 13851|7047:7-? -> 31380|11418:1-?
+# To LOVE-Ru Darkness 2nd -> ~ Specials
+- 28979|?:13-14 -> 31711|?:1-2
 
 # Towa no Quon 1 -> ~ 2,3,4,5,6
 - 10294|6116:2 -> 10713|6310:1
