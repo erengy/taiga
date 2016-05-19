@@ -346,6 +346,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     // Deluge
     } else if (InStr(GetFileName(app_path), L"deluge", 0, true) > -1) {
       app_path = GetPathOnly(app_path) + L"deluge-console.exe";
+      TrimRight(download_path, L"\\");  // gets mixed up as an escape character
       parameters = L"add -p \\\"" + download_path + L"\\\" \\\"" + file + L"\\\"";
       show_command = SW_HIDE;
     } else {
