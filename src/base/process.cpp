@@ -212,6 +212,7 @@ BOOL GetProcessFiles(ULONG process_id,
     // Skip access codes that can cause NtDuplicateObject() or NtQueryObject()
     // to hang
     if (handle.GrantedAccess == 0x00100000 ||
+        handle.GrantedAccess == 0x0012008d ||
         handle.GrantedAccess == 0x00120189 ||
         handle.GrantedAccess == 0x0012019f ||
         handle.GrantedAccess == 0x001a019f)
