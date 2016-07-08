@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2016-05-20
+- last_modified: 2016-07-08
 
 ::rules
 
@@ -223,6 +223,9 @@
 
 # Hayate no Gotoku!! -> ~: Atsu ga Natsuize - Mizugihen!
 - 4192|3514:0 -> 5521|4133:1
+
+# Hibike! Euphonium -> ~: Kakedasu Monaka
+- 27989|9980:14 -> 31665|11391:1
 
 # High School DxD -> ~ OVA
 - 11617|6550:13-14 -> 12729|6801:1-2
