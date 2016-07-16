@@ -399,7 +399,7 @@ bool MatchStreamUrl(StreamingVideoProvider stream_provider,
       return SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/episode-[0-9]+.*-[0-9]+") ||
              SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/.*-movie-[0-9]+");
     case kStreamDaisuki:
-      return InStr(url, L"daisuki.net/anime/watch/") > -1;
+      return SearchRegex(url, L"daisuki\\.net/[a-z]+/[a-z]+/anime/watch");
     case kStreamPlex:
       return SearchRegex(url,
           L"(?:(?:localhost|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):32400|plex.tv)/web/");
