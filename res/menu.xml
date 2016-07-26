@@ -162,11 +162,11 @@
 		<item name="Anime News Network" action="URL(http://www.animenewsnetwork.com/search?q=%title%)"/>
 		<item name="Hummingbird"        action="URL(http://hummingbird.me/search?query=%title%&scope=anime)"/>
 		<item name="MyAnimeList"        action="URL(http://myanimelist.net/anime.php?q=%title%)"/>
+		<item name="Reddit discussion" action="URL(https://www.reddit.com/r/anime/search?q=spoilers+%title%+%watched%&amp;restrict_sr=on&amp;sort=relevance&amp;t=all)"/>
 		<item name="Wikipedia"          action="URL(http://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
 		<item type="separator"/>
 		<item name="Custom RSS feed" action="SearchTorrents()"/>
 		<item name="NyaaTorrents" action="SearchTorrents(http://www.nyaa.se/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%title%)"/>
-		<item name="Reddit discussion" action="URL(https://www.reddit.com/r/anime/search?q=%title%+%watched%+discussion&amp;restrict_sr=on&amp;sort=relevance&amp;t=all)"/>
 	</menu>
 	<!-- Play episode -->
 	<menu name="PlayEpisode">
