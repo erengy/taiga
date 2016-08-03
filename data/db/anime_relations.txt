@@ -31,7 +31,7 @@
 - version: 1.2.0
 
 # Update this date when you add, remove or modify a rule.
-- last_modified: 2016-07-08
+- last_modified: 2016-08-04
 
 ::rules
 
@@ -306,6 +306,9 @@
 # Kono Naka ni Hitori, Imouto ga Iru! -> ~: Ani, Imouto, Koibito
 - 13367|6947:13 -> 15609|7282:1
 
+# Kono Subarashii Sekai ni Shukufuku wo! -> ~ OVA
+- 30831|10941:11 -> 32380|11752:1
+
 # Kore wa Zombie Desu ka? -> ~ OVA
 - 8841|5507:13 -> 10209|6079:1
 # Kore wa Zombie Desu ka? of the Dead -> Kore wa Zombie Desu ka? OVA
@@ -466,6 +469,9 @@
 - 16524|7449:14-15 -> 19211|7872:1-2
 # Puchitto Gargantia -> ~ Special
 - 18413|7751:14 -> 23099|8592:1
+
+# Tales of Zestiria the X -> ~: Saiyaku no Jidai
+- 30911|11023:0 -> 33558|12283:1
 
 # Tamayura: Sotsugyou Shashin Part 1 -> ~ 2,3,4
 - 25729|8808:2 -> 29829|10439:1
