@@ -529,6 +529,9 @@
 # Ushio to Tora (TV) -> ~ 2nd Season
 - 29854|10359:27-39 -> 31098|11126:1-13!
 
+# Under the Dog -> ~ Episode 0
+- 27387|9098:0 -> 27387|9098:1
+
 # Watashi ga Motenai no wa Dou Kangaetemo Omaera ga Warui! -> ~ OVA
 - 16742|7504:13 -> 20449|7991:1
 
