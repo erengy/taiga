@@ -295,12 +295,15 @@ std::wstring MediaPlayers::GetTitle(HWND hwnd, const MediaPlayer& media_player) 
 
     // Window title
     case kMediaModeWindowTitle:
+    case kMediaModeWindowTitleOnly:
     default: {
       std::wstring title;
-      auto method = Settings[taiga::kRecognition_MediaPlayerDetectionMethod];
-      if (method == L"prioritize_file_handle")
-        if (GetTitleFromProcessHandle(hwnd, 0, title))
-          return title;
+      if (media_player.mode != kMediaModeWindowTitleOnly) {
+        auto method = Settings[taiga::kRecognition_MediaPlayerDetectionMethod];
+        if (method == L"prioritize_file_handle")
+          if (GetTitleFromProcessHandle(hwnd, 0, title))
+            return title;
+      }
       title = GetWindowTitle(hwnd);
       EditTitle(title, media_player);
       return title;

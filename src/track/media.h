@@ -30,7 +30,8 @@ enum MediaPlayerModes {
   kMediaModeWinampApi,
   kMediaModeSpecialMessage,
   kMediaModeMplayer,
-  kMediaModeWebBrowser
+  kMediaModeWebBrowser,
+  kMediaModeWindowTitleOnly,
 };
 
 class MediaPlayer {

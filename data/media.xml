@@ -339,6 +339,16 @@
 		<folder>%ProgramFiles%\VideoLAN\VLC\</folder>
 		<folder>%ProgramW6432%\VideoLAN\VLC\</folder>
 	</player>
+	<!-- WebTorrent -->
+	<player>
+		<name>WebTorrent</name>
+		<enabled>1</enabled>
+		<visible>1</visible>
+		<mode>6</mode>
+		<class>Chrome_WidgetWin_1</class>
+		<file>WebTorrent.exe</file>
+		<folder>%LocalAppData%\WebTorrent\app-0.9.0\</folder>
+	</player>
 	<!-- Winamp -->
 	<player>
 		<name>Winamp</name>
