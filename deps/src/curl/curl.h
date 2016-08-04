@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2016, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -91,7 +91,13 @@
 extern "C" {
 #endif
 
+#if defined(BUILDING_LIBCURL) || defined(CURL_STRICTER)
+typedef struct Curl_easy CURL;
+typedef struct Curl_share CURLSH;
+#else
 typedef void CURL;
+typedef void CURLSH;
+#endif
 
 /*
  * libcurl external API function linkage decorations.
@@ -373,6 +379,7 @@ typedef curlioerr (*curl_ioctl_callback)(CURL *handle,
                                          int cmd,
                                          void *clientp);
 
+#ifndef CURL_DID_MEMORY_FUNC_TYPEDEFS
 /*
  * The following typedef's are signatures of malloc, free, realloc, strdup and
  * calloc respectively.  Function pointers of these types can be passed to the
@@ -384,6 +391,9 @@ typedef void (*curl_free_callback)(void *ptr);
 typedef void *(*curl_realloc_callback)(void *ptr, size_t size);
 typedef char *(*curl_strdup_callback)(const char *str);
 typedef void *(*curl_calloc_callback)(size_t nmemb, size_t size);
+
+#define CURL_DID_MEMORY_FUNC_TYPEDEFS
+#endif
 
 /* the kind of data that is passed to information_callback*/
 typedef enum {
@@ -471,9 +481,9 @@ typedef enum {
   CURLE_OBSOLETE44,              /* 44 - NOT USED */
   CURLE_INTERFACE_FAILED,        /* 45 - CURLOPT_INTERFACE failed */
   CURLE_OBSOLETE46,              /* 46 - NOT USED */
-  CURLE_TOO_MANY_REDIRECTS ,     /* 47 - catch endless re-direct loops */
+  CURLE_TOO_MANY_REDIRECTS,      /* 47 - catch endless re-direct loops */
   CURLE_UNKNOWN_OPTION,          /* 48 - User specified an unknown option */
-  CURLE_TELNET_OPTION_SYNTAX ,   /* 49 - Malformed telnet option */
+  CURLE_TELNET_OPTION_SYNTAX,    /* 49 - Malformed telnet option */
   CURLE_OBSOLETE50,              /* 50 - NOT USED */
   CURLE_PEER_FAILED_VERIFICATION, /* 51 - peer's certificate or fingerprint
                                      wasn't verified fine */
@@ -535,6 +545,8 @@ typedef enum {
   CURLE_SSL_PINNEDPUBKEYNOTMATCH, /* 90 - specified pinned public key did not
                                      match */
   CURLE_SSL_INVALIDCERTSTATUS,   /* 91 - invalid certificate status */
+  CURLE_HTTP2_STREAM,            /* 92 - stream error in HTTP/2 framing layer
+                                    */
   CURL_LAST /* never use! */
 } CURLcode;
 
@@ -1460,7 +1472,7 @@ typedef enum {
   CINIT(TFTP_BLKSIZE, LONG, 178),
 
   /* Socks Service */
-  CINIT(SOCKS5_GSSAPI_SERVICE, STRINGPOINT, 179),
+  CINIT(SOCKS5_GSSAPI_SERVICE, STRINGPOINT, 179), /* DEPRECATED, do not use! */
 
   /* Socks Service */
   CINIT(SOCKS5_GSSAPI_NEC, LONG, 180),
@@ -1676,6 +1688,13 @@ typedef enum {
   /* Do not send any tftp option requests to the server */
   CINIT(TFTP_NO_OPTIONS, LONG, 242),
 
+  /* Linked-list of host:port:connect-to-host:connect-to-port,
+     overrides the URL's host:port (only for the network layer) */
+  CINIT(CONNECT_TO, OBJECTPOINT, 243),
+
+  /* Set TCP Fast Open */
+  CINIT(TCP_FASTOPEN, LONG, 244),
+
   CURLOPT_LASTENTRY /* the last unused */
 } CURLoption;
 
@@ -1727,6 +1746,8 @@ enum {
   CURL_HTTP_VERSION_1_1,  /* please use HTTP 1.1 in the request */
   CURL_HTTP_VERSION_2_0,  /* please use HTTP 2 in the request */
   CURL_HTTP_VERSION_2TLS, /* use version 2 for HTTPS, version 1.1 for HTTP */
+  CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE,  /* please use HTTP 2 without HTTP/1.1
+                                           Upgrade */
 
   CURL_HTTP_VERSION_LAST /* *ILLEGAL* http version */
 };
@@ -2110,6 +2131,11 @@ typedef enum {
   CURLSSLBACKEND_MBEDTLS = 11
 } curl_sslbackend;
 
+/* aliases for library clones and renames */
+#define CURLSSLBACKEND_LIBRESSL 1
+#define CURLSSLBACKEND_BORINGSSL 1
+#define CURLSSLBACKEND_WOLFSSL 6
+
 /* Information about the SSL library used and the respective internal SSL
    handle, which can be used to obtain further information regarding the
    connection. Asked for with CURLINFO_TLS_SSL_PTR or CURLINFO_TLS_SESSION. */
@@ -2173,9 +2199,10 @@ typedef enum {
   CURLINFO_TLS_SESSION      = CURLINFO_SLIST  + 43,
   CURLINFO_ACTIVESOCKET     = CURLINFO_SOCKET + 44,
   CURLINFO_TLS_SSL_PTR      = CURLINFO_SLIST  + 45,
+  CURLINFO_HTTP_VERSION     = CURLINFO_LONG   + 46,
   /* Fill in new entries below here! */
 
-  CURLINFO_LASTONE          = 45
+  CURLINFO_LASTONE          = 46
 } CURLINFO;
 
 /* CURLINFO_RESPONSE_CODE is the new name for the option previously known as
@@ -2237,7 +2264,6 @@ typedef void (*curl_unlock_function)(CURL *handle,
                                      curl_lock_data data,
                                      void *userptr);
 
-typedef void CURLSH;
 
 typedef enum {
   CURLSHE_OK,  /* all is fine */
