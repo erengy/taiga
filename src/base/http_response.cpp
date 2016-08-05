@@ -37,8 +37,9 @@ bool Client::GetResponseHeader(const std::wstring& header) {
       if (StartsWith(*line, L"HTTP/"))
         response_.code = ToInt(InStr(*line, L" ", L" "));
     } else {
-      std::wstring name = CharLeft(*line, pos);
-      std::wstring value = line->substr(pos + 2);
+      std::wstring name = line->substr(0, pos);
+      std::wstring value = line->substr(pos + 1);
+      TrimLeft(value);
       // Using insert function instead of operator[] to avoid overwriting
       // previous header fields.
       response_.header.insert(std::make_pair(name, value));
