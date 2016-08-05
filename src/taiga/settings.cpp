@@ -529,6 +529,19 @@ void AppSettings::HandleCompatibility() {
     external_links = Join(link_vector, L"\r\n");
     Set(kApp_Interface_ExternalLinks, external_links);
   }
+
+  if (GetInt(kMeta_Version_Major) <= 1 &&
+      GetInt(kMeta_Version_Minor) <= 2 &&
+      GetInt(kMeta_Version_Revision) <= 3) {
+    if (GetBool(kTorrent_Download_UseAnimeFolder)) {
+      auto app_path = GetWstr(kTorrent_Download_AppPath);
+      if (IsEqual(GetFileName(app_path), L"deluge.exe")) {
+        app_path = GetPathOnly(app_path) + L"deluge-console.exe";
+        Set(kTorrent_Download_AppPath, app_path);
+        LOG(LevelWarning, L"Changed BitTorrent client from deluge.exe to deluge-console.exe");
+      }
+    }
+  }
 }
 
 void AppSettings::RestoreDefaults() {

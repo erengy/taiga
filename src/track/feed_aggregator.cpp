@@ -344,8 +344,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     if (InStr(GetFileName(app_path), L"utorrent", 0, true) > -1) {
       parameters = L"/directory \"" + download_path + L"\" " + parameters;
     // Deluge
-    } else if (InStr(GetFileName(app_path), L"deluge", 0, true) > -1) {
-      app_path = GetPathOnly(app_path) + L"deluge-console.exe";
+    } else if (InStr(GetFileName(app_path), L"deluge-console", 0, true) > -1) {
       TrimRight(download_path, L"\\");  // gets mixed up as an escape character
       parameters = L"add -p \\\"" + download_path + L"\\\" \\\"" + file + L"\\\"";
       show_command = SW_HIDE;
