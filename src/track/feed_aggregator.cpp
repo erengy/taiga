@@ -372,6 +372,7 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
 
   auto it = http_response.header.find(L"Content-Type");
   if (it != http_response.header.end()) {
+    const auto& content_type = it->second;
     static const std::vector<std::wstring> allowed_types{
       L"application/x-bittorrent",
       // The following MIME types are invalid for .torrent files, but we allow
@@ -382,9 +383,12 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
       L"application/x-torrent",
     };
     if (std::find(allowed_types.begin(), allowed_types.end(),
-                  ToLower_Copy(it->second)) == allowed_types.end()) {
-      ui::OnFeedDownload(false, L"Invalid content type: " + it->second);
-      return false;
+                  ToLower_Copy(content_type)) == allowed_types.end()) {
+      it = http_response.header.find(L"Content-Disposition");
+      if (it == http_response.header.end()) {
+        ui::OnFeedDownload(false, L"Invalid content type: " + content_type);
+        return false;
+      }
     }
   }
 
