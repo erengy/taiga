@@ -64,6 +64,7 @@ std::wstring Url::Build() const {
 
   switch (protocol) {
     case base::http::kHttp:
+    case base::http::kRelative:
     default:
       url += L"http";
       break;
@@ -99,6 +100,12 @@ void Url::Crack(std::wstring url) {
     url = url.substr(i + 3);
     if (IsEqual(scheme, L"https"))
       protocol = base::http::kHttps;
+  } else {
+    i = url.find(L"//", 0);
+    if (i == 0) {
+      url = url.substr(2);
+      protocol = base::http::kRelative;
+    }
   }
 
   // Get host and path

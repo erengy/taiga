@@ -29,7 +29,8 @@ namespace base {
 namespace http {
 enum Protocol {
   kHttp,
-  kHttps
+  kHttps,
+  kRelative,
 };
 }
 }
