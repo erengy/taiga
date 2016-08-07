@@ -1,3 +1,11 @@
+[submodule "anime-relations"]
+	path = deps/data/anime-relations
+	url = https://github.com/erengy/anime-relations
+
+[submodule "anime-seasons"]
+	path = deps/data/anime-seasons
+	url = https://github.com/erengy/anime-seasons
+
 [submodule "anitomy"]
 	path = deps/src/anitomy
 	url = https://github.com/erengy/anitomy.git
