@@ -9,7 +9,7 @@
 !define PRODUCT_NAME "Taiga"
 !define PRODUCT_PUBLISHER "erengy"
 !define PRODUCT_VERSION "1.2"
-!define PRODUCT_WEBSITE "http://taiga.erengy.com"
+!define PRODUCT_WEBSITE "http://taiga.moe"
 
 ; Uninstaller
 !define UNINST_EXE "Uninstall.exe"
@@ -91,10 +91,14 @@ Section "!${PRODUCT_NAME}" SEC01
   Call CheckInstance
   
   ; Add files
-  SetOutPath "$INSTDIR\data\"
-  File /r "..\data\"
   SetOutPath "$INSTDIR"
   File "..\bin\Release\Taiga.exe"
+  SetOutPath "$INSTDIR\data\"
+  File /r "..\data\"
+  SetOutPath "$INSTDIR\data\db\"
+  File "..\deps\data\anime-relations\anime-relations.txt"
+  SetOutPath "$INSTDIR\data\db\season\"
+  File /r "..\deps\data\anime-seasons\data\"
   
   ; Skip in silent installation mode
   IfSilent +6
