@@ -164,8 +164,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       ReplaceString(body, L"%title%", EncodeUrl(title));
 
 	  int last_watched_episode = anime_item->GetMyLastWatchedEpisode();
-	  if (last_watched_episode == 0) {
-		  //not watched yet, search for general discussion
+	  if (last_watched_episode == 0 || anime_item->GetEpisodeCount() == 1) {
+		  //not watched yet or some OVA or movie with only 1 episode, search for general discussion
 		  ReplaceString(body, L"%watched%", L"");
 	  }
 	  else {
