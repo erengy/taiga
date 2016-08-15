@@ -162,6 +162,15 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     if (anime_item) {
       std::wstring title = anime_item->GetTitle();
       ReplaceString(body, L"%title%", EncodeUrl(title));
+
+	  int last_watched_episode = anime_item->GetMyLastWatchedEpisode();
+	  if (last_watched_episode == 0 || anime_item->GetEpisodeCount() == 1) {
+		  //not watched yet or some OVA or movie with only 1 episode, search for general discussion
+		  ReplaceString(body, L"%watched%", L"");
+	  }
+	  else {
+		  ReplaceString(body, L"%watched%", std::to_wstring(last_watched_episode));
+	  }
     }
     ExecuteLink(body);
 
