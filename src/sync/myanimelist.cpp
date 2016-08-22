@@ -45,7 +45,7 @@ Service::Service() {
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
-
+  http_request.url.protocol = base::http::kHttps;
   // This doesn't quite help; MAL returns whatever it pleases
   http_request.header[L"Accept"] = L"text/xml, text/*";
   http_request.header[L"Accept-Charset"] = L"utf-8";
