@@ -93,11 +93,13 @@ int EstimateLastAiredEpisodeNumber(const Item& item) {
     // we substract one more day.
     int date_diff = GetDateJapan() - date_start - 1;
     if (date_diff > -1) {
-      int number_of_weeks = date_diff / 7;
-      if (number_of_weeks < item.GetEpisodeCount()) {
+      const int episode_count = item.GetEpisodeCount();
+      const int number_of_weeks = date_diff / 7;
+      if (!IsValidEpisodeCount(episode_count) ||
+          number_of_weeks < episode_count) {
         return number_of_weeks + 1;
       } else {
-        return item.GetEpisodeCount();
+        return episode_count;
       }
     }
   }
