@@ -688,6 +688,13 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
       break;
     }
 
+    // Scroll
+    case LVN_BEGINSCROLL:
+    case LVN_ENDSCROLL: {
+      listview.RefreshItem(-1);
+      break;
+    }
+
     // Column click
     case LVN_COLUMNCLICK: {
       auto lplv = reinterpret_cast<LPNMLISTVIEW>(lParam);
