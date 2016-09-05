@@ -364,7 +364,6 @@ void PageMyInfo::Refresh(int anime_id) {
   SendDlgItemMessage(IDC_DATETIME_START, DTM_SETFORMAT, 0, (LPARAM)date_format);
   SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETFORMAT, 0, (LPARAM)date_format);
   auto set_default_systemtime = [&](int control_id, SYSTEMTIME& st) {
-    SendDlgItemMessage(control_id, DTM_SETRANGE, GDTR_MIN, (LPARAM)&st);
     SendDlgItemMessage(control_id, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&st);
   };
   if (anime::IsValidDate(anime_item->GetDateStart())) {
