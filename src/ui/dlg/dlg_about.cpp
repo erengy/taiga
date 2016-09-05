@@ -107,7 +107,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"http://taiga.moe\"}}{\\fldrslt{Home page}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://github.com/erengy/taiga\"}}{\\fldrslt{GitHub repository}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://hummingbird.me/groups/taiga\"}}{\\fldrslt{Hummingbird group}}}\\line "
-      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"http://myanimelist.net/clubs.php?cid=21400\"}}{\\fldrslt{MyAnimeList club}}}\\line "
+      L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://myanimelist.net/clubs.php?cid=21400\"}}{\\fldrslt{MyAnimeList club}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"https://twitter.com/taigaapp\"}}{\\fldrslt{Twitter account}}}\\line "
       L"\u2022 {\\field{\\*\\fldinst{HYPERLINK \"irc://irc.rizon.net/taiga\"}}{\\fldrslt{IRC channel}}}"
       L"}";

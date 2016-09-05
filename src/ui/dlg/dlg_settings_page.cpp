@@ -305,14 +305,15 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Torrents > Discovery
     case kSettingsPageTorrentsDiscovery: {
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://feeds.feedburner.com/anime-rss-atom-feeds?format=xml");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://feeds.feedburner.com/baka-updates?format=xml");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://haruhichan.com/feed/feed.php?mode=rss");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.baka-updates.com/rss.php");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=0");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.nyaa.se/?page=rss&cats=1_37&filter=0");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.nyaa.se/?page=rss&cats=1_37&filter=2");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings[taiga::kTorrent_Discovery_Source].c_str());
-      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=0&term=%title%");
-      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%");
+      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://www.nyaa.se/?page=rss&cats=1_37&filter=0&term=%title%");
+      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%");
       SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings[taiga::kTorrent_Discovery_SearchUrl].c_str());
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETRANGE32, 10, 3600);
@@ -892,15 +893,15 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
       // Streaming media providers
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
         const std::vector<std::wstring> links = {
-          L"http://www.animelab.com",
-          L"http://www.animenewsnetwork.com/video/",
+          L"https://www.animelab.com",
+          L"https://www.animenewsnetwork.com/video/",
           L"http://www.crunchyroll.com",
           L"http://www.daisuki.net",
-          L"http://plex.tv",
+          L"https://www.plex.tv",
           L"http://www.veoh.com",
-          L"http://www.viz.com/anime/streaming",
+          L"https://www.viz.com/watch",
           L"http://www.wakanim.tv",
-          L"http://www.youtube.com",
+          L"https://www.youtube.com",
         };
         if (lpnmitem->iItem > -1 && lpnmitem->iItem < static_cast<int>(links.size()))
           ExecuteLink(links.at(lpnmitem->iItem));

@@ -39,7 +39,7 @@ void DummyAnime::Initialize() {
   SetAiringStatus(anime::kFinishedAiring);
   SetDateStart(Date(2008, 10, 01));
   SetDateEnd(Date(2009, 03, 25));
-  SetImageUrl(L"http://cdn.myanimelist.net/images/anime/5/22125.jpg");
+  SetImageUrl(L"https://myanimelist.cdn-dena.com/images/anime/13/22128.jpg");
   AddtoUserList();
   SetMyLastWatchedEpisode(25);
   SetMyScore(10);

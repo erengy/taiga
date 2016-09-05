@@ -170,7 +170,7 @@ std::wstring TranslateMyStatusTo(int value) {
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring GetAnimePage(const anime::Item& anime_item) {
-  return L"http://hummingbird.me/anime/" + anime_item.GetSlug();
+  return L"https://hummingbird.me/anime/" + anime_item.GetSlug();
 }
 
 void ViewAnimePage(int anime_id) {
@@ -181,20 +181,20 @@ void ViewAnimePage(int anime_id) {
 }
 
 void ViewDashboard() {
-  ExecuteLink(L"http://hummingbird.me/dashboard");
+  ExecuteLink(L"https://hummingbird.me/dashboard");
 }
 
 void ViewProfile() {
-  ExecuteLink(L"http://hummingbird.me/users/" +
+  ExecuteLink(L"https://hummingbird.me/users/" +
               Settings[taiga::kSync_Service_Hummingbird_Username]);
 }
 
 void ViewRecommendations() {
-  ExecuteLink(L"http://hummingbird.me/recommendations");
+  ExecuteLink(L"https://hummingbird.me/recommendations");
 }
 
 void ViewUpcomingAnime() {
-  ExecuteLink(L"http://hummingbird.me/anime/upcoming");
+  ExecuteLink(L"https://hummingbird.me/anime/upcoming");
 }
 
 }  // namespace hummingbird

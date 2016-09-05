@@ -26,7 +26,7 @@ namespace sync {
 namespace myanimelist {
 
 // API documentation:
-// http://myanimelist.net/modules.php?go=api
+// https://myanimelist.net/modules.php?go=api
 
 class Service : public sync::Service {
 public:

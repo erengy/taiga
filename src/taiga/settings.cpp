@@ -87,9 +87,9 @@ const std::wstring kDefaultFormatBalloon =
 const std::wstring kDefaultTorrentAppPath =
     L"C:\\Program Files\\uTorrent\\uTorrent.exe";
 const std::wstring kDefaultTorrentSearch =
-    L"http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%";
+    L"https://www.nyaa.se/?page=rss&cats=1_37&filter=2&term=%title%";
 const std::wstring kDefaultTorrentSource =
-    L"http://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
+    L"https://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
 
 // Here we assume that anything less than 10 MiB can't be a valid episode.
 const ULONGLONG kDefaultFileSizeThreshold = 1024 * 1024 * 10;

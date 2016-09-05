@@ -169,7 +169,7 @@ std::wstring TranslateKeyTo(const std::wstring& key) {
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring GetAnimePage(const anime::Item& anime_item) {
-  return L"http://myanimelist.net/anime/" +
+  return L"https://myanimelist.net/anime/" +
          anime_item.GetId(sync::kMyAnimeList) + L"/";
 }
 
@@ -181,27 +181,27 @@ void ViewAnimePage(int anime_id) {
 }
 
 void ViewAnimeSearch(const std::wstring& title) {
-  ExecuteLink(L"http://myanimelist.net/anime.php?q=" + title);
+  ExecuteLink(L"https://myanimelist.net/anime.php?q=" + title);
 }
 
 void ViewHistory() {
-  ExecuteLink(L"http://myanimelist.net/history/" +
+  ExecuteLink(L"https://myanimelist.net/history/" +
               Settings[taiga::kSync_Service_Mal_Username]);
 }
 
 void ViewPanel() {
-  ExecuteLink(L"http://myanimelist.net/panel.php");
+  ExecuteLink(L"https://myanimelist.net/panel.php");
 }
 
 void ViewProfile() {
-  ExecuteLink(L"http://myanimelist.net/profile/" +
+  ExecuteLink(L"https://myanimelist.net/profile/" +
               Settings[taiga::kSync_Service_Mal_Username]);
 }
 
 void ViewUpcomingAnime() {
   Date date = GetDate();
 
-  ExecuteLink(L"http://myanimelist.net/anime.php"
+  ExecuteLink(L"https://myanimelist.net/anime.php"
               L"?sd=" + ToWstr(date.day) +
               L"&sm=" + ToWstr(date.month) +
               L"&sy=" + ToWstr(date.year) +
