@@ -23,6 +23,8 @@
 #include "taiga/settings.h"
 #include "track/media.h"
 #include "win/win_automation.h"
+#include <curl/curl.h>
+#include <base/http.h>
 
 enum StreamingVideoProvider {
   kStreamUnknown = -1,
@@ -36,6 +38,7 @@ enum StreamingVideoProvider {
   kStreamViz,
   kStreamWakanim,
   kStreamYoutube,
+  kStreamFunimation,
   kStreamLast
 };
 
@@ -383,6 +386,8 @@ bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
       return Settings.GetBool(taiga::kStream_Wakanim);
     case kStreamYoutube:
       return Settings.GetBool(taiga::kStream_Youtube);
+    case kStreamFunimation:
+      return Settings.GetBool(taiga::kStream_Funimation);
   }
 
   return false;
@@ -412,6 +417,9 @@ bool MatchStreamUrl(StreamingVideoProvider stream_provider,
       return SearchRegex(url, L"wakanim\\.tv/video(-premium)?/[^/]+/");
     case kStreamYoutube:
       return InStr(url, L"youtube.com/watch") > -1;
+    case kStreamFunimation:
+      return SearchRegex(url, L"funimation.com/shows/.*/videos/official/");
+      break;
   }
 
   return false;
@@ -475,10 +483,50 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
       EraseRight(title, L" - YouTube");
       break;
     // Some other website, or URL is not found
+    case kStreamFunimation:
+      break;
     default:
     case kStreamUnknown:
       title.clear();
       break;
+  }
+}
+
+size_t write_callback(char* ptr, size_t size, size_t nmemb, void* userdata)
+{
+  std::wstring *response = (std::wstring*)userdata;
+  *response += StrToWstr(ptr);
+  return size * nmemb;
+}
+
+void ConstructTitleFromUrl(StreamingVideoProvider stream_provider, const std::wstring& url, std::wstring& title)
+{
+  CURL *curl;
+  CURLcode res;
+  std::wstring response{L""};
+
+  switch (stream_provider)
+  {
+  case kStreamFunimation:
+    title = L"";
+    curl = curl_easy_init();
+    if(curl) {
+      curl_easy_setopt(curl, CURLOPT_URL, WstrToStr(url).c_str());
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+      curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&response);
+      res = curl_easy_perform(curl);
+      if (res == CURLE_OK) {
+        std::wstring json = InStr(response, L"playersData = ", L"];") + L"]";
+        std::wstring show_name = InStr(json, L"\"artist\":\"", L"\",");
+        std::wstring episode_number = InStr(json, L"\"videoNumber\":\"", L".0\",");
+        title = show_name + L" " + episode_number;
+      }
+      curl_easy_cleanup(curl);
+    }
+    break;
+  default:
+    break;
   }
 }
 
@@ -501,6 +549,7 @@ std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
   }
 
   // Clean-up title
+  ConstructTitleFromUrl(stream_provider, url, title);
   EraseLeft(title, L"New Tab");
   CleanStreamTitle(stream_provider, title);
 
