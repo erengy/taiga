@@ -435,6 +435,7 @@
 		<visible>1</visible>
 		<mode>5</mode>
 		<class>Chrome_WidgetWin_0</class>
+		<class>Chrome_WidgetWin_1</class>
 		<file>opera.exe</file>
 		<folder>%ProgramFiles(x86)%\Opera\</folder>
 		<edit mode="2">Opera</edit>
