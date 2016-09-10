@@ -233,12 +233,12 @@ std::wstring Episode::GetElementsAsString(anitomy::ElementCategory category) con
 ////////////////////////////////////////////////////////////////////////////////
 
 void Episode::SetElementValue(anitomy::ElementCategory category, int value) {
-  elements_.get(category) = ToWstr(value);
+  elements_.set(category, ToWstr(value));
 }
 
 void Episode::SetElementValue(anitomy::ElementCategory category,
                               const std::wstring& str) {
-  elements_.get(category) = str;
+  elements_.set(category, str);
 }
 
 }  // namespace anime

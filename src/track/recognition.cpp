@@ -332,7 +332,7 @@ void Engine::ExtendAnimeTitle(anime::Episode& episode) const {
   // TEMP: We're going to get rid of this once we're able to redirect fractional
   // episode numbers.
   if (!episode.elements().empty(anitomy::kElementEpisodeNumber)) {
-    const auto& episode_number = episode.elements().get(anitomy::kElementEpisodeNumber);
+    const auto episode_number = episode.elements().get(anitomy::kElementEpisodeNumber);
     if (episode_number.find(L'.') != episode_number.npos) {
       episode.set_anime_title(episode.anime_title() +
                               L" Episode " + episode_number);
