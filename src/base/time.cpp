@@ -140,6 +140,11 @@ static void NeutralizeTimezone(tm& t) {
   if (!initialized) {
     _tzset();
     _get_timezone(&timezone_difference);
+
+    long dst_difference = 0;
+    _get_dstbias(&dst_difference);
+    timezone_difference += dst_difference;
+
     initialized = true;
   }
 
@@ -240,11 +245,12 @@ std::wstring ConvertRfc822ToLocal(const std::wstring& datetime) {
                 "%a, %d %b %Y %H:%M:%S", &local_tm);
 
   TIME_ZONE_INFORMATION time_zone_info = {0};
-  auto time_zone_id = GetTimeZoneInformation(&time_zone_info);
+  const auto time_zone_id = GetTimeZoneInformation(&time_zone_info);
+  const auto bias = time_zone_info.Bias + time_zone_info.DaylightBias;
 
-  std::wstring sign = time_zone_info.Bias <= 0 ? L"+" : L"-";
-  int hh = std::abs(time_zone_info.Bias) / 60;
-  int mm = std::abs(time_zone_info.Bias) % 60;
+  std::wstring sign = bias <= 0 ? L"+" : L"-";
+  int hh = std::abs(bias) / 60;
+  int mm = std::abs(bias) % 60;
 
   std::wstring result_with_tz = StrToWstr(result) + L" " + sign +
       PadChar(ToWstr(hh), L'0', 2) +
