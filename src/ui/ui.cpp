@@ -437,6 +437,12 @@ static bool AnimeListNeedsRefresh(const HistoryItem& history_item) {
          history_item.enable_rewatching;
 }
 
+static bool AnimeListNeedsResort() {
+  auto sort_column = DlgAnimeList.listview.TranslateColumnName(
+      Settings[taiga::kApp_List_SortColumn]);
+  return sort_column == kColumnUserLastUpdated;
+}
+
 void OnHistoryAddItem(const HistoryItem& history_item) {
   DlgHistory.RefreshList();
   DlgSearch.RefreshList();
@@ -448,6 +454,8 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
     DlgAnimeList.RefreshTabs();
   } else {
     DlgAnimeList.RefreshListItem(history_item.anime_id);
+    if (AnimeListNeedsResort())
+      DlgAnimeList.listview.SortFromSettings();
   }
 
   if (!Taiga.logged_in) {
@@ -470,6 +478,8 @@ void OnHistoryChange(const HistoryItem* history_item) {
     DlgAnimeList.RefreshTabs();
   } else {
     DlgAnimeList.RefreshListItem(history_item->anime_id);
+    if (AnimeListNeedsResort())
+      DlgAnimeList.listview.SortFromSettings();
   }
 }
 
