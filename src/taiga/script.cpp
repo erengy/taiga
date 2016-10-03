@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <set>
+
 #include "base/string.h"
 #include "base/url.h"
 #include "library/anime_db.h"
@@ -35,8 +37,7 @@
 //   http://wiki.hydrogenaudio.org/index.php?title=Foobar2000:Title_Formatting_Reference
 //   http://help.mp3tag.de/main_scripting.html
 
-#define SCRIPT_FUNCTION_COUNT 21
-const wchar_t* script_functions[] = {
+static const std::set<std::wstring> script_functions = {
   L"and",
   L"cut",
   L"equal",
@@ -60,8 +61,7 @@ const wchar_t* script_functions[] = {
   L"upper"
 };
 
-#define SCRIPT_VARIABLE_COUNT 22
-const wchar_t* script_variables[] = {
+static const std::set<std::wstring> script_variables = {
   L"animeurl",
   L"audio",
   L"checksum",
@@ -322,19 +322,11 @@ std::wstring EvaluateFunction(const std::wstring& func_name,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsScriptFunction(const std::wstring& str) {
-  for (int i = 0; i < SCRIPT_FUNCTION_COUNT; i++)
-    if (str == script_functions[i])
-      return true;
-
-  return false;
+  return script_functions.count(str) > 0;
 }
 
 bool IsScriptVariable(const std::wstring& str) {
-  for (int i = 0; i < SCRIPT_VARIABLE_COUNT; i++)
-    if (str == script_variables[i])
-      return true;
-
-  return false;
+  return script_variables.count(str) > 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
