@@ -336,16 +336,17 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
     }
   }
 
+  TrimRight(download_path, L"\\");  // gets mixed up as an escape character
+
   std::wstring parameters = L"\"" + file + L"\"";
   int show_command = SW_SHOWNORMAL;
 
   if (!download_path.empty()) {
     // uTorrent
     if (InStr(GetFileName(app_path), L"utorrent", 0, true) > -1) {
-      parameters = L"/directory \"" + download_path + L"\" " + parameters;
+      parameters = L"/directory \"" + download_path + L"\" \"" + file + L"\"";
     // Deluge
     } else if (InStr(GetFileName(app_path), L"deluge-console", 0, true) > -1) {
-      TrimRight(download_path, L"\\");  // gets mixed up as an escape character
       parameters = L"add -p \\\"" + download_path + L"\\\" \\\"" + file + L"\\\"";
       show_command = SW_HIDE;
     } else {
