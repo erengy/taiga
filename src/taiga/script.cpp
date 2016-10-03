@@ -356,6 +356,10 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
   std::wstring episode_number = ToWstr(anime::GetEpisodeHigh(episode));
   TrimLeft(episode_number, L"0");
 
+  // Prepare folder
+  std::wstring folder = episode.folder;
+  TrimRight(folder, L"\\");
+
   // Replace variables
   int pos_var = 0;
   do {
@@ -382,7 +386,7 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"audio", ENCODE(episode.audio_terms()));
           REPLACE(L"checksum", ENCODE(episode.file_checksum()));
           REPLACE(L"file", ENCODE(episode.file_name_with_extension()));
-          REPLACE(L"folder", ENCODE(episode.folder));
+          REPLACE(L"folder", ENCODE(folder));
           REPLACE(L"user", ENCODE(taiga::GetCurrentUsername()));
           REPLACE(L"manual", is_manual ? L"true" : L"");
           switch (Taiga.play_status) {
