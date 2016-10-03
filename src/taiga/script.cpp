@@ -505,14 +505,20 @@ std::wstring EscapeScriptEntities(const std::wstring& str) {
 
 std::wstring UnescapeScriptEntities(const std::wstring& str) {
   std::wstring unescaped;
-  size_t entity_pos;
+  unescaped.reserve(str.size());
 
-  for (size_t pos = 0; pos <= str.length(); ) {
-    entity_pos = InStr(str, L"\\", pos);
-    if (entity_pos == -1)
-      entity_pos = str.length();
-    unescaped.append(str, pos, entity_pos - pos);
-    pos = entity_pos + 1;
+  for (auto it = str.begin(); it != str.end(); ++it) {
+    switch (*it) {
+      case '\\': {
+        auto next = std::next(it);
+        if (next != str.end() && *next == '\\')
+          unescaped.push_back(*next);
+        break;
+      }
+      default:
+        unescaped += *it;
+        break;
+    }
   }
 
   return unescaped;
