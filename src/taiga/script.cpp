@@ -425,11 +425,14 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
   do {
     // Find non-escaped dollar sign
     pos_func = 0;
-    do {
+    while (true) {
       pos_func = InStr(str, L"$", pos_func);
-    } while (0 < pos_func &&
-             pos_func < str.length() &&
-             str[pos_func - 1] == '\\');
+      if (pos_func > 0 && str[pos_func - 1] == '\\') {
+        pos_func += 1;
+      } else {
+        break;
+      }
+    }
 
     if (pos_func > -1) {
       for (unsigned int i = pos_func; i < str.length(); i++) {
