@@ -244,11 +244,18 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
 
     case kHttpTaigaUpdateCheck: {
-      if (Taiga.Updater.ParseData(response.body))
-        if (Taiga.Updater.IsDownloadAllowed())
+      if (Taiga.Updater.ParseData(response.body)) {
+        if (Taiga.Updater.IsUpdateAvailable()) {
+          ui::OnUpdateAvailable();
           break;
+        }
+        if (Taiga.Updater.IsAnimeRelationsAvailable()) {
+          Taiga.Updater.CheckAnimeRelations();
+          break;
+        }
+        ui::OnUpdateNotAvailable();
+      }
       ui::OnUpdateFinished();
-      Taiga.Updater.CheckAnimeRelations();
       break;
     }
     case kHttpTaigaUpdateDownload:
@@ -260,10 +267,13 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       if (Meow.ReadRelations(client.write_buffer_) &&
           SaveToFile(client.write_buffer_, GetPath(kPathDatabaseAnimeRelations))) {
         LOG(LevelDebug, L"Updated anime relation data.");
+        ui::OnUpdateNotAvailable(true);
       } else {
         Meow.ReadRelations();
         LOG(LevelDebug, L"Anime relation data update failed.");
+        ui::OnUpdateNotAvailable(false);
       }
+      ui::OnUpdateFinished();
       break;
   }
 

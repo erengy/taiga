@@ -156,7 +156,7 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
       }
       if (http_client.mode() == taiga::kHttpTaigaUpdateDownload) {
         DlgUpdate.SetDlgItemText(IDC_STATIC_UPDATE_PROGRESS,
-                                    L"Downloading latest update...");
+                                 L"Downloading latest update...");
       }
       break;
     default:
@@ -1018,12 +1018,16 @@ void OnUpdateAvailable() {
   DlgUpdateNew.Create(IDD_UPDATE_NEW, DlgUpdate.GetWindowHandle(), true);
 }
 
-void OnUpdateNotAvailable() {
+void OnUpdateNotAvailable(bool relations) {
   if (DlgMain.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
-    std::wstring footer = L"Current version: " + std::wstring(Taiga.version);
-    dlg.SetFooter(footer.c_str());
-    dlg.SetMainInstruction(L"No updates available. Taiga is up to date!");
+    dlg.SetMainInstruction(L"Taiga is up to date!");
+    std::wstring content = L"Current version: " + std::wstring(Taiga.version);
+    if (relations) {
+      content += L"\n\nUpdated anime relations to: " +
+                 Taiga.Updater.GetCurrentAnimeRelationsModified();
+    }
+    dlg.SetContent(content.c_str());
     dlg.AddButton(L"OK", IDOK);
     dlg.Show(DlgUpdate.GetWindowHandle());
   }

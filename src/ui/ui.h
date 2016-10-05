@@ -110,7 +110,7 @@ void OnLogin();
 void OnLogout();
 
 void OnUpdateAvailable();
-void OnUpdateNotAvailable();
+void OnUpdateNotAvailable(bool relations = false);
 void OnUpdateFinished();
 
 }  // namespace ui

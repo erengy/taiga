@@ -63,19 +63,6 @@ void UpdateHelper::Check() {
 }
 
 void UpdateHelper::CheckAnimeRelations() {
-  if (!current_item_)
-    return;
-
-  if (current_item_->taiga_anime_relations_location.empty())
-    return;
-
-  Date local_modified(Settings[kRecognition_RelationsLastModified]);
-  if (local_modified) {
-    Date current_modified(current_item_->taiga_anime_relations_modified);
-    if (!current_modified || current_modified <= local_modified)
-      return;
-  }
-
   HttpRequest http_request;
   http_request.url = current_item_->taiga_anime_relations_location;
 
@@ -136,22 +123,29 @@ bool UpdateHelper::ParseData(std::wstring data) {
   return true;
 }
 
+bool UpdateHelper::IsAnimeRelationsAvailable() const {
+  if (!current_item_)
+    return false;
+
+  if (current_item_->taiga_anime_relations_location.empty())
+    return false;
+
+  Date local_modified(Settings[kRecognition_RelationsLastModified]);
+  if (local_modified) {
+    Date current_modified(current_item_->taiga_anime_relations_modified);
+    if (!current_modified || current_modified <= local_modified)
+      return false;
+  }
+
+  return true;
+}
+
 bool UpdateHelper::IsRestartRequired() const {
   return restart_required_;
 }
 
 bool UpdateHelper::IsUpdateAvailable() const {
   return update_available_;
-}
-
-bool UpdateHelper::IsDownloadAllowed() const {
-  if (IsUpdateAvailable()) {
-    ui::OnUpdateAvailable();
-    return true;
-  } else {
-    ui::OnUpdateNotAvailable();
-    return false;
-  }
 }
 
 bool UpdateHelper::Download() {
@@ -183,6 +177,11 @@ bool UpdateHelper::RunInstaller() {
   restart_required_ = Execute(download_path_, parameters);
 
   return restart_required_;
+}
+
+std::wstring UpdateHelper::GetCurrentAnimeRelationsModified() const {
+  return current_item_ ? current_item_->taiga_anime_relations_modified :
+                         std::wstring();
 }
 
 std::wstring UpdateHelper::GetDownloadPath() const {

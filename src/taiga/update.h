@@ -36,12 +36,13 @@ public:
   void Check();
   void CheckAnimeRelations();
   bool Download();
-  bool IsDownloadAllowed() const;
+  bool IsAnimeRelationsAvailable() const;
   bool IsRestartRequired() const;
   bool IsUpdateAvailable() const;
   bool ParseData(std::wstring data);
   bool RunInstaller();
 
+  std::wstring GetCurrentAnimeRelationsModified() const;
   std::wstring GetDownloadPath() const;
   void SetDownloadPath(const std::wstring& path);
 
