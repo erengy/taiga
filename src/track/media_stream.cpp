@@ -406,8 +406,8 @@ bool MatchStreamUrl(StreamingVideoProvider stream_provider,
     case kStreamVeoh:
       return InStr(url, L"veoh.com/watch/") > -1;
     case kStreamViz:
-      return SearchRegex(url, L"viz.com/anime/streaming/[^/]+-episode-[0-9]+/") ||
-             SearchRegex(url, L"viz.com/anime/streaming/[^/]+-movie/");
+      return SearchRegex(url, L"viz.com/watch/streaming/[^/]+-episode-[0-9]+/") ||
+             SearchRegex(url, L"viz.com/watch/streaming/[^/]+-movie/");
     case kStreamWakanim:
       return SearchRegex(url, L"wakanim\\.tv/video(-premium)?/[^/]+/");
     case kStreamYoutube:
@@ -460,7 +460,7 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
       break;
     // Viz Anime
     case kStreamViz:
-      EraseLeft(title, L"VIZ.com - NEON ALLEY - ");
+      EraseRight(title, L" // VIZ");
       break;
     // Wakanim
     case kStreamWakanim:
