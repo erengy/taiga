@@ -634,7 +634,7 @@ EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     LTEXT           "Anime list", IDC_STATIC_HEADER1, 7, 7, 300, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Anime count:\nEpisode count:\nLife spent watching:\nLife planned to watch:\nMean score:\nScore deviation:", IDC_STATIC, 19, 22, 70, 50, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Anime count:\nEpisode count:\nTime spent watching:\nTime to complete:\nMean score:\nScore deviation:", IDC_STATIC, 19, 22, 70, 50, SS_LEFT, WS_EX_LEFT
     LTEXT           "", IDC_STATIC_ANIME_STAT1, 96, 22, 215, 50, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
     LTEXT           "Score distribution", IDC_STATIC_HEADER2, 7, 79, 300, 8, SS_LEFT, WS_EX_LEFT
     RTEXT           "10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n", IDC_STATIC_ANIME_STAT2_LABEL, 16, 94, 10, 83, SS_RIGHT, WS_EX_LEFT
