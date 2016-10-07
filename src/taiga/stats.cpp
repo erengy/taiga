@@ -47,6 +47,7 @@ Statistics::Statistics()
 void Statistics::CalculateAll() {
   CalculateAnimeCount();
   CalculateEpisodeCount();
+  CalculateLifePlannedToWatch();
   CalculateLifeSpentWatching();
   CalculateLocalData();
   CalculateMeanScore();
@@ -79,41 +80,39 @@ int Statistics::CalculateEpisodeCount() {
   return episode_count;
 }
 
-const std::wstring& Statistics::CalculateLifeSpentWatching() {
-  int duration = 0;
+const std::wstring& Statistics::CalculateLifePlannedToWatch() {
   int seconds = 0;
 
   foreach_(it, AnimeDatabase.items) {
-    if (!it->second.IsInList())
+    const auto& item = it->second;
+
+    if (item.GetMyStatus() != anime::kPlanToWatch)
       continue;
 
-    duration = it->second.GetEpisodeLength();
-    if (duration <= 0) {
-      // Approximate duration in minutes
-      switch (it->second.GetType()) {
-        default:
-        case anime::kTv:      duration = 24; break;
-        case anime::kOva:     duration = 24; break;
-        case anime::kMovie:   duration = 90; break;
-        case anime::kSpecial: duration = 12; break;
-        case anime::kOna:     duration = 24; break;
-        case anime::kMusic:   duration =  5; break;
-      }
-    }
-
-    int episodes_watched = it->second.GetMyLastWatchedEpisode();
-    episodes_watched += anime::GetMyRewatchedTimes(it->second) *
-                        it->second.GetEpisodeCount();
-
-    seconds += (duration * 60) * episodes_watched;
+    seconds += (EstimateDuration(it->second) * 60) * EstimateEpisodeCount(item);
   }
 
-  if (seconds > 0) {
-    life_spent_watching = ToDateString(seconds);
-  } else {
-    life_spent_watching = L"None";
+  life_planned_to_watch = seconds > 0 ? ToDateString(seconds) : L"None";
+  return life_planned_to_watch;
+}
+
+const std::wstring& Statistics::CalculateLifeSpentWatching() {
+  int seconds = 0;
+
+  foreach_(it, AnimeDatabase.items) {
+    const auto& item = it->second;
+
+    if (!item.IsInList())
+      continue;
+
+    int episodes_watched = item.GetMyLastWatchedEpisode();
+    episodes_watched += anime::GetMyRewatchedTimes(item) *
+                        item.GetEpisodeCount();
+
+    seconds += (EstimateDuration(item) * 60) * episodes_watched;
   }
 
+  life_spent_watching = seconds > 0 ? ToDateString(seconds) : L"None";
   return life_spent_watching;
 }
 

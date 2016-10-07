@@ -32,6 +32,7 @@ public:
   void CalculateAll();
   int CalculateAnimeCount();
   int CalculateEpisodeCount();
+  const std::wstring& CalculateLifePlannedToWatch();
   const std::wstring& CalculateLifeSpentWatching();
   void CalculateLocalData();
   float CalculateMeanScore();
@@ -45,6 +46,7 @@ public:
   int episode_count;
   unsigned int image_count;
   unsigned long long image_size;
+  std::wstring life_planned_to_watch;
   std::wstring life_spent_watching;
   float score_mean;
   float score_deviation;

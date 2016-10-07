@@ -628,23 +628,23 @@ FONT 9, "Segoe UI", 400, 0, 0
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDD_STATS DIALOGEX 0, 0, 350, 277
+IDD_STATS DIALOGEX 0, 0, 350, 285
 STYLE DS_3DLOOK | DS_CONTROL | DS_SHELLFONT | WS_CHILDWINDOW | WS_CLIPCHILDREN
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 9, "Segoe UI", 400, 0, 0
 {
     LTEXT           "Anime list", IDC_STATIC_HEADER1, 7, 7, 300, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Anime count:\nEpisode count:\nLife spent watching:\nMean score:\nScore deviation:", IDC_STATIC, 19, 22, 70, 42, SS_LEFT, WS_EX_LEFT
-    LTEXT           "", IDC_STATIC_ANIME_STAT1, 96, 22, 215, 42, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
-    LTEXT           "Score distribution", IDC_STATIC_HEADER2, 7, 71, 300, 8, SS_LEFT, WS_EX_LEFT
-    RTEXT           "10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n", IDC_STATIC_ANIME_STAT2_LABEL, 16, 86, 10, 83, SS_RIGHT, WS_EX_LEFT
-    CONTROL         "", IDC_STATIC_ANIME_STAT2, WC_STATIC, SS_OWNERDRAW, 34, 86, 275, 83, WS_EX_LEFT
-    LTEXT           "Local database", IDC_STATIC_HEADER3, 7, 176, 300, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Anime count:\nImage files:\nTorrent files:", IDC_STATIC, 19, 191, 70, 25, SS_LEFT, WS_EX_LEFT
-    LTEXT           "", IDC_STATIC_ANIME_STAT3, 96, 191, 215, 25, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
-    LTEXT           "Taiga", IDC_STATIC_HEADER4, 7, 223, 300, 8, SS_LEFT, WS_EX_LEFT
-    LTEXT           "Connections made:\nUptime:\nTigers harmed:", IDC_STATIC, 19, 238, 70, 25, SS_LEFT, WS_EX_LEFT
-    LTEXT           "", IDC_STATIC_ANIME_STAT4, 96, 238, 215, 25, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
+    LTEXT           "Anime count:\nEpisode count:\nLife spent watching:\nLife planned to watch:\nMean score:\nScore deviation:", IDC_STATIC, 19, 22, 70, 50, SS_LEFT, WS_EX_LEFT
+    LTEXT           "", IDC_STATIC_ANIME_STAT1, 96, 22, 215, 50, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
+    LTEXT           "Score distribution", IDC_STATIC_HEADER2, 7, 79, 300, 8, SS_LEFT, WS_EX_LEFT
+    RTEXT           "10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n", IDC_STATIC_ANIME_STAT2_LABEL, 16, 94, 10, 83, SS_RIGHT, WS_EX_LEFT
+    CONTROL         "", IDC_STATIC_ANIME_STAT2, WC_STATIC, SS_OWNERDRAW, 34, 94, 275, 83, WS_EX_LEFT
+    LTEXT           "Local database", IDC_STATIC_HEADER3, 7, 184, 300, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Anime count:\nImage files:\nTorrent files:", IDC_STATIC, 19, 199, 70, 25, SS_LEFT, WS_EX_LEFT
+    LTEXT           "", IDC_STATIC_ANIME_STAT3, 96, 199, 215, 25, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
+    LTEXT           "Taiga", IDC_STATIC_HEADER4, 7, 231, 300, 8, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Connections made:\nUptime:\nTigers harmed:", IDC_STATIC, 19, 246, 70, 25, SS_LEFT, WS_EX_LEFT
+    LTEXT           "", IDC_STATIC_ANIME_STAT4, 96, 246, 215, 25, SS_LEFT | SS_NOPREFIX, WS_EX_LEFT
 }
 
 

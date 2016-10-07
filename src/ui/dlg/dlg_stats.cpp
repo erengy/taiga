@@ -165,6 +165,7 @@ void StatsDialog::Refresh() {
   text += ToWstr(Stats.anime_count) + L"\n";
   text += ToWstr(Stats.episode_count) + L"\n";
   text += Stats.life_spent_watching + L"\n";
+  text += Stats.life_planned_to_watch + L"\n";
   text += ToWstr(Stats.score_mean, 2) + L"\n";
   text += ToWstr(Stats.score_deviation, 2);
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());

@@ -35,6 +35,7 @@ bool IsValidId(int anime_id);
 
 bool IsAiredYet(const Item& item);
 bool IsFinishedAiring(const Item& item);
+int EstimateDuration(const Item& item);
 int EstimateLastAiredEpisodeNumber(const Item& item);
 
 bool IsItemOldEnough(const Item& item);
