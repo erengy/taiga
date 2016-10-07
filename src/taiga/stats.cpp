@@ -86,10 +86,16 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
   foreach_(it, AnimeDatabase.items) {
     const auto& item = it->second;
 
-    if (item.GetMyStatus() != anime::kPlanToWatch)
-      continue;
+    switch (item.GetMyStatus()) {
+      case anime::kNotInList:
+      case anime::kCompleted:
+      case anime::kDropped:
+        continue;
+    }
 
-    seconds += (EstimateDuration(it->second) * 60) * EstimateEpisodeCount(item);
+    int episodes = EstimateEpisodeCount(item) - item.GetMyLastWatchedEpisode();
+
+    seconds += (EstimateDuration(it->second) * 60) * episodes;
   }
 
   life_planned_to_watch = seconds > 0 ? ToDateString(seconds) : L"None";
