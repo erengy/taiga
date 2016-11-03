@@ -306,7 +306,6 @@ BOOL SettingsPage::OnInitDialog() {
     // Torrents > Discovery
     case kSettingsPageTorrentsDiscovery: {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://feeds.feedburner.com/anime-rss-atom-feeds?format=xml");
-      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://feeds.feedburner.com/baka-updates?format=xml");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://haruhichan.com/feed/feed.php?mode=rss");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.nyaa.se/?page=rss&cats=1_37&filter=0");

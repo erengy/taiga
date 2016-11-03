@@ -404,19 +404,8 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
 
 void Aggregator::ParseDescription(FeedItem& feed_item,
                                   const std::wstring& source) {
-  // Baka-Updates
-  if (InStr(source, L"baka-updates", 0, true) > -1) {
-    int index_begin = InStr(feed_item.description, L"Released on");
-    int index_end = feed_item.description.length();
-    if (index_begin > -1)
-      index_end -= index_begin;
-    if (index_begin == -1)
-      index_begin = 0;
-    feed_item.description =
-        feed_item.description.substr(index_begin, index_end);
-
   // Haruhichan
-  } else if (InStr(source, L"haruhichan", 0, true) > -1) {
+  if (InStr(source, L"haruhichan", 0, true) > -1) {
     feed_item.info_link = feed_item.description;
 
   // NyaaTorrents
