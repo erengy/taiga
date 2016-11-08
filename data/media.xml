@@ -246,6 +246,7 @@
 		<class>mpv</class>
 		<file>mpv.exe</file>
 		<edit mode="1">mpv - </edit>
+		<edit mode="2">mpv</edit>
 	</player>
 	<!-- MV2Player -->
 	<player>
