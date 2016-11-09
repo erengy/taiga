@@ -73,10 +73,14 @@ bool Client::ParseResponseHeader() {
     } else if (IsEqual(name, L"Location") || IsEqual(name, L"Refresh")) {
       refresh = IsEqual(name, L"Refresh");
       if (refresh) {
-        const std::wstring url_field = L"url=";
-        size_t pos = value.find(url_field);
-        if (pos != value.npos)
-          value = value.substr(pos + url_field.size());
+        std::initializer_list<std::wstring> url_fields = {L"url=", L"URL="};
+        for (const auto& url_field : url_fields) {
+          size_t pos = value.find(url_field);
+          if (pos != value.npos) {
+            value = value.substr(pos + url_field.size());
+            break;
+          }
+        }
       }
       location.Crack(value);
       if (location.host.empty())  // relative URL
