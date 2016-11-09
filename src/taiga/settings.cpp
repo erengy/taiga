@@ -140,6 +140,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_Connection_ProxyHost, nullptr, L"program/proxy/host");
   INITKEY(kApp_Connection_ProxyUsername, nullptr, L"program/proxy/username");
   INITKEY(kApp_Connection_ProxyPassword, nullptr, L"program/proxy/password");
+  INITKEY(kApp_Connection_NoRevoke, L"false", L"program/general/sslnorevoke");
   INITKEY(kApp_Connection_ReuseActive, L"true", L"program/general/reuseconnections");
   INITKEY(kApp_Interface_Theme, L"Default", L"program/general/theme");
   INITKEY(kApp_Interface_ExternalLinks, kDefaultExternalLinks.c_str(), L"program/general/externallinks");

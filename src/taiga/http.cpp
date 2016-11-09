@@ -53,6 +53,10 @@ HttpClient::HttpClient(const HttpRequest& request)
   // Enable debug mode to log requests and responses
   set_debug_mode(Taiga.debug_mode);
 
+  // Disabling certificate revocation checks seems to work for those who get
+  // "SSL connect error". See issue #312 for more information.
+  set_no_revoke(Settings.GetBool(kApp_Connection_NoRevoke));
+
   // The default header (e.g. "User-Agent: Taiga/1.0") will be used, unless
   // another value is specified in the request header
   set_user_agent(

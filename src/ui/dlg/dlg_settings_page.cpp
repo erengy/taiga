@@ -409,6 +409,7 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageAdvanced: {
       parent->advanced_settings_.clear();
       parent->advanced_settings_.insert({
+        {taiga::kApp_Connection_NoRevoke, {L"", L"Application / Disable certificate revocation checks"}},
         {taiga::kSync_Notify_Format, {L"", L"Application / Episode notification format"}},
         {taiga::kApp_Connection_ProxyHost, {L"", L"Application / Proxy host"}},
         {taiga::kApp_Connection_ProxyPassword, {L"", L"Application / Proxy password"}},

@@ -73,6 +73,7 @@ enum AppSettingName {
   kApp_Connection_ProxyHost,
   kApp_Connection_ProxyUsername,
   kApp_Connection_ProxyPassword,
+  kApp_Connection_NoRevoke,
   kApp_Connection_ReuseActive,
   kApp_Interface_Theme,
   kApp_Interface_ExternalLinks,

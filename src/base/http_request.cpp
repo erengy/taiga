@@ -173,6 +173,11 @@ bool Client::SetRequestOptions() {
   TAIGA_CURL_SET_OPTION(CURLOPT_SSL_VERIFYHOST, 0L);
 #endif
 
+  // Disable certificate revocation checks for the SSL backend
+  if (no_revoke_) {
+    TAIGA_CURL_SET_OPTION(CURLOPT_SSL_OPTIONS, CURLSSLOPT_NO_REVOKE);
+  }
+
   #undef TAIGA_CURL_SET_OPTION
 
   return true;
