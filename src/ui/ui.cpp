@@ -440,7 +440,13 @@ static bool AnimeListNeedsRefresh(const HistoryItem& history_item) {
 static bool AnimeListNeedsResort() {
   auto sort_column = DlgAnimeList.listview.TranslateColumnName(
       Settings[taiga::kApp_List_SortColumn]);
-  return sort_column == kColumnUserLastUpdated;
+  switch (sort_column) {
+    case kColumnUserLastUpdated:
+    case kColumnUserProgress:
+    case kColumnUserRating:
+      return true;
+  }
+  return false;
 }
 
 void OnHistoryAddItem(const HistoryItem& history_item) {
