@@ -1296,7 +1296,7 @@ void AnimeListDialog::RefreshList(int index) {
   if (!IsWindow())
     return;
 
-  bool group_view = !DlgMain.search_bar.filters.text.empty() &&
+  bool group_view = !DlgMain.search_bar.filters.text[kSidebarItemAnimeList].empty() &&
                     win::GetVersion() > win::kVersionXp;
 
   // Remember current position
@@ -1337,7 +1337,7 @@ void AnimeListDialog::RefreshList(int index) {
         continue;
       }
     }
-    if (!DlgMain.search_bar.filters.CheckItem(anime_item))
+    if (!DlgMain.search_bar.filters.CheckItem(anime_item, kSidebarItemAnimeList))
       continue;
 
     group_count.at(anime_item.GetMyStatus())++;
@@ -1438,7 +1438,7 @@ void AnimeListDialog::RefreshTabs(int index) {
     tab.SetItemText(i - 1, anime::TranslateMyStatus(i, true).c_str());
 
   // Select related tab
-  bool group_view = !DlgMain.search_bar.filters.text.empty();
+  bool group_view = !DlgMain.search_bar.filters.text[kSidebarItemAnimeList].empty();
   int tab_index = current_status_;
   if (group_view) {
     tab_index = -1;

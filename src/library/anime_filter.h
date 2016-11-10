@@ -19,6 +19,7 @@
 #ifndef TAIGA_LIBRARY_ANIME_FILTER_H
 #define TAIGA_LIBRARY_ANIME_FILTER_H
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -31,16 +32,16 @@ public:
   Filters();
   virtual ~Filters() {}
 
-  bool CheckItem(const Item& item) const;
+  bool CheckItem(const Item& item, int text_index) const;
   void Reset();
 
   std::vector<bool> my_status;
   std::vector<bool> status;
   std::vector<bool> type;
-  std::wstring text;
+  std::map<int, std::wstring> text;
 
 private:
-  bool FilterText(const Item& item) const;
+  bool FilterText(const Item& item, int text_index) const;
 };
 
 }  // namespace anime

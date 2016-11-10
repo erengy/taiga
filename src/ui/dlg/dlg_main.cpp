@@ -978,10 +978,10 @@ void MainDialog::Navigation::RefreshSearchText(int previous_page) {
     case kSidebarItemSeasons:
     case kSidebarItemSearch:
     case kSidebarItemFeeds:
-      parent->search_bar.filters.text = parent->search_bar.text[current_page_];
+      parent->search_bar.filters.text[current_page_] = parent->search_bar.text[current_page_];
       break;
     default:
-      parent->search_bar.filters.text.clear();
+      parent->search_bar.filters.text[current_page_].clear();
       parent->search_bar.text[current_page_].clear();
       break;
   }

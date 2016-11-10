@@ -27,7 +27,7 @@ Filters::Filters() {
   Reset();
 }
 
-bool Filters::CheckItem(const Item& item) const {
+bool Filters::CheckItem(const Item& item, int text_index) const {
   // Filter my status
   for (size_t i = 0; i < my_status.size(); i++)
     if (!my_status.at(i) && item.GetMyStatus() == i)
@@ -44,16 +44,18 @@ bool Filters::CheckItem(const Item& item) const {
       return false;
 
   // Filter text
-  if (!FilterText(item))
+  if (!FilterText(item, text_index))
     return false;
 
   // Item passed all filters
   return true;
 }
 
-bool Filters::FilterText(const Item& item) const {
+bool Filters::FilterText(const Item& item, int text_index) const {
   std::vector<std::wstring> words;
-  Split(text, L" ", words);
+  auto it = text.find(text_index);
+  auto filter_text = it != text.end() ? it->second : std::wstring();
+  Split(filter_text, L" ", words);
   RemoveEmptyStrings(words);
 
   std::vector<std::wstring> titles;
@@ -87,7 +89,7 @@ void Filters::Reset() {
   status.resize(3, true);
   type.resize(6, true);
 
-  text = L"";
+  text.clear();
 }
 
 }  // namespace anime

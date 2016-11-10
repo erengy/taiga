@@ -218,9 +218,9 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       cancel_button.Show(text.empty() ? SW_HIDE : SW_SHOWNORMAL);
       switch (current_page) {
         case kSidebarItemAnimeList:
-          if (search_bar.filters.text != text) {
+          if (search_bar.filters.text[current_page] != text) {
             if (text.empty() || text.size() > 1) {
-              search_bar.filters.text = text;
+              search_bar.filters.text[current_page] = text;
               DlgAnimeList.RefreshList();
               DlgAnimeList.RefreshTabs();
               return TRUE;
@@ -228,8 +228,8 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
           }
           break;
         case kSidebarItemSeasons:
-          if (search_bar.filters.text != text) {
-            search_bar.filters.text = text;
+          if (search_bar.filters.text[current_page] != text) {
+            search_bar.filters.text[current_page] = text;
             DlgSeason.RefreshList();
             return TRUE;
           }
