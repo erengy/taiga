@@ -126,6 +126,8 @@ bool Client::SetRequestOptions() {
   // Set auto-redirect
   if (auto_redirect_) {
     TAIGA_CURL_SET_OPTION(CURLOPT_FOLLOWLOCATION, TRUE);
+    // "20" happens to be the number used by Chrome and Firefox
+    TAIGA_CURL_SET_OPTION(CURLOPT_MAXREDIRS, 20);
   }
 
   // Set method
