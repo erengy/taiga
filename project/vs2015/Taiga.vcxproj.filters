@@ -67,9 +67,6 @@
     <ClCompile Include="..\..\src\base\base64.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\crc.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\crypto.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -523,9 +520,6 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\comparable.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\base\crc.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\crypto.h">
