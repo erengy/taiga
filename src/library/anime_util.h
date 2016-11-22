@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_UTIL_H
-#define TAIGA_LIBRARY_ANIME_UTIL_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -108,5 +107,3 @@ std::wstring TranslateDateToSeasonString(const Date& date);
 std::wstring TranslateSeasonToMonths(const Season& season);
 
 }  // namespace anime
-
-#endif  // TAIGA_LIBRARY_ANIME_UTIL_H

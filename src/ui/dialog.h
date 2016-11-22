@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DIALOG_H
-#define TAIGA_UI_DIALOG_H
+#pragma once
 
 #include <windows.h>
 
@@ -43,5 +42,3 @@ void ShowDlgAnimeInfo(int anime_id);
 void ShowDlgSettings(int section, int page);
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DIALOG_H

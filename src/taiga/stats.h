@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_STATS_H
-#define TAIGA_TAIGA_STATS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -61,5 +60,3 @@ public:
 }  // namespace taiga
 
 extern taiga::Statistics Stats;
-
-#endif  // TAIGA_TAIGA_STATS_H

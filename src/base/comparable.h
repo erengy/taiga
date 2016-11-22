@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_COMPARE_H
-#define TAIGA_BASE_COMPARE_H
+#pragma once
 
 namespace base {
 
@@ -54,5 +53,3 @@ private:
 };
 
 }  // namespace base
-
-#endif  // TAIGA_BASE_COMPARE_H

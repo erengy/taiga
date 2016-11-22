@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_ANIME_INFO_H
-#define TAIGA_UI_DLG_ANIME_INFO_H
+#pragma once
 
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
@@ -104,5 +103,3 @@ extern AnimeDialog DlgAnime;
 extern NowPlayingDialog DlgNowPlaying;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_ANIME_INFO_H

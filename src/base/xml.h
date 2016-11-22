@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_XML_H
-#define TAIGA_BASE_XML_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -52,5 +51,3 @@ void XmlWriteStrValue(pugi::xml_node& node, const wchar_t* name,
 
 bool XmlWriteDocumentToFile(const pugi::xml_document& document,
                             const std::wstring& path);
-
-#endif  // TAIGA_BASE_XML_H

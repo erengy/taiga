@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_HISTORY_H
-#define TAIGA_LIBRARY_HISTORY_H
+#pragma once
 
 #include <string>
 #include <queue>
@@ -121,5 +120,3 @@ private:
 
 extern class History History;
 extern class ConfirmationQueue ConfirmationQueue;
-
-#endif  // TAIGA_LIBRARY_HISTORY_H

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_MYANIMELIST_TYPES_H
-#define TAIGA_SYNC_MYANIMELIST_TYPES_H
+#pragma once
 
 namespace sync {
 namespace myanimelist {
@@ -49,5 +48,3 @@ enum MyStatus {
 
 }  // namespace myanimelist
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_MYANIMELIST_TYPES_H

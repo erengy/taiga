@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_DEBUG_H
-#define TAIGA_TAIGA_DEBUG_H
+#pragma once
 
 #include <string>
 
@@ -39,5 +38,3 @@ void Print(std::wstring text);
 void Test();
 
 }  // namespace debug
-
-#endif  // TAIGA_TAIGA_DEBUG_H

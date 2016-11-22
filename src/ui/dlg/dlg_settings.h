@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_SETTINGS_H
-#define TAIGA_UI_DLG_SETTINGS_H
+#pragma once
 
 #include <map>
 #include <vector>
@@ -78,5 +77,3 @@ private:
 extern SettingsDialog DlgSettings;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_SETTINGS_H

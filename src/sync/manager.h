@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_MANAGER_H
-#define TAIGA_SYNC_MANAGER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -61,5 +60,3 @@ private:
 }  // namespace sync
 
 extern sync::Manager ServiceManager;
-
-#endif  // TAIGA_SYNC_MANAGER_H

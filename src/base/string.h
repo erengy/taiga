@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_STRING_H
-#define TAIGA_BASE_STRING_H
+#pragma once
 
 #include <array>
 #include <string>
@@ -116,5 +115,3 @@ const std::wstring& EmptyString();
 std::wstring PadChar(std::wstring str, const wchar_t ch, const size_t len);
 std::wstring PushString(const std::wstring& str1, const std::wstring& str2);
 void ReadStringFromResource(LPCWSTR name, LPCWSTR type, std::wstring& output);
-
-#endif  // TAIGA_BASE_STRING_H

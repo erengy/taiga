@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_METADATA_H
-#define TAIGA_LIBRARY_METADATA_H
+#pragma once
 
 #include "base/time.h"
 #include "base/types.h"
@@ -67,5 +66,3 @@ struct Metadata {
 };
 
 }  // namespace library
-
-#endif  // TAIGA_LIBRARY_METADATA_H

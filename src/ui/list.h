@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_LIST_H
-#define TAIGA_UI_LIST_H
+#pragma once
 
 #include <vector>
 #include <windows.h>
@@ -61,5 +60,3 @@ void GetPopupMenuPositionForSelectedListItem(win::ListView& listview, POINT& pt)
 bool HitTestListHeader(win::ListView& listview, POINT pt);
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_LIST_H

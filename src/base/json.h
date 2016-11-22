@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_JSON_H
-#define TAIGA_BASE_JSON_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -25,5 +24,3 @@
 #include <jsoncpp/json/json.h>
 
 bool JsonReadArray(const Json::Value& root, const std::string& name, std::vector<std::wstring>& output);
-
-#endif  // TAIGA_BASE_JSON_H

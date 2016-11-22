@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_UI_H
-#define TAIGA_UI_UI_H
+#pragma once
 
 #include <windows/win/taskbar.h>
 
@@ -122,5 +121,3 @@ void OnUpdateNotAvailable(bool relations = false);
 void OnUpdateFinished();
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_UI_H

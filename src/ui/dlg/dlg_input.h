@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_INPUT_H
-#define TAIGA_UI_DLG_INPUT_H
+#pragma once
 
 #include <string>
 
@@ -50,5 +49,3 @@ private:
 };
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_INPUT_H

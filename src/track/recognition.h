@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TRACK_RECOGNITION_H
-#define TAIGA_TRACK_RECOGNITION_H
+#pragma once
 
 #include <map>
 #include <set>
@@ -117,5 +116,3 @@ private:
 }  // namespace track
 
 extern track::recognition::Engine Meow;
-
-#endif  // TAIGA_TRACK_RECOGNITION_H

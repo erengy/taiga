@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_SETTINGS_H
-#define TAIGA_BASE_SETTINGS_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -67,5 +66,3 @@ protected:
 };
 
 }  // namespace base
-
-#endif  // TAIGA_BASE_SETTINGS_H

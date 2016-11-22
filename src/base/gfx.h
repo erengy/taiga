@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_GFX_H
-#define TAIGA_BASE_GFX_H
+#pragma once
 
 #include <windows/win/gdi.h>
 #include <windows/win/gdi_plus.h>
@@ -54,6 +53,3 @@ int ScaleY(int value);
 void RgbToHsv(float r, float g, float b, float& h, float& s, float& v);
 void HsvToRgb(float& r, float& g, float& b, float h, float s, float v);
 COLORREF ChangeColorBrightness(COLORREF color, float modifier);
-
-
-#endif  // TAIGA_BASE_GFX_H

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_FILE_H
-#define TAIGA_BASE_FILE_H
+#pragma once
 
 #include <functional>
 #include <string>
@@ -87,5 +86,3 @@ protected:
   bool skip_files_;
   bool skip_subdirectories_;
 };
-
-#endif  // TAIGA_BASE_FILE_H

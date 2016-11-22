@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_SEASON_H
-#define TAIGA_LIBRARY_ANIME_SEASON_H
+#pragma once
 
 #include <string>
 
@@ -61,5 +60,3 @@ private:
 };
 
 }  // namespace anime
-
-#endif  // TAIGA_LIBRARY_ANIME_SEASON_H

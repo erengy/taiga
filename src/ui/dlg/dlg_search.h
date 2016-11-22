@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_SEARCH_H
-#define TAIGA_UI_DLG_SEARCH_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -53,5 +52,3 @@ private:
 extern SearchDialog DlgSearch;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_SEARCH_H

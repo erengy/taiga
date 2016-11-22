@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TRACK_MEDIA_H
-#define TAIGA_TRACK_MEDIA_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -109,5 +108,3 @@ extern MediaPlayers MediaPlayers;
 
 void ProcessMediaPlayerStatus(const MediaPlayer* media_player);
 void ProcessMediaPlayerTitle(const MediaPlayer& media_player);
-
-#endif  // TAIGA_TRACK_MEDIA_H

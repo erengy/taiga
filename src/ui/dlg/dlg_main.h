@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_MAIN_H
-#define TAIGA_UI_DLG_MAIN_H
+#pragma once
 
 #include <map>
 #include <vector>
@@ -166,5 +165,3 @@ private:
 extern MainDialog DlgMain;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_MAIN_H

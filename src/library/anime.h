@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_H
-#define TAIGA_LIBRARY_ANIME_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -114,5 +113,3 @@ class LocalInformation {
 };
 
 }  // namespace anime
-
-#endif  // TAIGA_LIBRARY_ANIME_H

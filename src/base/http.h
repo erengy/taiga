@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_HTTP_H
-#define TAIGA_BASE_HTTP_H
+#pragma once
 
 // Each client will have its own thread
 #define TAIGA_HTTP_MULTITHREADED
@@ -188,5 +187,3 @@ private:
 
 }  // namespace http
 }  // namespace base
-
-#endif  // TAIGA_BASE_HTTP_H

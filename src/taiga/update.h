@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_UPDATE_H
-#define TAIGA_TAIGA_UPDATE_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -65,5 +64,3 @@ private:
 };
 
 }  // namespace taiga
-
-#endif  // TAIGA_TAIGA_UPDATE_H

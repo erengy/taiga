@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_ORANGE_H
-#define TAIGA_TAIGA_ORANGE_H
+#pragma once
 
 #include <windows/win/thread.h>
 
@@ -43,5 +42,3 @@ private:
 extern Orange orange;
 
 }  // namespace taiga
-
-#endif  // TAIGA_TAIGA_ORANGE_H

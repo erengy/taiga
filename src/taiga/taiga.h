@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_TAIGA_H
-#define TAIGA_TAIGA_TAIGA_H
+#pragma once
 
 #include <semaver/semaver/version.h>
 #include <windows/win/application.h>
@@ -79,5 +78,3 @@ private:
 }  // namespace taiga
 
 extern taiga::App Taiga;
-
-#endif  // TAIGA_TAIGA_TAIGA_H

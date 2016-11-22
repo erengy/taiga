@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_TIMER_H
-#define TAIGA_BASE_TIMER_H
+#pragma once
 
 #include <map>
 #include <windows.h>
@@ -78,5 +77,3 @@ protected:
 };
 
 }  // namespace base
-
-#endif  // TAIGA_BASE_TIMER_H

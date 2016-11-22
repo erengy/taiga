@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_MAP_H
-#define TAIGA_BASE_MAP_H
+#pragma once
 
 #include <map>
 
@@ -38,5 +37,3 @@ public:
 };
 
 }  // namespace base
-
-#endif  // TAIGA_BASE_MAP_H

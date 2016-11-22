@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_SYNC_H
-#define TAIGA_SYNC_SYNC_H
+#pragma once
 
 #include "service.h"
 #include "base/types.h"
@@ -45,5 +44,3 @@ RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode);
 taiga::HttpClientMode RequestTypeToClientMode(RequestType request_type);
 
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_SYNC_H

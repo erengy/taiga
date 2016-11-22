@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_DUMMY_H
-#define TAIGA_TAIGA_DUMMY_H
+#pragma once
 
 #include "library/anime_episode.h"
 #include "library/anime_item.h"
@@ -38,5 +37,3 @@ extern class DummyAnime DummyAnime;
 extern class DummyEpisode DummyEpisode;
 
 }  // namespace taiga
-
-#endif  // TAIGA_TAIGA_DUMMY_H

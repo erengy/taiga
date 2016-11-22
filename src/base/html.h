@@ -16,12 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_HTML_H
-#define TAIGA_BASE_HTML_H
+#pragma once
 
 #include <string>
 
 void DecodeHtmlEntities(std::wstring& str);
 void StripHtmlTags(std::wstring& str);
-
-#endif  // TAIGA_BASE_HTML_H

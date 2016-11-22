@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_RESOURCE_H
-#define TAIGA_LIBRARY_RESOURCE_H
+#pragma once
 
 #include <map>
 
@@ -49,5 +48,3 @@ private:
 }  // namespace anime
 
 extern anime::ImageDatabase ImageDatabase;
-
-#endif  // TAIGA_LIBRARY_RESOURCE_H

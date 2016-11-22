@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_FEED_CONDITION_H
-#define TAIGA_UI_DLG_FEED_CONDITION_H
+#pragma once
 
 #include "track/feed.h"
 #include <windows/win/common_controls.h>
@@ -48,5 +47,3 @@ private:
 extern FeedConditionDialog DlgFeedCondition;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_FEED_CONDITION_H

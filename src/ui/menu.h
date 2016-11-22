@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_MENU_H
-#define TAIGA_UI_MENU_H
+#pragma once
 
 #include <string>
 
@@ -59,5 +58,3 @@ private:
 extern MenuList Menus;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_MENU_H

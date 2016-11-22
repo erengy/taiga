@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_FEED_FILTER_H
-#define TAIGA_UI_DLG_FEED_FILTER_H
+#pragma once
 
 #include "track/feed.h"
 #include <windows/win/common_controls.h>
@@ -95,5 +94,3 @@ private:
 extern FeedFilterDialog DlgFeedFilter;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_FEED_FILTER_H

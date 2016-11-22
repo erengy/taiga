@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_MYANIMELIST_H
-#define TAIGA_SYNC_MYANIMELIST_H
+#pragma once
 
 #include "base/types.h"
 #include "sync/service.h"
@@ -51,5 +50,3 @@ private:
 
 }  // namespace myanimelist
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_MYANIMELIST_H

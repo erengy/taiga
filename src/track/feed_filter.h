@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TRACK_FEED_FILTER_H
-#define TAIGA_TRACK_FEED_FILTER_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -187,5 +186,3 @@ private:
   std::map<int, std::wstring> operator_shortcodes_;
   std::map<int, std::wstring> option_shortcodes_;
 };
-
-#endif  // TAIGA_TRACK_FEED_FILTER_H

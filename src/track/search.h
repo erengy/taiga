@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TRACK_SEARCH_H
-#define TAIGA_TRACK_SEARCH_H
+#pragma once
 
 #include <string>
 
@@ -51,5 +50,3 @@ void ScanAvailableEpisodes(bool silent);
 void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number);
 void ScanAvailableEpisodesQuick();
 void ScanAvailableEpisodesQuick(int anime_id);
-
-#endif  // TAIGA_TRACK_SEARCH_H

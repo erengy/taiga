@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_HUMMINGBIRD_H
-#define TAIGA_SYNC_HUMMINGBIRD_H
+#pragma once
 
 #include "base/types.h"
 #include "sync/hummingbird_types.h"
@@ -65,5 +64,3 @@ private:
 
 }  // namespace hummingbird
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_HUMMINGBIRD_H

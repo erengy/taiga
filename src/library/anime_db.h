@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_DB_H
-#define TAIGA_LIBRARY_ANIME_DB_H
+#pragma once
 
 #include <map>
 
@@ -70,5 +69,3 @@ private:
 }  // namespace anime
 
 extern anime::Database AnimeDatabase;
-
-#endif  // TAIGA_LIBRARY_ANIME_DB_H

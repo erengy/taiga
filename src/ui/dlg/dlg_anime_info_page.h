@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_ANIME_INFO_PAGE_H
-#define TAIGA_UI_DLG_ANIME_INFO_PAGE_H
+#pragma once
 
 #include <windows/win/dialog.h>
 
@@ -71,5 +70,3 @@ private:
 };
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_ANIME_INFO_PAGE_H

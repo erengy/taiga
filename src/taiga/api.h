@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_API_H
-#define TAIGA_TAIGA_API_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -59,5 +58,3 @@ private:
 }  // namespace taiga
 
 extern taiga::Api TaigaApi;
-
-#endif  // TAIGA_TAIGA_API_H

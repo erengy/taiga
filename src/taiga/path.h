@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_PATH_H
-#define TAIGA_TAIGA_PATH_H
+#pragma once
 
 #include <string>
 
@@ -46,5 +45,3 @@ enum PathType {
 std::wstring GetPath(PathType type);
 
 }  // namespace taiga
-
-#endif  // TAIGA_TAIGA_PATH_H

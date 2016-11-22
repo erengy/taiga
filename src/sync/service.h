@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_SERVICE_H
-#define TAIGA_SYNC_SERVICE_H
+#pragma once
 
 #include "base/types.h"
 
@@ -112,5 +111,3 @@ protected:
     case type: function(response, http_response); break;
 
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_SERVICE_H

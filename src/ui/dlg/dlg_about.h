@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_ABOUT_H
-#define TAIGA_UI_DLG_ABOUT_H
+#pragma once
 
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
@@ -41,5 +40,3 @@ private:
 extern AboutDialog DlgAbout;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_ABOUT_H

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_PROCESS_H
-#define TAIGA_BASE_PROCESS_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -34,5 +33,3 @@ std::wstring GetWindowTitle(HWND hwnd);
 bool IsFullscreen(HWND hwnd);
 
 PVOID GetLibraryProcAddress(PSTR dll_module, PSTR proc_name);
-
-#endif  // TAIGA_BASE_PROCESS_H

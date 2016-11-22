@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_HTTP_H
-#define TAIGA_TAIGA_HTTP_H
+#pragma once
 
 #include <list>
 #include <map>
@@ -111,5 +110,3 @@ private:
 }  // namespace taiga
 
 extern taiga::HttpManager ConnectionManager;
-
-#endif  // TAIGA_TAIGA_HTTP_H

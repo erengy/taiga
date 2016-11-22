@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_SETTINGS_H
-#define TAIGA_TAIGA_SETTINGS_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -189,5 +188,3 @@ const std::wstring GetCurrentPassword();
 }  // namespace taiga
 
 extern taiga::AppSettings Settings;
-
-#endif  // TAIGA_TAIGA_SETTINGS_H

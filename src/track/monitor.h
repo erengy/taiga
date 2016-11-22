@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TRACK_MONITOR_H
-#define TAIGA_TRACK_MONITOR_H
+#pragma once
 
 #include "base/file_monitor.h"
 
@@ -32,5 +31,3 @@ private:
 };
 
 extern class FolderMonitor FolderMonitor;
-
-#endif  // TAIGA_TRACK_MONITOR_H

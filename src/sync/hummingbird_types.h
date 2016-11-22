@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_HUMMINGBIRD_TYPES_H
-#define TAIGA_SYNC_HUMMINGBIRD_TYPES_H
+#pragma once
 
 namespace sync {
 namespace hummingbird {
@@ -54,5 +53,3 @@ enum MyStatus {
 
 }  // namespace hummingbird
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_HUMMINGBIRD_TYPES_H

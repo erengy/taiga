@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_UPDATE_H
-#define TAIGA_UI_DLG_UPDATE_H
+#pragma once
 
 #include <windows/win/common_controls.h>
 #include <windows/win/dialog.h>
@@ -40,5 +39,3 @@ public:
 extern UpdateDialog DlgUpdate;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_UPDATE_H

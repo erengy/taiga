@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_TIMER_H
-#define TAIGA_TAIGA_TIMER_H
+#pragma once
 
 #include "base/timer.h"
 
@@ -60,5 +59,3 @@ private:
 extern TimerManager timers;
 
 }  // namespace taiga
-
-#endif  // TAIGA_TAIGA_TIMER_H

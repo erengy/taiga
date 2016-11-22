@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_CRYPTO_H
-#define TAIGA_BASE_CRYPTO_H
+#pragma once
 
 #include <string>
 
@@ -42,5 +41,3 @@ private:
 };
 
 std::string HmacSha1(const std::string& key_bytes, const std::string& data);
-
-#endif  // TAIGA_BASE_CRYPTO_H

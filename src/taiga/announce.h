@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_ANNOUNCE_H
-#define TAIGA_TAIGA_ANNOUNCE_H
+#pragma once
 
 #include <string>
 
@@ -139,5 +138,3 @@ extern taiga::Announcer Announcer;
 extern taiga::Mirc Mirc;
 extern taiga::Skype Skype;
 extern taiga::Twitter Twitter;
-
-#endif  // TAIGA_TAIGA_ANNOUNCE_H

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_EPISODE_H
-#define TAIGA_LIBRARY_ANIME_EPISODE_H
+#pragma once
 
 #include <string>
 
@@ -94,5 +93,3 @@ private:
 }  // namespace anime
 
 extern anime::Episode CurrentEpisode;
-
-#endif  // TAIGA_LIBRARY_ANIME_EPISODE_H

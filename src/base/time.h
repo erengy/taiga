@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_TIME_H
-#define TAIGA_BASE_TIME_H
+#pragma once
 
 #include <ctime>
 #include <string>
@@ -91,5 +90,3 @@ unsigned int ToDayCount(const Date& date);
 std::wstring ToTimeString(int seconds);
 
 const Date& EmptyDate();
-
-#endif  // TAIGA_BASE_TIME_H

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_DISCOVER_H
-#define TAIGA_LIBRARY_DISCOVER_H
+#pragma once
 
 #include <string>
 
@@ -59,5 +58,3 @@ public:
 }  // namespace library
 
 extern library::SeasonDatabase SeasonDatabase;
-
-#endif // TAIGA_LIBRARY_DISCOVER_H

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_OPTIONAL_H
-#define TAIGA_BASE_OPTIONAL_H
+#pragma once
 
 template <typename T>
 class Optional {
@@ -48,5 +47,3 @@ private:
   bool initialized_;
   T value_;
 };
-
-#endif  // TAIGA_BASE_OPTIONAL_H

@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_FILE_MONITOR_H
-#define TAIGA_BASE_FILE_MONITOR_H
+#pragma once
 
 #include <windows.h>
 #include <string>
@@ -108,5 +107,3 @@ private:
   HANDLE completion_port_;
   HWND window_handle_;
 };
-
-#endif  // TAIGA_BASE_FILE_MONITOR_H

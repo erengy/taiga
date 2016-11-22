@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_MYANIMELIST_UTIL_H
-#define TAIGA_SYNC_MYANIMELIST_UTIL_H
+#pragma once
 
 #include <string>
 
@@ -50,5 +49,3 @@ void ViewUpcomingAnime();
 
 }  // namespace myanimelist
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_MYANIMELIST_UTIL_H

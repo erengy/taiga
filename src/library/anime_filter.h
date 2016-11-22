@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_FILTER_H
-#define TAIGA_LIBRARY_ANIME_FILTER_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -45,5 +44,3 @@ private:
 };
 
 }  // namespace anime
-
-#endif  // TAIGA_LIBRARY_ANIME_FILTER_H
