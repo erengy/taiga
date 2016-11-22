@@ -10,6 +10,10 @@
 	path = deps/src/anitomy
 	url = https://github.com/erengy/anitomy.git
 
+[submodule "semaver"]
+	path = deps/src/semaver
+	url = https://github.com/erengy/semaver.git
+
 [submodule "windows"]
 	path = deps/src/windows
 	url = https://github.com/erengy/windows.git
