@@ -744,7 +744,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case 107: {
           std::wstring data;
           Aggregator.filter_manager.Export(data, parent->feed_filters_);
-          std::wstring metadata = Taiga.version;
+          std::wstring metadata = StrToWstr(Taiga.version.str());
           InputDialog dlg;
           StringCoder coder;
           if (coder.Encode(metadata, data, dlg.text)) {

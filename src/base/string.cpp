@@ -689,6 +689,12 @@ wstring ToWstr(const UINT& value) {
   return wstring(buffer);
 }
 
+wstring ToWstr(const ULONG& value) {
+  wchar_t buffer[65];
+  _ultow_s(value, buffer, 65, 10);
+  return wstring(buffer);
+}
+
 wstring ToWstr(const INT64& value) {
   wchar_t buffer[65];
   _i64tow_s(value, buffer, 65, 10);

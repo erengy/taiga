@@ -18,9 +18,10 @@
 
 #include <regex>
 
+#include <semaver/semaver/version.h>
+
 #include "base/file.h"
 #include "base/log.h"
-#include "base/version.h"
 #include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
@@ -189,7 +190,7 @@ bool Engine::ReadRelations(const std::string& document) {
           auto name = match_results[1].str();
           auto value = match_results[2].str();
           if (name == L"version") {
-            base::SemanticVersion version(value);
+            semaver::Version version(WstrToStr(value));
             if (version > Taiga.version)
               LOG(LevelDebug, L"Anime relations version is larger than "
                               L"application version.");

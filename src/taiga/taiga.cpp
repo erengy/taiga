@@ -57,7 +57,7 @@ App::App()
   version.patch = TAIGA_VERSION_PATCH;
   version.prerelease_identifiers = TAIGA_VERSION_PRE;
   if (TAIGA_VERSION_BUILD > 0)
-    version.build_metadata = ToWstr(TAIGA_VERSION_BUILD);
+    version.build_metadata = ToStr(TAIGA_VERSION_BUILD);
 }
 
 App::~App() {
@@ -73,7 +73,7 @@ BOOL App::InitInstance() {
   auto path = AddTrailingSlash(GetPathOnly(module_path));
   Logger.SetOutputPath(path + TAIGA_APP_NAME L".log");
   Logger.SetSeverityLevel(debug_mode ? LevelDebug : LevelWarning);
-  LOG(LevelInformational, L"Version " + std::wstring(version) +
+  LOG(LevelInformational, L"Version " + StrToWstr(version.str()) +
                           L" (" + GetFileLastModifiedDate(module_path) + L")");
 
   // Check another instance

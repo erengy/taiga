@@ -19,9 +19,9 @@
 #ifndef TAIGA_TAIGA_TAIGA_H
 #define TAIGA_TAIGA_TAIGA_H
 
+#include <semaver/semaver/version.h>
 #include <windows/win/application.h>
 
-#include "base/version.h"
 #include "taiga/update.h"
 
 #define TAIGA_APP_NAME    L"Taiga"
@@ -60,7 +60,7 @@ public:
   int current_tip_type, play_status;
   bool debug_mode;
   bool logged_in;
-  base::SemanticVersion version;
+  semaver::Version version;
 
   class Updater : public UpdateHelper {
   public:

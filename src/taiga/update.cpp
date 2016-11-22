@@ -53,7 +53,7 @@ void UpdateHelper::Check() {
   http_request.url.path = L"/update.php";
   http_request.url.query[L"channel"] = is_stable ? L"stable" : L"beta";
   http_request.url.query[L"check"] = is_automatic ? L"auto" : L"manual";
-  http_request.url.query[L"version"] = std::wstring(Taiga.version);
+  http_request.url.query[L"version"] = StrToWstr(Taiga.version.str());
   http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
   http_request.url.query[L"username"] = GetCurrentUsername();
 
@@ -101,7 +101,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
   auto current_version = Taiga.version;
   auto latest_version = current_version;
   foreach_(item, items) {
-    base::SemanticVersion item_version(item->guid);
+    semaver::Version item_version(WstrToStr(item->guid));
     if (item_version > latest_version) {
       latest_item_.reset(new Item(*item));
       latest_version = item_version;

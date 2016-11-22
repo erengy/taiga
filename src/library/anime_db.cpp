@@ -18,11 +18,12 @@
 
 #include <algorithm>
 
+#include <semaver/semaver/version.h>
+
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
-#include "base/version.h"
 #include "base/xml.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
@@ -129,7 +130,7 @@ bool Database::SaveDatabase() {
   xml_document document;
 
   xml_node meta_node = document.append_child(L"meta");
-  XmlWriteStrValue(meta_node, L"version", std::wstring(Taiga.version).c_str());
+  XmlWriteStrValue(meta_node, L"version", StrToWstr(Taiga.version.str()).c_str());
 
   xml_node database_node = document.append_child(L"database");
   WriteDatabaseNode(database_node);
@@ -637,9 +638,9 @@ bool Database::CheckOldUserDirectory() {
 }
 
 void Database::HandleCompatibility(const std::wstring& meta_version) {
-  base::SemanticVersion version = meta_version;
+  const semaver::Version version(WstrToStr(meta_version));
 
-  if (version <= base::SemanticVersion(L"1.1.11")) {
+  if (version <= semaver::Version(1, 1, 11)) {
     if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
       LOG(LevelWarning, L"Clearing English titles");
       for (auto& item : items) {

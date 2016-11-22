@@ -462,7 +462,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
 }
 
 void AppSettings::HandleCompatibility() {
-  const base::SemanticVersion version(
+  const semaver::Version version(
       GetInt(kMeta_Version_Major),
       GetInt(kMeta_Version_Minor),
       GetInt(kMeta_Version_Revision));
@@ -470,10 +470,10 @@ void AppSettings::HandleCompatibility() {
   if (version == Taiga.version)
     return;
 
-  LOG(LevelWarning, L"Upgraded from v" + std::wstring(version) +
-                    L" to v" + std::wstring(Taiga.version));
+  LOG(LevelWarning, L"Upgraded from v" + StrToWstr(version.str()) +
+                    L" to v" + StrToWstr(Taiga.version.str()));
 
-  if (version <= base::SemanticVersion(1, 1, 7)) {
+  if (version <= semaver::Version(1, 1, 7)) {
     // Convert old password encoding to base64
     std::wstring password = SimpleDecrypt(GetWstr(kSync_Service_Mal_Password));
     Set(kSync_Service_Mal_Password, Base64Encode(password));
@@ -496,13 +496,13 @@ void AppSettings::HandleCompatibility() {
     }
   }
 
-  if (version <= base::SemanticVersion(1, 1, 8)) {
+  if (version <= semaver::Version(1, 1, 8)) {
     auto external_links = GetWstr(kApp_Interface_ExternalLinks);
     ReplaceString(external_links, L"http://hummingboard.me", L"http://hb.cybrox.eu");
     Set(kApp_Interface_ExternalLinks, external_links);
   }
 
-  if (version <= base::SemanticVersion(1, 1, 11)) {
+  if (version <= semaver::Version(1, 1, 11)) {
     bool detect_streaming_media = false;
     for (auto& media_player : MediaPlayers.items) {
       if (media_player.mode == kMediaModeWebBrowser) {
@@ -514,7 +514,7 @@ void AppSettings::HandleCompatibility() {
     Set(kRecognition_DetectStreamingMedia, detect_streaming_media);
   }
 
-  if (version <= base::SemanticVersion(1, 2, 2)) {
+  if (version <= semaver::Version(1, 2, 2)) {
     auto external_links = GetWstr(kApp_Interface_ExternalLinks);
     ReplaceString(external_links, L"http://mal.oko.im", L"http://graph.anime.plus");
     std::vector<std::wstring> link_vector;
@@ -536,7 +536,7 @@ void AppSettings::HandleCompatibility() {
     Set(kApp_Interface_ExternalLinks, external_links);
   }
 
-  if (version <= base::SemanticVersion(1, 2, 3)) {
+  if (version <= semaver::Version(1, 2, 3)) {
     if (GetBool(kTorrent_Download_UseAnimeFolder)) {
       auto app_path = GetWstr(kTorrent_Download_AppPath);
       if (IsEqual(GetFileName(app_path), L"deluge.exe")) {

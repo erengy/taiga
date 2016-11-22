@@ -1033,7 +1033,7 @@ void OnUpdateNotAvailable(bool relations) {
   if (DlgMain.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Taiga is up to date!");
-    std::wstring content = L"Current version: " + std::wstring(Taiga.version);
+    std::wstring content = L"Current version: " + StrToWstr(Taiga.version.str());
     if (relations) {
       content += L"\n\nUpdated anime relations to: " +
                  Taiga.Updater.GetCurrentAnimeRelationsModified();

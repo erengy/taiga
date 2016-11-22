@@ -93,6 +93,7 @@ int ToInt(const std::wstring& str);
 std::string ToStr(const INT& value);
 std::wstring ToWstr(const INT& value);
 std::wstring ToWstr(const UINT& value);
+std::wstring ToWstr(const ULONG& value);
 std::wstring ToWstr(const INT64& value);
 std::wstring ToWstr(const UINT64& value);
 std::wstring ToWstr(const double& value, int count = 16);

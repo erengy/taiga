@@ -37,6 +37,9 @@
     <Filter Include="deps\pugixml">
       <UniqueIdentifier>{0f915cf6-1a44-47c9-8c1f-3a640aa5fb67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\semaver">
+      <UniqueIdentifier>{48fda121-559e-4cb2-9480-80a1baa8a730}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\utf8proc">
       <UniqueIdentifier>{810fd707-5236-421d-83d6-eb9251e1254d}</UniqueIdentifier>
     </Filter>
@@ -127,9 +130,6 @@
     <ClCompile Include="..\..\src\base\url.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\version.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\xml.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -168,6 +168,12 @@
     </ClCompile>
     <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp">
       <Filter>deps\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp">
+      <Filter>deps\semaver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp">
+      <Filter>deps\semaver</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c">
       <Filter>deps\utf8proc</Filter>
@@ -594,9 +600,6 @@
     <ClInclude Include="..\..\src\base\url.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\version.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\xml.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -662,6 +665,15 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp">
       <Filter>deps\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h">
+      <Filter>deps\semaver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\semaver\semaver\string.h">
+      <Filter>deps\semaver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\semaver\semaver\version.h">
+      <Filter>deps\semaver</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h">
       <Filter>deps\utf8proc</Filter>

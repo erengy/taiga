@@ -363,7 +363,7 @@ bool History::Load() {
 
   // Meta
   xml_node node_meta = document.child(L"meta");
-  base::SemanticVersion version(XmlReadStrValue(node_meta, L"version"));
+  semaver::Version version(WstrToStr(XmlReadStrValue(node_meta, L"version")));
 
   // Items
   xml_node node_items = document.child(L"history").child(L"items");
@@ -383,7 +383,7 @@ bool History::Load() {
     }
   }
   // Queue events
-  if (version < base::SemanticVersion(1, 1, 4)) {
+  if (version < semaver::Version(1, 1, 4)) {
     ReadQueueInCompatibilityMode(document);
   } else {
     ReadQueue(document);
@@ -487,8 +487,7 @@ bool History::Save() {
 
   // Write meta
   xml_node node_meta = document.append_child(L"meta");
-  XmlWriteStrValue(node_meta, L"version",
-                   static_cast<std::wstring>(Taiga.version).c_str());
+  XmlWriteStrValue(node_meta, L"version", StrToWstr(Taiga.version.str()).c_str());
 
   xml_node node_history = document.append_child(L"history");
 

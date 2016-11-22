@@ -114,6 +114,8 @@
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
     <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp" />
+    <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp" />
+    <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp" />
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c" />
     <ClCompile Include="..\..\deps\src\windows\win\accessibility.cpp" />
     <ClCompile Include="..\..\deps\src\windows\win\application.cpp" />
@@ -185,7 +187,6 @@
     <ClCompile Include="..\..\src\base\time.cpp" />
     <ClCompile Include="..\..\src\base\timer.cpp" />
     <ClCompile Include="..\..\src\base\url.cpp" />
-    <ClCompile Include="..\..\src\base\version.cpp" />
     <ClCompile Include="..\..\src\base\xml.cpp" />
     <ClCompile Include="..\..\src\library\anime.cpp" />
     <ClCompile Include="..\..\src\library\anime_db.cpp" />
@@ -280,6 +281,9 @@
     <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h" />
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp" />
+    <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h" />
+    <ClInclude Include="..\..\deps\src\semaver\semaver\string.h" />
+    <ClInclude Include="..\..\deps\src\semaver\semaver\version.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.h" />
     <ClInclude Include="..\..\deps\src\windows\win\accessibility.h" />
@@ -336,7 +340,6 @@
     <ClInclude Include="..\..\src\base\timer.h" />
     <ClInclude Include="..\..\src\base\types.h" />
     <ClInclude Include="..\..\src\base\url.h" />
-    <ClInclude Include="..\..\src\base\version.h" />
     <ClInclude Include="..\..\src\base\xml.h" />
     <ClInclude Include="..\..\src\library\anime.h" />
     <ClInclude Include="..\..\src\library\anime_db.h" />
