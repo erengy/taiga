@@ -260,6 +260,7 @@ BOOL SettingsPage::OnInitDialog() {
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"VIZ", taiga::kStream_Viz);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", taiga::kStream_Wakanim);
       list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", taiga::kStream_Youtube);
+      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Funimation", taiga::kStream_Funimation);
       for (int i = 0; i < list.GetItemCount(); ++i) {
         if (Settings.GetBool(static_cast<int>(list.GetItemParam(i))))
           list.SetCheckState(i, TRUE);

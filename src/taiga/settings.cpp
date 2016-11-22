@@ -173,6 +173,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kStream_Viz, L"true", L"recognition/streaming/providers/viz");
   INITKEY(kStream_Wakanim, L"true", L"recognition/streaming/providers/wakanim");
   INITKEY(kStream_Youtube, L"true", L"recognition/streaming/providers/youtube");
+  INITKEY(kStream_Funimation, L"true", L"recognition/streaming/providers/Funimation");
 
   // Sharing
   INITKEY(kShare_Http_Enabled, nullptr, L"announce/http/enabled");
