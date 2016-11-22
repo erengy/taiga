@@ -19,8 +19,8 @@
 #ifndef TAIGA_UI_DLG_SEASON_H
 #define TAIGA_UI_DLG_SEASON_H
 
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_dialog.h"
+#include <windows/win/common_controls.h>
+#include <windows/win/dialog.h>
 
 namespace ui {
 

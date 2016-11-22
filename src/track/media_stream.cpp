@@ -16,13 +16,14 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/automation.h>
+
 #include "base/foreach.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime_episode.h"
 #include "taiga/settings.h"
 #include "track/media.h"
-#include "win/win_automation.h"
 
 enum StreamingVideoProvider {
   kStreamUnknown = -1,

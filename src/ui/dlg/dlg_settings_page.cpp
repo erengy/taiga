@@ -16,6 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows.h>
+#include <uxtheme.h>
+
+#include <windows/win/common_dialogs.h>
+#include <windows/win/version.h>
+
 #include "base/base64.h"
 #include "base/crypto.h"
 #include "base/file.h"
@@ -41,7 +47,6 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_commondialog.h"
 
 namespace ui {
 

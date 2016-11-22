@@ -22,9 +22,10 @@
 #include <list>
 #include <map>
 
+#include <windows/win/thread.h>
+
 #include "base/http.h"
 #include "base/types.h"
-#include "win/win_thread.h"
 
 namespace taiga {
 

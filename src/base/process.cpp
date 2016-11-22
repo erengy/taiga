@@ -19,7 +19,9 @@
 #include <windows.h>
 #include <psapi.h>
 
-#include "error.h"
+#include <windows/win/error.h>
+#include <windows/win/version.h>
+
 #include "log.h"
 #include "process.h"
 #include "string.h"
@@ -249,7 +251,7 @@ BOOL GetProcessFiles(ULONG process_id,
       }
     }
 
-    base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+    win::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
 
     ULONG returnLength;
     PVOID objectNameInfo = malloc(0x1000);

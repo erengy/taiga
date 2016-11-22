@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/common_dialogs.h>
+
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
@@ -41,7 +43,6 @@
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/ui.h"
-#include "win/win_commondialog.h"
 
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   LOG(LevelDebug, action);

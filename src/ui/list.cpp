@@ -18,6 +18,9 @@
 
 #include "list.h"
 
+#include <windows/win/common_controls.h>
+#include <windows/win/gdi.h>
+
 #include "base/comparable.h"
 #include "base/string.h"
 #include "base/time.h"
@@ -26,9 +29,6 @@
 #include "library/anime_util.h"
 #include "sync/service.h"
 #include "taiga/settings.h"
-
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_gdi.h"
 
 namespace ui {
 

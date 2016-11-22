@@ -19,9 +19,10 @@
 #ifndef TAIGA_TAIGA_TAIGA_H
 #define TAIGA_TAIGA_TAIGA_H
 
+#include <windows/win/application.h>
+
 #include "base/version.h"
 #include "taiga/update.h"
-#include "win/win_main.h"
 
 #define TAIGA_APP_NAME    L"Taiga"
 #define TAIGA_APP_TITLE   L"Taiga"

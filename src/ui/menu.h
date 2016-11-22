@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "win/win_menu.h"
+#include <windows/win/menu.h>
 
 namespace anime {
 class Item;

@@ -18,13 +18,14 @@
 
 #include <algorithm>
 
+#include <windows/win/gdi.h>
+
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "taiga/resource.h"
 #include "ui/dlg/dlg_feed_condition.h"
-#include "win/win_gdi.h"
 
 namespace ui {
 

@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/taskbar.h>
+
 #include "base/file.h"
 #include "base/log.h"
 #include "base/process.h"
@@ -33,7 +35,7 @@
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
-#include "win/win_taskbar.h"
+#include "ui/ui.h"
 
 taiga::App Taiga;
 
@@ -116,8 +118,8 @@ void App::Uninitialize() {
 
   // Cleanup
   ConnectionManager.Shutdown();
-  Taskbar.Destroy();
-  TaskbarList.Release();
+  ui::taskbar.Destroy();
+  ui::taskbar_list.Release();
 
   // Save
   Settings.Save();

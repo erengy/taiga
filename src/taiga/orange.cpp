@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cmath>
+
 #include "taiga/orange.h"
 
 namespace taiga {
@@ -104,7 +106,7 @@ float Orange::NoteToFrequency(int n) {
   if (n < 0 || n > 119)
     return -1.0f;
 
-  return 440.0f * pow(2.0f, static_cast<float>(n - 57) / 12.0f);
+  return 440.0f * std::pow(2.0f, static_cast<float>(n - 57) / 12.0f);
 }
 
 }  // namespace taiga

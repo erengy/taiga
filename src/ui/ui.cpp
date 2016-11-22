@@ -18,6 +18,10 @@
 
 #include <map>
 #include <set>
+#include <vector>
+
+#include <windows/win/task_dialog.h>
+#include <windows/win/taskbar.h>
 
 #include "base/file.h"
 #include "base/foreach.h"
@@ -36,7 +40,6 @@
 #include "taiga/taiga.h"
 #include "track/media.h"
 #include "track/recognition.h"
-#include "win/win_taskbar.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_history.h"
@@ -53,9 +56,11 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_taskdialog.h"
 
 namespace ui {
+
+win::Taskbar taskbar;
+win::TaskbarList taskbar_list;
 
 void ChangeStatusText(const string_t& status) {
   DlgMain.ChangeStatus(status);
@@ -134,7 +139,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       return;
   }
 
-  TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+  taskbar_list.SetProgressState(TBPF_NOPROGRESS);
 }
 
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
@@ -160,8 +165,8 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
       }
       break;
     default:
-      TaskbarList.SetProgressState(http_client.content_length() > 0 ?
-                                   TBPF_NORMAL : TBPF_INDETERMINATE);
+      taskbar_list.SetProgressState(http_client.content_length() > 0 ?
+                                    TBPF_NORMAL : TBPF_INDETERMINATE);
       break;
   }
 }
@@ -220,8 +225,8 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     float content_length = static_cast<float>(http_client.content_length());
     int percentage = static_cast<int>((current_length / content_length) * 100);
     status += L" (" + ToWstr(percentage) + L"%)";
-    TaskbarList.SetProgressValue(static_cast<ULONGLONG>(current_length),
-                                 static_cast<ULONGLONG>(content_length));
+    taskbar_list.SetProgressValue(static_cast<ULONGLONG>(current_length),
+                                  static_cast<ULONGLONG>(content_length));
   } else {
     status += L" (" + ToSizeString(http_client.current_length()) + L")";
   }
@@ -230,7 +235,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
 }
 
 void OnHttpReadComplete(const taiga::HttpClient& http_client) {
-  TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+  taskbar_list.SetProgressState(TBPF_NOPROGRESS);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -346,8 +351,8 @@ void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved) {
     Taiga.current_tip_type = taiga::kTipTypeUpdateFailed;
   }
 
-  Taskbar.Tip(L"", L"", 0);  // clear previous tips
-  Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
+  taskbar.Tip(L"", L"", 0);  // clear previous tips
+  taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
 
   ChangeStatusText(L"Update failed: " + reason);
 }
@@ -623,8 +628,8 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
     Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
     std::wstring tip_text =
         ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode);
-    Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO);
+    taskbar.Tip(L"", L"", 0);
+    taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO);
   }
 }
 
@@ -681,8 +686,8 @@ void OnRecognitionFail() {
           ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode) +
           L"\nClick here to view similar titles for this anime.";
       Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
-      Taskbar.Tip(L"", L"", 0);
-      Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
+      taskbar.Tip(L"", L"", 0);
+      taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
     }
 
   } else {
@@ -916,8 +921,8 @@ bool OnFeedNotify(const Feed& feed) {
   tip_text += L"Click to see all.";
   tip_text = LimitText(tip_text, 255);
   Taiga.current_tip_type = taiga::kTipTypeTorrent;
-  Taskbar.Tip(L"", L"", 0);
-  Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
+  taskbar.Tip(L"", L"", 0);
+  taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
 
   return true;
 }

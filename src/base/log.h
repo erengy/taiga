@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "win/win_thread.h"
+#include <windows/win/thread.h>
 
 enum SeverityLevels {
   LevelEmergency,

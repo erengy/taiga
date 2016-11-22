@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/common_dialogs.h>
+
 #include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -32,7 +34,7 @@
 #include "ui/dlg/dlg_settings_page.h"
 #include "ui/dialog.h"
 #include "ui/theme.h"
-#include "win/win_commondialog.h"
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -104,7 +106,7 @@ void PageBaseInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
+      rect.Inflate(-ScaleX(kControlMargin), -ScaleY(kControlMargin));
 
       // Headers
       for (int i = 0; i < 3; i++) {
@@ -131,25 +133,25 @@ void PageSeriesInfo::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
+      rect.Inflate(-ScaleX(kControlMargin), -ScaleY(kControlMargin));
 
       // Synonyms
       win::Rect rect_child;
       win::Window window = GetDlgItem(IDC_EDIT_ANIME_ALT);
       window.GetWindowRect(GetWindowHandle(), &rect_child);
-      rect_child.right = rect.right - ScaleX(win::kControlMargin);
+      rect_child.right = rect.right - ScaleX(kControlMargin);
       window.SetPosition(nullptr, rect_child);
 
       // Details
       window.SetWindowHandle(GetDlgItem(IDC_STATIC_ANIME_DETAILS));
       window.GetWindowRect(GetWindowHandle(), &rect_child);
-      rect_child.right = rect.right - ScaleX(win::kControlMargin);
+      rect_child.right = rect.right - ScaleX(kControlMargin);
       window.SetPosition(nullptr, rect_child);
 
       // Synopsis
       window.SetWindowHandle(GetDlgItem(IDC_EDIT_ANIME_SYNOPSIS));
       window.GetWindowRect(GetWindowHandle(), &rect_child);
-      rect_child.right = rect.right - ScaleX(win::kControlMargin);
+      rect_child.right = rect.right - ScaleX(kControlMargin);
       rect_child.bottom = rect.bottom;
       window.SetPosition(nullptr, rect_child);
       window.SetWindowHandle(nullptr);

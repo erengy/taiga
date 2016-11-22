@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "win/win_thread.h"
+#include <windows/win/thread.h>
 
 #define WM_MONITORCALLBACK (WM_APP + 0x32)
 

@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_gdi.h"
+#include <windows/win/common_controls.h>
+#include <windows/win/gdi.h>
 
 namespace ui {
 

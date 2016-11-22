@@ -26,6 +26,7 @@
 #include "taiga/stats.h"
 #include "ui/dlg/dlg_stats.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -136,7 +137,7 @@ void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(win::kControlMargin) * 2, -ScaleY(win::kControlMargin));
+      rect.Inflate(-ScaleX(kControlMargin) * 2, -ScaleY(kControlMargin));
 
       // Headers
       for (int i = 0; i < 4; i++) {

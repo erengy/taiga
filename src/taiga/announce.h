@@ -21,10 +21,11 @@
 
 #include <string>
 
+#include <windows/win/window.h>
+
 #include "base/oauth.h"
 #include "base/types.h"
 #include "taiga/http.h"
-#include "win/win_window.h"
 
 namespace anime {
 class Episode;

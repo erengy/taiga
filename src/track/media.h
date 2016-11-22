@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "win/win_accessibility.h"
+#include <windows/win/accessibility.h>
 
 enum MediaPlayerModes {
   kMediaModeWindowTitle,

@@ -19,10 +19,11 @@
 #ifndef TAIGA_TAIGA_API_H
 #define TAIGA_TAIGA_API_H
 
+#include <map>
 #include <string>
 #include <vector>
 
-#include "win/win_window.h"
+#include <windows/win/window.h>
 
 namespace anime {
 class Episode;

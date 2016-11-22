@@ -19,8 +19,8 @@
 #ifndef TAIGA_UI_DLG_STATS_H
 #define TAIGA_UI_DLG_STATS_H
 
-#include "win/win_dialog.h"
-#include "win/win_resizable.h"
+#include <windows/win/dialog.h>
+#include <windows/win/resizable.h>
 
 namespace ui {
 

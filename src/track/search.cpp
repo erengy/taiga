@@ -27,7 +27,6 @@
 #include "track/recognition.h"
 #include "track/search.h"
 #include "ui/ui.h"
-#include "win/win_taskbar.h"
 
 TaigaFileSearchHelper file_search_helper;
 
@@ -166,7 +165,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   }
 
   if (!silent) {
-    TaskbarList.SetProgressState(TBPF_INDETERMINATE);
+    ui::taskbar_list.SetProgressState(TBPF_INDETERMINATE);
     ui::SetSharedCursor(IDC_WAIT);
     ui::ChangeStatusText(L"Scanning available episodes...");
   }
@@ -225,7 +224,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   }
 
   if (!silent) {
-    TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+    ui::taskbar_list.SetProgressState(TBPF_NOPROGRESS);
     ui::SetSharedCursor(IDC_ARROW);
     ui::ClearStatusText();
   }

@@ -22,10 +22,12 @@
 #include <map>
 #include <memory>
 #include <string>
+
+#include <windows/win/thread.h>
+
 #include "service.h"
 #include "base/types.h"
 #include "taiga/http.h"
-#include "win/win_thread.h"
 
 namespace sync {
 

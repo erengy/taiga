@@ -16,6 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/task_dialog.h>
+#include <windows/win/version.h>
+
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -28,8 +31,6 @@
 #include "ui/list.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_gdi.h"
-#include "win/win_taskdialog.h"
 
 namespace ui {
 

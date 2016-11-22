@@ -19,10 +19,11 @@
 #ifndef TAIGA_UI_DLG_ANIME_INFO_H
 #define TAIGA_UI_DLG_ANIME_INFO_H
 
+#include <windows/win/common_controls.h>
+#include <windows/win/dialog.h>
+
 #include "base/gfx.h"
 #include "ui/dlg/dlg_anime_info_page.h"
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_dialog.h"
 
 namespace ui {
 

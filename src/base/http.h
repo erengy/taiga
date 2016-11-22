@@ -39,10 +39,10 @@
 #include <vector>
 
 #include <curl/curl.h>
+#include <windows/win/thread.h>
 
 #include "map.h"
 #include "url.h"
-#include "win/win_thread.h"
 
 namespace base {
 namespace http {

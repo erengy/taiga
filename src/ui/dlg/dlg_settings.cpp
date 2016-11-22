@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/task_dialog.h>
+
 #include "base/base64.h"
 #include "base/file.h"
 #include "base/foreach.h"
@@ -30,7 +32,6 @@
 #include "track/monitor.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/theme.h"
-#include "win/win_taskdialog.h"
 
 namespace ui {
 

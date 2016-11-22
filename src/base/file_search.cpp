@@ -16,7 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "error.h"
+#include <windows/win/error.h>
+
 #include "file.h"
 #include "log.h"
 #include "string.h"
@@ -52,7 +53,7 @@ bool FileSearchHelper::Search(const std::wstring& root,
 
   do {
     if (handle == INVALID_HANDLE_VALUE) {
-      LOG(LevelError, base::FormatError(GetLastError()) + L"\nPath: " + path);
+      LOG(LevelError, win::FormatError(GetLastError()) + L"\nPath: " + path);
       SetLastError(ERROR_SUCCESS);
       continue;
     }

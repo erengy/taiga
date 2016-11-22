@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/version.h>
+
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -174,7 +176,7 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += rebar_.GetBarHeight() + ScaleY(win::kControlMargin / 2);
+      rcWindow.top += rebar_.GetBarHeight() + ScaleY(kControlMargin / 2);
       // Resize list
       list_.SetPosition(nullptr, rcWindow);
     }

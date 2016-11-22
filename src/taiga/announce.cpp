@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/dde.h>
+
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
@@ -29,7 +31,6 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "ui/ui.h"
-#include "win/win_dde.h"
 
 taiga::Announcer Announcer;
 taiga::Mirc Mirc;

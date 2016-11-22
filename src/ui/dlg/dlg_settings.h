@@ -23,8 +23,8 @@
 #include <vector>
 
 #include "track/feed.h"
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_dialog.h"
+#include <windows/win/common_controls.h>
+#include <windows/win/dialog.h>
 #include "ui/dlg/dlg_settings_page.h"
 
 namespace ui {

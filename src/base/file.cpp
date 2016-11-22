@@ -19,11 +19,12 @@
 #include <fstream>
 #include <shlobj.h>
 
-#include "error.h"
+#include <windows/win/error.h>
+#include <windows/win/registry.h>
+
 #include "file.h"
 #include "string.h"
 #include "time.h"
-#include "win/win_registry.h"
 
 HANDLE OpenFileForGenericRead(const std::wstring& path) {
   return ::CreateFile(GetExtendedLengthPath(path).c_str(),
@@ -297,7 +298,7 @@ bool FileExists(const std::wstring& file) {
 }
 
 bool FolderExists(const std::wstring& path) {
-  base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+  win::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
 
   auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
 
@@ -306,7 +307,7 @@ bool FolderExists(const std::wstring& path) {
 }
 
 bool PathExists(const std::wstring& path) {
-  base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+  win::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
 
   auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
 

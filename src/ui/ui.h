@@ -19,6 +19,8 @@
 #ifndef TAIGA_UI_UI_H
 #define TAIGA_UI_UI_H
 
+#include <windows/win/taskbar.h>
+
 #include "base/types.h"
 
 namespace anime {
@@ -32,6 +34,12 @@ class HttpClient;
 class Feed;
 
 namespace ui {
+
+constexpr int kControlMargin = 6;
+constexpr unsigned int kAppSysTrayId = 74164;  // TAIGA ^_^
+
+extern win::Taskbar taskbar;
+extern win::TaskbarList taskbar_list;
 
 void ChangeStatusText(const string_t& status);
 void ClearStatusText();

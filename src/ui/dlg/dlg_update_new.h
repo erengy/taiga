@@ -19,7 +19,7 @@
 #ifndef TAIGA_UI_DLG_UPDATE_NEW_H
 #define TAIGA_UI_DLG_UPDATE_NEW_H
 
-#include "win/win_dialog.h"
+#include <windows/win/dialog.h>
 
 namespace ui {
 

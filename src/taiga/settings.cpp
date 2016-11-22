@@ -16,6 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/registry.h>
+#include <windows/win/task_dialog.h>
+
 #include "base/base64.h"
 #include "base/crypto.h"
 #include "base/file.h"
@@ -42,8 +45,6 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_registry.h"
-#include "win/win_taskdialog.h"
 
 taiga::AppSettings Settings;
 

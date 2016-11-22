@@ -40,6 +40,12 @@
     <Filter Include="deps\utf8proc">
       <UniqueIdentifier>{810fd707-5236-421d-83d6-eb9251e1254d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\windows">
+      <UniqueIdentifier>{11f0ecfb-615d-4f52-9766-65668fa5f22f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\windows\ctrl">
+      <UniqueIdentifier>{a141982f-cc57-4b8f-a102-aa48c2a0ee94}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\zlib">
       <UniqueIdentifier>{1dd6ca23-29e1-4a1b-b1fb-a3b4988da7b0}</UniqueIdentifier>
     </Filter>
@@ -165,6 +171,108 @@
     </ClCompile>
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c">
       <Filter>deps\utf8proc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\accessibility.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\application.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\automation.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\common_dialogs.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\dde.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\dialog.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\error.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\gdi.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\gdi_plus.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\handle.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\menu.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\registry.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\resizable.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\string.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\task_dialog.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\taskbar.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\thread.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\version.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\window.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\window_map.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\combobox.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\edit.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\imagelist.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\listview.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\progressbar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\rebar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\richedit.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\spin.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\statusbar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\syslink.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\tab.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\toolbar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\tooltip.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\treeview.cpp">
+      <Filter>deps\windows\ctrl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\zlib\adler32.c">
       <Filter>deps\zlib</Filter>
@@ -560,6 +668,69 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.h">
       <Filter>deps\utf8proc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\accessibility.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\application.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\automation.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\common_controls.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\common_dialogs.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\dde.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\dialog.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\error.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\gdi.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\gdi_plus.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\handle.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\menu.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\registry.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\resizable.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\string.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\task_dialog.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\taskbar.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\thread.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\version.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\window.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\window_map.h">
+      <Filter>deps\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\zlib\crc32.h">
       <Filter>deps\zlib</Filter>

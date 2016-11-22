@@ -16,6 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows.h>
+#include <uxtheme.h>
+
+#include <windows/win/version.h>
+
 #include "base/foreach.h"
 #include "base/string.h"
 #include "base/process.h"
@@ -771,8 +776,8 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
     rect.Set(0, 0, size->cx, size->cy);
   }
 
-  rect.Inflate(-ScaleX(win::kControlMargin) * 2,
-               -ScaleY(win::kControlMargin) * 2);
+  rect.Inflate(-ScaleX(kControlMargin) * 2,
+               -ScaleY(kControlMargin) * 2);
 
   // Image
   if (current_page_ != kAnimePageNone) {
@@ -787,7 +792,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
       rect_image.bottom = rect_image.top + static_cast<int>(rect_image.Width() * 1.4);
     }
     image_label_.SetPosition(nullptr, rect_image);
-    rect.left = rect_image.right + ScaleX(win::kControlMargin) * 2;
+    rect.left = rect_image.right + ScaleX(kControlMargin) * 2;
   }
 
   // Title
@@ -796,20 +801,20 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   rect_title.Set(rect.left, rect.top,
                  rect.right, rect.top + rect_title.Height());
   edit_title_.SetPosition(nullptr, rect_title);
-  rect.top = rect_title.bottom + ScaleY(win::kControlMargin);
+  rect.top = rect_title.bottom + ScaleY(kControlMargin);
 
   // Buttons
   if (mode_ == kDialogModeAnimeInformation) {
     win::Rect rect_button;
     ::GetWindowRect(GetDlgItem(IDOK), &rect_button);
-    rect.bottom -= rect_button.Height() + ScaleY(win::kControlMargin) * 2;
+    rect.bottom -= rect_button.Height() + ScaleY(kControlMargin) * 2;
   }
 
   // Content
   auto anime_item = AnimeDatabase.FindItem(anime_id_);
   bool anime_in_list = anime_item && anime_item->IsInList();
   if (mode_ == kDialogModeNowPlaying && !anime::IsValidId(anime_id_)) {
-    rect.left += ScaleX(win::kControlMargin);
+    rect.left += ScaleX(kControlMargin);
     sys_link_.SetPosition(nullptr, rect);
   } else if (mode_ == kDialogModeNowPlaying || !anime_in_list) {
     win::Dc dc = sys_link_.GetDC();
@@ -819,10 +824,10 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
     dc.DetachDc();
     int line_count = mode_ == kDialogModeNowPlaying ? 2 : 1;
     win::Rect rect_content = rect;
-    rect_content.Inflate(-ScaleX(win::kControlMargin * 2), 0);
+    rect_content.Inflate(-ScaleX(kControlMargin * 2), 0);
     rect_content.bottom = rect_content.top + text_height * line_count;
     sys_link_.SetPosition(nullptr, rect_content);
-    rect.top = rect_content.bottom + ScaleY(win::kControlMargin) * 3;
+    rect.top = rect_content.bottom + ScaleY(kControlMargin) * 3;
   }
 
   // Pages
@@ -830,7 +835,7 @@ void AnimeDialog::UpdateControlPositions(const SIZE* size) {
   if (tab_.IsVisible()) {
     tab_.SetPosition(nullptr, rect_page);
     tab_.AdjustRect(GetWindowHandle(), FALSE, &rect_page);
-    rect_page.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
+    rect_page.Inflate(-ScaleX(kControlMargin), -ScaleY(kControlMargin));
   }
   page_series_info.SetPosition(nullptr, rect_page);
   page_my_info.SetPosition(nullptr, rect_page);

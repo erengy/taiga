@@ -18,6 +18,8 @@
 
 #include <set>
 
+#include <windows/win/version.h>
+
 #include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -39,7 +41,6 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_gdi.h"
 
 namespace ui {
 

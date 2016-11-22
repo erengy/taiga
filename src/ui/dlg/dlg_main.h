@@ -22,10 +22,11 @@
 #include <map>
 #include <vector>
 
+#include <windows/win/common_controls.h>
+#include <windows/win/dialog.h>
+#include <windows/win/gdi.h>
+
 #include "library/anime_filter.h"
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_dialog.h"
-#include "win/win_gdi.h"
 
 #define WM_TAIGA_SHOWMENU WM_USER + 1337
 

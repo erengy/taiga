@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windowsx.h>
+
 #include "base/string.h"
 #include "library/history.h"
 #include "sync/sync.h"

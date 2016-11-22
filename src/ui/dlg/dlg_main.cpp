@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/task_dialog.h>
+
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime.h"
@@ -49,8 +51,7 @@
 #include "ui/dlg/dlg_update.h"
 #include "ui/menu.h"
 #include "ui/theme.h"
-#include "win/win_taskbar.h"
-#include "win/win_taskdialog.h"
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -81,7 +82,7 @@ BOOL MainDialog::OnInitDialog() {
   taiga::timers.Initialize();
 
   // Add icon to taskbar
-  Taskbar.Create(GetWindowHandle(), nullptr, TAIGA_APP_TITLE);
+  taskbar.Create(GetWindowHandle(), kAppSysTrayId, nullptr, TAIGA_APP_TITLE);
 
   ChangeStatus();
   UpdateTip();
@@ -228,11 +229,11 @@ void MainDialog::CreateDialogControls() {
     fMask, fStyle);
   rebar.InsertBand(toolbar_main.GetWindowHandle(),
     GetSystemMetrics(SM_CXSCREEN),
-    win::kControlMargin - 2, 0, 0, 0, 0, 0,
+    kControlMargin - 2, 0, 0, 0, 0, 0,
     HIWORD(toolbar_main.GetButtonSize()) + 2,
     fMask, fStyle | RBBS_BREAK);
   rebar.InsertBand(toolbar_search.GetWindowHandle(),
-    0, win::kControlMargin, 0, rcEditWindow.Width() + win::kControlMargin, 0, 0, 0,
+    0, kControlMargin, 0, rcEditWindow.Width() + kControlMargin, 0, 0, 0,
     HIWORD(toolbar_search.GetButtonSize()),
     fMask, fStyle);
 }
@@ -686,11 +687,11 @@ void MainDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
 void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
   // Taskbar creation notification
   if (uMsg == WM_TASKBARCREATED) {
-    Taskbar.Create(GetWindowHandle(), nullptr, TAIGA_APP_TITLE);
+    taskbar.Create(GetWindowHandle(), kAppSysTrayId, nullptr, TAIGA_APP_TITLE);
 
   // Windows 7 taskbar interface
   } else if (uMsg == WM_TASKBARBUTTONCREATED) {
-    TaskbarList.Initialize(GetWindowHandle());
+    taskbar_list.Initialize(GetWindowHandle());
 
   // Taskbar callback
   } else if (uMsg == WM_TASKBARCALLBACK) {
@@ -780,7 +781,7 @@ void MainDialog::UpdateControlPositions(const SIZE* size) {
   // Resize treeview
   if (treeview.IsVisible()) {
     win::Rect rect_tree(rect_sidebar_);
-    rect_tree.Inflate(-ScaleX(win::kControlMargin), -ScaleY(win::kControlMargin));
+    rect_tree.Inflate(-ScaleX(kControlMargin), -ScaleY(kControlMargin));
     treeview.SetPosition(nullptr, rect_tree);
   }
 
@@ -850,7 +851,7 @@ void MainDialog::UpdateTip() {
            PushString(L" #", anime::GetEpisodeRange(CurrentEpisode));
   }
 
-  Taskbar.Modify(tip.c_str());
+  taskbar.Modify(tip.c_str());
 }
 
 void MainDialog::UpdateTitle() {

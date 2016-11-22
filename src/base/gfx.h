@@ -19,8 +19,8 @@
 #ifndef TAIGA_BASE_GFX_H
 #define TAIGA_BASE_GFX_H
 
-#include "win/win_gdi.h"
-#include "win/win_gdiplus.h"
+#include <windows/win/gdi.h>
+#include <windows/win/gdi_plus.h>
 
 extern class win::GdiPlus GdiPlus;
 

@@ -19,7 +19,7 @@
 #ifndef TAIGA_TAIGA_ORANGE_H
 #define TAIGA_TAIGA_ORANGE_H
 
-#include "win/win_thread.h"
+#include <windows/win/thread.h>
 
 namespace taiga {
 
