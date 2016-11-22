@@ -22,9 +22,6 @@
     <Filter Include="ui">
       <UniqueIdentifier>{aad11cb9-6941-4934-9c9a-6523a6da7d06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="win">
-      <UniqueIdentifier>{5802bd8b-5cfa-4945-b7eb-c52aa2fbef32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="deps\anitomy">
       <UniqueIdentifier>{09fde2fa-d11a-4179-b5ef-8f3924a3ab25}</UniqueIdentifier>
     </Filter>
@@ -58,9 +55,6 @@
     <Filter Include="ui\dlg">
       <UniqueIdentifier>{1fde5dda-2f86-4de5-a8cc-da7664cc759b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="win\ctrl">
-      <UniqueIdentifier>{cda71bda-a7b7-46d6-9c94-a7fafbabba09}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
@@ -68,9 +62,6 @@
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\crypto.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\error.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\file.cpp">
@@ -427,93 +418,6 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\win\win_accessibility.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_automation.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_commondialog.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_dde.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_dialog.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_gdi.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_gdiplus.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_main.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_menu.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_registry.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_resizable.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_taskbar.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_taskdialog.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_thread.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_window.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_combobox.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_edit.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_imagelist.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_listview.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_progressbar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_rebar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_richedit.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_spin.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_statusbar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_syslink.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tab.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_toolbar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tooltip.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_treeview.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -523,9 +427,6 @@
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\crypto.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\base\error.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\file.h">
@@ -884,54 +785,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_accessibility.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_automation.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_commondialog.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_dde.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_dialog.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_gdi.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_gdiplus.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_main.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_menu.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_registry.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_resizable.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_taskbar.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_taskdialog.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_thread.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_window.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h">
-      <Filter>win\ctrl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
