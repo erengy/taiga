@@ -46,7 +46,7 @@ int Engine::ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids,
       double result = CompareTrigrams(t1, t2);
       if (result > 0.1) {
         auto& target = trigram_results[anime_id];
-        target = max(target, result);
+        target = std::max(target, result);
       }
     }
   };
@@ -66,8 +66,8 @@ int Engine::ScoreTitle(anime::Episode& episode, const std::set<int>& anime_ids,
 }
 
 static double CustomScore(const std::wstring& title, const std::wstring& str) {
-  double length_min = min(title.size(), str.size());
-  double length_max = max(title.size(), str.size());
+  double length_min = std::min(title.size(), str.size());
+  double length_max = std::max(title.size(), str.size());
   double length_ratio = length_min / length_max;
 
   double score = 0.0;
@@ -85,7 +85,7 @@ static double CustomScore(const std::wstring& title, const std::wstring& str) {
     auto distance = std::distance(title.begin(), mismatch.first);
     if (distance > 0) {
       auto distance_score = distance / length_min;
-      score = max(score, distance_score * 0.7);
+      score = std::max(score, distance_score * 0.7);
     }
   }
 
@@ -122,9 +122,9 @@ int Engine::ScoreTitle(const std::wstring& str, const anime::Episode& episode,
 
     // Calculate individual scores for all titles
     for (auto& title : db_[id].normal_titles) {
-      jaro_winkler[id] = max(jaro_winkler[id], JaroWinklerDistance(title, str));
-      levenshtein[id] = max(levenshtein[id], LevenshteinDistance(title, str));
-      custom[id] = max(custom[id], CustomScore(title, str));
+      jaro_winkler[id] = std::max(jaro_winkler[id], JaroWinklerDistance(title, str));
+      levenshtein[id] = std::max(levenshtein[id], LevenshteinDistance(title, str));
+      custom[id] = std::max(custom[id], CustomScore(title, str));
     }
     bonus[id] = BonusScore(episode, id);
 

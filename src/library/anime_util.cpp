@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
@@ -322,7 +324,7 @@ bool PlayRandomEpisode(int anime_id) {
 
   srand(static_cast<unsigned int>(GetTickCount()));
 
-  for (int i = 0; i < min(total, max_tries); i++) {
+  for (int i = 0; i < std::min(total, max_tries); i++) {
     int episode_number = rand() % total + 1;
     if (PlayEpisode(anime_item->GetId(), episode_number))
       return true;
@@ -747,14 +749,14 @@ int EstimateEpisodeCount(const Item& item) {
 
   // Estimate using user information
   if (item.IsInList())
-    number = max(item.GetMyLastWatchedEpisode(),
-                 item.GetAvailableEpisodeCount());
+    number = std::max(item.GetMyLastWatchedEpisode(),
+                      item.GetAvailableEpisodeCount());
 
   // Estimate using local information
-  number = max(number, item.GetLastAiredEpisodeNumber());
+  number = std::max(number, item.GetLastAiredEpisodeNumber());
 
   // Estimate using airing dates of TV series
-  number = max(number, EstimateLastAiredEpisodeNumber(item));
+  number = std::max(number, EstimateLastAiredEpisodeNumber(item));
 
   // Given all TV series aired since 2000, most of them have their episodes
   // spanning one or two seasons. Following is a table of top ten values:
@@ -856,7 +858,7 @@ int GetMyRewatchedTimes(const Item& item) {
   const int rewatched_times = item.GetMyRewatchedTimes();
 
   if (item.GetMyRewatching()) {
-    return max(rewatched_times, 1);  // because MAL doesn't tell us the actual value
+    return std::max(rewatched_times, 1);  // because MAL doesn't tell us the actual value
   } else {
     return rewatched_times;
   }
@@ -889,8 +891,8 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
   }
 
   // Limit values so that they don't exceed total episodes
-  ratio_aired = min(ratio_aired, 1.0f);
-  ratio_watched = min(ratio_watched, 1.0f);
+  ratio_aired = std::min(ratio_aired, 1.0f);
+  ratio_watched = std::min(ratio_watched, 1.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

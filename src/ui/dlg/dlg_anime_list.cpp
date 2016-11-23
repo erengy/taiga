@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <set>
 
 #include <windows/win/version.h>
@@ -997,11 +998,11 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
     rcAvail.top = rcAvail.bottom - ScaleY(3);
     if (eps_estimate > 0) {
       float width = static_cast<float>(rcBar.Width()) / static_cast<float>(eps_estimate);
-      for (int i = 1; i <= min(eps_available, eps_estimate); i++) {
+      for (int i = 1; i <= std::min(eps_available, eps_estimate); i++) {
         if (anime_item.IsEpisodeAvailable(i)) {
           rcAvail.left = rcBar.left + static_cast<int>(std::floor(width * (i - 1)));
           rcAvail.right = rcAvail.left + static_cast<int>(std::ceil(width));
-          rcAvail.right = min(rcAvail.right, rcBar.right);
+          rcAvail.right = std::min(rcAvail.right, rcBar.right);
           ui::Theme.DrawListProgress(dc.Get(), &rcAvail, ui::kListProgressAvailable);
         }
       }
@@ -1549,7 +1550,7 @@ void AnimeListDialog::ListView::InsertColumns() {
       for (auto& it : columns) {
         auto& column = it.second;
         if (column.order > order) {
-          minimum_order = min(minimum_order, column.order);
+          minimum_order = std::min(minimum_order, column.order);
         }
       }
       int order_difference = minimum_order - order;
@@ -1571,7 +1572,7 @@ void AnimeListDialog::ListView::InsertColumns() {
       int maximum_order = 0;
       for (auto& it : columns) {
         auto& column = it.second;
-        maximum_order = max(maximum_order, column.order);
+        maximum_order = std::max(maximum_order, column.order);
       }
       int current_order = maximum_order + 1;
       found.erase(found.begin());
@@ -1662,8 +1663,8 @@ void AnimeListDialog::ListView::MoveColumn(int index, int new_visible_order) {
     auto& column = it.second;
     if (column.index == index) {
       column.order = new_order;
-    } else if (column.order >= min(order, new_order) &&
-               column.order <= max(order, new_order)) {
+    } else if (column.order >= std::min(order, new_order) &&
+               column.order <= std::max(order, new_order)) {
       column.order += new_order > order ? -1 : 1;
     }
   }

@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "base/file.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -268,8 +270,8 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           const int group = list_.GetItemGroup(list_.last_checked_item);
           if (list_.last_checked_item > -1 && (GetKeyState(VK_SHIFT) & 0x8000) &&
               list_.GetItemGroup(pnmv->iItem) == group) {
-            int item_index = min(pnmv->iItem, list_.last_checked_item);
-            const int last_index = max(pnmv->iItem, list_.last_checked_item);
+            int item_index = std::min(pnmv->iItem, list_.last_checked_item);
+            const int last_index = std::max(pnmv->iItem, list_.last_checked_item);
             do {
               if (list_.GetItemGroup(item_index) == group)
                 list_.SetCheckState(item_index, checked);

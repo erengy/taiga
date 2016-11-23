@@ -237,7 +237,7 @@ bool IntersectsWith(const std::wstring& str1, const std::wstring& str2) {
   if (str1.empty() || str2.empty())
     return false;
 
-  return min(str1.size(), str2.size()) ==
+  return std::min(str1.size(), str2.size()) ==
          LongestCommonSubsequenceLength(str1, str2);
 }
 
@@ -268,7 +268,7 @@ size_t LongestCommonSubsequenceLength(const wstring& str1,
       if (str1[i] == str2[j]) {
         table[i + 1][j + 1] = table[i][j] + 1;
       } else {
-        table[i + 1][j + 1] = max(table[i + 1][j], table[i][j + 1]);
+        table[i + 1][j + 1] = std::max(table[i + 1][j], table[i][j + 1]);
       }
     }
   }
@@ -325,9 +325,9 @@ double JaroWinklerDistance(const wstring& str1, const wstring& str2) {
   vector<int> sflags(len1), aflags(len2);
 
   // Calculate matching characters
-  int range = max(0, (max(len1, len2) / 2) - 1);
+  int range = std::max(0, (std::max(len1, len2) / 2) - 1);
   for (i = 0; i < len2; i++) {
-    for (j = max(i - range, 0), l = min(i + range + 1, len1); j < l; j++) {
+    for (j = std::max(i - range, 0), l = std::min(i + range + 1, len1); j < l; j++) {
       if (str2[i] == str1[j] && !sflags[j]) {
         sflags[j] = 1;
         aflags[i] = 1;
@@ -362,7 +362,7 @@ double JaroWinklerDistance(const wstring& str1, const wstring& str2) {
 
   // Calculate common string prefix up to 4 chars
   l = 0;
-  for (i = 0; i < min(min(len1, len2), 4); i++)
+  for (i = 0; i < std::min(std::min(len1, len2), 4); i++)
     if (str1[i] == str2[i])
         l++;
 
@@ -387,13 +387,13 @@ double LevenshteinDistance(const wstring& str1, const wstring& str2) {
     col[0] = i + 1;
 
     for (size_t j = 0; j < len2; j++)
-      col[j + 1] = min(min(1 + col[j], 1 + prev_col[1 + j]),
-                       prev_col[j] + (str1[i] == str2[j] ? 0 : 1));
+      col[j + 1] = std::min(std::min(1 + col[j], 1 + prev_col[1 + j]),
+                            prev_col[j] + (str1[i] == str2[j] ? 0 : 1));
 
     col.swap(prev_col);
   }
 
-  const double len = static_cast<double>(max(str1.size(), str2.size()));
+  const double len = static_cast<double>(std::max(str1.size(), str2.size()));
   return 1.0 - (prev_col[len2] / len);
 }
 
@@ -431,7 +431,7 @@ double CompareTrigrams(const trigram_container_t& t1,
                         std::back_inserter(intersection));
 
   return static_cast<double>(intersection.size()) /
-         static_cast<double>(max(t1.size(), t2.size()));
+         static_cast<double>(std::max(t1.size(), t2.size()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

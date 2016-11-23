@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <vector>
@@ -392,7 +393,7 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
       continue;
     current.insert(anime_item->GetMyLastWatchedEpisode());
     if (anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-      number_max = min(number_max, anime_item->GetEpisodeCount());
+      number_max = std::min(number_max, anime_item->GetEpisodeCount());
   }
   int value = current.size() == 1 ? *current.begin() : 0;
 
@@ -893,7 +894,7 @@ bool OnFeedNotify(const Feed& feed) {
       auto episode_l = anime::GetEpisodeLow(episode);
       auto episode_h = anime::GetEpisodeHigh(episode);
       if (anime_item)
-        episode_l = max(episode_l, anime_item->GetMyLastWatchedEpisode() + 1);
+        episode_l = std::max(episode_l, anime_item->GetMyLastWatchedEpisode() + 1);
       std::wstring episode_number = ToWstr(episode_h);
       if (episode_l < episode_h)
         episode_number = ToWstr(episode_l) + L"-" + episode_number;

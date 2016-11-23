@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "base/file.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -186,7 +188,7 @@ const std::vector<float>& Statistics::CalculateScoreDistribution() {
     if (score > 0) {
       score_count[score]++;
       score_distribution[score]++;
-      extreme_value = max(score_distribution[score], extreme_value);
+      extreme_value = std::max(score_distribution[score], extreme_value);
     }
   }
 
