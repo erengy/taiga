@@ -17,7 +17,6 @@
 */
 
 #include "base/base64.h"
-#include "base/foreach.h"
 #include "base/html.h"
 #include "base/string.h"
 #include "base/xml.h"

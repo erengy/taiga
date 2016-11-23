@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
@@ -80,9 +79,9 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
   // Edit > Status
   auto menu = menu_list_.FindMenu(L"EditStatus");
   if (menu) {
-    foreach_(it, menu->items) {
-      it->checked = false;
-      it->def = false;
+    for (auto& item : menu->items) {
+      item.checked = false;
+      item.def = false;
     }
     int item_index = anime_item->GetMyStatus();
     if (item_index - 1 < static_cast<int>(menu->items.size())) {
@@ -161,10 +160,10 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
 void MenuList::UpdateAnimeListHeaders() {
   auto menu = menu_list_.FindMenu(L"AnimeListHeaders");
   if (menu) {
-    foreach_(it, menu->items) {
-      auto column_type = AnimeListDialog::ListView::TranslateColumnName(it->action);
+    for (auto& item : menu->items) {
+      auto column_type = AnimeListDialog::ListView::TranslateColumnName(item.action);
       if (column_type != kColumnUnknown)
-        it->checked = ui::DlgAnimeList.listview.columns[column_type].visible;
+        item.checked = ui::DlgAnimeList.listview.columns[column_type].visible;
     }
   }
 }
@@ -173,9 +172,9 @@ void MenuList::UpdateAnnounce() {
   // List > Announce current episode
   auto menu = menu_list_.FindMenu(L"List");
   if (menu) {
-    foreach_(it, menu->items) {
-      if (it->submenu == L"Announce") {
-        it->enabled = CurrentEpisode.anime_id > 0;
+    for (auto& item : menu->items) {
+      if (item.submenu == L"Announce") {
+        item.enabled = CurrentEpisode.anime_id > 0;
         break;
       }
     }
@@ -190,13 +189,13 @@ void MenuList::UpdateExternalLinks() {
 
     std::vector<std::wstring> lines;
     Split(Settings[taiga::kApp_Interface_ExternalLinks], L"\r\n", lines);
-    foreach_(line, lines) {
-      if (IsEqual(*line, L"-")) {
+    for (const auto& line : lines) {
+      if (IsEqual(line, L"-")) {
         // Add separator
         menu->CreateItem();
       } else {
         std::vector<std::wstring> content;
-        Split(*line, L"|", content);
+        Split(line, L"|", content);
         if (content.size() > 1) {
           menu->CreateItem(L"URL(" + content.at(1) + L")", content.at(0));
         }
@@ -233,10 +232,10 @@ void MenuList::UpdateHistoryList(bool enabled) {
   auto menu = menu_list_.FindMenu(L"HistoryList");
   if (menu) {
     // Add to list
-    foreach_(it, menu->items) {
-      if (it->action == L"Info()" ||
-          it->action == L"Delete()") {
-        it->enabled = enabled;
+    for (auto& item : menu->items) {
+      if (item.action == L"Info()" ||
+          item.action == L"Delete()") {
+        item.enabled = enabled;
       }
     }
   }
@@ -265,9 +264,9 @@ void MenuList::UpdateSearchList(bool enabled) {
   auto menu = menu_list_.FindMenu(L"SearchList");
   if (menu) {
     // Add to list
-    foreach_(it, menu->items) {
-      if (it->submenu == L"AddToList") {
-        it->enabled = enabled;
+    for (auto& item : menu->items) {
+      if (item.submenu == L"AddToList") {
+        item.enabled = enabled;
         break;
       }
     }
@@ -278,9 +277,9 @@ void MenuList::UpdateSeasonList(bool enabled) {
   auto menu = menu_list_.FindMenu(L"SeasonList");
   if (menu) {
     // Add to list
-    foreach_(it, menu->items) {
-      if (it->submenu == L"AddToList") {
-        it->enabled = enabled;
+    for (auto& item : menu->items) {
+      if (item.submenu == L"AddToList") {
+        item.enabled = enabled;
         break;
       }
     }
@@ -291,16 +290,16 @@ void MenuList::UpdateTorrentsList(const FeedItem& feed_item) {
   auto menu = menu_list_.FindMenu(L"TorrentListRightClick");
   if (menu) {
     bool anime_identified = anime::IsValidId(feed_item.episode_data.anime_id);
-    foreach_(it, menu->items) {
+    for (auto& item : menu->items) {
       // Info
-      if (it->action == L"Info") {
-        it->enabled = anime_identified;
+      if (item.action == L"Info") {
+        item.enabled = anime_identified;
       // Torrent info
-      } else if (it->action == L"TorrentInfo") {
-        it->enabled = !feed_item.info_link.empty();
+      } else if (item.action == L"TorrentInfo") {
+        item.enabled = !feed_item.info_link.empty();
       // Quick filters
-      } else if (it->submenu == L"QuickFilters") {
-        it->enabled = anime_identified;
+      } else if (item.submenu == L"QuickFilters") {
+        item.enabled = anime_identified;
       }
     }
   }
@@ -349,8 +348,8 @@ void MenuList::UpdateSeason() {
   // Group by
   menu = menu_list_.FindMenu(L"SeasonGroup");
   if (menu) {
-    foreach_(it, menu->items) {
-      it->checked = false;
+    for (auto& item : menu->items) {
+      item.checked = false;
     }
     int item_index = Settings.GetInt(taiga::kApp_Seasons_GroupBy);
     if (item_index < static_cast<int>(menu->items.size())) {
@@ -361,11 +360,11 @@ void MenuList::UpdateSeason() {
   // Sort by
   menu = menu_list_.FindMenu(L"SeasonSort");
   if (menu) {
-    foreach_(it, menu->items) {
-      it->checked = false;
-      if (it->action == L"Season_SortBy(2)")  // Popularity
+    for (auto& item : menu->items) {
+      item.checked = false;
+      if (item.action == L"Season_SortBy(2)")  // Popularity
         if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)
-          it->visible = false;
+          item.visible = false;
     }
     int item_index = Settings.GetInt(taiga::kApp_Seasons_SortBy);
     if (item_index < static_cast<int>(menu->items.size())) {
@@ -376,8 +375,8 @@ void MenuList::UpdateSeason() {
   // View as
   menu = menu_list_.FindMenu(L"SeasonView");
   if (menu) {
-    foreach_(it, menu->items) {
-      it->checked = false;
+    for (auto& item : menu->items) {
+      item.checked = false;
     }
     int item_index = Settings.GetInt(taiga::kApp_Seasons_ViewAs);
     if (item_index < static_cast<int>(menu->items.size())) {
@@ -389,16 +388,16 @@ void MenuList::UpdateSeason() {
 void MenuList::UpdateTools() {
   auto menu = menu_list_.FindMenu(L"Tools");
   if (menu) {
-    foreach_(it, menu->items) {
+    for (auto& item : menu->items) {
       // Tools > Enable anime recognition
-      if (it->action == L"ToggleRecognition()")
-        it->checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+      if (item.action == L"ToggleRecognition()")
+        item.checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
       // Tools > Enable auto sharing
-      if (it->action == L"ToggleSharing()")
-        it->checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
+      if (item.action == L"ToggleSharing()")
+        item.checked = Settings.GetBool(taiga::kApp_Option_EnableSharing);
       // Tools > Enable auto synchronization
-      if (it->action == L"ToggleSynchronization()")
-        it->checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
+      if (item.action == L"ToggleSynchronization()")
+        item.checked = Settings.GetBool(taiga::kApp_Option_EnableSync);
     }
   }
 }
@@ -407,9 +406,9 @@ void MenuList::UpdateTray() {
   auto menu = menu_list_.FindMenu(L"Tray");
   if (menu) {
     // Tray > Enable recognition
-    foreach_(it, menu->items) {
-      if (it->action == L"ToggleRecognition()") {
-        it->checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
+    for (auto& item : menu->items) {
+      if (item.action == L"ToggleRecognition()") {
+        item.checked = Settings.GetBool(taiga::kApp_Option_EnableRecognition);
         break;
       }
     }
@@ -419,13 +418,13 @@ void MenuList::UpdateTray() {
 void MenuList::UpdateView() {
   auto menu = menu_list_.FindMenu(L"View");
   if (menu) {
-    foreach_(it, menu->items) {
-      it->checked = false;
+    for (auto& item : menu->items) {
+      item.checked = false;
     }
     int item_index = DlgMain.navigation.GetCurrentPage();
-    foreach_(it, menu->items) {
-      if (it->action == L"ViewContent(" + ToWstr(item_index) + L")") {
-        it->checked = true;
+    for (auto& item : menu->items) {
+      if (item.action == L"ViewContent(" + ToWstr(item_index) + L")") {
+        item.checked = true;
         break;
       }
     }

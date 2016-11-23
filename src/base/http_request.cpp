@@ -17,7 +17,6 @@
 */
 
 #include "file.h"
-#include "foreach.h"
 #include "http.h"
 #include "gzip.h"
 #include "log.h"
@@ -236,10 +235,10 @@ void Client::BuildRequestHeader() {
       request_.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
 
   // Append available header fields
-  foreach_(it, request_.header) {
-    std::string header = WstrToStr(it->first);
-    if (!it->second.empty()) {
-      header += ": " + WstrToStr(it->second);
+  for (const auto& pair : request_.header) {
+    std::string header = WstrToStr(pair.first);
+    if (!pair.second.empty()) {
+      header += ": " + WstrToStr(pair.second);
     } else {
       header += ";";
     }

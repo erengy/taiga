@@ -18,7 +18,6 @@
 
 #include <windows/win/common_dialogs.h>
 
-#include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -420,10 +419,10 @@ void PageMyInfo::RefreshFansubPreference() {
   std::vector<std::wstring> groups;
 
   if (anime::GetFansubFilter(anime_id_, groups)) {
-    foreach_(it, groups) {
+    for (const auto& group : groups) {
       if (!text.empty())
         text += L" or ";
-      text += L"\"" + *it + L"\"";
+      text += L"\"" + group + L"\"";
     }
   } else {
     text = L"None";

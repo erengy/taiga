@@ -17,7 +17,6 @@
 */
 
 #include "file.h"
-#include "foreach.h"
 #include "string.h"
 #include "xml.h"
 
@@ -56,9 +55,9 @@ void XmlWriteChildNodes(pugi::xml_node& parent_node,
                         const std::vector<std::wstring>& input,
                         const wchar_t* name,
                         pugi::xml_node_type node_type) {
-  foreach_(it, input) {
+  for (const auto& value : input) {
     xml_node child_node = parent_node.append_child(name);
-    child_node.append_child(node_type).set_value(it->c_str());
+    child_node.append_child(node_type).set_value(value.c_str());
   }
 }
 

@@ -22,7 +22,6 @@
 #include "base/base64.h"
 #include "base/crypto.h"
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -277,9 +276,9 @@ bool AppSettings::Load() {
   foreach_xmlnode_(player, node_players, L"player") {
     std::wstring name = player.attribute(L"name").value();
     bool enabled = player.attribute(L"enabled").as_bool();
-    foreach_(it, MediaPlayers.items) {
-      if (it->name == name) {
-        it->enabled = enabled;
+    for (auto& media_player : MediaPlayers.items) {
+      if (media_player.name == name) {
+        media_player.enabled = enabled;
         break;
       }
     }
@@ -338,15 +337,15 @@ bool AppSettings::Save() {
 
   // Library folders
   xml_node folders = settings.child(L"anime").child(L"folders");
-  foreach_(it, library_folders) {
+  for (const auto& folder : library_folders) {
     xml_node root = folders.append_child(L"root");
-    root.append_attribute(L"folder") = it->c_str();
+    root.append_attribute(L"folder") = folder.c_str();
   }
 
   // Anime items
   xml_node items = settings.child(L"anime").append_child(L"items");
-  foreach_(it, AnimeDatabase.items) {
-    anime::Item& anime_item = it->second;
+  for (const auto& pair : AnimeDatabase.items) {
+    const auto& anime_item = pair.second;
     if (anime_item.GetFolder().empty() &&
         !anime_item.UserSynonymsAvailable() &&
         !anime_item.GetUseAlternative())
@@ -363,10 +362,10 @@ bool AppSettings::Save() {
 
   // Media players
   xml_node mediaplayers = settings.child(L"recognition").child(L"mediaplayers");
-  foreach_(it, MediaPlayers.items) {
+  for (const auto& media_player : MediaPlayers.items) {
     xml_node player = mediaplayers.append_child(L"player");
-    player.append_attribute(L"name") = it->name.c_str();
-    player.append_attribute(L"enabled") = it->enabled;
+    player.append_attribute(L"name") = media_player.name.c_str();
+    player.append_attribute(L"enabled") = media_player.enabled;
   }
 
   // Anime list columns
@@ -481,14 +480,14 @@ void AppSettings::HandleCompatibility() {
     Set(kSync_Service_Hummingbird_Password, Base64Encode(password));
 
     // Update torrent filters
-    foreach_(filter, Aggregator.filter_manager.filters) {
-      if (filter->name == L"Discard unknown titles") {
-        if (filter->conditions.size() == 1) {
-          auto condition = filter->conditions.begin();
-          if (condition->element == kFeedFilterElement_Meta_Id) {
-            filter->name = L"Discard and deactivate not-in-list anime";
-            condition->element = kFeedFilterElement_User_Status;
-            condition->value = ToWstr(anime::kNotInList);
+    for (auto& filter : Aggregator.filter_manager.filters) {
+      if (filter.name == L"Discard unknown titles") {
+        if (filter.conditions.size() == 1) {
+          auto& condition = filter.conditions.front();
+          if (condition.element == kFeedFilterElement_Meta_Id) {
+            filter.name = L"Discard and deactivate not-in-list anime";
+            condition.element = kFeedFilterElement_User_Status;
+            condition.value = ToWstr(anime::kNotInList);
           }
         }
         break;

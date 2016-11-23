@@ -20,7 +20,6 @@
 
 #include <windows/win/version.h>
 
-#include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -1323,15 +1322,15 @@ void AnimeListDialog::RefreshList(int index) {
   std::vector<int> group_count(anime::kMyStatusLast);
   int group_index = -1;
   int i = 0;
-  foreach_(it, AnimeDatabase.items) {
-    anime::Item& anime_item = it->second;
+  for (const auto& pair : AnimeDatabase.items) {
+    const anime::Item& anime_item = pair.second;
 
     if (!anime_item.IsInList())
       continue;
     if (IsDeletedFromList(anime_item))
       continue;
     if (!group_view) {
-      if (it->second.GetMyRewatching()) {
+      if (anime_item.GetMyRewatching()) {
         if (current_status_ != anime::kWatching)
           continue;
       } else if (current_status_ != anime_item.GetMyStatus()) {

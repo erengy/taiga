@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "foreach.h"
 #include "string.h"
 #include "url.h"
 
@@ -136,11 +135,11 @@ void Url::Crack(std::wstring url) {
     path = path.substr(0, i);
     std::vector<std::wstring> parameters;
     Split(query_string, L"&", parameters);
-    foreach_(it, parameters) {
-      i = it->find(L"=", 0);
+    for (const auto& parameter : parameters) {
+      i = parameter.find(L"=", 0);
       if (i != std::wstring::npos) {
-        std::wstring name = it->substr(0, i);
-        std::wstring value = DecodeUrl(it->substr(i + 1));
+        std::wstring name = parameter.substr(0, i);
+        std::wstring value = DecodeUrl(parameter.substr(i + 1));
         query.insert(std::make_pair(name, value));
       }
     }

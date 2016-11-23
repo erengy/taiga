@@ -328,9 +328,9 @@ void HttpManager::Shutdown() {
 ////////////////////////////////////////////////////////////////////////////////
 
 HttpClient* HttpManager::FindClient(base::uid_t uid) {
-  foreach_(it, clients_)
-    if (it->request().uid == uid)
-      return &(*it);
+  for (auto& client : clients_)
+    if (client.request().uid == uid)
+      return &client;
 
   return nullptr;
 }
@@ -382,8 +382,8 @@ void HttpManager::ProcessQueue() {
   win::Lock lock(critical_section_);
 
   unsigned int connections = 0;
-  foreach_(it, connections_)
-    connections += it->second;
+  for (const auto& pair : connections_)
+    connections += pair.second;
 
   for (size_t i = 0; i < requests_.size(); i++) {
     if (shutdown_) {

@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "library/anime.h"
@@ -164,8 +163,8 @@ void TimerManager::OnTick() {
 
   UpdateEnabledState();
 
-  foreach_(it, timers_)
-    it->second->Tick();
+  for (const auto& pair : timers_)
+    pair.second->Tick();
 
   UpdateUi();
 }

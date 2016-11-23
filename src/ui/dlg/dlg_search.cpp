@@ -18,7 +18,6 @@
 
 #include <windows/win/task_dialog.h>
 
-#include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -225,8 +224,8 @@ void SearchDialog::RefreshList() {
   list_.DeleteAllItems();
 
   // Add anime items to list
-  foreach_(it, anime_ids_)
-    AddAnimeToList(*it);
+  for (const auto& anime_id : anime_ids_)
+    AddAnimeToList(anime_id);
 
   // Redraw
   list_.SetRedraw(TRUE);

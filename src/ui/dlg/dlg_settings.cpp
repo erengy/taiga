@@ -20,7 +20,6 @@
 
 #include "base/base64.h"
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/string.h"
 #include "library/history.h"
 #include "sync/manager.h"

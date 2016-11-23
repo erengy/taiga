@@ -262,8 +262,8 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
 
   if (!anime_ids.empty()) {
     bool apply_filter = false;
-    foreach_(id, anime_ids) {
-      if (*id == item.episode_data.anime_id) {
+    for (const auto& id : anime_ids) {
+      if (id == item.episode_data.anime_id) {
         apply_filter = true;
         break;
       }
@@ -365,49 +365,49 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
 bool FeedFilter::ApplyPreferenceFilter(Feed& feed, FeedItem& item) {
   std::map<FeedFilterElement, bool> element_found;
 
-  foreach_(condition, conditions) {
-    switch (condition->element) {
+  for (const auto& condition : conditions) {
+    switch (condition.element) {
       case kFeedFilterElement_Meta_Id:
       case kFeedFilterElement_Episode_Title:
       case kFeedFilterElement_Episode_Number:
       case kFeedFilterElement_Episode_Group:
-        element_found[condition->element] = true;
+        element_found[condition.element] = true;
         break;
     }
   }
 
   bool filter_applied = false;
 
-  foreach_(it, feed.items) {
+  for (auto& feed_item : feed.items) {
     // Do not bother if the item was discarded before
-    if (it->IsDiscarded())
+    if (feed_item.IsDiscarded())
       continue;
     // Do not filter the same item again
-    if (*it == item)
+    if (feed_item == item)
       continue;
 
     // Is it the same title/anime?
-    if (!anime::IsValidId(it->episode_data.anime_id) &&
+    if (!anime::IsValidId(feed_item.episode_data.anime_id) &&
         !anime::IsValidId(item.episode_data.anime_id)) {
       if (!element_found[kFeedFilterElement_Episode_Title])
-        if (!IsEqual(it->episode_data.anime_title(), item.episode_data.anime_title()))
+        if (!IsEqual(feed_item.episode_data.anime_title(), item.episode_data.anime_title()))
           continue;
     } else {
       if (!element_found[kFeedFilterElement_Meta_Id])
-        if (it->episode_data.anime_id != item.episode_data.anime_id)
+        if (feed_item.episode_data.anime_id != item.episode_data.anime_id)
           continue;
     }
     // Is it the same episode?
     if (!element_found[kFeedFilterElement_Episode_Number])
-      if (it->episode_data.episode_number_range() != item.episode_data.episode_number_range())
+      if (feed_item.episode_data.episode_number_range() != item.episode_data.episode_number_range())
         continue;
     // Is it from the same fansub group?
     if (!element_found[kFeedFilterElement_Episode_Group])
-      if (!IsEqual(it->episode_data.release_group(), item.episode_data.release_group()))
+      if (!IsEqual(feed_item.episode_data.release_group(), item.episode_data.release_group()))
         continue;
 
     // Try applying the same filter
-    bool result = Filter(feed, *it, false);
+    bool result = Filter(feed, feed_item, false);
     filter_applied = filter_applied || result;
   }
 
@@ -435,18 +435,18 @@ FeedFilterManager::FeedFilterManager() {
 }
 
 void FeedFilterManager::AddPresets() {
-  foreach_(preset, presets) {
-    if (!preset->is_default)
+  for (const auto& preset : presets) {
+    if (!preset.is_default)
       continue;
 
-    AddFilter(preset->filter.action, preset->filter.match,
-              preset->filter.option, preset->filter.enabled,
-              preset->filter.name);
+    AddFilter(preset.filter.action, preset.filter.match,
+              preset.filter.option, preset.filter.enabled,
+              preset.filter.name);
 
-    foreach_(condition, preset->filter.conditions) {
-      filters.back().AddCondition(condition->element,
-                                  condition->op,
-                                  condition->value);
+    for (const auto& condition : preset.filter.conditions) {
+      filters.back().AddCondition(condition.element,
+                                  condition.op,
+                                  condition.value);
     }
   }
 }
@@ -484,24 +484,24 @@ void FeedFilterManager::Filter(Feed& feed, bool preferences) {
   if (!Settings.GetBool(taiga::kTorrent_Filter_Enabled))
     return;
 
-  foreach_(item, feed.items) {
-    foreach_(filter, filters) {
-      if (preferences != (filter->action == kFeedFilterActionPrefer))
+  for (auto& item : feed.items) {
+    for (auto& filter : filters) {
+      if (preferences != (filter.action == kFeedFilterActionPrefer))
         continue;
-      filter->Filter(feed, *item, true);
+      filter.Filter(feed, item, true);
     }
   }
 }
 
 void FeedFilterManager::FilterArchived(Feed& feed) {
-  foreach_(item, feed.items) {
-    if (!item->IsDiscarded()) {
-      bool found = Aggregator.SearchArchive(item->title);
+  for (auto& item : feed.items) {
+    if (!item.IsDiscarded()) {
+      bool found = Aggregator.SearchArchive(item.title);
       if (found) {
-        item->state = kFeedItemDiscardedNormal;
+        item.state = kFeedItemDiscardedNormal;
         if (Taiga.debug_mode) {
           std::wstring filter_text = L"!FILTER :: Archived";
-          item->description = filter_text + L" -- " + item->description;
+          item.description = filter_text + L" -- " + item.description;
         }
       }
     }
@@ -509,12 +509,12 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
 }
 
 void FeedFilterManager::MarkNewEpisodes(Feed& feed) {
-  foreach_(item, feed.items) {
-    auto anime_item = AnimeDatabase.FindItem(item->episode_data.anime_id);
+  for (auto& feed_item : feed.items) {
+    auto anime_item = AnimeDatabase.FindItem(feed_item.episode_data.anime_id);
     if (anime_item) {
-      int number = anime::GetEpisodeHigh(item->episode_data);
+      int number = anime::GetEpisodeHigh(feed_item.episode_data);
       if (number > anime_item->GetMyLastWatchedEpisode())
-        item->episode_data.new_episode = true;
+        feed_item.episode_data.new_episode = true;
     }
   }
 }
@@ -701,34 +701,34 @@ void FeedFilterManager::Export(std::wstring& output,
 
 void FeedFilterManager::Export(pugi::xml_node& node_filter,
                                const std::vector<FeedFilter>& filters) {
-  foreach_(it, filters) {
+  for (const auto& feed_filter : filters) {
     xml_node item = node_filter.append_child(L"item");
     item.append_attribute(L"action") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
-            kFeedFilterShortcodeAction, it->action).c_str();
+            kFeedFilterShortcodeAction, feed_filter.action).c_str();
     item.append_attribute(L"match") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
-            kFeedFilterShortcodeMatch, it->match).c_str();
+            kFeedFilterShortcodeMatch, feed_filter.match).c_str();
     item.append_attribute(L"option") =
         Aggregator.filter_manager.GetShortcodeFromIndex(
-            kFeedFilterShortcodeOption, it->option).c_str();
-    item.append_attribute(L"enabled") = it->enabled;
-    item.append_attribute(L"name") = it->name.c_str();
+            kFeedFilterShortcodeOption, feed_filter.option).c_str();
+    item.append_attribute(L"enabled") = feed_filter.enabled;
+    item.append_attribute(L"name") = feed_filter.name.c_str();
 
-    foreach_(ita, it->anime_ids) {
+    for (const auto& id : feed_filter.anime_ids) {
       xml_node anime = item.append_child(L"anime");
-      anime.append_attribute(L"id") = *ita;
+      anime.append_attribute(L"id") = id;
     }
 
-    foreach_(itc, it->conditions) {
-      xml_node condition = item.append_child(L"condition");
-      condition.append_attribute(L"element") =
+    for (const auto& condition : feed_filter.conditions) {
+      xml_node node = item.append_child(L"condition");
+      node.append_attribute(L"element") =
           Aggregator.filter_manager.GetShortcodeFromIndex(
-              kFeedFilterShortcodeElement, itc->element).c_str();
-      condition.append_attribute(L"operator") =
+              kFeedFilterShortcodeElement, condition.element).c_str();
+      node.append_attribute(L"operator") =
           Aggregator.filter_manager.GetShortcodeFromIndex(
-              kFeedFilterShortcodeOperator, itc->op).c_str();
-      condition.append_attribute(L"value") = itc->value.c_str();
+              kFeedFilterShortcodeOperator, condition.op).c_str();
+      node.append_attribute(L"value") = condition.value.c_str();
     }
   }
 }
@@ -940,9 +940,9 @@ int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
       break;
   }
 
-  foreach_(it, *shortcodes)
-    if (IsEqual(it->second, shortcode))
-      return it->first;
+  for (const auto& pair : *shortcodes)
+    if (IsEqual(pair.second, shortcode))
+      return pair.first;
 
   LOG(LevelDebug, L"Shortcode: \"" + shortcode +
                   L"\" for type \"" + ToWstr(type) + L"\" is not found.");

@@ -280,8 +280,8 @@ bool PlayRandomAnime() {
 
   std::vector<int> valid_ids;
 
-  foreach_(it, AnimeDatabase.items) {
-    anime::Item& anime_item = it->second;
+  for (auto& pair : AnimeDatabase.items) {
+    anime::Item& anime_item = pair.second;
     if (!anime_item.IsInList())
       continue;
     if (!anime_item.IsNextEpisodeAvailable())
@@ -299,7 +299,7 @@ bool PlayRandomAnime() {
 
   srand(static_cast<unsigned int>(GetTickCount()));
 
-  foreach_(id, valid_ids) {
+  for (const auto& unused : valid_ids) {
     size_t index = rand() % max_value;
     int anime_id = valid_ids.at(index);
     if (PlayNextEpisode(anime_id))
@@ -403,10 +403,10 @@ void EndWatching(Item& item, Episode episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool IsDeletedFromList(Item& item) {
-  foreach_(it, History.queue.items)
-    if (it->anime_id == item.GetId())
-      if (it->mode == taiga::kHttpServiceDeleteLibraryEntry)
+bool IsDeletedFromList(const Item& item) {
+  for (const auto& history_item : History.queue.items)
+    if (history_item.anime_id == item.GetId())
+      if (history_item.mode == taiga::kHttpServiceDeleteLibraryEntry)
         return true;
 
   return false;
@@ -579,8 +579,8 @@ std::wstring GetImagePath(int anime_id) {
 }
 
 void GetUpcomingTitles(std::vector<int>& anime_ids) {
-  foreach_c_(item, AnimeDatabase.items) {
-    const anime::Item& anime_item = item->second;
+  for (const auto& pair : AnimeDatabase.items) {
+    const anime::Item& anime_item = pair.second;
 
     const Date& date_start = anime_item.GetDateStart();
     const Date& date_now = GetDateJapan();
@@ -598,8 +598,8 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsInsideLibraryFolders(const std::wstring& path) {
-  foreach_c_(library_folder, Settings.library_folders)
-    if (StartsWith(path, *library_folder))
+  for (const auto& library_folder : Settings.library_folders)
+    if (StartsWith(path, library_folder))
       return true;
 
   return false;
@@ -718,10 +718,10 @@ bool IsValidEpisodeNumber(int number, int total, int watched) {
 std::wstring JoinEpisodeNumbers(const std::vector<int>& input) {
   std::wstring output;
 
-  foreach_(it, input) {
+  for (const auto& number : input) {
     if (!output.empty())
       output += L"-";
-    output += ToWstr(*it);
+    output += ToWstr(number);
   }
 
   return output;
@@ -734,8 +734,8 @@ void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output) {
   std::vector<std::wstring> numbers;
   Split(input, L"-", numbers);
 
-  foreach_(it, numbers)
-    output.push_back(ToInt(*it));
+  for (const auto& number : numbers)
+    output.push_back(ToInt(number));
 }
 
 int EstimateEpisodeCount(const Item& item) {

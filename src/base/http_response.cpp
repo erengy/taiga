@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "foreach.h"
 #include "http.h"
 #include "string.h"
 #include "url.h"
@@ -31,14 +30,14 @@ bool Client::GetResponseHeader(const std::wstring& header) {
   std::vector<std::wstring> lines;
   Split(header, L"\r\n", lines);
 
-  foreach_(line, lines) {
-    int pos = InStr(*line, L":", 0);
+  for (const auto& line : lines) {
+    int pos = InStr(line, L":", 0);
     if (pos == -1) {
-      if (StartsWith(*line, L"HTTP/"))
-        response_.code = ToInt(InStr(*line, L" ", L" "));
+      if (StartsWith(line, L"HTTP/"))
+        response_.code = ToInt(InStr(line, L" ", L" "));
     } else {
-      std::wstring name = line->substr(0, pos);
-      std::wstring value = line->substr(pos + 1);
+      std::wstring name = line.substr(0, pos);
+      std::wstring value = line.substr(pos + 1);
       TrimLeft(value);
       // Using insert function instead of operator[] to avoid overwriting
       // previous header fields.
@@ -56,9 +55,9 @@ bool Client::ParseResponseHeader() {
   Url location;
   bool refresh = false;
 
-  foreach_(it, response_.header) {
-    std::wstring name = it->first;
-    std::wstring value = it->second;
+  for (const auto& pair : response_.header) {
+    std::wstring name = pair.first;
+    std::wstring value = pair.second;
 
     if (IsEqual(name, L"Content-Encoding")) {
       if (InStr(value, L"gzip") > -1) {

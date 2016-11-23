@@ -493,15 +493,15 @@ bool History::Save() {
 
   // Write items
   xml_node node_items = node_history.append_child(L"items");
-  foreach_(it, items) {
+  for (const auto& history_item : items) {
     xml_node node_item = node_items.append_child(L"item");
-    node_item.append_attribute(L"anime_id") = it->anime_id;
-    node_item.append_attribute(L"episode") = *it->episode;
-    node_item.append_attribute(L"time") = it->time.c_str();
+    node_item.append_attribute(L"anime_id") = history_item.anime_id;
+    node_item.append_attribute(L"episode") = *history_item.episode;
+    node_item.append_attribute(L"time") = history_item.time.c_str();
   }
   // Write queue
   xml_node node_queue = node_history.append_child(L"queue");
-  foreach_(it, queue.items) {
+  for (const auto& history_item : queue.items) {
     xml_node node_item = node_queue.append_child(L"item");
     #define APPEND_ATTRIBUTE_INT(x, y) \
         if (y) node_item.append_attribute(x) = *y;
@@ -509,17 +509,17 @@ bool History::Save() {
         if (y) node_item.append_attribute(x) = (*y).c_str();
     #define APPEND_ATTRIBUTE_DATE(x, y) \
         if (y) node_item.append_attribute(x) = std::wstring(*y).c_str();
-    node_item.append_attribute(L"anime_id") = it->anime_id;
-    node_item.append_attribute(L"mode") = TranslateModeToString(it->mode).c_str();
-    node_item.append_attribute(L"time") = it->time.c_str();
-    APPEND_ATTRIBUTE_INT(L"episode", it->episode);
-    APPEND_ATTRIBUTE_INT(L"score", it->score);
-    APPEND_ATTRIBUTE_INT(L"status", it->status);
-    APPEND_ATTRIBUTE_INT(L"enable_rewatching", it->enable_rewatching);
-    APPEND_ATTRIBUTE_INT(L"rewatched_times", it->rewatched_times);
-    APPEND_ATTRIBUTE_STR(L"tags", it->tags);
-    APPEND_ATTRIBUTE_DATE(L"date_start", it->date_start);
-    APPEND_ATTRIBUTE_DATE(L"date_finish", it->date_finish);
+    node_item.append_attribute(L"anime_id") = history_item.anime_id;
+    node_item.append_attribute(L"mode") = TranslateModeToString(history_item.mode).c_str();
+    node_item.append_attribute(L"time") = history_item.time.c_str();
+    APPEND_ATTRIBUTE_INT(L"episode", history_item.episode);
+    APPEND_ATTRIBUTE_INT(L"score", history_item.score);
+    APPEND_ATTRIBUTE_INT(L"status", history_item.status);
+    APPEND_ATTRIBUTE_INT(L"enable_rewatching", history_item.enable_rewatching);
+    APPEND_ATTRIBUTE_INT(L"rewatched_times", history_item.rewatched_times);
+    APPEND_ATTRIBUTE_STR(L"tags", history_item.tags);
+    APPEND_ATTRIBUTE_DATE(L"date_start", history_item.date_start);
+    APPEND_ATTRIBUTE_DATE(L"date_finish", history_item.date_finish);
     #undef APPEND_ATTRIBUTE_DATE
     #undef APPEND_ATTRIBUTE_STR
     #undef APPEND_ATTRIBUTE_INT

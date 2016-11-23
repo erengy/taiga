@@ -17,7 +17,6 @@
 */
 
 #include "base/crypto.h"
-#include "base/foreach.h"
 #include "base/string.h"
 #include "base/url.h"
 #include "library/anime_db.h"

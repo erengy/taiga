@@ -18,7 +18,6 @@
 
 #include <windows/win/automation.h>
 
-#include "base/foreach.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime_episode.h"
@@ -104,19 +103,19 @@ win::AccessibleChild* FindAccessibleChild(
     std::vector<win::AccessibleChild>& children,
     const std::wstring& name,
     DWORD role) {
-  win::AccessibleChild* child = nullptr;
+  win::AccessibleChild* result = nullptr;
 
-  foreach_(it, children) {
-    if (name.empty() || IsEqual(name, it->name))
-      if (!role || role == it->role)
-        child = &(*it);
-    if (child == nullptr && !it->children.empty())
-      child = FindAccessibleChild(it->children, name, role);
-    if (child)
+  for (auto& child : children) {
+    if (name.empty() || IsEqual(name, child.name))
+      if (!role || role == child.role)
+        result = &child;
+    if (result == nullptr && !child.children.empty())
+      result = FindAccessibleChild(child.children, name, role);
+    if (result)
       break;
   }
 
-  return child;
+  return result;
 }
 
 bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
@@ -203,8 +202,8 @@ std::wstring MediaPlayers::FromActiveAccessibility(HWND hwnd, int web_engine,
         break;
     }
     if (child) {
-      foreach_(it, child->children) {
-        if (IntersectsWith(it->name, current_title())) {
+      for (const auto& grandchild : child->children) {
+        if (IntersectsWith(grandchild.name, current_title())) {
           // Tab is still open, just not active
           return current_title();
         }
@@ -222,8 +221,8 @@ std::wstring MediaPlayers::FromActiveAccessibility(HWND hwnd, int web_engine,
       case kWebEngineTrident: {
         InitializeBrowserData();
         auto& child_data = browser_data[static_cast<WebBrowserEngine>(web_engine)];
-        foreach_(it, child_data) {
-          child = FindAccessibleChild(acc_obj.children, it->name, it->role);
+        for (const auto& data : child_data) {
+          child = FindAccessibleChild(acc_obj.children, data.name, data.role);
           if (child)
             break;
         }

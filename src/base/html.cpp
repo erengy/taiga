@@ -19,7 +19,6 @@
 #include <map>
 #include <string>
 
-#include "foreach.h"
 #include "html.h"
 #include "string.h"
 
@@ -301,12 +300,12 @@ void DecodeHtmlEntities(std::wstring& str) {
     html_entities[L"rsaquo"] =   L'\u203A';
     html_entities[L"euro"] =     L'\u20AC';
 
-    foreach_(entity, html_entities) {
+    for (const auto& pair : html_entities) {
       if (!min_html_entity_length ||
-          entity->first.length() < min_html_entity_length)
-        min_html_entity_length = entity->first.length();
-      if (entity->first.length() > max_html_entity_length)
-        max_html_entity_length = entity->first.length();
+          pair.first.length() < min_html_entity_length)
+        min_html_entity_length = pair.first.length();
+      if (pair.first.length() > max_html_entity_length)
+        max_html_entity_length = pair.first.length();
     }
   }
 

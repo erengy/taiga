@@ -19,7 +19,6 @@
 #include <set>
 
 #include "base/base64.h"
-#include "base/foreach.h"
 #include "base/html.h"
 #include "base/http.h"
 #include "base/string.h"
@@ -184,10 +183,10 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
       L"tags"
   };
   std::set<std::wstring> valid_tags(tags, tags + sizeof(tags) / sizeof(*tags));
-  foreach_(it, request.data) {
-    auto tag = valid_tags.find(TranslateKeyTo(it->first));
+  for (const auto& pair : request.data) {
+    auto tag = valid_tags.find(TranslateKeyTo(pair.first));
     if (tag != valid_tags.end()) {
-      std::wstring value = it->second;
+      std::wstring value = pair.second;
       if (*tag == L"status") {
         value = ToWstr(TranslateMyStatusTo(ToInt(value)));
       } else if (StartsWith(*tag, L"date")) {

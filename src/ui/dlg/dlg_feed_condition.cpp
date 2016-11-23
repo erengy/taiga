@@ -20,7 +20,6 @@
 
 #include <windows/win/gdi.h>
 
-#include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -267,8 +266,8 @@ void FeedConditionDialog::ChooseElement(int element_index) {
         });
       if (element_index == kFeedFilterElement_Meta_Id)
         value_combo_.AddString(L"(Unknown)");
-      foreach_(it, title_list)
-        value_combo_.AddItem(it->second.c_str(), it->first);
+      for (const auto& pair : title_list)
+        value_combo_.AddItem(pair.second.c_str(), pair.first);
       break;
     }
     case kFeedFilterElement_Meta_DateStart:

@@ -570,13 +570,13 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     if (!scores_.empty()) {
       int count = 0;
       content += L"Please choose the correct one from the list below:\n\n";
-      foreach_c_(it, scores_) {
+      for (const auto& pair : scores_) {
         passive_links.push_back(passive_links.empty() ? 1 : passive_links.back() + 2);
-        content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(it->first) + L"\">" +
-                   AnimeDatabase.items[it->first].GetTitle() + L"</a>" +
-                   L" <a href=\"Info(" + ToWstr(it->first) + L")\">[?]</a>";
+        content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(pair.first) + L"\">" +
+                   AnimeDatabase.items[pair.first].GetTitle() + L"</a>" +
+                   L" <a href=\"Info(" + ToWstr(pair.first) + L")\">[?]</a>";
         if (Taiga.debug_mode)
-          content += L" [Score: " + ToWstr(it->second) + L"]";
+          content += L" [Score: " + ToWstr(pair.second) + L"]";
         content += L"\n";
         if (++count >= 10)
           break;
@@ -614,12 +614,12 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     list_anime_ids(History.queue.items);
     list_anime_ids(History.items);
     int recently_watched = 0;
-    foreach_c_(it, anime_ids) {
-      auto anime_item = AnimeDatabase.FindItem(*it);
+    for (const auto& id : anime_ids) {
+      auto anime_item = AnimeDatabase.FindItem(id);
       if (!anime_item || !anime_item->IsNextEpisodeAvailable())
         continue;
       std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
-      content += L"\u2022 <a href=\"PlayNext(" + ToWstr(*it) + L")\">" + title + L"</a>\n";
+      content += L"\u2022 <a href=\"PlayNext(" + ToWstr(id) + L")\">" + title + L"</a>\n";
       recently_watched++;
       if (recently_watched >= 20)
         break;
@@ -632,17 +632,17 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content = L"Continue Watching:\n" + content + L"\n";
     }
     int watched_last_week = 0;
-    foreach_c_(it, History.queue.items) {
-      if (!it->episode || *it->episode == 0)
+    for (const auto& history_item : History.queue.items) {
+      if (!history_item.episode || *history_item.episode == 0)
         continue;
-      date_diff = date_now - (Date)(it->time.substr(0, 10));
+      date_diff = date_now - (Date)(history_item.time.substr(0, 10));
       if (date_diff <= day_limit)
         watched_last_week++;
     }
-    foreach_c_(it, History.items) {
-      if (!it->episode || *it->episode == 0)
+    for (const auto& history_item : History.items) {
+      if (!history_item.episode || *history_item.episode == 0)
         continue;
-      date_diff = date_now - (Date)(it->time.substr(0, 10));
+      date_diff = date_now - (Date)(history_item.time.substr(0, 10));
       if (date_diff <= day_limit)
         watched_last_week++;
     }
@@ -654,8 +654,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Available episodes
     int available_episodes = 0;
-    foreach_c_(it, AnimeDatabase.items) {
-      if (it->second.IsInList() && it->second.IsNextEpisodeAvailable())
+    for (const auto& pair : AnimeDatabase.items) {
+      if (pair.second.IsInList() && pair.second.IsNextEpisodeAvailable())
         available_episodes++;
     }
     if (available_episodes > 0) {
@@ -666,27 +666,27 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
 
     // Airing times
     std::vector<int> recently_started, recently_finished, upcoming;
-    foreach_c_(it, AnimeDatabase.items) {
-      if (it->second.GetMyStatus() != anime::kPlanToWatch)
+    for (const auto& pair : AnimeDatabase.items) {
+      if (pair.second.GetMyStatus() != anime::kPlanToWatch)
         continue;
-      const Date& date_start = it->second.GetDateStart();
-      const Date& date_end = it->second.GetDateEnd();
+      const Date& date_start = pair.second.GetDateStart();
+      const Date& date_end = pair.second.GetDateEnd();
       if (date_start.year && date_start.month && date_start.day) {
         date_diff = date_now - date_start;
         if (date_diff > 0 && date_diff <= day_limit) {
-          recently_started.push_back(it->first);
+          recently_started.push_back(pair.first);
           continue;
         }
         date_diff = date_start - date_now;
         if (date_diff > 0 && date_diff <= day_limit) {
-          upcoming.push_back(it->first);
+          upcoming.push_back(pair.first);
           continue;
         }
       }
       if (date_end.year && date_end.month && date_end.day) {
         date_diff = date_now - date_end;
         if (date_diff > 0 && date_diff <= day_limit) {
-          recently_finished.push_back(it->first);
+          recently_finished.push_back(pair.first);
           continue;
         }
       }

@@ -19,7 +19,6 @@
 #include <windows/win/dde.h>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/url.h"

@@ -18,7 +18,6 @@
 
 #include <windows/win/version.h>
 
-#include "base/foreach.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -538,11 +537,11 @@ void SeasonDialog::EnableInput(bool enable) {
 void SeasonDialog::RefreshData(int anime_id) {
   ui::SetSharedCursor(IDC_WAIT);
 
-  foreach_(id, SeasonDatabase.items) {
-    if (anime_id > 0 && anime_id != *id)
+  for (const auto& id : SeasonDatabase.items) {
+    if (anime_id > 0 && anime_id != id)
       continue;
 
-    auto anime_item = AnimeDatabase.FindItem(*id);
+    auto anime_item = AnimeDatabase.FindItem(id);
     if (!anime_item)
       continue;
 
@@ -550,12 +549,12 @@ void SeasonDialog::RefreshData(int anime_id) {
     if (anime_id > 0) {
       sync::DownloadImage(anime_id, anime_item->GetImageUrl());
     } else {
-      ImageDatabase.Load(*id, true, true);
+      ImageDatabase.Load(id, true, true);
     }
 
     // Get details
     if (anime_id > 0 || anime::MetadataNeedsRefresh(*anime_item))
-      sync::GetMetadataById(*id);
+      sync::GetMetadataById(id);
   }
 
   ui::SetSharedCursor(IDC_ARROW);

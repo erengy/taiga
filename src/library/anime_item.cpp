@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "base/foreach.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "library/anime_db.h"
@@ -101,10 +100,10 @@ const std::wstring& Item::GetTitle() const {
 }
 
 const std::wstring& Item::GetEnglishTitle(bool fallback) const {
-  foreach_(it, metadata_.alternative)
-    if (it->type == library::kTitleTypeLangEnglish)
-      if (!it->value.empty())
-        return it->value;
+  for (const auto& alt_title : metadata_.alternative)
+    if (alt_title.type == library::kTitleTypeLangEnglish)
+      if (!alt_title.value.empty())
+        return alt_title.value;
 
   if (fallback)
     return metadata_.title;
@@ -115,9 +114,9 @@ const std::wstring& Item::GetEnglishTitle(bool fallback) const {
 std::vector<std::wstring> Item::GetSynonyms() const {
   std::vector<std::wstring> synonyms;
 
-  foreach_(it, metadata_.alternative)
-    if (it->type == library::kTitleTypeSynonym)
-      synonyms.push_back(it->value);
+  for (const auto& alt_title : metadata_.alternative)
+    if (alt_title.type == library::kTitleTypeSynonym)
+      synonyms.push_back(alt_title.value);
 
   return synonyms;
 }
@@ -235,9 +234,9 @@ void Item::SetTitle(const std::wstring& title) {
 }
 
 void Item::SetEnglishTitle(const std::wstring& title) {
-  foreach_(it, metadata_.alternative) {
-    if (it->type == library::kTitleTypeLangEnglish) {
-      it->value = title;
+  for (auto& alt_title : metadata_.alternative) {
+    if (alt_title.type == library::kTitleTypeLangEnglish) {
+      alt_title.value = title;
       return;
     }
   }

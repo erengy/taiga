@@ -150,8 +150,8 @@ void TaigaFileSearchHelper::set_path_found(const std::wstring& path_found) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ScanAvailableEpisodes(bool silent) {
-  foreach_(it, AnimeDatabase.items) {
-    anime::ValidateFolder(it->second);
+  for (auto& pair : AnimeDatabase.items) {
+    anime::ValidateFolder(pair.second);
   }
 
   ScanAvailableEpisodes(silent, anime::ID_UNKNOWN, 0);
@@ -207,8 +207,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
   if (!found) {
     // Search library folders for available episodes
-    foreach_(it, Settings.library_folders) {
-      if (!FolderExists(*it))
+    for (const auto& folder : Settings.library_folders) {
+      if (!FolderExists(folder))
         continue;  // Might be a disconnected external drive
       bool skip_directories = false;
       if (anime_item && !anime_item->GetFolder().empty())
@@ -216,7 +216,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
       file_search_helper.set_skip_directories(skip_directories);
       file_search_helper.set_skip_files(false);
       file_search_helper.set_skip_subdirectories(false);
-      if (file_search_helper.Search(*it)) {
+      if (file_search_helper.Search(folder)) {
         found = true;
         break;
       }

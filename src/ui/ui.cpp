@@ -24,7 +24,6 @@
 #include <windows/win/taskbar.h>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
@@ -317,8 +316,8 @@ void OnLibrarySearchTitle(int id, const string_t& results) {
   RemoveEmptyStrings(split_vector);
 
   std::vector<int> ids;
-  foreach_(it, split_vector) {
-    int id = ToInt(*it);
+  for (const auto& id_str : split_vector) {
+    int id = ToInt(id_str);
     ids.push_back(id);
     OnLibraryEntryChange(id);
   }
@@ -885,9 +884,9 @@ void OnFeedDownload(bool success, const string_t& error) {
 bool OnFeedNotify(const Feed& feed) {
   std::map<std::wstring, std::set<std::wstring>> found_episodes;
 
-  foreach_(it, feed.items) {
-    if (it->state == kFeedItemSelected) {
-      const auto& episode = it->episode_data;
+  for (const auto& feed_item : feed.items) {
+    if (feed_item.state == kFeedItemSelected) {
+      const auto& episode = feed_item.episode_data;
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
       auto anime_title = anime_item ? anime_item->GetTitle() : episode.anime_title();
 
@@ -909,12 +908,12 @@ bool OnFeedNotify(const Feed& feed) {
   std::wstring tip_text;
   std::wstring tip_title = L"New torrents available";
 
-  foreach_(it, found_episodes) {
-    tip_text += L"\u00BB " + LimitText(it->first, 32);
+  for (const auto& pair : found_episodes) {
+    tip_text += L"\u00BB " + LimitText(pair.first, 32);
     std::wstring episodes;
-    foreach_(episode, it->second)
-      if (!episode->empty())
-        AppendString(episodes, L" #" + *episode);
+    for (const auto& episode : pair.second)
+      if (!episode.empty())
+        AppendString(episodes, L" #" + episode);
     tip_text += episodes + L"\n";
   }
 

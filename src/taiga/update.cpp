@@ -19,7 +19,6 @@
 #include <cmath>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "base/url.h"
@@ -100,20 +99,20 @@ bool UpdateHelper::ParseData(std::wstring data) {
 
   auto current_version = Taiga.version;
   auto latest_version = current_version;
-  foreach_(item, items) {
-    semaver::Version item_version(WstrToStr(item->guid));
+  for (const auto& item : items) {
+    semaver::Version item_version(WstrToStr(item.guid));
     if (item_version > latest_version) {
-      latest_item_.reset(new Item(*item));
+      latest_item_.reset(new Item(item));
       latest_version = item_version;
     } else if (item_version == current_version) {
-      current_item_.reset(new Item(*item));
-      anime::Season season_max(item->taiga_anime_season_max);
+      current_item_.reset(new Item(item));
+      anime::Season season_max(item.taiga_anime_season_max);
       if (season_max && season_max > SeasonDatabase.available_seasons.second) {
         SeasonDatabase.available_seasons.second = season_max;
         Settings.Set(taiga::kApp_Seasons_MaxSeason, season_max.GetString());
       }
-      if (!item->taiga_anime_season_location.empty())
-        SeasonDatabase.remote_location = item->taiga_anime_season_location;
+      if (!item.taiga_anime_season_location.empty())
+        SeasonDatabase.remote_location = item.taiga_anime_season_location;
     }
   }
 

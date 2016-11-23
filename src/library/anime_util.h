@@ -51,7 +51,7 @@ bool PlayRandomEpisode(int anime_id);
 bool LinkEpisodeToAnime(Episode& episode, int anime_id);
 void StartWatching(Item& item, Episode& episode);
 void EndWatching(Item& item, Episode episode);
-bool IsDeletedFromList(Item& item);
+bool IsDeletedFromList(const Item& item);
 bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time);
 void UpdateList(Item& item, Episode& episode);
 void AddToQueue(Item& item, const Episode& episode, bool change_status);

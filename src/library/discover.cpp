@@ -19,7 +19,6 @@
 #include <algorithm>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -112,8 +111,8 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
     int anime_id = anime::ID_UNKNOWN;
     anime::Item* anime_item = nullptr;
 
-    foreach_(it, id_map) {
-      anime_item = AnimeDatabase.FindItem(it->second, it->first, false);
+    for (const auto& pair : id_map) {
+      anime_item = AnimeDatabase.FindItem(pair.second, pair.first, false);
       if (anime_item)
         break;
     }
@@ -131,8 +130,8 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
 
       anime::Item item;
       item.SetSource(current_service_id);
-      foreach_(it, id_map) {
-        item.SetId(it->second, it->first);
+      for (const auto& pair : id_map) {
+        item.SetId(pair.second, pair.first);
       }
       item.SetLastModified(modified);
       item.SetTitle(XmlReadStrValue(node, L"title"));
@@ -155,8 +154,7 @@ bool SeasonDatabase::IsRefreshRequired() {
   int count = 0;
   bool required = false;
 
-  foreach_(it, items) {
-    int anime_id = *it;
+  for (const auto& anime_id : items) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       const Date& date_start = anime_item->GetDateStart();
@@ -207,26 +205,26 @@ void SeasonDatabase::Review(bool hide_nsfw) {
   }
 
   // Check for missing items
-  foreach_(it, AnimeDatabase.items) {
-    if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
+  for (const auto& pair : AnimeDatabase.items) {
+    if (std::find(items.begin(), items.end(), pair.second.GetId()) != items.end())
       continue;
     // Filter by age rating
-    if (hide_nsfw && IsNsfw(it->second))
+    if (hide_nsfw && IsNsfw(pair.second))
       continue;
     // Airing date must be within the interval
-    const Date& anime_start = it->second.GetDateStart();
+    const Date& anime_start = pair.second.GetDateStart();
     if (anime_start.year && anime_start.month &&
         anime_start >= date_start && anime_start <= date_end) {
-      items.push_back(it->second.GetId());
+      items.push_back(pair.second.GetId());
       LOGR(LevelDebug,
-          L"\t<anime>\n"
-          L"\t\t<type>" + ToWstr(it->second.GetType()) + L"</type>\n"
-          L"\t\t<id name=\"myanimelist\">" + ToWstr(it->second.GetId()) + L"</id>\n"
-          L"\t\t<id name=\"hummingbird\"></id>\n"
-          L"\t\t<producers>" + Join(it->second.GetProducers(), L", ") + L"</producers>\n"
-          L"\t\t<image>" + it->second.GetImageUrl() + L"</image>\n"
-          L"\t\t<title>" + it->second.GetTitle() + L"</title>\n"
-          L"\t</anime>\n");
+           L"\t<anime>\n"
+           L"\t\t<type>" + ToWstr(pair.second.GetType()) + L"</type>\n"
+           L"\t\t<id name=\"myanimelist\">" + ToWstr(pair.second.GetId()) + L"</id>\n"
+           L"\t\t<id name=\"hummingbird\"></id>\n"
+           L"\t\t<producers>" + Join(pair.second.GetProducers(), L", ") + L"</producers>\n"
+           L"\t\t<image>" + pair.second.GetImageUrl() + L"</image>\n"
+           L"\t\t<title>" + pair.second.GetTitle() + L"</title>\n"
+           L"\t</anime>\n");
     }
   }
 }

@@ -21,7 +21,6 @@
 #include <semaver/semaver/version.h>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -98,8 +97,8 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     int id = ToInt(id_map[sync::kTaiga]);
     Item& item = items[id];  // Creates the item if it doesn't exist
 
-    foreach_(it, id_map)
-      item.SetId(it->second, it->first);
+    for (const auto& pair : id_map)
+      item.SetId(pair.second, pair.first);
 
     item.SetSource(source);
     item.SetTitle(XmlReadStrValue(node, L"title"));
@@ -140,11 +139,11 @@ bool Database::SaveDatabase() {
 }
 
 void Database::WriteDatabaseNode(xml_node& database_node) {
-  foreach_(it, items) {
+  for (const auto& pair : items) {
     xml_node anime_node = database_node.append_child(L"anime");
 
     for (int i = 0; i <= sync::kLastService; i++) {
-      std::wstring id = it->second.GetId(i);
+      std::wstring id = pair.second.GetId(i);
       if (!id.empty()) {
         xml_node child = anime_node.append_child(L"id");
         std::wstring name = ServiceManager.GetServiceNameById(static_cast<sync::ServiceId>(i));
@@ -154,7 +153,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     }
 
     std::wstring source = ServiceManager.GetServiceNameById(
-        static_cast<sync::ServiceId>(it->second.GetSource()));
+        static_cast<sync::ServiceId>(pair.second.GetSource()));
 
     #define XML_WC(n, v, t) \
       if (!v.empty()) XmlWriteChildNodes(anime_node, v, n, t)
@@ -167,24 +166,24 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     #define XML_WF(n, v, t) \
       if (v > 0.0) XmlWriteStrValue(anime_node, n, ToWstr(v).c_str(), t)
     XML_WS(L"source", source, pugi::node_pcdata);
-    XML_WS(L"slug", it->second.GetSlug(), pugi::node_pcdata);
-    XML_WS(L"title", it->second.GetTitle(), pugi::node_cdata);
-    XML_WS(L"english", it->second.GetEnglishTitle(), pugi::node_cdata);
-    XML_WC(L"synonym", it->second.GetSynonyms(), pugi::node_cdata);
-    XML_WI(L"type", it->second.GetType());
-    XML_WI(L"status", it->second.GetAiringStatus());
-    XML_WI(L"episode_count", it->second.GetEpisodeCount());
-    XML_WI(L"episode_length", it->second.GetEpisodeLength());
-    XML_WD(L"date_start", it->second.GetDateStart());
-    XML_WD(L"date_end", it->second.GetDateEnd());
-    XML_WS(L"image", it->second.GetImageUrl(), pugi::node_pcdata);
-    XML_WI(L"age_rating", it->second.GetAgeRating());
-    XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
-    XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
-    XML_WF(L"score", it->second.GetScore(), pugi::node_pcdata);
-    XML_WI(L"popularity", it->second.GetPopularity());
-    XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
-    XML_WS(L"modified", ToWstr(it->second.GetLastModified()), pugi::node_pcdata);
+    XML_WS(L"slug", pair.second.GetSlug(), pugi::node_pcdata);
+    XML_WS(L"title", pair.second.GetTitle(), pugi::node_cdata);
+    XML_WS(L"english", pair.second.GetEnglishTitle(), pugi::node_cdata);
+    XML_WC(L"synonym", pair.second.GetSynonyms(), pugi::node_cdata);
+    XML_WI(L"type", pair.second.GetType());
+    XML_WI(L"status", pair.second.GetAiringStatus());
+    XML_WI(L"episode_count", pair.second.GetEpisodeCount());
+    XML_WI(L"episode_length", pair.second.GetEpisodeLength());
+    XML_WD(L"date_start", pair.second.GetDateStart());
+    XML_WD(L"date_end", pair.second.GetDateEnd());
+    XML_WS(L"image", pair.second.GetImageUrl(), pugi::node_pcdata);
+    XML_WI(L"age_rating", pair.second.GetAgeRating());
+    XML_WS(L"genres", Join(pair.second.GetGenres(), L", "), pugi::node_pcdata);
+    XML_WS(L"producers", Join(pair.second.GetProducers(), L", "), pugi::node_pcdata);
+    XML_WF(L"score", pair.second.GetScore(), pugi::node_pcdata);
+    XML_WI(L"popularity", pair.second.GetPopularity());
+    XML_WS(L"synopsis", pair.second.GetSynopsis(), pugi::node_cdata);
+    XML_WS(L"modified", ToWstr(pair.second.GetLastModified()), pugi::node_pcdata);
     #undef XML_WF
     #undef XML_WS
     #undef XML_WI
@@ -210,9 +209,9 @@ Item* Database::FindItem(int id, bool log_error) {
 Item* Database::FindItem(const std::wstring& id, enum_t service,
                          bool log_error) {
   if (!id.empty()) {
-    foreach_(it, items)
-      if (id == it->second.GetId(service))
-        return &it->second;
+    for (auto& pair : items)
+      if (id == pair.second.GetId(service))
+        return &pair.second;
     if (log_error)
       LOG(LevelError, L"Could not find ID: " + id);
   }
@@ -445,21 +444,21 @@ bool Database::SaveList(bool include_database) {
 
   xml_node node_library = document.append_child(L"library");
 
-  foreach_(it, items) {
-    Item* item = &it->second;
-    if (item->IsInList()) {
+  for (const auto& pair : items) {
+    auto& item = pair.second;
+    if (item.IsInList()) {
       xml_node node = node_library.append_child(L"anime");
-      XmlWriteIntValue(node, L"id", item->GetId());
-      XmlWriteIntValue(node, L"progress", item->GetMyLastWatchedEpisode(false));
-      XmlWriteStrValue(node, L"date_start", std::wstring(item->GetMyDateStart()).c_str());
-      XmlWriteStrValue(node, L"date_end", std::wstring(item->GetMyDateEnd()).c_str());
-      XmlWriteIntValue(node, L"score", item->GetMyScore(false));
-      XmlWriteIntValue(node, L"status", item->GetMyStatus(false));
-      XmlWriteIntValue(node, L"rewatched_times", item->GetMyRewatchedTimes());
-      XmlWriteIntValue(node, L"rewatching", item->GetMyRewatching(false));
-      XmlWriteIntValue(node, L"rewatching_ep", item->GetMyRewatchingEp());
-      XmlWriteStrValue(node, L"tags", item->GetMyTags(false).c_str());
-      XmlWriteStrValue(node, L"last_updated", item->GetMyLastUpdated().c_str());
+      XmlWriteIntValue(node, L"id", item.GetId());
+      XmlWriteIntValue(node, L"progress", item.GetMyLastWatchedEpisode(false));
+      XmlWriteStrValue(node, L"date_start", std::wstring(item.GetMyDateStart()).c_str());
+      XmlWriteStrValue(node, L"date_end", std::wstring(item.GetMyDateEnd()).c_str());
+      XmlWriteIntValue(node, L"score", item.GetMyScore(false));
+      XmlWriteIntValue(node, L"status", item.GetMyStatus(false));
+      XmlWriteIntValue(node, L"rewatched_times", item.GetMyRewatchedTimes());
+      XmlWriteIntValue(node, L"rewatching", item.GetMyRewatching(false));
+      XmlWriteIntValue(node, L"rewatching_ep", item.GetMyRewatchingEp());
+      XmlWriteStrValue(node, L"tags", item.GetMyTags(false).c_str());
+      XmlWriteStrValue(node, L"last_updated", item.GetMyLastUpdated().c_str());
     }
   }
 
@@ -485,12 +484,13 @@ int Database::GetItemCount(int status, bool check_history) {
 
   // Search queued items for status changes
   if (check_history) {
-    foreach_(it, History.queue.items) {
-      if (it->status || it->mode == taiga::kHttpServiceDeleteLibraryEntry) {
-        if (status == *it->status) {
+    for (const auto& history_item : History.queue.items) {
+      if (history_item.status ||
+          history_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+        if (status == *history_item.status) {
           count++;
         } else {
-          auto anime_item = FindItem(it->anime_id);
+          auto anime_item = FindItem(history_item.anime_id);
           if (anime_item && status == anime_item->GetMyStatus(false))
             count--;
         }
@@ -543,8 +543,8 @@ void Database::AddToList(int anime_id, int status) {
 }
 
 void Database::ClearUserData() {
-  foreach_(it, items)
-    it->second.RemoveFromUserList();
+  for (auto& pair : items)
+    pair.second.RemoveFromUserList();
 }
 
 bool Database::DeleteListItem(int anime_id) {

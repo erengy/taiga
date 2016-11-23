@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/history.h"
@@ -51,9 +50,9 @@ const Service* Manager::service(ServiceId service_id) {
 }
 
 const Service* Manager::service(const string_t& canonical_name) {
-  foreach_(service, services_)
-    if (canonical_name == service->second.get()->canonical_name())
-      return service->second.get();
+  for (const auto& pair : services_)
+    if (canonical_name == pair.second.get()->canonical_name())
+      return pair.second.get();
 
   return nullptr;
 }
@@ -79,9 +78,9 @@ string_t Manager::GetServiceNameById(ServiceId service_id) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Manager::MakeRequest(Request& request) {
-  foreach_(service, services_) {
+  for (const auto& pair : services_) {
     if (request.service_id == kAllServices ||
-        request.service_id == service->first) {
+        request.service_id == pair.first) {
       // Create a new HTTP request, and store its UID alongside the service
       // request until we receive a response
       HttpRequest http_request;
@@ -89,10 +88,10 @@ void Manager::MakeRequest(Request& request) {
 
       // Make sure we store the actual service ID
       if (request.service_id == kAllServices)
-        requests_[http_request.uid].service_id = service->first;
+        requests_[http_request.uid].service_id = pair.first;
 
       // Let the service build the HTTP request
-      service->second->BuildRequest(request, http_request);
+      pair.second->BuildRequest(request, http_request);
       http_request.url.Crack(http_request.url.Build());
 
       // Make the request
