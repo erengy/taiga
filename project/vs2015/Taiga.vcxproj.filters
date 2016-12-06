@@ -55,7 +55,7 @@
     <Filter Include="library\anime">
       <UniqueIdentifier>{d6043b6b-33fb-470e-bab4-28380104489e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="sync\hummingbird">
+    <Filter Include="sync\kitsu">
       <UniqueIdentifier>{4eb462d7-7759-463c-99cf-e34daf381970}</UniqueIdentifier>
     </Filter>
     <Filter Include="sync\myanimelist">
@@ -370,11 +370,11 @@
     <ClCompile Include="..\..\src\sync\sync.cpp">
       <Filter>sync</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sync\hummingbird.cpp">
-      <Filter>sync\hummingbird</Filter>
+    <ClCompile Include="..\..\src\sync\kitsu.cpp">
+      <Filter>sync\kitsu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sync\hummingbird_util.cpp">
-      <Filter>sync\hummingbird</Filter>
+    <ClCompile Include="..\..\src\sync\kitsu_util.cpp">
+      <Filter>sync\kitsu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sync\myanimelist.cpp">
       <Filter>sync\myanimelist</Filter>
@@ -819,14 +819,14 @@
     <ClInclude Include="..\..\src\sync\sync.h">
       <Filter>sync</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\hummingbird_util.h">
-      <Filter>sync\hummingbird</Filter>
+    <ClInclude Include="..\..\src\sync\kitsu.h">
+      <Filter>sync\kitsu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\hummingbird.h">
-      <Filter>sync\hummingbird</Filter>
+    <ClInclude Include="..\..\src\sync\kitsu_types.h">
+      <Filter>sync\kitsu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\hummingbird_types.h">
-      <Filter>sync\hummingbird</Filter>
+    <ClInclude Include="..\..\src\sync\kitsu_util.h">
+      <Filter>sync\kitsu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\sync\myanimelist_util.h">
       <Filter>sync\myanimelist</Filter>

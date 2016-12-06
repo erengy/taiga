@@ -45,9 +45,9 @@ enum AppSettingName {
   kSync_Service_Mal_Username,
   kSync_Service_Mal_Password,
   kSync_Service_Mal_UseHttps,
-  kSync_Service_Hummingbird_Username,
-  kSync_Service_Hummingbird_Password,
-  kSync_Service_Hummingbird_UseHttps,
+  kSync_Service_Kitsu_Username,
+  kSync_Service_Kitsu_Password,
+  kSync_Service_Kitsu_UseHttps,
 
   // Library
   kLibrary_FileSizeThreshold,

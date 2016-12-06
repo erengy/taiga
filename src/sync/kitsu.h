@@ -19,7 +19,7 @@
 #pragma once
 
 #include "base/types.h"
-#include "sync/hummingbird_types.h"
+#include "sync/kitsu_types.h"
 #include "sync/service.h"
 
 namespace Json {
@@ -27,10 +27,9 @@ class Value;
 }
 
 namespace sync {
-namespace hummingbird {
+namespace kitsu {
 
-// API documentation:
-// https://github.com/hummingbird-me/hummingbird/wiki/API-Reference
+// API documentation: n/a
 
 class Service : public sync::Service {
 public:
@@ -62,5 +61,5 @@ private:
   string_t auth_token_;
 };
 
-}  // namespace hummingbird
+}  // namespace kitsu
 }  // namespace sync

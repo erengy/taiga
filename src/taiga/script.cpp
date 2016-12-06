@@ -23,7 +23,7 @@
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
-#include "sync/hummingbird_util.h"
+#include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/dummy.h"
@@ -398,8 +398,8 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
             case sync::kMyAnimeList:
               REPLACE(L"animeurl", ENCODE(sync::myanimelist::GetAnimePage(*anime_item)));
               break;
-            case sync::kHummingbird:
-              REPLACE(L"animeurl", ENCODE(sync::hummingbird::GetAnimePage(*anime_item)));
+            case sync::kKitsu:
+              REPLACE(L"animeurl", ENCODE(sync::kitsu::GetAnimePage(*anime_item)));
               break;
           }
         } else {

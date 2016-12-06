@@ -25,7 +25,7 @@ class Item;
 }
 
 namespace sync {
-namespace hummingbird {
+namespace kitsu {
   
 int TranslateAgeRatingFrom(const std::wstring& value);
 double TranslateSeriesRatingFrom(float value);
@@ -48,5 +48,5 @@ void ViewProfile();
 void ViewRecommendations();
 void ViewUpcomingAnime();
 
-}  // namespace hummingbird
+}  // namespace kitsu
 }  // namespace sync

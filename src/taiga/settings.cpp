@@ -113,9 +113,9 @@ void AppSettings::InitializeMap() {
   INITKEY(kSync_Service_Mal_Username, nullptr, L"account/myanimelist/username");
   INITKEY(kSync_Service_Mal_Password, nullptr, L"account/myanimelist/password");
   INITKEY(kSync_Service_Mal_UseHttps, L"true", L"account/myanimelist/https");
-  INITKEY(kSync_Service_Hummingbird_Username, nullptr, L"account/hummingbird/username");
-  INITKEY(kSync_Service_Hummingbird_Password, nullptr, L"account/hummingbird/password");
-  INITKEY(kSync_Service_Hummingbird_UseHttps, L"true", L"account/hummingbird/https");
+  INITKEY(kSync_Service_Kitsu_Username, nullptr, L"account/kitsu/username");
+  INITKEY(kSync_Service_Kitsu_Password, nullptr, L"account/kitsu/password");
+  INITKEY(kSync_Service_Kitsu_UseHttps, L"true", L"account/kitsu/https");
 
   // Library
   INITKEY(kLibrary_FileSizeThreshold, ToWstr(kDefaultFileSizeThreshold).c_str(), L"anime/folders/scan/minfilesize");
@@ -182,7 +182,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kShare_Mirc_MultiServer, nullptr, L"announce/mirc/multiserver");
   INITKEY(kShare_Mirc_UseMeAction, L"true", L"announce/mirc/useaction");
   INITKEY(kShare_Mirc_Mode, L"1", L"announce/mirc/mode");
-  INITKEY(kShare_Mirc_Channels, L"#hummingbird, #myanimelist, #taiga", L"announce/mirc/channels");
+  INITKEY(kShare_Mirc_Channels, L"#kitsu, #myanimelist, #taiga", L"announce/mirc/channels");
   INITKEY(kShare_Mirc_Format, kDefaultFormatMirc.c_str(), L"announce/mirc/format");
   INITKEY(kShare_Mirc_Service, L"mIRC", L"announce/mirc/service");
   INITKEY(kShare_Skype_Enabled, nullptr, L"announce/skype/enabled");
@@ -476,8 +476,8 @@ void AppSettings::HandleCompatibility() {
     // Convert old password encoding to base64
     std::wstring password = SimpleDecrypt(GetWstr(kSync_Service_Mal_Password));
     Set(kSync_Service_Mal_Password, Base64Encode(password));
-    password = SimpleDecrypt(GetWstr(kSync_Service_Hummingbird_Password));
-    Set(kSync_Service_Hummingbird_Password, Base64Encode(password));
+    password = SimpleDecrypt(GetWstr(kSync_Service_Kitsu_Password));
+    Set(kSync_Service_Kitsu_Password, Base64Encode(password));
 
     // Update torrent filters
     for (auto& filter : Aggregator.filter_manager.filters) {
@@ -587,8 +587,8 @@ const std::wstring GetCurrentUsername() {
 
   if (service->id() == sync::kMyAnimeList) {
     username = Settings[kSync_Service_Mal_Username];
-  } else if (service->id() == sync::kHummingbird) {
-    username = Settings[kSync_Service_Hummingbird_Username];
+  } else if (service->id() == sync::kKitsu) {
+    username = Settings[kSync_Service_Kitsu_Username];
   }
 
   return username;
@@ -600,8 +600,8 @@ const std::wstring GetCurrentPassword() {
 
   if (service->id() == sync::kMyAnimeList) {
     password = Base64Decode(Settings[kSync_Service_Mal_Password]);
-  } else if (service->id() == sync::kHummingbird) {
-    password = Base64Decode(Settings[kSync_Service_Hummingbird_Password]);
+  } else if (service->id() == sync::kKitsu) {
+    password = Base64Decode(Settings[kSync_Service_Kitsu_Password]);
   }
 
   return password;

@@ -32,7 +32,7 @@ enum ServiceId {
   kTaiga = 0,
   kFirstService = 1,
   kMyAnimeList = 1,
-  kHummingbird = 2,
+  kKitsu = 2,
   kLastService = 2
 };
 

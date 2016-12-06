@@ -22,12 +22,12 @@
 #include "base/time.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
-#include "sync/hummingbird_util.h"
-#include "sync/hummingbird_types.h"
+#include "sync/kitsu_util.h"
+#include "sync/kitsu_types.h"
 #include "taiga/settings.h"
 
 namespace sync {
-namespace hummingbird {
+namespace kitsu {
 
 int TranslateAgeRatingFrom(const std::wstring& value) {
   if (value.empty()) {
@@ -170,7 +170,7 @@ std::wstring TranslateMyStatusTo(int value) {
 ////////////////////////////////////////////////////////////////////////////////
 
 std::wstring GetAnimePage(const anime::Item& anime_item) {
-  return L"https://hummingbird.me/anime/" + anime_item.GetSlug();
+  return L"https://staging.kitsu.io/anime/" + anime_item.GetSlug();
 }
 
 void ViewAnimePage(int anime_id) {
@@ -181,12 +181,12 @@ void ViewAnimePage(int anime_id) {
 }
 
 void ViewDashboard() {
-  ExecuteLink(L"https://hummingbird.me/dashboard");
+  ExecuteLink(L"https://staging.kitsu.io");
 }
 
 void ViewProfile() {
-  ExecuteLink(L"https://hummingbird.me/users/" +
-              Settings[taiga::kSync_Service_Hummingbird_Username]);
+  ExecuteLink(L"https://staging.kitsu.io/users/" +
+              Settings[taiga::kSync_Service_Kitsu_Username]);
 }
 
 void ViewRecommendations() {
@@ -197,5 +197,5 @@ void ViewUpcomingAnime() {
   ExecuteLink(L"https://hummingbird.me/anime/upcoming");
 }
 
-}  // namespace hummingbird
+}  // namespace kitsu
 }  // namespace sync

@@ -321,7 +321,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         case sync::kMyAnimeList:
           line_count = 6;
           break;
-        case sync::kHummingbird:
+        case sync::kKitsu:
           line_count = 5;
           break;
       }
@@ -736,7 +736,7 @@ void SeasonDialog::SetViewMode(int mode) {
     case sync::kMyAnimeList:
       line_count = 6;
       break;
-    case sync::kHummingbird:
+    case sync::kKitsu:
       line_count = 5;
       break;
   }

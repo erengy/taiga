@@ -24,14 +24,14 @@
 	<menu name="Services">
 		<item name="Synchronize list&#9;Ctrl+S" action="Synchronize()"/>
 		<item type="separator"/>
-		<item name="Hummingbird" sub="Hummingbird"/>
+		<item name="Kitsu" sub="Kitsu"/>
 		<item name="MyAnimeList" sub="MyAnimeList"/>
 	</menu>
-	<!-- Hummingbird -->
-	<menu name="Hummingbird">
-		<item name="Go to my dashboard"       action="HummingbirdViewDashboard()"/>
-		<item name="Go to my profile"         action="HummingbirdViewProfile()"/>
-		<item name="Go to my recommendations" action="HummingbirdViewRecommendations()"/>
+	<!-- Kitsu -->
+	<menu name="Kitsu">
+		<item name="Go to my dashboard"       action="KitsuViewDashboard()"/>
+		<item name="Go to my profile"         action="KitsuViewProfile()"/>
+		<item name="Go to my recommendations" action="KitsuViewRecommendations()"/>
 	</menu>
 	<!-- MyAnimeList -->
 	<menu name="MyAnimeList">
@@ -160,7 +160,7 @@
 		<!-- Note: Use %title% as the search string -->
 		<item name="AniDB"              action="URL(https://anidb.net/perl-bin/animedb.pl?show=animelist&amp;adb.search=%title%&amp;noalias=1&amp;do.update=update)"/>
 		<item name="Anime News Network" action="URL(https://www.animenewsnetwork.com/search?q=%title%)"/>
-		<item name="Hummingbird"        action="URL(https://hummingbird.me/search?query=%title%&scope=anime)"/>
+		<item name="Kitsu"              action="URL(https://staging.kitsu.io/anime?text=%title%)"/>
 		<item name="MyAnimeList"        action="URL(https://myanimelist.net/anime.php?q=%title%)"/>
 		<item name="Reddit"             action="URL(https://www.reddit.com/search?sort=new&amp;q=subreddit%3Aanime%20title%3A%22%title%%20episode%20discussion%22)"/>
 		<item name="Wikipedia"          action="URL(https://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>

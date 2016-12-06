@@ -92,7 +92,7 @@ static bool ParseRule(const std::wstring& rule) {
       switch (taiga::GetCurrentServiceId()) {
         case sync::kMyAnimeList:
           return ToInt(match_results[first].str());
-        case sync::kHummingbird:
+        case sync::kKitsu:
           return ToInt(match_results[second].str());
         default:
           return 0;

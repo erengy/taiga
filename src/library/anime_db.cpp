@@ -641,7 +641,7 @@ void Database::HandleCompatibility(const std::wstring& meta_version) {
   const semaver::Version version(WstrToStr(meta_version));
 
   if (version <= semaver::Version(1, 1, 11)) {
-    if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
+    if (taiga::GetCurrentServiceId() == sync::kKitsu) {
       LOG(LevelWarning, L"Clearing English titles");
       for (auto& item : items) {
         item.second.SetEnglishTitle(EmptyString());

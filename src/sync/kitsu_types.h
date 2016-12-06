@@ -19,7 +19,7 @@
 #pragma once
 
 namespace sync {
-namespace hummingbird {
+namespace kitsu {
 
 enum SeriesStatus {
   kUnknownStatus,
@@ -51,5 +51,5 @@ enum MyStatus {
   kDropped
 };
 
-}  // namespace hummingbird
+}  // namespace kitsu
 }  // namespace sync

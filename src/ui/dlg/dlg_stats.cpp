@@ -178,7 +178,7 @@ void StatsDialog::Refresh() {
     default:
       text = L"10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n";
       break;
-    case sync::kHummingbird:
+    case sync::kKitsu:
       text = L"5.0\n4.5\n4.0\n3.5\n3.0\n2.5\n2.0\n1.5\n1.0\n0.5";
       break;
   }

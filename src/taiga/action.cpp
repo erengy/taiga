@@ -25,7 +25,7 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
-#include "sync/hummingbird_util.h"
+#include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
@@ -108,8 +108,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kMyAnimeList:
         sync::myanimelist::ViewAnimePage(anime_id);
         break;
-      case sync::kHummingbird:
-        sync::hummingbird::ViewAnimePage(anime_id);
+      case sync::kKitsu:
+        sync::kitsu::ViewAnimePage(anime_id);
         break;
     }
 
@@ -120,8 +120,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kMyAnimeList:
         sync::myanimelist::ViewUpcomingAnime();
         break;
-      case sync::kHummingbird:
-        sync::hummingbird::ViewUpcomingAnime();
+      case sync::kKitsu:
+        sync::kitsu::ViewUpcomingAnime();
         break;
     }
 
@@ -136,16 +136,16 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"MalViewHistory") {
     sync::myanimelist::ViewHistory();
 
-  // HummingbirdViewProfile()
-  // HummingbirdViewDashboard()
-  // HummingbirdViewRecommendations()
-  //   Opens up Hummingbird user pages.
-  } else if (action == L"HummingbirdViewProfile") {
-    sync::hummingbird::ViewProfile();
-  } else if (action == L"HummingbirdViewDashboard") {
-    sync::hummingbird::ViewDashboard();
-  } else if (action == L"HummingbirdViewRecommendations") {
-    sync::hummingbird::ViewRecommendations();
+  // KitsuViewProfile()
+  // KitsuViewDashboard()
+  // KitsuViewRecommendations()
+  //   Opens up Kitsu user pages.
+  } else if (action == L"KitsuViewProfile") {
+    sync::kitsu::ViewProfile();
+  } else if (action == L"KitsuViewDashboard") {
+    sync::kitsu::ViewDashboard();
+  } else if (action == L"KitsuViewRecommendations") {
+    sync::kitsu::ViewRecommendations();
 
   //////////////////////////////////////////////////////////////////////////////
 

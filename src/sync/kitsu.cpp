@@ -21,20 +21,20 @@
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
-#include "sync/hummingbird.h"
-#include "sync/hummingbird_types.h"
-#include "sync/hummingbird_util.h"
+#include "sync/kitsu.h"
+#include "sync/kitsu_types.h"
+#include "sync/kitsu_util.h"
 #include "taiga/settings.h"
 
 namespace sync {
-namespace hummingbird {
+namespace kitsu {
 
 Service::Service() {
   host_ = L"hummingbird.me/api/v1";
 
-  id_ = kHummingbird;
-  canonical_name_ = L"hummingbird";
-  name_ = L"Hummingbird";
+  id_ = kKitsu;
+  canonical_name_ = L"kitsu";
+  name_ = L"Kitsu";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,10 +42,10 @@ Service::Service() {
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
 
-  if (Settings.GetBool(taiga::kSync_Service_Hummingbird_UseHttps))
+  if (Settings.GetBool(taiga::kSync_Service_Kitsu_UseHttps))
     http_request.url.protocol = base::http::kHttps;
 
-  // Hummingbird is supposed to return a JSON response for each and every
+  // Kitsu is supposed to return a JSON response for each and every
   // request, so that's what we expect from it.
   http_request.header[L"Accept"] = L"application/json";
   http_request.header[L"Accept-Charset"] = L"utf-8";
@@ -379,5 +379,5 @@ bool Service::ParseResponseBody(Response& response, HttpResponse& http_response,
   return false;
 }
 
-}  // namespace hummingbird
+}  // namespace kitsu
 }  // namespace sync

@@ -72,7 +72,7 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageRecognitionStream, IDD_SETTINGS_RECOGNITION_STREAM);
     SETRESOURCEID(kSettingsPageServicesMain, IDD_SETTINGS_SERVICES_MAIN);
     SETRESOURCEID(kSettingsPageServicesMal, IDD_SETTINGS_SERVICES_MAL);
-    SETRESOURCEID(kSettingsPageServicesHummingbird, IDD_SETTINGS_SERVICES_HUMMINGBIRD);
+    SETRESOURCEID(kSettingsPageServicesKitsu, IDD_SETTINGS_SERVICES_KITSU);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
     SETRESOURCEID(kSettingsPageSharingSkype, IDD_SETTINGS_SHARING_SKYPE);
@@ -112,10 +112,10 @@ BOOL SettingsPage::OnInitDialog() {
       SetDlgItemText(IDC_EDIT_PASS_MAL, Base64Decode(Settings[taiga::kSync_Service_Mal_Password]).c_str());
       break;
     }
-    // Services > Hummingbird
-    case kSettingsPageServicesHummingbird: {
-      SetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD, Settings[taiga::kSync_Service_Hummingbird_Username].c_str());
-      SetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD, Base64Decode(Settings[taiga::kSync_Service_Hummingbird_Password]).c_str());
+    // Services > Kitsu
+    case kSettingsPageServicesKitsu: {
+      SetDlgItemText(IDC_EDIT_USER_KITSU, Settings[taiga::kSync_Service_Kitsu_Username].c_str());
+      SetDlgItemText(IDC_EDIT_PASS_KITSU, Base64Decode(Settings[taiga::kSync_Service_Kitsu_Password]).c_str());
       break;
     }
 
@@ -427,7 +427,7 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
         {taiga::kRecognition_MediaPlayerDetectionMethod, {L"", L"Recognition / Media player detection method"}},
         {taiga::kRecognition_BrowserDetectionMethod, {L"", L"Recognition / Web browser detection method"}},
-        {taiga::kSync_Service_Hummingbird_UseHttps, {L"", L"Services / Use HTTPS connections for Hummingbird"}},
+        {taiga::kSync_Service_Kitsu_UseHttps, {L"", L"Services / Use HTTPS connections for Kitsu"}},
         {taiga::kSync_Service_Mal_UseHttps, {L"", L"Services / Use HTTPS connections for MyAnimeList"}},
         {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrents / Archive limit"}},
       });
@@ -822,7 +822,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case NM_RETURN: {
       switch (pnmh->idFrom) {
         // Execute link
-        case IDC_LINK_ACCOUNT_HUMMINGBIRD:
+        case IDC_LINK_ACCOUNT_KITSU:
         case IDC_LINK_ACCOUNT_MAL:
         case IDC_LINK_TWITTER: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);

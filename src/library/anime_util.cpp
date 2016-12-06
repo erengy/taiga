@@ -28,7 +28,7 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/history.h"
-#include "sync/hummingbird_util.h"
+#include "sync/kitsu_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -921,9 +921,9 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
     case sync::kMyAnimeList:
       return value > 0 ? ToWstr(value) : default_char;
 
-    case sync::kHummingbird:
+    case sync::kKitsu:
       return value > 0 ? 
-          sync::hummingbird::TranslateMyRatingTo(value) : default_char;
+          sync::kitsu::TranslateMyRatingTo(value) : default_char;
   }
 }
 
@@ -947,7 +947,7 @@ std::wstring TranslateMyScoreFull(int value) {
       }
       break;
 
-    case sync::kHummingbird:
+    case sync::kKitsu:
       switch (value) {
         default:
         case 0: return L"\u2605 0.0";
@@ -972,8 +972,8 @@ std::wstring TranslateScore(double value) {
     case sync::kMyAnimeList:
       return ToWstr(value, 2);
 
-    case sync::kHummingbird:
-      return ToWstr(sync::hummingbird::TranslateSeriesRatingTo(value), 2);
+    case sync::kKitsu:
+      return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2);
   }
 }
 

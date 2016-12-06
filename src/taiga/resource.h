@@ -28,7 +28,7 @@
 #define IDD_SETTINGS_RECOGNITION_GENERAL        132
 #define IDD_SETTINGS_RECOGNITION_MEDIA          133
 #define IDD_SETTINGS_RECOGNITION_STREAM         134
-#define IDD_SETTINGS_SERVICES_HUMMINGBIRD       135
+#define IDD_SETTINGS_SERVICES_KITSU             135
 #define IDD_SETTINGS_SERVICES_MAIN              136
 #define IDD_SETTINGS_SERVICES_MAL               137
 #define IDD_SETTINGS_SHARING_HTTP               138
@@ -127,15 +127,15 @@
 #define IDC_EDIT_INPUT                          1082
 #define IDC_EDIT_MIRC_CHANNELS                  1083
 #define IDC_EDIT_MIRC_SERVICE                   1084
-#define IDC_EDIT_PASS_HUMMINGBIRD               1085
+#define IDC_EDIT_PASS_KITSU                     1085
 #define IDC_EDIT_PASS_MAL                       1086
 #define IDC_EDIT_PREVIEW                        1087
 #define IDC_EDIT_SEARCH                         1088
 #define IDC_EDIT_TORRENT_APP                    1089
 #define IDC_EDIT_TORRENT_INTERVAL               1090
-#define IDC_EDIT_USER_HUMMINGBIRD               1091
+#define IDC_EDIT_USER_KITSU                     1091
 #define IDC_EDIT_USER_MAL                       1092
-#define IDC_LINK_ACCOUNT_HUMMINGBIRD            1093
+#define IDC_LINK_ACCOUNT_KITSU                  1093
 #define IDC_LINK_ACCOUNT_MAL                    1094
 #define IDC_LINK_ANIME_FANSUB                   1095
 #define IDC_LINK_DEFAULTS                       1096

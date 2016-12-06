@@ -162,8 +162,8 @@ bool AddServiceDataToRequest(Request& request, int id) {
 
   request.data[ServiceManager.service(kMyAnimeList)->canonical_name() + L"-id"] =
       anime_item->GetId(kMyAnimeList);
-  request.data[ServiceManager.service(kHummingbird)->canonical_name() + L"-id"] =
-      anime_item->GetId(kHummingbird);
+  request.data[ServiceManager.service(kKitsu)->canonical_name() + L"-id"] =
+      anime_item->GetId(kKitsu);
 
   return true;
 }
