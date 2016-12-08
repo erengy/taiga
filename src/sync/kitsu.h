@@ -58,7 +58,7 @@ private:
   void ParseLibraryObject(Json::Value& value);
   bool ParseResponseBody(Response& response, HttpResponse& http_response, Json::Value& root);
 
-  string_t auth_token_;
+  string_t access_token_;
 };
 
 }  // namespace kitsu

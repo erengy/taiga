@@ -30,7 +30,7 @@ namespace sync {
 namespace kitsu {
 
 Service::Service() {
-  host_ = L"hummingbird.me/api/v1";
+  host_ = L"staging.kitsu.io/api";  // TODO: Change after launch
 
   id_ = kKitsu;
   canonical_name_ = L"kitsu";
@@ -45,17 +45,16 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   if (Settings.GetBool(taiga::kSync_Service_Kitsu_UseHttps))
     http_request.url.protocol = base::http::kHttps;
 
-  // Kitsu is supposed to return a JSON response for each and every
-  // request, so that's what we expect from it.
-  http_request.header[L"Accept"] = L"application/json";
+  // Kitsu requires use of the JSON API media type: http://jsonapi.org/format/
+  http_request.header[L"Accept"] = L"application/vnd.api+json";
   http_request.header[L"Accept-Charset"] = L"utf-8";
   http_request.header[L"Accept-Encoding"] = L"gzip";
 
-  // kAuthenticateUser method returns the user's authentication token, which
-  // is to be used on all methods that require authentication. Some methods
-  // don't require the token, but behave differently when it's provided.
+  // kAuthenticateUser method returns an access token, which is to be used on
+  // all methods that require authentication. Some methods don't require the
+  // token, but behave differently when it's provided.
   if (RequestNeedsAuthentication(request.type))
-    http_request.data[L"auth_token"] = auth_token_;
+    http_request.header[L"Authorization"] = L"Bearer " + access_token_;
 
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
@@ -93,8 +92,15 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
   http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
-  http_request.url.path = L"/users/authenticate";
+  http_request.url.path = L"/oauth/token";
 
+  // TODO: Register Taiga as a client and get a new ID
+  http_request.data[L"client_id"] =
+      L"dd031b32d2f56c990b1425efe6c42ad847e7fe3ab46bf1299f05ecd856bdb7dd";
+
+  // Resource Owner Password Credentials Grant
+  // https://tools.ietf.org/html/rfc6749#section-4.3
+  http_request.data[L"grant_type"] = L"password";
   http_request.data[L"username"] = request.data[canonical_name_ + L"-username"];
   http_request.data[L"password"] = request.data[canonical_name_ + L"-password"];
 }
@@ -153,8 +159,12 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 // Response handlers
 
 void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
-  auth_token_ = http_response.body;
-  Trim(auth_token_, L"\"'");
+  Json::Value root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  access_token_ = StrToWstr(root["access_token"].asString());
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -262,7 +272,7 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
     case kGetLibraryEntries:
     case kGetMetadataById:
     case kSearchTitle:
-      return !auth_token_.empty();
+      return !access_token_.empty();
   }
 
   return false;
