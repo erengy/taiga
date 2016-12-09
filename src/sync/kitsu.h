@@ -51,8 +51,9 @@ private:
 
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
+  void ParseObject(const Json::Value& value) const;
   int ParseAnimeObject(const Json::Value& value) const;
-  void ParseLibraryObject(Json::Value& value);
+  void ParseLibraryObject(const Json::Value& value) const;
 
   bool ParseResponseBody(const std::wstring& body, Response& response, Json::Value& root);
 

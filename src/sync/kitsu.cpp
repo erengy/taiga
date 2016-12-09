@@ -101,12 +101,12 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  http_request.url.path =
-      L"/users/" + request.data[canonical_name_ + L"-username"] + L"/library";
+  http_request.url.path = L"/edge/users";
 
-  if (request.data.count(L"status"))
-    http_request.url.query[L"status"] =
-        TranslateMyStatusTo(ToInt(request.data[L"status"]));
+  http_request.url.query[L"filter[name]"] =
+      request.data[canonical_name_ + L"-username"];
+
+  http_request.url.query[L"include"] = L"libraryEntries.media";
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
@@ -179,8 +179,9 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
 
   AnimeDatabase.ClearUserData();
 
-  for (size_t i = 0; i < root.size(); i++)
-    ParseLibraryObject(root[i]);
+  for (const auto& value : root["included"]) {
+    ParseObject(value);
+  }
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
@@ -274,6 +275,33 @@ bool Service::RequestSucceeded(Response& response,
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Service::ParseObject(const Json::Value& value) const {
+  enum class Type {
+    Anime,
+    LibraryEntries,
+    Unknown,
+  };
+
+  const std::map<std::string, Type> table{
+    {"anime", Type::Anime},
+    {"libraryEntries", Type::LibraryEntries},
+  };
+
+  const auto find_type = [&](const std::string& str) {
+    const auto it = table.find(str);
+    return it != table.end() ? it->second : Type::Unknown;
+  };
+
+  switch (find_type(value["type"].asString())) {
+    case Type::Anime:
+      ParseAnimeObject(value);
+      break;
+    case Type::LibraryEntries:
+      ParseLibraryObject(value);
+      break;
+  }
+}
+
 int Service::ParseAnimeObject(const Json::Value& value) const {
   const auto anime_id = ToInt(value["id"].asString());
   const auto& attributes = value["attributes"];
@@ -322,25 +350,33 @@ int Service::ParseAnimeObject(const Json::Value& value) const {
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
-void Service::ParseLibraryObject(Json::Value& value) {
-  auto& anime_value = value["anime"];
-  auto& rating_value = value["rating"];
+void Service::ParseLibraryObject(const Json::Value& value) const {
+  const auto& media = value["relationships"]["media"];
 
-  ::anime::Item anime_item;
+  if (media["data"]["type"] != "anime") {
+    return;  // ignore other types of media
+  }
+
+  const auto anime_id = ToInt(media["data"]["id"].asString());
+  const auto& attributes = value["attributes"];
+
+  anime::Item anime_item;
   anime_item.SetSource(this->id());
-  anime_item.SetId(ToWstr(anime_value["id"].asInt()), this->id());
-  anime_item.SetLastModified(time(nullptr));  // current time
-
-  ParseAnimeObject(anime_value, anime_item);
-
+  anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.AddtoUserList();
-  anime_item.SetMyLastWatchedEpisode(value["episodes_watched"].asInt());
-  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(StrToWstr(value["updated_at"].asString())));
-  anime_item.SetMyRewatchedTimes(value["rewatched_times"].asInt());
-  anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(value["status"].asString())));
-  anime_item.SetMyRewatching(value["rewatching"].asBool());
-  anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(rating_value["value"].asString()),
-                                              StrToWstr(rating_value["type"].asString())));
+
+  anime_item.SetMyLastWatchedEpisode(
+      attributes["progress"].asInt());
+  anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(
+      attributes["rating"].asString())));
+  anime_item.SetMyRewatchedTimes(
+      attributes["reconsumeCount"].asInt());
+  anime_item.SetMyRewatching(
+      attributes["reconsuming"].asBool());
+  anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(
+      attributes["status"].asString())));
+  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(StrToWstr(
+      attributes["updatedAt"].asString())));
 
   AnimeDatabase.UpdateItem(anime_item);
 }
