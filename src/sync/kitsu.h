@@ -49,9 +49,6 @@ private:
   REQUEST_AND_RESPONSE(SearchTitle);
   REQUEST_AND_RESPONSE(UpdateLibraryEntry);
 
-  void AppendTitleLanguagePreference(HttpRequest& http_request) const;
-  bool RequestSupportsTitleLanguagePreference(RequestType request_type) const;
-
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
   void ParseAnimeObject(Json::Value& value, anime::Item& anime_item);
