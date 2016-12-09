@@ -165,7 +165,7 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
   Json::Value root;
 
-  if (!ParseResponseBody(response, http_response, root))
+  if (!ParseResponseBody(http_response.body, response, root))
     return;
 
   AnimeDatabase.ClearUserData();
@@ -177,7 +177,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   Json::Value root;
 
-  if (!ParseResponseBody(response, http_response, root))
+  if (!ParseResponseBody(http_response.body, response, root))
     return;
 
   ::anime::Item anime_item;
@@ -193,7 +193,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   Json::Value root;
 
-  if (!ParseResponseBody(response, http_response, root))
+  if (!ParseResponseBody(http_response.body, response, root))
     return;
 
   for (size_t i = 0; i < root.size(); i++) {
@@ -222,7 +222,7 @@ void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response
 void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
   Json::Value root;
 
-  if (!ParseResponseBody(response, http_response, root))
+  if (!ParseResponseBody(http_response.body, response, root))
     return;
 
   ParseLibraryObject(root);
@@ -330,13 +330,12 @@ void Service::ParseLibraryObject(Json::Value& value) {
   AnimeDatabase.UpdateItem(anime_item);
 }
 
-bool Service::ParseResponseBody(Response& response, HttpResponse& http_response,
-                                Json::Value& root) {
+bool Service::ParseResponseBody(const std::wstring& body,
+                                Response& response, Json::Value& root) {
   Json::Reader reader;
 
-  if (http_response.body != L"false")
-    if (reader.parse(WstrToStr(http_response.body), root))
-      return true;
+  if (reader.parse(WstrToStr(body), root))
+    return true;
 
   switch (response.type) {
     case kGetLibraryEntries:

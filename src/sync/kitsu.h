@@ -53,7 +53,8 @@ private:
 
   void ParseAnimeObject(Json::Value& value, anime::Item& anime_item);
   void ParseLibraryObject(Json::Value& value);
-  bool ParseResponseBody(Response& response, HttpResponse& http_response, Json::Value& root);
+
+  bool ParseResponseBody(const std::wstring& body, Response& response, Json::Value& root);
 
   string_t access_token_;
 };
