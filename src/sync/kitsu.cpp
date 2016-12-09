@@ -110,13 +110,22 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/anime/" + request.data[canonical_name_ + L"-id"];
+  http_request.url.path = L"/edge/anime/" +
+                          request.data[canonical_name_ + L"-id"];
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
-  // Note that this method will return only 7 results at a time.
-  http_request.url.path = L"/search/anime";
-  http_request.url.query[L"query"] = request.data[L"title"];
+  http_request.url.path = L"/edge/anime";
+
+  http_request.url.query[L"filter[text]"] = request.data[L"title"];
+
+  // Kitsu's configuration sets JSONAPI's maximum_page_size to 20.
+  // See: /config/initializers/jsonapi-resources.rb
+  // Note that asking for more results will return an error: "Limit exceeds
+  // maximum page size of 20." This means that our application could break if
+  // the server's configuration is changed to reduce maximum_page_size.
+  http_request.url.query[L"page[offset]"] = L"0";
+  http_request.url.query[L"page[limit]"] = L"20";
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -180,14 +189,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  ::anime::Item anime_item;
-  anime_item.SetSource(this->id());
-  anime_item.SetId(ToWstr(root["id"].asInt()), this->id());
-  anime_item.SetLastModified(time(nullptr));  // current time
-
-  ParseAnimeObject(root, anime_item);
-
-  AnimeDatabase.UpdateItem(anime_item);
+  ParseAnimeObject(root["data"]);
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
@@ -196,15 +198,8 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  for (size_t i = 0; i < root.size(); i++) {
-    ::anime::Item anime_item;
-    anime_item.SetSource(this->id());
-    anime_item.SetId(ToWstr(root[i]["id"].asInt()), this->id());
-    anime_item.SetLastModified(time(nullptr));  // current time
-
-    ParseAnimeObject(root[i], anime_item);
-
-    int anime_id = AnimeDatabase.UpdateItem(anime_item);
+  for (const auto& value : root["data"]) {
+    const auto anime_id = ParseAnimeObject(value);
 
     // We return a list of IDs so that we can display the results afterwards
     AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
@@ -279,32 +274,52 @@ bool Service::RequestSucceeded(Response& response,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Service::ParseAnimeObject(Json::Value& value, anime::Item& anime_item) {
-  anime_item.SetSlug(StrToWstr(value["slug"].asString()));
-  anime_item.SetAiringStatus(TranslateSeriesStatusFrom(StrToWstr(value["status"].asString())));
-  anime_item.SetTitle(StrToWstr(value["title"].asString()));
-  anime_item.SetSynonyms(StrToWstr(value["alternate_title"].asString()));
-  anime_item.SetEpisodeCount(value["episode_count"].asInt());
-  anime_item.SetEpisodeLength(value["episode_length"].asInt());
-  anime_item.SetImageUrl(StrToWstr(value["cover_image"].asString()));
-  anime_item.SetSynopsis(StrToWstr(value["synopsis"].asString()));
-  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(value["show_type"].asString())));
-  anime_item.SetDateStart(StrToWstr(value["started_airing"].asString()));
-  anime_item.SetDateEnd(StrToWstr(value["finished_airing"].asString()));
-  anime_item.SetScore(TranslateSeriesRatingFrom(value["community_rating"].asFloat()));
-  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(value["age_rating"].asString())));
+int Service::ParseAnimeObject(const Json::Value& value) const {
+  const auto anime_id = ToInt(value["id"].asString());
+  const auto& attributes = value["attributes"];
 
-  int mal_id = value["mal_id"].asInt();
-  if (mal_id > 0)
-    anime_item.SetId(ToWstr(mal_id), sync::kMyAnimeList);
+  anime::Item anime_item;
+  anime_item.SetSource(this->id());
+  anime_item.SetId(ToWstr(anime_id), this->id());
+  anime_item.SetLastModified(time(nullptr));  // current time
 
-  std::vector<std::wstring> genres;
-  auto& genres_value = value["genres"];
-  for (size_t i = 0; i < genres_value.size(); i++)
-    genres.push_back(StrToWstr(genres_value[i]["name"].asString()));
+  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(
+      attributes["ageRating"].asString())));
+  anime_item.SetScore(TranslateSeriesRatingFrom(
+      attributes["averageRating"].asFloat()));
+  anime_item.SetTitle(StrToWstr(
+      attributes["canonicalTitle"].asString()));
+  anime_item.SetDateEnd(StrToWstr(
+      attributes["endDate"].asString()));
+  anime_item.SetEpisodeCount(
+      attributes["episodeCount"].asInt());
+  anime_item.SetEpisodeLength(
+      attributes["episodeLength"].asInt());
+  anime_item.SetImageUrl(StrToWstr(
+      attributes["posterImage"]["small"].asString()));
+  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(
+      attributes["showType"].asString())));
+  anime_item.SetSlug(StrToWstr(
+      attributes["slug"].asString()));
+  anime_item.SetDateStart(StrToWstr(
+      attributes["startDate"].asString()));
+  anime_item.SetSynopsis(StrToWstr(
+      attributes["synopsis"].asString()));
 
-  if (!genres.empty())
-    anime_item.SetGenres(genres);
+  for (const auto& title : attributes["abbreviatedTitles"]) {
+    anime_item.InsertSynonym(StrToWstr(title.asString()));
+  }
+  if (attributes["titles"]["en"].isString()) {
+    anime_item.SetEnglishTitle(StrToWstr(attributes["titles"]["en"].asString()));
+  }
+  if (attributes["titles"]["en_jp"].isString()) {
+    anime_item.SetTitle(StrToWstr(attributes["titles"]["en_jp"].asString()));
+  }
+  if (attributes["titles"]["ja_jp"].isString()) {
+    anime_item.InsertSynonym(StrToWstr(attributes["titles"]["ja_jp"].asString()));
+  }
+
+  return AnimeDatabase.UpdateItem(anime_item);
 }
 
 void Service::ParseLibraryObject(Json::Value& value) {
