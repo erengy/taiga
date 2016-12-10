@@ -17,7 +17,7 @@
 */
 
 #include <curl/curlver.h>
-#include <jsoncpp/json/json.h>
+#include <json/json.hpp>
 #include <pugixml/pugixml.hpp>
 #include <utf8proc/utf8proc.h>
 #include <zlib/zlib.h>
@@ -34,7 +34,7 @@
 namespace ui {
 
 enum ThirdPartyLibrary {
-  kJsoncpp,
+  kJson,
   kLibcurl,
   kPugixml,
   kUtf8proc,
@@ -43,8 +43,8 @@ enum ThirdPartyLibrary {
 
 static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
   switch (library) {
-    case kJsoncpp:
-      return StrToWstr(JSONCPP_VERSION_STRING);
+    case kJson:
+      return L"2.0.8";
     case kLibcurl:
       return StrToWstr(LIBCURL_VERSION);
     case kPugixml: {
@@ -97,7 +97,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"ryban\\line\\par "
       L"\\b Third-party components:\\b0\\line "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/yusukekamiyamane/fugue-icons\"}}{\\fldrslt{Fugue Icons 3.4.5}}}, "
-      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/open-source-parsers/jsoncpp\"}}{\\fldrslt{JsonCpp " + GetLibraryVersion(kJsoncpp) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/nlohmann/json\"}}{\\fldrslt{json " + GetLibraryVersion(kJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/bagder/curl\"}}{\\fldrslt{libcurl " + GetLibraryVersion(kLibcurl) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/zeux/pugixml\"}}{\\fldrslt{pugixml " + GetLibraryVersion(kPugixml) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/JuliaLang/utf8proc\"}}{\\fldrslt{utf8proc " + GetLibraryVersion(kUtf8proc) + L"}}}, "

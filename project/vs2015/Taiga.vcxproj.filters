@@ -31,7 +31,7 @@
     <Filter Include="deps\curl">
       <UniqueIdentifier>{73658da5-e312-4fe4-85e6-38a578acf869}</UniqueIdentifier>
     </Filter>
-    <Filter Include="deps\jsoncpp">
+    <Filter Include="deps\json">
       <UniqueIdentifier>{dd9648e9-7e26-4239-a931-8fee59d183e7}</UniqueIdentifier>
     </Filter>
     <Filter Include="deps\pugixml">
@@ -162,9 +162,6 @@
     </ClCompile>
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp">
-      <Filter>deps\jsoncpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp">
       <Filter>deps\pugixml</Filter>
@@ -654,11 +651,8 @@
     <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h">
-      <Filter>deps\jsoncpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\json-forwards.h">
-      <Filter>deps\jsoncpp</Filter>
+    <ClInclude Include="..\..\deps\src\json\json.hpp">
+      <Filter>deps\json</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp">
       <Filter>deps\pugixml</Filter>
