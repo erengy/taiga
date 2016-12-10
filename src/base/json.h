@@ -19,8 +19,10 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
-#include <jsoncpp/json/json.h>
+#include <json/json.hpp>
 
-bool JsonReadArray(const Json::Value& root, const std::string& name, std::vector<std::wstring>& output);
+using Json = nlohmann::json;
+
+bool ParseJsonString(const std::string& str, Json& output);
+bool ParseJsonString(const std::wstring& str, Json& output);

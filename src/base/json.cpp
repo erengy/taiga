@@ -19,14 +19,17 @@
 #include "json.h"
 #include "string.h"
 
-bool JsonReadArray(const Json::Value& root, const std::string& name,
-                   std::vector<std::wstring>& output) {
-  size_t previous_size = output.size();
+bool ParseJsonString(const std::string& str, Json& output) {
+  bool parsed = false;
 
-  auto& value = root[name.c_str()];
+  try {
+    output = Json::parse(str.begin(), str.end());
+    parsed = true;
+  } catch (const std::exception&) {}
 
-  for (size_t i = 0; i < value.size(); i++)
-    output.push_back(StrToWstr(value[i].asString()));
+  return parsed;
+}
 
-  return output.size() > previous_size;
+bool ParseJsonString(const std::wstring& str, Json& output) {
+  return ParseJsonString(WstrToStr(str), output);
 }
