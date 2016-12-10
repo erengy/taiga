@@ -17,7 +17,6 @@
 */
 
 #include "base/http.h"
-#include "base/json.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
@@ -163,16 +162,16 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 // Response handlers
 
 void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
-  Json::Value root;
+  Json root;
 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  access_token_ = StrToWstr(root["access_token"].asString());
+  access_token_ = StrToWstr(root["access_token"]);
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
-  Json::Value root;
+  Json root;
 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
@@ -185,7 +184,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
-  Json::Value root;
+  Json root;
 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
@@ -194,7 +193,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
-  Json::Value root;
+  Json root;
 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
@@ -251,23 +250,24 @@ bool Service::RequestSucceeded(Response& response,
 
     // Error
     default: {
-      Json::Value root;
-      Json::Reader reader;
-      bool parsed = reader.parse(WstrToStr(http_response.body), root);
       response.data[L"error"] = name() + L" returned an error: ";
-      if (parsed) {
-        auto error = StrToWstr(root["error"].asString());
+
+      Json root;
+      if (!ParseJsonString(http_response.body, root)) {
+        const auto error = StrToWstr(root["error"]);  // TODO: error_description
         response.data[L"error"] += error;
         if (response.type == kGetMetadataById) {
-          if (InStr(error, L"Couldn't find Anime with 'id'=") > -1)
+          if (InStr(error, L"Couldn't find Anime with 'id'=") > -1)  // TODO
             response.data[L"invalid_id"] = L"true";
         }
+
       } else {
         response.data[L"error"] += L"Unknown error (" +
             canonical_name() + L"|" +
             ToWstr(response.type) + L"|" +
             ToWstr(http_response.code) + L")";
       }
+
       return false;
     }
   }
@@ -275,7 +275,7 @@ bool Service::RequestSucceeded(Response& response,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Service::ParseObject(const Json::Value& value) const {
+void Service::ParseObject(const Json& value) const {
   enum class Type {
     Anime,
     LibraryEntries,
@@ -292,7 +292,7 @@ void Service::ParseObject(const Json::Value& value) const {
     return it != table.end() ? it->second : Type::Unknown;
   };
 
-  switch (find_type(value["type"].asString())) {
+  switch (find_type(value["type"])) {
     case Type::Anime:
       ParseAnimeObject(value);
       break;
@@ -302,8 +302,8 @@ void Service::ParseObject(const Json::Value& value) const {
   }
 }
 
-int Service::ParseAnimeObject(const Json::Value& value) const {
-  const auto anime_id = ToInt(value["id"].asString());
+int Service::ParseAnimeObject(const Json& value) const {
+  const auto anime_id = ToInt(value["id"].get<std::string>());
   const auto& attributes = value["attributes"];
 
   anime::Item anime_item;
@@ -311,53 +311,42 @@ int Service::ParseAnimeObject(const Json::Value& value) const {
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
-  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(
-      attributes["ageRating"].asString())));
-  anime_item.SetScore(TranslateSeriesRatingFrom(
-      attributes["averageRating"].asFloat()));
-  anime_item.SetTitle(StrToWstr(
-      attributes["canonicalTitle"].asString()));
-  anime_item.SetDateEnd(StrToWstr(
-      attributes["endDate"].asString()));
-  anime_item.SetEpisodeCount(
-      attributes["episodeCount"].asInt());
-  anime_item.SetEpisodeLength(
-      attributes["episodeLength"].asInt());
-  anime_item.SetImageUrl(StrToWstr(
-      attributes["posterImage"]["small"].asString()));
-  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(
-      attributes["showType"].asString())));
-  anime_item.SetSlug(StrToWstr(
-      attributes["slug"].asString()));
-  anime_item.SetDateStart(StrToWstr(
-      attributes["startDate"].asString()));
-  anime_item.SetSynopsis(StrToWstr(
-      attributes["synopsis"].asString()));
+  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(attributes["ageRating"])));
+  anime_item.SetScore(TranslateSeriesRatingFrom(attributes["averageRating"]));
+  anime_item.SetTitle(StrToWstr(attributes["canonicalTitle"]));
+  anime_item.SetDateEnd(StrToWstr(attributes["endDate"]));
+  anime_item.SetEpisodeCount(attributes["episodeCount"]);
+  anime_item.SetEpisodeLength(attributes["episodeLength"]);
+  anime_item.SetImageUrl(StrToWstr(attributes["posterImage"]["small"]));
+  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(attributes["showType"])));
+  anime_item.SetSlug(StrToWstr(attributes["slug"]));
+  anime_item.SetDateStart(StrToWstr(attributes["startDate"]));
+  anime_item.SetSynopsis(StrToWstr(attributes["synopsis"]));
 
   for (const auto& title : attributes["abbreviatedTitles"]) {
-    anime_item.InsertSynonym(StrToWstr(title.asString()));
+    anime_item.InsertSynonym(StrToWstr(title));
   }
-  if (attributes["titles"]["en"].isString()) {
-    anime_item.SetEnglishTitle(StrToWstr(attributes["titles"]["en"].asString()));
+  if (attributes["titles"]["en"].is_string()) {
+    anime_item.SetEnglishTitle(StrToWstr(attributes["titles"]["en"]));
   }
-  if (attributes["titles"]["en_jp"].isString()) {
-    anime_item.SetTitle(StrToWstr(attributes["titles"]["en_jp"].asString()));
+  if (attributes["titles"]["en_jp"].is_string()) {
+    anime_item.SetTitle(StrToWstr(attributes["titles"]["en_jp"]));
   }
-  if (attributes["titles"]["ja_jp"].isString()) {
-    anime_item.InsertSynonym(StrToWstr(attributes["titles"]["ja_jp"].asString()));
+  if (attributes["titles"]["ja_jp"].is_string()) {
+    anime_item.InsertSynonym(StrToWstr(attributes["titles"]["ja_jp"]));
   }
 
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
-void Service::ParseLibraryObject(const Json::Value& value) const {
+void Service::ParseLibraryObject(const Json& value) const {
   const auto& media = value["relationships"]["media"];
 
   if (media["data"]["type"] != "anime") {
     return;  // ignore other types of media
   }
 
-  const auto anime_id = ToInt(media["data"]["id"].asString());
+  const auto anime_id = ToInt(media["data"]["id"].get<std::string>());
   const auto& attributes = value["attributes"];
 
   anime::Item anime_item;
@@ -365,27 +354,19 @@ void Service::ParseLibraryObject(const Json::Value& value) const {
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.AddtoUserList();
 
-  anime_item.SetMyLastWatchedEpisode(
-      attributes["progress"].asInt());
-  anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(
-      attributes["rating"].asString())));
-  anime_item.SetMyRewatchedTimes(
-      attributes["reconsumeCount"].asInt());
-  anime_item.SetMyRewatching(
-      attributes["reconsuming"].asBool());
-  anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(
-      attributes["status"].asString())));
-  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(StrToWstr(
-      attributes["updatedAt"].asString())));
+  anime_item.SetMyLastWatchedEpisode(attributes["progress"]);
+  anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(attributes["rating"])));
+  anime_item.SetMyRewatchedTimes(attributes["reconsumeCount"]);
+  anime_item.SetMyRewatching(attributes["reconsuming"]);
+  anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(attributes["status"])));
+  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(StrToWstr(attributes["updatedAt"])));
 
   AnimeDatabase.UpdateItem(anime_item);
 }
 
 bool Service::ParseResponseBody(const std::wstring& body,
-                                Response& response, Json::Value& root) {
-  Json::Reader reader;
-
-  if (reader.parse(WstrToStr(body), root))
+                                Response& response, Json& root) {
+  if (ParseJsonString(body, root))
     return true;
 
   switch (response.type) {

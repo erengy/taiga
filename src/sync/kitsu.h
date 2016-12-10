@@ -18,13 +18,10 @@
 
 #pragma once
 
+#include "base/json.h"
 #include "base/types.h"
 #include "sync/kitsu_types.h"
 #include "sync/service.h"
-
-namespace Json {
-class Value;
-}
 
 namespace sync {
 namespace kitsu {
@@ -51,11 +48,11 @@ private:
 
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
-  void ParseObject(const Json::Value& value) const;
-  int ParseAnimeObject(const Json::Value& value) const;
-  void ParseLibraryObject(const Json::Value& value) const;
+  void ParseObject(const Json& value) const;
+  int ParseAnimeObject(const Json& value) const;
+  void ParseLibraryObject(const Json& value) const;
 
-  bool ParseResponseBody(const std::wstring& body, Response& response, Json::Value& root);
+  bool ParseResponseBody(const std::wstring& body, Response& response, Json& root);
 
   string_t access_token_;
 };
