@@ -16,7 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <map>
+
 #include "base/http.h"
+#include "base/log.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
@@ -51,7 +54,8 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
 
   // kAuthenticateUser method returns an access token, which is to be used on
   // all methods that require authentication. Some methods don't require the
-  // token, but behave differently when it's provided.
+  // token, but behave differently (e.g. private library entries are included)
+  // when it's provided.
   if (RequestNeedsAuthentication(request.type))
     http_request.header[L"Authorization"] = L"Bearer " + access_token_;
 
@@ -84,9 +88,12 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
 // Request builders
 
 void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
+  http_request.url.path = L"/oauth/token";
+
+  // We will transmit the credentials in the request body rather than as query
+  // parameters to avoid accidental logging.
   http_request.method = L"POST";
   http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
-  http_request.url.path = L"/oauth/token";
 
   // TODO: Register Taiga as a client and get a new ID
   http_request.data[L"client_id"] =
@@ -118,11 +125,10 @@ void Service::SearchTitle(Request& request, HttpRequest& http_request) {
 
   http_request.url.query[L"filter[text]"] = request.data[L"title"];
 
-  // Kitsu's configuration sets JSONAPI's maximum_page_size to 20.
-  // See: /config/initializers/jsonapi-resources.rb
-  // Note that asking for more results will return an error: "Limit exceeds
-  // maximum page size of 20." This means that our application could break if
-  // the server's configuration is changed to reduce maximum_page_size.
+  // Kitsu's configuration sets JSONAPI's maximum_page_size to 20. Asking for
+  // more results will return an error: "Limit exceeds maximum page size of 20."
+  // This means that our application could break if the server's configuration
+  // is changed to reduce maximum_page_size.
   http_request.url.query[L"page[offset]"] = L"0";
   http_request.url.query[L"page[limit]"] = L"20";
 }
@@ -299,6 +305,9 @@ void Service::ParseObject(const Json& json) const {
     case Type::LibraryEntries:
       ParseLibraryObject(json);
       break;
+    default:
+      LOG(LevelDebug, L"Invalid type: " + StrToWstr(json["type"]));
+      break;
   }
 }
 
@@ -344,6 +353,7 @@ void Service::ParseLibraryObject(const Json& json) const {
   const std::string media_type = media["data"]["type"];
 
   if (media_type != "anime") {
+    LOG(LevelDebug, L"Invalid type: " + StrToWstr(media_type));
     return;  // ignore other types of media
   }
 
@@ -372,10 +382,10 @@ bool Service::ParseResponseBody(const std::wstring& body,
 
   switch (response.type) {
     case kGetLibraryEntries:
-      response.data[L"error"] = L"Could not parse the list";
+      response.data[L"error"] = L"Could not parse library entries";
       break;
     case kGetMetadataById:
-      response.data[L"error"] = L"Could not parse the anime object";
+      response.data[L"error"] = L"Could not parse media object";
       break;
     case kSearchTitle:
       response.data[L"error"] = L"Could not parse search results";
