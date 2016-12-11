@@ -253,7 +253,7 @@ bool Service::RequestSucceeded(Response& response,
       response.data[L"error"] = name() + L" returned an error: ";
 
       Json root;
-      if (!ParseJsonString(http_response.body, root)) {
+      if (!JsonParseString(http_response.body, root)) {
         const auto error = StrToWstr(root["error"]);  // TODO: error_description
         response.data[L"error"] += error;
         if (response.type == kGetMetadataById) {
@@ -275,7 +275,7 @@ bool Service::RequestSucceeded(Response& response,
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Service::ParseObject(const Json& value) const {
+void Service::ParseObject(const Json& json) const {
   enum class Type {
     Anime,
     LibraryEntries,
@@ -292,36 +292,36 @@ void Service::ParseObject(const Json& value) const {
     return it != table.end() ? it->second : Type::Unknown;
   };
 
-  switch (find_type(value["type"])) {
+  switch (find_type(json["type"])) {
     case Type::Anime:
-      ParseAnimeObject(value);
+      ParseAnimeObject(json);
       break;
     case Type::LibraryEntries:
-      ParseLibraryObject(value);
+      ParseLibraryObject(json);
       break;
   }
 }
 
-int Service::ParseAnimeObject(const Json& value) const {
-  const auto anime_id = ToInt(value["id"].get<std::string>());
-  const auto& attributes = value["attributes"];
+int Service::ParseAnimeObject(const Json& json) const {
+  const auto anime_id = ToInt(json["id"].get<std::string>());
+  const auto& attributes = json["attributes"];
 
   anime::Item anime_item;
   anime_item.SetSource(this->id());
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
-  anime_item.SetAgeRating(TranslateAgeRatingFrom(attributes["ageRating"]));
-  anime_item.SetScore(TranslateSeriesRatingFrom(attributes["averageRating"]));
-  anime_item.SetTitle(StrToWstr(attributes["canonicalTitle"]));
-  anime_item.SetDateEnd(StrToWstr(attributes["endDate"]));
-  anime_item.SetEpisodeCount(attributes["episodeCount"]);
-  anime_item.SetEpisodeLength(attributes["episodeLength"]);
-  anime_item.SetImageUrl(StrToWstr(attributes["posterImage"]["small"]));
-  anime_item.SetType(TranslateSeriesTypeFrom(attributes["showType"]));
-  anime_item.SetSlug(StrToWstr(attributes["slug"]));
-  anime_item.SetDateStart(StrToWstr(attributes["startDate"]));
-  anime_item.SetSynopsis(StrToWstr(attributes["synopsis"]));
+  anime_item.SetAgeRating(TranslateAgeRatingFrom(JsonReadStr(attributes, "ageRating")));
+  anime_item.SetScore(TranslateSeriesRatingFrom(JsonReadDouble(attributes, "averageRating")));
+  anime_item.SetTitle(StrToWstr(JsonReadStr(attributes, "canonicalTitle")));
+  anime_item.SetDateEnd(StrToWstr(JsonReadStr(attributes, "endDate")));
+  anime_item.SetEpisodeCount(JsonReadInt(attributes, "episodeCount"));
+  anime_item.SetEpisodeLength(JsonReadInt(attributes, "episodeLength"));
+  anime_item.SetImageUrl(StrToWstr(JsonReadStr(attributes["posterImage"], "small")));
+  anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(attributes, "showType")));
+  anime_item.SetSlug(StrToWstr(JsonReadStr(attributes, "slug")));
+  anime_item.SetDateStart(StrToWstr(JsonReadStr(attributes, "startDate")));
+  anime_item.SetSynopsis(StrToWstr(JsonReadStr(attributes, "synopsis")));
 
   for (const auto& title : attributes["abbreviatedTitles"]) {
     anime_item.InsertSynonym(StrToWstr(title));
@@ -339,34 +339,35 @@ int Service::ParseAnimeObject(const Json& value) const {
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
-void Service::ParseLibraryObject(const Json& value) const {
-  const auto& media = value["relationships"]["media"];
+void Service::ParseLibraryObject(const Json& json) const {
+  const auto& media = json["relationships"]["media"];
+  const std::string media_type = media["data"]["type"];
 
-  if (media["data"]["type"] != "anime") {
+  if (media_type != "anime") {
     return;  // ignore other types of media
   }
 
   const auto anime_id = ToInt(media["data"]["id"].get<std::string>());
-  const auto& attributes = value["attributes"];
+  const auto& attributes = json["attributes"];
 
   anime::Item anime_item;
   anime_item.SetSource(this->id());
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.AddtoUserList();
 
-  anime_item.SetMyLastWatchedEpisode(attributes["progress"]);
-  anime_item.SetMyScore(TranslateMyRatingFrom(attributes["rating"]));
-  anime_item.SetMyRewatchedTimes(attributes["reconsumeCount"]);
-  anime_item.SetMyRewatching(attributes["reconsuming"]);
-  anime_item.SetMyStatus(TranslateMyStatusFrom(attributes["status"]));
-  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(attributes["updatedAt"]));
+  anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
+  anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadStr(attributes, "rating")));
+  anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));
+  anime_item.SetMyRewatching(JsonReadBool(attributes, "reconsuming"));
+  anime_item.SetMyStatus(TranslateMyStatusFrom(JsonReadStr(attributes, "status")));
+  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
 
   AnimeDatabase.UpdateItem(anime_item);
 }
 
 bool Service::ParseResponseBody(const std::wstring& body,
-                                Response& response, Json& root) {
-  if (ParseJsonString(body, root))
+                                Response& response, Json& json) {
+  if (JsonParseString(body, json))
     return true;
 
   switch (response.type) {

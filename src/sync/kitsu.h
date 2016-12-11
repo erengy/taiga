@@ -48,11 +48,11 @@ private:
 
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
-  void ParseObject(const Json& value) const;
-  int ParseAnimeObject(const Json& value) const;
-  void ParseLibraryObject(const Json& value) const;
+  void ParseObject(const Json& json) const;
+  int ParseAnimeObject(const Json& json) const;
+  void ParseLibraryObject(const Json& json) const;
 
-  bool ParseResponseBody(const std::wstring& body, Response& response, Json& root);
+  bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 
   string_t access_token_;
 };

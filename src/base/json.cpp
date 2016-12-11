@@ -19,17 +19,37 @@
 #include "json.h"
 #include "string.h"
 
-bool ParseJsonString(const std::string& str, Json& output) {
-  bool parsed = false;
-
+bool JsonParseString(const std::string& str, Json& output) {
   try {
     output = Json::parse(str.begin(), str.end());
-    parsed = true;
-  } catch (const std::exception&) {}
-
-  return parsed;
+    return true;
+  } catch (const std::exception&) {
+    return false;
+  }
 }
 
-bool ParseJsonString(const std::wstring& str, Json& output) {
-  return ParseJsonString(WstrToStr(str), output);
+bool JsonParseString(const std::wstring& str, Json& output) {
+  return JsonParseString(WstrToStr(str), output);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool JsonReadBool(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_boolean() ? it->get<bool>() : false;
+}
+
+double JsonReadDouble(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_number_float() ? it->get<double>() : 0.0;
+}
+
+int JsonReadInt(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_number_integer() ? it->get<int>() : 0;
+}
+
+std::string JsonReadStr(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_string() ? it->get<std::string>() : std::string();
 }

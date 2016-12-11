@@ -24,5 +24,10 @@
 
 using Json = nlohmann::json;
 
-bool ParseJsonString(const std::string& str, Json& output);
-bool ParseJsonString(const std::wstring& str, Json& output);
+bool JsonParseString(const std::string& str, Json& output);
+bool JsonParseString(const std::wstring& str, Json& output);
+
+bool JsonReadBool(const Json& json, const std::string& key);
+double JsonReadDouble(const Json& json, const std::string& key);
+int JsonReadInt(const Json& json, const std::string& key);
+std::string JsonReadStr(const Json& json, const std::string& key);
