@@ -659,6 +659,10 @@ bool ToBool(const wstring& str) {
   return (c == '1' || c == 't' || c == 'T' || c == 'y' || c == 'Y');
 }
 
+double ToDouble(const string& str) {
+  return atof(str.c_str());
+}
+
 double ToDouble(const wstring& str) {
   return _wtof(str.c_str());
 }

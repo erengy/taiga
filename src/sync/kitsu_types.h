@@ -21,23 +21,6 @@
 namespace sync {
 namespace kitsu {
 
-enum SeriesStatus {
-  kUnknownStatus,
-  kCurrentlyAiring,
-  kFinishedAiring,
-  kNotYetAired
-};
-
-enum SeriesType {
-  kUnknownType,
-  kTv,
-  kMovie,
-  kOva,
-  kOna,
-  kSpecial,
-  kMusic
-};
-
 enum MyPrivacy {
   kPrivate = 1,
   kPublic

@@ -27,18 +27,15 @@ class Item;
 namespace sync {
 namespace kitsu {
   
-int TranslateAgeRatingFrom(const std::wstring& value);
-double TranslateSeriesRatingFrom(float value);
+int TranslateAgeRatingFrom(const std::string& value);
+double TranslateSeriesRatingFrom(double value);
 double TranslateSeriesRatingTo(double value);
-int TranslateSeriesStatusFrom(int value);
-int TranslateSeriesStatusFrom(const std::wstring& value);
-int TranslateSeriesTypeFrom(int value);
-int TranslateSeriesTypeFrom(const std::wstring& value);
-std::wstring TranslateDateFrom(const std::wstring& value);
-std::wstring TranslateMyLastUpdatedFrom(const std::wstring& value);
-int TranslateMyRatingFrom(const std::wstring& value, const std::wstring& type);
+int TranslateSeriesTypeFrom(const std::string& value);
+std::wstring TranslateDateFrom(const std::string& value);
+std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
+int TranslateMyRatingFrom(const std::string& value);
 std::wstring TranslateMyRatingTo(int value);
-int TranslateMyStatusFrom(const std::wstring& value);
+int TranslateMyStatusFrom(const std::string& value);
 std::wstring TranslateMyStatusTo(int value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);

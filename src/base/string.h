@@ -86,6 +86,7 @@ void ToUpper(std::wstring& str, bool use_locale = false);
 std::wstring ToUpper_Copy(std::wstring str, bool use_locale = false);
 
 bool ToBool(const std::wstring& str);
+double ToDouble(const std::string& str);
 double ToDouble(const std::wstring& str);
 int ToInt(const std::string& str);
 int ToInt(const std::wstring& str);

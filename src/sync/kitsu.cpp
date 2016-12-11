@@ -311,14 +311,14 @@ int Service::ParseAnimeObject(const Json& value) const {
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.SetLastModified(time(nullptr));  // current time
 
-  anime_item.SetAgeRating(TranslateAgeRatingFrom(StrToWstr(attributes["ageRating"])));
+  anime_item.SetAgeRating(TranslateAgeRatingFrom(attributes["ageRating"]));
   anime_item.SetScore(TranslateSeriesRatingFrom(attributes["averageRating"]));
   anime_item.SetTitle(StrToWstr(attributes["canonicalTitle"]));
   anime_item.SetDateEnd(StrToWstr(attributes["endDate"]));
   anime_item.SetEpisodeCount(attributes["episodeCount"]);
   anime_item.SetEpisodeLength(attributes["episodeLength"]);
   anime_item.SetImageUrl(StrToWstr(attributes["posterImage"]["small"]));
-  anime_item.SetType(TranslateSeriesTypeFrom(StrToWstr(attributes["showType"])));
+  anime_item.SetType(TranslateSeriesTypeFrom(attributes["showType"]));
   anime_item.SetSlug(StrToWstr(attributes["slug"]));
   anime_item.SetDateStart(StrToWstr(attributes["startDate"]));
   anime_item.SetSynopsis(StrToWstr(attributes["synopsis"]));
@@ -355,11 +355,11 @@ void Service::ParseLibraryObject(const Json& value) const {
   anime_item.AddtoUserList();
 
   anime_item.SetMyLastWatchedEpisode(attributes["progress"]);
-  anime_item.SetMyScore(TranslateMyRatingFrom(StrToWstr(attributes["rating"])));
+  anime_item.SetMyScore(TranslateMyRatingFrom(attributes["rating"]));
   anime_item.SetMyRewatchedTimes(attributes["reconsumeCount"]);
   anime_item.SetMyRewatching(attributes["reconsuming"]);
-  anime_item.SetMyStatus(TranslateMyStatusFrom(StrToWstr(attributes["status"])));
-  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(StrToWstr(attributes["updatedAt"])));
+  anime_item.SetMyStatus(TranslateMyStatusFrom(attributes["status"]));
+  anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(attributes["updatedAt"]));
 
   AnimeDatabase.UpdateItem(anime_item);
 }
