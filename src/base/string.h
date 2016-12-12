@@ -96,6 +96,7 @@ std::wstring ToWstr(const UINT& value);
 std::wstring ToWstr(const ULONG& value);
 std::wstring ToWstr(const INT64& value);
 std::wstring ToWstr(const UINT64& value);
+std::string ToStr(const double& value, int count = 16);
 std::wstring ToWstr(const double& value, int count = 16);
 
 std::wstring LimitText(const std::wstring& str, unsigned int limit, const std::wstring& tail = L"...");

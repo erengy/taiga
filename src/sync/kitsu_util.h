@@ -34,9 +34,9 @@ int TranslateSeriesTypeFrom(const std::string& value);
 std::wstring TranslateDateFrom(const std::string& value);
 std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
 int TranslateMyRatingFrom(const std::string& value);
-std::wstring TranslateMyRatingTo(int value);
+std::string TranslateMyRatingTo(int value);
 int TranslateMyStatusFrom(const std::string& value);
-std::wstring TranslateMyStatusTo(int value);
+std::string TranslateMyStatusTo(int value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);

@@ -160,10 +160,14 @@ bool AddServiceDataToRequest(Request& request, int id) {
   if (!anime_item)
     return false;
 
-  request.data[ServiceManager.service(kMyAnimeList)->canonical_name() + L"-id"] =
-      anime_item->GetId(kMyAnimeList);
-  request.data[ServiceManager.service(kKitsu)->canonical_name() + L"-id"] =
-      anime_item->GetId(kKitsu);
+  auto add_data = [&](sync::ServiceId service_id) {
+    const auto canonical_name = ServiceManager.service(service_id)->canonical_name();
+    request.data[canonical_name + L"-id"] = anime_item->GetId(service_id);
+    request.data[canonical_name + L"-library-id"] = anime_item->GetMyId();
+  };
+
+  add_data(kMyAnimeList);
+  add_data(kKitsu);
 
   return true;
 }

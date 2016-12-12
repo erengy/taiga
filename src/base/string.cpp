@@ -711,6 +711,12 @@ wstring ToWstr(const UINT64& value) {
   return wstring(buffer);
 }
 
+string ToStr(const double& value, int count) {
+  std::ostringstream out;
+  out << std::fixed << std::setprecision(count) << value;
+  return out.str();
+}
+
 wstring ToWstr(const double& value, int count) {
   std::wostringstream out;
   out << std::fixed << std::setprecision(count) << value;

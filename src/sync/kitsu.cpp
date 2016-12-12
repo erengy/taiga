@@ -134,34 +134,30 @@ void Service::SearchTitle(Request& request, HttpRequest& http_request) {
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
-  UpdateLibraryEntry(request, http_request);
+  http_request.url.path = L"/edge/library-entries";
+
+  http_request.method = L"POST";
+  http_request.header[L"Content-Type"] = L"application/vnd.api+json";
+
+  http_request.body = BuildLibraryObject(request);
 }
 
 void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
-  http_request.method = L"POST";
-  http_request.url.path =
-      L"/libraries/" + request.data[canonical_name_ + L"-id"] + L"/remove";
+  http_request.url.path = L"/edge/library-entries/" +
+                          request.data[canonical_name_ + L"-library-id"];
+
+  http_request.method = L"DELETE";
+  http_request.header[L"Content-Type"] = L"application/vnd.api+json";
 }
 
 void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
-  http_request.method = L"POST";
-  http_request.header[L"Content-Type"] = L"application/x-www-form-urlencoded";
-  http_request.url.path =
-      L"/libraries/" + request.data[canonical_name_ + L"-id"];
+  http_request.url.path = L"/edge/library-entries/" +
+                          request.data[canonical_name_ + L"-library-id"];
 
-  if (request.data.count(L"status"))
-    http_request.data[L"status"] =
-        TranslateMyStatusTo(ToInt(request.data[L"status"]));
-  if (request.data.count(L"score"))
-    http_request.data[L"sane_rating_update"] =
-        TranslateMyRatingTo(ToInt(request.data[L"score"]));
-  if (request.data.count(L"enable_rewatching"))
-    http_request.data[L"rewatching"] =
-        request.data[L"enable_rewatching"] == L"0" ? L"false" : L"true";
-  if (request.data.count(L"rewatched_times"))
-    http_request.data[L"rewatched_times"] = request.data[L"rewatched_times"];
-  if (request.data.count(L"episode"))
-    http_request.data[L"episodes_watched"] = request.data[L"episode"];
+  http_request.method = L"PATCH";
+  http_request.header[L"Content-Type"] = L"application/vnd.api+json";
+
+  http_request.body = BuildLibraryObject(request);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,20 +209,20 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
 }
 
 void Service::AddLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Returns "false"
+  UpdateLibraryEntry(response, http_response);
 }
 
 void Service::DeleteLibraryEntry(Response& response, HttpResponse& http_response) {
-  // Returns "true"
+  // Returns "204 No Content" status and empty response body.
 }
 
 void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response) {
-  Json::Value root;
+  Json root;
 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  ParseLibraryObject(root);
+  ParseLibraryObject(root["data"]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +276,48 @@ bool Service::RequestSucceeded(Response& response,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+std::wstring Service::BuildLibraryObject(Request& request) const {
+  const auto anime_id = ToInt(request.data[canonical_name_ + L"-id"]);
+  const auto library_id = ToInt(request.data[canonical_name_ + L"-library-id"]);
+
+  Json json = {
+    {"data", {
+      {"type", "libraryEntries"},
+      {"attributes", {}},
+      {"relationships", {
+        {"media", {
+          {"data", {
+            {"type", "anime"},
+            {"id", ToStr(anime_id)},
+          }}
+        }},
+        // TODO: Add user data
+      }}
+    }}
+  };
+
+  // According to the JSON API specification, "The `id` member is not required
+  // when the resource object originates at the client and represents a new
+  // resource to be created on the server."
+  if (library_id)
+    json["data"]["id"] = ToStr(library_id);
+
+  auto& attributes = json["data"]["attributes"];
+
+  if (request.data.count(L"episode"))
+    attributes["progress"] = ToInt(request.data[L"episode"]);
+  if (request.data.count(L"score"))
+    attributes["rating"] = TranslateMyRatingTo(ToInt(request.data[L"score"]));
+  if (request.data.count(L"rewatched_times"))
+    attributes["reconsumeCount"] = ToInt(request.data[L"rewatched_times"]);
+  if (request.data.count(L"enable_rewatching"))
+    attributes["reconsuming"] = ToBool(request.data[L"enable_rewatching"]);
+  if (request.data.count(L"status"))
+    attributes["status"] = TranslateMyStatusTo(ToInt(request.data[L"status"]));
+
+  return StrToWstr(json.dump());
+}
 
 void Service::ParseObject(const Json& json) const {
   enum class Type {
@@ -358,6 +396,7 @@ void Service::ParseLibraryObject(const Json& json) const {
   }
 
   const auto anime_id = ToInt(media["data"]["id"].get<std::string>());
+  const auto library_id = ToInt(json["id"].get<std::string>());
   const auto& attributes = json["attributes"];
 
   anime::Item anime_item;
@@ -365,6 +404,7 @@ void Service::ParseLibraryObject(const Json& json) const {
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.AddtoUserList();
 
+  anime_item.SetMyId(library_id);
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
   anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadStr(attributes, "rating")));
   anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));

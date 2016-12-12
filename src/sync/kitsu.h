@@ -48,6 +48,8 @@ private:
 
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
+  std::wstring BuildLibraryObject(Request& request) const;
+
   void ParseObject(const Json& json) const;
   int ParseAnimeObject(const Json& json) const;
   void ParseLibraryObject(const Json& json) const;

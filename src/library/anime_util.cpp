@@ -923,7 +923,7 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
 
     case sync::kKitsu:
       return value > 0 ? 
-          sync::kitsu::TranslateMyRatingTo(value) : default_char;
+          StrToWstr(sync::kitsu::TranslateMyRatingTo(value)) : default_char;
   }
 }
 

@@ -90,8 +90,8 @@ int TranslateMyRatingFrom(const std::string& value) {
   return static_cast<int>(ToDouble(value) * 2.0);
 }
 
-std::wstring TranslateMyRatingTo(int value) {
-  return ToWstr(static_cast<double>(value) / 2.0, 1);
+std::string TranslateMyRatingTo(int value) {
+  return ToStr(static_cast<double>(value) / 2.0, 1);
 }
 
 int TranslateMyStatusFrom(const std::string& value) {
@@ -111,17 +111,17 @@ int TranslateMyStatusFrom(const std::string& value) {
   return anime::kNotInList;
 }
 
-std::wstring TranslateMyStatusTo(int value) {
+std::string TranslateMyStatusTo(int value) {
   switch (value) {
-    case anime::kWatching: return L"current";
-    case anime::kCompleted: return L"completed";
-    case anime::kOnHold: return L"on_hold";
-    case anime::kDropped: return L"dropped";
-    case anime::kPlanToWatch: return L"planned";
+    case anime::kWatching: return "current";
+    case anime::kCompleted: return "completed";
+    case anime::kOnHold: return "on_hold";
+    case anime::kDropped: return "dropped";
+    case anime::kPlanToWatch: return "planned";
   }
 
   LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
-  return L"";
+  return "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
