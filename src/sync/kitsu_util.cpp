@@ -126,7 +126,7 @@ std::string TranslateMyStatusTo(int value) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static const std::wstring kBaseUrl = L"https://staging.kitsu.io";
+static const std::wstring kBaseUrl = L"https://kitsu.io";
 
 std::wstring GetAnimePage(const anime::Item& anime_item) {
   return kBaseUrl + L"/anime/" + anime_item.GetSlug();

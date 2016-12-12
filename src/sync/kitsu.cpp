@@ -32,7 +32,7 @@ namespace sync {
 namespace kitsu {
 
 Service::Service() {
-  host_ = L"staging.kitsu.io/api";  // TODO: Change after launch
+  host_ = L"kitsu.io/api";
 
   id_ = kKitsu;
   canonical_name_ = L"kitsu";
