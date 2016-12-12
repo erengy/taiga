@@ -85,6 +85,7 @@ class MyInformation {
   MyInformation();
   virtual ~MyInformation() {}
 
+  int id;
   int watched_episodes;
   int score;
   int status;

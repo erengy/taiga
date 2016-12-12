@@ -21,7 +21,8 @@
 namespace anime {
 
 MyInformation::MyInformation()
-    : watched_episodes(0),
+    : id(0),
+      watched_episodes(0),
       score(0),
       status(kNotInList),
       rewatched_times(0),

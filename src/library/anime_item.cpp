@@ -369,6 +369,13 @@ void Item::SetLastModified(time_t modified) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+int Item::GetMyId() const {
+  if (!my_info_.get())
+    return 0;
+
+  return my_info_->id;
+}
+
 int Item::GetMyLastWatchedEpisode(bool check_queue) const {
   if (!my_info_.get())
     return 0;
@@ -464,6 +471,12 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void Item::SetMyId(int id) {
+  assert(my_info_.get());
+
+  my_info_->id = id;
+}
 
 void Item::SetMyLastWatchedEpisode(int number) {
   assert(my_info_.get());
