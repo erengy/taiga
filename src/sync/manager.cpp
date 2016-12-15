@@ -199,9 +199,16 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
   switch (response.type) {
     case kAuthenticateUser: {
       string_t username = response.data[service.canonical_name() + L"-username"];
-      if (response.service_id == kMyAnimeList && !username.empty()) {
+      if (!username.empty()) {
         // Update settings with the returned value for the correct letter case
-        Settings.Set(taiga::kSync_Service_Mal_Username, username);
+        switch (response.service_id) {
+          case kMyAnimeList:
+            Settings.Set(taiga::kSync_Service_Mal_Username, username);
+            break;
+          case kKitsu:
+            Settings.Set(taiga::kSync_Service_Kitsu_Username, username);
+            break;
+        }
       }
       Taiga.logged_in = true;
       ui::OnLogin();
