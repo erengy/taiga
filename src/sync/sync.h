@@ -26,6 +26,7 @@
 namespace sync {
 
 bool AuthenticateUser();
+void GetUser();
 void GetLibraryEntries();
 void GetMetadataById(int id);
 void SearchTitle(string_t title, int id);

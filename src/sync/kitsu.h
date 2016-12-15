@@ -40,6 +40,7 @@ public:
 private:
   REQUEST_AND_RESPONSE(AddLibraryEntry);
   REQUEST_AND_RESPONSE(AuthenticateUser);
+  REQUEST_AND_RESPONSE(GetUser);
   REQUEST_AND_RESPONSE(DeleteLibraryEntry);
   REQUEST_AND_RESPONSE(GetLibraryEntries);
   REQUEST_AND_RESPONSE(GetMetadataById);
@@ -57,6 +58,7 @@ private:
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 
   string_t access_token_;
+  int user_id_;
 };
 
 }  // namespace kitsu

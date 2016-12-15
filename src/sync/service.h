@@ -39,6 +39,7 @@ enum ServiceId {
 enum RequestType {
   kGenericRequest,
   kAuthenticateUser,
+  kGetUser,
   kGetMetadataById,
   kSearchTitle,
   kAddLibraryEntry,

@@ -185,6 +185,7 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
+    case kHttpServiceGetUser:
     case kHttpServiceGetMetadataById:
     case kHttpServiceSearchTitle:
     case kHttpServiceAddLibraryEntry:
@@ -210,6 +211,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
+    case kHttpServiceGetUser:
     case kHttpServiceGetMetadataById:
     case kHttpServiceSearchTitle:
     case kHttpServiceAddLibraryEntry:

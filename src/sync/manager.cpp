@@ -144,6 +144,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
 
   switch (response.type) {
     case kAuthenticateUser:
+    case kGetUser:
       Taiga.logged_in = false;
       ui::OnLogout();
       ui::ChangeStatusText(response.data[L"error"]);
@@ -203,6 +204,17 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
         Settings.Set(taiga::kSync_Service_Mal_Username, username);
       }
       Taiga.logged_in = true;
+      ui::OnLogin();
+      if (response.service_id == kKitsu) {
+        // We need to make an additional request to get the user ID
+        GetUser();
+      } else {
+        Synchronize();
+      }
+      break;
+    }
+
+    case kGetUser: {
       ui::OnLogin();
       Synchronize();
       break;

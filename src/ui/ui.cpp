@@ -104,6 +104,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
     case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
+    case taiga::kHttpServiceGetUser:
     case taiga::kHttpServiceGetLibraryEntries:
     case taiga::kHttpServiceAddLibraryEntry:
     case taiga::kHttpServiceDeleteLibraryEntry:
@@ -182,6 +183,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
+    case taiga::kHttpServiceGetUser:
       status = L"Reading account information...";
       break;
     case taiga::kHttpServiceGetLibraryEntries:

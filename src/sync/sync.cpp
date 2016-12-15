@@ -53,6 +53,25 @@ bool AuthenticateUser() {
   return true;
 }
 
+void GetUser() {
+  if (taiga::GetCurrentUsername().empty()) {
+    ui::ChangeStatusText(
+        L"Cannot get user information. Username is not available.");
+    return;
+  }
+
+  ui::ChangeStatusText(L"Retrieving user information...");
+  ui::EnableDialogInput(ui::kDialogMain, false);
+
+  Request request(kGetUser);
+  SetActiveServiceForRequest(request);
+
+  if (!AddAuthenticationToRequest(request))
+    return;
+
+  ServiceManager.MakeRequest(request);
+}
+
 void GetLibraryEntries() {
   ui::ChangeStatusText(L"Downloading anime list...");
   ui::EnableDialogInput(ui::kDialogMain, false);
@@ -195,6 +214,8 @@ RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode) {
   switch (client_mode) {
     case taiga::kHttpServiceAuthenticateUser:
       return kAuthenticateUser;
+    case taiga::kHttpServiceGetUser:
+      return kGetUser;
     case taiga::kHttpServiceGetMetadataById:
       return kGetMetadataById;
     case taiga::kHttpServiceSearchTitle:
@@ -216,6 +237,8 @@ taiga::HttpClientMode RequestTypeToClientMode(RequestType request_type) {
   switch (request_type) {
     case kAuthenticateUser:
       return taiga::kHttpServiceAuthenticateUser;
+    case kGetUser:
+      return taiga::kHttpServiceGetUser;
     case kGetMetadataById:
       return taiga::kHttpServiceGetMetadataById;
     case kSearchTitle:

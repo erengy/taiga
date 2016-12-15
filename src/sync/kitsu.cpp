@@ -37,6 +37,8 @@ Service::Service() {
   id_ = kKitsu;
   canonical_name_ = L"kitsu";
   name_ = L"Kitsu";
+
+  user_id_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +64,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   switch (request.type) {
     BUILD_HTTP_REQUEST(kAddLibraryEntry, AddLibraryEntry);
     BUILD_HTTP_REQUEST(kAuthenticateUser, AuthenticateUser);
+    BUILD_HTTP_REQUEST(kGetUser, GetUser);
     BUILD_HTTP_REQUEST(kDeleteLibraryEntry, DeleteLibraryEntry);
     BUILD_HTTP_REQUEST(kGetLibraryEntries, GetLibraryEntries);
     BUILD_HTTP_REQUEST(kGetMetadataById, GetMetadataById);
@@ -75,6 +78,7 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
     switch (response.type) {
       HANDLE_HTTP_RESPONSE(kAddLibraryEntry, AddLibraryEntry);
       HANDLE_HTTP_RESPONSE(kAuthenticateUser, AuthenticateUser);
+      HANDLE_HTTP_RESPONSE(kGetUser, GetUser);
       HANDLE_HTTP_RESPONSE(kDeleteLibraryEntry, DeleteLibraryEntry);
       HANDLE_HTTP_RESPONSE(kGetLibraryEntries, GetLibraryEntries);
       HANDLE_HTTP_RESPONSE(kGetMetadataById, GetMetadataById);
@@ -104,6 +108,13 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
   http_request.data[L"grant_type"] = L"password";
   http_request.data[L"username"] = request.data[canonical_name_ + L"-username"];
   http_request.data[L"password"] = request.data[canonical_name_ + L"-password"];
+}
+
+void Service::GetUser(Request& request, HttpRequest& http_request) {
+  http_request.url.path = L"/edge/users";
+
+  http_request.url.query[L"filter[name]"] =
+      request.data[canonical_name_ + L"-username"];
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
@@ -170,6 +181,20 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
     return;
 
   access_token_ = StrToWstr(root["access_token"]);
+}
+
+void Service::GetUser(Response& response, HttpResponse& http_response) {
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  const auto& user = root["data"].front();
+
+  user_id_ = ToInt(user["id"].get<std::string>());
+
+  response.data[canonical_name_ + L"-username"] =
+      StrToWstr(user["attributes"]["name"]);
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -292,7 +317,12 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
             {"id", ToStr(anime_id)},
           }}
         }},
-        // TODO: Add user data
+        {"user", {
+          {"data", {
+            {"type", "users"},
+            {"id", ToStr(user_id_)},
+          }}
+        }}
       }}
     }}
   };
