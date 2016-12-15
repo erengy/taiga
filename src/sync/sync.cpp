@@ -32,25 +32,25 @@
 
 namespace sync {
 
-void AuthenticateUser(bool download) {
-  if (!taiga::GetCurrentUsername().empty() &&
-      !taiga::GetCurrentPassword().empty()) {
-    ui::ChangeStatusText(L"Logging in...");
-    ui::EnableDialogInput(ui::kDialogMain, false);
-
-    Request request(kAuthenticateUser);
-    SetActiveServiceForRequest(request);
-    if (!AddAuthenticationToRequest(request))
-      return;
-    ServiceManager.MakeRequest(request);
-
-  } else if (!taiga::GetCurrentUsername().empty() && download) {
-    GetLibraryEntries();
-
-  } else {
+bool AuthenticateUser() {
+  if (taiga::GetCurrentUsername().empty() ||
+      taiga::GetCurrentPassword().empty()) {
     ui::ChangeStatusText(
         L"Cannot authenticate. Username or password not available.");
+    return false;
   }
+
+  ui::ChangeStatusText(L"Logging in...");
+  ui::EnableDialogInput(ui::kDialogMain, false);
+
+  Request request(kAuthenticateUser);
+  SetActiveServiceForRequest(request);
+
+  if (!AddAuthenticationToRequest(request))
+    return false;
+
+  ServiceManager.MakeRequest(request);
+  return true;
 }
 
 void GetLibraryEntries() {
@@ -85,12 +85,20 @@ void SearchTitle(string_t title, int id) {
 }
 
 void Synchronize() {
-  if (!Taiga.logged_in) {
-    AuthenticateUser(true);
-  } else if (History.queue.GetItemCount() == 0) {
-    GetLibraryEntries();
-  } else {
+  bool authenticated = Taiga.logged_in;
+
+  if (!authenticated) {
+    authenticated = AuthenticateUser();
+    // Special case where we allow downloading lists without authentication
+    if (!authenticated && !taiga::GetCurrentUsername().empty())
+      GetLibraryEntries();
+    return;
+  }
+
+  if (History.queue.GetItemCount()) {
     History.queue.Check(false);
+  } else {
+    GetLibraryEntries();
   }
 }
 

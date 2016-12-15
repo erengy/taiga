@@ -190,7 +190,7 @@ void HistoryQueue::Check(bool automatic) {
   }
 
   if (!Taiga.logged_in) {
-    sync::AuthenticateUser(false);
+    sync::AuthenticateUser();
     return;
   }
 
