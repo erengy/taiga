@@ -85,7 +85,7 @@ class MyInformation {
   MyInformation();
   virtual ~MyInformation() {}
 
-  int id;
+  std::wstring id;
   int watched_episodes;
   int score;
   int status;

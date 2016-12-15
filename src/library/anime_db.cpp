@@ -407,7 +407,7 @@ bool Database::LoadList() {
       anime_item.SetSource(sync::kTaiga);
 
       anime_item.AddtoUserList();
-      anime_item.SetMyId(XmlReadIntValue(node, L"library_id"));
+      anime_item.SetMyId(XmlReadStrValue(node, L"library_id"));
       anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"progress"));
       anime_item.SetMyDateStart(XmlReadStrValue(node, L"date_start"));
       anime_item.SetMyDateEnd(XmlReadStrValue(node, L"date_end"));
@@ -451,7 +451,7 @@ bool Database::SaveList(bool include_database) {
     if (item.IsInList()) {
       xml_node node = node_library.append_child(L"anime");
       XmlWriteIntValue(node, L"id", item.GetId());
-      XmlWriteIntValue(node, L"library_id", item.GetMyId());
+      XmlWriteStrValue(node, L"library_id", item.GetMyId().c_str());
       XmlWriteIntValue(node, L"progress", item.GetMyLastWatchedEpisode(false));
       XmlWriteStrValue(node, L"date_start", std::wstring(item.GetMyDateStart()).c_str());
       XmlWriteStrValue(node, L"date_end", std::wstring(item.GetMyDateEnd()).c_str());

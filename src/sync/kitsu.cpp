@@ -434,7 +434,7 @@ void Service::ParseLibraryObject(const Json& json) const {
   anime_item.SetId(ToWstr(anime_id), this->id());
   anime_item.AddtoUserList();
 
-  anime_item.SetMyId(library_id);
+  anime_item.SetMyId(ToWstr(library_id));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
   anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadStr(attributes, "rating")));
   anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));

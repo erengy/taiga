@@ -369,9 +369,9 @@ void Item::SetLastModified(time_t modified) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-int Item::GetMyId() const {
+const std::wstring& Item::GetMyId() const {
   if (!my_info_.get())
-    return 0;
+    return EmptyString();
 
   return my_info_->id;
 }
@@ -472,7 +472,7 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Item::SetMyId(int id) {
+void Item::SetMyId(const std::wstring& id) {
   assert(my_info_.get());
 
   my_info_->id = id;

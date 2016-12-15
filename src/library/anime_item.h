@@ -93,7 +93,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Library data
 
-  int GetMyId() const;
+  const std::wstring& GetMyId() const;
   int GetMyLastWatchedEpisode(bool check_queue = true) const;
   int GetMyScore(bool check_queue = true) const;
   int GetMyStatus(bool check_queue = true) const;
@@ -105,7 +105,7 @@ public:
   const std::wstring& GetMyLastUpdated() const;
   const std::wstring& GetMyTags(bool check_queue = true) const;
 
-  void SetMyId(int id);
+  void SetMyId(const std::wstring& id);
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
   void SetMyStatus(int status);
