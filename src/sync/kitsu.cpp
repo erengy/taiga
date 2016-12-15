@@ -269,32 +269,41 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
 
 bool Service::RequestSucceeded(Response& response,
                                const HttpResponse& http_response) {
-  switch (http_response.code) {
-    // OK
+  switch (http_response.code - (http_response.code % 100)) {
+    // 200 OK
+    // 201 Created
+    // 202 Accepted
+    // 204 No Content
     case 200:
-    case 201:
       return true;
 
     // Error
     default: {
-      response.data[L"error"] = name() + L" returned an error: ";
-
       Json root;
-      if (!JsonParseString(http_response.body, root)) {
-        const auto error = StrToWstr(root["error"]);  // TODO: error_description
-        response.data[L"error"] += error;
-        if (response.type == kGetMetadataById) {
-          if (InStr(error, L"Couldn't find Anime with 'id'=") > -1)  // TODO
-            response.data[L"invalid_id"] = L"true";
-        }
+      std::wstring error_description;
 
-      } else {
-        response.data[L"error"] += L"Unknown error (" +
+      if (JsonParseString(http_response.body, root)) {
+        if (root.count("error_description")) {
+          error_description = StrToWstr(root["error_description"]);
+        } else if (root.count("errors")) {
+          const auto& errors = root["errors"];
+          if (errors.is_array() && !errors.empty()) {
+            error_description = StrToWstr("\"" +
+                errors.front()["title"].get<std::string>() + ": " +
+                errors.front()["detail"].get<std::string>() + "\"");
+          }
+        }
+      }
+
+      if (error_description.empty()) {
+        error_description = L"Unknown error (" +
             canonical_name() + L"|" +
             ToWstr(response.type) + L"|" +
             ToWstr(http_response.code) + L")";
       }
 
+      response.data[L"error"] = name() + L" returned an error: " +
+                                error_description;
       return false;
     }
   }
