@@ -135,6 +135,8 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/anime/" +
                           request.data[canonical_name_ + L"-id"];
+
+  http_request.url.query[L"include"] = L"genres";
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
@@ -156,7 +158,7 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
   http_request.header[L"Content-Type"] = L"application/vnd.api+json";
 
-  http_request.url.query[L"include"] = L"media";
+  http_request.url.query[L"include"] = L"media,media.genres";
 
   http_request.body = BuildLibraryObject(request);
 }
@@ -176,7 +178,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"PATCH";
   http_request.header[L"Content-Type"] = L"application/vnd.api+json";
 
-  http_request.url.query[L"include"] = L"media";
+  http_request.url.query[L"include"] = L"media,media.genres";
 
   http_request.body = BuildLibraryObject(request);
 }
@@ -230,7 +232,9 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  ParseAnimeObject(root["data"]);
+  const auto anime_id = ParseAnimeObject(root["data"]);
+
+  ParseGenres(root["included"], anime_id);
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
@@ -261,11 +265,13 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  ParseLibraryObject(root["data"]);
+  const auto anime_id = ParseLibraryObject(root["data"]);
 
   for (const auto& value : root["included"]) {
     ParseObject(value);
   }
+
+  ParseGenres(root["included"], anime_id);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -382,12 +388,14 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
 void Service::ParseObject(const Json& json) const {
   enum class Type {
     Anime,
+    Genres,
     LibraryEntries,
     Unknown,
   };
 
   const std::map<std::string, Type> table{
     {"anime", Type::Anime},
+    {"genres", Type::Genres},
     {"libraryEntries", Type::LibraryEntries},
   };
 
@@ -399,6 +407,8 @@ void Service::ParseObject(const Json& json) const {
   switch (find_type(json["type"])) {
     case Type::Anime:
       ParseAnimeObject(json);
+      break;
+    case Type::Genres:
       break;
     case Type::LibraryEntries:
       ParseLibraryObject(json);
@@ -446,13 +456,33 @@ int Service::ParseAnimeObject(const Json& json) const {
   return AnimeDatabase.UpdateItem(anime_item);
 }
 
-void Service::ParseLibraryObject(const Json& json) const {
+void Service::ParseGenres(const Json& json, const int anime_id) const {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return;
+
+  std::vector<std::wstring> genres;
+  
+  // Here we assume that all listed genres are related to this anime. In order
+  // to parse an array of anime objects with genres, we would need to extract
+  // genre IDs from `relationships/genres/data` for each anime.
+  for (const auto& value : json) {
+    if (value["type"] == "genres") {
+      genres.push_back(StrToWstr(value["attributes"]["name"]));
+    }
+  }
+
+  anime_item->SetGenres(genres);
+}
+
+int Service::ParseLibraryObject(const Json& json) const {
   const auto& media = json["relationships"]["media"];
   const std::string media_type = media["data"]["type"];
 
   if (media_type != "anime") {
     LOG(LevelDebug, L"Invalid type: " + StrToWstr(media_type));
-    return;  // ignore other types of media
+    return anime::ID_UNKNOWN;  // ignore other types of media
   }
 
   const auto anime_id = ToInt(media["data"]["id"].get<std::string>());
@@ -472,7 +502,7 @@ void Service::ParseLibraryObject(const Json& json) const {
   anime_item.SetMyStatus(TranslateMyStatusFrom(JsonReadStr(attributes, "status")));
   anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
 
-  AnimeDatabase.UpdateItem(anime_item);
+  return AnimeDatabase.UpdateItem(anime_item);
 }
 
 bool Service::ParseResponseBody(const std::wstring& body,
