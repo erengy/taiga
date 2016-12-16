@@ -118,12 +118,18 @@ void Service::GetUser(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  http_request.url.path = L"/edge/users";
+  http_request.url.path = L"/edge/library-entries";
 
-  http_request.url.query[L"filter[name]"] =
-      request.data[canonical_name_ + L"-username"];
+  http_request.url.query[L"filter[user_id]"] = ToWstr(user_id_);
+  http_request.url.query[L"filter[media_type]"] = L"Anime";
 
-  http_request.url.query[L"include"] = L"libraryEntries.media";
+  http_request.url.query[L"include"] = L"media";
+
+  // Kitsu's configuration sets JSONAPI's default_page_size to 10. The only way
+  // to retrieve the entire library in a single request is to set the limit to a
+  // sufficiently big number.
+  http_request.url.query[L"page[offset]"] = L"0";
+  http_request.url.query[L"page[limit]"] = L"100000";
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
@@ -204,6 +210,10 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     return;
 
   AnimeDatabase.ClearUserData();
+
+  for (const auto& value : root["data"]) {
+    ParseLibraryObject(value);
+  }
 
   for (const auto& value : root["included"]) {
     ParseObject(value);
