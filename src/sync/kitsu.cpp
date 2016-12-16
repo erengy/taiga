@@ -174,6 +174,8 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"PATCH";
   http_request.header[L"Content-Type"] = L"application/vnd.api+json";
 
+  http_request.url.query[L"include"] = L"media";
+
   http_request.body = BuildLibraryObject(request);
 }
 
@@ -258,6 +260,10 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
     return;
 
   ParseLibraryObject(root["data"]);
+
+  for (const auto& value : root["included"]) {
+    ParseObject(value);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
