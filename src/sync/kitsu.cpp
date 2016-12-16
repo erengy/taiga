@@ -156,6 +156,8 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
   http_request.header[L"Content-Type"] = L"application/vnd.api+json";
 
+  http_request.url.query[L"include"] = L"media";
+
   http_request.body = BuildLibraryObject(request);
 }
 
