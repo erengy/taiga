@@ -167,8 +167,17 @@ void StatsDialog::Refresh() {
   text += ToWstr(Stats.episode_count) + L"\n";
   text += Stats.life_spent_watching + L"\n";
   text += Stats.life_planned_to_watch + L"\n";
-  text += ToWstr(Stats.score_mean, 2) + L"\n";
-  text += ToWstr(Stats.score_deviation, 2);
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+    default:
+      text += ToWstr(Stats.score_mean, 2) + L"\n";
+      text += ToWstr(Stats.score_deviation, 2);
+      break;
+    case sync::kKitsu:
+      text += ToWstr(Stats.score_mean / 2.0, 2) + L"\n";
+      text += ToWstr(Stats.score_deviation / 2.0, 2);
+      break;
+  }
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());
 
   // Score distribution
