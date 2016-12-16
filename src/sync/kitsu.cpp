@@ -304,9 +304,12 @@ bool Service::RequestSucceeded(Response& response,
         } else if (root.count("errors")) {
           const auto& errors = root["errors"];
           if (errors.is_array() && !errors.empty()) {
+            const auto& error = errors.front();
             error_description = StrToWstr("\"" +
-                errors.front()["title"].get<std::string>() + ": " +
-                errors.front()["detail"].get<std::string>() + "\"");
+                error["title"].get<std::string>() + ": " +
+                error["detail"].get<std::string>() + "\"");
+            if (response.type == kGetMetadataById && error["status"] == "404")
+              response.data[L"invalid_id"] = L"true";
           }
         }
       }
