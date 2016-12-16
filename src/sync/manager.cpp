@@ -152,8 +152,12 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
     case kGetMetadataById:
       ui::OnLibraryEntryChangeFailure(anime_id, response.data[L"error"]);
       if (response.data.count(L"invalid_id")) {
-        if (AnimeDatabase.DeleteItem(anime_id))
+        const bool in_list = anime_item && anime_item->IsInList();
+        if (AnimeDatabase.DeleteItem(anime_id)) {
           AnimeDatabase.SaveDatabase();
+          if (in_list)
+            AnimeDatabase.SaveList();
+        }
       } else {
         // Try making the other request, even though this one failed
         if (response.service_id == kMyAnimeList && anime_item) {
