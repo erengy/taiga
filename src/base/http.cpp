@@ -45,6 +45,10 @@ void Response::Clear() {
   body.clear();
 }
 
+unsigned int Response::GetStatusCategory() const {
+  return code - (code % 100);
+}
+
 std::wstring GenerateRequestId() {
   // Each HTTP request must have a unique ID, as there are many parts of the
   // application that rely on this assumption.

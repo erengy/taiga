@@ -105,7 +105,7 @@ bool HttpClient::OnHeadersAvailable() {
 }
 
 bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
-  LOG(LevelDebug, L"Redirecting... (" + address + L")");
+  LOG(LevelDebug, L"Location: " + address);
 
   switch (mode()) {
     case kHttpTaigaUpdateDownload: {

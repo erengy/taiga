@@ -79,6 +79,7 @@ public:
   virtual ~Response() {}
 
   void Clear();
+  unsigned int GetStatusCategory() const;
 
   unsigned int code;
 

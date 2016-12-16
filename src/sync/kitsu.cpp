@@ -285,7 +285,7 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
 
 bool Service::RequestSucceeded(Response& response,
                                const HttpResponse& http_response) {
-  switch (http_response.code - (http_response.code % 100)) {
+  switch (http_response.GetStatusCategory()) {
     // 200 OK
     // 201 Created
     // 202 Accepted

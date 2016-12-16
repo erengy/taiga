@@ -54,6 +54,7 @@ bool Client::GetResponseHeader(const std::wstring& header) {
 bool Client::ParseResponseHeader() {
   Url location;
   bool refresh = false;
+  const bool redirection = response_.GetStatusCategory() == 300;
 
   for (const auto& pair : response_.header) {
     std::wstring name = pair.first;
@@ -84,13 +85,14 @@ bool Client::ParseResponseHeader() {
       location.Crack(value);
       if (location.host.empty())  // relative URL
         location.host = request_.url.host;
-      if (OnRedirect(location.Build(), refresh))
-        return false;
+      if (redirection || refresh)
+        if (OnRedirect(location.Build(), refresh))
+          return false;
     }
   }
 
   // Redirection
-  if (!location.host.empty() && auto_redirect_ && !refresh) {
+  if (redirection && !refresh && auto_redirect_ && !location.host.empty()) {
     content_encoding_ = kContentEncodingNone;
     content_length_ = 0;
     current_length_ = 0;
