@@ -250,7 +250,7 @@ void Item::SetEnglishTitle(const std::wstring& title) {
 }
 
 void Item::InsertSynonym(const std::wstring& synonym) {
-  if (synonym == GetTitle() || synonym == GetEnglishTitle())
+  if (synonym.empty() || synonym == GetTitle() || synonym == GetEnglishTitle())
     return;
   metadata_.alternative.push_back(
       library::Title(library::kTitleTypeSynonym, synonym));
