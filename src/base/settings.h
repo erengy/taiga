@@ -57,6 +57,8 @@ public:
 
 protected:
   void InitializeKey(enum_t name, const wchar_t* default_value, const std::wstring& path);
+  std::wstring ReadValue(const pugi::xml_node& node_parent, const std::wstring& path,
+                         const bool attribute, const std::wstring& default_value);
   void ReadValue(const pugi::xml_node& node_parent, enum_t name);
   void WriteValue(const pugi::xml_node& node_parent, enum_t name);
 
