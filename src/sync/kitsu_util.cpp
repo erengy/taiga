@@ -31,6 +31,14 @@
 namespace sync {
 namespace kitsu {
 
+std::wstring DecodeSynopsis(std::string text) {
+  auto str = StrToWstr(text);
+  ReplaceString(str, L"\n\n", L"\r\n\r\n");
+  return str;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 int TranslateAgeRatingFrom(const std::string& value) {
   static const std::map<std::string, anime::AgeRating> table{
     {"G", anime::kAgeRatingG},

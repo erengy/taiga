@@ -438,7 +438,7 @@ int Service::ParseAnimeObject(const Json& json) const {
   anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(attributes, "showType")));
   anime_item.SetSlug(StrToWstr(JsonReadStr(attributes, "slug")));
   anime_item.SetDateStart(StrToWstr(JsonReadStr(attributes, "startDate")));
-  anime_item.SetSynopsis(StrToWstr(JsonReadStr(attributes, "synopsis")));
+  anime_item.SetSynopsis(DecodeSynopsis(JsonReadStr(attributes, "synopsis")));
 
   for (const auto& title : attributes["abbreviatedTitles"]) {
     anime_item.InsertSynonym(StrToWstr(title));

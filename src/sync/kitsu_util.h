@@ -26,7 +26,9 @@ class Item;
 
 namespace sync {
 namespace kitsu {
-  
+
+std::wstring DecodeSynopsis(std::string text);
+
 int TranslateAgeRatingFrom(const std::string& value);
 double TranslateSeriesRatingFrom(double value);
 double TranslateSeriesRatingTo(double value);
