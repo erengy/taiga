@@ -35,9 +35,7 @@ enum AppSettingName {
   kAppSettingNameFirst = 0,  // used for iteration
 
   // Meta
-  kMeta_Version_Major = 0,
-  kMeta_Version_Minor,
-  kMeta_Version_Revision,
+  kMeta_Version = 0,
 
   // Services
   kSync_ActiveService,

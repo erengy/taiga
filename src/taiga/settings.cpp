@@ -103,9 +103,7 @@ void AppSettings::InitializeMap() {
   #define INITKEY(name, def, path) InitializeKey(name, def, path);
 
   // Meta
-  INITKEY(kMeta_Version_Major, nullptr, L"meta/version/major");
-  INITKEY(kMeta_Version_Minor, nullptr, L"meta/version/minor");
-  INITKEY(kMeta_Version_Revision, nullptr, L"meta/version/revision");
+  INITKEY(kMeta_Version, nullptr, L"meta/version");
 
   // Services
   INITKEY(kSync_ActiveService, L"myanimelist", L"account/update/activeservice");
@@ -242,16 +240,23 @@ bool AppSettings::Load() {
 
   InitializeMap();
 
-  for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
+  for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i) {
     ReadValue(settings, i);
+  }
 
   // Meta
-  if (GetWstr(kMeta_Version_Major).empty())
-    Set(kMeta_Version_Major, ToWstr(Taiga.version.major));
-  if (GetWstr(kMeta_Version_Minor).empty())
-    Set(kMeta_Version_Minor, ToWstr(Taiga.version.minor));
-  if (GetWstr(kMeta_Version_Revision).empty())
-    Set(kMeta_Version_Revision, ToWstr(Taiga.version.patch));
+  if (GetWstr(kMeta_Version).empty()) {
+    // Try to read legacy values
+    const auto major = ReadValue(settings, L"meta/version/major", true, L"");
+    const auto minor = ReadValue(settings, L"meta/version/minor", true, L"");
+    const auto patch = ReadValue(settings, L"meta/version/revision", true, L"");
+    if (!major.empty() && !minor.empty() && !patch.empty()) {
+      const semaver::Version version(ToInt(major), ToInt(minor), ToInt(patch));
+      Set(kMeta_Version, StrToWstr(version.str()));
+    } else {
+      Set(kMeta_Version, StrToWstr(Taiga.version.str()));
+    }
+  }
 
   // Folders
   library_folders.clear();
@@ -328,12 +333,11 @@ bool AppSettings::Save() {
   xml_node settings = document.append_child(L"settings");
 
   // Meta
-  Set(kMeta_Version_Major, ToWstr(Taiga.version.major));
-  Set(kMeta_Version_Minor, ToWstr(Taiga.version.minor));
-  Set(kMeta_Version_Revision, ToWstr(Taiga.version.patch));
+  Set(kMeta_Version, StrToWstr(Taiga.version.str()));
 
-  for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i)
+  for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i) {
     WriteValue(settings, i);
+  }
 
   // Library folders
   xml_node folders = settings.child(L"anime").child(L"folders");
@@ -461,10 +465,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
 }
 
 void AppSettings::HandleCompatibility() {
-  const semaver::Version version(
-      GetInt(kMeta_Version_Major),
-      GetInt(kMeta_Version_Minor),
-      GetInt(kMeta_Version_Revision));
+  const semaver::Version version(WstrToStr(GetWstr(kMeta_Version)));
 
   if (version == Taiga.version)
     return;
