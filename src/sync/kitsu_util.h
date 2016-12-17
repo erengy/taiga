@@ -42,9 +42,9 @@ std::string TranslateMyStatusTo(int value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);
-void ViewDashboard();
+void ViewFeed();
+void ViewLibrary();
 void ViewProfile();
-void ViewRecommendations();
 void ViewUpcomingAnime();
 
 }  // namespace kitsu

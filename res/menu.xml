@@ -29,9 +29,9 @@
 	</menu>
 	<!-- Kitsu -->
 	<menu name="Kitsu">
-		<item name="Go to my dashboard"       action="KitsuViewDashboard()"/>
-		<item name="Go to my profile"         action="KitsuViewProfile()"/>
-		<item name="Go to my recommendations" action="KitsuViewRecommendations()"/>
+		<item name="Go to my feed"    action="KitsuViewFeed()"/>
+		<item name="Go to my library" action="KitsuViewLibrary()"/>
+		<item name="Go to my profile" action="KitsuViewProfile()"/>
 	</menu>
 	<!-- MyAnimeList -->
 	<menu name="MyAnimeList">

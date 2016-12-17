@@ -147,17 +147,18 @@ void ViewAnimePage(int anime_id) {
     ExecuteLink(GetAnimePage(*anime_item));
 }
 
-void ViewDashboard() {
+void ViewFeed() {
   ExecuteLink(kBaseUrl);
+}
+
+void ViewLibrary() {
+  ExecuteLink(kBaseUrl + L"/users/" +
+              Settings[taiga::kSync_Service_Kitsu_Username] + L"/library");
 }
 
 void ViewProfile() {
   ExecuteLink(kBaseUrl + L"/users/" +
               Settings[taiga::kSync_Service_Kitsu_Username]);
-}
-
-void ViewRecommendations() {
-  ExecuteLink(kBaseUrl + L"/recommendations");  // TODO
 }
 
 void ViewUpcomingAnime() {

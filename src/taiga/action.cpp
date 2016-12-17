@@ -136,16 +136,16 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"MalViewHistory") {
     sync::myanimelist::ViewHistory();
 
+  // KitsuViewFeed()
+  // KitsuViewLibrary()
   // KitsuViewProfile()
-  // KitsuViewDashboard()
-  // KitsuViewRecommendations()
   //   Opens up Kitsu user pages.
+  } else if (action == L"KitsuViewFeed") {
+    sync::kitsu::ViewFeed();
+  } else if (action == L"KitsuViewLibrary") {
+    sync::kitsu::ViewLibrary();
   } else if (action == L"KitsuViewProfile") {
     sync::kitsu::ViewProfile();
-  } else if (action == L"KitsuViewDashboard") {
-    sync::kitsu::ViewDashboard();
-  } else if (action == L"KitsuViewRecommendations") {
-    sync::kitsu::ViewRecommendations();
 
   //////////////////////////////////////////////////////////////////////////////
 
