@@ -20,6 +20,10 @@
 
 #include <string>
 
+namespace sync {
+enum ServiceId;
+}
+
 namespace taiga {
 
 enum PathType {
@@ -42,6 +46,8 @@ enum PathType {
   kPathUserLibrary
 };
 
+std::wstring GetUserDirectoryName(const sync::ServiceId service_id);
+std::wstring GetUserDirectoryName();
 std::wstring GetPath(PathType type);
 
 }  // namespace taiga

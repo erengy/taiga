@@ -395,7 +395,8 @@ bool Database::LoadList() {
 
   if (parse_result.status != pugi::status_ok) {
     if (parse_result.status == pugi::status_file_not_found) {
-      return CheckOldUserDirectory();
+      if (CheckOldUserDirectory())
+        return LoadList();
     } else {
       ui::DisplayErrorMessage(L"Could not read anime list.", path.c_str());
       return false;
@@ -634,19 +635,29 @@ void Database::UpdateItem(const HistoryItem& history_item) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Database::CheckOldUserDirectory() {
-  std::wstring path = taiga::GetPath(taiga::kPathUser) +
-                      taiga::GetCurrentUsername();
+  auto check_path = [](const std::wstring& path,
+                       const sync::ServiceId service_id) {
+    if (!FolderExists(path))
+      return false;
+    const auto new_path = taiga::GetPath(taiga::kPathUser) +
+                          taiga::GetUserDirectoryName(service_id);
+    LOG(LevelWarning, L"Renaming old user directory\n" +
+                      path + L"\n" + new_path);
+    return MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0;
+  };
 
-  if (FolderExists(path)) {
-    LOG(LevelWarning, L"Moving old user directory to its new place");
-    auto service_name = ServiceManager.GetServiceNameById(sync::kMyAnimeList);
-    std::wstring new_path = path + L"@" + service_name;
-    if (MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0) {
-      return LoadList();
-    }
+  // "Taiga\data\user\{username}"
+  if (check_path(taiga::GetPath(taiga::kPathUser) +
+                 taiga::GetCurrentUsername(),
+                 sync::kMyAnimeList) ||
+  // "Taiga\data\user\{username}@hummingbird"
+      check_path(taiga::GetPath(taiga::kPathUser) +
+                 taiga::GetCurrentUsername() + L"@hummingbird",
+                 sync::kKitsu)) {
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 void Database::HandleCompatibility(const std::wstring& meta_version) {

@@ -39,10 +39,13 @@ std::wstring GetDataPath() {
 #endif
 }
 
+std::wstring GetUserDirectoryName(const sync::ServiceId service_id) {
+  return GetCurrentUsername() + L"@" +
+         ServiceManager.service(service_id)->canonical_name();
+}
+
 std::wstring GetUserDirectoryName() {
-  std::wstring username = GetCurrentUsername();
-  auto service = GetCurrentService();
-  return username + L"@" + service->canonical_name();
+  return GetUserDirectoryName(GetCurrentServiceId());
 }
 
 std::wstring GetPath(PathType type) {
