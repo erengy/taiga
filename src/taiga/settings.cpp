@@ -244,19 +244,7 @@ bool AppSettings::Load() {
     ReadValue(settings, i);
   }
 
-  // Meta
-  if (GetWstr(kMeta_Version).empty()) {
-    // Try to read legacy values
-    const auto major = ReadValue(settings, L"meta/version/major", true, L"");
-    const auto minor = ReadValue(settings, L"meta/version/minor", true, L"");
-    const auto patch = ReadValue(settings, L"meta/version/revision", true, L"");
-    if (!major.empty() && !minor.empty() && !patch.empty()) {
-      const semaver::Version version(ToInt(major), ToInt(minor), ToInt(patch));
-      Set(kMeta_Version, StrToWstr(version.str()));
-    } else {
-      Set(kMeta_Version, StrToWstr(Taiga.version.str()));
-    }
-  }
+  ReadLegacyValues(settings);
 
   // Folders
   library_folders.clear();
@@ -324,6 +312,29 @@ bool AppSettings::Load() {
   Aggregator.LoadArchive();
 
   return result.status == pugi::status_ok;
+}
+
+void AppSettings::ReadLegacyValues(const xml_node& settings) {
+  // Meta
+  if (GetWstr(kMeta_Version).empty()) {
+    const auto major = ReadValue(settings, L"meta/version/major", true, L"");
+    const auto minor = ReadValue(settings, L"meta/version/minor", true, L"");
+    const auto patch = ReadValue(settings, L"meta/version/revision", true, L"");
+    if (!major.empty() && !minor.empty() && !patch.empty()) {
+      const semaver::Version version(ToInt(major), ToInt(minor), ToInt(patch));
+      Set(kMeta_Version, StrToWstr(version.str()));
+    } else {
+      Set(kMeta_Version, StrToWstr(Taiga.version.str()));
+    }
+  }
+
+  // Services
+  if (GetWstr(kSync_ActiveService) == L"hummingbird") {
+    Set(kSync_Service_Kitsu_Username,
+        ReadValue(settings, L"account/hummingbird/username", true, L""));
+    Set(kSync_Service_Kitsu_Password,
+        ReadValue(settings, L"account/hummingbird/password", true, L""));
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -544,6 +555,19 @@ void AppSettings::HandleCompatibility() {
         Set(kTorrent_Download_AppPath, app_path);
         LOG(LevelWarning, L"Changed BitTorrent client from deluge.exe to deluge-console.exe");
       }
+    }
+  }
+
+  if (version <= semaver::Version(1, 2, 5)) {
+    // Change active service to Kitsu
+    if (GetWstr(kSync_ActiveService) == L"hummingbird") {
+      Set(kSync_ActiveService, ServiceManager.GetServiceNameById(sync::kKitsu));
+    }
+
+    // Update mIRC channels
+    auto mirc_channels = GetWstr(kShare_Mirc_Channels);
+    if (ReplaceString(mirc_channels, L"#hummingbird", L"#kitsu")) {
+      Set(kShare_Mirc_Channels, mirc_channels);
     }
   }
 }

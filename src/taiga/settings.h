@@ -24,6 +24,10 @@
 
 #include "base/settings.h"
 
+namespace pugi {
+class xml_node;
+}
+
 namespace sync {
 class Service;
 enum ServiceId;
@@ -176,6 +180,7 @@ public:
 
 private:
   void InitializeMap();
+  void ReadLegacyValues(const pugi::xml_node& settings);
 };
 
 const sync::Service* GetCurrentService();
