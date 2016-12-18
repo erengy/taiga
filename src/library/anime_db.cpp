@@ -73,15 +73,24 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     std::map<enum_t, std::wstring> id_map;
 
     foreach_xmlnode_(id_node, node, L"id") {
-      auto name = id_node.attribute(L"name").as_string();
-      enum_t service_id = ServiceManager.GetServiceIdByName(name);
-      id_map[service_id] = id_node.child_value();
+      const std::wstring name = id_node.attribute(L"name").as_string();
+      if (name == L"hummingbird") {
+        id_map[sync::kKitsu] = id_node.child_value();
+      } else {
+        enum_t service_id = ServiceManager.GetServiceIdByName(name);
+        id_map[service_id] = id_node.child_value();
+      }
     }
 
     enum_t source = sync::kTaiga;
-    auto service = ServiceManager.service(XmlReadStrValue(node, L"source"));
-    if (service)
-      source = service->id();
+    const std::wstring source_name = XmlReadStrValue(node, L"source");
+    if (source_name == L"hummingbird") {
+      source = sync::kKitsu;
+    } else {
+      auto service = ServiceManager.service(source_name);
+      if (service)
+        source = service->id();
+    }
 
     if (source == sync::kTaiga) {
       auto current_service_id = taiga::GetCurrentServiceId();
@@ -648,6 +657,15 @@ void Database::HandleCompatibility(const std::wstring& meta_version) {
       LOG(LevelWarning, L"Clearing English titles");
       for (auto& item : items) {
         item.second.SetEnglishTitle(EmptyString());
+      }
+    }
+  }
+
+  if (version <= semaver::Version(1, 2, 5)) {
+    if (taiga::GetCurrentServiceId() == sync::kKitsu) {
+      LOG(LevelWarning, L"Clearing image URLs");
+      for (auto& item : items) {
+        item.second.SetImageUrl(EmptyString());
       }
     }
   }
