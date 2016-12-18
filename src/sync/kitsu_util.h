@@ -45,7 +45,6 @@ void ViewAnimePage(int anime_id);
 void ViewFeed();
 void ViewLibrary();
 void ViewProfile();
-void ViewUpcomingAnime();
 
 }  // namespace kitsu
 }  // namespace sync

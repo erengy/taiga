@@ -161,9 +161,5 @@ void ViewProfile() {
               Settings[taiga::kSync_Service_Kitsu_Username]);
 }
 
-void ViewUpcomingAnime() {
-  ExecuteLink(kBaseUrl + L"/anime/upcoming");  // TODO
-}
-
 }  // namespace kitsu
 }  // namespace sync

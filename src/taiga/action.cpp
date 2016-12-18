@@ -120,9 +120,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kMyAnimeList:
         sync::myanimelist::ViewUpcomingAnime();
         break;
-      case sync::kKitsu:
-        sync::kitsu::ViewUpcomingAnime();
-        break;
     }
 
   // MalViewPanel()

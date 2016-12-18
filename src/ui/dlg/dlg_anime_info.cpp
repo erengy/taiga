@@ -715,7 +715,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       add_info_lines(upcoming);
       content += L"\n\n";
     } else {
-      content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
+      if (taiga::GetCurrentServiceId() == sync::kMyAnimeList)
+        content += L"<a href=\"ViewUpcomingAnime()\">View upcoming anime</a>";
     }
 
     sys_link_.SetText(content);
