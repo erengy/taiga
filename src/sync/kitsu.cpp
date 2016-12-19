@@ -115,6 +115,8 @@ void Service::GetUser(Request& request, HttpRequest& http_request) {
 
   http_request.url.query[L"filter[name]"] =
       request.data[canonical_name_ + L"-username"];
+
+  UseSparseFieldsetsForUser(http_request);
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
@@ -130,6 +132,9 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   // sufficiently big number.
   http_request.url.query[L"page[offset]"] = L"0";
   http_request.url.query[L"page[limit]"] = L"100000";
+
+  UseSparseFieldsetsForAnime(http_request);
+  UseSparseFieldsetsForLibraryEntries(http_request);
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
@@ -137,6 +142,8 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
                           request.data[canonical_name_ + L"-id"];
 
   http_request.url.query[L"include"] = L"genres";
+
+  UseSparseFieldsetsForAnime(http_request);
 }
 
 void Service::SearchTitle(Request& request, HttpRequest& http_request) {
@@ -150,6 +157,8 @@ void Service::SearchTitle(Request& request, HttpRequest& http_request) {
   // is changed to reduce maximum_page_size.
   http_request.url.query[L"page[offset]"] = L"0";
   http_request.url.query[L"page[limit]"] = L"20";
+
+  UseSparseFieldsetsForAnime(http_request);
 }
 
 void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -161,6 +170,9 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.url.query[L"include"] = L"media,media.genres";
 
   http_request.body = BuildLibraryObject(request);
+
+  UseSparseFieldsetsForAnime(http_request);
+  UseSparseFieldsetsForLibraryEntries(http_request);
 }
 
 void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -181,6 +193,9 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.url.query[L"include"] = L"media,media.genres";
 
   http_request.body = BuildLibraryObject(request);
+
+  UseSparseFieldsetsForAnime(http_request);
+  UseSparseFieldsetsForLibraryEntries(http_request);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -383,6 +398,46 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
     attributes["status"] = TranslateMyStatusTo(ToInt(request.data[L"status"]));
 
   return StrToWstr(json.dump());
+}
+
+void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
+  // Requesting a restricted set of fields decreases response and download times
+  // in certain cases.
+  http_request.url.query[L"fields[anime]"] =
+      // attributes
+      L"abbreviatedTitles,"
+      L"ageRating,"
+      L"averageRating,"
+      L"canonicalTitle,"
+      L"endDate,"
+      L"episodeCount,"
+      L"episodeLength,"
+      L"posterImage,"
+      L"showType,"
+      L"slug,"
+      L"startDate,"
+      L"synopsis,"
+      L"titles,"
+      // relationships
+      L"genres";
+}
+
+void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const {
+  http_request.url.query[L"fields[libraryEntries]"] =
+      // attributes
+      L"progress,"
+      L"rating,"
+      L"reconsumeCount,"
+      L"reconsuming,"
+      L"status,"
+      L"updatedAt,"
+      // relationships
+      L"media";
+}
+
+void Service::UseSparseFieldsetsForUser(HttpRequest& http_request) const {
+  // We don't need any user information other than the ID and the name.
+  http_request.url.query[L"fields[users]"] = L"name";
 }
 
 void Service::ParseObject(const Json& json) const {

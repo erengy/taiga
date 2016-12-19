@@ -50,6 +50,9 @@ private:
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
   std::wstring BuildLibraryObject(Request& request) const;
+  void UseSparseFieldsetsForAnime(HttpRequest& http_request) const;
+  void UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const;
+  void UseSparseFieldsetsForUser(HttpRequest& http_request) const;
 
   void ParseObject(const Json& json) const;
   int ParseAnimeObject(const Json& json) const;
