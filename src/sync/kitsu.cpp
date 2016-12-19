@@ -125,6 +125,24 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   http_request.url.query[L"filter[user_id]"] = ToWstr(user_id_);
   http_request.url.query[L"filter[media_type]"] = L"Anime";
 
+  // We don't need to download the entire library; we just need to know about
+  // the entries that have changed since the last download. `filter[since]` is
+  // quite useful in this manner, but note that the following scenario results
+  // in an undesirable behavior:
+  //
+  // 1. Get library entries via client
+  // 2. Go to website and delete entry from library
+  // 3. Get library entries via client, using `filter[since]={...}`
+  // 4. Client doesn't know entry was deleted
+  //
+  // Our "solution" to this is to allow Taiga to download the entire library
+  // after each restart (i.e. last_synchronized_ is not saved on exit).
+  if (last_synchronized_ &&
+      Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary)) {
+    const auto date = GetDate(last_synchronized_ - (60 * 60 * 24));  // 1 day before, to be safe
+    http_request.url.query[L"filter[since]"] = std::wstring(date);
+  }
+
   http_request.url.query[L"include"] = L"media";
 
   // Kitsu's configuration sets JSONAPI's default_page_size to 10. The only way
@@ -230,7 +248,11 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  AnimeDatabase.ClearUserData();
+  if (!last_synchronized_ ||
+      !Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary)) {
+    AnimeDatabase.ClearUserData();
+  }
+  last_synchronized_ = time(nullptr);  // current time
 
   for (const auto& value : root["data"]) {
     ParseLibraryObject(value);

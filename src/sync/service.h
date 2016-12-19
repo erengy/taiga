@@ -98,6 +98,7 @@ protected:
   string_t name_;
   // User information
   User user_;
+  time_t last_synchronized_;
 };
 
 // Creates two overloaded functions: First one is to build a request, second

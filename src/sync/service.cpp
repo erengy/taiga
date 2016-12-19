@@ -35,7 +35,7 @@ Response::Response()
 ////////////////////////////////////////////////////////////////////////////////
 
 Service::Service()
-    : id_(0) {
+    : id_(0), last_synchronized_(0) {
 }
 
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {

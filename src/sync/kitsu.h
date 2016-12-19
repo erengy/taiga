@@ -26,7 +26,8 @@
 namespace sync {
 namespace kitsu {
 
-// API documentation: n/a
+// API documentation:
+// http://docs.kitsu17.apiary.io
 
 class Service : public sync::Service {
 public:

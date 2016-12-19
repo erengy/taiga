@@ -80,6 +80,7 @@ std::wstring ConvertRfc822ToLocal(const std::wstring& datetime);
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 
 Date GetDate();
+Date GetDate(time_t unix_time);
 std::wstring GetTime(LPCWSTR format = L"HH':'mm':'ss");
 
 Date GetDateJapan();

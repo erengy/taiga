@@ -49,6 +49,7 @@ enum AppSettingName {
   kSync_Service_Mal_UseHttps,
   kSync_Service_Kitsu_Username,
   kSync_Service_Kitsu_Password,
+  kSync_Service_Kitsu_PartialLibrary,
   kSync_Service_Kitsu_UseHttps,
 
   // Library

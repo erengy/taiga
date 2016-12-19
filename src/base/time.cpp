@@ -356,6 +356,16 @@ Date GetDate() {
   return Date(st.wYear, st.wMonth, st.wDay);
 }
 
+Date GetDate(time_t unix_time) {
+  std::tm tm;
+
+  if (localtime_s(&tm, &unix_time) == 0) {
+    return Date(1900 + tm.tm_year, tm.tm_mon + 1, tm.tm_mday);
+  }
+
+  return Date();
+}
+
 std::wstring GetTime(LPCWSTR format) {
   WCHAR buff[32];
   GetTimeFormat(LOCALE_SYSTEM_DEFAULT, 0, NULL, format, buff, 32);
