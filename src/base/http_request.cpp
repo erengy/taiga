@@ -144,11 +144,9 @@ bool Client::SetRequestOptions() {
     TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDS, optional_data_.c_str());
     TAIGA_CURL_SET_OPTION(CURLOPT_POSTFIELDSIZE, optional_data_.size());
     TAIGA_CURL_SET_OPTION(CURLOPT_POST, TRUE);
-    if (request_.method != L"POST") {
-      std::string custom_method = WstrToStr(request_.method);
-      TAIGA_CURL_SET_OPTION(CURLOPT_CUSTOMREQUEST, custom_method.c_str());
-    }
   }
+  const auto custom_method = WstrToStr(request_.method);
+  TAIGA_CURL_SET_OPTION(CURLOPT_CUSTOMREQUEST, custom_method.c_str());
 
   // Set referrer
   if (!referer_.empty()) {
