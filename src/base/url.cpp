@@ -138,7 +138,7 @@ void Url::Crack(std::wstring url) {
     for (const auto& parameter : parameters) {
       i = parameter.find(L"=", 0);
       if (i != std::wstring::npos) {
-        std::wstring name = parameter.substr(0, i);
+        std::wstring name = DecodeUrl(parameter.substr(0, i));
         std::wstring value = DecodeUrl(parameter.substr(i + 1));
         query.insert(std::make_pair(name, value));
       }
