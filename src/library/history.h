@@ -31,6 +31,7 @@ enum QueueSearchMode {
   kQueueSearchDateStart = 1,
   kQueueSearchDateEnd,
   kQueueSearchEpisode,
+  kQueueSearchNotes,
   kQueueSearchRewatchedTimes,
   kQueueSearchRewatching,
   kQueueSearchScore,
@@ -48,6 +49,7 @@ public:
   Optional<int> enable_rewatching;
   Optional<int> rewatched_times;
   Optional<std::wstring> tags;
+  Optional<std::wstring> notes;
 };
 
 class HistoryItem : public AnimeValues {

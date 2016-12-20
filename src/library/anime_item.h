@@ -104,6 +104,7 @@ public:
   const Date& GetMyDateEnd(bool check_queue = true) const;
   const std::wstring& GetMyLastUpdated() const;
   const std::wstring& GetMyTags(bool check_queue = true) const;
+  const std::wstring& GetMyNotes(bool check_queue = true) const;
 
   void SetMyId(const std::wstring& id);
   void SetMyLastWatchedEpisode(int number);
@@ -116,6 +117,7 @@ public:
   void SetMyDateEnd(const Date& date);
   void SetMyLastUpdated(const std::wstring& last_updated);
   void SetMyTags(const std::wstring& tags);
+  void SetMyNotes(const std::wstring& notes);
 
   //////////////////////////////////////////////////////////////////////////////
   // Local data

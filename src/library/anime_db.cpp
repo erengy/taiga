@@ -375,6 +375,7 @@ int Database::UpdateItem(const Item& new_item) {
     item->SetMyDateEnd(new_item.GetMyDateEnd());
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
+    item->SetMyNotes(new_item.GetMyNotes(false));
   }
 
   return item->GetId();
@@ -427,6 +428,7 @@ bool Database::LoadList() {
       anime_item.SetMyRewatching(XmlReadIntValue(node, L"rewatching"));
       anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"rewatching_ep"));
       anime_item.SetMyTags(XmlReadStrValue(node, L"tags"));
+      anime_item.SetMyNotes(XmlReadStrValue(node, L"notes"));
       anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"last_updated"));
 
       UpdateItem(anime_item);
@@ -471,6 +473,7 @@ bool Database::SaveList(bool include_database) {
       XmlWriteIntValue(node, L"rewatching", item.GetMyRewatching(false));
       XmlWriteIntValue(node, L"rewatching_ep", item.GetMyRewatchingEp());
       XmlWriteStrValue(node, L"tags", item.GetMyTags(false).c_str());
+      XmlWriteStrValue(node, L"notes", item.GetMyNotes(false).c_str());
       XmlWriteStrValue(node, L"last_updated", item.GetMyLastUpdated().c_str());
     }
   }
@@ -607,6 +610,10 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   // Edit tags
   if (history_item.tags) {
     anime_item->SetMyTags(*history_item.tags);
+  }
+  // Edit notes
+  if (history_item.notes) {
+    anime_item->SetMyNotes(*history_item.notes);
   }
   // Edit dates
   if (history_item.date_start) {

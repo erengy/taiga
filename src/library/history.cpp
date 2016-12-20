@@ -74,6 +74,9 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
     if (item.tags)
       if (anime->GetMyTags() == *item.tags)
         item.tags.Reset();
+    if (item.notes)
+      if (anime->GetMyNotes() == *item.notes)
+        item.notes.Reset();
     if (item.date_start)
       if (anime->GetMyDateStart() == *item.date_start)
         item.date_start.Reset();
@@ -89,6 +92,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
           !item.enable_rewatching &&
           !item.rewatched_times &&
           !item.tags &&
+          !item.notes &&
           !item.date_start &&
           !item.date_finish)
         return;
@@ -115,6 +119,8 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
               it->rewatched_times = *item.rewatched_times;
             if (item.tags)
               it->tags = *item.tags;
+            if (item.notes)
+              it->notes = *item.notes;
             if (item.date_start)
               it->date_start = *item.date_start;
             if (item.date_finish)
@@ -228,6 +234,11 @@ HistoryItem* HistoryQueue::FindItem(int anime_id, int search_mode) {
         // Episode
         case kQueueSearchEpisode:
           if (it->episode)
+            return &(*it);
+          break;
+        // Notes
+        case kQueueSearchNotes:
+          if (it->notes)
             return &(*it);
           break;
         // Rewatched times
@@ -415,6 +426,7 @@ void History::ReadQueue(const pugi::xml_document& document) {
     READ_ATTRIBUTE_INT(history_item.enable_rewatching, L"enable_rewatching");
     READ_ATTRIBUTE_INT(history_item.rewatched_times, L"rewatched_times");
     READ_ATTRIBUTE_STR(history_item.tags, L"tags");
+    READ_ATTRIBUTE_STR(history_item.notes, L"notes");
     READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
     READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
 
@@ -518,6 +530,7 @@ bool History::Save() {
     APPEND_ATTRIBUTE_INT(L"enable_rewatching", history_item.enable_rewatching);
     APPEND_ATTRIBUTE_INT(L"rewatched_times", history_item.rewatched_times);
     APPEND_ATTRIBUTE_STR(L"tags", history_item.tags);
+    APPEND_ATTRIBUTE_STR(L"notes", history_item.notes);
     APPEND_ATTRIBUTE_DATE(L"date_start", history_item.date_start);
     APPEND_ATTRIBUTE_DATE(L"date_finish", history_item.date_finish);
     #undef APPEND_ATTRIBUTE_DATE

@@ -96,6 +96,7 @@ class MyInformation {
   Date date_finish;
   std::wstring last_updated;
   std::wstring tags;
+  std::wstring notes;
 };
 
 // For all kinds of other temporary information

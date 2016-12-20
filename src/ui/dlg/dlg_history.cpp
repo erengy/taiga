@@ -213,6 +213,8 @@ void HistoryDialog::RefreshList() {
                    L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Rewatching");
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
+    if (it->notes)
+      AppendString(details, L"Notes: \"" + *it->notes + L"\"");
     if (it->date_start)
       AppendString(details, L"Date started: " + std::wstring(*it->date_start));
     if (it->date_finish)

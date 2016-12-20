@@ -408,6 +408,8 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
 
   auto& attributes = json["data"]["attributes"];
 
+  if (request.data.count(L"notes"))
+    attributes["notes"] = WstrToStr(request.data[L"notes"]);
   if (request.data.count(L"episode"))
     attributes["progress"] = ToInt(request.data[L"episode"]);
   if (request.data.count(L"score"))
@@ -447,6 +449,7 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
 void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const {
   http_request.url.query[L"fields[libraryEntries]"] =
       // attributes
+      L"notes,"
       L"progress,"
       L"rating,"
       L"reconsumeCount,"
@@ -572,6 +575,7 @@ int Service::ParseLibraryObject(const Json& json) const {
   anime_item.AddtoUserList();
 
   anime_item.SetMyId(ToWstr(library_id));
+  anime_item.SetMyNotes(StrToWstr(JsonReadStr(attributes, "notes")));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
   anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadStr(attributes, "rating")));
   anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));

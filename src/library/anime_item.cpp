@@ -465,9 +465,19 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
     return EmptyString();
 
   HistoryItem* history_item = check_queue ?
-    SearchHistory(kQueueSearchTags) : nullptr;
+      SearchHistory(kQueueSearchTags) : nullptr;
 
   return history_item ? *history_item->tags : my_info_->tags;
+}
+
+const std::wstring& Item::GetMyNotes(bool check_queue) const {
+  if (!my_info_.get())
+    return EmptyString();
+
+  HistoryItem* history_item = check_queue ?
+      SearchHistory(kQueueSearchNotes) : nullptr;
+
+  return history_item ? *history_item->notes : my_info_->notes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -536,6 +546,12 @@ void Item::SetMyTags(const std::wstring& tags) {
   assert(my_info_.get());
 
   my_info_->tags = tags;
+}
+
+void Item::SetMyNotes(const std::wstring& notes) {
+  assert(my_info_.get());
+
+  my_info_->notes = notes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -147,6 +147,8 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
     request.data[L"rewatched_times"] = ToWstr(*anime_values.rewatched_times);
   if (anime_values.tags)
     request.data[L"tags"] = *anime_values.tags;
+  if (anime_values.notes)
+    request.data[L"notes"] = *anime_values.notes;
 
   ServiceManager.MakeRequest(request);
 }

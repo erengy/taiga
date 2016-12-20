@@ -45,6 +45,7 @@ void DummyAnime::Initialize() {
   SetMyScore(10);
   SetMyStatus(anime::kCompleted);
   SetMyTags(L"comedy, romance, drama");
+  SetMyNotes(L"Best series ever!");
 }
 
 void DummyEpisode::Initialize() {

@@ -352,10 +352,20 @@ void PageMyInfo::Refresh(int anime_id) {
   combobox.SetCurSel(10 - anime_item->GetMyScore());
   combobox.SetWindowHandle(nullptr);
 
-  // Tags
+  // Tags / Notes
   win::Edit edit = GetDlgItem(IDC_EDIT_ANIME_TAGS);
-  edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
-  edit.SetText(anime_item->GetMyTags());
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+      SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Tags:");
+      edit.SetCueBannerText(L"Enter tags here, separated by a comma (e.g. tag1, tag2)");
+      edit.SetText(anime_item->GetMyTags());
+      break;
+    case sync::kKitsu:
+      SetDlgItemText(IDC_STATIC_TAGSNOTES, L"Notes:");
+      edit.SetCueBannerText(L"Enter your notes about this anime");
+      edit.SetText(anime_item->GetMyNotes());
+      break;
+  }
   edit.SetWindowHandle(nullptr);
 
   // Dates
@@ -461,8 +471,15 @@ bool PageMyInfo::Save() {
   // Status
   history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;
 
-  // Tags
-  history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
+  // Tags / Notes
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+      history_item.tags = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
+      break;
+    case sync::kKitsu:
+      history_item.notes = GetDlgItemText(IDC_EDIT_ANIME_TAGS);
+      break;
+  }
 
   // Start date
   if (start_date_changed_) {
