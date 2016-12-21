@@ -58,6 +58,7 @@ void OnLibraryEntryAdd(int id);
 void OnLibraryEntryChange(int id);
 void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
+void OnLibraryGetSeason();
 void OnLibrarySearchTitle(int id, const string_t& results);
 void OnLibraryEntryChangeFailure(int id, const string_t& reason);
 void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved);

@@ -118,6 +118,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       ChangeStatusText(error);
       DlgTorrent.EnableInput();
       break;
+    case taiga::kHttpServiceGetSeason:
     case taiga::kHttpSeasonsGet:
       ChangeStatusText(error);
       DlgSeason.EnableInput();
@@ -202,6 +203,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpFeedDownload:
       status = L"Downloading torrent file...";
       break;
+    case taiga::kHttpServiceGetSeason:
     case taiga::kHttpSeasonsGet:
       status = L"Downloading anime season data...";
       break;
@@ -311,6 +313,11 @@ void OnLibraryEntryImageChange(int id) {
 
   if (DlgSeason.IsWindow())
     DlgSeason.RefreshList(true);
+}
+
+void OnLibraryGetSeason() {
+  DlgSeason.RefreshList();
+  DlgSeason.EnableInput();
 }
 
 void OnLibrarySearchTitle(int id, const string_t& results) {

@@ -18,6 +18,8 @@
 
 #include "base/string.h"
 #include "library/anime_db.h"
+#include "library/anime_season.h"
+#include "library/discover.h"
 #include "library/history.h"
 #include "sync/kitsu.h"
 #include "sync/manager.h"
@@ -238,6 +240,32 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       // doesn't provide us enough information.
       if (response.service_id == kMyAnimeList && anime_item) {
         SearchTitle(anime_item->GetTitle(), anime_id);
+      }
+      break;
+    }
+
+    case kGetSeason: {
+      const auto current_page = ToInt(request.data[L"page_offset"]);
+      const auto next_page = ToInt(response.data[L"page_offset"]);
+
+      if (current_page == 0)  // first page
+        SeasonDatabase.items.clear();
+
+      std::vector<std::wstring> ids;
+      Split(response.data[L"ids"], L",", ids);
+      for (const auto& id_str : ids) {
+        const int id = ToInt(id_str);
+        SeasonDatabase.items.push_back(id);
+        ui::OnLibraryEntryChange(id);
+      }
+
+      if (next_page > 0) {
+        GetSeason(anime::Season(request.data[L"season"] + L" " +
+                                request.data[L"year"]), next_page);
+      } else {
+        ui::ClearStatusText();
+        ui::OnLibraryGetSeason();
+        // TODO: Get missing images
       }
       break;
     }

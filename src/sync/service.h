@@ -41,6 +41,7 @@ enum RequestType {
   kAuthenticateUser,
   kGetUser,
   kGetMetadataById,
+  kGetSeason,
   kSearchTitle,
   kAddLibraryEntry,
   kDeleteLibraryEntry,

@@ -150,6 +150,15 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
   return true;
 }
 
+bool SeasonDatabase::LoadSeasonFromMemory(const anime::Season& season) {
+  current_season = season;
+
+  items.clear();
+  Review();
+
+  return true;
+}
+
 bool SeasonDatabase::IsRefreshRequired() {
   int count = 0;
   bool required = false;

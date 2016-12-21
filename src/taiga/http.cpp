@@ -187,6 +187,7 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
     case kHttpServiceAuthenticateUser:
     case kHttpServiceGetUser:
     case kHttpServiceGetMetadataById:
+    case kHttpServiceGetSeason:
     case kHttpServiceSearchTitle:
     case kHttpServiceAddLibraryEntry:
     case kHttpServiceDeleteLibraryEntry:
@@ -213,6 +214,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     case kHttpServiceAuthenticateUser:
     case kHttpServiceGetUser:
     case kHttpServiceGetMetadataById:
+    case kHttpServiceGetSeason:
     case kHttpServiceSearchTitle:
     case kHttpServiceAddLibraryEntry:
     case kHttpServiceDeleteLibraryEntry:

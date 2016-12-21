@@ -23,12 +23,17 @@
 #include "library/history.h"
 #include "taiga/http.h"
 
+namespace anime {
+class Season;
+}
+
 namespace sync {
 
 bool AuthenticateUser();
 void GetUser();
 void GetLibraryEntries();
 void GetMetadataById(int id);
+void GetSeason(const anime::Season season, const int offset);
 void SearchTitle(string_t title, int id);
 void Synchronize();
 void UpdateLibraryEntry(AnimeValues& anime_values, int id,

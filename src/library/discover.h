@@ -34,6 +34,8 @@ public:
   bool LoadFile(const std::wstring& filename);
   bool LoadString(const std::wstring& data);
 
+  bool LoadSeasonFromMemory(const anime::Season& season);
+
   // Checkes if a significant portion of season data is empty and requires
   // refreshing.
   bool IsRefreshRequired();

@@ -87,10 +87,17 @@ BOOL SeasonDialog::OnInitDialog() {
   // Load the last selected season
   const auto last_season = Settings[taiga::kApp_Seasons_LastSeason];
   if (!last_season.empty()) {
-    if (SeasonDatabase.LoadSeason(last_season)) {
-      SeasonDatabase.Review();
-    } else {
-      Settings.Set(taiga::kApp_Seasons_LastSeason, std::wstring());
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        if (SeasonDatabase.LoadSeason(last_season)) {
+          SeasonDatabase.Review();
+        } else {
+          Settings.Set(taiga::kApp_Seasons_LastSeason, std::wstring());
+        }
+        break;
+      case sync::kKitsu:
+        SeasonDatabase.LoadSeasonFromMemory(last_season);
+        break;
     }
   }
 
@@ -120,7 +127,14 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Refresh data
     case 101:
-      RefreshData();
+      switch (taiga::GetCurrentServiceId()) {
+        case sync::kMyAnimeList:
+          RefreshData();
+          break;
+        case sync::kKitsu:
+          GetData();
+          break;
+      }
       return TRUE;
   }
 
@@ -534,6 +548,14 @@ void SeasonDialog::EnableInput(bool enable) {
   list_.Enable(enable);
 }
 
+void SeasonDialog::GetData() {
+  EnableInput(false);
+  ui::ChangeStatusText(L"Retrieving latest data for " +
+      SeasonDatabase.current_season.GetString() + L" anime season...");
+
+  sync::GetSeason(SeasonDatabase.current_season, 0);
+}
+
 void SeasonDialog::RefreshData(int anime_id) {
   ui::SetSharedCursor(IDC_WAIT);
 
@@ -664,7 +686,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 }
 
 void SeasonDialog::RefreshStatus() {
-  if (SeasonDatabase.items.empty())
+  if (!SeasonDatabase.current_season)
     return;
 
   std::wstring text = SeasonDatabase.current_season.GetString() + L", from " +
@@ -678,7 +700,7 @@ void SeasonDialog::RefreshToolbar() {
       SeasonDatabase.current_season.GetString().c_str() :
       L"Select season");
 
-  toolbar_.EnableButton(101, !SeasonDatabase.items.empty());
+  toolbar_.EnableButton(101, SeasonDatabase.current_season);
 
   std::wstring text = L"Group by: ";
   switch (Settings.GetInt(taiga::kApp_Seasons_GroupBy)) {

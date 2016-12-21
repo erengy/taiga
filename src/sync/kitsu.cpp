@@ -68,6 +68,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
     BUILD_HTTP_REQUEST(kDeleteLibraryEntry, DeleteLibraryEntry);
     BUILD_HTTP_REQUEST(kGetLibraryEntries, GetLibraryEntries);
     BUILD_HTTP_REQUEST(kGetMetadataById, GetMetadataById);
+    BUILD_HTTP_REQUEST(kGetSeason, GetSeason);
     BUILD_HTTP_REQUEST(kSearchTitle, SearchTitle);
     BUILD_HTTP_REQUEST(kUpdateLibraryEntry, UpdateLibraryEntry);
   }
@@ -82,6 +83,7 @@ void Service::HandleResponse(Response& response, HttpResponse& http_response) {
       HANDLE_HTTP_RESPONSE(kDeleteLibraryEntry, DeleteLibraryEntry);
       HANDLE_HTTP_RESPONSE(kGetLibraryEntries, GetLibraryEntries);
       HANDLE_HTTP_RESPONSE(kGetMetadataById, GetMetadataById);
+      HANDLE_HTTP_RESPONSE(kGetSeason, GetSeason);
       HANDLE_HTTP_RESPONSE(kSearchTitle, SearchTitle);
       HANDLE_HTTP_RESPONSE(kUpdateLibraryEntry, UpdateLibraryEntry);
     }
@@ -160,6 +162,18 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
                           request.data[canonical_name_ + L"-id"];
 
   http_request.url.query[L"include"] = L"genres";
+
+  UseSparseFieldsetsForAnime(http_request);
+}
+
+void Service::GetSeason(Request& request, HttpRequest& http_request) {
+  http_request.url.path = L"/edge/anime";
+
+  http_request.url.query[L"filter[season]"] = request.data[L"season"];
+  http_request.url.query[L"filter[year]"] = request.data[L"year"];
+
+  http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
+  http_request.url.query[L"page[limit]"] = L"20";
 
   UseSparseFieldsetsForAnime(http_request);
 }
@@ -274,6 +288,24 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   ParseGenres(root["included"], anime_id);
 }
 
+void Service::GetSeason(Response& response, HttpResponse& http_response) {
+  Json root;
+
+  if (!ParseResponseBody(http_response.body, response, root))
+    return;
+
+  for (const auto& value : root["data"]) {
+    const auto anime_id = ParseAnimeObject(value);
+    AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
+  }
+
+  const auto next = JsonReadStr(root["links"], "next");
+  if (!next.empty()) {
+    Url url = StrToWstr(next);
+    response.data[L"page_offset"] = url.query[L"page[offset]"];
+  }
+}
+
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
   Json root;
 
@@ -282,8 +314,6 @@ void Service::SearchTitle(Response& response, HttpResponse& http_response) {
 
   for (const auto& value : root["data"]) {
     const auto anime_id = ParseAnimeObject(value);
-
-    // We return a list of IDs so that we can display the results afterwards
     AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
   }
 }
@@ -321,6 +351,7 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
       return true;
     case kGetLibraryEntries:
     case kGetMetadataById:
+    case kGetSeason:
     case kSearchTitle:
       return !access_token_.empty();
   }
@@ -597,6 +628,9 @@ bool Service::ParseResponseBody(const std::wstring& body,
       break;
     case kGetMetadataById:
       response.data[L"error"] = L"Could not parse media object";
+      break;
+    case kGetSeason:
+      response.data[L"error"] = L"Could not parse season data";
       break;
     case kSearchTitle:
       response.data[L"error"] = L"Could not parse search results";

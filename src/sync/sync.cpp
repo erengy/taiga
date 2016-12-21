@@ -20,6 +20,7 @@
 #include "base/string.h"
 #include "base/url.h"
 #include "library/anime_db.h"
+#include "library/anime_season.h"
 #include "library/anime_util.h"
 #include "library/history.h"
 #include "sync/manager.h"
@@ -89,6 +90,17 @@ void GetMetadataById(int id) {
   if (!AddAuthenticationToRequest(request))
     return;
   AddServiceDataToRequest(request, id);
+  ServiceManager.MakeRequest(request);
+}
+
+void GetSeason(const anime::Season season, const int offset) {
+  Request request(kGetSeason);
+  SetActiveServiceForRequest(request);
+  if (!AddAuthenticationToRequest(request))
+    return;
+  request.data[L"year"] = ToWstr(season.year);
+  request.data[L"season"] = ToLower_Copy(season.GetName());
+  request.data[L"page_offset"] = ToWstr(offset);
   ServiceManager.MakeRequest(request);
 }
 
@@ -220,6 +232,8 @@ RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode) {
       return kGetUser;
     case taiga::kHttpServiceGetMetadataById:
       return kGetMetadataById;
+    case taiga::kHttpServiceGetSeason:
+      return kGetSeason;
     case taiga::kHttpServiceSearchTitle:
       return kSearchTitle;
     case taiga::kHttpServiceAddLibraryEntry:
@@ -243,6 +257,8 @@ taiga::HttpClientMode RequestTypeToClientMode(RequestType request_type) {
       return taiga::kHttpServiceGetUser;
     case kGetMetadataById:
       return taiga::kHttpServiceGetMetadataById;
+    case kGetSeason:
+      return taiga::kHttpServiceGetSeason;
     case kSearchTitle:
       return taiga::kHttpServiceSearchTitle;
     case kAddLibraryEntry:

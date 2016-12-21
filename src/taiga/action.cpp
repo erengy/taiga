@@ -533,11 +533,24 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // Season_Load(file)
   //   Loads season data.
   } else if (action == L"Season_Load") {
-    if (SeasonDatabase.LoadSeason(body)) {
-      Settings.Set(taiga::kApp_Seasons_LastSeason,
-                   SeasonDatabase.current_season.GetString());
-      SeasonDatabase.Review();
-      ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        if (SeasonDatabase.LoadSeason(body)) {
+          Settings.Set(taiga::kApp_Seasons_LastSeason,
+                       SeasonDatabase.current_season.GetString());
+          SeasonDatabase.Review();
+          ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
+        }
+        break;
+      case sync::kKitsu:
+        if (SeasonDatabase.LoadSeasonFromMemory(body)) {
+          if (SeasonDatabase.items.empty()) {
+            ui::DlgSeason.GetData();
+          } else {
+            ui::OnSeasonLoad(false);
+          }
+        }
+        break;
     }
 
   // Season_GroupBy(group)

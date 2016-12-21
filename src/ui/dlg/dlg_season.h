@@ -59,6 +59,7 @@ public:
   LRESULT OnToolbarNotify(LPARAM lParam);
 
   void EnableInput(bool enable = true);
+  void GetData();
   void RefreshData(int anime_id = 0);
   void RefreshList(bool redraw_only = false);
   void RefreshStatus();
