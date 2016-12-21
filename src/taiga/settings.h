@@ -174,7 +174,7 @@ public:
   void ApplyChanges(const std::wstring& previous_service,
                     const std::wstring& previous_user,
                     const std::wstring& previous_theme);
-  void HandleCompatibility();
+  bool HandleCompatibility();
   void RestoreDefaults();
 
   std::vector<std::wstring> library_folders;

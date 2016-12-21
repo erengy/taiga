@@ -475,11 +475,11 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
   timers.UpdateIntervalsFromSettings();
 }
 
-void AppSettings::HandleCompatibility() {
+bool AppSettings::HandleCompatibility() {
   const semaver::Version version(WstrToStr(GetWstr(kMeta_Version)));
 
   if (version == Taiga.version)
-    return;
+    return false;
 
   LOG(LevelWarning, L"Upgraded from v" + StrToWstr(version.str()) +
                     L" to v" + StrToWstr(Taiga.version.str()));
@@ -570,6 +570,8 @@ void AppSettings::HandleCompatibility() {
       Set(kShare_Mirc_Channels, mirc_channels);
     }
   }
+
+  return true;
 }
 
 void AppSettings::RestoreDefaults() {

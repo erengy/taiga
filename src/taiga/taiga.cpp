@@ -158,7 +158,8 @@ void App::LoadData() {
   MediaPlayers.Load();
 
   if (Settings.Load())
-    Settings.HandleCompatibility();
+    if (Settings.HandleCompatibility())
+      Settings.Save();
 
   ui::Theme.Load();
   ui::Menus.Load();
