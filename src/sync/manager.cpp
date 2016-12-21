@@ -21,6 +21,7 @@
 #include "library/anime_season.h"
 #include "library/discover.h"
 #include "library/history.h"
+#include "library/resource.h"
 #include "sync/kitsu.h"
 #include "sync/manager.h"
 #include "sync/myanimelist.h"
@@ -265,7 +266,9 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
       } else {
         ui::ClearStatusText();
         ui::OnLibraryGetSeason();
-        // TODO: Get missing images
+        for (const auto& id : SeasonDatabase.items) {
+          ImageDatabase.Load(id, true, true);
+        }
       }
       break;
     }
