@@ -544,6 +544,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         break;
       case sync::kKitsu:
         if (SeasonDatabase.LoadSeasonFromMemory(body)) {
+          Settings.Set(taiga::kApp_Seasons_LastSeason,
+                       SeasonDatabase.current_season.GetString());
           if (SeasonDatabase.items.empty()) {
             ui::DlgSeason.GetData();
           } else {
