@@ -31,6 +31,15 @@
 namespace sync {
 namespace kitsu {
 
+// Kitsu requires use of the JSON API media type: http://jsonapi.org/format/
+constexpr auto kJsonApiMediaType = L"application/vnd.api+json";
+
+// Kitsu's configuration sets JSON API's maximum_page_size to 20. Asking for
+// more results will return an error: "Limit exceeds maximum page size of 20."
+// This means that our application could break if the server's configuration is
+// changed to reduce maximum_page_size.
+constexpr auto kJsonApiMaximumPageSize = 20;
+
 Service::Service() {
   host_ = L"kitsu.io/api";
 
@@ -49,8 +58,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   if (Settings.GetBool(taiga::kSync_Service_Kitsu_UseHttps))
     http_request.url.protocol = base::http::kHttps;
 
-  // Kitsu requires use of the JSON API media type: http://jsonapi.org/format/
-  http_request.header[L"Accept"] = L"application/vnd.api+json";
+  http_request.header[L"Accept"] = kJsonApiMediaType;
   http_request.header[L"Accept-Charset"] = L"utf-8";
   http_request.header[L"Accept-Encoding"] = L"gzip";
 
@@ -173,7 +181,7 @@ void Service::GetSeason(Request& request, HttpRequest& http_request) {
   http_request.url.query[L"filter[year]"] = request.data[L"year"];
 
   http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
-  http_request.url.query[L"page[limit]"] = L"20";
+  http_request.url.query[L"page[limit]"] = ToWstr(kJsonApiMaximumPageSize);
 
   UseSparseFieldsetsForAnime(http_request);
 }
@@ -183,12 +191,8 @@ void Service::SearchTitle(Request& request, HttpRequest& http_request) {
 
   http_request.url.query[L"filter[text]"] = request.data[L"title"];
 
-  // Kitsu's configuration sets JSONAPI's maximum_page_size to 20. Asking for
-  // more results will return an error: "Limit exceeds maximum page size of 20."
-  // This means that our application could break if the server's configuration
-  // is changed to reduce maximum_page_size.
   http_request.url.query[L"page[offset]"] = L"0";
-  http_request.url.query[L"page[limit]"] = L"20";
+  http_request.url.query[L"page[limit]"] = ToWstr(kJsonApiMaximumPageSize);
 
   UseSparseFieldsetsForAnime(http_request);
 }
@@ -197,7 +201,7 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/library-entries";
 
   http_request.method = L"POST";
-  http_request.header[L"Content-Type"] = L"application/vnd.api+json";
+  http_request.header[L"Content-Type"] = kJsonApiMediaType;
 
   http_request.url.query[L"include"] = L"media,media.genres";
 
@@ -212,7 +216,7 @@ void Service::DeleteLibraryEntry(Request& request, HttpRequest& http_request) {
                           request.data[canonical_name_ + L"-library-id"];
 
   http_request.method = L"DELETE";
-  http_request.header[L"Content-Type"] = L"application/vnd.api+json";
+  http_request.header[L"Content-Type"] = kJsonApiMediaType;
 }
 
 void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
@@ -220,7 +224,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
                           request.data[canonical_name_ + L"-library-id"];
 
   http_request.method = L"PATCH";
-  http_request.header[L"Content-Type"] = L"application/vnd.api+json";
+  http_request.header[L"Content-Type"] = kJsonApiMediaType;
 
   http_request.url.query[L"include"] = L"media,media.genres";
 
