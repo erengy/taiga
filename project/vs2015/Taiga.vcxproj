@@ -276,7 +276,7 @@
     <ClInclude Include="..\..\deps\src\curl\multi.h" />
     <ClInclude Include="..\..\deps\src\curl\stdcheaders.h" />
     <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h" />
-    <ClInclude Include="..\..\deps\src\json\json.hpp" />
+    <ClInclude Include="..\..\deps\src\json\src\json.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp" />
     <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h" />

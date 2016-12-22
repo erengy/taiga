@@ -651,7 +651,7 @@
     <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\json\json.hpp">
+    <ClInclude Include="..\..\deps\src\json\src\json.hpp">
       <Filter>deps\json</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp">
