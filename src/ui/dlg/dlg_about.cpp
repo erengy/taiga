@@ -18,7 +18,7 @@
 
 #include <curl/curlver.h>
 #include <json/src/json.hpp>
-#include <pugixml/pugixml.hpp>
+#include <pugixml/src/pugixml.hpp>
 #include <utf8proc/utf8proc.h>
 #include <zlib/zlib.h>
 

@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include <pugixml/pugixml.hpp>
+#include <pugixml/src/pugixml.hpp>
 
 using pugi::xml_document;
 using pugi::xml_node;

@@ -163,7 +163,7 @@
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp">
+    <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp">
       <Filter>deps\pugixml</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp">
@@ -654,10 +654,10 @@
     <ClInclude Include="..\..\deps\src\json\src\json.hpp">
       <Filter>deps\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp">
+    <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp">
       <Filter>deps\pugixml</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp">
+    <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp">
       <Filter>deps\pugixml</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h">
