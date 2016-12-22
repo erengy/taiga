@@ -25,3 +25,7 @@
 [submodule "windows"]
 	path = deps/src/windows
 	url = https://github.com/erengy/windows.git
+
+[submodule "zlib"]
+	path = deps/src/zlib
+	url = https://github.com/madler/zlib.git
