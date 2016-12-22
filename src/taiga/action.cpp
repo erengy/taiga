@@ -546,10 +546,9 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         if (SeasonDatabase.LoadSeasonFromMemory(body)) {
           Settings.Set(taiga::kApp_Seasons_LastSeason,
                        SeasonDatabase.current_season.GetString());
+          ui::OnSeasonLoad(false);
           if (SeasonDatabase.items.empty()) {
             ui::DlgSeason.GetData();
-          } else {
-            ui::OnSeasonLoad(false);
           }
         }
         break;
