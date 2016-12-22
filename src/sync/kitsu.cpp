@@ -183,6 +183,10 @@ void Service::GetSeason(Request& request, HttpRequest& http_request) {
   http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
   http_request.url.query[L"page[limit]"] = ToWstr(kJsonApiMaximumPageSize);
 
+  // We don't actually need the results to be sorted. But without this
+  // parameter, we get inconsistent ordering and duplicate objects.
+  http_request.url.query[L"sort"] = L"-user_count";
+
   UseSparseFieldsetsForAnime(http_request);
 }
 
