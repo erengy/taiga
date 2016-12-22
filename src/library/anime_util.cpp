@@ -72,12 +72,15 @@ bool IsFinishedAiring(const Item& item) {
     return true;
 
   if (!IsValidDate(item.GetDateEnd()))
-    return false;
+    if (item.GetEpisodeCount() != 1)
+      return false;
 
   if (!IsAiredYet(item))
     return false;
 
-  return GetDateJapan() > item.GetDateEnd();
+  const auto& date = item.GetEpisodeCount() == 1 ?
+      item.GetDateStart() : item.GetDateEnd();
+  return GetDateJapan() > date;
 }
 
 int EstimateDuration(const Item& item) {
