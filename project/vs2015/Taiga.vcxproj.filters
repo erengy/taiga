@@ -672,7 +672,7 @@
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h">
       <Filter>deps\utf8proc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.h">
+    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c">
       <Filter>deps\utf8proc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\windows\win\accessibility.h">

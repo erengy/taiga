@@ -57,7 +57,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_WCHAR_MODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_WCHAR_MODE;UTF8PROC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
       <AdditionalIncludeDirectories>..\..\deps\src;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -81,7 +81,7 @@
       <Optimization>MinSpace</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_WCHAR_MODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_WCHAR_MODE;UTF8PROC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
@@ -283,7 +283,7 @@
     <ClInclude Include="..\..\deps\src\semaver\semaver\string.h" />
     <ClInclude Include="..\..\deps\src\semaver\semaver\version.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h" />
-    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.h" />
+    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c" />
     <ClInclude Include="..\..\deps\src\windows\win\accessibility.h" />
     <ClInclude Include="..\..\deps\src\windows\win\application.h" />
     <ClInclude Include="..\..\deps\src\windows\win\automation.h" />

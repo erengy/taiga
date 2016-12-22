@@ -22,6 +22,10 @@
 	path = deps/src/semaver
 	url = https://github.com/erengy/semaver.git
 
+[submodule "utf8proc"]
+	path = deps/src/utf8proc
+	url = https://github.com/JuliaLang/utf8proc.git
+
 [submodule "windows"]
 	path = deps/src/windows
 	url = https://github.com/erengy/windows.git
