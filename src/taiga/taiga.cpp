@@ -48,7 +48,6 @@ App::App()
 #else
       debug_mode(false),
 #endif
-      logged_in(false),
       current_tip_type(kTipTypeDefault),
       play_status(kPlayStatusStopped) {
 

@@ -116,7 +116,7 @@ void SearchTitle(string_t title, int id) {
 }
 
 void Synchronize() {
-  bool authenticated = Taiga.logged_in;
+  bool authenticated = UserAuthenticated();
 
   if (!authenticated) {
     authenticated = AuthenticateUser();
@@ -220,6 +220,16 @@ bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id) 
 
 void SetActiveServiceForRequest(Request& request) {
   request.service_id = taiga::GetCurrentServiceId();
+}
+
+bool UserAuthenticated() {
+  auto service = taiga::GetCurrentService();
+  return service->authenticated();
+}
+
+void InvalidateUserAuthentication() {
+  auto service = taiga::GetCurrentService();
+  service->set_authenticated(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

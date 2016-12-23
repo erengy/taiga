@@ -195,7 +195,7 @@ void HistoryQueue::Check(bool automatic) {
     return;
   }
 
-  if (!Taiga.logged_in) {
+  if (!sync::UserAuthenticated()) {
     sync::AuthenticateUser();
     return;
   }

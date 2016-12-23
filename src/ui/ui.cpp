@@ -33,6 +33,7 @@
 #include "library/history.h"
 #include "sync/manager.h"
 #include "sync/service.h"
+#include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -478,7 +479,7 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
       DlgAnimeList.listview.SortFromSettings();
   }
 
-  if (!Taiga.logged_in) {
+  if (!sync::UserAuthenticated()) {
     auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
     if (anime_item) {
       ChangeStatusText(L"\"" + anime_item->GetTitle() +

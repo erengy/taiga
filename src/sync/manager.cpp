@@ -141,6 +141,7 @@ void Manager::HandleHttpResponse(HttpResponse& http_response) {
 
 void Manager::HandleError(Response& response, HttpResponse& http_response) {
   Request& request = requests_[http_response.uid];
+  Service& service = *services_[response.service_id].get();
 
   int anime_id = ::anime::ID_UNKNOWN;
   if (request.data.count(L"taiga-id"))
@@ -150,7 +151,7 @@ void Manager::HandleError(Response& response, HttpResponse& http_response) {
   switch (response.type) {
     case kAuthenticateUser:
     case kGetUser:
-      Taiga.logged_in = false;
+      service.set_authenticated(false);
       ui::OnLogout();
       ui::ChangeStatusText(response.data[L"error"]);
       break;
@@ -219,7 +220,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
             break;
         }
       }
-      Taiga.logged_in = true;
+      service.set_authenticated(true);
       ui::OnLogin();
       if (response.service_id == kKitsu) {
         // We need to make an additional request to get the user ID

@@ -45,6 +45,8 @@ bool AddAuthenticationToRequest(Request& request);
 bool AddServiceDataToRequest(Request& request, int id);
 bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id);
 void SetActiveServiceForRequest(Request& request);
+bool UserAuthenticated();
+void InvalidateUserAuthentication();
 
 RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode);
 taiga::HttpClientMode RequestTypeToClientMode(RequestType request_type);

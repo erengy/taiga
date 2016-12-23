@@ -85,10 +85,13 @@ public:
   virtual void HandleResponse(Response& response, HttpResponse& http_response) = 0;
   virtual bool RequestNeedsAuthentication(RequestType request_type) const;
 
+  bool authenticated() const;
   const string_t& host() const;
   enum_t id() const;
   const string_t& canonical_name() const;
   const string_t& name() const;
+
+  void set_authenticated(bool authenticated);
 
 protected:
   // API end-point
@@ -98,6 +101,7 @@ protected:
   string_t canonical_name_;
   string_t name_;
   // User information
+  bool authenticated_;
   User user_;
   time_t last_synchronized_;
 };

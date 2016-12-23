@@ -31,6 +31,7 @@
 #include "library/history.h"
 #include "library/resource.h"
 #include "sync/manager.h"
+#include "sync/sync.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
@@ -459,7 +460,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
     History.Load();
     CurrentEpisode.Set(anime::ID_UNKNOWN);
     Stats.CalculateAll();
-    Taiga.logged_in = false;
+    sync::InvalidateUserAuthentication();
     ui::OnSettingsUserChange();
     ui::OnSettingsServiceChange();
   } else {
