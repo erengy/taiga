@@ -45,14 +45,16 @@ Manager::~Manager() {
   // Services will automatically free themselves
 }
 
-const Service* Manager::service(ServiceId service_id) {
-  if (services_.count(service_id))
-    return services_[service_id].get();
+Service* Manager::service(ServiceId service_id) const {
+  auto it = services_.find(service_id);
+  
+  if (it != services_.end())
+    return it->second.get();
 
   return nullptr;
 }
 
-const Service* Manager::service(const string_t& canonical_name) {
+Service* Manager::service(const string_t& canonical_name) const {
   for (const auto& pair : services_)
     if (canonical_name == pair.second.get()->canonical_name())
       return pair.second.get();
@@ -60,7 +62,7 @@ const Service* Manager::service(const string_t& canonical_name) {
   return nullptr;
 }
 
-ServiceId Manager::GetServiceIdByName(const string_t& canonical_name) {
+ServiceId Manager::GetServiceIdByName(const string_t& canonical_name) const {
   auto found_service = service(canonical_name);
 
   if (found_service)
@@ -69,7 +71,7 @@ ServiceId Manager::GetServiceIdByName(const string_t& canonical_name) {
   return kTaiga;
 }
 
-string_t Manager::GetServiceNameById(ServiceId service_id) {
+string_t Manager::GetServiceNameById(ServiceId service_id) const {
   auto found_service = service(service_id);
 
   if (found_service)

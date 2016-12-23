@@ -42,11 +42,11 @@ public:
   void HandleHttpError(HttpResponse& http_response, string_t error);
   void HandleHttpResponse(HttpResponse& http_response);
 
-  const Service* service(ServiceId service_id);
-  const Service* service(const string_t& canonical_name);
+  Service* service(ServiceId service_id) const;
+  Service* service(const string_t& canonical_name) const;
 
-  ServiceId GetServiceIdByName(const string_t& canonical_name);
-  string_t GetServiceNameById(ServiceId service_id);
+  ServiceId GetServiceIdByName(const string_t& canonical_name) const;
+  string_t GetServiceNameById(ServiceId service_id) const;
 
 private:
   void HandleError(Response& response, HttpResponse& http_response);

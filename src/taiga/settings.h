@@ -184,7 +184,7 @@ private:
   void ReadLegacyValues(const pugi::xml_node& settings);
 };
 
-const sync::Service* GetCurrentService();
+sync::Service* GetCurrentService();
 sync::ServiceId GetCurrentServiceId();
 const std::wstring GetCurrentUsername();
 const std::wstring GetCurrentPassword();

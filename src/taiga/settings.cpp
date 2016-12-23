@@ -594,7 +594,7 @@ void AppSettings::RestoreDefaults() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const sync::Service* GetCurrentService() {
+sync::Service* GetCurrentService() {
   std::wstring service_name = Settings[kSync_ActiveService];
   return ServiceManager.service(service_name);
 }
