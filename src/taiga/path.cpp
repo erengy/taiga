@@ -18,6 +18,7 @@
 
 #include <map>
 
+#include "base/file.h"
 #include "base/string.h"
 #include "sync/manager.h"
 #include "taiga/path.h"
@@ -27,16 +28,20 @@
 namespace taiga {
 
 std::wstring GetDataPath() {
+  std::wstring path;
+
 #ifdef TAIGA_PORTABLE
   // Return current path in portable mode
-  return AddTrailingSlash(GetPathOnly(Taiga.GetModulePath())) + L"data\\";
+  path = GetPathOnly(Taiga.GetModulePath());
 #else
   // Return %AppData% folder
-  WCHAR buffer[MAX_PATH];
-  if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                nullptr, SHGFP_TYPE_CURRENT, buffer)))
-    return AddTrailingSlash(buffer) + TAIGA_APP_NAME + L"\\";
+  path = GetKnownFolderPath(FOLDERID_RoamingAppData);
+  AddTrailingSlash(path);
+  path += TAIGA_APP_NAME;
 #endif
+
+  AddTrailingSlash(path);
+  return path + L"data\\";
 }
 
 std::wstring GetUserDirectoryName(const sync::ServiceId service_id) {

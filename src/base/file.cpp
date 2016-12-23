@@ -361,6 +361,18 @@ std::wstring GetDefaultAppPath(const std::wstring& extension,
   return path.empty() ? default_value : path;
 }
 
+std::wstring GetKnownFolderPath(REFKNOWNFOLDERID rfid) {
+  std::wstring output;
+
+  PWSTR path = nullptr;
+  if (SUCCEEDED(SHGetKnownFolderPath(rfid, KF_FLAG_CREATE, nullptr, &path))) {
+    output = path;
+  }
+  CoTaskMemFree(path);
+
+  return output;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
