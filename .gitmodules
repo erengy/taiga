@@ -10,6 +10,10 @@
 	path = deps/src/anitomy
 	url = https://github.com/erengy/anitomy.git
 
+[submodule "curl"]
+	path = deps/src/curl
+	url = https://github.com/curl/curl.git
+
 [submodule "json"]
 	path = deps/src/json
 	url = https://github.com/nlohmann/json.git

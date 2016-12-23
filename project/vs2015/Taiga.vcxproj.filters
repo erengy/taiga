@@ -624,31 +624,31 @@
     <ClInclude Include="..\..\deps\src\base64\base64.h">
       <Filter>deps\base64</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curl.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curl.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curlbuild.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlbuild.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curlrules.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlrules.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curlver.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlver.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\easy.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\easy.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\mprintf.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\mprintf.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\multi.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\multi.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\stdcheaders.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\stdcheaders.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\typecheck-gcc.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\json\src\json.hpp">
