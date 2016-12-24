@@ -143,6 +143,14 @@ void Synchronize() {
   }
 
   if (History.queue.GetItemCount()) {
+    if (taiga::GetCurrentServiceId() == sync::kKitsu) {
+      // Library IDs can be missing if the user has recently upgraded from a
+      // previous installation without Kitsu support.
+      if (anime::ListHasMissingIds()) {
+        GetLibraryEntries();
+        return;
+      }
+    }
     History.queue.Check(false);
   } else {
     GetLibraryEntries();

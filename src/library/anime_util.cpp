@@ -46,6 +46,17 @@ bool IsValidId(int anime_id) {
   return anime_id > ID_UNKNOWN;
 }
 
+bool ListHasMissingIds() {
+  for (const auto& pair : AnimeDatabase.items) {
+    const auto& item = pair.second;
+    if (item.GetMyStatus(false) != kNotInList && item.GetMyId().empty()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 SeriesStatus GetAiringStatus(const Item& item) {
