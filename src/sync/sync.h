@@ -48,6 +48,7 @@ void SetActiveServiceForRequest(Request& request);
 bool UserAuthenticated();
 void InvalidateUserAuthentication();
 
+bool ServiceSupportsRequestType(RequestType request_type);
 RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode);
 taiga::HttpClientMode RequestTypeToClientMode(RequestType request_type);
 

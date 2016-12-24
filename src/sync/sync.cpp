@@ -74,6 +74,17 @@ void GetUser() {
 }
 
 void GetLibraryEntries() {
+  const auto service = taiga::GetCurrentService();
+  switch (service->id()) {
+    case sync::kKitsu:
+      if (service->user().id.empty()) {
+        ui::ChangeStatusText(
+            L"Cannot get anime list. User ID is not available.");
+        return;
+      }
+      break;
+  }
+
   ui::ChangeStatusText(L"Downloading anime list...");
   ui::EnableDialogInput(ui::kDialogMain, false);
 
@@ -121,8 +132,13 @@ void Synchronize() {
   if (!authenticated) {
     authenticated = AuthenticateUser();
     // Special case where we allow downloading lists without authentication
-    if (!authenticated && !taiga::GetCurrentUsername().empty())
-      GetLibraryEntries();
+    if (!authenticated && !taiga::GetCurrentUsername().empty()) {
+      if (ServiceSupportsRequestType(kGetUser)) {
+        GetUser();
+      } else {
+        GetLibraryEntries();
+      }
+    }
     return;
   }
 
@@ -233,6 +249,23 @@ void InvalidateUserAuthentication() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+bool ServiceSupportsRequestType(RequestType request_type) {
+  const auto service_id = taiga::GetCurrentServiceId();
+
+  switch (request_type) {
+    case kGetUser:
+    case kGetSeason:
+      switch (service_id) {
+        case sync::kKitsu:
+          return true;
+        default:
+          return false;
+      }
+    default:
+      return true;
+  }
+}
 
 RequestType ClientModeToRequestType(taiga::HttpClientMode client_mode) {
   switch (client_mode) {

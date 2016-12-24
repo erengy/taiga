@@ -233,7 +233,11 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
 
     case kGetUser: {
       ui::OnLogin();
-      Synchronize();
+      if (service.authenticated()) {
+        Synchronize();
+      } else {
+        GetLibraryEntries();
+      }
       break;
     }
 
