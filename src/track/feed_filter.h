@@ -35,6 +35,7 @@ enum FeedFilterElement {
   kFeedFilterElement_Meta_Episodes,
   kFeedFilterElement_Meta_DateStart,
   kFeedFilterElement_Meta_DateEnd,
+  kFeedFilterElement_Meta_Groups,
   kFeedFilterElement_User_Status,
   kFeedFilterElement_User_Tags,
   kFeedFilterElement_Local_EpisodeAvailable,
