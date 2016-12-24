@@ -208,7 +208,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
 
   switch (response.type) {
     case kAuthenticateUser: {
-      string_t username = response.data[service.canonical_name() + L"-username"];
+      const auto& username = service.user().username;
       if (!username.empty()) {
         // Update settings with the returned value for the correct letter case
         switch (response.service_id) {

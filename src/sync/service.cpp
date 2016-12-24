@@ -62,6 +62,10 @@ const string_t& Service::name() const {
   return name_;
 }
 
+const User& Service::user() const {
+  return user_;
+}
+
 void Service::set_authenticated(bool authenticated) {
   authenticated_ = authenticated;
 }

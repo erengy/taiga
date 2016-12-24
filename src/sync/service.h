@@ -90,6 +90,7 @@ public:
   enum_t id() const;
   const string_t& canonical_name() const;
   const string_t& name() const;
+  const User& user() const;
 
   void set_authenticated(bool authenticated);
 

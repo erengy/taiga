@@ -64,7 +64,6 @@ private:
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 
   string_t access_token_;
-  int user_id_;
 };
 
 }  // namespace kitsu

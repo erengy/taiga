@@ -46,8 +46,6 @@ Service::Service() {
   id_ = kKitsu;
   canonical_name_ = L"kitsu";
   name_ = L"Kitsu";
-
-  user_id_ = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +130,7 @@ void Service::GetUser(Request& request, HttpRequest& http_request) {
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/library-entries";
 
-  http_request.url.query[L"filter[user_id]"] = ToWstr(user_id_);
+  http_request.url.query[L"filter[user_id]"] = user_.id;
   http_request.url.query[L"filter[media_type]"] = L"Anime";
 
   // We don't need to download the entire library; we just need to know about
@@ -258,10 +256,8 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
 
   const auto& user = root["data"].front();
 
-  user_id_ = ToInt(user["id"].get<std::string>());
-
-  response.data[canonical_name_ + L"-username"] =
-      StrToWstr(user["attributes"]["name"]);
+  user_.id = StrToWstr(JsonReadStr(user, "id"));
+  user_.username = StrToWstr(JsonReadStr(user["attributes"], "name"));
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -432,7 +428,7 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
         {"user", {
           {"data", {
             {"type", "users"},
-            {"id", ToStr(user_id_)},
+            {"id", WstrToStr(user_.id)},
           }}
         }}
       }}

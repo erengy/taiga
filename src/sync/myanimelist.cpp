@@ -203,8 +203,8 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 // Response handlers
 
 void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
-  response.data[canonical_name_ + L"-username"] =
-      InStr(http_response.body, L"<username>", L"</username>");
+  user_.id = InStr(http_response.body, L"<id>", L"</id>");
+  user_.username = InStr(http_response.body, L"<username>", L"</username>");
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
