@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "library/anime.h"
 #include "library/anime_episode.h"
 
 class Date;
@@ -32,6 +33,7 @@ class Season;
 
 bool IsValidId(int anime_id);
 
+SeriesStatus GetAiringStatus(const Item& item);
 bool IsAiredYet(const Item& item);
 bool IsFinishedAiring(const Item& item);
 int EstimateDuration(const Item& item);

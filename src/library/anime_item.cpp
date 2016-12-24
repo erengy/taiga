@@ -86,13 +86,7 @@ int Item::GetAiringStatus(bool check_date) const {
   if (!check_date)
     return metadata_.status;
 
-  // TODO: Move
-  if (IsFinishedAiring(*this))
-    return kFinishedAiring;
-  if (IsAiredYet(*this))
-    return kAiring;
-
-  return kNotYetAired;
+  return anime::GetAiringStatus(*this);
 }
 
 const std::wstring& Item::GetTitle() const {

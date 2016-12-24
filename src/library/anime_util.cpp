@@ -48,39 +48,58 @@ bool IsValidId(int anime_id) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool IsAiredYet(const Item& item) {
-  if (item.GetAiringStatus(false) != kNotYetAired)
-    return true;
+SeriesStatus GetAiringStatus(const Item& item) {
+  auto assume_worst_case = [](Date date) {
+    if (!date.month) date.month = 12;
+    if (!date.day) date.day = 31;
+    return date;
+  };
+
+  const Date now = GetDateJapan();
 
   if (!IsValidDate(item.GetDateStart()))
-    return false;
+    return kNotYetAired;
+  const Date start = assume_worst_case(item.GetDateStart());
+  if (now <= start)
+    return kNotYetAired;
 
-  Date date_japan = GetDateJapan();
-  Date date_start = item.GetDateStart();
+  // We don't need to check the end date for single-episode anime
+  if (item.GetEpisodeCount() == 1)
+    return kFinishedAiring;
 
-  // Assume the worst case
-  if (!date_start.month)
-    date_start.month = 12;
-  if (!date_start.day)
-    date_start.day = 31;
+  if (!IsValidDate(item.GetDateEnd()))
+    return kAiring;
+  const Date end = assume_worst_case(item.GetDateEnd());
+  if (now <= end)
+    return kAiring;
 
-  return date_japan >= date_start;
+  return kFinishedAiring;
+}
+
+bool IsAiredYet(const Item& item) {
+  switch (item.GetAiringStatus(false)) {
+    case kFinishedAiring:
+    case kAiring:
+      return true;
+  }
+
+  switch (GetAiringStatus(item)) {
+    case kFinishedAiring:
+    case kAiring:
+      return true;
+  }
+
+  return false;
 }
 
 bool IsFinishedAiring(const Item& item) {
   if (item.GetAiringStatus(false) == kFinishedAiring)
     return true;
 
-  if (!IsValidDate(item.GetDateEnd()))
-    if (item.GetEpisodeCount() != 1)
-      return false;
+  if (GetAiringStatus(item) == kFinishedAiring)
+    return true;
 
-  if (!IsAiredYet(item))
-    return false;
-
-  const auto& date = item.GetEpisodeCount() == 1 ?
-      item.GetDateStart() : item.GetDateEnd();
-  return GetDateJapan() > date;
+  return false;
 }
 
 int EstimateDuration(const Item& item) {
