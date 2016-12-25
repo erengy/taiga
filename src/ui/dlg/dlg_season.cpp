@@ -336,7 +336,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
           line_count = 6;
           break;
         case sync::kKitsu:
-          line_count = 5;
+          line_count = 4;
           break;
       }
 
@@ -448,7 +448,9 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(L"Aired:");
       DRAWLINE(L"Episodes:");
       DRAWLINE(L"Genres:");
-      DRAWLINE(L"Producers:");
+      if (current_service == sync::kMyAnimeList) {
+        DRAWLINE(L"Producers:");
+      }
       DRAWLINE(L"Score:");
       if (current_service == sync::kMyAnimeList) {
         DRAWLINE(L"Popularity:");
@@ -465,7 +467,9 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(text);
       DRAWLINE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
-      DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
+      if (current_service == sync::kMyAnimeList) {
+        DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
+      }
       DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
       if (current_service == sync::kMyAnimeList) {
         DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
@@ -759,7 +763,7 @@ void SeasonDialog::SetViewMode(int mode) {
       line_count = 6;
       break;
     case sync::kKitsu:
-      line_count = 5;
+      line_count = 4;
       break;
   }
   const int synopsis_line_count = 9 - line_count;
