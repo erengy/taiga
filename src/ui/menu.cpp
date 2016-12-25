@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/string.h>
+
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
@@ -39,7 +41,7 @@ void MenuList::Load() {
   menu_list_.menus.clear();
 
   std::wstring menu_resource;
-  ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
+  win::ReadStringFromResource(L"IDR_MENU", L"DATA", menu_resource);
 
   xml_document document;
   xml_parse_result parse_result = document.load(menu_resource.data());

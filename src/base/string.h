@@ -116,4 +116,3 @@ void AppendString(std::wstring& str0, const std::wstring& str1, const std::wstri
 const std::wstring& EmptyString();
 std::wstring PadChar(std::wstring str, const wchar_t ch, const size_t len);
 std::wstring PushString(const std::wstring& str1, const std::wstring& str2);
-void ReadStringFromResource(LPCWSTR name, LPCWSTR type, std::wstring& output);

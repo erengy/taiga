@@ -846,15 +846,3 @@ wstring PushString(const wstring& str1, const wstring& str2) {
     return str1 + str2;
   }
 }
-
-void ReadStringFromResource(LPCWSTR name, LPCWSTR type, wstring& output) {
-  HRSRC hResInfo = FindResource(nullptr, name,  type);
-  HGLOBAL hResHandle = LoadResource(nullptr, hResInfo);
-  DWORD dwSize = SizeofResource(nullptr, hResInfo);
-
-  const char* lpData = static_cast<char*>(LockResource(hResHandle));
-  string temp(lpData, dwSize);
-  output = StrToWstr(temp);
-
-  FreeResource(hResInfo);
-}
