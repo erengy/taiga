@@ -791,26 +791,26 @@ int EstimateEpisodeCount(const Item& item) {
   // Estimate using airing dates of TV series
   number = std::max(number, EstimateLastAiredEpisodeNumber(item));
 
-  // Given all TV series aired since 2000, most of them have their episodes
+  // Given all TV series aired in 2006-2016, most of them have their episodes
   // spanning one or two seasons. Following is a table of top ten values:
   //
   //   Episodes    Seasons    Percent
   //   ------------------------------
-  //         12          1      23.6%
-  //         13          1      20.2%
-  //         26          2      15.4%
-  //         24          2       6.4%
-  //         25          2       5.0%
-  //         52          4       4.4%
-  //         51          4       3.1%
-  //         11          1       2.6%
-  //         50          4       2.3%
+  //         12          1      34.2%
+  //         13          1      18.5%
+  //         26          2       9.5%
+  //         25          2       5.5%
+  //         24          2       5.4%
+  //         52          4       2.9%
+  //         11          1       2.7%
+  //         10          1       2.6%
+  //         51          4       2.4%
   //         39          3       1.4%
   //   ------------------------------
-  //   Total:                   84.6%
+  //   Total:                   85.1%
   //
   // With that in mind, we can normalize our output at several points.
-  if (number < 12) return 13;
+  if (number < 12) return 12;
   if (number < 24) return 26;
   if (number < 50) return 52;
 
