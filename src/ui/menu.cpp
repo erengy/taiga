@@ -312,8 +312,15 @@ void MenuList::UpdateSeason() {
   auto menu = menu_list_.FindMenu(L"SeasonSelect");
   if (menu) {
     menu->items.clear();
-    const auto& season_min = SeasonDatabase.available_seasons.first;
-    const auto& season_max = SeasonDatabase.available_seasons.second;
+    const auto season_min = SeasonDatabase.available_seasons.first;
+    auto season_max = SeasonDatabase.available_seasons.second;
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kKitsu: {
+        const auto next_season = ++anime::Season(GetDate());
+        season_max = std::max(season_max, next_season);
+        break;
+      }
+    }
     auto create_item = [](win::Menu& menu, const anime::Season& season) {
       menu.CreateItem(L"Season_Load(" + season.GetString() + L")",
                       season.GetString(), L"",
