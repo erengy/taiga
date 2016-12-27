@@ -447,8 +447,16 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
     attributes["notes"] = WstrToStr(request.data[L"notes"]);
   if (request.data.count(L"episode"))
     attributes["progress"] = ToInt(request.data[L"episode"]);
-  if (request.data.count(L"score"))
-    attributes["rating"] = TranslateMyRatingTo(ToInt(request.data[L"score"]));
+  if (request.data.count(L"score")) {
+    const auto score = ToInt(request.data[L"score"]);
+    if (score > 0) {
+      attributes["rating"] = TranslateMyRatingTo(score);
+    } else {
+      // Kitsu requires the rating value to be greater than zero. To remove the
+      // rating, we need to send `null` rather than `0`.
+      attributes["rating"] = nullptr;
+    }
+  }
   if (request.data.count(L"rewatched_times"))
     attributes["reconsumeCount"] = ToInt(request.data[L"rewatched_times"]);
   if (request.data.count(L"enable_rewatching"))
