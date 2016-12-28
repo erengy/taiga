@@ -45,7 +45,7 @@
 #include "ui/ui.h"
 
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
-  LOG(LevelDebug, action);
+  LOGD(action);
 
   std::wstring body;
   size_t pos = action.find('(');
@@ -586,6 +586,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // Unknown
   } else {
-    LOG(LevelWarning, L"Unknown action: " + action);
+    LOGW(L"Unknown action: " + action);
   }
 }

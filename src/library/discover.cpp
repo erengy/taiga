@@ -60,8 +60,7 @@ bool SeasonDatabase::LoadFile(const std::wstring& filename) {
   std::string document;
 
   if (!ReadFromFile(path, document)) {
-    LOG(LevelWarning, L"Could not find anime season file.\n"
-                      L"Path: " + path);
+    LOGW(L"Could not find anime season file.\nPath: " + path);
 
     // Try to download from remote location
     if (!remote_location.empty()) {
@@ -122,9 +121,9 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
     } else {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map[current_service_id].empty()) {
-        LOG(LevelDebug, current_season.GetString() +
-                        L" - No ID for current service: " +
-                        XmlReadStrValue(node, L"title"));
+        LOGD(current_season.GetString() +
+             L" - No ID for current service: " +
+             XmlReadStrValue(node, L"title"));
         continue;
       }
 
@@ -206,9 +205,9 @@ void SeasonDatabase::Review(bool hide_nsfw) {
         invalid = true;
       if (invalid) {
         items.erase(items.begin() + i--);
-        LOG(LevelDebug, L"Removed item: #" + ToWstr(anime_id) +
-                        L" \"" + anime_item->GetTitle() +
-                        L"\" (" + std::wstring(anime_start) + L")");
+        LOGD(L"Removed item: #" + ToWstr(anime_id) +
+             L" \"" + anime_item->GetTitle() +
+             L"\" (" + std::wstring(anime_start) + L")");
       }
     }
   }
@@ -225,8 +224,7 @@ void SeasonDatabase::Review(bool hide_nsfw) {
     if (anime_start.year && anime_start.month &&
         anime_start >= date_start && anime_start <= date_end) {
       items.push_back(pair.second.GetId());
-      LOGR(LevelDebug,
-           L"\t<anime>\n"
+      LOGD(L"\t<anime>\n"
            L"\t\t<type>" + ToWstr(pair.second.GetType()) + L"</type>\n"
            L"\t\t<id name=\"myanimelist\">" + ToWstr(pair.second.GetId()) + L"</id>\n"
            L"\t\t<id name=\"kitsu\"></id>\n"

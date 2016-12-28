@@ -70,16 +70,17 @@ BOOL App::InitInstance() {
   // Initialize logger
   auto module_path = GetModulePath();
   auto path = AddTrailingSlash(GetPathOnly(module_path));
-  Logger.SetOutputPath(path + TAIGA_APP_NAME L".log");
-  Logger.SetSeverityLevel(debug_mode ? LevelDebug : LevelWarning);
-  LOG(LevelInformational, L"Version " + StrToWstr(version.str()) +
-                          L" (" + GetFileLastModifiedDate(module_path) + L")");
+  using monolog::Level;
+  monolog::log.set_path(WstrToStr(path + TAIGA_APP_NAME L".log"));
+  monolog::log.set_level(debug_mode ? Level::Debug : Level::Warning);
+  LOGI(L"Version " + StrToWstr(version.str()) +
+       L" (" + GetFileLastModifiedDate(module_path) + L")");
 
   // Check another instance
   if (!allow_multiple_instances) {
     if (CheckInstance(L"Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258",
                       L"TaigaMainW")) {
-      LOG(LevelDebug, L"Another instance of Taiga is running.");
+      LOGD(L"Another instance of Taiga is running.");
       return FALSE;
     }
   }
@@ -141,12 +142,12 @@ void App::ParseCommandLineArguments() {
 
     if (argument == L"-debug") {
       debug_mode = true;
-      LOG(LevelDebug, argument);
+      LOGD(argument);
     } else if (argument == L"-allowmultipleinstances") {
       allow_multiple_instances = true;
-      LOG(LevelDebug, argument);
+      LOGD(argument);
     } else {
-      LOG(LevelWarning, L"Invalid argument: " + argument);
+      LOGW(L"Invalid argument: " + argument);
     }
   }
 

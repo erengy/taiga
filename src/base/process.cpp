@@ -242,8 +242,7 @@ BOOL GetProcessFiles(ULONG process_id,
                              objectTypeInfo->Name.Length / 2);
       if (IsEqual(type_name, L"File")) {
         objectTypeFile = handle.ObjectTypeIndex;
-        LOG(LevelDebug, L"objectTypeFile is set to " +
-                        ToWstr(objectTypeFile) + L".");
+        LOGD(L"objectTypeFile is set to " + ToWstr(objectTypeFile));
       } else {
         free(objectTypeInfo);
         CloseHandle(dupHandle);

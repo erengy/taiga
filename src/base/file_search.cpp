@@ -53,7 +53,7 @@ bool FileSearchHelper::Search(const std::wstring& root,
 
   do {
     if (handle == INVALID_HANDLE_VALUE) {
-      LOG(LevelError, win::FormatError(GetLastError()) + L"\nPath: " + path);
+      LOGE(win::FormatError(GetLastError()) + L"\nPath: " + path);
       SetLastError(ERROR_SUCCESS);
       continue;
     }

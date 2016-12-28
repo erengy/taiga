@@ -731,8 +731,8 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
               }
             }
             if (!parsed) {
-              LOG(LevelError, metadata);
-              LOG(LevelError, data);
+              LOGE(metadata);
+              LOGE(data);
               ui::DisplayErrorMessage(
                   L"Could not parse the filter string. It may be missing characters, "
                   L"or encoded with an incompatible version of the application.",

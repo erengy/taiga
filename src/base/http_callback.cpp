@@ -120,7 +120,7 @@ int Client::DebugHandler(curl_infotype infotype, std::string data,
   if (simulated_callback)
     text += L"<simulated> | ";
 
-  LOG(LevelDebug, text + StrToWstr(data));
+  LOGD(text + StrToWstr(data));
 
   return 0;
 }

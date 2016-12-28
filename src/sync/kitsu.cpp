@@ -537,7 +537,7 @@ void Service::ParseObject(const Json& json) const {
       ParseLibraryObject(json);
       break;
     default:
-      LOG(LevelDebug, L"Invalid type: " + StrToWstr(json["type"]));
+      LOGD(L"Invalid type: " + StrToWstr(json["type"]));
       break;
   }
 }
@@ -604,7 +604,7 @@ int Service::ParseLibraryObject(const Json& json) const {
   const std::string media_type = media["data"]["type"];
 
   if (media_type != "anime") {
-    LOG(LevelDebug, L"Invalid type: " + StrToWstr(media_type));
+    LOGD(L"Invalid type: " + StrToWstr(media_type));
     return anime::ID_UNKNOWN;  // ignore other types of media
   }
 

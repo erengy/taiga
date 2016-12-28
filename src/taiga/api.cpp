@@ -98,8 +98,7 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg,
   // Attach a handle
   if (uMsg == TaigaApi.wm_attach_) {
     TaigaApi.handles[hwnd_app] = L"";
-    LOG(LevelDebug, L"Attached handle: " +
-                    ToWstr(reinterpret_cast<int>(hwnd_app)));
+    LOGD(L"Attached handle: " + ToWstr(reinterpret_cast<int>(hwnd_app)));
     return TRUE;
   }
   // Detach a handle
@@ -107,8 +106,7 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg,
     auto it = TaigaApi.handles.find(hwnd_app);
     if (it != TaigaApi.handles.end()) {
       TaigaApi.handles.erase(it);
-      LOG(LevelDebug, L"Detached handle: " +
-                      ToWstr(reinterpret_cast<int>(hwnd_app)));
+      LOGD(L"Detached handle: " + ToWstr(reinterpret_cast<int>(hwnd_app)));
       return TRUE;
     } else {
       return FALSE;
@@ -120,9 +118,8 @@ LRESULT Api::Window::WindowProc(HWND hwnd, UINT uMsg,
     auto cds = reinterpret_cast<COPYDATASTRUCT*>(lParam);
     std::string format = reinterpret_cast<char*>(cds->lpData);
     TaigaApi.handles[hwnd_app] = StrToWstr(format);
-    LOG(LevelDebug, L"New format for " +
-                    ToWstr(reinterpret_cast<int>(hwnd_app)) +
-                    L": \"" + TaigaApi.handles[hwnd_app] + L"\"");
+    LOGD(L"New format for " + ToWstr(reinterpret_cast<int>(hwnd_app)) +
+         L": \"" + TaigaApi.handles[hwnd_app] + L"\"");
     return TRUE;
   }
 

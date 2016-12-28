@@ -482,8 +482,8 @@ bool AppSettings::HandleCompatibility() {
   if (version == Taiga.version)
     return false;
 
-  LOG(LevelWarning, L"Upgraded from v" + StrToWstr(version.str()) +
-                    L" to v" + StrToWstr(Taiga.version.str()));
+  LOGW(L"Upgraded from v" + StrToWstr(version.str()) +
+       L" to v" + StrToWstr(Taiga.version.str()));
 
   if (version <= semaver::Version(1, 1, 7)) {
     // Convert old password encoding to base64
@@ -554,7 +554,7 @@ bool AppSettings::HandleCompatibility() {
       if (IsEqual(GetFileName(app_path), L"deluge.exe")) {
         app_path = GetPathOnly(app_path) + L"deluge-console.exe";
         Set(kTorrent_Download_AppPath, app_path);
-        LOG(LevelWarning, L"Changed BitTorrent client from deluge.exe to deluge-console.exe");
+        LOGW(L"Changed BitTorrent client from deluge.exe to deluge-console.exe");
       }
     }
   }

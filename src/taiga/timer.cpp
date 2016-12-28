@@ -55,8 +55,8 @@ Timer::Timer(unsigned int id, int interval, bool repeat)
 }
 
 void Timer::OnTimeout() {
-  LOG(LevelDebug, L"ID: " + ToWstr(id()) + L", "
-                  L"Interval: " + ToWstr(this->interval()));
+  LOGD(L"ID: " + ToWstr(id()) + L", "
+       L"Interval: " + ToWstr(this->interval()));
 
   switch (id()) {
     case kTimerAnimeList:

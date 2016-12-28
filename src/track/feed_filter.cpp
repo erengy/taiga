@@ -944,8 +944,8 @@ int FeedFilterManager::GetIndexFromShortcode(FeedFilterShortcodeType type,
     if (IsEqual(pair.second, shortcode))
       return pair.first;
 
-  LOG(LevelDebug, L"Shortcode: \"" + shortcode +
-                  L"\" for type \"" + ToWstr(type) + L"\" is not found.");
+  LOGD(L"Shortcode: \"" + shortcode +
+       L"\" for type \"" + ToWstr(type) + L"\" is not found.");
 
   return -1;
 }

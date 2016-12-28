@@ -140,7 +140,7 @@ bool Engine::ReadRelations() {
   std::string document;
 
   if (!ReadFromFile(path, document)) {
-    LOG(LevelWarning, L"Could not read anime relations data.");
+    LOGW(L"Could not read anime relations data.");
     Settings.Set(taiga::kRecognition_RelationsLastModified, std::wstring());
     return false;
   }
@@ -192,8 +192,7 @@ bool Engine::ReadRelations(const std::string& document) {
           if (name == L"version") {
             semaver::Version version(WstrToStr(value));
             if (version > Taiga.version)
-              LOG(LevelDebug, L"Anime relations version is larger than "
-                              L"application version.");
+              LOGD(L"Anime relations version is larger than application version.");
           } else if (name == L"last_modified") {
             Settings.Set(taiga::kRecognition_RelationsLastModified, value);
           }
@@ -203,7 +202,7 @@ bool Engine::ReadRelations(const std::string& document) {
       case kRulesSection: {
         TrimLeft(line, L"- ");
         if (!ParseRule(line))
-          LOG(LevelWarning, L"Could not parse rule: " + line);
+          LOGW(L"Could not parse rule: " + line);
         break;
       }
     }

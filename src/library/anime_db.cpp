@@ -61,7 +61,7 @@ bool Database::LoadDatabase() {
     ReadDatabaseNode(database_node);
     HandleCompatibility(meta_version);
   } else {
-    LOG(LevelWarning, L"Reading database in compatibility mode");
+    LOGW(L"Reading database in compatibility mode");
     ReadDatabaseInCompatibilityMode(document);
   }
 
@@ -96,9 +96,9 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map.find(current_service_id) != id_map.end()) {
         source = current_service_id;
-        LOG(LevelWarning, L"Fixed source for ID: " + id_map[source]);
+        LOGW(L"Fixed source for ID: " + id_map[source]);
       } else {
-        LOG(LevelError, L"Invalid source for ID: " + id_map[sync::kTaiga]);
+        LOGE(L"Invalid source for ID: " + id_map[sync::kTaiga]);
         continue;
       }
     }
@@ -209,7 +209,7 @@ Item* Database::FindItem(int id, bool log_error) {
     if (it != items.end())
       return &it->second;
     if (log_error)
-      LOG(LevelError, L"Could not find ID: " + ToWstr(id));
+      LOGE(L"Could not find ID: " + ToWstr(id));
   }
 
   return nullptr;
@@ -222,7 +222,7 @@ Item* Database::FindItem(const std::wstring& id, enum_t service,
       if (id == pair.second.GetId(service))
         return &pair.second;
     if (log_error)
-      LOG(LevelError, L"Could not find ID: " + id);
+      LOGE(L"Could not find ID: " + id);
   }
 
   return nullptr;
@@ -234,7 +234,7 @@ void Database::ClearInvalidItems() {
   for (auto it = items.begin(); it != items.end(); ) {
     if (!anime::IsValidId(it->second.GetId()) ||
         it->first != it->second.GetId()) {
-      LOG(LevelDebug, L"ID: " + ToWstr(it->first));
+      LOGD(L"ID: " + ToWstr(it->first));
       items.erase(it++);
     } else {
       ++it;
@@ -250,7 +250,7 @@ bool Database::DeleteItem(int id) {
     title = anime_item->GetTitle();
 
   if (items.erase(id) > 0) {
-    LOG(LevelWarning, L"ID: " + ToWstr(id) + L" | Title: " + title);
+    LOGW(L"ID: " + ToWstr(id) + L" | Title: " + title);
 
     auto delete_history_items = [](int id, std::vector<HistoryItem>& items) {
       items.erase(std::remove_if(items.begin(), items.end(),
@@ -288,7 +288,7 @@ int Database::UpdateItem(const Item& new_item) {
     auto source = new_item.GetSource();
 
     if (source == sync::kTaiga) {
-      LOG(LevelError, L"Invalid source for ID: " + new_item.GetId(source));
+      LOGE(L"Invalid source for ID: " + new_item.GetId(source));
       return ID_UNKNOWN;
     }
 
@@ -435,7 +435,7 @@ bool Database::LoadList() {
     }
 
   } else {
-    LOG(LevelWarning, L"Reading list in compatibility mode");
+    LOGW(L"Reading list in compatibility mode");
     ReadListInCompatibilityMode(document);
   }
 
@@ -648,8 +648,7 @@ bool Database::CheckOldUserDirectory() {
       return false;
     const auto new_path = taiga::GetPath(taiga::kPathUser) +
                           taiga::GetUserDirectoryName(service_id);
-    LOG(LevelWarning, L"Renaming old user directory\n" +
-                      path + L"\n" + new_path);
+    LOGW(L"Renaming old user directory\n" + path + L"\n" + new_path);
     return MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0;
   };
 
@@ -672,7 +671,7 @@ void Database::HandleCompatibility(const std::wstring& meta_version) {
 
   if (version <= semaver::Version(1, 1, 11)) {
     if (taiga::GetCurrentServiceId() == sync::kKitsu) {
-      LOG(LevelWarning, L"Clearing English titles");
+      LOGW(L"Clearing English titles");
       for (auto& item : items) {
         item.second.SetEnglishTitle(EmptyString());
       }
@@ -681,7 +680,7 @@ void Database::HandleCompatibility(const std::wstring& meta_version) {
 
   if (version <= semaver::Version(1, 2, 5)) {
     if (taiga::GetCurrentServiceId() == sync::kKitsu) {
-      LOG(LevelWarning, L"Clearing image URLs");
+      LOGW(L"Clearing image URLs");
       for (auto& item : items) {
         item.second.SetImageUrl(EmptyString());
       }

@@ -174,7 +174,7 @@ void HistoryQueue::Check(bool automatic) {
     return;
 
   if (!items[index].enabled) {
-    LOG(LevelDebug, L"Item is disabled, removing...");
+    LOGD(L"Item is disabled, removing...");
     Remove(index, true, true, false);
     Check(automatic);
     return;
@@ -182,8 +182,8 @@ void HistoryQueue::Check(bool automatic) {
 
   auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);
   if (!anime_item) {
-    LOG(LevelWarning, L"Item not found in list, removing... ID: " +
-                      ToWstr(items[index].anime_id));
+    LOGW(L"Item not found in list, removing... ID: " +
+         ToWstr(items[index].anime_id));
     Remove(index, true, true, false);
     Check(automatic);
     return;
@@ -191,7 +191,7 @@ void HistoryQueue::Check(bool automatic) {
 
   if (automatic && !Settings.GetBool(taiga::kApp_Option_EnableSync)) {
     items[index].reason = L"Automatic synchronization is disabled";
-    LOG(LevelDebug, items[index].reason);
+    LOGD(items[index].reason);
     return;
   }
 
@@ -387,10 +387,10 @@ bool History::Load() {
     if (AnimeDatabase.FindItem(history_item.anime_id)) {
       items.push_back(history_item);
     } else {
-      LOG(LevelWarning, L"Item does not exist in the database.\n"
-                        L"ID: " + ToWstr(history_item.anime_id) + L"\n"
-                        L"Episode: " + ToWstr(*history_item.episode) + L"\n"
-                        L"Time: " + history_item.time);
+      LOGW(L"Item does not exist in the database.\n"
+           L"ID: " + ToWstr(history_item.anime_id) + L"\n"
+           L"Episode: " + ToWstr(*history_item.episode) + L"\n"
+           L"Time: " + history_item.time);
     }
   }
   // Queue events
@@ -437,8 +437,8 @@ void History::ReadQueue(const pugi::xml_document& document) {
     if (AnimeDatabase.FindItem(history_item.anime_id)) {
       queue.Add(history_item, false);
     } else {
-      LOG(LevelWarning, L"Item does not exist in the database.\n"
-                        L"ID: " + ToWstr(history_item.anime_id));
+      LOGW(L"Item does not exist in the database.\n"
+           L"ID: " + ToWstr(history_item.anime_id));
     }
   }
 }
@@ -487,8 +487,8 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
     if (AnimeDatabase.FindItem(history_item.anime_id)) {
       queue.Add(history_item, false);
     } else {
-      LOG(LevelWarning, L"Item does not exist in the database.\n"
-                        L"ID: " + ToWstr(history_item.anime_id));
+      LOGW(L"Item does not exist in the database.\n"
+           L"ID: " + ToWstr(history_item.anime_id));
     }
   }
 }

@@ -52,7 +52,7 @@ int TranslateAgeRatingFrom(const std::string& value) {
     return it->second;
 
   if (!value.empty())
-    LOG(LevelDebug, L"Invalid value: " + StrToWstr(value));
+    LOGD(L"Invalid value: " + StrToWstr(value));
 
   return anime::kUnknownAgeRating;
 }
@@ -79,7 +79,7 @@ int TranslateSeriesTypeFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOG(LevelWarning, L"Invalid value: " + StrToWstr(value));
+  LOGW(L"Invalid value: " + StrToWstr(value));
   return anime::kUnknownType;
 }
 
@@ -115,7 +115,7 @@ int TranslateMyStatusFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOG(LevelWarning, L"Invalid value: " + StrToWstr(value));
+  LOGW(L"Invalid value: " + StrToWstr(value));
   return anime::kNotInList;
 }
 
@@ -128,7 +128,7 @@ std::string TranslateMyStatusTo(int value) {
     case anime::kPlanToWatch: return "planned";
   }
 
-  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: " + ToWstr(value));
   return "";
 }
 
