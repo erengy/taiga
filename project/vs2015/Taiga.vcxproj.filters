@@ -34,6 +34,9 @@
     <Filter Include="deps\json">
       <UniqueIdentifier>{dd9648e9-7e26-4239-a931-8fee59d183e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\monolog">
+      <UniqueIdentifier>{c6b97ec8-114d-44c6-a87d-e4c7e3a2ecb1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\pugixml">
       <UniqueIdentifier>{0f915cf6-1a44-47c9-8c1f-3a640aa5fb67}</UniqueIdentifier>
     </Filter>
@@ -106,9 +109,6 @@
     <ClCompile Include="..\..\src\base\json.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\log.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\oauth.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -162,6 +162,9 @@
     </ClCompile>
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\monolog\monolog.cpp">
+      <Filter>deps\monolog</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp">
       <Filter>deps\pugixml</Filter>
@@ -653,6 +656,9 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\json\src\json.hpp">
       <Filter>deps\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\monolog\monolog.h">
+      <Filter>deps\monolog</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp">
       <Filter>deps\pugixml</Filter>

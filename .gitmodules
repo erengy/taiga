@@ -18,6 +18,10 @@
 	path = deps/src/json
 	url = https://github.com/nlohmann/json.git
 
+[submodule "monolog"]
+	path = deps/src/monolog
+	url = https://github.com/erengy/monolog.git
+
 [submodule "pugixml"]
 	path = deps/src/pugixml
 	url = https://github.com/zeux/pugixml.git

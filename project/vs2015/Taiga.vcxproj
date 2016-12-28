@@ -112,6 +112,7 @@
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\token.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\tokenizer.cpp" />
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
+    <ClCompile Include="..\..\deps\src\monolog\monolog.cpp" />
     <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp" />
     <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp" />
     <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp" />
@@ -178,7 +179,6 @@
     <ClCompile Include="..\..\src\base\http_request.cpp" />
     <ClCompile Include="..\..\src\base\http_response.cpp" />
     <ClCompile Include="..\..\src\base\json.cpp" />
-    <ClCompile Include="..\..\src\base\log.cpp" />
     <ClCompile Include="..\..\src\base\oauth.cpp" />
     <ClCompile Include="..\..\src\base\process.cpp" />
     <ClCompile Include="..\..\src\base\settings.cpp" />
@@ -277,6 +277,7 @@
     <ClInclude Include="..\..\deps\src\curl\include\curl\stdcheaders.h" />
     <ClInclude Include="..\..\deps\src\curl\include\curl\typecheck-gcc.h" />
     <ClInclude Include="..\..\deps\src\json\src\json.hpp" />
+    <ClInclude Include="..\..\deps\src\monolog\monolog.h" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp" />
     <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h" />
