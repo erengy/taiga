@@ -120,7 +120,10 @@ int Client::DebugHandler(curl_infotype infotype, std::string data,
   if (simulated_callback)
     text += L"<simulated> | ";
 
-  LOGD(text + StrToWstr(data));
+  auto wdata = StrToWstr(data);
+  Trim(wdata, L" \r\n");
+
+  LOGD(text + wdata);
 
   return 0;
 }
