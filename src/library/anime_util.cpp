@@ -965,7 +965,7 @@ std::wstring TranslateMyScoreFull(int value) {
       switch (value) {
         default:
         case 0: return L"(0) No Score";
-        case 1: return L"(1) Unwatchable";
+        case 1: return L"(1) Appalling";
         case 2: return L"(2) Horrible";
         case 3: return L"(3) Very Bad";
         case 4: return L"(4) Bad";
