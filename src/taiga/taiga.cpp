@@ -71,6 +71,7 @@ BOOL App::InitInstance() {
   auto module_path = GetModulePath();
   auto path = AddTrailingSlash(GetPathOnly(module_path));
   using monolog::Level;
+  monolog::log.enable_console_output(false);
   monolog::log.set_path(WstrToStr(path + TAIGA_APP_NAME L".log"));
   monolog::log.set_level(debug_mode ? Level::Debug : Level::Warning);
   LOGI(L"Version " + StrToWstr(version.str()) +
