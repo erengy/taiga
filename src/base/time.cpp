@@ -23,38 +23,48 @@
 #include "time.h"
 
 Date::Date()
-    : year(0), month(0), day(0) {
+    : year(0), month(0), day(0), seconds(0) {
 }
 
 Date::Date(const std::wstring& date)
-    : year(0), month(0), day(0) {
+    : year(0), month(0), day(0), seconds(0) {
   // Convert from YYYY-MM-DD
   if (date.length() >= 10) {
     year = ToInt(date.substr(0, 4));
     month = ToInt(date.substr(5, 2));
     day = ToInt(date.substr(8, 2));
+    tm tm = { 0 };
+    tm.tm_year = year - 1900;
+    tm.tm_mon = month - 1;
+    tm.tm_mday = day;
+    seconds = mktime(&tm);
   }
 }
 
 Date::Date(unsigned short year, unsigned short month, unsigned short day)
-    : year(year), month(month), day(day) {
+    : year(year), month(month), day(day), seconds(0) {
+  tm tm = { 0 };
+  tm.tm_year = year - 1900;
+  tm.tm_mon = month - 1;
+  tm.tm_mday = day;
+  seconds = mktime(&tm);
 }
 
 Date& Date::operator = (const Date& date) {
   year = date.year;
   month = date.month;
   day = date.day;
+  seconds = date.seconds;
 
   return *this;
 }
 
 int Date::operator - (const Date& date) const {
-  return ((year * 365) + (month * 30) + day) -
-         ((date.year * 365) + (date.month * 30) + date.day);
+  return Duration(difftime(seconds, date.seconds)).days();
 }
 
 Date::operator bool() const {
-  return year != 0 || month != 0 || day != 0;
+  return year != 0 || month != 0 || day != 0 || seconds != 0;
 }
 
 Date::operator SYSTEMTIME() const {
@@ -414,7 +424,7 @@ std::wstring ToDateString(time_t seconds) {
 }
 
 unsigned int ToDayCount(const Date& date) {
-  return (date.year * 365) + (date.month * 30) + date.day;
+  return Duration(date.seconds).days();
 }
 
 std::wstring ToTimeString(int seconds) {
