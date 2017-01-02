@@ -43,6 +43,7 @@ public:
   unsigned short year;
   unsigned short month;
   unsigned short day;
+  time_t seconds;
 
 private:
   base::CompareResult Compare(const Date& date) const;
