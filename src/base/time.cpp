@@ -49,8 +49,9 @@ Date& Date::operator = (const Date& date) {
 }
 
 int Date::operator - (const Date& date) const {
-  return ((year() * 365) + (month() * 30) + day()) -
-         ((date.year() * 365) + (date.month() * 30) + date.day());
+  const auto days = date::sys_days{static_cast<date::year_month_day>(*this)} -
+                    date::sys_days{static_cast<date::year_month_day>(date)};
+  return days.count();
 }
 
 Date::operator bool() const {
@@ -442,7 +443,8 @@ std::wstring ToDateString(time_t seconds) {
 }
 
 unsigned int ToDayCount(const Date& date) {
-  return (date.year() * 365) + (date.month() * 30) + date.day();
+  const auto days = date::sys_days{static_cast<date::year_month_day>(date)};
+  return days.time_since_epoch().count();
 }
 
 std::wstring ToTimeString(int seconds) {
