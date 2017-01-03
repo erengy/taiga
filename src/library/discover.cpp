@@ -221,7 +221,7 @@ void SeasonDatabase::Review(bool hide_nsfw) {
       continue;
     // Airing date must be within the interval
     const Date& anime_start = pair.second.GetDateStart();
-    if (anime_start.year && anime_start.month &&
+    if (anime_start.year() && anime_start.month() &&
         anime_start >= date_start && anime_start <= date_end) {
       items.push_back(pair.second.GetId());
       LOGD(L"\t<anime>\n"

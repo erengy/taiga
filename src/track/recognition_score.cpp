@@ -99,7 +99,7 @@ static double BonusScore(const anime::Episode& episode, int id) {
   if (anime_item) {
     auto anime_year = episode.anime_year();
     if (anime_year)
-      if (anime_year == anime_item->GetDateStart().year)
+      if (anime_year == anime_item->GetDateStart().year())
         score += 0.1;
 
     auto anime_type = anime::TranslateType(episode.anime_type());

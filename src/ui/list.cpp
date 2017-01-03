@@ -140,18 +140,18 @@ int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
   Date date2 = item2.GetDateStart();
 
   if (date1 != date2) {
-    if (!date1.year)
-      date1.year = static_cast<unsigned short>(-1);  // Hello.
-    if (!date2.year)
-      date2.year = static_cast<unsigned short>(-1);  // We come from the future.
-    if (!date1.month)
-      date1.month = 12;
-    if (!date2.month)
-      date2.month = 12;
-    if (!date1.day)
-      date1.day = 31;
-    if (!date2.day)
-      date2.day = 31;
+    if (!date1.year())
+      date1.set_year(static_cast<unsigned short>(-1));  // Hello.
+    if (!date2.year())
+      date2.set_year(static_cast<unsigned short>(-1));  // We come from the future.
+    if (!date1.month())
+      date1.set_month(12);
+    if (!date2.month())
+      date2.set_month(12);
+    if (!date1.day())
+      date1.set_day(31);
+    if (!date2.day())
+      date2.set_day(31);
   }
 
   return CompareValues<Date>(date1, date2);

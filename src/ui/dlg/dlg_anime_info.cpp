@@ -671,7 +671,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         continue;
       const Date& date_start = pair.second.GetDateStart();
       const Date& date_end = pair.second.GetDateEnd();
-      if (date_start.year && date_start.month && date_start.day) {
+      if (date_start.year() && date_start.month() && date_start.day()) {
         date_diff = date_now - date_start;
         if (date_diff > 0 && date_diff <= day_limit) {
           recently_started.push_back(pair.first);
@@ -683,7 +683,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
           continue;
         }
       }
-      if (date_end.year && date_end.month && date_end.day) {
+      if (date_end.year() && date_end.month() && date_end.day()) {
         date_diff = date_now - date_end;
         if (date_diff > 0 && date_diff <= day_limit) {
           recently_finished.push_back(pair.first);

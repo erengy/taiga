@@ -23,79 +23,107 @@
 #include "time.h"
 
 Date::Date()
-    : year(0), month(0), day(0) {
+    : Date(0, 0, 0) {
 }
 
 Date::Date(const std::wstring& date)
-    : year(0), month(0), day(0) {
+    : Date(0, 0, 0) {
   // Convert from YYYY-MM-DD
   if (date.length() >= 10) {
-    year = ToInt(date.substr(0, 4));
-    month = ToInt(date.substr(5, 2));
-    day = ToInt(date.substr(8, 2));
+    set_year(ToInt(date.substr(0, 4)));
+    set_month(ToInt(date.substr(5, 2)));
+    set_day(ToInt(date.substr(8, 2)));
   }
 }
 
 Date::Date(unsigned short year, unsigned short month, unsigned short day)
-    : year(year), month(month), day(day) {
+    : year_(year), month_(month), day_(day) {
 }
 
 Date& Date::operator = (const Date& date) {
-  year = date.year;
-  month = date.month;
-  day = date.day;
+  year_ = date.year_;
+  month_ = date.month_;
+  day_ = date.day_;
 
   return *this;
 }
 
 int Date::operator - (const Date& date) const {
-  return ((year * 365) + (month * 30) + day) -
-         ((date.year * 365) + (date.month * 30) + date.day);
+  return ((year() * 365) + (month() * 30) + day()) -
+         ((date.year() * 365) + (date.month() * 30) + date.day());
 }
 
 Date::operator bool() const {
-  return year != 0 || month != 0 || day != 0;
+  return year() != 0 || month() != 0 || day() != 0;
 }
 
 Date::operator SYSTEMTIME() const {
   SYSTEMTIME st = {0};
-  st.wYear = year;
-  st.wMonth = month;
-  st.wDay = day;
+  st.wYear = static_cast<WORD>(year());
+  st.wMonth = static_cast<WORD>(month());
+  st.wDay = static_cast<WORD>(day());
 
   return st;
 }
 
 Date::operator std::wstring() const {
   // Convert to YYYY-MM-DD
-  return PadChar(ToWstr(year), '0', 4) + L"-" +
-         PadChar(ToWstr(month), '0', 2) + L"-" +
-         PadChar(ToWstr(day), '0', 2);
+  return PadChar(ToWstr(year()), '0', 4) + L"-" +
+         PadChar(ToWstr(month()), '0', 2) + L"-" +
+         PadChar(ToWstr(day()), '0', 2);
+}
+
+Date::operator date::year_month_day() const {
+  return date::year_month_day{year_, month_, day_};
+}
+
+unsigned short Date::year() const {
+  return static_cast<int>(year_);
+}
+
+unsigned short Date::month() const {
+  return static_cast<unsigned>(month_);
+}
+
+unsigned short Date::day() const {
+  return static_cast<unsigned>(day_);
+}
+
+void Date::set_year(unsigned short year) {
+  year_ = date::year{year};
+}
+
+void Date::set_month(unsigned short month) {
+  month_ = date::month{month};
+}
+
+void Date::set_day(unsigned short day) {
+  day_ = date::day{day};
 }
 
 base::CompareResult Date::Compare(const Date& date) const {
-  if (year != date.year) {
-    if (year == 0)
+  if (year_ != date.year_) {
+    if (year() == 0)
       return base::kGreaterThan;
-    if (date.year == 0)
+    if (date.year() == 0)
       return base::kLessThan;
-    return year < date.year ? base::kLessThan : base::kGreaterThan;
+    return year_ < date.year_ ? base::kLessThan : base::kGreaterThan;
   }
 
-  if (month != date.month) {
-    if (month == 0)
+  if (month_ != date.month_) {
+    if (month() == 0)
       return base::kGreaterThan;
-    if (date.month == 0)
+    if (date.month() == 0)
       return base::kLessThan;
-    return month < date.month ? base::kLessThan : base::kGreaterThan;
+    return month_ < date.month_ ? base::kLessThan : base::kGreaterThan;
   }
 
-  if (day != date.day) {
-    if (day == 0)
+  if (day_ != date.day_) {
+    if (day() == 0)
       return base::kGreaterThan;
-    if (date.day == 0)
+    if (date.day() == 0)
       return base::kLessThan;
-    return day < date.day ? base::kLessThan : base::kGreaterThan;
+    return day_ < date.day_ ? base::kLessThan : base::kGreaterThan;
   }
 
   return base::kEqualTo;
@@ -274,9 +302,9 @@ std::wstring GetAbsoluteTimeString(time_t unix_time) {
     return StrToWstr(result);
   };
 
-  if (1900 + tm.tm_year < today.year) {
+  if (1900 + tm.tm_year < today.year()) {
     return strftime("%d %B %Y");  // 01 January 2014
-  } else if (std::lround(duration.days()) <= 1 && tm.tm_mday == today.day) {
+  } else if (std::lround(duration.days()) <= 1 && tm.tm_mday == today.day()) {
     return strftime("%H:%M");  // 13:37
   } else if (std::lround(duration.days()) <= 7) {
     return strftime("%A, %d %B");  // Thursday, 01 January
@@ -414,7 +442,7 @@ std::wstring ToDateString(time_t seconds) {
 }
 
 unsigned int ToDayCount(const Date& date) {
-  return (date.year * 365) + (date.month * 30) + date.day;
+  return (date.year() * 365) + (date.month() * 30) + date.day();
 }
 
 std::wstring ToTimeString(int seconds) {

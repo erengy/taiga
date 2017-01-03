@@ -254,7 +254,7 @@ void Engine::UpdateTitles(const anime::Item& anime_item, bool erase_ids) {
 
   const auto& date = anime_item.GetDateStart();
   if (anime::IsValidDate(date)) {
-    std::wstring year = ToWstr(date.year);
+    std::wstring year = ToWstr(date.year());
     if (anime_item.GetTitle().find(year) == std::wstring::npos) {
       update_title(anime_item.GetTitle() + L" (" + year + L")",
                    titles_.alternative, normal_titles_.alternative);

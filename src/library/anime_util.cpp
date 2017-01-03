@@ -61,8 +61,8 @@ bool ListHasMissingIds() {
 
 SeriesStatus GetAiringStatus(const Item& item) {
   auto assume_worst_case = [](Date date) {
-    if (!date.month) date.month = 12;
-    if (!date.day) date.day = 31;
+    if (!date.month()) date.set_month(12);
+    if (!date.day()) date.set_day(31);
     return date;
   };
 
@@ -142,7 +142,7 @@ int EstimateLastAiredEpisodeNumber(const Item& item) {
   // irregularities such as broadcasts being postponed due to sports events make
   // this method unreliable.
   const Date& date_start = item.GetDateStart();
-  if (date_start.year && date_start.month && date_start.day) {
+  if (date_start.year() && date_start.month() && date_start.day()) {
     // To compensate for the fact that we don't know the airing hour,
     // we substract one more day.
     int date_diff = GetDateJapan() - date_start - 1;
@@ -619,7 +619,7 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
     const Date& date_start = anime_item.GetDateStart();
     const Date& date_now = GetDateJapan();
 
-    if (!date_start.year || !date_start.month || !date_start.day)
+    if (!date_start.year() || !date_start.month() || !date_start.day())
       continue;
 
     if (date_start > date_now &&

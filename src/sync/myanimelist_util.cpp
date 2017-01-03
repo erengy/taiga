@@ -115,9 +115,9 @@ std::wstring TranslateMyDateTo(const std::wstring& value) {
   Date date(value);
 
   // Convert YYYY-MM-DD to MMDDYYYY
-  return PadChar(ToWstr(date.month), '0', 2) +
-         PadChar(ToWstr(date.day), '0', 2) +
-         PadChar(ToWstr(date.year), '0', 4);
+  return PadChar(ToWstr(date.month()), '0', 2) +
+         PadChar(ToWstr(date.day()), '0', 2) +
+         PadChar(ToWstr(date.year()), '0', 4);
 }
 
 int TranslateMyStatusFrom(int value) {
@@ -202,9 +202,9 @@ void ViewUpcomingAnime() {
   Date date = GetDate();
 
   ExecuteLink(L"https://myanimelist.net/anime.php"
-              L"?sd=" + ToWstr(date.day) +
-              L"&sm=" + ToWstr(date.month) +
-              L"&sy=" + ToWstr(date.year) +
+              L"?sd=" + ToWstr(date.day()) +
+              L"&sm=" + ToWstr(date.month()) +
+              L"&sy=" + ToWstr(date.year()) +
               L"&em=0&ed=0&ey=0&o=2&w=&c[]=a&c[]=d&cv=1");
 }
 

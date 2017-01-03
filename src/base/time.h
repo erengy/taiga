@@ -22,6 +22,8 @@
 #include <string>
 #include <windows.h>
 
+#include <date/date.h>
+
 #include "comparable.h"
 
 class Date : public base::Comparable<Date> {
@@ -38,13 +40,22 @@ public:
   operator bool() const;
   operator SYSTEMTIME() const;
   operator std::wstring() const;
+  operator date::year_month_day() const;
 
-  unsigned short year;
-  unsigned short month;
-  unsigned short day;
+  unsigned short year() const;
+  unsigned short month() const;
+  unsigned short day() const;
+
+  void set_year(unsigned short year);
+  void set_month(unsigned short month);
+  void set_day(unsigned short day);
 
 private:
   base::CompareResult Compare(const Date& date) const;
+
+  date::year year_;
+  date::month month_;
+  date::day day_;
 };
 
 class Duration {
