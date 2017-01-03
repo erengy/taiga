@@ -14,6 +14,10 @@
 	path = deps/src/curl
 	url = https://github.com/curl/curl.git
 
+[submodule "date"]
+	path = deps/src/date
+	url = https://github.com/HowardHinnant/date.git
+
 [submodule "json"]
 	path = deps/src/json
 	url = https://github.com/nlohmann/json.git

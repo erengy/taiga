@@ -34,6 +34,7 @@
 namespace ui {
 
 enum ThirdPartyLibrary {
+  kDate,
   kJson,
   kLibcurl,
   kPugixml,
@@ -43,6 +44,8 @@ enum ThirdPartyLibrary {
 
 static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
   switch (library) {
+    case kDate:
+      return L"2.1";
     case kJson:
       return L"2.0.8";
     case kLibcurl:
@@ -96,6 +99,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"saka, Diablofan, slevir, LordGravewish, rr-, sunjayc, ConnorKrammer, Soinou, Jiyuu,\\line "
       L"ryban\\line\\par "
       L"\\b Third-party components:\\b0\\line "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/HowardHinnant/date\"}}{\\fldrslt{date " + GetLibraryVersion(kDate) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/yusukekamiyamane/fugue-icons\"}}{\\fldrslt{Fugue Icons 3.4.5}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/nlohmann/json\"}}{\\fldrslt{json " + GetLibraryVersion(kJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/curl/curl\"}}{\\fldrslt{libcurl " + GetLibraryVersion(kLibcurl) + L"}}}, "

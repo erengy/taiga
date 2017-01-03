@@ -276,6 +276,7 @@
     <ClInclude Include="..\..\deps\src\curl\include\curl\multi.h" />
     <ClInclude Include="..\..\deps\src\curl\include\curl\stdcheaders.h" />
     <ClInclude Include="..\..\deps\src\curl\include\curl\typecheck-gcc.h" />
+    <ClInclude Include="..\..\deps\src\date\date.h" />
     <ClInclude Include="..\..\deps\src\json\src\json.hpp" />
     <ClInclude Include="..\..\deps\src\monolog\monolog.h" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp" />

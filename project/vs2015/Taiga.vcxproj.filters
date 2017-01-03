@@ -31,6 +31,9 @@
     <Filter Include="deps\curl">
       <UniqueIdentifier>{73658da5-e312-4fe4-85e6-38a578acf869}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\date">
+      <UniqueIdentifier>{01a715e8-af40-4ff8-893b-7a9491d532c6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\json">
       <UniqueIdentifier>{dd9648e9-7e26-4239-a931-8fee59d183e7}</UniqueIdentifier>
     </Filter>
@@ -653,6 +656,9 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\curl\include\curl\typecheck-gcc.h">
       <Filter>deps\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\date\date.h">
+      <Filter>deps\date</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\json\src\json.hpp">
       <Filter>deps\json</Filter>
