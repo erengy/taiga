@@ -526,7 +526,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     win::Rect rect_item;
     get_subitem_rect(kColumnUserLastUpdated, rect_item);
     if (rect_item.PtIn(pt)) {
-      time_t time_last_updated = _wtoi64(anime_item->GetMyLastUpdated().c_str());
+      time_t time_last_updated = ToTime(anime_item->GetMyLastUpdated());
       if (time_last_updated > 0) {
         const std::wstring text = GetAbsoluteTimeString(time_last_updated);
         update_tooltip(kTooltipUserLastUpdated, text.c_str(), &rect_item);
@@ -1410,7 +1410,7 @@ void AnimeListDialog::RefreshListItemColumns(int index, const anime::Item& anime
         text = anime::TranslateType(anime_item.GetType());
         break;
       case kColumnUserLastUpdated: {
-        time_t time_last_updated = _wtoi64(anime_item.GetMyLastUpdated().c_str());
+        time_t time_last_updated = ToTime(anime_item.GetMyLastUpdated());
         text = GetRelativeTimeString(time_last_updated, true);
         break;
       }
@@ -1699,7 +1699,7 @@ void AnimeListDialog::ListView::RefreshLastUpdateColumn() {
     auto anime_item = AnimeDatabase.FindItem(GetItemParam(i));
     if (!anime_item)
       continue;
-    time_t time_last_updated = _wtoi64(anime_item->GetMyLastUpdated().c_str());
+    time_t time_last_updated = ToTime(anime_item->GetMyLastUpdated());
     if (Duration(time_now - time_last_updated).hours() < 22) {
       std::wstring text = GetRelativeTimeString(time_last_updated, true);
       SetItem(i, column.index, text.c_str());

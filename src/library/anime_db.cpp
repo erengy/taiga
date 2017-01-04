@@ -117,7 +117,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
-    item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
+    item.SetLastModified(ToTime(XmlReadStrValue(node, L"modified")));
 
     // This ordering results in less reallocations
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));  // alternative
@@ -710,7 +710,7 @@ void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
     item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
     item.SetPopularity(XmlReadIntValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
-    item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"last_modified").c_str()));
+    item.SetLastModified(ToTime(XmlReadStrValue(node, L"last_modified")));
   }
 }
 

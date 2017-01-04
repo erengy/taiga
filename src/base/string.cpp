@@ -675,6 +675,14 @@ int ToInt(const wstring& str) {
   return _wtoi(str.c_str());
 }
 
+time_t ToTime(const std::string& str) {
+  return _atoi64(str.c_str());
+}
+
+time_t ToTime(const std::wstring& str) {
+  return _wtoi64(str.c_str());
+}
+
 string ToStr(const INT& value) {
   char buffer[65];
   _ltoa_s(value, buffer, 65, 10);

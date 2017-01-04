@@ -92,8 +92,7 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
   xml_node season_node = document.child(L"season");
 
   current_season = XmlReadStrValue(season_node.child(L"info"), L"name");
-  time_t modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
-                                            L"modified").c_str());
+  time_t modified = ToTime(XmlReadStrValue(season_node.child(L"info"), L"modified"));
 
   items.clear();
 

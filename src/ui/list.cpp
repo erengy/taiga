@@ -163,8 +163,8 @@ int SortListByEpisodeCount(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<time_t>(_wtoi64(item1.GetMyLastUpdated().c_str()),
-                               _wtoi64(item2.GetMyLastUpdated().c_str()));
+  return CompareValues<time_t>(ToTime(item1.GetMyLastUpdated()),
+                               ToTime(item2.GetMyLastUpdated()));
 }
 
 int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {
