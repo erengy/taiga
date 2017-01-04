@@ -139,19 +139,20 @@ int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
   Date date1 = item1.GetDateStart();
   Date date2 = item2.GetDateStart();
 
+  auto assume_worst_case = [](Date& date) {
+    // Hello.
+    // We come from the future.
+    if (!date.year())
+      date.set_year(static_cast<decltype(date.year())>(-1));
+    if (!date.month())
+      date.set_month(12);
+    if (!date.day())
+      date.set_day(31);
+  };
+
   if (date1 != date2) {
-    if (!date1.year())
-      date1.set_year(static_cast<unsigned short>(-1));  // Hello.
-    if (!date2.year())
-      date2.set_year(static_cast<unsigned short>(-1));  // We come from the future.
-    if (!date1.month())
-      date1.set_month(12);
-    if (!date2.month())
-      date2.set_month(12);
-    if (!date1.day())
-      date1.set_day(31);
-    if (!date2.day())
-      date2.set_day(31);
+    assume_worst_case(date1);
+    assume_worst_case(date2);
   }
 
   return CompareValues<Date>(date1, date2);
