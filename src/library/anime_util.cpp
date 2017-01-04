@@ -171,12 +171,12 @@ bool IsItemOldEnough(const Item& item) {
   if (!item.GetLastModified())
     return true;
 
-  time_t time_diff = time(nullptr) - item.GetLastModified();
+  const auto duration = Duration(time(nullptr) - item.GetLastModified());
 
   if (item.GetAiringStatus() == kFinishedAiring) {
-    return time_diff >= 60 * 60 * 24 * 7;  // 1 week
+    return duration.days() >= 7;  // 1 week
   } else {
-    return time_diff >= 60 * 60;  // 1 hour
+    return duration.hours() >= 1;
   }
 }
 

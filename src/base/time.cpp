@@ -140,32 +140,46 @@ base::CompareResult Date::Compare(const Date& date) const {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Duration::Duration(time_t time)
-    : time_(time) {
+Duration::Duration(const seconds_t seconds)
+    : seconds_(seconds) {
 }
 
-float Duration::seconds() const {
-  return static_cast<float>(time_);
+Duration::Duration(const std::time_t seconds)
+    : Duration(std::chrono::seconds(seconds)) {
 }
 
-float Duration::minutes() const {
-  return static_cast<float>(time_) / kToMinutes;
+Duration& Duration::operator=(const seconds_t seconds) {
+  seconds_ = seconds;
+  return *this;
 }
 
-float Duration::hours() const {
-  return static_cast<float>(time_) / kToHours;
+Duration& Duration::operator=(const std::time_t seconds) {
+  seconds_ = static_cast<seconds_t>(seconds);
+  return *this;
 }
 
-float Duration::days() const {
-  return static_cast<float>(time_) / kToDays;
+Duration::seconds_t::rep Duration::seconds() const {
+  return seconds_.count();
 }
 
-float Duration::months() const {
-  return static_cast<float>(time_) / kToMonths;
+Duration::minutes_t::rep Duration::minutes() const {
+  return std::chrono::duration_cast<minutes_t>(seconds_).count();
 }
 
-float Duration::years() const {
-  return static_cast<float>(time_) / kToYears;
+Duration::hours_t::rep Duration::hours() const {
+  return std::chrono::duration_cast<hours_t>(seconds_).count();
+}
+
+Duration::days_t::rep Duration::days() const {
+  return std::chrono::duration_cast<days_t>(seconds_).count();
+}
+
+Duration::months_t::rep Duration::months() const {
+  return std::chrono::duration_cast<months_t>(seconds_).count();
+}
+
+Duration::years_t::rep Duration::years() const {
+  return std::chrono::duration_cast<years_t>(seconds_).count();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -423,28 +437,30 @@ std::wstring GetTimeJapan(LPCWSTR format) {
   return buff;
 }
 
-std::wstring ToDateString(time_t seconds) {
-  time_t days, hours, minutes;
+std::wstring ToDateString(Duration duration) {
   std::wstring date;
 
-  if (seconds > 0) {
-    #define CALC_TIME(x, y) x = seconds / (y); seconds = seconds % (y);
-    CALC_TIME(days, 60 * 60 * 24);
-    CALC_TIME(hours, 60 * 60);
-    CALC_TIME(minutes, 60);
-    #undef CALC_TIME
-    date.clear();
-    #define ADD_TIME(x, y) \
-      if (x > 0) { \
-        if (!date.empty()) date += L" "; \
-        date += ToWstr(x) + y; \
-        if (x > 1) date += L"s"; \
+  if (duration.seconds() > 0) {
+    const auto days = static_cast<int>(duration.days());
+    duration = duration.seconds() % Duration::days_t::period::num;
+
+    const auto hours = static_cast<int>(duration.hours());
+    duration = duration.seconds() % Duration::hours_t::period::num;
+
+    const auto minutes = static_cast<int>(duration.minutes());
+    duration = duration.seconds() % Duration::minutes_t::period::num;
+
+    auto add_time = [&date](const int value, const std::wstring& str) {
+      if (value > 0) {
+        date += (!date.empty() ? L" " : L"") +
+                ToWstr(value) + L" " + str + (value > 1 ? L"s" : L"");
       }
-    ADD_TIME(days, L" day");
-    ADD_TIME(hours, L" hour");
-    ADD_TIME(minutes, L" minute");
-    ADD_TIME(seconds, L" second");
-    #undef ADD_TIME
+    };
+
+    add_time(days, L"day");
+    add_time(hours, L"hour");
+    add_time(minutes, L"minute");
+    add_time(static_cast<int>(duration.seconds()), L"second");
   }
 
   return date;
@@ -455,16 +471,16 @@ unsigned int ToDayCount(const Date& date) {
   return days.time_since_epoch().count();
 }
 
-std::wstring ToTimeString(int seconds) {
-  int hours = seconds / 3600;
-  seconds = seconds % 3600;
-  int minutes = seconds / 60;
-  seconds = seconds % 60;
+std::wstring ToTimeString(Duration duration) {
+  const auto hours = static_cast<int>(duration.hours());
+  duration = duration.seconds() % Duration::hours_t::period::num;
 
-  #define TWO_DIGIT(x) (x >= 10 ? ToWstr(x) : L"0" + ToWstr(x))
-  return (hours > 0 ? TWO_DIGIT(hours) + L":" : L"") +
-         TWO_DIGIT(minutes) + L":" + TWO_DIGIT(seconds);
-  #undef TWO_DIGIT
+  const auto minutes = static_cast<int>(duration.minutes());
+  duration = duration.seconds() % Duration::minutes_t::period::num;
+
+  return (hours > 0 ? PadChar(ToWstr(hours), '0', 2) + L":" : L"") +
+         PadChar(ToWstr(minutes), '0', 2) + L":" +
+         PadChar(ToWstr(duration.seconds()), '0', 2);
 }
 
 const Date& EmptyDate() {
