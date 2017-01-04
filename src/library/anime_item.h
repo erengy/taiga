@@ -78,7 +78,9 @@ public:
   void SetSynonyms(const std::wstring& synonyms);
   void SetSynonyms(const std::vector<std::wstring>& synonyms);
   void SetDateStart(const Date& date);
+  void SetDateStart(const std::wstring& date);
   void SetDateEnd(const Date& date);
+  void SetDateEnd(const std::wstring& date);
   void SetImageUrl(const std::wstring& url);
   void SetAgeRating(enum_t rating);
   void SetGenres(const std::wstring& genres);
@@ -114,7 +116,9 @@ public:
   void SetMyRewatching(int rewatching);
   void SetMyRewatchingEp(int rewatching_ep);
   void SetMyDateStart(const Date& date);
+  void SetMyDateStart(const std::wstring& date);
   void SetMyDateEnd(const Date& date);
+  void SetMyDateEnd(const std::wstring& date);
   void SetMyLastUpdated(const std::wstring& last_updated);
   void SetMyTags(const std::wstring& tags);
   void SetMyNotes(const std::wstring& notes);

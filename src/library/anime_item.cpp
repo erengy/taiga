@@ -284,6 +284,10 @@ void Item::SetDateStart(const Date& date) {
   metadata_.date.at(0) = date;
 }
 
+void Item::SetDateStart(const std::wstring& date) {
+  SetDateStart(Date(date));
+}
+
 void Item::SetDateEnd(const Date& date) {
   if (metadata_.date.size() < 2) {
     if (!IsValidDate(date))
@@ -292,6 +296,10 @@ void Item::SetDateEnd(const Date& date) {
   }
 
   metadata_.date.at(1) = date;
+}
+
+void Item::SetDateEnd(const std::wstring& date) {
+  SetDateEnd(Date(date));
 }
 
 void Item::SetImageUrl(const std::wstring& url) {
@@ -524,10 +532,18 @@ void Item::SetMyDateStart(const Date& date) {
   my_info_->date_start = date;
 }
 
+void Item::SetMyDateStart(const std::wstring& date) {
+  SetMyDateStart(Date(date));
+}
+
 void Item::SetMyDateEnd(const Date& date) {
   assert(my_info_.get());
 
   my_info_->date_finish = date;
+}
+
+void Item::SetMyDateEnd(const std::wstring& date) {
+  SetMyDateEnd(Date(date));
 }
 
 void Item::SetMyLastUpdated(const std::wstring& last_updated) {

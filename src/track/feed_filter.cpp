@@ -59,11 +59,11 @@ bool EvaluateCondition(const FeedFilterCondition& condition,
       break;
     case kFeedFilterElement_Meta_DateStart:
       if (anime)
-        element = anime->GetDateStart();
+        element = anime->GetDateStart().to_string();
       break;
     case kFeedFilterElement_Meta_DateEnd:
       if (anime)
-        element = anime->GetDateEnd();
+        element = anime->GetDateEnd().to_string();
       break;
     case kFeedFilterElement_Meta_Episodes:
       if (anime)

@@ -83,7 +83,7 @@ std::wstring GetFileLastModifiedDate(const std::wstring& path) {
       SYSTEMTIME st_file = {0};
       result = FileTimeToSystemTime(&ft_file, &st_file);
       if (result)
-        return Date(st_file.wYear, st_file.wMonth, st_file.wDay);
+        return static_cast<std::wstring>(Date(st_file));
     }
   }
 

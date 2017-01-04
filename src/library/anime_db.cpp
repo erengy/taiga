@@ -167,7 +167,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     #define XML_WC(n, v, t) \
       if (!v.empty()) XmlWriteChildNodes(anime_node, v, n, t)
     #define XML_WD(n, v) \
-      if (v) XmlWriteStrValue(anime_node, n, std::wstring(v).c_str())
+      if (v) XmlWriteStrValue(anime_node, n, v.to_string().c_str())
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \

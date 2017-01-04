@@ -506,7 +506,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
     if (rect_item.PtIn(pt)) {
       auto date_start = anime_item->GetDateStart();
       if (date_start.year() && date_start.month() && date_start.day()) {
-        const std::wstring text = date_start;
+        const auto text = date_start.to_string();
         update_tooltip(kTooltipAnimeSeason, text.c_str(), &rect_item);
       }
     }

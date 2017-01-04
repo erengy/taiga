@@ -36,11 +36,15 @@ Date::Date(const std::wstring& date)
   }
 }
 
+Date::Date(const SYSTEMTIME& st)
+    : year_(st.wYear), month_(st.wMonth), day_(st.wDay) {
+}
+
 Date::Date(unsigned short year, unsigned short month, unsigned short day)
     : year_(year), month_(month), day_(day) {
 }
 
-Date& Date::operator = (const Date& date) {
+Date& Date::operator=(const Date& date) {
   year_ = date.year_;
   month_ = date.month_;
   day_ = date.day_;
@@ -48,14 +52,14 @@ Date& Date::operator = (const Date& date) {
   return *this;
 }
 
-int Date::operator - (const Date& date) const {
+int Date::operator-(const Date& date) const {
   const auto days = date::sys_days{static_cast<date::year_month_day>(*this)} -
                     date::sys_days{static_cast<date::year_month_day>(date)};
   return days.count();
 }
 
 Date::operator bool() const {
-  return year() != 0 || month() != 0 || day() != 0;
+  return year() && month() && day();
 }
 
 Date::operator SYSTEMTIME() const {
@@ -68,14 +72,18 @@ Date::operator SYSTEMTIME() const {
 }
 
 Date::operator std::wstring() const {
-  // Convert to YYYY-MM-DD
-  return PadChar(ToWstr(year()), '0', 4) + L"-" +
-         PadChar(ToWstr(month()), '0', 2) + L"-" +
-         PadChar(ToWstr(day()), '0', 2);
+  return to_string();
 }
 
 Date::operator date::year_month_day() const {
   return date::year_month_day{year_, month_, day_};
+}
+
+std::wstring Date::to_string() const {
+  // Convert to YYYY-MM-DD
+  return PadChar(ToWstr(year()), '0', 4) + L"-" +
+         PadChar(ToWstr(month()), '0', 2) + L"-" +
+         PadChar(ToWstr(day()), '0', 2);
 }
 
 unsigned short Date::year() const {
@@ -382,7 +390,7 @@ void GetSystemTime(SYSTEMTIME& st, int utc_offset) {
 Date GetDate() {
   SYSTEMTIME st;
   GetLocalTime(&st);
-  return Date(st.wYear, st.wMonth, st.wDay);
+  return Date(st);
 }
 
 Date GetDate(time_t unix_time) {
@@ -402,9 +410,9 @@ std::wstring GetTime(LPCWSTR format) {
 }
 
 Date GetDateJapan() {
-  SYSTEMTIME st_jst;
-  GetSystemTime(st_jst, 9);  // JST is UTC+09
-  return Date(st_jst.wYear, st_jst.wMonth, st_jst.wDay);
+  SYSTEMTIME st;
+  GetSystemTime(st, 9);  // JST is UTC+09
+  return Date(st);
 }
 
 std::wstring GetTimeJapan(LPCWSTR format) {

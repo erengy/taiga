@@ -29,18 +29,20 @@
 class Date : public base::Comparable<Date> {
 public:
   Date();
-  Date(const std::wstring& date);
-  Date(unsigned short year, unsigned short month, unsigned short day);
-  virtual ~Date() {}
+  explicit Date(const std::wstring& date);
+  explicit Date(const SYSTEMTIME& st);
+  explicit Date(unsigned short year, unsigned short month, unsigned short day);
 
-  Date& operator = (const Date& date);
+  Date& operator=(const Date& date);
 
-  int operator - (const Date& date) const;
+  int operator-(const Date& date) const;
 
-  operator bool() const;
-  operator SYSTEMTIME() const;
-  operator std::wstring() const;
-  operator date::year_month_day() const;
+  explicit operator bool() const;
+  explicit operator SYSTEMTIME() const;
+  explicit operator std::wstring() const;
+  explicit operator date::year_month_day() const;
+
+  std::wstring to_string() const;
 
   unsigned short year() const;
   unsigned short month() const;

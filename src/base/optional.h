@@ -37,6 +37,10 @@ public:
     return value_;
   }
 
+  const T* operator ->() const {
+    return &value_;
+  }
+
   T& operator =(const T& value) {
     value_ = value;
     initialized_ = true;

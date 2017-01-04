@@ -635,14 +635,14 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
     for (const auto& history_item : History.queue.items) {
       if (!history_item.episode || *history_item.episode == 0)
         continue;
-      date_diff = date_now - (Date)(history_item.time.substr(0, 10));
+      date_diff = date_now - Date(history_item.time.substr(0, 10));
       if (date_diff <= day_limit)
         watched_last_week++;
     }
     for (const auto& history_item : History.items) {
       if (!history_item.episode || *history_item.episode == 0)
         continue;
-      date_diff = date_now - (Date)(history_item.time.substr(0, 10));
+      date_diff = date_now - Date(history_item.time.substr(0, 10));
       if (date_diff <= day_limit)
         watched_last_week++;
     }

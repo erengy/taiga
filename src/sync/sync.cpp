@@ -174,9 +174,9 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
   if (anime_values.score)
     request.data[L"score"] = ToWstr(*anime_values.score);
   if (anime_values.date_start)
-    request.data[L"date_start"] = *anime_values.date_start;
+    request.data[L"date_start"] = anime_values.date_start->to_string();
   if (anime_values.date_finish)
-    request.data[L"date_finish"] = *anime_values.date_finish;
+    request.data[L"date_finish"] = anime_values.date_finish->to_string();
   if (anime_values.enable_rewatching)
     request.data[L"enable_rewatching"] = ToWstr(*anime_values.enable_rewatching);
   if (anime_values.rewatched_times)

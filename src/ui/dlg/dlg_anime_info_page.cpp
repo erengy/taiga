@@ -378,12 +378,12 @@ void PageMyInfo::Refresh(int anime_id) {
     SendDlgItemMessage(control_id, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&st);
   };
   if (anime::IsValidDate(anime_item->GetDateStart())) {
-    SYSTEMTIME stSeriesStart = anime_item->GetDateStart();
+    auto stSeriesStart = static_cast<SYSTEMTIME>(anime_item->GetDateStart());
     set_default_systemtime(IDC_DATETIME_START, stSeriesStart);
     set_default_systemtime(IDC_DATETIME_FINISH, stSeriesStart);
   }
   if (anime::IsValidDate(anime_item->GetDateEnd())) {
-    SYSTEMTIME stSeriesEnd = anime_item->GetDateEnd();
+    auto stSeriesEnd = static_cast<SYSTEMTIME>(anime_item->GetDateEnd());
     set_default_systemtime(IDC_DATETIME_FINISH, stSeriesEnd);
   }
   auto fix_systemtime = [](SYSTEMTIME& st) {
@@ -391,14 +391,14 @@ void PageMyInfo::Refresh(int anime_id) {
     if (!st.wDay) st.wDay = 1;
   };
   if (anime::IsValidDate(anime_item->GetMyDateStart())) {
-    SYSTEMTIME stMyStart = anime_item->GetMyDateStart();
+    auto stMyStart = static_cast<SYSTEMTIME>(anime_item->GetMyDateStart());
     fix_systemtime(stMyStart);
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyStart);
   } else {
     SendDlgItemMessage(IDC_DATETIME_START, DTM_SETSYSTEMTIME, GDT_NONE, 0);
   }
   if (anime::IsValidDate(anime_item->GetMyDateEnd())) {
-    SYSTEMTIME stMyFinish = anime_item->GetMyDateEnd();
+    auto stMyFinish = static_cast<SYSTEMTIME>(anime_item->GetMyDateEnd());
     fix_systemtime(stMyFinish);
     SendDlgItemMessage(IDC_DATETIME_FINISH, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&stMyFinish);
   } else {
