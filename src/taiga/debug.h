@@ -18,20 +18,22 @@
 
 #pragma once
 
+#include <chrono>
 #include <string>
 
 namespace debug {
 
 class Tester {
- public:
+public:
+  using clock_t = std::chrono::steady_clock;
+
   Tester();
 
   void Start();
-  void End(std::wstring str, bool display_result);
+  void Stop(std::wstring str, bool display_result);
 
- private:
-  double frequency_;
-  __int64 value_;
+private:
+  clock_t::time_point t0_;
 };
 
 void Print(std::wstring text);
