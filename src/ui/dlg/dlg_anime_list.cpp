@@ -562,10 +562,13 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
       if (columns[kColumnUserProgress].visible && rect_item.PtIn(pt)) {
         std::wstring text;
 
+        const int eps_aired_estimated = anime_item->GetLastAiredEpisodeNumber(true);
+        const int eps_available = anime_item->GetAvailableEpisodeCount();
+        const int available_episodes = std::max(eps_aired_estimated, eps_available);
+
         // Find missing episodes
         std::vector<int> missing_episodes;
-        const int last_aired_episode_number = anime_item->GetLastAiredEpisodeNumber(true);
-        for (int i = 1; i <= last_aired_episode_number; ++i) {
+        for (int i = 1; i <= available_episodes; ++i) {
           if (!anime_item->IsEpisodeAvailable(i))
             missing_episodes.push_back(i);
         }
@@ -585,7 +588,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
           }
         }
 
-        if (missing_episodes.size() == last_aired_episode_number) {
+        if (missing_episodes.size() == available_episodes) {
           AppendString(text, L"All episodes are missing");
         } else if (missing_episodes.empty()) {
           AppendString(text, L"All episodes are in library folders");
@@ -599,9 +602,9 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
         }
 
         if (!anime::IsFinishedAiring(*anime_item) &&
-            last_aired_episode_number > anime_item->GetMyLastWatchedEpisode()) {
-          bool estimate = last_aired_episode_number != anime_item->GetLastAiredEpisodeNumber();
-          AppendString(text, L"Aired: #" + ToWstr(last_aired_episode_number) +
+            eps_aired_estimated > anime_item->GetMyLastWatchedEpisode()) {
+          bool estimate = eps_aired_estimated != anime_item->GetLastAiredEpisodeNumber(false);
+          AppendString(text, L"Aired: #" + ToWstr(eps_aired_estimated) +
                              (estimate ? L" (estimated)" : L""), L"\r\n");
         }
 
