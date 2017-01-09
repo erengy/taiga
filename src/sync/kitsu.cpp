@@ -131,7 +131,7 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/library-entries";
 
   http_request.url.query[L"filter[user_id]"] = user_.id;
-  http_request.url.query[L"filter[media_type]"] = L"Anime";
+  http_request.url.query[L"filter[kind]"] = L"anime";
 
   // We don't need to download the entire library; we just need to know about
   // the entries that have changed since the last download. `filter[since]` is
@@ -151,7 +151,7 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
     http_request.url.query[L"filter[since]"] = std::wstring(date);
   }
 
-  http_request.url.query[L"include"] = L"media";
+  http_request.url.query[L"include"] = L"anime";
 
   // Kitsu's configuration sets JSONAPI's default_page_size to 10. The only way
   // to retrieve the entire library in a single request is to set the limit to a
@@ -205,7 +205,7 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
   http_request.header[L"Content-Type"] = kJsonApiMediaType;
 
-  http_request.url.query[L"include"] = L"media,media.genres";
+  http_request.url.query[L"include"] = L"anime,anime.genres";
 
   http_request.body = BuildLibraryObject(request);
 
@@ -228,7 +228,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"PATCH";
   http_request.header[L"Content-Type"] = kJsonApiMediaType;
 
-  http_request.url.query[L"include"] = L"media,media.genres";
+  http_request.url.query[L"include"] = L"anime,anime.genres";
 
   http_request.body = BuildLibraryObject(request);
 
@@ -419,7 +419,7 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
       {"type", "libraryEntries"},
       {"attributes", {}},
       {"relationships", {
-        {"media", {
+        {"anime", {
           {"data", {
             {"type", "anime"},
             {"id", ToStr(anime_id)},
@@ -480,9 +480,9 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
       L"episodeCount,"
       L"episodeLength,"
       L"posterImage,"
-      L"showType,"
       L"slug,"
       L"startDate,"
+      L"subtype,"
       L"synopsis,"
       L"titles,"
       // relationships
@@ -500,7 +500,7 @@ void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) con
       L"status,"
       L"updatedAt,"
       // relationships
-      L"media";
+      L"anime";
 }
 
 void Service::UseSparseFieldsetsForUser(HttpRequest& http_request) const {
@@ -558,9 +558,9 @@ int Service::ParseAnimeObject(const Json& json) const {
   anime_item.SetEpisodeCount(JsonReadInt(attributes, "episodeCount"));
   anime_item.SetEpisodeLength(JsonReadInt(attributes, "episodeLength"));
   anime_item.SetImageUrl(StrToWstr(JsonReadStr(attributes["posterImage"], "small")));
-  anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(attributes, "showType")));
   anime_item.SetSlug(StrToWstr(JsonReadStr(attributes, "slug")));
   anime_item.SetDateStart(StrToWstr(JsonReadStr(attributes, "startDate")));
+  anime_item.SetType(TranslateSeriesTypeFrom(JsonReadStr(attributes, "subtype")));
   anime_item.SetSynopsis(DecodeSynopsis(JsonReadStr(attributes, "synopsis")));
 
   for (const auto& title : attributes["abbreviatedTitles"]) {
@@ -600,17 +600,11 @@ void Service::ParseGenres(const Json& json, const int anime_id) const {
 }
 
 int Service::ParseLibraryObject(const Json& json) const {
-  const auto& media = json["relationships"]["media"];
-  const std::string media_type = media["data"]["type"];
-
-  if (media_type != "anime") {
-    LOGD(L"Invalid type: " + StrToWstr(media_type));
-    return anime::ID_UNKNOWN;  // ignore other types of media
-  }
+  const auto& media = json["relationships"]["anime"];
+  const auto& attributes = json["attributes"];
 
   const auto anime_id = ToInt(media["data"]["id"].get<std::string>());
   const auto library_id = ToInt(json["id"].get<std::string>());
-  const auto& attributes = json["attributes"];
 
   anime::Item anime_item;
   anime_item.SetSource(this->id());
@@ -639,7 +633,7 @@ bool Service::ParseResponseBody(const std::wstring& body,
       response.data[L"error"] = L"Could not parse library entries";
       break;
     case kGetMetadataById:
-      response.data[L"error"] = L"Could not parse media object";
+      response.data[L"error"] = L"Could not parse anime object";
       break;
     case kGetSeason:
       response.data[L"error"] = L"Could not parse season data";
