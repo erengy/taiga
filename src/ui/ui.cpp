@@ -1039,7 +1039,7 @@ void OnUpdateAvailable() {
   DlgUpdateNew.Create(IDD_UPDATE_NEW, DlgUpdate.GetWindowHandle(), true);
 }
 
-void OnUpdateNotAvailable(bool relations) {
+void OnUpdateNotAvailable(bool relations, bool season) {
   if (DlgMain.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Taiga is up to date!");
@@ -1047,6 +1047,10 @@ void OnUpdateNotAvailable(bool relations) {
     if (relations) {
       content += L"\n\nUpdated anime relations to: " +
                  Taiga.Updater.GetCurrentAnimeRelationsModified();
+    }
+    if (season) {
+      content += L"\n\nNew anime season: " +
+                 SeasonDatabase.available_seasons.second.GetString();
     }
     dlg.SetContent(content.c_str());
     dlg.AddButton(L"OK", IDOK);

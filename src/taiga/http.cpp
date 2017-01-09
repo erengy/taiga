@@ -280,7 +280,8 @@ void HttpManager::HandleResponse(HttpResponse& response) {
           Taiga.Updater.CheckAnimeRelations();
           break;
         }
-        ui::OnUpdateNotAvailable();
+        const bool new_season = Taiga.Updater.IsNewSeasonAvailable();
+        ui::OnUpdateNotAvailable(false, new_season);
       }
       ui::OnUpdateFinished();
       break;
@@ -290,18 +291,20 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       Taiga.Updater.RunInstaller();
       ui::OnUpdateFinished();
       break;
-    case kHttpTaigaUpdateRelations:
+    case kHttpTaigaUpdateRelations: {
+      const bool new_season = Taiga.Updater.IsNewSeasonAvailable();
       if (Meow.ReadRelations(client.write_buffer_) &&
           SaveToFile(client.write_buffer_, GetPath(kPathDatabaseAnimeRelations))) {
         LOGD(L"Updated anime relation data.");
-        ui::OnUpdateNotAvailable(true);
+        ui::OnUpdateNotAvailable(true, new_season);
       } else {
         Meow.ReadRelations();
         LOGD(L"Anime relation data update failed.");
-        ui::OnUpdateNotAvailable(false);
+        ui::OnUpdateNotAvailable(false, new_season);
       }
       ui::OnUpdateFinished();
       break;
+    }
   }
 
   FreeConnection(client.request_.url.host);

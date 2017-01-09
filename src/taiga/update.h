@@ -36,6 +36,7 @@ public:
   void CheckAnimeRelations();
   bool Download();
   bool IsAnimeRelationsAvailable() const;
+  bool IsNewSeasonAvailable() const;
   bool IsRestartRequired() const;
   bool IsUpdateAvailable() const;
   bool ParseData(std::wstring data);
@@ -58,6 +59,7 @@ private:
   std::wstring download_path_;
   std::unique_ptr<Item> current_item_;
   std::unique_ptr<Item> latest_item_;
+  bool new_season_available_;
   bool restart_required_;
   bool update_available_;
   std::wstring client_uid_;
