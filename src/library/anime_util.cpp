@@ -71,7 +71,7 @@ SeriesStatus GetAiringStatus(const Item& item) {
   if (!IsValidDate(item.GetDateStart()))
     return kNotYetAired;
   const Date start = assume_worst_case(item.GetDateStart());
-  if (now <= start)
+  if (now < start)
     return kNotYetAired;
 
   // We don't need to check the end date for single-episode anime
