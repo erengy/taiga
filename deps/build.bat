@@ -1,7 +1,7 @@
 @echo off
 
 echo Running vcvarsall.bat...
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
+call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
 
 cd src\curl\winbuild\
 
