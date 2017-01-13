@@ -588,6 +588,8 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   if (!anime_item)
     return;
 
+  anime_item->AddtoUserList();
+
   // Edit episode
   if (history_item.episode) {
     anime_item->SetMyLastWatchedEpisode(*history_item.episode);
