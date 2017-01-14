@@ -365,47 +365,47 @@ bool Service::RequestNeedsAuthentication(RequestType request_type) const {
 
 bool Service::RequestSucceeded(Response& response,
                                const HttpResponse& http_response) {
-  switch (http_response.GetStatusCategory()) {
-    // 200 OK
-    // 201 Created
-    // 202 Accepted
-    // 204 No Content
-    case 200:
-      return true;
+  const auto status_category = http_response.GetStatusCategory();
 
-    // Error
-    default: {
-      Json root;
-      std::wstring error_description;
+  // 200 OK
+  // 201 Created
+  // 202 Accepted
+  // 204 No Content
+  if (status_category == 200)
+    return true;
 
-      if (JsonParseString(http_response.body, root)) {
-        if (root.count("error_description")) {
-          error_description = StrToWstr(root["error_description"]);
-        } else if (root.count("errors")) {
-          const auto& errors = root["errors"];
-          if (errors.is_array() && !errors.empty()) {
-            const auto& error = errors.front();
-            error_description = StrToWstr("\"" +
-                error["title"].get<std::string>() + ": " +
-                error["detail"].get<std::string>() + "\"");
-            if (response.type == kGetMetadataById && error["status"] == "404")
-              response.data[L"invalid_id"] = L"true";
-          }
-        }
+  // Handle invalid anime IDs
+  if (response.type == kGetMetadataById && http_response.code == 404)
+    response.data[L"invalid_id"] = L"true";
+
+  // Error
+  Json root;
+  std::wstring error_description;
+
+  if (JsonParseString(http_response.body, root)) {
+    if (root.count("error_description")) {
+      error_description = StrToWstr(root["error_description"]);
+    } else if (root.count("errors")) {
+      const auto& errors = root["errors"];
+      if (errors.is_array() && !errors.empty()) {
+        const auto& error = errors.front();
+        error_description = StrToWstr("\"" +
+            error["title"].get<std::string>() + ": " +
+            error["detail"].get<std::string>() + "\"");
       }
-
-      if (error_description.empty()) {
-        error_description = L"Unknown error (" +
-            canonical_name() + L"|" +
-            ToWstr(response.type) + L"|" +
-            ToWstr(http_response.code) + L")";
-      }
-
-      response.data[L"error"] = name() + L" returned an error: " +
-                                error_description;
-      return false;
     }
   }
+
+  if (error_description.empty()) {
+    error_description = L"Unknown error (" +
+        canonical_name() + L"|" +
+        ToWstr(response.type) + L"|" +
+        ToWstr(http_response.code) + L")";
+  }
+
+  response.data[L"error"] = name() + L" returned an error: " +
+                            error_description;
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
