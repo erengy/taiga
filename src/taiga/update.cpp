@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #include <cmath>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "base/url.h"
@@ -53,7 +52,7 @@ void UpdateHelper::Check() {
   http_request.url.path = L"/update.php";
   http_request.url.query[L"channel"] = is_stable ? L"stable" : L"beta";
   http_request.url.query[L"check"] = is_automatic ? L"auto" : L"manual";
-  http_request.url.query[L"version"] = std::wstring(Taiga.version);
+  http_request.url.query[L"version"] = StrToWstr(Taiga.version.str());
   http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
   http_request.url.query[L"username"] = GetCurrentUsername();
 
@@ -75,6 +74,7 @@ bool UpdateHelper::ParseData(std::wstring data) {
   download_path_.clear();
   current_item_.reset();
   latest_item_.reset();
+  new_season_available_ = false;
   restart_required_ = false;
   update_available_ = false;
 
@@ -100,20 +100,21 @@ bool UpdateHelper::ParseData(std::wstring data) {
 
   auto current_version = Taiga.version;
   auto latest_version = current_version;
-  foreach_(item, items) {
-    base::SemanticVersion item_version(item->guid);
+  for (const auto& item : items) {
+    semaver::Version item_version(WstrToStr(item.guid));
     if (item_version > latest_version) {
-      latest_item_.reset(new Item(*item));
+      latest_item_.reset(new Item(item));
       latest_version = item_version;
     } else if (item_version == current_version) {
-      current_item_.reset(new Item(*item));
-      anime::Season season_max(item->taiga_anime_season_max);
+      current_item_.reset(new Item(item));
+      anime::Season season_max(item.taiga_anime_season_max);
       if (season_max && season_max > SeasonDatabase.available_seasons.second) {
+        new_season_available_ = true;
         SeasonDatabase.available_seasons.second = season_max;
         Settings.Set(taiga::kApp_Seasons_MaxSeason, season_max.GetString());
       }
-      if (!item->taiga_anime_season_location.empty())
-        SeasonDatabase.remote_location = item->taiga_anime_season_location;
+      if (!item.taiga_anime_season_location.empty())
+        SeasonDatabase.remote_location = item.taiga_anime_season_location;
     }
   }
 
@@ -138,6 +139,10 @@ bool UpdateHelper::IsAnimeRelationsAvailable() const {
   }
 
   return true;
+}
+
+bool UpdateHelper::IsNewSeasonAvailable() const {
+  return new_season_available_;
 }
 
 bool UpdateHelper::IsRestartRequired() const {

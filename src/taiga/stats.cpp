@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "base/file.h"
-#include "base/foreach.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "taiga/path.h"
@@ -58,8 +59,8 @@ void Statistics::CalculateAll() {
 int Statistics::CalculateAnimeCount() {
   anime_count = 0;
 
-  foreach_(it, AnimeDatabase.items)
-    if (it->second.IsInList())
+  for (const auto& pair : AnimeDatabase.items)
+    if (pair.second.IsInList())
       anime_count++;
 
   return anime_count;
@@ -68,13 +69,13 @@ int Statistics::CalculateAnimeCount() {
 int Statistics::CalculateEpisodeCount() {
   episode_count = 0;
 
-  foreach_(it, AnimeDatabase.items) {
-    if (!it->second.IsInList())
+  for (const auto& pair : AnimeDatabase.items) {
+    if (!pair.second.IsInList())
       continue;
 
-    episode_count += it->second.GetMyLastWatchedEpisode();
-    episode_count += anime::GetMyRewatchedTimes(it->second) *
-                     it->second.GetEpisodeCount();
+    episode_count += pair.second.GetMyLastWatchedEpisode();
+    episode_count += anime::GetMyRewatchedTimes(pair.second) *
+                     pair.second.GetEpisodeCount();
   }
 
   return episode_count;
@@ -83,8 +84,8 @@ int Statistics::CalculateEpisodeCount() {
 const std::wstring& Statistics::CalculateLifePlannedToWatch() {
   int seconds = 0;
 
-  foreach_(it, AnimeDatabase.items) {
-    const auto& item = it->second;
+  for (const auto& pair : AnimeDatabase.items) {
+    const auto& item = pair.second;
 
     switch (item.GetMyStatus()) {
       case anime::kNotInList:
@@ -95,7 +96,7 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
 
     int episodes = EstimateEpisodeCount(item) - item.GetMyLastWatchedEpisode();
 
-    seconds += (EstimateDuration(it->second) * 60) * episodes;
+    seconds += (EstimateDuration(item) * 60) * episodes;
   }
 
   life_planned_to_watch = seconds > 0 ? ToDateString(seconds) : L"None";
@@ -105,8 +106,8 @@ const std::wstring& Statistics::CalculateLifePlannedToWatch() {
 const std::wstring& Statistics::CalculateLifeSpentWatching() {
   int seconds = 0;
 
-  foreach_(it, AnimeDatabase.items) {
-    const auto& item = it->second;
+  for (const auto& pair : AnimeDatabase.items) {
+    const auto& item = pair.second;
 
     if (!item.IsInList())
       continue;
@@ -139,12 +140,12 @@ float Statistics::CalculateMeanScore() {
   float items_scored = 0.0f;
   float sum_scores = 0.0f;
 
-  foreach_(it, AnimeDatabase.items) {
-    if (!it->second.IsInList())
+  for (const auto& pair : AnimeDatabase.items) {
+    if (!pair.second.IsInList())
       continue;
 
-    if (it->second.GetMyScore() > 0) {
-      sum_scores += static_cast<float>(it->second.GetMyScore());
+    if (pair.second.GetMyScore() > 0) {
+      sum_scores += static_cast<float>(pair.second.GetMyScore());
       items_scored++;
     }
   }
@@ -158,12 +159,12 @@ float Statistics::CalculateScoreDeviation() {
   float items_scored = 0.0f;
   float sum_squares = 0.0f;
 
-  foreach_(it, AnimeDatabase.items) {
-    if (!it->second.IsInList())
+  for (const auto& pair : AnimeDatabase.items) {
+    if (!pair.second.IsInList())
       continue;
 
-    if (it->second.GetMyScore() > 0) {
-      float score = static_cast<float>(it->second.GetMyScore());
+    if (pair.second.GetMyScore() > 0) {
+      float score = static_cast<float>(pair.second.GetMyScore());
       sum_squares += pow(score - score_mean, 2);
       items_scored++;
     }
@@ -175,24 +176,24 @@ float Statistics::CalculateScoreDeviation() {
 }
 
 const std::vector<float>& Statistics::CalculateScoreDistribution() {
-  foreach_(item, score_count)
-    *item = 0;
-  foreach_(item, score_distribution)
-    *item = 0.0f;
+  for (auto& value : score_count)
+    value = 0;
+  for (auto& value : score_distribution)
+    value = 0.0f;
 
   float extreme_value = 1.0f;
 
-  foreach_(it, AnimeDatabase.items) {
-    int score = it->second.GetMyScore();
+  for (const auto& pair : AnimeDatabase.items) {
+    int score = pair.second.GetMyScore();
     if (score > 0) {
       score_count[score]++;
       score_distribution[score]++;
-      extreme_value = max(score_distribution[score], extreme_value);
+      extreme_value = std::max(score_distribution[score], extreme_value);
     }
   }
 
-  foreach_(it, score_distribution)
-    *it = *it / extreme_value;
+  for (auto& value : score_distribution)
+    value = value / extreme_value;
 
   return score_distribution;
 }

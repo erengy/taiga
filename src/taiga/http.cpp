@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ void HttpClient::OnError(CURLcode error_code) {
       break;
   }
 
-  LOG(LevelError, error_text + L"\nConnection mode: " + ToWstr(mode_));
+  LOGE(error_text + L"\nConnection mode: " + ToWstr(mode_));
 
   ui::OnHttpError(*this, error_text);
 
@@ -105,7 +105,7 @@ bool HttpClient::OnHeadersAvailable() {
 }
 
 bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
-  LOG(LevelDebug, L"Redirecting... (" + address + L")");
+  LOGD(L"Location: " + address);
 
   switch (mode()) {
     case kHttpTaigaUpdateDownload: {
@@ -131,7 +131,7 @@ bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
     if (check_cloudflare(response_)) {
       std::wstring error_text = L"Cannot connect to " + request_.url.host +
                                 L" because of Cloudflare DDoS protection";
-      LOG(LevelError, error_text + L"\nConnection mode: " + ToWstr(mode_));
+      LOGE(error_text + L"\nConnection mode: " + ToWstr(mode_));
       ui::OnHttpError(*this, error_text);
     } else {
       HttpRequest http_request = request_;
@@ -185,7 +185,9 @@ void HttpManager::HandleError(HttpResponse& response, const string_t& error) {
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
+    case kHttpServiceGetUser:
     case kHttpServiceGetMetadataById:
+    case kHttpServiceGetSeason:
     case kHttpServiceSearchTitle:
     case kHttpServiceAddLibraryEntry:
     case kHttpServiceDeleteLibraryEntry:
@@ -210,7 +212,9 @@ void HttpManager::HandleResponse(HttpResponse& response) {
 
   switch (client.mode()) {
     case kHttpServiceAuthenticateUser:
+    case kHttpServiceGetUser:
     case kHttpServiceGetMetadataById:
+    case kHttpServiceGetSeason:
     case kHttpServiceSearchTitle:
     case kHttpServiceAddLibraryEntry:
     case kHttpServiceDeleteLibraryEntry:
@@ -276,7 +280,8 @@ void HttpManager::HandleResponse(HttpResponse& response) {
           Taiga.Updater.CheckAnimeRelations();
           break;
         }
-        ui::OnUpdateNotAvailable();
+        const bool new_season = Taiga.Updater.IsNewSeasonAvailable();
+        ui::OnUpdateNotAvailable(false, new_season);
       }
       ui::OnUpdateFinished();
       break;
@@ -286,18 +291,20 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       Taiga.Updater.RunInstaller();
       ui::OnUpdateFinished();
       break;
-    case kHttpTaigaUpdateRelations:
+    case kHttpTaigaUpdateRelations: {
+      const bool new_season = Taiga.Updater.IsNewSeasonAvailable();
       if (Meow.ReadRelations(client.write_buffer_) &&
           SaveToFile(client.write_buffer_, GetPath(kPathDatabaseAnimeRelations))) {
-        LOG(LevelDebug, L"Updated anime relation data.");
-        ui::OnUpdateNotAvailable(true);
+        LOGD(L"Updated anime relation data.");
+        ui::OnUpdateNotAvailable(true, new_season);
       } else {
         Meow.ReadRelations();
-        LOG(LevelDebug, L"Anime relation data update failed.");
-        ui::OnUpdateNotAvailable(false);
+        LOGD(L"Anime relation data update failed.");
+        ui::OnUpdateNotAvailable(false, new_season);
       }
       ui::OnUpdateFinished();
       break;
+    }
   }
 
   FreeConnection(client.request_.url.host);
@@ -328,9 +335,9 @@ void HttpManager::Shutdown() {
 ////////////////////////////////////////////////////////////////////////////////
 
 HttpClient* HttpManager::FindClient(base::uid_t uid) {
-  foreach_(it, clients_)
-    if (it->request().uid == uid)
-      return &(*it);
+  for (auto& client : clients_)
+    if (client.request().uid == uid)
+      return &client;
 
   return nullptr;
 }
@@ -341,8 +348,8 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
   foreach_(it, clients_) {
     if (it->allow_reuse() && !it->busy()) {
       if (IsEqual(it->request().url.host, request.url.host)) {
-        LOG(LevelDebug, L"Reusing client with the ID: " + it->request().uid +
-                        L"\nClient's new ID: " + request.uid);
+        LOGD(L"Reusing client with the ID: " + it->request().uid +
+             L"\nClient's new ID: " + request.uid);
         client = &(*it);
         // Proxy settings might have changed since then
         client->set_proxy(Settings[kApp_Connection_ProxyHost],
@@ -356,8 +363,8 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
   if (!client) {
     clients_.push_back(HttpClient(request));
     client = &clients_.back();
-    LOG(LevelDebug, L"Created a new client. Total number of clients is now " +
-                    ToWstr(clients_.size()));
+    LOGD(L"Created a new client. Total number of clients is now " +
+         ToWstr(clients_.size()));
   }
 
   return *client;
@@ -367,7 +374,7 @@ void HttpManager::AddToQueue(HttpRequest& request, HttpClientMode mode) {
 #ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
-  LOG(LevelDebug, L"ID: " + request.uid);
+  LOGD(L"ID: " + request.uid);
 
   requests_.push_back(std::make_pair(request, mode));
 #else
@@ -382,17 +389,17 @@ void HttpManager::ProcessQueue() {
   win::Lock lock(critical_section_);
 
   unsigned int connections = 0;
-  foreach_(it, connections_)
-    connections += it->second;
+  for (const auto& pair : connections_)
+    connections += pair.second;
 
   for (size_t i = 0; i < requests_.size(); i++) {
     if (shutdown_) {
-      LOG(LevelDebug, L"Shutting down");
+      LOGD(L"Shutting down");
       return;
     }
 
     if (connections == kMaxSimultaneousConnections) {
-      LOG(LevelDebug, L"Reached max connections");
+      LOGD(L"Reached max connections");
       return;
     }
 
@@ -400,14 +407,14 @@ void HttpManager::ProcessQueue() {
     HttpClientMode mode = requests_.at(i).second;
 
     if (connections_[request.url.host] == kMaxSimultaneousConnectionsPerHostname) {
-      LOG(LevelDebug, L"Reached max connections for hostname: " + request.url.host);
+      LOGD(L"Reached max connections for hostname: " + request.url.host);
       continue;
     } else {
       connections++;
       connections_[request.url.host]++;
-      LOG(LevelDebug, L"Connections for hostname is now " +
-                      ToWstr(connections_[request.url.host]) +
-                      L": " + request.url.host);
+      LOGD(L"Connections for hostname is now " +
+           ToWstr(connections_[request.url.host]) +
+           L": " + request.url.host);
 
       HttpClient& client = GetClient(request);
       client.set_mode(mode);
@@ -425,8 +432,8 @@ void HttpManager::AddConnection(const string_t& hostname) {
   win::Lock lock(critical_section_);
 
   connections_[hostname]++;
-  LOG(LevelDebug, L"Connections for hostname is now " +
-                  ToWstr(connections_[hostname]) + L": " + hostname);
+  LOGD(L"Connections for hostname is now " +
+       ToWstr(connections_[hostname]) + L": " + hostname);
 #endif
 }
 
@@ -436,10 +443,10 @@ void HttpManager::FreeConnection(const string_t& hostname) {
 
   if (connections_[hostname] > 0) {
     connections_[hostname]--;
-    LOG(LevelDebug, L"Connections for hostname is now " +
-                    ToWstr(connections_[hostname]) + L": " + hostname);
+    LOGD(L"Connections for hostname is now " +
+         ToWstr(connections_[hostname]) + L": " + hostname);
   } else {
-    LOG(LevelError, L"Connections for hostname was already zero: " + hostname);
+    LOGE(L"Connections for hostname was already zero: " + hostname);
   }
 #endif
 }

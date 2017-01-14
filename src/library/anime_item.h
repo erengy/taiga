@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_ITEM_H
-#define TAIGA_LIBRARY_ANIME_ITEM_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -79,7 +78,9 @@ public:
   void SetSynonyms(const std::wstring& synonyms);
   void SetSynonyms(const std::vector<std::wstring>& synonyms);
   void SetDateStart(const Date& date);
+  void SetDateStart(const std::wstring& date);
   void SetDateEnd(const Date& date);
+  void SetDateEnd(const std::wstring& date);
   void SetImageUrl(const std::wstring& url);
   void SetAgeRating(enum_t rating);
   void SetGenres(const std::wstring& genres);
@@ -94,6 +95,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Library data
 
+  const std::wstring& GetMyId() const;
   int GetMyLastWatchedEpisode(bool check_queue = true) const;
   int GetMyScore(bool check_queue = true) const;
   int GetMyStatus(bool check_queue = true) const;
@@ -104,7 +106,9 @@ public:
   const Date& GetMyDateEnd(bool check_queue = true) const;
   const std::wstring& GetMyLastUpdated() const;
   const std::wstring& GetMyTags(bool check_queue = true) const;
+  const std::wstring& GetMyNotes(bool check_queue = true) const;
 
+  void SetMyId(const std::wstring& id);
   void SetMyLastWatchedEpisode(int number);
   void SetMyScore(int score);
   void SetMyStatus(int status);
@@ -112,9 +116,12 @@ public:
   void SetMyRewatching(int rewatching);
   void SetMyRewatchingEp(int rewatching_ep);
   void SetMyDateStart(const Date& date);
+  void SetMyDateStart(const std::wstring& date);
   void SetMyDateEnd(const Date& date);
+  void SetMyDateEnd(const std::wstring& date);
   void SetMyLastUpdated(const std::wstring& last_updated);
   void SetMyTags(const std::wstring& tags);
+  void SetMyNotes(const std::wstring& notes);
 
   //////////////////////////////////////////////////////////////////////////////
   // Local data
@@ -166,5 +173,3 @@ private:
 };
 
 }  // namespace anime
-
-#endif  // TAIGA_LIBRARY_ANIME_ITEM_H

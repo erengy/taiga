@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "library/anime.h"
@@ -56,8 +55,8 @@ Timer::Timer(unsigned int id, int interval, bool repeat)
 }
 
 void Timer::OnTimeout() {
-  LOG(LevelDebug, L"ID: " + ToWstr(id()) + L", "
-                  L"Interval: " + ToWstr(this->interval()));
+  LOGD(L"ID: " + ToWstr(id()) + L", "
+       L"Interval: " + ToWstr(this->interval()));
 
   switch (id()) {
     case kTimerAnimeList:
@@ -164,8 +163,8 @@ void TimerManager::OnTick() {
 
   UpdateEnabledState();
 
-  foreach_(it, timers_)
-    it->second->Tick();
+  for (const auto& pair : timers_)
+    pair.second->Tick();
 
   UpdateUi();
 }

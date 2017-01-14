@@ -3,8 +3,7 @@
 ** http://support.microsoft.com/kb/191239
 */
 
-#ifndef BASE64_H
-#define BASE64_H
+#pragma once
 
 #include <string>
 #include <windows.h>
@@ -54,5 +53,3 @@ protected:
   static BOOL m_Init;
   void _Init();
 };
-
-#endif // BASE64_H

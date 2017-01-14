@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,29 +25,23 @@
 namespace debug {
 
 Tester::Tester()
-    : frequency_(0.0), value_(0) {
+    : t0_(clock_t::duration::zero()) {
 }
 
 void Tester::Start() {
-  LARGE_INTEGER li;
-
-  if (frequency_ == 0.0) {
-    ::QueryPerformanceFrequency(&li);
-    frequency_ = double(li.QuadPart) / 1000.0;
-  }
-
-  ::QueryPerformanceCounter(&li);
-  value_ = li.QuadPart;
+  t0_ = clock_t::now();
 }
 
-void Tester::End(std::wstring str, bool display_result) {
-  LARGE_INTEGER li;
+void Tester::Stop(std::wstring str, bool display_result) {
+  using duration_t =
+      std::chrono::duration<float, std::chrono::milliseconds::period>;
 
-  ::QueryPerformanceCounter(&li);
-  double value = double(li.QuadPart - value_) / frequency_;
+  const auto now = clock_t::now();
+  const auto duration = std::chrono::duration_cast<duration_t>(now - t0_);
+  t0_ = now;
 
   if (display_result) {
-    str = ToWstr(value, 2) + L"ms | Text: [" + str + L"]";
+    str = ToWstr(duration.count(), 2) + L"ms | Text: [" + str + L"]";
     ui::DlgMain.SetText(str);
   }
 }
@@ -80,7 +74,7 @@ void Test() {
   }
 
   // Show result
-  test.End(str, true);
+  test.Stop(str, true);
 }
 
 } // namespace debug

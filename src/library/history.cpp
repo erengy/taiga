@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,6 +74,9 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
     if (item.tags)
       if (anime->GetMyTags() == *item.tags)
         item.tags.Reset();
+    if (item.notes)
+      if (anime->GetMyNotes() == *item.notes)
+        item.notes.Reset();
     if (item.date_start)
       if (anime->GetMyDateStart() == *item.date_start)
         item.date_start.Reset();
@@ -89,6 +92,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
           !item.enable_rewatching &&
           !item.rewatched_times &&
           !item.tags &&
+          !item.notes &&
           !item.date_start &&
           !item.date_finish)
         return;
@@ -115,6 +119,8 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
               it->rewatched_times = *item.rewatched_times;
             if (item.tags)
               it->tags = *item.tags;
+            if (item.notes)
+              it->notes = *item.notes;
             if (item.date_start)
               it->date_start = *item.date_start;
             if (item.date_finish)
@@ -168,7 +174,7 @@ void HistoryQueue::Check(bool automatic) {
     return;
 
   if (!items[index].enabled) {
-    LOG(LevelDebug, L"Item is disabled, removing...");
+    LOGD(L"Item is disabled, removing...");
     Remove(index, true, true, false);
     Check(automatic);
     return;
@@ -176,8 +182,8 @@ void HistoryQueue::Check(bool automatic) {
 
   auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);
   if (!anime_item) {
-    LOG(LevelWarning, L"Item not found in list, removing... ID: " +
-                      ToWstr(items[index].anime_id));
+    LOGW(L"Item not found in list, removing... ID: " +
+         ToWstr(items[index].anime_id));
     Remove(index, true, true, false);
     Check(automatic);
     return;
@@ -185,12 +191,12 @@ void HistoryQueue::Check(bool automatic) {
 
   if (automatic && !Settings.GetBool(taiga::kApp_Option_EnableSync)) {
     items[index].reason = L"Automatic synchronization is disabled";
-    LOG(LevelDebug, items[index].reason);
+    LOGD(items[index].reason);
     return;
   }
 
-  if (!Taiga.logged_in) {
-    sync::AuthenticateUser(false);
+  if (!sync::UserAuthenticated()) {
+    sync::AuthenticateUser();
     return;
   }
 
@@ -228,6 +234,11 @@ HistoryItem* HistoryQueue::FindItem(int anime_id, int search_mode) {
         // Episode
         case kQueueSearchEpisode:
           if (it->episode)
+            return &(*it);
+          break;
+        // Notes
+        case kQueueSearchNotes:
+          if (it->notes)
             return &(*it);
           break;
         // Rewatched times
@@ -363,7 +374,7 @@ bool History::Load() {
 
   // Meta
   xml_node node_meta = document.child(L"meta");
-  base::SemanticVersion version(XmlReadStrValue(node_meta, L"version"));
+  semaver::Version version(WstrToStr(XmlReadStrValue(node_meta, L"version")));
 
   // Items
   xml_node node_items = document.child(L"history").child(L"items");
@@ -376,14 +387,14 @@ bool History::Load() {
     if (AnimeDatabase.FindItem(history_item.anime_id)) {
       items.push_back(history_item);
     } else {
-      LOG(LevelWarning, L"Item does not exist in the database.\n"
-                        L"ID: " + ToWstr(history_item.anime_id) + L"\n"
-                        L"Episode: " + ToWstr(*history_item.episode) + L"\n"
-                        L"Time: " + history_item.time);
+      LOGW(L"Item does not exist in the database.\n"
+           L"ID: " + ToWstr(history_item.anime_id) + L"\n"
+           L"Episode: " + ToWstr(*history_item.episode) + L"\n"
+           L"Time: " + history_item.time);
     }
   }
   // Queue events
-  if (version < base::SemanticVersion(1, 1, 4)) {
+  if (version < semaver::Version(1, 1, 4)) {
     ReadQueueInCompatibilityMode(document);
   } else {
     ReadQueue(document);
@@ -415,6 +426,7 @@ void History::ReadQueue(const pugi::xml_document& document) {
     READ_ATTRIBUTE_INT(history_item.enable_rewatching, L"enable_rewatching");
     READ_ATTRIBUTE_INT(history_item.rewatched_times, L"rewatched_times");
     READ_ATTRIBUTE_STR(history_item.tags, L"tags");
+    READ_ATTRIBUTE_STR(history_item.notes, L"notes");
     READ_ATTRIBUTE_DATE(history_item.date_start, L"date_start");
     READ_ATTRIBUTE_DATE(history_item.date_finish, L"date_finish");
 
@@ -425,8 +437,8 @@ void History::ReadQueue(const pugi::xml_document& document) {
     if (AnimeDatabase.FindItem(history_item.anime_id)) {
       queue.Add(history_item, false);
     } else {
-      LOG(LevelWarning, L"Item does not exist in the database.\n"
-                        L"ID: " + ToWstr(history_item.anime_id));
+      LOGW(L"Item does not exist in the database.\n"
+           L"ID: " + ToWstr(history_item.anime_id));
     }
   }
 }
@@ -475,8 +487,8 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
     if (AnimeDatabase.FindItem(history_item.anime_id)) {
       queue.Add(history_item, false);
     } else {
-      LOG(LevelWarning, L"Item does not exist in the database.\n"
-                        L"ID: " + ToWstr(history_item.anime_id));
+      LOGW(L"Item does not exist in the database.\n"
+           L"ID: " + ToWstr(history_item.anime_id));
     }
   }
 }
@@ -487,22 +499,21 @@ bool History::Save() {
 
   // Write meta
   xml_node node_meta = document.append_child(L"meta");
-  XmlWriteStrValue(node_meta, L"version",
-                   static_cast<std::wstring>(Taiga.version).c_str());
+  XmlWriteStrValue(node_meta, L"version", StrToWstr(Taiga.version.str()).c_str());
 
   xml_node node_history = document.append_child(L"history");
 
   // Write items
   xml_node node_items = node_history.append_child(L"items");
-  foreach_(it, items) {
+  for (const auto& history_item : items) {
     xml_node node_item = node_items.append_child(L"item");
-    node_item.append_attribute(L"anime_id") = it->anime_id;
-    node_item.append_attribute(L"episode") = *it->episode;
-    node_item.append_attribute(L"time") = it->time.c_str();
+    node_item.append_attribute(L"anime_id") = history_item.anime_id;
+    node_item.append_attribute(L"episode") = *history_item.episode;
+    node_item.append_attribute(L"time") = history_item.time.c_str();
   }
   // Write queue
   xml_node node_queue = node_history.append_child(L"queue");
-  foreach_(it, queue.items) {
+  for (const auto& history_item : queue.items) {
     xml_node node_item = node_queue.append_child(L"item");
     #define APPEND_ATTRIBUTE_INT(x, y) \
         if (y) node_item.append_attribute(x) = *y;
@@ -510,17 +521,18 @@ bool History::Save() {
         if (y) node_item.append_attribute(x) = (*y).c_str();
     #define APPEND_ATTRIBUTE_DATE(x, y) \
         if (y) node_item.append_attribute(x) = std::wstring(*y).c_str();
-    node_item.append_attribute(L"anime_id") = it->anime_id;
-    node_item.append_attribute(L"mode") = TranslateModeToString(it->mode).c_str();
-    node_item.append_attribute(L"time") = it->time.c_str();
-    APPEND_ATTRIBUTE_INT(L"episode", it->episode);
-    APPEND_ATTRIBUTE_INT(L"score", it->score);
-    APPEND_ATTRIBUTE_INT(L"status", it->status);
-    APPEND_ATTRIBUTE_INT(L"enable_rewatching", it->enable_rewatching);
-    APPEND_ATTRIBUTE_INT(L"rewatched_times", it->rewatched_times);
-    APPEND_ATTRIBUTE_STR(L"tags", it->tags);
-    APPEND_ATTRIBUTE_DATE(L"date_start", it->date_start);
-    APPEND_ATTRIBUTE_DATE(L"date_finish", it->date_finish);
+    node_item.append_attribute(L"anime_id") = history_item.anime_id;
+    node_item.append_attribute(L"mode") = TranslateModeToString(history_item.mode).c_str();
+    node_item.append_attribute(L"time") = history_item.time.c_str();
+    APPEND_ATTRIBUTE_INT(L"episode", history_item.episode);
+    APPEND_ATTRIBUTE_INT(L"score", history_item.score);
+    APPEND_ATTRIBUTE_INT(L"status", history_item.status);
+    APPEND_ATTRIBUTE_INT(L"enable_rewatching", history_item.enable_rewatching);
+    APPEND_ATTRIBUTE_INT(L"rewatched_times", history_item.rewatched_times);
+    APPEND_ATTRIBUTE_STR(L"tags", history_item.tags);
+    APPEND_ATTRIBUTE_STR(L"notes", history_item.notes);
+    APPEND_ATTRIBUTE_DATE(L"date_start", history_item.date_start);
+    APPEND_ATTRIBUTE_DATE(L"date_finish", history_item.date_finish);
     #undef APPEND_ATTRIBUTE_DATE
     #undef APPEND_ATTRIBUTE_STR
     #undef APPEND_ATTRIBUTE_INT

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,15 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_HTTP_H
-#define TAIGA_TAIGA_HTTP_H
+#pragma once
 
 #include <list>
 #include <map>
 
+#include <windows/win/thread.h>
+
 #include "base/http.h"
 #include "base/types.h"
-#include "win/win_thread.h"
 
 namespace taiga {
 
@@ -32,7 +32,9 @@ enum HttpClientMode {
   kHttpSilent,
   // Service
   kHttpServiceAuthenticateUser,
+  kHttpServiceGetUser,
   kHttpServiceGetMetadataById,
+  kHttpServiceGetSeason,
   kHttpServiceSearchTitle,
   kHttpServiceAddLibraryEntry,
   kHttpServiceDeleteLibraryEntry,
@@ -110,5 +112,3 @@ private:
 }  // namespace taiga
 
 extern taiga::HttpManager ConnectionManager;
-
-#endif  // TAIGA_TAIGA_HTTP_H

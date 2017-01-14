@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_SYNC_SERVICE_H
-#define TAIGA_SYNC_SERVICE_H
+#pragma once
 
 #include "base/types.h"
 
@@ -33,14 +32,16 @@ enum ServiceId {
   kTaiga = 0,
   kFirstService = 1,
   kMyAnimeList = 1,
-  kHummingbird = 2,
+  kKitsu = 2,
   kLastService = 2
 };
 
 enum RequestType {
   kGenericRequest,
   kAuthenticateUser,
+  kGetUser,
   kGetMetadataById,
+  kGetSeason,
   kSearchTitle,
   kAddLibraryEntry,
   kDeleteLibraryEntry,
@@ -84,10 +85,14 @@ public:
   virtual void HandleResponse(Response& response, HttpResponse& http_response) = 0;
   virtual bool RequestNeedsAuthentication(RequestType request_type) const;
 
+  bool authenticated() const;
   const string_t& host() const;
   enum_t id() const;
   const string_t& canonical_name() const;
   const string_t& name() const;
+  const User& user() const;
+
+  void set_authenticated(bool authenticated);
 
 protected:
   // API end-point
@@ -97,7 +102,9 @@ protected:
   string_t canonical_name_;
   string_t name_;
   // User information
+  bool authenticated_;
   User user_;
+  time_t last_synchronized_;
 };
 
 // Creates two overloaded functions: First one is to build a request, second
@@ -112,5 +119,3 @@ protected:
     case type: function(response, http_response); break;
 
 }  // namespace sync
-
-#endif  // TAIGA_SYNC_SERVICE_H

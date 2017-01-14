@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,9 @@
 #include <windows.h>
 #include <psapi.h>
 
-#include "error.h"
+#include <windows/win/error.h>
+#include <windows/win/version.h>
+
 #include "log.h"
 #include "process.h"
 #include "string.h"
@@ -240,8 +242,7 @@ BOOL GetProcessFiles(ULONG process_id,
                              objectTypeInfo->Name.Length / 2);
       if (IsEqual(type_name, L"File")) {
         objectTypeFile = handle.ObjectTypeIndex;
-        LOG(LevelDebug, L"objectTypeFile is set to " +
-                        ToWstr(objectTypeFile) + L".");
+        LOGD(L"objectTypeFile is set to " + ToWstr(objectTypeFile));
       } else {
         free(objectTypeInfo);
         CloseHandle(dupHandle);
@@ -249,7 +250,7 @@ BOOL GetProcessFiles(ULONG process_id,
       }
     }
 
-    base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+    win::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
 
     ULONG returnLength;
     PVOID objectNameInfo = malloc(0x1000);

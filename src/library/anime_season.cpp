@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2016, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,17 +35,17 @@ Season::Season(Name name, unsigned short year)
 }
 
 Season::Season(const Date& date) {
-  year = date.year;
+  year = date.year();
 
-  if (date.month == 0 || date.month > 12) {
+  if (date.month() == 0 || date.month() > 12) {
     name = kUnknown;
-  } else if (date.month < 3) {   // Jan-Feb
+  } else if (date.month() < 3) {   // Jan-Feb
     name = kWinter;
-  } else if (date.month < 6) {   // Mar-May
+  } else if (date.month() < 6) {   // Mar-May
     name = kSpring;
-  } else if (date.month < 9) {   // Jun-Aug
+  } else if (date.month() < 9) {   // Jun-Aug
     name = kSummer;
-  } else if (date.month < 12) {  // Sep-Nov
+  } else if (date.month() < 12) {  // Sep-Nov
     name = kFall;
   } else {                       // Dec
     name = kWinter;
@@ -137,13 +137,13 @@ void Season::GetInterval(Date& date_start, Date& date_end) const {
     31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
   };
 
-  date_start.year = name == kWinter ? year - 1 : year;
-  date_start.month = interval[name].first;
-  date_start.day = 1;
+  date_start.set_year(name == kWinter ? year - 1 : year);
+  date_start.set_month(interval[name].first);
+  date_start.set_day(1);
 
-  date_end.year = year;
-  date_end.month = interval[name].second;
-  date_end.day = days_in_months[date_end.month - 1];
+  date_end.set_year(year);
+  date_end.set_month(interval[name].second);
+  date_end.set_day(days_in_months[date_end.month() - 1]);
 }
 
 std::wstring Season::GetName() const {

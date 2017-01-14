@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 */
 
 #include "base/base64.h"
-#include "base/foreach.h"
 #include "base/html.h"
 #include "base/string.h"
 #include "base/xml.h"

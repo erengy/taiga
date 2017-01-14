@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,59 +16,80 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_TIME_H
-#define TAIGA_BASE_TIME_H
+#pragma once
 
+#include <chrono>
 #include <ctime>
 #include <string>
 #include <windows.h>
+
+#include <date/date.h>
 
 #include "comparable.h"
 
 class Date : public base::Comparable<Date> {
 public:
   Date();
-  Date(const std::wstring& date);
-  Date(unsigned short year, unsigned short month, unsigned short day);
-  virtual ~Date() {}
+  explicit Date(const std::wstring& date);
+  explicit Date(const SYSTEMTIME& st);
+  explicit Date(unsigned short year, unsigned short month, unsigned short day);
 
-  Date& operator = (const Date& date);
+  Date& operator=(const Date& date);
 
-  int operator - (const Date& date) const;
+  int operator-(const Date& date) const;
 
-  operator bool() const;
-  operator SYSTEMTIME() const;
-  operator std::wstring() const;
+  explicit operator bool() const;
+  explicit operator SYSTEMTIME() const;
+  explicit operator std::wstring() const;
+  explicit operator date::year_month_day() const;
 
-  unsigned short year;
-  unsigned short month;
-  unsigned short day;
+  std::wstring to_string() const;
+
+  unsigned short year() const;
+  unsigned short month() const;
+  unsigned short day() const;
+
+  void set_year(unsigned short year);
+  void set_month(unsigned short month);
+  void set_day(unsigned short day);
 
 private:
   base::CompareResult Compare(const Date& date) const;
+
+  date::year year_;
+  date::month month_;
+  date::day day_;
 };
 
 class Duration {
 public:
-  Duration(time_t time);
+  using seconds_t = std::chrono::seconds;
+  using minutes_t = std::chrono::duration
+      <float, std::ratio<60>>;
+  using hours_t = std::chrono::duration
+      <float, std::ratio_multiply<std::ratio<60>, minutes_t::period>>;
+  using days_t = std::chrono::duration
+      <float, std::ratio_multiply<std::ratio<24>, hours_t::period>>;
+  using years_t = std::chrono::duration
+      <float, std::ratio_multiply<std::ratio<146097, 400>, days_t::period>>;
+  using months_t = std::chrono::duration
+      <float, std::ratio_divide<years_t::period, std::ratio<12>>>;
 
-  enum {
-    kToMinutes = 60,
-    kToHours   = 60 * 60,
-    kToDays    = 60 * 60 * 24,
-    kToMonths  = 60 * 60 * 24 * 30,
-    kToYears   = 60 * 60 * 24 * 365,
-  };
+  Duration(const seconds_t seconds);
+  Duration(const std::time_t seconds);
 
-  float seconds() const;
-  float minutes() const;
-  float hours() const;
-  float days() const;
-  float months() const;
-  float years() const;
+  Duration& operator=(const seconds_t seconds);
+  Duration& operator=(const std::time_t seconds);
+
+  seconds_t::rep seconds() const;
+  minutes_t::rep minutes() const;
+  hours_t::rep hours() const;
+  days_t::rep days() const;
+  months_t::rep months() const;
+  years_t::rep years() const;
 
 private:
-  time_t time_;
+  seconds_t seconds_;
 };
 
 std::wstring GetAbsoluteTimeString(time_t unix_time);
@@ -81,15 +102,14 @@ std::wstring ConvertRfc822ToLocal(const std::wstring& datetime);
 void GetSystemTime(SYSTEMTIME& st, int utc_offset = 0);
 
 Date GetDate();
+Date GetDate(time_t unix_time);
 std::wstring GetTime(LPCWSTR format = L"HH':'mm':'ss");
 
 Date GetDateJapan();
 std::wstring GetTimeJapan(LPCWSTR format = L"HH':'mm':'ss");
 
-std::wstring ToDateString(time_t seconds);
+std::wstring ToDateString(Duration duration);
 unsigned int ToDayCount(const Date& date);
-std::wstring ToTimeString(int seconds);
+std::wstring ToTimeString(Duration duration);
 
 const Date& EmptyDate();
-
-#endif  // TAIGA_BASE_TIME_H

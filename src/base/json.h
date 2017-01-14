@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,14 +16,18 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_JSON_H
-#define TAIGA_BASE_JSON_H
+#pragma once
 
 #include <string>
-#include <vector>
 
-#include <jsoncpp/json/json.h>
+#include <json/src/json.hpp>
 
-bool JsonReadArray(const Json::Value& root, const std::string& name, std::vector<std::wstring>& output);
+using Json = nlohmann::json;
 
-#endif  // TAIGA_BASE_JSON_H
+bool JsonParseString(const std::string& str, Json& output);
+bool JsonParseString(const std::wstring& str, Json& output);
+
+bool JsonReadBool(const Json& json, const std::string& key);
+double JsonReadDouble(const Json& json, const std::string& key);
+int JsonReadInt(const Json& json, const std::string& key);
+std::string JsonReadStr(const Json& json, const std::string& key);

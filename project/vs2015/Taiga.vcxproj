@@ -57,7 +57,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_WCHAR_MODE;UTF8PROC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
       <AdditionalIncludeDirectories>..\..\deps\src;..\..\src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -81,7 +81,7 @@
       <Optimization>MinSpace</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;NOMINMAX;_WINDOWS;_WIN32_WINNT=0x0600;PUGIXML_WCHAR_MODE;UTF8PROC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
@@ -112,9 +112,45 @@
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\token.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\tokenizer.cpp" />
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
-    <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp" />
-    <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp" />
+    <ClCompile Include="..\..\deps\src\monolog\monolog.cpp" />
+    <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp" />
+    <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp" />
+    <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp" />
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c" />
+    <ClCompile Include="..\..\deps\src\windows\win\accessibility.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\application.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\automation.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\common_dialogs.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\combobox.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\edit.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\imagelist.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\listview.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\progressbar.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\rebar.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\richedit.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\spin.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\statusbar.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\syslink.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\tab.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\toolbar.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\tooltip.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\treeview.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\dde.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\dialog.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\error.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\gdi.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\gdi_plus.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\handle.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\menu.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\registry.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\resizable.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\string.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\taskbar.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\task_dialog.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\thread.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\version.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\window.cpp" />
+    <ClCompile Include="..\..\deps\src\windows\win\window_map.cpp" />
     <ClCompile Include="..\..\deps\src\zlib\adler32.c" />
     <ClCompile Include="..\..\deps\src\zlib\compress.c" />
     <ClCompile Include="..\..\deps\src\zlib\crc32.c" />
@@ -131,9 +167,7 @@
     <ClCompile Include="..\..\deps\src\zlib\uncompr.c" />
     <ClCompile Include="..\..\deps\src\zlib\zutil.c" />
     <ClCompile Include="..\..\src\base\base64.cpp" />
-    <ClCompile Include="..\..\src\base\crc.cpp" />
     <ClCompile Include="..\..\src\base\crypto.cpp" />
-    <ClCompile Include="..\..\src\base\error.cpp" />
     <ClCompile Include="..\..\src\base\file.cpp" />
     <ClCompile Include="..\..\src\base\file_monitor.cpp" />
     <ClCompile Include="..\..\src\base\file_search.cpp" />
@@ -145,7 +179,6 @@
     <ClCompile Include="..\..\src\base\http_request.cpp" />
     <ClCompile Include="..\..\src\base\http_response.cpp" />
     <ClCompile Include="..\..\src\base\json.cpp" />
-    <ClCompile Include="..\..\src\base\log.cpp" />
     <ClCompile Include="..\..\src\base\oauth.cpp" />
     <ClCompile Include="..\..\src\base\process.cpp" />
     <ClCompile Include="..\..\src\base\settings.cpp" />
@@ -153,7 +186,6 @@
     <ClCompile Include="..\..\src\base\time.cpp" />
     <ClCompile Include="..\..\src\base\timer.cpp" />
     <ClCompile Include="..\..\src\base\url.cpp" />
-    <ClCompile Include="..\..\src\base\version.cpp" />
     <ClCompile Include="..\..\src\base\xml.cpp" />
     <ClCompile Include="..\..\src\library\anime.cpp" />
     <ClCompile Include="..\..\src\library\anime_db.cpp" />
@@ -168,8 +200,8 @@
     <ClCompile Include="..\..\src\library\metadata.cpp" />
     <ClCompile Include="..\..\src\library\resource.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\sync\hummingbird.cpp" />
-    <ClCompile Include="..\..\src\sync\hummingbird_util.cpp" />
+    <ClCompile Include="..\..\src\sync\kitsu.cpp" />
+    <ClCompile Include="..\..\src\sync\kitsu_util.cpp" />
     <ClCompile Include="..\..\src\sync\manager.cpp" />
     <ClCompile Include="..\..\src\sync\myanimelist.cpp" />
     <ClCompile Include="..\..\src\sync\myanimelist_util.cpp" />
@@ -225,35 +257,6 @@
     <ClCompile Include="..\..\src\ui\menu.cpp" />
     <ClCompile Include="..\..\src\ui\theme.cpp" />
     <ClCompile Include="..\..\src\ui\ui.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_combobox.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_edit.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_imagelist.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_listview.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_progressbar.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_rebar.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_richedit.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_spin.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_statusbar.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_syslink.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tab.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_toolbar.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tooltip.cpp" />
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_treeview.cpp" />
-    <ClCompile Include="..\..\src\win\win_accessibility.cpp" />
-    <ClCompile Include="..\..\src\win\win_automation.cpp" />
-    <ClCompile Include="..\..\src\win\win_commondialog.cpp" />
-    <ClCompile Include="..\..\src\win\win_dde.cpp" />
-    <ClCompile Include="..\..\src\win\win_dialog.cpp" />
-    <ClCompile Include="..\..\src\win\win_gdi.cpp" />
-    <ClCompile Include="..\..\src\win\win_gdiplus.cpp" />
-    <ClCompile Include="..\..\src\win\win_main.cpp" />
-    <ClCompile Include="..\..\src\win\win_menu.cpp" />
-    <ClCompile Include="..\..\src\win\win_registry.cpp" />
-    <ClCompile Include="..\..\src\win\win_resizable.cpp" />
-    <ClCompile Include="..\..\src\win\win_taskbar.cpp" />
-    <ClCompile Include="..\..\src\win\win_taskdialog.cpp" />
-    <ClCompile Include="..\..\src\win\win_thread.cpp" />
-    <ClCompile Include="..\..\src\win\win_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h" />
@@ -264,21 +267,46 @@
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\token.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\tokenizer.h" />
     <ClInclude Include="..\..\deps\src\base64\base64.h" />
-    <ClInclude Include="..\..\deps\src\curl\curl.h" />
-    <ClInclude Include="..\..\deps\src\curl\curlbuild.h" />
-    <ClInclude Include="..\..\deps\src\curl\curlrules.h" />
-    <ClInclude Include="..\..\deps\src\curl\curlver.h" />
-    <ClInclude Include="..\..\deps\src\curl\easy.h" />
-    <ClInclude Include="..\..\deps\src\curl\mprintf.h" />
-    <ClInclude Include="..\..\deps\src\curl\multi.h" />
-    <ClInclude Include="..\..\deps\src\curl\stdcheaders.h" />
-    <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\json-forwards.h" />
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h" />
-    <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp" />
-    <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curl.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlbuild.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlrules.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlver.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\easy.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\mprintf.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\multi.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\stdcheaders.h" />
+    <ClInclude Include="..\..\deps\src\curl\include\curl\typecheck-gcc.h" />
+    <ClInclude Include="..\..\deps\src\date\date.h" />
+    <ClInclude Include="..\..\deps\src\json\src\json.hpp" />
+    <ClInclude Include="..\..\deps\src\monolog\monolog.h" />
+    <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp" />
+    <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp" />
+    <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h" />
+    <ClInclude Include="..\..\deps\src\semaver\semaver\string.h" />
+    <ClInclude Include="..\..\deps\src\semaver\semaver\version.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h" />
-    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.h" />
+    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c" />
+    <ClInclude Include="..\..\deps\src\windows\win\accessibility.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\application.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\automation.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\common_controls.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\common_dialogs.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\dde.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\dialog.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\error.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\gdi.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\gdi_plus.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\handle.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\menu.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\registry.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\resizable.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\string.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\taskbar.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\task_dialog.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\thread.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\version.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\window.h" />
+    <ClInclude Include="..\..\deps\src\windows\win\window_map.h" />
     <ClInclude Include="..\..\deps\src\zlib\crc32.h" />
     <ClInclude Include="..\..\deps\src\zlib\deflate.h" />
     <ClInclude Include="..\..\deps\src\zlib\gzguts.h" />
@@ -292,9 +320,7 @@
     <ClInclude Include="..\..\deps\src\zlib\zutil.h" />
     <ClInclude Include="..\..\src\base\base64.h" />
     <ClInclude Include="..\..\src\base\comparable.h" />
-    <ClInclude Include="..\..\src\base\crc.h" />
     <ClInclude Include="..\..\src\base\crypto.h" />
-    <ClInclude Include="..\..\src\base\error.h" />
     <ClInclude Include="..\..\src\base\file.h" />
     <ClInclude Include="..\..\src\base\file_monitor.h" />
     <ClInclude Include="..\..\src\base\foreach.h" />
@@ -314,7 +340,6 @@
     <ClInclude Include="..\..\src\base\timer.h" />
     <ClInclude Include="..\..\src\base\types.h" />
     <ClInclude Include="..\..\src\base\url.h" />
-    <ClInclude Include="..\..\src\base\version.h" />
     <ClInclude Include="..\..\src\base\xml.h" />
     <ClInclude Include="..\..\src\library\anime.h" />
     <ClInclude Include="..\..\src\library\anime_db.h" />
@@ -327,9 +352,9 @@
     <ClInclude Include="..\..\src\library\history.h" />
     <ClInclude Include="..\..\src\library\metadata.h" />
     <ClInclude Include="..\..\src\library\resource.h" />
-    <ClInclude Include="..\..\src\sync\hummingbird.h" />
-    <ClInclude Include="..\..\src\sync\hummingbird_types.h" />
-    <ClInclude Include="..\..\src\sync\hummingbird_util.h" />
+    <ClInclude Include="..\..\src\sync\kitsu.h" />
+    <ClInclude Include="..\..\src\sync\kitsu_types.h" />
+    <ClInclude Include="..\..\src\sync\kitsu_util.h" />
     <ClInclude Include="..\..\src\sync\manager.h" />
     <ClInclude Include="..\..\src\sync\myanimelist.h" />
     <ClInclude Include="..\..\src\sync\myanimelist_types.h" />
@@ -380,22 +405,6 @@
     <ClInclude Include="..\..\src\ui\menu.h" />
     <ClInclude Include="..\..\src\ui\theme.h" />
     <ClInclude Include="..\..\src\ui\ui.h" />
-    <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h" />
-    <ClInclude Include="..\..\src\win\win_accessibility.h" />
-    <ClInclude Include="..\..\src\win\win_automation.h" />
-    <ClInclude Include="..\..\src\win\win_commondialog.h" />
-    <ClInclude Include="..\..\src\win\win_dde.h" />
-    <ClInclude Include="..\..\src\win\win_dialog.h" />
-    <ClInclude Include="..\..\src\win\win_gdi.h" />
-    <ClInclude Include="..\..\src\win\win_gdiplus.h" />
-    <ClInclude Include="..\..\src\win\win_main.h" />
-    <ClInclude Include="..\..\src\win\win_menu.h" />
-    <ClInclude Include="..\..\src\win\win_registry.h" />
-    <ClInclude Include="..\..\src\win\win_resizable.h" />
-    <ClInclude Include="..\..\src\win\win_taskbar.h" />
-    <ClInclude Include="..\..\src\win\win_taskdialog.h" />
-    <ClInclude Include="..\..\src\win\win_thread.h" />
-    <ClInclude Include="..\..\src\win\win_window.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\taiga\resource.rc" />

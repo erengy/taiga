@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <assert.h>
 
-#include "base/foreach.h"
 #include "base/string.h"
 #include "base/time.h"
 #include "library/anime_db.h"
@@ -87,13 +86,7 @@ int Item::GetAiringStatus(bool check_date) const {
   if (!check_date)
     return metadata_.status;
 
-  // TODO: Move
-  if (IsFinishedAiring(*this))
-    return kFinishedAiring;
-  if (IsAiredYet(*this))
-    return kAiring;
-
-  return kNotYetAired;
+  return anime::GetAiringStatus(*this);
 }
 
 const std::wstring& Item::GetTitle() const {
@@ -101,10 +94,10 @@ const std::wstring& Item::GetTitle() const {
 }
 
 const std::wstring& Item::GetEnglishTitle(bool fallback) const {
-  foreach_(it, metadata_.alternative)
-    if (it->type == library::kTitleTypeLangEnglish)
-      if (!it->value.empty())
-        return it->value;
+  for (const auto& alt_title : metadata_.alternative)
+    if (alt_title.type == library::kTitleTypeLangEnglish)
+      if (!alt_title.value.empty())
+        return alt_title.value;
 
   if (fallback)
     return metadata_.title;
@@ -115,9 +108,9 @@ const std::wstring& Item::GetEnglishTitle(bool fallback) const {
 std::vector<std::wstring> Item::GetSynonyms() const {
   std::vector<std::wstring> synonyms;
 
-  foreach_(it, metadata_.alternative)
-    if (it->type == library::kTitleTypeSynonym)
-      synonyms.push_back(it->value);
+  for (const auto& alt_title : metadata_.alternative)
+    if (alt_title.type == library::kTitleTypeSynonym)
+      synonyms.push_back(alt_title.value);
 
   return synonyms;
 }
@@ -235,9 +228,9 @@ void Item::SetTitle(const std::wstring& title) {
 }
 
 void Item::SetEnglishTitle(const std::wstring& title) {
-  foreach_(it, metadata_.alternative) {
-    if (it->type == library::kTitleTypeLangEnglish) {
-      it->value = title;
+  for (auto& alt_title : metadata_.alternative) {
+    if (alt_title.type == library::kTitleTypeLangEnglish) {
+      alt_title.value = title;
       return;
     }
   }
@@ -251,7 +244,7 @@ void Item::SetEnglishTitle(const std::wstring& title) {
 }
 
 void Item::InsertSynonym(const std::wstring& synonym) {
-  if (synonym == GetTitle() || synonym == GetEnglishTitle())
+  if (synonym.empty() || synonym == GetTitle() || synonym == GetEnglishTitle())
     return;
   metadata_.alternative.push_back(
       library::Title(library::kTitleTypeSynonym, synonym));
@@ -291,6 +284,10 @@ void Item::SetDateStart(const Date& date) {
   metadata_.date.at(0) = date;
 }
 
+void Item::SetDateStart(const std::wstring& date) {
+  SetDateStart(Date(date));
+}
+
 void Item::SetDateEnd(const Date& date) {
   if (metadata_.date.size() < 2) {
     if (!IsValidDate(date))
@@ -299,6 +296,10 @@ void Item::SetDateEnd(const Date& date) {
   }
 
   metadata_.date.at(1) = date;
+}
+
+void Item::SetDateEnd(const std::wstring& date) {
+  SetDateEnd(Date(date));
 }
 
 void Item::SetImageUrl(const std::wstring& url) {
@@ -369,6 +370,13 @@ void Item::SetLastModified(time_t modified) {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+
+const std::wstring& Item::GetMyId() const {
+  if (!my_info_.get())
+    return EmptyString();
+
+  return my_info_->id;
+}
 
 int Item::GetMyLastWatchedEpisode(bool check_queue) const {
   if (!my_info_.get())
@@ -459,12 +467,28 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
     return EmptyString();
 
   HistoryItem* history_item = check_queue ?
-    SearchHistory(kQueueSearchTags) : nullptr;
+      SearchHistory(kQueueSearchTags) : nullptr;
 
   return history_item ? *history_item->tags : my_info_->tags;
 }
 
+const std::wstring& Item::GetMyNotes(bool check_queue) const {
+  if (!my_info_.get())
+    return EmptyString();
+
+  HistoryItem* history_item = check_queue ?
+      SearchHistory(kQueueSearchNotes) : nullptr;
+
+  return history_item ? *history_item->notes : my_info_->notes;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
+
+void Item::SetMyId(const std::wstring& id) {
+  assert(my_info_.get());
+
+  my_info_->id = id;
+}
 
 void Item::SetMyLastWatchedEpisode(int number) {
   assert(my_info_.get());
@@ -508,10 +532,18 @@ void Item::SetMyDateStart(const Date& date) {
   my_info_->date_start = date;
 }
 
+void Item::SetMyDateStart(const std::wstring& date) {
+  SetMyDateStart(Date(date));
+}
+
 void Item::SetMyDateEnd(const Date& date) {
   assert(my_info_.get());
 
   my_info_->date_finish = date;
+}
+
+void Item::SetMyDateEnd(const std::wstring& date) {
+  SetMyDateEnd(Date(date));
 }
 
 void Item::SetMyLastUpdated(const std::wstring& last_updated) {
@@ -524,6 +556,12 @@ void Item::SetMyTags(const std::wstring& tags) {
   assert(my_info_.get());
 
   my_info_->tags = tags;
+}
+
+void Item::SetMyNotes(const std::wstring& notes) {
+  assert(my_info_.get());
+
+  my_info_->notes = notes;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

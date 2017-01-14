@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
 
 #include "list.h"
 
+#include <windows/win/common_controls.h>
+#include <windows/win/gdi.h>
+
 #include "base/comparable.h"
 #include "base/string.h"
 #include "base/time.h"
@@ -26,9 +29,6 @@
 #include "library/anime_util.h"
 #include "sync/service.h"
 #include "taiga/settings.h"
-
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_gdi.h"
 
 namespace ui {
 
@@ -139,19 +139,20 @@ int SortListByDateStart(const anime::Item& item1, const anime::Item& item2) {
   Date date1 = item1.GetDateStart();
   Date date2 = item2.GetDateStart();
 
+  auto assume_worst_case = [](Date& date) {
+    // Hello.
+    // We come from the future.
+    if (!date.year())
+      date.set_year(static_cast<decltype(date.year())>(-1));
+    if (!date.month())
+      date.set_month(12);
+    if (!date.day())
+      date.set_day(31);
+  };
+
   if (date1 != date2) {
-    if (!date1.year)
-      date1.year = static_cast<unsigned short>(-1);  // Hello.
-    if (!date2.year)
-      date2.year = static_cast<unsigned short>(-1);  // We come from the future.
-    if (!date1.month)
-      date1.month = 12;
-    if (!date2.month)
-      date2.month = 12;
-    if (!date1.day)
-      date1.day = 31;
-    if (!date2.day)
-      date2.day = 31;
+    assume_worst_case(date1);
+    assume_worst_case(date2);
   }
 
   return CompareValues<Date>(date1, date2);
@@ -162,8 +163,8 @@ int SortListByEpisodeCount(const anime::Item& item1, const anime::Item& item2) {
 }
 
 int SortListByLastUpdated(const anime::Item& item1, const anime::Item& item2) {
-  return CompareValues<time_t>(_wtoi64(item1.GetMyLastUpdated().c_str()),
-                               _wtoi64(item2.GetMyLastUpdated().c_str()));
+  return CompareValues<time_t>(ToTime(item1.GetMyLastUpdated()),
+                               ToTime(item2.GetMyLastUpdated()));
 }
 
 int SortListByPopularity(const anime::Item& item1, const anime::Item& item2) {

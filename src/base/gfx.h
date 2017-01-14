@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,11 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_GFX_H
-#define TAIGA_BASE_GFX_H
+#pragma once
 
-#include "win/win_gdi.h"
-#include "win/win_gdiplus.h"
+#include <windows/win/gdi.h>
+#include <windows/win/gdi_plus.h>
 
 extern class win::GdiPlus GdiPlus;
 
@@ -54,6 +53,3 @@ int ScaleY(int value);
 void RgbToHsv(float r, float g, float b, float& h, float& s, float& v);
 void HsvToRgb(float& r, float& g, float& b, float h, float s, float v);
 COLORREF ChangeColorBrightness(COLORREF color, float modifier);
-
-
-#endif  // TAIGA_BASE_GFX_H

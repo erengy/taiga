@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_URL_H
-#define TAIGA_BASE_URL_H
+#pragma once
 
 #include <string>
 
@@ -59,5 +58,3 @@ public:
 std::wstring BuildUrlParameters(const query_t& parameters);
 std::wstring DecodeUrl(const std::wstring& input);
 std::wstring EncodeUrl(const std::wstring& input, bool encode_unreserved = false);
-
-#endif  // TAIGA_BASE_URL_H

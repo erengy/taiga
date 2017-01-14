@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
+
 #include "base/file.h"
 #include "base/foreach.h"
 #include "base/log.h"
@@ -26,7 +28,7 @@
 #include "library/anime_episode.h"
 #include "library/anime_util.h"
 #include "library/history.h"
-#include "sync/hummingbird_util.h"
+#include "sync/kitsu_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
 #include "taiga/path.h"
@@ -44,38 +46,71 @@ bool IsValidId(int anime_id) {
   return anime_id > ID_UNKNOWN;
 }
 
+bool ListHasMissingIds() {
+  for (const auto& pair : AnimeDatabase.items) {
+    const auto& item = pair.second;
+    if (item.GetMyStatus(false) != kNotInList && item.GetMyId().empty()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-bool IsAiredYet(const Item& item) {
-  if (item.GetAiringStatus(false) != kNotYetAired)
-    return true;
+SeriesStatus GetAiringStatus(const Item& item) {
+  auto assume_worst_case = [](Date date) {
+    if (!date.month()) date.set_month(12);
+    if (!date.day()) date.set_day(31);
+    return date;
+  };
+
+  const Date now = GetDateJapan();
 
   if (!IsValidDate(item.GetDateStart()))
-    return false;
+    return kNotYetAired;
+  const Date start = assume_worst_case(item.GetDateStart());
+  if (now < start)
+    return kNotYetAired;
 
-  Date date_japan = GetDateJapan();
-  Date date_start = item.GetDateStart();
+  // We don't need to check the end date for single-episode anime
+  if (item.GetEpisodeCount() == 1)
+    return kFinishedAiring;
 
-  // Assume the worst case
-  if (!date_start.month)
-    date_start.month = 12;
-  if (!date_start.day)
-    date_start.day = 31;
+  if (!IsValidDate(item.GetDateEnd()))
+    return kAiring;
+  const Date end = assume_worst_case(item.GetDateEnd());
+  if (now <= end)
+    return kAiring;
 
-  return date_japan >= date_start;
+  return kFinishedAiring;
+}
+
+bool IsAiredYet(const Item& item) {
+  switch (item.GetAiringStatus(false)) {
+    case kFinishedAiring:
+    case kAiring:
+      return true;
+  }
+
+  switch (GetAiringStatus(item)) {
+    case kFinishedAiring:
+    case kAiring:
+      return true;
+  }
+
+  return false;
 }
 
 bool IsFinishedAiring(const Item& item) {
   if (item.GetAiringStatus(false) == kFinishedAiring)
     return true;
 
-  if (!IsValidDate(item.GetDateEnd()))
-    return false;
+  if (GetAiringStatus(item) == kFinishedAiring)
+    return true;
 
-  if (!IsAiredYet(item))
-    return false;
-
-  return GetDateJapan() > item.GetDateEnd();
+  return false;
 }
 
 int EstimateDuration(const Item& item) {
@@ -107,7 +142,7 @@ int EstimateLastAiredEpisodeNumber(const Item& item) {
   // irregularities such as broadcasts being postponed due to sports events make
   // this method unreliable.
   const Date& date_start = item.GetDateStart();
-  if (date_start.year && date_start.month && date_start.day) {
+  if (date_start.year() && date_start.month() && date_start.day()) {
     // To compensate for the fact that we don't know the airing hour,
     // we substract one more day.
     int date_diff = GetDateJapan() - date_start - 1;
@@ -136,12 +171,12 @@ bool IsItemOldEnough(const Item& item) {
   if (!item.GetLastModified())
     return true;
 
-  time_t time_diff = time(nullptr) - item.GetLastModified();
+  const auto duration = Duration(time(nullptr) - item.GetLastModified());
 
   if (item.GetAiringStatus() == kFinishedAiring) {
-    return time_diff >= 60 * 60 * 24 * 7;  // 1 week
+    return duration.days() >= 7;  // 1 week
   } else {
-    return time_diff >= 60 * 60;  // 1 hour
+    return duration.hours() >= 1;
   }
 }
 
@@ -198,8 +233,7 @@ bool PlayEpisode(int anime_id, int number) {
       if (FileExists(next_episode_path)) {
         file_path = next_episode_path;
       } else {
-        LOG(LevelDebug, L"File doesn't exist anymore.\n"
-                        L"Path: " + next_episode_path);
+        LOGD(L"File doesn't exist anymore.\nPath: " + next_episode_path);
         anime_item->SetEpisodeAvailability(number, false, L"");
       }
     }
@@ -280,8 +314,8 @@ bool PlayRandomAnime() {
 
   std::vector<int> valid_ids;
 
-  foreach_(it, AnimeDatabase.items) {
-    anime::Item& anime_item = it->second;
+  for (auto& pair : AnimeDatabase.items) {
+    anime::Item& anime_item = pair.second;
     if (!anime_item.IsInList())
       continue;
     if (!anime_item.IsNextEpisodeAvailable())
@@ -299,7 +333,7 @@ bool PlayRandomAnime() {
 
   srand(static_cast<unsigned int>(GetTickCount()));
 
-  foreach_(id, valid_ids) {
+  for (const auto& unused : valid_ids) {
     size_t index = rand() % max_value;
     int anime_id = valid_ids.at(index);
     if (PlayNextEpisode(anime_id))
@@ -322,7 +356,7 @@ bool PlayRandomEpisode(int anime_id) {
 
   srand(static_cast<unsigned int>(GetTickCount()));
 
-  for (int i = 0; i < min(total, max_tries); i++) {
+  for (int i = 0; i < std::min(total, max_tries); i++) {
     int episode_number = rand() % total + 1;
     if (PlayEpisode(anime_item->GetId(), episode_number))
       return true;
@@ -403,10 +437,10 @@ void EndWatching(Item& item, Episode episode) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool IsDeletedFromList(Item& item) {
-  foreach_(it, History.queue.items)
-    if (it->anime_id == item.GetId())
-      if (it->mode == taiga::kHttpServiceDeleteLibraryEntry)
+bool IsDeletedFromList(const Item& item) {
+  for (const auto& history_item : History.queue.items)
+    if (history_item.anime_id == item.GetId())
+      if (history_item.mode == taiga::kHttpServiceDeleteLibraryEntry)
         return true;
 
   return false;
@@ -579,13 +613,13 @@ std::wstring GetImagePath(int anime_id) {
 }
 
 void GetUpcomingTitles(std::vector<int>& anime_ids) {
-  foreach_c_(item, AnimeDatabase.items) {
-    const anime::Item& anime_item = item->second;
+  for (const auto& pair : AnimeDatabase.items) {
+    const anime::Item& anime_item = pair.second;
 
     const Date& date_start = anime_item.GetDateStart();
     const Date& date_now = GetDateJapan();
 
-    if (!date_start.year || !date_start.month || !date_start.day)
+    if (!date_start.year() || !date_start.month() || !date_start.day())
       continue;
 
     if (date_start > date_now &&
@@ -598,8 +632,8 @@ void GetUpcomingTitles(std::vector<int>& anime_ids) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool IsInsideLibraryFolders(const std::wstring& path) {
-  foreach_c_(library_folder, Settings.library_folders)
-    if (StartsWith(path, *library_folder))
+  for (const auto& library_folder : Settings.library_folders)
+    if (StartsWith(path, library_folder))
       return true;
 
   return false;
@@ -612,8 +646,7 @@ bool ValidateFolder(Item& item) {
   if (FolderExists(item.GetFolder()))
     return true;
 
-  LOG(LevelDebug, L"Folder doesn't exist anymore.\n"
-                  L"Path: " + item.GetFolder());
+  LOGD(L"Folder doesn't exist anymore.\nPath: " + item.GetFolder());
 
   item.SetFolder(L"");
 
@@ -718,10 +751,10 @@ bool IsValidEpisodeNumber(int number, int total, int watched) {
 std::wstring JoinEpisodeNumbers(const std::vector<int>& input) {
   std::wstring output;
 
-  foreach_(it, input) {
+  for (const auto& number : input) {
     if (!output.empty())
       output += L"-";
-    output += ToWstr(*it);
+    output += ToWstr(number);
   }
 
   return output;
@@ -734,8 +767,8 @@ void SplitEpisodeNumbers(const std::wstring& input, std::vector<int>& output) {
   std::vector<std::wstring> numbers;
   Split(input, L"-", numbers);
 
-  foreach_(it, numbers)
-    output.push_back(ToInt(*it));
+  for (const auto& number : numbers)
+    output.push_back(ToInt(number));
 }
 
 int EstimateEpisodeCount(const Item& item) {
@@ -747,35 +780,35 @@ int EstimateEpisodeCount(const Item& item) {
 
   // Estimate using user information
   if (item.IsInList())
-    number = max(item.GetMyLastWatchedEpisode(),
-                 item.GetAvailableEpisodeCount());
+    number = std::max(item.GetMyLastWatchedEpisode(),
+                      item.GetAvailableEpisodeCount());
 
   // Estimate using local information
-  number = max(number, item.GetLastAiredEpisodeNumber());
+  number = std::max(number, item.GetLastAiredEpisodeNumber());
 
   // Estimate using airing dates of TV series
-  number = max(number, EstimateLastAiredEpisodeNumber(item));
+  number = std::max(number, EstimateLastAiredEpisodeNumber(item));
 
-  // Given all TV series aired since 2000, most of them have their episodes
+  // Given all TV series aired in 2006-2016, most of them have their episodes
   // spanning one or two seasons. Following is a table of top ten values:
   //
   //   Episodes    Seasons    Percent
   //   ------------------------------
-  //         12          1      23.6%
-  //         13          1      20.2%
-  //         26          2      15.4%
-  //         24          2       6.4%
-  //         25          2       5.0%
-  //         52          4       4.4%
-  //         51          4       3.1%
-  //         11          1       2.6%
-  //         50          4       2.3%
+  //         12          1      34.2%
+  //         13          1      18.5%
+  //         26          2       9.5%
+  //         25          2       5.5%
+  //         24          2       5.4%
+  //         52          4       2.9%
+  //         11          1       2.7%
+  //         10          1       2.6%
+  //         51          4       2.4%
   //         39          3       1.4%
   //   ------------------------------
-  //   Total:                   84.6%
+  //   Total:                   85.1%
   //
   // With that in mind, we can normalize our output at several points.
-  if (number < 12) return 13;
+  if (number < 12) return 12;
   if (number < 24) return 26;
   if (number < 50) return 52;
 
@@ -856,7 +889,7 @@ int GetMyRewatchedTimes(const Item& item) {
   const int rewatched_times = item.GetMyRewatchedTimes();
 
   if (item.GetMyRewatching()) {
-    return max(rewatched_times, 1);  // because MAL doesn't tell us the actual value
+    return std::max(rewatched_times, 1);  // because MAL doesn't tell us the actual value
   } else {
     return rewatched_times;
   }
@@ -889,8 +922,8 @@ void GetProgressRatios(const Item& item, float& ratio_aired, float& ratio_watche
   }
 
   // Limit values so that they don't exceed total episodes
-  ratio_aired = min(ratio_aired, 1.0f);
-  ratio_watched = min(ratio_watched, 1.0f);
+  ratio_aired = std::min(ratio_aired, 1.0f);
+  ratio_watched = std::min(ratio_watched, 1.0f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -919,9 +952,9 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
     case sync::kMyAnimeList:
       return value > 0 ? ToWstr(value) : default_char;
 
-    case sync::kHummingbird:
+    case sync::kKitsu:
       return value > 0 ? 
-          sync::hummingbird::TranslateMyRatingTo(value) : default_char;
+          StrToWstr(sync::kitsu::TranslateMyRatingTo(value)) : default_char;
   }
 }
 
@@ -932,7 +965,7 @@ std::wstring TranslateMyScoreFull(int value) {
       switch (value) {
         default:
         case 0: return L"(0) No Score";
-        case 1: return L"(1) Unwatchable";
+        case 1: return L"(1) Appalling";
         case 2: return L"(2) Horrible";
         case 3: return L"(3) Very Bad";
         case 4: return L"(4) Bad";
@@ -945,7 +978,7 @@ std::wstring TranslateMyScoreFull(int value) {
       }
       break;
 
-    case sync::kHummingbird:
+    case sync::kKitsu:
       switch (value) {
         default:
         case 0: return L"\u2605 0.0";
@@ -970,8 +1003,8 @@ std::wstring TranslateScore(double value) {
     case sync::kMyAnimeList:
       return ToWstr(value, 2);
 
-    case sync::kHummingbird:
-      return ToWstr(sync::hummingbird::TranslateSeriesRatingTo(value), 2);
+    case sync::kKitsu:
+      return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2);
   }
 }
 

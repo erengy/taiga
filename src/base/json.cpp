@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,14 +19,37 @@
 #include "json.h"
 #include "string.h"
 
-bool JsonReadArray(const Json::Value& root, const std::string& name,
-                   std::vector<std::wstring>& output) {
-  size_t previous_size = output.size();
+bool JsonParseString(const std::string& str, Json& output) {
+  try {
+    output = Json::parse(str.begin(), str.end());
+    return true;
+  } catch (const std::exception&) {
+    return false;
+  }
+}
 
-  auto& value = root[name.c_str()];
+bool JsonParseString(const std::wstring& str, Json& output) {
+  return JsonParseString(WstrToStr(str), output);
+}
 
-  for (size_t i = 0; i < value.size(); i++)
-    output.push_back(StrToWstr(value[i].asString()));
+////////////////////////////////////////////////////////////////////////////////
 
-  return output.size() > previous_size;
+bool JsonReadBool(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_boolean() ? it->get<bool>() : false;
+}
+
+double JsonReadDouble(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_number_float() ? it->get<double>() : 0.0;
+}
+
+int JsonReadInt(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_number_integer() ? it->get<int>() : 0;
+}
+
+std::string JsonReadStr(const Json& json, const std::string& key) {
+  const auto it = json.find(key);
+  return it != json.end() && it->is_string() ? it->get<std::string>() : std::string();
 }

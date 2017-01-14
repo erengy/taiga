@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/dde.h>
+
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/url.h"
@@ -29,7 +30,6 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "ui/ui.h"
-#include "win/win_dde.h"
 
 taiga::Announcer Announcer;
 taiga::Mirc Mirc;
@@ -57,7 +57,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 
   if (modes & kAnnounceToHttp) {
     if (Settings.GetBool(kShare_Http_Enabled) || force) {
-      LOG(LevelDebug, L"HTTP");
+      LOGD(L"HTTP");
       ToHttp(Settings[kShare_Http_Url],
              ReplaceVariables(Settings[kShare_Http_Format],
                               *episode, true, force));
@@ -69,7 +69,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 
   if (modes & kAnnounceToMirc) {
     if (Settings.GetBool(kShare_Mirc_Enabled) || force) {
-      LOG(LevelDebug, L"mIRC");
+      LOGD(L"mIRC");
       ToMirc(Settings[kShare_Mirc_Service],
              Settings[kShare_Mirc_Channels],
              ReplaceVariables(Settings[kShare_Mirc_Format],
@@ -82,7 +82,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 
   if (modes & kAnnounceToSkype) {
     if (Settings.GetBool(kShare_Skype_Enabled) || force) {
-      LOG(LevelDebug, L"Skype");
+      LOGD(L"Skype");
       ToSkype(ReplaceVariables(Settings[kShare_Skype_Format],
                                *episode, false, force));
     }
@@ -90,7 +90,7 @@ void Announcer::Do(int modes, anime::Episode* episode, bool force) {
 
   if (modes & kAnnounceToTwitter) {
     if (Settings.GetBool(kShare_Twitter_Enabled) || force) {
-      LOG(LevelDebug, L"Twitter");
+      LOGD(L"Twitter");
       ToTwitter(ReplaceVariables(Settings[kShare_Twitter_Format],
                                  *episode, false, force));
     }
@@ -263,11 +263,11 @@ bool Skype::SendCommand(const std::wstring& command) {
   if (SendMessage(hwnd_skype, WM_COPYDATA,
                   reinterpret_cast<WPARAM>(hwnd),
                   reinterpret_cast<LPARAM>(&cds)) == FALSE) {
-    LOG(LevelError, L"WM_COPYDATA failed.");
+    LOGE(L"WM_COPYDATA failed.");
     hwnd_skype = nullptr;
     return false;
   } else {
-    LOG(LevelDebug, L"WM_COPYDATA succeeded.");
+    LOGD(L"WM_COPYDATA succeeded.");
     return true;
   }
 }
@@ -308,13 +308,13 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
     auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
     std::wstring command = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
-    LOG(LevelDebug, L"Received WM_COPYDATA: " + command);
+    LOGD(L"Received WM_COPYDATA: " + command);
 
     std::wstring profile_command = L"PROFILE RICH_MOOD_TEXT ";
     if (StartsWith(command, profile_command)) {
       std::wstring mood = command.substr(profile_command.length());
       if (mood != current_mood && mood != previous_mood) {
-        LOG(LevelDebug, L"Saved previous mood message: " + mood);
+        LOGD(L"Saved previous mood message: " + mood);
         previous_mood = mood;
       }
     }
@@ -326,34 +326,34 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
     switch (lParam) {
       case kSkypeControlApiAttachSuccess:
-        LOG(LevelDebug, L"Attach succeeded.");
+        LOGD(L"Attach succeeded.");
         hwnd_skype = reinterpret_cast<HWND>(wParam);
         GetMoodText();
         if (!current_mood.empty())
           SetMoodText(current_mood);
         break;
       case kSkypeControlApiAttachPendingAuthorization:
-        LOG(LevelDebug, L"Waiting for user confirmation...");
+        LOGD(L"Waiting for user confirmation...");
         break;
       case kSkypeControlApiAttachRefused:
-        LOG(LevelError, L"User denied access to client.");
+        LOGE(L"User denied access to client.");
         break;
       case kSkypeControlApiAttachNotAvailable:
-        LOG(LevelError, L"API is not available.");
+        LOGE(L"API is not available.");
         break;
       case kSkypeControlApiAttachApiAvailable:
-        LOG(LevelDebug, L"API is now available.");
+        LOGD(L"API is now available.");
         Discover();
         break;
       default:
-        LOG(LevelDebug, L"Received unknown message.");
+        LOGD(L"Received unknown message.");
         break;
     }
 
     return TRUE;
 
   } else if (uMsg == wm_discover) {
-    LOG(LevelDebug, L"Received SkypeControlAPIDiscover message.");
+    LOGD(L"Received SkypeControlAPIDiscover message.");
   }
 
   return FALSE;

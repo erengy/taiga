@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,24 +98,31 @@ void Settings::InitializeKey(enum_t name, const wchar_t* default_value,
   }
 }
 
-void Settings::ReadValue(const xml_node& node_parent, enum_t name) {
-  Setting& item = map_[name];
-
+std::wstring Settings::ReadValue(const xml_node& node_parent,
+                                 const std::wstring& path,
+                                 const bool attribute,
+                                 const std::wstring& default_value) {
   std::vector<std::wstring> node_names;
-  Split(item.path, L"/", node_names);
+  Split(path, L"/", node_names);
 
   const wchar_t* node_name = node_names.back().c_str();
 
   xml_node current_node = node_parent;
-  for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++)
+  for (int i = 0; i < static_cast<int>(node_names.size()) - 1; i++) {
     current_node = current_node.child(node_names.at(i).c_str());
-
-  if (item.attribute) {
-    const wchar_t* default_value = item.default_value.c_str();
-    item.value = current_node.attribute(node_name).as_string(default_value);
-  } else {
-    item.value = XmlReadStrValue(current_node, node_name);
   }
+
+  if (attribute) {
+    return current_node.attribute(node_name).as_string(default_value.c_str());
+  } else {
+    return XmlReadStrValue(current_node, node_name);
+  }
+}
+
+void Settings::ReadValue(const xml_node& node_parent, enum_t name) {
+  Setting& item = map_[name];
+  item.value = ReadValue(node_parent, item.path,
+                         item.attribute, item.default_value);
 }
 
 void Settings::WriteValue(const xml_node& node_parent, enum_t name) {

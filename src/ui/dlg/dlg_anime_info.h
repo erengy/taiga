@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_ANIME_INFO_H
-#define TAIGA_UI_DLG_ANIME_INFO_H
+#pragma once
+
+#include <windows/win/common_controls.h>
+#include <windows/win/dialog.h>
 
 #include "base/gfx.h"
 #include "ui/dlg/dlg_anime_info_page.h"
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_dialog.h"
 
 namespace ui {
 
@@ -103,5 +103,3 @@ extern AnimeDialog DlgAnime;
 extern NowPlayingDialog DlgNowPlaying;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_ANIME_INFO_H

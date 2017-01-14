@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <algorithm>
 
 #include "base/file.h"
 #include "base/gfx.h"
@@ -268,8 +270,8 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           const int group = list_.GetItemGroup(list_.last_checked_item);
           if (list_.last_checked_item > -1 && (GetKeyState(VK_SHIFT) & 0x8000) &&
               list_.GetItemGroup(pnmv->iItem) == group) {
-            int item_index = min(pnmv->iItem, list_.last_checked_item);
-            const int last_index = max(pnmv->iItem, list_.last_checked_item);
+            int item_index = std::min(pnmv->iItem, list_.last_checked_item);
+            const int last_index = std::max(pnmv->iItem, list_.last_checked_item);
             do {
               if (list_.GetItemGroup(item_index) == group)
                 list_.SetCheckState(item_index, checked);
@@ -382,7 +384,7 @@ void TorrentDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += rebar_.GetBarHeight() + ScaleY(win::kControlMargin / 2);
+      rcWindow.top += rebar_.GetBarHeight() + ScaleY(kControlMargin / 2);
       // Resize list
       list_.SetPosition(NULL, rcWindow);
     }

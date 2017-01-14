@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ static void ChangeAnimeFolder(anime::Item& anime_item,
   anime_item.SetFolder(path);
   Settings.Save();
 
-  LOG(LevelDebug, L"Anime folder changed: " + anime_item.GetTitle() + L"\n"
-                  L"Path: " + anime_item.GetFolder());
+  LOGD(L"Anime folder changed: " + anime_item.GetTitle() + L"\n"
+       L"Path: " + anime_item.GetFolder());
 
   if (path.empty()) {
     for (int i = 1; i <= anime_item.GetAvailableEpisodeCount(); ++i) {
@@ -66,9 +66,9 @@ void FolderMonitor::HandleChangeNotification(
       OnFile(notification);
       break;
     default:
-      LOG(LevelDebug, L"Unknown change type\n"
-                      L"Path: " + notification.path + L"\n"
-                      L"Filename: " + notification.filename.first);
+      LOGD(L"Unknown change type\n"
+           L"Path: " + notification.path + L"\n"
+           L"Filename: " + notification.filename.first);
       break;
   }
 }
@@ -171,8 +171,8 @@ void FolderMonitor::OnFile(const DirectoryChangeNotification& notification) cons
   std::wstring path = notification.path + notification.filename.first;
   for (int number = lower_bound; number <= upper_bound; ++number) {
     if (anime_item->SetEpisodeAvailability(number, path_available, path)) {
-      LOG(LevelDebug, anime_item->GetTitle() + L" #" + ToWstr(number) + L" is " +
-          (path_available ? L"available." : L"unavailable."));
+      LOGD(anime_item->GetTitle() + L" #" + ToWstr(number) + L" is " +
+           (path_available ? L"available." : L"unavailable."));
     }
   }
 }

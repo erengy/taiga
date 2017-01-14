@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,11 +83,11 @@ bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
     if (SearchEpisodeRedirection(anime_item.GetId(), range,
                                  destination_id, destination_range)) {
       if (redirect) {
-        LOG(LevelDebug, L"Redirection: " +
-                        ToWstr(anime_item.GetId()) + L":" +
-                        anime::GetEpisodeRange(episode) + L" -> " +
-                        ToWstr(destination_id) + L":" +
-                        anime::GetEpisodeRange(destination_range));
+        LOGD(L"Redirection: " +
+             ToWstr(anime_item.GetId()) + L":" +
+             anime::GetEpisodeRange(episode) + L" -> " +
+             ToWstr(destination_id) + L":" +
+             anime::GetEpisodeRange(destination_range));
         episode.anime_id = destination_id;
         episode.set_episode_number_range(destination_range);
       }
@@ -138,7 +138,7 @@ bool Engine::IsValidAnimeType(const anime::Episode& episode) const {
   auto anime_types = episode.elements().get_all(category);
   for (const auto& anime_type : anime_types) {
     if (!ValidateAnitomyElement(anime_type, category)) {
-      LOG(LevelDebug, episode.file_name_with_extension());
+      LOGD(episode.file_name_with_extension());
       return false;
     }
   }
@@ -162,7 +162,7 @@ bool Engine::IsValidAnimeType(const std::wstring& path) const {
 
 bool Engine::IsValidFileExtension(const anime::Episode& episode) const {
   if (!IsValidFileExtension(episode.file_extension())) {
-    LOG(LevelDebug, episode.file_name_with_extension());
+    LOGD(episode.file_name_with_extension());
     return false;
   }
 

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
+#include <windows/win/task_dialog.h>
+
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -33,7 +34,6 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_taskdialog.h"
 
 namespace ui {
 
@@ -224,8 +224,8 @@ void SearchDialog::RefreshList() {
   list_.DeleteAllItems();
 
   // Add anime items to list
-  foreach_(it, anime_ids_)
-    AddAnimeToList(*it);
+  for (const auto& anime_id : anime_ids_)
+    AddAnimeToList(anime_id);
 
   // Redraw
   list_.SetRedraw(TRUE);
