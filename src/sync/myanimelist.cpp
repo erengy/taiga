@@ -466,6 +466,12 @@ bool Service::RequestSucceeded(Response& response,
       // case MAL suddenly reverts to the old behavior.
       if (InStr(http_response.body, L"<title>201 Created</title>") > -1)
         return true;
+      // If we try to add an anime that is already in user's list, MyAnimeList
+      // returns a "400 Bad Request" response with "The anime (id: 12345) is
+      // already in the list." error message. Here we ignore this error and
+      // assume that our request succeeded.
+      if (InStr(http_response.body, L"is already in the list") > -1)
+        return true;
       break;
     case kAuthenticateUser:
       if (InStr(http_response.body, L"<username>") > -1)

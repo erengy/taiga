@@ -374,6 +374,13 @@ bool Service::RequestSucceeded(Response& response,
   if (status_category == 200)
     return true;
 
+  // If we try to add a library entry that is already there, Kitsu returns a
+  // "422 Unprocessable Entity" response with "animeId - has already been taken"
+  // error message. Here we ignore this error and assume that our request
+  // succeeded.
+  if (response.type == kAddLibraryEntry && status_category == 400)
+    return true;
+
   // Handle invalid anime IDs
   if (response.type == kGetMetadataById && http_response.code == 404)
     response.data[L"invalid_id"] = L"true";
