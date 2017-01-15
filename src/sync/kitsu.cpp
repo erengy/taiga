@@ -379,7 +379,7 @@ bool Service::RequestSucceeded(Response& response,
   // error message. Here we ignore this error and assume that our request
   // succeeded.
   if (response.type == kAddLibraryEntry && status_category == 400)
-    return true;
+    return false;
 
   // Handle invalid anime IDs
   if (response.type == kGetMetadataById && http_response.code == 404)
