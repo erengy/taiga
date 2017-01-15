@@ -176,7 +176,7 @@ void Service::GetSeason(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/anime";
 
   http_request.url.query[L"filter[season]"] = request.data[L"season"];
-  http_request.url.query[L"filter[year]"] = request.data[L"year"];
+  http_request.url.query[L"filter[season_year]"] = request.data[L"year"];
 
   http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
   http_request.url.query[L"page[limit]"] = ToWstr(kJsonApiMaximumPageSize);
