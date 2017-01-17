@@ -217,6 +217,7 @@ BOOL GetProcessFiles(ULONG process_id,
         handle.GrantedAccess == 0x0012008d ||
         handle.GrantedAccess == 0x00120189 ||
         handle.GrantedAccess == 0x0012019f ||
+        handle.GrantedAccess == 0x0016019f ||
         handle.GrantedAccess == 0x001a019f)
       continue;
 
