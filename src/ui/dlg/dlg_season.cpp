@@ -237,9 +237,8 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         const std::wstring separator = L" \u2022 ";
         text += anime::TranslateType(anime_item->GetType()) + separator +
                 anime::TranslateNumber(anime_item->GetEpisodeCount(), L"?") + L" eps." + separator +
-                anime::TranslateScore(anime_item->GetScore());
-        if (taiga::GetCurrentServiceId() == sync::kMyAnimeList)
-          text += separator + L"#" + ToWstr(anime_item->GetPopularity());
+                anime::TranslateScore(anime_item->GetScore()) + separator +
+                L"#" + ToWstr(anime_item->GetPopularity());
         if (!anime_item->GetGenres().empty())
           text += L"\n" + Join(anime_item->GetGenres(), L", ");
         if (!anime_item->GetProducers().empty())
@@ -444,9 +443,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         DRAWLINE(L"Producers:");
       }
       DRAWLINE(L"Score:");
-      if (current_service == sync::kMyAnimeList) {
-        DRAWLINE(L"Popularity:");
-      }
+      DRAWLINE(L"Popularity:");
 
       rect_details.Set(rect_details.left + ScaleX(75), text_top,
                        rect_details.right, rect_details.top + text_height);
@@ -463,9 +460,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
       }
       DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
-      if (current_service == sync::kMyAnimeList) {
-        DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
-      }
+      DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
 
       #undef DRAWLINE
 
@@ -783,7 +778,7 @@ int SeasonDialog::GetLineCount() const {
     case sync::kMyAnimeList:
       return 6;
     case sync::kKitsu:
-      return 4;  // missing popularity and producers
+      return 5;  // missing producers
   }
 }
 

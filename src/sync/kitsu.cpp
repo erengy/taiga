@@ -486,6 +486,7 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
       L"endDate,"
       L"episodeCount,"
       L"episodeLength,"
+      L"popularityRank,"
       L"posterImage,"
       L"slug,"
       L"startDate,"
@@ -564,6 +565,7 @@ int Service::ParseAnimeObject(const Json& json) const {
   anime_item.SetDateEnd(StrToWstr(JsonReadStr(attributes, "endDate")));
   anime_item.SetEpisodeCount(JsonReadInt(attributes, "episodeCount"));
   anime_item.SetEpisodeLength(JsonReadInt(attributes, "episodeLength"));
+  anime_item.SetPopularity(JsonReadInt(attributes, "popularityRank"));
   anime_item.SetImageUrl(StrToWstr(JsonReadStr(attributes["posterImage"], "small")));
   anime_item.SetSlug(StrToWstr(JsonReadStr(attributes, "slug")));
   anime_item.SetDateStart(StrToWstr(JsonReadStr(attributes, "startDate")));

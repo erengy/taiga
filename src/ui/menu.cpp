@@ -371,9 +371,6 @@ void MenuList::UpdateSeason() {
   if (menu) {
     for (auto& item : menu->items) {
       item.checked = false;
-      if (item.action == L"Season_SortBy(2)")  // Popularity
-        if (taiga::GetCurrentServiceId() != sync::kMyAnimeList)
-          item.visible = false;
     }
     int item_index = Settings.GetInt(taiga::kApp_Seasons_SortBy);
     if (item_index < static_cast<int>(menu->items.size())) {
