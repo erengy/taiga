@@ -67,6 +67,8 @@ public:
   void SetViewMode(int mode);
 
 private:
+  int GetLineCount() const;
+
   win::Window cancel_button_;
   win::ListView list_;
   win::Rebar rebar_;

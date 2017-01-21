@@ -329,16 +329,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       int text_height = GetTextHeight(hdc.Get());
 
       // Calculate line count
-      int line_count = 6;
-      auto current_service = taiga::GetCurrentServiceId();
-      switch (current_service) {
-        case sync::kMyAnimeList:
-          line_count = 6;
-          break;
-        case sync::kKitsu:
-          line_count = 4;
-          break;
-      }
+      const int line_count = GetLineCount();
 
       // Calculate areas
       win::Rect rect_image(
@@ -438,6 +429,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw details
       if (view_as == kSeasonViewAsImages)
         break;
+      auto current_service = taiga::GetCurrentServiceId();
       int text_top = rect_details.top;
       #define DRAWLINE(t) \
         text = t; \
@@ -756,16 +748,7 @@ void SeasonDialog::RefreshToolbar() {
 }
 
 void SeasonDialog::SetViewMode(int mode) {
-  int line_count = 6;
-  auto current_service = taiga::GetCurrentServiceId();
-  switch (current_service) {
-    case sync::kMyAnimeList:
-      line_count = 6;
-      break;
-    case sync::kKitsu:
-      line_count = 4;
-      break;
-  }
+  const int line_count = GetLineCount();
   const int synopsis_line_count = 9 - line_count;
 
   win::Dc hdc = list_.GetDC();
@@ -792,6 +775,16 @@ void SeasonDialog::SetViewMode(int mode) {
   list_.SetTileViewInfo(0, LVTVIF_FIXEDSIZE, nullptr, &size);
 
   Settings.Set(taiga::kApp_Seasons_ViewAs, mode);
+}
+
+int SeasonDialog::GetLineCount() const {
+  switch (taiga::GetCurrentServiceId()) {
+    default:
+    case sync::kMyAnimeList:
+      return 6;
+    case sync::kKitsu:
+      return 4;  // missing popularity and producers
+  }
 }
 
 }  // namespace ui
