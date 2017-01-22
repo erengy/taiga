@@ -167,7 +167,10 @@ void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
   http_request.url.path = L"/edge/anime/" +
                           request.data[canonical_name_ + L"-id"];
 
-  http_request.url.query[L"include"] = L"genres";
+  http_request.url.query[L"include"] =
+      L"genres,"
+      L"animeProductions,"
+      L"animeProductions.producer";
 
   UseSparseFieldsetsForAnime(http_request);
 }
@@ -205,7 +208,11 @@ void Service::AddLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"POST";
   http_request.header[L"Content-Type"] = kJsonApiMediaType;
 
-  http_request.url.query[L"include"] = L"anime,anime.genres";
+  http_request.url.query[L"include"] =
+      L"anime,"
+      L"anime.genres,"
+      L"anime.animeProductions,"
+      L"anime.animeProductions.producer";
 
   http_request.body = BuildLibraryObject(request);
 
@@ -228,7 +235,11 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
   http_request.method = L"PATCH";
   http_request.header[L"Content-Type"] = kJsonApiMediaType;
 
-  http_request.url.query[L"include"] = L"anime,anime.genres";
+  http_request.url.query[L"include"] =
+      L"anime,"
+      L"anime.genres,"
+      L"anime.animeProductions,"
+      L"anime.animeProductions.producer";
 
   http_request.body = BuildLibraryObject(request);
 
@@ -290,6 +301,7 @@ void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
   const auto anime_id = ParseAnimeObject(root["data"]);
 
   ParseGenres(root["included"], anime_id);
+  ParseProducers(root["included"], anime_id);
 }
 
 void Service::GetSeason(Response& response, HttpResponse& http_response) {
@@ -343,6 +355,7 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
   }
 
   ParseGenres(root["included"], anime_id);
+  ParseProducers(root["included"], anime_id);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -494,7 +507,11 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
       L"synopsis,"
       L"titles,"
       // relationships
+      L"animeProductions,"
       L"genres";
+  http_request.url.query[L"fields[animeProductions]"] = L"producer";
+  http_request.url.query[L"fields[genres]"] = L"name";
+  http_request.url.query[L"fields[producers]"] = L"name";
 }
 
 void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const {
@@ -521,6 +538,7 @@ void Service::ParseObject(const Json& json) const {
     Anime,
     Genres,
     LibraryEntries,
+    Producers,
     Unknown,
   };
 
@@ -528,6 +546,7 @@ void Service::ParseObject(const Json& json) const {
     {"anime", Type::Anime},
     {"genres", Type::Genres},
     {"libraryEntries", Type::LibraryEntries},
+    {"producers", Type::Producers},
   };
 
   const auto find_type = [&](const std::string& str) {
@@ -543,6 +562,8 @@ void Service::ParseObject(const Json& json) const {
       break;
     case Type::LibraryEntries:
       ParseLibraryObject(json);
+      break;
+    case Type::Producers:
       break;
     default:
       LOGD(L"Invalid type: " + StrToWstr(json["type"]));
@@ -606,6 +627,24 @@ void Service::ParseGenres(const Json& json, const int anime_id) const {
   }
 
   anime_item->SetGenres(genres);
+}
+
+void Service::ParseProducers(const Json& json, const int anime_id) const {
+  auto anime_item = AnimeDatabase.FindItem(anime_id);
+
+  if (!anime_item)
+    return;
+
+  std::vector<std::wstring> producers;
+
+  // Here we assume that all listed producers are related to this anime.
+  for (const auto& value : json) {
+    if (value["type"] == "producers") {
+      producers.push_back(StrToWstr(value["attributes"]["name"]));
+    }
+  }
+
+  anime_item->SetProducers(producers);
 }
 
 int Service::ParseLibraryObject(const Json& json) const {
