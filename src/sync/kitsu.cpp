@@ -596,14 +596,33 @@ int Service::ParseAnimeObject(const Json& json) const {
   for (const auto& title : attributes["abbreviatedTitles"]) {
     anime_item.InsertSynonym(StrToWstr(title));
   }
-  if (attributes["titles"]["en"].is_string()) {
-    anime_item.SetEnglishTitle(StrToWstr(attributes["titles"]["en"]));
-  }
-  if (attributes["titles"]["en_jp"].is_string()) {
-    anime_item.SetTitle(StrToWstr(attributes["titles"]["en_jp"]));
-  }
-  if (attributes["titles"]["ja_jp"].is_string()) {
-    anime_item.InsertSynonym(StrToWstr(attributes["titles"]["ja_jp"]));
+
+  enum class TitleLanguage {
+    en,     // English
+    en_jp,  // Romaji
+    ja_jp,  // Japanese
+  };
+  static const std::map<std::string, TitleLanguage> title_languages{
+    {"en", TitleLanguage::en},
+    {"en_jp", TitleLanguage::en_jp},
+    {"ja_jp", TitleLanguage::ja_jp},
+  };
+  auto& titles = attributes["titles"];
+  for (auto it = titles.cbegin(); it != titles.cend(); ++it) {
+    auto language = title_languages.find(it.key());
+    if (language == title_languages.end() || !it->is_string())
+      continue;
+    switch (language->second) {
+      case TitleLanguage::en:
+        anime_item.SetEnglishTitle(StrToWstr(it.value()));
+        break;
+      case TitleLanguage::en_jp:
+        anime_item.SetTitle(StrToWstr(it.value()));
+        break;
+      case TitleLanguage::ja_jp:
+        anime_item.InsertSynonym(StrToWstr(it.value()));
+        break;
+    }
   }
 
   return AnimeDatabase.UpdateItem(anime_item);
