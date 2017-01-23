@@ -53,6 +53,7 @@ public:
   int GetAiringStatus(bool check_date = true) const;
   const std::wstring& GetTitle() const;
   const std::wstring& GetEnglishTitle(bool fallback = false) const;
+  const std::wstring& GetJapaneseTitle() const;
   std::vector<std::wstring> GetSynonyms() const;
   const Date& GetDateStart() const;
   const Date& GetDateEnd() const;
@@ -74,6 +75,7 @@ public:
   void SetAiringStatus(int status);
   void SetTitle(const std::wstring& title);
   void SetEnglishTitle(const std::wstring& title);
+  void SetJapaneseTitle(const std::wstring& title);
   void InsertSynonym(const std::wstring& synonym);
   void SetSynonyms(const std::wstring& synonyms);
   void SetSynonyms(const std::vector<std::wstring>& synonyms);

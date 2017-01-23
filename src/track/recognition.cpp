@@ -251,6 +251,7 @@ void Engine::UpdateTitles(const anime::Item& anime_item, bool erase_ids) {
 
   update_title(anime_item.GetTitle(), titles_.main, normal_titles_.main);
   update_title(anime_item.GetEnglishTitle(), titles_.main, normal_titles_.main);
+  update_title(anime_item.GetJapaneseTitle(), titles_.main, normal_titles_.main);
 
   const auto& date = anime_item.GetDateStart();
   if (anime::IsValidDate(date)) {

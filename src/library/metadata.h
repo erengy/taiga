@@ -26,7 +26,8 @@ namespace library {
 enum TitleType {
   kTitleTypeUnknown,
   kTitleTypeSynonym,
-  kTitleTypeLangEnglish
+  kTitleTypeLangEnglish,
+  kTitleTypeLangJapanese,
 };
 
 struct Title {

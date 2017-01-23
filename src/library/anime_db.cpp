@@ -121,6 +121,7 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
 
     // This ordering results in less reallocations
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));  // alternative
+    item.SetJapaneseTitle(XmlReadStrValue(node, L"japanese"));  // alternative
     foreach_xmlnode_(child_node, node, L"synonym")
       item.InsertSynonym(child_node.child_value());  // alternative
     item.SetPopularity(XmlReadIntValue(node, L"popularity"));  // community(1)
@@ -178,6 +179,7 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     XML_WS(L"slug", pair.second.GetSlug(), pugi::node_pcdata);
     XML_WS(L"title", pair.second.GetTitle(), pugi::node_cdata);
     XML_WS(L"english", pair.second.GetEnglishTitle(), pugi::node_cdata);
+    XML_WS(L"japanese", pair.second.GetJapaneseTitle(), pugi::node_cdata);
     XML_WC(L"synonym", pair.second.GetSynonyms(), pugi::node_cdata);
     XML_WI(L"type", pair.second.GetType());
     XML_WI(L"status", pair.second.GetAiringStatus());
@@ -325,6 +327,8 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetTitle(new_item.GetTitle());
     if (!new_item.GetEnglishTitle(false).empty())
       item->SetEnglishTitle(new_item.GetEnglishTitle());
+    if (!new_item.GetJapaneseTitle().empty())
+      item->SetJapaneseTitle(new_item.GetJapaneseTitle());
     if (!new_item.GetSynonyms().empty())
       item->SetSynonyms(new_item.GetSynonyms());
     if (IsValidDate(new_item.GetDateStart()))
@@ -349,7 +353,8 @@ int Database::UpdateItem(const Item& new_item) {
     // Update clean titles, if necessary
     if (!new_item.GetTitle().empty() ||
         !new_item.GetSynonyms().empty() ||
-        !new_item.GetEnglishTitle(false).empty())
+        !new_item.GetEnglishTitle(false).empty() ||
+        !new_item.GetJapaneseTitle().empty())
       Meow.UpdateTitles(*item);
   }
 

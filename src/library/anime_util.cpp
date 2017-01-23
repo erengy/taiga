@@ -877,6 +877,7 @@ void GetAllTitles(int anime_id, std::vector<std::wstring>& titles) {
 
   insert_title(anime_item.GetTitle());
   insert_title(anime_item.GetEnglishTitle());
+  insert_title(anime_item.GetJapaneseTitle());
 
   for (const auto& synonym : anime_item.GetSynonyms())
     insert_title(synonym);

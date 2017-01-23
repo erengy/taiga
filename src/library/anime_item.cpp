@@ -105,6 +105,15 @@ const std::wstring& Item::GetEnglishTitle(bool fallback) const {
   return EmptyString();
 }
 
+const std::wstring& Item::GetJapaneseTitle() const {
+  for (const auto& alt_title : metadata_.alternative)
+    if (alt_title.type == library::kTitleTypeLangJapanese)
+      if (!alt_title.value.empty())
+        return alt_title.value;
+
+  return EmptyString();
+}
+
 std::vector<std::wstring> Item::GetSynonyms() const {
   std::vector<std::wstring> synonyms;
 
@@ -243,8 +252,25 @@ void Item::SetEnglishTitle(const std::wstring& title) {
   metadata_.alternative.push_back(new_title);
 }
 
+void Item::SetJapaneseTitle(const std::wstring& title) {
+  for (auto& alt_title : metadata_.alternative) {
+    if (alt_title.type == library::kTitleTypeLangJapanese) {
+      alt_title.value = title;
+      return;
+    }
+  }
+
+  if (title.empty())
+    return;
+
+  library::Title new_title(library::kTitleTypeLangJapanese, title);
+
+  metadata_.alternative.push_back(new_title);
+}
+
 void Item::InsertSynonym(const std::wstring& synonym) {
-  if (synonym.empty() || synonym == GetTitle() || synonym == GetEnglishTitle())
+  if (synonym.empty() || synonym == GetTitle() ||
+      synonym == GetEnglishTitle() || synonym == GetJapaneseTitle())
     return;
   metadata_.alternative.push_back(
       library::Title(library::kTitleTypeSynonym, synonym));

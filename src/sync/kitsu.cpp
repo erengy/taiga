@@ -620,7 +620,7 @@ int Service::ParseAnimeObject(const Json& json) const {
         anime_item.SetTitle(StrToWstr(it.value()));
         break;
       case TitleLanguage::ja_jp:
-        anime_item.InsertSynonym(StrToWstr(it.value()));
+        anime_item.SetJapaneseTitle(StrToWstr(it.value()));
         break;
     }
   }
