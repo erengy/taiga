@@ -804,7 +804,6 @@ void OnSettingsLibraryFoldersEmpty() {
 void OnSettingsRestoreDefaults() {
   if (DlgSettings.IsWindow()) {
     EndDialog(kDialogSettings);
-    ShowDialog(kDialogSettings);
   }
 }
 
