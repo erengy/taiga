@@ -803,7 +803,7 @@ void OnSettingsLibraryFoldersEmpty() {
 
 void OnSettingsRestoreDefaults() {
   if (DlgSettings.IsWindow()) {
-    DestroyDialog(kDialogSettings);
+    EndDialog(kDialogSettings);
     ShowDialog(kDialogSettings);
   }
 }

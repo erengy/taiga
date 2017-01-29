@@ -32,7 +32,7 @@ enum Dialog {
   kDialogUpdate
 };
 
-void DestroyDialog(Dialog dialog);
+void EndDialog(Dialog dialog);
 void EnableDialogInput(Dialog dialog, bool enable);
 HWND GetWindowHandle(Dialog dialog);
 void ShowDialog(Dialog dialog);

@@ -605,10 +605,10 @@ BOOL MainDialog::OnDestroy() {
     }
   }
 
-  ui::DestroyDialog(ui::kDialogAbout);
-  ui::DestroyDialog(ui::kDialogAnimeInformation);
-  ui::DestroyDialog(ui::kDialogSettings);
-  ui::DestroyDialog(ui::kDialogUpdate);
+  ui::EndDialog(ui::kDialogAbout);
+  ui::EndDialog(ui::kDialogAnimeInformation);
+  ui::EndDialog(ui::kDialogSettings);
+  ui::EndDialog(ui::kDialogUpdate);
 
   Taiga.Uninitialize();
 

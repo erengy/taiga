@@ -74,14 +74,14 @@ void InitializeDialogProperties() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void DestroyDialog(Dialog dialog) {
+void EndDialog(Dialog dialog) {
   InitializeDialogProperties();
 
   auto it = dialog_properties.find(dialog);
 
   if (it != dialog_properties.end())
     if (it->second.dialog)
-      it->second.dialog->Destroy();
+      it->second.dialog->EndDialog(IDABORT);
 }
 
 void EnableDialogInput(Dialog dialog, bool enable) {
