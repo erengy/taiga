@@ -50,7 +50,7 @@ taiga::AppSettings Settings;
 namespace taiga {
 
 const std::wstring kDefaultExternalLinks =
-    L"Hummingbird Tools|https://hb.wopian.me\r\n"
+    L"Hibari|https://hb.wopian.me\r\n"
     L"MALgraph|http://graph.anime.plus\r\n"
     L"-\r\n"
     L"AniChart|http://anichart.net/airing\r\n"
