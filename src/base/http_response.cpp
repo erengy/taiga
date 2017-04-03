@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "foreach.h"
 #include "http.h"
 #include "string.h"
 #include "url.h"
@@ -31,14 +30,14 @@ bool Client::GetResponseHeader(const std::wstring& header) {
   std::vector<std::wstring> lines;
   Split(header, L"\r\n", lines);
 
-  foreach_(line, lines) {
-    int pos = InStr(*line, L":", 0);
+  for (const auto& line : lines) {
+    int pos = InStr(line, L":", 0);
     if (pos == -1) {
-      if (StartsWith(*line, L"HTTP/"))
-        response_.code = ToInt(InStr(*line, L" ", L" "));
+      if (StartsWith(line, L"HTTP/"))
+        response_.code = ToInt(InStr(line, L" ", L" "));
     } else {
-      std::wstring name = line->substr(0, pos);
-      std::wstring value = line->substr(pos + 1);
+      std::wstring name = line.substr(0, pos);
+      std::wstring value = line.substr(pos + 1);
       TrimLeft(value);
       // Using insert function instead of operator[] to avoid overwriting
       // previous header fields.
@@ -55,10 +54,11 @@ bool Client::GetResponseHeader(const std::wstring& header) {
 bool Client::ParseResponseHeader() {
   Url location;
   bool refresh = false;
+  const bool redirection = response_.GetStatusCategory() == 300;
 
-  foreach_(it, response_.header) {
-    std::wstring name = it->first;
-    std::wstring value = it->second;
+  for (const auto& pair : response_.header) {
+    std::wstring name = pair.first;
+    std::wstring value = pair.second;
 
     if (IsEqual(name, L"Content-Encoding")) {
       if (InStr(value, L"gzip") > -1) {
@@ -85,13 +85,14 @@ bool Client::ParseResponseHeader() {
       location.Crack(value);
       if (location.host.empty())  // relative URL
         location.host = request_.url.host;
-      if (OnRedirect(location.Build(), refresh))
-        return false;
+      if (redirection || refresh)
+        if (OnRedirect(location.Build(), refresh))
+          return false;
     }
   }
 
   // Redirection
-  if (!location.host.empty() && auto_redirect_ && !refresh) {
+  if (redirection && !refresh && auto_redirect_ && !location.host.empty()) {
     content_encoding_ = kContentEncodingNone;
     content_length_ = 0;
     current_length_ = 0;

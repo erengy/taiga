@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/common_dialogs.h>
+
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
@@ -23,7 +25,7 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "library/history.h"
-#include "sync/hummingbird_util.h"
+#include "sync/kitsu_util.h"
 #include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/announce.h"
@@ -41,10 +43,9 @@
 #include "ui/dialog.h"
 #include "ui/menu.h"
 #include "ui/ui.h"
-#include "win/win_commondialog.h"
 
 void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
-  LOG(LevelDebug, action);
+  LOGD(action);
 
   std::wstring body;
   size_t pos = action.find('(');
@@ -107,8 +108,8 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       case sync::kMyAnimeList:
         sync::myanimelist::ViewAnimePage(anime_id);
         break;
-      case sync::kHummingbird:
-        sync::hummingbird::ViewAnimePage(anime_id);
+      case sync::kKitsu:
+        sync::kitsu::ViewAnimePage(anime_id);
         break;
     }
 
@@ -118,9 +119,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
     switch (taiga::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
         sync::myanimelist::ViewUpcomingAnime();
-        break;
-      case sync::kHummingbird:
-        sync::hummingbird::ViewUpcomingAnime();
         break;
     }
 
@@ -135,16 +133,16 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   } else if (action == L"MalViewHistory") {
     sync::myanimelist::ViewHistory();
 
-  // HummingbirdViewProfile()
-  // HummingbirdViewDashboard()
-  // HummingbirdViewRecommendations()
-  //   Opens up Hummingbird user pages.
-  } else if (action == L"HummingbirdViewProfile") {
-    sync::hummingbird::ViewProfile();
-  } else if (action == L"HummingbirdViewDashboard") {
-    sync::hummingbird::ViewDashboard();
-  } else if (action == L"HummingbirdViewRecommendations") {
-    sync::hummingbird::ViewRecommendations();
+  // KitsuViewFeed()
+  // KitsuViewLibrary()
+  // KitsuViewProfile()
+  //   Opens up Kitsu user pages.
+  } else if (action == L"KitsuViewFeed") {
+    sync::kitsu::ViewFeed();
+  } else if (action == L"KitsuViewLibrary") {
+    sync::kitsu::ViewLibrary();
+  } else if (action == L"KitsuViewProfile") {
+    sync::kitsu::ViewProfile();
 
   //////////////////////////////////////////////////////////////////////////////
 
@@ -535,11 +533,25 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // Season_Load(file)
   //   Loads season data.
   } else if (action == L"Season_Load") {
-    if (SeasonDatabase.LoadSeason(body)) {
-      Settings.Set(taiga::kApp_Seasons_LastSeason,
-                   SeasonDatabase.current_season.GetString());
-      SeasonDatabase.Review();
-      ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        if (SeasonDatabase.LoadSeason(body)) {
+          Settings.Set(taiga::kApp_Seasons_LastSeason,
+                       SeasonDatabase.current_season.GetString());
+          SeasonDatabase.Review();
+          ui::OnSeasonLoad(SeasonDatabase.IsRefreshRequired());
+        }
+        break;
+      case sync::kKitsu:
+        if (SeasonDatabase.LoadSeasonFromMemory(body)) {
+          Settings.Set(taiga::kApp_Seasons_LastSeason,
+                       SeasonDatabase.current_season.GetString());
+          ui::OnSeasonLoad(false);
+          if (SeasonDatabase.items.empty()) {
+            ui::DlgSeason.GetData();
+          }
+        }
+        break;
     }
 
   // Season_GroupBy(group)
@@ -574,6 +586,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // Unknown
   } else {
-    LOG(LevelWarning, L"Unknown action: " + action);
+    LOGW(L"Unknown action: " + action);
   }
 }

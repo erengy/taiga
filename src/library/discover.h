@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_DISCOVER_H
-#define TAIGA_LIBRARY_DISCOVER_H
+#pragma once
 
 #include <string>
 
@@ -34,6 +33,8 @@ public:
   bool LoadSeason(const anime::Season& season);
   bool LoadFile(const std::wstring& filename);
   bool LoadString(const std::wstring& data);
+
+  bool LoadSeasonFromMemory(const anime::Season& season);
 
   // Checkes if a significant portion of season data is empty and requires
   // refreshing.
@@ -59,5 +60,3 @@ public:
 }  // namespace library
 
 extern library::SeasonDatabase SeasonDatabase;
-
-#endif // TAIGA_LIBRARY_DISCOVER_H

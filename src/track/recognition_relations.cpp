@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 
 #include <regex>
 
+#include <semaver/semaver/version.h>
+
 #include "base/file.h"
 #include "base/log.h"
-#include "base/version.h"
 #include "sync/service.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
@@ -91,7 +92,7 @@ static bool ParseRule(const std::wstring& rule) {
       switch (taiga::GetCurrentServiceId()) {
         case sync::kMyAnimeList:
           return ToInt(match_results[first].str());
-        case sync::kHummingbird:
+        case sync::kKitsu:
           return ToInt(match_results[second].str());
         default:
           return 0;
@@ -139,7 +140,7 @@ bool Engine::ReadRelations() {
   std::string document;
 
   if (!ReadFromFile(path, document)) {
-    LOG(LevelWarning, L"Could not read anime relations data.");
+    LOGW(L"Could not read anime relations data.");
     Settings.Set(taiga::kRecognition_RelationsLastModified, std::wstring());
     return false;
   }
@@ -189,10 +190,9 @@ bool Engine::ReadRelations(const std::string& document) {
           auto name = match_results[1].str();
           auto value = match_results[2].str();
           if (name == L"version") {
-            base::SemanticVersion version(value);
+            semaver::Version version(WstrToStr(value));
             if (version > Taiga.version)
-              LOG(LevelDebug, L"Anime relations version is larger than "
-                              L"application version.");
+              LOGD(L"Anime relations version is larger than application version.");
           } else if (name == L"last_modified") {
             Settings.Set(taiga::kRecognition_RelationsLastModified, value);
           }
@@ -202,7 +202,7 @@ bool Engine::ReadRelations(const std::string& document) {
       case kRulesSection: {
         TrimLeft(line, L"- ");
         if (!ParseRule(line))
-          LOG(LevelWarning, L"Could not parse rule: " + line);
+          LOGW(L"Could not parse rule: " + line);
         break;
       }
     }

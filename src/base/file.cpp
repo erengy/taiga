@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,11 +19,12 @@
 #include <fstream>
 #include <shlobj.h>
 
-#include "error.h"
+#include <windows/win/error.h>
+#include <windows/win/registry.h>
+
 #include "file.h"
 #include "string.h"
 #include "time.h"
-#include "win/win_registry.h"
 
 HANDLE OpenFileForGenericRead(const std::wstring& path) {
   return ::CreateFile(GetExtendedLengthPath(path).c_str(),
@@ -82,7 +83,7 @@ std::wstring GetFileLastModifiedDate(const std::wstring& path) {
       SYSTEMTIME st_file = {0};
       result = FileTimeToSystemTime(&ft_file, &st_file);
       if (result)
-        return Date(st_file.wYear, st_file.wMonth, st_file.wDay);
+        return static_cast<std::wstring>(Date(st_file));
     }
   }
 
@@ -297,7 +298,7 @@ bool FileExists(const std::wstring& file) {
 }
 
 bool FolderExists(const std::wstring& path) {
-  base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+  win::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
 
   auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
 
@@ -306,7 +307,7 @@ bool FolderExists(const std::wstring& path) {
 }
 
 bool PathExists(const std::wstring& path) {
-  base::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
+  win::ErrorMode error_mode(SEM_FAILCRITICALERRORS);
 
   auto file_attr = GetFileAttributes(GetExtendedLengthPath(path).c_str());
 
@@ -358,6 +359,18 @@ std::wstring GetDefaultAppPath(const std::wstring& extension,
   }
 
   return path.empty() ? default_value : path;
+}
+
+std::wstring GetKnownFolderPath(REFKNOWNFOLDERID rfid) {
+  std::wstring output;
+
+  PWSTR path = nullptr;
+  if (SUCCEEDED(SHGetKnownFolderPath(rfid, KF_FLAG_CREATE, nullptr, &path))) {
+    output = path;
+  }
+  CoTaskMemFree(path);
+
+  return output;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

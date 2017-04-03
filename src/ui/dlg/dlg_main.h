@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,16 +16,16 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_DLG_MAIN_H
-#define TAIGA_UI_DLG_MAIN_H
+#pragma once
 
 #include <map>
 #include <vector>
 
+#include <windows/win/common_controls.h>
+#include <windows/win/dialog.h>
+#include <windows/win/gdi.h>
+
 #include "library/anime_filter.h"
-#include "win/ctrl/win_ctrl.h"
-#include "win/win_dialog.h"
-#include "win/win_gdi.h"
 
 #define WM_TAIGA_SHOWMENU WM_USER + 1337
 
@@ -165,5 +165,3 @@ private:
 extern MainDialog DlgMain;
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_DLG_MAIN_H

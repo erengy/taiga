@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,6 +15,12 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <windows.h>
+#include <uxtheme.h>
+
+#include <windows/win/common_dialogs.h>
+#include <windows/win/version.h>
 
 #include "base/base64.h"
 #include "base/crypto.h"
@@ -41,7 +47,6 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_commondialog.h"
 
 namespace ui {
 
@@ -67,7 +72,7 @@ void SettingsPage::Create() {
     SETRESOURCEID(kSettingsPageRecognitionStream, IDD_SETTINGS_RECOGNITION_STREAM);
     SETRESOURCEID(kSettingsPageServicesMain, IDD_SETTINGS_SERVICES_MAIN);
     SETRESOURCEID(kSettingsPageServicesMal, IDD_SETTINGS_SERVICES_MAL);
-    SETRESOURCEID(kSettingsPageServicesHummingbird, IDD_SETTINGS_SERVICES_HUMMINGBIRD);
+    SETRESOURCEID(kSettingsPageServicesKitsu, IDD_SETTINGS_SERVICES_KITSU);
     SETRESOURCEID(kSettingsPageSharingHttp, IDD_SETTINGS_SHARING_HTTP);
     SETRESOURCEID(kSettingsPageSharingMirc, IDD_SETTINGS_SHARING_MIRC);
     SETRESOURCEID(kSettingsPageSharingSkype, IDD_SETTINGS_SHARING_SKYPE);
@@ -107,10 +112,10 @@ BOOL SettingsPage::OnInitDialog() {
       SetDlgItemText(IDC_EDIT_PASS_MAL, Base64Decode(Settings[taiga::kSync_Service_Mal_Password]).c_str());
       break;
     }
-    // Services > Hummingbird
-    case kSettingsPageServicesHummingbird: {
-      SetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD, Settings[taiga::kSync_Service_Hummingbird_Username].c_str());
-      SetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD, Base64Decode(Settings[taiga::kSync_Service_Hummingbird_Password]).c_str());
+    // Services > Kitsu
+    case kSettingsPageServicesKitsu: {
+      SetDlgItemText(IDC_EDIT_USER_KITSU, Settings[taiga::kSync_Service_Kitsu_Username].c_str());
+      SetDlgItemText(IDC_EDIT_PASS_KITSU, Base64Decode(Settings[taiga::kSync_Service_Kitsu_Password]).c_str());
       break;
     }
 
@@ -422,8 +427,9 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
         {taiga::kRecognition_MediaPlayerDetectionMethod, {L"", L"Recognition / Media player detection method"}},
         {taiga::kRecognition_BrowserDetectionMethod, {L"", L"Recognition / Web browser detection method"}},
-        {taiga::kSync_Service_Hummingbird_UseHttps, {L"", L"Services / Use HTTPS connections for Hummingbird"}},
-        {taiga::kSync_Service_Mal_UseHttps, {L"", L"Services / Use HTTPS connections for MyAnimeList"}},
+        {taiga::kSync_Service_Kitsu_PartialLibrary, {L"", L"Services / Kitsu / Download partial library"}},
+        {taiga::kSync_Service_Kitsu_UseHttps, {L"", L"Services / Kitsu / Use HTTPS connections"}},
+        {taiga::kSync_Service_Mal_UseHttps, {L"", L"Services / MyAnimeList / Use HTTPS connections"}},
         {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrents / Archive limit"}},
       });
       win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
@@ -725,8 +731,8 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
               }
             }
             if (!parsed) {
-              LOG(LevelError, metadata);
-              LOG(LevelError, data);
+              LOGE(metadata);
+              LOGE(data);
               ui::DisplayErrorMessage(
                   L"Could not parse the filter string. It may be missing characters, "
                   L"or encoded with an incompatible version of the application.",
@@ -739,7 +745,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         case 107: {
           std::wstring data;
           Aggregator.filter_manager.Export(data, parent->feed_filters_);
-          std::wstring metadata = Taiga.version;
+          std::wstring metadata = StrToWstr(Taiga.version.str());
           InputDialog dlg;
           StringCoder coder;
           if (coder.Encode(metadata, data, dlg.text)) {
@@ -817,7 +823,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
     case NM_RETURN: {
       switch (pnmh->idFrom) {
         // Execute link
-        case IDC_LINK_ACCOUNT_HUMMINGBIRD:
+        case IDC_LINK_ACCOUNT_KITSU:
         case IDC_LINK_ACCOUNT_MAL:
         case IDC_LINK_TWITTER: {
           PNMLINK pNMLink = reinterpret_cast<PNMLINK>(pnmh);

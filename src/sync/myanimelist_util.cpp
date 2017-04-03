@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ int TranslateSeriesStatusFrom(int value) {
     case kNotYetAired: return anime::kNotYetAired;
   }
 
-  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: " + ToWstr(value));
   return anime::kUnknownStatus;
 }
 
@@ -73,7 +73,7 @@ int TranslateSeriesStatusFrom(const std::wstring& value) {
     return anime::kNotYetAired;
   }
 
-  LOG(LevelWarning, L"Invalid value: " + value);
+  LOGW(L"Invalid value: " + value);
   return anime::kUnknownStatus;
 }
 
@@ -88,7 +88,7 @@ int TranslateSeriesTypeFrom(int value) {
     case kMusic: return anime::kMusic;
   }
 
-  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: " + ToWstr(value));
   return anime::kUnknownType;
 }
 
@@ -107,7 +107,7 @@ int TranslateSeriesTypeFrom(const std::wstring& value) {
     return anime::kMusic;
   }
 
-  LOG(LevelWarning, L"Invalid value: " + value);
+  LOGW(L"Invalid value: " + value);
   return anime::kUnknownType;
 }
 
@@ -115,9 +115,9 @@ std::wstring TranslateMyDateTo(const std::wstring& value) {
   Date date(value);
 
   // Convert YYYY-MM-DD to MMDDYYYY
-  return PadChar(ToWstr(date.month), '0', 2) +
-         PadChar(ToWstr(date.day), '0', 2) +
-         PadChar(ToWstr(date.year), '0', 4);
+  return PadChar(ToWstr(date.month()), '0', 2) +
+         PadChar(ToWstr(date.day()), '0', 2) +
+         PadChar(ToWstr(date.year()), '0', 4);
 }
 
 int TranslateMyStatusFrom(int value) {
@@ -129,7 +129,7 @@ int TranslateMyStatusFrom(int value) {
     case kPlanToWatch: return anime::kPlanToWatch;
   }
 
-  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: " + ToWstr(value));
   return anime::kNotInList;
 }
 
@@ -142,7 +142,7 @@ int TranslateMyStatusTo(int value) {
     case anime::kPlanToWatch: return kPlanToWatch;
   }
 
-  LOG(LevelWarning, L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: " + ToWstr(value));
   return kWatching;
 }
 
@@ -202,9 +202,9 @@ void ViewUpcomingAnime() {
   Date date = GetDate();
 
   ExecuteLink(L"https://myanimelist.net/anime.php"
-              L"?sd=" + ToWstr(date.day) +
-              L"&sm=" + ToWstr(date.month) +
-              L"&sy=" + ToWstr(date.year) +
+              L"?sd=" + ToWstr(date.day()) +
+              L"&sm=" + ToWstr(date.month()) +
+              L"&sy=" + ToWstr(date.year()) +
               L"&em=0&ed=0&ey=0&o=2&w=&c[]=a&c[]=d&cv=1");
 }
 

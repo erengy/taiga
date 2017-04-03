@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,14 +74,14 @@ void InitializeDialogProperties() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void DestroyDialog(Dialog dialog) {
+void EndDialog(Dialog dialog) {
   InitializeDialogProperties();
 
   auto it = dialog_properties.find(dialog);
 
   if (it != dialog_properties.end())
     if (it->second.dialog)
-      it->second.dialog->Destroy();
+      it->second.dialog->EndDialog(IDABORT);
 }
 
 void EnableDialogInput(Dialog dialog, bool enable) {

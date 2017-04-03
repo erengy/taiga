@@ -25,27 +25,25 @@ class Item;
 }
 
 namespace sync {
-namespace myanimelist {
+namespace kitsu {
 
-std::wstring DecodeText(std::wstring text);
-std::wstring EraseBbcode(std::wstring& str);
+std::wstring DecodeSynopsis(std::string text);
 
-int TranslateSeriesStatusFrom(int value);
-int TranslateSeriesStatusFrom(const std::wstring& value);
-int TranslateSeriesTypeFrom(int value);
-int TranslateSeriesTypeFrom(const std::wstring& value);
-std::wstring TranslateMyDateTo(const std::wstring& value);
-int TranslateMyStatusFrom(int value);
-int TranslateMyStatusTo(int value);
-std::wstring TranslateKeyTo(const std::wstring& key);
+int TranslateAgeRatingFrom(const std::string& value);
+double TranslateSeriesRatingFrom(double value);
+double TranslateSeriesRatingTo(double value);
+int TranslateSeriesTypeFrom(const std::string& value);
+std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
+int TranslateMyRatingFrom(const std::string& value);
+std::string TranslateMyRatingTo(int value);
+int TranslateMyStatusFrom(const std::string& value);
+std::string TranslateMyStatusTo(int value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);
-void ViewAnimeSearch(const std::wstring& title);
-void ViewHistory();
-void ViewPanel();
+void ViewFeed();
+void ViewLibrary();
 void ViewProfile();
-void ViewUpcomingAnime();
 
-}  // namespace myanimelist
+}  // namespace kitsu
 }  // namespace sync

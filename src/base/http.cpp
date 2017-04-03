@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,10 @@ void Response::Clear() {
   code = 0;
   header.clear();
   body.clear();
+}
+
+unsigned int Response::GetStatusCategory() const {
+  return code - (code % 100);
 }
 
 std::wstring GenerateRequestId() {

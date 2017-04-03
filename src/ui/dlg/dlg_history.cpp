@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ void HistoryDialog::RefreshList() {
   foreach_cr_(it, History.queue.items) {
     auto anime_item = AnimeDatabase.FindItem(it->anime_id);
     if (!anime_item) {
-      LOG(LevelError, L"Item does not exist in the database: " + ToWstr(it->anime_id));
+      LOGE(L"Item does not exist in the database: " + ToWstr(it->anime_id));
       continue;
     }
 
@@ -213,6 +213,8 @@ void HistoryDialog::RefreshList() {
                    L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Rewatching");
     if (it->tags)
       AppendString(details, L"Tags: \"" + *it->tags + L"\"");
+    if (it->notes)
+      AppendString(details, L"Notes: \"" + *it->notes + L"\"");
     if (it->date_start)
       AppendString(details, L"Date started: " + std::wstring(*it->date_start));
     if (it->date_finish)
@@ -228,7 +230,7 @@ void HistoryDialog::RefreshList() {
   foreach_cr_(it, History.items) {
     auto anime_item = AnimeDatabase.FindItem(it->anime_id);
     if (!anime_item) {
-      LOG(LevelError, L"Item does not exist in the database: " + ToWstr(it->anime_id));
+      LOGE(L"Item does not exist in the database: " + ToWstr(it->anime_id));
       continue;
     }
 

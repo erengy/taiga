@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
+#include <windows/win/task_dialog.h>
+#include <windows/win/version.h>
+
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -28,8 +30,6 @@
 #include "ui/list.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_gdi.h"
-#include "win/win_taskdialog.h"
 
 namespace ui {
 
@@ -264,20 +264,20 @@ BOOL FeedFilterDialog::DialogPage0::OnInitDialog() {
   preset_list.SetView(LV_VIEW_TILE);
 
   // Insert presets
-  foreach_(it, Aggregator.filter_manager.presets) {
-    if (it->is_default)
+  for (const auto& preset : Aggregator.filter_manager.presets) {
+    if (preset.is_default)
       continue;
     int icon_ = ui::kIcon16_Funnel;
-    switch (it->filter.action) {
+    switch (preset.filter.action) {
       case kFeedFilterActionDiscard: icon_ = ui::kIcon16_FunnelCross; break;
       case kFeedFilterActionSelect:  icon_ = ui::kIcon16_FunnelTick;  break;
       case kFeedFilterActionPrefer:  icon_ = ui::kIcon16_FunnelPlus;  break;
     }
-    if (it->filter.conditions.empty())
+    if (preset.filter.conditions.empty())
       icon_ = ui::kIcon16_FunnelPencil;
-    preset_list.InsertItem(it - Aggregator.filter_manager.presets.begin(),
+    preset_list.InsertItem(preset_list.GetItemCount(),
                            0, icon_, I_COLUMNSCALLBACK, nullptr, LPSTR_TEXTCALLBACK,
-                           reinterpret_cast<LPARAM>(&(*it)));
+                           reinterpret_cast<LPARAM>(&preset));
   }
   preset_list.SelectItem(0);
 
@@ -558,8 +558,8 @@ void FeedFilterDialog::DialogPage1::AddConditionToList(const FeedFilterCondition
 void FeedFilterDialog::DialogPage1::RefreshConditionList() {
   condition_list.DeleteAllItems();
 
-  foreach_(it, parent->filter.conditions)
-    AddConditionToList(*it);
+  for (const auto& condition : parent->filter.conditions)
+    AddConditionToList(condition);
 }
 
 void FeedFilterDialog::DialogPage1::ChangeAction() {
@@ -597,14 +597,14 @@ BOOL FeedFilterDialog::DialogPage2::OnInitDialog() {
 
   // Add anime to list
   int list_index = 0;
-  foreach_(it, AnimeDatabase.items) {
-    if (!it->second.IsInList())
+  for (const auto& pair : AnimeDatabase.items) {
+    if (!pair.second.IsInList())
       continue;
-    anime_list.InsertItem(list_index, it->second.GetMyStatus(),
-                          StatusToIcon(it->second.GetAiringStatus()), 0, nullptr,
-                          LPSTR_TEXTCALLBACK, static_cast<int>(it->second.GetId()));
-    foreach_(id, parent->filter.anime_ids) {
-      if (*id == it->second.GetId()) {
+    anime_list.InsertItem(list_index, pair.second.GetMyStatus(),
+                          StatusToIcon(pair.second.GetAiringStatus()), 0, nullptr,
+                          LPSTR_TEXTCALLBACK, static_cast<int>(pair.second.GetId()));
+    for (const auto& anime_id : parent->filter.anime_ids) {
+      if (anime_id == pair.second.GetId()) {
         anime_list.SetCheckState(list_index, TRUE);
         break;
       }

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_LIBRARY_ANIME_UTIL_H
-#define TAIGA_LIBRARY_ANIME_UTIL_H
+#pragma once
 
 #include <string>
 #include <vector>
 
+#include "library/anime.h"
 #include "library/anime_episode.h"
 
 class Date;
@@ -32,7 +32,9 @@ class Item;
 class Season;
 
 bool IsValidId(int anime_id);
+bool ListHasMissingIds();
 
+SeriesStatus GetAiringStatus(const Item& item);
 bool IsAiredYet(const Item& item);
 bool IsFinishedAiring(const Item& item);
 int EstimateDuration(const Item& item);
@@ -52,7 +54,7 @@ bool PlayRandomEpisode(int anime_id);
 bool LinkEpisodeToAnime(Episode& episode, int anime_id);
 void StartWatching(Item& item, Episode& episode);
 void EndWatching(Item& item, Episode episode);
-bool IsDeletedFromList(Item& item);
+bool IsDeletedFromList(const Item& item);
 bool IsUpdateAllowed(Item& item, const Episode& episode, bool ignore_update_time);
 void UpdateList(Item& item, Episode& episode);
 void AddToQueue(Item& item, const Episode& episode, bool change_status);
@@ -108,5 +110,3 @@ std::wstring TranslateDateToSeasonString(const Date& date);
 std::wstring TranslateSeasonToMonths(const Season& season);
 
 }  // namespace anime
-
-#endif  // TAIGA_LIBRARY_ANIME_UTIL_H

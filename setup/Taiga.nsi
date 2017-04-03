@@ -8,7 +8,7 @@
 !define PRODUCT_EXE "Taiga.exe"
 !define PRODUCT_NAME "Taiga"
 !define PRODUCT_PUBLISHER "erengy"
-!define PRODUCT_VERSION "1.2"
+!define PRODUCT_VERSION "1.3"
 !define PRODUCT_WEBSITE "http://taiga.moe"
 
 ; Uninstaller

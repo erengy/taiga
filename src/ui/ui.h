@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_UI_UI_H
-#define TAIGA_UI_UI_H
+#pragma once
+
+#include <windows/win/taskbar.h>
 
 #include "base/types.h"
 
@@ -32,6 +33,12 @@ class HttpClient;
 class Feed;
 
 namespace ui {
+
+constexpr int kControlMargin = 6;
+constexpr unsigned int kAppSysTrayId = 74164;  // TAIGA ^_^
+
+extern win::Taskbar taskbar;
+extern win::TaskbarList taskbar_list;
 
 void ChangeStatusText(const string_t& status);
 void ClearStatusText();
@@ -51,6 +58,7 @@ void OnLibraryEntryAdd(int id);
 void OnLibraryEntryChange(int id);
 void OnLibraryEntryDelete(int id);
 void OnLibraryEntryImageChange(int id);
+void OnLibraryGetSeason();
 void OnLibrarySearchTitle(int id, const string_t& results);
 void OnLibraryEntryChangeFailure(int id, const string_t& reason);
 void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved);
@@ -110,9 +118,7 @@ void OnLogin();
 void OnLogout();
 
 void OnUpdateAvailable();
-void OnUpdateNotAvailable(bool relations = false);
+void OnUpdateNotAvailable(bool relations = false, bool season = false);
 void OnUpdateFinished();
 
 }  // namespace ui
-
-#endif  // TAIGA_UI_UI_H

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "taiga/stats.h"
 #include "ui/dlg/dlg_stats.h"
 #include "ui/theme.h"
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -136,7 +137,7 @@ void StatsDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
     case WM_SIZE: {
       win::Rect rect;
       rect.Set(0, 0, size.cx, size.cy);
-      rect.Inflate(-ScaleX(win::kControlMargin) * 2, -ScaleY(win::kControlMargin));
+      rect.Inflate(-ScaleX(kControlMargin) * 2, -ScaleY(kControlMargin));
 
       // Headers
       for (int i = 0; i < 4; i++) {
@@ -166,8 +167,17 @@ void StatsDialog::Refresh() {
   text += ToWstr(Stats.episode_count) + L"\n";
   text += Stats.life_spent_watching + L"\n";
   text += Stats.life_planned_to_watch + L"\n";
-  text += ToWstr(Stats.score_mean, 2) + L"\n";
-  text += ToWstr(Stats.score_deviation, 2);
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kMyAnimeList:
+    default:
+      text += ToWstr(Stats.score_mean, 2) + L"\n";
+      text += ToWstr(Stats.score_deviation, 2);
+      break;
+    case sync::kKitsu:
+      text += ToWstr(Stats.score_mean / 2.0, 2) + L"\n";
+      text += ToWstr(Stats.score_deviation / 2.0, 2);
+      break;
+  }
   SetDlgItemText(IDC_STATIC_ANIME_STAT1, text.c_str());
 
   // Score distribution
@@ -177,7 +187,7 @@ void StatsDialog::Refresh() {
     default:
       text = L"10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n";
       break;
-    case sync::kHummingbird:
+    case sync::kKitsu:
       text = L"5.0\n4.5\n4.0\n3.5\n3.0\n2.5\n2.0\n1.5\n1.0\n0.5";
       break;
   }

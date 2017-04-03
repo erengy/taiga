@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 
 #include <algorithm>
 
+#include <semaver/semaver/version.h>
+
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
-#include "base/version.h"
 #include "base/xml.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
@@ -61,7 +61,7 @@ bool Database::LoadDatabase() {
     ReadDatabaseNode(database_node);
     HandleCompatibility(meta_version);
   } else {
-    LOG(LevelWarning, L"Reading database in compatibility mode");
+    LOGW(L"Reading database in compatibility mode");
     ReadDatabaseInCompatibilityMode(document);
   }
 
@@ -73,23 +73,32 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     std::map<enum_t, std::wstring> id_map;
 
     foreach_xmlnode_(id_node, node, L"id") {
-      auto name = id_node.attribute(L"name").as_string();
-      enum_t service_id = ServiceManager.GetServiceIdByName(name);
-      id_map[service_id] = id_node.child_value();
+      const std::wstring name = id_node.attribute(L"name").as_string();
+      if (name == L"hummingbird") {
+        id_map[sync::kKitsu] = id_node.child_value();
+      } else {
+        enum_t service_id = ServiceManager.GetServiceIdByName(name);
+        id_map[service_id] = id_node.child_value();
+      }
     }
 
     enum_t source = sync::kTaiga;
-    auto service = ServiceManager.service(XmlReadStrValue(node, L"source"));
-    if (service)
-      source = service->id();
+    const std::wstring source_name = XmlReadStrValue(node, L"source");
+    if (source_name == L"hummingbird") {
+      source = sync::kKitsu;
+    } else {
+      auto service = ServiceManager.service(source_name);
+      if (service)
+        source = service->id();
+    }
 
     if (source == sync::kTaiga) {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map.find(current_service_id) != id_map.end()) {
         source = current_service_id;
-        LOG(LevelWarning, L"Fixed source for ID: " + id_map[source]);
+        LOGW(L"Fixed source for ID: " + id_map[source]);
       } else {
-        LOG(LevelError, L"Invalid source for ID: " + id_map[sync::kTaiga]);
+        LOGE(L"Invalid source for ID: " + id_map[sync::kTaiga]);
         continue;
       }
     }
@@ -97,8 +106,8 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     int id = ToInt(id_map[sync::kTaiga]);
     Item& item = items[id];  // Creates the item if it doesn't exist
 
-    foreach_(it, id_map)
-      item.SetId(it->second, it->first);
+    for (const auto& pair : id_map)
+      item.SetId(pair.second, pair.first);
 
     item.SetSource(source);
     item.SetTitle(XmlReadStrValue(node, L"title"));
@@ -108,10 +117,11 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
     item.SetGenres(XmlReadStrValue(node, L"genres"));
     item.SetProducers(XmlReadStrValue(node, L"producers"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
-    item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"modified").c_str()));
+    item.SetLastModified(ToTime(XmlReadStrValue(node, L"modified")));
 
     // This ordering results in less reallocations
     item.SetEnglishTitle(XmlReadStrValue(node, L"english"));  // alternative
+    item.SetJapaneseTitle(XmlReadStrValue(node, L"japanese"));  // alternative
     foreach_xmlnode_(child_node, node, L"synonym")
       item.InsertSynonym(child_node.child_value());  // alternative
     item.SetPopularity(XmlReadIntValue(node, L"popularity"));  // community(1)
@@ -129,7 +139,7 @@ bool Database::SaveDatabase() {
   xml_document document;
 
   xml_node meta_node = document.append_child(L"meta");
-  XmlWriteStrValue(meta_node, L"version", std::wstring(Taiga.version).c_str());
+  XmlWriteStrValue(meta_node, L"version", StrToWstr(Taiga.version.str()).c_str());
 
   xml_node database_node = document.append_child(L"database");
   WriteDatabaseNode(database_node);
@@ -139,11 +149,11 @@ bool Database::SaveDatabase() {
 }
 
 void Database::WriteDatabaseNode(xml_node& database_node) {
-  foreach_(it, items) {
+  for (const auto& pair : items) {
     xml_node anime_node = database_node.append_child(L"anime");
 
     for (int i = 0; i <= sync::kLastService; i++) {
-      std::wstring id = it->second.GetId(i);
+      std::wstring id = pair.second.GetId(i);
       if (!id.empty()) {
         xml_node child = anime_node.append_child(L"id");
         std::wstring name = ServiceManager.GetServiceNameById(static_cast<sync::ServiceId>(i));
@@ -153,12 +163,12 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     }
 
     std::wstring source = ServiceManager.GetServiceNameById(
-        static_cast<sync::ServiceId>(it->second.GetSource()));
+        static_cast<sync::ServiceId>(pair.second.GetSource()));
 
     #define XML_WC(n, v, t) \
       if (!v.empty()) XmlWriteChildNodes(anime_node, v, n, t)
     #define XML_WD(n, v) \
-      if (v) XmlWriteStrValue(anime_node, n, std::wstring(v).c_str())
+      if (v) XmlWriteStrValue(anime_node, n, v.to_string().c_str())
     #define XML_WI(n, v) \
       if (v > 0) XmlWriteIntValue(anime_node, n, v)
     #define XML_WS(n, v, t) \
@@ -166,24 +176,25 @@ void Database::WriteDatabaseNode(xml_node& database_node) {
     #define XML_WF(n, v, t) \
       if (v > 0.0) XmlWriteStrValue(anime_node, n, ToWstr(v).c_str(), t)
     XML_WS(L"source", source, pugi::node_pcdata);
-    XML_WS(L"slug", it->second.GetSlug(), pugi::node_pcdata);
-    XML_WS(L"title", it->second.GetTitle(), pugi::node_cdata);
-    XML_WS(L"english", it->second.GetEnglishTitle(), pugi::node_cdata);
-    XML_WC(L"synonym", it->second.GetSynonyms(), pugi::node_cdata);
-    XML_WI(L"type", it->second.GetType());
-    XML_WI(L"status", it->second.GetAiringStatus());
-    XML_WI(L"episode_count", it->second.GetEpisodeCount());
-    XML_WI(L"episode_length", it->second.GetEpisodeLength());
-    XML_WD(L"date_start", it->second.GetDateStart());
-    XML_WD(L"date_end", it->second.GetDateEnd());
-    XML_WS(L"image", it->second.GetImageUrl(), pugi::node_pcdata);
-    XML_WI(L"age_rating", it->second.GetAgeRating());
-    XML_WS(L"genres", Join(it->second.GetGenres(), L", "), pugi::node_pcdata);
-    XML_WS(L"producers", Join(it->second.GetProducers(), L", "), pugi::node_pcdata);
-    XML_WF(L"score", it->second.GetScore(), pugi::node_pcdata);
-    XML_WI(L"popularity", it->second.GetPopularity());
-    XML_WS(L"synopsis", it->second.GetSynopsis(), pugi::node_cdata);
-    XML_WS(L"modified", ToWstr(it->second.GetLastModified()), pugi::node_pcdata);
+    XML_WS(L"slug", pair.second.GetSlug(), pugi::node_pcdata);
+    XML_WS(L"title", pair.second.GetTitle(), pugi::node_cdata);
+    XML_WS(L"english", pair.second.GetEnglishTitle(), pugi::node_cdata);
+    XML_WS(L"japanese", pair.second.GetJapaneseTitle(), pugi::node_cdata);
+    XML_WC(L"synonym", pair.second.GetSynonyms(), pugi::node_cdata);
+    XML_WI(L"type", pair.second.GetType());
+    XML_WI(L"status", pair.second.GetAiringStatus());
+    XML_WI(L"episode_count", pair.second.GetEpisodeCount());
+    XML_WI(L"episode_length", pair.second.GetEpisodeLength());
+    XML_WD(L"date_start", pair.second.GetDateStart());
+    XML_WD(L"date_end", pair.second.GetDateEnd());
+    XML_WS(L"image", pair.second.GetImageUrl(), pugi::node_pcdata);
+    XML_WI(L"age_rating", pair.second.GetAgeRating());
+    XML_WS(L"genres", Join(pair.second.GetGenres(), L", "), pugi::node_pcdata);
+    XML_WS(L"producers", Join(pair.second.GetProducers(), L", "), pugi::node_pcdata);
+    XML_WF(L"score", pair.second.GetScore(), pugi::node_pcdata);
+    XML_WI(L"popularity", pair.second.GetPopularity());
+    XML_WS(L"synopsis", pair.second.GetSynopsis(), pugi::node_cdata);
+    XML_WS(L"modified", ToWstr(pair.second.GetLastModified()), pugi::node_pcdata);
     #undef XML_WF
     #undef XML_WS
     #undef XML_WI
@@ -200,7 +211,7 @@ Item* Database::FindItem(int id, bool log_error) {
     if (it != items.end())
       return &it->second;
     if (log_error)
-      LOG(LevelError, L"Could not find ID: " + ToWstr(id));
+      LOGE(L"Could not find ID: " + ToWstr(id));
   }
 
   return nullptr;
@@ -209,11 +220,11 @@ Item* Database::FindItem(int id, bool log_error) {
 Item* Database::FindItem(const std::wstring& id, enum_t service,
                          bool log_error) {
   if (!id.empty()) {
-    foreach_(it, items)
-      if (id == it->second.GetId(service))
-        return &it->second;
+    for (auto& pair : items)
+      if (id == pair.second.GetId(service))
+        return &pair.second;
     if (log_error)
-      LOG(LevelError, L"Could not find ID: " + id);
+      LOGE(L"Could not find ID: " + id);
   }
 
   return nullptr;
@@ -225,7 +236,7 @@ void Database::ClearInvalidItems() {
   for (auto it = items.begin(); it != items.end(); ) {
     if (!anime::IsValidId(it->second.GetId()) ||
         it->first != it->second.GetId()) {
-      LOG(LevelDebug, L"ID: " + ToWstr(it->first));
+      LOGD(L"ID: " + ToWstr(it->first));
       items.erase(it++);
     } else {
       ++it;
@@ -241,7 +252,7 @@ bool Database::DeleteItem(int id) {
     title = anime_item->GetTitle();
 
   if (items.erase(id) > 0) {
-    LOG(LevelWarning, L"ID: " + ToWstr(id) + L" | Title: " + title);
+    LOGW(L"ID: " + ToWstr(id) + L" | Title: " + title);
 
     auto delete_history_items = [](int id, std::vector<HistoryItem>& items) {
       items.erase(std::remove_if(items.begin(), items.end(),
@@ -279,7 +290,7 @@ int Database::UpdateItem(const Item& new_item) {
     auto source = new_item.GetSource();
 
     if (source == sync::kTaiga) {
-      LOG(LevelError, L"Invalid source for ID: " + new_item.GetId(source));
+      LOGE(L"Invalid source for ID: " + new_item.GetId(source));
       return ID_UNKNOWN;
     }
 
@@ -316,6 +327,8 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetTitle(new_item.GetTitle());
     if (!new_item.GetEnglishTitle(false).empty())
       item->SetEnglishTitle(new_item.GetEnglishTitle());
+    if (!new_item.GetJapaneseTitle().empty())
+      item->SetJapaneseTitle(new_item.GetJapaneseTitle());
     if (!new_item.GetSynonyms().empty())
       item->SetSynonyms(new_item.GetSynonyms());
     if (IsValidDate(new_item.GetDateStart()))
@@ -340,7 +353,8 @@ int Database::UpdateItem(const Item& new_item) {
     // Update clean titles, if necessary
     if (!new_item.GetTitle().empty() ||
         !new_item.GetSynonyms().empty() ||
-        !new_item.GetEnglishTitle(false).empty())
+        !new_item.GetEnglishTitle(false).empty() ||
+        !new_item.GetJapaneseTitle().empty())
       Meow.UpdateTitles(*item);
   }
 
@@ -355,6 +369,7 @@ int Database::UpdateItem(const Item& new_item) {
       item->SetNextEpisodePath(L"");
     }
 
+    item->SetMyId(new_item.GetMyId());
     item->SetMyLastWatchedEpisode(new_item.GetMyLastWatchedEpisode(false));
     item->SetMyScore(new_item.GetMyScore(false));
     item->SetMyStatus(new_item.GetMyStatus(false));
@@ -365,6 +380,7 @@ int Database::UpdateItem(const Item& new_item) {
     item->SetMyDateEnd(new_item.GetMyDateEnd());
     item->SetMyLastUpdated(new_item.GetMyLastUpdated());
     item->SetMyTags(new_item.GetMyTags(false));
+    item->SetMyNotes(new_item.GetMyNotes(false));
   }
 
   return item->GetId();
@@ -385,7 +401,8 @@ bool Database::LoadList() {
 
   if (parse_result.status != pugi::status_ok) {
     if (parse_result.status == pugi::status_file_not_found) {
-      return CheckOldUserDirectory();
+      if (CheckOldUserDirectory())
+        return LoadList();
     } else {
       ui::DisplayErrorMessage(L"Could not read anime list.", path.c_str());
       return false;
@@ -406,6 +423,7 @@ bool Database::LoadList() {
       anime_item.SetSource(sync::kTaiga);
 
       anime_item.AddtoUserList();
+      anime_item.SetMyId(XmlReadStrValue(node, L"library_id"));
       anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"progress"));
       anime_item.SetMyDateStart(XmlReadStrValue(node, L"date_start"));
       anime_item.SetMyDateEnd(XmlReadStrValue(node, L"date_end"));
@@ -415,13 +433,14 @@ bool Database::LoadList() {
       anime_item.SetMyRewatching(XmlReadIntValue(node, L"rewatching"));
       anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"rewatching_ep"));
       anime_item.SetMyTags(XmlReadStrValue(node, L"tags"));
+      anime_item.SetMyNotes(XmlReadStrValue(node, L"notes"));
       anime_item.SetMyLastUpdated(XmlReadStrValue(node, L"last_updated"));
 
       UpdateItem(anime_item);
     }
 
   } else {
-    LOG(LevelWarning, L"Reading list in compatibility mode");
+    LOGW(L"Reading list in compatibility mode");
     ReadListInCompatibilityMode(document);
   }
 
@@ -444,21 +463,23 @@ bool Database::SaveList(bool include_database) {
 
   xml_node node_library = document.append_child(L"library");
 
-  foreach_(it, items) {
-    Item* item = &it->second;
-    if (item->IsInList()) {
+  for (const auto& pair : items) {
+    auto& item = pair.second;
+    if (item.IsInList()) {
       xml_node node = node_library.append_child(L"anime");
-      XmlWriteIntValue(node, L"id", item->GetId());
-      XmlWriteIntValue(node, L"progress", item->GetMyLastWatchedEpisode(false));
-      XmlWriteStrValue(node, L"date_start", std::wstring(item->GetMyDateStart()).c_str());
-      XmlWriteStrValue(node, L"date_end", std::wstring(item->GetMyDateEnd()).c_str());
-      XmlWriteIntValue(node, L"score", item->GetMyScore(false));
-      XmlWriteIntValue(node, L"status", item->GetMyStatus(false));
-      XmlWriteIntValue(node, L"rewatched_times", item->GetMyRewatchedTimes());
-      XmlWriteIntValue(node, L"rewatching", item->GetMyRewatching(false));
-      XmlWriteIntValue(node, L"rewatching_ep", item->GetMyRewatchingEp());
-      XmlWriteStrValue(node, L"tags", item->GetMyTags(false).c_str());
-      XmlWriteStrValue(node, L"last_updated", item->GetMyLastUpdated().c_str());
+      XmlWriteIntValue(node, L"id", item.GetId());
+      XmlWriteStrValue(node, L"library_id", item.GetMyId().c_str());
+      XmlWriteIntValue(node, L"progress", item.GetMyLastWatchedEpisode(false));
+      XmlWriteStrValue(node, L"date_start", std::wstring(item.GetMyDateStart()).c_str());
+      XmlWriteStrValue(node, L"date_end", std::wstring(item.GetMyDateEnd()).c_str());
+      XmlWriteIntValue(node, L"score", item.GetMyScore(false));
+      XmlWriteIntValue(node, L"status", item.GetMyStatus(false));
+      XmlWriteIntValue(node, L"rewatched_times", item.GetMyRewatchedTimes());
+      XmlWriteIntValue(node, L"rewatching", item.GetMyRewatching(false));
+      XmlWriteIntValue(node, L"rewatching_ep", item.GetMyRewatchingEp());
+      XmlWriteStrValue(node, L"tags", item.GetMyTags(false).c_str());
+      XmlWriteStrValue(node, L"notes", item.GetMyNotes(false).c_str());
+      XmlWriteStrValue(node, L"last_updated", item.GetMyLastUpdated().c_str());
     }
   }
 
@@ -484,12 +505,13 @@ int Database::GetItemCount(int status, bool check_history) {
 
   // Search queued items for status changes
   if (check_history) {
-    foreach_(it, History.queue.items) {
-      if (it->status || it->mode == taiga::kHttpServiceDeleteLibraryEntry) {
-        if (status == *it->status) {
+    for (const auto& history_item : History.queue.items) {
+      if (history_item.status ||
+          history_item.mode == taiga::kHttpServiceDeleteLibraryEntry) {
+        if (status == *history_item.status) {
           count++;
         } else {
-          auto anime_item = FindItem(it->anime_id);
+          auto anime_item = FindItem(history_item.anime_id);
           if (anime_item && status == anime_item->GetMyStatus(false))
             count--;
         }
@@ -542,8 +564,8 @@ void Database::AddToList(int anime_id, int status) {
 }
 
 void Database::ClearUserData() {
-  foreach_(it, items)
-    it->second.RemoveFromUserList();
+  for (auto& pair : items)
+    pair.second.RemoveFromUserList();
 }
 
 bool Database::DeleteListItem(int anime_id) {
@@ -571,6 +593,8 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   if (!anime_item)
     return;
 
+  anime_item->AddtoUserList();
+
   // Edit episode
   if (history_item.episode) {
     anime_item->SetMyLastWatchedEpisode(*history_item.episode);
@@ -593,6 +617,10 @@ void Database::UpdateItem(const HistoryItem& history_item) {
   // Edit tags
   if (history_item.tags) {
     anime_item->SetMyTags(*history_item.tags);
+  }
+  // Edit notes
+  if (history_item.notes) {
+    anime_item->SetMyNotes(*history_item.notes);
   }
   // Edit dates
   if (history_item.date_start) {
@@ -621,29 +649,47 @@ void Database::UpdateItem(const HistoryItem& history_item) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Database::CheckOldUserDirectory() {
-  std::wstring path = taiga::GetPath(taiga::kPathUser) +
-                      taiga::GetCurrentUsername();
+  auto check_path = [](const std::wstring& path,
+                       const sync::ServiceId service_id) {
+    if (!FolderExists(path))
+      return false;
+    const auto new_path = taiga::GetPath(taiga::kPathUser) +
+                          taiga::GetUserDirectoryName(service_id);
+    LOGW(L"Renaming old user directory\n" + path + L"\n" + new_path);
+    return MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0;
+  };
 
-  if (FolderExists(path)) {
-    LOG(LevelWarning, L"Moving old user directory to its new place");
-    auto service_name = ServiceManager.GetServiceNameById(sync::kMyAnimeList);
-    std::wstring new_path = path + L"@" + service_name;
-    if (MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0) {
-      return LoadList();
-    }
+  // "Taiga\data\user\{username}"
+  if (check_path(taiga::GetPath(taiga::kPathUser) +
+                 taiga::GetCurrentUsername(),
+                 sync::kMyAnimeList) ||
+  // "Taiga\data\user\{username}@hummingbird"
+      check_path(taiga::GetPath(taiga::kPathUser) +
+                 taiga::GetCurrentUsername() + L"@hummingbird",
+                 sync::kKitsu)) {
+    return true;
   }
 
-  return true;
+  return false;
 }
 
 void Database::HandleCompatibility(const std::wstring& meta_version) {
-  base::SemanticVersion version = meta_version;
+  const semaver::Version version(WstrToStr(meta_version));
 
-  if (version <= base::SemanticVersion(L"1.1.11")) {
-    if (taiga::GetCurrentServiceId() == sync::kHummingbird) {
-      LOG(LevelWarning, L"Clearing English titles");
+  if (version <= semaver::Version(1, 1, 11)) {
+    if (taiga::GetCurrentServiceId() == sync::kKitsu) {
+      LOGW(L"Clearing English titles");
       for (auto& item : items) {
         item.second.SetEnglishTitle(EmptyString());
+      }
+    }
+  }
+
+  if (version <= semaver::Version(1, 2, 5)) {
+    if (taiga::GetCurrentServiceId() == sync::kKitsu) {
+      LOGW(L"Clearing image URLs");
+      for (auto& item : items) {
+        item.second.SetImageUrl(EmptyString());
       }
     }
   }
@@ -671,7 +717,7 @@ void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
     item.SetScore(ToDouble(XmlReadStrValue(node, L"score")));
     item.SetPopularity(XmlReadIntValue(node, L"popularity"));
     item.SetSynopsis(XmlReadStrValue(node, L"synopsis"));
-    item.SetLastModified(_wtoi64(XmlReadStrValue(node, L"last_modified").c_str()));
+    item.SetLastModified(ToTime(XmlReadStrValue(node, L"last_modified")));
   }
 }
 

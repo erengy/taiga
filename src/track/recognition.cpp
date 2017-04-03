@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ bool Engine::Parse(std::wstring filename, const ParseOptions& parse_options,
         anitomy_instance.options().ignored_strings);
 
   if (!anitomy_instance.Parse(filename)) {
-    LOG(LevelDebug, L"Could not parse filename: " + filename);
+    LOGD(L"Could not parse filename: " + filename);
     if (episode.folder.empty())  // If not, perhaps we can parse the path later on
       return false;
   }
@@ -99,8 +99,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
     valide_ids(episode_merged_title);
     if (!anime_ids.empty()) {
       std::swap(episode_merged_title, episode);
-      LOG(LevelDebug, L"Merged title lookup succeeded: " +
-                      episode.anime_title());
+      LOGD(L"Merged title lookup succeeded: " + episode.anime_title());
     }
   };
 
@@ -136,9 +135,9 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
       valide_ids(episode_from_directory);
       if (!anime_ids.empty()) {
         std::swap(episode_from_directory, episode);
-        LOG(LevelDebug, L"Parent directory lookup succeeded: " +
-                        episode_from_directory.anime_title() + L" -> " +
-                        episode.anime_title());
+        LOGD(L"Parent directory lookup succeeded: " +
+             episode_from_directory.anime_title() + L" -> " +
+             episode.anime_title());
       }
     }
   }
@@ -148,8 +147,8 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
     // We had a redirection while validating IDs
     if (!AnimeDatabase.FindItem(episode.anime_id, false)) {
       episode.anime_id = anime::ID_UNKNOWN;
-      LOG(LevelDebug, L"Redirection failed, because destination ID is not "
-                      L"available in the database.");
+      LOGD(L"Redirection failed, because destination ID is not available in the "
+           L"database.");
     }
   } else if (anime_ids.size() == 1) {
     episode.anime_id = *anime_ids.begin();
@@ -252,10 +251,11 @@ void Engine::UpdateTitles(const anime::Item& anime_item, bool erase_ids) {
 
   update_title(anime_item.GetTitle(), titles_.main, normal_titles_.main);
   update_title(anime_item.GetEnglishTitle(), titles_.main, normal_titles_.main);
+  update_title(anime_item.GetJapaneseTitle(), titles_.main, normal_titles_.main);
 
   const auto& date = anime_item.GetDateStart();
   if (anime::IsValidDate(date)) {
-    std::wstring year = ToWstr(date.year);
+    std::wstring year = ToWstr(date.year());
     if (anime_item.GetTitle().find(year) == std::wstring::npos) {
       update_title(anime_item.GetTitle() + L" (" + year + L")",
                    titles_.alternative, normal_titles_.alternative);

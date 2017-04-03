@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #include <set>
 
 #include "base/base64.h"
-#include "base/foreach.h"
 #include "base/html.h"
 #include "base/http.h"
 #include "base/string.h"
@@ -184,10 +183,10 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
       L"tags"
   };
   std::set<std::wstring> valid_tags(tags, tags + sizeof(tags) / sizeof(*tags));
-  foreach_(it, request.data) {
-    auto tag = valid_tags.find(TranslateKeyTo(it->first));
+  for (const auto& pair : request.data) {
+    auto tag = valid_tags.find(TranslateKeyTo(pair.first));
     if (tag != valid_tags.end()) {
-      std::wstring value = it->second;
+      std::wstring value = pair.second;
       if (*tag == L"status") {
         value = ToWstr(TranslateMyStatusTo(ToInt(value)));
       } else if (StartsWith(*tag, L"date")) {
@@ -204,8 +203,8 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 // Response handlers
 
 void Service::AuthenticateUser(Response& response, HttpResponse& http_response) {
-  response.data[canonical_name_ + L"-username"] =
-      InStr(http_response.body, L"<username>", L"</username>");
+  user_.id = InStr(http_response.body, L"<id>", L"</id>");
+  user_.username = InStr(http_response.body, L"<username>", L"</username>");
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -466,6 +465,12 @@ bool Service::RequestSucceeded(Response& response,
       // ...but it returned some HTML code instead. We're keeping these lines in
       // case MAL suddenly reverts to the old behavior.
       if (InStr(http_response.body, L"<title>201 Created</title>") > -1)
+        return true;
+      // If we try to add an anime that is already in user's list, MyAnimeList
+      // returns a "400 Bad Request" response with "The anime (id: 12345) is
+      // already in the list." error message. Here we ignore this error and
+      // assume that our request succeeded.
+      if (InStr(http_response.body, L"is already in the list") > -1)
         return true;
       break;
     case kAuthenticateUser:

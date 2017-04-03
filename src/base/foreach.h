@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_FOREACH_H
-#define TAIGA_BASE_FOREACH_H
+#pragma once
 
 // iterator
 #define foreach_(item, container) \
@@ -34,5 +33,3 @@
 // const reverse iterator
 #define foreach_cr_(item, container) \
     for (auto item = (container).crbegin(); item != (container).crend(); ++item)
-
-#endif  // TAIGA_BASE_FOREACH_H

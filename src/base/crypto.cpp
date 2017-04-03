@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <string>
 #include <windows.h>
 
@@ -220,7 +221,7 @@ std::string HmacSha1(const std::string& key_bytes, const std::string& data) {
         key_blob.hdr.aiKeyAlg = CALG_RC2;
         key_blob.len = key_bytes.size();
         ZeroMemory(key_blob.key, sizeof(key_blob.key));
-        CopyMemory(key_blob.key, key_bytes.c_str(), min(key_bytes.size(), key_size));
+        CopyMemory(key_blob.key, key_bytes.c_str(), std::min(key_bytes.size(), key_size));
         if (CryptImportKey(hProv, (BYTE*)&key_blob, sizeof(key_blob), 0, CRYPT_IPSEC_HMAC_KEY, &hKey)) {
           if (CryptCreateHash(hProv, CALG_HMAC, hKey, 0, &hHmac)) {
             if (CryptSetHashParam(hHmac, HP_HMAC_INFO, (BYTE*)&HmacInfo, 0)) {

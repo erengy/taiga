@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <map>
 
+#include "base/file.h"
 #include "base/string.h"
 #include "sync/manager.h"
 #include "taiga/path.h"
@@ -27,22 +28,29 @@
 namespace taiga {
 
 std::wstring GetDataPath() {
+  std::wstring path;
+
 #ifdef TAIGA_PORTABLE
   // Return current path in portable mode
-  return AddTrailingSlash(GetPathOnly(Taiga.GetModulePath())) + L"data\\";
+  path = GetPathOnly(Taiga.GetModulePath());
 #else
   // Return %AppData% folder
-  WCHAR buffer[MAX_PATH];
-  if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                nullptr, SHGFP_TYPE_CURRENT, buffer)))
-    return AddTrailingSlash(buffer) + TAIGA_APP_NAME + L"\\";
+  path = GetKnownFolderPath(FOLDERID_RoamingAppData);
+  AddTrailingSlash(path);
+  path += TAIGA_APP_NAME;
 #endif
+
+  AddTrailingSlash(path);
+  return path + L"data\\";
+}
+
+std::wstring GetUserDirectoryName(const sync::ServiceId service_id) {
+  return GetCurrentUsername() + L"@" +
+         ServiceManager.service(service_id)->canonical_name();
 }
 
 std::wstring GetUserDirectoryName() {
-  std::wstring username = GetCurrentUsername();
-  auto service = GetCurrentService();
-  return username + L"@" + service->canonical_name();
+  return GetUserDirectoryName(GetCurrentServiceId());
 }
 
 std::wstring GetPath(PathType type) {

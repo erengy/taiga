@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <windows.h>
-#include <gdiplus.h>
+#include <algorithm>
+
+#include <windows/win/gdi_plus.h>
 
 #include "gfx.h"
 
@@ -248,8 +249,8 @@ int ScaleY(int value) {
 }
 
 void RgbToHsv(float r, float g, float b, float& h, float& s, float& v) {
-  float rgb_min = min(r, min(g, b));
-  float rgb_max = max(r, max(g, b));
+  float rgb_min = std::min(r, std::min(g, b));
+  float rgb_max = std::max(r, std::max(g, b));
   float rgb_delta = rgb_max - rgb_min;
 
   s = rgb_delta / (rgb_max + 1e-20f);

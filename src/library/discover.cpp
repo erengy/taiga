@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #include <algorithm>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -43,7 +42,7 @@ namespace library {
 
 SeasonDatabase::SeasonDatabase()
     : available_seasons({anime::Season::kWinter, 2011},
-                        {anime::Season::kFall, 2016}),
+                        {anime::Season::kWinter, 2017}),
       remote_location(L"https://raw.githubusercontent.com"
                       L"/erengy/anime-seasons/master/data/") {
 }
@@ -61,8 +60,7 @@ bool SeasonDatabase::LoadFile(const std::wstring& filename) {
   std::string document;
 
   if (!ReadFromFile(path, document)) {
-    LOG(LevelWarning, L"Could not find anime season file.\n"
-                      L"Path: " + path);
+    LOGW(L"Could not find anime season file.\nPath: " + path);
 
     // Try to download from remote location
     if (!remote_location.empty()) {
@@ -94,8 +92,7 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
   xml_node season_node = document.child(L"season");
 
   current_season = XmlReadStrValue(season_node.child(L"info"), L"name");
-  time_t modified = _wtoi64(XmlReadStrValue(season_node.child(L"info"),
-                                            L"modified").c_str());
+  time_t modified = ToTime(XmlReadStrValue(season_node.child(L"info"), L"modified"));
 
   items.clear();
 
@@ -112,8 +109,8 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
     int anime_id = anime::ID_UNKNOWN;
     anime::Item* anime_item = nullptr;
 
-    foreach_(it, id_map) {
-      anime_item = AnimeDatabase.FindItem(it->second, it->first, false);
+    for (const auto& pair : id_map) {
+      anime_item = AnimeDatabase.FindItem(pair.second, pair.first, false);
       if (anime_item)
         break;
     }
@@ -123,16 +120,16 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
     } else {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map[current_service_id].empty()) {
-        LOG(LevelDebug, current_season.GetString() +
-                        L" - No ID for current service: " +
-                        XmlReadStrValue(node, L"title"));
+        LOGD(current_season.GetString() +
+             L" - No ID for current service: " +
+             XmlReadStrValue(node, L"title"));
         continue;
       }
 
       anime::Item item;
       item.SetSource(current_service_id);
-      foreach_(it, id_map) {
-        item.SetId(it->second, it->first);
+      for (const auto& pair : id_map) {
+        item.SetId(pair.second, pair.first);
       }
       item.SetLastModified(modified);
       item.SetTitle(XmlReadStrValue(node, L"title"));
@@ -151,12 +148,20 @@ bool SeasonDatabase::LoadString(const std::wstring& data) {
   return true;
 }
 
+bool SeasonDatabase::LoadSeasonFromMemory(const anime::Season& season) {
+  current_season = season;
+
+  items.clear();
+  Review();
+
+  return true;
+}
+
 bool SeasonDatabase::IsRefreshRequired() {
   int count = 0;
   bool required = false;
 
-  foreach_(it, items) {
-    int anime_id = *it;
+  for (const auto& anime_id : items) {
     auto anime_item = AnimeDatabase.FindItem(anime_id);
     if (anime_item) {
       const Date& date_start = anime_item->GetDateStart();
@@ -199,34 +204,33 @@ void SeasonDatabase::Review(bool hide_nsfw) {
         invalid = true;
       if (invalid) {
         items.erase(items.begin() + i--);
-        LOG(LevelDebug, L"Removed item: #" + ToWstr(anime_id) +
-                        L" \"" + anime_item->GetTitle() +
-                        L"\" (" + std::wstring(anime_start) + L")");
+        LOGD(L"Removed item: #" + ToWstr(anime_id) +
+             L" \"" + anime_item->GetTitle() +
+             L"\" (" + std::wstring(anime_start) + L")");
       }
     }
   }
 
   // Check for missing items
-  foreach_(it, AnimeDatabase.items) {
-    if (std::find(items.begin(), items.end(), it->second.GetId()) != items.end())
+  for (const auto& pair : AnimeDatabase.items) {
+    if (std::find(items.begin(), items.end(), pair.second.GetId()) != items.end())
       continue;
     // Filter by age rating
-    if (hide_nsfw && IsNsfw(it->second))
+    if (hide_nsfw && IsNsfw(pair.second))
       continue;
     // Airing date must be within the interval
-    const Date& anime_start = it->second.GetDateStart();
-    if (anime_start.year && anime_start.month &&
+    const Date& anime_start = pair.second.GetDateStart();
+    if (anime_start.year() && anime_start.month() &&
         anime_start >= date_start && anime_start <= date_end) {
-      items.push_back(it->second.GetId());
-      LOGR(LevelDebug,
-          L"\t<anime>\n"
-          L"\t\t<type>" + ToWstr(it->second.GetType()) + L"</type>\n"
-          L"\t\t<id name=\"myanimelist\">" + ToWstr(it->second.GetId()) + L"</id>\n"
-          L"\t\t<id name=\"hummingbird\"></id>\n"
-          L"\t\t<producers>" + Join(it->second.GetProducers(), L", ") + L"</producers>\n"
-          L"\t\t<image>" + it->second.GetImageUrl() + L"</image>\n"
-          L"\t\t<title>" + it->second.GetTitle() + L"</title>\n"
-          L"\t</anime>\n");
+      items.push_back(pair.second.GetId());
+      LOGD(L"\t<anime>\n"
+           L"\t\t<type>" + ToWstr(pair.second.GetType()) + L"</type>\n"
+           L"\t\t<id name=\"myanimelist\">" + ToWstr(pair.second.GetId()) + L"</id>\n"
+           L"\t\t<id name=\"kitsu\"></id>\n"
+           L"\t\t<producers>" + Join(pair.second.GetProducers(), L", ") + L"</producers>\n"
+           L"\t\t<image>" + pair.second.GetImageUrl() + L"</image>\n"
+           L"\t\t<title>" + pair.second.GetTitle() + L"</title>\n"
+           L"\t</anime>\n");
     }
   }
 }

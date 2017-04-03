@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_OPTIONAL_H
-#define TAIGA_BASE_OPTIONAL_H
+#pragma once
 
 template <typename T>
 class Optional {
@@ -38,6 +37,10 @@ public:
     return value_;
   }
 
+  const T* operator ->() const {
+    return &value_;
+  }
+
   T& operator =(const T& value) {
     value_ = value;
     initialized_ = true;
@@ -48,5 +51,3 @@ private:
   bool initialized_;
   T value_;
 };
-
-#endif  // TAIGA_BASE_OPTIONAL_H

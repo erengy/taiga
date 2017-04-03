@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,11 +35,15 @@ Response::Response()
 ////////////////////////////////////////////////////////////////////////////////
 
 Service::Service()
-    : id_(0) {
+    : authenticated_(false), id_(0), last_synchronized_(0) {
 }
 
 bool Service::RequestNeedsAuthentication(RequestType request_type) const {
   return false;
+}
+
+bool Service::authenticated() const {
+  return authenticated_;
 }
 
 const string_t& Service::host() const {
@@ -56,6 +60,14 @@ const string_t& Service::canonical_name() const {
 
 const string_t& Service::name() const {
   return name_;
+}
+
+const User& Service::user() const {
+  return user_;
+}
+
+void Service::set_authenticated(bool authenticated) {
+  authenticated_ = authenticated;
 }
 
 }  // namespace sync

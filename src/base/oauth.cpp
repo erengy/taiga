@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,9 +67,9 @@ oauth_parameter_t OAuth::ParseQueryString(const std::wstring& url) {
   std::vector<std::wstring> parameters;
   Split(url, L"&", parameters);
 
-  foreach_(parameter, parameters) {
+  for (const auto& parameter : parameters) {
     std::vector<std::wstring> elements;
-    Split(*parameter, L"=", elements);
+    Split(parameter, L"=", elements);
     if (elements.size() == 2) {
       parsed_parameters[elements[0]] = elements[1];
     }
@@ -175,25 +175,25 @@ std::wstring OAuth::NormalizeUrl(const std::wstring& url) {
 oauth_parameter_t OAuth::ParseQuery(const query_t& query) {
   oauth_parameter_t parameters;
 
-  foreach_(it, query)
-    parameters[it->first] = it->second;
+  for (const auto& pair : query)
+    parameters[pair.first] = pair.second;
 
   return parameters;
 }
 
 std::wstring OAuth::SortParameters(const oauth_parameter_t& parameters) {
   std::list<std::wstring> sorted;
-  foreach_c_(it, parameters) {
-    std::wstring param = it->first + L"=" + it->second;
+  for (const auto& pair : parameters) {
+    std::wstring param = pair.first + L"=" + pair.second;
     sorted.push_back(param);
   }
   sorted.sort();
 
   std::wstring params;
-  foreach_(it, sorted) {
+  for (const auto& param : sorted) {
     if (params.size() > 0)
       params += L"&";
-    params += *it;
+    params += param;
   }
   return params;
 }

@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ void DummyAnime::Initialize() {
   SetSource(sync::kMyAnimeList);
   SetId(L"4224", sync::kTaiga);
   SetId(L"4224", sync::kMyAnimeList);
-  SetId(L"3532", sync::kHummingbird);
+  SetId(L"3532", sync::kKitsu);
   SetSlug(L"toradora");
   SetTitle(L"Toradora!");
   SetSynonyms(L"Tiger X Dragon");
@@ -45,6 +45,7 @@ void DummyAnime::Initialize() {
   SetMyScore(10);
   SetMyStatus(anime::kCompleted);
   SetMyTags(L"comedy, romance, drama");
+  SetMyNotes(L"Best series ever!");
 }
 
 void DummyEpisode::Initialize() {

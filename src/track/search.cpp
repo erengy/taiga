@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #include "track/recognition.h"
 #include "track/search.h"
 #include "ui/ui.h"
-#include "win/win_taskbar.h"
 
 TaigaFileSearchHelper file_search_helper;
 
@@ -44,7 +43,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
   parse_options.streaming_media = false;
 
   if (!Meow.Parse(name, parse_options, episode_)) {
-    LOG(LevelDebug, L"Could not parse directory: " + name);
+    LOGD(L"Could not parse directory: " + name);
     return false;
   }
 
@@ -82,7 +81,7 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
   parse_options.streaming_media = false;
 
   if (!Meow.Parse(path, parse_options, episode_)) {
-    LOG(LevelDebug, L"Could not parse filename: " + name);
+    LOGD(L"Could not parse filename: " + name);
     return false;
   }
 
@@ -104,8 +103,8 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
     if (!anime::IsValidEpisodeNumber(upper_bound, anime_item->GetEpisodeCount()) ||
         !anime::IsValidEpisodeNumber(lower_bound, anime_item->GetEpisodeCount())) {
       std::wstring episode_number = anime::GetEpisodeRange(episode_);
-      LOG(LevelDebug, L"Invalid episode number: " + episode_number + L"\n"
-                      L"File: " + path);
+      LOGD(L"Invalid episode number: " + episode_number + L"\n"
+           L"File: " + path);
       return false;
     }
 
@@ -151,8 +150,8 @@ void TaigaFileSearchHelper::set_path_found(const std::wstring& path_found) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void ScanAvailableEpisodes(bool silent) {
-  foreach_(it, AnimeDatabase.items) {
-    anime::ValidateFolder(it->second);
+  for (auto& pair : AnimeDatabase.items) {
+    anime::ValidateFolder(pair.second);
   }
 
   ScanAvailableEpisodes(silent, anime::ID_UNKNOWN, 0);
@@ -166,7 +165,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   }
 
   if (!silent) {
-    TaskbarList.SetProgressState(TBPF_INDETERMINATE);
+    ui::taskbar_list.SetProgressState(TBPF_INDETERMINATE);
     ui::SetSharedCursor(IDC_WAIT);
     ui::ChangeStatusText(L"Scanning available episodes...");
   }
@@ -208,8 +207,8 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
 
   if (!found) {
     // Search library folders for available episodes
-    foreach_(it, Settings.library_folders) {
-      if (!FolderExists(*it))
+    for (const auto& folder : Settings.library_folders) {
+      if (!FolderExists(folder))
         continue;  // Might be a disconnected external drive
       bool skip_directories = false;
       if (anime_item && !anime_item->GetFolder().empty())
@@ -217,7 +216,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
       file_search_helper.set_skip_directories(skip_directories);
       file_search_helper.set_skip_files(false);
       file_search_helper.set_skip_subdirectories(false);
-      if (file_search_helper.Search(*it)) {
+      if (file_search_helper.Search(folder)) {
         found = true;
         break;
       }
@@ -225,7 +224,7 @@ void ScanAvailableEpisodes(bool silent, int anime_id, int episode_number) {
   }
 
   if (!silent) {
-    TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+    ui::taskbar_list.SetProgressState(TBPF_NOPROGRESS);
     ui::SetSharedCursor(IDC_ARROW);
     ui::ClearStatusText();
   }

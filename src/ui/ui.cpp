@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,11 +16,15 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <map>
 #include <set>
+#include <vector>
+
+#include <windows/win/task_dialog.h>
+#include <windows/win/taskbar.h>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
@@ -29,6 +33,7 @@
 #include "library/history.h"
 #include "sync/manager.h"
 #include "sync/service.h"
+#include "sync/sync.h"
 #include "taiga/http.h"
 #include "taiga/resource.h"
 #include "taiga/script.h"
@@ -36,7 +41,6 @@
 #include "taiga/taiga.h"
 #include "track/media.h"
 #include "track/recognition.h"
-#include "win/win_taskbar.h"
 #include "ui/dlg/dlg_anime_info.h"
 #include "ui/dlg/dlg_anime_list.h"
 #include "ui/dlg/dlg_history.h"
@@ -53,9 +57,11 @@
 #include "ui/menu.h"
 #include "ui/theme.h"
 #include "ui/ui.h"
-#include "win/win_taskdialog.h"
 
 namespace ui {
+
+win::Taskbar taskbar;
+win::TaskbarList taskbar_list;
 
 void ChangeStatusText(const string_t& status) {
   DlgMain.ChangeStatus(status);
@@ -99,6 +105,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
     case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
+    case taiga::kHttpServiceGetUser:
     case taiga::kHttpServiceGetLibraryEntries:
     case taiga::kHttpServiceAddLibraryEntry:
     case taiga::kHttpServiceDeleteLibraryEntry:
@@ -112,6 +119,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       ChangeStatusText(error);
       DlgTorrent.EnableInput();
       break;
+    case taiga::kHttpServiceGetSeason:
     case taiga::kHttpSeasonsGet:
       ChangeStatusText(error);
       DlgSeason.EnableInput();
@@ -134,7 +142,7 @@ void OnHttpError(const taiga::HttpClient& http_client, const string_t& error) {
       return;
   }
 
-  TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+  taskbar_list.SetProgressState(TBPF_NOPROGRESS);
 }
 
 void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
@@ -160,8 +168,8 @@ void OnHttpHeadersAvailable(const taiga::HttpClient& http_client) {
       }
       break;
     default:
-      TaskbarList.SetProgressState(http_client.content_length() > 0 ?
-                                   TBPF_NORMAL : TBPF_INDETERMINATE);
+      taskbar_list.SetProgressState(http_client.content_length() > 0 ?
+                                    TBPF_NORMAL : TBPF_INDETERMINATE);
       break;
   }
 }
@@ -177,6 +185,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpTaigaUpdateRelations:
       return;
     case taiga::kHttpServiceAuthenticateUser:
+    case taiga::kHttpServiceGetUser:
       status = L"Reading account information...";
       break;
     case taiga::kHttpServiceGetLibraryEntries:
@@ -195,6 +204,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     case taiga::kHttpFeedDownload:
       status = L"Downloading torrent file...";
       break;
+    case taiga::kHttpServiceGetSeason:
     case taiga::kHttpSeasonsGet:
       status = L"Downloading anime season data...";
       break;
@@ -220,8 +230,8 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     float content_length = static_cast<float>(http_client.content_length());
     int percentage = static_cast<int>((current_length / content_length) * 100);
     status += L" (" + ToWstr(percentage) + L"%)";
-    TaskbarList.SetProgressValue(static_cast<ULONGLONG>(current_length),
-                                 static_cast<ULONGLONG>(content_length));
+    taskbar_list.SetProgressValue(static_cast<ULONGLONG>(current_length),
+                                  static_cast<ULONGLONG>(content_length));
   } else {
     status += L" (" + ToSizeString(http_client.current_length()) + L")";
   }
@@ -230,7 +240,7 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
 }
 
 void OnHttpReadComplete(const taiga::HttpClient& http_client) {
-  TaskbarList.SetProgressState(TBPF_NOPROGRESS);
+  taskbar_list.SetProgressState(TBPF_NOPROGRESS);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,14 +316,19 @@ void OnLibraryEntryImageChange(int id) {
     DlgSeason.RefreshList(true);
 }
 
+void OnLibraryGetSeason() {
+  DlgSeason.RefreshList();
+  DlgSeason.EnableInput();
+}
+
 void OnLibrarySearchTitle(int id, const string_t& results) {
   std::vector<string_t> split_vector;
   Split(results, L",", split_vector);
   RemoveEmptyStrings(split_vector);
 
   std::vector<int> ids;
-  foreach_(it, split_vector) {
-    int id = ToInt(*it);
+  for (const auto& id_str : split_vector) {
+    int id = ToInt(id_str);
     ids.push_back(id);
     OnLibraryEntryChange(id);
   }
@@ -346,8 +361,8 @@ void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved) {
     Taiga.current_tip_type = taiga::kTipTypeUpdateFailed;
   }
 
-  Taskbar.Tip(L"", L"", 0);  // clear previous tips
-  Taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
+  taskbar.Tip(L"", L"", 0);  // clear previous tips
+  taskbar.Tip(text.c_str(), L"Update failed", NIIF_ERROR);
 
   ChangeStatusText(L"Update failed: " + reason);
 }
@@ -388,7 +403,7 @@ int OnLibraryEntriesEditEpisode(const std::vector<int> ids) {
       continue;
     current.insert(anime_item->GetMyLastWatchedEpisode());
     if (anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()))
-      number_max = min(number_max, anime_item->GetEpisodeCount());
+      number_max = std::min(number_max, anime_item->GetEpisodeCount());
   }
   int value = current.size() == 1 ? *current.begin() : 0;
 
@@ -464,7 +479,7 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
       DlgAnimeList.listview.SortFromSettings();
   }
 
-  if (!Taiga.logged_in) {
+  if (!sync::UserAuthenticated()) {
     auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
     if (anime_item) {
       ChangeStatusText(L"\"" + anime_item->GetTitle() +
@@ -623,8 +638,8 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
     Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
     std::wstring tip_text =
         ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode);
-    Taskbar.Tip(L"", L"", 0);
-    Taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO);
+    taskbar.Tip(L"", L"", 0);
+    taskbar.Tip(tip_text.c_str(), L"Now Playing", NIIF_INFO);
   }
 }
 
@@ -681,8 +696,8 @@ void OnRecognitionFail() {
           ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode) +
           L"\nClick here to view similar titles for this anime.";
       Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
-      Taskbar.Tip(L"", L"", 0);
-      Taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
+      taskbar.Tip(L"", L"", 0);
+      taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
     }
 
   } else {
@@ -788,8 +803,7 @@ void OnSettingsLibraryFoldersEmpty() {
 
 void OnSettingsRestoreDefaults() {
   if (DlgSettings.IsWindow()) {
-    DestroyDialog(kDialogSettings);
-    ShowDialog(kDialogSettings);
+    EndDialog(kDialogSettings);
   }
 }
 
@@ -880,16 +894,16 @@ void OnFeedDownload(bool success, const string_t& error) {
 bool OnFeedNotify(const Feed& feed) {
   std::map<std::wstring, std::set<std::wstring>> found_episodes;
 
-  foreach_(it, feed.items) {
-    if (it->state == kFeedItemSelected) {
-      const auto& episode = it->episode_data;
+  for (const auto& feed_item : feed.items) {
+    if (feed_item.state == kFeedItemSelected) {
+      const auto& episode = feed_item.episode_data;
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
       auto anime_title = anime_item ? anime_item->GetTitle() : episode.anime_title();
 
       auto episode_l = anime::GetEpisodeLow(episode);
       auto episode_h = anime::GetEpisodeHigh(episode);
       if (anime_item)
-        episode_l = max(episode_l, anime_item->GetMyLastWatchedEpisode() + 1);
+        episode_l = std::max(episode_l, anime_item->GetMyLastWatchedEpisode() + 1);
       std::wstring episode_number = ToWstr(episode_h);
       if (episode_l < episode_h)
         episode_number = ToWstr(episode_l) + L"-" + episode_number;
@@ -904,20 +918,20 @@ bool OnFeedNotify(const Feed& feed) {
   std::wstring tip_text;
   std::wstring tip_title = L"New torrents available";
 
-  foreach_(it, found_episodes) {
-    tip_text += L"\u00BB " + LimitText(it->first, 32);
+  for (const auto& pair : found_episodes) {
+    tip_text += L"\u00BB " + LimitText(pair.first, 32);
     std::wstring episodes;
-    foreach_(episode, it->second)
-      if (!episode->empty())
-        AppendString(episodes, L" #" + *episode);
+    for (const auto& episode : pair.second)
+      if (!episode.empty())
+        AppendString(episodes, L" #" + episode);
     tip_text += episodes + L"\n";
   }
 
   tip_text += L"Click to see all.";
   tip_text = LimitText(tip_text, 255);
   Taiga.current_tip_type = taiga::kTipTypeTorrent;
-  Taskbar.Tip(L"", L"", 0);
-  Taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
+  taskbar.Tip(L"", L"", 0);
+  taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
 
   return true;
 }
@@ -1024,14 +1038,18 @@ void OnUpdateAvailable() {
   DlgUpdateNew.Create(IDD_UPDATE_NEW, DlgUpdate.GetWindowHandle(), true);
 }
 
-void OnUpdateNotAvailable(bool relations) {
+void OnUpdateNotAvailable(bool relations, bool season) {
   if (DlgMain.IsWindow()) {
     win::TaskDialog dlg(L"Update", TD_ICON_INFORMATION);
     dlg.SetMainInstruction(L"Taiga is up to date!");
-    std::wstring content = L"Current version: " + std::wstring(Taiga.version);
+    std::wstring content = L"Current version: " + StrToWstr(Taiga.version.str());
     if (relations) {
       content += L"\n\nUpdated anime relations to: " +
                  Taiga.Updater.GetCurrentAnimeRelationsModified();
+    }
+    if (season) {
+      content += L"\n\nNew anime season: " +
+                 SeasonDatabase.available_seasons.second.GetString();
     }
     dlg.SetContent(content.c_str());
     dlg.AddButton(L"OK", IDOK);

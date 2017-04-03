@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "base/foreach.h"
+#include <windows/win/version.h>
+
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -86,10 +87,17 @@ BOOL SeasonDialog::OnInitDialog() {
   // Load the last selected season
   const auto last_season = Settings[taiga::kApp_Seasons_LastSeason];
   if (!last_season.empty()) {
-    if (SeasonDatabase.LoadSeason(last_season)) {
-      SeasonDatabase.Review();
-    } else {
-      Settings.Set(taiga::kApp_Seasons_LastSeason, std::wstring());
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        if (SeasonDatabase.LoadSeason(last_season)) {
+          SeasonDatabase.Review();
+        } else {
+          Settings.Set(taiga::kApp_Seasons_LastSeason, std::wstring());
+        }
+        break;
+      case sync::kKitsu:
+        SeasonDatabase.LoadSeasonFromMemory(last_season);
+        break;
     }
   }
 
@@ -119,7 +127,14 @@ BOOL SeasonDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
   switch (LOWORD(wParam)) {
     // Refresh data
     case 101:
-      RefreshData();
+      switch (taiga::GetCurrentServiceId()) {
+        case sync::kMyAnimeList:
+          RefreshData();
+          break;
+        case sync::kKitsu:
+          GetData();
+          break;
+      }
       return TRUE;
   }
 
@@ -174,7 +189,7 @@ void SeasonDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
       rcWindow.Set(0, 0, size.cx, size.cy);
       // Resize rebar
       rebar_.SendMessage(WM_SIZE, 0, 0);
-      rcWindow.top += rebar_.GetBarHeight() + ScaleY(win::kControlMargin / 2);
+      rcWindow.top += rebar_.GetBarHeight() + ScaleY(kControlMargin / 2);
       // Resize list
       list_.SetPosition(nullptr, rcWindow);
     }
@@ -222,9 +237,8 @@ LRESULT SeasonDialog::OnListNotify(LPARAM lParam) {
         const std::wstring separator = L" \u2022 ";
         text += anime::TranslateType(anime_item->GetType()) + separator +
                 anime::TranslateNumber(anime_item->GetEpisodeCount(), L"?") + L" eps." + separator +
-                anime::TranslateScore(anime_item->GetScore());
-        if (taiga::GetCurrentServiceId() == sync::kMyAnimeList)
-          text += separator + L"#" + ToWstr(anime_item->GetPopularity());
+                anime::TranslateScore(anime_item->GetScore()) + separator +
+                L"#" + ToWstr(anime_item->GetPopularity());
         if (!anime_item->GetGenres().empty())
           text += L"\n" + Join(anime_item->GetGenres(), L", ");
         if (!anime_item->GetProducers().empty())
@@ -314,16 +328,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       int text_height = GetTextHeight(hdc.Get());
 
       // Calculate line count
-      int line_count = 6;
-      auto current_service = taiga::GetCurrentServiceId();
-      switch (current_service) {
-        case sync::kMyAnimeList:
-          line_count = 6;
-          break;
-        case sync::kHummingbird:
-          line_count = 5;
-          break;
-      }
+      const int line_count = GetLineCount();
 
       // Calculate areas
       win::Rect rect_image(
@@ -423,6 +428,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       // Draw details
       if (view_as == kSeasonViewAsImages)
         break;
+      auto current_service = taiga::GetCurrentServiceId();
       int text_top = rect_details.top;
       #define DRAWLINE(t) \
         text = t; \
@@ -433,11 +439,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(L"Aired:");
       DRAWLINE(L"Episodes:");
       DRAWLINE(L"Genres:");
-      DRAWLINE(L"Producers:");
-      DRAWLINE(L"Score:");
       if (current_service == sync::kMyAnimeList) {
-        DRAWLINE(L"Popularity:");
+        DRAWLINE(L"Producers:");
       }
+      DRAWLINE(L"Score:");
+      DRAWLINE(L"Popularity:");
 
       rect_details.Set(rect_details.left + ScaleX(75), text_top,
                        rect_details.right, rect_details.top + text_height);
@@ -450,11 +456,11 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       DRAWLINE(text);
       DRAWLINE(anime::TranslateNumber(anime_item->GetEpisodeCount(), L"Unknown"));
       DRAWLINE(anime_item->GetGenres().empty() ? L"?" : Join(anime_item->GetGenres(), L", "));
-      DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
-      DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
       if (current_service == sync::kMyAnimeList) {
-        DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
+        DRAWLINE(anime_item->GetProducers().empty() ? L"?" : Join(anime_item->GetProducers(), L", "));
       }
+      DRAWLINE(anime::TranslateScore(anime_item->GetScore()));
+      DRAWLINE(L"#" + ToWstr(anime_item->GetPopularity()));
 
       #undef DRAWLINE
 
@@ -533,14 +539,22 @@ void SeasonDialog::EnableInput(bool enable) {
   list_.Enable(enable);
 }
 
+void SeasonDialog::GetData() {
+  EnableInput(false);
+  ui::ChangeStatusText(L"Retrieving latest data for " +
+      SeasonDatabase.current_season.GetString() + L" anime season...");
+
+  sync::GetSeason(SeasonDatabase.current_season, 0);
+}
+
 void SeasonDialog::RefreshData(int anime_id) {
   ui::SetSharedCursor(IDC_WAIT);
 
-  foreach_(id, SeasonDatabase.items) {
-    if (anime_id > 0 && anime_id != *id)
+  for (const auto& id : SeasonDatabase.items) {
+    if (anime_id > 0 && anime_id != id)
       continue;
 
-    auto anime_item = AnimeDatabase.FindItem(*id);
+    auto anime_item = AnimeDatabase.FindItem(id);
     if (!anime_item)
       continue;
 
@@ -548,12 +562,12 @@ void SeasonDialog::RefreshData(int anime_id) {
     if (anime_id > 0) {
       sync::DownloadImage(anime_id, anime_item->GetImageUrl());
     } else {
-      ImageDatabase.Load(*id, true, true);
+      ImageDatabase.Load(id, true, true);
     }
 
     // Get details
     if (anime_id > 0 || anime::MetadataNeedsRefresh(*anime_item))
-      sync::GetMetadataById(*id);
+      sync::GetMetadataById(id);
   }
 
   ui::SetSharedCursor(IDC_ARROW);
@@ -663,7 +677,7 @@ void SeasonDialog::RefreshList(bool redraw_only) {
 }
 
 void SeasonDialog::RefreshStatus() {
-  if (SeasonDatabase.items.empty())
+  if (!SeasonDatabase.current_season)
     return;
 
   std::wstring text = SeasonDatabase.current_season.GetString() + L", from " +
@@ -677,7 +691,7 @@ void SeasonDialog::RefreshToolbar() {
       SeasonDatabase.current_season.GetString().c_str() :
       L"Select season");
 
-  toolbar_.EnableButton(101, !SeasonDatabase.items.empty());
+  toolbar_.EnableButton(101, SeasonDatabase.current_season);
 
   std::wstring text = L"Group by: ";
   switch (Settings.GetInt(taiga::kApp_Seasons_GroupBy)) {
@@ -729,16 +743,7 @@ void SeasonDialog::RefreshToolbar() {
 }
 
 void SeasonDialog::SetViewMode(int mode) {
-  int line_count = 6;
-  auto current_service = taiga::GetCurrentServiceId();
-  switch (current_service) {
-    case sync::kMyAnimeList:
-      line_count = 6;
-      break;
-    case sync::kHummingbird:
-      line_count = 5;
-      break;
-  }
+  const int line_count = GetLineCount();
   const int synopsis_line_count = 9 - line_count;
 
   win::Dc hdc = list_.GetDC();
@@ -765,6 +770,16 @@ void SeasonDialog::SetViewMode(int mode) {
   list_.SetTileViewInfo(0, LVTVIF_FIXEDSIZE, nullptr, &size);
 
   Settings.Set(taiga::kApp_Seasons_ViewAs, mode);
+}
+
+int SeasonDialog::GetLineCount() const {
+  switch (taiga::GetCurrentServiceId()) {
+    default:
+    case sync::kMyAnimeList:
+      return 6;
+    case sync::kKitsu:
+      return 5;  // missing producers
+  }
 }
 
 }  // namespace ui

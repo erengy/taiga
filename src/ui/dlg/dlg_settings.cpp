@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,9 +16,10 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/task_dialog.h>
+
 #include "base/base64.h"
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/string.h"
 #include "library/history.h"
 #include "sync/manager.h"
@@ -30,7 +31,6 @@
 #include "track/monitor.h"
 #include "ui/dlg/dlg_settings.h"
 #include "ui/theme.h"
-#include "win/win_taskdialog.h"
 
 namespace ui {
 
@@ -71,7 +71,7 @@ void SettingsDialog::SetCurrentSection(SettingsSections section) {
     case kSettingsSectionServices:
       tab_.InsertItem(0, L"Main", kSettingsPageServicesMain);
       tab_.InsertItem(1, L"MyAnimeList", kSettingsPageServicesMal);
-      tab_.InsertItem(2, L"Hummingbird", kSettingsPageServicesHummingbird);
+      tab_.InsertItem(2, L"Kitsu", kSettingsPageServicesKitsu);
       break;
     case kSettingsSectionLibrary:
       tab_.InsertItem(0, L"Folders", kSettingsPageLibraryFolders);
@@ -190,11 +190,11 @@ void SettingsDialog::OnOK() {
     Settings.Set(taiga::kSync_Service_Mal_Username, page->GetDlgItemText(IDC_EDIT_USER_MAL));
     Settings.Set(taiga::kSync_Service_Mal_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_MAL)));
   }
-  // Services > Hummingbird
-  page = &pages[kSettingsPageServicesHummingbird];
+  // Services > Kitsu
+  page = &pages[kSettingsPageServicesKitsu];
   if (page->IsWindow()) {
-    Settings.Set(taiga::kSync_Service_Hummingbird_Username, page->GetDlgItemText(IDC_EDIT_USER_HUMMINGBIRD));
-    Settings.Set(taiga::kSync_Service_Hummingbird_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_HUMMINGBIRD)));
+    Settings.Set(taiga::kSync_Service_Kitsu_Username, page->GetDlgItemText(IDC_EDIT_USER_KITSU));
+    Settings.Set(taiga::kSync_Service_Kitsu_Password, Base64Encode(page->GetDlgItemText(IDC_EDIT_PASS_KITSU)));
   }
 
   // Library > Folders

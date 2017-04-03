@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_TAIGA_UPDATE_H
-#define TAIGA_TAIGA_UPDATE_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -37,6 +36,7 @@ public:
   void CheckAnimeRelations();
   bool Download();
   bool IsAnimeRelationsAvailable() const;
+  bool IsNewSeasonAvailable() const;
   bool IsRestartRequired() const;
   bool IsUpdateAvailable() const;
   bool ParseData(std::wstring data);
@@ -59,11 +59,10 @@ private:
   std::wstring download_path_;
   std::unique_ptr<Item> current_item_;
   std::unique_ptr<Item> latest_item_;
+  bool new_season_available_;
   bool restart_required_;
   bool update_available_;
   std::wstring client_uid_;
 };
 
 }  // namespace taiga
-
-#endif  // TAIGA_TAIGA_UPDATE_H

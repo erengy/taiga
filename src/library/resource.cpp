@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 */
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -85,9 +84,9 @@ bool ImageDatabase::Reload(int anime_id) {
 }
 
 void ImageDatabase::FreeMemory() {
-  foreach_(it, ::AnimeDatabase.items) {
+  for (const auto& pair : ::AnimeDatabase.items) {
     bool erase = true;
-    int anime_id = it->first;
+    int anime_id = pair.first;
 
     if (items_.find(anime_id) == items_.end())
       continue;

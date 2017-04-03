@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <cmath>
 
 #include "taiga/orange.h"
 
@@ -104,7 +106,7 @@ float Orange::NoteToFrequency(int n) {
   if (n < 0 || n > 119)
     return -1.0f;
 
-  return 440.0f * pow(2.0f, static_cast<float>(n - 57) / 12.0f);
+  return 440.0f * std::pow(2.0f, static_cast<float>(n - 57) / 12.0f);
 }
 
 }  // namespace taiga

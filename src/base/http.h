@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TAIGA_BASE_HTTP_H
-#define TAIGA_BASE_HTTP_H
+#pragma once
 
 // Each client will have its own thread
 #define TAIGA_HTTP_MULTITHREADED
@@ -38,11 +37,11 @@
 #include <string>
 #include <vector>
 
-#include <curl/curl.h>
+#include <curl/include/curl/curl.h>
+#include <windows/win/thread.h>
 
 #include "map.h"
 #include "url.h"
-#include "win/win_thread.h"
 
 namespace base {
 namespace http {
@@ -80,6 +79,7 @@ public:
   virtual ~Response() {}
 
   void Clear();
+  unsigned int GetStatusCategory() const;
 
   unsigned int code;
 
@@ -188,5 +188,3 @@ private:
 
 }  // namespace http
 }  // namespace base
-
-#endif  // TAIGA_BASE_HTTP_H

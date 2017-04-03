@@ -22,9 +22,6 @@
     <Filter Include="ui">
       <UniqueIdentifier>{aad11cb9-6941-4934-9c9a-6523a6da7d06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="win">
-      <UniqueIdentifier>{5802bd8b-5cfa-4945-b7eb-c52aa2fbef32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="deps\anitomy">
       <UniqueIdentifier>{09fde2fa-d11a-4179-b5ef-8f3924a3ab25}</UniqueIdentifier>
     </Filter>
@@ -34,14 +31,29 @@
     <Filter Include="deps\curl">
       <UniqueIdentifier>{73658da5-e312-4fe4-85e6-38a578acf869}</UniqueIdentifier>
     </Filter>
-    <Filter Include="deps\jsoncpp">
+    <Filter Include="deps\date">
+      <UniqueIdentifier>{01a715e8-af40-4ff8-893b-7a9491d532c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\json">
       <UniqueIdentifier>{dd9648e9-7e26-4239-a931-8fee59d183e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\monolog">
+      <UniqueIdentifier>{c6b97ec8-114d-44c6-a87d-e4c7e3a2ecb1}</UniqueIdentifier>
     </Filter>
     <Filter Include="deps\pugixml">
       <UniqueIdentifier>{0f915cf6-1a44-47c9-8c1f-3a640aa5fb67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\semaver">
+      <UniqueIdentifier>{48fda121-559e-4cb2-9480-80a1baa8a730}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\utf8proc">
       <UniqueIdentifier>{810fd707-5236-421d-83d6-eb9251e1254d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\windows">
+      <UniqueIdentifier>{11f0ecfb-615d-4f52-9766-65668fa5f22f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deps\windows\ctrl">
+      <UniqueIdentifier>{a141982f-cc57-4b8f-a102-aa48c2a0ee94}</UniqueIdentifier>
     </Filter>
     <Filter Include="deps\zlib">
       <UniqueIdentifier>{1dd6ca23-29e1-4a1b-b1fb-a3b4988da7b0}</UniqueIdentifier>
@@ -49,7 +61,7 @@
     <Filter Include="library\anime">
       <UniqueIdentifier>{d6043b6b-33fb-470e-bab4-28380104489e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="sync\hummingbird">
+    <Filter Include="sync\kitsu">
       <UniqueIdentifier>{4eb462d7-7759-463c-99cf-e34daf381970}</UniqueIdentifier>
     </Filter>
     <Filter Include="sync\myanimelist">
@@ -58,22 +70,13 @@
     <Filter Include="ui\dlg">
       <UniqueIdentifier>{1fde5dda-2f86-4de5-a8cc-da7664cc759b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="win\ctrl">
-      <UniqueIdentifier>{cda71bda-a7b7-46d6-9c94-a7fafbabba09}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\base\base64.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\crc.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\crypto.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\error.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\file.cpp">
@@ -109,9 +112,6 @@
     <ClCompile Include="..\..\src\base\json.cpp">
       <Filter>base</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\base\log.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\base\oauth.cpp">
       <Filter>base</Filter>
     </ClCompile>
@@ -131,9 +131,6 @@
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\url.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\base\version.cpp">
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\base\xml.cpp">
@@ -169,14 +166,122 @@
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\jsoncpp\jsoncpp.cpp">
-      <Filter>deps\jsoncpp</Filter>
+    <ClCompile Include="..\..\deps\src\monolog\monolog.cpp">
+      <Filter>deps\monolog</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\pugixml\pugixml.cpp">
+    <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp">
       <Filter>deps\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp">
+      <Filter>deps\semaver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp">
+      <Filter>deps\semaver</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c">
       <Filter>deps\utf8proc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\accessibility.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\application.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\automation.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\common_dialogs.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\dde.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\dialog.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\error.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\gdi.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\gdi_plus.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\handle.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\menu.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\registry.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\resizable.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\string.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\task_dialog.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\taskbar.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\thread.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\version.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\window.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\window_map.cpp">
+      <Filter>deps\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\combobox.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\edit.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\imagelist.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\listview.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\progressbar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\rebar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\richedit.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\spin.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\statusbar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\syslink.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\tab.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\toolbar.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\tooltip.cpp">
+      <Filter>deps\windows\ctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\windows\win\ctrl\treeview.cpp">
+      <Filter>deps\windows\ctrl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\zlib\adler32.c">
       <Filter>deps\zlib</Filter>
@@ -268,11 +373,11 @@
     <ClCompile Include="..\..\src\sync\sync.cpp">
       <Filter>sync</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sync\hummingbird.cpp">
-      <Filter>sync\hummingbird</Filter>
+    <ClCompile Include="..\..\src\sync\kitsu.cpp">
+      <Filter>sync\kitsu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sync\hummingbird_util.cpp">
-      <Filter>sync\hummingbird</Filter>
+    <ClCompile Include="..\..\src\sync\kitsu_util.cpp">
+      <Filter>sync\kitsu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sync\myanimelist.cpp">
       <Filter>sync\myanimelist</Filter>
@@ -430,93 +535,6 @@
     <ClCompile Include="..\..\src\ui\dlg\dlg_update_new.cpp">
       <Filter>ui\dlg</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\win\win_accessibility.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_automation.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_commondialog.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_dde.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_dialog.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_gdi.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_gdiplus.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_main.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_menu.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_registry.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_resizable.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_taskbar.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_taskdialog.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_thread.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\win_window.cpp">
-      <Filter>win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_combobox.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_edit.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_imagelist.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_listview.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_progressbar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_rebar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_richedit.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_spin.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_statusbar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_syslink.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tab.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_toolbar.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_tooltip.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\win\ctrl\win_ctrl_treeview.cpp">
-      <Filter>win\ctrl</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\base\base64.h">
@@ -525,13 +543,7 @@
     <ClInclude Include="..\..\src\base\comparable.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\crc.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\crypto.h">
-      <Filter>base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\base\error.h">
       <Filter>base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\base\file.h">
@@ -591,9 +603,6 @@
     <ClInclude Include="..\..\src\base\url.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\base\version.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\base\xml.h">
       <Filter>base</Filter>
     </ClInclude>
@@ -621,50 +630,125 @@
     <ClInclude Include="..\..\deps\src\base64\base64.h">
       <Filter>deps\base64</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curl.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curl.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curlbuild.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlbuild.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curlrules.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlrules.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\curlver.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\curlver.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\easy.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\easy.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\mprintf.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\mprintf.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\multi.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\multi.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\stdcheaders.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\stdcheaders.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\curl\typecheck-gcc.h">
+    <ClInclude Include="..\..\deps\src\curl\include\curl\typecheck-gcc.h">
       <Filter>deps\curl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\json.h">
-      <Filter>deps\jsoncpp</Filter>
+    <ClInclude Include="..\..\deps\src\date\date.h">
+      <Filter>deps\date</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\jsoncpp\json\json-forwards.h">
-      <Filter>deps\jsoncpp</Filter>
+    <ClInclude Include="..\..\deps\src\json\src\json.hpp">
+      <Filter>deps\json</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\pugixml\pugiconfig.hpp">
+    <ClInclude Include="..\..\deps\src\monolog\monolog.h">
+      <Filter>deps\monolog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp">
       <Filter>deps\pugixml</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\pugixml\pugixml.hpp">
+    <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp">
       <Filter>deps\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h">
+      <Filter>deps\semaver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\semaver\semaver\string.h">
+      <Filter>deps\semaver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\semaver\semaver\version.h">
+      <Filter>deps\semaver</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h">
       <Filter>deps\utf8proc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.h">
+    <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c">
       <Filter>deps\utf8proc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\accessibility.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\application.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\automation.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\common_controls.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\common_dialogs.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\dde.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\dialog.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\error.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\gdi.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\gdi_plus.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\handle.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\menu.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\registry.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\resizable.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\string.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\task_dialog.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\taskbar.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\thread.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\version.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\window.h">
+      <Filter>deps\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\windows\win\window_map.h">
+      <Filter>deps\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\zlib\crc32.h">
       <Filter>deps\zlib</Filter>
@@ -741,14 +825,14 @@
     <ClInclude Include="..\..\src\sync\sync.h">
       <Filter>sync</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\hummingbird_util.h">
-      <Filter>sync\hummingbird</Filter>
+    <ClInclude Include="..\..\src\sync\kitsu.h">
+      <Filter>sync\kitsu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\hummingbird.h">
-      <Filter>sync\hummingbird</Filter>
+    <ClInclude Include="..\..\src\sync\kitsu_types.h">
+      <Filter>sync\kitsu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sync\hummingbird_types.h">
-      <Filter>sync\hummingbird</Filter>
+    <ClInclude Include="..\..\src\sync\kitsu_util.h">
+      <Filter>sync\kitsu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\sync\myanimelist_util.h">
       <Filter>sync\myanimelist</Filter>
@@ -890,54 +974,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\ui\dlg\dlg_update_new.h">
       <Filter>ui\dlg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_accessibility.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_automation.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_commondialog.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_dde.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_dialog.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_gdi.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_gdiplus.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_main.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_menu.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_registry.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_resizable.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_taskbar.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_taskdialog.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_thread.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\win_window.h">
-      <Filter>win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\win\ctrl\win_ctrl.h">
-      <Filter>win\ctrl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

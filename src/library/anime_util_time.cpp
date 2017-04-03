@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 namespace anime {
 
 bool IsValidDate(const Date& date) {
-  return date.year > 0;
+  return date.year() > 0;
 }
 
 std::wstring TranslateDate(const Date& date) {
@@ -35,17 +35,17 @@ std::wstring TranslateDate(const Date& date) {
 
   std::wstring result;
 
-  if (date.month > 0 && date.month <= 12) {
+  if (date.month() > 0 && date.month() <= 12) {
     const wchar_t* months[] = {
       L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
       L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
     };
-    result += months[date.month - 1];
+    result += months[date.month() - 1];
     result += L" ";
   }
-  if (date.day > 0)
-    result += ToWstr(date.day) + L", ";
-  result += ToWstr(date.year);
+  if (date.day() > 0)
+    result += ToWstr(date.day()) + L", ";
+  result += ToWstr(date.year());
 
   return result;
 }
@@ -66,10 +66,10 @@ std::wstring TranslateSeasonToMonths(const Season& season) {
   Date date_start, date_end;
   season.GetInterval(date_start, date_end);
 
-  std::wstring result = months[date_start.month - 1];
-  result += L" " + ToWstr(date_start.year) + L" to ";
-  result += months[date_end.month - 1];
-  result += L" " + ToWstr(date_end.year);
+  std::wstring result = months[date_start.month() - 1];
+  result += L" " + ToWstr(date_start.year()) + L" to ";
+  result += months[date_end.month() - 1];
+  result += L" " + ToWstr(date_end.year());
 
   return result;
 }

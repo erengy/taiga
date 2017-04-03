@@ -1,6 +1,6 @@
 /*
 ** Taiga
-** Copyright (C) 2010-2014, Eren Okka
+** Copyright (C) 2010-2017, Eren Okka
 ** 
 ** This program is free software: you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include <tlhelp32.h>
 
 #include "base/file.h"
-#include "base/foreach.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -86,9 +85,9 @@ bool MediaPlayers::Load() {
 
 MediaPlayer* MediaPlayers::FindPlayer(const std::wstring& name) {
   if (!name.empty())
-    foreach_(item, items)
-      if (item->name == name)
-        return &(*item);
+    for (auto& item : items)
+      if (item.name == name)
+        return &item;
 
   return nullptr;
 }
@@ -239,16 +238,16 @@ void MediaPlayers::EditTitle(std::wstring& str, const MediaPlayer& media_player)
   if (str.empty() || media_player.edits.empty())
     return;
 
-  foreach_(it, media_player.edits) {
-    switch (it->mode) {
+  for (const auto& edit : media_player.edits) {
+    switch (edit.mode) {
       // Erase
       case 1: {
-        ReplaceString(str, it->value, L"");
+        ReplaceString(str, edit.value, L"");
         break;
       }
       // Cut right side
       case 2: {
-        int pos = InStr(str, it->value, 0);
+        int pos = InStr(str, edit.value, 0);
         if (pos > -1)
           str.resize(pos);
         break;
@@ -260,9 +259,9 @@ void MediaPlayers::EditTitle(std::wstring& str, const MediaPlayer& media_player)
 }
 
 std::wstring MediaPlayer::GetPath() const {
-  foreach_(folder, folders) {
-    foreach_(file, files) {
-      std::wstring path = *folder + *file;
+  for (const auto& folder : folders) {
+    for (const auto& file : files) {
+      std::wstring path = folder + file;
       path = ExpandEnvironmentStrings(path);
       if (FileExists(path))
         return path;
