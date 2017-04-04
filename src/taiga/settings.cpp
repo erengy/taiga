@@ -571,6 +571,11 @@ bool AppSettings::HandleCompatibility() {
     if (ReplaceString(mirc_channels, L"#hummingbird", L"#kitsu")) {
       Set(kShare_Mirc_Channels, mirc_channels);
     }
+
+    // Hummingbird Tools -> Hibari
+    auto external_links = GetWstr(kApp_Interface_ExternalLinks);
+    ReplaceString(external_links, L"Hummingbird Tools|", L"Hibari|");
+    Set(kApp_Interface_ExternalLinks, external_links);
   }
 
   return true;
