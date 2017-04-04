@@ -8,7 +8,9 @@ Visit our [home page](http://taiga.moe) for more information. See the [guideline
 
 - [Anime relations](https://github.com/erengy/anime-relations): Episode redirections
 - [Anime seasons](https://github.com/erengy/anime-seasons): Anime season data
+- [Anisthesia](https://github.com/erengy/anisthesia): Media detection library
 - [Anitomy](https://github.com/erengy/anitomy): Anime video filename parser
+- [taiga.moe](https://github.com/erengy/taiga-moe): Home page of Taiga
 
 ## License
 
