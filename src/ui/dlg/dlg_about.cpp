@@ -47,7 +47,7 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
     case kDate:
       return L"2.1";
     case kJson:
-      return L"2.0.8";
+      return StrToWstr(nlohmann::json::meta()["version"]["string"]);
     case kLibcurl:
       return StrToWstr(LIBCURL_VERSION);
     case kPugixml: {
