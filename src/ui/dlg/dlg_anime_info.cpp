@@ -136,8 +136,11 @@ BOOL AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
       win::Dc dc = reinterpret_cast<HDC>(wParam);
       HWND hwnd_control = reinterpret_cast<HWND>(lParam);
       dc.SetBkMode(TRANSPARENT);
-      if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE))
+      if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
         dc.SetTextColor(ui::kColorMainInstruction);
+      } else {
+        dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+      }
       dc.DetachDc();
       if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE))
         return reinterpret_cast<INT_PTR>(Theme.GetBackgroundBrush());

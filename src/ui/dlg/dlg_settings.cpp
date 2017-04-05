@@ -365,7 +365,7 @@ INT_PTR SettingsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
       HWND hwnd_static = reinterpret_cast<HWND>(lParam);
       if (hwnd_static == GetDlgItem(IDC_STATIC_TITLE)) {
         ::SetBkMode(hdc, TRANSPARENT);
-        ::SetTextColor(hdc, ::GetSysColor(COLOR_WINDOW));
+        ::SetTextColor(hdc, ::GetSysColor(COLOR_HIGHLIGHTTEXT));
         return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_APPWORKSPACE));
       }
       break;

@@ -230,6 +230,7 @@ INT_PTR FeedFilterDialog::DialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wP
     case WM_CTLCOLORSTATIC: {
       win::Dc dc = reinterpret_cast<HDC>(wParam);
       dc.SetBkMode(TRANSPARENT);
+      dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
       dc.DetachDc();
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }

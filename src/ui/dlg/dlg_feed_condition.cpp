@@ -96,6 +96,7 @@ INT_PTR FeedConditionDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     case WM_CTLCOLORSTATIC: {
       win::Dc dc = reinterpret_cast<HDC>(wParam);
       dc.SetBkMode(TRANSPARENT);
+      dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
       dc.DetachDc();
       return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
     }

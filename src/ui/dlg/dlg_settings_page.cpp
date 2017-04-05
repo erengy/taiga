@@ -466,7 +466,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
       if (::GetWindowLong(hwnd_static, GWL_EXSTYLE) & WS_EX_TRANSPARENT) {
         ::SetBkMode(hdc, TRANSPARENT);
         ::SetTextColor(hdc, ::GetSysColor(COLOR_GRAYTEXT));
-        return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+        return reinterpret_cast<INT_PTR>(::GetStockObject(HOLLOW_BRUSH));
       }
       break;
     }
