@@ -209,7 +209,6 @@
     <ClCompile Include="..\..\src\sync\sync.cpp" />
     <ClCompile Include="..\..\src\taiga\action.cpp" />
     <ClCompile Include="..\..\src\taiga\announce.cpp" />
-    <ClCompile Include="..\..\src\taiga\api.cpp" />
     <ClCompile Include="..\..\src\taiga\debug.cpp" />
     <ClCompile Include="..\..\src\taiga\dummy.cpp" />
     <ClCompile Include="..\..\src\taiga\http.cpp" />
@@ -362,7 +361,6 @@
     <ClInclude Include="..\..\src\sync\service.h" />
     <ClInclude Include="..\..\src\sync\sync.h" />
     <ClInclude Include="..\..\src\taiga\announce.h" />
-    <ClInclude Include="..\..\src\taiga\api.h" />
     <ClInclude Include="..\..\src\taiga\debug.h" />
     <ClInclude Include="..\..\src\taiga\dummy.h" />
     <ClInclude Include="..\..\src\taiga\http.h" />

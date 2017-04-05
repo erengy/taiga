@@ -25,7 +25,6 @@
 #include "library/anime_db.h"
 #include "library/history.h"
 #include "taiga/announce.h"
-#include "taiga/api.h"
 #include "taiga/dummy.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -98,7 +97,6 @@ BOOL App::InitInstance() {
 
   // Create API windows
   ::Skype.Create();
-  TaigaApi.Create();
 
   if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
     ui::ShowDialog(ui::kDialogUpdate);

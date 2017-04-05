@@ -391,9 +391,6 @@
     <ClCompile Include="..\..\src\taiga\announce.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\taiga\api.cpp">
-      <Filter>taiga</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\taiga\debug.cpp">
       <Filter>taiga</Filter>
     </ClCompile>
@@ -844,9 +841,6 @@
       <Filter>sync\myanimelist</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\announce.h">
-      <Filter>taiga</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\taiga\api.h">
       <Filter>taiga</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\taiga\debug.h">
