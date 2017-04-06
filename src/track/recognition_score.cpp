@@ -81,7 +81,8 @@ static double CustomScore(const std::wstring& title, const std::wstring& str) {
     auto lcs_score = length_lcs / length_max;
     score = lcs_score * 0.8;
 
-    auto mismatch = std::mismatch(title.begin(), title.end(), str.begin());
+    auto mismatch = std::mismatch(title.begin(), title.end(),
+                                  str.begin(), str.end());
     auto distance = std::distance(title.begin(), mismatch.first);
     if (distance > 0) {
       auto distance_score = distance / length_min;
