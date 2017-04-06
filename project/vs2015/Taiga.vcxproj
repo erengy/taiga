@@ -187,6 +187,10 @@
     <ClCompile Include="..\..\src\base\timer.cpp" />
     <ClCompile Include="..\..\src\base\url.cpp" />
     <ClCompile Include="..\..\src\base\xml.cpp" />
+    <ClCompile Include="..\..\src\compat\anime_db.cpp" />
+    <ClCompile Include="..\..\src\compat\crypto.cpp" />
+    <ClCompile Include="..\..\src\compat\history.cpp" />
+    <ClCompile Include="..\..\src\compat\settings.cpp" />
     <ClCompile Include="..\..\src\library\anime.cpp" />
     <ClCompile Include="..\..\src\library\anime_db.cpp" />
     <ClCompile Include="..\..\src\library\anime_episode.cpp" />
@@ -340,6 +344,7 @@
     <ClInclude Include="..\..\src\base\types.h" />
     <ClInclude Include="..\..\src\base\url.h" />
     <ClInclude Include="..\..\src\base\xml.h" />
+    <ClInclude Include="..\..\src\compat\crypto.h" />
     <ClInclude Include="..\..\src\library\anime.h" />
     <ClInclude Include="..\..\src\library\anime_db.h" />
     <ClInclude Include="..\..\src\library\anime_episode.h" />

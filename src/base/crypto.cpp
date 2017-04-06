@@ -25,64 +25,6 @@
 #include "gzip.h"
 #include "string.h"
 
-namespace base {
-const wchar_t encryption_char = L'?';
-const wchar_t* encryption_key = L"Tenori Taiga";
-const size_t encryption_length_min = 16;
-
-std::wstring Xor(std::wstring str, const std::wstring& key) {
-  for (size_t i = 0; i < str.size(); i++)
-    str[i] = str[i] ^ key[i % key.length()];
-
-  return str;
-}
-
-}  // namespace base
-
-std::wstring SimpleEncrypt(std::wstring str) {
-  // Set minimum length
-  if (str.length() > 0 && str.length() < base::encryption_length_min)
-    str.append(base::encryption_length_min - str.length(),
-               base::encryption_char);
-
-  // Encrypt
-  str = base::Xor(str, base::encryption_key);
-
-  // Convert to hexadecimal string
-  std::wstring buffer;
-  for (size_t i = 0; i < str.size(); i++) {
-    wchar_t c[32] = {'\0'};
-    _itow_s(str[i], c, 32, 16);
-    if (wcslen(c) == 1)
-      buffer.push_back('0');
-    buffer += c;
-  }
-  ToUpper(buffer);
-
-  return buffer;
-}
-
-std::wstring SimpleDecrypt(std::wstring str) {
-  // Convert from hexadecimal string
-  std::wstring buffer;
-  for (size_t i = 0; i < str.size(); i = i + 2) {
-    wchar_t c = static_cast<wchar_t>(wcstoul(str.substr(i, 2).c_str(),
-                                             nullptr, 16));
-    buffer.push_back(c);
-  }
-
-  // Decrypt
-  buffer = base::Xor(buffer, base::encryption_key);
-
-  // Trim characters appended to match the minimum length
-  if (buffer.size() >= base::encryption_length_min)
-    TrimRight(buffer, std::wstring(1, base::encryption_char).c_str());
-
-  return buffer;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 StringCoder::StringCoder()
     : magic_string_("TAI"),
       min_length_(3 + 1 + 2 + 2 + 2),

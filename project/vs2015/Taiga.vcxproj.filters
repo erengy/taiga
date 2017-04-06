@@ -4,6 +4,9 @@
     <Filter Include="base">
       <UniqueIdentifier>{7445b39f-ce54-4d5d-8b95-9a45f6138c5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="compat">
+      <UniqueIdentifier>{d308910f-724a-44c6-a6b1-d79ee386a1a4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps">
       <UniqueIdentifier>{58598ee5-0814-4581-87d0-a28008a25893}</UniqueIdentifier>
     </Filter>
@@ -135,6 +138,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\base\xml.cpp">
       <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compat\anime_db.cpp">
+      <Filter>compat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compat\crypto.cpp">
+      <Filter>compat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compat\history.cpp">
+      <Filter>compat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\compat\settings.cpp">
+      <Filter>compat</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp">
       <Filter>deps\anitomy</Filter>
@@ -602,6 +617,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\base\xml.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\compat\crypto.h">
+      <Filter>compat</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h">
       <Filter>deps\anitomy</Filter>

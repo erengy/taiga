@@ -20,20 +20,9 @@
 
 #include <string>
 
-class StringCoder {
-public:
-  StringCoder();
+namespace compat {
 
-  bool Encode(const std::wstring& metadata, const std::wstring& data, std::wstring& output);
-  bool Decode(const std::wstring& input, std::wstring& metadata, std::wstring& data);
+std::wstring SimpleEncrypt(std::wstring str);
+std::wstring SimpleDecrypt(std::wstring str);
 
-private:
-  std::string ConvertSizeToString(unsigned short value);
-  unsigned short ReadSize(const std::string& str, unsigned short pos);
-
-  const std::string magic_string_;
-  const size_t min_length_;
-  const unsigned char version_;
-};
-
-std::string HmacSha1(const std::string& key_bytes, const std::string& data);
+}  // namespace compat
