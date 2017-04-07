@@ -1703,7 +1703,7 @@ void AnimeListDialog::ListView::RefreshLastUpdateColumn() {
     if (!anime_item)
       continue;
     time_t time_last_updated = ToTime(anime_item->GetMyLastUpdated());
-    if (Duration(time_now - time_last_updated).hours() < 22) {
+    if (Duration(time_now - time_last_updated).hours() < 24) {
       std::wstring text = GetRelativeTimeString(time_last_updated, true);
       SetItem(i, column.index, text.c_str());
     }
