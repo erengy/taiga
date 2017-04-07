@@ -2,6 +2,7 @@ bin/*
 build/*
 deps/lib/*
 
+project/vs*/.vs
 project/vs*/ipch
 project/vs*/*.db
 project/vs*/*.opendb
