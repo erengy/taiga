@@ -44,14 +44,15 @@ void UpdateHelper::Cancel() {
 }
 
 void UpdateHelper::Check() {
-  bool is_automatic = !ui::DlgMain.IsWindow();
-  bool is_stable = Taiga.version.prerelease_identifiers.empty();
+  const std::wstring channel = Taiga.version.prerelease_identifiers.empty() ?
+      L"stable" : StrToWstr(Taiga.version.prerelease_identifiers);
+  const std::wstring method = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
 
   HttpRequest http_request;
   http_request.url.host = L"taiga.moe";
   http_request.url.path = L"/update.php";
-  http_request.url.query[L"channel"] = is_stable ? L"stable" : L"beta";
-  http_request.url.query[L"check"] = is_automatic ? L"auto" : L"manual";
+  http_request.url.query[L"channel"] = channel;
+  http_request.url.query[L"check"] = method;
   http_request.url.query[L"version"] = StrToWstr(Taiga.version.str());
   http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
   http_request.url.query[L"username"] = GetCurrentUsername();
