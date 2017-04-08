@@ -357,20 +357,26 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
 
 bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
                                       HttpResponse& http_response) {
+  // Check response code
   if (http_response.code >= 400) {
     if (http_response.code == 404) {
-      auto location = http_request.url.Build();
+      const auto location = http_request.url.Build();
       ui::OnFeedDownload(false, L"File not found at " + location);
     } else {
-      auto code = ToWstr(http_response.code);
+      const auto code = ToWstr(http_response.code);
       ui::OnFeedDownload(false, L"Invalid HTTP response (" + code + L")");
     }
     return false;
   }
 
-  auto it = http_response.header.find(L"Content-Type");
-  if (it != http_response.header.end()) {
-    const auto& content_type = it->second;
+  // Check response body
+  if (StartsWith(http_response.body, L"<!DOCTYPE html>")) {
+    const auto location = http_request.url.Build();
+    ui::OnFeedDownload(false, L"Invalid torrent file: " + location);
+    return false;
+  }
+
+  auto verify_content_type = [&]() {
     static const std::vector<std::wstring> allowed_types{
       L"application/x-bittorrent",
       // The following MIME types are invalid for .torrent files, but we allow
@@ -380,20 +386,25 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
       L"application/torrent",
       L"application/x-torrent",
     };
-    if (std::find(allowed_types.begin(), allowed_types.end(),
-                  ToLower_Copy(content_type)) == allowed_types.end()) {
-      it = http_response.header.find(L"Content-Disposition");
-      if (it == http_response.header.end()) {
-        ui::OnFeedDownload(false, L"Invalid content type: " + content_type);
-        return false;
-      }
-    }
-  }
+    auto it = http_response.header.find(L"Content-Type");
+    if (it == http_response.header.end())
+      return true;  // We can't check the header if it doesn't exist
+    const auto& content_type = it->second;
+    return std::find(allowed_types.begin(), allowed_types.end(),
+                     ToLower_Copy(content_type)) != allowed_types.end();
+  };
 
-  if (StartsWith(http_response.body, L"<!DOCTYPE html>")) {
-    auto location = http_request.url.Build();
-    ui::OnFeedDownload(false, L"Invalid torrent file: " + location);
-    return false;
+  auto has_content_disposition = [&]() {
+    return http_response.header.count(L"Content-Disposition") > 0;
+  };
+
+  if (!verify_content_type()) {
+    // Allow invalid MIME types when Content-Disposition field is present
+    if (!has_content_disposition()) {
+      ui::OnFeedDownload(false, L"Invalid content type: " +
+                                http_response.header[L"Content-Type"]);
+      return false;
+    }
   }
 
   return true;
