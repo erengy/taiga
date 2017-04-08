@@ -143,6 +143,7 @@ public:
 
   void HandleFeedCheck(Feed& feed, const std::string& data, bool automatic);
   void HandleFeedDownload(Feed& feed, const std::string& data);
+  void HandleFeedDownloadError(Feed& feed);
   bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
 
   void ExamineData(Feed& feed);

@@ -273,6 +273,12 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
     Download(feed.category, nullptr);
 }
 
+void Aggregator::HandleFeedDownloadError(Feed& feed) {
+  if (!download_queue_.empty()) {
+    download_queue_.erase(download_queue_.begin());
+  }
+}
+
 void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
                                         const std::wstring& file) {
   if (!Settings.GetBool(taiga::kTorrent_Download_AppOpen))
