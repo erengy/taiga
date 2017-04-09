@@ -30,7 +30,7 @@ namespace kitsu {
 std::wstring DecodeSynopsis(std::string text);
 
 int TranslateAgeRatingFrom(const std::string& value);
-double TranslateSeriesRatingFrom(double value);
+double TranslateSeriesRatingFrom(const std::string& value);
 double TranslateSeriesRatingTo(double value);
 int TranslateSeriesTypeFrom(const std::string& value);
 std::wstring TranslateMyLastUpdatedFrom(const std::string& value);

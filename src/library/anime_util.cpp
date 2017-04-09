@@ -1005,7 +1005,7 @@ std::wstring TranslateScore(double value) {
       return ToWstr(value, 2);
 
     case sync::kKitsu:
-      return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2);
+      return ToWstr(sync::kitsu::TranslateSeriesRatingTo(value), 2) + L"%";
   }
 }
 

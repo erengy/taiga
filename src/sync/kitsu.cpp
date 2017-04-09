@@ -581,7 +581,7 @@ int Service::ParseAnimeObject(const Json& json) const {
   anime_item.SetLastModified(time(nullptr));  // current time
 
   anime_item.SetAgeRating(TranslateAgeRatingFrom(JsonReadStr(attributes, "ageRating")));
-  anime_item.SetScore(TranslateSeriesRatingFrom(JsonReadDouble(attributes, "averageRating")));
+  anime_item.SetScore(TranslateSeriesRatingFrom(JsonReadStr(attributes, "averageRating")));
   anime_item.SetTitle(StrToWstr(JsonReadStr(attributes, "canonicalTitle")));
   anime_item.SetDateEnd(StrToWstr(JsonReadStr(attributes, "endDate")));
   anime_item.SetEpisodeCount(JsonReadInt(attributes, "episodeCount"));

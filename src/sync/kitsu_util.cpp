@@ -57,12 +57,12 @@ int TranslateAgeRatingFrom(const std::string& value) {
   return anime::kUnknownAgeRating;
 }
 
-double TranslateSeriesRatingFrom(double value) {
-  return value * 2.0;
+double TranslateSeriesRatingFrom(const std::string& value) {
+  return ToDouble(value) / 10.0;
 }
 
 double TranslateSeriesRatingTo(double value) {
-  return value / 2.0;
+  return value * 10.0;
 }
 
 int TranslateSeriesTypeFrom(const std::string& value) {
