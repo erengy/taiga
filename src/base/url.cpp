@@ -141,6 +141,8 @@ void Url::Crack(std::wstring url) {
         std::wstring name = DecodeUrl(parameter.substr(0, i));
         std::wstring value = DecodeUrl(parameter.substr(i + 1));
         query.insert(std::make_pair(name, value));
+      } else {
+        query.insert(std::make_pair(parameter, L""));
       }
     }
   }
@@ -154,7 +156,9 @@ std::wstring BuildUrlParameters(const query_t& parameters) {
   for (const auto& parameter : parameters) {
     if (!output.empty())
       output += L"&";
-    output += parameter.first + L"=" + EncodeUrl(parameter.second, false);
+    output += parameter.first;
+    if (!parameter.second.empty())
+      output += L"=" + EncodeUrl(parameter.second, false);
   }
 
   return output;
