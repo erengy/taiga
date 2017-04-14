@@ -30,12 +30,6 @@
 
 namespace taiga {
 
-enum PlayStatus {
-  kPlayStatusStopped,
-  kPlayStatusPlaying,
-  kPlayStatusUpdated
-};
-
 class App : public win::App {
 public:
   App();
@@ -47,7 +41,6 @@ public:
   void LoadData();
 
   bool allow_multiple_instances;
-  int play_status;
   bool debug_mode;
   semaver::Version version;
 

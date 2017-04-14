@@ -43,12 +43,11 @@ namespace taiga {
 App::App()
     : allow_multiple_instances(false),
 #ifdef _DEBUG
-      debug_mode(true),
+      debug_mode(true)
 #else
-      debug_mode(false),
+      debug_mode(false)
 #endif
-      play_status(kPlayStatusStopped) {
-
+{
   version.major = TAIGA_VERSION_MAJOR;
   version.minor = TAIGA_VERSION_MINOR;
   version.patch = TAIGA_VERSION_PATCH;
@@ -108,8 +107,8 @@ BOOL App::InitInstance() {
 
 void App::Uninitialize() {
   // Announce
-  if (play_status == kPlayStatusPlaying) {
-    play_status = kPlayStatusStopped;
+  if (MediaPlayers.play_status == PlayStatus::Playing) {
+    MediaPlayers.play_status = PlayStatus::Stopped;
     ::Announcer.Do(kAnnounceToHttp);
   }
   ::Announcer.Clear(kAnnounceToSkype);

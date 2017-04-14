@@ -28,6 +28,7 @@
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/media.h"
 #include "track/search.h"
 #include "ui/ui.h"
 
@@ -152,7 +153,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
       anime::Episode episode;
       episode.anime_id = anime->GetId();
       episode.set_episode_number(*item.episode);
-      Taiga.play_status = taiga::kPlayStatusUpdated;
+      MediaPlayers.play_status = PlayStatus::Updated;
       Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToTwitter, &episode);
     }
 

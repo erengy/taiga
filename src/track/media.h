@@ -33,6 +33,12 @@ enum MediaPlayerModes {
   kMediaModeWindowTitleOnly,
 };
 
+enum class PlayStatus {
+  Stopped,
+  Playing,
+  Updated,
+};
+
 class MediaPlayer {
 public:
   std::wstring GetPath() const;
@@ -86,6 +92,7 @@ public:
 
 public:
   std::vector<MediaPlayer> items;
+  PlayStatus play_status = PlayStatus::Stopped;
 
   class BrowserAccessibleObject : public win::AccessibleObject {
   public:

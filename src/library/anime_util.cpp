@@ -36,6 +36,7 @@
 #include "taiga/taiga.h"
 #include "taiga/timer.h"
 #include "track/feed.h"
+#include "track/media.h"
 #include "track/recognition.h"
 #include "track/search.h"
 #include "ui/ui.h"
@@ -396,7 +397,7 @@ void StartWatching(Item& item, Episode& episode) {
     item.AddtoUserList();
 
   // Change status
-  Taiga.play_status = taiga::kPlayStatusPlaying;
+  MediaPlayers.play_status = PlayStatus::Playing;
   item.SetPlaying(true);
 
   ui::OnAnimeWatchingStart(item, episode);
@@ -422,7 +423,7 @@ void StartWatching(Item& item, Episode& episode) {
 
 void EndWatching(Item& item, Episode episode) {
   // Change status
-  Taiga.play_status = taiga::kPlayStatusStopped;
+  MediaPlayers.play_status = PlayStatus::Stopped;
   item.SetPlaying(false);
 
   // Announce

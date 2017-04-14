@@ -30,6 +30,7 @@
 #include "taiga/script.h"
 #include "taiga/settings.h"
 #include "taiga/taiga.h"
+#include "track/media.h"
 #include "ui/ui.h"
 
 // The idea behind Taiga's script functions is borrowed from Mp3tag, which
@@ -389,10 +390,10 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"folder", ENCODE(folder));
           REPLACE(L"user", ENCODE(taiga::GetCurrentUsername()));
           REPLACE(L"manual", is_manual ? L"true" : L"");
-          switch (Taiga.play_status) {
-            case taiga::kPlayStatusStopped: REPLACE(L"playstatus", L"stopped"); break;
-            case taiga::kPlayStatusPlaying: REPLACE(L"playstatus", L"playing"); break;
-            case taiga::kPlayStatusUpdated: REPLACE(L"playstatus", L"updated"); break;
+          switch (MediaPlayers.play_status) {
+            case PlayStatus::Stopped: REPLACE(L"playstatus", L"stopped"); break;
+            case PlayStatus::Playing: REPLACE(L"playstatus", L"playing"); break;
+            case PlayStatus::Updated: REPLACE(L"playstatus", L"updated"); break;
           }
           switch (taiga::GetCurrentServiceId()) {
             case sync::kMyAnimeList:
