@@ -34,10 +34,24 @@ class Feed;
 
 namespace ui {
 
+enum class TipType {
+  Default,
+  NowPlaying,
+  Search,
+  Torrent,
+  UpdateFailed,
+  NotApproved,
+};
+
+class Taskbar : public win::Taskbar {
+public:
+  TipType tip_type = TipType::Default;
+};
+
 constexpr int kControlMargin = 6;
 constexpr unsigned int kAppSysTrayId = 74164;  // TAIGA ^_^
 
-extern win::Taskbar taskbar;
+extern Taskbar taskbar;
 extern win::TaskbarList taskbar_list;
 
 void ChangeStatusText(const string_t& status);

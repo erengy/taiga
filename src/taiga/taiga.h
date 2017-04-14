@@ -36,15 +36,6 @@ enum PlayStatus {
   kPlayStatusUpdated
 };
 
-enum TipType {
-  kTipTypeDefault,
-  kTipTypeNowPlaying,
-  kTipTypeSearch,
-  kTipTypeTorrent,
-  kTipTypeUpdateFailed,
-  kTipTypeNotApproved,
-};
-
 class App : public win::App {
 public:
   App();
@@ -56,7 +47,7 @@ public:
   void LoadData();
 
   bool allow_multiple_instances;
-  int current_tip_type, play_status;
+  int play_status;
   bool debug_mode;
   semaver::Version version;
 

@@ -700,29 +700,29 @@ void MainDialog::OnTaskbarCallback(UINT uMsg, LPARAM lParam) {
         break;
       }
       case NIN_BALLOONTIMEOUT: {
-        Taiga.current_tip_type = taiga::kTipTypeDefault;
+        taskbar.tip_type = TipType::Default;
         break;
       }
       case NIN_BALLOONUSERCLICK: {
-        switch (Taiga.current_tip_type) {
-          case taiga::kTipTypeNowPlaying:
+        switch (taskbar.tip_type) {
+          case TipType::NowPlaying:
             navigation.SetCurrentPage(kSidebarItemNowPlaying);
             break;
-          case taiga::kTipTypeSearch:
+          case TipType::Search:
             ExecuteAction(L"SearchAnime(" + CurrentEpisode.anime_title() + L")");
             break;
-          case taiga::kTipTypeTorrent:
+          case TipType::Torrent:
             navigation.SetCurrentPage(kSidebarItemFeeds);
             break;
-          case taiga::kTipTypeUpdateFailed:
+          case TipType::UpdateFailed:
             History.queue.Check(false);
             break;
-          case taiga::kTipTypeNotApproved:
+          case TipType::NotApproved:
             navigation.SetCurrentPage(kSidebarItemHistory);
             break;
         }
         ActivateWindow(GetWindowHandle());
-        Taiga.current_tip_type = taiga::kTipTypeDefault;
+        taskbar.tip_type = TipType::Default;
         break;
       }
       case WM_LBUTTONUP:

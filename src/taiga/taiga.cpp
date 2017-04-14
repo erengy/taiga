@@ -47,7 +47,6 @@ App::App()
 #else
       debug_mode(false),
 #endif
-      current_tip_type(kTipTypeDefault),
       play_status(kPlayStatusStopped) {
 
   version.major = TAIGA_VERSION_MAJOR;

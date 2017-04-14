@@ -60,7 +60,7 @@
 
 namespace ui {
 
-win::Taskbar taskbar;
+Taskbar taskbar;
 win::TaskbarList taskbar_list;
 
 void ChangeStatusText(const string_t& status) {
@@ -353,12 +353,12 @@ void OnLibraryUpdateFailure(int id, const string_t& reason, bool not_approved) {
     text += L"Reason: Taiga won't be able to synchronize your list until MAL "
             L"approves the anime, or you remove it from the update queue.\n"
             L"Click to go to History page.";
-    Taiga.current_tip_type = taiga::kTipTypeNotApproved;
+    taskbar.tip_type = TipType::NotApproved;
   } else {
     if (!reason.empty())
       text += L"Reason: " + reason + L"\n";
     text += L"Click to try again.";
-    Taiga.current_tip_type = taiga::kTipTypeUpdateFailed;
+    taskbar.tip_type = TipType::UpdateFailed;
   }
 
   taskbar.Tip(L"", L"", 0);  // clear previous tips
@@ -635,7 +635,7 @@ void OnAnimeWatchingStart(const anime::Item& anime_item,
     DlgMain.navigation.SetCurrentPage(kSidebarItemNowPlaying);
 
   if (Settings.GetBool(taiga::kSync_Notify_Recognized)) {
-    Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
+    taskbar.tip_type = TipType::NowPlaying;
     std::wstring tip_text =
         ReplaceVariables(Settings[taiga::kSync_Notify_Format], episode);
     taskbar.Tip(L"", L"", 0);
@@ -695,7 +695,7 @@ void OnRecognitionFail() {
       std::wstring tip_text =
           ReplaceVariables(Settings[taiga::kSync_Notify_Format], CurrentEpisode) +
           L"\nClick here to view similar titles for this anime.";
-      Taiga.current_tip_type = taiga::kTipTypeNowPlaying;
+      taskbar.tip_type = TipType::NowPlaying;
       taskbar.Tip(L"", L"", 0);
       taskbar.Tip(tip_text.c_str(), L"Media is not in your list", NIIF_WARNING);
     }
@@ -929,7 +929,7 @@ bool OnFeedNotify(const Feed& feed) {
 
   tip_text += L"Click to see all.";
   tip_text = LimitText(tip_text, 255);
-  Taiga.current_tip_type = taiga::kTipTypeTorrent;
+  taskbar.tip_type = TipType::Torrent;
   taskbar.Tip(L"", L"", 0);
   taskbar.Tip(tip_text.c_str(), tip_title.c_str(), NIIF_INFO);
 
