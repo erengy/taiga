@@ -21,7 +21,7 @@
 namespace library {
 
 Title::Title()
-    : type(kTitleTypeSynonym) {
+    : type(TitleType::Synonym) {
 }
 
 Title::Title(TitleType type, const string_t& value)

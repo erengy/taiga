@@ -35,7 +35,7 @@ ThemeManager::ThemeManager() {
 
 bool ThemeManager::Load() {
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathThemeCurrent);
+  std::wstring path = taiga::GetPath(taiga::Path::ThemeCurrent);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
@@ -83,7 +83,7 @@ bool ThemeManager::Load() {
   // Load icons
   icons16_.Remove(-1);
   icons24_.Remove(-1);
-  path = GetPathOnly(taiga::GetPath(taiga::kPathThemeCurrent));
+  path = GetPathOnly(taiga::GetPath(taiga::Path::ThemeCurrent));
   HBITMAP bitmap_handle;
   for (size_t i = 0; i < kIconCount16px && i < icons16.size(); i++) {
     bitmap_handle = GdiPlus.LoadImage(path + L"16px\\" +

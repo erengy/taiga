@@ -380,7 +380,7 @@ Twitter::Twitter() {
 
 bool Twitter::RequestToken() {
   HttpRequest http_request;
-  http_request.url.protocol = base::http::kHttps;
+  http_request.url.protocol = base::http::Protocol::Https;
   http_request.url.host = L"api.twitter.com";
   http_request.url.path = L"/oauth/request_token";
   http_request.header[L"Authorization"] =
@@ -393,7 +393,7 @@ bool Twitter::RequestToken() {
 bool Twitter::AccessToken(const std::wstring& key, const std::wstring& secret,
                           const std::wstring& pin) {
   HttpRequest http_request;
-  http_request.url.protocol = base::http::kHttps;
+  http_request.url.protocol = base::http::Protocol::Https;
   http_request.url.host = L"api.twitter.com";
   http_request.url.path = L"/oauth/access_token";
   http_request.header[L"Authorization"] =
@@ -418,7 +418,7 @@ bool Twitter::SetStatusText(const std::wstring& status_text) {
 
   HttpRequest http_request;
   http_request.method = L"POST";
-  http_request.url.protocol = base::http::kHttps;
+  http_request.url.protocol = base::http::Protocol::Https;
   http_request.url.host = L"api.twitter.com";
   http_request.url.path = L"/1.1/statuses/update.json";
   http_request.body = L"status=" + post_parameters[L"status"];

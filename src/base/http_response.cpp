@@ -62,9 +62,9 @@ bool Client::ParseResponseHeader() {
 
     if (IsEqual(name, L"Content-Encoding")) {
       if (InStr(value, L"gzip") > -1) {
-        content_encoding_ = kContentEncodingGzip;
+        content_encoding_ = ContentEncoding::Gzip;
       } else {
-        content_encoding_ = kContentEncodingNone;
+        content_encoding_ = ContentEncoding::None;
       }
 
     } else if (IsEqual(name, L"Content-Length")) {
@@ -93,7 +93,7 @@ bool Client::ParseResponseHeader() {
 
   // Redirection
   if (redirection && !refresh && auto_redirect_ && !location.host.empty()) {
-    content_encoding_ = kContentEncodingNone;
+    content_encoding_ = ContentEncoding::None;
     content_length_ = 0;
     current_length_ = 0;
     request_.url.host = location.host;

@@ -22,14 +22,14 @@
 
 namespace ui {
 
-enum Dialog {
-  kDialogNone,
-  kDialogAbout,
-  kDialogAnimeInformation,
-  kDialogMain,
-  kDialogSettings,
-  kDialogTorrents,
-  kDialogUpdate
+enum class Dialog {
+  None,
+  About,
+  AnimeInformation,
+  Main,
+  Settings,
+  Torrents,
+  Update,
 };
 
 void EndDialog(Dialog dialog);

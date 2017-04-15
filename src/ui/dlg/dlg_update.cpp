@@ -81,7 +81,7 @@ BOOL UpdateDialog::OnDestroy() {
     }
   } else {
     // Create/activate main window
-    ShowDialog(kDialogMain);
+    ShowDialog(ui::Dialog::Main);
   }
 
   return TRUE;

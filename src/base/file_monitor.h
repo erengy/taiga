@@ -28,10 +28,10 @@
 
 class DirectoryChangeNotification {
 public:
-  enum Type {
-    kTypeDirectory,
-    kTypeFile,
-    kTypeUnknown
+  enum class Type {
+    Directory,
+    File,
+    Unknown,
   };
 
   DirectoryChangeNotification(DWORD action,
@@ -48,9 +48,9 @@ class DirectoryChangeEntry {
 public:
   friend class DirectoryMonitor;
 
-  enum State {
-    kStateStopped,
-    kStateActive
+  enum class State {
+    Stopped,
+    Active,
   };
 
   DirectoryChangeEntry(HANDLE directory_handle, const std::wstring& path);

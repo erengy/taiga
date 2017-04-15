@@ -29,27 +29,27 @@ namespace pugi {
 class xml_document;
 }
 
-enum FeedItemState {
-  kFeedItemBlank,
-  kFeedItemDiscardedNormal,
-  kFeedItemDiscardedInactive,
-  kFeedItemDiscardedHidden,
-  kFeedItemSelected
+enum class FeedItemState {
+  Blank,
+  DiscardedNormal,
+  DiscardedInactive,
+  DiscardedHidden,
+  Selected,
 };
 
-enum FeedCategory {
+enum class FeedCategory {
   // Broadcatching for torrent files and DDL
-  kFeedCategoryLink,
+  Link,
   // News around the web
-  kFeedCategoryText,
+  Text,
   // Airing times for anime titles
-  kFeedCategoryTime
+  Time,
 };
 
-enum TorrentCategory {
-  kTorrentCategoryAnime,
-  kTorrentCategoryBatch,
-  kTorrentCategoryOther
+enum class TorrentCategory {
+  Anime,
+  Batch,
+  Other,
 };
 
 ////////////////////////////////////////////////////////////////////////////////

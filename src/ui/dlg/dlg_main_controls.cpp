@@ -203,7 +203,7 @@ BOOL MainDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
       return TRUE;
     // Settings
     case kToolbarButtonSettings:
-      ShowDialog(ui::kDialogSettings);
+      ShowDialog(ui::Dialog::Settings);
       return TRUE;
     // Debug
     case kToolbarButtonDebug:

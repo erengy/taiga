@@ -254,7 +254,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
 
     case kHttpSeasonsGet: {
       auto filename = GetFileName(client.request().url.path);
-      auto path = GetPath(kPathDatabaseSeason) + filename;
+      auto path = GetPath(Path::DatabaseSeason) + filename;
       if (SaveToFile(client.write_buffer_, path) &&
           SeasonDatabase.LoadFile(filename)) {
         Settings.Set(taiga::kApp_Seasons_LastSeason,
@@ -297,7 +297,7 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     case kHttpTaigaUpdateRelations: {
       const bool new_season = Taiga.Updater.IsNewSeasonAvailable();
       if (Meow.ReadRelations(client.write_buffer_) &&
-          SaveToFile(client.write_buffer_, GetPath(kPathDatabaseAnimeRelations))) {
+          SaveToFile(client.write_buffer_, GetPath(Path::DatabaseAnimeRelations))) {
         LOGD(L"Updated anime relation data.");
         ui::OnUpdateNotAvailable(true, new_season);
       } else {

@@ -59,10 +59,10 @@ static void ChangeAnimeFolder(anime::Item& anime_item,
 void FolderMonitor::HandleChangeNotification(
     const DirectoryChangeNotification& notification) const {
   switch (notification.type) {
-    case DirectoryChangeNotification::kTypeDirectory:
+    case DirectoryChangeNotification::Type::Directory:
       OnDirectory(notification);
       break;
-    case DirectoryChangeNotification::kTypeFile:
+    case DirectoryChangeNotification::Type::File:
       OnFile(notification);
       break;
     default:
@@ -78,13 +78,13 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
   std::wstring path;
   static track::recognition::ParseOptions parse_options;
   switch (notification.type) {
-    case DirectoryChangeNotification::kTypeDirectory:
+    case DirectoryChangeNotification::Type::Directory:
       path = GetFileName(notification.filename.first);
       parse_options.parse_path = false;
       parse_options.streaming_media = false;
       break;
     default:
-    case DirectoryChangeNotification::kTypeFile:
+    case DirectoryChangeNotification::Type::File:
       path = notification.path + notification.filename.first;
       parse_options.parse_path = true;
       parse_options.streaming_media = false;
@@ -96,14 +96,14 @@ static anime::Item* FindAnimeItem(const DirectoryChangeNotification& notificatio
 
   static track::recognition::MatchOptions match_options;
   switch (notification.type) {
-    case DirectoryChangeNotification::kTypeDirectory:
+    case DirectoryChangeNotification::Type::Directory:
       match_options.allow_sequels = false;
       match_options.check_airing_date = false;
       match_options.check_anime_type = false;
       match_options.check_episode_number = false;
       break;
     default:
-    case DirectoryChangeNotification::kTypeFile:
+    case DirectoryChangeNotification::Type::File:
       match_options.allow_sequels = true;
       match_options.check_airing_date = true;
       match_options.check_anime_type = true;

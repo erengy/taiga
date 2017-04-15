@@ -109,7 +109,7 @@ void ImageDatabase::FreeMemory() {
 void ImageDatabase::Clear() {
   items_.clear();
 
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
+  std::wstring path = taiga::GetPath(taiga::Path::DatabaseImage);
   DeleteFolder(path);
 }
 

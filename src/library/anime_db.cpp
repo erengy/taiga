@@ -43,7 +43,7 @@ namespace anime {
 
 bool Database::LoadDatabase() {
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
+  std::wstring path = taiga::GetPath(taiga::Path::DatabaseAnime);
   unsigned int options = pugi::parse_default & ~pugi::parse_eol;
   xml_parse_result parse_result = document.load_file(path.c_str(), options);
 
@@ -141,7 +141,7 @@ bool Database::SaveDatabase() {
   xml_node database_node = document.append_child(L"database");
   WriteDatabaseNode(database_node);
 
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnime);
+  std::wstring path = taiga::GetPath(taiga::Path::DatabaseAnime);
   return XmlWriteDocumentToFile(document, path);
 }
 
@@ -393,7 +393,7 @@ bool Database::LoadList() {
     return false;
 
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathUserLibrary);
+  std::wstring path = taiga::GetPath(taiga::Path::UserLibrary);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
@@ -480,7 +480,7 @@ bool Database::SaveList(bool include_database) {
     }
   }
 
-  std::wstring path = taiga::GetPath(taiga::kPathUserLibrary);
+  std::wstring path = taiga::GetPath(taiga::Path::UserLibrary);
   return XmlWriteDocumentToFile(document, path);
 }
 

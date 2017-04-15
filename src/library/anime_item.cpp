@@ -95,7 +95,7 @@ const std::wstring& Item::GetTitle() const {
 
 const std::wstring& Item::GetEnglishTitle(bool fallback) const {
   for (const auto& alt_title : metadata_.alternative)
-    if (alt_title.type == library::kTitleTypeLangEnglish)
+    if (alt_title.type == library::TitleType::LangEnglish)
       if (!alt_title.value.empty())
         return alt_title.value;
 
@@ -107,7 +107,7 @@ const std::wstring& Item::GetEnglishTitle(bool fallback) const {
 
 const std::wstring& Item::GetJapaneseTitle() const {
   for (const auto& alt_title : metadata_.alternative)
-    if (alt_title.type == library::kTitleTypeLangJapanese)
+    if (alt_title.type == library::TitleType::LangJapanese)
       if (!alt_title.value.empty())
         return alt_title.value;
 
@@ -118,7 +118,7 @@ std::vector<std::wstring> Item::GetSynonyms() const {
   std::vector<std::wstring> synonyms;
 
   for (const auto& alt_title : metadata_.alternative)
-    if (alt_title.type == library::kTitleTypeSynonym)
+    if (alt_title.type == library::TitleType::Synonym)
       synonyms.push_back(alt_title.value);
 
   return synonyms;
@@ -238,7 +238,7 @@ void Item::SetTitle(const std::wstring& title) {
 
 void Item::SetEnglishTitle(const std::wstring& title) {
   for (auto& alt_title : metadata_.alternative) {
-    if (alt_title.type == library::kTitleTypeLangEnglish) {
+    if (alt_title.type == library::TitleType::LangEnglish) {
       alt_title.value = title;
       return;
     }
@@ -247,14 +247,14 @@ void Item::SetEnglishTitle(const std::wstring& title) {
   if (title.empty())
     return;
 
-  library::Title new_title(library::kTitleTypeLangEnglish, title);
+  library::Title new_title(library::TitleType::LangEnglish, title);
 
   metadata_.alternative.push_back(new_title);
 }
 
 void Item::SetJapaneseTitle(const std::wstring& title) {
   for (auto& alt_title : metadata_.alternative) {
-    if (alt_title.type == library::kTitleTypeLangJapanese) {
+    if (alt_title.type == library::TitleType::LangJapanese) {
       alt_title.value = title;
       return;
     }
@@ -263,7 +263,7 @@ void Item::SetJapaneseTitle(const std::wstring& title) {
   if (title.empty())
     return;
 
-  library::Title new_title(library::kTitleTypeLangJapanese, title);
+  library::Title new_title(library::TitleType::LangJapanese, title);
 
   metadata_.alternative.push_back(new_title);
 }
@@ -273,7 +273,7 @@ void Item::InsertSynonym(const std::wstring& synonym) {
       synonym == GetEnglishTitle() || synonym == GetJapaneseTitle())
     return;
   metadata_.alternative.push_back(
-      library::Title(library::kTitleTypeSynonym, synonym));
+      library::Title(library::TitleType::Synonym, synonym));
 }
 
 void Item::SetSynonyms(const std::wstring& synonyms) {
@@ -291,7 +291,7 @@ void Item::SetSynonyms(const std::vector<std::wstring>& synonyms) {
   auto iterator = std::remove_if(
       metadata_.alternative.begin(), metadata_.alternative.end(),
       [](const library::Title& title) {
-        return title.type == library::kTitleTypeSynonym;
+        return title.type == library::TitleType::Synonym;
       });
   metadata_.alternative.erase(iterator, metadata_.alternative.end());
 
@@ -409,7 +409,7 @@ int Item::GetMyLastWatchedEpisode(bool check_queue) const {
     return 0;
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchEpisode) : nullptr;
+      SearchHistory(QueueSearch::Episode) : nullptr;
 
   return history_item ? *history_item->episode : my_info_->watched_episodes;
 }
@@ -419,7 +419,7 @@ int Item::GetMyScore(bool check_queue) const {
     return 0;
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchScore) : nullptr;
+      SearchHistory(QueueSearch::Score) : nullptr;
 
   return history_item ? *history_item->score : my_info_->score;
 }
@@ -429,7 +429,7 @@ int Item::GetMyStatus(bool check_queue) const {
     return kNotInList;
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchStatus) : nullptr;
+      SearchHistory(QueueSearch::Status) : nullptr;
 
   return history_item ? *history_item->status : my_info_->status;
 }
@@ -439,7 +439,7 @@ int Item::GetMyRewatchedTimes(bool check_queue) const {
     return 0;
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchRewatchedTimes) : nullptr;
+      SearchHistory(QueueSearch::RewatchedTimes) : nullptr;
 
   return history_item ? *history_item->rewatched_times : my_info_->rewatched_times;
 }
@@ -449,7 +449,7 @@ int Item::GetMyRewatching(bool check_queue) const {
     return FALSE;
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchRewatching) : nullptr;
+      SearchHistory(QueueSearch::Rewatching) : nullptr;
 
   return history_item ? *history_item->enable_rewatching : my_info_->rewatching;
 }
@@ -466,7 +466,7 @@ const Date& Item::GetMyDateStart(bool check_queue) const {
     return EmptyDate();
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchDateStart) : nullptr;
+      SearchHistory(QueueSearch::DateStart) : nullptr;
 
   return history_item ? *history_item->date_start : my_info_->date_start;
 }
@@ -476,7 +476,7 @@ const Date& Item::GetMyDateEnd(bool check_queue) const {
     return EmptyDate();
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchDateEnd) : nullptr;
+      SearchHistory(QueueSearch::DateEnd) : nullptr;
 
   return history_item ? *history_item->date_finish : my_info_->date_finish;
 }
@@ -493,7 +493,7 @@ const std::wstring& Item::GetMyTags(bool check_queue) const {
     return EmptyString();
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchTags) : nullptr;
+      SearchHistory(QueueSearch::Tags) : nullptr;
 
   return history_item ? *history_item->tags : my_info_->tags;
 }
@@ -503,7 +503,7 @@ const std::wstring& Item::GetMyNotes(bool check_queue) const {
     return EmptyString();
 
   HistoryItem* history_item = check_queue ?
-      SearchHistory(kQueueSearchNotes) : nullptr;
+      SearchHistory(QueueSearch::Notes) : nullptr;
 
   return history_item ? *history_item->notes : my_info_->notes;
 }
@@ -742,7 +742,7 @@ void Item::RemoveFromUserList() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-HistoryItem* Item::SearchHistory(int search_mode) const {
+HistoryItem* Item::SearchHistory(QueueSearch search_mode) const {
   return History.queue.FindItem(GetId(), search_mode);
 }
 

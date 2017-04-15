@@ -397,12 +397,12 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             if (text.empty())
               break;
             switch (search_bar.mode) {
-              case kSearchModeService: {
+              case SearchMode::Service: {
                 BOOL local_search = GetKeyState(VK_CONTROL) & 0x8000;
                 ExecuteAction(L"SearchAnime(" + text + L")", local_search);
                 return TRUE;
               }
-              case kSearchModeFeed: {
+              case SearchMode::Feed: {
                 DlgTorrent.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], text);
                 return TRUE;
               }
@@ -481,7 +481,7 @@ BOOL MainDialog::PreTranslateMessage(MSG* pMsg) {
             case kSidebarItemFeeds: {
               // Check new torrents
               edit.SetText(L"");
-              Aggregator.CheckFeed(kFeedCategoryLink,
+              Aggregator.CheckFeed(FeedCategory::Link,
                                    Settings[taiga::kTorrent_Discovery_Source]);
               return TRUE;
             }
@@ -605,10 +605,10 @@ BOOL MainDialog::OnDestroy() {
     }
   }
 
-  ui::EndDialog(ui::kDialogAbout);
-  ui::EndDialog(ui::kDialogAnimeInformation);
-  ui::EndDialog(ui::kDialogSettings);
-  ui::EndDialog(ui::kDialogUpdate);
+  ui::EndDialog(ui::Dialog::About);
+  ui::EndDialog(ui::Dialog::AnimeInformation);
+  ui::EndDialog(ui::Dialog::Settings);
+  ui::EndDialog(ui::Dialog::Update);
 
   Taiga.Uninitialize();
 
@@ -957,18 +957,18 @@ void MainDialog::Navigation::RefreshSearchText(int previous_page) {
   switch (current_page_) {
     case kSidebarItemAnimeList:
     case kSidebarItemSeasons:
-      parent->search_bar.mode = kSearchModeService;
+      parent->search_bar.mode = SearchMode::Service;
       cue_text = L"Filter list or search " + taiga::GetCurrentService()->name();
       break;
     case kSidebarItemNowPlaying:
     case kSidebarItemHistory:
     case kSidebarItemStats:
     case kSidebarItemSearch:
-      parent->search_bar.mode = kSearchModeService;
+      parent->search_bar.mode = SearchMode::Service;
       cue_text = L"Search " + taiga::GetCurrentService()->name() + L" for anime";
       break;
     case kSidebarItemFeeds:
-      parent->search_bar.mode = kSearchModeFeed;
+      parent->search_bar.mode = SearchMode::Feed;
       cue_text = L"Search for torrents";
       break;
   }

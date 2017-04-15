@@ -25,6 +25,8 @@
 #include "anime.h"
 #include "metadata.h"
 
+enum class QueueSearch;
+
 namespace anime {
 class Database;
 class Episode;
@@ -158,7 +160,7 @@ public:
 
 private:
   // Helper function
-  HistoryItem* SearchHistory(int search_mode) const;
+  HistoryItem* SearchHistory(QueueSearch search_mode) const;
 
   // Series information, stored in db\anime.xml
   library::Metadata metadata_;

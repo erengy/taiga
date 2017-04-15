@@ -136,7 +136,7 @@ static bool ParseRule(const std::wstring& rule) {
 }
 
 bool Engine::ReadRelations() {
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseAnimeRelations);
+  std::wstring path = taiga::GetPath(taiga::Path::DatabaseAnimeRelations);
   std::string document;
 
   if (!ReadFromFile(path, document)) {
@@ -154,12 +154,12 @@ bool Engine::ReadRelations(const std::string& document) {
   std::vector<std::wstring> lines;
   Split(StrToWstr(document), L"\n", lines);
 
-  enum FileSections {
-    kUnknownSection,
-    kMetaSection,
-    kRulesSection,
+  enum class FileSection {
+    Unknown,
+    Meta,
+    Rules,
   };
-  auto current_section = kUnknownSection;
+  auto current_section = FileSection::Unknown;
 
   for (auto& line : lines) {
     Trim(line, L"\r ");
@@ -172,17 +172,17 @@ bool Engine::ReadRelations(const std::string& document) {
     if (StartsWith(line, L"::")) {
       auto section = line.substr(2);
       if (section == L"meta") {
-        current_section = kMetaSection;
+        current_section = FileSection::Meta;
       } else if (section == L"rules") {
-        current_section = kRulesSection;
+        current_section = FileSection::Rules;
       } else {
-        current_section = kUnknownSection;
+        current_section = FileSection::Unknown;
       }
       continue;
     }
 
     switch (current_section) {
-      case kMetaSection: {
+      case FileSection::Meta: {
         TrimLeft(line, L"- ");
         static const std::wregex pattern(L"([a-z_]+): (.+)");
         std::match_results<std::wstring::const_iterator> match_results;
@@ -199,7 +199,7 @@ bool Engine::ReadRelations(const std::string& document) {
         }
         break;
       }
-      case kRulesSection: {
+      case FileSection::Rules: {
         TrimLeft(line, L"- ");
         if (!ParseRule(line))
           LOGW(L"Could not parse rule: " + line);

@@ -803,7 +803,7 @@ void OnSettingsLibraryFoldersEmpty() {
 
 void OnSettingsRestoreDefaults() {
   if (DlgSettings.IsWindow()) {
-    EndDialog(kDialogSettings);
+    EndDialog(Dialog::Settings);
   }
 }
 
@@ -895,7 +895,7 @@ bool OnFeedNotify(const Feed& feed) {
   std::map<std::wstring, std::set<std::wstring>> found_episodes;
 
   for (const auto& feed_item : feed.items) {
-    if (feed_item.state == kFeedItemSelected) {
+    if (feed_item.state == FeedItemState::Selected) {
       const auto& episode = feed_item.episode_data;
       auto anime_item = AnimeDatabase.FindItem(episode.anime_id);
       auto anime_title = anime_item ? anime_item->GetTitle() : episode.anime_title();

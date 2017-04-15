@@ -38,7 +38,7 @@ class Aggregator Aggregator;
 Aggregator::Aggregator() {
   // Add torrent feed
   feeds_.resize(feeds_.size() + 1);
-  feeds_.back().category = kFeedCategoryLink;
+  feeds_.back().category = FeedCategory::Link;
 }
 
 Feed* Aggregator::GetFeed(FeedCategory category) {
@@ -64,12 +64,12 @@ bool Aggregator::CheckFeed(FeedCategory category, const std::wstring& source,
   http_request.header[L"Accept-Encoding"] = L"gzip";
 
   switch (feed.category) {
-    case kFeedCategoryLink:
+    case FeedCategory::Link:
       if (!automatic) {
         ui::ChangeStatusText(L"Checking new torrents via " +
                              http_request.url.host + L"...");
       }
-      ui::EnableDialogInput(ui::kDialogTorrents, false);
+      ui::EnableDialogInput(ui::Dialog::Torrents, false);
       break;
   }
 
@@ -128,7 +128,7 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
   } else if (download_queue_.empty()) {
     std::vector<const FeedItem*> selected_feed_items;
     for (const auto& item : feed.items) {
-      if (item.state == kFeedItemSelected)
+      if (item.state == FeedItemState::Selected)
         selected_feed_items.push_back(&item);
     }
     std::sort(selected_feed_items.begin(), selected_feed_items.end(),
@@ -178,7 +178,7 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
 
   } else {
     ui::ChangeStatusText(L"Downloading \"" + feed_item->title + L"\"...");
-    ui::EnableDialogInput(ui::kDialogTorrents, false);
+    ui::EnableDialogInput(ui::Dialog::Torrents, false);
 
     HttpRequest http_request;
     http_request.header[L"Accept"] = L"application/x-bittorrent, */*";
@@ -213,7 +213,7 @@ void Aggregator::HandleFeedCheck(Feed& feed, const std::string& data,
 
   bool success = false;
   for (const auto& item : feed.items) {
-    if (item.state == kFeedItemSelected) {
+    if (item.state == FeedItemState::Selected) {
       success = true;
       break;
     }
@@ -259,7 +259,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
     }
   }
 
-  feed_item->state = kFeedItemDiscardedNormal;
+  feed_item->state = FeedItemState::DiscardedNormal;
   AddToArchive(feed_item->title);
   ui::OnFeedDownload(true, L"");
 
@@ -465,7 +465,7 @@ void Aggregator::ParseDescription(FeedItem& feed_item,
 
 bool Aggregator::LoadArchive() {
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathFeedHistory);
+  std::wstring path = taiga::GetPath(taiga::Path::FeedHistory);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok)
@@ -498,7 +498,7 @@ bool Aggregator::SaveArchive() const {
     }
   }
 
-  std::wstring path = taiga::GetPath(taiga::kPathFeedHistory);
+  std::wstring path = taiga::GetPath(taiga::Path::FeedHistory);
   return XmlWriteDocumentToFile(document, path);
 }
 

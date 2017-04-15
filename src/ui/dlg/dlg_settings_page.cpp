@@ -481,19 +481,19 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
       switch (LOWORD(wParam)) {
         // Edit format
         case IDC_BUTTON_FORMAT_HTTP:
-          DlgFormat.mode = kFormatModeHttp;
+          DlgFormat.mode = FormatDialogMode::Http;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_MIRC:
-          DlgFormat.mode = kFormatModeMirc;
+          DlgFormat.mode = FormatDialogMode::Mirc;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_SKYPE:
-          DlgFormat.mode = kFormatModeSkype;
+          DlgFormat.mode = FormatDialogMode::Skype;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
         case IDC_BUTTON_FORMAT_TWITTER:
-          DlgFormat.mode = kFormatModeTwitter;
+          DlgFormat.mode = FormatDialogMode::Twitter;
           DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true);
           return TRUE;
 
@@ -534,7 +534,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
             CheckDlgButton(IDC_CHECK_CACHE2, FALSE);
           }
           if (IsDlgButtonChecked(IDC_CHECK_CACHE3)) {
-            std::wstring path = taiga::GetPath(taiga::kPathFeed);
+            std::wstring path = taiga::GetPath(taiga::Path::Feed);
             DeleteFolder(path);
             CheckDlgButton(IDC_CHECK_CACHE3, FALSE);
           }
@@ -931,7 +931,7 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         auto param = list.GetItemParam(lpnmitem->iItem);
         auto& it = parent->advanced_settings_[param];
         if (param == taiga::kSync_Notify_Format) {
-          DlgFormat.mode = kFormatModeBalloon;
+          DlgFormat.mode = FormatDialogMode::Balloon;
           if (DlgFormat.Create(IDD_FORMAT, parent->GetWindowHandle(), true) == IDOK) {
             it.first = Settings.GetWstr(taiga::kSync_Notify_Format);
             list.SetItem(lpnmitem->iItem, 1, it.first.c_str());

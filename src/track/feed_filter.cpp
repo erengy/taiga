@@ -311,7 +311,7 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
     case kFeedFilterActionSelect:
       if (matched) {
         // Select matched items, if they were not discarded before
-        item.state = kFeedItemSelected;
+        item.state = FeedItemState::Selected;
       } else {
         return false;  // Filter doesn't apply to this item
       }
@@ -324,7 +324,7 @@ bool FeedFilter::Filter(Feed& feed, FeedItem& item, bool recursive) {
         if (strong_preference) {
           if (matched) {
             // Select matched items, if they were not discarded before
-            item.state = kFeedItemSelected;
+            item.state = FeedItemState::Selected;
           } else {
             // Discard mismatched items, regardless of their previous state
             item.Discard(option);
@@ -498,7 +498,7 @@ void FeedFilterManager::FilterArchived(Feed& feed) {
     if (!item.IsDiscarded()) {
       bool found = Aggregator.SearchArchive(item.title);
       if (found) {
-        item.state = kFeedItemDiscardedNormal;
+        item.state = FeedItemState::DiscardedNormal;
         if (Taiga.debug_mode) {
           std::wstring filter_text = L"!FILTER :: Archived";
           item.description = filter_text + L" -- " + item.description;

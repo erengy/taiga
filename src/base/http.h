@@ -48,9 +48,9 @@ namespace http {
 
 typedef base::multimap<std::wstring, std::wstring> header_t;
 
-enum ContentEncoding {
-  kContentEncodingNone,
-  kContentEncodingGzip
+enum class ContentEncoding {
+  None,
+  Gzip,
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -54,7 +54,7 @@ void Service::BuildRequest(Request& request, HttpRequest& http_request) {
   http_request.url.host = host_;
 
   if (Settings.GetBool(taiga::kSync_Service_Kitsu_UseHttps))
-    http_request.url.protocol = base::http::kHttps;
+    http_request.url.protocol = base::http::Protocol::Https;
 
   http_request.header[L"Accept"] = kJsonApiMediaType;
   http_request.header[L"Accept-Charset"] = L"utf-8";

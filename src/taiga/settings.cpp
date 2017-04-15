@@ -235,7 +235,7 @@ void AppSettings::InitializeMap() {
 
 bool AppSettings::Load() {
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathSettings);
+  std::wstring path = taiga::GetPath(taiga::Path::Settings);
   xml_parse_result result = document.load_file(path.c_str());
 
   xml_node settings = document.child(L"settings");
@@ -308,7 +308,7 @@ bool AppSettings::Load() {
   Aggregator.filter_manager.Import(node_filter, Aggregator.filter_manager.filters);
   if (Aggregator.filter_manager.filters.empty())
     Aggregator.filter_manager.AddPresets();
-  auto feed = Aggregator.GetFeed(kFeedCategoryLink);
+  auto feed = Aggregator.GetFeed(FeedCategory::Link);
   if (feed)
     feed->link = GetWstr(kTorrent_Discovery_Source);
   Aggregator.LoadArchive();
@@ -390,7 +390,7 @@ bool AppSettings::Save() {
   }
   reg.CloseKey();
 
-  std::wstring path = taiga::GetPath(taiga::kPathSettings);
+  std::wstring path = taiga::GetPath(taiga::Path::Settings);
   return XmlWriteDocumentToFile(document, path);
 }
 
@@ -456,7 +456,7 @@ void AppSettings::ApplyChanges(const std::wstring& previous_service,
 
 void AppSettings::RestoreDefaults() {
   // Take a backup
-  std::wstring file = taiga::GetPath(taiga::kPathSettings);
+  std::wstring file = taiga::GetPath(taiga::Path::Settings);
   std::wstring backup = file + L".bak";
   DWORD flags = MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH;
   MoveFileEx(file.c_str(), backup.c_str(), flags);

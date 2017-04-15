@@ -608,7 +608,7 @@ bool SetFansubFilter(int anime_id, const std::wstring& group_name) {
 }
 
 std::wstring GetImagePath(int anime_id) {
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseImage);
+  std::wstring path = taiga::GetPath(taiga::Path::DatabaseImage);
   if (anime_id > 0) path += ToWstr(anime_id) + L".jpg";
   return path;
 }
@@ -844,7 +844,7 @@ void DecrementEpisode(int anime_id) {
 
   int watched = anime_item->GetMyLastWatchedEpisode();
   auto history_item = History.queue.FindItem(anime_item->GetId(),
-                                             kQueueSearchEpisode);
+                                             QueueSearch::Episode);
 
   if (history_item && *history_item->episode == watched &&
       watched > anime_item->GetMyLastWatchedEpisode(false)) {

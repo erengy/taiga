@@ -92,7 +92,7 @@ void Timer::OnTimeout() {
       break;
 
     case kTimerTorrents:
-      Aggregator.CheckFeed(kFeedCategoryLink,
+      Aggregator.CheckFeed(FeedCategory::Link,
                            Settings[taiga::kTorrent_Discovery_Source], true);
       break;
   }

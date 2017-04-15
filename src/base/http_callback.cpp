@@ -99,7 +99,7 @@ int Client::DebugHandler(curl_infotype infotype, std::string data,
       text = L"=> Request header";
       break;
     case CURLINFO_DATA_IN:
-      if (content_encoding_ == kContentEncodingGzip && !simulated_callback)
+      if (content_encoding_ == ContentEncoding::Gzip && !simulated_callback)
         return 0;  // Don't output garbage
       text = L"<= Recv data";
       break;

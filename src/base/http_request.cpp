@@ -195,7 +195,7 @@ bool Client::Perform() {
 
   if (code == CURLE_OK) {
     if (!write_buffer_.empty()) {
-      if (content_encoding_ == kContentEncodingGzip) {
+      if (content_encoding_ == ContentEncoding::Gzip) {
         std::string compressed;
         std::swap(write_buffer_, compressed);
         UncompressGzippedString(compressed, write_buffer_);

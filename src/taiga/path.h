@@ -26,28 +26,28 @@ enum ServiceId;
 
 namespace taiga {
 
-enum PathType {
-  kPathData,
-  kPathDatabase,
-  kPathDatabaseAnime,
-  kPathDatabaseAnimeRelations,
-  kPathDatabaseImage,
-  kPathDatabaseSeason,
-  kPathFeed,
-  kPathFeedHistory,
-  kPathMedia,
-  kPathSettings,
-  kPathTest,
-  kPathTestRecognition,
-  kPathTheme,
-  kPathThemeCurrent,
-  kPathUser,
-  kPathUserHistory,
-  kPathUserLibrary
+enum class Path {
+  Data,
+  Database,
+  DatabaseAnime,
+  DatabaseAnimeRelations,
+  DatabaseImage,
+  DatabaseSeason,
+  Feed,
+  FeedHistory,
+  Media,
+  Settings,
+  Test,
+  TestRecognition,
+  Theme,
+  ThemeCurrent,
+  User,
+  UserHistory,
+  UserLibrary
 };
 
 std::wstring GetUserDirectoryName(const sync::ServiceId service_id);
 std::wstring GetUserDirectoryName();
-std::wstring GetPath(PathType type);
+std::wstring GetPath(Path path);
 
 }  // namespace taiga

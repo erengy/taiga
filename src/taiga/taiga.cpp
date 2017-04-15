@@ -97,9 +97,9 @@ BOOL App::InitInstance() {
   ::Skype.Create();
 
   if (Settings.GetBool(kApp_Behavior_CheckForUpdates)) {
-    ui::ShowDialog(ui::kDialogUpdate);
+    ui::ShowDialog(ui::Dialog::Update);
   } else {
-    ui::ShowDialog(ui::kDialogMain);
+    ui::ShowDialog(ui::Dialog::Main);
   }
 
   return TRUE;

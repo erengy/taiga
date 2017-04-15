@@ -44,7 +44,7 @@
 
 namespace ui {
 
-enum kAnimeListTooltips {
+enum AnimeListTooltips {
   kTooltipFirst,
   kTooltipAnimeSeason = kTooltipFirst,
   kTooltipAnimeStatus,

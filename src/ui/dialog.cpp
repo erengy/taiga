@@ -31,7 +31,7 @@ namespace ui {
 class DialogProperties {
 public:
   DialogProperties(unsigned int resource_id, win::Dialog* dialog,
-                   Dialog parent = kDialogNone, bool modal = false);
+                   Dialog parent = Dialog::None, bool modal = false);
 
   unsigned int resource_id;
   win::Dialog* dialog;
@@ -56,20 +56,20 @@ void InitializeDialogProperties() {
     return;
 
   dialog_properties.insert(std::make_pair(
-      kDialogAbout,
-      DialogProperties(IDD_ABOUT, &DlgAbout, kDialogMain, true)));
+      Dialog::About,
+      DialogProperties(IDD_ABOUT, &DlgAbout, Dialog::Main, true)));
   dialog_properties.insert(std::make_pair(
-      kDialogAnimeInformation,
-      DialogProperties(IDD_ANIME_INFO, &DlgAnime, kDialogMain, false)));
+      Dialog::AnimeInformation,
+      DialogProperties(IDD_ANIME_INFO, &DlgAnime, Dialog::Main, false)));
   dialog_properties.insert(std::make_pair(
-      kDialogMain,
+      Dialog::Main,
       DialogProperties(IDD_MAIN, &DlgMain)));
   dialog_properties.insert(std::make_pair(
-      kDialogSettings,
-      DialogProperties(IDD_SETTINGS, &DlgSettings, kDialogMain, true)));
+      Dialog::Settings,
+      DialogProperties(IDD_SETTINGS, &DlgSettings, Dialog::Main, true)));
   dialog_properties.insert(std::make_pair(
-      kDialogUpdate,
-      DialogProperties(IDD_UPDATE, &DlgUpdate, kDialogMain, true)));
+      Dialog::Update,
+      DialogProperties(IDD_UPDATE, &DlgUpdate, Dialog::Main, true)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,10 +86,10 @@ void EndDialog(Dialog dialog) {
 
 void EnableDialogInput(Dialog dialog, bool enable) {
   switch (dialog) {
-    case kDialogMain:
+    case Dialog::Main:
       DlgMain.EnableInput(enable);
       break;
-    case kDialogTorrents:
+    case Dialog::Torrents:
       DlgTorrent.EnableInput(enable);
       break;
   }
@@ -129,16 +129,16 @@ void ShowDialog(Dialog dialog) {
 
 void ShowDlgAnimeEdit(int anime_id) {
   DlgAnime.SetCurrentId(anime_id);
-  DlgAnime.SetCurrentPage(kAnimePageMyInfo);
+  DlgAnime.SetCurrentPage(AnimePageType::MyInfo);
 
-  ShowDialog(kDialogAnimeInformation);
+  ShowDialog(Dialog::AnimeInformation);
 }
 
 void ShowDlgAnimeInfo(int anime_id) {
   DlgAnime.SetCurrentId(anime_id);
-  DlgAnime.SetCurrentPage(kAnimePageSeriesInfo);
+  DlgAnime.SetCurrentPage(AnimePageType::SeriesInfo);
 
-  ShowDialog(kDialogAnimeInformation);
+  ShowDialog(Dialog::AnimeInformation);
 }
 
 void ShowDlgSettings(int section, int page) {
@@ -147,7 +147,7 @@ void ShowDlgSettings(int section, int page) {
   if (page > 0)
     DlgSettings.SetCurrentPage(static_cast<SettingsPages>(page));
 
-  ShowDialog(kDialogSettings);
+  ShowDialog(Dialog::Settings);
 }
 
 }  // namespace ui

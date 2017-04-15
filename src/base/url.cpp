@@ -22,11 +22,11 @@
 #include "url.h"
 
 Url::Url()
-    : protocol(base::http::kHttp), port(0) {
+    : protocol(base::http::Protocol::Http), port(0) {
 }
 
 Url::Url(const std::wstring& url)
-    : protocol(base::http::kHttp), port(0) {
+    : protocol(base::http::Protocol::Http), port(0) {
   Crack(url);
 }
 
@@ -50,7 +50,7 @@ void Url::operator=(const std::wstring& url) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void Url::Clear() {
-  protocol = base::http::kHttp;
+  protocol = base::http::Protocol::Http;
   host.clear();
   port = 0;
   path.clear();
@@ -62,12 +62,12 @@ std::wstring Url::Build() const {
   std::wstring url;
 
   switch (protocol) {
-    case base::http::kHttp:
-    case base::http::kRelative:
+    case base::http::Protocol::Http:
+    case base::http::Protocol::Relative:
     default:
       url += L"http";
       break;
-    case base::http::kHttps:
+    case base::http::Protocol::Https:
       url += L"https";
       break;
   }
@@ -98,12 +98,12 @@ void Url::Crack(std::wstring url) {
     std::wstring scheme = url.substr(0, i);
     url = url.substr(i + 3);
     if (IsEqual(scheme, L"https"))
-      protocol = base::http::kHttps;
+      protocol = base::http::Protocol::Https;
   } else {
     i = url.find(L"//", 0);
     if (i == 0) {
       url = url.substr(2);
-      protocol = base::http::kRelative;
+      protocol = base::http::Protocol::Relative;
     }
   }
 

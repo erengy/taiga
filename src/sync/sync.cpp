@@ -42,7 +42,7 @@ bool AuthenticateUser() {
   }
 
   ui::ChangeStatusText(L"Logging in...");
-  ui::EnableDialogInput(ui::kDialogMain, false);
+  ui::EnableDialogInput(ui::Dialog::Main, false);
 
   Request request(kAuthenticateUser);
   SetActiveServiceForRequest(request);
@@ -62,7 +62,7 @@ void GetUser() {
   }
 
   ui::ChangeStatusText(L"Retrieving user information...");
-  ui::EnableDialogInput(ui::kDialogMain, false);
+  ui::EnableDialogInput(ui::Dialog::Main, false);
 
   Request request(kGetUser);
   SetActiveServiceForRequest(request);
@@ -86,7 +86,7 @@ void GetLibraryEntries() {
   }
 
   ui::ChangeStatusText(L"Downloading anime list...");
-  ui::EnableDialogInput(ui::kDialogMain, false);
+  ui::EnableDialogInput(ui::Dialog::Main, false);
 
   Request request(kGetLibraryEntries);
   SetActiveServiceForRequest(request);

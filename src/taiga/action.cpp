@@ -64,7 +64,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // CheckUpdates()
   //   Checks for a new version of the program.
   if (action == L"CheckUpdates") {
-    ui::ShowDialog(ui::kDialogUpdate);
+    ui::ShowDialog(ui::Dialog::Update);
 
   // Exit(), Quit()
   //   Exits from Taiga.
@@ -169,7 +169,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   // About()
   //   Shows about window.
   } else if (action == L"About") {
-    ui::ShowDialog(ui::kDialogAbout);
+    ui::ShowDialog(ui::Dialog::About);
 
   // Info([anime_id])
   //   Shows anime information window.
@@ -180,7 +180,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // MainDialog()
   } else if (action == L"MainDialog") {
-    ui::ShowDialog(ui::kDialogMain);
+    ui::ShowDialog(ui::Dialog::Main);
 
   // Settings()
   //   Shows settings window.
@@ -255,7 +255,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
   //   Opens up a dialog to add new library folder.
   } else if (action == L"AddFolder") {
     std::wstring path;
-    if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
+    if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
                              L"Add a Library Folder", L"", path)) {
       Settings.library_folders.push_back(path);
       if (Settings.GetBool(taiga::kLibrary_WatchFolders))
@@ -475,7 +475,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
         std::wstring default_path, path;
         if (!Settings.library_folders.empty())
           default_path = Settings.library_folders.front();
-        if (win::BrowseForFolder(ui::GetWindowHandle(ui::kDialogMain),
+        if (win::BrowseForFolder(ui::GetWindowHandle(ui::Dialog::Main),
                                  L"Select Anime Folder",
                                  default_path, path)) {
           anime_item->SetFolder(path);

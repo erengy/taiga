@@ -22,11 +22,11 @@
 
 namespace ui {
 
-enum AnimePageType {
-  kAnimePageNone,
-  kAnimePageSeriesInfo,
-  kAnimePageMyInfo,
-  kAnimePageNotRecognized
+enum class AnimePageType {
+  None,
+  SeriesInfo,
+  MyInfo,
+  NotRecognized,
 };
 
 class AnimeDialog;

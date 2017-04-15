@@ -30,7 +30,7 @@ namespace ui {
 FormatDialog DlgFormat;
 
 FormatDialog::FormatDialog()
-    : mode(kFormatModeHttp) {
+    : mode(FormatDialogMode::Http) {
   RegisterDlgClass(L"TaigaFormatW");
 }
 
@@ -41,23 +41,23 @@ BOOL FormatDialog::OnInitDialog() {
 
   // Set text
   switch (mode) {
-    case kFormatModeHttp:
+    case FormatDialogMode::Http:
       SetText(L"Edit Format - HTTP Request");
       rich_edit_.SetText(Settings[taiga::kShare_Http_Format].c_str());
       break;
-    case kFormatModeMirc:
+    case FormatDialogMode::Mirc:
       SetText(L"Edit Format - mIRC");
       rich_edit_.SetText(Settings[taiga::kShare_Mirc_Format].c_str());
       break;
-    case kFormatModeSkype:
+    case FormatDialogMode::Skype:
       SetText(L"Edit Format - Skype");
       rich_edit_.SetText(Settings[taiga::kShare_Skype_Format].c_str());
       break;
-    case kFormatModeTwitter:
+    case FormatDialogMode::Twitter:
       SetText(L"Edit Format - Twitter");
       rich_edit_.SetText(Settings[taiga::kShare_Twitter_Format].c_str());
       break;
-    case kFormatModeBalloon:
+    case FormatDialogMode::Balloon:
       SetText(L"Edit Format - Episode Notifications");
       rich_edit_.SetText(Settings[taiga::kSync_Notify_Format].c_str());
       break;
@@ -68,19 +68,19 @@ BOOL FormatDialog::OnInitDialog() {
 
 void FormatDialog::OnOK() {
   switch (mode) {
-    case kFormatModeHttp:
+    case FormatDialogMode::Http:
       Settings.Set(taiga::kShare_Http_Format, rich_edit_.GetText());
       break;
-    case kFormatModeMirc:
+    case FormatDialogMode::Mirc:
       Settings.Set(taiga::kShare_Mirc_Format, rich_edit_.GetText());
       break;
-    case kFormatModeSkype:
+    case FormatDialogMode::Skype:
       Settings.Set(taiga::kShare_Skype_Format, rich_edit_.GetText());
       break;
-    case kFormatModeTwitter:
+    case FormatDialogMode::Twitter:
       Settings.Set(taiga::kShare_Twitter_Format, rich_edit_.GetText());
       break;
-    case kFormatModeBalloon:
+    case FormatDialogMode::Balloon:
       Settings.Set(taiga::kSync_Notify_Format, rich_edit_.GetText());
       break;
   }
@@ -193,7 +193,7 @@ void FormatDialog::RefreshPreviewText() {
   str = ReplaceVariables(str, *episode, false, false, true);
 
   switch (mode) {
-    case kFormatModeMirc: {
+    case FormatDialogMode::Mirc: {
       // Strip IRC characters
       for (size_t i = 0; i < str.length(); i++) {
         if (str[i] == 0x02 || // Bold
@@ -217,7 +217,7 @@ void FormatDialog::RefreshPreviewText() {
       }
       break;
     }
-    case kFormatModeSkype: {
+    case FormatDialogMode::Skype: {
       // Strip HTML codes
       StripHtmlTags(str);
       break;

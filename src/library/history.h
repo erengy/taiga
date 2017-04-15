@@ -27,16 +27,16 @@
 #include "base/xml.h"
 #include "library/anime_episode.h"
 
-enum QueueSearchMode {
-  kQueueSearchDateStart = 1,
-  kQueueSearchDateEnd,
-  kQueueSearchEpisode,
-  kQueueSearchNotes,
-  kQueueSearchRewatchedTimes,
-  kQueueSearchRewatching,
-  kQueueSearchScore,
-  kQueueSearchStatus,
-  kQueueSearchTags
+enum class QueueSearch {
+  DateStart,
+  DateEnd,
+  Episode,
+  Notes,
+  RewatchedTimes,
+  Rewatching,
+  Score,
+  Status,
+  Tags,
 };
 
 class AnimeValues {
@@ -74,7 +74,7 @@ public:
   void Add(HistoryItem& item, bool save = true);
   void Check(bool automatic = true);
   void Clear(bool save = true);
-  HistoryItem* FindItem(int anime_id, int search_mode = 0);
+  HistoryItem* FindItem(int anime_id, QueueSearch search_mode);
   HistoryItem* GetCurrentItem();
   int GetItemCount();
   void Remove(int index = -1, bool save = true, bool refresh = true, bool to_history = true);

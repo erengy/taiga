@@ -23,12 +23,12 @@
 
 namespace ui {
 
-enum FormatModes {
-  kFormatModeHttp,
-  kFormatModeMirc,
-  kFormatModeSkype,
-  kFormatModeTwitter,
-  kFormatModeBalloon
+enum class FormatDialogMode {
+  Http,
+  Mirc,
+  Skype,
+  Twitter,
+  Balloon,
 };
 
 class FormatDialog : public win::Dialog {
@@ -43,7 +43,7 @@ public:
   void ColorizeText();
   void RefreshPreviewText();
 
-  int mode;
+  FormatDialogMode mode;
 
 private:
   win::RichEdit rich_edit_;

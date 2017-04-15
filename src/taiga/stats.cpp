@@ -130,7 +130,7 @@ void Statistics::CalculateLocalData() {
   image_size = GetFolderSize(anime::GetImagePath(), false);
 
   file_list.clear();
-  std::wstring path = taiga::GetPath(taiga::kPathFeed);
+  std::wstring path = taiga::GetPath(taiga::Path::Feed);
 
   torrent_count = PopulateFiles(file_list, path, L"torrent", true);
   torrent_size = GetFolderSize(path, true);

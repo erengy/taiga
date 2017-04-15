@@ -28,7 +28,7 @@ DirectoryChangeNotification::DirectoryChangeNotification(
     : action(action),
       filename(std::make_pair(filename, L"")),
       path(path),
-      type(kTypeUnknown) {
+      type(Type::Unknown) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ DirectoryChangeEntry::DirectoryChangeEntry(HANDLE directory_handle,
     : bytes_returned_(0),
       directory_handle_(directory_handle),
       path(path),
-      state(kStateStopped) {
+      state(State::Stopped) {
   buffer_.resize(65536);
   ZeroMemory(&overlapped_, sizeof(overlapped_));
 }
@@ -169,11 +169,11 @@ void DirectoryMonitor::MonitorProc() {
     if (entry && number_of_bytes > 0) {
       win::Lock lock(critical_section_);
       switch (entry->state) {
-        case DirectoryChangeEntry::kStateStopped: {
+        case DirectoryChangeEntry::State::Stopped: {
           HandleStoppedState(*entry);
           break;
         }
-        case DirectoryChangeEntry::kStateActive: {
+        case DirectoryChangeEntry::State::Active: {
           HandleActiveState(*entry);
           break;
         }
@@ -186,7 +186,7 @@ void DirectoryMonitor::MonitorProc() {
 
 void DirectoryMonitor::HandleStoppedState(DirectoryChangeEntry& entry) {
   if (ReadDirectoryChanges(entry)) {
-    entry.state = DirectoryChangeEntry::kStateActive;
+    entry.state = DirectoryChangeEntry::State::Active;
     LOGD(L"Started monitoring: " + entry.path);
   }
 }
@@ -257,13 +257,13 @@ void DirectoryMonitor::Callback(DirectoryChangeEntry& entry) {
     if (notification.action != FILE_ACTION_REMOVED) {
       std::wstring path = entry.path + notification.filename.first;
       notification.type = FolderExists(path) ?
-          DirectoryChangeNotification::kTypeDirectory :
-          DirectoryChangeNotification::kTypeFile;
+          DirectoryChangeNotification::Type::Directory :
+          DirectoryChangeNotification::Type::File;
     } else {
       std::wstring extension = GetFileExtension(notification.filename.first);
       notification.type = !ValidateFileExtension(extension, 4) ?
-          DirectoryChangeNotification::kTypeDirectory :
-          DirectoryChangeNotification::kTypeFile;
+          DirectoryChangeNotification::Type::Directory :
+          DirectoryChangeNotification::Type::File;
     }
 
     LogFileAction(entry, notification);

@@ -39,10 +39,10 @@ enum MainToolbarButtons {
   kToolbarButtonDebug = 207
 };
 
-enum SearchMode {
-  kSearchModeNone,
-  kSearchModeService,
-  kSearchModeFeed
+enum class SearchMode {
+  None,
+  Service,
+  Feed,
 };
 
 enum SidebarItems {
@@ -151,8 +151,8 @@ public:
   // Search bar
   class SearchBar {
   public:
-    SearchBar() : mode(kSearchModeNone), parent(nullptr) {}
-    int mode;
+    SearchBar() : mode(SearchMode::None), parent(nullptr) {}
+    SearchMode mode;
     MainDialog* parent;
     anime::Filters filters;
     std::map<int, std::wstring> text;

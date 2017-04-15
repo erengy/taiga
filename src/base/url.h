@@ -26,10 +26,10 @@ typedef base::multimap<std::wstring, std::wstring> query_t;
 
 namespace base {
 namespace http {
-enum Protocol {
-  kHttp,
-  kHttps,
-  kRelative,
+enum class Protocol {
+  Http,
+  Https,
+  Relative,
 };
 }
 }

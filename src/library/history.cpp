@@ -219,51 +219,51 @@ void HistoryQueue::Clear(bool save) {
     history->Save();
 }
 
-HistoryItem* HistoryQueue::FindItem(int anime_id, int search_mode) {
+HistoryItem* HistoryQueue::FindItem(int anime_id, QueueSearch search_mode) {
   for (auto it = items.rbegin(); it != items.rend(); ++it) {
     if (it->anime_id == anime_id && it->enabled) {
       switch (search_mode) {
         // Date
-        case kQueueSearchDateStart:
+        case QueueSearch::DateStart:
           if (it->date_start)
             return &(*it);
           break;
-        case kQueueSearchDateEnd:
+        case QueueSearch::DateEnd:
           if (it->date_finish)
             return &(*it);
           break;
         // Episode
-        case kQueueSearchEpisode:
+        case QueueSearch::Episode:
           if (it->episode)
             return &(*it);
           break;
         // Notes
-        case kQueueSearchNotes:
+        case QueueSearch::Notes:
           if (it->notes)
             return &(*it);
           break;
         // Rewatched times
-        case kQueueSearchRewatchedTimes:
+        case QueueSearch::RewatchedTimes:
           if (it->rewatched_times)
             return &(*it);
           break;
         // Rewatching
-        case kQueueSearchRewatching:
+        case QueueSearch::Rewatching:
           if (it->enable_rewatching)
             return &(*it);
           break;
         // Score
-        case kQueueSearchScore:
+        case QueueSearch::Score:
           if (it->score)
             return &(*it);
           break;
         // Status
-        case kQueueSearchStatus:
+        case QueueSearch::Status:
           if (it->status)
             return &(*it);
           break;
         // Tags
-        case kQueueSearchTags:
+        case QueueSearch::Tags:
           if (it->tags)
             return &(*it);
           break;
@@ -367,7 +367,7 @@ bool History::Load() {
   queue.items.clear();
 
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathUserHistory);
+  std::wstring path = taiga::GetPath(taiga::Path::UserHistory);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok)
@@ -446,7 +446,7 @@ void History::ReadQueue(const pugi::xml_document& document) {
 
 bool History::Save() {
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathUserHistory);
+  std::wstring path = taiga::GetPath(taiga::Path::UserHistory);
 
   // Write meta
   xml_node node_meta = document.append_child(L"meta");

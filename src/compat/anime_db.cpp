@@ -35,18 +35,18 @@ bool Database::CheckOldUserDirectory() {
                        const sync::ServiceId service_id) {
     if (!FolderExists(path))
       return false;
-    const auto new_path = taiga::GetPath(taiga::kPathUser) +
+    const auto new_path = taiga::GetPath(taiga::Path::User) +
                           taiga::GetUserDirectoryName(service_id);
     LOGW(L"Renaming old user directory\n" + path + L"\n" + new_path);
     return MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0;
   };
 
   // "Taiga\data\user\{username}"
-  if (check_path(taiga::GetPath(taiga::kPathUser) +
+  if (check_path(taiga::GetPath(taiga::Path::User) +
                  taiga::GetCurrentUsername(),
                  sync::kMyAnimeList) ||
   // "Taiga\data\user\{username}@hummingbird"
-      check_path(taiga::GetPath(taiga::kPathUser) +
+      check_path(taiga::GetPath(taiga::Path::User) +
                  taiga::GetCurrentUsername() + L"@hummingbird",
                  sync::kKitsu)) {
     return true;

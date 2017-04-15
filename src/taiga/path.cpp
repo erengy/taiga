@@ -53,44 +53,44 @@ std::wstring GetUserDirectoryName() {
   return GetUserDirectoryName(GetCurrentServiceId());
 }
 
-std::wstring GetPath(PathType type) {
+std::wstring GetPath(Path path) {
   static const std::wstring data_path = GetDataPath();
 
-  switch (type) {
+  switch (path) {
     default:
-    case kPathData:
+    case Path::Data:
       return data_path;
-    case kPathDatabase:
+    case Path::Database:
       return data_path + L"db\\";
-    case kPathDatabaseAnime:
+    case Path::DatabaseAnime:
       return data_path + L"db\\anime.xml";
-    case kPathDatabaseAnimeRelations:
+    case Path::DatabaseAnimeRelations:
       return data_path + L"db\\anime-relations.txt";
-    case kPathDatabaseImage:
+    case Path::DatabaseImage:
       return data_path + L"db\\image\\";
-    case kPathDatabaseSeason:
+    case Path::DatabaseSeason:
       return data_path + L"db\\season\\";
-    case kPathFeed:
+    case Path::Feed:
       return data_path + L"feed\\";
-    case kPathFeedHistory:
+    case Path::FeedHistory:
       return data_path + L"feed\\history.xml";
-    case kPathMedia:
+    case Path::Media:
       return data_path + L"media.xml";
-    case kPathSettings:
+    case Path::Settings:
       return data_path + L"settings.xml";
-    case kPathTest:
+    case Path::Test:
       return data_path + L"test\\";
-    case kPathTestRecognition:
+    case Path::TestRecognition:
       return data_path + L"test\\recognition.xml";
-    case kPathTheme:
+    case Path::Theme:
       return data_path + L"theme\\";
-    case kPathThemeCurrent:
+    case Path::ThemeCurrent:
       return data_path + L"theme\\" + Settings[kApp_Interface_Theme] + L"\\theme.xml";
-    case kPathUser:
+    case Path::User:
       return data_path + L"user\\";
-    case kPathUserHistory:
+    case Path::UserHistory:
       return data_path + L"user\\" + GetUserDirectoryName() + L"\\history.xml";
-    case kPathUserLibrary:
+    case Path::UserLibrary:
       return data_path + L"user\\" + GetUserDirectoryName() + L"\\anime.xml";
   }
 }

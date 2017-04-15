@@ -26,9 +26,9 @@
 
 namespace ui {
 
-enum AnimeDialogMode {
-  kDialogModeAnimeInformation,
-  kDialogModeNowPlaying
+enum class AnimeDialogMode {
+  AnimeInformation,
+  NowPlaying,
 };
 
 class AnimeDialog : public win::Dialog {
@@ -51,10 +51,10 @@ public:
   bool IsTabVisible() const;
   void GoToPreviousTab();
   void GoToNextTab();
-  int GetMode() const;
+  AnimeDialogMode GetMode() const;
   int GetCurrentId() const;
   void SetCurrentId(int anime_id);
-  void SetCurrentPage(int index);
+  void SetCurrentPage(AnimePageType index);
   void SetScores(const sorted_scores_t& scores);
   void Refresh(bool image = true,
                bool series_info = true,
@@ -69,8 +69,8 @@ public:
 
 protected:
   int anime_id_;
-  int current_page_;
-  int mode_;
+  AnimePageType current_page_;
+  AnimeDialogMode mode_;
   sorted_scores_t scores_;
 
   class ImageLabel : public win::Window {

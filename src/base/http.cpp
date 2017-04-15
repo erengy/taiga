@@ -61,7 +61,7 @@ Client::Client(const Request& request)
       auto_redirect_(true),
       busy_(false),
       cancel_(false),
-      content_encoding_(kContentEncodingNone),
+      content_encoding_(ContentEncoding::None),
       content_length_(0),
       current_length_(0),
       curl_handle_(nullptr),
@@ -113,7 +113,7 @@ void Client::Cleanup(bool reuse) {
   // Reset variables
   busy_ = false;
   cancel_ = false;
-  content_encoding_ = kContentEncodingNone;
+  content_encoding_ = ContentEncoding::None;
   content_length_ = 0;
   current_length_ = 0;
 }

@@ -49,7 +49,7 @@ bool MediaPlayers::Load() {
   items.clear();
 
   xml_document document;
-  std::wstring path = taiga::GetPath(taiga::kPathMedia);
+  std::wstring path = taiga::GetPath(taiga::Path::Media);
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
@@ -135,7 +135,7 @@ MediaPlayer* MediaPlayers::CheckRunningPlayers() {
   std::vector<running_player_t> running_players;
 
   // Go through windows, starting with the highest in the Z-order
-  HWND hwnd = GetWindow(ui::GetWindowHandle(ui::kDialogMain), GW_HWNDFIRST);
+  HWND hwnd = GetWindow(ui::GetWindowHandle(ui::Dialog::Main), GW_HWNDFIRST);
   while (hwnd != nullptr) {
     std::wstring class_from_window;
     std::wstring filename_from_window;
@@ -501,7 +501,7 @@ std::wstring MediaPlayers::GetTitleFromSpecialMessage(HWND hwnd) {
       cds.lpData = &data;
       cds.cbData = 4;
       SendMessage(hwnd, WM_COPYDATA,
-                  reinterpret_cast<WPARAM>(ui::GetWindowHandle(ui::kDialogMain)),
+                  reinterpret_cast<WPARAM>(ui::GetWindowHandle(ui::Dialog::Main)),
                   reinterpret_cast<LPARAM>(&cds));
       title = StrToWstr(file_name);
     }

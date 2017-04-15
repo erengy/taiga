@@ -55,7 +55,7 @@ bool SeasonDatabase::LoadSeason(const anime::Season& season) {
 }
 
 bool SeasonDatabase::LoadFile(const std::wstring& filename) {
-  std::wstring path = taiga::GetPath(taiga::kPathDatabaseSeason) + filename;
+  std::wstring path = taiga::GetPath(taiga::Path::DatabaseSeason) + filename;
 
   std::string document;
 

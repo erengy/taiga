@@ -42,7 +42,7 @@ PageBaseInfo::PageBaseInfo()
 }
 
 BOOL PageBaseInfo::OnClose() {
-  if (parent && parent->GetMode() == kDialogModeAnimeInformation)
+  if (parent && parent->GetMode() == AnimeDialogMode::AnimeInformation)
     parent->OnCancel();
 
   return TRUE;  // Disables closing via Escape key

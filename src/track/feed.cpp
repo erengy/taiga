@@ -31,29 +31,29 @@ GenericFeedItem::GenericFeedItem()
 }
 
 FeedItem::FeedItem()
-    : state(kFeedItemBlank) {
+    : state(FeedItemState::Blank) {
 }
 
 void FeedItem::Discard(int option) {
   switch (option) {
     default:
     case kFeedFilterOptionDefault:
-      state = kFeedItemDiscardedNormal;
+      state = FeedItemState::DiscardedNormal;
       break;
     case kFeedFilterOptionDeactivate:
-      state = kFeedItemDiscardedInactive;
+      state = FeedItemState::DiscardedInactive;
       break;
     case kFeedFilterOptionHide:
-      state = kFeedItemDiscardedHidden;
+      state = FeedItemState::DiscardedHidden;
       break;
   }
 }
 
 bool FeedItem::IsDiscarded() const {
   switch (state) {
-    case kFeedItemDiscardedNormal:
-    case kFeedItemDiscardedInactive:
-    case kFeedItemDiscardedHidden:
+    case FeedItemState::DiscardedNormal:
+    case FeedItemState::DiscardedInactive:
+    case FeedItemState::DiscardedHidden:
       return true;
     default:
       return false;
@@ -65,7 +65,8 @@ bool FeedItem::operator<(const FeedItem& item) const {
   static const int state_priorities[] = {1, 2, 3, 4, 0};
 
   // Sort items by the priority of their state
-  return state_priorities[this->state] < state_priorities[item.state];
+  return state_priorities[static_cast<size_t>(this->state)] <
+         state_priorities[static_cast<size_t>(item.state)];
 }
 
 bool FeedItem::operator==(const FeedItem& item) const {
@@ -91,32 +92,32 @@ bool FeedItem::operator==(const FeedItem& item) const {
 
 TorrentCategory FeedItem::GetTorrentCategory() const {
   if (InStr(category, L"Batch") > -1)  // Respect feed's own categorization
-    return kTorrentCategoryBatch;
+    return TorrentCategory::Batch;
 
   if (Meow.IsBatchRelease(episode_data))
-    return kTorrentCategoryBatch;
+    return TorrentCategory::Batch;
 
   if (!Meow.IsValidAnimeType(episode_data))
-    return kTorrentCategoryOther;
+    return TorrentCategory::Other;
 
   if (anime::IsEpisodeRange(episode_data))
-    return kTorrentCategoryBatch;
+    return TorrentCategory::Batch;
 
   if (!episode_data.file_extension().empty())
     if (!Meow.IsValidFileExtension(episode_data.file_extension()))
-      return kTorrentCategoryOther;
+      return TorrentCategory::Other;
 
-  return kTorrentCategoryAnime;
+  return TorrentCategory::Anime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 Feed::Feed()
-    : category(kFeedCategoryLink) {
+    : category(FeedCategory::Link) {
 }
 
 std::wstring Feed::GetDataPath() {
-  std::wstring path = taiga::GetPath(taiga::kPathFeed);
+  std::wstring path = taiga::GetPath(taiga::Path::Feed);
 
   if (!link.empty()) {
     Url url(link);
@@ -177,7 +178,7 @@ void Feed::Load(const xml_document& document) {
       item.permalink = ToBool(permalink);
 
     // Skip if title or link is empty
-    if (category == kFeedCategoryLink)
+    if (category == FeedCategory::Link)
       if (item.title.empty() || item.link.empty())
         continue;
 
