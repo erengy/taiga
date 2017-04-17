@@ -131,6 +131,7 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
     }
     // Discard marked torrents
     case 102: {
+      bool save_archive = false;
       for (int i = 0; i < list_.GetItemCount(); i++) {
         if (list_.GetCheckState(i) == TRUE) {
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(i));
@@ -138,9 +139,12 @@ BOOL TorrentDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
             feed_item->state = FeedItemState::DiscardedNormal;
             list_.SetCheckState(i, FALSE);
             Aggregator.AddToArchive(feed_item->title);
+            save_archive = true;
           }
         }
       }
+      if (save_archive)
+        Aggregator.SaveArchive();
       return TRUE;
     }
     // Settings
@@ -181,6 +185,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
     feed_item->state = FeedItemState::DiscardedNormal;
     list_.SetCheckState(item_index, FALSE);
     Aggregator.AddToArchive(feed_item->title);
+    Aggregator.SaveArchive();
 
   } else if (answer == L"DiscardTorrents") {
     auto anime_item = AnimeDatabase.FindItem(feed_item->episode_data.anime_id);

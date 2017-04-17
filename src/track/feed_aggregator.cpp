@@ -261,6 +261,7 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
 
   feed_item->state = FeedItemState::DiscardedNormal;
   AddToArchive(feed_item->title);
+  SaveArchive();
   ui::OnFeedDownload(true, L"");
 
   if (!file.empty()) {
