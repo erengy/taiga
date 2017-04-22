@@ -403,7 +403,11 @@ Stream FindStreamFromUrl(const std::wstring& url) {
   if (SearchRegex(url, L"daisuki\\.net/[a-z]+/[a-z]+/anime/watch"))
     return Stream::Daisuki;
 
-  if (SearchRegex(url, L"(?:(?:localhost|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):32400|plex.tv)/web/"))
+  if (InStr(url, L"plex.tv/web/") > -1 ||
+      InStr(url, L"localhost:32400/web/") > -1 ||
+      SearchRegex(url, L"\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:32400/web/") ||
+      SearchRegex(url, L"plex\\.[a-z0-9-]+\\.[a-z0-9-]+") ||
+      SearchRegex(url, L"[a-z0-9-]+\\.[a-z0-9-]+/plex"))
     return Stream::Plex;
 
   if (InStr(url, L"veoh.com/watch/") > -1)
