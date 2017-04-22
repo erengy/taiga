@@ -24,19 +24,17 @@
 #include "taiga/settings.h"
 #include "track/media.h"
 
-enum StreamingVideoProvider {
-  kStreamUnknown = -1,
-  kStreamFirst,
-  kStreamAnimelab = kStreamFirst,
-  kStreamAnn,
-  kStreamCrunchyroll,
-  kStreamDaisuki,
-  kStreamPlex,
-  kStreamVeoh,
-  kStreamViz,
-  kStreamWakanim,
-  kStreamYoutube,
-  kStreamLast
+enum class Stream {
+  Unknown,
+  Animelab,
+  Ann,
+  Crunchyroll,
+  Daisuki,
+  Plex,
+  Veoh,
+  Viz,
+  Wakanim,
+  Youtube,
 };
 
 enum WebBrowserEngine {
@@ -363,80 +361,86 @@ std::wstring MediaPlayers::GetTitleFromBrowser(
   }
 }
 
-bool IsStreamSettingEnabled(StreamingVideoProvider stream_provider) {
-  switch (stream_provider) {
-    case kStreamAnimelab:
+bool IsStreamSettingEnabled(Stream stream) {
+  switch (stream) {
+    case Stream::Animelab:
       return Settings.GetBool(taiga::kStream_Animelab);
-    case kStreamAnn:
+    case Stream::Ann:
       return Settings.GetBool(taiga::kStream_Ann);
-    case kStreamCrunchyroll:
+    case Stream::Crunchyroll:
       return Settings.GetBool(taiga::kStream_Crunchyroll);
-    case kStreamDaisuki:
+    case Stream::Daisuki:
       return Settings.GetBool(taiga::kStream_Daisuki);
-    case kStreamPlex:
+    case Stream::Plex:
       return Settings.GetBool(taiga::kStream_Plex);
-    case kStreamVeoh:
+    case Stream::Veoh:
       return Settings.GetBool(taiga::kStream_Veoh);
-    case kStreamViz:
+    case Stream::Viz:
       return Settings.GetBool(taiga::kStream_Viz);
-    case kStreamWakanim:
+    case Stream::Wakanim:
       return Settings.GetBool(taiga::kStream_Wakanim);
-    case kStreamYoutube:
+    case Stream::Youtube:
       return Settings.GetBool(taiga::kStream_Youtube);
   }
 
   return false;
 }
 
-bool MatchStreamUrl(StreamingVideoProvider stream_provider,
-                    const std::wstring& url) {
-  switch (stream_provider) {
-    case kStreamAnimelab:
-      return InStr(url, L"animelab.com/player/") > -1;
-    case kStreamAnn:
-      return SearchRegex(url, L"animenewsnetwork.com/video/[0-9]+");
-    case kStreamCrunchyroll:
-      return SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/episode-[0-9]+.*-[0-9]+") ||
-             SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/.*-movie-[0-9]+");
-    case kStreamDaisuki:
-      return SearchRegex(url, L"daisuki\\.net/[a-z]+/[a-z]+/anime/watch");
-    case kStreamPlex:
-      return SearchRegex(url,
-          L"(?:(?:localhost|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):32400|plex.tv)/web/");
-    case kStreamVeoh:
-      return InStr(url, L"veoh.com/watch/") > -1;
-    case kStreamViz:
-      return SearchRegex(url, L"viz.com/watch/streaming/[^/]+-episode-[0-9]+/") ||
-             SearchRegex(url, L"viz.com/watch/streaming/[^/]+-movie/");
-    case kStreamWakanim:
-      return SearchRegex(url, L"wakanim\\.tv/video(-premium)?/[^/]+/");
-    case kStreamYoutube:
-      return InStr(url, L"youtube.com/watch") > -1;
-  }
+Stream FindStreamFromUrl(const std::wstring& url) {
+  if (url.empty())
+    return Stream::Unknown;
 
-  return false;
+  if (InStr(url, L"animelab.com/player/") > -1)
+    return Stream::Animelab;
+
+  if (SearchRegex(url, L"animenewsnetwork.com/video/[0-9]+"))
+    return Stream::Ann;
+
+  if (SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/episode-[0-9]+.*-[0-9]+") ||
+      SearchRegex(url, L"crunchyroll\\.[a-z.]+/[^/]+/.*-movie-[0-9]+"))
+    return Stream::Crunchyroll;
+
+  if (SearchRegex(url, L"daisuki\\.net/[a-z]+/[a-z]+/anime/watch"))
+    return Stream::Daisuki;
+
+  if (SearchRegex(url, L"(?:(?:localhost|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):32400|plex.tv)/web/"))
+    return Stream::Plex;
+
+  if (InStr(url, L"veoh.com/watch/") > -1)
+    return Stream::Veoh;
+
+  if (SearchRegex(url, L"viz.com/watch/streaming/[^/]+-episode-[0-9]+/") ||
+      SearchRegex(url, L"viz.com/watch/streaming/[^/]+-movie/"))
+    return Stream::Viz;
+
+  if (SearchRegex(url, L"wakanim\\.tv/video(-premium)?/[^/]+/"))
+    return Stream::Wakanim;
+
+  if (InStr(url, L"youtube.com/watch") > -1)
+    return Stream::Youtube;
+
+  return Stream::Unknown;
 }
 
-void CleanStreamTitle(StreamingVideoProvider stream_provider,
-                      std::wstring& title) {
-  switch (stream_provider) {
+void CleanStreamTitle(Stream stream, std::wstring& title) {
+  switch (stream) {
     // AnimeLab
-    case kStreamAnimelab:
+    case Stream::Animelab:
       EraseLeft(title, L"AnimeLab - ");
       break;
     // Anime News Network
-    case kStreamAnn:
+    case Stream::Ann:
       EraseRight(title, L" - Anime News Network");
       Erase(title, L" (s)");
       Erase(title, L" (d)");
       break;
     // Crunchyroll
-    case kStreamCrunchyroll:
+    case Stream::Crunchyroll:
       EraseLeft(title, L"Crunchyroll - Watch ");
       EraseRight(title, L" - Movie - Movie");
       break;
     // DAISUKI
-    case kStreamDaisuki: {
+    case Stream::Daisuki: {
       EraseRight(title, L" - DAISUKI");
       auto pos = title.rfind(L" - ");
       if (pos != title.npos) {
@@ -447,36 +451,36 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
       break;
     }
     // Plex
-    case kStreamPlex: {
+    case Stream::Plex: {
       EraseLeft(title, L"Plex");
       EraseLeft(title, L"\u25B6 ");  // black right pointing triangle
       ReplaceString(title, L" \u00B7 ", L"");
       break;
     }
     // Veoh
-    case kStreamVeoh:
+    case Stream::Veoh:
       EraseLeft(title, L"Watch Videos Online | ");
       EraseRight(title, L" | Veoh.com");
       break;
     // Viz Anime
-    case kStreamViz:
+    case Stream::Viz:
       EraseRight(title, L" // VIZ");
       break;
     // Wakanim
-    case kStreamWakanim:
+    case Stream::Wakanim:
       EraseRight(title, L" - Wakanim.TV");
       EraseRight(title, L" / Streaming");
       ReplaceString(title, 0, L" de ", L" ", false, false);
       ReplaceString(title, 0, L" en VOSTFR", L" VOSTFR", false, false);
       break;
     // YouTube
-    case kStreamYoutube:
+    case Stream::Youtube:
       EraseLeft(title, L"\u25B6 ");  // black right pointing triangle
       EraseRight(title, L" - YouTube");
       break;
     // Some other website, or URL is not found
     default:
-    case kStreamUnknown:
+    case Stream::Unknown:
       title.clear();
       break;
   }
@@ -485,24 +489,13 @@ void CleanStreamTitle(StreamingVideoProvider stream_provider,
 std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
     const std::wstring& url,
     std::wstring& title) {
-  StreamingVideoProvider stream_provider = kStreamUnknown;
-
-  // Check URL for known streaming video providers
-  if (!url.empty()) {
-    for (int i = kStreamFirst; i < kStreamLast; i++) {
-      auto stream = static_cast<StreamingVideoProvider>(i);
-      if (IsStreamSettingEnabled(stream)) {
-        if (MatchStreamUrl(stream, url)) {
-          stream_provider = stream;
-          break;
-        }
-      }
-    }
+  const auto stream = FindStreamFromUrl(url);
+  if (IsStreamSettingEnabled(stream)) {
+    EraseLeft(title, L"New Tab");
+    CleanStreamTitle(stream, title);
+  } else {
+    title.clear();
   }
-
-  // Clean-up title
-  EraseLeft(title, L"New Tab");
-  CleanStreamTitle(stream_provider, title);
 
   return title;
 }
