@@ -484,6 +484,10 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
     ui::ClearStatusText();
+    if (!anime_item->GetNextEpisodePath().empty()) {
+      if (OpenFolderAndSelectFile(anime_item->GetNextEpisodePath()))
+        return;
+    }
     if (!anime_item->GetFolder().empty()) {
       Execute(anime_item->GetFolder());
     }

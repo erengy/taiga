@@ -36,6 +36,7 @@ bool Execute(const std::wstring& path, const std::wstring& parameters = L"", int
 bool ExecuteFile(const std::wstring& path, std::wstring parameters = L"");
 void ExecuteLink(const std::wstring& link);
 
+bool OpenFolderAndSelectFile(const std::wstring& path);
 bool CreateFolder(const std::wstring& path);
 int DeleteFolder(std::wstring path);
 

@@ -169,6 +169,16 @@ void ExecuteLink(const std::wstring& link) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool OpenFolderAndSelectFile(const std::wstring& path) {
+  HRESULT result = S_FALSE;
+  const auto pidl = ::ILCreateFromPath(path.c_str());
+  if (pidl) {
+    result = ::SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
+    ::ILFree(pidl);
+  }
+  return result == S_OK;
+}
+
 bool CreateFolder(const std::wstring& path) {
   auto result = SHCreateDirectoryEx(nullptr, path.c_str(), nullptr);
   return result == ERROR_SUCCESS || result == ERROR_ALREADY_EXISTS;
