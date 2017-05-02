@@ -484,12 +484,15 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
       }
     }
     ui::ClearStatusText();
-    if (!anime_item->GetNextEpisodePath().empty()) {
-      if (OpenFolderAndSelectFile(anime_item->GetNextEpisodePath()))
-        return;
+    const auto next_episode_path = anime_item->GetNextEpisodePath();
+    const auto anime_folder = anime_item->GetFolder();
+    if (!next_episode_path.empty()) {
+      if (anime_folder.empty() || StartsWith(next_episode_path, anime_folder))
+        if (OpenFolderAndSelectFile(next_episode_path))
+          return;
     }
-    if (!anime_item->GetFolder().empty()) {
-      Execute(anime_item->GetFolder());
+    if (!anime_folder.empty()) {
+      Execute(anime_folder);
     }
 
   //////////////////////////////////////////////////////////////////////////////
