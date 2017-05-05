@@ -31,7 +31,7 @@ namespace sync {
 
 bool AuthenticateUser();
 void GetUser();
-void GetLibraryEntries();
+void GetLibraryEntries(const int offset = 0);
 void GetMetadataById(int id);
 void GetSeason(const anime::Season season, const int offset);
 void SearchTitle(string_t title, int id);

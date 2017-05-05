@@ -73,7 +73,7 @@ void GetUser() {
   ServiceManager.MakeRequest(request);
 }
 
-void GetLibraryEntries() {
+void GetLibraryEntries(const int offset) {
   const auto service = taiga::GetCurrentService();
   switch (service->id()) {
     case sync::kKitsu:
@@ -92,6 +92,7 @@ void GetLibraryEntries() {
   SetActiveServiceForRequest(request);
   if (!AddAuthenticationToRequest(request))
     return;
+  request.data[L"page_offset"] = ToWstr(offset);
   ServiceManager.MakeRequest(request);
 }
 

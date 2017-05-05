@@ -61,6 +61,7 @@ private:
   void ParseGenres(const Json& json, const int anime_id) const;
   void ParseProducers(const Json& json, const int anime_id) const;
   int ParseLibraryObject(const Json& json) const;
+  void ParseLinks(const Json& json, Response& response) const;
 
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 

@@ -288,10 +288,15 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     }
 
     case kGetLibraryEntries: {
-      AnimeDatabase.SaveDatabase();
-      AnimeDatabase.SaveList();
-      ui::ChangeStatusText(L"Successfully downloaded the list.");
-      ui::OnLibraryChange();
+      const auto next_page = ToInt(response.data[L"page_offset"]);
+      if (next_page > 0) {
+        GetLibraryEntries(next_page);
+      } else {
+        AnimeDatabase.SaveDatabase();
+        AnimeDatabase.SaveList();
+        ui::ChangeStatusText(L"Successfully downloaded the list.");
+        ui::OnLibraryChange();
+      }
       break;
     }
 

@@ -40,6 +40,9 @@ constexpr auto kJsonApiMediaType = L"application/vnd.api+json";
 // changed to reduce maximum_page_size.
 constexpr auto kJsonApiMaximumPageSize = 20;
 
+// Library requests are limited to 500 entries per page.
+constexpr auto kLibraryMaximumPageSize = 500;
+
 Service::Service() {
   host_ = L"kitsu.io/api";
 
@@ -153,11 +156,10 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
 
   http_request.url.query[L"include"] = L"anime";
 
-  // Kitsu's configuration sets JSONAPI's default_page_size to 10. The only way
-  // to retrieve the entire library in a single request is to set the limit to a
-  // sufficiently big number.
-  http_request.url.query[L"page[offset]"] = L"0";
-  http_request.url.query[L"page[limit]"] = L"100000";
+  // We would prefer retrieving the entire library in a single request. However,
+  // Kitsu's server fails to respond in time for large libraries.
+  http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
+  http_request.url.query[L"page[limit]"] = ToWstr(kLibraryMaximumPageSize);
 
   UseSparseFieldsetsForAnime(http_request);
   UseSparseFieldsetsForLibraryEntries(http_request);
@@ -290,6 +292,8 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   for (const auto& value : root["included"]) {
     ParseObject(value);
   }
+
+  ParseLinks(root, response);
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
@@ -315,11 +319,7 @@ void Service::GetSeason(Response& response, HttpResponse& http_response) {
     AppendString(response.data[L"ids"], ToWstr(anime_id), L",");
   }
 
-  const auto next = JsonReadStr(root["links"], "next");
-  if (!next.empty()) {
-    Url url = StrToWstr(next);
-    response.data[L"page_offset"] = url.query[L"page[offset]"];
-  }
+  ParseLinks(root, response);
 }
 
 void Service::SearchTitle(Response& response, HttpResponse& http_response) {
@@ -688,6 +688,15 @@ int Service::ParseLibraryObject(const Json& json) const {
   anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
 
   return AnimeDatabase.UpdateItem(anime_item);
+}
+
+void Service::ParseLinks(const Json& json, Response& response) const {
+  const auto next = JsonReadStr(json["links"], "next");
+
+  if (!next.empty()) {
+    Url url = StrToWstr(next);
+    response.data[L"page_offset"] = url.query[L"page[offset]"];
+  }
 }
 
 bool Service::ParseResponseBody(const std::wstring& body,
