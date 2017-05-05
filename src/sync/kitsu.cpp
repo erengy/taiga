@@ -148,10 +148,9 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   //
   // Our "solution" to this is to allow Taiga to download the entire library
   // after each restart (i.e. last_synchronized_ is not saved on exit).
-  if (last_synchronized_ &&
-      Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary)) {
+  if (IsPartialLibraryRequest()) {
     const auto date = GetDate(last_synchronized_ - (60 * 60 * 24));  // 1 day before, to be safe
-    http_request.url.query[L"filter[since]"] = std::wstring(date);
+    http_request.url.query[L"filter[since]"] = date.to_string();
   }
 
   http_request.url.query[L"include"] = L"anime";
@@ -279,11 +278,13 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  if (!last_synchronized_ ||
-      !Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary)) {
+  ParseLinks(root, response);
+  const auto first_page = response.data[L"prev_page_offset"].empty();
+  const auto next_page = ToInt(response.data[L"next_page_offset"]);
+
+  if (!IsPartialLibraryRequest() && first_page) {
     AnimeDatabase.ClearUserData();
   }
-  last_synchronized_ = time(nullptr);  // current time
 
   for (const auto& value : root["data"]) {
     ParseLibraryObject(value);
@@ -293,7 +294,9 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     ParseObject(value);
   }
 
-  ParseLinks(root, response);
+  if (!next_page) {
+    last_synchronized_ = time(nullptr);  // current time
+  }
 }
 
 void Service::GetMetadataById(Response& response, HttpResponse& http_response) {
@@ -691,12 +694,16 @@ int Service::ParseLibraryObject(const Json& json) const {
 }
 
 void Service::ParseLinks(const Json& json, Response& response) const {
-  const auto next = JsonReadStr(json["links"], "next");
+  auto parse_link = [&](const std::string& name) {
+    const auto link = JsonReadStr(json["links"], name);
+    if (!link.empty()) {
+      Url url = StrToWstr(link);
+      response.data[StrToWstr(name) + L"_page_offset"] = url.query[L"page[offset]"];
+    }
+  };
 
-  if (!next.empty()) {
-    Url url = StrToWstr(next);
-    response.data[L"page_offset"] = url.query[L"page[offset]"];
-  }
+  parse_link("prev");
+  parse_link("next");
 }
 
 bool Service::ParseResponseBody(const std::wstring& body,
@@ -723,6 +730,13 @@ bool Service::ParseResponseBody(const std::wstring& body,
   }
 
   return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+bool Service::IsPartialLibraryRequest() const {
+  return last_synchronized_ &&
+         Settings.GetBool(taiga::kSync_Service_Kitsu_PartialLibrary);
 }
 
 }  // namespace kitsu

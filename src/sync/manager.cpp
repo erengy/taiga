@@ -254,7 +254,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
 
     case kGetSeason: {
       const auto current_page = ToInt(request.data[L"page_offset"]);
-      const auto next_page = ToInt(response.data[L"page_offset"]);
+      const auto next_page = ToInt(response.data[L"next_page_offset"]);
 
       if (current_page == 0)  // first page
         SeasonDatabase.items.clear();
@@ -288,7 +288,7 @@ void Manager::HandleResponse(Response& response, HttpResponse& http_response) {
     }
 
     case kGetLibraryEntries: {
-      const auto next_page = ToInt(response.data[L"page_offset"]);
+      const auto next_page = ToInt(response.data[L"next_page_offset"]);
       if (next_page > 0) {
         GetLibraryEntries(next_page);
       } else {

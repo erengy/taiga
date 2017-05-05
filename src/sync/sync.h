@@ -42,6 +42,7 @@ void UpdateLibraryEntry(AnimeValues& anime_values, int id,
 void DownloadImage(int id, const std::wstring& image_url);
 
 bool AddAuthenticationToRequest(Request& request);
+void AddPageOffsetToRequest(const int offset, Request& request);
 bool AddServiceDataToRequest(Request& request, int id);
 bool RequestNeedsAuthentication(RequestType request_type, ServiceId service_id);
 void SetActiveServiceForRequest(Request& request);

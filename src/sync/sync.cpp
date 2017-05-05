@@ -92,7 +92,7 @@ void GetLibraryEntries(const int offset) {
   SetActiveServiceForRequest(request);
   if (!AddAuthenticationToRequest(request))
     return;
-  request.data[L"page_offset"] = ToWstr(offset);
+  AddPageOffsetToRequest(offset, request);
   ServiceManager.MakeRequest(request);
 }
 
@@ -110,9 +110,9 @@ void GetSeason(const anime::Season season, const int offset) {
   SetActiveServiceForRequest(request);
   if (!AddAuthenticationToRequest(request))
     return;
+  AddPageOffsetToRequest(offset, request);
   request.data[L"year"] = ToWstr(season.year);
   request.data[L"season"] = ToLower_Copy(season.GetName());
-  request.data[L"page_offset"] = ToWstr(offset);
   ServiceManager.MakeRequest(request);
 }
 
@@ -216,6 +216,14 @@ bool AddAuthenticationToRequest(Request& request) {
       taiga::GetCurrentPassword();
 
   return true;
+}
+
+void AddPageOffsetToRequest(const int offset, Request& request) {
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kKitsu:
+      request.data[L"page_offset"] = ToWstr(offset);
+      break;
+  }
 }
 
 bool AddServiceDataToRequest(Request& request, int id) {
