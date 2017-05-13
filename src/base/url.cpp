@@ -92,6 +92,8 @@ std::wstring Url::Build() const {
 void Url::Crack(std::wstring url) {
   Clear();
 
+  Trim(url, L"\t\n\r ");
+
   // Get protocol
   size_t i = url.find(L"://", 0);
   if (i != std::wstring::npos) {
