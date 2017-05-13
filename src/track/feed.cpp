@@ -132,7 +132,8 @@ bool Feed::Load() {
 
   xml_document document;
   std::wstring file = GetDataPath() + L"feed.xml";
-  xml_parse_result parse_result = document.load_file(file.c_str());
+  const unsigned int options = pugi::parse_default | pugi::parse_trim_pcdata;
+  xml_parse_result parse_result = document.load_file(file.c_str(), options);
 
   if (parse_result.status != pugi::status_ok)
     return false;
