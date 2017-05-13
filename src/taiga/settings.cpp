@@ -88,7 +88,7 @@ const std::wstring kDefaultFormatBalloon =
 const std::wstring kDefaultTorrentAppPath =
     L"C:\\Program Files\\uTorrent\\uTorrent.exe";
 const std::wstring kDefaultTorrentSearch =
-    L"https://nyaa.pantsu.cat/feed?c=3_5&q=%title%";
+    L"https://nyaa.si/rss?c=1_2&f=0&q=%title%";
 const std::wstring kDefaultTorrentSource =
     L"https://tokyotosho.info/rss.php?filter=1,11&zwnj=0";
 

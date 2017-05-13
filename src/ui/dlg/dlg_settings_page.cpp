@@ -314,11 +314,13 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://haruhichan.com/feed/feed.php?mode=rss");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://horriblesubs.info/rss.php?res=all");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://nyaa.pantsu.cat/feed?c=3_5");
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://nyaa.si/rss?c=1_2&f=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://tracker.minglong.org/rss.xml");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.shanaproject.com/feeds/site/");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings[taiga::kTorrent_Discovery_Source].c_str());
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://nyaa.pantsu.cat/feed?c=3_5&q=%title%");
+      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://nyaa.si/rss?c=1_2&f=0&q=%title%");
       SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings[taiga::kTorrent_Discovery_SearchUrl].c_str());
       CheckDlgButton(IDC_CHECK_TORRENT_AUTOCHECK, Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled));
       SendDlgItemMessage(IDC_SPIN_TORRENT_INTERVAL, UDM_SETRANGE32, 10, 3600);
