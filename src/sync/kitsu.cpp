@@ -597,7 +597,8 @@ int Service::ParseAnimeObject(const Json& json) const {
   anime_item.SetSynopsis(DecodeSynopsis(JsonReadStr(attributes, "synopsis")));
 
   for (const auto& title : attributes["abbreviatedTitles"]) {
-    anime_item.InsertSynonym(StrToWstr(title));
+    if (title.is_string())
+      anime_item.InsertSynonym(StrToWstr(title));
   }
 
   enum class TitleLanguage {
