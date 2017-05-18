@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "base/file.h"
+#include "base/html.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/time.h"
@@ -423,43 +424,55 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
   return true;
 }
 
-void Aggregator::ParseDescription(FeedItem& feed_item,
-                                  const std::wstring& source) {
+void Aggregator::ParseFeedItem(const std::wstring& source, FeedItem& feed_item) {
+  Url url(source);
+
+  auto parse_magnet_link = [&]() {
+    feed_item.magnet_link = InStr(feed_item.description,
+                                  L"<a href=\"magnet:?", L"\">");
+    if (!feed_item.magnet_link.empty())
+      feed_item.magnet_link = L"magnet:?" + feed_item.magnet_link;
+  };
+
+  // AniDex
+  if (InStr(url.host, L"anidex", 0, true) > -1) {
+    feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L" |");
+    parse_magnet_link();
+
   // Haruhichan
-  if (InStr(source, L"haruhichan", 0, true) > -1) {
+  } else if (InStr(url.host, L"haruhichan", 0, true) > -1) {
     feed_item.info_link = feed_item.description;
 
-  // NyaaTorrents
-  } else if (InStr(source, L"nyaa", 0, true) > -1) {
-    std::vector<std::wstring> description_vector;
-    Split(feed_item.description, L" - ", description_vector);
-    if (description_vector.size() > 1) {
-      feed_item.episode_data.file_size = description_vector.at(1);
-      description_vector.erase(description_vector.begin() + 1);
-      feed_item.description = Join(description_vector, L" - ");
-    }
+  // minglong
+  } else if (InStr(url.host, L"minglong", 0, true) > -1) {
+    feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
+
+  // Nyaa Pantsu
+  } else if (InStr(url.host, L"nyaa.pantsu", 0, true) > -1) {
     feed_item.info_link = feed_item.guid;
 
-  // TokyoTosho
-  } else if (InStr(source, L"tokyotosho", 0, true) > -1) {
-    std::wstring size_str = L"Size: ";
-    std::wstring comment_str = L"Comment: ";
-    std::vector<std::wstring> description_vector;
-    Split(feed_item.description, L"\n", description_vector);
-    feed_item.description.clear();
-    for (const auto& it : description_vector) {
-      if (StartsWith(it, size_str)) {
-        feed_item.episode_data.file_size = it.substr(size_str.length());
-      } else if (StartsWith(it, comment_str)) {
-        feed_item.description = it.substr(comment_str.length());
-      } else if (InStr(it, L"magnet:?") > -1) {
-        // TODO: This doesn't work because we've used StripHtmlTags beforehand.
-        feed_item.magnet_link = L"magnet:?" +
-            InStr(it, L"<a href=\"magnet:?", L"\">Magnet Link</a>");
-      }
-    }
+  // Nyaa.si
+  } else if (InStr(url.host, L"nyaa.si", 0, true) > -1) {
+    feed_item.info_link = feed_item.guid;
+
+  // Tokyo Toshokan
+  } else if (InStr(url.host, L"tokyotosho", 0, true) > -1) {
+    feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
+    parse_magnet_link();
+    feed_item.description = InStr(feed_item.description, L"Comment: ", L"");
     feed_item.info_link = feed_item.guid;
   }
+}
+
+void Aggregator::CleanupDescription(std::wstring& description) {
+  ReplaceString(description, L"</p>", L"\n");
+  ReplaceString(description, L"<br/>", L"\n");
+  ReplaceString(description, L"<br />", L"\n");
+  StripHtmlTags(description);
+  Trim(description, L" \n");
+  while (ReplaceString(description, L"\n\n", L"\n"));
+  ReplaceString(description, L"\n", L" | ");
+  while (ReplaceString(description, L"  ", L" "));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

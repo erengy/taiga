@@ -147,7 +147,8 @@ public:
   bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
 
   void ExamineData(Feed& feed);
-  void ParseDescription(FeedItem& feed_item, const std::wstring& source);
+  void ParseFeedItem(const std::wstring& source, FeedItem& feed_item);
+  void CleanupDescription(std::wstring& description);
 
   bool LoadArchive();
   bool SaveArchive() const;

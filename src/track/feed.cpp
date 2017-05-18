@@ -178,22 +178,15 @@ void Feed::Load(const xml_document& document) {
     if (!permalink.empty())
       item.permalink = ToBool(permalink);
 
-    // Skip if title or link is empty
     if (category == FeedCategory::Link)
       if (item.title.empty() || item.link.empty())
         continue;
 
-    // Clean up title
     DecodeHtmlEntities(item.title);
-    ReplaceString(item.title, L"\\'", L"'");
-    // Clean up description
-    ReplaceString(item.description, L"<br/>", L"\n");
-    ReplaceString(item.description, L"<br />", L"\n");
-    StripHtmlTags(item.description);
     DecodeHtmlEntities(item.description);
-    Trim(item.description, L" \n");
-    Aggregator.ParseDescription(item, link);
-    ReplaceString(item.description, L"\n", L" | ");
+
+    Aggregator.ParseFeedItem(link, item);
+    Aggregator.CleanupDescription(item.description);
 
     items.push_back(item);
   }
