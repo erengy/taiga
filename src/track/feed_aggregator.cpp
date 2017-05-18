@@ -62,6 +62,7 @@ bool Aggregator::CheckFeed(FeedCategory category, const std::wstring& source,
   HttpRequest http_request;
   http_request.url = feed.link;
   http_request.parameter = reinterpret_cast<LPARAM>(&feed);
+  http_request.header[L"Accept"] = L"application/rss+xml, */*";
   http_request.header[L"Accept-Encoding"] = L"gzip";
 
   switch (feed.category) {
