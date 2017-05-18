@@ -143,6 +143,7 @@ enum AppSettingName {
   kTorrent_Download_CreateSubfolder,
   kTorrent_Download_SortBy,
   kTorrent_Download_SortOrder,
+  kTorrent_Download_UseMagnet,
   kTorrent_Filter_Enabled,
   kTorrent_Filter_ArchiveMaxCount,
 

@@ -436,6 +436,7 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kSync_Service_Kitsu_UseHttps, {L"", L"Services / Kitsu / Use HTTPS connections"}},
         {taiga::kSync_Service_Mal_UseHttps, {L"", L"Services / MyAnimeList / Use HTTPS connections"}},
         {taiga::kTorrent_Filter_ArchiveMaxCount, {L"", L"Torrents / Archive limit"}},
+        {taiga::kTorrent_Download_UseMagnet, {L"", L"Torrents / Use magnet links if available"}},
       });
       win::ListView list = GetDlgItem(IDC_LIST_ADVANCED_SETTINGS);
       list.SetExtendedStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);

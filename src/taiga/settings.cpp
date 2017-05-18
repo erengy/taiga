@@ -208,6 +208,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kTorrent_Download_CreateSubfolder, nullptr, L"rss/torrent/options/autocreatefolder");
   INITKEY(kTorrent_Download_SortBy, L"episode_number", L"rss/torrent/options/downloadsortby");
   INITKEY(kTorrent_Download_SortOrder, L"ascending", L"rss/torrent/options/downloadsortorder");
+  INITKEY(kTorrent_Download_UseMagnet, L"false", L"rss/torrent/options/downloadusemagnet");
   INITKEY(kTorrent_Filter_Enabled, L"true", L"rss/torrent/filter/enabled");
   INITKEY(kTorrent_Filter_ArchiveMaxCount, L"1000", L"rss/torrent/filter/archive_maxcount");
 
