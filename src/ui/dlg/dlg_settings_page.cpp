@@ -310,6 +310,7 @@ BOOL SettingsPage::OnInitDialog() {
 
     // Torrents > Discovery
     case kSettingsPageTorrentsDiscovery: {
+      AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://anidex.info/rss?cat=1&lang_id=1");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://feeds.feedburner.com/anime-rss-atom-feeds?format=xml");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://haruhichan.com/feed/feed.php?mode=rss");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"http://horriblesubs.info/rss.php?res=all");
@@ -319,6 +320,7 @@ BOOL SettingsPage::OnInitDialog() {
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://tokyotosho.info/rss.php?filter=1,11&zwnj=0");
       AddComboString(IDC_COMBO_TORRENT_SOURCE, L"https://www.shanaproject.com/feeds/site/");
       SetDlgItemText(IDC_COMBO_TORRENT_SOURCE, Settings[taiga::kTorrent_Discovery_Source].c_str());
+      AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://anidex.info/rss?cat=1&lang_id=1&q=%title%");
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://nyaa.pantsu.cat/feed?c=3_5&q=%title%");
       AddComboString(IDC_COMBO_TORRENT_SEARCH, L"https://nyaa.si/rss?c=1_2&f=0&q=%title%");
       SetDlgItemText(IDC_COMBO_TORRENT_SEARCH, Settings[taiga::kTorrent_Discovery_SearchUrl].c_str());
