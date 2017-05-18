@@ -161,6 +161,7 @@ private:
   bool CompareFeedItems(const GenericFeedItem& item1, const GenericFeedItem& item2);
   FeedItem* FindFeedItemByLink(Feed& feed, const std::wstring& link);
   void HandleFeedDownloadOpen(FeedItem& feed_item, const std::wstring& file);
+  bool IsMagnetLink(const FeedItem& feed_item) const;
 
   std::vector<std::wstring> download_queue_;
   std::vector<Feed> feeds_;

@@ -172,7 +172,7 @@ bool Aggregator::Download(FeedCategory category, const FeedItem* feed_item) {
   if (!feed_item)
     return false;
 
-  if (StartsWith(feed_item->link, L"magnet")) {
+  if (IsMagnetLink(*feed_item)) {
     ui::ChangeStatusText(L"Opening magnet link for \"" + feed_item->title + L"\"...");
     const std::string empty_data;
     HandleFeedDownload(feed, empty_data);
@@ -260,16 +260,17 @@ void Aggregator::HandleFeedDownload(Feed& feed, const std::string& data) {
     }
   }
 
+  if (IsMagnetLink(*feed_item)) {
+    file = !feed_item->magnet_link.empty() ? feed_item->magnet_link :
+                                             feed_item->link;
+  }
+
   feed_item->state = FeedItemState::DiscardedNormal;
   AddToArchive(feed_item->title);
   SaveArchive();
   ui::OnFeedDownload(true, L"");
 
-  if (!file.empty()) {
-    HandleFeedDownloadOpen(*feed_item, file);
-  } else {
-    ExecuteLink(feed_item->link);  // magnet link
-  }
+  HandleFeedDownloadOpen(*feed_item, file);
 
   if (!download_queue_.empty())
     Download(feed.category, nullptr);
@@ -361,6 +362,17 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
   }
 
   Execute(app_path, parameters, show_command);
+}
+
+bool Aggregator::IsMagnetLink(const FeedItem& feed_item) const {
+  if (Settings.GetBool(taiga::kTorrent_Download_UseMagnet) &&
+      !feed_item.magnet_link.empty())
+    return true;
+
+  if (StartsWith(feed_item.link, L"magnet"))
+    return true;
+
+  return false;
 }
 
 bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
