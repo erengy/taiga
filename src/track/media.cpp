@@ -440,12 +440,12 @@ bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
       ConvertToLongPath(path);
       if (Meow.IsValidAnimeType(path)) {
         title = path;
-        break;
+        return true;
       }
     }
   }
 
-  return true;
+  return false;
 }
 
 std::wstring MediaPlayers::GetTitleFromWinampAPI(HWND hwnd, bool use_unicode) {
