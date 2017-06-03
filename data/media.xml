@@ -283,8 +283,9 @@
 		<name>SMPlayer</name>
 		<enabled>1</enabled>
 		<visible>1</visible>
-		<mode>0</mode>
+		<mode>6</mode>
 		<class>QWidget</class>
+		<class>Qt5WindowIcon</class>
 		<file>smplayer.exe</file>
 		<file>smplayer2.exe</file>
 		<folder>%ProgramFiles%\SMPlayer\</folder>
