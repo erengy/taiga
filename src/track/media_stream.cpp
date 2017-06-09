@@ -33,6 +33,7 @@ enum class Stream {
   Plex,
   Veoh,
   Viz,
+  Vrv,
   Wakanim,
   Youtube,
 };
@@ -377,6 +378,8 @@ bool IsStreamSettingEnabled(Stream stream) {
       return Settings.GetBool(taiga::kStream_Veoh);
     case Stream::Viz:
       return Settings.GetBool(taiga::kStream_Viz);
+    case Stream::Vrv:
+      return Settings.GetBool(taiga::kStream_Vrv);
     case Stream::Wakanim:
       return Settings.GetBool(taiga::kStream_Wakanim);
     case Stream::Youtube:
@@ -416,6 +419,9 @@ Stream FindStreamFromUrl(const std::wstring& url) {
   if (SearchRegex(url, L"viz.com/watch/streaming/[^/]+-episode-[0-9]+/") ||
       SearchRegex(url, L"viz.com/watch/streaming/[^/]+-movie/"))
     return Stream::Viz;
+
+  if (InStr(url, L"vrv.co/watch") > -1)
+    return Stream::Vrv;
 
   if (SearchRegex(url, L"wakanim\\.tv/video(-premium)?/[^/]+/"))
     return Stream::Wakanim;
@@ -469,6 +475,11 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
     // Viz Anime
     case Stream::Viz:
       EraseRight(title, L" // VIZ");
+      break;
+    // VRV
+    case Stream::Vrv:
+      EraseLeft(title, L"VRV - Watch ");
+      ReplaceString(title, 0, L": EP ", L" - EP ", false, false);
       break;
     // Wakanim
     case Stream::Wakanim:

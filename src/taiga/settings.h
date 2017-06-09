@@ -106,6 +106,7 @@ enum AppSettingName {
   kStream_Plex,
   kStream_Veoh,
   kStream_Viz,
+  kStream_Vrv,
   kStream_Wakanim,
   kStream_Youtube,
 

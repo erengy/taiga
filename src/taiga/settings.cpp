@@ -171,6 +171,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kStream_Plex, L"true", L"recognition/streaming/providers/plex");
   INITKEY(kStream_Veoh, L"true", L"recognition/streaming/providers/veoh");
   INITKEY(kStream_Viz, L"true", L"recognition/streaming/providers/viz");
+  INITKEY(kStream_Vrv, L"true", L"recognition/streaming/providers/vrv");
   INITKEY(kStream_Wakanim, L"true", L"recognition/streaming/providers/wakanim");
   INITKEY(kStream_Youtube, L"true", L"recognition/streaming/providers/youtube");
 
