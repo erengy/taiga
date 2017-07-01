@@ -463,6 +463,8 @@ void Aggregator::ParseFeedItem(const std::wstring& source, FeedItem& feed_item) 
   // Nyaa Pantsu
   } else if (InStr(url.host, L"nyaa.pantsu", 0, true) > -1) {
     feed_item.info_link = feed_item.guid;
+    feed_item.episode_data.file_size = ToSizeString(
+        std::wcstoull(feed_item.enclosure_length.c_str(), nullptr, 10));
 
   // Nyaa.si
   } else if (InStr(url.host, L"nyaa.si", 0, true) > -1) {
