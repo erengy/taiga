@@ -23,6 +23,11 @@ call %vcvarsall% || (
 )
 
 :build_libcurl
+if exist src\curl\builds (
+  echo Clearing previous libcurl builds...
+  rmdir /s /q src\curl\builds
+)
+
 cd src\curl\winbuild\
 
 echo Building libcurl for Debug configuration...
