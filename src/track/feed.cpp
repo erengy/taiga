@@ -174,6 +174,13 @@ void Feed::Load(const xml_document& document) {
     item.guid = XmlReadStrValue(node, L"guid");
     item.pub_date = XmlReadStrValue(node, L"pubDate");
 
+    xml_node enclosure_node = node.child(L"enclosure");
+    if (!enclosure_node.empty()) {
+      item.enclosure_url = enclosure_node.attribute(L"url").value();
+      item.enclosure_length = enclosure_node.attribute(L"length").value();
+      item.enclosure_type = enclosure_node.attribute(L"type").value();
+    }
+
     auto permalink = XmlReadStrValue(node, L"isPermaLink");
     if (!permalink.empty())
       item.permalink = ToBool(permalink);

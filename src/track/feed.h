@@ -65,7 +65,9 @@ public:
                author,
                category,
                comments,
-               enclosure,
+               enclosure_url,
+               enclosure_length,
+               enclosure_type,
                guid,
                pub_date,
                source;
