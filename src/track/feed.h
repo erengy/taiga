@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -88,6 +89,7 @@ public:
   bool operator<(const FeedItem& item) const;
   bool operator==(const FeedItem& item) const;
 
+  std::map<std::wstring, std::wstring> elements;
   std::wstring info_link;
   std::wstring magnet_link;
   FeedItemState state;

@@ -181,6 +181,12 @@ void Feed::Load(const xml_document& document) {
       item.enclosure_type = enclosure_node.attribute(L"type").value();
     }
 
+    for (auto element : node.children()) {
+      if (InStr(element.name(), L":") > -1) {
+        item.elements[element.name()] = element.child_value();
+      }
+    }
+
     auto permalink = XmlReadStrValue(node, L"isPermaLink");
     if (!permalink.empty())
       item.permalink = ToBool(permalink);
