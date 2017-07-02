@@ -30,6 +30,7 @@ enum class Stream {
   Ann,
   Crunchyroll,
   Daisuki,
+  Hidive,
   Plex,
   Veoh,
   Viz,
@@ -372,6 +373,8 @@ bool IsStreamSettingEnabled(Stream stream) {
       return Settings.GetBool(taiga::kStream_Crunchyroll);
     case Stream::Daisuki:
       return Settings.GetBool(taiga::kStream_Daisuki);
+    case Stream::Hidive:
+      return Settings.GetBool(taiga::kStream_Hidive);
     case Stream::Plex:
       return Settings.GetBool(taiga::kStream_Plex);
     case Stream::Veoh:
@@ -405,6 +408,9 @@ Stream FindStreamFromUrl(const std::wstring& url) {
 
   if (SearchRegex(url, L"daisuki\\.net/[a-z]+/[a-z]+/anime/watch"))
     return Stream::Daisuki;
+
+  if (InStr(url, L"hidive.com/stream/") > -1)
+    return Stream::Hidive;
 
   if (InStr(url, L"plex.tv/web/") > -1 ||
       InStr(url, L"localhost:32400/web/") > -1 ||
@@ -458,6 +464,10 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
       } else {
         title.clear();
       }
+      break;
+    }
+    // HIDIVE
+    case Stream::Hidive: {
       break;
     }
     // Plex
