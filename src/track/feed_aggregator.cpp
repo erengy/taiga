@@ -469,6 +469,17 @@ void Aggregator::ParseFeedItem(const std::wstring& source, FeedItem& feed_item) 
   // Nyaa.si
   } else if (InStr(url.host, L"nyaa.si", 0, true) > -1) {
     feed_item.info_link = feed_item.guid;
+    if (feed_item.description.empty()) {
+      auto append_description = [&](const std::wstring& title, const std::wstring& name) {
+        if (feed_item.elements.count(name))
+          AppendString(feed_item.description, title + feed_item.elements[name]);
+      };
+      append_description(L"Seeders: ", L"nyaa:seeders");
+      append_description(L"Leechers: ", L"nyaa:leechers");
+      append_description(L"Downloads: ", L"nyaa:downloads");
+    }
+    if (feed_item.elements.count(L"nyaa:size"))
+      feed_item.episode_data.file_size = feed_item.elements[L"nyaa:size"];
 
   // Tokyo Toshokan
   } else if (InStr(url.host, L"tokyotosho", 0, true) > -1) {
