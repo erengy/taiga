@@ -78,8 +78,8 @@ const std::wstring kDefaultFormatSkype =
     L"$if(%episode%, #%episode%$if(%total%,/%total%))";
 const std::wstring kDefaultFormatTwitter =
     L"$ifequal(%episode%,%total%,Just completed: %title%"
-    L"$if(%score%, (Score: %score%)) "
-    L"%animeurl%)";
+    L"$if(%score%, (Score: %score%)) %animeurl%,"
+    L"$ifequal(%episode%,1,Started watching: %title% %animeurl%))";
 const std::wstring kDefaultFormatBalloon =
     L"$if(%title%,%title%)\\n"
     L"$if(%episode%,Episode %episode%$if(%total%,/%total%) )"
