@@ -102,6 +102,9 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\automation.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\process.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\window.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\element.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\keyword.cpp" />
@@ -262,6 +265,10 @@
     <ClCompile Include="..\..\src\ui\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\automation.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\process.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\util.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\window.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\element.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\keyword.h" />

@@ -25,6 +25,9 @@
     <Filter Include="ui">
       <UniqueIdentifier>{aad11cb9-6941-4934-9c9a-6523a6da7d06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\anisthesia">
+      <UniqueIdentifier>{11b92802-1a55-4c3d-97ea-65840c4c1c7c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\anitomy">
       <UniqueIdentifier>{09fde2fa-d11a-4179-b5ef-8f3924a3ab25}</UniqueIdentifier>
     </Filter>
@@ -150,6 +153,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\compat\settings.cpp">
       <Filter>compat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\automation.cpp">
+      <Filter>deps\anisthesia</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\process.cpp">
+      <Filter>deps\anisthesia</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\window.cpp">
+      <Filter>deps\anisthesia</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp">
       <Filter>deps\anitomy</Filter>
@@ -620,6 +632,18 @@
     </ClInclude>
     <ClInclude Include="..\..\src\compat\crypto.h">
       <Filter>compat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\automation.h">
+      <Filter>deps\anisthesia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\process.h">
+      <Filter>deps\anisthesia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\util.h">
+      <Filter>deps\anisthesia</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\window.h">
+      <Filter>deps\anisthesia</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h">
       <Filter>deps\anitomy</Filter>

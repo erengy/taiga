@@ -6,6 +6,10 @@
 	path = deps/data/anime-seasons
 	url = https://github.com/erengy/anime-seasons.git
 
+[submodule "anisthesia"]
+	path = deps/src/anisthesia
+	url = https://github.com/erengy/anisthesia.git
+
 [submodule "anitomy"]
 	path = deps/src/anitomy
 	url = https://github.com/erengy/anitomy.git
