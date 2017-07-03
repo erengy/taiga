@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <windows/win/automation.h>
+#include <anisthesia/src/win/automation.h>
 
 #include "base/process.h"
 #include "base/string.h"
@@ -39,291 +39,10 @@ enum class Stream {
   Youtube,
 };
 
-enum WebBrowserEngine {
-  kWebEngineUnknown = -1,
-  kWebEngineWebkit,   // Google Chrome (and other browsers based on Chromium)
-  kWebEngineGecko,    // Mozilla Firefox
-  kWebEngineTrident,  // Internet Explorer
-  kWebEnginePresto    // Opera (older versions)
-};
-
-class BrowserAccessibilityData {
-public:
-  BrowserAccessibilityData(const std::wstring& name, DWORD role);
-
-  std::wstring name;
-  DWORD role;
-};
-
-std::map<WebBrowserEngine, std::vector<BrowserAccessibilityData>> browser_data;
-
 ////////////////////////////////////////////////////////////////////////////////
-
-BrowserAccessibilityData::BrowserAccessibilityData(const std::wstring& name,
-                                                   DWORD role)
-    : name(name), role(role) {
-}
-
-void AddBrowserData(WebBrowserEngine browser,
-                    const std::wstring& name, DWORD role) {
-  browser_data[browser].push_back(BrowserAccessibilityData(name, role));
-}
-
-void InitializeBrowserData() {
-  if (!browser_data.empty())
-    return;
-
-  AddBrowserData(kWebEngineWebkit,
-      L"Address and search bar", ROLE_SYSTEM_TEXT);
-  AddBrowserData(kWebEngineWebkit,
-      L"Address and search bar", ROLE_SYSTEM_GROUPING);
-  AddBrowserData(kWebEngineWebkit,
-      L"Address", ROLE_SYSTEM_GROUPING);
-  AddBrowserData(kWebEngineWebkit,
-      L"Location", ROLE_SYSTEM_GROUPING);
-  AddBrowserData(kWebEngineWebkit,
-      L"Address field", ROLE_SYSTEM_TEXT);
-
-  AddBrowserData(kWebEngineGecko,
-      L"Search or enter address", ROLE_SYSTEM_TEXT);
-  AddBrowserData(kWebEngineGecko,
-      L"Go to a Website", ROLE_SYSTEM_TEXT);
-  AddBrowserData(kWebEngineGecko,
-      L"Go to a Web Site", ROLE_SYSTEM_TEXT);
-
-  AddBrowserData(kWebEngineTrident,
-      L"Address and search using Bing", ROLE_SYSTEM_TEXT);
-  AddBrowserData(kWebEngineTrident,
-      L"Address and search using Google", ROLE_SYSTEM_TEXT);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-win::AccessibleChild* FindAccessibleChild(
-    std::vector<win::AccessibleChild>& children,
-    const std::wstring& name,
-    DWORD role) {
-  win::AccessibleChild* result = nullptr;
-
-  for (auto& child : children) {
-    if (name.empty() || IsEqual(name, child.name))
-      if (!role || role == child.role)
-        result = &child;
-    if (result == nullptr && !child.children.empty())
-      result = FindAccessibleChild(child.children, name, role);
-    if (result)
-      break;
-  }
-
-  return result;
-}
-
-bool MediaPlayers::BrowserAccessibleObject::AllowChildTraverse(
-    win::AccessibleChild& child,
-    LPARAM param) {
-  switch (param) {
-    case kWebEngineUnknown:
-      return false;
-
-    case kWebEngineWebkit:
-      switch (child.role) {
-        case ROLE_SYSTEM_CLIENT:
-        case ROLE_SYSTEM_GROUPING:
-        case ROLE_SYSTEM_PAGETABLIST:
-        case ROLE_SYSTEM_TEXT:
-        case ROLE_SYSTEM_TOOLBAR:
-        case ROLE_SYSTEM_WINDOW:
-          return true;
-        default:
-          return false;
-      }
-      break;
-
-    case kWebEngineGecko:
-      switch (child.role) {
-        case ROLE_SYSTEM_APPLICATION:
-        case ROLE_SYSTEM_COMBOBOX:
-        case ROLE_SYSTEM_PAGETABLIST:
-        case ROLE_SYSTEM_TOOLBAR:
-          return true;
-        case ROLE_SYSTEM_DOCUMENT:
-        default:
-          return false;
-      }
-      break;
-
-    case kWebEngineTrident:
-      switch (child.role) {
-        case ROLE_SYSTEM_PANE:
-        case ROLE_SYSTEM_SCROLLBAR:
-          return false;
-      }
-      break;
-
-    case kWebEnginePresto:
-      switch (child.role) {
-        case ROLE_SYSTEM_DOCUMENT:
-        case ROLE_SYSTEM_PANE:
-          return false;
-      }
-      break;
-  }
-
-  return true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring MediaPlayers::FromActiveAccessibility(HWND hwnd, int web_engine,
-                                                   std::wstring& title) {
-  // Build accessibility data
-  acc_obj.children.clear();
-  if (acc_obj.FromWindow(hwnd) == S_OK) {
-    acc_obj.BuildChildren(acc_obj.children, nullptr, web_engine);
-    acc_obj.Release();
-  }
-
-  // Check other tabs
-  if (CurrentEpisode.anime_id > 0) {
-    win::AccessibleChild* child = nullptr;
-    switch (web_engine) {
-      case kWebEngineWebkit:
-      case kWebEngineGecko:
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"", ROLE_SYSTEM_PAGETABLIST);
-        break;
-      case kWebEngineTrident:
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"Tab Row", 0);
-        break;
-      case kWebEnginePresto:
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"", ROLE_SYSTEM_CLIENT);
-        break;
-    }
-    if (child) {
-      for (const auto& grandchild : child->children) {
-        if (IntersectsWith(grandchild.name, current_title())) {
-          // Tab is still open, just not active
-          return current_title();
-        }
-      }
-    }
-    // Tab is closed
-    return std::wstring();
-
-  // Find URL
-  } else {
-    win::AccessibleChild* child = nullptr;
-    switch (web_engine) {
-      case kWebEngineWebkit:
-      case kWebEngineGecko:
-      case kWebEngineTrident: {
-        InitializeBrowserData();
-        auto& child_data = browser_data[static_cast<WebBrowserEngine>(web_engine)];
-        for (const auto& data : child_data) {
-          child = FindAccessibleChild(acc_obj.children, data.name, data.role);
-          if (child)
-            break;
-        }
-        break;
-      }
-      case kWebEnginePresto:
-        child = FindAccessibleChild(acc_obj.children,
-                                    L"", ROLE_SYSTEM_CLIENT);
-        if (child && !child->children.empty()) {
-          child = FindAccessibleChild(child->children.at(0).children,
-                                      L"", ROLE_SYSTEM_TOOLBAR);
-          if (child && !child->children.empty()) {
-            child = FindAccessibleChild(child->children,
-                                        L"", ROLE_SYSTEM_COMBOBOX);
-            if (child && !child->children.empty()) {
-              child = FindAccessibleChild(child->children,
-                                          L"", ROLE_SYSTEM_TEXT);
-            }
-          }
-        }
-        break;
-    }
-    if (child) {
-      title = GetTitleFromStreamingMediaProvider(child->value, title);
-    } else {
-      title.clear();
-    }
-  }
-
-  return title;
-}
-
-std::wstring MediaPlayers::FromAutomationApi(HWND hwnd, int web_engine,
-                                             std::wstring& title) {
-  win::UIAutomation ui_automation;
-  if (!ui_automation.Initialize())
-    return std::wstring();
-
-  // Find browser
-  auto element_browser = ui_automation.ElementFromHandle(hwnd);
-  if (!element_browser)
-    return std::wstring();
-
-  // Find tabs
-  if (CurrentEpisode.anime_id > 0) {
-    bool found_tab = false;
-    auto element_tab = ui_automation.FindFirstControl(
-        element_browser, UIA_TabControlTypeId, true);
-    if (element_tab) {
-      auto element_array_tab_items = ui_automation.FindAllControls(
-          element_tab, UIA_TabItemControlTypeId, true);
-      if (element_array_tab_items) {
-        int tab_count = ui_automation.GetElementArrayLength(element_array_tab_items);
-        for (int tab_index = 0; tab_index < tab_count; ++tab_index) {
-          auto element_tab_item = ui_automation.GetElementFromArrayIndex(
-              element_array_tab_items, tab_index);
-          auto name = ui_automation.GetElementName(element_tab_item);
-          if (name.empty()) {
-            auto element_text = ui_automation.FindFirstControl(
-                element_tab_item, UIA_TextControlTypeId, true);
-            if (element_text) {
-              name = ui_automation.GetElementName(element_text);
-              element_text->Release();
-            }
-          }
-          if (IntersectsWith(name, current_title())) {
-            // Tab is still open, just not active
-            title = current_title();
-            found_tab = true;
-            break;
-          }
-        }
-        element_array_tab_items->Release();
-      }
-      element_tab->Release();
-    }
-    if (!found_tab)
-      title.clear();
-  
-  // Find URL
-  } else {
-    auto element_url = ui_automation.FindFirstControl(
-        element_browser, UIA_EditControlTypeId, false);
-    if (element_url) {
-      title = GetTitleFromStreamingMediaProvider(
-          ui_automation.GetElementValue(element_url), title);
-      element_url->Release();
-    } else {
-      title.clear();
-    }
-  }
-
-  element_browser->Release();
-
-  return title;
-}
 
 std::wstring MediaPlayers::GetTitleFromBrowser(
     HWND hwnd, const MediaPlayer& media_player) {
-  WebBrowserEngine web_engine = kWebEngineUnknown;
-
   // Get window title
   std::wstring title = GetWindowTitle(hwnd);
   EditTitle(title, media_player);
@@ -343,24 +62,19 @@ std::wstring MediaPlayers::GetTitleFromBrowser(
     }
   }
 
-  // Select web browser engine
-  if (media_player.engine == L"WebKit") {
-    web_engine = kWebEngineWebkit;
-  } else if (media_player.engine == L"Gecko") {
-    web_engine = kWebEngineGecko;
-  } else if (media_player.engine == L"Trident") {
-    web_engine = kWebEngineTrident;
-  } else if (media_player.engine == L"Presto") {
-    web_engine = kWebEnginePresto;
-  } else {
+  anisthesia::win::WebBrowser browser;
+  if (!anisthesia::win::GetWebBrowserInformation(hwnd, browser))
+    return std::wstring();
+
+  if (CurrentEpisode.anime_id > 0) {
+    for (const auto& tab : browser.tabs) {
+      if (IntersectsWith(tab, current_title()))
+        return current_title();  // Tab is still open, just not active
+    }
     return std::wstring();
   }
 
-  if (Settings[taiga::kRecognition_BrowserDetectionMethod] == L"ui_automation") {
-    return FromAutomationApi(hwnd, web_engine, title);
-  } else {
-    return FromActiveAccessibility(hwnd, web_engine, title);
-  }
+  return GetTitleFromStreamingMediaProvider(browser.address, title);
 }
 
 bool IsStreamSettingEnabled(Stream stream) {

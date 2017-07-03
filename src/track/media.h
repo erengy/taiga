@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <windows/win/accessibility.h>
-
 enum MediaPlayerModes {
   kMediaModeWindowTitle,
   kMediaModeFileHandle,
@@ -94,15 +92,7 @@ public:
   std::vector<MediaPlayer> items;
   PlayStatus play_status = PlayStatus::Stopped;
 
-  class BrowserAccessibleObject : public win::AccessibleObject {
-  public:
-    bool AllowChildTraverse(win::AccessibleChild& child, LPARAM param = 0L);
-  } acc_obj;
-
 private:
-  std::wstring FromActiveAccessibility(HWND hwnd, int web_engine, std::wstring& title);
-  std::wstring FromAutomationApi(HWND hwnd, int web_engine, std::wstring& title);
-
   HWND current_window_handle_;
   std::wstring current_player_name_;
   bool player_running_;
