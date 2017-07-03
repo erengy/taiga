@@ -20,6 +20,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
+#include <anisthesia/src/win/process.h>
 #include <anisthesia/src/win/window.h>
 
 #include "base/file.h"
@@ -432,18 +433,19 @@ bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
   if (hwnd != nullptr && process_id == 0)
     GetWindowThreadProcessId(hwnd, &process_id);
 
-  std::vector<std::wstring> process_files;
-
-  if (!GetProcessFiles(process_id, process_files))
+  std::map<DWORD, std::vector<std::wstring>> process_files = {
+    {process_id, {}}
+  };
+  if (!anisthesia::win::EnumerateFiles(process_files))
     return false;
 
-  for (auto path : process_files) {
-    if (Meow.IsValidFileExtension(GetFileExtension(path))) {
-      TranslateDeviceName(path);
-      ConvertToLongPath(path);
-      if (Meow.IsValidAnimeType(path)) {
-        title = path;
-        break;
+  for (const auto& pair : process_files) {
+    for (const auto& path : pair.second) {
+      if (Meow.IsValidFileExtension(GetFileExtension(path))) {
+        if (Meow.IsValidAnimeType(path)) {
+          title = path;
+          break;
+        }
       }
     }
   }

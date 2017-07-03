@@ -40,13 +40,11 @@ bool OpenFolderAndSelectFile(const std::wstring& path);
 bool CreateFolder(const std::wstring& path);
 int DeleteFolder(std::wstring path);
 
-void ConvertToLongPath(std::wstring& path);
 std::wstring GetExtendedLengthPath(const std::wstring& path);
 bool IsDirectory(const WIN32_FIND_DATA& find_data);
 bool IsHiddenFile(const WIN32_FIND_DATA& find_data);
 bool IsSystemFile(const WIN32_FIND_DATA& find_data);
 bool IsValidDirectory(const WIN32_FIND_DATA& find_data);
-bool TranslateDeviceName(std::wstring& path);
 
 bool FileExists(const std::wstring& file);
 bool FolderExists(const std::wstring& folder);

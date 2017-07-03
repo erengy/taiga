@@ -19,16 +19,10 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <windows.h>
 
-BOOL GetProcessFiles(ULONG process_id, std::vector<std::wstring>& files_vector);
-
 bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name);
-
 void ActivateWindow(HWND hwnd);
 std::wstring GetWindowClass(HWND hwnd);
 std::wstring GetWindowTitle(HWND hwnd);
 bool IsFullscreen(HWND hwnd);
-
-PVOID GetLibraryProcAddress(PSTR dll_module, PSTR proc_name);
