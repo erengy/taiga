@@ -20,6 +20,8 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
+#include <anisthesia/src/win/window.h>
+
 #include "base/file.h"
 #include "base/process.h"
 #include "base/string.h"
@@ -130,53 +132,54 @@ void MediaPlayers::set_title_changed(bool title_changed) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-MediaPlayer* MediaPlayers::CheckRunningPlayers() {
-  typedef std::pair<HWND, const MediaPlayer*> running_player_t;
-  std::vector<running_player_t> running_players;
-
-  // Go through windows, starting with the highest in the Z-order
-  HWND hwnd = GetWindow(ui::GetWindowHandle(ui::Dialog::Main), GW_HWNDFIRST);
-  while (hwnd != nullptr) {
-    std::wstring class_from_window;
-    std::wstring filename_from_window;
-
-    for (const auto& item : items) {
-      if (!item.enabled)
-        continue;
-      if (item.visible && !IsWindowVisible(hwnd))
-        continue;
-      switch (item.mode) {
-        default:
-          if (!Settings.GetBool(taiga::kRecognition_DetectMediaPlayers))
-            continue;
-          break;
-        case kMediaModeWebBrowser:
-          if (!Settings.GetBool(taiga::kRecognition_DetectStreamingMedia))
-            continue;
-          break;
-      }
-
-      if (class_from_window.empty())
-        class_from_window = GetWindowClass(hwnd);
-      auto class_from_item = std::find(
-          item.classes.begin(), item.classes.end(), class_from_window);
-      if (class_from_item == item.classes.end())
-        continue;
-
-      if (filename_from_window.empty())
-        filename_from_window = GetFileName(GetWindowPath(hwnd));
-      auto filename_from_item = std::find_if(
-          item.files.begin(), item.files.end(),
-          [&filename_from_window](const std::wstring& filename) {
-            return IsEqual(filename, filename_from_window);
-          });
-      if (filename_from_item == item.files.end())
-        continue;
-
-      running_players.push_back(std::make_pair(hwnd, &item));
+const MediaPlayer* GetPlayerFromWindow(const anisthesia::win::Window& window,
+                                       const std::vector<MediaPlayer>& players) {
+  for (const auto& player : players) {
+    if (!player.enabled)
+      continue;
+    if (player.visible && !IsWindowVisible(window.handle))
+      continue;
+    switch (player.mode) {
+      default:
+        if (!Settings.GetBool(taiga::kRecognition_DetectMediaPlayers))
+          continue;
+        break;
+      case kMediaModeWebBrowser:
+        if (!Settings.GetBool(taiga::kRecognition_DetectStreamingMedia))
+          continue;
+        break;
     }
 
-    hwnd = GetWindow(hwnd, GW_HWNDNEXT);
+    auto class_name = std::find(
+        player.classes.begin(), player.classes.end(), window.class_name);
+    if (class_name == player.classes.end())
+      continue;
+
+    auto file_name = std::find_if(
+        player.files.begin(), player.files.end(),
+        [&window](const std::wstring& filename) {
+          return IsEqual(filename, window.file_name);
+        });
+    if (file_name == player.files.end())
+      continue;
+
+    return &player;
+  }
+
+  return nullptr;
+}
+
+MediaPlayer* MediaPlayers::CheckRunningPlayers() {
+  using running_player_t = std::pair<HWND, const MediaPlayer*>;
+  std::vector<running_player_t> running_players;
+
+  std::vector<anisthesia::win::Window> windows;
+  anisthesia::win::EnumerateWindows(windows);
+
+  for (const auto& window : windows) {
+    const auto player = GetPlayerFromWindow(window, items);
+    if (player)
+      running_players.push_back(std::make_pair(window.handle, player));
   }
 
   const MediaPlayer* current_player = nullptr;

@@ -338,40 +338,6 @@ std::wstring GetWindowTitle(HWND hwnd) {
   return buff;
 }
 
-std::wstring GetWindowPath(HWND hwnd) {
-  DWORD dwProcessId;
-  DWORD dwSize = MAX_PATH;
-  WCHAR buff[MAX_PATH] = {'\0'};
-
-  GetWindowThreadProcessId(hwnd, &dwProcessId);
-  HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-                                FALSE, dwProcessId);
-
-  typedef DWORD (WINAPI *_QueryFullProcessImageName)(
-      HANDLE hProcess, DWORD dwFlags, LPTSTR lpExeName, PDWORD lpdwSize);
-
-  if (hProcess != NULL) {
-    bool success = false;
-    if (win::GetVersion() >= win::kVersionVista) {
-      HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
-      if (hKernel32 != NULL) {
-        auto proc = reinterpret_cast<_QueryFullProcessImageName>(
-            GetProcAddress(hKernel32, "QueryFullProcessImageNameW"));
-        if (proc != NULL) {
-          success = (proc)(hProcess, 0, buff, &dwSize) != 0;
-        }
-        FreeLibrary(hKernel32);
-      }
-    }
-    if (!success) {
-      GetModuleFileNameEx(hProcess, NULL, buff, dwSize);
-    }
-    CloseHandle(hProcess);
-  }
-
-  return buff;
-}
-
 bool IsFullscreen(HWND hwnd) {
   LONG style = GetWindowLong(hwnd, GWL_EXSTYLE);
 
