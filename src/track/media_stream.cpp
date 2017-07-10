@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <anisthesia/src/win/automation.h>
+#include <anisthesia/src/win/strategy/ui_automation.h>
 
 #include "base/process.h"
 #include "base/string.h"

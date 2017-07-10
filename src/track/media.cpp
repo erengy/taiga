@@ -20,8 +20,8 @@
 #include <windows.h>
 #include <tlhelp32.h>
 
-#include <anisthesia/src/win/process.h>
-#include <anisthesia/src/win/window.h>
+#include <anisthesia/src/win/strategy/open_files.h>
+#include <anisthesia/src/win/strategy/window_title.h>
 
 #include "base/file.h"
 #include "base/process.h"
@@ -159,7 +159,7 @@ const MediaPlayer* GetPlayerFromWindow(const anisthesia::win::Window& window,
     auto file_name = std::find_if(
         player.files.begin(), player.files.end(),
         [&window](const std::wstring& filename) {
-          return IsEqual(filename, window.file_name);
+          return IsEqual(filename, window.process_file_name);
         });
     if (file_name == player.files.end())
       continue;
@@ -174,14 +174,14 @@ MediaPlayer* MediaPlayers::CheckRunningPlayers() {
   using running_player_t = std::pair<HWND, const MediaPlayer*>;
   std::vector<running_player_t> running_players;
 
-  std::vector<anisthesia::win::Window> windows;
-  anisthesia::win::EnumerateWindows(windows);
-
-  for (const auto& window : windows) {
+  auto enum_windows_proc = [&](const anisthesia::win::Window& window) -> bool {
     const auto player = GetPlayerFromWindow(window, items);
     if (player)
       running_players.push_back(std::make_pair(window.handle, player));
-  }
+    return true;
+  };
+
+  anisthesia::win::EnumerateWindows(enum_windows_proc);
 
   const MediaPlayer* current_player = nullptr;
   std::wstring current_player_name;
@@ -433,22 +433,20 @@ bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
   if (hwnd != nullptr && process_id == 0)
     GetWindowThreadProcessId(hwnd, &process_id);
 
-  std::map<DWORD, std::vector<std::wstring>> process_files = {
-    {process_id, {}}
-  };
-  if (!anisthesia::win::EnumerateFiles(process_files))
-    return false;
+  std::set<DWORD> process_ids = {process_id};
 
-  for (const auto& pair : process_files) {
-    for (const auto& path : pair.second) {
-      if (Meow.IsValidFileExtension(GetFileExtension(path))) {
-        if (Meow.IsValidAnimeType(path)) {
-          title = path;
-          break;
-        }
+  auto enum_files_proc = [&](const anisthesia::win::OpenFile& open_file) -> bool {
+    if (Meow.IsValidFileExtension(GetFileExtension(open_file.path))) {
+      if (Meow.IsValidAnimeType(open_file.path)) {
+        title = open_file.path;
+        TrimLeft(title, L"\\?");
       }
     }
-  }
+    return true;
+  };
+
+  if (!anisthesia::win::EnumerateFiles(process_ids, enum_files_proc))
+    return false;
 
   return true;
 }
