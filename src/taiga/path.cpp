@@ -75,7 +75,7 @@ std::wstring GetPath(Path path) {
     case Path::FeedHistory:
       return data_path + L"feed\\history.xml";
     case Path::Media:
-      return data_path + L"media.xml";
+      return data_path + L"players.anisthesia";
     case Path::Settings:
       return data_path + L"settings.xml";
     case Path::Test:

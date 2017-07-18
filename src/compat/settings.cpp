@@ -96,7 +96,7 @@ bool AppSettings::HandleCompatibility() {
   if (version <= semaver::Version(1, 1, 11)) {
     bool detect_streaming_media = false;
     for (auto& media_player : MediaPlayers.items) {
-      if (media_player.mode == kMediaModeWebBrowser) {
+      if (media_player.type == anisthesia::PlayerType::WebBrowser) {
         if (media_player.enabled)
           detect_streaming_media = true;
         media_player.enabled = true;

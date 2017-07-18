@@ -221,11 +221,10 @@ BOOL SettingsPage::OnInitDialog() {
         header.SetWindowHandle(nullptr);
       }
       for (size_t i = 0; i < MediaPlayers.items.size(); i++) {
-        if (MediaPlayers.items[i].mode == kMediaModeWebBrowser)
+        if (MediaPlayers.items[i].type == anisthesia::PlayerType::WebBrowser)
           continue;
-        BOOL player_available = MediaPlayers.items[i].GetPath().empty() ? FALSE : TRUE;
-        list.InsertItem(i, 0, ui::kIcon16_AppGray - player_available, 0, nullptr,
-                        MediaPlayers.items[i].name.c_str(), i);
+        list.InsertItem(i, 0, ui::kIcon16_AppBlue, 0, nullptr,
+                        StrToWstr(MediaPlayers.items[i].name).c_str(), i);
         list.SetCheckState(i, MediaPlayers.items[i].enabled);
       }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -900,9 +899,6 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         list.GetItemText(lpnmitem->iItem, 0, buffer);
         Execute(buffer);
         list.SetWindowHandle(nullptr);
-      // Media players
-      } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_MEDIA)) {
-        Execute(MediaPlayers.items[lpnmitem->iItem].GetPath());
       // Streaming media providers
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
         const std::vector<std::wstring> links = {

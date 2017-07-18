@@ -21,15 +21,7 @@
 #include <string>
 #include <vector>
 
-enum MediaPlayerModes {
-  kMediaModeWindowTitle,
-  kMediaModeFileHandle,
-  kMediaModeWinampApi,
-  kMediaModeSpecialMessage,
-  kMediaModeMplayer,
-  kMediaModeWebBrowser,
-  kMediaModeWindowTitleOnly,
-};
+#include <anisthesia/src/player.h>
 
 enum class PlayStatus {
   Stopped,
@@ -37,38 +29,20 @@ enum class PlayStatus {
   Updated,
 };
 
-class MediaPlayer {
+class MediaPlayer : public anisthesia::Player {
 public:
-  std::wstring GetPath() const;
-
-  std::wstring name;
-  BOOL enabled;
-  BOOL visible;
-  int mode;
-  std::vector<std::wstring> classes;
-  std::vector<std::wstring> files;
-  std::vector<std::wstring> folders;
-  std::wstring engine;
-
-  struct EditTitle {
-    int mode;
-    std::wstring value;
-  };
-  std::vector<EditTitle> edits;
+  MediaPlayer(const anisthesia::Player& player);
+  bool enabled = true;
 };
 
 class MediaPlayers {
 public:
-  MediaPlayers();
-  ~MediaPlayers() {}
-
   bool Load();
 
-  MediaPlayer* FindPlayer(const std::wstring& name);
   bool IsPlayerActive() const;
 
   HWND current_window_handle() const;
-  std::wstring current_player_name() const;
+  std::string current_player_name() const;
   bool player_running() const;
   void set_player_running(bool player_running);
   std::wstring current_title() const;
@@ -82,9 +56,6 @@ public:
   std::wstring GetTitle(HWND hwnd, const MediaPlayer& media_player);
 
   bool GetTitleFromProcessHandle(HWND hwnd, ULONG process_id, std::wstring& title);
-  std::wstring GetTitleFromWinampAPI(HWND hwnd, bool use_unicode);
-  std::wstring GetTitleFromSpecialMessage(HWND hwnd);
-  std::wstring GetTitleFromMPlayer();
   std::wstring GetTitleFromBrowser(HWND hwnd, const MediaPlayer& media_player);
   std::wstring GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 
@@ -93,15 +64,15 @@ public:
   PlayStatus play_status = PlayStatus::Stopped;
 
 private:
-  HWND current_window_handle_;
-  std::wstring current_player_name_;
-  bool player_running_;
+  HWND current_window_handle_ = nullptr;
+  std::string current_player_name_;
+  bool player_running_ = false;
 
   std::wstring current_title_;
-  bool title_changed_;
+  bool title_changed_ = false;
 };
 
-extern MediaPlayers MediaPlayers;
+extern class MediaPlayers MediaPlayers;
 
 void ProcessMediaPlayerStatus(const MediaPlayer* media_player);
 void ProcessMediaPlayerTitle(const MediaPlayer& media_player);

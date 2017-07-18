@@ -274,7 +274,7 @@ bool AppSettings::Load() {
     std::wstring name = player.attribute(L"name").value();
     bool enabled = player.attribute(L"enabled").as_bool();
     for (auto& media_player : MediaPlayers.items) {
-      if (media_player.name == name) {
+      if (media_player.name == WstrToStr(name)) {
         media_player.enabled = enabled;
         break;
       }
