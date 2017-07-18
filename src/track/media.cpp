@@ -235,12 +235,15 @@ std::wstring MediaPlayers::GetTitle(HWND hwnd, const MediaPlayer& media_player) 
       case anisthesia::Strategy::WindowTitle: {
         std::wstring title = GetWindowTitle(hwnd);
         EditTitle(title, media_player);
-        return title;
+        if (!title.empty())
+          return title;
+        break;
       }
       case anisthesia::Strategy::OpenFiles: {
         std::wstring title;
-        GetTitleFromProcessHandle(hwnd, 0, title);
-        return title;
+        if (GetTitleFromProcessHandle(hwnd, 0, title) && !title.empty())
+          return title;
+        break;
       }
       case anisthesia::Strategy::UiAutomation:
         return GetTitleFromBrowser(hwnd, media_player);
