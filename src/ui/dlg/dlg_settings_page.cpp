@@ -431,7 +431,6 @@ BOOL SettingsPage::OnInitDialog() {
         {taiga::kLibrary_FileSizeThreshold, {L"", L"Library / File size threshold"}},
         {taiga::kRecognition_IgnoredStrings, {L"", L"Recognition / Ignored strings"}},
         {taiga::kRecognition_LookupParentDirectories, {L"", L"Recognition / Look up parent directories"}},
-        {taiga::kRecognition_MediaPlayerDetectionMethod, {L"", L"Recognition / Media player detection method"}},
         {taiga::kSync_Service_Kitsu_PartialLibrary, {L"", L"Services / Kitsu / Download partial library"}},
         {taiga::kSync_Service_Kitsu_UseHttps, {L"", L"Services / Kitsu / Use HTTPS connections"}},
         {taiga::kSync_Service_Mal_UseHttps, {L"", L"Services / MyAnimeList / Use HTTPS connections"}},
