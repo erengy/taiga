@@ -39,6 +39,7 @@
 namespace taiga {
 
 Timer timer_anime_list(kTimerAnimeList, 60);    //  1 minute
+Timer timer_detection(kTimerDetection, 3);      //  3 seconds
 Timer timer_history(kTimerHistory, 5 * 60);     //  5 minutes
 Timer timer_library(kTimerLibrary, 30 * 60);    // 30 minutes
 Timer timer_media(kTimerMedia, 2 * 60, false);  //  2 minutes
@@ -61,6 +62,10 @@ void Timer::OnTimeout() {
   switch (id()) {
     case kTimerAnimeList:
       ui::DlgAnimeList.listview.RefreshLastUpdateColumn();
+      break;
+
+    case kTimerDetection:
+      MediaPlayers.CheckRunningPlayers();
       break;
 
     case kTimerHistory:
@@ -109,6 +114,7 @@ void TimerManager::Initialize() {
 
   // Attach timers to the manager
   InsertTimer(&timer_anime_list);
+  InsertTimer(&timer_detection);
   InsertTimer(&timer_history);
   InsertTimer(&timer_library);
   InsertTimer(&timer_media);
@@ -158,7 +164,6 @@ void TimerManager::UpdateUi() {
 }
 
 void TimerManager::OnTick() {
-  MediaPlayers.CheckRunningPlayers();
   Stats.uptime++;
 
   UpdateEnabledState();
