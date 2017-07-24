@@ -16,8 +16,6 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <anisthesia/src/win/strategy/ui_automation.h>
-
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime_episode.h"
@@ -38,44 +36,6 @@ enum class Stream {
   Wakanim,
   Youtube,
 };
-
-////////////////////////////////////////////////////////////////////////////////
-
-std::wstring MediaPlayers::GetTitleFromBrowser(
-    HWND hwnd, const MediaPlayer& media_player) {
-  // Get window title
-  std::wstring title = GetWindowTitle(hwnd);
-  EditTitle(title, media_player);
-
-  if (media_player.name == current_player_name()) {
-    // Return current title if the same web page is still open
-    if (CurrentEpisode.anime_id > 0)
-      if (IntersectsWith(title, current_title()))
-        return current_title();
-
-    // Delay operation to save some CPU cycles
-    static int counter = 0;
-    if (++counter < 5) {
-      return current_title();
-    } else {
-      counter = 0;
-    }
-  }
-
-  anisthesia::win::WebBrowser browser;
-  if (!anisthesia::win::GetWebBrowserInformation(hwnd, browser))
-    return std::wstring();
-
-  if (CurrentEpisode.anime_id > 0) {
-    for (const auto& tab : browser.tabs) {
-      if (IntersectsWith(tab, current_title()))
-        return current_title();  // Tab is still open, just not active
-    }
-    return std::wstring();
-  }
-
-  return GetTitleFromStreamingMediaProvider(browser.address, title);
-}
 
 bool IsStreamSettingEnabled(Stream stream) {
   switch (stream) {
@@ -225,7 +185,7 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
   }
 }
 
-std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
+bool MediaPlayers::GetTitleFromStreamingMediaProvider(
     const std::wstring& url,
     std::wstring& title) {
   const auto stream = FindStreamFromUrl(url);
@@ -236,5 +196,5 @@ std::wstring MediaPlayers::GetTitleFromStreamingMediaProvider(
     title.clear();
   }
 
-  return title;
+  return !title.empty();
 }

@@ -104,10 +104,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\deps\src\anisthesia\src\player.cpp" />
     <ClCompile Include="..\..\deps\src\anisthesia\src\util.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\strategy\open_files.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\strategy\ui_automation.cpp" />
-    <ClCompile Include="..\..\deps\src\anisthesia\src\win\strategy\window_title.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\open_files.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\platform.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\strategies.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\ui_automation.cpp" />
     <ClCompile Include="..\..\deps\src\anisthesia\src\win\util.cpp" />
+    <ClCompile Include="..\..\deps\src\anisthesia\src\win\windows.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\anitomy.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\element.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\keyword.cpp" />
@@ -268,12 +270,14 @@
     <ClCompile Include="..\..\src\ui\ui.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\deps\src\anisthesia\src\media.h" />
     <ClInclude Include="..\..\deps\src\anisthesia\src\player.h" />
     <ClInclude Include="..\..\deps\src\anisthesia\src\util.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\strategy\open_files.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\strategy\ui_automation.h" />
-    <ClInclude Include="..\..\deps\src\anisthesia\src\win\strategy\window_title.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\open_files.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\platform.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\ui_automation.h" />
     <ClInclude Include="..\..\deps\src\anisthesia\src\win\util.h" />
+    <ClInclude Include="..\..\deps\src\anisthesia\src\win\windows.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\anitomy.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\element.h" />
     <ClInclude Include="..\..\deps\src\anitomy\anitomy\keyword.h" />

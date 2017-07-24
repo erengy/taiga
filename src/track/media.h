@@ -18,10 +18,12 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include <anisthesia/src/player.h>
+#include <anisthesia/src/win/platform.h>
 
 enum class PlayStatus {
   Stopped,
@@ -41,7 +43,6 @@ public:
 
   bool IsPlayerActive() const;
 
-  HWND current_window_handle() const;
   std::string current_player_name() const;
   bool player_running() const;
   void set_player_running(bool player_running);
@@ -49,26 +50,19 @@ public:
   bool title_changed() const;
   void set_title_changed(bool title_changed);
 
-  MediaPlayer* CheckRunningPlayers();
+  bool CheckRunningPlayers();
   MediaPlayer* GetRunningPlayer();
 
-  void EditTitle(std::wstring& str, const MediaPlayer& media_player);
-  std::wstring GetTitle(HWND hwnd, const MediaPlayer& media_player);
-
-  bool GetTitleFromProcessHandle(HWND hwnd, ULONG process_id, std::wstring& title);
-  std::wstring GetTitleFromBrowser(HWND hwnd, const MediaPlayer& media_player);
-  std::wstring GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
+  bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 
 public:
   std::vector<MediaPlayer> items;
   PlayStatus play_status = PlayStatus::Stopped;
 
 private:
-  HWND current_window_handle_ = nullptr;
-  std::string current_player_name_;
-  bool player_running_ = false;
-
+  std::unique_ptr<anisthesia::win::Result> current_result_;
   std::wstring current_title_;
+  bool player_running_ = false;
   bool title_changed_ = false;
 };
 

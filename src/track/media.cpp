@@ -17,11 +17,6 @@
 */
 
 #include <algorithm>
-#include <regex>
-#include <windows.h>
-
-#include <anisthesia/src/win/strategy/open_files.h>
-#include <anisthesia/src/win/strategy/window_title.h>
 
 #include "base/file.h"
 #include "base/process.h"
@@ -51,15 +46,12 @@ bool MediaPlayers::Load() {
   const auto path = taiga::GetPath(taiga::Path::Media);
   std::vector<anisthesia::Player> players;
 
-  if (!anisthesia::ParsePlayersData(WstrToStr(path), players)) {
+  if (!anisthesia::ParsePlayersFile(WstrToStr(path), players)) {
     ui::DisplayErrorMessage(L"Could not read media list.", path.c_str());
     return false;
   }
 
   for (auto& player : players) {
-    for (auto& executable : player.executables) {
-      executable += ".exe";
-    }
     items.push_back(player);
   }
 
@@ -72,16 +64,14 @@ bool MediaPlayers::IsPlayerActive() const {
   if (!Settings.GetBool(taiga::kSync_Update_CheckPlayer))
     return true;
 
-  return current_window_handle_ &&
-         current_window_handle_ == GetForegroundWindow();
-}
-
-HWND MediaPlayers::current_window_handle() const {
-  return current_window_handle_;
+  return current_result_ &&
+         current_result_->window.handle == GetForegroundWindow();
 }
 
 std::string MediaPlayers::current_player_name() const {
-  return current_player_name_;
+  if (current_result_)
+    return current_result_->player.name;
+  return std::string();
 }
 
 bool MediaPlayers::player_running() const {
@@ -106,11 +96,14 @@ void MediaPlayers::set_title_changed(bool title_changed) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const MediaPlayer* GetPlayerFromWindow(const anisthesia::win::Window& window,
-                                       const std::vector<MediaPlayer>& players) {
+std::vector<anisthesia::Player> GetEnabledPlayers(
+    const std::vector<MediaPlayer>& players) {
+  std::vector<anisthesia::Player> results;
+
   for (const auto& player : players) {
     if (!player.enabled)
       continue;
+
     switch (player.type) {
       default:
       case anisthesia::PlayerType::Default:
@@ -123,134 +116,145 @@ const MediaPlayer* GetPlayerFromWindow(const anisthesia::win::Window& window,
         break;
     }
 
-    auto class_name = std::find(
-        player.windows.begin(), player.windows.end(), WstrToStr(window.class_name));
-    if (class_name == player.windows.end())
-      continue;
-
-    auto file_name = std::find_if(
-        player.executables.begin(), player.executables.end(),
-        [&window](const std::string& filename) {
-          return IsEqual(StrToWstr(filename), window.process_file_name);
-        });
-    if (file_name == player.executables.end())
-      continue;
-
-    return &player;
+    results.push_back(player);
   }
 
-  return nullptr;
+  return results;
 }
 
-MediaPlayer* MediaPlayers::CheckRunningPlayers() {
-  using running_player_t = std::pair<HWND, const MediaPlayer*>;
-  std::vector<running_player_t> running_players;
+bool VerifyMedia(const anisthesia::MediaInformation& media_information) {
+  const auto value = StrToWstr(media_information.value);
 
-  auto enum_windows_proc = [&](const anisthesia::win::Window& window) -> bool {
-    const auto player = GetPlayerFromWindow(window, items);
-    if (player)
-      running_players.push_back(std::make_pair(window.handle, player));
-    return true;
-  };
-
-  anisthesia::win::EnumerateWindows(enum_windows_proc);
-
-  const MediaPlayer* current_player = nullptr;
-  std::string current_player_name;
-  std::wstring current_title;
-  HWND current_window_handle = nullptr;
-
-  if (!running_players.empty()) {
-    auto set_running_player = [&](running_player_t& running_player) {
-      if (!running_player.first || !running_player.second)
+  switch (media_information.type) {
+    case anisthesia::MediaInformationType::File:
+      if (!Meow.IsValidFileExtension(GetFileExtension(value)))
         return false;
-      current_title = GetTitle(running_player.first, *running_player.second);
-      if (!current_title.empty()) {
-        current_player = running_player.second;
-        current_player_name = running_player.second->name;
-        current_window_handle = running_player.first;
-        return true;
-      } else {
-        running_player.second = nullptr;
+      if (!Meow.IsValidAnimeType(value))
         return false;
-      }
-    };
+      break;
+  }
 
-    // Stick with the previously detected window if possible
-    bool anime_identified = anime::IsValidId(CurrentEpisode.anime_id);
-    if (current_window_handle_ && anime_identified) {
-      for (auto& running_player : running_players) {
-        if (running_player.first == current_window_handle_)
-          if (set_running_player(running_player))
-            break;
+  return true;
+}
+
+bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
+                               std::wstring& title) {
+  for (const auto& item : media) {
+    for (const auto& information : item.information) {
+      auto value = StrToWstr(information.value);
+
+      switch (information.type) {
+        case anisthesia::MediaInformationType::File:
+          TrimLeft(value, L"\\?");
+          break;
       }
+
+      title = value;
+      return true;
     }
-    // Otherwise, get the first one with a valid title
-    if (!current_player) {
-      for (auto& running_player : running_players) {
-        if (set_running_player(running_player))
+  }
+
+  return false;
+}
+
+bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
+                            const std::wstring& current_title,
+                            std::wstring& title) {
+  std::wstring page_title;
+  std::wstring url;
+  std::vector<std::wstring> tabs;
+
+  for (const auto& item : media) {
+    for (const auto& information : item.information) {
+      const auto value = StrToWstr(information.value);
+      switch (information.type) {
+        case anisthesia::MediaInformationType::Title:
+          if (page_title.empty()) {
+            page_title = value;
+          } else {
+            tabs.push_back(value);
+          }
+          break;
+        case anisthesia::MediaInformationType::Url:
+          url = value;
           break;
       }
     }
   }
 
-  if (current_player)
-    player_running_ = true;
-  current_player_name_ = current_player_name;
-  if (current_title_ != current_title) {
-    current_title_ = current_title;
-    set_title_changed(true);
-  }
-  current_window_handle_ = current_window_handle;
-
-  return const_cast<MediaPlayer*>(current_player);
-}
-
-MediaPlayer* MediaPlayers::GetRunningPlayer() {
-  if (!current_player_name_.empty())
-    for (auto& item : items)
-      if (item.name == current_player_name_)
-        return &item;
-
-  return nullptr;
-}
-
-void MediaPlayers::EditTitle(std::wstring& str, const MediaPlayer& media_player) {
-  if (str.empty() || media_player.window_title_format.empty())
-    return;
-
-  const std::string title = WstrToStr(str);
-  const std::regex pattern(media_player.window_title_format);
-  std::smatch match;
-  std::regex_match(title, match, pattern);
-
-  if (match.size() == 2)
-    str = StrToWstr(match[1].str());
-}
-
-std::wstring MediaPlayers::GetTitle(HWND hwnd, const MediaPlayer& media_player) {
-  for (const auto strategy : media_player.strategies) {
-    switch (strategy) {
-      default:
-      case anisthesia::Strategy::WindowTitle: {
-        std::wstring title = GetWindowTitle(hwnd);
-        EditTitle(title, media_player);
-        if (!title.empty())
-          return title;
-        break;
+  if (anime::IsValidId(CurrentEpisode.anime_id)) {
+    if (page_title == current_title) {
+      title = page_title;
+      return true;
+    }
+    for (const auto& tab : tabs) {
+      if (tab == current_title) {
+        title = tab;
+        return true;
       }
-      case anisthesia::Strategy::OpenFiles: {
-        std::wstring title;
-        if (GetTitleFromProcessHandle(hwnd, 0, title) && !title.empty())
-          return title;
-        break;
-      }
-      case anisthesia::Strategy::UiAutomation:
-        return GetTitleFromBrowser(hwnd, media_player);
     }
   }
 
-  return std::wstring();
+  title = page_title;
+  return MediaPlayers.GetTitleFromStreamingMediaProvider(url, title);
+}
+
+bool GetTitleFromResult(const anisthesia::win::Result& result,
+                        const std::wstring& current_title,
+                        std::wstring& title) {
+  switch (result.player.type) {
+    case anisthesia::PlayerType::Default:
+      return GetTitleFromDefaultPlayer(result.media, title);
+    case anisthesia::PlayerType::WebBrowser:
+      return GetTitleFromWebBrowser(result.media, current_title, title);
+  }
+
+  return false;
+}
+
+bool MediaPlayers::CheckRunningPlayers() {
+  const auto enabled_players = GetEnabledPlayers(items);
+  std::vector<anisthesia::win::Result> results;
+
+  if (anisthesia::win::GetResults(enabled_players, VerifyMedia, results)) {
+    // Stick with the previously detected window if possible
+    if (current_result_ && anime::IsValidId(CurrentEpisode.anime_id)) {
+      auto it = std::find_if(results.begin(), results.end(),
+          [this](const anisthesia::win::Result& result) {
+            return result.window.handle == current_result_->window.handle;
+          });
+      if (it != results.end())
+        std::rotate(results.begin(), it, it + 1);  // Move to front
+    }
+
+    std::wstring current_title;
+
+    for (const auto& result : results) {
+      if (GetTitleFromResult(result, current_title_, current_title)) {
+        current_result_.reset(new anisthesia::win::Result(result));
+
+        if (current_title_ != current_title) {
+          current_title_ = current_title;
+          set_title_changed(true);
+        }
+        player_running_ = true;
+
+        return true;
+      }
+    }
+  }
+
+  current_result_.reset();
+  return false;
+}
+
+MediaPlayer* MediaPlayers::GetRunningPlayer() {
+  if (current_result_)
+    for (auto& item : items)
+      if (item.name == current_result_->player.name)
+        return &item;
+
+  return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,29 +357,4 @@ void ProcessMediaPlayerTitle(const MediaPlayer& media_player) {
       taiga::timers.timer(taiga::kTimerMedia)->Reset();
     }
   }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-bool MediaPlayers::GetTitleFromProcessHandle(HWND hwnd, ULONG process_id,
-                                             std::wstring& title) {
-  if (hwnd != nullptr && process_id == 0)
-    GetWindowThreadProcessId(hwnd, &process_id);
-
-  std::set<DWORD> process_ids = {process_id};
-
-  auto enum_files_proc = [&](const anisthesia::win::OpenFile& open_file) -> bool {
-    if (Meow.IsValidFileExtension(GetFileExtension(open_file.path))) {
-      if (Meow.IsValidAnimeType(open_file.path)) {
-        title = open_file.path;
-        TrimLeft(title, L"\\?");
-      }
-    }
-    return true;
-  };
-
-  if (!anisthesia::win::EnumerateFiles(process_ids, enum_files_proc))
-    return false;
-
-  return true;
 }
