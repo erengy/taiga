@@ -185,10 +185,10 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
   }
 }
 
-bool MediaPlayers::GetTitleFromStreamingMediaProvider(
-    const std::wstring& url,
-    std::wstring& title) {
+bool MediaPlayers::GetTitleFromStreamingMediaProvider(const std::wstring& url,
+                                                      std::wstring& title) {
   const auto stream = FindStreamFromUrl(url);
+
   if (IsStreamSettingEnabled(stream)) {
     EraseLeft(title, L"New Tab");
     CleanStreamTitle(stream, title);

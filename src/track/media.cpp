@@ -159,6 +159,7 @@ bool GetTitleFromDefaultPlayer(const std::vector<anisthesia::Media>& media,
 
 bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
                             const std::wstring& current_title,
+                            std::wstring& current_page_title,
                             std::wstring& title) {
   std::wstring page_title;
   std::wstring url;
@@ -183,30 +184,39 @@ bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
   }
 
   if (anime::IsValidId(CurrentEpisode.anime_id)) {
-    if (page_title == current_title) {
-      title = page_title;
+    if (page_title == current_page_title) {
+      title = current_title;
       return true;
     }
     for (const auto& tab : tabs) {
-      if (tab == current_title) {
-        title = tab;
+      if (tab == current_page_title) {
+        title = current_title;
         return true;
       }
     }
   }
 
   title = page_title;
-  return MediaPlayers.GetTitleFromStreamingMediaProvider(url, title);
+
+  if (MediaPlayers.GetTitleFromStreamingMediaProvider(url, title)) {
+    current_page_title = page_title;
+    return true;
+  } else {
+    current_page_title.clear();
+    return false;
+  }
 }
 
 bool GetTitleFromResult(const anisthesia::win::Result& result,
                         const std::wstring& current_title,
+                        std::wstring& current_page_title,
                         std::wstring& title) {
   switch (result.player.type) {
     case anisthesia::PlayerType::Default:
       return GetTitleFromDefaultPlayer(result.media, title);
     case anisthesia::PlayerType::WebBrowser:
-      return GetTitleFromWebBrowser(result.media, current_title, title);
+      return GetTitleFromWebBrowser(result.media, current_title,
+                                    current_page_title, title);
   }
 
   return false;
@@ -227,14 +237,15 @@ bool MediaPlayers::CheckRunningPlayers() {
         std::rotate(results.begin(), it, it + 1);  // Move to front
     }
 
-    std::wstring current_title;
+    std::wstring title;
 
     for (const auto& result : results) {
-      if (GetTitleFromResult(result, current_title_, current_title)) {
+      if (GetTitleFromResult(result, current_title_,
+                             current_page_title_, title)) {
         current_result_.reset(new anisthesia::win::Result(result));
 
-        if (current_title_ != current_title) {
-          current_title_ = current_title;
+        if (current_title_ != title) {
+          current_title_ = title;
           set_title_changed(true);
         }
         player_running_ = true;

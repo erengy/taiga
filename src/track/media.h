@@ -62,6 +62,7 @@ public:
 private:
   std::unique_ptr<anisthesia::win::Result> current_result_;
   std::wstring current_title_;
+  std::wstring current_page_title_;
   bool player_running_ = false;
   bool title_changed_ = false;
 };
