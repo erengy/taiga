@@ -217,12 +217,22 @@ void IgnoreCommonTitles(const std::wstring& address, std::wstring& title) {
   }
 }
 
+void RemoveCommonAffixes(std::wstring& title) {
+  static const std::vector<std::wstring> common_suffixes{
+    L" - Audio playing",  // Chrome
+  };
+  for (const auto& suffix : common_suffixes) {
+    EraseRight(title, suffix);
+  }
+}
+
 bool MediaPlayers::GetTitleFromStreamingMediaProvider(const std::wstring& url,
                                                       std::wstring& title) {
   const auto stream = FindStreamFromUrl(url);
 
   if (IsStreamSettingEnabled(stream)) {
     IgnoreCommonTitles(url, title);
+    RemoveCommonAffixes(title);
     CleanStreamTitle(stream, title);
   } else {
     title.clear();
