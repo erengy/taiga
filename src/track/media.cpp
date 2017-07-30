@@ -169,12 +169,11 @@ bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
     for (const auto& information : item.information) {
       const auto value = StrToWstr(information.value);
       switch (information.type) {
+        case anisthesia::MediaInformationType::Tab:
+          tabs.push_back(value);
+          break;
         case anisthesia::MediaInformationType::Title:
-          if (page_title.empty()) {
-            page_title = value;
-          } else {
-            tabs.push_back(value);
-          }
+          page_title = value;
           break;
         case anisthesia::MediaInformationType::Url:
           url = value;

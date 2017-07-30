@@ -16,8 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <set>
+
 #include "base/process.h"
 #include "base/string.h"
+#include "base/url.h"
 #include "library/anime_episode.h"
 #include "taiga/settings.h"
 #include "track/media.h"
@@ -185,12 +188,41 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
   }
 }
 
+void IgnoreCommonTitles(const std::wstring& address, std::wstring& title) {
+  const Url url(address);
+  if (!url.host.empty() && StartsWith(title, url.host))  // Chrome
+    title.clear();
+
+  static const std::set<std::wstring> common_titles{
+    L"Blank Page",            // Internet Explorer
+    L"InPrivate",             // Internet Explorer
+    L"New Tab",               // Chrome, Firefox
+    L"Private Browsing",      // Firefox
+    L"Private browsing",      // Opera
+    L"Problem loading page",  // Firefox
+    L"Speed Dial",            // Opera
+    L"Untitled",              // Chrome
+  };
+  if (common_titles.count(title))
+    title.clear();
+
+  static const std::vector<std::wstring> common_suffixes{
+    L" - Network error",  // Chrome
+  };
+  for (const auto& suffix : common_suffixes) {
+    if (EndsWith(title, suffix)) {
+      title.clear();
+      return;
+    }
+  }
+}
+
 bool MediaPlayers::GetTitleFromStreamingMediaProvider(const std::wstring& url,
                                                       std::wstring& title) {
   const auto stream = FindStreamFromUrl(url);
 
   if (IsStreamSettingEnabled(stream)) {
-    EraseLeft(title, L"New Tab");
+    IgnoreCommonTitles(url, title);
     CleanStreamTitle(stream, title);
   } else {
     title.clear();
