@@ -72,5 +72,4 @@ extern class MediaPlayers MediaPlayers;
 void ProcessMediaPlayerStatus(const MediaPlayer* media_player);
 void ProcessMediaPlayerTitle(const MediaPlayer& media_player);
 
-void IgnoreCommonWebBrowserTitles(const std::wstring& address, std::wstring& title);
-void RemoveCommonWebBrowserAffixes(std::wstring& title);
+void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);

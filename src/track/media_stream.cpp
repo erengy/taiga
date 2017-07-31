@@ -188,6 +188,21 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
   }
 }
 
+bool MediaPlayers::GetTitleFromStreamingMediaProvider(const std::wstring& url,
+                                                      std::wstring& title) {
+  const auto stream = FindStreamFromUrl(url);
+
+  if (IsStreamSettingEnabled(stream)) {
+    CleanStreamTitle(stream, title);
+  } else {
+    title.clear();
+  }
+
+  return !title.empty();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void IgnoreCommonWebBrowserTitles(const std::wstring& address,
                                   std::wstring& title) {
   const Url url(address);
@@ -227,15 +242,7 @@ void RemoveCommonWebBrowserAffixes(std::wstring& title) {
   }
 }
 
-bool MediaPlayers::GetTitleFromStreamingMediaProvider(const std::wstring& url,
-                                                      std::wstring& title) {
-  const auto stream = FindStreamFromUrl(url);
-
-  if (IsStreamSettingEnabled(stream)) {
-    CleanStreamTitle(stream, title);
-  } else {
-    title.clear();
-  }
-
-  return !title.empty();
+void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title) {
+  IgnoreCommonWebBrowserTitles(url, title);
+  RemoveCommonWebBrowserAffixes(title);
 }
