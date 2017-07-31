@@ -188,7 +188,8 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
   }
 }
 
-void IgnoreCommonTitles(const std::wstring& address, std::wstring& title) {
+void IgnoreCommonWebBrowserTitles(const std::wstring& address,
+                                  std::wstring& title) {
   const Url url(address);
   if (!url.host.empty() && StartsWith(title, url.host))  // Chrome
     title.clear();
@@ -217,7 +218,7 @@ void IgnoreCommonTitles(const std::wstring& address, std::wstring& title) {
   }
 }
 
-void RemoveCommonAffixes(std::wstring& title) {
+void RemoveCommonWebBrowserAffixes(std::wstring& title) {
   static const std::vector<std::wstring> common_suffixes{
     L" - Audio playing",  // Chrome
   };
@@ -231,8 +232,6 @@ bool MediaPlayers::GetTitleFromStreamingMediaProvider(const std::wstring& url,
   const auto stream = FindStreamFromUrl(url);
 
   if (IsStreamSettingEnabled(stream)) {
-    IgnoreCommonTitles(url, title);
-    RemoveCommonAffixes(title);
     CleanStreamTitle(stream, title);
   } else {
     title.clear();

@@ -182,13 +182,16 @@ bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
     }
   }
 
+  IgnoreCommonWebBrowserTitles(url, page_title);
+  RemoveCommonWebBrowserAffixes(page_title);
+
   if (anime::IsValidId(CurrentEpisode.anime_id)) {
-    if (page_title == current_page_title) {
+    if (!page_title.empty() && page_title == current_page_title) {
       title = current_title;
       return true;
     }
     for (const auto& tab : tabs) {
-      if (tab == current_page_title) {
+      if (!tab.empty() && tab == current_page_title) {
         title = current_title;
         return true;
       }
