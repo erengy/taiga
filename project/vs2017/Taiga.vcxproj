@@ -125,9 +125,7 @@
     <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp" />
     <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp" />
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c" />
-    <ClCompile Include="..\..\deps\src\windows\win\accessibility.cpp" />
     <ClCompile Include="..\..\deps\src\windows\win\application.cpp" />
-    <ClCompile Include="..\..\deps\src\windows\win\automation.cpp" />
     <ClCompile Include="..\..\deps\src\windows\win\common_dialogs.cpp" />
     <ClCompile Include="..\..\deps\src\windows\win\ctrl\combobox.cpp" />
     <ClCompile Include="..\..\deps\src\windows\win\ctrl\edit.cpp" />
@@ -305,9 +303,7 @@
     <ClInclude Include="..\..\deps\src\semaver\semaver\version.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c" />
-    <ClInclude Include="..\..\deps\src\windows\win\accessibility.h" />
     <ClInclude Include="..\..\deps\src\windows\win\application.h" />
-    <ClInclude Include="..\..\deps\src\windows\win\automation.h" />
     <ClInclude Include="..\..\deps\src\windows\win\common_controls.h" />
     <ClInclude Include="..\..\deps\src\windows\win\common_dialogs.h" />
     <ClInclude Include="..\..\deps\src\windows\win\dde.h" />

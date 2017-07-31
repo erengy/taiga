@@ -226,13 +226,7 @@
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c">
       <Filter>deps\utf8proc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\windows\win\accessibility.cpp">
-      <Filter>deps\windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\deps\src\windows\win\application.cpp">
-      <Filter>deps\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\windows\win\automation.cpp">
       <Filter>deps\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\windows\win\common_dialogs.cpp">
@@ -756,13 +750,7 @@
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c">
       <Filter>deps\utf8proc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\windows\win\accessibility.h">
-      <Filter>deps\windows</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\deps\src\windows\win\application.h">
-      <Filter>deps\windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\windows\win\automation.h">
       <Filter>deps\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\windows\win\common_controls.h">
