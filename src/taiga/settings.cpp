@@ -359,7 +359,7 @@ bool AppSettings::Save() {
   xml_node mediaplayers = settings.child(L"recognition").child(L"mediaplayers");
   for (const auto& media_player : MediaPlayers.items) {
     xml_node player = mediaplayers.append_child(L"player");
-    player.append_attribute(L"name") = media_player.name.c_str();
+    player.append_attribute(L"name") = StrToWstr(media_player.name).c_str();
     player.append_attribute(L"enabled") = media_player.enabled;
   }
 
