@@ -81,6 +81,7 @@ enum AppSettingName {
   kApp_Interface_ExternalLinks,
 
   // Recognition
+  kRecognition_DetectionInterval,
   kRecognition_DetectMediaPlayers,
   kRecognition_DetectStreamingMedia,
   kRecognition_IgnoredStrings,

@@ -146,6 +146,7 @@ void AppSettings::InitializeMap() {
   INITKEY(kApp_Interface_ExternalLinks, kDefaultExternalLinks.c_str(), L"program/general/externallinks");
 
   // Recognition
+  INITKEY(kRecognition_DetectionInterval, L"3", L"recognition/general/detectioninterval");
   INITKEY(kRecognition_DetectMediaPlayers, L"true", L"recognition/mediaplayers/enabled");
   INITKEY(kRecognition_DetectStreamingMedia, nullptr, L"recognition/streaming/enabled");
   INITKEY(kRecognition_IgnoredStrings, nullptr, L"recognition/anitomy/ignored_strings");

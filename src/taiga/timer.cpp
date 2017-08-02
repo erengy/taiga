@@ -143,6 +143,9 @@ void TimerManager::UpdateEnabledState() {
 }
 
 void TimerManager::UpdateIntervalsFromSettings() {
+  timer_detection.set_interval(
+      std::max(1, Settings.GetInt(taiga::kRecognition_DetectionInterval)));
+
   timer_media.set_interval(
       Settings.GetInt(taiga::kSync_Update_Delay));
 
