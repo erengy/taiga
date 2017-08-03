@@ -18,7 +18,10 @@
 
 #include <algorithm>
 
+#include <windows/win/string.h>
+
 #include "base/file.h"
+#include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
 #include "library/anime.h"
@@ -43,16 +46,38 @@ MediaPlayer::MediaPlayer(const anisthesia::Player& player)
 bool MediaPlayers::Load() {
   items.clear();
 
-  const auto path = taiga::GetPath(taiga::Path::Media);
   std::vector<anisthesia::Player> players;
+  const auto path = taiga::GetPath(taiga::Path::Media);
 
-  if (!anisthesia::ParsePlayersFile(WstrToStr(path), players)) {
-    ui::DisplayErrorMessage(L"Could not read media list.", path.c_str());
-    return false;
+  std::wstring resource;
+  win::ReadStringFromResource(L"IDR_PLAYERS", L"DATA", resource);
+  if (anisthesia::ParsePlayersData(WstrToStr(resource), players)) {
+    for (const auto& player : players) {
+      items.push_back(player);
+    }
   }
 
-  for (auto& player : players) {
-    items.push_back(player);
+  players.clear();
+  if (anisthesia::ParsePlayersFile(WstrToStr(path), players)) {
+    for (const auto& player : players) {
+      auto it = std::find_if(items.begin(), items.end(),
+          [&player](const MediaPlayer& item) {
+            return item.name == player.name;
+          });
+      if (it != items.end()) {
+        LOGD(L"Override: " + StrToWstr(player.name));
+        *it = player;
+      } else {
+        LOGD(L"Add: " + StrToWstr(player.name));
+        items.push_back(player);
+      }
+    }
+  }
+
+  if (items.empty()) {
+    ui::DisplayErrorMessage(L"Could not read media players data.",
+                            path.c_str());
+    return false;
   }
 
   return true;

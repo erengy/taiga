@@ -12,6 +12,7 @@
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDR_MENU           DATA           "..\\..\\res\\menu.xml"
+IDR_PLAYERS        DATA           "..\\..\\deps\\src\\anisthesia\\data\\players.anisthesia"
 
 
 

@@ -94,7 +94,6 @@ Section "!${PRODUCT_NAME}" SEC01
   SetOutPath "$INSTDIR"
   File "..\bin\Release\Taiga.exe"
   SetOutPath "$INSTDIR\data\"
-  File "..\deps\src\anisthesia\data\players.anisthesia"
   File /r "..\data\"
   SetOutPath "$INSTDIR\data\db\"
   File "..\deps\data\anime-relations\anime-relations.txt"
