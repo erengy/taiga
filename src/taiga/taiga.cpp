@@ -107,8 +107,8 @@ BOOL App::InitInstance() {
 
 void App::Uninitialize() {
   // Announce
-  if (MediaPlayers.play_status == PlayStatus::Playing) {
-    MediaPlayers.play_status = PlayStatus::Stopped;
+  if (MediaPlayers.play_status == track::recognition::PlayStatus::Playing) {
+    MediaPlayers.play_status = track::recognition::PlayStatus::Stopped;
     ::Announcer.Do(kAnnounceToHttp);
   }
   ::Announcer.Clear(kAnnounceToSkype);

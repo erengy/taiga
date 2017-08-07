@@ -37,11 +37,10 @@
 #include "ui/dialog.h"
 #include "ui/ui.h"
 
-class MediaPlayers MediaPlayers;
+class track::recognition::MediaPlayers MediaPlayers;
 
-MediaPlayer::MediaPlayer(const anisthesia::Player& player)
-    : anisthesia::Player(player) {
-}
+namespace track {
+namespace recognition {
 
 bool MediaPlayers::Load() {
   items.clear();
@@ -99,16 +98,16 @@ std::string MediaPlayers::current_player_name() const {
   return std::string();
 }
 
+std::wstring MediaPlayers::current_title() const {
+  return current_title_;
+}
+
 bool MediaPlayers::player_running() const {
   return player_running_;
 }
 
 void MediaPlayers::set_player_running(bool player_running) {
   player_running_ = player_running;
-}
-
-std::wstring MediaPlayers::current_title() const {
-  return current_title_;
 }
 
 bool MediaPlayers::title_changed() const {
@@ -227,7 +226,7 @@ bool GetTitleFromWebBrowser(const std::vector<anisthesia::Media>& media,
 
   title = page_title;
 
-  if (MediaPlayers.GetTitleFromStreamingMediaProvider(url, title)) {
+  if (GetTitleFromStreamingMediaProvider(url, title)) {
     current_page_title = page_title;
     return true;
   } else {
@@ -296,6 +295,9 @@ MediaPlayer* MediaPlayers::GetRunningPlayer() {
 
   return nullptr;
 }
+
+}  // namespace recognition
+}  // namespace track
 
 ////////////////////////////////////////////////////////////////////////////////
 

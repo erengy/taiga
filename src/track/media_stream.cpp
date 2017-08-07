@@ -25,6 +25,9 @@
 #include "taiga/settings.h"
 #include "track/media.h"
 
+namespace track {
+namespace recognition {
+
 enum class Stream {
   Unknown,
   Animelab,
@@ -188,8 +191,8 @@ void CleanStreamTitle(Stream stream, std::wstring& title) {
   }
 }
 
-bool MediaPlayers::GetTitleFromStreamingMediaProvider(const std::wstring& url,
-                                                      std::wstring& title) {
+bool GetTitleFromStreamingMediaProvider(const std::wstring& url,
+                                        std::wstring& title) {
   const auto stream = FindStreamFromUrl(url);
 
   if (IsStreamSettingEnabled(stream)) {
@@ -246,3 +249,6 @@ void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title) {
   IgnoreCommonWebBrowserTitles(url, title);
   RemoveCommonWebBrowserAffixes(title);
 }
+
+}  // namespace recognition
+}  // namespace track

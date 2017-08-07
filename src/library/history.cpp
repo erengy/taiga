@@ -153,7 +153,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
       anime::Episode episode;
       episode.anime_id = anime->GetId();
       episode.set_episode_number(*item.episode);
-      MediaPlayers.play_status = PlayStatus::Updated;
+      MediaPlayers.play_status = track::recognition::PlayStatus::Updated;
       Announcer.Do(taiga::kAnnounceToHttp | taiga::kAnnounceToTwitter, &episode);
     }
 

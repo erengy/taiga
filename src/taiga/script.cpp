@@ -391,9 +391,9 @@ std::wstring ReplaceVariables(std::wstring str, const anime::Episode& episode,
           REPLACE(L"user", ENCODE(taiga::GetCurrentUsername()));
           REPLACE(L"manual", is_manual ? L"true" : L"");
           switch (MediaPlayers.play_status) {
-            case PlayStatus::Stopped: REPLACE(L"playstatus", L"stopped"); break;
-            case PlayStatus::Playing: REPLACE(L"playstatus", L"playing"); break;
-            case PlayStatus::Updated: REPLACE(L"playstatus", L"updated"); break;
+            case track::recognition::PlayStatus::Stopped: REPLACE(L"playstatus", L"stopped"); break;
+            case track::recognition::PlayStatus::Playing: REPLACE(L"playstatus", L"playing"); break;
+            case track::recognition::PlayStatus::Updated: REPLACE(L"playstatus", L"updated"); break;
           }
           switch (taiga::GetCurrentServiceId()) {
             case sync::kMyAnimeList:

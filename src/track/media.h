@@ -25,6 +25,9 @@
 #include <anisthesia/src/player.h>
 #include <anisthesia/src/win/platform.h>
 
+namespace track {
+namespace recognition {
+
 enum class PlayStatus {
   Stopped,
   Playing,
@@ -33,7 +36,9 @@ enum class PlayStatus {
 
 class MediaPlayer : public anisthesia::Player {
 public:
-  MediaPlayer(const anisthesia::Player& player);
+  MediaPlayer(const anisthesia::Player& player)
+      : anisthesia::Player(player) {}
+
   bool enabled = true;
 };
 
@@ -44,16 +49,16 @@ public:
   bool IsPlayerActive() const;
 
   std::string current_player_name() const;
+  std::wstring current_title() const;
+
   bool player_running() const;
   void set_player_running(bool player_running);
-  std::wstring current_title() const;
+
   bool title_changed() const;
   void set_title_changed(bool title_changed);
 
   bool CheckRunningPlayers();
   MediaPlayer* GetRunningPlayer();
-
-  bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 
 public:
   std::vector<MediaPlayer> items;
@@ -67,9 +72,15 @@ private:
   bool title_changed_ = false;
 };
 
-extern class MediaPlayers MediaPlayers;
+bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
+void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);
+
+}  // namespace recognition
+}  // namespace track
+
+using track::recognition::MediaPlayer;
 
 void ProcessMediaPlayerStatus(const MediaPlayer* media_player);
 void ProcessMediaPlayerTitle(const MediaPlayer& media_player);
 
-void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);
+extern track::recognition::MediaPlayers MediaPlayers;
