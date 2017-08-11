@@ -548,7 +548,7 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
 
       win::Rect rect_item;
       GetSubItemRect(index, columns[kColumnUserProgress].index, &rect_item);
-      rect_item.right -= ScaleX(50);
+      rect_item.right -= ScaleX(60);
       rect_item.Inflate(ScaleX(-4), ScaleY(-4));
       button_rect[0].Copy(rect_item);
       button_rect[0].right = button_rect[0].left + rect_item.Height();
@@ -1226,7 +1226,7 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
             rcItem.Inflate(ScaleX(-4), 0);
             if (listview.progress_bars_visible) {
               win::Rect rcBar = rcItem;
-              rcBar.right -= ScaleX(50);
+              rcBar.right -= ScaleX(60);
               rcBar.Inflate(0, ScaleY(-4));
               listview.DrawProgressBar(pCD->nmcd.hdc, &rcBar, pCD->nmcd.dwItemSpec,
                                        *anime_item);
