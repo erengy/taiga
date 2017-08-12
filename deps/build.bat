@@ -34,6 +34,9 @@ call %vcvarsall% || (
 )
 
 :build_libcurl
+echo Configuring libcurl...
+call src\curl\buildconf.bat
+
 if exist src\curl\builds (
   echo Clearing previous libcurl builds...
   rmdir /s /q src\curl\builds
