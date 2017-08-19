@@ -17,14 +17,14 @@
 */
 
 #include <algorithm>
-#include <map>
 #include <string>
+#include <unordered_map>
 
 #include "html.h"
 #include "string.h"
 
 // Source: http://www.w3.org/TR/html4/sgml/entities.html
-static const std::map<std::wstring, wchar_t> html_entities = {
+static const std::unordered_map<std::wstring, wchar_t> html_entities{
   //////////////////////////////////////////////////////////////////////////////
   // ISO 8859-1 characters
 
@@ -366,7 +366,7 @@ void DecodeHtmlEntities(std::wstring& str) {
           size_t length = i - pos;
           if (length >= min_entity_length &&
               length <= max_entity_length) {
-            std::wstring entity_name = str.substr(pos, length);
+            const auto entity_name = str.substr(pos, length);
             auto it = html_entities.find(entity_name);
             if (it != html_entities.end()) {
               character_value = it->second;
