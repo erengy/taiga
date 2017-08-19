@@ -16,40 +16,11 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
 #include <windows.h>
 
 #include <zlib/zlib.h>
 
 #include "gzip.h"
-
-struct GzFileDeleter {
-  using pointer = gzFile;
-  void operator()(pointer p) const { gzclose(p); }
-};
-
-using GzFile = std::unique_ptr<gzFile, GzFileDeleter>;
-
-bool UncompressGzippedFile(const std::string& file, std::string& output) {
-  GzFile gzfile(gzopen(file.c_str(), "rb"));
-
-  if (!gzfile)
-    return false;
-
-  constexpr unsigned int kBufferSize = 16384;
-  auto buffer = std::make_unique<char>(kBufferSize);
-
-  while (true) {
-    const auto len = gzread(gzfile.get(), buffer.get(), kBufferSize);
-    if (len > 0) {
-      output.append(buffer.get(), len);
-    } else {
-      break;
-    }
-  }
-
-  return true;
-}
 
 bool UncompressGzippedString(const std::string& input, std::string& output) {
   z_stream stream;

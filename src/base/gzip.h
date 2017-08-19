@@ -20,7 +20,6 @@
 
 #include <string>
 
-bool UncompressGzippedFile(const std::string& file, std::string& output);
 bool UncompressGzippedString(const std::string& input, std::string& output);
 
 bool DeflateString(const std::string& input, std::string& output);
