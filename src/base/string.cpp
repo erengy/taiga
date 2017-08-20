@@ -620,8 +620,9 @@ std::locale current_locale("");
 void ToLower(wstring& str, bool use_locale) {
   if (use_locale) {
     std::transform(str.begin(), str.end(), str.begin(),
-                   std::bind2nd(std::ptr_fun(&std::tolower<wchar_t>),
-                                current_locale));
+        [](const wchar_t c) {
+          return std::tolower(c, current_locale);
+        });
   } else {
     std::transform(str.begin(), str.end(), str.begin(), towlower);
   }
@@ -635,8 +636,9 @@ wstring ToLower_Copy(wstring str, bool use_locale) {
 void ToUpper(wstring& str, bool use_locale) {
   if (use_locale) {
     std::transform(str.begin(), str.end(), str.begin(),
-                   std::bind2nd(std::ptr_fun(&std::toupper<wchar_t>),
-                                current_locale));
+        [](const wchar_t c) {
+          return std::toupper(c, current_locale);
+        });
   } else {
     std::transform(str.begin(), str.end(), str.begin(), towupper);
   }
