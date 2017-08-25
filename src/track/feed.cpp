@@ -26,14 +26,6 @@
 #include "track/feed.h"
 #include "track/recognition.h"
 
-GenericFeedItem::GenericFeedItem()
-    : permalink(true) {
-}
-
-FeedItem::FeedItem()
-    : state(FeedItemState::Blank) {
-}
-
 void FeedItem::Discard(int option) {
   switch (option) {
     default:

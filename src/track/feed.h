@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include "base/optional.h"
 #include "base/types.h"
 #include "library/anime_episode.h"
 #include "track/feed_filter.h"
@@ -55,11 +56,7 @@ enum class TorrentCategory {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class GenericFeedItem {
-public:
-  GenericFeedItem();
-  virtual ~GenericFeedItem() {}
-
+struct GenericFeedItem {
   std::wstring title,
                link,
                description,
@@ -73,14 +70,11 @@ public:
                pub_date,
                source;
 
-  bool permalink;
+  bool permalink = true;
 };
 
 class FeedItem : public GenericFeedItem {
 public:
-  FeedItem();
-  ~FeedItem() {};
-
   void Discard(int option);
   bool IsDiscarded() const;
 
@@ -92,7 +86,10 @@ public:
   std::map<std::wstring, std::wstring> elements;
   std::wstring info_link;
   std::wstring magnet_link;
-  FeedItemState state;
+  FeedItemState state = FeedItemState::Blank;
+  Optional<size_t> seeders;
+  Optional<size_t> leechers;
+  Optional<size_t> downloads;
 
   class EpisodeData : public anime::Episode {
   public:
@@ -104,8 +101,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class GenericFeed {
-public:
+struct GenericFeed {
   // Required channel elements
   std::wstring title,
                link,

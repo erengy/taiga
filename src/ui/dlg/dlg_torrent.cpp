@@ -40,6 +40,20 @@
 
 namespace ui {
 
+enum TorrentListColumn {
+  kColumnAnimeTitle,
+  kColumnEpisode,
+  kColumnGroup,
+  kColumnSize,
+  kColumnVideo,
+  kColumnSeeders,
+  kColumnLeechers,
+  kColumnDownloads,
+  kColumnDescription,
+  kColumnFilename,
+  kColumnReleaseDate,
+};
+
 TorrentDialog DlgTorrent;
 
 BOOL TorrentDialog::OnInitDialog() {
@@ -52,14 +66,17 @@ BOOL TorrentDialog::OnInitDialog() {
   list_.SetTheme();
 
   // Insert list columns
-  list_.InsertColumn(0, ScaleX(240), ScaleX(240), LVCFMT_LEFT,  L"Anime title");
-  list_.InsertColumn(1,  ScaleX(60),  ScaleX(60), LVCFMT_RIGHT, L"Episode");
-  list_.InsertColumn(2, ScaleX(100), ScaleX(100), LVCFMT_LEFT,  L"Group");
-  list_.InsertColumn(3,  ScaleX(70),  ScaleX(70), LVCFMT_RIGHT, L"Size");
-  list_.InsertColumn(4, ScaleX(100), ScaleX(100), LVCFMT_LEFT,  L"Video");
-  list_.InsertColumn(5, ScaleX(200), ScaleX(200), LVCFMT_LEFT,  L"Description");
-  list_.InsertColumn(6, ScaleX(200), ScaleX(200), LVCFMT_LEFT,  L"Filename");
-  list_.InsertColumn(7, ScaleX(190), ScaleX(190), LVCFMT_RIGHT, L"Release date");
+  list_.InsertColumn(kColumnAnimeTitle,  ScaleX(240), ScaleX(240), LVCFMT_LEFT,  L"Anime title");
+  list_.InsertColumn(kColumnEpisode,      ScaleX(60),  ScaleX(60), LVCFMT_RIGHT, L"Episode");
+  list_.InsertColumn(kColumnGroup,       ScaleX(100), ScaleX(100), LVCFMT_LEFT,  L"Group");
+  list_.InsertColumn(kColumnSize,         ScaleX(70),  ScaleX(70), LVCFMT_RIGHT, L"Size");
+  list_.InsertColumn(kColumnVideo,       ScaleX(100), ScaleX(100), LVCFMT_LEFT,  L"Video");
+  list_.InsertColumn(kColumnSeeders,      ScaleX(20),  ScaleX(20), LVCFMT_RIGHT, L"S");
+  list_.InsertColumn(kColumnLeechers,     ScaleX(20),  ScaleX(20), LVCFMT_RIGHT, L"L");
+  list_.InsertColumn(kColumnDownloads,    ScaleX(20),  ScaleX(20), LVCFMT_RIGHT, L"D");
+  list_.InsertColumn(kColumnDescription, ScaleX(200), ScaleX(200), LVCFMT_LEFT,  L"Description");
+  list_.InsertColumn(kColumnFilename,    ScaleX(200), ScaleX(200), LVCFMT_LEFT,  L"Filename");
+  list_.InsertColumn(kColumnReleaseDate, ScaleX(190), ScaleX(190), LVCFMT_RIGHT, L"Release date");
   // Insert list groups
   list_.InsertGroup(0, L"Anime");
   list_.InsertGroup(1, L"Batch");
@@ -236,28 +253,32 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
         LPNMLISTVIEW lplv = (LPNMLISTVIEW)pnmh;
         int order = 1;
         switch (lplv->iSubItem) {
-          case 1:  // Episode
-          case 3:  // Size
-          case 7:  // Release date
+          case kColumnEpisode:
+          case kColumnSize:
+          case kColumnSeeders:
+          case kColumnLeechers:
+          case kColumnDownloads:
+          case kColumnReleaseDate:
             order = -1;
             break;
         }
         if (lplv->iSubItem == list_.GetSortColumn())
           order = list_.GetSortOrder() * -1;
         switch (lplv->iSubItem) {
-          // Episode
-          case 1:
+          case kColumnEpisode:
             list_.Sort(lplv->iSubItem, order, ui::kListSortEpisodeRange, ui::ListViewCompareProc);
             break;
-          // File size
-          case 3:
+          case kColumnSize:
             list_.Sort(lplv->iSubItem, order, ui::kListSortFileSize, ui::ListViewCompareProc);
             break;
-          // Release date
-          case 7:
+          case kColumnSeeders:
+          case kColumnLeechers:
+          case kColumnDownloads:
+            list_.Sort(lplv->iSubItem, order, ui::kListSortNumber, ui::ListViewCompareProc);
+            break;
+          case kColumnReleaseDate:
             list_.Sort(lplv->iSubItem, order, ui::kListSortRfc822DateTime, ui::ListViewCompareProc);
             break;
-          // Other columns
           default:
             list_.Sort(lplv->iSubItem, order, ui::kListSortDefault, ui::ListViewCompareProc);
             break;
@@ -456,22 +477,28 @@ void TorrentDialog::RefreshList() {
     int index = list_.InsertItem(it - feed->items.begin(),
                                  group, icon, 0, NULL, title.c_str(),
                                  reinterpret_cast<LPARAM>(&(*it)));
-    list_.SetItem(index, 1, number.c_str());
-    list_.SetItem(index, 2, it->episode_data.release_group().c_str());
-    list_.SetItem(index, 3, it->episode_data.file_size.c_str());
-    list_.SetItem(index, 4, video.c_str());
-    list_.SetItem(index, 5, LimitText(it->description, 255).c_str());
-    list_.SetItem(index, 6, it->episode_data.file_name_with_extension().c_str());
-    list_.SetItem(index, 7, ConvertRfc822ToLocal(it->pub_date).c_str());
+    list_.SetItem(index, kColumnEpisode, number.c_str());
+    list_.SetItem(index, kColumnGroup, it->episode_data.release_group().c_str());
+    list_.SetItem(index, kColumnSize, it->episode_data.file_size.c_str());
+    list_.SetItem(index, kColumnVideo, video.c_str());
+    list_.SetItem(index, kColumnSeeders, it->seeders ? ToWstr(*it->seeders).c_str() : L"");
+    list_.SetItem(index, kColumnLeechers, it->leechers ? ToWstr(*it->leechers).c_str() : L"");
+    list_.SetItem(index, kColumnDownloads, it->downloads ? ToWstr(*it->downloads).c_str() : L"");
+    list_.SetItem(index, kColumnDescription, LimitText(it->description, 255).c_str());
+    list_.SetItem(index, kColumnFilename, it->episode_data.file_name_with_extension().c_str());
+    list_.SetItem(index, kColumnReleaseDate, ConvertRfc822ToLocal(it->pub_date).c_str());
     list_.SetCheckState(index, it->state == FeedItemState::Selected);
   }
 
   // Resize columns
-  list_.SetColumnWidth(1, LVSCW_AUTOSIZE);
-  list_.SetColumnWidth(2, LVSCW_AUTOSIZE);
-  list_.SetColumnWidth(3, LVSCW_AUTOSIZE);
-  list_.SetColumnWidth(4, LVSCW_AUTOSIZE);
-  list_.SetColumnWidth(7, LVSCW_AUTOSIZE_USEHEADER);
+  list_.SetColumnWidth(kColumnEpisode, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(kColumnGroup, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(kColumnSize, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(kColumnVideo, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(kColumnSeeders, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(kColumnLeechers, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(kColumnDownloads, LVSCW_AUTOSIZE);
+  list_.SetColumnWidth(kColumnReleaseDate, LVSCW_AUTOSIZE_USEHEADER);
 
   // Redraw
   list_.SetRedraw(TRUE);
