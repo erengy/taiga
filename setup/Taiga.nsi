@@ -55,6 +55,12 @@ RequestExecutionLevel user
     WARNING: Installing under Program Files may cause issues if you have User Account Control enabled on your system.$\r$\n$\r$\n\
     The default installation folder is:$\r$\n${DEFAULT_INSTALL_DIR}"
 
+; Desktop shortcut
+!define MUI_FINISHPAGE_SHOWREADME ""
+!define MUI_FINISHPAGE_SHOWREADME_CHECKED
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Create Desktop Shortcut"
+!define MUI_FINISHPAGE_SHOWREADME_FUNCTION finishpageaction
+
 ; ------------------------------------------------------------------------------
 ; Pages
 
@@ -108,8 +114,6 @@ Section "!${PRODUCT_NAME}" SEC01
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}"
   CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk" "$INSTDIR\${UNINST_EXE}"
-  ; Desktop shortcut
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}"
   
   ; Uninstaller
   WriteUninstaller "$INSTDIR\${UNINST_EXE}"
@@ -120,6 +124,10 @@ Section "!${PRODUCT_NAME}" SEC01
   WriteRegStr HKCU "${UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEBSITE}"
   WriteRegStr HKCU "${UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
+
+Function finishpageaction
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}"
+FunctionEnd
 
 Function .onInstSuccess
   IfSilent 0 skipAutorun
