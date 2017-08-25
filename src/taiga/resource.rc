@@ -600,19 +600,19 @@ FONT 9, "Segoe UI", 400, 0, 0
     GROUPBOX        "Download queue", IDC_STATIC, 7, 7, 301, 31, 0, WS_EX_LEFT
     COMBOBOX        IDC_COMBO_TORRENTS_QUEUE_SORTBY, 12, 18, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
     COMBOBOX        IDC_COMBO_TORRENTS_QUEUE_SORTORDER, 160, 18, 141, 30, WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS, WS_EX_LEFT
-    GROUPBOX        "Download location", IDC_STATIC, 7, 45, 301, 79, 0, WS_EX_LEFT
+    GROUPBOX        "Download location", IDC_STATIC, 7, 45, 301, 87, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Use anime folders as the download folder", IDC_CHECK_TORRENT_AUTOSETFOLDER, 12, 56, 160, 8, 0, WS_EX_LEFT
     AUTOCHECKBOX    "If no anime folder is set, use this folder instead:", IDC_CHECK_TORRENT_AUTOUSEFOLDER, 21, 67, 201, 8, 0, WS_EX_LEFT
     COMBOBOX        IDC_COMBO_TORRENT_FOLDER, 30, 78, 251, 101, WS_TABSTOP | CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_HASSTRINGS, WS_EX_LEFT
     PUSHBUTTON      "...", IDC_BUTTON_TORRENT_BROWSE_FOLDER, 285, 78, 16, 12, 0, WS_EX_LEFT
     AUTOCHECKBOX    "Create a subfolder using the anime title as its name", IDC_CHECK_TORRENT_AUTOCREATEFOLDER, 30, 94, 192, 8, 0, WS_EX_LEFT
-    LTEXT           "Note: This feature is only supported by Deluge (deluge-console) and uTorrent.", IDC_STATIC, 12, 109, 289, 8, SS_LEFT, WS_EX_TRANSPARENT
-    GROUPBOX        "BitTorrent client", IDC_STATIC, 7, 131, 301, 63, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Open downloaded .torrent files", IDC_CHECK_TORRENT_APP_OPEN, 12, 142, 160, 8, 0, WS_EX_LEFT
-    RADIOBUTTON     "Use the default application associated with .torrent files", IDC_RADIO_TORRENT_APP1, 21, 153, 210, 8, WS_TABSTOP, WS_EX_LEFT
-    RADIOBUTTON     "Use a custom application:", IDC_RADIO_TORRENT_APP2, 21, 164, 105, 8, WS_TABSTOP, WS_EX_LEFT
-    EDITTEXT        IDC_EDIT_TORRENT_APP, 30, 175, 251, 12, ES_AUTOHSCROLL, WS_EX_LEFT
-    PUSHBUTTON      "...", IDC_BUTTON_TORRENT_BROWSE_APP, 285, 175, 16, 12, 0, WS_EX_LEFT
+    LTEXT           "Note: This feature is only supported by Deluge (deluge-console), uTorrent and Transmission (transmission-remote).", IDC_STATIC, 12, 109, 289, 16, SS_LEFT, WS_EX_TRANSPARENT
+    GROUPBOX        "BitTorrent client", IDC_STATIC, 7, 139, 301, 63, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Open downloaded .torrent files", IDC_CHECK_TORRENT_APP_OPEN, 12, 150, 160, 8, 0, WS_EX_LEFT
+    RADIOBUTTON     "Use the default application associated with .torrent files", IDC_RADIO_TORRENT_APP1, 21, 161, 210, 8, WS_TABSTOP, WS_EX_LEFT
+    RADIOBUTTON     "Use a custom application:", IDC_RADIO_TORRENT_APP2, 21, 172, 105, 8, WS_TABSTOP, WS_EX_LEFT
+    EDITTEXT        IDC_EDIT_TORRENT_APP, 30, 183, 251, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    PUSHBUTTON      "...", IDC_BUTTON_TORRENT_BROWSE_APP, 285, 183, 16, 12, 0, WS_EX_LEFT
 }
 
 
