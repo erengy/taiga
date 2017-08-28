@@ -50,10 +50,18 @@ RequestExecutionLevel user
 !define MUI_ABORTWARNING
 !define MUI_UNABORTWARNING
 
+; ------------------------------------------------------------------------------
+; Page settings
+
 ; Directory page
 !define MUI_DIRECTORYPAGE_TEXT_TOP "\
     WARNING: Installing under Program Files may cause issues if you have User Account Control enabled on your system.$\r$\n$\r$\n\
     The default installation folder is:$\r$\n${DEFAULT_INSTALL_DIR}"
+
+; Finish page
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXE}"
+!define MUI_FINISHPAGE_LINK "Visit home page"
+!define MUI_FINISHPAGE_LINK_LOCATION "${PRODUCT_WEBSITE}"
 
 ; ------------------------------------------------------------------------------
 ; Pages
@@ -62,9 +70,6 @@ RequestExecutionLevel user
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
-!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXE}"
-!define MUI_FINISHPAGE_LINK "Visit home page"
-!define MUI_FINISHPAGE_LINK_LOCATION "${PRODUCT_WEBSITE}"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstallation pages
