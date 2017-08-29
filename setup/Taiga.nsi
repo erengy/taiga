@@ -53,6 +53,9 @@ RequestExecutionLevel user
 ; ------------------------------------------------------------------------------
 ; Page settings
 
+; Components page
+!define MUI_COMPONENTSPAGE_NODESC
+
 ; Directory page
 !define MUI_DIRECTORYPAGE_TEXT_TOP "\
     WARNING: Installing under Program Files may cause issues if you have User Account Control enabled on your system.$\r$\n$\r$\n\
@@ -68,6 +71,7 @@ RequestExecutionLevel user
 
 ; Installation pages
 !insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -85,16 +89,19 @@ RequestExecutionLevel user
 !insertmacro MUI_LANGUAGE "English"
 
 ; ------------------------------------------------------------------------------
-; Install section
+; Install sections
 
-Section "!${PRODUCT_NAME}" SEC01
+Section "!${PRODUCT_NAME}" SECTION_DEFAULT
+  ; Set section as read-only
+  SectionIn RO
+
   ; Set properties
   SetOutPath "$INSTDIR"
   SetOverwrite on
-  
+
   ; Wait for application to close
   Call CheckInstance
-  
+
   ; Add files
   SetOutPath "$INSTDIR"
   File "..\bin\Release\Taiga.exe"
@@ -104,18 +111,11 @@ Section "!${PRODUCT_NAME}" SEC01
   File "..\deps\data\anime-relations\anime-relations.txt"
   SetOutPath "$INSTDIR\data\db\season\"
   File /r "..\deps\data\anime-seasons\data\"
-  
-  ; Skip in silent installation mode
-  IfSilent +6
+
   ; Store installation folder
+  IfSilent +2
   WriteRegStr HKCU "Software\${PRODUCT_NAME}" "" $INSTDIR
-  ; Start menu shortcuts
-  CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk" "$INSTDIR\${UNINST_EXE}"
-  ; Desktop shortcut
-  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}"
-  
+
   ; Uninstaller
   WriteUninstaller "$INSTDIR\${UNINST_EXE}"
   WriteRegStr HKCU "${UNINST_KEY}" "DisplayName" "${PRODUCT_NAME}"
@@ -126,42 +126,15 @@ Section "!${PRODUCT_NAME}" SEC01
   WriteRegStr HKCU "${UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 SectionEnd
 
-Function .onInstSuccess
-  IfSilent 0 skipAutorun
-  Exec "$INSTDIR\${PRODUCT_EXE}"
-  skipAutorun:
-FunctionEnd
+Section "Start menu shortcuts" SECTION_START_MENU_SHORTCUTS
+  CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}"
+  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk" "$INSTDIR\${UNINST_EXE}"
+SectionEnd
 
-Function CheckInstance
-  Var /GLOBAL messageSent
-  StrCpy $messageSent "false"
-  Var /GLOBAL secondsWaited
-  IntOp $secondsWaited 0 + 0
-  
-  checkInstanceLoop:
-    System::Call "kernel32::OpenMutex(i 0x100000, b 0, t 'Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258') i .R0"
-    IntCmp $R0 0 skipInstanceCheck
-    System::Call "kernel32::CloseHandle(i $R0)"
-    
-    IfSilent skipSendMessage ; Assuming the application is going to close itself
-    StrCmp $messageSent "true" skipSendMessage
-      FindWindow $R0 "TaigaMainW"
-      SendMessage $R0 ${WM_DESTROY} 0 0
-      StrCpy $messageSent "true"
-      Goto skipMessageBox
-    skipSendMessage:
-    
-    IntOp $secondsWaited $secondsWaited + 1
-    IntCmp $secondsWaited 3 0 skipMessageBox 0 ; Display the message box after 3 seconds
-      MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is still running. Close it first, then click OK to continue setup." IDOK skipMessageBox
-      Quit
-    skipMessageBox:
-    
-    Sleep 1000
-    Goto checkInstanceLoop
-  
-  skipInstanceCheck:
-FunctionEnd
+Section "Desktop shortcut" SECTION_DESKTOP_SHORTCUT
+  CreateShortCut "$DESKTOP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXE}"
+SectionEnd
 
 ; ------------------------------------------------------------------------------
 ; Uninstall section
@@ -170,17 +143,75 @@ Section Uninstall
   ; Delete registry entries
   DeleteRegKey HKCU "${UNINST_KEY}"
   DeleteRegKey /ifempty HKCU "Software\${PRODUCT_NAME}"
-  
+
   ; Delete start menu shortcuts
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\${PRODUCT_NAME}.lnk"
   Delete "$SMPROGRAMS\${PRODUCT_NAME}\Uninstall.lnk"
   RMDir "$SMPROGRAMS\${PRODUCT_NAME}"
-  
+
   ; Delete desktop shortcut
   Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
-  
+
   ; Delete files
   Delete "$INSTDIR\${PRODUCT_EXE}"
   Delete "$INSTDIR\${UNINST_EXE}"
   RMDir /r "$INSTDIR\data\"
 SectionEnd
+
+; ------------------------------------------------------------------------------
+; Callback functions
+
+Function .onInit
+  !macro DeselectSection sectionId
+    Push $0
+    SectionGetFlags ${sectionId} $0
+    IntOp $0 $0 ^ ${SF_SELECTED}
+    SectionSetFlags ${sectionId} $0
+    Pop $0
+  !macroend
+
+  IfSilent 0 skipDeselectShortcuts
+  !insertmacro DeselectSection ${SECTION_START_MENU_SHORTCUTS}
+  !insertmacro DeselectSection ${SECTION_DESKTOP_SHORTCUT}
+  skipDeselectShortcuts:
+FunctionEnd
+
+Function .onInstSuccess
+  IfSilent 0 skipAutorun
+  Exec "$INSTDIR\${PRODUCT_EXE}"
+  skipAutorun:
+FunctionEnd
+
+; ------------------------------------------------------------------------------
+; Custom functions
+
+Function CheckInstance
+  Var /GLOBAL messageSent
+  StrCpy $messageSent "false"
+  Var /GLOBAL secondsWaited
+  IntOp $secondsWaited 0 + 0
+
+  checkInstanceLoop:
+    System::Call "kernel32::OpenMutex(i 0x100000, b 0, t 'Taiga-33d5a63c-de90-432f-9a8b-f6f733dab258') i .R0"
+    IntCmp $R0 0 skipInstanceCheck
+    System::Call "kernel32::CloseHandle(i $R0)"
+
+    IfSilent skipSendMessage ; Assuming the application is going to close itself
+    StrCmp $messageSent "true" skipSendMessage
+      FindWindow $R0 "TaigaMainW"
+      SendMessage $R0 ${WM_DESTROY} 0 0
+      StrCpy $messageSent "true"
+      Goto skipMessageBox
+    skipSendMessage:
+
+    IntOp $secondsWaited $secondsWaited + 1
+    IntCmp $secondsWaited 3 0 skipMessageBox 0 ; Display the message box after 3 seconds
+      MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "${PRODUCT_NAME} is still running. Close it first, then click OK to continue setup." IDOK skipMessageBox
+      Quit
+    skipMessageBox:
+
+    Sleep 1000
+    Goto checkInstanceLoop
+
+  skipInstanceCheck:
+FunctionEnd
