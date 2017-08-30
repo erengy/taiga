@@ -112,10 +112,6 @@ Section "!${PRODUCT_NAME}" SECTION_DEFAULT
   SetOutPath "$INSTDIR\data\db\season\"
   File /r "..\deps\data\anime-seasons\data\"
 
-  ; Store installation folder
-  IfSilent +2
-  WriteRegStr HKCU "Software\${PRODUCT_NAME}" "" $INSTDIR
-
   ; Uninstaller
   WriteUninstaller "$INSTDIR\${UNINST_EXE}"
   WriteRegStr HKCU "${UNINST_KEY}" "DisplayName" "${PRODUCT_NAME}"
@@ -162,24 +158,13 @@ SectionEnd
 ; Callback functions
 
 Function .onInit
-  !macro DeselectSection sectionId
-    Push $0
-    SectionGetFlags ${sectionId} $0
-    IntOp $0 $0 ^ ${SF_SELECTED}
-    SectionSetFlags ${sectionId} $0
-    Pop $0
-  !macroend
-
-  IfSilent 0 skipDeselectShortcuts
-  !insertmacro DeselectSection ${SECTION_START_MENU_SHORTCUTS}
-  !insertmacro DeselectSection ${SECTION_DESKTOP_SHORTCUT}
-  skipDeselectShortcuts:
+  Call InitializeSections
 FunctionEnd
 
 Function .onInstSuccess
-  IfSilent 0 skipAutorun
-  Exec "$INSTDIR\${PRODUCT_EXE}"
-  skipAutorun:
+  Call SaveInstDir
+  Call SaveSections
+  Call RunProductExe
 FunctionEnd
 
 ; ------------------------------------------------------------------------------
@@ -214,4 +199,63 @@ Function CheckInstance
     Goto checkInstanceLoop
 
   skipInstanceCheck:
+FunctionEnd
+
+Function SaveInstDir
+  IfSilent 0 +2
+  Return
+  WriteRegStr HKCU "Software\${PRODUCT_NAME}" "" $INSTDIR
+FunctionEnd
+
+Function RunProductExe
+  IfSilent +2
+  Return
+  Exec "$INSTDIR\${PRODUCT_EXE}"
+FunctionEnd
+
+Function InitializeSections
+  !macro DeselectSection sectionId
+    Push $0
+    SectionGetFlags ${sectionId} $0
+    IntOp $0 $0 ^ ${SF_SELECTED}
+    SectionSetFlags ${sectionId} $0
+    Pop $0
+  !macroend
+
+  !macro LoadSection sectionId
+    Push $0
+    SectionGetText ${sectionId} $0
+    ClearErrors
+    ReadRegDWORD $0 HKCU "Software\${PRODUCT_NAME}\Setup\Sections" "$0"
+    IfErrors +2
+    SectionSetFlags ${sectionId} $0
+    Pop $0
+  !macroend
+
+  IfSilent 0 loadSections
+  !insertmacro DeselectSection ${SECTION_START_MENU_SHORTCUTS}
+  !insertmacro DeselectSection ${SECTION_DESKTOP_SHORTCUT}
+  Return
+
+  loadSections:
+  !insertmacro LoadSection ${SECTION_START_MENU_SHORTCUTS}
+  !insertmacro LoadSection ${SECTION_DESKTOP_SHORTCUT}
+FunctionEnd
+
+Function SaveSections
+  IfSilent 0 +2
+  Return
+
+  !macro SaveSection sectionId
+    Push $0
+    Push $1
+    SectionGetText ${sectionId} $0
+    SectionGetFlags ${sectionId} $1
+    WriteRegDWORD HKCU "Software\${PRODUCT_NAME}\Setup\Sections" "$0" $1
+    Pop $1
+    Pop $0
+  !macroend
+
+  !insertmacro SaveSection ${SECTION_START_MENU_SHORTCUTS}
+  !insertmacro SaveSection ${SECTION_DESKTOP_SHORTCUT}
 FunctionEnd
