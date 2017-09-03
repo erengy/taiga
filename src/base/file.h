@@ -77,12 +77,14 @@ public:
   virtual bool OnDirectory(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
   virtual bool OnFile(const std::wstring& root, const std::wstring& name, const WIN32_FIND_DATA& data);
 
+  void set_log_errors(bool log_errors);
   void set_minimum_file_size(ULONGLONG minimum_file_size);
   void set_skip_directories(bool skip_directories);
   void set_skip_files(bool skip_files);
   void set_skip_subdirectories(bool skip_subdirectories);
 
 protected:
+  bool log_errors_;
   ULONGLONG minimum_file_size_;
   bool skip_directories_;
   bool skip_files_;

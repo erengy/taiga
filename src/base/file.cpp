@@ -117,6 +117,7 @@ QWORD GetFolderSize(const std::wstring& path, bool recursive) {
   };
 
   FileSearchHelper helper;
+  helper.set_log_errors(false);
   helper.set_skip_subdirectories(!recursive);
   helper.Search(path, nullptr, OnFile);
 
@@ -342,6 +343,7 @@ unsigned int PopulateFiles(std::vector<std::wstring>& file_list,
   };
 
   FileSearchHelper helper;
+  helper.set_log_errors(false);
   helper.set_skip_subdirectories(!recursive);
   helper.Search(path, nullptr, OnFile);
 
@@ -360,6 +362,7 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
   };
 
   FileSearchHelper helper;
+  helper.set_log_errors(false);
   helper.set_skip_subdirectories(true);
   helper.Search(path, OnDirectory, nullptr);
 

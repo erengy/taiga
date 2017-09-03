@@ -23,7 +23,8 @@
 #include "string.h"
 
 FileSearchHelper::FileSearchHelper()
-    : minimum_file_size_(0),
+    : log_errors_(true),
+      minimum_file_size_(0),
       skip_directories_(false),
       skip_files_(false),
       skip_subdirectories_(false) {
@@ -53,9 +54,11 @@ bool FileSearchHelper::Search(const std::wstring& root,
 
   do {
     if (handle == INVALID_HANDLE_VALUE) {
-      auto error_message = win::FormatError(GetLastError());
-      TrimRight(error_message, L"\r\n");
-      LOGE(error_message + L"\nPath: " + path);
+      if (log_errors_) {
+        auto error_message = win::FormatError(GetLastError());
+        TrimRight(error_message, L"\r\n");
+        LOGE(error_message + L"\nPath: " + path);
+      }
       SetLastError(ERROR_SUCCESS);
       continue;
     }
@@ -99,6 +102,10 @@ bool FileSearchHelper::OnFile(const std::wstring& root,
                               const std::wstring& name,
                               const WIN32_FIND_DATA& data) {
   return false;
+}
+
+void FileSearchHelper::set_log_errors(bool log_errors) {
+  log_errors_ = log_errors;
 }
 
 void FileSearchHelper::set_minimum_file_size(ULONGLONG minimum_file_size) {
