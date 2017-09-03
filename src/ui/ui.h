@@ -112,6 +112,7 @@ void OnSettingsServiceChangeFailed();
 void OnSettingsThemeChange();
 void OnSettingsUserChange();
 
+void OnEpisodeAvailabilityChange(int id);
 void OnScanAvailableEpisodesFinished();
 
 void OnFeedCheck(bool success);

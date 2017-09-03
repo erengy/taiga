@@ -652,7 +652,7 @@ bool Item::SetEpisodeAvailability(int number, bool available,
       SetNextEpisodePath(path);
     }
 
-    ui::OnLibraryEntryChange(GetId());
+    ui::OnEpisodeAvailabilityChange(GetId());
 
     return true;
   }

@@ -867,6 +867,14 @@ void OnSettingsUserChange() {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void OnEpisodeAvailabilityChange(int id) {
+  if (DlgAnimeList.IsWindow())
+    DlgAnimeList.RefreshListItem(id);
+
+  if (DlgNowPlaying.GetCurrentId() == anime::ID_UNKNOWN)
+    DlgNowPlaying.Refresh(false, false, false, false);
+}
+
 void OnScanAvailableEpisodesFinished() {
   DlgNowPlaying.Refresh(false, false, false);
 }
