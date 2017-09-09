@@ -260,10 +260,11 @@ void HttpManager::HandleResponse(HttpResponse& response) {
     }
 
     case kHttpSeasonsGet: {
-      auto filename = GetFileName(client.request().url.path);
-      auto path = GetPath(Path::DatabaseSeason) + filename;
-      if (SaveToFile(client.write_buffer_, path) &&
-          SeasonDatabase.LoadFile(filename)) {
+      if (response.GetStatusCategory() == 200 &&
+          SeasonDatabase.LoadString(response.body)) {
+        const auto path = GetPath(Path::DatabaseSeason) +
+                          GetFileName(client.request().url.path);
+        SaveToFile(client.write_buffer_, path);
         Settings.Set(taiga::kApp_Seasons_LastSeason,
                      SeasonDatabase.current_season.GetString());
         SeasonDatabase.Review();
