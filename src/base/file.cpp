@@ -372,20 +372,22 @@ int PopulateFolders(std::vector<std::wstring>& folder_list,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool ReadFromFile(const std::wstring& path, std::string& output) {
-  std::ifstream is;
-  is.open(WstrToStr(path).c_str(), std::ios::binary);
+  HANDLE file_handle = OpenFileForGenericRead(path);
 
-  is.seekg(0, std::ios::end);
-  size_t len = static_cast<size_t>(is.tellg());
+  if (file_handle == INVALID_HANDLE_VALUE)
+    return false;
 
-  if (len != -1) {
-    output.resize(len);
-    is.seekg(0, std::ios::beg);
-    is.read((char*)output.data(), output.size());
-  }
+  LARGE_INTEGER file_size{};
+  if (::GetFileSizeEx(file_handle, &file_size) == FALSE)
+    return false;
+  output.resize(static_cast<size_t>(file_size.QuadPart));
 
-  is.close();
-  return len != -1;
+  DWORD bytes_read = 0;
+  const BOOL result = ::ReadFile(file_handle, output.data(),
+                                 output.size(), &bytes_read, nullptr);
+  ::CloseHandle(file_handle);
+
+  return result != FALSE && bytes_read == output.size();
 }
 
 bool SaveToFile(LPCVOID data, DWORD length, const string_t& path,
