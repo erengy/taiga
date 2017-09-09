@@ -134,6 +134,7 @@ void OnLogout();
 
 void OnUpdateAvailable();
 void OnUpdateNotAvailable(bool relations = false, bool season = false);
+void OnUpdateFailed();
 void OnUpdateFinished();
 
 }  // namespace ui

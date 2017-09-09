@@ -298,8 +298,12 @@ void HttpManager::HandleResponse(HttpResponse& response) {
       break;
     }
     case kHttpTaigaUpdateDownload:
-      SaveToFile(client.write_buffer_, Taiga.Updater.GetDownloadPath());
-      Taiga.Updater.RunInstaller();
+      if (response.GetStatusCategory() == 200 &&
+          SaveToFile(client.write_buffer_, Taiga.Updater.GetDownloadPath())) {
+        Taiga.Updater.RunInstaller();
+      } else {
+        ui::OnUpdateFailed();
+      }
       ui::OnUpdateFinished();
       break;
     case kHttpTaigaUpdateRelations: {

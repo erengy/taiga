@@ -1066,6 +1066,14 @@ void OnUpdateNotAvailable(bool relations, bool season) {
   }
 }
 
+void OnUpdateFailed() {
+  win::TaskDialog dlg;
+  dlg.SetWindowTitle(TAIGA_APP_TITLE);
+  dlg.SetMainIcon(TD_ICON_ERROR);
+  dlg.SetMainInstruction(L"Could not download the latest update.");
+  dlg.Show(DlgUpdate.GetWindowHandle());
+}
+
 void OnUpdateFinished() {
   DlgUpdate.PostMessage(WM_CLOSE);
 }
