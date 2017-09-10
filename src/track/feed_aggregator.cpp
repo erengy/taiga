@@ -17,6 +17,7 @@
 */
 
 #include <algorithm>
+#include <regex>
 
 #include "base/file.h"
 #include "base/html.h"
@@ -85,13 +86,30 @@ bool Aggregator::CheckFeed(FeedCategory category, const std::wstring& source,
 
 void Aggregator::ExamineData(Feed& feed) {
   for (auto& feed_item : feed.items) {
+    auto title = feed_item.title;
+    switch (feed.source) {
+      case FeedSource::AnimeBytes: {
+        // Anitomy cannot parse AnimeBytes' titles as is. To avoid writing
+        // another parser, we pre-process (i.e. hack) the title instead:
+        // 1. Ignore anime type and year (because we normally assume that they
+        //    are only used to differentiate)
+        // 2. Insert a pseudo-keyword (to make Anitomy stop there while parsing
+        //    anime title)
+        std::wsmatch matches;
+        static const std::wregex pattern{L"(.+) - .+ \\[\\d{4}\\] :: (.+)"};
+        if (std::regex_match(title, matches, pattern))
+          title = matches[1].str() + L" [REMASTER] " + matches[2].str();
+        break;
+      }
+    }
+
     auto& episode_data = feed_item.episode_data;
 
     // Examine title and compare with anime list items
     static track::recognition::ParseOptions parse_options;
     parse_options.parse_path = false;
     parse_options.streaming_media = false;
-    Meow.Parse(feed_item.title, parse_options, episode_data);
+    Meow.Parse(title, parse_options, episode_data);
     static track::recognition::MatchOptions match_options;
     match_options.allow_sequels = true;
     match_options.check_airing_date = true;
@@ -444,6 +462,7 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
 void Aggregator::FindFeedSource(Feed& feed) const {
   static const std::map<std::wstring, FeedSource> sources{
     {L"anidex", FeedSource::AniDex},
+    {L"animebytes", FeedSource::AnimeBytes},
     {L"haruhichan", FeedSource::Haruhichan},
     {L"minglong", FeedSource::Minglong},
     {L"nyaa.pantsu", FeedSource::NyaaPantsu},

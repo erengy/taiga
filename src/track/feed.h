@@ -51,6 +51,7 @@ enum class FeedCategory {
 enum class FeedSource {
   Unknown,
   AniDex,
+  AnimeBytes,
   Haruhichan,
   Minglong,
   NyaaPantsu,
