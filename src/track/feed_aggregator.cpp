@@ -441,54 +441,80 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
   return true;
 }
 
-void Aggregator::ParseFeedItem(const std::wstring& source, FeedItem& feed_item) {
-  Url url(source);
+void Aggregator::FindFeedSource(Feed& feed) const {
+  static const std::map<std::wstring, FeedSource> sources{
+    {L"anidex", FeedSource::AniDex},
+    {L"haruhichan", FeedSource::Haruhichan},
+    {L"minglong", FeedSource::Minglong},
+    {L"nyaa.pantsu", FeedSource::NyaaPantsu},
+    {L"nyaa.si", FeedSource::NyaaSi},
+    {L"tokyotosho", FeedSource::TokyoToshokan},
+  };
+  
+  const Url url(feed.link);
 
-  auto parse_magnet_link = [&]() {
+  for (const auto& pair : sources) {
+    if (InStr(url.host, pair.first, 0, true) > -1) {
+      feed.source = pair.second;
+      return;
+    }
+  }
+}
+
+void Aggregator::ParseFeedItem(FeedSource source, FeedItem& feed_item) {
+  auto parse_magnet_link = [&feed_item]() {
     feed_item.magnet_link = InStr(feed_item.description,
                                   L"<a href=\"magnet:?", L"\">");
     if (!feed_item.magnet_link.empty())
       feed_item.magnet_link = L"magnet:?" + feed_item.magnet_link;
   };
 
-  // AniDex
-  if (InStr(url.host, L"anidex", 0, true) > -1) {
-    feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L" |");
-    parse_magnet_link();
+  switch (source) {
+    // AniDex
+    case FeedSource::AniDex:
+      feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L" |");
+      parse_magnet_link();
+      break;
 
-  // Haruhichan
-  } else if (InStr(url.host, L"haruhichan", 0, true) > -1) {
-    feed_item.info_link = feed_item.description;
+    // Haruhichan
+    case FeedSource::Haruhichan:
+      feed_item.info_link = feed_item.description;
+      break;
 
-  // minglong
-  } else if (InStr(url.host, L"minglong", 0, true) > -1) {
-    feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
+    // minglong
+    case FeedSource::Minglong:
+      feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
+      break;
 
-  // Nyaa Pantsu
-  } else if (InStr(url.host, L"nyaa.pantsu", 0, true) > -1) {
-    feed_item.info_link = feed_item.guid;
-    feed_item.episode_data.file_size = ToSizeString(
-        std::wcstoull(feed_item.enclosure_length.c_str(), nullptr, 10));
+    // Nyaa Pantsu
+    case FeedSource::NyaaPantsu:
+      feed_item.info_link = feed_item.guid;
+      feed_item.episode_data.file_size = ToSizeString(
+          std::wcstoull(feed_item.enclosure_length.c_str(), nullptr, 10));
+      break;
 
-  // Nyaa.si
-  } else if (InStr(url.host, L"nyaa.si", 0, true) > -1) {
-    feed_item.info_link = feed_item.guid;
-    if (feed_item.elements.count(L"nyaa:size"))
-      feed_item.episode_data.file_size = feed_item.elements[L"nyaa:size"];
-    auto get_torrent_stat = [&](const std::wstring& name, Optional<size_t>& result) {
-      if (feed_item.elements.count(name))
-        result = ToInt(feed_item.elements[name]);
-    };
-    get_torrent_stat(L"nyaa:seeders", feed_item.seeders);
-    get_torrent_stat(L"nyaa:leechers", feed_item.leechers);
-    get_torrent_stat(L"nyaa:downloads", feed_item.downloads);
+    // Nyaa.si
+    case FeedSource::NyaaSi: {
+      feed_item.info_link = feed_item.guid;
+      if (feed_item.elements.count(L"nyaa:size"))
+        feed_item.episode_data.file_size = feed_item.elements[L"nyaa:size"];
+      auto get_torrent_stat = [&](const std::wstring& name, Optional<size_t>& result) {
+        if (feed_item.elements.count(name))
+          result = ToInt(feed_item.elements[name]);
+      };
+      get_torrent_stat(L"nyaa:seeders", feed_item.seeders);
+      get_torrent_stat(L"nyaa:leechers", feed_item.leechers);
+      get_torrent_stat(L"nyaa:downloads", feed_item.downloads);
+      break;
+    }
 
-  // Tokyo Toshokan
-  } else if (InStr(url.host, L"tokyotosho", 0, true) > -1) {
-    feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
-    parse_magnet_link();
-    feed_item.description = InStr(feed_item.description, L"Comment: ", L"");
-    feed_item.info_link = feed_item.guid;
+    // Tokyo Toshokan
+    case FeedSource::TokyoToshokan:
+      feed_item.episode_data.file_size = InStr(feed_item.description, L"Size: ", L"<");
+      parse_magnet_link();
+      feed_item.description = InStr(feed_item.description, L"Comment: ", L"");
+      feed_item.info_link = feed_item.guid;
+      break;
   }
 }
 

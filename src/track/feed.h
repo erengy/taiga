@@ -48,6 +48,16 @@ enum class FeedCategory {
   Time,
 };
 
+enum class FeedSource {
+  Unknown,
+  AniDex,
+  Haruhichan,
+  Minglong,
+  NyaaPantsu,
+  NyaaSi,
+  TokyoToshokan,
+};
+
 enum class TorrentCategory {
   Anime,
   Batch,
@@ -124,6 +134,7 @@ public:
   bool Load(const std::wstring& data);
 
   FeedCategory category;
+  FeedSource source;
 
 private:
   void Load(const pugi::xml_document& document);
@@ -146,8 +157,9 @@ public:
   void HandleFeedDownloadError(Feed& feed);
   bool ValidateFeedDownload(const HttpRequest& http_request, HttpResponse& http_response);
 
+  void FindFeedSource(Feed& feed) const;
   void ExamineData(Feed& feed);
-  void ParseFeedItem(const std::wstring& source, FeedItem& feed_item);
+  void ParseFeedItem(FeedSource source, FeedItem& feed_item);
   void CleanupDescription(std::wstring& description);
 
   bool LoadArchive();

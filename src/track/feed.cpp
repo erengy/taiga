@@ -105,7 +105,8 @@ TorrentCategory FeedItem::GetTorrentCategory() const {
 ////////////////////////////////////////////////////////////////////////////////
 
 Feed::Feed()
-    : category(FeedCategory::Link) {
+    : category(FeedCategory::Link),
+      source(FeedSource::Unknown) {
 }
 
 std::wstring Feed::GetDataPath() {
@@ -154,6 +155,8 @@ void Feed::Load(const xml_document& document) {
   link = XmlReadStrValue(channel, L"link");
   description = XmlReadStrValue(channel, L"description");
 
+  Aggregator.FindFeedSource(*this);
+
   // Read items
   foreach_xmlnode_(node, channel, L"item") {
     // Read data
@@ -190,7 +193,7 @@ void Feed::Load(const xml_document& document) {
     DecodeHtmlEntities(item.title);
     DecodeHtmlEntities(item.description);
 
-    Aggregator.ParseFeedItem(link, item);
+    Aggregator.ParseFeedItem(source, item);
     Aggregator.CleanupDescription(item.description);
 
     items.push_back(item);
