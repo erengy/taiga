@@ -466,6 +466,15 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
 
   auto& attributes = json["data"]["attributes"];
 
+  // Note that we send `null` (rather than `0` or `""`) to remove certain values
+  if (request.data.count(L"date_finish")) {
+    const auto finished_at = TranslateMyDateTo(request.data[L"date_finish"]);
+    if (!finished_at.empty()) {
+      attributes["finishedAt"] = finished_at;
+    } else {
+      attributes["finishedAt"] = nullptr;
+    }
+  }
   if (request.data.count(L"notes"))
     attributes["notes"] = WstrToStr(request.data[L"notes"]);
   if (request.data.count(L"episode"))
@@ -475,8 +484,6 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
     if (score > 0) {
       attributes["rating"] = TranslateMyRatingTo(score);
     } else {
-      // Kitsu requires the rating value to be greater than zero. To remove the
-      // rating, we need to send `null` rather than `0`.
       attributes["rating"] = nullptr;
     }
   }
@@ -484,6 +491,14 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
     attributes["reconsumeCount"] = ToInt(request.data[L"rewatched_times"]);
   if (request.data.count(L"enable_rewatching"))
     attributes["reconsuming"] = ToBool(request.data[L"enable_rewatching"]);
+  if (request.data.count(L"date_start")) {
+    const auto started_at = TranslateMyDateTo(request.data[L"date_start"]);
+    if (!started_at.empty()) {
+      attributes["startedAt"] = started_at;
+    } else {
+      attributes["startedAt"] = nullptr;
+    }
+  }
   if (request.data.count(L"status"))
     attributes["status"] = TranslateMyStatusTo(ToInt(request.data[L"status"]));
 
@@ -520,11 +535,13 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
 void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const {
   http_request.url.query[L"fields[libraryEntries]"] =
       // attributes
+      L"finishedAt,"
       L"notes,"
       L"progress,"
       L"rating,"
       L"reconsumeCount,"
       L"reconsuming,"
+      L"startedAt,"
       L"status,"
       L"updatedAt,"
       // relationships
@@ -683,11 +700,13 @@ int Service::ParseLibraryObject(const Json& json) const {
   anime_item.AddtoUserList();
 
   anime_item.SetMyId(ToWstr(library_id));
+  anime_item.SetMyDateEnd(TranslateMyDateFrom(JsonReadStr(attributes, "finishedAt")));
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(attributes, "notes")));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
   anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadStr(attributes, "rating")));
   anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));
   anime_item.SetMyRewatching(JsonReadBool(attributes, "reconsuming"));
+  anime_item.SetMyDateStart(TranslateMyDateFrom(JsonReadStr(attributes, "startedAt")));
   anime_item.SetMyStatus(TranslateMyStatusFrom(JsonReadStr(attributes, "status")));
   anime_item.SetMyLastUpdated(TranslateMyLastUpdatedFrom(JsonReadStr(attributes, "updatedAt")));
 

@@ -83,6 +83,14 @@ int TranslateSeriesTypeFrom(const std::string& value) {
   return anime::kUnknownType;
 }
 
+std::wstring TranslateMyDateFrom(const std::string& value) {
+  return value.size() >= 10 ? StrToWstr(value.substr(0, 10)) : std::wstring();
+}
+
+std::string TranslateMyDateTo(const std::wstring& value) {
+  return WstrToStr(value) + "T00:00:00.000Z";
+}
+
 std::wstring TranslateMyLastUpdatedFrom(const std::string& value) {
   // Get Unix time from ISO 8601
   const auto result = ConvertIso8601(StrToWstr(value));
