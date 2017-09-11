@@ -226,7 +226,6 @@ void SeasonDatabase::Review(bool hide_nsfw) {
       LOGD(L"\t<anime>\n"
            L"\t\t<type>" + ToWstr(pair.second.GetType()) + L"</type>\n"
            L"\t\t<id name=\"myanimelist\">" + ToWstr(pair.second.GetId()) + L"</id>\n"
-           L"\t\t<id name=\"kitsu\"></id>\n"
            L"\t\t<producers>" + Join(pair.second.GetProducers(), L", ") + L"</producers>\n"
            L"\t\t<image>" + pair.second.GetImageUrl() + L"</image>\n"
            L"\t\t<title>" + pair.second.GetTitle() + L"</title>\n"
