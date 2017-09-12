@@ -1057,8 +1057,12 @@ void OnUpdateNotAvailable(bool relations, bool season) {
                  Taiga.Updater.GetCurrentAnimeRelationsModified();
     }
     if (season) {
-      content += L"\n\nNew anime season: " +
-                 SeasonDatabase.available_seasons.second.GetString();
+      switch (taiga::GetCurrentServiceId()) {
+        case sync::kMyAnimeList:
+          content += L"\n\nNew anime season: " +
+                     SeasonDatabase.available_seasons.second.GetString();
+          break;
+      }
     }
     dlg.SetContent(content.c_str());
     dlg.AddButton(L"OK", IDOK);
