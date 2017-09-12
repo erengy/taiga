@@ -36,8 +36,8 @@ int TranslateSeriesTypeFrom(const std::string& value);
 std::wstring TranslateMyDateFrom(const std::string& value);
 std::string TranslateMyDateTo(const std::wstring& value);
 std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
-int TranslateMyRatingFrom(const std::string& value);
-std::string TranslateMyRatingTo(int value);
+int TranslateMyRatingFrom(int value);
+int TranslateMyRatingTo(int value);
 int TranslateMyStatusFrom(const std::string& value);
 std::string TranslateMyStatusTo(int value);
 

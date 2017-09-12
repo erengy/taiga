@@ -97,12 +97,12 @@ std::wstring TranslateMyLastUpdatedFrom(const std::string& value) {
   return result != -1 ? ToWstr(result) : std::wstring();
 }
 
-int TranslateMyRatingFrom(const std::string& value) {
-  return static_cast<int>(ToDouble(value) * 2.0);
+int TranslateMyRatingFrom(int value) {
+  return value / 2;
 }
 
-std::string TranslateMyRatingTo(int value) {
-  return ToStr(static_cast<double>(value) / 2.0, 1);
+int TranslateMyRatingTo(int value) {
+  return value * 2;
 }
 
 int TranslateMyStatusFrom(const std::string& value) {

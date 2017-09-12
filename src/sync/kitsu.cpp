@@ -482,9 +482,9 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
   if (request.data.count(L"score")) {
     const auto score = ToInt(request.data[L"score"]);
     if (score > 0) {
-      attributes["rating"] = TranslateMyRatingTo(score);
+      attributes["ratingTwenty"] = TranslateMyRatingTo(score);
     } else {
-      attributes["rating"] = nullptr;
+      attributes["ratingTwenty"] = nullptr;
     }
   }
   if (request.data.count(L"rewatched_times"))
@@ -538,7 +538,7 @@ void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) con
       L"finishedAt,"
       L"notes,"
       L"progress,"
-      L"rating,"
+      L"ratingTwenty,"
       L"reconsumeCount,"
       L"reconsuming,"
       L"startedAt,"
@@ -703,7 +703,7 @@ int Service::ParseLibraryObject(const Json& json) const {
   anime_item.SetMyDateEnd(TranslateMyDateFrom(JsonReadStr(attributes, "finishedAt")));
   anime_item.SetMyNotes(StrToWstr(JsonReadStr(attributes, "notes")));
   anime_item.SetMyLastWatchedEpisode(JsonReadInt(attributes, "progress"));
-  anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadStr(attributes, "rating")));
+  anime_item.SetMyScore(TranslateMyRatingFrom(JsonReadInt(attributes, "ratingTwenty")));
   anime_item.SetMyRewatchedTimes(JsonReadInt(attributes, "reconsumeCount"));
   anime_item.SetMyRewatching(JsonReadBool(attributes, "reconsuming"));
   anime_item.SetMyDateStart(TranslateMyDateFrom(JsonReadStr(attributes, "startedAt")));
