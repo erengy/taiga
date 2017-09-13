@@ -35,6 +35,10 @@ call %vcvarsall% || (
 
 :build_libcurl
 echo Configuring libcurl...
+
+set currentdir=%cd%
+cd /D %~dp0
+
 call src\curl\buildconf.bat
 
 if exist src\curl\builds (
@@ -51,6 +55,8 @@ xcopy /s ..\builds\libcurl-vc%vc%-x86-debug-static-ipv6-sspi-winssl\lib ..\..\..
 echo Building libcurl for Release configuration...
 nmake /f Makefile.vc mode=static RTLIBCFG=static VC=%vc% MACHINE=x86
 xcopy /s ..\builds\libcurl-vc%vc%-x86-release-static-ipv6-sspi-winssl\lib ..\..\..\lib\
+
+cd /D %currentdir%
 
 echo Done!
 pause
