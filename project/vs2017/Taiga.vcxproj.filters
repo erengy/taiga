@@ -217,12 +217,6 @@
     <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp">
       <Filter>deps\pugixml</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp">
-      <Filter>deps\semaver</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp">
-      <Filter>deps\semaver</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c">
       <Filter>deps\utf8proc</Filter>
     </ClCompile>
@@ -735,13 +729,7 @@
     <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp">
       <Filter>deps\pugixml</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h">
-      <Filter>deps\semaver</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\semaver\semaver\string.h">
-      <Filter>deps\semaver</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\deps\src\semaver\semaver\version.h">
+    <ClInclude Include="..\..\deps\src\semaver\src\semaver.hpp">
       <Filter>deps\semaver</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h">

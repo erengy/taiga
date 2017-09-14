@@ -325,7 +325,7 @@ bool AppSettings::Save() {
   xml_node settings = document.append_child(L"settings");
 
   // Meta
-  Set(kMeta_Version, StrToWstr(Taiga.version.str()));
+  Set(kMeta_Version, StrToWstr(Taiga.version.to_string()));
 
   for (enum_t i = kAppSettingNameFirst; i < kAppSettingNameLast; ++i) {
     WriteValue(settings, i);

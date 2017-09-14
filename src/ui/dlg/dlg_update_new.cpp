@@ -40,7 +40,7 @@ BOOL NewUpdateDialog::OnInitDialog() {
                  L"A new version of " TAIGA_APP_NAME L" is available!");
 
   // Set details text
-  std::wstring text = L"Current version: " + StrToWstr(Taiga.version.str());
+  std::wstring text = L"Current version: " + StrToWstr(Taiga.version.to_string());
   SetDlgItemText(IDC_STATIC_UPDATE_DETAILS, text.c_str());
 
   // Set changelog text

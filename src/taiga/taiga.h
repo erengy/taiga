@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <semaver/semaver/version.h>
+#include <semaver/src/semaver.hpp>
 #include <windows/win/application.h>
 
 #include "taiga/update.h"

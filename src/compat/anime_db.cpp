@@ -16,7 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <semaver/semaver/version.h>
+#include <semaver/src/semaver.hpp>
 
 #include "base/file.h"
 #include "base/log.h"

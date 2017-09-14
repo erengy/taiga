@@ -38,9 +38,9 @@ void AppSettings::ReadLegacyValues(const xml_node& settings) {
     const auto patch = ReadValue(settings, L"meta/version/revision", true, L"");
     if (!major.empty() && !minor.empty() && !patch.empty()) {
       const semaver::Version version(ToInt(major), ToInt(minor), ToInt(patch));
-      Set(kMeta_Version, StrToWstr(version.str()));
+      Set(kMeta_Version, StrToWstr(version.to_string()));
     } else {
-      Set(kMeta_Version, StrToWstr(Taiga.version.str()));
+      Set(kMeta_Version, StrToWstr(Taiga.version.to_string()));
     }
   }
 
@@ -61,8 +61,8 @@ bool AppSettings::HandleCompatibility() {
   if (version == Taiga.version)
     return false;
 
-  LOGW(L"Upgraded from v" + StrToWstr(version.str()) +
-       L" to v" + StrToWstr(Taiga.version.str()));
+  LOGW(L"Upgraded from v" + StrToWstr(version.to_string()) +
+       L" to v" + StrToWstr(Taiga.version.to_string()));
 
   if (version <= semaver::Version(1, 1, 7)) {
     // Convert old password encoding to base64

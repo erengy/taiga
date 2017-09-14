@@ -54,7 +54,7 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
       return StrToWstr(semaver::Version(
           (PUGIXML_VERSION / 100),
           (PUGIXML_VERSION % 100) / 10,
-          (PUGIXML_VERSION % 100) % 10).str());
+          (PUGIXML_VERSION % 100) % 10).to_string());
     }
     case kUtf8proc:
       return StrToWstr(utf8proc_version());
@@ -92,7 +92,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"{\\fonttbl"
       L"{\\f0\\fnil\\fcharset0 Segoe UI;}"
       L"}"
-      L"\\fs24\\b " TAIGA_APP_NAME L"\\b0  " + StrToWstr(Taiga.version.str()) + L"\\line\\fs18\\par "
+      L"\\fs24\\b " TAIGA_APP_NAME L"\\b0  " + StrToWstr(Taiga.version.to_string()) + L"\\line\\fs18\\par "
       L"\\b Author:\\b0\\line "
       L"erengy (Eren Okka)\\line\\par "
       L"\\b Contributors:\\b0\\line "

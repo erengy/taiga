@@ -44,8 +44,8 @@ void UpdateHelper::Cancel() {
 }
 
 void UpdateHelper::Check() {
-  const std::wstring channel = Taiga.version.prerelease_identifiers.empty() ?
-      L"stable" : StrToWstr(Taiga.version.prerelease_identifiers);
+  const std::wstring channel = Taiga.version.prerelease.empty() ?
+      L"stable" : StrToWstr(Taiga.version.prerelease);
   const std::wstring method = ui::DlgMain.IsWindow() ? L"manual" : L"auto";
 
   HttpRequest http_request;
@@ -53,7 +53,7 @@ void UpdateHelper::Check() {
   http_request.url.path = L"/update.php";
   http_request.url.query[L"channel"] = channel;
   http_request.url.query[L"check"] = method;
-  http_request.url.query[L"version"] = StrToWstr(Taiga.version.str());
+  http_request.url.query[L"version"] = StrToWstr(Taiga.version.to_string());
   http_request.url.query[L"service"] = GetCurrentService()->canonical_name();
   http_request.url.query[L"username"] = GetCurrentUsername();
 

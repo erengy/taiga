@@ -124,8 +124,6 @@
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
     <ClCompile Include="..\..\deps\src\monolog\monolog.cpp" />
     <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp" />
-    <ClCompile Include="..\..\deps\src\semaver\semaver\string.cpp" />
-    <ClCompile Include="..\..\deps\src\semaver\semaver\version.cpp" />
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c" />
     <ClCompile Include="..\..\deps\src\windows\win\application.cpp" />
     <ClCompile Include="..\..\deps\src\windows\win\common_dialogs.cpp" />
@@ -300,9 +298,7 @@
     <ClInclude Include="..\..\deps\src\monolog\monolog.h" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugixml.hpp" />
-    <ClInclude Include="..\..\deps\src\semaver\semaver\comparable.h" />
-    <ClInclude Include="..\..\deps\src\semaver\semaver\string.h" />
-    <ClInclude Include="..\..\deps\src\semaver\semaver\version.h" />
+    <ClInclude Include="..\..\deps\src\semaver\src\semaver.hpp" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc.h" />
     <ClInclude Include="..\..\deps\src\utf8proc\utf8proc_data.c" />
     <ClInclude Include="..\..\deps\src\windows\win\application.h" />

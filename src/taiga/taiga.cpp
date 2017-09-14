@@ -51,9 +51,9 @@ App::App()
   version.major = TAIGA_VERSION_MAJOR;
   version.minor = TAIGA_VERSION_MINOR;
   version.patch = TAIGA_VERSION_PATCH;
-  version.prerelease_identifiers = TAIGA_VERSION_PRE;
+  version.prerelease = TAIGA_VERSION_PRE;
   if (TAIGA_VERSION_BUILD > 0)
-    version.build_metadata = ToStr(TAIGA_VERSION_BUILD);
+    version.build = ToStr(TAIGA_VERSION_BUILD);
 }
 
 App::~App() {
@@ -71,7 +71,7 @@ BOOL App::InitInstance() {
   monolog::log.enable_console_output(false);
   monolog::log.set_path(path + TAIGA_APP_NAME L".log");
   monolog::log.set_level(debug_mode ? Level::Debug : Level::Warning);
-  LOGI(L"Version " + StrToWstr(version.str()) +
+  LOGI(L"Version " + StrToWstr(version.to_string()) +
        L" (" + GetFileLastModifiedDate(module_path) + L")");
 
   // Check another instance
