@@ -61,7 +61,7 @@ void HistoryQueue::Add(HistoryItem& item, bool save) {
       if (anime->GetMyLastWatchedEpisode() == *item.episode || *item.episode < 0)
         item.episode.Reset();
     if (item.score)
-      if (anime->GetMyScore() == *item.score || *item.score < 0 || *item.score > 10)
+      if (anime->GetMyScore() == *item.score || *item.score < 0 || *item.score > anime::kUserScoreMax)
         item.score.Reset();
     if (item.status)
       if (anime->GetMyStatus() == *item.status || *item.status < anime::kMyStatusFirst || *item.status >= anime::kMyStatusLast)
@@ -375,7 +375,8 @@ bool History::Load() {
 
   // Meta
   xml_node node_meta = document.child(L"meta");
-  semaver::Version version(WstrToStr(XmlReadStrValue(node_meta, L"version")));
+  const auto meta_version = XmlReadStrValue(node_meta, L"version");
+  semaver::Version version(WstrToStr(meta_version));
 
   // Items
   xml_node node_items = document.child(L"history").child(L"items");
@@ -399,6 +400,7 @@ bool History::Load() {
     ReadQueueInCompatibilityMode(document);
   } else {
     ReadQueue(document);
+    HandleCompatibility(meta_version);
   }
 
   return true;

@@ -98,11 +98,11 @@ std::wstring TranslateMyLastUpdatedFrom(const std::string& value) {
 }
 
 int TranslateMyRatingFrom(int value) {
-  return value / 2;
+  return value * (anime::kUserScoreMax / 20);
 }
 
 int TranslateMyRatingTo(int value) {
-  return value * 2;
+  return (value * 20) / anime::kUserScoreMax;
 }
 
 int TranslateMyStatusFrom(const std::string& value) {

@@ -62,6 +62,7 @@ private:
 
   bool CheckOldUserDirectory();
   void HandleCompatibility(const std::wstring& meta_version);
+  void HandleListCompatibility(const std::wstring& meta_version);
   void ReadDatabaseInCompatibilityMode(pugi::xml_document& document);
   void ReadListInCompatibilityMode(pugi::xml_document& document);
 };

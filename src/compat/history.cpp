@@ -16,6 +16,8 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <semaver/src/semaver.hpp>
+
 #include "base/foreach.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -23,6 +25,29 @@
 #include "library/anime_db.h"
 #include "library/history.h"
 #include "sync/sync.h"
+
+void History::HandleCompatibility(const std::wstring& meta_version) {
+  const semaver::Version version(WstrToStr(meta_version));
+  bool need_to_save = false;
+
+  // Convert from 10-point scale to 100-point scale
+  if (version < semaver::Version(1, 3, 0, "alpha.2")) {
+    for (auto& item : queue.items) {
+      if (item.score) {
+        const auto score = *item.score;
+        if (0 < score && score <= 10) {
+          item.score = score * 10;
+          need_to_save = true;
+          LOGW(L"Converted score of " + ToWstr(item.anime_id) +
+               L" from " + ToWstr(score) + L" to " + ToWstr(*item.score));
+        }
+      }
+    }
+  }
+
+  if (need_to_save)
+    Save();
+}
 
 void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
   xml_node node_queue = document.child(L"history").child(L"queue");

@@ -436,6 +436,8 @@ bool Database::LoadList() {
       UpdateItem(anime_item);
     }
 
+    HandleListCompatibility(meta_version);
+
   } else {
     LOGW(L"Reading list in compatibility mode");
     ReadListInCompatibilityMode(document);
@@ -451,7 +453,7 @@ bool Database::SaveList(bool include_database) {
   xml_document document;
 
   xml_node meta_node = document.append_child(L"meta");
-  XmlWriteStrValue(meta_node, L"version", L"1.1");
+  XmlWriteStrValue(meta_node, L"version", StrToWstr(Taiga.version.to_string()).c_str());
 
   if (include_database) {
     xml_node node_database = document.append_child(L"database");

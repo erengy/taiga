@@ -58,6 +58,7 @@ enum SeriesType {
 const int kUnknownEpisodeCount = -1;
 const int kUnknownEpisodeLength = -1;
 const double kUnknownScore = 0.0;
+const int kUserScoreMax = 100;
 
 enum MyStatus {
   kMyStatusFirst = 1,

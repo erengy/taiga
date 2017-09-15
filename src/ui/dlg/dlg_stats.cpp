@@ -74,8 +74,8 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         int bar_height = GetTextHeight(dc.Get());
         int bar_max = rect.Width() * 3 / 4;
 
-        for (int i = 10; i > 0; i--) {
-          if (i < 10)
+        for (int i = anime::kUserScoreMax; i > 0; i -= 10) {
+          if (i < anime::kUserScoreMax)
             rect.top += bar_height;
 
           if (Stats.score_distribution[i] > 0.0f) {

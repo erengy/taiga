@@ -77,6 +77,28 @@ void Database::HandleCompatibility(const std::wstring& meta_version) {
   }
 }
 
+void Database::HandleListCompatibility(const std::wstring& meta_version) {
+  const semaver::Version version(WstrToStr(meta_version));
+  bool need_to_save = false;
+
+  // Convert from 10-point scale to 100-point scale
+  if (version < semaver::Version(1, 3, 0, "alpha.2")) {
+    for (auto& pair : items) {
+      auto& item = pair.second;
+      const auto score = item.GetMyScore(false);
+      if (0 < score && score <= 10) {
+        item.SetMyScore(score * 10);
+        need_to_save = true;
+        LOGW(L"Converted score of " + ToWstr(item.GetId()) +
+             L" from " + ToWstr(score) + L" to " + ToWstr(item.GetMyScore(false)));
+      }
+    }
+  }
+
+  if (need_to_save)
+    SaveList();
+}
+
 void Database::ReadDatabaseInCompatibilityMode(xml_document& document) {
   xml_node animedb_node = document.child(L"animedb");
 

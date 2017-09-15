@@ -164,7 +164,7 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 
   // MAL allows setting a new value to "times_rewatched" and others, but
   // there's no way to get the current value. So we avoid them altogether.
-  const wchar_t* tags[] = {
+  const std::set<std::wstring> valid_tags{
       L"episode",
       L"status",
       L"score",
@@ -182,12 +182,13 @@ void Service::UpdateLibraryEntry(Request& request, HttpRequest& http_request) {
 //    L"fansub_group",
       L"tags"
   };
-  std::set<std::wstring> valid_tags(tags, tags + sizeof(tags) / sizeof(*tags));
   for (const auto& pair : request.data) {
     auto tag = valid_tags.find(TranslateKeyTo(pair.first));
     if (tag != valid_tags.end()) {
       std::wstring value = pair.second;
-      if (*tag == L"status") {
+      if (*tag == L"score") {
+        value = ToWstr(TranslateMyRatingTo(ToInt(value)));
+      } else if (*tag == L"status") {
         value = ToWstr(TranslateMyStatusTo(ToInt(value)));
       } else if (StartsWith(*tag, L"date")) {
         value = TranslateMyDateTo(value);
@@ -274,7 +275,7 @@ void Service::GetLibraryEntries(Response& response, HttpResponse& http_response)
     anime_item.SetMyLastWatchedEpisode(XmlReadIntValue(node, L"my_watched_episodes"));
     anime_item.SetMyDateStart(XmlReadStrValue(node, L"my_start_date"));
     anime_item.SetMyDateEnd(XmlReadStrValue(node, L"my_finish_date"));
-    anime_item.SetMyScore(XmlReadIntValue(node, L"my_score"));
+    anime_item.SetMyScore(TranslateMyRatingFrom(XmlReadIntValue(node, L"my_score")));
     anime_item.SetMyStatus(TranslateMyStatusFrom(XmlReadIntValue(node, L"my_status")));
     anime_item.SetMyRewatching(XmlReadIntValue(node, L"my_rewatching"));
     anime_item.SetMyRewatchingEp(XmlReadIntValue(node, L"my_rewatching_ep"));

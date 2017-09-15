@@ -400,7 +400,7 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // EditScore(value)
   //   Changes anime score.
-  //   Value must be between 0-10 and different from current score.
+  //   Value must be between 0-100 and different from current score.
   //   lParam is a pointer to a vector of anime IDs.
   } else if (action == L"EditScore") {
     const auto& anime_ids = *reinterpret_cast<std::vector<int>*>(lParam);

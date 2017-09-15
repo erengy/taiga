@@ -42,7 +42,7 @@ void DummyAnime::Initialize() {
   SetImageUrl(L"https://myanimelist.cdn-dena.com/images/anime/13/22128.jpg");
   AddtoUserList();
   SetMyLastWatchedEpisode(25);
-  SetMyScore(10);
+  SetMyScore(anime::kUserScoreMax);
   SetMyStatus(anime::kCompleted);
   SetMyTags(L"comedy, romance, drama");
   SetMyNotes(L"Best series ever!");

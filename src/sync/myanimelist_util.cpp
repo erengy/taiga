@@ -120,6 +120,14 @@ std::wstring TranslateMyDateTo(const std::wstring& value) {
          PadChar(ToWstr(date.year()), '0', 4);
 }
 
+int TranslateMyRatingFrom(int value) {
+  return value * (anime::kUserScoreMax / 10);
+}
+
+int TranslateMyRatingTo(int value) {
+  return (value * 10) / anime::kUserScoreMax;
+}
+
 int TranslateMyStatusFrom(int value) {
   switch (value) {
     case kWatching: return anime::kWatching;

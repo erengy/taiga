@@ -135,17 +135,17 @@
 	<!-- Score -->
 	<menu name="EditScore">
 		<!-- Note: Overwritten -->
-		<item name="(0) No Score"     action="EditScore(0)"  radio="1"/>
-		<item name="(1) Appalling"    action="EditScore(1)"  radio="1"/>
-		<item name="(2) Horrible"     action="EditScore(2)"  radio="1"/>
-		<item name="(3) Very Bad"     action="EditScore(3)"  radio="1"/>
-		<item name="(4) Bad"          action="EditScore(4)"  radio="1"/>
-		<item name="(5) Average"      action="EditScore(5)"  radio="1"/>
-		<item name="(6) Fine"         action="EditScore(6)"  radio="1"/>
-		<item name="(7) Good"         action="EditScore(7)"  radio="1"/>
-		<item name="(8) Very Good"    action="EditScore(8)"  radio="1"/>
-		<item name="(9) Great"        action="EditScore(9)"  radio="1"/>
-		<item name="(10) Masterpiece" action="EditScore(10)" radio="1"/>
+		<item name="(0) No Score"     action="EditScore(0)"   radio="1"/>
+		<item name="(1) Appalling"    action="EditScore(10)"  radio="1"/>
+		<item name="(2) Horrible"     action="EditScore(20)"  radio="1"/>
+		<item name="(3) Very Bad"     action="EditScore(30)"  radio="1"/>
+		<item name="(4) Bad"          action="EditScore(40)"  radio="1"/>
+		<item name="(5) Average"      action="EditScore(50)"  radio="1"/>
+		<item name="(6) Fine"         action="EditScore(60)"  radio="1"/>
+		<item name="(7) Good"         action="EditScore(70)"  radio="1"/>
+		<item name="(8) Very Good"    action="EditScore(80)"  radio="1"/>
+		<item name="(9) Great"        action="EditScore(90)"  radio="1"/>
+		<item name="(10) Masterpiece" action="EditScore(100)" radio="1"/>
 	</menu>
 	<!-- Status -->
 	<menu name="EditStatus">

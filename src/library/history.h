@@ -95,6 +95,8 @@ public:
   bool Load();
   bool Save();
 
+  void HandleCompatibility(const std::wstring& meta_version);
+
   std::vector<HistoryItem> items;
   HistoryQueue queue;
   int limit;

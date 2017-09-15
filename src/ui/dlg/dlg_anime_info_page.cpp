@@ -343,13 +343,15 @@ void PageMyInfo::Refresh(int anime_id) {
   combobox.SetWindowHandle(nullptr);
 
   // Score
+  const auto score = anime_item->GetMyScore();
   combobox.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
   if (combobox.GetCount() == 0) {
-    for (int i = 10; i >= 0; i--) {
-      combobox.AddString(anime::TranslateMyScoreFull(i).c_str());
+    for (int i = anime::kUserScoreMax; i >= 0; i -= 10) {
+      const int index = combobox.AddItem(anime::TranslateMyScoreFull(i).c_str(), i);
+      if (i == score)
+        combobox.SetCurSel(index);
     }
   }
-  combobox.SetCurSel(10 - anime_item->GetMyScore());
   combobox.SetWindowHandle(nullptr);
 
   // Tags / Notes
@@ -466,7 +468,9 @@ bool PageMyInfo::Save() {
   history_item.enable_rewatching = IsDlgButtonChecked(IDC_CHECK_ANIME_REWATCH);
 
   // Score
-  history_item.score = 10 - GetComboSelection(IDC_COMBO_ANIME_SCORE);
+  win::ComboBox combobox = GetDlgItem(IDC_COMBO_ANIME_SCORE);
+  history_item.score = combobox.GetItemData(combobox.GetCurSel());
+  combobox.SetWindowHandle(nullptr);
 
   // Status
   history_item.status = GetComboSelection(IDC_COMBO_ANIME_STATUS) + 1;

@@ -848,11 +848,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               return TRUE;
             // Edit score
             } else if (pnkd->wVKey >= '0' && pnkd->wVKey <= '9') {
-              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - '0') + L")", 0,
+              ExecuteAction(L"EditScore(" + ToWstr((pnkd->wVKey - '0') * 10) + L")", 0,
                             reinterpret_cast<LPARAM>(&anime_ids));
               return TRUE;
             } else if (pnkd->wVKey >= VK_NUMPAD0 && pnkd->wVKey <= VK_NUMPAD9) {
-              ExecuteAction(L"EditScore(" + ToWstr(pnkd->wVKey - VK_NUMPAD0) + L")", 0,
+              ExecuteAction(L"EditScore(" + ToWstr((pnkd->wVKey - VK_NUMPAD0) * 10) + L")", 0,
                             reinterpret_cast<LPARAM>(&anime_ids));
               return TRUE;
             // Open folder
