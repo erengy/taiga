@@ -36,7 +36,7 @@ enum MyStatus {
 
 enum class RatingSystem {
   Simple,
-  Standard,
+  Regular,
   Advanced,
 };
 

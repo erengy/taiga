@@ -138,7 +138,7 @@ std::string TranslateMyStatusTo(int value) {
 RatingSystem TranslateRatingSystemFrom(const std::string& value) {
   static const std::map<std::string, RatingSystem> table{
     {"simple", RatingSystem::Simple},
-    {"standard", RatingSystem::Standard},
+    {"regular", RatingSystem::Regular},
     {"advanced", RatingSystem::Advanced},
   };
 
@@ -147,7 +147,7 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
     return it->second;
 
   LOGW(L"Invalid value: " + StrToWstr(value));
-  return RatingSystem::Standard;
+  return RatingSystem::Regular;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

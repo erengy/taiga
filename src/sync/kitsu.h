@@ -70,7 +70,7 @@ private:
   bool IsPartialLibraryRequest() const;
 
   string_t access_token_;
-  RatingSystem rating_system_ = RatingSystem::Standard;
+  RatingSystem rating_system_ = RatingSystem::Regular;
 };
 
 }  // namespace kitsu
