@@ -34,5 +34,11 @@ enum MyStatus {
   kDropped
 };
 
+enum class RatingSystem {
+  Simple,
+  Standard,
+  Advanced,
+};
+
 }  // namespace kitsu
 }  // namespace sync

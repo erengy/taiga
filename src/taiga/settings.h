@@ -50,6 +50,7 @@ enum AppSettingName {
   kSync_Service_Kitsu_Username,
   kSync_Service_Kitsu_Password,
   kSync_Service_Kitsu_PartialLibrary,
+  kSync_Service_Kitsu_RatingSystem,
   kSync_Service_Kitsu_UseHttps,
 
   // Library

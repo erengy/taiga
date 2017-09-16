@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "sync/kitsu_types.h"
+
 namespace anime {
 class Item;
 }
@@ -40,6 +42,7 @@ int TranslateMyRatingFrom(int value);
 int TranslateMyRatingTo(int value);
 int TranslateMyStatusFrom(const std::string& value);
 std::string TranslateMyStatusTo(int value);
+RatingSystem TranslateRatingSystemFrom(const std::string& value);
 
 std::wstring GetAnimePage(const anime::Item& anime_item);
 void ViewAnimePage(int anime_id);

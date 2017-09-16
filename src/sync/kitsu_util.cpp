@@ -135,6 +135,21 @@ std::string TranslateMyStatusTo(int value) {
   return "";
 }
 
+RatingSystem TranslateRatingSystemFrom(const std::string& value) {
+  static const std::map<std::string, RatingSystem> table{
+    {"simple", RatingSystem::Simple},
+    {"standard", RatingSystem::Standard},
+    {"advanced", RatingSystem::Advanced},
+  };
+
+  const auto it = table.find(value);
+  if (it != table.end())
+    return it->second;
+
+  LOGW(L"Invalid value: " + StrToWstr(value));
+  return RatingSystem::Standard;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static const std::wstring kBaseUrl = L"https://kitsu.io";

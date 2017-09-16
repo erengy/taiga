@@ -51,6 +51,10 @@ Service::Service() {
   name_ = L"Kitsu";
 }
 
+RatingSystem Service::rating_system() const {
+  return rating_system_;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {
@@ -270,6 +274,11 @@ void Service::GetUser(Response& response, HttpResponse& http_response) {
 
   user_.id = StrToWstr(JsonReadStr(user, "id"));
   user_.username = StrToWstr(JsonReadStr(user["attributes"], "name"));
+
+  const auto rating_system = JsonReadStr(user["attributes"], "ratingSystem");
+  rating_system_ = TranslateRatingSystemFrom(rating_system);
+  Settings.Set(taiga::kSync_Service_Kitsu_RatingSystem,
+               StrToWstr(rating_system));
 }
 
 void Service::GetLibraryEntries(Response& response, HttpResponse& http_response) {
@@ -549,8 +558,9 @@ void Service::UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) con
 }
 
 void Service::UseSparseFieldsetsForUser(HttpRequest& http_request) const {
-  // We don't need any user information other than the ID and the name.
-  http_request.url.query[L"fields[users]"] = L"name";
+  http_request.url.query[L"fields[users]"] =
+      L"name,"
+      L"ratingSystem";
 }
 
 void Service::ParseObject(const Json& json) const {

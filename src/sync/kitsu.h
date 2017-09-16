@@ -38,6 +38,8 @@ public:
   void HandleResponse(Response& response, HttpResponse& http_response);
   bool RequestNeedsAuthentication(RequestType request_type) const;
 
+  RatingSystem rating_system() const;
+
 private:
   REQUEST_AND_RESPONSE(AddLibraryEntry);
   REQUEST_AND_RESPONSE(AuthenticateUser);
@@ -68,6 +70,7 @@ private:
   bool IsPartialLibraryRequest() const;
 
   string_t access_token_;
+  RatingSystem rating_system_ = RatingSystem::Standard;
 };
 
 }  // namespace kitsu
