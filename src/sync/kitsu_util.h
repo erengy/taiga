@@ -19,8 +19,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "sync/kitsu_types.h"
+#include "sync/service.h"
 
 namespace anime {
 class Item;
@@ -31,6 +33,10 @@ namespace kitsu {
 
 std::wstring DecodeSynopsis(std::string text);
 
+RatingSystem GetCurrentRatingSystem();
+void SetCurrentRatingSystem(RatingSystem rating_system);
+std::vector<Rating> GetMyRatings(RatingSystem rating_system);
+
 int TranslateAgeRatingFrom(const std::string& value);
 double TranslateSeriesRatingFrom(const std::string& value);
 double TranslateSeriesRatingTo(double value);
@@ -38,6 +44,7 @@ int TranslateSeriesTypeFrom(const std::string& value);
 std::wstring TranslateMyDateFrom(const std::string& value);
 std::string TranslateMyDateTo(const std::wstring& value);
 std::wstring TranslateMyLastUpdatedFrom(const std::string& value);
+std::wstring TranslateMyRating(int value, RatingSystem rating_system);
 int TranslateMyRatingFrom(int value);
 int TranslateMyRatingTo(int value);
 int TranslateMyStatusFrom(const std::string& value);

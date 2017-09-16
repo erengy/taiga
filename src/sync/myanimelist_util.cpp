@@ -52,6 +52,42 @@ std::wstring EraseBbcode(std::wstring& str) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+std::vector<Rating> GetMyRatings(bool full) {
+  constexpr int k = anime::kUserScoreMax / 10;
+
+  if (!full) {
+    return {
+      {0, L"0"},
+      {1 * k, L"1"},
+      {2 * k, L"2"},
+      {3 * k, L"3"},
+      {4 * k, L"4"},
+      {5 * k, L"5"},
+      {6 * k, L"6"},
+      {7 * k, L"7"},
+      {8 * k, L"8"},
+      {9 * k, L"9"},
+      {10 * k, L"10"},
+    };
+  }
+
+  return {
+    {0, L"(0) No Score"},
+    {1 * k, L"(1) Appalling"},
+    {2 * k, L"(2) Horrible"},
+    {3 * k, L"(3) Very Bad"},
+    {4 * k, L"(4) Bad"},
+    {5 * k, L"(5) Average"},
+    {6 * k, L"(6) Fine"},
+    {7 * k, L"(7) Good"},
+    {8 * k, L"(8) Very Good"},
+    {9 * k, L"(9) Great"},
+    {10 * k, L"(10) Masterpiece"},
+  };
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 int TranslateSeriesStatusFrom(int value) {
   switch (value) {
     case kUnknownStatus: return anime::kUnknownStatus;
@@ -118,6 +154,28 @@ std::wstring TranslateMyDateTo(const std::wstring& value) {
   return PadChar(ToWstr(date.month()), '0', 2) +
          PadChar(ToWstr(date.day()), '0', 2) +
          PadChar(ToWstr(date.year()), '0', 4);
+}
+
+std::wstring TranslateMyRating(int value, bool full) {
+  constexpr int k = anime::kUserScoreMax / 10;
+
+  if (!full)
+    return ToWstr(TranslateMyRatingTo(value));
+
+  if (value == 0) return L"(0) No Score";
+  if (value <= 1 * k) return L"(1) Appalling";
+  if (value <= 2 * k) return L"(2) Horrible";
+  if (value <= 3 * k) return L"(3) Very Bad";
+  if (value <= 4 * k) return L"(4) Bad";
+  if (value <= 5 * k) return L"(5) Average";
+  if (value <= 6 * k) return L"(6) Fine";
+  if (value <= 7 * k) return L"(7) Good";
+  if (value <= 8 * k) return L"(8) Very Good";
+  if (value <= 9 * k) return L"(9) Great";
+  if (value <= 10 * k) return L"(10) Masterpiece";
+
+  LOGW(L"Invalid value: " + ToWstr(value));
+  return {};
 }
 
 int TranslateMyRatingFrom(int value) {

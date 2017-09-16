@@ -22,6 +22,8 @@
 #include "library/anime_db.h"
 #include "library/anime_util.h"
 #include "library/history.h"
+#include "sync/kitsu_util.h"
+#include "sync/myanimelist_util.h"
 #include "sync/sync.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -343,14 +345,31 @@ void PageMyInfo::Refresh(int anime_id) {
   combobox.SetWindowHandle(nullptr);
 
   // Score
-  const auto score = anime_item->GetMyScore();
   combobox.SetWindowHandle(GetDlgItem(IDC_COMBO_ANIME_SCORE));
   if (combobox.GetCount() == 0) {
-    for (int i = anime::kUserScoreMax; i >= 0; i -= 10) {
-      const int index = combobox.AddItem(anime::TranslateMyScoreFull(i).c_str(), i);
-      if (i == score)
-        combobox.SetCurSel(index);
+    std::vector<sync::Rating> ratings;
+    std::wstring current_rating;
+    int selected_item = -1;
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        ratings = sync::myanimelist::GetMyRatings(true);
+        current_rating = sync::myanimelist::TranslateMyRating(anime_item->GetMyScore(), true);
+        break;
+      case sync::kKitsu: {
+        const auto rating_system = sync::kitsu::GetCurrentRatingSystem();
+        ratings = sync::kitsu::GetMyRatings(rating_system);
+        current_rating = sync::kitsu::TranslateMyRating(anime_item->GetMyScore(), rating_system);
+        break;
+      }
     }
+    for (auto it = ratings.rbegin(); it != ratings.rend(); ++it) {
+      const auto& rating = *it;
+      combobox.AddItem(rating.text.c_str(), rating.value);
+      if (selected_item == -1 && current_rating == rating.text)
+        selected_item = combobox.GetCount() - 1;
+    }
+    if (selected_item > -1)
+      combobox.SetCurSel(selected_item);
   }
   combobox.SetWindowHandle(nullptr);
 

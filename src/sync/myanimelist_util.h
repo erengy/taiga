@@ -19,6 +19,9 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+#include "sync/service.h"
 
 namespace anime {
 class Item;
@@ -30,11 +33,14 @@ namespace myanimelist {
 std::wstring DecodeText(std::wstring text);
 std::wstring EraseBbcode(std::wstring& str);
 
+std::vector<Rating> GetMyRatings(bool full);
+
 int TranslateSeriesStatusFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);
 int TranslateSeriesTypeFrom(int value);
 int TranslateSeriesTypeFrom(const std::wstring& value);
 std::wstring TranslateMyDateTo(const std::wstring& value);
+std::wstring TranslateMyRating(int value, bool full);
 int TranslateMyRatingFrom(int value);
 int TranslateMyRatingTo(int value);
 int TranslateMyStatusFrom(int value);

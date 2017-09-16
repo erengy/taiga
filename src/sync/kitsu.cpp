@@ -55,6 +55,10 @@ RatingSystem Service::rating_system() const {
   return rating_system_;
 }
 
+void Service::set_rating_system(RatingSystem rating_system) {
+  rating_system_ = rating_system;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void Service::BuildRequest(Request& request, HttpRequest& http_request) {

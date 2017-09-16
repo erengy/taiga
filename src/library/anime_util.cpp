@@ -961,59 +961,22 @@ std::wstring TranslateMyScore(int value, const std::wstring& default_char) {
     default:
       return ToWstr(value);
     case sync::kMyAnimeList:
-      return ToWstr(sync::myanimelist::TranslateMyRatingTo(value));
+      return sync::myanimelist::TranslateMyRating(value, false);
     case sync::kKitsu:
-      // TODO: Support all rating systems
-      return ToWstr(static_cast<double>(sync::kitsu::TranslateMyRatingTo(value)) / 2.0, 1);
+      return sync::kitsu::TranslateMyRating(
+          value, sync::kitsu::GetCurrentRatingSystem());
   }
 }
 
 std::wstring TranslateMyScoreFull(int value) {
   switch (taiga::GetCurrentServiceId()) {
     default:
+      return ToWstr(value);
     case sync::kMyAnimeList:
-      switch (value) {
-        default:
-        case 0: return L"(0) No Score";
-        case 10: return L"(1) Appalling";
-        case 20: return L"(2) Horrible";
-        case 30: return L"(3) Very Bad";
-        case 40: return L"(4) Bad";
-        case 50: return L"(5) Average";
-        case 60: return L"(6) Fine";
-        case 70: return L"(7) Good";
-        case 80: return L"(8) Very Good";
-        case 90: return L"(9) Great";
-        case 100: return L"(10) Masterpiece";
-      }
-      break;
-
+      return sync::myanimelist::TranslateMyRating(value, true);
     case sync::kKitsu:
-      // TODO: Support all rating systems
-      switch (value) {
-        default:
-        case 0: return L"0.0";
-        case 10: return L"1.0";
-        case 15: return L"1.5";
-        case 20: return L"2.0";
-        case 25: return L"2.5";
-        case 30: return L"3.0";
-        case 35: return L"3.5";
-        case 40: return L"4.0";
-        case 45: return L"4.5";
-        case 50: return L"5.0";
-        case 55: return L"5.5";
-        case 60: return L"6.0";
-        case 65: return L"6.5";
-        case 70: return L"7.0";
-        case 75: return L"7.5";
-        case 80: return L"8.0";
-        case 85: return L"8.5";
-        case 90: return L"9.0";
-        case 95: return L"9.5";
-        case 100: return L"10.0";
-      }
-      break;
+      return sync::kitsu::TranslateMyRating(
+          value, sync::kitsu::GetCurrentRatingSystem());
   }
 }
 

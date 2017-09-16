@@ -39,6 +39,7 @@ public:
   bool RequestNeedsAuthentication(RequestType request_type) const;
 
   RatingSystem rating_system() const;
+  void set_rating_system(RatingSystem rating_system);
 
 private:
   REQUEST_AND_RESPONSE(AddLibraryEntry);

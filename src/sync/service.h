@@ -76,6 +76,11 @@ public:
   string_t username;
 };
 
+struct Rating {
+  int value = 0;
+  std::wstring text;
+};
+
 class Service {
 public:
   Service();

@@ -32,6 +32,7 @@
 #include "library/resource.h"
 #include "sync/manager.h"
 #include "sync/sync.h"
+#include "sync/kitsu_util.h"
 #include "taiga/path.h"
 #include "taiga/settings.h"
 #include "taiga/stats.h"
@@ -250,6 +251,16 @@ bool AppSettings::Load() {
   }
 
   ReadLegacyValues(settings);
+
+  // Services
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kKitsu: {
+      const auto rating_system = sync::kitsu::TranslateRatingSystemFrom(
+          WstrToStr(GetWstr(kSync_Service_Kitsu_RatingSystem)));
+      sync::kitsu::SetCurrentRatingSystem(rating_system);
+      break;
+    }
+  }
 
   // Folders
   library_folders.clear();

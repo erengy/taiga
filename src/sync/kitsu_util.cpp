@@ -24,8 +24,10 @@
 #include "base/time.h"
 #include "library/anime.h"
 #include "library/anime_db.h"
+#include "sync/kitsu.h"
 #include "sync/kitsu_util.h"
 #include "sync/kitsu_types.h"
+#include "sync/manager.h"
 #include "taiga/settings.h"
 
 namespace sync {
@@ -35,6 +37,76 @@ std::wstring DecodeSynopsis(std::string text) {
   auto str = StrToWstr(text);
   ReplaceString(str, L"\n\n", L"\r\n\r\n");
   return str;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+RatingSystem GetCurrentRatingSystem() {
+  const auto& service = *reinterpret_cast<sync::kitsu::Service*>(
+      ServiceManager.service(sync::kKitsu));
+  return service.rating_system();
+}
+
+void SetCurrentRatingSystem(RatingSystem rating_system) {
+  auto& service = *reinterpret_cast<sync::kitsu::Service*>(
+      ServiceManager.service(sync::kKitsu));
+  service.set_rating_system(rating_system);
+}
+
+std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
+  constexpr int k = anime::kUserScoreMax / 20;
+
+  switch (rating_system) {
+    case RatingSystem::Simple:
+      return {
+        {0, L"-"},
+        {2 * k, L"Awful"},
+        {8 * k, L"Meh"},
+        {14 * k, L"Good"},
+        {20 * k, L"Great"},
+      };
+
+    case RatingSystem::Regular:
+      return {
+        {0, L"0"},
+        {2 * k, L"\u2605 0.5"},
+        {4 * k, L"\u2605 1"},
+        {6 * k, L"\u2605 1.5"},
+        {8 * k, L"\u2605 2"},
+        {10 * k, L"\u2605 2.5"},
+        {12 * k, L"\u2605 3"},
+        {14 * k, L"\u2605 3.5"},
+        {16 * k, L"\u2605 4"},
+        {18 * k, L"\u2605 4.5"},
+        {20 * k, L"\u2605 5"},
+      };
+
+    case RatingSystem::Advanced:
+      return {
+        {0, L"0"},
+        {2 * k, L"1"},
+        {3 * k, L"1.5"},
+        {4 * k, L"2"},
+        {5 * k, L"2.5"},
+        {6 * k, L"3"},
+        {7 * k, L"3.5"},
+        {8 * k, L"4"},
+        {9 * k, L"4.5"},
+        {10 * k, L"5"},
+        {11 * k, L"5.5"},
+        {12 * k, L"6"},
+        {13 * k, L"6.5"},
+        {14 * k, L"7"},
+        {15 * k, L"7.5"},
+        {16 * k, L"8"},
+        {17 * k, L"8.5"},
+        {18 * k, L"9"},
+        {19 * k, L"9.5"},
+        {20 * k, L"10"},
+      };
+  }
+
+  return {};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,6 +167,70 @@ std::wstring TranslateMyLastUpdatedFrom(const std::string& value) {
   // Get Unix time from ISO 8601
   const auto result = ConvertIso8601(StrToWstr(value));
   return result != -1 ? ToWstr(result) : std::wstring();
+}
+
+std::wstring TranslateMyRating(int value, RatingSystem rating_system) {
+  constexpr int k = anime::kUserScoreMax / 20;
+  
+  switch (rating_system) {
+    case RatingSystem::Simple:
+      if (value == 0) {
+        return L"-";
+      // Awful (2-5)
+      } else if (value <= 5 * k) {
+        return L"Awful";
+      // Meh (6-10)
+      } else if (value <= 10 * k) {
+        return L"Meh";
+      // Good (11-15)
+      } else if (value <= 15 * k) {
+        return L"Good";
+      // Great (16-20)
+      } else if (value <= 20 * k) {
+        return L"Great";
+      }
+      break;
+
+    case RatingSystem::Regular:
+      if (value == 0) return L"0";
+      if (value <= 2 * k) return L"0.5";
+      if (value <= 4 * k) return L"1";
+      if (value <= 6 * k) return L"1.5";
+      if (value <= 8 * k) return L"2";
+      if (value <= 10 * k) return L"2.5";
+      if (value <= 12 * k) return L"3";
+      if (value <= 14 * k) return L"3.5";
+      if (value <= 16 * k) return L"4";
+      if (value <= 18 * k) return L"4.5";
+      if (value <= 20 * k) return L"5";
+      break;
+
+    case RatingSystem::Advanced:
+      if (value == 0) return L"0";
+      if (value <= 2 * k) return L"1";
+      if (value <= 3 * k) return L"1.5";
+      if (value <= 4 * k) return L"2";
+      if (value <= 5 * k) return L"2.5";
+      if (value <= 6 * k) return L"3";
+      if (value <= 7 * k) return L"3.5";
+      if (value <= 8 * k) return L"4";
+      if (value <= 9 * k) return L"4.5";
+      if (value <= 10 * k) return L"5";
+      if (value <= 11 * k) return L"5.5";
+      if (value <= 12 * k) return L"6";
+      if (value <= 13 * k) return L"6.5";
+      if (value <= 14 * k) return L"7";
+      if (value <= 15 * k) return L"7.5";
+      if (value <= 16 * k) return L"8";
+      if (value <= 17 * k) return L"8.5";
+      if (value <= 18 * k) return L"9";
+      if (value <= 19 * k) return L"9.5";
+      if (value <= 20 * k) return L"10";
+      break;
+  }
+
+  LOGW(L"Invalid value: " + ToWstr(value));
+  return ToWstr(value);
 }
 
 int TranslateMyRatingFrom(int value) {

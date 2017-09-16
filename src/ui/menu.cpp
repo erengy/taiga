@@ -25,6 +25,8 @@
 #include "library/anime_util.h"
 #include "library/discover.h"
 #include "sync/sync.h"
+#include "sync/kitsu_util.h"
+#include "sync/myanimelist_util.h"
 #include "taiga/settings.h"
 #include "track/feed.h"
 #include "ui/menu.h"
@@ -246,18 +248,31 @@ void MenuList::UpdateHistoryList(bool enabled) {
 void MenuList::UpdateScore(const anime::Item* anime_item) {
   auto menu = menu_list_.FindMenu(L"EditScore");
   if (menu) {
-    for (size_t i = 0; i < menu->items.size(); i++) {
-      auto& item = menu->items.at(i);
-      item.checked = false;
-      item.def = false;
-      item.name = anime::TranslateMyScoreFull(i);
-    }
-    if (anime_item) {
-      int item_index = anime_item->GetMyScore();
-      if (item_index < static_cast<int>(menu->items.size())) {
-        menu->items[item_index].checked = true;
-        menu->items[item_index].def = true;
+    menu->items.clear();
+
+    std::vector<sync::Rating> ratings;
+    std::wstring current_rating;
+
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kMyAnimeList:
+        ratings = sync::myanimelist::GetMyRatings(true);
+        current_rating = sync::myanimelist::TranslateMyRating(
+            anime_item->GetMyScore(), true);
+        break;
+      case sync::kKitsu: {
+        const auto rating_system = sync::kitsu::GetCurrentRatingSystem();
+        ratings = sync::kitsu::GetMyRatings(rating_system);
+        current_rating = sync::kitsu::TranslateMyRating(
+            anime_item->GetMyScore(), rating_system);
+        break;
       }
+    }
+
+
+    for (const auto& rating : ratings) {
+      const bool current = rating.text == current_rating;
+      menu->CreateItem(L"EditScore(" + ToWstr(rating.value) + L")", rating.text,
+                       L"", current, current, true, false, true);
     }
   }
 }
