@@ -59,50 +59,50 @@ std::vector<Rating> GetMyRatings(RatingSystem rating_system) {
   switch (rating_system) {
     case RatingSystem::Simple:
       return {
-        {0, L"-"},
-        {2 * k, L"Awful"},
-        {8 * k, L"Meh"},
+        { 0,     L"-"},
+        { 2 * k, L"Awful"},
+        { 8 * k, L"Meh"},
         {14 * k, L"Good"},
         {20 * k, L"Great"},
       };
 
     case RatingSystem::Regular:
       return {
-        {0, L"0"},
-        {2 * k, L"\u2605 0.5"},
-        {4 * k, L"\u2605 1"},
-        {6 * k, L"\u2605 1.5"},
-        {8 * k, L"\u2605 2"},
+        { 0,     L"\u2605 0.0"},
+        { 2 * k, L"\u2605 0.5"},
+        { 4 * k, L"\u2605 1.0"},
+        { 6 * k, L"\u2605 1.5"},
+        { 8 * k, L"\u2605 2.0"},
         {10 * k, L"\u2605 2.5"},
-        {12 * k, L"\u2605 3"},
+        {12 * k, L"\u2605 3.0"},
         {14 * k, L"\u2605 3.5"},
-        {16 * k, L"\u2605 4"},
+        {16 * k, L"\u2605 4.0"},
         {18 * k, L"\u2605 4.5"},
-        {20 * k, L"\u2605 5"},
+        {20 * k, L"\u2605 5.0"},
       };
 
     case RatingSystem::Advanced:
       return {
-        {0, L"0"},
-        {2 * k, L"1"},
-        {3 * k, L"1.5"},
-        {4 * k, L"2"},
-        {5 * k, L"2.5"},
-        {6 * k, L"3"},
-        {7 * k, L"3.5"},
-        {8 * k, L"4"},
-        {9 * k, L"4.5"},
-        {10 * k, L"5"},
-        {11 * k, L"5.5"},
-        {12 * k, L"6"},
-        {13 * k, L"6.5"},
-        {14 * k, L"7"},
-        {15 * k, L"7.5"},
-        {16 * k, L"8"},
-        {17 * k, L"8.5"},
-        {18 * k, L"9"},
-        {19 * k, L"9.5"},
-        {20 * k, L"10"},
+        { 0,      L"0.0"},
+        { 2 * k,  L"1.0"},
+        { 3 * k,  L"1.5"},
+        { 4 * k,  L"2.0"},
+        { 5 * k,  L"2.5"},
+        { 6 * k,  L"3.0"},
+        { 7 * k,  L"3.5"},
+        { 8 * k,  L"4.0"},
+        { 9 * k,  L"4.5"},
+        {10 * k,  L"5.0"},
+        {11 * k,  L"5.5"},
+        {12 * k,  L"6.0"},
+        {13 * k,  L"6.5"},
+        {14 * k,  L"7.0"},
+        {15 * k,  L"7.5"},
+        {16 * k,  L"8.0"},
+        {17 * k,  L"8.5"},
+        {18 * k,  L"9.0"},
+        {19 * k,  L"9.5"},
+        {20 * k, L"10.0"},
       };
   }
 
@@ -170,63 +170,27 @@ std::wstring TranslateMyLastUpdatedFrom(const std::string& value) {
 }
 
 std::wstring TranslateMyRating(int value, RatingSystem rating_system) {
-  constexpr int k = anime::kUserScoreMax / 20;
-  
+  value = (value * 20) / anime::kUserScoreMax;
+
   switch (rating_system) {
     case RatingSystem::Simple:
-      if (value == 0) {
-        return L"-";
-      // Awful (2-5)
-      } else if (value <= 5 * k) {
-        return L"Awful";
-      // Meh (6-10)
-      } else if (value <= 10 * k) {
-        return L"Meh";
-      // Good (11-15)
-      } else if (value <= 15 * k) {
-        return L"Good";
-      // Great (16-20)
-      } else if (value <= 20 * k) {
-        return L"Great";
+      switch (static_cast<int>(std::ceil(value / 5.0))) {
+        case 0: return L"-";
+        case 1: return L"Awful";
+        case 2: return L"Meh";
+        case 3: return L"Good";
+        case 4: return L"Great";
       }
       break;
 
     case RatingSystem::Regular:
-      if (value == 0) return L"0";
-      if (value <= 2 * k) return L"0.5";
-      if (value <= 4 * k) return L"1";
-      if (value <= 6 * k) return L"1.5";
-      if (value <= 8 * k) return L"2";
-      if (value <= 10 * k) return L"2.5";
-      if (value <= 12 * k) return L"3";
-      if (value <= 14 * k) return L"3.5";
-      if (value <= 16 * k) return L"4";
-      if (value <= 18 * k) return L"4.5";
-      if (value <= 20 * k) return L"5";
-      break;
+      value = value / 2;
+      return L"\u2605 " + ToWstr(value / 2.0, 1);
 
     case RatingSystem::Advanced:
-      if (value == 0) return L"0";
-      if (value <= 2 * k) return L"1";
-      if (value <= 3 * k) return L"1.5";
-      if (value <= 4 * k) return L"2";
-      if (value <= 5 * k) return L"2.5";
-      if (value <= 6 * k) return L"3";
-      if (value <= 7 * k) return L"3.5";
-      if (value <= 8 * k) return L"4";
-      if (value <= 9 * k) return L"4.5";
-      if (value <= 10 * k) return L"5";
-      if (value <= 11 * k) return L"5.5";
-      if (value <= 12 * k) return L"6";
-      if (value <= 13 * k) return L"6.5";
-      if (value <= 14 * k) return L"7";
-      if (value <= 15 * k) return L"7.5";
-      if (value <= 16 * k) return L"8";
-      if (value <= 17 * k) return L"8.5";
-      if (value <= 18 * k) return L"9";
-      if (value <= 19 * k) return L"9.5";
-      if (value <= 20 * k) return L"10";
-      break;
+      if (value == 1)
+        break;  // there is no "0.5" rating
+      return ToWstr(value / 2.0, 1);
   }
 
   LOGW(L"Invalid value: " + ToWstr(value));

@@ -33,7 +33,7 @@ namespace myanimelist {
 std::wstring DecodeText(std::wstring text);
 std::wstring EraseBbcode(std::wstring& str);
 
-std::vector<Rating> GetMyRatings(bool full);
+std::vector<Rating> GetMyRatings();
 
 int TranslateSeriesStatusFrom(int value);
 int TranslateSeriesStatusFrom(const std::wstring& value);

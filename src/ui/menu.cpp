@@ -255,7 +255,7 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
 
     switch (taiga::GetCurrentServiceId()) {
       case sync::kMyAnimeList:
-        ratings = sync::myanimelist::GetMyRatings(true);
+        ratings = sync::myanimelist::GetMyRatings();
         current_rating = sync::myanimelist::TranslateMyRating(
             anime_item->GetMyScore(), true);
         break;

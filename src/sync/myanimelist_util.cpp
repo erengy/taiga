@@ -52,36 +52,20 @@ std::wstring EraseBbcode(std::wstring& str) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::vector<Rating> GetMyRatings(bool full) {
+std::vector<Rating> GetMyRatings() {
   constexpr int k = anime::kUserScoreMax / 10;
 
-  if (!full) {
-    return {
-      {0, L"0"},
-      {1 * k, L"1"},
-      {2 * k, L"2"},
-      {3 * k, L"3"},
-      {4 * k, L"4"},
-      {5 * k, L"5"},
-      {6 * k, L"6"},
-      {7 * k, L"7"},
-      {8 * k, L"8"},
-      {9 * k, L"9"},
-      {10 * k, L"10"},
-    };
-  }
-
   return {
-    {0, L"(0) No Score"},
-    {1 * k, L"(1) Appalling"},
-    {2 * k, L"(2) Horrible"},
-    {3 * k, L"(3) Very Bad"},
-    {4 * k, L"(4) Bad"},
-    {5 * k, L"(5) Average"},
-    {6 * k, L"(6) Fine"},
-    {7 * k, L"(7) Good"},
-    {8 * k, L"(8) Very Good"},
-    {9 * k, L"(9) Great"},
+    { 0,      L"(0) No Score"},
+    { 1 * k,  L"(1) Appalling"},
+    { 2 * k,  L"(2) Horrible"},
+    { 3 * k,  L"(3) Very Bad"},
+    { 4 * k,  L"(4) Bad"},
+    { 5 * k,  L"(5) Average"},
+    { 6 * k,  L"(6) Fine"},
+    { 7 * k,  L"(7) Good"},
+    { 8 * k,  L"(8) Very Good"},
+    { 9 * k,  L"(9) Great"},
     {10 * k, L"(10) Masterpiece"},
   };
 }
@@ -157,25 +141,25 @@ std::wstring TranslateMyDateTo(const std::wstring& value) {
 }
 
 std::wstring TranslateMyRating(int value, bool full) {
-  constexpr int k = anime::kUserScoreMax / 10;
-
   if (!full)
     return ToWstr(TranslateMyRatingTo(value));
 
-  if (value == 0) return L"(0) No Score";
-  if (value <= 1 * k) return L"(1) Appalling";
-  if (value <= 2 * k) return L"(2) Horrible";
-  if (value <= 3 * k) return L"(3) Very Bad";
-  if (value <= 4 * k) return L"(4) Bad";
-  if (value <= 5 * k) return L"(5) Average";
-  if (value <= 6 * k) return L"(6) Fine";
-  if (value <= 7 * k) return L"(7) Good";
-  if (value <= 8 * k) return L"(8) Very Good";
-  if (value <= 9 * k) return L"(9) Great";
-  if (value <= 10 * k) return L"(10) Masterpiece";
+  switch (TranslateMyRatingTo(value)) {
+    case  0: return  L"(0) No Score";
+    case  1: return  L"(1) Appalling";
+    case  2: return  L"(2) Horrible";
+    case  3: return  L"(3) Very Bad";
+    case  4: return  L"(4) Bad";
+    case  5: return  L"(5) Average";
+    case  6: return  L"(6) Fine";
+    case  7: return  L"(7) Good";
+    case  8: return  L"(8) Very Good";
+    case  9: return  L"(9) Great";
+    case 10: return L"(10) Masterpiece";
+  }
 
   LOGW(L"Invalid value: " + ToWstr(value));
-  return {};
+  return ToWstr(value);
 }
 
 int TranslateMyRatingFrom(int value) {
