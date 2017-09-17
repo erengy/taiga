@@ -20,6 +20,7 @@
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
+#include "sync/kitsu_util.h"
 #include "sync/service.h"
 #include "taiga/resource.h"
 #include "taiga/settings.h"
@@ -74,8 +75,8 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         int bar_height = GetTextHeight(dc.Get());
         int bar_max = rect.Width() * 3 / 4;
 
-        for (int i = anime::kUserScoreMax; i > 0; i -= 10) {
-          if (i < anime::kUserScoreMax)
+        for (int i = 10; i > 0; --i) {
+          if (i < 10)
             rect.top += bar_height;
 
           if (Stats.score_distribution[i] > 0.0f) {
@@ -162,19 +163,32 @@ void StatsDialog::Refresh() {
   if (!IsWindow())
     return;
 
+  enum class RatingType {
+    Five,
+    Ten,
+  } rating_type = RatingType::Ten;
+  switch (taiga::GetCurrentServiceId()) {
+    case sync::kKitsu:
+      switch (sync::kitsu::GetCurrentRatingSystem()) {
+        case sync::kitsu::RatingSystem::Regular:
+          rating_type = RatingType::Five;
+          break;
+      }
+      break;
+  }
+
   // Anime list
   std::wstring text;
   text += ToWstr(Stats.anime_count) + L"\n";
   text += ToWstr(Stats.episode_count) + L"\n";
   text += Stats.life_spent_watching + L"\n";
   text += Stats.life_planned_to_watch + L"\n";
-  switch (taiga::GetCurrentServiceId()) {
-    case sync::kMyAnimeList:
-    default:
+  switch (rating_type) {
+    case RatingType::Ten:
       text += ToWstr(Stats.score_mean, 2) + L"\n";
       text += ToWstr(Stats.score_deviation, 2);
       break;
-    case sync::kKitsu:
+    case RatingType::Five:
       text += ToWstr(Stats.score_mean / 2.0, 2) + L"\n";
       text += ToWstr(Stats.score_deviation / 2.0, 2);
       break;
@@ -183,12 +197,11 @@ void StatsDialog::Refresh() {
 
   // Score distribution
   text.clear();
-  switch (taiga::GetCurrentServiceId()) {
-    case sync::kMyAnimeList:
-    default:
+  switch (rating_type) {
+    case RatingType::Ten:
       text = L"10\n9\n8\n7\n6\n5\n4\n3\n2\n1\n";
       break;
-    case sync::kKitsu:
+    case RatingType::Five:
       text = L"5.0\n4.5\n4.0\n3.5\n3.0\n2.5\n2.0\n1.5\n1.0\n0.5";
       break;
   }

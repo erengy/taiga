@@ -37,8 +37,8 @@ Statistics::Statistics()
       image_size(0),
       score_mean(0.0f),
       score_deviation(0.0f),
-      score_count(anime::kUserScoreMax + 1, 0),
-      score_distribution(anime::kUserScoreMax + 1, 0.0f),
+      score_count(11, 0),
+      score_distribution(11, 0.0f),
       tigers_harmed(0),
       torrent_count(0),
       torrent_size(0),
@@ -186,9 +186,10 @@ const std::vector<float>& Statistics::CalculateScoreDistribution() {
   for (const auto& pair : AnimeDatabase.items) {
     int score = pair.second.GetMyScore();
     if (score > 0) {
-      score_count[score]++;
-      score_distribution[score]++;
-      extreme_value = std::max(score_distribution[score], extreme_value);
+      const auto score_index = static_cast<size_t>(std::floor(score / 10.0));
+      score_count[score_index]++;
+      score_distribution[score_index]++;
+      extreme_value = std::max(score_distribution[score_index], extreme_value);
     }
   }
 
