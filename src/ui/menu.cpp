@@ -327,45 +327,77 @@ void MenuList::UpdateSeason() {
   auto menu = menu_list_.FindMenu(L"SeasonSelect");
   if (menu) {
     menu->items.clear();
-    const auto season_min = SeasonDatabase.available_seasons.first;
+
+    auto season_min = SeasonDatabase.available_seasons.first;
     auto season_max = SeasonDatabase.available_seasons.second;
     switch (taiga::GetCurrentServiceId()) {
       case sync::kKitsu: {
         const auto next_season = ++anime::Season(GetDate());
         season_max = std::max(season_max, next_season);
+        season_min = anime::Season(anime::Season::Name::kWinter, 2010);
         break;
       }
     }
+
     auto create_item = [](win::Menu& menu, const anime::Season& season) {
       menu.CreateItem(L"Season_Load(" + season.GetString() + L")",
                       season.GetString(), L"",
                       season == SeasonDatabase.current_season,
                       false, true, false, true);
     };
+
+    auto create_submenu = [this](const std::wstring& name) {
+      auto submenu = menu_list_.FindMenu(name.c_str());
+      if (!submenu) {
+        menu_list_.Create(name.c_str(), L"");
+        submenu = menu_list_.FindMenu(name.c_str());
+      }
+      return submenu;
+    };
+
+    auto create_available_seasons = [this, &create_item, &create_submenu](
+        win::Menu& menu,
+        const anime::Season& season_min,
+        const anime::Season& season_max) {
+      int current_year = 0;
+      for (auto season = season_max; season >= season_min; --season) {
+        std::wstring submenu_name = L"Season" + ToWstr(season.year);
+        auto submenu = create_submenu(submenu_name);
+        if (current_year == 0 || current_year != season.year) {
+          menu.CreateItem(L"", ToWstr(season.year), submenu_name);
+          submenu->items.clear();
+          current_year = season.year;
+        }
+        create_item(*submenu, season);
+      }
+    };
+
     // Add latest seasons
     for (auto season = season_max; season >= season_min; --season) {
       create_item(*menu, season);
       if (menu->items.size() == 2)
         break;
     }
+
     if (!menu->items.empty())
       menu->CreateItem();  // separator
+
     // Add available seasons
-    int current_year = 0;
-    for (auto season = season_max; season >= season_min; --season) {
-      win::Menu* submenu = nullptr;
-      std::wstring submenu_name = L"Season" + ToWstr(season.year);
-      submenu = menu_list_.FindMenu(submenu_name.c_str());
-      if (!submenu) {
-        menu_list_.Create(submenu_name.c_str(), L"");
-        submenu = menu_list_.FindMenu(submenu_name.c_str());
+    create_available_seasons(*menu, season_min, season_max);
+    switch (taiga::GetCurrentServiceId()) {
+      case sync::kKitsu: {
+        menu->CreateItem();  // separator
+        for (int decade = 2000; decade >= 1960; decade -= 10) {
+          std::wstring submenu_name = L"SeasonDecade" + ToWstr(decade);
+          auto submenu = create_submenu(submenu_name);
+          submenu->items.clear();
+          menu->CreateItem(L"", ToWstr(decade) + L"s", submenu_name);
+          create_available_seasons(*submenu,
+              anime::Season(anime::Season::Name::kWinter, decade),
+              anime::Season(anime::Season::Name::kFall, decade + 9));
+        }
+        break;
       }
-      if (current_year == 0 || current_year != season.year) {
-        menu->CreateItem(L"", ToWstr(season.year), submenu_name);
-        submenu->items.clear();
-        current_year = season.year;
-      }
-      create_item(*submenu, season);
     }
   }
 
