@@ -104,11 +104,11 @@ static const std::vector<StreamData> stream_data{
     taiga::kStream_Plex,
     L"Plex",
     std::regex(
-      "plex\\.tv/web/|"
-      "localhost:32400/web/|"
-      "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:32400/web/|"
-      "plex\\.[a-z0-9-]+\\.[a-z0-9-]+|"
-      "[a-z0-9-]+\\.[a-z0-9-]+/plex"
+      "^[^/]*?plex\\.tv/web/|"
+      "^localhost:32400/web/|"
+      "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:32400/web/|"
+      "^plex\\.[a-z0-9-]+\\.[a-z0-9-]+|"
+      "^[^/]*[a-z0-9-]+\\.[a-z0-9-]+/plex"
     ),
     std::regex(u8"Plex|(?:\u25B6 )?(.+)"),
   },
