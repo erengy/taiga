@@ -254,20 +254,12 @@ BOOL SettingsPage::OnInitDialog() {
         Header_SetItem(header.GetWindowHandle(), 0, &hdi);
         header.SetWindowHandle(nullptr);
       }
-      int i = 0;
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"AnimeLab", taiga::kStream_Animelab);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Anime News Network", taiga::kStream_Ann);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Crunchyroll", taiga::kStream_Crunchyroll);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"DAISUKI", taiga::kStream_Daisuki);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"HIDIVE", taiga::kStream_Hidive);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Plex Web App", taiga::kStream_Plex);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Veoh", taiga::kStream_Veoh);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"VIZ", taiga::kStream_Viz);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"VRV", taiga::kStream_Vrv);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"Wakanim", taiga::kStream_Wakanim);
-      list.InsertItem(i++, 0, ui::kIcon16_AppBlue, 0, nullptr, L"YouTube", taiga::kStream_Youtube);
-      for (int i = 0; i < list.GetItemCount(); ++i) {
-        if (Settings.GetBool(static_cast<int>(list.GetItemParam(i))))
+      const auto& stream_data = track::recognition::GetStreamData();
+      for (int i = 0; i < static_cast<int>(stream_data.size()); i++) {
+        const auto& item = stream_data.at(i);
+        list.InsertItem(i, 0, ui::kIcon16_AppBlue, 0, nullptr,
+                        item.name.c_str(), item.option_id);
+        if (Settings.GetBool(item.option_id))
           list.SetCheckState(i, TRUE);
       }
       list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
@@ -900,19 +892,9 @@ LRESULT SettingsPage::OnNotify(int idCtrl, LPNMHDR pnmh) {
         list.SetWindowHandle(nullptr);
       // Streaming media providers
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_STREAM_PROVIDER)) {
-        const std::vector<std::wstring> links = {
-          L"https://www.animelab.com",
-          L"https://www.animenewsnetwork.com/video/",
-          L"http://www.crunchyroll.com",
-          L"http://www.daisuki.net",
-          L"https://www.plex.tv",
-          L"http://www.veoh.com",
-          L"https://www.viz.com/watch",
-          L"http://www.wakanim.tv",
-          L"https://www.youtube.com",
-        };
-        if (lpnmitem->iItem > -1 && lpnmitem->iItem < static_cast<int>(links.size()))
-          ExecuteLink(links.at(lpnmitem->iItem));
+        const auto& stream_data = track::recognition::GetStreamData();
+        if (lpnmitem->iItem > -1 && lpnmitem->iItem < static_cast<int>(stream_data.size()))
+          ExecuteLink(stream_data.at(lpnmitem->iItem).url);
       // Torrent filters
       } else if (lpnmitem->hdr.hwndFrom == GetDlgItem(IDC_LIST_TORRENT_FILTER)) {
         win::ListView list = lpnmitem->hdr.hwndFrom;

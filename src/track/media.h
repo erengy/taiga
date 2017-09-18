@@ -19,6 +19,7 @@
 #pragma once
 
 #include <memory>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -71,6 +72,32 @@ private:
   bool player_running_ = false;
   bool title_changed_ = false;
 };
+
+enum class Stream {
+  Unknown,
+  Animelab,
+  Ann,
+  Crunchyroll,
+  Daisuki,
+  Hidive,
+  Plex,
+  Veoh,
+  Viz,
+  Vrv,
+  Wakanim,
+  Youtube,
+};
+
+struct StreamData {
+  Stream id;
+  enum_t option_id;
+  std::wstring name;
+  std::wstring url;
+  std::regex url_pattern;
+  std::regex title_pattern;
+};
+
+const std::vector<StreamData>& GetStreamData();
 
 bool GetTitleFromStreamingMediaProvider(const std::wstring& url, std::wstring& title);
 void NormalizeWebBrowserTitle(const std::wstring& url, std::wstring& title);

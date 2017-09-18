@@ -29,35 +29,13 @@
 namespace track {
 namespace recognition {
 
-enum class Stream {
-  Unknown,
-  Animelab,
-  Ann,
-  Crunchyroll,
-  Daisuki,
-  Hidive,
-  Plex,
-  Veoh,
-  Viz,
-  Vrv,
-  Wakanim,
-  Youtube,
-};
-
-struct StreamData {
-  Stream id;
-  enum_t option_id;
-  std::wstring name;
-  std::regex url_pattern;
-  std::regex title_pattern;
-};
-
 static const std::vector<StreamData> stream_data{
   // AnimeLab
   {
     Stream::Animelab,
     taiga::kStream_Animelab,
     L"AnimeLab",
+    L"https://www.animelab.com",
     std::regex("animelab\\.com/player/"),
     std::regex("AnimeLab - (.+)"),
   },
@@ -66,6 +44,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Ann,
     taiga::kStream_Ann,
     L"Anime News Network",
+    L"https://www.animenewsnetwork.com/video/",
     std::regex("animenewsnetwork\\.(?:com|cc)/video/[0-9]+"),
     std::regex("(.+) - Anime News Network"),
   },
@@ -74,6 +53,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Crunchyroll,
     taiga::kStream_Crunchyroll,
     L"Crunchyroll",
+    L"http://www.crunchyroll.com",
     std::regex(
       "crunchyroll\\.[a-z.]+/[^/]+/(?:"
         "episode-[0-9]+.*|"
@@ -87,6 +67,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Daisuki,
     taiga::kStream_Daisuki,
     L"DAISUKI",
+    L"http://www.daisuki.net",
     std::regex("daisuki\\.net/[a-z]+/[a-z]+/anime/watch"),
     std::regex("(.+) - DAISUKI"),
   },
@@ -95,6 +76,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Hidive,
     taiga::kStream_Hidive,
     L"HIDIVE",
+    L"https://www.hidive.com",
     std::regex("hidive\\.com/stream/"),
     std::regex("(.+)"),
   },
@@ -103,6 +85,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Plex,
     taiga::kStream_Plex,
     L"Plex",
+    L"https://www.plex.tv",
     std::regex(
       "^[^/]*?plex\\.tv/web/|"
       "^localhost:32400/web/|"
@@ -117,6 +100,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Veoh,
     taiga::kStream_Veoh,
     L"Veoh",
+    L"http://www.veoh.com",
     std::regex("veoh\\.com/watch/"),
     std::regex("Watch Videos Online \\| (.+) \\| Veoh\\.com"),
   },
@@ -125,6 +109,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Viz,
     taiga::kStream_Viz,
     L"Viz Anime",
+    L"https://www.viz.com/watch",
     std::regex("viz\\.com/watch/streaming/[^/]+-(?:episode-[0-9]+|movie)/"),
     std::regex("(.+) // VIZ"),
   },
@@ -133,6 +118,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Vrv,
     taiga::kStream_Vrv,
     L"VRV",
+    L"https://vrv.co",
     std::regex("vrv\\.co/watch"),
     std::regex("VRV - Watch (.+)"),
   },
@@ -141,6 +127,7 @@ static const std::vector<StreamData> stream_data{
     Stream::Wakanim,
     taiga::kStream_Wakanim,
     L"Wakanim",
+    L"https://www.wakanim.tv",
     std::regex("wakanim\\.tv/video(?:-premium)?/[^/]+/"),
     std::regex("(.+) / Streaming - Wakanim.TV"),
   },
@@ -149,10 +136,15 @@ static const std::vector<StreamData> stream_data{
     Stream::Youtube,
     taiga::kStream_Youtube,
     L"YouTube",
+    L"https://www.youtube.com",
     std::regex("youtube\\.com/watch"),
     std::regex(u8"YouTube|(?:\u25B6 )?(.+) - YouTube"),
   },
 };
+
+const std::vector<StreamData>& GetStreamData() {
+  return stream_data;
+}
 
 const StreamData* FindStreamFromUrl(std::wstring url) {
   EraseLeft(url, L"http://");
