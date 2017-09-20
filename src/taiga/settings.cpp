@@ -56,11 +56,11 @@ const std::wstring kDefaultExternalLinks =
     L"MALgraph|http://graph.anime.plus\r\n"
     L"-\r\n"
     L"AniChart|http://anichart.net/airing\r\n"
-    L"Monthly.moe|http://www.monthly.moe/weekly\r\n"
+    L"Monthly.moe|https://www.monthly.moe/weekly\r\n"
     L"Senpai Anime Charts|http://www.senpai.moe/?mode=calendar\r\n"
     L"-\r\n"
     L"Anime Streaming Search Engine|http://because.moe\r\n"
-    L"The Fansub Database|http://fansubdb.com";
+    L"The Fansub Database|https://fansubdb.com";
 const std::wstring kDefaultFormatHttp =
     L"user=%user%"
     L"&name=%title%"
