@@ -1,0 +1,8 @@
+root = true
+
+[*.{cpp,h}]
+charset = latin1
+end_of_line = crlf
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = true
