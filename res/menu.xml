@@ -166,7 +166,7 @@
 		<item name="Wikipedia"          action="URL(https://en.wikipedia.org/wiki/Special:Search?search=%title%)"/>
 		<item type="separator"/>
 		<item name="Custom RSS feed" action="SearchTorrents()"/>
-		<item name="NyaaTorrents" action="SearchTorrents(https://www.nyaa.se/?page=rss&amp;cats=1_37&amp;filter=2&amp;term=%title%)"/>
+		<item name="Nyaa.si" action="SearchTorrents(https://nyaa.si/?page=rss&amp;c=1_2&amp;f=0&amp;q=%title%)"/>
 	</menu>
 	<!-- Play episode -->
 	<menu name="PlayEpisode">

@@ -414,14 +414,8 @@ bool Aggregator::ValidateFeedDownload(const HttpRequest& http_request,
 
   // Check response body
   if (StartsWith(http_response.body, L"<!DOCTYPE html>")) {
-    static const std::wstring nyaa_error =
-        L"The torrent you are looking for does not appear to be in the database.";
-    if (InStr(http_response.body, nyaa_error) > -1) {
-      ui::OnFeedDownload(false, nyaa_error);
-    } else {
-      const auto location = http_request.url.Build();
-      ui::OnFeedDownload(false, L"Invalid torrent file: " + location);
-    }
+    const auto location = http_request.url.Build();
+    ui::OnFeedDownload(false, L"Invalid torrent file: " + location);
     return false;
   }
 
