@@ -80,11 +80,11 @@ static const std::vector<StreamData> stream_data{
     std::regex("hidive\\.com/stream/"),
     std::regex("(.+)"),
   },
-  // Plex
+  // Plex Web App
   {
     Stream::Plex,
     taiga::kStream_Plex,
-    L"Plex",
+    L"Plex Web App",
     L"https://www.plex.tv",
     std::regex(
       "^[^/]*?plex\\.tv/web/|"
@@ -104,11 +104,11 @@ static const std::vector<StreamData> stream_data{
     std::regex("veoh\\.com/watch/"),
     std::regex("Watch Videos Online \\| (.+) \\| Veoh\\.com"),
   },
-  // Viz Anime
+  // VIZ
   {
     Stream::Viz,
     taiga::kStream_Viz,
-    L"Viz Anime",
+    L"VIZ",
     L"https://www.viz.com/watch",
     std::regex("viz\\.com/watch/streaming/[^/]+-(?:episode-[0-9]+|movie)/"),
     std::regex("(.+) // VIZ"),
