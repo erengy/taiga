@@ -23,6 +23,7 @@
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_item.h"
+#include "library/anime_util.h"
 #include "sync/kitsu.h"
 #include "sync/kitsu_types.h"
 #include "sync/kitsu_util.h"
@@ -265,7 +266,7 @@ void Service::AuthenticateUser(Response& response, HttpResponse& http_response) 
   if (!ParseResponseBody(http_response.body, response, root))
     return;
 
-  access_token_ = StrToWstr(root["access_token"]);
+  access_token_ = StrToWstr(JsonReadStr(root, "access_token"));
 }
 
 void Service::GetUser(Response& response, HttpResponse& http_response) {
@@ -366,6 +367,9 @@ void Service::UpdateLibraryEntry(Response& response, HttpResponse& http_response
 
   const auto anime_id = ParseLibraryObject(root["data"]);
 
+  if (!anime::IsValidId(anime_id))
+    return;
+
   for (const auto& value : root["included"]) {
     ParseObject(value);
   }
@@ -426,8 +430,8 @@ bool Service::RequestSucceeded(Response& response,
       if (errors.is_array() && !errors.empty()) {
         const auto& error = errors.front();
         error_description = StrToWstr("\"" +
-            error["title"].get<std::string>() + ": " +
-            error["detail"].get<std::string>() + "\"");
+            JsonReadStr(error, "title") + ": " +
+            JsonReadStr(error, "detail") + "\"");
       }
     }
   }
@@ -606,8 +610,11 @@ void Service::ParseObject(const Json& json) const {
 }
 
 int Service::ParseAnimeObject(const Json& json) const {
-  const auto anime_id = ToInt(json["id"].get<std::string>());
+  const auto anime_id = ToInt(JsonReadStr(json, "id"));
   const auto& attributes = json["attributes"];
+
+  if (!anime_id)
+    return anime::ID_UNKNOWN;
 
   anime::Item anime_item;
   anime_item.SetSource(this->id());
@@ -705,8 +712,11 @@ int Service::ParseLibraryObject(const Json& json) const {
   const auto& media = json["relationships"]["anime"];
   const auto& attributes = json["attributes"];
 
-  const auto anime_id = ToInt(media["data"]["id"].get<std::string>());
-  const auto library_id = ToInt(json["id"].get<std::string>());
+  const auto anime_id = ToInt(JsonReadStr(media["data"], "id"));
+  const auto library_id = ToInt(JsonReadStr(json, "id"));
+
+  if (!anime_id)
+    return anime::ID_UNKNOWN;
 
   anime::Item anime_item;
   anime_item.SetSource(this->id());
