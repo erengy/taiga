@@ -613,8 +613,10 @@ int Service::ParseAnimeObject(const Json& json) const {
   const auto anime_id = ToInt(JsonReadStr(json, "id"));
   const auto& attributes = json["attributes"];
 
-  if (!anime_id)
+  if (!anime_id) {
+    LOGW(L"Could not parse anime object:\n" + StrToWstr(json.dump()));
     return anime::ID_UNKNOWN;
+  }
 
   anime::Item anime_item;
   anime_item.SetSource(this->id());
@@ -715,8 +717,10 @@ int Service::ParseLibraryObject(const Json& json) const {
   const auto anime_id = ToInt(JsonReadStr(media["data"], "id"));
   const auto library_id = ToInt(JsonReadStr(json, "id"));
 
-  if (!anime_id)
+  if (!anime_id) {
+    LOGW(L"Could not parse library entry #" + ToWstr(library_id));
     return anime::ID_UNKNOWN;
+  }
 
   anime::Item anime_item;
   anime_item.SetSource(this->id());
