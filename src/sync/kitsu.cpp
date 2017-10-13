@@ -169,7 +169,7 @@ void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
   http_request.url.query[L"page[offset]"] = request.data[L"page_offset"];
   http_request.url.query[L"page[limit]"] = ToWstr(kLibraryMaximumPageSize);
 
-  UseSparseFieldsetsForAnime(http_request);
+  UseSparseFieldsetsForAnime(http_request, true);
   UseSparseFieldsetsForLibraryEntries(http_request);
 }
 
@@ -522,7 +522,8 @@ std::wstring Service::BuildLibraryObject(Request& request) const {
   return StrToWstr(json.dump());
 }
 
-void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
+void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request,
+                                         bool minimal) const {
   // Requesting a restricted set of fields decreases response and download times
   // in certain cases.
   http_request.url.query[L"fields[anime]"] =
@@ -539,11 +540,14 @@ void Service::UseSparseFieldsetsForAnime(HttpRequest& http_request) const {
       L"slug,"
       L"startDate,"
       L"subtype,"
-      L"synopsis,"
       L"titles,"
       // relationships
       L"animeProductions,"
       L"genres";
+  if (!minimal) {
+    http_request.url.query[L"fields[anime]"] += L",synopsis";
+  }
+
   http_request.url.query[L"fields[animeProductions]"] = L"producer";
   http_request.url.query[L"fields[genres]"] = L"name";
   http_request.url.query[L"fields[producers]"] = L"name";

@@ -27,7 +27,7 @@ namespace sync {
 namespace kitsu {
 
 // API documentation:
-// http://docs.kitsu17.apiary.io
+// http://docs.kitsu.apiary.io
 
 class Service : public sync::Service {
 public:
@@ -55,7 +55,7 @@ private:
   bool RequestSucceeded(Response& response, const HttpResponse& http_response);
 
   std::wstring BuildLibraryObject(Request& request) const;
-  void UseSparseFieldsetsForAnime(HttpRequest& http_request) const;
+  void UseSparseFieldsetsForAnime(HttpRequest& http_request, bool minimal = false) const;
   void UseSparseFieldsetsForLibraryEntries(HttpRequest& http_request) const;
   void UseSparseFieldsetsForUser(HttpRequest& http_request) const;
 
