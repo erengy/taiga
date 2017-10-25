@@ -402,8 +402,8 @@ bool Database::LoadList() {
         return LoadList();
     } else {
       ui::DisplayErrorMessage(L"Could not read anime list.", path.c_str());
-      return false;
     }
+    return false;
   }
 
   xml_node meta_node = document.child(L"meta");
