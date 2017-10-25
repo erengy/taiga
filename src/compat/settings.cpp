@@ -154,6 +154,14 @@ bool AppSettings::HandleCompatibility() {
     auto external_links = GetWstr(kApp_Interface_ExternalLinks);
     ReplaceString(external_links, L"Hummingbird Tools|", L"Hibari|");
     Set(kApp_Interface_ExternalLinks, external_links);
+
+    // Change active Nyaa.se feeds to new defaults
+    if (GetWstr(kTorrent_Discovery_Source) == L"nyaa.se") {
+      Set(kTorrent_Discovery_Source, kDefaultTorrentSource);
+    }
+    if (GetWstr(kTorrent_Discovery_SearchUrl) == L"nyaa.se") {
+      Set(kTorrent_Discovery_SearchUrl, kDefaultTorrentSearch);
+    }
   }
 
   return true;

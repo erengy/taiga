@@ -169,6 +169,9 @@ enum AppSettingName {
   kAppSettingNameLast  // used for iteration
 };
 
+extern const std::wstring kDefaultTorrentSearch;
+extern const std::wstring kDefaultTorrentSource;
+
 class AppSettings : public base::Settings {
 public:
   bool Load();
