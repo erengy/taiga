@@ -279,8 +279,8 @@ void FeedConditionDialog::ChooseElement(int element_index) {
       break;
     case kFeedFilterElement_Meta_Status:
       RECREATE_COMBO(CBS_DROPDOWNLIST);
-      value_combo_.AddItem(anime::TranslateStatus(anime::kAiring).c_str(), anime::kAiring);
       value_combo_.AddItem(anime::TranslateStatus(anime::kFinishedAiring).c_str(), anime::kFinishedAiring);
+      value_combo_.AddItem(anime::TranslateStatus(anime::kAiring).c_str(), anime::kAiring);
       value_combo_.AddItem(anime::TranslateStatus(anime::kNotYetAired).c_str(), anime::kNotYetAired);
       break;
     case kFeedFilterElement_Meta_Type:
