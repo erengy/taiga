@@ -45,7 +45,7 @@ enum ThirdPartyLibrary {
 static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
   switch (library) {
     case kDate:
-      return L"2.2";
+      return L"2.3";
     case kJson:
       return StrToWstr(nlohmann::json::meta()["version"]["string"]);
     case kLibcurl:
