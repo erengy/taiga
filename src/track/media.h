@@ -78,7 +78,6 @@ enum class Stream {
   Animelab,
   Ann,
   Crunchyroll,
-  Daisuki,
   Hidive,
   Plex,
   Veoh,

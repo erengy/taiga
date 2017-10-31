@@ -62,15 +62,6 @@ static const std::vector<StreamData> stream_data{
     ),
     std::regex("Crunchyroll - Watch (?:(.+) - (?:Movie - Movie|ONA - ONA|OVA - OVA)|(.+))"),
   },
-  // DAISUKI
-  {
-    Stream::Daisuki,
-    taiga::kStream_Daisuki,
-    L"DAISUKI",
-    L"http://www.daisuki.net",
-    std::regex("daisuki\\.net/[a-z]+/[a-z]+/anime/watch"),
-    std::regex("(.+) - DAISUKI"),
-  },
   // HIDIVE
   {
     Stream::Hidive,
@@ -194,11 +185,6 @@ void CleanStreamTitle(const StreamData& stream_data, std::string& title) {
     case Stream::Ann: {
       static const std::regex pattern{" \\((?:s|d)(?:, uncut)?\\)"};
       title = std::regex_replace(title, pattern, "");
-      break;
-    }
-    case Stream::Daisuki: {
-      static const std::regex pattern{"(#\\d+ .+) - (.+)"};
-      title = std::regex_replace(title, pattern, "$2 - $1");
       break;
     }
     case Stream::Plex: {
