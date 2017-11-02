@@ -122,6 +122,10 @@
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\token.cpp" />
     <ClCompile Include="..\..\deps\src\anitomy\anitomy\tokenizer.cpp" />
     <ClCompile Include="..\..\deps\src\base64\base64.cpp" />
+    <ClCompile Include="..\..\deps\src\fmt\fmt\format.cc" />
+    <ClCompile Include="..\..\deps\src\fmt\fmt\ostream.cc" />
+    <ClCompile Include="..\..\deps\src\fmt\fmt\posix.cc" />
+    <ClCompile Include="..\..\deps\src\fmt\fmt\printf.cc" />
     <ClCompile Include="..\..\deps\src\monolog\monolog.cpp" />
     <ClCompile Include="..\..\deps\src\pugixml\src\pugixml.cpp" />
     <ClCompile Include="..\..\deps\src\utf8proc\utf8proc.c" />
@@ -294,6 +298,13 @@
     <ClInclude Include="..\..\deps\src\curl\include\curl\stdcheaders.h" />
     <ClInclude Include="..\..\deps\src\curl\include\curl\typecheck-gcc.h" />
     <ClInclude Include="..\..\deps\src\date\date.h" />
+    <ClInclude Include="..\..\deps\src\fmt\fmt\container.h" />
+    <ClInclude Include="..\..\deps\src\fmt\fmt\format.h" />
+    <ClInclude Include="..\..\deps\src\fmt\fmt\ostream.h" />
+    <ClInclude Include="..\..\deps\src\fmt\fmt\posix.h" />
+    <ClInclude Include="..\..\deps\src\fmt\fmt\printf.h" />
+    <ClInclude Include="..\..\deps\src\fmt\fmt\string.h" />
+    <ClInclude Include="..\..\deps\src\fmt\fmt\time.h" />
     <ClInclude Include="..\..\deps\src\json\src\json.hpp" />
     <ClInclude Include="..\..\deps\src\monolog\monolog.h" />
     <ClInclude Include="..\..\deps\src\pugixml\src\pugiconfig.hpp" />

@@ -43,6 +43,9 @@
     <Filter Include="deps\date">
       <UniqueIdentifier>{01a715e8-af40-4ff8-893b-7a9491d532c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="deps\fmt">
+      <UniqueIdentifier>{451cd069-4306-41ae-acd9-57c5c2606e51}</UniqueIdentifier>
+    </Filter>
     <Filter Include="deps\json">
       <UniqueIdentifier>{dd9648e9-7e26-4239-a931-8fee59d183e7}</UniqueIdentifier>
     </Filter>
@@ -210,6 +213,18 @@
     </ClCompile>
     <ClCompile Include="..\..\deps\src\base64\base64.cpp">
       <Filter>deps\base64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\fmt\fmt\format.cc">
+      <Filter>deps\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\fmt\fmt\ostream.cc">
+      <Filter>deps\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\fmt\fmt\posix.cc">
+      <Filter>deps\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\src\fmt\fmt\printf.cc">
+      <Filter>deps\fmt</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\src\monolog\monolog.cpp">
       <Filter>deps\monolog</Filter>
@@ -716,6 +731,27 @@
     </ClInclude>
     <ClInclude Include="..\..\deps\src\date\date.h">
       <Filter>deps\date</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\fmt\container.h">
+      <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\fmt\format.h">
+      <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\fmt\ostream.h">
+      <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\fmt\posix.h">
+      <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\fmt\printf.h">
+      <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\fmt\string.h">
+      <Filter>deps\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\src\fmt\fmt\time.h">
+      <Filter>deps\fmt</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\src\json\src\json.hpp">
       <Filter>deps\json</Filter>

@@ -17,6 +17,7 @@
 */
 
 #include <curl/include/curl/curlver.h>
+#include <fmt/fmt/format.h>
 #include <json/src/json.hpp>
 #include <pugixml/src/pugixml.hpp>
 #include <utf8proc/utf8proc.h>
@@ -35,6 +36,7 @@ namespace ui {
 
 enum ThirdPartyLibrary {
   kDate,
+  kFmt,
   kJson,
   kLibcurl,
   kPugixml,
@@ -46,6 +48,11 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
   switch (library) {
     case kDate:
       return L"2.3";
+    case kFmt:
+      return StrToWstr(semaver::Version(
+          (FMT_VERSION / 10000),
+          (FMT_VERSION % 10000) / 100,
+          (FMT_VERSION % 10000) % 100).to_string());
     case kJson:
       return StrToWstr(nlohmann::json::meta()["version"]["string"]);
     case kLibcurl:
@@ -100,6 +107,7 @@ BOOL AboutDialog::OnInitDialog() {
       L"ryban, tollyx\\line\\par "
       L"\\b Third-party components:\\b0\\line "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/HowardHinnant/date\"}}{\\fldrslt{date " + GetLibraryVersion(kDate) + L"}}}, "
+      L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/fmtlib/fmt\"}}{\\fldrslt{fmt " + GetLibraryVersion(kFmt) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/yusukekamiyamane/fugue-icons\"}}{\\fldrslt{Fugue Icons 3.4.5}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/nlohmann/json\"}}{\\fldrslt{json " + GetLibraryVersion(kJson) + L"}}}, "
       L"{\\field{\\*\\fldinst{HYPERLINK \"https://github.com/curl/curl\"}}{\\fldrslt{libcurl " + GetLibraryVersion(kLibcurl) + L"}}}, "
