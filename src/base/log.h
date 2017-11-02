@@ -21,7 +21,21 @@
 #include <fmt/fmt/format.h>
 #include <monolog/monolog.h>
 
-#define LOGD(...) MONOLOG_DEBUG(fmt::format(__VA_ARGS__))
-#define LOGI(...) MONOLOG_INFO(fmt::format(__VA_ARGS__))
-#define LOGW(...) MONOLOG_WARNING(fmt::format(__VA_ARGS__))
-#define LOGE(...) MONOLOG_ERROR(fmt::format(__VA_ARGS__))
+namespace base {
+
+template <class... Args>
+void Log(const monolog::Level level, const monolog::Source& source,
+         const std::wstring& str, const Args&... args) {
+  const monolog::Record record{sizeof...(Args) ? fmt::format(str, args...) : str};
+  monolog::log.Write(level, record, source);
+}
+
+}  // namespace base
+
+#define TAIGA_LOG(level, text, ...) \
+    base::Log(level, monolog::Source{__FILE__, __FUNCTION__, __LINE__}, text, __VA_ARGS__)
+
+#define LOGD(text, ...) TAIGA_LOG(monolog::Level::Debug, text, __VA_ARGS__)
+#define LOGI(text, ...) TAIGA_LOG(monolog::Level::Informational, text, __VA_ARGS__)
+#define LOGW(text, ...) TAIGA_LOG(monolog::Level::Warning, text, __VA_ARGS__)
+#define LOGE(text, ...) TAIGA_LOG(monolog::Level::Error, text, __VA_ARGS__)
