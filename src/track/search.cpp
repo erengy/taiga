@@ -43,7 +43,7 @@ bool TaigaFileSearchHelper::OnDirectory(const std::wstring& root,
   parse_options.streaming_media = false;
 
   if (!Meow.Parse(name, parse_options, episode_)) {
-    LOGD(L"Could not parse directory: " + name);
+    LOGD(L"Could not parse directory: {}", name);
     return false;
   }
 
@@ -81,7 +81,7 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
   parse_options.streaming_media = false;
 
   if (!Meow.Parse(path, parse_options, episode_)) {
-    LOGD(L"Could not parse filename: " + name);
+    LOGD(L"Could not parse filename: {}", name);
     return false;
   }
 
@@ -103,8 +103,7 @@ bool TaigaFileSearchHelper::OnFile(const std::wstring& root,
     if (!anime::IsValidEpisodeNumber(upper_bound, anime_item->GetEpisodeCount()) ||
         !anime::IsValidEpisodeNumber(lower_bound, anime_item->GetEpisodeCount())) {
       std::wstring episode_number = anime::GetEpisodeRange(episode_);
-      LOGD(L"Invalid episode number: " + episode_number + L"\n"
-           L"File: " + path);
+      LOGD(L"Invalid episode number: {}\nFile: {}", episode_number, path);
       return false;
     }
 

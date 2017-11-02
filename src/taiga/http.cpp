@@ -91,7 +91,7 @@ void HttpClient::OnError(CURLcode error_code) {
       break;
   }
 
-  LOGE(error_text + L"\nConnection mode: " + ToWstr(mode_));
+  LOGE(L"{}\nConnection mode: {}", error_text, mode_);
 
   ui::OnHttpError(*this, error_text);
 
@@ -106,7 +106,7 @@ bool HttpClient::OnHeadersAvailable() {
 }
 
 bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
-  LOGD(L"Location: " + address);
+  LOGD(L"Location: {}", address);
 
   switch (mode()) {
     case kHttpTaigaUpdateDownload: {
@@ -132,7 +132,7 @@ bool HttpClient::OnRedirect(const std::wstring& address, bool refresh) {
     if (check_cloudflare(response_)) {
       std::wstring error_text = L"Cannot connect to " + request_.url.host +
                                 L" because of Cloudflare DDoS protection";
-      LOGE(error_text + L"\nConnection mode: " + ToWstr(mode_));
+      LOGE(L"{}\nConnection mode: {}", error_text, mode_);
       ui::OnHttpError(*this, error_text);
     } else {
       HttpRequest http_request = request_;
@@ -363,8 +363,8 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
   foreach_(it, clients_) {
     if (it->allow_reuse() && !it->busy()) {
       if (IsEqual(it->request().url.host, request.url.host)) {
-        LOGD(L"Reusing client with the ID: " + it->request().uid +
-             L"\nClient's new ID: " + request.uid);
+        LOGD(L"Reusing client with the ID: {}\nClient's new ID: {}",
+             it->request().uid, request.uid);
         client = &(*it);
         // Proxy settings might have changed since then
         client->set_proxy(Settings[kApp_Connection_ProxyHost],
@@ -378,8 +378,8 @@ HttpClient& HttpManager::GetClient(const HttpRequest& request) {
   if (!client) {
     clients_.push_back(HttpClient(request));
     client = &clients_.back();
-    LOGD(L"Created a new client. Total number of clients is now " +
-         ToWstr(clients_.size()));
+    LOGD(L"Created a new client. Total number of clients is now {}",
+         clients_.size());
   }
 
   return *client;
@@ -389,7 +389,7 @@ void HttpManager::AddToQueue(HttpRequest& request, HttpClientMode mode) {
 #ifdef TAIGA_HTTP_MULTITHREADED
   win::Lock lock(critical_section_);
 
-  LOGD(L"ID: " + request.uid);
+  LOGD(L"ID: {}", request.uid);
 
   requests_.push_back(std::make_pair(request, mode));
 #else
@@ -422,14 +422,13 @@ void HttpManager::ProcessQueue() {
     HttpClientMode mode = requests_.at(i).second;
 
     if (connections_[request.url.host] == kMaxSimultaneousConnectionsPerHostname) {
-      LOGD(L"Reached max connections for hostname: " + request.url.host);
+      LOGD(L"Reached max connections for hostname: {}", request.url.host);
       continue;
     } else {
       connections++;
       connections_[request.url.host]++;
-      LOGD(L"Connections for hostname is now " +
-           ToWstr(connections_[request.url.host]) +
-           L": " + request.url.host);
+      LOGD(L"Connections for hostname is now {}: {}",
+           connections_[request.url.host], request.url.host);
 
       HttpClient& client = GetClient(request);
       client.set_mode(mode);
@@ -447,8 +446,8 @@ void HttpManager::AddConnection(const string_t& hostname) {
   win::Lock lock(critical_section_);
 
   connections_[hostname]++;
-  LOGD(L"Connections for hostname is now " +
-       ToWstr(connections_[hostname]) + L": " + hostname);
+  LOGD(L"Connections for hostname is now {}: {}",
+       connections_[hostname], hostname);
 #endif
 }
 
@@ -458,10 +457,10 @@ void HttpManager::FreeConnection(const string_t& hostname) {
 
   if (connections_[hostname] > 0) {
     connections_[hostname]--;
-    LOGD(L"Connections for hostname is now " +
-         ToWstr(connections_[hostname]) + L": " + hostname);
+    LOGD(L"Connections for hostname is now {}: {}",
+         connections_[hostname], hostname);
   } else {
-    LOGE(L"Connections for hostname was already zero: " + hostname);
+    LOGE(L"Connections for hostname was already zero: {}", hostname);
   }
 #endif
 }

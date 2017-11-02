@@ -57,7 +57,7 @@ bool FileSearchHelper::Search(const std::wstring& root,
       if (log_errors_) {
         auto error_message = win::FormatError(GetLastError());
         TrimRight(error_message, L"\r\n");
-        LOGE(error_message + L"\nPath: " + path);
+        LOGE(L"{}\nPath: {}", error_message, path);
       }
       SetLastError(ERROR_SUCCESS);
       continue;

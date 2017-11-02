@@ -58,7 +58,7 @@ bool Engine::Parse(std::wstring filename, const ParseOptions& parse_options,
         anitomy_instance.options().ignored_strings);
 
   if (!anitomy_instance.Parse(filename)) {
-    LOGD(L"Could not parse filename: " + filename);
+    LOGD(L"Could not parse filename: {}", filename);
     if (episode.folder.empty())  // If not, perhaps we can parse the path later on
       return false;
   }
@@ -99,7 +99,7 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
     valide_ids(episode_merged_title);
     if (!anime_ids.empty()) {
       std::swap(episode_merged_title, episode);
-      LOGD(L"Merged title lookup succeeded: " + episode.anime_title());
+      LOGD(L"Merged title lookup succeeded: {}", episode.anime_title());
     }
   };
 
@@ -135,8 +135,8 @@ int Engine::Identify(anime::Episode& episode, bool give_score,
       valide_ids(episode_from_directory);
       if (!anime_ids.empty()) {
         std::swap(episode_from_directory, episode);
-        LOGD(L"Parent directory lookup succeeded: " +
-             episode_from_directory.anime_title() + L" -> " +
+        LOGD(L"Parent directory lookup succeeded: {} -> {}",
+             episode_from_directory.anime_title(),
              episode.anime_title());
       }
     }

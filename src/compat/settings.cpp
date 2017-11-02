@@ -61,8 +61,8 @@ bool AppSettings::HandleCompatibility() {
   if (version == Taiga.version)
     return false;
 
-  LOGW(L"Upgraded from v" + StrToWstr(version.to_string()) +
-       L" to v" + StrToWstr(Taiga.version.to_string()));
+  LOGW(L"Upgraded from v{} to v{}", StrToWstr(version.to_string()),
+       StrToWstr(Taiga.version.to_string()));
 
   if (version <= semaver::Version(1, 1, 7)) {
     // Convert old password encoding to base64

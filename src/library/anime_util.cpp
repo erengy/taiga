@@ -235,7 +235,7 @@ bool PlayEpisode(int anime_id, int number) {
       if (FileExists(next_episode_path)) {
         file_path = next_episode_path;
       } else {
-        LOGD(L"File doesn't exist anymore.\nPath: " + next_episode_path);
+        LOGD(L"File doesn't exist anymore.\nPath: {}", next_episode_path);
         anime_item->SetEpisodeAvailability(number, false, L"");
       }
     }
@@ -652,7 +652,7 @@ bool ValidateFolder(Item& item) {
   if (FolderExists(item.GetFolder()))
     return true;
 
-  LOGD(L"Folder doesn't exist anymore.\nPath: " + item.GetFolder());
+  LOGD(L"Folder doesn't exist anymore.\nPath: {}", item.GetFolder());
 
   item.SetFolder(L"");
 

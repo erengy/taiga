@@ -187,7 +187,7 @@ void DirectoryMonitor::MonitorProc() {
 void DirectoryMonitor::HandleStoppedState(DirectoryChangeEntry& entry) {
   if (ReadDirectoryChanges(entry)) {
     entry.state = DirectoryChangeEntry::State::Active;
-    LOGD(L"Started monitoring: " + entry.path);
+    LOGD(L"Started monitoring: {}", entry.path);
   }
 }
 
@@ -224,14 +224,14 @@ static void LogFileAction(const DirectoryChangeEntry& entry,
                           const DirectoryChangeNotification& notification) {
   switch (notification.action) {
     case FILE_ACTION_ADDED:
-      LOGD(L"Added: " + entry.path + notification.filename.first);
+      LOGD(L"Added: {}{}", entry.path, notification.filename.first);
       break;
     case FILE_ACTION_REMOVED:
-      LOGD(L"Removed: " + entry.path + notification.filename.first);
+      LOGD(L"Removed: {}{}", entry.path, notification.filename.first);
       break;
     case FILE_ACTION_RENAMED_NEW_NAME:
-      LOGD(L"Renamed (old): " + entry.path + notification.filename.second + L"\n"
-           L"Renamed (new): " + entry.path + notification.filename.first);
+      LOGD(L"Renamed (old): {0}{1}\nRenamed (new): {0}{2}", entry.path,
+           notification.filename.second, notification.filename.first);
       break;
   }
 }

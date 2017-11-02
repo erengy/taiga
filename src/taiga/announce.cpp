@@ -308,13 +308,13 @@ LRESULT Skype::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
     auto pCDS = reinterpret_cast<PCOPYDATASTRUCT>(lParam);
     std::wstring command = StrToWstr(reinterpret_cast<LPCSTR>(pCDS->lpData));
-    LOGD(L"Received WM_COPYDATA: " + command);
+    LOGD(L"Received WM_COPYDATA: {}", command);
 
     std::wstring profile_command = L"PROFILE RICH_MOOD_TEXT ";
     if (StartsWith(command, profile_command)) {
       std::wstring mood = command.substr(profile_command.length());
       if (mood != current_mood && mood != previous_mood) {
-        LOGD(L"Saved previous mood message: " + mood);
+        LOGD(L"Saved previous mood message: {}", mood);
         previous_mood = mood;
       }
     }

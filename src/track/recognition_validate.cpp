@@ -83,11 +83,9 @@ bool Engine::ValidateEpisodeNumber(anime::Episode& episode,
     if (SearchEpisodeRedirection(anime_item.GetId(), range,
                                  destination_id, destination_range)) {
       if (redirect) {
-        LOGD(L"Redirection: " +
-             ToWstr(anime_item.GetId()) + L":" +
-             anime::GetEpisodeRange(episode) + L" -> " +
-             ToWstr(destination_id) + L":" +
-             anime::GetEpisodeRange(destination_range));
+        LOGD(L"Redirection: {}:{} -> {}:{}",
+             anime_item.GetId(), anime::GetEpisodeRange(episode),
+             destination_id, anime::GetEpisodeRange(destination_range));
         episode.anime_id = destination_id;
         episode.set_episode_number_range(destination_range);
       }

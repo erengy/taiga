@@ -333,7 +333,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         download_path = Settings[taiga::kTorrent_Download_Location];
       }
       if (!download_path.empty() && !FolderExists(download_path)) {
-        LOGW(L"Folder doesn't exist.\nPath: " + download_path);
+        LOGW(L"Folder doesn't exist.\nPath: {}", download_path);
         download_path.clear();
       }
       // Create a subfolder using the anime title as its name
@@ -350,7 +350,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
         AddTrailingSlash(download_path);
         download_path += anime_title;
         if (!CreateFolder(download_path)) {
-          LOGE(L"Subfolder could not be created.\nPath: " + download_path);
+          LOGE(L"Subfolder could not be created.\nPath: {}", download_path);
           download_path.clear();
         } else {
           if (anime_item) {
@@ -380,7 +380,7 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
       parameters = L"-a \"" + file + L"\" -w \"" + download_path + L"\"";
       show_command = SW_HIDE;
     } else {
-      LOGD(L"Application is not a supported torrent client.\nPath: " + app_path);
+      LOGD(L"Application is not a supported torrent client.\nPath: {}", app_path);
     }
   }
 

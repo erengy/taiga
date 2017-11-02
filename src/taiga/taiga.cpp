@@ -71,8 +71,8 @@ BOOL App::InitInstance() {
   monolog::log.enable_console_output(false);
   monolog::log.set_path(path + TAIGA_APP_NAME L".log");
   monolog::log.set_level(debug_mode ? Level::Debug : Level::Warning);
-  LOGI(L"Version " + StrToWstr(version.to_string()) +
-       L" (" + GetFileLastModifiedDate(module_path) + L")");
+  LOGI(L"Version {} ({})", StrToWstr(version.to_string()),
+       GetFileLastModifiedDate(module_path));
 
   // Check another instance
   if (!allow_multiple_instances) {
@@ -144,7 +144,7 @@ void App::ParseCommandLineArguments() {
       allow_multiple_instances = true;
       LOGD(argument);
     } else {
-      LOGW(L"Invalid argument: " + argument);
+      LOGW(L"Invalid argument: {}", argument);
     }
   }
 

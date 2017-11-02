@@ -183,8 +183,7 @@ void HistoryQueue::Check(bool automatic) {
 
   auto anime_item = AnimeDatabase.FindItem(items[index].anime_id);
   if (!anime_item) {
-    LOGW(L"Item not found in list, removing... ID: " +
-         ToWstr(items[index].anime_id));
+    LOGW(L"Item not found in list, removing... ID: {}", items[index].anime_id);
     Remove(index, true, true, false);
     Check(automatic);
     return;
@@ -390,9 +389,8 @@ bool History::Load() {
       items.push_back(history_item);
     } else {
       LOGW(L"Item does not exist in the database.\n"
-           L"ID: " + ToWstr(history_item.anime_id) + L"\n"
-           L"Episode: " + ToWstr(*history_item.episode) + L"\n"
-           L"Time: " + history_item.time);
+           L"ID: {}\nEpisode: {}\nTime: {}",
+           history_item.anime_id, *history_item.episode, history_item.time);
     }
   }
   // Queue events
@@ -441,7 +439,7 @@ void History::ReadQueue(const pugi::xml_document& document) {
       queue.Add(history_item, false);
     } else {
       LOGW(L"Item does not exist in the database.\n"
-           L"ID: " + ToWstr(history_item.anime_id));
+           L"ID: {}", history_item.anime_id);
     }
   }
 }

@@ -57,8 +57,7 @@ Timer::Timer(unsigned int id, int interval, bool repeat)
 
 void Timer::OnTimeout() {
   if (interval() >= 60) {
-    LOGD(L"ID: " + ToWstr(id()) + L", "
-         L"Interval: " + ToWstr(this->interval()));
+    LOGD(L"ID: {}, Interval: {}", id(), this->interval());
   }
 
   switch (id()) {

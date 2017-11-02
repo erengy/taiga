@@ -38,8 +38,8 @@ void History::HandleCompatibility(const std::wstring& meta_version) {
         if (0 < score && score <= 10) {
           item.score = score * 10;
           need_to_save = true;
-          LOGW(L"Converted score of " + ToWstr(item.anime_id) +
-               L" from " + ToWstr(score) + L" to " + ToWstr(*item.score));
+          LOGW(L"Converted score of {} from {} to {}",
+               item.anime_id, score, *item.score);
         }
       }
     }
@@ -94,7 +94,7 @@ void History::ReadQueueInCompatibilityMode(const pugi::xml_document& document) {
       queue.Add(history_item, false);
     } else {
       LOGW(L"Item does not exist in the database.\n"
-           L"ID: " + ToWstr(history_item.anime_id));
+           L"ID: {}", history_item.anime_id);
     }
   }
 }

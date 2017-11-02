@@ -593,6 +593,6 @@ void ExecuteAction(std::wstring action, WPARAM wParam, LPARAM lParam) {
 
   // Unknown
   } else {
-    LOGW(L"Unknown action: " + action);
+    LOGW(L"Unknown action: {}", action);
   }
 }

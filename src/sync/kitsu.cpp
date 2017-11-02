@@ -608,7 +608,7 @@ void Service::ParseObject(const Json& json) const {
     case Type::Producers:
       break;
     default:
-      LOGD(L"Invalid type: " + StrToWstr(json["type"]));
+      LOGD(L"Invalid type: {}", StrToWstr(json["type"]));
       break;
   }
 }
@@ -618,7 +618,7 @@ int Service::ParseAnimeObject(const Json& json) const {
   const auto& attributes = json["attributes"];
 
   if (!anime_id) {
-    LOGW(L"Could not parse anime object:\n" + StrToWstr(json.dump()));
+    LOGW(L"Could not parse anime object:\n{}", StrToWstr(json.dump()));
     return anime::ID_UNKNOWN;
   }
 
@@ -722,7 +722,7 @@ int Service::ParseLibraryObject(const Json& json) const {
   const auto library_id = ToInt(JsonReadStr(json, "id"));
 
   if (!anime_id) {
-    LOGW(L"Could not parse library entry #" + ToWstr(library_id));
+    LOGW(L"Could not parse library entry #{}", library_id);
     return anime::ID_UNKNOWN;
   }
 

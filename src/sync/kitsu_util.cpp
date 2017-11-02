@@ -124,7 +124,7 @@ int TranslateAgeRatingFrom(const std::string& value) {
     return it->second;
 
   if (!value.empty())
-    LOGD(L"Invalid value: " + StrToWstr(value));
+    LOGD(L"Invalid value: {}", StrToWstr(value));
 
   return anime::kUnknownAgeRating;
 }
@@ -151,7 +151,7 @@ int TranslateSeriesTypeFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOGW(L"Invalid value: " + StrToWstr(value));
+  LOGW(L"Invalid value: {}", StrToWstr(value));
   return anime::kUnknownType;
 }
 
@@ -193,7 +193,7 @@ std::wstring TranslateMyRating(int value, RatingSystem rating_system) {
       return ToWstr(value / 2.0, 1);
   }
 
-  LOGW(L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: {}", value);
   return ToWstr(value);
 }
 
@@ -218,7 +218,7 @@ int TranslateMyStatusFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOGW(L"Invalid value: " + StrToWstr(value));
+  LOGW(L"Invalid value: {}", StrToWstr(value));
   return anime::kNotInList;
 }
 
@@ -231,7 +231,7 @@ std::string TranslateMyStatusTo(int value) {
     case anime::kPlanToWatch: return "planned";
   }
 
-  LOGW(L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: {}", value);
   return "";
 }
 
@@ -246,7 +246,7 @@ RatingSystem TranslateRatingSystemFrom(const std::string& value) {
   if (it != table.end())
     return it->second;
 
-  LOGW(L"Invalid value: " + StrToWstr(value));
+  LOGW(L"Invalid value: {}", StrToWstr(value));
   return RatingSystem::Regular;
 }
 

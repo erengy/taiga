@@ -37,7 +37,7 @@ bool Database::CheckOldUserDirectory() {
       return false;
     const auto new_path = taiga::GetPath(taiga::Path::User) +
                           taiga::GetUserDirectoryName(service_id);
-    LOGW(L"Renaming old user directory\n" + path + L"\n" + new_path);
+    LOGW(L"Renaming old user directory\n{}\n{}", path, new_path);
     return MoveFileEx(path.c_str(), new_path.c_str(), 0) != 0;
   };
 
@@ -89,8 +89,8 @@ void Database::HandleListCompatibility(const std::wstring& meta_version) {
       if (0 < score && score <= 10) {
         item.SetMyScore(score * 10);
         need_to_save = true;
-        LOGW(L"Converted score of " + ToWstr(item.GetId()) +
-             L" from " + ToWstr(score) + L" to " + ToWstr(item.GetMyScore(false)));
+        LOGW(L"Converted score of {} from {} to {}",
+             item.GetId(), score, item.GetMyScore(false));
       }
     }
   }

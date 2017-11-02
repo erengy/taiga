@@ -80,7 +80,7 @@ int TranslateSeriesStatusFrom(int value) {
     case kNotYetAired: return anime::kNotYetAired;
   }
 
-  LOGW(L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: {}", value);
   return anime::kUnknownStatus;
 }
 
@@ -93,7 +93,7 @@ int TranslateSeriesStatusFrom(const std::wstring& value) {
     return anime::kNotYetAired;
   }
 
-  LOGW(L"Invalid value: " + value);
+  LOGW(L"Invalid value: {}", value);
   return anime::kUnknownStatus;
 }
 
@@ -108,7 +108,7 @@ int TranslateSeriesTypeFrom(int value) {
     case kMusic: return anime::kMusic;
   }
 
-  LOGW(L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: {}", value);
   return anime::kUnknownType;
 }
 
@@ -127,7 +127,7 @@ int TranslateSeriesTypeFrom(const std::wstring& value) {
     return anime::kMusic;
   }
 
-  LOGW(L"Invalid value: " + value);
+  LOGW(L"Invalid value: {}", value);
   return anime::kUnknownType;
 }
 
@@ -158,7 +158,7 @@ std::wstring TranslateMyRating(int value, bool full) {
     case 10: return L"(10) Masterpiece";
   }
 
-  LOGW(L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: {}", value);
   return ToWstr(value);
 }
 
@@ -179,7 +179,7 @@ int TranslateMyStatusFrom(int value) {
     case kPlanToWatch: return anime::kPlanToWatch;
   }
 
-  LOGW(L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: {}", value);
   return anime::kNotInList;
 }
 
@@ -192,7 +192,7 @@ int TranslateMyStatusTo(int value) {
     case anime::kPlanToWatch: return kPlanToWatch;
   }
 
-  LOGW(L"Invalid value: " + ToWstr(value));
+  LOGW(L"Invalid value: {}", value);
   return kWatching;
 }
 

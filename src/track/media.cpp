@@ -64,10 +64,10 @@ bool MediaPlayers::Load() {
             return item.name == player.name;
           });
       if (it != items.end()) {
-        LOGD(L"Override: " + StrToWstr(player.name));
+        LOGD(L"Override: {}", StrToWstr(player.name));
         *it = player;
       } else {
-        LOGD(L"Add: " + StrToWstr(player.name));
+        LOGD(L"Add: {}", StrToWstr(player.name));
         items.push_back(player);
       }
     }

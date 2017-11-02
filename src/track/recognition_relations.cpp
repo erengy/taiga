@@ -202,7 +202,7 @@ bool Engine::ReadRelations(const std::string& document) {
       case FileSection::Rules: {
         TrimLeft(line, L"- ");
         if (!ParseRule(line))
-          LOGW(L"Could not parse rule: " + line);
+          LOGW(L"Could not parse rule: {}", line);
         break;
       }
     }

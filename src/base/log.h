@@ -18,9 +18,10 @@
 
 #pragma once
 
+#include <fmt/fmt/format.h>
 #include <monolog/monolog.h>
 
-#define LOGD MONOLOG_DEBUG
-#define LOGI MONOLOG_INFO
-#define LOGW MONOLOG_WARNING
-#define LOGE MONOLOG_ERROR
+#define LOGD(...) MONOLOG_DEBUG(fmt::format(__VA_ARGS__))
+#define LOGI(...) MONOLOG_INFO(fmt::format(__VA_ARGS__))
+#define LOGW(...) MONOLOG_WARNING(fmt::format(__VA_ARGS__))
+#define LOGE(...) MONOLOG_ERROR(fmt::format(__VA_ARGS__))

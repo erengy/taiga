@@ -183,7 +183,7 @@ void HistoryDialog::RefreshList() {
   foreach_cr_(it, History.queue.items) {
     auto anime_item = AnimeDatabase.FindItem(it->anime_id);
     if (!anime_item) {
-      LOGE(L"Item does not exist in the database: " + ToWstr(it->anime_id));
+      LOGE(L"Item does not exist in the database: {}", it->anime_id);
       continue;
     }
 
@@ -230,7 +230,7 @@ void HistoryDialog::RefreshList() {
   foreach_cr_(it, History.items) {
     auto anime_item = AnimeDatabase.FindItem(it->anime_id);
     if (!anime_item) {
-      LOGE(L"Item does not exist in the database: " + ToWstr(it->anime_id));
+      LOGE(L"Item does not exist in the database: {}", it->anime_id);
       continue;
     }
 

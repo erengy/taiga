@@ -29,7 +29,7 @@ namespace http {
 bool Client::MakeRequest(const Request& request) {
   // Check if the client is busy
   if (busy_) {
-    LOGW(L"Client is busy. ID: " + request_.uid);
+    LOGW(L"Client is busy. ID: {}", request_.uid);
     return false;
   } else {
     busy_ = true;
@@ -37,7 +37,7 @@ bool Client::MakeRequest(const Request& request) {
 
   // Set the new request
   request_ = request;
-  LOGD(L"ID: " + request_.uid);
+  LOGD(L"ID: {}", request_.uid);
 
   // Ensure that the response has the same parameter and UID as the request
   response_.parameter = request_.parameter;
@@ -98,7 +98,7 @@ bool Client::SetRequestOptions() {
   // Set URL
   std::wstring url = request_.url.Build();
   TAIGA_CURL_SET_OPTION(CURLOPT_URL, WstrToStr(url).c_str());
-  LOGD(L"URL: " + url);
+  LOGD(L"URL: {}", url);
 
   // Set allowed protocols
   int protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;

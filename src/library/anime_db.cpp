@@ -93,9 +93,9 @@ void Database::ReadDatabaseNode(xml_node& database_node) {
       auto current_service_id = taiga::GetCurrentServiceId();
       if (id_map.find(current_service_id) != id_map.end()) {
         source = current_service_id;
-        LOGW(L"Fixed source for ID: " + id_map[source]);
+        LOGW(L"Fixed source for ID: {}", id_map[source]);
       } else {
-        LOGE(L"Invalid source for ID: " + id_map[sync::kTaiga]);
+        LOGE(L"Invalid source for ID: {}", id_map[sync::kTaiga]);
         continue;
       }
     }
@@ -208,7 +208,7 @@ Item* Database::FindItem(int id, bool log_error) {
     if (it != items.end())
       return &it->second;
     if (log_error)
-      LOGE(L"Could not find ID: " + ToWstr(id));
+      LOGE(L"Could not find ID: {}", id);
   }
 
   return nullptr;
@@ -221,7 +221,7 @@ Item* Database::FindItem(const std::wstring& id, enum_t service,
       if (id == pair.second.GetId(service))
         return &pair.second;
     if (log_error)
-      LOGE(L"Could not find ID: " + id);
+      LOGE(L"Could not find ID: {}", id);
   }
 
   return nullptr;
@@ -233,7 +233,7 @@ void Database::ClearInvalidItems() {
   for (auto it = items.begin(); it != items.end(); ) {
     if (!anime::IsValidId(it->second.GetId()) ||
         it->first != it->second.GetId()) {
-      LOGD(L"ID: " + ToWstr(it->first));
+      LOGD(L"ID: {}", it->first);
       items.erase(it++);
     } else {
       ++it;
@@ -249,7 +249,7 @@ bool Database::DeleteItem(int id) {
     title = anime_item->GetTitle();
 
   if (items.erase(id) > 0) {
-    LOGW(L"ID: " + ToWstr(id) + L" | Title: " + title);
+    LOGW(L"ID: {} | Title: {}", id, title);
 
     auto delete_history_items = [](int id, std::vector<HistoryItem>& items) {
       items.erase(std::remove_if(items.begin(), items.end(),
@@ -287,7 +287,7 @@ int Database::UpdateItem(const Item& new_item) {
     auto source = new_item.GetSource();
 
     if (source == sync::kTaiga) {
-      LOGE(L"Invalid source for ID: " + new_item.GetId(source));
+      LOGE(L"Invalid source for ID: {}", new_item.GetId(source));
       return ID_UNKNOWN;
     }
 

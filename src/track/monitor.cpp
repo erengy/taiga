@@ -44,8 +44,8 @@ static void ChangeAnimeFolder(anime::Item& anime_item,
   anime_item.SetFolder(path);
   Settings.Save();
 
-  LOGD(L"Anime folder changed: " + anime_item.GetTitle() + L"\n"
-       L"Path: " + anime_item.GetFolder());
+  LOGD(L"Anime folder changed: {}\nPath: {}",
+       anime_item.GetTitle(), anime_item.GetFolder());
 
   if (path.empty()) {
     for (int i = 1; i <= anime_item.GetAvailableEpisodeCount(); ++i) {
@@ -66,9 +66,8 @@ void FolderMonitor::HandleChangeNotification(
       OnFile(notification);
       break;
     default:
-      LOGD(L"Unknown change type\n"
-           L"Path: " + notification.path + L"\n"
-           L"Filename: " + notification.filename.first);
+      LOGD(L"Unknown change type\nPath: {}\nFilename: {}",
+           notification.path, notification.filename.first);
       break;
   }
 }
@@ -171,8 +170,8 @@ void FolderMonitor::OnFile(const DirectoryChangeNotification& notification) cons
   std::wstring path = notification.path + notification.filename.first;
   for (int number = lower_bound; number <= upper_bound; ++number) {
     if (anime_item->SetEpisodeAvailability(number, path_available, path)) {
-      LOGD(anime_item->GetTitle() + L" #" + ToWstr(number) + L" is " +
-           (path_available ? L"available." : L"unavailable."));
+      LOGD(L"{} #{} is {}.", anime_item->GetTitle(), number,
+           path_available ? L"available" : L"unavailable");
     }
   }
 }
