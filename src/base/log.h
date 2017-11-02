@@ -19,3 +19,8 @@
 #pragma once
 
 #include <monolog/monolog.h>
+
+#define LOGD MONOLOG_DEBUG
+#define LOGI MONOLOG_INFO
+#define LOGW MONOLOG_WARNING
+#define LOGE MONOLOG_ERROR
