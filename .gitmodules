@@ -22,6 +22,10 @@
 	path = deps/src/date
 	url = https://github.com/HowardHinnant/date.git
 
+[submodule "fmt"]
+	path = deps/src/fmt
+	url = https://github.com/fmtlib/fmt.git
+
 [submodule "json"]
 	path = deps/src/json
 	url = https://github.com/nlohmann/json.git
