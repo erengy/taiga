@@ -56,13 +56,15 @@ static std::wstring GetLibraryVersion(ThirdPartyLibrary library) {
     case kJson:
       return StrToWstr(nlohmann::json::meta()["version"]["string"]);
     case kLibcurl:
-      return StrToWstr(LIBCURL_VERSION);
-    case kPugixml: {
+      return StrToWstr(semaver::Version(
+          LIBCURL_VERSION_MAJOR,
+          LIBCURL_VERSION_MINOR,
+          LIBCURL_VERSION_PATCH).to_string());
+    case kPugixml:
       return StrToWstr(semaver::Version(
           (PUGIXML_VERSION / 100),
           (PUGIXML_VERSION % 100) / 10,
           (PUGIXML_VERSION % 100) % 10).to_string());
-    }
     case kUtf8proc:
       return StrToWstr(utf8proc_version());
     case kZlib:
