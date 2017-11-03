@@ -371,14 +371,14 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
   if (!download_path.empty()) {
     // uTorrent
     if (InStr(GetFileName(app_path), L"utorrent", 0, true) > -1) {
-      parameters = L"/directory \"{}\" \"{}\""_format(download_path, file);
+      parameters = LR"(/directory "{}" "{}")"_format(download_path, file);
     // Deluge
     } else if (InStr(GetFileName(app_path), L"deluge-console", 0, true) > -1) {
-      parameters = L"add -p \\\"{}\\\" \\\"{}\\\""_format(download_path, file);
+      parameters = LR"(add -p \"{}\" \"{}\")"_format(download_path, file);
       show_command = SW_HIDE;
     // Transmission
     } else if (InStr(GetFileName(app_path), L"transmission-remote", 0, true) > -1) {
-      parameters = L"-a \"{}\" -w \"{}\""_format(file, download_path);
+      parameters = LR"(-a "{}" -w "{}")"_format(file, download_path);
       show_command = SW_HIDE;
     } else {
       LOGD(L"Application is not a supported torrent client.\nPath: {}", app_path);

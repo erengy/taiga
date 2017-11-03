@@ -146,7 +146,7 @@ bool ExecuteFile(const std::wstring& path, std::wstring parameters) {
   if (exe_path.empty())
     return false;
 
-  parameters = L"\"{}\" \"{}\" {}"_format(
+  parameters = LR"("{}" "{}" {})"_format(
       exe_path, GetExtendedLengthPath(path), parameters);
 
   PROCESS_INFORMATION process_information = {0};
@@ -202,14 +202,14 @@ int DeleteFolder(std::wstring path) {
 // Extends the length limit from 260 to 32767 characters
 // See: http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247%28v=vs.85%29.aspx#maxpath
 std::wstring GetExtendedLengthPath(const std::wstring& path) {
-  const std::wstring prefix = L"\\\\?\\";
+  const std::wstring prefix = LR"(\\?\)";
 
   if (StartsWith(path, prefix))
     return path;
 
   // "\\computer\path" -> "\\?\UNC\computer\path"
-  if (StartsWith(path, L"\\\\"))
-    return prefix + L"UNC\\" + path.substr(2);
+  if (StartsWith(path, LR"(\\)"))
+    return prefix + LR"(UNC\)" + path.substr(2);
 
   // "C:\path" -> "\\?\C:\path"
   return prefix + path;
