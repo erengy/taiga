@@ -89,6 +89,7 @@
       <ObjectFileName>$(IntDir)\x\x\%(RelativeDir)</ObjectFileName>
       <AdditionalIncludeDirectories>..\..\deps\src;..\..\src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
