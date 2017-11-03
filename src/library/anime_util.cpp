@@ -20,6 +20,7 @@
 
 #include "base/file.h"
 #include "base/foreach.h"
+#include "base/format.h"
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
@@ -250,8 +251,8 @@ bool PlayEpisode(int anime_id, int number) {
   }
 
   if (file_path.empty()) {
-    ui::ChangeStatusText(L"Could not find episode #" + ToWstr(number) +
-                         L" (" + anime_item->GetTitle() + L").");
+    ui::ChangeStatusText(L"Could not find episode #{} ({})."_format(
+                         number, anime_item->GetTitle()));
   } else {
     Execute(file_path);
   }

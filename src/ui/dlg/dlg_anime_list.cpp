@@ -21,6 +21,7 @@
 
 #include <windows/win/version.h>
 
+#include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -177,7 +178,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         if (tab_index > -1) {
           int status = tab.GetItemParam(tab_index);
           if (anime_item->IsInList()) {
-            ExecuteAction(L"EditStatus(" + ToWstr(status) + L")", 0,
+            ExecuteAction(L"EditStatus({})"_format(status), 0,
                           reinterpret_cast<LPARAM>(&anime_ids));
           } else {
             for (const auto& id : anime_ids) {
@@ -205,7 +206,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
           int index = DlgMain.treeview.GetItemData(ht.hItem);
           switch (index) {
             case kSidebarItemSearch:
-              ExecuteAction(L"SearchAnime(" + text + L")");
+              ExecuteAction(L"SearchAnime({})"_format(text));
               break;
             case kSidebarItemFeeds:
               DlgTorrent.Search(Settings[taiga::kTorrent_Discovery_SearchUrl], anime_id);
@@ -848,11 +849,11 @@ LRESULT AnimeListDialog::OnListNotify(LPARAM lParam) {
               return TRUE;
             // Edit score
             } else if (pnkd->wVKey >= '0' && pnkd->wVKey <= '9') {
-              ExecuteAction(L"EditScore(" + ToWstr((pnkd->wVKey - '0') * 10) + L")", 0,
+              ExecuteAction(L"EditScore({})"_format((pnkd->wVKey - '0') * 10), 0,
                             reinterpret_cast<LPARAM>(&anime_ids));
               return TRUE;
             } else if (pnkd->wVKey >= VK_NUMPAD0 && pnkd->wVKey <= VK_NUMPAD9) {
-              ExecuteAction(L"EditScore(" + ToWstr((pnkd->wVKey - VK_NUMPAD0) * 10) + L")", 0,
+              ExecuteAction(L"EditScore({})"_format((pnkd->wVKey - VK_NUMPAD0) * 10), 0,
                             reinterpret_cast<LPARAM>(&anime_ids));
               return TRUE;
             // Open folder

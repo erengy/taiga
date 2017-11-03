@@ -20,6 +20,7 @@
 #include <regex>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/html.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -364,20 +365,20 @@ void Aggregator::HandleFeedDownloadOpen(FeedItem& feed_item,
 
   TrimRight(download_path, L"\\");  // gets mixed up as an escape character
 
-  std::wstring parameters = L"\"" + file + L"\"";
+  std::wstring parameters = L"\"{}\""_format(file);
   int show_command = SW_SHOWNORMAL;
 
   if (!download_path.empty()) {
     // uTorrent
     if (InStr(GetFileName(app_path), L"utorrent", 0, true) > -1) {
-      parameters = L"/directory \"" + download_path + L"\" \"" + file + L"\"";
+      parameters = L"/directory \"{}\" \"{}\""_format(download_path, file);
     // Deluge
     } else if (InStr(GetFileName(app_path), L"deluge-console", 0, true) > -1) {
-      parameters = L"add -p \\\"" + download_path + L"\\\" \\\"" + file + L"\\\"";
+      parameters = L"add -p \\\"{}\\\" \\\"{}\\\""_format(download_path, file);
       show_command = SW_HIDE;
     // Transmission
     } else if (InStr(GetFileName(app_path), L"transmission-remote", 0, true) > -1) {
-      parameters = L"-a \"" + file + L"\" -w \"" + download_path + L"\"";
+      parameters = L"-a \"{}\" -w \"{}\""_format(file, download_path);
       show_command = SW_HIDE;
     } else {
       LOGD(L"Application is not a supported torrent client.\nPath: {}", app_path);

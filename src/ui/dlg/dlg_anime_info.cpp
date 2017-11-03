@@ -22,6 +22,7 @@
 #include <windows/win/version.h>
 
 #include "base/foreach.h"
+#include "base/format.h"
 #include "base/string.h"
 #include "base/process.h"
 #include "library/anime_db.h"
@@ -575,11 +576,11 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"Please choose the correct one from the list below:\n\n";
       for (const auto& pair : scores_) {
         passive_links.push_back(passive_links.empty() ? 1 : passive_links.back() + 2);
-        content += L"  \u2022 <a href=\"score\" id=\"" + ToWstr(pair.first) + L"\">" +
-                   AnimeDatabase.items[pair.first].GetTitle() + L"</a>" +
-                   L" <a href=\"Info(" + ToWstr(pair.first) + L")\">[?]</a>";
+        content += L"  \u2022 <a href=\"score\" id=\"{0}\">{1}</a>"
+                   L" <a href=\"Info({0})\">[?]</a>"_format(
+                   pair.first, AnimeDatabase.items[pair.first].GetTitle());
         if (Taiga.debug_mode)
-          content += L" [Score: " + ToWstr(pair.second) + L"]";
+          content += L" [Score: {}]"_format(pair.second);
         content += L"\n";
         if (++count >= 10)
           break;
@@ -621,8 +622,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       auto anime_item = AnimeDatabase.FindItem(id);
       if (!anime_item || !anime_item->IsNextEpisodeAvailable())
         continue;
-      std::wstring title = anime_item->GetTitle() + L" #" + ToWstr(anime_item->GetMyLastWatchedEpisode() + 1);
-      content += L"\u2022 <a href=\"PlayNext(" + ToWstr(id) + L")\">" + title + L"</a>\n";
+      std::wstring title = L"{} #{}"_format(anime_item->GetTitle(), anime_item->GetMyLastWatchedEpisode() + 1);
+      content += L"\u2022 <a href=\"PlayNext({})\">{}</a>\n"_format(id, title);
       recently_watched++;
       if (recently_watched >= 20)
         break;
@@ -650,9 +651,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         watched_last_week++;
     }
     if (watched_last_week > 0) {
-      content += L"You've watched " + ToWstr(watched_last_week) + L" ";
-      content += watched_last_week == 1 ? L"episode" : L"episodes";
-      content += L" in the last week.\n\n";
+      content += L"You've watched {} {} in the last week.\n\n"_format(
+          watched_last_week, watched_last_week == 1 ? L"episode" : L"episodes");
     }
 
     // Available episodes
@@ -662,9 +662,8 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         available_episodes++;
     }
     if (available_episodes > 0) {
-      content += L"There are at least " + ToWstr(available_episodes) + L" new ";
-      content += available_episodes == 1 ? L"episode" : L"episodes";
-      content += L" available in library folders.\n\n";
+      content += L"There are at least {} new {} available in library folders.\n\n"_format(
+          available_episodes, available_episodes == 1 ? L"episode" : L"episodes");
     }
 
     // Airing times
@@ -699,7 +698,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       std::wstring text;
       for (const auto& id : ids) {
         auto title = AnimeDatabase.FindItem(id)->GetTitle();
-        AppendString(text, L"<a href=\"Info(" + ToWstr(id) + L")\">" + title + L"</a>", L"  \u2022  ");
+        AppendString(text, L"<a href=\"Info({})\">{}</a>"_format(id, title), L"  \u2022  ");
       }
       content += text;
     };
@@ -733,12 +732,12 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
       content += L"\n";
     }
     if (anime_item && anime_item->IsInList()) {
-      content += L"<a href=\"EditAll(" + ToWstr(anime_id_) + L")\">Edit</a>";
+      content += L"<a href=\"EditAll({})\">Edit</a>"_format(anime_id_);
     } else {
       int status = anime::kPlanToWatch;
       if (mode_ == AnimeDialogMode::NowPlaying || CurrentEpisode.anime_id == anime_id_)
         status = anime::kWatching;
-      content += L"<a href=\"AddToList(" + ToWstr(status) + L")\">Add to list</a>";
+      content += L"<a href=\"AddToList({})\">Add to list</a>"_format(status);
     }
     if (anime_item && mode_ == AnimeDialogMode::NowPlaying) {
       content += L" \u2022 <a id=\"menu\" href=\"Announce\">Share</a>";
@@ -747,7 +746,7 @@ void AnimeDialog::Refresh(bool image, bool series_info, bool my_info, bool conne
         episode_number = 1;
       if (!anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()) ||
           anime_item->GetEpisodeCount() > episode_number) {
-        content += L" \u2022 <a href=\"PlayEpisode(" + ToWstr(episode_number + 1) + L"\">Watch next episode</a>";
+        content += L" \u2022 <a href=\"PlayEpisode({})\">Watch next episode</a>"_format(episode_number + 1);
       }
     }
     sys_link_.SetText(content);

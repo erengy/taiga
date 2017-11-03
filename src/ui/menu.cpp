@@ -18,6 +18,7 @@
 
 #include <windows/win/string.h>
 
+#include "base/format.h"
 #include "base/string.h"
 #include "base/xml.h"
 #include "library/anime_db.h"
@@ -108,16 +109,15 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
         // Play last episode
         if (anime_item->GetMyLastWatchedEpisode() > 0) {
           menu->CreateItem(L"PlayLast()",
-                           L"Play last episode (#" +
-                           ToWstr(anime_item->GetMyLastWatchedEpisode()) + L")");
+                           L"Play last episode (#{})"_format(
+                             anime_item->GetMyLastWatchedEpisode()));
         }
         // Play next episode
         if (!anime::IsValidEpisodeCount(anime_item->GetEpisodeCount()) ||
             anime_item->GetMyLastWatchedEpisode() < anime_item->GetEpisodeCount()) {
           menu->CreateItem(L"PlayNext()",
-                           L"Play next episode (#" +
-                           ToWstr(anime_item->GetMyLastWatchedEpisode() + 1) + L")"
-                           L"\tCtrl+N");
+                           L"Play next episode (#{})\tCtrl+N"_format(
+                             anime_item->GetMyLastWatchedEpisode() + 1));
         }
         // Play random episode
         if (anime_item->GetEpisodeCount() != 1) {
@@ -149,8 +149,8 @@ void MenuList::UpdateAnime(const anime::Item* anime_item) {
       count_column = count_max % 12 == 0 ? 12 : 13;
       if (count_max > 52)
         count_column *= 2;
-      menu->CreateItem(L"PlayEpisode(" + ToWstr(i) + L")",
-                       L"#" + ToWstr(i),
+      menu->CreateItem(L"PlayEpisode({})"_format(i),
+                       L"#{}"_format(i),
                        L"",
                        i <= anime_item->GetMyLastWatchedEpisode(),
                        false,
@@ -271,7 +271,7 @@ void MenuList::UpdateScore(const anime::Item* anime_item) {
 
     for (const auto& rating : ratings) {
       const bool current = rating.text == current_rating;
-      menu->CreateItem(L"EditScore(" + ToWstr(rating.value) + L")", rating.text,
+      menu->CreateItem(L"EditScore({})"_format(rating.value), rating.text,
                        L"", current, current, true, false, true);
     }
   }

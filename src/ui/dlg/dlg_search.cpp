@@ -18,6 +18,7 @@
 
 #include <windows/win/task_dialog.h>
 
+#include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "library/anime_db.h"
@@ -185,7 +186,7 @@ void SearchDialog::ParseResults(const std::vector<int>& ids) {
     return;
 
   if (ids.empty()) {
-    std::wstring msg = L"No results found for \"" + search_text + L"\".";
+    std::wstring msg = L"No results found for \"{}\"."_format(search_text);
     win::TaskDialog dlg(L"Search Anime", TD_INFORMATION_ICON);
     dlg.SetMainInstruction(msg.c_str());
     dlg.AddButton(L"OK", IDOK);
@@ -241,8 +242,8 @@ void SearchDialog::Search(const std::wstring& title, bool local) {
     Meow.Search(title, anime_ids_);
     RefreshList();
   } else {
-    ui::ChangeStatusText(L"Searching " + taiga::GetCurrentService()->name() +
-                         L" for \"" + title + L"\"...");
+    ui::ChangeStatusText(L"Searching {} for \"{}\"..."_format(
+                         taiga::GetCurrentService()->name(), title));
     sync::SearchTitle(title, anime::ID_UNKNOWN);
   }
 }

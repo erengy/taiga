@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "base/url.h"
@@ -216,7 +217,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
       }
       Aggregator.filter_manager.AddFilter(
           kFeedFilterActionDiscard, kFeedFilterMatchAll, kFeedFilterOptionDefault,
-          true, L"Discard \"" + anime_item->GetTitle() + L"\"");
+          true, L"Discard \"{}\""_format(anime_item->GetTitle()));
       Aggregator.filter_manager.filters.back().AddCondition(
           kFeedFilterElement_Meta_Id, kFeedFilterOperator_Equals,
           ToWstr(anime_item->GetId()));
@@ -240,7 +241,7 @@ void TorrentDialog::OnContextMenu(HWND hwnd, POINT pt) {
     Search(Settings[taiga::kTorrent_Discovery_SearchUrl], feed_item->episode_data.anime_title());
 
   } else if (answer == L"SearchService") {
-    ExecuteAction(L"SearchAnime(" + feed_item->episode_data.anime_title() + L")");
+    ExecuteAction(L"SearchAnime({})"_format(feed_item->episode_data.anime_title()));
   }
 }
 
@@ -316,7 +317,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           if (checked_count == 1) {
             DlgMain.ChangeStatus(L"Marked 1 torrent.");
           } else {
-            DlgMain.ChangeStatus(L"Marked " + ToWstr(checked_count) + L" torrents.");
+            DlgMain.ChangeStatus(L"Marked {} torrents."_format(checked_count));
           }
           FeedItem* feed_item = reinterpret_cast<FeedItem*>(list_.GetItemParam(pnmv->iItem));
           if (feed_item) {
@@ -523,7 +524,7 @@ void TorrentDialog::Search(std::wstring url, int anime_id) {
 void TorrentDialog::Search(std::wstring url, std::wstring title) {
   DlgMain.navigation.SetCurrentPage(kSidebarItemFeeds);
   DlgMain.edit.SetText(title);
-  DlgMain.ChangeStatus(L"Searching torrents for \"" + title + L"\"...");
+  DlgMain.ChangeStatus(L"Searching torrents for \"{}\"..."_format(title));
 
   ReplaceString(url, L"%title%", title);
   Aggregator.CheckFeed(FeedCategory::Link, url);
@@ -537,7 +538,7 @@ void TorrentDialog::SetTimer(int ticks) {
 
   if (Settings.GetBool(taiga::kTorrent_Discovery_AutoCheckEnabled) &&
       Settings.GetInt(taiga::kTorrent_Discovery_AutoCheckInterval) > 0) {
-    text += L" [" + ToTimeString(ticks) + L"]";
+    text += L" [{}]"_format(ToTimeString(ticks));
   }
 
   toolbar_.SetButtonText(0, text.c_str());

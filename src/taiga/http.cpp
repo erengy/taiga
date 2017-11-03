@@ -18,6 +18,7 @@
 
 #include "base/file.h"
 #include "base/foreach.h"
+#include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
 #include "base/url.h"
@@ -60,9 +61,8 @@ HttpClient::HttpClient(const HttpRequest& request)
 
   // The default header (e.g. "User-Agent: Taiga/1.0") will be used, unless
   // another value is specified in the request header
-  set_user_agent(
-      TAIGA_APP_NAME L"/" +
-      ToWstr(TAIGA_VERSION_MAJOR) + L"." + ToWstr(TAIGA_VERSION_MINOR));
+  set_user_agent(L"{}/{}.{}"_format(
+      TAIGA_APP_NAME, TAIGA_VERSION_MAJOR, TAIGA_VERSION_MINOR));
 
   // Make sure all new clients use the proxy settings
   set_proxy(Settings[kApp_Connection_ProxyHost],

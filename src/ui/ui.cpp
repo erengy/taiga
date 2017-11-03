@@ -25,6 +25,7 @@
 #include <windows/win/taskbar.h>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_episode.h"
@@ -198,8 +199,8 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
       break;
     case taiga::kHttpFeedCheck:
     case taiga::kHttpFeedCheckAuto:
-      status = L"Checking new torrents via " +
-               http_client.request().url.host + L"...";
+      status = L"Checking new torrents via {}..."_format(
+               http_client.request().url.host);
       break;
     case taiga::kHttpFeedDownload:
       status = L"Downloading torrent file...";
@@ -229,11 +230,11 @@ void OnHttpProgress(const taiga::HttpClient& http_client) {
     float current_length = static_cast<float>(http_client.current_length());
     float content_length = static_cast<float>(http_client.content_length());
     int percentage = static_cast<int>((current_length / content_length) * 100);
-    status += L" (" + ToWstr(percentage) + L"%)";
+    status += L" ({}%)"_format(percentage);
     taskbar_list.SetProgressValue(static_cast<ULONGLONG>(current_length),
                                   static_cast<ULONGLONG>(content_length));
   } else {
-    status += L" (" + ToSizeString(http_client.current_length()) + L")";
+    status += L" ({})"_format(ToSizeString(http_client.current_length()));
   }
 
   ChangeStatusText(status);
@@ -482,8 +483,8 @@ void OnHistoryAddItem(const HistoryItem& history_item) {
   if (!sync::UserAuthenticated()) {
     auto anime_item = AnimeDatabase.FindItem(history_item.anime_id);
     if (anime_item) {
-      ChangeStatusText(L"\"" + anime_item->GetTitle() +
-                       L"\" is queued for update.");
+      ChangeStatusText(L"\"{}\" is queued for update."_format(
+                       anime_item->GetTitle()));
     }
   }
 }
@@ -686,9 +687,9 @@ void OnRecognitionFail() {
     MediaPlayers.set_title_changed(false);
     DlgNowPlaying.SetScores(Meow.GetScores());
     DlgNowPlaying.SetCurrentId(anime::ID_NOTINLIST);
-    ChangeStatusText(L"Watching: " + CurrentEpisode.anime_title() +
-                     PushString(L" #", anime::GetEpisodeRange(CurrentEpisode)) +
-                     L" (Not recognized)");
+    ChangeStatusText(L"Watching: {}{} (Not recognized)"_format(
+                     CurrentEpisode.anime_title(),
+                     PushString(L" #", anime::GetEpisodeRange(CurrentEpisode))));
     if (Settings.GetBool(taiga::kSync_GoToNowPlaying_NotRecognized))
       DlgMain.navigation.SetCurrentPage(kSidebarItemNowPlaying);
     if (Settings.GetBool(taiga::kSync_Notify_NotRecognized)) {
@@ -821,9 +822,9 @@ bool OnSettingsServiceChangeConfirm(const string_t& current_service,
                                     const string_t& new_service) {
   win::TaskDialog dlg(TAIGA_APP_TITLE, TD_ICON_INFORMATION);
   std::wstring instruction =
-      L"Are you sure you want to change the active service from " +
-      ServiceManager.service(current_service)->name() + L" to " +
-      ServiceManager.service(new_service)->name() + L"?";
+      L"Are you sure you want to change the active service from {} to {}?"_format(
+      ServiceManager.service(current_service)->name(),
+      ServiceManager.service(new_service)->name());
   dlg.SetMainInstruction(instruction.c_str());
   dlg.SetContent(L"Note that:\n"
                  L"- Your list will not be moved from one service to another. "

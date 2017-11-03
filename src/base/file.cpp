@@ -23,6 +23,7 @@
 #include <windows/win/registry.h>
 
 #include "file.h"
+#include "format.h"
 #include "string.h"
 #include "time.h"
 
@@ -145,9 +146,8 @@ bool ExecuteFile(const std::wstring& path, std::wstring parameters) {
   if (exe_path.empty())
     return false;
 
-  parameters = L"\"" + exe_path + L"\" " +
-               L"\"" + GetExtendedLengthPath(path) + L"\"" +
-               parameters;
+  parameters = L"\"{}\" \"{}\" {}"_format(
+      exe_path, GetExtendedLengthPath(path), parameters);
 
   PROCESS_INFORMATION process_information = {0};
   STARTUPINFO startup_info = {sizeof(STARTUPINFO)};

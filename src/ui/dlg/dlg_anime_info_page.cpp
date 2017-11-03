@@ -18,6 +18,7 @@
 
 #include <windows/win/common_dialogs.h>
 
+#include "base/format.h"
 #include "base/string.h"
 #include "library/anime_db.h"
 #include "library/anime_util.h"
@@ -477,8 +478,8 @@ bool PageMyInfo::Save() {
   // Episodes watched
   history_item.episode = GetDlgItemInt(IDC_EDIT_ANIME_PROGRESS);
   if (!anime::IsValidEpisodeNumber(*history_item.episode, anime_item->GetEpisodeCount())) {
-    std::wstring msg = L"Please enter a valid episode number between 0-" +
-                  ToWstr(anime_item->GetEpisodeCount()) + L".";
+    std::wstring msg = L"Please enter a valid episode number between 0-{}."_format(
+        anime_item->GetEpisodeCount());
     MessageBox(msg.c_str(), L"Episodes watched", MB_OK | MB_ICONERROR);
     return false;
   }

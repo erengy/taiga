@@ -17,6 +17,7 @@
 */
 
 #include "base/foreach.h"
+#include "base/format.h"
 #include "base/gfx.h"
 #include "base/log.h"
 #include "base/string.h"
@@ -212,9 +213,9 @@ void HistoryDialog::RefreshList() {
       AppendString(details, !it->enable_rewatching || *it->enable_rewatching != TRUE ?
                    L"Status: " + anime::TranslateMyStatus(*it->status, false) : L"Rewatching");
     if (it->tags)
-      AppendString(details, L"Tags: \"" + *it->tags + L"\"");
+      AppendString(details, L"Tags: \"{}\""_format(*it->tags));
     if (it->notes)
-      AppendString(details, L"Notes: \"" + *it->notes + L"\"");
+      AppendString(details, L"Notes: \"{}\""_format(*it->notes));
     if (it->date_start)
       AppendString(details, L"Date started: " + std::wstring(*it->date_start));
     if (it->date_finish)

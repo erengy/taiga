@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
 #include "base/xml.h"
@@ -39,8 +40,7 @@ bool ThemeManager::Load() {
   xml_parse_result parse_result = document.load_file(path.c_str());
 
   if (parse_result.status != pugi::status_ok) {
-    std::wstring message = L"Could not read theme file:\n" + path;
-    ui::DisplayErrorMessage(message.c_str(), TAIGA_APP_TITLE);
+    ui::DisplayErrorMessage(L"Could not read theme file:\n" + path, TAIGA_APP_TITLE);
     return false;
   }
 
@@ -86,15 +86,13 @@ bool ThemeManager::Load() {
   path = GetPathOnly(taiga::GetPath(taiga::Path::ThemeCurrent));
   HBITMAP bitmap_handle;
   for (size_t i = 0; i < kIconCount16px && i < icons16.size(); i++) {
-    bitmap_handle = GdiPlus.LoadImage(path + L"16px\\" +
-                                      icons16.at(i) + L".png",
+    bitmap_handle = GdiPlus.LoadImage(L"{}16px\\{}.png"_format(path, icons16.at(i)),
                                       ScaleX(16), ScaleY(16));
     icons16_.AddBitmap(bitmap_handle, CLR_NONE);
     DeleteObject(bitmap_handle);
   }
   for (size_t i = 0; i < kIconCount24px && i < icons24.size(); i++) {
-    bitmap_handle = GdiPlus.LoadImage(path + L"24px\\" +
-                                      icons24.at(i) + L".png",
+    bitmap_handle = GdiPlus.LoadImage(L"{}24px\\{}.png"_format(path, icons24.at(i)),
                                       ScaleX(24), ScaleY(24));
     icons24_.AddBitmap(bitmap_handle, CLR_NONE);
     DeleteObject(bitmap_handle);

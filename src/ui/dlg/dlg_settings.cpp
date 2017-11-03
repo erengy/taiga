@@ -20,6 +20,7 @@
 
 #include "base/base64.h"
 #include "base/file.h"
+#include "base/format.h"
 #include "base/string.h"
 #include "library/history.h"
 #include "sync/manager.h"
@@ -514,9 +515,10 @@ void SettingsDialog::RefreshTwitterLink() {
   if (Settings[taiga::kShare_Twitter_Username].empty()) {
     text = L"Taiga is not authorized to post to your Twitter account yet.";
   } else {
-    text = L"Taiga is authorized to post to this Twitter account: ";
-    text += L"<a href=\"URL(http://twitter.com/" + Settings[taiga::kShare_Twitter_Username];
-    text += L")\">" + Settings[taiga::kShare_Twitter_Username] + L"</a>";
+    text = L"Taiga is authorized to post to this Twitter account: "
+           L"<a href=\"URL(https://twitter.com/{})\">{}</a>"_format(
+             Settings[taiga::kShare_Twitter_Username],
+             Settings[taiga::kShare_Twitter_Username]);
   }
 
   pages[kSettingsPageSharingTwitter].SetDlgItemText(IDC_LINK_TWITTER, text.c_str());
