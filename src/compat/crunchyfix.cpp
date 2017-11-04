@@ -74,7 +74,10 @@ std::wstring GetProcessPath(DWORD process_id) {
     return std::wstring();
   }
 
-  return std::wstring(buffer, buffer_size);
+  auto path = std::wstring(buffer, buffer_size);
+  TrimLeft(path, L"\\?");
+
+  return path;
 }
 
 bool TerminateProcess() {
