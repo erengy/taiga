@@ -77,7 +77,6 @@ BOOL App::InitInstance() {
 
   // Apply fix for CrunchyViewer
   crunchyfix::ApplyFix();
-  return FALSE;
 
   // Check another instance
   if (!allow_multiple_instances) {
