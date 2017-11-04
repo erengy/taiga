@@ -22,6 +22,7 @@
 #include "base/log.h"
 #include "base/process.h"
 #include "base/string.h"
+#include "compat/crunchyfix.h"
 #include "library/anime_db.h"
 #include "library/history.h"
 #include "taiga/announce.h"
@@ -73,6 +74,10 @@ BOOL App::InitInstance() {
   monolog::log.set_level(debug_mode ? Level::Debug : Level::Warning);
   LOGI(L"Version {} ({})", StrToWstr(version.to_string()),
        GetFileLastModifiedDate(module_path));
+
+  // Apply fix for CrunchyViewer
+  crunchyfix::ApplyFix();
+  return FALSE;
 
   // Check another instance
   if (!allow_multiple_instances) {

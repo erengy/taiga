@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\src\base\url.cpp" />
     <ClCompile Include="..\..\src\base\xml.cpp" />
     <ClCompile Include="..\..\src\compat\anime_db.cpp" />
+    <ClCompile Include="..\..\src\compat\crunchyfix.cpp" />
     <ClCompile Include="..\..\src\compat\crypto.cpp" />
     <ClCompile Include="..\..\src\compat\history.cpp" />
     <ClCompile Include="..\..\src\compat\settings.cpp" />
@@ -368,6 +369,7 @@
     <ClInclude Include="..\..\src\base\types.h" />
     <ClInclude Include="..\..\src\base\url.h" />
     <ClInclude Include="..\..\src\base\xml.h" />
+    <ClInclude Include="..\..\src\compat\crunchyfix.h" />
     <ClInclude Include="..\..\src\compat\crypto.h" />
     <ClInclude Include="..\..\src\library\anime.h" />
     <ClInclude Include="..\..\src\library\anime_db.h" />
