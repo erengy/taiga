@@ -25,6 +25,7 @@
 #include <windows/win/task_dialog.h>
 
 #include "base/file.h"
+#include "base/format.h"
 #include "base/log.h"
 #include "base/string.h"
 
@@ -134,18 +135,27 @@ bool DeleteExecutableFile() {
   return true;
 }
 
-void ApplyFix() {
-  DeleteRegistryValue();
-  if (TerminateProcess())
-    ::Sleep(1000);
-  DeleteExecutableFile();
+void DisplayResultMessage() {
+  const auto footer_text =
+      LR"(For more information, visit: <A HREF="{0}">{0}</A>)"_format(
+      L"https://github.com/erengy/taiga/issues/489");
 
   win::TaskDialog dlg;
   dlg.SetWindowTitle(L"CrunchyViewer Fix");
   dlg.SetMainIcon(TD_ICON_INFORMATION);
   dlg.SetMainInstruction(L"The fix was applied. Please check the log file for details.");
+  dlg.SetFooterIcon(TD_ICON_INFORMATION);
+  dlg.SetFooter(footer_text.c_str());
   dlg.AddButton(L"OK", IDOK);
   dlg.Show(nullptr);
+}
+
+void ApplyFix() {
+  DeleteRegistryValue();
+  if (TerminateProcess())
+    ::Sleep(1000);
+  DeleteExecutableFile();
+  DisplayResultMessage();
 }
 
 }  // namespace crunchyfix
