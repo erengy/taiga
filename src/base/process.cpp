@@ -39,13 +39,17 @@ bool CheckInstance(LPCWSTR mutex_name, LPCWSTR class_name) {
 
 void ActivateWindow(HWND hwnd) {
   if (IsIconic(hwnd))
-    SendMessage(hwnd, WM_SYSCOMMAND, SC_RESTORE, NULL);
+    ::ShowWindow(hwnd, SW_RESTORE);
 
-  if (!IsWindowVisible(hwnd))
-    ShowWindow(hwnd, SW_SHOWNORMAL);
+  if (!IsWindowVisible(hwnd)) {
+    WINDOWPLACEMENT wp = {0};
+    wp.length = sizeof(WINDOWPLACEMENT);
+    ::GetWindowPlacement(hwnd, &wp);
+    ::ShowWindow(hwnd, wp.showCmd);
+  }
 
-  SetForegroundWindow(hwnd);
-  BringWindowToTop(hwnd);
+  ::SetForegroundWindow(hwnd);
+  ::BringWindowToTop(hwnd);
 }
 
 std::wstring GetWindowClass(HWND hwnd) {
