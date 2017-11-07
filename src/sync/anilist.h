@@ -57,6 +57,7 @@ private:
 
   bool ParseResponseBody(const std::wstring& body, Response& response, Json& json);
 
+  std::string ExpandQuery(std::wstring query) const;
   std::wstring GetMediaFields() const;
 
   string_t access_token_;

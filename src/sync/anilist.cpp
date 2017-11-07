@@ -90,8 +90,9 @@ void Service::AuthenticateUser(Request& request, HttpRequest& http_request) {
 }
 
 void Service::GetLibraryEntries(Request& request, HttpRequest& http_request) {
-  std::wstring query{LR"(query {
-  MediaListCollection (userName: "{userName}", type: ANIME) {
+  static const auto query{LR"(
+query ($userName: String!) {
+  MediaListCollection (userName: $userName, type: ANIME) {
     statusLists {
       ...mediaListFragment
     }
@@ -125,30 +126,38 @@ fragment mediaFragment on Media {
 })"
   };
 
-  ReplaceString(query, L"{userName}",
-                request.data[canonical_name_ + L"-username"]);
-  ReplaceString(query, L"{mediaFields}", GetMediaFields());
-
   const Json json{
-    {"query", WstrToStr(query)},
+    {
+      "query", ExpandQuery(query)
+    },
+    {
+      "variables", {
+        {"userName", WstrToStr(request.data[canonical_name_ + L"-username"])},
+      }
+    }
   };
 
   http_request.body = StrToWstr(json.dump());
 }
 
 void Service::GetMetadataById(Request& request, HttpRequest& http_request) {
-  std::wstring query{LR"(query {
-  Media (id: {id}, type: ANIME) {
+  static const auto query{LR"(
+query ($id: Int!) {
+  Media (id: $id, type: ANIME) {
     {mediaFields}
   }
 })"
   };
 
-  ReplaceString(query, L"{id}", request.data[canonical_name_ + L"-id"]);
-  ReplaceString(query, L"{mediaFields}", GetMediaFields());
-
   const Json json{
-    {"query", WstrToStr(query)},
+    {
+      "query", ExpandQuery(query)
+    },
+    {
+      "variables", {
+        {"id", ToInt(request.data[canonical_name_ + L"-id"])},
+      }
+    }
   };
 
   http_request.body = StrToWstr(json.dump());
@@ -363,6 +372,13 @@ bool Service::ParseResponseBody(const std::wstring& body,
   }
 
   return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::string Service::ExpandQuery(std::wstring query) const {
+  ReplaceString(query, L"{mediaFields}", GetMediaFields());
+  return WstrToStr(query);
 }
 
 std::wstring Service::GetMediaFields() const {
